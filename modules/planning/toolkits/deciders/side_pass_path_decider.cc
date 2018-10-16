@@ -36,9 +36,9 @@ using ::apollo::common::ErrorCode;
 using ::apollo::common::Status;
 using ::apollo::hdmap::PathOverlap;
 
-double ROAD_BUFFER = 0.2;
-double OBSTACLE_BUFFER = 0.2;
-double PLANNING_DIST_AFTER_OBSTACLE = 3.0;
+constexpr double kRoadBuffer = 0.2;
+constexpr double kObstacleBuffer = 0.2;
+constexpr double kPlanDistAfterObs = 3.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {
@@ -93,8 +93,10 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   double adc_end_s = reference_line_info->AdcSlBoundary().end_s();
   // Get obstacle info.
   bool no_obs_selected = true;
-  double nearest_obs_start_s, nearest_obs_end_s,
-         nearest_obs_start_l, nearest_obs_end_l;
+  double nearest_obs_start_s = 0.0;
+  double nearest_obs_end_s = 0.0;
+  double nearest_obs_start_l = 0.0;
+  double nearest_obs_end_l = 0.0;
   for (const auto* path_obstacle :
        reference_line_info->path_decision()->path_obstacles().Items()) {
     // Filter out obstacles that are behind ADC.
@@ -111,8 +113,10 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
       continue;
     }
     // Filter out those out-of-lane obstacles.
-    double lane_left_width_at_start_s, lane_left_width_at_end_s,
-           lane_right_width_at_start_s, lane_right_width_at_end_s;
+    double lane_left_width_at_start_s = 0.0;
+    double lane_left_width_at_end_s = 0.0;
+    double lane_right_width_at_start_s = 0.0;
+    double lane_right_width_at_end_s = 0.0;
     reference_line.GetLaneWidth(obs_start_s,
         &lane_left_width_at_start_s, &lane_right_width_at_start_s);
     reference_line.GetLaneWidth(obs_end_s,
@@ -173,31 +177,33 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     std::tuple<double, double, double> s_leftbound_rightbound;
     std::get<0>(s_leftbound_rightbound) = curr_s;
     // Check if boundary should be dictated by obstacle or road
-    if (curr_s >= nearest_obs_start_s && curr_s <= nearest_obs_end_s) {
+    if (curr_s >= nearest_obs_start_s - kObstacleBuffer
+        && curr_s <= nearest_obs_end_s + kObstacleBuffer) {
       is_blocked_by_obs = true;
     } else {
       is_blocked_by_obs = false;
     }
     // Get the road info at the current s.
-    double road_left_width_at_curr_s, road_right_width_at_curr_s;
+    double road_left_width_at_curr_s = 0.0;
+    double road_right_width_at_curr_s = 0.0;
     reference_line.GetRoadWidth(curr_s,
         &road_left_width_at_curr_s, &road_right_width_at_curr_s);
     if (!is_blocked_by_obs) {
       std::get<1>(s_leftbound_rightbound) =
-          -std::abs(road_left_width_at_curr_s-ROAD_BUFFER);
+          -std::abs(road_left_width_at_curr_s - kRoadBuffer);
       std::get<2>(s_leftbound_rightbound) =
-          std::abs(road_right_width_at_curr_s-ROAD_BUFFER);
+          std::abs(road_right_width_at_curr_s - kRoadBuffer);
     } else {
       if (decided_direction_ == LEFT) {
         std::get<1>(s_leftbound_rightbound) =
-            -std::abs(road_left_width_at_curr_s-ROAD_BUFFER);
+            -std::abs(road_left_width_at_curr_s - kRoadBuffer);
         std::get<2>(s_leftbound_rightbound) =
-            -nearest_obs_end_l;
+            -nearest_obs_end_l - kObstacleuffer;
       } else if (decided_direction_ == RIGHT) {
         std::get<1>(s_leftbound_rightbound) =
-            -nearest_obs_start_l;
+            -nearest_obs_start_l + kObstacleBuffer;
         std::get<2>(s_leftbound_rightbound) =
-            std::abs(road_right_width_at_curr_s-ROAD_BUFFER);
+            std::abs(road_right_width_at_curr_s - kRoadBuffer);
       } else {
         AERROR << "Side-pass direction undefined.";
         return false;
@@ -206,7 +212,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     list_s_leftbound_rightbound.push_back(s_leftbound_rightbound);
     // Move to next s
     curr_s += s_increment;
-    if (curr_s > PLANNING_DIST_AFTER_OBSTACLE + nearest_obs_end_s) {
+    if (curr_s > kPlanDistAfterObs + nearest_obs_end_s) {
       bound_cond_gen_finished = true;
     }
   }
