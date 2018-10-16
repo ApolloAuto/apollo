@@ -84,6 +84,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   weight_stitching_a_ = distance_approach_config_.weight_stitching(1);
   weight_first_order_time_ = distance_approach_config_.weight_time(0);
   weight_second_order_time_ = distance_approach_config_.weight_time(1);
+  min_safety_distance_ = distance_approach_config_.min_safety_distance();
 
   wheelbase_ = vehicle_param_.wheel_base();
   AINFO << "constructor out";
@@ -419,6 +420,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
         tmp3 += -g_[k] * nj[k];
       }
 
+      double tmp4 = 0.0;
       for (std::size_t k = 0; k < current_vertice_num; ++k) {
         tmp4 += bj(k, 0) * x[l_index + k];
       }
@@ -427,7 +429,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
           tmp3 +
           (x[state_index] + std::cos(x[state_index + 2]) * offset_) * tmp1 +
           (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) * tmp2 -
-          tmp4;
+          tmp4 - min_safety_distance_;
 
       // Update index
       counter += 4;
@@ -671,8 +673,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
 
     state_index = state_start_index_;
-    l_index = l_start_index_;
-    n_index = n_start_index_;
+    std::size_t l_index = l_start_index_;
+    std::size_t n_index = n_start_index_;
 
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
@@ -764,8 +766,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
           ++nz_index;
         }
 
-        // Update index
-        counter += 4;
+        // Update inde
         l_index += current_vertice_num;
         n_index += 4;
         constraint_index += 1;
@@ -1025,8 +1026,9 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
 
     state_index = state_start_index_;
-    l_index = l_start_index_;
-    n_index = n_start_index_;
+    std::size_t l_index = l_start_index_;
+    std::size_t n_index = n_start_index_;
+    std::size_t counter = 0;
 
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
@@ -1048,6 +1050,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         }
 
         double tmp3 = 0.0;
+        double tmp4 = 0.0;
         for (std::size_t k = 0; k < 4; ++k) {
           // TODO(QiL) : replace this one directly with x
           tmp3 += -g_[k] * nj[k];
@@ -1140,7 +1143,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         counter += 4;
         l_index += current_vertice_num;
         n_index += 4;
-        constraint_index += 1;
       }
     }
 
