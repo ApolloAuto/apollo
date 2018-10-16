@@ -58,7 +58,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Ones(4, 6);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
   Eigen::MatrixXd timeWS_ = Eigen::MatrixXd::Ones(1, 5);
-  Eigen::MatrixXd obstacles_vertices_num_;
+  Eigen::MatrixXd obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
   Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
   int num_of_variables_;
@@ -72,7 +72,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
 };
 
 void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
-  obstacles_vertices_num_ = 4 * Eigen::MatrixXd::Ones(obstacles_num_, 1);
+  obstacles_edges_num_ = 4 * Eigen::MatrixXd::Ones(obstacles_num_, 1);
 
   num_of_variables_ = 4 * (horizon_ + 1) + 2 * horizon_ + (horizon_ + 1) +
                       (horizon_ + 1) * 4 * obstacles_num_ +
@@ -84,7 +84,7 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
 
   ptop_.reset(new DistanceApproachIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xf_, last_time_u_, XYbounds_, obstacles_vertices_num_,
+      timeWS_, x0_, xf_, last_time_u_, XYbounds_, obstacles_edges_num_,
       obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_));
 }
 

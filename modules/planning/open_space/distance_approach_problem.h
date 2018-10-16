@@ -43,7 +43,7 @@ class DistanceApproachProblem {
       Eigen::MatrixXd x0, Eigen::MatrixXd xF, Eigen::MatrixXd last_time_u,
       std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
       Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
-      Eigen::MatrixXd obstacles_vertices_num, Eigen::MatrixXd obstacles_A,
+      Eigen::MatrixXd obstacles_edges_num, Eigen::MatrixXd obstacles_A,
       Eigen::MatrixXd obstacles_b);
 
   virtual ~DistanceApproachProblem() = default;
@@ -85,8 +85,8 @@ class DistanceApproachProblem {
   // number of obstacles
   std::size_t obstacles_num_;
 
-  // obstacles_vertices_num
-  Eigen::MatrixXd obstacles_vertices_num_;
+  // obstacles_edges_num
+  Eigen::MatrixXd obstacles_edges_num_;
 
   // obstacles_A
   Eigen::MatrixXd obstacles_A_;
