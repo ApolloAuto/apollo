@@ -142,35 +142,38 @@ void Fem1dExpandedJerkQpProblem::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
-  // N constraints on x
-  // 3N constraints on x', x'', x''' (large)
-  // N constraints on x'''
+  // 4N constraints on x, x', x'', x'''
   // 3(N-1) constraints on x, x', x''
   // 3 constraints on x_init_
   const int kNumParam = static_cast<int>(4 * num_var_);
   const int N = static_cast<int>(num_var_);
   const int kNumConstraint =
-      kNumParam + static_cast<int>(num_var_ + 3 * (num_var_ - 1) + 3);
+      kNumParam + static_cast<int>(3 * (num_var_ - 1) + 3);
   lower_bounds->resize(kNumConstraint);
   upper_bounds->resize(kNumConstraint);
 
   int constraint_index = 0;
 
   // set x, dx, ddx bounds
-  constexpr double LARGE_VALUE = 2.0;
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
       lower_bounds->at(constraint_index) = std::get<0>(x_bounds_[i]);
       upper_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
     } else if (i < 2 * N) {
-      lower_bounds->at(constraint_index) = -LARGE_VALUE;
-      upper_bounds->at(constraint_index) = LARGE_VALUE;
+      lower_bounds->at(constraint_index) = std::get<0>(dx_bounds_[i - N]);
+      upper_bounds->at(constraint_index) = std::get<1>(dx_bounds_[i - N]);
+    } else if (i + 1 < 3 * N) {
+      lower_bounds->at(constraint_index) = std::get<0>(ddx_bounds_[i - 2 * N]);
+      upper_bounds->at(constraint_index) = std::get<1>(ddx_bounds_[i - 2 * N]);
     } else if (i < 3 * N) {
-      lower_bounds->at(constraint_index) = -LARGE_VALUE;
-      upper_bounds->at(constraint_index) = LARGE_VALUE;
+      lower_bounds->at(constraint_index) = 0.0;
+      upper_bounds->at(constraint_index) = 0.0;
+    } else if (i + 1 < 4 * N) {
+      lower_bounds->at(constraint_index) = -max_x_third_order_derivative_;
+      upper_bounds->at(constraint_index) = max_x_third_order_derivative_;
     } else {
-      lower_bounds->at(constraint_index) = -LARGE_VALUE;
-      upper_bounds->at(constraint_index) = LARGE_VALUE;
+      lower_bounds->at(constraint_index) = 0.0;
+      upper_bounds->at(constraint_index) = 0.0;
     }
     ++constraint_index;
   }
@@ -212,19 +215,8 @@ void Fem1dExpandedJerkQpProblem::CalculateAffineConstraint(
     ++constraint_index;
   }
 
-  // x''' bounds
-  for (int i = 0; i < N; ++i) {
-    if (i + 1 < N) {
-      lower_bounds->at(constraint_index) = -weight_.x_third_order_derivative_w;
-      upper_bounds->at(constraint_index) = weight_.x_third_order_derivative_w;
-    } else {
-      lower_bounds->at(constraint_index) = 0.0;
-      upper_bounds->at(constraint_index) = 0.0;
-    }
-    ++constraint_index;
-  }
-
   CHECK_EQ(constraint_index, kNumConstraint);
+
   int ind_p = 0;
   for (int i = 0; i < kNumParam; ++i) {
     A_data->push_back(1.0);
@@ -292,12 +284,12 @@ void Fem1dExpandedJerkQpProblem::CalculateAffineConstraint(
         A_data->push_back(-delta_s_);
         A_indices->push_back(j + 6 * N + 1);
       }
-      A_data->push_back(1.0);
-      A_indices->push_back(j + 7 * N);
+      // A_data->push_back(1.0);
+      // A_indices->push_back(j + 7 * N);
       if (j + 1 < N) {
-        ind_p += 5;
+        ind_p += 4;
       } else {
-        ind_p += 2;
+        ind_p += 1;
       }
     }
   }
@@ -315,7 +307,7 @@ void Fem1dExpandedJerkQpProblem::CalculateAffineConstraintUsingDenseMatrix(
   // 3(N-1) constraints on x, x', x''
   // 3 constraints on x_init_
   const size_t kNumParam = 4 * num_var_;
-  const size_t kNumConstraint = kNumParam + num_var_ + 3 * (num_var_ - 1) + 3;
+  const size_t kNumConstraint = kNumParam + 3 * (num_var_ - 1) + 3;
   MatrixXd affine_constraint = MatrixXd::Zero(kNumConstraint, kNumParam);
   lower_bounds->resize(kNumConstraint);
   upper_bounds->resize(kNumConstraint);
@@ -383,19 +375,6 @@ void Fem1dExpandedJerkQpProblem::CalculateAffineConstraintUsingDenseMatrix(
       affine_constraint(constraint_index, i + pprime_offset) = 1.0;
       affine_constraint(constraint_index, i + pprime_offset - 1) = -1.0;
       affine_constraint(constraint_index, i + ppprime_offset - 1) = -delta_s_;
-      lower_bounds->at(constraint_index) = 0.0;
-      upper_bounds->at(constraint_index) = 0.0;
-    }
-    ++constraint_index;
-  }
-  // x''' bounds
-  for (size_t i = 0; i < num_var_; ++i) {
-    if (i + 1 < num_var_) {
-      affine_constraint(constraint_index, i + ppprime_offset) = 1.0;
-      lower_bounds->at(constraint_index) = -weight_.x_third_order_derivative_w;
-      upper_bounds->at(constraint_index) = weight_.x_third_order_derivative_w;
-    } else {
-      affine_constraint(constraint_index, i + ppprime_offset) = 1.0;
       lower_bounds->at(constraint_index) = 0.0;
       upper_bounds->at(constraint_index) = 0.0;
     }

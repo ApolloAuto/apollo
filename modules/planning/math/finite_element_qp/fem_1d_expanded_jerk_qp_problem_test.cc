@@ -51,7 +51,7 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
     }
   }
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
-  double max_x_third_order_derivative = 0.25;
+  double max_x_third_order_derivative = 1.25;
   EXPECT_TRUE(
       fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
 
