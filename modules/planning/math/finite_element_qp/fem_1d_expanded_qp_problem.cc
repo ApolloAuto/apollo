@@ -119,7 +119,7 @@ void Fem1dExpandedQpProblem::CalculateOffset(std::vector<c_float>* q) {
   for (size_t i = 0; i < kNumParam; ++i) {
     if (i < x_bounds_.size()) {
       q->at(i) = -2.0 * weight_.x_mid_line_w *
-                 (std::get<1>(x_bounds_[i]) + std::get<2>(x_bounds_[i]));
+                 (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;
     }
@@ -204,8 +204,8 @@ void Fem1dExpandedQpProblem::CalculateAffineConstraint(
   for (size_t i = 0; i < kNumParam; ++i) {
     affine_constraint(constraint_index, i) = 1.0;
     if (i < num_var_) {
-      lower_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
-      upper_bounds->at(constraint_index) = std::get<2>(x_bounds_[i]);
+      lower_bounds->at(constraint_index) = std::get<0>(x_bounds_[i]);
+      upper_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
     } else {
       lower_bounds->at(constraint_index) = -LARGE_VALUE;
       upper_bounds->at(constraint_index) = LARGE_VALUE;

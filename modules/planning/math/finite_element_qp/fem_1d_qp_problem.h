@@ -131,7 +131,7 @@ class Fem1dQpProblem {
 
   virtual void ProcessBound(
       const std::vector<std::tuple<double, double, double>>& src,
-      std::vector<std::tuple<double, double, double>>* dst);
+      std::vector<std::pair<double, double>>* dst);
 
  protected:
   bool is_init_ = false;
@@ -145,9 +145,9 @@ class Fem1dQpProblem {
   std::vector<double> x_third_order_derivative_;
 
   std::array<double, 3> x_init_;
-  std::vector<std::tuple<double, double, double>> x_bounds_;
-  std::vector<std::tuple<double, double, double>> dx_bounds_;
-  std::vector<std::tuple<double, double, double>> ddx_bounds_;
+  std::vector<std::pair<double, double>> x_bounds_;
+  std::vector<std::pair<double, double>> dx_bounds_;
+  std::vector<std::pair<double, double>> ddx_bounds_;
 
   struct {
     double x_w = 0.0;

@@ -131,7 +131,7 @@ void Fem1dExpandedJerkQpProblem::CalculateOffset(std::vector<c_float>* q) {
   for (size_t i = 0; i < kNumParam; ++i) {
     if (i < x_bounds_.size()) {
       q->at(i) = -2.0 * weight_.x_mid_line_w *
-                 (std::get<1>(x_bounds_[i]) + std::get<2>(x_bounds_[i]));
+                 (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;
     }
@@ -157,12 +157,17 @@ void Fem1dExpandedJerkQpProblem::CalculateAffineConstraint(
   int constraint_index = 0;
 
   // set x, dx, ddx bounds
-  const double LARGE_VALUE = 2.0;
+  constexpr double LARGE_VALUE = 2.0;
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
-      // x_bounds_[i].first <= x[i] <= x_bounds_[i].second
-      lower_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
-      upper_bounds->at(constraint_index) = std::get<2>(x_bounds_[i]);
+      lower_bounds->at(constraint_index) = std::get<0>(x_bounds_[i]);
+      upper_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
+    } else if (i < 2 * N) {
+      lower_bounds->at(constraint_index) = -LARGE_VALUE;
+      upper_bounds->at(constraint_index) = LARGE_VALUE;
+    } else if (i < 3 * N) {
+      lower_bounds->at(constraint_index) = -LARGE_VALUE;
+      upper_bounds->at(constraint_index) = LARGE_VALUE;
     } else {
       lower_bounds->at(constraint_index) = -LARGE_VALUE;
       upper_bounds->at(constraint_index) = LARGE_VALUE;
@@ -323,8 +328,8 @@ void Fem1dExpandedJerkQpProblem::CalculateAffineConstraintUsingDenseMatrix(
     affine_constraint(constraint_index, i) = 1.0;
     if (i < num_var_) {
       // x_bounds_[i].first <= x[i] <= x_bounds_[i].second
-      lower_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
-      upper_bounds->at(constraint_index) = std::get<2>(x_bounds_[i]);
+      lower_bounds->at(constraint_index) = std::get<0>(x_bounds_[i]);
+      upper_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
     } else {
       lower_bounds->at(constraint_index) = -LARGE_VALUE;
       upper_bounds->at(constraint_index) = LARGE_VALUE;

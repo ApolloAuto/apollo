@@ -218,7 +218,7 @@ void Fem1dLinearQpProblem::CalculateOffset(std::vector<c_float>* q) {
   q->resize(num_var_);
   for (size_t i = 0; i < num_var_; ++i) {
     q->at(i) = -2.0 * weight_.x_mid_line_w *
-               (std::get<1>(x_bounds_[i]) + std::get<2>(x_bounds_[i]));
+               (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
   }
   // first order derivative offset
   q->at(0) += (-2.0 * x_init_[0]) * weight_.x_derivative_w / delta_s_sq_;
@@ -252,8 +252,8 @@ void Fem1dLinearQpProblem::CalculateAffineConstraint(
   int constraint_index = 0;
   for (size_t i = 0; i < num_var_; ++i) {
     // affine_constraint(i, i) = 1.0;
-    lower_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
-    upper_bounds->at(constraint_index) = std::get<2>(x_bounds_[i]);
+    lower_bounds->at(constraint_index) = std::get<0>(x_bounds_[i]);
+    upper_bounds->at(constraint_index) = std::get<1>(x_bounds_[i]);
     ++constraint_index;
   }
 

@@ -35,14 +35,20 @@ namespace apollo {
 namespace planning {
 
 TEST(Fem1dLinearQpProblemTest, basic_test) {
-  FLAGS_enable_osqp_debug = false;
+  FLAGS_enable_osqp_debug = true;
   Fem1dQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
   double delta_s = 0.5;
   size_t n = 400;
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 0; i < n; ++i) {
-    x_bounds.emplace_back(std::make_tuple(static_cast<double>(i), -1.81, 1.95));
+    if (i != 2) {
+      x_bounds.emplace_back(
+          std::make_tuple(static_cast<double>(i), -1.81, 1.95));
+    } else {
+      x_bounds.emplace_back(
+          std::make_tuple(static_cast<double>(i), 0.81, 1.95));
+    }
   }
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
@@ -60,8 +66,8 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   const std::vector<double> x = fem_qp->x();
   AINFO << "x.size() = " << x.size();
   for (size_t i = 0; i < x.size(); ++i) {
-    EXPECT_LE(x[i], std::get<2>(x_bounds[i]));
-    EXPECT_GE(x[i], std::get<1>(x_bounds[i]));
+    EXPECT_LE(x[i], fem_qp->x_bounds_[i].second);
+    EXPECT_GE(x[i], fem_qp->x_bounds_[i].first);
   }
 }
 
@@ -136,9 +142,8 @@ TEST(Fem1dLinearQpProblemTest, add_bounds_test) {
   CHECK_EQ(n, x.size());
 
   for (size_t i = 20; i < 40; i += 2) {
-    EXPECT_DOUBLE_EQ(std::get<0>(x[i]), static_cast<double>(i));
-    EXPECT_DOUBLE_EQ(std::get<1>(x[i]), -1.81);
-    EXPECT_DOUBLE_EQ(std::get<2>(x[i]), 1.95);
+    EXPECT_DOUBLE_EQ(std::get<0>(x[i]), -1.81);
+    EXPECT_DOUBLE_EQ(std::get<1>(x[i]), 1.95);
   }
 }
 

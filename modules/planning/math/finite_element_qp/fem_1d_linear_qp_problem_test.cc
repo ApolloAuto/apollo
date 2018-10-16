@@ -18,14 +18,17 @@
  * @file
  **/
 
-#include "modules/planning/math/finite_element_qp/fem_1d_linear_qp_problem.h"
-
 #include <chrono>
 
 #include "cybertron/common/log.h"
 #include "gtest/gtest.h"
 
 #include "modules/planning/common/planning_gflags.h"
+
+#define private public
+#define protected public
+#include "modules/planning/math/finite_element_qp/fem_1d_linear_qp_problem.h"
+#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -38,13 +41,7 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   double delta_s = 0.5;
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 0; i < n; ++i) {
-    if (i != 400) {
-      x_bounds.emplace_back(
-          std::make_tuple(static_cast<double>(i), -1.81, 1.95));
-    } else {
-      x_bounds.emplace_back(
-          std::make_tuple(static_cast<double>(i), 1.11, 1.95));
-    }
+    x_bounds.emplace_back(std::make_tuple(static_cast<double>(i), -1.81, 1.95));
   }
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
@@ -63,8 +60,8 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
 
   const std::vector<double> x = fem_qp->x();
   for (size_t i = 1; i < x.size(); ++i) {
-    EXPECT_LE(x[i] - 1e-5, std::get<2>(x_bounds[i - 1]));
-    EXPECT_GE(x[i] + 1e-5, std::get<1>(x_bounds[i - 1]));
+    EXPECT_LE(x[i - 1] - 1e-5, fem_qp->x_bounds_[i - 1].second);
+    EXPECT_GE(x[i - 1] + 1e-5, fem_qp->x_bounds_[i - 1].first);
   }
 }
 
