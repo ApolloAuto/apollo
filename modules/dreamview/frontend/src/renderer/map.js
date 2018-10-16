@@ -267,7 +267,7 @@ export default class Map {
             console.warn("The signal orthogonal direction is parallel to the stop line,",
                 "signal_id: " + signal.id.id);
             return this.getHeadingFromStopLine(signal);
-        }      
+        }
         const intersectX = (stopLineY * orthogonalConstant - orthogonalY * stopLineConstant)
             / (stopLineX * orthogonalY - orthogonalX * stopLineY);
         const intersectY = stopLineY !== 0 ?
