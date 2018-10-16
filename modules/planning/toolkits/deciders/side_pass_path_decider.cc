@@ -198,7 +198,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
         std::get<1>(s_leftbound_rightbound) =
             -std::abs(road_left_width_at_curr_s - kRoadBuffer);
         std::get<2>(s_leftbound_rightbound) =
-            -nearest_obs_end_l - kObstacleuffer;
+            -nearest_obs_end_l - kObstacleBuffer;
       } else if (decided_direction_ == RIGHT) {
         std::get<1>(s_leftbound_rightbound) =
             -nearest_obs_start_l + kObstacleBuffer;
