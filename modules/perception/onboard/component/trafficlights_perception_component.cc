@@ -31,10 +31,10 @@
 #include "cybertron/time/time.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lib/utils/time_util.h"
@@ -55,7 +55,7 @@ static int GetGpuId(
     lib::FileUtil::GetAbsolutePath(options.root_dir,
                                    options.conf_file);
   config_file = lib::FileUtil::GetAbsolutePath(work_root, config_file);
-  if (!lib::ParseProtobufFromFile<camera::app::TrafficLightParam>(
+  if (!apollo::common::util::GetProtoFromFile<camera::app::TrafficLightParam>(
         config_file,
         &trafficlight_param)) {
     AERROR << "Read config failed: " << config_file;

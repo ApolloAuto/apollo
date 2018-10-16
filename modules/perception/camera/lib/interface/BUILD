@@ -69,8 +69,6 @@ cc_library(
     hdrs = [ 
         "base_obstacle_postprocessor.h",
     ],
-    deps = [
-    ],
 )
 
 cc_library(
@@ -227,6 +225,5 @@ cc_library(
         ":base_traffic_light_tracker",
     ],
 )
-
 
 cpplint()

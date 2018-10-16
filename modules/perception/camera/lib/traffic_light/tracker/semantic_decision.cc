@@ -20,8 +20,8 @@
 #include <sstream>
 #include <map>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -42,7 +42,7 @@ bool compare(const SemanticTable& s1, const SemanticTable& s2) {
 bool SemanticReviser::Init(const TrafficLightTrackerInitOptions& options) {
   std::string proto_path =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!lib::ParseProtobufFromFile(proto_path, &semantic_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(proto_path, &semantic_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
@@ -98,7 +98,7 @@ SemanticReviser::ReviseBySemantic(SemanticTable semantic_table,
   int max_color_num = 0;
   base::TLColor max_color = base::TLColor::TL_UNKNOWN_COLOR;
 
-  for (int i = 0; i < static_cast<int>(semantic_table.light_ids.size()); ++i) {
+  for (size_t i = 0; i < semantic_table.light_ids.size(); ++i) {
     int index = semantic_table.light_ids.at(i);
     base::TrafficLightPtr light = lights_ref[index];
     auto color = light->status.color;
@@ -257,7 +257,7 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions& options,
     return true;
   }
 
-  for (int i = 0; i < static_cast<int>(lights_ref.size()); i++) {
+  for (size_t i = 0; i < lights_ref.size(); i++) {
     base::TrafficLightPtr light = lights_ref.at(i);
     int cur_semantic = light->semantic;
     AINFO << "light " << light->id << " semantic " << cur_semantic;
@@ -287,7 +287,7 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions& options,
     }
   }
 
-  for (int i = 0; i < static_cast<int>(semantic_table.size()); ++i) {
+  for (size_t i = 0; i < semantic_table.size(); ++i) {
     SemanticTable cur_semantic_table = semantic_table.at(i);
     ReviseByTimeSeries(time_stamp, cur_semantic_table, &lights_ref);
   }

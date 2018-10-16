@@ -20,12 +20,12 @@
 #include <iostream>
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/lib/singleton/singleton.h"
-#include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/camera/lib/lane/common/denseline.pb.h"
 #include "modules/perception/camera/common/math_functions.h"
+#include "modules/perception/camera/lib/lane/common/denseline.pb.h"
+#include "modules/perception/lib/io/file_util.h"
+#include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/utils/timer.h"
 
 namespace apollo {
@@ -39,7 +39,7 @@ bool DenselineLanePostprocessor::Init(
   const std::string& proto_path =
       lib::FileUtil::GetAbsolutePath(options.detect_config_root,
       options.detect_config_name);
-  if (!lib::ParseProtobufFromFile(proto_path, &denseline_param)) {
+  if (!apollo::common::util::GetProtoFromFile(proto_path, &denseline_param)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
@@ -58,7 +58,7 @@ bool DenselineLanePostprocessor::Init(
   const std::string& postprocessor_config =
       lib::FileUtil::GetAbsolutePath(root_dir, conf_file);
   AINFO << "postprocessor_config:" << postprocessor_config;
-  if (!lib::ParseProtobufFromFile(
+  if (!apollo::common::util::GetProtoFromFile(
     postprocessor_config, &lane_postprocessor_param_)) {
     AERROR << "Read config detect_param failed: " << postprocessor_config;
     return false;

@@ -27,9 +27,9 @@
 #include <iomanip>
 
 #include "modules/common/math/math_utils.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/utils/time_util.h"
 #include "cybertron/common/log.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
@@ -51,7 +51,7 @@ static int GetGpuId(
       lib::FileUtil::GetAbsolutePath(options.root_dir,
                                      options.conf_file);
   config_file = lib::FileUtil::GetAbsolutePath(work_root, config_file);
-  if (!lib::ParseProtobufFromFile<camera::app::PerceptionParam>(
+  if (!apollo::common::util::GetProtoFromFile<camera::app::PerceptionParam>(
       config_file,
       &perception_param)) {
     AERROR << "Read config failed: " << config_file;

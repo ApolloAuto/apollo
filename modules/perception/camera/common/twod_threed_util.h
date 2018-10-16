@@ -16,15 +16,13 @@
 #pragma once
 
 #include <float.h>
-
 #include <Eigen/Dense>
+#include <algorithm>
 #include <cstdlib>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 #include "cybertron/common/log.h"
-
 #include "modules/perception/common/i_lib/core/i_constant.h"
 #include "modules/perception/common/i_lib/geometry/i_util.h"
 #include "modules/perception/common/i_lib/geometry/i_line.h"

@@ -18,11 +18,11 @@
 #include <gflags/gflags.h>
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lib/io/file_util.h"
+#include "modules/perception/lib/utils/time_util.h"
 
 namespace apollo {
 namespace perception {
@@ -312,7 +312,7 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
 
   // project light region on each camera's image plane
   const auto &camera_names = projection_.getCameraNamesByDescendingFocalLen();
-  for (int cam_id = 0; cam_id < static_cast<int>(num_cameras_); ++cam_id) {
+  for (size_t cam_id = 0; cam_id < num_cameras_; ++cam_id) {
     const std::string &camera_name = camera_names[cam_id];
     if (!ProjectLights(pose, camera_name, lights,
                        &(lights_on_image_array_[cam_id]),
@@ -325,7 +325,7 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
   }
 
   projections_outside_all_images_ = (lights->size() > 0);
-  for (int cam_id = 0; cam_id < static_cast<int>(num_cameras_); ++cam_id) {
+  for (size_t cam_id = 0; cam_id < num_cameras_; ++cam_id) {
     projections_outside_all_images_ = projections_outside_all_images_ &&
         (lights_on_image_array_[cam_id].size() < lights->size());
   }

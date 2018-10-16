@@ -19,11 +19,11 @@
 #include <algorithm>
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
-#include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
+#include "modules/perception/lib/singleton/singleton.h"
 
 // TODO(Xun): code completion
 
@@ -36,9 +36,9 @@ bool LocationRefinerObstaclePostprocessor::Init(
   std::string postprocessor_config =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
 
-  if (!lib::ParseProtobufFromFile<location_refiner::LocationRefinerParam>(
-      postprocessor_config,
-      &location_refiner_param_)) {
+  if (!apollo::common::util::GetProtoFromFile
+      <location_refiner::LocationRefinerParam>(postprocessor_config,
+        &location_refiner_param_)) {
     AERROR << "Read config failed: " << postprocessor_config;
     return false;
   }

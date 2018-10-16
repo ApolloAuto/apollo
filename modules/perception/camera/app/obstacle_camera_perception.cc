@@ -16,22 +16,22 @@
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include <gflags/gflags.h>
 #include <yaml-cpp/yaml.h>
+#include <algorithm>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <algorithm>
 #include <utility>
+#include <vector>
 #include "cybertron/common/log.h"
-#include "modules/perception/inference/utils/cuda_util.h"
-#include "modules/perception/common/io/io_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object.h"
-#include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lib/utils/perf.h"
-#include "modules/perception/lib/singleton/singleton.h"
-#include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/app/debug_info.h"
+#include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
+#include "modules/perception/common/io/io_util.h"
+#include "modules/perception/inference/utils/cuda_util.h"
+#include "modules/perception/lib/io/file_util.h"
+#include "modules/perception/lib/singleton/singleton.h"
+#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -47,7 +47,7 @@ bool ObstacleCameraPerception::Init(
       lib::FileUtil::GetAbsolutePath(options.root_dir,
                                      options.conf_file);
   config_file = lib::FileUtil::GetAbsolutePath(work_root, config_file);
-  CHECK(lib::ParseProtobufFromFile<app::PerceptionParam>(
+  CHECK(apollo::common::util::GetProtoFromFile<app::PerceptionParam>(
         config_file, &perception_param_)) << "Read config failed: ";
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
@@ -392,7 +392,7 @@ bool ObstacleCameraPerception::Perception(
                       std::to_string(frame->frame_id) + ".txt",
                   frame);
   // set the sensor name of each object
-  for (int i = 0; i < static_cast<int>(frame->detected_objects.size()); i++) {
+  for (size_t i = 0; i < frame->detected_objects.size(); i++) {
     frame->detected_objects[i]->camera_supplement.sensor_name =
         frame->data_provider->sensor_name();
   }

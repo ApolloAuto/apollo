@@ -16,9 +16,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -36,7 +36,7 @@ bool TrackingFeatureExtractor::Init(const FeatureExtractorInitOptions
   std::string config_path =
       lib::FileUtil::GetAbsolutePath(init_options.root_dir,
                                      init_options.conf_file);
-  if (!lib::ParseProtobufFromFile(config_path, &feat_param)) {
+  if (!apollo::common::util::GetProtoFromFile(config_path, &feat_param)) {
     AERROR << "read proto_config fail";
     return false;
   }

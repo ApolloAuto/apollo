@@ -17,9 +17,9 @@
 #include "cybertron/common/log.h"
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
-#include "modules/perception/lib/utils/perf.h"
-#include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/inference_factory.h"
+#include "modules/perception/inference/utils/resize.h"
+#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -197,7 +197,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   CHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
   std::string config_path =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!lib::ParseProtobufFromFile(config_path, &yolo_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(config_path, &yolo_param_)) {
     AERROR << "read proto_config fail";
     return false;
   }

@@ -14,10 +14,12 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h"
-#include <vector>
+
 #include <map>
+#include <vector>
+
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/inference_factory.h"
@@ -31,8 +33,8 @@ bool ExternalFeatureExtractor::Init(const FeatureExtractorInitOptions
                                     &options) {
   std::string efx_config =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
-  CHECK(lib::ParseProtobufFromFile<tracking_feature::ExternalParam>(efx_config,
-                                                                     &param_))
+  CHECK(apollo::common::util::GetProtoFromFile
+      <tracking_feature::ExternalParam>(efx_config, &param_))
   << "Read config failed: " << efx_config;
   AINFO << "Load config Success: " << param_.ShortDebugString();
   std::string proto_file =

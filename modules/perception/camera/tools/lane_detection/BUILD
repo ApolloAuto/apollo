@@ -31,15 +31,15 @@ cc_binary(
         ":lane_common",
         "//external:gflags",
         "//cybertron",
-        "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
-        "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
-        "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
+        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
+        "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/io:protobuf_util",
     ]
 )
 

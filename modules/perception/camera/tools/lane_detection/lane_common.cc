@@ -46,8 +46,8 @@ void show_detect_point_set(const cv::Mat& image,
   int draw_size = 2;
 
   cv::Mat draw_mat = image.clone();
-  for (int line_idx = 0;
-    line_idx < static_cast<int>(detect_laneline_point_set.size()); line_idx++) {
+  for (size_t line_idx = 0;
+    line_idx < detect_laneline_point_set.size(); ++line_idx) {
     if (line_idx == 0) {
       color = cv::Scalar(0, 255, 0);
     } else if (line_idx == 1) {
@@ -57,8 +57,8 @@ void show_detect_point_set(const cv::Mat& image,
     } else if (line_idx == 3) {
       color = cv::Scalar(0, 255, 255);
     }
-    for (int i = 0;
-      i < static_cast<int>(detect_laneline_point_set[line_idx].size()); i++) {
+    for (size_t i = 0;
+      i < detect_laneline_point_set[line_idx].size(); ++i) {
       int point_x =
         detect_laneline_point_set[line_idx][i].x;
       int point_y =
@@ -77,8 +77,7 @@ void show_all_infer_point_set(const cv::Mat& image,
   int draw_size = 2;
 
   cv::Mat draw_mat = image.clone();
-  for (int i = 0;
-    i < static_cast<int>(infer_point_set.size()); i++) {
+  for (size_t i = 0; i < infer_point_set.size(); ++i) {
     int point_x = infer_point_set[i].x;
     int point_y = infer_point_set[i].y;
     cv::circle(draw_mat,
@@ -101,7 +100,7 @@ void show_lane_lines(const cv::Mat& image,
   cv::Scalar color = cv::Scalar(0, 255, 0);
   int draw_size = 2;
   cv::Mat draw_mat = image.clone();
-  for (int i = 0; i < static_cast<int>(lane_marks.size()); i++) {
+  for (size_t i = 0; i < lane_marks.size(); ++i) {
     base::LaneLinePositionType pos_type = lane_marks[i].pos_type;
     if (pos_type == base::LaneLinePositionType::EGO_LEFT ||
         pos_type == base::LaneLinePositionType::EGO_RIGHT) {
@@ -119,7 +118,7 @@ void show_lane_lines(const cv::Mat& image,
     float fd = lane_marks[i].curve_image_coord.d;
     float y0 = lane_marks[i].curve_image_coord.x_start;
     float y1 = lane_marks[i].curve_image_coord.x_end;
-    for (int j = static_cast<int>(y0); j <= static_cast<int>(y1); j++) {
+    for (int j = static_cast<int>(y0); j <= static_cast<int>(y1); ++j) {
       int x = fa * pow(j, 3) + fb * pow(j, 2) + fc * j + fd;
       cv::circle(draw_mat, cv::Point(x, j), draw_size, color);
     }
@@ -169,7 +168,7 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
   const std::string& save_path) {
   cv::Mat lane_map_draw =
     cv::Mat::zeros(lane_map_height, lane_map_width, CV_8UC1);
-  for (int y = 0; y < lane_map_height; y++) {
+  for (int y = 0; y < lane_map_height; ++y) {
     for (int x = 0; x < lane_map_width; x++) {
       lane_map_draw.at<unsigned char>(y, x) = 255 -
         lane_map[y * lane_map_width + x] * 255;
@@ -179,11 +178,11 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
   cv::cvtColor(lane_map_draw, lane_draw, 8);
   cv::Scalar color;
   std::string msg = "";
-  for (int i = 0; i < static_cast<int>(lane_ccs.size()); i++) {
+  for (size_t i = 0; i < lane_ccs.size(); ++i) {
     std::vector<base::Point2DI> pixels = lane_ccs[i].GetPixels();
     base::BBox2DI bbox1 = lane_ccs[i].GetBBox();
     int find_index = -1;
-    for (int j = 0; j < static_cast<int>(select_lane_ccs.size()); j++) {
+    for (size_t j = 0; j < select_lane_ccs.size(); ++j) {
       base::BBox2DI bbox2 = select_lane_ccs[j].GetBBox();
       if (bbox1.xmin == bbox2.xmin &&
           bbox1.xmax == bbox2.xmax &&
@@ -202,7 +201,7 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
     } else {
       color = cv::Scalar(0, 0, 0);
     }
-    for (int j = 0; j < static_cast<int>(pixels.size()); j++) {
+    for (size_t j = 0; j < pixels.size(); ++j) {
       int x = pixels[j].x;
       int y = pixels[j].y;
       cv::circle(lane_draw, cv::Point(x, y), 1, color);
@@ -221,7 +220,7 @@ void output_laneline_to_json(const std::vector<base::LaneLine> &lane_objects,
   AINFO << "lane line num: " << lane_line_size;
   std::string msg = "lane line info: ";
   fprintf(file_save, "[\n");
-  for (int j = 0; j < lane_line_size; j++) {
+  for (int j = 0; j < lane_line_size; ++j) {
     const base::LaneLineCubicCurve& curve_camera
       = lane_objects[j].curve_camera_coord;
     const base::LaneLineCubicCurve& curve_img
@@ -244,8 +243,8 @@ void output_laneline_to_json(const std::vector<base::LaneLine> &lane_objects,
     // camera_image_point_set
     fprintf(file_save, "\"camera_point_set\":\n");
     fprintf(file_save, "[");
-    for (int k = 0; k < static_cast<int>(camera_point_set.size()); k++) {
-      if (k < static_cast<int>(camera_point_set.size()) - 1) {
+    for (size_t k = 0; k < camera_point_set.size(); ++k) {
+      if (k < camera_point_set.size() - 1) {
         fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f,\"z\":%.4f},",
           camera_point_set[k].x, camera_point_set[k].y,
           camera_point_set[k].z);
@@ -268,8 +267,8 @@ void output_laneline_to_json(const std::vector<base::LaneLine> &lane_objects,
     //  curve_image_point_set
     fprintf(file_save, "\"image_point_set\":\n");
     fprintf(file_save, "[");
-    for (int k = 0; k < static_cast<int>(image_point_set.size()); k++) {
-      if (k < static_cast<int>(image_point_set.size()) - 1) {
+    for (size_t k = 0; k < image_point_set.size(); ++k) {
+      if (k < image_point_set.size() - 1) {
         fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f},",
           image_point_set[k].x, image_point_set[k].y);
       } else {
@@ -296,7 +295,7 @@ void output_laneline_to_txt(const std::vector<base::LaneLine> &lane_objects,
   int lane_line_size = lane_objects.size();
   AINFO << "lane line num: " << lane_line_size;
   fprintf(file_save, "lane_line_num=%d\n", lane_line_size);
-  for (int j = 0; j < lane_line_size; j++) {
+  for (int j = 0; j < lane_line_size; ++j) {
     base::LaneLineCubicCurve curve_camera = lane_objects[j].curve_camera_coord;
     base::LaneLineCubicCurve curve_img = lane_objects[j].curve_image_coord;
     fprintf(file_save, "type=%d\n", lane_objects[j].type);
@@ -317,13 +316,13 @@ void output_laneline_to_txt(const std::vector<base::LaneLine> &lane_objects,
     std::vector<base::Point3DF> curve_camera_point_set
       = lane_objects[j].curve_camera_point_set;
     fprintf(file_save, "curve_image_point_set:\n");
-    for (int k = 0; k < static_cast<int>(curve_image_point_set.size()); k++) {
+    for (size_t k = 0; k < curve_image_point_set.size(); ++k) {
       fprintf(file_save, "[%f %f] ", curve_image_point_set[k].x,
         curve_image_point_set[k].y);
     }
     fprintf(file_save, "\n");
     fprintf(file_save, "curve_camera_point_set:\n");
-    for (int k = 0; k < static_cast<int>(curve_camera_point_set.size()); k++) {
+    for (size_t k = 0; k < curve_camera_point_set.size(); ++k) {
       fprintf(file_save, "[%f %f %f] ", curve_camera_point_set[k].x,
         curve_camera_point_set[k].y, curve_camera_point_set[k].z);
     }
@@ -340,8 +339,7 @@ void show_detect_point_set(const cv::Mat& image,
   int draw_size = 2;
 
   cv::Mat draw_mat = image.clone();
-  for (int i = 0;
-    i < static_cast<int>(img_laneline_point_set.size()); i++) {
+  for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
     const base::Point2DF& point = img_laneline_point_set[i];
     cv::circle(draw_mat,
       cv::Point(point.x, point.y),
@@ -359,8 +357,7 @@ void show_neighbor_point_set(const cv::Mat& image,
   int draw_size = 2;
 
   cv::Mat draw_mat = image.clone();
-  for (int i = 0;
-    i < static_cast<int>(img_laneline_point_set.size()); i++) {
+  for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
     const base::Point2DF& point = img_laneline_point_set[i];
     cv::circle(draw_mat,
       cv::Point(point.x, point.y),
@@ -392,8 +389,7 @@ void show_detect_point_set(const cv::Mat& image,
   int draw_size = 2;
 
   cv::Mat draw_mat = image.clone();
-  for (int i = 0;
-    i < static_cast<int>(img_laneline_point_set.size()); i++) {
+  for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
     const base::Point2DF& point = img_laneline_point_set[i];
     std::string label = cv::format("%.2f", point_score_vec[i]);
     cv::putText(draw_mat, label, cv::Point(point.x, point.y),

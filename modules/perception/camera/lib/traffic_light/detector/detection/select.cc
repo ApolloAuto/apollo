@@ -46,16 +46,16 @@ void Select::SelectTrafficLights(
   std::vector<std::pair<size_t, size_t> > assignments;
   munkres_.costs()->Resize(hdmap_bboxes->size(), refined_bboxes.size());
 
-  for (int row = 0; row < static_cast<int>(hdmap_bboxes->size()); ++row) {
+  for (size_t row = 0; row < hdmap_bboxes->size(); ++row) {
     auto center_hd = (*hdmap_bboxes)[row]->region.detection_roi.Center();
     if ((*hdmap_bboxes)[row]->region.outside_image) {
       AINFO << "projection_roi outside image, set score to 0.";
-      for (int col = 0; col < static_cast<int>(refined_bboxes.size()); ++col) {
+      for (size_t col = 0; col < refined_bboxes.size(); ++col) {
         (*munkres_.costs())(row, col) = 0.0;
       }
       continue;
     }
-    for (int col = 0; col < static_cast<int>(refined_bboxes.size()); ++col) {
+    for (size_t col = 0; col < refined_bboxes.size(); ++col) {
       float gaussian_score = 100.0f;
       auto center_refine = refined_bboxes[col]->region.detection_roi.Center();
       // use gaussian score as metrics of distance and width

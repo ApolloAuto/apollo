@@ -12,9 +12,9 @@ cc_library(
         "online_calibration_service.h",
     ],
     deps = [
+        "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/common/i_lib/core:core",
         "//modules/perception/common/i_lib/geometry:i_plane",
-        "//modules/perception/camera/lib/interface:interface",
     ],
 )
 

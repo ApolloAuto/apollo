@@ -24,10 +24,10 @@
 #include <utility>
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -63,7 +63,8 @@ bool ObjectTemplateManager::Init(
   std::string config =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
   ObjectTemplateMeta proto;
-  if (!lib::ParseProtobufFromFile<ObjectTemplateMeta>(config, &proto)) {
+  if (!apollo::common::util::GetProtoFromFile<ObjectTemplateMeta>(
+        config, &proto)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
@@ -187,7 +188,7 @@ void ObjectTemplateManager::LoadVehTemplates(const ObjectTemplate &tmplt) {
     list_tpl.push_back(std::make_tuple(dim.h(), dim.w(), dim.l()));
   }
   std::sort(list_tpl.begin(), list_tpl.end());
-  for (int i = 0; i < static_cast<int>(list_tpl.size()); ++i) {
+  for (size_t i = 0; i < list_tpl.size(); ++i) {
     veh_hwl_.push_back(std::get<0>(list_tpl[i]));
     veh_hwl_.push_back(std::get<1>(list_tpl[i]));
     veh_hwl_.push_back(std::get<2>(list_tpl[i]));

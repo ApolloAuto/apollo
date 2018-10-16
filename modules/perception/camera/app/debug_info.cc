@@ -67,7 +67,7 @@ void WriteTracking(std::ofstream &fout,
     return;
   }
   char output[500];
-  for (int i = 0; i < static_cast<int>(tracked_object.size()); ++i) {
+  for (size_t i = 0; i < tracked_object.size(); ++i) {
     base::ObjectPtr ptr = tracked_object[i];
     snprintf(output,
              sizeof(output),
@@ -256,8 +256,8 @@ int WriteLanelines(const bool enable,
     // camera_image_point_set
     fprintf(file_save, "\"camera_point_set\":\n");
     fprintf(file_save, "[");
-    for (int k = 0; k < static_cast<int>(camera_point_set.size()); k++) {
-      if (k < static_cast<int>(camera_point_set.size()) - 1) {
+    for (size_t k = 0; k < camera_point_set.size(); k++) {
+      if (k < camera_point_set.size() - 1) {
         fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f,\"z\":%.4f},",
           camera_point_set[k].x, camera_point_set[k].y,
           camera_point_set[k].z);
@@ -280,9 +280,8 @@ int WriteLanelines(const bool enable,
     //  curve_image_point_set
     fprintf(file_save, "\"image_point_set\":\n");
     fprintf(file_save, "[");
-    for (int k = 0; k < static_cast<int>(image_point_set.size());
-      k++) {
-      if (k < static_cast<int>(image_point_set.size()) - 1) {
+    for (size_t k = 0; k < image_point_set.size(); k++) {
+      if (k < image_point_set.size() - 1) {
         fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f},",
           image_point_set[k].x, image_point_set[k].y);
       } else {
@@ -333,11 +332,8 @@ void WriteFusionTracking(std::ofstream &fout,
   }
   AINFO << "Write track results:" << frame_num;
   if (camera_name == "onsemi_narrow") {
-    for (int i = 0; i < static_cast<int>(tracked_object.size()); ++i) {
+    for (size_t i = 0; i < tracked_object.size(); ++i) {
       base::ObjectPtr ptr = tracked_object[i];
-//      if (ptr->camera_supplement.sensor_name == "onsemi_obstacle") {
-//        continue;  // do not show the 6mm target in the 12mm camera
-//      }
       char output[300];
       snprintf(output,
                sizeof(output),
@@ -366,7 +362,7 @@ void WriteFusionTracking(std::ofstream &fout,
       fout << output << std::endl;
     }
   } else if (camera_name == "onsemi_obstacle") {
-    for (int i = 0; i < static_cast<int>(tracked_object.size()); ++i) {
+    for (size_t i = 0; i < tracked_object.size(); ++i) {
       base::ObjectPtr ptr = tracked_object[i];
       char output[300];
       snprintf(output,

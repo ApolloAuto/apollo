@@ -3,7 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 
-
 cc_library(
     name = "camera_frame",
     hdrs = [
@@ -29,8 +28,6 @@ cc_library(
         "//modules/perception/common/i_lib/core:core",
         "//modules/perception/common/i_lib/da:i_ransac",
         "//modules/perception/common/i_lib/geometry:i_plane",
-        #"//modules/perception/common/i_lib/geometry:i_util",
-        #"//modules/perception/common/i_lib/numeric:numeric",
     ],
 )
 
@@ -78,14 +75,14 @@ cc_library(
     deps = [
         "//external:gflags",
         "//cybertron",
+        "//modules/common/util:file_util",
         "//modules/perception/base:base",
+        "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/singleton:singleton",
         "//modules/perception/lib/thread:thread",
-        "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
     ],
 )
 
@@ -107,7 +104,6 @@ cc_library(
         "@eigen",
         "//modules/perception/common/i_lib/core:core",
         "//modules/perception/common/i_lib/geometry:i_plane",
-        #"//modules/perception/common/i_lib/geometry:i_util",
     ],
 )
 

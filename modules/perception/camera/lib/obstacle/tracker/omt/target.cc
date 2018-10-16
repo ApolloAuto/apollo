@@ -62,8 +62,8 @@ void Target::Add(TrackObjectPtr object) {
   tracked_objects.push_back(object);
 }
 void Target::RemoveOld(int frame_id) {
-  int index = 0;
-  while (index < static_cast<int>(tracked_objects.size()) &&
+  size_t index = 0;
+  while (index < tracked_objects.size() &&
       tracked_objects[index]->indicator.frame_id < frame_id) {
     ++index;
   }

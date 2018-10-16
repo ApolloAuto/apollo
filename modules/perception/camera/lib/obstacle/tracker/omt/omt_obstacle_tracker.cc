@@ -19,19 +19,20 @@
 #include <google/protobuf/io/gzip_stream.h>
 #include <fcntl.h>
 
-#include <vector>
 #include <algorithm>
 #include <functional>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
+
+#include "modules/common/util/file.h"
+#include "modules/perception/base/point.h"
+#include "modules/perception/camera/common/global_config.h"
+#include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/geometry/common.h"
-#include "modules/perception/camera/common/global_config.h"
-#include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/base/point.h"
-#include "modules/perception/camera/common/math_functions.h"
+#include "modules/perception/lib/singleton/singleton.h"
 
 namespace apollo {
 namespace perception {
@@ -40,7 +41,8 @@ namespace camera {
 bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   std::string omt_config =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!lib::ParseProtobufFromFile<omt::OmtParam>(omt_config, &omt_param_)) {
+  if (!apollo::common::util::GetProtoFromFile
+      <omt::OmtParam>(omt_config, &omt_param_)) {
     AERROR << "Read config failed: " << omt_config;
     return false;
   }
@@ -91,11 +93,11 @@ std::string OMTObstacleTracker::Name() const {
 bool OMTObstacleTracker::CombineDuplicateTargets() {
   std::vector<Hypothesis> score_list;
   Hypothesis hypo;
-  for (int i = 0; i < static_cast<int>(targets_.size()); ++i) {
+  for (size_t i = 0; i < targets_.size(); ++i) {
     if (targets_[i].Size() == 0) {
       continue;
     }
-    for (int j = i + 1; j < static_cast<int>(targets_.size()); ++j) {
+    for (size_t j = i + 1; j < targets_.size(); ++j) {
       if (targets_[j].Size() == 0) {
         continue;
       }
@@ -182,9 +184,9 @@ bool OMTObstacleTracker::CombineDuplicateTargets() {
 void OMTObstacleTracker::GenerateHypothesis(const TrackObjectPtrs &objects) {
   std::vector<Hypothesis> score_list;
   Hypothesis hypo;
-  for (int i = 0; i < static_cast<int>(targets_.size()); ++i) {
+  for (size_t i = 0; i < targets_.size(); ++i) {
     ADEBUG << "Target " << targets_[i].id;
-    for (int j = 0; j < static_cast<int>(objects.size()); ++j) {
+    for (size_t j = 0; j < objects.size(); ++j) {
       hypo.target = i;
       hypo.object = j;
       float sa = ScoreAppearance(targets_[i], objects[j]);
@@ -337,7 +339,7 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
     target_rects.push_back(target_rect);
   }
   int created_count = 0;
-  for (int i = 0; i < static_cast<int>(objects.size()); ++i) {
+  for (size_t i = 0; i < objects.size(); ++i) {
     if (!used_[i]) {
       bool is_covered = false;
       const auto &sub_type = objects[i]->object->sub_type;
@@ -387,7 +389,7 @@ bool OMTObstacleTracker::Associate2D(const ObstacleTrackerOptions &options,
   }
 
   TrackObjectPtrs track_objects;
-  for (int i = 0; i < static_cast<int>(frame->detected_objects.size()); ++i) {
+  for (size_t i = 0; i < frame->detected_objects.size(); ++i) {
     // TODO(gaohan): use pool
     TrackObjectPtr track_ptr(new TrackObject);
     track_ptr->object = frame->detected_objects[i];

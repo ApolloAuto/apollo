@@ -44,10 +44,10 @@ cc_library(
         ":multicue_proto",
         ":obj_mapper",
         "//cybertron",
-        "//modules/perception/camera/lib/interface:interface",
+        "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",
+        "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/io:protobuf_util",
         "//modules/perception/lib/singleton:singleton",
     ],
 )

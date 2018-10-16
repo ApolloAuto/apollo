@@ -14,8 +14,8 @@ cc_binary(
     ],
     deps = [
         "@gtest",
-        "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/base:base",
+        "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/common/io:io_util",
     ]
 )

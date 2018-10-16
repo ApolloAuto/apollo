@@ -19,8 +19,8 @@
 #include <utility>
 
 #include "cybertron/common/log.h"
-#include "modules/perception/common/i_lib/geometry/i_util.h"
 #include "modules/perception/common/i_lib/da/i_ransac.h"
+#include "modules/perception/common/i_lib/geometry/i_util.h"
 
 
 namespace apollo {

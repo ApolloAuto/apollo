@@ -99,7 +99,7 @@ int work() {
 
   std::vector<DataProvider> data_providers(camera_names.size());
 
-  for (int i = 0; i < static_cast<int>(camera_names.size()); i++) {
+  for (size_t i = 0; i < camera_names.size(); ++i) {
     data_options.sensor_name = camera_names[i];
     CHECK(data_providers[i].Init(data_options));
     name_provider_map.insert(std::pair<std::string, DataProvider *>(
@@ -134,7 +134,7 @@ int work() {
   //      pitch_angle and project_matrix
   std::map<std::string, float> name_camera_ground_height_map;
   std::map<std::string, float> name_camera_pitch_angle_diff_map;
-  for (int i = 0; i < static_cast<int>(camera_names.size()); i++) {
+  for (size_t i = 0; i < camera_names.size(); ++i) {
     Eigen::Affine3d c2g;
     if (!transform_server.QueryTransform(camera_names[i], "ground", &c2g)) {
       AINFO << "Failed to query transform from " << camera_names[i]

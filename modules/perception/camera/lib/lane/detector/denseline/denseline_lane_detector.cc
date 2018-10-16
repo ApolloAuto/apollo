@@ -18,7 +18,7 @@
 #include <map>
 #include <algorithm>
 
-#include "modules/perception/lib/io/protobuf_util.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/inference/utils/resize.h"
@@ -31,7 +31,7 @@ namespace camera {
 bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
   std::string proto_path =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!lib::ParseProtobufFromFile(proto_path, &denseline_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(proto_path, &denseline_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }

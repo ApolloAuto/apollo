@@ -171,7 +171,7 @@ void ClassifyBySimple::Prob2Color(const float *out_put_data, float threshold,
   light->status.confidence = out_put_data[max_color_id];
   AINFO << "Light status recognized as " << name_map[max_color_id];
   AINFO << "Color Prob:";
-  for (int j = 0; j < static_cast<int>(status_map.size()); j++) {
+  for (size_t j = 0; j < status_map.size(); j++) {
     AINFO << out_put_data[j];
   }
 }
