@@ -82,13 +82,41 @@ class ClearAreaInfo;
 class SpeedBumpInfo;
 class RoadInfo;
 class ParkingSpaceInfo;
-
 class HDMapImpl;
+
+struct LineBoundary {
+  std::vector<apollo::common::PointENU> line_points;
+};
+struct PolygonBoundary {
+  std::vector<apollo::common::PointENU> polygon_points;
+};
+
+enum PolygonType {
+  JUNCTION_POLYGON = 0,
+  PARKINGSPACE_POLYGON = 1,
+  ROAD_HOLE_POLYGON = 2,
+};
+
+struct RoiAttribute {
+  PolygonType type;
+  Id id;
+};
+
+struct PolygonRoi {
+  apollo::common::math::Polygon2d polygon;
+  RoiAttribute attribute;
+};
+
+struct RoadRoi {
+  Id id;
+  LineBoundary left_boundary;
+  LineBoundary right_boundary;
+  std::vector<PolygonBoundary> holes_boundary;
+};
 
 using LaneSegmentBox =
     ObjectWithAABox<LaneInfo, apollo::common::math::LineSegment2d>;
 using LaneSegmentKDTree = apollo::common::math::AABoxKDTree2d<LaneSegmentBox>;
-
 using OverlapInfoConstPtr = std::shared_ptr<const OverlapInfo>;
 using LaneInfoConstPtr = std::shared_ptr<const LaneInfo>;
 using JunctionInfoConstPtr = std::shared_ptr<const JunctionInfo>;
@@ -101,6 +129,8 @@ using SpeedBumpInfoConstPtr = std::shared_ptr<const SpeedBumpInfo>;
 using RoadInfoConstPtr = std::shared_ptr<const RoadInfo>;
 using ParkingSpaceInfoConstPtr = std::shared_ptr<const ParkingSpaceInfo>;
 using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
+using PolygonRoiPtr = std::shared_ptr<PolygonRoi>;
+using RoadRoiPtr = std::shared_ptr<RoadRoi>;
 
 class LaneInfo {
  public:

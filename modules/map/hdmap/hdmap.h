@@ -222,6 +222,17 @@ class HDMap {
                         std::vector<RoadROIBoundaryPtr>* road_boundaries,
                         std::vector<JunctionBoundaryPtr>* junctions) const;
   /**
+   * @brief get ROI within certain range
+   * @param point the target position
+   * @param radius the search radius
+   * @param roads_roi the roads' boundaries
+   * @param polygons_roi the junctions' boundaries
+   * @return 0:success, otherwise failed
+   */
+  int GetRoi(const apollo::common::PointENU& point, double radius,
+             std::vector<RoadRoiPtr>* roads_roi,
+             std::vector<PolygonRoiPtr>* polygons_roi);
+  /**
    * @brief get forward nearest signals within certain range on the lane
    *        if there are two signals related to one stop line,
    *        return both signals.

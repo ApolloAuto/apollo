@@ -163,6 +163,12 @@ int HDMap::GetRoadBoundaries(
   return impl_.GetRoadBoundaries(point, radius, road_boundaries, junctions);
 }
 
+int HDMap::GetRoi(const apollo::common::PointENU& point, double radius,
+                  std::vector<RoadRoiPtr>* roads_roi,
+                  std::vector<PolygonRoiPtr>* polygons_roi) {
+  return impl_.GetRoi(point, radius, roads_roi, polygons_roi);
+}
+
 int HDMap::GetForwardNearestSignalsOnLane(
     const apollo::common::PointENU& point, const double distance,
     std::vector<SignalInfoConstPtr>* signals) const {
