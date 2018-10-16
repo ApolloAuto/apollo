@@ -219,3 +219,5 @@ DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 DECLARE_bool(export_chart);
 DECLARE_bool(enable_record_debug);
+
+DECLARE_double(default_front_clear_distance);

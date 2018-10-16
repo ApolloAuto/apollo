@@ -33,6 +33,7 @@
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -74,7 +75,7 @@ class EgoInfo {
   // ego vehicle state
   common::VehicleState vehicle_state_;
 
-  double front_clear_distance_ = std::numeric_limits<double>::max();
+  double front_clear_distance_ = FLAGS_default_front_clear_distance;
 
   common::VehicleConfig ego_vehicle_config_;
 
