@@ -34,10 +34,18 @@ message LaneFeature {
   optional double lane_heading = 8;
 }
 
+// Junction MLP model feature values
+message JunctionMLPFeature {
+  optional string exit_lane_id = 1;
+  repeated double feature_value = 2; // feature values for MLP
+  optional int32 label = 3;  // label 1: exit through the lane, 0: otherwise
+}
+
 message JunctionFeature {
   optional string junction_id = 1;
   optional string enter_lane_id = 2;
   repeated LaneFeature exit_lane = 3;
+  repeated JunctionMLPFeature junction_mlp_feature = 4;  // for MLP
 }
 
 message ObstaclePriority {
