@@ -119,7 +119,7 @@ float MlfTrackObjectDistance::ComputeDistance(
   track->PredictState(current_time);
 
   double time_diff = current_time;
-  -track->latest_visible_time_;
+  // -track->latest_visible_time_;
   if (weights->at(0) > delta) {
     distance +=
         weights->at(0) * LocationDistance(latest_object, track->predict_.state,
