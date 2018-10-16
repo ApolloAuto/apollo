@@ -43,7 +43,7 @@ message JunctionMLPFeature {
 
 message JunctionFeature {
   optional string junction_id = 1;
-  optional string enter_lane_id = 2;
+  optional LaneFeature enter_lane = 2;
   repeated LaneFeature exit_lane = 3;
   repeated JunctionMLPFeature junction_mlp_feature = 4;  // for MLP
 }
