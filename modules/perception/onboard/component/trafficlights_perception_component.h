@@ -45,7 +45,7 @@ namespace onboard {
 class TrafficLightsPerceptionComponent :
     public apollo::cybertron::Component<> {
  public:
-  TrafficLightsPerceptionComponent();
+  TrafficLightsPerceptionComponent() = default;
   ~TrafficLightsPerceptionComponent() = default;
 
   TrafficLightsPerceptionComponent(
