@@ -16,8 +16,8 @@
 # limitations under the License.
 ###############################################################################
 
-from statistical_analyzer import StatisticalAnalyzer
-from statistical_analyzer import PrintColors
+from common.statistical_analyzer import StatisticalAnalyzer
+from common.statistical_analyzer import PrintColors
 
 
 class LidarEndToEndAnalyzer:

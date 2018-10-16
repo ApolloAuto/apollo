@@ -18,6 +18,7 @@
 
 from modules.common.proto import error_code_pb2
 from statistical_analyzer import PrintColors
+from distribution_analyzer import DistributionAnalyzer
 
 
 class ErrorCodeAnalyzer:
@@ -38,6 +39,4 @@ class ErrorCodeAnalyzer:
 
     def print_results(self):
         """print"""
-        for error_code, num in self.error_code_count.items():
-            print PrintColors.OKBLUE + error_code + " = " + str(num) + \
-                  PrintColors.ENDC
+        DistributionAnalyzer().print_distribution_results(self.error_code_count)

@@ -16,11 +16,11 @@
 # limitations under the License.
 ###############################################################################
 
-from statistical_analyzer import StatisticalAnalyzer
-from statistical_analyzer import PrintColors
-from distribution_analyzer import DistributionAnalyzer
-from error_code_analyzer import ErrorCodeAnalyzer
-from error_msg_analyzer import ErrorMsgAnalyzer
+from common.statistical_analyzer import StatisticalAnalyzer
+from common.statistical_analyzer import PrintColors
+from common.distribution_analyzer import DistributionAnalyzer
+from common.error_code_analyzer import ErrorCodeAnalyzer
+from common.error_msg_analyzer import ErrorMsgAnalyzer
 from modules.planning.proto import planning_pb2
 
 
