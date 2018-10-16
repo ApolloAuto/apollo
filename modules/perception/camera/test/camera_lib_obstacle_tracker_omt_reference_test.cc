@@ -15,15 +15,15 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/omt/obstacle_reference.h"
 
+#include "gtest/gtest.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
-#include "gtest/gtest.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -46,7 +46,7 @@ TEST(RefTest, update_test) {
     "/apollo/modules/perception/testdata/"
     "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
     "config.pt");
-  CHECK(lib::ParseProtobufFromFile<omt::OmtParam>(
+  CHECK(apollo::common::util::GetProtoFromFile<omt::OmtParam>(
       omt_config, &omt_param));
   ref.Init(omt_param.reference(), 1920.0f, 1080.0f);
   std::string sensor_name = "onsemi_obstacle";

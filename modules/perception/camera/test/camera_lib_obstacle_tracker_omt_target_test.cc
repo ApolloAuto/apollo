@@ -13,15 +13,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
+#include "gtest/gtest.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
-#include "gtest/gtest.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -46,7 +46,7 @@ TEST(TargetTest, target_test) {
     "omt_obstacle_tracker",
     "config.pt");
 
-  ASSERT_TRUE(lib::ParseProtobufFromFile<omt::OmtParam>(
+  ASSERT_TRUE(apollo::common::util::GetProtoFromFile<omt::OmtParam>(
       omt_config, &omt_param));
 
   // first frame with one car object
@@ -223,7 +223,7 @@ TEST(TargetTest, clapping_velocity_test) {
     "omt_obstacle_tracker",
     "config.pt");
 
-  ASSERT_TRUE(lib::ParseProtobufFromFile<omt::OmtParam>(
+  ASSERT_TRUE(apollo::common::util::GetProtoFromFile<omt::OmtParam>(
       omt_config, &omt_param));
 
   auto read_pos_and_theta_vec = [](const std::string& fname)
@@ -263,7 +263,7 @@ TEST(TargetTest, clapping_velocity_test) {
     std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta1.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
-    for (int i = 0; i < static_cast<int>(pos_and_theta_vec.size()); ++i) {
+    for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = i * 0.066;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
@@ -322,7 +322,7 @@ TEST(TargetTest, clapping_velocity_test) {
     std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta1.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
-    for (int i = 0; i < static_cast<int>(pos_and_theta_vec.size()); ++i) {
+    for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
       base::BBox2DF bbox(500, 500, 1000, 1000);
@@ -377,7 +377,7 @@ TEST(TargetTest, clapping_velocity_test) {
     std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta2.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
-    for (int i = 0; i < static_cast<int>(pos_and_theta_vec.size()); ++i) {
+    for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = i * 0.066;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
@@ -435,7 +435,7 @@ TEST(TargetTest, clapping_velocity_test) {
     std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta3.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
-    for (int i = 0; i < static_cast<int>(pos_and_theta_vec.size()); ++i) {
+    for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = i * 0.033;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
@@ -494,7 +494,7 @@ TEST(TargetTest, clapping_velocity_test) {
     std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta4.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
-    for (int i = 0; i < static_cast<int>(pos_and_theta_vec.size()); ++i) {
+    for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = i * 0.033;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);

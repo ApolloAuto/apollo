@@ -536,7 +536,7 @@
 # #         "//modules/perception/camera/lib/obstacle/tracker/omt:omt_proto",
 # #         "//modules/perception/camera/lib/obstacle/tracker/omt:target",
 # #         "//modules/perception/lib/io:file_util",
-# #         "//modules/perception/lib/io:protobuf_util",
+# #         "//modules/common/util:file_util",
 # #         "@gtest//:main",
 # #     ]
 # # )
@@ -554,7 +554,7 @@
 #         "//modules/perception/camera/lib/obstacle/tracker/omt:target",
 #         "//modules/perception/inference/utils:inference_gemm_lib",
 #         "//modules/perception/lib/io:file_util",
-#         "//modules/perception/lib/io:protobuf_util",
+#         "//modules/common/util:file_util",
 #         "@gtest//:main",
 #     ]
 # )

@@ -525,7 +525,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
                 overlapped,
                 idx_sm,
                 stream);
-  for (int k = 0; k < num_classes; k++) {
+  for (int k = 0; k < num_classes; ++k) {
     apply_nms_gpu(res_box_data,
                   cpu_cls_data + k * num_candidates,
                   rest_indices,
@@ -562,7 +562,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
     }
     const std::vector<float> &scores = conf_scores.find(label)->second;
     std::vector<int> &indice = it->second;
-    for (int j = 0; j < static_cast<int>(indice.size()); ++j) {
+    for (size_t j = 0; j < indice.size(); ++j) {
       int idx = indice[j];
       const float *bbox = cpu_box_data + idx * kBoxBlockSize;
       if (scores[idx] < model_param.confidence_threshold()) {
@@ -662,7 +662,7 @@ void get_max_score_index(const std::vector<float> &scores,
                          const int top_k,
                          std::vector<std::pair<float, int> > *score_index_vec) {
   // Generate index score pairs.
-  for (int i = 0; i < static_cast<int>(scores.size()); ++i) {
+  for (size_t i = 0; i < scores.size(); ++i) {
     if (scores[i] > threshold) {
       score_index_vec->push_back(std::make_pair(scores[i], i));
     }
@@ -731,16 +731,16 @@ void apply_boxvoting_fast(std::vector<NormalizedBBox> *bboxes,
     return;
   }
   indices->clear();
-  for (int i = 0; i < static_cast<int>(bboxes->size()); i++) {
+  for (size_t i = 0; i < bboxes->size(); ++i) {
     (*bboxes)[i].mask = false;
     if ((*scores)[i] > conf_threshold) {
       indices->push_back(i);
     }
   }
-  for (int count = 0; count < static_cast<int>(indices->size()); count++) {
+  for (size_t count = 0; count < indices->size(); ++count) {
     int max_box_idx = 0;
 
-    for (int i = 1; i < static_cast<int>(indices->size()); i++) {
+    for (size_t i = 1; i < indices->size(); ++i) {
       int idx = indices->at(i);
       if ((*bboxes)[idx].mask) {
         continue;
@@ -758,7 +758,7 @@ void apply_boxvoting_fast(std::vector<NormalizedBBox> *bboxes,
     float x2_vt = best_bbox.xmax * s_vt;
     float y1_vt = best_bbox.ymin * s_vt;
     float y2_vt = best_bbox.ymax * s_vt;
-    for (int i = 0; i < static_cast<int>(indices->size()); i++) {
+    for (size_t i = 0; i < indices->size(); ++i) {
       int sub_it = indices->at(i);
       if ((*bboxes)[sub_it].mask) {
         continue;
@@ -812,7 +812,7 @@ void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
   while (score_index_vec.size() != 0) {
     const int idx = score_index_vec.front().second;
     bool keep = true;
-    for (int k = 0; k < static_cast<int>(indices->size()); ++k) {
+    for (size_t k = 0; k < indices->size(); ++k) {
       if (keep) {
         const int kept_idx = (*indices)[k];
         float overlap = get_jaccard_overlap(bboxes[idx], bboxes[kept_idx]);
@@ -833,9 +833,9 @@ void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
 
 void filter_bbox(const MinDims &min_dims,
                  std::vector<base::ObjectPtr> *objects) {
-  int valid_obj_idx = 0;
-  int total_obj_idx = 0;
-  while (total_obj_idx < static_cast<int>(objects->size())) {
+  size_t valid_obj_idx = 0;
+  size_t total_obj_idx = 0;
+  while (total_obj_idx < objects->size()) {
     const auto &obj = (*objects)[total_obj_idx];
     if ((obj->camera_supplement.box.ymax
         - obj->camera_supplement.box.ymin) >= min_dims.min_2d_height &&
@@ -968,7 +968,7 @@ void fill_area_id(bool with_flag, base::ObjectPtr obj, const float *data) {
 int get_area_id(float visible_ratios[4]) {
   int area_id = 0;
   int max_face = 0;
-  for (int i = 1; i < 4; i++) {
+  for (int i = 1; i < 4; ++i) {
     if (visible_ratios[i] > visible_ratios[max_face]) {
       max_face = i;
     }

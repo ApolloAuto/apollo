@@ -246,7 +246,7 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
       std::vector<float> height_error(kTemplateHWL.size(), 0);
 
       float obj_h = obj->size[2];
-      for (int i = 0; i < static_cast<int>(height_error.size()); ++i) {
+      for (size_t i = 0; i < height_error.size(); ++i) {
         height_error[i] =
             std::abs(kTemplateHWL[i].at(obj->sub_type).at(0) - obj_h);
       }

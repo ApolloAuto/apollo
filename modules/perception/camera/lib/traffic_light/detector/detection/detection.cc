@@ -22,8 +22,8 @@
 #include <numeric>
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/utils/util.h"
 #include "modules/perception/inference/utils/resize.h"
@@ -37,7 +37,7 @@ bool TrafficLightDetection::Init(
   std::string proto_path =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
   AINFO << "proto_path " << proto_path;
-  if (!lib::ParseProtobufFromFile(proto_path, &detection_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(proto_path, &detection_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
@@ -183,7 +183,7 @@ TrafficLightDetection::Inference(std::vector<base::TrafficLightPtr> *lights,
                       detection_param_.min_crop_size(), 3);
   param_blob_->Reshape(batch_num, 6, 1, 1);
   float *param_data = param_blob_->mutable_cpu_data();
-  for (int i = 0; i < static_cast<int>(batch_num); ++i) {
+  for (size_t i = 0; i < batch_num; ++i) {
     auto offset = i * param_blob_length_;
     param_data[offset + 0] = detection_param_.min_crop_size();
     param_data[offset + 1] = detection_param_.min_crop_size();
@@ -195,7 +195,7 @@ TrafficLightDetection::Inference(std::vector<base::TrafficLightPtr> *lights,
 
   AINFO << "reshape inputblob " << input_img_blob->shape_string();
 
-  for (int i = 0; i < static_cast<int>(batch_num); ++i) {
+  for (size_t i = 0; i < batch_num; ++i) {
     base::TrafficLightPtr light = lights->at(i);
     base::RectI cbox;
     crop_->getCropBox(img_width, img_height, light, &cbox);
@@ -283,7 +283,7 @@ bool TrafficLightDetection::Detect(
 
   AINFO << "Dump output Done! Get box num:" << detected_bboxes_.size();
 
-  for (int j = 0; j < static_cast<int>(detected_bboxes_.size()); ++j) {
+  for (size_t j = 0; j < detected_bboxes_.size(); ++j) {
       base::RectI &region = detected_bboxes_[j]->region.detection_roi;
       float score = detected_bboxes_[j]->region.detect_score;
       lights_ref[0]->region.debug_roi.push_back(region);

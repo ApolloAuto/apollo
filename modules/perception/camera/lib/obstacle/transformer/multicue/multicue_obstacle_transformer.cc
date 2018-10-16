@@ -16,9 +16,9 @@
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/singleton/singleton.h"
 
 namespace apollo {
@@ -30,8 +30,8 @@ bool MultiCueObstacleTransformer::Init(
   std::string transformer_config =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
 
-  if (!lib::ParseProtobufFromFile<multicue::MulticueParam>(transformer_config,
-                                                           &multicue_param_)) {
+  if (!apollo::common::util::GetProtoFromFile
+      <multicue::MulticueParam>(transformer_config, &multicue_param_)) {
     AERROR << "Read config failed: " << transformer_config;
     return false;
   }

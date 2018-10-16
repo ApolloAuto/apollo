@@ -285,7 +285,7 @@ TEST(KalmanConstTest, const_filter_test) {
         0.19266443,  2.05814734,  0.44203236, -0.36923239, -2.74245158,
        1.71922351,  0.50960368, -1.24154697, -1.7048239 ,  0.80218156};
 
-    for (int i = 0; i < static_cast<int>(measurements.size()); ++i) {
+    for (size_t i = 0; i < measurements.size(); ++i) {
       param << measurements[i];
       filter.Predict(1.0);
       filter.Correct(param);

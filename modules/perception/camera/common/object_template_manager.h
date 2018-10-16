@@ -24,10 +24,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "gflags/gflags.h"
 #include "cybertron/common/log.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/proto/object_template_meta_schema.pb.h"
-#include "gflags/gflags.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/thread/mutex.h"
 

@@ -18,15 +18,15 @@
 #include <gflags/gflags.h>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <string>
 #include <algorithm>
-#include <numeric>
-#include <limits>
 #include <cmath>
+#include <limits>
+#include <numeric>
+#include <string>
 
 #include "cybertron/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/camera/common/util.h"

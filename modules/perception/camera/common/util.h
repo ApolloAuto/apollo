@@ -21,19 +21,19 @@
 #include <google/protobuf/io/gzip_stream.h>
 #include <google/protobuf/text_format.h>
 #include <cblas.h>
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <numeric>
 #include <string>
 #include <vector>
-#include <map>
-#include <algorithm>
-#include <numeric>
-#include <memory>
-#include <iostream>
-#include <fstream>
+#include "glog/logging.h"
 #include "modules/perception/base/blob.h"
+#include "modules/perception/base/image.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/base/image.h"
-#include "glog/logging.h"
 
 namespace apollo {
 namespace perception {

@@ -334,12 +334,12 @@ TEST(UtilTest, GetCybertronWorkRootTest) {
   GetCybertronWorkRoot(&work_root);
   EXPECT_EQ(work_root, "");
 
-  char cybertron_path[80] = "CYBERTRON_PATH=/home/caros/cybertron";
+  char cybertron_path[] = "CYBERTRON_PATH=/home/caros/cybertron";
   putenv(cybertron_path);
   GetCybertronWorkRoot(&work_root);
   EXPECT_EQ(work_root, "/home/caros/cybertron");
 
-  char module_path[80] = "MODULE_PATH=/home/test/perception-camera";
+  char module_path[] = "MODULE_PATH=/home/test/perception-camera";
   putenv(module_path);
   GetCybertronWorkRoot(&work_root);
   EXPECT_EQ(work_root, "/home/test/perception-camera");

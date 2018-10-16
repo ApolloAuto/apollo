@@ -35,7 +35,7 @@ bool CosineSimilar::Calc(CameraFrame *frame1,
   for (auto &object1 : frame1->detected_objects) {
     for (auto &object2 : frame2->detected_objects) {
       float s = 0;
-      for (int k = 0; k < static_cast<int>(dim); ++k) {
+      for (size_t k = 0; k < dim; ++k) {
         s += object1->camera_supplement.object_feature[k]
             * object2->camera_supplement.object_feature[k];
       }

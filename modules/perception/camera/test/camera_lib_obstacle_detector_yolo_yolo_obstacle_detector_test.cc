@@ -142,7 +142,7 @@ TEST(YoloCameraDetectorTest, inference_init_test) {
       lib::FileUtil::GetAbsolutePath(init_options.root_dir,
                                      init_options.conf_file);
   yolo::YoloParam yolo_param;
-  lib::ParseProtobufFromFile(config_path, &yolo_param);
+  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
   yolo::YoloParam origin_yolo_param;
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_model_type("Unknownnet");
@@ -185,7 +185,7 @@ TEST(YoloCameraDetectorTest, anchor_init_test) {
                                      init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
-  lib::ParseProtobufFromFile(config_path, &yolo_param);
+  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_anchors_file("unknown_anchor.txt");
   {
@@ -226,7 +226,7 @@ TEST(YoloCameraDetectorTest, type_init_test) {
                                      init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
-  lib::ParseProtobufFromFile(config_path, &yolo_param);
+  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_types_file("config.pt");
   {
@@ -267,7 +267,7 @@ TEST(YoloCameraDetectorTest, feature_init_test) {
                                      init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
-  lib::ParseProtobufFromFile(config_path, &yolo_param);
+  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_feature_file("unknown.pt");
   {

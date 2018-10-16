@@ -19,13 +19,13 @@
 #include <string>
 
 #include "cybertron/common/log.h"
-#include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
-#include "modules/perception/lib/utils/perf.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
-#include "modules/perception/camera/common/util.h"
+#include "modules/perception/lib/io/file_util.h"
+#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {
@@ -41,7 +41,7 @@ bool TrafficLightCameraPerception::Init(
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
   proto_path = lib::FileUtil::GetAbsolutePath(work_root, proto_path);
   AINFO << "proto_path " << proto_path;
-  if (!lib::ParseProtobufFromFile(proto_path, &tl_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(proto_path, &tl_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }

@@ -35,7 +35,7 @@ void do_test(std::shared_ptr<SemanticReviser> _reviser,
   TrafficLightTrackerOptions option;
   CameraFrame frame;
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);
@@ -96,7 +96,7 @@ TEST(SemanticReviser, mix) {
   TrafficLightTrackerOptions option;
   CameraFrame frame;
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);
@@ -123,7 +123,7 @@ TEST(SemanticReviser, mix_yellow) {
   TrafficLightTrackerOptions option;
   CameraFrame frame;
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);
@@ -150,7 +150,7 @@ TEST(SemanticReviser, mix_black) {
   TrafficLightTrackerOptions option;
   CameraFrame frame;
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);
@@ -177,7 +177,7 @@ TEST(SemanticReviser, unknown_to_black) {
   TrafficLightTrackerOptions option;
   CameraFrame frame;
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);
@@ -204,7 +204,7 @@ TEST(SemanticReviser, black_to_unknown) {
   TrafficLightTrackerOptions option;
   CameraFrame frame;
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);
@@ -263,7 +263,7 @@ TEST(SemanticReviser, mix_yellow_red_flash) {
   TrafficLightTrackerOptions option;
   CameraFrame frame;
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);
@@ -327,7 +327,7 @@ TEST(SemanticReviser, green_blink) {
   options.conf_file = "semantic.pt";
   reviser->Init(options);
   frame.timestamp = 100;
-  for (int i = 0; i < static_cast<int>(color_list.size()); ++i) {
+  for (size_t i = 0; i < color_list.size(); ++i) {
     std::vector<base::TrafficLightPtr> light;
     light.emplace_back(new base::TrafficLight);
     light[0]->status.color = base::TLColor(color_list[i]);

@@ -219,7 +219,7 @@ void MaxNMeanFilter::AddMeasure(const Eigen::VectorXd &z) {
 
 Eigen::VectorXd MaxNMeanFilter::get_state() const {
   Eigen::VectorXd x = measures_[0];
-  for (unsigned int i = 1; i < measures_.size(); ++i) {
+  for (size_t i = 1; i < measures_.size(); ++i) {
     x += measures_[i];
   }
   x = x / measures_.size();

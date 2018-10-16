@@ -93,7 +93,7 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
   static bool CompareCCSize(const ConnectedComponent& cc1,
     const ConnectedComponent& cc2) {
     std::vector<base::Point2DI> cc1_pixels = cc1.GetPixels();
-    std::vector<base::Point2DI> cc2_pixels = cc1.GetPixels();
+    std::vector<base::Point2DI> cc2_pixels = cc2.GetPixels();
     return cc1_pixels.size() > cc2_pixels.size();
   }
   // @brief: infer point set from lane center

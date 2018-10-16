@@ -104,7 +104,7 @@ bool LaneLineCalibrator::LoadEgoLaneline(
   bool found_ego_left = false;
   bool found_ego_right = false;
   // using points from model fitting
-  for (int i = 0; i < static_cast<int>(lane_objects.size()); ++i) {
+  for (size_t i = 0; i < lane_objects.size(); ++i) {
     if (lane_objects[i].pos_type ==
         base::LaneLinePositionType::EGO_LEFT) {
       int num_points = lane_objects[i].curve_image_point_set.size();

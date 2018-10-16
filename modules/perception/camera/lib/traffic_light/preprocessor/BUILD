@@ -18,7 +18,6 @@ proto_library(
 )
 
 
-
 cc_library(
     name = "multi_camera_projection",
     srcs = [
@@ -30,12 +29,12 @@ cc_library(
     deps = [
         ":pose",
         "//cybertron",
+        "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
-        "//modules/perception/common/sensor_manager:sensor_manager",
         "//modules/perception/common/io:io_util",
+        "//modules/perception/common/sensor_manager:sensor_manager",
         "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/io:protobuf_util",
     ],
 )
 
@@ -78,7 +77,7 @@ cc_library(
         "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/lib/utils:utils",
         "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/io:protobuf_util",
+        "//modules/common/util:file_util",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/camera/lib/interface:base_init_options",
     ],

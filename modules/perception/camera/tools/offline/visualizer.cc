@@ -49,7 +49,7 @@ bool Visualizer::Init(const std::vector<std::string> &camera_names,
   wide_pixel_ = 800;
   m2pixel_ = 6;
 
-  for (int i = 0; i < static_cast<int>(camera_names.size()); ++i) {
+  for (size_t i = 0; i < camera_names.size(); ++i) {
     camera_image_[camera_names[i]] =
         cv::Mat(small_h_, small_w_, CV_8UC3, cv::Scalar(0, 0, 0));
   }

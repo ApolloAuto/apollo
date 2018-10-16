@@ -73,7 +73,6 @@ TEST(RecognizeTest, yellow) {
 
 #ifndef CPU_ONLY
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
-  // 直接 EXPECT_EQ 会出 core
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_YELLOW == lights[0]->status.color);
 #endif
@@ -130,7 +129,6 @@ TEST(RecognizeTest, red) {
 
 #ifndef CPU_ONLY
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
-  // 直接 EXPECT_EQ 会出 core
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_RED == lights[0]->status.color);
 #endif
@@ -184,7 +182,6 @@ TEST(RecognizeTest, green) {
   frame.traffic_lights = lights;
 
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
-  // 直接 EXPECT_EQ 会出 core
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_GREEN == lights[0]->status.color);
 }
@@ -240,7 +237,6 @@ TEST(RecognizeTest, black) {
 
 #ifndef CPU_ONLY
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
-  // 直接 EXPECT_EQ 会出 core
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_BLACK == lights[0]->status.color);
 #endif
@@ -293,7 +289,6 @@ TEST(RecognizeTest, no_detection) {
 
 #ifndef CPU_ONLY
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
-  // 直接 EXPECT_EQ 会出 core
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_UNKNOWN_COLOR == lights[0]->status.color);
 #endif
@@ -404,7 +399,6 @@ TEST(RecognizeTest, quadrate) {
 
 #ifndef CPU_ONLY
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
-  // 直接 EXPECT_EQ 会出 core
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_GREEN == lights[0]->status.color);
 #endif
@@ -467,7 +461,6 @@ TEST(RecognizeTest, horizontal) {
 
 #ifndef CPU_ONLY
   ASSERT_TRUE(recognition->Detect(recognition_options, &frame));
-  // 直接 EXPECT_EQ 会出 core
   AINFO << "COLOR " << static_cast<int>(lights[0]->status.color);
   ASSERT_TRUE(base::TLColor::TL_GREEN == lights[0]->status.color);
 #endif

@@ -17,8 +17,8 @@
 
 #include <string>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {
 namespace perception {
@@ -30,7 +30,7 @@ TrafficLightRecognition::Init(const TrafficLightDetectorInitOptions& options) {
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
 
   AINFO << "proto_path " << proto_path;
-  if (!lib::ParseProtobufFromFile(proto_path, &recognize_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(proto_path, &recognize_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }

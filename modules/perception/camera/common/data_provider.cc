@@ -13,8 +13,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include "cybertron/common/log.h"
 #include "modules/perception/camera/common/data_provider.h"
+#include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {

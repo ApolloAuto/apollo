@@ -30,11 +30,11 @@ cc_library(
         ":obj_postprocessor",
         ":location_refiner_proto",
         "//cybertron",
+        "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/lib/singleton:singleton",
         "//modules/perception/lib/io:file_util",
-        "//modules/perception/lib/io:protobuf_util",
+        "//modules/perception/lib/singleton:singleton",
     ],
 )
 

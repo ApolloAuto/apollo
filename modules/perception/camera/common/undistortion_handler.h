@@ -21,8 +21,8 @@
 #include <string>
 
 #include "modules/perception/base/blob.h"
-#include "modules/perception/base/image.h"
 #include "modules/perception/base/distortion_model.h"
+#include "modules/perception/base/image.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
