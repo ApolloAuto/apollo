@@ -12,4 +12,5 @@ message Config {
   optional string map_dir = 7;
   optional string lidar_localization_topic = 8 [default = "/apollo/localization/msf_lidar"];
   optional string gnss_localization_topic = 9 [default = "/apollo/localization/msf_gnss"];
+  optional string localization_status_topic = 10 [default = "/apollo/localization/msf_status"];
 }

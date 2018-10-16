@@ -84,6 +84,7 @@ class LocalizationMsgPublisher {
 
   void PublishLocalizationMsfGnss(const LocalizationEstimate& localization);
   void PublishLocalizationMsfLidar(const LocalizationEstimate& localization);
+  void PublishLocalizationStatus(const LocalizationStatus& localization_status);
 
  private:
   std::shared_ptr<cybertron::Node> node_;
@@ -97,12 +98,16 @@ class LocalizationMsgPublisher {
   apollo::transform::TransformBroadcaster tf2_broadcaster_;
 
   std::string lidar_local_topic_ = "";
-  std::shared_ptr<cybertron::Writer<LocalizationEstimate>>
-      lidar_local_talker_ = nullptr;
+  std::shared_ptr<cybertron::Writer<LocalizationEstimate>> lidar_local_talker_ =
+      nullptr;
 
   std::string gnss_local_topic_ = "";
-  std::shared_ptr<cybertron::Writer<LocalizationEstimate>>
-      gnss_local_talker_ = nullptr;
+  std::shared_ptr<cybertron::Writer<LocalizationEstimate>> gnss_local_talker_ =
+      nullptr;
+
+  std::string localization_status_topic_ = "";
+  std::shared_ptr<cybertron::Writer<LocalizationStatus>>
+      localization_status_talker_ = nullptr;
 };
 
 }  // namespace localization

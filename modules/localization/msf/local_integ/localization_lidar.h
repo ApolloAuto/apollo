@@ -104,7 +104,9 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
   int Update(const unsigned int frame_idx, const Eigen::Affine3d& pose,
              const Eigen::Vector3d velocity, const LidarFrame& lidar_frame);
 
-  void GetResult(Eigen::Affine3d *location, Eigen::Matrix3d *covariance);
+  void GetResult(Eigen::Affine3d *location,
+                 Eigen::Matrix3d *covariance,
+                 double *location_score);
 
   void GetLocalizationDistribution(Eigen::MatrixXd *distribution);
 
@@ -115,24 +117,24 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
 
  protected:
   LidarLocator *lidar_locator_;
-  int search_range_x_;
-  int search_range_y_;
-  int node_size_x_;
-  int node_size_y_;
-  double resolution_;
+  int search_range_x_ = 0;
+  int search_range_y_ = 0;
+  int node_size_x_ = 0;
+  int node_size_y_ = 0;
+  double resolution_ = 0.125;
   MapNodeData* lidar_map_node_;
 
   LossyMapConfig config_;
   LossyMap map_;
   LossyMapNodePool map_node_pool_;
   Eigen::Vector2d map_left_top_corner_;
-  unsigned int resolution_id_;
-  int zone_id_;
-  bool is_map_loaded_;
+  unsigned int resolution_id_ = 0;
+  int zone_id_ = 50;
+  bool is_map_loaded_ = false;
 
-  double vehicle_lidar_height_;
-  double pre_vehicle_ground_height_;
-  bool is_pre_ground_height_valid_;
+  double vehicle_lidar_height_ = 1.7;
+  double pre_vehicle_ground_height_ = 0.0;
+  bool is_pre_ground_height_valid_ = false;
   Eigen::Affine3d velodyne_extrinsic_;
 };
 

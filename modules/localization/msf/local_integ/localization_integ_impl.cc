@@ -102,6 +102,8 @@ Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
         << gnss_antenna_extrinsic_.translation()(1) << " "
         << gnss_antenna_extrinsic_.translation()(2);
 
+  expert_.Init(params);
+
   StartThreadLoop();
 
   return Status::OK();
@@ -198,6 +200,8 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
 
   state = lidar_process_->GetResult(&lidar_localization);
 
+  expert_.AddLidarLocalization(lidar_localization);
+
   MeasureData lidar_measure;
   if (state == 2) {  // only state OK republish lidar msg
     republish_process_->LidarLocalProcess(lidar_localization, &lidar_measure);
@@ -271,10 +275,19 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   }
   integ_process_->RawImuProcess(imu_data);
 
+  expert_.AddImu(imu_data);
+
   // integ
   IntegState state;
   LocalizationEstimate integ_localization;
   integ_process_->GetResult(&state, &integ_localization);
+  // check msf running status and set msf_status in integ_localization
+
+  LocalizationIntegStatus integ_status;
+  expert_.AddFusionLocalization(integ_localization);
+  expert_.GetFusionStatus(integ_localization.mutable_msf_status(),
+                          integ_localization.mutable_sensor_status(),
+                          &integ_status);
 
   apollo::localization::Pose* posepb_loc = integ_localization.mutable_pose();
 
@@ -323,8 +336,9 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   angular_velocity_vrf->set_z(imu_data.wibb[2]);
 
   integ_localization_mutex_.lock();
-  integ_localization_list_.push_back(LocalizationResult(
-      LocalizationMeasureState(static_cast<int>(state)), integ_localization));
+  integ_localization_list_.emplace_back(
+                         LocalizationMeasureState(static_cast<int>(state)),
+                         integ_localization, integ_status);
   if (integ_localization_list_.size() > integ_localization_list_max_size_) {
     integ_localization_list_.pop_front();
   }
@@ -486,8 +500,10 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
                                                     &measure)) {
     integ_process_->MeasureDataProcess(measure);
 
+    expert_.AddGnssBestPose(bestgnsspos_msg, measure);
     LocalizationEstimate gnss_localization;
     TransferGnssMeasureToLocalization(measure, &gnss_localization);
+    expert_.GetGnssStatus(gnss_localization.mutable_msf_status());
 
     gnss_localization_mutex_.lock();
     gnss_localization_list_.push_back(

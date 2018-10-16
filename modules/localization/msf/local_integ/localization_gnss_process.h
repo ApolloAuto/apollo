@@ -128,20 +128,20 @@ class LocalizationGnssProcess {
   GnssSolver *gnss_solver_;
   GnssPntResultMsg gnss_pnt_result_;
 
-  bool enable_ins_aid_rtk_;
+  bool enable_ins_aid_rtk_ = true;
 
   std::map<EphKey, drivers::gnss::GnssEphemeris> map_gnss_eph_;
 
   // from imu to gnss antenna
   LeverArm gnss_lever_arm_;
   // integrated-ins indicator
-  bool sins_align_finish_;
+  bool sins_align_finish_ = false;
 
   // deploy simple short-baseline to resolve heading
   GnssSolver *double_antenna_solver_;
 
   // newest obs time
-  double current_obs_time_;
+  double current_obs_time_ = 0.0;
 
   LocalizationMeasureState gnss_state_;
 };
