@@ -34,6 +34,7 @@
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/localization/proto/localization_status.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
 
@@ -114,43 +115,46 @@ class LocalizationLidarProcess {
   std::string map_path_;
   std::string lidar_extrinsic_file_;
   std::string lidar_height_file_;
-  int localization_mode_;
-  int yaw_align_mode_;
-  int lidar_filter_size_;
-  double delta_yaw_limit_;
-  double init_delta_yaw_limit_;
-  double compensate_pitch_roll_limit_;
-  int utm_zone_id_;
-  double map_coverage_theshold_;
+  int localization_mode_ = 2;
+  int yaw_align_mode_ = 2;
+  int lidar_filter_size_ = 17;
+  double delta_yaw_limit_ = 0.00436;
+  double init_delta_yaw_limit_ = 0.02618;
+  double compensate_pitch_roll_limit_ = 0.035;
+  int utm_zone_id_ = 50;
+  double map_coverage_theshold_ = 0.8;
   TransformD lidar_extrinsic_;
   LidarHeight lidar_height_;
 
-  bool is_get_first_lidar_msg_;
+  bool is_get_first_lidar_msg_ = false;
   TransformD cur_predict_location_;
   TransformD pre_predict_location_;
   Vector3D velocity_;
   TransformD pre_location_;
   TransformD location_;
-  double pre_location_time_;
+  double pre_location_time_ = 0;
 
   // Information used to output.
   Matrix3D location_covariance_;
   LidarState lidar_status_;
 
-  bool reinit_flag_;
+  LocalLidarStatus local_lidar_status_;
+  LocalLidarQuality local_lidar_quality_;
+
+  bool reinit_flag_ = false;
 
   // imu and lidar max delay time
-  double imu_lidar_max_delay_time_;
+  double imu_lidar_max_delay_time_ = 0.4;
 
-  bool is_unstable_reset_;
-  int unstable_count_;
-  double unstable_threshold_;
+  bool is_unstable_reset_ = false;
+  int unstable_count_ = 0;
+  double unstable_threshold_ = 0.3;
 
-  int out_map_count_;
+  int out_map_count_ = 0;
 
   /**@brief forcast integ pose, use to limit output of yaw */
   ForcastState forcast_integ_state_;
-  int64_t forcast_timer_;
+  int64_t forcast_timer_ = 0;
 
   static constexpr double DEG_TO_RAD = 0.017453292519943;
   static constexpr double DEG_TO_RAD2 = DEG_TO_RAD * DEG_TO_RAD;

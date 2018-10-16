@@ -96,10 +96,10 @@ class LocalizationIntegProcess {
 
   std::atomic<bool> keep_running_;
   std::queue<MeasureData> measure_data_queue_;
-  int measure_data_queue_size_;
+  int measure_data_queue_size_ = 150;
   std::mutex measure_data_queue_mutex_;
 
-  int delay_output_counter_;
+  int delay_output_counter_ = 0;
 };
 
 }  // namespace msf

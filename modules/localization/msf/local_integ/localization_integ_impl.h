@@ -32,6 +32,7 @@
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 #include "modules/localization/msf/local_integ/localization_lidar_process.h"
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
+#include "modules/localization/msf/local_integ/online_localization_expert.h"
 
 /**
  * @namespace apollo::localization
@@ -116,36 +117,36 @@ class LocalizationIntegImpl {
 
   // lidar localizaiton result list
   std::list<LocalizationResult> lidar_localization_list_;
-  size_t lidar_localization_list_max_size_;
+  size_t lidar_localization_list_max_size_ = 10;
   std::mutex lidar_localization_mutex_;
 
   // integration localization result list
   std::list<LocalizationResult> integ_localization_list_;
-  size_t integ_localization_list_max_size_;
+  size_t integ_localization_list_max_size_ = 50;
   std::mutex integ_localization_mutex_;
 
   // gnss localization result list
   std::list<LocalizationResult> gnss_localization_list_;
-  size_t gnss_localization_list_max_size_;
+  size_t gnss_localization_list_max_size_ = 10;
   std::mutex gnss_localization_mutex_;
-  bool is_use_gnss_bestpose_;
+  bool is_use_gnss_bestpose_ = true;
 
   // lidar process thread
   std::atomic<bool> keep_lidar_running_;
   std::thread lidar_data_thread_;
   std::condition_variable lidar_data_signal_;
   std::queue<LidarFrame> lidar_data_queue_;
-  size_t lidar_queue_max_size_;
+  size_t lidar_queue_max_size_ = 5;
   std::mutex lidar_data_queue_mutex_;
-  double imu_altitude_from_lidar_localization_;
-  bool imu_altitude_from_lidar_localization_available_;
+  double imu_altitude_from_lidar_localization_ = 0.0;
+  bool imu_altitude_from_lidar_localization_available_ = false;
 
   // imu process thread
   std::atomic<bool> keep_imu_running_;
   std::thread imu_data_thread_;
   std::condition_variable imu_data_signal_;
   std::queue<ImuData> imu_data_queue_;
-  size_t imu_queue_max_size_;
+  size_t imu_queue_max_size_ = 200;
   std::mutex imu_data_queue_mutex_;
 
   // gnss process thread
@@ -153,12 +154,12 @@ class LocalizationIntegImpl {
   std::thread gnss_function_thread_;
   std::condition_variable gnss_function_signal_;
   std::queue<std::function<void()>> gnss_function_queue_;
-  size_t gnss_queue_max_size_;
+  size_t gnss_queue_max_size_ = 100;
   std::mutex gnss_function_queue_mutex_;
 
-  bool enable_lidar_localization_;
-
+  bool enable_lidar_localization_ = true;
   Eigen::Affine3d gnss_antenna_extrinsic_;
+  OnlineLocalizationExpert expert_;
 };
 
 }  // namespace msf

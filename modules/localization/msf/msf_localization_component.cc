@@ -26,8 +26,8 @@
 namespace apollo {
 namespace localization {
 
-using apollo::cybertron::proto::RoleAttributes;
 using apollo::common::time::Clock;
+using apollo::cybertron::proto::RoleAttributes;
 
 MSFLocalizationComponent::MSFLocalizationComponent() {}
 
@@ -80,6 +80,7 @@ bool MSFLocalizationComponent::InitIO() {
   std::function<void(const std::shared_ptr<drivers::PointCloud>&)>
       lidar_register_call = std::bind(&MSFLocalization::OnPointCloud,
                                       &localization_, std::placeholders::_1);
+
   lidar_listener_ = this->node_->CreateReader<drivers::PointCloud>(
       reader_config, lidar_register_call);
 
@@ -118,6 +119,7 @@ bool LocalizationMsgPublisher::InitConfig(const msf_config::Config& config) {
   broadcast_tf_child_frame_id_ = config.broadcast_tf_child_frame_id();
   lidar_local_topic_ = config.lidar_localization_topic();
   gnss_local_topic_ = config.gnss_localization_topic();
+  localization_status_topic_ = config.localization_status_topic();
   return true;
 }
 
@@ -130,6 +132,9 @@ bool LocalizationMsgPublisher::InitIO() {
 
   gnss_local_talker_ =
       node_->CreateWriter<LocalizationEstimate>(gnss_local_topic_);
+
+  localization_status_talker_ =
+      node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
   return true;
 }
 
@@ -174,6 +179,11 @@ void LocalizationMsgPublisher::PublishLocalizationMsfLidar(
     const LocalizationEstimate& localization) {
   lidar_local_talker_->Write(localization);
   return;
+}
+
+void LocalizationMsgPublisher::PublishLocalizationStatus(
+    const LocalizationStatus& localization_status) {
+  localization_status_talker_->Write(localization_status);
 }
 
 }  // namespace localization

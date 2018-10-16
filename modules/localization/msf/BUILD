@@ -38,6 +38,7 @@ cc_library(
         "//modules/localization/proto:gnss_pnt_result_proto",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/localization/proto:localization_status_proto",
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:sins_pva_proto",
         "//modules/localization/proto:msf_config_proto",

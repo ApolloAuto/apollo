@@ -35,8 +35,7 @@ using apollo::localization::MeasureState_Name;
 
 LocalizationMonitor::LocalizationMonitor()
     : RecurrentRunner(FLAGS_localization_monitor_name,
-                      FLAGS_localization_monitor_interval) {
-}
+                      FLAGS_localization_monitor_interval) {}
 
 void LocalizationMonitor::RunOnce(const double current_time) {
   static auto reader = MonitorManager::CreateReader<LocalizationStatus>(
@@ -53,14 +52,16 @@ void LocalizationMonitor::RunOnce(const double current_time) {
   //   2. Log to Dreamview as error.
   //   3. Read aloud to passengers.
   //   4. Trigger guardian safety stop.
-  if (status->gnss_status() != MeasureState::OK) {
-    AWARN << "Localization GNSS status "
-          << MeasureState_Name(status->gnss_status());
-  }
-  if (status->lidar_status() != MeasureState::OK) {
-    AWARN << "Localization lidar status "
-          << MeasureState_Name(status->lidar_status());
-  }
+  //  if (status->gnss_status() != MeasureState::OK) {
+  //    AWARN << "Localization GNSS status "
+  //          << MeasureState_Name(status->gnss_status());
+  //  }
+  //  if (status->lidar_status() != MeasureState::OK) {
+  //    AWARN << "Localization lidar status "
+  //          << MeasureState_Name(status->lidar_status());
+  //  }
+
+  // TODO(xiaoxq): implement monitor for new localization status
   if (status->fusion_status() != MeasureState::OK) {
     AERROR << "Localization fusion status "
            << MeasureState_Name(status->fusion_status());

@@ -77,6 +77,7 @@ proto_library(
     srcs = ["localization.proto"],
     deps = [
         ":pose_proto_lib",
+        ":localization_status_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
@@ -127,6 +128,21 @@ proto_library(
     srcs = ["gnss_pnt_result.proto"],
     deps = [
         "//modules/drivers/gnss/proto:gnss_raw_observation_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "localization_status_proto",
+    deps = [
+        ":localization_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "localization_status_proto_lib",
+    srcs = ["localization_status.proto"],
+    deps = [
+        "//modules/common/proto:header_proto_lib",
     ],
 )
 
