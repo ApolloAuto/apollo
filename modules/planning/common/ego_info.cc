@@ -46,7 +46,7 @@ bool EgoInfo::Update(const common::TrajectoryPoint& start_point,
 void EgoInfo::Clear() {
   start_point_.Clear();
   vehicle_state_.Clear();
-  front_clear_distance_ = std::numeric_limits<double>::max();
+  front_clear_distance_ = FLAGS_default_front_clear_distance;
 }
 
 void EgoInfo::CalculateFrontObstacleClearDistance(

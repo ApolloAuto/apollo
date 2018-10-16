@@ -409,3 +409,7 @@ DEFINE_bool(enable_osqp_debug, false,
 DEFINE_bool(export_chart, false, "export chart in planning");
 DEFINE_bool(enable_record_debug, true,
             "True to enable record debug info in chart format");
+
+DEFINE_double(
+    default_front_clear_distance, 300.0,
+    "default front clear distance value in case there is no obstacle around.");
