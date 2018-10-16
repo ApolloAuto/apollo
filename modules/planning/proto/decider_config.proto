@@ -12,3 +12,8 @@ message DeciderCreepConfig {
   // min boundary t to ignore obstacles while creeping
   optional double min_boundary_t = 4 [default = 6.0];  // second
 }
+
+message DeciderStopSignConfig {
+  // stop distance(m) to the stop line of the stop sign
+  optional double stop_distance = 1 [default = 1.0];  // meter
+}

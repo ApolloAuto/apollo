@@ -7,14 +7,14 @@ cc_library(
     srcs = [
         "decider.cc",
         "decider_creep.cc",
-        "decider_stop_sign_monitor.cc",
+        "decider_stop_sign.cc",
         "side_pass_path_decider.cc",
         "side_pass_safety.cc",
     ],
     hdrs = [
         "decider.h",
         "decider_creep.h",
-        "decider_stop_sign_monitor.h",
+        "decider_stop_sign.h",
         "side_pass_path_decider.h",
         "side_pass_safety.h",
     ],

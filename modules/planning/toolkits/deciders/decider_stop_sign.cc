@@ -18,78 +18,81 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/decider_creep.h"
+#include "modules/planning/toolkits/deciders/decider_stop_sign.h"
 
 #include <string>
+
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::util::WithinBound;
 using apollo::hdmap::PathOverlap;
 
-DeciderCreep::DeciderCreep(const TaskConfig& config) : Decider(config) {
-  CHECK(config.has_decider_creep_config());
-  config_ = config.decider_creep_config();
+DeciderStopSign::DeciderStopSign(const TaskConfig& config) : Decider(config) {
+  CHECK(config.has_decider_stop_sign_config());
+  config_ = config.decider_stop_sign_config();
   SetName("DeciderCreep");
 }
 
-Status DeciderCreep::Process(Frame* frame,
+Status DeciderStopSign::Process(Frame* frame,
                              ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  BuildStopDecision(frame, reference_line_info);
+  // TODO(all): to read from scenario context
+  const std::string stop_sign_id = "TEMP";
+  const double stop_line_s = 100;
+
+  const double stop_distance = config_.stop_distance();
+  const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_id;
+  BuildStopDecision(frame, reference_line_info,
+                    stop_wall_id, stop_line_s,
+                    stop_distance);
 
   return Status::OK();
 }
 
-double DeciderCreep::FindCreepDistance(Frame* frame,
-                                       ReferenceLineInfo* reference_line_info) {
-  // TODO(all)
-  return 0.5;
-}
-
-// TODO(all): revisit & rewrite
-// bool Creep::BuildStopDecision(Frame* frame,
-//                              ReferenceLineInfo* reference_line_info,
-//                              const PathOverlap& overlap) {
-bool DeciderCreep::BuildStopDecision(Frame* frame,
-                                     ReferenceLineInfo* reference_line_info) {
+bool DeciderStopSign::BuildStopDecision(
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info,
+    const std::string& stop_wall_id,
+    const double stop_line_s,
+    const double stop_distance) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const double creep_distance = FindCreepDistance(frame, reference_line_info);
-  double creep_stop_s = adc_front_edge_s + creep_distance;
+  // check
+  const auto& reference_line = reference_line_info->reference_line();
+  if (!WithinBound(0.0, reference_line.Length(), stop_line_s)) {
+    AERROR << "stop_line_s[" << stop_line_s << "] is not on reference line";
+    return 0;
+  }
 
   // create virtual stop wall
-  // TODO(all)
-  // std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + overlap.object_id;
-  std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + std::string("test");
-  auto* obstacle = frame->CreateStopObstacle(reference_line_info,
-                                             virtual_obstacle_id, creep_stop_s);
+  auto* obstacle =
+      frame->CreateStopObstacle(reference_line_info, stop_wall_id, stop_line_s);
   if (!obstacle) {
-    AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
-    return false;
+    AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
+    return -1;
   }
   PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
-    return false;
+    AERROR << "Failed to create path_obstacle for: " << stop_wall_id;
+    return -1;
   }
 
   // build stop decision
-  const double stop_distance = config_.stop_distance();
-  const double stop_s = creep_stop_s - stop_distance;
-  const auto& reference_line = reference_line_info->reference_line();
+  const double stop_s = stop_line_s - stop_distance;
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
-  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CREEPER);
+  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_STOP_SIGN);
   stop_decision->set_distance_s(-stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
@@ -97,9 +100,10 @@ bool DeciderCreep::BuildStopDecision(Frame* frame,
   stop_decision->mutable_stop_point()->set_z(0.0);
 
   auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision("Creeper", stop_wall->Id(), stop);
+  path_decision->AddLongitudinalDecision(
+      "DeciderStopSign", stop_wall->Id(), stop);
 
-  return true;
+  return 0;
 }
 
 }  // namespace planning

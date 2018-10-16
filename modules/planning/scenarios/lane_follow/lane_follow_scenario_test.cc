@@ -50,7 +50,7 @@ TEST_F(LaneFollowScenarioTest, VerifyConf) {
       FLAGS_scenario_side_pass_config_file, &config));
 }
 
-TEST_F(LaneFollowScenarioTest, InitTasks) {
+TEST_F(LaneFollowScenarioTest, Init) {
   FLAGS_scenario_lane_follow_config_file =
       "//apollo/modules/planning/testdata/conf/"
       "scenario_lane_follow_config.pb.txt";
