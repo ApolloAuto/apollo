@@ -42,9 +42,9 @@ TrackObjectPtr Target::operator[](int index) const {
   return get_object(index);
 }
 TrackObjectPtr Target::get_object(int index) const {
-  CHECK(tracked_objects.size() > 0); // NOLINT
-  CHECK(index < static_cast<int>(tracked_objects.size()));  // NOLINT
-  CHECK(index >= -static_cast<int>(tracked_objects.size()));  // NOLINT
+  CHECK_GT(tracked_objects.size(), 0);
+  CHECK_LT(index, static_cast<int>(tracked_objects.size()));
+  CHECK_GE(index, -static_cast<int>(tracked_objects.size()));
   return tracked_objects[(index + tracked_objects.size())
       % tracked_objects.size()];
 }

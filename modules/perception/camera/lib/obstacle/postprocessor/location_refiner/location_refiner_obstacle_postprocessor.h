@@ -13,14 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#pragma once  // NOLINT
+#pragma once
 
 #include <vector>
 #include <string>
 
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner.pb.h"
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/obj_postprocessor.h"
-#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner.pb.h"  // NOLINT
 
 namespace apollo {
 namespace perception {

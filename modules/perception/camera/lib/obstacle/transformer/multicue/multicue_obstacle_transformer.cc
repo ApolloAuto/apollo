@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"  // NOLINT
-
+#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 
 #include "cybertron/common/log.h"
 #include "modules/perception/camera/common/global_config.h"

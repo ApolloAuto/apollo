@@ -14,11 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 #include <nppi.h>
-#include <opencv2/highgui/highgui_c.h>
 #include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui_c.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <thread>  // NOLINT
+
+#include <thread>
+
 #include "gtest/gtest.h"
 #include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/inference/utils/gemm.h"
@@ -55,10 +57,10 @@ TEST(UtilTest, GemmTest) {
   inference::GPUGemmFloat(CblasNoTrans, CblasTrans, 2, 2, 2, 1, a.gpu_data(),
                           b.gpu_data(), 0, c.mutable_gpu_data());
   const float *out = c.cpu_data();
-  ASSERT_TRUE(out[0] == 8);   // NOLINT
-  ASSERT_TRUE(out[1] == 14);  // NOLINT
-  ASSERT_TRUE(out[2] == 18);  // NOLINT
-  ASSERT_TRUE(out[3] == 32);  // NOLINT
+  EXPECT_EQ(8, out[0]);
+  EXPECT_EQ(14, out[1]);
+  EXPECT_EQ(18, out[2]);
+  EXPECT_EQ(32, out[3]);
 
   inference::GPUGemmFloat(CblasNoTrans, CblasNoTrans, 2, 2, 2, 1, a.gpu_data(),
                           b.gpu_data(), 0, c.mutable_gpu_data());

@@ -20,7 +20,6 @@
 #include <gtest/gtest.h>
 
 #include "cybertron/common/log.h"
-
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
@@ -52,7 +51,6 @@ class HDMapInputTest : public testing::Test {
 // EXPECT_TRUE(hdmap_input_.Init());
 // // data reference to
 // hdmap-library/src/test/get_forward_nearest_signals_on_lane_test.cpp in master
-// // NOLINT
 // std::string test_file_name = "/apollo/modules/perception/testdata/"
 //     "map/hdmap/data/adu_common_ShaHeDaXueCheng-test01_1_5_0_15.bin";
 // if (hdmap_input_.hdmap_->load_map_from_file(test_file_name) != 0) {
@@ -98,7 +96,7 @@ class HDMapInputTest : public testing::Test {
 // AINFO << "In test_GetNearestLaneDirection,load hdmap file: "
 //          << test_file_name;
 // // data reference to hdmap-library/src/test/get_nearest_lane_test.cpp in
-// master // NOLINT
+// // master
 // base::PointD pointd;
 // pointd.x = 690;
 // pointd.y = 225;
