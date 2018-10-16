@@ -19,13 +19,12 @@
 #include <string>
 
 #include "cybertron/cybertron.h"
-
-#include "modules/drivers/proto/pointcloud.pb.h"  // NOLINT
+#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/component/lidar_inner_component_messages.h"
-#include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/onboard/proto/lidar_component_config.pb.h"
+#include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
 
 namespace apollo {

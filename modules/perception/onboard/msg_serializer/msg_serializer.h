@@ -19,7 +19,7 @@
 
 #include "cybertron/time/time.h"
 #include "modules/perception/base/object.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"  // NOLINT
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {

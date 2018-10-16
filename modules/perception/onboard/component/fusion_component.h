@@ -16,7 +16,7 @@
 #pragma once
 
 #include <memory>
-#include <mutex>  // NOLINT
+#include <mutex>
 #include <string>
 #include <vector>
 

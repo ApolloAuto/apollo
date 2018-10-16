@@ -19,31 +19,32 @@
 #include <Eigen/Dense>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+
 #include <algorithm>
-#include <utility>
+#include <iomanip>
 #include <iostream>
 #include <string>
-#include <iomanip>
 #include <tuple>
+#include <utility>
 
-#include "modules/common/math/math_utils.h"  // from adu/common
+#include "cybertron/common/log.h"
 #include "cybertron/time/time.h"
-#include "modules/perception/lib/singleton/singleton.h"
+#include "modules/common/math/math_utils.h"
+#include "modules/common/time/time_util.h"
+#include "modules/perception/camera/common/data_provider.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
-#include "cybertron/common/log.h"
-#include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/camera/common/data_provider.h"
-#include "modules/perception/lib/utils/time_util.h"
+#include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/utils/perf.h"
+#include "modules/perception/lib/utils/time_util.h"
 #include "modules/transform/proto/transform.pb.h"
-#include "modules/common/time/time_util.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
-
 typedef apollo::perception::TrafficLightDetection::CameraID TLCamID;
+using apollo::perception::common::SensorManager;
 
 static int GetGpuId(
     const apollo::perception::camera::CameraPerceptionInitOptions& options) {
@@ -72,8 +73,8 @@ static int GetGpuId(
 }
 
 bool TrafficLightsPerceptionComponent::Init() {
-  writer_ =
-    node_->CreateWriter<apollo::perception::TrafficLightDetection>("/perception/traffic_light");  // NOLINT
+  writer_ = node_->CreateWriter<apollo::perception::TrafficLightDetection>(
+      "/perception/traffic_light");
 
   if (InitConfig() != cybertron::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitConfig failed.";
@@ -103,10 +104,12 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   apollo::perception::onboard::TrafficLight traffic_light_param;
 
   const std::string proto_path =
-      "../production/conf/perception/camera_onboard/trafficlights_perception_component.config";  // NOLINT
+      "../production/conf/perception/camera_onboard/"
+      "trafficlights_perception_component.config";
 
   if (!GetProtoConfig(&traffic_light_param)) {
-    AINFO << "load trafficlights perception component proto param failed, file dir";  // NOLINT
+    AINFO << "load trafficlights perception component proto param failed, "
+        "file dir";
     return false;
   }
 
@@ -179,8 +182,7 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
     AERROR << "invalid camera_names config";
     return cybertron::FAIL;
   }
-  apollo::perception::common::SensorManager* sensor_manager =
-                apollo::perception::lib::Singleton<apollo::perception::common::SensorManager>::get_instance();  // NOLINT
+  SensorManager* sensor_manager = lib::Singleton<SensorManager>::get_instance();
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     if (!sensor_manager->IsSensorExist(camera_names_[i])) {
       AERROR << ("sensor_name: " + camera_names_[i] + " not exists.");
@@ -700,14 +702,13 @@ bool TrafficLightsPerceptionComponent::GetPoseFromTF(
 bool TrafficLightsPerceptionComponent::TransformOutputMessage(
     camera::CameraFrame* frame,
     const std::string& camera_name,
-    std::shared_ptr<apollo::perception::
-                    TrafficLightDetection>* out_msg) {
+    std::shared_ptr<TrafficLightDetection>* out_msg) {
   PERCEPTION_PERF_FUNCTION();
-  const std::map<std::string, TLCamID> CAMERA_ID_TO_TLCAMERA_ID = {  // NOLINT
-      {"onsemi_traffic", apollo::perception::TrafficLightDetection::CAMERA_FRONT_LONG},  // NOLINT
-      {"onsemi_narrow", apollo::perception::TrafficLightDetection::CAMERA_FRONT_NARROW},  // NOLINT
-      {"onsemi_obstacle", apollo::perception::TrafficLightDetection::CAMERA_FRONT_SHORT},  // NOLINT
-      {"onsemi_wide", apollo::perception::TrafficLightDetection::CAMERA_FRONT_WIDE}  // NOLINT
+  const std::map<std::string, TLCamID> CAMERA_ID_TO_TLCAMERA_ID = {
+      {"onsemi_traffic", TrafficLightDetection::CAMERA_FRONT_LONG},
+      {"onsemi_narrow", TrafficLightDetection::CAMERA_FRONT_NARROW},
+      {"onsemi_obstacle", TrafficLightDetection::CAMERA_FRONT_SHORT},
+      {"onsemi_wide", TrafficLightDetection::CAMERA_FRONT_WIDE}
   };
 
   const auto &lights = frame->traffic_lights;
@@ -824,8 +825,7 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
     auto tl_rectified_box = light_debug->add_box();
     TransRect2Box(rectified_roi, tl_rectified_box);
     tl_rectified_box->set_color(
-                                static_cast<apollo::perception::TrafficLight_Color>  // NOLINT
-                                (lights.at(i)->status.color));
+        static_cast<TrafficLight_Color>(lights.at(i)->status.color));
     tl_rectified_box->set_selected(true);
   }
 
@@ -858,8 +858,7 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
     auto tl_rectified_box = light_debug->add_rectified_roi();
     TransRect2Box(rectified_roi, tl_rectified_box);
     tl_rectified_box->set_color(
-                                static_cast<apollo::perception::TrafficLight_Color>  // NOLINT
-                                (lights.at(i)->status.color));
+        static_cast<TrafficLight_Color>(lights.at(i)->status.color));
     tl_rectified_box->set_selected(true);
   }
 
@@ -894,8 +893,7 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
 }
 
 void TrafficLightsPerceptionComponent::SendSimulationMsg() {
-  std::shared_ptr<apollo::perception::TrafficLightDetection> out_msg =
-      std::make_shared<apollo::perception::TrafficLightDetection>();
+  auto out_msg = std::make_shared<TrafficLightDetection>();
   writer_->Write(out_msg);
 }
 

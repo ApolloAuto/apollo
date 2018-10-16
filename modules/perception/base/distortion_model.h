@@ -84,9 +84,11 @@ class BrownCameraDistortionModel : public BaseCameraDistortionModel {
   Eigen::Matrix<float, 5, 1> distort_params_;
 };
 
-using BrownCameraDistortionModelPtr = std::shared_ptr<BrownCameraDistortionModel>;  // NOLINT
+using BrownCameraDistortionModelPtr =
+    std::shared_ptr<BrownCameraDistortionModel>;
 
-using BrownCameraDistortionModelConstPtr = std::shared_ptr<const BrownCameraDistortionModel>;  // NOLINT
+using BrownCameraDistortionModelConstPtr =
+    std::shared_ptr<const BrownCameraDistortionModel>;
 
 }  // namespace base
 }  // namespace perception

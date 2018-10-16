@@ -26,7 +26,7 @@
 #include <tuple>
 #include <iomanip>
 
-#include "modules/common/math/math_utils.h"  // from adu/common
+#include "modules/common/math/math_utils.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/io/protobuf_util.h"
@@ -332,21 +332,21 @@ int FusionCameraDetectionComponent::InitConfig() {
   enable_undistortion_ = fusion_camera_detection_param.enable_undistortion();
   enable_visualization_ = fusion_camera_detection_param.enable_visualization();
   output_obstacles_channel_name_ =
-    fusion_camera_detection_param.output_obstacles_channel_name();  // NOLINT
+    fusion_camera_detection_param.output_obstacles_channel_name();
   camera_perception_viz_message_channel_name_ =
-    fusion_camera_detection_param.camera_perception_viz_message_channel_name();  // NOLINT
+    fusion_camera_detection_param.camera_perception_viz_message_channel_name();
   output_final_obstacles_ =
-    fusion_camera_detection_param.output_final_obstacles();  // NOLINT
+    fusion_camera_detection_param.output_final_obstacles();
   prefused_channel_name_ =
-    fusion_camera_detection_param.prefused_channel_name();  // NOLINT
+    fusion_camera_detection_param.prefused_channel_name();
   default_camera_pitch_ =
-    fusion_camera_detection_param.default_camera_pitch();  // NOLINT
+    fusion_camera_detection_param.default_camera_pitch();
   default_camera_height_ =
-    fusion_camera_detection_param.default_camera_height();  // NOLINT
+    fusion_camera_detection_param.default_camera_height();
   output_camera_debug_msg_ =
-    fusion_camera_detection_param.output_camera_debug_msg();  // NOLINT
+    fusion_camera_detection_param.output_camera_debug_msg();
   camera_debug_channel_name_ =
-    fusion_camera_detection_param.camera_debug_channel_name();  // NOLINT
+    fusion_camera_detection_param.camera_debug_channel_name();
   ts_diff_ = fusion_camera_detection_param.ts_diff();
 
   std::string format_str = R"(
@@ -765,12 +765,9 @@ int FusionCameraDetectionComponent::ConvertObjectToPb(
   }
 
   pb_msg->set_tracking_time(object_ptr->tracking_time);
-  pb_msg->set_type(
-      static_cast<apollo::perception::PerceptionObstacle::Type>(
-          object_ptr->type));
+  pb_msg->set_type(static_cast<PerceptionObstacle::Type>(object_ptr->type));
   pb_msg->set_sub_type(
-                      static_cast<apollo::perception::PerceptionObstacle::SubType>(  // NOLINT
-                           object_ptr->sub_type));
+      static_cast<PerceptionObstacle::SubType>(object_ptr->sub_type));
   pb_msg->set_timestamp(object_ptr->latest_tracked_time);  // in seconds.
 
   pb_msg->set_height_above_ground(object_ptr->size(2));

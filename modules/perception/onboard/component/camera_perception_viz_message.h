@@ -17,24 +17,24 @@
 
 #include <Eigen/Dense>
 #include <Eigen/Core>
+
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "cybertron/cybertron.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"  // NOLINT
 #include "modules/common/proto/error_code.pb.h"
-
-#include "modules/perception/base/object.h"
-#include "modules/perception/base/object_types.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/lane_struct.h"
+#include "modules/perception/base/object.h"
+#include "modules/perception/base/object_types.h"
+#include "modules/perception/proto/perception_obstacle.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
-class CameraPerceptionVizMessage : public apollo::cybertron::message::IntraMessage { // NOLINT
+class CameraPerceptionVizMessage : public cybertron::message::IntraMessage {
  public:
   CameraPerceptionVizMessage() {
     type_name_ = "CameraPerceptionVizMessage";

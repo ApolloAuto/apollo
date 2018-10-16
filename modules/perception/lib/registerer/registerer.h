@@ -32,7 +32,7 @@ class Any {
   Any() : content_(NULL) {}
 
   template <typename ValueType>
-  Any(const ValueType &value)  // NOLINT
+  explicit Any(const ValueType &value)
       : content_(new Holder<ValueType>(value)) {}
 
   Any(const Any &other)
@@ -43,7 +43,7 @@ class Any {
   template <typename ValueType>
   ValueType *AnyCast() {
     return content_ ? &(static_cast<Holder<ValueType> *>(content_)->held_)
-                    : nullptr;  // NOLINT
+                    : nullptr;
   }
 
  private:
