@@ -83,10 +83,10 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
 
   AINFO << "Number of variables are : " << num_of_variables;
   AINFO << "Number of constraints are : " << num_of_constraints;
-  AINFO << "m1" << m1;
-  AINFO << "m2" << m2;
-  AINFO << "m3" << m3;
-  AINFO << "m4" << m4;
+  AINFO << "m1 " << m1;
+  AINFO << "m2 " << m2;
+  AINFO << "m3 " << m3;
+  AINFO << "m4 " << m4;
 
   // TODO(QiL) : evaluate whether need to new it everytime
   bool use_fix_time_ = false;

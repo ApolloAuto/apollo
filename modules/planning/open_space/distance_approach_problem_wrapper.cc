@@ -32,7 +32,7 @@ class ObstacleContainer {
       const double* ROI_distance_approach_parking_boundary) {
     obstacles_num_ = 4;
     obstacles_edges_num_.resize(4, 1);
-    obstacles_edges_num_ << 1, 2, 2, 1;
+    obstacles_edges_num_ << 2, 1, 2, 1;
     std::size_t index = 0;
     for (std::size_t i = 0; i < obstacles_num_; i++) {
       std::vector<Vec2d> vertices_cw;

@@ -27,7 +27,7 @@ if scenario == "backward":
     OpenSpacePlanner.AddWarmStartObstacle(0.0, -0.5, 0.0, 4.0, 1.0, 4)
     # obstacles for distance approach(vertices coords in clock wise order)
     ROI_distance_approach_parking_boundary = (
-        c_double * 16)(*[-20, 5, -2, 5, -2, 0, 2, 0, 2, 5, 20, 5, 20, 11, -20, 11])
+        c_double * 20)(*[-20, 5, -2, 5, -2, 0, -2, 0, 2, 0, 2, 0, 2, 5, 20, 5, 20, 11, -20, 11])
     # ROI_distance_approach_parking_boundary = [-20, 5, -
     #                                           2, 5, -2, 0, 2, 0, 2, 5, 20, 5, 20, 11, -20, 11]
     OpenSpacePlanner.AddDistanceApproachObstacle(
