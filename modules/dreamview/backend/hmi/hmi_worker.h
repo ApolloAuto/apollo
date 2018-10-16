@@ -40,6 +40,7 @@ namespace apollo {
 namespace dreamview {
 
 using ChangeModeHandler = std::function<void(const std::string&)>;
+using ChangeLaunchHandler = std::function<void(const std::string&)>;
 using ChangeMapHandler = std::function<void(const std::string&)>;
 using ChangeVehicleHandler = std::function<void(const std::string&)>;
 
@@ -68,14 +69,18 @@ class HMIWorker {
   void RegisterChangeModeHandler(ChangeModeHandler handler) {
     change_mode_handlers_.emplace_back(handler);
   }
+  void RegisterChangeLaunchHandler(ChangeLaunchHandler handler) {
+    change_launch_handlers_.emplace_back(handler);
+  }
   void RegisterChangeMapHandler(ChangeMapHandler handler) {
     change_map_handlers_.emplace_back(handler);
   }
   void RegisterChangeVehicleHandler(ChangeVehicleHandler handler) {
     change_vehicle_handlers_.emplace_back(handler);
   }
-  // Change current mode, map, vehicle and driving mode.
+  // Change current mode, launch, map, vehicle and driving mode.
   void ChangeToMode(const std::string& mode_name);
+  void ChangeToLaunch(const std::string& launch_name);
   void ChangeToMap(const std::string& map_name);
   void ChangeToVehicle(const std::string& vehicle_name);
   bool ChangeToDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
@@ -132,6 +137,7 @@ class HMIWorker {
   mutable boost::shared_mutex status_mutex_;
 
   std::vector<ChangeModeHandler> change_mode_handlers_;
+  std::vector<ChangeLaunchHandler> change_launch_handlers_;
   std::vector<ChangeMapHandler> change_map_handlers_;
   std::vector<ChangeVehicleHandler> change_vehicle_handlers_;
 

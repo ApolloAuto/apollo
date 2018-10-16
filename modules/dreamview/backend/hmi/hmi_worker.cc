@@ -168,6 +168,12 @@ HMIWorker::HMIWorker(const std::shared_ptr<apollo::cybertron::Node> &node) {
   }
   apollo::common::KVDB::Put("apollo:dreamview:mode", status_.current_mode());
 
+  // If the default launch is unavailable, select the first one.
+  const auto &launches = modes.at(status_.current_mode()).launches();
+  if (!ContainsKey(launches, status_.current_launch())) {
+    status_.set_current_launch(launches.begin()->first);
+  }
+
   // If the FLAGS_map_dir is set, set it in HMIStatus.
   if (!FLAGS_map_dir.empty()) {
     for (const auto &entry : config_.available_maps()) {
@@ -189,10 +195,6 @@ bool HMIWorker::LoadModesConfig(
   for (const auto& mode_dir : ListDirAsDict(modes_config_path)) {
     auto& mode = LookupOrInsert(modes, mode_dir.first, {});
     mode.set_path(mode_dir.second);
-    // TODO(xiaoxq): Modules are now managed by launchfile, while recorder is
-    // a common tool for all modes. Need to refactor both backend and frontend
-    // UI to reflect Cybertron control flow.
-    mode.add_live_modules("record_bag");
 
     static const std::string kFileExt = ".launch";
     for (const auto& launch_file :
@@ -201,7 +203,12 @@ bool HMIWorker::LoadModesConfig(
       const auto filename = apollo::common::util::GetFileName(launch_file);
       const auto launch_name = TitleCase(
           filename.substr(0, filename.length() - kFileExt.length()));
-      mode.mutable_launches()->insert({launch_name, launch_file});
+
+      // Add new Launch config, or update the pre-configed one in hmi.conf.
+      auto& launch = LookupOrInsert(mode.mutable_launches(), launch_name, {});
+      launch.set_path(launch_file);
+      // Add recorder to all modes.
+      launch.add_additional_modules("record_bag");
     }
   }
   return !modes->empty();
@@ -216,10 +223,15 @@ bool HMIWorker::CyberLaunch(const std::string& command) const {
     current_launch = status_.current_launch();
   }
   const Mode &mode_conf = config_.modes().at(current_mode);
-  const std::string &launch_file = mode_conf.launches().at(current_launch);
+  const Launch &launch_conf = mode_conf.launches().at(current_launch);
+  if (launch_conf.path().empty()) {
+    AERROR << "No launch file available for mode '" << current_mode << ":"
+           << current_launch << "'";
+    return false;
+  }
 
   const auto cmd_str = StrCat("/apollo/scripts/cyber_launch.sh ",
-                              command, " '", launch_file, "'");
+                              command, " '", launch_conf.path(), "'");
   AINFO << "Execute system command: " << cmd_str;
   const int ret = std::system(cmd_str.c_str());
   if (ret != 0) {
@@ -408,29 +420,77 @@ void HMIWorker::ChangeToMode(const std::string &mode_name) {
   }
 
   std::string old_mode;
+  std::string old_launch;
   {
-    // Update current_mode status.
-    WLock wlock(status_mutex_);
+    RLock rlock(status_mutex_);
     old_mode = status_.current_mode();
-    if (old_mode == mode_name) {
-      return;
-    }
-    status_.set_current_mode(mode_name);
+    old_launch = status_.current_launch();
   }
-  apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
+  // Skip if mode doesn't actually change.
+  if (old_mode == mode_name) {
+    return;
+  }
 
-  const auto &old_modules = config_.modes().at(old_mode).live_modules();
-  const bool use_navigation_mode = (mode_name == kNavigationModeName);
-  SetGlobalFlag("use_navigation_mode", use_navigation_mode,
-                &FLAGS_use_navigation_mode);
-  // Now stop all old modules.
-  for (const auto &module : old_modules) {
+  // Now stop all old launch related modules.
+  const auto &old_launch_conf =
+      config_.modes().at(old_mode).launches().at(old_launch);
+  for (const auto &module : old_launch_conf.additional_modules()) {
     RunModuleCommand(module, "stop");
   }
+  CyberLaunch("stop");
+
+  // Update current mode and launch status.
+  const auto &launches = config_.modes().at(mode_name).launches();
+  const std::string &launch_name = launches.begin()->first;
+  {
+    WLock wlock(status_mutex_);
+    status_.set_current_mode(mode_name);
+    status_.set_current_launch(launch_name);
+  }
+  apollo::common::KVDB::Put("apollo:dreamview:mode", mode_name);
+  apollo::common::KVDB::Put("apollo:dreamview:launch", launch_name);
 
   // Trigger registered change mode handlers.
   for (const auto handler : change_mode_handlers_) {
     handler(mode_name);
+  }
+}
+
+void HMIWorker::ChangeToLaunch(const std::string &launch_name) {
+  std::string current_mode;
+  std::string old_launch;
+  {
+    RLock rlock(status_mutex_);
+    current_mode = status_.current_mode();
+    old_launch = status_.current_launch();
+  }
+  const auto &launches = config_.modes().at(current_mode).launches();
+
+  // Skip if launch doesn't actually change.
+  if (old_launch == launch_name) {
+    return;
+  }
+  if (!ContainsKey(launches, launch_name)) {
+    AERROR << "Unknown launch '" << current_mode << ":" << launch_name << "'";
+    return;
+  }
+
+  // Now stop all old launch related modules.
+  for (const auto &module : launches.at(old_launch).additional_modules()) {
+    RunModuleCommand(module, "stop");
+  }
+  CyberLaunch("stop");
+
+  // Update current launch status.
+  {
+    WLock wlock(status_mutex_);
+    status_.set_current_launch(launch_name);
+  }
+  apollo::common::KVDB::Put("apollo:dreamview:launch", launch_name);
+
+  // Trigger registered change launch handlers.
+  for (const auto handler : change_launch_handlers_) {
+    handler(launch_name);
   }
 }
 

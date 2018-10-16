@@ -7,6 +7,7 @@ export default class HMI {
 
     modes = {};
     @observable currentMode = 'none';
+    @observable currentLaunch = 'none';
 
     vehicles = [];
     @observable currentVehicle = 'none';
@@ -71,6 +72,9 @@ export default class HMI {
     @action updateStatus(newStatus) {
         if (newStatus.currentMode) {
             this.currentMode = newStatus.currentMode;
+        }
+        if (newStatus.currentLaunch) {
+            this.currentLaunch = newStatus.currentLaunch;
         }
         if (newStatus.currentMap) {
             this.currentMap = newStatus.currentMap;

@@ -5,10 +5,12 @@ import WS from "store/websocket";
 
 export default class HMISelectors extends React.Component {
     render() {
-        const { modes, currentMode,
+        const { modes, currentMode, currentLaunch,
                 maps, currentMap,
                 vehicles, currentVehicle } = this.props;
 
+        const launches = modes[currentMode] !== undefined ?
+            modes[currentMode].launches : {};
         return (
             <React.Fragment>
                 <Selector name="setup mode"
@@ -16,6 +18,12 @@ export default class HMISelectors extends React.Component {
                           currentOption={currentMode}
                           onChange={(event) => {
                             WS.changeSetupMode(event.target.value);
+                          }} />
+                <Selector name="launch"
+                          options={Object.keys(launches).sort()}
+                          currentOption={currentLaunch}
+                          onChange={(event) => {
+                            WS.changeLaunch(event.target.value);
                           }} />
                 <Selector name="vehicle"
                           options={vehicles}
