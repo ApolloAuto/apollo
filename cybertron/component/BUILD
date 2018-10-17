@@ -61,7 +61,7 @@ cc_library(
         "//cybertron/base:signal",
         "//cybertron/base:thread_pool",
         "//cybertron/class_loader:class_loader",
-        "//cybertron/node:node_lib",
+        "//cybertron/node:node",
     ],
 )
 

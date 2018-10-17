@@ -15,7 +15,7 @@ cc_library(
 )
 
 cc_library(
-    name = "node_lib",
+    name = "node",
     srcs = glob([
         "node.cc",
     ]),
