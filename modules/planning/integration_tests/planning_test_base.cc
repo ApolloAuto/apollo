@@ -93,6 +93,9 @@ bool PlanningTestBase::FeedTestData() {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
     return false;
   }
+
+  Clock::SetNowInSeconds(localization.header().timestamp_sec());
+
   // prediction
   PredictionObstacles prediction;
   if (!apollo::common::util::GetProtoFromFile(
