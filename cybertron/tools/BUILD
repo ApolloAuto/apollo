@@ -5,9 +5,9 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "cyber_recorder",
     srcs = glob([
-        "cyber_recorder/*.cpp",
+        "cyber_recorder/*.cc",
         "cyber_recorder/*.h",
-        "cyber_recorder/**/*.cpp",
+        "cyber_recorder/**/*.cc",
         "cyber_recorder/**/*.h",
     ]),
     deps = [
@@ -21,7 +21,7 @@ cc_binary(
 cc_binary(
     name = "cyber_monitor",
     srcs = glob([
-        "cvt/monitor/*.cpp",
+        "cvt/monitor/*.cc",
         "cvt/monitor/*.h",
     ]),
     deps = [

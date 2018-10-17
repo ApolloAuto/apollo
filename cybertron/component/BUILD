@@ -8,7 +8,8 @@ cc_library(
         "component.h",
     ],
     deps = [
-          "//cybertron/component:component_base",
+        "component_base",
+        "//cybertron/scheduler:scheduler",
     ],
 )
 
@@ -16,11 +17,10 @@ cc_test(
     name = "component_test",
     size = "small",
     srcs = [
-        "component_test.cpp",
+        "component_test.cc",
     ],
     deps = [
         "//cybertron",
-        "//cybertron/component:component",
         "@gtest//:main",
     ],
 )
@@ -28,13 +28,14 @@ cc_test(
 cc_library(
     name = "timer_component",
     srcs = [
-        "timer_component.cpp",
+        "timer_component.cc",
     ],
     hdrs = [
         "timer_component.h",
     ],
     deps = [
-          "//cybertron/component:component_base",
+        "component_base",
+        "//cybertron/blocker:blocker_manager",
     ],
 )
 
@@ -42,11 +43,10 @@ cc_test(
     name = "timer_component_test",
     size = "small",
     srcs = [
-        "timer_component_test.cpp",
+        "timer_component_test.cc",
     ],
     deps = [
         "//cybertron",
-        "//cybertron/component:timer_component",
         "@gtest//:main",
     ],
 )
@@ -57,12 +57,10 @@ cc_library(
         "component_base.h",
     ],
     deps = [
-          "//cybertron/base:signal",
-          "//cybertron/base:thread_pool",
-          "//cybertron/blocker:blocker_lib",
-          "//cybertron/class_loader:class_loader_lib",
-          "//cybertron/node:node_lib",
-          "//cybertron/scheduler:scheduler_lib",
+        "//cybertron/base:signal",
+        "//cybertron/base:thread_pool",
+        "//cybertron/class_loader:class_loader",
+        "//cybertron/node:node_lib",
     ],
 )
 

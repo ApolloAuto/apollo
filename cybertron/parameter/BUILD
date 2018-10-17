@@ -3,46 +3,16 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "parameter_lib",
-    srcs = glob([
-        "parameter_client.cpp",
-        "parameter.cpp",
-        "parameter_server.cpp",
-    ]),
-    hdrs = glob([
-        "*.h",
-    ]),
+    name = "parameter",
+    srcs = [
+        "parameter.cc",
+    ],
+    hdrs = [
+        "parameter.h",
+    ],
     deps = [
-        "//cybertron/node:node_lib",
-        "//cybertron/data:data_lib",
-        "//cybertron/message:message_lib",
-        "//cybertron/service:service_lib",
+        "//cybertron/message:protobuf_factory",
         "//cybertron/proto:parameter_cc_proto",
-        "@fastrtps",
-    ],
-)
-
-cc_test(
-    name = "parameter_client_test",
-    size = "small",
-    srcs = [
-        "parameter_client_test.cpp",
-    ],
-    deps = [
-        "//cybertron",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "parameter_server_test",
-    size = "small",
-    srcs = [
-        "parameter_server_test.cpp",
-    ],
-    deps = [
-        "//cybertron",
-        "@gtest//:main",
     ],
 )
 
@@ -50,11 +20,76 @@ cc_test(
     name = "parameter_test",
     size = "small",
     srcs = [
-        "parameter_test.cpp",
+        "parameter_test.cc",
     ],
     deps = [
         "//cybertron",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "parameter_client",
+    srcs = [
+        "parameter_client.cc",
+    ],
+    hdrs = [
+        "parameter_client.h",
+    ],
+    deps = [
+        "parameter",
+        "parameter_service_names",
+        "//cybertron/node:node_lib",
+        "//cybertron/service:client",
+        "@fastrtps",
+    ]
+)
+
+cc_test(
+    name = "parameter_client_test",
+    size = "small",
+    srcs = [
+        "parameter_client_test.cc",
+    ],
+    deps = [
+        "//cybertron",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "parameter_server",
+    srcs = [
+        "parameter_server.cc",
+    ],
+    hdrs = [
+        "parameter_server.h",
+    ],
+    deps = [
+        "parameter",
+        "parameter_service_names",
+        "//cybertron/node:node_lib",
+        "//cybertron/service:service",
+        "@fastrtps",
+    ]
+)
+
+cc_test(
+    name = "parameter_server_test",
+    size = "small",
+    srcs = [
+        "parameter_server_test.cc",
+    ],
+    deps = [
+        "//cybertron",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "parameter_service_names",
+    hdrs = [
+        "parameter_service_names.h",
     ],
 )
 

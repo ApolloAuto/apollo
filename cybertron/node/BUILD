@@ -10,25 +10,27 @@ cc_library(
     deps = [
         "//cybertron/transport:transport_lib",
         "//cybertron/common:common",
-        "//cybertron/event:event_lib",
+        "//cybertron/event:perf_event_cache",
     ],
 )
 
 cc_library(
     name = "node_lib",
     srcs = glob([
-        "node.cpp",
+        "node.cc",
     ]),
     hdrs = glob([
         "*.h",
     ]),
     deps = [
         "//cybertron/transport:transport_lib",
-        "//cybertron/blocker:blocker_lib",
+        "//cybertron/blocker:intra_reader",
+        "//cybertron/blocker:intra_writer",
         "//cybertron/croutine:croutine",
-        "//cybertron/data:data_lib",
-        "//cybertron/scheduler:scheduler_lib",
-        "//cybertron/service:service_lib",
+        "//cybertron/data:data_visitor",
+        "//cybertron/scheduler:scheduler",
+        "//cybertron/service:client",
+        "//cybertron/service:service",
     ],
 )
 
@@ -36,7 +38,7 @@ cc_test(
     name = "node_test",
     size = "small",
     srcs = [
-        "node_test.cpp",
+        "node_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -49,7 +51,7 @@ cc_test(
     name = "writer_reader_test",
     size = "small",
     srcs = [
-        "writer_reader_test.cpp",
+        "writer_reader_test.cc",
     ],
     deps = [
         "//cybertron",

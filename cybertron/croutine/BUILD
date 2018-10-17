@@ -5,20 +5,20 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "croutine",
     srcs = [
-        "croutine.cpp",
+        "croutine.cc",
     ],
     hdrs = [
         "croutine.h",
     ],
     deps = [
-        "//cybertron:init_lib",
+        "//cybertron:init",
         "//cybertron/base:atomic_hash_map",
         "//cybertron/base:atomic_rw_lock",
         "//cybertron/base:bounded_queue",
         "//cybertron/base:macros",
         "//cybertron/base:wait_strategy",
         "//cybertron/common:common",
-        "//cybertron/event:event_lib",
+        "//cybertron/event:perf_event_cache",
         "//cybertron/time:time",
         "//cybertron/croutine:routine_context",
         "//cybertron/croutine:routine_factory",
@@ -29,7 +29,7 @@ cc_library(
 cc_library(
     name = "routine_context",
     srcs = [
-        "routine_context.cpp",
+        "routine_context.cc",
     ],
     hdrs = [
         "routine_context.h",
@@ -46,7 +46,7 @@ cc_library(
     ],
     deps = [
           "//cybertron/common:common",
-          "//cybertron/event:event_lib",
+          "//cybertron/event:perf_event_cache",
     ],
 )
 
@@ -61,7 +61,7 @@ cc_test(
     name = "croutine_test",
     size = "small",
     srcs = [
-        "croutine_test.cpp",
+        "croutine_test.cc",
     ],
     deps = [
         "//cybertron",

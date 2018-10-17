@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "qos_lib",
     srcs = glob([
-        "*.cpp",
+        "*.cc",
     ]),
     hdrs = glob([
         "*.h",

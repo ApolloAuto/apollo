@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "cybertron/class_loader/class_factory.h"
+#include "cybertron/class_loader/utility/class_factory.h"
 #include "cybertron/class_loader/class_loader.h"
 
 namespace apollo {

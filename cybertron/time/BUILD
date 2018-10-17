@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "time",
     srcs = [
-        "time.cpp",
+        "time.cc",
     ],
     hdrs = [
         "time.h",
@@ -20,7 +20,7 @@ cc_test(
     name = "time_test",
     size = "small",
     srcs = [
-        "time_test.cpp",
+        "time_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -31,7 +31,7 @@ cc_test(
 cc_library(
     name = "rate",
     srcs = [
-        "rate.cpp",
+        "rate.cc",
     ],
     hdrs = [
         "rate.h",
@@ -46,7 +46,7 @@ cc_library(
 cc_library(
     name = "duration",
     srcs = [
-        "duration.cpp",
+        "duration.cc",
     ],
     hdrs = [
         "duration.h",
@@ -60,7 +60,7 @@ cc_test(
     name = "duration_test",
     size = "small",
     srcs = [
-        "duration_test.cpp",
+        "duration_test.cc",
     ],
     deps = [
         "//cybertron",

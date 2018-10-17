@@ -5,19 +5,19 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "record_lib",
     srcs = glob([
-        "header_builder.cpp",
-        "record_file.cpp",
-        "record_reader.cpp",
-        "record_viewer.cpp",
-        "record_writer.cpp",
+        "header_builder.cc",
+        "record_file.cc",
+        "record_reader.cc",
+        "record_viewer.cc",
+        "record_writer.cc",
     ]),
     hdrs = glob([
         "*.h",
     ]),
     deps = [
-        "//cybertron:init_lib",
+        "//cybertron:init",
         "//cybertron/common:common",
-        "//cybertron/message:message_lib",
+        "//cybertron/message:raw_message",
         "//cybertron/proto:record_cc_proto",
     ],
 )

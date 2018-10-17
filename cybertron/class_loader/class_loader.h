@@ -23,7 +23,6 @@
 #include <vector>
 
 #include "cybertron/class_loader/class_loader_register_macro.h"
-#include "cybertron/class_loader/class_loader_utility.h"
 
 namespace apollo {
 namespace cybertron {

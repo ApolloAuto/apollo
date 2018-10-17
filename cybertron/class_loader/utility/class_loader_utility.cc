@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/class_loader/class_loader_utility.h"
+#include "cybertron/class_loader/utility/class_loader_utility.h"
 
 #include "cybertron/class_loader/class_loader.h"
 
