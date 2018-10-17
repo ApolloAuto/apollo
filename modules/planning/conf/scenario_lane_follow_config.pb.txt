@@ -14,9 +14,6 @@ stage_config : {
       task_type : QP_PIECEWISE_JERK_PATH_OPTIMIZER
     }
     task_config : {
-      task_type : QP_PIECEWISE_JERK_PATH_OPTIMIZER
-    }
-    task_config : {
       task_type : DP_POLY_PATH_OPTIMIZER
     }
     task_config : {
