@@ -102,7 +102,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
 
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   // TODO(QiL) : Change IPOPT settings to flag or configs
-  int print_level = 0;
+  int print_level = 5;
   app->Options()->SetIntegerValue("print_level", print_level);
   int mumps_mem_percent = 6000;
   app->Options()->SetIntegerValue("mumps_mem_percent", mumps_mem_percent);
