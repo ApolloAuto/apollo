@@ -56,6 +56,7 @@ class SidePassPathDecider : public Decider {
  private:
   std::unique_ptr<Fem1dQpProblem> fem_qp_;
   SidePassDirection decided_direction_;
+  double delta_s_ = 0.0;
 };
 
 }  // namespace planning
