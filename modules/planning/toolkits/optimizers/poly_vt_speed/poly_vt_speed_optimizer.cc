@@ -43,19 +43,19 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::planning_internal::STGraphDebug;
 using apollo::planning_internal::StGraphBoundaryDebug;
+using apollo::planning_internal::STGraphDebug;
 
 PolyVTSpeedOptimizer::PolyVTSpeedOptimizer(const TaskConfig& config)
     : Task(config) {
-  CHECK(config.has_poly_st_speed_config());
+  CHECK(config_.has_poly_vt_speed_config());
   SetName("PolyVTSpeedOptimizer");
-  config_ = config.poly_vt_speed_config();
-  st_boundary_config_ = config_.st_boundary_config();
+  st_boundary_config_ = config_.poly_vt_speed_config().st_boundary_config();
 }
 
 apollo::common::Status PolyVTSpeedOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
+  const auto& poly_vt_config = config_.poly_vt_speed_config();
   // extract infos
   const SLBoundary& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   const PathData& path_data = reference_line_info->path_data();
@@ -80,10 +80,10 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StBoundaryMapper boundary_mapper(adc_sl_boundary, st_boundary_config_,
-                                   reference_line, path_data, config_.total_s(),
-                                   config_.total_time(),
-                                   reference_line_info->IsChangeLanePath());
+  StBoundaryMapper boundary_mapper(
+      adc_sl_boundary, st_boundary_config_, reference_line, path_data,
+      poly_vt_config.total_s(), poly_vt_config.total_time(),
+      reference_line_info->IsChangeLanePath());
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
     DCHECK(path_obstacle->HasLongitudinalDecision());
@@ -118,9 +118,9 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
   }
 
   // step 2 : sampling speed profile
-  PiecewisePolyVTSpeedSampler sampler(config_);
+  PiecewisePolyVTSpeedSampler sampler(poly_vt_config);
   std::vector<PiecewisePolySpeedProfile> sampled_speed_profile;
-  sampler.Sample(init_point, config_.total_s(), &sampled_speed_profile);
+  sampler.Sample(init_point, poly_vt_config.total_s(), &sampled_speed_profile);
 
   // step 3 : autotuning feature generator, feature builder as well as speed
   // model

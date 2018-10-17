@@ -48,13 +48,13 @@ const double increment_t = 0.1;
 ProceedWithCautionSpeedGenerator::ProceedWithCautionSpeedGenerator(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config.has_proceed_with_caution_speed_config());
-  proceed_with_caution_speed_config_ =
-      config.proceed_with_caution_speed_config();
-  isFixedDistanceNotFixedSpeed = proceed_with_caution_speed_config_.type();
+  CHECK(config_.has_proceed_with_caution_speed_config());
+  const auto& proceed_with_caution_speed_config =
+      config_.proceed_with_caution_speed_config();
+  isFixedDistanceNotFixedSpeed = proceed_with_caution_speed_config.type();
   maxDistanceOrSpeed = isFixedDistanceNotFixedSpeed
-                           ? proceed_with_caution_speed_config_.max_distance()
-                           : proceed_with_caution_speed_config_.max_speed();
+                           ? proceed_with_caution_speed_config.max_distance()
+                           : proceed_with_caution_speed_config.max_speed();
   SetName("ProceedWithCautionSpeedGenerator");
 }
 

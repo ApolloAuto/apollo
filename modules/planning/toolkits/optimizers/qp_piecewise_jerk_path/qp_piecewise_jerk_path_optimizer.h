@@ -57,7 +57,6 @@ class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
       const common::TrajectoryPoint& init_point, const double qp_delta_s);
 
  private:
-  QpPiecewiseJerkPathConfig config_;
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp_;
 };
 

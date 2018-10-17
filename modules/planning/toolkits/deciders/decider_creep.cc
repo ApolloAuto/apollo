@@ -30,8 +30,7 @@ using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
 
 DeciderCreep::DeciderCreep(const TaskConfig& config) : Decider(config) {
-  CHECK(config.has_decider_creep_config());
-  config_ = config.decider_creep_config();
+  CHECK(config_.has_decider_creep_config());
   SetName("DeciderCreep");
 }
 
@@ -81,7 +80,7 @@ bool DeciderCreep::BuildStopDecision(Frame* frame,
   }
 
   // build stop decision
-  const double stop_distance = config_.stop_distance();
+  const double stop_distance = config_.decider_creep_config().stop_distance();
   const double stop_s = creep_stop_s - stop_distance;
   const auto& reference_line = reference_line_info->reference_line();
   auto stop_point = reference_line.GetReferencePoint(stop_s);
@@ -105,12 +104,13 @@ bool DeciderCreep::BuildStopDecision(Frame* frame,
 bool DeciderCreep::CheckCreepDone(Frame* frame,
                                   ReferenceLineInfo* reference_line_info,
                                   double stop_sign_end_s) {
+  const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
   double creep_stop_s =
       stop_sign_end_s + FindCreepDistance(frame, reference_line_info);
   const double distance =
       creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
-  if (distance < config_.max_valid_stop_distance()) {
+  if (distance < creep_config.max_valid_stop_distance()) {
     bool all_far_away = true;
     for (auto* path_obstacle :
          reference_line_info->path_decision()->path_obstacles().Items()) {
@@ -119,7 +119,7 @@ bool DeciderCreep::CheckCreepDone(Frame* frame,
         continue;
       }
       if (path_obstacle->reference_line_st_boundary().min_t() <
-          config_.min_boundary_t()) {
+          creep_config.min_boundary_t()) {
         all_far_away = false;
         break;
       }

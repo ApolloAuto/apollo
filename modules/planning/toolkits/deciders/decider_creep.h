@@ -49,7 +49,6 @@ class DeciderCreep : public Decider {
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
-  DeciderCreepConfig config_;
 };
 
 }  // namespace planning
