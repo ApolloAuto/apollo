@@ -19,7 +19,6 @@
 #include "cybertron/common/global_data.h"
 #include "cybertron/common/log.h"
 #include "cybertron/time/time.h"
-#include "cybertron/transport/rtps/participant.h"
 
 namespace apollo {
 namespace cybertron {

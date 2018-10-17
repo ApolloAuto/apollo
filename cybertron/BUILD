@@ -104,6 +104,7 @@ cc_library(
           "//cybertron/scheduler:scheduler",
           "//cybertron/service:client",
           "//cybertron/service:service",
+          "//cybertron/service_discovery:topology_manager",
           "//cybertron/task:task",
           "//cybertron/time:time",
           "//cybertron/time:rate",

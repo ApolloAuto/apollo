@@ -31,7 +31,6 @@
 #include "cybertron/service_discovery/specific_manager/node_manager.h"
 #include "cybertron/service_discovery/specific_manager/service_manager.h"
 #include "cybertron/transport/rtps/participant.h"
-#include "fastrtps/participant/Participant.h"
 
 namespace apollo {
 namespace cybertron {
