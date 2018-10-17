@@ -14,8 +14,11 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/common/similar.h"
+
 #include <cblas.h>
 #include <memory>
+
+#include "cybertron/common/log.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/utils/gemm.h"
 
@@ -34,7 +37,7 @@ bool GPUSimilar::Calc(CameraFrame *frame1,
   sim->Reshape({n, m});
 
   if (frame1->track_feature_blob == nullptr) {
-    LOG(ERROR) << "No feature blob";
+    AERROR << "No feature blob";
     return false;
   }
   int dim = frame1->track_feature_blob->count(1);

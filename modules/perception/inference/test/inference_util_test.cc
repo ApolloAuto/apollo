@@ -26,7 +26,6 @@
 #include "modules/perception/inference/utils/gemm.h"
 #include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/utils/util.h"
-#include "modules/perception/perception_base/base/log.h"
 
 namespace apollo {
 namespace perception {
@@ -126,7 +125,6 @@ void CudaUtilFun(int gpu_count, int thread_id) {
     EXPECT_TRUE(inference::CudaUtil::set_device_id(i));
   }
   handlers[thread_id] = inference::CudaUtil::get_handler();
-  LOG_INFO << "Thread " << thread_id << " exit";
 }
 
 TEST(UtilTest, CudaUtilTest) {

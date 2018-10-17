@@ -18,6 +18,7 @@
 
 #include <algorithm>
 
+#include "cybertron/common/log.h"
 #include "modules/perception/inference/utils/util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
 
@@ -169,7 +170,7 @@ bool ResizeGPU(const base::Image8U &src,
   int origin_width = src.cols();
 
   if (origin_channel != dst->shape(3)) {
-    LOG(ERROR) << "channel should be the same after resize.";
+    AERROR << "channel should be the same after resize.";
     return false;
   }
   float fx = static_cast<float>(origin_width) / static_cast<float>(width);
@@ -213,7 +214,7 @@ bool ResizeGPU(const apollo::perception::base::Blob<uint8_t> &src_gpu,
   // SRC: 1 H W C
   // DST: 1 H W C
   if (origin_channel != channel) {
-    LOG(ERROR) << "channel should be the same after resize.";
+    AERROR << "channel should be the same after resize.";
     return false;
   }
 
@@ -259,7 +260,7 @@ bool ResizeGPU(const base::Image8U &src,
   // SRC: 1 H W C
   // DST: 1 H W C
   if (origin_channel != channel) {
-    LOG(ERROR) << "channel should be the same after resize.";
+    AERROR << "channel should be the same after resize.";
     return false;
   }
 
