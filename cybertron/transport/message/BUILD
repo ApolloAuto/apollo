@@ -11,7 +11,9 @@ cc_library(
         "*.h",
     ]),
     deps = [
+        "//cybertron/base:signal",
         "//cybertron/common:common",
+        "//cybertron/message:raw_message",
         "//cybertron/transport/common:transport_common",
     ],
 )
