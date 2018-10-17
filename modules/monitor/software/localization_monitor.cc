@@ -18,6 +18,7 @@
 
 #include "cybertron/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/map_util.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
 
@@ -27,8 +28,12 @@ DEFINE_string(localization_monitor_name, "LocalizationMonitor",
 DEFINE_double(localization_monitor_interval, 5,
               "Localization status checking interval (s).");
 
+DEFINE_string(localization_module_name, "localization",
+              "Localization module name.");
+
 namespace apollo {
 namespace monitor {
+using apollo::common::util::StrCat;
 using apollo::localization::LocalizationStatus;
 using apollo::localization::MeasureState;
 using apollo::localization::MeasureState_Name;
@@ -47,25 +52,39 @@ void LocalizationMonitor::RunOnce(const double current_time) {
     return;
   }
 
-  // TODO(xiaoxq): Decide situations of escalating warnings to:
-  //   1. Log to Dreamview as warning.
-  //   2. Log to Dreamview as error.
-  //   3. Read aloud to passengers.
-  //   4. Trigger guardian safety stop.
-  //  if (status->gnss_status() != MeasureState::OK) {
-  //    AWARN << "Localization GNSS status "
-  //          << MeasureState_Name(status->gnss_status());
-  //  }
-  //  if (status->lidar_status() != MeasureState::OK) {
-  //    AWARN << "Localization lidar status "
-  //          << MeasureState_Name(status->lidar_status());
-  //  }
+  auto& localization_status = apollo::common::util::LookupOrInsert(
+      MonitorManager::GetStatus()->mutable_modules(),
+      FLAGS_localization_module_name, {});
+  auto& dv_log = MonitorManager::LogBuffer();
 
-  // TODO(xiaoxq): implement monitor for new localization status
-  if (status->fusion_status() != MeasureState::OK) {
-    AERROR << "Localization fusion status "
-           << MeasureState_Name(status->fusion_status());
+  switch (status->fusion_status()) {
+    case MeasureState::OK:
+      localization_status.set_summary(Summary::OK);
+      break;
+    case MeasureState::WARNNING:
+      AWARN << "Localization WARNNING: " << status->state_message();
+      localization_status.set_summary(Summary::WARN);
+      break;
+    case MeasureState::ERROR:
+      dv_log.WARN(StrCat("Localization ERROR: ", status->state_message()));
+      localization_status.set_summary(Summary::WARN);
+      break;
+    case MeasureState::CRITICAL_ERROR:
+      dv_log.ERROR(StrCat(
+          "Localization CRITICAL_ERROR: ", status->state_message()));
+      localization_status.set_summary(Summary::WARN);
+      break;
+    case MeasureState::FATAL_ERROR:
+      dv_log.ERROR(StrCat(
+          "Localization FATAL_ERROR: ", status->state_message()));
+      // ERROR and FATAL will trigger safety stop.
+      localization_status.set_summary(Summary::FATAL);
+      break;
+    default:
+      AFATAL << "Unknown fusion_status: " << status->fusion_status();
+      break;
   }
+  localization_status.set_msg(status->state_message());
 }
 
 }  // namespace monitor
