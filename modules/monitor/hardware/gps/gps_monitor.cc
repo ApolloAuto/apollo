@@ -29,17 +29,9 @@ DEFINE_string(gps_hardware_name, "GPS", "Name of the GPS hardware.");
 DEFINE_string(gps_monitor_name, "GpsMonitor", "Name of the GPS monitor.");
 DEFINE_double(gps_monitor_interval, 3, "GPS status checking interval (s).");
 
-DEFINE_double(acceptable_gnss_best_pose_std_dev, 0.5,
-              "Acceptable Gnss BestPose standard deviation on latitude, "
-              "longitude and height.");
-
-DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 120,
-              "Acceptable Gnss BestPose unstable duration in seconds.");
-
 namespace apollo {
 namespace monitor {
 
-using apollo::drivers::gnss::GnssBestPose;
 using apollo::drivers::gnss::GnssStatus;
 using apollo::drivers::gnss::InsStatus;
 
@@ -89,38 +81,6 @@ void GpsMonitor::RunOnce(const double current_time) {
       status->set_status(HardwareStatus::ERR);
       status->set_detailed_msg("INS status invalid.");
       return;
-  }
-
-  // Check Gnss BestPose.
-  static auto best_pose_reader =
-      MonitorManager::CreateReader<GnssBestPose>(FLAGS_gnss_best_pose_topic);
-  best_pose_reader->Observe();
-  const auto best_pose = best_pose_reader->GetLatestObserved();
-  if (best_pose == nullptr) {
-    status->set_status(HardwareStatus::ERR);
-    status->set_detailed_msg("No Gnss BestPose message.");
-    return;
-  }
-  const double largest_std_dev = std::max({best_pose->latitude_std_dev(),
-                                           best_pose->longitude_std_dev(),
-                                           best_pose->height_std_dev()});
-  if (largest_std_dev > FLAGS_acceptable_gnss_best_pose_std_dev) {
-    status->set_status(HardwareStatus::GPS_UNSTABLE_WARNING);
-    status->set_detailed_msg("GPS BestPose is unstable.");
-    if (status->has_gps_unstable_start_time()) {
-      const double duration = current_time - status->gps_unstable_start_time();
-      if (duration > FLAGS_acceptable_gnss_best_pose_unstable_duration) {
-        status->set_status(HardwareStatus::GPS_UNSTABLE_ERROR);
-        MonitorManager::LogBuffer().ERROR("GPS is very unstable!");
-      }
-    } else {
-      status->set_gps_unstable_start_time(current_time);
-      MonitorManager::LogBuffer().WARN("GPS becomes unstable!");
-    }
-    return;
-  } else if (status->has_gps_unstable_start_time()) {
-    status->clear_gps_unstable_start_time();
-    MonitorManager::LogBuffer().INFO("GPS stability recovered.");
   }
 
   // All check passed.

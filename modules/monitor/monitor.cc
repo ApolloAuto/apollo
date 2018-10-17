@@ -33,9 +33,10 @@ namespace monitor {
 bool Monitor::Init() {
   MonitorManager::Init(node_);
 
-  // TODO(xiaoxq): Migrate CAN monitor and topic monitor.
+  // TODO(xiaoxq): Migrate CAN monitor.
   // runners_.emplace_back(new CanMonitor());
   runners_.emplace_back(new GpsMonitor());
+  runners_.emplace_back(new LocalizationMonitor());
   runners_.emplace_back(new ProcessMonitor());
 
   const auto &config = MonitorManager::GetConfig();
