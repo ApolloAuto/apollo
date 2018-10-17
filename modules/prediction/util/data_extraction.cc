@@ -32,8 +32,8 @@ void GetDataFileNames(const boost::filesystem::path& p,
   }
   if (boost::filesystem::is_regular_file(p)) {
     const auto ext = p.extension();
-    if (ext == ".bag" || ext == ".BAG") {
-      AINFO << "Found bag file: " << p.c_str();
+    if (ext == ".record" || ext == ".RECORD") {
+      AINFO << "Found record file: " << p.c_str();
       bag_files->push_back(p.c_str());
     }
     return;
