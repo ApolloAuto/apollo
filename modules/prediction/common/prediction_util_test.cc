@@ -56,6 +56,19 @@ TEST(PredictionUtilTest, non_solvable_quadratic_equation) {
   EXPECT_EQ(SolveQuadraticEquation(coefficients, &roots), -1);
 }
 
+TEST(PredictionUtilTest, solve_cubic_polynomial_and_evaluate) {
+  std::array<double, 2> start = {2.0, 3.0};
+  std::array<double, 2> end = {8.0, 1.0};
+  double param = 5.0;
+
+  auto coefs = ComputePolynomial<3>(start, end, param);
+  EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, 0.0, 0, param, 1.0), start[0]);
+  EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, 0.0, 1, param, 1.0), start[1]);
+
+  EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, param, 0, param, 1.0), end[0]);
+  EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, param, 1, param, 1.0), end[1]);
+}
+
 }  // namespace math_util
 
 namespace predictor_util {

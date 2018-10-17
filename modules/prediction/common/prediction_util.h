@@ -81,6 +81,44 @@ double EvaluateQuarticPolynomial(
     const double t, const uint32_t order,
     const double end_t, const double end_v);
 
+/**
+ * @brief Evaluate cubic polynomial.
+ * @param coefficients of the cubic polynomial, lower to higher.
+ * @param parameter of the cubic polynomial.
+ * @param end_t ending time for extrapolation.
+ * @param end_v ending velocity for extrapolation.
+ * @return order of derivative to evaluate.
+ */
+double EvaluateCubicPolynomial(
+    const std::array<double, 4>& coefs,
+    const double t, const uint32_t order,
+    const double end_t, const double end_v);
+
+template <std::size_t N>
+std::array<double, 2 * N - 2> ComputePolynomial(
+    const std::array<double, N - 1>& start_state,
+    const std::array<double, N - 1>& end_state,
+    const double param);
+
+template <>
+inline std::array<double, 4> ComputePolynomial<3>(
+    const std::array<double, 2>& start_state,
+    const std::array<double, 2>& end_state,
+    const double param) {
+  std::array<double, 4> coefs;
+  coefs[0] = start_state[0];
+  coefs[1] = start_state[1];
+
+  auto m0 = end_state[0] - start_state[0] - start_state[1] * param;
+  auto m1 = end_state[1] - start_state[1];
+
+  auto param_p3 = param * param * param;
+  coefs[3] = (m1 * param - 2.0 * m0) / param_p3;
+
+  coefs[2] = (m1 - 3.0 * coefs[3] * param * param) / param * 0.5;
+  return coefs;
+}
+
 }  // namespace math_util
 
 namespace predictor_util {
