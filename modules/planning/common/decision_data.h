@@ -17,6 +17,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
@@ -45,6 +46,7 @@ class DecisionData {
   explicit DecisionData(const prediction::PredictionObstacles obstacles,
                         const ReferenceLine& reference_line);
   ~DecisionData() = default;
+
  public:
   bool GetObstacleById(const std::string& id,
                        PathObstacle* const obstacle) const;
@@ -58,6 +60,7 @@ class DecisionData {
   const std::vector<PathObstacle*>& GetPracticalObstacle() const;
   const std::vector<PathObstacle*>& GetAllObstacle() const;
   void Update();
+
  public:
   bool CreateVirtualObstacle(const ReferencePoint& point,
                              const VirtualObjectType& type,
@@ -65,12 +68,14 @@ class DecisionData {
   bool CreateVirtualObstacle(const double point_s,
                              const VirtualObjectType& type,
                              std::string* const id);
+
  private:
   std::vector<PathObstacle*> static_obstacle_;
   std::vector<PathObstacle*> dynamic_obstacle_;
   std::vector<PathObstacle*> virtual_obstacle_;
   std::vector<PathObstacle*> practical_obstacle_;
   std::vector<PathObstacle*> all_obstacle_;
+
  private:
   const ReferenceLine& reference_line_;
   std::list<std::unique_ptr<PathObstacle>> obstacle_;
