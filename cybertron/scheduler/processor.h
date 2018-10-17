@@ -54,7 +54,10 @@ class Processor {
   }
   void set_id(uint32_t id) { id_ = id; }
   uint32_t id() const { return id_; }
-  void Stop() { running_ = false; }
+  void Stop() {
+    running_ = false;
+    Notify();
+  }
   void Notify() { cv_.notify_one(); }
 
   std::shared_ptr<ProcessorContext> Context() { return context_; }
@@ -66,7 +69,7 @@ class Processor {
   std::condition_variable cv_;
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
   std::shared_ptr<CRoutine> cur_routine_ = nullptr;
-  std::shared_ptr<ProcessorContext> context_ = nullptr;
+  std::shared_ptr<ProcessorContext> context_;
   uint32_t id_ = 0;
   bool running_ = true;
 };

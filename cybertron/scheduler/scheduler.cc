@@ -123,6 +123,11 @@ void Scheduler::ShutDown() {
     return;
   }
 
+  for (auto& proc_ctx : proc_ctxs_) {
+    proc_ctx->ShutDown();
+  }
+  proc_ctxs_.clear();
+
   if (sysmon_.joinable()) {
     sysmon_.join();
   }

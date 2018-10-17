@@ -53,7 +53,12 @@ TaskManager::TaskManager()
   }
 }
 
-TaskManager::~TaskManager() {
+TaskManager::~TaskManager() { Shutdown(); }
+
+void TaskManager::Shutdown() {
+  if (is_shutdown_.exchange(true)) {
+    return;
+  }
   for (uint32_t i = 0; i < num_threads_; i++) {
     scheduler::Scheduler::Instance()->RemoveTask(task_prefix +
                                                  std::to_string(i));

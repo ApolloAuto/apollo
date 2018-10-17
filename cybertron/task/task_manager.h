@@ -17,6 +17,7 @@
 #ifndef CYBERTRON_TASK_TASK_MANAGER_H_
 #define CYBERTRON_TASK_TASK_MANAGER_H_
 
+#include <atomic>
 #include <future>
 #include <memory>
 #include <string>
@@ -34,6 +35,8 @@ class TaskManager {
  public:
   virtual ~TaskManager();
 
+  void Shutdown();
+
   template <typename F, typename... Args>
   auto Enqueue(F&& func, Args&&... args)
       -> std::future<typename std::result_of<F(Args...)>::type> {
@@ -49,6 +52,7 @@ class TaskManager {
   }
 
  private:
+  std::atomic<bool> is_shutdown_ = {false};
   uint32_t num_threads_;
   uint32_t task_queue_size_ = 1000;
   std::vector<uint64_t> tasks_;
