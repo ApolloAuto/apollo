@@ -50,8 +50,8 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
-using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
+using apollo::common::time::ToSecond;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::FillHeader;
 using apollo::common::util::GetProtoFromFile;
@@ -284,8 +284,24 @@ void SimulationWorldService::InitReaders() {
 void SimulationWorldService::InitWriters() {
   navigation_writer_ =
       node_->CreateWriter<NavigationInfo>(FLAGS_navigation_topic);
-  routing_request_writer_ =
-      node_->CreateWriter<RoutingRequest>(FLAGS_routing_request_topic);
+
+  {  // configure QoS for routing request writer
+    apollo::cybertron::proto::RoleAttributes routing_request_attr;
+    routing_request_attr.set_channel_name(FLAGS_routing_request_topic);
+    auto qos = routing_request_attr.mutable_qos_profile();
+    // only keeps the last message in history
+    qos->set_history(
+        apollo::cybertron::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+    // reliable transfer
+    qos->set_reliability(
+        apollo::cybertron::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+    // when writer find new readers, send all its history messsage
+    qos->set_durability(apollo::cybertron::proto::QosDurabilityPolicy::
+                            DURABILITY_TRANSIENT_LOCAL);
+    routing_request_writer_ =
+        node_->CreateWriter<RoutingRequest>(routing_request_attr);
+  }
+
   routing_response_writer_ =
       node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
 }
