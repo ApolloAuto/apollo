@@ -4,20 +4,16 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "task",
-    hdrs = [
-        "task.h",
-    ],
+    hdrs = [ "task.h", ],
     deps = [
-        "//cybertron/task:task_manager",
+        "task_manager",
     ],
 )
 
 cc_test(
     name = "task_test",
     size = "small",
-    srcs = [
-        "task_test.cc",
-    ],
+    srcs = [ "task_test.cc", ],
     deps = [
         "//cybertron:cybertron_core",
         "@gtest//:main",
@@ -26,12 +22,8 @@ cc_test(
 
 cc_library(
     name = "task_manager",
-    srcs = [
-        "task_manager.cc",
-    ],
-    hdrs = [
-        "task_manager.h",
-    ],
+    srcs = [ "task_manager.cc", ],
+    hdrs = [ "task_manager.h", ],
     deps = [
         "//cybertron/scheduler:scheduler",
     ],

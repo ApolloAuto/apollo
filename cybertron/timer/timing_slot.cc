@@ -17,7 +17,6 @@
 #include "cybertron/timer/timing_slot.h"
 
 #include "cybertron/common/log.h"
-#include "cybertron/time/time.h"
 #include "cybertron/timer/timer_task.h"
 
 namespace apollo {

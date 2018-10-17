@@ -11,8 +11,8 @@ cc_library(
         "time.h",
     ],
     deps = [
-          "//cybertron/time:duration",
-          "//cybertron/common:common",
+        "duration",
+        "//cybertron/common:common",
     ],
 )
 
@@ -23,7 +23,7 @@ cc_test(
         "time_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "@gtest//:main",
     ],
 )
@@ -37,9 +37,9 @@ cc_library(
         "rate.h",
     ],
     deps = [
-          "//cybertron/common:common",
-          "//cybertron/time:duration",
-          "//cybertron/time:time",
+        "time",
+        "duration",
+        "//cybertron/common:common",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_library(
         "duration.h",
     ],
     deps = [
-          "//cybertron/common:common",
+        "//cybertron/common:common",
     ],
 )
 
@@ -63,10 +63,9 @@ cc_test(
         "duration_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "@gtest//:main",
     ],
 )
-
 
 cpplint()

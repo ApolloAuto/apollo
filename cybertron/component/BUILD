@@ -36,6 +36,7 @@ cc_library(
     deps = [
         "component_base",
         "//cybertron/blocker:blocker_manager",
+        "//cybertron/timer:timer",
     ],
 )
 

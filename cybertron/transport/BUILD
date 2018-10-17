@@ -33,7 +33,7 @@ cc_library(
         "//cybertron/transport/common:transport_common",
         "//cybertron/transport/message:transport_message_lib",
         "//cybertron/time:time",
-        "//cybertron/timer:timer_lib",
+        "//cybertron/timer:timer_manager",
     ],
 )
 
