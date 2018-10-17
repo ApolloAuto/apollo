@@ -104,13 +104,11 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // TODO(QiL) : Change IPOPT settings to flag or configs
   int print_level = 0;
   app->Options()->SetIntegerValue("print_level", print_level);
-  int num_iterations = 0;
-  app->Options()->SetIntegerValue("max_iter", num_iterations);
   int mumps_mem_percent = 6000;
   app->Options()->SetIntegerValue("mumps_mem_percent", mumps_mem_percent);
-  int max_iter = 750;
+  int max_iter = 1000;
   app->Options()->SetIntegerValue("max_iter", max_iter);
-  double tol = 1e-5;
+  double tol = 1e-4;
   app->Options()->SetNumericValue("tol", tol);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
