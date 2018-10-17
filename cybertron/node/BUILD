@@ -31,6 +31,8 @@ cc_library(
         "//cybertron/scheduler:scheduler",
         "//cybertron/service:client",
         "//cybertron/service:service",
+        "//cybertron/service_discovery:topology_manager",
+        "//cybertron/proto:topology_change_cc_proto",
     ],
 )
 
