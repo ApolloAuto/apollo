@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
   apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
                                                         &outputs);
   for (auto name : outputs) {
-    LOG(INFO) << name;
+    ADEBUG << name;
   }
 
   if (FLAGS_int8) {
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
   for (auto image_file : image_lists) {
     cv::Mat img =
         cv::imread(FLAGS_image_root + image_file + FLAGS_image_ext, CV_8UC1);
-    LOG(INFO) << img.channels();
+    ADEBUG << img.channels();
     cv::Rect roi(0, offset_y, img.cols, img.rows - offset_y);
     cv::Mat img_roi = img(roi);
     img_roi.copyTo(img);

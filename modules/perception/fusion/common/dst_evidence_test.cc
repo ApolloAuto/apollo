@@ -102,19 +102,19 @@ class DSTEvidenceTest : public ::testing::Test {
     for (size_t i = 0; i < fused_spt_gt.size(); ++i) {
       fused_uct_gt[i] = fused_pls_gt[i] - fused_spt_gt[i];
     }
-    LOG(INFO) << fused_dst_.PrintBba();
+    AINFO << fused_dst_.PrintBba();
     // double sum = std::accumulate(fused_dst__vec.begin(),
     // fused_dst__vec.end(), 0.0);
-    // LOG(INFO) << boost::format("fused dst sum: %lf") % sum;
-    LOG(INFO) << "check dst";
+    // AINFO << boost::format("fused dst sum: %lf") % sum;
+    AINFO << "check dst";
     vec_equal_(fused_dst_vec_, fused_dst_gt);
-    LOG(INFO) << "check spt";
+    AINFO << "check spt";
     vec_equal_(fused_spt_vec_, fused_spt_gt);
-    LOG(INFO) << "check pls";
+    AINFO << "check pls";
     vec_equal_(fused_pls_vec_, fused_pls_gt);
-    LOG(INFO) << "check uct";
+    AINFO << "check uct";
     vec_equal_(fused_uct_vec_, fused_uct_gt);
-    LOG(INFO) << "check prob";
+    AINFO << "check prob";
     vec_equal_(fused_prob_vec_, fused_prob_gt);
   }
   void add_dst_test2() {
@@ -136,16 +136,16 @@ class DSTEvidenceTest : public ::testing::Test {
     for (size_t i = 0; i < fused_spt_gt.size(); ++i) {
       fused_uct_gt[i] = fused_pls_gt[i] - fused_spt_gt[i];
     }
-    LOG(INFO) << fused_dst_.PrintBba();
-    LOG(INFO) << "check dst";
+    AINFO << fused_dst_.PrintBba();
+    AINFO << "check dst";
     vec_equal_(fused_dst_vec_, fused_dst_gt);
-    LOG(INFO) << "check spt";
+    AINFO << "check spt";
     vec_equal_(fused_spt_vec_, fused_spt_gt);
-    LOG(INFO) << "check pls";
+    AINFO << "check pls";
     vec_equal_(fused_pls_vec_, fused_pls_gt);
-    LOG(INFO) << "check uct";
+    AINFO << "check uct";
     vec_equal_(fused_uct_vec_, fused_uct_gt);
-    LOG(INFO) << "check prob";
+    AINFO << "check prob";
     vec_equal_(fused_prob_vec_, fused_prob_gt);
   }
   void multipy_dst_test() {
@@ -157,7 +157,7 @@ class DSTEvidenceTest : public ::testing::Test {
     dst.SetBbaVec(dst_data);
     Dst res("test");
     res = dst * 0.8;
-    LOG(INFO) << res.PrintBba();
+    AINFO << res.PrintBba();
     vec_equal_(res.GetBbaVec(), gt);
   }
 

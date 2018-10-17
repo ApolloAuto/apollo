@@ -97,7 +97,7 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
   int origin_height = src_blob.shape(1);
   int origin_width = src_blob.shape(2);
   if (origin_channel != dst_blob->shape(3)) {
-    LOG(ERROR) << "channel should be the same after resize.";
+    AERROR << "channel should be the same after resize.";
     return false;
   }
   float fx = static_cast<float>(origin_width) / static_cast<float>(width);
