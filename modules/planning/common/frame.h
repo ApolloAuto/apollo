@@ -65,7 +65,11 @@ class Frame {
                  ReferenceLineProvider *reference_line_provider);
 
   const common::TrajectoryPoint &PlanningStartPoint() const;
-  common::Status Init();
+
+  common::Status Init(
+      const std::list<ReferenceLine> &reference_lines,
+      const std::list<hdmap::RouteSegments> &segments,
+      const std::vector<routing::LaneWaypoint> &future_route_waypoints);
 
   uint32_t SequenceNum() const;
 
@@ -123,7 +127,8 @@ class Frame {
   const LocalView &local_view() const { return local_view_; }
 
  private:
-  bool CreateReferenceLineInfo();
+  bool CreateReferenceLineInfo(const std::list<ReferenceLine> &reference_lines,
+                               const std::list<hdmap::RouteSegments> &segments);
 
   /**
    * Find an obstacle that collides with ADC (Autonomous Driving Car) if
@@ -162,7 +167,9 @@ class Frame {
 
   // TODO(All): add lag_predictor back
   // std::unique_ptr<LagPrediction> lag_predictor_;
-  ReferenceLineProvider *reference_line_provider_ = nullptr;
+  const ReferenceLineProvider *reference_line_provider_ = nullptr;
+
+  std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };

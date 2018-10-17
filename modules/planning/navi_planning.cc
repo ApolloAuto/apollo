@@ -109,7 +109,18 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          start_time, vehicle_state,
                          reference_line_provider_.get()));
-  auto status = frame_->Init();
+
+  std::list<ReferenceLine> reference_lines;
+  std::list<hdmap::RouteSegments> segments;
+  if (!reference_line_provider_->GetReferenceLines(&reference_lines,
+                                                   &segments)) {
+    std::string msg = "Failed to create reference line";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
+  auto status = frame_->Init(reference_lines, segments,
+                             reference_line_provider_->FutureRouteWaypoints());
+
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;
