@@ -16,6 +16,8 @@
 
 #include "modules/routing/routing_component.h"
 
+#include "cybertron/cybertron.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/routing/common/routing_gflags.h"
 
@@ -25,8 +27,16 @@ namespace apollo {
 namespace routing {
 
 bool RoutingComponent::Init() {
-  response_writer_ =
-      node_->CreateWriter<RoutingResponse>(FLAGS_routing_response_topic);
+  apollo::cybertron::proto::RoleAttributes attr;
+  attr.set_channel_name(FLAGS_routing_response_topic);
+  auto qos = attr.mutable_qos_profile();
+  qos->set_history(
+      apollo::cybertron::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+  qos->set_reliability(
+      apollo::cybertron::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+  qos->set_durability(apollo::cybertron::proto::QosDurabilityPolicy::
+                          DURABILITY_TRANSIENT_LOCAL);
+  response_writer_ = node_->CreateWriter<RoutingResponse>(attr);
 
   return routing_.Init().ok() && routing_.Start().ok();
 }
