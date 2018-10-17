@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
-
+#include "modules/planning/common/planning_gflags.h"
 
 #define private public
 
@@ -30,7 +30,10 @@ namespace planning {
 
 class SidePassSafetyTest : public ::testing::Test {
  public:
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    config_.mutable_side_pass_safety_config()->
+        set_min_obstacle_lateral_distance(1);
+  }
 
   virtual void TearDown() {}
 
