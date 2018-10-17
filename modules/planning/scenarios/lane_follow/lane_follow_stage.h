@@ -40,18 +40,32 @@
 namespace apollo {
 namespace planning {
 
-class LaneFollowScenario : public Scenario {
+class LaneFollowStage : public Stage {
  public:
-  LaneFollowScenario();
-  explicit LaneFollowScenario(const std::string& config_file);
-  explicit LaneFollowScenario(const ScenarioConfig& config);
+  explicit LaneFollowStage(const ScenarioConfig::StageConfig& config);
 
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
+  StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
-                      const Frame& frame) const override;
+  common::Status PlanOnReferenceLine(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info);
+
+  void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
+                                   PathData* path_data);
+
+  common::SLPoint GetStopSL(const ObjectStop& stop_decision,
+                            const ReferenceLine& reference_line) const;
+
+  void RecordObstacleDebugInfo(ReferenceLineInfo* reference_line_info);
+
+  void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
+                       const std::string& name, const double time_diff_ms);
+
+ private:
+  ScenarioConfig config_;
+  std::unique_ptr<Stage> stage_;
+  SpeedProfileGenerator speed_profile_generator_;
 };
 
 }  // namespace planning
