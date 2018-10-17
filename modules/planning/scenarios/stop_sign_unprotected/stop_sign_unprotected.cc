@@ -45,6 +45,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using common::ErrorCode;
 using common::TrajectoryPoint;
 using common::time::Clock;
@@ -219,11 +220,19 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
     return Stage::FINISHED;
   }
-
-  // TODO(all)
-
-  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
-  return Stage::FINISHED;
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  if (static_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+          ->CheckCreepDone(frame, &reference_line_info,
+                           GetContext()->next_stop_sign_overlap.end_s)) {
+    return Stage::FINISHED;
+  }
+  // build a stop fence by creep decider
+  if (static_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+          ->Process(frame, &reference_line_info) != Status::OK()) {
+    ADEBUG << "fail at build stop fence at creeping";
+    return Stage::ERROR;
+  }
+  return Stage::RUNNING;
 }
 
 Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(

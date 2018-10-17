@@ -47,9 +47,19 @@ struct StopSignUnprotectedContext {
       associated_lanes;
 };
 
-DECLARE_STAGE(StopSignUnprotectedCreep, StopSignUnprotectedContext);
 DECLARE_STAGE(StopSignUnprotectedIntersectionCruise,
               StopSignUnprotectedContext);
+
+class StopSignUnprotectedCreep : public Stage {
+ public:
+  explicit StopSignUnprotectedCreep(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame);
+  StopSignUnprotectedContext* GetContext() {
+    return Stage::GetContextAs<StopSignUnprotectedContext>();
+  }
+};
 
 class StopSignUnprotectedStop : public Stage {
  public:
