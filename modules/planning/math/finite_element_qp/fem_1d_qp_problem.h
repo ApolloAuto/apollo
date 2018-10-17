@@ -106,6 +106,10 @@ class Fem1dQpProblem {
     return x_third_order_derivative_;
   }
 
+  // modify output resolution. If not set, the output resolution is by default
+  // identical to the original resolution.
+  virtual void SetOutputResolution(const double resolution);
+
  protected:
   // naming convention follows osqp solver.
   virtual void CalculateKernel(std::vector<c_float>* P_data,

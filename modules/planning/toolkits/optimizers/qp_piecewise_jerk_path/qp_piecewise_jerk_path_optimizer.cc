@@ -38,21 +38,19 @@ namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::min_element(begin, end,
-                          [](const std::pair<double, double>& lhs,
-                             const std::pair<double, double>& rhs) {
-                            return lhs.first < rhs.first;
-                          });
+  return std::min_element(begin, end, [](const std::pair<double, double>& lhs,
+                                         const std::pair<double, double>& rhs) {
+    return lhs.first < rhs.first;
+  });
 }
 
 std::vector<std::pair<double, double>>::iterator max_pair_second(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::max_element(begin, end,
-                          [](const std::pair<double, double>& lhs,
-                             const std::pair<double, double>& rhs) {
-                            return lhs.second < rhs.second;
-                          });
+  return std::max_element(begin, end, [](const std::pair<double, double>& lhs,
+                                         const std::pair<double, double>& rhs) {
+    return lhs.second < rhs.second;
+  });
 }
 
 void assign_pair_first(std::vector<std::pair<double, double>>::iterator begin,
@@ -80,12 +78,9 @@ QpPiecewiseJerkPathOptimizer::QpPiecewiseJerkPathOptimizer(
   if (config.has_qp_piecewise_jerk_path_config()) {
     config_ = config.qp_piecewise_jerk_path_config();
   }
-  // TODO(all): use gflags or config to turn on/off new algorithms
-  // lateral_qp_optimizer_.reset(new OsqpLateralJerkQPOptimizer());
-  lateral_qp_optimizer_.reset(new OsqpLateralLinearQPOptimizer());
 }
 
-std::vector<std::pair<double, double>>
+std::vector<std::tuple<double, double, double>>
 QpPiecewiseJerkPathOptimizer::GetLateralBounds(
     const SLBoundary& adc_sl, const common::FrenetFramePoint& frenet_point,
     const double qp_delta_s, double path_length,
@@ -206,7 +201,16 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
     assign_pair_first(start_iter, end_iter, l_lower);
     assign_pair_second(start_iter, end_iter, l_upper);
   }
-  return lateral_bounds;
+
+  std::vector<std::tuple<double, double, double>> lateral_bound_tuples;
+
+  double s = 0.0;
+  for (size_t i = 0; i < lateral_bounds.size(); ++i) {
+    lateral_bound_tuples.emplace_back(std::make_tuple(
+        s, std::get<0>(lateral_bounds[i]), std::get<1>(lateral_bounds[i])));
+    s += qp_delta_s;
+  }
+  return lateral_bound_tuples;
 }
 
 Status QpPiecewiseJerkPathOptimizer::Process(
@@ -222,28 +226,58 @@ Status QpPiecewiseJerkPathOptimizer::Process(
       adc_sl, frenet_point, qp_delta_s, path_length, reference_line,
       reference_line_info_->path_decision()->path_obstacles().Items());
 
-  std::array<double, 3> lateral_state{frenet_point.l(), frenet_point.dl(),
-                                      frenet_point.ddl()};
+  std::array<double, 3> init_lateral_state{frenet_point.l(), frenet_point.dl(),
+                                           frenet_point.ddl()};
+  const int n = static_cast<int>(path_length / qp_delta_s);
+
+  std::array<double, 5> w = {
+      config_.l_weight(),
+      config_.dl_weight(),
+      config_.ddl_weight(),
+      config_.dddl_weight(),
+      config_.guiding_line_weight(),
+  };
+
+  fem_1d_qp_.reset(new Fem1dExpandedJerkQpProblem());
+  constexpr double kMaxLThirdOrderDerivative = 2.0;
+
+  if (!fem_1d_qp_->Init(n, init_lateral_state, qp_delta_s, w,
+                        kMaxLThirdOrderDerivative)) {
+    std::string msg = "lateral qp optimizer failed";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   auto start_time = std::chrono::system_clock::now();
-  bool success = lateral_qp_optimizer_->optimize(lateral_state, qp_delta_s,
-                                                 lateral_bounds);
+
+  fem_1d_qp_->SetVariableBounds(lateral_bounds);
+  bool success = fem_1d_qp_->Optimize();
+
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
-  ADEBUG << "lateral_qp_optimizer used time: " << diff.count() * 1000 << " ms.";
+  ADEBUG << "Path Optimizer used time: " << diff.count() * 1000 << " ms.";
 
   if (!success) {
     AERROR << "lateral qp optimizer failed";
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
+  fem_1d_qp_->SetOutputResolution(config_.path_output_resolution());
 
-  std::vector<common::FrenetFramePoint> frenet_path =
-      lateral_qp_optimizer_->GetFrenetFramePath();
+  std::vector<common::FrenetFramePoint> frenet_path;
 
-  for (auto& point : frenet_path) {
-    point.set_s(frenet_point.s() + point.s());
+  std::vector<common::FrenetFramePoint> frenet_frame_path;
+  double accumulated_s = frenet_point.s();
+  for (size_t i = 0; i < fem_1d_qp_->x().size(); ++i) {
+    common::FrenetFramePoint frenet_frame_point;
+    frenet_frame_point.set_s(accumulated_s);
+    frenet_frame_point.set_l(fem_1d_qp_->x()[i]);
+    frenet_frame_point.set_dl(fem_1d_qp_->x_derivative()[i]);
+    frenet_frame_point.set_ddl(fem_1d_qp_->x_second_order_derivative()[i]);
+    frenet_frame_path.push_back(std::move(frenet_frame_point));
+    accumulated_s += config_.path_output_resolution();
   }
+
   path_data->SetReferenceLine(&reference_line);
-  path_data->SetFrenetPath(FrenetFramePath(frenet_path));
+  path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
 
   return Status::OK();
 }
