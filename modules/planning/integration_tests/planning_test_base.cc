@@ -16,7 +16,10 @@
 
 #include "modules/planning/integration_tests/planning_test_base.h"
 
+#include <unistd.h>
+#include <chrono>
 #include <cstdlib>
+#include <thread>
 
 #include "cybertron/common/log.h"
 
@@ -94,6 +97,7 @@ bool PlanningTestBase::FeedTestData() {
     return false;
   }
 
+  Clock::SetMode(Clock::MOCK);
   Clock::SetNowInSeconds(localization.header().timestamp_sec());
 
   // prediction
@@ -144,6 +148,9 @@ void PlanningTestBase::SetUp() {
   }
 
   CHECK(FeedTestData()) << "Failed to feed test data";
+  AERROR << std::to_string(Clock::NowInSeconds());
+  usleep(200000);
+  AERROR << std::to_string(Clock::NowInSeconds());
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))

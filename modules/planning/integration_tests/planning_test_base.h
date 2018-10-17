@@ -56,7 +56,6 @@ namespace planning {
     ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
     using apollo::common::time::Clock;                   \
-    Clock::SetMode(Clock::MOCK);                         \
     int ret = RUN_ALL_TESTS();                           \
     ::apollo::cybertron::Shutdown();                     \
     return ret;                                          \
