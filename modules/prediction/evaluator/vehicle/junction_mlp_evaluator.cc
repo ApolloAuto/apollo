@@ -30,6 +30,11 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // 2. compute probabilities
 }
 
+void JunctionMLPEvaluator::ClusterLaneIds(Feature* feature_ptr) {
+  // TODO(all) implement
+  // group lane ids belonging to the same junction exit
+}
+
 void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {
   // TODO(all) implement
   // 1. Make model file ready
