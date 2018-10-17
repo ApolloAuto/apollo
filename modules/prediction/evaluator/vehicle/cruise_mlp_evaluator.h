@@ -59,7 +59,6 @@ class CruiseMLPEvaluator : public Evaluator {
   double ComputeFinishTime(const std::vector<double>& feature_values);
 
  private:
-  std::unordered_map<int, std::vector<std::string>> junction_exit_lane_ids_;
 };
 
 }  // namespace prediction

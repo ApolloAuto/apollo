@@ -81,6 +81,7 @@ DECLARE_double(prediction_pedestrian_total_time);
 DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
+DECLARE_string(evaluator_vehicle_cruise_mlp_file);
 DECLARE_string(evaluator_vehicle_junction_mlp_file);
 DECLARE_int32(max_num_obstacles);
 DECLARE_double(valid_position_diff_threshold);

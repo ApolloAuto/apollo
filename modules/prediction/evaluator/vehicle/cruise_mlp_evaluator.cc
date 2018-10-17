@@ -21,7 +21,7 @@ namespace apollo {
 namespace prediction {
 
 CruiseMLPEvaluator::CruiseMLPEvaluator() {
-  LoadModel(FLAGS_evaluator_vehicle_junction_mlp_file);
+  LoadModel(FLAGS_evaluator_vehicle_cruise_mlp_file);
 }
 
 void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
