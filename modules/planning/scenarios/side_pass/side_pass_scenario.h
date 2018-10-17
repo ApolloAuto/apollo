@@ -39,15 +39,12 @@
 namespace apollo {
 namespace planning {
 
-struct SidePassContext {};
-DECLARE_STAGE(SidePassApproachObstacle, SidePassContext);
-DECLARE_STAGE(SidePassGeneratePath, SidePassContext);
-DECLARE_STAGE(SidePassStopOnWaitPoint, SidePassContext);
-DECLARE_STAGE(SidePassDetectSafety, SidePassContext);
-DECLARE_STAGE(SidePassPassObstacle, SidePassContext);
-
 class SidePassScenario : public Scenario {
  public:
+  struct SidePassContext {
+    PathData path_data_;
+  };
+
   SidePassScenario() : Scenario(FLAGS_scenario_side_pass_config_file) {}
   explicit SidePassScenario(const ScenarioConfig& config) : Scenario(config) {}
 
@@ -80,10 +77,14 @@ class SidePassScenario : public Scenario {
   ScenarioConfig config_;
   bool stage_init_ = false;
   SpeedProfileGenerator speed_profile_generator_;
-  PathData path_;
   double wait_point_s = 0;
-  PathData path_data_;
 };
+
+DECLARE_STAGE(SidePassApproachObstacle, SidePassScenario::SidePassContext);
+DECLARE_STAGE(SidePassGeneratePath, SidePassScenario::SidePassContext);
+DECLARE_STAGE(SidePassStopOnWaitPoint, SidePassScenario::SidePassContext);
+DECLARE_STAGE(SidePassDetectSafety, SidePassScenario::SidePassContext);
+DECLARE_STAGE(SidePassPassObstacle, SidePassScenario::SidePassContext);
 
 }  // namespace planning
 }  // namespace apollo

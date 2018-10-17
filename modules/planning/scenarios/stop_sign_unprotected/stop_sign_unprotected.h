@@ -38,62 +38,17 @@
 namespace apollo {
 namespace planning {
 
-// stage context
-struct StopSignUnprotectedContext {
-  double stop_start_time;
-  std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
-  hdmap::PathOverlap next_stop_sign_overlap;
-  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
-      associated_lanes;
-};
-
-DECLARE_STAGE(StopSignUnprotectedIntersectionCruise,
-              StopSignUnprotectedContext);
-
-class StopSignUnprotectedCreep : public Stage {
- public:
-  explicit StopSignUnprotectedCreep(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame);
-  StopSignUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<StopSignUnprotectedContext>();
-  }
-};
-
-class StopSignUnprotectedStop : public Stage {
- public:
-  explicit StopSignUnprotectedStop(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame);
-  StopSignUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<StopSignUnprotectedContext>();
-  }
-  int RemoveWatchVehicle(
-      const PathObstacle& path_obstacle,
-      const std::vector<std::string>& watch_vehicle_ids,
-      std::unordered_map<std::string, std::vector<std::string>>*
-          watch_vehicles);
-};
-
-class StopSignUnprotectedPreStop : public Stage {
- public:
-  explicit StopSignUnprotectedPreStop(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame);
-  int AddWatchVehicle(const PathObstacle& path_obstacle,
-                      std::unordered_map<std::string, std::vector<std::string>>*
-                          watch_vehicles);
-  StopSignUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<StopSignUnprotectedContext>();
-  }
-  bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
-};
-
 class StopSignUnprotectedScenario : public Scenario {
  public:
+  // stage context
+  struct StopSignUnprotectedContext {
+    double stop_start_time;
+    std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
+    hdmap::PathOverlap next_stop_sign_overlap;
+    std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
+        associated_lanes;
+  };
+
   StopSignUnprotectedScenario()
       : Scenario(FLAGS_scenario_stop_sign_unprotected_config_file) {}
   explicit StopSignUnprotectedScenario(const ScenarioConfig& config)
@@ -131,6 +86,54 @@ class StopSignUnprotectedScenario : public Scenario {
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
+};
+
+DECLARE_STAGE(StopSignUnprotectedIntersectionCruise,
+              StopSignUnprotectedScenario::StopSignUnprotectedContext);
+
+class StopSignUnprotectedCreep : public Stage {
+ public:
+  explicit StopSignUnprotectedCreep(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame);
+  StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
+    return Stage::GetContextAs<
+        StopSignUnprotectedScenario::StopSignUnprotectedContext>();
+  }
+};
+
+class StopSignUnprotectedStop : public Stage {
+ public:
+  explicit StopSignUnprotectedStop(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame);
+  StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
+    return GetContextAs<
+        StopSignUnprotectedScenario::StopSignUnprotectedContext>();
+  }
+  int RemoveWatchVehicle(
+      const PathObstacle& path_obstacle,
+      const std::vector<std::string>& watch_vehicle_ids,
+      std::unordered_map<std::string, std::vector<std::string>>*
+          watch_vehicles);
+};
+
+class StopSignUnprotectedPreStop : public Stage {
+ public:
+  explicit StopSignUnprotectedPreStop(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame);
+  int AddWatchVehicle(const PathObstacle& path_obstacle,
+                      std::unordered_map<std::string, std::vector<std::string>>*
+                          watch_vehicles);
+  StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
+    return GetContextAs<
+        StopSignUnprotectedScenario::StopSignUnprotectedContext>();
+  }
+  bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
 };
 
 }  // namespace planning
