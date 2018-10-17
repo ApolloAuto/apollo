@@ -55,6 +55,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
             adc_trajectory = planning_pb2.ADCTrajectory()
             adc_trajectory.ParseFromString(msg.message)
             planning_analyzer.put(adc_trajectory)
+            lidar_endtoend_analyzer.put_planning(adc_trajectory)
 
         if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2":
             if is_auto_drive:
