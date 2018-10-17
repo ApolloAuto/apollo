@@ -497,9 +497,6 @@ function run_cpp_lint() {
   generate_build_targets
   echo "$BUILD_TARGETS" | grep -v "tools/visualizer" | xargs bazel test --config=cpplint -c dbg
 
-  # check /apollo/framework
-  BUILD_TARGETS="//cybertron/..."
-  echo "$BUILD_TARGETS" | xargs bazel test --config=cpplint -c dbg
 }
 
 function run_bash_lint() {
