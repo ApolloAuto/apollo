@@ -152,6 +152,44 @@ double EvaluateQuarticPolynomial(
   }
 }
 
+double EvaluateCubicPolynomial(
+    const std::array<double, 4>& coefs,
+    const double t, const uint32_t order, const double end_t,
+    const double end_v) {
+  if (t > end_t) {
+    switch (order) {
+    case 0: {
+      double end_value = ((coefs[3] * end_t + coefs[2]) * end_t + coefs[1])
+          * end_t + coefs[0];
+      return end_value + (t - end_t) * end_v;
+    }
+    case 1: {
+      return end_v;
+    }
+    default: {
+      return 0.0;
+    }
+    }
+  }
+
+  switch (order) {
+  case 0: {
+    return ((coefs[3] * t + coefs[2]) * t + coefs[1]) * t + coefs[0];
+  }
+  case 1: {
+    return (3.0 * coefs[3] * t + 2.0 * coefs[2]) * t + coefs[1];
+  }
+  case 2: {
+    return 6.0 * coefs[3] * t + 2.0 * coefs[2];
+  }
+  case 3: {
+    return 6.0 * coefs[3];
+  }
+  default:
+    return 0.0;
+  }
+}
+
 }  // namespace math_util
 
 namespace predictor_util {
@@ -264,3 +302,5 @@ double AdjustSpeedByCurvature(const double speed, const double curvature) {
 }  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo
+
+
