@@ -97,7 +97,7 @@ layer {
         pad: 1
         stride: 2
         pool: MAX
-        cmp_out_shape_floor_as_conv: true
+        round_mode: 1
     }
 }
 
