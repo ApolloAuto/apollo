@@ -221,13 +221,13 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
     return Stage::FINISHED;
   }
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
-  if (static_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+  if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(frame, &reference_line_info,
                            GetContext()->next_stop_sign_overlap.end_s)) {
     return Stage::FINISHED;
   }
   // build a stop fence by creep decider
-  if (static_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+  if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->Process(frame, &reference_line_info) != Status::OK()) {
     ADEBUG << "fail at build stop fence at creeping";
     return Stage::ERROR;
