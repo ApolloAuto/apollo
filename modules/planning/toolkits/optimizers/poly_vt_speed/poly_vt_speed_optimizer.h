@@ -50,7 +50,6 @@ class PolyVTSpeedOptimizer : public Task {
   void RecordDebugInfo(const SpeedData& speed_data);
 
  private:
-  PolyVTSpeedConfig config_;
   StBoundaryConfig st_boundary_config_;
 };
 

@@ -35,19 +35,21 @@ namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::min_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.first < rhs.first;
-  });
+  return std::min_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.first < rhs.first;
+                          });
 }
 
 std::vector<std::pair<double, double>>::iterator max_pair_second(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::max_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.second < rhs.second;
-  });
+  return std::max_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.second < rhs.second;
+                          });
 }
 
 void assign_pair_first(std::vector<std::pair<double, double>>::iterator begin,
@@ -72,9 +74,7 @@ QpPiecewiseJerkPathOptimizer::QpPiecewiseJerkPathOptimizer(
     const TaskConfig& config)
     : PathOptimizer(config) {
   SetName("QpPiecewiseJerkPathOptimizer");
-  if (config.has_qp_piecewise_jerk_path_config()) {
-    config_ = config.qp_piecewise_jerk_path_config();
-  }
+  CHECK(config_.has_qp_piecewise_jerk_path_config());
 }
 
 std::vector<std::tuple<double, double, double>>
@@ -83,9 +83,10 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
     const double qp_delta_s, double path_length,
     const ReferenceLine& reference_line,
     const std::vector<const PathObstacle*>& obstacles) {
+  const auto& qp_config = config_.qp_piecewise_jerk_path_config();
   int size = std::max(2, static_cast<int>(path_length / qp_delta_s));
   const double buffered_adc_width =
-      adc_sl.end_l() - adc_sl.start_l() + config_.lateral_buffer();
+      adc_sl.end_l() - adc_sl.start_l() + qp_config.lateral_buffer();
   std::vector<std::pair<double, double>> lateral_bounds(size);
   double start_s = frenet_point.s();
 
@@ -214,11 +215,12 @@ Status QpPiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
   const auto frenet_point = reference_line.GetFrenetPoint(init_point);
+  const auto& qp_config = config_.qp_piecewise_jerk_path_config();
   const auto& adc_sl = reference_line_info_->AdcSlBoundary();
-  const double qp_delta_s = config_.qp_delta_s();
+  const double qp_delta_s = qp_config.qp_delta_s();
   const double path_length =
-      std::fmax(config_.min_look_ahead_time() * init_point.v(),
-                config_.min_look_ahead_distance());
+      std::fmax(qp_config.min_look_ahead_time() * init_point.v(),
+                qp_config.min_look_ahead_distance());
   auto lateral_bounds = GetLateralBounds(
       adc_sl, frenet_point, qp_delta_s, path_length, reference_line,
       reference_line_info_->path_decision()->path_obstacles().Items());
@@ -230,11 +232,11 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   const int n = static_cast<int>(path_length / qp_delta_s);
 
   std::array<double, 5> w = {
-      config_.l_weight(),
-      config_.dl_weight(),
-      config_.ddl_weight(),
-      config_.dddl_weight(),
-      config_.guiding_line_weight(),
+      qp_config.l_weight(),
+      qp_config.dl_weight(),
+      qp_config.ddl_weight(),
+      qp_config.dddl_weight(),
+      qp_config.guiding_line_weight(),
   };
 
   fem_1d_qp_.reset(new Fem1dExpandedJerkQpProblem());
@@ -262,7 +264,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
     AERROR << "lateral qp optimizer failed";
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
-  fem_1d_qp_->SetOutputResolution(config_.path_output_resolution());
+  fem_1d_qp_->SetOutputResolution(qp_config.path_output_resolution());
 
   std::vector<common::FrenetFramePoint> frenet_path;
 
@@ -275,7 +277,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
     frenet_frame_point.set_dl(fem_1d_qp_->x_derivative()[i]);
     frenet_frame_point.set_ddl(fem_1d_qp_->x_second_order_derivative()[i]);
     frenet_frame_path.push_back(std::move(frenet_frame_point));
-    accumulated_s += config_.path_output_resolution();
+    accumulated_s += qp_config.path_output_resolution();
   }
 
   path_data->SetReferenceLine(&reference_line);

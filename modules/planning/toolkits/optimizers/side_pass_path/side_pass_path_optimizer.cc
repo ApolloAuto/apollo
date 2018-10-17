@@ -36,7 +36,7 @@ using apollo::common::Status;
 
 SidePassPathOptimizer::SidePassPathOptimizer(const TaskConfig &config)
     : PathOptimizer(config) {
-  config_ = config.dp_poly_path_config();
+  CHECK(config_.has_dp_poly_path_config());
   SetName("SidePassPathOptimizer");
 }
 
@@ -45,10 +45,11 @@ Status SidePassPathOptimizer::Process(const SpeedData &speed_data,
                                       const common::TrajectoryPoint &init_point,
                                       PathData *const path_data) {
   CHECK_NOTNULL(path_data);
-  DpRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
+  DpRoadGraph dp_road_graph(config_.dp_poly_path_config(),
+                            *reference_line_info_, speed_data);
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());
-  dp_road_graph.SetWaypointSampler(
-      new SidePassWaypointSampler(config_.waypoint_sampler_config()));
+  dp_road_graph.SetWaypointSampler(new SidePassWaypointSampler(
+      config_.dp_poly_path_config().waypoint_sampler_config()));
 
   if (!dp_road_graph.FindPathTunnel(
           init_point,

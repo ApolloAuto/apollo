@@ -34,12 +34,11 @@ using apollo::hdmap::PathOverlap;
 
 DeciderStopSign::DeciderStopSign(const TaskConfig& config) : Decider(config) {
   CHECK(config.has_decider_stop_sign_config());
-  config_ = config.decider_stop_sign_config();
   SetName("DeciderCreep");
 }
 
 Status DeciderStopSign::Process(Frame* frame,
-                             ReferenceLineInfo* reference_line_info) {
+                                ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -47,20 +46,18 @@ Status DeciderStopSign::Process(Frame* frame,
   const std::string stop_sign_id = "TEMP";
   const double stop_line_s = 100;
 
-  const double stop_distance = config_.stop_distance();
+  const double stop_distance =
+      config_.decider_stop_sign_config().stop_distance();
   const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_id;
-  BuildStopDecision(frame, reference_line_info,
-                    stop_wall_id, stop_line_s,
+  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
                     stop_distance);
 
   return Status::OK();
 }
 
 bool DeciderStopSign::BuildStopDecision(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info,
-    const std::string& stop_wall_id,
-    const double stop_line_s,
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
+    const std::string& stop_wall_id, const double stop_line_s,
     const double stop_distance) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -100,8 +97,8 @@ bool DeciderStopSign::BuildStopDecision(
   stop_decision->mutable_stop_point()->set_z(0.0);
 
   auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision(
-      "DeciderStopSign", stop_wall->Id(), stop);
+  path_decision->AddLongitudinalDecision("DeciderStopSign", stop_wall->Id(),
+                                         stop);
 
   return 0;
 }

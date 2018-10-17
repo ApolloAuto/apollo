@@ -41,15 +41,13 @@ class DeciderStopSign : public Decider {
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-    bool BuildStopDecision(Frame* const frame,
+  bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
                          const std::string& stop_wall_id,
-                         const double stop_line_s,
-                         const double stop_distance);
+                         const double stop_line_s, const double stop_distance);
 
  private:
   static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
-  DeciderStopSignConfig config_;
 };
 
 }  // namespace planning
