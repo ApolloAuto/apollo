@@ -432,6 +432,37 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "threshold",
+    srcs = [
+        "threshold.cc",
+    ],
+    hdrs = [
+        "threshold.h",
+    ],
+    deps = [
+        ":frame",
+        ":speed_limit",
+    ],
+)
+
+cc_library(
+    name = "decision_data",
+    srcs = [
+        "decision_data.cc",
+    ],
+    hdrs = [
+        "decision_data.h",
+    ],
+    deps = [
+        ":path_obstacle",
+        "//modules/planning/reference_line",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/common/configs:vehicle_config_helper",
+    ],
+)
+
+
 cc_test(
     name = "ego_info_test",
     size = "small",
@@ -447,15 +478,9 @@ cc_test(
 
 cc_library(
     name = "planning_common",
-    srcs = [
-        "threshold.cc",
-        "decision_data.cc",
-    ],
-    hdrs = [
-        "threshold.h",
-        "decision_data.h",
-    ],
     deps = [
+        "decision_data",
+        "threshold",
         ":ego_info",
         ":frame",
         #":frame_open_space",
