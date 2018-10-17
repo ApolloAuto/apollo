@@ -41,11 +41,15 @@ message JunctionMLPFeature {
   optional int32 label = 3;  // label 1: exit through the lane, 0: otherwise
 }
 
+message JunctionExit {
+  optional LaneFeature exit_lane = 1;
+  optional LaneFeature pred_exit_lane = 2;  // exit lane's predecessor
+}
+
 message JunctionFeature {
   optional string junction_id = 1;
   optional LaneFeature enter_lane = 2;
-  repeated LaneFeature exit_lane = 3;
-  repeated LaneFeature pred_exit_lane = 5;  // correspond exit lane one by one
+  repeated JunctionExit junction_exit = 3;
   repeated JunctionMLPFeature junction_mlp_feature = 4;  // for MLP
 }
 
