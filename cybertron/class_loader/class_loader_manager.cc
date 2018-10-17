@@ -21,7 +21,7 @@ namespace class_loader {
 
 ClassLoaderManager::ClassLoaderManager() {}
 
-ClassLoaderManager::~ClassLoaderManager() { UnloadAllLibrary(); }
+ClassLoaderManager::~ClassLoaderManager() {}
 
 ClassLoader* ClassLoaderManager::GetClassLoaderByLibPath(
     const std::string& library_path) {

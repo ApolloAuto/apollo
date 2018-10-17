@@ -146,9 +146,10 @@ bool Init(const char* argv) {
 
 void Shutdown() {
   std::lock_guard<std::recursive_mutex> lg(g_mutex);
-  if (IsShutdown()) {
+  if (GetState() == STATE_SHUTDOWN) {
     return;
   }
+  TaskManager::Instance()->Shutdown();
   scheduler::Scheduler::Instance()->ShutDown();
   service_discovery::TopologyManager::Instance()->Shutdown();
   transport::Transport::Shutdown();

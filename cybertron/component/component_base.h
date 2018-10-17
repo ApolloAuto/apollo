@@ -17,6 +17,7 @@
 #ifndef CYBERTRON_COMPONENT_COMPONENT_BASE_H_
 #define CYBERTRON_COMPONENT_COMPONENT_BASE_H_
 
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
@@ -43,6 +44,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
 
   virtual bool Initialize(const ComponentConfig& config) { return false; }
   virtual bool Initialize(const TimerComponentConfig& config) { return false; }
+  virtual void Shutdown() { is_shutdown_.exchange(true); }
 
   template <typename T>
   bool GetProtoConfig(T* config) const {
@@ -93,6 +95,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
     }
   }
 
+  std::atomic<bool> is_shutdown_ = {false};
   std::shared_ptr<Node> node_;
   std::string config_file_path_ = "";
   std::vector<std::shared_ptr<ReaderBase>> readers_;

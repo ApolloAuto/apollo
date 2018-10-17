@@ -37,6 +37,9 @@ bool ModuleController::Init() {
 }
 
 void ModuleController::Clear() {
+  for (auto& component : component_list_) {
+    component->Shutdown();
+  }
   component_list_.clear();  // keep alive
   class_loader_manager_.UnloadAllLibrary();
 }

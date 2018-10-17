@@ -25,6 +25,9 @@ TimerComponent::TimerComponent() {}
 TimerComponent::~TimerComponent() {}
 
 bool TimerComponent::Process() {
+  if (is_shutdown_.load()) {
+    return true;
+  }
   // TODO(hewei03): Add some protection here.
   return Proc();
 }

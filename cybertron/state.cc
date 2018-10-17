@@ -30,7 +30,9 @@ void SetState(const State& state) { g_cybertron_state.store(state); }
 
 bool OK() { return GetState() == STATE_INITIALIZED; }
 
-bool IsShutdown() { return GetState() == STATE_SHUTDOWN; }
+bool IsShutdown() {
+  return GetState() == STATE_SHUTTING_DOWN || GetState() == STATE_SHUTDOWN;
+}
 
 void WaitForShutdown() {
   while (OK()) {
