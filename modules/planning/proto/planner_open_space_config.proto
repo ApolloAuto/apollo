@@ -36,4 +36,11 @@ message DistanceApproachConfig {
   repeated double weight_stitching = 4;
   repeated double weight_time = 5;
   optional double min_safety_distance = 6;
+  optional double max_steer_angle = 7;
+  optional double max_speed_forward = 8;
+  optional double max_speed_reverse = 9;
+  optional double max_acceleration_forward = 10;
+  optional double max_acceleration_reverse = 11;
+  optional double min_time_sample_scaling = 12;
+  optional double max_time_sample_scaling = 13;
 }
