@@ -91,7 +91,7 @@ struct PolygonBoundary {
   std::vector<apollo::common::PointENU> polygon_points;
 };
 
-enum PolygonType {
+enum class PolygonType {
   JUNCTION_POLYGON = 0,
   PARKINGSPACE_POLYGON = 1,
   ROAD_HOLE_POLYGON = 2,
