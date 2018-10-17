@@ -45,6 +45,7 @@ message JunctionFeature {
   optional string junction_id = 1;
   optional LaneFeature enter_lane = 2;
   repeated LaneFeature exit_lane = 3;
+  repeated LaneFeature pred_exit_lane = 5;  // correspond exit lane one by one
   repeated JunctionMLPFeature junction_mlp_feature = 4;  // for MLP
 }
 
