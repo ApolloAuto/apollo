@@ -18,6 +18,7 @@ limitations under the License.
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <set>
 #include <unordered_set>
 
 #include "modules/common/util/file.h"

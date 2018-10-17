@@ -20,9 +20,6 @@ limitations under the License.
 
 namespace apollo {
 namespace hdmap {
-//using apollo::common::adapter::AdapterConfig;
-//using apollo::common::adapter::AdapterManager;
-//using apollo::common::adapter::AdapterManagerConfig;
 using apollo::common::time::Clock;
 using apollo::relative_map::MapMsg;
 
@@ -58,7 +55,7 @@ void HDMapUtilTestSuite::InitMapProto(Map* map_proto) {
   lane->set_type(Lane::CITY_DRIVING);
 }
 
-//TEST_F(HDMapUtilTestSuite, ReuseMap) {
+// TEST_F(HDMapUtilTestSuite, ReuseMap) {
 //  MapMsg map_msg;
 //  InitMapProto(map_msg.mutable_hdmap());
 //  map_msg.mutable_header()->set_sequence_num(1);
