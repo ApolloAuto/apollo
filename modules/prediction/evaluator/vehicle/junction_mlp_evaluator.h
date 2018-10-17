@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/evaluator/evaluator.h"
@@ -53,9 +54,18 @@ class JunctionMLPEvaluator : public Evaluator {
   void LoadModel(const std::string& model_file);
 
   /**
+   * @brief Cluster lane ids by exit
+   * @param feature per frame
+   */
+  void ClusterLaneIds(Feature* feature_ptr);
+
+  /**
    * @brief Compute probability of a junction exit
    */
   double ComputeProbability(const std::vector<double>& feature_values);
+
+ private:
+  std::unordered_map<int, std::vector<std::string>> junction_exit_lane_ids_;
 };
 
 }  // namespace prediction
