@@ -23,9 +23,7 @@
 
 #include "cybertron/common/log.h"
 #include "cybertron/common/macros.h"
-#include "cybertron/data/cache_buffer.h"
 #include "cybertron/data/channel_buffer.h"
-#include "cybertron/data/data_notifier.h"
 #include "cybertron/init.h"
 #include "cybertron/time/time.h"
 

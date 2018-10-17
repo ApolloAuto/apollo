@@ -16,7 +16,7 @@ cc_test(
     name = "task_test",
     size = "small",
     srcs = [
-        "task_test.cpp",
+        "task_test.cc",
     ],
     deps = [
         "//cybertron:cybertron_core",
@@ -27,13 +27,13 @@ cc_test(
 cc_library(
     name = "task_manager",
     srcs = [
-        "task_manager.cpp",
+        "task_manager.cc",
     ],
     hdrs = [
         "task_manager.h",
     ],
     deps = [
-        "//cybertron/scheduler:scheduler_lib",
+        "//cybertron/scheduler:scheduler",
     ],
 )
 

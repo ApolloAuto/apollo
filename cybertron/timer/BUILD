@@ -5,11 +5,11 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "timer_lib",
     srcs = glob([
-        "timer.cpp",
-        "timer_manager.cpp",
-        "timer_task.cpp",
-        "timing_slot.cpp",
-        "timing_wheel.cpp",
+        "timer.cc",
+        "timer_manager.cc",
+        "timer_task.cc",
+        "timing_slot.cc",
+        "timing_wheel.cc",
     ]),
     hdrs = glob([
         "*.h",
@@ -18,9 +18,6 @@ cc_library(
           "//cybertron/base:thread_pool",
           "//cybertron/common:common",
           "//cybertron/croutine:croutine",
-          "//cybertron/data:data_lib",
-          "//cybertron/event:event_lib",
-          "//cybertron/scheduler:scheduler_lib",
           "//cybertron/task:task",
           "//cybertron/time:rate",
           "//cybertron/time:time",
@@ -31,7 +28,7 @@ cc_test(
     name = "timer_manager_test",
     size = "small",
     srcs = [
-        "timer_manager_test.cpp",
+        "timer_manager_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -43,7 +40,7 @@ cc_test(
     name = "timing_wheel_test",
     size = "small",
     srcs = [
-        "timing_wheel_test.cpp",
+        "timing_wheel_test.cc",
     ],
     deps = [
         "//cybertron",

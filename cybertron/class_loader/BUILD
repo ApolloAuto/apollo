@@ -1,27 +1,39 @@
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility = ["//visibility:public"],)
 
 cc_library(
-    name = "class_loader_lib",
-    srcs = glob([
-        "class_factory.cpp",
-        "class_loader.cpp",
-        "class_loader_manager.cpp",
-        "class_loader_utility.cpp",
-    ]),
-    hdrs = glob([
-        "class_factory.h",
+    name = "class_loader",
+    srcs = [
+        "class_loader.cc",
+        "utility/class_factory.cc",
+        "utility/class_loader_utility.cc",
+    ],
+    hdrs = [
         "class_loader.h",
-        "class_loader_manager.h",
         "class_loader_register_macro.h",
-        "class_loader_utility.h",
-    ]),
+        "utility/class_factory.h",
+        "utility/class_loader_utility.h",
+    ],
     deps = [
-          "//cybertron/common:common",
+        "//cybertron/common:log",
+        "//cybertron:init",
     ],
     linkopts = [
         "-lPocoFoundation",
+    ],
+)
+        
+cc_library(
+    name = "class_loader_manager",
+    srcs = [
+        "class_loader_manager.cc",
+    ],
+    hdrs = [
+        "class_loader_manager.h",
+    ],
+    deps = [
+        "class_loader",
     ],
 )
 

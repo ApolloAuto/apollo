@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef CYBERTRON_CLASS_LOADER_CLASS_FACTORY_H_
-#define CYBERTRON_CLASS_LOADER_CLASS_FACTORY_H_
+#ifndef CYBERTRON_CLASS_LOADER_UTILITY_CLASS_FACTORY_H_
+#define CYBERTRON_CLASS_LOADER_UTILITY_CLASS_FACTORY_H_
 
 #include <string>
 #include <typeinfo>
@@ -81,4 +81,4 @@ class ClassFactory : public AbstractClassFactory<Base> {
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_CLASS_LOADER_CLASS_FACTORY_H_
+#endif  // CYBERTRON_CLASS_LOADER_UTILITY_CLASS_FACTORY_H_

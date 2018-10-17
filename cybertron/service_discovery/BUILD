@@ -5,22 +5,22 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "service_discovery_lib",
     srcs = glob([
-        "topology_manager.cpp",
-        "container/*.cpp",
-        "specific_manager/*.cpp",
-        "communication/*.cpp",
-        "role/*.cpp",
+        "topology_manager.cc",
+        "container/*.cc",
+        "specific_manager/*.cc",
+        "communication/*.cc",
+        "role/*.cc",
     ]),
     hdrs = glob([
         "*.h",
         "**/*.h",
     ]),
     deps = [
-        "//cybertron:init_lib",
+        "//cybertron:init",
         "//cybertron/base:signal",
         "//cybertron/common:common",
-        "//cybertron/event:event_lib",
-        "//cybertron/message:message_lib",
+        "//cybertron/message:message_traits",
+        "//cybertron/message:protobuf_factory",
         "//cybertron/proto:role_attributes_cc_proto",
         "//cybertron/proto:topology_change_cc_proto",
         "//cybertron/time:time",
@@ -33,7 +33,7 @@ cc_test(
     name = "channel_manager_test",
     size = "small",
     srcs = [
-        "channel_manager_test.cpp",
+        "channel_manager_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -46,7 +46,7 @@ cc_test(
     name = "graph_test",
     size = "small",
     srcs = [
-        "graph_test.cpp",
+        "graph_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -58,7 +58,7 @@ cc_test(
     name = "node_manager_test",
     size = "small",
     srcs = [
-        "node_manager_test.cpp",
+        "node_manager_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -70,7 +70,7 @@ cc_test(
     name = "role_test",
     size = "small",
     srcs = [
-        "role_test.cpp",
+        "role_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -82,7 +82,7 @@ cc_test(
     name = "service_manager_test",
     size = "small",
     srcs = [
-        "service_manager_test.cpp",
+        "service_manager_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -94,7 +94,7 @@ cc_test(
     name = "topology_manager_test",
     size = "small",
     srcs = [
-        "topology_manager_test.cpp",
+        "topology_manager_test.cc",
     ],
     deps = [
         "//cybertron",

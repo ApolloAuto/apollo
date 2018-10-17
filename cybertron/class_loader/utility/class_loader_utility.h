@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/class_loader/class_factory.h"
+#include "cybertron/class_loader/utility/class_factory.h"
 #include "cybertron/common/log.h"
 
 /**

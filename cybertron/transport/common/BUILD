@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "transport_common",
     srcs = glob([
-        "*.cpp",
+        "*.cc",
     ]),
     hdrs = glob([
         "*.h",

@@ -34,7 +34,7 @@ cc_test(
     name = "any_test",
     size = "small",
     srcs = [
-        "any_test.cpp",
+        "any_test.cc",
     ],
     deps = [
         "//cybertron/base:any",
@@ -60,7 +60,7 @@ cc_test(
     name = "atomic_hash_map_test",
     size = "small",
     srcs = [
-        "atomic_hash_map_test.cpp",
+        "atomic_hash_map_test.cc",
     ],
     deps = [
         "//cybertron/base:atomic_hash_map",
@@ -83,7 +83,7 @@ cc_test(
     name = "atomic_rw_lock_test",
     size = "small",
     srcs = [
-        "atomic_rw_lock_test.cpp",
+        "atomic_rw_lock_test.cc",
     ],
     deps = [
         "//cybertron/base:atomic_rw_lock",
@@ -107,7 +107,7 @@ cc_test(
     name = "bounded_queue_test",
     size = "small",
     srcs = [
-        "bounded_queue_test.cpp",
+        "bounded_queue_test.cc",
     ],
     deps = [
         "//cybertron/base:bounded_queue",
@@ -143,7 +143,7 @@ cc_test(
     name = "object_pool_test",
     size = "small",
     srcs = [
-        "object_pool_test.cpp",
+        "object_pool_test.cc",
     ],
     deps = [
         "//cybertron/base:object_pool",
@@ -176,7 +176,7 @@ cc_test(
     name = "signal_test",
     size = "small",
     srcs = [
-        "signal_test.cpp",
+        "signal_test.cc",
     ],
     deps = [
         "//cybertron/base:signal",

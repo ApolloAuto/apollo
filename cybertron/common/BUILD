@@ -19,7 +19,7 @@ cc_library(
 cc_library(
     name = "file",
     srcs = [
-          "file.cpp",
+          "file.cc",
     ],
     hdrs = [
           "file.h",
@@ -34,7 +34,7 @@ cc_test(
     name = "file_test",
     size = "small",
     srcs = [
-        "file_test.cpp",
+        "file_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -49,7 +49,7 @@ cc_library(
           "log.h",
     ],
     deps = [
-        "//cybertron:init_lib",
+        "//cybertron:binary",
     ],
 )
 
@@ -57,7 +57,7 @@ cc_test(
     name = "logfileobject_test",
     size = "small",
     srcs = [
-        "logfileobject_test.cpp",
+        "logfileobject_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -69,7 +69,7 @@ cc_test(
     name = "log_test",
     size = "small",
     srcs = [
-        "log_test.cpp",
+        "log_test.cc",
     ],
     deps = [
         "//cybertron",
@@ -90,7 +90,7 @@ cc_library(
 cc_library(
     name = "global_data",
     srcs = [
-          "global_data.cpp",
+          "global_data.cc",
     ],
     hdrs = [
           "global_data.h",
