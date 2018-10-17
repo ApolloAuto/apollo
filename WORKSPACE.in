@@ -227,3 +227,16 @@ new_local_repository(
     build_file = "third_party/fastrtps.BUILD",
     path = "/apollo/third_party/fast-rtps",
 )
+
+# grpc
+http_archive(
+    name = "com_github_grpc_grpc",
+    urls = [
+        "https://github.com/grpc/grpc/archive/v1.14.2.tar.gz",
+    ],
+    strip_prefix = "grpc-1.14.2",
+)
+
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+grpc_deps()
