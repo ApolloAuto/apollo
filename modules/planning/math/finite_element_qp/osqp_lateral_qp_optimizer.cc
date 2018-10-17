@@ -39,20 +39,21 @@ bool OsqpLateralQPOptimizer::optimize(
   const int num_var = d_bounds.size();
   const int kNumParam = 3 * d_bounds.size();
   const int kNumConstraint = kNumParam + 3 * (num_var - 1) + 3;
-  MatrixXd affine_constraint = MatrixXd::Zero(kNumConstraint, kNumParam);
   c_float lower_bounds[kNumConstraint];
   c_float upper_bounds[kNumConstraint];
 
   const int prime_offset = num_var;
   const int pprime_offset = 2 * num_var;
+
+  std::vector<std::vector<std::pair<c_int, c_float>>> columns;
+  columns.resize(kNumParam);
+
   int constraint_index = 0;
 
   // d_i+1'' - d_i''
   for (int i = 0; i + 1 < num_var; ++i) {
-    const int row = constraint_index;
-    const int col = pprime_offset + i;
-    affine_constraint(row, col) = -1.0;
-    affine_constraint(row, col + 1) = 1.0;
+    columns[pprime_offset + i].emplace_back(constraint_index, -1.0);
+    columns[pprime_offset + i + 1].emplace_back(constraint_index, 1.0);
 
     lower_bounds[constraint_index] =
         -FLAGS_lateral_third_order_derivative_max * delta_s;
@@ -63,11 +64,11 @@ bool OsqpLateralQPOptimizer::optimize(
 
   // d_i+1' - d_i' - 0.5 * ds * (d_i'' + d_i+1'')
   for (int i = 0; i + 1 < num_var; ++i) {
-    affine_constraint(constraint_index, prime_offset + i) = -1.0;
-    affine_constraint(constraint_index, prime_offset + i + 1) = 1.0;
-
-    affine_constraint(constraint_index, pprime_offset + i) = -0.5 * delta_s;
-    affine_constraint(constraint_index, pprime_offset + i + 1) = -0.5 * delta_s;
+    columns[prime_offset + i].emplace_back(constraint_index, -1.0);
+    columns[prime_offset + i + 1].emplace_back(constraint_index, 1.0);
+    columns[pprime_offset + i].emplace_back(constraint_index, -0.5 * delta_s);
+    columns[pprime_offset + i + 1].emplace_back(constraint_index,
+                                                -0.5 * delta_s);
 
     lower_bounds[constraint_index] = 0.0;
     upper_bounds[constraint_index] = 0.0;
@@ -76,39 +77,37 @@ bool OsqpLateralQPOptimizer::optimize(
 
   // d_i+1 - d_i - d_i' * ds - 1/3 * d_i'' * ds^2 - 1/6 * d_i+1'' * ds^2
   for (int i = 0; i + 1 < num_var; ++i) {
-    affine_constraint(constraint_index, i) = -1.0;
-    affine_constraint(constraint_index, i + 1) = 1.0;
-
-    affine_constraint(constraint_index, prime_offset + i) = -delta_s;
-
-    affine_constraint(constraint_index, pprime_offset + i) =
-        -delta_s * delta_s / 3.0;
-    affine_constraint(constraint_index, pprime_offset + i + 1) =
-        -delta_s * delta_s / 6.0;
+    columns[i].emplace_back(constraint_index, -1.0);
+    columns[i + 1].emplace_back(constraint_index, 1.0);
+    columns[prime_offset + i].emplace_back(constraint_index, -delta_s);
+    columns[pprime_offset + i].emplace_back(constraint_index,
+                                            -delta_s * delta_s / 3.0);
+    columns[pprime_offset + i + 1].emplace_back(constraint_index,
+                                                -delta_s * delta_s / 6.0);
 
     lower_bounds[constraint_index] = 0.0;
     upper_bounds[constraint_index] = 0.0;
     ++constraint_index;
   }
 
-  affine_constraint(constraint_index, 0) = 1.0;
+  columns[0].emplace_back(constraint_index, 1.0);
   lower_bounds[constraint_index] = d_state[0];
   upper_bounds[constraint_index] = d_state[0];
   ++constraint_index;
 
-  affine_constraint(constraint_index, prime_offset) = 1.0;
+  columns[prime_offset].emplace_back(constraint_index, 1.0);
   lower_bounds[constraint_index] = d_state[1];
   upper_bounds[constraint_index] = d_state[1];
   ++constraint_index;
 
-  affine_constraint(constraint_index, pprime_offset) = 1.0;
+  columns[pprime_offset].emplace_back(constraint_index, 1.0);
   lower_bounds[constraint_index] = d_state[2];
   upper_bounds[constraint_index] = d_state[2];
   ++constraint_index;
 
   const double LARGE_VALUE = 2.0;
   for (int i = 0; i < kNumParam; ++i) {
-    affine_constraint(constraint_index, i) = 1.0;
+    columns[i].emplace_back(constraint_index, 1.0);
     if (i < num_var) {
       lower_bounds[constraint_index] = d_bounds[i].first;
       upper_bounds[constraint_index] = d_bounds[i].second;
@@ -125,7 +124,16 @@ bool OsqpLateralQPOptimizer::optimize(
   std::vector<c_float> A_data;
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
-  DenseToCSCMatrix(affine_constraint, &A_data, &A_indices, &A_indptr);
+  int ind_p = 0;
+  for (int j = 0; j < kNumParam; ++j) {
+    A_indptr.push_back(ind_p);
+    for (const auto& row_data_pair : columns[j]) {
+      A_data.push_back(row_data_pair.second);
+      A_indices.push_back(row_data_pair.first);
+      ++ind_p;
+    }
+  }
+  A_indptr.push_back(ind_p);
 
   // offset
   double q[kNumParam];
@@ -154,7 +162,7 @@ bool OsqpLateralQPOptimizer::optimize(
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   data->n = kNumParam;
-  data->m = affine_constraint.rows();
+  data->m = kNumConstraint;
   data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
                        P_indices.data(), P_indptr.data());
   data->q = q;
@@ -193,22 +201,24 @@ void OsqpLateralQPOptimizer::CalculateKernel(
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {
   const int kNumParam = 3 * d_bounds.size();
-
-  // const int kNumOfMatrixElement = kNumParam * kNumParam;
-  MatrixXd kernel = MatrixXd::Zero(kNumParam, kNumParam);  // dense matrix
+  P_data->resize(kNumParam);
+  P_indices->resize(kNumParam);
+  P_indptr->resize(kNumParam + 1);
 
   for (int i = 0; i < kNumParam; ++i) {
     if (i < static_cast<int>(d_bounds.size())) {
-      kernel(i, i) = 2.0 * FLAGS_weight_lateral_offset +
-                     2.0 * FLAGS_weight_lateral_obstacle_distance;
+      P_data->at(i) = 2.0 * FLAGS_weight_lateral_offset +
+                      2.0 * FLAGS_weight_lateral_obstacle_distance;
     } else if (i < 2 * static_cast<int>(d_bounds.size())) {
-      kernel(i, i) = 2.0 * FLAGS_weight_lateral_derivative;
+      P_data->at(i) = 2.0 * FLAGS_weight_lateral_derivative;
     } else {
-      kernel(i, i) = 2.0 * FLAGS_weight_lateral_second_order_derivative;
+      P_data->at(i) = 2.0 * FLAGS_weight_lateral_second_order_derivative;
     }
+    P_indices->at(i) = i;
+    P_indptr->at(i) = i;
   }
-
-  DenseToCSCMatrix(kernel, P_data, P_indices, P_indptr);
+  P_indptr->at(kNumParam) = kNumParam;
+  CHECK_EQ(P_data->size(), P_indices->size());
 }
 
 }  // namespace planning
