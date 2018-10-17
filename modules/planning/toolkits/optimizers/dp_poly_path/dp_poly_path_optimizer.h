@@ -44,9 +44,6 @@ class DpPolyPathOptimizer : public PathOptimizer {
                                  const ReferenceLine &reference_line,
                                  const common::TrajectoryPoint &init_point,
                                  PathData *const path_data) override;
-
- private:
-  DpPolyPathConfig config_;
 };
 
 }  // namespace planning

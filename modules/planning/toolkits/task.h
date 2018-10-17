@@ -50,7 +50,6 @@ class Task {
   Frame* frame_ = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;
 
- private:
   TaskConfig config_;
   std::string name_;
 };
