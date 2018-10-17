@@ -47,7 +47,7 @@ Status DeciderCreep::Process(Frame* frame,
 
 double DeciderCreep::FindCreepDistance(Frame* frame,
                                        ReferenceLineInfo* reference_line_info) {
-  // TODO(all)
+  // more delicate design of creep distance
   return 0.5;
 }
 
@@ -100,6 +100,33 @@ bool DeciderCreep::BuildStopDecision(Frame* frame,
   path_decision->AddLongitudinalDecision("Creeper", stop_wall->Id(), stop);
 
   return true;
+}
+
+bool DeciderCreep::CheckCreepDone(Frame* frame,
+                                  ReferenceLineInfo* reference_line_info,
+                                  double stop_sign_end_s) {
+  bool creep_done = false;
+  double creep_stop_s =
+      stop_sign_end_s + FindCreepDistance(frame, reference_line_info);
+  const double distance =
+      creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
+  if (distance < config_.max_valid_stop_distance()) {
+    bool all_far_away = true;
+    for (auto* path_obstacle :
+         reference_line_info->path_decision()->path_obstacles().Items()) {
+      if (path_obstacle->obstacle()->IsVirtual() ||
+          !path_obstacle->obstacle()->IsStatic()) {
+        continue;
+      }
+      if (path_obstacle->reference_line_st_boundary().min_t() <
+          config_.min_boundary_t()) {
+        all_far_away = false;
+        break;
+      }
+    }
+    creep_done = all_far_away;
+  }
+  return creep_done;
 }
 
 }  // namespace planning
