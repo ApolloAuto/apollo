@@ -39,7 +39,7 @@ cc_library(
     deps = [
         "parameter",
         "parameter_service_names",
-        "//cybertron/node:node_lib",
+        "//cybertron/node:node",
         "//cybertron/service:client",
         "@fastrtps",
     ]
@@ -68,7 +68,7 @@ cc_library(
     deps = [
         "parameter",
         "parameter_service_names",
-        "//cybertron/node:node_lib",
+        "//cybertron/node:node",
         "//cybertron/service:service",
         "@fastrtps",
     ]
