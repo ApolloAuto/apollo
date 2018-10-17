@@ -40,11 +40,13 @@
 namespace apollo {
 namespace planning {
 
-apollo::common::util::Factory<TaskConfig::TaskType, Task,
-                              Task* (*)(const TaskConfig& config)>
+apollo::common::util::Factory<
+    TaskConfig::TaskType, Task, Task* (*)(const TaskConfig& config),
+    std::unordered_map<TaskConfig::TaskType,
+                       Task* (*)(const TaskConfig& config), std::hash<int>>>
     TaskFactory::task_factory_;
 
-std::unordered_map<TaskConfig::TaskType, TaskConfig, EnumHash>
+std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {

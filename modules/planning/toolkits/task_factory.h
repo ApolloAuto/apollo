@@ -32,23 +32,18 @@
 namespace apollo {
 namespace planning {
 
-struct EnumHash {
-  template <typename T>
-  std::size_t operator()(T t) const {
-    return static_cast<std::size_t>(t);
-  }
-};
-
 class TaskFactory {
  public:
-  static void Init(const PlanningConfig& config);
+  static void Init(const PlanningConfig &config);
   static std::unique_ptr<Task> CreateTask(const TaskConfig &task_config);
 
  private:
-  static apollo::common::util::Factory<TaskConfig::TaskType, Task,
-                                       Task *(*)(const TaskConfig &config)>
+  static apollo::common::util::Factory<
+      TaskConfig::TaskType, Task, Task *(*)(const TaskConfig &config),
+      std::unordered_map<TaskConfig::TaskType,
+                         Task *(*)(const TaskConfig &config), std::hash<int>>>
       task_factory_;
-  static std::unordered_map<TaskConfig::TaskType, TaskConfig, EnumHash>
+  static std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
       default_task_configs_;
 };
 
