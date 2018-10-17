@@ -10,7 +10,6 @@ import PlanningData from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
 import TrafficSignal from "store/traffic_signal";
-import PARAMETERS from "store/config/parameters.yml";
 
 class DreamviewStore {
     // Mutable States

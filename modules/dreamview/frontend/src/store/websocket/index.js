@@ -1,5 +1,3 @@
-import PARAMETERS from "store/config/parameters.yml";
-
 import OfflinePlaybackWebSocketEndpoint from "store/websocket/websocket_offline";
 import RealtimeWebSocketEndpoint from "store/websocket/websocket_realtime";
 import MapDataWebSocketEndpoint from "store/websocket/websocket_map";

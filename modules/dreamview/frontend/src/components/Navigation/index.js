@@ -1,6 +1,5 @@
 import React from "react";
 
-import PARAMETERS from "store/config/parameters.yml";
 import WindowResizeControl from "components/Navigation/WindowResizeControl";
 import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
 import WS from "store/websocket";

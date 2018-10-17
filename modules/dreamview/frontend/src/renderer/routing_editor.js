@@ -3,7 +3,6 @@ import "imports-loader?THREE=three!three/examples/js/controls/OrbitControls.js";
 
 import routingPointPin from "assets/images/routing/pin.png";
 
-import PARAMETERS from "store/config/parameters.yml";
 import STORE from "store";
 import WS from "store/websocket";
 import { drawImage } from "utils/draw";

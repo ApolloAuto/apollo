@@ -15,7 +15,6 @@ import positionIcon from "assets/images/menu/position.png";
 import mapIcon from "assets/images/menu/map.png";
 
 import { POINT_CLOUD_WS } from "store/websocket";
-import PARAMETERS from "store/config/parameters.yml";
 
 const MenuIconMapping = {
         perception: perceptionIcon,

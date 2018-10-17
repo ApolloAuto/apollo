@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 import { loadTexture } from "utils/models";
 import gridGround from "assets/images/ground.png";
-import PARAMETERS from "store/config/parameters.yml";
 import STORE from "store";
 
 export default class Ground {

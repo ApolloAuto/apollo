@@ -1,7 +1,7 @@
 {
     "name": "dreamview",
     "version": "2.0.0",
-    "description": "Visiualization of the Apollo simulator.",
+    "description": "Visualization of the Apollo simulator.",
     "main": "app.js",
     "author": "adu-sim",
     "license": "Apache 2.0",
@@ -49,7 +49,7 @@
         "eslint-loader": "^1.7.1",
         "eslint-plugin-react": "^7.0.1",
         "favicons-webpack-plugin": "^0.0.7",
-        "file-loader": "^0.11.1",
+        "file-loader": "^1.1.11",
         "html-webpack-plugin": "^2.28.0",
         "image-webpack-loader": "^3.3.1",
         "json-loader": "^0.5.4",

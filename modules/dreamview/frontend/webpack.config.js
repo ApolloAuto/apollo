@@ -13,6 +13,7 @@ module.exports = {
 
     entry: {
         app: "./app.js",
+        parameters: path.join(__dirname, "src/store/config/parameters.yml")
     },
 
     output: {
@@ -162,6 +163,18 @@ module.exports = {
                     options: {
                         presets: ["es2015"],
                     }
+                }]
+            }, {
+                test: /parameters.yml/,
+                use: [{
+                    loader: 'file-loader',
+                    options: {
+                        name: '[path][name].json',
+                        context: 'src/store/config',
+                        outputPath: ".", // the "dist" dir
+                    }
+                },{
+                    loader: 'yaml-loader'
                 }]
             },
         ]

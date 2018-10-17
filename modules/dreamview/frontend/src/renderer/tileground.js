@@ -1,6 +1,5 @@
 import * as THREE from "three";
 
-import PARAMETERS from "store/config/parameters.yml";
 import WS from "store/websocket";
 import { loadTexture } from "utils/models";
 
