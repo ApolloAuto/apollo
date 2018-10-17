@@ -41,6 +41,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::Vec2d;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
@@ -143,7 +144,36 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
-  auto status = frame_->Init();
+
+  std::list<ReferenceLine> reference_lines;
+  std::list<hdmap::RouteSegments> segments;
+  if (!reference_line_provider_->GetReferenceLines(&reference_lines,
+                                                   &segments)) {
+    std::string msg = "Failed to create reference line";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  DCHECK_EQ(reference_lines.size(), segments.size());
+
+  auto forword_limit =
+      hdmap::PncMap::LookForwardDistance(vehicle_state.linear_velocity());
+
+  for (auto& ref_line : reference_lines) {
+    if (!ref_line.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
+                         FLAGS_look_backward_distance, forword_limit)) {
+      std::string msg = "Fail to shrink reference line.";
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+  }
+  for (auto& seg : segments) {
+    if (!seg.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
+                    FLAGS_look_backward_distance, forword_limit)) {
+      std::string msg = "Fail to shrink routing segments.";
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+  }
+
+  auto status = frame_->Init(reference_lines, segments,
+                             reference_line_provider_->FutureRouteWaypoints());
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
     return status;

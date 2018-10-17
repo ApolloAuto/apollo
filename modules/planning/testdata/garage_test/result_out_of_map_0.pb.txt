@@ -1,14 +1,14 @@
 header {
   status {
     error_code: PLANNING_ERROR
-    msg: "failed to init reference line info"
+    msg: "Failed to create reference line"
   }
 }
 gear: GEAR_DRIVE
 decision {
   main_decision {
     not_ready {
-      reason: "PLANNING_ERROR: failed to init reference line info"
+      reason: "PLANNING_ERROR: Failed to create reference line"
     }
   }
 }

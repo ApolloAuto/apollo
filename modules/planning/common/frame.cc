@@ -113,8 +113,8 @@ bool Frame::Rerouting() {
   start_point->set_id(lane->id().id());
   start_point->set_s(s);
   start_point->mutable_pose()->CopyFrom(point);
-  for (const auto &waypoint :
-       reference_line_provider_->FutureRouteWaypoints()) {
+  for (const auto &waypoint : future_route_waypoints_) {
+    // reference_line_provider_->FutureRouteWaypoints()) {
     request.add_waypoint()->CopyFrom(waypoint);
   }
   if (request.waypoint_size() <= 1) {
@@ -159,34 +159,9 @@ void Frame::UpdateReferenceLinePriority(
   }
 }
 
-bool Frame::CreateReferenceLineInfo() {
-  std::list<ReferenceLine> reference_lines;
-  std::list<hdmap::RouteSegments> segments;
-  if (!reference_line_provider_->GetReferenceLines(&reference_lines,
-                                                   &segments)) {
-    AERROR << "Failed to create reference line";
-    return false;
-  }
-  DCHECK_EQ(reference_lines.size(), segments.size());
-
-  auto forword_limit =
-      hdmap::PncMap::LookForwardDistance(vehicle_state_.linear_velocity());
-
-  for (auto &ref_line : reference_lines) {
-    if (!ref_line.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
-                         FLAGS_look_backward_distance, forword_limit)) {
-      AERROR << "Fail to shrink reference line.";
-      return false;
-    }
-  }
-  for (auto &seg : segments) {
-    if (!seg.Shrink(Vec2d(vehicle_state_.x(), vehicle_state_.y()),
-                    FLAGS_look_backward_distance, forword_limit)) {
-      AERROR << "Fail to shrink routing segments.";
-      return false;
-    }
-  }
-
+bool Frame::CreateReferenceLineInfo(
+    const std::list<ReferenceLine> &reference_lines,
+    const std::list<hdmap::RouteSegments> &segments) {
   reference_line_info_.clear();
   auto ref_line_iter = reference_lines.begin();
   auto segments_iter = segments.begin();
@@ -355,7 +330,10 @@ const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
   return ptr;
 }
 
-Status Frame::Init() {
+Status Frame::Init(
+    const std::list<ReferenceLine> &reference_lines,
+    const std::list<hdmap::RouteSegments> &segments,
+    const std::vector<routing::LaneWaypoint> &future_route_waypoints) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
@@ -391,11 +369,12 @@ Status Frame::Init() {
       return Status(ErrorCode::PLANNING_ERROR, err_str);
     }
   }
-  if (!CreateReferenceLineInfo()) {
+  if (!CreateReferenceLineInfo(reference_lines, segments)) {
     AERROR << "Failed to init reference line info";
     return Status(ErrorCode::PLANNING_ERROR,
                   "failed to init reference line info");
   }
+  future_route_waypoints_ = future_route_waypoints;
 
   return Status::OK();
 }
