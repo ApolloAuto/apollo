@@ -55,9 +55,9 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
   offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
   obstacles_vertices_sum_ = std::size_t(obstacles_edges_num_.sum());
-  state_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 4);
-  control_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 2);
-  time_result_ = Eigen::MatrixXd::Zero(horizon_ + 1, 1);
+  state_result_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  control_result_ = Eigen::MatrixXd::Zero(2, horizon_ + 1);
+  time_result_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);
   state_start_index_ = 0;
   control_start_index_ = 4 * (horizon_ + 1);
   time_start_index_ = control_start_index_ + 2 * horizon_;
@@ -1409,27 +1409,36 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
   AINFO << "finalize_solution";
-  for (std::size_t i = 0; i < horizon_; ++i) {
-    std::size_t state_index = i * 4;
-    std::size_t control_index = i * 2;
+  std::size_t state_index = state_start_index_;
+  std::size_t control_index = control_start_index_;
+  std::size_t time_index = time_start_index_;
+  // 1. state variables, 4 * [0, horizon]
+  // 2. control variables, 2 * [0, horizon_-1]
 
+  // 3. sampling time variables, 1 * [0, horizon_]
+  for (std::size_t i = 0; i < horizon_; ++i) {
     state_result_(0, i) = x[state_index];
     state_result_(1, i) = x[state_index + 1];
     state_result_(2, i) = x[state_index + 2];
     state_result_(3, i) = x[state_index + 3];
 
-    control_result_(0, i) = x[control_start_index_ + control_index];
-    control_result_(1, i) = x[control_start_index_ + control_index + 1];
+    control_result_(0, i) = x[control_index];
+    control_result_(1, i) = x[control_index];
 
-    time_result_(0, i) = x[time_start_index_ + i];
+    time_result_(0, i) = x[time_index];
+    state_index += 4;
+    control_index += 2;
+    time_index += 1;
   }
-  // push back state for N+1
-  state_result_(0, 4 * horizon_) = x[4 * horizon_];
-  state_result_(1, 4 * horizon_ + 1) = x[4 * horizon_ + 1];
-  state_result_(2, 4 * horizon_ + 2) = x[4 * horizon_ + 2];
-  state_result_(3, 4 * horizon_ + 3) = x[4 * horizon_ + 3];
-  time_result_(0, time_start_index_ + horizon_) =
-      x[time_start_index_ + horizon_];
+  AINFO << "finalize_solution horizon done!";
+  // push back last horizon for state and time variables
+  state_result_(0, horizon_) = x[state_index];
+  state_result_(1, horizon_) = x[state_index + 1];
+  state_result_(2, horizon_) = x[state_index + 2];
+  state_result_(3, horizon_) = x[state_index + 3];
+
+  time_result_(0, horizon_) = x[time_index];
+  AINFO << "finalize_solution done!";
 }
 
 void DistanceApproachIPOPTInterface::get_optimization_results(
