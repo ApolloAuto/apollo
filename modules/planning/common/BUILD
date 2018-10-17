@@ -449,9 +449,11 @@ cc_library(
     name = "planning_common",
     srcs = [
         "threshold.cc",
+        "decision_data.cc",
     ],
     hdrs = [
         "threshold.h",
+        "decision_data.h",
     ],
     deps = [
         ":ego_info",

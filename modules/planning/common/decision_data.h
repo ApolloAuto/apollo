@@ -19,7 +19,7 @@
 #include <list>
 #include <mutex>
 #include <string>
-#include <unordred_map>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -46,7 +46,7 @@ class DecisionData {
                         const ReferenceLine& reference_line);
   ~DecisionData() = default;
  public:
-  bool GetObstacleById(const str::string& id,
+  bool GetObstacleById(const std::string& id,
                        PathObstacle* const obstacle) const;
   bool GetObstacleByType(const VirtualObjectType& type,
                          std::vector<PathObstacle*>* const obstacles) const;
