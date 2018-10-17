@@ -154,4 +154,28 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "cruise_mlp_evaluator",
+    srcs = [
+        "cruise_mlp_evaluator.cc",
+    ],
+    hdrs = [
+        "cruise_mlp_evaluator.h",
+    ],
+    deps = [
+        "//modules/common/math:geometry",
+        "//modules/common/util",
+        "//modules/map/proto:map_proto",
+        "//modules/prediction/common:feature_output",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:validation_checker",
+        "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/evaluator",
+        "//modules/prediction/proto:fnn_vehicle_model_proto",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:lane_graph_proto",
+    ],
+)
+
 cpplint()
