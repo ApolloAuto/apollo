@@ -7,18 +7,27 @@ cc_library(
     srcs = glob([
         "transport.cc",
         "message/*.cc",
-        "common/*.cc",
         "receiver/*.cc",
         "transmitter/*.cc",
         "qos/*.cc",
         "rtps/*.cc",
         "shm/*.cc",
-        "dispatcher/*.cc",
-        "reactor/*.cc",
+        "dispatcher/dispatcher.cc",
+        "dispatcher/intra_dispatcher.cc",
+        "dispatcher/rtps_dispatcher.cc",
+        "dispatcher/shm_dispatcher.cc",
+        "reactor/reactor.cc",
     ]),
     hdrs = glob([
-        "*.h",
-        "**/*.h",
+        "transport.h",
+        "message/*.h",
+        "receiver/*.h",
+        "transmitter/*.h",
+        "qos/*.h",
+        "rtps/*.h",
+        "shm/*.h",
+        "dispatcher/*.h",
+        "reactor/*.h",
     ]),
     deps = [
         "//cybertron/base:signal",
@@ -30,22 +39,10 @@ cc_library(
         "//cybertron/proto:transport_conf_cc_proto",
         "//cybertron/service_discovery:role",
         "//cybertron/transport/rtps:rtps_lib",
-        "//cybertron/transport/common:transport_common",
         "//cybertron/transport/message:transport_message_lib",
+        "//cybertron/transport/common:transport_common",
         "//cybertron/time:time",
         "//cybertron/timer:timer_manager",
-    ],
-)
-
-cc_test(
-    name = "common_test",
-    size = "small",
-    srcs = [
-        "common_test.cc",
-    ],
-    deps = [
-        "//cybertron",
-        "@gtest//:main",
     ],
 )
 
@@ -56,7 +53,7 @@ cc_test(
         "dispatcher_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:chatter_cc_proto",
         "@gtest//:main",
     ],
@@ -69,7 +66,7 @@ cc_test(
         "hybrid_transceiver_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
@@ -82,7 +79,7 @@ cc_test(
         "intra_dispatcher_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:chatter_cc_proto",
         "@gtest//:main",
     ],
@@ -95,7 +92,7 @@ cc_test(
         "intra_transceiver_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
@@ -108,7 +105,7 @@ cc_test(
         "message_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "@gtest//:main",
     ],
 )
@@ -116,11 +113,9 @@ cc_test(
 cc_test(
     name = "reactor_test",
     size = "small",
-    srcs = [
-        "reactor_test.cc",
-    ],
+    srcs = [ "reactor/reactor_test.cc", ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "@gtest//:main",
     ],
 )
@@ -132,7 +127,7 @@ cc_test(
         "rtps_dispatcher_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:chatter_cc_proto",
         "@gtest//:main",
     ],
@@ -145,7 +140,7 @@ cc_test(
         "rtps_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "@gtest//:main",
     ],
 )
@@ -157,7 +152,7 @@ cc_test(
         "rtps_transceiver_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
@@ -170,7 +165,7 @@ cc_test(
         "shm_dispatcher_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:chatter_cc_proto",
         "@gtest//:main",
     ],
@@ -183,7 +178,7 @@ cc_test(
         "shm_transceiver_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
@@ -196,7 +191,7 @@ cc_test(
         "transport_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
