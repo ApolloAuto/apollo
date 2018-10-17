@@ -62,14 +62,16 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
-// next id = 27
+// next id = 29
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
 
   // Obstacle features
   optional apollo.common.Point3D position = 2;
+  optional apollo.common.Point3D front_position = 27;
   optional apollo.common.Point3D velocity = 3;
+  optional apollo.common.Point3D raw_velocity = 28;  // from perception
   optional apollo.common.Point3D acceleration = 4;
   optional double velocity_heading = 5;
   optional double speed = 6;
