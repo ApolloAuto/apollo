@@ -147,6 +147,34 @@ Stage::StageStatus SidePassGeneratePath::Process(
 
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  bool all_far_away = false;
+  const PathDecision& path_decision =
+      frame->reference_line_info().front().path_decision();
+  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
+    if (path_obstacle->obstacle()->IsVirtual()) {
+      continue;
+    }
+    // TODO(All): check all ST boundaries are far away.
+  }
+  if (!all_far_away) {
+    // wait here, do nothing this cycle.
+    return Stage::RUNNING;
+  }
+  double move_forward_distance = 5.0;
+  for (const auto& path_point :
+       GetContext()->path_data_.discretized_path().path_points()) {
+    // TODO(All):
+    // (1) check if the ego car on path_point will partially go into the
+    // neighbor
+    // lane.
+    // (2) update move_forward_distance
+    CHECK_GE(path_point.s(), 0.0);
+    CHECK_GE(move_forward_distance, 0.0);
+  }
+  // TODO(All):
+  // (1) call proceed with cautious
+  // (2) combine path and speed.
+
   next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
   return Stage::FINISHED;
 }
