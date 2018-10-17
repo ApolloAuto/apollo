@@ -1,5 +1,4 @@
 import STORE from "store";
-import PARAMETERS from "store/config/parameters.yml";
 import { drawThickBandFromPoints } from "utils/draw";
 
 function normalizePlanningTrajectory(trajectory, coordinates) {

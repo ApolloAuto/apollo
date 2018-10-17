@@ -1,0 +1,275 @@
+{
+	"camera": {
+		"viewAngle": 0.65,
+		"Default": {
+			"fov": 60,
+			"near": 1,
+			"far": 300
+		},
+		"Near": {
+			"fov": 60,
+			"near": 1,
+			"far": 200
+		},
+		"Overhead": {
+			"fov": 60,
+			"near": 1,
+			"far": 100
+		},
+		"Map": {
+			"fov": 70,
+			"near": 1,
+			"far": 4000
+		},
+		"laneWidth": 4.5,
+		"laneWidthToViewDistanceRatio": 5
+	},
+	"ground": {
+		"defaults": {
+			"mpp": 0.125,
+			"xres": 8192,
+			"yres": 8192,
+			"xorigin": 4096,
+			"yorigin": 4096,
+			"type": "default",
+			"tileRange": 4
+		},
+		"sunnyvale_big_loop": {
+			"mpp": 0.125,
+			"xres": 24576,
+			"yres": 16384,
+			"xorigin": 587392,
+			"yorigin": 4140800,
+			"type": "default",
+			"tileRange": 4
+		}
+	},
+	"planning": {
+		"minInterval": 0.1,
+		"defaults": {
+			"width": 1.4
+		},
+		"pathProperties": {
+			"trajectory": {
+				"optionName": "showPlanningTrajectory",
+				"width": 0.8,
+				"color": 119233,
+				"opacity": 0.65,
+				"zOffset": 4
+			},
+			"planning_reference_line": {
+				"optionName": "showPlanningReference",
+				"width": 0.15,
+				"color": 3580651,
+				"opacity": 1,
+				"zOffset": 7
+			},
+			"DpPolyPathOptimizer": {
+				"optionName": "showPlanningDpOptimizer",
+				"width": 0.4,
+				"color": 9305268,
+				"opacity": 0.8,
+				"zOffset": 6
+			},
+			"QpSplinePathOptimizer": {
+				"optionName": "showPlanningQpOptimizer",
+				"width": 0.65,
+				"color": 14177878,
+				"opacity": 0.8,
+				"zOffset": 5
+			}
+		}
+	},
+	"options": {
+		"showTasks": {
+			"default": true
+		},
+		"showModuleController": {
+			"default": false
+		},
+		"showMenu": {
+			"default": false
+		},
+		"showRouteEditingBar": {
+			"default": false
+		},
+		"showPOI": {
+			"default": false
+		},
+		"enableAudioCapture": {
+			"default": false
+		},
+		"showDataRecorder": {
+			"default": false
+		},
+		"showPNCMonitor": {
+			"default": false
+		},
+		"enableSimControl": {
+			"default": false
+		},
+		"lockTaskPanel": {
+			"default": false
+		},
+		"showVideo": {
+			"default": false
+		},
+		"cameraAngle": {
+			"default": "Default"
+		},
+		"showDecisionMain": {
+			"default": true,
+			"menuId": "decisionMain"
+		},
+		"showDecisionObstacle": {
+			"default": true,
+			"menuId": "decisionObstacle"
+		},
+		"showPlanningTrajectory": {
+			"default": true,
+			"menuId": "planningTrajectory"
+		},
+		"showPlanningCar": {
+			"default": false,
+			"menuId": "planningCar"
+		},
+		"showPlanningReference": {
+			"default": false,
+			"menuId": "planningReference",
+			"forPncMonitor": true
+		},
+		"showPlanningDpOptimizer": {
+			"default": false,
+			"menuId": "planningDpOptimizer",
+			"forPncMonitor": true
+		},
+		"showPlanningQpOptimizer": {
+			"default": false,
+			"menuId": "planningQpOptimizer",
+			"forPncMonitor": true
+		},
+		"showRouting": {
+			"default": true,
+			"menuId": "routing"
+		},
+		"showPredictionMajor": {
+			"default": true,
+			"menuId": "predictionMajor"
+		},
+		"showPredictionMinor": {
+			"default": true,
+			"menuId": "predictionMinor"
+		},
+		"showPointCloud": {
+			"default": false,
+			"menuId": "perceptionPointCloud"
+		},
+		"showPerceptionLaneMarker": {
+			"default": false,
+			"menuId": "perceptionLaneMarker"
+		},
+		"showObstaclesVehicle": {
+			"default": true,
+			"menuId": "perceptionVehicle"
+		},
+		"showObstaclesPedestrian": {
+			"default": true,
+			"menuId": "perceptionPedestrian"
+		},
+		"showObstaclesBicycle": {
+			"default": true,
+			"menuId": "perceptionBicycle"
+		},
+		"showObstaclesUnknownMovable": {
+			"default": true,
+			"menuId": "perceptionUnknownMovable"
+		},
+		"showObstaclesUnknownUnmovable": {
+			"default": true,
+			"menuId": "perceptionUnknownUnmovable"
+		},
+		"showObstaclesUnknown": {
+			"default": true,
+			"menuId": "perceptionUnknown"
+		},
+		"showObstaclesVirtual": {
+			"default": false,
+			"menuId": "perceptionVirtual"
+		},
+		"showObstaclesCipv": {
+			"default": true,
+			"menuId": "perceptionCipv"
+		},
+		"showObstaclesVelocity": {
+			"default": true,
+			"menuId": "perceptionVelocity"
+		},
+		"showObstaclesHeading": {
+			"default": true,
+			"menuId": "perceptionHeading"
+		},
+		"showObstaclesId": {
+			"default": true,
+			"menuId": "perceptionId"
+		},
+		"showObstaclesInfo": {
+			"default": true,
+			"menuId": "perceptionObstacleInfo"
+		},
+		"showPositionGps": {
+			"default": false,
+			"menuId": "positionGps"
+		},
+		"showPositionLocalization": {
+			"default": true,
+			"menuId": "positionLocalization"
+		},
+		"showMapCrosswalk": {
+			"default": true,
+			"menuId": "mapCrosswalk"
+		},
+		"showMapClearArea": {
+			"default": true,
+			"menuId": "mapClearArea"
+		},
+		"showMapJunction": {
+			"default": false,
+			"menuId": "mapJunction"
+		},
+		"showMapLane": {
+			"default": true,
+			"menuId": "mapLane"
+		},
+		"showMapRoad": {
+			"default": false,
+			"menuId": "mapRoad"
+		},
+		"showMapSignal": {
+			"default": true,
+			"menuId": "mapSignal"
+		},
+		"showMapStopSign": {
+			"default": true,
+			"menuId": "mapStopSign"
+		},
+		"showMapSpeedBump": {
+			"default": true,
+			"menuId": "mapSpeedBump"
+		},
+		"showMapParkingSpace": {
+			"default": true,
+			"menuId": "mapParkingSpace"
+		}
+	},
+	"navigation": {
+		"map": "BaiduMap",
+		"mapAPiUrl": "https://api.map.baidu.com/api?v=3.0&ak=0kKZnWWhXEPfzIkklmzAa3dZ&callback=initMap"
+	},
+	"debug": {
+		"autoMonitorMessage": false,
+		"performanceMonitor": false
+	},
+	"server": {
+		"port": 8888
+	}
+}

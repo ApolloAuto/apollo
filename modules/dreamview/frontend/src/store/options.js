@@ -1,6 +1,5 @@
 import { observable, action, computed, extendObservable } from "mobx";
 
-import PARAMETERS from "store/config/parameters.yml";
 import MENU_DATA from "store/config/MenuData";
 
 export default class Options {

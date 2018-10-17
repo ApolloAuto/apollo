@@ -2,7 +2,6 @@ import * as THREE from "three";
 import OrbitControls from "three/examples/js/controls/OrbitControls.js";
 import Stats from "stats.js";
 
-import PARAMETERS from "store/config/parameters.yml";
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
 import Ground from "renderer/ground";
