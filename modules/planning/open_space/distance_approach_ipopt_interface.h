@@ -175,6 +175,20 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   double min_safety_distance_ = 0.0;
 
+  double max_steer_angle_ = 0.0;
+
+  double max_speed_forward_ = 0.0;
+
+  double max_speed_reverse_ = 0.0;
+
+  double max_acceleration_forward_ = 0.0;
+
+  double max_acceleration_reverse_ = 0.0;
+
+  double min_time_sample_scaling_ = 0.0;
+
+  double max_time_sample_scaling_ = 0.0;
+
  private:
   DistanceApproachConfig distance_approach_config_;
   PlannerOpenSpaceConfig planner_open_space_config_;
