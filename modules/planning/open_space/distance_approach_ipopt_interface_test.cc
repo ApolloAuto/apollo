@@ -78,9 +78,8 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
                       (horizon_ + 1) * 4 * obstacles_num_ +
                       4 * obstacles_num_ * (horizon_ + 1);
 
-  num_of_constraints_ = 4 * (horizon_ + 1) + 2 * horizon_ + (horizon_ + 1) +
-                        (horizon_ + 1) * 4 * obstacles_num_ +
-                        4 * obstacles_num_ * (horizon_ + 1);
+  num_of_constraints_ =
+      4 * horizon_ + horizon_ + horizon_ + 4 * obstacles_num_ * (horizon_ + 1);
 
   ptop_.reset(new DistanceApproachIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
@@ -98,14 +97,14 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_nlp_info) {
   ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
   EXPECT_EQ(n, num_of_variables_);
   EXPECT_EQ(m, num_of_constraints_);
-  EXPECT_EQ(nnz_jac_g, 5200);
+  EXPECT_EQ(nnz_jac_g, 1880);
   EXPECT_EQ(nnz_h_lag, 7285);
   EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, get_bounds_info) {
   int kNumOfVariables = 520;
-  int kNumOfConstraints = 520;
+  int kNumOfConstraints = 270;
   double x_l[kNumOfVariables];
   double x_u[kNumOfVariables];
   double g_l[kNumOfConstraints];
@@ -117,7 +116,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_bounds_info) {
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, get_starting_point) {
   int kNumOfVariables = 520;
-  int kNumOfConstraints = 520;
+  int kNumOfConstraints = 270;
   bool init_x = true;
   bool init_z = false;
   bool init_lambda = false;
