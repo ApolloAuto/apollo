@@ -44,12 +44,9 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {
   SetName("SidePassPathDecider");
   fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
-  // TODO(lianglia-apollo):
-  // Put numbers into config when refactor is finished.
-  const double delta_s =
-      config.side_pass_path_decider_config().path_resolution();
+  delta_s_ = config.side_pass_path_decider_config().path_resolution();
   const int n = static_cast<int>(
-      config.side_pass_path_decider_config().total_path_length() / delta_s);
+      config.side_pass_path_decider_config().total_path_length() / delta_s_);
   std::array<double, 3> l_init = {0.0, 0.0, 0.0};
   std::array<double, 5> w = {
       config.side_pass_path_decider_config().l_weight(),
@@ -58,7 +55,7 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
       config.side_pass_path_decider_config().dddl_weight(),
       config.side_pass_path_decider_config().guiding_line_weight(),
   };
-  CHECK(fem_qp_->Init(n, l_init, delta_s, w,
+  CHECK(fem_qp_->Init(n, l_init, delta_s_, w,
                       config.side_pass_path_decider_config().max_dddl()));
 }
 
@@ -97,7 +94,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   // Generate the boundary conditions for the selected direction
   // based on the obstacle ahead and road conditions.
   std::vector<std::pair<double, double>> bound_cond;
-  const ReferenceLine& reference_line = reference_line_info->reference_line();
+  const ReferenceLine &reference_line = reference_line_info->reference_line();
   double adc_end_s = reference_line_info->AdcSlBoundary().end_s();
   // Get obstacle info.
   bool no_obs_selected = true;
@@ -105,7 +102,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   double nearest_obs_end_s = 0.0;
   double nearest_obs_start_l = 0.0;
   double nearest_obs_end_l = 0.0;
-  for (const auto* path_obstacle :
+  for (const auto *path_obstacle :
        reference_line_info->path_decision()->path_obstacles().Items()) {
     // Filter out obstacles that are behind ADC.
     double obs_start_s = path_obstacle->PerceptionSLBoundary().start_s();
@@ -125,14 +122,14 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     double lane_left_width_at_end_s = 0.0;
     double lane_right_width_at_start_s = 0.0;
     double lane_right_width_at_end_s = 0.0;
-    reference_line.GetLaneWidth(obs_start_s,
-        &lane_left_width_at_start_s, &lane_right_width_at_start_s);
-    reference_line.GetLaneWidth(obs_end_s,
-        &lane_left_width_at_end_s, &lane_right_width_at_end_s);
+    reference_line.GetLaneWidth(obs_start_s, &lane_left_width_at_start_s,
+                                &lane_right_width_at_start_s);
+    reference_line.GetLaneWidth(obs_end_s, &lane_left_width_at_end_s,
+                                &lane_right_width_at_end_s);
     double lane_left_width = std::min(std::abs(lane_left_width_at_start_s),
                                       std::abs(lane_left_width_at_end_s));
     double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
-                                      std::abs(lane_right_width_at_end_s));
+                                       std::abs(lane_right_width_at_end_s));
     double obs_start_l = path_obstacle->PerceptionSLBoundary().start_l();
     double obs_end_l = path_obstacle->PerceptionSLBoundary().end_l();
     if (obs_start_l > lane_left_width || -obs_end_l > lane_right_width) {
@@ -185,8 +182,8 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     std::tuple<double, double, double> s_leftbound_rightbound;
     std::get<0>(s_leftbound_rightbound) = curr_s;
     // Check if boundary should be dictated by obstacle or road
-    if (curr_s >= nearest_obs_start_s - kObstacleBuffer
-        && curr_s <= nearest_obs_end_s + kObstacleBuffer) {
+    if (curr_s >= nearest_obs_start_s - kObstacleBuffer &&
+        curr_s <= nearest_obs_end_s + kObstacleBuffer) {
       is_blocked_by_obs = true;
     } else {
       is_blocked_by_obs = false;
@@ -194,8 +191,8 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     // Get the road info at the current s.
     double road_left_width_at_curr_s = 0.0;
     double road_right_width_at_curr_s = 0.0;
-    reference_line.GetRoadWidth(curr_s,
-        &road_left_width_at_curr_s, &road_right_width_at_curr_s);
+    reference_line.GetRoadWidth(curr_s, &road_left_width_at_curr_s,
+                                &road_right_width_at_curr_s);
     if (!is_blocked_by_obs) {
       std::get<1>(s_leftbound_rightbound) =
           -std::abs(road_left_width_at_curr_s - kRoadBuffer);
@@ -230,7 +227,23 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
 
   // TODO(All): put optimized results into ReferenceLineInfo.
   // Update Reference_Line_Info with this newly generated path.
+  std::vector<common::FrenetFramePoint> frenet_path;
 
+  std::vector<common::FrenetFramePoint> frenet_frame_path;
+  double accumulated_s = 0.0;
+  for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
+    common::FrenetFramePoint frenet_frame_point;
+    frenet_frame_point.set_s(accumulated_s);
+    frenet_frame_point.set_l(fem_qp_->x()[i]);
+    frenet_frame_point.set_dl(fem_qp_->x_derivative()[i]);
+    frenet_frame_point.set_ddl(fem_qp_->x_second_order_derivative()[i]);
+    frenet_frame_path.push_back(std::move(frenet_frame_point));
+    accumulated_s += delta_s_;
+  }
+
+  auto path_data = reference_line_info->mutable_path_data();
+  path_data->SetReferenceLine(&reference_line);
+  path_data->SetFrenetPath(FrenetFramePath(frenet_path));
 
   return true;
 }
