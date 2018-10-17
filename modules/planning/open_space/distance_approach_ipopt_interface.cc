@@ -397,7 +397,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     int edges_counter = 0;
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      std::size_t current_edges_num = obstacles_edges_num_(i, 0);
+      std::size_t current_edges_num = obstacles_edges_num_(j, 0);
       Eigen::MatrixXd Aj =
           obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
       std::vector<int> lj(&x[l_index], &x[l_index + current_edges_num]);
@@ -809,7 +809,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     // TODO(QiL) : initially implemented to be debug friendly, later iterate
     // towards better efficiency
     // 1. state constraints 4 * [0, horizons-1]
-    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t i = 0; i < horizon_; ++i) {
       values[nz_index] = -1.0;
       ++nz_index;
 
@@ -995,7 +995,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       time_index += 1;
     }
 
-    AINFO << "eval_jac_g, fulfilled state constraint values";
+    AINFO << "After fulfilled dynamics constraints derivative, nz_index : "
+          << nz_index << " nele_jac : " << nele_jac;
 
     // 2. control rate constraints 1 * [0, horizons-1]
     control_index = control_start_index_;
@@ -1032,7 +1033,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       time_index += 1;
     }
 
-    AINFO << "eval_jac_g, fulfilled control rate constraint values";
+    AINFO << "After fulfilled control rate constraints derivative, nz_index : "
+          << nz_index << " nele_jac : " << nele_jac;
 
     // 3. Time constraints [0, horizon_ -1]
     time_index = time_start_index_;
@@ -1049,8 +1051,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       time_index += 1;
     }
 
-    AINFO << "eval_jac_g, fulfilled time constraint values";
-
+    AINFO << "After fulfilled time constraints derivative, nz_index : "
+          << nz_index << " nele_jac : " << nele_jac;
     // 4. Three obstacles related equal constraints, one equality constraints,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
 
@@ -1062,22 +1064,22 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       std::size_t edges_counter = 0;
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
         std::size_t current_edges_num = obstacles_edges_num_(j, 0);
-        AINFO << "eval_jac_g, obstacle constraint values, current "
-                 "vertice_num : "
-              << current_edges_num << " i :  " << i << " j : " << j;
-        AINFO << "obstacles_A_ size : " << obstacles_A_.rows() << " and "
-              << obstacles_A_.cols();
-        AINFO << "edges_counter : " << edges_counter;
+        ADEBUG << "eval_jac_g, obstacle constraint values, current "
+                  "vertice_num : "
+               << current_edges_num << " i :  " << i << " j : " << j;
+        ADEBUG << "obstacles_A_ size : " << obstacles_A_.rows() << " and "
+               << obstacles_A_.cols();
+        ADEBUG << "edges_counter : " << edges_counter;
         Eigen::MatrixXd Aj =
             obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-        AINFO << "before after Aj";
+        ADEBUG << "before after Aj";
         std::vector<int> lj(&x[l_index], &x[l_index + current_edges_num]);
-        AINFO << "before nj";
+        ADEBUG << "before nj";
         std::vector<int> nj(&x[n_index], &x[n_index + 3]);
         Eigen::MatrixXd bj =
             obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-        AINFO
+        ADEBUG
             << "eval_jac_g, obstacle constraint values, extraction number : i "
             << i << " j : " << j;
         // TODO(QiL) : Remove redudant calculation
@@ -1100,8 +1102,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
           tmp4 += bj(k, 0) * x[l_index + k];
         }
 
-        AINFO << "eval_jac_g, bstacle constraint values, tmp prepare : i " << i
-              << " j : " << j;
+        ADEBUG << "eval_jac_g, bstacle constraint values, tmp prepare : i " << i
+               << " j : " << j;
 
         // 1. norm(A* lambda == 1)
         for (std::size_t k = 0; k < current_edges_num; ++k) {
@@ -1111,8 +1113,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
           ++nz_index;
         }
 
-        AINFO << "eval_jac_g, bstacle constraint values, 1 : i " << i
-              << " j : " << j;
+        ADEBUG << "eval_jac_g, bstacle constraint values, 1 : i " << i
+               << " j : " << j;
 
         // 2. G' * mu + R' * lambda == 0, part 1
         // With respect to x
@@ -1154,8 +1156,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         values[nz_index] = -1.0;  // z3
         ++nz_index;
 
-        AINFO << "eval_jac_g, bstacle constraint values, 2 : i " << i
-              << " j : " << j;
+        ADEBUG << "eval_jac_g, bstacle constraint values, 2 : i " << i
+               << " j : " << j;
 
         //  3. -g'*mu + (A*t - b)*lambda > 0
 
@@ -1188,8 +1190,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
           ++nz_index;
         }
 
-        AINFO << "eval_jac_g, bstacle constraint values, 4 : i " << i
-              << " j : " << j;
+        ADEBUG << "eval_jac_g, bstacle constraint values, 4 : i " << i
+               << " j : " << j;
 
         // Update index
         edges_counter += current_edges_num;
@@ -1199,8 +1201,10 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     }
 
     AINFO << "eval_jac_g, fulfilled obstacle constraint values";
-    //  CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
+    CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
   }
+
+  AINFO << "eval_jac_g done";
   return true;
 }
 
