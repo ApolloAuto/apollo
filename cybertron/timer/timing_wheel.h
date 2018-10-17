@@ -29,7 +29,6 @@
 #include <vector>
 
 #include "cybertron/base/bounded_queue.h"
-#include "cybertron/base/thread_pool.h"
 #include "cybertron/time/duration.h"
 #include "cybertron/timer/timing_slot.h"
 

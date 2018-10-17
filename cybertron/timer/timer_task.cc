@@ -16,10 +16,7 @@
 
 #include "cybertron/timer/timer_task.h"
 
-#include "cybertron/common/log.h"
 #include "cybertron/task/task.h"
-#include "cybertron/time/time.h"
-#include "cybertron/timer/timing_wheel.h"
 
 namespace apollo {
 namespace cybertron {

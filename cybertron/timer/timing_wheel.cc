@@ -21,7 +21,6 @@
 #include "cybertron/task/task.h"
 #include "cybertron/time/time.h"
 #include "cybertron/timer/timer_task.h"
-#include "cybertron/timer/timing_slot.h"
 
 namespace apollo {
 namespace cybertron {

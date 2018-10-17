@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cybertron/timer/timer.h"
+
 #include "cybertron/common/global_data.h"
 
 namespace apollo {
