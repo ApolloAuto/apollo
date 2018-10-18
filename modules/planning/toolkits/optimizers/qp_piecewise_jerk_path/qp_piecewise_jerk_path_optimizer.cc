@@ -225,6 +225,8 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   auto lateral_bounds = GetLateralBounds(
       adc_sl, frenet_point, qp_delta_s, path_length, reference_line,
       reference_line_info_->path_decision()->path_obstacles().Items());
+  auto lateral_second_order_derivative_bounds =
+      GetLateralSecondOrderDerivativeBounds(init_point, qp_delta_s);
 
   std::array<double, 3> init_lateral_state{frenet_point.l(), frenet_point.dl(),
                                            frenet_point.ddl()};
@@ -250,6 +252,9 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   auto start_time = std::chrono::system_clock::now();
 
   fem_1d_qp_->SetVariableBounds(lateral_bounds);
+  fem_1d_qp_->SetVariableSecondOrderDerivativeBounds(
+      lateral_second_order_derivative_bounds);
+
   bool success = fem_1d_qp_->Optimize();
 
   auto end_time = std::chrono::system_clock::now();
@@ -280,6 +285,23 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
 
   return Status::OK();
+}
+
+std::vector<std::tuple<double, double, double>>
+QpPiecewiseJerkPathOptimizer::GetLateralSecondOrderDerivativeBounds(
+    const common::TrajectoryPoint& init_point, const double qp_delta_s) {
+  std::vector<std::tuple<double, double, double>>
+      lateral_second_order_derivative_bounds;
+  constexpr double kMaxTolerableAcc = 0.5;
+  constexpr double kMaxConstraintDist = 6.0;
+
+  const double ddx = std::sqrt(kMaxTolerableAcc) / (1e-3 + init_point.v());
+
+  for (double s = qp_delta_s; s < kMaxConstraintDist; s += qp_delta_s) {
+    lateral_second_order_derivative_bounds.push_back(
+        std::make_tuple(s, -ddx, ddx));
+  }
+  return lateral_second_order_derivative_bounds;
 }
 
 }  // namespace planning

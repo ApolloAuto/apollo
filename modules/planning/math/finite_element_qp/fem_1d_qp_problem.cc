@@ -149,39 +149,45 @@ void Fem1dQpProblem::SetVariableSecondOrderDerivativeBounds(
 void Fem1dQpProblem::SetOutputResolution(const double resolution) {
   // It is assumed that the third order derivative of x is const between each s
   // positions
-  const double kEps = 1e-15;
+  const double kEps = 1e-12;
   if (resolution < kEps || x_.empty()) {
     return;
   }
-  std::vector<double> new_x{x_.front()};
-  std::vector<double> new_dx{x_derivative_.front()};
-  std::vector<double> new_ddx{x_second_order_derivative_.front()};
-  std::vector<double> new_dddx{x_third_order_derivative_.front()};
+  std::vector<double> new_x;
+  std::vector<double> new_dx;
+  std::vector<double> new_ddx;
+  std::vector<double> new_dddx;
 
   const double total_s = delta_s_ * (x_.size() - 1);
   for (double s = resolution; s < total_s; s += resolution) {
     const size_t idx = std::floor(s / delta_s_);
     const double ds = s - delta_s_ * idx;
-    AINFO << "ds = " << ds;
 
-    if (ds < kEps) {
-      new_x.push_back(x_[idx]);
-      new_dx.push_back(x_derivative_[idx]);
-      new_ddx.push_back(x_second_order_derivative_[idx]);
-      new_ddx.push_back(x_third_order_derivative_[idx]);
+    double x = 0.0;
+    double dx = 0.0;
+    double d2x = 0.0;
+    double d3x = 0.0;
+
+    if (idx == 0) {
+      d3x = x_third_order_derivative_.front();
+      d2x = x_init_[2] + d3x * ds;
+      dx = x_init_[1] + x_init_[2] * ds + 0.5 * d3x * ds * ds;
+      x = x_init_[0] + x_init_[1] * ds + 0.5 * x_init_[2] * ds * ds +
+          d3x * ds * ds * ds / 6.0;
     } else {
-      const double d3x = x_third_order_derivative_[idx - 1];
-      const double x =
-          x_[idx - 1] + 0.5 * x_derivative_[idx - 1] + d3x * ds * ds * ds / 6.0;
-      const double dx = x_[idx - 1] + 0.5 * x_derivative_[idx - 1] +
-                        x_second_order_derivative_[idx - 1] * ds * ds;
-      const double d2x = x_[idx - 1] + d3x * ds;
-
-      new_x.push_back(x);
-      new_dx.push_back(dx);
-      new_ddx.push_back(d2x);
-      new_ddx.push_back(d3x);
+      d3x = x_third_order_derivative_[idx - 1];
+      d2x = x_second_order_derivative_[idx - 1] + d3x * ds;
+      dx = x_derivative_[idx - 1] + x_second_order_derivative_[idx - 1] * ds +
+           0.5 * d3x * ds * ds;
+      x = x_[idx - 1] + x_derivative_[idx - 1] * ds +
+          0.5 * x_second_order_derivative_[idx - 1] * ds * ds +
+          d3x * ds * ds * ds / 6.0;
     }
+
+    new_x.push_back(x);
+    new_dx.push_back(dx);
+    new_ddx.push_back(d2x);
+    new_ddx.push_back(d3x);
   }
   x_ = new_x;
   x_derivative_ = new_dx;
