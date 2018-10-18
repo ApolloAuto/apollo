@@ -35,7 +35,7 @@ static const int REGISTERS_SIZE = 56;
 
 typedef void (*func)(void*);
 struct RoutineContext {
-  ~RoutineContext() { delete stack; }
+  ~RoutineContext() { std::free(stack); }
   char* stack = nullptr;
   char* sp = nullptr;
 };
