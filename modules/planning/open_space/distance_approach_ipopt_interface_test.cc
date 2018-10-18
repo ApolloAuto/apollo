@@ -97,7 +97,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_nlp_info) {
   ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
   EXPECT_EQ(n, num_of_variables_);
   EXPECT_EQ(m, num_of_constraints_);
-  EXPECT_EQ(nnz_jac_g, 1880);
+  EXPECT_EQ(nnz_jac_g, 1884);
   EXPECT_EQ(nnz_h_lag, 7285);
   EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
 }
@@ -137,7 +137,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
   std::fill_n(x, kNumOfVariables, 1.2);
   bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
   EXPECT_TRUE(res);
-  EXPECT_DOUBLE_EQ(obj_value, 3.6727199999999991);
+  EXPECT_DOUBLE_EQ(obj_value, 2013.0328094069705);
 }
 
 }  // namespace planning
