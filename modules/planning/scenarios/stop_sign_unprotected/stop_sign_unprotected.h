@@ -62,6 +62,8 @@ class StopSignUnprotectedScenario : public Scenario {
 
   StopSignUnprotectedContext* GetContext() { return &context_; }
 
+  void Observe(const Frame* frame);
+
  private:
   static void RegisterStages();
 
