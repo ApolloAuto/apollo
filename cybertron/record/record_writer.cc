@@ -17,6 +17,7 @@
 #include "cybertron/record/record_writer.h"
 
 #include <iostream>
+#include <iomanip>
 
 #include "cybertron/common/log.h"
 
@@ -33,7 +34,11 @@ RecordWriter::~RecordWriter() { Close(); }
 
 bool RecordWriter::Open(const std::string& file) {
   file_ = file;
-  path_ = file_;
+  file_index_ = 0;
+  sstream_.str(std::string());
+  sstream_.clear();
+  sstream_ << "." << std::setw(5) << std::setfill('0') << file_index_++;
+  path_ = file_ + sstream_.str();
   file_writer_.reset(new RecordFileWriter());
   if (!file_writer_->Open(path_)) {
     AERROR << "open outfile failed. file: " << path_;
@@ -53,7 +58,14 @@ void RecordWriter::Close() {
 
 void RecordWriter::SplitOutfile() {
   file_writer_.reset(new RecordFileWriter());
-  path_ = file_ + "." + std::to_string(++file_index_);
+  if (file_index_ > 99999) {
+    AWARN << "More than 9999 files had bean recored, will restart counting at 00000.";
+    file_index_ = 0;
+  }
+  sstream_.str(std::string());
+  sstream_.clear();
+  sstream_ << "." << std::setw(5) << std::setfill('0') << file_index_++;
+  path_ = file_ + sstream_.str();
   segment_raw_size_ = 0;
   segment_begin_time_ = 0;
   file_writer_->Open(path_);
