@@ -142,7 +142,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double offset_;
   Eigen::MatrixXd obstacles_edges_num_;
   std::size_t obstacles_num_;
-  std::size_t obstacles_vertices_sum_;
+  std::size_t obstacles_edges_sum_;
   double wheelbase_;
 
   Eigen::MatrixXd state_result_;
@@ -188,6 +188,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double min_time_sample_scaling_ = 0.0;
 
   double max_time_sample_scaling_ = 0.0;
+
+  double max_steer_rate_ = 0.0;
 
  private:
   DistanceApproachConfig distance_approach_config_;

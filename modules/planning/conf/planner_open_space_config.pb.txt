@@ -1,4 +1,4 @@
-delta_t : 1.0
+delta_t : 0.5
 
 warm_start_config : {
   xy_grid_resolution : 0.2
@@ -18,22 +18,23 @@ warm_start_config : {
 
 distance_approach_config : {
   weight_u : 0.01
-  weight_u : 0.5
+  weight_u : 0.1
   weight_u_rate : 0.1
   weight_u_rate : 0.1
   weight_state : 0.001
   weight_state : 0.001
   weight_state : 0.001
-  weight_stitching : 0.0
-  weight_stitching : 0.0
-  weight_time : 0.0
-  weight_time : 0.0
+  weight_stitching : 0.1
+  weight_stitching : 0.1
+  weight_time : 0.5
+  weight_time : 1.0
   min_safety_distance : 0.05
-  max_steer_angle : 0.6
-  max_speed_forward : 10
-  max_speed_reverse : 10 
-  max_acceleration_forward : 10 
-  max_acceleration_reverse : 10
-  min_time_sample_scaling : 0.0 
-  max_time_sample_scaling : 100 
+  max_steer_angle : 6000
+  max_steer_rate : 6000
+  max_speed_forward : 1000
+  max_speed_reverse : 1000
+  max_acceleration_forward : 1000
+  max_acceleration_reverse : 1000
+  min_time_sample_scaling : 0.0
+  max_time_sample_scaling : 10000
 }
