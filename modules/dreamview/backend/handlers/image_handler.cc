@@ -30,7 +30,6 @@ using apollo::drivers::Image;
 
 constexpr double ImageHandler::kImageScale;
 
-template <>
 void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
   if (requests_ == 0) {
     return;
@@ -65,11 +64,15 @@ ImageHandler::ImageHandler()
     : requests_(0), node_(cybertron::CreateNode("image_handler")) {
   node_->CreateReader<Image>(
       FLAGS_image_front_topic,
-      [this](const std::shared_ptr<Image> &image) { OnImageFront(image); });
+      [this](const std::shared_ptr<Image> &image) {
+        OnImageFront(image);
+      });
 
   node_->CreateReader<Image>(
       FLAGS_image_short_topic,
-      [this](const std::shared_ptr<Image> &image) { OnImageShort(image); });
+      [this](const std::shared_ptr<Image> &image) {
+        OnImageShort(image);
+      });
 }
 
 bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {
