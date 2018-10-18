@@ -42,14 +42,19 @@ Status PublicRoadPlanner::Init(const PlanningConfig& config) {
 
 Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
                                Frame* frame) {
-  scenario_manager_.Update(planning_start_point, *frame);
+  if (!scenario_) {  // initial condition
+    scenario_manager_.Update(planning_start_point, *frame);
+  }
   scenario_ = scenario_manager_.mutable_scenario();
   auto result = scenario_->Process(planning_start_point, frame);
-  if (result == Scenario::STATUS_UNKNOWN) {
+  if (result == Scenario::STATUS_DONE) {
+    // only updates scenario manager when previous scenario's status is
+    // STATUS_DONE
+    scenario_manager_.Update(planning_start_point, *frame);
+  } else if (result == Scenario::STATUS_UNKNOWN) {
     return Status(common::PLANNING_ERROR, "scenario returned unknown");
-  } else {
-    return Status::OK();
   }
+  return Status::OK();
 }
 
 }  // namespace planning

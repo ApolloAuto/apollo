@@ -1,4 +1,5 @@
 header {
+  timestamp_sec: 1518741702.4168837
 }
 is_replan: true
 gear: GEAR_DRIVE
@@ -8,10 +9,10 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_9762"
       stop_point {
-        x: 586716.4568207158
-        y: 4140220.2888243636
+        x: 586716.46014851762
+        y: 4140220.277540185
       }
-      stop_heading: -2.8555587170214531
+      stop_heading: -2.8564398597206049
       change_lane_type: FORWARD
     }
   }
@@ -24,11 +25,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -1
           stop_point {
-            x: 586716.4568207158
-            y: 4140220.2888243636
+            x: 586716.46014851762
+            y: 4140220.277540185
             z: 0
           }
-          stop_heading: -2.8555587170214531
+          stop_heading: -2.8564398597206049
         }
       }
     }

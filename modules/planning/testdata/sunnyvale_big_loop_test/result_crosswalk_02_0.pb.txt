@@ -1,4 +1,5 @@
 header {
+  timestamp_sec: 1517275936.5507183
 }
 is_replan: true
 gear: GEAR_DRIVE
@@ -8,10 +9,10 @@ decision {
       reason_code: STOP_REASON_CROSSWALK
       reason: "stop by CW_2832"
       stop_point {
-        x: 586261.36689252325
-        y: 4141304.5609416384
+        x: 586261.369950383
+        y: 4141304.5599670527
       }
-      stop_heading: -1.7953307895873911
+      stop_heading: -1.7956280493489223
       change_lane_type: FORWARD
     }
   }
@@ -23,11 +24,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.317462054
-            y: 4141284.1579688918
+            x: 586260.30218708527
+            y: 4141284.1751651387
             z: 0
           }
-          fence_heading: -1.3302128435273524
+          fence_heading: -1.3299784970826325
         }
       }
     }
@@ -38,11 +39,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.26557687053
-            y: 4141284.3683266877
+            x: 586260.25445978157
+            y: 4141284.3693824667
             z: 0
           }
-          fence_heading: -1.3433247345806181
+          fence_heading: -1.3430782827827037
         }
       }
     }
@@ -64,11 +65,11 @@ decision {
           reason_code: STOP_REASON_CROSSWALK
           distance_s: -1
           stop_point {
-            x: 586261.36689252325
-            y: 4141304.5609416384
+            x: 586261.369950383
+            y: 4141304.5599670527
             z: 0
           }
-          stop_heading: -1.7953307895873911
+          stop_heading: -1.7956280493489223
           wait_for_obstacle: "11652"
         }
       }

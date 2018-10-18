@@ -69,6 +69,7 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_localization_file = "";
   FLAGS_test_chassis_file = "";
   FLAGS_test_routing_response_file = "";
+  FLAGS_test_previous_planning_file = "";
   FLAGS_test_prediction_file = "";
   FLAGS_align_prediction_time = false;
   FLAGS_estimate_current_vehicle_state = false;
@@ -78,17 +79,27 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_trajectory_check = false;
   FLAGS_planning_test_mode = true;
   FLAGS_enable_lag_prediction = false;
+  FLAGS_use_osqp_optimizer_for_qp_st = false;
+  FLAGS_use_osqp_optimizer_for_reference_line = false;
 }
 
 bool PlanningTestBase::FeedTestData() {
   // chassis
   Chassis chassis;
+  if (FLAGS_test_chassis_file.empty()) {
+    AERROR << "Requires FLAGS_test_chassis_file to be set";
+    return false;
+  }
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis)) {
     AERROR << "failed to load file: " << FLAGS_test_chassis_file;
     return false;
   }
   // localization
+  if (FLAGS_test_localization_file.empty()) {
+    AERROR << "Requires FLAGS_test_localization_file to be set";
+    return false;
+  }
   LocalizationEstimate localization;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
@@ -96,11 +107,14 @@ bool PlanningTestBase::FeedTestData() {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
     return false;
   }
-
   Clock::SetMode(Clock::MOCK);
   Clock::SetNowInSeconds(localization.header().timestamp_sec());
 
   // prediction
+  if (FLAGS_test_prediction_file.empty()) {
+    AERROR << "Requires FLAGS_test_prediction_file to be set";
+    return false;
+  }
   PredictionObstacles prediction;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
@@ -109,6 +123,10 @@ bool PlanningTestBase::FeedTestData() {
     return false;
   }
   // routing_response
+  if (FLAGS_test_routing_response_file.empty()) {
+    AERROR << "Requires FLAGS_test_routing_response_file";
+    return false;
+  }
   RoutingResponse routing_response;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
@@ -117,6 +135,7 @@ bool PlanningTestBase::FeedTestData() {
     return false;
   }
   // traffic_light_detection
+  // optional
   TrafficLightDetection traffic_light_detection;
   if (!apollo::common::util::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
@@ -148,9 +167,6 @@ void PlanningTestBase::SetUp() {
   }
 
   CHECK(FeedTestData()) << "Failed to feed test data";
-  AERROR << std::to_string(Clock::NowInSeconds());
-  usleep(200000);
-  AERROR << std::to_string(Clock::NowInSeconds());
 
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
@@ -200,11 +216,11 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
                                     bool no_trajectory_point) {
   origin->clear_latency_stats();
   origin->clear_debug();
-  origin->mutable_header()->clear_radar_timestamp();
-  origin->mutable_header()->clear_lidar_timestamp();
-  origin->mutable_header()->clear_timestamp_sec();
-  origin->mutable_header()->clear_camera_timestamp();
-  origin->mutable_header()->clear_sequence_num();
+  // origin->mutable_header()->clear_radar_timestamp();
+  // origin->mutable_header()->clear_lidar_timestamp();
+  // origin->mutable_header()->clear_timestamp_sec();
+  // origin->mutable_header()->clear_camera_timestamp();
+  // origin->mutable_header()->clear_sequence_num();
 
   if (no_trajectory_point) {
     origin->clear_total_path_length();
@@ -245,8 +261,10 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
       if (!common::util::SetProtoToASCIIFile(adc_trajectory_, fd)) {
         AERROR << "Failed to write to file " << tmp_fname;
       }
-      AERROR << "found\ndiff " << tmp_fname << " " << full_golden_path;
-      AERROR << "visualize diff\n/usr/bin/python "
+      AERROR << "found error\ndiff -y " << tmp_fname << " " << full_golden_path;
+      AERROR << "to override error\nmv " << tmp_fname << " "
+             << full_golden_path;
+      AERROR << "to visualize\n/usr/bin/python "
                 "modules/tools/plot_trace/plot_planning_result.py "
              << tmp_fname << " " << full_golden_path;
       return false;

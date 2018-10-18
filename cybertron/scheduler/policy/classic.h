@@ -17,8 +17,10 @@
 #ifndef CYBERTRON_SCHEDULER_POLICY_CLASSIC_H_
 #define CYBERTRON_SCHEDULER_POLICY_CLASSIC_H_
 
-#include <unordered_map>
+#include <functional>
 #include <map>
+#include <memory>
+#include <unordered_map>
 
 #include "cybertron/scheduler/processor_context.h"
 
@@ -34,13 +36,17 @@ class ClassicContext : public ProcessorContext {
   bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
   bool RqEmpty() override;
   void Notify(uint64_t tid) override;
-  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) { return false; };
+  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) {
+    return false;
+  }
 
  private:
   static std::mutex mtx_taskq_;
   static std::mutex mtx_rq_;
   static std::unordered_multimap<uint64_t, std::shared_ptr<CRoutine>> taskq_;
-  static std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>> rq_;
+  static std::multimap<uint32_t, std::shared_ptr<CRoutine>,
+                       std::greater<uint32_t>>
+      rq_;
 };
 
 }  // namespace scheduler

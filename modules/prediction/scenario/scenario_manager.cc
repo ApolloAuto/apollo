@@ -16,8 +16,8 @@
 
 #include "modules/prediction/scenario/scenario_manager.h"
 
-#include <cmath>
 #include <algorithm>
+#include <cmath>
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/vec2d.h"
@@ -45,9 +45,7 @@ void ScenarioManager::Run() {
   // TODO(all) other functionalities including lane, junction filters
 }
 
-const Scenario& ScenarioManager::scenario() const {
-  return current_scenario_;
-}
+const Scenario& ScenarioManager::scenario() const { return current_scenario_; }
 
 void ScenarioManager::PrioritizeObstacles(
     const EnvironmentFeatures& environment_features,
@@ -64,9 +62,11 @@ void ScenarioManager::PrioritizeObstacles(
   if (scenario_type == Scenario::CRUISE ||
       scenario_type == Scenario::CRUISE_URBAN ||
       scenario_type == Scenario::CRUISE_HIGHWAY) {
-    PrioritizeObstaclesForCruiseScenario(environment_features,
+    PrioritizeObstaclesForCruiseScenario(
+        environment_features,
         std::dynamic_pointer_cast<CruiseScenarioFeatures>(
-            ptr_scenario_features), obstacles_container);
+            ptr_scenario_features),
+        obstacles_container);
   } else if (scenario_type == Scenario::JUNCTION ||
              scenario_type == Scenario::JUNCTION_TRAFFIC_LIGHT ||
              scenario_type == Scenario::JUNCTION_STOP_SIGN) {
@@ -75,9 +75,9 @@ void ScenarioManager::PrioritizeObstacles(
 }
 
 void ScenarioManager::PrioritizeObstaclesForCruiseScenario(
-  const EnvironmentFeatures& environment_features,
-  const std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features,
-  ObstaclesContainer* ptr_obstacle_contrainer) {
+    const EnvironmentFeatures& environment_features,
+    const std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features,
+    ObstaclesContainer* ptr_obstacle_contrainer) {
   const auto& obstacle_ids =
       ptr_obstacle_contrainer->GetCurrentFramePredictableObstacleIds();
 
@@ -91,7 +91,7 @@ void ScenarioManager::PrioritizeObstaclesForCruiseScenario(
     if (obstacle_ptr->IsOnLane()) {
       bool has_lane_of_interest = false;
       for (const auto& curr_lane :
-          latest_feature_ptr->lane().current_lane_feature()) {
+           latest_feature_ptr->lane().current_lane_feature()) {
         const auto& curr_lane_id = curr_lane.lane_id();
         if (cruise_scenario_features->IsLaneOfInterest(curr_lane_id)) {
           has_lane_of_interest = true;
@@ -100,7 +100,7 @@ void ScenarioManager::PrioritizeObstaclesForCruiseScenario(
       }
       if (!has_lane_of_interest) {
         for (const auto& nearby_lane :
-            latest_feature_ptr->lane().nearby_lane_feature()) {
+             latest_feature_ptr->lane().nearby_lane_feature()) {
           const auto& nearby_lane_id = nearby_lane.lane_id();
           if (cruise_scenario_features->IsLaneOfInterest(nearby_lane_id)) {
             has_lane_of_interest = true;
@@ -125,8 +125,7 @@ void ScenarioManager::PrioritizeObstaclesForCruiseScenario(
       Vec2d ego_vec = Vec2d::CreateUnitVec2d(ego_heading);
       double l = ego_vec.CrossProd(ego_to_obstacle_vec);
       double s = ego_to_obstacle_vec.InnerProd(ego_vec);
-      if (std::abs(l) > 10.0 ||
-          s > std::max(20.0, ego_speed * 5.0) ||
+      if (std::abs(l) > 10.0 || s > std::max(20.0, ego_speed * 5.0) ||
           s < 0.0) {
         latest_feature_ptr->mutable_priority()->set_priority(
             ObstaclePriority::IGNORE);
