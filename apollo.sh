@@ -464,6 +464,7 @@ function citest_extended() {
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
   echo "$BUILD_TARGETS" | grep "test" \
+          | grep -v "modules\/planning/integration_tests" \
           | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   if [ $? -eq 0 ]; then
