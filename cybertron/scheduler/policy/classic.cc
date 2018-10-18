@@ -15,90 +15,79 @@
  *****************************************************************************/
 
 #include "cybertron/scheduler/policy/classic.h"
-
-#include <utility>
-
-#include "cybertron/common/global_data.h"
-#include "cybertron/common/log.h"
-#include "cybertron/common/types.h"
-#include "cybertron/croutine/croutine.h"
-#include "cybertron/event/perf_event_cache.h"
-#include "cybertron/proto/routine_conf.pb.h"
-#include "cybertron/proto/scheduler_conf.pb.h"
+#include "cybertron/scheduler/scheduler.h"
 #include "cybertron/scheduler/processor.h"
-#include "cybertron/time/time.h"
+#include "cybertron/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cybertron {
 namespace scheduler {
 
-using croutine::RoutineState;
-using apollo::cybertron::common::GlobalData;
 using apollo::cybertron::event::PerfEventCache;
 using apollo::cybertron::event::SchedPerf;
-using apollo::cybertron::proto::SchedulerConf;
-using apollo::cybertron::proto::RoutineConf;
-using apollo::cybertron::proto::RoutineConfInfo;
+
+std::mutex ClassicContext::mtx_taskq_;
+std::mutex ClassicContext::mtx_rq_;
+std::unordered_multimap<uint64_t, std::shared_ptr<CRoutine>> ClassicContext::taskq_;
+std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>> ClassicContext::rq_;
+
+bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
+  std::lock_guard<std::mutex> lk(mtx_taskq_);
+  if (taskq_.find(cr->id()) == taskq_.end()) {
+    taskq_.insert({cr->id(), cr});
+  }
+  return true;
+}
+
+void ClassicContext::Notify(uint64_t tid) {
+  std::lock_guard<std::mutex> lk(mtx_rq_);
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, tid, proc_index_, 0, 0, -1, -1);
+  auto p = taskq_.find(tid);
+  if ( p != taskq_.end() && p->second->state() != RoutineState::RUNNING) {
+    p->second->set_state(RoutineState::READY);
+    rq_.insert({p->second->priority(), p->second});
+  }
+
+  if (!notified_.exchange(true)) {
+    processor_->Notify();
+    return;
+  } 
+}
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   if (stop_) {
     return nullptr;
   }
-  std::lock_guard<std::mutex> lock(mtx_run_queue_);
-  auto start_perf_time = apollo::cybertron::Time::Now().ToNanosecond();
-
+  std::lock_guard<std::mutex> lk(mtx_rq_);
   std::shared_ptr<CRoutine> croutine = nullptr;
-  for (auto it = rt_queue_.begin(); it != rt_queue_.end();) {
-    auto cr = it->second;
+  auto start_perf_time = apollo::cybertron::Time::Now().ToNanosecond();
+  auto p = rq_.begin();
+  for (; p != rq_.end(); ) {
+    auto cr = p->second;
     auto lock = cr->TryLock();
     if (!lock) {
-      ++it;
+      ++p;
       continue;
     }
-
-    cr->UpdateState();
-    if (cr->state() == RoutineState::FINISHED) {
-      it = rt_queue_.erase(it);
-      continue;
-    }
-
     if (cr->state() == RoutineState::READY) {
       croutine = cr;
-      cr->set_state(RoutineState::RUNNING);
+      croutine->set_state(RoutineState::RUNNING);
+      rq_.erase(p);
       break;
     }
-    ++it;
+    ++p;
   }
   if (croutine == nullptr) {
     notified_.store(false);
   } else {
-    PerfEventCache::Instance()->AddSchedEvent(
-        SchedPerf::NEXT_ROUTINE, croutine->id(), croutine->processor_id(), 0,
-        start_perf_time, -1, -1);
+    PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_ROUTINE, croutine->id(), croutine->processor_id(), 
+      0, start_perf_time, -1, -1);
   }
   return croutine;
 }
 
-bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
-  WriteLockGuard<AtomicRWLock> lg(rw_lock_);
-  if (cr_map_.find(cr->id()) != cr_map_.end()) {
-    return false;
-  }
-  cr_map_[cr->id()] = cr;
-  return true;
-}
-
-bool ClassicContext::EnqueueAffinityRoutine(
-    const std::shared_ptr<CRoutine>& cr) {
-  std::lock_guard<std::mutex> lg(mtx_run_queue_);
-  rt_queue_.insert(
-      std::pair<double, std::shared_ptr<CRoutine>>(cr->priority(), cr));
-  return true;
-}
-
 bool ClassicContext::RqEmpty() {
-  std::lock_guard<std::mutex> lg(mtx_run_queue_);
-  return !notified_.load();
+  return rq_.empty();
 }
 
 }  // namespace scheduler

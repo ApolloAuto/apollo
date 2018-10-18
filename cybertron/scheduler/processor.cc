@@ -41,7 +41,7 @@ Processor::~Processor() {
 void Processor::Start() {
   thread_ = std::thread(&Processor::Run, this);
   uint32_t core_num = std::thread::hardware_concurrency();
-  if (core_num != 0) {
+  if (strategy_ != ProcessStrategy::CLASSIC && core_num != 0) {
     cpu_set_t set;
     CPU_ZERO(&set);
     CPU_SET(id_, &set);
@@ -61,9 +61,9 @@ void Processor::Run() {
         cr->Resume();
       } else {
         std::unique_lock<std::mutex> lk_rq(mtx_rq_);
-        if (Scheduler::Instance()->IsClassic()) {
-          cv_.wait_for(lk_rq, std::chrono::milliseconds(1), [this] {
-            return !this->running_ || !this->context_->RqEmpty();
+        if (strategy_ == ProcessStrategy::CLASSIC) {
+          cv_.wait_for(lk_rq, std::chrono::milliseconds(1), [this] { 
+            return !this->running_ || !this->context_->RqEmpty(); 
           });
         } else {
           cv_.wait_for(lk_rq, std::chrono::milliseconds(1));

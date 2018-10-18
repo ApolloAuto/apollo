@@ -14,45 +14,37 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
-#define CYBERTRON_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
+#ifndef CYBERTRON_SCHEDULER_POLICY_CLASSIC_H_
+#define CYBERTRON_SCHEDULER_POLICY_CLASSIC_H_
 
-#include <cstdint>
-#include <functional>
+#include <unordered_map>
 #include <map>
-#include <memory>
-#include <mutex>
-#include <string>
 
 #include "cybertron/scheduler/processor_context.h"
 
 namespace apollo {
 namespace cybertron {
-namespace croutine {
-class CRoutine;
-}
-
 namespace scheduler {
-
-class Processor;
 
 using croutine::CRoutine;
 
 class ClassicContext : public ProcessorContext {
  public:
-  std::shared_ptr<CRoutine> NextRoutine() override;
+  std::shared_ptr<CRoutine> NextRoutine();
   bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
-  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) override;
   bool RqEmpty() override;
+  void Notify(uint64_t tid) override;
+  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) { return false; };
 
  private:
-  std::mutex mtx_run_queue_;
-  std::multimap<double, std::shared_ptr<CRoutine>, std::greater<double>>
-      rt_queue_;
+  static std::mutex mtx_taskq_;
+  static std::mutex mtx_rq_;
+  static std::unordered_multimap<uint64_t, std::shared_ptr<CRoutine>> taskq_;
+  static std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>> rq_;
 };
 
 }  // namespace scheduler
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_
+#endif  // CYBERTRON_SCHEDULER_POLICY_CLASSIC_H_
