@@ -129,12 +129,12 @@ void CruiseMLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
 void CruiseMLPEvaluator::LoadModel(const std::string& model_file) {
   // Currently, it's using FnnVehicleModel
   // TODO(all) implement it using the generic "network" class.
-  model_ptr_.reset(new FnnVehicleModel());
-  CHECK(model_ptr_ != nullptr);
-  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
-      << "Unable to load model file: " << model_file << ".";
+  // model_ptr_.reset(new FnnVehicleModel());
+  // CHECK(model_ptr_ != nullptr);
+  // CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+  //     << "Unable to load model file: " << model_file << ".";
 
-  AINFO << "Succeeded in loading the model file: " << model_file << ".";
+  // AINFO << "Succeeded in loading the model file: " << model_file << ".";
 }
 
 double CruiseMLPEvaluator::ComputeFinishTime(
@@ -325,6 +325,13 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
     feature_values->push_back(heading);
     feature_values->push_back(angle_diff);
     size = feature_values->size();
+  }
+}
+
+void CruiseMLPEvaluator::SaveOfflineFeatures(
+    LaneSequence* sequence, const std::vector<double>& feature_values) {
+  for (double feature_value : feature_values) {
+    sequence->mutable_features()->add_mlp_features(feature_value);
   }
 }
 
