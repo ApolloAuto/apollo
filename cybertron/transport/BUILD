@@ -68,7 +68,7 @@ cc_test(
     deps = [
         "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
-        "@gtest//:main",
+        "@gtest",
     ],
 )
 
@@ -154,7 +154,7 @@ cc_test(
     deps = [
         "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
-        "@gtest//:main",
+        "@gtest",
     ],
 )
 
@@ -193,7 +193,7 @@ cc_test(
     deps = [
         "//cybertron:cybertron_core",
         "//cybertron/proto:unit_test_cc_proto",
-        "@gtest//:main",
+        "@gtest",
     ],
 )
 

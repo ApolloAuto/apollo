@@ -74,3 +74,10 @@ TEST(TransportTest, create_receiver) {
 }  // namespace transport
 }  // namespace cybertron
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  auto res = RUN_ALL_TESTS();
+  apollo::cybertron::transport::Transport::Shutdown();
+  return res;
+}

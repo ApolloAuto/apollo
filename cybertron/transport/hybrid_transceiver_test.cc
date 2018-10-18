@@ -397,3 +397,10 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
 }  // namespace transport
 }  // namespace cybertron
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  auto res = RUN_ALL_TESTS();
+  apollo::cybertron::transport::Transport::Shutdown();
+  return res;
+}
