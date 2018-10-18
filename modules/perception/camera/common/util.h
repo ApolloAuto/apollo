@@ -1,26 +1,25 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
-#include <fcntl.h>
 
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-#include <google/protobuf/io/gzip_stream.h>
-#include <google/protobuf/text_format.h>
 #include <cblas.h>
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/gzip_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/text_format.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -29,7 +28,8 @@
 #include <numeric>
 #include <string>
 #include <vector>
-#include "glog/logging.h"
+
+#include "cybertron/common/log.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image.h"
 #include "modules/perception/base/object.h"
@@ -43,16 +43,14 @@ bool Equal(float x, float target, float eps = 1e-6);
 bool Equal(double x, double target, double eps = 1e-6);
 
 // @brief whether rect1 is covered by rect2
-template<typename T>
-bool IsCovered(const base::Rect<T> &rect1,
-               const base::Rect<T> &rect2,
+template <typename T>
+bool IsCovered(const base::Rect<T> &rect1, const base::Rect<T> &rect2,
                float thresh) {
   base::RectF inter = rect1 & rect2;
   return inter.Area() / rect1.Area() > thresh;
 }
-template<typename T>
-bool IsCoveredHorizon(const base::Rect<T> &rect1,
-                      const base::Rect<T> &rect2,
+template <typename T>
+bool IsCoveredHorizon(const base::Rect<T> &rect1, const base::Rect<T> &rect2,
                       float thresh) {
   base::RectF inter = rect1 & rect2;
   if (inter.Area() > 0) {
@@ -60,9 +58,8 @@ bool IsCoveredHorizon(const base::Rect<T> &rect1,
   }
   return false;
 }
-template<typename T>
-bool IsCoveredVertical(const base::Rect<T> &rect1,
-                       const base::Rect<T> &rect2,
+template <typename T>
+bool IsCoveredVertical(const base::Rect<T> &rect1, const base::Rect<T> &rect2,
                        float thresh) {
   base::RectF inter = rect1 & rect2;
   if (inter.Area() > 0) {
@@ -71,7 +68,7 @@ bool IsCoveredVertical(const base::Rect<T> &rect1,
   return false;
 }
 
-template<typename T>
+template <typename T>
 bool Contain(const std::vector<T> &array, const T &element) {
   for (const auto &item : array) {
     if (item == element) {
@@ -81,33 +78,26 @@ bool Contain(const std::vector<T> &array, const T &element) {
   return false;
 }
 
-template<typename T>
-bool OutOfValidRegion(const base::BBox2D<T> box,
-                      const T width,
-                      const T height,
+template <typename T>
+bool OutOfValidRegion(const base::BBox2D<T> box, const T width, const T height,
                       const T border_size = 0) {
   if (box.xmin < border_size || box.ymin < border_size) {
     return true;
   }
-  if (box.xmax + border_size > width ||
-      box.ymax + border_size > height) {
+  if (box.xmax + border_size > width || box.ymax + border_size > height) {
     return true;
   }
   return false;
 }
-template<typename T>
-bool OutOfValidRegion(const base::Rect<T> rect,
-                      const T width,
-                      const T height,
+template <typename T>
+bool OutOfValidRegion(const base::Rect<T> rect, const T width, const T height,
                       const T border_size = 0) {
   base::BBox2D<T> box(rect);
   return OutOfValidRegion(box, width, height, border_size);
 }
 
-template<typename T>
-void RefineBox(const base::Rect<T> &box_in,
-               const T width,
-               const T height,
+template <typename T>
+void RefineBox(const base::Rect<T> &box_in, const T width, const T height,
                base::Rect<T> *box_out) {
   if (!box_out) {
     return;
@@ -129,10 +119,11 @@ void RefineBox(const base::Rect<T> &box_in,
     box_out->y = 0;
     box_out->height = 0;
   }
-  box_out->width = (box_out->x + box_out->width <= width) ? box_out->width :
-                   width - box_out->x;
-  box_out->height = (box_out->y + box_out->height <= height) ? box_out->height :
-                    height - box_out->y;
+  box_out->width = (box_out->x + box_out->width <= width) ? box_out->width
+                                                          : width - box_out->x;
+  box_out->height = (box_out->y + box_out->height <= height)
+                        ? box_out->height
+                        : height - box_out->y;
   if (box_out->width < 0) {
     box_out->width = 0;
   }
@@ -141,10 +132,8 @@ void RefineBox(const base::Rect<T> &box_in,
   }
 }
 
-template<typename T>
-void RefineBox(const base::BBox2D<T> &box_in,
-               const T width,
-               const T height,
+template <typename T>
+void RefineBox(const base::BBox2D<T> &box_in, const T width, const T height,
                base::BBox2D<T> *box_out) {
   if (!box_out) {
     return;
@@ -157,21 +146,18 @@ void RefineBox(const base::BBox2D<T> &box_in,
 bool LoadAnchors(const std::string &path, std::vector<float> *anchors);
 bool LoadTypes(const std::string &path,
                std::vector<base::ObjectSubType> *types);
-bool LoadExpand(const std::string &path,
-                std::vector<float> *expands);
+bool LoadExpand(const std::string &path, std::vector<float> *expands);
 
 bool ResizeCPU(const base::Blob<uint8_t> &src_gpu,
-               std::shared_ptr<base::Blob<float> > dst,
-               int stepwidth,
+               std::shared_ptr<base::Blob<float>> dst, int stepwidth,
                int start_axis);
-
 
 void GetCybertronWorkRoot(std::string *work_root);
 void FillObjectPolygonFromBBox3D(base::Object *object_ptr);
 
-template<typename T>
-void CalculateMeanAndVariance(const std::vector<T> &data,
-    T* mean, T* variance) {
+template <typename T>
+void CalculateMeanAndVariance(const std::vector<T> &data, T *mean,
+                              T *variance) {
   if (!mean || !variance) {
     return;
   }
@@ -184,11 +170,10 @@ void CalculateMeanAndVariance(const std::vector<T> &data,
   *mean = sum / data.size();
 
   std::vector<T> diff(data.size());
-  std::transform(data.begin(), data.end(), diff.begin(), [mean](T x) {
-    return x - *mean;
-  });
+  std::transform(data.begin(), data.end(), diff.begin(),
+                 [mean](T x) { return x - *mean; });
   T sum_of_diff_sqrs = std::inner_product(diff.begin(), diff.end(),
-      diff.begin(), static_cast<T>(0));
+                                          diff.begin(), static_cast<T>(0));
   *variance = sum_of_diff_sqrs / data.size();
 }
 

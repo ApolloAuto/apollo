@@ -18,7 +18,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "glog/logging.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/base/common.h"
 
 namespace apollo {

@@ -45,6 +45,7 @@ cc_library(
         "blob.h",
     ],
     deps = [
+        "//cybertron",
         ":common",
         ":syncedmem",
     ],

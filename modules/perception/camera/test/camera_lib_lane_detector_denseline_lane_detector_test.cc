@@ -13,13 +13,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
+
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 #include <fstream>
 #include <iostream>
+
+#include "cybertron/common/log.h"
 #include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
-#include "glog/logging.h"
-#include "gflags/gflags.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/common/io/io_util.h"
 

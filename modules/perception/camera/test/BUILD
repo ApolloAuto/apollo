@@ -385,7 +385,7 @@
 #         "-lopencv_highgui",
 #     ],
 #     deps = [
-#         "//external:gflags",
+#         "//cybertron",
 #         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
 #         "//modules/perception/base:base",
 #         "//modules/perception/common/io:io_util",
@@ -712,6 +712,7 @@
 #         "-lcaffe",
 #     ],
 #     deps = [
+#         "//cybertron",
 #         "//modules/perception/base:distortion_model",
 #         "//modules/perception/common/io:io_util",
 #         "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",

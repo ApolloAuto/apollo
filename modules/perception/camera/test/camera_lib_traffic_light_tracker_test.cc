@@ -18,9 +18,8 @@
 #include <iostream>
 
 #include "gtest/gtest.h"
-#include "glog/logging.h"
-#include "gflags/gflags.h"
 
+#include "cybertron/common/log.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
