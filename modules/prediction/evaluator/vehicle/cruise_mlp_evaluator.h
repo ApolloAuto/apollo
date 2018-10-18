@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -24,6 +25,7 @@
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/fnn_vehicle_model.pb.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -46,7 +48,35 @@ class CruiseMLPEvaluator : public Evaluator {
    */
   void Evaluate(Obstacle* obstacle_ptr) override;
 
+  /**
+   * @brief Extract feature vector
+   * @param Obstacle pointer
+   *        Lane Sequence pointer
+   */
+  void ExtractFeatureValues(Obstacle* obstacle_ptr,
+                            LaneSequence* lane_sequence_ptr,
+                            std::vector<double>* feature_values);
+  void Clear();
+
  private:
+  /**
+   * @brief Set obstacle feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void SetObstacleFeatureValues(const Obstacle* obstacle_ptr,
+                                std::vector<double>* feature_values);
+
+  /**
+   * @brief Set lane feature vector
+   * @param Obstacle pointer
+   *        Lane sequence pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void SetLaneFeatureValues(const Obstacle* obstacle_ptr,
+                            const LaneSequence* lane_sequence_ptr,
+                            std::vector<double>* feature_values);
+
   /**
    * @brief Load mode file
    * @param Model file name
@@ -58,7 +88,18 @@ class CruiseMLPEvaluator : public Evaluator {
    */
   double ComputeFinishTime(const std::vector<double>& feature_values);
 
+  /**
+   * @brief Save offline feature values in proto
+   * @param Lane sequence
+   * @param Vector of feature values
+   */
+  void SaveOfflineFeatures(LaneSequence* sequence,
+                           const std::vector<double>& feature_values);
+
  private:
+  static const size_t OBSTACLE_FEATURE_SIZE = 22;
+  static const size_t LANE_FEATURE_SIZE = 40;
+  std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
   std::unique_ptr<FnnVehicleModel> model_ptr_;
 };
 
