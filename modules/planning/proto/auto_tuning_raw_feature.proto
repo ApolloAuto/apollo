@@ -38,6 +38,7 @@ message SpeedPointRawFeature {
   repeated ObjectDecisionFeature nudge = 12;
   repeated ObjectDecisionFeature sidepass_front = 16;
   repeated ObjectDecisionFeature sidepass_rear = 17;
+  repeated ObjectDecisionFeature keep_clear = 18;
 }
 
 // caputuring the obstacle raw distance information from surrounding environment

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/planning/tuning/autotuning_raw_feature_generator.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -48,11 +49,49 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
 }
 
 common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
-  const std::vector<common::SpeedPoint>& speed_profile,
+    const std::vector<common::SpeedPoint>& speed_profile,
     const ReferenceLineInfo& reference_line_info, const Frame& frame,
     autotuning::TrajectoryRawFeature* const trajectory_feature) const {
   return common::Status::OK();
 }
 
+void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
+    const ReferenceLineInfo& reference_line_info,
+    std::vector<const StBoundary*>* const boundaries) const {
+  const auto& path_decision = reference_line_info.path_decision();
+  const auto& adc_sl_boundary = reference_line_info.AdcSlBoundary();
+  for (auto* obstacle : path_decision.path_obstacles().Items()) {
+    auto id = obstacle->Id();
+    if (!obstacle->st_boundary().IsEmpty()) {
+      boundaries->push_back(&obstacle->st_boundary());
+    } else if (FLAGS_enable_side_vehicle_st_boundary &&
+               (adc_sl_boundary.start_l() > 2.0 ||
+                adc_sl_boundary.end_l() < -2.0)) {
+      if (path_decision.Find(id)->reference_line_st_boundary().IsEmpty()) {
+        continue;
+      }
+      ADEBUG << "obstacle " << id << " is NOT blocking.";
+      auto st_boundary_copy =
+          path_decision.Find(id)->reference_line_st_boundary();
+      auto st_boundary = st_boundary_copy.CutOffByT(3.5);
+      if (!st_boundary.IsEmpty()) {
+        auto decision = obstacle->LongitudinalDecision();
+        if (decision.has_yield()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
+        } else if (decision.has_overtake()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::OVERTAKE);
+        } else if (decision.has_follow()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::FOLLOW);
+        } else if (decision.has_stop()) {
+          st_boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
+        }
+        st_boundary.SetId(st_boundary_copy.id());
+        st_boundary.SetCharacteristicLength(
+            st_boundary_copy.characteristic_length());
+        boundaries->push_back(&obstacle->st_boundary());
+      }
+    }
+  }
+}
 }  // namespace planning
 }  // namespace apollo

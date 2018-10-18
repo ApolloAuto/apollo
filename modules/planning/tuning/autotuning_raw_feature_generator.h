@@ -67,9 +67,13 @@ class AutotuningRawFeatureGenerator {
       const;
 
   common::Status EvaluateSpeedProfile(
-    const std::vector<common::SpeedPoint>& speed_profile,
+      const std::vector<common::SpeedPoint>& speed_profile,
       const ReferenceLineInfo& reference_line_info, const Frame& frame,
       autotuning::TrajectoryRawFeature* const trajectory_feature) const;
+
+ private:
+  void GenerateSTBoundaries(const ReferenceLineInfo& reference_line_info,
+      std::vector<const StBoundary*>* const boundaries) const;
 
  private:
   std::vector<double> evaluate_time_;
