@@ -458,6 +458,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       l_index += current_edges_num;
       n_index += 4;
       constraint_index += 4;
+      state_index += 4;
     }
   }
 
@@ -682,12 +683,12 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     for (std::size_t i = 1; i < horizon_; ++i) {
       // with respect to u(0, i-1)
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = control_index;
+      jCol[nz_index] = control_index - 2;
       ++nz_index;
 
       // with respect to u(0, i)
       iRow[nz_index] = constraint_index;
-      jCol[nz_index] = control_index - 2;
+      jCol[nz_index] = control_index;
       ++nz_index;
 
       // with respect to time
@@ -862,8 +863,10 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index] / wheelbase_)) +
-           x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-               x[control_index + 1] * (-1) * x[time_index] * ts_ * 0.5 *
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               (-1) * x[time_index] * ts_ * 0.5 *
                std::tan(x[control_index] / wheelbase_) *
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
@@ -875,13 +878,15 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
       values[nz_index] =
           x[time_index] * ts_ *
-          (x[state_index] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (x[state_index + 3] +
+           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
           std::sin(x[state_index + 2] +
                    x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                        std::tan(x[control_index] / wheelbase_)) *
-          x[time_index] * ts_ * 0.5 * wheelbase_ /
+          x[time_index] * ts_ * 0.5 * x[state_index + 3] /
           (std::cos(x[control_index] / wheelbase_) *
-           std::cos(x[control_index] / wheelbase_));  // c
+           std::cos(x[control_index] / wheelbase_)) /
+          wheelbase_;  // c
       ++nz_index;
 
       values[nz_index] =
@@ -931,8 +936,10 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index] / wheelbase_)) +
-           x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-               x[control_index + 1] * (-1) * x[time_index] * ts_ * 0.5 *
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[time_index] * ts_ * 0.5 *
                std::tan(x[control_index] / wheelbase_) *
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
@@ -943,15 +950,16 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
 
       values[nz_index] =
-          -1.0 *
-          (x[time_index] * ts_ *
-           (x[state_index] + x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-           std::cos(x[state_index + 2] +
-                    x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                        std::tan(x[control_index] / wheelbase_)) *
-           x[time_index] * ts_ * 0.5 * wheelbase_ /
-           (std::cos(x[control_index] / wheelbase_) *
-            std::cos(x[control_index] / wheelbase_)));  // h
+          -1.0 * (x[time_index] * ts_ *
+                  (x[state_index + 3] +
+                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                  std::cos(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index] / wheelbase_)) *
+                  x[time_index] * ts_ * 0.5 * x[state_index + 3] /
+                  (std::cos(x[control_index] / wheelbase_) *
+                   std::cos(x[control_index] / wheelbase_)) /
+                  wheelbase_);  // h
       ++nz_index;
 
       values[nz_index] =
@@ -966,11 +974,11 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
           (ts_ *
                (x[state_index + 3] +
                 x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               std::cos(x[state_index + 2] +
+               std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index] / wheelbase_)) +
            x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-               std::cos(x[state_index + 2] +
+               std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index] / wheelbase_)) +
            x[time_index] * ts_ *
@@ -986,7 +994,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       values[nz_index] = -1.0;
       ++nz_index;
 
-      values[nz_index] = -1.0 * x[time_index] * ts_;  // k.
+      values[nz_index] = -1.0 * x[time_index] * ts_ *
+                         std::tan(x[control_index] / wheelbase_);  // k.
       ++nz_index;
 
       values[nz_index] = 1.0;
@@ -995,17 +1004,14 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ *
                   (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                  wheelbase_ /
+                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) /
                   (std::cos(x[control_index] / wheelbase_) *
-                   std::cos(x[control_index] / wheelbase_)));  // l.
-      ++nz_index;
-
-      values[nz_index] = 1.0;
+                   std::cos(x[control_index] / wheelbase_)) /
+                  wheelbase_);  // l.
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ *
+          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
                   std::tan(x[control_index] / wheelbase_));  // m.
       ++nz_index;
 
@@ -1019,6 +1025,9 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
 
       values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] = 1.0;
       ++nz_index;
 
       values[nz_index] = -1.0 * ts_ * x[time_index];  // o.
@@ -1064,7 +1073,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       values[nz_index] = 1.0 / x[time_index] / ts_;
       ++nz_index;
 
-      values[nz_index] = -1.0 * (x[control_index + 2] - x[control_index]) /
+      // with respect to time
+      values[nz_index] = -1.0 * (x[control_index] - x[control_index - 2]) /
                          x[time_index] / x[time_index] / ts_;
       ++nz_index;
 
@@ -1102,17 +1112,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       std::size_t edges_counter = 0;
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
         std::size_t current_edges_num = obstacles_edges_num_(j, 0);
-        AINFO << "eval_jac_g, obstacle constraint values, current "
-                 "vertice_num : "
-              << current_edges_num << " i :  " << i << " j : " << j;
-        AINFO << "obstacles_A_ size : " << obstacles_A_.rows() << " and "
-              << obstacles_A_.cols();
-        AINFO << "edges_counter : " << edges_counter;
         Eigen::MatrixXd Aj =
             obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-        AINFO << "before after Aj";
-        std::vector<int> lj(&x[l_index], &x[l_index + current_edges_num]);
-        AINFO << "before nj";
         std::vector<int> nj(&x[n_index], &x[n_index + 3]);
         Eigen::MatrixXd bj =
             obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
@@ -1140,8 +1141,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         // 1. norm(A* lambda == 1)
         for (std::size_t k = 0; k < current_edges_num; ++k) {
           // with respect to l
-          values[nz_index] = 2 * Aj(k, 0) * Aj(k, 0) * x[l_index + k] +
-                             2 * Aj(k, 0) * Aj(k, 1) * x[l_index + k];  // t0~tk
+          values[nz_index] =
+              2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
           ++nz_index;
         }
 
@@ -1173,7 +1174,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {
-          values[nz_index] = std::cos(x[state_index + 2]) * Aj(k, 0) +
+          values[nz_index] = -std::sin(x[state_index + 2]) * Aj(k, 0) -
                              std::sin(x[state_index + 2]) * Aj(k, 1);  // y0~yn
           ++nz_index;
         }
@@ -1220,6 +1221,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         edges_counter += current_edges_num;
         l_index += current_edges_num;
         n_index += 4;
+        state_index += 4;
       }
     }
 
