@@ -25,18 +25,51 @@ DecisionData::DecisionData(const prediction::PredictionObstacles obstacles,
 }
 
 bool DecisionData::GetObstacleById(const std::string& id,
-    PathObstacle* const obstacle) const {
-  return false;
+    PathObstacle** const obstacle) {
+  CHECK_NOTNULL(obstacle);
+  *obstacle = nullptr;
+
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  const auto it = obstacle_map_.find(id);
+  if (it == obstacle_map_.end()) {
+    return false;
+  }
+  *obstacle = it->second;
+  return true;
 }
 
 bool DecisionData::GetObstacleByType(const VirtualObjectType& type,
-                       std::vector<PathObstacle*>* const obstacles) const {
-  return false;
+                       std::vector<PathObstacle*>* const obstacles) {
+  CHECK_NOTNULL(obstacles);
+  obstacles->clear();
+
+  std::lock_guard<std::mutex> lock(transaction_mutex_);
+
+  std::vector<std::string> ids;
+  if (!GetObstacleIdByType(type, &ids)) {
+    return false;
+  }
+  for (const std::string& id : ids) {
+    obstacles->emplace_back();
+    CHECK(GetObstacleById(id, &(obstacles->back())));
+  }
+  return true;
 }
 
 bool DecisionData::GetObstacleIdByType(const VirtualObjectType& type,
-                         std::vector<std::string>* const ids) const {
-  return false;
+                         std::vector<std::string>* const ids) {
+  CHECK_NOTNULL(ids);
+  ids->clear();
+
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  const auto it = virtual_obstacle_id_map_.find(type);
+  if (it == virtual_obstacle_id_map_.end()) {
+    return false;
+  }
+  *ids = it->second;
+  return true;
 }
 
 const std::vector<PathObstacle*>& DecisionData::GetStaticObstacle() const {
@@ -59,17 +92,18 @@ const std::vector<PathObstacle*>& DecisionData::GetAllObstacle() const {
   return all_obstacle_;
 }
 
-void DecisionData::Update() {
-}
-
 bool DecisionData::CreateVirtualObstacle(const ReferencePoint& point,
                              const VirtualObjectType& type,
                              std::string* const id) {
+  std::lock_guard<std::mutex> transaction_lock(transaction_mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
   return false;
 }
 bool DecisionData::CreateVirtualObstacle(const double point_s,
                              const VirtualObjectType& type,
                              std::string* const id) {
+  std::lock_guard<std::mutex> transaction_lock(transaction_mutex_);
+  std::lock_guard<std::mutex> lock(mutex_);
   return false;
 }
 

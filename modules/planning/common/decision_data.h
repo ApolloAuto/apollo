@@ -49,17 +49,16 @@ class DecisionData {
 
  public:
   bool GetObstacleById(const std::string& id,
-                       PathObstacle* const obstacle) const;
+                       PathObstacle** const obstacle);
   bool GetObstacleByType(const VirtualObjectType& type,
-                         std::vector<PathObstacle*>* const obstacles) const;
+                         std::vector<PathObstacle*>* const obstacles);
   bool GetObstacleIdByType(const VirtualObjectType& type,
-                         std::vector<std::string>* const ids) const;
+                         std::vector<std::string>* const ids);
   const std::vector<PathObstacle*>& GetStaticObstacle() const;
   const std::vector<PathObstacle*>& GetDynamicObstacle() const;
   const std::vector<PathObstacle*>& GetVirtualObstacle() const;
   const std::vector<PathObstacle*>& GetPracticalObstacle() const;
   const std::vector<PathObstacle*>& GetAllObstacle() const;
-  void Update();
 
  public:
   bool CreateVirtualObstacle(const ReferencePoint& point,
@@ -81,8 +80,9 @@ class DecisionData {
   std::list<std::unique_ptr<PathObstacle>> obstacle_;
   std::unordered_map<std::string, PathObstacle*> obstacle_map_;
   std::unordered_map<VirtualObjectType,
-        std::vector<std::string>, std::hash<int>> virtual_object_id_map_;
+        std::vector<std::string>, std::hash<int>> virtual_obstacle_id_map_;
   std::mutex mutex_;
+  std::mutex transaction_mutex_;
 };
 
 }  // namespace planning
