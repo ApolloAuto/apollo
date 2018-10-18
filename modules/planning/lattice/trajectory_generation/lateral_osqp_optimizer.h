@@ -28,8 +28,8 @@
 #include "Eigen/Core"
 #include "osqp/include/osqp.h"
 
-#include "modules/planning/math/finite_element_qp/lateral_qp_optimizer.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {
