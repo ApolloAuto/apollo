@@ -43,17 +43,14 @@ enum VirtualObjectType {
 
 class DecisionData {
  public:
-  explicit DecisionData(const prediction::PredictionObstacles obstacles,
+  explicit DecisionData(const prediction::PredictionObstacles& obstacles,
                         const ReferenceLine& reference_line);
   ~DecisionData() = default;
 
  public:
-  bool GetObstacleById(const std::string& id,
-                       PathObstacle** const obstacle);
-  bool GetObstacleByType(const VirtualObjectType& type,
-                         std::vector<PathObstacle*>* const obstacles);
-  bool GetObstacleIdByType(const VirtualObjectType& type,
-                         std::vector<std::string>* const ids);
+  PathObstacle* GetObstacleById(const std::string& id);
+  std::vector<PathObstacle*> GetObstacleByType(const VirtualObjectType& type);
+  std::vector<std::string> GetObstacleIdByType(const VirtualObjectType& type);
   const std::vector<PathObstacle*>& GetStaticObstacle() const;
   const std::vector<PathObstacle*>& GetDynamicObstacle() const;
   const std::vector<PathObstacle*>& GetVirtualObstacle() const;
@@ -79,12 +76,12 @@ class DecisionData {
   const ReferenceLine& reference_line_;
   std::list<std::unique_ptr<PathObstacle>> obstacle_;
   std::unordered_map<std::string, PathObstacle*> obstacle_map_;
-  std::unordered_map<VirtualObjectType,
-        std::vector<std::string>, std::hash<int>> virtual_obstacle_id_map_;
+  std::unordered_map<VirtualObjectType, std::vector<std::string>,
+                     std::hash<int>>
+      virtual_obstacle_id_map_;
   std::mutex mutex_;
   std::mutex transaction_mutex_;
 };
 
 }  // namespace planning
 }  // namespace apollo
-

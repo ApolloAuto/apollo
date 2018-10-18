@@ -19,57 +19,46 @@
 namespace apollo {
 namespace planning {
 
-DecisionData::DecisionData(const prediction::PredictionObstacles obstacles,
-                        const ReferenceLine& reference_line) :
-                        reference_line_(reference_line) {
-}
+DecisionData::DecisionData(const prediction::PredictionObstacles& obstacles,
+                           const ReferenceLine& reference_line)
+    : reference_line_(reference_line) {}
 
-bool DecisionData::GetObstacleById(const std::string& id,
-    PathObstacle** const obstacle) {
-  CHECK_NOTNULL(obstacle);
-  *obstacle = nullptr;
-
+PathObstacle* DecisionData::GetObstacleById(const std::string& id) {
   std::lock_guard<std::mutex> lock(mutex_);
-
   const auto it = obstacle_map_.find(id);
   if (it == obstacle_map_.end()) {
-    return false;
+    return nullptr;
   }
-  *obstacle = it->second;
-  return true;
+  return it->second;
 }
 
-bool DecisionData::GetObstacleByType(const VirtualObjectType& type,
-                       std::vector<PathObstacle*>* const obstacles) {
-  CHECK_NOTNULL(obstacles);
-  obstacles->clear();
-
+std::vector<PathObstacle*> DecisionData::GetObstacleByType(
+    const VirtualObjectType& type) {
+  std::vector<PathObstacle*> obstacles;
   std::lock_guard<std::mutex> lock(transaction_mutex_);
 
-  std::vector<std::string> ids;
-  if (!GetObstacleIdByType(type, &ids)) {
-    return false;
+  std::vector<std::string> ids = GetObstacleIdByType(type);
+  if (!ids.empty()) {
+    return obstacles;
   }
   for (const std::string& id : ids) {
-    obstacles->emplace_back();
-    CHECK(GetObstacleById(id, &(obstacles->back())));
+    obstacles.emplace_back();
+    obstacles.back() = GetObstacleById(id);
+    CHECK_NOTNULL(obstacles.back());
   }
-  return true;
+  return obstacles;
 }
 
-bool DecisionData::GetObstacleIdByType(const VirtualObjectType& type,
-                         std::vector<std::string>* const ids) {
-  CHECK_NOTNULL(ids);
-  ids->clear();
-
+std::vector<std::string> DecisionData::GetObstacleIdByType(
+    const VirtualObjectType& type) {
+  std::vector<std::string> ids;
   std::lock_guard<std::mutex> lock(mutex_);
 
   const auto it = virtual_obstacle_id_map_.find(type);
   if (it == virtual_obstacle_id_map_.end()) {
-    return false;
+    return ids;
   }
-  *ids = it->second;
-  return true;
+  return it->second;
 }
 
 const std::vector<PathObstacle*>& DecisionData::GetStaticObstacle() const {
@@ -93,15 +82,15 @@ const std::vector<PathObstacle*>& DecisionData::GetAllObstacle() const {
 }
 
 bool DecisionData::CreateVirtualObstacle(const ReferencePoint& point,
-                             const VirtualObjectType& type,
-                             std::string* const id) {
+                                         const VirtualObjectType& type,
+                                         std::string* const id) {
   std::lock_guard<std::mutex> transaction_lock(transaction_mutex_);
   std::lock_guard<std::mutex> lock(mutex_);
   return false;
 }
 bool DecisionData::CreateVirtualObstacle(const double point_s,
-                             const VirtualObjectType& type,
-                             std::string* const id) {
+                                         const VirtualObjectType& type,
+                                         std::string* const id) {
   std::lock_guard<std::mutex> transaction_lock(transaction_mutex_);
   std::lock_guard<std::mutex> lock(mutex_);
   return false;
@@ -109,4 +98,3 @@ bool DecisionData::CreateVirtualObstacle(const double point_s,
 
 }  // namespace planning
 }  // namespace apollo
-
