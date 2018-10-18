@@ -34,11 +34,4 @@ cc_binary(
     #linkstatic = False,
 )
 
-py_binary(
-    name = "extrinsics_broadcaster",
-    srcs = [
-        "extrinsics_broadcaster/bin/extrinsics_broadcaster.py",
-    ],
-)
-
 #cpplint()
