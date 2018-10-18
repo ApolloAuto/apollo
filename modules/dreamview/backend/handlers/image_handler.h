@@ -55,8 +55,7 @@ class ImageHandler : public CivetHandler {
   bool handleGet(CivetServer *server, struct mg_connection *conn);
 
  private:
-  template <typename SensorMsgsImage>
-  void OnImage(const std::shared_ptr<SensorMsgsImage> &image);
+  void OnImage(const std::shared_ptr<apollo::drivers::Image> &image);
 
   void OnImageFront(const std::shared_ptr<apollo::drivers::Image> &image);
   void OnImageShort(const std::shared_ptr<apollo::drivers::Image> &image);
