@@ -52,6 +52,10 @@ class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
       const ReferenceLine& reference_line,
       const std::vector<const PathObstacle*>& obstacles);
 
+  std::vector<std::tuple<double, double, double>>
+  GetLateralSecondOrderDerivativeBounds(
+      const common::TrajectoryPoint& init_point, const double qp_delta_s);
+
  private:
   QpPiecewiseJerkPathConfig config_;
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp_;
