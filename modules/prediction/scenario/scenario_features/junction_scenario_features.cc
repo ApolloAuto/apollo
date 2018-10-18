@@ -25,5 +25,11 @@ JunctionScenarioFeatures::JunctionScenarioFeatures() {
 
 JunctionScenarioFeatures::~JunctionScenarioFeatures() {}
 
+void JunctionScenarioFeatures::BuildJunctionScenarioFeatures(
+    const EnvironmentFeatures& environment_features) {
+  // CHECK(environment_features.has_front_junction());
+  scenario_.set_junction_id(environment_features.GetFrontJunction().first);
+}
+
 }  // namespace prediction
 }  // namespace apollo

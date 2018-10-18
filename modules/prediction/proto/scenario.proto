@@ -13,4 +13,5 @@ message Scenario {
     JUNCTION_STOP_SIGN = 2002;
   }
   optional Type type = 1 [default = UNKNOWN];
+  optional string junction_id = 2;
 }

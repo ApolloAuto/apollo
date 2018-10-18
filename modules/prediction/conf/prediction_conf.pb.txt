@@ -6,6 +6,12 @@ obstacle_conf {
 }
 obstacle_conf {
   obstacle_type: VEHICLE
+  obstacle_status: IN_JUNCTION
+  evaluator_type: MLP_EVALUATOR
+  predictor_type: MOVE_SEQUENCE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
   obstacle_status: OFF_LANE
   predictor_type: FREE_MOVE_PREDICTOR
 }

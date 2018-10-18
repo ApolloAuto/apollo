@@ -10,6 +10,7 @@ message ObstacleConf {
     OFF_LANE = 1;
     STATIONARY = 3;
     MOVING = 4;
+    IN_JUNCTION = 5;
   }
 
   enum EvaluatorType {
