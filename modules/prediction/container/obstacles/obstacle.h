@@ -258,9 +258,11 @@ class Obstacle {
 
   void InsertFeatureToHistory(const Feature& feature);
 
-  void BuildJunctionExitsWithEnterLane(const std::string& junction_id);
+  void SearchJunctionExitsWithEnterLane(
+      const std::string& enter_lane_id, const std::string& junction_id,
+      Feature* feature_ptr);
 
-  void BuildJunctionExitsWithoutEnterLane(const std::string& junction_id);
+  void SearchJunctionExitsWithoutEnterLane(const std::string& junction_id);
 
   void Trim();
 

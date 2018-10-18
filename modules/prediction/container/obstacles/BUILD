@@ -95,6 +95,7 @@ cc_library(
     deps = [
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:road_graph",
+        "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:lane_graph_proto",
     ],
 )

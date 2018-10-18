@@ -233,7 +233,7 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
   Feature* latest_feature_ptr = mutable_latest_feature();
   latest_feature_ptr->mutable_junction_feature()->set_junction_id(junction_id);
   if (feature_history_.size() == 1) {
-    BuildJunctionExitsWithoutEnterLane(junction_id);
+    SearchJunctionExitsWithoutEnterLane(junction_id);
     return;
   }
   const Feature& prev_feature = feature(1);
@@ -241,21 +241,23 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
     CHECK(prev_feature.junction_feature().enter_lane().has_lane_id());
     std::string enter_lane_id =
         prev_feature.junction_feature().enter_lane().lane_id();
-    latest_feature_ptr->mutable_junction_feature()
-                      ->mutable_enter_lane()
-                      ->set_lane_id(enter_lane_id);
-    BuildJunctionExitsWithEnterLane(junction_id);
+    SearchJunctionExitsWithEnterLane(
+        enter_lane_id, junction_id, latest_feature_ptr);
   } else {
-    BuildJunctionExitsWithoutEnterLane(junction_id);
+    SearchJunctionExitsWithoutEnterLane(junction_id);
   }
 }
 
-void Obstacle::BuildJunctionExitsWithEnterLane(
-    const std::string& junction_id) {
-  // TODO(kechxu) implement
+void Obstacle::SearchJunctionExitsWithEnterLane(
+    const std::string& enter_lane_id, const std::string& junction_id,
+    Feature* feature_ptr) {
+  const JunctionFeature& junction_feature =
+      ObstacleClusters::GetJunctionFeature(enter_lane_id, junction_id);
+
+  feature_ptr->mutable_junction_feature()->CopyFrom(junction_feature);
 }
 
-void Obstacle::BuildJunctionExitsWithoutEnterLane(
+void Obstacle::SearchJunctionExitsWithoutEnterLane(
     const std::string& junction_id) {
   // TODO(kechxu) implement
 }
