@@ -58,7 +58,8 @@ TEST_F(SidePassScenarioTest, Init) {
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_side_pass_config_file, &config));
-  scenario_.reset(new SidePassScenario(config));
+  ScenarioContext context;
+  scenario_.reset(new SidePassScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::SIDE_PASS);
 }
 

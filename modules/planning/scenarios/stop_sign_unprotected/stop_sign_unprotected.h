@@ -49,12 +49,9 @@ class StopSignUnprotectedScenario : public Scenario {
         associated_lanes;
   };
 
-  StopSignUnprotectedScenario()
-      : Scenario(FLAGS_scenario_stop_sign_unprotected_config_file) {}
-  explicit StopSignUnprotectedScenario(const ScenarioConfig& config)
-      : Scenario(config) {}
-
-  void Observe(Frame* const frame);
+  explicit StopSignUnprotectedScenario(const ScenarioConfig& config,
+                                       const ScenarioContext* context)
+      : Scenario(config, context) {}
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);

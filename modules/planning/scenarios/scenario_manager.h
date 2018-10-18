@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <set>
+#include <unordered_map>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -38,6 +39,16 @@ class ScenarioManager final {
   void Update(const common::TrajectoryPoint& ego_point, const Frame& frame);
 
  private:
+  /**
+   * This function will wake up each scenario's observe function to cache
+   * neccessary information in planning context, even when the scenario is not
+   * scheduled.
+   */
+  void Observe(const Frame& frame);
+
+  std::unique_ptr<Scenario> CreateScenario(
+      ScenarioConfig::ScenarioType scenario_type);
+
   bool SelectChangeLaneScenario(const common::TrajectoryPoint& ego_point,
                                 const Frame& frame);
   bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
@@ -51,12 +62,14 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType DecideCurrentScenario(
       const common::TrajectoryPoint& ego_point, const Frame& frame);
 
-  common::util::Factory<ScenarioConfig::ScenarioType, Scenario>
-      scenario_factory_;
+  std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
+                     std::hash<int>>
+      config_map_;
 
   std::unique_ptr<Scenario> current_scenario_;
   ScenarioConfig::ScenarioType default_scenario_type_;
   std::set<ScenarioConfig::ScenarioType> supported_scenarios_;
+  ScenarioContext scenario_context_;
 };
 
 }  // namespace planning
