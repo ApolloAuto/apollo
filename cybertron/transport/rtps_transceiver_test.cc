@@ -151,3 +151,10 @@ TEST_F(RtpsTransceiverTest, enable_and_disable) {
 }  // namespace transport
 }  // namespace cybertron
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  auto res = RUN_ALL_TESTS();
+  apollo::cybertron::transport::Transport::Shutdown();
+  return res;
+}
