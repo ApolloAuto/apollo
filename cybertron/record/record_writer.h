@@ -20,8 +20,8 @@
 #include <stdint.h>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <sstream>
+#include <string>
 #include <unordered_map>
 
 #include "cybertron/common/log.h"

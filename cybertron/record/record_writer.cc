@@ -16,8 +16,8 @@
 
 #include "cybertron/record/record_writer.h"
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 #include "cybertron/common/log.h"
 
@@ -59,7 +59,8 @@ void RecordWriter::Close() {
 void RecordWriter::SplitOutfile() {
   file_writer_.reset(new RecordFileWriter());
   if (file_index_ > 99999) {
-    AWARN << "More than 9999 files had bean recored, will restart counting at 00000.";
+    AWARN << "More than 9999 record files had been recored, will restart"
+          << " counting from 0.";
     file_index_ = 0;
   }
   sstream_.str(std::string());

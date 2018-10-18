@@ -27,7 +27,7 @@ class GeneralChannelMessage
     : public CybertronChannelMessage<apollo::cybertron::message::RawMessage> {
  public:
   ChannelMsgSubFactory(GeneralChannelMessage,
-                          apollo::cybertron::message::RawMessage);
+                       apollo::cybertron::message::RawMessage);
   void Render(const Screen* s, int key) override;
   ~GeneralChannelMessage() {
     if (raw_msg_class_) {
