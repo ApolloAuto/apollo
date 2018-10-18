@@ -924,12 +924,12 @@ void Obstacle::BuildLaneGraph() {
       ++curr_lane_count;
     }
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
-      LaneSequence seq(lane_seq);
-      seq.set_lane_sequence_id(seq_id++);
-      feature->mutable_lane()
+      LaneSequence* lane_seq_ptr = feature->mutable_lane()
           ->mutable_lane_graph()
-          ->add_lane_sequence()
-          ->CopyFrom(seq);
+          ->add_lane_sequence();
+      lane_seq_ptr->CopyFrom(lane_seq);
+      lane_seq_ptr->set_lane_sequence_id(seq_id++);
+      lane_seq_ptr->set_vehicle_on_lane(true);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
@@ -948,12 +948,12 @@ void Obstacle::BuildLaneGraph() {
       ++nearby_lane_count;
     }
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
-      LaneSequence seq(lane_seq);
-      seq.set_lane_sequence_id(seq_id++);
-      feature->mutable_lane()
+      LaneSequence* lane_seq_ptr = feature->mutable_lane()
           ->mutable_lane_graph()
-          ->add_lane_sequence()
-          ->CopyFrom(seq);
+          ->add_lane_sequence();
+      lane_seq_ptr->CopyFrom(lane_seq);
+      lane_seq_ptr->set_lane_sequence_id(seq_id++);
+      lane_seq_ptr->set_vehicle_on_lane(false);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
