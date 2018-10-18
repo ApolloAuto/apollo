@@ -13,45 +13,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#include "sensor_msgs/CompressedImage.h"
-#include "sensor_msgs/Image.h"
-
 #include "modules/dreamview/backend/handlers/image_handler.h"
 
-#include "modules/common/adapters/adapter_manager.h"
 #include "cybertron/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/perception/traffic_light/util/color_space.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/configs/config_gflags.h"
 
 #include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::adapter::AdapterManager;
+using apollo::drivers::Image;
 
 constexpr double ImageHandler::kImageScale;
 
 template <>
-void ImageHandler::OnImage(const sensor_msgs::Image &image) {
+void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
   if (requests_ == 0) {
     return;
   }
 
-  if (image.encoding != "yuyv") {
-    AERROR_EVERY(100) << "Image format not support: " << image.encoding;
-    return;
-  }
-
-  unsigned char *yuv = (unsigned char *)&(image.data[0]);
-  auto mat = cv::Mat(image.height, image.width, CV_8UC3);
-  apollo::perception::traffic_light::Yuyv2rgb(yuv, mat.data,
-                                              image.height * image.width);
-
-  cv::cvtColor(mat, mat, CV_RGB2BGR);
-
-  cv::resize(mat, mat, cv::Size(image.width * ImageHandler::kImageScale,
-                                image.height * ImageHandler::kImageScale),
+  cv::Mat mat(image->height(), image->width(), CV_8UC3,
+              const_cast<char *>(image->data().data()), image->step());
+  cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
+  cv::resize(mat, mat,
+             cv::Size(image->width() * ImageHandler::kImageScale,
+                      image->height() * ImageHandler::kImageScale),
              0, 0, CV_INTER_LINEAR);
 
   std::unique_lock<std::mutex> lock(mutex_);
@@ -59,39 +47,27 @@ void ImageHandler::OnImage(const sensor_msgs::Image &image) {
   cvar_.notify_all();
 }
 
-template <>
-void ImageHandler::OnImage(const sensor_msgs::CompressedImage &image) {
-  if (requests_ == 0) {
-    return;
-  }
-
-  try {
-    std::unique_lock<std::mutex> lock(mutex_);
-    auto current_image = cv_bridge::toCvCopy(image);
-    cv::imencode(".jpg", current_image->image, send_buffer_,
-                 std::vector<int>() /* params */);
-    cvar_.notify_all();
-  } catch (cv_bridge::Exception &e) {
-    AERROR << "Error when converting ROS image to CV image: " << e.what();
-    return;
-  }
-}
-
-void ImageHandler::OnImageFront(const sensor_msgs::Image &image) {
+void ImageHandler::OnImageFront(const std::shared_ptr<Image> &image) {
   if (FLAGS_use_navigation_mode) {
     OnImage(image);
   }
 }
 
-void ImageHandler::OnImageShort(const sensor_msgs::Image &image) {
+void ImageHandler::OnImageShort(const std::shared_ptr<Image> &image) {
   if (!FLAGS_use_navigation_mode) {
     OnImage(image);
   }
 }
 
-ImageHandler::ImageHandler() : requests_(0) {
-  AdapterManager::AddImageFrontCallback(&ImageHandler::OnImageFront, this);
-  AdapterManager::AddImageShortCallback(&ImageHandler::OnImageShort, this);
+ImageHandler::ImageHandler()
+    : requests_(0), node_(cybertron::CreateNode("image_handler")) {
+  node_->CreateReader<Image>(
+      FLAGS_image_front_topic,
+      [this](const std::shared_ptr<Image> &image) { OnImageFront(image); });
+
+  node_->CreateReader<Image>(
+      FLAGS_image_short_topic,
+      [this](const std::shared_ptr<Image> &image) { OnImageShort(image); });
 }
 
 bool ImageHandler::handleGet(CivetServer *server, struct mg_connection *conn) {

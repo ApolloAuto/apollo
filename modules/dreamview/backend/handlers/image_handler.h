@@ -25,7 +25,9 @@
 #include <mutex>
 #include <string>
 #include <vector>
-#include "cv_bridge/cv_bridge.h"
+
+#include "cybertron/cybertron.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
 
 #include "CivetServer.h"
 
@@ -53,17 +55,19 @@ class ImageHandler : public CivetHandler {
 
  private:
   template <typename SensorMsgsImage>
-  void OnImage(const SensorMsgsImage &image);
+  void OnImage(const std::shared_ptr<SensorMsgsImage> &image);
 
-  void OnImageFront(const sensor_msgs::Image &image);
-  void OnImageShort(const sensor_msgs::Image &image);
+  void OnImageFront(const std::shared_ptr<apollo::drivers::Image> &image);
+  void OnImageShort(const std::shared_ptr<apollo::drivers::Image> &image);
 
-  std::vector<uchar> send_buffer_;
+  std::vector<uint8_t> send_buffer_;
   std::atomic<int> requests_;
 
   // mutex lock and condition variable to protect the received image
   std::mutex mutex_;
   std::condition_variable cvar_;
+
+  std::unique_ptr<cybertron::Node> node_;
 };
 
 }  // namespace dreamview

@@ -14,6 +14,7 @@ cc_library(
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
+        "//modules/dreamview/backend/handlers:image_handler",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/hmi",
         "//modules/dreamview/backend/map:map_service",
