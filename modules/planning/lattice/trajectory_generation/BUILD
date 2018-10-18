@@ -31,9 +31,10 @@ cc_library(
     ],
     deps = [
         ":end_condition_sampler",
+        ":lateral_osqp_optimizer",
+        ":lateral_qp_optimizer",
         ":lateral_trajectory_optimizer",
         ":lateral_trajectory_optimizer_interface",
-        ":lateral_osqp_optimizer",
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:path_time_graph",
@@ -45,7 +46,6 @@ cc_library(
         "//modules/planning/lattice/trajectory1d:standing_still_trajectory1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/math/finite_element_qp:lateral_qp_optimizer",
         "//modules/planning/proto:lattice_sampling_config_proto",
         "//modules/planning/proto:lattice_structure_proto",
     ],
@@ -157,6 +157,20 @@ cc_library(
 )
 
 cc_library(
+    name = "lateral_qp_optimizer",
+    srcs = [
+        "lateral_qp_optimizer.cc",
+    ],
+    hdrs = [
+        "lateral_qp_optimizer.h",
+    ],
+    deps = [
+        "//cybertron",
+        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+    ],
+)
+
+cc_library(
     name = "lateral_osqp_optimizer",
     srcs = [
         "lateral_osqp_optimizer.cc",
@@ -165,9 +179,9 @@ cc_library(
         "lateral_osqp_optimizer.h",
     ],
     deps = [
-        "//modules/planning/math/finite_element_qp:lateral_qp_optimizer",
-        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+        ":lateral_qp_optimizer",
         "//cybertron",
+        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",
         "@osqp",
     ],
