@@ -59,6 +59,7 @@ class CruiseMLPEvaluator : public Evaluator {
   double ComputeFinishTime(const std::vector<double>& feature_values);
 
  private:
+  std::unique_ptr<FnnVehicleModel> model_ptr_;
 };
 
 }  // namespace prediction
