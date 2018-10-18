@@ -722,7 +722,8 @@ int HDMapImpl::GetRoi(const apollo::common::PointENU& point, double radius,
                 polygon_id_set.end()) {
               PolygonRoiPtr polygon_roi_ptr(new PolygonRoi());
               polygon_roi_ptr->polygon = parkingspace_ptr->polygon();
-              polygon_roi_ptr->attribute.type = PolygonType::PARKINGSPACE_POLYGON;
+              polygon_roi_ptr->attribute.type =
+                PolygonType::PARKINGSPACE_POLYGON;
               polygon_roi_ptr->attribute.id = parkingspace_ptr->id();
               polygons_roi->push_back(polygon_roi_ptr);
               polygon_id_set.insert(parkingspace_ptr->id().id());
