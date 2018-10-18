@@ -31,6 +31,7 @@ namespace planning {
 class SidePassSafetyTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    config_.set_task_type(TaskConfig::SIDE_PASS_SAFETY);
     config_.mutable_side_pass_safety_config()->
         set_min_obstacle_lateral_distance(1);
   }
@@ -44,7 +45,8 @@ class SidePassSafetyTest : public ::testing::Test {
 TEST_F(SidePassSafetyTest, Init) {
   const TaskConfig& config = config_;
   SidePassSafety side_pass_safety_(config);
-  EXPECT_EQ(side_pass_safety_.Name(), "SidePassSafety");
+  EXPECT_EQ(side_pass_safety_.Name(),
+            TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning
