@@ -88,7 +88,7 @@ DEFINE_string(ultrasonic_radar_topic, "/apollo/sensor/ultrasonic_radar",
 // TODO(Authors): Change the topic name
 DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
-DEFINE_string(image_front_topic, "/apollo/sensor/camera/obstacle/front_6mm",
+DEFINE_string(image_front_topic, "/apollo/sensor/camera/front_6mm/image",
               "front camera image topic name for obstacles from camera");
 DEFINE_string(image_short_topic, "/apollo/sensor/camera/traffic/image_short",
               "short camera image topic name");

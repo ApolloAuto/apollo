@@ -20,20 +20,23 @@ cc_library(
     ],
 )
 
-#cc_library(
-#    name = "image_handler",
-#    srcs = [
-#        "image_handler.cc",
-#    ],
-#    hdrs = [
-#        "image_handler.h",
-#    ],
-#    deps = [
-#        "//modules/perception/traffic_light/util",
-#        "@civetweb//:civetweb++",
-#        "@opencv2//:highgui",
-#    ],
-#)
+cc_library(
+    name = "image_handler",
+    srcs = [
+        "image_handler.cc",
+    ],
+    hdrs = [
+        "image_handler.h",
+    ],
+    deps = [
+        "//cybertron",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:config_gflags",
+        "//modules/drivers/proto:sensor_proto",
+        "@civetweb//:civetweb++",
+        "@opencv2//:highgui",
+    ],
+)
 
 cc_test(
     name = "websocket_handler_test",

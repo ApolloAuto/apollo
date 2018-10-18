@@ -76,7 +76,7 @@ Status Dreamview::Init() {
   point_cloud_ws_.reset(new WebSocketHandler("PointCloud"));
 
   map_service_.reset(new MapService());
-  //   image_.reset(new ImageHandler());
+  image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
 
   sim_world_updater_.reset(new SimulationWorldUpdater(
@@ -88,7 +88,7 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
-  //   server_->addHandler("/image", *image_);
+  server_->addHandler("/image", *image_);
 
   return Status::OK();
 }
