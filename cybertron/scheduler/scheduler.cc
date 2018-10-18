@@ -107,6 +107,7 @@ void Scheduler::CreateProcessor() {
 
     ctx->set_id(i);
     proc->BindContext(ctx);
+    proc->set_strategy(sched_policy_);
     ctx->BindProcessor(proc);
     proc_ctxs_.emplace_back(ctx);
     {
@@ -184,10 +185,7 @@ bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
     return false;
   }
 
-  if (ctx->Enqueue(croutine)) {
-    ADEBUG << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
-           << "] into processor[" << croutine->processor_id() << "]";
-  } else {
+  if (!ctx->Enqueue(croutine)) {
     AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
           << "] into processor[" << croutine->processor_id() << "] failed";
     return false;
@@ -195,10 +193,7 @@ bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
 
   for (uint32_t i = 0; i < proc_ctxs_.size(); ++i) {
     if (croutine->IsAffinity(i)) {
-      if (proc_ctxs_.at(i)->EnqueueAffinityRoutine(croutine)) {
-        ADEBUG << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
-               << "] into affinity_processor[" << i << "]";
-      } else {
+      if (!proc_ctxs_.at(i)->EnqueueAffinityRoutine(croutine)) {
         AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
               << "] into affinity_processor[" << i << "] failed";
       }
