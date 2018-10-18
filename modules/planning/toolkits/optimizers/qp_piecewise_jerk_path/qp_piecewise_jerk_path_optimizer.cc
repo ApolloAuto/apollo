@@ -23,8 +23,6 @@
 #include <algorithm>
 
 #include "modules/common/time/time.h"
-#include "modules/planning/math/finite_element_qp/osqp_lateral_jerk_qp_optimizer.h"
-#include "modules/planning/math/finite_element_qp/osqp_lateral_linear_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {
