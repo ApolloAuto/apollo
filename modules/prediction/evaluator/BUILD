@@ -11,6 +11,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",

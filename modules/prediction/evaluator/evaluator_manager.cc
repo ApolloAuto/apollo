@@ -19,6 +19,7 @@
 #include "cyber/common/log.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
@@ -54,25 +55,34 @@ void EvaluatorManager::Init(const PredictionConf& config) {
       continue;
     }
 
-    if (obstacle_conf.has_obstacle_status() &&
-        obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-      switch (obstacle_conf.obstacle_type()) {
-        case PerceptionObstacle::VEHICLE: {
-          vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
-          break;
+    if (obstacle_conf.has_obstacle_status()) {
+      if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+        switch (obstacle_conf.obstacle_type()) {
+          case PerceptionObstacle::VEHICLE: {
+            vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+            break;
+          }
+          case PerceptionObstacle::BICYCLE: {
+            cyclist_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+            break;
+          }
+          case PerceptionObstacle::PEDESTRIAN: {
+            break;
+          }
+          case PerceptionObstacle::UNKNOWN: {
+            default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+            break;
+          }
+          default: { break; }
         }
-        case PerceptionObstacle::BICYCLE: {
-          cyclist_on_lane_evaluator_ = obstacle_conf.evaluator_type();
-          break;
+      } else if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
+        switch (obstacle_conf.obstacle_type()) {
+          case PerceptionObstacle::VEHICLE: {
+            vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
+            break;
+          }
+          default: { break; }
         }
-        case PerceptionObstacle::PEDESTRIAN: {
-          break;
-        }
-        case PerceptionObstacle::UNKNOWN: {
-          default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
-          break;
-        }
-        default: { break; }
       }
     }
   }
@@ -117,10 +127,17 @@ void EvaluatorManager::Run(
       continue;
     }
 
+    const Scenario& scenario = ScenarioManager::Instance()->scenario();
+
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
         if (obstacle->IsOnLane()) {
-          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+          if (scenario.type() == Scenario::JUNCTION &&
+              obstacle->IsInJunction(scenario.junction_id())) {
+            evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
+          } else {
+            evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+          }
           CHECK_NOTNULL(evaluator);
         }
         break;
