@@ -62,8 +62,8 @@ void Processor::Run() {
       } else {
         std::unique_lock<std::mutex> lk_rq(mtx_rq_);
         if (strategy_ == ProcessStrategy::CLASSIC) {
-          cv_.wait_for(lk_rq, std::chrono::milliseconds(1), [this] { 
-            return !this->running_ || !this->context_->RqEmpty(); 
+          cv_.wait_for(lk_rq, std::chrono::milliseconds(1), [this] {
+            return !this->running_ || !this->context_->RqEmpty();
           });
         } else {
           cv_.wait_for(lk_rq, std::chrono::milliseconds(1));

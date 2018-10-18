@@ -15,6 +15,8 @@ limitations under the License.
 
 #include "modules/dreamview/backend/handlers/image_handler.h"
 
+#include <memory>
+
 #include "cybertron/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"

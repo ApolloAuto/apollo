@@ -1,4 +1,5 @@
 header {
+  timestamp_sec: 1526490067.7635956
 }
 is_replan: false
 gear: GEAR_DRIVE
@@ -8,10 +9,10 @@ decision {
       reason_code: STOP_REASON_STOP_SIGN
       reason: "stop by SS_CREEP_2203"
       stop_point {
-        x: 586978.32235444186
-        y: 4141242.4747485421
+        x: 586978.32357418328
+        y: 4141242.4926718017
       }
-      stop_heading: 2.6693327752053015
+      stop_heading: 2.673177386626687
       change_lane_type: FORWARD
     }
   }
@@ -24,11 +25,11 @@ decision {
           reason_code: STOP_REASON_STOP_SIGN
           distance_s: -0.3
           stop_point {
-            x: 586978.32235444186
-            y: 4141242.4747485421
+            x: 586978.32357418328
+            y: 4141242.4926718017
             z: 0
           }
-          stop_heading: 2.6693327752053015
+          stop_heading: 2.673177386626687
         }
       }
     }

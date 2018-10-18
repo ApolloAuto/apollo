@@ -66,7 +66,7 @@ class Planner {
  protected:
   PlanningConfig config_;
   ScenarioManager scenario_manager_;
-  Scenario* scenario_;
+  Scenario* scenario_ = nullptr;
 };
 
 class PlannerWithReferenceLine : public Planner {

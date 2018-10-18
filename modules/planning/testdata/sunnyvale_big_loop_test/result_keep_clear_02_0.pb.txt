@@ -1,4 +1,5 @@
 header {
+  timestamp_sec: 1527023638.1240931
 }
 is_replan: true
 gear: GEAR_DRIVE
@@ -8,10 +9,10 @@ decision {
       reason_code: STOP_REASON_CLEAR_ZONE
       reason: "stop by KC_1254"
       stop_point {
-        x: 586424.20103133633
-        y: 4140676.1581023959
+        x: 586424.1553915285
+        y: 4140676.1709626503
       }
-      stop_heading: 1.2952328024341349
+      stop_heading: 1.3030688337003014
       change_lane_type: FORWARD
     }
   }
@@ -24,10 +25,10 @@ decision {
           reason_code: STOP_REASON_OBSTACLE
           distance_s: -6
           stop_point {
-            x: 586427.47280386882
-            y: 4140689.4555914388
+            x: 586427.42409684742
+            y: 4140689.4706909908
           }
-          stop_heading: 1.3485751406181414
+          stop_heading: 1.3460085746193724
         }
       }
     }
@@ -39,11 +40,11 @@ decision {
           reason_code: STOP_REASON_CLEAR_ZONE
           distance_s: -1
           stop_point {
-            x: 586424.20103133633
-            y: 4140676.1581023959
+            x: 586424.1553915285
+            y: 4140676.1709626503
             z: 0
           }
-          stop_heading: 1.2952328024341349
+          stop_heading: 1.3030688337003014
         }
       }
     }

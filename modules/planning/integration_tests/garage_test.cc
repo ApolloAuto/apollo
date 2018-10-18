@@ -18,6 +18,7 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/common/time/time.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
@@ -46,6 +47,10 @@ class GarageTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/garage_test";
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_test_routing_response_file = "garage_routing.pb.txt";
+    FLAGS_test_previous_planning_file = "";
+    FLAGS_test_prediction_file = "";
+    FLAGS_test_localization_file = "";
+    FLAGS_test_chassis_file = "";
     FLAGS_enable_lag_prediction = false;
   }
 };
