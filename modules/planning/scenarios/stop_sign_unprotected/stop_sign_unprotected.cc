@@ -226,6 +226,23 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
   return Stage::FINISHED;
 }
 
+void StopSignUnprotectedScenario::Observe(const Frame* frame) {
+  CHECK_NOTNULL(frame);
+
+  const auto& reference_line_info = frame->reference_line_info().front();
+
+  if (!FindNextStopSign(reference_line_info)) {
+    ADEBUG << "no stop sign found";
+    return;
+  }
+
+  GetAssociatedLanes(*next_stop_sign_);
+
+  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  adc_distance_to_stop_sign_ =
+      context_.next_stop_sign_overlap.start_s - adc_front_edge_s;
+}
+
 /**
  * @brief: fine next stop sign ahead of adc along reference line
  */
