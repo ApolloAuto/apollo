@@ -25,8 +25,11 @@
 #include <utility>
 #include <vector>
 
+#include "Eigen/Core"
+#include "osqp/include/osqp.h"
+
+#include "modules/planning/math/finite_element_qp/lateral_qp_optimizer.h"
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
-#include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
 
 namespace apollo {
 namespace planning {
@@ -40,6 +43,14 @@ class LateralOSQPOptimizer : public LateralQPOptimizer {
   bool optimize(
       const std::array<double, 3>& d_state, const double delta_s,
       const std::vector<std::pair<double, double>>& d_bounds) override;
+
+ private:
+  void CalculateKernel(const std::vector<std::pair<double, double>>& d_bounds,
+                       std::vector<c_float>* P_data,
+                       std::vector<c_int>* P_indices,
+                       std::vector<c_int>* P_indptr);
+
+  double delta_s_ = 0.0;
 };
 
 }  // namespace planning
