@@ -14,8 +14,7 @@ cuda_library(
     deps = [
         "@cuda",
         "//cybertron",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/camera/common:camera_frame",
         "//modules/perception/inference/utils:inference_gemm_lib",
     ],
 )

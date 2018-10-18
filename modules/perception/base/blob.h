@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "glog/logging.h"
+#include "cybertron/common/log.h"
 #include "modules/perception/base/syncedmem.h"
 
 namespace apollo {

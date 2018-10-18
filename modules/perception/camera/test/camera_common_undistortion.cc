@@ -14,18 +14,13 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/test/camera_common_undistortion.h"
-#include <npp.h>
 
-#include <glog/logging.h>
+#include <npp.h>
 #include <boost/filesystem.hpp>
 #include <yaml-cpp/yaml.h>
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
-
 #include <vector>
-
-// #include "cybertron/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -169,7 +164,6 @@ int ImageGpuPreprocessHandler::load_camera_intrinsics(
     << "File not exists: " << intrinsics_path;
   YAML::Node node = YAML::LoadFile(intrinsics_path);
   if (node.IsNull()) {
-    // AINFO << "Load " << intrinsics_path << " failed! please check!";
     return -1;
   }
   D->resize(node["D"].size());
