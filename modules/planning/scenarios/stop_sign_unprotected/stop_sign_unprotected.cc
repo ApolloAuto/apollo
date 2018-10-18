@@ -105,23 +105,6 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
   return ptr;
 }
 
-void StopSignUnprotectedScenario::Observe(Frame* const frame) {
-  CHECK_NOTNULL(frame);
-
-  const auto& reference_line_info = frame->reference_line_info().front();
-
-  if (!FindNextStopSign(reference_line_info)) {
-    ADEBUG << "no stop sign found";
-    return;
-  }
-
-  GetAssociatedLanes(*next_stop_sign_);
-
-  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  adc_distance_to_stop_sign_ =
-      context_.next_stop_sign_overlap.start_s - adc_front_edge_s;
-}
-
 bool StopSignUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario, const common::TrajectoryPoint& ego_point,
     const Frame& frame) const {

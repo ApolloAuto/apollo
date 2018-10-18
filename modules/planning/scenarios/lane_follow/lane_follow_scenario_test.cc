@@ -58,7 +58,8 @@ TEST_F(LaneFollowScenarioTest, Init) {
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_lane_follow_config_file, &config));
-  scenario_.reset(new LaneFollowScenario(config));
+  ScenarioContext context;
+  scenario_.reset(new LaneFollowScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 }
 

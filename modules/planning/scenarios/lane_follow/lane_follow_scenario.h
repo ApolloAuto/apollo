@@ -42,9 +42,9 @@ namespace planning {
 
 class LaneFollowScenario : public Scenario {
  public:
-  LaneFollowScenario();
-  explicit LaneFollowScenario(const std::string& config_file);
-  explicit LaneFollowScenario(const ScenarioConfig& config);
+  explicit LaneFollowScenario(const ScenarioConfig& config,
+                              const ScenarioContext* context)
+      : Scenario(config, context) {}
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;

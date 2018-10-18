@@ -45,8 +45,9 @@ class SidePassScenario : public Scenario {
     PathData path_data_;
   };
 
-  SidePassScenario() : Scenario(FLAGS_scenario_side_pass_config_file) {}
-  explicit SidePassScenario(const ScenarioConfig& config) : Scenario(config) {}
+  explicit SidePassScenario(const ScenarioConfig& config,
+                            const ScenarioContext* scenario_context)
+      : Scenario(config, scenario_context) {}
 
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,
@@ -72,7 +73,7 @@ class SidePassScenario : public Scenario {
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
 
-  SidePassContext context_;
+  SidePassContext side_pass_context_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   bool stage_init_ = false;

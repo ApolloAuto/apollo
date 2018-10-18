@@ -26,11 +26,13 @@
 namespace apollo {
 namespace planning {
 
-Scenario::Scenario(const std::string& config_file) {
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_));
-}
+Scenario::Scenario(const ScenarioConfig& config, const ScenarioContext* context)
+    : config_(config), scenario_context_(context) {}
 
-Scenario::Scenario(const ScenarioConfig& config) : config_(config) {}
+bool Scenario::LoadConfig(const std::string& config_file,
+                          ScenarioConfig* config) {
+  return apollo::common::util::GetProtoFromFile(config_file, config);
+}
 
 void Scenario::Init() {
   CHECK(!config_.stage_type().empty());

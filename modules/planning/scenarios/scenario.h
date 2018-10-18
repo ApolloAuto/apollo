@@ -36,6 +36,8 @@
 namespace apollo {
 namespace planning {
 
+struct ScenarioContext {};
+
 class Scenario {
  public:
   enum ScenarioStatus {
@@ -44,9 +46,11 @@ class Scenario {
     STATUS_DONE = 2,
   };
 
-  explicit Scenario(const std::string& config_file);
+  explicit Scenario(const ScenarioConfig& config,
+                    const ScenarioContext* context);
 
-  explicit Scenario(const ScenarioConfig& config);
+  static bool LoadConfig(const std::string& config_file,
+                         ScenarioConfig* config);
 
   virtual ~Scenario() = default;
 
@@ -83,6 +87,7 @@ class Scenario {
   std::unordered_map<ScenarioConfig::StageType,
                      const ScenarioConfig::StageConfig*, std::hash<int>>
       stage_config_map_;
+  const ScenarioContext* scenario_context_ = nullptr;
 };
 
 }  // namespace planning

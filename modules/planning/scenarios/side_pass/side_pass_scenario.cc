@@ -102,7 +102,7 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
   }
   auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
                                                  stage_config);
-  ptr->SetContext(&context_);
+  ptr->SetContext(&side_pass_context_);
   return ptr;
 }
 
