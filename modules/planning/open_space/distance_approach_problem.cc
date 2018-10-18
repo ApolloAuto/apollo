@@ -87,9 +87,12 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   AINFO << "m2 " << m2;
   AINFO << "m3 " << m3;
   AINFO << "m4 " << m4;
+  AINFO << "matrix uWS beforehand: " << uWS_;
+  AINFO << "matrix xWS beforehand: " << xWS_;
 
   // TODO(QiL) : evaluate whether need to new it everytime
   bool use_fix_time_ = false;
+
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
       timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_edges_num_,
@@ -101,6 +104,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
+  app->Options()->SetStringValue("derivative_test", "first-order");
   // TODO(QiL) : Change IPOPT settings to flag or configs
   int print_level = 5;
   app->Options()->SetIntegerValue("print_level", print_level);
