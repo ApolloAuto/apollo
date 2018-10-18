@@ -32,9 +32,7 @@ using ::apollo::common::ErrorCode;
 using ::apollo::common::Status;
 using ::apollo::hdmap::PathOverlap;
 
-SidePassSafety::SidePassSafety(const TaskConfig &config) : Decider(config) {
-  SetName("SidePassSafety");
-}
+SidePassSafety::SidePassSafety(const TaskConfig &config) : Decider(config) {}
 
 Status SidePassSafety::Process(Frame *frame,
                                ReferenceLineInfo *reference_line_info) {

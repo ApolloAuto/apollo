@@ -42,7 +42,6 @@ constexpr double kPlanDistAfterObs = 3.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {
-  SetName("SidePassPathDecider");
   fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
   delta_s_ = config.side_pass_path_decider_config().path_resolution();
   const int n = static_cast<int>(
