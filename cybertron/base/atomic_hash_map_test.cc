@@ -64,8 +64,7 @@ TEST(AtomicHashMapTest, int_str) {
   }
 }
 
-TEST(AtomicHashMapTest, concurrency) {
-}
+TEST(AtomicHashMapTest, concurrency) {}
 
 }  // namespace base
 }  // namespace cybertron
