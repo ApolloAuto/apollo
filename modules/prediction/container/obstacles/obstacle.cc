@@ -233,7 +233,7 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
   Feature* latest_feature_ptr = mutable_latest_feature();
   latest_feature_ptr->mutable_junction_feature()->set_junction_id(junction_id);
   if (feature_history_.size() == 1) {
-    // TODO(all) build junction exits without enter lane
+    BuildJunctionExitsWithoutEnterLane(junction_id);
     return;
   }
   const Feature& prev_feature = feature(1);
@@ -244,10 +244,20 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
     latest_feature_ptr->mutable_junction_feature()
                       ->mutable_enter_lane()
                       ->set_lane_id(enter_lane_id);
-    // TODO(all) build junction exits with enter lane
+    BuildJunctionExitsWithEnterLane(junction_id);
   } else {
-    // TODO(all) build junction exits without enter lane
+    BuildJunctionExitsWithoutEnterLane(junction_id);
   }
+}
+
+void Obstacle::BuildJunctionExitsWithEnterLane(
+    const std::string& junction_id) {
+  // TODO(kechxu) implement
+}
+
+void Obstacle::BuildJunctionExitsWithoutEnterLane(
+    const std::string& junction_id) {
+  // TODO(kechxu) implement
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
