@@ -24,6 +24,8 @@ namespace prediction {
 using ::apollo::hdmap::LaneInfo;
 
 std::unordered_map<std::string, LaneGraph> ObstacleClusters::lane_graphs_;
+std::unordered_map<std::string, JunctionFeature>
+    ObstacleClusters::junction_features_;
 
 void ObstacleClusters::Clear() { lane_graphs_.clear(); }
 
@@ -53,6 +55,19 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
   road_graph.BuildLaneGraph(&lane_graph);
   lane_graphs_[lane_id] = std::move(lane_graph);
   return lane_graphs_[lane_id];
+}
+
+const JunctionFeature& ObstacleClusters::GetJunctionFeature(
+    const std::string& enter_lane_id, const std::string& junction_id) {
+  if (junction_features_.find(enter_lane_id) != junction_features_.end()) {
+    return junction_features_[enter_lane_id];
+  }
+  JunctionFeature junction_feature;
+  junction_feature.set_junction_id(junction_id);
+  junction_feature.mutable_enter_lane()->set_lane_id(enter_lane_id);
+  // TODO(all) add junction exits into junction feature
+  junction_features_[enter_lane_id] = std::move(junction_feature);
+  return junction_features_[enter_lane_id];
 }
 
 }  // namespace prediction

@@ -24,6 +24,7 @@
 #include "cyber/common/macros.h"
 
 #include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/prediction/proto/feature.pb.h"
 
 #include "modules/map/hdmap/hdmap_common.h"
 
@@ -48,6 +49,9 @@ class ObstacleClusters {
       const double start_s, const double length,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
+  static const JunctionFeature& GetJunctionFeature(
+      const std::string& enter_lane_id, const std::string& junction_id);
+
  private:
   ObstacleClusters() = delete;
 
@@ -55,6 +59,7 @@ class ObstacleClusters {
 
  private:
   static std::unordered_map<std::string, LaneGraph> lane_graphs_;
+  static std::unordered_map<std::string, JunctionFeature> junction_features_;
 };
 
 }  // namespace prediction
