@@ -207,6 +207,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 
 bool Obstacle::IsInJunction(const std::string& junction_id) {
   // TODO(all) Consider if need to use vehicle front rather than position
+  // TODO(all) refactor according to virtual lane if needed
   if (feature_history_.size() == 0) {
     AERROR << "Obstacle [" << id_ << "] has no history";
     return false;
@@ -220,6 +221,33 @@ bool Obstacle::IsInJunction(const std::string& junction_id) {
 
 void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
   // TODO(all) implement
+  if (feature_history_.size() == 0) {
+    AERROR << "Obstacle [" << id_ << "] has no history";
+    return;
+  }
+  if (!IsInJunction(junction_id)) {
+    ADEBUG << "Obstacle [" << id_ << "] is not in junction ["
+           << junction_id << "]";
+    return;
+  }
+  Feature* latest_feature_ptr = mutable_latest_feature();
+  latest_feature_ptr->mutable_junction_feature()->set_junction_id(junction_id);
+  if (feature_history_.size() == 1) {
+    // TODO(all) build junction exits without enter lane
+    return;
+  }
+  const Feature& prev_feature = feature(1);
+  if (prev_feature.junction_feature().has_enter_lane()) {
+    CHECK(prev_feature.junction_feature().enter_lane().has_lane_id());
+    std::string enter_lane_id =
+        prev_feature.junction_feature().enter_lane().lane_id();
+    latest_feature_ptr->mutable_junction_feature()
+                      ->mutable_enter_lane()
+                      ->set_lane_id(enter_lane_id);
+    // TODO(all) build junction exits with enter lane
+  } else {
+    // TODO(all) build junction exits without enter lane
+  }
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
