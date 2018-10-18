@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <sstream>
 #include <unordered_map>
 
 #include "cybertron/common/log.h"
@@ -83,13 +84,14 @@ class RecordWriter : public RecordBase {
 
   uint64_t segment_raw_size_ = 0;
   uint64_t segment_begin_time_ = 0;
-  uint64_t file_index_ = 0;
+  uint32_t file_index_ = 0;
   MessageNumberMap channel_message_number_map_;
   MessageTypeMap channel_message_type_map_;
   MessageProtoDescMap channel_proto_desc_map_;
   FileWriterPtr file_writer_ = nullptr;
   FileWriterPtr file_writer_backup_ = nullptr;
   std::mutex mutex_;
+  std::stringstream sstream_;
 };
 
 template <>
