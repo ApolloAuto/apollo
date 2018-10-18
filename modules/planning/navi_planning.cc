@@ -56,6 +56,7 @@ NaviPlanning::~NaviPlanning() { Stop(); }
 std::string NaviPlanning::Name() const { return "navi_planning"; }
 
 Status NaviPlanning::Init() {
+  common::util::ThreadPool::Init(FLAGS_max_planning_thread_pool_size);
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
