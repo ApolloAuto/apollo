@@ -1,0 +1,41 @@
+syntax = "proto2";
+
+package apollo.dbmap;
+
+message DBPoint {
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+  optional double s = 4;
+  optional double heading = 5;
+}
+
+message DBLine {
+  repeated DBPoint point = 1;
+}
+
+message DBNeighbourSegment {
+  optional double start_s = 1;
+  optional double end_s = 2;
+  optional string path_id = 3;
+  optional double path_start_s = 4;
+  optional double path_end_s = 5;
+}
+
+message DBNeighbourPath {
+  repeated DBNeighbourSegment segment = 1;
+}
+
+message DBPath {
+  optional string id = 1;
+  repeated DBLine path = 2;
+  repeated DBLine left_bounday = 3;
+  repeated DBLine right_bounday = 4;
+  repeated DBNeighbourPath left_path = 5;
+  repeated DBNeighbourPath right_path = 6;
+  repeated DBNeighbourPath duplicate_path = 7;
+}
+
+message DBMap {
+  repeated DBPath paths = 1;
+}
