@@ -32,9 +32,9 @@ namespace scheduler {
 
 class ProcessorContext;
 
-using apollo::cybertron::proto::ProcessStrategy;
 using croutine::CRoutine;
 using croutine::RoutineContext;
+using apollo::cybertron::proto::ProcessStrategy;
 
 struct ProcessorStat {
   uint64_t switch_num = 0;
@@ -75,7 +75,7 @@ class Processor {
   std::shared_ptr<ProcessorContext> context_;
   uint32_t id_ = 0;
   bool running_ = true;
-  ProcessStrategy strategy_ = ProcessStrategy::CFS;
+  ProcessStrategy strategy_ = ProcessStrategy::CHOREO;
 };
 
 }  // namespace scheduler

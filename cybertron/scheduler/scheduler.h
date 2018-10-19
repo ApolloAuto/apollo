@@ -85,7 +85,8 @@ class Scheduler {
   std::mutex task_id_map_mutex_;
   std::unordered_map<uint64_t, std::string> task_id_map_;
   uint32_t proc_num_;
-  ProcessStrategy sched_policy_ = ProcessStrategy::CFS;
+  uint32_t task_pool_size_;
+  ProcessStrategy sched_policy_ = ProcessStrategy::CHOREO;
   std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
   std::mutex mtx_ctx_qsize_;
   std::multimap<int, std::shared_ptr<ProcessorContext>> ctx_qsize_;

@@ -24,6 +24,7 @@
 namespace apollo {
 namespace cybertron {
 
+using apollo::cybertron::common::GlobalData;
 static const char* const task_prefix = "/internal/task";
 
 TaskManager::TaskManager()
@@ -43,10 +44,22 @@ TaskManager::TaskManager()
     }
   };
 
+  uint32_t pool_size = 0;
+  auto gconf = GlobalData::Instance()->Config();
+  if (gconf.has_scheduler_conf()) {
+    if (gconf.scheduler_conf().has_task_pool_conf()) {
+      pool_size = gconf.scheduler_conf().task_pool_conf().task_pool_size();
+    } else {
+      AERROR << "No task pool conf";
+      return;
+    }
+  } else {
+    AERROR << "No scheduler conf";
+    return;
+  }
   auto factory = croutine::CreateRoutineFactory(std::move(func));
-  num_threads_ = scheduler::Scheduler::Instance()->ProcessorNum();
-  tasks_.reserve(num_threads_);
-  for (uint32_t i = 0; i < num_threads_; i++) {
+  tasks_.reserve(pool_size);
+  for (uint32_t i = 0; i < pool_size; i++) {
     auto task_name = task_prefix + std::to_string(i);
     tasks_.push_back(common::GlobalData::RegisterTaskName(task_name));
     scheduler::Scheduler::Instance()->CreateTask(factory, task_name);

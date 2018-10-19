@@ -8,14 +8,14 @@ cc_library(
         "processor.cc",
         "processor_context.cc",
         "scheduler.cc",
-        "policy/cfs.cc",
+        "policy/task_choreo.cc",
         "policy/classic.cc",
     ],
     hdrs = [
         "processor.h",
         "processor_context.h",
         "scheduler.h",
-        "policy/cfs.h",
+        "policy/task_choreo.h",
         "policy/classic.h",
     ],
     deps = [

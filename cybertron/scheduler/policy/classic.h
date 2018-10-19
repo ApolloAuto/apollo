@@ -53,4 +53,4 @@ class ClassicContext : public ProcessorContext {
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_SCHEDULER_POLICY_CLASSIC_H_
+#endif  // CYBERTRON_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
