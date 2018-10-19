@@ -15,7 +15,7 @@ cc_library(
         "//modules/planning/open_space:distance_approach_problem",
         "//modules/planning/open_space:hybrid_a_star",
         "//external:gflags",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",

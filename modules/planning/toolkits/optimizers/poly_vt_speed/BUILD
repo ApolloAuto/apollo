@@ -69,7 +69,7 @@ cc_library(
     deps = [
         ":piecewise_poly_speed_profile",
         ":piecewise_poly_speed_curve",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/proto:poly_vt_speed_config_proto",
     ]
@@ -96,7 +96,7 @@ cc_library(
         "poly_vt_speed_optimizer.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/status",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",

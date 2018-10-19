@@ -19,16 +19,15 @@ cc_library(
 cc_library(
     name = "file",
     srcs = [
-          "file.cc",
+        "file.cc",
     ],
     hdrs = [
-          "file.h",
+        "file.h",
     ],
     deps = [
         "//cyber/common:log",
     ],
 )
-
 
 cc_test(
     name = "file_test",
@@ -46,7 +45,10 @@ cc_test(
 cc_library(
     name = "log",
     hdrs = [
-          "log.h",
+        "log.h",
+    ],
+    linkopts = [
+        "-lglog",
     ],
     deps = [
         "//cyber:binary",
@@ -80,20 +82,20 @@ cc_test(
 cc_library(
     name = "environment",
     hdrs = [
-          "environment.h",
+        "environment.h",
     ],
     deps = [
-#"//cyber/common:log",
+        #"//cyber/common:log",
     ],
 )
 
 cc_library(
     name = "global_data",
     srcs = [
-          "global_data.cc",
+        "global_data.cc",
     ],
     hdrs = [
-          "global_data.h",
+        "global_data.h",
     ],
     deps = [
         "//cyber/base:atomic_hash_map",
@@ -109,30 +111,29 @@ cc_library(
 cc_library(
     name = "macros",
     hdrs = [
-          "macros.h",
+        "macros.h",
     ],
 )
 
 cc_library(
     name = "time_conversion",
     hdrs = [
-          "time_conversion.h",
+        "time_conversion.h",
     ],
 )
 
 cc_library(
     name = "types",
     hdrs = [
-          "types.h",
+        "types.h",
     ],
 )
 
 cc_library(
     name = "util",
     hdrs = [
-          "util.h",
+        "util.h",
     ],
 )
-
 
 cpplint()

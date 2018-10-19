@@ -11,7 +11,7 @@ cc_library(
         "side_pass_scenario.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//external:gflags",
         "//modules/common",
         "//modules/common/proto:pnc_point_proto",

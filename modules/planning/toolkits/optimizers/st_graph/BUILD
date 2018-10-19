@@ -63,7 +63,7 @@ cc_test(
     ],
     deps = [
         ":st_boundary_mapper",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
         "@gtest//:main",
@@ -82,7 +82,7 @@ cc_test(
     ],
     deps = [
         ":st_boundary_mapper",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
         "@gtest//:main",
@@ -97,7 +97,7 @@ cc_test(
     ],
     deps = [
         ":st_graph_data",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
         "@gtest//:main",

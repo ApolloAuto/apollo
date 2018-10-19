@@ -136,7 +136,7 @@ cc_library(
     ],
     deps = [
         ":planning_gflags",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/map/pnc_map:path",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
@@ -185,7 +185,7 @@ cc_library(
         ":ego_info",
         ":path_decision",
         ":planning_gflags",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
@@ -256,7 +256,7 @@ cc_test(
 #    deps = [
 #        ":planning_gflags",
 #        "//modules/prediction/proto:prediction_proto",
-#        "//cyber",
+#        "//cyber/common:log",
 #    ],
 #)
 
@@ -306,7 +306,7 @@ cc_library(
         ":obstacle",
         ":reference_line_info",
         "//modules/common/monitor_log",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap:hdmap_util",
@@ -335,7 +335,7 @@ cc_library(
         #":lag_prediction",
         ":obstacle",
         "//modules/common/configs:vehicle_config_helper",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/monitor_log",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/hdmap:hdmap_util",
@@ -423,7 +423,7 @@ cc_library(
     ],
     deps = [
         ":obstacle",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/math:geometry",
@@ -487,7 +487,7 @@ cc_library(
         #":frame_open_space",
         ":planning_gflags",
         ":speed_limit",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
         "@eigen",

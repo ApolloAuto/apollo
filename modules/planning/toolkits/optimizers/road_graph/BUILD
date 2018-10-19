@@ -18,7 +18,7 @@ cc_library(
         "waypoint_sampler.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/status",

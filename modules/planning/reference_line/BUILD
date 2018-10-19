@@ -13,7 +13,7 @@ cc_library(
         "reference_point.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:string_util",
