@@ -46,12 +46,17 @@ class LaneFollowScenario : public Scenario {
                               const ScenarioContext* context)
       : Scenario(config, context) {}
 
+  void Init() override;
+
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
 
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,
                       const Frame& frame) const override;
+
+ private:
+  bool init_ = false;
 };
 
 }  // namespace planning

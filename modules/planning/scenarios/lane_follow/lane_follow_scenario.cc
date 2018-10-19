@@ -64,6 +64,16 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
+void LaneFollowScenario::Init() {
+  if (init_) {
+    return;
+  }
+
+  Scenario::Init();
+
+  init_ = true;
+}
+
 std::unique_ptr<Stage> LaneFollowScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
   if (stage_config.stage_type() != ScenarioConfig::LANE_FOLLOW_DEFAULT_STAGE) {

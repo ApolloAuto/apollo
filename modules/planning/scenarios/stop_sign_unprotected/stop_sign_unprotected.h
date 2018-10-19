@@ -53,6 +53,8 @@ class StopSignUnprotectedScenario : public Scenario {
                                        const ScenarioContext* context)
       : Scenario(config, context) {}
 
+  void Init() override;
+
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
@@ -61,8 +63,6 @@ class StopSignUnprotectedScenario : public Scenario {
                       const Frame& frame) const override;
 
   StopSignUnprotectedContext* GetContext() { return &context_; }
-
-  void Init() override;
 
  private:
   static void RegisterStages();
