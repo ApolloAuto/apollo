@@ -41,6 +41,11 @@ class JunctionMLPEvaluator : public Evaluator {
   virtual ~JunctionMLPEvaluator() = default;
 
   /**
+   * @brief Clear obstacle feature map
+   */
+  void Clear();
+
+  /**
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
@@ -48,16 +53,33 @@ class JunctionMLPEvaluator : public Evaluator {
 
  private:
   /**
+   * @brief Set obstacle feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void SetObstacleFeatureValues(Obstacle* obstacle_ptr,
+                                std::vector<double>* feature_values);
+
+  /**
+   * @brief Set junction feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void SetJunctionFeatureValues(Obstacle* obstacle_ptr,
+                                std::vector<double>* feature_values);
+
+/**
+   * @brief Find junction path
+   * @param Obstacle pointer
+   */
+  void FindJunctionPath(Obstacle* obstacle_ptr,
+                        std::vector<double>* path_values);
+
+  /**
    * @brief Load mode file
    * @param Model file name
    */
   void LoadModel(const std::string& model_file);
-
-  /**
-   * @brief Cluster lane ids by exit
-   * @param feature per frame
-   */
-  void ClusterLaneIds(Feature* feature_ptr);
 
   /**
    * @brief Compute probability of a junction exit
@@ -65,7 +87,9 @@ class JunctionMLPEvaluator : public Evaluator {
   double ComputeProbability(const std::vector<double>& feature_values);
 
  private:
-  std::unordered_map<int, std::vector<std::string>> junction_exit_lane_ids_;
+  std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
+  static const size_t OBSTACLE_FEATURE_SIZE = 22;
+  static const size_t JUNCTION_FEATURE_SIZE = 40;
 };
 
 }  // namespace prediction

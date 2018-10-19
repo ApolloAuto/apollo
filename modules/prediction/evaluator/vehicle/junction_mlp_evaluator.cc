@@ -15,13 +15,33 @@
  *****************************************************************************/
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
+
+#include <memory>
+
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
+
+using apollo::hdmap::LaneInfo;
 
 namespace apollo {
 namespace prediction {
 
+double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
+  int count = 0;
+  double sum = 0.0;
+  for (size_t i = start; i <= end && i < nums.size(); i++) {
+    sum += nums[i];
+    ++count;
+  }
+  return (count == 0) ? 0.0 : sum / count;
+}
+
 JunctionMLPEvaluator::JunctionMLPEvaluator() {
   LoadModel(FLAGS_evaluator_vehicle_junction_mlp_file);
+}
+
+void JunctionMLPEvaluator::Clear() {
+  obstacle_feature_values_map_.clear();
 }
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
@@ -30,9 +50,50 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // 2. compute probabilities
 }
 
-void JunctionMLPEvaluator::ClusterLaneIds(Feature* feature_ptr) {
+void JunctionMLPEvaluator::SetObstacleFeatureValues(
+    Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+  feature_values->clear();
+  feature_values->reserve(OBSTACLE_FEATURE_SIZE);
   // TODO(all) implement
-  // group lane ids belonging to the same junction exit
+}
+
+void JunctionMLPEvaluator::SetJunctionFeatureValues(
+    Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+  feature_values->clear();
+  feature_values->reserve(JUNCTION_FEATURE_SIZE);
+  // TODO(all) implement
+}
+
+void JunctionMLPEvaluator::FindJunctionPath(
+    Obstacle* obstacle_ptr, std::vector<double>* path_values) {
+  CHECK_NOTNULL(obstacle_ptr);
+  path_values->clear();
+  path_values->reserve(40);
+  const Feature& feature = obstacle_ptr->latest_feature();
+  if (!feature.has_junction_feature()) {
+    AERROR << "Obstacle [" << obstacle_ptr->id()
+           << "] has no junction_feature.";
+    return;
+  }
+  std::string junction_id = "";
+  if (feature.junction_feature().has_junction_id()) {
+    junction_id = feature.junction_feature().junction_id();
+  }
+  int num_junction_exit = feature.junction_feature().junction_exit_size();
+  for (int i = 0; i < num_junction_exit; ++i) {
+    const JunctionExit& junction_exit =
+        feature.junction_feature().junction_exit(i);
+    if (!junction_exit.has_pred_exit_lane_id()) {
+      AERROR << "JunctionExit [" << i
+             << "] has no pred_exit_lane.";
+      return;
+    }
+    const std::string& pred_exit_lane_id = junction_exit.pred_exit_lane_id();
+    std::shared_ptr<const LaneInfo> pre_exit_lane_info =
+        PredictionMap::LaneById(pred_exit_lane_id);
+    // Under construction~
+  }
+  // TODO(all) implement
 }
 
 void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {

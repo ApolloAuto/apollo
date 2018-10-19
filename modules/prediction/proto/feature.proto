@@ -42,8 +42,8 @@ message JunctionMLPFeature {
 }
 
 message JunctionExit {
-  optional LaneFeature exit_lane = 1;
-  optional LaneFeature pred_exit_lane = 2;  // exit lane's predecessor
+  optional string exit_lane_id = 1;
+  optional string pred_exit_lane_id = 2;  // exit lane's predecessor id
 }
 
 message JunctionFeature {
