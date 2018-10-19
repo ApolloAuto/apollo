@@ -67,6 +67,7 @@ void ShmDispatcher::ThreadFunc() {
   int addr_len = sizeof(local_addr_);
   MessageInfo msg_info;
   std::string msg_info_str("");
+  std::shared_ptr<std::string> msg_str_ptr = std::make_shared<std::string>();
 
   while (!shutdown_) {
     int read_bytes =
@@ -92,8 +93,6 @@ void ShmDispatcher::ThreadFunc() {
     {
       ReadLockGuard<AtomicRWLock> lock(segments_lock_);
       if (segments_.count(channel_id) > 0) {
-        std::shared_ptr<std::string> msg_str_ptr =
-            std::make_shared<std::string>();
         if (!segments_[channel_id]->Read(block_index, msg_str_ptr.get(),
                                          &msg_info_str)) {
           AERROR << "read msg failed, channel:"
