@@ -13,9 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/obj_postprocessor.h"  // NO_LINT
-// #include "modules/perception/lib/postprocessor/obj_postprocessor.h"
-// #include <iostream>
+#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/obj_postprocessor.h"
 
 // TODO(Xun & Yucheng): code completion
 namespace apollo {

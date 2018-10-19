@@ -17,11 +17,9 @@
 #include <fstream>
 #include <sstream>
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
-
-DECLARE_string(work_root);
-DECLARE_string(config_manager_path);
 
 namespace apollo {
 namespace perception {
