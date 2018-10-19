@@ -2,7 +2,7 @@
 
 #include "cybertron/common/util.h"
 #include "cybertron/cybertron.h"
-#include "cybertron/scheduler/policy/cfs.h"
+#include "cybertron/scheduler/policy/task_choreo.h"
 #include "cybertron/scheduler/processor.h"
 
 namespace apollo {
@@ -10,14 +10,14 @@ namespace cybertron {
 namespace scheduler {
 
 void func() {}
-TEST(SchedulerPolicyTest, cfs) {
+TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
-  ctx.reset(new CFSContext(processor));
+  ctx.reset(new TaskChoreoContext(processor));
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   EXPECT_TRUE(ctx->RqEmpty());
-  cr->SetId(common::Hash("cfs"));
+  cr->SetId(common::Hash("choreo"));
   ctx->Push(cr);
   // repeat Push the same CRoutine
   EXPECT_TRUE(ctx->NextRoutine() != nullptr);

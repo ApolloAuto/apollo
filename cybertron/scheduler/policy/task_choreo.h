@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_
-#define CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_
+#ifndef CYBERTRON_SCHEDULER_POLICY_TASK_CHOREO_CONTEXT_H_
+#define CYBERTRON_SCHEDULER_POLICY_TASK_CHOREO_CONTEXT_H_
 
 #include <cstdint>
 #include <functional>
@@ -38,23 +38,16 @@ class Processor;
 
 using croutine::CRoutine;
 
-class CFSContext : public ProcessorContext {
+class TaskChoreoContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
-  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) override;
   bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
   bool RqEmpty() override;
 
  private:
-  std::shared_ptr<CRoutine> NextLocalRoutine();
-  std::shared_ptr<CRoutine> NextAffinityRoutine();
-
   std::mutex mtx_run_queue_;
-  std::mutex rw_affinity_lock_;
-  std::multimap<double, std::shared_ptr<CRoutine>> local_rt_queue_;
-  std::multimap<double, std::shared_ptr<CRoutine>, std::greater<double>>
-      affinity_rt_queue_;
-  std::shared_ptr<CRoutine> cur_croutine_ = nullptr;
+  std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
+      rt_queue_;
   double min_vruntime_ = 0;
 };
 
@@ -62,4 +55,4 @@ class CFSContext : public ProcessorContext {
 }  // namespace cybertron
 }  // namespace apollo
 
-#endif  // CYBERTRON_SCHEDULER_POLICY_CFS_CONTEXT_H_
+#endif  // CYBERTRON_SCHEDULER_POLICY_CHOREO_CONTEXT_H_

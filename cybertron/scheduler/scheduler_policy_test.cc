@@ -19,7 +19,7 @@
 
 #include "cybertron/common/util.h"
 #include "cybertron/cybertron.h"
-#include "cybertron/scheduler/policy/cfs.h"
+#include "cybertron/scheduler/policy/task_choreo.h"
 #include "cybertron/scheduler/processor.h"
 
 namespace apollo {
@@ -27,16 +27,16 @@ namespace cybertron {
 namespace scheduler {
 
 void func() {}
-TEST(SchedulerPolicyTest, cfs) {
+TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
-  ctx.reset(new CFSContext());
+  ctx.reset(new TaskChoreoContext());
   processor->BindContext(ctx);
   ctx->BindProcessor(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   EXPECT_TRUE(ctx->RqEmpty());
-  cr->set_id(common::Hash("cfs"));
+  cr->set_id(common::Hash("choreo"));
 }
 
 }  // namespace scheduler

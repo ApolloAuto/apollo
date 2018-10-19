@@ -63,10 +63,6 @@ class CRoutine {
   void HangUp();
   void Sleep(const Duration &sleep_duration);
 
-  void AddAffinityProcessor(int processor_id);
-  const std::set<int> &GetAffinityProcessorSet() const;
-  bool IsAffinity(int processor_id);
-
   // getter and setter
   RoutineState state() const;
   void set_state(const RoutineState &state);
@@ -109,7 +105,6 @@ class CRoutine {
   void Unlock();
 
   std::string name_;
-  std::set<int> affinity_processor_id_set_;
   std::chrono::steady_clock::time_point wake_time_;
 
   RoutineFunc func_;
@@ -202,19 +197,6 @@ inline int CRoutine::processor_id() const { return processor_id_; }
 
 inline void CRoutine::set_processor_id(int processor_id) {
   processor_id_ = processor_id;
-}
-
-inline void CRoutine::AddAffinityProcessor(int processor_id) {
-  affinity_processor_id_set_.insert(processor_id);
-}
-
-inline const std::set<int> &CRoutine::GetAffinityProcessorSet() const {
-  return affinity_processor_id_set_;
-}
-
-inline bool CRoutine::IsAffinity(int processor_id) {
-  return affinity_processor_id_set_.find(processor_id) !=
-         affinity_processor_id_set_.end();
 }
 
 inline RoutineState CRoutine::UpdateState() {

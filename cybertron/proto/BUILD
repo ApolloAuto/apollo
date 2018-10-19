@@ -51,9 +51,6 @@ proto_library(
     srcs = [
         "scheduler_conf.proto",
     ],
-    deps = [
-        ":processor_conf_proto",
-    ],
 )
 
 cc_proto_library(
@@ -123,20 +120,6 @@ proto_library(
     name = "record_conf_proto",
     srcs = [
         "record_conf.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "processor_conf_cc_proto",
-    deps = [
-        ":processor_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "processor_conf_proto",
-    srcs = [
-        "processor_conf.proto",
     ],
 )
 
