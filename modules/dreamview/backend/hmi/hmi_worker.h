@@ -23,7 +23,7 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
@@ -47,7 +47,7 @@ using ChangeVehicleHandler = std::function<void(const std::string&)>;
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
-  explicit HMIWorker(const std::shared_ptr<apollo::cybertron::Node>& node);
+  explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
 
   // High level HMI action trigger.
   bool Trigger(const HMIAction action);
@@ -127,7 +127,7 @@ class HMIWorker {
 
  private:
   void InitReadersAndWriters(
-      const std::shared_ptr<apollo::cybertron::Node>& node);
+      const std::shared_ptr<apollo::cyber::Node>& node);
 
   // Run command: scripts/cyber_launch.sh <command> <current_launch>
   bool CyberLaunch(const std::string& command) const;
@@ -141,9 +141,9 @@ class HMIWorker {
   std::vector<ChangeMapHandler> change_map_handlers_;
   std::vector<ChangeVehicleHandler> change_vehicle_handlers_;
 
-  std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>> chassis_reader_;
-  std::shared_ptr<cybertron::Writer<apollo::control::PadMessage>> pad_writer_;
-  std::shared_ptr<cybertron::Writer<apollo::common::DriveEvent>>
+  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
+  std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;
 };
 

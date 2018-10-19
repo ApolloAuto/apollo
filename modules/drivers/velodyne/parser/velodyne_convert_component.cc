@@ -18,7 +18,7 @@
 #include <string>
 #include <thread>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/velodyne/parser/velodyne_convert_component.h"
 

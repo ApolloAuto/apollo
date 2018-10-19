@@ -19,7 +19,7 @@
 #include <gflags/gflags.h>
 #include <gtest/gtest.h>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
 namespace apollo {
@@ -33,8 +33,8 @@ namespace map {
 class HDMapInputTest : public testing::Test {
  protected:
   virtual void SetUp() {
-    //    char* cybertron_path = "CYBERTRON_PATH=";
-    //    putenv(cybertron_path);
+    //    char* cyber_path = "CYBER_PATH=";
+    //    putenv(cyber_path);
     //    char* module_path = "MODULE_PATH=";
     //    putenv(module_path);
     //    FLAGS_config_manager_path = "/apollo/modules/perception/testdata/"

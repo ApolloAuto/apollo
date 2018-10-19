@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include <functional>
 #include <memory>
@@ -82,7 +82,7 @@ class CyberChannReader {
   bool CreateChannel(const std::string& channelName,
                      const std::string& nodeName) {
     if (channel_node_ == nullptr) {
-      channel_node_ = apollo::cybertron::CreateNode(nodeName);
+      channel_node_ = apollo::cyber::CreateNode(nodeName);
       if (channel_node_ == nullptr) {
         return false;
       }
@@ -99,6 +99,6 @@ class CyberChannReader {
   }
 
   CyberChannelCallback<T> channel_callback_;
-  std::shared_ptr<apollo::cybertron::Reader<T>> channel_reader_;
-  std::shared_ptr<apollo::cybertron::Node> channel_node_;
+  std::shared_ptr<apollo::cyber::Reader<T>> channel_reader_;
+  std::shared_ptr<apollo::cyber::Node> channel_node_;
 };

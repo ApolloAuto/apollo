@@ -21,7 +21,7 @@
 #include "modules/perception/camera/lib/obstacle/tracker/common/kalman_filter.h"
 #include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/similar.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

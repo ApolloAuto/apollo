@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 
 #include "CivetServer.h"
@@ -67,7 +67,7 @@ class ImageHandler : public CivetHandler {
   std::mutex mutex_;
   std::condition_variable cvar_;
 
-  std::unique_ptr<cybertron::Node> node_;
+  std::unique_ptr<cyber::Node> node_;
 };
 
 }  // namespace dreamview

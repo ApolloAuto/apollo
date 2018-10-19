@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <thread>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/gnss/stream/stream.h"
 

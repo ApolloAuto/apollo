@@ -17,7 +17,7 @@
 
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "google/protobuf/text_format.h"
 
 #include "modules/perception/common/perception_gflags.h"
@@ -37,7 +37,7 @@ ConfigManager::ConfigManager() {
   if (work_root_.empty()) {
     work_root_ = get_env("MODULE_PATH");
     if (work_root_.empty()) {
-      work_root_ = get_env("CYBERTRON_PATH");
+      work_root_ = get_env("CYBER_PATH");
     }
   }
 }

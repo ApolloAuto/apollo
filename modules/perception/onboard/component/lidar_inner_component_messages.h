@@ -18,7 +18,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class LidarFrameMessage : public apollo::cybertron::message::IntraMessage {
+class LidarFrameMessage : public apollo::cyber::message::IntraMessage {
  public:
   LidarFrameMessage() : lidar_frame_(nullptr) {
     type_name_ = "LidarFrameMessage";

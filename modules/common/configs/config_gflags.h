@@ -34,7 +34,7 @@ DECLARE_double(look_forward_time_sec);
 
 DECLARE_string(vehicle_config_path);
 
-DECLARE_bool(use_cybertron_time);
+DECLARE_bool(use_cyber_time);
 
 DECLARE_string(localization_tf2_frame_id);
 DECLARE_string(localization_tf2_child_frame_id);

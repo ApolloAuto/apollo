@@ -16,7 +16,7 @@ cc_library(
     deps = [
         "//modules/drivers/velodyne/driver:driver",
         "//modules/common/util:message_util",
-        "//cybertron",
+        "//cyber",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
@@ -40,7 +40,7 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//modules/drivers/velodyne/proto:velodyne_proto",
-        "//cybertron",
+        "//cyber",
         "@pcl",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']

@@ -30,8 +30,8 @@ namespace lidar {
 class LidarLibGroundServiceDetectorTest : public testing::Test {
  protected:
   void SetUp() {
-    char cybertron_path[] = "CYBERTRON_PATH=";
-    putenv(cybertron_path);
+    char cyber_path[] = "CYBER_PATH=";
+    putenv(cyber_path);
     char module_path[] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root = "/apollo/modules/perception/testdata/"

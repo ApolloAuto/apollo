@@ -24,7 +24,7 @@
 #include <memory>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
@@ -647,7 +647,7 @@ bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
     return false;
   }
 
-  ins_.mutable_header()->set_timestamp_sec(cybertron::Time::Now().ToSecond());
+  ins_.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
   return true;
 }
 
@@ -696,7 +696,7 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
     return false;
   }
 
-  ins_.mutable_header()->set_timestamp_sec(cybertron::Time::Now().ToSecond());
+  ins_.mutable_header()->set_timestamp_sec(cyber::Time::Now().ToSecond());
   return true;
 }
 

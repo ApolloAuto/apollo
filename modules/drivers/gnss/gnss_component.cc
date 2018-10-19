@@ -19,7 +19,7 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using apollo::cybertron::proto::RoleAttributes;
+using apollo::cyber::proto::RoleAttributes;
 
 GnssDriverComponent::GnssDriverComponent()
     : monitor_logger_buffer_(
@@ -27,7 +27,7 @@ GnssDriverComponent::GnssDriverComponent()
 
 bool GnssDriverComponent::Init() {
   config::Config gnss_config;
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
                                                    &gnss_config)) {
     monitor_logger_buffer_.ERROR(
         "Unable to load gnss conf file: " + config_file_path_);

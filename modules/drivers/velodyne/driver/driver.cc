@@ -18,7 +18,7 @@
 #include <ctime>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/velodyne/driver/driver.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
@@ -118,7 +118,7 @@ bool VelodyneDriver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
-  scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
+  scan->mutable_header()->set_timestamp_sec(cyber::Time().Now().ToSecond());
   scan->mutable_header()->set_frame_id(config_.frame_id());
   scan->set_model(config_.model());
   scan->set_mode(config_.mode());
@@ -165,7 +165,7 @@ int VelodyneDriver::PollStandard(std::shared_ptr<VelodyneScan> scan) {
 }
 
 void VelodyneDriver::PollPositioningPacket(void) {
-  while (!cybertron::IsShutdown()) {
+  while (!cyber::IsShutdown()) {
     NMEATimePtr nmea_time(new NMEATime);
     bool ret = true;
     if (config_.has_use_gps_time() && !config_.use_gps_time()) {
@@ -183,7 +183,7 @@ void VelodyneDriver::PollPositioningPacket(void) {
             << "day:" << nmea_time->day << "hour:" << nmea_time->hour
             << "min:" << nmea_time->min << "sec:" << nmea_time->sec;
     } else {
-      while (!cybertron::IsShutdown()) {
+      while (!cyber::IsShutdown()) {
         int rc = positioning_input_->get_positioning_data_packet(nmea_time);
         if (rc == 0) {
           break;  // got a full packet

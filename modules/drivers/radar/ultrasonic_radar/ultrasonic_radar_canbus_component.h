@@ -28,17 +28,17 @@ namespace apollo {
 namespace drivers {
 namespace ultrasonic_radar {
 
-class UltrasonicRadarCanbusComponent : public apollo::cybertron::Component<> {
+class UltrasonicRadarCanbusComponent : public apollo::cyber::Component<> {
  public:
   UltrasonicRadarCanbusComponent();
   ~UltrasonicRadarCanbusComponent() = default;
   bool Init() override;
  private:
   UltrasonicRadarCanbus utralsonic_radar_canbus_;
-  std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>> writer_;
+  std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>> writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(UltrasonicRadarCanbusComponent)
+CYBER_REGISTER_COMPONENT(UltrasonicRadarCanbusComponent)
 
 }  // namespace ultrasonic_radar
 }  // namespace drivers

@@ -25,7 +25,7 @@
 #include "tf2/time.h"
 #include "tf2/transform_stamped.h"
 
-#include "cybertron/node/node.h"
+#include "cyber/node/node.h"
 #include "modules/transform/buffer_interface.h"
 #include "modules/transform/proto/transform.pb.h"
 
@@ -60,7 +60,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    */
   virtual apollo::transform::TransformStamped lookupTransform(
       const std::string& target_frame, const std::string& source_frame,
-      const cybertron::Time& time, const float timeout_second = 0.01) const;
+      const cyber::Time& time, const float timeout_second = 0.01) const;
 
   /** \brief Get the transform between two frames by frame ID assuming fixed
    *frame.
@@ -79,8 +79,8 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
   virtual apollo::transform::TransformStamped lookupTransform(
-      const std::string& target_frame, const cybertron::Time& target_time,
-      const std::string& source_frame, const cybertron::Time& source_time,
+      const std::string& target_frame, const cyber::Time& target_time,
+      const std::string& source_frame, const cyber::Time& source_time,
       const std::string& fixed_frame, const float timeout_second = 0.01) const;
 
   /** \brief Test if a transform is possible
@@ -94,7 +94,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    */
   virtual bool canTransform(const std::string& target_frame,
                             const std::string& source_frame,
-                            const cybertron::Time& target_time,
+                            const cyber::Time& target_time,
                             const float timeout_second = 0.01,
                             std::string* errstr = nullptr) const;
 
@@ -111,9 +111,9 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * \return True if the transform is possible, false otherwise
    */
   virtual bool canTransform(const std::string& target_frame,
-                            const cybertron::Time& target_time,
+                            const cyber::Time& target_time,
                             const std::string& source_frame,
-                            const cybertron::Time& source_time,
+                            const cyber::Time& source_time,
                             const std::string& fixed_frame,
                             const float timeout_second = 0.01,
                             std::string* errstr = nullptr) const;
@@ -133,13 +133,13 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
   void TF2MsgToCyber(const geometry_msgs::TransformStamped& tf2_trans_stamped,
                      apollo::transform::TransformStamped& trans_stamped) const; // NOLINT
 
-  std::unique_ptr<cybertron::Node> node_;
-  std::shared_ptr<cybertron::Reader<apollo::transform::TransformStampeds>>
+  std::unique_ptr<cyber::Node> node_;
+  std::shared_ptr<cyber::Reader<apollo::transform::TransformStampeds>>
       message_subscriber_tf_;
-  std::shared_ptr<cybertron::Reader<apollo::transform::TransformStampeds>>
+  std::shared_ptr<cyber::Reader<apollo::transform::TransformStampeds>>
       message_subscriber_tf_static_;
 
-  cybertron::Time last_update_;
+  cyber::Time last_update_;
   std::vector<geometry_msgs::TransformStamped> static_msgs_;
   DECLARE_SINGLETON(Buffer)
 };  // class

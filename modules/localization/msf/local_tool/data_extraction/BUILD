@@ -20,7 +20,7 @@ cc_library(
         "-lboost_program_options",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/math",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
@@ -45,7 +45,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":data_extraction",
-        "//cybertron",
+        "//cyber",
         "@eigen//:eigen",
         "@pcl//:pcl",
     ],
@@ -64,7 +64,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":data_extraction",
-        "//cybertron",
+        "//cyber",
         "@eigen//:eigen",
     ],
 )

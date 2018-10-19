@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/camera/proto/config.pb.h"
 
@@ -29,9 +29,9 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Component;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::drivers::Image;
 using apollo::drivers::camera::config::Config;
 
@@ -53,7 +53,7 @@ class CameraComponent : public Component<> {
   int buffer_size_ = 8;
 };
 
-CYBERTRON_REGISTER_COMPONENT(CameraComponent)
+CYBER_REGISTER_COMPONENT(CameraComponent)
 }  // namespace camera
 }  // namespace drivers
 }  // namespace apollo

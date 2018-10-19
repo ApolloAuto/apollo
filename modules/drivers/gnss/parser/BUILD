@@ -28,7 +28,7 @@ cc_library(
         "//modules/localization/proto:imu_proto",
         "//modules/transform:transform_broadcaster_lib",
         "@proj4",
-        "//cybertron",
+        "//cyber",
         "@eigen",
     ],
 )
@@ -46,7 +46,7 @@ cc_library(
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "//cybertron",
+        "//cyber",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_library(
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "//cybertron",
+        "//cyber",
     ],
 )
 

@@ -17,7 +17,7 @@
 
 #include <string>
 #include <vector>
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/inference/utils/binary_data.h"
 
 namespace apollo {

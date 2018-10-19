@@ -19,7 +19,7 @@ limitations under the License.
 #include <string>
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 using ::testing::ElementsAre;
 

@@ -7,7 +7,7 @@ cc_library(
     srcs = ["registerer.cc"],
     hdrs = ["registerer.h"],
     deps = [
-        "//cybertron",
+        "//cyber",
     ],
 )
 

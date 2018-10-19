@@ -25,8 +25,8 @@ namespace perception {
 namespace lidar {
 
 TEST(LidarLibMapManagerTest, lidar_map_manager_empty_test) {
-  char cybertron_path[100] = "CYBERTRON_PATH=";
-  putenv(cybertron_path);
+  char cyber_path[100] = "CYBER_PATH=";
+  putenv(cyber_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
 
@@ -45,8 +45,8 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_empty_test) {
 }
 
 TEST(LidarLibMapManagerTest, lidar_map_manager_test) {
-  char cybertron_path[100] = "CYBERTRON_PATH=";
-  putenv(cybertron_path);
+  char cyber_path[100] = "CYBER_PATH=";
+  putenv(cyber_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
 

@@ -84,9 +84,9 @@ function set_lib_path() {
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
-    local CYBERTRON_SETUP="/apollo/cybertron/setup.bash"
-    if [ -e "${CYBERTRON_SETUP}" ]; then
-      source "${CYBERTRON_SETUP}"
+    local CYBER_SETUP="/apollo/cyber/setup.bash"
+    if [ -e "${CYBER_SETUP}" ]; then
+      source "${CYBER_SETUP}"
     fi
     PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
@@ -426,9 +426,9 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
-CYBERTRON_SETUP="/apollo/cybertron/setup.bash"
-if [ -e "${CYBERTRON_SETUP}" ]; then
-    source "${CYBERTRON_SETUP}"
+CYBER_SETUP="/apollo/cyber/setup.bash"
+if [ -e "${CYBER_SETUP}" ]; then
+    source "${CYBER_SETUP}"
 fi
 
 check_in_docker

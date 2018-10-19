@@ -15,7 +15,7 @@ cc_library(
     hdrs = ["velodyne_convert_component.h"],
     deps = [
         "//modules/drivers/velodyne/parser:convert",
-        "//cybertron",
+        "//cyber",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
@@ -44,7 +44,7 @@ cc_library(
     deps = [
         "//modules/drivers/velodyne/proto:velodyne_proto",
         "//modules/drivers/proto:sensor_proto",
-        "//cybertron",
+        "//cyber",
         "@eigen",
         "@yaml_cpp//:yaml",
     ],

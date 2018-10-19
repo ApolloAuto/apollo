@@ -24,7 +24,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/softmax_plugin.h"

@@ -16,7 +16,7 @@
 
 #include "modules/monitor/software/topic_monitor.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/string_util.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -35,7 +35,7 @@ DEFINE_double(topic_monitor_interval, 5, "Topic status checking interval (s).");
 namespace apollo {
 namespace monitor {
 
-std::shared_ptr<cybertron::ReaderBase> TopicMonitor::CreateReaderFromChannel(
+std::shared_ptr<cyber::ReaderBase> TopicMonitor::CreateReaderFromChannel(
     const std::string &channel) {
   if (channel == FLAGS_control_command_topic) {
     return MonitorManager::CreateReader<apollo::control::ControlCommand>(

@@ -21,7 +21,7 @@
 #include <string>
 #include <thread>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/velodyne/parser/convert.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
@@ -31,9 +31,9 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Component;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::VelodyneScan;
 
@@ -50,7 +50,7 @@ class VelodyneConvertComponent : public Component<VelodyneScan> {
   int index_ = 0;
 };
 
-CYBERTRON_REGISTER_COMPONENT(VelodyneConvertComponent)
+CYBER_REGISTER_COMPONENT(VelodyneConvertComponent)
 
 }  // namespace velodyne
 }  // namespace drivers

@@ -26,7 +26,7 @@ namespace velodyne {
 
 bool Compensator::QueryPoseAffineFromTF2(const uint64_t& timestamp, void* pose,
                                          const std::string& child_frame_id) {
-  cybertron::Time query_time(timestamp);
+  cyber::Time query_time(timestamp);
   std::string err_string;
   if (!tf2_buffer_ptr_->canTransform(
           config_.world_frame_id(), child_frame_id, query_time,
@@ -61,7 +61,7 @@ bool Compensator::QueryPoseAffineFromTF2(const uint64_t& timestamp, void* pose,
 bool Compensator::MotionCompensation(
     const std::shared_ptr<const PointCloud>& msg,
     std::shared_ptr<PointCloud> msg_compensated) {
-  uint64_t start = cybertron::Time::Now().ToNanosecond();
+  uint64_t start = cyber::Time::Now().ToNanosecond();
   Eigen::Affine3d pose_min_time;
   Eigen::Affine3d pose_max_time;
 
@@ -71,7 +71,7 @@ bool Compensator::MotionCompensation(
   GetTimestampInterval(msg, &timestamp_min, &timestamp_max);
 
   msg_compensated->mutable_header()->set_timestamp_sec(
-      cybertron::Time::Now().ToSecond());
+      cyber::Time::Now().ToSecond());
   msg_compensated->mutable_header()->set_frame_id(msg->header().frame_id());
   msg_compensated->mutable_header()->set_lidar_timestamp(
       msg->header().lidar_timestamp());
@@ -79,7 +79,7 @@ bool Compensator::MotionCompensation(
   msg_compensated->set_height(msg->height());
   msg_compensated->set_is_dense(msg->is_dense());
 
-  uint64_t new_time = cybertron::Time().Now().ToNanosecond();
+  uint64_t new_time = cyber::Time().Now().ToNanosecond();
   AINFO << "compenstator new msg diff:" << new_time - start
         << ";meta:" << msg->header().lidar_timestamp();
   msg_compensated->mutable_point()->Reserve(240000);
@@ -87,12 +87,12 @@ bool Compensator::MotionCompensation(
   // compensate point cloud, remove nan point
   if (QueryPoseAffineFromTF2(timestamp_min, &pose_min_time, frame_id) &&
       QueryPoseAffineFromTF2(timestamp_max, &pose_max_time, frame_id)) {
-    uint64_t tf_time = cybertron::Time().Now().ToNanosecond();
+    uint64_t tf_time = cyber::Time().Now().ToNanosecond();
     AINFO << "compenstator tf msg diff:" << tf_time - new_time
           << ";meta:" << msg->header().lidar_timestamp();
     MotionCompensation(msg, msg_compensated, timestamp_min, timestamp_max,
                        pose_min_time, pose_max_time);
-    uint64_t com_time = cybertron::Time().Now().ToNanosecond();
+    uint64_t com_time = cyber::Time().Now().ToNanosecond();
 
     msg_compensated->set_width(msg_compensated->point_size() / msg->height());
     AINFO << "compenstator com msg diff:" << com_time - tf_time

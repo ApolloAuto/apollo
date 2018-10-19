@@ -326,30 +326,30 @@ TEST(UtilTest, test_resize_cpu) {
   }
 }
 
-TEST(UtilTest, GetCybertronWorkRootTest) {
+TEST(UtilTest, GetCyberWorkRootTest) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
 
   std::string work_root = "";
-  GetCybertronWorkRoot(&work_root);
+  GetCyberWorkRoot(&work_root);
   EXPECT_EQ(work_root, "");
 
-  char cybertron_path[] = "CYBERTRON_PATH=/home/caros/cybertron";
-  putenv(cybertron_path);
-  GetCybertronWorkRoot(&work_root);
-  EXPECT_EQ(work_root, "/home/caros/cybertron");
+  char cyber_path[] = "CYBER_PATH=/home/caros/cyber";
+  putenv(cyber_path);
+  GetCyberWorkRoot(&work_root);
+  EXPECT_EQ(work_root, "/home/caros/cyber");
 
   char module_path[] = "MODULE_PATH=/home/test/perception-camera";
   putenv(module_path);
-  GetCybertronWorkRoot(&work_root);
+  GetCyberWorkRoot(&work_root);
   EXPECT_EQ(work_root, "/home/test/perception-camera");
 
   unsetenv("MODULE_PATH");
-  GetCybertronWorkRoot(&work_root);
-  EXPECT_EQ(work_root, "/home/caros/cybertron");
+  GetCyberWorkRoot(&work_root);
+  EXPECT_EQ(work_root, "/home/caros/cyber");
 
-  unsetenv("CYBERTRON_PATH");
-  GetCybertronWorkRoot(&work_root);
+  unsetenv("CYBER_PATH");
+  GetCyberWorkRoot(&work_root);
   EXPECT_EQ(work_root, "");
 }
 

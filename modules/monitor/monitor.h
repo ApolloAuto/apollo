@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/component/timer_component.h"
-#include "cybertron/cybertron.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/cyber.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
@@ -32,7 +32,7 @@
 namespace apollo {
 namespace monitor {
 
-class Monitor : public apollo::cybertron::TimerComponent {
+class Monitor : public apollo::cyber::TimerComponent {
  public:
   bool Init() override;
   bool Proc() override;
@@ -40,7 +40,7 @@ class Monitor : public apollo::cybertron::TimerComponent {
   std::vector<std::unique_ptr<RecurrentRunner>> runners_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(Monitor)
+CYBER_REGISTER_COMPONENT(Monitor)
 
 }  // namespace monitor
 }  // namespace apollo

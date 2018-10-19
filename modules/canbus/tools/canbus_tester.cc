@@ -16,30 +16,30 @@
 
 #include <thread>
 
-#include "cybertron/cybertron.h"
-#include "cybertron/time/rate.h"
+#include "cyber/cyber.h"
+#include "cyber/time/rate.h"
 
 #include "gflags/gflags.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 using apollo::control::ControlCommand;
-using apollo::cybertron::Rate;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Rate;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 
 int main(int32_t argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_alsologtostderr = true;
 
-  // init cybertron framework
-  apollo::cybertron::Init("testing_canbus_tester");
-  std::shared_ptr<apollo::cybertron::Node> node_(
-      apollo::cybertron::CreateNode("canbus_tester"));
+  // init cyber framework
+  apollo::cyber::Init("testing_canbus_tester");
+  std::shared_ptr<apollo::cyber::Node> node_(
+      apollo::cyber::CreateNode("canbus_tester"));
   std::shared_ptr<Writer<ControlCommand>> control_command_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
 
@@ -52,7 +52,7 @@ int main(int32_t argc, char **argv) {
 
   Rate rate(1.0);  // frequency
 
-  while (apollo::cybertron::OK()) {
+  while (apollo::cyber::OK()) {
     // pub.publish(msg);
     control_command_writer_->Write(
         std::make_shared<ControlCommand>(control_cmd));

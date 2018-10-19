@@ -22,7 +22,7 @@
 
 #include "Eigen/Geometry"
 #include "boost/array.hpp"
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
@@ -65,7 +65,7 @@ Parser *CreateParser(config::Config config, bool is_base_station = false) {
 }  // namespace
 
 DataParser::DataParser(const config::Config &config,
-                       const std::shared_ptr<apollo::cybertron::Node> &node)
+                       const std::shared_ptr<apollo::cyber::Node> &node)
     : config_(config), tf_broadcaster_(node), node_(node) {
   std::string utm_target_param;
 
@@ -80,9 +80,9 @@ DataParser::DataParser(const config::Config &config,
 
 bool DataParser::Init() {
   ins_status_.mutable_header()->set_timestamp_sec(
-      cybertron::Time::Now().ToSecond());
+      cyber::Time::Now().ToSecond());
   gnss_status_.mutable_header()->set_timestamp_sec(
-      cybertron::Time::Now().ToSecond());
+      cyber::Time::Now().ToSecond());
 
   gnssstatus_writer_ = node_->CreateWriter<GnssStatus>(FLAGS_gnss_status_topic);
   insstatus_writer_ = node_->CreateWriter<InsStatus>(FLAGS_ins_status_topic);
@@ -124,7 +124,7 @@ void DataParser::ParseRawData(const std::string &msg) {
   Parser::MessageType type;
   MessagePtr msg_ptr;
 
-  while (cybertron::OK()) {
+  while (cyber::OK()) {
     type = data_parser_->GetMessage(&msg_ptr);
     if (type == Parser::MessageType::NONE) break;
     DispatchMessage(type, msg_ptr);

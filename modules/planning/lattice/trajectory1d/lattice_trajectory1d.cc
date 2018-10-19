@@ -20,7 +20,7 @@
 
 #include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {

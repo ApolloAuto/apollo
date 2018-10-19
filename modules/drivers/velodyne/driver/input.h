@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <memory>
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 // #include "velodyne_msgs/VelodyneScanUnified.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"

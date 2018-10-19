@@ -21,7 +21,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/gnss/util/macros.h"
 
@@ -79,7 +79,7 @@ class Stream {
       write(login_data_[i]);
       AINFO << "Login: " << login_data_[i];
       // sleep a little to avoid overrun of the slow serial interface.
-      cybertron::Duration(0.5).Sleep();
+      cyber::Duration(0.5).Sleep();
     }
   }
 

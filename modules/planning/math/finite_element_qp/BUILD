@@ -11,7 +11,7 @@ cc_library(
         "fem_1d_qp_problem.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/planning/common:planning_gflags",
         "@osqp",
     ],
@@ -27,7 +27,7 @@ cc_library(
     ],
     deps = [
         ":fem_1d_qp_problem",
-        "//cybertron",
+        "//cyber",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -41,7 +41,7 @@ cc_test(
     ],
     deps = [
         ":fem_1d_expanded_qp_problem",
-        "//cybertron",
+        "//cyber",
         "@gtest//:main",
     ],
 )
@@ -56,7 +56,7 @@ cc_library(
     ],
     deps = [
         ":fem_1d_qp_problem",
-        "//cybertron",
+        "//cyber",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -70,7 +70,7 @@ cc_test(
     ],
     deps = [
         ":fem_1d_linear_qp_problem",
-        "//cybertron",
+        "//cyber",
         "@gtest//:main",
     ],
 )
@@ -85,7 +85,7 @@ cc_library(
     ],
     deps = [
         ":fem_1d_qp_problem",
-        "//cybertron",
+        "//cyber",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -99,7 +99,7 @@ cc_test(
     ],
     deps = [
         ":fem_1d_expanded_jerk_qp_problem",
-        "//cybertron",
+        "//cyber",
         "//modules/planning/common:planning_gflags",
         "@gtest//:main",
     ],

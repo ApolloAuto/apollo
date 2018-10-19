@@ -25,7 +25,7 @@ cc_library(
         "debug_info.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
@@ -45,7 +45,7 @@ cc_library(
         ":camera_app_lib_proto",
         "@yaml_cpp//:yaml",
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
@@ -80,7 +80,7 @@ cc_library(
     ],
     deps = [
         ":camera_app_lib_proto",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",

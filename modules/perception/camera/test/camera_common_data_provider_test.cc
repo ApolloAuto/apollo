@@ -31,7 +31,7 @@ namespace camera {
 
 TEST(DataProvider, test_image_options) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   DataProvider::ImageOptions image_options;
   EXPECT_EQ(image_options.ToString(),
             " 0 0");
@@ -42,7 +42,7 @@ TEST(DataProvider, test_image_options) {
 
 TEST(DataProvider, test_nodistortion) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   cv::Mat img = cv::imread("/apollo/modules/perception/testdata/"
     "camera/common/img/test.jpg");
 
@@ -123,7 +123,7 @@ TEST(DataProvider, test_nodistortion) {
 
 TEST(DataProvider, test_fill_image_data) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/common/conf/sensor_meta.config";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
@@ -174,7 +174,7 @@ TEST(DataProvider, test_fill_image_data) {
 
 TEST(DataProvider, test_convert_color) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/common/conf/sensor_meta.config";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
@@ -281,7 +281,7 @@ TEST(DataProvider, test_convert_color) {
 
 TEST(DataProvider, test_undistortion) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/common/conf/sensor_meta.config";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"

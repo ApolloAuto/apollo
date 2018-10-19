@@ -23,13 +23,13 @@
 #include <algorithm>
 #include <utility>
 
-#include "cybertron/task/task.h"
+#include "cyber/task/task.h"
 
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/util.h"
@@ -170,7 +170,7 @@ bool DpRoadGraph::GenerateMinCostPath(
 
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
         results.emplace_back(
-            cybertron::Async(&DpRoadGraph::UpdateNode, this, msg));
+            cyber::Async(&DpRoadGraph::UpdateNode, this, msg));
       } else {
         UpdateNode(msg);
       }

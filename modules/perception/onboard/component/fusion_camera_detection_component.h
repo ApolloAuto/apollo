@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
@@ -43,7 +43,7 @@ namespace perception {
 namespace onboard {
 
 class FusionCameraDetectionComponent :
-    public apollo::cybertron::Component<> {
+    public apollo::cyber::Component<> {
  public:
   FusionCameraDetectionComponent() : seq_num_(0) {}
   ~FusionCameraDetectionComponent();
@@ -87,7 +87,7 @@ class FusionCameraDetectionComponent :
   std::mutex mutex_;
   uint32_t seq_num_;
 
-  std::vector<std::shared_ptr<cybertron::Node> > camera_listener_nodes_;
+  std::vector<std::shared_ptr<cyber::Node> > camera_listener_nodes_;
 
   std::vector<std::string> camera_names_;  // camera sensor names
   std::vector<std::string> input_camera_channel_names_;
@@ -157,14 +157,14 @@ class FusionCameraDetectionComponent :
   double last_timestamp_ = 0.0;
   double ts_diff_ = 1.0;
 
-  std::shared_ptr<apollo::cybertron::Writer<
+  std::shared_ptr<apollo::cyber::Writer<
         apollo::perception::PerceptionObstacles>> writer_;
 
-//   std::shared_ptr<apollo::cybertron::Writer<SensorFrameMessage>>
+//   std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>>
 //         sensorframe_writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(FusionCameraDetectionComponent);
+CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);
 
 }  // namespace onboard
 }  // namespace perception

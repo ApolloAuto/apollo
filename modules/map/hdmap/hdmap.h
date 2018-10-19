@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/map/proto/map_clear_area.pb.h"

@@ -104,12 +104,12 @@ bool CanbusComponent::Init() {
         << " initialized with canbus conf as : "
         << canbus_conf_.vehicle_parameter().ShortDebugString();
 
-  cybertron::ReaderConfig guardian_cmd_reader_config;
+  cyber::ReaderConfig guardian_cmd_reader_config;
   guardian_cmd_reader_config.channel_name = FLAGS_guardian_topic;
   guardian_cmd_reader_config.pending_queue_size =
       FLAGS_guardian_cmd_pending_queue_size;
 
-  cybertron::ReaderConfig control_cmd_reader_config;
+  cyber::ReaderConfig control_cmd_reader_config;
   control_cmd_reader_config.channel_name = FLAGS_control_command_topic;
   control_cmd_reader_config.pending_queue_size =
       FLAGS_control_cmd_pending_queue_size;

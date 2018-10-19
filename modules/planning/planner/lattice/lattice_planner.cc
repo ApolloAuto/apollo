@@ -26,8 +26,8 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/common/log.h"
-#include "cybertron/common/macros.h"
+#include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/common/time/time.h"

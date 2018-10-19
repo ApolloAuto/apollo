@@ -18,7 +18,7 @@ cc_library(
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/io:file_util",
         "//modules/perception/lidar/lib/interface:base_object_filter",
-        "//cybertron",
+        "//cyber",
         "@eigen",
     ],
 )

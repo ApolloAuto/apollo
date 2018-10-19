@@ -18,7 +18,7 @@
 
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -40,7 +40,7 @@ float PointCloudUpdater::lidar_height_ = kDefaultLidarHeight;
 boost::shared_mutex PointCloudUpdater::mutex_;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
-    : node_(cybertron::CreateNode("point_cloud")),
+    : node_(cyber::CreateNode("point_cloud")),
       websocket_(websocket),
       point_cloud_str_(""),
       future_ready_(true) {
@@ -170,7 +170,7 @@ void PointCloudUpdater::UpdatePointCloud(
       pcl_ptr->points[i].z = point_cloud->point(i).z();
     }
     std::future<void> f =
-        cybertron::Async(&PointCloudUpdater::FilterPointCloud,
+        cyber::Async(&PointCloudUpdater::FilterPointCloud,
                          this, pcl_ptr);
     async_future_ = std::move(f);
   }

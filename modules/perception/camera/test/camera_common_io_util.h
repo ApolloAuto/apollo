@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {

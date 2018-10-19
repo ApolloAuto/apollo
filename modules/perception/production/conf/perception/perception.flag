@@ -81,7 +81,7 @@
 # default:
 --obs_novatel2world_tf2_child_frame_id=novatel
 
-# query Cybertron TF buffer size in second.
+# query Cyber TF buffer size in second.
 # type: double
 # default: 0.01
 --obs_tf2_buff_size=0.01

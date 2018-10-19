@@ -17,7 +17,7 @@
 #include "modules/transform/buffer.h"
 
 #include <sstream>
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
@@ -27,9 +27,9 @@ Buffer::Buffer() : BufferCore() { Init(); }
 
 int Buffer::Init() {
   std::string node_name = "transform_listener_" +
-                          std::to_string(cybertron::Time::Now().ToNanosecond());
-  node_ = cybertron::CreateNode(node_name);
-  apollo::cybertron::proto::RoleAttributes attr;
+                          std::to_string(cyber::Time::Now().ToNanosecond());
+  node_ = cyber::CreateNode(node_name);
+  apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
   message_subscriber_tf_ =
       node_->CreateReader<apollo::transform::TransformStampeds>(
@@ -37,17 +37,17 @@ int Buffer::Init() {
           [&](const std::shared_ptr<const apollo::transform::TransformStampeds>&
                   msg_evt) { SubscriptionCallbackImpl(msg_evt, false); });
 
-  apollo::cybertron::proto::RoleAttributes attr_static;
+  apollo::cyber::proto::RoleAttributes attr_static;
   attr_static.set_channel_name("/tf_static");
   attr_static.mutable_qos_profile()->CopyFrom(
-      apollo::cybertron::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
+      apollo::cyber::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
   message_subscriber_tf_static_ =
       node_->CreateReader<apollo::transform::TransformStampeds>(
           attr_static,
           [&](const std::shared_ptr<apollo::transform::TransformStampeds>&
                   msg_evt) { SubscriptionCallbackImpl(msg_evt, true); });
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 void Buffer::SubscriptionCallback(
@@ -65,9 +65,9 @@ void Buffer::StaticSubscriptionCallback(
 void Buffer::SubscriptionCallbackImpl(
     const std::shared_ptr<const apollo::transform::TransformStampeds>& msg_evt,
     bool is_static) {
-  cybertron::Time now = cybertron::Time::Now();
+  cyber::Time now = cyber::Time::Now();
   std::string authority =
-      "cybertron_tf";  // msg_evt.getPublisherName(); // lookup the authority
+      "cyber_tf";  // msg_evt.getPublisherName(); // lookup the authority
   if (now.ToNanosecond() < last_update_.ToNanosecond()) {
     AINFO << "Detected jump back in time. Clearing TF buffer.";
     clear();
@@ -156,7 +156,7 @@ void Buffer::TF2MsgToCyber(
 
 apollo::transform::TransformStamped Buffer::lookupTransform(
     const std::string& target_frame, const std::string& source_frame,
-    const cybertron::Time& time, const float timeout_second) const {
+    const cyber::Time& time, const float timeout_second) const {
   (void)timeout_second;
   tf2::Time tf2_time(time.ToNanosecond());
   geometry_msgs::TransformStamped tf2_trans_stamped =
@@ -167,8 +167,8 @@ apollo::transform::TransformStamped Buffer::lookupTransform(
 }
 
 apollo::transform::TransformStamped Buffer::lookupTransform(
-    const std::string& target_frame, const cybertron::Time& target_time,
-    const std::string& source_frame, const cybertron::Time& source_time,
+    const std::string& target_frame, const cyber::Time& target_time,
+    const std::string& source_frame, const cyber::Time& source_time,
     const std::string& fixed_frame, const float timeout_second) const {
   (void)timeout_second;
   geometry_msgs::TransformStamped tf2_trans_stamped =
@@ -181,15 +181,15 @@ apollo::transform::TransformStamped Buffer::lookupTransform(
 
 bool Buffer::canTransform(const std::string& target_frame,
                           const std::string& source_frame,
-                          const cybertron::Time& time,
+                          const cyber::Time& time,
                           const float timeout_second,
                           std::string* errstr) const {
   uint64_t timeout_ns = timeout_second * 1000000000;
-  uint64_t start_time = cybertron::Time::Now().ToNanosecond();
+  uint64_t start_time = cyber::Time::Now().ToNanosecond();
   while (
-      cybertron::Time::Now().ToNanosecond() < start_time + timeout_ns &&
+      cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
       !canTransform(target_frame, source_frame, time.ToNanosecond(), errstr) &&
-      !cybertron::IsShutdown()) {
+      !cyber::IsShutdown()) {
     usleep(3000);
   }
   bool retval =
@@ -199,20 +199,20 @@ bool Buffer::canTransform(const std::string& target_frame,
 }
 
 bool Buffer::canTransform(const std::string& target_frame,
-                          const cybertron::Time& target_time,
+                          const cyber::Time& target_time,
                           const std::string& source_frame,
-                          const cybertron::Time& source_time,
+                          const cyber::Time& source_time,
                           const std::string& fixed_frame,
                           const float timeout_second,
                           std::string* errstr) const {
   // poll for transform if timeout is set
   uint64_t timeout_ns = timeout_second * 1000000000;
-  uint64_t start_time = cybertron::Time::Now().ToNanosecond();
-  while (cybertron::Time::Now().ToNanosecond() < start_time + timeout_ns &&
+  uint64_t start_time = cyber::Time::Now().ToNanosecond();
+  while (cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
          !canTransform(target_frame, target_time.ToNanosecond(), source_frame,
                        source_time.ToNanosecond(),
                        fixed_frame) &&
-         !cybertron::IsShutdown()) {  // Make sure we haven't been stopped
+         !cyber::IsShutdown()) {  // Make sure we haven't been stopped
     usleep(3000);
   }
   bool retval =

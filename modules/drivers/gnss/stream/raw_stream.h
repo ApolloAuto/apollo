@@ -21,7 +21,7 @@
 #include <string>
 #include <thread>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
@@ -38,7 +38,7 @@ namespace gnss {
 class RawStream {
  public:
   explicit RawStream(const config::Config& config,
-                     const std::shared_ptr<apollo::cybertron::Node>& node);
+                     const std::shared_ptr<apollo::cyber::Node>& node);
   ~RawStream();
   bool Init();
 
@@ -63,7 +63,7 @@ class RawStream {
   void GpsbinCallback(const std::shared_ptr<RawData const>& raw_data);
   void OnWheelVelocityTimer();
 
-  std::unique_ptr<cybertron::Timer> wheel_velocity_timer_ = nullptr;
+  std::unique_ptr<cyber::Timer> wheel_velocity_timer_ = nullptr;
   std::shared_ptr<apollo::canbus::Chassis> chassis_ptr_ = nullptr;
   static constexpr size_t BUFFER_SIZE = 2048;
   uint8_t buffer_[BUFFER_SIZE] = {0};
@@ -95,13 +95,13 @@ class RawStream {
   std::unique_ptr<std::thread> gpsbin_thread_ptr_;
   std::unique_ptr<std::ofstream> gpsbin_stream_ = nullptr;
 
-  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Writer<StreamStatus>> stream_writer_ =
+  std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<StreamStatus>> stream_writer_ =
       nullptr;
-  std::shared_ptr<apollo::cybertron::Writer<RawData>> raw_writer_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Writer<RawData>> rtcm_writer_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Reader<RawData>> gpsbin_reader_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Reader<apollo::canbus::Chassis>>
+  std::shared_ptr<apollo::cyber::Writer<RawData>> raw_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<RawData>> rtcm_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Reader<RawData>> gpsbin_reader_ = nullptr;
+  std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
       chassis_reader_ = nullptr;
 };
 

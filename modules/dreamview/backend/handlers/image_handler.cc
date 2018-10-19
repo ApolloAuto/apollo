@@ -17,7 +17,7 @@ limitations under the License.
 
 #include <memory>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 
@@ -61,7 +61,7 @@ void ImageHandler::OnImageShort(const std::shared_ptr<Image> &image) {
 }
 
 ImageHandler::ImageHandler()
-    : requests_(0), node_(cybertron::CreateNode("image_handler")) {
+    : requests_(0), node_(cyber::CreateNode("image_handler")) {
   node_->CreateReader<Image>(
       FLAGS_image_front_topic,
       [this](const std::shared_ptr<Image> &image) {

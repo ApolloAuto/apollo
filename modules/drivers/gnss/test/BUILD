@@ -8,7 +8,7 @@ cc_binary(
     deps = [
         "//modules/drivers/gnss/stream:gnss_stream",
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "@ros//:ros_common",
     ],
 )

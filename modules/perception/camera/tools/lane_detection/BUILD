@@ -11,7 +11,7 @@ cc_library(
         "lane_common.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
         "//modules/perception/camera/lib/lane/common:common_functions",
     ]
@@ -30,7 +30,7 @@ cc_binary(
     deps = [
         ":lane_common",
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",

@@ -20,7 +20,7 @@
 #include <thread>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
@@ -56,7 +56,7 @@ std::string getLocalTimeFileStr(const std::string &gpsbin_folder) {
   std::strftime(local_time_char, sizeof(local_time_char), "%Y%m%d_%H%M%S",
                 localtime(&it));
   std::string local_time_str = local_time_char;
-  CHECK(cybertron::common::EnsureDirectory(gpsbin_folder))
+  CHECK(cyber::common::EnsureDirectory(gpsbin_folder))
       << "gbsbin folder : " << gpsbin_folder << " create fail";
   std::string local_time_file_str =
       gpsbin_folder + "/" + local_time_str + ".bin";
@@ -130,7 +130,7 @@ Stream *create_stream(const config::Stream &sd) {
 }
 
 RawStream::RawStream(const config::Config &config,
-                     const std::shared_ptr<apollo::cybertron::Node> &node)
+                     const std::shared_ptr<apollo::cyber::Node> &node)
     : config_(config), node_(node) {
   data_parser_ptr_.reset(new DataParser(config_, node_));
   rtcm_parser_ptr_.reset(new RtcmParser(config_, node_));
@@ -272,7 +272,7 @@ bool RawStream::Init() {
       node_->CreateWriter<StreamStatus>(FLAGS_stream_status_topic);
   raw_writer_ = node_->CreateWriter<RawData>(FLAGS_gnss_raw_data_topic);
   rtcm_writer_ = node_->CreateWriter<RawData>(FLAGS_rtcm_data_topic);
-  cybertron::ReaderConfig reader_config;
+  cyber::ReaderConfig reader_config;
   reader_config.channel_name = FLAGS_gnss_raw_data_topic;
   reader_config.pending_queue_size = 100;
   gpsbin_reader_ = node_->CreateReader<RawData>(reader_config,
@@ -290,7 +290,7 @@ void RawStream::Start() {
   data_thread_ptr_.reset(new std::thread(&RawStream::DataSpin, this));
   rtk_thread_ptr_.reset(new std::thread(&RawStream::RtkSpin, this));
   if (config_.has_wheel_parameters()) {
-    wheel_velocity_timer_.reset(new cybertron::Timer(
+    wheel_velocity_timer_.reset(new cyber::Timer(
         1000, [this]() { this->OnWheelVelocityTimer(); }, false));
     wheel_velocity_timer_->Start();
   }
@@ -301,7 +301,7 @@ void RawStream::OnWheelVelocityTimer() {
     AINFO << "No chassis message received";
     return;
   }
-  auto latency_sec = cybertron::Time::Now().ToSecond() -
+  auto latency_sec = cyber::Time::Now().ToSecond() -
                      chassis_ptr_->header().timestamp_sec();
   auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
   auto speed_cmps =
@@ -407,7 +407,7 @@ bool RawStream::Login() {
     login_data.emplace_back(login_command);
     AINFO << "Login command: " << login_command;
     // sleep a little to avoid overrun of the slow serial interface.
-    cybertron::Duration(0.5).Sleep();
+    cyber::Duration(0.5).Sleep();
   }
   data_stream_->RegisterLoginData(login_data);
 
@@ -464,7 +464,7 @@ void RawStream::StreamStatusCheck() {
 void RawStream::DataSpin() {
   common::util::FillHeader("gnss", &stream_status_);
   stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
-  while (cybertron::OK()) {
+  while (cyber::OK()) {
     size_t length = data_stream_->read(buffer_, BUFFER_SIZE);
     if (length > 0) {
       std::shared_ptr<RawData> msg_pub = std::make_shared<RawData>();
@@ -487,7 +487,7 @@ void RawStream::RtkSpin() {
   if (in_rtk_stream_ == nullptr) {
     return;
   }
-  while (cybertron::OK()) {
+  while (cyber::OK()) {
     size_t length = in_rtk_stream_->read(buffer_rtk_, BUFFER_SIZE);
     if (length > 0) {
       if (rtk_software_solution_) {

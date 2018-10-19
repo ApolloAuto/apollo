@@ -20,7 +20,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -34,25 +34,25 @@ namespace monitor {
 
 class MonitorManager {
  public:
-  static void Init(const std::shared_ptr<apollo::cybertron::Node>& node);
+  static void Init(const std::shared_ptr<apollo::cyber::Node>& node);
 
-  static inline std::shared_ptr<apollo::cybertron::Node> CurrentNode() {
+  static inline std::shared_ptr<apollo::cyber::Node> CurrentNode() {
     return Instance()->node_;
   }
 
   template <class T>
-  static inline std::shared_ptr<cybertron::Reader<T>> CreateReader(
+  static inline std::shared_ptr<cyber::Reader<T>> CreateReader(
       const std::string& channel) {
     auto* readers = &(Instance()->readers_);
     if (readers->find(channel) == readers->end()) {
       readers->emplace(channel,
                        CHECK_NOTNULL(CurrentNode())->CreateReader<T>(channel));
     }
-    return std::dynamic_pointer_cast<cybertron::Reader<T>>((*readers)[channel]);
+    return std::dynamic_pointer_cast<cyber::Reader<T>>((*readers)[channel]);
   }
 
   template <class T>
-  static inline std::shared_ptr<cybertron::Writer<T>> CreateWriter(
+  static inline std::shared_ptr<cyber::Writer<T>> CreateWriter(
       const std::string& channel) {
     return CHECK_NOTNULL(CurrentNode())->CreateWriter<T>(channel);
   }
@@ -72,8 +72,8 @@ class MonitorManager {
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
   bool in_autonomous_driving_ = false;
 
-  std::shared_ptr<apollo::cybertron::Node> node_;
-  std::unordered_map<std::string, std::shared_ptr<cybertron::ReaderBase>>
+  std::shared_ptr<apollo::cyber::Node> node_;
+  std::unordered_map<std::string, std::shared_ptr<cyber::ReaderBase>>
       readers_;
 
   DECLARE_SINGLETON(MonitorManager);

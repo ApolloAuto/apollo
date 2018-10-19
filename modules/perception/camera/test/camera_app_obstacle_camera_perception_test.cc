@@ -29,7 +29,7 @@ DECLARE_string(obs_sensor_intrinsic_path);
 namespace camera {
 TEST(ObstacleCameraPerceptionTest, init_all_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
 
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/params";
@@ -48,7 +48,7 @@ TEST(ObstacleCameraPerceptionTest, init_all_test) {
 
 TEST(ObstacleCameraPerceptionTest, init_feature_extractor_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   ObstacleCameraPerception perception;
@@ -61,7 +61,7 @@ TEST(ObstacleCameraPerceptionTest, init_feature_extractor_test) {
 
 TEST(ObstacleCameraPerceptionTest, init_debug_para_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   ObstacleCameraPerception perception;
@@ -74,7 +74,7 @@ TEST(ObstacleCameraPerceptionTest, init_debug_para_test) {
 
 TEST(ObstacleCameraPerceptionTest, perception_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   ObstacleCameraPerception perception;

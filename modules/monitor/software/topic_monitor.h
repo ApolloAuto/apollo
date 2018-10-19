@@ -18,7 +18,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/monitor/common/recurrent_runner.h"
 #include "modules/monitor/proto/monitor_conf.pb.h"
 
@@ -30,13 +30,13 @@ class TopicMonitor : public RecurrentRunner {
   TopicMonitor(const TopicConf &config, TopicStatus *status);
   void RunOnce(const double current_time) override;
 
-  static std::shared_ptr<cybertron::ReaderBase> CreateReaderFromChannel(
+  static std::shared_ptr<cyber::ReaderBase> CreateReaderFromChannel(
       const std::string& channel);
 
  private:
   const TopicConf &config_;
   TopicStatus *status_;
-  std::shared_ptr<cybertron::ReaderBase> reader_;
+  std::shared_ptr<cyber::ReaderBase> reader_;
 };
 
 }  // namespace monitor

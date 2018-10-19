@@ -19,7 +19,7 @@
 #include <string>
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"

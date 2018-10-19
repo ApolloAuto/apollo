@@ -20,7 +20,7 @@
 
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

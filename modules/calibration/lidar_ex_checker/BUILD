@@ -12,7 +12,7 @@ package(default_visibility = ["//visibility:public"])
 #     deps = [
 #         "//modules/calibration/lidar_ex_checker/common:lidar_ex_checker_common",
 #         "//modules/common:apollo_app",
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/localization/proto:gps_proto",
 #         "//modules/perception/common:pcl_util",
 #         "@vtk",
@@ -28,7 +28,7 @@ package(default_visibility = ["//visibility:public"])
 #     deps = [
 #         ":lidar_ex_checker_lib",
 #         "//external:gflags",
-#         "//cybertron",
+#         "//cyber",
 #         "@pcl",
 #         "@ros//:ros_common",
 #     ],

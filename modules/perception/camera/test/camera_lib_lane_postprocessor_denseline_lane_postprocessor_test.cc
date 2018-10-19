@@ -21,7 +21,7 @@
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/io/file_util.h"
@@ -32,7 +32,7 @@ namespace camera {
 
 TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   //  initialize lane detector
   LaneDetectorInitOptions init_options;
   LaneDetectorOptions detetor_options;
@@ -145,7 +145,7 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
 
 TEST(DenselineLanePostprocessor, lane_postprocessor_init_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   std::shared_ptr<DenselineLanePostprocessor> lane_postprocessor;
   lane_postprocessor.reset(new DenselineLanePostprocessor);
   LanePostprocessorInitOptions postprocessor_init_options;

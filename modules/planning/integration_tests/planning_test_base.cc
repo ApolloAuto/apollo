@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <thread>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"

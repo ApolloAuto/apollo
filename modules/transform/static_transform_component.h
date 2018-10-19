@@ -20,14 +20,14 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 #include "modules/transform/proto/static_transform_conf.pb.h"
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
 namespace transform {
 
-class StaticTransformComponent final : public ::apollo::cybertron::Component<> {
+class StaticTransformComponent final : public ::apollo::cyber::Component<> {
  public:
   StaticTransformComponent() = default;
   ~StaticTransformComponent() = default;
@@ -43,12 +43,12 @@ class StaticTransformComponent final : public ::apollo::cybertron::Component<> {
                      apollo::transform::TransformStamped* transform);
 
   ::apollo::static_transform::Conf conf_;
-  std::shared_ptr<cybertron::Writer<apollo::transform::TransformStampeds>>
+  std::shared_ptr<cyber::Writer<apollo::transform::TransformStampeds>>
       writer_;
   apollo::transform::TransformStampeds transform_stampeds_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(StaticTransformComponent)
+CYBER_REGISTER_COMPONENT(StaticTransformComponent)
 
 }  // namespace transform
 }  // namespace apollo

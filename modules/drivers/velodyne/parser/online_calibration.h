@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/velodyne/parser/calibration.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"

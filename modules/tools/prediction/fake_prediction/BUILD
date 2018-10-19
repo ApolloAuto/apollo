@@ -9,7 +9,7 @@ cc_binary(
     ],
     deps = [
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
         "//modules/prediction/proto:prediction_proto",

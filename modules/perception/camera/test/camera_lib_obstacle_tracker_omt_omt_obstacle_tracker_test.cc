@@ -24,7 +24,7 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/distortion_model.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"

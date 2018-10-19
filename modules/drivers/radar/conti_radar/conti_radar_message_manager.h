@@ -21,7 +21,7 @@
 #pragma once
 
 #include <memory>
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -42,7 +42,7 @@ using apollo::drivers::canbus::CanClient;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::conti_radar::RadarConfig200;
 template<typename T>
-using Writer = apollo::cybertron::Writer<T>;
+using Writer = apollo::cyber::Writer<T>;
 
 class ContiRadarMessageManager : public MessageManager<ContiRadar> {
  public:

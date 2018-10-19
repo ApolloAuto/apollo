@@ -39,7 +39,7 @@ cc_library(
     linkstatic = False,
     deps = [
         ":qp_solver",
-        "//cybertron",
+        "//cyber",
         "//modules/common/math/qp_solver:qp_solver_gflags",
         "@eigen",
         "@qpOASES",

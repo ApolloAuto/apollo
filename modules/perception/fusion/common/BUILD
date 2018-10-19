@@ -49,7 +49,7 @@ cc_library(
         "dst_evidence.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
     ],
 )
 
@@ -102,7 +102,7 @@ cc_library(
     ],
     deps = [
         ":base_filter",
-        "//cybertron",
+        "//cyber",
     ],
 )
 

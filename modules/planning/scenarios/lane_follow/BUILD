@@ -19,7 +19,7 @@ cc_library(
         "lane_follow_stage.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//external:gflags",
         "//modules/common",
         "//modules/common/proto:pnc_point_proto",
@@ -61,7 +61,7 @@ cc_library(
     ],
     deps = [
         ":lane_follow_stage",
-        "//cybertron",
+        "//cyber",
         "//external:gflags",
         "//modules/common",
         "//modules/common/proto:pnc_point_proto",

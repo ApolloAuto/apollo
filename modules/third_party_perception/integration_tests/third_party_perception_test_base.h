@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 

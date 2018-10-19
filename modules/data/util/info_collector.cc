@@ -73,7 +73,7 @@ InfoCollector::InfoCollector() {
   }
 }
 
-void InfoCollector::Init(const std::shared_ptr<apollo::cybertron::Node>& node) {
+void InfoCollector::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
   Instance()->routing_request_reader_ =
       node->CreateReader<apollo::routing::RoutingRequest>(
           FLAGS_routing_request_topic);

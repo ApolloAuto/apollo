@@ -15,7 +15,7 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/lib/io/file_util.h"

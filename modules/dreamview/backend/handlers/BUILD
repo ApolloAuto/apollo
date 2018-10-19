@@ -29,7 +29,7 @@ cc_library(
         "image_handler.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/drivers/proto:sensor_proto",
@@ -46,7 +46,7 @@ cc_test(
     ],
     deps = [
         ":websocket_handler",
-        "//cybertron",
+        "//cyber",
         "@gtest//:main",
     ],
 )

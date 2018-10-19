@@ -14,7 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/inference/inference_factory.h"

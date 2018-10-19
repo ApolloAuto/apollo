@@ -18,7 +18,7 @@
 #include "gtest/gtest.h"
 #include "modules/perception/camera/lib/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/base/point.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
@@ -34,7 +34,7 @@ class TLPreprocessorTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     unsetenv("MODULE_PATH");
-    unsetenv("CYBERTRON_PATH");
+    unsetenv("CYBER_PATH");
     FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/preprocessor/conf/sensor_meta.config";
     FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
@@ -161,7 +161,7 @@ class TLPreprocessorTest : public ::testing::Test {
 
 TEST_F(TLPreprocessorTest, test_set_and_get_camera_is_working_flag) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   TrafficLightPreprocessorInitOptions init_options;
   init_options.conf_file = "preprocess.pt";
   init_options.root_dir = "/apollo/modules/perception/testdata/"
@@ -201,7 +201,7 @@ TEST_F(TLPreprocessorTest, test_set_and_get_camera_is_working_flag) {
 
 TEST_F(TLPreprocessorTest, test_project_lights) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   TrafficLightPreprocessorInitOptions init_options;
   init_options.conf_file = "preprocess.pt";
   init_options.root_dir = "/apollo/modules/perception/testdata/"
@@ -344,7 +344,7 @@ TEST_F(TLPreprocessorTest, test_project_lights) {
 
 TEST_F(TLPreprocessorTest, test_select_camera) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   TrafficLightPreprocessorInitOptions init_options;
   init_options.conf_file = "preprocess.pt";
   init_options.root_dir = "/apollo/modules/perception/testdata/"
@@ -467,7 +467,7 @@ TEST_F(TLPreprocessorTest, test_select_camera) {
 
 TEST_F(TLPreprocessorTest, test_get_max_min_focal_len_camera_id) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   TrafficLightPreprocessorInitOptions init_options;
   init_options.conf_file = "preprocess.pt";
   init_options.root_dir = "/apollo/modules/perception/testdata/"
@@ -523,7 +523,7 @@ TEST_F(TLPreprocessorTest, test_get_max_min_focal_len_camera_id) {
 
 TEST_F(TLPreprocessorTest, invalid_pose_id) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   CarPose pose;
   Eigen::Matrix4d c2w_pose;
   std::vector<base::TrafficLightPtr> lights(1);
@@ -540,7 +540,7 @@ TEST_F(TLPreprocessorTest, invalid_pose_id) {
 
 TEST_F(TLPreprocessorTest, invalid_camera_name) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   CarPose pose;
   Eigen::Matrix4d c2w_pose;
   std::vector<base::TrafficLightPtr> lights(1);
@@ -568,7 +568,7 @@ TEST_F(TLPreprocessorTest, invalid_camera_name) {
 
 TEST_F(TLPreprocessorTest, on_board) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   TrafficLightPreprocessorInitOptions init_options;
   init_options.conf_file = "preprocess.pt";
   init_options.root_dir = "/apollo/modules/perception/testdata/"
@@ -655,7 +655,7 @@ TEST_F(TLPreprocessorTest, on_board) {
 
 TEST_F(TLPreprocessorTest, UpdateLightsProjectionTest) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   TrafficLightPreprocessorInitOptions init_options;
   init_options.conf_file = "preprocess.pt";
   init_options.root_dir = "/apollo/modules/perception/testdata/"

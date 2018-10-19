@@ -18,7 +18,7 @@
 
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/controller/lat_controller.h"

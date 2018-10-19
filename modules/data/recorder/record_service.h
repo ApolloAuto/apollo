@@ -18,9 +18,9 @@
 
 #include <memory>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/cybertron.h"
-#include "cybertron/service/service.h"
+#include "cyber/common/macros.h"
+#include "cyber/cyber.h"
+#include "cyber/service/service.h"
 #include "modules/data/proto/record_request.pb.h"
 #include "modules/data/proto/record_response.pb.h"
 
@@ -33,13 +33,13 @@ namespace data {
 
 class RecordService {
  public:
-  static bool Init(const std::shared_ptr<apollo::cybertron::Node>& node);
+  static bool Init(const std::shared_ptr<apollo::cyber::Node>& node);
  private:
   static void OnRecordRequest(
       const std::shared_ptr<RecordRequest> &request,
       const std::shared_ptr<RecordResponse> &response);
  private:
-  std::shared_ptr<apollo::cybertron::Service<RecordRequest, RecordResponse>>
+  std::shared_ptr<apollo::cyber::Service<RecordRequest, RecordResponse>>
       server_;
   DECLARE_SINGLETON(RecordService);
 };

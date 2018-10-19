@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",
@@ -43,7 +43,7 @@ cc_test(
     deps = [
         "@gtest//:main",
         ":navi_planner",
-        "//cybertron",
+        "//cyber",
         "//modules/common/time",
         "//modules/common/util",
     ],

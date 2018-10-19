@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "gtest/gtest_prod.h"
 
@@ -219,7 +219,7 @@ class SimulationWorldService {
    * SimulationWorld object when triggered by refresh timer.
    */
   template <typename MessageT>
-  void UpdateWithLatestObserved(cybertron::Reader<MessageT> *reader,
+  void UpdateWithLatestObserved(cyber::Reader<MessageT> *reader,
                                 bool logging = true) {
     if (reader->Empty()) {
       if (logging) {
@@ -238,7 +238,7 @@ class SimulationWorldService {
    * file.
    */
   template <typename MessageT>
-  void DumpMessageFromReader(cybertron::Reader<MessageT> *reader) {
+  void DumpMessageFromReader(cyber::Reader<MessageT> *reader) {
     if (reader->Empty()) {
       AWARN << "Has not received any data from " << reader->GetChannelName()
             << ". Cannot dump message!";
@@ -252,7 +252,7 @@ class SimulationWorldService {
 
   template <typename MessageT>
   void UpdateLatency(const std::string &module_name,
-                     cybertron::Reader<MessageT> *reader) {
+                     cyber::Reader<MessageT> *reader) {
     if (reader->Empty()) {
       return;
     }
@@ -260,7 +260,7 @@ class SimulationWorldService {
     const auto header = reader->GetLatestObserved()->header();
     const double publish_time_sec = header.timestamp_sec();
     const double sensor_time_sec =
-        apollo::cybertron::Time(
+        apollo::cyber::Time(
             std::max({header.lidar_timestamp(), header.camera_timestamp(),
                       header.radar_timestamp()}))
             .ToSecond();
@@ -309,7 +309,7 @@ class SimulationWorldService {
     point->set_v(points[points.size() - 1].v());
   }
 
-  std::unique_ptr<cybertron::Node> node_;
+  std::unique_ptr<cyber::Node> node_;
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.
@@ -342,39 +342,39 @@ class SimulationWorldService {
   std::atomic<bool> ready_to_push_;
 
   // Readers.
-  std::shared_ptr<cybertron::Reader<apollo::canbus::Chassis>> chassis_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::localization::Gps>> gps_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::localization::LocalizationEstimate>>
+  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::Gps>> gps_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::perception::PerceptionObstacles>>
+  std::shared_ptr<cyber::Reader<apollo::perception::PerceptionObstacles>>
       perception_obstacle_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::perception::TrafficLightDetection>>
+  std::shared_ptr<cyber::Reader<apollo::perception::TrafficLightDetection>>
       perception_traffic_light_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::prediction::PredictionObstacles>>
+  std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>>
       prediction_obstacle_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::planning::ADCTrajectory>>
+  std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
       planning_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::control::ControlCommand>>
+  std::shared_ptr<cyber::Reader<apollo::control::ControlCommand>>
       control_command_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::relative_map::NavigationInfo>>
+  std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>
       navigation_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::relative_map::MapMsg>>
+  std::shared_ptr<cyber::Reader<apollo::relative_map::MapMsg>>
       relative_map_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::common::DriveEvent>>
+  std::shared_ptr<cyber::Reader<apollo::common::DriveEvent>>
       drive_event_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::common::monitor::MonitorMessage>>
+  std::shared_ptr<cyber::Reader<apollo::common::monitor::MonitorMessage>>
       monitor_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingRequest>>
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
       routing_request_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingResponse>>
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
       routing_response_reader_;
 
   // Writers.
-  std::shared_ptr<cybertron::Writer<apollo::relative_map::NavigationInfo>>
+  std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>>
       navigation_writer_;
-  std::shared_ptr<cybertron::Writer<apollo::routing::RoutingRequest>>
+  std::shared_ptr<cyber::Writer<apollo::routing::RoutingRequest>>
       routing_request_writer_;
-  std::shared_ptr<cybertron::Writer<apollo::routing::RoutingResponse>>
+  std::shared_ptr<cyber::Writer<apollo::routing::RoutingResponse>>
       routing_response_writer_;
 
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);

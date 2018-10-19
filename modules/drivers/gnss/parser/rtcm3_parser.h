@@ -25,7 +25,7 @@
 
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"

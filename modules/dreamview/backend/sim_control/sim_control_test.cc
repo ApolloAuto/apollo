@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "cybertron/blocker/blocker_manager.h"
+#include "cyber/blocker/blocker_manager.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -31,7 +31,7 @@
 using apollo::canbus::Chassis;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::time::Clock;
-using apollo::cybertron::blocker::BlockerManager;
+using apollo::cyber::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
@@ -43,7 +43,7 @@ namespace dreamview {
 class SimControlTest : public ::testing::Test {
  public:
   static void SetUpTestCase() {
-    cybertron::GlobalData::Instance()->EnableSimulationMode();
+    cyber::GlobalData::Instance()->EnableSimulationMode();
   }
 
   virtual void SetUp() {

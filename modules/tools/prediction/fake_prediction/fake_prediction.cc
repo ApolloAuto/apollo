@@ -18,8 +18,8 @@
  * @file
  */
 
-#include "cybertron/component/timer_component.h"
-#include "cybertron/cybertron.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
@@ -35,7 +35,7 @@ namespace prediction {
  * This tool is used to trigger modules that depends on prediction message.
  */
 
-class FakePredictionComponent : public apollo::cybertron::TimerComponent {
+class FakePredictionComponent : public apollo::cyber::TimerComponent {
  public:
   bool Init() override {
     prediction_writer_ =
@@ -50,10 +50,10 @@ class FakePredictionComponent : public apollo::cybertron::TimerComponent {
   }
 
  private:
-  std::shared_ptr<apollo::cybertron::Writer<PredictionObstacles>>
+  std::shared_ptr<apollo::cyber::Writer<PredictionObstacles>>
       prediction_writer_;
 };
-CYBERTRON_REGISTER_COMPONENT(FakePredictionComponent);
+CYBER_REGISTER_COMPONENT(FakePredictionComponent);
 
 }  // namespace prediction
 }  // namespace apollo

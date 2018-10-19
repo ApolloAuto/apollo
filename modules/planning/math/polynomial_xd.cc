@@ -20,7 +20,7 @@
 
 #include "modules/planning/math/polynomial_xd.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {

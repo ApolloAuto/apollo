@@ -31,9 +31,9 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_client/can_client.h"

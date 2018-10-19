@@ -16,7 +16,7 @@ cc_library(
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/point_cloud_processing:point_cloud_processing",
         "//modules/perception/lidar/common:feature_descriptor",
-        "//cybertron",
+        "//cyber",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_library(
     deps = [
         ":tracked_object",
         "//modules/perception/base:object_pool",
-        "//cybertron",
+        "//cyber",
     ],
 )
 
@@ -50,7 +50,7 @@ cc_library(
     deps = [
         ":track_data",
         "//modules/perception/base:object_pool",
-        "//cybertron",
+        "//cyber",
         "@eigen",
     ],
 )

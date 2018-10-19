@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 DEFINE_string(list, "test.list", "test file title");
 DEFINE_string(file_title, "", "test file title");

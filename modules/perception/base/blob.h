@@ -66,7 +66,7 @@ license and copyright terms herein.
 #include <string>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/syncedmem.h"
 
 namespace apollo {

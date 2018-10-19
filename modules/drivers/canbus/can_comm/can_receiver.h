@@ -28,8 +28,8 @@
 #include <thread>
 #include <vector>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/macros.h"
+#include "cyber/cyber.h"
 
 #include "modules/common/proto/error_code.pb.h"
 
@@ -146,7 +146,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
       LOG_IF_EVERY_N(ERROR, receive_error_count++ > ERROR_COUNT_MAX,
                      ERROR_COUNT_MAX)
           << "Received " << receive_error_count << " error messages.";
-      cybertron::USleep(default_period);
+      cyber::USleep(default_period);
       continue;
     }
     receive_error_count = 0;
@@ -161,7 +161,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
       LOG_IF_EVERY_N(ERROR, receive_none_count++ > ERROR_COUNT_MAX,
                      ERROR_COUNT_MAX)
           << "Received " << receive_none_count << " empty messages.";
-      cybertron::USleep(default_period);
+      cyber::USleep(default_period);
       continue;
     }
     receive_none_count = 0;
@@ -175,7 +175,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
         ADEBUG << "recv_can_frame#" << frame.CanFrameString();
       }
     }
-    cybertron::Yield();
+    cyber::Yield();
   }
   AINFO << "Can client receiver thread stopped.";
 }
@@ -192,7 +192,7 @@ template <typename SensorType>
   }
   is_running_ = true;
 
-  cybertron::Async(&CanReceiver<SensorType>::RecvThreadFunc, this);
+  cyber::Async(&CanReceiver<SensorType>::RecvThreadFunc, this);
   return ::apollo::common::ErrorCode::OK;
 }
 

@@ -32,7 +32,7 @@ void Velodyne128Parser::GeneratePointcloud(
   // allocate a point cloud with same time and frame ID as raw data
   out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());
   out_msg->mutable_header()->set_timestamp_sec(
-      cybertron::Time().Now().ToSecond());
+      cyber::Time().Now().ToSecond());
   out_msg->set_height(1);
 
   // us

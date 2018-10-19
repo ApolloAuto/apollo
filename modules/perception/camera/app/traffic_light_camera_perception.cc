@@ -18,7 +18,7 @@
 #include <gflags/gflags.h>
 #include <string>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
@@ -34,8 +34,8 @@ namespace camera {
 bool TrafficLightCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
-  if (options.use_cybertron_work_root) {
-    GetCybertronWorkRoot(&work_root);
+  if (options.use_cyber_work_root) {
+    GetCyberWorkRoot(&work_root);
   }
   std::string proto_path =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);

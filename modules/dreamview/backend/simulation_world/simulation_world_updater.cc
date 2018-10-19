@@ -318,7 +318,7 @@ bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
 }
 
 void SimulationWorldUpdater::Start() {
-  timer_.reset(new cybertron::Timer(kSimWorldTimeIntervalMs,
+  timer_.reset(new cyber::Timer(kSimWorldTimeIntervalMs,
                                     [this]() { this->OnTimer(); }, false));
   timer_->Start();
 }

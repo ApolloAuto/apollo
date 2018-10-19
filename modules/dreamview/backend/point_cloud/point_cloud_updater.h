@@ -28,8 +28,8 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
-#include "cybertron/common/log.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/log.h"
+#include "cyber/cyber.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
@@ -88,7 +88,7 @@ class PointCloudUpdater {
 
   constexpr static float kDefaultLidarHeight = 1.91;
 
-  std::unique_ptr<cybertron::Node> node_;
+  std::unique_ptr<cyber::Node> node_;
 
   WebSocketHandler *websocket_;
 
@@ -100,10 +100,10 @@ class PointCloudUpdater {
   std::future<void> async_future_;
   std::atomic<bool> future_ready_;
 
-  // Cybertron messsage readers.
-  std::shared_ptr<cybertron::Reader<apollo::localization::LocalizationEstimate>>
+  // Cyber messsage readers.
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
-  std::shared_ptr<cybertron::Reader<drivers::PointCloud>>
+  std::shared_ptr<cyber::Reader<drivers::PointCloud>>
       point_cloud_reader_;
 
   double last_point_cloud_time_ = 0.0;

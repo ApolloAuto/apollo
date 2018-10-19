@@ -242,7 +242,7 @@ class RtkPlayer(object):
 
     def shutdown(self):
         """
-        shutdown cybertron
+        shutdown cyber
         """
         self.terminating = True
         self.logger.info("Shutting Down...")
@@ -257,7 +257,7 @@ class RtkPlayer(object):
 
 def main():
     """
-    Main cybertron
+    Main cyber
     """
     parser = argparse.ArgumentParser(
         description='Generate Planning Trajectory from Data File')
@@ -276,7 +276,7 @@ def main():
         default='F')
     args = vars(parser.parse_args())
 
-    node = cybertron.Node("rtk_player")
+    node = cyber.Node("rtk_player")
 
     Logger.config(
         log_file=os.path.join(APOLLO_ROOT, 'data/log/rtk_player.log'),
@@ -298,7 +298,7 @@ def main():
     node.create_reader('/apollo/control/pad', pad_msg_pb2.PadMessage,
                        player.padmsg_callback)
 
-    while not cybertron.is_shutdown():
+    while not cyber.is_shutdown():
         now = time.time()
         player.publish_planningmsg()
         sleep_time = 0.1 - (time.time() - now)
@@ -307,6 +307,6 @@ def main():
 
 
 if __name__ == '__main__':
-    cybertron.init()
+    cyber.init()
     main()
-    cybertron.shutdown()
+    cyber.shutdown()

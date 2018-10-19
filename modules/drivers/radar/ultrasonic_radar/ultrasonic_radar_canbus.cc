@@ -43,7 +43,7 @@ std::string UltrasonicRadarCanbus::Name() const {
 
 apollo::common::Status UltrasonicRadarCanbus::Init(
   const std::string& config_path,
-  const std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>>& writer) {
+  const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer) {
   if (!apollo::common::util::GetProtoFromFile(config_path,
                                               &ultrasonic_radar_conf_)) {
     return OnError("Unable to load canbus conf file: " + config_path);

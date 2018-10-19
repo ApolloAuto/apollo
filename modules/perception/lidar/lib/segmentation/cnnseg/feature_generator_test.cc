@@ -114,8 +114,8 @@ class FeatureGeneratorTest : public ::testing::Test {
 };
 
 TEST_F(FeatureGeneratorTest, basic_test) {
-  char cybertron_path[100] = "CYBERTRON_PATH=";
-  putenv(cybertron_path);
+  char cyber_path[100] = "CYBER_PATH=";
+  putenv(cyber_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
   FLAGS_work_root = "/apollo/modules/perception/testdata/"

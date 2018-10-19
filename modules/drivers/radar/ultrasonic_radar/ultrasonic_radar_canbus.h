@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/time/time.h"
@@ -83,7 +83,7 @@ class UltrasonicRadarCanbus {
   */
   apollo::common::Status Init(
     const std::string& config_path,
-    const std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>>& writer);
+    const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer);
 
   /**
   * @brief module start function

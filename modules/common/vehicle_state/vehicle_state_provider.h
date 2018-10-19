@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"

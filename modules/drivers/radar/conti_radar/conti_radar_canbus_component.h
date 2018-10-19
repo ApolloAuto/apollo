@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
@@ -66,10 +66,10 @@ using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
 using apollo::localization::LocalizationEstimate;
-using apollo::cybertron::Writer;
-using apollo::cybertron::Reader;
+using apollo::cyber::Writer;
+using apollo::cyber::Reader;
 
-class ContiRadarCanbusComponent : public apollo::cybertron::Component<> {
+class ContiRadarCanbusComponent : public apollo::cyber::Component<> {
  public:
   ContiRadarCanbusComponent();
   ~ContiRadarCanbusComponent();
@@ -96,7 +96,7 @@ class ContiRadarCanbusComponent : public apollo::cybertron::Component<> {
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(ContiRadarCanbusComponent)
+CYBER_REGISTER_COMPONENT(ContiRadarCanbusComponent)
 
 }  // namespace conti_radar
 }  // namespace drivers

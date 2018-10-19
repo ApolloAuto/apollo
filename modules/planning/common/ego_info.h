@@ -27,7 +27,7 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"

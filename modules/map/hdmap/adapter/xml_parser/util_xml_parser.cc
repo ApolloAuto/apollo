@@ -21,7 +21,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
 
 namespace apollo {

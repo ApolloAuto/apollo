@@ -21,7 +21,7 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 #include "modules/perception/common/i_lib/core/i_alloc.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"
 

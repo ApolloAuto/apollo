@@ -7,7 +7,7 @@ cc_library(
     srcs = ["vehicle_manager.cc"],
     hdrs = ["vehicle_manager.h"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/util",
         "//modules/common/util:string_util",
         "//modules/dreamview/proto:hmi_config_proto",
@@ -61,7 +61,7 @@ cc_library(
     ],
     deps = [
         ":vehicle_manager",
-        "//cybertron",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/common/kv_db",

@@ -20,14 +20,14 @@
 #include <memory>
 #include <thread>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/cybertron.h"
-#include "cybertron/time/time.h"
+#include "cyber/common/macros.h"
+#include "cyber/cyber.h"
+#include "cyber/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
@@ -45,9 +45,9 @@ using apollo::common::VehicleSignal;
 using apollo::common::time::Clock;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
-using apollo::cybertron::CreateNode;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::CreateNode;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 
 const uint32_t KEYCODE_O = 0x4F;  // '0'
 
@@ -409,13 +409,13 @@ class Teleop {
   std::shared_ptr<Writer<ControlCommand>> control_command_writer_;
   ControlCommand control_command_;
   bool is_running_ = false;
-  std::shared_ptr<apollo::cybertron::Node> node_;
+  std::shared_ptr<apollo::cyber::Node> node_;
 };
 
 }  // namespace
 
 int main(int32_t argc, char **argv) {
-  apollo::cybertron::Init(argv[0]);
+  apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
 
@@ -428,7 +428,7 @@ int main(int32_t argc, char **argv) {
     return -1;
   }
   Teleop::PrintKeycode();
-  apollo::cybertron::WaitForShutdown();
+  apollo::cyber::WaitForShutdown();
   teleop.Stop();
   AINFO << "Teleop exit done.";
   return 0;

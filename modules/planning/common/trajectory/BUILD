@@ -89,7 +89,7 @@ cc_library(
     ],
     deps = [
         ":publishable_trajectory",
-        "//cybertron",
+        "//cyber",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/reference_line",

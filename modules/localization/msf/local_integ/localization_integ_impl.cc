@@ -19,7 +19,7 @@
 #include <list>
 #include <queue>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/time/timer.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 
@@ -373,7 +373,7 @@ void LocalizationIntegImpl::RawObservationProcess(
 
   RawObservationProcessImpl(raw_obs_msg);
 
-  // TODO(zhouyao4321): Use cybertron::Task instead.
+  // TODO(zhouyao4321): Use cyber::Task instead.
   // // push process function to queue
   // gnss_function_queue_mutex_.lock();
   // gnss_function_queue_.push(std::function<void()>(std::bind(
@@ -393,7 +393,7 @@ void LocalizationIntegImpl::RawEphemerisProcess(
 
   RawEphemerisProcessImpl(gnss_orbit_msg);
 
-  // TODO(zhouyao4321): Use cybertron::Task instead.
+  // TODO(zhouyao4321): Use cyber::Task instead.
   // // push process function to queue
   // gnss_function_queue_mutex_.lock();
   // gnss_function_queue_.push(std::function<void()>(std::bind(
@@ -413,7 +413,7 @@ void LocalizationIntegImpl::GnssBestPoseProcess(
 
   GnssBestPoseProcessImpl(bestgnsspos_msg);
 
-  // TODO(zhouyao4321): Use cybertron::Task instead.
+  // TODO(zhouyao4321): Use cyber::Task instead.
   // // push process function to queue
   // gnss_function_queue_mutex_.lock();
   // gnss_function_queue_.push(std::function<void()>(std::bind(

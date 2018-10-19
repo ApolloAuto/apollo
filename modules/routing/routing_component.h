@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include "cybertron/class_loader/class_loader.h"
-#include "cybertron/component/component.h"
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/component.h"
 
 #include "modules/routing/routing.h"
 
@@ -27,7 +27,7 @@ namespace apollo {
 namespace routing {
 
 class RoutingComponent final
-    : public ::apollo::cybertron::Component<RoutingRequest> {
+    : public ::apollo::cyber::Component<RoutingRequest> {
  public:
   RoutingComponent() = default;
   ~RoutingComponent() = default;
@@ -35,12 +35,12 @@ class RoutingComponent final
   bool Init() override;
   bool Proc(const std::shared_ptr<RoutingRequest>& request) override;
  private:
-  std::shared_ptr<::apollo::cybertron::Writer<RoutingResponse>>
+  std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>>
       response_writer_ = nullptr;
   Routing routing_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(RoutingComponent)
+CYBER_REGISTER_COMPONENT(RoutingComponent)
 
 }  // namespace routing
 }  // namespace apollo

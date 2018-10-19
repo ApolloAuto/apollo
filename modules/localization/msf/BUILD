@@ -43,7 +43,7 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "//modules/localization/proto:msf_config_proto",
         "//modules/transform:transform_broadcaster_lib",
-        "//cybertron",
+        "//cyber",
         "@glog",
         "@gtest",
         "@yaml_cpp//:yaml",
@@ -67,7 +67,7 @@ cc_binary(
 #     data = ["//modules/localization:localization_testdata"],
 #     deps = [
 #         ":msf_localization",
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/common/time",
 #         "//modules/common/util",
 #         "@gtest//:main",

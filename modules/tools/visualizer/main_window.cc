@@ -45,7 +45,7 @@ const char* globalTreeItemStyle = "margin-right:10px";
 const char* aboutMessage =
     "Cyber_Visualizer\n"
     "\n"
-    "One Visualization Tool for Presenting Cybertron Channel Data\n"
+    "One Visualization Tool for Presenting Cyber Channel Data\n"
     "\n"
     "F5  Play | Pause\n"
     "\n"
@@ -260,7 +260,7 @@ MainWindow::~MainWindow() {
 
   pointcloud_reader_mutex_.unlock();
 
-  apollo::cybertron::Shutdown();
+  apollo::cyber::Shutdown();
 
   if (pointcloud_channel_Reader_) {
     delete pointcloud_channel_Reader_;
@@ -604,9 +604,9 @@ void MainWindow::DoOpenRadarChannel(bool b, RadarData* radarProxy) {
           new CyberChannReader<apollo::drivers::RadarObstacles>();
 
       if (!radarProxy->channel_reader_) {
-        QMessageBox::warning(this, tr("Create Cybertron Channel Reader"),
+        QMessageBox::warning(this, tr("Create cyber Channel Reader"),
                              tr("There is no enough memory!!!\nCannot create "
-                                "cybertron channel reader!"),
+                                "cyber channel reader!"),
                              QMessageBox::Ok);
         return;
       }
@@ -896,9 +896,9 @@ void MainWindow::PlayRenderableObject(bool b) {
           new CyberChannReader<apollo::drivers::PointCloud>();
 
       if (!pointcloud_channel_Reader_) {
-        QMessageBox::warning(this, tr("Create Cybertron Channel Reader"),
+        QMessageBox::warning(this, tr("Create Cyber Channel Reader"),
                              tr("There is no enough memory!!!\nCannot create "
-                                "cybertron channel reader!"),
+                                "cyber channel reader!"),
                              QMessageBox::Ok);
         pointcloud_button_->setChecked(false);
         return;
@@ -1025,9 +1025,9 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
       }
 
       if (!theVideoImg->image_reader_) {
-        QMessageBox::warning(this, tr("Create Cybertron Channel Reader"),
+        QMessageBox::warning(this, tr("Create cyber Channel Reader"),
                              tr("There is no enough memory!!!\nCannot create "
-                                "cybertron channel reader!"),
+                                "cyber channel reader!"),
                              QMessageBox::Ok);
         return;
       }
@@ -1135,19 +1135,19 @@ void MainWindow::SelectCurrentTreeItem(FixedAspectRatioWidget* dock) {
 }
 
 void MainWindow::TopologyChanged(
-    const apollo::cybertron::proto::ChangeMsg& changeMsg) {
-  if (::apollo::cybertron::proto::ChangeType::CHANGE_CHANNEL ==
+    const apollo::cyber::proto::ChangeMsg& changeMsg) {
+  if (::apollo::cyber::proto::ChangeType::CHANGE_CHANNEL ==
           changeMsg.change_type() &&
-      ::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
+      ::apollo::cyber::proto::RoleType::ROLE_WRITER ==
           changeMsg.role_type() &&
-      ::apollo::cybertron::proto::OperateType::OPT_JOIN ==
+      ::apollo::cyber::proto::OperateType::OPT_JOIN ==
           changeMsg.operate_type()) {
     FindNewWriter(changeMsg.role_attr());
   }
 }
 
 void MainWindow::FindNewWriter(
-    const apollo::cybertron::proto::RoleAttributes& role) {
+    const apollo::cyber::proto::RoleAttributes& role) {
   const std::string& channelName = role.channel_name();
   if (_channelName2TypeMap.find(channelName) != _channelName2TypeMap.end())
     return;

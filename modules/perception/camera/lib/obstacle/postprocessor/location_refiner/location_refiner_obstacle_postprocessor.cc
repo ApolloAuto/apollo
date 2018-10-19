@@ -18,7 +18,7 @@
 #include <assert.h>
 #include <algorithm>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"

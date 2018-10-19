@@ -18,7 +18,7 @@
 #include <iostream>
 #include "gflags/gflags.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 DEFINE_string(op, "get", "Operation to execute, should be put, get or del.");
 DEFINE_string(key, "", "The key to query.");

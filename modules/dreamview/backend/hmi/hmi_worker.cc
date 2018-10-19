@@ -128,7 +128,7 @@ void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
 
 }  // namespace
 
-HMIWorker::HMIWorker(const std::shared_ptr<apollo::cybertron::Node> &node) {
+HMIWorker::HMIWorker(const std::shared_ptr<apollo::cyber::Node> &node) {
   // Init HMIConfig.
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
@@ -242,7 +242,7 @@ bool HMIWorker::CyberLaunch(const std::string& command) const {
 }
 
 void HMIWorker::InitReadersAndWriters(
-    const std::shared_ptr<apollo::cybertron::Node> &node) {
+    const std::shared_ptr<apollo::cyber::Node> &node) {
   // Received Chassis, trigger action if there is high beam signal.
   chassis_reader_ = node->CreateReader<Chassis>(
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
@@ -379,7 +379,7 @@ void HMIWorker::ChangeToMap(const std::string &map_name) {
   apollo::common::KVDB::Put("apollo:dreamview:map", map_name);
 
   SetGlobalFlag("map_dir", *map_dir, &FLAGS_map_dir);
-  cybertron::Async(&HMIWorker::RunModeCommand, this, "stop");
+  cyber::Async(&HMIWorker::RunModeCommand, this, "stop");
 
   // Trigger registered change map handlers.
   for (const auto handler : change_map_handlers_) {

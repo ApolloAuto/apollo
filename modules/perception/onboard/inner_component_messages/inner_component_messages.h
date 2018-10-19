@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/impending_collision_edge.h"
@@ -49,7 +49,7 @@ class Descriptor {
   std::string full_name() { return "name"; }
 };
 
-class SensorFrameMessage : public apollo::cybertron::message::IntraMessage {
+class SensorFrameMessage : public apollo::cyber::message::IntraMessage {
  public:
   SensorFrameMessage() { type_name_ = "SensorFrameMessage"; }
   ~SensorFrameMessage() = default;

@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
@@ -33,8 +33,8 @@ namespace transform {
 
 class TransformBroadcaster {
  public:
-  /** \brief Constructor (needs a cybertron::Node reference) */
-  explicit TransformBroadcaster(const std::shared_ptr<cybertron::Node>& node);
+  /** \brief Constructor (needs a cyber::Node reference) */
+  explicit TransformBroadcaster(const std::shared_ptr<cyber::Node>& node);
 
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id
@@ -48,8 +48,8 @@ class TransformBroadcaster {
       const std::vector<apollo::transform::TransformStamped>& transforms);
 
  private:
-  std::shared_ptr<cybertron::Node> node_;
-  std::shared_ptr<cybertron::Writer<apollo::transform::TransformStampeds>>
+  std::shared_ptr<cyber::Node> node_;
+  std::shared_ptr<cyber::Writer<apollo::transform::TransformStampeds>>
       writer_;
 };
 }  // namespace transform

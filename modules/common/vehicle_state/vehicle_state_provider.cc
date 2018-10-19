@@ -20,7 +20,7 @@
 
 #include "Eigen/Core"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/euler_angles_zxy.h"

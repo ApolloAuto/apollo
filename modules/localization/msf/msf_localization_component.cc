@@ -27,12 +27,12 @@ namespace apollo {
 namespace localization {
 
 using apollo::common::time::Clock;
-using apollo::cybertron::proto::RoleAttributes;
+using apollo::cyber::proto::RoleAttributes;
 
 MSFLocalizationComponent::MSFLocalizationComponent() {}
 
 bool MSFLocalizationComponent::Init() {
-  Clock::SetMode(Clock::CYBERTRON);
+  Clock::SetMode(Clock::CYBER);
   publisher_.reset(new LocalizationMsgPublisher(this->node_));
 
   if (InitConfig() != true) {
@@ -50,7 +50,7 @@ bool MSFLocalizationComponent::Init() {
 
 bool MSFLocalizationComponent::InitConfig() {
   msf_config::Config msf_config;
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
                                                    &msf_config)) {
     return false;
   }
@@ -73,7 +73,7 @@ bool MSFLocalizationComponent::InitConfig() {
 }
 
 bool MSFLocalizationComponent::InitIO() {
-  cybertron::ReaderConfig reader_config;
+  cyber::ReaderConfig reader_config;
   reader_config.channel_name = lidar_topic_;
   reader_config.pending_queue_size = 1;
 
@@ -110,7 +110,7 @@ bool MSFLocalizationComponent::Proc(
 }
 
 LocalizationMsgPublisher::LocalizationMsgPublisher(
-    const std::shared_ptr<cybertron::Node>& node)
+    const std::shared_ptr<cyber::Node>& node)
     : node_(node), tf2_broadcaster_(node) {}
 
 bool LocalizationMsgPublisher::InitConfig(const msf_config::Config& config) {

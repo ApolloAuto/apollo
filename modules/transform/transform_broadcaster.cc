@@ -20,9 +20,9 @@ namespace apollo {
 namespace transform {
 
 TransformBroadcaster::TransformBroadcaster(
-    const std::shared_ptr<cybertron::Node>& node)
+    const std::shared_ptr<cyber::Node>& node)
     : node_(node) {
-  cybertron::proto::RoleAttributes attr;
+  cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
   writer_ = node_->CreateWriter<::apollo::transform::TransformStampeds>(attr);
 }

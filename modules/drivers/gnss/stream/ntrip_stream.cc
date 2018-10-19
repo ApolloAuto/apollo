@@ -18,7 +18,7 @@
 #include <iostream>
 #include <mutex>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
@@ -172,7 +172,7 @@ void NtripStream::Reconnect() {
     return;
   }
 
-  data_active_s_ = cybertron::Time::Now().ToSecond();
+  data_active_s_ = cyber::Time::Now().ToSecond();
   AINFO << "Reconnect ntrip caster success.";
 }
 
@@ -191,16 +191,16 @@ size_t NtripStream::read(uint8_t* buffer, size_t max_length) {
   }
 
   if (is_zero(data_active_s_)) {
-    data_active_s_ = cybertron::Time::Now().ToSecond();
+    data_active_s_ = cyber::Time::Now().ToSecond();
   }
 
   ret = tcp_stream_->read(buffer, max_length);
   if (ret) {
-    data_active_s_ = cybertron::Time::Now().ToSecond();
+    data_active_s_ = cyber::Time::Now().ToSecond();
   }
 
   // timeout detect
-  if ((cybertron::Time::Now().ToSecond() - data_active_s_) > timeout_s_) {
+  if ((cyber::Time::Now().ToSecond() - data_active_s_) > timeout_s_) {
     AINFO << "Ntrip timeout.";
     Reconnect();
   }

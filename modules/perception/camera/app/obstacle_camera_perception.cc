@@ -21,7 +21,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/app/debug_info.h"
@@ -40,8 +40,8 @@ namespace camera {
 bool ObstacleCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
-  if (options.use_cybertron_work_root) {
-    GetCybertronWorkRoot(&work_root);
+  if (options.use_cyber_work_root) {
+    GetCyberWorkRoot(&work_root);
   }
   std::string config_file =
       lib::FileUtil::GetAbsolutePath(options.root_dir,

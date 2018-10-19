@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/lib/utils/time_util.h"
@@ -35,13 +35,13 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-using apollo::cybertron::FAIL;
-using apollo::cybertron::SUCC;
+using apollo::cyber::FAIL;
+using apollo::cyber::SUCC;
 using apollo::drivers::ContiRadar;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::onboard::RadarComponentConfig;
 
-class RadarDetectionComponent : public cybertron::Component<ContiRadar> {
+class RadarDetectionComponent : public cyber::Component<ContiRadar> {
  public:
   RadarDetectionComponent()
       : seq_num_(0),
@@ -78,10 +78,10 @@ class RadarDetectionComponent : public cybertron::Component<ContiRadar> {
   std::shared_ptr<radar::BasePreprocessor> radar_preprocessor_;
   std::shared_ptr<radar::BaseRadarObstaclePerception> radar_perception_;
   MsgBuffer<LocalizationEstimate> localization_subscriber_;
-  std::shared_ptr<apollo::cybertron::Writer<SensorFrameMessage>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>> writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(RadarDetectionComponent);
+CYBER_REGISTER_COMPONENT(RadarDetectionComponent);
 
 }  // namespace onboard
 }  // namespace perception

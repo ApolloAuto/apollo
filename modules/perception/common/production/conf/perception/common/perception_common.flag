@@ -9,4 +9,4 @@
 # The intrinsics/extrinsics dir
 # type: string
 # default:
---obs_sensor_intrinsic_path=/home/caros/cybertron/params
+--obs_sensor_intrinsic_path=/home/caros/cyber/params

@@ -58,7 +58,7 @@ cc_library(
         "frame_list.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
@@ -99,7 +99,7 @@ cc_library(
         ":frame_list",
         ":omt_proto",
         ":target",
-        "//cybertron",
+        "//cyber",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
     ],

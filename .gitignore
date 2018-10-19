@@ -89,5 +89,5 @@ modules/calibration/data/
 # Data bag
 docs/demo_guide/*.bag
 
-# Cybertron
-cybertron/log/*
+# Logs
+cyber/log/*

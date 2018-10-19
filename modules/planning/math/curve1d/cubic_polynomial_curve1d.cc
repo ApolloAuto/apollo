@@ -20,7 +20,7 @@
 
 #include "modules/planning/math/curve1d/cubic_polynomial_curve1d.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/string_util.h"
 
 namespace apollo {

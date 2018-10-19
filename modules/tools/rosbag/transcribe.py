@@ -20,6 +20,7 @@ This program can transcribe a protobuf message to file
 """
 
 from cyber_py import cybertron
+
 import argparse
 import shutil
 import os
@@ -62,8 +63,8 @@ if __name__ == "__main__":
     if not meta_msg:
         print "Unknown topic name: %s" % (g_args.topic)
         sys.exit(0)
-    cybertron.init()
-    node = cybertron.Node("transcribe_node")
+    cyber.init()
+    node = cyber.Node("transcribe_node")
     node.create_reader(g_args.topic, meta_msg.msg_type, transcribe)
-    while not cybertron.is_shutdown():
+    while not cyber.is_shutdown():
         time.sleep(0.005)

@@ -92,7 +92,7 @@ void SocketInput::init(const int &port) {
 /** @brief Get one velodyne packet. */
 int SocketInput::get_firing_data_packet(VelodynePacket *pkt) {
   // double time1 = ros::Time::now().toSec();
-  double time1 = apollo::cybertron::Time().Now().ToSecond();
+  double time1 = apollo::cyber::Time().Now().ToSecond();
   while (true) {
     if (!input_available(POLL_TIMEOUT)) {
       return SOCKET_TIMEOUT;
@@ -119,8 +119,8 @@ int SocketInput::get_firing_data_packet(VelodynePacket *pkt) {
     AERROR << "Incomplete Velodyne rising data packet read: " << nbytes
            << " bytes from port " << port_;
   }
-  double time2 = apollo::cybertron::Time().Now().ToSecond();
-  pkt->set_stamp(apollo::cybertron::Time((time2 + time1) / 2.0).ToNanosecond());
+  double time2 = apollo::cyber::Time().Now().ToSecond();
+  pkt->set_stamp(apollo::cyber::Time((time2 + time1) / 2.0).ToNanosecond());
 
   return 0;
 }

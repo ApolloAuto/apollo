@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/time/time.h"
@@ -68,7 +68,7 @@ using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
 
-class RacobitRadarCanbusComponent : public apollo::cybertron::Component<> {
+class RacobitRadarCanbusComponent : public apollo::cyber::Component<> {
  public:
   // TODO(lizh): check whether we need a new msg item, say
   // MonitorMessageItem::SENSORCANBUS
@@ -92,12 +92,12 @@ class RacobitRadarCanbusComponent : public apollo::cybertron::Component<> {
   int64_t last_timestamp_ = 0;
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   bool start_success_ = false;
-  // cybertron
+  // cyber
   RacobitRadarConf racobit_radar_conf_;
-  std::shared_ptr<cybertron::Writer<RacobitRadar>> racobit_radar_writer_;
+  std::shared_ptr<cyber::Writer<RacobitRadar>> racobit_radar_writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(RacobitRadarCanbusComponent)
+CYBER_REGISTER_COMPONENT(RacobitRadarCanbusComponent)
 
 }  // namespace racobit_radar
 }  // namespace drivers

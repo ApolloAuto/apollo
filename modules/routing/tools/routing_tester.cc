@@ -19,12 +19,12 @@
 
 #include "gflags/gflags.h"
 
-#include "cybertron/cybertron.h"
-#include "cybertron/time/rate.h"
-#include "cybertron/time/time.h"
+#include "cyber/cyber.h"
+#include "cyber/time/rate.h"
+#include "cyber/time/time.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -35,14 +35,14 @@ DEFINE_string(routing_test_file,
               "modules/routing/testdata/routing_tester/routing_test.pb.txt",
               "Used for sending routing request to routing node.");
 
-using apollo::cybertron::Rate;
-using apollo::cybertron::Time;
+using apollo::cyber::Rate;
+using apollo::cyber::Time;
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  // init cybertron framework
-  apollo::cybertron::Init(argv[0]);
+  // init cyber framework
+  apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
 
   apollo::routing::RoutingRequest routing_request;
@@ -59,13 +59,13 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("routing_tester"));
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("routing_tester"));
   auto writer = node->CreateWriter<apollo::routing::RoutingRequest>(
       FLAGS_routing_request_topic);
 
   Rate rate(1.0);
-  while (apollo::cybertron::OK()) {
+  while (apollo::cyber::OK()) {
     writer->Write(routing_request);
     AINFO << "send out routing request: " << routing_request.DebugString();
     rate.Sleep();

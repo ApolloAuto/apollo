@@ -22,7 +22,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/gnss/stream/stream.h"
 

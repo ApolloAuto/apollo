@@ -17,14 +17,14 @@
 
 #include <memory>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
-class LidarOutputComponent : public cybertron::Component<SensorFrameMessage> {
+class LidarOutputComponent : public cyber::Component<SensorFrameMessage> {
  public:
   LidarOutputComponent() = default;
   ~LidarOutputComponent() = default;
@@ -33,10 +33,10 @@ class LidarOutputComponent : public cybertron::Component<SensorFrameMessage> {
   bool Proc(const std::shared_ptr<SensorFrameMessage>& message) override;
 
  private:
-  std::shared_ptr<apollo::cybertron::Writer<PerceptionObstacles>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<PerceptionObstacles>> writer_;
 };  // class LidarOutputComponent
 
-CYBERTRON_REGISTER_COMPONENT(LidarOutputComponent);
+CYBER_REGISTER_COMPONENT(LidarOutputComponent);
 
 }  // namespace onboard
 }  // namespace perception

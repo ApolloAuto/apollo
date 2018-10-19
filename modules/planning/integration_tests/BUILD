@@ -16,7 +16,7 @@ cc_library(
         "//modules/planning:planning_testdata",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",

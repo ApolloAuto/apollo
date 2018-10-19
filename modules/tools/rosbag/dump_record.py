@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 """
-This program can dump a cybertron record into separate text files that contains the pb messages
+This program can dump a cyber record into separate text files that contains the pb messages
 """
 
 import argparse
@@ -80,24 +80,24 @@ def dump_record(in_record, out_dir, start_time, duration, filter_topic):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=
-        "A tool to dump the protobuf messages in a cybertron record into text files"
+        "A tool to dump the protobuf messages in a cyber record into text files"
     )
     parser.add_argument(
         "in_record",
         action="store",
         type=str,
-        help="the input cybertron record")
+        help="the input cyber record")
     parser.add_argument(
         "--start_time",
         action="store",
         type=float,
-        help="the input cybertron record")
+        help="the input cyber record")
     parser.add_argument(
         "--duration",
         action="store",
         type=float,
         default=1.0,
-        help="the input cybertron record")
+        help="the input cyber record")
     parser.add_argument(
         "out_dir",
         action="store",

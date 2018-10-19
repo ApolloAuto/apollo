@@ -19,8 +19,8 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
-#include "cybertron/common/log.h"
-#include "cybertron/time/time.h"
+#include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -78,7 +78,7 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
   }
 
   lidar_frame->measurement_time =
-      cybertron::Time(msg.measurement_time()).ToSecond();
+      cyber::Time(msg.measurement_time()).ToSecond();
   if (FLAGS_lidar_debug_log_flag) {
     AINFO << std::setprecision(15) << "LocalLidar Debug Log: velodyne msg. "
           << "[time:" << lidar_frame->measurement_time

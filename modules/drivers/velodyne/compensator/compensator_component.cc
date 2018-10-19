@@ -47,7 +47,7 @@ bool CompensatorComponent::Init() {
 
 bool CompensatorComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
-  uint64_t start = cybertron::Time().Now().ToNanosecond();
+  uint64_t start = cyber::Time().Now().ToNanosecond();
   if (index_ >= queue_size_) {
     index_ = 0;
   }
@@ -55,7 +55,7 @@ bool CompensatorComponent::Proc(
       compensator_deque_[index_++];
   point_cloud_compensated->Clear();
   if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
-    uint64_t diff = cybertron::Time().Now().ToNanosecond() - start;
+    uint64_t diff = cyber::Time().Now().ToNanosecond() - start;
     AINFO << "compenstator diff:" << diff
           << ";meta:" << point_cloud_compensated->header().lidar_timestamp();
     point_cloud_compensated->mutable_header()->set_sequence_num(seq_);

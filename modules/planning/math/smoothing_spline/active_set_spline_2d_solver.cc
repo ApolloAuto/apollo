@@ -23,7 +23,7 @@
 #include <algorithm>
 
 #include "Eigen/Core"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"
 #include "modules/common/time/time.h"

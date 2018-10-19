@@ -24,7 +24,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/map/proto/map_geometry.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
@@ -43,7 +43,7 @@ namespace perception {
 namespace onboard {
 
 class TrafficLightsPerceptionComponent :
-    public apollo::cybertron::Component<> {
+    public apollo::cyber::Component<> {
  public:
   TrafficLightsPerceptionComponent() = default;
   ~TrafficLightsPerceptionComponent() = default;
@@ -126,7 +126,7 @@ class TrafficLightsPerceptionComponent :
   // camera_name -> image_border_size
   std::map<std::string, int> image_border_sizes_;
 
-  std::vector<std::shared_ptr<cybertron::Node> > camera_listener_nodes_;
+  std::vector<std::shared_ptr<cyber::Node> > camera_listener_nodes_;
 
   double last_sub_tf_ts_ = 0.0;
 
@@ -178,11 +178,11 @@ class TrafficLightsPerceptionComponent :
   std::string simulation_channel_name_;
   std::string traffic_light_output_channel_name_;
 
-  std::shared_ptr<apollo::cybertron::Writer<
+  std::shared_ptr<apollo::cyber::Writer<
         apollo::perception::TrafficLightDetection>> writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(TrafficLightsPerceptionComponent);
+CYBER_REGISTER_COMPONENT(TrafficLightsPerceptionComponent);
 
 }  // namespace onboard
 }  // namespace perception

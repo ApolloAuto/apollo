@@ -41,7 +41,7 @@ using RLock = boost::shared_lock<boost::shared_mutex>;
 constexpr int HMI::kMinBroadcastIntervalMs;
 
 HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
-    : node_(cybertron::CreateNode("hmi")),
+    : node_(cyber::CreateNode("hmi")),
       websocket_(websocket),
       map_service_(map_service),
       monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI) {
@@ -50,7 +50,7 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
   // Register websocket message handlers.
   if (websocket_) {
     RegisterMessageHandlers();
-    cybertron::Async(&HMI::BroadcastStatusThreadLoop, this);
+    cyber::Async(&HMI::BroadcastStatusThreadLoop, this);
   }
 
   audio_capture_writer_ =

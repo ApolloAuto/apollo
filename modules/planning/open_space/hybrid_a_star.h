@@ -40,8 +40,8 @@
 #include "modules/planning/open_space/node3d.h"
 #include "modules/planning/open_space/reeds_shepp_path.h"
 
-#include "cybertron/common/log.h"
-#include "cybertron/common/macros.h"
+#include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"

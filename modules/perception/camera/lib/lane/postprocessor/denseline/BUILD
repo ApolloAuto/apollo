@@ -28,7 +28,7 @@ cc_library(
     ],
 
     deps = [
-        "//cybertron",
+        "//cyber",
         ":denseline_postprocessor_proto",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",

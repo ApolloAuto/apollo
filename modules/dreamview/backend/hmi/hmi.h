@@ -48,8 +48,8 @@ class HMI {
 
   void RegisterMessageHandlers();
 
-  std::shared_ptr<cybertron::Node> node_;
-  std::shared_ptr<cybertron::Writer<AudioCapture>> audio_capture_writer_;
+  std::shared_ptr<cyber::Node> node_;
+  std::shared_ptr<cyber::Writer<AudioCapture>> audio_capture_writer_;
 
   std::unique_ptr<HMIWorker> hmi_worker_;
 

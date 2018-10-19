@@ -18,7 +18,7 @@
 #include "google/protobuf/util/message_differencer.h"
 #include "gtest/gtest.h"
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/util/file.h"
 
 DECLARE_string(modes_config_path);
@@ -27,9 +27,9 @@ namespace apollo {
 namespace dreamview {
 
 TEST(HMIWorkerTest, Init) {
-  apollo::cybertron::Init();
-  std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("hmi_worker_tester"));
+  apollo::cyber::Init();
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("hmi_worker_tester"));
   HMIWorker worker(node);
   const auto& hmi_config = worker.GetConfig();
   EXPECT_GT(hmi_config.available_vehicles().size(), 0);

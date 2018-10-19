@@ -19,7 +19,7 @@
 #include <map>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/twod_threed_util.h"
 

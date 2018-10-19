@@ -23,7 +23,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "gtest/gtest_prod.h"
 
@@ -123,30 +123,30 @@ class SimControl : SimControlInterface {
 
   const MapService *map_service_ = nullptr;
 
-  std::unique_ptr<cybertron::Node> node_;
+  std::unique_ptr<cyber::Node> node_;
 
-  std::shared_ptr<cybertron::Reader<apollo::localization::LocalizationEstimate>>
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::planning::ADCTrajectory>>
+  std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
       planning_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingResponse>>
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
       routing_response_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::relative_map::NavigationInfo>>
+  std::shared_ptr<cyber::Reader<apollo::relative_map::NavigationInfo>>
       navigation_reader_;
-  std::shared_ptr<cybertron::Reader<apollo::prediction::PredictionObstacles>>
+  std::shared_ptr<cyber::Reader<apollo::prediction::PredictionObstacles>>
       prediction_reader_;
 
-  std::shared_ptr<cybertron::Writer<apollo::localization::LocalizationEstimate>>
+  std::shared_ptr<cyber::Writer<apollo::localization::LocalizationEstimate>>
       localization_writer_;
-  std::shared_ptr<cybertron::Writer<apollo::canbus::Chassis>> chassis_writer_;
-  std::shared_ptr<cybertron::Writer<apollo::prediction::PredictionObstacles>>
+  std::shared_ptr<cyber::Writer<apollo::canbus::Chassis>> chassis_writer_;
+  std::shared_ptr<cyber::Writer<apollo::prediction::PredictionObstacles>>
       prediction_writer_;
 
   // The timer to publish simulated localization and chassis messages.
-  std::unique_ptr<cybertron::Timer> sim_control_timer_;
+  std::unique_ptr<cyber::Timer> sim_control_timer_;
 
   // The timer to publish dummy prediction
-  std::unique_ptr<cybertron::Timer> sim_prediction_timer_;
+  std::unique_ptr<cyber::Timer> sim_prediction_timer_;
 
   // Time interval of the timer, in milliseconds.
   static constexpr double kSimControlIntervalMs = 10;

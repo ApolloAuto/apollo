@@ -28,7 +28,7 @@ cc_library(
     ],
     deps = [
         ":pose",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
@@ -48,7 +48,7 @@ cc_library(
         "pose.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
     ],
 )
@@ -71,7 +71,7 @@ cc_library(
         "@eigen",
         ":multi_camera_projection",
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",

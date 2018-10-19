@@ -60,7 +60,7 @@ extern "C" {
 #include <sstream>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/camera/proto/config.pb.h"
 

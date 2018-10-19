@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include <map>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
 

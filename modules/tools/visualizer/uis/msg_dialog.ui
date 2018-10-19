@@ -20,9 +20,9 @@
    <item>
     <widget class="QLabel" name="msgLabel">
      <property name="text">
-      <string>CybertronVisualizer
+      <string>CyberVisualizer
 
-One Visualization Tool for Presenting Cybertron Channel Data
+One Visualization Tool for Presenting Cyber Channel Data
 
 F5  Play | Pause
 Main View PointCloud view

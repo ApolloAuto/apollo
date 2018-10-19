@@ -24,7 +24,7 @@ cc_library(
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/transform:transform_broadcaster_lib",
-        "//cybertron",
+        "//cyber",
         "@eigen",
         "@gtest",
     ],
@@ -45,7 +45,7 @@ cc_test(
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/time",
         "//modules/common/util",
         "//modules/localization/rtk:rtk_localization_component_lib",

@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/prediction/proto/lane_graph.pb.h"
 

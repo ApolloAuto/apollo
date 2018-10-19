@@ -22,7 +22,7 @@
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {

@@ -38,7 +38,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/msf_config.pb.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_integ.h"

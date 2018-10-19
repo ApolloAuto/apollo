@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+enum LogLevel {
+  DEBUG = -1;
+  INFO = 0;
+  WARNING = 1;
+  ERROR = 2;
+  FATAL = 3;
+}
+
+message LogConf {
+  optional string log_dir = 1;
+  optional bool log_to_stderr = 2 [default = false];
+  optional bool color_log_to_stderr = 3 [default = true];
+  optional LogLevel min_log_level = 4;
+}
+

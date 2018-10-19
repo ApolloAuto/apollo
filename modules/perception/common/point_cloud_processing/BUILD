@@ -9,7 +9,7 @@ cc_library(
         "downsampling.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/geometry:basic",
     ],

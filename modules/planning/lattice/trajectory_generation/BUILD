@@ -165,7 +165,7 @@ cc_library(
         "lateral_qp_optimizer.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
     ],
 )
@@ -180,7 +180,7 @@ cc_library(
     ],
     deps = [
         ":lateral_qp_optimizer",
-        "//cybertron",
+        "//cyber",
         "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",
         "@osqp",

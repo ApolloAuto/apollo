@@ -16,7 +16,7 @@
 
 #include "modules/monitor/software/localization_monitor.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"
 #include "modules/localization/proto/localization.pb.h"

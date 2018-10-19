@@ -20,7 +20,7 @@
 #include <string>
 
 #include "CivetServer.h"
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/status/status.h"
 #include "modules/dreamview/backend/handlers/image_handler.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
@@ -48,7 +48,7 @@ class Dreamview {
  private:
   void TerminateProfilingMode();
 
-  std::unique_ptr<cybertron::Timer> exit_timer_;
+  std::unique_ptr<cyber::Timer> exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;
   std::unique_ptr<PointCloudUpdater> point_cloud_updater_;

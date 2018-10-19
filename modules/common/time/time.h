@@ -28,10 +28,10 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/time/time.h"
+#include "cyber/common/macros.h"
+#include "cyber/time/time.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 
 /**
@@ -152,7 +152,7 @@ class Clock {
   enum ClockMode {
     SYSTEM = 0,
     MOCK = 1,
-    CYBERTRON = 2,
+    CYBER = 2,
   };
 
   /**
@@ -165,12 +165,12 @@ class Clock {
         return SystemNow();
       case ClockMode::MOCK:
         return Instance()->mock_now_;
-      case ClockMode::CYBERTRON:
-        return From(cybertron::Time::Now().ToSecond());
+      case ClockMode::CYBER:
+        return From(cyber::Time::Now().ToSecond());
       default:
         AFATAL << "Unsupported clock mode: " << mode();
     }
-    return From(cybertron::Time::Now().ToSecond());
+    return From(cyber::Time::Now().ToSecond());
   }
 
   /**
@@ -250,7 +250,7 @@ class Clock {
 };
 
 inline Clock::Clock()
-    : Clock(FLAGS_use_cybertron_time ? ClockMode::CYBERTRON
+    : Clock(FLAGS_use_cyber_time ? ClockMode::CYBER
                                      : ClockMode::SYSTEM) {}
 
 // Measure run time of a code block, mostly for debugging purpose.

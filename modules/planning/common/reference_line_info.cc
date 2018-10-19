@@ -24,7 +24,7 @@
 #include <functional>
 #include <utility>
 
-#include "cybertron/task/task.h"
+#include "cyber/task/task.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -332,7 +332,7 @@ bool ReferenceLineInfo::AddObstacles(
     std::vector<std::future<PathObstacle*>> results;
     for (const auto* obstacle : obstacles) {
       results.push_back(
-          cybertron::Async(&ReferenceLineInfo::AddObstacle, this, obstacle));
+          cyber::Async(&ReferenceLineInfo::AddObstacle, this, obstacle));
     }
     for (auto& result : results) {
       if (!result.get()) {

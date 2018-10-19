@@ -11,7 +11,7 @@ cc_library(
         "third_party_perception_test_base.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",
         "//modules/third_party_perception:third_party_perception_lib",

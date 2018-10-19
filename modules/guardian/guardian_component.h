@@ -26,9 +26,9 @@
 #include <queue>
 #include <string>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/component/timer_component.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/macros.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/cyber.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -43,7 +43,7 @@
 namespace apollo {
 namespace guardian {
 
-class GuardianComponent : public apollo::cybertron::TimerComponent {
+class GuardianComponent : public apollo::cyber::TimerComponent {
  public:
   bool Init() override;
   bool Proc() override;
@@ -58,19 +58,19 @@ class GuardianComponent : public apollo::cybertron::TimerComponent {
   apollo::control::ControlCommand control_cmd_;
   apollo::guardian::GuardianCommand guardian_cmd_;
 
-  std::shared_ptr<apollo::cybertron::Reader<apollo::canbus::Chassis>>
+  std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
       chassis_reader_;
-  std::shared_ptr<apollo::cybertron::Reader<apollo::control::ControlCommand>>
+  std::shared_ptr<apollo::cyber::Reader<apollo::control::ControlCommand>>
       control_cmd_reader_;
-  std::shared_ptr<apollo::cybertron::Reader<apollo::monitor::SystemStatus>>
+  std::shared_ptr<apollo::cyber::Reader<apollo::monitor::SystemStatus>>
       system_status_reader_;
-  std::shared_ptr<apollo::cybertron::Writer<apollo::guardian::GuardianCommand>>
+  std::shared_ptr<apollo::cyber::Writer<apollo::guardian::GuardianCommand>>
       guardian_writer_;
 
   std::mutex mutex_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(GuardianComponent)
+CYBER_REGISTER_COMPONENT(GuardianComponent)
 
 }  // namespace guardian
 }  // namespace apollo

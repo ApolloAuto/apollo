@@ -18,7 +18,7 @@
 #include <cmath>
 #include <limits>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/perception/base/camera.h"
 #include "modules/perception/base/polynomial.h"

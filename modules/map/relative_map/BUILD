@@ -41,7 +41,7 @@ cc_library(
         "navigation_lane.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/localization/proto:localization_proto",
@@ -63,7 +63,7 @@ cc_library(
     deps = [
         ":relative_map_lib",
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
     ],
 )

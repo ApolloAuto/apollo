@@ -16,7 +16,7 @@
 
 #include "modules/map/pnc_map/cuda_util.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include <cuda_runtime_api.h>
 #include <device_functions.h>

@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/geometry/basic.h"

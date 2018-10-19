@@ -170,7 +170,7 @@ def main(argv):
     """
     Main node
     """
-    node = cybertron.Node("rtk_recorder")
+    node = cyber.Node("rtk_recorder")
     argv = FLAGS(argv)
     log_dir = os.path.dirname(os.path.abspath(__file__)) + "/../../../data/log/"
     if not os.path.exists(log_dir):
@@ -190,11 +190,11 @@ def main(argv):
                      localization_pb2.LocalizationEstimate,
                      recorder.localization_callback)
 
-    while not cybertron.is_shutdown():
+    while not cyber.is_shutdown():
         time.sleep(0.002)
 
 
 if __name__ == '__main__':
-    cybertron.init()
+    cyber.init()
     main(sys.argv)
-    cybertron.shutdown()
+    cyber.shutdown()

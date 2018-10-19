@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/lane_struct.h"
@@ -34,7 +34,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class CameraPerceptionVizMessage : public cybertron::message::IntraMessage {
+class CameraPerceptionVizMessage : public cyber::message::IntraMessage {
  public:
   CameraPerceptionVizMessage() {
     type_name_ = "CameraPerceptionVizMessage";

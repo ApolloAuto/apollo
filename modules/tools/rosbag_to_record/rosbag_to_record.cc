@@ -24,7 +24,7 @@
 #include <tf2_msgs/TFMessage.h>
 #include <vector>
 
-#include "cybertron/proto/record.pb.h"
+#include "cyber/proto/record.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
@@ -36,7 +36,7 @@
 #include "modules/tools/rosbag_to_record/channel_info.h"
 #include "modules/transform/proto/transform.pb.h"
 
-using apollo::cybertron::proto::SingleMessage;
+using apollo::cyber::proto::SingleMessage;
 using apollo::tools::ChannelInfo;
 
 void PrintUsage() {
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
   auto channel_info = ChannelInfo::Instance();
 
   auto record_writer =
-      std::make_shared<apollo::cybertron::record::RecordWriter>();
+      std::make_shared<apollo::cyber::record::RecordWriter>();
   if (!record_writer->Open(record_file_name)) {
     std::cerr << "Error: open file[" << record_file_name << "] failed.";
   }
@@ -305,7 +305,7 @@ int main(int argc, char **argv) {
     //
     //    single_msg.set_content(serialized_str);
     //    single_msg.set_time(nsec);
-    auto raw_message = std::make_shared<apollo::cybertron::message::RawMessage>(
+    auto raw_message = std::make_shared<apollo::cyber::message::RawMessage>(
         serialized_str);
     if (!record_writer->WriteMessage(channel_name, raw_message, nsec)) {
       AERROR << "write single msg fail";

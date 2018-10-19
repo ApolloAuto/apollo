@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -69,7 +69,7 @@ using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SensorCanbusConf;
 
 template <typename SensorType>
-class SensorCanbus : public apollo::cybertron::Component {
+class SensorCanbus : public apollo::cyber::Component {
  public:
   // TODO(lizh): check whether we need a new msg item, say
   // MonitorMessageItem::SENSORCANBUS
@@ -160,7 +160,7 @@ bool SensorCanbus<SensorType>::Start() {
   // no need for timer.
   if (FLAGS_sensor_freq > 0) {
     const double duration_ms = 1000.0 / FLAGS_sensor_freq;
-    timer_ = cybertron::Timer(duration_ms, &SensorCanbus<SensorType>::OnTimer,
+    timer_ = cyber::Timer(duration_ms, &SensorCanbus<SensorType>::OnTimer,
                               this, false);
     timer_.Start();
   } else {

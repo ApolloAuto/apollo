@@ -23,7 +23,7 @@
 
 #include "gtest/gtest.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/common/byte.h"
 

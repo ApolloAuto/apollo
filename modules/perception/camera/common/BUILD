@@ -74,7 +74,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common/proto:object_template_meta_schema_proto",

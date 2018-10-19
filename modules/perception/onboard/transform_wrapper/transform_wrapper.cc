@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {
@@ -29,7 +29,7 @@ DEFINE_string(obs_novatel2world_tf2_frame_id, "world",
 DEFINE_string(obs_novatel2world_tf2_child_frame_id, "novatel",
               "novatel to world child frame id");
 DEFINE_double(obs_tf2_buff_size, 0.01,
-              "query Cybertron TF buffer size in second");
+              "query Cyber TF buffer size in second");
 DEFINE_double(obs_transform_cache_size, 1.0, "transform cache size in second");
 DEFINE_double(obs_max_local_pose_extrapolation_latency, 0.15,
               "max local pose extrapolation period in second");
@@ -218,7 +218,7 @@ bool TransformWrapper::GetTrans(double timestamp, Eigen::Affine3d* trans,
 bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
                                   const std::string& frame_id,
                                   const std::string& child_frame_id) {
-  cybertron::Time query_time(timestamp);
+  cyber::Time query_time(timestamp);
   std::string err_string;
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
                                  FLAGS_obs_tf2_buff_size, &err_string)) {

@@ -15,7 +15,7 @@
 *****************************************************************************/
 #include "modules/perception/camera/common/util.h"
 #include <cstdlib>
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -149,14 +149,14 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
   return true;
 }
 
-void GetCybertronWorkRoot(std::string* work_root) {
+void GetCyberWorkRoot(std::string* work_root) {
   char *var = nullptr;
   var = std::getenv("MODULE_PATH");
   if (var != nullptr) {
     *work_root = std::string(var);
     return;
   }
-  var = std::getenv("CYBERTRON_PATH");
+  var = std::getenv("CYBER_PATH");
   if (var != nullptr) {
     *work_root = std::string(var);
     return;
