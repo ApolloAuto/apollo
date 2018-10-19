@@ -14,38 +14,37 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from cyber_py import cybertron
 """Module for example of talker."""
 
 import time
 import sys
 
 sys.path.append("../")
-from cybertron import cybertron
-from proto import chatter_pb2
+
 
 def test_talker_class():
     """
     test talker.
     """
-    msg = chatter_pb2.Chatter()
-    msg.content = "talker:send Alex!"
-    msg.seq = 0
-    msg.timestamp = 0
-    msg.lidar_timestamp = 0
+    msg = SimpleMessage()
+    msg.text = "talker:send Alex!"
+    msg.integer = 0
 
     test_node = cybertron.Node("node_name1")
     g_count = 1
 
     writer = test_node.create_writer("channel/chatter",
-        chatter_pb2.Chatter, 6)
+                                     SimpleMessage, 6)
     while not cybertron.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
-        msg.seq = g_count
-        msg.timestamp = long(time.time())
+        msg.integer = g_count
         print "="*80
         print "write msg -> %s" % msg
         writer.write(msg)
+
 
 if __name__ == '__main__':
     cybertron.init()

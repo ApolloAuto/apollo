@@ -25,8 +25,8 @@ import os
 import time
 import sys
 
-from cybertron import cybertron
-from cybertron import record
+from cyber_py import cybertron
+from cyber_py import record
 from common.message_manager import PbMessageManager
 
 g_message_manager = PbMessageManager()

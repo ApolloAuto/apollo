@@ -349,7 +349,6 @@ PyObject *cyber_PyService_register_func(PyObject *self, PyObject *args) {
 
 PyObject *cyber_PyService_read(PyObject *self, PyObject *args) {
   PyObject *pyobj_service = nullptr;
-  char *data = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_PyService_read"),
                         &pyobj_service)) {
     AINFO << "cyber_PyService_read:PyArg_ParseTuple failed!";
@@ -605,7 +604,6 @@ student *cyber_student() {
 PyObject *cyber_test1(PyObject *self, PyObject *args) {
   char *channel = nullptr;
   char *data_type = nullptr;
-  PyObject *pyboj_binstr = nullptr;
   char *s = 0;
   int len = 0;
   if (!PyArg_ParseTuple(args, "sss#", &channel, &data_type, &s, &len)) {

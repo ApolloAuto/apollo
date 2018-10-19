@@ -30,7 +30,7 @@ import numpy
 import tkFileDialog
 from matplotlib import patches
 from matplotlib import lines
-from cybertron import cybertron
+from cyber_py import cybertron
 
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
@@ -325,7 +325,7 @@ class ControlInfo(object):
 
 
 if __name__ == "__main__":
-    from cybertron.record import RecordReader
+    from cyber_py.record import RecordReader
 
     parser = argparse.ArgumentParser(
         description='Process and analyze control and planning data')

@@ -31,7 +31,7 @@ bool py_init() {
     return false;
   }
 
-  return Init();
+  return true;
 }
 
 bool py_ok() { return OK(); }

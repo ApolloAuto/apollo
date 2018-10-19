@@ -32,8 +32,8 @@ import time
 import gflags
 import glog
 
-from cybertron import cybertron
-from cybertron import record
+from cyber_py import cybertron
+from cyber_py import record
 
 # Requried flags.
 gflags.DEFINE_string('input_file', None, 'Input record file path.')

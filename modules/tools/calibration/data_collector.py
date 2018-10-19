@@ -24,7 +24,7 @@ import time
 import signal
 import time
 
-from cybertron import pynode
+from cyber_py import pynode
 from std_msgs.msg import String
 
 from plot_data import Plotter

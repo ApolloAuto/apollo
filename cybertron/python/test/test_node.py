@@ -20,8 +20,8 @@ import sys
 import unittest
 
 sys.path.append("../")
-from cybertron import cybertron
-from proto import chatter_pb2
+from cyber_py import cybertron
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 def callback(data):
     """
@@ -48,17 +48,15 @@ class TestNode(unittest.TestCase):
         """
         unit test of writer.
         """
-        msg = chatter_pb2.Chatter()
-        msg.content = "talker:send Alex!"
-        msg.seq = 0
-        msg.timestamp = 0
-        msg.lidar_timestamp = 0
+        msg = SimpleMessage()
+        msg.text = "talker:send Alex!"
+        msg.integer = 0
 
         self.assertTrue(cybertron.ok())
         test_node = cybertron.Node("node_name1")
-        writer = test_node.create_writer("channel/chatter", chatter_pb2.Chatter, 7)
+        writer = test_node.create_writer("channel/chatter", SimpleMessage, 7)
         self.assertEqual(writer.name, "channel/chatter")
-        self.assertEqual(writer.data_type, "apollo.cybertron.proto.Chatter")
+        self.assertEqual(writer.data_type, "apollo.common.util.test.SimpleMessage")
         self.assertTrue(writer.write(msg))
 
     def test_reader(self):
@@ -68,11 +66,11 @@ class TestNode(unittest.TestCase):
         self.assertTrue(cybertron.ok())
         test_node = cybertron.Node("listener")
         reader = test_node.create_reader("channel/chatter",
-                chatter_pb2.Chatter, callback)
+                SimpleMessage, callback)
         self.assertEqual(reader.name, "channel/chatter")
-        self.assertEqual(reader.data_type, chatter_pb2.Chatter)
-        self.assertEqual(chatter_pb2.Chatter.DESCRIPTOR.full_name,
-                "apollo.cybertron.proto.Chatter")
+        self.assertEqual(reader.data_type, SimpleMessage)
+        self.assertEqual(SimpleMessage.DESCRIPTOR.full_name,
+                "apollo.common.util.test.SimpleMessage")
 
 if __name__ == '__main__':
     unittest.main()
