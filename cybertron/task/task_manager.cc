@@ -30,7 +30,10 @@ static const char* const task_prefix = "/internal/task";
 TaskManager::TaskManager()
     : task_queue_size_(1000),
       task_queue_(new base::BoundedQueue<std::function<void()>>()) {
-  task_queue_->Init(task_queue_size_, new base::BlockWaitStrategy());
+  if (!task_queue_->Init(task_queue_size_, new base::BlockWaitStrategy())) {
+    AERROR << "Task queue init failed";
+    throw std::runtime_error("Task queue init failed");
+  }
   auto func = [task_queue = this->task_queue_]() {
     while (!cybertron::IsShutdown()) {
       std::function<void()> task;

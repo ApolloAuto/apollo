@@ -26,17 +26,35 @@ namespace apollo {
 namespace cybertron {
 
 TimingWheel::TimingWheel() {
-  add_queue_.Init(BOUNDED_QUEUE_SIZE);
-  repeat_queue_.Init(BOUNDED_QUEUE_SIZE);
-  handler_queue_.Init(BOUNDED_QUEUE_SIZE);
+  if (!add_queue_.Init(BOUNDED_QUEUE_SIZE)) {
+    AERROR << "Add queue init failed.";
+    throw std::runtime_error("Add queue init failed.");
+  }
+  if (!repeat_queue_.Init(BOUNDED_QUEUE_SIZE)) {
+    AERROR << "Repeated task queue init failed.";
+    throw std::runtime_error("Repeated queue init failed.");
+  }
+  if (!handler_queue_.Init(BOUNDED_QUEUE_SIZE)) {
+    AERROR << "Handler queue init failed.";
+    throw std::runtime_error("Handler queue init failed.");
+  }
 }
 
 TimingWheel::TimingWheel(const Duration& tick_duration) {
   tick_duration_ = tick_duration.ToNanosecond();
   resolution_ = tick_duration_ / 1000000UL;
-  add_queue_.Init(BOUNDED_QUEUE_SIZE);
-  repeat_queue_.Init(BOUNDED_QUEUE_SIZE);
-  handler_queue_.Init(BOUNDED_QUEUE_SIZE);
+  if (!add_queue_.Init(BOUNDED_QUEUE_SIZE)) {
+    AERROR << "Add queue init failed.";
+    throw std::runtime_error("Add queue init failed.");
+  }
+  if (!repeat_queue_.Init(BOUNDED_QUEUE_SIZE)) {
+    AERROR << "Repeated task queue init failed.";
+    throw std::runtime_error("Repeated queue init failed.");
+  }
+  if (!handler_queue_.Init(BOUNDED_QUEUE_SIZE)) {
+    AERROR << "Handler queue init failed.";
+    throw std::runtime_error("Handler queue init failed.");
+  }
 }
 
 uint64_t TimingWheel::StartTimer(uint64_t interval, CallHandler handler,

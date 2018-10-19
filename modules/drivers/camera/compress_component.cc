@@ -31,9 +31,14 @@ bool CompressComponent::Init() {
     return false;
   }
   AINFO << "Camera config: \n" << config_.DebugString();
+  try {
+    image_pool_.reset(new CCObjectPool<CompressedImage>(
+        config_.compress_conf().image_pool_size()));
+  } catch (const std::bad_alloc& e) {
+    AERROR << e.what();
+    return false;
+  }
 
-  image_pool_.reset(new CCObjectPool<CompressedImage>(
-      config_.compress_conf().image_pool_size()));
   writer_ = node_->CreateWriter<CompressedImage>(
       config_.compress_conf().output_channel());
   return true;

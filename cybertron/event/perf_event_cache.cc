@@ -35,7 +35,10 @@ PerfEventCache::PerfEventCache() {
     enable_ = perf_conf_.enable();
   }
   if (enable_) {
-    event_queue_.Init(MAX_EVENT_SIZE);
+    if (!event_queue_.Init(MAX_EVENT_SIZE)) {
+      AERROR << "Event queue init failed.";
+      throw std::runtime_error("Event queue init failed.");
+    }
     Start();
   }
 }
