@@ -34,7 +34,7 @@
 namespace apollo {
 namespace planning {
 
-TEST(Fem1dLinearQpProblemTest, basic_test) {
+TEST(Fem1dExpendedJerkQpProblemTest, basic_test) {
   FLAGS_enable_osqp_debug = true;
   Fem1dQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
@@ -71,7 +71,7 @@ TEST(Fem1dLinearQpProblemTest, basic_test) {
   }
 }
 
-TEST(Fem1dLinearQpProblemTest, affine_constraint_test) {
+TEST(Fem1dExpendedJerkQpProblemTest, affine_constraint_test) {
   FLAGS_enable_osqp_debug = false;
   Fem1dExpandedJerkQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
@@ -120,7 +120,7 @@ TEST(Fem1dLinearQpProblemTest, affine_constraint_test) {
   }
 }
 
-TEST(Fem1dLinearQpProblemTest, add_bounds_test) {
+TEST(Fem1dExpendedJerkQpProblemTest, add_bounds_test) {
   FLAGS_enable_osqp_debug = false;
   Fem1dQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
@@ -144,6 +144,52 @@ TEST(Fem1dLinearQpProblemTest, add_bounds_test) {
   for (size_t i = 20; i < 40; i += 2) {
     EXPECT_DOUBLE_EQ(std::get<0>(x[i]), -1.81);
     EXPECT_DOUBLE_EQ(std::get<1>(x[i]), 1.95);
+  }
+}
+
+TEST(Fem1dExpendedJerkQpProblemTest, second_order_derivative_constraint_test) {
+  FLAGS_enable_osqp_debug = true;
+  Fem1dQpProblem* fem_qp = new Fem1dExpandedJerkQpProblem();
+  std::array<double, 3> x_init = {4.5, 0.00, 0.0};
+  double delta_s = 0.5;
+  size_t n = 400;
+  std::vector<std::tuple<double, double, double>> x_bounds;
+  for (size_t i = 0; i < n; ++i) {
+    x_bounds.emplace_back(std::make_tuple(static_cast<double>(i), -6.0, 6.0));
+  }
+  std::array<double, 5> w = {1.0, 100.0, 1000.0, 1000.0, 0.0};
+  double max_x_third_order_derivative = 2.0;
+  EXPECT_TRUE(
+      fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
+
+  fem_qp->SetVariableBounds(x_bounds);
+
+  const double ddx_max = std::sqrt(0.5) / 15.0;
+  std::vector<std::tuple<double, double, double>> ddx_bounds;
+  for (size_t i = 0; i < 20; ++i) {
+    ddx_bounds.emplace_back(
+        std::make_tuple(static_cast<double>(i), -ddx_max, ddx_max));
+  }
+  fem_qp->SetVariableDerivativeBounds(ddx_bounds);
+
+  auto start_time = std::chrono::system_clock::now();
+  EXPECT_TRUE(fem_qp->Optimize());
+  auto end_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_time - start_time;
+  AINFO << "qp_optimizer used time: " << diff.count() * 1000 << " ms.";
+
+  const std::vector<double>& x = fem_qp->x();
+  AINFO << "x.size() = " << x.size();
+  for (size_t i = 0; i < x.size(); ++i) {
+    EXPECT_LE(x[i], fem_qp->x_bounds_[i].second);
+    EXPECT_GE(x[i], fem_qp->x_bounds_[i].first);
+  }
+
+  const std::vector<double>& ddx = fem_qp->x_second_order_derivative();
+  AINFO << "ddx.size() = " << ddx.size();
+  for (size_t i = 0; i < ddx.size(); ++i) {
+    EXPECT_LE(ddx[i], fem_qp->ddx_bounds_[i].second);
+    EXPECT_GE(ddx[i], fem_qp->ddx_bounds_[i].first);
   }
 }
 
