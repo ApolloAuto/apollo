@@ -139,7 +139,6 @@ Scheduler::~Scheduler() {}
 std::shared_ptr<ProcessorContext> Scheduler::FindProc(
     const std::shared_ptr<CRoutine>& cr) {
   int cur_proc_ = -1;
-  int count = 0;
   auto cur_cr = CRoutine::GetCurrentRoutine();
 
   if (cur_cr) {
@@ -152,10 +151,14 @@ std::shared_ptr<ProcessorContext> Scheduler::FindProc(
     return proc_ctxs_[cr->processor_id()];
   }
 
-  for (uint32_t i = 0; i < proc_num_; i++) {
-    count += proc_ctxs_[i]->RqSize();
+  auto id = 0;
+  int min_q_size = proc_ctxs_[id]->RqSize();
+  for (uint32_t i = 1; i < proc_num_; i++) {
+    if (min_q_size > proc_ctxs_[i]->RqSize()) {
+      min_q_size = proc_ctxs_[i]->RqSize();
+      id = i;
+    }
   }
-  auto id = count % proc_ctxs_.size();
   cr->set_processor_id(proc_ctxs_[id]->id());
   return proc_ctxs_[cr->processor_id()];
 }
@@ -230,9 +233,11 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     auto processor_id = cr_info.processor_index();
     croutine->set_processor_id(processor_id);
   }
-
-  if (!DispatchTask(croutine)) {
-    return false;
+  {
+    std::lock_guard<std::mutex> lock(task_id_map_mutex_);
+    if (!DispatchTask(croutine)) {
+      return false;
+    }
   }
 
   return true;
