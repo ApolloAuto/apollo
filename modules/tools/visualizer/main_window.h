@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <map>
+#include <string>
+
 #include <QMainWindow>
 #include <QMenu>
 #include <QMutex>
@@ -51,6 +54,7 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
 
   void TopologyChanged(const apollo::cybertron::proto::ChangeMsg& change_msg);
+  void FindNewWriter(const apollo::cybertron::proto::RoleAttributes& role);
 
  protected:
   void resizeEvent(QResizeEvent*) override;
@@ -98,6 +102,9 @@ class MainWindow : public QMainWindow {
   void ImageReaderCallback(
       const std::shared_ptr<const apollo::drivers::Image>& imgData,
       VideoImgProxy* proxy);
+  void ImageReaderCallback(
+      const std::shared_ptr<const apollo::drivers::CompressedImage>& imgData,
+      VideoImgProxy* proxy);
 
   void InsertAllChannelNames(void);
   VideoImgProxy* AddVideoImgViewer(void);
@@ -106,9 +113,10 @@ class MainWindow : public QMainWindow {
   void calculateWH(void);
 
   RadarData* createRadarData(void);
-  void DoOpenRadarChannel(bool b, RadarData * radarProxy);
-  void RadarRenderCallback(const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData,
-                                       RadarData* radar);
+  void DoOpenRadarChannel(bool b, RadarData* radarProxy);
+  void RadarRenderCallback(
+      const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData,
+      RadarData* radar);
 
   Ui::MainWindow* ui_;
   MessageDialog* msg_dialog_;
@@ -138,4 +146,7 @@ class MainWindow : public QMainWindow {
 
   QList<RadarData*> radarData_list_;
   QList<RadarData*> closed_radarData_list_;
+
+  std::map<std::string , std::string>
+      _channelName2TypeMap;
 };

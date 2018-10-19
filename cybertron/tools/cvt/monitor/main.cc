@@ -99,9 +99,22 @@ int main(int argc, char *argv[]) {
         topologyMsg.TopologyChanged(change_msg);
       };
 
-  apollo::cybertron::service_discovery::TopologyManager::Instance()
-      ->channel_manager()
-      ->AddChangeListener(topologyCallback);
+  auto channelManager =
+      apollo::cybertron::service_discovery::TopologyManager::Instance()
+          ->channel_manager();
+  channelManager->AddChangeListener(topologyCallback);
+
+  std::vector<apollo::cybertron::proto::RoleAttributes> roleVec;
+  channelManager->GetWriters(&roleVec);
+  for (auto &role : roleVec) {
+    topologyMsg.AddReaderWriter(role, true);
+  }
+
+  roleVec.clear();
+  channelManager->GetReaders(&roleVec);
+  for (auto &role : roleVec) {
+    topologyMsg.AddReaderWriter(role, false);
+  }
 
   Screen *s = Screen::Instance();
 

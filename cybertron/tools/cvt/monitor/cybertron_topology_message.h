@@ -25,6 +25,7 @@ namespace apollo {
 namespace cybertron {
 namespace proto {
 class ChangeMsg;
+class RoleAttributes;
 }  // proto
 }  // cybertron
 }  // apollo
@@ -41,7 +42,7 @@ class CybertronTopologyMessage : public RenderableMessage {
   RenderableMessage* Child(int index) const override;
 
   void TopologyChanged(const apollo::cybertron::proto::ChangeMsg& change_msg);
-
+  void AddReaderWriter(const apollo::cybertron::proto::RoleAttributes& role, bool isWriter);
  private:
   CybertronTopologyMessage(const CybertronTopologyMessage&) = delete;
   CybertronTopologyMessage& operator=(const CybertronTopologyMessage&) = delete;

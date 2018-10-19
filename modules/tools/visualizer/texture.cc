@@ -26,7 +26,9 @@ Texture::Texture()
       data_size_(0),
       data_(nullptr) {}
 
-bool Texture::UpdateData(const QImage &img) {
+bool Texture::UpdateData(const QImage& img) {
+  std::cout << "Image: ImageSize = " << img.byteCount()
+            << ", data_size_ = " << data_size_;
   if (data_size_ < img.byteCount()) {
     if (!data_) {
       delete[] data_;
@@ -41,17 +43,26 @@ bool Texture::UpdateData(const QImage &img) {
     is_size_changed_ = true;
   }
 
+  image_height_ = img.height();
+  image_width_ = img.width();
+
   memcpy(data_, img.bits(), img.byteCount());
   is_dirty_ = true;
 
-  image_height_ = img.height();
-  image_width_ = img.width();
+  std::cout << ", imgWidth = " << image_width_
+            << ", imgHeight = " << image_height_
+            << ", w * h * sizeof(GL_RGB) = "
+            << image_width_ * image_height_ * sizeof(GL_RGB)
+            << ",format = " << img.pixelFormat().colorModel() << std::endl;
 
   texture_format_ = GL_RGBA;
   return true;
 }
-bool Texture::UpdateData(const std::shared_ptr<const apollo::drivers::Image>& imgData){
-    std::size_t imgSize = imgData->data().size();
+
+bool Texture::UpdateData(
+    const std::shared_ptr<const apollo::drivers::Image>& imgData) {
+    std::size_t imgSize = imgData->width() * imgData->height() * 3;
+
     if (static_cast<std::size_t>(data_size_) < imgSize) {
       if (!data_) {
         delete[] data_;
@@ -62,15 +73,54 @@ bool Texture::UpdateData(const std::shared_ptr<const apollo::drivers::Image>& im
         data_size_ = 0;
         return false;
       }
-      data_size_ = imgSize;
+      data_size_ = static_cast<GLsizei>(imgSize);
       is_size_changed_ = true;
     }
 
-    memcpy(data_, imgData->data().c_str(), imgSize);
+    if(imgData->encoding() == std::string("yuyv")){
+      const GLubyte* src = reinterpret_cast<const GLubyte*>(imgData->data().c_str());
+
+      auto clamp = [](int v) -> GLubyte {
+        int ret = v;
+        if(v < 0) { ret = 0; }
+        if(v > 255) { ret = 255; }
+
+        return static_cast<GLubyte>(ret);
+      };
+
+      GLubyte* dst = data_;
+      for(std::size_t i = 0; i < imgData->data().size(); i += 4){
+          int y = 298 * (src[i] - 16);
+          int u = src[i + 1] - 128;
+          int u1 = 516 * u;
+          int v = src[i + 3] - 128;
+          int v1 = 208 * v;
+
+          u *= 100;
+          v *= 409;
+
+          *dst++ = clamp((y + v + 128) >> 8);
+          *dst++ = clamp((y - u - v1 + 128) >> 8);
+          *dst++ = clamp((y + u1 + 128) >> 8);
+
+          y = 298 * (src[i + 2] - 16);
+
+          *dst++ = clamp((y + v + 128) >> 8);
+          *dst++ = clamp((y - u - v1 + 128) >> 8);
+          *dst++ = clamp((y + u1 + 128) >> 8);         
+      }
+
+    } else if (imgData->encoding() == std::string("rgb8")){
+      memcpy(data_, imgData->data().c_str(), imgSize);
+    } else {
+      memset(data_, 0, imgSize);
+      std::cerr << "Cannot support this format (" 
+        << imgData->encoding() << ") image" << std::endl;
+    }
     is_dirty_ = true;
 
-    image_width_ = imgData->width();
     image_height_ = imgData->height();
+    image_width_ = imgData->width();
 
     texture_format_ = GL_RGB;
     return true;

@@ -58,7 +58,7 @@ bool PointCloud::FillData(
       tmp[0] = point.x();
       tmp[1] = point.z();
       tmp[2] = -point.y();
-      tmp[3] = point.intensity();
+      tmp[3] = static_cast<float>(point.intensity());
     }
     return true;
   }

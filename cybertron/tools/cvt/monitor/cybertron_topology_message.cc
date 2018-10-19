@@ -20,6 +20,7 @@
 #include "./screen.h"
 #include "cybertron/message/message_traits.h"
 #include "cybertron/proto/topology_change.pb.h"
+#include "cybertron/proto/role_attributes.pb.h"
 
 #include <ncurses.h>
 #include <iomanip>
@@ -71,9 +72,33 @@ RenderableMessage* CybertronTopologyMessage::Child(int lineNo) const {
 
 void CybertronTopologyMessage::TopologyChanged(
     const apollo::cybertron::proto::ChangeMsg& changeMsg) {
-  const std::string& nodeName = changeMsg.role_attr().node_name();
-  const std::string& channelName = changeMsg.role_attr().channel_name();
-  const std::string& msgTypeName = changeMsg.role_attr().message_type();
+  if (::apollo::cybertron::proto::OperateType::OPT_JOIN ==
+      changeMsg.operate_type()) {
+    bool isWriter = true;
+    if (::apollo::cybertron::proto::RoleType::ROLE_READER ==
+        changeMsg.role_type())
+      isWriter = false;
+    AddReaderWriter(changeMsg.role_attr(), isWriter);
+  } else {
+    auto iter = all_channels_map_.find(changeMsg.role_attr().channel_name());
+
+    if (iter != all_channels_map_.cend() &&
+        !ChannelMessage::isErrorCode(iter->second)) {
+      const std::string& nodeName = changeMsg.role_attr().node_name();
+      if (::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
+          changeMsg.role_type()) {
+        changeMsg.role_attr();
+        iter->second->del_writer(nodeName);
+      } else {
+        iter->second->del_reader(nodeName);
+      }
+    }
+  }
+}
+
+void CybertronTopologyMessage::AddReaderWriter(
+    const apollo::cybertron::proto::RoleAttributes& role, bool isWriter) {
+  const std::string& channelName = role.channel_name();
 
   if (!specified_channel_.empty() && specified_channel_ != channelName) {
     return;
@@ -83,54 +108,39 @@ void CybertronTopologyMessage::TopologyChanged(
     col1_width_ = channelName.length();
   }
 
-  if (::apollo::cybertron::proto::OperateType::OPT_JOIN ==
-      changeMsg.operate_type()) {
-    if (ChannelMsgFactory::Instance()->isFromHere(nodeName)) {
-      return;
-    }
+  const std::string& nodeName = role.node_name();
+  if (ChannelMsgFactory::Instance()->isFromHere(nodeName)) {
+    return;
+  }
 
-    ChannelMessage* channelMsg = nullptr;
-
-    auto iter = all_channels_map_.find(channelName);
-    if (iter == all_channels_map_.cend()) {
-      channelMsg = ChannelMsgFactory::Instance()->CreateChannelMessage(
-          msgTypeName, channelName);
-
-      if (!ChannelMessage::isErrorCode(channelMsg)) {
-        channelMsg->set_parent(this);
-        channelMsg->set_message_type(msgTypeName);
-        channelMsg->add_reader(channelMsg->NodeName());
-      }
-
-      all_channels_map_[channelName] = channelMsg;
-    } else {
-      channelMsg = iter->second;
-    }
+  ChannelMessage* channelMsg = nullptr;
+  const std::string& msgTypeName = role.message_type();
+  auto iter = all_channels_map_.find(channelName);
+  if (iter == all_channels_map_.cend()) {
+    channelMsg = ChannelMsgFactory::Instance()->CreateChannelMessage(
+        msgTypeName, channelName);
 
     if (!ChannelMessage::isErrorCode(channelMsg)) {
-      if (::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
-          changeMsg.role_type()) {
-        if (msgTypeName != apollo::cybertron::message::MessageType<
-                               apollo::cybertron::message::RawMessage>()) {
-          channelMsg->set_message_type(msgTypeName);
-        }
-
-        channelMsg->add_writer(nodeName);
-      } else {
-        channelMsg->add_reader(nodeName);
-      }
+      channelMsg->set_parent(this);
+      channelMsg->set_message_type(msgTypeName);
+      channelMsg->add_reader(channelMsg->NodeName());
     }
-  } else {
-    auto iter = all_channels_map_.find(channelName);
 
-    if (iter != all_channels_map_.cend() &&
-        !ChannelMessage::isErrorCode(iter->second)) {
-      if (::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
-          changeMsg.role_type()) {
-        iter->second->del_writer(nodeName);
-      } else {
-        iter->second->del_reader(nodeName);
+    all_channels_map_[channelName] = channelMsg;
+  } else {
+    channelMsg = iter->second;
+  }
+
+  if (!ChannelMessage::isErrorCode(channelMsg)) {
+    if (isWriter) {
+      if (msgTypeName != apollo::cybertron::message::MessageType<
+                             apollo::cybertron::message::RawMessage>()) {
+        channelMsg->set_message_type(msgTypeName);
       }
+
+      channelMsg->add_writer(nodeName);
+    } else {
+      channelMsg->add_reader(nodeName);
     }
   }
 }

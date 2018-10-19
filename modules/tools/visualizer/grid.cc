@@ -22,7 +22,7 @@ Grid::Grid(int cellCountBySide)
       grid_color_(128, 128, 128) {}
 
 bool Grid::FillVertexBuffer(GLfloat* pBuffer) {
-  float x = CellCount() / 2.0f;
+  float x = static_cast<float>(CellCount()) / 2.0f;
   float z;
 
   for (z = -x; z <= x; ++z) {

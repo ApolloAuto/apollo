@@ -74,6 +74,9 @@ const char* gridVertexPath = ":/shaders/grid.vert";
 const char* gridFragPath = ":/shaders/grid_pointcloud.frag";
 const char* radarVertexPath = ":/shaders/radarpoints.vert";
 const char* radarFragPath = ":/shaders/radarpoints.frag";
+
+const std::string CompressedImageType("apollo.drivers.CompressedImage");
+
 }  // namespace
 
 #define MEMBER_OFFSET(StructType, Member)                                    \
@@ -95,21 +98,80 @@ struct MainWindow::VideoImgProxy {
 
   QMutex reader_mutex_;
   std::shared_ptr<Texture> dynamic_texture_;
-  CyberChannReader<apollo::drivers::Image>* channel_reader_;
+  bool isCompressedImage_;
+  union {
+    CyberChannReader<apollo::drivers::Image>* image_reader_;
+    CyberChannReader<apollo::drivers::CompressedImage>*
+        compressed_image_reader_;
+  };
+
+  VideoImgProxy()
+      : video_image_viewer_(),
+        root_item_(),
+        channel_name_item_(),
+        action_item_(),
+        channel_name_combobox_(),
+        action_item_button_(),
+        reader_mutex_(),
+        dynamic_texture_(),
+        isCompressedImage_(false),
+        image_reader_(nullptr) {}
+
+  void deleteReader(void) {
+    if (image_reader_) {
+      if (isCompressedImage_) {
+        delete compressed_image_reader_;
+      } else {
+        delete image_reader_;
+      }
+      image_reader_ = nullptr;
+      isCompressedImage_ = false;
+    }
+  }
+
+  void CloseChannel(void) {
+    if (isCompressedImage_) {
+      compressed_image_reader_->CloseChannel();
+    } else {
+      image_reader_->CloseChannel();
+    }
+  }
+
+  ~VideoImgProxy(void) {
+    dynamic_texture_.reset();
+    deleteReader();
+  }
 };
 
-struct MainWindow::RadarData{
-    QTreeWidgetItem root_item_;
-    QTreeWidgetItem channel_name_item_;
-    QTreeWidgetItem action_item_;
+struct MainWindow::RadarData {
+  QTreeWidgetItem root_item_;
+  QTreeWidgetItem channel_name_item_;
+  QTreeWidgetItem action_item_;
 
-    QComboBox channel_name_combobox_;
-    QPushButton action_item_button_;
-    QCheckBox enable_checkBox_;
+  QComboBox channel_name_combobox_;
+  QPushButton action_item_button_;
+  QCheckBox enable_checkBox_;
 
-    QMutex reader_mutex_;
+  QMutex reader_mutex_;
 
-    CyberChannReader<apollo::drivers::RadarObstacles>* channel_reader_;
+  CyberChannReader<apollo::drivers::RadarObstacles>* channel_reader_;
+
+  RadarData(void)
+      : root_item_(),
+        channel_name_item_(),
+        action_item_(),
+        channel_name_combobox_(),
+        action_item_button_(),
+        enable_checkBox_(),
+        reader_mutex_(),
+        channel_reader_(nullptr) {}
+
+  ~RadarData(void) {
+    if (channel_reader_) {
+      delete channel_reader_;
+      channel_reader_ = nullptr;
+    }
+  }
 };
 
 MainWindow::MainWindow(QWidget* parent)
@@ -135,7 +197,8 @@ MainWindow::MainWindow(QWidget* parent)
       video_image_viewer_list_(),
       closed_video_image_viewer_list_(),
       radarData_list_(),
-      closed_radarData_list_() {
+      closed_radarData_list_(),
+      _channelName2TypeMap() {
   ui_->setupUi(this);
   ui_->videoImageGridLayout->setContentsMargins(2, 2, 2, 2);
   ui_->videoImageWidget->setVisible(false);
@@ -188,11 +251,11 @@ MainWindow::~MainWindow() {
   for (VideoImgProxy* item : closed_video_image_viewer_list_) {
     item->reader_mutex_.unlock();
   }
-  for(RadarData* item : radarData_list_){
-      item->reader_mutex_.unlock();
+  for (RadarData* item : radarData_list_) {
+    item->reader_mutex_.unlock();
   }
-  for(RadarData* item : closed_radarData_list_){
-      item->reader_mutex_.unlock();
+  for (RadarData* item : closed_radarData_list_) {
+    item->reader_mutex_.unlock();
   }
 
   pointcloud_reader_mutex_.unlock();
@@ -200,69 +263,23 @@ MainWindow::~MainWindow() {
   apollo::cybertron::Shutdown();
 
   if (pointcloud_channel_Reader_) {
-    if (pointcloud_channel_Reader_->isRunning()) {
-      pointcloud_channel_Reader_->quit();
-    }
-
-    if (!pointcloud_channel_Reader_->isFinished()) {
-      pointcloud_channel_Reader_->wait();
-    }
-
     delete pointcloud_channel_Reader_;
     pointcloud_channel_Reader_ = nullptr;
   }
 
   for (VideoImgProxy* item : video_image_viewer_list_) {
-    if (item->channel_reader_ && item->channel_reader_->isRunning()) {
-      item->channel_reader_->quit();
-
-      if (!item->channel_reader_->isFinished()) {
-        item->channel_reader_->wait();
-      }
-      delete item->channel_reader_;
-    }
-
-    item->dynamic_texture_.reset();
     delete item;
   }
 
   for (VideoImgProxy* item : closed_video_image_viewer_list_) {
-    if (item->channel_reader_ && item->channel_reader_->isRunning()) {
-      item->channel_reader_->quit();
-
-      if (!item->channel_reader_->isFinished()) {
-        item->channel_reader_->wait();
-      }
-      delete item->channel_reader_;
-    }
-
-    item->dynamic_texture_.reset();
     delete item;
   }
 
   for (RadarData* item : radarData_list_) {
-    if (item->channel_reader_ &&
-        item->channel_reader_->isRunning()) {
-      item->channel_reader_->quit();
-
-      if (!item->channel_reader_->isFinished()) {
-        item->channel_reader_->wait();
-      }
-      delete item->channel_reader_;
-    }
     delete item;
   }
 
   for (RadarData* item : closed_radarData_list_) {
-    if (item->channel_reader_ &&
-        item->channel_reader_->isRunning()) {
-      item->channel_reader_->quit();
-
-      if (!item->channel_reader_->isFinished()) {
-        item->channel_reader_->wait();
-      }
-      delete item->channel_reader_;
-    }
     delete item;
   }
 
@@ -331,35 +348,37 @@ MainWindow::VideoImgProxy* MainWindow::AddVideoImgViewer() {
     ret->video_image_viewer_.setSizePolicy(QSizePolicy::Preferred,
                                            QSizePolicy::Preferred);
     ret->video_image_viewer_.addAction(ui_->actionDelImage);
+    ret->reader_mutex_.lock();
   }
   return ret;
 }
 
 MainWindow::RadarData* MainWindow::createRadarData(void) {
-    RadarData* ret = new RadarData();
+  RadarData* ret = new RadarData();
 
-    if (ret) {
-      int index = radarData_list_.count();
-      QString radarName = tr("Radar%1").arg(index);
+  if (ret) {
+    int index = radarData_list_.count();
+    QString radarName = tr("Radar%1").arg(index);
 
-      ret->root_item_.setHidden(true);
-      ret->root_item_.setText(0, radarName);
+    ret->root_item_.setHidden(true);
+    ret->root_item_.setText(0, radarName);
 
-      ret->channel_name_item_.setText(0, "ChannelName");
-      ret->action_item_.setText(0, "Action");
-      ret->enable_checkBox_.setChecked(true);
+    ret->channel_name_item_.setText(0, "ChannelName");
+    ret->action_item_.setText(0, "Action");
+    ret->enable_checkBox_.setChecked(true);
 
-      ret->action_item_button_.setText("Play");
-      ret->action_item_button_.setCheckable(true);
-      ret->action_item_button_.setStyleSheet(globalTreeItemStyle);
+    ret->action_item_button_.setText("Play");
+    ret->action_item_button_.setCheckable(true);
+    ret->action_item_button_.setStyleSheet(globalTreeItemStyle);
 
-      ret->channel_name_combobox_.setObjectName(tr("comboBox%1").arg(index));
-      ret->channel_name_combobox_.setStyleSheet(globalTreeItemStyle);
+    ret->channel_name_combobox_.setObjectName(tr("comboBox%1").arg(index));
+    ret->channel_name_combobox_.setStyleSheet(globalTreeItemStyle);
 
-      ret->root_item_.addChild(&ret->channel_name_item_);
-      ret->root_item_.addChild(&ret->action_item_);
-    }
-    return ret;
+    ret->root_item_.addChild(&ret->channel_name_item_);
+    ret->root_item_.addChild(&ret->action_item_);
+    ret->reader_mutex_.lock();
+  }
+  return ret;
 }
 
 void MainWindow::EnableGrid(bool b) { grid_->set_is_renderable(b); }
@@ -493,175 +512,168 @@ void MainWindow::EditGridColor(QTreeWidgetItem* item, int column) {
 }
 
 void MainWindow::EnableRadarPoints(bool b) {
-    QCheckBox* obj = static_cast<QCheckBox*>(sender());
-    RadarData* r = StructPtrByMemberPtr(obj, RadarData, enable_checkBox_);
-    ui_->sceneWidget->setTempObjGroupEnabled(r->root_item_.text(0).toStdString(), b);
+  QCheckBox* obj = static_cast<QCheckBox*>(sender());
+  RadarData* r = StructPtrByMemberPtr(obj, RadarData, enable_checkBox_);
+  ui_->sceneWidget->setTempObjGroupEnabled(r->root_item_.text(0).toStdString(),
+                                           b);
 }
 
 void MainWindow::ActionOpenRadarChannel(void) {
-    if (radar_points_shader_ == nullptr) {
-      radar_points_shader_ = RenderableObject::CreateShaderProgram(
-          tr(radarVertexPath), tr(radarFragPath));
-//      if(radar_points_shader_){
-//          if(!RenderableObject::AttachShaderProgram(radar_points_shader_,
-//                      tr(":/radarpoints.geom"), QOpenGLShader::Geometry)) {
-//              radar_points_shader_.reset();
-
-//              std::cerr << "Cannot attach geometry shader" << std::endl;
-//          }
-//      }
-      if (radar_points_shader_ != nullptr) {
-        ui_->sceneWidget->AddNewShaderProg("radarpoints", radar_points_shader_);
-      } else {
-        QMessageBox::warning(this, tr("NO Shader"),
-                             tr("There is no suitable shader for Radar Points!!!"),
-                             QMessageBox::Ok);
-        return;
-      }
-    }
-
-    RadarData* radarProxy;
-
-    if (closed_radarData_list_.empty()) {
-      radarProxy = createRadarData();
-
-      if (radarProxy == nullptr) {
-        QMessageBox::warning(this, tr("No Enough Memory"),
-                             tr("There is no enough memory!!!\nCannot add new "
-                                "image or video channel!"),
-                             QMessageBox::Ok);
-        return;
-      }
-
-      ui_->treeWidget->addTopLevelItem(&radarProxy->root_item_);
-      ui_->treeWidget->setItemWidget(&radarProxy->root_item_, 1, &radarProxy->enable_checkBox_);
-
-      ui_->treeWidget->setItemWidget(&radarProxy->channel_name_item_, 1,
-                                     &radarProxy->channel_name_combobox_);
-      ui_->treeWidget->setItemWidget(&radarProxy->action_item_, 1,
-                                     &radarProxy->action_item_button_);
-
-      for (int i = 0; i < all_channel_root_->childCount(); ++i) {
-        QTreeWidgetItem* child = all_channel_root_->child(i);
-        QString channel = child->text(0);
-        if (channel.contains("radar")) {
-          radarProxy->channel_name_combobox_.addItem(channel);
-        }
-      }
+  if (radar_points_shader_ == nullptr) {
+    radar_points_shader_ = RenderableObject::CreateShaderProgram(
+        tr(radarVertexPath), tr(radarFragPath));
+    if (radar_points_shader_ != nullptr) {
+      ui_->sceneWidget->AddNewShaderProg("radarpoints", radar_points_shader_);
     } else {
-      radarProxy = closed_radarData_list_.takeFirst();
-      if (radarProxy->action_item_button_.isChecked()) {
-        radarProxy->reader_mutex_.unlock();
-      }
+      QMessageBox::warning(
+          this, tr("NO Shader"),
+          tr("There is no suitable shader for Radar Points!!!"),
+          QMessageBox::Ok);
+      return;
+    }
+  }
+
+  RadarData* radarProxy;
+
+  if (closed_radarData_list_.empty()) {
+    radarProxy = createRadarData();
+
+    if (radarProxy == nullptr) {
+      QMessageBox::warning(this, tr("No Enough Memory"),
+                           tr("There is no enough memory!!!\nCannot add new "
+                              "image or video channel!"),
+                           QMessageBox::Ok);
+      return;
     }
 
-    connect(&radarProxy->action_item_button_, SIGNAL(clicked(bool)), this,
-            SLOT(openRadarChannel(bool)));
-    connect(&radarProxy->enable_checkBox_,
-            SIGNAL(clicked(bool)), this,
-            SLOT(EnableRadarPoints(bool)));
-    connect(&radarProxy->channel_name_combobox_, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(ChangeRadarChannel()));
+    ui_->treeWidget->addTopLevelItem(&radarProxy->root_item_);
+    ui_->treeWidget->setItemWidget(&radarProxy->root_item_, 1,
+                                   &radarProxy->enable_checkBox_);
 
-    radarData_list_.append(radarProxy);
+    ui_->treeWidget->setItemWidget(&radarProxy->channel_name_item_, 1,
+                                   &radarProxy->channel_name_combobox_);
+    ui_->treeWidget->setItemWidget(&radarProxy->action_item_, 1,
+                                   &radarProxy->action_item_button_);
 
-    radarProxy->root_item_.setHidden(false);
+    for (int i = 0; i < all_channel_root_->childCount(); ++i) {
+      QTreeWidgetItem* child = all_channel_root_->child(i);
+      QString channel = child->text(0);
+      if (channel.contains("radar")) {
+        radarProxy->channel_name_combobox_.addItem(channel);
+      }
+    }
+  } else {
+    radarProxy = closed_radarData_list_.takeFirst();
+  }
 
-    ui_->treeWidget->setVisible(true);
-    ui_->actionGlobal->setChecked(true);
+  connect(&radarProxy->action_item_button_, SIGNAL(clicked(bool)), this,
+          SLOT(openRadarChannel(bool)));
+  connect(&radarProxy->enable_checkBox_, SIGNAL(clicked(bool)), this,
+          SLOT(EnableRadarPoints(bool)));
+  connect(&radarProxy->channel_name_combobox_, SIGNAL(currentIndexChanged(int)),
+          this, SLOT(ChangeRadarChannel()));
+
+  radarData_list_.append(radarProxy);
+
+  radarProxy->root_item_.setHidden(false);
+
+  ui_->treeWidget->setVisible(true);
+  ui_->actionGlobal->setChecked(true);
 }
 
 void MainWindow::openRadarChannel(bool b) {
-    QPushButton* obj = static_cast<QPushButton*>(QObject::sender());
-    RadarData* theVideoImg =
-        StructPtrByMemberPtr(obj, RadarData, action_item_button_);
-    DoOpenRadarChannel(b, theVideoImg);
+  QPushButton* obj = static_cast<QPushButton*>(QObject::sender());
+  RadarData* theVideoImg =
+      StructPtrByMemberPtr(obj, RadarData, action_item_button_);
+  DoOpenRadarChannel(b, theVideoImg);
 }
 
-void MainWindow::DoOpenRadarChannel(bool b, RadarData * radarProxy){
-    if (b) {
-      if (radarProxy->channel_name_combobox_.currentText().isEmpty()) {
-        QMessageBox::warning(
-            this, tr("Settup Channel Name"),
-            tr("Channel Name cannot be empty!!!\nPlease select one!"),
-            QMessageBox::Ok);
-        radarProxy->action_item_button_.setChecked(false);
+void MainWindow::DoOpenRadarChannel(bool b, RadarData* radarProxy) {
+  if (b) {
+    if (radarProxy->channel_name_combobox_.currentText().isEmpty()) {
+      QMessageBox::warning(
+          this, tr("Settup Channel Name"),
+          tr("Channel Name cannot be empty!!!\nPlease select one!"),
+          QMessageBox::Ok);
+      radarProxy->action_item_button_.setChecked(false);
+      return;
+    }
+
+    if (!radarProxy->channel_reader_) {
+      radarProxy->channel_reader_ =
+          new CyberChannReader<apollo::drivers::RadarObstacles>();
+
+      if (!radarProxy->channel_reader_) {
+        QMessageBox::warning(this, tr("Create Cybertron Channel Reader"),
+                             tr("There is no enough memory!!!\nCannot create "
+                                "cybertron channel reader!"),
+                             QMessageBox::Ok);
         return;
       }
 
-      if (!radarProxy->channel_reader_) {
-        radarProxy->channel_reader_ =
-            new CyberChannReader<apollo::drivers::RadarObstacles>();
+      auto radarcallback =
+          [this, radarProxy](
+              const std::shared_ptr<apollo::drivers::RadarObstacles>& pdata) {
+            this->RadarRenderCallback(pdata, radarProxy);
+          };
 
-        if (!radarProxy->channel_reader_) {
-          QMessageBox::warning(this, tr("Create Cybertron Channel Reader"),
-                               tr("There is no enough memory!!!\nCannot create "
-                                  "cybertron channel reader!"),
-                               QMessageBox::Ok);
-          return;
-        }
+      std::string nodeName("Visualizer-");
+      nodeName.append(radarProxy->root_item_.text(0).toStdString());
 
-        auto radarcallback = [this, radarProxy](
-            const std::shared_ptr<apollo::drivers::RadarObstacles>& pdata) {
-          this->RadarRenderCallback(pdata, radarProxy);
-        };
+      if (!radarProxy->channel_reader_->InstallCallbackAndOpen(
+              radarcallback,
+              radarProxy->channel_name_combobox_.currentText().toStdString(),
+              nodeName)) {
+        QMessageBox::warning(
+            this, tr("Settup Channel Callback"),
+            tr("Channel Callback cannot be installed!!!\nPlease check it!"),
+            QMessageBox::Ok);
+        delete radarProxy->channel_reader_;
+        radarProxy->channel_reader_ = nullptr;
 
-        std::string nodeName("Visualizer-");
-        nodeName.append(radarProxy->root_item_.text(0).toStdString());
-
-        if (!radarProxy->channel_reader_->InstallCallbackAndOpen(
-                radarcallback, radarProxy->channel_name_combobox_.currentText()
-                                   .toStdString(), nodeName)) {
-          QMessageBox::warning(
-              this, tr("Settup Channel Callback"),
-              tr("Channel Callback cannot be installed!!!\nPlease check it!"),
-              QMessageBox::Ok);
-          delete radarProxy->channel_reader_;
-          radarProxy->channel_reader_ = nullptr;
-
-          radarProxy->action_item_button_.setChecked(false);
-          return;
-        }
+        radarProxy->action_item_button_.setChecked(false);
+        return;
       }
+    }
 
-      radarProxy->root_item_.setToolTip(0, radarProxy->channel_name_combobox_.currentText());
+    radarProxy->root_item_.setToolTip(
+        0, radarProxy->channel_name_combobox_.currentText());
 
-      radarProxy->action_item_button_.setText("Stop");
-      radarProxy->channel_name_combobox_.setEnabled(false);
+    radarProxy->action_item_button_.setText("Stop");
+    radarProxy->channel_name_combobox_.setEnabled(false);
 
-      radarProxy->reader_mutex_.unlock();
-      if (!radarProxy->channel_reader_->isRunning())
-        radarProxy->channel_reader_->start();
-    } else {
-      if (radarProxy->channel_reader_->isRunning()) {
-        radarProxy->reader_mutex_.lock();
-      }
-
+    radarProxy->reader_mutex_.unlock();
+  } else {
+    if (!radarProxy->channel_name_combobox_.isEnabled()) {
+      radarProxy->reader_mutex_.lock();
       radarProxy->action_item_button_.setText("Play");
       radarProxy->channel_name_combobox_.setEnabled(true);
     }
-    ui_->treeWidget->setCurrentItem(nullptr);
-    ui_->treeWidget->clearFocus();
+  }
+  ui_->treeWidget->setCurrentItem(nullptr);
+  ui_->treeWidget->clearFocus();
 }
 
 void MainWindow::RadarRenderCallback(
     const std::shared_ptr<const apollo::drivers::RadarObstacles>& rawData,
-    RadarData* radar){
-    radar->reader_mutex_.lock();
-    radar->reader_mutex_.unlock();
+    RadarData* radar) {
+  radar->reader_mutex_.lock();
+  radar->reader_mutex_.unlock();
 
-    std::cout << "-------MainWindow::RadarRenderCallback()-------" << std::endl;
+  std::cout << "-------MainWindow::RadarRenderCallback()-------" << std::endl;
 
-   if (rawData != nullptr){
-       RadarPoints* r = new RadarPoints(radar_points_shader_);
-       if(r){
-           if(!r->FillData(rawData) || !ui_->sceneWidget->AddTempRenderableObj(radar->root_item_.text(0).toStdString(), r)){
-               delete r;
-           }
-       } else {
-           std::cerr << "cannot create RadarPoints Renderable Object" << std::endl;
-       }
-   }
+  if (rawData != nullptr) {
+    RadarPoints* r = new RadarPoints(radar_points_shader_);
+    if (r) {
+      if (!r->FillData(rawData) ||
+          !ui_->sceneWidget->AddTempRenderableObj(
+              radar->root_item_.text(0).toStdString(), r)) {
+        delete r;
+      }
+    } else {
+      std::cerr << "cannot create RadarPoints Renderable Object" << std::endl;
+    }
+  }
 }
 
 void MainWindow::ActionOpenPointCloud(void) {
@@ -771,9 +783,6 @@ void MainWindow::ActionOpenImage(void) {
     }
   } else {
     videoImgProxy = closed_video_image_viewer_list_.takeFirst();
-    if (videoImgProxy->action_item_button_.isChecked()) {
-      videoImgProxy->reader_mutex_.unlock();
-    }
   }
 
   connect(&videoImgProxy->action_item_button_, SIGNAL(clicked(bool)), this,
@@ -827,9 +836,8 @@ void MainWindow::DoDeleteVideoImg(VideoImgProxy* proxy) {
              SIGNAL(focusOnThis(FixedAspectRatioWidget*)), this,
              SLOT(SelectCurrentTreeItem(FixedAspectRatioWidget*)));
 
-  if (proxy->action_item_button_.isChecked()) {
-    proxy->reader_mutex_.lock();
-  }
+  proxy->action_item_button_.setChecked(false);
+  DoPlayVideoImage(false, proxy);
 
   proxy->video_image_viewer_.StartOrStopUpdate(false);
   proxy->root_item_.setHidden(true);
@@ -923,16 +931,12 @@ void MainWindow::PlayRenderableObject(bool b) {
     pointcloud_button_->setText(tr("Stop"));
 
     pointcloud_reader_mutex_.unlock();
-    if (!pointcloud_channel_Reader_->isRunning()) {
-      pointcloud_channel_Reader_->start();
-    }
   } else {
-    if (pointcloud_channel_Reader_->isRunning()) {
+    if (!pointcloud_comboBox_->isEnabled()) {
       pointcloud_reader_mutex_.lock();
+      pointcloud_comboBox_->setEnabled(true);
+      pointcloud_button_->setText(tr("Show"));
     }
-
-    pointcloud_comboBox_->setEnabled(true);
-    pointcloud_button_->setText(tr("Show"));
   }
 
   ui_->treeWidget->setCurrentItem(nullptr);
@@ -950,6 +954,35 @@ void MainWindow::ImageReaderCallback(
     } else {
       std::cerr << "--------Cannot update dynamic Texture Data--------"
                 << std::endl;
+    }
+  } else {
+    std::cerr
+        << "----Dynamic Texture is nullptr or apollo.drivers.Image is nullptr"
+        << std::endl;
+  }
+  theVideoImgProxy->reader_mutex_.unlock();
+}
+
+void MainWindow::ImageReaderCallback(
+    const std::shared_ptr<const apollo::drivers::CompressedImage>& imgData,
+    VideoImgProxy* theVideoImgProxy) {
+  theVideoImgProxy->reader_mutex_.lock();
+  if (theVideoImgProxy->dynamic_texture_ != nullptr && imgData != nullptr) {
+    QImage img;
+    const std::string& data = imgData->data();
+    if (img.loadFromData(reinterpret_cast<const unsigned char*>(data.c_str()),
+                         static_cast<int>(data.size()))) {
+      if (theVideoImgProxy->dynamic_texture_->UpdateData(img)) {
+        theVideoImgProxy->video_image_viewer_.SetupDynamicTexture(
+            theVideoImgProxy->dynamic_texture_);
+      } else {
+        std::cerr << "--------Cannot update dynamic Texture Data--------"
+                  << std::endl;
+      }
+    } else {
+      std::cerr
+          << "-----------Cannot load compressed image from data with QImage"
+          << std::endl;
     }
   } else {
     std::cerr
@@ -977,11 +1010,21 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
       return;
     }
 
-    if (!theVideoImg->channel_reader_) {
-      theVideoImg->channel_reader_ =
-          new CyberChannReader<apollo::drivers::Image>();
+    const std::string channelName =
+        theVideoImg->channel_name_combobox_.currentText().toStdString();
+    if (_channelName2TypeMap[channelName] == CompressedImageType)
+      theVideoImg->isCompressedImage_ = true;
 
-      if (!theVideoImg->channel_reader_) {
+    if (!theVideoImg->image_reader_) {
+      if (theVideoImg->isCompressedImage_) {
+        theVideoImg->compressed_image_reader_ =
+            new CyberChannReader<apollo::drivers::CompressedImage>();
+      } else {
+        theVideoImg->image_reader_ =
+            new CyberChannReader<apollo::drivers::Image>();
+      }
+
+      if (!theVideoImg->image_reader_) {
         QMessageBox::warning(this, tr("Create Cybertron Channel Reader"),
                              tr("There is no enough memory!!!\nCannot create "
                                 "cybertron channel reader!"),
@@ -989,25 +1032,35 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
         return;
       }
 
-      auto videoCallback =
-          [this,
-           theVideoImg](const std::shared_ptr<apollo::drivers::Image>& pdata) {
-            this->ImageReaderCallback(pdata, theVideoImg);
-          };
-
       std::string nodeName("Visualizer-");
       nodeName.append(theVideoImg->root_item_.text(0).toStdString());
-      if (!theVideoImg->channel_reader_->InstallCallbackAndOpen(
-              videoCallback,
-              theVideoImg->channel_name_combobox_.currentText().toStdString(),
-              nodeName)) {
+
+      bool ret = false;
+
+      if (theVideoImg->isCompressedImage_) {
+        auto videoCallback =
+            [this, theVideoImg](
+                const std::shared_ptr<apollo::drivers::CompressedImage>&
+                    pdata) { this->ImageReaderCallback(pdata, theVideoImg); };
+
+        ret = theVideoImg->compressed_image_reader_->InstallCallbackAndOpen(
+            videoCallback, channelName, nodeName);
+      } else {
+        auto videoCallback =
+            [this, theVideoImg](
+                const std::shared_ptr<apollo::drivers::Image>& pdata) {
+              this->ImageReaderCallback(pdata, theVideoImg);
+            };
+        ret = theVideoImg->image_reader_->InstallCallbackAndOpen(
+            videoCallback, channelName, nodeName);
+      }
+      if (!ret) {
         QMessageBox::warning(
             this, tr("Settup Channel Callback"),
             tr("Channel Callback cannot be installed!!!\nPlease check it!"),
             QMessageBox::Ok);
-        delete theVideoImg->channel_reader_;
-        theVideoImg->channel_reader_ = nullptr;
 
+        theVideoImg->deleteReader();
         theVideoImg->action_item_button_.setChecked(false);
         return;
       }
@@ -1022,15 +1075,12 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
     theVideoImg->channel_name_combobox_.setEnabled(false);
 
     theVideoImg->reader_mutex_.unlock();
-    if (!theVideoImg->channel_reader_->isRunning())
-      theVideoImg->channel_reader_->start();
   } else {
-    if (theVideoImg->channel_reader_->isRunning()) {
+    if (!theVideoImg->channel_name_combobox_.isEnabled()) {
       theVideoImg->reader_mutex_.lock();
+      theVideoImg->action_item_button_.setText("Play");
+      theVideoImg->channel_name_combobox_.setEnabled(true);
     }
-
-    theVideoImg->action_item_button_.setText("Play");
-    theVideoImg->channel_name_combobox_.setEnabled(true);
   }
   ui_->treeWidget->setCurrentItem(nullptr);
   ui_->treeWidget->clearFocus();
@@ -1051,27 +1101,23 @@ void MainWindow::ChangeVideoImgChannel() {
   VideoImgProxy* theVideoImg =
       StructPtrByMemberPtr(obj, VideoImgProxy, channel_name_combobox_);
 
-  if (theVideoImg->channel_reader_ != nullptr) {
-    theVideoImg->channel_reader_->CloseChannel();
-    std::string nodeName("Visualizer-");
-    nodeName.append(theVideoImg->root_item_.text(0).toStdString());
-    theVideoImg->channel_reader_->OpenChannel(obj->currentText().toStdString(),
-                                              nodeName);
+  if (theVideoImg->image_reader_ != nullptr) {
+    theVideoImg->deleteReader();
   }
 }
 
-void MainWindow::ChangeRadarChannel(void){
-    QComboBox* obj = static_cast<QComboBox*>(QObject::sender());
-    RadarData* radar =
-        StructPtrByMemberPtr(obj, RadarData, channel_name_combobox_);
+void MainWindow::ChangeRadarChannel(void) {
+  QComboBox* obj = static_cast<QComboBox*>(QObject::sender());
+  RadarData* radar =
+      StructPtrByMemberPtr(obj, RadarData, channel_name_combobox_);
 
-    if (radar->channel_reader_ != nullptr) {
-      radar->channel_reader_->CloseChannel();
-      std::string nodeName("Visualizer-");
-      nodeName.append(radar->root_item_.text(0).toStdString());
-      radar->channel_reader_->OpenChannel(obj->currentText().toStdString(),
-                                                nodeName);
-    }
+  if (radar->channel_reader_ != nullptr) {
+    radar->channel_reader_->CloseChannel();
+    std::string nodeName("Visualizer-");
+    nodeName.append(radar->root_item_.text(0).toStdString());
+    radar->channel_reader_->OpenChannel(obj->currentText().toStdString(),
+                                        nodeName);
+  }
 }
 
 void MainWindow::SelectCurrentTreeItem(FixedAspectRatioWidget* dock) {
@@ -1089,62 +1135,71 @@ void MainWindow::SelectCurrentTreeItem(FixedAspectRatioWidget* dock) {
 }
 
 void MainWindow::TopologyChanged(
-    const apollo::cybertron::proto::ChangeMsg& change_msg) {
+    const apollo::cybertron::proto::ChangeMsg& changeMsg) {
   if (::apollo::cybertron::proto::ChangeType::CHANGE_CHANNEL ==
-          change_msg.change_type() &&
+          changeMsg.change_type() &&
       ::apollo::cybertron::proto::RoleType::ROLE_WRITER ==
-          change_msg.role_type() &&
+          changeMsg.role_type() &&
       ::apollo::cybertron::proto::OperateType::OPT_JOIN ==
-          change_msg.operate_type()) {
-    QString str(change_msg.role_attr().channel_name().c_str());
-    QStringList tmpList;
-    tmpList << str;
+          changeMsg.operate_type()) {
+    FindNewWriter(changeMsg.role_attr());
+  }
+}
 
-    QTreeWidgetItem* child = new QTreeWidgetItem(tmpList);
-    if (child == nullptr) {
-      QMessageBox::warning(
-          this, tr("Error"),
-          tr("No Enough for New Channel!!!\nPlease Select it!"),
-          QMessageBox::Ok);
-      return;
+void MainWindow::FindNewWriter(
+    const apollo::cybertron::proto::RoleAttributes& role) {
+  const std::string& channelName = role.channel_name();
+  if (_channelName2TypeMap.find(channelName) != _channelName2TypeMap.end())
+    return;
+  const std::string& msgTypeName = role.message_type();
+  _channelName2TypeMap[channelName] = msgTypeName;
+
+  QTreeWidgetItem* child = new QTreeWidgetItem();
+  if (child == nullptr) {
+    QMessageBox::warning(this, tr("Error"),
+                         tr("No Enough for New Channel!!!\nPlease Select it!"),
+                         QMessageBox::Ok);
+    return;
+  }
+
+  QString str(channelName.c_str());
+  child->setText(0, str);
+  child->setToolTip(0, str);
+
+  bool b = true;
+  for (int i = 0; i < all_channel_root_->childCount(); ++i) {
+    if (str < all_channel_root_->child(i)->text(0)) {
+      all_channel_root_->insertChild(i, child);
+      b = false;
     }
-    child->setToolTip(0, str);
+  }
 
-    bool b = true;
-    for (int i = 0; i < all_channel_root_->childCount(); ++i) {
-      if (str < all_channel_root_->child(i)->text(0)) {
-        all_channel_root_->insertChild(i, child);
-        b = false;
-      }
+  if (b) {
+    all_channel_root_->addChild(child);
+  }
+  ui_->treeWidget->setRootIsDecorated(true);
+
+  if (str.contains("camera", Qt::CaseInsensitive)) {
+    for (VideoImgProxy* item : video_image_viewer_list_) {
+      item->channel_name_combobox_.addItem(str);
     }
 
-    if (b) {
-      all_channel_root_->addChild(child);
+    for (VideoImgProxy* item : closed_video_image_viewer_list_) {
+      item->channel_name_combobox_.addItem(str);
     }
-    ui_->treeWidget->setRootIsDecorated(true);
+  }
 
-    if (str.contains("camera", Qt::CaseInsensitive)) {
-      for (VideoImgProxy* item : video_image_viewer_list_) {
-        item->channel_name_combobox_.addItem(str);
-      }
+  if (str.contains("pointcloud", Qt::CaseInsensitive)) {
+    pointcloud_comboBox_->addItem(str);
+  }
 
-      for (VideoImgProxy* item : closed_video_image_viewer_list_) {
-        item->channel_name_combobox_.addItem(str);
-      }
-    }
-
-    if (str.contains("pointcloud", Qt::CaseInsensitive)) {
-      pointcloud_comboBox_->addItem(str);
+  if (str.contains("radar", Qt::CaseInsensitive)) {
+    for (RadarData* item : radarData_list_) {
+      item->channel_name_combobox_.addItem(str);
     }
 
-    if(str.contains("radar", Qt::CaseInsensitive)){
-        for(RadarData* item : radarData_list_){
-            item->channel_name_combobox_.addItem(str);
-        }
-
-        for (RadarData* item : closed_radarData_list_) {
-           item->channel_name_combobox_.addItem(str);
-        }
+    for (RadarData* item : closed_radarData_list_) {
+      item->channel_name_combobox_.addItem(str);
     }
   }
 }
@@ -1162,9 +1217,9 @@ void MainWindow::PlayPause(void) {
     p->action_item_button_.setChecked(b);
     DoPlayVideoImage(b, p);
   }
-  for(RadarData* item : radarData_list_){
-      item->action_item_button_.setChecked(b);
-      DoOpenRadarChannel(b, item);
+  for (RadarData* item : radarData_list_) {
+    item->action_item_button_.setChecked(b);
+    DoOpenRadarChannel(b, item);
   }
 }
 

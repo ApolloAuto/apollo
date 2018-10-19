@@ -169,8 +169,8 @@
     <addaction name="actionOpenImage"/>
     <addaction name="actionOpenImages"/>
     <addaction name="actionDelImage"/>
-    <addaction name="separator"/>
-    <addaction name="actionRadar"/>
+<!--     <addaction name="separator"/>
+    <addaction name="actionRadar"/> -->
    </widget>
    <widget class="QMenu" name="menuActions">
     <property name="title">
@@ -323,11 +323,11 @@
     <string>F9</string>
    </property>
   </action>
-  <action name="actionRadar">
+<!--   <action name="actionRadar">
    <property name="text">
     <string>Radar</string>
    </property>
-  </action>
+  </action> -->
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -479,7 +479,7 @@
     </hint>
    </hints>
   </connection>
-  <connection>
+  <!-- <connection>
    <sender>actionRadar</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
@@ -494,7 +494,7 @@
      <y>376</y>
     </hint>
    </hints>
-  </connection>
+  </connection> -->
  </connections>
  <slots>
   <slot>ActionOpenImage()</slot>
@@ -503,6 +503,6 @@
   <slot>ActionAddGrid()</slot>
   <slot>ActionOpenImages()</slot>
   <slot>CloseVideoImgViewer(bool)</slot>
-  <slot>ActionOpenRadarChannel()</slot>
+<!--   <slot>ActionOpenRadarChannel()</slot> -->
  </slots>
 </ui>

@@ -60,9 +60,9 @@ public:
     }
 
     void set_color(const QColor& color) {
-        color_.setX(color.redF());
-        color_.setY(color.greenF());
-        color_.setZ(color.blueF());
+        color_.setX(static_cast<float>(color.redF()));
+        color_.setY(static_cast<float>(color.greenF()));
+        color_.setZ(static_cast<float>(color.blueF()));
     }
 
     bool FillData(

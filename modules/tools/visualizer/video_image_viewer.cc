@@ -82,7 +82,7 @@ void VideoImgViewer::initializeGL() {
   ortho_camera_.set_near_plane_width(GLfloat(width()));
   ortho_camera_.set_near_plane_height(GLfloat(height()));
 
-  ortho_camera_.set_fov(height());
+  ortho_camera_.set_fov(static_cast<float>(height()));
   ortho_camera_.set_camera_mode(AbstractCamera::CameraMode::OrthoMode);
   ortho_camera_.set_position(0.0f, 0.0f, 0.0f);
 
@@ -103,7 +103,7 @@ void VideoImgViewer::resizeGL(int width, int height) {
   glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
   if (is_init_) {
-    ortho_camera_.set_fov(height);
+    ortho_camera_.set_fov(static_cast<float>(height));
     ortho_camera_.set_near_plane_width(GLfloat(width));
     ortho_camera_.set_near_plane_height(GLfloat(height));
     ortho_camera_.UpdateProjection();
