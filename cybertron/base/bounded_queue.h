@@ -91,20 +91,22 @@ template <typename T>
 bool BoundedQueue<T>::Init(uint64_t size) {
   // Head and tail each occupy a space
   pool_size_ = size + 2;
-  try {
-    pool_ = reinterpret_cast<T*>(std::calloc(pool_size_, sizeof(T)));
-    for (int i = 0; i < pool_size_; ++i) {
-      new (&(pool_[i])) T();
-    }
-    flags_ = reinterpret_cast<AtomicBool*>(
-        std::calloc(pool_size_, sizeof(AtomicBool)));
-    for (int i = 0; i < pool_size_; ++i) {
-      flags_[i].flag = false;
-    }
-    return true;
-  } catch (...) {
+  pool_ = reinterpret_cast<T*>(std::calloc(pool_size_, sizeof(T)));
+  if (pool_ == nullptr) {
     return false;
   }
+  for (int i = 0; i < pool_size_; ++i) {
+    new (&(pool_[i])) T();
+  }
+  flags_ = reinterpret_cast<AtomicBool*>(
+      std::calloc(pool_size_, sizeof(AtomicBool)));
+  if (flags_ == nullptr) {
+    return false;
+  }
+  for (int i = 0; i < pool_size_; ++i) {
+    flags_[i].flag = false;
+  }
+  return true;
 }
 
 template <typename T>
