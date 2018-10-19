@@ -12,7 +12,7 @@
         console.log("Loading Json file:", jsonFilePath);
         const xobj = new XMLHttpRequest();
         xobj.overrideMimeType('application/json');
-        xobj.open('GET', jsonFilePath, true);
+        xobj.open('GET', jsonFilePath, false /* synchronous */);
         xobj.onreadystatechange = () => {
           if (xobj.readyState === 4 && xobj.status === 200) {
             // Required use of an anonymous callback as .open will NOT
