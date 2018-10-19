@@ -22,6 +22,7 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <utility>
 
 #include "cybertron/base/macros.h"
@@ -70,6 +71,9 @@ template <typename T>
 template <typename... Args>
 CCObjectPool<T>::CCObjectPool(int size, Args &&... args) : num_object_(size) {
   node_arena_ = static_cast<Node *>(malloc(num_object_ * sizeof(Node)));
+  if (node_arena_ == nullptr) {
+    throw std::bad_alloc();
+  }
   memset(node_arena_, 0, num_object_ * sizeof(Node));
 
   char *m = reinterpret_cast<char *>(node_arena_);
@@ -87,6 +91,9 @@ template <typename... Args>
 CCObjectPool<T>::CCObjectPool(int size, InitFunc f, Args &&... args)
     : num_object_(size) {
   node_arena_ = static_cast<Node *>(malloc(num_object_ * sizeof(Node)));
+  if (node_arena_ == nullptr) {
+    throw std::bad_alloc();
+  }
   memset(node_arena_, 0, num_object_ * sizeof(Node));
 
   char *m = reinterpret_cast<char *>(node_arena_);

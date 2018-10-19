@@ -22,6 +22,7 @@
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <new>
 #include <utility>
 
 #include "cybertron/base/macros.h"
@@ -69,6 +70,9 @@ ObjectPool<T>::ObjectPool(int num_objects, Args &&... args)
     : num_objects_(num_objects) {
   int size = sizeof(Node);
   object_arena_ = static_cast<char *>(malloc(num_objects_ * size));
+  if (object_arena_ == nullptr) {
+    throw std::bad_alloc();
+  }
   memset(object_arena_, 0, num_objects_ * size);
 
   for (int i = 0; i < num_objects_; i++) {
@@ -84,6 +88,9 @@ ObjectPool<T>::ObjectPool(int num_objects, InitFunc f, Args &&... args)
     : num_objects_(num_objects) {
   int size = sizeof(Node);
   object_arena_ = static_cast<char *>(malloc(num_objects_ * size));
+  if (object_arena_ == nullptr) {
+    throw std::bad_alloc();
+  }
   memset(object_arena_, 0, num_objects_ * size);
 
   for (int i = 0; i < num_objects_; i++) {
