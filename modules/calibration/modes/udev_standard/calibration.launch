@@ -1,0 +1,42 @@
+<!--this file list the modules which will be loaded dynamicly and their process name to be running in -->
+
+<cyber>
+	<desc>cyber modules list config</desc>
+	<version>1.0.0</version>
+
+	<module>
+		<name>gnss</name>
+		<dag_conf>/apollo/modules/drivers/gnss/dag/gnss.dag</dag_conf>
+		<process_name>apollo</process_name>
+		<version>1.0.0</version>
+	</module>
+
+	<module>
+		<name>velodyne</name>
+		<dag_conf>/apollo/modules/drivers/velodyne/dag/velodyne_udev_calibration.dag</dag_conf>
+		<process_name>apollo</process_name>
+		<version>1.0.0</version>
+	</module>
+
+	<module>
+		<name>camera</name>
+		<dag_conf>/apollo/modules/drivers/camera/dag/camera_udev.dag</dag_conf>
+		<process_name>apollo</process_name>
+		<version>1.0.0</version>
+	</module>
+
+	<module>
+		<name>conti_radar</name>
+		<dag_conf>/apollo/modules/drivers/radar/conti_radar/dag/conti_radar_udev.dag</dag_conf>
+		<process_name>apollo</process_name>
+		<version>1.0.0</version>
+	</module>
+	
+	<module>
+		<name>static_transform</name>
+		<dag_conf>/apollo/modules/transform/dag/static_transform.dag</dag_conf>
+		<process_name>apollo</process_name>
+		<version>1.0.0</version>
+	</module>
+
+</cyber>
