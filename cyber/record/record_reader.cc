@@ -28,7 +28,10 @@ RecordReader::~RecordReader() {}
 
 RecordReader::RecordReader(const std::string& file) {
   file_reader_.reset(new RecordFileReader());
-  file_reader_->Open(file);
+  if (!file_reader_->Open(file)) {
+    AERROR << "Open record file failed, file: " << file;
+    return;
+  }
   header_ = file_reader_->GetHeader();
   if (file_reader_->ReadIndex()) {
     index_ = file_reader_->GetIndex();
