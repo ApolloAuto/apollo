@@ -64,10 +64,10 @@ bool Stage::PlanningOnReferenceLine(
     }
 
     auto ret = common::Status::OK();
-    for (auto* optimizer : task_list_) {
-      ret = optimizer->Execute(frame, &reference_line_info);
+    for (auto* task : task_list_) {
+      ret = task->Execute(frame, &reference_line_info);
       if (!ret.ok()) {
-        AERROR << "Failed to run tasks[" << optimizer->Name()
+        AERROR << "Failed to run tasks[" << task->Name()
                << "], Error message: " << ret.error_message();
         break;
       }
