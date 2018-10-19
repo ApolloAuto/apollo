@@ -16,15 +16,21 @@
 
 #include "modules/planning/scenarios/scenario_manager.h"
 
+#include <limits>
 #include <utility>
+#include <vector>
 
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"
 
 namespace apollo {
 namespace planning {
+
+using apollo::hdmap::PathOverlap;
 
 bool ScenarioManager::Init(
     const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
@@ -100,7 +106,23 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
-  // TODO(all) fill in observe functions
+  const auto& reference_line_info = frame.reference_line_info().front();
+
+  // find next stop_sign_overlap
+  const std::vector<PathOverlap>& stop_sign_overlaps =
+      reference_line_info.reference_line().map_path().stop_sign_overlaps();
+  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+
+  double min_start_s = std::numeric_limits<double>::max();
+  for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
+    if (adc_front_edge_s - stop_sign_overlap.end_s <=
+        conf_min_pass_s_distance_ &&
+        stop_sign_overlap.start_s < min_start_s) {
+      min_start_s = stop_sign_overlap.start_s;
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap =
+          stop_sign_overlap;
+    }
+  }
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,

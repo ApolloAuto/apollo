@@ -137,6 +137,7 @@ cc_library(
     deps = [
         ":planning_gflags",
         "//cybertron",
+        "//modules/map/pnc_map:path",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",

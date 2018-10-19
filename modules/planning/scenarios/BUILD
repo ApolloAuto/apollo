@@ -45,6 +45,7 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_common",
+        "//modules/planning/common:planning_context",
         "//modules/planning/scenarios/lane_follow",
         "//modules/planning/scenarios/side_pass",
         "//modules/planning/scenarios/stop_sign_unprotected",

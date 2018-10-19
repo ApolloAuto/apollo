@@ -62,21 +62,18 @@ class StopSignUnprotectedScenario : public Scenario {
 
   StopSignUnprotectedContext* GetContext() { return &context_; }
 
-  void Observe(const Frame* frame);
+  void Init() override;
 
  private:
   static void RegisterStages();
-
-  bool FindNextStopSign(const ReferenceLineInfo& reference_line_info);
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
 
  private:
+  bool init_ = false;
   SpeedProfileGenerator speed_profile_generator_;
-
   StopSignUnprotectedContext context_;
 
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
-  double adc_distance_to_stop_sign_;
 
   // TODO(all): move to scenario conf later
   const uint32_t conf_start_stop_sign_timer = 10;  // second

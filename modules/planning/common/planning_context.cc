@@ -22,12 +22,16 @@ namespace apollo {
 namespace planning {
 
 PlanningStatus PlanningContext::planning_status_;
+PlanningContext::ScenarioInfo PlanningContext::scenario_info_;
 
 PlanningContext::PlanningContext() {}
 
 void PlanningContext::Init() {}
 
-void PlanningContext::Clear() { planning_status_.Clear(); }
+void PlanningContext::Clear() {
+  planning_status_.Clear();
+  scenario_info_ = {};
+}
 
 }  // namespace planning
 }  // namespace apollo
