@@ -28,6 +28,7 @@
 namespace apollo {
 namespace prediction {
 
+// Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
   int count = 0;
   double sum = 0.0;
@@ -43,21 +44,19 @@ CruiseMLPEvaluator::CruiseMLPEvaluator() {
 }
 
 void CruiseMLPEvaluator::Clear() {
-  obstacle_feature_values_map_.clear();
 }
 
 void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+  // Sanity checks.
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
-
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
     return;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
-
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph()) {
     ADEBUG << "Obstacle [" << id << "] has no lane graph.";
@@ -66,11 +65,11 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
     return;
   }
+
   // For every possible lane sequence, extract needed features.
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
@@ -81,31 +80,32 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     lane_sequence_ptr->set_time_to_lane_center(finish_time);
   }
 
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::Insert(*latest_feature_ptr);
-  }
+  // if (FLAGS_prediction_offline_mode) {
+  //  FeatureOutput::Insert(*latest_feature_ptr);
+  // }
 }
 
-void CruiseMLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
-    LaneSequence* lane_sequence_ptr, std::vector<double>* feature_values) {
+void CruiseMLPEvaluator::ExtractFeatureValues
+    (Obstacle* obstacle_ptr,
+     LaneSequence* lane_sequence_ptr,
+     std::vector<double>* feature_values) {
+  // Sanity checks.
+  CHECK_NOTNULL(obstacle_ptr);
+  CHECK_NOTNULL(lane_sequence_ptr);
   int id = obstacle_ptr->id();
+
+  // Extract obstacle related features.
   std::vector<double> obstacle_feature_values;
-
-  auto it = obstacle_feature_values_map_.find(id);
-  if (it == obstacle_feature_values_map_.end()) {
-    SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
-    obstacle_feature_values_map_[id] = obstacle_feature_values;
-  } else {
-    obstacle_feature_values = it->second;
-  }
-
+  SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
   if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
     ADEBUG << "Obstacle [" << id << "] has fewer than "
            << "expected obstacle feature_values "
            << obstacle_feature_values.size() << ".";
     return;
   }
-
+  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
+                         obstacle_feature_values.end());
+  // Extract lane related features.
   std::vector<double> lane_feature_values;
   SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
   if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
@@ -114,37 +114,20 @@ void CruiseMLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
            << ".";
     return;
   }
-
-  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
-                         obstacle_feature_values.end());
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
 
+  // For offline training, write the extracted features into proto.
   if (FLAGS_prediction_offline_mode &&
       !obstacle_ptr->IsNearJunction()) {
     SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
   }
 }
 
-void CruiseMLPEvaluator::LoadModel(const std::string& model_file) {
-  // Currently, it's using FnnVehicleModel
-  // TODO(all) implement it using the generic "network" class.
-  // model_ptr_.reset(new FnnVehicleModel());
-  // CHECK(model_ptr_ != nullptr);
-  // CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
-  //     << "Unable to load model file: " << model_file << ".";
-
-  // AINFO << "Succeeded in loading the model file: " << model_file << ".";
-}
-
-double CruiseMLPEvaluator::ComputeFinishTime(
-    const std::vector<double>& feature_values) {
-  // TODO(all) implement
-  return 6.0;
-}
-
 void CruiseMLPEvaluator::SetObstacleFeatureValues(
     const Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+  // Sanity checks.
+  CHECK_NOTNULL(obstacle_ptr);
   feature_values->clear();
   feature_values->reserve(OBSTACLE_FEATURE_SIZE);
 
@@ -156,14 +139,16 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> speeds;
   std::vector<double> timestamps;
 
-  double duration = obstacle_ptr->timestamp() - FLAGS_prediction_duration;
+  double obs_feature_history_start_time =
+      obstacle_ptr->timestamp() - FLAGS_prediction_duration;
   int count = 0;
+  // Starting from the most recent timestamp and going backward.
   for (std::size_t i = 0; i < obstacle_ptr->history_size(); ++i) {
     const Feature& feature = obstacle_ptr->feature(i);
     if (!feature.IsInitialized()) {
       continue;
     }
-    if (feature.timestamp() < duration) {
+    if (feature.timestamp() < obs_feature_history_start_time) {
       break;
     }
     if (feature.has_lane() && feature.lane().has_lane_feature()) {
@@ -181,6 +166,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   if (count <= 0) {
     return;
   }
+
   int curr_size = 5;
   int hist_size = obstacle_ptr->history_size();
   double theta_mean = ComputeMean(thetas, 0, hist_size - 1);
@@ -222,10 +208,13 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   double acc = 0.0;
   if (static_cast<int>(speeds.size()) >= 3 * curr_size &&
       delta_t > std::numeric_limits<double>::epsilon()) {
-    double speed_1 = ComputeMean(speeds, 0, curr_size - 1);
-    double speed_2 = ComputeMean(speeds, curr_size, 2 * curr_size - 1);
-    double speed_3 = ComputeMean(speeds, 2 * curr_size, 3 * curr_size - 1);
-    acc = (speed_1 - 2 * speed_2 + speed_3) /
+    double speed_1st_recent =
+        ComputeMean(speeds, 0, curr_size - 1);
+    double speed_2nd_recent =
+        ComputeMean(speeds, curr_size, 2 * curr_size - 1);
+    double speed_3rd_recent =
+        ComputeMean(speeds, 2 * curr_size, 3 * curr_size - 1);
+    acc = (speed_1st_recent - 2 * speed_2nd_recent + speed_3rd_recent) /
           (curr_size * curr_size * delta_t * delta_t);
   }
 
@@ -245,7 +234,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
     dist_rb_rate_curr = (dist_rb_curr - dist_rb_prev) / (curr_size * delta_t);
   }
 
-  // setup obstacle feature values
+  // Setup obstacle feature values.
   feature_values->push_back(theta_filtered);
   feature_values->push_back(theta_mean);
   feature_values->push_back(theta_filtered - theta_mean);
@@ -278,6 +267,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
 void CruiseMLPEvaluator::SetLaneFeatureValues
     (const Obstacle* obstacle_ptr, const LaneSequence* lane_sequence_ptr,
      std::vector<double>* feature_values) {
+  // Sanity checks.
   feature_values->clear();
   feature_values->reserve(LANE_FEATURE_SIZE);
   const Feature& feature = obstacle_ptr->latest_feature();
@@ -307,6 +297,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       double diff_x = lane_point.position().x() - feature.position().x();
       double diff_y = lane_point.position().y() - feature.position().y();
       double angle = std::atan2(diff_x, diff_y);
+      feature_values->push_back(lane_point.kappa());
       feature_values->push_back(std::sin(angle - heading));
       feature_values->push_back(lane_point.relative_l());
       feature_values->push_back(lane_point.heading());
@@ -314,18 +305,39 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
     }
   }
 
+  // If the lane points are not sufficient, apply a linear extrapolation.
   std::size_t size = feature_values->size();
   while (size >= 4 && size < LANE_FEATURE_SIZE) {
+    double lane_kappa = feature_values->operator[](size-5);
     double heading_diff = feature_values->operator[](size - 4);
     double lane_l_diff = feature_values->operator[](size - 3);
     double heading = feature_values->operator[](size - 2);
     double angle_diff = feature_values->operator[](size - 1);
+    feature_values->push_back(lane_kappa);
     feature_values->push_back(heading_diff);
     feature_values->push_back(lane_l_diff);
     feature_values->push_back(heading);
     feature_values->push_back(angle_diff);
     size = feature_values->size();
   }
+}
+
+// TODO(all): uncomment this once the model is trained and ready.
+void CruiseMLPEvaluator::LoadModel(const std::string& model_file) {
+  // Currently, it's using FnnVehicleModel
+  // TODO(all) implement it using the generic "network" class.
+  // model_ptr_.reset(new FnnVehicleModel());
+  // CHECK(model_ptr_ != nullptr);
+  // CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+  //     << "Unable to load model file: " << model_file << ".";
+
+  // AINFO << "Succeeded in loading the model file: " << model_file << ".";
+}
+
+// TODO(all): implement this once the model is trained and ready.
+double CruiseMLPEvaluator::ComputeFinishTime(
+    const std::vector<double>& feature_values) {
+  return 6.0;
 }
 
 void CruiseMLPEvaluator::SaveOfflineFeatures(
