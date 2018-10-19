@@ -458,8 +458,8 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       l_index += current_edges_num;
       n_index += 4;
       constraint_index += 4;
-      state_index += 4;
     }
+    state_index += 4;
   }
 
   AINFO << "constraint_index after obstacles avoidance constraints "
@@ -759,7 +759,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         // With respect to x
         iRow[nz_index] = constraint_index + 2;
         jCol[nz_index] = state_index + 2;
-        ++nz_index;
+        ++nz_index;  // FIXME()
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {
@@ -777,6 +777,12 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         jCol[nz_index] = n_index + 3;
         ++nz_index;
 
+        /*
+                CHECK_NE(constraint_index + 2, 300)
+                    << "index i : " << i << "index j : " << j
+                    << ", state_index + 2 : " << state_index + 2
+                    << ", l_index : " << l_index << ", n_index : " << n_index;
+        */
         //  -g'*mu + (A*t - b)*lambda > 0
 
         // With respect to x
@@ -786,11 +792,11 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
         iRow[nz_index] = constraint_index + 3;
         jCol[nz_index] = state_index + 1;
-        ++nz_index;
+        ++nz_index;  // FIXME()
 
         iRow[nz_index] = constraint_index + 3;
         jCol[nz_index] = state_index + 2;
-        ++nz_index;
+        ++nz_index;  // FIXME()
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {
@@ -810,8 +816,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         l_index += current_edges_num;
         n_index += 4;
         constraint_index += 4;
-        state_index += 4;
       }
+      state_index += 4;
     }
 
     CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
@@ -1205,8 +1211,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         edges_counter += current_edges_num;
         l_index += current_edges_num;
         n_index += 4;
-        state_index += 4;
       }
+      state_index += 4;
     }
 
     AINFO << "eval_jac_g, fulfilled obstacle constraint values";
