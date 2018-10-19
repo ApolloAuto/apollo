@@ -29,7 +29,7 @@ cc_library(
     ],
     deps = [
         ":polynomial_curve1d",
-        "//cyber",
+        "//cyber/common",
         "//modules/common/util:string_util",
     ],
 )
@@ -41,9 +41,10 @@ cc_test(
         "quartic_polynomial_curve1d_test.cc",
     ],
     deps = [
+        ":cubic_polynomial_curve1d",
         ":quartic_polynomial_curve1d",
         ":quintic_polynomial_curve1d",
-        ":cubic_polynomial_curve1d",
+        "//cyber/common:log",
         "@gtest//:main",
     ],
 )
@@ -58,7 +59,7 @@ cc_library(
     ],
     deps = [
         ":polynomial_curve1d",
-        "//cyber",
+        "//cyber/common",
         "//modules/common/util:string_util",
     ],
 )
@@ -73,8 +74,8 @@ cc_library(
     ],
     deps = [
         ":polynomial_curve1d",
-        "//cyber",
         ":quartic_polynomial_curve1d",
+        "//cyber/common:log",
         "//modules/common/util:string_util",
     ],
 )
@@ -88,6 +89,7 @@ cc_test(
     deps = [
         ":cubic_polynomial_curve1d",
         ":quartic_polynomial_curve1d",
+        "//cyber/common:log",
         "@gtest//:main",
     ],
 )
@@ -102,7 +104,7 @@ cc_library(
     ],
     deps = [
         ":quintic_polynomial_curve1d",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/math",
         "//modules/common/util:string_util",
     ],
@@ -118,7 +120,7 @@ cc_library(
     ],
     deps = [
         ":quintic_spiral_path",
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/math",
         "//modules/common/util:string_util",
     ],
@@ -131,8 +133,9 @@ cc_test(
         "quintic_polynomial_curve1d_test.cc",
     ],
     deps = [
-        ":quintic_polynomial_curve1d",
         ":quartic_polynomial_curve1d",
+        ":quintic_polynomial_curve1d",
+        "//cyber/common:log",
         "@gtest//:main",
     ],
 )
@@ -145,7 +148,9 @@ cc_test(
     ],
     deps = [
         ":piecewise_quintic_spiral_path",
+        "//cyber/common:log",
         "@gtest//:main",
     ],
 )
+
 cpplint()

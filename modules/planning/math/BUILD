@@ -33,7 +33,7 @@ cc_library(
         "polynomial_xd.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
     ],
 )
 

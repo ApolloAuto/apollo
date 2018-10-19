@@ -4,10 +4,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "cyber",
+    linkstatic = False,
     deps = [
         "//cyber:cyber_core",
     ],
-    linkstatic = False,
 )
 
 cc_binary(
@@ -16,28 +16,28 @@ cc_binary(
         "mainboard/*.cc",
         "mainboard/*.h",
     ]),
-    deps = [
-        ":cyber_core",
-        "//cyber/proto:dag_config_cc_proto",
-    ],
     copts = [
         "-pthread",
     ],
     linkstatic = False,
+    deps = [
+        ":cyber_core",
+        "//cyber/proto:dag_config_cc_proto",
+    ],
 )
 
 cc_binary(
     name = "libcyber.so",
-    deps = [
-        ":cyber_core",
-          "@fastrtps//:fastrtps",
-    ],
     #TODO: Using deps instead.
     linkopts = [
         "-luuid",
     ],
     linkshared = True,
     linkstatic = True,
+    deps = [
+        ":cyber_core",
+        "@fastrtps//:fastrtps",
+    ],
 )
 
 cc_library(
@@ -74,53 +74,52 @@ cc_library(
         "cyber.cc",
         "init.cc",
     ],
-    deps = [
-          "//cyber:binary",
-          "//cyber:state",
-          "//cyber/base",
-          "//cyber/blocker:blocker_manager",
-          "//cyber/common",
-          "//cyber/component:component",
-          "//cyber/component:timer_component",
-          "//cyber/class_loader:class_loader",
-          "//cyber/class_loader:class_loader_manager",
-          "//cyber/croutine:croutine",
-          "//cyber/data:data",
-          "//cyber/event:perf_event",
-          "//cyber/event:perf_event_cache",
-          "//cyber:init",
-          "//cyber/logger:logger",
-          "//cyber/logger:async_logger",
-          "//cyber/message:message_traits",
-          "//cyber/message:raw_message_traits",
-          "//cyber/message:py_message_traits",
-          "//cyber/message:protobuf_traits",
-          "//cyber/message:intra_message_traits",
-          "//cyber/node:node",
-          "//cyber/proto:run_mode_conf_cc_proto",
-          "//cyber/parameter:parameter_client",
-          "//cyber/parameter:parameter_server",
-          "//cyber/record:record",
-          "//cyber/scheduler:scheduler",
-          "//cyber/service:client",
-          "//cyber/service:service",
-          "//cyber/service_discovery:topology_manager",
-          "//cyber/task:task",
-          "//cyber/time:time",
-          "//cyber/time:duration",
-          "//cyber/time:rate",
-          "//cyber/timer:timer",
-          "//cyber/transport:transport_lib",
-          "//third_party/tf2:tf2",
-          "@fastrtps",
-    ],
     linkopts = [
         "-luuid",
         "-lprotobuf",
         "-lglog",
         "-lgflags",
     ],
+    deps = [
+        "//cyber:binary",
+        "//cyber:init",
+        "//cyber:state",
+        "//cyber/base",
+        "//cyber/blocker:blocker_manager",
+        "//cyber/class_loader",
+        "//cyber/class_loader:class_loader_manager",
+        "//cyber/common",
+        "//cyber/component",
+        "//cyber/component:timer_component",
+        "//cyber/croutine",
+        "//cyber/data",
+        "//cyber/event:perf_event",
+        "//cyber/event:perf_event_cache",
+        "//cyber/logger",
+        "//cyber/logger:async_logger",
+        "//cyber/message:intra_message_traits",
+        "//cyber/message:message_traits",
+        "//cyber/message:protobuf_traits",
+        "//cyber/message:py_message_traits",
+        "//cyber/message:raw_message_traits",
+        "//cyber/node",
+        "//cyber/parameter:parameter_client",
+        "//cyber/parameter:parameter_server",
+        "//cyber/proto:run_mode_conf_cc_proto",
+        "//cyber/record",
+        "//cyber/scheduler",
+        "//cyber/service",
+        "//cyber/service:client",
+        "//cyber/service_discovery:topology_manager",
+        "//cyber/task",
+        "//cyber/time",
+        "//cyber/time:duration",
+        "//cyber/time:rate",
+        "//cyber/timer",
+        "//cyber/transport:transport_lib",
+        "//third_party/tf2",
+        "@fastrtps",
+    ],
 )
-
 
 cpplint()

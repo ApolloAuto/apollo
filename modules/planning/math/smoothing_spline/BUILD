@@ -57,7 +57,7 @@ cc_library(
     deps = [
         ":affine_constraint",
         ":spline_1d",
-        "//cyber",
+        "//cyber/common:log",
         "@eigen",
     ],
 )
@@ -71,7 +71,8 @@ cc_library(
         "spline_seg_kernel.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
+        "//cyber/common:macros",
         "@eigen",
     ],
 )
@@ -315,7 +316,7 @@ cc_library(
         "piecewise_linear_constraint.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "@eigen",
     ],
 )
@@ -329,7 +330,7 @@ cc_library(
         "piecewise_linear_kernel.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "@eigen",
     ],
 )
@@ -371,6 +372,7 @@ cc_test(
     ],
     deps = [
         ":spline_1d_constraint",
+        "//cyber/common",
         "@gtest//:main",
     ],
 )
@@ -383,6 +385,7 @@ cc_test(
     ],
     deps = [
         ":piecewise_linear_kernel",
+        "//cyber/common",
         "@gtest//:main",
     ],
 )
@@ -395,6 +398,7 @@ cc_test(
     ],
     deps = [
         ":piecewise_linear_constraint",
+        "//cyber/common",
         "@gtest//:main",
     ],
 )

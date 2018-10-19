@@ -11,7 +11,7 @@ cc_library(
         "lattice_planner.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/math:path_matcher",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
