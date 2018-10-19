@@ -70,6 +70,9 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType default_scenario_type_;
   std::set<ScenarioConfig::ScenarioType> supported_scenarios_;
   ScenarioContext scenario_context_;
+
+  // TODO(all): move to scenario conf later
+  const uint32_t conf_min_pass_s_distance_ = 3.0;  // meter
 };
 
 }  // namespace planning

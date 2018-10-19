@@ -27,6 +27,7 @@
 
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/proto/planning_status.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -39,6 +40,11 @@ namespace planning {
 
 class PlanningContext {
  public:
+  // scenario context
+  struct ScenarioInfo {
+    apollo::hdmap::PathOverlap next_stop_sign_overlap;
+  };
+
   static void Clear();
 
   static void Init();
@@ -47,8 +53,11 @@ class PlanningContext {
 
   static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
 
+  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
+
  private:
   static PlanningStatus planning_status_;
+  static ScenarioInfo scenario_info_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext);

@@ -78,7 +78,7 @@ class Scenario {
 
   const ScenarioStatus& GetStatus() const { return scenario_status_; }
 
-  void Init();
+  virtual void Init();
 
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
