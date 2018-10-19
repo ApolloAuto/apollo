@@ -27,9 +27,9 @@ class Grid : public RenderableObject {
   GLenum GetPrimitiveType(void) const { return GL_LINES; }
   void SetupExtraUniforms(void) {
     QVector3D color;
-    color.setX(grid_color_.redF());
-    color.setY(grid_color_.greenF());
-    color.setZ(grid_color_.blueF());
+    color.setX(static_cast<float>(grid_color_.redF()));
+    color.setY(static_cast<float>(grid_color_.greenF()));
+    color.setZ(static_cast<float>(grid_color_.blueF()));
     shader_program_->setUniformValue("color", color);
   }
 

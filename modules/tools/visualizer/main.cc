@@ -44,9 +44,16 @@ int main(int argc, char* argv[]) {
         w.TopologyChanged(change_msg);
       };
 
-  apollo::cybertron::service_discovery::TopologyManager::Instance()
-      ->channel_manager()
-      ->AddChangeListener(topologyCallback);
+  auto channelManager = apollo::cybertron::service_discovery::TopologyManager::Instance()
+      ->channel_manager();
+  channelManager->AddChangeListener(topologyCallback);
+
+  std::vector<apollo::cybertron::proto::RoleAttributes> role_attr_vec;
+  channelManager->GetWriters(&role_attr_vec);
+  for (auto& role_attr : role_attr_vec) {
+    w.FindNewWriter(role_attr);
+  }
+
   w.show();
 
   return a.exec();

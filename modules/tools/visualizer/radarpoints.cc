@@ -42,9 +42,9 @@ bool RadarPoints::FillData(
       const apollo::common::Point2D& position =
           iter->second.absolute_position();
 
-      ptr[0] = position.x();
-      ptr[1] = position.y();
-      ptr[2] = std::pow(10, iter->second.rcs() / 20.0);
+      ptr[0] = static_cast<float>(position.x());
+      ptr[1] = static_cast<float>(position.y());
+      ptr[2] = std::pow(10.0f, static_cast<float>(iter->second.rcs() / 20.0));
     }  // end for
 
     ret = true;

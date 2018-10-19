@@ -250,8 +250,8 @@ void SceneViewer::UpdateCameraYaw(double yawInDegrees) {
     yawInDegrees += 360.0;
   }
 
-  free_camera_.set_yaw(yawInDegrees);
-  target_camera_.set_yaw(yawInDegrees);
+  free_camera_.set_yaw(static_cast<float>(yawInDegrees));
+  target_camera_.set_yaw(static_cast<float>(yawInDegrees));
   UpdateCameraWorld();
 }
 
@@ -263,8 +263,8 @@ void SceneViewer::UpdateCameraPitch(double pitchInDegrees) {
     pitchInDegrees = -90.0;
   }
 
-  free_camera_.set_pitch(pitchInDegrees);
-  target_camera_.set_pitch(pitchInDegrees);
+  free_camera_.set_pitch(static_cast<float>(pitchInDegrees));
+  target_camera_.set_pitch(static_cast<float>(pitchInDegrees));
   UpdateCameraWorld();
 }
 void SceneViewer::UpdateCameraRoll(double rollInDegrees) {
@@ -275,8 +275,8 @@ void SceneViewer::UpdateCameraRoll(double rollInDegrees) {
     rollInDegrees += 360.0;
   }
 
-  free_camera_.set_roll(rollInDegrees);
-  free_camera_.set_roll(rollInDegrees);
+  free_camera_.set_roll(static_cast<float>(rollInDegrees));
+  free_camera_.set_roll(static_cast<float>(rollInDegrees));
   UpdateCameraWorld();
 }
 
@@ -316,7 +316,7 @@ void SceneViewer::mousePressEvent(QMouseEvent *event) {
     left_key_last_pos_ = QCursor::pos();
   } else if (event->button() == Qt::RightButton) {
     right_key_is_moved_ = false;
-    right_key_last_y_ = QCursor::pos().y();
+    right_key_last_y_ = static_cast<float>(QCursor::pos().y());
   }
 
   QOpenGLWidget::mousePressEvent(event);
@@ -328,8 +328,8 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *mouseEvent) {
     QPoint dd = tmp - left_key_last_pos_;
     left_key_last_pos_ = tmp;
 
-    float x = dd.x() * sensitivity();
-    float y = dd.y() * sensitivity();
+    float x = static_cast<float>(dd.x()) * sensitivity();
+    float y = static_cast<float>(dd.y()) * sensitivity();
 
     if (IsFreeCamera()) {
       free_camera_.Starfe(-x);
@@ -365,7 +365,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *mouseEvent) {
     right_key_is_moved_ = true;
     if (IsFreeCamera()) {
       {
-        float tmp = QCursor::pos().y();
+        float tmp = static_cast<float>(QCursor::pos().y());
         float dd = right_key_last_y_ - tmp;
         right_key_last_y_ = tmp;
 
@@ -385,7 +385,7 @@ void SceneViewer::mouseMoveEvent(QMouseEvent *mouseEvent) {
 }
 
 void SceneViewer::wheelEvent(QWheelEvent *event) {
-  float delta = event->angleDelta().y();
+  float delta = static_cast<float>(event->angleDelta().y());
   delta *= sensitivity();
 
   target_camera_.set_distance(target_camera_.distance() + delta);

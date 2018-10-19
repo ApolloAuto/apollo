@@ -180,7 +180,7 @@ bool LogFileObject::CreateLogfile(const std::string& time_pid_string) {
     // entire log directory gets relocated the link is still valid.
     const char* linkdest = slash ? (slash + 1) : filename;
     // silently ignore failures
-    if (!symlink(linkdest, linkpath.c_str())) {
+    if (symlink(linkdest, linkpath.c_str())) {
       AERROR << "symlink failed.";
     }
   }

@@ -62,39 +62,43 @@ bool Plane::FillVertexBuffer(GLfloat* pBuffer) {
 
 void Plane::SetupAllAttrPointer(void) {
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                        sizeof(GLfloat) * vertex_element_count(), 0);
+  glVertexAttribPointer(
+      0, 2, GL_FLOAT, GL_FALSE,
+      static_cast<int>(sizeof(GLfloat)) * vertex_element_count(), 0);
 
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                        sizeof(GLfloat) * vertex_element_count(),
-                        reinterpret_cast<void*>(sizeof(GLfloat) * 2));
+  glVertexAttribPointer(
+      1, 2, GL_FLOAT, GL_FALSE,
+      static_cast<int>(sizeof(GLfloat)) * vertex_element_count(),
+      reinterpret_cast<void*>(sizeof(GLfloat) * 2));
 }
 
 void Plane::Draw(void) {
-  if (texture_->isSizeChanged()) {
-    glGenTextures(1, &texture_id_);
+  if (texture_->data()) {
+    if (texture_->isSizeChanged()) {
+      glGenTextures(1, &texture_id_);
 
-    glBindTexture(GL_TEXTURE_2D, texture_id_);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+      glBindTexture(GL_TEXTURE_2D, texture_id_);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture_->width(),
-                 texture_->height(), 0, texture_->texture_format(),
-                 GL_UNSIGNED_BYTE, texture_->data());
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, texture_->width(),
+                   texture_->height(), 0, texture_->texture_format(),
+                   GL_UNSIGNED_BYTE, texture_->data());
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+      glBindTexture(GL_TEXTURE_2D, 0);
 
-    texture_->removeDirty();
-  } else if (texture_->isDirty()) {
-    glBindTexture(GL_TEXTURE_2D, texture_id_);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texture_->width(),
-                    texture_->height(), texture_->texture_format(),
-                    GL_UNSIGNED_BYTE, texture_->data());
-    glBindTexture(GL_TEXTURE_2D, 0);
-    texture_->removeDirty();
+      texture_->removeDirty();
+    } else if (texture_->isDirty()) {
+      glBindTexture(GL_TEXTURE_2D, texture_id_);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, texture_->width(),
+                      texture_->height(), texture_->texture_format(),
+                      GL_UNSIGNED_BYTE, texture_->data());
+      glBindTexture(GL_TEXTURE_2D, 0);
+      texture_->removeDirty();
+    }
   }
 
   glActiveTexture(GL_TEXTURE0);

@@ -18,7 +18,6 @@
 
 #include "cybertron/cybertron.h"
 
-#include <QThread>
 #include <functional>
 #include <memory>
 #include <string>
@@ -29,10 +28,9 @@ template <typename T>
 using CyberChannelCallback = std::function<void(const std::shared_ptr<T>&)>;
 
 template <typename T>
-class CyberChannReader : public QThread {
+class CyberChannReader {
  public:
-  explicit CyberChannReader(QObject* parent = nullptr)
-      : QThread(parent), channel_callback_(nullptr), channel_node_(nullptr) {}
+  CyberChannReader(void) : channel_callback_(nullptr), channel_node_(nullptr) {}
 
   ~CyberChannReader() { CloseChannel(); }
 
@@ -47,9 +45,10 @@ class CyberChannReader : public QThread {
   }
 
   bool InstallCallbackAndOpen(CyberChannelCallback<T> channelCallback,
-                              const std::string& channelName, const std::string& nodeName) {
-
-    return InstallCallback(channelCallback) && OpenChannel(channelName, nodeName);
+                              const std::string& channelName,
+                              const std::string& nodeName) {
+    return InstallCallback(channelCallback) &&
+           OpenChannel(channelName, nodeName);
   }
 
   bool InstallCallback(CyberChannelCallback<T> channelCallback) {
@@ -62,8 +61,9 @@ class CyberChannReader : public QThread {
     }
   }
 
-  bool OpenChannel(const std::string& channelName, const std::string& nodeName) {
-    if(channelName.empty() || nodeName.empty()){
+  bool OpenChannel(const std::string& channelName,
+                   const std::string& nodeName) {
+    if (channelName.empty() || nodeName.empty()) {
       std::cerr << "Channel Name or Node Name must be not empty" << std::endl;
       return false;
     }
@@ -78,15 +78,9 @@ class CyberChannReader : public QThread {
 
   const std::string& NodeName(void) const { return channel_node_->Name(); }
 
-  void start(Priority priority = InheritPriority) {
-    if (channel_reader_ != nullptr) QThread::start(priority);
-  }
-
- protected:
-  void run() override { apollo::cybertron::WaitForShutdown(); }
-
  private:
-  bool CreateChannel(const std::string& channelName, const std::string& nodeName) {
+  bool CreateChannel(const std::string& channelName,
+                     const std::string& nodeName) {
     if (channel_node_ == nullptr) {
       channel_node_ = apollo::cybertron::CreateNode(nodeName);
       if (channel_node_ == nullptr) {

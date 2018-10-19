@@ -131,10 +131,10 @@ class ChannelMessage : public GeneralMessageBase {
 
   const std::string& NodeName(void) const { return channel_node_->Name(); }
 
-  void add_reader(const std::string& reader) { readers_.push_back(reader); }
+  void add_reader(const std::string& reader) { DoAdd(readers_, reader); }
   void del_reader(const std::string& reader) { DoDelete(readers_, reader); }
 
-  void add_writer(const std::string& writer) { writers_.push_back(writer); }
+  void add_writer(const std::string& writer) { DoAdd(writers_, writer); }
   void del_writer(const std::string& writer) {
     DoDelete(writers_, writer);
     if (!writers_.size()) {
@@ -150,6 +150,16 @@ class ChannelMessage : public GeneralMessageBase {
         break;
       }
     }
+  }
+
+  static void DoAdd(std::vector<std::string>& vec, const std::string& str) {
+    for (auto iter = vec.begin(); iter != vec.end(); ++iter) {
+      if (*iter == str) {
+        return;
+      }
+    }
+
+    vec.emplace_back(str);
   }
 
   void set_has_message_come(bool b) { has_message_come_ = b; }
