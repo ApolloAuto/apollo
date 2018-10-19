@@ -38,7 +38,11 @@ bool RecordWriter::Open(const std::string& file) {
   sstream_.str(std::string());
   sstream_.clear();
   sstream_ << "." << std::setw(5) << std::setfill('0') << file_index_++;
-  path_ = file_ + sstream_.str();
+  if (header_.segment_interval() > 0 || header_.segment_raw_size() > 0) {
+    path_ = file_ + sstream_.str();
+  } else {
+    path_ = file_;
+  }
   file_writer_.reset(new RecordFileWriter());
   if (!file_writer_->Open(path_)) {
     AERROR << "open outfile failed. file: " << path_;
