@@ -70,15 +70,16 @@ void StopSignUnprotectedScenario::Init() {
 
   context_.next_stop_sign_overlap =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap;
-  if (context_.next_stop_sign_overlap.object_id.empty()) {
+  const std::string stop_sign_overlap_id =
+      context_.next_stop_sign_overlap.object_id;
+  if (stop_sign_overlap_id.empty()) {
     return;
   }
 
   next_stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
-      hdmap::MakeMapId(context_.next_stop_sign_overlap.object_id));
+      hdmap::MakeMapId(stop_sign_overlap_id));
   if (!next_stop_sign_) {
-    AERROR << "Could not find stop sign: "
-           << context_.next_stop_sign_overlap.object_id;
+    AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
   }
 
@@ -132,9 +133,12 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 }
 
 bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario, const common::TrajectoryPoint& ego_point,
+    const Scenario& current_scenario,
+    const common::TrajectoryPoint& ego_point,
     const Frame& frame) const {
-  if (next_stop_sign_ == nullptr) {
+  const std::string stop_sign_overlap_id =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  if (stop_sign_overlap_id.empty()) {
     return false;
   }
 
@@ -151,7 +155,7 @@ bool StopSignUnprotectedScenario::IsTransferable(
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return (time_distance <= conf_start_stop_sign_timer);
+      return (time_distance <= conf_start_stop_sign_timer_);
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
@@ -171,12 +175,10 @@ bool StopSignUnprotectedScenario::IsTransferable(
 Stage::StageStatus StopSignUnprotectedPreStop::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   CHECK_NOTNULL(frame);
-  const auto& reference_line_info = frame->reference_line_info().front();
 
+  const auto& reference_line_info = frame->reference_line_info().front();
   if (CheckADCStop(reference_line_info)) {
-    PlanningContext::MutablePlanningStatus()
-        ->mutable_stop_sign()
-        ->set_stop_start_time(Clock::NowInSeconds());
+    GetContext()->stop_start_time = Clock::NowInSeconds();
 
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP;
     return Stage::FINISHED;
@@ -189,23 +191,22 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
     AddWatchVehicle(*path_obstacle, &watch_vehicles);
   }
 
-  // TODO(all): call decider to add stop fence
+  // TODO(all): add tasks
+  // (1) call decider to add stop fence
+  // (2) call optimizers to run to stop fence
   return Stage::RUNNING;
 }
 
 Stage::StageStatus StopSignUnprotectedStop::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   CHECK_NOTNULL(frame);
-  constexpr float conf_stop_duration = 1.0f;
-  const auto& reference_line_info = frame->reference_line_info().front();
 
   auto start_time = GetContext()->stop_start_time;
-
   double wait_time = Clock::NowInSeconds() - start_time;
-  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
-         << "]";
+  ADEBUG << "stop_start_time[" << start_time
+      << "] wait_time[" << wait_time << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
-  if (wait_time >= conf_stop_duration && watch_vehicles.empty()) {
+  if (wait_time >= conf_stop_duration_ && watch_vehicles.empty()) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
     return Stage::FINISHED;
   }
@@ -217,22 +218,25 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
               std::back_inserter(watch_vehicle_ids));
   }
 
+  const auto& reference_line_info = frame->reference_line_info().front();
   const PathDecision& path_decision = reference_line_info.path_decision();
   for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
     // remove from watch_vehicles_ if adc is stopping/waiting at stop sign
     RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles);
   }
 
-  // TODO(all):
   return Stage::RUNNING;
 }
 
 Stage::StageStatus StopSignUnprotectedCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  CHECK_NOTNULL(frame);
+
   if (!config_.enabled()) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
     return Stage::FINISHED;
   }
+
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(frame, &reference_line_info,
@@ -245,6 +249,9 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
     ADEBUG << "fail at build stop fence at creeping";
     return Stage::ERROR;
   }
+
+  // TODO(all): call optimizers to run to stop fence
+
   return Stage::RUNNING;
 }
 
@@ -302,7 +309,6 @@ int StopSignUnprotectedScenario::GetAssociatedLanes(
 int StopSignUnprotectedPreStop::AddWatchVehicle(
     const PathObstacle& path_obstacle, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
-  constexpr double conf_watch_vehicle_max_valid_stop_distance = 5.0;
 
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
@@ -372,7 +378,7 @@ int StopSignUnprotectedPreStop::AddWatchVehicle(
   double stop_line_s = over_lap_info->lane_overlap_info().start_s();
   double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
   double distance_to_stop_line = stop_line_s - obstacle_end_s;
-  if (distance_to_stop_line > conf_watch_vehicle_max_valid_stop_distance) {
+  if (distance_to_stop_line > conf_watch_vehicle_max_valid_stop_distance_) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
@@ -400,8 +406,6 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
     const PathObstacle& path_obstacle,
     const std::vector<std::string>& watch_vehicle_ids,
     StopSignLaneVehicles* watch_vehicles) {
-  constexpr double conf_min_pass_s_distance = 3.0;
-
   CHECK_NOTNULL(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle =
@@ -469,7 +473,7 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
     double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
     double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
     double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
-    if (distance_pass_stop_line > conf_min_pass_s_distance && !is_path_cross) {
+    if (distance_pass_stop_line > conf_min_pass_s_distance_ && !is_path_cross) {
       erase = true;
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
@@ -523,11 +527,9 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
  */
 bool StopSignUnprotectedPreStop::CheckADCStop(
     const ReferenceLineInfo& reference_line_info) {
-  constexpr double conf_max_valid_stop_distance = 3.5;
-  constexpr double conf_max_adc_stop_speed = 0.3;
   double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  if (adc_speed > conf_max_adc_stop_speed) {
+  if (adc_speed > conf_max_adc_stop_speed_) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
   }
@@ -542,7 +544,7 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
          << stop_line_start_s << "]; adc_front_edge_s[" << adc_front_edge_s
          << "]";
 
-  if (distance_stop_line_to_adc_front_edge > conf_max_valid_stop_distance) {
+  if (distance_stop_line_to_adc_front_edge > conf_max_valid_stop_distance_) {
     ADEBUG << "not a valid stop. too far from stop line.";
     return false;
   }

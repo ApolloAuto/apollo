@@ -76,7 +76,7 @@ class StopSignUnprotectedScenario : public Scenario {
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
 
   // TODO(all): move to scenario conf later
-  const uint32_t conf_start_stop_sign_timer = 10;  // second
+  const uint32_t conf_start_stop_sign_timer_ = 10;  // second
 
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
@@ -93,6 +93,8 @@ class StopSignUnprotectedCreep : public Stage {
       : Stage(config) {}
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame);
+
+ private:
   StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
     return Stage::GetContextAs<
         StopSignUnprotectedScenario::StopSignUnprotectedContext>();
@@ -105,15 +107,21 @@ class StopSignUnprotectedStop : public Stage {
       : Stage(config) {}
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame);
+
+ private:
   StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
     return GetContextAs<
         StopSignUnprotectedScenario::StopSignUnprotectedContext>();
   }
+
   int RemoveWatchVehicle(
       const PathObstacle& path_obstacle,
       const std::vector<std::string>& watch_vehicle_ids,
       std::unordered_map<std::string, std::vector<std::string>>*
           watch_vehicles);
+ private:
+  const float conf_stop_duration_ = 1.0f;
+  const double conf_min_pass_s_distance_ = 3.0;
 };
 
 class StopSignUnprotectedPreStop : public Stage {
@@ -122,14 +130,21 @@ class StopSignUnprotectedPreStop : public Stage {
       : Stage(config) {}
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame);
-  int AddWatchVehicle(const PathObstacle& path_obstacle,
-                      std::unordered_map<std::string, std::vector<std::string>>*
-                          watch_vehicles);
+ private:
   StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
     return GetContextAs<
         StopSignUnprotectedScenario::StopSignUnprotectedContext>();
   }
+
+  int AddWatchVehicle(const PathObstacle& path_obstacle,
+                      std::unordered_map<std::string, std::vector<std::string>>*
+                          watch_vehicles);
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
+
+ private:
+  const double conf_watch_vehicle_max_valid_stop_distance_ = 5.0;
+  const double conf_max_valid_stop_distance_ = 3.5;
+  const double conf_max_adc_stop_speed_ = 0.3;
 };
 
 }  // namespace planning
