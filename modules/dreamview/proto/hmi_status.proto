@@ -4,10 +4,37 @@ package apollo.dreamview;
 
 import "modules/monitor/proto/system_status.proto";
 
+message ComponentStatus {
+  enum Status {
+    UNKNOWN = 0;
+    OK = 1;
+    WARN = 2;
+    ERROR = 3;
+    FATAL = 4;
+  }
+  optional Status status = 1;
+  optional string message = 2;
+}
+
+// TODO(xiaoxq): Simplify HMI backend / frontend comunication with single proto.
 message HMIStatus {
-  optional apollo.monitor.SystemStatus system_status = 1;
-  optional string current_map = 2;
-  optional string current_vehicle = 3;
+  optional apollo.monitor.SystemStatus system_status = 1 [deprecated = true];
+  optional string current_launch = 5 [deprecated = true];
+
+  repeated string modes = 6;
   optional string current_mode = 4 [default = "Mkz Standard"];
-  optional string current_launch = 5 [default = "Close Loop"];
+
+  repeated string maps = 7;
+  optional string current_map = 2;
+
+  repeated string vehicles = 8;
+  optional string current_vehicle = 3;
+
+  // {module_name: is_running_or_not}
+  map<string, bool> modules = 9;
+  // {component_name: status}
+  map<string, ComponentStatus> monitored_components = 10;
+
+  optional string docker_image = 11;
+  optional int32 utm_zone_id = 12;  // FLAGS_local_utm_zone_id
 }
