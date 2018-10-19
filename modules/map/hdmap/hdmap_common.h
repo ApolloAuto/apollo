@@ -176,6 +176,9 @@ class LaneInfo {
   const std::vector<OverlapInfoConstPtr> &speed_bumps() const {
     return speed_bumps_;
   }
+  const std::vector<OverlapInfoConstPtr> &parking_spaces() const {
+    return parking_spaces_;
+  }
   double total_length() const { return total_length_; }
   using SampledWidth = std::pair<double, double>;
   const std::vector<SampledWidth> &sampled_left_width() const {
@@ -237,10 +240,10 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> yield_signs_;
   std::vector<OverlapInfoConstPtr> stop_signs_;
   std::vector<OverlapInfoConstPtr> crosswalks_;
-  std::vector<OverlapInfoConstPtr> parking_spaces_;
   std::vector<OverlapInfoConstPtr> junctions_;
   std::vector<OverlapInfoConstPtr> clear_areas_;
   std::vector<OverlapInfoConstPtr> speed_bumps_;
+  std::vector<OverlapInfoConstPtr> parking_spaces_;
   double total_length_ = 0.0;
   std::vector<SampledWidth> sampled_left_width_;
   std::vector<SampledWidth> sampled_right_width_;

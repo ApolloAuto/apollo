@@ -63,50 +63,46 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
 }
 
 apollo::common::Status OpenSpacePlanner::Plan(
-    const common::TrajectoryPoint& planning_init_point, FrameOpenSpace* frame) {
-  // Problem setup
-
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   // initial state
   init_state_ = frame->vehicle_state();
   init_x_ = init_state_.x();
   init_y_ = init_state_.y();
   init_phi_ = init_state_.heading();
   init_v_ = init_state_.linear_velocity();
+  // rotate and scale the state according to the origin point defined in frame
+  double rotate_angle = frame->origin_heading();
+  const Vec2d& translate_origin = frame->origin_point();
+  init_x_ = init_x_ - translate_origin.x();
+  init_y_ = init_y_ - translate_origin.y();
+  double tmp_x = init_x_;
+  init_x_ =
+      init_x_ * std::cos(-rotate_angle) - init_y_ * std::sin(-rotate_angle);
+  init_y_ = tmp_x * std::sin(-rotate_angle) + init_y_ * std::cos(-rotate_angle);
+
+  // TODO(Jinyun) how to initial input not decided yet
   init_steer_ = 0;
   init_a_ = 0;
   Eigen::MatrixXd x0(4, 1);
   x0 << init_x_, init_y_, init_phi_, init_v_;
   Eigen::MatrixXd last_time_u(2, 1);
   last_time_u << init_steer_, init_a_;
-  // std::vector<double> x0({-12, 11, 0, 0});
 
   // final state
-  // TODO(QiL): Step 2 ： Take final state from decision / or decision level
-  // when enabled.
+  const std::vector<double>& end_pose = frame->open_space_end_pose();
   Eigen::MatrixXd xF(4, 1);
-  xF << 0, 1.2, M_PI / 2, 0;
-  // std::vector<double> xf({0, 1.2, M_PI / 2, 0});
+  xF << end_pose[0], end_pose[1], end_pose[2], end_pose[3];
 
-  // vertices using V-represetntation (clock wise)
+  // vertices using V-represetntation (counter clock wise)
   std::size_t obstacles_num = frame->obstacles_num();
   Eigen::MatrixXd obstacles_edges_num = frame->obstacles_edges_num();
   Eigen::MatrixXd obstacles_A = frame->obstacles_A();
   Eigen::MatrixXd obstacles_b = frame->obstacles_b();
-  // std::vector<std::vector<std::vector<double>>> obstacles_vertices_vec = {
-  //     {{-20, 5}, {-1.3, 5}, {-1.3, -5}, {-20, -5}, {-20, 5}},
-  //     {{1.3, 5}, {20, 5}, {20, -5}, {1.3, -5}, {1.3, 5}},
-  //     {{-20, 15}, {20, 15}, {20, 11}, {-20, 11}, {-20, 15}}};
-
-  // Eigen::MatrixXd ob1(4, 1), ob2(4, 1), ob3(4, 1);
-  // [x_upper, y_upper, -x_lower, -y_lower]
-  // ob1 << -1.3, 5, 20, 5;
-  // ob2 << 20, 5, -1.3, 5;
-  // ob3 << 20, 15, 20, -11;
 
   // Warm Start (initial velocity is assumed to be 0 for now)
-
   Result result;
-  ThreadSafeIndexedObstacles* obstalce_list = frame->GetObstacleList();
+  ThreadSafeIndexedObstacles* obstalce_list =
+      frame->openspace_warmstart_obstacles();
 
   if (warm_start_->Plan(x0(0, 0), x0(1, 0), x0(2, 0), xF(0, 0), xF(1, 0),
                         xF(2, 0), obstalce_list, &result)) {
@@ -159,6 +155,18 @@ apollo::common::Status OpenSpacePlanner::Plan(
   } else {
     return Status(ErrorCode::PLANNING_ERROR,
                   "Distance approach problem failed to solve");
+  }
+
+  // rescale the states to the world frame
+  for (std::size_t i = 0; i < horizon_ + 1; i++) {
+    double tmp_x = state_result_ds(0, i);
+    state_result_ds(0, i) = state_result_ds(0, i) * std::cos(rotate_angle) -
+                            state_result_ds(1, i) * std::sin(rotate_angle);
+    state_result_ds(1, i) = tmp_x * std::sin(rotate_angle) +
+                            state_result_ds(1, i) * std::cos(rotate_angle);
+    state_result_ds(0, i) += translate_origin.x();
+    state_result_ds(1, i) += translate_origin.y();
+    state_result_ds(2, i) += rotate_angle;
   }
 
   // TODO(QiL): Step 9 : Publish trajectoryPoint in planning trajectory, i.e.

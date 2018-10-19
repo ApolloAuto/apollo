@@ -30,6 +30,7 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+#include "modules/map/proto/map_id.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
@@ -49,6 +50,8 @@
 
 namespace apollo {
 namespace planning {
+
+using apollo::common::math::Vec2d;
 
 /**
  * @class Frame
@@ -126,7 +129,58 @@ class Frame {
 
   const LocalView &local_view() const { return local_view_; }
 
+  ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
+
+  // @brief return the obstacle list for warm start in open space planner
+  ThreadSafeIndexedObstacles *GetOSWSObstacleList() {
+    return &openspace_warmstart_obstacles_;
+  }
+
+  const std::size_t obstacles_num() { return obstacles_num_; }
+
+  const Eigen::MatrixXd &obstacles_edges_num() { return obstacles_edges_num_; }
+
+  const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec() {
+    return obstacles_vertices_vec_;
+  }
+
+  const Eigen::MatrixXd &obstacles_A() { return obstacles_A_; }
+
+  const Eigen::MatrixXd &obstacles_b() { return obstacles_b_; }
+
+  const double origin_heading() { return origin_heading_; }
+
+  const Vec2d &origin_point() { return origin_point_; }
+
+  ThreadSafeIndexedObstacles *openspace_warmstart_obstacles() {
+    return &openspace_warmstart_obstacles_;
+  }
+  const std::vector<double> &ROI_xy_boundary() { return ROI_xy_boundary_; }
+
+  const std::vector<double> &open_space_end_pose() {
+    return open_space_end_pose_;
+  }
+
  private:
+  // @brief "Region of Interest", load open space xy boundary and parking space
+  // boundary from pnc map (only for T shape parking space)
+  // to ROI_xy_boundary_ and ROI_parking_boundary_
+  bool OpenSpaceROI();
+
+  // @brief Transform the vertice presentation of the obstacles into linear
+  // inequality as Ax>b
+  bool HPresentationObstacle();
+
+  // @brief Helper function for HPresentationObstacle()
+  bool ObsHRep(const std::size_t &obstacles_num,
+               const Eigen::MatrixXd &obstacles_edges_num,
+               const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
+               Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
+
+  // @brief Represent the obstacles in vertices and load it into
+  // obstacles_vertices_vec_ in clock wise order. Take different approach
+  // towards warm start and distance approach
+  bool VPresentationObstacle();
   bool CreateReferenceLineInfo(const std::list<ReferenceLine> &reference_lines,
                                const std::list<hdmap::RouteSegments> &segments);
 
@@ -172,6 +226,67 @@ class Frame {
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+
+  // @brief obstacles total num including perception obstacles and parking space
+  // boundary
+  std::size_t obstacles_num_ = 0;
+
+  // @brief the dimension needed for A and b matrix dimension in H
+  // representation
+  Eigen::MatrixXd obstacles_edges_num_;
+
+  // @brief obstacle list for open space warm start as warm start needs all
+  // obstacles in shape of box while distance approach only requires lines for
+  // parking boundary
+  // the viewing angle and the boundaries names
+  //
+  //                     ------------------------   <-  up_boundary
+  //
+  //  left_boundary  |-> --------      ----------   <-|  right_boundary
+  //                 |->        |      |            <-|
+  //                            |      |
+  //                            |      |
+  //                            |------|
+  //                                ^
+  //                          down_boundary
+  ThreadSafeIndexedObstacles openspace_warmstart_obstacles_;
+
+  // @brief in the order of [x_min, x_max, y_min, y_max];
+  std::vector<double> ROI_xy_boundary_;
+
+  // @brief vectors in the order of left parking bound, parking end bound, right
+  // parking bound, opposite lane. And the vertices order is counter-clockwise
+  // the viewing angle and the vertice sequence
+  //
+  //                     8------------------------7   <-  up_boundary
+  //
+  //  left_boundary  |-> 1-------2      5----------6   <-|  right_boundary
+  //                 |->         |      |            <-|
+  //                             |      |
+  //                             |      |
+  //                            |3------4|
+  //                                ^
+  //                          down_boundary
+  // ROI_parking_boundary_ in form of {{1,2,3},{3,4},{4,5,6},{7,8}}
+  std::vector<std::vector<Vec2d>> ROI_parking_boundary_;
+
+  // @brief open_space end configuration in order of x, y, heading and speed.
+  // Speed is set to be always zero now for parking
+  std::vector<double> open_space_end_pose_;
+
+  // @brief vector storing the vertices of obstacles in counter-clock-wise order
+  std::vector<std::vector<Vec2d>> obstacles_vertices_vec_;
+
+  // @brief Linear inequality representation of the obstacles Ax>b
+  Eigen::MatrixXd obstacles_A_;
+  Eigen::MatrixXd obstacles_b_;
+
+  // @brief origin heading for planning space rotation
+  double origin_heading_;
+
+  // @brief origin point for scaling down the numeric value of the optimization
+  // problem in order of x , y
+  Vec2d origin_point_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

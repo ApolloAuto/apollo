@@ -66,6 +66,12 @@ Vec2d Vec2d::rotate(const double angle) const {
                x_ * sin(angle) + y_ * cos(angle));
 }
 
+void Vec2d::SelfRotate(const double angle) {
+  double tmp_x = x_;
+  x_ = x_ * cos(angle) - y_ * sin(angle);
+  y_ = tmp_x * sin(angle) + y_ * cos(angle);
+}
+
 Vec2d Vec2d::operator+(const Vec2d &other) const {
   return Vec2d(x_ + other.x(), y_ + other.y());
 }

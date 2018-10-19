@@ -80,6 +80,25 @@ TEST(Vec2dTest, rotate) {
   EXPECT_NEAR(p4.y(), 0.0, 1e-5);
 }
 
+TEST(Vec2dTest, selfrotate) {
+  Vec2d p1(4, 0);
+  p1.SelfRotate(M_PI / 2.0);
+  EXPECT_NEAR(p1.x(), 0.0, 1e-5);
+  EXPECT_NEAR(p1.y(), 4.0, 1e-5);
+  Vec2d p2(4, 0);
+  p2.SelfRotate(M_PI);
+  EXPECT_NEAR(p2.x(), -4.0, 1e-5);
+  EXPECT_NEAR(p2.y(), 0.0, 1e-5);
+  Vec2d p3(4, 0);
+  p3.SelfRotate(-M_PI / 2.0);
+  EXPECT_NEAR(p3.x(), 0.0, 1e-5);
+  EXPECT_NEAR(p3.y(), -4.0, 1e-5);
+  Vec2d p4(4, 0);
+  p4.SelfRotate(-M_PI);
+  EXPECT_NEAR(p4.x(), -4.0, 1e-5);
+  EXPECT_NEAR(p4.y(), 0.0, 1e-5);
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
