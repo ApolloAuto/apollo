@@ -35,7 +35,6 @@
 #include "cybertron/node/node.h"
 #include "cybertron/node/reader.h"
 #include "cybertron/node/writer.h"
-#include "cybertron/proto/chatter.pb.h"
 
 namespace apollo {
 namespace cybertron {
@@ -108,7 +107,7 @@ class PyReader {
  public:
   PyReader(const std::string &channel, const std::string &type,
            apollo::cybertron::Node *node)
-      : channel_name_(channel), data_type_(type), node_(node), func_(nullptr) {
+      : node_(node), channel_name_(channel), data_type_(type), func_(nullptr) {
     auto f = [this](
         const std::shared_ptr<const apollo::cybertron::message::PyMessageWrap>
             &request) { this->cb(request); };
@@ -207,7 +206,7 @@ class PyService {
   void cb(
       const std::shared_ptr<const apollo::cybertron::message::PyMessageWrap>
           &request,
-      std::shared_ptr<apollo::cybertron::message::PyMessageWrap> &response) {
+      std::shared_ptr<apollo::cybertron::message::PyMessageWrap> &response) { // NOLINT
     std::lock_guard<std::mutex> lg(msg_lock_);
 
     request_cache_.push_back(request->data());

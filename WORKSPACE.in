@@ -240,3 +240,10 @@ http_archive(
 load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
 
 grpc_deps()
+
+# python
+new_local_repository(
+    name = "python27",
+    build_file = "third_party/python27.BUILD",
+    path = "/usr",
+)

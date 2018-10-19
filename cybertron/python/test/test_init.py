@@ -20,7 +20,7 @@ import sys
 import unittest
 
 sys.path.append("../")
-from cybertron import cybertron
+from cyber_py import cybertron
 
 class TestInit(unittest.TestCase):
     """

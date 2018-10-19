@@ -19,8 +19,8 @@
 import sys
 
 sys.path.append("../")
-from cybertron import cybertron
-from cybertron import record
+from cyber_py import cybertron
+from cyber_py import record
 
 TEST_RECORD_FILE = "trans_ret.record"
 

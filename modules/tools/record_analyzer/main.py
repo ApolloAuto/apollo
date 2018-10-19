@@ -18,7 +18,7 @@
 
 import sys
 import argparse
-from cybertron.record import RecordReader
+from cyber_py.record import RecordReader
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2

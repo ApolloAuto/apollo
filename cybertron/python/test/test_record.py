@@ -20,14 +20,14 @@ import sys
 import unittest
 
 sys.path.append("../")
-from cybertron import cybertron
-from cybertron import record
-from proto import record_pb2
+from cyber_py import cybertron
+from cyber_py import record
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 TEST_RECORD_FILE = "test02.record"
 CHAN_1 = "channel/chatter"
 CHAN_2 = "/test2"
-MSG_TYPE = "apollo.cybertron.proto.Test"
+MSG_TYPE = "apollo.common.util.test.SimpleMessage"
 STR_10B = "1234567890"
 TEST_FILE = "test.record"
 TIME = 999

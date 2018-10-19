@@ -20,15 +20,15 @@ import time
 import sys
 
 sys.path.append("../")
-from cybertron import cybertron
-from cybertron import record
-import chatter_pb2
+from cyber_py import cybertron
+from cyber_py import record
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 TEST_RECORD_FILE = "test02.record"
 CHAN_1 = "channel/chatter"
 CHAN_2 = "/test2"
-MSG_TYPE = "apollo.cybertron.proto.Test"
+MSG_TYPE = "apollo.common.util.test.SimpleMessage"
 STR_10B = "1234567890"
 TEST_FILE = "test.record"
 
@@ -44,8 +44,8 @@ def test_record_writer(writer_path):
     fwriter.write_channel(CHAN_1, MSG_TYPE, STR_10B)
     fwriter.write_message(CHAN_1, STR_10B, 1000)
 
-    msg = chatter_pb2.Chatter()
-    msg.content = "AAAAAA"
+    msg = SimpleMessage()
+    msg.text = "AAAAAA"
 
     file_desc = msg.DESCRIPTOR.file
     proto = FileDescriptorProto()

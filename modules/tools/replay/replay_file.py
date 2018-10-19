@@ -26,7 +26,7 @@ import time
 
 from google.protobuf import text_format
 
-from cybertron import cybertron
+from cyber_py import cybertron
 
 import common.proto_utils as proto_utils
 from common.message_manager import PbMessageManager
