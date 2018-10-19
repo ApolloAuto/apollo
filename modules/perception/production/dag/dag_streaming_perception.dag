@@ -21,7 +21,7 @@ module_config {
       name: "Velodyne16Segmentation"
       config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
       readers {
-          channel: "/apollo/sensor/velodyne64/compensator/PointCloud2"
+          channel: "/apollo/sensor/velodyne16/compensator/PointCloud2"
         }
     }
  }
