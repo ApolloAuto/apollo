@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stage.h"  // NOINT
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -44,6 +44,8 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace stop_sign_protected {
 
 using apollo::common::Status;
 using common::ErrorCode;
@@ -60,117 +62,6 @@ using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
-
-void StopSignUnprotectedScenario::Init() {
-  if (init_) {
-    return;
-  }
-
-  Scenario::Init();
-
-  context_.next_stop_sign_overlap =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap;
-  const std::string stop_sign_overlap_id =
-      context_.next_stop_sign_overlap.object_id;
-  if (stop_sign_overlap_id.empty()) {
-    return;
-  }
-
-  next_stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
-      hdmap::MakeMapId(stop_sign_overlap_id));
-  if (!next_stop_sign_) {
-    AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
-    return;
-  }
-
-  GetAssociatedLanes(*next_stop_sign_);
-
-  init_ = true;
-}
-
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-    StopSignUnprotectedScenario::s_stage_factory_;
-
-void StopSignUnprotectedScenario::RegisterStages() {
-  if (!s_stage_factory_.Empty()) {
-    s_stage_factory_.Clear();
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedPreStop(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedStop(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedCreep(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedIntersectionCruise(config);
-      });
-}
-
-std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
-  if (s_stage_factory_.Empty()) {
-    RegisterStages();
-  }
-  auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
-                                                 stage_config);
-  if (ptr) {
-    ptr->SetContext(&context_);
-  }
-  return ptr;
-}
-
-bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario,
-    const common::TrajectoryPoint& ego_point,
-    const Frame& frame) const {
-  const std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (stop_sign_overlap_id.empty()) {
-    return false;
-  }
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double adc_distance_to_stop_sign =
-      context_.next_stop_sign_overlap.start_s - adc_front_edge_s;
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
-  const uint32_t time_distance = ceil(adc_distance_to_stop_sign / adc_speed);
-
-  switch (current_scenario.scenario_type()) {
-    case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
-      return (time_distance <= conf_start_stop_sign_timer_);
-    case ScenarioConfig::STOP_SIGN_PROTECTED:
-      return false;
-    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      return true;
-    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_GO_THROUGH:
-    default:
-      break;
-  }
-
-  return false;
-}
 
 Stage::StageStatus StopSignUnprotectedPreStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -264,12 +155,11 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   CHECK_NOTNULL(frame);
 
-  /* TODO(all)
-  if (CheckStopSignDone()) {
+  if (GetContext()->next_stop_sign_overlap.object_id !=
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
-  */
 
   bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
@@ -569,5 +459,7 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
   return true;
 }
 
+}  // namespace stop_sign_protected
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

@@ -48,7 +48,7 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/scenarios/lane_follow",
         "//modules/planning/scenarios/side_pass",
-        "//modules/planning/scenarios/stop_sign_unprotected",
+        "//modules/planning/scenarios/stop_sign_unprotected:stop_sign_unprotected_scenario",
     ],
 )
 
