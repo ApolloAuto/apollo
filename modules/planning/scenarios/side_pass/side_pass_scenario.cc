@@ -63,16 +63,6 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
-void SidePassScenario::Init() {
-  if (init_) {
-    return;
-  }
-
-  Scenario::Init();
-
-  init_ = true;
-}
-
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
