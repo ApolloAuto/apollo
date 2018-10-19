@@ -115,14 +115,6 @@ function generate_build_targets() {
 #              Build functions
 #=================================================
 
-function build_cybertron() {
-  cd /apollo/framework
-  bash cybertron.sh build_fast
-  cd /apollo
-  info "Building cybertron ..."
-  source framework/install/setup.bash
-}
-
 function build() {
   if [ "${USE_GPU}" = "1" ] ; then
     echo -e "${YELLOW}Running build under GPU mode. GPU is required to run the build.${NO_COLOR}"
@@ -594,124 +586,6 @@ function get_branch() {
   echo "$BRANCH"
 }
 
-function build_velodyne() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  source "${ROS_PATH}/setup.bash"
-
-  cd modules
-  catkin_make_isolated --install --source drivers/velodyne \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
-function build_velodyne_vls128() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  source "${ROS_PATH}/setup.bash"
-
-  cd modules
-  catkin_make_isolated --install --source drivers/velodyne_vls \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
-
-
-function build_lslidar() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  source "${ROS_PATH}/setup.bash"
-
-  cd modules
-  catkin_make_isolated --install --source drivers/lslidar_apollo \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
-function build_rslidar() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  source "${ROS_PATH}/setup.bash"
-
-  cd modules
-  catkin_make_isolated --install --source drivers/rslidar \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
-
-function build_usbcam() {
-  CURRENT_PATH=$(pwd)
-  if [ -d "${ROS_ROOT}" ]; then
-    ROS_PATH="${ROS_ROOT}/../.."
-  else
-    warning "ROS not found. Run apolllo.sh build first."
-    exit 1
-  fi
-
-  source "${ROS_PATH}/setup.bash"
-
-  cd modules
-  catkin_make_isolated --install --source drivers/usb_cam \
-    --install-space "${ROS_PATH}" -DCMAKE_BUILD_TYPE=Release \
-    --cmake-args --no-warn-unused-cli
-  find "${ROS_PATH}" -name "*.pyc" -print0 | xargs -0 rm -rf
-  cd -
-
-  rm -rf modules/.catkin_workspace
-  rm -rf modules/build_isolated/
-  rm -rf modules/devel_isolated/
-}
-
 function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
@@ -729,12 +603,6 @@ function print_usage() {
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
-  ${BLUE}build_cybertron${NONE}: run build cybertron framework only
-  ${BLUE}build_velodyne${NONE}: build velodyne driver
-  ${BLUE}build_velodyne_vls128${NONE}: build velodyne vls-128 driver
-  ${BLUE}build_lslidar${NONE}: build lslidar driver
-  ${BLUE}build_rslidar${NONE}: build rslidar driver
-  ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
   ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
@@ -826,26 +694,8 @@ function main() {
     buildify)
       buildify
       ;;
-    build_cybertron)
-     build_cybertron
-      ;;
     build_py)
       build_py_proto
-      ;;
-    build_velodyne)
-      build_velodyne
-      ;;
-    build_velodyne_vls128)
-      build_velodyne_vls128
-      ;;
-    build_lslidar)
-      build_lslidar
-      ;;
-    build_rslidar)
-      build_rslidar
-      ;;
-    build_usbcam)
-      build_usbcam
       ;;
     config)
       config
