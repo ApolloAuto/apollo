@@ -16,6 +16,10 @@
 
 #include "modules/perception/common/perception_gflags.h"
 
+
+namespace apollo {
+namespace perception {
+
 // sensor_manager
 DEFINE_string(obs_sensor_intrinsic_path,
               "/apollo/modules/calibration/data/example/camera_params",
@@ -32,3 +36,6 @@ DEFINE_string(work_root, "/apollo/modules/perception/production",
               "Project work root direcotry.");
 DEFINE_string(adu_data, "/home/caros/adu_data",
               "ADU shared data path, including maps, routings...");
+
+}  // namespace perception
+}  // namespace apollo

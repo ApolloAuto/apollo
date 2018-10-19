@@ -45,6 +45,7 @@ cc_test(
         "//modules/map/proto:map_proto",
         "//modules/perception/base",
         "//modules/perception/common/io:io_util",
+        "//modules/perception/common:perception_gflags",
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",

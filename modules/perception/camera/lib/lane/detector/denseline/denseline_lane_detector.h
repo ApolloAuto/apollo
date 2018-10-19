@@ -15,17 +15,17 @@
 *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/camera/lib/lane/common/denseline.pb.h"
-#include "modules/perception/camera/lib/interface/base_lane_detector.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
 #include "modules/perception/base/camera.h"
+#include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/data_provider.h"
+#include "modules/perception/camera/lib/interface/base_lane_detector.h"
+#include "modules/perception/camera/lib/lane/common/denseline.pb.h"
+#include "modules/perception/inference/tensorrt/rt_net.h"
+#include "modules/perception/lib/registerer/registerer.h"
 
 
 namespace apollo {

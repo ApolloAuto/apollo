@@ -19,6 +19,7 @@
 
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/pcl_util.h"
@@ -27,9 +28,6 @@
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
-
-DECLARE_string(work_root);
-DECLARE_string(config_manager_path);
 
 namespace apollo {
 namespace perception {

@@ -41,6 +41,7 @@ cc_test(
         ":ground_service_detector",
         "@gtest//:main",
         "//modules/perception/common/io:io_util",
+        "//modules/perception/common:perception_gflags",
     ],
 )
 

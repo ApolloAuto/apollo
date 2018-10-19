@@ -32,6 +32,7 @@ cc_test(
     deps = [
         ":roi_boundary_filter",
         "@gtest//:main",
+        "//modules/perception/common:perception_gflags",
     ],
 )
 
