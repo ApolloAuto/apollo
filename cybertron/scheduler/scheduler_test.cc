@@ -30,6 +30,7 @@ auto sched = Scheduler::Instance();
 void proc() {}
 
 TEST(SchedulerTest, create_task) {
+  cybertron::Init();
   std::string croutine_name = "DriverProc";
   EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));
 }
