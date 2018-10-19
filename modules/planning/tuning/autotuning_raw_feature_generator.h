@@ -16,21 +16,26 @@
 
 #pragma once
 
+#include <array>
 #include <vector>
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/planning/common/speed_limit.h"
 #include "modules/planning/proto/auto_tuning_raw_feature.pb.h"
+
 namespace apollo {
 namespace planning {
 
 class AutotuningRawFeatureGenerator {
  public:
   // @brief class constructor
-  AutotuningRawFeatureGenerator() = default;
-  explicit AutotuningRawFeatureGenerator(
-      const std::vector<double>& evaluate_time);
+  AutotuningRawFeatureGenerator(const double time_range,
+                                const std::size_t num_points,
+                                const ReferenceLineInfo& reference_line_info,
+                                const Frame& frame,
+                                const SpeedLimit& speed_limit);
 
   // @evaluation interface
   /**
@@ -42,7 +47,6 @@ class AutotuningRawFeatureGenerator {
    */
   common::Status EvaluateTrajectory(
       const std::vector<common::TrajectoryPoint>& trajectory,
-      const ReferenceLineInfo& reference_line_info, const Frame& frame,
       autotuning::TrajectoryRawFeature* const trajectory_feature) const;
 
   /**
@@ -55,28 +59,42 @@ class AutotuningRawFeatureGenerator {
    */
   common::Status EvaluateTrajectoryPoint(
       const common::TrajectoryPoint& trajectory_point,
-      const ReferenceLineInfo& reference_line_info, const Frame& frame,
       autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
       const;
 
-
-  common::Status EvaluateSpeedPoint(
-      const common::SpeedPoint& speed_point,
-      const ReferenceLineInfo& reference_line_info, const Frame& frame,
-      autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
-      const;
-
+  /**
+   * EvaluateSpeed Profile shall match the time range as well as resolution
+   */
   common::Status EvaluateSpeedProfile(
       const std::vector<common::SpeedPoint>& speed_profile,
-      const ReferenceLineInfo& reference_line_info, const Frame& frame,
       autotuning::TrajectoryRawFeature* const trajectory_feature) const;
 
  private:
-  void GenerateSTBoundaries(const ReferenceLineInfo& reference_line_info,
-      std::vector<const StBoundary*>* const boundaries) const;
+  void GenerateSTBoundaries(const ReferenceLineInfo& reference_line_info);
+
+  /**
+   * Convert st boundaries to discretized boundaries
+   */
+  void ConvertToDiscretizedBoundaries(const StBoundary& boundary,
+                                      const double speed);
+
+  common::Status EvaluateSpeedPoint(const common::SpeedPoint& speed_point,
+                                    const std::size_t index,
+                                    autotuning::TrajectoryPointRawFeature* const
+                                        trajectory_point_feature) const;
 
  private:
-  std::vector<double> evaluate_time_;
+  std::vector<double> eval_time_;
+  const ReferenceLineInfo& reference_line_info_;
+  const Frame& frame_;
+  const SpeedLimit& speed_limit_;
+  std::vector<const StBoundary*> boundaries_;
+
+  // covers the boundary info lower s upper s as well as the speed of obs
+  std::vector<std::vector<std::array<double, 3>>> obs_boundaries_;
+  std::vector<std::vector<std::array<double, 3>>> stop_boundaries_;
+  std::vector<std::vector<std::array<double, 3>>> nudge_boundaries_;
+  std::vector<std::vector<std::array<double, 3>>> side_pass_boundaries_;
 };
 
 }  // namespace planning
