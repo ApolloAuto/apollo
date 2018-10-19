@@ -186,6 +186,21 @@ HMIWorker::HMIWorker(const std::shared_ptr<apollo::cyber::Node> &node) {
     }
   }
 
+  // TODO(xiaoxq): Populate fields in HMIStatus, only send HMIStatus to frontend
+  // in the future.
+  for (const auto &entry : config_.modes()) {
+    *status_.add_modes() = entry.first;
+  }
+  for (const auto &entry : config_.available_maps()) {
+    *status_.add_maps() = entry.first;
+  }
+  for (const auto &entry : config_.available_vehicles()) {
+    *status_.add_vehicles() = entry.first;
+  }
+  status_.set_docker_image(config_.docker_image());
+  status_.set_utm_zone_id(config_.utm_zone_id());
+  // TODO(xiaoxq): Populate modules and monitored components.
+
   InitReadersAndWriters(node);
 }
 
