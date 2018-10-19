@@ -42,35 +42,36 @@ class AutotuningRawFeatureGeneratorTest : public ::testing::Test {
     LocalView dummy_local_view;
     frame_.reset(
         new Frame(0, dummy_local_view, ego_pos, 0, ego_state, nullptr));
-    std::vector<double> evaluate_time{1., 2., 3., 4., 5., 6., 7., 8.};
-    generator_.reset(new AutotuningRawFeatureGenerator(evaluate_time));
+    speed_limit_.reset(new SpeedLimit());
+    generator_.reset(new AutotuningRawFeatureGenerator(8, 17, *ref_line_info_,
+                                                       *frame_, *speed_limit_));
   }
 
   void TearDown() override {
     generator_.reset(nullptr);
     ref_line_info_.reset(nullptr);
     frame_.reset(nullptr);
+    speed_limit_.reset(nullptr);
   }
 
   std::unique_ptr<AutotuningRawFeatureGenerator> generator_ = nullptr;
   std::unique_ptr<ReferenceLineInfo> ref_line_info_ = nullptr;
   std::unique_ptr<Frame> frame_ = nullptr;
+  std::unique_ptr<SpeedLimit> speed_limit_ = nullptr;
 };
 
 TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory) {
   // init trajectory
   std::vector<common::TrajectoryPoint> trajectory;
   ASSERT_TRUE(generator_ != nullptr);
-  auto result = generator_->EvaluateTrajectory(trajectory, *ref_line_info_,
-                                                *frame_, nullptr);
+  auto result = generator_->EvaluateTrajectory(trajectory, nullptr);
   EXPECT_TRUE(result == common::Status::OK());
 }
 
 TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory_pointwise) {
   common::TrajectoryPoint trajectory_point;
   ASSERT_TRUE(generator_ != nullptr);
-  auto result = generator_->EvaluateTrajectoryPoint(
-      trajectory_point, *ref_line_info_, *frame_, nullptr);
+  auto result = generator_->EvaluateTrajectoryPoint(trajectory_point, nullptr);
   EXPECT_TRUE(result == common::Status::OK());
 }
 

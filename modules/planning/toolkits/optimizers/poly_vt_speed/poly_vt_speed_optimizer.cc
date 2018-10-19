@@ -74,6 +74,11 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     return Status::OK();
   }
 
+  if (frame == nullptr) {
+    AERROR << "Frame info is empty!";
+    return Status(ErrorCode::PLANNING_ERROR, "No Frame info");
+  }
+
   if (path_data.discretized_path().NumOfPoints() == 0) {
     std::string msg("Empty path data");
     AERROR << msg;
@@ -121,10 +126,11 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
   PiecewisePolyVTSpeedSampler sampler(poly_vt_config);
   std::vector<PiecewisePolySpeedProfile> sampled_speed_profile;
   sampler.Sample(init_point, poly_vt_config.total_s(), &sampled_speed_profile);
-
   // step 3 : autotuning feature generator, feature builder as well as speed
   // model
-  AutotuningRawFeatureGenerator feature_generator;
+  AutotuningRawFeatureGenerator feature_generator(
+      poly_vt_config.total_time(), poly_vt_config.num_evaluated_points(),
+      *reference_line_info, *frame, speed_limits);
   AutotuningSpeedFeatureBuilder feature_builder;
   AutotuningSpeedMLPModel autotuning_speed_model;
 
@@ -135,7 +141,6 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
   for (auto& speed_profile : sampled_speed_profile) {
     autotuning::TrajectoryRawFeature raw_feature;
     feature_generator.EvaluateSpeedProfile(speed_profile.eval_points(),
-                                           *reference_line_info, *frame,
                                            &raw_feature);
     autotuning::TrajectoryFeature input_feature;
     feature_builder.BuildFeature(raw_feature, &input_feature);

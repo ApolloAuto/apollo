@@ -14,6 +14,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/planning/common:frame",
+        "//modules/planning/common:speed_limit",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:auto_tuning_raw_feature_proto",
     ],

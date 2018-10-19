@@ -40,7 +40,7 @@ const std::vector<std::pair<double, double>>& SpeedLimit::speed_limit_points()
 }
 
 double SpeedLimit::GetSpeedLimitByS(const double s) const {
-  DCHECK_GE(speed_limit_points_.size(), 2);
+  CHECK_GE(speed_limit_points_.size(), 2);
   DCHECK_GE(s, speed_limit_points_.front().first);
 
   auto compare_s = [](const std::pair<double, double>& point, const double s) {
@@ -54,6 +54,11 @@ double SpeedLimit::GetSpeedLimitByS(const double s) const {
     return (it_lower - 1)->second;
   }
   return it_lower->second;
+}
+
+double SpeedLimit::MinValidS() const {
+  CHECK_GE(speed_limit_points_.size(), 2);
+  return speed_limit_points_.front().first;
 }
 
 void SpeedLimit::Clear() { speed_limit_points_.clear(); }
