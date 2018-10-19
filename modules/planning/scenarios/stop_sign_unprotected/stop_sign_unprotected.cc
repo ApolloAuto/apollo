@@ -61,6 +61,32 @@ using perception::PerceptionObstacle;
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
+void StopSignUnprotectedScenario::Init() {
+  if (init_) {
+    return;
+  }
+
+  Scenario::Init();
+
+  context_.next_stop_sign_overlap =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap;
+  if (context_.next_stop_sign_overlap.object_id.empty()) {
+    return;
+  }
+
+  next_stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
+      hdmap::MakeMapId(context_.next_stop_sign_overlap.object_id));
+  if (!next_stop_sign_) {
+    AERROR << "Could not find stop sign: "
+           << context_.next_stop_sign_overlap.object_id;
+    return;
+  }
+
+  GetAssociatedLanes(*next_stop_sign_);
+
+  init_ = true;
+}
+
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
@@ -228,32 +254,6 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
-}
-
-void StopSignUnprotectedScenario::Init() {
-  if (init_) {
-    return;
-  }
-
-  Scenario::Init();
-
-  context_.next_stop_sign_overlap =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap;
-  if (context_.next_stop_sign_overlap.object_id.empty()) {
-    return;
-  }
-
-  next_stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
-      hdmap::MakeMapId(context_.next_stop_sign_overlap.object_id));
-  if (!next_stop_sign_) {
-    AERROR << "Could not find stop sign: "
-           << context_.next_stop_sign_overlap.object_id;
-    return;
-  }
-
-  GetAssociatedLanes(*next_stop_sign_);
-
-  init_ = true;
 }
 
 /*

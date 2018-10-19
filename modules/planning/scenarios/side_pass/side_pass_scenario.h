@@ -49,6 +49,8 @@ class SidePassScenario : public Scenario {
                             const ScenarioContext* scenario_context)
       : Scenario(config, scenario_context) {}
 
+  void Init() override;
+
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,
                       const Frame& frame) const override;
@@ -68,11 +70,11 @@ class SidePassScenario : public Scenario {
                            const PathDecision& path_decision) const;
 
  private:
+  bool init_ = false;
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
   SidePassContext side_pass_context_;
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
