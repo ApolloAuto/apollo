@@ -438,6 +438,7 @@ function citest_basic() {
           | grep -v "syncedmem_test" | grep -v "blob_test" \
           | grep -v "perception_inference_operators_test" \
           | grep -v "cuda_util_test" \
+          | grep -v "modules\/perception" \
           | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
 
   if [ $? -eq 0 ]; then
