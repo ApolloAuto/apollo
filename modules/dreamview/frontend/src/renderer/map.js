@@ -282,7 +282,7 @@ export default class Map {
         }
 
         let heading = undefined;
-        const overlapLen = signal.overlapId.length;
+        const overlapLen = _.get(signal, 'overlapId.length', 0);
         if (overlapLen > 0) {
             const overlapId = signal.overlapId[overlapLen - 1].id;
             heading = this.laneHeading[this.overlapMap[overlapId]];
