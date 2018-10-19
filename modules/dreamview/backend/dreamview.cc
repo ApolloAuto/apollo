@@ -36,7 +36,7 @@ Dreamview::~Dreamview() { Stop(); }
 
 void Dreamview::TerminateProfilingMode() {
   Stop();
-  apollo::cybertron::Shutdown();
+  apollo::cyber::Shutdown();
   AWARN << "Profiling timer called shutdown!";
 }
 
@@ -45,7 +45,7 @@ Status Dreamview::Init() {
 
   if (FLAGS_dreamview_profiling_mode &&
       FLAGS_dreamview_profiling_duration > 0.0) {
-    exit_timer_.reset(new cybertron::Timer(
+    exit_timer_.reset(new cyber::Timer(
         FLAGS_dreamview_profiling_duration,
         [this]() { this->TerminateProfilingMode(); }, false));
 

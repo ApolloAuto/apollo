@@ -22,7 +22,7 @@ cc_test(
         "fake_can_client_test.cc",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/common:canbus_common",
         "@gtest//:main",

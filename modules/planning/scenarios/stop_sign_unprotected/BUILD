@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//external:gflags",
-        "//cybertron",
+        "//cyber",
         "//modules/common",
         "//modules/common/status",
         "//modules/common/util",

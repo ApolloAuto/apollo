@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "gflags/gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/proto/object_template_meta_schema.pb.h"
 #include "modules/perception/lib/singleton/singleton.h"
@@ -48,7 +48,7 @@ struct ObjectTemplateManagerInitOptions {
   std::string root_dir;
   std::string conf_file;
   int gpu_id = 0;
-  bool use_cybertron_work_root = false;
+  bool use_cyber_work_root = false;
 };
 
 class ObjectTemplateManager {

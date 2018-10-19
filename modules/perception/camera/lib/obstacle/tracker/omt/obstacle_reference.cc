@@ -19,7 +19,7 @@
 #include <queue>
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 

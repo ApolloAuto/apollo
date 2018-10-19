@@ -32,7 +32,7 @@ cc_library(
         "region_output.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",

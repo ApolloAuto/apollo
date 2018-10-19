@@ -33,7 +33,7 @@ cc_library(
     deps = [
         "@eigen",
         "@yaml_cpp//:yaml",
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
     ]

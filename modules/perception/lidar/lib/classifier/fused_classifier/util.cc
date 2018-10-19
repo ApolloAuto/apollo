@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {

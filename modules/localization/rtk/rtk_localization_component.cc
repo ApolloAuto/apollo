@@ -26,7 +26,7 @@ RTKLocalizationComponent::RTKLocalizationComponent()
     : localization_(new RTKLocalization()) {}
 
 bool RTKLocalizationComponent::Init() {
-  Clock::SetMode(Clock::CYBERTRON);
+  Clock::SetMode(Clock::CYBER);
   tf2_broadcaster_.reset(new apollo::transform::TransformBroadcaster(node_));
   if (InitConfig() != true) {
     AERROR << "Init Config falseed.";
@@ -43,7 +43,7 @@ bool RTKLocalizationComponent::Init() {
 
 bool RTKLocalizationComponent::InitConfig() {
   rtk_config::Config rtk_config;
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
                                                    &rtk_config)) {
     return false;
   }

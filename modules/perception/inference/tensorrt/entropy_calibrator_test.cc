@@ -18,7 +18,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "gtest/gtest.h"
 
 #define private public

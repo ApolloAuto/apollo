@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -48,7 +48,7 @@ using apollo::drivers::racobit_radar::RadarConfig200;
 class RacobitRadarMessageManager : public MessageManager<RacobitRadar> {
  public:
   RacobitRadarMessageManager(
-      std::shared_ptr<cybertron::Writer<RacobitRadar>> writer);
+      std::shared_ptr<cyber::Writer<RacobitRadar>> writer);
   virtual ~RacobitRadarMessageManager() {}
   void set_radar_conf(RadarConf radar_conf);
   ProtocolData<RacobitRadar> *GetMutableProtocolDataById(
@@ -60,7 +60,7 @@ class RacobitRadarMessageManager : public MessageManager<RacobitRadar> {
   bool is_configured_ = false;
   RadarConfig200 radar_config_;
   std::shared_ptr<CanClient> can_client_;
-  std::shared_ptr<cybertron::Writer<RacobitRadar>> writer_;
+  std::shared_ptr<cyber::Writer<RacobitRadar>> writer_;
 };
 
 }  // namespace racobit_radar

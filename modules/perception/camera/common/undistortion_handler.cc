@@ -22,7 +22,7 @@
 #include <Eigen/Dense>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {

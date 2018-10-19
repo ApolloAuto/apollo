@@ -18,7 +18,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/common/lidar_frame.h"
@@ -31,7 +31,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class SegmentationComponent : public cybertron::Component<drivers::PointCloud> {
+class SegmentationComponent : public cyber::Component<drivers::PointCloud> {
  public:
   SegmentationComponent() : segmentor_(nullptr) {}
 
@@ -57,10 +57,10 @@ class SegmentationComponent : public cybertron::Component<drivers::PointCloud> {
   base::SensorInfo sensor_info_;
   TransformWrapper lidar2world_trans_;
   std::unique_ptr<lidar::LidarObstacleSegmentation> segmentor_;
-  std::shared_ptr<apollo::cybertron::Writer<LidarFrameMessage>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<LidarFrameMessage>> writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(SegmentationComponent);
+CYBER_REGISTER_COMPONENT(SegmentationComponent);
 
 }  // namespace onboard
 }  // namespace perception

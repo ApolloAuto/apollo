@@ -18,7 +18,7 @@
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/data/proto/data.pb.h"
 #include "modules/data/proto/data_conf.pb.h"
@@ -33,43 +33,43 @@ namespace apollo {
 namespace data {
 
 using apollo::common::time::Clock;
-using apollo::cybertron::ComponentConfig;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::ComponentConfig;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 
 class DataComponentTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    SetupCybertron();
+    SetupCyber();
   }
 
  protected:
-  void SetupCybertron();
+  void SetupCyber();
   bool RunDataTest();
 
  protected:
-  bool is_cybertron_initialized_ = false;
-  cybertron::ComponentConfig component_config_;
+  bool is_cyber_initialized_ = false;
+  cyber::ComponentConfig component_config_;
   std::shared_ptr<Writer<DataInputCommand>> data_writer_;
   std::shared_ptr<DataComponent> data_component_;
 };
 
-void DataComponentTest::SetupCybertron() {
-  if (is_cybertron_initialized_) {
+void DataComponentTest::SetupCyber() {
+  if (is_cyber_initialized_) {
     return;
   }
 
-  apollo::cybertron::Init("data_test");
-  Clock::SetMode(Clock::CYBERTRON);
+  apollo::cyber::Init("data_test");
+  Clock::SetMode(Clock::CYBER);
 
   component_config_.set_name("data_test");
   component_config_.add_readers();
 
-  std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("data_test"));
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("data_test"));
   data_writer_ = node->CreateWriter<DataInputCommand>(FLAGS_data_topic);
 
-  is_cybertron_initialized_ = true;
+  is_cyber_initialized_ = true;
 }
 
 bool DataComponentTest::RunDataTest() {

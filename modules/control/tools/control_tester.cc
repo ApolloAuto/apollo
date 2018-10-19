@@ -19,13 +19,13 @@
 
 #include "gflags/gflags.h"
 
-#include "cybertron/cybertron.h"
-#include "cybertron/time/rate.h"
-#include "cybertron/time/time.h"
+#include "cyber/cyber.h"
+#include "cyber/time/rate.h"
+#include "cyber/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/pad_msg.pb.h"
@@ -54,13 +54,13 @@ DEFINE_int32(feed_frequency, 10,
 int main(int argc, char** argv) {
   using apollo::canbus::Chassis;
   using apollo::control::PadMessage;
-  using apollo::cybertron::Time;
+  using apollo::cyber::Time;
   using apollo::localization::LocalizationEstimate;
   using apollo::planning::ADCTrajectory;
   using std::this_thread::sleep_for;
 
   google::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::cybertron::Init(argv[0]);
+  apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
 
   Chassis chassis;
@@ -91,8 +91,8 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("control_tester"));
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("control_tester"));
   auto chassis_writer = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
   auto localization_writer =
       node->CreateWriter<LocalizationEstimate>(FLAGS_localization_topic);

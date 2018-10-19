@@ -13,7 +13,7 @@ cc_library(
     ],
     deps = [
         "@eigen",
-        "//cybertron",
+        "//cyber",
         "//modules/perception/common/i_lib/core:core",
     ],
 )

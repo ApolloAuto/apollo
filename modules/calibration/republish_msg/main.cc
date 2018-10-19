@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "gflags/gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "ros/include/ros/ros.h"
 
 #include "modules/calibration/republish_msg/republish_msg.h"

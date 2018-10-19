@@ -28,7 +28,7 @@
 #include <cstring>
 #include <fstream>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/lib/utils/string_util.h"
 
 namespace apollo {

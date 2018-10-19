@@ -29,7 +29,7 @@
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 #include "modules/prediction/container/container.h"
 
 /**

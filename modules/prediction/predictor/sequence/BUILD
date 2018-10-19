@@ -7,7 +7,7 @@ cc_library(
     srcs = ["sequence_predictor.cc"],
     hdrs = ["sequence_predictor.h"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/math:geometry",
         "//modules/prediction/common:prediction_gflags",

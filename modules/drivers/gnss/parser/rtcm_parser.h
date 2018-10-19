@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/gnss/parser/parser.h"
 
@@ -33,7 +33,7 @@ class RtcmParser {
  public:
   using MessagePtr = ::google::protobuf::Message*;
   RtcmParser(const config::Config& config,
-             const std::shared_ptr<apollo::cybertron::Node>& node);
+             const std::shared_ptr<apollo::cyber::Node>& node);
   ~RtcmParser() {}
   bool Init();
   void ParseRtcmData(const std::string& msg);
@@ -44,10 +44,10 @@ class RtcmParser {
   void PublishObservation(const MessagePtr& message);
 
   config::Config config_;
-  std::shared_ptr<apollo::cybertron::Node> node_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Writer<GnssEphemeris>>
+  std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>>
       gnssephemeris_writer_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Writer<EpochObservation>>
+  std::shared_ptr<apollo::cyber::Writer<EpochObservation>>
       epochobservation_writer_ = nullptr;
   bool init_flag_ = false;
   std::unique_ptr<Parser> rtcm_parser_ = nullptr;

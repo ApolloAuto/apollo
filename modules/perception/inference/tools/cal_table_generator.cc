@@ -18,7 +18,7 @@
 #include "gflags/gflags.h"
 #include "opencv2/opencv.hpp"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 #include "modules/perception/inference/tensorrt/entropy_calibrator.h"

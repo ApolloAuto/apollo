@@ -10,7 +10,7 @@ package(default_visibility = ["//visibility:public"])
 #         "//modules/calibration/republish_msg/common:republish_msg_common",
 #         "//modules/calibration/republish_msg/proto:relative_odometry_proto",
 #         "//modules/common:apollo_app",
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/drivers/gnss/proto:ins_proto",
 #         "//modules/localization/proto:gps_proto",
 #     ],
@@ -26,7 +26,7 @@ package(default_visibility = ["//visibility:public"])
 #     deps = [
 #         ":republish_msg_lib",
 #         "//external:gflags",
-#         "//cybertron",
+#         "//cyber",
 #         "@ros//:ros_common",
 #     ],
 # )

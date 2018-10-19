@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+message RecordConf {
+  optional uint32 reader_pending_queue_size = 1 [default = 50];
+}

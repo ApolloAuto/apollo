@@ -8,7 +8,7 @@ cc_library(
         "i_sort.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
     ],
 )
 

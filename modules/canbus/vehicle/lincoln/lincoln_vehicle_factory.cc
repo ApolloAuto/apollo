@@ -18,7 +18,7 @@
 
 #include "modules/canbus/vehicle/lincoln/lincoln_controller.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {

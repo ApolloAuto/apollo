@@ -18,7 +18,7 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
@@ -30,7 +30,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class RecognitionComponent : public cybertron::Component<LidarFrameMessage> {
+class RecognitionComponent : public cyber::Component<LidarFrameMessage> {
  public:
   RecognitionComponent() : tracker_(nullptr) {}
   ~RecognitionComponent() = default;
@@ -46,10 +46,10 @@ class RecognitionComponent : public cybertron::Component<LidarFrameMessage> {
   base::SensorInfo sensor_info_;
   std::string main_sensor_name_;
   std::string output_channel_name_;
-  std::shared_ptr<apollo::cybertron::Writer<SensorFrameMessage>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>> writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(RecognitionComponent);
+CYBER_REGISTER_COMPONENT(RecognitionComponent);
 
 }  // namespace onboard
 }  // namespace perception

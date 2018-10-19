@@ -21,7 +21,7 @@
 #include <limits>
 #include <numeric>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/camera/common/util.h"

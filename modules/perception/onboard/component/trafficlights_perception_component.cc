@@ -27,8 +27,8 @@
 #include <tuple>
 #include <utility>
 
-#include "cybertron/common/log.h"
-#include "cybertron/time/time.h"
+#include "cyber/common/log.h"
+#include "cyber/time/time.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time_util.h"
 #include "modules/common/util/file.h"
@@ -50,7 +50,7 @@ static int GetGpuId(
     const apollo::perception::camera::CameraPerceptionInitOptions& options) {
   apollo::perception::camera::app::TrafficLightParam trafficlight_param;
   std::string work_root = "";
-  apollo::perception::camera::GetCybertronWorkRoot(&work_root);
+  apollo::perception::camera::GetCyberWorkRoot(&work_root);
   std::string config_file =
     lib::FileUtil::GetAbsolutePath(options.root_dir,
                                    options.conf_file);
@@ -76,28 +76,28 @@ bool TrafficLightsPerceptionComponent::Init() {
   writer_ = node_->CreateWriter<apollo::perception::TrafficLightDetection>(
       "/perception/traffic_light");
 
-  if (InitConfig() != cybertron::SUCC) {
+  if (InitConfig() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitConfig failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
-  if (InitAlgorithmPlugin() != cybertron::SUCC) {
+  if (InitAlgorithmPlugin() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitAlgorithmPlugin failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
-  if (InitCameraListeners() != cybertron::SUCC) {
+  if (InitCameraListeners() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitCameraListeners failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
-  if (InitCameraFrame() != cybertron::SUCC) {
+  if (InitCameraFrame() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitCameraFrame failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   AINFO << "TrafficLight Preproc Init Success";
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int TrafficLightsPerceptionComponent::InitConfig() {
@@ -155,7 +155,7 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   traffic_light_output_channel_name_ =
     traffic_light_param.traffic_light_output_channel_name();
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
@@ -163,30 +163,30 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   preprocessor_.reset(new camera::TLPreprocessor);
   if (!preprocessor_) {
     AERROR << "TrafficLightsPerceptionComponent new preprocessor failed";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   preprocessor_init_options_.camera_names = camera_names_;
   if (!preprocessor_->Init(preprocessor_init_options_)) {
     AERROR << "TrafficLightsPerceptionComponent init preprocessor failed";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   const auto camera_names_by_descending_focal_len =
       preprocessor_->GetCameraNamesByDescendingFocalLen();
   if (camera_names_by_descending_focal_len.empty()) {
     AERROR << "empty camera_names in preprocessor";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (camera_names_.size() != input_camera_channel_names_.size() ||
       camera_names_.size() == 0) {
     AERROR << "invalid camera_names config";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   SensorManager* sensor_manager = lib::Singleton<SensorManager>::get_instance();
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     if (!sensor_manager->IsSensorExist(camera_names_[i])) {
       AERROR << ("sensor_name: " + camera_names_[i] + " not exists.");
-      return cybertron::FAIL;
+      return cyber::FAIL;
     }
 
     // init transform wrappers
@@ -207,22 +207,22 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   hd_map_ = lib::Singleton<map::HDMapInput>::get_instance();
   if (hd_map_ == nullptr) {
     AERROR << "PreprocessComponent get hdmap failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   if (!hd_map_->Init()) {
     AERROR << "PreprocessComponent init hd-map failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
-  camera_perception_init_options_.use_cybertron_work_root = true;
+  camera_perception_init_options_.use_cyber_work_root = true;
   traffic_light_pipeline_.reset(new camera::TrafficLightCameraPerception);
   if (!traffic_light_pipeline_->Init(camera_perception_init_options_)) {
     AERROR << "camera_obstacle_pipeline_->Init() failed";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int TrafficLightsPerceptionComponent::InitCameraListeners() {
@@ -242,7 +242,7 @@ int TrafficLightsPerceptionComponent::InitCameraListeners() {
     last_sub_camera_image_ts_[camera_name] = 0.0;
   }
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int TrafficLightsPerceptionComponent::InitCameraFrame() {
@@ -250,7 +250,7 @@ int TrafficLightsPerceptionComponent::InitCameraFrame() {
   data_provider_init_options_.image_width = image_width_;
   int gpu_id = GetGpuId(camera_perception_init_options_);
   if (gpu_id == -1) {
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   data_provider_init_options_.device_id = gpu_id;
   AINFO << "trafficlights data_provider_init_options_.device_id: "
@@ -265,12 +265,12 @@ int TrafficLightsPerceptionComponent::InitCameraFrame() {
     if (!data_provider->Init(data_provider_init_options_)) {
       AERROR << "trafficlights init data_provider failed. "
           << " camera_name: " << camera_name;
-      return cybertron::FAIL;
+      return cyber::FAIL;
     }
     data_providers_map_[camera_name] = data_provider;
   }
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 void TrafficLightsPerceptionComponent::OnReceiveImage(
@@ -642,13 +642,13 @@ bool TrafficLightsPerceptionComponent::GetCarPose(
   }
 
   int state = 0;
-  int ret = cybertron::FAIL;
+  int ret = cyber::FAIL;
   Eigen::Affine3d affine3d_trans;
   for (const auto &camera_name : camera_names_) {
     const auto trans_wrapper = camera2world_trans_wrapper_map_[camera_name];
     ret = trans_wrapper->GetSensor2worldTrans(timestamp, &affine3d_trans);
     pose_matrix = affine3d_trans.matrix();
-    if (ret != cybertron::SUCC) {
+    if (ret != cyber::SUCC) {
       pose->ClearCameraPose(camera_name);
       AERROR << "get pose from tf failed, camera_name: "
                 << camera_name;
@@ -666,7 +666,7 @@ bool TrafficLightsPerceptionComponent::GetPoseFromTF(
     const std::string& child_frame_id,
     Eigen::Matrix4d* pose_matrix) {
   PERCEPTION_PERF_FUNCTION();
-  apollo::cybertron::Time query_time(timestamp);
+  apollo::cyber::Time query_time(timestamp);
   std::string err_string;
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id,
                                 query_time, tf2_timeout_second_, &err_string)) {
@@ -713,7 +713,7 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
 
   const auto &lights = frame->traffic_lights;
   auto *header = (*out_msg)->mutable_header();
-  double publish_time = apollo::cybertron::Time::Now().ToSecond();
+  double publish_time = apollo::cyber::Time::Now().ToSecond();
   header->set_timestamp_sec(publish_time);  // message publishing time
   AINFO << "set header time sec:" << std::to_string(frame->timestamp);
 

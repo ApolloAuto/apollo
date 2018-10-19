@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "boost/circular_buffer.hpp"
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "gflags/gflags.h"
 
 namespace apollo {
@@ -60,8 +60,8 @@ class MsgBuffer {
 
  private:
   std::string node_name_;
-  std::unique_ptr<cybertron::Node> node_;
-  std::shared_ptr<cybertron::Reader<T>> msg_subscriber_;
+  std::unique_ptr<cyber::Node> node_;
+  std::shared_ptr<cyber::Reader<T>> msg_subscriber_;
   std::mutex buffer_mutex_;
 
   bool init_ = false;
@@ -76,7 +76,7 @@ void MsgBuffer<T>::Init(const std::string& channel, const std::string& name) {
   } else {
     node_name_ = name + "_subscriber";
   }
-  node_.reset(apollo::cybertron::CreateNode(node_name_).release());
+  node_.reset(apollo::cyber::CreateNode(node_name_).release());
 
   std::function<void(const ConstPtr&)> register_call =
       std::bind(&MsgBuffer<T>::MsgCallback, this, std::placeholders::_1);
@@ -99,23 +99,23 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
     AERROR << "msg buffer is uninitialized.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (buffer_queue_.empty()) {
     AERROR << "msg buffer is empty.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest "
            << "timestamp (" << buffer_queue_.front().first << ").";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is newer than the latest "
            << "timestamp (" << buffer_queue_.back().first << ").";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   // loop to find nearest
@@ -130,7 +130,7 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   }
   *msg = buffer_queue_[idx + 1].second;
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 template <class T>
@@ -138,14 +138,14 @@ int MsgBuffer<T>::LookupLatest(ConstPtr* msg) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
     AERROR << "msg buffer is uninitialized.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (buffer_queue_.empty()) {
     AERROR << "msg buffer is empty.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   *msg = buffer_queue_.back().second;
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 template <class T>
@@ -154,23 +154,23 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
     AERROR << "msg buffer is uninitialized.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (buffer_queue_.empty()) {
     AERROR << "msg buffer is empty.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest "
            << "timestamp (" << buffer_queue_.front().first << ").";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is newer than the latest "
            << "timestamp (" << buffer_queue_.back().first << ").";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   const double lower_timestamp = timestamp - period;
@@ -188,7 +188,7 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
     }
   }
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 }  // namespace onboard

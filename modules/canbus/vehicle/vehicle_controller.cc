@@ -16,7 +16,7 @@
 
 #include "modules/canbus/vehicle/vehicle_controller.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace canbus {

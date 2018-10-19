@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
@@ -31,9 +31,9 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Component;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::drivers::PointCloud;
 
 class PriSecFusionComponent : public Component<PointCloud> {
@@ -60,7 +60,7 @@ class PriSecFusionComponent : public Component<PointCloud> {
   std::vector<std::shared_ptr<Reader<PointCloud>>> readers_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(PriSecFusionComponent)
+CYBER_REGISTER_COMPONENT(PriSecFusionComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo

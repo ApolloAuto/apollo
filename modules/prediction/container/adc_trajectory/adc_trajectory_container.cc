@@ -20,7 +20,7 @@
 #include <vector>
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {

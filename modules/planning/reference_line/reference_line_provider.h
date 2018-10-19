@@ -34,7 +34,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"

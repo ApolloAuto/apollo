@@ -20,7 +20,7 @@
 
 #include "modules/prediction/network/net_layer.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace prediction {

@@ -12,7 +12,7 @@ cuda_library(
         "cuda_util.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "@cuda",
     ],
 )
@@ -98,7 +98,7 @@ cc_test(
     ],
     deps = [
         ":path",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util",
         "@gtest//:main",
     ],
@@ -116,7 +116,7 @@ cc_test(
     ],
     deps = [
         ":pnc_map",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util",
         "@gtest//:main",
     ],
@@ -134,7 +134,7 @@ cc_test(
     ],
     deps = [
         ":route_segments",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util",
         "@gtest//:main",
     ],

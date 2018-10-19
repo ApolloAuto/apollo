@@ -38,7 +38,7 @@ namespace drivers {
 namespace racobit_radar {
 
 RacobitRadarMessageManager::RacobitRadarMessageManager(
-    std::shared_ptr<cybertron::Writer<RacobitRadar>> writer)
+    std::shared_ptr<cyber::Writer<RacobitRadar>> writer)
     : writer_(std::move(writer)) {
   AddRecvProtocolData<RadarState201, true>();
   AddRecvProtocolData<ClusterListStatus600, true>();

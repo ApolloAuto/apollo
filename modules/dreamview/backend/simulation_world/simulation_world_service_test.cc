@@ -29,7 +29,7 @@ using apollo::canbus::Chassis;
 using apollo::common::TrajectoryPoint;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::util::StrCat;
-using apollo::cybertron::blocker::BlockerManager;
+using apollo::cyber::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
@@ -46,10 +46,10 @@ const float kEpsilon = 0.01;
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
   static void SetUpTestCase() {
-    cybertron::GlobalData::Instance()->EnableSimulationMode();
+    cyber::GlobalData::Instance()->EnableSimulationMode();
 
-    std::unique_ptr<cybertron::Node> node =
-        cybertron::CreateNode("sim_world_service_test");
+    std::unique_ptr<cyber::Node> node =
+        cyber::CreateNode("sim_world_service_test");
     control_writer_ = node->CreateWriter<apollo::control::ControlCommand>(
         FLAGS_control_command_topic);
   }
@@ -72,11 +72,11 @@ class SimulationWorldServiceTest : public ::testing::Test {
   std::unique_ptr<SimulationWorldService> sim_world_service_;
   std::unique_ptr<MapService> map_service_;
 
-  static std::shared_ptr<cybertron::Writer<apollo::control::ControlCommand>>
+  static std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>>
       control_writer_;
 };
 
-std::shared_ptr<cybertron::Writer<apollo::control::ControlCommand>>
+std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>>
     SimulationWorldServiceTest::control_writer_;
 
 TEST_F(SimulationWorldServiceTest, UpdateMonitorSuccess) {

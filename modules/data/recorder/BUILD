@@ -7,7 +7,7 @@ cc_library(
     srcs = ["record_service.cc"],
     hdrs = ["record_service.h"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
         "//modules/data/common:data_gflags",

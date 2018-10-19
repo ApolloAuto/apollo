@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
@@ -43,7 +43,7 @@ namespace apollo {
 namespace prediction {
 
 class PredictionComponent
-    : public cybertron::Component<perception::PerceptionObstacles,
+    : public cyber::Component<perception::PerceptionObstacles,
                                   localization::LocalizationEstimate> {
  public:
   /**
@@ -94,16 +94,16 @@ class PredictionComponent
 
   common::adapter::AdapterManagerConfig adapter_conf_;
 
-  std::shared_ptr<apollo::cybertron::Reader<planning::ADCTrajectory>>
+  std::shared_ptr<apollo::cyber::Reader<planning::ADCTrajectory>>
       planning_reader_;
 
-  std::shared_ptr<apollo::cybertron::Writer<PredictionObstacles>>
+  std::shared_ptr<apollo::cyber::Writer<PredictionObstacles>>
       prediction_writer_;
 
   std::mutex mutex_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(PredictionComponent)
+CYBER_REGISTER_COMPONENT(PredictionComponent)
 
 }  // namespace prediction
 }  // namespace apollo

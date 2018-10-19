@@ -76,15 +76,15 @@ if __name__ == "__main__":
             g_args.localization_topic)
         sys.exit(0)
 
-    cybertron.init()
-    node = cybertron.Node("derive_event_node")
+    cyber.init()
+    node = cyber.Node("derive_event_node")
     node.create_reader(localization_meta_msg.topic,
                        localization_meta_msg.msg_type, OnReceiveLocalization)
 
     writer = node.create_writer(drive_event_meta_msg.topic,
                                 drive_event_meta_msg.msg_type)
     seq_num = 0
-    while not cybertron.is_shutdown():
+    while not cyber.is_shutdown():
         event_type = raw_input(
             "Type in Event Type('d') and press Enter (current time: " +
             str(datetime.datetime.now()) + ")\n>")

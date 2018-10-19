@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/class_loader/class_loader.h"
-#include "cybertron/component/component.h"
-#include "cybertron/cybertron.h"
-#include "cybertron/message/raw_message.h"
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/component.h"
+#include "cyber/cyber.h"
+#include "cyber/message/raw_message.h"
 
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -36,7 +36,7 @@ namespace apollo {
 namespace localization {
 
 class RTKLocalizationComponent final
-    : public cybertron::Component<localization::Gps> {
+    : public cyber::Component<localization::Gps> {
  public:
   RTKLocalizationComponent();
   ~RTKLocalizationComponent() = default;
@@ -55,10 +55,10 @@ class RTKLocalizationComponent final
   void PublishPoseBroadcastTopic(const LocalizationEstimate &localization);
 
  private:
-  std::shared_ptr<cybertron::Reader<localization::CorrectedImu>>
+  std::shared_ptr<cyber::Reader<localization::CorrectedImu>>
       corrected_imu_listener_ = nullptr;
 
-  std::shared_ptr<cybertron::Writer<LocalizationEstimate>>
+  std::shared_ptr<cyber::Writer<LocalizationEstimate>>
       localization_talker_ = nullptr;
 
   std::string localization_topic_ = "";
@@ -72,7 +72,7 @@ class RTKLocalizationComponent final
   std::unique_ptr<RTKLocalization> localization_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(RTKLocalizationComponent);
+CYBER_REGISTER_COMPONENT(RTKLocalizationComponent);
 
 }  // namespace localization
 }  // namespace apollo

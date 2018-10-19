@@ -9,7 +9,7 @@ cc_library(
         "prediction_component.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_proto",

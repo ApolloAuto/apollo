@@ -14,7 +14,7 @@ cc_library(
         "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
-        "//cybertron",
+        "//cyber",
         "@eigen",
 
     ],
@@ -32,7 +32,7 @@ cc_library(
         "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
-        "//cybertron",
+        "//cyber",
     ],
 )
 

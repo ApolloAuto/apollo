@@ -25,7 +25,7 @@ cc_library(
     deps = [
         ":camera",
         "//modules/drivers/proto:sensor_proto",
-        "//cybertron",
+        "//cyber",
     ],
     copts = ['-DMODULE_NAME=\\"camera\\"']
 )
@@ -37,7 +37,7 @@ cc_library(
     deps = [
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers/camera/proto:camera_proto",
-        "//cybertron",
+        "//cyber",
         "@opencv2//:core",
         "@opencv2//:highgui"
     ],
@@ -57,7 +57,7 @@ cc_library(
     
     deps = [
         "//modules/drivers/camera/proto:camera_proto",
-        "//cybertron",
+        "//cyber",
         "@adv_plat//:adv_plat",
     ],
     copts = ['-mavx2']

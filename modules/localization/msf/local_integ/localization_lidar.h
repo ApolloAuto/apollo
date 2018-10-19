@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"

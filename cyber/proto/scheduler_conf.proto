@@ -1,0 +1,24 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+enum ProcessStrategy {
+  CLASSIC = 0;
+  CHOREO = 1;
+}
+
+message ProcessorConf {
+  optional uint32 processor_num = 1;
+  optional ProcessStrategy process_strategy = 2 [default = CHOREO];
+}
+
+message SchedulerConf {
+  optional int32 sysmon_hz = 1;
+  optional int32 sysmon_prio = 2;
+  optional ProcessorConf processor_conf = 3;
+  optional TaskPoolConf task_pool_conf = 4;
+}
+
+message TaskPoolConf {
+  optional uint32 task_pool_size = 1 [default = 8];
+}

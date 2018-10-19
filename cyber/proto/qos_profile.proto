@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+enum QosHistoryPolicy {
+  HISTORY_SYSTEM_DEFAULT = 0;
+  HISTORY_KEEP_LAST = 1;
+  HISTORY_KEEP_ALL = 2;
+};
+
+enum QosReliabilityPolicy {
+  RELIABILITY_SYSTEM_DEFAULT = 0;
+  RELIABILITY_RELIABLE = 1;
+  RELIABILITY_BEST_EFFORT = 2;
+};
+
+enum QosDurabilityPolicy {
+  DURABILITY_SYSTEM_DEFAULT = 0;
+  DURABILITY_TRANSIENT_LOCAL = 1;
+  DURABILITY_VOLATILE = 2;
+};
+
+message QosProfile {
+  optional QosHistoryPolicy history = 1 [default = HISTORY_KEEP_LAST];
+  optional uint32 depth = 2 [default = 1];  // capacity of history
+  optional uint32 mps = 3 [default = 0];  // messages per second
+  optional QosReliabilityPolicy reliability = 4 [default = RELIABILITY_RELIABLE];
+  optional QosDurabilityPolicy durability = 5 [default = DURABILITY_VOLATILE];
+};

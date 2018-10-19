@@ -17,7 +17,7 @@
 
 #include <cmath>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
@@ -27,8 +27,8 @@ namespace guardian {
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::control::ControlCommand;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::monitor::SystemStatus;
 
 bool GuardianComponent::Init() {

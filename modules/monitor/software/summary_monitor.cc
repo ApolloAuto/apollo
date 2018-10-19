@@ -16,7 +16,7 @@
 
 #include "modules/monitor/software/summary_monitor.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"

@@ -1,5 +1,5 @@
 module_config {
-  module_library : "lib/libperception_camera_cybertron_viz.so"
+  module_library : "lib/libperception_camera_cyber_viz.so"
   components {
     comname : "FusionCameraDetectionViz"
     comclass : "FusionCameraDetectionComponent"

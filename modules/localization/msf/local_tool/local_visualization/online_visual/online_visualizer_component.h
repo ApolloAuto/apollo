@@ -31,7 +31,7 @@
 #include "glog/logging.h"
 #include "gtest/gtest_prod.h"
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -48,7 +48,7 @@ namespace localization {
 namespace msf {
 
 class OnlineVisualizerComponent final
-    : public cybertron::Component<drivers::PointCloud> {
+    : public cyber::Component<drivers::PointCloud> {
  public:
   OnlineVisualizerComponent();
   ~OnlineVisualizerComponent();
@@ -80,20 +80,20 @@ class OnlineVisualizerComponent final
   std::string map_folder_;
   std::string map_visual_folder_;
 
-  std::shared_ptr<cybertron::Reader<LocalizationEstimate>>
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
       lidar_local_listener_ = nullptr;
   std::string lidar_local_topic_ = "";
 
-  std::shared_ptr<cybertron::Reader<LocalizationEstimate>>
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
       gnss_local_listener_ = nullptr;
   std::string gnss_local_topic_ = "";
 
-  std::shared_ptr<cybertron::Reader<LocalizationEstimate>>
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
       fusion_local_listener_ = nullptr;
   std::string fusion_local_topic_ = "";
 };
 
-CYBERTRON_REGISTER_COMPONENT(OnlineVisualizerComponent);
+CYBER_REGISTER_COMPONENT(OnlineVisualizerComponent);
 
 }  // namespace msf
 }  // namespace localization

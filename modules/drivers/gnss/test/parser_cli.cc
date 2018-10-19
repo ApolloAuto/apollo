@@ -23,8 +23,8 @@
 #include <iostream>
 #include <memory>
 
-#include "cybertron/cybertron.h"
-#include "cybertron/record/record_reader.h"
+#include "cyber/cyber.h"
+#include "cyber/record/record_reader.h"
 
 #include "modules/drivers/gnss/parser/data_parser.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
@@ -67,8 +67,8 @@ void ParseBag(const char* filename, DataParser* parser) {
 }
 
 void ParseRecord(const char* filename, DataParser* parser) {
-  cybertron::record::RecordReader reader(filename);
-  cybertron::record::RecordMessage message;
+  cyber::record::RecordReader reader(filename);
+  cyber::record::RecordMessage message;
   while (reader.ReadMessage(&message)) {
     if (message.channel_name == "/apollo/sensor/gnss/raw_data") {
       apollo::drivers::gnss::RawData msg;
@@ -80,10 +80,10 @@ void ParseRecord(const char* filename, DataParser* parser) {
 }
 
 void Parse(const char* filename, const char* file_type,
-           const std::shared_ptr<::apollo::cybertron::Node>& node) {
+           const std::shared_ptr<::apollo::cyber::Node>& node) {
   std::string type = std::string(file_type);
   config::Config config;
-  if (!apollo::cybertron::common::GetProtoFromFile(
+  if (!apollo::cyber::common::GetProtoFromFile(
           std::string("/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"),
           &config)) {
     std::cout << "Unable to load gnss conf file";
@@ -111,9 +111,9 @@ int main(int argc, char** argv) {
     std::cout << "Usage: " << argv[0] << " filename [record|bin]" << std::endl;
     return 0;
   }
-  ::apollo::cybertron::Init("parser_cli");
-  std::shared_ptr<::apollo::cybertron::Node> parser_node(
-      ::apollo::cybertron::CreateNode("parser_cli"));
+  ::apollo::cyber::Init("parser_cli");
+  std::shared_ptr<::apollo::cyber::Node> parser_node(
+      ::apollo::cyber::CreateNode("parser_cli"));
   ::apollo::drivers::gnss::Parse(argv[1], argv[2], parser_node);
   return 0;
 }

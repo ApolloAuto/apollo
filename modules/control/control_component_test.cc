@@ -19,8 +19,8 @@
 #include <string>
 #include <utility>
 
-#include "cybertron/common/log.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/log.h"
+#include "cyber/cyber.h"
 
 #include "gtest/gtest.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -30,9 +30,9 @@
 
 namespace apollo {
 namespace control {
-using apollo::cybertron::ComponentConfig;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::ComponentConfig;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 
 using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
@@ -58,21 +58,21 @@ class ControlComponentTest : public ::testing::Test {
         "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
     FLAGS_is_control_test_mode = true;
 
-    SetupCybertron();
+    SetupCyber();
   }
 
  protected:
   bool FeedTestData();
-  void SetupCybertron();
+  void SetupCyber();
   bool RunControl(const std::string& test_case_name);
   void TrimControlCommand(ControlCommand* origin);
 
  protected:
-  bool is_cybertron_initialized_ = false;
+  bool is_cyber_initialized_ = false;
   std::mutex mutex_;
-  cybertron::TimerComponentConfig component_config_;
+  cyber::TimerComponentConfig component_config_;
 
-  // cybertron readers/writers
+  // cyber readers/writers
   std::shared_ptr<Writer<Chassis>> chassis_writer_;
   std::shared_ptr<Writer<LocalizationEstimate>> localization_writer_;
   std::shared_ptr<Writer<ADCTrajectory>> planning_writer_;
@@ -88,22 +88,22 @@ class ControlComponentTest : public ::testing::Test {
   PadMessage pad_message_;
 };
 
-void ControlComponentTest::SetupCybertron() {
-  if (is_cybertron_initialized_) {
+void ControlComponentTest::SetupCyber() {
+  if (is_cyber_initialized_) {
     return;
   }
 
-  // init cybertron framework
-  apollo::cybertron::Init("control_test");
+  // init cyber framework
+  apollo::cyber::Init("control_test");
 
-  Clock::SetMode(Clock::CYBERTRON);
+  Clock::SetMode(Clock::CYBER);
 
   component_config_.set_name("control_test");
 
   component_config_.set_interval(0.01);
 
-  std::shared_ptr<apollo::cybertron::Node> node(
-      apollo::cybertron::CreateNode("control_test"));
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("control_test"));
 
   chassis_writer_ = node->CreateWriter<Chassis>(FLAGS_chassis_topic);
   localization_writer_ =
@@ -120,7 +120,7 @@ void ControlComponentTest::SetupCybertron() {
         control_command_.CopyFrom(*control_command);
       });
 
-  is_cybertron_initialized_ = true;
+  is_cyber_initialized_ = true;
 }
 
 bool ControlComponentTest::FeedTestData() {

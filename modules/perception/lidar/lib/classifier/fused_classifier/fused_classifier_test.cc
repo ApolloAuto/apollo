@@ -36,8 +36,8 @@ using base::ObjectPtr;
 class FusedClassifierTest : public testing::Test {
  protected:
   void SetUp() override {
-    char cybertron_path[80] = "CYBERTRON_PATH=";
-    putenv(cybertron_path);
+    char cyber_path[80] = "CYBER_PATH=";
+    putenv(cyber_path);
     char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root = "/apollo/modules/perception/testdata/"

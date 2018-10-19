@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 
 #include "modules/drivers/gnss/stream/raw_stream.h"
@@ -28,9 +28,9 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Component;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::drivers::gnss::RawData;
 
 class GnssDriverComponent : public Component<> {
@@ -43,7 +43,7 @@ class GnssDriverComponent : public Component<> {
   apollo::common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(GnssDriverComponent)
+CYBER_REGISTER_COMPONENT(GnssDriverComponent)
 
 }  // namespace gnss
 }  // namespace drivers

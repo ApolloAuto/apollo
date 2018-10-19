@@ -21,7 +21,7 @@
 #include <chrono>
 #include <iostream>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "gtest/gtest.h"
 
 #include "modules/planning/common/planning_gflags.h"

@@ -22,7 +22,7 @@
 #include "modules/planning/proto/pad_msg.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace {
 

@@ -52,12 +52,12 @@ namespace planning {
 
 #define TMAIN                                            \
   int main(int argc, char** argv) {                      \
-    ::apollo::cybertron::Init("planning_test");          \
+    ::apollo::cyber::Init("planning_test");          \
     ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
     using apollo::common::time::Clock;                   \
     int ret = RUN_ALL_TESTS();                           \
-    ::apollo::cybertron::Shutdown();                     \
+    ::apollo::cyber::Shutdown();                     \
     return ret;                                          \
   }
 

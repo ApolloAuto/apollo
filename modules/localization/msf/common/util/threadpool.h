@@ -24,8 +24,8 @@
 #include <thread>
 #include <vector>
 
-#include "cybertron/common/log.h"
-#include "cybertron/common/macros.h"
+#include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 
 /// The namespace threadpool contains a thread pool and related utility classes.
 namespace apollo {

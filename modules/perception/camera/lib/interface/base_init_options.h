@@ -25,7 +25,7 @@ struct BaseInitOptions {
   std::string root_dir;
   std::string conf_file;
   int gpu_id = 0;
-  bool use_cybertron_work_root = false;
+  bool use_cyber_work_root = false;
 };
 
 }  // namespace camera

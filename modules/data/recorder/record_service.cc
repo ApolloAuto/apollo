@@ -18,7 +18,7 @@
 #include "modules/data/recorder/record_service.h"
 
 #include "gflags/gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace data {
@@ -26,7 +26,7 @@ namespace data {
 RecordService::RecordService() = default;
 
 bool RecordService::Init(
-    const std::shared_ptr<apollo::cybertron::Node>& node) {
+    const std::shared_ptr<apollo::cyber::Node>& node) {
   AINFO << "RecordService::Init(), starting...";
 
   Instance()->server_ = node->CreateService<RecordRequest, RecordResponse>(

@@ -68,7 +68,7 @@ if __name__ == "__main__":
         action="store",
         nargs='+',
         type=str,
-        help="the input cybertron record(s)")
+        help="the input cyber record(s)")
     parser.add_argument(
         "--output",
         action="store",
@@ -83,4 +83,4 @@ if __name__ == "__main__":
     for record_file in args.in_record:
         extract_record(record_file, out)
     out.close()
-    cybertron.shutdown()
+    cyber.shutdown()

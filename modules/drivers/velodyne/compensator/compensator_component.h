@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/compensator/compensator.h"
@@ -28,9 +28,9 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Component;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::drivers::PointCloud;
 
 class CompensatorComponent : public Component<PointCloud> {
@@ -47,7 +47,7 @@ class CompensatorComponent : public Component<PointCloud> {
   std::shared_ptr<Writer<PointCloud>> writer_ = nullptr;
 };
 
-CYBERTRON_REGISTER_COMPONENT(CompensatorComponent)
+CYBER_REGISTER_COMPONENT(CompensatorComponent)
 }  // namespace velodyne
 }  // namespace drivers
 }  // namespace apollo

@@ -14,7 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/preprocessor/pose.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {

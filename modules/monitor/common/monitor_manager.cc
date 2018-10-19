@@ -40,7 +40,7 @@ MonitorManager::MonitorManager() :
 }
 
 void MonitorManager::Init(
-    const std::shared_ptr<apollo::cybertron::Node>& node) {
+    const std::shared_ptr<apollo::cyber::Node>& node) {
   Instance()->node_ = node;
 }
 

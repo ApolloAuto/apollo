@@ -28,7 +28,7 @@ cc_library(
     ],
     deps = [
         "@eigen",
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
     ],
 )

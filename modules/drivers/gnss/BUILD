@@ -16,7 +16,7 @@ cc_library(
     deps = [
         "//modules/drivers/gnss/stream:gnss_stream",
         "//modules/common/monitor_log",
-        "//cybertron",
+        "//cyber",
     ],
     copts = ['-DMODULE_NAME=\\"gnss\\"']
 )

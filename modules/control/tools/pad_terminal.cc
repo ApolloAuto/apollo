@@ -17,10 +17,10 @@
 #include <iostream>
 #include <thread>
 
-#include "cybertron/common/log.h"
-#include "cybertron/common/macros.h"
-#include "cybertron/cybertron.h"
-#include "cybertron/time/time.h"
+#include "cyber/common/log.h"
+#include "cyber/common/macros.h"
+#include "cyber/cyber.h"
+#include "cyber/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
@@ -37,10 +37,10 @@ using apollo::common::time::AsInt64;
 using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
 using apollo::control::PadMessage;
-using apollo::cybertron::CreateNode;
-using apollo::cybertron::Node;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::CreateNode;
+using apollo::cyber::Node;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 
 class PadTerminal {
  public:
@@ -148,14 +148,14 @@ class PadTerminal {
 }  // namespace
 
 int main(int argc, char **argv) {
-  apollo::cybertron::Init("pad_terminal");
+  apollo::cyber::Init("pad_terminal");
   FLAGS_alsologtostderr = true;
   FLAGS_v = 3;
   google::ParseCommandLineFlags(&argc, &argv, true);
   PadTerminal pad_terminal;
   pad_terminal.init();
   pad_terminal.help();
-  apollo::cybertron::WaitForShutdown();
+  apollo::cyber::WaitForShutdown();
   pad_terminal.stop();
   return 0;
 }

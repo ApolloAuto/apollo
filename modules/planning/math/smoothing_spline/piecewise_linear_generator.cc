@@ -22,7 +22,7 @@
 
 #include "modules/planning/math/smoothing_spline/piecewise_linear_generator.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/math/qp_solver/active_set_qp_solver.h"
 
 namespace apollo {

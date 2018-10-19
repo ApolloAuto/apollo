@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_node.h"
 
 namespace apollo {

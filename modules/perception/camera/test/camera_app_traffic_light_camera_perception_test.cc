@@ -31,7 +31,7 @@ namespace camera {
 
 TEST(TrafficLightCameraPerceptionTest, normal) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   fLS::FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
@@ -86,7 +86,7 @@ TEST(TrafficLightCameraPerceptionTest, normal) {
 
 TEST(TrafficLightCameraPerceptionTest, bad_proto) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   fLS::FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
@@ -101,7 +101,7 @@ TEST(TrafficLightCameraPerceptionTest, bad_proto) {
 
 TEST(TrafficLightCameraPerceptionTest, bad_detector) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   fLS::FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
@@ -116,7 +116,7 @@ TEST(TrafficLightCameraPerceptionTest, bad_detector) {
 
 TEST(TrafficLightCameraPerceptionTest, bad_recognizer) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   fLS::FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
@@ -131,7 +131,7 @@ TEST(TrafficLightCameraPerceptionTest, bad_recognizer) {
 
 TEST(TrafficLightCameraPerceptionTest, bad_tracker) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   fLS::FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/sensor_meta_camera.pt";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"

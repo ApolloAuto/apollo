@@ -37,7 +37,7 @@ DEFINE_string(config_file, "obstacle.pt", "config_file");
 DEFINE_string(narrow_name, "onsemi_narrow", " camera for projecting");
 DEFINE_string(base_camera_name, "onsemi_obstacle", "camera to be peojected");
 DEFINE_string(sensor_name, "onsemi_obstacle,onsemi_narrow", "camera to use");
-DEFINE_string(params_dir, "/home/caros/cybertron/params", "params dir");
+DEFINE_string(params_dir, "/home/caros/cyber/params", "params dir");
 DEFINE_string(visualize_dir, "/tmp/0000", "visualize dir");
 DEFINE_double(camera_fps, 15, "camera_fps");
 DEFINE_bool(do_undistortion, false, "do_undistortion");

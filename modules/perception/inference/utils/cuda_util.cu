@@ -19,7 +19,7 @@
 #include <boost/thread.hpp>
 #include <cuda_runtime_api.h>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {

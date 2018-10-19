@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/init.h"
+#include "cyber/init.h"
 #include "modules/dreamview/backend/dreamview.h"
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  apollo::cybertron::Init(argv[0]);
+  apollo::cyber::Init(argv[0]);
 
   apollo::dreamview::Dreamview dreamview;
   const bool init_success = dreamview.Init().ok() && dreamview.Start().ok();
@@ -28,6 +28,6 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  apollo::cybertron::WaitForShutdown();
+  apollo::cyber::WaitForShutdown();
   return 0;
 }

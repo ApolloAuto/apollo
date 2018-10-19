@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {

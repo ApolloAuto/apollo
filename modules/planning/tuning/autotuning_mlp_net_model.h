@@ -20,7 +20,7 @@
 
 #include "Eigen/Dense"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/prediction/network/net_model.h"
 

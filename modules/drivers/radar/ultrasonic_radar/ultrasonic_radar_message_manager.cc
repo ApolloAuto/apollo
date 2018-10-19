@@ -28,7 +28,7 @@ namespace ultrasonic_radar {
 
 UltrasonicRadarMessageManager::UltrasonicRadarMessageManager(
     const int entrance_num,
-    const std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>> &writer)
+    const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>> &writer)
     : entrance_num_(entrance_num), ultrasonic_radar_writer_(writer) {
   sensor_data_.mutable_ranges()->Resize(entrance_num_, 0.0);
 }

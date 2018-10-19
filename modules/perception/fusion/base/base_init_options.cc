@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/base_init_options.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/perception/lib/config_manager/config_manager.h"
 

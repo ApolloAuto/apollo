@@ -24,7 +24,7 @@
 
 #include "modules/planning/proto/decider_config.pb.h"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"

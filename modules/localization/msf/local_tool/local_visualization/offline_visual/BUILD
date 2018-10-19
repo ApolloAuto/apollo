@@ -16,7 +16,7 @@ cc_library(
         "-lboost_program_options",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/util",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
@@ -38,7 +38,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         ":offline_local_visualizer_lib",
-        "//cybertron",
+        "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@eigen//:eigen",

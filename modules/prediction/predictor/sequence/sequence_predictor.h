@@ -28,7 +28,7 @@
 #include "Eigen/Dense"
 #include "gtest/gtest.h"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 
 #include "modules/prediction/proto/lane_graph.pb.h"
 

@@ -58,8 +58,8 @@ bool LoadPCDFile(const std::string& file_path, base::PointFCloudPtr cloud_out) {
 }
 
 TEST(SpatioTemporalGroundDetectorTest, test_spatio_temporal_ground_detector) {
-  // char cybertron_path[100] = "CYBERTRON_PATH=";
-  // putenv(cybertron_path);
+  // char cyber_path[100] = "CYBER_PATH=";
+  // putenv(cyber_path);
   // char module_path[100] = "MODULE_PATH=";
   // putenv(module_path);
   // EXPECT_TRUE(SceneManager::Instance().Init());

@@ -29,7 +29,7 @@ cc_library(
         ":cropbox",
         ":select",
         ":trafficlight_detector_detection_proto",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
@@ -51,7 +51,7 @@ cc_library(
         "select.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/common/graph:hungarian_optimizer",

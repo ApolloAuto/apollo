@@ -18,7 +18,7 @@
 #include <map>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/inference/inference_factory.h"

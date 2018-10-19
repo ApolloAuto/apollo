@@ -24,7 +24,7 @@
 #include "tf2/exceptions.h"
 #include "tf2/transform_datatypes.h"
 
-#include "cybertron/time/time.h"
+#include "cyber/time/time.h"
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
@@ -46,7 +46,7 @@ class BufferInterface {
    */
   virtual apollo::transform::TransformStamped lookupTransform(
       const std::string& target_frame, const std::string& source_frame,
-      const cybertron::Time& time, const float timeout_second = 0.01) const = 0;
+      const cyber::Time& time, const float timeout_second = 0.01) const = 0;
 
   /** \brief Get the transform between two frames by frame ID assuming fixed
    *frame.
@@ -65,8 +65,8 @@ class BufferInterface {
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
   virtual apollo::transform::TransformStamped lookupTransform(
-      const std::string& target_frame, const cybertron::Time& target_time,
-      const std::string& source_frame, const cybertron::Time& source_time,
+      const std::string& target_frame, const cyber::Time& target_time,
+      const std::string& source_frame, const cyber::Time& source_time,
       const std::string& fixed_frame,
       const float timeout_second = 0.01) const = 0;
 
@@ -81,7 +81,7 @@ class BufferInterface {
    */
   virtual bool canTransform(const std::string& target_frame,
                             const std::string& source_frame,
-                            const cybertron::Time& time,
+                            const cyber::Time& time,
                             const float timeout_second = 0.01,
                             std::string* errstr = nullptr) const = 0;
 
@@ -98,9 +98,9 @@ class BufferInterface {
    * \return True if the transform is possible, false otherwise
    */
   virtual bool canTransform(const std::string& target_frame,
-                            const cybertron::Time& target_time,
+                            const cyber::Time& target_time,
                             const std::string& source_frame,
-                            const cybertron::Time& source_time,
+                            const cyber::Time& source_time,
                             const std::string& fixed_frame,
                             const float timeout_second = 0.01,
                             std::string* errstr = nullptr) const = 0;
@@ -136,7 +136,7 @@ class BufferInterface {
   // Transform, advanced api, with pre-allocation
   template <typename T>
   T& transform(const T& in, T& out, const std::string& target_frame,  // NOLINT
-               const cybertron::Time& target_time,
+               const cyber::Time& target_time,
                const std::string& fixed_frame, float timeout = 0.0) const {
     // do the transform
     tf2::doTransform(
@@ -149,7 +149,7 @@ class BufferInterface {
   // transform, advanced api, no pre-allocation
   template <typename T>
   T transform(const T& in, const std::string& target_frame,
-              const cybertron::Time& target_time,
+              const cyber::Time& target_time,
               const std::string& fixed_frame, float timeout = 0.0) const {
     T out;
     return transform(in, out, target_frame, target_time, fixed_frame, timeout);
@@ -158,7 +158,7 @@ class BufferInterface {
   // Transform, advanced api, different types, with pre-allocation
   template <typename A, typename B>
   B& transform(const A& in, B& out, const std::string& target_frame,  // NOLINT
-               const cybertron::Time& target_time,
+               const cyber::Time& target_time,
                const std::string& fixed_frame, float timeout = 0.0) const {
     // do the transform
     A copy = transform(in, target_frame, target_time, fixed_frame, timeout);

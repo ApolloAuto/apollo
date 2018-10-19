@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/perception/proto/map_manager_config.pb.h"
 

@@ -27,10 +27,10 @@ bool StaticTransformComponent::Init() {
     AERROR << "Parse conf file failed, " << ConfigFilePath();
     return false;
   }
-  cybertron::proto::RoleAttributes attr;
+  cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf_static");
   attr.mutable_qos_profile()->CopyFrom(
-      cybertron::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
+      cyber::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
   writer_ = node_->CreateWriter<apollo::transform::TransformStampeds>(attr);
   SendTransforms();
   return true;

@@ -41,7 +41,7 @@ cc_library(
     ],
     deps = [
         ":racobit_radar_message_manager",
-        "//cybertron",
+        "//cyber",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",

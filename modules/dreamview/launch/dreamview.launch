@@ -1,4 +1,4 @@
-<cybertron>
+<cyber>
     <module>
         <name>dreamview</name>
         <dag_conf></dag_conf>
@@ -8,4 +8,4 @@
         </process_name>
         <exception_handler>respawn</exception_handler>
     </module>
-</cybertron>
+</cyber>

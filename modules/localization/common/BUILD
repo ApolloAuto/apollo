@@ -11,7 +11,7 @@ cc_library(
         "*.h",
     ]),
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/dreamview/backend/hmi:vehicle_manager",
         "//modules/localization/proto:localization_proto",
     ],

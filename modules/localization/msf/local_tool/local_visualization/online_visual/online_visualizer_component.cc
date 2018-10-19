@@ -61,7 +61,7 @@ bool OnlineVisualizerComponent::Init() {
 
 bool OnlineVisualizerComponent::InitConfig() {
   msf_config::Config msf_config;
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
                                                    &msf_config)) {
     return false;
   }
@@ -140,7 +140,7 @@ bool OnlineVisualizerComponent::Proc(
     const std::shared_ptr<drivers::PointCloud> &msg) {
   LidarVisFrame lidar_vis_frame;
   lidar_vis_frame.timestamp =
-      cybertron::Time(msg->measurement_time()).ToSecond();
+      cyber::Time(msg->measurement_time()).ToSecond();
 
   std::vector<unsigned char> intensities;
   ParsePointCloudMessage(msg, &lidar_vis_frame.pt3ds, &intensities);

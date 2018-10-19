@@ -22,7 +22,7 @@
 
 #include <memory>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
@@ -46,14 +46,14 @@ using apollo::drivers::canbus::SenderMessage;
 class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
  public:
   explicit UltrasonicRadarMessageManager(const int entrance_num,
-      const std::shared_ptr<::apollo::cybertron::Writer<Ultrasonic>> &writer);
+      const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>> &writer);
   virtual ~UltrasonicRadarMessageManager() = default;
   void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);
   void set_can_client(std::shared_ptr<CanClient> can_client);
 
  private:
   int entrance_num_ = 0;
-  std::shared_ptr<cybertron::Writer<Ultrasonic>> ultrasonic_radar_writer_;
+  std::shared_ptr<cyber::Writer<Ultrasonic>> ultrasonic_radar_writer_;
   std::shared_ptr<CanClient> can_client_;
 };
 

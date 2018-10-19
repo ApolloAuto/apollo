@@ -58,7 +58,7 @@ def setup_listener(node):
     node.create_reader(LOCALIZATION_TOPIC,
                        localization_pb2.LocalizationEstimate,
                        localization_callback)
-    while not cybertron.is_shutdown():
+    while not cyber.is_shutdown():
         time.sleep(0.002)
 
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         and plot the autonomous driving trace in real time.
         The manual driving trace is the blue lines, and the autonomous driving trace is the red lines.
         It is visualization a way to verify the precision of the autonomous driving trace.
-        If you have a cybertron record file, you can play the record and the tool will plot the received localization
+        If you have a cyber record file, you can play the record and the tool will plot the received localization
         message in realtime. To do that, start this tool first with a manual driving trace, and then
         play record use another terminal with the following command [replace your_file.record to your
         own record file]: cyber_record play -f your_file.record
@@ -98,8 +98,8 @@ if __name__ == '__main__':
     ax.plot(trace_data['x'], trace_data['y'], 'b-', alpha=0.5, linewidth=1)
     handle.close()
 
-    cybertron.init()
-    node = cybertron.Node("plot_trace")
+    cyber.init()
+    node = cyber.Node("plot_trace")
     setup_listener(node)
 
     x_min = min(trace_data['x'])

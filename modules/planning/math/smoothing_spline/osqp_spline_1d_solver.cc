@@ -25,7 +25,7 @@
 #include "Eigen/Core"
 #include "Eigen/Eigenvalues"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/common/math/matrix_operations.h"
 #include "modules/common/time/time.h"

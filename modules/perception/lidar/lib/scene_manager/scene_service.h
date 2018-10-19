@@ -19,7 +19,7 @@
 #include <mutex>
 #include <string>
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"
 
 namespace apollo {

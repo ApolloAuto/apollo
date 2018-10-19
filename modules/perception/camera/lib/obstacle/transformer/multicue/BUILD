@@ -27,7 +27,7 @@ cc_library(
         "obj_mapper.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/perception/camera/common:common",
     ],
 )
@@ -43,7 +43,7 @@ cc_library(
     deps = [
         ":multicue_proto",
         ":obj_mapper",
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",

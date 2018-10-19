@@ -37,7 +37,7 @@
 #include "NvCaffeParser.h"
 #include "NvInfer.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/common.h"
 #include "modules/perception/proto/rt.pb.h"
 

@@ -26,8 +26,8 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
-#include "cybertron/common/log.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/log.h"
+#include "cyber/cyber.h"
 
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
@@ -122,7 +122,7 @@ class SimulationWorldUpdater {
 
   void RegisterMessageHandlers();
 
-  std::unique_ptr<cybertron::Timer> timer_;
+  std::unique_ptr<cyber::Timer> timer_;
 
   SimulationWorldService sim_world_service_;
   const MapService *map_service_ = nullptr;

@@ -24,7 +24,7 @@
 
 #include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace calibration {

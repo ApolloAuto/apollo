@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/component/component.h"
+#include "cyber/component/component.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/fusion/app/obstacle_multi_sensor_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
@@ -31,7 +31,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class FusionComponent : public cybertron::Component<SensorFrameMessage> {
+class FusionComponent : public cyber::Component<SensorFrameMessage> {
  public:
   FusionComponent() = default;
   ~FusionComponent() = default;
@@ -49,11 +49,11 @@ class FusionComponent : public cybertron::Component<SensorFrameMessage> {
   static uint32_t s_seq_num_;
   std::unique_ptr<fusion::ObstacleMultiSensorFusion> fusion_;
   map::HDMapInput* hdmap_input_ = nullptr;
-  std::shared_ptr<apollo::cybertron::Writer<PerceptionObstacles>> writer_;
-  std::shared_ptr<apollo::cybertron::Writer<SensorFrameMessage>> inner_writer_;
+  std::shared_ptr<apollo::cyber::Writer<PerceptionObstacles>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>> inner_writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(FusionComponent);
+CYBER_REGISTER_COMPONENT(FusionComponent);
 
 }  // namespace onboard
 }  // namespace perception

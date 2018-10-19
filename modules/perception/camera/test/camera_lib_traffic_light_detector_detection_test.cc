@@ -23,7 +23,7 @@ namespace camera {
 
 TEST(DetectionTest, init_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   {
     std::shared_ptr<TrafficLightDetection> detector(new TrafficLightDetection);
     TrafficLightDetectorInitOptions init_options;
@@ -56,7 +56,7 @@ TEST(DetectionTest, init_test) {
 
 TEST(DetectionTest, all) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   std::shared_ptr<TrafficLightDetection> detector(new TrafficLightDetection);
   TrafficLightDetectorInitOptions init_options;
   TrafficLightDetectorOptions detetor_options;
@@ -139,7 +139,7 @@ TEST(DetectionTest, all) {
 
 TEST(DetectionTest, no_light) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   std::shared_ptr<TrafficLightDetection> detector(new TrafficLightDetection);
   AINFO << detector->Name();
   TrafficLightDetectorInitOptions init_options;
@@ -190,7 +190,7 @@ TEST(DetectionTest, no_light) {
 
 TEST(DetectionTest, out_of_img_light) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   std::shared_ptr<TrafficLightDetection> detector(new TrafficLightDetection);
   TrafficLightDetectorInitOptions init_options;
   TrafficLightDetectorOptions detetor_options;
@@ -264,7 +264,7 @@ TEST(DetectionTest, out_of_img_light) {
 
 TEST(DetectionTest, nms_test) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   std::shared_ptr<TrafficLightDetection> detector(new TrafficLightDetection);
   TrafficLightDetectorInitOptions init_options;
   TrafficLightDetectorOptions detetor_options;

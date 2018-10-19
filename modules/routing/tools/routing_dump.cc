@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/common/log.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/log.h"
+#include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -30,7 +30,7 @@ void MessageCallback(
     std::ofstream dump_file(FLAGS_routing_dump_file);
     dump_file << trajectory->debug().planning_data().routing().DebugString();
     dump_file.close();
-    apollo::cybertron::Shutdown();
+    apollo::cyber::Shutdown();
     exit(0);
   }
 }
@@ -38,13 +38,13 @@ void MessageCallback(
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  apollo::cybertron::Init(argv[0]);
+  apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
 
-  auto listener_node = apollo::cybertron::CreateNode("routing_dump");
+  auto listener_node = apollo::cyber::CreateNode("routing_dump");
   auto listener =
       listener_node->CreateReader<apollo::planning::ADCTrajectory>(
           FLAGS_planning_trajectory_topic, MessageCallback);
-  apollo::cybertron::WaitForShutdown();
+  apollo::cyber::WaitForShutdown();
   return 0;
 }

@@ -18,7 +18,7 @@
 #include <sstream>
 #include <string>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/common/point_cloud_processing/common.h"

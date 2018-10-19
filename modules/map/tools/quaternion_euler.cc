@@ -18,7 +18,7 @@
 
 #include "gflags/gflags.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
 

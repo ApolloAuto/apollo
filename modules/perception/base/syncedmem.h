@@ -65,7 +65,7 @@ license and copyright terms herein.
 #include <cstdlib>
 #include <iostream>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/common.h"
 
 namespace apollo {

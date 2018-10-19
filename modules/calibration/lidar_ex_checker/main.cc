@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "gflags/gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "ros/include/ros/ros.h"
 
 #include "modules/calibration/lidar_ex_checker/lidar_ex_checker.h"

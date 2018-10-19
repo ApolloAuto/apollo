@@ -12,7 +12,7 @@ cc_library(
     ],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",

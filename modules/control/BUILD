@@ -20,7 +20,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
-        "//cybertron",
+        "//cyber",
         "//external:gflags",
     ],
 )

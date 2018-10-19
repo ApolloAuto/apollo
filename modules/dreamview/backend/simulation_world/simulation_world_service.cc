@@ -225,7 +225,7 @@ constexpr int SimulationWorldService::kMaxMonitorItems;
 
 SimulationWorldService::SimulationWorldService(const MapService *map_service,
                                                bool routing_from_file)
-    : node_(cybertron::CreateNode("simulation_world")),
+    : node_(cyber::CreateNode("simulation_world")),
       map_service_(map_service),
       monitor_logger_buffer_(MonitorMessageItem::SIMULATOR),
       ready_to_push_(false) {
@@ -286,17 +286,17 @@ void SimulationWorldService::InitWriters() {
       node_->CreateWriter<NavigationInfo>(FLAGS_navigation_topic);
 
   {  // configure QoS for routing request writer
-    apollo::cybertron::proto::RoleAttributes routing_request_attr;
+    apollo::cyber::proto::RoleAttributes routing_request_attr;
     routing_request_attr.set_channel_name(FLAGS_routing_request_topic);
     auto qos = routing_request_attr.mutable_qos_profile();
     // only keeps the last message in history
     qos->set_history(
-        apollo::cybertron::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+        apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
     // reliable transfer
     qos->set_reliability(
-        apollo::cybertron::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+        apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
     // when writer find new readers, send all its history messsage
-    qos->set_durability(apollo::cybertron::proto::QosDurabilityPolicy::
+    qos->set_durability(apollo::cyber::proto::QosDurabilityPolicy::
                             DURABILITY_TRANSIENT_LOCAL);
     routing_request_writer_ =
         node_->CreateWriter<RoutingRequest>(routing_request_attr);

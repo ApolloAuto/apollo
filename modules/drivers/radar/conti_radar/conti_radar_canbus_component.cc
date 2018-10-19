@@ -130,7 +130,7 @@ bool ContiRadarCanbusComponent::OnError(const std::string& error_msg) {
 void ContiRadarCanbusComponent::PoseCallback(
     const std::shared_ptr<LocalizationEstimate>& pose_msg) {
   auto send_interval = conti_radar_conf_.radar_conf().input_send_interval();
-  uint64_t now_nsec = cybertron::Time().Now().ToNanosecond();
+  uint64_t now_nsec = cyber::Time().Now().ToNanosecond();
   if (last_nsec_ != 0 && (now_nsec - last_nsec_) < send_interval) {
     return;
   }

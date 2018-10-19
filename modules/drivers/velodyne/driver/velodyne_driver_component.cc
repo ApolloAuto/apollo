@@ -18,7 +18,7 @@
 #include <string>
 #include <thread>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/common/util/message_util.h"
 #include "modules/drivers/velodyne/driver/velodyne_driver_component.h"
@@ -53,7 +53,7 @@ bool VelodyneDriverComponent::Init() {
 
 /** @brief Device poll thread main loop. */
 void VelodyneDriverComponent::device_poll() {
-  while (!apollo::cybertron::IsShutdown()) {
+  while (!apollo::cyber::IsShutdown()) {
     // poll device until end of file
     std::shared_ptr<VelodyneScan> scan = std::make_shared<VelodyneScan>();
     bool ret = dvr_->Poll(scan);

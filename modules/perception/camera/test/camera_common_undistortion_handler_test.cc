@@ -40,7 +40,7 @@ namespace camera {
 
 TEST(UndistortionHandlerTest, test_init) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   {
     FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
       "camera/common/conf/sensor_meta.config";
@@ -74,7 +74,7 @@ TEST(UndistortionHandlerTest, test_init) {
 
 TEST(UndistortionHandlerTest, test_undistortion) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   {
     FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
       "camera/common/conf/sensor_meta.config";
@@ -114,7 +114,7 @@ TEST(UndistortionHandlerTest, test_undistortion) {
 
 TEST(UndistortionHandlerTest, test_verify) {
   unsetenv("MODULE_PATH");
-  unsetenv("CYBERTRON_PATH");
+  unsetenv("CYBER_PATH");
   {
     // test RGB undistortion
     cv::Mat rgb_image = cv::imread("/apollo/modules/perception/testdata/"

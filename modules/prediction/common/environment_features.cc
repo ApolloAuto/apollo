@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/prediction/common/environment_features.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace prediction {

@@ -19,7 +19,7 @@
 #include <utility>
 #include "google/protobuf/text_format.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/common/io/io_util.h"

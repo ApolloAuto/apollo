@@ -21,7 +21,7 @@
 
 #include "Eigen/Core"
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 #include "modules/perception/common/graph/secure_matrix.h"
 #include "modules/perception/lib/registerer/registerer.h"
 

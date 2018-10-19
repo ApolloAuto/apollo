@@ -16,7 +16,7 @@
 
 #include "modules/routing/core/black_list_range_generator.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace routing {

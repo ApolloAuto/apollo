@@ -13,7 +13,7 @@ cuda_library(
     ],
     deps = [
         "@cuda",
-        "//cybertron",
+        "//cyber",
         "//modules/perception/camera/common:camera_frame",
         "//modules/perception/inference/utils:inference_gemm_lib",
     ],
@@ -58,7 +58,7 @@ cc_library(
     ],
     deps = [
         "@eigen",
-        "//cybertron",
+        "//cyber",
     ],
 )
 

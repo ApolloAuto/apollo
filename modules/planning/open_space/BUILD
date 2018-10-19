@@ -6,7 +6,7 @@ cc_library(
     name = "node3d",
     srcs = ["node3d.cc"],
     hdrs = ["node3d.h"],
-    deps = ["//cybertron",
+    deps = ["//cyber",
             "//modules/common/math",
             "//modules/planning/common:obstacle",
             "//modules/planning/constraint_checker:collision_checker",
@@ -18,7 +18,7 @@ cc_library(
     srcs = ["reeds_shepp_path.cc"],
     hdrs = ["reeds_shepp_path.h"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/math",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/proto:planner_open_space_config_proto",
@@ -36,7 +36,7 @@ cc_test(
     size = "small",
     srcs = ["reeds_shepp_path_test.cc"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/planning/open_space:open_space_utils",
         "//modules/common/math",
         "//modules/common/configs:vehicle_config_helper",
@@ -49,7 +49,7 @@ cc_test(
     size = "small",
     srcs = ["node3d_test.cc"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/planning/open_space:open_space_utils",
         "@gtest//:main",
     ],
@@ -97,7 +97,7 @@ cc_library(
         "distance_approach_problem.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
@@ -114,7 +114,7 @@ cc_library(
         "distance_approach_ipopt_interface.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
@@ -135,7 +135,7 @@ cc_test(
     deps = [
         "@gtest//:main",
         ":distance_approach_ipopt_interface",
-        "//cybertron",
+        "//cyber",
     ],
 )
 
@@ -148,7 +148,7 @@ cc_test(
     deps = [
         "@gtest//:main",
         ":distance_approach_problem",
-        "//cybertron",
+        "//cyber",
     ],
 )
 
@@ -185,7 +185,7 @@ cc_library(
         "hybrid_a_star.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/planning/common:obstacle",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/proto:planner_open_space_config_proto",

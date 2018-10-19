@@ -325,7 +325,11 @@ class ControlInfo(object):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     from cyber_py.record import RecordReader
+=======
+    from cyber.record import RecordReader
+>>>>>>> framwork: rename to cyber
 
     parser = argparse.ArgumentParser(
         description='Process and analyze control and planning data')
@@ -364,9 +368,9 @@ if __name__ == "__main__":
         print "Done reading the file"
 
     else:
-        cybertron.init()
+        cyber.init()
         # rospy.init_node('control_info', anonymous=True)
-        node = cybertron.Node("rtk_recorder")
+        node = cyber.Node("rtk_recorder")
         planningsub = node.create_reader('/apollo/planning',
                                          planning_pb2.ADCTrajectory,
                                          controlinfo.callback_planning)

@@ -24,8 +24,8 @@
 #include "boost/filesystem.hpp"
 #include "boost/range/iterator_range.hpp"
 
-#include "cybertron/cybertron.h"
-#include "cybertron/record/record_reader.h"
+#include "cyber/cyber.h"
+#include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
@@ -59,8 +59,8 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
-using cybertron::record::RecordMessage;
-using cybertron::record::RecordReader;
+using cyber::record::RecordMessage;
+using cyber::record::RecordReader;
 
 PredictionComponent::~PredictionComponent() { Stop(); }
 

@@ -17,7 +17,7 @@
 #include <QApplication>
 #include <QFile>
 #include <QSurfaceFormat>
-#include "cybertron/init.h"
+#include "cyber/init.h"
 #include "modules/tools/visualizer/main_window.h"
 
 int main(int argc, char* argv[]) {
@@ -35,20 +35,20 @@ int main(int argc, char* argv[]) {
       "   border-radius: 2px; "
       "}");
 
-  apollo::cybertron::Init(argv[0]);
+  apollo::cyber::Init(argv[0]);
 
   MainWindow w;
 
   auto topologyCallback =
-      [&w](const apollo::cybertron::proto::ChangeMsg& change_msg) {
+      [&w](const apollo::cyber::proto::ChangeMsg& change_msg) {
         w.TopologyChanged(change_msg);
       };
 
-  auto channelManager = apollo::cybertron::service_discovery::TopologyManager::Instance()
+  auto channelManager = apollo::cyber::service_discovery::TopologyManager::Instance()
       ->channel_manager();
   channelManager->AddChangeListener(topologyCallback);
 
-  std::vector<apollo::cybertron::proto::RoleAttributes> role_attr_vec;
+  std::vector<apollo::cyber::proto::RoleAttributes> role_attr_vec;
   channelManager->GetWriters(&role_attr_vec);
   for (auto& role_attr : role_attr_vec) {
     w.FindNewWriter(role_attr);

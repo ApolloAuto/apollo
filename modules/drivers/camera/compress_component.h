@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include "cybertron/base/concurrent_object_pool.h"
-#include "cybertron/cybertron.h"
+#include "cyber/base/concurrent_object_pool.h"
+#include "cyber/cyber.h"
 #include "modules/drivers/camera/proto/config.pb.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 
@@ -27,9 +27,9 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::Writer;
-using apollo::cybertron::base::CCObjectPool;
+using apollo::cyber::Component;
+using apollo::cyber::Writer;
+using apollo::cyber::base::CCObjectPool;
 using apollo::drivers::Image;
 using apollo::drivers::camera::config::Config;
 
@@ -44,7 +44,7 @@ class CompressComponent : public Component<Image> {
   Config config_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(CompressComponent)
+CYBER_REGISTER_COMPONENT(CompressComponent)
 }  // namespace camera
 }  // namespace drivers
 }  // namespace apollo

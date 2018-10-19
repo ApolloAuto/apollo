@@ -18,7 +18,7 @@
 #include <string>
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_types.h"
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 
 namespace apollo {
@@ -52,7 +52,7 @@ void PCDExporter::CompensatedPcdCallback(const std::string &msg_string) {
   std::string pcd_filename = ss_pcd.str();
 
   WritePcdFile(pcd_filename, msg);
-  double timestamp = cybertron::Time(msg.measurement_time()).ToSecond();
+  double timestamp = cyber::Time(msg.measurement_time()).ToSecond();
   fprintf(stamp_file_handle_, "%u %lf\n", index, timestamp);
 
   ++index;

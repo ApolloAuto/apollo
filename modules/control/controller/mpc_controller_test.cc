@@ -20,7 +20,7 @@
 #include <string>
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/common/time/time.h"

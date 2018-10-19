@@ -26,7 +26,7 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/util/message_util.h"
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
 
@@ -39,8 +39,8 @@ namespace common {
 namespace monitor {
 
 using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
-using apollo::cybertron::Node;
-using apollo::cybertron::Writer;
+using apollo::cyber::Node;
+using apollo::cyber::Writer;
 
 /**
  * class MonitorLogger

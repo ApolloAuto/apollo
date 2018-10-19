@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm3_parser.h"
@@ -32,7 +32,7 @@ using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssEphemeris;
 
 RtcmParser::RtcmParser(const config::Config& config,
-                       const std::shared_ptr<apollo::cybertron::Node>& node)
+                       const std::shared_ptr<apollo::cyber::Node>& node)
     : config_(config), node_(node) {}
 
 bool RtcmParser::Init() {
@@ -60,7 +60,7 @@ void RtcmParser::ParseRtcmData(const std::string& msg) {
   Parser::MessageType type;
   MessagePtr msg_ptr;
 
-  while (cybertron::OK()) {
+  while (cyber::OK()) {
     type = rtcm_parser_->GetMessage(&msg_ptr);
     if (type == Parser::MessageType::NONE) break;
     DispatchMessage(type, msg_ptr);

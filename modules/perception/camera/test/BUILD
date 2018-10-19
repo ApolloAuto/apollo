@@ -219,7 +219,7 @@
 #         "camera_lib_calibration_service_online_calibration_service_test.cc",
 #     ],
 #     deps = [
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/perception/base:base",
 #         "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
 #         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
@@ -364,7 +364,7 @@
 #         "-lopencv_highgui",
 #     ],
 #     deps = [
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/perception/camera/lib/lane/common:common_functions",
 #         "//modules/perception/base:base",
 #         "//modules/perception/common/io:io_util",
@@ -385,7 +385,7 @@
 #         "-lopencv_highgui",
 #     ],
 #     deps = [
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
 #         "//modules/perception/base:base",
 #         "//modules/perception/common/io:io_util",
@@ -404,7 +404,7 @@
 #         "-lopencv_highgui",
 #     ],
 #     deps = [
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/perception/camera/common:common",
 #         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
 #         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
@@ -458,7 +458,7 @@
 #         "camera_lib_obstacle_postprocessor_location_refiner_test.cc",
 #     ],
 #     deps = [
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
 #         "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
 #         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
@@ -474,7 +474,7 @@
 #     ],
 #     deps = [
 #         "@eigen",
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/perception/camera/common:common",
 #         "//modules/perception/camera/lib/obstacle/tracker/common:common",
 #         "//modules/perception/inference/utils:inference_util_lib",
@@ -510,7 +510,7 @@
 # #         "-lopencv_highgui",
 # #     ],
 # #     deps = [
-# #         "//cybertron",
+# #         "//cyber",
 # #         "//modules/perception/base:base",
 # #         "//modules/perception/camera/common:common",
 # #         "//modules/perception/camera/lib/interface:interface",
@@ -712,7 +712,7 @@
 #         "-lcaffe",
 #     ],
 #     deps = [
-#         "//cybertron",
+#         "//cyber",
 #         "//modules/perception/base:distortion_model",
 #         "//modules/perception/common/io:io_util",
 #         "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",

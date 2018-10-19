@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 
 using apollo::common::PathPoint;

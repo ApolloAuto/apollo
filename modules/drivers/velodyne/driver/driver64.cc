@@ -57,7 +57,7 @@ bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
 
   // publish message using time of last packet read
   ADEBUG << "Publishing a full Velodyne scan.";
-  scan->mutable_header()->set_timestamp_sec(cybertron::Time().Now().ToSecond());
+  scan->mutable_header()->set_timestamp_sec(cyber::Time().Now().ToSecond());
   scan->mutable_header()->set_frame_id(config_.frame_id());
   scan->set_model(config_.model());
   scan->set_mode(config_.mode());

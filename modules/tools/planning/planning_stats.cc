@@ -20,7 +20,7 @@
 #include "gflags/gflags.h"
 #include "ros/ros.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"

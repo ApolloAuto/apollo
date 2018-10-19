@@ -69,7 +69,7 @@ bool IsSameHeader(const Header& lhs, const Header& rhs) {
 
 SimControl::SimControl(const MapService* map_service)
     : map_service_(map_service),
-      node_(cybertron::CreateNode("sim_control")),
+      node_(cyber::CreateNode("sim_control")),
       current_trajectory_(std::make_shared<ADCTrajectory>()) {
   InitTimerAndIO();
 }
@@ -105,9 +105,9 @@ void SimControl::InitTimerAndIO() {
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
   // Start timer to publish localization and chassis messages.
-  sim_control_timer_.reset(new cybertron::Timer(
+  sim_control_timer_.reset(new cyber::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(new cybertron::Timer(
+  sim_prediction_timer_.reset(new cyber::Timer(
       kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
       false));
 }

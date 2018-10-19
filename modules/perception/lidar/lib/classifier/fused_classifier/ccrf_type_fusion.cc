@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"

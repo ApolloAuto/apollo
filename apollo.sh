@@ -93,10 +93,10 @@ function check_esd_files() {
 
 function generate_build_targets() {
   if [ -z $NOT_BUILD_PERCEPTION ] ; then
-    BUILD_TARGETS=`bazel query //modules/... union //cybertron/...`
+    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
   else
     info 'Skip building perception module!'
-    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/... union //cybertron/...`
+    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/... union //cyber/...`
   fi
 
   if [ $? -ne 0 ]; then
@@ -175,7 +175,7 @@ function cibuild_extended() {
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
     //modules/perception/...
-    //cybertron/...
+    //cyber/...
     //modules/dreamview/...
     //modules/drivers/radar/conti_radar/...
     //modules/drivers/radar/racobit_radar/...
@@ -210,7 +210,7 @@ function cibuild() {
 
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
-    //cybertron/...
+    //cyber/...
     //modules/canbus/...
     //modules/common/...
     //modules/control/...
@@ -412,10 +412,10 @@ function citest_basic() {
 
   info "Building framework ..."
   cd /apollo
-  source cybertron/setup.bash
+  source cyber/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/... union //cybertron/...`
+    `bazel query //modules/... union //cyber/...`
   "
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
@@ -447,10 +447,10 @@ function citest_extended() {
 
   info "Building framework ..."
   cd /apollo
-  source cybertron/setup.bash
+  source cyber/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/planning/... union //modules/common/... union //cybertron/...`
+    `bazel query //modules/planning/... union //modules/common/... union //cyber/...`
     `bazel query //modules/prediction/... union //modules/control/...`
   "
 
@@ -472,7 +472,7 @@ function citest_extended() {
 function citest() {
   info "Building framework ..."
   cd /apollo
-  source cybertron/setup.bash
+  source cyber/setup.bash
 
   citest_basic
   citest_extended
@@ -500,7 +500,7 @@ function run_bash_lint() {
 
 function run_lint() {
   # Add cpplint rule to BUILD files that do not contain it.
-  for file in $(find cybertron modules -name BUILD |  grep -v gnss/third_party | \
+  for file in $(find cyber modules -name BUILD |  grep -v gnss/third_party | \
     xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
   do
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file

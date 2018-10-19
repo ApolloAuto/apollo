@@ -21,9 +21,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cybertron/common/log.h"
-#include "cybertron/message/message_traits.h"
-#include "cybertron/message/protobuf_factory.h"
+#include "cyber/common/log.h"
+#include "cyber/message/message_traits.h"
+#include "cyber/message/protobuf_factory.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
@@ -56,8 +56,8 @@
 namespace apollo {
 namespace tools {
 
-// using namespace apollo::cybertron::message;
-using apollo::cybertron::message::ProtobufFactory;
+// using namespace apollo::cyber::message;
+using apollo::cyber::message::ProtobufFactory;
 
 class ChannelInfo {
  public:

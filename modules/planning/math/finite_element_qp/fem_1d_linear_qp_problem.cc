@@ -20,7 +20,7 @@
 #include <chrono>
 
 #include "Eigen/Core"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/common/math/matrix_operations.h"
 

@@ -53,8 +53,8 @@ class MainWindow : public QMainWindow {
   explicit MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
 
-  void TopologyChanged(const apollo::cybertron::proto::ChangeMsg& change_msg);
-  void FindNewWriter(const apollo::cybertron::proto::RoleAttributes& role);
+  void TopologyChanged(const apollo::cyber::proto::ChangeMsg& change_msg);
+  void FindNewWriter(const apollo::cyber::proto::RoleAttributes& role);
 
  protected:
   void resizeEvent(QResizeEvent*) override;

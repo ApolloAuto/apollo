@@ -19,8 +19,8 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/macros.h"
+#include "cyber/cyber.h"
 #include "modules/data/proto/static_info.pb.h"
 
 /**
@@ -32,7 +32,7 @@ namespace data {
 
 class InfoCollector {
  public:
-  static void Init(const std::shared_ptr<apollo::cybertron::Node>& node);
+  static void Init(const std::shared_ptr<apollo::cyber::Node>& node);
   // Get task information.
   static const StaticInfo &GetStaticInfo();
 
@@ -50,7 +50,7 @@ class InfoCollector {
  private:
   StaticInfo static_info_;
   StaticInfoConf config_;
-  std::shared_ptr<cybertron::Reader<apollo::routing::RoutingRequest>>
+  std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
       routing_request_reader_;
 
   DECLARE_SINGLETON(InfoCollector);

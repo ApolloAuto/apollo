@@ -21,8 +21,8 @@
 #include <mutex>
 #include <string>
 
-#include "cybertron/class_loader/class_loader.h"
-#include "cybertron/component/timer_component.h"
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/timer_component.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
@@ -42,15 +42,15 @@
 namespace apollo {
 namespace control {
 
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 /**
  * @class Control
  *
  * @brief control module main class, it processes localization, chasiss, and
  * pad data to compute throttle, brake and steer values.
  */
-class ControlComponent final : public apollo::cybertron::TimerComponent {
+class ControlComponent final : public apollo::cyber::TimerComponent {
   friend class ControlTestBase;
 
  public:
@@ -122,6 +122,6 @@ class ControlComponent final : public apollo::cybertron::TimerComponent {
   LocalView local_view_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(ControlComponent)
+CYBER_REGISTER_COMPONENT(ControlComponent)
 }  // namespace control
 }  // namespace apollo

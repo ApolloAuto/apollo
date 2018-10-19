@@ -19,7 +19,7 @@ limitations under the License.
 
 #include "modules/canbus/vehicle/%(car_type_lower)s/%(car_type_lower)s_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"

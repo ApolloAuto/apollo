@@ -36,8 +36,8 @@ g_message_manager = PbMessageManager()
 
 def topic_publisher(topic, filename, period):
     """publisher"""
-    cybertron.init()
-    node = cybertron.Node("replay_file")
+    cyber.init()
+    node = cyber.Node("replay_file")
     meta_msg = None
     msg = None
     if not topic:
@@ -62,14 +62,14 @@ def topic_publisher(topic, filename, period):
     writer = node.create_writer(topic, meta_msg.msg_type)
 
     if period == 0:
-        while not cybertron.is_shutdown():
+        while not cyber.is_shutdown():
             raw_input("Press any key to publish one message...")
             writer.write(msg)
             print("Topic[%s] message published" % topic)
     else:
         print("started to publish topic[%s] message with rate period %s" %
               (topic, period))
-        while not cybertron.is_shutdown():
+        while not cyber.is_shutdown():
             writer.write(msg)
             time.sleep(period)
 

@@ -25,10 +25,10 @@
 #include <utility>
 #include <vector>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/component/timer_component.h"
-#include "cybertron/cybertron.h"
-#include "cybertron/timer/timer.h"
+#include "cyber/common/macros.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/cyber.h"
+#include "cyber/timer/timer.h"
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
@@ -50,8 +50,8 @@
 namespace apollo {
 namespace canbus {
 
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 
 /**
  * @class Canbus
@@ -59,7 +59,7 @@ using apollo::cybertron::Writer;
  * @brief canbus module main class.
  * It processes the control data to send protocol messages to can card.
  */
-class CanbusComponent final : public apollo::cybertron::TimerComponent {
+class CanbusComponent final : public apollo::cyber::TimerComponent {
  public:
   CanbusComponent();
   /**
@@ -105,7 +105,7 @@ class CanbusComponent final : public apollo::cybertron::TimerComponent {
   std::shared_ptr<Writer<ChassisDetail>> chassis_detail_writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(CanbusComponent)
+CYBER_REGISTER_COMPONENT(CanbusComponent)
 
 }  // namespace canbus
 }  // namespace apollo

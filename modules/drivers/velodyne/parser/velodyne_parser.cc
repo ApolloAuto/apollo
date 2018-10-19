@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/velodyne/parser/util.h"
 #include "modules/drivers/velodyne/parser/velodyne_parser.h"

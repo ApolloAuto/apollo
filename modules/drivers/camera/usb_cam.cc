@@ -792,7 +792,7 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
       raw_image->tv_usec = buf.timestamp.tv_usec;
 
       {
-        cybertron::Time image_time(raw_image->tv_sec,
+        cyber::Time image_time(raw_image->tv_sec,
                                    1000 * raw_image->tv_usec);
         uint64_t camera_timestamp = image_time.ToNanosecond();
         if (last_nsec_ == 0) {
@@ -814,7 +814,7 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
           last_nsec_ = camera_timestamp;
         }
 
-        double now_s = cybertron::Time::Now().ToSecond();
+        double now_s = cyber::Time::Now().ToSecond();
         double image_s = camera_timestamp / 1e9;
         double diff = now_s - image_s;
         if (diff > 0.5 || diff < 0) {

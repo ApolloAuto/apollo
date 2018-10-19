@@ -22,10 +22,10 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/class_loader/class_loader.h"
-#include "cybertron/component/component.h"
-#include "cybertron/cybertron.h"
-#include "cybertron/message/raw_message.h"
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/component.h"
+#include "cyber/cyber.h"
+#include "cyber/message/raw_message.h"
 
 #include "modules/localization/msf/msf_localization.h"
 
@@ -41,7 +41,7 @@ namespace apollo {
 namespace localization {
 
 class MSFLocalizationComponent final
-    : public cybertron::Component<drivers::gnss::Imu> {
+    : public cyber::Component<drivers::gnss::Imu> {
  public:
   MSFLocalizationComponent();
   ~MSFLocalizationComponent() = default;
@@ -55,11 +55,11 @@ class MSFLocalizationComponent final
   bool InitIO();
 
  private:
-  std::shared_ptr<cybertron::Reader<drivers::PointCloud>> lidar_listener_ =
+  std::shared_ptr<cyber::Reader<drivers::PointCloud>> lidar_listener_ =
       nullptr;
   std::string lidar_topic_ = "";
 
-  std::shared_ptr<cybertron::Reader<drivers::gnss::GnssBestPose>>
+  std::shared_ptr<cyber::Reader<drivers::gnss::GnssBestPose>>
       bestgnsspos_listener_ = nullptr;
   std::string bestgnsspos_topic_ = "";
 
@@ -68,12 +68,12 @@ class MSFLocalizationComponent final
   MSFLocalization localization_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(MSFLocalizationComponent);
+CYBER_REGISTER_COMPONENT(MSFLocalizationComponent);
 
 class LocalizationMsgPublisher {
  public:
   explicit LocalizationMsgPublisher(
-      const std::shared_ptr<cybertron::Node>& node);
+      const std::shared_ptr<cyber::Node>& node);
   ~LocalizationMsgPublisher() = default;
 
   bool InitConfig(const msf_config::Config& config);
@@ -87,10 +87,10 @@ class LocalizationMsgPublisher {
   void PublishLocalizationStatus(const LocalizationStatus& localization_status);
 
  private:
-  std::shared_ptr<cybertron::Node> node_;
+  std::shared_ptr<cyber::Node> node_;
 
   std::string localization_topic_ = "";
-  std::shared_ptr<cybertron::Writer<LocalizationEstimate>>
+  std::shared_ptr<cyber::Writer<LocalizationEstimate>>
       localization_talker_ = nullptr;
 
   std::string broadcast_tf_frame_id_ = "";
@@ -98,15 +98,15 @@ class LocalizationMsgPublisher {
   apollo::transform::TransformBroadcaster tf2_broadcaster_;
 
   std::string lidar_local_topic_ = "";
-  std::shared_ptr<cybertron::Writer<LocalizationEstimate>> lidar_local_talker_ =
+  std::shared_ptr<cyber::Writer<LocalizationEstimate>> lidar_local_talker_ =
       nullptr;
 
   std::string gnss_local_topic_ = "";
-  std::shared_ptr<cybertron::Writer<LocalizationEstimate>> gnss_local_talker_ =
+  std::shared_ptr<cyber::Writer<LocalizationEstimate>> gnss_local_talker_ =
       nullptr;
 
   std::string localization_status_topic_ = "";
-  std::shared_ptr<cybertron::Writer<LocalizationStatus>>
+  std::shared_ptr<cyber::Writer<LocalizationStatus>>
       localization_status_talker_ = nullptr;
 };
 

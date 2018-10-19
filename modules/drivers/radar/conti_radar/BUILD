@@ -39,7 +39,7 @@ cc_library(
         "//modules/localization/proto:pose_proto",
         "//modules/localization/proto:localization_proto",
         "@eigen//:eigen",
-        "//cybertron",
+        "//cyber",
     ],
     copts = ['-DMODULE_NAME=\\"conti_radar\\"']
 )

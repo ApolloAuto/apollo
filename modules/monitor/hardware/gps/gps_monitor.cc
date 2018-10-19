@@ -18,7 +18,7 @@
 
 #include <algorithm>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"

@@ -22,7 +22,7 @@ namespace camera {
 
 bool CameraComponent::Init() {
   camera_config_ = std::make_shared<Config>();
-  if (!apollo::cybertron::common::GetProtoFromFile(config_file_path_,
+  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
                                                    camera_config_.get())) {
     return false;
   }
@@ -68,15 +68,15 @@ bool CameraComponent::Init() {
   }
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
-  cybertron::Async(&CameraComponent::run, this);
+  cyber::Async(&CameraComponent::run, this);
   return true;
 }
 
 void CameraComponent::run() {
-  while (!cybertron::IsShutdown()) {
+  while (!cyber::IsShutdown()) {
     if (!camera_device_->wait_for_device()) {
       // sleep for next check
-      cybertron::SleepFor(std::chrono::milliseconds(device_wait_));
+      cyber::SleepFor(std::chrono::milliseconds(device_wait_));
       continue;
     }
 
@@ -85,18 +85,18 @@ void CameraComponent::run() {
       continue;
     }
 
-    cybertron::Time image_time(raw_image_->tv_sec, 1000 * raw_image_->tv_usec);
+    cyber::Time image_time(raw_image_->tv_sec, 1000 * raw_image_->tv_usec);
     if (index_ >= buffer_size_) {
       index_ = 0;
     }
     auto pb_image = pb_image_buffer_.at(index_++);
     pb_image->mutable_header()->set_timestamp_sec(
-        cybertron::Time::Now().ToSecond());
+        cyber::Time::Now().ToSecond());
     pb_image->set_measurement_time(image_time.ToSecond());
     pb_image->set_data(raw_image_->image, raw_image_->image_size);
     writer_->Write(pb_image);
 
-    cybertron::SleepFor(std::chrono::microseconds(spin_rate_));
+    cyber::SleepFor(std::chrono::microseconds(spin_rate_));
   }
 }
 

@@ -21,7 +21,7 @@
 #include "modules/planning/common/ego_info.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {

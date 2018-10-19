@@ -15,7 +15,7 @@ limitations under the License.
 
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/canbus/vehicle/lexus/lexus_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/proto/vehicle_signal.pb.h"

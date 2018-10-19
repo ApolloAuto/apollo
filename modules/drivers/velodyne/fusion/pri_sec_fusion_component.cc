@@ -22,7 +22,7 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::cybertron::Time;
+using apollo::cyber::Time;
 
 bool PriSecFusionComponent::Init() {
   if (!GetProtoConfig(&conf_)) {
@@ -81,7 +81,7 @@ bool PriSecFusionComponent::QueryPoseAffine(const std::string& target_frame_id,
                                             Eigen::Affine3d* pose) {
   std::string err_string;
   if (!buffer_ptr_->canTransform(target_frame_id, source_frame_id,
-                                 cybertron::Time(0), 0.02, &err_string)) {
+                                 cyber::Time(0), 0.02, &err_string)) {
     AERROR << "Can not find transform. "
            << "target_id:" << target_frame_id << " frame_id:" << source_frame_id
            << " Error info: " << err_string;
@@ -90,7 +90,7 @@ bool PriSecFusionComponent::QueryPoseAffine(const std::string& target_frame_id,
   apollo::transform::TransformStamped stamped_transform;
   try {
     stamped_transform = buffer_ptr_->lookupTransform(
-        target_frame_id, source_frame_id, cybertron::Time(0));
+        target_frame_id, source_frame_id, cyber::Time(0));
   } catch (tf2::TransformException& ex) {
     AERROR << ex.what();
     return false;

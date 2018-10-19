@@ -9,7 +9,7 @@ cc_binary(
         "monitor.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/util:message_util",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/hardware/gps:gps_monitor",

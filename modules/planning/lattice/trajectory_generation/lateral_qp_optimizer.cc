@@ -16,7 +16,7 @@
 
 #include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {

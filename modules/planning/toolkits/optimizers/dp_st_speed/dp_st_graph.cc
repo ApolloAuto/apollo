@@ -25,11 +25,11 @@
 #include <string>
 #include <utility>
 
-#include "cybertron/task/task.h"
+#include "cyber/task/task.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -181,7 +181,7 @@ Status DpStGraph::CalculateTotalCost() {
         auto msg = std::make_shared<StGraphMessage>(c, r);
         if (FLAGS_enable_multi_thread_in_dp_st_graph) {
           results.push_back(
-              cybertron::Async(&DpStGraph::CalculateCostAt, this, msg));
+              cyber::Async(&DpStGraph::CalculateCostAt, this, msg));
         } else {
           CalculateCostAt(msg);
         }

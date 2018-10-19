@@ -14,7 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include <gtest/gtest.h>
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 
 #define private public

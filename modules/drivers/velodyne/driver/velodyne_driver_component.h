@@ -19,7 +19,7 @@
 #include <string>
 #include <thread>
 
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/velodyne/driver/driver.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
@@ -29,9 +29,9 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::cybertron::Component;
-using apollo::cybertron::Reader;
-using apollo::cybertron::Writer;
+using apollo::cyber::Component;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::drivers::velodyne::VelodyneScan;
 
 class VelodyneDriverComponent : public Component<> {
@@ -49,10 +49,10 @@ class VelodyneDriverComponent : public Component<> {
   uint32_t seq_ = 0;
   std::shared_ptr<std::thread> device_thread_;
   std::shared_ptr<VelodyneDriver> dvr_;  ///< driver implementation class
-  std::shared_ptr<apollo::cybertron::Writer<VelodyneScan>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<VelodyneScan>> writer_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(VelodyneDriverComponent)
+CYBER_REGISTER_COMPONENT(VelodyneDriverComponent)
 
 }  // namespace velodyne
 }  // namespace drivers

@@ -20,8 +20,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "cybertron/component/timer_component.h"
-#include "cybertron/cybertron.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/cyber.h"
 #include "gflags/gflags.h"
 
 #include "modules/localization/proto/localization.pb.h"
@@ -29,7 +29,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/util/color.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/message_util.h"
@@ -56,7 +56,7 @@ DEFINE_bool(all_lights, false, "set all lights on the map");
 DEFINE_double(traffic_light_distance, 1000.0,
               "only retrieves traffic lights within this distance");
 
-class ManualTrafficLight final : public ::apollo::cybertron::TimerComponent {
+class ManualTrafficLight final : public ::apollo::cyber::TimerComponent {
  public:
   bool Init() {
     localization_reader_ = node_->CreateReader<LocalizationEstimate>(
@@ -247,10 +247,10 @@ class ManualTrafficLight final : public ::apollo::cybertron::TimerComponent {
   bool has_localization_ = false;
   LocalizationEstimate localization_;
   std::unordered_set<std::string> prev_traffic_lights_;
-  std::shared_ptr<::apollo::cybertron::Writer<TrafficLightDetection>>
+  std::shared_ptr<::apollo::cyber::Writer<TrafficLightDetection>>
       traffic_light_detection_writer_ = nullptr;
-  std::shared_ptr<::apollo::cybertron::Reader<LocalizationEstimate>>
+  std::shared_ptr<::apollo::cyber::Reader<LocalizationEstimate>>
       localization_reader_ = nullptr;
 };
 
-CYBERTRON_REGISTER_COMPONENT(ManualTrafficLight);
+CYBER_REGISTER_COMPONENT(ManualTrafficLight);

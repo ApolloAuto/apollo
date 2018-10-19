@@ -26,7 +26,7 @@
 #include "boost/program_options.hpp"
 #include "yaml-cpp/yaml.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 

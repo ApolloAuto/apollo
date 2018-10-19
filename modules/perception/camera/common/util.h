@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image.h"
 #include "modules/perception/base/object.h"
@@ -152,7 +152,7 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_gpu,
                std::shared_ptr<base::Blob<float>> dst, int stepwidth,
                int start_axis);
 
-void GetCybertronWorkRoot(std::string *work_root);
+void GetCyberWorkRoot(std::string *work_root);
 void FillObjectPolygonFromBBox3D(base::Object *object_ptr);
 
 template <typename T>

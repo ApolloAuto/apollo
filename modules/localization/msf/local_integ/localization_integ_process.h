@@ -26,7 +26,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "cybertron/cybertron.h"
+#include "cyber/cyber.h"
 
 #include "include/sins.h"
 #include "modules/common/status/status.h"

@@ -11,7 +11,7 @@ cc_library(
         "net_util.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
     ],
@@ -26,7 +26,7 @@ cc_library(
         "net_layer.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/prediction/network:net_util",
         "//modules/prediction/proto:network_model_proto",
         "@eigen//:eigen",
@@ -42,7 +42,7 @@ cc_library(
         "net_model.h",
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/util",
         "//modules/prediction/network:net_layer",
         "//modules/prediction/proto:network_model_proto",

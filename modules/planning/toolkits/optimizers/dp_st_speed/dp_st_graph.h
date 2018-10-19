@@ -57,7 +57,7 @@ class DpStGraph {
 
   apollo::common::Status CalculateTotalCost();
 
-  // defined for cybertron task
+  // defined for cyber task
   struct StGraphMessage {
     StGraphMessage(const uint32_t c_, const int32_t r_) : c(c_), r(r_) {}
     uint32_t c;

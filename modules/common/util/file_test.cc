@@ -17,7 +17,7 @@
 #include "modules/common/util/file.h"
 
 #include "boost/filesystem.hpp"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/common/util/testdata/simple.pb.h"

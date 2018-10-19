@@ -24,7 +24,7 @@
 #include <string>
 #include <memory>
 
-#include "cybertron/common/macros.h"
+#include "cyber/common/macros.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/proto/scenario.pb.h"

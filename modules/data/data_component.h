@@ -23,9 +23,9 @@
 #include <memory>
 #include <string>
 
-#include "cybertron/common/macros.h"
-#include "cybertron/component/timer_component.h"
-#include "cybertron/cybertron.h"
+#include "cyber/common/macros.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/cyber.h"
 
 #include "modules/data/proto/data.pb.h"
 #include "modules/data/proto/data_conf.pb.h"
@@ -38,7 +38,7 @@ namespace apollo {
 namespace data {
 
 class DataComponent final
-    : public apollo::cybertron::Component<DataInputCommand> {
+    : public apollo::cyber::Component<DataInputCommand> {
  public:
   DataComponent() = default;
   ~DataComponent() = default;
@@ -54,11 +54,11 @@ class DataComponent final
     const std::shared_ptr<DataInputCommand> &data_input_cmd);
  private:
   DataConf data_conf_;
-  std::shared_ptr<apollo::cybertron::Reader<DataInputCommand>>
+  std::shared_ptr<apollo::cyber::Reader<DataInputCommand>>
     data_input_cmd_reader_;
 };
 
-CYBERTRON_REGISTER_COMPONENT(DataComponent)
+CYBER_REGISTER_COMPONENT(DataComponent)
 
 }  // namespace data
 }  // namespace apollo

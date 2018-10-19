@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/data/data_component.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"

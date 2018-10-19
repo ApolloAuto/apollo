@@ -169,8 +169,8 @@ class HdmapROIFilterTest : public ::testing::Test {
  public:
   HdmapROIFilterTest() : hdmap_roi_filter_ptr_(new HdmapROIFilter) {
     // prepare test data
-    char cybertron_path[50] = "CYBERTRON_PATH=";
-    putenv(cybertron_path);
+    char cyber_path[50] = "CYBER_PATH=";
+    putenv(cyber_path);
     char module_path[50] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_work_root = "/apollo/modules/perception/testdata/"

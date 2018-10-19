@@ -9,7 +9,7 @@ cc_library(
     hdrs = ["scenario_features.h"],
     deps = [
         "//modules/prediction/proto:scenario_proto",
-        "//cybertron",
+        "//cyber",
     ],
 )
 
@@ -22,7 +22,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:environment_features",
-        "//cybertron",
+        "//cyber",
     ],
 )
 

@@ -8,7 +8,7 @@ cc_library(
     srcs = ["feature_extractor.cc"],
     hdrs = ["feature_extractor.h"],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/math:geometry",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:environment_features",

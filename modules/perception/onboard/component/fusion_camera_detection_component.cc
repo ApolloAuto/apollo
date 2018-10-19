@@ -27,7 +27,7 @@
 #include <string>
 #include <tuple>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time_util.h"
 #include "modules/common/util/file.h"
@@ -46,7 +46,7 @@ namespace onboard {
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
   std::string work_root = "";
-  camera::GetCybertronWorkRoot(&work_root);
+  camera::GetCyberWorkRoot(&work_root);
   std::string config_file =
       lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = lib::FileUtil::GetAbsolutePath(work_root, config_file);
@@ -179,33 +179,33 @@ FusionCameraDetectionComponent::~FusionCameraDetectionComponent() {}
 bool FusionCameraDetectionComponent::Init() {
   writer_ = node_->CreateWriter<PerceptionObstacles>("/perception/obstacles");
 
-  if (InitConfig() != cybertron::SUCC) {
+  if (InitConfig() != cyber::SUCC) {
     AERROR << "InitConfig() failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
-  if (InitSensorInfo() != cybertron::SUCC) {
+  if (InitSensorInfo() != cyber::SUCC) {
     AERROR << "InitSensorInfo() failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
-  if (InitAlgorithmPlugin() != cybertron::SUCC) {
+  if (InitAlgorithmPlugin() != cyber::SUCC) {
     AERROR << "InitAlgorithmPlugin() failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
-  if (InitCameraFrames() != cybertron::SUCC) {
+  if (InitCameraFrames() != cyber::SUCC) {
     AERROR << "InitCameraFrames() failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
-  if (InitProjectMatrix() != cybertron::SUCC) {
+  if (InitProjectMatrix() != cyber::SUCC) {
     AERROR << "InitProjectMatrix() failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
-  if (InitCameraListeners() != cybertron::SUCC) {
+  if (InitCameraListeners() != cyber::SUCC) {
     AERROR << "InitCameraListeners() failed.";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   SetCameraHeightAndPitch();
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 void FusionCameraDetectionComponent::OnReceiveImage(
@@ -246,10 +246,10 @@ void FusionCameraDetectionComponent::OnReceiveImage(
                                                            SensorFrameMessage);
 
   if (InternalProc(message, camera_name, &error_code, prefused_message.get(),
-                   out_message.get()) != cybertron::SUCC) {
+                   out_message.get()) != cyber::SUCC) {
     AERROR << "InternalProc failed, error_code: " << error_code;
     if (MakeProtobufMsg(msg_timestamp, seq_num_, std::vector<base::ObjectPtr>(),
-                        error_code, out_message.get()) != cybertron::SUCC) {
+                        error_code, out_message.get()) != cyber::SUCC) {
       AERROR << "MakeProtobufMsg failed";
       return;
     }
@@ -277,7 +277,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
 }
 
 int FusionCameraDetectionComponent::InitConfig() {
-  // the macro READ_CONF would return cybertron::FAIL if config not exists
+  // the macro READ_CONF would return cyber::FAIL if config not exists
   apollo::perception::onboard::FusionCameraDetection
       fusion_camera_detection_param;
   if (!GetProtoConfig(&fusion_camera_detection_param)) {
@@ -290,7 +290,7 @@ int FusionCameraDetectionComponent::InitConfig() {
                           boost::algorithm::is_any_of(","));
   if (camera_names_.size() != 2) {
     AERROR << "Now FusionCameraDetectionComponent only support 2 cameras";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   std::string input_camera_channel_names_str =
@@ -301,7 +301,7 @@ int FusionCameraDetectionComponent::InitConfig() {
   if (input_camera_channel_names_.size() != camera_names_.size()) {
     AERROR << "wrong input_camera_channel_names_.size(): "
            << input_camera_channel_names_.size();
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   camera_perception_init_options_.root_dir =
@@ -310,7 +310,7 @@ int FusionCameraDetectionComponent::InitConfig() {
       fusion_camera_detection_param.camera_obstacle_perception_conf_file();
   camera_perception_init_options_.lane_calibration_working_sensor_name =
       fusion_camera_detection_param.lane_calibration_working_sensor_name();
-  camera_perception_init_options_.use_cybertron_work_root = true;
+  camera_perception_init_options_.use_cyber_work_root = true;
   frame_capacity_ = fusion_camera_detection_param.frame_capacity();
   image_channel_num_ = fusion_camera_detection_param.image_channel_num();
   enable_undistortion_ = fusion_camera_detection_param.enable_undistortion();
@@ -356,13 +356,13 @@ int FusionCameraDetectionComponent::InitConfig() {
           output_final_obstacles_ % prefused_channel_name_);
   AINFO << config_info_str;
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int FusionCameraDetectionComponent::InitSensorInfo() {
   if (camera_names_.size() != 2) {
     AERROR << "invalid camera_names_.size(): " << camera_names_.size();
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   common::SensorManager *sensor_manager =
@@ -370,13 +370,13 @@ int FusionCameraDetectionComponent::InitSensorInfo() {
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     if (!sensor_manager->IsSensorExist(camera_names_[i])) {
       AERROR << ("sensor_name: " + camera_names_[i] + " not exists.");
-      return cybertron::FAIL;
+      return cyber::FAIL;
     }
 
     base::SensorInfo sensor_info;
     if (!(sensor_manager->GetSensorInfo(camera_names_[i], &sensor_info))) {
       AERROR << "Failed to get sensor info, sensor name: " << camera_names_[i];
-      return cybertron::FAIL;
+      return cyber::FAIL;
     }
     sensor_info_map_[camera_names_[i]] = sensor_info;
 
@@ -407,28 +407,28 @@ int FusionCameraDetectionComponent::InitSensorInfo() {
           image_height_ % image_channel_num_);
   AINFO << sensor_info_str;
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int FusionCameraDetectionComponent::InitAlgorithmPlugin() {
   camera_obstacle_pipeline_.reset(new camera::ObstacleCameraPerception);
   if (!camera_obstacle_pipeline_->Init(camera_perception_init_options_)) {
     AERROR << "camera_obstacle_pipeline_->Init() failed";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int FusionCameraDetectionComponent::InitCameraFrames() {
   if (camera_names_.size() != 2) {
     AERROR << "invalid camera_names_.size(): " << camera_names_.size();
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   // fixed size
   camera_frames_.resize(frame_capacity_);
   if (camera_frames_.size() == 0) {
     AERROR << "frame_capacity_ must > 0";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   // init data_providers for each camera
@@ -440,7 +440,7 @@ int FusionCameraDetectionComponent::InitCameraFrames() {
     data_provider_init_options.sensor_name = camera_name;
     int gpu_id = GetGpuId(camera_perception_init_options_);
     if (gpu_id == -1) {
-      return cybertron::FAIL;
+      return cyber::FAIL;
     }
     data_provider_init_options.device_id = gpu_id;
     AINFO << "data_provider_init_options.device_id: "
@@ -482,14 +482,14 @@ int FusionCameraDetectionComponent::InitCameraFrames() {
     frame.track_feature_blob.reset(new base::Blob<float>());
     frame.lane_detected_blob.reset(new base::Blob<float>());
   }
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int FusionCameraDetectionComponent::InitProjectMatrix() {
   if (!GetProjectMatrix(camera_names_, extrinsic_map_, intrinsic_map_,
                         &project_matrix_, &pitch_diff_)) {
     AERROR << "GetProjectMatrix failed";
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   AINFO << "project_matrix_: " << project_matrix_;
   AINFO << "pitch_diff_:" << pitch_diff_;
@@ -497,7 +497,7 @@ int FusionCameraDetectionComponent::InitProjectMatrix() {
   name_camera_pitch_angle_diff_map_[camera_names_[1]] =
       static_cast<float>(pitch_diff_);
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int FusionCameraDetectionComponent::InitCameraListeners() {
@@ -513,7 +513,7 @@ int FusionCameraDetectionComponent::InitCameraListeners() {
                   std::placeholders::_1, camera_name);
     auto camera_reader = node_->CreateReader(channel_name, camera_callback);
   }
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 void FusionCameraDetectionComponent::SetCameraHeightAndPitch() {
@@ -543,14 +543,14 @@ int FusionCameraDetectionComponent::InternalProc(
   // Get sensor to world pose from TF
   Eigen::Affine3d camera2world_trans;
   if (camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
-          msg_timestamp, &camera2world_trans) != cybertron::SUCC) {
+          msg_timestamp, &camera2world_trans) != cyber::SUCC) {
     std::string err_str = "failed to get camera to world pose, ts: " +
                           std::to_string(msg_timestamp) +
                           " camera_name: " + camera_name;
     AERROR << err_str;
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     prefused_message->error_code_ = *error_code;
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   prefused_message->frame_->sensor2world_pose = camera2world_trans;
 
@@ -583,7 +583,7 @@ int FusionCameraDetectionComponent::InternalProc(
            << " msg_timestamp: " << std::to_string(msg_timestamp);
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     prefused_message->error_code_ = *error_code;
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   AINFO << "##" << camera_name << ": pitch "
         << camera_frame.calibration_service->QueryPitchAngle()
@@ -602,12 +602,12 @@ int FusionCameraDetectionComponent::InternalProc(
   // process success, make pb msg
   if (output_final_obstacles_ &&
       MakeProtobufMsg(msg_timestamp, seq_num_, camera_frame.tracked_objects,
-                      *error_code, out_message) != cybertron::SUCC) {
+                      *error_code, out_message) != cyber::SUCC) {
     AERROR << "MakeProtobufMsg failed"
            << " ts: " << std::to_string(msg_timestamp);
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_UNKNOWN;
     prefused_message->error_code_ = *error_code;
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
   *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_NONE;
   prefused_message->error_code_ = *error_code;
@@ -639,7 +639,7 @@ int FusionCameraDetectionComponent::InternalProc(
     // Send(camera_perception_viz_message_channel_name_, viz_msg);
   }
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int FusionCameraDetectionComponent::MakeProtobufMsg(
@@ -647,7 +647,7 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
     const std::vector<base::ObjectPtr> &objects,
     const apollo::common::ErrorCode error_code,
     apollo::perception::PerceptionObstacles *obstacles) {
-  double publish_time = apollo::cybertron::Time::Now().ToSecond();
+  double publish_time = apollo::cyber::Time::Now().ToSecond();
   apollo::common::Header *header = obstacles->mutable_header();
   header->set_timestamp_sec(publish_time);
   header->set_module_name("perception_camera");
@@ -662,19 +662,19 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
   for (const auto &obj : objects) {
     apollo::perception::PerceptionObstacle *obstacle =
         obstacles->add_perception_obstacle();
-    if (ConvertObjectToPb(obj, obstacle) != cybertron::SUCC) {
+    if (ConvertObjectToPb(obj, obstacle) != cyber::SUCC) {
       AERROR << "ConvertObjectToPb failed, Object:" << obj->ToString();
-      return cybertron::FAIL;
+      return cyber::FAIL;
     }
   }
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 int FusionCameraDetectionComponent::ConvertObjectToPb(
     const base::ObjectPtr &object_ptr,
     apollo::perception::PerceptionObstacle *pb_msg) {
   if (!object_ptr || !pb_msg) {
-    return cybertron::FAIL;
+    return cyber::FAIL;
   }
 
   pb_msg->set_id(object_ptr->track_id);
@@ -746,7 +746,7 @@ int FusionCameraDetectionComponent::ConvertObjectToPb(
     light_status->set_right_turn_switch_on(car_light.right_turn_switch_on);
   }
 
-  return cybertron::SUCC;
+  return cyber::SUCC;
 }
 
 }  // namespace onboard

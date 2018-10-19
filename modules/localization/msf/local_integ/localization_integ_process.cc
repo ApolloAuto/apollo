@@ -19,7 +19,7 @@
 #include <iomanip>
 #include "yaml-cpp/yaml.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/time/timer.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
@@ -251,7 +251,7 @@ void LocalizationIntegProcess::MeasureDataProcess(
 void LocalizationIntegProcess::StartThreadLoop() {
   keep_running_ = true;
   measure_data_queue_size_ = 150;
-  cybertron::Async(&LocalizationIntegProcess::MeasureDataThreadLoop, this);
+  cyber::Async(&LocalizationIntegProcess::MeasureDataThreadLoop, this);
 }
 
 void LocalizationIntegProcess::StopThreadLoop() {
@@ -272,7 +272,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
       }
       if (measure_data_queue_.size() == 0) {
         lock.unlock();
-        cybertron::Yield();
+        cyber::Yield();
         continue;
       }
     }

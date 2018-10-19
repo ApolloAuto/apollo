@@ -16,7 +16,7 @@
 #include <google/protobuf/stubs/common.h>
 #include <gtest/gtest.h>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 #include "modules/perception/lib/thread/concurrent_queue.h"
 #include "modules/perception/lib/thread/thread_pool.h"

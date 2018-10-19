@@ -18,7 +18,7 @@
 #include <cblas.h>
 #include <memory>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/utils/gemm.h"
 

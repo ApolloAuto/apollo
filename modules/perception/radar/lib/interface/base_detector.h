@@ -56,8 +56,8 @@
 
 #include "Eigen/Core"
 
-#include "cybertron/common/macros.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/macros.h"
+#include "cyber/common/log.h"
 
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/base/frame.h"

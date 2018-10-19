@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_integ/gnss_msg_transfer.h"
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {

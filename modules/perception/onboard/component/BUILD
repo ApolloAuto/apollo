@@ -36,7 +36,7 @@ cc_library(
         '-DMODULE_NAME=\\"perception\\"',
     ],
     deps = [
-        "//cybertron",
+        "//cyber",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",

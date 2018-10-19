@@ -1,8 +1,8 @@
 <!--this file list the modules which will be loaded dynamicly and 
     their process name to be running in -->
 
-<cybertron>
-    <desc>cybertron modules list config</desc>
+<cyber>
+    <desc>cyber modules list config</desc>
     <version>1.0.0</version>
 
     <!-- sample module config, and the files should have relative path like
@@ -18,4 +18,4 @@
         <version>1.0.0</version>
     </module>
 
-</cybertron>
+</cyber>

@@ -21,7 +21,7 @@
 
 #include "gtest/gtest.h"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace common {
@@ -29,7 +29,7 @@ namespace monitor {
 
 class MonitorBufferTest : public ::testing::Test {
  protected:
-  void SetUp() override { cybertron::Init(); }
+  void SetUp() override { cyber::Init(); }
   void TearDown() override {}
   MonitorLogBuffer buffer_{MonitorMessageItem::CONTROL};
 };

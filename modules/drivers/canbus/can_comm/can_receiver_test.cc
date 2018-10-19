@@ -28,7 +28,7 @@ namespace drivers {
 namespace canbus {
 
 TEST(CanReceiverTest, ReceiveOne) {
-  cybertron::Init();
+  cyber::Init();
   can::FakeCanClient can_client;
   MessageManager<::apollo::canbus::ChassisDetail> pm;
   CanReceiver<::apollo::canbus::ChassisDetail> receiver;
@@ -38,7 +38,7 @@ TEST(CanReceiverTest, ReceiveOne) {
   EXPECT_TRUE(receiver.IsRunning());
   receiver.Stop();
   EXPECT_FALSE(receiver.IsRunning());
-  cybertron::Shutdown();
+  cyber::Shutdown();
 }
 
 }  // namespace canbus

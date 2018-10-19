@@ -24,7 +24,7 @@
 #include <cmath>
 #include <utility>
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/common/math/vec2d.h"

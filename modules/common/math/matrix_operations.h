@@ -28,7 +28,7 @@
 #include "Eigen/Dense"
 #include "Eigen/SVD"
 
-#include "cybertron/common/log.h"
+#include "cyber/common/log.h"
 
 /**
  * @namespace apollo::common::math
