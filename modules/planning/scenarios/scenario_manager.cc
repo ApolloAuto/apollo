@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "modules/map/pnc_map/path.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"
@@ -48,8 +48,8 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     ptr.reset(
         new LaneFollowScenario(config_map_[scenario_type], &scenario_context_));
   } else if (scenario_type == ScenarioConfig::SIDE_PASS) {
-    ptr.reset(
-        new SidePassScenario(config_map_[scenario_type], &scenario_context_));
+    ptr.reset(new scenario::side_pass::SidePassScenario(
+        config_map_[scenario_type], &scenario_context_));
   } else if (scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
     ptr.reset(new StopSignUnprotectedScenario(config_map_[scenario_type],
                                               &scenario_context_));
@@ -116,7 +116,7 @@ void ScenarioManager::Observe(const Frame& frame) {
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-        conf_min_pass_s_distance_ &&
+            conf_min_pass_s_distance_ &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap =

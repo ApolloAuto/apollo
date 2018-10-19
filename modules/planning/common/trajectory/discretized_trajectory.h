@@ -55,12 +55,12 @@ class DiscretizedTrajectory : public Trajectory {
 
   common::TrajectoryPoint Evaluate(const double relative_time) const override;
 
-  virtual uint32_t QueryLowerBoundPoint(const double relative_time) const;
+  virtual size_t QueryLowerBoundPoint(const double relative_time) const;
 
-  virtual uint32_t QueryNearestPoint(const common::math::Vec2d& position) const;
+  virtual size_t QueryNearestPoint(const common::math::Vec2d& position) const;
 
-  uint32_t QueryNearestPointWithBuffer(
-      const common::math::Vec2d& position, const double buffer) const;
+  uint32_t QueryNearestPointWithBuffer(const common::math::Vec2d& position,
+                                       const double buffer) const;
 
   virtual void AppendTrajectoryPoint(
       const common::TrajectoryPoint& trajectory_point);
@@ -88,8 +88,8 @@ class DiscretizedTrajectory : public Trajectory {
   std::vector<common::TrajectoryPoint> trajectory_points_;
 };
 
-inline std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
-  return trajectory_points_.size();
+inline uint32_t DiscretizedTrajectory::NumOfPoints() const {
+  return static_cast<uint32_t>(trajectory_points_.size());
 }
 
 inline const std::vector<common::TrajectoryPoint>&

@@ -6,9 +6,11 @@ cc_library(
     name = "side_pass",
     srcs = [
         "side_pass_scenario.cc",
+        "side_pass_stage.cc",
     ],
     hdrs = [
         "side_pass_scenario.h",
+        "side_pass_stage.h",
     ],
     deps = [
         "//cyber/common:log",

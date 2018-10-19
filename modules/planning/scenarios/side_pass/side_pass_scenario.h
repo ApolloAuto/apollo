@@ -34,17 +34,20 @@
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/scenarios/side_pass/side_pass_stage.h"
 #include "modules/planning/toolkits/task.h"
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace side_pass {
+
+struct SidePassContext {
+  PathData path_data_;
+};
 
 class SidePassScenario : public Scenario {
  public:
-  struct SidePassContext {
-    PathData path_data_;
-  };
-
   explicit SidePassScenario(const ScenarioConfig& config,
                             const ScenarioContext* scenario_context)
       : Scenario(config, scenario_context) {}
@@ -83,11 +86,7 @@ class SidePassScenario : public Scenario {
   double wait_point_s = 0;
 };
 
-DECLARE_STAGE(SidePassApproachObstacle, SidePassScenario::SidePassContext);
-DECLARE_STAGE(SidePassGeneratePath, SidePassScenario::SidePassContext);
-DECLARE_STAGE(SidePassStopOnWaitPoint, SidePassScenario::SidePassContext);
-DECLARE_STAGE(SidePassDetectSafety, SidePassScenario::SidePassContext);
-DECLARE_STAGE(SidePassPassObstacle, SidePassScenario::SidePassContext);
-
+}  // namespace side_pass
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

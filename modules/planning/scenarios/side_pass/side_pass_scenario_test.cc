@@ -31,6 +31,8 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace side_pass {
 
 class SidePassScenarioTest : public ::testing::Test {
  public:
@@ -63,5 +65,7 @@ TEST_F(SidePassScenarioTest, Init) {
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::SIDE_PASS);
 }
 
+}  // namespace side_pass
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

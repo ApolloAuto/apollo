@@ -66,7 +66,7 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
       *(it_lower - 1), *it_lower, relative_time);
 }
 
-std::uint32_t DiscretizedTrajectory::QueryLowerBoundPoint(
+size_t DiscretizedTrajectory::QueryLowerBoundPoint(
     const double relative_time) const {
   CHECK(!trajectory_points_.empty());
 
@@ -82,7 +82,7 @@ std::uint32_t DiscretizedTrajectory::QueryLowerBoundPoint(
   return std::distance(trajectory_points_.begin(), it_lower);
 }
 
-std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
+size_t DiscretizedTrajectory::QueryNearestPoint(
     const common::math::Vec2d& position) const {
   double dist_sqr_min = std::numeric_limits<double>::max();
   std::uint32_t index_min = 0;
