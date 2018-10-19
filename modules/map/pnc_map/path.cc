@@ -34,11 +34,11 @@ namespace apollo {
 namespace hdmap {
 
 using common::math::Box2d;
+using common::math::kMathEpsilon;
 using common::math::LineSegment2d;
 using common::math::Polygon2d;
 using common::math::Sqr;
 using common::math::Vec2d;
-using common::math::kMathEpsilon;
 using std::placeholders::_1;
 
 namespace {
@@ -491,12 +491,8 @@ void Path::InitOverlaps() {
   GetAllOverlaps(std::bind(&LaneInfo::junctions, _1), &junction_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::clear_areas, _1), &clear_area_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::speed_bumps, _1), &speed_bump_overlaps_);
-
-  // TODO(all): add support for parking.
-  /*
   GetAllOverlaps(std::bind(&LaneInfo::parking_spaces, _1),
-                   &parking_space_overlaps_);
-  */
+                 &parking_space_overlaps_);
 }
 
 MapPathPoint Path::GetSmoothPoint(const InterpolatedIndex& index) const {

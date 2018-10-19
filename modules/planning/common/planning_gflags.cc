@@ -399,6 +399,15 @@ DEFINE_string(planner_open_space_config_filename,
               "/apollo/modules/planning/conf/planner_open_space_config.pb.txt",
               "The open space planner configuration file");
 
+DEFINE_string(target_parking_spot_id, "11315", "the test parking spot id");
+
+DEFINE_double(
+    parking_longitudinal_range, 15.0,
+    "the distance serving as the parking range when solving the problem");
+
+DEFINE_double(parking_start_range, 10.0,
+              "the distance used for checking whether doing parking");
+
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,

@@ -29,7 +29,7 @@
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/common/frame_open_space.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/open_space/distance_approach_problem.h"
 #include "modules/planning/open_space/hybrid_a_star.h"
 #include "modules/planning/open_space/warm_start_problem.h"
@@ -74,19 +74,11 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Status Init(const PlanningConfig& config) override;
 
   /**
-   * @brief override function Plan in parent class Planner.Dummy implementation
-   */
-  apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame) {
-    return Status::OK();
-  }
-
-  /**
-   * @brief Real "Plan" taking init point and FrameOpenSpace
+   * @brief override function Plan in parent class Planner.
    */
   apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point,
-      FrameOpenSpace* frame);
+      Frame* frame) override;
 
  private:
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;

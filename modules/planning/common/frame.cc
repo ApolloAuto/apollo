@@ -34,6 +34,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -47,6 +48,8 @@ using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::hdmap::ParkingSpaceInfoConstPtr;
+using apollo::hdmap::PathOverlap;
 using apollo::prediction::PredictionObstacles;
 
 constexpr double kMathEpsilon = 1e-8;
@@ -516,6 +519,409 @@ const ReferenceLineInfo *Frame::DriveReferenceLineInfo() const {
 
 const std::vector<const Obstacle *> Frame::obstacles() const {
   return obstacles_.Items();
+}
+
+bool Frame::VPresentationObstacle() {
+  // load info from pnc map
+  if (!OpenSpaceROI()) {
+    AINFO << "fail at ROI()";
+    return false;
+  }
+
+  std::size_t perception_obstacles_num = obstacles_.Items().size();
+  std::size_t parking_boundaries_num = ROI_parking_boundary_.size();
+  obstacles_num_ = perception_obstacles_num + parking_boundaries_num;
+  if (perception_obstacles_num == 0) {
+    AINFO << "no obstacle given by percption";
+  }
+  if (parking_boundaries_num != 4) {
+    AERROR << "parking boundary obstacles size not right";
+    return false;
+  }
+  // load percption obstacle list for warm start
+  for (std::size_t i = 0; i < perception_obstacles_num; i++) {
+    Box2d original_box = obstacles_.Items().at(i)->PerceptionBoundingBox();
+    original_box.Shift(-1 * origin_point_);
+    original_box.RotateFromCenter(-origin_heading_);
+    std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles(
+        obstacles_.Items().at(i)->Id(), original_box);
+    openspace_warmstart_obstacles_.Add(obstacle->Id(), *obstacle);
+  }
+
+  // load boundary obstacle for warm start
+  Vec2d left_boundary_center(
+      (ROI_parking_boundary_[0][0].x() + ROI_parking_boundary_[0][1].x()) / 2,
+      (ROI_parking_boundary_[0][1].y() + ROI_parking_boundary_[0][2].y()) / 2);
+  double left_boundary_heading = std::atan2(
+      ROI_parking_boundary_[0][1].y() - ROI_parking_boundary_[0][0].y(),
+      ROI_parking_boundary_[0][1].x() - ROI_parking_boundary_[0][0].x());
+  double left_boundary_length = std::abs(-ROI_parking_boundary_[0][0].x() +
+                                         ROI_parking_boundary_[0][1].x());
+  double left_boundary_width = std::abs(ROI_parking_boundary_[0][1].y() -
+                                        ROI_parking_boundary_[0][2].y());
+  Box2d left_boundary_box(left_boundary_center, left_boundary_heading,
+                          left_boundary_length, left_boundary_width);
+  // check the heading of the parking spot is facing up or down
+  Vec2d down_boundary_center(
+      (ROI_parking_boundary_[1][0].x() + ROI_parking_boundary_[1][1].x()) / 2,
+      ROI_parking_boundary_[1][1].y() +
+          (open_space_end_pose_[2] > kMathEpsilon ? 0.5 : -0.5));
+  double down_boundary_heading = std::atan2(
+      ROI_parking_boundary_[1][1].y() - ROI_parking_boundary_[1][0].y(),
+      ROI_parking_boundary_[1][1].x() - ROI_parking_boundary_[1][0].x());
+  double down_boundary_length = std::abs(-ROI_parking_boundary_[1][0].x() +
+                                         ROI_parking_boundary_[1][1].x());
+  double down_boundary_width = 1.0;
+  Box2d down_boundary_box(down_boundary_center, down_boundary_heading,
+                          down_boundary_length, down_boundary_width);
+
+  Vec2d right_boundary_center(
+      (ROI_parking_boundary_[2][1].x() + ROI_parking_boundary_[2][2].x()) / 2,
+      (ROI_parking_boundary_[2][0].y() + ROI_parking_boundary_[2][1].y()) / 2);
+  double right_boundary_heading = std::atan2(
+      ROI_parking_boundary_[2][2].y() - ROI_parking_boundary_[2][1].y(),
+      ROI_parking_boundary_[2][2].x() - ROI_parking_boundary_[2][1].x());
+  double right_boundary_length = std::abs(-ROI_parking_boundary_[2][1].x() +
+                                          ROI_parking_boundary_[2][2].x());
+  double right_boundary_width = std::abs(ROI_parking_boundary_[2][1].y() -
+                                         ROI_parking_boundary_[2][0].y());
+  Box2d right_boundary_box(right_boundary_center, right_boundary_heading,
+                           right_boundary_length, right_boundary_width);
+
+  Vec2d up_boundary_center(
+      (ROI_parking_boundary_[3][0].x() + ROI_parking_boundary_[3][1].x()) / 2,
+      ROI_parking_boundary_[3][0].y() +
+          (open_space_end_pose_[2] > kMathEpsilon ? -0.5 : 0.5));
+  double up_boundary_heading = std::atan2(
+      ROI_parking_boundary_[3][1].y() - ROI_parking_boundary_[3][0].y(),
+      ROI_parking_boundary_[3][1].x() - ROI_parking_boundary_[3][0].x());
+  double up_boundary_length = std::abs(-ROI_parking_boundary_[3][0].x() +
+                                       ROI_parking_boundary_[3][1].x());
+  double up_boundary_width = 1.0;
+  Box2d up_boundary_box(up_boundary_center, up_boundary_heading,
+                        up_boundary_length, up_boundary_width);
+
+  std::unique_ptr<Obstacle> left_boundary_obstacle =
+      Obstacle::CreateStaticVirtualObstacles("left_boundary",
+                                             left_boundary_box);
+
+  openspace_warmstart_obstacles_.Add(left_boundary_obstacle->Id(),
+                                     *left_boundary_obstacle);
+
+  std::unique_ptr<Obstacle> down_boundary_obstacle =
+      Obstacle::CreateStaticVirtualObstacles("down_boundary",
+                                             down_boundary_box);
+
+  openspace_warmstart_obstacles_.Add(down_boundary_obstacle->Id(),
+                                     *down_boundary_obstacle);
+
+  std::unique_ptr<Obstacle> right_boundary_obstacle =
+      Obstacle::CreateStaticVirtualObstacles("right_boundary",
+                                             right_boundary_box);
+
+  openspace_warmstart_obstacles_.Add(right_boundary_obstacle->Id(),
+                                     *right_boundary_obstacle);
+
+  std::unique_ptr<Obstacle> up_boundary_obstacle =
+      Obstacle::CreateStaticVirtualObstacles("up_boundary", up_boundary_box);
+
+  openspace_warmstart_obstacles_.Add(up_boundary_obstacle->Id(),
+                                     *up_boundary_obstacle);
+
+  // load vertice vector for distance approach
+  Eigen::MatrixXd perception_obstacles_edges_num_ =
+      4 * Eigen::MatrixXd::Ones(perception_obstacles_num, 1);
+  Eigen::MatrixXd parking_boundaries_obstacles_edges_num(4, 1);
+  // the order is decided by the ROI()
+  parking_boundaries_obstacles_edges_num << 2, 1, 2, 1;
+  obstacles_edges_num_.resize(perception_obstacles_edges_num_.rows() +
+                                  parking_boundaries_obstacles_edges_num.rows(),
+                              1);
+  obstacles_edges_num_ << perception_obstacles_edges_num_,
+      parking_boundaries_obstacles_edges_num;
+
+  // load vertices for perception obstacles(repeat the first vertice at the
+  // last to form closed convex hull)
+  for (const auto &obstacle : obstacles_.Items()) {
+    Box2d original_box = obstacle->PerceptionBoundingBox();
+    original_box.Shift(-1 * origin_point_);
+    original_box.RotateFromCenter(-origin_heading_);
+    std::vector<Vec2d> vertices_ccw = original_box.GetAllCorners();
+    std::vector<Vec2d> vertices_cw;
+    while (!vertices_ccw.empty()) {
+      vertices_cw.emplace_back(vertices_ccw.back());
+      vertices_ccw.pop_back();
+    }
+    // As the perception obstacle is a closed convex set, the first vertice is
+    // repeated at the end of the vector to help transform all four edges to
+    // inequality constraint
+    vertices_cw.push_back(vertices_cw.front());
+    obstacles_vertices_vec_.emplace_back(vertices_cw);
+  }
+  // load vertices for parking boundary (not need to repeat the first vertice to
+  // get close hull)
+  for (std::size_t i = 0; i < parking_boundaries_num; i++) {
+    // directly load the ROI_distance_approach_parking_boundary_ into
+    // obstacles_vertices_vec_
+    obstacles_vertices_vec_.emplace_back(ROI_parking_boundary_[i]);
+  }
+  return true;
+}
+
+bool Frame::HPresentationObstacle() {
+  obstacles_A_ = Eigen::MatrixXd::Zero(obstacles_edges_num_.sum(), 2);
+  obstacles_b_ = Eigen::MatrixXd::Zero(obstacles_edges_num_.sum(), 1);
+  // vertices using H-represetntation
+  if (!ObsHRep(obstacles_num_, obstacles_edges_num_, obstacles_vertices_vec_,
+               &obstacles_A_, &obstacles_b_)) {
+    AINFO << "Fail to present obstacle in hyperplane";
+    return false;
+  }
+  return true;
+}
+
+bool Frame::ObsHRep(
+    const std::size_t &obstacles_num,
+    const Eigen::MatrixXd &obstacles_edges_num,
+    const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
+    Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all) {
+  if (obstacles_num != obstacles_vertices_vec.size()) {
+    AINFO << "obstacles_num != obstacles_vertices_vec.size()";
+    return false;
+  }
+
+  A_all->resize(obstacles_edges_num.sum(), 2);
+  b_all->resize(obstacles_edges_num.sum(), 1);
+
+  int counter = 0;
+  double kEpsilon = 1.0e-5;
+  // start building H representation
+  for (std::size_t i = 0; i < obstacles_num; ++i) {
+    std::size_t current_vertice_num = obstacles_edges_num(i, 0);
+    Eigen::MatrixXd A_i(current_vertice_num, 2);
+    Eigen::MatrixXd b_i(current_vertice_num, 1);
+
+    // take two subsequent vertices, and computer hyperplane
+    for (std::size_t j = 0; j < current_vertice_num; ++j) {
+      Vec2d v1 = obstacles_vertices_vec[i][j];
+      Vec2d v2 = obstacles_vertices_vec[i][j + 1];
+
+      Eigen::MatrixXd A_tmp(2, 1), b_tmp(1, 1), ab(2, 1);
+      // find hyperplane passing through v1 and v2
+      if (std::abs(v1.x() - v2.x()) < kEpsilon) {
+        if (v2.y() < v1.y()) {
+          A_tmp << 1, 0;
+          b_tmp << v1.x();
+        } else {
+          A_tmp << -1, 0;
+          b_tmp << -v1.x();
+        }
+      } else if (std::abs(v1.y() - v2.y()) < kEpsilon) {
+        if (v1.x() < v2.x()) {
+          A_tmp << 0, 1;
+          b_tmp << v1.y();
+        } else {
+          A_tmp << 0, -1;
+          b_tmp << -v1.y();
+        }
+      } else {
+        Eigen::MatrixXd tmp1(2, 2);
+        tmp1 << v1.x(), 1, v2.x(), 1;
+        Eigen::MatrixXd tmp2(2, 1);
+        tmp2 << v1.y(), v2.y();
+        ab = tmp1.inverse() * tmp2;
+        double a = ab(0, 0);
+        double b = ab(1, 0);
+
+        if (v1.x() < v2.x()) {
+          A_tmp << -a, 1;
+          b_tmp << b;
+        } else {
+          A_tmp << a, -1;
+          b_tmp << -b;
+        }
+      }
+
+      // store vertices
+      A_i.block(j, 0, 1, 2) = A_tmp.transpose();
+      b_i.block(j, 0, 1, 1) = b_tmp;
+    }
+
+    A_all->block(counter, 0, A_i.rows(), 2) = A_i;
+    b_all->block(counter, 0, b_i.rows(), 1) = b_i;
+    counter += current_vertice_num;
+  }
+  return true;
+}
+
+bool Frame::OpenSpaceROI() {
+  const ReferenceLineInfo *best_ref_info = FindDriveReferenceLineInfo();
+  if (!best_ref_info) {
+    std::string msg("fail to get the best reference line");
+    AERROR << msg;
+    return false;
+  }
+  ParkingSpaceInfoConstPtr target_parking_spot;
+  const hdmap::Path &path = best_ref_info->reference_line().GetMapPath();
+  const auto &parking_space_overlaps = path.parking_space_overlaps();
+  for (const PathOverlap &parking_overlap : parking_space_overlaps) {
+    if (parking_overlap.object_id == FLAGS_target_parking_spot_id) {
+      hdmap::Id id;
+      id.set_id(parking_overlap.object_id);
+      target_parking_spot = hdmap_->GetParkingSpaceById(id);
+    }
+  }
+  // left or right of the parking lot is decided when viewing the parking spot
+  // open upward
+  Vec2d left_top = target_parking_spot->polygon().points().at(0);
+  Vec2d left_down = target_parking_spot->polygon().points().at(3);
+  Vec2d right_top = target_parking_spot->polygon().points().at(1);
+  Vec2d right_down = target_parking_spot->polygon().points().at(2);
+  double left_top_s = 0.0;
+  double left_top_l = 0.0;
+  double right_top_s = 0.0;
+  double right_top_l = 0.0;
+  if (!(path.GetProjection(left_top, &left_top_s, &left_top_l) &&
+        path.GetProjection(right_top, &right_top_s, &right_top_l))) {
+    std::string msg(
+        "fail to get parking spot points' projections on reference line");
+    AERROR << msg;
+    return false;
+  }
+  // start or end, left or right is decided by the vehicle's heading
+  double center_line_s = (left_top_s + right_top_s) / 2;
+  double start_s = center_line_s - FLAGS_parking_longitudinal_range;
+  double end_s = center_line_s + FLAGS_parking_longitudinal_range;
+  hdmap::MapPathPoint end_point = path.GetSmoothPoint(end_s);
+  hdmap::MapPathPoint start_point = path.GetSmoothPoint(start_s);
+  double start_left_width = path.GetRoadLeftWidth(start_s);
+  double start_right_width = path.GetRoadRightWidth(start_s);
+  double end_left_width = path.GetRoadLeftWidth(end_s);
+  double end_right_width = path.GetRoadRightWidth(end_s);
+  double start_right_vec_cos = std::cos(start_point.heading() - M_PI / 2);
+  double start_right_vec_sin = std::sin(start_point.heading() - M_PI / 2);
+  double start_left_vec_cos = std::cos(start_point.heading() + M_PI / 2);
+  double start_left_vec_sin = std::sin(start_point.heading() + M_PI / 2);
+  double end_right_vec_cos = std::cos(end_point.heading() - M_PI / 2);
+  double end_right_vec_sin = std::sin(end_point.heading() - M_PI / 2);
+  double end_left_vec_cos = std::cos(end_point.heading() + M_PI / 2);
+  double end_left_vec_sin = std::sin(end_point.heading() + M_PI / 2);
+
+  Vec2d start_right = Vec2d(start_right_width * start_right_vec_cos,
+                            start_right_width * start_right_vec_sin);
+  Vec2d start_left = Vec2d(start_left_width * start_left_vec_cos,
+                           start_left_width * start_left_vec_sin);
+  Vec2d end_right = Vec2d(end_right_width * end_right_vec_cos,
+                          end_right_width * end_right_vec_cos);
+  Vec2d end_left = Vec2d(end_left_width * end_left_vec_cos,
+                         end_left_width * end_left_vec_sin);
+
+  // rotate the points to have the lane to be horizontal to x axis and scale
+  // them base on the origin point
+  origin_heading_ = path.GetSmoothPoint(center_line_s).heading();
+  origin_point_.set_x(left_top.x());
+  origin_point_.set_y(left_top.y());
+  left_top -= left_top;
+  left_down -= left_top;
+  right_top -= left_top;
+  right_down -= left_top;
+  start_right -= left_top;
+  start_left -= left_top;
+  end_right -= left_top;
+  end_left -= left_top;
+  left_top.SelfRotate(-origin_heading_);
+  left_down.SelfRotate(-origin_heading_);
+  right_top.SelfRotate(-origin_heading_);
+  right_down.SelfRotate(-origin_heading_);
+  start_right.SelfRotate(-origin_heading_);
+  start_left.SelfRotate(-origin_heading_);
+  end_right.SelfRotate(-origin_heading_);
+  end_left.SelfRotate(-origin_heading_);
+
+  // get end_pose of the parking spot
+  double heading = (left_down - left_top).Angle();
+  double x = (left_top.x() + right_top.x()) / 2;
+  double y = 0.0;
+  if (heading > kMathEpsilon) {
+    y = left_top.y() + (-left_top.y() + left_down.y()) / 4;
+  } else {
+    y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
+  }
+  open_space_end_pose_.emplace_back(x);
+  open_space_end_pose_.emplace_back(y);
+  open_space_end_pose_.emplace_back(heading);
+  open_space_end_pose_.emplace_back(0.0);
+
+  // get xy boundary of the ROI
+  double x_min = start_left.x();
+  double x_max = end_left.x();
+  double y_min = 0.0;
+  double y_max = 0.0;
+  if (left_down.y() > start_left.y()) {
+    y_max = left_down.y();
+    y_min = start_right.y();
+  } else {
+    y_max = start_left.y();
+    y_min = left_down.y();
+  }
+  ROI_xy_boundary_.emplace_back(x_min);
+  ROI_xy_boundary_.emplace_back(x_max);
+  ROI_xy_boundary_.emplace_back(y_min);
+  ROI_xy_boundary_.emplace_back(y_max);
+
+  // If smaller than zero, the parking spot is on the right of the lane
+  // Left, right, down or up of the boundary is decided when viewing the
+  // parking spot upward
+  std::vector<Vec2d> left_boundary;
+  std::vector<Vec2d> down_boundary;
+  std::vector<Vec2d> right_boundary;
+  std::vector<Vec2d> up_boundary;
+
+  if (left_top_l < 0) {
+    start_right.set_x(-left_top_l * start_right_vec_cos);
+    start_right.set_y(-left_top_l * start_right_vec_sin);
+    end_right.set_x(-left_top_l * end_right_vec_cos);
+    end_right.set_y(-left_top_l * end_right_vec_sin);
+    start_right -= left_top;
+    end_right -= left_top;
+    start_right.SelfRotate(-origin_heading_);
+    end_right.SelfRotate(-origin_heading_);
+    left_boundary.push_back(start_right);
+    left_boundary.push_back(left_top);
+    left_boundary.push_back(left_down);
+    down_boundary.push_back(left_down);
+    down_boundary.push_back(right_down);
+    right_boundary.push_back(right_down);
+    right_boundary.push_back(right_top);
+    right_boundary.push_back(end_right);
+    up_boundary.push_back(end_left);
+    up_boundary.push_back(start_left);
+  } else {
+    start_left.set_x(left_top_l * start_left_vec_cos);
+    start_left.set_y(left_top_l * start_left_vec_sin);
+    end_left.set_x(left_top_l * end_left_vec_cos);
+    end_left.set_y(left_top_l * end_left_vec_sin);
+    start_left -= left_top;
+    end_left -= left_top;
+    start_left.SelfRotate(-origin_heading_);
+    end_left.SelfRotate(-origin_heading_);
+    left_boundary.push_back(end_left);
+    left_boundary.push_back(left_top);
+    left_boundary.push_back(left_down);
+    down_boundary.push_back(left_down);
+    down_boundary.push_back(right_down);
+    right_boundary.push_back(right_down);
+    right_boundary.push_back(right_top);
+    right_boundary.push_back(start_left);
+    up_boundary.push_back(start_right);
+    up_boundary.push_back(end_right);
+  }
+  ROI_parking_boundary_.emplace_back(left_boundary);
+  ROI_parking_boundary_.emplace_back(down_boundary);
+  ROI_parking_boundary_.emplace_back(right_boundary);
+  ROI_parking_boundary_.emplace_back(up_boundary);
+
+  return true;
 }
 
 }  // namespace planning

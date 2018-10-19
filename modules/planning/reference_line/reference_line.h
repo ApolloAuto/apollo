@@ -166,7 +166,10 @@ class ReferenceLine {
   void AddSpeedLimit(double start_s, double end_s, double speed_limit);
 
   uint32_t GetPriority() const { return priority_; }
+
   void SetPriority(uint32_t priority) { priority_ = priority; }
+
+  const hdmap::Path& GetMapPath() const { return map_path_; }
 
  private:
   /**

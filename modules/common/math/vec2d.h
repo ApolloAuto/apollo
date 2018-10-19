@@ -89,6 +89,9 @@ class Vec2d {
   //! rotate the vector by angle.
   Vec2d rotate(const double angle) const;
 
+  //! rotate the vector itself by angle.
+  void SelfRotate(const double angle);
+
   //! Sums two Vec2d
   Vec2d operator+(const Vec2d &other) const;
 

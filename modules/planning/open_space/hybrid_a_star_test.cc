@@ -51,12 +51,10 @@ TEST_F(HybridATest, test1) {
   double ephi = 0.0;
   ThreadSafeIndexedObstacles obstacles_list;
   Result result;
-  std::unique_ptr<Obstacle> obstacle_class =
-      std::unique_ptr<Obstacle>(new Obstacle());
   Vec2d obstacle_center(0.0, 0.0);
   Box2d obstacle_box(obstacle_center, 0.0, 5.0, 5.0);
   std::unique_ptr<Obstacle> obstacle =
-      obstacle_class->CreateStaticVirtualObstacles("a box in center",
+      Obstacle::CreateStaticVirtualObstacles("a box in center",
                                                    obstacle_box);
   obstacles_list.Add(obstacle->Id(), *obstacle);
   ASSERT_TRUE(
