@@ -3,12 +3,14 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "stop_sign_unprotected",
+    name = "stop_sign_unprotected_scenario",
     srcs = [
-        "stop_sign_unprotected.cc",
+        "stop_sign_unprotected_scenario.cc",
+        "stop_sign_unprotected_stage.cc",
     ],
     hdrs = [
-        "stop_sign_unprotected.h",
+        "stop_sign_unprotected_scenario.h",
+        "stop_sign_unprotected_stage.h",
     ],
     deps = [
         "//external:gflags",
@@ -36,16 +38,16 @@ cc_library(
 )
 
 cc_test(
-    name = "stop_sign_unprotected_test",
+    name = "stop_sign_unprotected_scenario_test",
     size = "small",
     srcs = [
-        "stop_sign_unprotected_test.cc",
+        "stop_sign_unprotected_scenario_test.cc",
     ],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
-        ":stop_sign_unprotected",
+        ":stop_sign_unprotected_scenario",
         "@gtest//:main",
     ],
 )

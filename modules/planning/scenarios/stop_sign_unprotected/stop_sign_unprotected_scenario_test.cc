@@ -20,7 +20,7 @@
 
 #define protected public
 #define private public
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
 
 #include <memory>
 
@@ -32,6 +32,8 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace stop_sign_protected {
 
 class StopSignUnprotectedScenarioTest : public ::testing::Test {
  public:
@@ -65,5 +67,7 @@ TEST_F(StopSignUnprotectedScenarioTest, Init) {
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
 }
 
+}  // namespace stop_sign_protected
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

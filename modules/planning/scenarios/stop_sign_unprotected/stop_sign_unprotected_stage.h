@@ -34,58 +34,17 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace stop_sign_protected {
 
-class StopSignUnprotectedScenario : public Scenario {
- public:
-  // stage context
-  struct StopSignUnprotectedContext {
-    double stop_start_time;
-    std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
-    hdmap::PathOverlap next_stop_sign_overlap;
-    std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
-        associated_lanes;
-  };
-
-  explicit StopSignUnprotectedScenario(const ScenarioConfig& config,
-                                       const ScenarioContext* context)
-      : Scenario(config, context) {}
-
-  void Init() override;
-
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config);
-
-  bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
-                      const Frame& frame) const override;
-
-  StopSignUnprotectedContext* GetContext() { return &context_; }
-
- private:
-  static void RegisterStages();
-  int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
-
- private:
-  bool init_ = false;
-  SpeedProfileGenerator speed_profile_generator_;
-  StopSignUnprotectedContext context_;
-
-  hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
-
-  // TODO(all): move to scenario conf later
-  const uint32_t conf_start_stop_sign_timer_ = 10;  // second
-
-  static apollo::common::util::Factory<
-      ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-      s_stage_factory_;
-};
+struct StopSignUnprotectedContext;
 
 DECLARE_STAGE(StopSignUnprotectedIntersectionCruise,
-              StopSignUnprotectedScenario::StopSignUnprotectedContext);
+              StopSignUnprotectedContext);
 
 class StopSignUnprotectedCreep : public Stage {
  public:
@@ -95,9 +54,8 @@ class StopSignUnprotectedCreep : public Stage {
                              Frame* frame);
 
  private:
-  StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<
-        StopSignUnprotectedScenario::StopSignUnprotectedContext>();
+  StopSignUnprotectedContext* GetContext() {
+    return Stage::GetContextAs<StopSignUnprotectedContext>();
   }
 };
 
@@ -109,9 +67,8 @@ class StopSignUnprotectedStop : public Stage {
                              Frame* frame);
 
  private:
-  StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
-    return GetContextAs<
-        StopSignUnprotectedScenario::StopSignUnprotectedContext>();
+  StopSignUnprotectedContext* GetContext() {
+    return GetContextAs<StopSignUnprotectedContext>();
   }
 
   int RemoveWatchVehicle(
@@ -131,9 +88,8 @@ class StopSignUnprotectedPreStop : public Stage {
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame);
  private:
-  StopSignUnprotectedScenario::StopSignUnprotectedContext* GetContext() {
-    return GetContextAs<
-        StopSignUnprotectedScenario::StopSignUnprotectedContext>();
+  StopSignUnprotectedContext* GetContext() {
+    return GetContextAs<StopSignUnprotectedContext>();
   }
 
   int AddWatchVehicle(const PathObstacle& path_obstacle,
@@ -147,5 +103,7 @@ class StopSignUnprotectedPreStop : public Stage {
   const double conf_max_adc_stop_speed_ = 0.3;
 };
 
+}  // namespace stop_sign_protected
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

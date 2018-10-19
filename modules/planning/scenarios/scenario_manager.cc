@@ -25,7 +25,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected.h"
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
 
 namespace apollo {
 namespace planning {
@@ -51,8 +51,8 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     ptr.reset(new scenario::side_pass::SidePassScenario(
         config_map_[scenario_type], &scenario_context_));
   } else if (scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
-    ptr.reset(new StopSignUnprotectedScenario(config_map_[scenario_type],
-                                              &scenario_context_));
+    ptr.reset(new scenario::stop_sign_protected::StopSignUnprotectedScenario(
+        config_map_[scenario_type], &scenario_context_));
   } else {
     return nullptr;
   }
