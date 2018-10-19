@@ -173,7 +173,7 @@ bool StopSignUnprotectedScenario::IsTransferable(
 }
 
 Stage::StageStatus StopSignUnprotectedPreStop::Process(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
+    const TrajectoryPoint& planning_init_point, Frame* frame) {
   CHECK_NOTNULL(frame);
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -191,14 +191,15 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
     AddWatchVehicle(*path_obstacle, &watch_vehicles);
   }
 
-  // TODO(all): add tasks
-  // (1) call decider to add stop fence
-  // (2) call optimizers to run to stop fence
+  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedPreStop planning error";
+  }
   return Stage::RUNNING;
 }
 
 Stage::StageStatus StopSignUnprotectedStop::Process(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
+    const TrajectoryPoint& planning_init_point, Frame* frame) {
   CHECK_NOTNULL(frame);
 
   auto start_time = GetContext()->stop_start_time;
@@ -243,24 +244,38 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
                            GetContext()->next_stop_sign_overlap.end_s)) {
     return Stage::FINISHED;
   }
+  /*
   // build a stop fence by creep decider
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->Process(frame, &reference_line_info) != Status::OK()) {
     ADEBUG << "fail at build stop fence at creeping";
     return Stage::ERROR;
   }
+  */
 
-  // TODO(all): call optimizers to run to stop fence
-
+  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedCreep planning error";
+  }
   return Stage::RUNNING;
 }
 
 Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
-    const common::TrajectoryPoint& planning_start_point, Frame* frame) {
-  // TODO(all)
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  CHECK_NOTNULL(frame);
 
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
+  /* TODO(all)
+  if (CheckStopSignDone()) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+  */
+
+  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedIntersectionCruise plan error";
+  }
+  return Stage::RUNNING;
 }
 
 /*
