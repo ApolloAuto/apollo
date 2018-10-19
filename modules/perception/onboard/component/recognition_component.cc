@@ -28,10 +28,6 @@ namespace perception {
 namespace onboard {
 
 bool RecognitionComponent::Init() {
-  if (InitAlgorithmPlugin() != true) {
-    AERROR << "Failed to init recongnition component algorithm plugin.";
-    return false;
-  }
   LidarRecognitionComponentConfig comp_config;
   if (!GetProtoConfig(&comp_config)) {
     return false;
@@ -40,6 +36,10 @@ bool RecognitionComponent::Init() {
   output_channel_name_ = comp_config.output_channel_name();
   main_sensor_name_ = comp_config.main_sensor_name();
   writer_ = node_->CreateWriter<SensorFrameMessage>(output_channel_name_);
+  if (InitAlgorithmPlugin() != true) {
+    AERROR << "Failed to init recongnition component algorithm plugin.";
+    return false;
+  }
   return true;
 }
 
@@ -86,6 +86,7 @@ bool RecognitionComponent::InternalProc(
   out_message->seq_num_ = in_message->seq_num_;
   out_message->process_stage_ = ProcessStage::LIDAR_RECOGNITION;
   out_message->sensor_id_ = sensor_name;
+
   if (in_message->error_code_ != apollo::common::ErrorCode::OK) {
     out_message->error_code_ = in_message->error_code_;
     AERROR << "Lidar recognition receive message with error code, skip it";

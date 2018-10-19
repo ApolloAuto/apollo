@@ -31,10 +31,6 @@ uint32_t SegmentationComponent::s_seq_num_ = 0;
 std::mutex SegmentationComponent::s_mutex_;
 
 bool SegmentationComponent::Init() {
-  if (InitAlgorithmPlugin() != true) {
-    AERROR << "Failed to init segmentation component algorithm plugin.";
-    return false;
-  }
   LidarSegmentationComponentConfig comp_config;
   if (!GetProtoConfig(&comp_config)) {
     return false;
@@ -48,6 +44,10 @@ bool SegmentationComponent::Init() {
   enable_hdmap_ = comp_config.enable_hdmap();
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 
+  if (InitAlgorithmPlugin() != true) {
+    AERROR << "Failed to init segmentation component algorithm plugin.";
+    return false;
+  }
   return true;
 }
 
@@ -115,6 +115,12 @@ bool SegmentationComponent::InternalProc(
   out_message->process_stage_ = ProcessStage::LIDAR_SEGMENTATION;
   out_message->error_code_ = apollo::common::ErrorCode::OK;
 
+  auto& frame = out_message->lidar_frame_;
+  frame = lidar::LidarFramePool::Instance().Get();
+  frame->cloud = base::PointFCloudPool::Instance().Get();
+  frame->timestamp = timestamp;
+  frame->sensor_info = sensor_info_;
+
   PERCEPTION_PERF_BLOCK_START();
   Eigen::Affine3d pose = Eigen::Affine3d::Identity();
   const double lidar_query_tf_timestamp =
@@ -129,11 +135,7 @@ bool SegmentationComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
       sensor_name_, "segmentation_1::get_lidar_to_world_pose");
 
-  auto& frame = out_message->lidar_frame_;
-  frame = lidar::LidarFramePool::Instance().Get();
   frame->lidar2world_pose = pose;
-  frame->cloud = base::PointFCloudPool::Instance().Get();
-  frame->timestamp = timestamp;
 
   lidar::LidarObstacleSegmentationOptions segment_opts;
   segment_opts.sensor_name = sensor_name_;

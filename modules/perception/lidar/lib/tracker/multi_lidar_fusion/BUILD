@@ -139,6 +139,9 @@ cc_library(
     deps = [
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
+        "//modules/perception/lidar/lib/tracker/association:gnn_bipartite_graph_matcher",
+        "//modules/perception/lidar/lib/tracker/association:multi_hm_bipartite_graph_matcher",
+        "//modules/perception/lidar/lib/tracker/association:distance_collection",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_distance",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/io:file_util",
@@ -158,7 +161,11 @@ cc_library(
     deps = [
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_measurement",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_shape_filter",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_filter",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_refiner",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/io:file_util",
         "//modules/common/util:file_util",

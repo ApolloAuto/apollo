@@ -25,7 +25,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-DEFINE_string(obs_onboard_fusion, "", "onboard fusion method");
+DEFINE_string(obs_onboard_fusion, "ProbabilisticFusion",
+              "onboard fusion method");
 DEFINE_string(obs_fusion_main_sensor, "velodyne64", "main sensor for fusion");
 DEFINE_bool(obs_object_in_roi_check, false, "use object in-roi check function");
 DEFINE_double(obs_roi_radius_for_object_check, 180,

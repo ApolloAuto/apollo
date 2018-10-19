@@ -15,7 +15,7 @@ module_config {
     }
   }
 
-   components {
+ components {
     class_name : "SegmentationComponent"
     config {
       name: "Velodyne16Segmentation"
@@ -24,7 +24,7 @@ module_config {
           channel: "/apollo/sensor/velodyne64/compensator/PointCloud2"
         }
     }
-  }
+ }
 
 
   components {
@@ -52,7 +52,7 @@ module_config {
     class_name: "RadarDetectionComponent"
     config {
       name: "FrontRadarDetection"
-      config_file_path: "/apollo2/modules/perception/production/conf/perception/radar/front_radar_component_conf.pb.txt"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/radar/front_radar_component_conf.pb.txt"
       readers {
           channel: "/sensor/frontradar/radardata"
         }
@@ -63,7 +63,7 @@ module_config {
     class_name: "RadarDetectionComponent"
     config {
       name: "RearRadarDetection"
-      config_file_path: "/apollo2/modules/perception/production/conf/perception/radar/rear_radar_component_conf.pb.txt"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/radar/rear_radar_component_conf.pb.txt"
       readers {
           channel: "/sensor/rearradar/radardata"
         }
