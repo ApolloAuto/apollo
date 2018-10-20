@@ -32,19 +32,20 @@ Track::Track() { fused_object_.reset(new FusedObject()); }
 
 bool Track::Initialize(SensorObjectPtr obj, bool is_background) {
   Reset();
-  track_id_ = GenerateNewTrackId();
+  int track_id = GenerateNewTrackId();
   is_background_ = is_background;
   std::shared_ptr<base::Object> fused_base_obj
       = fused_object_->GetBaseObject();
   std::shared_ptr<const base::Object> sensor_base_obj
       = obj->GetBaseObject();
   *fused_base_obj = *sensor_base_obj;
+  fused_base_obj->track_id = track_id;
   UpdateWithSensorObject(obj);
   return true;
 }
 
 void Track::Reset() {
-  track_id_ = 0;
+  fused_object_->GetBaseObject()->track_id = 0;
   lidar_objects_.clear();
   radar_objects_.clear();
   camera_objects_.clear();
@@ -286,7 +287,9 @@ void Track::UpdateWithSensorObjectForBackground(const SensorObjectPtr& obj) {
       = fused_object_->GetBaseObject();
   std::shared_ptr<const base::Object> measurement_base_object
       = obj->GetBaseObject();
+  int track_id = fused_base_object->track_id;
   *fused_base_object = *measurement_base_object;
+  fused_base_object->track_id = track_id;
 }
 
 void Track::UpdateWithoutSensorObjectForBackground(
@@ -294,7 +297,7 @@ void Track::UpdateWithoutSensorObjectForBackground(
 
 std::string Track::DebugString() const {
   std::ostringstream oss;
-  oss << "fusion_track[id: " << track_id_ << ", fused_object("
+  oss << "fusion_track[id: " << this->GetTrackId() << ", fused_object("
       << fused_object_->GetBaseObject()->ToString() << ")\n";
 
   oss << "lidar_measurments[number: " << lidar_objects_.size() << ",";

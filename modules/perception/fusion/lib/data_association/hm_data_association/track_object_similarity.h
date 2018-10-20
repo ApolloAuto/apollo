@@ -63,7 +63,7 @@ struct LocSimilarityParams {
 // Otherwise, it would close to 0.
 // @NOTE: original method name is compute_pts_box_dist_score
 double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
-                                       const ProjectionCacheObject& object,
+                                       const ProjectionCacheObject* object,
                                        const base::BBox2DF& camera_bbox);
 // @brief: calculate the shape similarity between cloud and camera box
 // @return the shape similarity which belongs to [0, 1]. When cloud's shape
@@ -71,7 +71,7 @@ double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
 // it would close to 0.
 // @NOTE: original method name is compute_pts_box_shape_score
 double ComputePtsBoxShapeSimilarity(const ProjectionCachePtr& cache,
-                                    const ProjectionCacheObject& object,
+                                    const ProjectionCacheObject* object,
                                     const base::BBox2DF& camera_bbox);
 // @brief: calculate the similarity between cloud and camera box
 // @return the similarity which belongs to [0, 1].
@@ -80,7 +80,7 @@ double ComputePtsBoxShapeSimilarity(const ProjectionCachePtr& cache,
 // 2. fuse the two similarity calculated above
 // @NOTE: original method name is compute_pts_box_score
 double ComputePtsBoxSimilarity(const ProjectionCachePtr& cache,
-                               const ProjectionCacheObject& object,
+                               const ProjectionCacheObject* object,
                                const base::BBox2DF& camera_bbox);
 // @brief: calculate the x/y/h/w/3d similarity between radar and camera
 // @return the similarity which belongs to [0, 1].

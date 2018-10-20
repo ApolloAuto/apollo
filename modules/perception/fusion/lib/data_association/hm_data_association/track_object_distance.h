@@ -157,15 +157,19 @@ class TrackObjectDistance {
       const base::BaseCameraModelPtr& camera_intrinsic,
       const Eigen::Matrix4d& world2camera_pose,
       std::vector<Eigen::Vector2d>* radar_box2d_vertices);
-  bool BuildProjectionCacheObject(const SensorObjectConstPtr& lidar,
-                                  const SensorObjectConstPtr& camera,
-                                  const base::BaseCameraModelPtr& camera_model,
-                                  ProjectionCacheObject* object);
-  bool QueryProjectionCacheObject(const SensorObjectConstPtr& lidar,
-                                  const SensorObjectConstPtr& camera,
-                                  const base::BaseCameraModelPtr& camera_model,
-                                  const bool measurement_is_lidar,
-                                  ProjectionCacheObject* object);
+  ProjectionCacheObject* BuildProjectionCacheObject(
+      const SensorObjectConstPtr& lidar,
+      const SensorObjectConstPtr& camera,
+      const base::BaseCameraModelPtr& camera_model,
+      const std::string& measurement_sensor_id,
+      double measurement_timestamp,
+      const std::string& projection_sensor_id,
+      double projection_timestamp);
+  ProjectionCacheObject* QueryProjectionCacheObject(
+      const SensorObjectConstPtr& lidar,
+      const SensorObjectConstPtr& camera,
+      const base::BaseCameraModelPtr& camera_model,
+      const bool measurement_is_lidar);
   bool IsTrackIdConsistent(const SensorObjectConstPtr& object1,
                            const SensorObjectConstPtr& object2);
   bool LidarCameraCenterDistanceExceedDynamicThreshold(
