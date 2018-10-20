@@ -109,8 +109,7 @@ bool ReferenceLineProvider::Start() {
   }
 
   if (FLAGS_enable_reference_line_provider_thread) {
-    task_future_ =
-        cyber::Async(&ReferenceLineProvider::GenerateThread, this);
+    task_future_ = cyber::Async(&ReferenceLineProvider::GenerateThread, this);
   }
   return true;
 }
@@ -681,7 +680,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
                                    ReferenceLine *reference_line,
                                    RouteSegments *segments) {
-  constexpr double kMaxHeadingDiff = M_PI * 3.0 / 4.0;
+  constexpr double kMaxHeadingDiff = M_PI * 5.0 / 6.0;
   // shrink reference line
   double new_backward_distance = sl.s();
   double new_forward_distance = reference_line->Length() - sl.s();

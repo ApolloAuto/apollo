@@ -30,10 +30,22 @@ cc_library(
         ":edge_creator",
         ":node_creator",
         "//modules/common",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",
         "//modules/routing/proto:routing_proto",
+    ],
+)
+
+cc_test(
+    name = "graph_creator_test",
+    srcs = [
+        "graph_creator_test.cc",
+    ],
+    deps = [
+        ":graph_creator",
+        "@gtest//:main",
     ],
 )
 
@@ -58,9 +70,9 @@ cc_binary(
     srcs = ["topo_creator.cc"],
     deps = [
         ":graph_creator",
+        "//cyber",
         "//external:gflags",
         "//modules/common",
-        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/status",
         "//modules/common/util",
