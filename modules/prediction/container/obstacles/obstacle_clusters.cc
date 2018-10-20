@@ -58,16 +58,16 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
 }
 
 const JunctionFeature& ObstacleClusters::GetJunctionFeature(
-    const std::string& enter_lane_id, const std::string& junction_id) {
-  if (junction_features_.find(enter_lane_id) != junction_features_.end()) {
-    return junction_features_[enter_lane_id];
+    const std::string& start_lane_id, const std::string& junction_id) {
+  if (junction_features_.find(start_lane_id) != junction_features_.end()) {
+    return junction_features_[start_lane_id];
   }
   JunctionFeature junction_feature;
   junction_feature.set_junction_id(junction_id);
-  junction_feature.mutable_enter_lane()->set_lane_id(enter_lane_id);
+  junction_feature.mutable_enter_lane()->set_lane_id(start_lane_id);
   // TODO(all) add junction exits into junction feature
-  junction_features_[enter_lane_id] = std::move(junction_feature);
-  return junction_features_[enter_lane_id];
+  junction_features_[start_lane_id] = std::move(junction_feature);
+  return junction_features_[start_lane_id];
 }
 
 }  // namespace prediction
