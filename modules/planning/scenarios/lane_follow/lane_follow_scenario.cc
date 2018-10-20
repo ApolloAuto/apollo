@@ -49,6 +49,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 using common::ErrorCode;
 using common::SLPoint;
@@ -85,5 +86,6 @@ bool LaneFollowScenario::IsTransferable(
   }
 }
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

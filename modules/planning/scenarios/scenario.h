@@ -35,6 +35,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 struct ScenarioContext {};
 
@@ -90,5 +91,6 @@ class Scenario {
   const ScenarioContext* scenario_context_ = nullptr;
 };
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

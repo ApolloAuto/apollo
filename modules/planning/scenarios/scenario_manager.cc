@@ -29,6 +29,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 using apollo::hdmap::PathOverlap;
 
@@ -184,5 +185,6 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   }
 }
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
