@@ -262,7 +262,8 @@ class Obstacle {
       const std::string& enter_lane_id, const std::string& junction_id,
       Feature* feature_ptr);
 
-  void SearchJunctionExitsWithoutEnterLane(const std::string& junction_id);
+  void SearchJunctionExitsWithoutEnterLane(
+      const std::string& junction_id, Feature* feature_ptr);
 
   void Trim();
 

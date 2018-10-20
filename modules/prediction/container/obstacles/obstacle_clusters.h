@@ -50,7 +50,7 @@ class ObstacleClusters {
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
   static const JunctionFeature& GetJunctionFeature(
-      const std::string& enter_lane_id, const std::string& junction_id);
+      const std::string& start_lane_id, const std::string& junction_id);
 
  private:
   ObstacleClusters() = delete;

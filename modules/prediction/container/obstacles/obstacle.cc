@@ -233,7 +233,7 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
   Feature* latest_feature_ptr = mutable_latest_feature();
   latest_feature_ptr->mutable_junction_feature()->set_junction_id(junction_id);
   if (feature_history_.size() == 1) {
-    SearchJunctionExitsWithoutEnterLane(junction_id);
+    SearchJunctionExitsWithoutEnterLane(junction_id, latest_feature_ptr);
     return;
   }
   const Feature& prev_feature = feature(1);
@@ -244,7 +244,7 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
     SearchJunctionExitsWithEnterLane(
         enter_lane_id, junction_id, latest_feature_ptr);
   } else {
-    SearchJunctionExitsWithoutEnterLane(junction_id);
+    SearchJunctionExitsWithoutEnterLane(junction_id, latest_feature_ptr);
   }
 }
 
@@ -258,8 +258,18 @@ void Obstacle::SearchJunctionExitsWithEnterLane(
 }
 
 void Obstacle::SearchJunctionExitsWithoutEnterLane(
-    const std::string& junction_id) {
+    const std::string& junction_id, Feature* feature_ptr) {
   // TODO(kechxu) implement
+  if (!feature_ptr->has_lane() ||
+      !feature_ptr->mutable_lane()->has_lane_feature()) {
+    AERROR << "Obstacle [" << id_ << "] has no current lane feature.";
+    return;
+  }
+  const std::string& curr_lane_id =
+      feature_ptr->lane().lane_feature().lane_id();
+  const JunctionFeature& junction_feature =
+      ObstacleClusters::GetJunctionFeature(curr_lane_id, junction_id);
+  feature_ptr->mutable_junction_feature()->CopyFrom(junction_feature);
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
