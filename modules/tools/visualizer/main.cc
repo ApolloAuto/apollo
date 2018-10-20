@@ -20,12 +20,8 @@
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 #include <QSurfaceFormat>
-<<<<<<< HEAD
-#include "cyber/init.h"
-=======
 #include <sstream>
 #include "cybertron/init.h"
->>>>>>> Modules: add OpenGL version checking function
 #include "modules/tools/visualizer/main_window.h"
 
 int main(int argc, char* argv[]) {
@@ -73,14 +69,8 @@ int main(int argc, char* argv[]) {
         w.TopologyChanged(change_msg);
       };
 
-<<<<<<< HEAD
   auto channelManager = apollo::cyber::service_discovery::TopologyManager::Instance()
       ->channel_manager();
-=======
-  auto channelManager =
-      apollo::cybertron::service_discovery::TopologyManager::Instance()
-          ->channel_manager();
->>>>>>> Modules: add OpenGL version checking function
   channelManager->AddChangeListener(topologyCallback);
 
   std::vector<apollo::cyber::proto::RoleAttributes> role_attr_vec;
