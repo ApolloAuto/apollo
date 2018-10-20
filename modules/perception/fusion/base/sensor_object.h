@@ -19,6 +19,7 @@
 #include <string>
 
 #include "Eigen/Core"
+#include "gtest/gtest_prod.h"
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/sensor_meta.h"
@@ -32,8 +33,16 @@ class SensorObject {
  public:
   SensorObject() = delete;
 
-  SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
-               const SensorFramePtr& frame_ptr);
+  explicit SensorObject(
+      const std::shared_ptr<const base::Object>& object_ptr);
+
+  explicit SensorObject(
+      const std::shared_ptr<const base::Object>& object_ptr,
+      const std::shared_ptr<const SensorFrameHeader>& frame_header);
+
+  explicit SensorObject(
+      const std::shared_ptr<const base::Object>& object_ptr,
+      const std::shared_ptr<SensorFrame>& frame_ptr);
 
   // Getter
   // @brief get frame timestamp which might be different with object timestamp
@@ -52,15 +61,11 @@ class SensorObject {
   inline void SetInvisiblePeriod(double period) { invisible_period_ = period; }
 
  private:
-  inline bool CheckFrameExist() const {
-    bool expired = frame_ptr_.expired();
-    return !expired;
-  }
+  FRIEND_TEST(SensorObjectTest, test);
 
- private:
   std::shared_ptr<const base::Object> object_;
   double invisible_period_ = 0.0;
-  std::weak_ptr<const SensorFrame> frame_ptr_;
+  std::shared_ptr<const SensorFrameHeader> frame_header_ = nullptr;
 };
 
 typedef std::shared_ptr<SensorObject> SensorObjectPtr;

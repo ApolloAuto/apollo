@@ -29,21 +29,37 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
- public:
-  SensorFrame() = default;
+struct SensorFrameHeader {
+  base::SensorInfo sensor_info;
+  double timestamp = 0.0;
+  Eigen::Affine3d sensor2world_pose;
 
-  // Unable to be called in constructor due to weak_ptr initialization
+  SensorFrameHeader() = default;
+  SensorFrameHeader(const base::SensorInfo& info,
+  double ts, const Eigen::Affine3d& pose): sensor_info(info),
+  timestamp(ts), sensor2world_pose(pose) {
+  }
+};
+
+class SensorFrame {
+ public:
+  SensorFrame();
+
+  explicit SensorFrame(const base::FrameConstPtr& base_frame_ptr);
+
+  void Initialize(const base::FrameConstPtr& base_frame_ptr);
+
   void Initialize(const base::FrameConstPtr& base_frame_ptr,
-                  const std::string& sensor_id,
-                  const base::SensorType& sensor_type);
+                  const SensorPtr& sensor);
 
   // Getter
-  inline double GetTimestamp() const { return timestamp_; }
+  inline double GetTimestamp() const {
+    return header_->timestamp;
+  }
 
   inline bool GetPose(Eigen::Affine3d* pose) const {
     CHECK_NOTNULL(pose);
-    *pose = sensor2world_pose_;
+    *pose = header_->sensor2world_pose;
     return true;
   }
 
@@ -67,13 +83,11 @@ class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
 
   base::SensorType GetSensorType() const;
 
- private:
-  inline SensorFramePtr GetPtr() { return shared_from_this(); }
+  SensorFrameHeaderConstPtr GetHeader() const {
+    return header_;
+  }
 
  private:
-  double timestamp_ = 0.0;
-  Eigen::Affine3d sensor2world_pose_;
-
   std::vector<SensorObjectPtr> foreground_objects_;
   std::vector<SensorObjectPtr> background_objects_;
 
@@ -82,8 +96,7 @@ class SensorFrame : public std::enable_shared_from_this<SensorFrame> {
   base::RadarFrameSupplement radar_frame_supplement_;
   base::CameraFrameSupplement camera_frame_supplement_;
 
-  std::string sensor_id_;
-  base::SensorType sensor_type_;
+  SensorFrameHeaderPtr header_ = nullptr;
 };
 
 }  // namespace fusion

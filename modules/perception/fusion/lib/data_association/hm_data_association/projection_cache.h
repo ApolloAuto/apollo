@@ -70,15 +70,17 @@ class ProjectionCacheFrame {
     }
     return true;
   }
-  void AddObject(int lidar_object_id, const ProjectionCacheObject& object) {
-    objects_[lidar_object_id] = object;
+  ProjectionCacheObject* BuildObject(int lidar_object_id) {
+    objects_[lidar_object_id] = ProjectionCacheObject();
+    return QueryObject(lidar_object_id);
   }
-  bool QueryObject(int lidar_object_id, ProjectionCacheObject* object) {
-    if (objects_.find(lidar_object_id) == objects_.end()) {
-      return false;
+  ProjectionCacheObject* QueryObject(int lidar_object_id) {
+    auto it = objects_.find(lidar_object_id);
+    if (it == objects_.end()) {
+      return nullptr;
+    } else {
+      return &(it->second);
     }
-    *object = objects_[lidar_object_id];
-    return true;
   }
 
  private:
@@ -110,64 +112,73 @@ class ProjectionCache {
     frames_.clear();
   }
   // getters
-  Eigen::Vector2d& GetPoint2d(size_t ind) { return point2ds_[ind]; }
+  Eigen::Vector2d* GetPoint2d(size_t ind) {
+    if (ind >= point2ds_.size()) {
+      return nullptr;
+    }
+    return &(point2ds_[ind]);
+  }
   size_t GetPoint2dsSize() const { return point2ds_.size(); }
   // add point
   void AddPoint(const Eigen::Vector2f& pt) {
     point2ds_.emplace_back(pt.x(), pt.y());
   }
   // add object
-  void AddObject(std::string projection_sensor_id, double projection_timestamp,
-                 int lidar_object_id, const ProjectionCacheObject& object) {
-    ProjectionCacheFrame frame =
-        ProjectionCacheFrame(projection_sensor_id, projection_timestamp);
-    if (!VerifyFrame(projection_sensor_id, projection_timestamp, &frame)) {
-      frame.AddObject(lidar_object_id, object);
-      frames_.push_back(frame);
-      return;
+  ProjectionCacheObject* BuildObject(
+      const std::string& measurement_sensor_id, double measurement_timestamp,
+      const std::string& projection_sensor_id, double projection_timestamp,
+      int lidar_object_id) {
+    if (!VerifyKey(measurement_sensor_id, measurement_timestamp)) {
+      return nullptr;
     }
-    for (size_t i = 0; i < frames_.size(); ++i) {
-      if (!frames_[i].VerifyKey(projection_sensor_id, projection_timestamp)) {
-        continue;
-      }
-      frames_[i].AddObject(lidar_object_id, object);
+    ProjectionCacheFrame* frame = QueryFrame(projection_sensor_id,
+        projection_timestamp);
+    if (frame == nullptr) {
+      frame = BuildFrame(projection_sensor_id, projection_timestamp);
     }
+    if (frame == nullptr) {
+      return nullptr;
+    }
+    return frame->BuildObject(lidar_object_id);
   }
   // query projection cache object
-  bool QueryObject(std::string measurement_sensor_id,
-                   double measurement_timestamp,
-                   std::string projection_sensor_id,
-                   double projection_timestamp, int lidar_object_id,
-                   ProjectionCacheObject* object) {
+  ProjectionCacheObject* QueryObject(
+      const std::string& measurement_sensor_id, double measurement_timestamp,
+      const std::string& projection_sensor_id, double projection_timestamp,
+      int lidar_object_id) {
     if (!VerifyKey(measurement_sensor_id, measurement_timestamp)) {
-      return false;
+      return nullptr;
     }
-    ProjectionCacheFrame frame = ProjectionCacheFrame();
-    if (!VerifyFrame(projection_sensor_id, projection_timestamp, &frame)) {
-      return false;
+    ProjectionCacheFrame* frame =
+        QueryFrame(projection_sensor_id, projection_timestamp);
+    if (frame == nullptr) {
+      return nullptr;
     }
-    if (frame.QueryObject(lidar_object_id, object)) {
-      return true;
-    }
-    return false;
+    return frame->QueryObject(lidar_object_id);
   }
 
  private:
-  bool VerifyKey(std::string sensor_id, double timestamp) {
+  bool VerifyKey(const std::string& sensor_id, double timestamp) {
     if (measurement_sensor_id_ != sensor_id ||
         fabs(measurement_timestamp_ - timestamp) > DBL_EPSILON) {
       return false;
     }
     return true;
   }
-  bool VerifyFrame(std::string sensor_id, double timestamp,
-                   ProjectionCacheFrame* frame) {
+  ProjectionCacheFrame* BuildFrame(const std::string& sensor_id,
+                                   double timestamp) {
+    frames_.push_back(ProjectionCacheFrame(sensor_id, timestamp));
+    return &(frames_[frames_.size() - 1]);
+  }
+  ProjectionCacheFrame* QueryFrame(const std::string& sensor_id,
+                                   double timestamp) {
     for (size_t i = 0; i < frames_.size(); ++i) {
-      if (!frames_[i].VerifyKey(sensor_id, timestamp)) continue;
-      *frame = frames_[i];
-      return true;
+      if (!frames_[i].VerifyKey(sensor_id, timestamp)) {
+        continue;
+      }
+      return &(frames_[i]);
     }
-    return false;
+    return nullptr;
   }
 
  private:

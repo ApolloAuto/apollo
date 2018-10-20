@@ -25,47 +25,56 @@ namespace fusion {
 
 // SensorObject implementations
 SensorObject::SensorObject(
+    const std::shared_ptr<const base::Object>& object_ptr):
+    object_(object_ptr), frame_header_(nullptr) {
+}
+
+SensorObject::SensorObject(
     const std::shared_ptr<const base::Object>& object_ptr,
-    const SensorFramePtr& frame_ptr) {
-  object_ = object_ptr;
-  frame_ptr_ = frame_ptr;
+    const std::shared_ptr<const SensorFrameHeader>& frame_header):
+    object_(object_ptr), frame_header_(frame_header) {
+}
+
+
+SensorObject::SensorObject(
+    const std::shared_ptr<const base::Object>& object_ptr,
+    const std::shared_ptr<SensorFrame>& frame_ptr):
+    object_(object_ptr),
+    frame_header_((frame_ptr == nullptr) ? nullptr : frame_ptr->GetHeader()) {
 }
 
 double SensorObject::GetTimestamp() const {
-  if (!this->CheckFrameExist()) {
+  if (frame_header_ == nullptr) {
     return 0.0;
   }
 
-  SensorFrameConstPtr sp = frame_ptr_.lock();
-  return sp->GetTimestamp();
+  return frame_header_->timestamp;
 }
 
 bool SensorObject::GetRelatedFramePose(Eigen::Affine3d* pose) const {
   CHECK_NOTNULL(pose);
-  if (!this->CheckFrameExist()) {
+  if (frame_header_ == nullptr) {
     return false;
   }
 
-  SensorFrameConstPtr sp = frame_ptr_.lock();
-  return sp->GetPose(pose);
+  *pose = frame_header_->sensor2world_pose;
+  return true;
 }
 
 std::string SensorObject::GetSensorId() const {
-  if (!this->CheckFrameExist()) {
+  if (frame_header_ == nullptr) {
     return std::string("");
   }
 
-  SensorFrameConstPtr sp = frame_ptr_.lock();
-  return sp->GetSensorId();
+  return frame_header_->sensor_info.name;
 }
 
 base::SensorType SensorObject::GetSensorType() const {
-  if (!this->CheckFrameExist()) {
+  if (frame_header_ == nullptr) {
     return base::SensorType::UNKNOWN_SENSOR_TYPE;
   }
 
-  SensorFrameConstPtr sp = frame_ptr_.lock();
-  return sp->GetSensorType();
+  return frame_header_->sensor_info.type;
 }
 
 // FusedObject implementations
@@ -77,21 +86,21 @@ FusedObject::FusedObject() {
 bool IsLidar(const SensorObjectConstPtr& obj) {
   base::SensorType type = obj->GetSensorType();
   common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+    lib::Singleton<common::SensorManager>::get_instance();
   return sensor_manager->IsLidar(type);
 }
 
 bool IsRadar(const SensorObjectConstPtr& obj) {
   base::SensorType type = obj->GetSensorType();
   common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+    lib::Singleton<common::SensorManager>::get_instance();
   return sensor_manager->IsRadar(type);
 }
 
 bool IsCamera(const SensorObjectConstPtr& obj) {
   base::SensorType type = obj->GetSensorType();
   common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+    lib::Singleton<common::SensorManager>::get_instance();
   return sensor_manager->IsCamera(type);
 }
 

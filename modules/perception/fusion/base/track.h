@@ -79,7 +79,9 @@ class Track {
     return camera_objects_;
   }
 
-  inline size_t GetTrackId() const { return track_id_; }
+  inline int GetTrackId() const {
+    return fused_object_->GetBaseObject()->track_id;
+  }
 
   inline double GetTrackingPeriod() const { return tracking_period_; }
 
@@ -120,7 +122,7 @@ class Track {
   SensorObjectConstPtr GetLatestSensorObject(
       const SensorId2ObjectMap& objects) const;
   void UpdateSensorObject(SensorId2ObjectMap* objects,
-                          const SensorObjectPtr& obj);
+      const SensorObjectPtr& obj);
   void UpdateSensorObjectWithoutMeasurement(SensorId2ObjectMap* objects,
                                             const std::string& sensor_id,
                                             double measurement_timestamp,
@@ -142,8 +144,7 @@ class Track {
   double tracking_period_ = 0.0;
   double existance_prob_ = 0.0;
   double toic_prob_ = 0.0;
-  //
-  size_t track_id_ = 0;
+
   bool is_background_ = false;
   bool is_alive_ = true;
 

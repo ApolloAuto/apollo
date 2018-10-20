@@ -41,9 +41,9 @@ TEST(SensorObjectTest, test) {
   base_frame->timestamp = timestamp;
   base_frame->sensor2world_pose = sensor2world_pose;
   base_frame->objects.emplace_back(base_object);
+  base_frame->sensor_info = sensor_info;
   SensorFramePtr frame_ptr(new SensorFrame());
-  frame_ptr->Initialize(base_frame, sensor_ptr->GetSensorId(),
-                        sensor_ptr->GetSensorType());
+  frame_ptr->Initialize(base_frame, sensor_ptr);
 
   SensorObjectPtr object(new SensorObject(base_object, frame_ptr));
 
@@ -58,7 +58,7 @@ TEST(SensorObjectTest, test) {
   EXPECT_EQ(object->GetSensorId(), "test");
   EXPECT_TRUE(object->GetBaseObject() != nullptr);
 
-  frame_ptr.reset();
+  object->frame_header_ = nullptr;
   EXPECT_DOUBLE_EQ(object->GetTimestamp(), 0);
   EXPECT_FALSE(object->GetRelatedFramePose(&pose));
   EXPECT_EQ(object->GetSensorId(), "");

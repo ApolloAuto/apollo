@@ -36,12 +36,12 @@ TEST(SensorFrameTest, test) {
   base::FramePtr base_frame(new base::Frame());
   base_frame->timestamp = timestamp;
   base_frame->sensor2world_pose = sensor2world_pose;
+  base_frame->sensor_info = sensor_info;
   base_frame->objects.emplace_back(base_object);
   base_frame->objects.emplace_back(base_object_2);
 
   SensorFramePtr frame_ptr(new SensorFrame());
-  frame_ptr->Initialize(base_frame, sensor_ptr->GetSensorId(),
-                        sensor_ptr->GetSensorType());
+  frame_ptr->Initialize(base_frame, sensor_ptr);
   EXPECT_EQ(frame_ptr->GetForegroundObjects().size(), 1);
   EXPECT_EQ(frame_ptr->GetBackgroundObjects().size(), 1);
 

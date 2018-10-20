@@ -19,24 +19,31 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-void SensorFrame::Initialize(const base::FrameConstPtr& frame_ptr,
-                             const std::string& sensor_id,
-                             const base::SensorType& sensor_type) {
-  timestamp_ = frame_ptr->timestamp;
-  sensor2world_pose_ = frame_ptr->sensor2world_pose;
-  lidar_frame_supplement_ = frame_ptr->lidar_frame_supplement;
-  radar_frame_supplement_ = frame_ptr->radar_frame_supplement;
-  camera_frame_supplement_ = frame_ptr->camera_frame_supplement;
-  sensor_id_ = sensor_id;
-  sensor_type_ = sensor_type;
+SensorFrame::SensorFrame() {
+  header_.reset(new SensorFrameHeader());
+}
 
-  const auto& base_objects = frame_ptr->objects;
+SensorFrame::SensorFrame(
+  const base::FrameConstPtr& base_frame_ptr) {
+  Initialize(base_frame_ptr);
+}
+
+void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr) {
+  header_.reset(new SensorFrameHeader(
+    base_frame_ptr->sensor_info,
+    base_frame_ptr->timestamp,
+    base_frame_ptr->sensor2world_pose));
+
+  lidar_frame_supplement_ = base_frame_ptr->lidar_frame_supplement;
+  radar_frame_supplement_ = base_frame_ptr->radar_frame_supplement;
+  camera_frame_supplement_ = base_frame_ptr->camera_frame_supplement;
+
+  const auto& base_objects = base_frame_ptr->objects;
   foreground_objects_.reserve(base_objects.size());
 
-  SensorFramePtr sensor_frame_ptr = this->GetPtr();
-  for (size_t i = 0; i < base_objects.size(); ++i) {
-    SensorObjectPtr obj(new SensorObject(base_objects[i], sensor_frame_ptr));
-    if (base_objects[i]->lidar_supplement.is_background) {
+  for (const auto& base_obj : base_objects) {
+    SensorObjectPtr obj = std::make_shared<SensorObject>(base_obj, header_);
+    if (base_obj->lidar_supplement.is_background) {
       background_objects_.emplace_back(obj);
     } else {
       foreground_objects_.emplace_back(obj);
@@ -44,9 +51,27 @@ void SensorFrame::Initialize(const base::FrameConstPtr& frame_ptr,
   }
 }
 
-std::string SensorFrame::GetSensorId() const { return sensor_id_; }
+void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr,
+                             const SensorPtr& sensor) {
+  Initialize(base_frame_ptr);
+}
 
-base::SensorType SensorFrame::GetSensorType() const { return sensor_type_; }
+std::string SensorFrame::GetSensorId() const {
+  if (header_ == nullptr) {
+    return std::string("");
+  }
+
+  return header_->sensor_info.name;
+}
+
+
+base::SensorType SensorFrame::GetSensorType() const {
+  if (header_ == nullptr) {
+    return base::SensorType::UNKNOWN_SENSOR_TYPE;
+  }
+
+  return header_->sensor_info.type;
+}
 
 }  // namespace fusion
 }  // namespace perception

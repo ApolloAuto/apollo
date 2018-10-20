@@ -66,8 +66,7 @@ TEST(TrackTest, test) {
   base_frame_1->objects.emplace_back(base_obj_1);
   base_frame_1->sensor_info = vlp64_info;
   SensorFramePtr frame_1(new SensorFrame());
-  frame_1->Initialize(base_frame_1, vlp64_ptr->GetSensorId(),
-                      vlp64_ptr->GetSensorType());
+  frame_1->Initialize(base_frame_1, vlp64_ptr);
   EXPECT_EQ(frame_1->GetForegroundObjects().size(), 1);
 
   base::ObjectPtr base_obj_2(new base::Object());
@@ -79,8 +78,7 @@ TEST(TrackTest, test) {
   base_frame_2->objects.emplace_back(base_obj_2);
   base_frame_2->sensor_info = radar_info;
   SensorFramePtr frame_2(new SensorFrame());
-  frame_2->Initialize(base_frame_2, radar_ptr->GetSensorId(),
-                      radar_ptr->GetSensorType());
+  frame_2->Initialize(base_frame_2, radar_ptr);
   EXPECT_EQ(frame_2->GetForegroundObjects().size(), 1);
 
   base::ObjectPtr base_obj_3(new base::Object());
@@ -92,8 +90,7 @@ TEST(TrackTest, test) {
   base_frame_3->objects.emplace_back(base_obj_3);
   base_frame_3->sensor_info = radar_rear_info;
   SensorFramePtr frame_3(new SensorFrame());
-  frame_3->Initialize(base_frame_3, radar_rear_ptr->GetSensorId(),
-                      radar_rear_ptr->GetSensorType());
+  frame_3->Initialize(base_frame_3, radar_rear_ptr);
   EXPECT_EQ(frame_3->GetForegroundObjects().size(), 1);
 
   base::ObjectPtr base_obj_4(new base::Object());
@@ -105,8 +102,7 @@ TEST(TrackTest, test) {
   base_frame_4->objects.emplace_back(base_obj_4);
   base_frame_4->sensor_info = camera_info;
   SensorFramePtr frame_4(new SensorFrame());
-  frame_4->Initialize(base_frame_4, camera_ptr->GetSensorId(),
-                      camera_ptr->GetSensorType());
+  frame_4->Initialize(base_frame_4, camera_ptr);
   EXPECT_EQ(frame_4->GetForegroundObjects().size(), 1);
 
   base::ObjectPtr base_obj_5(new base::Object());
@@ -118,8 +114,7 @@ TEST(TrackTest, test) {
   base_frame_5->objects.emplace_back(base_obj_5);
   base_frame_5->sensor_info = vlp64_info;
   SensorFramePtr frame_5(new SensorFrame());
-  frame_5->Initialize(base_frame_5, vlp64_ptr->GetSensorId(),
-                      vlp64_ptr->GetSensorType());
+  frame_5->Initialize(base_frame_5, vlp64_ptr);
   EXPECT_EQ(frame_5->GetForegroundObjects().size(), 1);
 
   base::ObjectPtr base_obj_6(new base::Object());
@@ -131,13 +126,12 @@ TEST(TrackTest, test) {
   base_frame_6->objects.emplace_back(base_obj_6);
   base_frame_6->sensor_info = radar_info;
   SensorFramePtr frame_6(new SensorFrame());
-  frame_6->Initialize(base_frame_6, radar_ptr->GetSensorId(),
-                      radar_ptr->GetSensorType());
+  frame_6->Initialize(base_frame_6, radar_ptr);
   EXPECT_EQ(frame_6->GetForegroundObjects().size(), 1);
 
   Track track;
   EXPECT_TRUE(track.GetFusedObject() != nullptr);
-  EXPECT_EQ(track.GetTrackId(), 0);
+  EXPECT_EQ(track.GetTrackId(), -1);
 
   track.Initialize(frame_1->GetForegroundObjects()[0], false);
   EXPECT_TRUE(track.GetLatestLidarObject() != nullptr);

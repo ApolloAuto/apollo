@@ -31,7 +31,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-class Sensor : public std::enable_shared_from_this<Sensor> {
+class Sensor {
  public:
   Sensor() = delete;
 
@@ -70,9 +70,6 @@ class Sensor : public std::enable_shared_from_this<Sensor> {
  private:
   FRIEND_TEST(SensorTest, test);
 
-  inline SensorPtr GetPtr() { return shared_from_this(); }
-
- private:
   base::SensorInfo sensor_info_;
 
   double latest_query_timestamp_ = 0.0;

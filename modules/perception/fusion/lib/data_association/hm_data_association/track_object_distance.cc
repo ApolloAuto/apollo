@@ -106,18 +106,22 @@ bool TrackObjectDistance::QueryLidar2WorldPose(
   return true;
 }
 
-bool TrackObjectDistance::BuildProjectionCacheObject(
-    const SensorObjectConstPtr& lidar, const SensorObjectConstPtr& camera,
+ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
+    const SensorObjectConstPtr& lidar,
+    const SensorObjectConstPtr& camera,
     const base::BaseCameraModelPtr& camera_model,
-    ProjectionCacheObject* object) {
+    const std::string& measurement_sensor_id,
+    double measurement_timestamp,
+    const std::string& projection_sensor_id,
+    double projection_timestamp) {
   // 1. get lidar2camera_pose
   Eigen::Matrix4d world2camera_pose;
   if (!QueryWorld2CameraPose(camera, &world2camera_pose)) {
-    return false;
+    return nullptr;
   }
   Eigen::Matrix4d lidar2world_pose;
   if (!QueryLidar2WorldPose(lidar, &lidar2world_pose)) {
-    return false;
+    return nullptr;
   }
   Eigen::Matrix4d lidar2camera_pose = world2camera_pose * lidar2world_pose;
   // 2. compute offset
@@ -129,6 +133,14 @@ bool TrackObjectDistance::BuildProjectionCacheObject(
       lidar->GetBaseObject()->lidar_supplement.cloud;
   double width = camera_model->get_width();
   double height = camera_model->get_height();
+  const int& lidar_object_id = lidar->GetBaseObject()->id;
+  ProjectionCacheObject* cache_object = projection_cache_.BuildObject(
+      measurement_sensor_id, measurement_timestamp,
+      projection_sensor_id, projection_timestamp, lidar_object_id);
+  if (cache_object == nullptr) {
+    AERROR << "Failed to build projection cache object";
+    return nullptr;
+  }
   size_t start_ind = projection_cache_.GetPoint2dsSize();
   size_t end_ind = projection_cache_.GetPoint2dsSize();
   float xmin = FLT_MAX;
@@ -187,17 +199,18 @@ bool TrackObjectDistance::BuildProjectionCacheObject(
     }
   }
   end_ind = projection_cache_.GetPoint2dsSize();
-  object->SetStartInd(start_ind);
-  object->SetEndInd(end_ind);
+  cache_object->SetStartInd(start_ind);
+  cache_object->SetEndInd(end_ind);
   base::BBox2DF box = base::BBox2DF(xmin, ymin, xmax, ymax);
-  object->SetBox(box);
-  return true;
+  cache_object->SetBox(box);
+  return cache_object;
 }
 
-bool TrackObjectDistance::QueryProjectionCacheObject(
-    const SensorObjectConstPtr& lidar, const SensorObjectConstPtr& camera,
+ProjectionCacheObject* TrackObjectDistance::QueryProjectionCacheObject(
+    const SensorObjectConstPtr& lidar,
+    const SensorObjectConstPtr& camera,
     const base::BaseCameraModelPtr& camera_model,
-    const bool measurement_is_lidar, ProjectionCacheObject* object) {
+    const bool measurement_is_lidar) {
   // 1. try to query existed projection cache object
   const std::string& measurement_sensor_id =
       measurement_is_lidar ? lidar->GetSensorId() : camera->GetSensorId();
@@ -208,24 +221,14 @@ bool TrackObjectDistance::QueryProjectionCacheObject(
   const double& projection_timestamp =
       measurement_is_lidar ? camera->GetTimestamp() : lidar->GetTimestamp();
   const int& lidar_object_id = lidar->GetBaseObject()->id;
-  if (projection_cache_.QueryObject(
-          measurement_sensor_id, measurement_timestamp, projection_sensor_id,
-          projection_timestamp, lidar_object_id, object)) {
-    return true;
-  }
+  ProjectionCacheObject* cache_object = projection_cache_.QueryObject(
+      measurement_sensor_id, measurement_timestamp,
+      projection_sensor_id, projection_timestamp, lidar_object_id);
+  if (cache_object != nullptr) return cache_object;
   // 2. if query failed, build projection and cache it
-  ProjectionCacheObject pc_object = ProjectionCacheObject();
-  if (!BuildProjectionCacheObject(lidar, camera, camera_model, &pc_object)) {
-    return false;
-  }
-  projection_cache_.AddObject(projection_sensor_id, projection_timestamp,
-                              lidar_object_id, pc_object);
-  if (projection_cache_.QueryObject(
-          measurement_sensor_id, measurement_timestamp, projection_sensor_id,
-          projection_timestamp, lidar_object_id, object)) {
-    return true;
-  }
-  return false;
+  return BuildProjectionCacheObject(lidar, camera, camera_model,
+      measurement_sensor_id, measurement_timestamp,
+      projection_sensor_id, projection_timestamp);
 }
 
 void TrackObjectDistance::QueryProjectedVeloCtOnCamera(
@@ -304,12 +307,9 @@ float TrackObjectDistance::Compute(const TrackPtr& fused_track,
   }
   float distance = (std::numeric_limits<float>::max)();
   float min_distance = (std::numeric_limits<float>::max)();
-  const SensorObjectConstPtr& lidar_object =
-      fused_track->GetLatestLidarObject();
-  const SensorObjectConstPtr& radar_object =
-      fused_track->GetLatestRadarObject();
-  const SensorObjectConstPtr& camera_object =
-      fused_track->GetLatestCameraObject();
+  SensorObjectConstPtr lidar_object = fused_track->GetLatestLidarObject();
+  SensorObjectConstPtr radar_object = fused_track->GetLatestRadarObject();
+  SensorObjectConstPtr camera_object = fused_track->GetLatestCameraObject();
   if (IsLidar(sensor_object)) {
     if (lidar_object != nullptr) {
       distance = ComputeLidarLidar(lidar_object, sensor_object, *ref_point);
@@ -466,15 +466,14 @@ float TrackObjectDistance::ComputeLidarCamera(
   if (cloud.size() > 0) {
     // 2.1 if cloud is not empty, calculate distance according to pts box
     // similarity
-    ProjectionCacheObject projection_cache_object = ProjectionCacheObject();
-    if (!QueryProjectionCacheObject(lidar, camera, camera_model,
-                                    measurement_is_lidar,
-                                    &projection_cache_object)) {
+    ProjectionCacheObject* cache_object = QueryProjectionCacheObject(
+        lidar, camera, camera_model, measurement_is_lidar);
+    if (cache_object == nullptr) {
       AERROR << "Failed to query projection cached object";
       return distance;
     }
-    double similarity = ComputePtsBoxSimilarity(
-        &projection_cache_, projection_cache_object, camera_bbox);
+    double similarity = ComputePtsBoxSimilarity(&projection_cache_,
+        cache_object, camera_bbox);
     distance =
         distance_thresh_ *
         ((1 - similarity) / (1 - vc_similarity2distance_penalize_thresh_));
@@ -625,14 +624,13 @@ double TrackObjectDistance::ComputeLidarCameraSimilarity(
   const base::BBox2DF& camera_bbox =
       camera->GetBaseObject()->camera_supplement.box;
   if (cloud.size() > 0) {
-    ProjectionCacheObject projection_cache_object = ProjectionCacheObject();
-    if (!QueryProjectionCacheObject(lidar, camera, camera_model,
-                                    measurement_is_lidar,
-                                    &projection_cache_object)) {
+    ProjectionCacheObject* cache_object = QueryProjectionCacheObject(
+        lidar, camera, camera_model, measurement_is_lidar);
+    if (cache_object == nullptr) {
       return similarity;
     }
     similarity = ComputePtsBoxSimilarity(&projection_cache_,
-                                         projection_cache_object, camera_bbox);
+                                         cache_object, camera_bbox);
   }
   return similarity;
 }

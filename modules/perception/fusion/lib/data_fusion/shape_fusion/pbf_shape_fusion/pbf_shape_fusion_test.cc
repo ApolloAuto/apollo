@@ -74,8 +74,7 @@ TEST(PbfShapeFusion, lidar_track) {
   lidar_track_frame->objects = lidar_track_objects;
 
   SensorFramePtr lidar_sensor_frame(new SensorFrame);
-  lidar_sensor_frame->Initialize(lidar_track_frame,
-      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
+  lidar_sensor_frame->Initialize(lidar_track_frame, lidar_sensor);
   SensorObjectPtr lidar_obj(
       new SensorObject(base_track_lidar, lidar_sensor_frame));
   TrackPtr lidar_track(new Track());
@@ -97,8 +96,7 @@ TEST(PbfShapeFusion, lidar_track) {
   lidar_frame->objects = lidar_objects;
 
   SensorFramePtr lidar_sensor_frame_2(new SensorFrame);
-  lidar_sensor_frame_2->Initialize(lidar_frame,
-      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
+  lidar_sensor_frame_2->Initialize(lidar_frame, lidar_sensor);
   SensorObjectPtr lidar_measurement(
       new SensorObject(base_object_lidar, lidar_sensor_frame_2));
   // radar measurment
@@ -118,8 +116,7 @@ TEST(PbfShapeFusion, lidar_track) {
   radar_frame->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame(new SensorFrame);
-  radar_sensor_frame->Initialize(radar_frame,
-      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
+  radar_sensor_frame->Initialize(radar_frame, radar_sensor);
   SensorObjectPtr radar_measurement(
       new SensorObject(base_object_radar, radar_sensor_frame));
   // camera measurment
@@ -139,8 +136,7 @@ TEST(PbfShapeFusion, lidar_track) {
   camera_frame->objects = camera_objects;
 
   SensorFramePtr camera_sensor_frame(new SensorFrame);
-  camera_sensor_frame->Initialize(camera_frame,
-      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
+  camera_sensor_frame->Initialize(camera_frame, camera_sensor);
   SensorObjectPtr camera_measurement(
       new SensorObject(base_object_camera, camera_sensor_frame));
 
@@ -217,8 +213,7 @@ TEST(PbfShapeFusion, radar_track) {
   radar_track_frame->objects = radar_track_objects;
 
   SensorFramePtr radar_sensor_frame(new SensorFrame);
-  radar_sensor_frame->Initialize(radar_track_frame,
-      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
+  radar_sensor_frame->Initialize(radar_track_frame, radar_sensor);
   SensorObjectPtr radar_obj(
       new SensorObject(base_track_radar, radar_sensor_frame));
   TrackPtr radar_track(new Track());
@@ -241,8 +236,7 @@ TEST(PbfShapeFusion, radar_track) {
   lidar_frame->objects = lidar_objects;
 
   SensorFramePtr lidar_sensor_frame(new SensorFrame);
-  lidar_sensor_frame->Initialize(lidar_frame,
-      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
+  lidar_sensor_frame->Initialize(lidar_frame, lidar_sensor);
   SensorObjectPtr lidar_measurement(
       new SensorObject(base_object_lidar, lidar_sensor_frame));
   // radar measurment
@@ -262,8 +256,7 @@ TEST(PbfShapeFusion, radar_track) {
   radar_frame->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame_2(new SensorFrame);
-  radar_sensor_frame_2->Initialize(radar_frame,
-      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
+  radar_sensor_frame_2->Initialize(radar_frame, radar_sensor);
   SensorObjectPtr radar_measurement(
       new SensorObject(base_object_radar, radar_sensor_frame_2));
   // camera measurment
@@ -283,8 +276,7 @@ TEST(PbfShapeFusion, radar_track) {
   camera_frame->objects = camera_objects;
 
   SensorFramePtr camera_sensor_frame(new SensorFrame);
-  camera_sensor_frame->Initialize(camera_frame,
-      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
+  camera_sensor_frame->Initialize(camera_frame, camera_sensor);
   SensorObjectPtr camera_measurement(
       new SensorObject(base_object_camera, camera_sensor_frame));
   // unknown measurment
@@ -304,8 +296,7 @@ TEST(PbfShapeFusion, radar_track) {
   unknown_frame->objects = unknown_objects;
 
   SensorFramePtr unknown_sensor_frame(new SensorFrame);
-  unknown_sensor_frame->Initialize(unknown_frame,
-      unknown_sensor->GetSensorId(), unknown_sensor->GetSensorType());
+  unknown_sensor_frame->Initialize(unknown_frame, unknown_sensor);
   SensorObjectPtr unknown_measurement(
       new SensorObject(base_object_unknown, unknown_sensor_frame));
 
@@ -393,8 +384,7 @@ TEST(PbfShapeFusion, camera_track) {
   camera_track_frame->objects = camera_track_objects;
 
   SensorFramePtr camera_sensor_frame(new SensorFrame);
-  camera_sensor_frame->Initialize(camera_track_frame,
-      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
+  camera_sensor_frame->Initialize(camera_track_frame, camera_sensor);
   SensorObjectPtr camera_obj(
       new SensorObject(base_track_camera, camera_sensor_frame));
   TrackPtr camera_track(new Track());
@@ -417,8 +407,7 @@ TEST(PbfShapeFusion, camera_track) {
   lidar_frame->objects = lidar_objects;
 
   SensorFramePtr lidar_sensor_frame(new SensorFrame);
-  lidar_sensor_frame->Initialize(lidar_frame,
-      lidar_sensor->GetSensorId(), lidar_sensor->GetSensorType());
+  lidar_sensor_frame->Initialize(lidar_frame, lidar_sensor);
   SensorObjectPtr lidar_measurement(
       new SensorObject(base_object_lidar, lidar_sensor_frame));
   // radar measurment
@@ -438,8 +427,7 @@ TEST(PbfShapeFusion, camera_track) {
   radar_frame->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame(new SensorFrame);
-  radar_sensor_frame->Initialize(radar_frame,
-      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
+  radar_sensor_frame->Initialize(radar_frame, radar_sensor);
   SensorObjectPtr radar_measurement(
       new SensorObject(base_object_radar, radar_sensor_frame));
   FramePtr radar_frame_2(new base::Frame);
@@ -449,8 +437,7 @@ TEST(PbfShapeFusion, camera_track) {
   radar_frame_2->objects = radar_objects;
 
   SensorFramePtr radar_sensor_frame_2(new SensorFrame);
-  radar_sensor_frame_2->Initialize(radar_frame_2,
-      radar_sensor->GetSensorId(), radar_sensor->GetSensorType());
+  radar_sensor_frame_2->Initialize(radar_frame_2, radar_sensor);
   SensorObjectPtr radar_measurement_2(
       new SensorObject(base_object_radar, radar_sensor_frame_2));
   // camera measurment
@@ -470,8 +457,7 @@ TEST(PbfShapeFusion, camera_track) {
   camera_frame->objects = camera_objects;
 
   SensorFramePtr camera_sensor_frame_2(new SensorFrame);
-  camera_sensor_frame_2->Initialize(camera_frame,
-      camera_sensor->GetSensorId(), camera_sensor->GetSensorType());
+  camera_sensor_frame_2->Initialize(camera_frame, camera_sensor);
   SensorObjectPtr camera_measurement(
       new SensorObject(base_object_camera, camera_sensor_frame_2));
 

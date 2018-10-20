@@ -35,7 +35,7 @@ namespace fusion {
 // 3. generate location similarity from Chi-Squared distribution
 // @NOTE: original method name is compute_pts_box_dist_score
 double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
-                                       const ProjectionCacheObject& object,
+                                       const ProjectionCacheObject* object,
                                        const base::BBox2DF& camera_bbox) {
   static const double min_p = 1e-6;
   static const double max_p = 1 - 1e-6;
@@ -43,35 +43,44 @@ double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
   double y_std_dev = 0.5;
   size_t check_augmented_iou_minimum_pts_num = 20;
   float augmented_buffer = 25;
-  if (object.Empty()) {
+  if (object->Empty()) {
+    ADEBUG << "cache object is empty!";
     return min_p;
   }
   Eigen::Vector2d mean_pixel_dist(0.0, 0.0);
   // calculate mean x y pixel distance
-  const size_t& start_ind = object.GetStartInd();
-  const size_t& end_ind = object.GetEndInd();
+  const size_t& start_ind = object->GetStartInd();
+  const size_t& end_ind = object->GetEndInd();
   if (end_ind - start_ind >= check_augmented_iou_minimum_pts_num) {
-    base::BBox2DF velo_bbox = object.GetBox();
+    base::BBox2DF velo_bbox = object->GetBox();
     float augmented_iou =
         CalculateAugmentedIOUBBox(velo_bbox, camera_bbox, augmented_buffer);
     if (augmented_iou < FLT_EPSILON) {
+      ADEBUG << "augmented iou is empty!";
       return min_p;
     }
   }
   for (size_t i = start_ind; i < end_ind; ++i) {
-    auto& velo_pt2d = cache->GetPoint2d(i);
-    if (velo_pt2d.x() >= camera_bbox.xmin && velo_pt2d.x() < camera_bbox.xmax &&
-        velo_pt2d.y() >= camera_bbox.ymin && velo_pt2d.y() < camera_bbox.ymax) {
+    auto* velo_pt2d = cache->GetPoint2d(i);
+    if (velo_pt2d == nullptr) {
+      AERROR << "query pt from projection cache failed!";
+      continue;
+    }
+    if (velo_pt2d->x() >= camera_bbox.xmin &&
+        velo_pt2d->x() < camera_bbox.xmax &&
+        velo_pt2d->y() >= camera_bbox.ymin &&
+        velo_pt2d->y() < camera_bbox.ymax) {
       continue;
     }
     Eigen::Vector2d diff;
-    diff.x() = std::max(0.0, camera_bbox.xmin - velo_pt2d.x());
-    diff.x() = std::max(diff.x(), velo_pt2d.x() - camera_bbox.xmax);
-    diff.y() = std::max(0.0, camera_bbox.ymin - velo_pt2d.y());
-    diff.y() = std::max(diff.y(), velo_pt2d.y() - camera_bbox.ymax);
+    diff.x() = std::max(0.0, camera_bbox.xmin - velo_pt2d->x());
+    diff.x() = std::max(diff.x(), velo_pt2d->x() - camera_bbox.xmax);
+    diff.y() = std::max(0.0, camera_bbox.ymin - velo_pt2d->y());
+    diff.y() = std::max(diff.y(), velo_pt2d->y() - camera_bbox.ymax);
     mean_pixel_dist += diff;
   }
-  mean_pixel_dist /= object.Size();
+  mean_pixel_dist /= object->Size();
+  ADEBUG << "mean_pixel_dist is: " << mean_pixel_dist;
   // normalize according to box size
   Eigen::Vector2d box_size = Eigen::Vector2d(
       camera_bbox.xmax - camera_bbox.xmin, camera_bbox.ymax - camera_bbox.ymin);
@@ -95,20 +104,20 @@ double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
 // 3. generate shape similarity from Chi-Squared distribution
 // @NOTE: original method name is compute_pts_box_shape_score
 double ComputePtsBoxShapeSimilarity(const ProjectionCachePtr& cache,
-                                    const ProjectionCacheObject& object,
+                                    const ProjectionCacheObject* object,
                                     const base::BBox2DF& camera_bbox) {
   static const double min_p = 1e-3;
   static const double max_p = 1 - 1e-3;
   double x_std_dev = 0.3;
   double y_std_dev = 0.4;
-  if (object.Empty()) {
+  if (object->Empty()) {
     return min_p;
   }
   // compute 2d bbox size of camera & velo
   Eigen::Vector2d camera_box_size = Eigen::Vector2d(
       camera_bbox.xmax - camera_bbox.xmin, camera_bbox.ymax - camera_bbox.ymin);
   // handled one point case
-  base::BBox2DF velo_projection_bbox = object.GetBox();
+  base::BBox2DF velo_projection_bbox = object->GetBox();
   Eigen::Vector2d velo_box_size = camera_box_size / 10;
   velo_box_size.x() =
       std::max(static_cast<float>(velo_box_size.x()),
@@ -145,16 +154,17 @@ double ComputePtsBoxShapeSimilarity(const ProjectionCachePtr& cache,
 // 2. fuse the two similarity above
 // @NOTE: original method name is compute_pts_box_score
 double ComputePtsBoxSimilarity(const ProjectionCachePtr& cache,
-                               const ProjectionCacheObject& object,
+                               const ProjectionCacheObject* object,
                                const base::BBox2DF& camera_bbox) {
   double location_similarity =
       ComputePtsBoxLocationSimilarity(cache, object, camera_bbox);
   double shape_similarity =
       ComputePtsBoxShapeSimilarity(cache, object, camera_bbox);
-  ADEBUG << "location_similarity@" << location_similarity
-         << ", shape_similarity@" << shape_similarity;
   double fused_similarity =
       FuseTwoProbabilities(location_similarity, shape_similarity);
+  ADEBUG << "fused_similarity@" << fused_similarity
+         << ", location_similarity@" << location_similarity
+         << ", shape_similarity@" << shape_similarity;
   return fused_similarity;
 }
 // @brief: calculate the x/y/h similarity between radar and camera
