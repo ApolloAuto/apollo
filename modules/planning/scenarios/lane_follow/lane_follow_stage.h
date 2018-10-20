@@ -39,6 +39,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 class LaneFollowStage : public Stage {
  public:
@@ -68,5 +69,6 @@ class LaneFollowStage : public Stage {
   SpeedProfileGenerator speed_profile_generator_;
 };
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

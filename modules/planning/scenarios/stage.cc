@@ -27,6 +27,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
   next_stage_ = config_.stage_type();
@@ -88,5 +89,6 @@ bool Stage::PlanningOnReferenceLine(
   return true;
 }
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

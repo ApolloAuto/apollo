@@ -25,6 +25,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 Scenario::Scenario(const ScenarioConfig& config, const ScenarioContext* context)
     : config_(config), scenario_context_(context) {}
@@ -76,5 +77,6 @@ Scenario::ScenarioStatus Scenario::Process(
   }
 }
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

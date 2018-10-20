@@ -27,6 +27,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 class ScenarioManager final {
  public:
@@ -75,5 +76,6 @@ class ScenarioManager final {
   const uint32_t conf_min_pass_s_distance_ = 3.0;  // meter
 };
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

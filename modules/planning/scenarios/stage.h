@@ -34,6 +34,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 class Stage {
  public:
@@ -96,5 +97,6 @@ class Stage {
     CONTEXT* GetContext() { return GetContextAs<CONTEXT>(); }              \
   }
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

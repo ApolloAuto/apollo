@@ -39,6 +39,7 @@
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 
 class LaneFollowScenario : public Scenario {
  public:
@@ -54,5 +55,6 @@ class LaneFollowScenario : public Scenario {
                       const Frame& frame) const override;
 };
 
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
