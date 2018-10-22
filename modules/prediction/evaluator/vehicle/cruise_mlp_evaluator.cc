@@ -206,6 +206,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   }
 
   double acc = 0.0;
+  double jerk = 0.0;
   if (static_cast<int>(speeds.size()) >= 3 * curr_size &&
       delta_t > std::numeric_limits<double>::epsilon()) {
     double speed_1st_recent =
@@ -214,7 +215,8 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
         ComputeMean(speeds, curr_size, 2 * curr_size - 1);
     double speed_3rd_recent =
         ComputeMean(speeds, 2 * curr_size, 3 * curr_size - 1);
-    acc = (speed_1st_recent - 2 * speed_2nd_recent + speed_3rd_recent) /
+    acc = (speed_1st_recent - speed_2nd_recent) / (curr_size * delta_t);
+    jerk = (speed_1st_recent - 2 * speed_2nd_recent + speed_3rd_recent) /
           (curr_size * curr_size * delta_t * delta_t);
   }
 
@@ -249,6 +251,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
 
   feature_values->push_back(speed_mean);
   feature_values->push_back(acc);
+  feature_values->push_back(jerk);
 
   feature_values->push_back(dist_lbs.front());
   feature_values->push_back(dist_lb_rate);
