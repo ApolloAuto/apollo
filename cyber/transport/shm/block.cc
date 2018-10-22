@@ -73,9 +73,11 @@ bool Block::Read(const uint8_t* src, std::string* msg, std::string* msg_info) {
   if (msg == nullptr || msg_info == nullptr) {
     return false;
   }
-  msg->assign(reinterpret_cast<const char*>(src), msg_size_);
-  msg_info->assign(reinterpret_cast<const char*>(src) + msg_size_,
-                   msg_info_size_);
+  msg->resize(msg_size_);
+  memcpy(const_cast<char*>(msg->data()), src, msg_size_);
+
+  msg_info->resize(msg_info_size_);
+  memcpy(const_cast<char*>(msg_info->data()), src + msg_size_, msg_info_size_);
 
   return true;
 }

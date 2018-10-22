@@ -37,6 +37,11 @@ cc_library(
         "component_base",
         "//cyber/blocker:blocker_manager",
         "//cyber/timer:timer",
+        "//cyber/transport:history",
+        "//cyber/transport:hybrid_transmitter",
+        "//cyber/transport:intra_transmitter",
+        "//cyber/transport:rtps_transmitter",
+        "//cyber/transport:shm_transmitter",
     ],
 )
 

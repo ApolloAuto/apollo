@@ -12,6 +12,7 @@ cc_library(
         "node_manager",
         "service_manager",
         "//cyber:init",
+        "//cyber/transport:participant",
     ],
 )
 
@@ -30,7 +31,8 @@ cc_library(
     srcs = [ "communication/participant_listener.cc", ],
     hdrs = [ "communication/participant_listener.h", ],
     deps = [
-        "//cyber/transport/rtps:rtps_lib",
+        "//cyber/common:log",
+        "@fastrtps//:fastrtps",
     ],
 )
 
@@ -39,7 +41,10 @@ cc_library(
     srcs = [ "communication/subscriber_listener.cc", ],
     hdrs = [ "communication/subscriber_listener.h", ],
     deps = [
-        "//cyber/transport/rtps:rtps_lib",
+        "//cyber/common:log",
+        "//cyber/transport:underlay_message",
+        "//cyber/transport:underlay_message_type",
+        "@fastrtps//:fastrtps",
     ],
 )
 
@@ -121,6 +126,9 @@ cc_library(
         "//cyber/proto:role_attributes_cc_proto",
         "//cyber/proto:topology_change_cc_proto",
         "//cyber/time:time",
+        "//cyber/transport:attributes_filler",
+        "//cyber/transport:underlay_message_type",
+        "//cyber/transport:qos_profile_conf",
     ],
 )
 
