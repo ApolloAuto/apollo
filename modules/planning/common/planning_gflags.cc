@@ -380,9 +380,9 @@ DEFINE_double(fallback_time_unit, 0.02,
 DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
               "velocity to use polynomial speed fallback.");
 
-DEFINE_double(speed_bump_speed_limit, 6.7056,
+DEFINE_double(speed_bump_speed_limit, 4.4704,
               "the speed limit when passing a speed bump, m/s. The default "
-              "speed limit is 15 mph.");
+              "speed limit is 10 mph.");
 
 // navigation mode
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
