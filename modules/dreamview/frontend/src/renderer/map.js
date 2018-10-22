@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import STORE from "store";
 import { MAP_WS } from "store/websocket";
+import _ from "lodash";
 
 import {
     drawSegmentsFromPoints,
@@ -41,12 +42,12 @@ const stopSignScales = {
     z: STOP_SIGN_SCALE
 };
 
+const EPSILON = 1e-9;
+
 export default class Map {
     constructor() {
         this.hash = -1;
         this.data = {};
-        this.laneHeading = {};
-        this.overlapMap = {};
         this.initialized = false;
         this.elementKindsDrawn = '';
     }
@@ -219,41 +220,6 @@ export default class Map {
         return drewObjects;
     }
 
-    extractOverlaps(overlaps) {
-        overlaps.forEach(overlap => {
-            const overlapId = overlap.id.id;
-
-            const laneIds = [];
-            const signalIds = [];
-            const stopIds = [];
-            overlap.object.forEach(object => {
-                if (object.laneOverlapInfo) {
-                    laneIds.push(object.id.id);
-                }
-                if (object.signalOverlapInfo) {
-                    signalIds.push(object.id.id);
-                }
-                if (object.stopSignOverlapInfo) {
-                    stopIds.push(object.id.id);
-                }
-            });
-            // Picks overlap with one signal/stop_sign and one lane.
-            // Constructs a map: overlapId -> laneId
-            if (laneIds.length === 1 && (stopIds.length === 1 || signalIds.length === 1)) {
-                this.overlapMap[overlapId] = laneIds[0];
-            }
-        });
-    }
-
-    getLaneHeading(lane) {
-        const last2Points = _.takeRight(_.last(lane.centralCurve.segment).lineSegment.point, 2);
-        if (last2Points.length === 2) {
-            return Math.atan2(last2Points[0].y - last2Points[1].y,
-                last2Points[0].x - last2Points[1].x);
-        }
-        return 0;
-    }
-
     getHeadingFromStopLine(object) {
         const stopLine = object.stopLine[0].segment[0].lineSegment.point;
         const len = stopLine.length;
@@ -263,6 +229,57 @@ export default class Map {
             return Math.PI * 1.5 + stopLineDirection;
         }
         return NaN;
+    }
+
+    // use the signal real direction to decide its heading
+    // but the signal could either face towards or away from the stop line
+    // so use the intersection of signal's orthiogonal line and stop line to decide
+    getHeadingFromStopLineAndTrafficLightBoundary(signal) {
+        // find the plane of the signal
+        const boundaryPoints = signal.boundary.point;
+        if (boundaryPoints.length < 3) {
+            console.warn("Cannot get three points from boundary, signal_id: " + signal.id.id);
+            return this.getHeadingFromStopLine(signal);
+        }
+        const boundary1 = boundaryPoints[0];
+        const boundary2 = boundaryPoints[1];
+        const boundary3 = boundaryPoints[2];
+        // get a orthogonal line of the plane (only need its projection on XY coordinate system)
+        // construct ax+by+c=0 ==> orthogonalX*x+orthogonalY*y+constant=0
+        const orthogonalX = (boundary2.x - boundary1.x) * (boundary3.z - boundary1.z)
+            - (boundary3.x - boundary1.x) * (boundary2.z - boundary1.z);
+        const orthogonalY = (boundary2.y - boundary1.y) * (boundary3.z - boundary1.z)
+             - (boundary3.y - boundary1.y) * (boundary2.z - boundary1.z);
+        const orthogonalConstant = -orthogonalX * boundary1.x - orthogonalY * boundary1.y;
+        // get the stop line
+        const stopLine = _.get(signal, 'stopLine[0].segment[0].lineSegment.point', '');
+        const len = stopLine.length;
+        if (len < 2) {
+            console.warn("Cannot get any stop line, signal_id: " + signal.id.id);
+            return NaN;
+        }
+        // construct ax+by+c=0 ==> stopLineX*x+stopLineY*y+constant=0
+        const stopLineX = stopLine[len - 1].y - stopLine[0].y;
+        const stopLineY = stopLine[0].x - stopLine[len - 1].x;
+        const stopLineConstant = -stopLineX * stopLine[0].x - stopLineY * stopLine[0].y;
+        // calculate the intersection
+        if (Math.abs(stopLineX * orthogonalY - orthogonalX * stopLineY) < EPSILON) {
+            console.warn("The signal orthogonal direction is parallel to the stop line,",
+                "signal_id: " + signal.id.id);
+            return this.getHeadingFromStopLine(signal);
+        }
+        const intersectX = (stopLineY * orthogonalConstant - orthogonalY * stopLineConstant)
+            / (stopLineX * orthogonalY - orthogonalX * stopLineY);
+        const intersectY = stopLineY !== 0 ?
+            (-stopLineX * intersectX - stopLineConstant) / stopLineY
+            : (-orthogonalX * intersectX - orthogonalConstant) / orthogonalY;
+        let direction = Math.atan2(- orthogonalX, orthogonalY);
+        // if the direction is not towards to intersection point, turn around
+        if ((direction < 0 && intersectY > boundary1.y) ||
+            (direction > 0 && intersectY < boundary1.y)) {
+            direction += Math.PI;
+        }
+        return direction;
     }
 
     getSignalPositionAndHeading(signal, coordinates) {
@@ -280,25 +297,12 @@ export default class Map {
             console.warn("Unable to determine signal location, skip.");
             return null;
         }
-
-        let heading = undefined;
-        const overlapLen = _.get(signal, 'overlapId.length', 0);
-        if (overlapLen > 0) {
-            const overlapId = signal.overlapId[overlapLen - 1].id;
-            heading = this.laneHeading[this.overlapMap[overlapId]];
-        }
-        if (!heading) {
-            console.warn("Unable to get traffic light heading, " +
-                "use orthogonal direction of StopLine.");
-            heading = this.getHeadingFromStopLine(signal);
-        }
-
+        const heading = this.getHeadingFromStopLineAndTrafficLightBoundary(signal);
         if (!isNaN(heading)) {
             let position = new THREE.Vector3(0, 0, 0);
             position.x = _.meanBy(_.values(locations), l => l.x);
             position.y = _.meanBy(_.values(locations), l => l.y);
             position = coordinates.applyOffset(position);
-
             return { "pos": position, "heading": heading };
         } else {
             console.error('Error loading traffic light. Unable to determine heading.');
@@ -331,11 +335,7 @@ export default class Map {
     }
 
     getStopSignPositionAndHeading(stopSign, coordinates) {
-        let heading = this.getHeadingFromStopLine(stopSign);
-        if (isNaN(heading) && !_.isEmpty(stopSign.overlapId)) {
-            const overlapId = stopSign.overlapId[0].id;
-            heading = this.laneHeading[this.overlapMap[overlapId]] || NaN;
-        }
+        const heading = this.getHeadingFromStopLine(stopSign);
 
         if (!isNaN(heading)) {
             const stopLinePoint = _.last(stopSign.stopLine[0].segment[0].lineSegment.point);
@@ -401,15 +401,7 @@ export default class Map {
                 if (drawThisKind && currentIds && currentIds.includes(oldData.id.id)) {
                     newData[kind].push(oldData);
                 } else {
-                    if (kind !== "overlap") {
-                        this.removeDrewObjects(oldData.drewObjects, scene);
-                    }
-                    if (kind === "lane") {
-                        delete this.laneHeading[oldData.id.id];
-                    }
-                    if (kind === "overlap") {
-                        delete this.overlapMap[oldData.id.id];
-                    }
+                    this.removeDrewObjects(oldData.drewObjects, scene);
                 }
             });
         }
@@ -421,11 +413,7 @@ export default class Map {
     // side. This also means that the server should maintain a state of
     // (possibly) visible elements, presummably in the global store.
     appendMapData(newData, coordinates, scene) {
-        // Note: drawing order matter since "stopSign" and "signal" are dependent on "overlap"
-        const kinds = ["overlap", "lane", "junction", "road",
-                       "clearArea", "signal", "stopSign", "crosswalk",
-                       "parkingSpace", "speedBump"];
-        for (const kind of kinds) {
+        for (const kind in newData) {
             if (!newData[kind]) {
                 continue;
             }
@@ -441,7 +429,6 @@ export default class Map {
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addLane(lane, coordinates, scene)
                         }));
-                        this.laneHeading[lane.id.id] = this.getLaneHeading(lane);
                         break;
                     case "clearArea":
                         this.data[kind].push(Object.assign(newData[kind][i], {
@@ -460,10 +447,6 @@ export default class Map {
                             drewObjects: this.addBorder(
                                 newData[kind][i], colorMapping.BLUE, coordinates, scene)
                         }));
-                        break;
-                    case "overlap":
-                        this.extractOverlaps(newData['overlap']);
-                        this.data[kind].push(newData[kind][i]);
                         break;
                     case "signal":
                         this.data[kind].push(Object.assign(newData[kind][i], {
@@ -535,3 +518,4 @@ export default class Map {
         }
     }
 }
+
