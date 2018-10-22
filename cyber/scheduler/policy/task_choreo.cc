@@ -22,8 +22,6 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/proto/routine_conf.pb.h"
-#include "cyber/proto/scheduler_conf.pb.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/time/time.h"
 
@@ -33,9 +31,6 @@ namespace scheduler {
 
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
-using apollo::cyber::proto::RoutineConf;
-using apollo::cyber::proto::RoutineConfInfo;
-using apollo::cyber::proto::SchedulerConf;
 using croutine::RoutineState;
 
 std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
@@ -87,10 +82,10 @@ bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
 
   {
     WriteLockGuard<AtomicRWLock> lg(rw_lock_);
-    if (cr_map_.find(cr->id()) != cr_map_.end()) {
+    if (cr_container_.find(cr->id()) != cr_container_.end()) {
       return false;
     }
-    cr_map_[cr->id()] = cr;
+    cr_container_[cr->id()] = cr;
   }
 
   std::lock_guard<std::mutex> lg(mtx_run_queue_);

@@ -36,13 +36,6 @@ using croutine::CRoutine;
 using croutine::RoutineContext;
 using apollo::cyber::proto::ProcessStrategy;
 
-struct ProcessorStat {
-  uint64_t switch_num = 0;
-  double io_wait_time = 0;
-  double sleep_time = 0;
-  double exec_time = 0;
-};
-
 class Processor {
  public:
   Processor();
@@ -50,31 +43,36 @@ class Processor {
 
   void Run();
   void Start();
-  void BindContext(const std::shared_ptr<ProcessorContext>& context) {
-    context_ = context;
-  }
-  void set_id(uint32_t id) { id_ = id; }
-  uint32_t id() const { return id_; }
   void Stop() {
     running_ = false;
     Notify();
   }
   void Notify() { cv_.notify_one(); }
 
-  std::shared_ptr<ProcessorContext> Context() { return context_; }
+  inline void bind_context(const std::shared_ptr<ProcessorContext>& context) {
+    context_ = context;
+  }
+
+  inline uint32_t id() const { return id_; }
+  inline void set_id(uint32_t id) { id_ = id; }
+
 
   void set_strategy(const ProcessStrategy strategy) { strategy_ = strategy; }
 
  private:
-  std::thread thread_;
   std::mutex mtx_rq_;
   std::mutex mtx_pctx_;
   std::condition_variable cv_;
+
+  std::thread thread_;
+
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
   std::shared_ptr<CRoutine> cur_routine_ = nullptr;
   std::shared_ptr<ProcessorContext> context_;
-  uint32_t id_ = 0;
+
   bool running_ = true;
+  uint32_t id_ = 0;
+
   ProcessStrategy strategy_ = ProcessStrategy::CHOREO;
 };
 

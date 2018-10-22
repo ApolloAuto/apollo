@@ -31,8 +31,8 @@ TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
   ctx.reset(new TaskChoreoContext());
-  processor->BindContext(ctx);
-  ctx->BindProcessor(processor);
+  processor->bind_context(ctx);
+  ctx->bind_processor(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   EXPECT_TRUE(ctx->RqEmpty());

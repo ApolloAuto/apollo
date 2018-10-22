@@ -32,21 +32,18 @@ using croutine::CRoutine;
 
 class ClassicContext : public ProcessorContext {
  public:
-  std::shared_ptr<CRoutine> NextRoutine();
   bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
   bool RqEmpty() override;
+  std::shared_ptr<CRoutine> NextRoutine() override;
+
   void Notify(uint64_t tid) override;
-  bool EnqueueAffinityRoutine(const std::shared_ptr<CRoutine>& cr) {
-    return false;
-  }
 
  private:
   static std::mutex mtx_taskq_;
   static std::mutex mtx_rq_;
   static std::unordered_multimap<uint64_t, std::shared_ptr<CRoutine>> taskq_;
   static std::multimap<uint32_t, std::shared_ptr<CRoutine>,
-                       std::greater<uint32_t>>
-      rq_;
+                       std::greater<uint32_t>> rq_;
 };
 
 }  // namespace scheduler

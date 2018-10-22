@@ -40,11 +40,10 @@ using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
 using croutine::CRoutine;
 using croutine::RoutineState;
-using CRoutineList = std::list<std::shared_ptr<CRoutine>>;
-using CRoutineMap = std::unordered_map<uint64_t, std::shared_ptr<CRoutine>>;
+using CRoutineContainer =
+    std::unordered_map<uint64_t, std::shared_ptr<CRoutine>>;
 
 class Processor;
-class ProcessorStat;
 
 struct CommonState {
   bool running = false;
@@ -56,15 +55,13 @@ class ProcessorContext {
 
   void ShutDown();
 
-  inline void set_id(int id) { proc_index_ = id; }
   inline int id() const { return proc_index_; }
-  inline bool Getstate(const uint64_t& routine_id, RoutineState* state);
+  inline void set_id(int id) { proc_index_ = id; }
+  inline bool get_state(const uint64_t& routine_id, RoutineState* state);
   inline bool set_state(const uint64_t& routine_id, const RoutineState& state);
 
-  void BindProcessor(const std::shared_ptr<Processor>& processor) {
-    if (!processor_) {
+  inline void bind_processor(const std::shared_ptr<Processor>& processor) {
       processor_ = processor;
-    }
   }
 
   virtual void Notify(uint64_t croutine_id);
@@ -77,7 +74,7 @@ class ProcessorContext {
 
  protected:
   AtomicRWLock rw_lock_;
-  CRoutineMap cr_map_;
+  CRoutineContainer cr_container_;
   std::shared_ptr<Processor> processor_ = nullptr;
 
   bool stop_ = false;
@@ -87,11 +84,11 @@ class ProcessorContext {
   int proc_index_ = -1;
 };
 
-bool ProcessorContext::Getstate(const uint64_t& routine_id,
+bool ProcessorContext::get_state(const uint64_t& routine_id,
                                 RoutineState* state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  auto it = cr_map_.find(routine_id);
-  if (it != cr_map_.end()) {
+  auto it = cr_container_.find(routine_id);
+  if (it != cr_container_.end()) {
     *state = it->second->state();
     return true;
   }
@@ -101,8 +98,8 @@ bool ProcessorContext::Getstate(const uint64_t& routine_id,
 bool ProcessorContext::set_state(const uint64_t& routine_id,
                                  const RoutineState& state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  auto it = cr_map_.find(routine_id);
-  if (it != cr_map_.end()) {
+  auto it = cr_container_.find(routine_id);
+  if (it != cr_container_.end()) {
     it->second->set_state(state);
     return true;
   }
