@@ -26,7 +26,7 @@ import os
 import sys
 import time
 
-from cyber_py import cybertron
+from cyber_py import cyber
 import scipy.signal as signal
 from logger import Logger
 from numpy import genfromtxt

@@ -21,7 +21,7 @@
 #include <QOpenGLFunctions>
 #include <QSurfaceFormat>
 #include <sstream>
-#include "cybertron/init.h"
+#include "cyber/init.h"
 #include "modules/tools/visualizer/main_window.h"
 
 int main(int argc, char* argv[]) {

@@ -32,7 +32,7 @@ import time
 import gflags
 import glog
 
-from cyber_py import cybertron
+from cyber_py import cyber
 from cyber_py import record
 
 # Requried flags.

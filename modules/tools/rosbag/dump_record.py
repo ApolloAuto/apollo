@@ -25,7 +25,7 @@ import os
 import time
 import sys
 
-from cyber_py import cybertron
+from cyber_py import cyber
 from cyber_py import record
 from common.message_manager import PbMessageManager
 

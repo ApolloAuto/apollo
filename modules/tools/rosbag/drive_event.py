@@ -19,7 +19,7 @@
 This program can publish drive event message
 """
 
-from cyber_py import cybertron
+from cyber_py import cyber
 
 import argparse
 import datetime
