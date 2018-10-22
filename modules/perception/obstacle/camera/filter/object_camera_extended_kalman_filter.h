@@ -64,7 +64,6 @@ class ObjectCameraExtendedKalmanFilter : public BaseCameraFilter {
 
   // @brief Predict step
   void Predict(const int track_id, const double timestamp);
-
   // @brief Update step
   void Update(const int track_id, const std::shared_ptr<VisualObject> &obj_ptr);
 
@@ -75,7 +74,7 @@ class ObjectCameraExtendedKalmanFilter : public BaseCameraFilter {
   common::math::ExtendedKalmanFilter<float, 4, 3, 1> InitObjectFilter(
       const float x, const float y, const float theta, const float v) const;
 
-  Eigen::Matrix4f UpdateTransitionMatrix(const double theta, const double v,
+  Eigen::Matrix4f GetTransitionMatrix(const double theta, const double v,
                                          const double dt) const;
 
   std::unordered_map<int, ObjectFilter> tracked_filters_;
