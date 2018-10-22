@@ -63,30 +63,6 @@ void ExtractIds(const std::vector<MapElementInfoConstPtr> &items,
   std::sort(ids->begin(), ids->end());
 }
 
-void ExtractOverlapIds(const std::vector<SignalInfoConstPtr> &items,
-                       RepeatedPtrField<std::string> *ids) {
-  for (const auto &item : items) {
-    for (auto &overlap_id : item->signal().overlap_id()) {
-      ids->Add()->assign(overlap_id.id());
-    }
-  }
-  // The output is sorted so that the calculated hash will be
-  // invariant to the order of elements.
-  std::sort(ids->begin(), ids->end());
-}
-
-void ExtractOverlapIds(const std::vector<StopSignInfoConstPtr> &items,
-                       RepeatedPtrField<std::string> *ids) {
-  for (const auto &item : items) {
-    for (auto &overlap_id : item->stop_sign().overlap_id()) {
-      ids->Add()->assign(overlap_id.id());
-    }
-  }
-  // The output is sorted so that the calculated hash will be
-  // invariant to the order of elements.
-  std::sort(ids->begin(), ids->end());
-}
-
 void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr> &lanes,
                            RepeatedPtrField<std::string> *lane_ids,
                            RepeatedPtrField<std::string> *road_ids) {
@@ -230,14 +206,12 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   }
 
   ExtractIds(signals, ids->mutable_signal());
-  ExtractOverlapIds(signals, ids->mutable_overlap());
 
   std::vector<StopSignInfoConstPtr> stop_signs;
   if (SimMap()->GetStopSigns(point, radius, &stop_signs) != 0) {
     AERROR << "Failed to get stop signs from sim_map.";
   }
   ExtractIds(stop_signs, ids->mutable_stop_sign());
-  ExtractOverlapIds(stop_signs, ids->mutable_overlap());
 
   std::vector<YieldSignInfoConstPtr> yield_signs;
   if (SimMap()->GetYieldSigns(point, radius, &yield_signs) != 0) {
@@ -321,14 +295,6 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     auto element = SimMap()->GetRoadById(map_id);
     if (element) {
       *result.add_road() = element->road();
-    }
-  }
-
-  for (const auto &id : ids.overlap()) {
-    map_id.set_id(id);
-    auto element = SimMap()->GetOverlapById(map_id);
-    if (element) {
-      *result.add_overlap() = element->overlap();
     }
   }
 
