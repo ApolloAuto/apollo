@@ -111,9 +111,9 @@ void Scheduler::CreateProcessor() {
     }
 
     ctx->set_id(i);
-    proc->BindContext(ctx);
+    proc->bind_context(ctx);
     proc->set_strategy(sched_policy_);
-    ctx->BindProcessor(proc);
+    ctx->bind_processor(proc);
     proc_ctxs_.emplace_back(ctx);
     proc->Start();
   }
@@ -173,13 +173,16 @@ bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
     return false;
   }
 
+  // rt may removed before inserted to croutine
+  if (rt_ctx_.find(croutine->id()) != rt_ctx_.end()) {
+    rt_ctx_[croutine->id()] = croutine->processor_id();
+  }
+
   if (!ctx->Enqueue(croutine)) {
     AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
           << "] into processor[" << croutine->processor_id() << "] failed";
     return false;
   }
-
-  rt_ctx_.insert({croutine->id(), croutine->processor_id()});
 
   return true;
 }
@@ -198,12 +201,12 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   }
   auto task_id = GlobalData::RegisterTaskName(name);
   {
-    std::lock_guard<std::mutex> lock(task_id_map_mutex_);
-    if (task_id_map_.find(task_id) != task_id_map_.end()) {
+    std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
+    if (rt_ctx_.find(task_id) != rt_ctx_.end()) {
       AERROR << "Routine [" << name << "] has been exists";
       return false;
     }
-    task_id_map_[task_id] = name;
+    rt_ctx_[task_id] = 0;
   }
 
   if (visitor != nullptr) {
@@ -233,33 +236,35 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     auto processor_id = cr_info.processor_index();
     croutine->set_processor_id(processor_id);
   }
-  {
-    std::lock_guard<std::mutex> lock(task_id_map_mutex_);
-    if (!DispatchTask(croutine)) {
-      return false;
-    }
+
+  std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
+  if (!DispatchTask(croutine)) {
+    return false;
   }
 
   return true;
 }
 
-bool Scheduler::NotifyTask(uint64_t task_id) const {
+bool Scheduler::NotifyTask(uint64_t task_id) {
   if (stop_) {
     return true;
   }
+
   return NotifyProcessor(task_id);
 }
 
-bool Scheduler::NotifyProcessor(uint64_t cr_id) const {
+bool Scheduler::NotifyProcessor(uint64_t cr_id) {
   if (stop_) {
     return true;
   }
 
+  std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
   auto itr = rt_ctx_.find(cr_id);
   if (itr != rt_ctx_.end()) {
     proc_ctxs_[itr->second]->Notify(cr_id);
     return true;
   }
+
   return false;
 }
 
@@ -267,30 +272,30 @@ bool Scheduler::RemoveTask(const std::string& name) {
   if (stop_) {
     return true;
   }
+
   auto task_id = GlobalData::RegisterTaskName(name);
   {
-    std::lock_guard<std::mutex> lock(task_id_map_mutex_);
-    task_id_map_.erase(task_id);
+    std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
+    rt_ctx_.erase(task_id);
   }
 
   return RemoveCRoutine(task_id);
 }
 
 bool Scheduler::RemoveCRoutine(uint64_t cr_id) {
-  {
-    std::lock_guard<std::mutex> lock(task_id_map_mutex_);
-    task_id_map_.erase(cr_id);
+  if (stop_) {
+    return true;
   }
-  auto p = rt_ctx_.find(cr_id);
 
+  std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
+  auto p = rt_ctx_.find(cr_id);
   if (p != rt_ctx_.end()) {
     rt_ctx_.erase(cr_id);
     proc_ctxs_[p->second]->RemoveCRoutine(cr_id);
   }
+
   return true;
 }
-
-void Scheduler::PrintStatistics() {}
 
 }  // namespace scheduler
 }  // namespace cyber

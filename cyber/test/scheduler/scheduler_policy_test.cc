@@ -23,7 +23,6 @@ TEST(SchedulerPolicyTest, choreo) {
   EXPECT_TRUE(ctx->NextRoutine() != nullptr);
   ctx->ShutDown();
   EXPECT_TRUE(ctx->NextRoutine() == nullptr);
-  ctx->PrintStatistics();
 }
 
 }  // namespace scheduler

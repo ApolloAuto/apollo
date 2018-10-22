@@ -16,11 +16,6 @@ TEST(SchedulerTest, create_task) {
   EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));
 }
 
-TEST(SchedulerTest, print_statistics) {
-  Scheduler scheduler;
-  scheduler.PrintStatistics();
-}
-
 TEST(SchedulerTest, remove_task) {
   Scheduler scheduler;
   EXPECT_TRUE(scheduler.RemoveTask("remove_task"));

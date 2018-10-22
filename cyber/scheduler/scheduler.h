@@ -18,11 +18,10 @@
 #define CYBER_SCHEDULER_SCHEDULER_H_
 
 #include <unistd.h>
+
 #include <atomic>
 #include <map>
 #include <memory>
-#include <mutex>
-#include <set>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -55,43 +54,49 @@ class Scheduler {
   bool CreateTask(const RoutineFactory& factory, const std::string& name);
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
-  bool RemoveTask(const std::string& name);
-  void PrintStatistics();
-  void ShutDown();
-  uint32_t ProcessorNum() { return proc_num_; }
-
   bool DispatchTask(const std::shared_ptr<CRoutine>& croutine);
+  bool RemoveTask(const std::string& name);
   bool RemoveCRoutine(uint64_t cr_id);
-  bool NotifyProcessor(uint64_t cr_id) const;
-  bool NotifyTask(uint64_t task_id) const;
 
+  bool NotifyProcessor(uint64_t cr_id);
+  bool NotifyTask(uint64_t task_id);
+
+  void ShutDown();
+
+  uint32_t ProcessorNum() { return proc_num_; }
+  inline std::unordered_map<uint64_t, uint32_t> RtCtx() { return rt_ctx_; }
   inline std::vector<std::shared_ptr<ProcessorContext>> ProcCtxs() {
     return proc_ctxs_;
   }
-  inline std::unordered_map<uint64_t, uint32_t> RtCtx() { return rt_ctx_; }
+
   inline bool IsClassic() { return classic_; }
 
  private:
   Scheduler(Scheduler&) = delete;
   Scheduler& operator=(Scheduler&) = delete;
+
   void CreateProcessor();
   std::shared_ptr<ProcessorContext> FindProc(const std::shared_ptr<CRoutine>&);
+
   void StartSysmon();
 
-  std::atomic<bool> stop_;
   std::thread sysmon_;
+
   SchedulerConf sched_conf_;
   RoutineConf rt_conf_;
-  std::mutex task_id_map_mutex_;
-  std::unordered_map<uint64_t, std::string> task_id_map_;
+
+  ProcessStrategy sched_policy_ = ProcessStrategy::CHOREO;
+
+  std::mutex rt_ctx_mutex_;
+
+  std::unordered_map<uint64_t, uint32_t> rt_ctx_;
+  std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
+
+  bool classic_ = false;
   uint32_t proc_num_;
   uint32_t task_pool_size_;
-  ProcessStrategy sched_policy_ = ProcessStrategy::CHOREO;
-  std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
-  std::mutex mtx_ctx_qsize_;
-  std::multimap<int, std::shared_ptr<ProcessorContext>> ctx_qsize_;
-  std::unordered_map<uint64_t, uint32_t> rt_ctx_;
-  bool classic_ = false;
+
+  std::atomic<bool> stop_;
 
   DECLARE_SINGLETON(Scheduler)
 };

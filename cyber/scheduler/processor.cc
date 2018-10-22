@@ -24,7 +24,6 @@
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/scheduler.h"
-#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
@@ -40,6 +39,7 @@ Processor::~Processor() {
 
 void Processor::Start() {
   thread_ = std::thread(&Processor::Run, this);
+
   uint32_t core_num = std::thread::hardware_concurrency();
   if (strategy_ != ProcessStrategy::CLASSIC && core_num != 0) {
     cpu_set_t set;
