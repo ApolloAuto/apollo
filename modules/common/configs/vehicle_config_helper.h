@@ -23,8 +23,9 @@
 #include <string>
 
 #include "cyber/common/macros.h"
-
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/math/box2d.h"
 
 /**
  * @namespace apollo::common
@@ -106,6 +107,14 @@ class VehicleConfigHelper {
    */
 
   static double MinSafeTurnRadius();
+
+  /**
+   * @brief Get the box (four corners: ABCD) of the vehicle.
+   * @param path_point of a vehicle (which contains point X and heading).
+   * @return a box2d which contains the ABCD points info.
+   */
+  static const common::math::Box2d &GetBoundingBox
+      (const common::PathPoint& path_point);
 
  private:
   static VehicleConfig vehicle_config_;

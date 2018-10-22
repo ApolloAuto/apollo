@@ -62,5 +62,24 @@ double VehicleConfigHelper::MinSafeTurnRadius() {
                    lon_edge_to_center * lon_edge_to_center);
 }
 
+const common::math::Box2d& VehicleConfigHelper::GetBoundingBox
+    (const common::PathPoint& path_point) {
+  const auto& vehicle_param = vehicle_config_.vehicle_param();
+  double diff_truecenter_and_pointX =
+      (vehicle_param.front_edge_to_center() -
+      vehicle_param.back_edge_to_center()) / 2.0;
+  common::math::Vec2d true_center(
+      path_point.x() +
+      diff_truecenter_and_pointX * std::cos(path_point.theta()),
+      path_point.y() +
+      diff_truecenter_and_pointX * std::sin(path_point.theta()));
+
+  common::math::Box2d vehicle_bounding_box(true_center,
+                                           path_point.theta(),
+                                           vehicle_param.length(),
+                                           vehicle_param.width());
+  return vehicle_bounding_box;
+}
+
 }  // namespace common
 }  // namespace apollo
