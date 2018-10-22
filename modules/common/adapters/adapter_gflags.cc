@@ -118,6 +118,10 @@ DEFINE_string(relative_map_topic, "/apollo/relative_map", "relative map");
 DEFINE_string(navigation_topic, "/apollo/navigation", "navigation");
 DEFINE_string(audio_capture_topic, "/apollo/hmi/audio_capture",
               "HMI audio capture topic name.");
+DEFINE_string(v2x_obstacle_topic, "/apollo/v2x/obstacles",
+              "v2x obstacles topic name");
+DEFINE_string(v2x_trafficlight_topic, "/apollo/v2x/traffic_light",
+              "v2x trafficlight topic name");
 // For pandora.
 DEFINE_string(pandora_pointcloud_topic,
               "/apollo/sensor/pandora/hesai40/PointCloud2",
