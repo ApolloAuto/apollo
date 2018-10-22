@@ -135,15 +135,19 @@ Stage::StageStatus SidePassPassObstacle::Process(
   if (!plan_ok) {
     return Stage::ERROR;
   }
-  const SLBoundary& adc_sl_boundary =
-      frame->reference_line_info().front().AdcSlBoundary();
-  const auto& frenet_frame_path =
-      frame->reference_line_info().front().path_data().frenet_frame_path();
-  const auto& frenet_frame_point =
-      frenet_frame_path.PointAt(frenet_frame_path.NumOfPoints() - 1);
-  const double adc_start_s = adc_sl_boundary.start_s();
-  const double path_end_s = frenet_frame_point.s();
-  if ((path_end_s - adc_start_s) > 20.0) {
+  const auto& reference_line_info = frame->reference_line_info().front();
+  const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
+  const auto& end_point =
+      reference_line_info.path_data().discretized_path().EndPoint();
+  Vec2d last_xy_point(end_point.x(), end_point.y());
+  // get s of last point on path
+  common::SLPoint sl_point;
+  if (!reference_line_info.reference_line().XYToSL(last_xy_point, &sl_point)) {
+    AERROR << "Fail to transfer cartesian point to frenet point.";
+    return Stage::ERROR;
+  }
+
+  if (adc_sl_boundary.end_s() > sl_point.s() - 1.0) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
