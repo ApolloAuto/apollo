@@ -280,6 +280,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
   }
 
   double heading = feature.velocity_heading();
+  double speed = feature.speed();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
     if (feature_values->size() >= LANE_FEATURE_SIZE) {
       break;
@@ -298,6 +299,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       double diff_y = lane_point.position().y() - feature.position().y();
       double angle = std::atan2(diff_x, diff_y);
       feature_values->push_back(lane_point.kappa());
+      feature_values->push_back(speed * speed * lane_point.kappa());
       feature_values->push_back(std::sin(angle - heading));
       feature_values->push_back(lane_point.relative_l());
       feature_values->push_back(lane_point.heading());
@@ -307,13 +309,15 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
 
   // If the lane points are not sufficient, apply a linear extrapolation.
   std::size_t size = feature_values->size();
-  while (size >= 4 && size < LANE_FEATURE_SIZE) {
-    double lane_kappa = feature_values->operator[](size-5);
+  while (size >= 6 && size < LANE_FEATURE_SIZE) {
+    double lane_kappa = feature_values->operator[](size - 6);
+    double centri_acc = feature_values->operator[](size - 5);
     double heading_diff = feature_values->operator[](size - 4);
     double lane_l_diff = feature_values->operator[](size - 3);
     double heading = feature_values->operator[](size - 2);
     double angle_diff = feature_values->operator[](size - 1);
     feature_values->push_back(lane_kappa);
+    feature_values->push_back(centri_acc);
     feature_values->push_back(heading_diff);
     feature_values->push_back(lane_l_diff);
     feature_values->push_back(heading);
