@@ -39,7 +39,7 @@ apollo_root = os.path.abspath(
 py_proto_path = os.path.join(apollo_root, 'py_proto')
 sys.path.append(py_proto_path)
 
-from cyber_py import cybertron
+from cyber_py import cyber
 from cyber_py import record
 from modules.data.proto import frame_pb2
 from modules.drivers.proto.pointcloud_pb2 import PointCloud

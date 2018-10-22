@@ -19,7 +19,7 @@
 This program can transcribe a protobuf message to file
 """
 
-from cyber_py import cybertron
+from cyber_py import cyber
 
 import argparse
 import shutil

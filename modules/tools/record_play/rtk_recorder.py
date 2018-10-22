@@ -26,7 +26,7 @@ import os
 import sys
 import time
 
-from cyber_py import cybertron
+from cyber_py import cyber
 from gflags import FLAGS
 
 from logger import Logger
