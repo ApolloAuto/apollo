@@ -36,14 +36,19 @@ class DeciderCreep : public Decider {
  public:
   explicit DeciderCreep(const TaskConfig& config);
 
-  bool CheckCreepDone(Frame* frame, ReferenceLineInfo* reference_line_info,
-                      double stop_sign_end_s);
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
+  bool CheckCreepDone(Frame* frame, ReferenceLineInfo* reference_line_info,
+                      double stop_sign_end_s);
+
+  void SetProceedWithCautionSpeedParam(
+      const Frame& frame,
+      const ReferenceLineInfo& reference_line_info);
+
  private:
-  double FindCreepDistance(Frame* frame,
-                           ReferenceLineInfo* reference_line_info);
+  double FindCreepDistance(const Frame& frame,
+                           const ReferenceLineInfo& reference_line_info);
 
   bool BuildStopDecision(Frame* frame, ReferenceLineInfo* reference_line_info);
 
