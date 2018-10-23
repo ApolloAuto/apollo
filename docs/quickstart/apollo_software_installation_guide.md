@@ -14,6 +14,20 @@ This section includes:
 
 Before getting started, please make sure you have installed Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the [Apollo core Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc).
 
+## *New*
+
+Now we leverage [git-lfs](https://git-lfs.github.com) to manage large files in
+Apollo. Please make sure you installed the plugin by following the guiding steps
+on its web page.
+
+```bash
+# Required for Ubuntu 14.04 / 16.04.
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+
+# Ubuntu 14.04 / 16.04 / 18.04.
+sudo apt-get install -y git-lfs
+```
+
 ## Download Apollo Source
 
 1. Download Apollo source code from the [github source](https://github.com/ApolloAuto/apollo/) and check out the correct branch:
