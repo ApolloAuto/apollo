@@ -45,10 +45,6 @@ using CRoutineContainer =
 
 class Processor;
 
-struct CommonState {
-  bool running = false;
-};
-
 class ProcessorContext {
  public:
   ProcessorContext() : notified_(false) {}

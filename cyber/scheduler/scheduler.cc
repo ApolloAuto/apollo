@@ -99,7 +99,6 @@ void Scheduler::CreateProcessor() {
     std::shared_ptr<ProcessorContext> ctx;
     switch (sched_policy_) {
       case ProcessStrategy::CLASSIC:
-        classic_ = true;
         ctx.reset(new ClassicContext());
         break;
       case ProcessStrategy::CHOREO:

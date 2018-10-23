@@ -22,7 +22,6 @@
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/scheduler.h"
-#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
