@@ -239,7 +239,6 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
       ++variable_index;
     }
   }
-
   ADEBUG << "variable_index after adding lagrange n : " << variable_index;
 
   // Constraints: includes four state Euler forward constraints, three
@@ -460,7 +459,6 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
     }
     state_index += 4;
   }
-
   ADEBUG << "constraint_index after obstacles avoidance constraints "
             "updated: "
          << constraint_index;
@@ -724,7 +722,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     state_index = state_start_index_;
     std::size_t l_index = l_start_index_;
     std::size_t n_index = n_start_index_;
-
+    CHECK_EQ(constraint_index, 294)
+        << "start constraint of obstacles, at this time,";
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
         std::size_t current_edges_num = obstacles_edges_num_(j, 0);
@@ -1044,12 +1043,12 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     // First horizon
 
     // with respect to u(0, 0)
-    values[nz_index] = 1.0 / x[time_index] / ts_;
+    values[nz_index] = 1.0 / x[time_index] / ts_;  // q
     ++nz_index;
 
     // with respect to time
     values[nz_index] = -2 * (x[control_index] - last_time_u_(0, 0)) /
-                       x[time_index] / x[time_index] / ts_;
+                       x[time_index] / x[time_index] / ts_;  // r FIXME()
     ++nz_index;
     time_index += 1;
     control_index += 2;
@@ -1154,8 +1153,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {
-          values[nz_index] = -std::sin(x[state_index + 2]) * Aj(k, 0) -
-                             std::sin(x[state_index + 2]) * Aj(k, 1);  // y0~yn
+          values[nz_index] = -std::sin(x[state_index + 2]) * Aj(k, 0) +
+                             std::cos(x[state_index + 2]) * Aj(k, 1);  // y0~yn
           ++nz_index;
         }
 
