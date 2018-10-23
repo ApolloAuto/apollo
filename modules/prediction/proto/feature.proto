@@ -34,23 +34,20 @@ message LaneFeature {
   optional double lane_heading = 8;
 }
 
-// Junction MLP model feature values
-message JunctionMLPFeature {
-  optional string exit_lane_id = 1;
-  repeated double feature_value = 2; // feature values for MLP
-  optional int32 label = 3;  // label 1: exit through the lane, 0: otherwise
-}
-
 message JunctionExit {
   optional string exit_lane_id = 1;
-  optional string pred_exit_lane_id = 2;  // exit lane's predecessor id
+  optional apollo.common.Point3D exit_position = 2;
+  optional double exit_heading = 3;
 }
 
 message JunctionFeature {
   optional string junction_id = 1;
-  optional LaneFeature enter_lane = 2;
-  repeated JunctionExit junction_exit = 3;
-  repeated JunctionMLPFeature junction_mlp_feature = 4;  // for MLP
+  optional double x_range = 2;
+  optional double y_range = 3;
+  optional LaneFeature enter_lane = 4;
+  repeated JunctionExit junction_exit = 5;
+  repeated double junction_mlp_feature = 6;
+  repeated int32 junction_mlp_label = 7;  // dim is number of masks, i.e. 10
 }
 
 message ObstaclePriority {

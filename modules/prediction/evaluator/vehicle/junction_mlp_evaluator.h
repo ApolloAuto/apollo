@@ -68,12 +68,12 @@ class JunctionMLPEvaluator : public Evaluator {
   void SetJunctionFeatureValues(Obstacle* obstacle_ptr,
                                 std::vector<double>* feature_values);
 
-/**
-   * @brief Find junction path
-   * @param Obstacle pointer
-   */
-  void FindJunctionPath(Obstacle* obstacle_ptr,
-                        std::vector<double>* path_values);
+  // /**
+  //  * @brief Find junction path
+  //  * @param Obstacle pointer
+  //  */
+  // void FindJunctionPath(Obstacle* obstacle_ptr,
+  //                       std::vector<double>* path_values);
 
   /**
    * @brief Load mode file
