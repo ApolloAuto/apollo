@@ -51,6 +51,14 @@ class JunctionMLPEvaluator : public Evaluator {
    */
   void Evaluate(Obstacle* obstacle_ptr) override;
 
+  /**
+   * @brief Extract feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void ExtractFeatureValues(Obstacle* obstacle_ptr,
+                                std::vector<double>* feature_values);
+
  private:
   /**
    * @brief Set obstacle feature vector
@@ -68,13 +76,6 @@ class JunctionMLPEvaluator : public Evaluator {
   void SetJunctionFeatureValues(Obstacle* obstacle_ptr,
                                 std::vector<double>* feature_values);
 
-  // /**
-  //  * @brief Find junction path
-  //  * @param Obstacle pointer
-  //  */
-  // void FindJunctionPath(Obstacle* obstacle_ptr,
-  //                       std::vector<double>* path_values);
-
   /**
    * @brief Load mode file
    * @param Model file name
@@ -88,8 +89,8 @@ class JunctionMLPEvaluator : public Evaluator {
 
  private:
   std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
-  static const size_t OBSTACLE_FEATURE_SIZE = 22;
-  static const size_t JUNCTION_FEATURE_SIZE = 40;
+  static const size_t OBSTACLE_FEATURE_SIZE = 3;
+  static const size_t JUNCTION_FEATURE_SIZE = 60;
 };
 
 }  // namespace prediction
