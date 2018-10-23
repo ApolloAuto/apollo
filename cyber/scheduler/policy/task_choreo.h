@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SCHEDULER_POLICY_TASK_CHOREO_CONTEXT_H_
-#define CYBER_SCHEDULER_POLICY_TASK_CHOREO_CONTEXT_H_
+#ifndef CYBER_SCHEDULER_POLICY_TASK_CHOREO_H_
+#define CYBER_SCHEDULER_POLICY_TASK_CHOREO_H_
 
 #include <cstdint>
 #include <functional>
@@ -48,11 +48,10 @@ class TaskChoreoContext : public ProcessorContext {
   std::mutex mtx_run_queue_;
   std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
       rt_queue_;
-  double min_vruntime_ = 0;
 };
 
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SCHEDULER_POLICY_CHOREO_CONTEXT_H_
+#endif  // CYBER_SCHEDULER_POLICY_CHOREO_H_

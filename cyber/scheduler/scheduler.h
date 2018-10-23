@@ -69,8 +69,6 @@ class Scheduler {
     return proc_ctxs_;
   }
 
-  inline bool IsClassic() { return classic_; }
-
  private:
   Scheduler(Scheduler&) = delete;
   Scheduler& operator=(Scheduler&) = delete;
@@ -92,7 +90,6 @@ class Scheduler {
   std::unordered_map<uint64_t, uint32_t> rt_ctx_;
   std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
 
-  bool classic_ = false;
   uint32_t proc_num_;
   uint32_t task_pool_size_;
 
