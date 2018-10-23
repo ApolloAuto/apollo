@@ -88,3 +88,11 @@ TEST_F(ParameterClientTest, list_parameter) {
 
 }  // namespace cyber
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  apollo::cyber::Init(argv[0]);
+  testing::InitGoogleTest(&argc, argv);
+  auto res = RUN_ALL_TESTS();
+  apollo::cyber::Shutdown();
+  return res;
+}
