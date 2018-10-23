@@ -135,6 +135,7 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
                            GetContext()->next_stop_sign_overlap.end_s)) {
     return Stage::FINISHED;
   }
+
   /*
   // build a stop fence by creep decider
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
@@ -143,6 +144,11 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
     return Stage::ERROR;
   }
   */
+
+  // set param for PROCEED_WITH_CAUTION_SPEED
+  dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+      ->SetProceedWithCautionSpeedParam(
+          *frame, reference_line_info);
 
   bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

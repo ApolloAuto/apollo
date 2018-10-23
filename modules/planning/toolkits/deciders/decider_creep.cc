@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include "modules/planning/common/planning_context.h"
+
 namespace apollo {
 namespace planning {
 
@@ -44,8 +46,9 @@ Status DeciderCreep::Process(Frame* frame,
   return Status::OK();
 }
 
-double DeciderCreep::FindCreepDistance(Frame* frame,
-                                       ReferenceLineInfo* reference_line_info) {
+double DeciderCreep::FindCreepDistance(
+    const Frame& frame,
+    const ReferenceLineInfo& reference_line_info) {
   // more delicate design of creep distance
   return 0.5;
 }
@@ -60,7 +63,7 @@ bool DeciderCreep::BuildStopDecision(Frame* frame,
   CHECK_NOTNULL(reference_line_info);
 
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const double creep_distance = FindCreepDistance(frame, reference_line_info);
+  const double creep_distance = FindCreepDistance(*frame, *reference_line_info);
   double creep_stop_s = adc_front_edge_s + creep_distance;
 
   // create virtual stop wall
@@ -107,7 +110,7 @@ bool DeciderCreep::CheckCreepDone(Frame* frame,
   const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
   double creep_stop_s =
-      stop_sign_end_s + FindCreepDistance(frame, reference_line_info);
+      stop_sign_end_s + FindCreepDistance(*frame, *reference_line_info);
   const double distance =
       creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
   if (distance < creep_config.max_valid_stop_distance()) {
@@ -127,6 +130,22 @@ bool DeciderCreep::CheckCreepDone(Frame* frame,
     creep_done = all_far_away;
   }
   return creep_done;
+}
+
+void DeciderCreep::SetProceedWithCautionSpeedParam(
+    const Frame& frame,
+    const ReferenceLineInfo& reference_line_info) {
+  common::SLPoint adc_center_sl;
+  reference_line_info.reference_line().XYToSL(
+      {frame.vehicle_state().x(), frame.vehicle_state().y()},
+      &adc_center_sl);
+  const double creep_distance =
+      adc_center_sl.s() + FindCreepDistance(frame, reference_line_info);
+
+  PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.type =
+      PlanningContext::ProceedWithCautionSpeedParam::Type::FIXED_DISTANCE;
+  PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.distance =
+      creep_distance;
 }
 
 }  // namespace planning

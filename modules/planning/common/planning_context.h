@@ -40,9 +40,20 @@ namespace planning {
 
 class PlanningContext {
  public:
+  struct ProceedWithCautionSpeedParam {
+    enum class Type {
+      FIXED_SPEED,
+      FIXED_DISTANCE,
+    };
+    Type type;
+    double speed;
+    double distance;
+  };
+
   // scenario context
   struct ScenarioInfo {
     apollo::hdmap::PathOverlap next_stop_sign_overlap;
+    ProceedWithCautionSpeedParam proceed_with_caution_speed;
   };
 
   static void Clear();
