@@ -16,6 +16,8 @@
 
 #include "modules/routing/topo_creator/graph_creator.h"
 
+#include <vector>
+
 #include "glog/logging.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
