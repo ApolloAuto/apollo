@@ -39,8 +39,9 @@ class DeciderCreep : public Decider {
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-  bool CheckCreepDone(Frame* frame, ReferenceLineInfo* reference_line_info,
-                      double stop_sign_end_s);
+  bool CheckCreepDone(const Frame& frame,
+                      const ReferenceLineInfo& reference_line_info,
+                      const double stop_sign_overlap_end_s);
 
   void SetProceedWithCautionSpeedParam(
       const Frame& frame,
@@ -50,7 +51,8 @@ class DeciderCreep : public Decider {
   double FindCreepDistance(const Frame& frame,
                            const ReferenceLineInfo& reference_line_info);
 
-  bool BuildStopDecision(Frame* frame, ReferenceLineInfo* reference_line_info);
+  bool BuildStopDecision(const double stop_sign_overlap_end_s,
+                         Frame* frame, ReferenceLineInfo* reference_line_info);
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";

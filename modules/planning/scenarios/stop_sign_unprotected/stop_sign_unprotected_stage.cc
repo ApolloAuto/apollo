@@ -131,7 +131,7 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
 
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-          ->CheckCreepDone(frame, &reference_line_info,
+          ->CheckCreepDone(*frame, reference_line_info,
                            GetContext()->next_stop_sign_overlap.end_s)) {
     return Stage::FINISHED;
   }
