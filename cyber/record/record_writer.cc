@@ -155,7 +155,7 @@ bool RecordWriter::SetIntervalOfFileSegmentation(uint64_t time_sec) {
     AWARN << "please call this interface before opening file.";
     return false;
   }
-  header_.set_segment_interval(time_sec * 1e9L);
+  header_.set_segment_interval(time_sec * 1000000000UL);
   return true;
 }
 

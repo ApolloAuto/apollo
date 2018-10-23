@@ -24,8 +24,9 @@
 
 #include "cyber/common/log.h"
 #include "cyber/proto/record.pb.h"
+#include "cyber/record/file/record_file_reader.h"
+#include "cyber/record/file/record_file_writer.h"
 #include "cyber/record/header_builder.h"
-#include "cyber/record/record_file.h"
 
 using ::apollo::cyber::proto::Header;
 using ::apollo::cyber::proto::ChunkHeader;
