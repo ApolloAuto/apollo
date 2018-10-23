@@ -55,9 +55,7 @@ TEST_F(ConfigManagerTest, TestInit) {
   config_manager_->get_env("PATH");
   ConfigManager config_manager;
   config_manager.set_work_root("");
-  config_manager.set_adu_data("");
   EXPECT_EQ(config_manager.work_root(), "");
-  EXPECT_EQ(config_manager.adu_data(), "");
 }
 
 TEST_F(ConfigManagerTest, TestGetModelConfig) {

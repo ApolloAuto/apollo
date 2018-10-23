@@ -31,7 +31,6 @@ using google::protobuf::TextFormat;
 
 ConfigManager::ConfigManager() {
   work_root_ = FLAGS_work_root;
-  adu_data_ = FLAGS_adu_data;
 
   // For start at arbitrary path
   if (work_root_.empty()) {
@@ -61,8 +60,7 @@ bool ConfigManager::InitInternal() {
   std::string config_module_path =
       FileUtil::GetAbsolutePath(work_root_, FLAGS_config_manager_path);
   AINFO << "WORK_ROOT: " << work_root_
-        << " config_root_path: " << config_module_path
-        << " ADU_DATA: " << adu_data_;
+        << " config_root_path: " << config_module_path;
 
   std::vector<std::string> model_config_files;
   if (!FileUtil::GetFileList(config_module_path, "config_manager.config",
