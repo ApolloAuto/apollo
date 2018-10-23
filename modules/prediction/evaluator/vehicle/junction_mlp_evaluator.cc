@@ -50,51 +50,100 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // 2. compute probabilities
 }
 
+void JunctionMLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
+                                        std::vector<double>* feature_values) {
+  int id = obstacle_ptr->id();
+  std::vector<double> obstacle_feature_values;
+
+  auto it = obstacle_feature_values_map_.find(id);
+  if (it == obstacle_feature_values_map_.end()) {
+    SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
+    obstacle_feature_values_map_[id] = obstacle_feature_values;
+  } else {
+    obstacle_feature_values = it->second;
+  }
+
+  if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected obstacle feature_values "
+           << obstacle_feature_values.size() << ".";
+    return;
+  }
+
+  std::vector<double> junction_feature_values;
+  SetJunctionFeatureValues(obstacle_ptr, &junction_feature_values);
+  if (junction_feature_values.size() != JUNCTION_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected junction feature_values"
+           << junction_feature_values.size() << ".";
+    return;
+  }
+
+  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
+                         obstacle_feature_values.end());
+  feature_values->insert(feature_values->end(), junction_feature_values.begin(),
+                         junction_feature_values.end());
+}
+
 void JunctionMLPEvaluator::SetObstacleFeatureValues(
     Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
   feature_values->clear();
   feature_values->reserve(OBSTACLE_FEATURE_SIZE);
-  // TODO(all) implement
+  const Feature& feature = obstacle_ptr->latest_feature();
+  if (!feature.has_position()) {
+    ADEBUG << "Obstacle [" << obstacle_ptr->id() << "] has no position.";
+    return;
+  }
+  feature_values->push_back(feature.speed());
+  feature_values->push_back(feature.acc());
+  feature_values->push_back(feature.junction_feature().junction_range());
 }
 
 void JunctionMLPEvaluator::SetJunctionFeatureValues(
     Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
   feature_values->clear();
   feature_values->reserve(JUNCTION_FEATURE_SIZE);
-  // TODO(all) implement
+  const Feature& feature = obstacle_ptr->latest_feature();
+  if (!feature.has_position()) {
+    ADEBUG << "Obstacle [" << obstacle_ptr->id() << "] has no position.";
+    return;
+  }
+  double heading = feature.velocity_heading();
+  if (!feature.has_junction_feature()) {
+    AERROR << "Obstacle [" << obstacle_ptr->id()
+           << "] has no junction_feature.";
+    return;
+  }
+  std::string junction_id = feature.junction_feature().junction_id();
+  double junction_range = feature.junction_feature().junction_range();
+  for (int i = 0; i < 12; ++i) {
+    feature_values->push_back(0);
+    feature_values->push_back(1);
+    feature_values->push_back(1);
+    feature_values->push_back(1);
+    feature_values->push_back(0);
+  }
+  int num_junction_exit = feature.junction_feature().junction_exit_size();
+  for (int i = 0; i < num_junction_exit; ++i) {
+    const JunctionExit& junction_exit =
+        feature.junction_feature().junction_exit(i);
+    double _x = junction_exit.exit_position().x() - feature.position().x();
+    double _y = junction_exit.exit_position().y() - feature.position().y();
+    double diff_x = std::cos(heading) * _x - std::sin(heading) * _y;
+    double diff_y = std::sin(heading) * _x + std::cos(heading) * _y;
+    double angle = std::atan2(diff_x, diff_y);
+    double d_idx = (angle / (2.0 * std::acos(-1))) -
+        floor((angle / (2.0 * std::acos(-1.0))) / 12.0) * 12.0;
+    int idx = static_cast<int>(d_idx >= 0 ? d_idx : d_idx + 12.0);
+    feature_values->operator[](idx * 5) = 1;
+    feature_values->operator[](idx * 5 + 1) = diff_x / junction_range;
+    feature_values->operator[](idx * 5 + 2) = diff_y / junction_range;
+    feature_values->operator[](idx * 5 + 3) =
+        std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
+    feature_values->operator[](idx * 5 + 4) =
+        junction_exit.exit_heading() - heading;
+  }
 }
-
-// void JunctionMLPEvaluator::FindJunctionPath(
-//     Obstacle* obstacle_ptr, std::vector<double>* path_values) {
-//   CHECK_NOTNULL(obstacle_ptr);
-//   path_values->clear();
-//   path_values->reserve(40);
-//   const Feature& feature = obstacle_ptr->latest_feature();
-//   if (!feature.has_junction_feature()) {
-//     AERROR << "Obstacle [" << obstacle_ptr->id()
-//            << "] has no junction_feature.";
-//     return;
-//   }
-//   std::string junction_id = "";
-//   if (feature.junction_feature().has_junction_id()) {
-//     junction_id = feature.junction_feature().junction_id();
-//   }
-//   int num_junction_exit = feature.junction_feature().junction_exit_size();
-//   for (int i = 0; i < num_junction_exit; ++i) {
-//     const JunctionExit& junction_exit =
-//         feature.junction_feature().junction_exit(i);
-//     if (!junction_exit.has_pred_exit_lane_id()) {
-//       AERROR << "JunctionExit [" << i
-//              << "] has no pred_exit_lane.";
-//       return;
-//     }
-//     const std::string& pred_exit_lane_id = junction_exit.pred_exit_lane_id();
-//     std::shared_ptr<const LaneInfo> pre_exit_lane_info =
-//         PredictionMap::LaneById(pred_exit_lane_id);
-//     // Under construction~
-//   }
-//   // TODO(all) implement
-// }
 
 void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {
   // TODO(all) implement
