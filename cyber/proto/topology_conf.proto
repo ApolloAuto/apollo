@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+// if you don't want other processes to know your channel,
+// you can add your channel to this conf
+message ChannelConf {
+    repeated string intra_channels = 1;
+};
+
+message TopologyConf {
+    optional ChannelConf channel_conf = 1;
+};

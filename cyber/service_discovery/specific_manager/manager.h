@@ -75,6 +75,7 @@ class Manager {
 
   virtual bool Check(const RoleAttributes& attr) = 0;
   virtual void Dispose(const ChangeMsg& msg) = 0;
+  virtual bool NeedPublish(const ChangeMsg& msg) const;
 
   void Convert(const RoleAttributes& attr, RoleType role, OperateType opt,
                ChangeMsg* msg);
