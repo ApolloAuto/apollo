@@ -29,7 +29,7 @@ bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point) {
            std::isnan(point.path_point().ddkappa()) || std::isnan(point.v()) ||
            std::isnan(point.a()) || std::isnan(point.relative_time()));
 }
-}
+}  // namespace
 
 DecisionData::DecisionData(
     const prediction::PredictionObstacles& prediction_obstacles,
