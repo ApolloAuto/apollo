@@ -198,6 +198,11 @@ LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) {
   for (const auto& lane_id : trajectory.lane_id()) {
     LaneInfoPtr lane_info =
         HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
+
+    if (lane_info == nullptr) {
+      continue;
+    }
+
     if (lane_info->IsOnLane(ego_position)) {
       return lane_info;
     }
