@@ -246,7 +246,17 @@ class HDMapImpl {
   int GetRoadBoundaries(const apollo::common::PointENU& point, double radius,
                         std::vector<RoadROIBoundaryPtr>* road_boundaries,
                         std::vector<JunctionBoundaryPtr>* junctions) const;
-
+  /**
+   * @brief get all road boundaries and junctions within certain range
+   * @param point the target position
+   * @param radius the search radius
+   * @param road_boundaries the roads' boundaries
+   * @param junctions the junctions
+   * @return 0:success, otherwise failed
+   */
+  int GetRoadBoundaries(const apollo::common::PointENU& point, double radius,
+                        std::vector<RoadRoiPtr>* road_boundaries,
+                        std::vector<JunctionInfoConstPtr>* junctions) const;
   /**
    * @brief get ROI within certain range
    * @param point the target position
