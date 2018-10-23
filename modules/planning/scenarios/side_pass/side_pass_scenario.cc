@@ -20,12 +20,13 @@
 
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 
+#include <algorithm>
 #include <fstream>
 #include <limits>
 #include <utility>
-#include <algorithm>
 
 #include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -37,14 +38,6 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
-#include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
-#include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
-#include "modules/planning/toolkits/optimizers/poly_st_speed/poly_st_speed_optimizer.h"
-#include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
-#include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
-#include "modules/planning/toolkits/optimizers/speed_decider/speed_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -57,12 +50,6 @@ using common::SpeedPoint;
 using common::TrajectoryPoint;
 using common::math::Vec2d;
 using common::time::Clock;
-
-namespace {
-constexpr double kPathOptimizationFallbackCost = 2e4;
-constexpr double kSpeedOptimizationFallbackCost = 2e4;
-constexpr double kStraightForwardLineCost = 10.0;
-}  // namespace
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
@@ -132,8 +119,6 @@ bool SidePassScenario::IsSidePassScenario(
       frame.reference_line_info().front().AdcSlBoundary();
   const PathDecision& path_decision =
       frame.reference_line_info().front().path_decision();
-  // TODO(lianglia-apollo)
-
   return HasBlockingObstacle(adc_sl_boundary, path_decision);
 }
 
@@ -171,7 +156,7 @@ bool SidePassScenario::HasBlockingObstacle(
     CHECK(path_obstacle->obstacle()->IsStatic());
 
     if (path_obstacle->PerceptionSLBoundary().start_s() <=
-        adc_sl_boundary.end_s()) {  // such vehicles are behind the adc.
+        adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
       continue;
     }
     constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
