@@ -14,7 +14,7 @@ Currently, most software upgrade solutions are not securely protected. Therefore
 ## Upgrade Procedure
 A typical upgrade procedure is shown below:
 
-![](images/apollo_unsecure_upgrade_procedure.JPG)
+![](images/apollo_unsecure_upgrade_procedure.jpg)
 
 1. The upgrade server generates the upgrade package.
 2. Packages are uploaded to the storage server.
@@ -27,7 +27,7 @@ A typical upgrade procedure is shown below:
 
 After integrating secure upgrade SDK, the upgrade procedure is modified as follows:
 
-![](images/apollo_secure_upgrade_procedure.JPG)
+![](images/apollo_secure_upgrade_procedure.jpg)
 
 1. The upgrade server generates the secure package and package token.
 2. Secure packages and the package token are uploaded to the storage server.

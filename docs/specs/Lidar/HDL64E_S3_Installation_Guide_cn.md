@@ -36,13 +36,13 @@ HDL64E S3 LiDAR需要定制的结构才能安装在车辆顶部。该结构必�
 
    将电源线和信号线连接到LiDAR上的匹配端口
 
-   ![HDL64_Cabling](images/HDL64_Cabling.JPG)
+   ![HDL64_Cabling](images/HDL64_Cabling.jpg)
 
 * **连接电源**
 
    两根AWG 16线用于为HDL-64E S3 LiDAR供电。 它需要大约3A的电流12V电压。连接电源时，请完全接触电线并拧紧螺钉。
 
-   ![HDL64_Power_Cable](images/HDL64_PowerCable.JPG)
+   ![HDL64_Power_Cable](images/HDL64_PowerCable.jpg)
 
 * **连接IPC**
 

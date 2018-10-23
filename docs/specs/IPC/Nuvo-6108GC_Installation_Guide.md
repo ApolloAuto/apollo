@@ -33,7 +33,7 @@ Follow these steps:
   
     b. Remove the cover from the IPC. 
     
-  ![removing the cover](images/Removing_the_cover.JPG)
+  ![removing the cover](images/Removing_the_cover.jpg)
     
     You will find 3 PCI slots (one occupied by the	graphic card) located on the base:
 
@@ -94,7 +94,7 @@ Follow these steps:
 
 4.  Connect the power: 
 
-![IPC-6108GC-PowerCable.JPG](images/IPC-6108GC-PowerCable.JPG)
+![IPC-6108GC-PowerCable.jpg](images/IPC-6108GC-PowerCable.jpg)
 
 
 
