@@ -42,12 +42,11 @@ message JunctionExit {
 
 message JunctionFeature {
   optional string junction_id = 1;
-  optional double x_range = 2;
-  optional double y_range = 3;
-  optional LaneFeature enter_lane = 4;
-  repeated JunctionExit junction_exit = 5;
-  repeated double junction_mlp_feature = 6;
-  repeated int32 junction_mlp_label = 7;  // dim is number of masks, i.e. 10
+  optional double junction_range = 2;
+  optional LaneFeature enter_lane = 3;
+  repeated JunctionExit junction_exit = 4;
+  repeated double junction_mlp_feature = 5;
+  repeated int32 junction_mlp_label = 6;  // dim is number of masks, i.e. 10
 }
 
 message ObstaclePriority {
