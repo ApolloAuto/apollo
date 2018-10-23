@@ -41,7 +41,9 @@ Status DeciderCreep::Process(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  BuildStopDecision(frame, reference_line_info);
+  const double stop_sign_overlap_end_s =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
+  BuildStopDecision(stop_sign_overlap_end_s, frame, reference_line_info);
 
   return Status::OK();
 }
@@ -54,17 +56,15 @@ double DeciderCreep::FindCreepDistance(
 }
 
 // TODO(all): revisit & rewrite
-// bool Creep::BuildStopDecision(Frame* frame,
-//                              ReferenceLineInfo* reference_line_info,
-//                              const PathOverlap& overlap) {
-bool DeciderCreep::BuildStopDecision(Frame* frame,
-                                     ReferenceLineInfo* reference_line_info) {
+bool DeciderCreep::BuildStopDecision(
+    const double stop_sign_overlap_end_s,
+    Frame* frame,
+    ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const double creep_distance = FindCreepDistance(*frame, *reference_line_info);
-  double creep_stop_s = adc_front_edge_s + creep_distance;
+  double creep_stop_s = stop_sign_overlap_end_s +
+      FindCreepDistance(*frame, *reference_line_info);
 
   // create virtual stop wall
   // TODO(all)
@@ -104,19 +104,20 @@ bool DeciderCreep::BuildStopDecision(Frame* frame,
   return true;
 }
 
-bool DeciderCreep::CheckCreepDone(Frame* frame,
-                                  ReferenceLineInfo* reference_line_info,
-                                  double stop_sign_end_s) {
+bool DeciderCreep::CheckCreepDone(
+    const Frame& frame,
+    const ReferenceLineInfo& reference_line_info,
+    const double stop_sign_overlap_end_s) {
   const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
   double creep_stop_s =
-      stop_sign_end_s + FindCreepDistance(*frame, *reference_line_info);
+      stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
   const double distance =
-      creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
+      creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
   if (distance < creep_config.max_valid_stop_distance()) {
     bool all_far_away = true;
     for (auto* path_obstacle :
-         reference_line_info->path_decision()->path_obstacles().Items()) {
+         reference_line_info.path_decision().path_obstacles().Items()) {
       if (path_obstacle->obstacle()->IsVirtual() ||
           !path_obstacle->obstacle()->IsStatic()) {
         continue;

@@ -150,7 +150,8 @@ bool StopSignUnprotectedScenario::IsTransferable(
       context_.next_stop_sign_overlap.start_s - adc_front_edge_s;
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  const uint32_t time_distance = ceil(adc_distance_to_stop_sign / adc_speed);
+  const uint32_t time_distance = static_cast<uint32_t>(ceil(
+      adc_distance_to_stop_sign / adc_speed));
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
