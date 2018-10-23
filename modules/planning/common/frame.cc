@@ -55,7 +55,13 @@ using apollo::prediction::PredictionObstacles;
 constexpr double kMathEpsilon = 1e-8;
 
 FrameHistory::FrameHistory()
-    : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
+    : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {
+}
+
+Frame::Frame(uint32_t sequence_num) : sequence_num_(sequence_num),
+  monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
+  init_data_ = false;
+}
 
 Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
@@ -67,12 +73,23 @@ Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
       start_time_(start_time),
       vehicle_state_(vehicle_state),
       reference_line_provider_(reference_line_provider),
-      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
-  // if (FLAGS_enable_lag_prediction) {
-  //   lag_predictor_.reset(
-  //       new LagPrediction(FLAGS_lag_prediction_min_appear_num,
-  //                         FLAGS_lag_prediction_max_disappear_num));
-  // }
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING),
+      init_data_(true) {
+}
+
+
+void Frame::InitData(const LocalView &local_view,
+             const common::TrajectoryPoint &planning_start_point,
+             const double start_time, const common::VehicleState &vehicle_state,
+             ReferenceLineProvider *reference_line_provider) {
+  if (!init_data_) {
+      local_view_ = local_view;
+      planning_start_point_ = planning_start_point;
+      start_time_ = start_time;
+      vehicle_state_ = vehicle_state;
+      reference_line_provider_ = reference_line_provider;
+  }
+  init_data_ = true;
 }
 
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
@@ -98,7 +115,6 @@ bool Frame::Rerouting() {
   }
   auto request = local_view_.routing->routing_request();
   request.clear_header();
-  // AdapterManager::FillRoutingRequestHeader("planning", &request);
 
   auto point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());

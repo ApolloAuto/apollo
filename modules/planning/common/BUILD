@@ -294,9 +294,11 @@ cc_library(
     name = "frame",
     srcs = [
         "frame.cc",
+        "frame_manager.cc",
     ],
     hdrs = [
         "frame.h",
+        "frame_manager.h",
     ],
     deps = [
         ":local_view",

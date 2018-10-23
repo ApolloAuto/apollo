@@ -74,6 +74,10 @@ class DecisionData {
                              std::string* const id);
 
  private:
+  bool IsValidTrajectory(const prediction::Trajectory& trajectory);
+  bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
+
+ private:
   std::vector<PathObstacle*> static_obstacle_;
   std::vector<PathObstacle*> dynamic_obstacle_;
   std::vector<PathObstacle*> virtual_obstacle_;
