@@ -41,6 +41,11 @@ DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "scenario_stop_sign_unprotected_config.pb.txt",
               "The stop_sign_unprotected scenario configuration file");
 
+DEFINE_bool(enable_scenario_side_pass, false,
+              "enable the side pass scenario in planning");
+DEFINE_bool(enable_scenario_stop_sign_unprotected, false,
+              "enable the stop_sign_unprotected scenario in planning");
+
 DEFINE_string(planning_adapter_config_filename,
               "/apollo/modules/planning/conf/adapter.conf",
               "The adapter configuration file");

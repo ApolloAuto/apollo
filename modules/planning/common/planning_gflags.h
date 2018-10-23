@@ -27,6 +27,8 @@ DECLARE_string(planning_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
 DECLARE_string(scenario_side_pass_config_file);
 DECLARE_string(scenario_stop_sign_unprotected_config_file);
+DECLARE_bool(enable_scenario_side_pass);
+DECLARE_bool(enable_scenario_stop_sign_unprotected);
 
 DECLARE_string(planning_adapter_config_filename);
 DECLARE_string(traffic_rule_config_filename);
