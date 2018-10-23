@@ -198,6 +198,62 @@ std::string LaneSegment::DebugString() const {
                               end_s);
 }
 
+std::vector<MapPathPoint> MapPathPoint::GetPointsFromSegment(
+    const LaneSegment& segment) {
+  return GetPointsFromLane(segment.lane, segment.start_s, segment.end_s);
+}
+
+std::vector<MapPathPoint> MapPathPoint::GetPointsFromLane(LaneInfoConstPtr lane,
+                                                          const double start_s,
+                                                          const double end_s) {
+  std::vector<MapPathPoint> points;
+  if (start_s >= end_s) {
+    return points;
+  }
+  double accumulate_s = 0.0;
+  for (size_t i = 0; i < lane->points().size(); ++i) {
+    if (accumulate_s >= start_s && accumulate_s <= end_s) {
+      points.emplace_back(lane->points()[i], lane->headings()[i],
+                          LaneWaypoint(lane, accumulate_s));
+    }
+    if (i < lane->segments().size()) {
+      const auto& segment = lane->segments()[i];
+      const double next_accumulate_s = accumulate_s + segment.length();
+      if (start_s > accumulate_s && start_s < next_accumulate_s) {
+        points.emplace_back(segment.start() + segment.unit_direction() *
+                                                  (start_s - accumulate_s),
+                            lane->headings()[i], LaneWaypoint(lane, start_s));
+      }
+      if (end_s > accumulate_s && end_s < next_accumulate_s) {
+        points.emplace_back(
+            segment.start() + segment.unit_direction() * (end_s - accumulate_s),
+            lane->headings()[i], LaneWaypoint(lane, end_s));
+      }
+      accumulate_s = next_accumulate_s;
+    }
+    if (accumulate_s > end_s) {
+      break;
+    }
+  }
+  return points;
+}
+
+void MapPathPoint::RemoveDuplicates(std::vector<MapPathPoint>* points) {
+  constexpr double kDuplicatedPointsEpsilon = 1e-7;
+  constexpr double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
+  CHECK_NOTNULL(points);
+  int count = 0;
+  for (size_t i = 0; i < points->size(); ++i) {
+    if (count == 0 ||
+        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
+      (*points)[count++] = (*points)[i];
+    } else {
+      (*points)[count - 1].add_lane_waypoints((*points)[i].lane_waypoints());
+    }
+  }
+  points->resize(count);
+}
+
 std::string MapPathPoint::DebugString() const {
   return common::util::StrCat(
       "x = ", x_, "  y = ", y_, "  heading = ", heading_,
@@ -256,6 +312,30 @@ Path::Path(const std::vector<MapPathPoint>& path_points,
     use_path_approximation_ = true;
     approximation_ = PathApproximation(*this, max_approximation_error);
   }
+}
+
+Path::Path(const std::vector<LaneSegment>& segments)
+    : lane_segments_(segments) {
+  for (const auto& segment : lane_segments_) {
+    const auto points = MapPathPoint::GetPointsFromLane(
+        segment.lane, segment.start_s, segment.end_s);
+    path_points_.insert(path_points_.end(), points.begin(), points.end());
+  }
+  MapPathPoint::RemoveDuplicates(&path_points_);
+  CHECK_GE(path_points_.size(), 2);
+  Init();
+}
+
+Path::Path(std::vector<LaneSegment>&& segments)
+    : lane_segments_(std::move(segments)) {
+  for (const auto& segment : lane_segments_) {
+    const auto points = MapPathPoint::GetPointsFromLane(
+        segment.lane, segment.start_s, segment.end_s);
+    path_points_.insert(path_points_.end(), points.begin(), points.end());
+  }
+  MapPathPoint::RemoveDuplicates(&path_points_);
+  CHECK_GE(path_points_.size(), 2);
+  Init();
 }
 
 Path::Path(std::vector<MapPathPoint>&& path_points,

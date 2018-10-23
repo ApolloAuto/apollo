@@ -57,9 +57,6 @@ class PncMap {
 
   const routing::RoutingResponse &routing_response() const;
 
-  static bool CreatePathFromLaneSegments(const RouteSegments &segments,
-                                         Path *const path);
-
   static double LookForwardDistance(const double velocity);
 
   bool GetRouteSegments(const common::VehicleState &vehicle_state,

@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <utility>
 
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/string_util.h"
@@ -35,6 +36,7 @@ using apollo::hdmap::Id;
 using apollo::hdmap::JunctionInfoConstPtr;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::Map;
+using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 using apollo::hdmap::PncMap;
@@ -403,20 +405,25 @@ bool MapService::AddPathFromPassageRegion(
   }
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
-  RouteSegments segments;
+  std::vector<MapPathPoint> path_points;
   for (const auto &segment : passage_region.segment()) {
     auto lane_ptr = HDMap()->GetLaneById(hdmap::MakeMapId(segment.id()));
     if (!lane_ptr) {
       AERROR << "Failed to find lane: " << segment.id();
       return false;
     }
-    segments.emplace_back(lane_ptr, segment.start_s(), segment.end_s());
+    if (segment.start_s() >= segment.end_s()) {
+      continue;
+    }
+    auto points = MapPathPoint::GetPointsFromLane(lane_ptr, segment.start_s(),
+                                                  segment.end_s());
+    path_points.insert(path_points.end(), points.begin(), points.end());
   }
 
-  paths->emplace_back();
-  if (!PncMap::CreatePathFromLaneSegments(segments, &paths->back())) {
+  if (path_points.size() < 2) {
     return false;
   }
+  paths->emplace_back(Path(std::move(path_points)));
 
   return true;
 }

@@ -61,26 +61,8 @@ using common::util::MakePointENU;
 
 namespace {
 
-// Minimum distance to remove duplicated points.
-const double kDuplicatedPointsEpsilon = 1e-7;
-
 // Maximum lateral error used in trajectory approximation.
 const double kTrajectoryApproximationMaxError = 2.0;
-
-void RemoveDuplicates(std::vector<MapPathPoint> *points) {
-  CHECK_NOTNULL(points);
-  int count = 0;
-  const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
-  for (size_t i = 0; i < points->size(); ++i) {
-    if (count == 0 ||
-        (*points)[i].DistanceSquareTo((*points)[count - 1]) > limit) {
-      (*points)[count++] = (*points)[i];
-    } else {
-      (*points)[count - 1].add_lane_waypoints((*points)[i].lane_waypoints());
-    }
-  }
-  points->resize(count);
-}
 
 }  // namespace
 
@@ -770,24 +752,6 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
       break;
     }
   }
-}
-
-bool PncMap::CreatePathFromLaneSegments(const RouteSegments &segments,
-                                        Path *const path) {
-  std::vector<MapPathPoint> points;
-  for (const auto &segment : segments) {
-    AppendLaneToPoints(segment.lane, segment.start_s, segment.end_s, &points);
-  }
-  RemoveDuplicates(&points);
-
-  if (points.size() < 2) {
-    AWARN << "Cannot create path from " << points.size()
-          << " points. Expecting more than 2.";
-    return false;
-  }
-
-  *path = Path(points, segments, kTrajectoryApproximationMaxError);
-  return true;
 }
 
 }  // namespace hdmap
