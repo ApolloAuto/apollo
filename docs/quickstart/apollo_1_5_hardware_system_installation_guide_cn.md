@@ -200,7 +200,7 @@ a. 找到并拧下计算机侧面的八个螺丝（棕色方块所示或棕色�
 
 b. 从IPC上拆下盖子。基座有3个PCI插槽（由显卡占据一个）：
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Removing_the_cover.JPG" width="99%">
+<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Removing_the_cover.jpg" width="99%">
 
 ![Before installing the CAN card](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Before_installing_the_can_card.png)
 
@@ -255,7 +255,7 @@ e. 安装IPC盖子：
 
 c. 连接电源: 
 
-![IPC-6108GC-PowerCable.JPG](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-PowerCable.JPG)
+![IPC-6108GC-PowerCable.jpg](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-PowerCable.jpg)
 
 #### 为IPC安装软件
 这部分主要描述以下的安装步骤：
@@ -503,13 +503,13 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
   将电源和信号电缆连接到LiDAR上的匹配端口
 
-   ![HDL64_Cabling](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_Cabling.JPG)
+   ![HDL64_Cabling](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_Cabling.jpg)
 
 2. 连接到电源
 
    两根AWG 16线为HDL-64E S3提供所需电力。 所需电压/电流：12V/3A。 要连接电源，请与电线完全接触并拧紧螺丝。
 
-   ![HDL64_Power_Cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_PowerCable.JPG)
+   ![HDL64_Power_Cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_PowerCable.jpg)
 
 3. 连接到IPC
 
@@ -588,7 +588,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
 2.   将板载计算机系统6108GC放在主干箱内（推荐）。
 
-      例如，阿波罗1.5使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.JPG)
+      例如，阿波罗1.5使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.jpg)
 
 3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的主干。
 这种定位使得连接所有电缆更容易。
@@ -618,7 +618,7 @@ d. 连接:
 - 全球定位系统接收机
 -（可选）监视器：
 
-![IPC-power-842x636](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/cable_connected_incar.JPG)
+![IPC-power-842x636](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/cable_connected_incar.jpg)
 
 
 #### 杠杆臂测量

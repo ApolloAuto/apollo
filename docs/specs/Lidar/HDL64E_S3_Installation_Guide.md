@@ -36,13 +36,13 @@ Each HDL-64E S3 LiDAR includes a cable bundle to connect the LiDAR to the power 
 
    Connect the power and signal cable to the matching ports on the LiDAR
 
-   ![HDL64_Cabling](images/HDL64_Cabling.JPG)
+   ![HDL64_Cabling](images/HDL64_Cabling.jpg)
 
 * **Connecting the Power Source**
 
    Two AWG 16 wires are used to power the HDL-64E S3 LiDAR. It requires about 3A at 12V. To connect the power source, make full contact with the wires and tighten the screws. 
 
-   ![HDL64_Power_Cable](images/HDL64_PowerCable.JPG)
+   ![HDL64_Power_Cable](images/HDL64_PowerCable.jpg)
 
 * **Connecting the IPC**
 

@@ -15,7 +15,7 @@
 
 一种典型的更新流程如下图所示：
 
-![](images/apollo_unsecure_upgrade_procedure.JPG)
+![](images/apollo_unsecure_upgrade_procedure.jpg)
 
 1. 更新服务器生成更新包
 2. 更新包上传至存储服务器
@@ -28,7 +28,7 @@
 
 在集成Apollo安全更新SDK后，更新流程修改为：
 
-![](images/apollo_secure_upgrade_procedure.JPG)
+![](images/apollo_secure_upgrade_procedure.jpg)
 
 1. 更新服务器生成安全更新包和更新包的token
 2. 安全更新包和更新包token上传至存储服务器

@@ -294,7 +294,7 @@ Follow these steps:
   a. Locate and unscrew the eight screws (shown in the brown squares or	pointed by brown arrows) on the side of computer:
   ![Positions_of_Screws](images/IPC-6108GC-Screw-Positions_labeled.png)b. Remove the cover from the IPC. 3 PCI slots (one occupied by the	graphic card) locate on the base:
 
-  ![removing the cover](images/Removing_the_cover.JPG)
+  ![removing the cover](images/Removing_the_cover.jpg)
 
   ![Before installing the CAN card](images/Before_installing_the_can_card.png)
 
@@ -342,7 +342,7 @@ Follow these steps:
 
 c. Connect the power: 
 
-![IPC-6108GC-PowerCable.JPG](images/IPC-6108GC-PowerCable.JPG)
+![IPC-6108GC-PowerCable.jpg](images/IPC-6108GC-PowerCable.jpg)
 
 
 ### Installing the Software for the IPC
@@ -623,13 +623,13 @@ Each HDL-64E S3 LiDAR includes a cablebundle to connect the LiDAR to power suppl
 
    Connect the power and signal cable to the matching ports on the LiDAR
 
-   ![HDL64_Cabling](images/HDL64_Cabling.JPG)
+   ![HDL64_Cabling](images/HDL64_Cabling.jpg)
 
 2. Connection to Power Source
 
    The two AWG 16 wires are used to power HDL-64E S3 Lidar. It requires about 3A at 12V. To make connection to the power source, make full contact with the wires and tighten the screws. 
 
-   ![HDL64_Power_Cable](images/HDL64_PowerCable.JPG)
+   ![HDL64_Power_Cable](images/HDL64_PowerCable.jpg)
 
 3. Conection to IPC
 
@@ -718,7 +718,7 @@ Follow these steps:
 
 2.   Place the onboard computer system, the 6108GC, inside the trunk (recommended).
 
-     For example, Apollo 1.5 uses 4x4 self-tapping screws to bolt the 6108GC to the carpeted floor of the trunk. ![IPC-bolt_down-936x720](images/Mount_ipc_on_carpet.JPG)
+     For example, Apollo 1.5 uses 4x4 self-tapping screws to bolt the 6108GC to the carpeted floor of the trunk. ![IPC-bolt_down-936x720](images/Mount_ipc_on_carpet.jpg)
 
 3. Mount the IPC so that its front and back sides(where all ports are located) face the right side (passenger) or the left side(driver) of the trunk.
 
@@ -762,7 +762,7 @@ d. Connect:
 
 - (optional) the monitor:
 
-![IPC-power-842x636](images/cable_connected_incar.JPG)
+![IPC-power-842x636](images/cable_connected_incar.jpg)
 
 
 
