@@ -10,8 +10,10 @@ RUN apt-get update -y && \
     cmake \
     cppcheck \
     curl \
+    curlftpfs \
     debconf-utils \
     doxygen \
+    expect-dev \
     gdb \
     git \
     google-perftools \
@@ -64,8 +66,6 @@ RUN bash /tmp/installers/install_undistort.sh
 RUN bash /tmp/installers/install_user.sh
 RUN bash /tmp/installers/install_yarn.sh
 RUN bash /tmp/installers/post_install.sh
-
-# TODO(xiaoxq): Install TensorRT 3 properly.
 
 WORKDIR /apollo
 USER apollo
