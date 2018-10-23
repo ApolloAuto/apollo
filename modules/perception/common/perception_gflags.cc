@@ -21,8 +21,7 @@ namespace apollo {
 namespace perception {
 
 // sensor_manager
-DEFINE_string(obs_sensor_intrinsic_path,
-              "/apollo/modules/calibration/data/example/camera_params",
+DEFINE_string(obs_sensor_intrinsic_path, "/home/caros/cybertron/params",
               "The intrinsics/extrinsics dir.");
 
 DEFINE_string(obs_sensor_meta_path, "./data/perception/common/sensor_meta.pt",
@@ -32,7 +31,7 @@ DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");
 
 // config_manager
 DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
-DEFINE_string(work_root, "/apollo/modules/perception/production",
+DEFINE_string(work_root, "",
               "Project work root direcotry.");
 DEFINE_string(adu_data, "/home/caros/adu_data",
               "ADU shared data path, including maps, routings...");

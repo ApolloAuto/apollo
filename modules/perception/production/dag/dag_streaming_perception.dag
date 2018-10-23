@@ -1,6 +1,3 @@
-
-
-
 module_config {
   module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component.so"
 
@@ -9,6 +6,7 @@ module_config {
     config {
       name: "Velodyne64Segmentation"
       config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne64_segmentation_conf.pb.txt"
+      flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
       readers {
           channel: "/apollo/sensor/velodyne64/compensator/PointCloud2"
         }
@@ -39,16 +37,6 @@ module_config {
   }
 
   components {
-    class_name: "FusionComponent"
-    config {
-      name: "SensorFusion"
-      readers {
-          channel: "/perception/inner/PrefusedObjects"
-        }
-    }
-  }
-
-  components {
     class_name: "RadarDetectionComponent"
     config {
       name: "FrontRadarDetection"
@@ -66,6 +54,17 @@ module_config {
       config_file_path: "/apollo/modules/perception/production/conf/perception/radar/rear_radar_component_conf.pb.txt"
       readers {
           channel: "/sensor/rearradar/radardata"
+        }
+    }
+  }
+
+  components {
+    class_name: "FusionComponent"
+    config {
+      name: "SensorFusion"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/fusion/fusion_component_conf.pb.txt"
+      readers {
+          channel: "/perception/inner/PrefusedObjects"
         }
     }
   }

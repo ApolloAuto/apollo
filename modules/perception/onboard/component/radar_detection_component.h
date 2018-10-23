@@ -47,12 +47,15 @@ class RadarDetectionComponent : public cyber::Component<ContiRadar> {
       : seq_num_(0),
         tf_child_frame_id_(""),
         radar_forward_distance_(200.0),
-        preprocessor_name_(""),
+        preprocessor_method_(""),
+        perception_method_(""),
         pipeline_name_(""),
+        odometry_channel_name_(""),
         hdmap_input_(nullptr),
         radar_preprocessor_(nullptr),
         radar_perception_(nullptr) {}
   ~RadarDetectionComponent() = default;
+
   bool Init() override;
   bool Proc(const std::shared_ptr<ContiRadar>& message) override;
 
@@ -63,15 +66,22 @@ class RadarDetectionComponent : public cyber::Component<ContiRadar> {
   int GetCarLocalizationSpeed(double timestamp,
                               Eigen::Vector3f* car_linear_speed,
                               Eigen::Vector3f* car_angular_speed);
+
   RadarDetectionComponent(const RadarDetectionComponent&) = delete;
   RadarDetectionComponent& operator=(const RadarDetectionComponent&) = delete;
+
+ private:
   std::mutex _mutex;
   uint32_t seq_num_;
+
   base::SensorInfo radar_info_;
   std::string tf_child_frame_id_;
   double radar_forward_distance_;
-  std::string preprocessor_name_;
+  std::string preprocessor_method_;
+  std::string perception_method_;
   std::string pipeline_name_;
+  std::string odometry_channel_name_;
+
   TransformWrapper radar2world_trans_;
   TransformWrapper radar2novatel_trans_;
   map::HDMapInput* hdmap_input_;

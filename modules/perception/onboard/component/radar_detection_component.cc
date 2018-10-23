@@ -21,25 +21,20 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-DEFINE_string(obs_localization_channel, "/localization/100hz/localization_pose",
-              "subscribe localization channel name");
-DEFINE_string(obs_radar_obstacle_perception, "RadarObstaclePerception",
-              "radar obstacle perception");
-DEFINE_bool(obs_convert2gps_timestamp, false,
-            "whether convert timestamp to gps timestamp.");
-
 bool RadarDetectionComponent::Init() {
   RadarComponentConfig comp_config;
   if (!GetProtoConfig(&comp_config)) {
     return false;
   }
-  AINFO <<"Radarr Component Configs: " << comp_config.DebugString();
+  AINFO <<"Radar Component Configs: " << comp_config.DebugString();
 
   // to load component configs
   tf_child_frame_id_ = comp_config.tf_child_frame_id();
   radar_forward_distance_ = comp_config.radar_forward_distance();
-  preprocessor_name_ = comp_config.radar_preprocessor();
-  pipeline_name_ = comp_config.radar_pipeline();
+  preprocessor_method_ = comp_config.radar_preprocessor_method();
+  perception_method_ = comp_config.radar_perception_method();
+  pipeline_name_ = comp_config.radar_pipeline_name();
+  odometry_channel_name_ = comp_config.odometry_channel_name();
 
   common::SensorManager* sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
@@ -60,9 +55,8 @@ bool RadarDetectionComponent::Init() {
   CHECK(InitAlgorithmPlugin() == SUCC) << "Failed to init algorithm plugin.";
   radar2world_trans_.Init(tf_child_frame_id_);
   radar2novatel_trans_.Init(tf_child_frame_id_);
-  localization_subscriber_.Init(
-      FLAGS_obs_localization_channel,
-      FLAGS_obs_localization_channel + '_' + comp_config.radar_name());
+  localization_subscriber_.Init(odometry_channel_name_,
+      odometry_channel_name_ + '_' + comp_config.radar_name());
   return true;
 }
 
@@ -82,22 +76,22 @@ bool RadarDetectionComponent::Proc(
 }
 
 int RadarDetectionComponent::InitAlgorithmPlugin() {
-  AINFO << "onboard radar_preprocessor: " << preprocessor_name_;
+  AINFO << "onboard radar_preprocessor: " << preprocessor_method_;
   if (FLAGS_obs_enable_hdmap_input) {
     hdmap_input_ = lib::Singleton<map::HDMapInput>::get_instance();
     CHECK_NOTNULL(hdmap_input_);
     CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   radar::BasePreprocessor* preprocessor =
-      radar::BasePreprocessorRegisterer::GetInstanceByName(preprocessor_name_);
+      radar::BasePreprocessorRegisterer::GetInstanceByName(preprocessor_method_);
   CHECK_NOTNULL(preprocessor);
   radar_preprocessor_.reset(preprocessor);
   CHECK(radar_preprocessor_->Init()) << "Failed to init radar preprocessor.";
   radar::BaseRadarObstaclePerception* radar_perception =
       radar::BaseRadarObstaclePerceptionRegisterer::GetInstanceByName(
-          FLAGS_obs_radar_obstacle_perception);
+          perception_method_);
   CHECK(radar_perception != nullptr) << "No radar obstacle perception named "
-                                     << FLAGS_obs_radar_obstacle_perception;
+                                     << perception_method_;
   radar_perception_.reset(radar_perception);
   CHECK(radar_perception_->Init(pipeline_name_))
       << "Failed to init radar perception.";
@@ -130,9 +124,6 @@ bool RadarDetectionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
                                            "radar_preprocessor");
   timestamp = corrected_obstacles.header().timestamp_sec();
-  if (FLAGS_obs_convert2gps_timestamp) {
-    timestamp = lib::TimeUtil::Unix2Gps(timestamp);
-  }
 
   out_message->timestamp_ = timestamp;
   out_message->seq_num_ = seq_num_;
