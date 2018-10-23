@@ -127,14 +127,14 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
   for (int i = 0; i < num_junction_exit; ++i) {
     const JunctionExit& junction_exit =
         feature.junction_feature().junction_exit(i);
-    double _x = junction_exit.exit_position().x() - feature.position().x();
-    double _y = junction_exit.exit_position().y() - feature.position().y();
-    double diff_x = std::cos(heading) * _x - std::sin(heading) * _y;
-    double diff_y = std::sin(heading) * _x + std::cos(heading) * _y;
+    double x = junction_exit.exit_position().x() - feature.position().x();
+    double y = junction_exit.exit_position().y() - feature.position().y();
+    double diff_x = std::cos(heading) * x - std::sin(heading) * y;
+    double diff_y = std::sin(heading) * x + std::cos(heading) * y;
     double angle = std::atan2(diff_x, diff_y);
     double d_idx = (angle / (2.0 * std::acos(-1))) -
         floor((angle / (2.0 * std::acos(-1.0))) / 12.0) * 12.0;
-    int idx = static_cast<int>(d_idx >= 0 ? d_idx : d_idx + 12.0);
+    int idx = static_cast<int>(d_idx >= 0 ? d_idx : d_idx + 12);
     feature_values->operator[](idx * 5) = 1;
     feature_values->operator[](idx * 5 + 1) = diff_x / junction_range;
     feature_values->operator[](idx * 5 + 2) = diff_y / junction_range;
