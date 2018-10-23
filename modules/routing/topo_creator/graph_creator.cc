@@ -18,8 +18,7 @@
 
 #include <vector>
 
-#include "glog/logging.h"
-
+#include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
@@ -32,15 +31,15 @@
 namespace apollo {
 namespace routing {
 
+using ::google::protobuf::RepeatedPtrField;
 using apollo::common::PointENU;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::math::CrossProd;
-using apollo::common::math::kMathEpsilon;
 using apollo::common::math::Vec2d;
+using apollo::common::math::kMathEpsilon;
 using apollo::hdmap::Id;
 using apollo::hdmap::LaneBoundary;
 using apollo::hdmap::LaneBoundaryType;
-using ::google::protobuf::RepeatedPtrField;
 
 using apollo::common::util::EndWith;
 

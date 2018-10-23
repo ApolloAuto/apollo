@@ -70,7 +70,7 @@ cc_binary(
     srcs = ["topo_creator.cc"],
     deps = [
         ":graph_creator",
-        "//cyber",
+        "//cyber/common:log",
         "//external:gflags",
         "//modules/common",
         "//modules/common/configs:config_gflags",
