@@ -99,6 +99,7 @@ cc_library(
         "//modules/perception/radar/common:radar_util",
 
         "//modules/perception/onboard/proto:lidar_component_config_proto",
+        "//modules/perception/onboard/proto:fusion_component_config_proto",
         "//modules/perception/onboard/proto:radar_component_config_proto",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",

@@ -17,6 +17,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "fusion_component_config_proto",
+    deps = [
+        ":fusion_component_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "fusion_component_config_proto_lib",
+    srcs = [
+        "fusion_component_config.proto"
+    ],
+)
+
+cc_proto_library(
 	name = "fusion_camera_detection_proto",
 	deps = [
 		":fusion_camera_detection_proto_lib",

@@ -25,17 +25,22 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-DEFINE_string(obs_onboard_fusion, "ProbabilisticFusion",
-              "onboard fusion method");
-DEFINE_string(obs_fusion_main_sensor, "velodyne64", "main sensor for fusion");
-DEFINE_bool(obs_object_in_roi_check, false, "use object in-roi check function");
-DEFINE_double(obs_roi_radius_for_object_check, 180,
-              "roi radius for object in-roi check");
-
 uint32_t FusionComponent::s_seq_num_ = 0;
 std::mutex FusionComponent::s_mutex_;
 
 bool FusionComponent::Init() {
+  FusionComponentConfig comp_config;
+  if (!GetProtoConfig(&comp_config)) {
+    return false;
+  }
+  AINFO <<"Radarr Component Configs: " << comp_config.DebugString();
+
+  // to load component configs
+  fusion_method_ = comp_config.fusion_method();
+  fusion_main_sensor_ = comp_config.fusion_main_sensor();
+  object_in_roi_check_ = comp_config.object_in_roi_check();
+  radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
+
   // init algorithm plugin
   CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
   writer_ =
@@ -58,8 +63,8 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
   bool status = InternalProc(message, out_message, viz_message);
   if (status == true) {
     // TODO(conver sensor id)
-    if (message->sensor_id_ != FLAGS_obs_fusion_main_sensor) {
-      AINFO << "Fusion receive non " << FLAGS_obs_fusion_main_sensor
+    if (message->sensor_id_ != fusion_main_sensor_) {
+      AINFO << "Fusion receive non " << fusion_main_sensor_
             << " message, skip send.";
     } else {
       // Send("/apollo/perception/obstacles", out_message);
@@ -78,17 +83,17 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
 bool FusionComponent::InitAlgorithmPlugin() {
   fusion_.reset(new fusion::ObstacleMultiSensorFusion());
   fusion::ObstacleMultiSensorFusionParam param;
-  param.main_sensor = FLAGS_obs_fusion_main_sensor;
-  param.fusion_method = FLAGS_obs_onboard_fusion;
+  param.main_sensor = fusion_main_sensor_;
+  param.fusion_method = fusion_method_;
   CHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
 
-  if (FLAGS_obs_enable_hdmap_input && FLAGS_obs_object_in_roi_check) {
+  if (FLAGS_obs_enable_hdmap_input && object_in_roi_check_) {
     hdmap_input_ = lib::Singleton<map::HDMapInput>::get_instance();
     CHECK_NOTNULL(hdmap_input_);
     CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   AINFO << "Init algorithm successfully, onboard fusion: "
-        << FLAGS_obs_onboard_fusion;
+        << fusion_method_;
   return true;
 }
 
@@ -129,13 +134,13 @@ bool FusionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(std::string("fusion_process"),
                                            in_message->sensor_id_);
 
-  if (in_message->sensor_id_ != FLAGS_obs_fusion_main_sensor) {
+  if (in_message->sensor_id_ != fusion_main_sensor_) {
     return true;
   }
 
   Eigen::Matrix4d sensor2world_pose =
       in_message->frame_->sensor2world_pose.matrix();
-  if (FLAGS_obs_object_in_roi_check && FLAGS_obs_enable_hdmap_input) {
+  if (object_in_roi_check_ && FLAGS_obs_enable_hdmap_input) {
     // get hdmap
     base::HdmapStructPtr hdmap(new base::HdmapStruct());
     if (hdmap_input_) {
@@ -144,7 +149,7 @@ bool FusionComponent::InternalProc(
       position.y = sensor2world_pose(1, 3);
       position.z = sensor2world_pose(2, 3);
       hdmap_input_->GetRoiHDMapStruct(
-          position, FLAGS_obs_roi_radius_for_object_check, hdmap);
+          position, radius_for_roi_object_check_, hdmap);
       // TODO(use check)
       // ObjectInRoiSlackCheck(hdmap, fused_objects, &valid_objects);
       valid_objects.assign(fused_objects.begin(), fused_objects.end());

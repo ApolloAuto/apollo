@@ -19,7 +19,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-DEFINE_bool(obs_enable_hdmap_input, false, "enable hdmap input for roi filter");
+DEFINE_bool(obs_enable_hdmap_input, true, "enable hdmap input for roi filter");
 DEFINE_bool(obs_enable_visualization, false,
             "whether to send message for visualization");
 DEFINE_string(obs_screen_output_dir, "./",

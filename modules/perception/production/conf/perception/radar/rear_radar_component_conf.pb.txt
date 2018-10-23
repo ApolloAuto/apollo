@@ -1,5 +1,7 @@
 radar_name: "radar_rear"
 tf_child_frame_id: "radar_rear"
 radar_forward_distance: 120.0
-radar_preprocessor: "ContiArsPreprocessor"
-radar_pipeline: "RearRadarPipeline"
+radar_preprocessor_method: "ContiArsPreprocessor"
+radar_perception_method: "RadarObstaclePerception"
+radar_pipeline_name: "RearRadarPipeline"
+odometry_channel_name: "/localization/100hz/localization_pose"

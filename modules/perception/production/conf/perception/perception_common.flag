@@ -1,6 +1,11 @@
 ###########################################################################
 # Flags from sensor_manager
 
+# config file work root
+# type: string
+# default:
+--work_root=/apollo/modules/perception/production
+
 # SensorManager config file
 # type: string
 # default:
@@ -11,37 +16,13 @@
 # default:
 --obs_sensor_intrinsic_path=/apollo/modules/calibration/data/example/camera_params
 
-
-###########################################################################
-# Flags from fusion_component
-
-# onboard fusion method
-# type: string
-# default:
---obs_onboard_fusion=ProbabilisticFusion
-
-# main sensor for fusion
-# type: string
-# default:
---obs_fusion_main_sensor=velodyne64
-
-# use object in-roi check function
-# type: bool
-# default:
---obs_object_in_roi_check=false
-
-# roi radius for object in-roi check
-# type: double
-# default:
---obs_roi_radius_for_object_check=180
-
 ###########################################################################
 # Flags from common_flags
 
 # enable hdmap input for roi filter.
 # type: bool
 # default: true
---obs_enable_hdmap_input=true
+--obs_enable_hdmap_input=false
 
 # whether to send message for visualization.
 # type: bool
@@ -101,19 +82,3 @@
 # default: 0.15
 --obs_max_local_pose_extrapolation_latency=0.15
 
-
-###########################################################################
-# Flags from radar_detection_component
-
-# radar obstacle perception.
-# type: string
-# default: RadarObstaclePerception
---obs_radar_obstacle_perception=RadarObstaclePerception
-
-# whether convert timestamp to gps timestamp
-# type: bool
-# default: false
---obs_convert2gps_timestamp=false
-
-
---work_root=/apollo/modules/perception/production
