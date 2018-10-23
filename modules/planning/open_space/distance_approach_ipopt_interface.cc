@@ -304,6 +304,288 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   return true;
 }
 
+bool DistanceApproachIPOPTInterface::get_starting_point(
+    int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
+    bool init_lambda, double* lambda) {
+  ADEBUG << "get_starting_point";
+  CHECK(n == num_of_variables_)
+      << "No. of variables wrong in get_starting_point. n : " << n;
+  CHECK(init_x == true) << "Warm start init_x setting failed";
+  CHECK(init_z == false) << "Warm start init_z setting failed";
+  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+
+  CHECK_EQ(horizon_, uWS_.cols());
+  CHECK_EQ(horizon_ + 1, xWS_.cols());
+
+  // 1. state variables 4 * (horizon_ + 1)
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    std::size_t index = i * 4;
+    for (std::size_t j = 0; j < 4; ++j) {
+      x[index + j] = xWS_(j, i);
+    }
+  }
+
+  // 2. control variable initialization, 2 * horizon_
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    std::size_t index = i * 2;
+    x[control_start_index_ + index] = uWS_(0, i);
+    x[control_start_index_ + index + 1] = uWS_(1, i);
+  }
+
+  // 2. time scale variable initialization, horizon_ + 1
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    x[time_start_index_ + i] = 1.0;
+  }
+
+  // TODO(QiL) : better hot start l
+  // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    std::size_t index = i * obstacles_edges_sum_;
+    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
+      x[index + j] = 0.2;
+    }
+  }
+
+  // TODO(QiL) : better hot start m
+  // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    std::size_t index = i * 4 * obstacles_num_;
+    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+      x[index + j] = 0.2;
+    }
+  }
+  ADEBUG << "get_starting_point out";
+  return true;
+}
+
+bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
+                                            double& obj_value) {
+  ADEBUG << "eval_f";
+  // Objective is :
+  // min control inputs
+  // min input rate
+  // min time (if the time step is not fixed)
+  // regularization wrt warm start trajectory
+  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
+  std::size_t control_index = control_start_index_;
+  std::size_t time_index = time_start_index_;
+  std::size_t state_index = state_start_index_;
+
+  // TODO(QiL): Initial implementation towards earlier understanding and debug
+  // purpose, later code refine towards improving efficiency
+
+  obj_value = 0.0;
+  // 1. objective to minimize state diff to warm up
+  state_index = state_start_index_;
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    double x1_diff = x[state_index] - xWS_(0, i);
+    double x2_diff = x[state_index + 1] - xWS_(1, i);
+    double x3_diff = x[state_index + 2] - xWS_(2, i);
+    obj_value += weight_state_x_ * x1_diff * x1_diff +
+                 weight_state_y_ * x2_diff * x2_diff +
+                 weight_state_phi_ * x3_diff * x3_diff;
+    state_index += 4;
+  }
+
+  // 2. objective to minimize u square
+  control_index = control_start_index_;
+  for (std::size_t i = 0; i < horizon_; ++i) {
+    obj_value += weight_input_steer_ * x[control_index] * x[control_index] +
+                 weight_input_a_ * x[control_index + 1] * x[control_index + 1];
+    control_index += 2;
+  }
+
+  // 3. objective to minimize input change rate for first horizon
+
+  double last_time_steer_rate = (x[control_start_index_] - last_time_u_(0, 0)) /
+                                x[time_start_index_] / ts_;
+  double last_time_a_rate = (x[control_start_index_ + 1] - last_time_u_(1, 0)) /
+                            x[time_start_index_] / ts_;
+  obj_value +=
+      weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+      weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
+
+  // 4. objective to minimize input change rates, [0- horizon_ -2]
+  control_index = control_start_index_;
+  time_index = time_start_index_;
+  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
+    double steering_rate =
+        (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
+    double a_rate =
+        (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
+    obj_value += weight_rate_steer_ * steering_rate * steering_rate +
+                 weight_rate_a_ * a_rate * a_rate;
+    control_index += 2;
+    time_index += 1;
+  }
+
+  // 5. objective to minimize total time [0, horizon_]
+  time_index = time_start_index_;
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    double first_order_penalty = weight_first_order_time_ * x[time_index];
+    double second_order_penalty =
+        weight_second_order_time_ * x[time_index] * x[time_index];
+    obj_value += first_order_penalty + second_order_penalty;
+    time_index += 1;
+  }
+
+  ADEBUG << "objective value after this iteration : " << obj_value;
+  return true;
+}
+
+bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
+                                                 bool new_x, double* grad_f) {
+  ADEBUG << "eval_grad_f";
+  std::fill(grad_f, grad_f + n, 0.0);
+  std::size_t control_index = control_start_index_;
+  std::size_t time_index = time_start_index_;
+  std::size_t state_index = state_start_index_;
+
+  // 1. Gradients on states
+  // a. From minimizing difference from warm start, [0, horizon_]
+  for (std::size_t i = 0; i < horizon_ + 1; i++) {
+    grad_f[state_index] = weight_state_x_ * 2 * (x[state_index] - xWS_(0, i));
+    grad_f[state_index + 1] =
+        weight_state_y_ * 2.0 * (x[state_index + 1] - xWS_(1, i));
+    grad_f[state_index + 2] =
+        weight_state_phi_ * 2.0 * (x[state_index + 2] - xWS_(2, i));
+    grad_f[state_index + 3] = 0.0;
+    state_index += 4;
+  }
+
+  ADEBUG << "grad_f last index after over states " << state_index;
+  // 2. Gradients on control.
+  // a. from minimizing abosulte value square
+  control_index = control_start_index_;
+  time_index = time_start_index_;
+  state_index = state_start_index_;
+  for (std::size_t i = 0; i < horizon_; i++) {
+    grad_f[control_index] += weight_input_steer_ * 2 * x[control_index];
+    grad_f[control_index + 1] += weight_input_a_ * 2 * x[control_index + 1];
+    control_index += 2;
+  }
+
+  ADEBUG << "grad_f last index after over controls abs squares "
+         << control_index;
+
+  // b. from change rate first horizon.
+  control_index = control_start_index_;
+  time_index = time_start_index_;
+  grad_f[control_start_index_] +=
+      weight_stitching_steer_ *
+          (2 * x[control_start_index_] - 2 * last_time_u_(0, 0)) /
+          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
+      weight_rate_steer_ *
+          (-2 * x[control_start_index_ + 2] + 2 * x[control_start_index_]) /
+          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]);
+
+  grad_f[control_start_index_ + 1] +=
+      weight_stitching_a_ *
+          (2 * x[control_start_index_ + 1] - 2 * last_time_u_(1, 0)) /
+          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
+      weight_rate_a_ *
+          (-2 * x[control_start_index_ + 3] + 2 * x[control_start_index_ + 1]) /
+          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]);
+
+  control_index += 2;
+  time_index += 1;
+
+  // c. from change rate horizon [1, horizon-2]
+  for (std::size_t i = 0; i < horizon_ - 2; i++) {
+    grad_f[control_index] +=
+        weight_rate_steer_ *
+        ((-2 * x[control_index + 2] + 2 * x[control_index]) /
+             (ts_ * ts_ * x[time_index] * x[time_index]) +
+         (-2 * x[control_index - 2] + 2 * x[control_index]) /
+             (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]));
+
+    grad_f[control_index + 1] +=
+        weight_rate_a_ *
+        ((-2 * x[control_index + 3] + 2 * x[control_index + 1]) /
+             (ts_ * ts_ * x[time_index] * x[time_index]) +
+         (-2 * x[control_index - 1] + 2 * x[control_index + 1]) /
+             (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]));
+    control_index += 2;
+    time_index += 1;
+  }
+
+  // d. from change rate last horizon.
+  grad_f[control_index] += weight_rate_steer_ * 2 *
+                           (-x[control_index - 2] + x[control_index]) /
+                           (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]);
+
+  grad_f[control_index + 1] +=
+      weight_rate_a_ * (-2 * x[control_index - 1] + 2 * x[control_index + 1]) /
+      (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]);
+
+  ADEBUG << "grad_f last index after over controls change rate"
+         << control_index;
+
+  // 3. Grdients over time scale
+  time_index = time_start_index_;
+  state_index = state_start_index_;
+  // a. from  control rate change, first horizon
+  grad_f[time_start_index_] +=
+      -2 * weight_stitching_steer_ *
+          ((last_time_u_(0, 0) * last_time_u_(0, 0) +
+            x[control_start_index_] * x[control_start_index_] -
+            2 * last_time_u_(0, 0) * x[control_start_index_]) /
+           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_] *
+            x[time_start_index_])) -
+      2 * weight_stitching_a_ *
+          ((last_time_u_(1, 0) * last_time_u_(1, 0) +
+            x[control_start_index_ + 1] * x[control_start_index_ + 1] -
+            2 * last_time_u_(1, 0) * x[control_start_index_ + 1]) /
+           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_] *
+            x[time_start_index_]));
+
+  // from gradients of control rate, horizon [0, horizon-2]
+  time_index = time_start_index_;
+  control_index = control_start_index_;
+  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
+    grad_f[time_index] +=
+        -2 * weight_rate_steer_ * (x[control_index] - x[control_index + 2]) *
+            (x[control_index] - x[control_index + 2]) /
+            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]) -
+        2 * weight_rate_a_ * (x[control_index + 1] - x[control_index + 3]) *
+            (x[control_index + 1] - x[control_index + 3]) /
+            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]);
+    control_index += 2;
+    time_index += 1;
+  }
+
+  // from time scale minimization, [0, horizon_]
+  time_index = time_start_index_;
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    grad_f[time_index] += weight_first_order_time_ +
+                          2 * weight_second_order_time_ * x[time_index];
+    time_index += 1;
+  }
+
+  // 4. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
+  // horizon_]
+  std::size_t l_index = l_start_index_;
+  std::size_t n_index = n_start_index_;
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
+      grad_f[l_index] = 0.0;
+      ++l_index;
+    }
+  }
+
+  // 5. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+      grad_f[n_index] = 0.0;
+      ++n_index;
+    }
+  }
+
+  CHECK_EQ(n, n_index) << "No. of variables wrong in eval_grad_f. n : " << n;
+  ADEBUG << "eval_grad_f done";
+  return true;
+}
+
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
   ADEBUG << "eval_g";
@@ -466,60 +748,6 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
   return true;
 }
 
-bool DistanceApproachIPOPTInterface::get_starting_point(
-    int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
-    bool init_lambda, double* lambda) {
-  ADEBUG << "get_starting_point";
-  CHECK(n == num_of_variables_)
-      << "No. of variables wrong in get_starting_point. n : " << n;
-  CHECK(init_x == true) << "Warm start init_x setting failed";
-  CHECK(init_z == false) << "Warm start init_z setting failed";
-  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
-
-  CHECK_EQ(horizon_, uWS_.cols());
-  CHECK_EQ(horizon_ + 1, xWS_.cols());
-
-  // 1. state variables 4 * (horizon_ + 1)
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    std::size_t index = i * 4;
-    for (std::size_t j = 0; j < 4; ++j) {
-      x[index + j] = xWS_(j, i);
-    }
-  }
-
-  // 2. control variable initialization, 2 * horizon_
-  for (std::size_t i = 0; i < horizon_; ++i) {
-    std::size_t index = i * 2;
-    x[control_start_index_ + index] = uWS_(0, i);
-    x[control_start_index_ + index + 1] = uWS_(1, i);
-  }
-
-  // 2. time scale variable initialization, horizon_ + 1
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    x[time_start_index_ + i] = 1.0;
-  }
-
-  // TODO(QiL) : better hot start l
-  // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    std::size_t index = i * obstacles_edges_sum_;
-    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      x[index + j] = 0.2;
-    }
-  }
-
-  // TODO(QiL) : better hot start m
-  // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    std::size_t index = i * 4 * obstacles_num_;
-    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      x[index + j] = 0.2;
-    }
-  }
-  ADEBUG << "get_starting_point out";
-  return true;
-}
-
 bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                                                 bool new_x, int m, int nele_jac,
                                                 int* iRow, int* jCol,
@@ -621,8 +849,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
       iRow[nz_index] = state_index + 2;
       jCol[nz_index] = control_index + 1;
-      std::cout << "Non-zero element m : " << state_index + 2 << ",  "
-                << control_index + 1 << std::endl;
       ++nz_index;
 
       // g(2)' with respect to time
@@ -668,6 +894,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     // First element, with respect to time
     iRow[nz_index] = constraint_index;
     jCol[nz_index] = time_index;
+    std::cout << "196.298" << constraint_index << ", " << time_index;
     ++nz_index;
 
     control_index += 2;
@@ -1040,8 +1267,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     ++nz_index;
 
     // with respect to time
-    values[nz_index] = -2 * (x[control_index] - last_time_u_(0, 0)) /
-                       x[time_index] / x[time_index] / ts_;  // r FIXME()
+    values[nz_index] = -1.0 * (x[control_index] - last_time_u_(0, 0)) /
+                       x[time_index] / x[time_index] / ts_;
     ++nz_index;
     time_index += 1;
     control_index += 2;
@@ -1222,233 +1449,6 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
                                             double* values) {
   ADEBUG << "eval_h";
   return false;
-}
-
-bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
-                                            double& obj_value) {
-  ADEBUG << "eval_f";
-  // Objective is :
-  // min control inputs
-  // min input rate
-  // min time (if the time step is not fixed)
-  // regularization wrt warm start trajectory
-  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
-  std::size_t control_index = control_start_index_;
-  std::size_t time_index = time_start_index_;
-  std::size_t state_index = state_start_index_;
-
-  // TODO(QiL): Initial implementation towards earlier understanding and debug
-  // purpose, later code refine towards improving efficiency
-
-  obj_value = 0.0;
-  // 1. objective to minimize state diff to warm up
-  state_index = state_start_index_;
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    double x1_diff = x[state_index] - xWS_(0, i);
-    double x2_diff = x[state_index + 1] - xWS_(1, i);
-    double x3_diff = x[state_index + 2] - xWS_(2, i);
-    obj_value += weight_state_x_ * x1_diff * x1_diff +
-                 weight_state_y_ * x2_diff * x2_diff +
-                 weight_state_phi_ * x3_diff * x3_diff;
-    state_index += 4;
-  }
-
-  // 2. objective to minimize u square
-  control_index = control_start_index_;
-  for (std::size_t i = 0; i < horizon_; ++i) {
-    obj_value += weight_input_steer_ * x[control_index] * x[control_index] +
-                 weight_input_a_ * x[control_index + 1] * x[control_index + 1];
-    control_index += 2;
-  }
-
-  // 3. objective to minimize input change rate for first horizon
-
-  double last_time_steer_rate = (x[control_start_index_] - last_time_u_(0, 0)) /
-                                x[time_start_index_] / ts_;
-  double last_time_a_rate = (x[control_start_index_ + 1] - last_time_u_(1, 0)) /
-                            x[time_start_index_] / ts_;
-  obj_value +=
-      weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
-      weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
-
-  // 4. objective to minimize input change rates, [0- horizon_ -2]
-  control_index = control_start_index_;
-  time_index = time_start_index_;
-  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
-    double steering_rate =
-        (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
-    double a_rate =
-        (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
-    obj_value += weight_rate_steer_ * steering_rate * steering_rate +
-                 weight_rate_a_ * a_rate * a_rate;
-    control_index += 2;
-    time_index += 1;
-  }
-
-  // 5. objective to minimize total time [0, horizon_]
-  time_index = time_start_index_;
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    double first_order_penalty = weight_first_order_time_ * x[time_index];
-    double second_order_penalty =
-        weight_second_order_time_ * x[time_index] * x[time_index];
-    obj_value += first_order_penalty + second_order_penalty;
-    time_index += 1;
-  }
-
-  ADEBUG << "objective value after this iteration : " << obj_value;
-  return true;
-}
-
-bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
-                                                 bool new_x, double* grad_f) {
-  ADEBUG << "eval_grad_f";
-  std::fill(grad_f, grad_f + n, 0.0);
-  std::size_t control_index = control_start_index_;
-  std::size_t time_index = time_start_index_;
-  std::size_t state_index = state_start_index_;
-
-  // 1. Gradients on states
-  // a. From minimizing difference from warm start, [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; i++) {
-    grad_f[state_index] = weight_state_x_ * 2 * (x[state_index] - xWS_(0, i));
-    grad_f[state_index + 1] =
-        weight_state_y_ * 2.0 * (x[state_index + 1] - xWS_(1, i));
-    grad_f[state_index + 2] =
-        weight_state_phi_ * 2.0 * (x[state_index + 2] - xWS_(2, i));
-    grad_f[state_index + 3] = 0.0;
-    state_index += 4;
-  }
-
-  ADEBUG << "grad_f last index after over states " << state_index;
-  // 2. Gradients on control.
-  // a. from minimizing abosulte value square
-  control_index = control_start_index_;
-  time_index = time_start_index_;
-  state_index = state_start_index_;
-  for (std::size_t i = 0; i < horizon_; i++) {
-    grad_f[control_index] += weight_input_steer_ * 2 * x[control_index];
-    grad_f[control_index + 1] += weight_input_a_ * 2 * x[control_index + 1];
-    control_index += 2;
-  }
-
-  ADEBUG << "grad_f last index after over controls abs squares "
-         << control_index;
-
-  // b. from change rate first horizon.
-  control_index = control_start_index_;
-  time_index = time_start_index_;
-  grad_f[control_start_index_] +=
-      weight_stitching_steer_ *
-          (2 * x[control_start_index_] - 2 * last_time_u_(0, 0)) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
-      weight_rate_steer_ *
-          (-2 * x[control_start_index_ + 2] + 2 * x[control_start_index_]) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]);
-
-  grad_f[control_start_index_ + 1] +=
-      weight_stitching_a_ *
-          (2 * x[control_start_index_ + 1] - 2 * last_time_u_(1, 0)) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
-      weight_rate_a_ *
-          (-2 * x[control_start_index_ + 3] + 2 * x[control_start_index_ + 1]) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]);
-
-  control_index += 2;
-  time_index += 1;
-
-  // c. from change rate horizon [1, horizon-2]
-  for (std::size_t i = 0; i < horizon_ - 2; i++) {
-    grad_f[control_index] +=
-        weight_rate_steer_ *
-        ((-2 * x[control_index + 2] + 2 * x[control_index]) /
-             (ts_ * ts_ * x[time_index] * x[time_index]) +
-         (-2 * x[control_index - 2] + 2 * x[control_index]) /
-             (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]));
-
-    grad_f[control_index + 1] +=
-        weight_rate_a_ *
-        ((-2 * x[control_index + 3] + 2 * x[control_index + 1]) /
-             (ts_ * ts_ * x[time_index] * x[time_index]) +
-         (-2 * x[control_index - 1] + 2 * x[control_index + 1]) /
-             (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]));
-    control_index += 2;
-    time_index += 1;
-  }
-
-  // d. from change rate last horizon.
-  grad_f[control_index] += weight_rate_steer_ * 2 *
-                           (-x[control_index - 2] + x[control_index]) /
-                           (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]);
-
-  grad_f[control_index + 1] +=
-      weight_rate_a_ * (-2 * x[control_index - 1] + 2 * x[control_index + 1]) /
-      (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]);
-
-  ADEBUG << "grad_f last index after over controls change rate"
-         << control_index;
-
-  // 3. Grdients over time scale
-  time_index = time_start_index_;
-  state_index = state_start_index_;
-  // a. from  control rate change, first horizon
-  grad_f[time_start_index_] +=
-      -2 * weight_stitching_steer_ *
-          ((last_time_u_(0, 0) * last_time_u_(0, 0) +
-            x[control_start_index_] * x[control_start_index_] -
-            2 * last_time_u_(0, 0) * x[control_start_index_]) /
-           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_] *
-            x[time_start_index_])) -
-      2 * weight_stitching_a_ *
-          ((last_time_u_(1, 0) * last_time_u_(1, 0) +
-            x[control_start_index_ + 1] * x[control_start_index_ + 1] -
-            2 * last_time_u_(1, 0) * x[control_start_index_ + 1]) /
-           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_] *
-            x[time_start_index_]));
-
-  // from gradients of control rate, horizon [0, horizon-2]
-  time_index = time_start_index_;
-  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
-    grad_f[time_index] +=
-        -2 * weight_rate_steer_ * (x[control_index] - x[control_index + 2]) *
-            (x[control_index] - x[control_index + 2]) /
-            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]) -
-        2 * weight_rate_a_ * (x[control_index + 1] - x[control_index + 3]) *
-            (x[control_index + 1] - x[control_index + 3]) /
-            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]);
-    control_index += 2;
-    time_index += 1;
-  }
-
-  // from time scale minimization, [0, horizon_]
-  time_index = time_start_index_;
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    grad_f[time_index] += weight_first_order_time_ +
-                          2 * weight_second_order_time_ * x[time_index];
-    time_index += 1;
-  }
-
-  // 4. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
-  // horizon_]
-  std::size_t l_index = l_start_index_;
-  std::size_t n_index = n_start_index_;
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      grad_f[l_index] = 0.0;
-      ++l_index;
-    }
-  }
-
-  // 5. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      grad_f[n_index] = 0.0;
-      ++n_index;
-    }
-  }
-
-  CHECK_EQ(n, n_index) << "No. of variables wrong in eval_grad_f. n : " << n;
-  ADEBUG << "eval_grad_f done";
-  return true;
 }
 
 void DistanceApproachIPOPTInterface::finalize_solution(

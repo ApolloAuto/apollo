@@ -55,13 +55,6 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
-  void set_objective_weights(
-      const apollo::planning::DistanceApproachConfig& distance_approach_config);
-
-  void get_optimization_results(Eigen::MatrixXd* state_result,
-                                Eigen::MatrixXd* control_result,
-                                Eigen::MatrixXd* time_result) const;
-
   /** Method to return some info about the nlp */
   bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
                     IndexStyleEnum& index_style) override;
@@ -108,6 +101,10 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
                          const double* g, const double* lambda,
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
+
+  void get_optimization_results(Eigen::MatrixXd* state_result,
+                                Eigen::MatrixXd* control_result,
+                                Eigen::MatrixXd* time_result) const;
 
  private:
   int num_of_variables_;
