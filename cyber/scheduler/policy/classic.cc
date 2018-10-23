@@ -32,32 +32,35 @@ using apollo::cyber::event::SchedPerf;
 
 std::mutex ClassicContext::mtx_taskq_;
 std::mutex ClassicContext::mtx_rq_;
-
-std::unordered_multimap<uint64_t, std::shared_ptr<CRoutine>>
+std::unordered_map<uint64_t, std::shared_ptr<CRoutine>>
     ClassicContext::taskq_;
 std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
     ClassicContext::rq_;
 
 bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
-  std::lock_guard<std::mutex> lk(mtx_taskq_);
-  if (taskq_.find(cr->id()) == taskq_.end()) {
-    taskq_.insert({cr->id(), cr});
+  {
+    std::lock_guard<std::mutex> lk(mtx_taskq_);
+    if (taskq_.find(cr->id()) != taskq_.end()) {
+      return false;
+    }
+    taskq_[cr->id()] = cr;
   }
+  std::lock_guard<std::mutex> lg(mtx_rq_);
+  rq_.insert({cr->priority(), cr});
   return true;
 }
 
-void ClassicContext::Notify(uint64_t tid) {
-  std::lock_guard<std::mutex> lk(mtx_rq_);
-
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, tid,
-                                            proc_index_, 0, 0, -1, -1);
-
-  auto p = taskq_.find(tid);
-  if (p != taskq_.end() && p->second->state() != RoutineState::RUNNING) {
-    p->second->set_state(RoutineState::READY);
-    rq_.insert({p->second->priority(), p->second});
+void ClassicContext::Notify(uint64_t routine_id) {
+  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, routine_id,
+      proc_index_, 0, 0, -1, -1);
+  auto routine = taskq_[routine_id];
+  if (routine->state() == RoutineState::DATA_WAIT) {
+    auto lock = routine->GetLock();
+    if (routine->state() == RoutineState::DATA_WAIT) {
+      routine->set_state(RoutineState::READY);
+    }
   }
-
   if (!notified_.exchange(true)) {
     processor_->Notify();
     return;
@@ -68,28 +71,28 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   if (stop_) {
     return nullptr;
   }
-
-  auto start_perf_time = apollo::cyber::Time::Now().ToNanosecond();
   std::lock_guard<std::mutex> lk(mtx_rq_);
-
   std::shared_ptr<CRoutine> croutine = nullptr;
-  auto p = rq_.begin();
-  for (; p != rq_.end();) {
-    auto cr = p->second;
-
+  auto start_perf_time = apollo::cyber::Time::Now().ToNanosecond();
+  for (auto it = rq_.begin(); it != rq_.end();) {
+    auto cr = it->second;
     auto lock = cr->TryLock();
     if (!lock) {
-      ++p;
+      ++it;
+      continue;
+    }
+    cr->UpdateState();
+    if (cr->state() == RoutineState::FINISHED) {
+      it = rq_.erase(it);
       continue;
     }
 
     if (cr->state() == RoutineState::READY) {
+      cr->set_state(RoutineState::RUNNING);
       croutine = cr;
-      croutine->set_state(RoutineState::RUNNING);
-      rq_.erase(p);
       break;
     }
-    ++p;
+    ++it;
   }
 
   if (croutine == nullptr) {
@@ -102,7 +105,10 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   return croutine;
 }
 
-bool ClassicContext::RqEmpty() { return rq_.empty(); }
+bool ClassicContext::RqEmpty() {
+  std::lock_guard<std::mutex> lg(mtx_rq_);
+  return rq_.empty();
+}
 
 }  // namespace scheduler
 }  // namespace cyber

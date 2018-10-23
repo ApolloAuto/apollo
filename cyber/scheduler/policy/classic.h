@@ -41,7 +41,7 @@ class ClassicContext : public ProcessorContext {
  private:
   static std::mutex mtx_taskq_;
   static std::mutex mtx_rq_;
-  static std::unordered_multimap<uint64_t, std::shared_ptr<CRoutine>> taskq_;
+  static std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> taskq_;
   static std::multimap<uint32_t, std::shared_ptr<CRoutine>,
                        std::greater<uint32_t>> rq_;
 };
@@ -50,4 +50,4 @@ class ClassicContext : public ProcessorContext {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
+#endif  // CYBER_SCHEDULER_POLICY_CLASSIC_H_
