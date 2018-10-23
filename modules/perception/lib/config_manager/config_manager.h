@@ -144,10 +144,6 @@ class ConfigManager {
 
   const std::string &work_root() const { return work_root_; }
 
-  const std::string &adu_data() const { return adu_data_; }
-
-  void set_adu_data(const std::string &adu_data) { adu_data_ = adu_data; }
-
   void set_work_root(const std::string &work_root) { work_root_ = work_root; }
 
   ConfigManager(const ConfigManager &) = delete;
@@ -173,7 +169,6 @@ class ConfigManager {
   Mutex mutex_;  // multi-thread init safe.
   bool inited_ = false;
   std::string work_root_;  // ConfigManager work root dir.
-  std::string adu_data_;
 };
 
 class ModelConfig {

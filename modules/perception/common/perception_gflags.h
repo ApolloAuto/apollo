@@ -31,7 +31,6 @@ DECLARE_bool(enable_base_object_pool);
 // config_manager
 DECLARE_string(config_manager_path);
 DECLARE_string(work_root);
-DECLARE_string(adu_data);
 
 }  // namespace perception
 }  // namespace apollo
