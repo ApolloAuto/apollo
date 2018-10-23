@@ -77,7 +77,8 @@ bool SidePassSafety::IsSafeSidePass(
     }
     // ignore the obstacles behind adc and is able to catch adc after 5 secs.
     if (path_obstacle->PerceptionSLBoundary().end_s() < adc_front_edge_s &&
-        path_obstacle->st_boundary().min_t() >  5) {
+        path_obstacle->st_boundary().min_t() >
+            Config().side_pass_safety_config().safe_duration_reach_ref_line()) {
       continue;
     }
     // not overlapped obstacles
@@ -95,7 +96,7 @@ bool SidePassSafety::IsSafeSidePass(
     // overlap is more than 5 meters
     double s_range = path_obstacle->st_boundary().max_s() -
                      path_obstacle->st_boundary().min_s();
-    if (s_range > 5) {
+    if (s_range > Config().side_pass_safety_config().max_overlap_s_range()) {
       return false;
     }
   }
