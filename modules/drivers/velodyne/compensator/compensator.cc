@@ -61,6 +61,10 @@ bool Compensator::QueryPoseAffineFromTF2(const uint64_t& timestamp, void* pose,
 bool Compensator::MotionCompensation(
     const std::shared_ptr<const PointCloud>& msg,
     std::shared_ptr<PointCloud> msg_compensated) {
+  if (msg->height() == 0 || msg->width() == 0) {
+    AERROR << "PointCloud width & height should not be 0";
+    return false;
+  }
   uint64_t start = cyber::Time::Now().ToNanosecond();
   Eigen::Affine3d pose_min_time;
   Eigen::Affine3d pose_max_time;
@@ -93,7 +97,6 @@ bool Compensator::MotionCompensation(
     MotionCompensation(msg, msg_compensated, timestamp_min, timestamp_max,
                        pose_min_time, pose_max_time);
     uint64_t com_time = cyber::Time().Now().ToNanosecond();
-
     msg_compensated->set_width(msg_compensated->point_size() / msg->height());
     AINFO << "compenstator com msg diff:" << com_time - tf_time
           << ";meta:" << msg->header().lidar_timestamp();

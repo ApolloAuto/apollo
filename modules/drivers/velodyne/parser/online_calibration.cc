@@ -28,6 +28,11 @@ int OnlineCalibration::decode(const std::shared_ptr<VelodyneScan>& scan_msgs) {
     return 0;
   }
   for (auto& packet : scan_msgs->firing_pkts()) {
+    if (packet.data().size() < 1206) {
+      AERROR << "Ivalid packet data size, expect 1206, actually "
+             << packet.data().size();
+      return -1;
+    }
     uint8_t* data =
         reinterpret_cast<uint8_t*>(const_cast<char*>(packet.data().c_str()));
     status_types_.emplace_back(data[1204]);
