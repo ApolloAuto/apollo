@@ -14,8 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_RECORD_HEADER_BUILDER_H_
-#define CYBER_RECORD_HEADER_BUILDER_H_
+#ifndef CYBER_RECORD_FILE_RECORD_FILE_BASE_H_
+#define CYBER_RECORD_FILE_RECORD_FILE_BASE_H_
+
+#include <mutex>
+#include <string>
 
 #include "cyber/proto/record.pb.h"
 
@@ -23,29 +26,40 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
+const int HEADER_LENGTH = 2048;
+
 using ::apollo::cyber::proto::Header;
+using ::apollo::cyber::proto::Channel;
+using ::apollo::cyber::proto::ChunkHeader;
+using ::apollo::cyber::proto::ChunkBody;
+using ::apollo::cyber::proto::SingleMessage;
+using ::apollo::cyber::proto::Index;
+using ::apollo::cyber::proto::SingleIndex;
+using ::apollo::cyber::proto::ChannelCache;
+using ::apollo::cyber::proto::ChunkHeaderCache;
+using ::apollo::cyber::proto::ChunkBodyCache;
+using ::apollo::cyber::proto::SectionType;
 using ::apollo::cyber::proto::CompressType;
 
-class HeaderBuilder {
+class RecordFileBase {
  public:
-  static Header GetHeaderWithSegmentParams(const uint64_t segment_interval,
-                                           const uint64_t segment_raw_size);
-  static Header GetHeaderWithChunkParams(const uint64_t chunk_interval,
-                                         const uint64_t chunk_raw_size);
-  static Header GetHeader();
+  RecordFileBase() {}
+  virtual ~RecordFileBase() {}
+  virtual bool Open(const std::string& path) = 0;
+  virtual void Close() = 0;
+  std::string GetPath() { return path_; }
+  Header GetHeader() { return header_; }
+  Index GetIndex() { return index_; }
 
- private:
-  static const uint32_t MAJOR_VERSION_ = 1;
-  static const uint32_t MINOR_VERSION_ = 0;
-  static const CompressType COMPRESS_TYPE_ = CompressType::COMPRESS_NONE;
-  static const uint64_t CHUNK_INTERVAL_ = 20 * 1000 * 1000 * 1000ULL;    // 20s
-  static const uint64_t SEGMENT_INTERVAL_ = 60 * 1000 * 1000 * 1000ULL;  // 60s
-  static const uint64_t CHUNK_RAW_SIZE_ = 200 * 1024 * 1024ULL;     // 200MB
-  static const uint64_t SEGMENT_RAW_SIZE_ = 2048 * 1024 * 1024ULL;  // 200GB
+ protected:
+  std::mutex mutex_;
+  std::string path_;
+  Header header_;
+  Index index_;
 };
 
 }  // namespace record
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_RECORD_HEADER_BUILDER_H_
+#endif  // CYBER_RECORD_FILE_RECORD_FILE_BASE_H_

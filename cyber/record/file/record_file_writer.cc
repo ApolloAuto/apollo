@@ -14,137 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/record/record_file.h"
+#include "cyber/record/file/record_file_writer.h"
+
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace cyber {
 namespace record {
-
-RecordFile::RecordFile() {}
-
-RecordFile::~RecordFile() {}
-
-Header RecordFile::GetHeader() { return header_; }
-
-Index RecordFile::GetIndex() { return index_; }
-
-RecordFileReader::RecordFileReader() {}
-
-RecordFileReader::~RecordFileReader() {}
-
-bool RecordFileReader::Open(const std::string& path) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  path_ = path;
-  if (!::apollo::cyber::common::PathExists(path_)) {
-    AERROR << "file not exist, file: " << path_;
-    return false;
-  }
-  if (ifstream_.is_open()) {
-    ifstream_.close();
-  }
-  std::ios_base::openmode mode = std::ios::binary | std::ios::in;
-  ifstream_.open(path_, mode);
-  if (!ifstream_ || !ifstream_.is_open()) {
-    AERROR << "ifstream open fail, filename: " << path_ << "openmode: " << mode;
-    return false;
-  }
-  return ReadHeader();
-}
-
-void RecordFileReader::Reset() {
-  ifstream_.clear();
-  ifstream_.seekg(0, std::ios::beg);
-  ReadHeader();
-}
-
-bool RecordFileReader::ReadHeader() {
-  uint64_t backup_position = ifstream_.tellg();
-  ifstream_.seekg(0, std::ios::beg);
-  Section section;
-  if (!ReadSection(&section)) {
-    AERROR << "read header section fail, file is broken of it is not a record "
-              "file.";
-    return false;
-  }
-  if (section.type != SectionType::SECTION_HEADER) {
-    ifstream_.seekg(backup_position, std::ios::beg);
-    AERROR << "this section is not header section, MUST BE a bug.";
-    return false;
-  }
-  if (!ReadSection<Header>(section.size, &header_, HEADER_LENGTH)) {
-    ifstream_.seekg(backup_position, std::ios::beg);
-    AERROR << "read header section fail, file is broken of it is not a record "
-              "file.";
-    return false;
-  }
-  return true;
-}
-
-bool RecordFileReader::ReadIndex() {
-  Section section;
-  if (header_.index_position() <= sizeof(section) + HEADER_LENGTH) {
-    AERROR << "index position in header is invalid, index position: "
-           << header_.index_position();
-    return false;
-  }
-  uint64_t backup_position = ifstream_.tellg();
-  ifstream_.seekg(header_.index_position(), std::ios::beg);
-  if (!ReadSection(&section)) {
-    AERROR << "read index section fail, maybe file is broken."
-              "file.";
-    return false;
-  }
-  if (section.type != SectionType::SECTION_INDEX) {
-    ifstream_.seekg(backup_position, std::ios::beg);
-    AERROR << "this section is not index section, MUST BE a bug.";
-    return false;
-  }
-  if (!ReadSection<Index>(section.size, &index_)) {
-    ifstream_.seekg(backup_position, std::ios::beg);
-    AERROR << "read index section fail, maybe file is broken.";
-    return false;
-  }
-  ifstream_.seekg(backup_position, std::ios::beg);
-  return true;
-}
-
-void RecordFileReader::Close() {
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (ifstream_.is_open()) {
-    ifstream_.close();
-  }
-}
-
-bool RecordFileReader::ReadSection(Section* section) {
-  if (!ifstream_.is_open()) {
-    AERROR << "Input file stream is not open, file: " << path_;
-    return false;
-  }
-  ifstream_.read(reinterpret_cast<char*>(section), sizeof(*section));
-  if (ifstream_.eof()) {
-    ADEBUG << "Failed to read section due to EOF, file: " << path_;
-    return false;
-  }
-  if (ifstream_.gcount() != sizeof(*section)) {
-    AERROR << "size of last readed is not equal with size of section"
-           << " , file: " << path_ << " , actual size: " << ifstream_.gcount()
-           << " , expect size: " << sizeof(*section);
-    return false;
-  }
-  return true;
-}
-
-void RecordFileReader::SkipSection(uint64_t size, uint64_t fixed_size) {
-  int64_t backup_position = ifstream_.tellg();
-  if (size > 0) {
-    ifstream_.seekg(backup_position + size, std::ios::beg);
-  }
-  if (fixed_size > size) {
-    ifstream_.seekg(backup_position + fixed_size, std::ios::beg);
-  }
-}
-
-bool RecordFileReader::EndOfFile() { return ifstream_.eof(); }
 
 RecordFileWriter::RecordFileWriter() {}
 
@@ -390,6 +266,15 @@ void RecordFileWriter::Flush() {
     }
     chunk_flush_->clear();
   }
+}
+
+uint64_t RecordFileWriter::GetMessageNumber(
+    const std::string& channel_name) const {
+  auto search = channel_message_number_map_.find(channel_name);
+  if (search != channel_message_number_map_.end()) {
+    return search->second;
+  }
+  return 0;
 }
 
 }  // namespace record

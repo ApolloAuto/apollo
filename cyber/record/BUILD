@@ -5,13 +5,57 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "record",
     deps = [
-        "header_builder",
-        "record_file",
         "record_reader",
         "record_writer",
-        "record_base",
-        "record_message",
         "record_viewer",
+    ],
+)
+
+cc_library(
+    name = "record_file_base",
+    hdrs = [ "file/record_file_base.h", ],
+    deps = [
+        "//cyber/proto:record_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "record_file_reader",
+    srcs = [ "file/record_file_reader.cc", ],
+    hdrs = [ "file/record_file_reader.h", ],
+    deps = [
+        "record_file_base",
+        "section",
+        "//cyber/common:log",
+        "//cyber/common:file",
+    ],
+)
+
+cc_library(
+    name = "record_file_writer",
+    srcs = [ "file/record_file_writer.cc", ],
+    hdrs = [ "file/record_file_writer.h", ],
+    deps = [
+        "record_file_base",
+        "section",
+        "//cyber/common:log",
+        "//cyber/common:file",
+    ],
+)
+
+cc_library(
+    name = "section",
+    hdrs = [ "file/section.h", ],
+)
+
+cc_test(
+    name = "record_file_test",
+    size = "small",
+    srcs = [ "file/record_file_test.cc", ],
+    deps = [
+        "//cyber",
+        "//cyber/proto:record_cc_proto",
+        "@gtest//:main",
     ],
 )
 
@@ -33,17 +77,6 @@ cc_library(
 )
 
 cc_library(
-    name = "record_file",
-    hdrs = [ "record_file.h", ],
-    srcs = [ "record_file.cc", ],
-    deps = [
-        "//cyber/common:file",
-        "//cyber/common:log",
-        "//cyber/proto:record_cc_proto",
-    ],
-)
-
-cc_library(
     name = "record_message",
     hdrs = [ "record_message.h", ],
 )
@@ -54,7 +87,7 @@ cc_library(
     hdrs = [ "record_reader.h", ],
     deps = [
         "record_base",
-        "record_file",
+        "record_file_reader",
         "record_message",
     ],
 )
@@ -74,9 +107,9 @@ cc_library(
     srcs = [ "record_writer.cc", ],
     hdrs = [ "record_writer.h", ],
     deps = [
-        "header_builder",
         "record_base",
-        "record_file",
+        "header_builder",
+        "record_file_writer",
         "//cyber/message:raw_message",
         "//cyber/proto:record_cc_proto",
     ],

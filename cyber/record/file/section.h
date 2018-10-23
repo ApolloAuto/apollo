@@ -14,31 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_TOOLS_CYBER_RECORDER_INFO_H_
-#define CYBER_TOOLS_CYBER_RECORDER_INFO_H_
-
-#include <chrono>
-#include <iomanip>
-#include <string>
-#include "cyber/common/time_conversion.h"
-#include "cyber/proto/record.pb.h"
-#include "cyber/record/file/record_file_reader.h"
-
-using ::apollo::cyber::common::UnixSecondsToString;
+#ifndef CYBER_RECORD_FILE_SECTION_H_
+#define CYBER_RECORD_FILE_SECTION_H_
 
 namespace apollo {
 namespace cyber {
 namespace record {
 
-class Info {
- public:
-  Info();
-  ~Info();
-  bool Display(const std::string& file);
+struct Section {
+  SectionType type;
+  uint64_t size;
 };
 
 }  // namespace record
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_TOOLS_CYBER_RECORDER_INFO_H_
+#endif  // CYBER_RECORD_FILE_SECTION_H_

@@ -240,10 +240,12 @@ int main(int argc, char** argv) {
         }
         break;
       case 'b':
-        opt_begin = StringToUnixSeconds(std::string(optarg)) * 1e9;
+        opt_begin =
+            StringToUnixSeconds(std::string(optarg)) * 1000 * 1000 * 1000ULL;
         break;
       case 'e':
-        opt_end = StringToUnixSeconds(std::string(optarg)) * 1e9;
+        opt_end =
+            StringToUnixSeconds(std::string(optarg)) * 1000 * 1000 * 1000ULL;
         break;
       case 's':
         try {

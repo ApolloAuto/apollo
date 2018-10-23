@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/tools/cyber_recorder/player/play_task_buffer.h"
+#include <utility>
 
 namespace apollo {
 namespace cyber {
