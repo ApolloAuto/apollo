@@ -642,9 +642,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       // g(3)' with respect to u0 ~ u1'
       iRow[nz_index] = state_index + 3;
       jCol[nz_index] = control_index + 1;
-      std::cout << "Non-zero element O : " << state_index + 3 << ",  "
-                << control_index + 1 << ", nz_index : " << nz_index
-                << std::endl;
       ++nz_index;
 
       // g(3)' with respect to time
@@ -722,8 +719,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     state_index = state_start_index_;
     std::size_t l_index = l_start_index_;
     std::size_t n_index = n_start_index_;
-    CHECK_EQ(constraint_index, 294)
-        << "start constraint of obstacles, at this time,";
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
         std::size_t current_edges_num = obstacles_edges_num_(j, 0);
@@ -1005,8 +1000,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
                   std::tan(x[control_index] / wheelbase_));  // m.
-      std::cout << "value for function M, nz_index : " << nz_index
-                << ", actual value : " << values[nz_index] << std::endl;
       ++nz_index;
 
       values[nz_index] =
