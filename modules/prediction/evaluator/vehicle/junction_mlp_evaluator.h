@@ -57,7 +57,7 @@ class JunctionMLPEvaluator : public Evaluator {
    *        Feature container in a vector for receiving the feature values
    */
   void ExtractFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* feature_values);
+                            std::vector<double>* feature_values);
 
  private:
   /**

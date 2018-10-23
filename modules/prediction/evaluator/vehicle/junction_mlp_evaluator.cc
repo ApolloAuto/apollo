@@ -50,23 +50,22 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // 2. compute probabilities
 }
 
-void JunctionMLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
-                                        std::vector<double>* feature_values) {
+void JunctionMLPEvaluator::ExtractFeatureValues(
+    Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+  CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
-  std::vector<double> obstacle_feature_values;
 
   auto it = obstacle_feature_values_map_.find(id);
   if (it == obstacle_feature_values_map_.end()) {
+    std::vector<double> obstacle_feature_values;
     SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
     obstacle_feature_values_map_[id] = obstacle_feature_values;
-  } else {
-    obstacle_feature_values = it->second;
   }
 
-  if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
+  if (obstacle_feature_values_map_[id].size() != OBSTACLE_FEATURE_SIZE) {
     ADEBUG << "Obstacle [" << id << "] has fewer than "
            << "expected obstacle feature_values "
-           << obstacle_feature_values.size() << ".";
+           << obstacle_feature_values_map_[id].size() << ".";
     return;
   }
 
@@ -79,8 +78,9 @@ void JunctionMLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
     return;
   }
 
-  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
-                         obstacle_feature_values.end());
+  feature_values->insert(feature_values->end(),
+                         obstacle_feature_values_map_[id].begin(),
+                         obstacle_feature_values_map_[id].end());
   feature_values->insert(feature_values->end(), junction_feature_values.begin(),
                          junction_feature_values.end());
 }
