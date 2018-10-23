@@ -31,20 +31,28 @@
 namespace apollo {
 namespace planning {
 
-enum VirtualObjectType {
-  VIRTUAL_OBJECT_TYPE_DESTINATION = 0,
-  VIRTUAL_OBJECT_TYPE_CROSSWALK = 1,
-  VIRTUAL_OBJECT_TYPE_TRAFFIC_LIGHT = 2,
-  VIRTUAL_OBJECT_TYPE_CLEAR_ZONE = 3,
-  VIRTUAL_OBJECT_TYPE_REROUTE = 4,
-  VIRTUAL_OBJECT_TYPE_DECISION_JUMP = 5,
-  VIRTUAL_OBJECT_TYPE_PRIORITY = 6
+enum class VirtualObjectType {
+  DESTINATION = 0,
+  CROSSWALK = 1,
+  TRAFFIC_LIGHT = 2,
+  CLEAR_ZONE = 3,
+  REROUTE = 4,
+  DECISION_JUMP = 5,
+  PRIORITY = 6
+};
+
+struct EnumClassHash {
+  template <typename T>
+  std::size_t operator()(T t) const {
+    return static_cast<std::size_t>(t);
+  }
 };
 
 class DecisionData {
  public:
-  explicit DecisionData(const prediction::PredictionObstacles& obstacles,
-                        const ReferenceLine& reference_line);
+  explicit DecisionData(
+      const prediction::PredictionObstacles& prediction_obstacles,
+      const ReferenceLine& reference_line);
   ~DecisionData() = default;
 
  public:
@@ -74,10 +82,10 @@ class DecisionData {
 
  private:
   const ReferenceLine& reference_line_;
-  std::list<std::unique_ptr<PathObstacle>> obstacle_;
+  std::list<std::unique_ptr<Obstacle>> obstacles_;
+  std::list<std::unique_ptr<PathObstacle>> path_obstacles_;
   std::unordered_map<std::string, PathObstacle*> obstacle_map_;
-  std::unordered_map<VirtualObjectType, std::vector<std::string>,
-                     std::hash<int>>
+  std::unordered_map<VirtualObjectType, std::vector<std::string>, EnumClassHash>
       virtual_obstacle_id_map_;
   std::mutex mutex_;
   std::mutex transaction_mutex_;

@@ -18,10 +18,57 @@
 
 namespace apollo {
 namespace planning {
+namespace {
+bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point) {
+  return !((!point.has_path_point()) || std::isnan(point.path_point().x()) ||
+           std::isnan(point.path_point().y()) ||
+           std::isnan(point.path_point().z()) ||
+           std::isnan(point.path_point().kappa()) ||
+           std::isnan(point.path_point().s()) ||
+           std::isnan(point.path_point().dkappa()) ||
+           std::isnan(point.path_point().ddkappa()) || std::isnan(point.v()) ||
+           std::isnan(point.a()) || std::isnan(point.relative_time()));
+}
+}
 
-DecisionData::DecisionData(const prediction::PredictionObstacles& obstacles,
-                           const ReferenceLine& reference_line)
-    : reference_line_(reference_line) {}
+DecisionData::DecisionData(
+    const prediction::PredictionObstacles& prediction_obstacles,
+    const ReferenceLine& reference_line)
+    : reference_line_(reference_line) {
+  for (const auto& prediction_obstacle :
+       prediction_obstacles.prediction_obstacle()) {
+    const auto perception_id =
+        std::to_string(prediction_obstacle.perception_obstacle().id());
+    if (prediction_obstacle.trajectory().empty()) {
+      obstacles_.emplace_back(new Obstacle(
+          perception_id, prediction_obstacle.perception_obstacle()));
+      continue;
+    }
+
+    int trajectory_index = 0;
+    for (const auto& trajectory : prediction_obstacle.trajectory()) {
+      bool is_valid_trajectory = true;
+      for (const auto& point : trajectory.trajectory_point()) {
+        if (!IsValidTrajectoryPoint(point)) {
+          AERROR << "obj:" << perception_id
+                 << " TrajectoryPoint: " << trajectory.ShortDebugString()
+                 << " is NOT valid.";
+          is_valid_trajectory = false;
+          break;
+        }
+      }
+      if (!is_valid_trajectory) {
+        continue;
+      }
+
+      const std::string obstacle_id =
+          apollo::common::util::StrCat(perception_id, "_", trajectory_index);
+      obstacles_.emplace_back(new Obstacle(
+          obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
+      ++trajectory_index;
+    }
+  }
+}
 
 PathObstacle* DecisionData::GetObstacleById(const std::string& id) {
   std::lock_guard<std::mutex> lock(mutex_);
