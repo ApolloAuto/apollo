@@ -141,9 +141,8 @@ bool ConnectedComponentGeneratorGPU::BlockUnionFind(const unsigned char* img) {
 
   dim3 block(UF_BLOCK_WIDTH, UF_BLOCK_HEIGHT);
   dim3 grid(
-      static_cast<unsigned int>((width_ + UF_BLOCK_WIDTH - 1) / UF_BLOCK_WIDTH),
-      static_cast<unsigned int>((height_ + UF_BLOCK_HEIGHT - 1) /
-                                UF_BLOCK_HEIGHT));
+      static_cast<unsigned int>((width_ + block.x - 1) / block.x),
+      static_cast<unsigned int>((height_ + block.y - 1) / block.y));
 
   cuda_err = cudaGetLastError();
   if (cuda_err != cudaSuccess) {
