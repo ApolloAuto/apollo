@@ -9,6 +9,7 @@ import "cyber/proto/log_conf.proto";
 import "cyber/proto/perf_conf.proto";
 import "cyber/proto/run_mode_conf.proto";
 import "cyber/proto/record_conf.proto";
+import "cyber/proto/topology_conf.proto";
 
 message CyberConfig {
     optional LogConf log_conf = 1;
@@ -18,4 +19,5 @@ message CyberConfig {
     optional PerfConf perf_conf = 5;
     optional RunModeConf run_mode_conf = 6;
     optional RecordConf record_conf = 7;
+    optional TopologyConf topology_conf = 8;
 }

@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "cyber/service_discovery/container/graph.h"
@@ -42,6 +43,7 @@ class ChannelManager : public Manager {
   using ChannelDelegateWarehouse = SingleValueWarehouse;
   using WriterWarehouse = MultiValueWarehouse;
   using ReaderWarehouse = MultiValueWarehouse;
+  using IntraChannels = std::unordered_set<std::string>;
 
   ChannelManager();
   virtual ~ChannelManager();
@@ -71,10 +73,13 @@ class ChannelManager : public Manager {
  private:
   bool Check(const RoleAttributes& attr) override;
   void Dispose(const ChangeMsg& msg) override;
+  bool NeedPublish(const ChangeMsg& msg) const override;
   void OnTopoModuleLeave(const std::string& host_name, int process_id) override;
 
   void DisposeJoin(const ChangeMsg& msg);
   void DisposeLeave(const ChangeMsg& msg);
+
+  IntraChannels intra_channels_;
 
   Graph node_graph_;
   // key: node_id

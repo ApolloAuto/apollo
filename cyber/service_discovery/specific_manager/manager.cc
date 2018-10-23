@@ -102,7 +102,10 @@ bool Manager::Join(const RoleAttributes& attr, RoleType role) {
   ChangeMsg msg;
   Convert(attr, role, OperateType::OPT_JOIN, &msg);
   Dispose(msg);
-  return Publish(msg);
+  if (NeedPublish(msg)) {
+    return Publish(msg);
+  }
+  return true;
 }
 
 bool Manager::Leave(const RoleAttributes& attr, RoleType role) {
@@ -115,7 +118,10 @@ bool Manager::Leave(const RoleAttributes& attr, RoleType role) {
   ChangeMsg msg;
   Convert(attr, role, OperateType::OPT_LEAVE, &msg);
   Dispose(msg);
-  return Publish(msg);
+  if (NeedPublish(msg)) {
+    return Publish(msg);
+  }
+  return true;
 }
 
 Manager::ChangeConnection Manager::AddChangeListener(const ChangeFunc& func) {
@@ -150,6 +156,11 @@ bool Manager::CreateSubscriber(RtpsParticipant* participant) {
   subscriber_ = eprosima::fastrtps::Domain::createSubscriber(
       participant, sub_attr, listener_);
   return subscriber_ != nullptr;
+}
+
+bool Manager::NeedPublish(const ChangeMsg& msg) const {
+  (void)msg;
+  return true;
 }
 
 void Manager::Convert(const RoleAttributes& attr, RoleType role,
