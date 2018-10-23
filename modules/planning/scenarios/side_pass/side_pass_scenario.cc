@@ -45,7 +45,6 @@
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/speed_decider/speed_decider.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 
 namespace apollo {
 namespace planning {
@@ -63,7 +62,6 @@ namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;
 constexpr double kSpeedOptimizationFallbackCost = 2e4;
 constexpr double kStraightForwardLineCost = 10.0;
-constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 }  // namespace
 
 apollo::common::util::Factory<
