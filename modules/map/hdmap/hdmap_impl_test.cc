@@ -388,5 +388,23 @@ TEST_F(HDMapImplTestSuite, GetRoi) {
   ASSERT_EQ(0, polygons_roi.size());
 }
 
+TEST_F(HDMapImplTestSuite, GetRoadBounrariesAndJunctions) {
+  apollo::common::PointENU point;
+  point.set_x(586441.73);
+  point.set_y(4140745.25);
+  double distance = 100.0;
+  std::vector<RoadRoiPtr> roads_roi;
+  std::vector<JunctionInfoConstPtr> junctions;
+  ASSERT_EQ(0, hdmap_impl_.GetRoadBoundaries(point, distance, &roads_roi,
+                                             &junctions));
+  ASSERT_EQ(5, roads_roi.size());
+  ASSERT_EQ(1, junctions.size());
+  distance = 1.0;
+  ASSERT_EQ(0, hdmap_impl_.GetRoadBoundaries(point, distance, &roads_roi,
+                                             &junctions));
+  ASSERT_EQ(1, roads_roi.size());
+  ASSERT_EQ(0, junctions.size());
+}
+
 }  // namespace hdmap
 }  // namespace apollo

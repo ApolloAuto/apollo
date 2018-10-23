@@ -103,7 +103,6 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   for (const auto& road : map_.road()) {
     road_table_[road.id().id()].reset(new RoadInfo(road));
   }
-
   for (const auto& road_ptr_pair : road_table_) {
     const auto& road_id = road_ptr_pair.second->id();
     for (const auto& road_section : road_ptr_pair.second->sections()) {
@@ -128,7 +127,6 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   for (const auto& stop_sign_ptr_pair : stop_sign_table_) {
     stop_sign_ptr_pair.second->PostProcess(*this);
   }
-
   BuildLaneSegmentKDTree();
   BuildJunctionPolygonKDTree();
   BuildSignalSegmentKDTree();
@@ -138,7 +136,6 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   BuildClearAreaPolygonKDTree();
   BuildSpeedBumpSegmentKDTree();
   BuildParkingSpacePolygonKDTree();
-
   return 0;
 }
 
@@ -207,7 +204,6 @@ int HDMapImpl::GetLanes(const Vec2d& point, double distance,
   if (lanes == nullptr || lane_segment_kdtree_ == nullptr) {
     return -1;
   }
-
   lanes->clear();
   std::vector<std::string> ids;
   const int status =
@@ -215,7 +211,6 @@ int HDMapImpl::GetLanes(const Vec2d& point, double distance,
   if (status < 0) {
     return status;
   }
-
   for (const auto& id : ids) {
     lanes->emplace_back(GetLaneById(CreateHDMapId(id)));
   }
@@ -626,6 +621,77 @@ int HDMapImpl::GetRoadBoundaries(
   return 0;
 }
 
+int HDMapImpl::GetRoadBoundaries(
+    const PointENU& point, double radius,
+    std::vector<RoadRoiPtr>* road_boundaries,
+    std::vector<JunctionInfoConstPtr>* junctions) const {
+  if (road_boundaries == nullptr || junctions == nullptr) {
+    AERROR << "the pointer in parameter is null";
+    return -1;
+  }
+  road_boundaries->clear();
+  junctions->clear();
+  std::set<std::string> junction_id_set;
+  std::vector<RoadInfoConstPtr> roads;
+  if (GetRoads(point, radius, &roads) != 0) {
+    AERROR << "can not get roads in the range.";
+    return -1;
+  }
+  for (const auto& road_ptr : roads) {
+    if (road_ptr->has_junction_id()) {
+      JunctionInfoConstPtr junction_ptr =
+          GetJunctionById(road_ptr->junction_id());
+      if (junction_id_set.find(junction_ptr->id().id()) ==
+          junction_id_set.end()) {
+        junctions->push_back(junction_ptr);
+        junction_id_set.insert(junction_ptr->id().id());
+      }
+    } else {
+      RoadRoiPtr road_boundary_ptr(new RoadRoi());
+      const std::vector<apollo::hdmap::RoadBoundary>& temp_road_boundaries =
+          road_ptr->GetBoundaries();
+      road_boundary_ptr->id = road_ptr->id();
+      for (const auto& temp_road_boundary : temp_road_boundaries) {
+        apollo::hdmap::BoundaryPolygon boundary_polygon =
+            temp_road_boundary.outer_polygon();
+        for (const auto& edge : boundary_polygon.edge()) {
+          if (edge.type() == apollo::hdmap::BoundaryEdge::LEFT_BOUNDARY) {
+            for (const auto& s : edge.curve().segment()) {
+              for (const auto& p : s.line_segment().point()) {
+                road_boundary_ptr->left_boundary.line_points.push_back(p);
+              }
+            }
+          }
+          if (edge.type() == apollo::hdmap::BoundaryEdge::RIGHT_BOUNDARY) {
+            for (const auto& s : edge.curve().segment()) {
+              for (const auto& p : s.line_segment().point()) {
+                road_boundary_ptr->right_boundary.line_points.push_back(p);
+              }
+            }
+          }
+        }
+        if (temp_road_boundary.hole_size() != 0) {
+          for (const auto& hole : temp_road_boundary.hole()) {
+            PolygonBoundary hole_boundary;
+            for (const auto& edge : hole.edge()) {
+              if (edge.type() == apollo::hdmap::BoundaryEdge::NORMAL) {
+                for (const auto& s : edge.curve().segment()) {
+                  for (const auto& p : s.line_segment().point()) {
+                    hole_boundary.polygon_points.push_back(p);
+                  }
+                }
+              }
+            }
+            road_boundary_ptr->holes_boundary.push_back(hole_boundary);
+          }
+        }
+      }
+      road_boundaries->push_back(road_boundary_ptr);
+    }
+  }
+  return 0;
+}
+
 int HDMapImpl::GetRoi(const apollo::common::PointENU& point, double radius,
                       std::vector<RoadRoiPtr>* roads_roi,
                       std::vector<PolygonRoiPtr>* polygons_roi) {
@@ -723,7 +789,7 @@ int HDMapImpl::GetRoi(const apollo::common::PointENU& point, double radius,
               PolygonRoiPtr polygon_roi_ptr(new PolygonRoi());
               polygon_roi_ptr->polygon = parkingspace_ptr->polygon();
               polygon_roi_ptr->attribute.type =
-                PolygonType::PARKINGSPACE_POLYGON;
+                  PolygonType::PARKINGSPACE_POLYGON;
               polygon_roi_ptr->attribute.id = parkingspace_ptr->id();
               polygons_roi->push_back(polygon_roi_ptr);
               polygon_id_set.insert(parkingspace_ptr->id().id());

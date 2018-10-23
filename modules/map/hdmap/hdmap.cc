@@ -163,6 +163,13 @@ int HDMap::GetRoadBoundaries(
   return impl_.GetRoadBoundaries(point, radius, road_boundaries, junctions);
 }
 
+int HDMap::GetRoadBoundaries(
+    const apollo::common::PointENU& point, double radius,
+    std::vector<RoadRoiPtr>* road_boundaries,
+    std::vector<JunctionInfoConstPtr>* junctions) const {
+  return impl_.GetRoadBoundaries(point, radius, road_boundaries, junctions);
+}
+
 int HDMap::GetRoi(const apollo::common::PointENU& point, double radius,
                   std::vector<RoadRoiPtr>* roads_roi,
                   std::vector<PolygonRoiPtr>* polygons_roi) {
