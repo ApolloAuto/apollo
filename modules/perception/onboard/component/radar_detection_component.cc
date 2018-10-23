@@ -83,7 +83,8 @@ int RadarDetectionComponent::InitAlgorithmPlugin() {
     CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   radar::BasePreprocessor* preprocessor =
-      radar::BasePreprocessorRegisterer::GetInstanceByName(preprocessor_method_);
+      radar::BasePreprocessorRegisterer::GetInstanceByName(
+          preprocessor_method_);
   CHECK_NOTNULL(preprocessor);
   radar_preprocessor_.reset(preprocessor);
   CHECK(radar_preprocessor_->Init()) << "Failed to init radar preprocessor.";
