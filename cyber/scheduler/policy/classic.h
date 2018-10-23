@@ -17,12 +17,15 @@
 #ifndef CYBER_SCHEDULER_POLICY_CLASSIC_H_
 #define CYBER_SCHEDULER_POLICY_CLASSIC_H_
 
+#include <array>
 #include <functional>
-#include <map>
 #include <memory>
-#include <unordered_map>
+#include <mutex>
+#include <vector>
 
 #include "cyber/scheduler/processor_context.h"
+
+#define MAX_SCHED_PRIORITY 20
 
 namespace apollo {
 namespace cyber {
@@ -36,14 +39,11 @@ class ClassicContext : public ProcessorContext {
   bool RqEmpty() override;
   std::shared_ptr<CRoutine> NextRoutine() override;
 
-  void Notify(uint64_t tid) override;
 
  private:
-  static std::mutex mtx_taskq_;
-  static std::mutex mtx_rq_;
-  static std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> taskq_;
-  static std::multimap<uint32_t, std::shared_ptr<CRoutine>,
-                       std::greater<uint32_t>> rq_;
+  static std::array<std::mutex, MAX_SCHED_PRIORITY> mtx_rq_;
+  static std::array<std::vector<std::shared_ptr<CRoutine>>,
+      MAX_SCHED_PRIORITY> rq_;
 };
 
 }  // namespace scheduler
