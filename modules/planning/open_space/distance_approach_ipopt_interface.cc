@@ -19,6 +19,7 @@
  */
 
 #include "modules/planning/open_space/distance_approach_ipopt_interface.h"
+#include <iostream>
 
 namespace apollo {
 namespace planning {
@@ -412,7 +413,6 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       std::size_t current_edges_num = obstacles_edges_num_(j, 0);
       Eigen::MatrixXd Aj =
           obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-      std::vector<int> lj(&x[l_index], &x[l_index + current_edges_num]);
       Eigen::MatrixXd bj =
           obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
@@ -533,11 +533,11 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       << "No. of constraints wrong in eval_jac_g. n : " << m;
 
   if (values == nullptr) {
-    int nz_index = 0;
-    int constraint_index = 0;
-    int state_index = state_start_index_;
-    int control_index = control_start_index_;
-    int time_index = time_start_index_;
+    std::size_t nz_index = 0;
+    std::size_t constraint_index = 0;
+    std::size_t state_index = state_start_index_;
+    std::size_t control_index = control_start_index_;
+    std::size_t time_index = time_start_index_;
 
     // 1. State Constraint with respect to variables
     for (std::size_t i = 0; i < horizon_; ++i) {
@@ -623,6 +623,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
       iRow[nz_index] = state_index + 2;
       jCol[nz_index] = control_index + 1;
+      std::cout << "Non-zero element m : " << state_index + 2 << ",  "
+                << control_index + 1 << std::endl;
       ++nz_index;
 
       // g(2)' with respect to time
@@ -640,12 +642,15 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
 
       // g(3)' with respect to u0 ~ u1'
-      iRow[nz_index] = state_index + 2;
+      iRow[nz_index] = state_index + 3;
       jCol[nz_index] = control_index + 1;
+      std::cout << "Non-zero element O : " << state_index + 3 << ",  "
+                << control_index + 1 << ", nz_index : " << nz_index
+                << std::endl;
       ++nz_index;
 
       // g(3)' with respect to time
-      iRow[nz_index] = state_index + 2;
+      iRow[nz_index] = state_index + 3;
       jCol[nz_index] = time_index;
       ++nz_index;
 
@@ -822,7 +827,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
     CHECK_EQ(constraint_index, static_cast<std::size_t>(m));
   } else {
-    ADEBUG << "eval_jac_g, second time";
     std::fill(values, values + nele_jac, 0.0);
     std::size_t nz_index = 0;
 
@@ -1002,6 +1006,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       values[nz_index] =
           -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
                   std::tan(x[control_index] / wheelbase_));  // m.
+      std::cout << "value for function M, nz_index : " << nz_index
+                << ", actual value : " << values[nz_index] << std::endl;
       ++nz_index;
 
       values[nz_index] =
@@ -1029,9 +1035,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       control_index += 2;
       time_index += 1;
     }
-
-    ADEBUG << "After fulfilled dynamics constraints derivative, nz_index : "
-           << nz_index << " nele_jac : " << nele_jac;
 
     // 2. control rate constraints 1 * [0, horizons-1]
     control_index = control_start_index_;
@@ -1267,8 +1270,7 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   }
 
   // 3. objective to minimize input change rate for first horizon
-  control_index = control_start_index_;
-  time_index = time_start_index_;
+
   double last_time_steer_rate = (x[control_start_index_] - last_time_u_(0, 0)) /
                                 x[time_start_index_] / ts_;
   double last_time_a_rate = (x[control_start_index_ + 1] - last_time_u_(1, 0)) /
@@ -1278,6 +1280,8 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
       weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
 
   // 4. objective to minimize input change rates, [0- horizon_ -2]
+  control_index = control_start_index_;
+  time_index = time_start_index_;
   for (std::size_t i = 0; i < horizon_ - 1; ++i) {
     double steering_rate =
         (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
@@ -1310,8 +1314,6 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
   std::size_t control_index = control_start_index_;
   std::size_t time_index = time_start_index_;
   std::size_t state_index = state_start_index_;
-  std::size_t l_index = l_start_index_;
-  std::size_t n_index = n_start_index_;
 
   // 1. Gradients on states
   // a. From minimizing difference from warm start, [0, horizon_]
@@ -1413,33 +1415,30 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
 
   // from gradients of control rate, horizon [0, horizon-2]
   time_index = time_start_index_;
-  state_index = state_start_index_;
-  for (std::size_t i = 0; i < horizon_ - 1; i++) {
+  for (std::size_t i = 0; i < horizon_ - 1; ++i) {
     grad_f[time_index] +=
-        -2 * weight_rate_steer_ *
-            ((x[control_index] * x[control_index] +
-              x[control_index + 2] * x[control_index + 2] -
-              2 * x[control_index] * x[control_index + 2]) /
-             (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index])) -
-        2 * weight_rate_a_ *
-            ((x[control_index + 1] * x[control_index + 1] +
-              x[control_index + 3] * x[control_index + 3] -
-              2 * x[control_index + 1] * x[control_index + 3]) /
-             (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]));
+        -2 * weight_rate_steer_ * (x[control_index] - x[control_index + 2]) *
+            (x[control_index] - x[control_index + 2]) /
+            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]) -
+        2 * weight_rate_a_ * (x[control_index + 1] - x[control_index + 3]) *
+            (x[control_index + 1] - x[control_index + 3]) /
+            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]);
     control_index += 2;
     time_index += 1;
   }
 
-  // from time scale minimization
-  for (std::size_t i = 0; i < horizon_ + 1; i++) {
-    grad_f[time_start_index_ + i] =
-        weight_first_order_time_ +
-        2 * weight_second_order_time_ * x[time_start_index_ + i];
+  // from time scale minimization, [0, horizon_]
+  time_index = time_start_index_;
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    grad_f[time_index] += weight_first_order_time_ +
+                          2 * weight_second_order_time_ * x[time_index];
+    time_index += 1;
   }
 
   // 4. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
   // horizon_]
-
+  std::size_t l_index = l_start_index_;
+  std::size_t n_index = n_start_index_;
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
       grad_f[l_index] = 0.0;
