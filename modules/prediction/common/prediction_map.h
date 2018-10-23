@@ -176,12 +176,22 @@ class PredictionMap {
       const std::shared_ptr<const hdmap::JunctionInfo> junction_info_ptr);
 
   /**
-  * @brief Check if the obstacle is in a junction.
-  * @param point position
-  * @param radius the radius to search candidate junctions
-  * @return If the obstacle is in a junction.
-  */
+   * @brief Check if the obstacle is in a junction.
+   * @param point position
+   * @param radius the radius to search candidate junctions
+   * @return If the obstacle is in a junction.
+   */
   static bool InJunction(const Eigen::Vector2d& point, const double radius);
+
+  /**
+   * @brief Check if a lane is in a junction
+   * @param lane
+   * @param junction id
+   * @return If the lane is in the junction
+   */
+  static bool IsLaneInJunction(
+      const std::shared_ptr<const hdmap::LaneInfo> lane_info,
+      const std::string& junction_id);
 
   /**
    * @brief Get a list of junctions given a point and a search radius

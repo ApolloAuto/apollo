@@ -66,6 +66,7 @@ const JunctionFeature& ObstacleClusters::GetJunctionFeature(
   junction_feature.set_junction_id(junction_id);
   junction_feature.mutable_enter_lane()->set_lane_id(start_lane_id);
   // TODO(all) add junction exits into junction feature
+  // use PredictionMap::IsLaneInJunction()
   junction_features_[start_lane_id] = std::move(junction_feature);
   return junction_features_[start_lane_id];
 }

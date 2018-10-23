@@ -282,6 +282,13 @@ bool PredictionMap::InJunction(const Eigen::Vector2d& point,
   return false;
 }
 
+bool PredictionMap::IsLaneInJunction(
+    const std::shared_ptr<const LaneInfo> lane_info,
+    const std::string& junction_id) {
+  // TODO(all) implement
+  return false;
+}
+
 double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
                                   const common::PointENU& point) {
   double s = 0.0;
