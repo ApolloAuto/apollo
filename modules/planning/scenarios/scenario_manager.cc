@@ -150,9 +150,11 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
   for (const auto& overlap : first_overlaps) {
     auto preferred_scenario = ScenarioConfig::LANE_FOLLOW;
-    if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
+    if (overlap.first == ReferenceLineInfo::STOP_SIGN &&
+        FLAGS_enable_scenario_stop_sign_unprotected) {
       preferred_scenario = ScenarioConfig::STOP_SIGN_UNPROTECTED;
-    } else if (overlap.first == ReferenceLineInfo::OBSTACLE) {
+    } else if (overlap.first == ReferenceLineInfo::OBSTACLE &&
+        FLAGS_enable_scenario_side_pass) {
       preferred_scenario = ScenarioConfig::SIDE_PASS;
     }
     if (rejected_scenarios.find(preferred_scenario) !=
