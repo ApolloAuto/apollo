@@ -652,8 +652,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
     ADEBUG << "Could not further extend reference line";
     return true;
   }
-  hdmap::Path path;
-  hdmap::PncMap::CreatePathFromLaneSegments(shifted_segments, &path);
+  hdmap::Path path(shifted_segments);
   ReferenceLine new_ref(path);
   if (!SmoothPrefixedReferenceLine(*prev_ref, new_ref, reference_line)) {
     AWARN << "Failed to smooth forward shifted reference line";
@@ -833,8 +832,7 @@ void ReferenceLineProvider::GetAnchorPoints(
 
 bool ReferenceLineProvider::SmoothRouteSegment(const RouteSegments &segments,
                                                ReferenceLine *reference_line) {
-  hdmap::Path path;
-  hdmap::PncMap::CreatePathFromLaneSegments(segments, &path);
+  hdmap::Path path(segments);
   return SmoothReferenceLine(ReferenceLine(path), reference_line);
 }
 

@@ -137,6 +137,15 @@ class MapPathPoint : public common::math::Vec2d {
 
   void clear_lane_waypoints() { lane_waypoints_.clear(); }
 
+  static void RemoveDuplicates(std::vector<MapPathPoint>* points);
+
+  static std::vector<MapPathPoint> GetPointsFromSegment(
+      const LaneSegment& segment);
+
+  static std::vector<MapPathPoint> GetPointsFromLane(LaneInfoConstPtr lane,
+                                                     const double start_s,
+                                                     const double end_s);
+
   std::string DebugString() const;
 
  protected:
@@ -212,6 +221,8 @@ class Path {
   Path() = default;
   explicit Path(const std::vector<MapPathPoint>& path_points);
   explicit Path(std::vector<MapPathPoint>&& path_points);
+  explicit Path(std::vector<LaneSegment>&& path_points);
+  explicit Path(const std::vector<LaneSegment>& path_points);
 
   Path(const std::vector<MapPathPoint>& path_points,
        const std::vector<LaneSegment>& lane_segments);
