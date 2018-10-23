@@ -17,8 +17,10 @@
 #include "cyber/common/global_data.h"
 
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 #include <netdb.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <functional>
 
@@ -82,9 +84,50 @@ void GlobalData::InitHostInfo() {
   char host_name[1024];
   gethostname(host_name, 1024);
   host_name_ = host_name;
-  hostent* host = gethostbyname(host_name);
-  assert(host != nullptr);
-  host_ip_ = inet_ntoa(*(reinterpret_cast<in_addr*>(host->h_addr_list[0])));
+
+  host_ip_ = "127.0.0.1";
+
+  // if we have exported a non-loopback CYBER_IP, we will use it firstly,
+  // otherwise, we try to find first non-loopback ipv4 addr.
+  const char* ip_env = getenv("CYBER_IP");
+  if (ip_env != nullptr) {
+    // maybe we need to verify ip_env
+    std::string ip_env_str(ip_env);
+    std::string starts = ip_env_str.substr(0, 3);
+    if (starts != "127") {
+      host_ip_ = ip_env_str;
+      AINFO << "host ip: " << host_ip_;
+      return;
+    }
+  }
+
+  ifaddrs* ifaddr = nullptr;
+  if (getifaddrs(&ifaddr) != 0) {
+    AERROR << "getifaddrs failed, we will use 127.0.0.1 as host ip.";
+    return;
+  }
+  for (ifaddrs* ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
+    if (ifa->ifa_addr == nullptr) {
+      continue;
+    }
+    int family = ifa->ifa_addr->sa_family;
+    if (family != AF_INET) {
+      continue;
+    }
+    char addr[NI_MAXHOST] = {0};
+    if (getnameinfo(ifa->ifa_addr, sizeof(sockaddr_in), addr, NI_MAXHOST, NULL,
+                    0, NI_NUMERICHOST) != 0) {
+      continue;
+    }
+    std::string tmp_ip(addr);
+    std::string starts = tmp_ip.substr(0, 3);
+    if (starts != "127") {
+      host_ip_ = tmp_ip;
+      break;
+    }
+  }
+  freeifaddrs(ifaddr);
+  AINFO << "host ip: " << host_ip_;
 }
 
 void GlobalData::InitConfig() {

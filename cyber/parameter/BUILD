@@ -53,7 +53,7 @@ cc_test(
     ],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@gtest",
     ],
 )
 

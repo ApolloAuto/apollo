@@ -65,65 +65,29 @@ bool MessageInfo::operator==(const MessageInfo& another) const {
 bool MessageInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
 
-  std::string sender_id_data_str(sender_id_.data(), ID_SIZE);
+  dst->assign(sender_id_.data(), ID_SIZE);
+  dst->append(reinterpret_cast<char*>(const_cast<uint64_t*>(&seq_num_)),
+              sizeof(seq_num_));
+  dst->append(spare_id_.data(), ID_SIZE);
 
-  // fetch high 4 bytes
-  int32_t host_high_seq = (seq_num_ & 0xffffffff00000000) >> 32;
-  uint32_t network_high_seq = htonl((uint32_t)host_high_seq);
-
-  // fetch low 4 bytes
-  int32_t host_low_seq = seq_num_ & 0x00000000ffffffff;
-  uint32_t network_low_seq = htonl((uint32_t)host_low_seq);
-
-  // convert to char array
-  char array[8] = {0};
-  char* ptr = array;
-  memcpy(ptr, reinterpret_cast<char*>(&network_high_seq),
-         sizeof(network_high_seq));
-  ptr += sizeof(network_high_seq);
-  memcpy(ptr, reinterpret_cast<char*>(&network_low_seq),
-         sizeof(network_low_seq));
-
-  std::string array_str(array, 8);
-
-  std::string spare_id_data_str(spare_id_.data(), ID_SIZE);
-
-  *dst = sender_id_data_str + array_str + spare_id_data_str;
   return true;
 }
 
 bool MessageInfo::DeserializeFrom(const std::string& src) {
   auto given_size = src.size();
-  auto target_size = 2 * ID_SIZE + sizeof(seq_num_);
+  static size_t target_size = 2 * ID_SIZE + sizeof(seq_num_);
   if (given_size != target_size) {
     AWARN << "src size mismatch, given[" << given_size << "] target["
           << target_size << "]";
     return false;
   }
 
-  std::string sender_id_data_str = src.substr(0, ID_SIZE);
-  sender_id_.set_data(sender_id_data_str.data());
-
-  std::string seq_num_str = src.substr(ID_SIZE, sizeof(seq_num_));
-
-  uint32_t network_high_seq = 0;
-  char* ptr = const_cast<char*>(seq_num_str.data());
-  memcpy(reinterpret_cast<char*>(&network_high_seq), ptr,
-         sizeof(network_high_seq));
-  ptr += sizeof(network_high_seq);
-  int32_t host_high_seq = (int32_t)ntohl(network_high_seq);
-
-  uint32_t network_low_seq = 0;
-  memcpy(reinterpret_cast<char*>(&network_low_seq), ptr,
-         sizeof(network_low_seq));
-  int32_t host_low_seq = (int32_t)ntohl(network_low_seq);
-
-  seq_num_ = ((int64_t)host_high_seq << 32) |
-             ((int64_t)host_low_seq & 0x00000000ffffffff);
-
-  std::string spare_id_data_str =
-      src.substr(ID_SIZE + sizeof(seq_num_), ID_SIZE);
-  spare_id_.set_data(spare_id_data_str.data());
+  char* ptr = const_cast<char*>(src.data());
+  sender_id_.set_data(ptr);
+  ptr += ID_SIZE;
+  memcpy(reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));
+  ptr += sizeof(seq_num_);
+  spare_id_.set_data(ptr);
 
   return true;
 }

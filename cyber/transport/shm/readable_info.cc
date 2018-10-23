@@ -34,13 +34,12 @@ ReadableInfo::~ReadableInfo() {}
 
 bool ReadableInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
-  dst->resize(READABLE_INFO_SIZE);
-  char* ptr = const_cast<char*>(dst->data());
-  memcpy(ptr, reinterpret_cast<char*>(const_cast<uint64_t*>(&host_id_)), 8);
-  ptr += 8;
-  memcpy(ptr, reinterpret_cast<char*>(const_cast<uint32_t*>(&block_index_)), 4);
-  ptr += 4;
-  memcpy(ptr, reinterpret_cast<char*>(const_cast<uint64_t*>(&channel_id_)), 8);
+  dst->assign(reinterpret_cast<char*>(const_cast<uint64_t*>(&host_id_)),
+              sizeof(host_id_));
+  dst->append(reinterpret_cast<char*>(const_cast<uint32_t*>(&block_index_)),
+              sizeof(block_index_));
+  dst->append(reinterpret_cast<char*>(const_cast<uint64_t*>(&channel_id_)),
+              sizeof(channel_id_));
   return true;
 }
 
