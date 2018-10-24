@@ -25,24 +25,24 @@ namespace planning {
 
 using apollo::common::time::Clock;
 
-HybridAStar::HybridAStar() {
-  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
-                                       &open_space_conf_))
-      << "Failed to load open space planner config file "
-      << FLAGS_planner_open_space_config_filename;
-  reed_shepp_generator_.reset(new ReedShepp(vehicle_param_, open_space_conf_));
-  next_node_num_ = open_space_conf_.warm_start_config().next_node_num();
+HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
+  planner_open_space_config_.CopyFrom(open_space_conf);
+  reed_shepp_generator_.reset(
+      new ReedShepp(vehicle_param_, planner_open_space_config_));
+  next_node_num_ =
+      planner_open_space_config_.warm_start_config().next_node_num();
   max_steer_ = vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
-  step_size_ = open_space_conf_.warm_start_config().step_size();
+  step_size_ = planner_open_space_config_.warm_start_config().step_size();
   xy_grid_resolution_ =
-      open_space_conf_.warm_start_config().xy_grid_resolution();
-  back_penalty_ = open_space_conf_.warm_start_config().back_penalty();
+      planner_open_space_config_.warm_start_config().xy_grid_resolution();
+  back_penalty_ = planner_open_space_config_.warm_start_config().back_penalty();
   gear_switch_penalty_ =
-      open_space_conf_.warm_start_config().gear_switch_penalty();
-  steer_penalty_ = open_space_conf_.warm_start_config().steer_penalty();
+      planner_open_space_config_.warm_start_config().gear_switch_penalty();
+  steer_penalty_ =
+      planner_open_space_config_.warm_start_config().steer_penalty();
   steer_change_penalty_ =
-      open_space_conf_.warm_start_config().steer_change_penalty();
-  delta_t_ = open_space_conf_.delta_t();
+      planner_open_space_config_.warm_start_config().steer_change_penalty();
+  delta_t_ = planner_open_space_config_.delta_t();
 }
 
 bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
@@ -72,7 +72,7 @@ bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
   for (std::size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
     std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(
         new Node3d(reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
-                   reeds_shepp_to_end->phi[i], open_space_conf_));
+                   reeds_shepp_to_end->phi[i], planner_open_space_config_));
     if (!ValidityCheck(node)) {
       return false;
     }
@@ -96,10 +96,11 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
 std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
     const ReedSheppPath* reeds_shepp_to_end,
     std::shared_ptr<Node3d> current_node) {
-  std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
-      reeds_shepp_to_end->x.back(), reeds_shepp_to_end->y.back(),
-      reeds_shepp_to_end->phi.back(), reeds_shepp_to_end->x,
-      reeds_shepp_to_end->y, reeds_shepp_to_end->phi, open_space_conf_));
+  std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(
+      new Node3d(reeds_shepp_to_end->x.back(), reeds_shepp_to_end->y.back(),
+                 reeds_shepp_to_end->phi.back(), reeds_shepp_to_end->x,
+                 reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
+                 planner_open_space_config_));
   end_node->SetPre(current_node);
   end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
@@ -150,7 +151,7 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   }
   std::shared_ptr<Node3d> next_node = std::shared_ptr<Node3d>(
       new Node3d(last_x, last_y, last_phi, intermediate_x, intermediate_y,
-                 intermediate_phi, open_space_conf_));
+                 intermediate_phi, planner_open_space_config_));
   next_node->SetPre(current_node);
   next_node->SetDirec(traveled_distance > 0);
   next_node->SetSteer(steering);
@@ -315,10 +316,10 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
   std::vector<double> ex_vec{ex};
   std::vector<double> ey_vec{ey};
   std::vector<double> ephi_vec{ephi};
-  start_node_.reset(
-      new Node3d(sx, sy, sphi, sx_vec, sy_vec, sphi_vec, open_space_conf_));
-  end_node_.reset(
-      new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec, open_space_conf_));
+  start_node_.reset(new Node3d(sx, sy, sphi, sx_vec, sy_vec, sphi_vec,
+                               planner_open_space_config_));
+  end_node_.reset(new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec,
+                             planner_open_space_config_));
   obstacles_ = obstacles;
   if (!ValidityCheck(start_node_)) {
     AINFO << "start_node in collision with obstacles";

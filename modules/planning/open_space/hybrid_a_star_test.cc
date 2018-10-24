@@ -35,11 +35,18 @@ using apollo::common::math::Vec2d;
 class HybridATest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    hybrid_test = std::unique_ptr<HybridAStar>(new HybridAStar());
+    CHECK(apollo::common::util::GetProtoFromFile(
+        FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+        << "Failed to load open space config file "
+        << FLAGS_planner_open_space_config_filename;
+
+    hybrid_test = std::unique_ptr<HybridAStar>(
+        new HybridAStar(planner_open_space_config_));
   }
 
  protected:
   std::unique_ptr<HybridAStar> hybrid_test;
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 TEST_F(HybridATest, test1) {
@@ -54,8 +61,7 @@ TEST_F(HybridATest, test1) {
   Vec2d obstacle_center(0.0, 0.0);
   Box2d obstacle_box(obstacle_center, 0.0, 5.0, 5.0);
   std::unique_ptr<Obstacle> obstacle =
-      Obstacle::CreateStaticVirtualObstacles("a box in center",
-                                                   obstacle_box);
+      Obstacle::CreateStaticVirtualObstacles("a box in center", obstacle_box);
   obstacles_list.Add(obstacle->Id(), *obstacle);
   ASSERT_TRUE(
       hybrid_test->Plan(sx, sy, sphi, ex, ey, ephi, &obstacles_list, &result));

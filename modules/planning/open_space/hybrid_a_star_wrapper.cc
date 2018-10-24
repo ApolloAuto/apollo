@@ -32,9 +32,8 @@ class HybridAObstacleContainer {
                           const int id) {
     Vec2d obstacle_center(x, y);
     Box2d obstacle_box(obstacle_center, heading, length, width);
-    std::unique_ptr<Obstacle> obstacle =
-        Obstacle::CreateStaticVirtualObstacles(std::to_string(id),
-                                                     obstacle_box);
+    std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles(
+        std::to_string(id), obstacle_box);
     obstacles_list.Add(obstacle->Id(), *obstacle);
   }
   ThreadSafeIndexedObstacles* GetObstacleList() { return &obstacles_list; }
@@ -73,7 +72,15 @@ class HybridAResultContainer {
 };
 
 extern "C" {
-HybridAStar* CreatePlannerPtr() { return new HybridAStar(); }
+HybridAStar* CreatePlannerPtr() {
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
+  return new HybridAStar(planner_open_space_config_);
+}
 HybridAObstacleContainer* CreateObstaclesPtr() {
   return new HybridAObstacleContainer();
 }

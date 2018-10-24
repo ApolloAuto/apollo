@@ -203,7 +203,15 @@ class ResultContainer {
 };
 
 extern "C" {
-HybridAStar* CreateHybridAPtr() { return new HybridAStar(); }
+HybridAStar* CreateHybridAPtr() {
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
+  return new HybridAStar(planner_open_space_config_);
+}
 ObstacleContainer* DistanceCreateObstaclesPtr() {
   return new ObstacleContainer();
 }
