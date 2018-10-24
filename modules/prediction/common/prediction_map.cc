@@ -285,7 +285,28 @@ bool PredictionMap::InJunction(const Eigen::Vector2d& point,
 bool PredictionMap::IsLaneInJunction(
     const std::shared_ptr<const LaneInfo> lane_info,
     const std::string& junction_id) {
-  // TODO(all) implement
+  if (lane_info == nullptr) {
+    return false;
+  }
+
+  // first, check whether the lane is virtual
+  if (!PredictionMap::IsVirtualLane(lane_info->lane().id().id())) {
+    return false;
+  }
+
+  // second, use junction from lane
+  if (lane_info->lane().has_junction_id() &&
+      lane_info->lane().junction_id().id() == junction_id) {
+    return true;
+  }
+
+  // third, use junction from road
+  auto ptr_road_info = HDMapUtil::BaseMap().GetRoadById(lane_info->road_id());
+  if (ptr_road_info->has_junction_id() &&
+      ptr_road_info->junction_id().id() == junction_id) {
+    return true;
+  }
+
   return false;
 }
 
