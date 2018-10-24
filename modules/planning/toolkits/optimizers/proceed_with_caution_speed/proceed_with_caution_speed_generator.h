@@ -52,8 +52,8 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
                          const SpeedData& reference_speed_data,
                          PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
-  bool isFixedDistanceNotFixedSpeed;
-  double maxDistanceOrSpeed;
+  bool is_fixed_distance_ = false;  // not fixed speed
+  double max_distance_or_speed_ = 0.0;
 };
 
 }  // namespace planning

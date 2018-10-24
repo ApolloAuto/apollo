@@ -94,7 +94,7 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
   EXPECT_EQ(process_status, common::Status::OK());
 
   std::vector<common::SpeedPoint> speed_points = speed_data2.speed_vector();
-  int num_speed_points = speed_points.size();
+  int num_speed_points = static_cast<int>(speed_points.size());
   EXPECT_GT(num_speed_points, 0);
   AERROR << "Number of speed points: " << num_speed_points;
 

@@ -18,12 +18,14 @@
  * @file
  **/
 
-#include <vector>
-#include <algorithm>
-
 #include "modules/planning/scenarios/side_pass/side_pass_stage.h"
-#include "modules/planning/common/frame.h"
+
+#include <algorithm>
+#include <vector>
+
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
 namespace planning {
@@ -90,12 +92,12 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   bool all_far_away = true;
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
-  const ReferenceLine &reference_line = reference_line_info.reference_line();
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
   const PathDecision& path_decision = reference_line_info.path_decision();
 
   double move_forward_distance = 5.0;
-  CHECK_GT
-      ((GetContext()->path_data_.discretized_path().path_points()).size(), 0);
+  CHECK_GT((GetContext()->path_data_.discretized_path().path_points()).size(),
+           0);
   common::PathPoint first_path_point =
       (GetContext()->path_data_.discretized_path().path_points())[0];
   common::PathPoint last_path_point;
@@ -106,10 +108,10 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     // and check if that's within the current lane until it reaches
     // out of current lane.
     const auto& vehicle_box =
-      common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
+        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
     std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
     bool is_out_of_curr_lane = false;
-    for (size_t i = 0; i < ABCDpoints.size(); i ++) {
+    for (size_t i = 0; i < ABCDpoints.size(); i++) {
       // For each corner point, project it onto reference_line
       common::SLPoint curr_point_SL;
       if (!reference_line.XYToSL(ABCDpoints[i], &curr_point_SL)) {
@@ -120,8 +122,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
       // Get the lane width at the current s indicated by path_point
       double curr_point_left_width = 0.0;
       double curr_point_right_width = 0.0;
-      reference_line.GetLaneWidth(curr_point_SL.s(),
-                                  &curr_point_left_width,
+      reference_line.GetLaneWidth(curr_point_SL.s(), &curr_point_left_width,
                                   &curr_point_right_width);
       // Check if this corner point is within the lane:
       if (curr_point_SL.l() > std::abs(curr_point_left_width) ||
@@ -169,8 +170,8 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
               "reference_line";
     return Stage::ERROR;
   }
-  double no_obs_zone_end_s = last_path_point_SL.s() +
-                             kExtraMarginforStopOnWaitPointStage;
+  double no_obs_zone_end_s =
+      last_path_point_SL.s() + kExtraMarginforStopOnWaitPointStage;
 
   // Go through every obstacle, check if there is any in the no_obs_zone,
   // which will used by the proceed_with_caution movement.
