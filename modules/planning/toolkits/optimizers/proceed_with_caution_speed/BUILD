@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/localization/proto:pose_proto",
         "//modules/map/hdmap",
+        "//modules/planning/common:speed_profile_generator",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/toolkits/optimizers:speed_optimizer",
         "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",

@@ -31,6 +31,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/speed_profile_generator.h"
 
 namespace apollo {
 namespace planning {
@@ -80,41 +81,16 @@ Status ProceedWithCautionSpeedGenerator::Process(
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    tot_len = max_distance_or_speed_;
-    double distance_to_start_deceleration =
-        proceeding_speed * proceeding_speed / const_deceleration / 2;
-    bool is_const_deceleration_mode = tot_len < distance_to_start_deceleration;
-    double a = const_deceleration;
-    double t = 0.0;
-    double s = 0.0;
-    double v = proceeding_speed;
-
-    while (s < tot_len && v > 0) {
-      if (is_const_deceleration_mode) {
-        speed_data->AppendSpeedPoint(s, t, v, a, 0.0);
-        t += increment_t;
-        double v_new = std::max(0.0, v + a * t);
-        s += increment_t * (v + v_new) / 2;
-        v = v_new;
-      } else {
-        speed_data->AppendSpeedPoint(s, t, v, 0.0, 0.0);
-        t += increment_t;
-        s += increment_t * v;
-        if (tot_len - s < distance_to_start_deceleration) {
-          is_const_deceleration_mode = true;
-        }
-      }
-    }
+    *speed_data = SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
+        tot_len, proceeding_speed);
   } else {
     if (proceeding_speed > max_distance_or_speed_) {
       std::string msg("Speed exceeds the max allowed value.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    double v = proceeding_speed;
-    for (double s = 0.0; s < tot_len; s += increment_s) {
-      speed_data->AppendSpeedPoint(s, s / v, v, 0.0, 0.0);
-    }
+    *speed_data = SpeedProfileGenerator::GenerateFixedSpeedCreepProfile(
+        tot_len, proceeding_speed);
   }
   return Status::OK();
 }
