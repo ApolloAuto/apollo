@@ -186,8 +186,8 @@ class TrajectoryToSample(object):
                 print "No lane feature, cancel labeling"
                 continue
 
-            # Find the lane at which the obstacle is located,
-            # and put all lane_segment ids into a set.
+            # Find the lane_sequence at which the obstacle is located,
+            # and put all the lane_segment ids into a set.
             curr_lane_seq = set()
             for lane_sequence in fea.lane.lane_graph.lane_sequence:
                 if lane_sequence.vehicle_on_lane:
@@ -198,16 +198,15 @@ class TrajectoryToSample(object):
                 print "Obstacle is not on any lane."
                 continue
 
-            future_lane_ids = []
             new_lane_id = None
             has_started_lane_change = False
             has_finished_lane_change = False
-            lane_change_finish_time = 100.0
+            lane_change_finish_time = 10.0
 
             # Go through all the subsequent features in this sequence
             # of features.
             for j in range(i, feature_seq_len):
-                # If exceed 6sec, then break.
+                # If timespan exceeds max. maneuver finish time, then break.
                 time_span = trajectory[j].timestamp - fea.timestamp
                 if time_span > param_fea['maximum_maneuver_finish_time']:
                     break
@@ -216,44 +215,51 @@ class TrajectoryToSample(object):
                 if not trajectory[j].HasField('lane') or \
                    not trajectory[j].lane.HasField('lane_feature'):
                     continue
+                fea.label_update_time_delta = time_span
 
                 # If step into another lane, label lane change to be started.
                 lane_id_j = trajectory[j].lane.lane_feature.lane_id
                 if lane_id_j not in curr_lane_seq:
                     has_started_lane_change = True
                     lane_change_finish_time = 10.0
-                    if new_lane_id is not None:
+                    if new_lane_id is None:
                         new_lane_id = lane_id_j
+                else:
+                    has_started_lane_change = False
 
                 # If roughly get to the center of another lane, label lane change to be finished.
                 left_bound = trajectory[j].lane.lane_feature.dist_to_left_boundary
                 right_bound = trajectory[j].lane.lane_feature.dist_to_right_boundary
-                if has_started_lane_change and \
-                   left_bound > (1 - param_fea['lane_change_finish_condition']) * right_bound and \
+                if left_bound > (1 - param_fea['lane_change_finish_condition']) * right_bound and \
                    left_bound < (1 + param_fea['lane_change_finish_condition']) * right_bound:
-                    has_finished_lane_change = True
-                    lane_change_finish_time = time_span
-                    new_lane_id = lane_id_j
-                    break
-
-                trajectory[i].label_update_time_delta = time_span
-                #if lane_id_j not in future_lane_ids:
-                #    future_lane_ids.append(lane_id_j)
-
-            #if len(future_lane_ids) < 1:
-            #    print "No lane id"
-            #    continue
+                    if has_started_lane_change:
+                        has_finished_lane_change = True
+                        lane_change_finish_time = time_span
+                        new_lane_id = lane_id_j
+                        # This is to let such data not be eliminated by label_file function
+                        fea.label_update_time_delta = param_fea['maximum_maneuver_finish_time']
+                        break
+                    else:
+                        # This means that the obstacle moves back to the center
+                        # of the original lane for the first time.
+                        if lane_change_finish_time == 10.0:
+                            lane_change_finish_time = time_span
             
-            # For every lane_sequence in the lane_graph,
-            # assign a label and a finish_time.
+            '''
+            For every lane_sequence in the lane_graph,
+            assign a label and a finish_time.
+            -1: False Cut-in
+            0:  False Follow-lane
+            1:  True Follow-lane
+            2:  True Cut-in
+            '''
             for lane_sequence in fea.lane.lane_graph.lane_sequence:
                 if len(lane_sequence.lane_segment) == 0:
                     continue
-
                 if lane_sequence.vehicle_on_lane:
                     if not has_started_lane_change:
                         lane_sequence.label = 1
-                        lane_sequence.time_to_lane_center = 0.0
+                        lane_sequence.time_to_lane_center = lane_change_finish_time
                     else:
                         lane_sequence.label = 0
                         lane_sequence.time_to_lane_center = 100.0
@@ -262,26 +268,18 @@ class TrajectoryToSample(object):
                         lane_sequence.label = -1
                         lane_sequence.time_to_lane_center = 100.0
                     else:
-                        new_lane_id_in_this_lane_seq = False
+                        new_lane_id_is_in_this_lane_seq = False
                         for lane_segment in lane_sequence.lane_segment:
                             if lane_segment.lane_id == new_lane_id:
-                                new_lane_id_in_this_lane_seq = True
+                                new_lane_id_is_in_this_lane_seq = True
                                 break
-                        if new_lane_id_in_this_lane_seq:
+                        if new_lane_id_is_in_this_lane_seq:
                             lane_sequence.label = 2
                             lane_sequence.time_to_lane_center = lane_change_finish_time
                         else:
                             lane_sequence.label = -1
                             lane_sequence.time_to_lane_center = 100.0
 
-                #predict_lane_ids = []
-                ## Append all the ids of lane_segment into a list.
-                #for k in range(len(lane_seq.lane_segment)):
-                #    if lane_seq.lane_segment[k].HasField('lane_id'):
-                #        predict_lane_ids.append(lane_seq.lane_segment[k].lane_id)
-
-                #lane_seq.label = cls.cmp_lane_seq(future_lane_ids, predict_lane_ids)
-                #lane_seq.time_to_lane_center = lane_change_finish_time
         return trajectory
 
     @abc.abstractmethod
