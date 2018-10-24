@@ -55,6 +55,10 @@ DecisionData::DecisionData(
     if (prediction_obstacle.trajectory().empty()) {
       obstacles_.emplace_back(new Obstacle(
           perception_id, prediction_obstacle.perception_obstacle()));
+      path_obstacles_.emplace_back(new PathObstacle(obstacles_.back().get()));
+      all_obstacle_.emplace_back(path_obstacles_.back().get());
+      practical_obstacle_.emplace_back(path_obstacles_.back().get());
+      static_obstacle_.emplace_back(path_obstacles_.back().get());
       continue;
     }
     int trajectory_index = 0;
@@ -67,6 +71,10 @@ DecisionData::DecisionData(
           apollo::common::util::StrCat(perception_id, "_", trajectory_index);
       obstacles_.emplace_back(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
+      path_obstacles_.emplace_back(new PathObstacle(obstacles_.back().get()));
+      all_obstacle_.emplace_back(path_obstacles_.back().get());
+      practical_obstacle_.emplace_back(path_obstacles_.back().get());
+      dynamic_obstacle_.emplace_back(path_obstacles_.back().get());
       ++trajectory_index;
     }
   }
