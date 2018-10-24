@@ -1,7 +1,0 @@
-#ifndef QT_QTUIPLUGIN_MODULE_H
-#define QT_QTUIPLUGIN_MODULE_H
-#include <QtUiPlugin/QtUiPluginDepends>
-#include "customwidget.h"
-#include "qdesignerexportwidget.h"
-#include "qtuipluginversion.h"
-#endif

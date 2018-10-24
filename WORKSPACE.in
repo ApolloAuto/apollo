@@ -219,13 +219,13 @@ new_http_archive(
 new_local_repository(
     name = "qt",
     build_file = "third_party/qt.BUILD",
-    path = "/apollo/third_party/Qt5.5.1/5.5/gcc_64",
+    path = "/usr/local/Qt5.5.1/5.5/gcc_64",
 )
 
 new_local_repository(
     name = "fastrtps",
     build_file = "third_party/fastrtps.BUILD",
-    path = "/apollo/third_party/fast-rtps",
+    path = "/usr/local/fast-rtps",
 )
 
 # grpc
