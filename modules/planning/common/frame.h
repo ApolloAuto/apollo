@@ -71,9 +71,10 @@ class Frame {
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
   void InitData(const LocalView &local_view,
-             const common::TrajectoryPoint &planning_start_point,
-             const double start_time, const common::VehicleState &vehicle_state,
-             ReferenceLineProvider *reference_line_provider);
+                const common::TrajectoryPoint &planning_start_point,
+                const double start_time,
+                const common::VehicleState &vehicle_state,
+                ReferenceLineProvider *reference_line_provider);
   common::Status Init(
       const std::list<ReferenceLine> &reference_lines,
       const std::list<hdmap::RouteSegments> &segments,
