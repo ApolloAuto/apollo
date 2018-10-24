@@ -51,8 +51,8 @@ class HDMapInput {
   bool InitHDMap();
   bool InitInternal();
   void MergeBoundaryJunction(
-      const std::vector<apollo::hdmap::RoadROIBoundaryPtr>& boundary,
-      const std::vector<apollo::hdmap::JunctionBoundaryPtr>& junctions,
+      const std::vector<apollo::hdmap::RoadRoiPtr>& boundary,
+      const std::vector<apollo::hdmap::JunctionInfoConstPtr>& junctions,
       std::vector<base::RoadBoundary>* road_boundaries_ptr,
       std::vector<base::PolygonDType>* road_polygons_ptr,
       std::vector<base::PolygonDType>* junction_polygons_ptr);
