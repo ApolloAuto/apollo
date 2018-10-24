@@ -18,6 +18,8 @@
 
 import abc
 import logging
+import math
+import numpy as np
 
 from configure import parameters
 param_fea = parameters['feature']
@@ -280,6 +282,41 @@ class TrajectoryToSample(object):
                             lane_sequence.label = -1
                             lane_sequence.time_to_lane_center = 100.0
 
+        return trajectory
+
+    @classmethod
+    def label_junction(cls, trajectory):
+        '''
+        label feature trajectory according to real future lane sequence in 3s
+        '''
+        traj_len = len(trajectory)
+        for i, fea in enumerate(trajectory):
+            # Sanity check.
+            if not fea.HasField('junction_feature') or \
+               not fea.junction_feature.HasField('junction_exit') or \
+               not fea.junction_feature.HasField('junction_mlp_feature'):
+                print("No junction_feature, junction_exit, or junction_mlp_feature, not labeling this frame.")
+                continue
+            curr_pos = np.array([fea.position.x(), fea.position.y()])
+            heading = fea.theta()
+            # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
+            exit_dict = dict()
+            for junction_exit in fea.junction_exit:
+                if junction_exit.HasField('exit_lane_id'):
+                    exit_dict[junction_exit.exit_lane_id] = np.array([junction_exit.exit_position.x(), junction_exit.exit_position.y()])
+            # Searching for up to 70 frames
+            for j in range(i, min(i + 70, traj_len)):
+                if trajectory[j].lane.lane_feature.lane_id in exit_dict:
+                    exit_pos = exit_dict[trajectory[j].lane.lane_feature.lane_id]
+                    delta_pos = exit_pos - curr_pos
+                    angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
+                    d_idx = int((angle / (2.0 * np.pi) + 1) * 12 % 12)
+                    for idx in range(12):
+                        if idx == d_idx:
+                            fea.junction_feature.junction_mlp_label.append(1)
+                        else:
+                            fea.junction_feature.junction_mlp_label.append(0)
+                    break
         return trajectory
 
     @abc.abstractmethod
