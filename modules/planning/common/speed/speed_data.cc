@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file speed_data.cc
+ * @file
  **/
 
 #include "modules/planning/common/speed/speed_data.h"

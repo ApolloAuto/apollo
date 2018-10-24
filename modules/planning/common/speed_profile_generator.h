@@ -46,6 +46,12 @@ class SpeedProfileGenerator {
 
   SpeedData GenerateFallbackSpeedProfile();
 
+  static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
+                                                     const double max_speed);
+
+  static SpeedData GenerateFixedSpeedCreepProfile(const double distance,
+                                                  const double max_speed);
+
  private:
   SpeedData GenerateStopProfile(const double init_speed,
                                 const double init_acc) const;
