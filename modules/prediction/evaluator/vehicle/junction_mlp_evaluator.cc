@@ -130,8 +130,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
         feature.junction_feature().junction_exit(i);
     double x = junction_exit.exit_position().x() - feature.position().x();
     double y = junction_exit.exit_position().y() - feature.position().y();
-    double diff_x = std::cos(heading) * x - std::sin(heading) * y;
-    double diff_y = std::sin(heading) * x + std::cos(heading) * y;
+    double diff_x = std::cos(-heading) * x - std::sin(-heading) * y;
+    double diff_y = std::sin(-heading) * x + std::cos(-heading) * y;
     double angle = std::atan2(diff_y, diff_x);
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
