@@ -105,18 +105,18 @@ fig1 = plt.figure(1)
 ax = fig1.add_subplot(111)
 for i in range(0, size[0]):
     # warm start
-    # downx = 1.055 * math.cos(phi_out[i] - math.pi / 2)
-    # downy = 1.055 * math.sin(phi_out[i] - math.pi / 2)
-    # leftx = 1.043 * math.cos(phi_out[i] - math.pi)
-    # lefty = 1.043 * math.sin(phi_out[i] - math.pi)
-    # x_shift_leftbottom = x_out[i] + downx + leftx
-    # y_shift_leftbottom = y_out[i] + downy + lefty
-    # warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-    #                                    angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
-    # warm_start_arrow = patches.Arrow(
-    #     x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2)
+    downx = 1.055 * math.cos(phi_out[i] - math.pi / 2)
+    downy = 1.055 * math.sin(phi_out[i] - math.pi / 2)
+    leftx = 1.043 * math.cos(phi_out[i] - math.pi)
+    lefty = 1.043 * math.sin(phi_out[i] - math.pi)
+    x_shift_leftbottom = x_out[i] + downx + leftx
+    y_shift_leftbottom = y_out[i] + downy + lefty
+    warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
+                                       angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
+    warm_start_arrow = patches.Arrow(
+        x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2, edgecolor='r',)
     # ax.add_patch(warm_start_car)
-    # ax.add_patch(warm_start_arrow)
+    ax.add_patch(warm_start_arrow)
     # distance approach
     downx = 1.055 * math.cos(opt_phi_out[i] - math.pi / 2)
     downy = 1.055 * math.sin(opt_phi_out[i] - math.pi / 2)
@@ -124,10 +124,10 @@ for i in range(0, size[0]):
     lefty = 1.043 * math.sin(opt_phi_out[i] - math.pi)
     x_shift_leftbottom = opt_x_out[i] + downx + leftx
     y_shift_leftbottom = opt_y_out[i] + downy + lefty
-    # smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                    #   angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
+    smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
+                                      angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='y', facecolor='none')
     smoothing_arrow = patches.Arrow(
-        opt_x_out[i], opt_y_out[i], 0.25*math.cos(opt_phi_out[i]), 0.25*math.sin(opt_phi_out[i]), 0.2)
+        opt_x_out[i], opt_y_out[i], 0.25*math.cos(opt_phi_out[i]), 0.25*math.sin(opt_phi_out[i]), 0.2, edgecolor='y',)
     # ax.add_patch(smoothing_car)
     ax.add_patch(smoothing_arrow)
 
