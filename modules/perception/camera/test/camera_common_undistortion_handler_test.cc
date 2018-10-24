@@ -68,7 +68,6 @@ TEST(UndistortionHandlerTest, test_init) {
     EXPECT_TRUE(handler.Init("onsemi_obstacle", 0));
 
     EXPECT_TRUE(handler.Handle(image, &undistorted));
-    save_image("undistorted_new.jpg", undistorted);
   }
 }
 
@@ -193,7 +192,6 @@ TEST(UndistortionHandlerTest, test_verify) {
     EXPECT_TRUE(handler.Init("onsemi_obstacle", 0));
     timer.End("init UndistortionHandler");
     handler.Handle(image, &undistorted);
-    save_image("undistorted_new.jpg", undistorted);
   }
   {
     cv::Mat img_old = cv::imread("undistorted_old.jpg");

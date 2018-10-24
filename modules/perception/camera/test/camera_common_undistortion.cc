@@ -117,8 +117,8 @@ int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
 
   NppStatus eStatusNPP = nppiRemap_8u_C3R(_d_rgb, Remapsize,
       (_width * CHANNEL), RemapRect,
-      _d_mapx, (_width * sizeof(float)),
-      _d_mapy, (_width * sizeof(float)),
+      _d_mapx, (_width * static_cast<int>(sizeof(float))),
+      _d_mapy, (_width * static_cast<int>(sizeof(float))),
       _d_dst, (_width * CHANNEL),
       Remapsize, RemapMode);
 
@@ -160,8 +160,9 @@ int ImageGpuPreprocessHandler::release(void) {
 int ImageGpuPreprocessHandler::load_camera_intrinsics(
     const std::string &intrinsics_path, int *width, int *height,
     std::vector<double> *D, std::vector<double> *K) {
-  CHECK(boost::filesystem::exists(intrinsics_path))
-    << "File not exists: " << intrinsics_path;
+  if (!(boost::filesystem::exists(intrinsics_path))) {
+    return -1;
+  }
   YAML::Node node = YAML::LoadFile(intrinsics_path);
   if (node.IsNull()) {
     return -1;

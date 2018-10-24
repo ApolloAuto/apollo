@@ -71,15 +71,12 @@ TEST(DataProvider, test_nodistortion) {
   // test GetImage - correct color
   image_options.target_color = base::Color::GRAY;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-full-gray.jpg", image);
 
   image_options.target_color = base::Color::BGR;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-full-bgr.jpg", image);
 
   image_options.target_color = base::Color::RGB;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-full-rgb.jpg", image);
 
   // test GetImage - wrong color
   image_options.target_color = base::Color::NONE;
@@ -91,30 +88,24 @@ TEST(DataProvider, test_nodistortion) {
   // test GetImage - with crop
   image_options.target_color = base::Color::GRAY;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-roi-gray.jpg", image);
 
   image_options.target_color = base::Color::BGR;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-roi-bgr.jpg", image);
 
   image_options.target_color = base::Color::RGB;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-roi-rgb.jpg", image);
 
   base::Blob<uint8_t> blob;
 
   // test GetImageBlob - correct color
   image_options.target_color = base::Color::GRAY;
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, &blob));
-  save_blob("./test-blob-roi-gray.jpg", blob);
 
   image_options.target_color = base::Color::BGR;
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, &blob));
-  save_blob("./test-blob-roi-bgr.jpg", blob);
 
   image_options.target_color = base::Color::RGB;
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, &blob));
-  save_blob("./test-blob-roi-rgb.jpg", blob);
 
   // test GetImageBlob - wrong color
   image_options.target_color = base::Color::NONE;
@@ -309,46 +300,37 @@ TEST(DataProvider, test_undistortion) {
 
   image_options.target_color = base::Color::GRAY;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-undist-full-gray.jpg", image);
 
   image_options.target_color = base::Color::BGR;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-undist-full-bgr.jpg", image);
 
   image_options.target_color = base::Color::RGB;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-undist-full-rgb.jpg", image);
 
   image_options.do_crop = true;
   image_options.crop_roi = base::RectI(100, 100, 512, 512);
 
   image_options.target_color = base::Color::GRAY;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-undist-roi-gray.jpg", image);
 
   image_options.target_color = base::Color::BGR;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-undist-roi-bgr.jpg", image);
 
   image_options.target_color = base::Color::RGB;
   EXPECT_TRUE(data_provider.GetImage(image_options, &image));
-  save_image("./test-undist-roi-rgb.jpg", image);
 
   base::Blob<uint8_t> blob;
 
   image_options.target_color = base::Color::GRAY;
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, &blob));
-  save_blob("./test-undist-blob-roi-gray.jpg", blob);
 
   image_options.target_color = base::Color::BGR;
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, &blob));
   // get the same image twice
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, &blob));
-  save_blob("./test-undist-blob-roi-bgr.jpg", blob);
 
   image_options.target_color = base::Color::RGB;
   EXPECT_TRUE(data_provider.GetImageBlob(image_options, &blob));
-  save_blob("./test-undist-blob-roi-rgb.jpg", blob);
 }
 
 }  // namespace camera

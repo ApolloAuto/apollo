@@ -15,32 +15,32 @@
 *****************************************************************************/
 #pragma once
 
-#include <string>
 
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
-
+#include <string>
 #include "cyber/common/log.h"
+
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
-inline void save_image(const std::string &path, base::Image8U &image) {
+inline void save_image(const std::string &path, base::Image8U *image) {
   AINFO << path;
-  int cv_type = image.type() == base::Color::GRAY ? CV_8UC1 : CV_8UC3;
-  cv::Mat cv_img(image.rows(), image.cols(), cv_type,
-                 image.mutable_cpu_data(),
-                 image.width_step());
+  int cv_type = image->type() == base::Color::GRAY ? CV_8UC1 : CV_8UC3;
+  cv::Mat cv_img(image->rows(), image->cols(), cv_type,
+                 image->mutable_cpu_data(),
+                 image->width_step());
   cv::imwrite(path, cv_img);
 }
 
-inline void save_blob(const std::string &path, base::Blob<uint8_t> &blob) {
+inline void save_blob(const std::string &path, base::Blob<uint8_t> *blob) {
   AINFO << path;
-  blob.Reshape({blob.shape(1), blob.shape(2), blob.shape(3)});
-  int cv_type = blob.shape(2) == 1 ? CV_8UC1 : CV_8UC3;
-  cv::Mat cv_img(blob.shape(0), blob.shape(1), cv_type,
-                 blob.mutable_cpu_data());
+  blob->Reshape({blob->shape(1), blob->shape(2), blob->shape(3)});
+  int cv_type = blob->shape(2) == 1 ? CV_8UC1 : CV_8UC3;
+  cv::Mat cv_img(blob->shape(0), blob->shape(1), cv_type,
+                 blob->mutable_cpu_data());
   cv::imwrite(path, cv_img);
 }
 
