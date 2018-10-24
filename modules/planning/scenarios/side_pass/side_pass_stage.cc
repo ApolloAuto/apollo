@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include "modules/planning/scenarios/side_pass/side_pass_stage.h"
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 

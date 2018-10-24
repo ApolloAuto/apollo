@@ -21,35 +21,19 @@
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 
 #include <algorithm>
-#include <fstream>
 #include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
-#include "modules/common/util/string_tokenizer.h"
-#include "modules/common/util/string_util.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/map/hdmap/hdmap.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/scenarios/side_pass/side_pass_stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace side_pass {
-
-using common::ErrorCode;
-using common::SLPoint;
-using common::SpeedPoint;
-using common::TrajectoryPoint;
-using common::math::Vec2d;
-using common::time::Clock;
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
