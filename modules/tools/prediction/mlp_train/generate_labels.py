@@ -39,11 +39,12 @@ def label_file(input_file, output_file):
     # for each obstacle ID, sort dict by their timestamp
     fea_trajs = build_trajectory(features)
 
-    # for each obstacle ID, label them, remove record cannot be labeled
+    # For each obstacle ID, remove those that cannot be labeled,
+    # and label the rest.
     for fea_key, fea_traj in fea_trajs.items():
         fea_traj = fea_trajs[fea_key]
         fea_traj = TrajectoryToSample.clean(fea_traj)
-        fea_traj = TrajectoryToSample.label(fea_traj)
+        fea_traj = TrajectoryToSample.label_wFinishTime(fea_traj)
         for i, fea in enumerate(fea_traj):
             if not fea.HasField('label_update_time_delta'):
                 del fea_traj[i]
