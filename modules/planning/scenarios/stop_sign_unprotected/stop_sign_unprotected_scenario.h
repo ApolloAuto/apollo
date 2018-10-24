@@ -28,13 +28,9 @@
 
 #include "modules/planning/proto/planning.pb.h"
 
-#include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/scenarios/scenario.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stage.h"  // NOINT
 
 namespace apollo {
 namespace planning {
@@ -73,7 +69,6 @@ class StopSignUnprotectedScenario : public Scenario {
 
  private:
   bool init_ = false;
-  SpeedProfileGenerator speed_profile_generator_;
   StopSignUnprotectedContext context_;
 
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;

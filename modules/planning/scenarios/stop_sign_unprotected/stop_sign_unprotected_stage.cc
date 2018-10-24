@@ -18,29 +18,20 @@
  * @file
  **/
 
-#include <algorithm>
-#include <limits>
-
 #include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stage.h"  // NOINT
 
+#include <algorithm>
+#include <limits>
+#include <utility>
+
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
-#include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/toolkits/deciders/decider_creep.h"
-#include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
-#include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
-#include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
-#include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
-#include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
-#include "modules/planning/toolkits/optimizers/speed_decider/speed_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -55,7 +46,6 @@ using hdmap::HDMapUtil;
 using hdmap::LaneInfo;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
-using hdmap::PathOverlap;
 using hdmap::StopSignInfo;
 using hdmap::StopSignInfoConstPtr;
 using perception::PerceptionObstacle;
