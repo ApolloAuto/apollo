@@ -23,13 +23,9 @@ from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.drivers.proto import pointcloud_pb2
-from module_control_analyzer import ControlAnalyzer
-from module_planning_analyzer import PlannigAnalyzer
-from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
+from modules.perception.proto import perception_obstacle_pb2
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print "usage: python main.py record_file"
     parser = argparse.ArgumentParser(
         description="Recode Analyzer is a tool to analyze record files.",
         prog="main.py")
@@ -43,8 +39,8 @@ if __name__ == "__main__":
         help="Specify the message topic for dumping.")
 
     parser.add_argument(
-        "-t", "--timestamp", action="store", type=long, required=True,
-        help="Specify the timestamp fpr dumping.")
+        "-t", "--timestamp", action="store", type=float, required=True,
+        help="Specify the timestamp for dumping.")
 
     args = parser.parse_args()
 
@@ -52,11 +48,13 @@ if __name__ == "__main__":
     reader = RecordReader(record_file)
 
     for msg in reader.read_messages():
-        print msg.data_type
-        print msg.topic
-        print msg.timestamp
-        if msg.topic == args.message and (msg.timestamp - args.timestamp) < 1:
-            print msg.topic
-            data = msg.data_type()
-            data.ParseFromString(msg.message)
-            print data
+        timestamp = msg.timestamp / float(1e9)
+        if msg.topic == args.message and abs(timestamp - args.timestamp) <= 1:
+            if msg.topic == "/apollo/perception/obstacles":
+                perception_obstacles = \
+                    perception_obstacle_pb2.PerceptionObstacles()
+                perception_obstacles.ParseFromString(msg.message)
+                with open('perception_obstacles.txt', 'a') as f:
+                    f.write(str(perception_obstacles))
+                print str(perception_obstacles)
+                break
