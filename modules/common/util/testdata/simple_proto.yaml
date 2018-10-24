@@ -1,0 +1,9 @@
+message:
+  - integer: 1
+    text: "234"
+    header:
+      module_name: "Message 1"
+      status:
+        msg: "Status"
+        error_code: "OK"
+  - integer: 2

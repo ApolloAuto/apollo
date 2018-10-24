@@ -269,6 +269,34 @@ cc_test(
 )
 
 cc_library(
+    name = "yaml_util",
+    srcs = [
+        "yaml_util.cc",
+    ],
+    hdrs = [
+        "yaml_util.h",
+    ],
+    deps = [
+        "@com_google_protobuf//:protobuf",
+        "@yaml_cpp//:yaml",
+    ],
+)
+
+cc_test(
+    name = "yaml_util_test",
+    size = "small",
+    srcs = [
+        "yaml_util_test.cc",
+    ],
+    deps = [
+        ":util",
+        ":yaml_util",
+        "//modules/common/util/testdata:simple_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "http_client",
     srcs = ["http_client.cc"],
     hdrs = ["http_client.h"],
