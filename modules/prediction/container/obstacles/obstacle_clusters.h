@@ -57,6 +57,9 @@ class ObstacleClusters {
 
   static void Clear();
 
+  static JunctionExit BuildJunctionExit(
+      const std::shared_ptr<const apollo::hdmap::LaneInfo> exit_lane);
+
  private:
   static std::unordered_map<std::string, LaneGraph> lane_graphs_;
   static std::unordered_map<std::string, JunctionFeature> junction_features_;

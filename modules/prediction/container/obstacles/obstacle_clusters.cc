@@ -16,7 +16,10 @@
 
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 
+#include <queue>
+
 #include "modules/prediction/common/road_graph.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -65,10 +68,39 @@ const JunctionFeature& ObstacleClusters::GetJunctionFeature(
   JunctionFeature junction_feature;
   junction_feature.set_junction_id(junction_id);
   junction_feature.mutable_enter_lane()->set_lane_id(start_lane_id);
-  // TODO(all) add junction exits into junction feature
-  // use PredictionMap::IsLaneInJunction()
+  std::queue<std::shared_ptr<const LaneInfo>> lane_queue;
+  lane_queue.push(PredictionMap::LaneById(start_lane_id));
+  while (!lane_queue.empty()) {
+    std::shared_ptr<const LaneInfo> curr_lane = lane_queue.front();
+    lane_queue.pop();
+    for (auto& succ_lane_id : curr_lane->lane().successor_id()) {
+      std::shared_ptr<const LaneInfo> succ_lane =
+          PredictionMap::LaneById(succ_lane_id.id());
+      if (PredictionMap::IsLaneInJunction(succ_lane, junction_id)) {
+        lane_queue.push(succ_lane);
+      } else {
+        JunctionExit junction_exit = BuildJunctionExit(succ_lane);
+        junction_feature.add_junction_exit()->CopyFrom(junction_exit);
+      }
+    }
+  }
+
   junction_features_[start_lane_id] = std::move(junction_feature);
   return junction_features_[start_lane_id];
+}
+
+JunctionExit ObstacleClusters::BuildJunctionExit(
+    const std::shared_ptr<const LaneInfo> exit_lane) {
+  JunctionExit junction_exit;
+  junction_exit.set_exit_lane_id(exit_lane->id().id());
+  // TODO(kechxu) set exit position and heading
+  double s = 0.5;  // TODO(all) think about this value
+  double exit_heading = exit_lane->Heading(s);
+  apollo::common::PointENU position = exit_lane->GetSmoothPoint(s);
+  junction_exit.set_exit_heading(exit_heading);
+  junction_exit.mutable_exit_position()->set_x(position.x());
+  junction_exit.mutable_exit_position()->set_y(position.y());
+  return junction_exit;
 }
 
 }  // namespace prediction
