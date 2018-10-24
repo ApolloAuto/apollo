@@ -32,7 +32,6 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/open_space/distance_approach_problem.h"
 #include "modules/planning/open_space/hybrid_a_star.h"
-#include "modules/planning/open_space/warm_start_problem.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"

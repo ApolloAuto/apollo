@@ -11,7 +11,6 @@ cc_library(
         "open_space_planner.h",
     ],
     deps = [
-        "//modules/planning/open_space:warm_start_problem",
         "//modules/planning/open_space:distance_approach_problem",
         "//modules/planning/open_space:hybrid_a_star",
         "//external:gflags",
