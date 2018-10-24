@@ -85,6 +85,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   weight_first_order_time_ = distance_approach_config_.weight_time(0);
   weight_second_order_time_ = distance_approach_config_.weight_time(1);
   min_safety_distance_ = distance_approach_config_.min_safety_distance();
+  max_safety_distance_ = distance_approach_config_.max_safety_distance();
   max_steer_angle_ = distance_approach_config_.max_steer_angle();
   max_speed_forward_ = distance_approach_config_.max_speed_forward();
   max_speed_reverse_ = distance_approach_config_.max_speed_reverse();
@@ -97,7 +98,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   max_time_sample_scaling_ =
       distance_approach_config_.max_time_sample_scaling();
   max_steer_rate_ = distance_approach_config_.max_steer_rate();
-
+  max_lambda_ = distance_approach_config_.max_lambda();
+  max_miu_ = distance_approach_config_.max_miu();
   wheelbase_ = vehicle_param_.wheel_base();
 }
 
@@ -167,12 +169,10 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
     x_u[variable_index + 1] = XYbounds_(3, 0);
 
     // phi
-    // TODO(QiL): Change this to configs
-    x_l[variable_index + 2] = -max_steer_angle_;
-    x_u[variable_index + 2] = max_steer_angle_;
+    x_l[variable_index + 2] = -M_PI;
+    x_u[variable_index + 2] = M_PI;
 
     // v
-    // TODO(QiL) : Change this to configs
     x_l[variable_index + 3] = -max_speed_reverse_;
     x_u[variable_index + 3] = max_speed_forward_;
 
@@ -194,7 +194,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
     x_u[variable_index] = max_steer_angle_;
 
     // u2
-    x_l[variable_index + 1] = -max_acceleration_forward_;
+    x_l[variable_index + 1] = -max_acceleration_reverse_;
     x_u[variable_index + 1] = max_acceleration_forward_;
 
     variable_index += 2;
@@ -222,8 +222,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
       x_l[variable_index] = 0.0;
-      // TODO(QiL): refine this variables limits
-      x_u[variable_index] = 100.0;
+      x_u[variable_index] = max_lambda_;
       ++variable_index;
     }
   }
@@ -233,8 +232,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
       x_l[variable_index] = 0.0;
-      // TODO(QiL): refine this variables limits
-      x_u[variable_index] = 10000.0;
+      x_u[variable_index] = max_miu_;
 
       ++variable_index;
     }
@@ -258,7 +256,6 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // 2. Control rate limit constraints, 1 * [0, horizons-1], only apply
   // steering rate as of now
   for (std::size_t i = 0; i < horizon_; ++i) {
-    // TODO(QiL) : change this to configs
     g_l[constraint_index] = -max_steer_rate_;
     g_u[constraint_index] = max_steer_rate_;
     ++constraint_index;
@@ -282,8 +279,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       // a. norm(A'*lambda) = 1
-      g_l[constraint_index] = -1.0;
-      g_u[constraint_index] = 0.0;
+      g_l[constraint_index] = 1.0;
+      g_u[constraint_index] = 1.0;
 
       // b. G'*mu + R'*A*lambda = 0
       g_l[constraint_index + 1] = 0.0;
@@ -291,9 +288,9 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
       g_l[constraint_index + 2] = 0.0;
       g_u[constraint_index + 2] = 0.0;
 
-      // c. -g'*mu + (A*t - b)*lambda > 0
-      g_l[constraint_index + 3] = 0.0;
-      g_u[constraint_index + 3] = 10000.0;
+      // c. -g'*mu + (A*t - b)*lambda > min_safety_distance_
+      g_l[constraint_index + 3] = min_safety_distance_;
+      g_u[constraint_index + 3] = max_safety_distance_;
       constraint_index += 4;
     }
   }
@@ -376,7 +373,6 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
 
   obj_value = 0.0;
   // 1. objective to minimize state diff to warm up
-  state_index = state_start_index_;
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     double x1_diff = x[state_index] - xWS_(0, i);
     double x2_diff = x[state_index + 1] - xWS_(1, i);
@@ -388,7 +384,6 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   }
 
   // 2. objective to minimize u square
-  control_index = control_start_index_;
   for (std::size_t i = 0; i < horizon_; ++i) {
     obj_value += weight_input_steer_ * x[control_index] * x[control_index] +
                  weight_input_a_ * x[control_index + 1] * x[control_index + 1];
@@ -396,18 +391,17 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
   }
 
   // 3. objective to minimize input change rate for first horizon
-
-  double last_time_steer_rate = (x[control_start_index_] - last_time_u_(0, 0)) /
-                                x[time_start_index_] / ts_;
-  double last_time_a_rate = (x[control_start_index_ + 1] - last_time_u_(1, 0)) /
-                            x[time_start_index_] / ts_;
+  control_index = control_start_index_;
+  double last_time_steer_rate =
+      (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+  double last_time_a_rate =
+      (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
   obj_value +=
       weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
       weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
 
   // 4. objective to minimize input change rates, [0- horizon_ -2]
-  control_index = control_start_index_;
-  time_index = time_start_index_;
+  time_index++;
   for (std::size_t i = 0; i < horizon_ - 1; ++i) {
     double steering_rate =
         (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
@@ -444,24 +438,22 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
   // 1. Gradients on states
   // a. From minimizing difference from warm start, [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
-    grad_f[state_index] = weight_state_x_ * 2 * (x[state_index] - xWS_(0, i));
-    grad_f[state_index + 1] =
+    grad_f[state_index] +=
+        weight_state_x_ * 2.0 * (x[state_index] - xWS_(0, i));
+    grad_f[state_index + 1] +=
         weight_state_y_ * 2.0 * (x[state_index + 1] - xWS_(1, i));
-    grad_f[state_index + 2] =
+    grad_f[state_index + 2] +=
         weight_state_phi_ * 2.0 * (x[state_index + 2] - xWS_(2, i));
-    grad_f[state_index + 3] = 0.0;
+    grad_f[state_index + 3] += 0.0;
     state_index += 4;
   }
 
   ADEBUG << "grad_f last index after over states " << state_index;
   // 2. Gradients on control.
   // a. from minimizing abosulte value square
-  control_index = control_start_index_;
-  time_index = time_start_index_;
-  state_index = state_start_index_;
   for (std::size_t i = 0; i < horizon_; i++) {
-    grad_f[control_index] += weight_input_steer_ * 2 * x[control_index];
-    grad_f[control_index + 1] += weight_input_a_ * 2 * x[control_index + 1];
+    grad_f[control_index] += weight_input_steer_ * 2.0 * x[control_index];
+    grad_f[control_index + 1] += weight_input_a_ * 2.0 * x[control_index + 1];
     control_index += 2;
   }
 
@@ -470,22 +462,21 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
 
   // b. from change rate first horizon.
   control_index = control_start_index_;
-  time_index = time_start_index_;
   grad_f[control_start_index_] +=
       weight_stitching_steer_ *
           (2 * x[control_start_index_] - 2 * last_time_u_(0, 0)) /
           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
       weight_rate_steer_ *
-          (-2 * x[control_start_index_ + 2] + 2 * x[control_start_index_]) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]);
+          (2 * x[control_start_index_] - 2 * x[control_start_index_ + 2]) /
+          (ts_ * ts_ * x[time_start_index_ + 1] * x[time_start_index_ + 1]);
 
   grad_f[control_start_index_ + 1] +=
       weight_stitching_a_ *
           (2 * x[control_start_index_ + 1] - 2 * last_time_u_(1, 0)) /
           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
       weight_rate_a_ *
-          (-2 * x[control_start_index_ + 3] + 2 * x[control_start_index_ + 1]) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]);
+          (2 * x[control_start_index_ + 1] - 2 * x[control_start_index_ + 3]) /
+          (ts_ * ts_ * x[time_start_index_ + 1] * x[time_start_index_ + 1]);
 
   control_index += 2;
   time_index += 1;
@@ -494,29 +485,29 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
   for (std::size_t i = 0; i < horizon_ - 2; i++) {
     grad_f[control_index] +=
         weight_rate_steer_ *
-        ((-2 * x[control_index + 2] + 2 * x[control_index]) /
-             (ts_ * ts_ * x[time_index] * x[time_index]) +
-         (-2 * x[control_index - 2] + 2 * x[control_index]) /
-             (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]));
+        ((2 * x[control_index] - 2 * x[control_index + 2]) /
+             (ts_ * ts_ * x[time_index + 1] * x[time_index + 1]) +
+         (2 * x[control_index] - 2 * x[control_index - 2]) /
+             (ts_ * ts_ * x[time_index] * x[time_index]));
 
     grad_f[control_index + 1] +=
         weight_rate_a_ *
-        ((-2 * x[control_index + 3] + 2 * x[control_index + 1]) /
-             (ts_ * ts_ * x[time_index] * x[time_index]) +
-         (-2 * x[control_index - 1] + 2 * x[control_index + 1]) /
-             (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]));
+        ((2 * x[control_index + 1] - 2 * x[control_index + 3]) /
+             (ts_ * ts_ * x[time_index + 1] * x[time_index + 1]) +
+         (2 * x[control_index + 1] - 2 * x[control_index - 1]) /
+             (ts_ * ts_ * x[time_index] * x[time_index]));
     control_index += 2;
     time_index += 1;
   }
 
   // d. from change rate last horizon.
-  grad_f[control_index] += weight_rate_steer_ * 2 *
-                           (-x[control_index - 2] + x[control_index]) /
-                           (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]);
+  grad_f[control_index] += weight_rate_steer_ *
+                           (2 * x[control_index] - 2 * x[control_index - 2]) /
+                           (ts_ * ts_ * x[time_index] * x[time_index]);
 
   grad_f[control_index + 1] +=
-      weight_rate_a_ * (-2 * x[control_index - 1] + 2 * x[control_index + 1]) /
-      (ts_ * ts_ * x[time_index - 1] * x[time_index - 1]);
+      weight_rate_a_ * (2 * x[control_index + 1] - 2 * x[control_index - 1]) /
+      (ts_ * ts_ * x[time_index] * x[time_index]);
 
   ADEBUG << "grad_f last index after over controls change rate"
          << control_index;
@@ -524,6 +515,7 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
   // 3. Grdients over time scale
   time_index = time_start_index_;
   state_index = state_start_index_;
+  control_index = control_start_index_;
   // a. from  control rate change, first horizon
   grad_f[time_start_index_] +=
       -2 * weight_stitching_steer_ *
@@ -538,10 +530,8 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
             2 * last_time_u_(1, 0) * x[control_start_index_ + 1]) /
            (ts_ * ts_ * x[time_start_index_] * x[time_start_index_] *
             x[time_start_index_]));
-
+  time_index++;
   // from gradients of control rate, horizon [0, horizon-2]
-  time_index = time_start_index_;
-  control_index = control_start_index_;
   for (std::size_t i = 0; i < horizon_ - 1; ++i) {
     grad_f[time_index] +=
         -2 * weight_rate_steer_ * (x[control_index] - x[control_index + 2]) *
@@ -697,15 +687,15 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       Eigen::MatrixXd bj =
           obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-      // norm(A* lambda == 1)
-      double tmp1 = 0;
-      double tmp2 = 0;
+      // norm(A* lambda) = 1
+      double tmp1 = 0.0;
+      double tmp2 = 0.0;
       for (std::size_t k = 0; k < current_edges_num; ++k) {
         // TODO(QiL) : replace this one directly with x
         tmp1 += Aj(k, 0) * x[l_index + k];
         tmp2 += Aj(k, 1) * x[l_index + k];
       }
-      g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2 - 1.0;
+      g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2;
 
       // G' * mu + R' * lambda == 0
       g[constraint_index + 1] = x[n_index] - x[n_index + 2] +
@@ -731,7 +721,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
           tmp3 +
           (x[state_index] + std::cos(x[state_index + 2]) * offset_) * tmp1 +
           (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) * tmp2 -
-          tmp4 - min_safety_distance_;
+          tmp4;
 
       // Update index
       edges_counter += current_edges_num;
@@ -894,7 +884,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     // First element, with respect to time
     iRow[nz_index] = constraint_index;
     jCol[nz_index] = time_index;
-    std::cout << "196.298" << constraint_index << ", " << time_index;
     ++nz_index;
 
     control_index += 2;

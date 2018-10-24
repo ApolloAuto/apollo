@@ -70,7 +70,7 @@ end = time.time()
 print("planning time is " + str(end - start))
 
 # load result
-HybridAStar.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
+OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
                               opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, size)
 x_out = []
 y_out = []
@@ -105,18 +105,18 @@ fig1 = plt.figure(1)
 ax = fig1.add_subplot(111)
 for i in range(0, size[0]):
     # warm start
-    downx = 1.055 * math.cos(phi_out[i] - math.pi / 2)
-    downy = 1.055 * math.sin(phi_out[i] - math.pi / 2)
-    leftx = 1.043 * math.cos(phi_out[i] - math.pi)
-    lefty = 1.043 * math.sin(phi_out[i] - math.pi)
-    x_shift_leftbottom = x_out[i] + downx + leftx
-    y_shift_leftbottom = y_out[i] + downy + lefty
-    warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                       angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
-    warm_start_arrow = patches.Arrow(
-        x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2)
-    ax.add_patch(warm_start_car)
-    ax.add_patch(warm_start_arrow)
+    # downx = 1.055 * math.cos(phi_out[i] - math.pi / 2)
+    # downy = 1.055 * math.sin(phi_out[i] - math.pi / 2)
+    # leftx = 1.043 * math.cos(phi_out[i] - math.pi)
+    # lefty = 1.043 * math.sin(phi_out[i] - math.pi)
+    # x_shift_leftbottom = x_out[i] + downx + leftx
+    # y_shift_leftbottom = y_out[i] + downy + lefty
+    # warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
+    #                                    angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
+    # warm_start_arrow = patches.Arrow(
+    #     x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2)
+    # ax.add_patch(warm_start_car)
+    # ax.add_patch(warm_start_arrow)
     # distance approach
     downx = 1.055 * math.cos(opt_phi_out[i] - math.pi / 2)
     downy = 1.055 * math.sin(opt_phi_out[i] - math.pi / 2)
@@ -124,11 +124,11 @@ for i in range(0, size[0]):
     lefty = 1.043 * math.sin(opt_phi_out[i] - math.pi)
     x_shift_leftbottom = opt_x_out[i] + downx + leftx
     y_shift_leftbottom = opt_y_out[i] + downy + lefty
-    smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                      angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
+    # smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
+                                    #   angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
     smoothing_arrow = patches.Arrow(
         opt_x_out[i], opt_y_out[i], 0.25*math.cos(opt_phi_out[i]), 0.25*math.sin(opt_phi_out[i]), 0.2)
-    ax.add_patch(smoothing_car)
+    # ax.add_patch(smoothing_car)
     ax.add_patch(smoothing_arrow)
 
 ax.plot(sx, sy, "s")
@@ -155,16 +155,19 @@ plt.axis('equal')
 
 # input plot
 fig2 = plt.figure(2)
-v_graph = fig2.add_subplot(311)
+v_graph = fig2.add_subplot(411)
 v_graph.title.set_text('v')
 v_graph.plot(np.linspace(0, size[0], size[0]), v_out)
 v_graph.plot(np.linspace(0, size[0], size[0]), opt_v_out)
-a_graph = fig2.add_subplot(312)
+a_graph = fig2.add_subplot(412)
 a_graph.title.set_text('a')
 a_graph.plot(np.linspace(0, size[0], size[0]), a_out)
 a_graph.plot(np.linspace(0, size[0], size[0]), opt_a_out)
-steer_graph = fig2.add_subplot(313)
+steer_graph = fig2.add_subplot(413)
 steer_graph.title.set_text('steering')
 steer_graph.plot(np.linspace(0, size[0], size[0]), steer_out)
 steer_graph.plot(np.linspace(0, size[0], size[0]), opt_steer_out)
+steer_graph = fig2.add_subplot(414)
+steer_graph.title.set_text('t')
+steer_graph.plot(np.linspace(0, size[0], size[0]), opt_time_out)
 plt.show()
