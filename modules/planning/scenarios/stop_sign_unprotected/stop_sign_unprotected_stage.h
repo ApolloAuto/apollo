@@ -20,20 +20,12 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
-
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-#include "modules/map/hdmap/hdmap.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/speed_profile_generator.h"
-#include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
 
 namespace apollo {
