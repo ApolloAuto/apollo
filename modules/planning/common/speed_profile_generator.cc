@@ -203,5 +203,55 @@ bool SpeedProfileGenerator::IsValidProfile(
   return true;
 }
 
+SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
+    const double distance, const double max_speed) {
+  constexpr double kConstDeceleration = -0.8;  // (~3sec to fully stop)
+  constexpr double kProceedingSpeed = 2.23;    // (5mph proceeding speed)
+  const double proceeding_speed = std::min(max_speed, kProceedingSpeed);
+  const double distance_to_start_deceleration =
+      proceeding_speed * proceeding_speed / kConstDeceleration / 2;
+  bool is_const_deceleration_mode = distance < distance_to_start_deceleration;
+
+  double a = kConstDeceleration;
+  double t = 0.0;
+  double s = 0.0;
+  double v = proceeding_speed;
+
+  constexpr double kDeltaT = 0.1;
+
+  SpeedData speed_data;
+  while (s < distance && v > 0) {
+    if (is_const_deceleration_mode) {
+      speed_data.AppendSpeedPoint(s, t, v, a, 0.0);
+      t += kDeltaT;
+      double v_new = std::max(0.0, v + a * t);
+      s += kDeltaT * (v + v_new) / 2;
+      v = v_new;
+    } else {
+      speed_data.AppendSpeedPoint(s, t, v, 0.0, 0.0);
+      t += kDeltaT;
+      s += kDeltaT * v;
+      if (distance - s < distance_to_start_deceleration)
+        is_const_deceleration_mode = true;
+    }
+  }
+
+  return speed_data;
+}
+
+SpeedData SpeedProfileGenerator::GenerateFixedSpeedCreepProfile(
+    const double distance, const double max_speed) {
+  constexpr double kProceedingSpeed = 2.23;  // (5mph proceeding speed)
+  const double proceeding_speed = std::min(max_speed, kProceedingSpeed);
+
+  constexpr double kDeltaS = 0.1;
+  SpeedData speed_data;
+  for (double s = 0.0; s < distance; s += kDeltaS) {
+    speed_data.AppendSpeedPoint(s, s / proceeding_speed, proceeding_speed, 0.0,
+                                0.0);
+  }
+  return speed_data;
+}
+
 }  // namespace planning
 }  // namespace apollo
