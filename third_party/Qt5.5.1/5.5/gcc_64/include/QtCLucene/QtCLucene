@@ -1,5 +1,0 @@
-#ifndef QT_QTCLUCENE_MODULE_H
-#define QT_QTCLUCENE_MODULE_H
-#include <QtCLucene/QtCLuceneDepends>
-#include "qtcluceneversion.h"
-#endif

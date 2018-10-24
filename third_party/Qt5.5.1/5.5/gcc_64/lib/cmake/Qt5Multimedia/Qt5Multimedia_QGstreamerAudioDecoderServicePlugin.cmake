@@ -1,6 +1,0 @@
-
-add_library(Qt5::QGstreamerAudioDecoderServicePlugin MODULE IMPORTED)
-
-_populate_Multimedia_plugin_properties(QGstreamerAudioDecoderServicePlugin RELEASE "mediaservice/libgstaudiodecoder.so")
-
-list(APPEND Qt5Multimedia_PLUGINS Qt5::QGstreamerAudioDecoderServicePlugin)

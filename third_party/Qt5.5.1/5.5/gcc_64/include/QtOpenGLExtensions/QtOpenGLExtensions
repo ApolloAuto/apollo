@@ -1,6 +1,0 @@
-#ifndef QT_QTOPENGLEXTENSIONS_MODULE_H
-#define QT_QTOPENGLEXTENSIONS_MODULE_H
-#include <QtOpenGLExtensions/QtOpenGLExtensionsDepends>
-#include "qopenglextensions.h"
-#include "qtopenglextensionsversion.h"
-#endif

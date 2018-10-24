@@ -1,9 +1,0 @@
-#ifndef QT_QTWEBCHANNEL_MODULE_H
-#define QT_QTWEBCHANNEL_MODULE_H
-#include <QtWebChannel/QtWebChannelDepends>
-#include "qqmlwebchannel.h"
-#include "qwebchannel.h"
-#include "qwebchannelabstracttransport.h"
-#include "qwebchannelglobal.h"
-#include "qtwebchannelversion.h"
-#endif

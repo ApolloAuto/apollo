@@ -5,7 +5,7 @@ recorder_path="${tool_path}/cyber_recorder"
 monitor_path="${tool_path}/cyber_monitor"
 PYTHON_LD_PATH="/apollo/bazel-bin/cyber/py_wrapper"
 launch_path="${CYBER_PATH}/tools/cyber_launch"
-qt_path=${CYBER_PATH}/../third_party/Qt5.5.1/5.5/gcc_64
+qt_path=/usr/local/Qt5.5.1/5.5/gcc_64
 
 export LD_LIBRARY_PATH=${qt_path}/lib:$LD_LIBRARY_PATH
 export QT_QPA_PLATFORM_PLUGIN_PATH=${qt_path}/plugins

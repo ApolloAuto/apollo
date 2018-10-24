@@ -7,7 +7,7 @@ cc_library(
         "-Iinclude/QtCore",
     ],
     linkopts = [
-        "-Wl,-rpath,/apollo/third_party/Qt5.5.1/5.5/gcc_64/lib",
+        "-Wl,-rpath,/usr/local/Qt5.5.1/5.5/gcc_64/lib",
         "-lQt5Core",
     ],
     visibility = ["//visibility:public"],
@@ -24,7 +24,7 @@ cc_library(
         "-Iinclude/QtWidgets",
     ],
     linkopts = [
-        "-L/apollo/third_party/Qt5.5.1/5.5/gcc_64/lib",
+        "-L/usr/local/Qt5.5.1/5.5/gcc_64/lib",
         "-lQt5Widgets",
     ],
     visibility = ["//visibility:public"],
@@ -42,7 +42,7 @@ cc_library(
        # "-Iinclude/QtWidgets",
     ],
     linkopts = [
-        "-L/apollo/third_party/Qt5.5.1/5.5/gcc_64/lib",
+        "-L/usr/local/Qt5.5.1/5.5/gcc_64/lib",
         "-lQt5Gui",
     ],
     visibility = ["//visibility:public"],
@@ -61,7 +61,7 @@ cc_library(
         "-Iinclude/QtOpenGL",
     ],
     linkopts = [
-        "-L/apollo/third_party/Qt5.5.1/5.5/gcc_64/lib",
+        "-L/usr/local/Qt5.5.1/5.5/gcc_64/lib",
         "-lQt5OpenGL",
     ],
     visibility = ["//visibility:public"],

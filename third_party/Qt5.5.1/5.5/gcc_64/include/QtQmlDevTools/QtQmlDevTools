@@ -1,5 +1,0 @@
-#ifndef QT_QTQMLDEVTOOLS_MODULE_H
-#define QT_QTQMLDEVTOOLS_MODULE_H
-#include <QtQmlDevTools/QtQmlDevToolsDepends>
-#include "qtqmldevtoolsversion.h"
-#endif
