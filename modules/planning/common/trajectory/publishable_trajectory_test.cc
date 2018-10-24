@@ -22,10 +22,10 @@
 
 #include <string>
 
-#include "google/protobuf/util/message_differencer.h"
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -45,10 +45,9 @@ TEST(basic_test, DiscretizedTrajectory) {
   ADCTrajectory output_trajectory;
   publishable_trajectory.PopulateTrajectoryProtobuf(&output_trajectory);
 
-  google::protobuf::util::MessageDifferencer differencer;
   for (int i = 0; i < output_trajectory.trajectory_point_size(); ++i) {
-    EXPECT_TRUE(differencer.Compare(output_trajectory.trajectory_point(i),
-                                    trajectory.trajectory_point(i)));
+    EXPECT_TRUE(apollo::common::util::IsProtoEqual(
+        output_trajectory.trajectory_point(i), trajectory.trajectory_point(i)));
   }
 }
 

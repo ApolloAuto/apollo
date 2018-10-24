@@ -15,11 +15,10 @@
  *****************************************************************************/
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
-#include "google/protobuf/util/message_differencer.h"
-#include "gtest/gtest.h"
-
 #include "cyber/cyber.h"
+#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/util.h"
 
 DECLARE_string(modes_config_path);
 
@@ -49,8 +48,8 @@ TEST(HMIWorkerTest, LoadModesConfig) {
   HMIConfig loaded_config;
   EXPECT_TRUE(HMIWorker::LoadModesConfig(modes_config_path, &loaded_config));
 
-  EXPECT_TRUE(google::protobuf::util::MessageDifferencer::Equivalent(
-      expected_config, loaded_config));
+  EXPECT_TRUE(apollo::common::util::IsProtoEqual(expected_config,
+                                                 loaded_config));
 }
 
 }  // namespace dreamview
