@@ -28,7 +28,13 @@ parameters = {
     },
     'feature': {
         'threshold_label_time_delta': 1.0,
-        'prediction_label_timeframe': 3.0
+        'prediction_label_timeframe': 3.0,
+        'maximum_maneuver_finish_time': 6.0,
+
+        # Lane change is defined to be finished if difference 
+        # between dist_to_left_boundary and dist_to_right_boundary 
+        # is within the following portion:
+        'lane_change_finish_condition': 0.1
     }
 }
 
