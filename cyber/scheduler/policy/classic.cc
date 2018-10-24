@@ -30,8 +30,8 @@ namespace scheduler {
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-std::array<std::mutex, MAX_SCHED_PRIORITY>
-   ClassicContext::mtx_rq_;
+std::array<AtomicRWLock, MAX_SCHED_PRIORITY>
+     ClassicContext::rw_locks_;
 std::array<std::vector<std::shared_ptr<CRoutine>>,
     MAX_SCHED_PRIORITY> ClassicContext::rq_;
 
@@ -41,7 +41,7 @@ bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
   }
 
   {
-    WriteLockGuard<AtomicRWLock> lg(rw_lock_);
+    WriteLockGuard<AtomicRWLock> rw(rw_lock_);
     if (cr->priority() < 0 || cr->priority() >= MAX_SCHED_PRIORITY) {
       return false;
     }
@@ -53,7 +53,7 @@ bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
     cr_container_[cr->id()] = cr;
   }
 
-  std::lock_guard<std::mutex> lg(mtx_rq_[cr->priority()]);
+  WriteLockGuard<AtomicRWLock> rw_lock(rw_locks_[cr->priority()]);
   rq_[cr->priority()].emplace_back(cr);
 
   return true;
@@ -66,7 +66,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 
   auto start_perf_time = apollo::cyber::Time::Now().ToNanosecond();
   for (int i = MAX_SCHED_PRIORITY - 1; i >= 0; --i) {
-    std::lock_guard<std::mutex> lg(mtx_rq_[i]);
+    ReadLockGuard<AtomicRWLock> rw_lock(rw_locks_[i]);
     for (auto it = rq_[i].begin(); it != rq_[i].end();) {
       auto cr = (*it);
       auto lock = cr->TryLock();
@@ -76,11 +76,6 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
       }
 
       cr->UpdateState();
-      if (cr->state() == RoutineState::FINISHED) {
-        it = rq_[i].erase(it);
-        continue;
-      }
-
       if (cr->state() == RoutineState::READY) {
         cr->set_state(RoutineState::RUNNING);
         PerfEventCache::Instance()->AddSchedEvent(
