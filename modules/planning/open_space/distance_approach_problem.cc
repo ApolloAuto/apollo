@@ -84,6 +84,7 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // TODO(QiL) : evaluate whether need to new it everytime
   bool use_fix_time_ = false;
 
+  auto t_start = cyber::Time::Now().ToSecond();
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
       timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_edges_num_,
@@ -100,9 +101,9 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   // app->Options()->SetStringValue("derivative_test", "first-order");
   // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
   // TODO(QiL) : Change IPOPT settings to flag or configs
-  app->Options()->SetIntegerValue("print_level", 5);
+  app->Options()->SetIntegerValue("print_level", 0);
   app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
-    app->Options()->SetNumericValue("mumps_pivotol", 1e-6);
+  app->Options()->SetNumericValue("mumps_pivotol", 1e-6);
   app->Options()->SetIntegerValue("max_iter", 1000);
   app->Options()->SetNumericValue("tol", 1e-4);
   app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
@@ -125,6 +126,11 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
     AINFO << "*** The final value of the objective function is " << final_obj
           << '.';
+
+    auto t_end = cyber::Time::Now().ToSecond();
+
+    AINFO << "DistanceApproachProblem solving time in second : "
+          << t_end - t_start;
   } else {
     AINFO << "Return status: " << int(status);
   }
