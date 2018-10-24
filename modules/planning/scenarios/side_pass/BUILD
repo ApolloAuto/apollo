@@ -17,6 +17,7 @@ cc_library(
         "//modules/common",
         "//modules/common/util:factory",
         "//modules/planning/common:planning_common",
+        "//modules/planning/common:speed_profile_generator",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/scenarios:scenario",

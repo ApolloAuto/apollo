@@ -26,6 +26,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/speed_profile_generator.h"
 
 namespace apollo {
 namespace planning {
@@ -89,7 +90,6 @@ Stage::StageStatus SidePassGeneratePath::Process(
   */
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  bool all_far_away = true;
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
   const ReferenceLine& reference_line = reference_line_info.reference_line();
@@ -173,6 +173,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   double no_obs_zone_end_s =
       last_path_point_SL.s() + kExtraMarginforStopOnWaitPointStage;
 
+  bool all_far_away = true;
   // Go through every obstacle, check if there is any in the no_obs_zone,
   // which will used by the proceed_with_caution movement.
   for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
@@ -212,9 +213,26 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     return Stage::RUNNING;
   }
 
-  // TODO(All):
   // (1) call proceed with cautious
+  constexpr double kSidePassCreepSpeed = 2.33;  // m/s
+  auto& rfl_info = frame->mutable_reference_line_info()->front();
+  *(rfl_info.mutable_speed_data()) =
+      SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
+          move_forward_distance, kSidePassCreepSpeed);
+
   // (2) combine path and speed.
+  *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
+
+  rfl_info.set_trajectory_type(ADCTrajectory::NORMAL);
+  DiscretizedTrajectory trajectory;
+  if (!rfl_info.CombinePathAndSpeedProfile(
+          frame->PlanningStartPoint().relative_time(),
+          frame->PlanningStartPoint().path_point().s(), &trajectory)) {
+    AERROR << "Fail to aggregate planning trajectory.";
+    return Stage::RUNNING;
+  }
+  rfl_info.SetTrajectory(trajectory);
+  rfl_info.SetDrivable(true);
 
   next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
   return Stage::FINISHED;
