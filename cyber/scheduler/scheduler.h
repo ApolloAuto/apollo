@@ -82,6 +82,7 @@ class Scheduler {
 
   SchedulerConf sched_conf_;
   RoutineConf rt_conf_;
+  std::unordered_map<std::string, RoutineConf> rt_confs_;
 
   ProcessStrategy sched_policy_ = ProcessStrategy::CHOREO;
 

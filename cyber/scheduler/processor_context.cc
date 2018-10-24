@@ -31,7 +31,7 @@ using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
 void ProcessorContext::RemoveCRoutine(uint64_t croutine_id) {
-  WriteLockGuard<AtomicRWLock> lg(rw_lock_);
+  WriteLockGuard<AtomicRWLock> rw(rw_lock_);
   auto it = cr_container_.find(croutine_id);
   if (it != cr_container_.end()) {
     it->second->Stop();
@@ -40,7 +40,7 @@ void ProcessorContext::RemoveCRoutine(uint64_t croutine_id) {
 }
 
 int ProcessorContext::RqSize() {
-  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
+  ReadLockGuard<AtomicRWLock> rw(rw_lock_);
   return cr_container_.size();
 }
 
@@ -48,7 +48,7 @@ void ProcessorContext::Notify(uint64_t routine_id) {
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, routine_id,
                                             proc_index_, 0, 0, -1, -1);
 
-  ReadLockGuard<AtomicRWLock> lg(rw_lock_);
+  ReadLockGuard<AtomicRWLock> rw(rw_lock_);
 
   auto routine = cr_container_[routine_id];
   if (routine->state() == RoutineState::DATA_WAIT) {

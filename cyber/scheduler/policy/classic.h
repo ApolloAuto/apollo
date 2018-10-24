@@ -20,9 +20,9 @@
 #include <array>
 #include <functional>
 #include <memory>
-#include <mutex>
 #include <vector>
 
+#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/scheduler/processor_context.h"
 
 #define MAX_SCHED_PRIORITY 20
@@ -32,6 +32,9 @@ namespace cyber {
 namespace scheduler {
 
 using croutine::CRoutine;
+using apollo::cyber::base::AtomicRWLock;
+using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::WriteLockGuard;
 
 class ClassicContext : public ProcessorContext {
  public:
@@ -41,7 +44,7 @@ class ClassicContext : public ProcessorContext {
 
 
  private:
-  static std::array<std::mutex, MAX_SCHED_PRIORITY> mtx_rq_;
+  static std::array<AtomicRWLock, MAX_SCHED_PRIORITY> rw_locks_;
   static std::array<std::vector<std::shared_ptr<CRoutine>>,
       MAX_SCHED_PRIORITY> rq_;
 };

@@ -29,7 +29,6 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::proto::RoutineConfInfo;
 using apollo::cyber::common::GlobalData;
 
 Scheduler::Scheduler() : stop_(false) {
@@ -59,10 +58,11 @@ Scheduler::Scheduler() : stop_(false) {
     return;
   }
 
-  if (gconf.has_routine_conf()) {
-    rt_conf_.CopyFrom(gconf.routine_conf());
-  } else {
-    AWARN << "No routine conf";
+  for (auto& conf : gconf.routine_conf()) {
+    if (rt_confs_.find(conf.routine_name()) ==
+        rt_confs_.end()) {
+      rt_confs_[conf.routine_name()] = conf;
+    }
   }
 
   CreateProcessor();
@@ -198,6 +198,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     AERROR << "scheduler is stoped, cannot create task!";
     return false;
   }
+
   auto task_id = GlobalData::RegisterTaskName(name);
   {
     std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
@@ -217,22 +218,19 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     });
   }
 
-  RoutineConfInfo cr_info;
-  for (const auto& routine_info : rt_conf_.routine_info()) {
-    if (routine_info.routine_name() == name) {
-      cr_info.CopyFrom(routine_info);
-      break;
-    }
+  RoutineConf rt_conf;
+  if (rt_confs_.find(name) != rt_confs_.end()) {
+    rt_conf = rt_confs_[name];
   }
 
   auto croutine = std::make_shared<CRoutine>(func);
   croutine->set_id(task_id);
   croutine->set_name(name);
-  croutine->set_priority(cr_info.priority());
-  croutine->set_frequency(cr_info.frequency());
+  croutine->set_priority(rt_conf.priority());
+  croutine->set_frequency(rt_conf.frequency());
 
-  if (cr_info.has_processor_index()) {
-    auto processor_id = cr_info.processor_index();
+  if (rt_conf.has_processor_index()) {
+    auto processor_id = rt_conf.processor_index();
     croutine->set_processor_id(processor_id);
   }
 
