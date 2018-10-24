@@ -25,8 +25,9 @@
 #include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
+
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -68,6 +69,7 @@ class StopSignUnprotectedStop : public Stage {
       const std::vector<std::string>& watch_vehicle_ids,
       std::unordered_map<std::string, std::vector<std::string>>*
           watch_vehicles);
+
  private:
   const float conf_stop_duration_ = 1.0f;
   const double conf_min_pass_s_distance_ = 3.0;
@@ -79,6 +81,7 @@ class StopSignUnprotectedPreStop : public Stage {
       : Stage(config) {}
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame);
+
  private:
   StopSignUnprotectedContext* GetContext() {
     return GetContextAs<StopSignUnprotectedContext>();

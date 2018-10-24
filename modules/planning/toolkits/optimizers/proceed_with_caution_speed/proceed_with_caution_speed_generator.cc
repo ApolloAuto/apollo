@@ -40,10 +40,12 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::planning_internal::STGraphDebug;
 
+namespace {
 const double proceeding_speed = 2.23;    // (5mph proceeding speed)
 const double const_deceleration = -0.8;  // (~3sec to fully stop)
 const double increment_s = 0.1;
 const double increment_t = 0.1;
+}  // namespace
 
 ProceedWithCautionSpeedGenerator::ProceedWithCautionSpeedGenerator(
     const TaskConfig& config)
@@ -51,10 +53,10 @@ ProceedWithCautionSpeedGenerator::ProceedWithCautionSpeedGenerator(
   CHECK(config_.has_proceed_with_caution_speed_config());
   const auto& proceed_with_caution_speed_config =
       config_.proceed_with_caution_speed_config();
-  isFixedDistanceNotFixedSpeed = proceed_with_caution_speed_config.type();
-  maxDistanceOrSpeed = isFixedDistanceNotFixedSpeed
-                           ? proceed_with_caution_speed_config.max_distance()
-                           : proceed_with_caution_speed_config.max_speed();
+  is_fixed_distance_ = proceed_with_caution_speed_config.type();
+  max_distance_or_speed_ =
+      is_fixed_distance_ ? proceed_with_caution_speed_config.max_distance()
+                         : proceed_with_caution_speed_config.max_speed();
   SetName("ProceedWithCautionSpeedGenerator");
 }
 
@@ -72,23 +74,23 @@ Status ProceedWithCautionSpeedGenerator::Process(
   speed_data->Clear();
   double tot_len = path_data.discretized_path().Length();
 
-  if (isFixedDistanceNotFixedSpeed) {
-    if (tot_len < maxDistanceOrSpeed) {
+  if (is_fixed_distance_) {
+    if (tot_len < max_distance_or_speed_) {
       std::string msg("The length planned by path data is too small.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    tot_len = maxDistanceOrSpeed;
-    double Distance2StartDeceleration =
+    tot_len = max_distance_or_speed_;
+    double distance_to_start_deceleration =
         proceeding_speed * proceeding_speed / const_deceleration / 2;
-    bool ConstDecelerationMode = tot_len < Distance2StartDeceleration;
+    bool is_const_deceleration_mode = tot_len < distance_to_start_deceleration;
     double a = const_deceleration;
     double t = 0.0;
     double s = 0.0;
     double v = proceeding_speed;
 
     while (s < tot_len && v > 0) {
-      if (ConstDecelerationMode) {
+      if (is_const_deceleration_mode) {
         speed_data->AppendSpeedPoint(s, t, v, a, 0.0);
         t += increment_t;
         double v_new = std::max(0.0, v + a * t);
@@ -98,12 +100,13 @@ Status ProceedWithCautionSpeedGenerator::Process(
         speed_data->AppendSpeedPoint(s, t, v, 0.0, 0.0);
         t += increment_t;
         s += increment_t * v;
-        if (tot_len - s < Distance2StartDeceleration)
-          ConstDecelerationMode = true;
+        if (tot_len - s < distance_to_start_deceleration) {
+          is_const_deceleration_mode = true;
+        }
       }
     }
   } else {
-    if (proceeding_speed > maxDistanceOrSpeed) {
+    if (proceeding_speed > max_distance_or_speed_) {
       std::string msg("Speed exceeds the max allowed value.");
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -113,7 +116,6 @@ Status ProceedWithCautionSpeedGenerator::Process(
       speed_data->AppendSpeedPoint(s, s / v, v, 0.0, 0.0);
     }
   }
-
   return Status::OK();
 }
 

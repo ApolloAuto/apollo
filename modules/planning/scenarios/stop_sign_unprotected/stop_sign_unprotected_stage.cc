@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stage.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stage.h"
 
 #include <algorithm>
 #include <limits>
@@ -85,8 +85,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 
   auto start_time = GetContext()->stop_start_time;
   double wait_time = Clock::NowInSeconds() - start_time;
-  ADEBUG << "stop_start_time[" << start_time
-      << "] wait_time[" << wait_time << "]";
+  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
+         << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
   if (wait_time >= conf_stop_duration_ && watch_vehicles.empty()) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
@@ -137,8 +137,7 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(
-          *frame, reference_line_info);
+      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info);
 
   bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
