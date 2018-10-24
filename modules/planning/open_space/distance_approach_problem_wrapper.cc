@@ -138,9 +138,8 @@ class ObstacleContainer {
                             const double width, const int id) {
     Vec2d obstacle_center(x, y);
     Box2d obstacle_box(obstacle_center, heading, length, width);
-    std::unique_ptr<Obstacle> obstacle =
-        Obstacle::CreateStaticVirtualObstacles(std::to_string(id),
-                                                     obstacle_box);
+    std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles(
+        std::to_string(id), obstacle_box);
     obstacles_list.Add(obstacle->Id(), *obstacle);
   }
 
@@ -293,7 +292,8 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   DistanceApproachProblem* distance_approach_ptr = new DistanceApproachProblem(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
       obstacles_ptr->GetObstaclesNum(), obstacles_ptr->GetObstaclesEdgesNum(),
-      obstacles_ptr->GetAMatrix(), obstacles_ptr->GetbMatrix());
+      obstacles_ptr->GetAMatrix(), obstacles_ptr->GetbMatrix(),
+      planner_open_space_config_);
 
   bool status = distance_approach_ptr->Solve(result_ptr->PrepareStateResult(),
                                              result_ptr->PrepareControlResult(),

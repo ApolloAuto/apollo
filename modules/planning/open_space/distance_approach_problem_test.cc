@@ -26,7 +26,12 @@ namespace planning {
 
 class DistanceApproachProblemTest : public ::testing::Test {
  public:
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    CHECK(apollo::common::util::GetProtoFromFile(
+        FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+        << "Failed to load open space config file "
+        << FLAGS_planner_open_space_config_filename;
+  }
 
  protected:
   std::unique_ptr<DistanceApproachProblem> distance_approach_ = nullptr;
@@ -46,12 +51,14 @@ class DistanceApproachProblemTest : public ::testing::Test {
   Eigen::MatrixXd obstacles_edges_num = Eigen::MatrixXd::Zero(1, horizon_ + 1);
   Eigen::MatrixXd obstacles_A = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd obstacles_b = Eigen::MatrixXd::Ones(4, 1);
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 TEST_F(DistanceApproachProblemTest, initilization) {
   distance_approach_.reset(new DistanceApproachProblem(
       x0_, xf_, last_time_u_, horizon_, ts_, ego_, xWS_, uWS_, XYbounds_,
-      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b));
+      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
+      planner_open_space_config_));
   EXPECT_NE(distance_approach_, nullptr);
 }
 

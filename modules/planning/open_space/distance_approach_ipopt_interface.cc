@@ -32,7 +32,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
     Eigen::MatrixXd obstacles_edges_num, std::size_t obstacles_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    bool use_fix_time)
+    bool use_fix_time, const PlannerOpenSpaceConfig& planner_open_space_config)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
@@ -65,12 +65,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   l_start_index_ = time_start_index_ + (horizon_ + 1);
   n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
 
-  // TODO(QiL): integrate open_space planner into task config when refactor done
-  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
-                                       &planner_open_space_config_))
-      << "Failed to load open space config file "
-      << FLAGS_planner_open_space_config_filename;
-
+  planner_open_space_config_.CopyFrom(planner_open_space_config);
   distance_approach_config_ =
       planner_open_space_config_.distance_approach_config();
   weight_state_x_ = distance_approach_config_.weight_state(0);
