@@ -54,7 +54,7 @@ if __name__ == "__main__":
                 perception_obstacles = \
                     perception_obstacle_pb2.PerceptionObstacles()
                 perception_obstacles.ParseFromString(msg.message)
-                with open('perception_obstacles.txt', 'a') as f:
+                with open('perception_obstacles.txt', 'w') as f:
                     f.write(str(perception_obstacles))
                 print str(perception_obstacles)
                 break
