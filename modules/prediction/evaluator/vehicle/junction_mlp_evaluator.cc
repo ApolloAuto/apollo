@@ -17,7 +17,7 @@
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
 #include <memory>
-#include <math>
+#include <cmath>
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -133,9 +133,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double diff_x = std::cos(heading) * x - std::sin(heading) * y;
     double diff_y = std::sin(heading) * x + std::cos(heading) * y;
     double angle = std::atan2(diff_y, diff_x);
-    double d_idx = (angle / (2.0 * M_PI)) -
-        floor((angle / (2.0 * M_PI)) / 12.0) * 12.0;
-    int idx = static_cast<int>(d_idx >= 0 ? d_idx : d_idx + 12);
+    double d_idx = (angle / (2.0 * M_PI)) * 12.0;
+    int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     feature_values->operator[](idx * 5) = 1;
     feature_values->operator[](idx * 5 + 1) = diff_x / junction_range;
     feature_values->operator[](idx * 5 + 2) = diff_y / junction_range;
