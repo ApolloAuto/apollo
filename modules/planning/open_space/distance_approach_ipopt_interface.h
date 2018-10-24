@@ -124,6 +124,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double weight_state_x_;
   double weight_state_y_;
   double weight_state_phi_;
+  double weight_state_v_;
   double weight_input_steer_;
   double weight_input_a_;
   double weight_rate_steer_;

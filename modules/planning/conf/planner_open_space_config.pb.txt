@@ -18,14 +18,15 @@ warm_start_config : {
 
 distance_approach_config : {
   weight_u : 0.01
-  weight_u : 0.1
-  weight_u_rate : 10.0
-  weight_u_rate : 10.0
-  weight_state : 1.0
-  weight_state : 1.0
-  weight_state : 4.0
-  weight_stitching : 10.0
-  weight_stitching : 10.0
+  weight_u : 0.5
+  weight_u_rate : 0.1
+  weight_u_rate : 0.1
+  weight_state : 0.001
+  weight_state : 0.001
+  weight_state : 0.0001
+  weight_state : 0.0001
+  weight_stitching : 0.1
+  weight_stitching : 0.1
   weight_time : 0.5
   weight_time : 1
   min_safety_distance : 0.0

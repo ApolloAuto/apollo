@@ -76,6 +76,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   weight_state_x_ = distance_approach_config_.weight_state(0);
   weight_state_y_ = distance_approach_config_.weight_state(1);
   weight_state_phi_ = distance_approach_config_.weight_state(2);
+  weight_state_v_ = distance_approach_config_.weight_state(3);
   weight_input_steer_ = distance_approach_config_.weight_u(0);
   weight_input_a_ = distance_approach_config_.weight_u(1);
   weight_rate_steer_ = distance_approach_config_.weight_u_rate(0);
@@ -377,9 +378,11 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
     double x1_diff = x[state_index] - xWS_(0, i);
     double x2_diff = x[state_index + 1] - xWS_(1, i);
     double x3_diff = x[state_index + 2] - xWS_(2, i);
+    double x4_abs = x[state_index + 3];
     obj_value += weight_state_x_ * x1_diff * x1_diff +
                  weight_state_y_ * x2_diff * x2_diff +
-                 weight_state_phi_ * x3_diff * x3_diff;
+                 weight_state_phi_ * x3_diff * x3_diff +
+                 weight_state_v_ * x4_abs * x4_abs;
     state_index += 4;
   }
 
@@ -444,7 +447,7 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
         weight_state_y_ * 2.0 * (x[state_index + 1] - xWS_(1, i));
     grad_f[state_index + 2] +=
         weight_state_phi_ * 2.0 * (x[state_index + 2] - xWS_(2, i));
-    grad_f[state_index + 3] += 0.0;
+    grad_f[state_index + 3] += weight_state_v_ * 2.0 * x[state_index + 3];
     state_index += 4;
   }
 

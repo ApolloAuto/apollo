@@ -97,16 +97,16 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   // app->Options()->SetStringValue("jacobian_approximation",
   // "finite-difference-values");
-  app->Options()->SetStringValue("derivative_test", "first-order");
+  // app->Options()->SetStringValue("derivative_test", "first-order");
+  // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
   // TODO(QiL) : Change IPOPT settings to flag or configs
-  int print_level = 5;
-  app->Options()->SetIntegerValue("print_level", print_level);
-  int mumps_mem_percent = 6000;
-  app->Options()->SetIntegerValue("mumps_mem_percent", mumps_mem_percent);
-  int max_iter = 1000;
-  app->Options()->SetIntegerValue("max_iter", max_iter);
-  double tol = 1e-4;
-  app->Options()->SetNumericValue("tol", tol);
+  app->Options()->SetIntegerValue("print_level", 5);
+  app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
+    app->Options()->SetNumericValue("mumps_pivotol", 1e-6);
+  app->Options()->SetIntegerValue("max_iter", 1000);
+  app->Options()->SetNumericValue("tol", 1e-4);
+  app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
+  app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
