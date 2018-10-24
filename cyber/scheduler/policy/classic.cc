@@ -92,7 +92,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 }
 
 bool ClassicContext::RqEmpty() {
-  return true;
+  return false;
 }
 
 }  // namespace scheduler

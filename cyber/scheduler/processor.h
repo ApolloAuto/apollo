@@ -56,7 +56,6 @@ class Processor {
   inline uint32_t id() const { return id_; }
   inline void set_id(uint32_t id) { id_ = id; }
 
-
   void set_strategy(const ProcessStrategy strategy) { strategy_ = strategy; }
 
  private:
@@ -66,14 +65,13 @@ class Processor {
 
   std::thread thread_;
 
-  std::shared_ptr<RoutineContext> routine_context_ = nullptr;
-  std::shared_ptr<CRoutine> cur_routine_ = nullptr;
+  ProcessStrategy strategy_ = ProcessStrategy::CHOREO;
+
   std::shared_ptr<ProcessorContext> context_;
+  std::shared_ptr<RoutineContext> routine_context_ = nullptr;
 
   bool running_ = true;
   uint32_t id_ = 0;
-
-  ProcessStrategy strategy_ = ProcessStrategy::CHOREO;
 };
 
 }  // namespace scheduler

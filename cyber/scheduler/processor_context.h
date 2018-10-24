@@ -53,16 +53,16 @@ class ProcessorContext {
 
   inline int id() const { return proc_index_; }
   inline void set_id(int id) { proc_index_ = id; }
-  inline bool get_state(const uint64_t& routine_id, RoutineState* state);
-  inline bool set_state(const uint64_t& routine_id, const RoutineState& state);
+  inline bool get_state(const uint64_t& cr_id, RoutineState* state);
+  inline bool set_state(const uint64_t& cr_id, const RoutineState& state);
 
   inline void bind_processor(const std::shared_ptr<Processor>& processor) {
       processor_ = processor;
   }
 
-  virtual void Notify(uint64_t croutine_id);
+  virtual void Notify(uint64_t cr_id);
   virtual bool Enqueue(const std::shared_ptr<CRoutine>& cr) = 0;
-  void RemoveCRoutine(uint64_t croutine_id);
+  void RemoveCRoutine(uint64_t cr_id);
   int RqSize();
 
   virtual bool RqEmpty() = 0;
@@ -73,17 +73,18 @@ class ProcessorContext {
   CRoutineContainer cr_container_;
   std::shared_ptr<Processor> processor_ = nullptr;
 
-  bool stop_ = false;
   std::atomic<bool> notified_;
+
+  bool stop_ = false;
+  int proc_index_ = -1;
   uint32_t index_ = 0;
   uint32_t status_;
-  int proc_index_ = -1;
 };
 
-bool ProcessorContext::get_state(const uint64_t& routine_id,
+bool ProcessorContext::get_state(const uint64_t& cr_id,
                                 RoutineState* state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  auto it = cr_container_.find(routine_id);
+  auto it = cr_container_.find(cr_id);
   if (it != cr_container_.end()) {
     *state = it->second->state();
     return true;
@@ -91,10 +92,10 @@ bool ProcessorContext::get_state(const uint64_t& routine_id,
   return false;
 }
 
-bool ProcessorContext::set_state(const uint64_t& routine_id,
+bool ProcessorContext::set_state(const uint64_t& cr_id,
                                  const RoutineState& state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
-  auto it = cr_container_.find(routine_id);
+  auto it = cr_container_.find(cr_id);
   if (it != cr_container_.end()) {
     it->second->set_state(state);
     return true;

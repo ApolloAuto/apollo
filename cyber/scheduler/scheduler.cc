@@ -58,10 +58,10 @@ Scheduler::Scheduler() : stop_(false) {
     return;
   }
 
-  for (auto& conf : gconf.routine_conf()) {
-    if (rt_confs_.find(conf.routine_name()) ==
-        rt_confs_.end()) {
-      rt_confs_[conf.routine_name()] = conf;
+  for (auto& conf : gconf.croutine_conf()) {
+    if (cr_confs_.find(conf.name()) ==
+        cr_confs_.end()) {
+      cr_confs_[conf.name()] = conf;
     }
   }
 
@@ -173,8 +173,8 @@ bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
   }
 
   // rt may removed before inserted to croutine
-  if (rt_ctx_.find(croutine->id()) != rt_ctx_.end()) {
-    rt_ctx_[croutine->id()] = croutine->processor_id();
+  if (cr_ctx_.find(croutine->id()) != cr_ctx_.end()) {
+    cr_ctx_[croutine->id()] = croutine->processor_id();
   }
 
   if (!ctx->Enqueue(croutine)) {
@@ -201,12 +201,12 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
 
   auto task_id = GlobalData::RegisterTaskName(name);
   {
-    std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
-    if (rt_ctx_.find(task_id) != rt_ctx_.end()) {
+    ReadLockGuard<AtomicRWLock> rw(rw_lock_);
+    if (cr_ctx_.find(task_id) != cr_ctx_.end()) {
       AERROR << "Routine [" << name << "] has been exists";
       return false;
     }
-    rt_ctx_[task_id] = 0;
+    cr_ctx_[task_id] = 0;
   }
 
   if (visitor != nullptr) {
@@ -218,27 +218,26 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     });
   }
 
-  RoutineConf rt_conf;
-  if (rt_confs_.find(name) != rt_confs_.end()) {
-    rt_conf = rt_confs_[name];
+  auto cr = std::make_shared<CRoutine>(func);
+  cr->set_id(task_id);
+  cr->set_name(name);
+
+  CRoutineConf conf;
+  if (cr_confs_.find(name) != cr_confs_.end()) {
+    conf = cr_confs_[name];
+    cr->set_priority(conf.priority());
+    cr->set_frequency(conf.frequency());
+
+    if (conf.has_processor_index()) {
+      auto proc_id = conf.processor_index();
+      cr->set_processor_id(proc_id);
+    }
   }
 
-  auto croutine = std::make_shared<CRoutine>(func);
-  croutine->set_id(task_id);
-  croutine->set_name(name);
-  croutine->set_priority(rt_conf.priority());
-  croutine->set_frequency(rt_conf.frequency());
-
-  if (rt_conf.has_processor_index()) {
-    auto processor_id = rt_conf.processor_index();
-    croutine->set_processor_id(processor_id);
-  }
-
-  std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
-  if (!DispatchTask(croutine)) {
+  WriteLockGuard<AtomicRWLock> rw(rw_lock_);
+  if (!DispatchTask(cr)) {
     return false;
   }
-
   return true;
 }
 
@@ -255,9 +254,9 @@ bool Scheduler::NotifyProcessor(uint64_t cr_id) {
     return true;
   }
 
-  std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
-  auto itr = rt_ctx_.find(cr_id);
-  if (itr != rt_ctx_.end()) {
+  ReadLockGuard<AtomicRWLock> rw(rw_lock_);
+  auto itr = cr_ctx_.find(cr_id);
+  if (itr != cr_ctx_.end()) {
     proc_ctxs_[itr->second]->Notify(cr_id);
     return true;
   }
@@ -272,8 +271,8 @@ bool Scheduler::RemoveTask(const std::string& name) {
 
   auto task_id = GlobalData::RegisterTaskName(name);
   {
-    std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
-    rt_ctx_.erase(task_id);
+    WriteLockGuard<AtomicRWLock> rw(rw_lock_);
+    cr_ctx_.erase(task_id);
   }
 
   return RemoveCRoutine(task_id);
@@ -284,10 +283,10 @@ bool Scheduler::RemoveCRoutine(uint64_t cr_id) {
     return true;
   }
 
-  std::lock_guard<std::mutex> lg(rt_ctx_mutex_);
-  auto p = rt_ctx_.find(cr_id);
-  if (p != rt_ctx_.end()) {
-    rt_ctx_.erase(cr_id);
+  WriteLockGuard<AtomicRWLock> rw(rw_lock_);
+  auto p = cr_ctx_.find(cr_id);
+  if (p != cr_ctx_.end()) {
+    cr_ctx_.erase(cr_id);
     proc_ctxs_[p->second]->RemoveCRoutine(cr_id);
   }
 

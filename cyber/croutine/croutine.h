@@ -117,12 +117,12 @@ class CRoutine {
   bool force_stop_ = false;
   double proc_num_ = 0.0;
   double vruntime_ = 0.0;
-  double frequency_ = 0.0;
+  double frequency_ = 1.0;
   double vfrequency_ = 0.0;
   double normalized_vruntime_ = 0.0;
   double normalized_vfrequency_ = 0.0;
+  int processor_id_ = -1;
   uint32_t priority_ = 1;
-  uint32_t processor_id_ = -1;
   uint64_t id_ = 0;
   uint64_t exec_time_ = 0;
 

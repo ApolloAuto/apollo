@@ -30,9 +30,9 @@ namespace scheduler {
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-void ProcessorContext::RemoveCRoutine(uint64_t croutine_id) {
+void ProcessorContext::RemoveCRoutine(uint64_t cr_id) {
   WriteLockGuard<AtomicRWLock> rw(rw_lock_);
-  auto it = cr_container_.find(croutine_id);
+  auto it = cr_container_.find(cr_id);
   if (it != cr_container_.end()) {
     it->second->Stop();
     cr_container_.erase(it);
@@ -44,18 +44,15 @@ int ProcessorContext::RqSize() {
   return cr_container_.size();
 }
 
-void ProcessorContext::Notify(uint64_t routine_id) {
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, routine_id,
+void ProcessorContext::Notify(uint64_t cr_id) {
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, cr_id,
                                             proc_index_, 0, 0, -1, -1);
 
   ReadLockGuard<AtomicRWLock> rw(rw_lock_);
 
-  auto routine = cr_container_[routine_id];
-  if (routine->state() == RoutineState::DATA_WAIT) {
-    auto lock = routine->GetLock();
-    if (routine->state() == RoutineState::DATA_WAIT) {
-      routine->set_state(RoutineState::READY);
-    }
+  auto& cr = cr_container_[cr_id];
+  if (cr->state() == RoutineState::DATA_WAIT) {
+    cr->set_state(RoutineState::READY);
   }
 
   if (!notified_.exchange(true)) {
