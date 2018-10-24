@@ -84,7 +84,8 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
   ptop_.reset(new DistanceApproachIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
       timeWS_, x0_, xf_, last_time_u_, XYbounds_, obstacles_edges_num_,
-      obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_));
+      obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_,
+      planner_open_space_config_));
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {

@@ -30,7 +30,8 @@ DistanceApproachProblem::DistanceApproachProblem(
     std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
     Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
     Eigen::MatrixXd obstacles_edges_num, Eigen::MatrixXd obstacles_A,
-    Eigen::MatrixXd obstacles_b)
+    Eigen::MatrixXd obstacles_b,
+    const PlannerOpenSpaceConfig& planner_open_space_config)
     : x0_(x0),
       xF_(xF),
       last_time_u_(last_time_u),
@@ -43,7 +44,9 @@ DistanceApproachProblem::DistanceApproachProblem(
       obstacles_num_(obstacles_num),
       obstacles_edges_num_(obstacles_edges_num),
       obstacles_A_(obstacles_A),
-      obstacles_b_(obstacles_b) {}
+      obstacles_b_(obstacles_b) {
+  planner_open_space_config_.CopyFrom(planner_open_space_config);
+}
 
 bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
                                     Eigen::MatrixXd* control_result,
@@ -88,7 +91,8 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
       timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_edges_num_,
-      obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_);
+      obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_,
+      planner_open_space_config_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

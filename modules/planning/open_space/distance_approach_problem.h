@@ -44,7 +44,8 @@ class DistanceApproachProblem {
       std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
       Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
       Eigen::MatrixXd obstacles_edges_num, Eigen::MatrixXd obstacles_A,
-      Eigen::MatrixXd obstacles_b);
+      Eigen::MatrixXd obstacles_b,
+      const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachProblem() = default;
 
@@ -93,6 +94,8 @@ class DistanceApproachProblem {
 
   // obstacles_b
   Eigen::MatrixXd obstacles_b_;
+
+  PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 }  // namespace planning

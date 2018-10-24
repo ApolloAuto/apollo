@@ -38,6 +38,13 @@ using apollo::common::math::Vec2d;
 
 Status OpenSpacePlanner::Init(const PlanningConfig&) {
   AINFO << "In OpenSpacePlanner::Init()";
+
+  // TODO(QiL): integrate open_space planner into task config when refactor done
+  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
+                                       &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
+
   // nominal sampling time
   ts_ = planner_open_space_config_.delta_t();
 
@@ -138,7 +145,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // solution from distance approach
   distance_approach_.reset(new DistanceApproachProblem(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
-      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b));
+      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
+      planner_open_space_config_));
 
   ADEBUG << "Distance approach configs set"
          << distance_approach_config_.ShortDebugString();
