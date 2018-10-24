@@ -85,14 +85,12 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
   int num_of_constraints = m1 + m2 + m3 + m4;
 
   // TODO(QiL) : evaluate whether need to new it everytime
-  bool use_fix_time_ = false;
 
   auto t_start = cyber::Time::Now().ToSecond();
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
       num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
       timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_edges_num_,
-      obstacles_num_, obstacles_A_, obstacles_b_, use_fix_time_,
-      planner_open_space_config_);
+      obstacles_num_, obstacles_A_, obstacles_b_, planner_open_space_config_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

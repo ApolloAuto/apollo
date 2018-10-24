@@ -41,5 +41,5 @@ distance_approach_config : {
   max_time_sample_scaling : 10.0
   max_miu : 1.0e10
   max_lambda : 1.0e10
+  use_fix_time : false
 }
-

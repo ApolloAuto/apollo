@@ -51,7 +51,6 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
       Eigen::MatrixXd obstacles_edges_num, std::size_t obstacles_num,
       const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      bool use_fix_time,
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
