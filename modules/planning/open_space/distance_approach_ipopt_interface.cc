@@ -32,7 +32,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
     Eigen::MatrixXd obstacles_edges_num, std::size_t obstacles_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    bool use_fix_time, const PlannerOpenSpaceConfig& planner_open_space_config)
+    const PlannerOpenSpaceConfig& planner_open_space_config)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
@@ -48,8 +48,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       obstacles_edges_num_(obstacles_edges_num),
       obstacles_num_(obstacles_num),
       obstacles_A_(obstacles_A),
-      obstacles_b_(obstacles_b),
-      use_fix_time_(use_fix_time) {
+      obstacles_b_(obstacles_b) {
   w_ev_ = ego_(1, 0) + ego_(3, 0);
   l_ev_ = ego_(0, 0) + ego_(2, 0);
 
@@ -96,6 +95,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   max_steer_rate_ = distance_approach_config_.max_steer_rate();
   max_lambda_ = distance_approach_config_.max_lambda();
   max_miu_ = distance_approach_config_.max_miu();
+  use_fix_time_ = distance_approach_config_.use_fix_time();
   wheelbase_ = vehicle_param_.wheel_base();
 }
 

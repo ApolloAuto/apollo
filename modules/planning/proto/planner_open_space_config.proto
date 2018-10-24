@@ -47,4 +47,5 @@ message DistanceApproachConfig {
   optional double max_miu = 15;
   optional double max_lambda = 16;
   optional double max_safety_distance = 17;
+  optional bool use_fix_time = 18;
 }
