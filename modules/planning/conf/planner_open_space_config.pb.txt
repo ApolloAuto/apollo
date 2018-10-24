@@ -23,7 +23,7 @@ distance_approach_config : {
   weight_u_rate : 10.0
   weight_state : 1.0
   weight_state : 1.0
-  weight_state : 10.0
+  weight_state : 4.0
   weight_stitching : 10.0
   weight_stitching : 10.0
   weight_time : 0.5
