@@ -287,7 +287,7 @@ class TrajectoryToSample(object):
     @classmethod
     def label_junction(cls, trajectory):
         '''
-        label feature trajectory according to real future lane sequence in 3s
+        label feature trajectory according to real future lane sequence in 7s
         '''
         traj_len = len(trajectory)
         for i, fea in enumerate(trajectory):
