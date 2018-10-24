@@ -56,14 +56,15 @@ CRoutine::~CRoutine() {}
 RoutineState CRoutine::Resume() {
   {
     auto lock = GetLock();
-    if (force_stop_) {
+    if (unlikely(force_stop_)) {
       state_ = RoutineState::FINISHED;
       return state_;
     }
 
     UpdateState();
 
-    if (state_ != RoutineState::RUNNING && state_ != RoutineState::READY) {
+    if (unlikely(state_ != RoutineState::RUNNING &&
+                 state_ != RoutineState::READY)) {
       AERROR << "Invalid Routine State!";
       return state_;
     }
