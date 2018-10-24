@@ -311,11 +311,9 @@ class TrajectoryToSample(object):
                     delta_pos = exit_pos - curr_pos
                     angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
                     d_idx = int((angle / (2.0 * np.pi) + 1) * 12 % 12)
-                    for idx in range(12):
-                        if idx == d_idx:
-                            fea.junction_feature.junction_mlp_label.append(1)
-                        else:
-                            fea.junction_feature.junction_mlp_label.append(0)
+                    label = [0 for idx in range(12)]
+                    label[d_idx] = 1
+                    fea.junction_feature.junction_mlp_label[:] = label
                     break
         return trajectory
 
