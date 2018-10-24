@@ -93,6 +93,12 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
     return Stage::FINISHED;
   }
 
+  // check timeout
+  if (wait_time > conf_wait_timeout_ && watch_vehicles.size() <= 1) {
+    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
+    return Stage::FINISHED;
+  }
+
   // get all vehicles currently watched
   std::vector<std::string> watch_vehicle_ids;
   for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {

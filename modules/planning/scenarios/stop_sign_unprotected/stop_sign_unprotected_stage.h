@@ -71,8 +71,10 @@ class StopSignUnprotectedStop : public Stage {
           watch_vehicles);
 
  private:
+  // TODO(all): move to scenario conf later
   const float conf_stop_duration_ = 1.0f;
   const double conf_min_pass_s_distance_ = 3.0;
+  const float conf_wait_timeout_ = 8.0;
 };
 
 class StopSignUnprotectedPreStop : public Stage {
@@ -93,6 +95,7 @@ class StopSignUnprotectedPreStop : public Stage {
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
 
  private:
+  // TODO(all): move to scenario conf later
   const double conf_watch_vehicle_max_valid_stop_distance_ = 5.0;
   const double conf_max_valid_stop_distance_ = 3.5;
   const double conf_max_adc_stop_speed_ = 0.3;
