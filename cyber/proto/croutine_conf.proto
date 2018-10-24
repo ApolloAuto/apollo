@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package apollo.cyber.proto;
 
-message RoutineConf {
-    optional string routine_name = 1;
-    optional uint32 processor_index = 2;
+message CRoutineConf {
+    optional string name = 1;
+    optional int32 processor_index = 2;
     optional double exec_time = 3;
     optional double wait_time = 4;
     optional double deadline = 5;

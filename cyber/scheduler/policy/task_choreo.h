@@ -45,9 +45,9 @@ class TaskChoreoContext : public ProcessorContext {
   bool RqEmpty() override;
 
  private:
-  std::mutex mtx_run_queue_;
+  std::mutex mtx_;
   std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
-      rt_queue_;
+      cr_queue_;
 };
 
 }  // namespace scheduler

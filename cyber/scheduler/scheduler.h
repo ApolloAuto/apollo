@@ -27,24 +27,29 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
-#include "cyber/proto/routine_conf.pb.h"
+#include "cyber/proto/croutine_conf.pb.h"
 #include "cyber/proto/scheduler_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::proto::RoutineConf;
+using apollo::cyber::proto::CRoutineConf;
 using apollo::cyber::proto::SchedulerConf;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
 using apollo::cyber::proto::ProcessStrategy;
+
+using apollo::cyber::base::AtomicRWLock;
+using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::WriteLockGuard;
 
 class ProcessorContext;
 
@@ -64,7 +69,7 @@ class Scheduler {
   void ShutDown();
 
   uint32_t ProcessorNum() { return proc_num_; }
-  inline std::unordered_map<uint64_t, uint32_t> RtCtx() { return rt_ctx_; }
+  inline std::unordered_map<uint64_t, uint32_t> RtCtx() { return cr_ctx_; }
   inline std::vector<std::shared_ptr<ProcessorContext>> ProcCtxs() {
     return proc_ctxs_;
   }
@@ -81,14 +86,12 @@ class Scheduler {
   std::thread sysmon_;
 
   SchedulerConf sched_conf_;
-  RoutineConf rt_conf_;
-  std::unordered_map<std::string, RoutineConf> rt_confs_;
+  std::unordered_map<std::string, CRoutineConf> cr_confs_;
 
   ProcessStrategy sched_policy_ = ProcessStrategy::CHOREO;
 
-  std::mutex rt_ctx_mutex_;
-
-  std::unordered_map<uint64_t, uint32_t> rt_ctx_;
+  AtomicRWLock rw_lock_;
+  std::unordered_map<uint64_t, uint32_t> cr_ctx_;
   std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
 
   uint32_t proc_num_;

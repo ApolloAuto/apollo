@@ -38,11 +38,10 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
     return nullptr;
   }
 
-  std::lock_guard<std::mutex> lock(mtx_run_queue_);
+  std::lock_guard<std::mutex> lock(mtx_);
   auto start_perf_time = apollo::cyber::Time::Now().ToNanosecond();
 
-  std::shared_ptr<CRoutine> croutine = nullptr;
-  for (auto it = rt_queue_.begin(); it != rt_queue_.end();) {
+  for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
     auto lock = cr->TryLock();
     if (!lock) {
@@ -53,26 +52,22 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
     cr->UpdateState();
 
     if (cr->state() == RoutineState::FINISHED) {
-      it = rt_queue_.erase(it);
+      it = cr_queue_.erase(it);
       continue;
     }
 
     if (cr->state() == RoutineState::READY) {
-      croutine = cr;
-      croutine->set_state(RoutineState::RUNNING);
-      break;
+      cr->set_state(RoutineState::RUNNING);
+      PerfEventCache::Instance()->AddSchedEvent(
+          SchedPerf::NEXT_ROUTINE, cr->id(), cr->processor_id(), 0,
+          start_perf_time, -1, -1);
+      return cr;
     }
     ++it;
   }
 
-  if (croutine == nullptr) {
-    notified_.store(false);
-  } else {
-    PerfEventCache::Instance()->AddSchedEvent(
-        SchedPerf::NEXT_ROUTINE, croutine->id(), croutine->processor_id(), 0,
-        start_perf_time, -1, -1);
-  }
-  return croutine;
+  notified_.store(false);
+  return nullptr;
 }
 
 bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
@@ -88,14 +83,13 @@ bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
     cr_container_[cr->id()] = cr;
   }
 
-  std::lock_guard<std::mutex> lg(mtx_run_queue_);
-  rt_queue_.insert(
+  std::lock_guard<std::mutex> lg(mtx_);
+  cr_queue_.insert(
       std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
   return true;
 }
 
 bool TaskChoreoContext::RqEmpty() {
-  std::lock_guard<std::mutex> lg(mtx_run_queue_);
   return !notified_.load();
 }
 

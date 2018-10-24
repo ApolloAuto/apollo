@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.cyber.proto;
 
-import "cyber/proto/routine_conf.proto";
+import "cyber/proto/croutine_conf.proto";
 import "cyber/proto/scheduler_conf.proto";
 import "cyber/proto/transport_conf.proto";
 import "cyber/proto/log_conf.proto";
@@ -12,7 +12,7 @@ import "cyber/proto/record_conf.proto";
 
 message CyberConfig {
     optional LogConf log_conf = 1;
-    repeated RoutineConf routine_conf = 2;
+    repeated CRoutineConf croutine_conf = 2;
     optional SchedulerConf scheduler_conf = 3;
     optional TransportConf transport_conf = 4;
     optional PerfConf perf_conf = 5;
