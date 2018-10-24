@@ -210,6 +210,10 @@ class Obstacle {
       const perception::PerceptionObstacle& perception_obstacle,
       Feature* feature);
 
+  void SetIsNearJunction(
+      const perception::PerceptionObstacle& perception_obstacle,
+      Feature* feature);
+
   void SetTimestamp(const perception::PerceptionObstacle& perception_obstacle,
                     const double timestamp, Feature* feature);
 

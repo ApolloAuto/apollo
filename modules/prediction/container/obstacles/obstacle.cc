@@ -280,6 +280,7 @@ void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
   SetAcceleration(feature);
   SetTheta(perception_obstacle, feature);
   SetLengthWidthHeight(perception_obstacle, feature);
+  SetIsNearJunction(perception_obstacle, feature);
 }
 
 void Obstacle::UpdateStatus(Feature* feature) {
@@ -628,6 +629,22 @@ void Obstacle::SetLengthWidthHeight(
          << std::setprecision(6) << length << ", " << std::fixed
          << std::setprecision(6) << width << ", " << std::fixed
          << std::setprecision(6) << height << "].";
+}
+
+void Obstacle::SetIsNearJunction(
+    const PerceptionObstacle& perception_obstacle, Feature* feature) {
+  if (!perception_obstacle.has_position()) {
+    return;
+  }
+  if (!perception_obstacle.position().has_x() ||
+      !perception_obstacle.position().has_y()) {
+    return;
+  }
+  double x = perception_obstacle.position().x();
+  double y = perception_obstacle.position().y();
+  bool is_near_junction = PredictionMap::NearJunction({x, y},
+      FLAGS_junction_search_radius);
+  feature->set_is_near_junction(is_near_junction);
 }
 
 void Obstacle::InitKFMotionTracker(const Feature& feature) {
