@@ -117,7 +117,7 @@ class ReedShepp {
 
  private:
   common::VehicleParam vehicle_param_;
-  PlannerOpenSpaceConfig open_space_conf_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
   double max_kappa_;
 };
 }  // namespace planning

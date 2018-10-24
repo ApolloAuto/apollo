@@ -66,7 +66,7 @@ struct Result {
 
 class HybridAStar {
  public:
-  HybridAStar();
+  HybridAStar(const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
             double ephi, ThreadSafeIndexedObstacles* obstacles, Result* result);
@@ -96,7 +96,7 @@ class HybridAStar {
   bool GenerateSpeedAcceleration(Result* result);
 
  private:
-  PlannerOpenSpaceConfig open_space_conf_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
   common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   std::size_t next_node_num_ = 0;
