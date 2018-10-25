@@ -281,13 +281,16 @@ bool HMIWorker::Trigger(const HMIAction action) {
   switch (action) {
     case HMIAction::NONE:
       break;
-    case HMIAction::SETUP:
-      RunModeCommand("start");
+    case HMIAction::SETUP_MODE:
+      SetupMode();
       break;
-    case HMIAction::AUTO_MODE:
+    case HMIAction::ENTER_AUTO_MODE:
       return ChangeToDrivingMode(Chassis::COMPLETE_AUTO_DRIVE);
     case HMIAction::DISENGAGE:
       return ChangeToDrivingMode(Chassis::COMPLETE_MANUAL);
+    case HMIAction::RESET_MODE:
+      ResetMode();
+      break;
     default:
       AERROR << "HMIAction not implemented, yet!";
       return false;
@@ -514,9 +517,17 @@ void HMIWorker::UpdateSystemStatus(const monitor::SystemStatus &system_status) {
   *status_.mutable_system_status() = system_status;
 }
 
-const HMIStatus HMIWorker::GetStatus() const {
+HMIStatus HMIWorker::GetStatus() const {
   RLock rlock(status_mutex_);
   return status_;
+}
+
+void HMIWorker::SetupMode() {
+  // TODO(xiaoxq): Setup everything corresponding to current mode.
+}
+
+void HMIWorker::ResetMode() {
+  // TODO(xiaoxq): Stop everything corresponding to current mode.
 }
 
 }  // namespace dreamview
