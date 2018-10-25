@@ -59,6 +59,7 @@ class FullyConn_NN(torch.nn.Module):
         self.classify = torch.nn.Sequential(\
                             nn.Linear(83, 55),\
                             nn.Sigmoid(),\
+<<<<<<< 35cc22d6d8aad4441589b72838da16d4a2dc0fdc
                             nn.Dropout(0.3),\
 
                             nn.Linear(55, 23),\
@@ -69,6 +70,18 @@ class FullyConn_NN(torch.nn.Module):
                             nn.Sigmoid(),\
                             nn.Dropout(0.3),\
 
+=======
+                            nn.Dropout(0.3),\
+
+                            nn.Linear(55, 23),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.2),\
+
+                            nn.Linear(23, 11),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.3),\
+
+>>>>>>> Tools: Finished the cruiseMLP_train.py
                             nn.Linear(11, 5),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
@@ -94,7 +107,11 @@ class FullyConn_NN(torch.nn.Module):
         return out_c, out_r
 
 
+<<<<<<< 35cc22d6d8aad4441589b72838da16d4a2dc0fdc
 class CNN1D_Lane(torch.nn.Module):
+=======
+class FCNN_CNN1D(torch.nn.Module):
+>>>>>>> Tools: Finished the cruiseMLP_train.py
     def __init__(self):
         super(FullyConn_NN, self).__init__()
         self.classify = torch.nn.Sequential(\
@@ -133,7 +150,6 @@ class CNN1D_Lane(torch.nn.Module):
         out_c = self.classify(x)
         out_r = self.regress(x)
         return out_c, out_r
-
 
 
 '''
@@ -280,3 +296,37 @@ if __name__ == "__main__":
         train(X_train, y_train, model, optimizer, epoch)
         valid_loss = validate(X_valid, y_valid, model)
         scheduler.step(valid_loss)
+
+
+
+
+
+'''
+    model = setup_model()
+
+    model.fit(X_train, Y_trainc, shuffle=True, nb_epoch=20, batch_size=32)
+    print ("Model trained success.")
+
+    X_test = (X_test - param_norm[0]) / param_norm[1]
+
+    score = model.evaluate(X_test, Y_testc)
+    print ("\nThe accuracy on testing dat is", score[1])
+
+    logging.info("Test data loss: {}, accuracy: {} ".format(
+        score[0], score[1]))
+    Y_train_hat = model.predict_classes(X_train, batch_size=32)
+    Y_test_hat = model.predict_proba(X_test, batch_size=32)
+    logging.info("## Training Data:")
+    evaluate_model(Y_train, Y_train_hat)
+    for thres in [x / 100.0 for x in range(20, 80, 5)]:
+        logging.info("##threshond = {} Testing Data:".format(thres))
+        performance = evaluate_model(Y_test, Y_test_hat > thres)
+    performance['accuracy'] = [score[1]]
+
+    print ("\nFor more detailed evaluation results, please refer to", \
+          evaluation_log_path + ".log")
+
+    model_path = os.path.join(os.getcwd(), "mlp_model.bin")
+    save_model(model, param_norm, model_path)
+    print ("Model has been saved to", model_path)
+'''
