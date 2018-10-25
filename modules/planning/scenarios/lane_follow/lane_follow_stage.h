@@ -66,7 +66,6 @@ class LaneFollowStage : public Stage {
  private:
   ScenarioConfig config_;
   std::unique_ptr<Stage> stage_;
-  SpeedProfileGenerator speed_profile_generator_;
 };
 
 }  // namespace scenario

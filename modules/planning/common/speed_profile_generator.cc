@@ -37,7 +37,7 @@ using common::math::Vec2d;
 
 std::vector<SpeedPoint> SpeedProfileGenerator::GenerateInitSpeedProfile(
     const TrajectoryPoint& planning_init_point,
-    const ReferenceLineInfo* reference_line_info) const {
+    const ReferenceLineInfo* reference_line_info) {
   std::vector<SpeedPoint> speed_profile;
   const auto* last_frame = FrameHistory::Instance()->Latest();
   if (!last_frame) {
@@ -102,7 +102,7 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateInitSpeedProfile(
 // a dummy simple hot start
 // TODO(All): refine the hotstart speed profile
 std::vector<SpeedPoint> SpeedProfileGenerator::GenerateSpeedHotStart(
-    const TrajectoryPoint& planning_init_point) const {
+    const TrajectoryPoint& planning_init_point) {
   std::vector<SpeedPoint> hot_start_speed_profile;
   double s = 0.0;
   double t = 0.0;
@@ -136,8 +136,8 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
   return GenerateStopProfile(init_v, init_a);
 }
 
-SpeedData SpeedProfileGenerator::GenerateStopProfile(
-    const double init_speed, const double init_acc) const {
+SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
+                                                     const double init_acc) {
   AERROR << "Using fallback stopping profile: Slowing down the car!";
   SpeedData speed_data;
 
@@ -162,7 +162,7 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(
 }
 
 SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
-    const double init_speed, const double init_acc) const {
+    const double init_speed, const double init_acc) {
   AERROR << "Slowing down the car with polynomial.";
   constexpr double kMaxT = 4.0;
   for (double t = 2.0; t <= kMaxT; t += 0.5) {
@@ -190,7 +190,7 @@ SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
 }
 
 bool SpeedProfileGenerator::IsValidProfile(
-    const QuinticPolynomialCurve1d& curve) const {
+    const QuinticPolynomialCurve1d& curve) {
   for (double evaluate_t = 0.1; evaluate_t <= curve.ParamLength();
        evaluate_t += 0.2) {
     const double v = curve.Evaluate(1, evaluate_t);
