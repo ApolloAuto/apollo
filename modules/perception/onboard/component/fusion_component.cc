@@ -43,10 +43,10 @@ bool FusionComponent::Init() {
 
   // init algorithm plugin
   CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
-  writer_ =
-      node_->CreateWriter<PerceptionObstacles>("/apollo/perception/obstacles");
+  writer_ = node_->CreateWriter<PerceptionObstacles>(
+      comp_config.output_obstacles_channel_name());
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
-      "/perception/inner/PrefusedObjects");
+      comp_config.output_viz_fused_content_channel_name());
   return true;
 }
 
