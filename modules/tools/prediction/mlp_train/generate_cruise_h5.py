@@ -31,8 +31,7 @@ from common.feature_io import save_protobuf
 from common.feature_io import build_trajectory
 from common.trajectory import TrajectoryToSample
 
-mlp_feature_size = parameters['mlp']['dim_input']
-
+mlp_feature_size = parameters['cruise_mlp']['dim_input']
 
 def extract_mlp_features(filename):
     features = load_label_feature(filename)
