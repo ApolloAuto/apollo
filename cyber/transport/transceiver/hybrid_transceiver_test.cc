@@ -52,9 +52,8 @@ class HybridTransceiverTest : public ::testing::Test {
     transmitter_a_ = std::make_shared<HybridTransmitter<proto::UnitTest>>(
         attr, Transport::participant());
 
-    attr.set_process_id(54321);
-    attr.mutable_qos_profile()->CopyFrom(
-        QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
+    attr.set_process_id(common::GlobalData::Instance()->ProcessId() + 1);
+    attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
     transmitter_b_ = std::make_shared<HybridTransmitter<proto::UnitTest>>(
         attr, Transport::participant());
   }
@@ -159,7 +158,6 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_no_relation) {
       },
       Transport::participant());
 
-  attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
@@ -212,7 +210,6 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_same_process) {
       },
       Transport::participant());
 
-  attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
@@ -284,7 +281,6 @@ TEST_F(HybridTransceiverTest,
       },
       Transport::participant());
 
-  attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
@@ -312,8 +308,8 @@ TEST_F(HybridTransceiverTest,
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  // 2 from receiver_b(transient_local), 2 from receiver_a(volatile)
-  EXPECT_EQ(msgs.size(), 4);
+  // 1 from receiver_b, 1 from receiver_a
+  EXPECT_EQ(msgs.size(), 2);
   for (auto& item : msgs) {
     EXPECT_EQ(item.class_name(), class_name);
     EXPECT_EQ(item.case_name(), case_name);
@@ -352,7 +348,6 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
       },
       Transport::participant());
 
-  attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_TOPO_CHANGE);
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
       [&](const std::shared_ptr<proto::UnitTest>& msg,
@@ -378,7 +373,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
   transmitter_b_->Transmit(msg);
   std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  // 1 from receiver_b(transient_local), 1 from receiver_a(volatile)
+  // 1 from receiver_b, 1 from receiver_a
   EXPECT_EQ(msgs.size(), 2);
   for (auto& item : msgs) {
     EXPECT_EQ(item.class_name(), class_name);
