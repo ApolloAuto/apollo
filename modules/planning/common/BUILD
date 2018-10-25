@@ -288,35 +288,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "frame_open_space",
-    srcs = [
-        "frame_open_space.cc",
-    ],
-    hdrs = [
-        "frame_open_space.h",
-    ],
-    deps = [
-        ":change_lane_decider",
-        ":indexed_queue",
-        ":local_view",
-        #":lag_prediction",
-        ":path_obstacle",
-        "//modules/common/configs:vehicle_config_helper",
-        "//cyber/common:log",
-        "//modules/common/monitor_log",
-        "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/map/hdmap:hdmap_util",
-        "//modules/map/pnc_map",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/common/trajectory:publishable_trajectory",
-        "//modules/planning/proto:planning_config_proto",
-        "//modules/planning/proto:planning_proto",
-        "//modules/common/math:geometry",
-        "@eigen",
-    ],
-)
-
 cc_test(
     name = "frame_test",
     size = "small",
@@ -331,26 +302,6 @@ cc_test(
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/planning/proto:planning_config_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "frame_open_space_test",
-    size = "small",
-    srcs = [
-        "frame_open_space_test.cc",
-    ],
-    data = [
-        "//modules/planning/common:common_testdata",
-    ],
-    deps = [
-        ":frame_open_space",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/common/util",
-        "//modules/common/vehicle_state/proto:vehicle_state_proto",
-        "//modules/planning/proto:planning_config_proto",
-        "@eigen",
         "@gtest//:main",
     ],
 )
@@ -450,7 +401,6 @@ cc_library(
         "threshold",
         ":ego_info",
         ":frame",
-        #":frame_open_space",
         ":planning_gflags",
         ":speed_limit",
         "//cyber/common:log",
