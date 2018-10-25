@@ -259,16 +259,26 @@ void Obstacle::SearchJunctionExitsWithEnterLane(
 
 void Obstacle::SearchJunctionExitsWithoutEnterLane(
     const std::string& junction_id, Feature* feature_ptr) {
-  // TODO(kechxu) implement
-  if (!feature_ptr->has_lane() ||
-      !feature_ptr->mutable_lane()->has_lane_feature()) {
-    AERROR << "Obstacle [" << id_ << "] has no current lane feature.";
+  if (!feature_ptr->has_lane()) {
+    AERROR << "Obstacle [" << id_ << "] has no lane.";
     return;
   }
-  const std::string& curr_lane_id =
-      feature_ptr->lane().lane_feature().lane_id();
+  std::string start_lane_id = "";
+  if (feature_ptr->mutable_lane()->has_lane_feature()) {
+    start_lane_id = feature_ptr->lane().lane_feature().lane_id();
+  } else {
+    if (feature_ptr->lane().nearby_lane_feature_size() > 0) {
+      // TODO(kechxu) start with multiple lane ids
+      start_lane_id = feature_ptr->lane().nearby_lane_feature(0).lane_id();
+    }
+  }
+  if (start_lane_id == "") {
+    AERROR << "Obstacle [" << id_ << "] has no lane in junction";
+    return;
+  }
+
   const JunctionFeature& junction_feature =
-      ObstacleClusters::GetJunctionFeature(curr_lane_id, junction_id);
+      ObstacleClusters::GetJunctionFeature(start_lane_id, junction_id);
   feature_ptr->mutable_junction_feature()->CopyFrom(junction_feature);
 }
 
