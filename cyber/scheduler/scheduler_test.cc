@@ -17,9 +17,9 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "cyber/croutine/routine_factory.h"
 #include "cyber/cyber.h"
 #include "cyber/scheduler/scheduler.h"
+#include "cyber/common/global_data.h"
 
 namespace apollo {
 namespace cyber {
@@ -32,7 +32,15 @@ void proc() {}
 TEST(SchedulerTest, create_task) {
   cyber::Init();
   std::string croutine_name = "DriverProc";
+  sched->RtCtx().clear();
   EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));
+  // create a croutine with the same name
+  EXPECT_FALSE(sched->CreateTask(&proc, croutine_name));
+  auto task_id = GlobalData::RegisterTaskName(croutine_name);
+  EXPECT_TRUE(sched->NotifyTask(task_id));
+  EXPECT_TRUE(sched->RemoveTask(croutine_name));
+  sched->ShutDown();
+  EXPECT_FALSE(sched->CreateTask(&proc, croutine_name));
 }
 
 }  // namespace scheduler

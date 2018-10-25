@@ -20,6 +20,7 @@
 #include "cyber/common/util.h"
 #include "cyber/cyber.h"
 #include "cyber/scheduler/policy/task_choreo.h"
+#include "cyber/scheduler/policy/classic.h"
 #include "cyber/scheduler/processor.h"
 
 namespace apollo {
@@ -27,7 +28,7 @@ namespace cyber {
 namespace scheduler {
 
 void func() {}
-TEST(SchedulerPolicyTest, choreo) {
+TEST(SchedulerPolicyTest, task_choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
   ctx.reset(new TaskChoreoContext());
@@ -36,7 +37,29 @@ TEST(SchedulerPolicyTest, choreo) {
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   EXPECT_TRUE(ctx->RqEmpty());
-  cr->set_id(common::Hash("choreo"));
+  auto task_id = GlobalData::RegisterTaskName("task_choreo");
+  cr->set_id(task_id);
+  EXPECT_TRUE(ctx->Enqueue(cr));
+  EXPECT_GT(ctx->RqSize(), 0);
+  processor->Start();
+  ctx->ShutDown();
+}
+
+TEST(SchedulerPolicyTest, classic) {
+  auto processor = std::make_shared<Processor>();
+  std::shared_ptr<ProcessorContext> ctx;
+  ctx.reset(new ClassicContext());
+  processor->bind_context(ctx);
+  ctx->bind_processor(processor);
+
+  std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
+  EXPECT_TRUE(ctx->RqEmpty());
+  auto task_id = GlobalData::RegisterTaskName("classic");
+  cr->set_id(task_id);
+  EXPECT_TRUE(ctx->Enqueue(cr));
+  EXPECT_GT(ctx->RqSize(), 0);
+  processor->Start();
+  ctx->ShutDown();
 }
 
 }  // namespace scheduler
