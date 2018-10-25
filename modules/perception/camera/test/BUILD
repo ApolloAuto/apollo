@@ -5,6 +5,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_test(
     name = "camera_app_obstacle_camera_perception_test",
+    size = "small",
     srcs = [
         "camera_app_obstacle_camera_perception_test.cc",
     ],
@@ -50,6 +51,7 @@ cc_test(
 #)
 cc_test(
     name = "camera_common_camera_ground_plane_test",
+    size = "small",
     srcs = [
         "camera_common_camera_ground_plane_test.cc",
     ],
@@ -73,6 +75,7 @@ cc_library(
 
 cc_test(
     name = "camera_common_data_provider_test",
+    size = "small",
     srcs = [
         "camera_common_data_provider_test.cc",
     ],
@@ -97,6 +100,7 @@ cc_test(
 )
 cc_test(
     name = "camera_common_twod_threed_util_test",
+    size = "small",
     srcs = [
         "camera_common_twod_threed_util_test.cc",
     ],
@@ -164,6 +168,7 @@ cc_library(
 #)
 cc_test(
     name = "camera_common_util_test",
+    size = "small",
     srcs = [
         "camera_common_util_test.cc",
     ],
@@ -190,6 +195,7 @@ cc_test(
 )
 cc_test(
     name = "camera_common_veh_template_test",
+    size = "small",
     srcs = [
         "camera_common_veh_template_test.cc",
     ],
@@ -215,6 +221,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_calibration_service_online_calibration_service_test",
+    size = "small",
     srcs = [
         "camera_lib_calibration_service_online_calibration_service_test.cc",
     ],
@@ -231,6 +238,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_calibrator_common_histogram_estimator_test",
+    size = "small",
     srcs = [
         "camera_lib_calibrator_common_histogram_estimator_test.cc",
     ],
@@ -317,6 +325,7 @@ cc_library(
 
 cc_test(
     name = "camera_lib_dummy_algorithms_test",
+    size = "small",
     srcs = [
         "camera_lib_dummy_algorithms_test.cc",
     ],
@@ -328,6 +337,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_feature_extractor_tfe_tracking_feat_extractor_test",
+    size = "small",
     srcs = [
         "camera_lib_feature_extractor_tfe_tracking_feat_extractor_test.cc",
     ],
@@ -344,6 +354,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_interface_test",
+    size = "small",
     srcs = [
         "camera_lib_interface_test.cc",
     ],
@@ -355,6 +366,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_lane_common_functions_test",
+    size = "small",
     srcs = [
         "camera_lib_lane_common_functions_test.cc",
     ],
@@ -376,6 +388,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_lane_detector_denseline_lane_detector_test",
+    size = "small",
     srcs = [
         "camera_lib_lane_detector_denseline_lane_detector_test.cc",
     ],
@@ -395,6 +408,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_lane_postprocessor_denseline_lane_postprocessor_test",
+    size = "small",
     srcs = [
         "camera_lib_lane_postprocessor_denseline_lane_postprocessor_test.cc",
     ],
@@ -419,6 +433,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_obstacle_detector_yolo_region_output_test",
+    size = "small",
     srcs = [
         "camera_lib_obstacle_detector_yolo_region_output_test.cc",
     ],
@@ -434,6 +449,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test",
+    size = "small",
     srcs = [
         "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test.cc",
     ],
@@ -454,6 +470,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_obstacle_postprocessor_location_refiner_test",
+    size = "small",
     srcs = [
         "camera_lib_obstacle_postprocessor_location_refiner_test.cc",
     ],
@@ -469,6 +486,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_obstacle_tracker_common_test",
+    size = "small",
     srcs = [
         "camera_lib_obstacle_tracker_common_test.cc",
     ],
@@ -487,6 +505,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_obstacle_tracker_omt_frame_list_test",
+    size = "small",
     srcs = [
         "camera_lib_obstacle_tracker_omt_frame_list_test.cc",
     ],
@@ -543,6 +562,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_obstacle_tracker_omt_target_test",
+    size = "small",
     srcs = [
         "camera_lib_obstacle_tracker_omt_target_test.cc",
     ],
@@ -560,6 +580,7 @@ cc_test(
 )
 cc_test(
     name = "camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test",
+    size = "small",
     srcs = [
         "camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test.cc",
     ],
@@ -584,6 +605,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_traffic_light_detector_crop_test",
+    size = "small",
     srcs = [
         "camera_lib_traffic_light_detector_crop_test.cc",
     ],
@@ -650,6 +672,7 @@ cc_test(
 #)
 cc_test(
     name = "camera_lib_traffic_light_detector_select_test",
+    size = "small",
     srcs = [
         "camera_lib_traffic_light_detector_select_test.cc",
     ],
@@ -700,6 +723,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_traffic_light_tracker_test",
+    size = "small",
     srcs = [
         "camera_lib_traffic_light_tracker_test.cc",
     ],

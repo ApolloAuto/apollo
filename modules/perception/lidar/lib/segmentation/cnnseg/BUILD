@@ -86,6 +86,7 @@ cc_library(
 
 cc_test(
     name = "cnn_segmentation_test",
+    size = "small",
     srcs = [
         "cnn_segmentation_test.cc",
     ],
