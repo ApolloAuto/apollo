@@ -1,0 +1,33 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: gnss
+        dag_conf: /apollo/modules/drivers/gnss/dag/gnss.dag
+        process_name: apollo
+        version: 1.0.0
+    -
+        name: velodyne
+        dag_conf: /apollo/modules/drivers/velodyne/dag/velodyne.dag
+        process_name: apollo
+        version: 1.0.0
+    -
+        name: localization
+        dag_conf: /apollo/modules/localization/dag/localization.dag
+        process_name: apollo
+        version: 1.0.0
+    -
+        name: canbus
+        dag_conf: /apollo/modules/canbus/dag/canbus.dag
+        process_name: apollo-control
+        version: 1.0.0
+    -
+        name: control
+        dag_conf: /apollo/modules/control/dag/control.dag
+        process_name: apollo-control
+        version: 1.0.0
+    -
+        name: guardian
+        dag_conf: /apollo/modules/guardian/dag/guardian.dag
+        process_name: apollo-control
+        version: 1.0.0

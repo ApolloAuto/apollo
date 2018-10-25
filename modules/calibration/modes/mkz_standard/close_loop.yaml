@@ -1,0 +1,68 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: gnss
+        dag: /apollo/modules/drivers/gnss/dag/gnss.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: velodyne
+        dag: /apollo/modules/drivers/velodyne/dag/velodyne.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: camera
+        dag: /apollo/modules/drivers/camera/dag/camera.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: conti_radar
+        dag: /apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: localization
+        dag: /apollo/modules/localization/dag/localization.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: perception
+        dag: /apollo/modules/perception/production/dag/dag_streaming_perception.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: canbus
+        dag: /apollo/modules/canbus/dag/canbus.dag
+        process_name: apollo-control
+        version: 1.0.0.0
+    -
+        name: control
+        dag: /apollo/modules/control/dag/control.dag
+        process_name: apollo-control
+        version: 1.0.0.0
+    -
+        name: guardian
+        dag: /apollo/modules/guardian/dag/guardian.dag
+        process_name: apollo-control
+        version: 1.0.0.0
+    -
+        name: routing
+        dag: /apollo/modules/routing/dag/routing.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: planning
+        dag: /apollo/modules/planning/dag/planning.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: prediction
+        dag: /apollo/modules/prediction/dag/prediction.dag
+        process_name: apollo
+        version: 1.0.0.0
+    -
+        name: static_transform
+        dag: /apollo/modules/transform/dag/static_transform.dag
+        process_name: apollo
+        version: 1.0.0.0

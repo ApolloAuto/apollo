@@ -1,0 +1,28 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: gnss
+        dag: /apollo/modules/drivers/gnss/dag/gnss.dag
+        process_name: apollo
+        version: 1.0.0
+    -
+        name: velodyne
+        dag: /apollo/modules/drivers/velodyne/dag/velodyne_udev_calibration.dag
+        process_name: apollo
+        version: 1.0.0
+    -
+        name: camera
+        dag: /apollo/modules/drivers/camera/dag/camera_udev.dag
+        process_name: apollo
+        version: 1.0.0
+    -
+        name: conti_radar
+        dag: /apollo/modules/drivers/radar/conti_radar/dag/conti_radar_udev.dag
+        process_name: apollo
+        version: 1.0.0
+    -
+        name: static_transform
+        dag: /apollo/modules/transform/dag/static_transform.dag
+        process_name: apollo
+        version: 1.0.0
