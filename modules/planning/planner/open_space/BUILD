@@ -24,7 +24,6 @@ cc_library(
         "//modules/map/hdmap",
         "//modules/planning/common:planning_common",
         "//modules/planning/planner",
-        "//modules/planning/common:frame_open_space",
         "//modules/planning/common:frame",
         "//modules/planning/proto:planning_proto",
         "@eigen//:eigen",
