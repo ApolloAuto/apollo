@@ -135,6 +135,7 @@ class CNN1D_Lane(torch.nn.Module):
         return out_c, out_r
 
 
+
 '''
 Load the data from h5 file to the numpy format
 '''
