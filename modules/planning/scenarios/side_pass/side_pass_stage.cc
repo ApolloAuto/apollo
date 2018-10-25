@@ -47,7 +47,27 @@ Stage::StageStatus SidePassApproachObstacle::Process(
   if (!plan_ok) {
     return Stage::ERROR;
   }
-  if (frame->vehicle_state().linear_velocity() < 1.0e-5) {
+  const ReferenceLineInfo& reference_line_info =
+    frame->reference_line_info().front();
+  double adc_velocity = frame->vehicle_state().linear_velocity();
+  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+
+  const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
+  double obstacle_start_s = 0.0;
+  for (const auto& overlap : first_overlaps) {
+    if (overlap.first == ReferenceLineInfo::OBSTACLE) {
+      obstacle_start_s = overlap.second.start_s;
+    }
+  }
+  if ((obstacle_start_s - adc_front_edge_s) < 0) {
+    return Stage::ERROR;
+  }
+  // TODO(all): stage params need to be in config file
+  double max_stop_velocity = 1.0e-5;
+  double max_stop_obstacle_distance = 5;
+
+  if (adc_velocity < max_stop_velocity &&
+      (obstacle_start_s - adc_front_edge_s) < max_stop_obstacle_distance) {
     next_stage_ = ScenarioConfig::SIDE_PASS_GENERATE_PATH;
     return Stage::FINISHED;
   }
