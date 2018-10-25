@@ -56,6 +56,39 @@ cc_test(
 )
 
 cc_library(
+    name = "dual_variable_warm_start_problem",
+    srcs = [
+        "dual_variable_warm_start_problem.cc",
+    ],
+    hdrs = [
+        "dual_variable_warm_start_problem.h",
+    ],
+    deps = [
+        "dual_variable_warm_start_ipopt_interface",
+    ],
+)
+
+cc_library(
+    name = "dual_variable_warm_start_ipopt_interface",
+    srcs = [
+        "dual_variable_warm_start_ipopt_interface.cc",
+    ],
+    hdrs = [
+        "dual_variable_warm_start_ipopt_interface.h",
+    ],
+    deps = [
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "@eigen//:eigen",
+        "@ipopt//:ipopt",
+    ],
+)
+
+cc_library(
     name = "distance_approach_problem",
     srcs = [
         "distance_approach_problem.cc",
@@ -116,6 +149,30 @@ cc_test(
         "@gtest//:main",
         ":distance_approach_problem",
         "//cyber/common:log",
+    ],
+)
+
+cc_test(
+    name = "dual_variable_warm_start_ipopt_interface_test",
+    size = "small",
+    srcs = [
+        "dual_variable_warm_start_ipopt_interface_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":dual_variable_warm_start_ipopt_interface",
+    ],
+)
+
+cc_test(
+    name = "dual_variable_warm_start_problem_test",
+    size = "small",
+    srcs = [
+        "dual_variable_warm_start_problem_test.cc",
+    ],
+    deps = [
+        "@gtest//:main",
+        ":dual_variable_warm_start_problem",
     ],
 )
 
