@@ -96,7 +96,7 @@ auto ReceiverManager<MessageT>::GetReceiver(
   const std::string& channel_name = role_attr.channel_name();
   if (receiver_map_.count(channel_name) == 0) {
     receiver_map_[channel_name] =
-        transport::Transport::CreateReceiver<MessageT>(
+        transport::Transport::Instance()->CreateReceiver<MessageT>(
             role_attr, [](const std::shared_ptr<MessageT>& msg,
                           const transport::MessageInfo& msg_info,
                           const proto::RoleAttributes& reader_attr) {

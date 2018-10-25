@@ -16,29 +16,35 @@
 
 #include "cyber/transport/dispatcher/rtps_dispatcher.h"
 
-#include "cyber/transport/transport.h"
-
 namespace apollo {
 namespace cyber {
 namespace transport {
 
-RtpsDispatcher::RtpsDispatcher() {}
+RtpsDispatcher::RtpsDispatcher() : participant_(nullptr) {}
 
 RtpsDispatcher::~RtpsDispatcher() { Shutdown(); }
 
 void RtpsDispatcher::Shutdown() {
-  if (shutdown_) {
+  if (is_shutdown_.exchange(true)) {
     return;
   }
-  shutdown_ = true;
 
-  std::lock_guard<std::mutex> lock(subs_mutex_);
-  for (auto& item : subs_) {
-    item.second.sub = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(subs_mutex_);
+    for (auto& item : subs_) {
+      item.second.sub = nullptr;
+    }
   }
+
+  participant_ = nullptr;
 }
 
 void RtpsDispatcher::AddSubscriber(const RoleAttributes& self_attr) {
+  if (participant_ == nullptr) {
+    AWARN << "please set participant firstly.";
+    return;
+  }
+
   uint64_t channel_id = self_attr.channel_id();
   std::lock_guard<std::mutex> lock(subs_mutex_);
   if (subs_.count(channel_id) > 0) {
@@ -55,7 +61,7 @@ void RtpsDispatcher::AddSubscriber(const RoleAttributes& self_attr) {
                 std::placeholders::_2, std::placeholders::_3));
 
   new_sub.sub = eprosima::fastrtps::Domain::createSubscriber(
-      Transport::participant()->fastrtps_participant(), sub_attr,
+      participant_->fastrtps_participant(), sub_attr,
       new_sub.sub_listener.get());
   RETURN_IF_NULL(new_sub.sub);
   subs_[channel_id] = new_sub;
@@ -64,6 +70,10 @@ void RtpsDispatcher::AddSubscriber(const RoleAttributes& self_attr) {
 void RtpsDispatcher::OnMessage(uint64_t channel_id,
                                const std::shared_ptr<std::string>& msg_str,
                                const MessageInfo& msg_info) {
+  if (is_shutdown_.load()) {
+    return;
+  }
+
   ListenerHandlerBasePtr* handler_base = nullptr;
   if (msg_listeners_.Get(channel_id, &handler_base)) {
     auto handler =

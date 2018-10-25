@@ -74,7 +74,7 @@ TEST(RtpsDispatcherTest, on_message) {
         recv_msg->CopyFrom(*msg);
       });
 
-  auto transmitter = Transport::CreateTransmitter<proto::Chatter>(
+  auto transmitter = Transport::Instance()->CreateTransmitter<proto::Chatter>(
       self_attr, proto::OptionalMode::RTPS);
   EXPECT_TRUE(transmitter != nullptr);
 

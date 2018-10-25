@@ -28,6 +28,7 @@
 #include "cyber/message/message_traits.h"
 #include "cyber/transport/dispatcher/dispatcher.h"
 #include "cyber/transport/rtps/attributes_filler.h"
+#include "cyber/transport/rtps/participant.h"
 #include "cyber/transport/rtps/sub_listener.h"
 
 namespace apollo {
@@ -59,6 +60,10 @@ class RtpsDispatcher : public Dispatcher {
                    const RoleAttributes& opposite_attr,
                    const MessageListener<MessageT>& listener);
 
+  void set_participant(const ParticipantPtr& participant) {
+    participant_ = participant;
+  }
+
  private:
   void OnMessage(uint64_t channel_id,
                  const std::shared_ptr<std::string>& msg_str,
@@ -68,6 +73,8 @@ class RtpsDispatcher : public Dispatcher {
   std::unordered_map<uint64_t, Subscriber> subs_;
   std::mutex subs_mutex_;
 
+  ParticipantPtr participant_;
+
   DECLARE_SINGLETON(RtpsDispatcher)
 };
 
@@ -75,8 +82,8 @@ template <typename MessageT>
 void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                                  const MessageListener<MessageT>& listener) {
   auto listener_adapter = [listener](
-      const std::shared_ptr<std::string>& msg_str,
-      const MessageInfo& msg_info) {
+                              const std::shared_ptr<std::string>& msg_str,
+                              const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
     listener(msg, msg_info);
@@ -91,8 +98,8 @@ void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                                  const RoleAttributes& opposite_attr,
                                  const MessageListener<MessageT>& listener) {
   auto listener_adapter = [listener](
-      const std::shared_ptr<std::string>& msg_str,
-      const MessageInfo& msg_info) {
+                              const std::shared_ptr<std::string>& msg_str,
+                              const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
     listener(msg, msg_info);

@@ -6,15 +6,14 @@ cc_library(
     name = "transport",
     srcs = [
         "transport.cc",
-        "dispatcher/rtps_dispatcher.cc",
     ],
     hdrs = [
         "transport.h",
-        "dispatcher/rtps_dispatcher.h",
     ],
     deps = [
         "history",
         "intra_dispatcher",
+        "rtps_dispatcher",
         "shm_dispatcher",
         "hybrid_receiver",
         "intra_receiver",
@@ -137,6 +136,20 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "rtps_dispatcher",
+    srcs = [ "dispatcher/rtps_dispatcher.cc", ],
+    hdrs = [ "dispatcher/rtps_dispatcher.h", ],
+    deps = [
+        "//cyber/proto:role_attributes_cc_proto",
+        "//cyber/message:message_traits",
+        "dispatcher",
+        "attributes_filler",
+        "sub_listener",
+        "participant",
+    ],
+)
+
 cc_test(
     name = "rtps_dispatcher_test",
     size = "small",
@@ -146,7 +159,7 @@ cc_test(
     deps = [
         "//cyber:cyber_core",
         "//cyber/proto:chatter_cc_proto",
-        "@gtest//:main",
+        "@gtest",
     ],
 )
 

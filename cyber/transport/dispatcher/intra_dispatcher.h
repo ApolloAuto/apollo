@@ -49,6 +49,9 @@ template <typename MessageT>
 void IntraDispatcher::OnMessage(uint64_t channel_id,
                                 const std::shared_ptr<MessageT>& message,
                                 const MessageInfo& message_info) {
+  if (is_shutdown_.load()) {
+    return;
+  }
   ADEBUG << "intra on message, channel:"
          << common::GlobalData::GetChannelById(channel_id);
   ListenerHandlerBasePtr* handler_base = nullptr;

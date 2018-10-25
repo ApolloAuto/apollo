@@ -30,9 +30,9 @@ using TransmitterPtr = std::shared_ptr<Transmitter<proto::UnitTest>>;
 using ReceiverPtr = std::shared_ptr<Receiver<proto::UnitTest>>;
 
 TEST(TransportTest, constructor) {
-  Transport transport_a;
-  Transport transport_b;
-  EXPECT_EQ(transport_a.participant(), transport_b.participant());
+  auto transport_a = Transport::Instance();
+  auto transport_b = Transport::Instance();
+  EXPECT_EQ(transport_a->participant(), transport_b->participant());
 }
 
 TEST(TransportTest, create_transmitter) {
@@ -45,11 +45,13 @@ TEST(TransportTest, create_transmitter) {
   attr.set_id(id.HashValue());
 
   TransmitterPtr intra =
-      Transport::CreateTransmitter<proto::UnitTest>(attr, OptionalMode::INTRA);
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(
+          attr, OptionalMode::INTRA);
   EXPECT_EQ(typeid(*intra), typeid(IntraTransmitter<proto::UnitTest>));
 
   TransmitterPtr shm =
-      Transport::CreateTransmitter<proto::UnitTest>(attr, OptionalMode::SHM);
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(
+          attr, OptionalMode::SHM);
   EXPECT_EQ(typeid(*shm), typeid(ShmTransmitter<proto::UnitTest>));
 }
 
@@ -62,11 +64,11 @@ TEST(TransportTest, create_receiver) {
   auto listener = [](const std::shared_ptr<proto::UnitTest>&,
                      const MessageInfo&, const RoleAttributes&) {};
 
-  ReceiverPtr intra = Transport::CreateReceiver<proto::UnitTest>(
+  ReceiverPtr intra = Transport::Instance()->CreateReceiver<proto::UnitTest>(
       attr, listener, OptionalMode::INTRA);
   EXPECT_EQ(typeid(*intra), typeid(IntraReceiver<proto::UnitTest>));
 
-  ReceiverPtr shm = Transport::CreateReceiver<proto::UnitTest>(
+  ReceiverPtr shm = Transport::Instance()->CreateReceiver<proto::UnitTest>(
       attr, listener, OptionalMode::SHM);
   EXPECT_EQ(typeid(*shm), typeid(ShmReceiver<proto::UnitTest>));
 }
@@ -77,7 +79,8 @@ TEST(TransportTest, create_receiver) {
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::transport::Transport::Instance();
   auto res = RUN_ALL_TESTS();
-  apollo::cyber::transport::Transport::Shutdown();
+  apollo::cyber::transport::Transport::Instance()->Shutdown();
   return res;
 }

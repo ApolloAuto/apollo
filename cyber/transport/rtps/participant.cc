@@ -48,6 +48,10 @@ void Participant::Shutdown() {
 }
 
 eprosima::fastrtps::Participant* Participant::fastrtps_participant() {
+  if (shutdown_.load()) {
+    return nullptr;
+  }
+
   std::lock_guard<std::mutex> lck(mutex_);
   if (fastrtps_participant_ != nullptr) {
     return fastrtps_participant_;

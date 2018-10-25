@@ -50,12 +50,12 @@ class HybridTransceiverTest : public ::testing::Test {
     attr.set_channel_id(common::Hash(channel_name_));
     attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
     transmitter_a_ = std::make_shared<HybridTransmitter<proto::UnitTest>>(
-        attr, Transport::participant());
+        attr, Transport::Instance()->participant());
 
     attr.set_process_id(common::GlobalData::Instance()->ProcessId() + 1);
     attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
     transmitter_b_ = std::make_shared<HybridTransmitter<proto::UnitTest>>(
-        attr, Transport::participant());
+        attr, Transport::Instance()->participant());
   }
 
   virtual void TearDown() {
@@ -72,9 +72,9 @@ TEST_F(HybridTransceiverTest, constructor) {
   RoleAttributes attr;
   TransmitterPtr transmitter =
       std::make_shared<HybridTransmitter<proto::UnitTest>>(
-          attr, Transport::participant());
+          attr, Transport::Instance()->participant());
   ReceiverPtr receiver = std::make_shared<HybridReceiver<proto::UnitTest>>(
-      attr, nullptr, Transport::participant());
+      attr, nullptr, Transport::Instance()->participant());
 
   EXPECT_EQ(transmitter->seq_num(), 0);
 
@@ -104,7 +104,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_no_param) {
         (void)attr;
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   receiver->Enable();
 
@@ -156,7 +156,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_no_relation) {
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
@@ -167,7 +167,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_no_relation) {
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   auto msg = std::make_shared<proto::UnitTest>();
   msg->set_class_name("HybridTransceiverTest");
@@ -208,7 +208,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_same_process) {
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
@@ -219,7 +219,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_same_process) {
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   std::string class_name("HybridTransceiverTest");
   std::string case_name("enable_and_disable_with_param_same_process");
@@ -279,7 +279,7 @@ TEST_F(HybridTransceiverTest,
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
@@ -290,7 +290,7 @@ TEST_F(HybridTransceiverTest,
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   std::string class_name("HybridTransceiverTest");
   std::string case_name("enable_and_disable_with_param_same_host_diff_proc");
@@ -346,7 +346,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   ReceiverPtr receiver_b = std::make_shared<HybridReceiver<proto::UnitTest>>(
       attr,
@@ -357,7 +357,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
         std::lock_guard<std::mutex> lock(mtx);
         msgs.emplace_back(*msg);
       },
-      Transport::participant());
+      Transport::Instance()->participant());
 
   std::string class_name("HybridTransceiverTest");
   std::string case_name("enable_and_disable_with_param_same_host_diff_proc");
@@ -395,7 +395,8 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::transport::Transport::Instance();
   auto res = RUN_ALL_TESTS();
-  apollo::cyber::transport::Transport::Shutdown();
+  apollo::cyber::transport::Transport::Instance()->Shutdown();
   return res;
 }

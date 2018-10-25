@@ -44,9 +44,9 @@ class RtpsTransceiverTest : public ::testing::Test {
     attr.set_channel_name(channel_name_);
     attr.set_channel_id(common::Hash(channel_name_));
     transmitter_a_ = std::make_shared<RtpsTransmitter<proto::UnitTest>>(
-        attr, Transport::participant());
+        attr, Transport::Instance()->participant());
     transmitter_b_ = std::make_shared<RtpsTransmitter<proto::UnitTest>>(
-        attr, Transport::participant());
+        attr, Transport::Instance()->participant());
 
     transmitter_a_->Enable();
     transmitter_b_->Enable();
@@ -66,7 +66,7 @@ TEST_F(RtpsTransceiverTest, constructor) {
   RoleAttributes attr;
   TransmitterPtr transmitter =
       std::make_shared<RtpsTransmitter<proto::UnitTest>>(
-          attr, Transport::participant());
+          attr, Transport::Instance()->participant());
   ReceiverPtr receiver =
       std::make_shared<RtpsReceiver<proto::UnitTest>>(attr, nullptr);
 
@@ -154,7 +154,8 @@ TEST_F(RtpsTransceiverTest, enable_and_disable) {
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::transport::Transport::Instance();
   auto res = RUN_ALL_TESTS();
-  apollo::cyber::transport::Transport::Shutdown();
+  apollo::cyber::transport::Transport::Instance()->Shutdown();
   return res;
 }
