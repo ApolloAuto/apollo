@@ -92,7 +92,7 @@ class HMIWorker {
 
   // Get current config and status.
   inline const HMIConfig& GetConfig() const { return config_; }
-  const HMIStatus GetStatus() const;
+  HMIStatus GetStatus() const;
 
   // HMIStatus is updated frequently by multiple threads, including web workers
   // and ROS message callback. Please apply proper read/write lock when
@@ -131,6 +131,8 @@ class HMIWorker {
 
   // Run command: scripts/cyber_launch.sh <command> <current_launch>
   bool CyberLaunch(const std::string& command) const;
+  void SetupMode();
+  void ResetMode();
 
   HMIConfig config_;
   HMIStatus status_;

@@ -152,6 +152,28 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
+  // TODO(xiaoxq): Unify simple actions to the same interface:
+  //     ExecuteModeCommand:start -> HMIAction:SETUP_MODE
+  //     ExecuteModeCommand:stop -> HMIAction:RESET_MODE
+  //     ChangeDrivingMode:COMPLETE_AUTO_DRIVE -> HMIAction:ENTER_AUTO_MODE
+  //     ChangeDrivingMode:COMPLETE_MANUAL -> HMIAction:DISENGAGE
+  websocket_->RegisterMessageHandler(
+      "HMIAction",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // json should contain {action: "<An HMIAction name>"}.
+        std::string action;
+        if (JsonUtil::GetStringFromJson(json, "action", &action)) {
+          HMIAction hmi_action;
+          if (HMIAction_Parse(action, &hmi_action)) {
+            hmi_worker_->Trigger(hmi_action);
+          } else {
+            AERROR << "Invalid HMIAction string: " << action;
+          }
+        } else {
+          AERROR << "Truncated HMIAction.";
+        }
+      });
+
   // HMI client asks for changing map.
   hmi_worker_->RegisterChangeMapHandler([this](const std::string &new_map) {
     // Reload simulation map after changing map.

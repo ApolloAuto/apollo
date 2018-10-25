@@ -4,9 +4,10 @@ package apollo.dreamview;
 
 enum HMIAction {
   NONE = 0;
-  SETUP = 1;
-  AUTO_MODE = 2;
-  DISENGAGE = 3;
+  SETUP_MODE = 1;
+  RESET_MODE = 2;
+  ENTER_AUTO_MODE = 3;
+  DISENGAGE = 4;
 }
 
 message Component {
