@@ -47,10 +47,10 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       const int num_of_variables, const int num_of_constraints,
       std::size_t horizon, float ts, Eigen::MatrixXd ego,
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
-      const Eigen::MatrixXd& timeWS, Eigen::MatrixXd x0, Eigen::MatrixXd xf,
-      Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
-      Eigen::MatrixXd obstacles_edges_num, std::size_t obstacles_num,
-      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+      Eigen::MatrixXd x0, Eigen::MatrixXd xf, Eigen::MatrixXd last_time_u,
+      Eigen::MatrixXd XYbounds, Eigen::MatrixXd obstacles_edges_num,
+      std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
+      const Eigen::MatrixXd& obstacles_b,
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachIPOPTInterface() = default;

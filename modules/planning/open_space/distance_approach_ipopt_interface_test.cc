@@ -57,7 +57,6 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd XYbounds_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Ones(4, 6);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
-  Eigen::MatrixXd timeWS_ = Eigen::MatrixXd::Ones(1, 5);
   Eigen::MatrixXd obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
   Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
@@ -83,8 +82,8 @@ void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
 
   ptop_.reset(new DistanceApproachIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xf_, last_time_u_, XYbounds_, obstacles_edges_num_,
-      obstacles_num_, obstacles_A_, obstacles_b_, planner_open_space_config_));
+      x0_, xf_, last_time_u_, XYbounds_, obstacles_edges_num_, obstacles_num_,
+      obstacles_A_, obstacles_b_, planner_open_space_config_));
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {

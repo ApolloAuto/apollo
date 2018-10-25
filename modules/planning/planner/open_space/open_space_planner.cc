@@ -66,6 +66,10 @@ Status OpenSpacePlanner::Init(const PlanningConfig&) {
   // initialize warm start class pointer
   warm_start_.reset(new HybridAStar(planner_open_space_config_));
 
+  // initialize distance approach class pointer
+  distance_approach_.reset(
+      new DistanceApproachProblem(planner_open_space_config_));
+
   return Status::OK();
 }
 
@@ -143,10 +147,6 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   // TODO(QiL): Step 8 : Formulate distance approach problem
   // solution from distance approach
-  distance_approach_.reset(new DistanceApproachProblem(
-      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
-      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
-      planner_open_space_config_));
 
   ADEBUG << "Distance approach configs set"
          << distance_approach_config_.ShortDebugString();
@@ -155,8 +155,10 @@ apollo::common::Status OpenSpacePlanner::Plan(
   Eigen::MatrixXd control_result_ds;
   Eigen::MatrixXd time_result_ds;
 
-  bool status = distance_approach_->Solve(&state_result_ds, &control_result_ds,
-                                          &time_result_ds);
+  bool status = distance_approach_->Solve(
+      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
+      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
+      &state_result_ds, &control_result_ds, &time_result_ds);
 
   if (status) {
     ADEBUG << "Distance approach problem solved successfully!";

@@ -40,61 +40,22 @@ namespace planning {
 class DistanceApproachProblem {
  public:
   explicit DistanceApproachProblem(
-      Eigen::MatrixXd x0, Eigen::MatrixXd xF, Eigen::MatrixXd last_time_u,
-      std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
-      Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
-      Eigen::MatrixXd obstacles_edges_num, Eigen::MatrixXd obstacles_A,
-      Eigen::MatrixXd obstacles_b,
+
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachProblem() = default;
 
-  bool Solve(Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
-             Eigen::MatrixXd* time_result);
+  bool Solve(const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xF,
+             const Eigen::MatrixXd& last_time_u, const std::size_t& horizon,
+             const float& ts, const Eigen::MatrixXd& ego,
+             const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+             const Eigen::MatrixXd& XYbounds, const std::size_t& obstacles_num,
+             const Eigen::MatrixXd& obstacles_edges_num,
+             const Eigen::MatrixXd& obstacles_A,
+             const Eigen::MatrixXd& obstacles_b, Eigen::MatrixXd* state_result,
+             Eigen::MatrixXd* control_result, Eigen::MatrixXd* time_result);
 
  private:
-  // start point
-  Eigen::MatrixXd x0_;
-
-  // end point
-  Eigen::MatrixXd xF_;
-
-  // the last control command in last planning cycle
-  Eigen::MatrixXd last_time_u_;
-
-  // time horizon
-  std::size_t horizon_;
-
-  // time interval
-  float ts_;
-
-  // ego car dimension
-  Eigen::MatrixXd ego_;
-
-  // xWs from warm start problem
-  Eigen::MatrixXd xWS_;
-
-  // uWs from warm start problem
-  Eigen::MatrixXd uWS_;
-
-  // timeWS from warm start problem
-  Eigen::MatrixXd timeWS_;
-
-  // XY bounds
-  Eigen::MatrixXd XYbounds_;
-
-  // number of obstacles
-  std::size_t obstacles_num_;
-
-  // obstacles_edges_num
-  Eigen::MatrixXd obstacles_edges_num_;
-
-  // obstacles_A
-  Eigen::MatrixXd obstacles_A_;
-
-  // obstacles_b
-  Eigen::MatrixXd obstacles_b_;
-
   PlannerOpenSpaceConfig planner_open_space_config_;
 };
 

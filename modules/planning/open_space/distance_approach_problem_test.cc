@@ -55,10 +55,8 @@ class DistanceApproachProblemTest : public ::testing::Test {
 };
 
 TEST_F(DistanceApproachProblemTest, initilization) {
-  distance_approach_.reset(new DistanceApproachProblem(
-      x0_, xf_, last_time_u_, horizon_, ts_, ego_, xWS_, uWS_, XYbounds_,
-      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
-      planner_open_space_config_));
+  distance_approach_.reset(
+      new DistanceApproachProblem(planner_open_space_config_));
   EXPECT_NE(distance_approach_, nullptr);
 }
 

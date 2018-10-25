@@ -26,60 +26,49 @@ namespace planning {
 using apollo::common::time::Clock;
 
 DistanceApproachProblem::DistanceApproachProblem(
-    Eigen::MatrixXd x0, Eigen::MatrixXd xF, Eigen::MatrixXd last_time_u,
-    std::size_t horizon, float ts, Eigen::MatrixXd ego, Eigen::MatrixXd xWS,
-    Eigen::MatrixXd uWS, Eigen::MatrixXd XYbounds, std::size_t obstacles_num,
-    Eigen::MatrixXd obstacles_edges_num, Eigen::MatrixXd obstacles_A,
-    Eigen::MatrixXd obstacles_b,
-    const PlannerOpenSpaceConfig& planner_open_space_config)
-    : x0_(x0),
-      xF_(xF),
-      last_time_u_(last_time_u),
-      horizon_(horizon),
-      ts_(ts),
-      ego_(ego),
-      xWS_(xWS),
-      uWS_(uWS),
-      XYbounds_(XYbounds),
-      obstacles_num_(obstacles_num),
-      obstacles_edges_num_(obstacles_edges_num),
-      obstacles_A_(obstacles_A),
-      obstacles_b_(obstacles_b) {
+    const PlannerOpenSpaceConfig& planner_open_space_config) {
   planner_open_space_config_.CopyFrom(planner_open_space_config);
 }
 
-bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
-                                    Eigen::MatrixXd* control_result,
-                                    Eigen::MatrixXd* time_result) {
+bool DistanceApproachProblem::Solve(
+    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xF,
+    const Eigen::MatrixXd& last_time_u, const std::size_t& horizon,
+    const float& ts, const Eigen::MatrixXd& ego, const Eigen::MatrixXd& xWS,
+    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& XYbounds,
+    const std::size_t& obstacles_num,
+    const Eigen::MatrixXd& obstacles_edges_num,
+    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
+    Eigen::MatrixXd* time_result) {
   // TODO(QiL) : set up number of variables and number of constaints, and rego
   // so constants do not get set repeatedly
 
   // n1 : states variables, 4 * (N+1)
-  int n1 = 4 * (horizon_ + 1);
+  int n1 = 4 * (horizon + 1);
 
   // n2 : control inputs variables
-  int n2 = 2 * horizon_;
+  int n2 = 2 * horizon;
 
   // n3 : sampling time variables
-  int n3 = horizon_ + 1;
+  int n3 = horizon + 1;
 
   // n4 : dual multiplier associated with obstacleShape
-  int n4 = obstacles_edges_num_.sum() * (horizon_ + 1);
+  int n4 = obstacles_edges_num.sum() * (horizon + 1);
 
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
-  int n5 = obstacles_num_ * 4 * (horizon_ + 1);
+  int n5 = obstacles_num * 4 * (horizon + 1);
 
   // m1 : dynamics constatins
-  int m1 = 4 * horizon_;
+  int m1 = 4 * horizon;
 
   // m2 : control rate constraints (only steering)
-  int m2 = horizon_;
+  int m2 = horizon;
 
   // m3 : sampling time equality constraints
-  int m3 = horizon_;
+  int m3 = horizon;
 
   // m4 : obstacle constraints
-  int m4 = 4 * obstacles_num_ * (horizon_ + 1);
+  int m4 = 4 * obstacles_num * (horizon + 1);
 
   int num_of_variables = n1 + n2 + n3 + n4 + n5;
   int num_of_constraints = m1 + m2 + m3 + m4;
@@ -88,9 +77,9 @@ bool DistanceApproachProblem::Solve(Eigen::MatrixXd* state_result,
 
   auto t_start = cyber::Time::Now().ToSecond();
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
-      num_of_variables, num_of_constraints, horizon_, ts_, ego_, xWS_, uWS_,
-      timeWS_, x0_, xF_, last_time_u_, XYbounds_, obstacles_edges_num_,
-      obstacles_num_, obstacles_A_, obstacles_b_, planner_open_space_config_);
+      num_of_variables, num_of_constraints, horizon, ts, ego, xWS, uWS, x0, xF,
+      last_time_u, XYbounds, obstacles_edges_num, obstacles_num, obstacles_A,
+      obstacles_b, planner_open_space_config_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
