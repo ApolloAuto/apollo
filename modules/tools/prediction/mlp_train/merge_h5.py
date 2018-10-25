@@ -17,12 +17,25 @@
 ###############################################################################
 
 import os
-import glob
 import argparse
 import datetime
 
 import numpy as np
 import h5py
+
+def getListOfFiles(dirName):
+    listOfFiles = os.listdir(dirName)
+    allFiles = list()
+    
+    for entry in listOfFiles:
+        fullPath = os.path.join(dirName, entry)
+        if os.path.isdir(fullPath):
+            allFiles = allFiles + getListOfFiles(fullPath)
+        else:
+            allFiles.append(fullPath)
+    
+    return allFiles
+
 
 def load_hdf5(filename):
     """
@@ -54,8 +67,8 @@ if __name__ == '__main__':
         features = None
         labels = None
 
-        h5_files = glob.glob(path + '/*.h5')
-        print "Length of files:", len(h5_files)
+        h5_files = getListOfFiles(path)
+        print "Total number of files:", len(h5_files)
         for i, h5_file in enumerate(h5_files):
             print "Process File", i, ":", h5_file
             feature = load_hdf5(h5_file)
@@ -68,12 +81,8 @@ if __name__ == '__main__':
         os._exit(-1)
 
     date = datetime.datetime.now().strftime('%Y-%m-%d')
-    sample_dir = path + '/mlp_merge'
-    if not os.path.exists(sample_dir):
-        os.makedirs(sample_dir)
-    sample_file = sample_dir + '/mlp_' + date + '.h5'
+    sample_file = path + '/merged' + date + '.h5'
     print "Save samples file to:", sample_file
     h5_file = h5py.File(sample_file, 'w')
     h5_file.create_dataset('data', data=features)
     h5_file.close()
-
