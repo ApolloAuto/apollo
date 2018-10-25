@@ -85,10 +85,10 @@ class EvaluatorManager {
   std::map<ObstacleConf::EvaluatorType, std::unique_ptr<Evaluator>> evaluators_;
 
   ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ =
-      ObstacleConf::MLP_EVALUATOR;
+      ObstacleConf::CRUISE_MLP_EVALUATOR;
 
   ObstacleConf::EvaluatorType vehicle_in_junction_evaluator_ =
-      ObstacleConf::MLP_EVALUATOR;
+      ObstacleConf::JUNCTION_MLP_EVALUATOR;
 
   ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;

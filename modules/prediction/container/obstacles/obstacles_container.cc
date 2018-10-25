@@ -137,6 +137,8 @@ void ObstaclesContainer::BuildJunctionFeature(const std::string& junction_id) {
       continue;
     }
     if (obstacle_ptr->IsInJunction(junction_id)) {
+      ADEBUG << "Build junction feature for obstacle [" << obstacle_ptr->id()
+            << "] in junction [" << junction_id << "]";
       obstacle_ptr->BuildJunctionFeature(junction_id);
     }
   }
