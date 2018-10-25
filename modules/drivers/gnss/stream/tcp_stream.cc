@@ -107,10 +107,9 @@ bool TcpStream::InitSocket() {
   }
 
   // disable Nagle
-  int ret = 0;
   int enable = 1;
-  ret = setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY,
-                   reinterpret_cast<void*>(&enable), sizeof(enable));
+  int ret = setsockopt(sockfd_, IPPROTO_TCP, TCP_NODELAY,
+                       reinterpret_cast<void*>(&enable), sizeof(enable));
   if (ret == -1) {
     ::close(sockfd_);
     AERROR << "setsockopt disable Nagle failed, errno: " << errno << ", "
@@ -154,10 +153,8 @@ bool TcpStream::Connect() {
 
   fd_set fds;
   timeval timeo = {10, 0};
-  int ret = 0;
   sockaddr_in peer_addr;
-
-  bzero(&peer_addr, sizeof(peer_addr));
+  memset(&peer_addr, 0, sizeof(peer_addr));
   peer_addr.sin_family = AF_INET;
   peer_addr.sin_port = peer_port_;
   peer_addr.sin_addr.s_addr = peer_addr_;
@@ -168,10 +165,11 @@ bool TcpStream::Connect() {
     return false;
   }
 
+  int ret;
   while ((ret = ::connect(sockfd_, reinterpret_cast<sockaddr*>(&peer_addr),
                           sizeof(peer_addr))) < 0) {
     if (errno == EINTR) {
-      AINFO << "Tcp connect return EINTR, continue.";
+      AINFO << "TCP connection return EINTR, continue.";
       continue;
     } else {
       if ((errno != EISCONN) && (errno != EINPROGRESS) && (errno != EALREADY)) {
@@ -193,9 +191,8 @@ bool TcpStream::Connect() {
         AINFO << "Tcp connect timeout.";
         return false;
       } else if (FD_ISSET(sockfd_, &fds)) {
-        int error = 0;
+        int error;
         socklen_t len = sizeof(int);
-
         if (getsockopt(sockfd_, SOL_SOCKET, SO_ERROR, &error, &len) < 0) {
           status_ = Stream::Status::ERROR;
           errno_ = errno;
@@ -244,8 +241,6 @@ bool TcpStream::Disconnect() {
 }
 
 size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
-  ssize_t ret = 0;
-
   if (status_ != Stream::Status::CONNECTED) {
     Reconnect();
     if (status_ != Stream::Status::CONNECTED) {
@@ -257,16 +252,16 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
     return 0;
   }
 
+  ssize_t ret;
   while ((ret = ::recv(sockfd_, buffer, max_length, 0)) < 0) {
     if (errno == EINTR) {
       continue;
-    } else {
-      // error
-      if (errno != EAGAIN) {
-        status_ = Stream::Status::ERROR;
-        errno_ = errno;
-        AERROR << "Read errno " << errno << ", error " << strerror(errno);
-      }
+    }
+    // error
+    if (errno != EAGAIN) {
+      status_ = Stream::Status::ERROR;
+      errno_ = errno;
+      AERROR << "Read errno " << errno << ", error " << strerror(errno);
     }
 
     return 0;
@@ -285,8 +280,6 @@ size_t TcpStream::read(uint8_t* buffer, size_t max_length) {
 }
 
 size_t TcpStream::write(const uint8_t* buffer, size_t length) {
-  size_t total_nsent = 0;
-
   if (status_ != Stream::Status::CONNECTED) {
     Reconnect();
     if (status_ != Stream::Status::CONNECTED) {
@@ -294,22 +287,22 @@ size_t TcpStream::write(const uint8_t* buffer, size_t length) {
     }
   }
 
+  size_t total_nsent = 0;
   while (length > 0) {
     ssize_t nsent = ::send(sockfd_, buffer, length, 0);
     if (nsent < 0) {
       if (errno == EINTR) {
         continue;
-      } else {
-        // error
-        if (errno == EPIPE || errno == ECONNRESET) {
-          status_ = Stream::Status::DISCONNECTED;
-          errno_ = errno;
-        } else if (errno != EAGAIN) {
-          status_ = Stream::Status::ERROR;
-          errno_ = errno;
-        }
-        return total_nsent;
       }
+      // error
+      if (errno == EPIPE || errno == ECONNRESET) {
+        status_ = Stream::Status::DISCONNECTED;
+        errno_ = errno;
+      } else if (errno != EAGAIN) {
+        status_ = Stream::Status::ERROR;
+        errno_ = errno;
+      }
+      return total_nsent;
     }
 
     total_nsent += nsent;
