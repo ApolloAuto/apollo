@@ -104,19 +104,19 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
   feature_values->clear();
   feature_values->reserve(JUNCTION_FEATURE_SIZE);
-  const Feature& feature = obstacle_ptr->latest_feature();
-  if (!feature.has_position()) {
+  Feature* feature_ptr = obstacle_ptr->mutable_latest_feature();
+  if (!feature_ptr->has_position()) {
     ADEBUG << "Obstacle [" << obstacle_ptr->id() << "] has no position.";
     return;
   }
-  double heading = feature.velocity_heading();
-  if (!feature.has_junction_feature()) {
+  double heading = feature_ptr->velocity_heading();
+  if (!feature_ptr->has_junction_feature()) {
     AERROR << "Obstacle [" << obstacle_ptr->id()
            << "] has no junction_feature.";
     return;
   }
-  std::string junction_id = feature.junction_feature().junction_id();
-  double junction_range = feature.junction_feature().junction_range();
+  std::string junction_id = feature_ptr->junction_feature().junction_id();
+  double junction_range = feature_ptr->junction_feature().junction_range();
   for (int i = 0; i < 12; ++i) {
     feature_values->push_back(0);
     feature_values->push_back(1);
@@ -124,12 +124,12 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     feature_values->push_back(1);
     feature_values->push_back(0);
   }
-  int num_junction_exit = feature.junction_feature().junction_exit_size();
+  int num_junction_exit = feature_ptr->junction_feature().junction_exit_size();
   for (int i = 0; i < num_junction_exit; ++i) {
     const JunctionExit& junction_exit =
-        feature.junction_feature().junction_exit(i);
-    double x = junction_exit.exit_position().x() - feature.position().x();
-    double y = junction_exit.exit_position().y() - feature.position().y();
+        feature_ptr->junction_feature().junction_exit(i);
+    double x = junction_exit.exit_position().x() - feature_ptr->position().x();
+    double y = junction_exit.exit_position().y() - feature_ptr->position().y();
     double diff_x = std::cos(-heading) * x - std::sin(-heading) * y;
     double diff_y = std::sin(-heading) * x + std::cos(-heading) * y;
     double angle = std::atan2(diff_y, diff_x);
@@ -142,6 +142,18 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
         std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
     feature_values->operator[](idx * 5 + 4) =
         junction_exit.exit_heading() - heading;
+  }
+  if (FLAGS_prediction_offline_mode) {
+    SaveOfflineFeatures(feature_ptr, *feature_values);
+  }
+}
+
+void JunctionMLPEvaluator::SaveOfflineFeatures(
+    Feature* feature_ptr,
+    const std::vector<double>& feature_values) {
+  for (double feature_value : feature_values) {
+    feature_ptr->mutable_junction_feature()
+               ->add_junction_mlp_feature(feature_value);
   }
 }
 
