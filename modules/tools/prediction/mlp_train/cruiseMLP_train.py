@@ -59,7 +59,6 @@ class FullyConn_NN(torch.nn.Module):
         self.classify = torch.nn.Sequential(\
                             nn.Linear(83, 55),\
                             nn.Sigmoid(),\
-<<<<<<< 35cc22d6d8aad4441589b72838da16d4a2dc0fdc
                             nn.Dropout(0.3),\
 
                             nn.Linear(55, 23),\
@@ -70,18 +69,6 @@ class FullyConn_NN(torch.nn.Module):
                             nn.Sigmoid(),\
                             nn.Dropout(0.3),\
 
-=======
-                            nn.Dropout(0.3),\
-
-                            nn.Linear(55, 23),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.2),\
-
-                            nn.Linear(23, 11),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.3),\
-
->>>>>>> Tools: Finished the cruiseMLP_train.py
                             nn.Linear(11, 5),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
@@ -107,11 +94,8 @@ class FullyConn_NN(torch.nn.Module):
         return out_c, out_r
 
 
-<<<<<<< 35cc22d6d8aad4441589b72838da16d4a2dc0fdc
-class CNN1D_Lane(torch.nn.Module):
-=======
+
 class FCNN_CNN1D(torch.nn.Module):
->>>>>>> Tools: Finished the cruiseMLP_train.py
     def __init__(self):
         super(FullyConn_NN, self).__init__()
         self.classify = torch.nn.Sequential(\
