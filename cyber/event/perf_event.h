@@ -52,7 +52,7 @@ enum class SchedPerf {
 
 enum class TransPerf { TRANS_FROM = 1, TRANS_TO = 2, WRITE_NOTIFY = 3 };
 
-class PerfEventBase {
+class EventBase {
  public:
   int event_type = 0;
   int event_id;
@@ -80,10 +80,59 @@ class PerfEventBase {
 // event_id
 // 1 swap_in
 // 2 swap_out
+class SchedSwapEvent : public EventBase {
+ public:
+  SchedPerfEvent() { event_type = static_cast<int>(EventType::SCHED_EVENT); }
+  void SetParams(const int count, ...) override;
+  std::string SerializeToString() override {
+    std::stringstream ss;
+    ss << event_type << "\t";
+    ss << event_id << "\t";
+    ss << apollo::cyber::common::GlobalData::GetTaskNameById(cr_id) << "\t";
+    ss << proc_id << "\t";
+    ss << t_end << "\t";
+    ss << croutine_state;
+    return ss.str();
+  }
+
+ private:
+  uint64_t cr_id = -1;
+  int proc_id = -1;
+  int croutine_state = -1;
+};
+
+// event_id
+// 3 try_fetch_out
+class SchedTryFetchEvent : public EventBase {
+ public:
+  SchedPerfEvent() { event_type = static_cast<int>(EventType::SCHED_EVENT); }
+  void SetParams(const int count, ...) override;
+  std::string SerializeToString() override {
+    std::stringstream ss;
+    ss << event_type << "\t";
+    ss << event_id << "\t";
+    ss << apollo::cyber::common::GlobalData::GetTaskNameById(cr_id) << "\t";
+    ss << proc_id << "\t";
+    ss << t_start << "\t";
+    ss << t_end << "\t";
+    ss << try_fetch_result << "\t";
+    ss << croutine_state;
+    return ss.str();
+  }
+
+ private:
+  uint64_t cr_id = -1;
+  int proc_id = -1;
+  uint64_t t_sleep = 0;
+  int try_fetch_result = -1;
+  int croutine_state = -1;
+};
+
+// event_id
 // 3 try_fetch_out
 // 4 notify_in
 // 5 next_routine
-class SchedPerfEvent : public PerfEventBase {
+class SchedSwapPerfEvent : public EventBase {
  public:
   SchedPerfEvent() { event_type = static_cast<int>(EventType::SCHED_EVENT); }
   void SetParams(const int count, ...) override;
@@ -112,7 +161,7 @@ class SchedPerfEvent : public PerfEventBase {
 // event_id = 1 transport
 // 1 transport time
 // 2 write_data_cache & notify listener
-class TransportPerfEvent : public PerfEventBase {
+class TransportPerfEvent : public EventBase {
  public:
   TransportPerfEvent() {
     event_type = static_cast<int>(EventType::TRANS_EVENT);
