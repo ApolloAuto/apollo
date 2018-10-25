@@ -20,11 +20,12 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_set>
 #include <unordered_map>
 #include <vector>
 
+#include "modules/common/math/box2d.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
-
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -58,7 +59,8 @@ class DecisionData {
  public:
   PathObstacle* GetObstacleById(const std::string& id);
   std::vector<PathObstacle*> GetObstacleByType(const VirtualObjectType& type);
-  std::vector<std::string> GetObstacleIdByType(const VirtualObjectType& type);
+  std::unordered_set<std::string> GetObstacleIdByType(
+      const VirtualObjectType& type);
   const std::vector<PathObstacle*>& GetStaticObstacle() const;
   const std::vector<PathObstacle*>& GetDynamicObstacle() const;
   const std::vector<PathObstacle*>& GetVirtualObstacle() const;
@@ -76,6 +78,9 @@ class DecisionData {
  private:
   bool IsValidTrajectory(const prediction::Trajectory& trajectory);
   bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
+  bool CreateVirtualObstacle(const common::math::Box2d& obstacle_box,
+                             const VirtualObjectType& type,
+                             std::string* const id);
 
  private:
   std::vector<PathObstacle*> static_obstacle_;
@@ -89,8 +94,8 @@ class DecisionData {
   std::list<std::unique_ptr<Obstacle>> obstacles_;
   std::list<std::unique_ptr<PathObstacle>> path_obstacles_;
   std::unordered_map<std::string, PathObstacle*> obstacle_map_;
-  std::unordered_map<VirtualObjectType, std::vector<std::string>, EnumClassHash>
-      virtual_obstacle_id_map_;
+  std::unordered_map<VirtualObjectType,
+    std::unordered_set<std::string>, EnumClassHash> virtual_obstacle_id_map_;
   std::mutex mutex_;
   std::mutex transaction_mutex_;
 };

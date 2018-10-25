@@ -16,6 +16,8 @@
 
 #include "modules/planning/common/decision_data.h"
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 
@@ -59,6 +61,7 @@ DecisionData::DecisionData(
       all_obstacle_.emplace_back(path_obstacles_.back().get());
       practical_obstacle_.emplace_back(path_obstacles_.back().get());
       static_obstacle_.emplace_back(path_obstacles_.back().get());
+      obstacle_map_[perception_id] = path_obstacles_.back().get();
       continue;
     }
     int trajectory_index = 0;
@@ -75,6 +78,7 @@ DecisionData::DecisionData(
       all_obstacle_.emplace_back(path_obstacles_.back().get());
       practical_obstacle_.emplace_back(path_obstacles_.back().get());
       dynamic_obstacle_.emplace_back(path_obstacles_.back().get());
+      obstacle_map_[obstacle_id] = path_obstacles_.back().get();
       ++trajectory_index;
     }
   }
@@ -91,29 +95,30 @@ PathObstacle* DecisionData::GetObstacleById(const std::string& id) {
 
 std::vector<PathObstacle*> DecisionData::GetObstacleByType(
     const VirtualObjectType& type) {
-  std::vector<PathObstacle*> obstacles;
   std::lock_guard<std::mutex> lock(transaction_mutex_);
 
-  std::vector<std::string> ids = GetObstacleIdByType(type);
-  if (!ids.empty()) {
-    return obstacles;
+  std::unordered_set<std::string> ids = GetObstacleIdByType(type);
+  if (ids.empty()) {
+    return std::vector<PathObstacle*>();
   }
+  std::vector<PathObstacle*> ret;
   for (const std::string& id : ids) {
-    obstacles.emplace_back();
-    obstacles.back() = GetObstacleById(id);
-    CHECK_NOTNULL(obstacles.back());
+    ret.emplace_back(GetObstacleById(id));
+    if (ret.back() == nullptr) {
+      AERROR << "can't find obstacle by id: " << id;
+      AERROR << "ignore...";
+      ret.pop_back();
+    }
   }
-  return obstacles;
+  return ret;
 }
 
-std::vector<std::string> DecisionData::GetObstacleIdByType(
+std::unordered_set<std::string> DecisionData::GetObstacleIdByType(
     const VirtualObjectType& type) {
-  std::vector<std::string> ids;
   std::lock_guard<std::mutex> lock(mutex_);
-
   const auto it = virtual_obstacle_id_map_.find(type);
   if (it == virtual_obstacle_id_map_.end()) {
-    return ids;
+    return std::unordered_set<std::string>();
   }
   return it->second;
 }
@@ -141,16 +146,82 @@ const std::vector<PathObstacle*>& DecisionData::GetAllObstacle() const {
 bool DecisionData::CreateVirtualObstacle(const ReferencePoint& point,
                                          const VirtualObjectType& type,
                                          std::string* const id) {
-  std::lock_guard<std::mutex> transaction_lock(transaction_mutex_);
-  std::lock_guard<std::mutex> lock(mutex_);
-  return false;
+  // should build different box by type;
+  common::SLPoint sl_point;
+  if (!reference_line_.XYToSL(point, &sl_point)) {
+    return false;
+  }
+  double obstacle_s = sl_point.s();
+  const double box_center_s = obstacle_s + FLAGS_virtual_stop_wall_length / 2.0;
+  auto box_center = reference_line_.GetReferencePoint(box_center_s);
+  double heading = reference_line_.GetReferencePoint(obstacle_s).heading();
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  reference_line_.GetLaneWidth(obstacle_s, &lane_left_width, &lane_right_width);
+  common::math::Box2d box(box_center,
+                          heading,
+                          FLAGS_virtual_stop_wall_length,
+                          lane_left_width + lane_right_width);
+  return CreateVirtualObstacle(box, type, id);
 }
+
 bool DecisionData::CreateVirtualObstacle(const double point_s,
                                          const VirtualObjectType& type,
                                          std::string* const id) {
+  // should build different box by type;
+  const double box_center_s = point_s + FLAGS_virtual_stop_wall_length / 2.0;
+  auto box_center = reference_line_.GetReferencePoint(box_center_s);
+  double heading = reference_line_.GetReferencePoint(point_s).heading();
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  reference_line_.GetLaneWidth(point_s, &lane_left_width, &lane_right_width);
+  common::math::Box2d box(box_center,
+                          heading,
+                          FLAGS_virtual_stop_wall_length,
+                          lane_left_width + lane_right_width);
+  return CreateVirtualObstacle(box, type, id);
+}
+
+bool DecisionData::CreateVirtualObstacle(
+                                    const common::math::Box2d& obstacle_box,
+                                    const VirtualObjectType& type,
+                                    std::string* const id) {
   std::lock_guard<std::mutex> transaction_lock(transaction_mutex_);
   std::lock_guard<std::mutex> lock(mutex_);
-  return false;
+
+  perception::PerceptionObstacle perception_obstacle;
+  // TODO(lianglia-apollo) please chagne is_virtual in obstacle
+  perception_obstacle.set_id(virtual_obstacle_.size() + 1);
+  perception_obstacle.mutable_position()->set_x(obstacle_box.center().x());
+  perception_obstacle.mutable_position()->set_y(obstacle_box.center().y());
+  perception_obstacle.set_theta(obstacle_box.heading());
+  perception_obstacle.mutable_velocity()->set_x(0);
+  perception_obstacle.mutable_velocity()->set_y(0);
+  perception_obstacle.set_length(obstacle_box.length());
+  perception_obstacle.set_width(obstacle_box.width());
+  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
+  perception_obstacle.set_type(
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_tracking_time(1.0);
+
+  std::vector<common::math::Vec2d> corner_points;
+  obstacle_box.GetAllCorners(&corner_points);
+  for (const auto& corner_point : corner_points) {
+    auto* point = perception_obstacle.add_polygon_point();
+    point->set_x(corner_point.x());
+    point->set_y(corner_point.y());
+  }
+  *id = std::to_string(perception_obstacle.id());
+  obstacles_.emplace_back(new Obstacle(*id, perception_obstacle));
+  path_obstacles_.emplace_back(new PathObstacle(obstacles_.back().get()));
+  all_obstacle_.emplace_back(path_obstacles_.back().get());
+  virtual_obstacle_.emplace_back(path_obstacles_.back().get());
+  // would be changed if some virtual type is not static one
+  static_obstacle_.emplace_back(path_obstacles_.back().get());
+
+  virtual_obstacle_id_map_[type].insert(*id);
+  obstacle_map_[*id] = path_obstacles_.back().get();
+  return true;
 }
 
 }  // namespace planning
