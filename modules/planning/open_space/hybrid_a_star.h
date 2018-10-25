@@ -66,7 +66,7 @@ struct Result {
 
 class HybridAStar {
  public:
-  HybridAStar(const PlannerOpenSpaceConfig& open_space_conf);
+  explicit HybridAStar(const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
             double ephi, ThreadSafeIndexedObstacles* obstacles, Result* result);

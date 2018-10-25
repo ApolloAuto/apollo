@@ -297,15 +297,15 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   double y_min = planner_open_space_config_.warm_start_config().min_y();
   XYbounds_ << x_min, x_max, y_min, y_max;
 
-  DistanceApproachProblem* distance_approach_ptr = new DistanceApproachProblem(
+  DistanceApproachProblem* distance_approach_ptr =
+      new DistanceApproachProblem(planner_open_space_config_);
+
+  bool status = distance_approach_ptr->Solve(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
       obstacles_ptr->GetObstaclesNum(), obstacles_ptr->GetObstaclesEdgesNum(),
       obstacles_ptr->GetAMatrix(), obstacles_ptr->GetbMatrix(),
-      planner_open_space_config_);
-
-  bool status = distance_approach_ptr->Solve(result_ptr->PrepareStateResult(),
-                                             result_ptr->PrepareControlResult(),
-                                             result_ptr->PrepareTimeResult());
+      result_ptr->PrepareStateResult(), result_ptr->PrepareControlResult(),
+      result_ptr->PrepareTimeResult());
   if (!status) {
     AINFO << "Distance fail";
     return false;
