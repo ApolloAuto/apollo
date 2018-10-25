@@ -379,7 +379,8 @@ Status Frame::Init(
     AddObstacle(*ptr);
   }
   if (FLAGS_enable_collision_detection) {
-    const auto *collision_obstacle = FindCollisionObstacle();
+    const auto *collision_obstacle =
+        FindCollisionObstacleWithInExtraRadius(FLAGS_max_collision_distance);
     if (collision_obstacle) {
       std::string err_str =
           "Found collision with obstacle: " + collision_obstacle->Id();
@@ -397,7 +398,10 @@ Status Frame::Init(
   return Status::OK();
 }
 
-const PathObstacle *Frame::FindCollisionObstacle() const {
+const Obstacle *Frame::FindCollisionObstacleWithInExtraRadius(
+    const double radius) const {
+  CHECK_GT(radius, kMathEpsilon)
+      << "Extra safety radius must be positive number!";
   if (obstacles_.Items().empty()) {
     return nullptr;
   }
@@ -419,7 +423,7 @@ const PathObstacle *Frame::FindCollisionObstacle() const {
     double center_dist =
         adc_box.center().DistanceTo(obstacle->PerceptionBoundingBox().center());
     if (center_dist > obstacle->PerceptionBoundingBox().diagonal() / 2.0 +
-                          adc_half_diagnal + FLAGS_max_collision_distance) {
+                          adc_half_diagnal + radius) {
       ADEBUG << "Obstacle : " << obstacle->Id() << " is too far to collide";
       continue;
     }
@@ -438,8 +442,9 @@ const PathObstacle *Frame::FindCollisionObstacle() const {
         continue;
       }
     }
-    if (distance < FLAGS_max_collision_distance) {
-      AERROR << "Found collision with obstacle " << obstacle->Id();
+    if (distance < radius) {
+      AERROR << "Found collision with obstacle " << obstacle->Id()
+             << "Within extra safety radius of : " << radius;
       return obstacle;
     }
   }

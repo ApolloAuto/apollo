@@ -196,7 +196,8 @@ class Frame {
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
-  const PathObstacle *FindCollisionObstacle() const;
+  const Obstacle *FindCollisionObstacleWithInExtraRadius(
+      const double radius) const;
 
   /**
    * @brief create a static virtual obstacle
