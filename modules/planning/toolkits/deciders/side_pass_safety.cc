@@ -71,8 +71,7 @@ bool SidePassSafety::IsSafeSidePass(
 
   for (const auto *path_obstacle : path_obstacles) {
     // ignore virtual and static obstacles
-    if (path_obstacle->obstacle()->IsVirtual() ||
-        path_obstacle->obstacle()->IsStatic()) {
+    if (path_obstacle->IsVirtual() || path_obstacle->IsStatic()) {
       continue;
     }
     // ignore the obstacles behind adc and is able to catch adc after 5 secs.
@@ -87,10 +86,13 @@ bool SidePassSafety::IsSafeSidePass(
     }
     // if near side obstacles exist, it is unsafe.
     if (std::abs(path_obstacle->PerceptionSLBoundary().start_l()) <=
-        Config().side_pass_safety_config().min_obstacle_lateral_distance() &&
+            Config()
+                .side_pass_safety_config()
+                .min_obstacle_lateral_distance() &&
         std::abs(path_obstacle->PerceptionSLBoundary().end_l()) <=
-            Config().side_pass_safety_config().min_obstacle_lateral_distance()
-        ) {
+            Config()
+                .side_pass_safety_config()
+                .min_obstacle_lateral_distance()) {
       return false;
     }
     // overlap is more than 5 meters

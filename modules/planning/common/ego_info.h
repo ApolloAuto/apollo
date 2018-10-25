@@ -32,7 +32,7 @@
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 
-#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -45,7 +45,7 @@ class EgoInfo {
 
   bool Update(const common::TrajectoryPoint& start_point,
               const common::VehicleState& vehicle_state,
-              const std::vector<const Obstacle*>& obstacles);
+              const std::vector<const PathObstacle*>& obstacles);
   void Clear();
 
   common::TrajectoryPoint start_point() const { return start_point_; }
@@ -66,7 +66,7 @@ class EgoInfo {
   }
 
   void CalculateFrontObstacleClearDistance(
-      const std::vector<const Obstacle*>& obstacles);
+      const std::vector<const PathObstacle*>& obstacles);
 
   // stitched point (at stitching mode)
   // or real vehicle point (at non-stitching mode)

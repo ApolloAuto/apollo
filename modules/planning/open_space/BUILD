@@ -6,11 +6,13 @@ cc_library(
     name = "node3d",
     srcs = ["node3d.cc"],
     hdrs = ["node3d.h"],
-    deps = ["//cyber/common:log",
-            "//modules/common/math",
-            "//modules/planning/common:obstacle",
-            "//modules/planning/constraint_checker:collision_checker",
-            "//modules/planning/proto:planner_open_space_config_proto",],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/math",
+        "//modules/planning/common:path_obstacle",
+        "//modules/planning/constraint_checker:collision_checker",
+        "//modules/planning/proto:planner_open_space_config_proto",
+    ],
 )
 
 cc_library(
@@ -19,16 +21,19 @@ cc_library(
     hdrs = ["reeds_shepp_path.h"],
     deps = [
         "//cyber/common:log",
-        "//modules/common/math",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/planning/open_space:node3d",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/open_space:node3d"],
+    ],
 )
 
 cc_library(
     name = "open_space_utils",
-    deps = ["//modules/planning/open_space:reeds_shepp_path",
-            "//modules/planning/open_space:node3d",]
+    deps = [
+        "//modules/planning/open_space:node3d",
+        "//modules/planning/open_space:reeds_shepp_path",
+    ],
 )
 
 cc_test(
@@ -37,11 +42,12 @@ cc_test(
     srcs = ["reeds_shepp_path_test.cc"],
     deps = [
         "//cyber/common:log",
-        "//modules/planning/open_space:open_space_utils",
-        "//modules/common/math",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/planning/open_space:open_space_utils",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "@gtest//:main",],
+        "@gtest//:main",
+    ],
 )
 
 cc_test(
@@ -77,14 +83,14 @@ cc_library(
         "dual_variable_warm_start_ipopt_interface.h",
     ],
     deps = [
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "@eigen//:eigen",
-        "@ipopt//:ipopt",
+        "//modules/planning/proto:planning_proto",
+        "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -97,11 +103,11 @@ cc_library(
         "distance_approach_problem.h",
     ],
     deps = [
+        "distance_approach_ipopt_interface",
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "distance_approach_ipopt_interface",
     ],
 )
 
@@ -115,14 +121,14 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/common/configs:vehicle_config_helper",
-        "@eigen//:eigen",
-        "@ipopt//:ipopt",
+        "//modules/planning/proto:planning_proto",
+        "@eigen",
+        "@ipopt",
     ],
 )
 
@@ -133,9 +139,9 @@ cc_test(
         "distance_approach_ipopt_interface_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
+        "@gtest//:main",
     ],
 )
 
@@ -146,9 +152,9 @@ cc_test(
         "distance_approach_problem_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":distance_approach_problem",
         "//cyber/common:log",
+        "@gtest//:main",
     ],
 )
 
@@ -159,8 +165,8 @@ cc_test(
         "dual_variable_warm_start_ipopt_interface_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":dual_variable_warm_start_ipopt_interface",
+        "@gtest//:main",
     ],
 )
 
@@ -171,8 +177,8 @@ cc_test(
         "dual_variable_warm_start_problem_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":dual_variable_warm_start_problem",
+        "@gtest//:main",
     ],
 )
 
@@ -186,10 +192,10 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "//modules/planning/common:obstacle",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/common:path_obstacle",
         "//modules/planning/open_space:open_space_utils",
+        "//modules/planning/proto:planner_open_space_config_proto",
     ],
 )
 
@@ -200,18 +206,18 @@ cc_test(
         "hybrid_a_star_test.cc",
     ],
     deps = [
-    "//modules/planning/open_space:hybrid_a_star",
-    "@gtest//:main",
+        "//modules/planning/open_space:hybrid_a_star",
+        "@gtest//:main",
     ],
 )
 
 cc_binary(
     name = "hybrid_a_star_wrapper_lib.so",
-    linkshared = True,
-    linkstatic = False,
     srcs = [
         "hybrid_a_star_wrapper.cc",
     ],
+    linkshared = True,
+    linkstatic = False,
     deps = [
         "//modules/planning/open_space:hybrid_a_star",
     ],
@@ -219,14 +225,14 @@ cc_binary(
 
 cc_binary(
     name = "distance_approach_problem_wrapper_lib.so",
-    linkshared = True,
-    linkstatic = False,
     srcs = [
         "distance_approach_problem_wrapper.cc",
     ],
+    linkshared = True,
+    linkstatic = False,
     deps = [
-        "//modules/planning/open_space:hybrid_a_star",
         "//modules/planning/open_space:distance_approach_problem",
+        "//modules/planning/open_space:hybrid_a_star",
     ],
 )
 

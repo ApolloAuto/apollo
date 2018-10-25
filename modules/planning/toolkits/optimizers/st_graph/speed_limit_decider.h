@@ -27,7 +27,6 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed_limit.h"

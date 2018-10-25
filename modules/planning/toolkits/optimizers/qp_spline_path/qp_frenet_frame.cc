@@ -139,7 +139,6 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
 
 bool QpFrenetFrame::MapDynamicObstacleWithDecision(
     const PathObstacle& path_obstacle) {
-  const Obstacle* ptr_obstacle = path_obstacle.obstacle();
   if (!path_obstacle.HasLateralDecision()) {
     ADEBUG << "object has no lateral decision";
     return false;
@@ -153,9 +152,9 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
   for (const SpeedPoint& veh_point : discretized_vehicle_location_) {
     double time = veh_point.t();
     common::TrajectoryPoint trajectory_point =
-        ptr_obstacle->GetPointAtTime(time);
+        path_obstacle.GetPointAtTime(time);
     common::math::Box2d obs_box =
-        ptr_obstacle->GetBoundingBox(trajectory_point);
+        path_obstacle.GetBoundingBox(trajectory_point);
     // project obs_box on reference line
     std::vector<common::math::Vec2d> corners;
     obs_box.GetAllCorners(&corners);
@@ -212,7 +211,6 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
 
 bool QpFrenetFrame::MapStaticObstacleWithDecision(
     const PathObstacle& path_obstacle) {
-  const auto ptr_obstacle = path_obstacle.obstacle();
   if (!path_obstacle.HasLateralDecision()) {
     ADEBUG << "obstacle has no lateral decision";
     return false;
@@ -223,7 +221,7 @@ bool QpFrenetFrame::MapStaticObstacleWithDecision(
     return true;
   }
   if (!MapNudgePolygon(
-          common::math::Polygon2d(ptr_obstacle->PerceptionBoundingBox()),
+          common::math::Polygon2d(path_obstacle.PerceptionBoundingBox()),
           decision.nudge(), &static_obstacle_bound_)) {
     AERROR << "fail to map polygon with id " << path_obstacle.Id()
            << " in qp frenet frame";
@@ -416,7 +414,7 @@ bool QpFrenetFrame::CalculateObstacleBound(
     if (!ptr_path_obstacle->HasLateralDecision()) {
       continue;
     }
-    if (ptr_path_obstacle->obstacle()->IsStatic()) {
+    if (ptr_path_obstacle->IsStatic()) {
       if (!MapStaticObstacleWithDecision(*ptr_path_obstacle)) {
         AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
                << "] failed in qp frenet frame.";

@@ -286,8 +286,7 @@ bool StopSign::CheckCreepDone(ReferenceLineInfo* const reference_line_info) {
     bool all_far_away = true;
     for (auto* path_obstacle :
          reference_line_info->path_decision()->path_obstacles().Items()) {
-      if (path_obstacle->obstacle()->IsVirtual() ||
-          !path_obstacle->obstacle()->IsStatic()) {
+      if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
         continue;
       }
       if (path_obstacle->reference_line_st_boundary().min_t() <
@@ -477,8 +476,7 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
                               StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle =
-      path_obstacle.obstacle()->Perception();
+  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
@@ -575,8 +573,7 @@ int StopSign::RemoveWatchVehicle(
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle =
-      path_obstacle.obstacle()->Perception();
+  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
@@ -697,12 +694,11 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
   const auto& path_obstacles =
       reference_line_info->path_decision()->path_obstacles().Items();
   std::unordered_set<std::string> obstacle_ids;
-  std::transform(
-      path_obstacles.begin(), path_obstacles.end(),
-      std::inserter(obstacle_ids, obstacle_ids.end()),
-      [](const PathObstacle* path_obstacle) {
-        return std::to_string(path_obstacle->obstacle()->Perception().id());
-      });
+  std::transform(path_obstacles.begin(), path_obstacles.end(),
+                 std::inserter(obstacle_ids, obstacle_ids.end()),
+                 [](const PathObstacle* path_obstacle) {
+                   return std::to_string(path_obstacle->Perception().id());
+                 });
 
   for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
        it != watch_vehicles->end();

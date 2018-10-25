@@ -46,8 +46,7 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
   double max_s = 0.0;
   const double min_overtake_time = config_.change_lane().min_overtake_time();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const auto* obstacle = path_obstacle->obstacle();
-    if (!obstacle->HasTrajectory()) {
+    if (!path_obstacle->HasTrajectory()) {
       continue;
     }
     if (path_obstacle->PerceptionSLBoundary().start_s() >
@@ -57,11 +56,11 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
     if (path_obstacle->PerceptionSLBoundary().end_s() <
         adc_sl_boundary.start_s() -
             std::max(config_.change_lane().min_overtake_distance(),
-                     obstacle->Speed() * min_overtake_time)) {
+                     path_obstacle->speed() * min_overtake_time)) {
       overtake_obstacles_.push_back(path_obstacle);
     }
     const auto& last_point =
-        *(obstacle->Trajectory().trajectory_point().rbegin());
+        *(path_obstacle->Trajectory().trajectory_point().rbegin());
     if (last_point.v() < config_.change_lane().min_guard_speed()) {
       continue;
     }
@@ -88,7 +87,7 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
 }
 
 bool ChangeLane::CreateGuardObstacle(
-    const ReferenceLineInfo* reference_line_info, Obstacle* obstacle) {
+    const ReferenceLineInfo* reference_line_info, PathObstacle* obstacle) {
   if (!obstacle || !obstacle->HasTrajectory()) {
     return false;
   }
@@ -173,7 +172,7 @@ ObjectDecisionType ChangeLane::CreateOvertakeDecision(
     const PathObstacle* path_obstacle) const {
   ObjectDecisionType overtake;
   overtake.mutable_overtake();
-  const double speed = path_obstacle->obstacle()->Speed();
+  const double speed = path_obstacle->speed();
   double distance = std::max(speed * config_.change_lane().min_overtake_time(),
                              config_.change_lane().min_overtake_distance());
   overtake.mutable_overtake()->set_distance_s(distance);

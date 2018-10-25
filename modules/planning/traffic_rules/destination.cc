@@ -138,7 +138,7 @@ int Destination::Stop(Frame* const frame,
   }
 
   // build stop decision
-  const auto stop_wall_box = stop_wall->obstacle()->PerceptionBoundingBox();
+  const auto stop_wall_box = stop_wall->PerceptionBoundingBox();
   if (!reference_line.IsOnLane(stop_wall_box.center())) {
     ADEBUG << "destination point is not on lane";
     return 0;

@@ -46,7 +46,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
-#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 

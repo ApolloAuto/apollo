@@ -37,9 +37,8 @@ Node3d::Node3d(double x, double y, double phi,
   phi_grid_ = static_cast<std::size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = phi_grid_ *
-               (open_space_conf.warm_start_config().max_x() -
-                open_space_conf.warm_start_config().min_x()) *
+  index_ = phi_grid_ * (open_space_conf.warm_start_config().max_x() -
+                        open_space_conf.warm_start_config().min_x()) *
                (open_space_conf.warm_start_config().max_y() -
                 open_space_conf.warm_start_config().min_y()) +
            y_grid_ * (open_space_conf.warm_start_config().max_x() -
@@ -69,9 +68,8 @@ Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
   phi_grid_ = static_cast<std::size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = phi_grid_ *
-               (open_space_conf.warm_start_config().max_x() -
-                open_space_conf.warm_start_config().min_x()) *
+  index_ = phi_grid_ * (open_space_conf.warm_start_config().max_x() -
+                        open_space_conf.warm_start_config().min_x()) *
                (open_space_conf.warm_start_config().max_y() -
                 open_space_conf.warm_start_config().min_y()) +
            y_grid_ * (open_space_conf.warm_start_config().max_x() -

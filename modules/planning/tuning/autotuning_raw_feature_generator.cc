@@ -150,7 +150,7 @@ void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
   const auto& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   for (auto* obstacle : path_decision.path_obstacles().Items()) {
     auto id = obstacle->Id();
-    const double speed = obstacle->obstacle()->Speed();
+    const double speed = obstacle->speed();
     if (!obstacle->st_boundary().IsEmpty()) {
       // fill discretized boundary info
       ConvertToDiscretizedBoundaries(obstacle->st_boundary(), speed);

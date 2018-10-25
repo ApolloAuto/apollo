@@ -139,7 +139,7 @@ float DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     }
     if (s < s_lower) {
       constexpr float kSafeTimeBuffer = 3.0;
-      const float len = obstacle->obstacle()->Speed() * kSafeTimeBuffer;
+      const float len = obstacle->speed() * kSafeTimeBuffer;
       if (s + len < s_lower) {
         continue;
       } else {

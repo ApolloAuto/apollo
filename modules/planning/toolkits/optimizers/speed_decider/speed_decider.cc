@@ -138,7 +138,7 @@ bool SpeedDecider::IsFollowTooClose(const PathObstacle& path_obstacle) const {
   if (path_obstacle.st_boundary().min_t() > 0.0) {
     return false;
   }
-  const double obs_speed = path_obstacle.obstacle()->Speed();
+  const double obs_speed = path_obstacle.speed();
   const double ego_speed = init_point_.v();
   if (obs_speed > ego_speed) {
     return false;
@@ -288,11 +288,9 @@ bool SpeedDecider::CreateStopDecision(const PathObstacle& path_obstacle,
     stop->set_reason_code(StopReasonCode::STOP_REASON_CLEAR_ZONE);
   }
 
-  PerceptionObstacle::Type obstacle_type =
-      path_obstacle.obstacle()->Perception().type();
-  ADEBUG << "STOP: obstacle_id[" << path_obstacle.obstacle()->Id()
-         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-         << "]";
+  PerceptionObstacle::Type obstacle_type = path_obstacle.Perception().type();
+  ADEBUG << "STOP: obstacle_id[" << path_obstacle.Id() << "] obstacle_type["
+         << PerceptionObstacle_Type_Name(obstacle_type) << "]";
 
   return true;
 }
@@ -327,11 +325,9 @@ bool SpeedDecider::CreateFollowDecision(
   fence_point->set_z(0.0);
   follow->set_fence_heading(ref_point.heading());
 
-  PerceptionObstacle::Type obstacle_type =
-      path_obstacle.obstacle()->Perception().type();
-  ADEBUG << "FOLLOW: obstacle_id[" << path_obstacle.obstacle()->Id()
-         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-         << "]";
+  PerceptionObstacle::Type obstacle_type = path_obstacle.Perception().type();
+  ADEBUG << "FOLLOW: obstacle_id[" << path_obstacle.Id() << "] obstacle_type["
+         << PerceptionObstacle_Type_Name(obstacle_type) << "]";
 
   return true;
 }
@@ -341,8 +337,7 @@ bool SpeedDecider::CreateYieldDecision(
     ObjectDecisionType* const yield_decision) const {
   DCHECK_NOTNULL(yield_decision);
 
-  PerceptionObstacle::Type obstacle_type =
-      path_obstacle.obstacle()->Perception().type();
+  PerceptionObstacle::Type obstacle_type = path_obstacle.Perception().type();
   double yield_distance = FLAGS_yield_distance;
   switch (obstacle_type) {
     case PerceptionObstacle::PEDESTRIAN:
@@ -377,9 +372,8 @@ bool SpeedDecider::CreateYieldDecision(
   yield->mutable_fence_point()->set_z(0.0);
   yield->set_fence_heading(ref_point.heading());
 
-  ADEBUG << "YIELD: obstacle_id[" << path_obstacle.obstacle()->Id()
-         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-         << "]";
+  ADEBUG << "YIELD: obstacle_id[" << path_obstacle.Id() << "] obstacle_type["
+         << PerceptionObstacle_Type_Name(obstacle_type) << "]";
 
   return true;
 }
@@ -392,7 +386,7 @@ bool SpeedDecider::CreateOvertakeDecision(
   constexpr double kOvertakeTimeBuffer = 3.0;    // in seconds
   constexpr double kMinOvertakeDistance = 10.0;  // in meters
 
-  const auto& velocity = path_obstacle.obstacle()->Perception().velocity();
+  const auto& velocity = path_obstacle.Perception().velocity();
   const double obstacle_speed =
       common::math::Vec2d::CreateUnitVec2d(init_point_.path_point().theta())
           .InnerProd(Vec2d(velocity.x(), velocity.y()));
@@ -421,11 +415,9 @@ bool SpeedDecider::CreateOvertakeDecision(
   overtake->mutable_fence_point()->set_z(0.0);
   overtake->set_fence_heading(ref_point.heading());
 
-  PerceptionObstacle::Type obstacle_type =
-      path_obstacle.obstacle()->Perception().type();
-  ADEBUG << "OVERTAKE: obstacle_id[" << path_obstacle.obstacle()->Id()
-         << "] obstacle_type[" << PerceptionObstacle_Type_Name(obstacle_type)
-         << "]";
+  PerceptionObstacle::Type obstacle_type = path_obstacle.Perception().type();
+  ADEBUG << "OVERTAKE: obstacle_id[" << path_obstacle.Id() << "] obstacle_type["
+         << PerceptionObstacle_Type_Name(obstacle_type) << "]";
 
   return true;
 }

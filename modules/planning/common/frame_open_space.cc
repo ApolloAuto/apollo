@@ -92,7 +92,7 @@ Status FrameOpenSpace::Init() {
     local_view_.prediction_obstacles->CopyFrom(prediction);
   }
   for (auto &ptr :
-       Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
+       PathObstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
     AddObstacle(*ptr);
   }
   // check collision
@@ -120,7 +120,7 @@ bool FrameOpenSpace::LoadDataOpenSpace() {
   }
 }
 
-const Obstacle *FrameOpenSpace::FindCollisionObstacle() const {
+const PathObstacle *FrameOpenSpace::FindCollisionObstacle() const {
   if (obstacles_.Items().empty()) {
     return nullptr;
   }
@@ -226,15 +226,15 @@ void FrameOpenSpace::AlignPredictionTime(
   }
 }
 
-Obstacle *FrameOpenSpace::Find(const std::string &id) {
+PathObstacle *FrameOpenSpace::Find(const std::string &id) {
   return obstacles_.Find(id);
 }
 
-void FrameOpenSpace::AddObstacle(const Obstacle &obstacle) {
+void FrameOpenSpace::AddObstacle(const PathObstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
 }
 
-const std::vector<const Obstacle *> FrameOpenSpace::obstacles() const {
+const std::vector<const PathObstacle *> FrameOpenSpace::obstacles() const {
   return obstacles_.Items();
 }
 

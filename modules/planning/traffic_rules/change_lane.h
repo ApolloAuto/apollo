@@ -37,7 +37,7 @@ class ChangeLane : public TrafficRule {
   virtual ~ChangeLane() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   /**
@@ -52,7 +52,7 @@ class ChangeLane : public TrafficRule {
    *even when it is not on the target lane yet.
    **/
   bool CreateGuardObstacle(const ReferenceLineInfo* reference_line_info,
-                           Obstacle* obstacle);
+                           PathObstacle* obstacle);
 
   /**
    * @brief create overtake decision for the give path obstacle

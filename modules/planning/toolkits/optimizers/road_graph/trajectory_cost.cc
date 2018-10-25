@@ -76,26 +76,27 @@ TrajectoryCost::TrajectoryCost(
       continue;
     }
 
-    const auto *ptr_obstacle = ptr_path_obstacle->obstacle();
     bool is_bycycle_or_pedestrian =
-        (ptr_obstacle->Perception().type() ==
+        (ptr_path_obstacle->Perception().type() ==
              perception::PerceptionObstacle::BICYCLE ||
-         ptr_obstacle->Perception().type() ==
+         ptr_path_obstacle->Perception().type() ==
              perception::PerceptionObstacle::PEDESTRIAN);
 
-    if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
+    if (PathObstacle::IsVirtualObstacle(ptr_path_obstacle->Perception())) {
       // Virtual obstacle
       continue;
-    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) ||
+    } else if (PathObstacle::IsStaticObstacle(
+                   ptr_path_obstacle->Perception()) ||
                is_bycycle_or_pedestrian) {
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;
       for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
         TrajectoryPoint trajectory_point =
-            ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
+            ptr_path_obstacle->GetPointAtTime(t * config.eval_time_interval());
 
-        Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
+        Box2d obstacle_box =
+            ptr_path_obstacle->GetBoundingBox(trajectory_point);
         constexpr float kBuff = 0.5;
         Box2d expanded_obstacle_box =
             Box2d(obstacle_box.center(), obstacle_box.heading(),

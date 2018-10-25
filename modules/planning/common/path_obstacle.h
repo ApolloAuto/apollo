@@ -21,6 +21,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -34,7 +35,6 @@
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/indexed_list.h"
-#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -61,11 +61,71 @@ namespace planning {
 class PathObstacle {
  public:
   PathObstacle() = default;
-  explicit PathObstacle(const Obstacle* obstacle);
+  explicit PathObstacle(
+      const std::string& id,
+      const perception::PerceptionObstacle& perception_obstacle);
+  explicit PathObstacle(
+      const std::string& id,
+      const perception::PerceptionObstacle& perception_obstacle,
+      const prediction::Trajectory& trajectory);
 
-  const std::string& Id() const;
+  const std::string& Id() const { return id_; }
+  void SetId(const std::string& id) { id_ = id; }
 
-  const Obstacle* obstacle() const;
+  double speed() const { return speed_; }
+
+  int32_t PerceptionId() const { return perception_id_; }
+
+  bool IsStatic() const { return is_static_; }
+  bool IsVirtual() const { return is_virtual_; }
+
+  common::TrajectoryPoint GetPointAtTime(const double time) const;
+
+  common::math::Box2d GetBoundingBox(
+      const common::TrajectoryPoint& point) const;
+
+  const common::math::Box2d& PerceptionBoundingBox() const {
+    return perception_bounding_box_;
+  }
+  const common::math::Polygon2d& PerceptionPolygon() const {
+    return perception_polygon_;
+  }
+  const prediction::Trajectory& Trajectory() const { return trajectory_; }
+  common::TrajectoryPoint* AddTrajectoryPoint() {
+    return trajectory_.add_trajectory_point();
+  }
+  bool HasTrajectory() const {
+    return !(trajectory_.trajectory_point().empty());
+  }
+
+  const perception::PerceptionObstacle& Perception() const {
+    return perception_obstacle_;
+  }
+
+  /**
+   * @brief This is a helper function that can create obstacles from prediction
+   * data.  The original prediction may have multiple trajectories for each
+   * obstacle. But this function will create one obstacle for each trajectory.
+   * @param predictions The prediction results
+   * @return obstacles The output obstacles saved in a list of unique_ptr.
+   */
+  static std::list<std::unique_ptr<PathObstacle>> CreateObstacles(
+      const prediction::PredictionObstacles& predictions);
+
+  static std::unique_ptr<PathObstacle> CreateStaticVirtualObstacles(
+      const std::string& id, const common::math::Box2d& obstacle_box);
+
+  static bool IsStaticObstacle(
+      const perception::PerceptionObstacle& perception_obstacle);
+
+  static bool IsVirtualObstacle(
+      const perception::PerceptionObstacle& perception_obstacle) {
+    return perception_obstacle.id() < 0;
+  }
+
+  static bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
+
+  // const Obstacle* obstacle() const;
 
   /**
    * return the merged lateral decision
@@ -161,8 +221,21 @@ class PathObstacle {
                                  StBoundary* const st_boundary);
   bool IsValidObstacle(
       const perception::PerceptionObstacle& perception_obstacle);
+
+ private:
   std::string id_;
-  const Obstacle* obstacle_ = nullptr;
+  int32_t perception_id_ = 0;
+  bool is_static_ = false;
+  bool is_virtual_ = false;
+  double speed_ = 0.0;
+
+  prediction::Trajectory trajectory_;
+  perception::PerceptionObstacle perception_obstacle_;
+  common::math::Box2d perception_bounding_box_;
+  common::math::Polygon2d perception_polygon_;
+
+  // const Obstacle* obstacle_ = nullptr;
+
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
   SLBoundary perception_sl_boundary_;
@@ -178,7 +251,7 @@ class PathObstacle {
   double min_radius_stop_distance_ = -1.0;
 
   struct ObjectTagCaseHash {
-    std::size_t operator()(
+    size_t operator()(
         const planning::ObjectDecisionType::ObjectTagCase tag) const {
       return static_cast<std::size_t>(tag);
     }
@@ -191,6 +264,10 @@ class PathObstacle {
                                   ObjectTagCaseHash>
       s_longitudinal_decision_safety_sorter_;
 };
+
+typedef IndexedList<std::string, PathObstacle> IndexedObstacles;
+typedef ThreadSafeIndexedList<std::string, PathObstacle>
+    ThreadSafeIndexedObstacles;
 
 }  // namespace planning
 }  // namespace apollo

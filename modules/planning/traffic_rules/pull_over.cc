@@ -146,15 +146,13 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
   // check obstacles
   auto* path_decision = reference_line_info_->path_decision();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const PerceptionObstacle& perception_obstacle =
-        path_obstacle->obstacle()->Perception();
+    const PerceptionObstacle& perception_obstacle = path_obstacle->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
     PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
         PerceptionObstacle_Type_Name(obstacle_type);
 
-    if (path_obstacle->obstacle()->IsVirtual() ||
-        !path_obstacle->obstacle()->IsStatic()) {
+    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] VIRTUAL or NOT STATIC. SKIP";
       continue;

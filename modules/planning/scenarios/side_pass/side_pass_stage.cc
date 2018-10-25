@@ -177,7 +177,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   // Go through every obstacle, check if there is any in the no_obs_zone,
   // which will used by the proceed_with_caution movement.
   for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    if (path_obstacle->obstacle()->IsVirtual()) {
+    if (path_obstacle->IsVirtual()) {
       continue;
     }
     // Check the s-direction.
@@ -251,7 +251,7 @@ Stage::StageStatus SidePassDetectSafety::Process(
   const PathDecision& path_decision =
       frame->reference_line_info().front().path_decision();
   for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    if (path_obstacle->obstacle()->IsVirtual()) {
+    if (path_obstacle->IsVirtual()) {
       is_safe = false;
       break;
     }

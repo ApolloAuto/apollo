@@ -49,22 +49,20 @@ Status DeciderCreep::Process(Frame* frame,
 }
 
 double DeciderCreep::FindCreepDistance(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info) {
+    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
   // more delicate design of creep distance
   return 0.5;
 }
 
 // TODO(all): revisit & rewrite
-bool DeciderCreep::BuildStopDecision(
-    const double stop_sign_overlap_end_s,
-    Frame* frame,
-    ReferenceLineInfo* reference_line_info) {
+bool DeciderCreep::BuildStopDecision(const double stop_sign_overlap_end_s,
+                                     Frame* frame,
+                                     ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  double creep_stop_s = stop_sign_overlap_end_s +
-      FindCreepDistance(*frame, *reference_line_info);
+  double creep_stop_s =
+      stop_sign_overlap_end_s + FindCreepDistance(*frame, *reference_line_info);
 
   // create virtual stop wall
   // TODO(all)
@@ -104,10 +102,9 @@ bool DeciderCreep::BuildStopDecision(
   return true;
 }
 
-bool DeciderCreep::CheckCreepDone(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info,
-    const double stop_sign_overlap_end_s) {
+bool DeciderCreep::CheckCreepDone(const Frame& frame,
+                                  const ReferenceLineInfo& reference_line_info,
+                                  const double stop_sign_overlap_end_s) {
   const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
   double creep_stop_s =
@@ -118,8 +115,7 @@ bool DeciderCreep::CheckCreepDone(
     bool all_far_away = true;
     for (auto* path_obstacle :
          reference_line_info.path_decision().path_obstacles().Items()) {
-      if (path_obstacle->obstacle()->IsVirtual() ||
-          !path_obstacle->obstacle()->IsStatic()) {
+      if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
         continue;
       }
       if (path_obstacle->reference_line_st_boundary().min_t() <
@@ -134,12 +130,10 @@ bool DeciderCreep::CheckCreepDone(
 }
 
 void DeciderCreep::SetProceedWithCautionSpeedParam(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info) {
+    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
   common::SLPoint adc_center_sl;
   reference_line_info.reference_line().XYToSL(
-      {frame.vehicle_state().x(), frame.vehicle_state().y()},
-      &adc_center_sl);
+      {frame.vehicle_state().x(), frame.vehicle_state().y()}, &adc_center_sl);
   const double creep_distance =
       adc_center_sl.s() + FindCreepDistance(frame, reference_line_info);
 

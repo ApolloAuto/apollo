@@ -44,7 +44,7 @@
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
-#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 
 namespace apollo {
@@ -78,9 +78,9 @@ class FrameOpenSpace {
 
   void RecordInputDebug(planning_internal::Debug *debug);
 
-  Obstacle *Find(const std::string &id);
+  PathObstacle *Find(const std::string &id);
 
-  const std::vector<const Obstacle *> obstacles() const;
+  const std::vector<const PathObstacle *> obstacles() const;
 
   const common::VehicleState &vehicle_state() const;
 
@@ -152,9 +152,9 @@ class FrameOpenSpace {
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
-  const Obstacle *FindCollisionObstacle() const;
+  const PathObstacle *FindCollisionObstacle() const;
 
-  void AddObstacle(const Obstacle &obstacle);
+  void AddObstacle(const PathObstacle &obstacle);
 
   const LocalView &local_view() const { return local_view_; }
 

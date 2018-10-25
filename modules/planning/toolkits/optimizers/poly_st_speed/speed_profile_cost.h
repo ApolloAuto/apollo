@@ -25,8 +25,8 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/poly_st_speed_config.pb.h"
 
-#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed_limit.h"
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 

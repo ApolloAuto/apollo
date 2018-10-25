@@ -89,14 +89,13 @@ bool PathDecider::MakeStaticObstacleDecision(
       half_width + FLAGS_static_decision_nudge_l_buffer;
 
   for (const auto *path_obstacle : path_decision->path_obstacles().Items()) {
-    const auto &obstacle = *path_obstacle->obstacle();
     bool is_bycycle_or_pedestrain =
-        (obstacle.Perception().type() ==
+        (path_obstacle->Perception().type() ==
              perception::PerceptionObstacle::BICYCLE ||
-         obstacle.Perception().type() ==
+         path_obstacle->Perception().type() ==
              perception::PerceptionObstacle::PEDESTRIAN);
 
-    if (!is_bycycle_or_pedestrain && !obstacle.IsStatic()) {
+    if (!is_bycycle_or_pedestrain && !path_obstacle->IsStatic()) {
       continue;
     }
 
@@ -130,10 +129,10 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     if (sl_boundary.end_s() < frenet_points.front().s() ||
         sl_boundary.start_s() > frenet_points.back().s()) {
-      path_decision->AddLongitudinalDecision("PathDecider/not-in-s",
-                                             obstacle.Id(), object_decision);
-      path_decision->AddLateralDecision("PathDecider/not-in-s", obstacle.Id(),
-                                        object_decision);
+      path_decision->AddLongitudinalDecision(
+          "PathDecider/not-in-s", path_obstacle->Id(), object_decision);
+      path_decision->AddLateralDecision("PathDecider/not-in-s",
+                                        path_obstacle->Id(), object_decision);
       continue;
     }
 
@@ -142,8 +141,8 @@ bool PathDecider::MakeStaticObstacleDecision(
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
       // ignore
-      path_decision->AddLateralDecision("PathDecider/not-in-l", obstacle.Id(),
-                                        object_decision);
+      path_decision->AddLateralDecision("PathDecider/not-in-l",
+                                        path_obstacle->Id(), object_decision);
     } else if (curr_l - lateral_stop_radius < sl_boundary.end_l() &&
                curr_l + lateral_stop_radius > sl_boundary.start_l()) {
       // stop
@@ -151,16 +150,17 @@ bool PathDecider::MakeStaticObstacleDecision(
           GenerateObjectStopDecision(*path_obstacle);
 
       if (path_decision->MergeWithMainStop(
-              object_decision.stop(), obstacle.Id(),
+              object_decision.stop(), path_obstacle->Id(),
               reference_line_info_->reference_line(),
               reference_line_info_->AdcSlBoundary())) {
-        path_decision->AddLongitudinalDecision("PathDecider/nearest-stop",
-                                               obstacle.Id(), object_decision);
+        path_decision->AddLongitudinalDecision(
+            "PathDecider/nearest-stop", path_obstacle->Id(), object_decision);
       } else {
         ObjectDecisionType object_decision;
         object_decision.mutable_ignore();
         path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop",
-                                               obstacle.Id(), object_decision);
+                                               path_obstacle->Id(),
+                                               object_decision);
       }
     } else if (FLAGS_enable_nudge_decision) {
       // nudge
@@ -170,14 +170,14 @@ bool PathDecider::MakeStaticObstacleDecision(
         object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
         object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
         path_decision->AddLateralDecision("PathDecider/left-nudge",
-                                          obstacle.Id(), object_decision);
+                                          path_obstacle->Id(), object_decision);
       } else {
         // RIGHT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);
         object_nudge_ptr->set_distance_l(-FLAGS_nudge_distance_obstacle);
         path_decision->AddLateralDecision("PathDecider/right-nudge",
-                                          obstacle.Id(), object_decision);
+                                          path_obstacle->Id(), object_decision);
       }
     }
   }

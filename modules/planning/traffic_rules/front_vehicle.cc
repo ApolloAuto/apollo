@@ -234,15 +234,13 @@ std::string FrontVehicle::FindPassableObstacle(
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   auto* path_decision = reference_line_info->path_decision();
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const PerceptionObstacle& perception_obstacle =
-        path_obstacle->obstacle()->Perception();
+    const PerceptionObstacle& perception_obstacle = path_obstacle->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
     PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
         PerceptionObstacle_Type_Name(obstacle_type);
 
-    if (path_obstacle->obstacle()->IsVirtual() ||
-        !path_obstacle->obstacle()->IsStatic()) {
+    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] VIRTUAL or NOT STATIC. SKIP";
       continue;
@@ -312,22 +310,20 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
   const double adc_width = vehicle_param.width();
 
   for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const PerceptionObstacle& perception_obstacle =
-        path_obstacle->obstacle()->Perception();
+    const PerceptionObstacle& perception_obstacle = path_obstacle->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
     PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
         PerceptionObstacle_Type_Name(obstacle_type);
 
-    if (path_obstacle->obstacle()->IsVirtual() ||
-        !path_obstacle->obstacle()->IsStatic()) {
+    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] VIRTUAL or NOT STATIC. SKIP";
       continue;
     }
 
     bool is_on_road = reference_line_info->reference_line().HasOverlap(
-        path_obstacle->obstacle()->PerceptionBoundingBox());
+        path_obstacle->PerceptionBoundingBox());
     if (!is_on_road) {
       // skip obstacles not on reference line
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
