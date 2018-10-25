@@ -68,6 +68,12 @@ class ObstaclesContainer : public Container {
   void BuildLaneGraph();
 
   /**
+   * @brief Build junction feature for obstacles
+   * @param junction id
+   */
+  void BuildJunctionFeature(const std::string& junction_id);
+
+  /**
    * @brief Get obstacle pointer
    * @param Obstacle ID
    * @return Obstacle pointer

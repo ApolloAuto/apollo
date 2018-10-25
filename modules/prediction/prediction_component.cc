@@ -216,6 +216,11 @@ void PredictionComponent::OnPerception(
   // Set up obstacle cluster
   obstacles_container->BuildLaneGraph();
 
+  const Scenario& scenario = ScenarioManager::Instance()->scenario();
+  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
+    obstacles_container->BuildJunctionFeature(scenario.junction_id());
+  }
+
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
