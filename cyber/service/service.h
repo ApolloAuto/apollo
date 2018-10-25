@@ -90,8 +90,9 @@ bool Service<Request, Response>::Init() {
   role.set_channel_id(channel_id);
   role.mutable_qos_profile()->CopyFrom(
       transport::QosProfileConf::QOS_PROFILE_SERVICES_DEFAULT);
-  response_transmitter_ = transport::Transport::CreateTransmitter<Response>(
-      role, proto::OptionalMode::RTPS);
+  auto transport = transport::Transport::Instance();
+  response_transmitter_ =
+      transport->CreateTransmitter<Response>(role, proto::OptionalMode::RTPS);
   if (response_transmitter_ == nullptr) {
     AERROR << " Create response pub failed.";
     return false;
@@ -104,7 +105,7 @@ bool Service<Request, Response>::Init() {
   role.set_channel_name(request_channel_);
   channel_id = common::GlobalData::RegisterChannel(request_channel_);
   role.set_channel_id(channel_id);
-  request_receiver_ = transport::Transport::CreateReceiver<Request>(
+  request_receiver_ = transport->CreateReceiver<Request>(
       role,
       [=](const std::shared_ptr<Request>& request,
           const transport::MessageInfo& message_info,

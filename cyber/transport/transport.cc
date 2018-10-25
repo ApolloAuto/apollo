@@ -16,50 +16,45 @@
 
 #include "cyber/transport/transport.h"
 
-#include <atomic>
-#include <mutex>
-
 #include "cyber/common/global_data.h"
 
 namespace apollo {
 namespace cyber {
 namespace transport {
 
-static std::atomic<bool> shutdown_ = {false};
-static std::mutex participant_mutex_;
+Transport::Transport()
+    : is_shutdown_(false),
+      participant_(nullptr),
+      intra_dispatcher_(nullptr),
+      shm_dispatcher_(nullptr),
+      rtps_dispatcher_(nullptr) {
+  CreateParticipant();
+  intra_dispatcher_ = IntraDispatcher::Instance();
+  shm_dispatcher_ = ShmDispatcher::Instance();
+  rtps_dispatcher_ = RtpsDispatcher::Instance();
+  rtps_dispatcher_->set_participant(participant_);
+}
 
-ParticipantPtr Transport::participant_ = nullptr;
-
-Transport::Transport() {}
-
-Transport::~Transport() {}
+Transport::~Transport() { Shutdown(); }
 
 void Transport::Shutdown() {
-  if (shutdown_.exchange(true)) {
+  if (is_shutdown_.exchange(true)) {
     return;
   }
+  intra_dispatcher_->Shutdown();
+  shm_dispatcher_->Shutdown();
+  rtps_dispatcher_->Shutdown();
   if (participant_ != nullptr) {
     participant_->Shutdown();
     participant_ = nullptr;
   }
 }
 
-ParticipantPtr Transport::CreateParticipant() {
+void Transport::CreateParticipant() {
   std::string participant_name =
       common::GlobalData::Instance()->HostName() + "+" +
       std::to_string(common::GlobalData::Instance()->ProcessId());
-  return std::make_shared<Participant>(participant_name, 11512);
-}
-
-ParticipantPtr Transport::participant() {
-  if (participant_ != nullptr) {
-    return participant_;
-  }
-  std::lock_guard<std::mutex> lck(participant_mutex_);
-  if (participant_ == nullptr) {
-    participant_ = CreateParticipant();
-  }
-  return participant_;
+  participant_ = std::make_shared<Participant>(participant_name, 11512);
 }
 
 }  // namespace transport

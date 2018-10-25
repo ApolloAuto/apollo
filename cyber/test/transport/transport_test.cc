@@ -30,9 +30,9 @@ using TransmitterPtr = std::shared_ptr<Transmitter<proto::UnitTest>>;
 using ReceiverPtr = std::shared_ptr<Receiver<proto::UnitTest>>;
 
 TEST(TransportTest, constructor) {
-  Transport transport_a;
-  Transport transport_b;
-  EXPECT_EQ(transport_a.participant(), transport_b.participant());
+  auto transport_a = Transport::Instance();
+  auto transport_b = Transport::Instance();
+  EXPECT_EQ(transport_a->participant(), transport_b->participant());
 }
 
 TEST(TransportTest, create_transmitter) {
@@ -45,19 +45,23 @@ TEST(TransportTest, create_transmitter) {
   attr.set_id(id.HashValue());
 
   TransmitterPtr intra =
-      Transport::CreateTransmitter<proto::UnitTest>(attr, OptionalMode::INTRA);
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(
+          attr, OptionalMode::INTRA);
   EXPECT_EQ(typeid(*intra), typeid(IntraTransmitter<proto::UnitTest>));
 
   TransmitterPtr shm =
-      Transport::CreateTransmitter<proto::UnitTest>(attr, OptionalMode::SHM);
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(
+          attr, OptionalMode::SHM);
   EXPECT_EQ(typeid(*shm), typeid(ShmTransmitter<proto::UnitTest>));
 
   TransmitterPtr rtps =
-      Transport::CreateTransmitter<proto::UnitTest>(attr, OptionalMode::RTPS);
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(
+          attr, OptionalMode::RTPS);
   EXPECT_EQ(typeid(*rtps), typeid(RtpsTransmitter<proto::UnitTest>));
 
   attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
-  TransmitterPtr hybrid = Transport::CreateTransmitter<proto::UnitTest>(attr);
+  TransmitterPtr hybrid =
+      Transport::Instance()->CreateTransmitter<proto::UnitTest>(attr);
   EXPECT_EQ(typeid(*hybrid), typeid(HybridTransmitter<proto::UnitTest>));
 }
 
@@ -70,21 +74,21 @@ TEST(TransportTest, create_receiver) {
   auto listener = [](const std::shared_ptr<proto::UnitTest>&,
                      const MessageInfo&, const RoleAttributes&) {};
 
-  ReceiverPtr intra = Transport::CreateReceiver<proto::UnitTest>(
+  ReceiverPtr intra = Transport::Instance()->CreateReceiver<proto::UnitTest>(
       attr, listener, OptionalMode::INTRA);
   EXPECT_EQ(typeid(*intra), typeid(IntraReceiver<proto::UnitTest>));
 
-  ReceiverPtr shm = Transport::CreateReceiver<proto::UnitTest>(
+  ReceiverPtr shm = Transport::Instance()->CreateReceiver<proto::UnitTest>(
       attr, listener, OptionalMode::SHM);
   EXPECT_EQ(typeid(*shm), typeid(ShmReceiver<proto::UnitTest>));
 
-  ReceiverPtr rtps = Transport::CreateReceiver<proto::UnitTest>(
+  ReceiverPtr rtps = Transport::Instance()->CreateReceiver<proto::UnitTest>(
       attr, listener, OptionalMode::RTPS);
   EXPECT_EQ(typeid(*rtps), typeid(RtpsReceiver<proto::UnitTest>));
 
   attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
   ReceiverPtr hybrid =
-      Transport::CreateReceiver<proto::UnitTest>(attr, listener);
+      Transport::Instance()->CreateReceiver<proto::UnitTest>(attr, listener);
   EXPECT_EQ(typeid(*hybrid), typeid(HybridReceiver<proto::UnitTest>));
 }
 

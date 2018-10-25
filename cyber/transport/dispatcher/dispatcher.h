@@ -17,6 +17,7 @@
 #ifndef CYBER_TRANSPORT_DISPATCHER_DISPATCHER_H_
 #define CYBER_TRANSPORT_DISPATCHER_DISPATCHER_H_
 
+#include <atomic>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -76,7 +77,7 @@ class Dispatcher {
   bool HasChannel(uint64_t channel_id);
 
  protected:
-  bool shutdown_;
+  std::atomic<bool> is_shutdown_;
   // key: channel_id of message
   AtomicHashMap<uint64_t, ListenerHandlerBasePtr> msg_listeners_;
   base::AtomicRWLock rw_lock_;
@@ -85,6 +86,9 @@ class Dispatcher {
 template <typename MessageT>
 void Dispatcher::AddListener(const RoleAttributes& self_attr,
                              const MessageListener<MessageT>& listener) {
+  if (is_shutdown_.load()) {
+    return;
+  }
   uint64_t channel_id = self_attr.channel_id();
 
   std::shared_ptr<ListenerHandler<MessageT>> handler;
@@ -105,6 +109,9 @@ template <typename MessageT>
 void Dispatcher::AddListener(const RoleAttributes& self_attr,
                              const RoleAttributes& opposite_attr,
                              const MessageListener<MessageT>& listener) {
+  if (is_shutdown_.load()) {
+    return;
+  }
   uint64_t channel_id = self_attr.channel_id();
 
   std::shared_ptr<ListenerHandler<MessageT>> handler;
@@ -123,6 +130,9 @@ void Dispatcher::AddListener(const RoleAttributes& self_attr,
 
 template <typename MessageT>
 void Dispatcher::RemoveListener(const RoleAttributes& self_attr) {
+  if (is_shutdown_.load()) {
+    return;
+  }
   uint64_t channel_id = self_attr.channel_id();
 
   ListenerHandlerBasePtr* handler_base = nullptr;
@@ -134,6 +144,9 @@ void Dispatcher::RemoveListener(const RoleAttributes& self_attr) {
 template <typename MessageT>
 void Dispatcher::RemoveListener(const RoleAttributes& self_attr,
                                 const RoleAttributes& opposite_attr) {
+  if (is_shutdown_.load()) {
+    return;
+  }
   uint64_t channel_id = self_attr.channel_id();
 
   ListenerHandlerBasePtr* handler_base = nullptr;

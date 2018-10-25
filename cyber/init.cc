@@ -78,6 +78,7 @@ bool Init() {
 
   // Initialize internal static objects
   common::GlobalData::Instance();
+  transport::Transport::Instance();
   service_discovery::TopologyManager::Instance();
   scheduler::Scheduler::Instance();
   TaskManager::Instance();
@@ -152,7 +153,7 @@ void Shutdown() {
   TaskManager::Instance()->Shutdown();
   scheduler::Scheduler::Instance()->ShutDown();
   service_discovery::TopologyManager::Instance()->Shutdown();
-  transport::Transport::Shutdown();
+  transport::Transport::Instance()->Shutdown();
   SetState(STATE_SHUTDOWN);
 }
 

@@ -30,10 +30,10 @@ ShmDispatcher::ShmDispatcher() : host_id_(0), sfd_(-1) { Init(); }
 ShmDispatcher::~ShmDispatcher() { Shutdown(); }
 
 void ShmDispatcher::Shutdown() {
-  if (shutdown_) {
+  if (is_shutdown_.exchange(true)) {
     return;
   }
-  shutdown_ = true;
+
   segments_.clear();
   if (thread_.joinable()) {
     thread_.join();
@@ -54,6 +54,9 @@ void ShmDispatcher::AddSegment(const RoleAttributes& self_attr) {
 void ShmDispatcher::OnMessage(uint64_t channel_id,
                               const std::shared_ptr<std::string>& msg_str,
                               const MessageInfo& msg_info) {
+  if (is_shutdown_.load()) {
+    return;
+  }
   ListenerHandlerBasePtr* handler_base = nullptr;
   if (msg_listeners_.Get(channel_id, &handler_base)) {
     auto handler =
@@ -69,7 +72,7 @@ void ShmDispatcher::ThreadFunc() {
   std::string msg_info_str("");
   std::shared_ptr<std::string> msg_str_ptr = std::make_shared<std::string>();
 
-  while (!shutdown_) {
+  while (!is_shutdown_.load()) {
     int read_bytes =
         recvfrom(sfd_, buf, 1024, 0, (struct sockaddr*)&local_addr_,
                  reinterpret_cast<socklen_t*>(&addr_len));

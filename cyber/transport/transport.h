@@ -17,10 +17,15 @@
 #ifndef CYBER_TRANSPORT_TRANSPORT_H_
 #define CYBER_TRANSPORT_TRANSPORT_H_
 
+#include <atomic>
 #include <memory>
 #include <string>
 
+#include "cyber/common/macros.h"
 #include "cyber/proto/transport_conf.pb.h"
+#include "cyber/transport/dispatcher/intra_dispatcher.h"
+#include "cyber/transport/dispatcher/rtps_dispatcher.h"
+#include "cyber/transport/dispatcher/shm_dispatcher.h"
 #include "cyber/transport/qos/qos_profile_conf.h"
 #include "cyber/transport/receiver/hybrid_receiver.h"
 #include "cyber/transport/receiver/intra_receiver.h"
@@ -42,35 +47,43 @@ using apollo::cyber::proto::OptionalMode;
 
 class Transport {
  public:
-  Transport();
   virtual ~Transport();
 
-  static void Shutdown();
+  void Shutdown();
 
   template <typename M>
-  static auto CreateTransmitter(const RoleAttributes& attr,
-                                const OptionalMode& mode = OptionalMode::HYBRID)
-      -> typename std::shared_ptr<Transmitter<M>>;
+  auto CreateTransmitter(const RoleAttributes& attr,
+                         const OptionalMode& mode = OptionalMode::HYBRID) ->
+      typename std::shared_ptr<Transmitter<M>>;
 
   template <typename M>
-  static auto CreateReceiver(
-      const RoleAttributes& attr,
-      const typename Receiver<M>::MessageListener& msg_listener,
-      const OptionalMode& mode = OptionalMode::HYBRID) ->
+  auto CreateReceiver(const RoleAttributes& attr,
+                      const typename Receiver<M>::MessageListener& msg_listener,
+                      const OptionalMode& mode = OptionalMode::HYBRID) ->
       typename std::shared_ptr<Receiver<M>>;
 
-  static ParticipantPtr participant();
+  ParticipantPtr participant() const { return participant_; }
 
  private:
-  static ParticipantPtr CreateParticipant();
+  void CreateParticipant();
 
-  static ParticipantPtr participant_;
+  std::atomic<bool> is_shutdown_;
+  ParticipantPtr participant_;
+  IntraDispatcherPtr intra_dispatcher_;
+  ShmDispatcherPtr shm_dispatcher_;
+  RtpsDispatcherPtr rtps_dispatcher_;
+
+  DECLARE_SINGLETON(Transport)
 };
 
 template <typename M>
 auto Transport::CreateTransmitter(const RoleAttributes& attr,
                                   const OptionalMode& mode) ->
     typename std::shared_ptr<Transmitter<M>> {
+  if (is_shutdown_.load()) {
+    AINFO << "transport has been shut down.";
+    return nullptr;
+  }
   std::shared_ptr<Transmitter<M>> transmitter = nullptr;
   RoleAttributes modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
@@ -109,6 +122,10 @@ auto Transport::CreateReceiver(
     const RoleAttributes& attr,
     const typename Receiver<M>::MessageListener& msg_listener,
     const OptionalMode& mode) -> typename std::shared_ptr<Receiver<M>> {
+  if (is_shutdown_.load()) {
+    AINFO << "transport has been shut down.";
+    return nullptr;
+  }
   std::shared_ptr<Receiver<M>> receiver = nullptr;
   RoleAttributes modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
