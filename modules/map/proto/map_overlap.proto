@@ -3,11 +3,14 @@ syntax = "proto2";
 package apollo.hdmap;
 
 import "modules/map/proto/map_id.proto";
+import "modules/map/proto/map_geometry.proto";
 
 message LaneOverlapInfo {
   optional double start_s = 1;  // position (s-coordinate)
   optional double end_s = 2;    // position (s-coordinate)
   optional bool is_merge = 3;
+
+  optional Id region_overlap_id = 4;
 }
 
 message SignalOverlapInfo {
@@ -17,6 +20,7 @@ message StopSignOverlapInfo {
 }
 
 message CrosswalkOverlapInfo {
+  optional Id region_overlap_id = 1;
 }
 
 message JunctionOverlapInfo {
@@ -32,6 +36,11 @@ message SpeedBumpOverlapInfo {
 }
 
 message ParkingSpaceOverlapInfo {
+}
+
+message RegionOverlapInfo {
+  optional Id id = 1;
+  repeated Polygon polygon = 2;
 }
 
 // Information about one object in the overlap.
@@ -58,4 +67,6 @@ message Overlap {
 
   // Information about one overlap, include all overlapped objects.
   repeated ObjectOverlapInfo object = 2;
+
+  repeated RegionOverlapInfo region_overlap = 3;
 }

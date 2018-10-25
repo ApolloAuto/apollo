@@ -77,6 +77,8 @@ class LanesXmlParser {
   static Status ToPbLaneMarkType(const std::string& type,
                                  const std::string& color,
                                  PbLaneBoundaryTypeType* boundary_type);
+  static Status ParseRegionOverlap(const tinyxml2::XMLElement& xml_node,
+                                std::vector<PbRegionOverlap>* region_overlaps);
 };
 
 }  // namespace adapter

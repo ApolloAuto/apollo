@@ -51,10 +51,12 @@ using PbLaneBoundaryTypeType = apollo::hdmap::LaneBoundaryType_Type;
 using PbPolygon = apollo::hdmap::Polygon;
 using PbBoundaryPolygon = apollo::hdmap::BoundaryPolygon;
 using PbBoundaryEdge = apollo::hdmap::BoundaryEdge;
+using PbRegionOverlap = apollo::hdmap::RegionOverlapInfo;
 
 using PbLaneDirection = apollo::hdmap::Lane_LaneDirection;
 using PbSignalType = apollo::hdmap::Signal_Type;
 using PbSubSignalType = apollo::hdmap::Subsignal_Type;
+using PbStopSignType = apollo::hdmap::StopSign_StopType;
 using PbBoundaryEdgeType = apollo::hdmap::BoundaryEdge_Type;
 
 struct StopLineInternal {
@@ -86,7 +88,8 @@ struct OverlapWithLane {
   double end_s;
   bool is_merge;
 
-  OverlapWithLane() : is_merge(false) {}
+  std::string region_overlap_id;
+  std::vector<PbRegionOverlap> region_overlaps;
 };
 
 struct OverlapWithJunction {

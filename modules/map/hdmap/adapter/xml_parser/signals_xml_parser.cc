@@ -169,6 +169,31 @@ Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
   return Status::OK();
 }
 
+Status SignalsXmlParser::ToPbStopSignType(const std::string& xml_type,
+                                           PbStopSignType* stop_type) {
+  CHECK_NOTNULL(stop_type);
+
+  std::string upper_str = UtilXmlParser::ToUpper(xml_type);
+
+  if (upper_str == "UNKNOWN") {
+    *stop_type = hdmap::StopSign::UNKNOWN;
+  } else if (upper_str == "ONEWAY") {
+    *stop_type = hdmap::StopSign::ONE_WAY;
+  } else if (upper_str == "TWOWAY") {
+    *stop_type = hdmap::StopSign::TWO_WAY;
+  } else if (upper_str == "THREEWAY") {
+    *stop_type = hdmap::StopSign::THREE_WAY;
+  } else if (upper_str == "FOURWAY") {
+    *stop_type = hdmap::StopSign::FOUR_WAY;
+  } else if (upper_str == "ALLWAY") {
+    *stop_type = hdmap::StopSign::ALL_WAY;
+  } else {
+    std::string err_msg = "Error or unsupport stop sign type";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+  }
+  return Status::OK();
+}
+
 Status SignalsXmlParser::ParseStopSigns(
     const tinyxml2::XMLElement& xml_node,
     std::vector<StopSignInternal>* stop_signs) {
@@ -208,6 +233,23 @@ Status SignalsXmlParser::ParseStopSigns(
           sub_node = sub_node->NextSiblingElement("objectReference");
         }
       }
+
+      sub_node = signal_node->FirstChildElement("attribute");
+      if (sub_node) {
+        std::string stop_type;
+        int checker = UtilXmlParser::QueryStringAttribute(*sub_node,
+                                                        "stopType",
+                                                        &stop_type);
+        if (checker != tinyxml2::XML_SUCCESS) {
+          std::string err_msg = "Error parse stop type.";
+          return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+        }
+
+        PbStopSignType pb_stop_type;
+        ToPbStopSignType(stop_type, &pb_stop_type);
+        stop_sign_internal.stop_sign.set_type(pb_stop_type);
+      }
+
       stop_signs->emplace_back(stop_sign_internal);
     }
 
