@@ -293,19 +293,19 @@ class TrajectoryToSample(object):
         for i, fea in enumerate(trajectory):
             # Sanity check.
             if not fea.HasField('junction_feature') or \
-               not fea.junction_feature.HasField('junction_exit') or \
-               not fea.junction_feature.HasField('junction_mlp_feature'):
-                print("No junction_feature, junction_exit, or junction_mlp_feature, not labeling this frame.")
+               not len(fea.junction_feature.junction_exit) or \
+               not len(fea.junction_feature.junction_mlp_feature):
+                # print("No junction_feature, junction_exit, or junction_mlp_feature, not labeling this frame.")
                 continue
-            curr_pos = np.array([fea.position.x(), fea.position.y()])
-            heading = fea.theta()
+            curr_pos = np.array([fea.position.x, fea.position.y])
+            heading = fea.theta
             # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
             exit_dict = dict()
-            for junction_exit in fea.junction_exit:
+            for junction_exit in fea.junction_feature.junction_exit:
                 if junction_exit.HasField('exit_lane_id'):
-                    exit_dict[junction_exit.exit_lane_id] = np.array([junction_exit.exit_position.x(), junction_exit.exit_position.y()])
-            # Searching for up to 70 frames
-            for j in range(i, min(i + 70, traj_len)):
+                    exit_dict[junction_exit.exit_lane_id] = np.array([junction_exit.exit_position.x, junction_exit.exit_position.y])
+            # Searching for up to 100 frames (10 seconds)
+            for j in range(i, min(i + 100, traj_len)):
                 if trajectory[j].lane.lane_feature.lane_id in exit_dict:
                     exit_pos = exit_dict[trajectory[j].lane.lane_feature.lane_id]
                     delta_pos = exit_pos - curr_pos
@@ -313,7 +313,7 @@ class TrajectoryToSample(object):
                     d_idx = int((angle / (2.0 * np.pi) + 1) * 12 % 12)
                     label = [0 for idx in range(12)]
                     label[d_idx] = 1
-                    fea.junction_feature.junction_mlp_label[:] = label
+                    fea.junction_feature.junction_mlp_label.extend(label)
                     break
         return trajectory
 
