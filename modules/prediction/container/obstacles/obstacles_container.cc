@@ -125,6 +125,23 @@ void ObstaclesContainer::BuildLaneGraph() {
   }
 }
 
+void ObstaclesContainer::BuildJunctionFeature(const std::string& junction_id) {
+  for (const int id : curr_frame_predictable_obstacle_ids_) {
+    Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle found.";
+      continue;
+    }
+    if (obstacle_ptr->ToIgnore()) {
+      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
+      continue;
+    }
+    if (obstacle_ptr->IsInJunction(junction_id)) {
+      obstacle_ptr->BuildJunctionFeature(junction_id);
+    }
+  }
+}
+
 bool ObstaclesContainer::IsPredictable(
     const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
