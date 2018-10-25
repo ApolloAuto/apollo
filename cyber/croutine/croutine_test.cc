@@ -13,31 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#include <chrono>
-#include <memory>
+#include "gtest/gtest.h"
 
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
 #include "cyber/cyber.h"
-#include "gtest/gtest.h"
+#include "cyber/common/global_data.h"
 
 namespace apollo {
 namespace cyber {
 namespace croutine {
 
-void Sleep(uint64_t ms) {
-  std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+void function() {
+  CRoutine::Yield(RoutineState::IO_WAIT);
 }
 
-class ParameterServerTest : public ::testing::Test {
-  virtual void SetUp() {
-    apollo::cyber::Init();
-    auto context =
-        std::make_shared<apollo::cyber::croutine::RoutineContext>();
-    apollo::cyber::croutine::CRoutine::SetMainContext(context);
-  }
-};
+TEST(Croutine, croutinetest) {
+  apollo::cyber::Init();
+  auto context = std::make_shared<apollo::cyber::croutine::RoutineContext>();
+  apollo::cyber::croutine::CRoutine::SetMainContext(context);
+  std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(function);
+  auto id = GlobalData::RegisterTaskName("croutine");
+  cr->set_id(id);
+  cr->set_name("croutine");
+  cr->set_processor_id(0);
+  cr->set_priority(1);
+  cr->set_state(RoutineState::DATA_WAIT);
+  EXPECT_EQ(cr->state(), RoutineState::DATA_WAIT);
+  cr->Wake();
+  EXPECT_EQ(cr->state(), RoutineState::READY);
+  cr->UpdateState();
+  EXPECT_EQ(cr->state(), RoutineState::READY);
+  EXPECT_NE(cr->GetMainContext(), nullptr);
+  cr->Resume();
+  EXPECT_EQ(cr->state(), RoutineState::IO_WAIT);
+  cr->Stop();
+  EXPECT_EQ(cr->Resume(), RoutineState::FINISHED);
+}
 
 }  // namespace croutine
 }  // namespace cyber
