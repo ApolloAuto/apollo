@@ -26,6 +26,12 @@ parameters = {
         'dim_hidden_2': 15,
         'dim_output': 1
     },
+    'cruise_mlp': {
+        'dim_input': 23 + 60,
+        'dim_hidden_1': 50,
+        'dim_hidden_2': 18,
+        'dim_output': 2
+    }
     'feature': {
         'threshold_label_time_delta': 1.0,
         'prediction_label_timeframe': 3.0,
