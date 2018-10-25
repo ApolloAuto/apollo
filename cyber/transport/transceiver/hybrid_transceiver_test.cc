@@ -84,58 +84,6 @@ TEST_F(HybridTransceiverTest, constructor) {
   EXPECT_NE(transmitter_id.ToString(), receiver_id.ToString());
 }
 
-TEST_F(HybridTransceiverTest, enable_and_disable_no_param) {
-  transmitter_a_->Enable();
-  transmitter_b_->Enable();
-
-  RoleAttributes attr;
-  attr.set_host_name(common::GlobalData::Instance()->HostName());
-  attr.set_process_id(common::GlobalData::Instance()->ProcessId());
-  attr.mutable_qos_profile()->CopyFrom(QosProfileConf::QOS_PROFILE_DEFAULT);
-  attr.set_channel_name(channel_name_);
-  attr.set_channel_id(common::Hash(channel_name_));
-
-  std::vector<proto::UnitTest> msgs;
-  ReceiverPtr receiver = std::make_shared<HybridReceiver<proto::UnitTest>>(
-      attr,
-      [&msgs](const std::shared_ptr<proto::UnitTest>& msg,
-              const MessageInfo& msg_info, const RoleAttributes& attr) {
-        (void)msg_info;
-        (void)attr;
-        msgs.emplace_back(*msg);
-      },
-      Transport::Instance()->participant());
-
-  receiver->Enable();
-
-  auto msg = std::make_shared<proto::UnitTest>();
-  std::string class_name("HybridTransceiverTest");
-  std::string case_name("enable_and_disable_no_param");
-  msg->set_class_name(class_name);
-  msg->set_case_name(case_name);
-
-  transmitter_a_->Transmit(msg);
-  transmitter_b_->Transmit(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  EXPECT_EQ(msgs.size(), 6);
-  for (auto& item : msgs) {
-    EXPECT_EQ(item.class_name(), class_name);
-    EXPECT_EQ(item.case_name(), case_name);
-  }
-
-  msgs.clear();
-  transmitter_b_->Disable();
-  transmitter_b_->Transmit(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  EXPECT_EQ(msgs.size(), 0);
-
-  msgs.clear();
-  receiver->Disable();
-  transmitter_a_->Transmit(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-  EXPECT_EQ(msgs.size(), 0);
-}
-
 TEST_F(HybridTransceiverTest, enable_and_disable_with_param_no_relation) {
   RoleAttributes attr;
   attr.set_host_name(common::GlobalData::Instance()->HostName());
