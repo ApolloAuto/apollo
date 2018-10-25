@@ -47,9 +47,9 @@ def label_file(input_file, output_file):
         fea_traj = TrajectoryToSample.label_junction(fea_traj)
         for i, fea in enumerate(fea_traj):
             if not fea.HasField('junction_feature') or \
-               not fea.junction_feature.HasField('junction_mlp_feature') or \
-               not fea.junction_feature.HasField('junction_mlp_label'):
-                del fea_traj[i]
+               not len(fea.junction_feature.junction_mlp_feature) or \
+               not len(fea.junction_feature.junction_mlp_label):
+                # del fea_traj[i]
                 continue
         fea_trajs[fea_key] = fea_traj
     # save them in the output file with the same format as the input file

@@ -32,6 +32,12 @@ parameters = {
         'dim_hidden_2': 18,
         'dim_output': 2
     },
+    'junction_mlp': {
+        'dim_input': 3 + 60,
+        'dim_hidden_1': 30,
+        'dim_hidden_2': 15,
+        'dim_output': 12
+    },
     'feature': {
         'threshold_label_time_delta': 1.0,
         'prediction_label_timeframe': 3.0,
