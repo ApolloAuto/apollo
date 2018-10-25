@@ -284,6 +284,10 @@ void Obstacle::SearchJunctionExitsWithoutEnterLane(
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
                          const double timestamp, Feature* feature) {
+  if (SetId(perception_obstacle, feature) == ErrorCode::PREDICTION_ERROR) {
+    AERROR << "Obstacle has no ID";
+    return;
+  }
   SetTimestamp(perception_obstacle, timestamp, feature);
   SetPosition(perception_obstacle, feature);
   SetVelocity(perception_obstacle, feature);
@@ -1096,7 +1100,15 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
     if (num_path_point <= 0) {
       continue;
     }
+    int segment_index = 0;
+    int point_index = 0;
     for (int j = 0; j + 1 < num_path_point; ++j) {
+      while (segment_index < lane_sequence->lane_segment_size() &&
+             point_index >= lane_sequence->lane_segment(segment_index)
+                                          .lane_point_size()) {
+        ++segment_index;
+        point_index = 0;
+      }
       PathPoint* first_point = lane_sequence->mutable_path_point(j);
       PathPoint* second_point = lane_sequence->mutable_path_point(j + 1);
       double delta_theta = apollo::common::math::AngleDiff(
@@ -1104,6 +1116,14 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
       double delta_s = second_point->s() - first_point->s();
       double kappa = std::abs(delta_theta / (delta_s + FLAGS_double_precision));
       lane_sequence->mutable_path_point(j)->set_kappa(kappa);
+      if (segment_index < lane_sequence->lane_segment_size() &&
+          point_index < lane_sequence->lane_segment(segment_index)
+                                      .lane_point_size()) {
+        lane_sequence->mutable_lane_segment(segment_index)
+                     ->mutable_lane_point(point_index)
+                     ->set_kappa(kappa);
+        ++point_index;
+      }
     }
     lane_sequence->mutable_path_point(num_path_point - 1)->set_kappa(0.0);
   }
