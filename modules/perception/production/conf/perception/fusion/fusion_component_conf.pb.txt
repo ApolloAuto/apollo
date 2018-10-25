@@ -2,3 +2,5 @@ fusion_method: "ProbabilisticFusion"
 fusion_main_sensor: "velodyne64"
 object_in_roi_check: false
 radius_for_roi_object_check: 180
+output_obstacles_channel_name: "/perception/obstacles"
+output_viz_fused_content_channel_name: "/perception/inner/visualization/FusedObjects"
