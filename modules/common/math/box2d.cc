@@ -127,9 +127,7 @@ void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   *corners = corners_;
 }
 
-std::vector<Vec2d> Box2d::GetAllCorners() const {
-  return corners_;
-}
+std::vector<Vec2d> Box2d::GetAllCorners() const { return corners_; }
 
 bool Box2d::IsPointIn(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
@@ -172,8 +170,8 @@ bool Box2d::HasOverlap(const LineSegment2d &line_segment) const {
   }
   if (std::fmax(line_segment.start().x(), line_segment.end().x()) < min_x() ||
       std::fmin(line_segment.start().x(), line_segment.end().x()) > max_x() ||
-      std::fmax(line_segment.start().y(), line_segment.end().y()) < min_x() ||
-      std::fmin(line_segment.start().y(), line_segment.end().y()) > max_x()) {
+      std::fmax(line_segment.start().y(), line_segment.end().y()) < min_y() ||
+      std::fmin(line_segment.start().y(), line_segment.end().y()) > max_y()) {
     return false;
   }
   return DistanceTo(line_segment) <= kMathEpsilon;
