@@ -15,9 +15,7 @@
  *****************************************************************************/
 
 #include <gtest/gtest.h>
-#include <memory>
 
-#include "cyber/common/util.h"
 #include "cyber/cyber.h"
 #include "cyber/scheduler/policy/task_choreo.h"
 #include "cyber/scheduler/policy/classic.h"
