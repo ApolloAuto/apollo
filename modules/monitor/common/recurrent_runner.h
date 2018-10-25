@@ -16,11 +16,7 @@
 
 #pragma once
 
-#include <memory>
-#include <mutex>
 #include <string>
-#include <thread>
-#include <vector>
 
 /**
  * @namespace apollo::monitor
@@ -43,6 +39,7 @@ class RecurrentRunner {
 
  protected:
   std::string name_;
+  unsigned int round_count_ = 0;
 
  private:
   double interval_;

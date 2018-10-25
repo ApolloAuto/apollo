@@ -73,8 +73,7 @@ class MonitorManager {
   bool in_autonomous_driving_ = false;
 
   std::shared_ptr<apollo::cyber::Node> node_;
-  std::unordered_map<std::string, std::shared_ptr<cyber::ReaderBase>>
-      readers_;
+  std::unordered_map<std::string, std::shared_ptr<cyber::ReaderBase>> readers_;
 
   DECLARE_SINGLETON(MonitorManager);
 };
