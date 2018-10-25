@@ -133,7 +133,8 @@ function build() {
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
-  echo "$BUILD_TARGETS" | xargs bazel build $JOB_ARG $DEFINES -c $@
+  # bazel build $JOB_ARG $DEFINES -c dbg $BUILD_TARGETS
+  bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
 
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
@@ -174,8 +175,8 @@ function cibuild_extended() {
 
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
-    //modules/perception/...
     //cyber/...
+    //modules/perception/...
     //modules/dreamview/...
     //modules/drivers/radar/conti_radar/...
     //modules/drivers/radar/racobit_radar/...
@@ -210,7 +211,6 @@ function cibuild() {
 
   info "Building with $JOB_ARG for $MACHINE_ARCH"
   BUILD_TARGETS="
-    //cyber/...
     //modules/canbus/...
     //modules/common/...
     //modules/control/...
@@ -391,10 +391,11 @@ function run_test() {
   generate_build_targets
   if [ "$USE_GPU" == "1" ]; then
     echo -e "${YELLOW}Running tests under GPU mode. GPU is required to run the tests.${NO_COLOR}"
-    echo "$BUILD_TARGETS" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $BUILD_TARGETS
   else
     echo -e "${YELLOW}Running tests under CPU mode. No GPU is required to run the tests.${NO_COLOR}"
-    echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test" | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+    BUILD_TARGETS="`echo "$BUILD_TARGETS" | grep -v "cnn_segmentation_test\|yolo_camera_detector_test\|unity_recognize_test\|perception_traffic_light_rectify_test\|cuda_util_test"`"
+    bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $BUILD_TARGETS
   fi
   if [ $? -ne 0 ]; then
     fail 'Test failed!'
@@ -420,7 +421,7 @@ function citest_basic() {
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
-  echo "$BUILD_TARGETS" | grep "modules\/" | grep "test" \
+  BUILD_TARGETS="`echo "$BUILD_TARGETS" | grep "modules\/" | grep "test" \
           | grep -v "modules\/planning" \
           | grep -v "modules\/prediction" \
           | grep -v "modules\/control" \
@@ -430,8 +431,9 @@ function citest_basic() {
           | grep -v "syncedmem_test" | grep -v "blob_test" \
           | grep -v "perception_inference_operators_test" \
           | grep -v "cuda_util_test" \
-          | grep -v "modules\/perception" \
-          | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+          | grep -v "modules\/perception"`"
+
+  bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $BUILD_TARGETS
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -456,9 +458,10 @@ function citest_extended() {
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
-  echo "$BUILD_TARGETS" | grep "test" \
-          | grep -v "modules\/planning/integration_tests" \
-          | xargs bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $@
+  BUILD_TARGETS="`echo "$BUILD_TARGETS" | grep "test" \
+          | grep -v "modules\/planning/integration_tests"`"
+
+  bazel test $DEFINES $JOB_ARG --config=unit_test -c dbg --test_verbose_timeout_warnings $BUILD_TARGETS
 
   if [ $? -eq 0 ]; then
     success 'Test passed!'
@@ -486,11 +489,8 @@ function citest() {
 }
 
 function run_cpp_lint() {
-  set -e
-  # check /apollo/module
-  generate_build_targets
-  echo "$BUILD_TARGETS" | grep -v "tools/visualizer" | xargs bazel test --config=cpplint -c dbg
-
+  BUILD_TARGETS="`bazel query //modules/... except //modules/tools/visualizer/... union //cyber/...`"
+  bazel test --config=cpplint $BUILD_TARGETS
 }
 
 function run_bash_lint() {
