@@ -34,6 +34,8 @@ from torch.autograd import Variable
 
 from sklearn.model_selection import train_test_split
 
+from common.configure import parameters
+
 # Constants
 dim_input = parameters['cruise_mlp']['dim_input']
 dim_hidden_1 = parameters['cruise_mlp']['dim_hidden_1']
@@ -55,15 +57,23 @@ class FullyConn_NN(torch.nn.Module):
     def __init__(self):
         super(FullyConn_NN, self).__init__()
         self.classify = torch.nn.Sequential(\
-                            nn.Linear(dim_input, dim_hidden_1),\
-                            nn.ReLU(),\
+                            nn.Linear(83, 55),\
+                            nn.Sigmoid(),\
                             nn.Dropout(0.3),\
 
-                            nn.Linear(dim_hidden_1, dim_hidden_2),\
-                            nn.ReLU(),\
+                            nn.Linear(55, 23),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.2),\
+
+                            nn.Linear(23, 11),\
+                            nn.Sigmoid(),\
                             nn.Dropout(0.3),\
 
-                            nn.Linear(dim_hidden_2, 1),\
+                            nn.Linear(11, 5),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.0),\
+
+                            nn.Linear(5, 1),\
                             nn.Sigmoid()
                                             )
         self.regress = torch.nn.Sequential(\
@@ -83,6 +93,46 @@ class FullyConn_NN(torch.nn.Module):
         out_r = self.regress(x)
         return out_c, out_r
 
+
+class CNN1D_Lane(torch.nn.Module):
+    def __init__(self):
+        super(FullyConn_NN, self).__init__()
+        self.classify = torch.nn.Sequential(\
+                            nn.Linear(83, 55),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.3),\
+
+                            nn.Linear(55, 23),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.2),\
+
+                            nn.Linear(23, 11),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.3),\
+
+                            nn.Linear(11, 5),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.0),\
+
+                            nn.Linear(5, 1),\
+                            nn.Sigmoid()
+                                            )
+        self.regress = torch.nn.Sequential(\
+                            nn.Linear(dim_input, dim_hidden_1),\
+                            nn.ReLU(),\
+                            nn.Dropout(0.1),\
+                              
+                            nn.Linear(dim_hidden_1, dim_hidden_2),\
+                            nn.ReLU(),\
+                            nn.Dropout(0.1),\
+                               
+                            nn.Linear(dim_hidden_2, 1),\
+                            nn.ReLU()
+                                            )
+    def forward(self, x):
+        out_c = self.classify(x)
+        out_r = self.regress(x)
+        return out_c, out_r
 
 
 '''
@@ -120,40 +170,67 @@ def data_preprocessing(data):
 
     return X_new, y_new
 
-def loss_fn(c_pred, r_pred, y_train):
+'''
+Custom defined loss function that lumps the loss of classification and
+of regression together.
+'''
+def loss_fn(c_pred, r_pred, target):
     loss_C = nn.BCELoss()
     loss_R = nn.MSELoss()
-    loss = loss_C(c_pred, y_train[:,0].view(y_train.shape[0],1)) + \
-           loss_R((y_train[:,0] == True).float().view(y_train.shape[0],1) * r_pred + \
-                  (y_train[:,0] == False).float().view(y_train.shape[0],1) * y_train[:,1].view(y_train.shape[0],1), \
-                  y_train[:,1].view(y_train.shape[0],1))
+    loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
+    #loss = 4 * loss_C(c_pred, target[:,0].view(target.shape[0],1)) + \
+    #      loss_R((target[:,0] == True).float().view(target.shape[0],1) * r_pred + \
+    #              (target[:,0] == False).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
+    #              target[:,1].view(target.shape[0],1))
     return loss
 
-def train(train_X, train_y, model, optimizer, epoch, batch_size=1024):
+'''
+Train the data.
+'''
+def train(train_X, train_y, model, optimizer, epoch, batch_size=256):
     model.train()
 
     loss_history = []
     logging.info('Epoch: {}'.format(epoch))
     num_of_data = train_X.shape[0]
-    num_of_batch = (num_of_data / batch_size) + 1
+    num_of_batch = int(num_of_data / batch_size) + 1
     for i in range(num_of_batch):
         optimizer.zero_grad()
         X = train_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         y = train_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         c_pred, r_pred = model(X)
-        loss = loss_fn(c_pred, r_pred, train_y)
+        loss = loss_fn(c_pred, r_pred, y)
         #loss.data[0].cpu().numpy()
         loss_history.append(loss.data[0])
         loss.backward()
         optimizer.step()
 
-        if i % 100 == 0:
+        if i % 1000 == 0:
             logging.info('Step: {}, train_loss: {}'.format(i, np.mean(loss_history[-100:])))
+            print ("Step: {}, training loss: {}".format(i, np.mean(loss_history[-100:])))
 
     train_loss = np.mean(loss_history)
     logging.info('Training loss: {}'.format(train_loss))
+    print ('Epoch: {}. Training Loss: {}'.format(epoch, train_loss))
 
 
+'''
+Validation
+'''
+def validate(valid_X, valid_y, model):
+    model.eval()
+
+    c_pred, r_pred = model(valid_X)
+    valid_loss = loss_fn(c_pred, r_pred, valid_y)
+    valid_classification_accuracy = \
+        np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == valid_y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1)) / c_pred.data.cpu().numpy().shape[0]
+
+    logging.info('Validation loss: {}. Validation classification accuracy: {}'\
+        .format(valid_loss, valid_classification_accuracy))
+    print ('Validation loss: {}. Classification accuracy: {}.'\
+        .format(valid_loss, valid_classification_accuracy))
+
+    return valid_loss
 
 
 if __name__ == "__main__":
@@ -182,10 +259,15 @@ if __name__ == "__main__":
     model = FullyConn_NN()
     print ("The model used is: ")
     print (model)
+    learning_rate = 3e-3
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau\
+        (optimizer, factor=0.3, patience=3, min_lr=1e-8, verbose=1, mode='min')
 
     # CUDA set-up:
     cuda_is_available = torch.cuda.is_available()
     if (cuda_is_available):
+        print ("Using CUDA to speed up training.")
         X_train = Variable(torch.FloatTensor(X_train).cuda())
         X_valid = Variable(torch.FloatTensor(X_valid).cuda())
         y_train = Variable(torch.FloatTensor(y_train).cuda())
@@ -193,38 +275,7 @@ if __name__ == "__main__":
         model.cuda()
 
     # Model training:
-
-
-
-
-
-
-'''
-    model = setup_model()
-
-    model.fit(X_train, Y_trainc, shuffle=True, nb_epoch=20, batch_size=32)
-    print ("Model trained success.")
-
-    X_test = (X_test - param_norm[0]) / param_norm[1]
-
-    score = model.evaluate(X_test, Y_testc)
-    print ("\nThe accuracy on testing dat is", score[1])
-
-    logging.info("Test data loss: {}, accuracy: {} ".format(
-        score[0], score[1]))
-    Y_train_hat = model.predict_classes(X_train, batch_size=32)
-    Y_test_hat = model.predict_proba(X_test, batch_size=32)
-    logging.info("## Training Data:")
-    evaluate_model(Y_train, Y_train_hat)
-    for thres in [x / 100.0 for x in range(20, 80, 5)]:
-        logging.info("##threshond = {} Testing Data:".format(thres))
-        performance = evaluate_model(Y_test, Y_test_hat > thres)
-    performance['accuracy'] = [score[1]]
-
-    print ("\nFor more detailed evaluation results, please refer to", \
-          evaluation_log_path + ".log")
-
-    model_path = os.path.join(os.getcwd(), "mlp_model.bin")
-    save_model(model, param_norm, model_path)
-    print ("Model has been saved to", model_path)
-'''
+    for epoch in range(100):
+        train(X_train, y_train, model, optimizer, epoch)
+        valid_loss = validate(X_valid, y_valid, model)
+        scheduler.step(valid_loss)
