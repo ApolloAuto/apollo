@@ -310,7 +310,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
       }
       double diff_x = lane_point.position().x() - feature.position().x();
       double diff_y = lane_point.position().y() - feature.position().y();
-      double angle = std::atan2(diff_x, diff_y);
+      double angle = std::atan2(diff_y, diff_x);
       feature_values->push_back(std::sin(angle - heading));
       feature_values->push_back(lane_point.relative_l());
       feature_values->push_back(lane_point.heading());

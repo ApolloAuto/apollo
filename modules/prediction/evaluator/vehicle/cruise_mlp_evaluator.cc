@@ -303,7 +303,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       }
       double diff_x = lane_point.position().x() - feature.position().x();
       double diff_y = lane_point.position().y() - feature.position().y();
-      double angle = std::atan2(diff_x, diff_y);
+      double angle = std::atan2(diff_y, diff_x);
       feature_values->push_back(lane_point.kappa());
       feature_values->push_back(speed * speed * lane_point.kappa());
       feature_values->push_back(std::sin(angle - heading));
