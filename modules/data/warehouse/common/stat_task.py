@@ -30,15 +30,23 @@ import sys
 
 from rosbag.bag import Bag
 import gflags
+import utm
 
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.data.proto.static_info_pb2 import StaticInfo
 from modules.data.proto.task_pb2 import Task
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
-import coord_calculator
 
 gflags.DEFINE_float('pos_sample_duration', 2, 'In seconds.')
 gflags.DEFINE_float('pos_sample_min_distance', 3, 'In meters.')
+gflags.DEFINE_integer('utm_zone_id', 10, 'UTM zone id.')
+
+
+def utm_distance(pos0, pos1):
+    """Return distance of pos0 and pos1 in meters."""
+    return math.sqrt((pos0.x - pos1.x) ** 2 +
+                     (pos0.y - pos1.y) ** 2 +
+                     (pos0.z - pos1.z) ** 2)
 
 
 class TaskCalculator(object):
@@ -159,35 +167,35 @@ class TaskCalculator(object):
             disengagement = self.task.disengagements.add()
             disengagement.time = t.to_sec()
             if self.last_pos:
-                lat, lng = coord_calculator.utm_to_latlng(self.last_pos.x,
-                                                          self.last_pos.y)
+                lat, lng = utm.to_latlng(self.last_pos.x, self.last_pos.y,
+                                         gflags.FLAGS.utm_zone_id)
                 disengagement.location.latitude = lat
                 disengagement.location.longitude = lng
         self.current_driving_mode = msg.driving_mode
 
     def _on_localization(self, msg, t):
+        G = gflags.FLAGS
         new_pos = msg.pose.position
 
         # Update mileage and position.
         if self.last_pos and (self.current_driving_mode is not None):
             self.mileage[self.current_driving_mode] += \
-                coord_calculator.utm_distance(self.last_pos, new_pos)
+                utm_distance(self.last_pos, new_pos)
         self.last_pos = new_pos
 
         # Sample map point.
         time_sec = t.to_sec()
         should_sample = True
         if self.last_pos_sampled:
-            G = gflags.FLAGS
             if time_sec - self.last_pos_sampled_time < G.pos_sample_duration:
                 should_sample = False
-            elif (coord_calculator.utm_distance(self.last_pos_sampled, new_pos)
+            elif (utm_distance(self.last_pos_sampled, new_pos)
                   < G.pos_sample_min_distance):
                 should_sample = False
         if should_sample:
             self.last_pos_sampled = new_pos
             self.last_pos_sampled_time = time_sec
-            lat, lng = coord_calculator.utm_to_latlng(new_pos.x, new_pos.y)
+            lat, lng = utm.to_latlng(new_pos.x, new_pos.y, G.utm_zone_id)
             map_point = self.task.map_path.add()
             map_point.latitude, map_point.longitude = lat, lng
 
