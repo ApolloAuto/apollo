@@ -28,16 +28,8 @@
 namespace apollo {
 namespace planning {
 
-class SpeedProfileGeneratorTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
-
- protected:
-  SpeedProfileGenerator spg_;
-};
-
-TEST_F(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
-  auto speed_data = spg_.GenerateFallbackSpeedProfile();
+TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
+  auto speed_data = SpeedProfileGenerator::GenerateFallbackSpeedProfile();
   EXPECT_FALSE(speed_data.Empty());
 
   common::TrajectoryPoint adc_planning_point;
@@ -47,7 +39,7 @@ TEST_F(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
   const std::vector<const Obstacle*> obstacles;
 
   EgoInfo::Instance()->Update(adc_planning_point, vs, obstacles);
-  auto speed_data2 = spg_.GenerateFallbackSpeedProfile();
+  auto speed_data2 = SpeedProfileGenerator::GenerateFallbackSpeedProfile();
   EXPECT_FALSE(speed_data2.Empty());
 }
 

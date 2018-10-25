@@ -34,17 +34,17 @@ namespace planning {
 
 class SpeedProfileGenerator {
  public:
-  SpeedProfileGenerator() = default;
-  ~SpeedProfileGenerator() = default;
+  SpeedProfileGenerator() = delete;
+  ~SpeedProfileGenerator() = delete;
 
-  std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
+  static std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
       const common::TrajectoryPoint& planning_init_point,
-      const ReferenceLineInfo* reference_line_info) const;
+      const ReferenceLineInfo* reference_line_info);
 
-  std::vector<common::SpeedPoint> GenerateSpeedHotStart(
-      const common::TrajectoryPoint& planning_init_point) const;
+  static std::vector<common::SpeedPoint> GenerateSpeedHotStart(
+      const common::TrajectoryPoint& planning_init_point);
 
-  SpeedData GenerateFallbackSpeedProfile();
+  static SpeedData GenerateFallbackSpeedProfile();
 
   static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
                                                      const double max_speed);
@@ -53,13 +53,13 @@ class SpeedProfileGenerator {
                                                   const double max_speed);
 
  private:
-  SpeedData GenerateStopProfile(const double init_speed,
-                                const double init_acc) const;
+  static SpeedData GenerateStopProfile(const double init_speed,
+                                       const double init_acc);
 
-  SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
-                                              const double init_acc) const;
+  static SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
+                                                     const double init_acc);
 
-  bool IsValidProfile(const QuinticPolynomialCurve1d& curve) const;
+  static bool IsValidProfile(const QuinticPolynomialCurve1d& curve);
 };
 
 }  // namespace planning

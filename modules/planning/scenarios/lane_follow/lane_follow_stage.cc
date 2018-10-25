@@ -150,11 +150,11 @@ Status LaneFollowStage::PlanOnReferenceLine(
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
   auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
-  auto speed_profile = speed_profile_generator_.GenerateInitSpeedProfile(
+  auto speed_profile = SpeedProfileGenerator::GenerateInitSpeedProfile(
       planning_start_point, reference_line_info);
   if (speed_profile.empty()) {
     speed_profile =
-        speed_profile_generator_.GenerateSpeedHotStart(planning_start_point);
+        SpeedProfileGenerator::GenerateSpeedHotStart(planning_start_point);
     ADEBUG << "Using dummy hot start for speed vector";
   }
   heuristic_speed_data->set_speed_vector(speed_profile);
@@ -193,7 +193,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
     ADEBUG << "Speed fallback.";
 
     *reference_line_info->mutable_speed_data() =
-        speed_profile_generator_.GenerateFallbackSpeedProfile();
+        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
   }
