@@ -55,11 +55,11 @@ using apollo::prediction::PredictionObstacles;
 constexpr double kMathEpsilon = 1e-8;
 
 FrameHistory::FrameHistory()
-    : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {
-}
+    : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
-Frame::Frame(uint32_t sequence_num) : sequence_num_(sequence_num),
-  monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
+Frame::Frame(uint32_t sequence_num)
+    : sequence_num_(sequence_num),
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
   init_data_ = false;
 }
 
@@ -74,20 +74,19 @@ Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
       vehicle_state_(vehicle_state),
       reference_line_provider_(reference_line_provider),
       monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING),
-      init_data_(true) {
-}
-
+      init_data_(true) {}
 
 void Frame::InitData(const LocalView &local_view,
-             const common::TrajectoryPoint &planning_start_point,
-             const double start_time, const common::VehicleState &vehicle_state,
-             ReferenceLineProvider *reference_line_provider) {
+                     const common::TrajectoryPoint &planning_start_point,
+                     const double start_time,
+                     const common::VehicleState &vehicle_state,
+                     ReferenceLineProvider *reference_line_provider) {
   if (!init_data_) {
-      local_view_ = local_view;
-      planning_start_point_ = planning_start_point;
-      start_time_ = start_time;
-      vehicle_state_ = vehicle_state;
-      reference_line_provider_ = reference_line_provider;
+    local_view_ = local_view;
+    planning_start_point_ = planning_start_point;
+    start_time_ = start_time;
+    vehicle_state_ = vehicle_state;
+    reference_line_provider_ = reference_line_provider;
   }
   init_data_ = true;
 }
@@ -233,7 +232,7 @@ bool Frame::CreateReferenceLineInfo(
  * @brief: create static virtual object with lane width,
  *         mainly used for virtual stop wall
  */
-const Obstacle *Frame::CreateStopObstacle(
+const PathObstacle *Frame::CreateStopObstacle(
     ReferenceLineInfo *const reference_line_info,
     const std::string &obstacle_id, const double obstacle_s) {
   if (reference_line_info == nullptr) {
@@ -258,9 +257,9 @@ const Obstacle *Frame::CreateStopObstacle(
  * @brief: create static virtual object with lane width,
  *         mainly used for virtual stop wall
  */
-const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
-                                          const std::string &lane_id,
-                                          const double lane_s) {
+const PathObstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
+                                              const std::string &lane_id,
+                                              const double lane_s) {
   if (!hdmap_) {
     AERROR << "Invalid HD Map.";
     return nullptr;
@@ -289,7 +288,7 @@ const Obstacle *Frame::CreateStopObstacle(const std::string &obstacle_id,
 /**
  * @brief: create static virtual object with lane width,
  */
-const Obstacle *Frame::CreateStaticObstacle(
+const PathObstacle *Frame::CreateStaticObstacle(
     ReferenceLineInfo *const reference_line_info,
     const std::string &obstacle_id, const double obstacle_start_s,
     const double obstacle_end_s) {
@@ -334,15 +333,15 @@ const Obstacle *Frame::CreateStaticObstacle(
   return CreateStaticVirtualObstacle(obstacle_id, obstacle_box);
 }
 
-const Obstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
-                                                   const Box2d &box) {
+const PathObstacle *Frame::CreateStaticVirtualObstacle(const std::string &id,
+                                                       const Box2d &box) {
   const auto *object = obstacles_.Find(id);
   if (object) {
     AWARN << "obstacle " << id << " already exist.";
     return object;
   }
   auto *ptr =
-      obstacles_.Add(id, *Obstacle::CreateStaticVirtualObstacles(id, box));
+      obstacles_.Add(id, *PathObstacle::CreateStaticVirtualObstacles(id, box));
   if (!ptr) {
     AERROR << "Failed to create virtual obstacle " << id;
   }
@@ -376,7 +375,7 @@ Status Frame::Init(
     local_view_.prediction_obstacles->CopyFrom(prediction);
   }
   for (auto &ptr :
-       Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
+       PathObstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
     AddObstacle(*ptr);
   }
   if (FLAGS_enable_collision_detection) {
@@ -398,7 +397,7 @@ Status Frame::Init(
   return Status::OK();
 }
 
-const Obstacle *Frame::FindCollisionObstacle() const {
+const PathObstacle *Frame::FindCollisionObstacle() const {
   if (obstacles_.Items().empty()) {
     return nullptr;
   }
@@ -510,9 +509,9 @@ void Frame::AlignPredictionTime(const double planning_start_time,
   }
 }
 
-Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
+PathObstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
 
-void Frame::AddObstacle(const Obstacle &obstacle) {
+void Frame::AddObstacle(const PathObstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
 }
 
@@ -533,7 +532,7 @@ const ReferenceLineInfo *Frame::DriveReferenceLineInfo() const {
   return drive_reference_line_info_;
 }
 
-const std::vector<const Obstacle *> Frame::obstacles() const {
+const std::vector<const PathObstacle *> Frame::obstacles() const {
   return obstacles_.Items();
 }
 
@@ -559,8 +558,9 @@ bool Frame::VPresentationObstacle() {
     Box2d original_box = obstacles_.Items().at(i)->PerceptionBoundingBox();
     original_box.Shift(-1 * origin_point_);
     original_box.RotateFromCenter(-origin_heading_);
-    std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles(
-        obstacles_.Items().at(i)->Id(), original_box);
+    std::unique_ptr<PathObstacle> obstacle =
+        PathObstacle::CreateStaticVirtualObstacles(
+            obstacles_.Items().at(i)->Id(), original_box);
     openspace_warmstart_obstacles_.Add(obstacle->Id(), *obstacle);
   }
 
@@ -617,29 +617,30 @@ bool Frame::VPresentationObstacle() {
   Box2d up_boundary_box(up_boundary_center, up_boundary_heading,
                         up_boundary_length, up_boundary_width);
 
-  std::unique_ptr<Obstacle> left_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("left_boundary",
-                                             left_boundary_box);
+  std::unique_ptr<PathObstacle> left_boundary_obstacle =
+      PathObstacle::CreateStaticVirtualObstacles("left_boundary",
+                                                 left_boundary_box);
 
   openspace_warmstart_obstacles_.Add(left_boundary_obstacle->Id(),
                                      *left_boundary_obstacle);
 
-  std::unique_ptr<Obstacle> down_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("down_boundary",
-                                             down_boundary_box);
+  std::unique_ptr<PathObstacle> down_boundary_obstacle =
+      PathObstacle::CreateStaticVirtualObstacles("down_boundary",
+                                                 down_boundary_box);
 
   openspace_warmstart_obstacles_.Add(down_boundary_obstacle->Id(),
                                      *down_boundary_obstacle);
 
-  std::unique_ptr<Obstacle> right_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("right_boundary",
-                                             right_boundary_box);
+  std::unique_ptr<PathObstacle> right_boundary_obstacle =
+      PathObstacle::CreateStaticVirtualObstacles("right_boundary",
+                                                 right_boundary_box);
 
   openspace_warmstart_obstacles_.Add(right_boundary_obstacle->Id(),
                                      *right_boundary_obstacle);
 
-  std::unique_ptr<Obstacle> up_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("up_boundary", up_boundary_box);
+  std::unique_ptr<PathObstacle> up_boundary_obstacle =
+      PathObstacle::CreateStaticVirtualObstacles("up_boundary",
+                                                 up_boundary_box);
 
   openspace_warmstart_obstacles_.Add(up_boundary_obstacle->Id(),
                                      *up_boundary_obstacle);

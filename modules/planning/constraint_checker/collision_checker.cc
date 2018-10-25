@@ -41,8 +41,8 @@ using apollo::common::math::PathMatcher;
 using apollo::common::math::Vec2d;
 
 CollisionChecker::CollisionChecker(
-    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
-    const double ego_vehicle_d,
+    const std::vector<const PathObstacle*>& obstacles,
+    const double ego_vehicle_s, const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line,
     const ReferenceLineInfo* ptr_reference_line_info,
     const std::shared_ptr<PathTimeGraph>& ptr_path_time_graph) {
@@ -83,16 +83,16 @@ bool CollisionChecker::InCollision(
 }
 
 void CollisionChecker::BuildPredictedEnvironment(
-    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
-    const double ego_vehicle_d,
+    const std::vector<const PathObstacle*>& obstacles,
+    const double ego_vehicle_s, const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line) {
   CHECK(predicted_bounding_rectangles_.empty());
 
   // If the ego vehicle is in lane,
   // then, ignore all obstacles from the same lane.
   bool ego_vehicle_in_lane = IsEgoVehicleInLane(ego_vehicle_s, ego_vehicle_d);
-  std::vector<const Obstacle*> obstacles_considered;
-  for (const Obstacle* obstacle : obstacles) {
+  std::vector<const PathObstacle*> obstacles_considered;
+  for (const PathObstacle* obstacle : obstacles) {
     if (obstacle->IsVirtual()) {
       continue;
     }
@@ -109,7 +109,7 @@ void CollisionChecker::BuildPredictedEnvironment(
   double relative_time = 0.0;
   while (relative_time < FLAGS_trajectory_time_length) {
     std::vector<Box2d> predicted_env;
-    for (const Obstacle* obstacle : obstacles_considered) {
+    for (const PathObstacle* obstacle : obstacles_considered) {
       // If an obstacle has no trajectory, it is considered as static.
       // Obstacle::GetPointAtTime has handled this case.
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
@@ -133,7 +133,7 @@ bool CollisionChecker::IsEgoVehicleInLane(const double ego_vehicle_s,
 }
 
 bool CollisionChecker::IsObstacleBehindEgoVehicle(
-    const Obstacle* obstacle, const double ego_vehicle_s,
+    const PathObstacle* obstacle, const double ego_vehicle_s,
     const std::vector<PathPoint>& discretized_reference_line) {
   double half_lane_width = FLAGS_default_reference_line_width * 0.5;
   TrajectoryPoint point = obstacle->GetPointAtTime(0.0);

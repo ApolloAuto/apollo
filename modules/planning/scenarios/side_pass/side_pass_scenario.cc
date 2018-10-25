@@ -133,11 +133,10 @@ bool SidePassScenario::HasBlockingObstacle(
   // a blocking obstacle is an obstacle blocks the road when it is not blocked
   // (by other obstacles or traffic rules)
   for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    if (path_obstacle->obstacle()->IsVirtual() ||
-        !path_obstacle->obstacle()->IsStatic()) {
+    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
       continue;
     }
-    CHECK(path_obstacle->obstacle()->IsStatic());
+    CHECK(path_obstacle->IsStatic());
 
     if (path_obstacle->PerceptionSLBoundary().start_s() <=
         adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.

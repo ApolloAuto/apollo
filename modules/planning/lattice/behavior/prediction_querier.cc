@@ -29,7 +29,7 @@ namespace apollo {
 namespace planning {
 
 PredictionQuerier::PredictionQuerier(
-    const std::vector<const Obstacle*>& obstacles,
+    const std::vector<const PathObstacle*>& obstacles,
     const std::shared_ptr<std::vector<common::PathPoint>>& ptr_reference_line)
     : ptr_reference_line_(ptr_reference_line) {
   for (const auto ptr_obstacle : obstacles) {
@@ -42,7 +42,7 @@ PredictionQuerier::PredictionQuerier(
   }
 }
 
-std::vector<const Obstacle*> PredictionQuerier::GetObstacles() const {
+std::vector<const PathObstacle*> PredictionQuerier::GetObstacles() const {
   return obstacles_;
 }
 
@@ -61,10 +61,12 @@ double PredictionQuerier::ProjectVelocityAlongReferenceLine(
     return 0.0;
   }
 
-  auto matched_it = std::lower_bound(trajectory.trajectory_point().begin(),
-      trajectory.trajectory_point().end(), t,
-      [](const common::TrajectoryPoint& p, const double t)
-      { return p.relative_time() < t; });
+  auto matched_it =
+      std::lower_bound(trajectory.trajectory_point().begin(),
+                       trajectory.trajectory_point().end(), t,
+                       [](const common::TrajectoryPoint& p, const double t) {
+                         return p.relative_time() < t;
+                       });
 
   double v = matched_it->v();
   double theta = matched_it->path_point().theta();

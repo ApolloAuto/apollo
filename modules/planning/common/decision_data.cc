@@ -23,7 +23,7 @@ namespace planning {
 
 // this sanity check will move to the very beginning of planning
 bool DecisionData::IsValidTrajectoryPoint(
-  const common::TrajectoryPoint& point) {
+    const common::TrajectoryPoint& point) {
   return !((!point.has_path_point()) || std::isnan(point.path_point().x()) ||
            std::isnan(point.path_point().y()) ||
            std::isnan(point.path_point().z()) ||
@@ -34,8 +34,7 @@ bool DecisionData::IsValidTrajectoryPoint(
            std::isnan(point.a()) || std::isnan(point.relative_time()));
 }
 
-bool DecisionData::IsValidTrajectory(
-  const prediction::Trajectory& trajectory) {
+bool DecisionData::IsValidTrajectory(const prediction::Trajectory& trajectory) {
   for (const auto& point : trajectory.trajectory_point()) {
     if (!IsValidTrajectoryPoint(point)) {
       AERROR << " TrajectoryPoint: " << trajectory.ShortDebugString()
@@ -55,9 +54,8 @@ DecisionData::DecisionData(
     const std::string perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
     if (prediction_obstacle.trajectory().empty()) {
-      obstacles_.emplace_back(new Obstacle(
+      path_obstacles_.emplace_back(new PathObstacle(
           perception_id, prediction_obstacle.perception_obstacle()));
-      path_obstacles_.emplace_back(new PathObstacle(obstacles_.back().get()));
       all_obstacle_.emplace_back(path_obstacles_.back().get());
       practical_obstacle_.emplace_back(path_obstacles_.back().get());
       static_obstacle_.emplace_back(path_obstacles_.back().get());
@@ -72,9 +70,8 @@ DecisionData::DecisionData(
       }
       const std::string obstacle_id =
           apollo::common::util::StrCat(perception_id, "_", trajectory_index);
-      obstacles_.emplace_back(new Obstacle(
+      path_obstacles_.emplace_back(new PathObstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
-      path_obstacles_.emplace_back(new PathObstacle(obstacles_.back().get()));
       all_obstacle_.emplace_back(path_obstacles_.back().get());
       practical_obstacle_.emplace_back(path_obstacles_.back().get());
       dynamic_obstacle_.emplace_back(path_obstacles_.back().get());
@@ -158,9 +155,7 @@ bool DecisionData::CreateVirtualObstacle(const ReferencePoint& point,
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   reference_line_.GetLaneWidth(obstacle_s, &lane_left_width, &lane_right_width);
-  common::math::Box2d box(box_center,
-                          heading,
-                          FLAGS_virtual_stop_wall_length,
+  common::math::Box2d box(box_center, heading, FLAGS_virtual_stop_wall_length,
                           lane_left_width + lane_right_width);
   return CreateVirtualObstacle(box, type, id);
 }
@@ -175,17 +170,14 @@ bool DecisionData::CreateVirtualObstacle(const double point_s,
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   reference_line_.GetLaneWidth(point_s, &lane_left_width, &lane_right_width);
-  common::math::Box2d box(box_center,
-                          heading,
-                          FLAGS_virtual_stop_wall_length,
+  common::math::Box2d box(box_center, heading, FLAGS_virtual_stop_wall_length,
                           lane_left_width + lane_right_width);
   return CreateVirtualObstacle(box, type, id);
 }
 
 bool DecisionData::CreateVirtualObstacle(
-                                    const common::math::Box2d& obstacle_box,
-                                    const VirtualObjectType& type,
-                                    std::string* const id) {
+    const common::math::Box2d& obstacle_box, const VirtualObjectType& type,
+    std::string* const id) {
   std::lock_guard<std::mutex> transaction_lock(transaction_mutex_);
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -212,8 +204,7 @@ bool DecisionData::CreateVirtualObstacle(
     point->set_y(corner_point.y());
   }
   *id = std::to_string(perception_obstacle.id());
-  obstacles_.emplace_back(new Obstacle(*id, perception_obstacle));
-  path_obstacles_.emplace_back(new PathObstacle(obstacles_.back().get()));
+  path_obstacles_.emplace_back(new PathObstacle(*id, perception_obstacle));
   all_obstacle_.emplace_back(path_obstacles_.back().get());
   virtual_obstacle_.emplace_back(path_obstacles_.back().get());
   // would be changed if some virtual type is not static one

@@ -31,7 +31,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/navi/decider/navi_task.h"
 
 /**
@@ -66,7 +66,7 @@ class NaviObstacleDecider : public NaviTask {
    * @return actual nudgable distance
    */
   double GetNudgeDistance(
-      const std::vector<const Obstacle *> &obstacles,
+      const std::vector<const PathObstacle *> &obstacles,
       const ReferenceLine &reference_line, const PathDecision &path_decision,
       const std::vector<common::PathPoint> &path_data_points,
       const common::VehicleState &vehicle_state, int *lane_obstacles_num);
@@ -77,7 +77,7 @@ class NaviObstacleDecider : public NaviTask {
    */
   void GetUnsafeObstaclesInfo(
       const std::vector<common::PathPoint> &path_data_points,
-      const std::vector<const Obstacle *> &obstacles);
+      const std::vector<const PathObstacle *> &obstacles);
 
   /**
    * @brief Get unsafe obstacles' ID
@@ -103,7 +103,7 @@ class NaviObstacleDecider : public NaviTask {
    * @return Number of obstacles in the current lane
    */
   void ProcessPathObstacle(
-      const std::vector<const Obstacle *> &obstacles,
+      const std::vector<const PathObstacle *> &obstacles,
       const std::vector<common::PathPoint> &path_data_points,
       const PathDecision &path_decision, const double min_lane_width,
       const common::VehicleState &vehicle_state);
@@ -116,14 +116,15 @@ class NaviObstacleDecider : public NaviTask {
   void AddObstacleOffsetDirection(
       const common::PathPoint &projection_point,
       const std::vector<common::PathPoint> &path_data_points,
-      const Obstacle *current_obstacle, const double proj_len, double *dist);
+      const PathObstacle *current_obstacle, const double proj_len,
+      double *dist);
 
   /**
    * @brief Remove safe obstacles
    * @return whether filter the obstacle
    */
   bool IsNeedFilterObstacle(
-      const Obstacle *current_obstacle,
+      const PathObstacle *current_obstacle,
       const common::PathPoint &vehicle_projection_point,
       const std::vector<common::PathPoint> &path_data_points,
       const common::VehicleState &vehicle_state,

@@ -216,8 +216,7 @@ int StopSignUnprotectedPreStop::AddWatchVehicle(
     const PathObstacle& path_obstacle, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle =
-      path_obstacle.obstacle()->Perception();
+  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
@@ -314,8 +313,7 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle =
-      path_obstacle.obstacle()->Perception();
+  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);

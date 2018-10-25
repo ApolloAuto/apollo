@@ -28,11 +28,12 @@
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
+#include "modules/planning/proto/lattice_structure.pb.h"
+
 #include "modules/common/math/polygon2d.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
@@ -40,12 +41,11 @@ namespace planning {
 
 class PathTimeGraph {
  public:
-  PathTimeGraph(const std::vector<const Obstacle*>& obstacles,
+  PathTimeGraph(const std::vector<const PathObstacle*>& obstacles,
                 const std::vector<common::PathPoint>& discretized_ref_points,
                 const ReferenceLineInfo* ptr_reference_line_info,
-                const double s_start, const double s_end,
-                const double t_start, const double t_end,
-                const std::array<double, 3>& init_d);
+                const double s_start, const double s_end, const double t_start,
+                const double t_end, const std::array<double, 3>& init_d);
 
   const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
 
@@ -73,7 +73,7 @@ class PathTimeGraph {
 
  private:
   void SetupObstacles(
-      const std::vector<const Obstacle*>& obstacles,
+      const std::vector<const PathObstacle*>& obstacles,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   SLBoundary ComputeObstacleBoundary(
@@ -84,18 +84,17 @@ class PathTimeGraph {
                                  const double t) const;
 
   void SetStaticObstacle(
-      const Obstacle* obstacle,
+      const PathObstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   void SetDynamicObstacle(
-      const Obstacle* obstacle,
+      const PathObstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   void UpdateLateralBoundsByObstacle(
-    const SLBoundary& sl_boundary,
-    const std::vector<double>& discretized_path,
-    const double s_start, const double s_end,
-    std::vector<std::pair<double, double>>* const bounds);
+      const SLBoundary& sl_boundary,
+      const std::vector<double>& discretized_path, const double s_start,
+      const double s_end, std::vector<std::pair<double, double>>* const bounds);
 
  private:
   std::pair<double, double> time_range_;

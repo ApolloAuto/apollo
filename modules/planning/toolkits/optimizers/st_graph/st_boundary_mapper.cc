@@ -28,8 +28,8 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/file.h"
@@ -302,8 +302,7 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
   std::vector<STPoint> upper_points;
 
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                                *(path_obstacle->obstacle()), &upper_points,
-                                &lower_points)) {
+                                *path_obstacle, &upper_points, &lower_points)) {
     return Status::OK();
   }
 
@@ -325,7 +324,7 @@ Status StBoundaryMapper::MapWithoutDecision(PathObstacle* path_obstacle) const {
 }
 
 bool StBoundaryMapper::GetOverlapBoundaryPoints(
-    const std::vector<PathPoint>& path_points, const Obstacle& obstacle,
+    const std::vector<PathPoint>& path_points, const PathObstacle& obstacle,
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
   DCHECK_NOTNULL(upper_points);
@@ -469,8 +468,7 @@ Status StBoundaryMapper::MapWithDecision(
   std::vector<STPoint> upper_points;
 
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                                *(path_obstacle->obstacle()), &upper_points,
-                                &lower_points)) {
+                                *path_obstacle, &upper_points, &lower_points)) {
     return Status::OK();
   }
 
@@ -510,7 +508,7 @@ Status StBoundaryMapper::MapWithDecision(
                   << decision.DebugString();
   }
   boundary.SetBoundaryType(b_type);
-  boundary.SetId(path_obstacle->obstacle()->Id());
+  boundary.SetId(path_obstacle->Id());
   boundary.SetCharacteristicLength(characteristic_length);
   path_obstacle->SetStBoundary(boundary);
 

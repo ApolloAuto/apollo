@@ -223,10 +223,10 @@ Status LaneFollowStage::PlanOnReferenceLine(
 
   for (const auto* path_obstacle :
        reference_line_info->path_decision()->path_obstacles().Items()) {
-    if (path_obstacle->obstacle()->IsVirtual()) {
+    if (path_obstacle->IsVirtual()) {
       continue;
     }
-    if (!path_obstacle->obstacle()->IsStatic()) {
+    if (!path_obstacle->IsStatic()) {
       continue;
     }
     if (path_obstacle->LongitudinalDecision().has_stop()) {

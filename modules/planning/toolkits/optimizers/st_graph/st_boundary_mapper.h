@@ -69,7 +69,7 @@ class StBoundaryMapper {
    */
   bool GetOverlapBoundaryPoints(
       const std::vector<apollo::common::PathPoint>& path_points,
-      const Obstacle& obstacle, std::vector<STPoint>* upper_points,
+      const PathObstacle& obstacle, std::vector<STPoint>* upper_points,
       std::vector<STPoint>* lower_points) const;
 
   apollo::common::Status MapWithoutDecision(PathObstacle* path_obstacle) const;

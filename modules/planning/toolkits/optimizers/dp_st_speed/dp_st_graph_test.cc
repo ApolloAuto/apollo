@@ -42,8 +42,7 @@ class DpStGraphTest : public ::testing::Test {
     CHECK(apollo::common::util::GetProtoFromFile(
         FLAGS_scenario_lane_follow_config_file, &config));
 
-    FLAGS_planning_config_file =
-        "modules/planning/conf/planning_config.pb.txt";
+    FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
     PlanningConfig planning_config;
     CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                  &planning_config))
@@ -79,7 +78,6 @@ class DpStGraphTest : public ::testing::Test {
 
  protected:
   std::list<PathObstacle> path_obstacle_list_;
-  std::list<Obstacle> obstacle_list_;
 
   StGraphData st_graph_data_;
   SpeedLimit speed_limit_;
@@ -91,10 +89,9 @@ class DpStGraphTest : public ::testing::Test {
 };
 
 TEST_F(DpStGraphTest, simple) {
-  Obstacle o1;
+  PathObstacle o1;
   o1.SetId("o1");
-  obstacle_list_.push_back(o1);
-  path_obstacle_list_.emplace_back(&(obstacle_list_.back()));
+  path_obstacle_list_.push_back(o1);
 
   std::vector<const PathObstacle*> obstacles_;
   obstacles_.emplace_back(&(path_obstacle_list_.back()));

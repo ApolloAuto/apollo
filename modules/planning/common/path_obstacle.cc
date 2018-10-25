@@ -23,8 +23,10 @@
 #include <unordered_map>
 #include <utility>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cyber/common/log.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/path_obstacle.h"
@@ -36,6 +38,7 @@ namespace planning {
 
 using apollo::common::VehicleConfigHelper;
 using apollo::common::util::FindOrDie;
+using apollo::perception::PerceptionObstacle;
 
 namespace {
 const double kStBoundaryDeltaS = 0.2;        // meters
@@ -59,11 +62,196 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
         {ObjectDecisionType::kNudge, 100},
         {ObjectDecisionType::kSidepass, 200}};
 
-const std::string& PathObstacle::Id() const { return id_; }
+PathObstacle::PathObstacle(const std::string& id,
+                           const PerceptionObstacle& perception_obstacle)
+    : id_(id),
+      perception_id_(perception_obstacle.id()),
+      perception_obstacle_(perception_obstacle),
+      perception_bounding_box_({perception_obstacle_.position().x(),
+                                perception_obstacle_.position().y()},
+                               perception_obstacle_.theta(),
+                               perception_obstacle_.length(),
+                               perception_obstacle_.width()) {
+  std::vector<common::math::Vec2d> polygon_points;
+  if (FLAGS_use_navigation_mode ||
+      perception_obstacle.polygon_point_size() <= 2) {
+    perception_bounding_box_.GetAllCorners(&polygon_points);
+  } else {
+    CHECK(perception_obstacle.polygon_point_size() > 2)
+        << "object " << id << "has less than 3 polygon points";
+    for (const auto& point : perception_obstacle.polygon_point()) {
+      polygon_points.emplace_back(point.x(), point.y());
+    }
+  }
+  CHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
+                                                   &perception_polygon_))
+      << "object[" << id << "] polygon is not a valid convex hull";
 
-PathObstacle::PathObstacle(const Obstacle* obstacle) : obstacle_(obstacle) {
-  CHECK_NOTNULL(obstacle);
-  id_ = obstacle_->Id();
+  is_static_ = IsStaticObstacle(perception_obstacle);
+  is_virtual_ = IsVirtualObstacle(perception_obstacle);
+  speed_ = std::hypot(perception_obstacle.velocity().x(),
+                      perception_obstacle.velocity().y());
+}
+
+PathObstacle::PathObstacle(const std::string& id,
+                           const PerceptionObstacle& perception_obstacle,
+                           const prediction::Trajectory& trajectory)
+    : PathObstacle(id, perception_obstacle) {
+  trajectory_ = trajectory;
+  auto& trajectory_points = *trajectory_.mutable_trajectory_point();
+  double cumulative_s = 0.0;
+  if (trajectory_points.size() > 0) {
+    trajectory_points[0].mutable_path_point()->set_s(0.0);
+  }
+  for (int i = 1; i < trajectory_points.size(); ++i) {
+    const auto& prev = trajectory_points[i - 1];
+    const auto& cur = trajectory_points[i];
+    if (prev.relative_time() >= cur.relative_time()) {
+      AERROR << "prediction time is not increasing."
+             << "current point: " << cur.ShortDebugString()
+             << "previous point: " << prev.ShortDebugString();
+    }
+    cumulative_s +=
+        common::util::DistanceXY(prev.path_point(), cur.path_point());
+    trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
+  }
+}
+
+common::TrajectoryPoint PathObstacle::GetPointAtTime(
+    const double relative_time) const {
+  const auto& points = trajectory_.trajectory_point();
+  if (points.size() < 2) {
+    common::TrajectoryPoint point;
+    point.mutable_path_point()->set_x(perception_obstacle_.position().x());
+    point.mutable_path_point()->set_y(perception_obstacle_.position().y());
+    point.mutable_path_point()->set_z(perception_obstacle_.position().z());
+    point.mutable_path_point()->set_theta(perception_obstacle_.theta());
+    point.mutable_path_point()->set_s(0.0);
+    point.mutable_path_point()->set_kappa(0.0);
+    point.mutable_path_point()->set_dkappa(0.0);
+    point.mutable_path_point()->set_ddkappa(0.0);
+    point.set_v(0.0);
+    point.set_a(0.0);
+    point.set_relative_time(0.0);
+    return point;
+  } else {
+    auto comp = [](const common::TrajectoryPoint p, const double time) {
+      return p.relative_time() < time;
+    };
+
+    auto it_lower =
+        std::lower_bound(points.begin(), points.end(), relative_time, comp);
+
+    if (it_lower == points.begin()) {
+      return *points.begin();
+    } else if (it_lower == points.end()) {
+      return *points.rbegin();
+    }
+    return common::math::InterpolateUsingLinearApproximation(
+        *(it_lower - 1), *it_lower, relative_time);
+  }
+}
+
+common::math::Box2d PathObstacle::GetBoundingBox(
+    const common::TrajectoryPoint& point) const {
+  return common::math::Box2d({point.path_point().x(), point.path_point().y()},
+                             point.path_point().theta(),
+                             perception_obstacle_.length(),
+                             perception_obstacle_.width());
+}
+
+bool PathObstacle::IsStaticObstacle(
+    const PerceptionObstacle& perception_obstacle) {
+  if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
+    return true;
+  }
+  auto moving_speed = std::hypot(perception_obstacle.velocity().x(),
+                                 perception_obstacle.velocity().y());
+  return std::isnan(moving_speed) ||
+         moving_speed <= FLAGS_static_obstacle_speed_threshold;
+}
+
+std::list<std::unique_ptr<PathObstacle>> PathObstacle::CreateObstacles(
+    const prediction::PredictionObstacles& predictions) {
+  std::list<std::unique_ptr<PathObstacle>> obstacles;
+  for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
+    const auto perception_id =
+        std::to_string(prediction_obstacle.perception_obstacle().id());
+    if (prediction_obstacle.trajectory().empty()) {
+      obstacles.emplace_back(new PathObstacle(
+          perception_id, prediction_obstacle.perception_obstacle()));
+      continue;
+    }
+
+    int trajectory_index = 0;
+    for (const auto& trajectory : prediction_obstacle.trajectory()) {
+      bool is_valid_trajectory = true;
+      for (const auto& point : trajectory.trajectory_point()) {
+        if (!IsValidTrajectoryPoint(point)) {
+          AERROR << "obj:" << perception_id
+                 << " TrajectoryPoint: " << trajectory.ShortDebugString()
+                 << " is NOT valid.";
+          is_valid_trajectory = false;
+          break;
+        }
+      }
+      if (!is_valid_trajectory) {
+        continue;
+      }
+
+      const std::string obstacle_id =
+          apollo::common::util::StrCat(perception_id, "_", trajectory_index);
+      obstacles.emplace_back(new PathObstacle(
+          obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
+      ++trajectory_index;
+    }
+  }
+  return obstacles;
+}
+
+std::unique_ptr<PathObstacle> PathObstacle::CreateStaticVirtualObstacles(
+    const std::string& id, const common::math::Box2d& obstacle_box) {
+  // create a "virtual" perception_obstacle
+  perception::PerceptionObstacle perception_obstacle;
+  // simulator needs a valid integer
+  int32_t negative_id = std::hash<std::string>{}(id);
+  // set the first bit to 1 so negative_id became negative number
+  negative_id |= (0x1 << 31);
+  perception_obstacle.set_id(negative_id);
+  perception_obstacle.mutable_position()->set_x(obstacle_box.center().x());
+  perception_obstacle.mutable_position()->set_y(obstacle_box.center().y());
+  perception_obstacle.set_theta(obstacle_box.heading());
+  perception_obstacle.mutable_velocity()->set_x(0);
+  perception_obstacle.mutable_velocity()->set_y(0);
+  perception_obstacle.set_length(obstacle_box.length());
+  perception_obstacle.set_width(obstacle_box.width());
+  perception_obstacle.set_height(FLAGS_virtual_stop_wall_height);
+  perception_obstacle.set_type(
+      perception::PerceptionObstacle::UNKNOWN_UNMOVABLE);
+  perception_obstacle.set_tracking_time(1.0);
+
+  std::vector<common::math::Vec2d> corner_points;
+  obstacle_box.GetAllCorners(&corner_points);
+  for (const auto& corner_point : corner_points) {
+    auto* point = perception_obstacle.add_polygon_point();
+    point->set_x(corner_point.x());
+    point->set_y(corner_point.y());
+  }
+  auto* obstacle = new PathObstacle(id, perception_obstacle);
+  obstacle->is_virtual_ = true;
+  return std::unique_ptr<PathObstacle>(obstacle);
+}
+
+bool PathObstacle::IsValidTrajectoryPoint(
+    const common::TrajectoryPoint& point) {
+  return !((!point.has_path_point()) || std::isnan(point.path_point().x()) ||
+           std::isnan(point.path_point().y()) ||
+           std::isnan(point.path_point().z()) ||
+           std::isnan(point.path_point().kappa()) ||
+           std::isnan(point.path_point().s()) ||
+           std::isnan(point.path_point().dkappa()) ||
+           std::isnan(point.path_point().ddkappa()) || std::isnan(point.v()) ||
+           std::isnan(point.a()) || std::isnan(point.relative_time()));
 }
 
 void PathObstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
@@ -98,16 +286,14 @@ void PathObstacle::BuildReferenceLineStBoundary(
   const auto& adc_param =
       VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   const double adc_width = adc_param.width();
-  if (obstacle_->IsStatic() ||
-      obstacle_->Trajectory().trajectory_point().empty()) {
+  if (is_static_ || trajectory_.trajectory_point().empty()) {
     std::vector<std::pair<STPoint, STPoint>> point_pairs;
     double start_s = perception_sl_boundary_.start_s();
     double end_s = perception_sl_boundary_.end_s();
     if (end_s - start_s < kStBoundaryDeltaS) {
       end_s = start_s + kStBoundaryDeltaS;
     }
-    if (!reference_line.IsBlockRoad(obstacle_->PerceptionBoundingBox(),
-                                    adc_width)) {
+    if (!reference_line.IsBlockRoad(perception_bounding_box_, adc_width)) {
       return;
     }
     point_pairs.emplace_back(STPoint(start_s - adc_start_s, 0.0),
@@ -132,19 +318,17 @@ void PathObstacle::BuildReferenceLineStBoundary(
 bool PathObstacle::BuildTrajectoryStBoundary(
     const ReferenceLine& reference_line, const double adc_start_s,
     StBoundary* const st_boundary) {
-  const auto& object_id = obstacle_->Id();
-  const auto& perception = obstacle_->Perception();
-  if (!IsValidObstacle(perception)) {
+  if (!IsValidObstacle(perception_obstacle_)) {
     AERROR << "Fail to build trajectory st boundary because object is not "
               "valid. PerceptionObstacle: "
-           << perception.DebugString();
+           << perception_obstacle_.DebugString();
     return false;
   }
-  const double object_width = perception.width();
-  const double object_length = perception.length();
-  const auto& trajectory_points = obstacle_->Trajectory().trajectory_point();
+  const double object_width = perception_obstacle_.width();
+  const double object_length = perception_obstacle_.length();
+  const auto& trajectory_points = trajectory_.trajectory_point();
   if (trajectory_points.empty()) {
-    AWARN << "object " << object_id << " has no trajectory points";
+    AWARN << "object " << id_ << " has no trajectory points";
     return false;
   }
   const auto& adc_param =
@@ -420,8 +604,6 @@ bool PathObstacle::HasNonIgnoreDecision() const {
   return (HasLateralDecision() && !IsLateralIgnore()) ||
          (HasLongitudinalDecision() && !IsLongitudinalIgnore());
 }
-
-const Obstacle* PathObstacle::obstacle() const { return obstacle_; }
 
 void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
                                            const ObjectDecisionType& decision) {

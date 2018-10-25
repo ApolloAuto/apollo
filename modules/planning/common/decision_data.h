@@ -20,14 +20,14 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/common/math/box2d.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -91,11 +91,11 @@ class DecisionData {
 
  private:
   const ReferenceLine& reference_line_;
-  std::list<std::unique_ptr<Obstacle>> obstacles_;
   std::list<std::unique_ptr<PathObstacle>> path_obstacles_;
   std::unordered_map<std::string, PathObstacle*> obstacle_map_;
-  std::unordered_map<VirtualObjectType,
-    std::unordered_set<std::string>, EnumClassHash> virtual_obstacle_id_map_;
+  std::unordered_map<VirtualObjectType, std::unordered_set<std::string>,
+                     EnumClassHash>
+      virtual_obstacle_id_map_;
   std::mutex mutex_;
   std::mutex transaction_mutex_;
 };

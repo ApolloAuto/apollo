@@ -51,7 +51,7 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/common/math:path_matcher",
         "//modules/planning/common:frame",
-        "//modules/planning/common:obstacle",
+        "//modules/planning/common:path_obstacle",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/prediction/proto:prediction_proto",

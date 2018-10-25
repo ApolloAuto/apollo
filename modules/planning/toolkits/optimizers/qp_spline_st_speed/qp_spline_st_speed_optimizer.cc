@@ -99,7 +99,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     } else if (FLAGS_enable_side_vehicle_st_boundary &&
                (adc_sl_boundary.start_l() > 2.0 ||
                 adc_sl_boundary.end_l() < -2.0)) {
-      if (obstacle->obstacle()->IsVirtual()) {
+      if (obstacle->IsVirtual()) {
         continue;
       }
       if (path_decision->Find(id)->reference_line_st_boundary().IsEmpty()) {

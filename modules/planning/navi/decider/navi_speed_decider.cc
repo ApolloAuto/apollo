@@ -25,8 +25,8 @@
 #include <cmath>
 #include <limits>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -55,8 +55,8 @@ NaviSpeedDecider::NaviSpeedDecider() : NaviTask("NaviSpeedDecider") {}
 
 bool NaviSpeedDecider::Init(const PlanningConfig& planning_config) {
   CHECK_GT(FLAGS_planning_upper_speed_limit, 0.0);
-  NavigationPlanningConfig config
-      = planning_config.navigation_planning_config();
+  NavigationPlanningConfig config =
+      planning_config.navigation_planning_config();
   CHECK(config.has_planner_navi_config());
   CHECK(config.planner_navi_config().has_navi_speed_decider_config());
   CHECK(config.planner_navi_config()
@@ -250,8 +250,8 @@ Status NaviSpeedDecider::Execute(Frame* frame,
 Status NaviSpeedDecider::MakeSpeedDecision(
     double start_v, double start_a, double start_da,
     const std::vector<PathPoint>& path_points,
-    const std::vector<const Obstacle*>& obstacles,
-    const std::function<const Obstacle*(const std::string&)>& find_obstacle,
+    const std::vector<const PathObstacle*>& obstacles,
+    const std::function<const PathObstacle*(const std::string&)>& find_obstacle,
     SpeedData* const speed_data) {
   CHECK_NOTNULL(speed_data);
   CHECK_GE(path_points.size(), 2);
@@ -366,8 +366,9 @@ Status NaviSpeedDecider::AddPerceptionRangeConstraints() {
 Status NaviSpeedDecider::AddObstaclesConstraints(
     double vehicle_speed, double path_length,
     const std::vector<PathPoint>& path_points,
-    const std::vector<const Obstacle*>& obstacles,
-    const std::function<const Obstacle*(const std::string&)>& find_obstacle) {
+    const std::vector<const PathObstacle*>& obstacles,
+    const std::function<const PathObstacle*(const std::string&)>&
+        find_obstacle) {
   const auto& vehicle_config = VehicleConfigHelper::Instance()->GetConfig();
   auto front_edge_to_center =
       vehicle_config.vehicle_param().front_edge_to_center();

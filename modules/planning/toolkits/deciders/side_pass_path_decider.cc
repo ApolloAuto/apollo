@@ -135,7 +135,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
       continue;
     }
     // Only select vehicle obstacles.
-    if (path_obstacle->obstacle()->Perception().type() !=
+    if (path_obstacle->Perception().type() !=
         perception::PerceptionObstacle::VEHICLE) {
       continue;
     }

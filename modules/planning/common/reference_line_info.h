@@ -56,13 +56,13 @@ class ReferenceLineInfo {
                              const ReferenceLine& reference_line,
                              const hdmap::RouteSegments& segments);
 
-  bool Init(const std::vector<const Obstacle*>& obstacles);
+  bool Init(const std::vector<const PathObstacle*>& obstacles);
 
   bool IsInited() const;
 
-  bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
-  PathObstacle* AddObstacle(const Obstacle* obstacle);
-  bool AddObstacleHelper(const std::shared_ptr<Obstacle>& obstacle);
+  bool AddObstacles(const std::vector<const PathObstacle*>& obstacles);
+  PathObstacle* AddObstacle(const PathObstacle* obstacle);
+  bool AddObstacleHelper(const std::shared_ptr<PathObstacle>& obstacle);
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;

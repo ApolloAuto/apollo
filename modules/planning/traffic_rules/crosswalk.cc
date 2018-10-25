@@ -124,7 +124,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     std::vector<std::string> pedestrians;
     for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
       const PerceptionObstacle& perception_obstacle =
-          path_obstacle->obstacle()->Perception();
+          path_obstacle->Perception();
       const std::string& obstacle_id = path_obstacle->Id();
       PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
       std::string obstacle_type_name =

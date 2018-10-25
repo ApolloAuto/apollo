@@ -43,7 +43,7 @@
 #include "modules/planning/common/indexed_queue.h"
 // #include "modules/planning/common/lag_prediction.h"
 #include "modules/planning/common/local_view.h"
-#include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -91,23 +91,23 @@ class Frame {
   const std::list<ReferenceLineInfo> &reference_line_info() const;
   std::list<ReferenceLineInfo> *mutable_reference_line_info();
 
-  Obstacle *Find(const std::string &id);
+  PathObstacle *Find(const std::string &id);
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
 
   const ReferenceLineInfo *DriveReferenceLineInfo() const;
 
-  const std::vector<const Obstacle *> obstacles() const;
+  const std::vector<const PathObstacle *> obstacles() const;
 
-  const Obstacle *CreateStopObstacle(
+  const PathObstacle *CreateStopObstacle(
       ReferenceLineInfo *const reference_line_info,
       const std::string &obstacle_id, const double obstacle_s);
 
-  const Obstacle *CreateStopObstacle(const std::string &obstacle_id,
-                                     const std::string &lane_id,
-                                     const double lane_s);
+  const PathObstacle *CreateStopObstacle(const std::string &obstacle_id,
+                                         const std::string &lane_id,
+                                         const double lane_s);
 
-  const Obstacle *CreateStaticObstacle(
+  const PathObstacle *CreateStaticObstacle(
       ReferenceLineInfo *const reference_line_info,
       const std::string &obstacle_id, const double obstacle_start_s,
       const double obstacle_end_s);
@@ -196,15 +196,15 @@ class Frame {
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
-  const Obstacle *FindCollisionObstacle() const;
+  const PathObstacle *FindCollisionObstacle() const;
 
   /**
    * @brief create a static virtual obstacle
    */
-  const Obstacle *CreateStaticVirtualObstacle(const std::string &id,
-                                              const common::math::Box2d &box);
+  const PathObstacle *CreateStaticVirtualObstacle(
+      const std::string &id, const common::math::Box2d &box);
 
-  void AddObstacle(const Obstacle &obstacle);
+  void AddObstacle(const PathObstacle &obstacle);
 
  private:
   uint32_t sequence_num_ = 0;

@@ -129,7 +129,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
     // (3) speed limit from nudge obstacles
     double nudge_obstacle_speed_limit = std::numeric_limits<double>::max();
     for (const auto* const_path_obstacle : path_obstacles.Items()) {
-      if (const_path_obstacle->obstacle()->IsVirtual()) {
+      if (const_path_obstacle->IsVirtual()) {
         continue;
       }
       if (!const_path_obstacle->LateralDecision().has_nudge()) {
@@ -168,7 +168,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
 
       if (is_close_on_left || is_close_on_right) {
         double nudge_speed_ratio = 1.0;
-        if (const_path_obstacle->obstacle()->IsStatic()) {
+        if (const_path_obstacle->IsStatic()) {
           nudge_speed_ratio =
               st_boundary_config_.static_obs_nudge_speed_ratio();
         } else {
