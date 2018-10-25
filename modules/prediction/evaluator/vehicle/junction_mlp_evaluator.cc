@@ -19,6 +19,7 @@
 #include <memory>
 #include <cmath>
 
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
@@ -46,9 +47,23 @@ void JunctionMLPEvaluator::Clear() {
 }
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
-  // TODO(all) implement
-  // 1. extract features
-  // 2. compute probabilities
+  // Sanity checks.
+  Clear();
+  CHECK_NOTNULL(obstacle_ptr);
+  int id = obstacle_ptr->id();
+  if (!obstacle_ptr->latest_feature().IsInitialized()) {
+    AERROR << "Obstacle [" << id << "] has no latest feature.";
+    return;
+  }
+
+  std::vector<double> feature_values;
+  
+  ExtractFeatureValues(obstacle_ptr, &feature_values);
+
+  if (FLAGS_prediction_offline_mode) {
+    FeatureOutput::Insert(obstacle_ptr->latest_feature());
+    ADEBUG << "Insert junction feature into feature output";
+  }
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(
@@ -64,7 +79,7 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   }
 
   if (obstacle_feature_values_map_[id].size() != OBSTACLE_FEATURE_SIZE) {
-    ADEBUG << "Obstacle [" << id << "] has fewer than "
+    AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected obstacle feature_values "
            << obstacle_feature_values_map_[id].size() << ".";
     return;
@@ -84,6 +99,13 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
                          obstacle_feature_values_map_[id].end());
   feature_values->insert(feature_values->end(), junction_feature_values.begin(),
                          junction_feature_values.end());
+  if (FLAGS_prediction_offline_mode) {
+    SaveOfflineFeatures(obstacle_ptr->mutable_latest_feature(),
+                        *feature_values);
+    ADEBUG << "Save junction mlp features for obstacle ["
+           << obstacle_ptr->id() << "] with dim ["
+           << feature_values->size() << "]";
+  }
 }
 
 void JunctionMLPEvaluator::SetObstacleFeatureValues(
@@ -142,9 +164,6 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
         std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
     feature_values->operator[](idx * 5 + 4) =
         junction_exit.exit_heading() - heading;
-  }
-  if (FLAGS_prediction_offline_mode) {
-    SaveOfflineFeatures(feature_ptr, *feature_values);
   }
 }
 

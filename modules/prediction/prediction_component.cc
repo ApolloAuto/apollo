@@ -162,6 +162,7 @@ bool PredictionComponent::Init() {
 
 void PredictionComponent::Stop() {
   if (FLAGS_prediction_offline_mode) {
+    AINFO << "write when stop";
     FeatureOutput::Close();
   }
 }

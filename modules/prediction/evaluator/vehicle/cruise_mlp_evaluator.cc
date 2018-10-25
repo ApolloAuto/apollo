@@ -80,9 +80,10 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     lane_sequence_ptr->set_time_to_lane_center(finish_time);
   }
 
-  // if (FLAGS_prediction_offline_mode) {
-  //  FeatureOutput::Insert(*latest_feature_ptr);
-  // }
+  if (FLAGS_prediction_offline_mode) {
+    FeatureOutput::Insert(*latest_feature_ptr);
+    ADEBUG << "Insert cruise feature into feature output";
+  }
 }
 
 void CruiseMLPEvaluator::ExtractFeatureValues
@@ -120,6 +121,9 @@ void CruiseMLPEvaluator::ExtractFeatureValues
   // For offline training, write the extracted features into proto.
   if (FLAGS_prediction_offline_mode) {
     SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
+    ADEBUG << "Save cruise mlp features for obstacle ["
+           << obstacle_ptr->id() << "] with dim ["
+           << feature_values->size() << "]";
   }
 }
 
