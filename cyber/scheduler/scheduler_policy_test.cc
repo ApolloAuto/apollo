@@ -51,7 +51,6 @@ TEST(SchedulerPolicyTest, classic) {
   ctx->bind_processor(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
-  EXPECT_TRUE(ctx->RqEmpty());
   auto task_id = GlobalData::RegisterTaskName("classic");
   cr->set_id(task_id);
   EXPECT_TRUE(ctx->Enqueue(cr));
