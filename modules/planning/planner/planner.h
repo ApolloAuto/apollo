@@ -63,6 +63,8 @@ class Planner {
   virtual apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
 
+  virtual void Stop() = 0;
+
  protected:
   PlanningConfig config_;
   scenario::ScenarioManager scenario_manager_;
