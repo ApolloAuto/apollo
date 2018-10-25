@@ -7,9 +7,17 @@ cc_library(
     srcs = ["recurrent_runner.cc"],
     hdrs = ["recurrent_runner.h"],
     deps = [
-        ":monitor_manager",
         "//cyber",
-        "//modules/common/time",
+    ],
+)
+
+cc_test(
+    name = "recurrent_runner_test",
+    size = "small",
+    srcs = ["recurrent_runner_test.cc"],
+    deps = [
+        ":recurrent_runner",
+        "@gtest//:main",
     ],
 )
 

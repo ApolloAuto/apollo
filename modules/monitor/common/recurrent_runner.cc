@@ -16,26 +16,20 @@
 
 #include "modules/monitor/common/recurrent_runner.h"
 
-#include <utility>
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/monitor/common/monitor_manager.h"
 
 namespace apollo {
 namespace monitor {
 
-using apollo::common::time::Clock;
-
-RecurrentRunner::RecurrentRunner(const std::string &name,
-                                 const double interval)
+RecurrentRunner::RecurrentRunner(const std::string &name, const double interval)
     : name_(name)
     , interval_(interval) {
 }
 
 void RecurrentRunner::Tick(const double current_time) {
   if (next_round_ <= current_time) {
-    ADEBUG << "RecurrentRunner " << name_ << " runs at " << current_time;
+    ++round_count_;
+    AINFO_EVERY(100) << name_ << " is running round #" << round_count_;
     next_round_ = current_time + interval_;
     RunOnce(current_time);
   }
