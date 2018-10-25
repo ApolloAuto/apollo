@@ -93,15 +93,15 @@ bool TopologyManager::Init() {
 }
 
 bool TopologyManager::InitNodeManager() {
-  return node_manager_->Init(participant_->fastrtps_participant());
+  return node_manager_->StartDiscovery(participant_->fastrtps_participant());
 }
 
 bool TopologyManager::InitChannelManager() {
-  return channel_manager_->Init(participant_->fastrtps_participant());
+  return channel_manager_->StartDiscovery(participant_->fastrtps_participant());
 }
 
 bool TopologyManager::InitServiceManager() {
-  return service_manager_->Init(participant_->fastrtps_participant());
+  return service_manager_->StartDiscovery(participant_->fastrtps_participant());
 }
 
 bool TopologyManager::CreateParticipant() {

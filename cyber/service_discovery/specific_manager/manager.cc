@@ -33,7 +33,8 @@ using transport::AttributesFiller;
 using transport::QosProfileConf;
 
 Manager::Manager()
-    : init_(false),
+    : is_shutdown_(false),
+      is_discovery_started_(false),
       allowed_role_(0),
       change_type_(proto::ChangeType::CHANGE_PARTICIPANT),
       channel_name_(""),
@@ -46,20 +47,23 @@ Manager::Manager()
 
 Manager::~Manager() { Shutdown(); }
 
-bool Manager::Init(RtpsParticipant* participant) {
-  RETURN_VAL_IF_NULL(participant, false);
-  RETURN_VAL_IF(init_.exchange(true), true);
-
+bool Manager::StartDiscovery(RtpsParticipant* participant) {
+  if (participant == nullptr) {
+    return false;
+  }
+  if (is_discovery_started_.exchange(true)) {
+    return true;
+  }
   if (!CreatePublisher(participant) || !CreateSubscriber(participant)) {
     AERROR << "create publisher or subscriber failed.";
-    Shutdown();
+    StopDiscovery();
     return false;
   }
   return true;
 }
 
-void Manager::Shutdown() {
-  if (!init_.exchange(false)) {
+void Manager::StopDiscovery() {
+  if (!is_discovery_started_.exchange(false)) {
     return;
   }
 
@@ -77,13 +81,20 @@ void Manager::Shutdown() {
     delete listener_;
     listener_ = nullptr;
   }
+}
 
+void Manager::Shutdown() {
+  if (is_shutdown_.exchange(true)) {
+    return;
+  }
+
+  StopDiscovery();
   signal_.DisconnectAllSlots();
 }
 
 bool Manager::Join(const RoleAttributes& attr, RoleType role) {
-  if (!init_.load()) {
-    ADEBUG << "please call Init firstly, or the manager has been shut down.";
+  if (is_shutdown_.load()) {
+    ADEBUG << "the manager has been shut down.";
     return false;
   }
   RETURN_VAL_IF(!((1 << role) & allowed_role_), false);
@@ -95,8 +106,8 @@ bool Manager::Join(const RoleAttributes& attr, RoleType role) {
 }
 
 bool Manager::Leave(const RoleAttributes& attr, RoleType role) {
-  if (!init_.load()) {
-    ADEBUG << "please call Init firstly, or the manager has been shut down.";
+  if (is_shutdown_.load()) {
+    ADEBUG << "the manager has been shut down.";
     return false;
   }
   RETURN_VAL_IF(!((1 << role) & allowed_role_), false);
@@ -160,8 +171,8 @@ void Manager::Convert(const RoleAttributes& attr, RoleType role,
 void Manager::Notify(const ChangeMsg& msg) { signal_(msg); }
 
 void Manager::OnRemoteChange(const std::string& msg_str) {
-  if (!init_.load()) {
-    ADEBUG << "please call Init firstly, or the manager has been shut down.";
+  if (is_shutdown_.load()) {
+    ADEBUG << "the manager has been shut down.";
     return;
   }
 
@@ -175,14 +186,17 @@ void Manager::OnRemoteChange(const std::string& msg_str) {
 }
 
 bool Manager::Publish(const ChangeMsg& msg) {
-  if (!init_.load()) {
-    ADEBUG << "please call Init firstly, or the manager has been shut down.";
-    return false;
+  if (!is_discovery_started_.load()) {
+    ADEBUG << "discovery is not started.";
+    return true;
   }
 
   apollo::cyber::transport::UnderlayMessage m;
   RETURN_VAL_IF(!message::SerializeToString(msg, &m.data()), false);
-  return publisher_->write(reinterpret_cast<void*>(&m));
+  if (publisher_ != nullptr) {
+    return publisher_->write(reinterpret_cast<void*>(&m));
+  }
+  return true;
 }
 
 bool Manager::IsFromSameProcess(const ChangeMsg& msg) {

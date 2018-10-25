@@ -25,7 +25,6 @@
 #include "cyber/proto/chatter.pb.h"
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
 #include "cyber/transport/common/identity.h"
-#include "cyber/transport/rtps/participant.h"
 
 namespace apollo {
 namespace cyber {
@@ -34,14 +33,6 @@ namespace service_discovery {
 class ChannelManagerTest : public ::testing::Test {
  protected:
   ChannelManagerTest() : channel_num_(10) {
-    std::string participant_name =
-        common::GlobalData::Instance()->HostName() + "+" +
-        std::to_string(common::GlobalData::Instance()->ProcessId());
-    participant_ =
-        std::make_shared<transport::Participant>(participant_name, 11511);
-
-    channel_manager_.Init(participant_->fastrtps_participant());
-
     RoleAttributes role_attr;
     role_attr.set_host_name(common::GlobalData::Instance()->HostName());
     role_attr.set_process_id(common::GlobalData::Instance()->ProcessId());
@@ -76,17 +67,13 @@ class ChannelManagerTest : public ::testing::Test {
       channel_manager_.Join(role_attr, RoleType::ROLE_READER);
     }
   }
-  virtual ~ChannelManagerTest() {
-    channel_manager_.Shutdown();
-    participant_->Shutdown();
-  }
+  virtual ~ChannelManagerTest() { channel_manager_.Shutdown(); }
 
   virtual void SetUp() {}
 
   virtual void TearDown() {}
 
   int channel_num_;
-  transport::ParticipantPtr participant_;
   ChannelManager channel_manager_;
 };
 
