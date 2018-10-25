@@ -54,6 +54,8 @@ class RTKReplayPlanner : public PlannerWithReferenceLine {
 
   apollo::common::Status Init(const PlanningConfig& config) override;
 
+  virtual void Stop() {}
+
   /**
    * @brief Override function Plan in parent class Planner.
    * @param planning_init_point The trajectory point where planning starts.

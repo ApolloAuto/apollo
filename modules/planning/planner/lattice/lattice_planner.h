@@ -44,6 +44,8 @@ class LatticePlanner : public PlannerWithReferenceLine {
     return common::Status::OK();
   }
 
+  void Stop() override {}
+
   /**
    * @brief Override function Plan in parent class Planner.
    * @param planning_init_point The trajectory point where planning starts.

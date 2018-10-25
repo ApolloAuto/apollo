@@ -79,6 +79,8 @@ class OpenSpacePlanner : public Planner {
       const common::TrajectoryPoint& planning_init_point,
       Frame* frame) override;
 
+  void Stop() override {}
+
  private:
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>

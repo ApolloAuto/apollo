@@ -73,6 +73,8 @@ class NaviPlanner : public PlannerWithReferenceLine {
   common::Status Plan(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;
 
+  void Stop() override {}
+
   /**
    * @brief Override function Plan in parent class Planner.
    * @param planning_init_point The trajectory point where planning starts.
