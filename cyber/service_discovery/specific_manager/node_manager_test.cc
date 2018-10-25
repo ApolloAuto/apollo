@@ -21,7 +21,6 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/service_discovery/specific_manager/node_manager.h"
-#include "cyber/transport/rtps/participant.h"
 
 namespace apollo {
 namespace cyber {
@@ -29,26 +28,14 @@ namespace service_discovery {
 
 class NodeManagerTest : public ::testing::Test {
  protected:
-  NodeManagerTest() {
-    std::string participant_name =
-        common::GlobalData::Instance()->HostName() + "+" +
-        std::to_string(common::GlobalData::Instance()->ProcessId());
-    participant_ =
-        std::make_shared<transport::Participant>(participant_name, 11511);
-    node_manager_ = std::make_shared<NodeManager>();
-    node_manager_->Init(participant_->fastrtps_participant());
-  }
-  virtual ~NodeManagerTest() {
-    node_manager_->Shutdown();
-    participant_->Shutdown();
-  }
+  NodeManagerTest() { node_manager_ = std::make_shared<NodeManager>(); }
+  virtual ~NodeManagerTest() { node_manager_->Shutdown(); }
 
   virtual void SetUp() {}
 
   virtual void TearDown() {}
 
   std::shared_ptr<NodeManager> node_manager_;
-  transport::ParticipantPtr participant_;
 };
 
 TEST_F(NodeManagerTest, node_change) {
@@ -90,11 +77,6 @@ TEST_F(NodeManagerTest, topo_module_leave) {
 }
 
 TEST_F(NodeManagerTest, add_and_remove_change_listener) {
-  auto participant =
-      std::make_shared<transport::Participant>("caros+1024", 11511);
-  NodeManager node_manager;
-  EXPECT_TRUE(node_manager_->Init(participant->fastrtps_participant()));
-
   bool recv_flag = false;
   auto conn = node_manager_->AddChangeListener(
       [&recv_flag](const ChangeMsg& msg) { recv_flag = true; });

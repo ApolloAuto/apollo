@@ -59,7 +59,7 @@ void NodeManager::Dispose(const ChangeMsg& msg) {
 
 void NodeManager::OnTopoModuleLeave(const std::string& host_name,
                                     int process_id) {
-  RETURN_IF(!init_.load());
+  RETURN_IF(!is_discovery_started_.load());
 
   RoleAttributes attr;
   attr.set_host_name(host_name);

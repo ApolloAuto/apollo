@@ -56,7 +56,8 @@ class Manager {
   Manager();
   virtual ~Manager();
 
-  bool Init(RtpsParticipant* participant);
+  bool StartDiscovery(RtpsParticipant* participant);
+  void StopDiscovery();
   virtual void Shutdown();
 
   bool Join(const RoleAttributes& attr, RoleType role);
@@ -83,7 +84,8 @@ class Manager {
   void OnRemoteChange(const std::string& msg_str);
   bool IsFromSameProcess(const ChangeMsg& msg);
 
-  std::atomic<bool> init_;
+  std::atomic<bool> is_shutdown_;
+  std::atomic<bool> is_discovery_started_;
   int allowed_role_;
   ChangeType change_type_;
   std::string host_name_;

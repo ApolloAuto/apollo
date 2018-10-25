@@ -21,7 +21,6 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/service_discovery/specific_manager/service_manager.h"
-#include "cyber/transport/rtps/participant.h"
 
 namespace apollo {
 namespace cyber {
@@ -30,25 +29,15 @@ namespace service_discovery {
 class ServiceManagerTest : public ::testing::Test {
  protected:
   ServiceManagerTest() {
-    std::string participant_name =
-        common::GlobalData::Instance()->HostName() + "+" +
-        std::to_string(common::GlobalData::Instance()->ProcessId());
-    participant_ =
-        std::make_shared<transport::Participant>(participant_name, 11511);
     service_manager_ = std::make_shared<ServiceManager>();
-    service_manager_->Init(participant_->fastrtps_participant());
   }
-  virtual ~ServiceManagerTest() {
-    service_manager_->Shutdown();
-    participant_->Shutdown();
-  }
+  virtual ~ServiceManagerTest() { service_manager_->Shutdown(); }
 
   virtual void SetUp() {}
 
   virtual void TearDown() {}
 
   std::shared_ptr<ServiceManager> service_manager_;
-  transport::ParticipantPtr participant_;
 };
 
 TEST_F(ServiceManagerTest, server_operation) {
