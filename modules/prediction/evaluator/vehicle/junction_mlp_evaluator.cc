@@ -57,7 +57,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   std::vector<double> feature_values;
-  
+
   ExtractFeatureValues(obstacle_ptr, &feature_values);
 
   if (FLAGS_prediction_offline_mode) {

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "cyber/common/macros.h"
