@@ -118,8 +118,7 @@ void CruiseMLPEvaluator::ExtractFeatureValues
                          lane_feature_values.end());
 
   // For offline training, write the extracted features into proto.
-  if (FLAGS_prediction_offline_mode &&
-      !obstacle_ptr->IsNearJunction()) {
+  if (FLAGS_prediction_offline_mode) {
     SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
   }
 }

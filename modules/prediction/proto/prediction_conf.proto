@@ -18,6 +18,7 @@ message ObstacleConf {
     RNN_EVALUATOR = 1;
     COST_EVALUATOR = 2;  // navi mode can only support this evaluator
     CRUISE_MLP_EVALUATOR = 3;
+    JUNCTION_MLP_EVALUATOR = 4;
   }
 
   enum PredictorType {

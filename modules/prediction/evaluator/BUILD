@@ -15,6 +15,7 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
+        "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:rnn_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",
         "@glog//:glog",
