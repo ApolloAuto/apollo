@@ -21,21 +21,12 @@
 
 namespace apollo {
 namespace routing {
+namespace edge_creator {
 
-class EdgeCreator {
- public:
-  static void GetPbEdge(const Node& node_from, const Node& node_to,
-                        const Edge::DirectionType& type, Edge* pb_edge,
-                        const RoutingConfig* routingconfig);
+void GetPbEdge(const Node& node_from, const Node& node_to,
+               const Edge::DirectionType& type,
+               const RoutingConfig& routingconfig, Edge* pb_edge);
 
- private:
-  static void InitEdgeInfo(const Node& node_from, const Node& node_to,
-                           const Edge::DirectionType& type, Edge* pb_edge,
-                           const RoutingConfig* routingconfig);
-  static void InitEdgeCost(const Node& node_from, const Node& node_to,
-                           const Edge::DirectionType& type, Edge* pb_edge,
-                           const RoutingConfig* routingconfig);
-};
-
+}  // namespace edge_creator
 }  // namespace routing
 }  // namespace apollo

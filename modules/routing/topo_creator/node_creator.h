@@ -24,23 +24,11 @@
 
 namespace apollo {
 namespace routing {
+namespace node_creator {
 
-class NodeCreator {
- public:
-  static void GetPbNode(const hdmap::Lane& lane, const std::string& road_id,
-                        Node* pb_node, const RoutingConfig* routingconfig);
+void GetPbNode(const hdmap::Lane& lane, const std::string& road_id,
+               const RoutingConfig& routingconfig, Node* const node);
 
- private:
-  static void AddOutBoundary(
-      const hdmap::LaneBoundary& bound, double lane_length,
-      ::google::protobuf::RepeatedPtrField<CurveRange>* const out_range);
-
-  static void InitNodeInfo(const hdmap::Lane& lane, const std::string& road_id,
-                           Node* const node,
-                           const RoutingConfig* routingconfig);
-  static void InitNodeCost(const hdmap::Lane& lane, Node* const node,
-                           const RoutingConfig* routingconfig);
-};
-
+}  // namespace node_creator
 }  // namespace routing
 }  // namespace apollo

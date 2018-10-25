@@ -59,7 +59,7 @@ bool IsAllowedToCross(const LaneBoundary& boundary) {
 
 GraphCreator::GraphCreator(const std::string& base_map_file_path,
                            const std::string& dump_topo_file_path,
-                           const RoutingConfig* routing_conf)
+                           const RoutingConfig& routing_conf)
     : base_map_file_path_(base_map_file_path),
       dump_topo_file_path_(dump_topo_file_path),
       routing_conf_(routing_conf) {}
@@ -115,11 +115,11 @@ bool GraphCreator::Create() {
     node_index_map_[lane_id] = graph_.node_size();
     const auto iter = road_id_map_.find(lane_id);
     if (iter != road_id_map_.end()) {
-      NodeCreator::GetPbNode(lane, iter->second, graph_.add_node(),
-                             routing_conf_);
+      node_creator::GetPbNode(lane, iter->second, routing_conf_,
+                              graph_.add_node());
     } else {
-      LOG(WARNING) << "Failed to find road id of lane " << lane_id;
-      NodeCreator::GetPbNode(lane, "", graph_.add_node(), routing_conf_);
+      AWARN << "Failed to find road id of lane " << lane_id;
+      node_creator::GetPbNode(lane, "", routing_conf_, graph_.add_node());
     }
   }
 
@@ -192,8 +192,8 @@ void GraphCreator::AddEdge(const Node& from_node,
       continue;
     }
     const auto& to_node = graph_.node(iter->second);
-    EdgeCreator::GetPbEdge(from_node, to_node, type, graph_.add_edge(),
-                           routing_conf_);
+    edge_creator::GetPbEdge(from_node, to_node, type, routing_conf_,
+                            graph_.add_edge());
   }
 }
 

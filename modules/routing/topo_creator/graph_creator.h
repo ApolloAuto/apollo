@@ -31,7 +31,7 @@ class GraphCreator {
  public:
   GraphCreator(const std::string& base_map_file_path,
                const std::string& dump_topo_file_path,
-               const RoutingConfig* routing_conf);
+               const RoutingConfig& routing_conf);
 
   ~GraphCreator() = default;
 
@@ -58,7 +58,7 @@ class GraphCreator {
   std::unordered_set<std::string> showed_edge_id_set_;
   std::unordered_set<std::string> forbidden_lane_id_set_;
 
-  const RoutingConfig* routing_conf_ = nullptr;
+  const RoutingConfig& routing_conf_;
 };
 
 }  // namespace routing
