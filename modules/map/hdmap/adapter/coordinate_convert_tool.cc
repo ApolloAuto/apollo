@@ -21,7 +21,7 @@ namespace hdmap {
 namespace adapter {
 
 CoordinateConvertTool::CoordinateConvertTool()
-  : pj_from_(NULL), pj_to_(NULL) {}
+  : pj_from_(nullptr), pj_to_(nullptr) {}
 
 CoordinateConvertTool::~CoordinateConvertTool() {
   if (pj_from_) {

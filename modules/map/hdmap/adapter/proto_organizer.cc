@@ -130,6 +130,10 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
     std::string overlap_id = CreateOverlapId();
     proto_data_.pb_lanes[lane_id].add_overlap_id()->set_id(overlap_id);
     overlap.mutable_id()->set_id(overlap_id);
+    for (auto& region_overlap : overlap_object.region_overlaps) {
+      *(overlap.add_region_overlap()) = region_overlap;
+    }
+
     PbObjectOverlapInfo* object_overlap = overlap.add_object();
     object_overlap->mutable_id()->set_id(lane_id);
     object_overlap->mutable_lane_overlap_info()->set_start_s(
@@ -138,10 +142,20 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
         overlap_object.end_s);
     object_overlap->mutable_lane_overlap_info()->set_is_merge(
         overlap_object.is_merge);
+    if (!overlap_object.region_overlap_id.empty()) {
+      object_overlap->mutable_lane_overlap_info()
+          ->mutable_region_overlap_id()->set_id(
+            overlap_object.region_overlap_id);
+    }
     object_overlap = overlap.add_object();
     object_overlap->mutable_id()->set_id(object_id);
     if (proto_data_.pb_crosswalks.count(object_id) > 0) {
       proto_data_.pb_crosswalks[object_id].add_overlap_id()->set_id(overlap_id);
+    if (!overlap_object.region_overlap_id.empty()) {
+      object_overlap->mutable_crosswalk_overlap_info()
+          ->mutable_region_overlap_id()
+          ->set_id(overlap_object.region_overlap_id);
+    }
       object_overlap->mutable_crosswalk_overlap_info();
     } else if (proto_data_.pb_clear_areas.count(object_id) > 0) {
       object_overlap->mutable_clear_area_overlap_info();

@@ -472,6 +472,15 @@ Status LanesXmlParser::ParseObjectOverlapGroup(
       overlap_with_lane.start_s = start_s;
       overlap_with_lane.end_s = end_s;
       overlap_with_lane.is_merge = is_merge;
+
+      RETURN_IF_ERROR(ParseRegionOverlap(*sub_node,
+                                      &overlap_with_lane.region_overlaps));
+
+      if (overlap_with_lane.region_overlaps.size() > 0) {
+        UtilXmlParser::QueryStringAttribute(*sub_node, "regionOverlapId",
+                                      &overlap_with_lane.region_overlap_id);
+      }
+
       object_overlaps->push_back(overlap_with_lane);
 
       sub_node = sub_node->NextSiblingElement("objectReference");
@@ -700,6 +709,7 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
     }
     sub_node = sub_node->NextSiblingElement("successor");
   }
+
   sub_node = xml_node.FirstChildElement("neighbor");
   while (sub_node) {
     std::string side;
@@ -718,6 +728,17 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
       }
     }
     sub_node = sub_node->NextSiblingElement("neighbor");
+  }
+
+  sub_node = xml_node.FirstChildElement("selfReverse");
+  while (sub_node) {
+    std::string lane_id;
+    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
+                                                    &lane_id);
+    if (checker == tinyxml2::XML_SUCCESS) {
+      lane->add_self_reverse_lane_id()->set_id(lane_id);
+    }
+    sub_node = sub_node->NextSiblingElement("selfReverse");
   }
 }
 
@@ -784,6 +805,41 @@ Status LanesXmlParser::ToPbLaneMarkType(const std::string& type,
   } else {
     std::string err_msg = "Error or unsupport lane boundary color.";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+  }
+
+  return Status::OK();
+}
+
+Status LanesXmlParser::ParseRegionOverlap(const tinyxml2::XMLElement& xml_node,
+                              std::vector<PbRegionOverlap>* region_overlaps) {
+  CHECK_NOTNULL(region_overlaps);
+
+  auto region_overlap_node = xml_node.FirstChildElement("regionOverlap");
+  while (region_overlap_node != nullptr) {
+    PbRegionOverlap region_overlap;
+
+    std::string region_overlap_id;
+    int checker = UtilXmlParser::QueryStringAttribute(*region_overlap_node,
+                                                    "id",
+                                                    &region_overlap_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error to parse region overlap id";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    region_overlap.mutable_id()->set_id(region_overlap_id);
+
+    auto outline_node = region_overlap_node->FirstChildElement("outline");
+    while (outline_node != nullptr) {
+      RETURN_IF_ERROR(UtilXmlParser::ParseOutline(*outline_node,
+                                            region_overlap.add_polygon()));
+      outline_node = outline_node->NextSiblingElement("outline");
+    }
+
+    region_overlap_node = region_overlap_node->NextSiblingElement(
+                                                        "regionOverlap");
+
+    region_overlaps->emplace_back(region_overlap);
   }
 
   return Status::OK();
