@@ -47,6 +47,7 @@ class PlanningContext {
     };
     Type type = Type::FIXED_SPEED;
     double speed = 2.23;  // m/s. (5 mph)
+    bool is_fixed_distance = false;
     double distance = 5.0;  // m
   };
 
