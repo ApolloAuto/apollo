@@ -39,6 +39,7 @@ namespace prediction {
 using ::apollo::common::ErrorCode;
 using ::apollo::common::Point3D;
 using ::apollo::common::math::KalmanFilter;
+using ::apollo::common::math::Vec2d;
 using ::apollo::common::util::FindOrDie;
 using ::apollo::common::util::FindOrNull;
 using ::apollo::common::PathPoint;
@@ -232,6 +233,28 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
   }
   Feature* latest_feature_ptr = mutable_latest_feature();
   latest_feature_ptr->mutable_junction_feature()->set_junction_id(junction_id);
+  std::shared_ptr<const JunctionInfo> junction_info_ptr =
+      PredictionMap::JunctionById(junction_id);
+  if (junction_info_ptr == nullptr ||
+      junction_info_ptr->polygon().points().size() < 3) {
+    AERROR << "Null junction info ptr";
+    latest_feature_ptr->mutable_junction_feature()->set_junction_range(10.0);
+  }
+
+  double x_min = std::numeric_limits<double>::infinity();
+  double x_max = -std::numeric_limits<double>::infinity();
+  double y_min = std::numeric_limits<double>::infinity();
+  double y_max = -std::numeric_limits<double>::infinity();
+  for (const Vec2d& point : junction_info_ptr->polygon().points()) {
+    x_min = std::min(x_min, point.x());
+    x_max = std::max(x_max, point.x());
+    y_min = std::min(y_min, point.y());
+    y_max = std::max(y_max, point.y());
+  }
+  double dx = std::abs(x_max - x_min);
+  double dy = std::abs(y_max - y_min);
+  double range = std::hypot(dx, dy);
+  latest_feature_ptr->mutable_junction_feature()->set_junction_range(range);
   if (feature_history_.size() == 1) {
     SearchJunctionExitsWithoutEnterLane(junction_id, latest_feature_ptr);
     return;
