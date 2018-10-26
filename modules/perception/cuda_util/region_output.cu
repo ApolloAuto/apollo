@@ -91,9 +91,9 @@ void compute_overlapped_by_idx_gpu(const int nthreads,
                                    const float *bbox_data, const float overlap_threshold,
                                    const int *idx, const int num_idx, bool *overlapped_data) {
     // NOLINT_NEXT_LINE(whitespace/operators)
-    const int thread_size = 512;
-    int block_size = (nthreads + thread_size - 1) / thread_size;
-    compute_overlapped_by_idx_kernel << < block_size, thread_size >> >
+    const int block_size = 512;
+    int block_size = (nthreads + block_size - 1) / block_size;
+    compute_overlapped_by_idx_kernel << < block_size, block_size >> >
                                                       (nthreads, bbox_data, overlap_threshold,
                                                               idx, num_idx, overlapped_data);
 }
