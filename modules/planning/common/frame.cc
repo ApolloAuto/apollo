@@ -66,30 +66,17 @@ Frame::Frame(uint32_t sequence_num)
 Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
              const double start_time, const common::VehicleState &vehicle_state,
-             ReferenceLineProvider *reference_line_provider)
+             ReferenceLineProvider *reference_line_provider,
+             ADCTrajectory* output_trajectory)
     : sequence_num_(sequence_num),
       local_view_(local_view),
       planning_start_point_(planning_start_point),
       start_time_(start_time),
       vehicle_state_(vehicle_state),
+      output_trajectory_(output_trajectory),
       reference_line_provider_(reference_line_provider),
       monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING),
       init_data_(true) {}
-
-void Frame::InitData(const LocalView &local_view,
-                     const common::TrajectoryPoint &planning_start_point,
-                     const double start_time,
-                     const common::VehicleState &vehicle_state,
-                     ReferenceLineProvider *reference_line_provider) {
-  if (!init_data_) {
-    local_view_ = local_view;
-    planning_start_point_ = planning_start_point;
-    start_time_ = start_time;
-    vehicle_state_ = vehicle_state;
-    reference_line_provider_ = reference_line_provider;
-  }
-  init_data_ = true;
-}
 
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;

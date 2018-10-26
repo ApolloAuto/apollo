@@ -105,10 +105,12 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 Status NaviPlanning::InitFrame(const uint32_t sequence_num,
                                const TrajectoryPoint& planning_start_point,
                                const double start_time,
-                               const VehicleState& vehicle_state) {
+                               const VehicleState& vehicle_state,
+                               ADCTrajectory* output_trajectory) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          start_time, vehicle_state,
-                         reference_line_provider_.get()));
+                         reference_line_provider_.get(),
+                         output_trajectory));
 
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
@@ -208,7 +210,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
 
   const uint32_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state);
+                     vehicle_state, trajectory_pb);
   if (!frame_) {
     std::string msg("Failed to init frame");
     AERROR << msg;
