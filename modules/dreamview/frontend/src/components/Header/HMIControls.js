@@ -13,6 +13,7 @@ export default class HMIControls extends React.Component {
             maps, currentMap,
             vehicles, currentVehicle,
             isCoDriver,
+            isMute
         } = this.props.store.hmi;
 
         return (
@@ -28,6 +29,15 @@ export default class HMIControls extends React.Component {
                     })}
                     onClick={() => this.props.store.hmi.toggleCoDriverFlag()}>
                     Co-Driver
+                </button>
+                <button
+                    className={classNames({
+                        "header-item": true,
+                        "header-button": true,
+                        "header-button-active": isMute,
+                    })}
+                    onClick={() => this.props.store.hmi.toggleMuteFlag()}>
+                    Mute
                 </button>
                 <HMISelectors
                     modes={modes}

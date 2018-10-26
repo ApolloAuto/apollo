@@ -4186,6 +4186,11 @@
                   "rule": "repeated",
                   "type": "LaneSampleAssociation",
                   "id": 21
+                },
+                "selfReverseLaneId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 22
                 }
               },
               "nested": {
@@ -4229,6 +4234,10 @@
                 "isMerge": {
                   "type": "bool",
                   "id": 3
+                },
+                "regionOverlapId": {
+                  "type": "Id",
+                  "id": 4
                 }
               }
             },
@@ -4239,7 +4248,12 @@
               "fields": {}
             },
             "CrosswalkOverlapInfo": {
-              "fields": {}
+              "fields": {
+                "regionOverlapId": {
+                  "type": "Id",
+                  "id": 1
+                }
+              }
             },
             "JunctionOverlapInfo": {
               "fields": {}
@@ -4255,6 +4269,19 @@
             },
             "ParkingSpaceOverlapInfo": {
               "fields": {}
+            },
+            "RegionOverlapInfo": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "rule": "repeated",
+                  "type": "Polygon",
+                  "id": 2
+                }
+              }
             },
             "ObjectOverlapInfo": {
               "oneofs": {
@@ -4325,6 +4352,11 @@
                   "rule": "repeated",
                   "type": "ObjectOverlapInfo",
                   "id": 2
+                },
+                "regionOverlap": {
+                  "rule": "repeated",
+                  "type": "RegionOverlapInfo",
+                  "id": 3
                 }
               }
             },
@@ -4545,6 +4577,31 @@
                   "rule": "repeated",
                   "type": "Curve",
                   "id": 3
+                }
+              }
+            },
+            "SpeedControl": {
+              "fields": {
+                "name": {
+                  "type": "string",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "apollo.hdmap.Polygon",
+                  "id": 2
+                },
+                "speedLimit": {
+                  "type": "double",
+                  "id": 3
+                }
+              }
+            },
+            "SpeedControls": {
+              "fields": {
+                "speedControl": {
+                  "rule": "repeated",
+                  "type": "SpeedControl",
+                  "id": 1
                 }
               }
             },
