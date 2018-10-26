@@ -48,7 +48,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     return Stage::ERROR;
   }
   const ReferenceLineInfo& reference_line_info =
-    frame->reference_line_info().front();
+      frame->reference_line_info().front();
   double adc_velocity = frame->vehicle_state().linear_velocity();
   double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
@@ -89,25 +89,25 @@ Stage::StageStatus SidePassGeneratePath::Process(
 }
 
 /**
-  * @brief:
-  * STAGE: SidePassStopOnWaitPoint
-  * Notations:
-  *
-  *    front of car
-  * A +----------+ B
-  *   |          |
-  *   /          / turn with maximum steering angle
-  *   |          |
-  *   |          |
-  *   |          |
-  *   |    X     |                                       O
-  *   |<-->.<----|-------------------------------------->* (turn center)
-  *   |          |   VehicleParam.min_turn_radius()
-  *   |          |
-  * D +----------+ C
-  *    back of car
-  *
-  */
+ * @brief:
+ * STAGE: SidePassStopOnWaitPoint
+ * Notations:
+ *
+ *    front of car
+ * A +----------+ B
+ *   |          |
+ *   /          / turn with maximum steering angle
+ *   |          |
+ *   |          |
+ *   |          |
+ *   |    X     |                                       O
+ *   |<-->.<----|-------------------------------------->* (turn center)
+ *   |          |   VehicleParam.min_turn_radius()
+ *   |          |
+ * D +----------+ C
+ *    back of car
+ *
+ */
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   const ReferenceLineInfo& reference_line_info =
@@ -268,10 +268,15 @@ Stage::StageStatus SidePassDetectSafety::Process(
     return Stage::ERROR;
   }
   bool is_safe = true;
+  const ReferenceLineInfo& reference_line_info =
+      frame->reference_line_info().front();
+  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+
   const PathDecision& path_decision =
       frame->reference_line_info().front().path_decision();
   for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    if (path_obstacle->IsVirtual()) {
+    if (path_obstacle->IsVirtual() &&
+        path_obstacle->PerceptionSLBoundary().start_s() >= adc_front_edge_s) {
       is_safe = false;
       break;
     }

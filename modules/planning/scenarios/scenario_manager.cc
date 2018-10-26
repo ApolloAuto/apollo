@@ -154,7 +154,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
         FLAGS_enable_scenario_stop_sign_unprotected) {
       preferred_scenario = ScenarioConfig::STOP_SIGN_UNPROTECTED;
     } else if (overlap.first == ReferenceLineInfo::OBSTACLE &&
-        FLAGS_enable_scenario_side_pass) {
+               FLAGS_enable_scenario_side_pass) {
       preferred_scenario = ScenarioConfig::SIDE_PASS;
     }
     if (rejected_scenarios.find(preferred_scenario) !=
