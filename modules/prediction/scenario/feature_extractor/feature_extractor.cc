@@ -48,21 +48,30 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
   }
   ExtractEgoVehicleFeatures(&environment_features);
 
-  const PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
-  if (pose_ptr == nullptr) {
+  const PerceptionObstacle* ptr_ego_pose =
+      pose_container->ToPerceptionObstacle();
+  if (ptr_ego_pose == nullptr) {
     AERROR << "Null pose pointer, skip extracting environment features.";
     return environment_features;
   }
 
-  auto ego_trajectory_point = pose_ptr->position();
-  if (!ego_trajectory_point.has_x() ||
-      !ego_trajectory_point.has_y()) {
+  ptr_ego_pose->position();
+  if (!ptr_ego_pose->position().has_x() ||
+      !ptr_ego_pose->position().has_y()) {
     AERROR << "Fail to get ego vehicle position";
     return environment_features;
   }
-  Vec2d ego_position(ego_trajectory_point.x(), ego_trajectory_point.y());
 
-  auto ptr_ego_lane = GetEgoLane(ego_position);
+  // TODO(all): check the coordinate frame.
+  if (!ptr_ego_pose->has_theta()) {
+    AERROR << "Fail to get ego vehicle heading";
+    return environment_features;
+  }
+  auto ptr_ego_lane = GetEgoLane(ptr_ego_pose->position(),
+      ptr_ego_pose->theta());
+
+  Vec2d ego_position(ptr_ego_pose->position().x(),
+      ptr_ego_pose->position().y());
 
   ExtractEgoLaneFeatures(&environment_features,
       ptr_ego_lane, ego_position);
@@ -188,23 +197,27 @@ void FeatureExtractor::ExtractObstacleFeatures(
     EnvironmentFeatures* ptr_environment_features) {
 }
 
-LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) {
-  ADCTrajectoryContainer* ego_trajectory_container =
-      dynamic_cast<ADCTrajectoryContainer*>(
-          ContainerManager::Instance()->GetContainer(
-              AdapterConfig::PLANNING_TRAJECTORY));
-  const auto& trajectory =
-      ego_trajectory_container->adc_trajectory();
-  for (const auto& lane_id : trajectory.lane_id()) {
-    LaneInfoPtr lane_info =
-        HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));
+LaneInfoPtr FeatureExtractor::GetEgoLane(const common::Point3D& position,
+    const double heading) {
+  common::PointENU position_enu;
+  position_enu.set_x(position.x());
+  position_enu.set_y(position.y());
+  position_enu.set_z(position.z());
 
-    if (lane_info == nullptr) {
-      continue;
-    }
+  // TODO(all): make 1.0 a gflag
+  auto nearby_lanes = PredictionMap::GetNearbyLanes(position_enu, 1.0);
+  if (nearby_lanes.empty()) {
+    return nullptr;
+  }
 
-    if (lane_info->IsOnLane(ego_position)) {
-      return lane_info;
+  // TODO(all): make this a gflag
+  double angle_threshold = M_PI * 0.25;
+
+  for (auto lane : nearby_lanes) {
+    auto heading_diff =
+        common::math::NormalizeAngle(heading - lane->Heading(0.0));
+    if (heading_diff < angle_threshold && heading_diff > -angle_threshold) {
+      return lane;
     }
   }
   return nullptr;

@@ -360,6 +360,15 @@ class PredictionMap {
    */
   static int LaneTurnType(const std::string& lane_id);
 
+  /**
+   * @brief Get all nearby lanes within certain radius given a position
+   * @param position Position in ENU frame
+   * @param nearyby_radius Search radius around the given position
+   * @return All nearby lanes within the radius
+   */
+  static std::vector<std::shared_ptr<const hdmap::LaneInfo>> GetNearbyLanes(
+      const common::PointENU& position, const double nearby_radius);
+
  private:
   static std::shared_ptr<const hdmap::LaneInfo> GetNeighborLane(
       const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
