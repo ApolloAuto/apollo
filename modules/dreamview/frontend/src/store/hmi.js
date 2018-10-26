@@ -36,6 +36,8 @@ export default class HMI {
 
     @observable isCoDriver = false;
 
+    @observable isMute = false;
+
     @action initialize(config) {
         if (config.dockerImage) {
             this.dockerImage = config.dockerImage;
@@ -67,6 +69,11 @@ export default class HMI {
 
     @action toggleCoDriverFlag() {
         this.isCoDriver = !this.isCoDriver;
+    }
+
+    @action toggleMuteFlag() {
+        this.isMute = !this.isMute;
+        UTTERANCE.setMute(this.isMute);
     }
 
     @action updateStatus(newStatus) {

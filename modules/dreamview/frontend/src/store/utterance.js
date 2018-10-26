@@ -1,12 +1,20 @@
 class Utterance {
     utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
+    mute = false;
 
     isSpeaking() {
         return this.utterance ? window.speechSynthesis.speaking : false;
     }
 
+    setMute(isMute) {
+        this.mute = isMute;
+        if (this.mute) {
+            this.cancelAllInQueue();
+        }
+    }
+
     speakOnce(text) {
-        if (!this.utterance) {
+        if (!this.utterance || this.mute) {
             return;
         }
 
@@ -16,7 +24,7 @@ class Utterance {
     }
 
     speakRepeatedly(text) {
-        if (!this.utterance) {
+        if (!this.utterance || this.mute) {
             return;
         }
 
