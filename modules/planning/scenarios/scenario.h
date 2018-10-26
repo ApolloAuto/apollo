@@ -79,6 +79,11 @@ class Scenario {
 
   const ScenarioStatus& GetStatus() const { return scenario_status_; }
 
+  const ScenarioConfig::StageType GetStage() const {
+    return current_stage_ ? current_stage_->stage_type()
+                          : ScenarioConfig::NO_STAGE;
+  }
+
   virtual void Init();
 
  protected:

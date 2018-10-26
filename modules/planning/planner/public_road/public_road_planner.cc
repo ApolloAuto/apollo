@@ -18,6 +18,8 @@
 
 #include <set>
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 
@@ -45,6 +47,18 @@ Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
   scenario_manager_.Update(planning_start_point, *frame);
   scenario_ = scenario_manager_.mutable_scenario();
   auto result = scenario_->Process(planning_start_point, frame);
+
+  if (FLAGS_enable_record_debug) {
+    if (frame && frame->output_trajectory()) {
+      auto scenario_debug = frame->output_trajectory()
+                                ->mutable_debug()
+                                ->mutable_planning_data()
+                                ->mutable_scenario();
+      scenario_debug->set_scenario_type(scenario_->scenario_type());
+      scenario_debug->set_stage_type(scenario_->GetStage());
+    }
+  }
+
   if (result == scenario::Scenario::STATUS_DONE) {
     // only updates scenario manager when previous scenario's status is
     // STATUS_DONE
