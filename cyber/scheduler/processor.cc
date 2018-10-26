@@ -66,13 +66,16 @@ void Processor::Run() {
       } else {
         std::unique_lock<std::mutex> lk_rq(mtx_rq_);
         cv_.wait_for(lk_rq, std::chrono::milliseconds(1));
+        //  cv_.wait(lk_rq, [this] {
+        //    return !this->context_->RqEmpty();
+        //  });
       }
     } else {
       std::unique_lock<std::mutex> lk_rq(mtx_rq_);
       cv_.wait(lk_rq, [this] {
-        return !this->running_ ||
-               (this->context_ && !this->context_->RqEmpty());
-      });
+          return !this->running_ ||
+              (this->context_ && !this->context_->RqEmpty());
+        });
     }
   }
 }

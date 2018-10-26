@@ -51,16 +51,14 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
     }
 
     cr->UpdateState();
-
     if (cr->state() == RoutineState::FINISHED) {
       it = cr_queue_.erase(it);
       continue;
     }
-
     if (cr->state() == RoutineState::READY) {
       cr->set_state(RoutineState::RUNNING);
         PerfEventCache::Instance()->AddSchedEvent(
-            SchedPerf::NEXT_ROUTINE, cr->id(),
+            SchedPerf::NEXT_RT, cr->id(),
             cr->processor_id());
       return cr;
     }
@@ -110,6 +108,10 @@ bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
     }
     cr_container_[cr->id()] = cr;
   }
+
+  PerfEventCache::Instance()->AddSchedEvent(
+      SchedPerf::RT_CREATE, cr->id(),
+      cr->processor_id());
 
   std::lock_guard<std::mutex> lg(mtx_);
   cr_queue_.insert(
