@@ -51,15 +51,6 @@ TEST(SchedulerTest, create_task) {
   EXPECT_EQ(sched->ProcessorNum(), proc_num);
   EXPECT_EQ(sched->ProcCtxs().size(), proc_num + task_pool_size);
 
-  std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(proc);
-  cr->set_id(task_id);
-  cr->set_name(croutine_name);
-  cr->set_processor_id(1);
-  EXPECT_TRUE(sched->DispatchTask(cr));
-  auto proc_ctxs = sched->ProcCtxs();
-  RoutineState state;
-  EXPECT_TRUE(proc_ctxs[1]->get_state(cr->id(), &state));
-
   sched->ShutDown();
   EXPECT_FALSE(sched->CreateTask(&proc, croutine_name));
 }

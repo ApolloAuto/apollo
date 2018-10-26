@@ -135,57 +135,6 @@ void Scheduler::ShutDown() {
 
 Scheduler::~Scheduler() {}
 
-std::shared_ptr<ProcessorContext> Scheduler::FindProc(
-    const std::shared_ptr<CRoutine>& cr) {
-  int cur_proc_ = -1;
-  auto cur_cr = CRoutine::GetCurrentRoutine();
-
-  if (cur_cr) {
-    cur_proc_ = cur_cr->processor_id();
-  }
-
-  if (cr->processor_id() != -1 && cr->processor_id() != cur_proc_ &&
-      cr->processor_id() < static_cast<int>(proc_ctxs_.size())) {
-    cr->set_processor_id(proc_ctxs_[cr->processor_id()]->id());
-    return proc_ctxs_[cr->processor_id()];
-  }
-
-  auto id = 0;
-  int min_q_size = proc_ctxs_[id]->RqSize();
-  for (uint32_t i = 1; i < proc_num_; i++) {
-    if (min_q_size > proc_ctxs_[i]->RqSize()) {
-      min_q_size = proc_ctxs_[i]->RqSize();
-      id = i;
-    }
-  }
-  cr->set_processor_id(proc_ctxs_[id]->id());
-  return proc_ctxs_[cr->processor_id()];
-}
-
-bool Scheduler::DispatchTask(const std::shared_ptr<CRoutine>& croutine) {
-  auto ctx = FindProc(croutine);
-
-  if (!ctx) {
-    AERROR << GlobalData::GetTaskNameById(croutine->id())
-           << " push failed, get processor failed, "
-           << "target processor index: " << croutine->processor_id();
-    return false;
-  }
-
-  // rt may removed before inserted to croutine
-  if (cr_ctx_.find(croutine->id()) != cr_ctx_.end()) {
-    cr_ctx_[croutine->id()] = croutine->processor_id();
-  }
-
-  if (!ctx->Enqueue(croutine)) {
-    AWARN << "push routine[" << GlobalData::GetTaskNameById(croutine->id())
-          << "] into processor[" << croutine->processor_id() << "] failed";
-    return false;
-  }
-
-  return true;
-}
-
 bool Scheduler::CreateTask(const RoutineFactory& factory,
                            const std::string& name) {
   return CreateTask(factory.create_routine(), name, factory.GetDataVisitor());
@@ -235,7 +184,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   }
 
   WriteLockGuard<AtomicRWLock> rw(rw_lock_);
-  if (!DispatchTask(cr)) {
+  if (!proc_ctxs_[0]->DispatchTask(cr)) {
     return false;
   }
   return true;

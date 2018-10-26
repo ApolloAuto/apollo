@@ -41,7 +41,8 @@ using croutine::CRoutine;
 class TaskChoreoContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
-  bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
+  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
+  bool Enqueue(const std::shared_ptr<CRoutine>) override;
   bool RqEmpty() override;
 
  private:
