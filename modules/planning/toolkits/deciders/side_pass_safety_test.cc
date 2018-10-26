@@ -20,8 +20,8 @@
 #include "modules/planning/toolkits/deciders/side_pass_safety.h"
 
 #include "gtest/gtest.h"
-#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 #define private public
 
@@ -32,8 +32,8 @@ class SidePassSafetyTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_task_type(TaskConfig::SIDE_PASS_SAFETY);
-    config_.mutable_side_pass_safety_config()->
-        set_min_obstacle_lateral_distance(1);
+    config_.mutable_side_pass_safety_config()
+        ->set_min_obstacle_lateral_distance(1);
   }
 
   virtual void TearDown() {}
