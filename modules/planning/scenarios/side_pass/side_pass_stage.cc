@@ -45,6 +45,8 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
+    AERROR << "Stage " << Name() << " error: "
+           << "planning on reference line failed.";
     return Stage::ERROR;
   }
   const ReferenceLineInfo& reference_line_info =
@@ -60,6 +62,8 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     }
   }
   if ((obstacle_start_s - adc_front_edge_s) < 0) {
+    AERROR << "Stage " << Name() << " error: "
+           << "front obstacle has wrong position.";
     return Stage::ERROR;
   }
   // TODO(all): stage params need to be in config file
