@@ -231,9 +231,7 @@ new_local_repository(
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
-    urls = [
-        "https://github.com/grpc/grpc/archive/v1.14.2.tar.gz",
-    ],
+    url = "file:///home/tmp/v1.14.2.tar.gz",
     strip_prefix = "grpc-1.14.2",
 )
 
