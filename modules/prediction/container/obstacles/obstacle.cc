@@ -230,18 +230,17 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
            << junction_id << "]";
     return;
   }
+  // TODO(kechxu) refactor this function
   Feature* latest_feature_ptr = mutable_latest_feature();
-  latest_feature_ptr->mutable_junction_feature()->set_junction_id(junction_id);
   std::shared_ptr<const JunctionInfo> junction_info_ptr =
       PredictionMap::JunctionById(junction_id);
-  double junction_range = ComputeJunctionRange(junction_info_ptr);
   if (junction_info_ptr == nullptr ||
       !junction_info_ptr->junction().has_polygon() ||
       junction_info_ptr->junction().polygon().point_size() < 3) {
     AERROR << "Null junction info ptr";
   }
+  double junction_range = ComputeJunctionRange(junction_info_ptr);
   if (feature_history_.size() == 1) {
-    // TODO(kechxu) merge set junction range somewhere to make code neat
     SearchJunctionExitsWithoutEnterLane(junction_id, latest_feature_ptr);
     latest_feature_ptr->mutable_junction_feature()
                       ->set_junction_range(junction_range);
@@ -255,9 +254,13 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
     SearchJunctionExitsWithEnterLane(
         enter_lane_id, junction_id, latest_feature_ptr);
     latest_feature_ptr->mutable_junction_feature()
+                      ->set_junction_id(junction_id);
+    latest_feature_ptr->mutable_junction_feature()
                       ->set_junction_range(junction_range);
   } else {
     SearchJunctionExitsWithoutEnterLane(junction_id, latest_feature_ptr);
+    latest_feature_ptr->mutable_junction_feature()
+                      ->set_junction_id(junction_id);
     latest_feature_ptr->mutable_junction_feature()
                       ->set_junction_range(junction_range);
   }
@@ -265,6 +268,11 @@ void Obstacle::BuildJunctionFeature(const std::string& junction_id) {
 
 double Obstacle::ComputeJunctionRange(
     std::shared_ptr<const JunctionInfo> junction_info_ptr) {
+  // TODO(kechxu) refactor this function
+  // CHECK(junction_info_ptr != nullptr);
+  if (junction_info_ptr == nullptr) {
+    return 10.0;
+  }
   double x_min = std::numeric_limits<double>::infinity();
   double x_max = -std::numeric_limits<double>::infinity();
   double y_min = std::numeric_limits<double>::infinity();
