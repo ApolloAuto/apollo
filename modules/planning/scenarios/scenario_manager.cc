@@ -174,6 +174,14 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
     if (rejected_scenarios.find(scenario) != rejected_scenarios.end()) {
       continue;
     }
+    if (scenario == ScenarioConfig::SIDE_PASS &&
+        !FLAGS_enable_scenario_side_pass) {
+      continue;
+    }
+    if (scenario == ScenarioConfig::STOP_SIGN_UNPROTECTED &&
+        !FLAGS_enable_scenario_stop_sign_unprotected) {
+      continue;
+    }
     if (SelectScenario(scenario, ego_point, frame)) {
       return;
     } else {
