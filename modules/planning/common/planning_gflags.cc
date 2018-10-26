@@ -423,3 +423,6 @@ DEFINE_bool(enable_record_debug, true,
 DEFINE_double(
     default_front_clear_distance, 300.0,
     "default front clear distance value in case there is no obstacle around.");
+
+DEFINE_bool(enable_open_space_planner_thread, true,
+            "Enable thread in open space planner for trajectory publish.");
