@@ -13,11 +13,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/configs/proto:vehicle_config_proto",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/localization/proto:pose_proto",
-        "//modules/map/hdmap",
+        "//modules/planning/common:planning_context",
         "//modules/planning/common:speed_profile_generator",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/toolkits/optimizers:speed_optimizer",

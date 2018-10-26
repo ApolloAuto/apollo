@@ -20,10 +20,8 @@
 
 #pragma once
 
-#include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common/status/status.h"
 #include "modules/planning/proto/st_boundary_config.pb.h"
-
 #include "modules/planning/toolkits/optimizers/speed_optimizer.h"
 
 namespace apollo {
@@ -52,8 +50,12 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
                          const SpeedData& reference_speed_data,
                          PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
-  bool is_fixed_distance_ = false;  // not fixed speed
-  double max_distance_or_speed_ = 0.0;
+ private:
+  // TODO(all): might move to conf later
+  const double proceeding_speed_ = 2.23;    // (5mph proceeding speed)
+  const double const_deceleration_ = -0.8;  // (~3sec to fully stop)
+  const double increment_s_ = 0.1;
+  const double increment_t_ = 0.1;
 };
 
 }  // namespace planning
