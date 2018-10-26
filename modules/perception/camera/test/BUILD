@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_test(
     name = "camera_app_obstacle_camera_perception_test",
-    size = "small",
+    size = "medium",
     srcs = [
         "camera_app_obstacle_camera_perception_test.cc",
     ],
@@ -388,7 +388,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_lane_detector_denseline_lane_detector_test",
-    size = "small",
+    size = "medium",
     srcs = [
         "camera_lib_lane_detector_denseline_lane_detector_test.cc",
     ],
@@ -449,7 +449,7 @@ cc_test(
 
 cc_test(
     name = "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test",
-    size = "small",
+    size = "medium",
     srcs = [
         "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test.cc",
     ],
