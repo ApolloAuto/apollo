@@ -64,7 +64,6 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
     return nullptr;
   }
 
-  auto start_perf_time = apollo::cyber::Time::Now().ToNanosecond();
   for (int i = MAX_SCHED_PRIORITY - 1; i >= 0; --i) {
     ReadLockGuard<AtomicRWLock> rw_lock(rw_locks_[i]);
     for (auto it = rq_[i].begin(); it != rq_[i].end();) {
@@ -79,8 +78,8 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
       if (cr->state() == RoutineState::READY) {
         cr->set_state(RoutineState::RUNNING);
         PerfEventCache::Instance()->AddSchedEvent(
-            SchedPerf::NEXT_ROUTINE, cr->id(), cr->processor_id(), 0,
-            start_perf_time, -1, -1);
+            SchedPerf::NEXT_ROUTINE, cr->id(),
+            cr->processor_id());
         return cr;
       }
       ++it;

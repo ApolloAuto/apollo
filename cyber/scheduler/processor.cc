@@ -21,6 +21,7 @@
 #include "cyber/common/log.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
+#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/scheduler.h"
@@ -28,6 +29,9 @@
 namespace apollo {
 namespace cyber {
 namespace scheduler {
+
+using apollo::cyber::event::PerfEventCache;
+using apollo::cyber::event::SchedPerf;
 
 Processor::Processor() { routine_context_.reset(new RoutineContext()); }
 

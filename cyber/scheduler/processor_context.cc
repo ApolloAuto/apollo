@@ -45,9 +45,9 @@ int ProcessorContext::RqSize() {
 }
 
 void ProcessorContext::Notify(uint64_t cr_id) {
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, cr_id,
-                                            proc_index_, 0, 0, -1, -1);
-
+  PerfEventCache::Instance()->AddSchedEvent(
+      SchedPerf::NOTIFY_IN, cr_id,
+      proc_index_);
   ReadLockGuard<AtomicRWLock> rw(rw_lock_);
 
   auto& cr = cr_container_[cr_id];

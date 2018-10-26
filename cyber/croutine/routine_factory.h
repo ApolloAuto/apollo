@@ -62,15 +62,9 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M0> msg;
       for (;;) {
         if (dv->TryFetch(msg)) {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg);
           CRoutine::Yield();
         } else {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
           CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }
@@ -91,15 +85,9 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M1> msg1;
       for (;;) {
         if (dv->TryFetch(msg0, msg1)) {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1);
           CRoutine::Yield();
         } else {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
           CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }
@@ -120,15 +108,9 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M2> msg2;
       for (;;) {
         if (dv->TryFetch(msg0, msg1, msg2)) {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1, msg2);
           CRoutine::Yield();
         } else {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
           CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }
@@ -150,15 +132,9 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M3> msg3;
       for (;;) {
         if (dv->TryFetch(msg0, msg1, msg2, msg3)) {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 1, -1);
           f(msg0, msg1, msg2, msg3);
           CRoutine::Yield();
         } else {
-          PerfEventCache::Instance()->AddSchedEvent(
-              SchedPerf::TRY_FETCH_OUT, CRoutine::GetCurrentRoutine()->id(),
-              CRoutine::GetCurrentRoutine()->processor_id(), 0, 0, 0, -1);
           CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }

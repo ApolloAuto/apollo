@@ -92,7 +92,6 @@ cc_library(
         "//cyber/class_loader:class_loader_manager",
         "//cyber/croutine:croutine",
         "//cyber/data:data",
-        "//cyber/event:perf_event",
         "//cyber/event:perf_event_cache",
         "//cyber:init",
         "//cyber/logger:logger",

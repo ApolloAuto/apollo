@@ -62,7 +62,6 @@ RoutineState CRoutine::Resume() {
     }
 
     UpdateState();
-
     if (unlikely(state_ != RoutineState::RUNNING &&
                  state_ != RoutineState::READY)) {
       AERROR << "Invalid Routine State!";
@@ -71,18 +70,16 @@ RoutineState CRoutine::Resume() {
     current_routine_ = this;
   }
 
-  auto t_start = cyber::Time::Now().ToNanosecond();
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN, id_,
-                                            processor_id_, 0, 0, -1, -1);
-  SwapContext(GetMainContext(), this->GetContext());
-  auto t_end = cyber::Time::Now().ToNanosecond();
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_OUT, id_,
-                                            processor_id_, 0, t_start, -1,
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN,
+                                            id_, processor_id_,
                                             static_cast<int>(state_));
-  exec_time_ += t_end - t_start;
+  SwapContext(GetMainContext(), this->GetContext());
   if (state_ == RoutineState::RUNNING) {
     state_ = RoutineState::READY;
   }
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_OUT,
+                                            id_, processor_id_,
+                                            static_cast<int>(state_));
   Unlock();
   return state_;
 }
