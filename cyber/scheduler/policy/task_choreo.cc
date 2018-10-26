@@ -17,6 +17,8 @@
 #include "cyber/scheduler/policy/task_choreo.h"
 
 #include <utility>
+#include <unordered_map>
+#include <vector>
 
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
@@ -24,6 +26,7 @@
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/time/time.h"
+#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
@@ -68,7 +71,34 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
   return nullptr;
 }
 
-bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
+bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
+  std::vector<std::shared_ptr<ProcessorContext>> ctxs =
+    Scheduler::Instance()->ProcCtxs();
+
+  uint32_t pid = cr->processor_id();
+  if (!(pid >= 0 && pid < ctxs.size())) {
+    // fallback for those w/o proc idx in conf
+    pid = 0;
+    int qsize = ctxs[pid]->RqSize();
+    for (uint32_t i = 1; i < ctxs.size(); i++) {
+      if (qsize > ctxs[i]->RqSize()) {
+        qsize = ctxs[i]->RqSize();
+        pid = i;
+      }
+    }
+    cr->set_processor_id(pid);
+  }
+
+  std::unordered_map<uint64_t, uint32_t>& rt_ctx =
+    Scheduler::Instance()->RtCtx();
+  if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
+    rt_ctx[cr->id()] = cr->processor_id();
+  }
+
+  return ctxs[pid]->Enqueue(cr);
+}
+
+bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
   if (cr->processor_id() != id()) {
     return false;
   }

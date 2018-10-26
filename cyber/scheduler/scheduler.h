@@ -59,7 +59,6 @@ class Scheduler {
   bool CreateTask(const RoutineFactory& factory, const std::string& name);
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
-  bool DispatchTask(const std::shared_ptr<CRoutine>& croutine);
   bool RemoveTask(const std::string& name);
   bool RemoveCRoutine(uint64_t cr_id);
 
@@ -69,7 +68,7 @@ class Scheduler {
   void ShutDown();
 
   uint32_t ProcessorNum() { return proc_num_; }
-  inline std::unordered_map<uint64_t, uint32_t> RtCtx() { return cr_ctx_; }
+  inline std::unordered_map<uint64_t, uint32_t>& RtCtx() { return cr_ctx_; }
   inline std::vector<std::shared_ptr<ProcessorContext>> ProcCtxs() {
     return proc_ctxs_;
   }
@@ -79,12 +78,9 @@ class Scheduler {
   Scheduler& operator=(Scheduler&) = delete;
 
   void CreateProcessor();
-  std::shared_ptr<ProcessorContext> FindProc(const std::shared_ptr<CRoutine>&);
-
   void StartSysmon();
 
   std::thread sysmon_;
-
   SchedulerConf sched_conf_;
   std::unordered_map<std::string, CRoutineConf> cr_confs_;
 

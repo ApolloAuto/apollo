@@ -18,6 +18,7 @@
 
 #include <functional>
 #include <memory>
+#include <unordered_map>
 
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
@@ -35,11 +36,17 @@ std::array<AtomicRWLock, MAX_SCHED_PRIORITY>
 std::array<std::vector<std::shared_ptr<CRoutine>>,
     MAX_SCHED_PRIORITY> ClassicContext::rq_;
 
-bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
-  if (cr->processor_id() != id()) {
-    return false;
+bool ClassicContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
+  std::unordered_map<uint64_t, uint32_t>& rt_ctx =
+    Scheduler::Instance()->RtCtx();
+  if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
+    rt_ctx[cr->id()] = 0;
   }
 
+  return Enqueue(cr);
+}
+
+bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
   {
     WriteLockGuard<AtomicRWLock> rw(rw_lock_);
     if (cr->priority() < 0 || cr->priority() >= MAX_SCHED_PRIORITY) {

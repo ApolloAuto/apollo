@@ -38,7 +38,8 @@ using apollo::cyber::base::WriteLockGuard;
 
 class ClassicContext : public ProcessorContext {
  public:
-  bool Enqueue(const std::shared_ptr<CRoutine>& cr) override;
+  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
+  bool Enqueue(const std::shared_ptr<CRoutine> cr) override;
   bool RqEmpty() override;
   std::shared_ptr<CRoutine> NextRoutine() override;
 
