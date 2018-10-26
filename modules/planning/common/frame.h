@@ -66,15 +66,11 @@ class Frame {
                  const common::TrajectoryPoint &planning_start_point,
                  const double start_time,
                  const common::VehicleState &vehicle_state,
-                 ReferenceLineProvider *reference_line_provider);
+                 ReferenceLineProvider *reference_line_provider,
+                 ADCTrajectory* output_trajectory);
 
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
-  void InitData(const LocalView &local_view,
-                const common::TrajectoryPoint &planning_start_point,
-                const double start_time,
-                const common::VehicleState &vehicle_state,
-                ReferenceLineProvider *reference_line_provider);
   common::Status Init(
       const std::list<ReferenceLine> &reference_lines,
       const std::list<hdmap::RouteSegments> &segments,
@@ -123,6 +119,8 @@ class Frame {
   ADCTrajectory *mutable_trajectory() { return &trajectory_; }
 
   const ADCTrajectory &trajectory() const { return trajectory_; }
+
+  ADCTrajectory *output_trajectory() { return output_trajectory_; }
 
   const bool is_near_destination() const { return is_near_destination_; }
 
@@ -226,6 +224,10 @@ class Frame {
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
 
+  // TODO(all): change to use shared_ptr.
+  // output trajectory pb
+  ADCTrajectory* output_trajectory_ = nullptr;  // not owned
+
   // TODO(All): add lag_predictor back
   // std::unique_ptr<LagPrediction> lag_predictor_;
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
@@ -233,6 +235,9 @@ class Frame {
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+
+
+  // TODO(all): refactoring open source codes into OpenSourceFrame.
 
   // @brief obstacles total num including perception obstacles and parking space
   // boundary

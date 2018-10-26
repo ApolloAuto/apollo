@@ -137,10 +137,12 @@ Status StdPlanning::Init(const PlanningConfig& config) {
 Status StdPlanning::InitFrame(const uint32_t sequence_num,
                               const TrajectoryPoint& planning_start_point,
                               const double start_time,
-                              const VehicleState& vehicle_state) {
+                              const VehicleState& vehicle_state,
+                              ADCTrajectory* output_trajectory) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          start_time, vehicle_state,
-                         reference_line_provider_.get()));
+                         reference_line_provider_.get(),
+                         output_trajectory));
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
@@ -246,7 +248,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
 
   const uint32_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state);
+                     vehicle_state, trajectory_pb);
   bool update_ego_info = EgoInfo::Instance()->Update(
       stitching_trajectory.back(), vehicle_state, frame_->obstacles());
 

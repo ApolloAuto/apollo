@@ -76,7 +76,8 @@ class NaviPlanning : public PlanningBase {
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
                            const double start_time,
-                           const common::VehicleState& vehicle_state);
+                           const common::VehicleState& vehicle_state,
+                           ADCTrajectory* output_trajectory);
 
   bool CheckPlanningConfig(const PlanningConfig& config);
 
