@@ -7,6 +7,7 @@ cc_library(
     hdrs = [
         "planner.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
@@ -30,6 +31,7 @@ cc_library(
         "planner_dispatcher.h",
         "std_planner_dispatcher.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
         "//modules/common/util",

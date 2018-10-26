@@ -15,6 +15,7 @@ cc_library(
         "trajectory_cost.h",
         "waypoint_sampler.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",

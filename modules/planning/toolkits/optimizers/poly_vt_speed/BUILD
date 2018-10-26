@@ -11,6 +11,7 @@ cc_library(
     hdrs = [
         "piecewise_poly_speed_curve.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/math/curve1d:cubic_polynomial_curve1d",
@@ -40,6 +41,7 @@ cc_library(
     hdrs = [
         "piecewise_poly_speed_profile.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/proto:pnc_point_proto",
         ":piecewise_poly_speed_curve",
@@ -66,6 +68,7 @@ cc_library(
     hdrs = [
         "piecewise_poly_vt_speed_sampler.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":piecewise_poly_speed_profile",
         ":piecewise_poly_speed_curve",

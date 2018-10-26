@@ -12,6 +12,7 @@ cc_library(
         "side_pass_scenario.h",
         "side_pass_stage.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common",

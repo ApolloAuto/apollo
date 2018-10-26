@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "qp_spline_st_graph.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs/proto:vehicle_config_proto",
@@ -34,6 +35,7 @@ cc_library(
     hdrs = [
         "qp_piecewise_st_graph.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs/proto:vehicle_config_proto",

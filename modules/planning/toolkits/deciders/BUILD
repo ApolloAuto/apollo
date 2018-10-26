@@ -18,6 +18,7 @@ cc_library(
         "side_pass_path_decider.h",
         "side_pass_safety.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
         "//modules/planning/common:planning_context",

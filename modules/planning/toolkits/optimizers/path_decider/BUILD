@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "path_decider.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",

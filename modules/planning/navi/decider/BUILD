@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "navi_task.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/status",
@@ -31,6 +32,7 @@ cc_library(
     hdrs = [
         "navi_path_decider.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":navi_task",
         "//cyber/common:log",
@@ -58,6 +60,7 @@ cc_library(
         "navi_speed_decider.h",
         "navi_speed_ts_graph.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":navi_task",
         "//cyber/common:log",
@@ -83,6 +86,7 @@ cc_library(
     hdrs = [
         "navi_obstacle_decider.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":navi_task",
         "//cyber/common:log",

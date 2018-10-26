@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "lattice_planner.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/math:path_matcher",
