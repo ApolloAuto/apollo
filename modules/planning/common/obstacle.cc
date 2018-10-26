@@ -29,7 +29,7 @@
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/st_boundary.h"
 
@@ -47,8 +47,8 @@ const double kStBoundaryDeltaT = 0.05;       // seconds
 }  // namespace
 
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
-                         PathObstacle::ObjectTagCaseHash>
-    PathObstacle::s_longitudinal_decision_safety_sorter_ = {
+                         Obstacle::ObjectTagCaseHash>
+    Obstacle::s_longitudinal_decision_safety_sorter_ = {
         {ObjectDecisionType::kIgnore, 0},
         {ObjectDecisionType::kOvertake, 100},
         {ObjectDecisionType::kFollow, 300},
@@ -56,14 +56,14 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
         {ObjectDecisionType::kStop, 500}};
 
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
-                         PathObstacle::ObjectTagCaseHash>
-    PathObstacle::s_lateral_decision_safety_sorter_ = {
+                         Obstacle::ObjectTagCaseHash>
+    Obstacle::s_lateral_decision_safety_sorter_ = {
         {ObjectDecisionType::kIgnore, 0},
         {ObjectDecisionType::kNudge, 100},
         {ObjectDecisionType::kSidepass, 200}};
 
-PathObstacle::PathObstacle(const std::string& id,
-                           const PerceptionObstacle& perception_obstacle)
+Obstacle::Obstacle(const std::string& id,
+                   const PerceptionObstacle& perception_obstacle)
     : id_(id),
       perception_id_(perception_obstacle.id()),
       perception_obstacle_(perception_obstacle),
@@ -93,10 +93,10 @@ PathObstacle::PathObstacle(const std::string& id,
                       perception_obstacle.velocity().y());
 }
 
-PathObstacle::PathObstacle(const std::string& id,
-                           const PerceptionObstacle& perception_obstacle,
-                           const prediction::Trajectory& trajectory)
-    : PathObstacle(id, perception_obstacle) {
+Obstacle::Obstacle(const std::string& id,
+                   const PerceptionObstacle& perception_obstacle,
+                   const prediction::Trajectory& trajectory)
+    : Obstacle(id, perception_obstacle) {
   trajectory_ = trajectory;
   auto& trajectory_points = *trajectory_.mutable_trajectory_point();
   double cumulative_s = 0.0;
@@ -117,7 +117,7 @@ PathObstacle::PathObstacle(const std::string& id,
   }
 }
 
-common::TrajectoryPoint PathObstacle::GetPointAtTime(
+common::TrajectoryPoint Obstacle::GetPointAtTime(
     const double relative_time) const {
   const auto& points = trajectory_.trajectory_point();
   if (points.size() < 2) {
@@ -152,7 +152,7 @@ common::TrajectoryPoint PathObstacle::GetPointAtTime(
   }
 }
 
-common::math::Box2d PathObstacle::GetBoundingBox(
+common::math::Box2d Obstacle::GetBoundingBox(
     const common::TrajectoryPoint& point) const {
   return common::math::Box2d({point.path_point().x(), point.path_point().y()},
                              point.path_point().theta(),
@@ -160,8 +160,7 @@ common::math::Box2d PathObstacle::GetBoundingBox(
                              perception_obstacle_.width());
 }
 
-bool PathObstacle::IsStaticObstacle(
-    const PerceptionObstacle& perception_obstacle) {
+bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
   if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
     return true;
   }
@@ -171,14 +170,14 @@ bool PathObstacle::IsStaticObstacle(
          moving_speed <= FLAGS_static_obstacle_speed_threshold;
 }
 
-std::list<std::unique_ptr<PathObstacle>> PathObstacle::CreateObstacles(
+std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     const prediction::PredictionObstacles& predictions) {
-  std::list<std::unique_ptr<PathObstacle>> obstacles;
+  std::list<std::unique_ptr<Obstacle>> obstacles;
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
     if (prediction_obstacle.trajectory().empty()) {
-      obstacles.emplace_back(new PathObstacle(
+      obstacles.emplace_back(new Obstacle(
           perception_id, prediction_obstacle.perception_obstacle()));
       continue;
     }
@@ -201,7 +200,7 @@ std::list<std::unique_ptr<PathObstacle>> PathObstacle::CreateObstacles(
 
       const std::string obstacle_id =
           apollo::common::util::StrCat(perception_id, "_", trajectory_index);
-      obstacles.emplace_back(new PathObstacle(
+      obstacles.emplace_back(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
       ++trajectory_index;
     }
@@ -209,7 +208,7 @@ std::list<std::unique_ptr<PathObstacle>> PathObstacle::CreateObstacles(
   return obstacles;
 }
 
-std::unique_ptr<PathObstacle> PathObstacle::CreateStaticVirtualObstacles(
+std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
     const std::string& id, const common::math::Box2d& obstacle_box) {
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
@@ -237,13 +236,12 @@ std::unique_ptr<PathObstacle> PathObstacle::CreateStaticVirtualObstacles(
     point->set_x(corner_point.x());
     point->set_y(corner_point.y());
   }
-  auto* obstacle = new PathObstacle(id, perception_obstacle);
+  auto* obstacle = new Obstacle(id, perception_obstacle);
   obstacle->is_virtual_ = true;
-  return std::unique_ptr<PathObstacle>(obstacle);
+  return std::unique_ptr<Obstacle>(obstacle);
 }
 
-bool PathObstacle::IsValidTrajectoryPoint(
-    const common::TrajectoryPoint& point) {
+bool Obstacle::IsValidTrajectoryPoint(const common::TrajectoryPoint& point) {
   return !((!point.has_path_point()) || std::isnan(point.path_point().x()) ||
            std::isnan(point.path_point().y()) ||
            std::isnan(point.path_point().z()) ||
@@ -254,11 +252,11 @@ bool PathObstacle::IsValidTrajectoryPoint(
            std::isnan(point.a()) || std::isnan(point.relative_time()));
 }
 
-void PathObstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
+void Obstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
   perception_sl_boundary_ = sl_boundary;
 }
 
-double PathObstacle::MinRadiusStopDistance(
+double Obstacle::MinRadiusStopDistance(
     const common::VehicleParam& vehicle_param) const {
   if (min_radius_stop_distance_ > 0) {
     return min_radius_stop_distance_;
@@ -281,8 +279,8 @@ double PathObstacle::MinRadiusStopDistance(
   return stop_distance;
 }
 
-void PathObstacle::BuildReferenceLineStBoundary(
-    const ReferenceLine& reference_line, const double adc_start_s) {
+void Obstacle::BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
+                                            const double adc_start_s) {
   const auto& adc_param =
       VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   const double adc_width = adc_param.width();
@@ -315,9 +313,9 @@ void PathObstacle::BuildReferenceLineStBoundary(
   }
 }
 
-bool PathObstacle::BuildTrajectoryStBoundary(
-    const ReferenceLine& reference_line, const double adc_start_s,
-    StBoundary* const st_boundary) {
+bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
+                                         const double adc_start_s,
+                                         StBoundary* const st_boundary) {
   if (!IsValidObstacle(perception_obstacle_)) {
     AERROR << "Fail to build trajectory st boundary because object is not "
               "valid. PerceptionObstacle: "
@@ -477,31 +475,31 @@ bool PathObstacle::BuildTrajectoryStBoundary(
   return true;
 }
 
-const StBoundary& PathObstacle::reference_line_st_boundary() const {
+const StBoundary& Obstacle::reference_line_st_boundary() const {
   return reference_line_st_boundary_;
 }
 
-const StBoundary& PathObstacle::st_boundary() const { return st_boundary_; }
+const StBoundary& Obstacle::st_boundary() const { return st_boundary_; }
 
-const std::vector<std::string>& PathObstacle::decider_tags() const {
+const std::vector<std::string>& Obstacle::decider_tags() const {
   return decider_tags_;
 }
 
-const std::vector<ObjectDecisionType>& PathObstacle::decisions() const {
+const std::vector<ObjectDecisionType>& Obstacle::decisions() const {
   return decisions_;
 }
 
-bool PathObstacle::IsLateralDecision(const ObjectDecisionType& decision) {
+bool Obstacle::IsLateralDecision(const ObjectDecisionType& decision) {
   return decision.has_ignore() || decision.has_nudge() ||
          decision.has_sidepass();
 }
 
-bool PathObstacle::IsLongitudinalDecision(const ObjectDecisionType& decision) {
+bool Obstacle::IsLongitudinalDecision(const ObjectDecisionType& decision) {
   return decision.has_ignore() || decision.has_stop() || decision.has_yield() ||
          decision.has_follow() || decision.has_overtake();
 }
 
-ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
+ObjectDecisionType Obstacle::MergeLongitudinalDecision(
     const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
   if (lhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return rhs;
@@ -536,27 +534,27 @@ ObjectDecisionType PathObstacle::MergeLongitudinalDecision(
   return lhs;  // stop compiler complaining
 }
 
-const ObjectDecisionType& PathObstacle::LongitudinalDecision() const {
+const ObjectDecisionType& Obstacle::LongitudinalDecision() const {
   return longitudinal_decision_;
 }
 
-const ObjectDecisionType& PathObstacle::LateralDecision() const {
+const ObjectDecisionType& Obstacle::LateralDecision() const {
   return lateral_decision_;
 }
 
-bool PathObstacle::IsIgnore() const {
+bool Obstacle::IsIgnore() const {
   return IsLongitudinalIgnore() && IsLateralIgnore();
 }
 
-bool PathObstacle::IsLongitudinalIgnore() const {
+bool Obstacle::IsLongitudinalIgnore() const {
   return longitudinal_decision_.has_ignore();
 }
 
-bool PathObstacle::IsLateralIgnore() const {
+bool Obstacle::IsLateralIgnore() const {
   return lateral_decision_.has_ignore();
 }
 
-ObjectDecisionType PathObstacle::MergeLateralDecision(
+ObjectDecisionType Obstacle::MergeLateralDecision(
     const ObjectDecisionType& lhs, const ObjectDecisionType& rhs) {
   if (lhs.object_tag_case() == ObjectDecisionType::OBJECT_TAG_NOT_SET) {
     return rhs;
@@ -590,23 +588,23 @@ ObjectDecisionType PathObstacle::MergeLateralDecision(
   return lhs;
 }
 
-bool PathObstacle::HasLateralDecision() const {
+bool Obstacle::HasLateralDecision() const {
   return lateral_decision_.object_tag_case() !=
          ObjectDecisionType::OBJECT_TAG_NOT_SET;
 }
 
-bool PathObstacle::HasLongitudinalDecision() const {
+bool Obstacle::HasLongitudinalDecision() const {
   return longitudinal_decision_.object_tag_case() !=
          ObjectDecisionType::OBJECT_TAG_NOT_SET;
 }
 
-bool PathObstacle::HasNonIgnoreDecision() const {
+bool Obstacle::HasNonIgnoreDecision() const {
   return (HasLateralDecision() && !IsLateralIgnore()) ||
          (HasLongitudinalDecision() && !IsLongitudinalIgnore());
 }
 
-void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
-                                           const ObjectDecisionType& decision) {
+void Obstacle::AddLongitudinalDecision(const std::string& decider_tag,
+                                       const ObjectDecisionType& decision) {
   DCHECK(IsLongitudinalDecision(decision))
       << "Decision: " << decision.ShortDebugString()
       << " is not a longitudinal decision";
@@ -620,8 +618,8 @@ void PathObstacle::AddLongitudinalDecision(const std::string& decider_tag,
   decider_tags_.push_back(decider_tag);
 }
 
-void PathObstacle::AddLateralDecision(const std::string& decider_tag,
-                                      const ObjectDecisionType& decision) {
+void Obstacle::AddLateralDecision(const std::string& decider_tag,
+                                  const ObjectDecisionType& decision) {
   DCHECK(IsLateralDecision(decision))
       << "Decision: " << decision.ShortDebugString()
       << " is not a lateral decision";
@@ -634,9 +632,9 @@ void PathObstacle::AddLateralDecision(const std::string& decider_tag,
   decider_tags_.push_back(decider_tag);
 }
 
-const std::string PathObstacle::DebugString() const {
+const std::string Obstacle::DebugString() const {
   std::stringstream ss;
-  ss << "PathObstacle id: " << id_;
+  ss << "Obstacle id: " << id_;
   for (std::size_t i = 0; i < decisions_.size(); ++i) {
     ss << " decision: " << decisions_[i].DebugString() << ", made by "
        << decider_tags_[i];
@@ -653,34 +651,34 @@ const std::string PathObstacle::DebugString() const {
   return ss.str();
 }
 
-const SLBoundary& PathObstacle::PerceptionSLBoundary() const {
+const SLBoundary& Obstacle::PerceptionSLBoundary() const {
   return perception_sl_boundary_;
 }
 
-void PathObstacle::SetStBoundary(const StBoundary& boundary) {
+void Obstacle::SetStBoundary(const StBoundary& boundary) {
   st_boundary_ = boundary;
 }
 
-void PathObstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
+void Obstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
   st_boundary_.SetBoundaryType(type);
 }
 
-void PathObstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
+void Obstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
 
-void PathObstacle::SetReferenceLineStBoundary(const StBoundary& boundary) {
+void Obstacle::SetReferenceLineStBoundary(const StBoundary& boundary) {
   reference_line_st_boundary_ = boundary;
 }
 
-void PathObstacle::SetReferenceLineStBoundaryType(
+void Obstacle::SetReferenceLineStBoundaryType(
     const StBoundary::BoundaryType type) {
   reference_line_st_boundary_.SetBoundaryType(type);
 }
 
-void PathObstacle::EraseReferenceLineStBoundary() {
+void Obstacle::EraseReferenceLineStBoundary() {
   reference_line_st_boundary_ = StBoundary();
 }
 
-bool PathObstacle::IsValidObstacle(
+bool Obstacle::IsValidObstacle(
     const perception::PerceptionObstacle& perception_obstacle) {
   const double object_width = perception_obstacle.width();
   const double object_length = perception_obstacle.length();

@@ -45,8 +45,7 @@ class PathDecider : public Task {
   bool MakeStaticObstacleDecision(const PathData &path_data,
                                   PathDecision *const path_decision);
 
-  ObjectStop GenerateObjectStopDecision(
-      const PathObstacle &path_obstacle) const;
+  ObjectStop GenerateObjectStopDecision(const Obstacle &obstacle) const;
 };
 
 }  // namespace planning

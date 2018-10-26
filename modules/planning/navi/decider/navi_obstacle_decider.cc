@@ -81,7 +81,7 @@ double NaviObstacleDecider::GetMinLaneWidth(
 void NaviObstacleDecider::AddObstacleOffsetDirection(
     const common::PathPoint& projection_point,
     const std::vector<common::PathPoint>& path_data_points,
-    const PathObstacle* current_obstacle, const double proj_len, double* dist) {
+    const Obstacle* current_obstacle, const double proj_len, double* dist) {
   Vec2d p1(0.0, 0.0);
   Vec2d p2(0.0, 0.0);
 
@@ -105,8 +105,7 @@ void NaviObstacleDecider::AddObstacleOffsetDirection(
 }
 
 bool NaviObstacleDecider::IsNeedFilterObstacle(
-    const PathObstacle* current_obstacle,
-    const PathPoint& vehicle_projection_point,
+    const Obstacle* current_obstacle, const PathPoint& vehicle_projection_point,
     const std::vector<common::PathPoint>& path_data_points,
     const common::VehicleState& vehicle_state,
     PathPoint* projection_point_ptr) {
@@ -135,7 +134,7 @@ bool NaviObstacleDecider::IsNeedFilterObstacle(
   }
   if ((obstacle_start_position - vehicle_frontedge_position) >
       config_.safe_distance()) {
-    if (!PathObstacle::IsStaticObstacle(current_obstacle->Perception())) {
+    if (!Obstacle::IsStaticObstacle(current_obstacle->Perception())) {
       if (current_obstacle->Perception().velocity().x() > 0.0) {
         return is_filter;
       }
@@ -145,8 +144,8 @@ bool NaviObstacleDecider::IsNeedFilterObstacle(
   return is_filter;
 }
 
-void NaviObstacleDecider::ProcessPathObstacle(
-    const std::vector<const PathObstacle*>& obstacles,
+void NaviObstacleDecider::ProcessObstacle(
+    const std::vector<const Obstacle*>& obstacles,
     const std::vector<common::PathPoint>& path_data_points,
     const PathDecision& path_decision, const double min_lane_width,
     const common::VehicleState& vehicle_state) {
@@ -274,7 +273,7 @@ void NaviObstacleDecider::SmoothNudgeDistance(
 }
 
 double NaviObstacleDecider::GetNudgeDistance(
-    const std::vector<const PathObstacle*>& obstacles,
+    const std::vector<const Obstacle*>& obstacles,
     const ReferenceLine& reference_line, const PathDecision& path_decision,
     const std::vector<common::PathPoint>& path_data_points,
     const common::VehicleState& vehicle_state, int* lane_obstacles_num) {
@@ -306,8 +305,8 @@ double NaviObstacleDecider::GetNudgeDistance(
 
   // Calculation of the number of current Lane obstacles
   obstacle_lat_dist_.clear();
-  ProcessPathObstacle(obstacles, path_data_points, path_decision,
-                      min_lane_width, vehicle_state);
+  ProcessObstacle(obstacles, path_data_points, path_decision, min_lane_width,
+                  vehicle_state);
   for (auto iter = obstacle_lat_dist_.begin(); iter != obstacle_lat_dist_.end();
        iter++) {
     auto actual_dist = GetObstacleActualOffsetDistance(
@@ -370,7 +369,7 @@ void NaviObstacleDecider::KeepNudgePosition(const double nudge_dist,
 
 void NaviObstacleDecider::GetUnsafeObstaclesInfo(
     const std::vector<common::PathPoint>& path_data_points,
-    const std::vector<const PathObstacle*>& obstacles) {
+    const std::vector<const Obstacle*>& obstacles) {
   // Find start point of the reference line.
   double reference_line_y = path_data_points[0].y();
 

@@ -30,8 +30,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path_decision.h"
-#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_cost.h"
@@ -44,7 +44,7 @@ namespace planning {
 class DpStGraph {
  public:
   DpStGraph(const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
-            const std::vector<const PathObstacle*>& obstacles,
+            const std::vector<const Obstacle*>& obstacles,
             const common::TrajectoryPoint& init_point,
             const SLBoundary& adc_sl_boundary);
 
@@ -84,7 +84,7 @@ class DpStGraph {
   DpStSpeedConfig dp_st_speed_config_;
 
   // obstacles based on the current reference line
-  const std::vector<const PathObstacle*>& obstacles_;
+  const std::vector<const Obstacle*>& obstacles_;
 
   // vehicle configuration parameter
   const common::VehicleParam& vehicle_param_ =

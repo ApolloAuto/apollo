@@ -157,8 +157,8 @@ void SignalLight::SetCreepForwardSignalDecision(
   const double creep_s_buffer =
       config_.signal_light().righ_turn_creep().min_boundary_s();
   const auto& path_decision = reference_line_info->path_decision();
-  for (const auto& path_obstacle : path_decision->path_obstacles().Items()) {
-    const auto& st_boundary = path_obstacle->reference_line_st_boundary();
+  for (const auto& obstacle : path_decision->obstacles().Items()) {
+    const auto& st_boundary = obstacle->reference_line_st_boundary();
     const double stop_s =
         signal_light->start_s - config_.signal_light().stop_distance();
     if (reference_line_info->AdcSlBoundary().end_s() + st_boundary.min_s() <
@@ -207,9 +207,9 @@ bool SignalLight::BuildStopDecision(
     AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
     return false;
   }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for " << virtual_obstacle_id;
+    AERROR << "Failed to create obstacle for " << virtual_obstacle_id;
     return false;
   }
 

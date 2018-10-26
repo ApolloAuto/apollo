@@ -9,7 +9,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
-        "//modules/planning/common:path_obstacle",
+        "//modules/planning/common:obstacle",
         "//modules/planning/constraint_checker:collision_checker",
         "//modules/planning/proto:planner_open_space_config_proto",
     ],
@@ -193,7 +193,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/planning/common:path_obstacle",
+        "//modules/planning/common:obstacle",
         "//modules/planning/open_space:open_space_utils",
         "//modules/planning/proto:planner_open_space_config_proto",
     ],

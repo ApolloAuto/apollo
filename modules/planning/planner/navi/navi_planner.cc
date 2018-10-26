@@ -204,15 +204,15 @@ Status NaviPlanner::PlanOnReferenceLine(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  for (const auto* path_obstacle :
-       reference_line_info->path_decision()->path_obstacles().Items()) {
-    if (path_obstacle->IsVirtual()) {
+  for (const auto* obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
+    if (obstacle->IsVirtual()) {
       continue;
     }
-    if (!path_obstacle->IsStatic()) {
+    if (!obstacle->IsStatic()) {
       continue;
     }
-    if (path_obstacle->LongitudinalDecision().has_stop()) {
+    if (obstacle->LongitudinalDecision().has_stop()) {
       constexpr double kRefrenceLineStaticObsCost = 1e3;
       reference_line_info->AddCost(kRefrenceLineStaticObsCost);
     }
@@ -241,13 +241,13 @@ void NaviPlanner::RecordObstacleDebugInfo(
   auto ptr_debug = reference_line_info->mutable_debug();
 
   const auto path_decision = reference_line_info->path_decision();
-  for (const auto path_obstacle : path_decision->path_obstacles().Items()) {
+  for (const auto obstacle : path_decision->obstacles().Items()) {
     auto obstacle_debug = ptr_debug->mutable_planning_data()->add_obstacle();
-    obstacle_debug->set_id(path_obstacle->Id());
+    obstacle_debug->set_id(obstacle->Id());
     obstacle_debug->mutable_sl_boundary()->CopyFrom(
-        path_obstacle->PerceptionSLBoundary());
-    const auto& decider_tags = path_obstacle->decider_tags();
-    const auto& decisions = path_obstacle->decisions();
+        obstacle->PerceptionSLBoundary());
+    const auto& decider_tags = obstacle->decider_tags();
+    const auto& decisions = obstacle->decisions();
     if (decider_tags.size() != decisions.size()) {
       AERROR << "decider_tags size: " << decider_tags.size()
              << " different from decisions size:" << decisions.size();

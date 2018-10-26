@@ -122,10 +122,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     }
 
     std::vector<std::string> pedestrians;
-    for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-      const PerceptionObstacle& perception_obstacle =
-          path_obstacle->Perception();
-      const std::string& obstacle_id = path_obstacle->Id();
+    for (const auto* obstacle : path_decision->obstacles().Items()) {
+      const PerceptionObstacle& perception_obstacle = obstacle->Perception();
+      const std::string& obstacle_id = obstacle->Id();
       PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
       std::string obstacle_type_name =
           PerceptionObstacle_Type_Name(obstacle_type);
@@ -165,11 +164,11 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       double obstacle_l_distance = std::fabs(obstacle_sl_point.l());
 
       const bool is_on_lane =
-          reference_line.IsOnLane(path_obstacle->PerceptionSLBoundary());
+          reference_line.IsOnLane(obstacle->PerceptionSLBoundary());
       const bool is_on_road =
-          reference_line.IsOnRoad(path_obstacle->PerceptionSLBoundary());
+          reference_line.IsOnRoad(obstacle->PerceptionSLBoundary());
       const bool is_path_cross =
-          !path_obstacle->reference_line_st_boundary().IsEmpty();
+          !obstacle->reference_line_st_boundary().IsEmpty();
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] crosswalk_id[" << crosswalk_id << "] obstacle_l["
@@ -361,9 +360,9 @@ int Crosswalk::BuildStopDecision(Frame* const frame,
     AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
     return -1;
   }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
+    AERROR << "Failed to create obstacle for: " << virtual_obstacle_id;
     return -1;
   }
 

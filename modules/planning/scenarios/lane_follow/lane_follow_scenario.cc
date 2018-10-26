@@ -41,7 +41,6 @@
 #include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
-#include "modules/planning/toolkits/optimizers/poly_st_speed/poly_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"

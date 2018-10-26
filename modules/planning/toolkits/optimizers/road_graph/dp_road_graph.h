@@ -29,9 +29,9 @@
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
-#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
@@ -52,7 +52,7 @@ class DpRoadGraph {
   ~DpRoadGraph() = default;
 
   bool FindPathTunnel(const common::TrajectoryPoint &init_point,
-                      const std::vector<const PathObstacle *> &obstacles,
+                      const std::vector<const Obstacle *> &obstacles,
                       PathData *const path_data);
 
   void SetDebugLogger(apollo::planning_internal::Debug *debug) {
@@ -97,7 +97,7 @@ class DpRoadGraph {
                                std::numeric_limits<float>::infinity()};
     QuinticPolynomialCurve1d min_cost_curve;
   };
-  bool GenerateMinCostPath(const std::vector<const PathObstacle *> &obstacles,
+  bool GenerateMinCostPath(const std::vector<const Obstacle *> &obstacles,
                            std::vector<DpRoadGraphNode> *min_cost_path);
 
   bool IsValidCurve(const QuinticPolynomialCurve1d &curve) const;

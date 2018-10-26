@@ -67,9 +67,9 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 
   const PathDecision& path_decision = reference_line_info.path_decision();
   auto& watch_vehicles = GetContext()->watch_vehicles;
-  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
     // add to watch_vehicles if adc is still proceeding to stop sign
-    AddWatchVehicle(*path_obstacle, &watch_vehicles);
+    AddWatchVehicle(*obstacle, &watch_vehicles);
   }
 
   bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
@@ -108,9 +108,9 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
   const PathDecision& path_decision = reference_line_info.path_decision();
-  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
     // remove from watch_vehicles_ if adc is stopping/waiting at stop sign
-    RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles);
+    RemoveWatchVehicle(*obstacle, watch_vehicle_ids, &watch_vehicles);
   }
 
   return Stage::RUNNING;
@@ -213,10 +213,10 @@ int StopSignUnprotectedScenario::GetAssociatedLanes(
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
 int StopSignUnprotectedPreStop::AddWatchVehicle(
-    const PathObstacle& path_obstacle, StopSignLaneVehicles* watch_vehicles) {
+    const Obstacle& obstacle, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
+  const PerceptionObstacle& perception_obstacle = obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
@@ -308,12 +308,11 @@ int StopSignUnprotectedPreStop::AddWatchVehicle(
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
 int StopSignUnprotectedStop::RemoveWatchVehicle(
-    const PathObstacle& path_obstacle,
-    const std::vector<std::string>& watch_vehicle_ids,
+    const Obstacle& obstacle, const std::vector<std::string>& watch_vehicle_ids,
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
+  const PerceptionObstacle& perception_obstacle = obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
@@ -354,7 +353,7 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
 
   bool erase = false;
 
-  bool is_path_cross = !path_obstacle.reference_line_st_boundary().IsEmpty();
+  bool is_path_cross = !obstacle.reference_line_st_boundary().IsEmpty();
 
   // check obstacle is on an associate lane guarded by stop sign
   const std::string& obstable_lane_id = obstacle_lane.get()->id().id();

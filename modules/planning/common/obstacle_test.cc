@@ -18,6 +18,8 @@
  * @file
  **/
 
+#include "modules/planning/common/obstacle.h"
+
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -29,7 +31,6 @@
 
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -204,5 +205,422 @@ TEST(Obstacle, CreateStaticVirtualObstacle) {
   EXPECT_FLOAT_EQ(0.0, perception_box.heading());
 }
 
+TEST(IsLateralDecision, AllDecisions) {
+  ObjectDecisionType decision_ignore;
+  decision_ignore.mutable_ignore();
+  EXPECT_TRUE(Obstacle::IsLateralDecision(decision_ignore));
+
+  ObjectDecisionType decision_overtake;
+  decision_overtake.mutable_overtake();
+  EXPECT_FALSE(Obstacle::IsLateralDecision(decision_overtake));
+
+  ObjectDecisionType decision_follow;
+  decision_follow.mutable_follow();
+  EXPECT_FALSE(Obstacle::IsLateralDecision(decision_follow));
+
+  ObjectDecisionType decision_yield;
+  decision_yield.mutable_yield();
+  EXPECT_FALSE(Obstacle::IsLateralDecision(decision_yield));
+
+  ObjectDecisionType decision_stop;
+  decision_stop.mutable_stop();
+  EXPECT_FALSE(Obstacle::IsLateralDecision(decision_stop));
+
+  ObjectDecisionType decision_nudge;
+  decision_nudge.mutable_nudge();
+  EXPECT_TRUE(Obstacle::IsLateralDecision(decision_nudge));
+
+  ObjectDecisionType decision_sidepass;
+  decision_sidepass.mutable_sidepass();
+  EXPECT_TRUE(Obstacle::IsLateralDecision(decision_sidepass));
+}
+
+TEST(IsLongitudinalDecision, AllDecisions) {
+  ObjectDecisionType decision_ignore;
+  decision_ignore.mutable_ignore();
+  EXPECT_TRUE(Obstacle::IsLongitudinalDecision(decision_ignore));
+
+  ObjectDecisionType decision_overtake;
+  decision_overtake.mutable_overtake();
+  EXPECT_TRUE(Obstacle::IsLongitudinalDecision(decision_overtake));
+
+  ObjectDecisionType decision_follow;
+  decision_follow.mutable_follow();
+  EXPECT_TRUE(Obstacle::IsLongitudinalDecision(decision_follow));
+
+  ObjectDecisionType decision_yield;
+  decision_yield.mutable_yield();
+  EXPECT_TRUE(Obstacle::IsLongitudinalDecision(decision_yield));
+
+  ObjectDecisionType decision_stop;
+  decision_stop.mutable_stop();
+  EXPECT_TRUE(Obstacle::IsLongitudinalDecision(decision_stop));
+
+  ObjectDecisionType decision_nudge;
+  decision_nudge.mutable_nudge();
+  EXPECT_FALSE(Obstacle::IsLongitudinalDecision(decision_nudge));
+
+  ObjectDecisionType decision_sidepass;
+  decision_sidepass.mutable_sidepass();
+  EXPECT_FALSE(Obstacle::IsLongitudinalDecision(decision_sidepass));
+}
+
+TEST(MergeLongitudinalDecision, AllDecisions) {
+  ObjectDecisionType decision_ignore;
+  decision_ignore.mutable_ignore();
+
+  ObjectDecisionType decision_overtake;
+  decision_overtake.mutable_overtake();
+
+  ObjectDecisionType decision_follow;
+  decision_follow.mutable_follow();
+
+  ObjectDecisionType decision_yield;
+  decision_yield.mutable_yield();
+
+  ObjectDecisionType decision_stop;
+  decision_stop.mutable_stop();
+
+  ObjectDecisionType decision_nudge;
+  decision_nudge.mutable_nudge();
+
+  ObjectDecisionType decision_sidepass;
+  decision_sidepass.mutable_sidepass();
+
+  // vertical decision comparison
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_stop, decision_ignore)
+          .has_stop());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_stop, decision_overtake)
+          .has_stop());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_stop, decision_follow)
+          .has_stop());
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_stop, decision_yield)
+                  .has_stop());
+
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_yield, decision_ignore)
+          .has_yield());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_yield, decision_overtake)
+          .has_yield());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_yield, decision_follow)
+          .has_yield());
+
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_follow, decision_ignore)
+          .has_follow());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_follow, decision_overtake)
+          .has_follow());
+
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_ignore)
+          .has_overtake());
+
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_overtake)
+          .has_overtake());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_follow)
+          .has_follow());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_yield)
+          .has_yield());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_stop)
+          .has_stop());
+
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_follow)
+          .has_follow());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_yield)
+          .has_yield());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_overtake, decision_stop)
+          .has_stop());
+
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_follow, decision_yield)
+          .has_yield());
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_follow, decision_stop)
+          .has_stop());
+
+  EXPECT_TRUE(Obstacle::MergeLongitudinalDecision(decision_yield, decision_stop)
+                  .has_stop());
+
+  EXPECT_TRUE(
+      Obstacle::MergeLongitudinalDecision(decision_ignore, decision_ignore)
+          .has_ignore());
+
+  ObjectDecisionType decision_overtake1;
+  decision_overtake1.mutable_overtake()->set_distance_s(1);
+  ObjectDecisionType decision_overtake2;
+  decision_overtake2.mutable_overtake()->set_distance_s(2);
+  EXPECT_EQ(2, Obstacle::MergeLongitudinalDecision(decision_overtake1,
+                                                   decision_overtake2)
+                   .overtake()
+                   .distance_s());
+
+  ObjectDecisionType decision_follow1;
+  decision_follow1.mutable_follow()->set_distance_s(-1);
+  ObjectDecisionType decision_follow2;
+  decision_follow2.mutable_follow()->set_distance_s(-2);
+  EXPECT_EQ(-2, Obstacle::MergeLongitudinalDecision(decision_follow1,
+                                                    decision_follow2)
+                    .follow()
+                    .distance_s());
+
+  ObjectDecisionType decision_yield1;
+  decision_yield1.mutable_yield()->set_distance_s(-1);
+  ObjectDecisionType decision_yield2;
+  decision_yield2.mutable_yield()->set_distance_s(-2);
+  EXPECT_EQ(
+      -2, Obstacle::MergeLongitudinalDecision(decision_yield1, decision_yield2)
+              .yield()
+              .distance_s());
+
+  ObjectDecisionType decision_stop1;
+  decision_stop1.mutable_stop()->set_distance_s(-1);
+  ObjectDecisionType decision_stop2;
+  decision_stop2.mutable_stop()->set_distance_s(-2);
+  EXPECT_EQ(-2,
+            Obstacle::MergeLongitudinalDecision(decision_stop1, decision_stop2)
+                .stop()
+                .distance_s());
+}
+
+TEST(MergeLateralDecision, AllDecisions) {
+  ObjectDecisionType decision_ignore;
+  decision_ignore.mutable_ignore();
+
+  ObjectDecisionType decision_overtake;
+  decision_overtake.mutable_overtake();
+
+  ObjectDecisionType decision_follow;
+  decision_follow.mutable_follow();
+
+  ObjectDecisionType decision_yield;
+  decision_yield.mutable_yield();
+
+  ObjectDecisionType decision_stop;
+  decision_stop.mutable_stop();
+
+  ObjectDecisionType decision_nudge;
+  decision_nudge.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
+
+  ObjectDecisionType decision_sidepass;
+  decision_sidepass.mutable_sidepass();
+
+  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_nudge, decision_ignore)
+                  .has_nudge());
+
+  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_ignore, decision_nudge)
+                  .has_nudge());
+
+  ObjectDecisionType decision_nudge2;
+  decision_nudge2.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
+  EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_nudge, decision_nudge2)
+                  .has_nudge());
+  decision_nudge2.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
+}
+
+TEST(ObstacleMergeTest, add_decision_test) {
+  // init state
+  {
+    Obstacle obstacle;
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_FALSE(obstacle.HasLongitudinalDecision());
+  }
+
+  // Ignore
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+    decision.mutable_ignore();
+    obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(obstacle.LateralDecision().has_ignore());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_ignore());
+  }
+
+  // stop and ignore
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_stop();
+    obstacle.AddLongitudinalDecision("test_stop", decision);
+
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_stop());
+
+    decision.mutable_ignore();
+    obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(obstacle.LateralDecision().has_ignore());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_stop());
+  }
+
+  // left nudge and ignore
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
+    obstacle.AddLateralDecision("test_nudge", decision);
+
+    EXPECT_TRUE(obstacle.HasLateralDecision());
+    EXPECT_FALSE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LateralDecision().has_nudge());
+
+    decision.mutable_ignore();
+    obstacle.AddLateralDecision("test_ignore", decision);
+    EXPECT_TRUE(obstacle.HasLateralDecision());
+    EXPECT_FALSE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LateralDecision().has_nudge());
+    EXPECT_FALSE(obstacle.LongitudinalDecision().has_ignore());
+  }
+
+  // right nudge and ignore
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_nudge()->set_type(ObjectNudge::RIGHT_NUDGE);
+    obstacle.AddLateralDecision("test_nudge", decision);
+
+    EXPECT_TRUE(obstacle.HasLateralDecision());
+    EXPECT_FALSE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LateralDecision().has_nudge());
+
+    decision.mutable_ignore();
+    obstacle.AddLateralDecision("test_ignore", decision);
+    EXPECT_TRUE(obstacle.HasLateralDecision());
+    EXPECT_FALSE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LateralDecision().has_nudge());
+    EXPECT_FALSE(obstacle.LongitudinalDecision().has_ignore());
+  }
+
+  // left nudge and right nudge
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
+    obstacle.AddLateralDecision("test_left_nudge", decision);
+
+    EXPECT_TRUE(obstacle.HasLateralDecision());
+    EXPECT_FALSE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LateralDecision().has_nudge());
+  }
+
+  // overtake and ignore
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_overtake();
+    obstacle.AddLongitudinalDecision("test_overtake", decision);
+
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_overtake());
+
+    decision.mutable_ignore();
+    obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(obstacle.LateralDecision().has_ignore());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_overtake());
+  }
+
+  // follow and ignore
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_follow();
+    obstacle.AddLongitudinalDecision("test_follow", decision);
+
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_follow());
+
+    decision.mutable_ignore();
+    obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(obstacle.LateralDecision().has_ignore());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_follow());
+  }
+
+  // yield and ignore
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_yield();
+    obstacle.AddLongitudinalDecision("test_yield", decision);
+
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_yield());
+
+    decision.mutable_ignore();
+    obstacle.AddLongitudinalDecision("test_ignore", decision);
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_FALSE(obstacle.LateralDecision().has_ignore());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_yield());
+  }
+
+  // stop and nudge
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_stop();
+    obstacle.AddLongitudinalDecision("test_stop", decision);
+
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_stop());
+
+    decision.mutable_nudge();
+    obstacle.AddLateralDecision("test_nudge", decision);
+    EXPECT_TRUE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LateralDecision().has_nudge());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_stop());
+  }
+
+  // stop and yield
+  {
+    Obstacle obstacle;
+    ObjectDecisionType decision;
+
+    decision.mutable_stop();
+    obstacle.AddLongitudinalDecision("test_stop", decision);
+
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_stop());
+
+    decision.mutable_yield();
+    obstacle.AddLongitudinalDecision("test_yield", decision);
+    EXPECT_FALSE(obstacle.HasLateralDecision());
+    EXPECT_TRUE(obstacle.HasLongitudinalDecision());
+    EXPECT_TRUE(obstacle.LongitudinalDecision().has_stop());
+  }
+}
 }  // namespace planning
 }  // namespace apollo

@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "modules/common/math/box2d.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
@@ -57,15 +57,15 @@ class DecisionData {
   ~DecisionData() = default;
 
  public:
-  PathObstacle* GetObstacleById(const std::string& id);
-  std::vector<PathObstacle*> GetObstacleByType(const VirtualObjectType& type);
+  Obstacle* GetObstacleById(const std::string& id);
+  std::vector<Obstacle*> GetObstacleByType(const VirtualObjectType& type);
   std::unordered_set<std::string> GetObstacleIdByType(
       const VirtualObjectType& type);
-  const std::vector<PathObstacle*>& GetStaticObstacle() const;
-  const std::vector<PathObstacle*>& GetDynamicObstacle() const;
-  const std::vector<PathObstacle*>& GetVirtualObstacle() const;
-  const std::vector<PathObstacle*>& GetPracticalObstacle() const;
-  const std::vector<PathObstacle*>& GetAllObstacle() const;
+  const std::vector<Obstacle*>& GetStaticObstacle() const;
+  const std::vector<Obstacle*>& GetDynamicObstacle() const;
+  const std::vector<Obstacle*>& GetVirtualObstacle() const;
+  const std::vector<Obstacle*>& GetPracticalObstacle() const;
+  const std::vector<Obstacle*>& GetAllObstacle() const;
 
  public:
   bool CreateVirtualObstacle(const ReferencePoint& point,
@@ -83,16 +83,16 @@ class DecisionData {
                              std::string* const id);
 
  private:
-  std::vector<PathObstacle*> static_obstacle_;
-  std::vector<PathObstacle*> dynamic_obstacle_;
-  std::vector<PathObstacle*> virtual_obstacle_;
-  std::vector<PathObstacle*> practical_obstacle_;
-  std::vector<PathObstacle*> all_obstacle_;
+  std::vector<Obstacle*> static_obstacle_;
+  std::vector<Obstacle*> dynamic_obstacle_;
+  std::vector<Obstacle*> virtual_obstacle_;
+  std::vector<Obstacle*> practical_obstacle_;
+  std::vector<Obstacle*> all_obstacle_;
 
  private:
   const ReferenceLine& reference_line_;
-  std::list<std::unique_ptr<PathObstacle>> path_obstacles_;
-  std::unordered_map<std::string, PathObstacle*> obstacle_map_;
+  std::list<std::unique_ptr<Obstacle>> obstacles_;
+  std::unordered_map<std::string, Obstacle*> obstacle_map_;
   std::unordered_map<VirtualObjectType, std::unordered_set<std::string>,
                      EnumClassHash>
       virtual_obstacle_id_map_;

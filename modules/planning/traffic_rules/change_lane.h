@@ -52,17 +52,16 @@ class ChangeLane : public TrafficRule {
    *even when it is not on the target lane yet.
    **/
   bool CreateGuardObstacle(const ReferenceLineInfo* reference_line_info,
-                           PathObstacle* obstacle);
+                           Obstacle* obstacle);
 
   /**
    * @brief create overtake decision for the give path obstacle
    */
-  ObjectDecisionType CreateOvertakeDecision(
-      const ReferenceLine& reference_line,
-      const PathObstacle* path_obstacle) const;
+  ObjectDecisionType CreateOvertakeDecision(const ReferenceLine& reference_line,
+                                            const Obstacle* obstacle) const;
 
-  std::vector<const PathObstacle*> guard_obstacles_;
-  std::vector<const PathObstacle*> overtake_obstacles_;
+  std::vector<const Obstacle*> guard_obstacles_;
+  std::vector<const Obstacle*> overtake_obstacles_;
 };
 
 }  // namespace planning

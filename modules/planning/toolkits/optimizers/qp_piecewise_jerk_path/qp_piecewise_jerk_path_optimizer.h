@@ -50,7 +50,7 @@ class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
       const SLBoundary& adc_sl, const common::FrenetFramePoint& frenet_point,
       const double qp_delta_s, double path_length,
       const ReferenceLine& reference_line,
-      const std::vector<const PathObstacle*>& obstacles);
+      const std::vector<const Obstacle*>& obstacles);
 
   std::vector<std::tuple<double, double, double>>
   GetLateralSecondOrderDerivativeBounds(

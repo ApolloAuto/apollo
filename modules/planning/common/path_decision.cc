@@ -28,28 +28,26 @@
 namespace apollo {
 namespace planning {
 
-using IndexedPathObstacles = IndexedList<std::string, PathObstacle>;
+using IndexedObstacles = IndexedList<std::string, Obstacle>;
 
-PathObstacle *PathDecision::AddPathObstacle(const PathObstacle &path_obstacle) {
+Obstacle *PathDecision::AddObstacle(const Obstacle &obstacle) {
   std::lock_guard<std::mutex> lock(obstacle_mutex_);
-  return path_obstacles_.Add(path_obstacle.Id(), path_obstacle);
+  return obstacles_.Add(obstacle.Id(), obstacle);
 }
 
-const IndexedPathObstacles &PathDecision::path_obstacles() const {
-  return path_obstacles_;
+const IndexedObstacles &PathDecision::obstacles() const { return obstacles_; }
+
+Obstacle *PathDecision::Find(const std::string &object_id) {
+  return obstacles_.Find(object_id);
 }
 
-PathObstacle *PathDecision::Find(const std::string &object_id) {
-  return path_obstacles_.Find(object_id);
-}
-
-const PathObstacle *PathDecision::Find(const std::string &object_id) const {
-  return path_obstacles_.Find(object_id);
+const Obstacle *PathDecision::Find(const std::string &object_id) const {
+  return obstacles_.Find(object_id);
 }
 
 void PathDecision::SetStBoundary(const std::string &id,
                                  const StBoundary &boundary) {
-  auto *obstacle = path_obstacles_.Find(id);
+  auto *obstacle = obstacles_.Find(id);
 
   if (!obstacle) {
     AERROR << "Failed to find obstacle : " << id;
@@ -62,18 +60,18 @@ void PathDecision::SetStBoundary(const std::string &id,
 bool PathDecision::AddLateralDecision(const std::string &tag,
                                       const std::string &object_id,
                                       const ObjectDecisionType &decision) {
-  auto *path_obstacle = path_obstacles_.Find(object_id);
-  if (!path_obstacle) {
+  auto *obstacle = obstacles_.Find(object_id);
+  if (!obstacle) {
     AERROR << "failed to find obstacle";
     return false;
   }
-  path_obstacle->AddLateralDecision(tag, decision);
+  obstacle->AddLateralDecision(tag, decision);
   return true;
 }
 
 void PathDecision::EraseStBoundaries() {
-  for (const auto *path_obstacle : path_obstacles_.Items()) {
-    auto *obstacle_ptr = path_obstacles_.Find(path_obstacle->Id());
+  for (const auto *obstacle : obstacles_.Items()) {
+    auto *obstacle_ptr = obstacles_.Find(obstacle->Id());
     obstacle_ptr->EraseStBoundary();
   }
 }
@@ -81,12 +79,12 @@ void PathDecision::EraseStBoundaries() {
 bool PathDecision::AddLongitudinalDecision(const std::string &tag,
                                            const std::string &object_id,
                                            const ObjectDecisionType &decision) {
-  auto *path_obstacle = path_obstacles_.Find(object_id);
-  if (!path_obstacle) {
+  auto *obstacle = obstacles_.Find(object_id);
+  if (!obstacle) {
     AERROR << "failed to find obstacle";
     return false;
   }
-  path_obstacle->AddLongitudinalDecision(tag, decision);
+  obstacle->AddLongitudinalDecision(tag, decision);
   return true;
 }
 

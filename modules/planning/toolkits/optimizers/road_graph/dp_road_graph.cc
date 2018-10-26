@@ -56,10 +56,9 @@ DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
       reference_line_(reference_line_info.reference_line()),
       speed_data_(speed_data) {}
 
-bool DpRoadGraph::FindPathTunnel(
-    const common::TrajectoryPoint &init_point,
-    const std::vector<const PathObstacle *> &obstacles,
-    PathData *const path_data) {
+bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
+                                 const std::vector<const Obstacle *> &obstacles,
+                                 PathData *const path_data) {
   CHECK_NOTNULL(path_data);
 
   init_point_ = init_point;
@@ -117,7 +116,7 @@ bool DpRoadGraph::FindPathTunnel(
 }
 
 bool DpRoadGraph::GenerateMinCostPath(
-    const std::vector<const PathObstacle *> &obstacles,
+    const std::vector<const Obstacle *> &obstacles,
     std::vector<DpRoadGraphNode> *min_cost_path) {
   CHECK(min_cost_path != nullptr);
 
@@ -169,8 +168,7 @@ bool DpRoadGraph::GenerateMinCostPath(
           &(graph_nodes.back().back()));
 
       if (FLAGS_enable_multi_thread_in_dp_poly_path) {
-        results.emplace_back(
-            cyber::Async(&DpRoadGraph::UpdateNode, this, msg));
+        results.emplace_back(cyber::Async(&DpRoadGraph::UpdateNode, this, msg));
       } else {
         UpdateNode(msg);
       }

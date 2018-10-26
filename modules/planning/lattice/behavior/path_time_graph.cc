@@ -45,7 +45,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
 
 PathTimeGraph::PathTimeGraph(
-    const std::vector<const PathObstacle*>& obstacles,
+    const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points,
     const ReferenceLineInfo* ptr_reference_line_info, const double s_start,
     const double s_end, const double t_start, const double t_end,
@@ -89,9 +89,9 @@ SLBoundary PathTimeGraph::ComputeObstacleBoundary(
 }
 
 void PathTimeGraph::SetupObstacles(
-    const std::vector<const PathObstacle*>& obstacles,
+    const std::vector<const Obstacle*>& obstacles,
     const std::vector<PathPoint>& discretized_ref_points) {
-  for (const PathObstacle* obstacle : obstacles) {
+  for (const Obstacle* obstacle : obstacles) {
     if (obstacle->IsVirtual()) {
       continue;
     }
@@ -126,7 +126,7 @@ void PathTimeGraph::SetupObstacles(
 }
 
 void PathTimeGraph::SetStaticObstacle(
-    const PathObstacle* obstacle,
+    const Obstacle* obstacle,
     const std::vector<PathPoint>& discretized_ref_points) {
   const Polygon2d& polygon = obstacle->PerceptionPolygon();
 
@@ -166,7 +166,7 @@ void PathTimeGraph::SetStaticObstacle(
 }
 
 void PathTimeGraph::SetDynamicObstacle(
-    const PathObstacle* obstacle,
+    const Obstacle* obstacle,
     const std::vector<PathPoint>& discretized_ref_points) {
   double relative_time = time_range_.first;
   while (relative_time < time_range_.second) {

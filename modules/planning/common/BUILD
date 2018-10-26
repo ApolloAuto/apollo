@@ -59,12 +59,12 @@ filegroup(
 )
 
 cc_library(
-    name = "path_obstacle",
+    name = "obstacle",
     srcs = [
-        "path_obstacle.cc",
+        "obstacle.cc",
     ],
     hdrs = [
-        "path_obstacle.h",
+        "obstacle.h",
     ],
     deps = [
         ":indexed_list",
@@ -77,16 +77,16 @@ cc_library(
 )
 
 cc_test(
-    name = "path_obstacle_test",
+    name = "obstacle_test",
     size = "small",
     srcs = [
-        "path_obstacle_test.cc",
+        "obstacle_test.cc",
     ],
     data = [
         "//modules/planning/common:common_testdata",
     ],
     deps = [
-        ":path_obstacle",
+        ":obstacle",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "@gtest//:main",
@@ -121,7 +121,7 @@ cc_library(
         "path_decision.h",
     ],
     deps = [
-        ":path_obstacle",
+        ":obstacle",
         "//modules/planning/reference_line",
     ],
 )
@@ -271,7 +271,7 @@ cc_library(
         ":change_lane_decider",
         ":indexed_queue",
         #":lag_prediction",
-        ":path_obstacle",
+        ":obstacle",
         ":reference_line_info",
         "//modules/common/monitor_log",
         "//cyber/common:log",
@@ -341,7 +341,7 @@ cc_library(
         "ego_info.h",
     ],
     deps = [
-        ":path_obstacle",
+        ":obstacle",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
@@ -375,7 +375,7 @@ cc_library(
         "decision_data.h",
     ],
     deps = [
-        ":path_obstacle",
+        ":obstacle",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/reference_line",
         "//modules/prediction/proto:prediction_proto",

@@ -40,7 +40,6 @@
 #include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
-#include "modules/planning/toolkits/optimizers/poly_st_speed/poly_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
@@ -76,13 +75,13 @@ void LaneFollowStage::RecordObstacleDebugInfo(
   auto ptr_debug = reference_line_info->mutable_debug();
 
   const auto path_decision = reference_line_info->path_decision();
-  for (const auto path_obstacle : path_decision->path_obstacles().Items()) {
+  for (const auto obstacle : path_decision->obstacles().Items()) {
     auto obstacle_debug = ptr_debug->mutable_planning_data()->add_obstacle();
-    obstacle_debug->set_id(path_obstacle->Id());
+    obstacle_debug->set_id(obstacle->Id());
     obstacle_debug->mutable_sl_boundary()->CopyFrom(
-        path_obstacle->PerceptionSLBoundary());
-    const auto& decider_tags = path_obstacle->decider_tags();
-    const auto& decisions = path_obstacle->decisions();
+        obstacle->PerceptionSLBoundary());
+    const auto& decider_tags = obstacle->decider_tags();
+    const auto& decisions = obstacle->decisions();
     if (decider_tags.size() != decisions.size()) {
       AERROR << "decider_tags size: " << decider_tags.size()
              << " different from decisions size:" << decisions.size();
@@ -210,33 +209,32 @@ Status LaneFollowStage::PlanOnReferenceLine(
 
   // determine if there is a destination on reference line.
   double dest_stop_s = -1.0;
-  for (const auto* path_obstacle :
-       reference_line_info->path_decision()->path_obstacles().Items()) {
-    if (path_obstacle->LongitudinalDecision().has_stop() &&
-        path_obstacle->LongitudinalDecision().stop().reason_code() ==
+  for (const auto* obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
+    if (obstacle->LongitudinalDecision().has_stop() &&
+        obstacle->LongitudinalDecision().stop().reason_code() ==
             STOP_REASON_DESTINATION) {
-      SLPoint dest_sl = GetStopSL(path_obstacle->LongitudinalDecision().stop(),
+      SLPoint dest_sl = GetStopSL(obstacle->LongitudinalDecision().stop(),
                                   reference_line_info->reference_line());
       dest_stop_s = dest_sl.s();
     }
   }
 
-  for (const auto* path_obstacle :
-       reference_line_info->path_decision()->path_obstacles().Items()) {
-    if (path_obstacle->IsVirtual()) {
+  for (const auto* obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
+    if (obstacle->IsVirtual()) {
       continue;
     }
-    if (!path_obstacle->IsStatic()) {
+    if (!obstacle->IsStatic()) {
       continue;
     }
-    if (path_obstacle->LongitudinalDecision().has_stop()) {
+    if (obstacle->LongitudinalDecision().has_stop()) {
       bool add_stop_obstacle_cost = false;
       if (dest_stop_s < 0.0) {
         add_stop_obstacle_cost = true;
       } else {
-        SLPoint stop_sl =
-            GetStopSL(path_obstacle->LongitudinalDecision().stop(),
-                      reference_line_info->reference_line());
+        SLPoint stop_sl = GetStopSL(obstacle->LongitudinalDecision().stop(),
+                                    reference_line_info->reference_line());
         if (stop_sl.s() < dest_stop_s) {
           add_stop_obstacle_cost = true;
         }

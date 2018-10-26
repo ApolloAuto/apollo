@@ -29,9 +29,9 @@
 #include "modules/planning/proto/qp_spline_path_config.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
-#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_frenet_frame.h"
@@ -50,7 +50,7 @@ class QpSplinePathGenerator {
 
   void SetChangeLane(bool is_change_lane_path);
 
-  bool Generate(const std::vector<const PathObstacle*>& path_obstacles,
+  bool Generate(const std::vector<const Obstacle*>& obstacles,
                 const SpeedData& speed_data,
                 const common::TrajectoryPoint& init_point,
                 const double boundary_extension, bool is_final_attempt,

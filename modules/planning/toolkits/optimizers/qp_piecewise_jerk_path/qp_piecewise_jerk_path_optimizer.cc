@@ -80,7 +80,7 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
     const SLBoundary& adc_sl, const common::FrenetFramePoint& frenet_point,
     const double qp_delta_s, double path_length,
     const ReferenceLine& reference_line,
-    const std::vector<const PathObstacle*>& obstacles) {
+    const std::vector<const Obstacle*>& obstacles) {
   const auto& qp_config = config_.qp_piecewise_jerk_path_config();
   int size = std::max(2, static_cast<int>(path_length / qp_delta_s));
   const double buffered_adc_width =
@@ -128,14 +128,14 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
     return lateral_bounds.begin() + index;
   };
 
-  for (const auto* path_obstacle :
-       reference_line_info_->path_decision()->path_obstacles().Items()) {
+  for (const auto* obstacle :
+       reference_line_info_->path_decision()->obstacles().Items()) {
     // only takes care of static obstacles
-    if (!path_obstacle->IsStatic()) {
+    if (!obstacle->IsStatic()) {
       continue;
     }
     // ignore obstacles that are not in longitudinal range.
-    const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     if (obstacle_sl.end_s() < start_s ||
         obstacle_sl.start_s() > accumulated_s) {
       continue;
@@ -220,7 +220,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
                 qp_config.min_look_ahead_distance());
   auto lateral_bounds = GetLateralBounds(
       adc_sl, frenet_point, qp_delta_s, path_length, reference_line,
-      reference_line_info_->path_decision()->path_obstacles().Items());
+      reference_line_info_->path_decision()->obstacles().Items());
   auto lateral_second_order_derivative_bounds =
       GetLateralSecondOrderDerivativeBounds(init_point, qp_delta_s);
 

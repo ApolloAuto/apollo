@@ -80,11 +80,11 @@ class NaviPathDecider : public NaviTask {
    * system
    * @return Status::OK() if a suitable path is created; error otherwise.
    */
-  apollo::common::Status Process(
-      const ReferenceLine &reference_line,
-      const common::TrajectoryPoint &init_point,
-      const std::vector<const PathObstacle *> &obstacles,
-      PathDecision *const path_decision, PathData *const path_data);
+  apollo::common::Status Process(const ReferenceLine &reference_line,
+                                 const common::TrajectoryPoint &init_point,
+                                 const std::vector<const Obstacle *> &obstacles,
+                                 PathDecision *const path_decision,
+                                 PathData *const path_data);
 
   /**
    * @brief take a section of the reference line as the initial path trajectory.
@@ -133,7 +133,7 @@ class NaviPathDecider : public NaviTask {
    */
   double NudgeProcess(const ReferenceLine &reference_line,
                       const std::vector<common::PathPoint> &path_data_points,
-                      const std::vector<const PathObstacle *> &obstacles,
+                      const std::vector<const Obstacle *> &obstacles,
                       const PathDecision &path_decision,
                       const common::VehicleState &vehicle_state);
   /**

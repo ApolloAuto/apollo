@@ -41,26 +41,25 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
   const auto& reference_line = reference_line_info->reference_line();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   const auto& path_decision = reference_line_info->path_decision();
-  const PathObstacle* first_guard_vehicle = nullptr;
+  const Obstacle* first_guard_vehicle = nullptr;
   constexpr double kGuardForwardDistance = 60;
   double max_s = 0.0;
   const double min_overtake_time = config_.change_lane().min_overtake_time();
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    if (!path_obstacle->HasTrajectory()) {
+  for (const auto* obstacle : path_decision->obstacles().Items()) {
+    if (!obstacle->HasTrajectory()) {
       continue;
     }
-    if (path_obstacle->PerceptionSLBoundary().start_s() >
-        adc_sl_boundary.end_s()) {
+    if (obstacle->PerceptionSLBoundary().start_s() > adc_sl_boundary.end_s()) {
       continue;
     }
-    if (path_obstacle->PerceptionSLBoundary().end_s() <
+    if (obstacle->PerceptionSLBoundary().end_s() <
         adc_sl_boundary.start_s() -
             std::max(config_.change_lane().min_overtake_distance(),
-                     path_obstacle->speed() * min_overtake_time)) {
-      overtake_obstacles_.push_back(path_obstacle);
+                     obstacle->speed() * min_overtake_time)) {
+      overtake_obstacles_.push_back(obstacle);
     }
     const auto& last_point =
-        *(path_obstacle->Trajectory().trajectory_point().rbegin());
+        *(obstacle->Trajectory().trajectory_point().rbegin());
     if (last_point.v() < config_.change_lane().min_guard_speed()) {
       continue;
     }
@@ -77,7 +76,7 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
     }
     if (last_sl.s() > max_s) {
       max_s = last_sl.s();
-      first_guard_vehicle = path_obstacle;
+      first_guard_vehicle = obstacle;
     }
   }
   if (first_guard_vehicle) {
@@ -87,7 +86,7 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
 }
 
 bool ChangeLane::CreateGuardObstacle(
-    const ReferenceLineInfo* reference_line_info, PathObstacle* obstacle) {
+    const ReferenceLineInfo* reference_line_info, Obstacle* obstacle) {
   if (!obstacle || !obstacle->HasTrajectory()) {
     return false;
   }
@@ -146,8 +145,8 @@ Status ChangeLane::ApplyRule(Frame* const frame,
   }
   if (config_.change_lane().enable_guard_obstacle() &&
       !guard_obstacles_.empty()) {
-    for (const auto path_obstacle : guard_obstacles_) {
-      auto* guard_obstacle = frame->Find(path_obstacle->Id());
+    for (const auto obstacle : guard_obstacles_) {
+      auto* guard_obstacle = frame->Find(obstacle->Id());
       if (guard_obstacle &&
           CreateGuardObstacle(reference_line_info, guard_obstacle)) {
         AINFO << "Created guard obstacle: " << guard_obstacle->Id();
@@ -158,25 +157,24 @@ Status ChangeLane::ApplyRule(Frame* const frame,
   if (!overtake_obstacles_.empty()) {
     auto* path_decision = reference_line_info->path_decision();
     const auto& reference_line = reference_line_info->reference_line();
-    for (const auto* path_obstacle : overtake_obstacles_) {
-      auto overtake = CreateOvertakeDecision(reference_line, path_obstacle);
+    for (const auto* obstacle : overtake_obstacles_) {
+      auto overtake = CreateOvertakeDecision(reference_line, obstacle);
       path_decision->AddLongitudinalDecision(
-          TrafficRuleConfig::RuleId_Name(Id()), path_obstacle->Id(), overtake);
+          TrafficRuleConfig::RuleId_Name(Id()), obstacle->Id(), overtake);
     }
   }
   return Status::OK();
 }
 
 ObjectDecisionType ChangeLane::CreateOvertakeDecision(
-    const ReferenceLine& reference_line,
-    const PathObstacle* path_obstacle) const {
+    const ReferenceLine& reference_line, const Obstacle* obstacle) const {
   ObjectDecisionType overtake;
   overtake.mutable_overtake();
-  const double speed = path_obstacle->speed();
+  const double speed = obstacle->speed();
   double distance = std::max(speed * config_.change_lane().min_overtake_time(),
                              config_.change_lane().min_overtake_distance());
   overtake.mutable_overtake()->set_distance_s(distance);
-  double fence_s = path_obstacle->PerceptionSLBoundary().end_s() + distance;
+  double fence_s = obstacle->PerceptionSLBoundary().end_s() + distance;
   auto point = reference_line.GetReferencePoint(fence_s);
   overtake.mutable_overtake()->set_time_buffer(
       config_.change_lane().min_overtake_time());

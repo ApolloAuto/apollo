@@ -36,7 +36,7 @@ EgoInfo::EgoInfo() {
 
 bool EgoInfo::Update(const common::TrajectoryPoint& start_point,
                      const common::VehicleState& vehicle_state,
-                     const std::vector<const PathObstacle*>& obstacles) {
+                     const std::vector<const Obstacle*>& obstacles) {
   set_start_point(start_point);
   set_vehicle_state(vehicle_state);
   CalculateFrontObstacleClearDistance(obstacles);
@@ -50,7 +50,7 @@ void EgoInfo::Clear() {
 }
 
 void EgoInfo::CalculateFrontObstacleClearDistance(
-    const std::vector<const PathObstacle*>& obstacles) {
+    const std::vector<const Obstacle*>& obstacles) {
   Vec2d position(vehicle_state_.x(), vehicle_state_.y());
 
   const auto& param = ego_vehicle_config_.vehicle_param();

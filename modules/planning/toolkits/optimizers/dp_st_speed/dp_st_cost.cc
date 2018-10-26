@@ -33,7 +33,7 @@ constexpr float kInf = std::numeric_limits<float>::infinity();
 }
 
 DpStCost::DpStCost(const DpStSpeedConfig& config,
-                   const std::vector<const PathObstacle*>& obstacles,
+                   const std::vector<const Obstacle*>& obstacles,
                    const common::TrajectoryPoint& init_point)
     : config_(config), obstacles_(obstacles), init_point_(init_point) {
   int index = 0;
@@ -53,7 +53,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
 }
 
 void DpStCost::AddToKeepClearRange(
-    const std::vector<const PathObstacle*>& obstacles) {
+    const std::vector<const Obstacle*>& obstacles) {
   for (const auto& obstacle : obstacles) {
     if (obstacle->st_boundary().IsEmpty()) {
       continue;

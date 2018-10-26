@@ -31,7 +31,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -47,7 +47,7 @@ class QpFrenetFrame {
                 const std::vector<double>& evaluated_s);
   virtual ~QpFrenetFrame() = default;
 
-  bool Init(const std::vector<const PathObstacle*>& path_obstacles);
+  bool Init(const std::vector<const Obstacle*>& obstacles);
 
   void LogQpBound(apollo::planning_internal::Debug* planning_debug);
 
@@ -58,9 +58,9 @@ class QpFrenetFrame {
  private:
   bool CalculateDiscretizedVehicleLocation();
 
-  bool MapDynamicObstacleWithDecision(const PathObstacle& path_obstacle);
+  bool MapDynamicObstacleWithDecision(const Obstacle& obstacle);
 
-  bool MapStaticObstacleWithDecision(const PathObstacle& path_obstacle);
+  bool MapStaticObstacleWithDecision(const Obstacle& obstacle);
 
   bool MapNudgePolygon(const common::math::Polygon2d& polygon,
                        const ObjectNudge& nudge,
@@ -80,8 +80,7 @@ class QpFrenetFrame {
 
   bool CalculateHDMapBound();
 
-  bool CalculateObstacleBound(
-      const std::vector<const PathObstacle*>& path_obstacles);
+  bool CalculateObstacleBound(const std::vector<const Obstacle*>& obstacles);
 
   uint32_t FindIndex(const double s) const;
 

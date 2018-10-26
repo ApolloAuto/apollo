@@ -55,8 +55,8 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
   bool is_final_attempt = false;
 
   bool ret = path_generator.Generate(
-      reference_line_info_->path_decision()->path_obstacles().Items(),
-      speed_data, init_point, boundary_extension, is_final_attempt, path_data);
+      reference_line_info_->path_decision()->obstacles().Items(), speed_data,
+      init_point, boundary_extension, is_final_attempt, path_data);
   if (!ret) {
     AERROR << "failed to generate spline path with boundary_extension = 0.";
 
@@ -64,9 +64,8 @@ Status QpSplinePathOptimizer::Process(const SpeedData& speed_data,
     is_final_attempt = true;
 
     ret = path_generator.Generate(
-        reference_line_info_->path_decision()->path_obstacles().Items(),
-        speed_data, init_point, boundary_extension, is_final_attempt,
-        path_data);
+        reference_line_info_->path_decision()->obstacles().Items(), speed_data,
+        init_point, boundary_extension, is_final_attempt, path_data);
     if (!ret) {
       const std::string msg =
           "failed to generate spline path at final attempt.";

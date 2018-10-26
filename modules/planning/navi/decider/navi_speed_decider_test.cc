@@ -67,8 +67,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedData) {
   speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
-  std::map<std::string, PathObstacle> obstacle_buf;
-  std::vector<const PathObstacle*> obstacles;
+  std::map<std::string, Obstacle> obstacle_buf;
+  std::vector<const Obstacle*> obstacles;
 
   std::vector<PathPoint> path_points;
   path_points.emplace_back(GenPathPoint(0.0));
@@ -111,8 +111,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle) {
   speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
-  std::map<std::string, PathObstacle> obstacle_buf;
-  std::vector<const PathObstacle*> obstacles;
+  std::map<std::string, Obstacle> obstacle_buf;
+  std::vector<const Obstacle*> obstacles;
 
   std::vector<PathPoint> path_points;
   path_points.emplace_back(GenPathPoint(0.0));
@@ -126,7 +126,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle) {
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
   std::string id = "1";
-  obstacle_buf.emplace(id, PathObstacle(id, perception_obstacle));
+  obstacle_buf.emplace(id, Obstacle(id, perception_obstacle));
   obstacles.emplace_back(&obstacle_buf[id]);
 
   SpeedData speed_data;
@@ -164,8 +164,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
-  std::map<std::string, PathObstacle> obstacle_buf;
-  std::vector<const PathObstacle*> obstacles;
+  std::map<std::string, Obstacle> obstacle_buf;
+  std::vector<const Obstacle*> obstacles;
 
   std::vector<PathPoint> path_points;
   path_points.emplace_back(GenPathPoint(0.0));
@@ -179,7 +179,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
   std::string id = "1";
-  obstacle_buf.emplace(id, PathObstacle(id, perception_obstacle));
+  obstacle_buf.emplace(id, Obstacle(id, perception_obstacle));
   obstacles.emplace_back(&obstacle_buf[id]);
 
   // obstacle2
@@ -190,7 +190,7 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
   id = "2";
-  obstacle_buf.emplace(id, PathObstacle(id, perception_obstacle));
+  obstacle_buf.emplace(id, Obstacle(id, perception_obstacle));
   obstacles.emplace_back(&obstacle_buf[id]);
 
   SpeedData speed_data;
@@ -229,8 +229,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForCurve) {
   speed_decider.kappa_threshold_ = 0.0;
 
   PerceptionObstacle perception_obstacle;
-  std::map<std::string, PathObstacle> obstacle_buf;
-  std::vector<const PathObstacle*> obstacles;
+  std::map<std::string, Obstacle> obstacle_buf;
+  std::vector<const Obstacle*> obstacles;
 
   std::vector<PathPoint> path_points;
   double s = 0.0;

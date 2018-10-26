@@ -29,7 +29,7 @@ namespace apollo {
 namespace planning {
 
 PredictionQuerier::PredictionQuerier(
-    const std::vector<const PathObstacle*>& obstacles,
+    const std::vector<const Obstacle*>& obstacles,
     const std::shared_ptr<std::vector<common::PathPoint>>& ptr_reference_line)
     : ptr_reference_line_(ptr_reference_line) {
   for (const auto ptr_obstacle : obstacles) {
@@ -42,7 +42,7 @@ PredictionQuerier::PredictionQuerier(
   }
 }
 
-std::vector<const PathObstacle*> PredictionQuerier::GetObstacles() const {
+std::vector<const Obstacle*> PredictionQuerier::GetObstacles() const {
   return obstacles_;
 }
 

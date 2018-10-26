@@ -32,9 +32,8 @@ class HybridAObstacleContainer {
                           const int id) {
     Vec2d obstacle_center(x, y);
     Box2d obstacle_box(obstacle_center, heading, length, width);
-    std::unique_ptr<PathObstacle> obstacle =
-        PathObstacle::CreateStaticVirtualObstacles(std::to_string(id),
-                                                   obstacle_box);
+    std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles(
+        std::to_string(id), obstacle_box);
     obstacles_list.Add(obstacle->Id(), *obstacle);
   }
   ThreadSafeIndexedObstacles* GetObstacleList() { return &obstacles_list; }

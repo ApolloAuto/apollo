@@ -54,40 +54,40 @@ class SpeedDecider : public Task {
    **/
   bool CheckIsFollowByT(const StBoundary& boundary) const;
 
-  bool CreateStopDecision(const PathObstacle& path_obstacle,
+  bool CreateStopDecision(const Obstacle& obstacle,
                           ObjectDecisionType* const stop_decision,
                           double stop_distance) const;
 
   /**
    * @brief create follow decision based on the boundary
    **/
-  bool CreateFollowDecision(const PathObstacle& path_obstacle,
+  bool CreateFollowDecision(const Obstacle& obstacle,
                             ObjectDecisionType* const follow_decision) const;
 
   /**
    * @brief create yield decision based on the boundary
    **/
-  bool CreateYieldDecision(const PathObstacle& path_obstacle,
+  bool CreateYieldDecision(const Obstacle& obstacle,
                            ObjectDecisionType* const yield_decision) const;
 
   /**
    * @brief create overtake decision based on the boundary
    **/
   bool CreateOvertakeDecision(
-      const PathObstacle& path_obstacle,
+      const Obstacle& obstacle,
       ObjectDecisionType* const overtake_decision) const;
 
   apollo::common::Status MakeObjectDecision(
       const SpeedData& speed_profile, PathDecision* const path_decision) const;
 
-  void AppendIgnoreDecision(PathObstacle* path_obstacle) const;
+  void AppendIgnoreDecision(Obstacle* obstacle) const;
 
   /**
    * @brief "too close" is determined by whether ego vehicle will hit the front
    * obstacle if the obstacle drive at current speed and ego vehicle use some
    * reasonable deceleration
    **/
-  bool IsFollowTooClose(const PathObstacle& path_obstacle) const;
+  bool IsFollowTooClose(const Obstacle& obstacle) const;
 
  private:
   DpStSpeedConfig dp_st_speed_config_;

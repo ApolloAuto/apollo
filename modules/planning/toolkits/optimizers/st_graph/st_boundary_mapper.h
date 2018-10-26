@@ -53,8 +53,7 @@ class StBoundaryMapper {
       PathDecision* path_decision) const;
 
   apollo::common::Status CreateStBoundary(
-      PathObstacle* path_obstacle,
-      const ObjectDecisionType& external_decision) const;
+      Obstacle* obstacle, const ObjectDecisionType& external_decision) const;
 
  private:
   FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
@@ -69,16 +68,16 @@ class StBoundaryMapper {
    */
   bool GetOverlapBoundaryPoints(
       const std::vector<apollo::common::PathPoint>& path_points,
-      const PathObstacle& obstacle, std::vector<STPoint>* upper_points,
+      const Obstacle& obstacle, std::vector<STPoint>* upper_points,
       std::vector<STPoint>* lower_points) const;
 
-  apollo::common::Status MapWithoutDecision(PathObstacle* path_obstacle) const;
+  apollo::common::Status MapWithoutDecision(Obstacle* obstacle) const;
 
-  bool MapStopDecision(PathObstacle* stop_obstacle,
+  bool MapStopDecision(Obstacle* stop_obstacle,
                        const ObjectDecisionType& decision) const;
 
   apollo::common::Status MapWithDecision(
-      PathObstacle* path_obstacle, const ObjectDecisionType& decision) const;
+      Obstacle* obstacle, const ObjectDecisionType& decision) const;
 
  private:
   const SLBoundary& adc_sl_boundary_;

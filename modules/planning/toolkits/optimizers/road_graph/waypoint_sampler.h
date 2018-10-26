@@ -28,9 +28,9 @@
 #include "modules/planning/proto/dp_poly_path_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
-#include "modules/planning/common/path_obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"

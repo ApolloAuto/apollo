@@ -40,7 +40,7 @@ namespace planning {
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   NaviObstacleDecider obstacle_decider;
-  std::vector<const PathObstacle*> vec_obstacle;
+  std::vector<const Obstacle*> vec_obstacle;
   std::vector<common::PathPoint> vec_points;
   PerceptionObstacle perception_obstacle;
   PathDecision path_decision;
@@ -52,7 +52,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(2.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  PathObstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle);
 
   PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   p1.set_s(0.0);
@@ -64,7 +64,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   obstacle_boundary.set_start_l(1.5);
 
   b1.SetPerceptionSlBoundary(obstacle_boundary);
-  path_decision.AddPathObstacle(b1);
+  path_decision.AddObstacle(b1);
 
   vehicle_state.set_linear_velocity(5.556);
   int lane_obstacles_num = 0;
@@ -82,7 +82,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
   NaviObstacleDecider obstacle_decider;
-  std::vector<const PathObstacle*> vec_obstacle;
+  std::vector<const Obstacle*> vec_obstacle;
   std::vector<common::PathPoint> vec_points;
   PerceptionObstacle perception_obstacle;
   PathDecision path_decision;
@@ -94,9 +94,9 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(-2.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  PathObstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle);
   b1.SetPerceptionSlBoundary(obstacle_boundary);
-  path_decision.AddPathObstacle(b1);
+  path_decision.AddObstacle(b1);
 
   PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   p1.set_s(0.0);
@@ -122,7 +122,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   NaviObstacleDecider obstacle_decider;
-  std::vector<const PathObstacle*> vec_obstacle;
+  std::vector<const Obstacle*> vec_obstacle;
   std::vector<common::PathPoint> vec_points;
   PerceptionObstacle perception_obstacle;
   PathDecision path_decision;
@@ -135,20 +135,20 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(3.0);
   perception_obstacle.mutable_position()->set_y(0.0);
-  PathObstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle);
   obstacle_boundary.set_start_l(1.6);
   b1.SetPerceptionSlBoundary(obstacle_boundary);
-  path_decision.AddPathObstacle(b1);
+  path_decision.AddObstacle(b1);
 
   // obstacle 2
   perception_obstacle.set_width(2.6);
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(4.0);
   perception_obstacle.mutable_position()->set_y(0.0);
-  PathObstacle b2("2", perception_obstacle);
+  Obstacle b2("2", perception_obstacle);
   obstacle_boundary.set_start_l(1.5);
   b2.SetPerceptionSlBoundary(obstacle_boundary);
-  path_decision.AddPathObstacle(b2);
+  path_decision.AddObstacle(b2);
 
   PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   p1.set_s(0.0);
@@ -184,7 +184,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
 
 TEST(NaviObstacleDeciderTest, ComputeNudgeDist4) {
   NaviObstacleDecider obstacle_decider;
-  std::vector<const PathObstacle*> vec_obstacle;
+  std::vector<const Obstacle*> vec_obstacle;
   std::vector<common::PathPoint> vec_points;
   PerceptionObstacle perception_obstacle;
   PathDecision path_decision;
@@ -196,10 +196,10 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist4) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(-3.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  PathObstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle);
 
   b1.SetPerceptionSlBoundary(obstacle_boundary);
-  path_decision.AddPathObstacle(b1);
+  path_decision.AddObstacle(b1);
 
   PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   p1.set_s(0.0);
@@ -224,7 +224,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist4) {
 
 TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   NaviObstacleDecider obstacle_decider;
-  std::vector<const PathObstacle*> vec_obstacle;
+  std::vector<const Obstacle*> vec_obstacle;
   std::vector<common::PathPoint> vec_points;
   PerceptionObstacle perception_obstacle;
 
@@ -235,7 +235,7 @@ TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   perception_obstacle.mutable_position()->set_y(3.0);
   perception_obstacle.mutable_velocity()->set_x(10.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
-  PathObstacle b1("5", perception_obstacle);
+  Obstacle b1("5", perception_obstacle);
 
   // obstacle 2
   perception_obstacle.set_width(2.6);
@@ -244,7 +244,7 @@ TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   perception_obstacle.mutable_position()->set_y(-1.0);
   perception_obstacle.mutable_velocity()->set_x(5.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
-  PathObstacle b2("6", perception_obstacle);
+  Obstacle b2("6", perception_obstacle);
 
   PathPoint p1 = MakePathPoint(0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   p1.set_s(0.0);

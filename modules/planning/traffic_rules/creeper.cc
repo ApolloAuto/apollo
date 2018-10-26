@@ -80,9 +80,9 @@ bool Creeper::BuildStopDecision(const PathOverlap& overlap,
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
   }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
+    AERROR << "Failed to create obstacle for: " << virtual_obstacle_id;
     return false;
   }
 
