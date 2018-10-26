@@ -39,8 +39,6 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
   }
 
   std::lock_guard<std::mutex> lock(mtx_);
-  auto start_perf_time = apollo::cyber::Time::Now().ToNanosecond();
-
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
     auto lock = cr->TryLock();
@@ -58,9 +56,9 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
 
     if (cr->state() == RoutineState::READY) {
       cr->set_state(RoutineState::RUNNING);
-      PerfEventCache::Instance()->AddSchedEvent(
-          SchedPerf::NEXT_ROUTINE, cr->id(), cr->processor_id(), 0,
-          start_perf_time, -1, -1);
+        PerfEventCache::Instance()->AddSchedEvent(
+            SchedPerf::NEXT_ROUTINE, cr->id(),
+            cr->processor_id());
       return cr;
     }
     ++it;

@@ -14,54 +14,52 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_PERF_EVENT_CACHE_H_
-#define CYBER_PERF_EVENT_CACHE_H_
+#ifndef CYBER_EVENT_CACHE_H_
+#define CYBER_EVENT_CACHE_H_
 
 #include <chrono>
 #include <fstream>
 #include <memory>
 #include <sstream>
 #include <thread>
-#include <unordered_map>
 
 #include "cyber/base/bounded_queue.h"
-#include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/event/perf_event.h"
 #include "cyber/proto/perf_conf.pb.h"
 
-#define MAX_EVENT_SIZE 16384
+#define MAX_EVENT_SIZE 5096
 
 namespace apollo {
 namespace cyber {
 namespace event {
 
 using apollo::cyber::base::BoundedQueue;
-using apollo::cyber::common::GlobalData;
 using apollo::cyber::proto::PerfConf;
 
 class PerfEventCache {
  public:
   ~PerfEventCache();
-  void AddSchedEvent(const SchedPerf event_id, const uint64_t cr_id,
-                     const int proc_id, const uint64_t t_sleep,
-                     const uint64_t t_start, const int try_fetch_result,
-                     const int croutine_state);
+  void AddSchedEvent(const SchedPerf event_id,
+                     const uint64_t cr_id, const int proc_id,
+                     const int cr_state = -1);
   void AddTransportEvent(const TransPerf event_id, const uint64_t channel_id,
                          const uint64_t msg_seq);
-  void AddEvent(const std::shared_ptr<PerfEventBase>& event);
 
  private:
   void Start();
   void Run();
-  BoundedQueue<std::shared_ptr<PerfEventBase>> event_queue_;
+
+  std::thread io_thread_;
+  std::ofstream of_;
 
   bool enable_ = false;
   bool shutdown_ = false;
+
+  BoundedQueue<std::shared_ptr<EventBase>> event_queue_;
   PerfConf perf_conf_;
-  std::thread io_thread_;
-  std::ofstream of_;
+
   DECLARE_SINGLETON(PerfEventCache)
 };
 }  // namespace event

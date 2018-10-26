@@ -23,10 +23,13 @@
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/init.h"
 #include "cyber/time/time.h"
+#include "cyber/proto/perf_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
 namespace event {
+
+using apollo::cyber::proto::PerfConf;
 
 PerfEventCache::PerfEventCache() {
   auto global_conf = GlobalData::Instance()->Config();
@@ -34,6 +37,7 @@ PerfEventCache::PerfEventCache() {
     perf_conf_.CopyFrom(global_conf.perf_conf());
     enable_ = perf_conf_.enable();
   }
+
   if (enable_) {
     if (!event_queue_.Init(MAX_EVENT_SIZE)) {
       AERROR << "Event queue init failed.";
@@ -47,6 +51,7 @@ PerfEventCache::~PerfEventCache() {
   if (!enable_) {
     return;
   }
+
   shutdown_ = true;
   event_queue_.BreakAllWait();
   if (io_thread_.joinable()) {
@@ -58,35 +63,26 @@ PerfEventCache::~PerfEventCache() {
   of_.close();
 }
 
-void PerfEventCache::AddEvent(const std::shared_ptr<PerfEventBase>& event) {
-  if (!enable_) {
-    return;
-  }
-  if (!event_queue_.Enqueue(event)) {
-    // AWARN << "msg dropped... " << event_id;
-  }
-}
-
 void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
                                    const uint64_t cr_id, const int proc_id,
-                                   const uint64_t t_sleep,
-                                   const uint64_t t_start,
-                                   const int try_fetch_result,
-                                   const int croutine_state) {
+                                   const int cr_state) {
   if (!enable_) {
     return;
   }
-  if (perf_conf_.type() != apollo::cyber::proto::SCHED) {
+
+  if (perf_conf_.type() != apollo::cyber::proto::SCHED
+      && perf_conf_.type() != apollo::cyber::proto::ALL) {
     return;
   }
 
-  std::shared_ptr<PerfEventBase> event = std::make_shared<SchedPerfEvent>();
-  event->SetParams(8, event_id, cr_id, proc_id, t_sleep, t_start,
-                   Time::Now().ToNanosecond(), try_fetch_result,
-                   croutine_state);
-  if (!event_queue_.Enqueue(event)) {
-    // AWARN << "msg dropped... " << event_id;
-  }
+  std::shared_ptr<EventBase> e = std::make_shared<SchedEvent>();
+  e->set_eid(static_cast<int>(event_id));
+  e->set_stamp(Time::Now().ToNanosecond());
+  e->set_cr_state(cr_state);
+  e->set_cr_id(cr_id);
+  e->set_proc_id(proc_id);
+
+  event_queue_.Enqueue(e);
 }
 
 void PerfEventCache::AddTransportEvent(const TransPerf event_id,
@@ -95,20 +91,23 @@ void PerfEventCache::AddTransportEvent(const TransPerf event_id,
   if (!enable_) {
     return;
   }
-  if (perf_conf_.type() != apollo::cyber::proto::SCHED) {
+
+  if (perf_conf_.type() != apollo::cyber::proto::TRANSPORT
+      && perf_conf_.type() != apollo::cyber::proto::ALL) {
     return;
   }
 
-  std::shared_ptr<PerfEventBase> event = std::make_shared<TransportPerfEvent>();
-  event->SetParams(4, event_id, channel_id, msg_seq,
-                   Time::Now().ToNanosecond());
-  if (!event_queue_.Enqueue(event)) {
-    // AWARN << "msg dropped... " << event_id;
-  }
+  std::shared_ptr<EventBase> e = std::make_shared<TransportEvent>();
+  e->set_eid(static_cast<int>(event_id));
+  e->set_channel_id(channel_id);
+  e->set_msg_seq(msg_seq);
+  e->set_stamp(Time::Now().ToNanosecond());
+
+  event_queue_.Enqueue(e);
 }
 
 void PerfEventCache::Run() {
-  std::shared_ptr<PerfEventBase> event;
+  std::shared_ptr<EventBase> event;
   int buf_size = 0;
   while (!shutdown_ && !apollo::cyber::IsShutdown()) {
     if (event_queue_.WaitDequeue(&event)) {
