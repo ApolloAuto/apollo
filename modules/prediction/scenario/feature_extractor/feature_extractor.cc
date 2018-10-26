@@ -55,7 +55,6 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
     return environment_features;
   }
 
-  ptr_ego_pose->position();
   if (!ptr_ego_pose->position().has_x() ||
       !ptr_ego_pose->position().has_y()) {
     AERROR << "Fail to get ego vehicle position";
