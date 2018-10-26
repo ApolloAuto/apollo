@@ -269,6 +269,9 @@ class Obstacle {
   void SearchJunctionExitsWithoutEnterLane(
       const std::string& junction_id, Feature* feature_ptr);
 
+  double ComputeJunctionRange(
+      std::shared_ptr<const hdmap::JunctionInfo> junction_info_ptr);
+
   void Trim();
 
  private:
