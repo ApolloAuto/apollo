@@ -41,8 +41,6 @@ def extract_mlp_features(filename):
     for fea in features:
         if not fea.HasField('junction_feature'):
             continue
-        print('has_junction_feature')
-        print(len(fea.junction_feature.junction_mlp_label))
         if len(fea.junction_feature.junction_mlp_feature) != mlp_feature_size or \
            len(fea.junction_feature.junction_mlp_label) != mlp_label_size:
             continue

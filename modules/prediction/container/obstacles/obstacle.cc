@@ -386,9 +386,9 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
       AERROR << "Obstacle [" << id_ << "] has a mismatched ID [" << id
              << "] from perception obstacle.";
       return ErrorCode::PREDICTION_ERROR;
-    } else {
     }
   }
+  feature->set_id(id);
   return ErrorCode::OK;
 }
 
