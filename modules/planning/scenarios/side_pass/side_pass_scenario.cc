@@ -132,42 +132,42 @@ bool SidePassScenario::HasBlockingObstacle(
     const PathDecision& path_decision) const {
   // a blocking obstacle is an obstacle blocks the road when it is not blocked
   // (by other obstacles or traffic rules)
-  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       continue;
     }
-    CHECK(path_obstacle->IsStatic());
+    CHECK(obstacle->IsStatic());
 
-    if (path_obstacle->PerceptionSLBoundary().start_s() <=
+    if (obstacle->PerceptionSLBoundary().start_s() <=
         adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
       continue;
     }
     constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
-    if (path_obstacle->PerceptionSLBoundary().start_s() >
+    if (obstacle->PerceptionSLBoundary().start_s() >
         adc_sl_boundary.end_s() +
             kAdcDistanceThreshold) {  // vehicles are far away
       continue;
     }
-    if (path_obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
-        path_obstacle->PerceptionSLBoundary().end_l() < -1.0) {
+    if (obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
+        obstacle->PerceptionSLBoundary().end_l() < -1.0) {
       continue;
     }
 
     bool is_blocked_by_others = false;
-    for (const auto* other_obstacle : path_decision.path_obstacles().Items()) {
-      if (other_obstacle->Id() == path_obstacle->Id()) {
+    for (const auto* other_obstacle : path_decision.obstacles().Items()) {
+      if (other_obstacle->Id() == obstacle->Id()) {
         continue;
       }
       if (other_obstacle->PerceptionSLBoundary().start_l() >
-              path_obstacle->PerceptionSLBoundary().end_l() ||
+              obstacle->PerceptionSLBoundary().end_l() ||
           other_obstacle->PerceptionSLBoundary().end_l() <
-              path_obstacle->PerceptionSLBoundary().start_l()) {
+              obstacle->PerceptionSLBoundary().start_l()) {
         // not blocking the backside vehicle
         continue;
       }
 
       double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-                       path_obstacle->PerceptionSLBoundary().end_s();
+                       obstacle->PerceptionSLBoundary().end_s();
       if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
         continue;
       } else {

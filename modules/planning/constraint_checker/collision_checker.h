@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "modules/common/math/box2d.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/lattice/behavior/path_time_graph.h"
@@ -36,8 +36,8 @@ namespace planning {
 class CollisionChecker {
  public:
   explicit CollisionChecker(
-      const std::vector<const PathObstacle*>& obstacles,
-      const double ego_vehicle_s, const double ego_vehicle_d,
+      const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
+      const double ego_vehicle_d,
       const std::vector<common::PathPoint>& discretized_reference_line,
       const ReferenceLineInfo* ptr_reference_line_info,
       const std::shared_ptr<PathTimeGraph>& ptr_path_time_graph);
@@ -46,15 +46,15 @@ class CollisionChecker {
 
  private:
   void BuildPredictedEnvironment(
-      const std::vector<const PathObstacle*>& obstacles,
-      const double ego_vehicle_s, const double ego_vehicle_d,
+      const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
+      const double ego_vehicle_d,
       const std::vector<common::PathPoint>& discretized_reference_line);
 
   bool IsEgoVehicleInLane(const double ego_vehicle_s,
                           const double ego_vehicle_d);
 
   bool IsObstacleBehindEgoVehicle(
-      const PathObstacle* obstacle, const double ego_vehicle_s,
+      const Obstacle* obstacle, const double ego_vehicle_s,
       const std::vector<apollo::common::PathPoint>& discretized_reference_line);
 
  private:

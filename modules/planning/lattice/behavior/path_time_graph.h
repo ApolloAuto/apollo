@@ -32,7 +32,7 @@
 
 #include "modules/common/math/polygon2d.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/reference_line/reference_line.h"
 
@@ -41,7 +41,7 @@ namespace planning {
 
 class PathTimeGraph {
  public:
-  PathTimeGraph(const std::vector<const PathObstacle*>& obstacles,
+  PathTimeGraph(const std::vector<const Obstacle*>& obstacles,
                 const std::vector<common::PathPoint>& discretized_ref_points,
                 const ReferenceLineInfo* ptr_reference_line_info,
                 const double s_start, const double s_end, const double t_start,
@@ -73,7 +73,7 @@ class PathTimeGraph {
 
  private:
   void SetupObstacles(
-      const std::vector<const PathObstacle*>& obstacles,
+      const std::vector<const Obstacle*>& obstacles,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   SLBoundary ComputeObstacleBoundary(
@@ -84,11 +84,11 @@ class PathTimeGraph {
                                  const double t) const;
 
   void SetStaticObstacle(
-      const PathObstacle* obstacle,
+      const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   void SetDynamicObstacle(
-      const PathObstacle* obstacle,
+      const Obstacle* obstacle,
       const std::vector<common::PathPoint>& discretized_ref_points);
 
   void UpdateLateralBoundsByObstacle(

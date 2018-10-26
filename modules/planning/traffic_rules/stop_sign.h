@@ -55,11 +55,11 @@ class StopSign : public TrafficRule {
                         StopSignLaneVehicles* watch_vehicles);
   bool CheckADCStop(ReferenceLineInfo* const reference_line_info);
   void GetWatchVehicles(const hdmap::StopSignInfo& stop_sign_info,
-                       StopSignLaneVehicles* watch_vehicles);
+                        StopSignLaneVehicles* watch_vehicles);
   void UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
-  int AddWatchVehicle(const PathObstacle& path_obstacle,
+  int AddWatchVehicle(const Obstacle& obstacle,
                       StopSignLaneVehicles* watch_vehicles);
-  int RemoveWatchVehicle(const PathObstacle& path_obstacle,
+  int RemoveWatchVehicle(const Obstacle& obstacle,
                          const std::vector<std::string>& watch_vehicle_ids,
                          StopSignLaneVehicles* watch_vehicles);
   int ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,

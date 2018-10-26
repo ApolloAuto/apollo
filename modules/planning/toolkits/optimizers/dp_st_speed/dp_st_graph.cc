@@ -63,7 +63,7 @@ bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
 
 DpStGraph::DpStGraph(const StGraphData& st_graph_data,
                      const DpStSpeedConfig& dp_config,
-                     const std::vector<const PathObstacle*>& obstacles,
+                     const std::vector<const Obstacle*>& obstacles,
                      const common::TrajectoryPoint& init_point,
                      const SLBoundary& adc_sl_boundary)
     : st_graph_data_(st_graph_data),

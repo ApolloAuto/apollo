@@ -67,8 +67,7 @@ QpFrenetFrame::QpFrenetFrame(const ReferenceLine& reference_line,
   DCHECK_GE(evaluated_s_.size(), 2);
 }
 
-bool QpFrenetFrame::Init(
-    const std::vector<const PathObstacle*>& path_obstacles) {
+bool QpFrenetFrame::Init(const std::vector<const Obstacle*>& obstacles) {
   if (!CalculateDiscretizedVehicleLocation()) {
     AERROR << "Fail to calculate discretized vehicle location!";
     return false;
@@ -79,7 +78,7 @@ bool QpFrenetFrame::Init(
     return false;
   }
 
-  if (!CalculateObstacleBound(path_obstacles)) {
+  if (!CalculateObstacleBound(obstacles)) {
     AERROR << "Calculate obstacle bound failed!";
     return false;
   }
@@ -137,13 +136,12 @@ bool QpFrenetFrame::CalculateDiscretizedVehicleLocation() {
   return true;
 }
 
-bool QpFrenetFrame::MapDynamicObstacleWithDecision(
-    const PathObstacle& path_obstacle) {
-  if (!path_obstacle.HasLateralDecision()) {
+bool QpFrenetFrame::MapDynamicObstacleWithDecision(const Obstacle& obstacle) {
+  if (!obstacle.HasLateralDecision()) {
     ADEBUG << "object has no lateral decision";
     return false;
   }
-  const auto& decision = path_obstacle.LateralDecision();
+  const auto& decision = obstacle.LateralDecision();
   if (!decision.has_nudge()) {
     ADEBUG << "only support nudge now";
     return true;
@@ -151,10 +149,8 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
   const auto& nudge = decision.nudge();
   for (const SpeedPoint& veh_point : discretized_vehicle_location_) {
     double time = veh_point.t();
-    common::TrajectoryPoint trajectory_point =
-        path_obstacle.GetPointAtTime(time);
-    common::math::Box2d obs_box =
-        path_obstacle.GetBoundingBox(trajectory_point);
+    common::TrajectoryPoint trajectory_point = obstacle.GetPointAtTime(time);
+    common::math::Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
     // project obs_box on reference line
     std::vector<common::math::Vec2d> corners;
     obs_box.GetAllCorners(&corners);
@@ -209,21 +205,20 @@ bool QpFrenetFrame::MapDynamicObstacleWithDecision(
   return true;
 }
 
-bool QpFrenetFrame::MapStaticObstacleWithDecision(
-    const PathObstacle& path_obstacle) {
-  if (!path_obstacle.HasLateralDecision()) {
+bool QpFrenetFrame::MapStaticObstacleWithDecision(const Obstacle& obstacle) {
+  if (!obstacle.HasLateralDecision()) {
     ADEBUG << "obstacle has no lateral decision";
     return false;
   }
-  const auto& decision = path_obstacle.LateralDecision();
+  const auto& decision = obstacle.LateralDecision();
   if (!decision.has_nudge()) {
     ADEBUG << "only support nudge decision now";
     return true;
   }
   if (!MapNudgePolygon(
-          common::math::Polygon2d(path_obstacle.PerceptionBoundingBox()),
+          common::math::Polygon2d(obstacle.PerceptionBoundingBox()),
           decision.nudge(), &static_obstacle_bound_)) {
-    AERROR << "fail to map polygon with id " << path_obstacle.Id()
+    AERROR << "fail to map polygon with id " << obstacle.Id()
            << " in qp frenet frame";
     return false;
   }
@@ -409,20 +404,20 @@ bool QpFrenetFrame::CalculateHDMapBound() {
 }
 
 bool QpFrenetFrame::CalculateObstacleBound(
-    const std::vector<const PathObstacle*>& path_obstacles) {
-  for (const auto ptr_path_obstacle : path_obstacles) {
-    if (!ptr_path_obstacle->HasLateralDecision()) {
+    const std::vector<const Obstacle*>& obstacles) {
+  for (const auto ptr_obstacle : obstacles) {
+    if (!ptr_obstacle->HasLateralDecision()) {
       continue;
     }
-    if (ptr_path_obstacle->IsStatic()) {
-      if (!MapStaticObstacleWithDecision(*ptr_path_obstacle)) {
-        AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
+    if (ptr_obstacle->IsStatic()) {
+      if (!MapStaticObstacleWithDecision(*ptr_obstacle)) {
+        AERROR << "mapping obstacle with id [" << ptr_obstacle->Id()
                << "] failed in qp frenet frame.";
         return false;
       }
     } else {
-      if (!MapDynamicObstacleWithDecision(*ptr_path_obstacle)) {
-        AERROR << "mapping obstacle with id [" << ptr_path_obstacle->Id()
+      if (!MapDynamicObstacleWithDecision(*ptr_obstacle)) {
+        AERROR << "mapping obstacle with id [" << ptr_obstacle->Id()
                << "] failed in qp frenet frame.";
         return false;
       }

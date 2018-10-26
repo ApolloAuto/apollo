@@ -40,12 +40,13 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Sigmoid;
 using apollo::common::math::Vec2d;
 
-TrajectoryCost::TrajectoryCost(
-    const DpPolyPathConfig &config, const ReferenceLine &reference_line,
-    const bool is_change_lane_path,
-    const std::vector<const PathObstacle *> &obstacles,
-    const common::VehicleParam &vehicle_param,
-    const SpeedData &heuristic_speed_data, const common::SLPoint &init_sl_point)
+TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
+                               const ReferenceLine &reference_line,
+                               const bool is_change_lane_path,
+                               const std::vector<const Obstacle *> &obstacles,
+                               const common::VehicleParam &vehicle_param,
+                               const SpeedData &heuristic_speed_data,
+                               const common::SLPoint &init_sl_point)
     : config_(config),
       reference_line_(&reference_line),
       is_change_lane_path_(is_change_lane_path),
@@ -58,13 +59,13 @@ TrajectoryCost::TrajectoryCost(
   num_of_time_stamps_ = static_cast<uint32_t>(
       std::floor(total_time / config.eval_time_interval()));
 
-  for (const auto *ptr_path_obstacle : obstacles) {
-    if (ptr_path_obstacle->IsIgnore()) {
+  for (const auto *ptr_obstacle : obstacles) {
+    if (ptr_obstacle->IsIgnore()) {
       continue;
-    } else if (ptr_path_obstacle->LongitudinalDecision().has_stop()) {
+    } else if (ptr_obstacle->LongitudinalDecision().has_stop()) {
       continue;
     }
-    const auto &sl_boundary = ptr_path_obstacle->PerceptionSLBoundary();
+    const auto &sl_boundary = ptr_obstacle->PerceptionSLBoundary();
 
     const float adc_left_l =
         init_sl_point_.l() + vehicle_param_.left_edge_to_center();
@@ -77,26 +78,24 @@ TrajectoryCost::TrajectoryCost(
     }
 
     bool is_bycycle_or_pedestrian =
-        (ptr_path_obstacle->Perception().type() ==
+        (ptr_obstacle->Perception().type() ==
              perception::PerceptionObstacle::BICYCLE ||
-         ptr_path_obstacle->Perception().type() ==
+         ptr_obstacle->Perception().type() ==
              perception::PerceptionObstacle::PEDESTRIAN);
 
-    if (PathObstacle::IsVirtualObstacle(ptr_path_obstacle->Perception())) {
+    if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obstacle
       continue;
-    } else if (PathObstacle::IsStaticObstacle(
-                   ptr_path_obstacle->Perception()) ||
+    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) ||
                is_bycycle_or_pedestrian) {
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;
       for (uint32_t t = 0; t <= num_of_time_stamps_; ++t) {
         TrajectoryPoint trajectory_point =
-            ptr_path_obstacle->GetPointAtTime(t * config.eval_time_interval());
+            ptr_obstacle->GetPointAtTime(t * config.eval_time_interval());
 
-        Box2d obstacle_box =
-            ptr_path_obstacle->GetBoundingBox(trajectory_point);
+        Box2d obstacle_box = ptr_obstacle->GetBoundingBox(trajectory_point);
         constexpr float kBuff = 0.5;
         Box2d expanded_obstacle_box =
             Box2d(obstacle_box.center(), obstacle_box.heading(),

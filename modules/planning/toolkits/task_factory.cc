@@ -30,7 +30,6 @@
 #include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
-#include "modules/planning/toolkits/optimizers/poly_st_speed/poly_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
@@ -77,10 +76,6 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::QP_PIECEWISE_JERK_PATH_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new QpPiecewiseJerkPathOptimizer(config);
-                         });
-  task_factory_.Register(TaskConfig::POLY_ST_SPEED_OPTIMIZER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new PolyStSpeedOptimizer(config);
                          });
   task_factory_.Register(TaskConfig::DECIDER_CREEP,
                          [](const TaskConfig& config) -> Task* {

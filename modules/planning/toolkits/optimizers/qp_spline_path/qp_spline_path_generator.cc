@@ -81,10 +81,9 @@ void QpSplinePathGenerator::SetChangeLane(bool is_change_lane_path) {
 }
 
 bool QpSplinePathGenerator::Generate(
-    const std::vector<const PathObstacle*>& path_obstacles,
-    const SpeedData& speed_data, const common::TrajectoryPoint& init_point,
-    const double boundary_extension, bool is_final_attempt,
-    PathData* const path_data) {
+    const std::vector<const Obstacle*>& obstacles, const SpeedData& speed_data,
+    const common::TrajectoryPoint& init_point, const double boundary_extension,
+    bool is_final_attempt, PathData* const path_data) {
   ADEBUG << "Init point: " << init_point.DebugString();
   init_trajectory_point_ = init_point;
 
@@ -123,7 +122,7 @@ bool QpSplinePathGenerator::Generate(
   QpFrenetFrame qp_frenet_frame(reference_line_, speed_data, init_frenet_point_,
                                 qp_spline_path_config_.time_resolution(),
                                 evaluated_s_);
-  if (!qp_frenet_frame.Init(path_obstacles)) {
+  if (!qp_frenet_frame.Init(obstacles)) {
     AERROR << "Fail to initialize qp frenet frame";
     return false;
   }

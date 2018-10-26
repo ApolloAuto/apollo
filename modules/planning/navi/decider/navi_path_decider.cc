@@ -99,7 +99,7 @@ Status NaviPathDecider::Execute(Frame* frame,
 apollo::common::Status NaviPathDecider::Process(
     const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point,
-    const std::vector<const PathObstacle*>& obstacles,
+    const std::vector<const Obstacle*>& obstacles,
     PathDecision* const path_decision, PathData* const path_data) {
   CHECK_NOTNULL(path_decision);
   CHECK_NOTNULL(path_data);
@@ -304,8 +304,8 @@ bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
     return false;
   }
 
-  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    const auto& sl_boundary = path_obstacle->PerceptionSLBoundary();
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    const auto& sl_boundary = obstacle->PerceptionSLBoundary();
     constexpr double kLateralShift = 6.0;
     if (sl_boundary.start_l() < -kLateralShift ||
         sl_boundary.end_l() > kLateralShift) {
@@ -316,14 +316,12 @@ bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
     constexpr double kForwardMinSafeDistance = 6.0;
     constexpr double kBackwardMinSafeDistance = 8.0;
 
-    const double kForwardSafeDistance =
-        std::max(kForwardMinSafeDistance,
-                 ((vehicle_state_.linear_velocity() - path_obstacle->speed()) *
-                  kSafeTime));
-    const double kBackwardSafeDistance =
-        std::max(kBackwardMinSafeDistance,
-                 ((path_obstacle->speed() - vehicle_state_.linear_velocity()) *
-                  kSafeTime));
+    const double kForwardSafeDistance = std::max(
+        kForwardMinSafeDistance,
+        ((vehicle_state_.linear_velocity() - obstacle->speed()) * kSafeTime));
+    const double kBackwardSafeDistance = std::max(
+        kBackwardMinSafeDistance,
+        ((obstacle->speed() - vehicle_state_.linear_velocity()) * kSafeTime));
     if (sl_boundary.end_s() >
             adc_sl_boundary.start_s() - kBackwardSafeDistance &&
         sl_boundary.start_s() <
@@ -338,7 +336,7 @@ bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
 double NaviPathDecider::NudgeProcess(
     const ReferenceLine& reference_line,
     const std::vector<common::PathPoint>& path_data_points,
-    const std::vector<const PathObstacle*>& obstacles,
+    const std::vector<const Obstacle*>& obstacles,
     const PathDecision& path_decision,
     const common::VehicleState& vehicle_state) {
   double nudge_position_y = 0.0;

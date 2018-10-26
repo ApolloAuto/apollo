@@ -66,38 +66,38 @@ bool SidePassSafety::IsSafeSidePass(
     Frame *frame, ReferenceLineInfo *const reference_line_info) {
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
-  const auto &path_obstacles =
-      reference_line_info->path_decision()->path_obstacles().Items();
+  const auto &obstacles =
+      reference_line_info->path_decision()->obstacles().Items();
 
-  for (const auto *path_obstacle : path_obstacles) {
+  for (const auto *obstacle : obstacles) {
     // ignore virtual and static obstacles
-    if (path_obstacle->IsVirtual() || path_obstacle->IsStatic()) {
+    if (obstacle->IsVirtual() || obstacle->IsStatic()) {
       continue;
     }
     // ignore the obstacles behind adc and is able to catch adc after 5 secs.
-    if (path_obstacle->PerceptionSLBoundary().end_s() < adc_front_edge_s &&
-        path_obstacle->st_boundary().min_t() >
+    if (obstacle->PerceptionSLBoundary().end_s() < adc_front_edge_s &&
+        obstacle->st_boundary().min_t() >
             Config().side_pass_safety_config().safe_duration_reach_ref_line()) {
       continue;
     }
     // not overlapped obstacles
-    if (path_obstacle->st_boundary().IsEmpty()) {
+    if (obstacle->st_boundary().IsEmpty()) {
       continue;
     }
     // if near side obstacles exist, it is unsafe.
-    if (std::abs(path_obstacle->PerceptionSLBoundary().start_l()) <=
+    if (std::abs(obstacle->PerceptionSLBoundary().start_l()) <=
             Config()
                 .side_pass_safety_config()
                 .min_obstacle_lateral_distance() &&
-        std::abs(path_obstacle->PerceptionSLBoundary().end_l()) <=
+        std::abs(obstacle->PerceptionSLBoundary().end_l()) <=
             Config()
                 .side_pass_safety_config()
                 .min_obstacle_lateral_distance()) {
       return false;
     }
     // overlap is more than 5 meters
-    double s_range = path_obstacle->st_boundary().max_s() -
-                     path_obstacle->st_boundary().min_s();
+    double s_range =
+        obstacle->st_boundary().max_s() - obstacle->st_boundary().min_s();
     if (s_range > Config().side_pass_safety_config().max_overlap_s_range()) {
       return false;
     }

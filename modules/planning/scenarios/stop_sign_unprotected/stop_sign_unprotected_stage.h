@@ -65,7 +65,7 @@ class StopSignUnprotectedStop : public Stage {
   }
 
   int RemoveWatchVehicle(
-      const PathObstacle& path_obstacle,
+      const Obstacle& obstacle,
       const std::vector<std::string>& watch_vehicle_ids,
       std::unordered_map<std::string, std::vector<std::string>>*
           watch_vehicles);
@@ -89,7 +89,7 @@ class StopSignUnprotectedPreStop : public Stage {
     return GetContextAs<StopSignUnprotectedContext>();
   }
 
-  int AddWatchVehicle(const PathObstacle& path_obstacle,
+  int AddWatchVehicle(const Obstacle& obstacle,
                       std::unordered_map<std::string, std::vector<std::string>>*
                           watch_vehicles);
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info);

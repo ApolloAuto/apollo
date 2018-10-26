@@ -76,9 +76,9 @@ bool DeciderStopSign::BuildStopDecision(
     AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
     return -1;
   }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << stop_wall_id;
+    AERROR << "Failed to create obstacle for: " << stop_wall_id;
     return -1;
   }
 

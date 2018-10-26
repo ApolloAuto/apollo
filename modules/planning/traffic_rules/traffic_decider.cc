@@ -107,7 +107,7 @@ void TrafficDecider::BuildPlanningTarget(
   double min_s = std::numeric_limits<double>::infinity();
   StopPoint stop_point;
   for (const auto *obstacle :
-       reference_line_info->path_decision()->path_obstacles().Items()) {
+       reference_line_info->path_decision()->obstacles().Items()) {
     if (obstacle->IsVirtual() && obstacle->HasLongitudinalDecision() &&
         obstacle->LongitudinalDecision().has_stop() &&
         obstacle->PerceptionSLBoundary().start_s() < min_s) {

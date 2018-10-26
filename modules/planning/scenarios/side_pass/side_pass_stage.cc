@@ -196,13 +196,13 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   bool all_far_away = true;
   // Go through every obstacle, check if there is any in the no_obs_zone,
   // which will used by the proceed_with_caution movement.
-  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    if (path_obstacle->IsVirtual()) {
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (obstacle->IsVirtual()) {
       continue;
     }
     // Check the s-direction.
-    double obs_start_s = path_obstacle->PerceptionSLBoundary().start_s();
-    double obs_end_s = path_obstacle->PerceptionSLBoundary().end_s();
+    double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
+    double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
     if (obs_end_s < no_obs_zone_start_s || obs_start_s > no_obs_zone_end_s) {
       continue;
     }
@@ -219,8 +219,8 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
                                       std::abs(lane_left_width_at_end_s));
     double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
                                        std::abs(lane_right_width_at_end_s));
-    double obs_start_l = path_obstacle->PerceptionSLBoundary().start_l();
-    double obs_end_l = path_obstacle->PerceptionSLBoundary().end_l();
+    double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
+    double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
     if (obs_start_l > lane_left_width || -obs_end_l > lane_right_width) {
       continue;
     }
@@ -262,6 +262,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
  * @brief:
  * STAGE: SidePassDetectSafety
  */
+
 Stage::StageStatus SidePassDetectSafety::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   if (PlanningOnReferenceLine(planning_start_point, frame)) {
@@ -274,9 +275,9 @@ Stage::StageStatus SidePassDetectSafety::Process(
 
   const PathDecision& path_decision =
       frame->reference_line_info().front().path_decision();
-  for (const auto* path_obstacle : path_decision.path_obstacles().Items()) {
-    if (path_obstacle->IsVirtual() &&
-        path_obstacle->PerceptionSLBoundary().start_s() >= adc_front_edge_s) {
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (obstacle->IsVirtual() &&
+        obstacle->PerceptionSLBoundary().start_s() >= adc_front_edge_s) {
       is_safe = false;
       break;
     }

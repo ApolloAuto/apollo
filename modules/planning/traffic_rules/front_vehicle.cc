@@ -233,20 +233,20 @@ std::string FrontVehicle::FindPassableObstacle(
   std::string passable_obstacle_id;
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   auto* path_decision = reference_line_info->path_decision();
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const PerceptionObstacle& perception_obstacle = path_obstacle->Perception();
+  for (const auto* obstacle : path_decision->obstacles().Items()) {
+    const PerceptionObstacle& perception_obstacle = obstacle->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
     PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
         PerceptionObstacle_Type_Name(obstacle_type);
 
-    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
+    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] VIRTUAL or NOT STATIC. SKIP";
       continue;
     }
 
-    const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     if (obstacle_sl.start_s() <= adc_sl_boundary.end_s()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] behind ADC. SKIP";
@@ -272,8 +272,8 @@ std::string FrontVehicle::FindPassableObstacle(
     }
 
     bool is_blocked_by_others = false;
-    for (const auto* other_obstacle : path_decision->path_obstacles().Items()) {
-      if (other_obstacle->Id() == path_obstacle->Id()) {
+    for (const auto* other_obstacle : path_decision->obstacles().Items()) {
+      if (other_obstacle->Id() == obstacle->Id()) {
         continue;
       }
       if (other_obstacle->PerceptionSLBoundary().start_l() >
@@ -295,7 +295,7 @@ std::string FrontVehicle::FindPassableObstacle(
       }
     }
     if (!is_blocked_by_others) {
-      passable_obstacle_id = path_obstacle->Id();
+      passable_obstacle_id = obstacle->Id();
       break;
     }
   }
@@ -309,21 +309,21 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   const double adc_width = vehicle_param.width();
 
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const PerceptionObstacle& perception_obstacle = path_obstacle->Perception();
+  for (const auto* obstacle : path_decision->obstacles().Items()) {
+    const PerceptionObstacle& perception_obstacle = obstacle->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
     PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
         PerceptionObstacle_Type_Name(obstacle_type);
 
-    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
+    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] VIRTUAL or NOT STATIC. SKIP";
       continue;
     }
 
     bool is_on_road = reference_line_info->reference_line().HasOverlap(
-        path_obstacle->PerceptionBoundingBox());
+        obstacle->PerceptionBoundingBox());
     if (!is_on_road) {
       // skip obstacles not on reference line
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
@@ -332,7 +332,7 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
     }
 
     const auto& vehicle_sl = reference_line_info->VehicleSlBoundary();
-    const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     if (obstacle_sl.end_s() <= adc_sl.start_s() ||
         obstacle_sl.end_s() <= vehicle_sl.start_s()) {
       // skip backside vehicles
@@ -342,7 +342,7 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
     }
 
     // check SIDE_PASS decision
-    if (path_obstacle->LateralDecision().has_sidepass()) {
+    if (obstacle->LateralDecision().has_sidepass()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] SIDE_PASS. SKIP";
       continue;
@@ -378,7 +378,7 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
 
       // build stop decision
       const double stop_distance =
-          path_obstacle->MinRadiusStopDistance(vehicle_param);
+          obstacle->MinRadiusStopDistance(vehicle_param);
       const double stop_s = obstacle_sl.start_s() - stop_distance;
       auto stop_point = reference_line.GetReferencePoint(stop_s);
       const double stop_heading =
@@ -400,8 +400,8 @@ void FrontVehicle::MakeStopDecision(ReferenceLineInfo* reference_line_info) {
       stop_decision->mutable_stop_point()->set_y(stop_point.y());
       stop_decision->mutable_stop_point()->set_z(0.0);
 
-      path_decision->AddLongitudinalDecision("front_vehicle",
-                                             path_obstacle->Id(), stop);
+      path_decision->AddLongitudinalDecision("front_vehicle", obstacle->Id(),
+                                             stop);
     }
   }
 }

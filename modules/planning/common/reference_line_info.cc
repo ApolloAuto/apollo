@@ -56,8 +56,7 @@ ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
       reference_line_(reference_line),
       lanes_(segments) {}
 
-bool ReferenceLineInfo::Init(
-    const std::vector<const PathObstacle*>& obstacles) {
+bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
   // stitching point
   const auto& path_point = adc_planning_point_.path_point();
@@ -142,7 +141,7 @@ void ReferenceLineInfo::InitFirstOverlaps() {
     first_encounter_overlaps_.push_back({STOP_SIGN, overlap});
     break;
   }
-  for (const auto& obstacle : path_decision_.path_obstacles().Items()) {
+  for (const auto& obstacle : path_decision_.obstacles().Items()) {
     if (!obstacle->IsBlockingObstacle()) {
       continue;
     }
@@ -214,8 +213,8 @@ bool ReferenceLineInfo::CheckChangeLane() const {
     return false;
   }
 
-  for (const auto* path_obstacle : path_decision_.path_obstacles().Items()) {
-    const auto& sl_boundary = path_obstacle->PerceptionSLBoundary();
+  for (const auto* obstacle : path_decision_.obstacles().Items()) {
+    const auto& sl_boundary = obstacle->PerceptionSLBoundary();
 
     constexpr float kLateralShift = 2.5;
     if (sl_boundary.start_l() < -kLateralShift ||
@@ -229,11 +228,11 @@ bool ReferenceLineInfo::CheckChangeLane() const {
 
     const float kForwardSafeDistance = std::max(
         kForwardMinSafeDistance,
-        static_cast<float>((adc_planning_point_.v() - path_obstacle->speed()) *
+        static_cast<float>((adc_planning_point_.v() - obstacle->speed()) *
                            kSafeTime));
     const float kBackwardSafeDistance = std::max(
         kBackwardMinSafeDistance,
-        static_cast<float>((path_obstacle->speed() - adc_planning_point_.v()) *
+        static_cast<float>((obstacle->speed() - adc_planning_point_.v()) *
                            kSafeTime));
     if (sl_boundary.end_s() > sl_boundary_info_.adc_sl_boundary_.start_s() -
                                   kBackwardSafeDistance &&
@@ -278,18 +277,18 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
 }
 
 bool ReferenceLineInfo::AddObstacleHelper(
-    const std::shared_ptr<PathObstacle>& obstacle) {
+    const std::shared_ptr<Obstacle>& obstacle) {
   return AddObstacle(obstacle.get()) != nullptr;
 }
 
 // AddObstacle is thread safe
-PathObstacle* ReferenceLineInfo::AddObstacle(const PathObstacle* obstacle) {
+Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   if (!obstacle) {
     AERROR << "The provided obstacle is empty";
     return nullptr;
   }
-  auto* path_obstacle = path_decision_.AddPathObstacle(*obstacle);
-  if (!path_obstacle) {
+  auto* mutable_obstacle = path_decision_.AddObstacle(*obstacle);
+  if (!mutable_obstacle) {
     AERROR << "failed to add obstacle " << obstacle->Id();
     return nullptr;
   }
@@ -298,11 +297,11 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const PathObstacle* obstacle) {
   if (!reference_line_.GetSLBoundary(obstacle->PerceptionBoundingBox(),
                                      &perception_sl)) {
     AERROR << "Failed to get sl boundary for obstacle: " << obstacle->Id();
-    return path_obstacle;
+    return mutable_obstacle;
   }
-  path_obstacle->SetPerceptionSlBoundary(perception_sl);
+  mutable_obstacle->SetPerceptionSlBoundary(perception_sl);
 
-  if (IsUnrelaventObstacle(path_obstacle)) {
+  if (IsUnrelaventObstacle(mutable_obstacle)) {
     ObjectDecisionType ignore;
     ignore.mutable_ignore();
     path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
@@ -312,23 +311,22 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const PathObstacle* obstacle) {
     ADEBUG << "NO build reference line st boundary. id:" << obstacle->Id();
   } else {
     ADEBUG << "build reference line st boundary. id:" << obstacle->Id();
-    path_obstacle->BuildReferenceLineStBoundary(
+    mutable_obstacle->BuildReferenceLineStBoundary(
         reference_line_, sl_boundary_info_.adc_sl_boundary_.start_s());
 
     ADEBUG << "reference line st boundary: "
-           << path_obstacle->reference_line_st_boundary().min_t() << ", "
-           << path_obstacle->reference_line_st_boundary().max_t()
-           << ", s_max: " << path_obstacle->reference_line_st_boundary().max_s()
-           << ", s_min: "
-           << path_obstacle->reference_line_st_boundary().min_s();
+           << obstacle->reference_line_st_boundary().min_t() << ", "
+           << obstacle->reference_line_st_boundary().max_t()
+           << ", s_max: " << obstacle->reference_line_st_boundary().max_s()
+           << ", s_min: " << obstacle->reference_line_st_boundary().min_s();
   }
-  return path_obstacle;
+  return mutable_obstacle;
 }
 
 bool ReferenceLineInfo::AddObstacles(
-    const std::vector<const PathObstacle*>& obstacles) {
+    const std::vector<const Obstacle*>& obstacles) {
   if (FLAGS_use_multi_thread_to_add_obstacles) {
-    std::vector<std::future<PathObstacle*>> results;
+    std::vector<std::future<Obstacle*>> results;
     for (const auto* obstacle : obstacles) {
       results.push_back(
           cyber::Async(&ReferenceLineInfo::AddObstacle, this, obstacle));
@@ -351,16 +349,15 @@ bool ReferenceLineInfo::AddObstacles(
   return true;
 }
 
-bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
+bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
   // if adc is on the road, and obstacle behind adc, ignore
-  if (path_obstacle->PerceptionSLBoundary().end_s() >
-      reference_line_.Length()) {
+  if (obstacle->PerceptionSLBoundary().end_s() > reference_line_.Length()) {
     return true;
   }
   if (is_on_reference_line_ &&
-      path_obstacle->PerceptionSLBoundary().end_s() <
+      obstacle->PerceptionSLBoundary().end_s() <
           sl_boundary_info_.adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnLane(path_obstacle->PerceptionSLBoundary())) {
+      reference_line_.IsOnLane(obstacle->PerceptionSLBoundary())) {
     return true;
   }
   return false;
@@ -616,11 +613,11 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
 int ReferenceLineInfo::MakeMainStopDecision(
     DecisionResult* decision_result) const {
   double min_stop_line_s = std::numeric_limits<double>::infinity();
-  const PathObstacle* stop_obstacle = nullptr;
+  const Obstacle* stop_obstacle = nullptr;
   const ObjectStop* stop_decision = nullptr;
 
-  for (const auto path_obstacle : path_decision_.path_obstacles().Items()) {
-    const auto& object_decision = path_obstacle->LongitudinalDecision();
+  for (const auto* obstacle : path_decision_.obstacles().Items()) {
+    const auto& object_decision = obstacle->LongitudinalDecision();
     if (!object_decision.has_stop()) {
       continue;
     }
@@ -631,7 +628,7 @@ int ReferenceLineInfo::MakeMainStopDecision(
 
     double stop_line_s = stop_line_sl.s();
     if (stop_line_s < 0 || stop_line_s > reference_line_.Length()) {
-      AERROR << "Ignore object:" << path_obstacle->Id() << " fence route_s["
+      AERROR << "Ignore object:" << obstacle->Id() << " fence route_s["
              << stop_line_s << "] not in range[0, " << reference_line_.Length()
              << "]";
       continue;
@@ -640,7 +637,7 @@ int ReferenceLineInfo::MakeMainStopDecision(
     // check stop_line_s vs adc_s
     if (stop_line_s < min_stop_line_s) {
       min_stop_line_s = stop_line_s;
-      stop_obstacle = path_obstacle;
+      stop_obstacle = obstacle;
       stop_decision = &(object_decision.stop());
     }
   }
@@ -667,23 +664,22 @@ int ReferenceLineInfo::MakeMainStopDecision(
 
 void ReferenceLineInfo::SetObjectDecisions(
     ObjectDecisions* object_decisions) const {
-  for (const auto path_obstacle : path_decision_.path_obstacles().Items()) {
-    if (!path_obstacle->HasNonIgnoreDecision()) {
+  for (const auto obstacle : path_decision_.obstacles().Items()) {
+    if (!obstacle->HasNonIgnoreDecision()) {
       continue;
     }
     auto* object_decision = object_decisions->add_decision();
 
-    object_decision->set_id(path_obstacle->Id());
-    object_decision->set_perception_id(path_obstacle->PerceptionId());
-    if (path_obstacle->HasLateralDecision() &&
-        !path_obstacle->IsLateralIgnore()) {
+    object_decision->set_id(obstacle->Id());
+    object_decision->set_perception_id(obstacle->PerceptionId());
+    if (obstacle->HasLateralDecision() && !obstacle->IsLateralIgnore()) {
       object_decision->add_object_decision()->CopyFrom(
-          path_obstacle->LateralDecision());
+          obstacle->LateralDecision());
     }
-    if (path_obstacle->HasLongitudinalDecision() &&
-        !path_obstacle->IsLongitudinalIgnore()) {
+    if (obstacle->HasLongitudinalDecision() &&
+        !obstacle->IsLongitudinalIgnore()) {
       object_decision->add_object_decision()->CopyFrom(
-          path_obstacle->LongitudinalDecision());
+          obstacle->LongitudinalDecision());
     }
   }
 }
@@ -747,10 +743,10 @@ void ReferenceLineInfo::MakeEStopDecision(
   // set object decisions
   ObjectDecisions* object_decisions =
       decision_result->mutable_object_decision();
-  for (const auto path_obstacle : path_decision_.path_obstacles().Items()) {
+  for (const auto obstacle : path_decision_.obstacles().Items()) {
     auto* object_decision = object_decisions->add_decision();
-    object_decision->set_id(path_obstacle->Id());
-    object_decision->set_perception_id(path_obstacle->PerceptionId());
+    object_decision->set_id(obstacle->Id());
+    object_decision->set_perception_id(obstacle->PerceptionId());
     object_decision->add_object_decision()->mutable_avoid();
   }
 }

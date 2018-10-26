@@ -36,7 +36,7 @@ TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
   adc_planning_point.set_v(FLAGS_polynomial_speed_fallback_velocity + 0.1);
 
   common::VehicleState vs;
-  const std::vector<const PathObstacle*> obstacles;
+  const std::vector<const Obstacle*> obstacles;
 
   EgoInfo::Instance()->Update(adc_planning_point, vs, obstacles);
   auto speed_data2 = SpeedProfileGenerator::GenerateFallbackSpeedProfile();

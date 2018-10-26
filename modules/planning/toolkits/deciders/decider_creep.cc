@@ -74,9 +74,9 @@ bool DeciderCreep::BuildStopDecision(const double stop_sign_overlap_end_s,
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
   }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << virtual_obstacle_id;
+    AERROR << "Failed to create obstacle for: " << virtual_obstacle_id;
     return false;
   }
 
@@ -113,12 +113,12 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
       creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
   if (distance < creep_config.max_valid_stop_distance()) {
     bool all_far_away = true;
-    for (auto* path_obstacle :
-         reference_line_info.path_decision().path_obstacles().Items()) {
-      if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
+    for (auto* obstacle :
+         reference_line_info.path_decision().obstacles().Items()) {
+      if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
         continue;
       }
-      if (path_obstacle->reference_line_st_boundary().min_t() <
+      if (obstacle->reference_line_st_boundary().min_t() <
           creep_config.min_boundary_t()) {
         all_far_away = false;
         break;

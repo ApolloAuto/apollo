@@ -77,7 +77,7 @@ class DpStGraphTest : public ::testing::Test {
   virtual void TearDown() {}
 
  protected:
-  std::list<PathObstacle> path_obstacle_list_;
+  std::list<Obstacle> obstacle_list_;
 
   StGraphData st_graph_data_;
   SpeedLimit speed_limit_;
@@ -89,12 +89,12 @@ class DpStGraphTest : public ::testing::Test {
 };
 
 TEST_F(DpStGraphTest, simple) {
-  PathObstacle o1;
+  Obstacle o1;
   o1.SetId("o1");
-  path_obstacle_list_.push_back(o1);
+  obstacle_list_.push_back(o1);
 
-  std::vector<const PathObstacle*> obstacles_;
-  obstacles_.emplace_back(&(path_obstacle_list_.back()));
+  std::vector<const Obstacle*> obstacles_;
+  obstacles_.emplace_back(&(obstacle_list_.back()));
 
   std::vector<STPoint> upper_points;
   std::vector<STPoint> lower_points;
@@ -108,7 +108,7 @@ TEST_F(DpStGraphTest, simple) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  path_obstacle_list_.back().SetStBoundary(StBoundary(point_pairs));
+  obstacle_list_.back().SetStBoundary(StBoundary(point_pairs));
 
   std::vector<const StBoundary*> boundaries;
   boundaries.push_back(&(obstacles_.back()->st_boundary()));

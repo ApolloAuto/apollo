@@ -54,12 +54,12 @@ DecisionData::DecisionData(
     const std::string perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
     if (prediction_obstacle.trajectory().empty()) {
-      path_obstacles_.emplace_back(new PathObstacle(
+      obstacles_.emplace_back(new Obstacle(
           perception_id, prediction_obstacle.perception_obstacle()));
-      all_obstacle_.emplace_back(path_obstacles_.back().get());
-      practical_obstacle_.emplace_back(path_obstacles_.back().get());
-      static_obstacle_.emplace_back(path_obstacles_.back().get());
-      obstacle_map_[perception_id] = path_obstacles_.back().get();
+      all_obstacle_.emplace_back(obstacles_.back().get());
+      practical_obstacle_.emplace_back(obstacles_.back().get());
+      static_obstacle_.emplace_back(obstacles_.back().get());
+      obstacle_map_[perception_id] = obstacles_.back().get();
       continue;
     }
     int trajectory_index = 0;
@@ -70,18 +70,18 @@ DecisionData::DecisionData(
       }
       const std::string obstacle_id =
           apollo::common::util::StrCat(perception_id, "_", trajectory_index);
-      path_obstacles_.emplace_back(new PathObstacle(
+      obstacles_.emplace_back(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
-      all_obstacle_.emplace_back(path_obstacles_.back().get());
-      practical_obstacle_.emplace_back(path_obstacles_.back().get());
-      dynamic_obstacle_.emplace_back(path_obstacles_.back().get());
-      obstacle_map_[obstacle_id] = path_obstacles_.back().get();
+      all_obstacle_.emplace_back(obstacles_.back().get());
+      practical_obstacle_.emplace_back(obstacles_.back().get());
+      dynamic_obstacle_.emplace_back(obstacles_.back().get());
+      obstacle_map_[obstacle_id] = obstacles_.back().get();
       ++trajectory_index;
     }
   }
 }
 
-PathObstacle* DecisionData::GetObstacleById(const std::string& id) {
+Obstacle* DecisionData::GetObstacleById(const std::string& id) {
   std::lock_guard<std::mutex> lock(mutex_);
   const auto it = obstacle_map_.find(id);
   if (it == obstacle_map_.end()) {
@@ -90,15 +90,15 @@ PathObstacle* DecisionData::GetObstacleById(const std::string& id) {
   return it->second;
 }
 
-std::vector<PathObstacle*> DecisionData::GetObstacleByType(
+std::vector<Obstacle*> DecisionData::GetObstacleByType(
     const VirtualObjectType& type) {
   std::lock_guard<std::mutex> lock(transaction_mutex_);
 
   std::unordered_set<std::string> ids = GetObstacleIdByType(type);
   if (ids.empty()) {
-    return std::vector<PathObstacle*>();
+    return std::vector<Obstacle*>();
   }
-  std::vector<PathObstacle*> ret;
+  std::vector<Obstacle*> ret;
   for (const std::string& id : ids) {
     ret.emplace_back(GetObstacleById(id));
     if (ret.back() == nullptr) {
@@ -120,23 +120,23 @@ std::unordered_set<std::string> DecisionData::GetObstacleIdByType(
   return it->second;
 }
 
-const std::vector<PathObstacle*>& DecisionData::GetStaticObstacle() const {
+const std::vector<Obstacle*>& DecisionData::GetStaticObstacle() const {
   return static_obstacle_;
 }
 
-const std::vector<PathObstacle*>& DecisionData::GetDynamicObstacle() const {
+const std::vector<Obstacle*>& DecisionData::GetDynamicObstacle() const {
   return dynamic_obstacle_;
 }
 
-const std::vector<PathObstacle*>& DecisionData::GetVirtualObstacle() const {
+const std::vector<Obstacle*>& DecisionData::GetVirtualObstacle() const {
   return virtual_obstacle_;
 }
 
-const std::vector<PathObstacle*>& DecisionData::GetPracticalObstacle() const {
+const std::vector<Obstacle*>& DecisionData::GetPracticalObstacle() const {
   return practical_obstacle_;
 }
 
-const std::vector<PathObstacle*>& DecisionData::GetAllObstacle() const {
+const std::vector<Obstacle*>& DecisionData::GetAllObstacle() const {
   return all_obstacle_;
 }
 
@@ -204,14 +204,14 @@ bool DecisionData::CreateVirtualObstacle(
     point->set_y(corner_point.y());
   }
   *id = std::to_string(perception_obstacle.id());
-  path_obstacles_.emplace_back(new PathObstacle(*id, perception_obstacle));
-  all_obstacle_.emplace_back(path_obstacles_.back().get());
-  virtual_obstacle_.emplace_back(path_obstacles_.back().get());
+  obstacles_.emplace_back(new Obstacle(*id, perception_obstacle));
+  all_obstacle_.emplace_back(obstacles_.back().get());
+  virtual_obstacle_.emplace_back(obstacles_.back().get());
   // would be changed if some virtual type is not static one
-  static_obstacle_.emplace_back(path_obstacles_.back().get());
+  static_obstacle_.emplace_back(obstacles_.back().get());
 
   virtual_obstacle_id_map_[type].insert(*id);
-  obstacle_map_[*id] = path_obstacles_.back().get();
+  obstacle_map_[*id] = obstacles_.back().get();
   return true;
 }
 

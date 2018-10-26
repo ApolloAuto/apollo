@@ -32,7 +32,7 @@ cc_library(
         "//modules/common/math:path_matcher",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:frame",
-        "//modules/planning/common:path_obstacle",
+        "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
@@ -50,7 +50,7 @@ cc_library(
     deps = [
         "//modules/common/math",
         "//modules/common/math:path_matcher",
-        "//modules/planning/common:path_obstacle",
+        "//modules/planning/common:obstacle",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/proto:planning_proto",
     ],

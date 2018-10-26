@@ -24,7 +24,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 namespace apollo {

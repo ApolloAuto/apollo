@@ -101,11 +101,11 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   double nearest_obs_end_s = 0.0;
   double nearest_obs_start_l = 0.0;
   double nearest_obs_end_l = 0.0;
-  for (const auto *path_obstacle :
-       reference_line_info->path_decision()->path_obstacles().Items()) {
+  for (const auto *obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
     // Filter out obstacles that are behind ADC.
-    double obs_start_s = path_obstacle->PerceptionSLBoundary().start_s();
-    double obs_end_s = path_obstacle->PerceptionSLBoundary().end_s();
+    double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
+    double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
     if (obs_end_s < adc_end_s) {
       continue;
     }
@@ -129,13 +129,13 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
                                       std::abs(lane_left_width_at_end_s));
     double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
                                        std::abs(lane_right_width_at_end_s));
-    double obs_start_l = path_obstacle->PerceptionSLBoundary().start_l();
-    double obs_end_l = path_obstacle->PerceptionSLBoundary().end_l();
+    double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
+    double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
     if (obs_start_l > lane_left_width || -obs_end_l > lane_right_width) {
       continue;
     }
     // Only select vehicle obstacles.
-    if (path_obstacle->Perception().type() !=
+    if (obstacle->Perception().type() !=
         perception::PerceptionObstacle::VEHICLE) {
       continue;
     }

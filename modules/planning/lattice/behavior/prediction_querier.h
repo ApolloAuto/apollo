@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 
 namespace apollo {
 namespace planning {
@@ -33,22 +33,22 @@ namespace planning {
 class PredictionQuerier {
  public:
   explicit PredictionQuerier(
-      const std::vector<const PathObstacle*>& obstacles,
+      const std::vector<const Obstacle*>& obstacles,
       const std::shared_ptr<std::vector<common::PathPoint>>&
           ptr_reference_line);
 
   virtual ~PredictionQuerier() = default;
 
-  std::vector<const PathObstacle*> GetObstacles() const;
+  std::vector<const Obstacle*> GetObstacles() const;
 
   double ProjectVelocityAlongReferenceLine(const std::string& obstacle_id,
                                            const double s,
                                            const double t) const;
 
  private:
-  std::unordered_map<std::string, const PathObstacle*> id_obstacle_map_;
+  std::unordered_map<std::string, const Obstacle*> id_obstacle_map_;
 
-  std::vector<const PathObstacle*> obstacles_;
+  std::vector<const Obstacle*> obstacles_;
 
   std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line_;
 };

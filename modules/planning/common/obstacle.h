@@ -42,7 +42,7 @@ namespace apollo {
 namespace planning {
 
 /**
- * @class PathObstacle
+ * @class Obstacle
  * @brief This is the class that associates an Obstacle with its path
  * properties. An obstacle's path properties relative to a path.
  * The `s` and `l` values are examples of path properties.
@@ -58,16 +58,14 @@ namespace planning {
  * Ignore decision belongs to both lateral decision and longitudinal decision,
  * and it has the lowest priority.
  */
-class PathObstacle {
+class Obstacle {
  public:
-  PathObstacle() = default;
-  explicit PathObstacle(
-      const std::string& id,
-      const perception::PerceptionObstacle& perception_obstacle);
-  explicit PathObstacle(
-      const std::string& id,
-      const perception::PerceptionObstacle& perception_obstacle,
-      const prediction::Trajectory& trajectory);
+  Obstacle() = default;
+  explicit Obstacle(const std::string& id,
+                    const perception::PerceptionObstacle& perception_obstacle);
+  explicit Obstacle(const std::string& id,
+                    const perception::PerceptionObstacle& perception_obstacle,
+                    const prediction::Trajectory& trajectory);
 
   const std::string& Id() const { return id_; }
   void SetId(const std::string& id) { id_ = id; }
@@ -109,10 +107,10 @@ class PathObstacle {
    * @param predictions The prediction results
    * @return obstacles The output obstacles saved in a list of unique_ptr.
    */
-  static std::list<std::unique_ptr<PathObstacle>> CreateObstacles(
+  static std::list<std::unique_ptr<Obstacle>> CreateObstacles(
       const prediction::PredictionObstacles& predictions);
 
-  static std::unique_ptr<PathObstacle> CreateStaticVirtualObstacles(
+  static std::unique_ptr<Obstacle> CreateStaticVirtualObstacles(
       const std::string& id, const common::math::Box2d& obstacle_box);
 
   static bool IsStaticObstacle(
@@ -265,9 +263,8 @@ class PathObstacle {
       s_longitudinal_decision_safety_sorter_;
 };
 
-typedef IndexedList<std::string, PathObstacle> IndexedObstacles;
-typedef ThreadSafeIndexedList<std::string, PathObstacle>
-    ThreadSafeIndexedObstacles;
+typedef IndexedList<std::string, Obstacle> IndexedObstacles;
+typedef ThreadSafeIndexedList<std::string, Obstacle> ThreadSafeIndexedObstacles;
 
 }  // namespace planning
 }  // namespace apollo

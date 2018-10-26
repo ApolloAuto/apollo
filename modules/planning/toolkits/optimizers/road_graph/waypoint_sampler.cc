@@ -204,7 +204,7 @@ bool WaypointSampler::SamplePathWaypoints(
 
 bool WaypointSampler::HasSidepass() {
   const auto &path_decision = reference_line_info_->path_decision();
-  for (const auto &obstacle : path_decision.path_obstacles().Items()) {
+  for (const auto &obstacle : path_decision.obstacles().Items()) {
     if (obstacle->LateralDecision().has_sidepass()) {
       sidepass_ = obstacle->LateralDecision().sidepass();
       return true;

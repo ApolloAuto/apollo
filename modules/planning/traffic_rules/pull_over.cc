@@ -145,20 +145,20 @@ PullOver::ValidateStopPointCode PullOver::IsValidStop(
 
   // check obstacles
   auto* path_decision = reference_line_info_->path_decision();
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    const PerceptionObstacle& perception_obstacle = path_obstacle->Perception();
+  for (const auto* obstacle : path_decision->obstacles().Items()) {
+    const PerceptionObstacle& perception_obstacle = obstacle->Perception();
     const std::string& obstacle_id = std::to_string(perception_obstacle.id());
     PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
     std::string obstacle_type_name =
         PerceptionObstacle_Type_Name(obstacle_type);
 
-    if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
+    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
              << "] VIRTUAL or NOT STATIC. SKIP";
       continue;
     }
 
-    const auto& obstacle_sl = path_obstacle->PerceptionSLBoundary();
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     if (!(parking_spot_boundary.start_s() > obstacle_sl.end_s() ||
           obstacle_sl.start_s() > parking_spot_boundary.end_s() ||
           parking_spot_boundary.start_l() > obstacle_sl.end_l() ||
@@ -650,9 +650,9 @@ int PullOver::BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
     AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
     return -1;
   }
-  PathObstacle* stop_wall = reference_line_info_->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info_->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for " << virtual_obstacle_id;
+    AERROR << "Failed to create obstacle for " << virtual_obstacle_id;
     return -1;
   }
 

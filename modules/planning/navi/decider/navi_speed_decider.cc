@@ -250,8 +250,8 @@ Status NaviSpeedDecider::Execute(Frame* frame,
 Status NaviSpeedDecider::MakeSpeedDecision(
     double start_v, double start_a, double start_da,
     const std::vector<PathPoint>& path_points,
-    const std::vector<const PathObstacle*>& obstacles,
-    const std::function<const PathObstacle*(const std::string&)>& find_obstacle,
+    const std::vector<const Obstacle*>& obstacles,
+    const std::function<const Obstacle*(const std::string&)>& find_obstacle,
     SpeedData* const speed_data) {
   CHECK_NOTNULL(speed_data);
   CHECK_GE(path_points.size(), 2);
@@ -366,9 +366,8 @@ Status NaviSpeedDecider::AddPerceptionRangeConstraints() {
 Status NaviSpeedDecider::AddObstaclesConstraints(
     double vehicle_speed, double path_length,
     const std::vector<PathPoint>& path_points,
-    const std::vector<const PathObstacle*>& obstacles,
-    const std::function<const PathObstacle*(const std::string&)>&
-        find_obstacle) {
+    const std::vector<const Obstacle*>& obstacles,
+    const std::function<const Obstacle*(const std::string&)>& find_obstacle) {
   const auto& vehicle_config = VehicleConfigHelper::Instance()->GetConfig();
   auto front_edge_to_center =
       vehicle_config.vehicle_param().front_edge_to_center();

@@ -56,13 +56,13 @@ class ReferenceLineInfo {
                              const ReferenceLine& reference_line,
                              const hdmap::RouteSegments& segments);
 
-  bool Init(const std::vector<const PathObstacle*>& obstacles);
+  bool Init(const std::vector<const Obstacle*>& obstacles);
 
   bool IsInited() const;
 
-  bool AddObstacles(const std::vector<const PathObstacle*>& obstacles);
-  PathObstacle* AddObstacle(const PathObstacle* obstacle);
-  bool AddObstacleHelper(const std::shared_ptr<PathObstacle>& obstacle);
+  bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
+  Obstacle* AddObstacle(const Obstacle* obstacle);
+  bool AddObstacleHelper(const std::shared_ptr<Obstacle>& obstacle);
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
@@ -186,7 +186,7 @@ class ReferenceLineInfo {
   bool CheckChangeLane() const;
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
-  bool IsUnrelaventObstacle(PathObstacle* path_obstacle);
+  bool IsUnrelaventObstacle(const Obstacle* obstacle);
 
   void MakeDecision(DecisionResult* decision_result) const;
   int MakeMainStopDecision(DecisionResult* decision_result) const;

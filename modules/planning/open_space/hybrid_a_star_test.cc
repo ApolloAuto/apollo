@@ -23,7 +23,7 @@
 #include "gtest/gtest.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/planning/common/path_obstacle.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/open_space/hybrid_a_star.h"
 
 namespace apollo {
@@ -60,9 +60,8 @@ TEST_F(HybridATest, test1) {
   Result result;
   Vec2d obstacle_center(0.0, 0.0);
   Box2d obstacle_box(obstacle_center, 0.0, 5.0, 5.0);
-  std::unique_ptr<PathObstacle> obstacle =
-      PathObstacle::CreateStaticVirtualObstacles("a box in center",
-                                                 obstacle_box);
+  std::unique_ptr<Obstacle> obstacle =
+      Obstacle::CreateStaticVirtualObstacles("a box in center", obstacle_box);
   obstacles_list.Add(obstacle->Id(), *obstacle);
   ASSERT_TRUE(
       hybrid_test->Plan(sx, sy, sphi, ex, ey, ephi, &obstacles_list, &result));

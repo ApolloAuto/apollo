@@ -79,8 +79,8 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       qp_st_speed_config_.total_path_length(), qp_st_speed_config_.total_time(),
       reference_line_info_->IsChangeLanePath());
 
-  for (const auto* path_obstacle : path_decision->path_obstacles().Items()) {
-    DCHECK(path_obstacle->HasLongitudinalDecision());
+  for (const auto* obstacle : path_decision->obstacles().Items()) {
+    DCHECK(obstacle->HasLongitudinalDecision());
   }
   // step 1 get boundaries
   path_decision->EraseStBoundaries();
@@ -91,7 +91,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
 
   std::vector<const StBoundary*> boundaries;
-  for (auto* obstacle : path_decision->path_obstacles().Items()) {
+  for (auto* obstacle : path_decision->obstacles().Items()) {
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
       path_decision->Find(id)->SetBlockingObstacle(true);
@@ -137,7 +137,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_,
                                         reference_line, path_data);
   SpeedLimit speed_limits;
-  if (speed_limit_decider.GetSpeedLimits(path_decision->path_obstacles(),
+  if (speed_limit_decider.GetSpeedLimits(path_decision->obstacles(),
                                          &speed_limits) != Status::OK()) {
     return Status(ErrorCode::PLANNING_ERROR,
                   "GetSpeedLimits for qp st speed optimizer failed!");

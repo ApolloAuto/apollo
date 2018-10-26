@@ -55,7 +55,7 @@ bool DpStSpeedOptimizer::SearchStGraph(
     SpeedData* speed_data, PathDecision* path_decision,
     STGraphDebug* st_graph_debug) const {
   std::vector<const StBoundary*> boundaries;
-  for (auto* obstacle : path_decision->path_obstacles().Items()) {
+  for (auto* obstacle : path_decision->obstacles().Items()) {
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
       if (obstacle->st_boundary().boundary_type() ==
@@ -99,7 +99,7 @@ bool DpStSpeedOptimizer::SearchStGraph(
   // step 2 perform graph search
   SpeedLimit speed_limit;
   if (!speed_limit_decider
-           .GetSpeedLimits(path_decision->path_obstacles(), &speed_limit)
+           .GetSpeedLimits(path_decision->obstacles(), &speed_limit)
            .ok()) {
     AERROR << "Getting speed limits for dp st speed optimizer failed!";
     return false;
@@ -108,10 +108,9 @@ bool DpStSpeedOptimizer::SearchStGraph(
   const float path_length = path_data.discretized_path().Length();
   StGraphData st_graph_data(boundaries, init_point_, speed_limit, path_length);
 
-  DpStGraph st_graph(
-      st_graph_data, dp_st_speed_config_,
-      reference_line_info_->path_decision()->path_obstacles().Items(),
-      init_point_, adc_sl_boundary_);
+  DpStGraph st_graph(st_graph_data, dp_st_speed_config_,
+                     reference_line_info_->path_decision()->obstacles().Items(),
+                     init_point_, adc_sl_boundary_);
 
   if (!st_graph.Search(speed_data).ok()) {
     AERROR << "failed to search graph with dynamic programming.";

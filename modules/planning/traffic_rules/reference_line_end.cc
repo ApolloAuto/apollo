@@ -57,7 +57,7 @@ Status ReferenceLineEnd::ApplyRule(
     return Status(common::PLANNING_ERROR,
                   "Failed to create reference line end obstacle");
   }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
     return Status(
         common::PLANNING_ERROR,

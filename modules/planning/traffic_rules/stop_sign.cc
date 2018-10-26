@@ -92,10 +92,9 @@ void StopSign::MakeDecisions(Frame* frame,
       stop_status_ == StopSignStatus::WAIT) {
     auto* path_decision = reference_line_info->path_decision();
     if (stop_status_ == StopSignStatus::DRIVE) {
-      for (const auto* path_obstacle :
-           path_decision->path_obstacles().Items()) {
+      for (const auto* obstacle : path_decision->obstacles().Items()) {
         // add to watch_vehicles if adc is still proceeding to stop sign
-        AddWatchVehicle(*path_obstacle, &watch_vehicles);
+        AddWatchVehicle(*obstacle, &watch_vehicles);
       }
     } else if (!watch_vehicles.empty() &&
                (stop_status_ == StopSignStatus::STOP ||
@@ -108,10 +107,9 @@ void StopSign::MakeDecisions(Frame* frame,
                   std::back_inserter(watch_vehicle_ids));
       }
 
-      for (const auto* path_obstacle :
-           path_decision->path_obstacles().Items()) {
+      for (const auto* obstacle : path_decision->obstacles().Items()) {
         // remove from watch_vehicles if adc is stopping/waiting at stop sign
-        RemoveWatchVehicle(*path_obstacle, watch_vehicle_ids, &watch_vehicles);
+        RemoveWatchVehicle(*obstacle, watch_vehicle_ids, &watch_vehicles);
       }
     }
 
@@ -284,12 +282,12 @@ bool StopSign::CheckCreepDone(ReferenceLineInfo* const reference_line_info) {
       creep_stop_s - reference_line_info->AdcSlBoundary().end_s();
   if (distance < config_.stop_sign().creep().max_valid_stop_distance()) {
     bool all_far_away = true;
-    for (auto* path_obstacle :
-         reference_line_info->path_decision()->path_obstacles().Items()) {
-      if (path_obstacle->IsVirtual() || !path_obstacle->IsStatic()) {
+    for (auto* obstacle :
+         reference_line_info->path_decision()->obstacles().Items()) {
+      if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
         continue;
       }
-      if (path_obstacle->reference_line_st_boundary().min_t() <
+      if (obstacle->reference_line_st_boundary().min_t() <
           config_.stop_sign().creep().min_boundary_t()) {
         all_far_away = false;
         break;
@@ -472,11 +470,11 @@ void StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
 /**
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
-int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
+int StopSign::AddWatchVehicle(const Obstacle& obstacle,
                               StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
+  const PerceptionObstacle& perception_obstacle = obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
@@ -568,12 +566,11 @@ int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
 int StopSign::RemoveWatchVehicle(
-    const PathObstacle& path_obstacle,
-    const std::vector<std::string>& watch_vehicle_ids,
+    const Obstacle& obstacle, const std::vector<std::string>& watch_vehicle_ids,
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle = path_obstacle.Perception();
+  const PerceptionObstacle& perception_obstacle = obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
@@ -614,7 +611,7 @@ int StopSign::RemoveWatchVehicle(
 
   bool erase = false;
 
-  bool is_path_cross = !path_obstacle.reference_line_st_boundary().IsEmpty();
+  bool is_path_cross = !obstacle.reference_line_st_boundary().IsEmpty();
 
   // check obstacle is on an associate lane guarded by stop sign
   const std::string& obstable_lane_id = obstacle_lane.get()->id().id();
@@ -691,13 +688,13 @@ int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
   CHECK_NOTNULL(reference_line_info);
   CHECK_NOTNULL(watch_vehicles);
 
-  const auto& path_obstacles =
-      reference_line_info->path_decision()->path_obstacles().Items();
+  const auto& obstacles =
+      reference_line_info->path_decision()->obstacles().Items();
   std::unordered_set<std::string> obstacle_ids;
-  std::transform(path_obstacles.begin(), path_obstacles.end(),
+  std::transform(obstacles.begin(), obstacles.end(),
                  std::inserter(obstacle_ids, obstacle_ids.end()),
-                 [](const PathObstacle* path_obstacle) {
-                   return std::to_string(path_obstacle->Perception().id());
+                 [](const Obstacle* obstacle) {
+                   return std::to_string(obstacle->Perception().id());
                  });
 
   for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
@@ -764,9 +761,9 @@ int StopSign::BuildStopDecision(Frame* frame,
     AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
     return -1;
   }
-  PathObstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
   if (!stop_wall) {
-    AERROR << "Failed to create path_obstacle for: " << stop_wall_id;
+    AERROR << "Failed to create obstacle for: " << stop_wall_id;
     return -1;
   }
 

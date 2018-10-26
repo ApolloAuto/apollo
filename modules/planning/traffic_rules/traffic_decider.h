@@ -38,7 +38,7 @@ namespace planning {
  * @class TrafficDecider
  * @brief Create traffic related decision in this class.
  * The created obstacles is added to obstacles_, and the decision is added to
- * path_obstacles_
+ * obstacles_
  * Traffic obstacle examples include:
  *  * Traffic Light
  *  * End of routing

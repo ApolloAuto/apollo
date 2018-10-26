@@ -81,8 +81,8 @@ class NaviSpeedDecider : public NaviTask {
   apollo::common::Status MakeSpeedDecision(
       double start_v, double start_a, double start_da,
       const std::vector<common::PathPoint>& path_points,
-      const std::vector<const PathObstacle*>& obstacles,
-      const std::function<const PathObstacle*(const std::string& id)>&
+      const std::vector<const Obstacle*>& obstacles,
+      const std::function<const Obstacle*(const std::string& id)>&
           find_obstacle,
       SpeedData* const speed_data);
 
@@ -104,8 +104,8 @@ class NaviSpeedDecider : public NaviTask {
   apollo::common::Status AddObstaclesConstraints(
       double vehicle_speed, double path_length,
       const std::vector<common::PathPoint>& path_points,
-      const std::vector<const PathObstacle*>& obstacles,
-      const std::function<const PathObstacle*(const std::string& id)>&
+      const std::vector<const Obstacle*>& obstacles,
+      const std::function<const Obstacle*(const std::string& id)>&
           find_obstacle);
 
   /**
