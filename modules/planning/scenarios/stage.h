@@ -65,6 +65,8 @@ class Stage {
    */
   const std::vector<Task*>& TaskList() const { return task_list_; }
 
+  const std::string& Name() const;
+
   template <typename T>
   T* GetContextAs() {
     return static_cast<T*>(context_);
@@ -85,6 +87,7 @@ class Stage {
   ScenarioConfig::StageConfig config_;
   ScenarioConfig::StageType next_stage_;
   void* context_;
+  std::string name_;
 };
 
 #define DECLARE_STAGE(NAME, CONTEXT)                                       \

@@ -42,9 +42,7 @@ Status PublicRoadPlanner::Init(const PlanningConfig& config) {
 
 Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
                                Frame* frame) {
-  if (!scenario_) {  // initial condition
-    scenario_manager_.Update(planning_start_point, *frame);
-  }
+  scenario_manager_.Update(planning_start_point, *frame);
   scenario_ = scenario_manager_.mutable_scenario();
   auto result = scenario_->Process(planning_start_point, frame);
   if (result == scenario::Scenario::STATUS_DONE) {

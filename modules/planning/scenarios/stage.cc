@@ -30,6 +30,7 @@ namespace planning {
 namespace scenario {
 
 Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
+  name_ = ScenarioConfig::StageType_Name(config_.stage_type());
   next_stage_ = config_.stage_type();
   std::unordered_map<TaskConfig::TaskType, const TaskConfig*, std::hash<int>>
       config_map;
@@ -46,6 +47,8 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
     tasks_[task_type] = std::move(ptr);
   }
 }
+
+const std::string& Stage::Name() const { return name_; }
 
 Task* Stage::FindTask(TaskConfig::TaskType task_type) const {
   auto iter = tasks_.find(task_type);

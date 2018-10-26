@@ -57,6 +57,7 @@ Scenario::ScenarioStatus Scenario::Process(
   }
   auto ret = current_stage_->Process(planning_init_point, frame);
   if (ret == Stage::ERROR) {
+    AERROR << "Stage '" << current_stage_->Name() << "' returns error";
     return STATUS_UNKNOWN;
   } else if (ret == Stage::RUNNING) {
     return STATUS_PROCESSING;
