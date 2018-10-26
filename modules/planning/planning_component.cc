@@ -17,6 +17,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
@@ -31,6 +32,7 @@ using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
+using apollo::common::time::Clock;
 
 bool PlanningComponent::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
@@ -38,6 +40,10 @@ bool PlanningComponent::Init() {
       << "failed to load planning config file " << FLAGS_planning_config_file;
 
   planning_base_->Init(config_);
+
+  if (FLAGS_use_sim_time) {
+    Clock::SetMode(Clock::MOCK);
+  }
 
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       FLAGS_routing_response_topic,
@@ -89,6 +95,10 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
   CHECK(prediction_obstacles != nullptr);
+
+  if (FLAGS_use_sim_time) {
+    Clock::SetNowInSeconds(localization_estimate->header().timestamp_sec());
+  }
 
   // check and process possible rerouting request
   CheckRerouting();
