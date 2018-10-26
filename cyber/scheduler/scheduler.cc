@@ -150,7 +150,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
 
   auto task_id = GlobalData::RegisterTaskName(name);
   {
-    ReadLockGuard<AtomicRWLock> rw(rw_lock_);
+    ReadLockGuard<AtomicRWLock> rg(rw_lock_);
     if (cr_ctx_.find(task_id) != cr_ctx_.end()) {
       AERROR << "Routine [" << name << "] has been exists";
       return false;
@@ -183,7 +183,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     }
   }
 
-  WriteLockGuard<AtomicRWLock> rw(rw_lock_);
+  WriteLockGuard<AtomicRWLock> rg(rw_lock_);
   if (!proc_ctxs_[0]->DispatchTask(cr)) {
     return false;
   }
@@ -203,7 +203,7 @@ bool Scheduler::NotifyProcessor(uint64_t cr_id) {
     return true;
   }
 
-  ReadLockGuard<AtomicRWLock> rw(rw_lock_);
+  ReadLockGuard<AtomicRWLock> rg(rw_lock_);
   auto itr = cr_ctx_.find(cr_id);
   if (itr != cr_ctx_.end()) {
     proc_ctxs_[itr->second]->Notify(cr_id);
@@ -220,7 +220,7 @@ bool Scheduler::RemoveTask(const std::string& name) {
 
   auto task_id = GlobalData::RegisterTaskName(name);
   {
-    WriteLockGuard<AtomicRWLock> rw(rw_lock_);
+    WriteLockGuard<AtomicRWLock> wg(rw_lock_);
     cr_ctx_.erase(task_id);
   }
 

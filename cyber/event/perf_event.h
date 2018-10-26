@@ -45,7 +45,8 @@ enum class SchedPerf {
   SWAP_IN = 1,
   SWAP_OUT = 2,
   NOTIFY_IN = 3,
-  NEXT_ROUTINE = 4,
+  NEXT_RT = 4,
+  RT_CREATE = 5,
 };
 
 class EventBase {
