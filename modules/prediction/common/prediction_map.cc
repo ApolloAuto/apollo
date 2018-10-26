@@ -607,5 +607,16 @@ int PredictionMap::LaneTurnType(const std::string& lane_id) {
   return 1;
 }
 
+std::vector<std::shared_ptr<const LaneInfo>> PredictionMap::GetNearbyLanes(
+    const common::PointENU& position, const double nearby_radius) {
+  CHECK(position.has_x() && position.has_y() && position.has_z());
+  CHECK(nearby_radius > 0.0);
+
+  std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
+
+  HDMapUtil::BaseMap().GetLanes(position, nearby_radius, &nearby_lanes);
+  return nearby_lanes;
+}
+
 }  // namespace prediction
 }  // namespace apollo

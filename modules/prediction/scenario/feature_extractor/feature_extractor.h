@@ -75,7 +75,8 @@ class FeatureExtractor {
       EnvironmentFeatures* ptr_environment_features);
 
   static std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(
-      const common::math::Vec2d& ego_position);
+      const common::Point3D& position,
+      const double heading);
 };
 
 }  // namespace prediction
