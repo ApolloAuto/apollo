@@ -53,6 +53,37 @@ CollisionChecker::CollisionChecker(
 }
 
 bool CollisionChecker::InCollision(
+    const std::vector<const Obstacle*>& obstacles,
+    const DiscretizedTrajectory& ego_trajectory, const double ego_length,
+    const double ego_width, const double ego_back_edge_to_center) {
+  for (std::size_t i = 0; i < ego_trajectory.NumOfPoints(); ++i) {
+    const auto& ego_point = ego_trajectory.TrajectoryPointAt(i);
+    const auto relative_time = ego_point.relative_time();
+    const auto ego_theta = ego_point.path_point().theta();
+
+    Box2d ego_box({ego_point.path_point().x(), ego_point.path_point().y()},
+        ego_theta, ego_length, ego_width);
+
+    // correct the inconsistency of reference point and center point
+    // TODO(all): move the logic before constructing the ego_box
+    double shift_distance = ego_length / 2.0 - ego_back_edge_to_center;
+    Vec2d shift_vec(shift_distance * std::cos(ego_theta), shift_distance
+        * std::sin(ego_theta));
+    ego_box.Shift(shift_vec);
+
+    std::vector<Box2d> obstacle_boxes;
+    for (const auto obstacle : obstacles) {
+      auto obtacle_point = obstacle->GetPointAtTime(relative_time);
+      Box2d obstacle_box = obstacle->GetBoundingBox(obtacle_point);
+      if (ego_box.HasOverlap(obstacle_box)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool CollisionChecker::InCollision(
     const DiscretizedTrajectory& discretized_trajectory) {
   CHECK_LE(discretized_trajectory.NumOfPoints(),
            predicted_bounding_rectangles_.size());
