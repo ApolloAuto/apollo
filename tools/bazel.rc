@@ -62,7 +62,7 @@ build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 # build with profiling
 build:cpu_prof --linkopt=-lprofiler
 
-build --copt="-Werror=sign-compare"
+#build --copt="-Werror=sign-compare"
 build --copt="-Werror=return-type"
 build --copt="-Werror=reorder"
 build --copt="-Werror=unused-variable"
