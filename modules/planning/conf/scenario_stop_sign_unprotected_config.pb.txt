@@ -65,6 +65,7 @@ stage_config: {
   task_config : {
     task_type : PROCEED_WITH_CAUTION_SPEED
     proceed_with_caution_speed_config : {
+      max_distance : 5.0
     }
   }
 }

@@ -3,11 +3,5 @@ syntax = "proto2";
 package apollo.planning;
 
 message ProceedWithCautionSpeedConfig {
-  enum Type {
-    FIXED_SPEED = 0;
-    FIXED_DISTANCE = 1;
-  }
-  optional Type type = 1;
-  optional double max_speed = 2 [ default=2.23]; // unit: m/s. (5 mph)
-  optional double max_distance = 3 [ default=5.0]; // unit: meters
+  optional double max_distance = 1 [ default=5.0]; // unit: meters
 }

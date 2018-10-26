@@ -137,8 +137,8 @@ void DeciderCreep::SetProceedWithCautionSpeedParam(
   const double creep_distance =
       adc_center_sl.s() + FindCreepDistance(frame, reference_line_info);
 
-  PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.type =
-      PlanningContext::ProceedWithCautionSpeedParam::Type::FIXED_DISTANCE;
+  PlanningContext::GetScenarioInfo()
+      ->proceed_with_caution_speed.is_fixed_distance = true;
   PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.distance =
       creep_distance;
 }
