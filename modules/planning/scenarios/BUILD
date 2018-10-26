@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "scenario.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":stage",
         "//modules/common",
@@ -26,6 +27,7 @@ cc_library(
     hdrs = [
         "stage.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_common",
@@ -42,6 +44,7 @@ cc_library(
     hdrs = [
         "scenario_manager.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_common",

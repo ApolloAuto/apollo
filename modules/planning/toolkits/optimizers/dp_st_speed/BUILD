@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "st_graph_point.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/speed:st_point",
@@ -24,6 +25,7 @@ cc_library(
     hdrs = [
         "dp_st_cost.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":st_graph_point",
         "//modules/common/proto:pnc_point_proto",
@@ -42,6 +44,7 @@ cc_library(
     hdrs = [
         "dp_st_graph.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":dp_st_cost",
         ":st_graph_point",
@@ -68,6 +71,7 @@ cc_library(
     hdrs = [
         "dp_st_speed_optimizer.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":dp_st_cost",
         ":dp_st_graph",

@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "open_space_planner.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/open_space:distance_approach_problem",
         "//modules/planning/open_space:hybrid_a_star",

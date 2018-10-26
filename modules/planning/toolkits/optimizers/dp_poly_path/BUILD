@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "dp_poly_path_optimizer.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/toolkits/optimizers:path_optimizer",
         "//modules/planning/toolkits/optimizers/road_graph",

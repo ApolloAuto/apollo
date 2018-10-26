@@ -4,6 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "lane_follow",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":lane_follow_scenario",
         ":lane_follow_stage",
@@ -18,6 +19,7 @@ cc_library(
     hdrs = [
         "lane_follow_stage.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//external:gflags",
@@ -58,6 +60,7 @@ cc_library(
     hdrs = [
         "lane_follow_scenario.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":lane_follow_stage",
         "//cyber/common:log",

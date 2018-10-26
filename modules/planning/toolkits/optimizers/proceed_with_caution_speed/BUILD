@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "proceed_with_caution_speed_generator.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",

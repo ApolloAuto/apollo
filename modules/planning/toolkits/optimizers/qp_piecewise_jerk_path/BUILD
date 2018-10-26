@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "qp_piecewise_jerk_path_optimizer.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",

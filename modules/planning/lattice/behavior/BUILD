@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "feasible_region.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
@@ -25,6 +26,7 @@ cc_library(
     hdrs = [
         "path_time_graph.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common",
@@ -47,6 +49,7 @@ cc_library(
     hdrs = [
         "prediction_querier.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/math",
         "//modules/common/math:path_matcher",

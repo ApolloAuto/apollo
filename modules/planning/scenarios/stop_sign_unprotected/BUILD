@@ -12,6 +12,7 @@ cc_library(
         "stop_sign_unprotected_scenario.h",
         "stop_sign_unprotected_stage.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//external:gflags",
         "//cyber/common:log",
@@ -28,12 +29,8 @@ cc_library(
 cc_test(
     name = "stop_sign_unprotected_scenario_test",
     size = "small",
-    srcs = [
-        "stop_sign_unprotected_scenario_test.cc",
-    ],
-    data = [
-        "//modules/planning:planning_conf",
-    ],
+    srcs = ["stop_sign_unprotected_scenario_test.cc",],
+    data = ["//modules/planning:planning_conf",],
     deps = [
         ":stop_sign_unprotected_scenario",
         "@gtest//:main",

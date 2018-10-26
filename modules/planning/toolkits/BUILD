@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "task.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
         "//modules/planning/common:frame",
@@ -28,6 +29,7 @@ cc_library(
     hdrs = [
         "task_factory.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":task",
         "//modules/planning/proto:planning_config_proto",

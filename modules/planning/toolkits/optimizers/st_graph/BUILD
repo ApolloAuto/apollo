@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "st_graph_data.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:speed_limit",
@@ -27,6 +28,7 @@ cc_library(
         "speed_limit_decider.h",
         "st_boundary_mapper.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",

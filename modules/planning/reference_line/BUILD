@@ -12,6 +12,7 @@ cc_library(
         "reference_line.h",
         "reference_point.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
@@ -30,6 +31,7 @@ cc_library(
     hdrs = [
         "reference_line_smoother.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/proto:reference_line_smoother_config_proto",
     ],
@@ -43,6 +45,7 @@ cc_library(
     hdrs = [
         "qp_spline_reference_line_smoother.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":reference_line",
         ":reference_line_smoother",
@@ -66,6 +69,7 @@ cc_library(
         "spiral_problem_interface.h",
         "spiral_reference_line_smoother.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":reference_line",
         ":reference_line_smoother",
@@ -89,6 +93,7 @@ cc_library(
         "cos_theta_problem_interface.h",
         "cos_theta_reference_line_smoother.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":qp_spline_reference_line_smoother",
         ":reference_line",
@@ -144,6 +149,7 @@ cc_library(
     hdrs = [
         "reference_line_provider.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":cos_theta_reference_line_smoother",
         ":qp_spline_reference_line_smoother",

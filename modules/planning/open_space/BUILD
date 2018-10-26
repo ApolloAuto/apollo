@@ -6,6 +6,7 @@ cc_library(
     name = "node3d",
     srcs = ["node3d.cc"],
     hdrs = ["node3d.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
@@ -19,6 +20,7 @@ cc_library(
     name = "reeds_shepp_path",
     srcs = ["reeds_shepp_path.cc"],
     hdrs = ["reeds_shepp_path.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -30,6 +32,7 @@ cc_library(
 
 cc_library(
     name = "open_space_utils",
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/open_space:node3d",
         "//modules/planning/open_space:reeds_shepp_path",
@@ -69,6 +72,7 @@ cc_library(
     hdrs = [
         "dual_variable_warm_start_problem.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "dual_variable_warm_start_ipopt_interface",
     ],
@@ -82,6 +86,7 @@ cc_library(
     hdrs = [
         "dual_variable_warm_start_ipopt_interface.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -102,6 +107,7 @@ cc_library(
     hdrs = [
         "distance_approach_problem.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "distance_approach_ipopt_interface",
         "//cyber/common:log",
@@ -119,6 +125,7 @@ cc_library(
     hdrs = [
         "distance_approach_ipopt_interface.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -190,6 +197,7 @@ cc_library(
     hdrs = [
         "hybrid_a_star.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",

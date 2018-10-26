@@ -37,6 +37,7 @@ cc_library(
         "traffic_rule.h",
         "util.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/util:factory",
         "//modules/common/util:map_util",
@@ -59,6 +60,7 @@ cc_library(
     hdrs = [
         "traffic_decider.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":traffic_rules",
         "//modules/common/status",

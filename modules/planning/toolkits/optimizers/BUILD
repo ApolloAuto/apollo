@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "path_optimizer.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
         "//modules/planning/common:path_decision",
@@ -29,6 +30,7 @@ cc_library(
     hdrs = [
         "speed_optimizer.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
         "//modules/planning/common:path_decision",
