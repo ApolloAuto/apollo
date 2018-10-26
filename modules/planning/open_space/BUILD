@@ -244,4 +244,30 @@ cc_binary(
     ],
 )
 
+cc_library(
+    name = "open_space_trajectory_generator",
+    srcs = [
+        "open_space_trajectory_generator.cc",
+    ],
+    hdrs = [
+        "open_space_trajectory_generator.h",
+    ],
+    deps = [
+        "distance_approach_problem",
+        "hybrid_a_star",
+        "//external:gflags",
+        "//cyber/common:log",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/status",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/map/hdmap",
+        "//modules/planning/common:planning_common",
+        "//modules/planning/common:frame",
+        "//modules/planning/proto:planning_proto",
+        "@eigen//:eigen",
+    ],
+)
+
 cpplint()
