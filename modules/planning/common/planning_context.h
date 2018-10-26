@@ -41,12 +41,6 @@ namespace planning {
 class PlanningContext {
  public:
   struct ProceedWithCautionSpeedParam {
-    enum class Type {
-      FIXED_SPEED,
-      FIXED_DISTANCE,
-    };
-    Type type = Type::FIXED_SPEED;
-    double speed = 2.23;  // m/s. (5 mph)
     bool is_fixed_distance = false;
     double distance = 5.0;  // m
   };
