@@ -211,6 +211,7 @@ proto_library(
     ],
     deps = [
         ":decision_proto_lib",
+        ":planning_config_proto_lib",
         ":sl_boundary_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:header_proto_lib",

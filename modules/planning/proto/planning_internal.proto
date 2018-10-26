@@ -12,6 +12,7 @@ import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/sl_boundary.proto";
 import "modules/planning/proto/decision.proto";
+import "modules/planning/proto/planning_config.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -117,6 +118,12 @@ message DpPolyGraphDebug {
   repeated apollo.common.SLPoint min_cost_point = 2;
 }
 
+message ScenarioDebug {
+  optional apollo.planning.ScenarioConfig.ScenarioType scenario_type = 1;
+  optional apollo.planning.ScenarioConfig.StageType stage_type = 2;
+}
+
+// next ID: 27
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -141,6 +148,7 @@ message PlanningData {
   optional AutoTuningTrainingData auto_tuning_training_data = 23;
   optional double front_clear_distance = 24;
   repeated apollo.dreamview.Chart chart = 25;
+  optional ScenarioDebug scenario = 26;
 }
 
 message LatticeStPixel {
