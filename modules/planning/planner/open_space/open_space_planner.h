@@ -20,7 +20,11 @@
 
 #pragma once
 
+#include <atomic>
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -79,7 +83,14 @@ class OpenSpacePlanner : public Planner {
       const common::TrajectoryPoint& planning_init_point,
       Frame* frame) override;
 
-  void Stop() override {}
+  apollo::common::Status GenerateTrajectoryThread(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame);
+
+  bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
+
+  void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
+
+  void Stop() override;
 
  private:
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
@@ -100,6 +111,23 @@ class OpenSpacePlanner : public Planner {
   double ts_ = 0;
   Eigen::MatrixXd ego_;
   Eigen::MatrixXd XYbounds_;
+
+  std::future<void> task_future_;
+  std::atomic<bool> is_stop_{false};
+
+  std::mutex open_space_mutex_;
+
+  ADCTrajectory current_trajectory_;
+  ADCTrajectory stop_trajectory_;
+  std::list<ADCTrajectory> trajectories_;
+  std::queue<ADCTrajectory> trajectory_history_;
+
+  std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
+
+  std::size_t obstacles_num_ = 0;
+  Eigen::MatrixXd obstacles_edges_num_;
+  Eigen::MatrixXd obstacles_A_;
+  Eigen::MatrixXd obstacles_b_;
 };
 
 }  // namespace planning

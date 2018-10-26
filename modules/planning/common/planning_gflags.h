@@ -225,3 +225,5 @@ DECLARE_bool(export_chart);
 DECLARE_bool(enable_record_debug);
 
 DECLARE_double(default_front_clear_distance);
+
+DECLARE_bool(enable_open_space_planner_thread);
