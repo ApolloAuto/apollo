@@ -398,7 +398,7 @@ Status Frame::Init(
   return Status::OK();
 }
 
-const Obstacle *Frame::FindCollisionObstacleWithInExtraRadius(
+const PathObstacle *Frame::FindCollisionObstacleWithInExtraRadius(
     const double radius) const {
   CHECK_GT(radius, kMathEpsilon)
       << "Extra safety radius must be positive number!";
