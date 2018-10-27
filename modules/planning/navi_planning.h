@@ -24,6 +24,7 @@
 
 #include "modules/planning/proto/pad_msg.pb.h"
 
+#include "modules/common/util/thread_pool.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 #include "modules/planning/planner/planner_dispatcher.h"
