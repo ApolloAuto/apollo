@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: prediction
+        dag: /apollo/modules/prediction/dag/prediction.dag
+        process_name: prediction
+        version: 1.0.0.0

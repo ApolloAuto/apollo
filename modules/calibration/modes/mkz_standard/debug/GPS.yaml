@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: gnss
+        dag: /apollo/modules/drivers/gnss/dag/gnss.dag
+        process_name: gnss
+        version: 1.0.0.0

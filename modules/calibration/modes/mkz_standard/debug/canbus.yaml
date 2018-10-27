@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: canbus
+        dag: /apollo/modules/canbus/dag/canbus.dag
+        process_name: canbus
+        version: 1.0.0.0

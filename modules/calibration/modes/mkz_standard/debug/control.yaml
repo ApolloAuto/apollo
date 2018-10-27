@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: control
+        dag: /apollo/modules/control/dag/control.dag
+        process_name: control
+        version: 1.0.0.0

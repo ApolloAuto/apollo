@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: camera
+        dag: /apollo/modules/drivers/camera/dag/camera.dag
+        process_name: camera
+        version: 1.0.0.0
