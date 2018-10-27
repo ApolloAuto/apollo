@@ -34,6 +34,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleState;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
@@ -75,17 +76,20 @@ Status OpenSpaceTrajectoryGenerator::Init(const PlanningConfig&) {
 }
 
 apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
-    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+    const VehicleState& vehicle_state, double rotate_angle,
+    const Vec2d& translate_origin, const std::vector<double>& end_pose,
+    std::size_t obstacles_num, Eigen::MatrixXd& obstacles_edges_num,
+    Eigen::MatrixXd& obstacles_A, Eigen::MatrixXd& obstacles_b,
+    ThreadSafeIndexedObstacles* obstalce_list) {
   // initial state
-  init_state_ = frame->vehicle_state();
+  init_state_ = vehicle_state;
   init_x_ = init_state_.x();
   init_y_ = init_state_.y();
   init_phi_ = init_state_.heading();
   init_v_ = init_state_.linear_velocity();
   // rotate and scale the state according to the origin point defined in
   // frame
-  double rotate_angle = frame->origin_heading();
-  const Vec2d& translate_origin = frame->origin_point();
+
   init_x_ = init_x_ - translate_origin.x();
   init_y_ = init_y_ - translate_origin.y();
   double tmp_x = init_x_;
@@ -102,20 +106,11 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   last_time_u << init_steer_, init_a_;
 
   // final state
-  const std::vector<double>& end_pose = frame->open_space_end_pose();
   Eigen::MatrixXd xF(4, 1);
   xF << end_pose[0], end_pose[1], end_pose[2], end_pose[3];
 
-  // vertices using V-represetntation (counter clock wise)
-  std::size_t obstacles_num = frame->obstacles_num();
-  Eigen::MatrixXd obstacles_edges_num = frame->obstacles_edges_num();
-  Eigen::MatrixXd obstacles_A = frame->obstacles_A();
-  Eigen::MatrixXd obstacles_b = frame->obstacles_b();
-
   // Warm Start (initial velocity is assumed to be 0 for now)
   Result result;
-  ThreadSafeIndexedObstacles* obstalce_list =
-      frame->openspace_warmstart_obstacles();
 
   if (warm_start_->Plan(x0(0, 0), x0(1, 0), x0(2, 0), xF(0, 0), xF(1, 0),
                         xF(2, 0), obstalce_list, &result)) {

@@ -71,10 +71,14 @@ class OpenSpaceTrajectoryGenerator {
   apollo::common::Status Init(const PlanningConfig& config);
 
   /**
-   * @brief override function Plan in parent class Planner.
+   * @brief plan for open space trajectory generators.
    */
   apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame);
+      const apollo::common::VehicleState& vehicle_state, double rotate_angle,
+      const apollo::common::math::Vec2d& translate_origin,
+      const std::vector<double>& end_pose, std::size_t obstacles_num,
+      Eigen::MatrixXd& obstacles_edges_num, Eigen::MatrixXd& obstacles_A,
+      Eigen::MatrixXd& obstacles_b, ThreadSafeIndexedObstacles* obstalce_list);
 
   bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
 
