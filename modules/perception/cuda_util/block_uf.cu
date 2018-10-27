@@ -176,9 +176,8 @@ bool BlockUnionFind(const unsigned char* img, int width, int height,
 
   dim3 block(UF_BLOCK_WIDTH, UF_BLOCK_HEIGHT);
   dim3 grid(
-      static_cast<unsigned int>((width + UF_BLOCK_WIDTH - 1) / UF_BLOCK_WIDTH),
-      static_cast<unsigned int>((height + UF_BLOCK_HEIGHT - 1) /
-                                UF_BLOCK_HEIGHT));
+      static_cast<unsigned int>((width + block.x - 1) / block.x),
+      static_cast<unsigned int>((height + block.y - 1) / block.y));
   cuda_err = cudaGetLastError();
   if (cuda_err != cudaSuccess) {
     std::cerr << "failed to start block union find with CUDA: "
