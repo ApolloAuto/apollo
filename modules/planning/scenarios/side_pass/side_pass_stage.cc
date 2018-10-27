@@ -53,25 +53,42 @@ Stage::StageStatus SidePassApproachObstacle::Process(
       frame->reference_line_info().front();
   double adc_velocity = frame->vehicle_state().linear_velocity();
   double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const PathDecision& path_decision = reference_line_info.path_decision();
 
-  const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
-  double obstacle_start_s = 0.0;
-  for (const auto& overlap : first_overlaps) {
-    if (overlap.first == ReferenceLineInfo::OBSTACLE) {
-      obstacle_start_s = overlap.second.start_s;
+  double front_obstacle_distance = 1000;
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
+
+    bool is_on_road = reference_line_info.reference_line().HasOverlap(
+        obstacle->PerceptionBoundingBox());
+    if (!is_on_road) {
+      continue;
+    }
+
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
+    if (obstacle_sl.end_s() <= reference_line_info.AdcSlBoundary().start_s()) {
+      continue;
+    }
+
+    double distance = obstacle_sl.start_s() - adc_front_edge_s;
+    if (distance < front_obstacle_distance) {
+      front_obstacle_distance = distance;
     }
   }
-  if ((obstacle_start_s - adc_front_edge_s) < 0) {
+
+  if ((front_obstacle_distance) < 0) {
     AERROR << "Stage " << Name() << " error: "
            << "front obstacle has wrong position.";
     return Stage::ERROR;
   }
   // TODO(all): stage params need to be in config file
   double max_stop_velocity = 1.0e-5;
-  double max_stop_obstacle_distance = 5;
+  double min_stop_obstacle_distance = 5;
 
   if (adc_velocity < max_stop_velocity &&
-      (obstacle_start_s - adc_front_edge_s) < max_stop_obstacle_distance) {
+      front_obstacle_distance < min_stop_obstacle_distance) {
     next_stage_ = ScenarioConfig::SIDE_PASS_GENERATE_PATH;
     return Stage::FINISHED;
   }
