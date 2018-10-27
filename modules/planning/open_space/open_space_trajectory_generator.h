@@ -78,8 +78,9 @@ class OpenSpaceTrajectoryGenerator {
       const apollo::common::VehicleState& vehicle_state, double rotate_angle,
       const apollo::common::math::Vec2d& translate_origin,
       const std::vector<double>& end_pose, std::size_t obstacles_num,
-      Eigen::MatrixXd& obstacles_edges_num, Eigen::MatrixXd& obstacles_A,
-      Eigen::MatrixXd& obstacles_b, ThreadSafeIndexedObstacles* obstalce_list);
+      const Eigen::MatrixXd& obstacles_edges_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+      ThreadSafeIndexedObstacles* obstalce_list);
 
   bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
 

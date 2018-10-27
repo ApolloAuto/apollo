@@ -120,10 +120,15 @@ class OpenSpacePlanner : public Planner {
 
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 
-  std::size_t obstacles_num_ = 0;
+  apollo::common::VehicleState vehicle_state_;
+  double rotate_angle_;
+  apollo::common::math::Vec2d translate_origin_;
+  std::vector<double> end_pose_;
+  std::size_t obstacles_num_;
   Eigen::MatrixXd obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
+  ThreadSafeIndexedObstacles* obstalce_list_;
 };
 
 }  // namespace planning
