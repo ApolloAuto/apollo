@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: guardian
+        dag: /apollo/modules/guardian/dag/guardian.dag
+        process_name: guardian
+        version: 1.0.0.0

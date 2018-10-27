@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: conti_radar
+        dag: /apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag
+        process_name: conti_radar
+        version: 1.0.0.0

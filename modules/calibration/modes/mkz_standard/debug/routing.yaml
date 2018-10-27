@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: routing
+        dag: /apollo/modules/routing/dag/routing.dag
+        process_name: routing
+        version: 1.0.0.0

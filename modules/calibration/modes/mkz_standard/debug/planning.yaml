@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: planning
+        dag: /apollo/modules/planning/dag/planning.dag
+        process_name: planning
+        version: 1.0.0.0

@@ -1,0 +1,8 @@
+description: cyber modules list config
+version: 1.0.0
+module:
+    -
+        name: perception
+        dag: /apollo/modules/perception/production/dag/dag_streaming_perception.dag
+        process_name: perception
+        version: 1.0.0.0
