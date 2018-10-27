@@ -137,7 +137,7 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
   }
 
   bool allowed_to_explore = true;
-  while (allowed_to_explore) {
+  do {
     std::vector<NodeWithRange> pred_set;
     for (const auto& edge :
          curr_passage->nodes.front().GetTopoNode()->InFromPreEdge()) {
@@ -165,12 +165,11 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
     if (pred_set.empty()) {
       allowed_to_explore = false;
     } else {
-      allowed_to_explore = true;
       const auto& node_to_insert = GetLargestRange(pred_set);
       curr_passage->nodes.insert(curr_passage->nodes.begin(), node_to_insert);
       node_set_of_curr_passage.emplace(node_to_insert.GetTopoNode());
     }
-  }
+  } while (allowed_to_explore);
 }
 
 void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
@@ -198,7 +197,7 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
   }
 
   bool allowed_to_explore = true;
-  while (allowed_to_explore) {
+  do {
     std::vector<NodeWithRange> succ_set;
     for (const auto& edge :
          curr_passage->nodes.back().GetTopoNode()->OutToSucEdge()) {
@@ -233,12 +232,11 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
     if (succ_set.empty()) {
       allowed_to_explore = false;
     } else {
-      allowed_to_explore = true;
       const auto& node_to_insert = GetLargestRange(succ_set);
       curr_passage->nodes.push_back(node_to_insert);
       node_set_of_curr_passage.emplace(node_to_insert.GetTopoNode());
     }
-  }
+  } while (allowed_to_explore);
 }
 
 void ResultGenerator::ExtendPassages(const TopoRangeManager& range_manager,

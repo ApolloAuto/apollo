@@ -126,7 +126,6 @@ bool ParseNavigationLineFileNames(
       initialized = true;
     } catch (const std::exception& e) {
       AERROR << "Failed to get navigation line filenames: " << e.what();
-      initialized = false;
     }
   }
 

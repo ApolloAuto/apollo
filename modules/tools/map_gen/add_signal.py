@@ -24,7 +24,7 @@ from google.protobuf import text_format
 from shapely.geometry import LineString, Point
 
 if len(sys.argv) < 3:
-    print("Usage: %s <fmap> <fsignal>" % sys.argv[0])
+    print("Usage: %s <map_data> <signal_data>" % sys.argv[0])
     sys.exit(1)
 
 fmap = sys.argv[1]
@@ -85,5 +85,5 @@ for stop_line in signal.stop_line:
             lanes_map[lane_id].overlap_id.add().id = overlap.id.id
 
 _map.signal.add().CopyFrom(signal)
-with open(fmap + "_" + fsignal, 'w') as f:
-    f.write(str(_map))
+with open(fmap + "_" + fsignal, 'w') as fmap:
+    fmap.write(str(_map))
