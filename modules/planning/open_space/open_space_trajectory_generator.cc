@@ -38,17 +38,12 @@ using apollo::common::VehicleState;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
-Status OpenSpaceTrajectoryGenerator::Init(const PlanningConfig&) {
+Status OpenSpaceTrajectoryGenerator::Init(
+    const PlannerOpenSpaceConfig& planner_open_space_config) {
   AINFO << "In OpenSpaceTrajectoryGenerator::Init()";
 
-  // TODO(QiL): integrate open_space planner into task config when refactor done
-  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
-                                       &planner_open_space_config_))
-      << "Failed to load open space config file "
-      << FLAGS_planner_open_space_config_filename;
-
   // nominal sampling time
-  ts_ = planner_open_space_config_.delta_t();
+  ts_ = planner_open_space_config.delta_t();
 
   // load vehicle configuration
   double front_to_center = vehicle_param_.front_edge_to_center();
@@ -58,19 +53,19 @@ Status OpenSpaceTrajectoryGenerator::Init(const PlanningConfig&) {
   ego_.resize(4, 1);
   ego_ << front_to_center, right_to_center, back_to_center, left_to_center;
   // load xy boundary into the Plan() from configuration(before ROI is done)
-  double x_max = planner_open_space_config_.warm_start_config().max_x();
-  double y_max = planner_open_space_config_.warm_start_config().max_y();
-  double x_min = planner_open_space_config_.warm_start_config().min_x();
-  double y_min = planner_open_space_config_.warm_start_config().min_y();
+  double x_max = planner_open_space_config.warm_start_config().max_x();
+  double y_max = planner_open_space_config.warm_start_config().max_y();
+  double x_min = planner_open_space_config.warm_start_config().min_x();
+  double y_min = planner_open_space_config.warm_start_config().min_y();
   XYbounds_.resize(4, 1);
   XYbounds_ << x_min, x_max, y_min, y_max;
 
   // initialize warm start class pointer
-  warm_start_.reset(new HybridAStar(planner_open_space_config_));
+  warm_start_.reset(new HybridAStar(planner_open_space_config));
 
   // initialize distance approach class pointer
   distance_approach_.reset(
-      new DistanceApproachProblem(planner_open_space_config_));
+      new DistanceApproachProblem(planner_open_space_config));
 
   return Status::OK();
 }

@@ -68,7 +68,8 @@ class OpenSpaceTrajectoryGenerator {
    */
   virtual ~OpenSpaceTrajectoryGenerator() = default;
 
-  apollo::common::Status Init(const PlanningConfig& config);
+  apollo::common::Status Init(
+      const PlannerOpenSpaceConfig& planner_open_space_config);
 
   /**
    * @brief plan for open space trajectory generators.

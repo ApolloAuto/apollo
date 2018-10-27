@@ -34,8 +34,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/open_space/distance_approach_problem.h"
-#include "modules/planning/open_space/hybrid_a_star.h"
+#include "modules/planning/open_space/open_space_trajectory_generator.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -83,8 +82,7 @@ class OpenSpacePlanner : public Planner {
       const common::TrajectoryPoint& planning_init_point,
       Frame* frame) override;
 
-  apollo::common::Status GenerateTrajectoryThread(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame);
+  void GenerateTrajectoryThread();
 
   bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
 
@@ -93,9 +91,9 @@ class OpenSpacePlanner : public Planner {
   void Stop() override;
 
  private:
-  std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
-  std::unique_ptr<::apollo::planning::DistanceApproachProblem>
-      distance_approach_;
+  std::unique_ptr<::apollo::planning::OpenSpaceTrajectoryGenerator>
+      open_space_trajectory_generator_;
+
   common::VehicleState init_state_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
@@ -114,13 +112,11 @@ class OpenSpacePlanner : public Planner {
 
   std::future<void> task_future_;
   std::atomic<bool> is_stop_{false};
+  std::atomic<bool> trajectory_updated_{false};
 
   std::mutex open_space_mutex_;
 
   ADCTrajectory current_trajectory_;
-  ADCTrajectory stop_trajectory_;
-  std::list<ADCTrajectory> trajectories_;
-  std::queue<ADCTrajectory> trajectory_history_;
 
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 
