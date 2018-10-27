@@ -73,8 +73,8 @@ Status OpenSpaceTrajectoryGenerator::Init(
 apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const VehicleState& vehicle_state, double rotate_angle,
     const Vec2d& translate_origin, const std::vector<double>& end_pose,
-    std::size_t obstacles_num, Eigen::MatrixXd& obstacles_edges_num,
-    Eigen::MatrixXd& obstacles_A, Eigen::MatrixXd& obstacles_b,
+    std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_edges_num,
+    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     ThreadSafeIndexedObstacles* obstalce_list) {
   // initial state
   init_state_ = vehicle_state;

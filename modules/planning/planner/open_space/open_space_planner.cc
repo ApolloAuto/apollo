@@ -63,27 +63,39 @@ apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   // 1. Build Predicition Environments.
   predicted_bounding_rectangles_.clear();
-  BuildPredictedEnvironment(frame->obstacles());
-  std::lock_guard<std::mutex> lock(open_space_mutex_);
+  {
+    std::lock_guard<std::mutex> lock(open_space_mutex_);
+    BuildPredictedEnvironment(frame->obstacles());
 
-  // 2. Update Vehicle information and obstacles information from frame.
+    // 2. Update Vehicle information and obstacles information from frame.
+    // TODO(QiL, Jinyun): Refactor this to be more compact
+    vehicle_state_ = frame->vehicle_state();
+    rotate_angle_ = frame->origin_heading();
+    translate_origin_ = frame->origin_point();
+    end_pose_ = frame->open_space_end_pose();
+    obstacles_num_ = frame->obstacles_num();
+    obstacles_edges_num_ = frame->obstacles_edges_num();
+    obstacles_A_ = frame->obstacles_A();
+    obstacles_b_ = frame->obstacles_b();
+    obstalce_list_ = frame->openspace_warmstart_obstacles();
+    // 3. Check if trajectory updated, if so, update internal
+    // current_trajectory_;
+    if (trajectory_updated_) {
+      open_space_trajectory_generator_->UpdateTrajectory(&current_trajectory_);
+      AINFO << "Trajectory caculation updated, new results : "
+            << current_trajectory_.ShortDebugString();
+    }
 
-  // 3. Check if trajectory updated, if so, update internal current_trajectory_;
-  if (trajectory_updated_) {
-    open_space_trajectory_generator_->UpdateTrajectory(&current_trajectory_);
-    AINFO << "Trajectory caculation updated, new results : "
-          << current_trajectory_.ShortDebugString();
-  }
-
-  // 4. Collision check for updated trajectory, if pass, update frame, else,
-  // return error status
-  if (IsCollisionFreeTrajectory(current_trajectory_)) {
-    frame->mutable_trajectory()->CopyFrom(current_trajectory_);
-    return Status::OK();
-  } else {
-    // If collision happens, return wrong planning status and estop
-    // trajectory would be sent in std planning
-    return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+    // 4. Collision check for updated trajectory, if pass, update frame, else,
+    // return error status
+    if (IsCollisionFreeTrajectory(current_trajectory_)) {
+      frame->mutable_trajectory()->CopyFrom(current_trajectory_);
+      return Status::OK();
+    } else {
+      // If collision happens, return wrong planning status and estop
+      // trajectory would be sent in std planning
+      return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+    }
   }
 }
 
@@ -92,7 +104,12 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
     {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       trajectory_updated_ = false;
-      //    open_space_trajectory_generator_.Plan();
+      if (open_space_trajectory_generator_->Plan(
+              vehicle_state_, rotate_angle_, translate_origin_, end_pose_,
+              obstacles_num_, obstacles_edges_num_, obstacles_A_, obstacles_b_,
+              obstalce_list_) == Status::OK()) {
+        trajectory_updated_ = true;
+      }
     }
   }
 }
