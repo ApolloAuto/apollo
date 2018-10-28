@@ -50,18 +50,19 @@ void ProcessorContext::Notify(uint64_t cr_id) {
       proc_index_);
 
   ReadLockGuard<AtomicRWLock> rw(rw_lock_);
-  if (cr_container_.find(cr_id) ==
-      cr_container_.end()) {
-    return;
-  }
-  auto& cr = cr_container_[cr_id];
-  if (cr->state() == RoutineState::DATA_WAIT) {
-    cr->set_state(RoutineState::READY);
-  }
+  auto iter = cr_container_.find(cr_id);
+  if (likely(iter != cr_container_.end())) {
+    auto& cr = iter->second;
+    if (cr->state() == RoutineState::DATA_WAIT) {
+      cr->set_state(RoutineState::READY);
+    }
 
-  if (!notified_.exchange(true)) {
-    processor_->Notify();
-    return;
+    // FIXME: should release cr_container lock here.
+
+    if (!notified_.exchange(true)) {
+      processor_->Notify();
+      return;
+    }
   }
 }
 
