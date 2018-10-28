@@ -62,7 +62,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     path = args.directory
 
-    print "load h5 from directory:", format(path)
+    print ("load h5 from directory: {}".format(path))
     if os.path.isdir(path):
         features = None
         labels = None

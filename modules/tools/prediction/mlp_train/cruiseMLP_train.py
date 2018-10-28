@@ -97,42 +97,78 @@ class FullyConn_NN(torch.nn.Module):
 
 class FCNN_CNN1D(torch.nn.Module):
     def __init__(self):
-        super(FullyConn_NN, self).__init__()
-        self.classify = torch.nn.Sequential(\
-                            nn.Linear(83, 55),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.3),\
+        super(FCNN_CNN1D, self).__init__()
+        self.lane_feature_conv = torch.nn.Sequential(\
+                            nn.Conv1d(6, 10, 2),\
+                            nn.ReLU(),\
+                            nn.Conv1d(10, 16, 2),\
+                            nn.ReLU(),\
+                            nn.Conv1d(16, 25, 3),\
+                            )
+        self.lane_feature_maxpool = nn.MaxPool1d(3)
+        self.lane_feature_avgpool = nn.AvgPool1d(3)
+        self.lane_feature_dropout = nn.Dropout(0.0)
 
-                            nn.Linear(55, 23),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.2),\
-
-                            nn.Linear(23, 11),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.3),\
-
-                            nn.Linear(11, 5),\
+        self.obs_feature_fc = torch.nn.Sequential(\
+                            nn.Linear(23, 17),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
+                            nn.Linear(17, 12),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.0),\
+                            )
 
-                            nn.Linear(5, 1),\
+        self.classify = torch.nn.Sequential(\
+                            nn.Linear(123, 66),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.3),\
+
+                            nn.Linear(66, 48),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.1),\
+
+                            nn.Linear(48, 11),\
+                            nn.Sigmoid(),\
+                            nn.Dropout(0.1),\
+
+                            nn.Linear(11, 1),\
                             nn.Sigmoid()
                                             )
         self.regress = torch.nn.Sequential(\
-                            nn.Linear(dim_input, dim_hidden_1),\
+                            nn.Linear(124, 77),\
+                            nn.ReLU(),\
+                            nn.Dropout(0.2),\
+
+                            nn.Linear(77, 46),\
+                            nn.ReLU(),\
+                            nn.Dropout(0.2),\
+
+                            nn.Linear(46, 12),\
                             nn.ReLU(),\
                             nn.Dropout(0.1),\
-                              
-                            nn.Linear(dim_hidden_1, dim_hidden_2),\
-                            nn.ReLU(),\
-                            nn.Dropout(0.1),\
-                               
-                            nn.Linear(dim_hidden_2, 1),\
+
+                            nn.Linear(12, 1),\
                             nn.ReLU()
                                             )
     def forward(self, x):
-        out_c = self.classify(x)
-        out_r = self.regress(x)
+        lane_fea = x[:,23:]
+        lane_fea = lane_fea.view(lane_fea.size(0), 6, 10)
+        obs_fea = x[:,:23]
+
+        lane_fea = self.lane_feature_conv(lane_fea)
+        lane_fea_max = self.lane_feature_maxpool(lane_fea)
+        lane_fea_avg = self.lane_feature_avgpool(lane_fea)
+
+        lane_fea = torch.cat([lane_fea_max.view(lane_fea_max.size(0),-1), \
+                              lane_fea_avg.view(lane_fea_avg.size(0),-1)], 1)
+        lane_fea = self.lane_feature_dropout(lane_fea)
+
+        #obs_fea = self.obs_feature_fc(obs_fea)
+        #print (lane_fea.shape)
+        tot_fea = torch.cat([lane_fea, obs_fea], 1)
+        out_c = self.classify(tot_fea)
+        out_r = self.regress(torch.cat([tot_fea, out_c], 1))
+
         return out_c, out_r
 
 
@@ -178,17 +214,20 @@ of regression together.
 def loss_fn(c_pred, r_pred, target):
     loss_C = nn.BCELoss()
     loss_R = nn.MSELoss()
-    loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
-    #loss = 4 * loss_C(c_pred, target[:,0].view(target.shape[0],1)) + \
-    #      loss_R((target[:,0] == True).float().view(target.shape[0],1) * r_pred + \
-    #              (target[:,0] == False).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
-    #              target[:,1].view(target.shape[0],1))
+    #loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
+    loss = 4 * loss_C(c_pred, target[:,0].view(target.shape[0],1)) + \
+          loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
+                  (target[:,1] >= 10.0).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
+                  target[:,1].view(target.shape[0],1))
+          #loss_R((target[:,0] == True).float().view(target.shape[0],1) * r_pred + \
+          #        (target[:,0] == False).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
+          #        target[:,1].view(target.shape[0],1))
     return loss
 
 '''
 Train the data.
 '''
-def train(train_X, train_y, model, optimizer, epoch, batch_size=256):
+def train(train_X, train_y, model, optimizer, epoch, batch_size=2048):
     model.train()
 
     loss_history = []
@@ -206,7 +245,7 @@ def train(train_X, train_y, model, optimizer, epoch, batch_size=256):
         loss.backward()
         optimizer.step()
 
-        if i % 1000 == 0:
+        if i % 500 == 0:
             logging.info('Step: {}, train_loss: {}'.format(i, np.mean(loss_history[-100:])))
             print ("Step: {}, training loss: {}".format(i, np.mean(loss_history[-100:])))
 
@@ -218,18 +257,27 @@ def train(train_X, train_y, model, optimizer, epoch, batch_size=256):
 '''
 Validation
 '''
-def validate(valid_X, valid_y, model):
+def validate(valid_X, valid_y, model, batch_size=1024):
     model.eval()
 
-    c_pred, r_pred = model(valid_X)
-    valid_loss = loss_fn(c_pred, r_pred, valid_y)
-    valid_classification_accuracy = \
-        np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == valid_y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1)) / c_pred.data.cpu().numpy().shape[0]
+    loss_history = []
+    valid_correct_class = 0.0
+    num_of_data = valid_X.shape[0]
+    num_of_batch = int(num_of_data / batch_size) + 1
+    for i in range(num_of_batch):
+        X = valid_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
+        y = valid_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
+        c_pred, r_pred = model(X)
+        valid_loss = loss_fn(c_pred, r_pred, y)
+        loss_history.append(valid_loss.data[0])
+        valid_correct_class += \
+            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
+    valid_classification_accuracy = valid_correct_class / valid_y.data.cpu().numpy().shape[0]
     logging.info('Validation loss: {}. Validation classification accuracy: {}'\
-        .format(valid_loss, valid_classification_accuracy))
+        .format(np.mean(loss_history), valid_classification_accuracy))
     print ('Validation loss: {}. Classification accuracy: {}.'\
-        .format(valid_loss, valid_classification_accuracy))
+        .format(np.mean(loss_history), valid_classification_accuracy))
 
     return valid_loss
 
@@ -257,13 +305,13 @@ if __name__ == "__main__":
     X_valid, y_valid = data_preprocessing(valid_data)
 
     # Model declaration
-    model = FullyConn_NN()
+    model = FCNN_CNN1D()
     print ("The model used is: ")
     print (model)
-    learning_rate = 3e-3
+    learning_rate = 5e-4
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau\
-        (optimizer, factor=0.3, patience=3, min_lr=1e-8, verbose=1, mode='min')
+        (optimizer, factor=0.5, patience=3, min_lr=1e-8, verbose=1, mode='min')
 
     # CUDA set-up:
     cuda_is_available = torch.cuda.is_available()
@@ -280,37 +328,4 @@ if __name__ == "__main__":
         train(X_train, y_train, model, optimizer, epoch)
         valid_loss = validate(X_valid, y_valid, model)
         scheduler.step(valid_loss)
-
-
-
-
-
-'''
-    model = setup_model()
-
-    model.fit(X_train, Y_trainc, shuffle=True, nb_epoch=20, batch_size=32)
-    print ("Model trained success.")
-
-    X_test = (X_test - param_norm[0]) / param_norm[1]
-
-    score = model.evaluate(X_test, Y_testc)
-    print ("\nThe accuracy on testing dat is", score[1])
-
-    logging.info("Test data loss: {}, accuracy: {} ".format(
-        score[0], score[1]))
-    Y_train_hat = model.predict_classes(X_train, batch_size=32)
-    Y_test_hat = model.predict_proba(X_test, batch_size=32)
-    logging.info("## Training Data:")
-    evaluate_model(Y_train, Y_train_hat)
-    for thres in [x / 100.0 for x in range(20, 80, 5)]:
-        logging.info("##threshond = {} Testing Data:".format(thres))
-        performance = evaluate_model(Y_test, Y_test_hat > thres)
-    performance['accuracy'] = [score[1]]
-
-    print ("\nFor more detailed evaluation results, please refer to", \
-          evaluation_log_path + ".log")
-
-    model_path = os.path.join(os.getcwd(), "mlp_model.bin")
-    save_model(model, param_norm, model_path)
-    print ("Model has been saved to", model_path)
-'''
+        torch.save(model.state_dict(), './cruiseMLP_saved_model.pt')
