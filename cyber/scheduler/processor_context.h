@@ -29,6 +29,7 @@
 #include "cyber/base/atomic_hash_map.h"
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/croutine/croutine.h"
+#include "cyber/base/macros.h"
 
 namespace apollo {
 namespace cyber {
@@ -70,11 +71,10 @@ class ProcessorContext {
   virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
 
  protected:
-  AtomicRWLock rw_lock_;
-  CRoutineContainer cr_container_;
-  std::shared_ptr<Processor> processor_ = nullptr;
-
-  std::atomic<bool> notified_;
+  alignas(CACHELINE_SIZE) CRoutineContainer cr_container_;
+  alignas(CACHELINE_SIZE) AtomicRWLock rw_lock_;
+  alignas(CACHELINE_SIZE) std::shared_ptr<Processor> processor_ = nullptr;
+  alignas(CACHELINE_SIZE) std::atomic<bool> notified_;
 
   bool stop_ = false;
   int proc_index_ = -1;
