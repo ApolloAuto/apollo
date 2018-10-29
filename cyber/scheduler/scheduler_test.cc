@@ -50,10 +50,39 @@ TEST(SchedulerTest, create_task) {
   auto task_pool_size = sched_conf.task_pool_conf().task_pool_size();
   EXPECT_EQ(sched->ProcessorNum(), proc_num);
   EXPECT_EQ(sched->ProcCtxs().size(), proc_num + task_pool_size);
-
-  sched->ShutDown();
-  EXPECT_FALSE(sched->CreateTask(&proc, croutine_name));
 }
+
+TEST(SchedulerTest, async_task_create_notify) {
+  cyber::Init();
+  int task_num = 50;
+  std::vector<std::string> names(task_num);
+  std::vector<uint64_t> task_ids(task_num);
+  for (int i = 0; i < task_num; i++) {
+    names[i] = std::to_string(i);
+    task_ids[i] = GlobalData::RegisterTaskName(std::to_string(i));
+  }
+  auto f = [&](std::string name) {
+    sched->CreateTask(&proc, name);
+  };
+  auto f1 = [&](uint64_t id) {
+    sched->NotifyTask(id);
+  };
+  std::vector<std::thread> task_create(task_num);
+  std::vector<std::thread> task_notify(task_num);
+  for (int i = 0; i < task_num; i++) {
+    task_create[i] = std::thread(f, names[i]);
+    task_notify[i] = std::thread(f1, task_ids[i]);
+  }
+  for (int i = 0; i < task_num; i++) {
+    if (task_create[i].joinable()) {
+      task_create[i].join();
+    }
+    if (task_notify[i].joinable()) {
+      task_notify[i].join();
+    }
+  }
+}
+
 
 }  // namespace scheduler
 }  // namespace cyber
