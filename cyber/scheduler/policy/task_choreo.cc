@@ -37,7 +37,7 @@ using apollo::cyber::event::SchedPerf;
 using croutine::RoutineState;
 
 std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
-  if (stop_) {
+  if (unlikely(stop_)) {
     return nullptr;
   }
 

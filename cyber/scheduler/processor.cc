@@ -58,8 +58,8 @@ void Processor::Run() {
 
   std::shared_ptr<CRoutine> cr = nullptr;
 
-  while (running_) {
-    if (context_) {
+  while (likely(running_)) {
+    if (likely(context_ != nullptr)) {
       cr = context_->NextRoutine();
       if (cr) {
         cr->Resume();
