@@ -175,7 +175,7 @@ class TrajectoryToSample(object):
         return trajectory
 
     @classmethod
-    def label_wFinishTime(cls, trajectory):
+    def label_cruise(cls, trajectory):
         '''
         Label feature trajectory according to real future lane sequence
         in 6sec
@@ -232,8 +232,8 @@ class TrajectoryToSample(object):
                 # If roughly get to the center of another lane, label lane change to be finished.
                 left_bound = trajectory[j].lane.lane_feature.dist_to_left_boundary
                 right_bound = trajectory[j].lane.lane_feature.dist_to_right_boundary
-                if left_bound > (1 - param_fea['lane_change_finish_condition']) * right_bound and \
-                   left_bound < (1 + param_fea['lane_change_finish_condition']) * right_bound:
+                if left_bound / (left_bound + right_bound) > (0.5 - param_fea['lane_change_finish_condition']) and \
+                   left_bound / (left_bound + right_bound) < (0.5 + param_fea['lane_change_finish_condition']):
                     if has_started_lane_change:
                         has_finished_lane_change = True
                         lane_change_finish_time = time_span
@@ -254,18 +254,31 @@ class TrajectoryToSample(object):
             0:  False Follow-lane
             1:  True Follow-lane
             2:  True Cut-in
+            3:  True Cut-in but time_to_lane_center unknown (started lane-change but haven't finished)
+            4:  True Follow-lane but time_to_lane_center unknown
             '''
             for lane_sequence in fea.lane.lane_graph.lane_sequence:
                 if len(lane_sequence.lane_segment) == 0:
                     continue
+                # The current lane is obstacle's original lane.
                 if lane_sequence.vehicle_on_lane:
+                    # Obs is following this lane.
                     if not has_started_lane_change:
-                        lane_sequence.label = 1
-                        lane_sequence.time_to_lane_center = lane_change_finish_time
+                        # Obstacle is following the original lane but is never at lane-center:
+                        if lane_change_finish_time == 10.0:
+                            lane_sequence.label = 4
+                            lane_sequence.time_to_lane_center = 10.0
+                        # Obstacle is following the original lane and moved to lane-center
+                        else:
+                            lane_sequence.label = 1
+                            lane_sequence.time_to_lane_center = lane_change_finish_time
+                    # Obs has stepped out of this lane within 6sec.
                     else:
                         lane_sequence.label = 0
                         lane_sequence.time_to_lane_center = 100.0
+                # The current lane is NOT obstacle's original lane.
                 else:
+                    # Obstacle is following the original lane.
                     if not has_started_lane_change:
                         lane_sequence.label = -1
                         lane_sequence.time_to_lane_center = 100.0
@@ -275,9 +288,18 @@ class TrajectoryToSample(object):
                             if lane_segment.lane_id == new_lane_id:
                                 new_lane_id_is_in_this_lane_seq = True
                                 break
+                        # Obstacle has changed to this lane.
                         if new_lane_id_is_in_this_lane_seq:
-                            lane_sequence.label = 2
-                            lane_sequence.time_to_lane_center = lane_change_finish_time
+                            # Obstacle has finished lane changing within 6 sec.
+                            if has_finished_lane_change:
+                                lane_sequence.label = 2
+                                lane_sequence.time_to_lane_center = lane_change_finish_time
+                            # Obstacle started lane changing but haven't finished yet.
+                            else:
+                                lane_sequence.label = 3
+                                lane_sequence.time_to_lane_center = 10.0
+
+                        # Obstacle has changed to some other lane.
                         else:
                             lane_sequence.label = -1
                             lane_sequence.time_to_lane_center = 100.0

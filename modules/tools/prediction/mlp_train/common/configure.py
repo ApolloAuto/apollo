@@ -43,9 +43,8 @@ parameters = {
         'prediction_label_timeframe': 3.0,
         'maximum_maneuver_finish_time': 6.0,
 
-        # Lane change is defined to be finished if difference 
-        # between dist_to_left_boundary and dist_to_right_boundary 
-        # is within the following portion:
+        # Lane change is defined to be finished if the ratio of deviation
+        # from center-line to the lane width is within this: (must be < 0.5)
         'lane_change_finish_condition': 0.1
     }
 }
