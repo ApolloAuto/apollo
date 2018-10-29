@@ -19,7 +19,6 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/hardware/gps/gps_monitor.h"
 #include "modules/monitor/hardware/resource_monitor.h"
-#include "modules/monitor/reporters/static_info_reporter.h"
 #include "modules/monitor/software/localization_monitor.h"
 #include "modules/monitor/software/process_monitor.h"
 #include "modules/monitor/software/summary_monitor.h"
@@ -58,9 +57,6 @@ bool Monitor::Init() {
 
   // Register resource monitor.
   runners_.emplace_back(new ResourceMonitor(config.resource_conf()));
-
-  // Register StaticInfo reporter.
-  runners_.emplace_back(new StaticInfoReporter());
 
   // Register the SummaryMonitor as last runner, so it will monitor all changes
   // made by the previous runners.
