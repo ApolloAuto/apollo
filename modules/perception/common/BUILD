@@ -8,6 +8,7 @@ cc_library(
         "geometry_util.cc",
         "graph_util.cc",
         "perception_gflags.cc",
+        "cuda_conf.cc",
     ],
     hdrs = [
         "geometry_util.h",
