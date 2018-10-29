@@ -165,6 +165,7 @@ void PredictionComponent::Stop() {
     AINFO << "write when stop";
     FeatureOutput::Close();
   }
+  apollo::cyber::Shutdown();
 }
 
 void PredictionComponent::OnLocalization(
