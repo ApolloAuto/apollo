@@ -14,19 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cuda_conf.h"
+#include "modules/perception/common/cuda_conf.h"
 
 
 namespace apollo {
 namespace perception {
 
 CudaConfig::CudaConfig(): block_width_(32)
-    , block_height_(32)
-{
+    , block_height_(32) {
+
 }
 void CudaConfig::initialize(unsigned int width, unsigned int height) {
     static bool initialized = false;
-    if( !initialized ) {
+    if ( !initialized ) {
         block_width_ = width;
         block_height_ = height;
         initialized = true;
@@ -38,5 +38,6 @@ CudaConfig& CudaConfig::instance() {
     return inst;
 }
 
-};
-};
+}; // end namespace perception
+}; // end namespace apollo
+
