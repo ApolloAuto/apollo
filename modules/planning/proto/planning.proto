@@ -99,3 +99,7 @@ message ADCTrajectory {
   }
   optional TrajectoryType trajectory_type = 21 [default = UNKNOWN];
 }
+
+message ADCTrajectories {
+  repeated ADCTrajectory adc_trajectory = 1;
+}

@@ -87,7 +87,8 @@ class OpenSpaceTrajectoryGenerator {
 
   void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
-  apollo::common::Status UpdateTrajectory(ADCTrajectory* current_trajectory);
+  apollo::common::Status UpdateTrajectory(
+      ADCTrajectories* trajectory_partition);
 
   void Stop();
 
@@ -111,7 +112,7 @@ class OpenSpaceTrajectoryGenerator {
   Eigen::MatrixXd ego_;
   std::vector<double> XYbounds_;
 
-  ADCTrajectory current_trajectory_;
+  ADCTrajectories trajectory_partition_;
 };
 
 }  // namespace planning

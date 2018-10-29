@@ -46,6 +46,7 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
 
+  current_trajectory_index_ = 0;
   // initialize open space trajectory generator;
   open_space_trajectory_generator_.reset(new OpenSpaceTrajectoryGenerator());
 
@@ -80,15 +81,38 @@ apollo::common::Status OpenSpacePlanner::Plan(
     obstalce_list_ = frame->openspace_warmstart_obstacles();
     XYbounds_ = frame->ROI_xy_boundary();
     // 3. Check if trajectory updated, if so, update internal
-    // current_trajectory_;
+    // trajectory_partition_;
     if (trajectory_updated_) {
-      open_space_trajectory_generator_->UpdateTrajectory(&current_trajectory_);
+      open_space_trajectory_generator_->UpdateTrajectory(
+          &trajectory_partition_);
       AINFO << "Trajectory caculation updated, new results : "
-            << current_trajectory_.ShortDebugString();
+            << trajectory_partition_.ShortDebugString();
+    }
+    // TODO(Jiaxuan): Choose the current_trajectory in trajectory_partition_
+    // If the vehicle each the end point of current trajectory and stop
+    // Then move to the next Trajectory
+    current_trajectory_ =
+        trajectory_partition_.adc_trajectory(current_trajectory_index_);
+
+    TrajectoryPoint end_point = current_trajectory_.trajectory_point(
+        current_trajectory_.trajectory_point_size() - 1);
+
+    if (vehicle_state_.linear_velocity() <= 1e-3 &&
+        std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
+                      (vehicle_state_.x() - end_point.path_point().x()) +
+                  (vehicle_state_.y() - end_point.path_point().y()) *
+                      (vehicle_state_.y() - end_point.path_point().y())) <
+            planner_open_space_config_.max_position_error_to_end_point() &&
+        std::abs(vehicle_state_.heading() - end_point.path_point().theta()) <
+            planner_open_space_config_.max_theta_error_to_end_point() &&
+        (current_trajectory_index_ <
+         trajectory_partition_.adc_trajectory_size() - 1)) {
+      current_trajectory_index_ += 1;
     }
 
     // 4. Collision check for updated trajectory, if pass, update frame, else,
     // return error status
+
     if (IsCollisionFreeTrajectory(current_trajectory_)) {
       frame->mutable_trajectory()->CopyFrom(current_trajectory_);
       return Status::OK();

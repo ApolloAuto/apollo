@@ -8,7 +8,8 @@ message PlannerOpenSpaceConfig {
   // Distance Approach COnfigs
   optional DistanceApproachConfig distance_approach_config = 2;
   optional double delta_t = 3 [default = 1.0];
-
+  optional double max_position_error_to_end_point = 4 [default = 0.5];
+  optional double max_theta_error_to_end_point = 5 [default = 0.2];
 }
 
 message WarmStartConfig {
