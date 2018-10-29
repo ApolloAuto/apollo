@@ -5,8 +5,6 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "cyber_monitor",
     srcs = [
-        "channel_msg_factory.cc",
-        "cyber_channel_message.cc",
         "cyber_topology_message.cc",
         "general_channel_message.cc",
         "general_message.cc",
@@ -16,8 +14,6 @@ cc_binary(
         "screen.cc",
     ],
     deps = [
-        "channel_msg_factory",
-        "cyber_channel_message",
         "cyber_topology_message",
         "general_channel_message",
         "screen",
@@ -27,23 +23,6 @@ cc_binary(
     linkopts = [
         "-pthread",
         "-lncurses"
-    ],
-)
-
-cc_library(
-    name = "channel_msg_factory",
-    hdrs = [ "channel_msg_factory.h", ],
-)
-
-cc_library(
-    name = "cyber_channel_message",
-    hdrs = [ "cyber_channel_message.h", ],
-    deps = [
-        "general_message",
-        "renderable_message",
-        "//cyber:cyber",
-        "//cyber/time:time",
-        "//cyber/time:duration",
     ],
 )
 

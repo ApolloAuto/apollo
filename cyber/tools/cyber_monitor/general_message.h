@@ -44,9 +44,6 @@ class GeneralMessage : public GeneralMessageBase {
   GeneralMessage(const GeneralMessage&) = delete;
   GeneralMessage& operator=(const GeneralMessage&) = delete;
 
-  // void PrintRepeatedField(const Screen* s, unsigned& lineNo, int indent,
-  //                         int index, int& jumpLines);
-
   int itemIndex_;
 
   const google::protobuf::FieldDescriptor* field_;

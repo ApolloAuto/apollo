@@ -27,6 +27,99 @@ namespace {
 constexpr int ReaderWriterOffset = 4;
 }  // namespace
 
+double GeneralChannelMessage::max_frmae_ratio_ = 1.0;
+
+const char* GeneralChannelMessage::errCode2Str(
+    GeneralChannelMessage::ErrorCode errCode) {
+  const char* ret = "Unknown Error Code";
+  switch (errCode) {
+    case GeneralChannelMessage::ErrorCode::NewSubClassFailed:
+      ret = "Cannot create Parser Object";
+      break;
+
+    case GeneralChannelMessage::ErrorCode::CreateNodeFailed:
+      ret = "Cannot create Cyber Node";
+      break;
+
+    case GeneralChannelMessage::ErrorCode::CreateReaderFailed:
+      ret = "Cannot create Cyber Reader";
+      break;
+
+    case GeneralChannelMessage::ErrorCode::MessageTypeIsEmpty:
+      ret = "Message Type is Empty";
+      break;
+
+    case GeneralChannelMessage::ErrorCode::ChannelNameOrNodeNameIsEmpty:
+      ret = "Channel Name or Node Name is Empty";
+      break;
+
+    case GeneralChannelMessage::ErrorCode::NoCloseChannel:
+      ret = "No close Channel";
+      break;
+  }
+  return ret;
+}
+
+bool GeneralChannelMessage::isErrorCode(void* ptr) {
+  GeneralChannelMessage::ErrorCode err =
+      (GeneralChannelMessage::ErrorCode)(reinterpret_cast<intptr_t>(ptr));
+  switch (err) {
+    case GeneralChannelMessage::ErrorCode::NewSubClassFailed:
+    case GeneralChannelMessage::ErrorCode::CreateNodeFailed:
+    case GeneralChannelMessage::ErrorCode::CreateReaderFailed:
+    case GeneralChannelMessage::ErrorCode::MessageTypeIsEmpty:
+    case GeneralChannelMessage::ErrorCode::ChannelNameOrNodeNameIsEmpty:
+      return true;
+
+    default: {}
+  }
+  return false;
+}
+
+double GeneralChannelMessage::frame_ratio(void) {
+  if (!is_enabled() || !has_message_come()) return 0.0;
+  apollo::cyber::Time curTime = apollo::cyber::Time::Now();
+  auto deltaTime = curTime - last_time_;
+
+  if (deltaTime.ToNanosecond() > 1000000000) {
+    last_time_ = curTime;
+    frame_ratio_ = frame_counter_ / deltaTime.ToSecond();
+    frame_counter_ = 0;
+  }
+
+  if (frame_ratio_ > max_frmae_ratio_) max_frmae_ratio_ = frame_ratio_;
+
+  return (frame_ratio_);
+}
+
+GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
+    const std::string& channelName) {
+  if (channelName.empty() || node_name_.empty()) {
+    return castErrorCode2Ptr(ErrorCode::ChannelNameOrNodeNameIsEmpty);
+  }
+  if (channel_node_ != nullptr || channel_reader_ != nullptr) {
+    return castErrorCode2Ptr(ErrorCode::NoCloseChannel);
+  }
+
+  channel_node_ = apollo::cyber::CreateNode(node_name_);
+  if (channel_node_ == nullptr) {
+    return castErrorCode2Ptr(ErrorCode::CreateNodeFailed);
+  }
+
+  auto callBack =
+      [this](const std::shared_ptr<apollo::cyber::message::RawMessage>& rawMsg) {
+        updateRawMessage(rawMsg);
+      };
+
+  channel_reader_ =
+      channel_node_->CreateReader<apollo::cyber::message::RawMessage>(channelName, callBack);
+  if (channel_reader_ == nullptr) {
+    channel_node_.reset();
+    return castErrorCode2Ptr(ErrorCode::CreateReaderFailed);
+  }
+  return this;
+}
+
 RenderableMessage* GeneralChannelMessage::Child(int lineNo) const {
   return GeneralMessageBase::Child(lineNo);
 }
