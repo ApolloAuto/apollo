@@ -1,3 +1,21 @@
+#!/usr/bin/env python
+
+###############################################################################
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
 from hybrid_a_star_python_interface import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -12,21 +30,22 @@ HybridAStar = HybridAStarPlanner()
 
 # parameter(except max, min and car size is defined in proto)
 num_output_buffer = 100000
-sx = -15.0
-sy = 7
+sx = -10.0
+sy = 2.5
 sphi = 0.0
 
 scenario = "backward"
 # scenario = "parallel"
 
 if scenario == "backward":
+    # for parking space 11543 in sunnyvale_with_two_offices
     #obstacles(x, y, heading, length, width, id)
-    HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
-    HybridAStar.AddVirtualObstacle(-11, 0.0, 0.0, 18.0, 10.0, 2)
-    HybridAStar.AddVirtualObstacle(11, 0.0, 0.0, 18.0, 10.0, 3)
-    ex = 0.0
-    ey = 0.0
-    ephi = math.pi / 2
+    HybridAStar.AddVirtualObstacle(1.0, 6.0, 0.0, 30.0, 1.0, 1)
+    HybridAStar.AddVirtualObstacle(-7.0, -3.0, 0.0, 14.0, 5.0, 2)
+    HybridAStar.AddVirtualObstacle(10.0, -3.0, 0.0, 14.0, 5.0, 3)
+    ex = 1.359
+    ey = -1.561
+    ephi = -math.pi / 2
 elif scenario == "parallel":
     #obstacles(x, y, heading, length, width, id)
     HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
@@ -89,9 +108,12 @@ for i in range(0, size[0]):
 ax.plot(sx, sy, "s")
 ax.plot(ex, ey, "s")
 if scenario == "backward":
-    rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
-    rect2 = patches.Rectangle((-20.0, -5.0), 18.0, 10.0, 0.0)
-    rect3 = patches.Rectangle((2.0, -5.0), 18.0, 10.0, 0.0)
+    rect1 = patches.Rectangle((-14.0, 5.5), 30.0, 1.0, 0.0)
+    rect2 = patches.Rectangle((-14.0, -5.5), 14.0, 5.0, 0.0)
+    rect3 = patches.Rectangle((3, -5.5), 14.0, 5.0, 0.0)
+    # HybridAStar.AddVirtualObstacle(1.0, 6.0, 0.0, 30.0, 1.0, 1)
+    # HybridAStar.AddVirtualObstacle(-7.0, -3.0, 0.0, 14.0, 5.0, 2)
+    # HybridAStar.AddVirtualObstacle(10.0, -3.0, 0.0, 14.0, 5.0, 3)
     ax.add_patch(rect1)
     ax.add_patch(rect2)
     ax.add_patch(rect3)
@@ -107,10 +129,10 @@ elif scenario == "parallel":
 plt.axis('equal')
 
 fig2 = plt.figure(2)
-v_graph = fig2.add_subplot(311);
+v_graph = fig2.add_subplot(311)
 v_graph.plot(np.linspace(0, size[0], size[0]), v_out)
-a_graph = fig2.add_subplot(312);
+a_graph = fig2.add_subplot(312)
 a_graph.plot(np.linspace(0, size[0], size[0]), a_out)
-steer_graph = fig2.add_subplot(313);
+steer_graph = fig2.add_subplot(313)
 steer_graph.plot(np.linspace(0, size[0], size[0]), steer_out)
 plt.show()

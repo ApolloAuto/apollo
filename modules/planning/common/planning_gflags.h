@@ -217,6 +217,7 @@ DECLARE_string(planner_open_space_config_filename);
 DECLARE_string(target_parking_spot_id);
 DECLARE_double(parking_longitudinal_range);
 DECLARE_double(parking_start_range);
+DECLARE_bool(enable_perception_obstacles);
 
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);

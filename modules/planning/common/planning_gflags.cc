@@ -409,6 +409,10 @@ DEFINE_double(
 DEFINE_double(parking_start_range, 10.0,
               "the distance used for checking whether doing parking");
 
+DEFINE_bool(enable_perception_obstacles, true,
+            "enable the open space planner to take percetion obstacles into "
+            "consideration");
+
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
