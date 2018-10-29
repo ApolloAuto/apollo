@@ -20,6 +20,7 @@
 
 #include "modules/planning/open_space/open_space_trajectory_generator.h"
 
+#include <cmath>
 #include <fstream>
 #include <utility>
 
@@ -168,15 +169,79 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     state_result_ds(2, i) += rotate_angle;
   }
 
-  // TODO(Jiaxuan): Step 9 : trajectory Partition and  Publish trajectoryPoint
-  // in planning trajectory, Result saved in current trajectory.
-  // ADCTrajectory current_trajectory_,
+  // TODO(Jiaxuan): Step 9 : Trajectory Partition and  Publish TrajectoryPoint
+  // in planning trajectory. Result saved in trajectory_partition_.
+  // Every time update, use trajectory_partition to store each ADCTrajectory
+  double relative_time = 0.0;
+  double distance_s = 0.0;
+  ADCTrajectories trajectory_partition;
+  ADCTrajectory* current_trajectory = trajectory_partition.add_adc_trajectory();
+  // set initial gear position for first ADCTrajectory depending on v
+  // and check potential edge cases
+  if (horizon_ < 3)
+    return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
+  if (state_result_ds(3, 0) > -1e-3 && state_result_ds(3, 1) > -1e-3 &&
+      state_result_ds(3, 2) > -1e-3) {
+    current_trajectory->set_gear(canbus::Chassis::GEAR_DRIVE);
+  } else {
+    if (state_result_ds(3, 0) < 1e-3 && state_result_ds(3, 1) < 1e-3 &&
+        state_result_ds(3, 2) < 1e-3) {
+      current_trajectory->set_gear(canbus::Chassis::GEAR_REVERSE);
+    } else {
+      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
+    }
+  }
+  // partition trajectory points into each trajectory
+  for (std::size_t i = 0; i < horizon_ + 1; i++) {
+    // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
+    // then add a new trajectory with GEAR_REVERSE
+    if (state_result_ds(3, i) < -1e-3 &&
+        current_trajectory->gear() == canbus::Chassis::GEAR_DRIVE) {
+      current_trajectory = trajectory_partition.add_adc_trajectory();
+      current_trajectory->set_gear(canbus::Chassis::GEAR_REVERSE);
+    }
+    // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
+    // then add a new trajectory with GEAR_DRIVE
+    if (state_result_ds(3, i) > 1e-3 &&
+        current_trajectory->gear() == canbus::Chassis::GEAR_REVERSE) {
+      current_trajectory = trajectory_partition.add_adc_trajectory();
+      current_trajectory->set_gear(canbus::Chassis::GEAR_DRIVE);
+    }
+
+    auto* point = current_trajectory->add_trajectory_point();
+    relative_time += time_result_ds(0, i);
+    point->set_relative_time(relative_time);
+    point->mutable_path_point()->set_x(state_result_ds(0, i));
+    point->mutable_path_point()->set_y(state_result_ds(1, i));
+    point->mutable_path_point()->set_z(0);
+    point->mutable_path_point()->set_theta(state_result_ds(2, i));
+    if (i > 0) {
+      distance_s +=
+          std::sqrt((state_result_ds(0, i) - state_result_ds(0, i - 1)) *
+                        (state_result_ds(0, i) - state_result_ds(0, i - 1)) +
+                    (state_result_ds(1, i) - state_result_ds(1, i - 1)) *
+                        (state_result_ds(1, i) - state_result_ds(1, i - 1)));
+    }
+    point->mutable_path_point()->set_s(distance_s);
+    int gear_drive = 1;
+    if (current_trajectory->gear() == canbus::Chassis::GEAR_REVERSE)
+      gear_drive = -1;
+
+    point->set_v(state_result_ds(3, i) * gear_drive);
+    // TODO(Jiaxuan): Verify this steering to kappa equation
+    point->mutable_path_point()->set_kappa(
+        std::tanh(control_result_ds(0, i) * 470 * M_PI / 180.0 / 16) / 2.85 *
+        gear_drive);
+    point->set_a(control_result_ds(1, i) * gear_drive);
+  }
+
+  trajectory_partition_.CopyFrom(trajectory_partition);
   return Status::OK();
 }
 
 apollo::common::Status OpenSpaceTrajectoryGenerator::UpdateTrajectory(
-    ADCTrajectory* current_trajectory) {
-  current_trajectory->CopyFrom(current_trajectory_);
+    ADCTrajectories* adc_trajectories) {
+  adc_trajectories->CopyFrom(trajectory_partition_);
   return Status::OK();
 }
 

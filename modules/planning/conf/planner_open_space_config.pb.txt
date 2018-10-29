@@ -1,4 +1,6 @@
 delta_t : 0.5
+max_position_error_to_end_point : 0.5
+max_theta_error_to_end_point : 0.2
 
 warm_start_config : {
   xy_grid_resolution : 0.2

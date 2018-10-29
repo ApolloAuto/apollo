@@ -116,7 +116,9 @@ class OpenSpacePlanner : public Planner {
 
   std::mutex open_space_mutex_;
 
+  int current_trajectory_index_;
   ADCTrajectory current_trajectory_;
+  ADCTrajectories trajectory_partition_;
 
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 
