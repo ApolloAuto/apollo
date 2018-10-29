@@ -22,7 +22,6 @@ namespace perception {
 
 CudaConfig::CudaConfig(): block_width_(32)
     , block_height_(32) {
-
 }
 void CudaConfig::initialize(unsigned int width, unsigned int height) {
     static bool initialized = false;
@@ -38,6 +37,6 @@ CudaConfig& CudaConfig::instance() {
     return inst;
 }
 
-}; // end namespace perception
-}; // end namespace apollo
+};  // end namespace perception
+};  // end namespace apollo
 
