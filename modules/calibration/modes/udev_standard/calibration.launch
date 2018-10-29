@@ -13,7 +13,7 @@
 
 	<module>
 		<name>velodyne</name>
-		<dag_conf>/apollo/modules/drivers/velodyne/dag/velodyne_udev_calibration.dag</dag_conf>
+		<dag_conf>/apollo/modules/drivers/velodyne/dag/velodyne_udev.dag</dag_conf>
 		<process_name>apollo</process_name>
 		<version>1.0.0</version>
 	</module>
