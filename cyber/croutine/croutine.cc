@@ -54,33 +54,35 @@ CRoutine::CRoutine(std::function<void()> &&func) {
 CRoutine::~CRoutine() {}
 
 RoutineState CRoutine::Resume() {
-  {
-    auto lock = GetLock();
-    if (unlikely(force_stop_)) {
-      state_ = RoutineState::FINISHED;
-      return state_;
-    }
-
-    UpdateState();
-    if (unlikely(state_ != RoutineState::RUNNING &&
-                 state_ != RoutineState::READY)) {
-      AERROR << "Invalid Routine State!";
-      return state_;
-    }
-    current_routine_ = this;
+  auto lock = GetLock();
+  if (unlikely(force_stop_)) {
+    state_ = RoutineState::FINISHED;
+    return state_;
   }
+
+  UpdateState();
+  if (unlikely(state_ != RoutineState::RUNNING &&
+               state_ != RoutineState::READY)) {
+    AERROR << "Invalid Routine State!";
+    return state_;
+  }
+  current_routine_ = this;
 
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_IN,
                                             id_, processor_id_,
                                             static_cast<int>(state_));
   SwapContext(GetMainContext(), this->GetContext());
-  if (state_ == RoutineState::RUNNING) {
-    state_ = RoutineState::READY;
-  }
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::SWAP_OUT,
                                             id_, processor_id_,
                                             static_cast<int>(state_));
-  Unlock();
+
+  if (state_ == RoutineState::RUNNING) {
+    state_ = RoutineState::READY;
+  } else if (state_ == RoutineState::DATA_WAIT_BEFORE_CTX_SWAP) {
+    state_ = RoutineState::DATA_WAIT;
+  } else if (state_ == RoutineState::SLEEP_BEFORE_CTX_SWAP) {
+    state_ = RoutineState::SLEEP;
+  }
   return state_;
 }
 
