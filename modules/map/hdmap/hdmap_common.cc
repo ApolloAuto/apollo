@@ -504,12 +504,9 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       if (map_instance.GetSpeedBumpById(object_map_id) != nullptr) {
         speed_bumps_.emplace_back(overlap_ptr);
       }
-      // TODO(all): support parking
-      /*
-      if (map_instance.get_parking_space_by_id(object_map_id) != nullptr) {
+      if (map_instance.GetParkingSpaceById(object_map_id) != nullptr) {
         parking_spaces_.emplace_back(overlap_ptr);
       }
-      */
     }
   }
 }

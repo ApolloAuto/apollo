@@ -270,4 +270,20 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "open_space_roi_wrapper_lib.so",
+    linkshared = True,
+    linkstatic = False,
+    srcs = [
+        "open_space_roi_wrapper.cc",
+    ],
+    deps = [
+        "//modules/planning/common:planning_gflags",
+        "//modules/map/pnc_map",
+        "//modules/common/math",
+        "//cyber/common:log",
+        "@eigen//:eigen",
+    ],
+)
+
 cpplint()
