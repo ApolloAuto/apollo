@@ -135,4 +135,7 @@ DECLARE_string(traffic_light_rectifier);
 DECLARE_string(traffic_light_recognizer);
 DECLARE_string(traffic_light_reviser);
 
+// cuda block configuration
+DECLARE_int32(cuda_block_width);
+DECLARE_int32(cuda_block_height);
 #endif  // MODULES_PERCEPTION_COMMON_PERCEPTION_GFLAGS_H_
