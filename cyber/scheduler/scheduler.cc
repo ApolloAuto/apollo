@@ -158,15 +158,6 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     cr_ctx_[task_id] = 0;
   }
 
-  if (visitor != nullptr) {
-    visitor->RegisterNotifyCallback([this, task_id, name]() {
-      if (stop_) {
-        return;
-      }
-      this->NotifyProcessor(task_id);
-    });
-  }
-
   auto cr = std::make_shared<CRoutine>(func);
   cr->set_id(task_id);
   cr->set_name(name);
@@ -186,6 +177,14 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   WriteLockGuard<AtomicRWLock> rg(rw_lock_);
   if (!proc_ctxs_[0]->DispatchTask(cr)) {
     return false;
+  }
+  if (visitor != nullptr) {
+    visitor->RegisterNotifyCallback([this, task_id, name]() {
+      if (stop_) {
+        return;
+      }
+      this->NotifyProcessor(task_id);
+    });
   }
   return true;
 }
