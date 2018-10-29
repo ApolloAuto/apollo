@@ -149,10 +149,9 @@ bool draw_vanishing_row_on_image(const cv::Scalar &color, int vanishing_row,
 
 void draw_lane_pts(const std::vector<Eigen::Vector2f> &lane_pts,
                    const cv::Scalar &color, cv::Mat *image) {
-  int h = image->rows;
-  int w = image->cols;
-  assert(h > 0);
-  assert(w > 0);
+  if (image->rows <= 0 || image->cols <= 0) {
+    return;
+  }
   for (auto &pt : lane_pts) {
     int xc = common::IRound(pt(0));
     int yc = common::IRound(pt(1));
