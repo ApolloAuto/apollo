@@ -23,19 +23,19 @@ namespace apollo {
 namespace perception {
 
 class CudaConfig {
-public:
+ public:
     CudaConfig();
-public:
+ public:
     static CudaConfig& instance();
     void initialize(unsigned int width, unsigned height);
     unsigned int width() const {return block_width_;}
     unsigned int height() const { return block_width_;}
-private:
+ private:
     unsigned int block_width_;
     unsigned int block_height_;
-private:
+ private:
     DISALLOW_COPY_AND_ASSIGN(CudaConfig)
-};
-};
-};
+};  // end class CudaConfig
+};  // end namespace perception
+};  // end namespace apollo
 #endif
