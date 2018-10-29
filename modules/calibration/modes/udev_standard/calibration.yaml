@@ -8,7 +8,7 @@ module:
         version: 1.0.0
     -
         name: velodyne
-        dag: /apollo/modules/drivers/velodyne/dag/velodyne_udev_calibration.dag
+        dag: /apollo/modules/drivers/velodyne/dag/velodyne_udev.dag
         process_name: apollo
         version: 1.0.0
     -

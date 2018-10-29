@@ -127,7 +127,7 @@ void VelodyneParser::ComputeCoords(const float &raw_distance,
                                     const uint16_t rotation,
                                     PointXYZIT *point) {
   // ROS_ASSERT_MSG(rotation < 36000, "rotation must between 0 and 35999");
-  assert(rotation < 36000);
+  assert(rotation <= 36000);
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
