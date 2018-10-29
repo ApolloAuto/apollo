@@ -65,7 +65,7 @@ class GeneralMessageBase : public RenderableMessage {
   GeneralMessageBase(const GeneralMessageBase&) = delete;
   GeneralMessageBase& operator=(const GeneralMessageBase&) = delete;
 
-  std::map<const int /* lineNo */, GeneralMessageBase*> children_map_;
+  std::map<const int, GeneralMessageBase*> children_map_;
 };
 
 #endif  // TOOLS_CVT_MONITOR_GENERAL_MESSAGE_BASE_H_

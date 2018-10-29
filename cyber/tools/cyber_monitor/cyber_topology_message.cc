@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "./cyber_topology_message.h"
-#include "./channel_msg_factory.h"
 #include "./general_channel_message.h"
 #include "./screen.h"
 
@@ -32,22 +31,43 @@ constexpr int SecondColumnOffset = 4;
 CyberTopologyMessage::CyberTopologyMessage(const std::string& channel)
     : RenderableMessage(nullptr, 1),
       second_column_(SecondColumnType::MessageFrameRatio),
+      pid_(getpid()),
       col1_width_(8),
       specified_channel_(channel),
       all_channels_map_() {}
 
 CyberTopologyMessage::~CyberTopologyMessage(void) {
-  apollo::cyber::Shutdown();
   for (auto item : all_channels_map_) {
-    if (!ChannelMessage::isErrorCode(item.second)) {
+    if (!GeneralChannelMessage::isErrorCode(item.second)) {
       delete item.second;
     }
   }
 }
 
+bool CyberTopologyMessage::isFromHere(const std::string& nodeName) {
+  std::ostringstream outStr;
+  outStr << "MonitorReader" << pid_;
+
+  std::string templateName = outStr.str();
+  const std::string baseName = nodeName.substr(0, templateName.size());
+
+  return (templateName.compare(baseName) == 0);
+}
+
 RenderableMessage* CyberTopologyMessage::Child(int lineNo) const {
   RenderableMessage* ret = nullptr;
+  auto iter = findChild(lineNo);
+  if (!GeneralChannelMessage::isErrorCode(iter->second) && 
+      iter->second->is_enabled()) {
+    ret = iter->second;
+  }
+  return ret;
+}
+
+std::map<std::string, GeneralChannelMessage*>::const_iterator CyberTopologyMessage::findChild(int lineNo) const{
   --lineNo;
+
+  std::map<std::string, GeneralChannelMessage*>::const_iterator ret = all_channels_map_.cend();
 
   if (lineNo > -1 && lineNo < page_item_count_) {
     int i = 0;
@@ -60,9 +80,7 @@ RenderableMessage* CyberTopologyMessage::Child(int lineNo) const {
 
     for (i = 0; iter != all_channels_map_.cend(); ++iter) {
       if (i == lineNo) {
-        if (!ChannelMessage::isErrorCode(iter->second)) {
-          ret = iter->second;
-        }
+        ret = iter;
         break;
       }
       ++i;
@@ -84,11 +102,10 @@ void CyberTopologyMessage::TopologyChanged(
     auto iter = all_channels_map_.find(changeMsg.role_attr().channel_name());
 
     if (iter != all_channels_map_.cend() &&
-        !ChannelMessage::isErrorCode(iter->second)) {
+        !GeneralChannelMessage::isErrorCode(iter->second)) {
       const std::string& nodeName = changeMsg.role_attr().node_name();
       if (::apollo::cyber::proto::RoleType::ROLE_WRITER ==
           changeMsg.role_type()) {
-        changeMsg.role_attr();
         iter->second->del_writer(nodeName);
       } else {
         iter->second->del_reader(nodeName);
@@ -110,29 +127,35 @@ void CyberTopologyMessage::AddReaderWriter(
   }
 
   const std::string& nodeName = role.node_name();
-  if (ChannelMsgFactory::Instance()->isFromHere(nodeName)) {
+  if (isFromHere(nodeName)) {
     return;
   }
 
-  ChannelMessage* channelMsg = nullptr;
+  GeneralChannelMessage* channelMsg = nullptr;
   const std::string& msgTypeName = role.message_type();
   auto iter = all_channels_map_.find(channelName);
   if (iter == all_channels_map_.cend()) {
-    channelMsg = ChannelMsgFactory::Instance()->CreateChannelMessage(
-        msgTypeName, channelName);
+    static int index = 0;
 
-    if (!ChannelMessage::isErrorCode(channelMsg)) {
-      channelMsg->set_parent(this);
-      channelMsg->set_message_type(msgTypeName);
-      channelMsg->add_reader(channelMsg->NodeName());
+    std::ostringstream outStr;
+    outStr << "MonitorReader" << pid_ << '-' << index++;
+
+    channelMsg = new GeneralChannelMessage(outStr.str(), this);
+
+    if(channelMsg != nullptr){
+      if (!GeneralChannelMessage::isErrorCode(channelMsg->OpenChannel(channelName))) {
+        channelMsg->set_message_type(msgTypeName);
+        channelMsg->add_reader(channelMsg->NodeName());
+      }
+    } else {
+      channelMsg = GeneralChannelMessage::castErrorCode2Ptr(GeneralChannelMessage::ErrorCode::NewSubClassFailed);
     }
-
     all_channels_map_[channelName] = channelMsg;
   } else {
     channelMsg = iter->second;
   }
 
-  if (!ChannelMessage::isErrorCode(channelMsg)) {
+  if (!GeneralChannelMessage::isErrorCode(channelMsg)) {
     if (isWriter) {
       if (msgTypeName != apollo::cyber::message::MessageType<
                              apollo::cyber::message::RawMessage>()) {
@@ -159,9 +182,20 @@ void CyberTopologyMessage::ChangeState(const Screen* s, int key) {
       break;
 
     case ' ': {
-      ChannelMessage* child = static_cast<ChannelMessage*>(Child(*line_no()));
-      if (child) {
-        child->set_enabled(!child->is_enabled());
+      auto iter = findChild(*line_no());
+      if (!GeneralChannelMessage::isErrorCode(iter->second)) {
+        GeneralChannelMessage* child = iter->second;
+        if(child->is_enabled()){
+          child->CloseChannel();
+        } else {
+          GeneralChannelMessage* ret = child->OpenChannel(iter->first);
+          if(GeneralChannelMessage::isErrorCode(ret)){
+            delete child;
+            all_channels_map_[iter->first] = ret;
+          } else {
+            child->add_reader(child->NodeName());
+          }
+        }
       }
     }
 
@@ -203,7 +237,7 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
        ++iter, ++line) {
     color = Screen::RED_BLACK;
 
-    if (!ChannelMessage::isErrorCode(iter->second)) {
+    if (!GeneralChannelMessage::isErrorCode(iter->second)) {
       if (iter->second->has_message_come()) {
         if (iter->second->is_enabled()) {
           color = Screen::GREEN_BLACK;
@@ -216,7 +250,7 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
     s->SetCurrentColor(color);
     s->AddStr(0, line, iter->first.c_str());
 
-    if (!ChannelMessage::isErrorCode(iter->second)) {
+    if (!GeneralChannelMessage::isErrorCode(iter->second)) {
       switch (second_column_) {
         case SecondColumnType::MessageType:
           s->AddStr(col1_width_ + SecondColumnOffset, line,
@@ -231,10 +265,10 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
         } break;
       }
     } else {
-      ChannelMessage::ErrorCode errcode =
-          ChannelMessage::castPtr2ErrorCode(iter->second);
+      GeneralChannelMessage::ErrorCode errcode =
+          GeneralChannelMessage::castPtr2ErrorCode(iter->second);
       s->AddStr(col1_width_ + SecondColumnOffset, line,
-                ChannelMessage::errCode2Str(errcode));
+                GeneralChannelMessage::errCode2Str(errcode));
     }
     s->ClearCurrentColor();
   }

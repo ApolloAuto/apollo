@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "screen.h"
-#include "cyber_channel_message.h"
+#include "general_channel_message.h"
 #include "cyber_topology_message.h"
 #include "renderable_message.h"
 
@@ -216,7 +216,7 @@ void Screen::Run() {
 
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
     std::this_thread::sleep_for(std::chrono::milliseconds(
-        static_cast<int>(1000.0 / (ChannelMessage::max_frame_ratio() + 10.0))));
+        static_cast<int>(1000.0 / (GeneralChannelMessage::max_frame_ratio() + 10.0))));
   } while (canRun_);
 }
 
@@ -278,6 +278,7 @@ void Screen::ShowRenderMessage(int ch) {
     case 'D':
     case KEY_RIGHT: {
       RenderableMessage* child = current_render_obj_->Child(*y);
+
       if (child) {
         child->reset_line_page();
         current_render_obj_ = child;

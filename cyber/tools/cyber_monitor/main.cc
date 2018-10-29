@@ -16,8 +16,6 @@
 
 #include "cyber_topology_message.h"
 #include "general_channel_message.h"
-
-#include "channel_msg_factory.h"
 #include "screen.h"
 
 #include "cyber/init.h"
@@ -87,11 +85,6 @@ int main(int argc, char *argv[]) {
   FLAGS_alsologtostderr = 0;
   FLAGS_colorlogtostderr = 0;
 
-  ChannelMsgFactory *f = ChannelMsgFactory::Instance();
-  f->RegisterChildFactory("apollo::cyber::message::RawMessage",
-                          GeneralChannelMessage::Instance);
-  f->SetDefaultChildFactory("apollo::cyber::message::RawMessage");
-
   CyberTopologyMessage topologyMsg(val);
 
   auto topologyCallback =
@@ -120,11 +113,13 @@ int main(int argc, char *argv[]) {
 
   signal(SIGWINCH, SigResizeHandle);
   signal(SIGINT, SigCtrlCHandle);
-
+  
   s->SetCurrentRenderMessage(&topologyMsg);
 
   s->Init();
   s->Run();
+
+  apollo::cyber::Shutdown();
 
   return 0;
 }

@@ -30,7 +30,7 @@ class RoleAttributes;
 }  // cyber
 }  // apollo
 
-class ChannelMessage;
+class GeneralChannelMessage;
 // class GeneralMessage;
 
 class CyberTopologyMessage : public RenderableMessage {
@@ -49,13 +49,17 @@ class CyberTopologyMessage : public RenderableMessage {
   CyberTopologyMessage& operator=(const CyberTopologyMessage&) = delete;
 
   void ChangeState(const Screen* s, int key);
+  bool isFromHere(const std::string& nodeName);
+
+  std::map<std::string, GeneralChannelMessage*>::const_iterator findChild(int index) const;
 
   enum class SecondColumnType { MessageType, MessageFrameRatio };
   SecondColumnType second_column_;
-
-  int col1_width_;
+  
+  int pid_;
+  int col1_width_; 
   const std::string& specified_channel_;
-  std::map<std::string, ChannelMessage*> all_channels_map_;
+  std::map<std::string, GeneralChannelMessage*> all_channels_map_;
 };
 
 #endif  // TOOLS_CVT_MONITOR_CYBER_TOPOLOGY_MESSAGE_H_
