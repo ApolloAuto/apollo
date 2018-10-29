@@ -121,16 +121,6 @@ The following diagram highlights the scope and features of each Apollo release:
 
 ![](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/images/apollo_versions_3.png)
 
-Apollo 1.0        Apollo 1.5          Apollo 2.0          Apollo 2.5          Apollo 3.0
--폐쇄장소 운전      -고정 차선 주행     -간단한 도시 도로     -고속 자동 주행    -제품화수준의 폐쇄장소운전 -지오펜스된 고속도로와 도시도로 
-제어               장애물 인식         향상된 인식           저비용 센서           보호자-안전 모듈      -고속도로와 도시도로의 완전 자동운전
-위치화             교통 예측           향상된 계획화         비전 기반              인식
-실행시간 뼈대        계획화             OTA의 보안성           인식                 모니터
-하드웨어 참조       끝과 끝                                고속&제어 계획화       초음파 센서
-차량 참조       하드웨어 참조 - LiDAR                        더 많은 교통법        하드웨어 개발
-                                                                                플랫폼
-
-
 [**Apollo 1.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
 
 Apollo 1.0 also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
