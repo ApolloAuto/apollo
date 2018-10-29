@@ -15,18 +15,19 @@
 # limitations under the License.
 # ****************************************************************************
 
-import argparse
-import atexit
+import signal
+import sys
 import logging
 import os
 import os.path
 import shlex
-import signal
 import subprocess
-import sys
-import threading
 import time
-import yaml
+import atexit
+import argparse
+import threading
+
+import xml.etree.ElementTree as ET
 
 g_binary_name = 'mainboard'
 g_pwd = os.getcwd()
@@ -285,7 +286,7 @@ class ProcessMonitor(object):
 
 def start(launch_file = ''):
     """
-    start all modules in yaml config
+    start all modules in xml config
     """
     pmon = ProcessMonitor()
 
@@ -310,26 +311,34 @@ def start(launch_file = ''):
     binary_path = g_binary_name
 
     if not os.path.isfile(launch_file):
-        logger.error('Launch yaml file %s does not exist' % launch_file)
+        logger.error('Launch xml file %s does not exist' % launch_file)
         sys.exit(1)
 
-    f = open(launch_file, 'r')
-    launch_conf = yaml.load(f.read())
+    try:
+        tree = ET.parse(launch_file)
+    except:
+        logger.error('Parse xml failed. illegal xml!')
+        sys.exit(1)
     total_dag_num =0
     dictionary = {}
     dag_dict = {}
-    for module in launch_conf.get('module'):
-        dag_conf = module.get('dag')
-        process_name = module.get('process_name')
-        process_type = module.get('type')
-        if process_type is None or not process_type.strip():
+    root1 = tree.getroot()
+    for module in root1.findall('module'):
+        dag_conf = module.find('dag_conf').text
+        process_name = module.find('process_name').text
+        process_type = module.find('type')
+        if process_type is None:
             process_type = 'library'
-        process_type = process_type.strip()
+        else:
+            process_type = process_type.text
+            if process_type is None:
+                process_type = 'library'
+            process_type = process_type.strip()
         if process_type != 'binary':
             if dag_conf is None or not dag_conf.strip():
                 logger.error('Library dag conf is null')
                 continue
-            if process_name is None or not process_name.strip():
+            if process_name is None:
                 process_name='mainboard_default_' + str(os.getpid())
             process_name = process_name.strip()
             if dictionary.has_key(str(process_name)):
@@ -344,16 +353,22 @@ def start(launch_file = ''):
                 total_dag_num +=1
 
     process_list = []
-    for module in launch_conf.get('module'):
-        module_name = module.get('name')
-        dag_conf = module.get('dag')
-        process_name = module.get('process_name')
-        process_type = module.get('type')
-        exception_handler = module.get('exception_handler')
-
-        if process_type is None or not process_type.strip():
+    root = tree.getroot()
+    for module in root.findall('module'):
+        module_name = module.find('name').text
+        dag_conf = module.find('dag_conf').text
+        process_name = module.find('process_name').text
+        process_type = module.find('type')
+        exception_handler = module.find('exception_handler')
+        if process_type is None:
             process_type = 'library'
-        if process_name is None or not process_name.strip():
+        else:
+            process_type = process_type.text
+            if process_type is None:
+                process_type = 'library'
+            process_type = process_type.strip()
+
+        if process_name is None:
             process_name='mainboard_default_' + str(os.getpid())
         if dag_conf is None:
             dag_conf =''
@@ -361,11 +376,11 @@ def start(launch_file = ''):
             module_name =''
         if exception_handler is None:
             exception_handler = ''
-
-        process_type = process_type.strip()
-        process_name = process_name.strip()
-        dag_conf = dag_conf.strip()
+        else:
+            exception_handler = exception_handler.text
         module_name = module_name.strip()
+        dag_conf = dag_conf.strip()
+        process_name = process_name.strip()
         exception_handler = exception_handler.strip()
 
         logger.info('Load module   [%s] %s: [%s] conf: [%s] exception_handler: [%s]' % (module_name, process_type, process_name, dag_conf, exception_handler))
@@ -392,9 +407,9 @@ def start(launch_file = ''):
             process_list.append(process_name)
             #print process_list
 
-    # no module in yaml
+    # no module in xml
     if not process_list:
-        logger.error("No module was found in yaml config.")
+        logger.error("No module was found in xml config.")
         return
     # start to monitor all process
     all_died = pmon.run()
