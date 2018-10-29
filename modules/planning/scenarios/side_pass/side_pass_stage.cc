@@ -85,10 +85,10 @@ Stage::StageStatus SidePassApproachObstacle::Process(
   }
   // TODO(all): stage params need to be in config file
   double max_stop_velocity = 1.0e-5;
-  double min_stop_obstacle_distance = 5;
+  double min_stop_obstacle_distance = 4.0;
 
   if (adc_velocity < max_stop_velocity &&
-      front_obstacle_distance < min_stop_obstacle_distance) {
+      front_obstacle_distance > min_stop_obstacle_distance) {
     next_stage_ = ScenarioConfig::SIDE_PASS_GENERATE_PATH;
     return Stage::FINISHED;
   }
