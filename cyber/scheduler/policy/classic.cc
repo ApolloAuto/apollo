@@ -77,11 +77,14 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 
   for (int i = MAX_SCHED_PRIORITY - 1; i >= 0; --i) {
     ReadLockGuard<AtomicRWLock> rw_lock(rw_locks_[i]);
-    for (auto it = rq_[i].begin(); it != rq_[i].end();) {
+    for (auto it = rq_[i].begin(); it != rq_[i].end(); ++it) {
       auto cr = (*it);
+      if (cr->state() == RoutineState::RUNNING) {
+        continue;
+      }
+
       auto lock = cr->TryLock();
       if (!lock) {
-        ++it;
         continue;
       }
 
@@ -93,7 +96,6 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
             cr->processor_id());
         return cr;
       }
-      ++it;
     }
   }
 

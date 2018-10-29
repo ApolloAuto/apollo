@@ -25,6 +25,7 @@
 #include <string>
 
 #include "cyber/croutine/routine_context.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {
@@ -33,7 +34,11 @@ namespace croutine {
 using RoutineFunc = std::function<void()>;
 using Duration = std::chrono::microseconds;
 
-enum class RoutineState { READY, RUNNING, FINISHED, SLEEP, IO_WAIT, DATA_WAIT };
+enum class RoutineState { READY, RUNNING, FINISHED,
+                          SLEEP, IO_WAIT, DATA_WAIT,
+                          DATA_WAIT_BEFORE_CTX_SWAP,
+                          IO_WAIT_BEFORE_CTX_SWAP,
+                          SLEEP_BEFORE_CTX_SWAP};
 
 class CRoutine {
  public:
@@ -132,7 +137,6 @@ class CRoutine {
 
 inline void CRoutine::Yield(const RoutineState &state) {
   auto routine = GetCurrentRoutine();
-  routine->Lock();
   routine->set_state(state);
   SwapContext(GetCurrentRoutine()->GetContext(), GetMainContext());
 }
@@ -182,7 +186,7 @@ inline void CRoutine::HangUp() { CRoutine::Yield(RoutineState::DATA_WAIT); }
 
 inline void CRoutine::Sleep(const Duration &sleep_duration) {
   wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
-  CRoutine::Yield(RoutineState::SLEEP);
+  CRoutine::Yield(RoutineState::SLEEP_BEFORE_CTX_SWAP);
 }
 
 inline uint64_t CRoutine::id() const { return id_; }
