@@ -45,9 +45,10 @@ class ClassicContext : public ProcessorContext {
 
 
  private:
-  static std::array<AtomicRWLock, MAX_SCHED_PRIORITY> rw_locks_;
-  static std::array<std::vector<std::shared_ptr<CRoutine>>,
-      MAX_SCHED_PRIORITY> rq_;
+  alignas(CACHELINE_SIZE) static std::array<AtomicRWLock, MAX_SCHED_PRIORITY>
+    rw_locks_;
+  alignas(CACHELINE_SIZE) static std::array<std::vector
+    <std::shared_ptr<CRoutine>>, MAX_SCHED_PRIORITY> rq_;
 };
 
 }  // namespace scheduler
