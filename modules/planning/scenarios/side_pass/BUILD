@@ -7,10 +7,12 @@ cc_library(
     srcs = [
         "side_pass_scenario.cc",
         "side_pass_stage.cc",
+        "side_pass_stop_on_wait_point.cc",
     ],
     hdrs = [
         "side_pass_scenario.h",
         "side_pass_stage.h",
+        "side_pass_stop_on_wait_point.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

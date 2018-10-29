@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
@@ -30,11 +32,21 @@ namespace side_pass {
 
 struct SidePassContext;
 
-DECLARE_STAGE(SidePassApproachObstacle, SidePassContext);
-DECLARE_STAGE(SidePassGeneratePath, SidePassContext);
-// DECLARE_STAGE(SidePassStopOnWaitPoint, SidePassContext);
-DECLARE_STAGE(SidePassDetectSafety, SidePassContext);
-DECLARE_STAGE(SidePassPassObstacle, SidePassContext);
+class SidePassStopOnWaitPoint : public Stage {
+ public:
+  explicit SidePassStopOnWaitPoint(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame);
+  SidePassContext* GetContext() { return GetContextAs<SidePassContext>(); }
+
+ private:
+  bool IsFarAwayFromObstacles(
+      const ReferenceLine& reference_line,
+      const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
+      const common::PathPoint& first_path_point,
+      const common::PathPoint& last_path_point);
+};
 
 }  // namespace side_pass
 }  // namespace scenario

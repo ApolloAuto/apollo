@@ -29,6 +29,7 @@
 #include "modules/common/time/time.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stage.h"
+#include "modules/planning/scenarios/side_pass/side_pass_stop_on_wait_point.h"
 
 namespace apollo {
 namespace planning {
