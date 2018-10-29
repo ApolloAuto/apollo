@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {
 namespace monitor {
 
-class CanMonitor : public RecurrentRunner {
+class SocketCanMonitor : public RecurrentRunner {
  public:
-  CanMonitor();
+  SocketCanMonitor();
   void RunOnce(const double current_time) override;
 };
 

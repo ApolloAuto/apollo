@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #pragma once
 
-#include "modules/monitor/hardware/can/esdcan/esdcan_test.h"
+#include "modules/monitor/common/recurrent_runner.h"
 
-/**
- * @namespace apollo::monitor::hw
- * @brief apollo::monitor::hw
- */
 namespace apollo {
 namespace monitor {
-namespace hw {
 
-void esdcan_print_if_status(int id, const CAN_IF_STATUS &if_status);
+class EsdCanMonitor : public RecurrentRunner {
+ public:
+  EsdCanMonitor();
+  void RunOnce(const double current_time) override;
+};
 
-void esdcan_print_stats(const NTCAN_BUS_STATISTIC &stats);
-
-void esdcan_print_ctrl_state(const NTCAN_CTRL_STATE &c_state);
-
-void esdcan_print_bitrate(const NTCAN_BITRATE &bitrate);
-
-}  // namespace hw
 }  // namespace monitor
 }  // namespace apollo
