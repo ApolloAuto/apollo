@@ -71,7 +71,7 @@ bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
 }
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
-  if (stop_) {
+  if (unlikely(stop_)) {
     return nullptr;
   }
 
