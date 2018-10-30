@@ -104,9 +104,17 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   // TODO(All): put optimized results into ReferenceLineInfo.
   // Update Reference_Line_Info with this newly generated path.
   std::vector<common::FrenetFramePoint> frenet_frame_path;
-  double accumulated_s = 0.0;
+  auto adc_frenet_frame_point =
+      reference_line_info->reference_line().GetFrenetPoint(
+          frame->PlanningStartPoint());
+  double accumulated_s = adc_frenet_frame_point.s();
   for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
     common::FrenetFramePoint frenet_frame_point;
+    ADEBUG << "FrenetFramePath: s = " << accumulated_s
+           << ", l = " << fem_qp_->x()[i];
+    if (accumulated_s >= reference_line_info->reference_line().Length()) {
+      break;
+    }
     frenet_frame_point.set_s(accumulated_s);
     frenet_frame_point.set_l(fem_qp_->x()[i]);
     frenet_frame_point.set_dl(fem_qp_->x_derivative()[i]);
@@ -127,7 +135,8 @@ SidePassPathDecider::GetPathBoundaries(
     const TrajectoryPoint &planning_start_point,
     const SLBoundary &adc_sl_boundary, const ReferenceLine &reference_line,
     const IndexedList<std::string, Obstacle> &indexed_obstacles) {
-  std::vector<std::tuple<double, double, double>> bounds;
+  std::vector<std::tuple<double, double, double>> list_s_leftbound_rightbound;
+
   // Generate the boundary conditions for the selected direction
   // based on the obstacle ahead and road conditions.
   double adc_end_s = adc_sl_boundary.end_s();
@@ -201,13 +210,13 @@ SidePassPathDecider::GetPathBoundaries(
   if (!reference_line.XYToSL(start_path_point_vec2d, &start_path_point_SL)) {
     AERROR << "Failed to get the projection from TrajectoryPoint onto "
               "reference_line";
-    return bounds;
+    return list_s_leftbound_rightbound;
   }
   double s_increment = 1.0;
   double curr_s = start_path_point_SL.s();
   bool bound_cond_gen_finished = false;
   bool is_blocked_by_obs = false;
-  std::vector<std::tuple<double, double, double>> list_s_leftbound_rightbound;
+
   // Currently, it only considers one obstacle.
   // For future scaling so that multiple obstacles can be considered,
   // a sweep-line method can be used. The code here leaves some room
@@ -245,7 +254,7 @@ SidePassPathDecider::GetPathBoundaries(
             std::abs(road_right_width_at_curr_s - kRoadBuffer);
       } else {
         AERROR << "Side-pass direction undefined.";
-        return bounds;
+        return list_s_leftbound_rightbound;
       }
     }
     list_s_leftbound_rightbound.push_back(s_leftbound_rightbound);
@@ -256,7 +265,7 @@ SidePassPathDecider::GetPathBoundaries(
     }
   }
 
-  return bounds;
+  return list_s_leftbound_rightbound;
 }
 }  // namespace planning
 }  // namespace apollo
