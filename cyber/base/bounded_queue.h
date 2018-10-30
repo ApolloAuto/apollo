@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstdlib>
-#include <iostream>
+#include <memory>
 
 #include "cyber/base/macros.h"
 #include "cyber/base/wait_strategy.h"
@@ -42,8 +42,7 @@ class BoundedQueue {
   };
 
  public:
-  BoundedQueue() : wait_strategy_(new SleepWaitStrategy()) {}
-  explicit BoundedQueue(WaitStrategy* strategy) : wait_strategy_(strategy) {}
+  BoundedQueue() {}
   BoundedQueue& operator=(const BoundedQueue& other) = delete;
   BoundedQueue(const BoundedQueue& other) = delete;
   ~BoundedQueue();
@@ -66,7 +65,7 @@ class BoundedQueue {
   uint64_t pool_size_ = 0;
   T* pool_ = nullptr;
   AtomicBool* flags_ = nullptr;
-  WaitStrategy* wait_strategy_ = nullptr;
+  std::unique_ptr<WaitStrategy> wait_strategy_ = nullptr;
   volatile bool break_all_wait_ = false;
 };
 
@@ -74,7 +73,6 @@ template <typename T>
 BoundedQueue<T>::~BoundedQueue() {
   if (wait_strategy_) {
     BreakAllWait();
-    delete wait_strategy_;
   }
   if (pool_) {
     for (int i = 0; i < pool_size_; ++i) {
@@ -82,13 +80,16 @@ BoundedQueue<T>::~BoundedQueue() {
     }
     std::free(pool_);
   }
-  if (flags_) {
-    std::free(flags_);
-  }
+  std::free(flags_);
 }
 
 template <typename T>
 bool BoundedQueue<T>::Init(uint64_t size) {
+  return Init(size, new SleepWaitStrategy());
+}
+
+template <typename T>
+bool BoundedQueue<T>::Init(uint64_t size, WaitStrategy* strategy) {
   // Head and tail each occupy a space
   pool_size_ = size + 2;
   pool_ = reinterpret_cast<T*>(std::calloc(pool_size_, sizeof(T)));
@@ -106,13 +107,7 @@ bool BoundedQueue<T>::Init(uint64_t size) {
   for (int i = 0; i < pool_size_; ++i) {
     flags_[i].flag = false;
   }
-  return true;
-}
-
-template <typename T>
-bool BoundedQueue<T>::Init(uint64_t size, WaitStrategy* strategy) {
-  Init(size);
-  wait_strategy_ = strategy;
+  wait_strategy_.reset(strategy);
   return true;
 }
 
@@ -217,7 +212,7 @@ uint64_t BoundedQueue<T>::GetIndex(uint64_t num) {
 
 template <typename T>
 void BoundedQueue<T>::SetWaitStrategy(WaitStrategy* strategy) {
-  wait_strategy_ = strategy;
+  wait_strategy_.reset(strategy);
 }
 
 template <typename T>
