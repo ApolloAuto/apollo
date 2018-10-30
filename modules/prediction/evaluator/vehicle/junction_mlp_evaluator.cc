@@ -131,7 +131,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     ADEBUG << "Obstacle [" << obstacle_ptr->id() << "] has no position.";
     return;
   }
-  double heading = feature_ptr->velocity_heading();
+  double heading = std::atan2(feature_ptr->raw_velocity().y(),
+                              feature_ptr->raw_velocity().x());
   if (!feature_ptr->has_junction_feature()) {
     AERROR << "Obstacle [" << obstacle_ptr->id()
            << "] has no junction_feature.";
