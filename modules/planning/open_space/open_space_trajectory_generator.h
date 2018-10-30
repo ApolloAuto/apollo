@@ -75,7 +75,8 @@ class OpenSpaceTrajectoryGenerator {
    * @brief plan for open space trajectory generators.
    */
   apollo::common::Status Plan(
-      const apollo::common::VehicleState& vehicle_state, double rotate_angle,
+      const apollo::common::VehicleState& vehicle_state,
+      const std::vector<double>& XYbounds, const double rotate_angle,
       const apollo::common::math::Vec2d& translate_origin,
       const std::vector<double>& end_pose, std::size_t obstacles_num,
       const Eigen::MatrixXd& obstacles_edges_num,
@@ -108,7 +109,7 @@ class OpenSpaceTrajectoryGenerator {
   size_t horizon_ = 0;
   double ts_ = 0;
   Eigen::MatrixXd ego_;
-  Eigen::MatrixXd XYbounds_;
+  std::vector<double> XYbounds_;
 
   ADCTrajectory current_trajectory_;
 };

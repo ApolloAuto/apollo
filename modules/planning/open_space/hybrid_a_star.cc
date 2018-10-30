@@ -70,9 +70,9 @@ bool HybridAStar::ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
 
 bool HybridAStar::RSPCheck(const ReedSheppPath* reeds_shepp_to_end) {
   for (std::size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
-    std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(
-        new Node3d(reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
-                   reeds_shepp_to_end->phi[i], planner_open_space_config_));
+    std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
+        reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
+        reeds_shepp_to_end->phi[i], XYbounds_, planner_open_space_config_));
     if (!ValidityCheck(node)) {
       return false;
     }
@@ -99,7 +99,7 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(
       new Node3d(reeds_shepp_to_end->x.back(), reeds_shepp_to_end->y.back(),
                  reeds_shepp_to_end->phi.back(), reeds_shepp_to_end->x,
-                 reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
+                 reeds_shepp_to_end->y, reeds_shepp_to_end->phi, XYbounds_,
                  planner_open_space_config_));
   end_node->SetPre(current_node);
   end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
@@ -151,7 +151,7 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   }
   std::shared_ptr<Node3d> next_node = std::shared_ptr<Node3d>(
       new Node3d(last_x, last_y, last_phi, intermediate_x, intermediate_y,
-                 intermediate_phi, planner_open_space_config_));
+                 intermediate_phi, XYbounds_, planner_open_space_config_));
   next_node->SetPre(current_node);
   next_node->SetDirec(traveled_distance > 0);
   next_node->SetSteer(steering);
@@ -307,8 +307,10 @@ bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
 }
 
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
-                       double ephi, ThreadSafeIndexedObstacles* obstacles,
-                       Result* result) {
+                       double ephi, const std::vector<double>& XYbounds,
+                       ThreadSafeIndexedObstacles* obstacles, Result* result) {
+  // load XYbounds
+  XYbounds_ = XYbounds;
   // load nodes and obstacles
   std::vector<double> sx_vec{sx};
   std::vector<double> sy_vec{sy};
@@ -317,8 +319,8 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
   std::vector<double> ey_vec{ey};
   std::vector<double> ephi_vec{ephi};
   start_node_.reset(new Node3d(sx, sy, sphi, sx_vec, sy_vec, sphi_vec,
-                               planner_open_space_config_));
-  end_node_.reset(new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec,
+                               XYbounds_, planner_open_space_config_));
+  end_node_.reset(new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec, XYbounds_,
                              planner_open_space_config_));
   obstacles_ = obstacles;
   if (!ValidityCheck(start_node_)) {

@@ -36,9 +36,9 @@ class HybridAStarPlanner(object):
         lib.AddVirtualObstacle(self.obstacles, c_double(x),
                                c_double(y), c_double(heading), c_double(length), c_double(width), c_int(identity))
 
-    def Plan(self, sx, sy, sphi, ex, ey, ephi):
+    def Plan(self, sx, sy, sphi, ex, ey, ephi, XYbounds):
         return lib.Plan(self.planner, self.obstacles, self.result, c_double(sx),
-                        c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi))
+                        c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi), POINTER(c_double)(XYbounds))
 
     def GetResult(self, x, y, phi, v, a, steer, output_size):
         lib.GetResult(self.result, POINTER(c_double)(x), POINTER(c_double)(y),

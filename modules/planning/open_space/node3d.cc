@@ -24,26 +24,25 @@ namespace apollo {
 namespace planning {
 
 Node3d::Node3d(double x, double y, double phi,
+               const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
+  CHECK(XYbounds.size() == 4)
+      << "XYbounds size is not 4, but" << XYbounds.size();
   x_ = x;
   y_ = y;
   phi_ = phi;
   x_grid_ = static_cast<std::size_t>(
-      (x_ - open_space_conf.warm_start_config().min_x()) /
+      (x_ - XYbounds[0]) /
       open_space_conf.warm_start_config().xy_grid_resolution());
   y_grid_ = static_cast<std::size_t>(
-      (y_ - open_space_conf.warm_start_config().min_y()) /
+      (y_ - XYbounds[2]) /
       open_space_conf.warm_start_config().xy_grid_resolution());
   phi_grid_ = static_cast<std::size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = phi_grid_ * (open_space_conf.warm_start_config().max_x() -
-                        open_space_conf.warm_start_config().min_x()) *
-               (open_space_conf.warm_start_config().max_y() -
-                open_space_conf.warm_start_config().min_y()) +
-           y_grid_ * (open_space_conf.warm_start_config().max_x() -
-                      open_space_conf.warm_start_config().min_x()) +
-           x_grid_;
+  index_ =
+      phi_grid_ * (XYbounds[1] - XYbounds[0]) * (XYbounds[3] - XYbounds[2]) +
+      y_grid_ * (XYbounds[1] - XYbounds[0]) + x_grid_;
 }
 
 Node3d::Node3d(double x, double y, double phi) {
@@ -55,26 +54,26 @@ Node3d::Node3d(double x, double y, double phi) {
 Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
                std::vector<double> traversed_y,
                std::vector<double> traversed_phi,
+               const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
+  CHECK(XYbounds.size() == 4)
+      << "XYbounds size is not 4, but" << XYbounds.size();
   x_ = x;
   y_ = y;
   phi_ = phi;
+  // XYbounds in xmin, xmax, ymin, ymax
   x_grid_ = static_cast<std::size_t>(
-      (x_ - open_space_conf.warm_start_config().min_x()) /
+      (x_ - XYbounds[0]) /
       open_space_conf.warm_start_config().xy_grid_resolution());
   y_grid_ = static_cast<std::size_t>(
-      (y_ - open_space_conf.warm_start_config().min_y()) /
+      (y_ - XYbounds[2]) /
       open_space_conf.warm_start_config().xy_grid_resolution());
   phi_grid_ = static_cast<std::size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = phi_grid_ * (open_space_conf.warm_start_config().max_x() -
-                        open_space_conf.warm_start_config().min_x()) *
-               (open_space_conf.warm_start_config().max_y() -
-                open_space_conf.warm_start_config().min_y()) +
-           y_grid_ * (open_space_conf.warm_start_config().max_x() -
-                      open_space_conf.warm_start_config().min_x()) +
-           x_grid_;
+  index_ =
+      phi_grid_ * (XYbounds[1] - XYbounds[0]) * (XYbounds[3] - XYbounds[2]) +
+      y_grid_ * (XYbounds[1] - XYbounds[0]) + x_grid_;
   traversed_x_ = traversed_x;
   traversed_y_ = traversed_y;
   traversed_phi_ = traversed_phi;

@@ -108,7 +108,7 @@ class OpenSpacePlanner : public Planner {
   size_t horizon_ = 0;
   double ts_ = 0;
   Eigen::MatrixXd ego_;
-  Eigen::MatrixXd XYbounds_;
+  std::vector<double> XYbounds_;
 
   std::future<void> task_future_;
   std::atomic<bool> is_stop_{false};

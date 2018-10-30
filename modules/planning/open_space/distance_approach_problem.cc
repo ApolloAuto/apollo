@@ -34,7 +34,7 @@ bool DistanceApproachProblem::Solve(
     const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xF,
     const Eigen::MatrixXd& last_time_u, const std::size_t& horizon,
     const float& ts, const Eigen::MatrixXd& ego, const Eigen::MatrixXd& xWS,
-    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& XYbounds,
+    const Eigen::MatrixXd& uWS, const std::vector<double>& XYbounds,
     const std::size_t& obstacles_num,
     const Eigen::MatrixXd& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,

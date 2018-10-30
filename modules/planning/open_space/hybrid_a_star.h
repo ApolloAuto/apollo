@@ -69,7 +69,8 @@ class HybridAStar {
   explicit HybridAStar(const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
-            double ephi, ThreadSafeIndexedObstacles* obstacles, Result* result);
+            double ephi, const std::vector<double>& XYbounds,
+            ThreadSafeIndexedObstacles* obstacles, Result* result);
 
  private:
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
@@ -108,6 +109,7 @@ class HybridAStar {
   double steer_penalty_ = 0.0;
   double steer_change_penalty_ = 0.0;
   double delta_t_ = 0.0;
+  std::vector<double> XYbounds_;
   ThreadSafeIndexedObstacles* obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;

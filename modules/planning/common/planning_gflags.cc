@@ -413,6 +413,15 @@ DEFINE_bool(enable_perception_obstacles, true,
             "enable the open space planner to take percetion obstacles into "
             "consideration");
 
+DEFINE_bool(enable_open_space_roi_and_info, false,
+            "enable the frame to load map data and calculate info for open "
+            "space planner");
+
+DEFINE_bool(
+    parking_inwards, false,
+    "true for parking the car inwards in parking spot, false for parking "
+    "the car towards the street");
+
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,

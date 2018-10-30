@@ -31,11 +31,11 @@ HybridAStar = HybridAStarPlanner()
 # parameter(except max, min and car size is defined in proto)
 num_output_buffer = 100000
 sx = -10.0
-sy = 2.5
+sy = 8
 sphi = 0.0
 
-scenario = "backward"
-# scenario = "parallel"
+# scenario = "backward"
+scenario = "parallel"
 
 if scenario == "backward":
     # for parking space 11543 in sunnyvale_with_two_offices
@@ -46,15 +46,17 @@ if scenario == "backward":
     ex = 1.359
     ey = -1.561
     ephi = -math.pi / 2
+    XYbounds = [-20, 20, -20, 20]
 elif scenario == "parallel":
     #obstacles(x, y, heading, length, width, id)
     HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
     HybridAStar.AddVirtualObstacle(-12, 0.0, 0.0, 16.0, 10.0, 2)
     HybridAStar.AddVirtualObstacle(12, 0.0, 0.0, 16.0, 10.0, 3)
     HybridAStar.AddVirtualObstacle(0.0, -1.25, 0.0, 40.0, 7.5, 4)
-    ex = -1.75
-    ey = 4.0
-    ephi = 0
+    ex = -1.0
+    ey = 0.0
+    ephi = 0.0
+    XYbounds = [-20, 20, -20, 20]
 
 
 x = (c_double * num_output_buffer)()
@@ -64,10 +66,11 @@ v = (c_double * num_output_buffer)()
 a = (c_double * num_output_buffer)()
 steer = (c_double * num_output_buffer)()
 size = (c_ushort * 1)()
+XYbounds_ctype = (c_double * 4)(*XYbounds)
 
 start = time.time()
 print("planning start")
-if not HybridAStar.Plan(sx, sy, sphi, ex, ey, ephi):
+if not HybridAStar.Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_ctype):
     print("planning fail")
     exit()
 end = time.time()

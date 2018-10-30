@@ -67,7 +67,7 @@ Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
              const double start_time, const common::VehicleState &vehicle_state,
              ReferenceLineProvider *reference_line_provider,
-             ADCTrajectory* output_trajectory)
+             ADCTrajectory *output_trajectory)
     : sequence_num_(sequence_num),
       local_view_(local_view),
       planning_start_point_(planning_start_point),
@@ -382,6 +382,14 @@ Status Frame::Init(
   }
   future_route_waypoints_ = future_route_waypoints;
 
+  // TODO(Jinyun) make frame only run GetOpenSpaceROI() at the first frame of
+  // open space planner to save computation effort
+  if (FLAGS_enable_open_space_roi_and_info) {
+    if (!(GetOpenSpaceROI() && GetOpenSpaceInfo())) {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "failed to init open space info");
+    }
+  }
   return Status::OK();
 }
 
@@ -529,12 +537,6 @@ const std::vector<const Obstacle *> Frame::obstacles() const {
 }
 
 bool Frame::VPresentationObstacle() {
-  // load info from pnc map
-  if (!OpenSpaceROI()) {
-    AERROR << "fail at ROI()";
-    return false;
-  }
-
   std::size_t parking_boundaries_num = ROI_parking_boundary_.size();
 
   if (parking_boundaries_num != 4) {
@@ -551,8 +553,8 @@ bool Frame::VPresentationObstacle() {
     // load percption obstacle list for warm start
     for (std::size_t i = 0; i < perception_obstacles_num; i++) {
       Box2d original_box = obstacles_.Items().at(i)->PerceptionBoundingBox();
-      original_box.Shift(-1 * origin_point_);
-      original_box.RotateFromCenter(-origin_heading_);
+      original_box.Shift(-1.0 * origin_point_);
+      original_box.RotateFromCenter(-1.0 * origin_heading_);
       std::unique_ptr<Obstacle> obstacle =
           Obstacle::CreateStaticVirtualObstacles(obstacles_.Items().at(i)->Id(),
                                                  original_box);
@@ -574,8 +576,8 @@ bool Frame::VPresentationObstacle() {
     // last to form closed convex hull)
     for (const auto &obstacle : obstacles_.Items()) {
       Box2d original_box = obstacle->PerceptionBoundingBox();
-      original_box.Shift(-1 * origin_point_);
-      original_box.RotateFromCenter(-origin_heading_);
+      original_box.Shift(-1.0 * origin_point_);
+      original_box.RotateFromCenter(-1.0 * origin_heading_);
       std::vector<Vec2d> vertices_ccw = original_box.GetAllCorners();
       std::vector<Vec2d> vertices_cw;
       while (!vertices_ccw.empty()) {
@@ -775,7 +777,7 @@ bool Frame::ObsHRep(
   return true;
 }
 
-bool Frame::OpenSpaceROI() {
+bool Frame::GetOpenSpaceROI() {
   const ReferenceLineInfo *best_ref_info = FindDriveReferenceLineInfo();
   if (!best_ref_info) {
     std::string msg("fail to get the best reference line");
@@ -864,27 +866,32 @@ bool Frame::OpenSpaceROI() {
   start_left -= origin_point_;
   end_right -= origin_point_;
   end_left -= origin_point_;
-  left_top.SelfRotate(-origin_heading_);
-  left_down.SelfRotate(-origin_heading_);
-  right_top.SelfRotate(-origin_heading_);
-  right_down.SelfRotate(-origin_heading_);
-  start_right.SelfRotate(-origin_heading_);
-  start_left.SelfRotate(-origin_heading_);
-  end_right.SelfRotate(-origin_heading_);
-  end_left.SelfRotate(-origin_heading_);
+  left_top.SelfRotate(-1.0 * origin_heading_);
+  left_down.SelfRotate(-1.0 * origin_heading_);
+  right_top.SelfRotate(-1.0 * origin_heading_);
+  right_down.SelfRotate(-1.0 * origin_heading_);
+  start_right.SelfRotate(-1.0 * origin_heading_);
+  start_left.SelfRotate(-1.0 * origin_heading_);
+  end_right.SelfRotate(-1.0 * origin_heading_);
+  end_left.SelfRotate(-1.0 * origin_heading_);
 
   // get end_pose of the parking spot
-  double heading = (left_down - left_top).Angle();
-  double x = (left_top.x() + right_top.x()) / 2;
-  double y = 0.0;
-  if (heading > kMathEpsilon) {
-    y = left_top.y() + (-left_top.y() + left_down.y()) / 4;
+  double parking_spot_heading = (left_down - left_top).Angle();
+  double end_x = (left_top.x() + right_top.x()) / 2;
+  double end_y = 0.0;
+  if (parking_spot_heading > kMathEpsilon) {
+    end_y = left_top.y() + (left_down.y() - left_top.y()) / 4;
   } else {
-    y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
+    end_y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
   }
-  open_space_end_pose_.emplace_back(x);
-  open_space_end_pose_.emplace_back(y);
-  open_space_end_pose_.emplace_back(heading);
+  open_space_end_pose_.emplace_back(end_x);
+  open_space_end_pose_.emplace_back(end_y);
+  if (FLAGS_parking_inwards) {
+    open_space_end_pose_.emplace_back(parking_spot_heading);
+  } else {
+    open_space_end_pose_.emplace_back(
+        common::math::NormalizeAngle(parking_spot_heading + M_PI));
+  }
   open_space_end_pose_.emplace_back(0.0);
 
   // get xy boundary of the ROI
@@ -903,7 +910,6 @@ bool Frame::OpenSpaceROI() {
   ROI_xy_boundary_.emplace_back(x_max);
   ROI_xy_boundary_.emplace_back(y_min);
   ROI_xy_boundary_.emplace_back(y_max);
-
   // If smaller than zero, the parking spot is on the right of the lane
   // Left, right, down or up of the boundary is decided when viewing the
   // parking spot upward
@@ -913,16 +919,16 @@ bool Frame::OpenSpaceROI() {
   std::vector<Vec2d> up_boundary;
 
   if (left_top_l < 0) {
-    start_right.set_x(-left_top_l * start_right_vec_cos);
-    start_right.set_y(-left_top_l * start_right_vec_sin);
+    start_right.set_x(-1.0 * left_top_l * start_right_vec_cos);
+    start_right.set_y(-1.0 * left_top_l * start_right_vec_sin);
     start_right = start_right + start_point;
-    end_right.set_x(-left_top_l * end_right_vec_cos);
-    end_right.set_y(-left_top_l * end_right_vec_sin);
+    end_right.set_x(-1.0 * left_top_l * end_right_vec_cos);
+    end_right.set_y(-1.0 * left_top_l * end_right_vec_sin);
     end_right = end_right + end_point;
     start_right -= origin_point_;
     end_right -= origin_point_;
-    start_right.SelfRotate(-origin_heading_);
-    end_right.SelfRotate(-origin_heading_);
+    start_right.SelfRotate(-1.0 * origin_heading_);
+    end_right.SelfRotate(-1.0 * origin_heading_);
     left_boundary.push_back(start_right);
     left_boundary.push_back(left_top);
     left_boundary.push_back(left_down);
@@ -942,8 +948,8 @@ bool Frame::OpenSpaceROI() {
     end_left = end_left + end_point;
     start_left -= origin_point_;
     end_left -= origin_point_;
-    start_left.SelfRotate(-origin_heading_);
-    end_left.SelfRotate(-origin_heading_);
+    start_left.SelfRotate(-1.0 * origin_heading_);
+    end_left.SelfRotate(-1.0 * origin_heading_);
     left_boundary.push_back(end_left);
     left_boundary.push_back(left_top);
     left_boundary.push_back(left_down);
@@ -963,5 +969,18 @@ bool Frame::OpenSpaceROI() {
   return true;
 }
 
+bool Frame::GetOpenSpaceInfo() {
+  // Gather vertice needed by warm start and distance approach
+  if (!VPresentationObstacle()) {
+    AERROR << "fail at VPresentationObstacle()";
+    return false;
+  }
+  // Transform vertices into the form of Ax>b
+  if (!HPresentationObstacle()) {
+    AERROR << "fail at HPresentationObstacle()";
+    return false;
+  }
+  return true;
+}
 }  // namespace planning
 }  // namespace apollo

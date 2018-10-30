@@ -53,6 +53,7 @@ if scenario == "backward":
     ex = 0.0
     ey = 2.0
     ephi = math.pi / 2
+    XYbounds = [-20, 20, -5, 15]
 # elif scenario == "parallel":
 #     #obstacles(x, y, heading, length, width, id)
 #     OpenSpacePlanner.AddWarmStartObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
@@ -62,6 +63,7 @@ if scenario == "backward":
 #     ex = -1.75
 #     ey = 4.0
 #     ephi = 0
+    # XYbounds = [-20, 20, -20, 20]
 
 
 x = (c_double * num_output_buffer)()
@@ -78,10 +80,11 @@ opt_a = (c_double * num_output_buffer)()
 opt_steer = (c_double * num_output_buffer)()
 opt_time = (c_double * num_output_buffer)()
 size = (c_ushort * 1)()
+XYbounds_ctype = (c_double * 4)(*XYbounds)
 
 start = time.time()
 print("planning start")
-if not OpenSpacePlanner.DistancePlan(sx, sy, sphi, ex, ey, ephi):
+if not OpenSpacePlanner.DistancePlan(sx, sy, sphi, ex, ey, ephi, XYbounds_ctype):
     print("planning fail")
     exit()
 end = time.time()
@@ -89,7 +92,7 @@ print("planning time is " + str(end - start))
 
 # load result
 OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
-                              opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, size)
+                                   opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, size)
 x_out = []
 y_out = []
 phi_out = []
