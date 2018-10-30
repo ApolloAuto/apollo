@@ -28,14 +28,15 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/toolkits/deciders/decider_creep.h"
 #include "modules/planning/toolkits/deciders/decider_stop_sign.h"
+#include "modules/planning/toolkits/deciders/side_pass_path_decider.h"
 #include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/path_decider/path_decider.h"
+#include "modules/planning/toolkits/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
 #include "modules/planning/toolkits/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/speed_decider/speed_decider.h"
-#include "modules/planning/toolkits/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"  // NOLINT
 #include "modules/planning/toolkits/task.h"
 
 namespace apollo {
@@ -58,6 +59,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::QP_SPLINE_PATH_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new QpSplinePathOptimizer(config);
+                         });
+  task_factory_.Register(TaskConfig::SIDE_PASS_PATH_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new SidePassPathDecider(config);
                          });
   task_factory_.Register(TaskConfig::DP_POLY_PATH_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
