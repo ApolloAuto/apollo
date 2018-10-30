@@ -14,19 +14,27 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <queue>
+
 #include "modules/prediction/common/junction_analyzer.h"
 
 namespace apollo {
 namespace prediction {
 
 JunctionAnalyzer::JunctionAnalyzer(const std::string& junction_id) {
-  // TODO(all) implement 
+  // TODO(all) implement
 }
 
-std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits() {
+std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
+    const std::string& start_lane_id) {
   // TODO(all) implement
   std::vector<JunctionExit> junction_exits;
   return junction_exits;
+}
+
+bool JunctionAnalyzer::IsExitLane(const std::string& lane_id) {
+  // TODO(kechxu) implement
+  return false;
 }
 
 }  // namespace prediction

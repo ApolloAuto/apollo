@@ -18,7 +18,9 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/common/prediction_map.h"
 
@@ -27,11 +29,17 @@ namespace prediction {
 
 class JunctionAnalyzer {
  public:
-  JunctionAnalyzer(const std::string& junction_id);
+  explicit JunctionAnalyzer(const std::string& junction_id);
 
   virtual ~JunctionAnalyzer() = default;
 
-  std::vector<JunctionExit> GetJunctionExits();
+  std::vector<JunctionExit> GetJunctionExits(const std::string& start_lane_id);
+
+ private:
+  bool IsExitLane(const std::string& lane_id);
+
+ private:
+  std::shared_ptr<apollo::hdmap::JunctionInfo> junction_info_ptr_;
 };
 
 }  // namespace prediction
