@@ -93,8 +93,8 @@ TEST(BoundedQueueTest, WaitDequeue) {
 }
 
 TEST(BoundedQueueTest, block_wait) {
-  BoundedQueue<int> queue(new BlockWaitStrategy());
-  queue.Init(100);
+  BoundedQueue<int> queue;
+  queue.Init(100, new BlockWaitStrategy());
   std::thread t([&]() {
     int value = 0;
     queue.WaitDequeue(&value);
@@ -105,8 +105,8 @@ TEST(BoundedQueueTest, block_wait) {
 }
 
 TEST(BoundedQueueTest, yield_wait) {
-  BoundedQueue<int> queue(new YieldWaitStrategy());
-  queue.Init(100);
+  BoundedQueue<int> queue;
+  queue.Init(100, new YieldWaitStrategy());
   std::thread t([&]() {
     int value = 0;
     queue.WaitDequeue(&value);
@@ -117,8 +117,8 @@ TEST(BoundedQueueTest, yield_wait) {
 }
 
 TEST(BoundedQueueTest, spin_wait) {
-  BoundedQueue<int> queue(new BusySpinWaitStrategy());
-  queue.Init(100);
+  BoundedQueue<int> queue;
+  queue.Init(100, new BusySpinWaitStrategy());
   std::thread t([&]() {
     int value = 0;
     queue.WaitDequeue(&value);
@@ -129,8 +129,8 @@ TEST(BoundedQueueTest, spin_wait) {
 }
 
 TEST(BoundedQueueTest, busy_wait) {
-  BoundedQueue<int> queue(new BusySpinWaitStrategy());
-  queue.Init(100);
+  BoundedQueue<int> queue;
+  queue.Init(100, new BusySpinWaitStrategy());
   std::thread t([&]() {
     int value = 0;
     queue.WaitDequeue(&value);
