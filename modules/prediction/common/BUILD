@@ -175,4 +175,15 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "junction_analyzer",
+    srcs = ["junction_analyzer.cc"],
+    hdrs = ["junction_analyzer.h"],
+    deps = [
+        "//modules/prediction/proto:feature_proto",
+        ":prediction_map",
+        "//cyber",
+    ],
+)
+
 cpplint()
