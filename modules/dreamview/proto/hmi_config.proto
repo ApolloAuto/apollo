@@ -58,6 +58,10 @@ message HMIConfig {
   reserved 9;
 }
 
+message AudioCapture {
+  optional bytes wav_stream = 1;
+}
+
 message VehicleData {
   // Upon switching vehicle, we need to copy source data to the dest path to
   // make it in effect.
