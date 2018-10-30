@@ -1107,9 +1107,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
         lane_point.mutable_position()->set_y(lane_point_pos[1]);
         lane_point.set_heading(lane_point_heading);
         lane_point.set_width(lane_point_width);
-        double lane_s = -1.0;
-        double lane_l = 0.0;
-        PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l);
+        double lane_l = feature->lane().lane_feature().lane_l();
         lane_point.set_relative_s(total_s);
         lane_point.set_relative_l(0.0 - lane_l);
         lane_point.set_angle_diff(lane_point_angle_diff);
