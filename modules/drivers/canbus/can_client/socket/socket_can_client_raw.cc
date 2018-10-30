@@ -178,7 +178,6 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
     return ErrorCode::CAN_CLIENT_ERROR_FRAME_NUM;
   }
 
-  int32_t framecount = 0;
   for (int32_t i = 0; i < *frame_num && i < MAX_CAN_RECV_FRAME_LEN; ++i) {
     CanFrame cf;
     int ret = read(dev_handler_, &recv_frames_[i], sizeof(recv_frames_[i]));
@@ -188,32 +187,17 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
       return ErrorCode::CAN_CLIENT_ERROR_BASE;
     }
     if (recv_frames_[i].can_dlc != CANBUS_MESSAGE_LENGTH) {
-      AWARN << "recv_frames_[" << i
+      AERROR << "recv_frames_[" << i
              << "].can_dlc = " << recv_frames_[i].can_dlc
              << ", which is not equal to can message data length ("
              << CANBUS_MESSAGE_LENGTH << ").";
-
-      //with the above precondition, if can_dlc is not equal to 0, it may be designed to send data with an unusual length
-      //we consider this and an error
-      if (recv_frames_[i].can_dlc != 0) {
-        AERROR << "recv_frames_[" << i
-             << "].can_dlc = " << recv_frames_[i].can_dlc
-             << ", which is not equal to can message data length and not equal to 0";
-
-      }
-      //return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
-      continue;
+      return ErrorCode::CAN_CLIENT_ERROR_RECV_FAILED;
     }
-
     cf.id = recv_frames_[i].can_id;
     cf.len = recv_frames_[i].can_dlc;
     std::memcpy(cf.data, recv_frames_[i].data, recv_frames_[i].can_dlc);
     frames->push_back(cf);
-    
-    framecount++;
   }
-  //assign actual frame count to temperory `frame_num`
-  *frame_num = framecount;
   return ErrorCode::OK;
 }
 
