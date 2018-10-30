@@ -503,6 +503,10 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     }
   }
 
+  feature->mutable_raw_velocity()->set_x(velocity_x);
+  feature->mutable_raw_velocity()->set_y(velocity_y);
+  feature->mutable_raw_velocity()->set_z(velocity_z);
+
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = std::atan2(velocity_y, velocity_x);
   if (FLAGS_adjust_velocity_by_obstacle_heading) {
