@@ -45,10 +45,10 @@ class SidePassPathDecider : public Decider {
   };
 
  private:
-  apollo::common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  common::Status Process(Frame* frame,
+                         ReferenceLineInfo* reference_line_info) override;
 
-  apollo::common::Status BuildSidePathDecision(
+  common::Status BuildSidePathDecision(
       Frame* frame, ReferenceLineInfo* const reference_line_info);
 
   bool GeneratePath(Frame* frame, ReferenceLineInfo* reference_line_info);

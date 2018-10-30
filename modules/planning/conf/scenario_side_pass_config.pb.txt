@@ -33,8 +33,6 @@ stage_config : {
 stage_config : {
   stage_type: SIDE_PASS_GENERATE_PATH
   enabled: true
-  
-  task_type: DP_POLY_PATH_OPTIMIZER
   task_type: SIDE_PASS_PATH_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
@@ -53,7 +51,7 @@ stage_config : {
     }
   }
   task_config : {
-    task_type : DP_POLY_PATH_OPTIMIZER
+    task_type : SIDE_PASS_PATH_DECIDER
   }
   task_config : {
     task_type : DP_ST_SPEED_OPTIMIZER
