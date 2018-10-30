@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+ARCH=$(uname -m)
 
 addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
 adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
@@ -23,15 +24,29 @@ adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
 usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
-echo '
-export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda2/bin
+if [ "$ARCH" == 'aarch64' ]; then
+  echo '
+  export PATH=\$PATH:\${JAVA_HOME}/bin:/apollo/scripts:/usr/local/miniconda2/bin/
 
-if [ -e "/apollo/scripts/apollo_base.sh" ]; then
-  source /apollo/scripts/apollo_base.sh
+  if [ -e "/apollo/scripts/apollo_base.sh" ]; then 
+    source /apollo/scripts/apollo_base.sh; 
+  fi
+
+  ulimit -c unlimited
+  ' >> "/home/${DOCKER_USER}/.bashrc"
+
+  source /home/${DOCKER_USER}/.bashrc
+else
+  echo '
+  export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda2/bin
+
+  if [ -e "/apollo/scripts/apollo_base.sh" ]; then
+    source /apollo/scripts/apollo_base.sh
+  fi
+
+  ulimit -c unlimited
+  ' >> "/home/${DOCKER_USER}/.bashrc"
 fi
-
-ulimit -c unlimited
-' >> "/home/${DOCKER_USER}/.bashrc"
 
 echo '
 genhtml_branch_coverage = 1
