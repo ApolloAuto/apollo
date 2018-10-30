@@ -320,6 +320,9 @@ class TrajectoryToSample(object):
                 # print("No junction_feature, junction_exit, or junction_mlp_feature, not labeling this frame.")
                 continue
             curr_pos = np.array([fea.position.x, fea.position.y])
+            # Only keep speed > 1
+            if fea.speed <= 1:
+                continue
             heading = math.atan2(fea.raw_velocity.y, fea.raw_velocity.x)
             # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
             exit_dict = dict()
