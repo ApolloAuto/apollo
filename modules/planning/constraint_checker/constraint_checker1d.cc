@@ -38,12 +38,12 @@ bool ConstraintChecker1d::IsValidLongitudinalTrajectory(
     const Curve1d& lon_trajectory) {
   double t = 0.0;
   while (t < lon_trajectory.ParamLength()) {
-    double v = lon_trajectory.Evaluate(1, t);  // evalute_v
+    double v = lon_trajectory.Evaluate(1, t);  // evaluate_v
     if (!fuzzy_within(v, FLAGS_speed_lower_bound, FLAGS_speed_upper_bound)) {
       return false;
     }
 
-    double a = lon_trajectory.Evaluate(2, t);  // evaluat_a
+    double a = lon_trajectory.Evaluate(2, t);  // evaluate_a
     if (!fuzzy_within(a, FLAGS_longitudinal_acceleration_lower_bound,
                       FLAGS_longitudinal_acceleration_upper_bound)) {
       return false;
