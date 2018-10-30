@@ -82,8 +82,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  // Check if ADC has fully stopped.
-  // TODO(All)
+  // TODO(All): Check if ADC has fully stopped.
 
   // Decide whether to side-pass from left or right.
   if (BuildSidePathDecision(frame, reference_line_info) != Status().OK()) {
@@ -223,12 +222,13 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   }
   // Call optimizer to generate smooth path.
   fem_qp_->SetVariableBounds(list_s_leftbound_rightbound);
-  fem_qp_->Optimize();
+  if (!fem_qp_->Optimize()) {
+    AERROR << "Fail to optimize in SidePassPathDecider.";
+    return false;
+  }
 
   // TODO(All): put optimized results into ReferenceLineInfo.
   // Update Reference_Line_Info with this newly generated path.
-  std::vector<common::FrenetFramePoint> frenet_path;
-
   std::vector<common::FrenetFramePoint> frenet_frame_path;
   double accumulated_s = 0.0;
   for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
@@ -243,7 +243,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
 
   auto path_data = reference_line_info->mutable_path_data();
   path_data->SetReferenceLine(&reference_line);
-  path_data->SetFrenetPath(FrenetFramePath(frenet_path));
+  path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
 
   return true;
 }
