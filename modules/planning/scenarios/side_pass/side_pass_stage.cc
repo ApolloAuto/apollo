@@ -102,6 +102,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
 Stage::StageStatus SidePassGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   if (PlanningOnReferenceLine(planning_start_point, frame)) {
+    GetContext()->path_data_ = frame->reference_line_info().front().path_data();
     next_stage_ = ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT;
     return Stage::FINISHED;
   } else {
