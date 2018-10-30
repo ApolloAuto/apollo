@@ -39,9 +39,9 @@ namespace stop_sign_protected {
 
 // stage context
 struct StopSignUnprotectedContext {
+  std::string stop_sign_id;
   double stop_start_time;
   std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
-  hdmap::PathOverlap next_stop_sign_overlap;
   std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
       associated_lanes;
 };
