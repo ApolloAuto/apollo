@@ -54,7 +54,7 @@ void ProcessorContext::Notify(uint64_t cr_id) {
   if (likely(iter != cr_container_.end())) {
     auto& cr = iter->second;
     if (cr->state() == RoutineState::DATA_WAIT) {
-      cr->set_state(RoutineState::READY);
+      cr->set_notified();
     }
 
     // FIXME: should release cr_container lock here.
