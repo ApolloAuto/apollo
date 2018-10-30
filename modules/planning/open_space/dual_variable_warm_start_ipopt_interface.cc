@@ -183,6 +183,35 @@ bool DualVariableWarmStartIPOPTInterface::eval_f(int n, const double* x,
 bool DualVariableWarmStartIPOPTInterface::eval_grad_f(int n, const double* x,
                                                       bool new_x,
                                                       double* grad_f) {
+  // 1. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
+  // horizon_]
+  std::size_t l_index = l_start_index_;
+  std::size_t n_index = n_start_index_;
+  std::size_t d_index = d_start_index_;
+
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
+      grad_f[l_index] = 0.0;
+      ++l_index;
+    }
+  }
+
+  // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+      grad_f[n_index] = 0.0;
+      ++n_index;
+    }
+  }
+
+  // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+      // TODO(QiL): Change to weight configration
+      grad_f[d_index] = 1.0;
+      ++n_index;
+    }
+  }
   return true;
 }
 
