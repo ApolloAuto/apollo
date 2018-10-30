@@ -85,8 +85,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 
   auto start_time = GetContext()->stop_start_time;
   double wait_time = Clock::NowInSeconds() - start_time;
-  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
-         << "]";
+  ADEBUG << "stop_start_time[" << start_time
+      << "] wait_time[" << wait_time << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
   if (wait_time >= conf_stop_duration_ && watch_vehicles.empty()) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
@@ -126,20 +126,13 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
   }
 
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  const double stop_sign_overlap_end_s =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
-                           GetContext()->next_stop_sign_overlap.end_s)) {
+                           stop_sign_overlap_end_s)) {
     return Stage::FINISHED;
   }
-
-  /*
-  // build a stop fence by creep decider
-  if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-          ->Process(frame, &reference_line_info) != Status::OK()) {
-    ADEBUG << "fail at build stop fence at creeping";
-    return Stage::ERROR;
-  }
-  */
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
@@ -156,7 +149,7 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   CHECK_NOTNULL(frame);
 
-  if (GetContext()->next_stop_sign_overlap.object_id !=
+  if (GetContext()->stop_sign_id !=
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
@@ -369,7 +362,7 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
     auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
         obstacle_lane.get()->id());
     if (over_lap_info == nullptr) {
-      AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
+      ADEBUG << "can't find over_lap_info for id: " << obstable_lane_id;
       return -1;
     }
 
@@ -439,7 +432,8 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
 
   // check stop close enough to stop line of the stop_sign
   double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  double stop_line_start_s = GetContext()->next_stop_sign_overlap.start_s;
+  double stop_line_start_s =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
   double distance_stop_line_to_adc_front_edge =
       stop_line_start_s - adc_front_edge_s;
   ADEBUG << "distance_stop_line_to_adc_front_edge["

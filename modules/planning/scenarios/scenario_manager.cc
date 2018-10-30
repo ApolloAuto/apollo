@@ -107,6 +107,9 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
+  PlanningContext::GetScenarioInfo()->next_stop_sign_overlap =
+      PathOverlap();
+
   const auto& reference_line_info = frame.reference_line_info().front();
 
   // find next stop_sign_overlap
@@ -124,6 +127,8 @@ void ScenarioManager::Observe(const Frame& frame) {
           stop_sign_overlap;
     }
   }
+  ADEBUG << "STOP SIGN: " <<
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,

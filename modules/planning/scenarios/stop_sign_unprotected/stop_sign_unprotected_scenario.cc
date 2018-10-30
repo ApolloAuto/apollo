@@ -52,14 +52,13 @@ void StopSignUnprotectedScenario::Init() {
 
   Scenario::Init();
 
-  context_.next_stop_sign_overlap =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap;
   const std::string stop_sign_overlap_id =
-      context_.next_stop_sign_overlap.object_id;
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
   if (stop_sign_overlap_id.empty()) {
     return;
   }
 
+  context_.stop_sign_id = stop_sign_overlap_id;
   next_stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
       hdmap::MakeMapId(stop_sign_overlap_id));
   if (!next_stop_sign_) {
@@ -128,8 +127,10 @@ bool StopSignUnprotectedScenario::IsTransferable(
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double stop_sign_overlap_start_s =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
   const double adc_distance_to_stop_sign =
-      context_.next_stop_sign_overlap.start_s - adc_front_edge_s;
+      stop_sign_overlap_start_s - adc_front_edge_s;
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   const uint32_t time_distance = static_cast<uint32_t>(ceil(
