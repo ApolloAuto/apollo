@@ -3,7 +3,7 @@
 
 * You are welcome to contribute to project Apollo. To contribute to apollo, you have to agree with the [Apollo individual contributor license agreement](https://gist.githubusercontent.com/startcode/f5ccf8887bfc7727a0ae05bf0d601e30/raw/029a11300e987e34a29a9d247ac30caa7f6741a7/Apollo_Individual_Contributor_License_Agreement)..
 
-* 아폴로 프로젝트에 참여하세요. 아폴로 프로젝트에 기여하기 위해서 당신은 아폴로 프로젝트 라이선스에 동의해야 합니다.[Apollo individual contributor license agreement](https://gist.githubusercontent.com/startcode/f5ccf8887bfc7727a0ae05bf0d601e30/raw/029a11300e987e34a29a9d247ac30caa7f6741a7/Apollo_Individual_Contributor_License_Agreement).
+* 아폴로 프로젝트에 참여하세요. 아폴로 프로젝트에 기여하기 위해서 당신은 아폴로 프로젝트 라이선스에 동의해야 합니다.[Apollo individual contributor license agreement](https://gist.githubusercontent.com/startcode/f5ccf8887bfc7727a0ae05bf0d601e30/raw/029a11300e987e34a29a9d247ac30caa7f6741a7/Apollo_Individual_Contributor_License_Agreement)
  ### How do I start contributing
  ### 기여 하는 방법
 * You can follow the standard [Github approach](https://help.github.com/articles/using-pull-requests/) to contribute code.
