@@ -69,7 +69,8 @@ bool DualVariableWarmStartProblem::Solve(
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    ADEBUG << "*** Wart start problem error during initialization!";
+    ADEBUG
+        << "*** Dual variable wart start problem error during initialization!";
     return false;
   }
 

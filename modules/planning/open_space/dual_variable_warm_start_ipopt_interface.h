@@ -35,12 +35,12 @@ namespace planning {
 
 class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
  public:
-  explicit DualVariableWarmStartIPOPTInterface(int num_of_variables,
-                                               int num_of_constraints,
-                                               std::size_t horizon, float ts,
-                                               Eigen::MatrixXd x0,
-                                               Eigen::MatrixXd xf,
-                                               Eigen::MatrixXd XYbounds);
+  explicit DualVariableWarmStartIPOPTInterface(
+      int num_of_variables, int num_of_constraints, std::size_t horizon,
+      float ts, const Eigen::MatrixXd& ego,
+      const Eigen::MatrixXd& obstacles_edges_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+      const double rx, const double ry, const double r_yaw);
 
   virtual ~DualVariableWarmStartIPOPTInterface() = default;
 
@@ -99,13 +99,39 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   int num_of_constraints_;
   std::size_t horizon_;
   float ts_;
-  Eigen::MatrixXd x0_;
-  Eigen::MatrixXd xf_;
-  Eigen::MatrixXd XYbounds_;
+  Eigen::MatrixXd ego_;
 
   Eigen::MatrixXd l_warm_up_;
   Eigen::MatrixXd n_warm_up_;
   double wheelbase_;
+
+  double w_ev_;
+  double l_ev_;
+  std::vector<double> g_;
+  double offset_;
+  Eigen::MatrixXd obstacles_edges_num_;
+  std::size_t obstacles_num_;
+  std::size_t obstacles_edges_sum_;
+
+  // lagrangian l start index
+  std::size_t l_start_index_ = 0;
+
+  // lagrangian n start index
+  std::size_t n_start_index_ = 0;
+
+  // lagrangian d start index
+  std::size_t d_start_index_ = 0;
+
+  // obstacles_A
+  Eigen::MatrixXd obstacles_A_;
+
+  // obstacles_b
+  Eigen::MatrixXd obstacles_b_;
+
+  // Final state of warm up stage
+  double rx_;
+  double ry_;
+  double r_yaw_;
 };
 
 }  // namespace planning
