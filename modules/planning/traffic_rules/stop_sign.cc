@@ -284,7 +284,7 @@ bool StopSign::CheckCreepDone(ReferenceLineInfo* const reference_line_info) {
     bool all_far_away = true;
     for (auto* obstacle :
          reference_line_info->path_decision()->obstacles().Items()) {
-      if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
+      if (obstacle->IsVirtual() || obstacle->IsStatic()) {
         continue;
       }
       if (obstacle->reference_line_st_boundary().min_t() <
