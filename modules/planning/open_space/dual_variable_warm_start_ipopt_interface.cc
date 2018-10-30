@@ -234,6 +234,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
 
   std::size_t l_index = l_start_index_;
   std::size_t n_index = n_start_index_;
+  std::size_t d_index = d_start_index_;
   std::size_t constraint_index = 0;
 
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
@@ -268,7 +269,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
       // TODO(QiL): Need to revise according to dual modeling
       double tmp3 = 0.0;
       for (std::size_t k = 0; k < 4; ++k) {
-        tmp3 += -g_[k] * x[n_index + k];
+        tmp3 += g_[k] * x[n_index + k];
       }
 
       double tmp4 = 0.0;
@@ -277,13 +278,14 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
       }
 
       g[constraint_index + 3] =
-          tmp3 + (rx_ + std::cos(r_yaw_) * offset_) * tmp1 +
-          (ry_ + std::sin(r_yaw_) * offset_) * tmp2 - tmp4;
+          x[d_index] + tmp3 - (rx_ + std::cos(r_yaw_) * offset_) * tmp1 -
+          (ry_ + std::sin(r_yaw_) * offset_) * tmp2 + tmp4;
 
       // Update index
       edges_counter += current_edges_num;
       l_index += current_edges_num;
       n_index += 4;
+      d_index += 1;
       constraint_index += 4;
     }
   }
@@ -312,6 +314,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
     std::size_t l_index = l_start_index_;
     std::size_t n_index = n_start_index_;
+    std::size_t d_index = d_start_index_;
     for (std::size_t i = 0; i < horizon_ + 1; ++i) {
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
         std::size_t current_edges_num = obstacles_edges_num_(j, 0);
@@ -373,9 +376,14 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
           ++nz_index;
         }
 
-        // Update inde
+        // with resepct to d
+        iRow[nz_index] = constraint_index + 3;
+        jCol[nz_index] = d_index;
+
+        // Update index
         l_index += current_edges_num;
         n_index += 4;
+        d_index += 1;
         constraint_index += 4;
       }
     }
@@ -486,6 +494,10 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
           ++nz_index;
         }
 
+        // with respect to d
+        values[nz_index] = 1;  // ffk
+        ++nz_index;
+
         // Update index
         edges_counter += current_edges_num;
         l_index += current_edges_num;
@@ -499,7 +511,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
 
   ADEBUG << "eval_jac_g done";
   return true;
-}
+}  // namespace planning
 
 void DualVariableWarmStartIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
