@@ -67,10 +67,10 @@ bool Player::Start() {
   }
 
   term_ctrl_->SetUp();
-  producer_->Start();
   std::cout << "\nPlease wait for loading...\n"
             << "Hit Ctrl+C to stop, or Space to pause.\n"
             << std::endl;
+  producer_->Start();
 
   auto& play_param = producer_->play_param();
   if (play_param.delay_time_s != 0) {

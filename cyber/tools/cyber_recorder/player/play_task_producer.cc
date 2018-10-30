@@ -82,6 +82,12 @@ void PlayTaskProducer::Start() {
   }
 
   produce_th_.reset(new std::thread(&PlayTaskProducer::ThreadFunc, this));
+
+  auto preload_sec = kPreloadTimeSec;
+  while (preload_sec > 0 && !is_stopped_.load()) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    --preload_sec;
+  }
 }
 
 void PlayTaskProducer::Stop() {
