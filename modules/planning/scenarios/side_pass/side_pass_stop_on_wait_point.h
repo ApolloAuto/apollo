@@ -32,6 +32,26 @@ namespace side_pass {
 
 struct SidePassContext;
 
+/**
+ * @brief:
+ * STAGE: SidePassStopOnWaitPoint
+ * Notations:
+ *
+ *    front of car
+ * A +----------+ B
+ *   |          |
+ *   /          /
+ *   |          |
+ *   |          |
+ *   |          |
+ *   |    X     |                                       O
+ *   |<-->.<----|-------------------------------------->* (turn center)
+ *   |          |   VehicleParam.min_turn_radius()
+ *   |          |
+ * D +----------+ C
+ *    back of car
+ *
+ */
 class SidePassStopOnWaitPoint : public Stage {
  public:
   explicit SidePassStopOnWaitPoint(const ScenarioConfig::StageConfig& config)
@@ -46,6 +66,8 @@ class SidePassStopOnWaitPoint : public Stage {
       const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
       const common::PathPoint& first_path_point,
       const common::PathPoint& last_path_point);
+  bool GetMoveForwardLastPathPoint(const ReferenceLine& reference_line,
+                                   common::PathPoint* const last_path_point);
 };
 
 }  // namespace side_pass
