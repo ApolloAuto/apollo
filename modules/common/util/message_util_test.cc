@@ -25,7 +25,7 @@ namespace apollo {
 namespace common {
 namespace util {
 
-TEST(StringUtilTest, dump_message) {
+TEST(MessageUtilTest, DumpMessage) {
   auto a = 1;
   EXPECT_TRUE(DumpMessage(a));
   auto simple_msg = std::make_shared<test::SimpleMessage>();
@@ -35,7 +35,25 @@ TEST(StringUtilTest, dump_message) {
       PathExists("/tmp/apollo.common.util.test.SimpleMessage/0.pb.txt"));
 }
 
-// TEST(StringUtilTest, get_desy_sec) {
+TEST(MessageUtilTest, MessageFingerprint) {
+  test::SimpleMessage msg;
+  const size_t fp0 = MessageFingerprint(msg);
+
+  msg.set_integer(1);
+  const size_t fp1 = MessageFingerprint(msg);
+  EXPECT_NE(fp0, fp1);
+
+  msg.set_integer(2);
+  EXPECT_NE(fp1, MessageFingerprint(msg));
+
+  msg.set_integer(1);
+  EXPECT_EQ(fp1, MessageFingerprint(msg));
+
+  msg.clear_integer();
+  EXPECT_EQ(fp0, MessageFingerprint(msg));
+}
+
+// TEST(MessageUtilTest, get_desy_sec) {
 //   auto simple_msg = std::make_shared<test::SimpleMessage>();
 //   FillHeader("test", simple_msg.get());
 //   EXPECT_GT(GetDelaySec(simple_msg), 0);

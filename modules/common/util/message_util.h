@@ -87,6 +87,13 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
       *msg, util::StrCat(dump_path, "/", sequence_num, ".pb.txt"));
 }
 
+inline size_t MessageFingerprint(const google::protobuf::Message& message) {
+  static std::hash<std::string> hash_fn;
+  std::string proto_bytes;
+  message.SerializeToString(&proto_bytes);
+  return hash_fn(proto_bytes);
+}
+
 // template <typename T, typename std::enable_if<
 //                           std::is_base_of<Message, T>::value, int>::type = 0>
 // double GetDelaySec(const std::shared_ptr<T>& msg) {
