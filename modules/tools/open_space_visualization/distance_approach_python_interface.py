@@ -40,9 +40,9 @@ class DistancePlanner(object):
         lib.AddDistanceApproachObstacle(self.obstacles, POINTER(
             c_double)(ROI_distance_approach_parking_boundary))
 
-    def DistancePlan(self, sx, sy, sphi, ex, ey, ephi):
+    def DistancePlan(self, sx, sy, sphi, ex, ey, ephi, XYbounds):
         return lib.DistancePlan(self.warm_start_planner, self.obstacles, self.result, c_double(sx),
-                        c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi))
+                        c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi), POINTER(c_double)(XYbounds))
 
     def DistanceGetResult(self, x, y, phi, v, a, steer, opt_x, opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, output_size):
         lib.DistanceGetResult(self.result, POINTER(c_double)(x), POINTER(c_double)(y),

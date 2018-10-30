@@ -94,8 +94,9 @@ void AddVirtualObstacle(HybridAObstacleContainer* obstacles_ptr, const double x,
 }
 bool Plan(HybridAStar* planner_ptr, HybridAObstacleContainer* obstacles_ptr,
           HybridAResultContainer* result_ptr, double sx, double sy, double sphi,
-          double ex, double ey, double ephi) {
-  return planner_ptr->Plan(sx, sy, sphi, ex, ey, ephi,
+          double ex, double ey, double ephi, double* XYbounds) {
+  std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
+  return planner_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
                            obstacles_ptr->GetObstacleList(),
                            result_ptr->PrepareResult());
 }

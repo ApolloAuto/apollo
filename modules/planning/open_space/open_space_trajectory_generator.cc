@@ -52,13 +52,6 @@ Status OpenSpaceTrajectoryGenerator::Init(
   double right_to_center = vehicle_param_.right_edge_to_center();
   ego_.resize(4, 1);
   ego_ << front_to_center, right_to_center, back_to_center, left_to_center;
-  // load xy boundary into the Plan() from configuration(before ROI is done)
-  double x_max = planner_open_space_config.warm_start_config().max_x();
-  double y_max = planner_open_space_config.warm_start_config().max_y();
-  double x_min = planner_open_space_config.warm_start_config().min_x();
-  double y_min = planner_open_space_config.warm_start_config().min_y();
-  XYbounds_.resize(4, 1);
-  XYbounds_ << x_min, x_max, y_min, y_max;
 
   // initialize warm start class pointer
   warm_start_.reset(new HybridAStar(planner_open_space_config));
@@ -71,9 +64,10 @@ Status OpenSpaceTrajectoryGenerator::Init(
 }
 
 apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
-    const VehicleState& vehicle_state, double rotate_angle,
-    const Vec2d& translate_origin, const std::vector<double>& end_pose,
-    std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_edges_num,
+    const VehicleState& vehicle_state, const std::vector<double>& XYbounds,
+    const double rotate_angle, const Vec2d& translate_origin,
+    const std::vector<double>& end_pose, std::size_t obstacles_num,
+    const Eigen::MatrixXd& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     ThreadSafeIndexedObstacles* obstalce_list) {
   // initial state
@@ -104,11 +98,14 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   Eigen::MatrixXd xF(4, 1);
   xF << end_pose[0], end_pose[1], end_pose[2], end_pose[3];
 
+  // planning bound
+  XYbounds_ = XYbounds;
+
   // Warm Start (initial velocity is assumed to be 0 for now)
   Result result;
 
   if (warm_start_->Plan(x0(0, 0), x0(1, 0), x0(2, 0), xF(0, 0), xF(1, 0),
-                        xF(2, 0), obstalce_list, &result)) {
+                        xF(2, 0), XYbounds_, obstalce_list, &result)) {
     ADEBUG << "Warm start problem solved successfully!";
   } else {
     return Status(ErrorCode::PLANNING_ERROR,

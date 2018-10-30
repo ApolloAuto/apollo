@@ -78,6 +78,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     obstacles_A_ = frame->obstacles_A();
     obstacles_b_ = frame->obstacles_b();
     obstalce_list_ = frame->openspace_warmstart_obstacles();
+    XYbounds_ = frame->ROI_xy_boundary();
     // 3. Check if trajectory updated, if so, update internal
     // current_trajectory_;
     if (trajectory_updated_) {
@@ -105,9 +106,9 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       trajectory_updated_ = false;
       if (open_space_trajectory_generator_->Plan(
-              vehicle_state_, rotate_angle_, translate_origin_, end_pose_,
-              obstacles_num_, obstacles_edges_num_, obstacles_A_, obstacles_b_,
-              obstalce_list_) == Status::OK()) {
+              vehicle_state_, XYbounds_, rotate_angle_, translate_origin_,
+              end_pose_, obstacles_num_, obstacles_edges_num_, obstacles_A_,
+              obstacles_b_, obstalce_list_) == Status::OK()) {
         trajectory_updated_ = true;
       }
     }

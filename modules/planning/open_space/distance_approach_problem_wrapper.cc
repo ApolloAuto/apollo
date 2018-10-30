@@ -205,7 +205,6 @@ class ResultContainer {
 extern "C" {
 HybridAStar* CreateHybridAPtr() {
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-
   CHECK(apollo::common::util::GetProtoFromFile(
       FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
@@ -230,8 +229,15 @@ void AddDistanceApproachObstacle(
 }
 bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
                   ResultContainer* result_ptr, double sx, double sy,
-                  double sphi, double ex, double ey, double ephi) {
-  if (!hybridA_ptr->Plan(sx, sy, sphi, ex, ey, ephi,
+                  double sphi, double ex, double ey, double ephi,
+                  double* XYbounds) {
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  CHECK(apollo::common::util::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
+  std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
+  if (!hybridA_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
                          obstacles_ptr->GetObstacleList(),
                          result_ptr->PrepareHybridAResult())) {
     AINFO << "Hybrid A fail";
@@ -272,13 +278,6 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-
-  CHECK(apollo::common::util::GetProtoFromFile(
-      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
-      << "Failed to load open space config file "
-      << FLAGS_planner_open_space_config_filename;
-
   // nominal sampling time
   float ts_ = planner_open_space_config_.delta_t();
 
@@ -289,13 +288,6 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   double left_to_center = vehicle_param_.left_edge_to_center();
   double right_to_center = vehicle_param_.right_edge_to_center();
   ego_ << front_to_center, right_to_center, back_to_center, left_to_center;
-  // load xy boundary into the Plan() from configuration(before ROI is done)
-  Eigen::MatrixXd XYbounds_(4, 1);
-  double x_max = planner_open_space_config_.warm_start_config().max_x();
-  double y_max = planner_open_space_config_.warm_start_config().max_y();
-  double x_min = planner_open_space_config_.warm_start_config().min_x();
-  double y_min = planner_open_space_config_.warm_start_config().min_y();
-  XYbounds_ << x_min, x_max, y_min, y_max;
 
   DistanceApproachProblem* distance_approach_ptr =
       new DistanceApproachProblem(planner_open_space_config_);

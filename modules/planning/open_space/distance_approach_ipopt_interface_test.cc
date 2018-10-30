@@ -54,7 +54,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xf_ = 10 * Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
-  Eigen::MatrixXd XYbounds_ = Eigen::MatrixXd::Ones(4, 1);
+  std::vector<double> XYbounds_ = {1.0, 1.0, 1.0, 1.0};
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Ones(4, 6);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
   Eigen::MatrixXd obstacles_edges_num_;

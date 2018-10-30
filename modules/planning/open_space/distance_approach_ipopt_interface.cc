@@ -28,9 +28,10 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     const int num_of_variables, const int num_of_constraints,
     std::size_t horizon, float ts, Eigen::MatrixXd ego,
     const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS, Eigen::MatrixXd x0,
-    Eigen::MatrixXd xf, Eigen::MatrixXd last_time_u, Eigen::MatrixXd XYbounds,
-    Eigen::MatrixXd obstacles_edges_num, std::size_t obstacles_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    Eigen::MatrixXd xf, Eigen::MatrixXd last_time_u,
+    const std::vector<double>& XYbounds, Eigen::MatrixXd obstacles_edges_num,
+    std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
+    const Eigen::MatrixXd& obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
@@ -141,6 +142,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   CHECK(m == num_of_constraints_)
       << "num_of_constraints_ mismatch, m: " << m
       << ", num_of_constraints_: " << num_of_constraints_;
+  CHECK(XYbounds_.size() == 4)
+      << "XYbounds_ size is not 4, but" << XYbounds_.size();
 
   // Variables: includes state, u, sample time and lagrange multipliers
   // 1. state variables, 4 * [0, horizon]
@@ -155,12 +158,12 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // During horizons, 2 ~ N-1
   for (std::size_t i = 1; i < horizon_; ++i) {
     // x
-    x_l[variable_index] = XYbounds_(0, 0);
-    x_u[variable_index] = XYbounds_(1, 0);
+    x_l[variable_index] = XYbounds_[0];
+    x_u[variable_index] = XYbounds_[1];
 
     // y
-    x_l[variable_index + 1] = XYbounds_(2, 0);
-    x_u[variable_index + 1] = XYbounds_(3, 0);
+    x_l[variable_index + 1] = XYbounds_[2];
+    x_u[variable_index + 1] = XYbounds_[3];
 
     // phi
     x_l[variable_index + 2] = -M_PI;

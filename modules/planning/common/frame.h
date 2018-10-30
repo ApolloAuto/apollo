@@ -166,10 +166,12 @@ class Frame {
   }
 
  private:
+  // @brief main process to compute and load info needed by open space planner
+  bool GetOpenSpaceInfo();
   // @brief "Region of Interest", load open space xy boundary and parking space
   // boundary from pnc map (only for T shape parking space)
   // to ROI_xy_boundary_ and ROI_parking_boundary_
-  bool OpenSpaceROI();
+  bool GetOpenSpaceROI();
 
   // @brief Transform the vertice presentation of the obstacles into linear
   // inequality as Ax>b
