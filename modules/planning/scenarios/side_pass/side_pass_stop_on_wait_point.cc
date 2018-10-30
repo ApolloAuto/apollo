@@ -39,26 +39,6 @@ using apollo::common::math::Vec2d;
 
 constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
-/**
- * @brief:
- * STAGE: SidePassStopOnWaitPoint
- * Notations:
- *
- *    front of car
- * A +----------+ B
- *   |          |
- *   /          / turn with maximum steering angle
- *   |          |
- *   |          |
- *   |          |
- *   |    X     |                                       O
- *   |<-->.<----|-------------------------------------->* (turn center)
- *   |          |   VehicleParam.min_turn_radius()
- *   |          |
- * D +----------+ C
- *    back of car
- *
- */
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   const ReferenceLineInfo& reference_line_info =
@@ -66,63 +46,19 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const PathDecision& path_decision = reference_line_info.path_decision();
 
-  double move_forward_distance = 5.0;
   if (GetContext()->path_data_.discretized_path().path_points().empty()) {
     AERROR << "path data is empty.";
     return Stage::ERROR;
   }
   PathPoint first_path_point =
       GetContext()->path_data_.discretized_path().path_points().front();
-  PathPoint last_path_point;
-  int count = 0;
-  for (const auto& path_point :
-       GetContext()->path_data_.discretized_path().path_points()) {
-    // Get the four corner points ABCD of ADC at every path point,
-    // and check if that's within the current lane until it reaches
-    // out of current lane.
-    const auto& vehicle_box =
-        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
-    std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
-    bool is_out_of_curr_lane = false;
-    for (size_t i = 0; i < ABCDpoints.size(); i++) {
-      // For each corner point, project it onto reference_line
-      common::SLPoint curr_point_sl;
-      if (!reference_line.XYToSL(ABCDpoints[i], &curr_point_sl)) {
-        AERROR << "Failed to get the projection from point onto "
-                  "reference_line";
-        return Stage::ERROR;
-      }
-      // Get the lane width at the current s indicated by path_point
-      double curr_point_left_width = 0.0;
-      double curr_point_right_width = 0.0;
-      reference_line.GetLaneWidth(curr_point_sl.s(), &curr_point_left_width,
-                                  &curr_point_right_width);
-      // Check if this corner point is within the lane:
-      if (curr_point_sl.l() > std::abs(curr_point_left_width) ||
-          curr_point_sl.l() < -std::abs(curr_point_right_width)) {
-        is_out_of_curr_lane = true;
-        break;
-      }
-    }
-    if (is_out_of_curr_lane) {
-      if (count == 0) {
-        // The current ADC, without moving at all, is already at least
-        // partially out of the current lane.
-        return Stage::FINISHED;
-      }
-      break;
-    } else {
-      last_path_point = path_point;
-      move_forward_distance = path_point.s();
-    }
-    // (1) check if the ego car on path_point will partially go into the
-    // neighbor lane, and retain only those within-lane path-points.
-    // (2) update move_forward_distance (to be used by proceed_with_caution)
-    CHECK_GE(path_point.s(), 0.0);
-    CHECK_GE(move_forward_distance, 0.0);
-    ++count;
-  }
 
+  PathPoint last_path_point;
+  if (!GetMoveForwardLastPathPoint(reference_line, &last_path_point)) {
+    AERROR << "Fail to get move forward last path point.";
+    return Stage::ERROR;
+  }
+  double move_forward_distance = last_path_point.s() - first_path_point.s();
   if (!IsFarAwayFromObstacles(reference_line, path_decision.obstacles(),
                               first_path_point, last_path_point)) {
     // wait here, do nothing this cycle.
@@ -204,6 +140,57 @@ bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
     if (obs_start_l < lane_left_width && -obs_end_l < lane_right_width) {
       return false;
     }
+  }
+  return true;
+}
+
+bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
+    const ReferenceLine& reference_line,
+    common::PathPoint* const last_path_point) {
+  int count = 0;
+  for (const auto& path_point :
+       GetContext()->path_data_.discretized_path().path_points()) {
+    // Get the four corner points ABCD of ADC at every path point,
+    // and check if that's within the current lane until it reaches
+    // out of current lane.
+    const auto& vehicle_box =
+        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
+    std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
+    bool is_out_of_curr_lane = false;
+    for (size_t i = 0; i < ABCDpoints.size(); i++) {
+      // For each corner point, project it onto reference_line
+      common::SLPoint curr_point_sl;
+      if (!reference_line.XYToSL(ABCDpoints[i], &curr_point_sl)) {
+        AERROR << "Failed to get the projection from point onto "
+                  "reference_line";
+        return false;
+      }
+      // Get the lane width at the current s indicated by path_point
+      double curr_point_left_width = 0.0;
+      double curr_point_right_width = 0.0;
+      reference_line.GetLaneWidth(curr_point_sl.s(), &curr_point_left_width,
+                                  &curr_point_right_width);
+      // Check if this corner point is within the lane:
+      if (curr_point_sl.l() > std::abs(curr_point_left_width) ||
+          curr_point_sl.l() < -std::abs(curr_point_right_width)) {
+        is_out_of_curr_lane = true;
+        break;
+      }
+    }
+    if (is_out_of_curr_lane) {
+      if (count == 0) {
+        // The current ADC, without moving at all, is already at least
+        // partially out of the current lane.
+        return Stage::FINISHED;
+      }
+      break;
+    } else {
+      *last_path_point = path_point;
+    }
+    // check if the ego car on path_point will partially go into the
+    // neighbor lane, and retain only those within-lane path-points.
+    CHECK_GE(path_point.s(), 0.0);
+    ++count;
   }
   return true;
 }
