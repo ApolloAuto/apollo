@@ -16,15 +16,12 @@
 
 #include "modules/dreamview/backend/hmi/hmi.h"
 
-#include <cstdlib>
 #include <string>
 #include <vector>
 
-#include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/json_util.h"
-#include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 
@@ -32,15 +29,13 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::time::Clock;
 using apollo::common::util::JsonUtil;
 using Json = WebSocketHandler::Json;
-using RLock = boost::shared_lock<boost::shared_mutex>;
 
 constexpr int HMI::kMinBroadcastIntervalMs;
 
-HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
+HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
     : node_(cyber::CreateNode("hmi")),
       websocket_(websocket),
       map_service_(map_service),
@@ -52,9 +47,6 @@ HMI::HMI(WebSocketHandler *websocket, MapService *map_service)
     RegisterMessageHandlers();
     cyber::Async(&HMI::BroadcastStatusThreadLoop, this);
   }
-
-  audio_capture_writer_ =
-      node_->CreateWriter<AudioCapture>(FLAGS_audio_capture_topic);
 }
 
 void HMI::RegisterMessageHandlers() {
@@ -75,16 +67,7 @@ void HMI::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "AudioPiece",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {data: "<base64 encoded audio/wav piece>"}.
-        std::string data;
-        if (JsonUtil::GetStringFromJson(json, "data", &data)) {
-          AudioCapture audio;
-          audio.set_connection_id(reinterpret_cast<uint64_t>(conn));
-          audio.set_wav_stream(apollo::common::util::DecodeBase64(data));
-          audio_capture_writer_->Write(std::make_shared<AudioCapture>(audio));
-        } else {
-          AERROR << "Truncated audio piece.";
-        }
+        // TODO(xiaoxq): Migrating to HMIWorker.
       });
 
   // HMI client asks for executing module command.
@@ -152,14 +135,9 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
-  // TODO(xiaoxq): Unify simple actions to the same interface:
-  //     ExecuteModeCommand:start -> HMIAction:SETUP_MODE
-  //     ExecuteModeCommand:stop -> HMIAction:RESET_MODE
-  //     ChangeDrivingMode:COMPLETE_AUTO_DRIVE -> HMIAction:ENTER_AUTO_MODE
-  //     ChangeDrivingMode:COMPLETE_MANUAL -> HMIAction:DISENGAGE
   websocket_->RegisterMessageHandler(
       "HMIAction",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain {action: "<An HMIAction name>"}.
         std::string action;
         if (JsonUtil::GetStringFromJson(json, "action", &action)) {
@@ -257,7 +235,7 @@ void HMI::RegisterMessageHandlers() {
   // HMI client asks for adding new DriveEvent.
   websocket_->RegisterMessageHandler(
       "SubmitDriveEvent",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
         // json should contain event_time_ms and event_msg.
         uint64_t event_time_ms;
         std::string event_msg;
@@ -322,15 +300,15 @@ void HMI::DeferredBroadcastHMIStatus() {
   need_broadcast_ = true;
 }
 
-void HMI::SendVehicleParam(WebSocketHandler::Connection *conn) {
+void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {
   if (websocket_ == nullptr) {
     return;
   }
 
-  const auto json_str =
-      JsonUtil::ProtoToTypedJson(
-          "VehicleParam", VehicleConfigHelper::GetConfig().vehicle_param())
-          .dump();
+  const auto& vehicle_param =
+      apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
+  const std::string json_str =
+      JsonUtil::ProtoToTypedJson("VehicleParam", vehicle_param).dump();
   if (conn != nullptr) {
     websocket_->SendData(conn, json_str);
   } else {

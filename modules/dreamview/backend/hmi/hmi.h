@@ -24,7 +24,6 @@
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 #include "modules/dreamview/backend/map/map_service.h"
-#include "modules/dreamview/proto/audio_capture.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 /**
@@ -49,7 +48,6 @@ class HMI {
   void RegisterMessageHandlers();
 
   std::shared_ptr<cyber::Node> node_;
-  std::shared_ptr<cyber::Writer<AudioCapture>> audio_capture_writer_;
 
   std::unique_ptr<HMIWorker> hmi_worker_;
 

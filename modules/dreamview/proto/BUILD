@@ -72,15 +72,3 @@ proto_library(
         "//modules/monitor/proto:system_status_proto_lib",
     ],
 )
-
-cc_proto_library(
-    name = "audio_capture_proto",
-    deps = [
-        ":audio_capture_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "audio_capture_proto_lib",
-    srcs = ["audio_capture.proto"],
-)
