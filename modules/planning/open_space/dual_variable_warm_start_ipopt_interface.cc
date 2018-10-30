@@ -167,6 +167,16 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
 bool DualVariableWarmStartIPOPTInterface::eval_f(int n, const double* x,
                                                  bool new_x,
                                                  double& obj_value) {
+  obj_value = 0.0;
+  std::size_t d_index = d_start_index_;
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+      // TODO(QiL): Change weight to configuration
+      obj_value += 1.0 * x[d_index];
+      ++d_index;
+    }
+  }
+
   return true;
 }
 
