@@ -123,6 +123,10 @@ message ScenarioDebug {
   optional apollo.planning.ScenarioConfig.StageType stage_type = 2;
 }
 
+message OpenSpaceDebug {
+  repeated apollo.common.Trajectory trajecotry = 1;
+}
+
 // next ID: 27
 message PlanningData {
   // input
@@ -149,6 +153,7 @@ message PlanningData {
   optional double front_clear_distance = 24;
   repeated apollo.dreamview.Chart chart = 25;
   optional ScenarioDebug scenario = 26;
+  optional OpenSpaceDebug open_space = 27;
 }
 
 message LatticeStPixel {

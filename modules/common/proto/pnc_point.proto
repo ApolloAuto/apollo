@@ -70,3 +70,8 @@ message TrajectoryPoint {
   // longitudinal jerk
   optional double da = 5;
 }
+
+message Trajectory {
+  optional string name = 1;
+  optional TrajectoryPoint trajectory_point = 2;
+}
