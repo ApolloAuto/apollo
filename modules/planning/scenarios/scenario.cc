@@ -49,6 +49,8 @@ void Scenario::Init() {
         << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
         << " has no config";
   }
+  AINFO << "init stage "
+        << ScenarioConfig::StageType_Name(config_.stage_type(0));
   current_stage_ = CreateStage(*stage_config_map_[config_.stage_type(0)]);
 }
 
@@ -66,6 +68,8 @@ Scenario::ScenarioStatus Scenario::Process(
   } else if (ret == Stage::FINISHED) {
     auto next_stage = current_stage_->NextStage();
     if (next_stage != current_stage_->stage_type()) {
+      AINFO << "switch stage from " << current_stage_->Name() << "to "
+            << ScenarioConfig::StageType_Name(next_stage);
       current_stage_ = CreateStage(*stage_config_map_[next_stage]);
     }
     if (current_stage_ != nullptr &&
