@@ -70,18 +70,7 @@ class SceneViewer : public QOpenGLWidget, protected QOpenGLFunctions {
 
   void AddNewShaderProg(
       const std::string& shaderProgName,
-      const std::shared_ptr<QOpenGLShaderProgram>& newShaderProg) {
-    if (newShaderProg == nullptr) {
-      return;
-    }
-
-    auto iter = managed_shader_prog_.find(shaderProgName);
-    if (iter != managed_shader_prog_.end()) {
-      iter->second.reset();
-    }
-
-    managed_shader_prog_[shaderProgName] = newShaderProg;
-  }
+      const std::shared_ptr<QOpenGLShaderProgram>& newShaderProg);
 
   std::shared_ptr<QOpenGLShaderProgram> FindShaderProg(
       const std::string& shaderProgName) {
