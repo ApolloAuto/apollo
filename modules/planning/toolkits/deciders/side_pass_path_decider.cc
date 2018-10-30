@@ -60,6 +60,7 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
 
 Status SidePassPathDecider::Process(Frame *frame,
                                     ReferenceLineInfo *reference_line_info) {
+  GeneratePath(frame, reference_line_info);
   return Status::OK();
 }
 
