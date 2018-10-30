@@ -22,9 +22,7 @@
 
 #include <algorithm>
 #include <string>
-#include <tuple>
 #include <utility>
-#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
@@ -32,9 +30,10 @@
 namespace apollo {
 namespace planning {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::common::Status;
-using ::apollo::hdmap::PathOverlap;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::hdmap::PathOverlap;
 
 constexpr double kRoadBuffer = 0.2;
 constexpr double kObstacleBuffer = 0.2;
@@ -68,7 +67,7 @@ Status SidePassPathDecider::BuildSidePathDecision(
     Frame *frame, ReferenceLineInfo *const reference_line_info) {
   // TODO(All): decide side pass from left or right.
   // For now, just go left at all times.
-  decided_direction_ = LEFT;
+  decided_direction_ = SidePassDirection::LEFT;
   return Status().OK();
 }
 
@@ -90,19 +89,55 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     return false;
   }
 
+  auto list_s_leftbound_rightbound = GetPathBoundaries(
+      frame->PlanningStartPoint(), reference_line_info->AdcSlBoundary(),
+      reference_line_info->reference_line(),
+      reference_line_info->path_decision()->obstacles());
+
+  // Call optimizer to generate smooth path.
+  fem_qp_->SetVariableBounds(list_s_leftbound_rightbound);
+  if (!fem_qp_->Optimize()) {
+    AERROR << "Fail to optimize in SidePassPathDecider.";
+    return false;
+  }
+
+  // TODO(All): put optimized results into ReferenceLineInfo.
+  // Update Reference_Line_Info with this newly generated path.
+  std::vector<common::FrenetFramePoint> frenet_frame_path;
+  double accumulated_s = 0.0;
+  for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
+    common::FrenetFramePoint frenet_frame_point;
+    frenet_frame_point.set_s(accumulated_s);
+    frenet_frame_point.set_l(fem_qp_->x()[i]);
+    frenet_frame_point.set_dl(fem_qp_->x_derivative()[i]);
+    frenet_frame_point.set_ddl(fem_qp_->x_second_order_derivative()[i]);
+    frenet_frame_path.push_back(std::move(frenet_frame_point));
+    accumulated_s += delta_s_;
+  }
+
+  auto path_data = reference_line_info->mutable_path_data();
+  path_data->SetReferenceLine(&reference_line_info->reference_line());
+  path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
+
+  return true;
+}
+
+std::vector<std::tuple<double, double, double>>
+SidePassPathDecider::GetPathBoundaries(
+    const TrajectoryPoint &planning_start_point,
+    const SLBoundary &adc_sl_boundary, const ReferenceLine &reference_line,
+    const IndexedList<std::string, Obstacle> &indexed_obstacles) {
+  std::vector<std::tuple<double, double, double>> bounds;
   // Generate the boundary conditions for the selected direction
   // based on the obstacle ahead and road conditions.
-  std::vector<std::pair<double, double>> bound_cond;
-  const ReferenceLine &reference_line = reference_line_info->reference_line();
-  double adc_end_s = reference_line_info->AdcSlBoundary().end_s();
+  double adc_end_s = adc_sl_boundary.end_s();
   // Get obstacle info.
   bool no_obs_selected = true;
   double nearest_obs_start_s = 0.0;
   double nearest_obs_end_s = 0.0;
   double nearest_obs_start_l = 0.0;
   double nearest_obs_end_l = 0.0;
-  for (const auto *obstacle :
-       reference_line_info->path_decision()->obstacles().Items()) {
+  for (const auto *obstacle : indexed_obstacles.Items()) {
     // Filter out obstacles that are behind ADC.
     double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
     double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
@@ -159,14 +194,14 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     }
   }
   // Get road info at every point and fill in the boundary condition vector.
-  common::PathPoint start_path_point = frame->PlanningStartPoint().path_point();
+  common::PathPoint start_path_point = planning_start_point.path_point();
   common::math::Vec2d start_path_point_vec2d(start_path_point.x(),
                                              start_path_point.y());
   common::SLPoint start_path_point_SL;
   if (!reference_line.XYToSL(start_path_point_vec2d, &start_path_point_SL)) {
     AERROR << "Failed to get the projection from TrajectoryPoint onto "
               "reference_line";
-    return false;
+    return bounds;
   }
   double s_increment = 1.0;
   double curr_s = start_path_point_SL.s();
@@ -198,19 +233,19 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
       std::get<2>(s_leftbound_rightbound) =
           std::abs(road_right_width_at_curr_s - kRoadBuffer);
     } else {
-      if (decided_direction_ == LEFT) {
+      if (decided_direction_ == SidePassDirection::LEFT) {
         std::get<1>(s_leftbound_rightbound) =
             -std::abs(road_left_width_at_curr_s - kRoadBuffer);
         std::get<2>(s_leftbound_rightbound) =
             -nearest_obs_end_l - kObstacleBuffer;
-      } else if (decided_direction_ == RIGHT) {
+      } else if (decided_direction_ == SidePassDirection::RIGHT) {
         std::get<1>(s_leftbound_rightbound) =
             -nearest_obs_start_l + kObstacleBuffer;
         std::get<2>(s_leftbound_rightbound) =
             std::abs(road_right_width_at_curr_s - kRoadBuffer);
       } else {
         AERROR << "Side-pass direction undefined.";
-        return false;
+        return bounds;
       }
     }
     list_s_leftbound_rightbound.push_back(s_leftbound_rightbound);
@@ -220,33 +255,8 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
       bound_cond_gen_finished = true;
     }
   }
-  // Call optimizer to generate smooth path.
-  fem_qp_->SetVariableBounds(list_s_leftbound_rightbound);
-  if (!fem_qp_->Optimize()) {
-    AERROR << "Fail to optimize in SidePassPathDecider.";
-    return false;
-  }
 
-  // TODO(All): put optimized results into ReferenceLineInfo.
-  // Update Reference_Line_Info with this newly generated path.
-  std::vector<common::FrenetFramePoint> frenet_frame_path;
-  double accumulated_s = 0.0;
-  for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
-    common::FrenetFramePoint frenet_frame_point;
-    frenet_frame_point.set_s(accumulated_s);
-    frenet_frame_point.set_l(fem_qp_->x()[i]);
-    frenet_frame_point.set_dl(fem_qp_->x_derivative()[i]);
-    frenet_frame_point.set_ddl(fem_qp_->x_second_order_derivative()[i]);
-    frenet_frame_path.push_back(std::move(frenet_frame_point));
-    accumulated_s += delta_s_;
-  }
-
-  auto path_data = reference_line_info->mutable_path_data();
-  path_data->SetReferenceLine(&reference_line);
-  path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-
-  return true;
+  return bounds;
 }
-
 }  // namespace planning
 }  // namespace apollo

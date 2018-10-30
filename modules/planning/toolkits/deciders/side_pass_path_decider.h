@@ -21,9 +21,13 @@
 #pragma once
 
 #include <memory>
+#include <string>
+#include <tuple>
+#include <vector>
 
 #include "cyber/common/macros.h"
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decider_config.pb.h"
 
 #include "modules/map/pnc_map/path.h"
@@ -39,7 +43,7 @@ class SidePassPathDecider : public Decider {
  public:
   explicit SidePassPathDecider(const TaskConfig& config);
 
-  enum SidePassDirection {
+  enum class SidePassDirection {
     LEFT = 0,
     RIGHT = 1,
   };
@@ -52,6 +56,11 @@ class SidePassPathDecider : public Decider {
       Frame* frame, ReferenceLineInfo* const reference_line_info);
 
   bool GeneratePath(Frame* frame, ReferenceLineInfo* reference_line_info);
+
+  std::vector<std::tuple<double, double, double>> GetPathBoundaries(
+      const common::TrajectoryPoint& planning_start_point,
+      const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,
+      const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
  private:
   std::unique_ptr<Fem1dQpProblem> fem_qp_;
