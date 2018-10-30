@@ -458,23 +458,14 @@ class OpenSpaceROITest {
     std::vector<LaneSegment> segments_vector;
     segments_vector.push_back(nearby_lanesegment);
     nearby_path_ = std::unique_ptr<Path>(new Path(segments_vector));
-    // const auto& parking_space_overlaps =
-    // nearby_path_->parking_space_overlaps();
-    const auto& parking_space_overlaps = nearby_lane->parking_spaces();
-    // const auto& parking_overlaps_on_path =
-    //     nearby_path_->parking_space_overlaps();
-    // if (parking_overlaps_on_path.size() == 0) {
-    //   std::cout << "No parking overlaps found on the path requested"
-    //             << std::endl;
-    //             return false;
-    // }
+    const auto& parking_space_overlaps = nearby_path_->parking_space_overlaps();
     if (parking_space_overlaps.size() == 0) {
       std::cout << "No parking overlaps found on the lane requested"
                 << std::endl;
       return false;
     }
     for (const auto parking_overlap : parking_space_overlaps) {
-      if (parking_overlap->GetObjectOverlapInfo(target_lane_id) != nullptr) {
+      if (parking_overlap.object_id != parking_id) {
         target_parking_spot_ = map_ptr->GetParkingSpaceById(target_lane_id);
         std::cout << "parking_overlap.object_id is " << target_lane_id.id()
                   << std::endl;

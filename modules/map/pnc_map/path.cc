@@ -512,8 +512,8 @@ void Path::GetAllOverlaps(GetOverlapFromLaneFunc GetOverlaps_from_lane,
       }
 
       const auto& lane_overlap_info = overlap_info->lane_overlap_info();
-      if (lane_overlap_info.start_s() < lane_segment.end_s &&
-          lane_overlap_info.end_s() > lane_segment.start_s) {
+      if (lane_overlap_info.start_s() <= lane_segment.end_s &&
+          lane_overlap_info.end_s() >= lane_segment.start_s) {
         const double ref_s = s - lane_segment.start_s;
         const double adjusted_start_s =
             std::max(lane_overlap_info.start_s(), lane_segment.start_s) + ref_s;
