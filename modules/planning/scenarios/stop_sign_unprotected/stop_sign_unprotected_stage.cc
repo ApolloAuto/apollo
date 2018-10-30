@@ -55,6 +55,7 @@ using StopSignLaneVehicles =
 
 Stage::StageStatus StopSignUnprotectedPreStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
+  ADEBUG << "stage: PreStop";
   CHECK_NOTNULL(frame);
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -81,6 +82,7 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 
 Stage::StageStatus StopSignUnprotectedStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
+  ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
 
   auto start_time = GetContext()->stop_start_time;
@@ -118,6 +120,7 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 
 Stage::StageStatus StopSignUnprotectedCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
 
   if (!config_.enabled()) {
@@ -136,7 +139,8 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info);
+      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
+                                        stop_sign_overlap_end_s);
 
   bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
@@ -147,6 +151,7 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
 
 Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
   if (GetContext()->stop_sign_id !=
