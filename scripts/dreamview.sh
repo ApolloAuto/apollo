@@ -23,6 +23,32 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-# run function from apollo_base.sh
-# run command_name module_name
-run dreamview "$@"
+function start_fe() {
+  /apollo/bazel-bin/modules/dreamview/dreamview \
+    --flagfile=/apollo/modules/common/data/global_flagfile.txt
+}
+
+function start() {
+  LOG="${APOLLO_ROOT_DIR}/data/log/dreamview.out"
+  nohup /apollo/bazel-bin/modules/dreamview/dreamview \
+    --flagfile=/apollo/modules/common/data/global_flagfile.txt > ${LOG} 2>&1 &
+}
+
+function stop() {
+  killall -9 /apollo/bazel-bin/modules/dreamview/dreamview
+}
+
+case $1 in
+  start_fe)
+    start_fe
+    ;;
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    start
+    ;;
+esac
