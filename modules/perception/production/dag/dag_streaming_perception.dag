@@ -1,14 +1,14 @@
 module_config {
-  module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component.so"
+  module_library : "/apollo/bazel-bin/modules/perception/onboard/component/libperception_component_lidar.so"
 
  components {
     class_name : "SegmentationComponent"
     config {
-      name: "Velodyne64Segmentation"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne64_segmentation_conf.pb.txt"
+      name: "Velodyne128Segmentation"
+      config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne128_segmentation_conf.pb.txt"
       flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
       readers {
-          channel: "/apollo/sensor/velodyne64/compensator/PointCloud2"
+          channel: "/apollo/sensor/lidar128/compensator/PointCloud2"
         }
     }
   }
@@ -19,7 +19,7 @@ module_config {
       name: "Velodyne16Segmentation"
       config_file_path: "/apollo/modules/perception/production/conf/perception/lidar/velodyne16_segmentation_conf.pb.txt"
       readers {
-          channel: "/apollo/sensor/velodyne16/compensator/PointCloud2"
+          channel: "/apollo/sensor/lidar16/compensator/PointCloud2"
         }
     }
  }
