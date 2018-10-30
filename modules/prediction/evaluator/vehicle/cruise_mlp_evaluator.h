@@ -98,7 +98,7 @@ class CruiseMLPEvaluator : public Evaluator {
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 23;
-  static const size_t LANE_FEATURE_SIZE = 60;
+  static const size_t LANE_FEATURE_SIZE = 180;
   std::unique_ptr<FnnVehicleModel> model_ptr_;
 };
 
