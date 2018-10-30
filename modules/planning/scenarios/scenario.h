@@ -86,6 +86,8 @@ class Scenario {
 
   virtual void Init();
 
+  const std::string& Name() const;
+
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
   std::unique_ptr<Stage> current_stage_;
@@ -94,6 +96,7 @@ class Scenario {
                      const ScenarioConfig::StageConfig*, std::hash<int>>
       stage_config_map_;
   const ScenarioContext* scenario_context_ = nullptr;
+  std::string name_;
 };
 
 }  // namespace scenario

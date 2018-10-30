@@ -99,6 +99,7 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
   } else {
     auto scenario = CreateScenario(type);
     if (scenario->IsTransferable(*current_scenario_, ego_point, frame)) {
+      AINFO << "switch to scenario: " << scenario->Name();
       current_scenario_ = std::move(scenario);
       return true;
     }

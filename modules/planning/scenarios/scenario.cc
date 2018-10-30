@@ -28,7 +28,9 @@ namespace planning {
 namespace scenario {
 
 Scenario::Scenario(const ScenarioConfig& config, const ScenarioContext* context)
-    : config_(config), scenario_context_(context) {}
+    : config_(config), scenario_context_(context) {
+      name_ = ScenarioConfig::ScenarioType_Name(config.scenario_type());
+    }
 
 bool Scenario::LoadConfig(const std::string& config_file,
                           ScenarioConfig* config) {
@@ -77,6 +79,8 @@ Scenario::ScenarioStatus Scenario::Process(
     return STATUS_UNKNOWN;
   }
 }
+
+const std::string& Scenario::Name() const { return name_; }
 
 }  // namespace scenario
 }  // namespace planning
