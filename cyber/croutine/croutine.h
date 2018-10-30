@@ -21,6 +21,7 @@
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <atomic>
 #include <set>
 #include <string>
 
@@ -35,10 +36,7 @@ using RoutineFunc = std::function<void()>;
 using Duration = std::chrono::microseconds;
 
 enum class RoutineState { READY, RUNNING, FINISHED,
-                          SLEEP, IO_WAIT, DATA_WAIT,
-                          DATA_WAIT_BEFORE_CTX_SWAP,
-                          IO_WAIT_BEFORE_CTX_SWAP,
-                          SLEEP_BEFORE_CTX_SWAP};
+                          SLEEP, IO_WAIT, DATA_WAIT};
 
 class CRoutine {
  public:
@@ -58,9 +56,6 @@ class CRoutine {
   RoutineState Resume();
   RoutineState UpdateState();
   RoutineContext *GetContext();
-  std::unique_lock<std::mutex> GetLock() const;
-  std::unique_lock<std::mutex> TryLock() const;
-  std::unique_lock<std::mutex> DeferLock() const;
 
   void Run();
   void Stop();
@@ -105,10 +100,12 @@ class CRoutine {
   double proc_num() const;
   void set_proc_num(double num);
 
- private:
-  void Lock();
-  void Unlock();
+  bool try_lock();
+  bool unlock();
 
+  void set_notified();
+
+ private:
   std::string name_;
   std::chrono::steady_clock::time_point wake_time_;
 
@@ -117,8 +114,9 @@ class CRoutine {
   RoutineContext context_;
 
   mutable std::mutex mutex_;
-  std::unique_lock<std::mutex> lock_;
 
+  std::atomic<bool> alock_{false};
+  std::atomic<bool> notified_{false};
   bool force_stop_ = false;
   double proc_num_ = 0.0;
   double vruntime_ = 0.0;
@@ -161,21 +159,6 @@ RoutineState Resume();
 
 inline void CRoutine::Run() { func_(); }
 
-inline std::unique_lock<std::mutex> CRoutine::GetLock() const {
-  std::unique_lock<std::mutex> ul(mutex_);
-  return ul;
-}
-
-inline std::unique_lock<std::mutex> CRoutine::DeferLock() const {
-  std::unique_lock<std::mutex> ul(mutex_, std::defer_lock);
-  return ul;
-}
-
-inline std::unique_lock<std::mutex> CRoutine::TryLock() const {
-  std::unique_lock<std::mutex> ul(mutex_, std::try_to_lock);
-  return ul;
-}
-
 inline void CRoutine::set_state(const RoutineState &state) { state_ = state; }
 
 inline RoutineState CRoutine::state() const { return state_; }
@@ -186,7 +169,7 @@ inline void CRoutine::HangUp() { CRoutine::Yield(RoutineState::DATA_WAIT); }
 
 inline void CRoutine::Sleep(const Duration &sleep_duration) {
   wake_time_ = std::chrono::steady_clock::now() + sleep_duration;
-  CRoutine::Yield(RoutineState::SLEEP_BEFORE_CTX_SWAP);
+  CRoutine::Yield(RoutineState::SLEEP);
 }
 
 inline uint64_t CRoutine::id() const { return id_; }
@@ -206,6 +189,8 @@ inline void CRoutine::set_processor_id(int processor_id) {
 inline RoutineState CRoutine::UpdateState() {
   if (state_ == RoutineState::SLEEP &&
       std::chrono::steady_clock::now() > wake_time_) {
+    state_ = RoutineState::READY;
+  } else if (notified_.exchange(false)) {
     state_ = RoutineState::READY;
   }
   return state_;
@@ -255,12 +240,16 @@ inline double CRoutine::proc_num() const { return proc_num_; }
 
 inline void CRoutine::set_proc_num(double num) { proc_num_ = num; }
 
-inline void CRoutine::Lock() { lock_ = std::unique_lock<std::mutex>(mutex_); }
+inline bool CRoutine::try_lock() {
+  return alock_.exchange(true);
+}
 
-inline void CRoutine::Unlock() {
-  if (lock_) {
-    lock_.unlock();
-  }
+inline bool CRoutine::unlock() {
+  return alock_.exchange(false);
+}
+
+inline void CRoutine::set_notified() {
+  notified_.exchange(true);
 }
 
 }  // namespace croutine

@@ -44,12 +44,6 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
   std::lock_guard<std::mutex> lock(mtx_);
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
-    auto lock = cr->TryLock();
-    if (!lock) {
-      ++it;
-      continue;
-    }
-
     cr->UpdateState();
     if (cr->state() == RoutineState::FINISHED) {
       it = cr_queue_.erase(it);

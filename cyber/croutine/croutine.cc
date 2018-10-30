@@ -54,13 +54,12 @@ CRoutine::CRoutine(std::function<void()> &&func) {
 CRoutine::~CRoutine() {}
 
 RoutineState CRoutine::Resume() {
-  auto lock = GetLock();
   if (unlikely(force_stop_)) {
     state_ = RoutineState::FINISHED;
     return state_;
   }
 
-  UpdateState();
+  // UpdateState();
   if (unlikely(state_ != RoutineState::RUNNING &&
                state_ != RoutineState::READY)) {
     AERROR << "Invalid Routine State!";
@@ -78,11 +77,9 @@ RoutineState CRoutine::Resume() {
 
   if (state_ == RoutineState::RUNNING) {
     state_ = RoutineState::READY;
-  } else if (state_ == RoutineState::DATA_WAIT_BEFORE_CTX_SWAP) {
-    state_ = RoutineState::DATA_WAIT;
-  } else if (state_ == RoutineState::SLEEP_BEFORE_CTX_SWAP) {
-    state_ = RoutineState::SLEEP;
   }
+
+  unlock();
   return state_;
 }
 

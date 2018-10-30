@@ -65,7 +65,7 @@ RoutineFactory CreateRoutineFactory(
           f(msg);
           CRoutine::Yield();
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT_BEFORE_CTX_SWAP);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }
     };
@@ -88,7 +88,7 @@ RoutineFactory CreateRoutineFactory(
           f(msg0, msg1);
           CRoutine::Yield();
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT_BEFORE_CTX_SWAP);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }
     };
@@ -111,7 +111,7 @@ RoutineFactory CreateRoutineFactory(
           f(msg0, msg1, msg2);
           CRoutine::Yield();
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT_BEFORE_CTX_SWAP);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }
     };
@@ -135,7 +135,7 @@ RoutineFactory CreateRoutineFactory(
           f(msg0, msg1, msg2, msg3);
           CRoutine::Yield();
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT_BEFORE_CTX_SWAP);
+          CRoutine::Yield(RoutineState::DATA_WAIT);
         }
       }
     };

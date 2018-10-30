@@ -83,8 +83,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
         continue;
       }
 
-      auto lock = cr->TryLock();
-      if (!lock) {
+      if (cr->try_lock()) {
         continue;
       }
 
@@ -96,6 +95,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
             cr->processor_id());
         return cr;
       }
+      cr->unlock();
     }
   }
 
