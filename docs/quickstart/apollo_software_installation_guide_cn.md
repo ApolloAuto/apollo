@@ -25,6 +25,9 @@ curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.s
 sudo apt-get install -y git-lfs
 ```
 
+较新版本的Git会自动并透明地执行lfs插件，因此你只需如常执行 `git clone` 或 `git pull` 等命令。
+但对于旧版本的Git，你需要显式执行 `git lfs clone` 或 `git lfs pull` 。
+
 ## 下载Apollo源代码
 
 1. 从[github source](https://github.com/ApolloAuto/apollo/)下载Apollo的源代码：
