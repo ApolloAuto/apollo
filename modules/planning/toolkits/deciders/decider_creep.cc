@@ -107,6 +107,7 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
                                   const double stop_sign_overlap_end_s) {
   const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
+
   double creep_stop_s =
       stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
   const double distance =
@@ -130,17 +131,23 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
 }
 
 void DeciderCreep::SetProceedWithCautionSpeedParam(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
+    const Frame& frame,
+    const ReferenceLineInfo& reference_line_info,
+    const double stop_sign_overlap_end_s) {
   common::SLPoint adc_center_sl;
   reference_line_info.reference_line().XYToSL(
       {frame.vehicle_state().x(), frame.vehicle_state().y()}, &adc_center_sl);
-  const double creep_distance =
-      adc_center_sl.s() + FindCreepDistance(frame, reference_line_info);
+  double creep_stop_s =
+      stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
+  const double creep_distance = creep_stop_s - adc_center_sl.s();
 
   PlanningContext::GetScenarioInfo()
       ->proceed_with_caution_speed.is_fixed_distance = true;
   PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.distance =
       creep_distance;
+  ADEBUG << "creep_stop_s[" << creep_stop_s
+      << "] adc_s[" <<  adc_center_sl.s()
+      << "] creep distance[" << creep_distance << "]";
 }
 
 }  // namespace planning

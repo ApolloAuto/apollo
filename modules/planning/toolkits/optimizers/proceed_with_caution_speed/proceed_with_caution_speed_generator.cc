@@ -57,14 +57,9 @@ Status ProceedWithCautionSpeedGenerator::Process(
   const bool is_fixed_distance = proceed_param.is_fixed_distance;
   double proceed_distance = is_fixed_distance ?
       proceed_param.distance : path_data.discretized_path().Length();
-  const double max_distance =
-      config_.proceed_with_caution_speed_config().max_distance();
-  if (proceed_distance > max_distance) {
-    AERROR << "required distance[" << proceed_distance
-        << "] is too long. max[" << max_distance << "]";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "required proceed distance is too long");
-  }
+  proceed_distance = std::min(
+      proceed_distance,
+      config_.proceed_with_caution_speed_config().max_distance());
 
   *speed_data = SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
       proceed_distance, proceeding_speed_);

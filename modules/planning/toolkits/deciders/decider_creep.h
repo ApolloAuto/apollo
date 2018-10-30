@@ -45,7 +45,8 @@ class DeciderCreep : public Decider {
 
   void SetProceedWithCautionSpeedParam(
       const Frame& frame,
-      const ReferenceLineInfo& reference_line_info);
+      const ReferenceLineInfo& reference_line_info,
+      const double stop_sign_overlap_end_s);
 
  private:
   double FindCreepDistance(const Frame& frame,
