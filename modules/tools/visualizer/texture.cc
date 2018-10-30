@@ -49,12 +49,6 @@ bool Texture::UpdateData(const QImage& img) {
   memcpy(data_, img.bits(), img.byteCount());
   is_dirty_ = true;
 
-  std::cout << ", imgWidth = " << image_width_
-            << ", imgHeight = " << image_height_
-            << ", w * h * sizeof(GL_RGB) = "
-            << image_width_ * image_height_ * sizeof(GL_RGB)
-            << ",format = " << img.pixelFormat().colorModel() << std::endl;
-
   texture_format_ = GL_RGBA;
   return true;
 }
