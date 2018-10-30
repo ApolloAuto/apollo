@@ -59,4 +59,4 @@ RUN apt-get install -y \
    zip
 
 WORKDIR /apollo
-USER apollo
+#USER apollo
