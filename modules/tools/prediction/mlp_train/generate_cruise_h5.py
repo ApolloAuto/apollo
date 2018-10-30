@@ -47,8 +47,8 @@ def extract_mlp_features(filename):
             if len(lane_seq.features.mlp_features) != mlp_feature_size:
                 continue
             mlp_feature = []
-            for i in range(mlp_feature_size):
-                mlp_feature.append(lane_seq.features.mlp_features[i])
+            for j in range(mlp_feature_size):
+                mlp_feature.append(lane_seq.features.mlp_features[j])
             mlp_feature.append(lane_seq.label)
             mlp_feature.append(lane_seq.time_to_lane_center)
             mlp_feature_np = np.array(mlp_feature)
