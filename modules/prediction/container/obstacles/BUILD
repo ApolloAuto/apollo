@@ -37,6 +37,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:road_graph",
+        "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:feature_proto",

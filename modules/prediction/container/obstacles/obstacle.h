@@ -169,9 +169,8 @@ class Obstacle {
 
   /**
    * @brief Build junction feature.
-   * @param junction ID
    */
-  void BuildJunctionFeature(const std::string& junction_id);
+  void BuildJunctionFeature();
 
   /**
    * @brief Build obstacle's lane graph
@@ -267,15 +266,12 @@ class Obstacle {
 
   void InsertFeatureToHistory(const Feature& feature);
 
-  void SearchJunctionExitsWithEnterLane(
-      const std::string& enter_lane_id, const std::string& junction_id,
+  void SetJunctionFeatureWithEnterLane(
+      const std::string& enter_lane_id, const double junction_range,
       Feature* feature_ptr);
 
-  void SearchJunctionExitsWithoutEnterLane(
-      const std::string& junction_id, Feature* feature_ptr);
-
-  double ComputeJunctionRange(
-      std::shared_ptr<const hdmap::JunctionInfo> junction_info_ptr);
+  void SetJunctionFeatureWithoutEnterLane(
+      const double junction_range, Feature* feature_ptr);
 
   void Trim();
 

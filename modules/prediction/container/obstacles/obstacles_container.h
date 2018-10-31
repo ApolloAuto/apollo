@@ -70,9 +70,8 @@ class ObstaclesContainer : public Container {
 
   /**
    * @brief Build junction feature for obstacles
-   * @param junction id
    */
-  void BuildJunctionFeature(const std::string& junction_id);
+  void BuildJunctionFeature();
 
   /**
    * @brief Get obstacle pointer
