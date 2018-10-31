@@ -225,8 +225,17 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
   return true;
 }
 
-bool PathData::LeftTrimWithRefS(const double ref_s) const {
-  // TODO(all) add implementation here.
+bool PathData::LeftTrimWithRefS(const double ref_s) {
+  CHECK_NOTNULL(reference_line_);
+  std::vector<common::FrenetFramePoint> frenet_frame_points;
+  for (const common::FrenetFramePoint frenet_point : frenet_path_.points()) {
+    if (frenet_point.s() >= ref_s) {
+      frenet_frame_points.push_back(std::move(frenet_point));
+    }
+  }
+  const FrenetFramePath frenet_path =
+      FrenetFramePath(std::move(frenet_frame_points));
+  SetFrenetPath(frenet_path);
   return false;
 }
 
