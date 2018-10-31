@@ -1,0 +1,56 @@
+syntax = "proto2";
+
+package apollo.monitor;
+
+// For ProcessMonitor.
+message ProcessConfig {
+  repeated string command_keywords = 1;
+}
+
+// For ChannelMonitor.
+message ChannelConfig {
+  optional string name = 1;
+  optional double delay_fatal = 2 [default = 3.0];  // In seconds.
+}
+
+// For ResourceMonitor.
+message ResourceConfig {
+  message DiskSpace {
+    // Path to monitor space. Support wildcards like ? and *.
+    // If the path doens't exist, raise UNKNWON which will be ignored.
+    optional string path = 1;
+    optional int32 insufficient_space_warning = 2;  // In GB.
+    optional int32 insufficient_space_error = 3;
+    optional int32 insufficient_space_fatal = 4;
+  }
+  repeated DiskSpace disk_spaces = 1;
+}
+
+message ComponentConfig {
+  // Note that modules that can be started / stopped by HMI should be configered
+  // in HMIConfig.
+  optional ProcessConfig process = 1;
+
+  // Generate SystemStatus.components[i].channel_status.
+  // OK if delay is not notable.
+  // FATAL if delay is larger than fatal_delay.
+  optional ChannelConfig channel = 2;
+
+  // Generate SystemStatus.components[i].resource_status.
+  // OK if all requirements are met.
+  // WARN/ERROR/FATAL if any requirement is below expectation.
+  optional ResourceConfig resource = 3;
+
+  // Whether to trigger safe-mode if the component is down.
+  optional bool required_for_functional_safety = 4 [default = true];
+}
+
+message MonitorConfig {
+  // Max interval seconds of publishing system status. 
+  optional double max_publish_interval = 1 [default = 10];
+  // Whether to trigger safety mode which takes over the vehicle on system
+  // failures.
+  optional bool enable_functional_safety = 2 [default = true];
+
+  map<string, ComponentConfig> components = 3;
+}

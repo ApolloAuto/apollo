@@ -8,6 +8,29 @@ import "modules/monitor/proto/monitor_conf.proto";
 // Status summary. The value order is important, because when we summarize,
 // larger value will overwrite smaller value:
 //    FATAL > ERROR > WARN > OK > UNKNOWN
+message ComponentStatus {
+  enum Status {
+    UNKNOWN = 0;
+    OK = 1;
+    WARN = 2;
+    ERROR = 3;
+    FATAL = 4;
+  }
+  optional Status status = 1 [default = UNKNOWN];
+  optional string message = 2;
+}
+
+message Component {
+  // A summary of all detailed status.
+  optional ComponentStatus summary = 1;
+
+  // Detailed status.
+  optional ComponentStatus process_status = 2;
+  optional ComponentStatus channel_status = 3;
+  optional ComponentStatus resource_status = 4;
+}
+
+// TODO(xiaoxq): Retire.
 enum Summary {
   UNKNOWN = 0;
   OK = 1;
@@ -16,6 +39,7 @@ enum Summary {
   FATAL = 4;
 }
 
+// TODO(xiaoxq): Retire.
 message HardwareStatus {
   // Overall status summary.
   optional Summary summary = 1 [default = UNKNOWN];
@@ -47,6 +71,7 @@ message HardwareStatus {
   optional TopicStatus topic_status = 5;
 }
 
+// TODO(xiaoxq): Retire.
 message ModuleStatus {
   // Overall status summary.
   optional Summary summary = 1 [default = UNKNOWN];
@@ -60,8 +85,9 @@ message ModuleStatus {
 
 message SystemStatus {
   optional apollo.common.Header header = 1;
-  map<string, ModuleStatus> modules = 2;
-  map<string, HardwareStatus> hardware = 3;
+
+  map<string, ComponentStatus> hmi_modules = 7;
+  map<string, Component> components = 8;
 
   // Some critical message for passengers. HMI should highlight it or even read
   // loudly.
@@ -73,4 +99,7 @@ message SystemStatus {
   // will be sent to bring the vehicle into emergency full stop.
   optional double safety_mode_trigger_time = 5;
   optional bool require_emergency_stop = 6;
+
+  map<string, ModuleStatus> modules = 2 [deprecated = true];
+  map<string, HardwareStatus> hardware = 3 [deprecated = true];
 }

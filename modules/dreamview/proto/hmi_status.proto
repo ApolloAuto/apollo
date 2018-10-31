@@ -2,39 +2,33 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+import "modules/common/proto/header.proto";
 import "modules/monitor/proto/system_status.proto";
 
-message ComponentStatus {
-  enum Status {
-    UNKNOWN = 0;
-    OK = 1;
-    WARN = 2;
-    ERROR = 3;
-    FATAL = 4;
-  }
-  optional Status status = 1;
-  optional string message = 2;
-}
-
-// TODO(xiaoxq): Simplify HMI backend / frontend comunication with single proto.
 message HMIStatus {
-  optional apollo.monitor.SystemStatus system_status = 1 [deprecated = true];
-  optional string current_launch = 5 [deprecated = true];
+  optional apollo.common.Header header = 1;
 
-  repeated string modes = 6;
-  optional string current_mode = 4 [default = "Mkz Standard"];
+  repeated string modes = 2;
+  optional string current_mode = 3;
 
-  repeated string maps = 7;
-  optional string current_map = 2;
+  repeated string maps = 4;
+  optional string current_map = 5;
 
-  repeated string vehicles = 8;
-  optional string current_vehicle = 3;
+  repeated string vehicles = 6;
+  optional string current_vehicle = 7;
 
   // {module_name: is_running_or_not}
-  map<string, bool> modules = 9;
+  map<string, bool> modules = 8;
   // {component_name: status}
-  map<string, ComponentStatus> monitored_components = 10;
+  map<string, apollo.monitor.ComponentStatus> monitored_components = 9;
 
-  optional string docker_image = 11;
-  optional int32 utm_zone_id = 12;  // FLAGS_local_utm_zone_id
+  optional string docker_image = 10;
+  optional int32 utm_zone_id = 11;  // FLAGS_local_utm_zone_id
+
+  // Message which will be read aloud to drivers and passengers through
+  // Dreamview.
+  optional string passenger_msg = 12;
+
+  optional apollo.monitor.SystemStatus system_status = 13 [deprecated = true];
+  optional string current_launch = 14 [deprecated = true];
 }
