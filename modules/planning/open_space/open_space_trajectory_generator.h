@@ -32,6 +32,7 @@
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/open_space/distance_approach_problem.h"
+#include "modules/planning/open_space/dual_variable_warm_start_problem.h"
 #include "modules/planning/open_space/hybrid_a_star.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -96,11 +97,12 @@ class OpenSpaceTrajectoryGenerator {
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;
+  std::unique_ptr<::apollo::planning::DualVariableWarmStartProblem>
+      dual_variable_warm_start_;
   common::VehicleState init_state_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  apollo::planning::DistanceApproachConfig distance_approach_config_;
   double init_x_ = 0.0;
   double init_y_ = 0.0;
   double init_phi_ = 0.0;

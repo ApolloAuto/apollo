@@ -37,9 +37,8 @@ class DualVariableWarmStartProblem {
 
   virtual ~DualVariableWarmStartProblem() = default;
 
-  bool Solve(const std::size_t& num_of_variables,
-             const std::size_t& num_of_constraints, const std::size_t& horizon,
-             const float& ts, const Eigen::MatrixXd& ego,
+  bool Solve(const std::size_t& horizon, const float& ts,
+             const Eigen::MatrixXd& ego, std::size_t obstacles_num,
              const Eigen::MatrixXd& obstacles_edges_num,
              const Eigen::MatrixXd& obstacles_A,
              const Eigen::MatrixXd& obstacles_b, const double rx,

@@ -57,6 +57,10 @@ Status OpenSpaceTrajectoryGenerator::Init(
   // initialize warm start class pointer
   warm_start_.reset(new HybridAStar(planner_open_space_config));
 
+  // initialize dual variable warm start class pointer
+  dual_variable_warm_start_.reset(
+      new DualVariableWarmStartProblem(planner_open_space_config));
+
   // initialize distance approach class pointer
   distance_approach_.reset(
       new DistanceApproachProblem(planner_open_space_config));
@@ -102,15 +106,18 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // planning bound
   XYbounds_ = XYbounds;
 
+  ADEBUG << "Start forming state warm start problem with configs setting : "
+         << planner_open_space_config_.warm_start_config().ShortDebugString();
+
   // Warm Start (initial velocity is assumed to be 0 for now)
   Result result;
 
   if (warm_start_->Plan(x0(0, 0), x0(1, 0), x0(2, 0), xF(0, 0), xF(1, 0),
                         xF(2, 0), XYbounds_, obstalce_list, &result)) {
-    ADEBUG << "Warm start problem solved successfully!";
+    ADEBUG << "State warm start problem solved successfully!";
   } else {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "Warm start problem failed to solve");
+                  "State warm start problem failed to solve");
   }
   // load Warm Start result(horizon is the "N", not the size of step points)
   horizon_ = result.x.size() - 1;
@@ -135,22 +142,48 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   uWS.row(0) = steer;
   uWS.row(1) = a;
 
-  // TODO(QiL): Step 8 : Formulate distance approach problem
+  // Step 8 : Formulate distance approach problem
   // solution from distance approach
+  ADEBUG << "Start forming state warm start problem with configs setting : "
+         << planner_open_space_config_.dual_variable_warm_start_config()
+                .ShortDebugString();
 
-  ADEBUG << "Distance approach configs set"
-         << distance_approach_config_.ShortDebugString();
+  const double rx = 0.0;
+  const double ry = 0.0;
+  const double r_yaw = 0.0;
+
+  // result for distance approach problem
+  Eigen::MatrixXd l_warm_up;
+  Eigen::MatrixXd n_warm_up;
+
+  bool dual_variable_warm_start_status = dual_variable_warm_start_->Solve(
+      horizon_, ts_, ego_, obstacles_num, obstacles_edges_num, obstacles_A,
+      obstacles_b, rx, ry, r_yaw, &l_warm_up, &n_warm_up);
+
+  if (dual_variable_warm_start_status) {
+    ADEBUG << "Dual variable problem solved successfully!";
+  } else {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Dual variable problem failed to solve");
+  }
+
+  // Step 9 : Formulate distance approach problem
+  // solution from distance approach
+  ADEBUG << "Start Forming Distance approach problem with configs setting : "
+         << planner_open_space_config_.distance_approach_config()
+                .ShortDebugString();
   // result for distance approach problem
   Eigen::MatrixXd state_result_ds;
   Eigen::MatrixXd control_result_ds;
   Eigen::MatrixXd time_result_ds;
 
-  bool status = distance_approach_->Solve(
+  // TODO(QiL): Pass dual variable warm start result in.
+  bool distance_approach_status = distance_approach_->Solve(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
       obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
       &state_result_ds, &control_result_ds, &time_result_ds);
 
-  if (status) {
+  if (distance_approach_status) {
     ADEBUG << "Distance approach problem solved successfully!";
   } else {
     return Status(ErrorCode::PLANNING_ERROR,

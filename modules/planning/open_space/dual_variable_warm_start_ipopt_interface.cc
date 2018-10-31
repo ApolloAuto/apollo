@@ -78,7 +78,7 @@ bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
   // TODO(QiL) : Update nnz_jac_g;
   nnz_jac_g = 0;
 
-  // TOdo(QiL) : Update nnz_h_lag;
+  // TODO(QiL) : Update nnz_h_lag;
   nnz_h_lag = 0;
 
   index_style = IndexStyleEnum::C_STYLE;
@@ -88,6 +88,41 @@ bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
 bool DualVariableWarmStartIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
+  ADEBUG << "get_starting_point";
+  CHECK(n == num_of_variables_)
+      << "No. of variables wrong in get_starting_point. n : " << n;
+  CHECK(init_x == true) << "Warm start init_x setting failed";
+  CHECK(init_z == false) << "Warm start init_z setting failed";
+  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+
+  std::size_t l_index = l_start_index_;
+  std::size_t n_index = n_start_index_;
+  std::size_t d_index = d_start_index_;
+
+  // 1. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
+      x[l_index] = 0.2;
+      ++l_index;
+    }
+  }
+
+  // 2. lagrange constraint m, 4*obstacles_num * (horizon_+1)
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+      x[n_index] = 0.2;
+      ++n_index;
+    }
+  }
+
+  // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+      x[d_index] = 0.2;
+      ++d_index;
+    }
+  }
+  ADEBUG << "get_starting_point out";
   return true;
 }
 
@@ -100,7 +135,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   CHECK(n == num_of_variables_) << "num_of_variables_ mismatch, n: " << n
                                 << ", num_of_variables_: " << num_of_variables_;
   CHECK(m == num_of_constraints_)
-      << "num_of_constraints_ mismatch, n: " << n
+      << "num_of_constraints_ mismatch, m: " << m
       << ", num_of_constraints_: " << num_of_constraints_;
 
   std::size_t variable_index = 0;
