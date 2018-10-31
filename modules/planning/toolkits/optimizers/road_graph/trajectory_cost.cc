@@ -175,6 +175,10 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
     const QuinticPolynomialCurve1d &curve, const float start_s,
     const float end_s) const {
   ComparableCost obstacle_cost;
+  if (dynamic_obstacle_boxes_.empty()) {
+    return obstacle_cost;
+  }
+
   float time_stamp = 0.0;
   for (size_t index = 0; index < num_of_time_stamps_;
        ++index, time_stamp += config_.eval_time_interval()) {
