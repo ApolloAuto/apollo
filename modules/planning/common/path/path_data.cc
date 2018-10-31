@@ -230,10 +230,14 @@ bool PathData::LeftTrimWithRefS(const double ref_s) const {
   return false;
 }
 
-bool PathData::UpdateFrenetFramePath(
-  const ReferenceLine *reference_line) const {
-  // TODO(all) add implementation here.
-  return false;
+bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
+  reference_line_ = reference_line;
+  const DiscretizedPath& discretized_path = discretized_path_;
+  bool success = SetDiscretizedPath(discretized_path);
+  if (!success) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace planning
