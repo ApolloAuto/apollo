@@ -159,7 +159,7 @@ function setup_device() {
   MACHINE_ARCH=$(uname -m)
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
     NODE_NAME=$(uname -n)
-    if [ "$NODE_NAME" == 'tegra_ubuntu' ]; then
+    if [ "$NODE_NAME" == 'tegra-ubuntu' ]; then
       sudo modprobe can
       sudo modprobe can_raw
       sudo modprobe mttcan
