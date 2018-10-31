@@ -147,7 +147,18 @@ Stage::StageStatus SidePassDetectSafety::Process(
  */
 Stage::StageStatus SidePassPassObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  // should shift based on ego car position
+  const auto& reference_line_info = frame->reference_line_info().front();
+  bool update_success = GetContext()->path_data_.UpdateFrenetFramePath(
+      &reference_line_info.reference_line());
+  if (!update_success) {
+    return Stage::ERROR;
+  }
+  bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
+      planning_start_point.path_point().s());
+  if (!trim_success) {
+    return Stage::ERROR;
+  }
+
   auto& rfl_info = frame->mutable_reference_line_info()->front();
   *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
 
@@ -155,7 +166,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
   if (!plan_ok) {
     return Stage::ERROR;
   }
-  const auto& reference_line_info = frame->reference_line_info().front();
+
   const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   const auto& end_point =
       reference_line_info.path_data().discretized_path().EndPoint();

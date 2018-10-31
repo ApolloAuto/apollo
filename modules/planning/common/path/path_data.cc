@@ -225,5 +225,16 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
   return true;
 }
 
+bool PathData::LeftTrimWithRefS(const double ref_s) const {
+  // TODO(all) add implementation here.
+  return false;
+}
+
+bool PathData::UpdateFrenetFramePath(
+  const ReferenceLine *reference_line) const {
+  // TODO(all) add implementation here.
+  return false;
+}
+
 }  // namespace planning
 }  // namespace apollo
