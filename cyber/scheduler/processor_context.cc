@@ -53,7 +53,7 @@ void ProcessorContext::Notify(uint64_t cr_id) {
   if (likely(iter != cr_container_.end())) {
     auto& cr = iter->second;
     if (cr->state() == RoutineState::DATA_WAIT) {
-      cr->set_notified();
+      cr->SetUpdateFlag();
     }
 
     if (!notified_.test_and_set(std::memory_order_acquire)) {

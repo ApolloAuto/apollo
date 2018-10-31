@@ -52,6 +52,11 @@ class CRoutine {
   static RoutineContext *GetMainContext();
 
   // public interfaces
+  bool Acquire();
+  void Release();
+  // It is caller's responsibility to check if state_ is valid before calling
+  // SetUpdateFlag().
+  void SetUpdateFlag();
   RoutineState Resume();
   RoutineState UpdateState();
   RoutineContext *GetContext();
@@ -99,11 +104,6 @@ class CRoutine {
   double proc_num() const;
   void set_proc_num(double num);
 
-  bool Acquire();
-  void Release();
-
-  void set_notified();
-
  private:
   std::string name_;
   std::chrono::steady_clock::time_point wake_time_;
@@ -115,9 +115,7 @@ class CRoutine {
   mutable std::mutex mutex_;
 
   std::atomic_flag lock_ = ATOMIC_FLAG_INIT;
-  std::atomic<bool> notified_{false};
-
-  std::atomic_flag needs_updates = ATOMIC_FLAG_INIT;
+  std::atomic_flag updated_ = ATOMIC_FLAG_INIT;
 
   bool force_stop_ = false;
   double proc_num_ = 0.0;
@@ -189,11 +187,18 @@ inline void CRoutine::set_processor_id(int processor_id) {
 }
 
 inline RoutineState CRoutine::UpdateState() {
+  // Synchronous Event Mechanism
   if (state_ == RoutineState::SLEEP &&
       std::chrono::steady_clock::now() > wake_time_) {
     state_ = RoutineState::READY;
-  } else if (notified_.exchange(false)) {
-    state_ = RoutineState::READY;
+    return state_;
+  }
+
+  // Asynchronous Event Mechanism
+  if (!updated_.test_and_set(std::memory_order_release)) {
+    if (state_ == RoutineState::DATA_WAIT || state_ == RoutineState::IO_WAIT) {
+      state_ = RoutineState::READY;
+    }
   }
   return state_;
 }
@@ -246,9 +251,13 @@ inline bool CRoutine::Acquire() {
   return !lock_.test_and_set(std::memory_order_acquire);
 }
 
-inline void CRoutine::Release() { return lock_.clear(); }
+inline void CRoutine::Release() {
+  return lock_.clear(std::memory_order_release);
+}
 
-inline void CRoutine::set_notified() { notified_.exchange(true); }
+inline void CRoutine::SetUpdateFlag() {
+  updated_.clear(std::memory_order_release);
+}
 
 }  // namespace croutine
 }  // namespace cyber
