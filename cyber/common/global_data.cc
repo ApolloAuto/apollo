@@ -43,7 +43,7 @@ const char* empty_str_ = "";
 
 GlobalData::GlobalData() {
   InitHostInfo();
-  InitConfig();
+  CHECK(InitConfig());
   process_id_ = getpid();
   process_name_ = "default_" + std::to_string(process_id_);
   is_reality_mode_ = (config_.has_run_mode_conf() &&
@@ -130,11 +130,23 @@ void GlobalData::InitHostInfo() {
   AINFO << "host ip: " << host_ip_;
 }
 
-void GlobalData::InitConfig() {
+bool GlobalData::InitConfig() {
   auto config_path = GetAbsolutePath(WorkRoot(), "conf/cyber.pb.conf");
   if (!GetProtoFromFile(config_path, &config_)) {
-    AERROR << "read cyber global conf failed!";
+    AERROR << "read cyber default conf failed!";
+    return false;
   }
+  auto user_config_path = GetAbsolutePath(WorkRoot(), "conf/user.pb.conf");
+  if (PathExists(user_config_path)) {
+    apollo::cyber::proto::CyberConfig user_config;
+    if (!GetProtoFromFile(user_config_path, &user_config)) {
+      AERROR << "read cyber user conf failed!";
+      return false;
+    } else {
+      config_.MergeFrom(user_config);
+    }
+  }
+  return true;
 }
 
 const CyberConfig& GlobalData::Config() const { return config_; }
