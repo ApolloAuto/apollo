@@ -10,19 +10,19 @@ warm_start_config : {
   step_size : 0.5
   back_penalty : 0.0
   gear_switch_penalty : 10.0
-  steer_penalty : 100.0
+  steer_penalty : 10.0
   steer_change_penalty : 10.0
 }
 
 distance_approach_config : {
   weight_u : 0.01
-  weight_u : 0.5
+  weight_u : 0.1
   weight_u_rate : 0.1
   weight_u_rate : 0.1
   weight_state : 0.001
   weight_state : 0.001
   weight_state : 0.0001
-  weight_state : 0.001
+  weight_state : 0.0001
   weight_stitching : 0.1
   weight_stitching : 0.1
   weight_time : 0.5
