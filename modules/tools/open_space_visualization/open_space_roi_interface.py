@@ -30,14 +30,15 @@ class open_space_roi(object):
 
     def ROITest(self, lane_id, parking_id,
                 unrotated_roi_boundary_x, unrotated_roi_boundary_y, roi_boundary_x, roi_boundary_y,
-                roi_box_x, roi_box_y, parking_spot_x, parking_spot_y, end_pose,
+                roi_box_x, roi_box_y, roi_box_info, parking_spot_x, parking_spot_y, end_pose,
                 xy_boundary, origin_pose):
         return lib.ROITest(self.open_space_roi_test, (c_char_p)(lane_id), (c_char_p)(parking_id),
                            POINTER(c_double)(unrotated_roi_boundary_x), POINTER(
                                c_double)(unrotated_roi_boundary_y),
                            POINTER(c_double)(roi_boundary_x), POINTER(
                                c_double)(roi_boundary_y),
-                           POINTER(c_double)(roi_box_x), POINTER(c_double)(roi_box_y), POINTER(c_double)(
+                           POINTER(c_double)(roi_box_x), POINTER(c_double)(roi_box_y), POINTER(
+                               c_double)(roi_box_info), POINTER(c_double)(
             parking_spot_x), POINTER(c_double)(
             parking_spot_y), POINTER(c_double)(end_pose),
             POINTER(c_double)(xy_boundary), POINTER(c_double)(origin_pose))

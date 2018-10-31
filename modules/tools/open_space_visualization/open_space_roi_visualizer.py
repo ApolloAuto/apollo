@@ -37,6 +37,7 @@ parking_spot_x = (c_double * num_output_buffer)()
 unrotated_roi_boundary_y = (c_double * num_output_buffer)()
 roi_boundary_y = (c_double * num_output_buffer)()
 roi_box_y = (c_double * num_output_buffer)()
+roi_box_info = (c_double * num_output_buffer)()
 parking_spot_y = (c_double * num_output_buffer)()
 end_pose = (c_double * num_output_buffer)()
 xy_boundary = (c_double * num_output_buffer)()
@@ -44,7 +45,7 @@ origin_pose = (c_double * num_output_buffer)()
 
 if not open_space_roi.ROITest(lane_id, parking_id,
                               unrotated_roi_boundary_x, unrotated_roi_boundary_y, roi_boundary_x, roi_boundary_y,
-                              roi_box_x, roi_box_y, parking_spot_x, parking_spot_y, end_pose,
+                              roi_box_x, roi_box_y, roi_box_info, parking_spot_x, parking_spot_y, end_pose,
                               xy_boundary, origin_pose):
     print("open_space_roi fail")
 result_unrotated_roi_boundary_x = []
@@ -53,21 +54,27 @@ result_roi_boundary_x = []
 result_roi_boundary_y = []
 result_roi_box_x = []
 result_roi_box_y = []
+result_roi_box_info = []
 result_parking_spot_x = []
 result_parking_spot_y = []
 result_end_pose = []
 result_xy_boundary = []
 result_origin_pose = []
 
+print("vertices for distance approach")
 for i in range(0, 10):
     result_unrotated_roi_boundary_x.append(float(unrotated_roi_boundary_x[i]))
     result_unrotated_roi_boundary_y.append(float(unrotated_roi_boundary_y[i]))
     result_roi_boundary_x.append(float(roi_boundary_x[i]))
     result_roi_boundary_y.append(float(roi_boundary_y[i]))
-    print(unrotated_roi_boundary_x[i])
+    print(str(float(roi_boundary_x[i])))
+    print(str(float(roi_boundary_y[i])))
+print("obstacle box for warm start")
 for i in range(0, 16):
     result_roi_box_x.append(float(roi_box_x[i]))
     result_roi_box_y.append(float(roi_box_y[i]))
+    result_roi_box_info.append(float(roi_box_info[i]))
+    print(str(float(roi_box_info[i])))
 for i in range(0, 4):
     result_parking_spot_x.append(float(parking_spot_x[i]))
     result_parking_spot_y.append(float(parking_spot_y[i]))

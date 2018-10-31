@@ -618,7 +618,7 @@ bool Frame::VPresentationObstacle() {
   Vec2d down_boundary_center(
       (ROI_parking_boundary_[1][0].x() + ROI_parking_boundary_[1][1].x()) / 2,
       ROI_parking_boundary_[1][1].y() +
-          (open_space_end_pose_[2] > kMathEpsilon ? 0.5 : -0.5));
+          (parking_spot_heading_ > kMathEpsilon ? 0.5 : -0.5));
   double down_boundary_heading = std::atan2(
       ROI_parking_boundary_[1][1].y() - ROI_parking_boundary_[1][0].y(),
       ROI_parking_boundary_[1][1].x() - ROI_parking_boundary_[1][0].x());
@@ -644,7 +644,7 @@ bool Frame::VPresentationObstacle() {
   Vec2d up_boundary_center(
       (ROI_parking_boundary_[3][0].x() + ROI_parking_boundary_[3][1].x()) / 2,
       ROI_parking_boundary_[3][0].y() +
-          (open_space_end_pose_[2] > kMathEpsilon ? -0.5 : 0.5));
+          (parking_spot_heading_ > kMathEpsilon ? -0.5 : 0.5));
   double up_boundary_heading = std::atan2(
       ROI_parking_boundary_[3][1].y() - ROI_parking_boundary_[3][0].y(),
       ROI_parking_boundary_[3][1].x() - ROI_parking_boundary_[3][0].x());
@@ -876,21 +876,29 @@ bool Frame::GetOpenSpaceROI() {
   end_left.SelfRotate(-1.0 * origin_heading_);
 
   // get end_pose of the parking spot
-  double parking_spot_heading = (left_down - left_top).Angle();
+  parking_spot_heading_ = (left_down - left_top).Angle();
   double end_x = (left_top.x() + right_top.x()) / 2;
   double end_y = 0.0;
-  if (parking_spot_heading > kMathEpsilon) {
-    end_y = left_top.y() + (left_down.y() - left_top.y()) / 4;
+  if (parking_spot_heading_ > kMathEpsilon) {
+    if (FLAGS_parking_inwards) {
+      end_y = left_top.y() + (left_down.y() - left_top.y()) / 4;
+    } else {
+      end_y = left_top.y() + 3 * (left_down.y() - left_top.y()) / 4;
+    }
   } else {
-    end_y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
+    if (FLAGS_parking_inwards) {
+      end_y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
+    } else {
+      end_y = left_down.y() + (left_top.y() - left_down.y()) / 4;
+    }
   }
   open_space_end_pose_.emplace_back(end_x);
   open_space_end_pose_.emplace_back(end_y);
   if (FLAGS_parking_inwards) {
-    open_space_end_pose_.emplace_back(parking_spot_heading);
+    open_space_end_pose_.emplace_back(parking_spot_heading_);
   } else {
     open_space_end_pose_.emplace_back(
-        common::math::NormalizeAngle(parking_spot_heading + M_PI));
+        common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
   }
   open_space_end_pose_.emplace_back(0.0);
 

@@ -67,7 +67,7 @@ class Frame {
                  const double start_time,
                  const common::VehicleState &vehicle_state,
                  ReferenceLineProvider *reference_line_provider,
-                 ADCTrajectory* output_trajectory);
+                 ADCTrajectory *output_trajectory);
 
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
@@ -228,7 +228,7 @@ class Frame {
 
   // TODO(all): change to use shared_ptr.
   // output trajectory pb
-  ADCTrajectory* output_trajectory_ = nullptr;  // not owned
+  ADCTrajectory *output_trajectory_ = nullptr;  // not owned
 
   // TODO(All): add lag_predictor back
   // std::unique_ptr<LagPrediction> lag_predictor_;
@@ -237,7 +237,6 @@ class Frame {
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-
 
   // TODO(all): refactoring open source codes into OpenSourceFrame.
 
@@ -301,6 +300,10 @@ class Frame {
   // @brief origin point for scaling down the numeric value of the optimization
   // problem in order of x , y
   Vec2d origin_point_;
+
+  // @brief parking_spot_heading_ is heading the direction pointing away from
+  // the lane
+  double parking_spot_heading_;
   bool init_data_ = false;
 };
 

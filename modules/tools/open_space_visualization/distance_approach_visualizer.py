@@ -30,8 +30,8 @@ OpenSpacePlanner = DistancePlanner()
 
 # parameter(except max, min and car size is defined in proto)
 num_output_buffer = 100000
-sx = -15.0
-sy = 7
+sx = -10.0
+sy = 3
 sphi = 0.0
 
 scenario = "backward"
@@ -39,21 +39,43 @@ scenario = "backward"
 
 if scenario == "backward":
     # obstacles for warm start(x, y, heading, length, width, id)
-    OpenSpacePlanner.AddWarmStartObstacle(0.0, 11.5, 0.0, 40.0, 1.0, 1)
-    OpenSpacePlanner.AddWarmStartObstacle(-11, 2.5, 0.0, 18.0, 5.0, 2)
-    OpenSpacePlanner.AddWarmStartObstacle(11, 2.5, 0.0, 18.0, 5.0, 3)
-    OpenSpacePlanner.AddWarmStartObstacle(0.0, -0.5, 0.0, 4.0, 1.0, 4)
+    OpenSpacePlanner.AddWarmStartObstacle(-6.82035273881, -
+                                          2.57629095812, 0.0, 13.6407054776, 5.15258191624, 1)
+    OpenSpacePlanner.AddWarmStartObstacle(
+        1.43767995317, -5.65306980547, 0.0, 2.77221918185, 1.0, 2)
+    OpenSpacePlanner.AddWarmStartObstacle(
+        9.53884237668, -2.59643884667, 0.0, 13.6407180455, 5.11326191759, 3)
+    OpenSpacePlanner.AddWarmStartObstacle(
+        1.35924792537, 6.10414234644, 0.0, 29.9998862221, 1.0, 4)
     # obstacles for distance approach(vertices coords in clock wise order)
     ROI_distance_approach_parking_boundary = (
-        c_double * 20)(*[-20, 5, -2, 5, -2, 0, -2, 0, 2, 0, 2, 0, 2, 5, 20, 5, 20, 11, -20, 11])
-    # ROI_distance_approach_parking_boundary = [-20, 5, -
-    #                                           2, 5, -2, 0, 2, 0, 2, 5, 20, 5, 20, 11, -20, 11]
+        c_double * 20)(*[-13.6407054776,
+                         0.0140634663703,
+                         0.0,
+                         0.0,
+                         0.0515703622475,
+                         -5.15258191624,
+                         0.0515703622475,
+                         -5.15258191624,
+                         2.8237895441,
+                         -5.15306980547,
+                         2.8237895441,
+                         -5.15306980547,
+                         2.7184833539,
+                         -0.0398078878812,
+                         16.3592013995,
+                         -0.011889513383,
+                         16.3591910364,
+                         5.60414234644,
+                         -13.6406951857,
+                         5.61797800844,
+                         ])
     OpenSpacePlanner.AddDistanceApproachObstacle(
         ROI_distance_approach_parking_boundary)
-    ex = 0.0
-    ey = 2.0
-    ephi = math.pi / 2
-    XYbounds = [-20, 20, -5, 15]
+    ex = 1.359
+    ey = -3.86443643718
+    ephi = 1.581
+    XYbounds = [-13.6406951857, 16.3591910364, -5.15258191624, 5.61797800844]
 # elif scenario == "parallel":
 #     #obstacles(x, y, heading, length, width, id)
 #     OpenSpacePlanner.AddWarmStartObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
@@ -155,10 +177,15 @@ for i in range(0, size[0]):
 ax.plot(sx, sy, "s")
 ax.plot(ex, ey, "s")
 if scenario == "backward":
-    rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 1.0, 0.0)
-    rect2 = patches.Rectangle((-20.0, 0.0), 18.0, 5.0, 0.0)
-    rect3 = patches.Rectangle((2.0, 0.0), 18.0, 5.0, 0.0)
-    rect4 = patches.Rectangle((-2.0, -1.0), 4.0, 1.0, 0.0)
+    rect1 = patches.Rectangle((-6.82035273881 - 0.5 * 13.6407054776, -
+                               2.57629095812 - 0.5 * 5.15258191624), 13.6407054776, 5.15258191624, 0.0)
+    rect2 = patches.Rectangle(
+        (1.43767995317 - 0.5 * 2.77221918185, -5.65306980547 - 0.5 * 1.0),  2.77221918185, 1.0, 0.0)
+    rect3 = patches.Rectangle((9.53884237668 - 0.5 * 13.6407180455, -
+                               2.59643884667 - 0.5 * 5.11326191759), 13.6407180455, 5.11326191759, 0.0)
+    rect4 = patches.Rectangle((1.35924792537 - 0.5 * 29.9998862221,
+                               6.10414234644 - 0.5 * 1.0), 29.9998862221, 1.0, 0.0)
+
     ax.add_patch(rect1)
     ax.add_patch(rect2)
     ax.add_patch(rect3)
