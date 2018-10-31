@@ -37,22 +37,11 @@ Scheduler::Scheduler() : stop_(false) {
 
   if (gconf.has_scheduler_conf()) {
     sched_conf_.CopyFrom(gconf.scheduler_conf());
+    sched_policy_ = sched_conf_.strategy();
 
-    if (sched_conf_.has_processor_conf()) {
-      sched_policy_ = sched_conf_.processor_conf().process_strategy();
-      proc_num_ = sched_conf_.processor_conf().processor_num();
-    } else {
-      AERROR << "No processor conf";
-      return;
-    }
-
-    if (sched_conf_.has_task_pool_conf()) {
-      task_pool_size_ = sched_conf_.task_pool_conf().task_pool_size();
-    } else {
-      AERROR << "No processor conf";
-      return;
-    }
-
+    proc_num_ = sched_conf_.proc_num();
+    ext_proc_num_ = sched_conf_.ext_proc_num();
+    task_pool_size_ = sched_conf_.task_pool_size();
   } else {
     AERROR << "No scheduler conf";
     return;
@@ -65,7 +54,7 @@ Scheduler::Scheduler() : stop_(false) {
     }
   }
 
-  CreateProcessor();
+  CreateProc();
   //  StartSysmon();
 }
 
@@ -91,30 +80,37 @@ void Scheduler::StartSysmon() {
   pthread_setschedparam(sysmon_.native_handle(), SCHED_FIFO, &param);
 }
 
-void Scheduler::CreateProcessor() {
-  for (uint32_t i = 0; i < proc_num_ + task_pool_size_; i++) {
+std::shared_ptr<ProcessorContext> Scheduler::CreatePctx() {
+  std::shared_ptr<ProcessorContext> ctx;
+  switch (sched_policy_) {
+    case SchedStrategy::CLASSIC:
+      ctx.reset(new ClassicContext());
+      break;
+    case SchedStrategy::CHOREO:
+      ctx.reset(new TaskChoreoContext());
+      break;
+    default:
+      ctx.reset(new TaskChoreoContext());
+      break;
+  }
+  return ctx;
+}
+
+void Scheduler::CreateProc() {
+  auto t_pnum = proc_num_ + task_pool_size_ + ext_proc_num_;
+  for (uint32_t i = 0; i < t_pnum; i++) {
     auto proc = std::make_shared<Processor>();
     proc->set_id(i);
+    proc->set_strategy(sched_policy_);
 
-    std::shared_ptr<ProcessorContext> ctx;
-    switch (sched_policy_) {
-      case ProcessStrategy::CLASSIC:
-        ctx.reset(new ClassicContext());
-        break;
-      case ProcessStrategy::CHOREO:
-        ctx.reset(new TaskChoreoContext());
-        break;
-      default:
-        ctx.reset(new TaskChoreoContext());
-        break;
-    }
-
+    auto ctx = CreatePctx();
     ctx->set_id(i);
     proc->bind_context(ctx);
-    proc->set_strategy(sched_policy_);
     ctx->bind_processor(proc);
     proc_ctxs_.emplace_back(ctx);
-    proc->Start();
+    if (sched_policy_ == SchedStrategy::CLASSIC) {
+      proc->Start();
+    }
   }
 }
 

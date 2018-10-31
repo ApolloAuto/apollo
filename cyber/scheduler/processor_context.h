@@ -60,6 +60,7 @@ class ProcessorContext {
   inline void bind_processor(const std::shared_ptr<Processor>& processor) {
     processor_ = processor;
   }
+  inline std::shared_ptr<Processor> processor() { return processor_; }
 
   virtual void Notify(uint64_t cr_id);
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;

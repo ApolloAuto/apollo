@@ -50,12 +50,7 @@ TaskManager::TaskManager()
   uint32_t pool_size = 0;
   auto gconf = GlobalData::Instance()->Config();
   if (gconf.has_scheduler_conf()) {
-    if (gconf.scheduler_conf().has_task_pool_conf()) {
-      pool_size = gconf.scheduler_conf().task_pool_conf().task_pool_size();
-    } else {
-      AERROR << "No task pool conf";
-      return;
-    }
+    pool_size = gconf.scheduler_conf().task_pool_size();
   } else {
     AERROR << "No scheduler conf";
     return;

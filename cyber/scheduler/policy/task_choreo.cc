@@ -70,13 +70,17 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
 bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   std::vector<std::shared_ptr<ProcessorContext>> ctxs =
       Scheduler::Instance()->ProcCtxs();
+  uint32_t pnum = Scheduler::Instance()->proc_num();
+  uint32_t ex_pnum = Scheduler::Instance()->ext_proc_num();
+  uint32_t psize = Scheduler::Instance()->task_pool_size();
 
   uint32_t pid = cr->processor_id();
   if (!(pid >= 0 && pid < ctxs.size())) {
     // fallback for those w/o proc idx in conf
-    pid = 0;
+    pid = psize + pnum;
     int qsize = ctxs[pid]->RqSize();
-    for (uint32_t i = 1; i < ctxs.size(); i++) {
+    for (uint32_t i = psize + pnum;
+        i < pnum + psize + ex_pnum; i++) {
       if (qsize > ctxs[i]->RqSize()) {
         qsize = ctxs[i]->RqSize();
         pid = i;
@@ -89,8 +93,11 @@ bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
       Scheduler::Instance()->RtCtx();
   if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
     rt_ctx[cr->id()] = cr->processor_id();
+  } else {
+    return false;
   }
 
+  ctxs[pid]->processor()->Start();
   return ctxs[pid]->Enqueue(cr);
 }
 
