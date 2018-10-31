@@ -78,6 +78,7 @@ modules/map/data
 
 # python proto
 py_proto
+cyber/python/cyber/proto/
 
 # gnss conf files
 modules/drivers/gnss/conf/conf_beijing
