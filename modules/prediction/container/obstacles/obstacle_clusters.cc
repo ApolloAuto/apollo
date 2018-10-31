@@ -34,7 +34,11 @@ std::unordered_map<std::string, JunctionFeature>
 std::unordered_map<std::string, std::vector<LaneObstacle>>
     ObstacleClusters::lane_obstacles_;
 
-void ObstacleClusters::Clear() { lane_graphs_.clear(); }
+void ObstacleClusters::Clear() {
+  lane_graphs_.clear();
+  junction_features_.clear();
+  lane_obstacles_.clear();
+}
 
 void ObstacleClusters::Init() { Clear(); }
 
