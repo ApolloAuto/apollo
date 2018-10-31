@@ -25,15 +25,14 @@ usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
 if [ "$ARCH" == 'aarch64' ]; then
-  echo '
-  export PATH=\$PATH:\${JAVA_HOME}/bin:/apollo/scripts:/usr/local/miniconda2/bin/
+  echo "
+export PATH=\$PATH:\${JAVA_HOME}/bin:/apollo/scripts:/usr/local/miniconda2/bin/
 
-  if [ -e "/apollo/scripts/apollo_base.sh" ]; then 
-    source /apollo/scripts/apollo_base.sh; 
-  fi
+if [ -e "/apollo/scripts/apollo_base.sh" ]; then 
+  source /apollo/scripts/apollo_base.sh; 
+fi
 
-  ulimit -c unlimited
-  ' >> "/home/${DOCKER_USER}/.bashrc"
+ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
 
   source /home/${DOCKER_USER}/.bashrc
 else
