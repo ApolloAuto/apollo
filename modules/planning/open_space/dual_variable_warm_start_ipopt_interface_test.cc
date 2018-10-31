@@ -21,6 +21,9 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/common/util/file.h"
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 
@@ -31,9 +34,6 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;
-
-    distance_approach_config_ =
-        planner_open_space_config_.distance_approach_config();
 
     ProblemSetup();
   }
@@ -56,49 +56,49 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
   Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
   int num_of_variables_;
+  double rx_ = 0.0;
+  double ry_ = 0.0;
+  double r_yaw_ = 0.0;
   bool use_fix_time_ = false;
 
   int num_of_constraints_;
 
-  std::unique_ptr<DistanceApproachIPOPTInterface> ptop_ = nullptr;
+  std::unique_ptr<DualVariableWarmStartIPOPTInterface> ptop_ = nullptr;
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  apollo::planning::DistanceApproachConfig distance_approach_config_;
 };
 
-void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
+void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
   obstacles_edges_num_ = 4 * Eigen::MatrixXd::Ones(obstacles_num_, 1);
 
-  num_of_variables_ = 4 * (horizon_ + 1) + 2 * horizon_ + (horizon_ + 1) +
-                      (horizon_ + 1) * 4 * obstacles_num_ +
-                      4 * obstacles_num_ * (horizon_ + 1);
+  num_of_variables_ = obstacles_edges_num_.sum() * (horizon_ + 1) +
+                      4 * obstacles_num_ * (horizon_ + 1) +
+                      obstacles_num_ * (horizon_ + 1);
 
-  num_of_constraints_ =
-      4 * horizon_ + horizon_ + horizon_ + 4 * obstacles_num_ * (horizon_ + 1);
+  num_of_constraints_ = 4 * obstacles_num_ * (horizon_ + 1);
 
-  ptop_.reset(new DistanceApproachIPOPTInterface(
-      num_of_variables_, num_of_constraints_, horizon_, ts_, ego_, xWS_, uWS_,
-      x0_, xf_, last_time_u_, XYbounds_, obstacles_edges_num_, obstacles_num_,
-      obstacles_A_, obstacles_b_, planner_open_space_config_));
+  ptop_.reset(new DualVariableWarmStartIPOPTInterface(
+      num_of_variables_, num_of_constraints_, horizon_, ts_, ego_,
+      obstacles_edges_num_, obstacles_A_, obstacles_b_, rx_, ry_, r_yaw_));
 }
 
-TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {
+TEST_F(DualVariableWarmStartIPOPTInterfaceTest, initilization) {
   EXPECT_NE(ptop_, nullptr);
 }
 
-TEST_F(DistanceApproachIPOPTInterfaceTest, get_nlp_info) {
+TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_nlp_info) {
   int n, m, nnz_jac_g, nnz_h_lag;
   Ipopt::TNLP::IndexStyleEnum index_style;
   ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
   EXPECT_EQ(n, num_of_variables_);
   EXPECT_EQ(m, num_of_constraints_);
-  EXPECT_EQ(nnz_jac_g, 1884);
+  EXPECT_EQ(nnz_jac_g, 0);
   EXPECT_EQ(nnz_h_lag, 0);
   EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
 }
 
-TEST_F(DistanceApproachIPOPTInterfaceTest, get_bounds_info) {
-  int kNumOfVariables = 520;
-  int kNumOfConstraints = 270;
+TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_bounds_info) {
+  int kNumOfVariables = 540;
+  int kNumOfConstraints = 240;
   double x_l[kNumOfVariables];
   double x_u[kNumOfVariables];
   double g_l[kNumOfConstraints];
@@ -108,9 +108,9 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_bounds_info) {
   EXPECT_TRUE(res);
 }
 
-TEST_F(DistanceApproachIPOPTInterfaceTest, get_starting_point) {
-  int kNumOfVariables = 520;
-  int kNumOfConstraints = 270;
+TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_starting_point) {
+  int kNumOfVariables = 540;
+  int kNumOfConstraints = 240;
   bool init_x = true;
   bool init_z = false;
   bool init_lambda = false;
@@ -124,8 +124,8 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_starting_point) {
   EXPECT_TRUE(res);
 }
 
-TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
-  int kNumOfVariables = 520;
+TEST_F(DualVariableWarmStartIPOPTInterfaceTest, eval_f) {
+  int kNumOfVariables = 540;
   double obj_value;
   double x[kNumOfVariables];
   std::fill_n(x, kNumOfVariables, 1.2);

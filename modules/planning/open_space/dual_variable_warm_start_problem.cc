@@ -41,12 +41,27 @@ DualVariableWarmStartProblem::DualVariableWarmStartProblem(
 }
 
 bool DualVariableWarmStartProblem::Solve(
-    const std::size_t& num_of_variables, const std::size_t& num_of_constraints,
     const std::size_t& horizon, const float& ts, const Eigen::MatrixXd& ego,
-    const Eigen::MatrixXd& obstacles_edges_num,
+    std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const double rx, const double ry, const double r_yaw,
     Eigen::MatrixXd* l_warm_up, Eigen::MatrixXd* n_warm_up) {
+  // n1 : lagrangian multiplier associated with obstacleShape
+  int n1 = obstacles_edges_num.sum() * (horizon + 1);
+
+  // n2 : lagrangian multipier associated with car shape, obstacles_num*4 *
+  // (N+1)
+  int n2 = obstacles_num * 4 * (horizon + 1);
+
+  // n3 : dual variable, obstacles_num * (N+1)
+  int n3 = obstacles_num * (horizon + 1);
+
+  // m1 : obstacle constraints
+  int m1 = 4 * obstacles_num * (horizon + 1);
+
+  int num_of_variables = n1 + n2 + n3;
+  int num_of_constraints = m1;
+
   DualVariableWarmStartIPOPTInterface* ptop =
       new DualVariableWarmStartIPOPTInterface(
           num_of_variables, num_of_constraints, horizon, ts, ego,

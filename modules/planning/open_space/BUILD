@@ -177,17 +177,17 @@ cc_test(
     ],
 )
 
-#cc_test(
-#    name = "dual_variable_warm_start_problem_test",
-#    size = "small",
-#    srcs = [
-#        "dual_variable_warm_start_problem_test.cc",
-#    ],
-#    deps = [
-#        ":dual_variable_warm_start_problem",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "dual_variable_warm_start_problem_test",
+    size = "small",
+    srcs = [
+        "dual_variable_warm_start_problem_test.cc",
+    ],
+    deps = [
+        ":dual_variable_warm_start_problem",
+        "@gtest//:main",
+    ],
+)
 
 cc_library(
     name = "hybrid_a_star",
@@ -255,6 +255,7 @@ cc_library(
     deps = [
         "distance_approach_problem",
         "hybrid_a_star",
+        "dual_variable_warm_start_problem",
         "//external:gflags",
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
