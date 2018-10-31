@@ -31,22 +31,27 @@ HybridAStar = HybridAStarPlanner()
 # parameter(except max, min and car size is defined in proto)
 num_output_buffer = 100000
 sx = -10.0
-sy = 8
+sy = 3
 sphi = 0.0
 
-# scenario = "backward"
-scenario = "parallel"
+scenario = "backward"
+# scenario = "parallel"
 
 if scenario == "backward":
     # for parking space 11543 in sunnyvale_with_two_offices
     #obstacles(x, y, heading, length, width, id)
-    HybridAStar.AddVirtualObstacle(1.0, 6.0, 0.0, 30.0, 1.0, 1)
-    HybridAStar.AddVirtualObstacle(-7.0, -3.0, 0.0, 14.0, 5.0, 2)
-    HybridAStar.AddVirtualObstacle(10.0, -3.0, 0.0, 14.0, 5.0, 3)
+    HybridAStar.AddVirtualObstacle(-6.82035273881, -
+                                   2.57629095812, 0.0, 13.6407054776, 5.15258191624, 1)
+    HybridAStar.AddVirtualObstacle(
+        1.43767995317, -5.65306980547, 0.0, 2.77221918185, 1.0, 2)
+    HybridAStar.AddVirtualObstacle(
+        9.53884237668, -2.59643884667, 0.0, 13.6407180455, 5.11326191759, 3)
+    HybridAStar.AddVirtualObstacle(
+        1.35924792537, 6.10414234644, 0.0, 29.9998862221, 1.0, 4)
     ex = 1.359
-    ey = -1.561
-    ephi = -math.pi / 2
-    XYbounds = [-20, 20, -20, 20]
+    ey = -3.86443643718
+    ephi = 1.581
+    XYbounds = [-13.6406951857, 16.3591910364, -5.15258191624, 5.61797800844]
 elif scenario == "parallel":
     #obstacles(x, y, heading, length, width, id)
     HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
@@ -111,15 +116,19 @@ for i in range(0, size[0]):
 ax.plot(sx, sy, "s")
 ax.plot(ex, ey, "s")
 if scenario == "backward":
-    rect1 = patches.Rectangle((-14.0, 5.5), 30.0, 1.0, 0.0)
-    rect2 = patches.Rectangle((-14.0, -5.5), 14.0, 5.0, 0.0)
-    rect3 = patches.Rectangle((3, -5.5), 14.0, 5.0, 0.0)
-    # HybridAStar.AddVirtualObstacle(1.0, 6.0, 0.0, 30.0, 1.0, 1)
-    # HybridAStar.AddVirtualObstacle(-7.0, -3.0, 0.0, 14.0, 5.0, 2)
-    # HybridAStar.AddVirtualObstacle(10.0, -3.0, 0.0, 14.0, 5.0, 3)
+    rect1 = patches.Rectangle((-6.82035273881 - 0.5 * 13.6407054776, -
+                               2.57629095812 - 0.5 * 5.15258191624), 13.6407054776, 5.15258191624, 0.0)
+    rect2 = patches.Rectangle(
+        (1.43767995317 - 0.5 * 2.77221918185, -5.65306980547 - 0.5 * 1.0),  2.77221918185, 1.0, 0.0)
+    rect3 = patches.Rectangle((9.53884237668 - 0.5 * 13.6407180455, -
+                               2.59643884667 - 0.5 * 5.11326191759), 13.6407180455, 5.11326191759, 0.0)
+    rect4 = patches.Rectangle((1.35924792537 - 0.5 * 29.9998862221,
+                               6.10414234644 - 0.5 * 1.0), 29.9998862221, 1.0, 0.0)
+
     ax.add_patch(rect1)
     ax.add_patch(rect2)
     ax.add_patch(rect3)
+    ax.add_patch(rect4)
 elif scenario == "parallel":
     rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
     rect2 = patches.Rectangle((-20.0, -5.0), 16.0, 10.0, 0.0)

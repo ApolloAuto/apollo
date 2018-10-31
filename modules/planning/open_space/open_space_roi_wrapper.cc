@@ -120,17 +120,30 @@ class OpenSpaceROITest {
     end_left.SelfRotate(-origin_heading_);
 
     // get end_pose of the parking spot
-    double heading = (left_down - left_top).Angle();
-    double x = (left_top.x() + right_top.x()) / 2;
-    double y = 0.0;
-    if (heading > kMathEpsilon) {
-      y = left_top.y() + (-left_top.y() + left_down.y()) / 4;
+    parking_spot_heading_ = (left_down - left_top).Angle();
+    double end_x = (left_top.x() + right_top.x()) / 2;
+    double end_y = 0.0;
+    if (parking_spot_heading_ > kMathEpsilon) {
+      if (FLAGS_parking_inwards) {
+        end_y = left_top.y() + (left_down.y() - left_top.y()) / 4;
+      } else {
+        end_y = left_top.y() + 3 * (left_down.y() - left_top.y()) / 4;
+      }
     } else {
-      y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
+      if (FLAGS_parking_inwards) {
+        end_y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
+      } else {
+        end_y = left_down.y() + (left_top.y() - left_down.y()) / 4;
+      }
     }
-    open_space_end_pose_.emplace_back(x);
-    open_space_end_pose_.emplace_back(y);
-    open_space_end_pose_.emplace_back(heading);
+    open_space_end_pose_.emplace_back(end_x);
+    open_space_end_pose_.emplace_back(end_y);
+    if (FLAGS_parking_inwards) {
+      open_space_end_pose_.emplace_back(parking_spot_heading_);
+    } else {
+      open_space_end_pose_.emplace_back(
+          common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
+    }
     open_space_end_pose_.emplace_back(0.0);
 
     // get xy boundary of the ROI
@@ -392,7 +405,7 @@ class OpenSpaceROITest {
     Vec2d down_boundary_center(
         (ROI_parking_boundary_[1][0].x() + ROI_parking_boundary_[1][1].x()) / 2,
         ROI_parking_boundary_[1][1].y() +
-            (open_space_end_pose_[2] > kMathEpsilon ? 0.5 : -0.5));
+            (parking_spot_heading_ > kMathEpsilon ? 0.5 : -0.5));
     double down_boundary_heading = std::atan2(
         ROI_parking_boundary_[1][1].y() - ROI_parking_boundary_[1][0].y(),
         ROI_parking_boundary_[1][1].x() - ROI_parking_boundary_[1][0].x());
@@ -419,7 +432,7 @@ class OpenSpaceROITest {
     Vec2d up_boundary_center(
         (ROI_parking_boundary_[3][0].x() + ROI_parking_boundary_[3][1].x()) / 2,
         ROI_parking_boundary_[3][0].y() +
-            (open_space_end_pose_[2] > kMathEpsilon ? -0.5 : 0.5));
+            (parking_spot_heading_ > kMathEpsilon ? -0.5 : 0.5));
     double up_boundary_heading = std::atan2(
         ROI_parking_boundary_[3][1].y() - ROI_parking_boundary_[3][0].y(),
         ROI_parking_boundary_[3][1].x() - ROI_parking_boundary_[3][0].x());
@@ -505,6 +518,7 @@ class OpenSpaceROITest {
   std::vector<double> open_space_end_pose_;
   double origin_heading_;
   Vec2d origin_point_;
+  double parking_spot_heading_;
 };
 
 extern "C" {
@@ -513,8 +527,9 @@ OpenSpaceROITest* CreateROITestPtr() { return new OpenSpaceROITest(); }
 bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
              double* unrotated_roi_boundary_x, double* unrotated_roi_boundary_y,
              double* roi_boundary_x, double* roi_boundary_y, double* roi_box_x,
-             double* roi_box_y, double* parking_spot_x, double* parking_spot_y,
-             double* end_pose, double* xy_boundary, double* origin_pose) {
+             double* roi_box_y, double* roi_box_info, double* parking_spot_x,
+             double* parking_spot_y, double* end_pose, double* xy_boundary,
+             double* origin_pose) {
   std::string lane_id_str(lane_id);
   std::string parking_id_str(parking_id);
   if (!test_ptr->VPresentationObstacle(lane_id_str, parking_id_str)) {
@@ -554,9 +569,15 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
   }
 
   index = 0;
+  std::size_t box_index = 0;
   for (std::size_t i = 0; i < roi_box_->size(); i++) {
     std::vector<Vec2d> points;
     roi_box_->at(i).GetAllCorners(&points);
+    roi_box_info[4 * box_index] = roi_box_->at(i).center_x();
+    roi_box_info[4 * box_index + 1] = roi_box_->at(i).center_y();
+    roi_box_info[4 * box_index + 2] = roi_box_->at(i).length();
+    roi_box_info[4 * box_index + 3] = roi_box_->at(i).width();
+    box_index++;
     for (std::size_t j = 0; j < points.size(); j++) {
       roi_box_x[index] = points[j].x();
       roi_box_y[index] = points[j].y();
