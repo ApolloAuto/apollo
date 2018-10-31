@@ -147,6 +147,10 @@ Stage::StageStatus SidePassDetectSafety::Process(
  */
 Stage::StageStatus SidePassPassObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  // should shift based on ego car position
+  auto& rfl_info = frame->mutable_reference_line_info()->front();
+  *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
+
   bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
     return Stage::ERROR;
