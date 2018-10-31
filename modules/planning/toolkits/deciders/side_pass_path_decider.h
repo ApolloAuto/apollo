@@ -67,6 +67,7 @@ class SidePassPathDecider : public Decider {
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
  private:
+  common::FrenetFramePoint adc_frenet_frame_point_;
   std::unique_ptr<Fem1dQpProblem> fem_qp_;
   SidePassDirection decided_direction_;
   double delta_s_ = 0.0;
