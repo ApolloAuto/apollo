@@ -42,15 +42,15 @@ def load_hdf5(filename):
     load training samples from *.hdf5 file
     """
     if not(os.path.exists(filename)):
-        print "file:", filename, "does not exist"
+        print ("file:", filename, "does not exist")
         os._exit(1)
     if os.path.splitext(filename)[1] != '.h5':
-        print "file:", filename, "is not an hdf5 file"
+        print ("file:", filename, "is not an hdf5 file")
         os._exit(1)
 
     h5_file = h5py.File(filename, 'r')
     values = h5_file.values()[0]
-    print "load data size:", values.shape[0]
+    print ("load data size:", values.shape[0])
     return values
 
 
@@ -68,21 +68,21 @@ if __name__ == '__main__':
         labels = None
 
         h5_files = getListOfFiles(path)
-        print "Total number of files:", len(h5_files)
+        print ("Total number of files:", len(h5_files))
         for i, h5_file in enumerate(h5_files):
-            print "Process File", i, ":", h5_file
+            print ("Process File", i, ":", h5_file)
             feature = load_hdf5(h5_file)
             if np.any(np.isinf(feature)):
-                print "inf data found"
+                print ("inf data found")
             features = np.concatenate((features, feature), axis=0) if features is not None \
                     else feature
     else:
-        print "Fail to find", path
+        print ("Fail to find", path)
         os._exit(-1)
 
     date = datetime.datetime.now().strftime('%Y-%m-%d')
     sample_file = path + '/merged' + date + '.h5'
-    print "Save samples file to:", sample_file
+    print ("Save samples file to:", sample_file)
     h5_file = h5py.File(sample_file, 'w')
     h5_file.create_dataset('data', data=features)
     h5_file.close()
