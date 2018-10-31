@@ -38,6 +38,7 @@ message JunctionExit {
   optional string exit_lane_id = 1;
   optional apollo.common.Point3D exit_position = 2;
   optional double exit_heading = 3;
+  optional double exit_width = 4;
 }
 
 message JunctionFeature {

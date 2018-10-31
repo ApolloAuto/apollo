@@ -26,6 +26,7 @@ namespace prediction {
 using apollo::hdmap::LaneInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::OverlapInfo;
 
 std::shared_ptr<const apollo::hdmap::JunctionInfo>
     JunctionAnalyzer::junction_info_ptr_;
@@ -35,19 +36,49 @@ std::unordered_map<std::string, JunctionFeature>
     JunctionAnalyzer::junction_features_;
 
 void JunctionAnalyzer::Init(const std::string& junction_id) {
-  // TODO(Hongyi) implement
-  // Initialize junction_info_ptr_
-  // Initialize junction_exits_ by SetAllJunctionExits()
+  if (junction_info_ptr_ != nullptr &&
+      junction_info_ptr_->id().id() == junction_id) {
+    return;
+  }
+  Clear();
+  junction_info_ptr_ = PredictionMap::JunctionById(junction_id);
+  SetAllJunctionExits();
 }
 
 void JunctionAnalyzer::Clear() {
-  // TODO(Hongyi) implement
   // Clear all data
+  junction_info_ptr_ = nullptr;
+  junction_exits_.clear();
+  junction_features_.clear();
 }
 
 void JunctionAnalyzer::SetAllJunctionExits() {
-  // TODO(Hongyi) implement
-  // Set junction_exits_
+  CHECK_NOTNULL(junction_info_ptr_);
+  for (const auto &overlap_id : junction_info_ptr_->junction().overlap_id()) {
+    auto overlap_info_ptr = PredictionMap::OverlapById(overlap_id.id());
+    if (overlap_info_ptr == nullptr) {
+      continue;
+    }
+    for (const auto &object : overlap_info_ptr->overlap().object()) {
+      if (object.has_lane_overlap_info()) {
+        std::string lane_id = object.id().id();
+        auto lane_info_ptr = PredictionMap::LaneById(lane_id);
+        if (object.lane_overlap_info().end_s() + 1e-3 <
+            lane_info_ptr->total_length()) {
+          JunctionExit junction_exit;
+          double s = object.lane_overlap_info().end_s();
+          apollo::common::PointENU position = lane_info_ptr->GetSmoothPoint(s);
+          junction_exit.set_exit_lane_id(lane_id);
+          junction_exit.mutable_exit_position()->set_x(position.x());
+          junction_exit.mutable_exit_position()->set_y(position.y());
+          junction_exit.set_exit_heading(lane_info_ptr->Heading(s));
+          junction_exit.set_exit_width(lane_info_ptr->GetWidth(s));
+          // add junction_exit to hashtable
+          junction_exits_[lane_id] = junction_exit;
+        }
+      }
+    }
+  }
 }
 
 std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
