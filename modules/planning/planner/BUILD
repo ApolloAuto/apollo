@@ -39,7 +39,14 @@ cc_library(
         "//modules/planning/planner/navi:navi_planner",
         "//modules/planning/planner/public_road:public_road_planner",
         "//modules/planning/planner/rtk:rtk_planner",
+        "//modules/planning/planner/open_space:open_space_planner",
         "//modules/planning/proto:planning_proto",
+        # for open space planner
+        "//modules/planning/common:planning_gflags",
+        "//modules/map/pnc_map",
+        "//modules/common/math",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/common/vehicle_state:vehicle_state_provider",
     ],
 )
 

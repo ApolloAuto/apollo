@@ -417,6 +417,9 @@ DEFINE_bool(enable_open_space_roi_and_info, false,
             "enable the frame to load map data and calculate info for open "
             "space planner");
 
+DEFINE_bool(enable_open_space_planner_thread, false,
+            "Enable thread in open space planner for trajectory publish.");
+
 DEFINE_bool(
     parking_inwards, false,
     "true for parking the car inwards in parking spot, false for parking "
@@ -436,6 +439,3 @@ DEFINE_bool(enable_record_debug, true,
 DEFINE_double(
     default_front_clear_distance, 300.0,
     "default front clear distance value in case there is no obstacle around.");
-
-DEFINE_bool(enable_open_space_planner_thread, true,
-            "Enable thread in open space planner for trajectory publish.");
