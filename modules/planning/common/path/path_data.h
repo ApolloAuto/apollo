@@ -59,7 +59,7 @@ class PathData {
 
   bool LeftTrimWithRefS(const double ref_s) const;
 
-  bool UpdateFrenetFramePath(const ReferenceLine *reference_line) const;
+  bool UpdateFrenetFramePath(const ReferenceLine *reference_line);
 
   void Clear();
 
