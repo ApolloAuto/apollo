@@ -15,6 +15,8 @@
  *****************************************************************************/
 
 #include <queue>
+#include <memory>
+#include <utility>
 
 #include "modules/prediction/common/junction_analyzer.h"
 
@@ -22,6 +24,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::hdmap::LaneInfo;
+using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 using apollo::hdmap::JunctionInfo;
 
 std::shared_ptr<const apollo::hdmap::JunctionInfo>
@@ -49,16 +52,31 @@ void JunctionAnalyzer::SetAllJunctionExits() {
 
 std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     const std::string& start_lane_id) {
-  // TODO(kechxu) implement
-  // By BFS with junction_exits_
+  int max_search_level = 3;
   std::vector<JunctionExit> junction_exits;
+  std::queue<std::pair<ConstLaneInfoPtr, int>> lane_info_queue;
+  lane_info_queue.emplace(PredictionMap::LaneById(start_lane_id), 0);
+  while (!lane_info_queue.empty()) {
+    ConstLaneInfoPtr curr_lane = lane_info_queue.front().first;
+    int level = lane_info_queue.front().second;
+    lane_info_queue.pop();
+    if (IsExitLane(start_lane_id)) {
+      junction_exits.push_back(junction_exits_[start_lane_id]);
+    }
+    if (level >= max_search_level) {
+      continue;
+    }
+    for (const auto& succ_lane_id : curr_lane->lane().successor_id()) {
+      ConstLaneInfoPtr succ_lane_ptr =
+          PredictionMap::LaneById(succ_lane_id.id());
+      lane_info_queue.emplace(succ_lane_ptr, level + 1);
+    }
+  }
   return junction_exits;
 }
 
 bool JunctionAnalyzer::IsExitLane(const std::string& lane_id) {
-  // TODO(kechxu) implement
-  // By junction_exits_
-  return false;
+  return junction_exits_.find(lane_id) != junction_exits_.end();
 }
 
 }  // namespace prediction
