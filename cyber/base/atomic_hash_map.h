@@ -136,7 +136,7 @@ class AtomicHashMap {
           // value_ptr will be set to nullptr befor remove, so check first
           while (old_val_ptr) {
             if (target->value_ptr.compare_exchange_strong(
-                    old_val_ptr, new_value, std::memory_order_acquire,
+                    old_val_ptr, new_value, std::memory_order_acq_rel,
                     std::memory_order_relaxed)) {
               target->Release();
               return;

@@ -121,7 +121,7 @@ bool BoundedQueue<T>::Enqueue(const T& element) {
       return false;
     }
   } while (!tail_.compare_exchange_weak(old_tail, new_tail,
-                                        std::memory_order_acquire,
+                                        std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
   // make sure the value of pool_[old_tail] has been read
   while (flags_[old_tail].flag) {
@@ -143,7 +143,7 @@ bool BoundedQueue<T>::Dequeue(T* element) {
       return false;
     }
   } while (!head_.compare_exchange_weak(old_head, new_head,
-                                        std::memory_order_acquire,
+                                        std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
   // make sure the value of pool_[new_head] has been written
   while (!flags_[new_head].flag) {
@@ -167,7 +167,7 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
         break;
       }
     } while (!head_.compare_exchange_weak(old_head, new_head,
-                                          std::memory_order_acquire,
+                                          std::memory_order_acq_rel,
                                           std::memory_order_relaxed));
     if (wait) {
       if (!wait_strategy_->EmptyWait()) {
