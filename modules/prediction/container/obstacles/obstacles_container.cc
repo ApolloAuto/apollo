@@ -21,6 +21,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 
 namespace apollo {
@@ -137,7 +138,7 @@ void ObstaclesContainer::BuildLaneGraph() {
   }
 }
 
-void ObstaclesContainer::BuildJunctionFeature(const std::string& junction_id) {
+void ObstaclesContainer::BuildJunctionFeature() {
   for (const int id : curr_frame_predictable_obstacle_ids_) {
     Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
     if (obstacle_ptr == nullptr) {
@@ -148,10 +149,11 @@ void ObstaclesContainer::BuildJunctionFeature(const std::string& junction_id) {
       ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
       continue;
     }
+    const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
     if (obstacle_ptr->IsInJunction(junction_id)) {
       ADEBUG << "Build junction feature for obstacle [" << obstacle_ptr->id()
             << "] in junction [" << junction_id << "]";
-      obstacle_ptr->BuildJunctionFeature(junction_id);
+      obstacle_ptr->BuildJunctionFeature();
     }
   }
 }

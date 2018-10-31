@@ -42,11 +42,24 @@ class JunctionAnalyzer {
   static void Clear();
 
   /**
+   * @brief Get junction ID
+   * @return Junction ID
+   */
+  static const std::string& GetJunctionId();
+
+  /**
+   * @brief Compute junction range
+   * @return Junction range
+   */
+  static double ComputeJunctionRange();
+
+  /**
    * @brief Get all filtered junction exits associated to start lane ID
    * @param start lane ID
    * @return Filtered junction exits
    */
-  std::vector<JunctionExit> GetJunctionExits(const std::string& start_lane_id);
+  static std::vector<JunctionExit>
+  GetJunctionExits(const std::string& start_lane_id);
 
  private:
   /**

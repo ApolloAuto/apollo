@@ -27,6 +27,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:validation_checker",
+        "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator:evaluator_manager",

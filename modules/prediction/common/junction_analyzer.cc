@@ -17,6 +17,8 @@
 #include <queue>
 #include <memory>
 #include <utility>
+#include <limits>
+#include <algorithm>
 
 #include "modules/prediction/common/junction_analyzer.h"
 
@@ -108,6 +110,36 @@ std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
 
 bool JunctionAnalyzer::IsExitLane(const std::string& lane_id) {
   return junction_exits_.find(lane_id) != junction_exits_.end();
+}
+
+const std::string& JunctionAnalyzer::GetJunctionId() {
+  CHECK_NOTNULL(junction_info_ptr_);
+  return junction_info_ptr_->id().id();
+}
+
+double JunctionAnalyzer::ComputeJunctionRange() {
+  CHECK_NOTNULL(junction_info_ptr_);
+  if (!junction_info_ptr_->junction().has_polygon() ||
+      junction_info_ptr_->junction().polygon().point_size() < 3) {
+    AERROR << "Junction [" << GetJunctionId()
+           << "] has not enough polygon points to compute range";
+    // TODO(kechxu) move the default range value to gflags
+    return 10.0;
+  }
+  double x_min = std::numeric_limits<double>::infinity();
+  double x_max = -std::numeric_limits<double>::infinity();
+  double y_min = std::numeric_limits<double>::infinity();
+  double y_max = -std::numeric_limits<double>::infinity();
+  for (const auto& point : junction_info_ptr_->junction().polygon().point()) {
+    x_min = std::min(x_min, point.x());
+    x_max = std::max(x_max, point.x());
+    y_min = std::min(y_min, point.y());
+    y_max = std::max(y_max, point.y());
+  }
+  double dx = std::abs(x_max - x_min);
+  double dy = std::abs(y_max - y_min);
+  double range = std::sqrt(dx * dx + dy * dy);
+  return range;
 }
 
 }  // namespace prediction

@@ -35,6 +35,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/validation_checker.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -192,8 +193,8 @@ void PredictionComponent::OnPlanning(
   }
   adc_trajectory_container->Insert(adc_trajectory);
 
-  ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
-         << "].";
+  ADEBUG << "Received a planning message ["
+         << adc_trajectory.ShortDebugString() << "].";
 }
 
 void PredictionComponent::OnPerception(
@@ -215,12 +216,14 @@ void PredictionComponent::OnPerception(
   // Scenario analysis
   // ScenarioManager::Instance()->Run();
 
+  // TODO(kechxu) refactor logic of build lane graph and build junction feature
   // Set up obstacle cluster
   obstacles_container->BuildLaneGraph();
 
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
-    obstacles_container->BuildJunctionFeature(scenario.junction_id());
+    JunctionAnalyzer::Init(scenario.junction_id());
+    obstacles_container->BuildJunctionFeature();
   }
 
   ADEBUG << "Received a perception message ["
