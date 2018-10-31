@@ -35,7 +35,7 @@ namespace croutine {
 using RoutineFunc = std::function<void()>;
 using Duration = std::chrono::microseconds;
 
-enum class RoutineState { READY, RUNNING, FINISHED, SLEEP, IO_WAIT, DATA_WAIT };
+enum class RoutineState { READY, FINISHED, SLEEP, IO_WAIT, DATA_WAIT };
 
 class CRoutine {
  public:
@@ -99,8 +99,8 @@ class CRoutine {
   double proc_num() const;
   void set_proc_num(double num);
 
-  bool try_lock();
-  bool unlock();
+  bool Acquire();
+  void Release();
 
   void set_notified();
 
@@ -114,7 +114,7 @@ class CRoutine {
 
   mutable std::mutex mutex_;
 
-  std::atomic<bool> alock_{false};
+  std::atomic_flag lock_ = ATOMIC_FLAG_INIT;
   std::atomic<bool> notified_{false};
 
   std::atomic_flag needs_updates = ATOMIC_FLAG_INIT;
@@ -242,9 +242,11 @@ inline double CRoutine::proc_num() const { return proc_num_; }
 
 inline void CRoutine::set_proc_num(double num) { proc_num_ = num; }
 
-inline bool CRoutine::try_lock() { return alock_.exchange(true); }
+inline bool CRoutine::Acquire() {
+  return !lock_.test_and_set(std::memory_order_acquire);
+}
 
-inline bool CRoutine::unlock() { return alock_.exchange(false); }
+inline void CRoutine::Release() { return lock_.clear(); }
 
 inline void CRoutine::set_notified() { notified_.exchange(true); }
 

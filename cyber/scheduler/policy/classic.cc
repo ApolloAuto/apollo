@@ -77,22 +77,16 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
     ReadLockGuard<AtomicRWLock> rw_lock(rw_locks_[i]);
     for (auto it = rq_[i].begin(); it != rq_[i].end(); ++it) {
       auto cr = (*it);
-      if (cr->state() == RoutineState::RUNNING) {
+      if (!cr->Acquire()) {
         continue;
       }
 
-      if (cr->try_lock()) {
-        continue;
-      }
-
-      cr->UpdateState();
-      if (cr->state() == RoutineState::READY) {
-        cr->set_state(RoutineState::RUNNING);
+      if (cr->UpdateState() == RoutineState::READY) {
         PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
                                                   cr->processor_id());
         return cr;
       }
-      cr->unlock();
+      cr->Release();
     }
   }
 

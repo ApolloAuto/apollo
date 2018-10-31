@@ -65,26 +65,10 @@ TEST(CRoutineTest, croutine_lock) {
   auto cr = std::make_shared<CRoutine>(
       []() { CRoutine::GetCurrentRoutine()->HangUp(); });
 
-  EXPECT_TRUE(bool(cr->GetLock()));
-  EXPECT_TRUE(bool(cr->TryLock()));
-  EXPECT_FALSE(bool(cr->DeferLock()));
-
-  auto lock = cr->GetLock();
-  EXPECT_TRUE(lock.owns_lock());
-  EXPECT_FALSE(bool(cr->TryLock()));
-  EXPECT_FALSE(bool(cr->DeferLock()));
-  lock.unlock();
-
-  auto lock2 = cr->DeferLock();
-  EXPECT_TRUE(lock2.try_lock());
-  EXPECT_FALSE(cr->TryLock());
-  auto lock3 = cr->DeferLock();
-  EXPECT_FALSE(lock3.try_lock());
-  lock2.unlock();
-
-  EXPECT_TRUE(lock3.try_lock());
-  EXPECT_TRUE(bool(lock3));
-  lock3.unlock();
+  EXPECT_TRUE(bool(cr->Acquire()));
+  EXPECT_FALSE(bool(cr->Acquire()));
+  cr->Release();
+  EXPECT_TRUE(bool(cr->Acquire()));
 }
 
 }  // namespace croutine
@@ -93,8 +77,7 @@ TEST(CRoutineTest, croutine_lock) {
 
 int main(int argc, char** argv) {
   apollo::cyber::Init(argv[0]);
-  auto context =
-      std::make_shared<apollo::cyber::croutine::RoutineContext>();
+  auto context = std::make_shared<apollo::cyber::croutine::RoutineContext>();
   apollo::cyber::croutine::CRoutine::SetMainContext(context);
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
