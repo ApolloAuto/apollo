@@ -31,14 +31,13 @@ namespace scheduler {
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-std::array<AtomicRWLock, MAX_SCHED_PRIORITY>
-     ClassicContext::rw_locks_;
-std::array<std::vector<std::shared_ptr<CRoutine>>,
-    MAX_SCHED_PRIORITY> ClassicContext::rq_;
+std::array<AtomicRWLock, MAX_SCHED_PRIORITY> ClassicContext::rw_locks_;
+std::array<std::vector<std::shared_ptr<CRoutine>>, MAX_SCHED_PRIORITY>
+    ClassicContext::rq_;
 
 bool ClassicContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   std::unordered_map<uint64_t, uint32_t>& rt_ctx =
-    Scheduler::Instance()->RtCtx();
+      Scheduler::Instance()->RtCtx();
   if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
     rt_ctx[cr->id()] = proc_index_;
   }
@@ -61,9 +60,8 @@ bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
     cr_container_[cr->id()] = cr;
   }
 
-  PerfEventCache::Instance()->AddSchedEvent(
-      SchedPerf::RT_CREATE, cr->id(),
-      cr->processor_id());
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
+                                            cr->processor_id());
   WriteLockGuard<AtomicRWLock> rw_lock(rw_locks_[cr->priority()]);
   rq_[cr->priority()].emplace_back(cr);
 
@@ -90,21 +88,16 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
       cr->UpdateState();
       if (cr->state() == RoutineState::READY) {
         cr->set_state(RoutineState::RUNNING);
-        PerfEventCache::Instance()->AddSchedEvent(
-            SchedPerf::NEXT_RT, cr->id(),
-            cr->processor_id());
+        PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
+                                                  cr->processor_id());
         return cr;
       }
       cr->unlock();
     }
   }
 
-  notified_.store(false);
+  notified_.clear();
   return nullptr;
-}
-
-bool ClassicContext::RqEmpty() {
-  return !notified_.load();
 }
 
 }  // namespace scheduler

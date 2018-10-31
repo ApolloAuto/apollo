@@ -40,15 +40,13 @@ class ClassicContext : public ProcessorContext {
  public:
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool Enqueue(const std::shared_ptr<CRoutine> cr) override;
-  bool RqEmpty() override;
   std::shared_ptr<CRoutine> NextRoutine() override;
 
-
  private:
-  alignas(CACHELINE_SIZE) static std::array<AtomicRWLock, MAX_SCHED_PRIORITY>
-    rw_locks_;
-  alignas(CACHELINE_SIZE) static std::array<std::vector
-    <std::shared_ptr<CRoutine>>, MAX_SCHED_PRIORITY> rq_;
+  alignas(CACHELINE_SIZE) static std::array<AtomicRWLock,
+                                            MAX_SCHED_PRIORITY> rw_locks_;
+  alignas(CACHELINE_SIZE) static std::array<
+      std::vector<std::shared_ptr<CRoutine>>, MAX_SCHED_PRIORITY> rq_;
 };
 
 }  // namespace scheduler

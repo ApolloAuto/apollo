@@ -45,9 +45,8 @@ int ProcessorContext::RqSize() {
 }
 
 void ProcessorContext::Notify(uint64_t cr_id) {
-  PerfEventCache::Instance()->AddSchedEvent(
-      SchedPerf::NOTIFY_IN, cr_id,
-      proc_index_);
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, cr_id,
+                                            proc_index_);
 
   ReadLockGuard<AtomicRWLock> rw(rw_lock_);
   auto iter = cr_container_.find(cr_id);
@@ -57,9 +56,7 @@ void ProcessorContext::Notify(uint64_t cr_id) {
       cr->set_notified();
     }
 
-    // FIXME: should release cr_container lock here.
-
-    if (!notified_.exchange(true)) {
+    if (!notified_.test_and_set(std::memory_order_acquire)) {
       processor_->Notify();
       return;
     }

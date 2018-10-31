@@ -16,7 +16,6 @@ TEST(SchedulerPolicyTest, choreo) {
   ctx.reset(new TaskChoreoContext(processor));
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
-  EXPECT_TRUE(ctx->RqEmpty());
   cr->SetId(common::Hash("choreo"));
   ctx->Push(cr);
   // repeat Push the same CRoutine

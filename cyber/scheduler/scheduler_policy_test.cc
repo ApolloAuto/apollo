@@ -17,8 +17,8 @@
 #include <gtest/gtest.h>
 
 #include "cyber/cyber.h"
-#include "cyber/scheduler/policy/task_choreo.h"
 #include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/policy/task_choreo.h"
 #include "cyber/scheduler/processor.h"
 
 namespace apollo {
@@ -34,7 +34,6 @@ TEST(SchedulerPolicyTest, task_choreo) {
   ctx->bind_processor(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
-  EXPECT_TRUE(ctx->RqEmpty());
   auto task_id = GlobalData::RegisterTaskName("task_choreo");
   cr->set_id(task_id);
   EXPECT_TRUE(ctx->Enqueue(cr));

@@ -43,7 +43,6 @@ class TaskChoreoContext : public ProcessorContext {
   std::shared_ptr<CRoutine> NextRoutine() override;
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool Enqueue(const std::shared_ptr<CRoutine>) override;
-  bool RqEmpty() override;
 
  private:
   std::mutex mtx_;

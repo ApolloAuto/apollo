@@ -55,27 +55,18 @@ void Processor::Start() {
 
 void Processor::Run() {
   CRoutine::SetMainContext(routine_context_);
-
-  std::shared_ptr<CRoutine> cr = nullptr;
-
   while (likely(running_)) {
     if (likely(context_ != nullptr)) {
-      cr = context_->NextRoutine();
-      if (cr) {
-        cr->Resume();
+      auto croutine = context_->NextRoutine();
+      if (croutine) {
+        croutine->Resume();
       } else {
-        std::unique_lock<std::mutex> lk_rq(mtx_rq_);
-        cv_.wait_for(lk_rq, std::chrono::milliseconds(1));
-        //  cv_.wait(lk_rq, [this] {
-        //    return !this->context_->RqEmpty();
-        //  });
+        std::unique_lock<std::mutex> ul(mtx_rq_);
+        cv_.wait_for(ul, std::chrono::milliseconds(1));
       }
     } else {
       std::unique_lock<std::mutex> lk_rq(mtx_rq_);
-      cv_.wait(lk_rq, [this] {
-          return !this->running_ ||
-              (this->context_ && !this->context_->RqEmpty());
-        });
+      cv_.wait(lk_rq, [this] { return !this->running_; });
     }
   }
 }
