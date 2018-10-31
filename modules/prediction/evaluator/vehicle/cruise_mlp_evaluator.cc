@@ -19,14 +19,19 @@
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/validation_checker.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
+
+using apollo::common::adapter::AdapterConfig;
 
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
@@ -106,6 +111,19 @@ void CruiseMLPEvaluator::ExtractFeatureValues
   }
   feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
+  // Extract interaction features.
+  std::vector<double> interaction_feature_values;
+  SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
+                              &interaction_feature_values);
+  if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected lane feature_values"
+           << interaction_feature_values.size() << ".";
+    return;
+  }
+  feature_values->insert(feature_values->end(),
+                         interaction_feature_values.begin(),
+                         interaction_feature_values.end());
   // Extract lane related features.
   std::vector<double> lane_feature_values;
   SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
@@ -171,7 +189,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   }
 
   int curr_size = 5;
-  int hist_size = obstacle_ptr->history_size();
+  int hist_size = static_cast<int>(obstacle_ptr->history_size());
   double theta_mean = ComputeMean(thetas, 0, hist_size - 1);
   double theta_filtered = ComputeMean(thetas, 0, curr_size - 1);
   double lane_l_mean = ComputeMean(lane_ls, 0, hist_size - 1);
@@ -189,7 +207,8 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   double delta_t = 0.0;
   if (timestamps.size() > 1) {
     delta_t =
-        (timestamps.front() - timestamps.back()) / (timestamps.size() - 1);
+        (timestamps.front() - timestamps.back()) /
+        static_cast<double>(timestamps.size() - 1);
   }
   double angle_curr = ComputeMean(thetas, 0, curr_size - 1);
   double angle_prev = ComputeMean(thetas, curr_size, 2 * curr_size - 1);
@@ -268,6 +287,66 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(lane_types.front() == 1 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 2 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 3 ? 1.0 : 0.0);
+}
+
+void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
+    LaneSequence* lane_sequence_ptr, std::vector<double>* feature_values) {
+  // forward / backward: relative_s, relative_l, speed, length
+  feature_values->clear();
+  // Initialize forward and backward obstacles
+  NearbyObstacle forward_obstacle;
+  NearbyObstacle backward_obstacle;
+  forward_obstacle.set_s(1000.0);  // TODO(kechxu) move to gflags
+  forward_obstacle.set_l(10.0);  // TODO(kechxu) move to gflags
+  backward_obstacle.set_s(-1000.0);  // TODO(kechxu) move to gflags
+  backward_obstacle.set_l(10.0);  // TODO(kechxu) move to gflags
+
+  for (const auto& nearby_obstacle : lane_sequence_ptr->nearby_obstacle()) {
+    if (nearby_obstacle.s() < 0.0) {
+      if (nearby_obstacle.s() > backward_obstacle.s()) {
+        backward_obstacle.set_id(nearby_obstacle.id());
+        backward_obstacle.set_s(nearby_obstacle.s());
+        backward_obstacle.set_l(nearby_obstacle.l());
+      }
+    } else {
+      if (nearby_obstacle.s() < forward_obstacle.s()) {
+        forward_obstacle.set_id(nearby_obstacle.id());
+        forward_obstacle.set_s(nearby_obstacle.s());
+        forward_obstacle.set_l(nearby_obstacle.l());
+      }
+    }
+  }
+
+  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
+      ContainerManager::Instance()->GetContainer(
+          AdapterConfig::PERCEPTION_OBSTACLES));
+  // Set feature values for forward obstacle
+  feature_values->push_back(forward_obstacle.s());
+  feature_values->push_back(forward_obstacle.l());
+  if (!forward_obstacle.has_id()) {  // no forward obstacle
+    feature_values->push_back(100.0);
+    feature_values->push_back(0.0);
+  } else {
+    Obstacle* forward_obs_ptr =
+        obstacles_container->GetObstacle(forward_obstacle.id());
+    const Feature& feature = forward_obs_ptr->latest_feature();
+    feature_values->push_back(feature.length());
+    feature_values->push_back(feature.speed());
+  }
+
+  // Set feature values for backward obstacle
+  feature_values->push_back(backward_obstacle.s());
+  feature_values->push_back(backward_obstacle.l());
+  if (!backward_obstacle.has_id()) {  // no forward obstacle
+    feature_values->push_back(100.0);
+    feature_values->push_back(0.0);
+  } else {
+    Obstacle* backward_obs_ptr =
+        obstacles_container->GetObstacle(backward_obstacle.id());
+    const Feature& feature = backward_obs_ptr->latest_feature();
+    feature_values->push_back(feature.length());
+    feature_values->push_back(feature.speed());
+  }
 }
 
 void CruiseMLPEvaluator::SetLaneFeatureValues

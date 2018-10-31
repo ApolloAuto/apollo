@@ -113,6 +113,11 @@ class Obstacle {
   Feature* mutable_latest_feature();
 
   /**
+   * @brief Set nearby obstacles.
+   */
+  void SetNearbyObstacles();
+
+  /**
    * @brief Get the number of historical features.
    * @return The number of historical features.
    */
