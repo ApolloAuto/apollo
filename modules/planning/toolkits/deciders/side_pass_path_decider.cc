@@ -94,6 +94,11 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
       reference_line_info->reference_line(),
       reference_line_info->path_decision()->obstacles());
 
+  for (const auto tp : list_s_leftbound_rightbound) {
+    ADEBUG << std::get<0>(tp) << ", " << std::get<1>(tp) << ", "
+           << std::get<2>(tp);
+  }
+
   // Call optimizer to generate smooth path.
   fem_qp_->SetVariableBounds(list_s_leftbound_rightbound);
   if (!fem_qp_->Optimize()) {
@@ -137,83 +142,22 @@ SidePassPathDecider::GetPathBoundaries(
     const IndexedList<std::string, Obstacle> &indexed_obstacles) {
   std::vector<std::tuple<double, double, double>> list_s_leftbound_rightbound;
 
-  // Generate the boundary conditions for the selected direction
-  // based on the obstacle ahead and road conditions.
-  double adc_end_s = adc_sl_boundary.end_s();
-  // Get obstacle info.
-  bool no_obs_selected = true;
-  double nearest_obs_start_s = 0.0;
-  double nearest_obs_end_s = 0.0;
-  double nearest_obs_start_l = 0.0;
-  double nearest_obs_end_l = 0.0;
-  for (const auto *obstacle : indexed_obstacles.Items()) {
-    // Filter out obstacles that are behind ADC.
-    double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
-    double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
-    if (obs_end_s < adc_end_s) {
-      continue;
-    }
-    // TODO(All): currently, it also ignores obstacles that are
-    // partially ahead of ADC, meaning (obs_end_s > adc_end_s) but
-    // (obs_start_s < adc_end_s). It treats such obstacles as
-    // those that have been considered already in the last cycle.
-    if (obs_start_s < adc_end_s) {
-      continue;
-    }
-    // Filter out those out-of-lane obstacles.
-    double lane_left_width_at_start_s = 0.0;
-    double lane_left_width_at_end_s = 0.0;
-    double lane_right_width_at_start_s = 0.0;
-    double lane_right_width_at_end_s = 0.0;
-    reference_line.GetLaneWidth(obs_start_s, &lane_left_width_at_start_s,
-                                &lane_right_width_at_start_s);
-    reference_line.GetLaneWidth(obs_end_s, &lane_left_width_at_end_s,
-                                &lane_right_width_at_end_s);
-    double lane_left_width = std::min(std::abs(lane_left_width_at_start_s),
-                                      std::abs(lane_left_width_at_end_s));
-    double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
-                                       std::abs(lane_right_width_at_end_s));
-    double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
-    double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
-    if (obs_start_l > lane_left_width || -obs_end_l > lane_right_width) {
-      continue;
-    }
-    // Only select vehicle obstacles.
-    if (obstacle->Perception().type() !=
-        perception::PerceptionObstacle::VEHICLE) {
-      continue;
-    }
-    // For obstacles of interests, select the nearest one.
-    // TODO(All): currently, regardless of the orientation
-    // of the obstacle, it treats the obstacle as a rectangle
-    // with two edges parallel to the reference line and the
-    // other two perpendicular to that.
-    if (no_obs_selected) {
-      nearest_obs_start_s = obs_start_s;
-      nearest_obs_end_s = obs_end_s;
-      nearest_obs_start_l = obs_start_l;
-      nearest_obs_end_l = obs_end_l;
-      no_obs_selected = false;
-    }
-    if (nearest_obs_start_s > obs_start_s) {
-      nearest_obs_start_s = obs_start_s;
-      nearest_obs_end_s = obs_end_s;
-      nearest_obs_start_l = obs_start_l;
-      nearest_obs_end_l = obs_end_l;
-    }
-  }
+  const auto nearest_obs_sl_boundary =
+      GetNearestObstacle(adc_sl_boundary, reference_line, indexed_obstacles)
+          ->PerceptionSLBoundary();
+
   // Get road info at every point and fill in the boundary condition vector.
   common::PathPoint start_path_point = planning_start_point.path_point();
   common::math::Vec2d start_path_point_vec2d(start_path_point.x(),
                                              start_path_point.y());
-  common::SLPoint start_path_point_SL;
-  if (!reference_line.XYToSL(start_path_point_vec2d, &start_path_point_SL)) {
+  common::SLPoint start_path_point_sl;
+  if (!reference_line.XYToSL(start_path_point_vec2d, &start_path_point_sl)) {
     AERROR << "Failed to get the projection from TrajectoryPoint onto "
               "reference_line";
     return list_s_leftbound_rightbound;
   }
   double s_increment = 1.0;
-  double curr_s = start_path_point_SL.s();
+  double curr_s = start_path_point_sl.s();
   bool bound_cond_gen_finished = false;
   bool is_blocked_by_obs = false;
 
@@ -225,8 +169,8 @@ SidePassPathDecider::GetPathBoundaries(
     std::tuple<double, double, double> s_leftbound_rightbound;
     std::get<0>(s_leftbound_rightbound) = curr_s;
     // Check if boundary should be dictated by obstacle or road
-    if (curr_s >= nearest_obs_start_s - kObstacleBuffer &&
-        curr_s <= nearest_obs_end_s + kObstacleBuffer) {
+    if (curr_s >= nearest_obs_sl_boundary.start_s() - kObstacleBuffer &&
+        curr_s <= nearest_obs_sl_boundary.end_s() + kObstacleBuffer) {
       is_blocked_by_obs = true;
     } else {
       is_blocked_by_obs = false;
@@ -246,10 +190,10 @@ SidePassPathDecider::GetPathBoundaries(
         std::get<1>(s_leftbound_rightbound) =
             -std::abs(road_left_width_at_curr_s - kRoadBuffer);
         std::get<2>(s_leftbound_rightbound) =
-            -nearest_obs_end_l - kObstacleBuffer;
+            -nearest_obs_sl_boundary.end_l() - kObstacleBuffer;
       } else if (decided_direction_ == SidePassDirection::RIGHT) {
         std::get<1>(s_leftbound_rightbound) =
-            -nearest_obs_start_l + kObstacleBuffer;
+            -nearest_obs_sl_boundary.start_l() + kObstacleBuffer;
         std::get<2>(s_leftbound_rightbound) =
             std::abs(road_right_width_at_curr_s - kRoadBuffer);
       } else {
@@ -260,12 +204,78 @@ SidePassPathDecider::GetPathBoundaries(
     list_s_leftbound_rightbound.push_back(s_leftbound_rightbound);
     // Move to next s
     curr_s += s_increment;
-    if (curr_s > kPlanDistAfterObs + nearest_obs_end_s) {
+    if (curr_s > kPlanDistAfterObs + nearest_obs_sl_boundary.end_s()) {
       bound_cond_gen_finished = true;
     }
   }
 
   return list_s_leftbound_rightbound;
 }
+
+const Obstacle *SidePassPathDecider::GetNearestObstacle(
+    const SLBoundary &adc_sl_boundary, const ReferenceLine &reference_line,
+    const IndexedList<std::string, Obstacle> &indexed_obstacles) {
+  const Obstacle *nearest_obstacle = nullptr;
+
+  // Generate the boundary conditions for the selected direction
+  // based on the obstacle ahead and road conditions.
+  double adc_end_s = adc_sl_boundary.end_s();
+
+  // Get obstacle info.
+  bool no_obs_selected = true;
+  double nearest_obs_start_s = 0.0;
+  for (const auto *obstacle : indexed_obstacles.Items()) {
+    // Filter out obstacles that are behind ADC.
+    double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
+    double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
+    if (obs_end_s < adc_end_s) {
+      continue;
+    }
+    // TODO(All): ignores obstacles that are partially ahead of ADC
+    if (obs_start_s < adc_end_s) {
+      continue;
+    }
+    // Filter out those out-of-lane obstacles.
+    double lane_left_width_at_start_s = 0.0;
+    double lane_left_width_at_end_s = 0.0;
+    double lane_right_width_at_start_s = 0.0;
+    double lane_right_width_at_end_s = 0.0;
+    reference_line.GetLaneWidth(obs_start_s, &lane_left_width_at_start_s,
+                                &lane_right_width_at_start_s);
+    reference_line.GetLaneWidth(obs_end_s, &lane_left_width_at_end_s,
+                                &lane_right_width_at_end_s);
+    double lane_left_width = std::min(std::abs(lane_left_width_at_start_s),
+                                      std::abs(lane_left_width_at_end_s));
+    double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
+                                       std::abs(lane_right_width_at_end_s));
+    double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
+    double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
+
+    // filter out-of-lane obstacles
+    if (obs_start_l > lane_left_width || obs_end_l < -lane_right_width) {
+      continue;
+    }
+    // do NOT sidepass non-vehicle obstacles.
+    if (obstacle->Perception().type() !=
+        perception::PerceptionObstacle::VEHICLE) {
+      continue;
+    }
+    // For obstacles of interests, select the nearest one.
+    // TODO(All): currently, regardless of the orientation
+    // of the obstacle, it treats the obstacle as a rectangle
+    // with two edges parallel to the reference line and the
+    // other two perpendicular to that.
+    if (no_obs_selected) {
+      nearest_obs_start_s = obs_start_s;
+      nearest_obstacle = obstacle;
+      no_obs_selected = false;
+    }
+    if (nearest_obs_start_s > obs_start_s) {
+      nearest_obs_start_s = obs_start_s;
+    }
+  }
+  return nearest_obstacle;
+}
+
 }  // namespace planning
 }  // namespace apollo

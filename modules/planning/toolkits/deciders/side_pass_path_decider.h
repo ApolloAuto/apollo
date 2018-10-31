@@ -62,6 +62,10 @@ class SidePassPathDecider : public Decider {
       const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
+  const Obstacle* GetNearestObstacle(
+      const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,
+      const IndexedList<std::string, Obstacle>& indexed_obstacles);
+
  private:
   std::unique_ptr<Fem1dQpProblem> fem_qp_;
   SidePassDirection decided_direction_;
