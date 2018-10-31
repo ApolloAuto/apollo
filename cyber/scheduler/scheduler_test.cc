@@ -52,35 +52,14 @@ TEST(SchedulerTest, create_task) {
   EXPECT_EQ(sched->ProcCtxs().size(), proc_num + task_pool_size);
 }
 
-TEST(SchedulerTest, async_task_create_notify) {
+TEST(SchedulerTest, notify_task) {
   cyber::Init();
-  int task_num = 50;
-  std::vector<std::string> names(task_num);
-  std::vector<uint64_t> task_ids(task_num);
-  for (int i = 0; i < task_num; i++) {
-    names[i] = std::to_string(i);
-    task_ids[i] = GlobalData::RegisterTaskName(std::to_string(i));
-  }
-  auto f = [&](std::string name) {
-    sched->CreateTask(&proc, name);
-  };
-  auto f1 = [&](uint64_t id) {
-    sched->NotifyTask(id);
-  };
-  std::vector<std::thread> task_create(task_num);
-  std::vector<std::thread> task_notify(task_num);
-  for (int i = 0; i < task_num; i++) {
-    task_create[i] = std::thread(f, names[i]);
-    task_notify[i] = std::thread(f1, task_ids[i]);
-  }
-  for (int i = 0; i < task_num; i++) {
-    if (task_create[i].joinable()) {
-      task_create[i].join();
-    }
-    if (task_notify[i].joinable()) {
-      task_notify[i].join();
-    }
-  }
+  std::string name = "croutine";
+  auto id = GlobalData::RegisterTaskName(name);
+  // notify task that the id is not exist
+  EXPECT_FALSE(sched->NotifyTask(id));
+  EXPECT_TRUE(sched->CreateTask(&proc, name));
+  EXPECT_TRUE(sched->NotifyTask(id));
 }
 
 
