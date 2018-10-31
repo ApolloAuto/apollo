@@ -25,6 +25,8 @@
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/frame.h"
 
 namespace apollo {
@@ -33,6 +35,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::PathOverlap;
 
 constexpr double kRoadBuffer = 0.2;
@@ -59,6 +62,9 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
 
 Status SidePassPathDecider::Process(Frame *frame,
                                     ReferenceLineInfo *reference_line_info) {
+  adc_frenet_frame_point_ =
+      reference_line_info->reference_line().GetFrenetPoint(
+          frame->PlanningStartPoint());
   GeneratePath(frame, reference_line_info);
   return Status::OK();
 }
@@ -77,10 +83,6 @@ Status SidePassPathDecider::BuildSidePathDecision(
 // subsequent obstacles)
 bool SidePassPathDecider::GeneratePath(Frame *frame,
                                        ReferenceLineInfo *reference_line_info) {
-  adc_frenet_frame_point_ =
-      reference_line_info->reference_line().GetFrenetPoint(
-          frame->PlanningStartPoint());
-
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -173,19 +175,22 @@ SidePassPathDecider::GetPathBoundaries(
     double road_right_width_at_curr_s = 0.0;
     reference_line.GetRoadWidth(curr_s, &road_left_width_at_curr_s,
                                 &road_right_width_at_curr_s);
-    if (!is_blocked_by_obs) {
-      std::get<1>(lateral_bound) = -(road_right_width_at_curr_s - kRoadBuffer);
-      std::get<2>(lateral_bound) = road_left_width_at_curr_s - kRoadBuffer;
-    } else {
+
+    const double adc_half_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+
+    std::get<1>(lateral_bound) =
+        -(road_right_width_at_curr_s - adc_half_width - kRoadBuffer);
+    std::get<2>(lateral_bound) =
+        road_left_width_at_curr_s - adc_half_width - kRoadBuffer;
+
+    if (is_blocked_by_obs) {
       if (decided_direction_ == SidePassDirection::LEFT) {
         std::get<1>(lateral_bound) =
-            nearest_obs_sl_boundary.end_l() + kObstacleBuffer;
-        std::get<2>(lateral_bound) = road_left_width_at_curr_s - kRoadBuffer;
+            nearest_obs_sl_boundary.end_l() + kObstacleBuffer + adc_half_width;
       } else if (decided_direction_ == SidePassDirection::RIGHT) {
-        std::get<1>(lateral_bound) =
-            -(road_right_width_at_curr_s - kRoadBuffer);
-        std::get<2>(lateral_bound) =
-            nearest_obs_sl_boundary.start_l() - kObstacleBuffer;
+        std::get<2>(lateral_bound) = nearest_obs_sl_boundary.start_l() -
+                                     kObstacleBuffer - adc_half_width;
       } else {
         AERROR << "Side-pass direction undefined.";
         return lateral_bounds;
