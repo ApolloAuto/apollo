@@ -68,6 +68,16 @@ class CruiseMLPEvaluator : public Evaluator {
                                 std::vector<double>* feature_values);
 
   /**
+   * @brief Set interaction feature vector
+   * @param Obstacle pointer
+   *        Lane sequence pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void SetInteractionFeatureValues(Obstacle* obstacle_ptr,
+                                   LaneSequence* lane_sequence_ptr,
+                                   std::vector<double>* feature_values);
+
+  /**
    * @brief Set lane feature vector
    * @param Obstacle pointer
    *        Lane sequence pointer
@@ -98,6 +108,7 @@ class CruiseMLPEvaluator : public Evaluator {
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 23;
+  static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t LANE_FEATURE_SIZE = 180;
   std::unique_ptr<FnnVehicleModel> model_ptr_;
 };

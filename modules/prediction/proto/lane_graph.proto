@@ -44,12 +44,14 @@ message NearbyObstacle {
   optional double l = 3;  // relative to focus obstacle
 }
 
-// next id = 17
+// next id = 19
 message LaneSequence {
   optional int32 lane_sequence_id = 1;
   repeated LaneSegment lane_segment = 2;
   // nearby obstacles on this lane sequence
   repeated NearbyObstacle nearby_obstacle = 3;
+  optional double lane_s = 17;
+  optional double lane_l = 18;
 
   message Features {
     repeated double mlp_features = 1;
@@ -87,4 +89,11 @@ message LaneSequence {
 
 message LaneGraph {
   repeated LaneSequence lane_sequence = 1;
+}
+
+message LaneObstacle {
+  optional int32 obstacle_id = 1;
+  optional string lane_id = 2;
+  optional double lane_s = 3;
+  optional double lane_l = 4;
 }

@@ -910,6 +910,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
       lane.mutable_lane_feature()->CopyFrom(*lane_feature);
       min_heading_diff = std::fabs(angle_diff);
     }
+    ObstacleClusters::AddObstacle(id_, lane_id, s, l);
     ADEBUG << "Obstacle [" << id_ << "] has current lanes ["
            << lane_feature->ShortDebugString() << "].";
   }
@@ -1013,6 +1014,8 @@ void Obstacle::BuildLaneGraph() {
           ->add_lane_sequence();
       lane_seq_ptr->CopyFrom(lane_seq);
       lane_seq_ptr->set_lane_sequence_id(seq_id++);
+      lane_seq_ptr->set_lane_s(lane.lane_s());
+      lane_seq_ptr->set_lane_l(lane.lane_l());
       lane_seq_ptr->set_vehicle_on_lane(true);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
@@ -1037,6 +1040,8 @@ void Obstacle::BuildLaneGraph() {
           ->add_lane_sequence();
       lane_seq_ptr->CopyFrom(lane_seq);
       lane_seq_ptr->set_lane_sequence_id(seq_id++);
+      lane_seq_ptr->set_lane_s(lane.lane_s());
+      lane_seq_ptr->set_lane_l(lane.lane_l());
       lane_seq_ptr->set_vehicle_on_lane(false);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
@@ -1167,6 +1172,34 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
       }
     }
     lane_sequence->mutable_path_point(num_path_point - 1)->set_kappa(0.0);
+  }
+}
+
+void Obstacle::SetNearbyObstacles() {
+  // This function runs after all basic features have been set up
+  Feature* feature_ptr = mutable_latest_feature();
+  if (feature_ptr == nullptr) {
+    AERROR << "Null feature received.";
+    return;
+  }
+  LaneGraph* lane_graph =
+      feature_ptr->mutable_lane()->mutable_lane_graph();
+  for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
+    LaneSequence* lane_sequence = lane_graph->mutable_lane_sequence(i);
+    if (lane_sequence->lane_segment_size() == 0) {
+      AERROR << "Empty lane sequence found.";
+      continue;
+    }
+    double obstacle_s = lane_sequence->lane_s();
+    double obstacle_l = lane_sequence->lane_l();
+    NearbyObstacle forward_obstacle;
+    ObstacleClusters::ForwardNearbyObstacle(*lane_sequence,
+        id_, obstacle_s, obstacle_l, &forward_obstacle);
+    lane_sequence->add_nearby_obstacle()->CopyFrom(forward_obstacle);
+    NearbyObstacle backward_obstacle;
+    ObstacleClusters::BackwardNearbyObstacle(*lane_sequence,
+        id_, obstacle_s, obstacle_l, &backward_obstacle);
+    lane_sequence->add_nearby_obstacle()->CopyFrom(backward_obstacle);
   }
 }
 
