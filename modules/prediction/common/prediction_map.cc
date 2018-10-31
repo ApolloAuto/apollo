@@ -41,8 +41,9 @@ using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::Id;
-using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::LaneInfo;
+using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::OverlapInfo;
 using apollo::hdmap::MapPathPoint;
 
 bool PredictionMap::Ready() { return HDMapUtil::BaseMapPtr() != nullptr; }
@@ -80,6 +81,11 @@ std::shared_ptr<const LaneInfo> PredictionMap::LaneById(
 std::shared_ptr<const JunctionInfo> PredictionMap::JunctionById(
     const std::string& str_id) {
   return HDMapUtil::BaseMap().GetJunctionById(hdmap::MakeMapId(str_id));
+}
+
+std::shared_ptr<const OverlapInfo> PredictionMap::OverlapById(
+    const std::string& str_id) {
+  return HDMapUtil::BaseMap().GetOverlapById(hdmap::MakeMapId(str_id));
 }
 
 bool PredictionMap::GetProjection(

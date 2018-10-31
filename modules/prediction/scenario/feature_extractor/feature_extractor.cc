@@ -28,9 +28,10 @@ using apollo::planning::ADCTrajectory;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::OverlapInfo;
 using apollo::perception::PerceptionObstacle;
-using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
 using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
+using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
 
 namespace apollo {
 namespace prediction {
@@ -187,9 +188,18 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
   }
   JunctionInfoPtr junction = ego_trajectory_container->ADCJunction();
   if (junction != nullptr) {
-    ptr_environment_features->SetFrontJunction(junction->id().id(),
-        ego_trajectory_container->ADCDistanceToJunction());
+    for (const auto &overlap_id : junction->junction().overlap_id()) {
+      for (auto &object :
+           PredictionMap::OverlapById(overlap_id.id())->overlap().object()) {
+        if (object.has_signal_overlap_info() ||
+            object.has_stop_sign_overlap_info()) {
+          ptr_environment_features->SetFrontJunction(junction->id().id(),
+                ego_trajectory_container->ADCDistanceToJunction());
+        }
+      }
+    }
   }
+  return;
 }
 
 void FeatureExtractor::ExtractObstacleFeatures(
