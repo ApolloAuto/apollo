@@ -63,13 +63,6 @@ void HMI::RegisterMessageHandlers() {
         SendVehicleParam(conn);
       });
 
-  // HMI client sends audio data, publish to AudioCapture topic.
-  websocket_->RegisterMessageHandler(
-      "AudioPiece",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // TODO(xiaoxq): Migrating to HMIWorker.
-      });
-
   // HMI client asks for executing module command.
   websocket_->RegisterMessageHandler(
       "ExecuteModuleCommand",
@@ -138,17 +131,22 @@ void HMI::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "HMIAction",
       [this](const Json& json, WebSocketHandler::Connection* conn) {
-        // json should contain {action: "<An HMIAction name>"}.
+        // Run HMIWorker::Trigger(action) if json is {action: "<action>"}
+        // Run HMIWorker::Trigger(action, value) if "value" field is provided.
         std::string action;
-        if (JsonUtil::GetStringFromJson(json, "action", &action)) {
-          HMIAction hmi_action;
-          if (HMIAction_Parse(action, &hmi_action)) {
-            hmi_worker_->Trigger(hmi_action);
-          } else {
-            AERROR << "Invalid HMIAction string: " << action;
-          }
+        if (!JsonUtil::GetStringFromJson(json, "action", &action)) {
+          AERROR << "Truncated HMIAction request.";
+          return;
+        }
+        HMIAction hmi_action;
+        if (!HMIAction_Parse(action, &hmi_action)) {
+          AERROR << "Invalid HMIAction string: " << action;
+        }
+        std::string value;
+        if (JsonUtil::GetStringFromJson(json, "value", &value)) {
+          hmi_worker_->Trigger(hmi_action, value);
         } else {
-          AERROR << "Truncated HMIAction.";
+          hmi_worker_->Trigger(hmi_action);
         }
       });
 
