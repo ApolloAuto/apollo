@@ -28,9 +28,8 @@ curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.s
 sudo apt-get install -y git-lfs
 ```
 
-For latest Git versions, the lfs plugin works automatically and transparentlly
-along with the commands you have been very familiar with, such as `git clone`
-and `git pull`.
+For latest Git versions, the lfs plugin works automatically and transparently
+along with the commands you are familiar with, such as `git clone` and `git pull`.
 
 But for old versions like Git 1.x, you may need to call it explicitly with
 `git lfs clone` and `git lfs pull`.
