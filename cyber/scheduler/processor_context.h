@@ -28,8 +28,8 @@
 
 #include "cyber/base/atomic_hash_map.h"
 #include "cyber/base/atomic_rw_lock.h"
-#include "cyber/croutine/croutine.h"
 #include "cyber/base/macros.h"
+#include "cyber/croutine/croutine.h"
 
 namespace apollo {
 namespace cyber {
@@ -48,7 +48,7 @@ class Processor;
 
 class ProcessorContext {
  public:
-  ProcessorContext() : notified_(false) {}
+  ProcessorContext() {}
 
   void ShutDown();
 
@@ -58,7 +58,7 @@ class ProcessorContext {
   inline bool set_state(const uint64_t& cr_id, const RoutineState& state);
 
   inline void bind_processor(const std::shared_ptr<Processor>& processor) {
-      processor_ = processor;
+    processor_ = processor;
   }
 
   virtual void Notify(uint64_t cr_id);
@@ -67,14 +67,13 @@ class ProcessorContext {
   void RemoveCRoutine(uint64_t cr_id);
   int RqSize();
 
-  virtual bool RqEmpty() = 0;
   virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
 
  protected:
   alignas(CACHELINE_SIZE) CRoutineContainer cr_container_;
   alignas(CACHELINE_SIZE) AtomicRWLock rw_lock_;
   alignas(CACHELINE_SIZE) std::shared_ptr<Processor> processor_ = nullptr;
-  alignas(CACHELINE_SIZE) std::atomic<bool> notified_;
+  alignas(CACHELINE_SIZE) std::atomic_flag notified_ = ATOMIC_FLAG_INIT;
 
   bool stop_ = false;
   int proc_index_ = -1;
@@ -82,8 +81,7 @@ class ProcessorContext {
   uint32_t status_;
 };
 
-bool ProcessorContext::get_state(const uint64_t& cr_id,
-                                RoutineState* state) {
+bool ProcessorContext::get_state(const uint64_t& cr_id, RoutineState* state) {
   ReadLockGuard<AtomicRWLock> lg(rw_lock_);
   auto it = cr_container_.find(cr_id);
   if (it != cr_container_.end()) {

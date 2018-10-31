@@ -16,8 +16,8 @@
 
 #include "cyber/scheduler/policy/task_choreo.h"
 
-#include <utility>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "cyber/common/log.h"
@@ -25,8 +25,8 @@
 #include "cyber/croutine/croutine.h"
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
-#include "cyber/time/time.h"
 #include "cyber/scheduler/scheduler.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
@@ -51,21 +51,20 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
     }
     if (cr->state() == RoutineState::READY) {
       cr->set_state(RoutineState::RUNNING);
-        PerfEventCache::Instance()->AddSchedEvent(
-            SchedPerf::NEXT_RT, cr->id(),
-            cr->processor_id());
+      PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
+                                                cr->processor_id());
       return cr;
     }
     ++it;
   }
 
-  notified_.store(false);
+  notified_.clear();
   return nullptr;
 }
 
 bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   std::vector<std::shared_ptr<ProcessorContext>> ctxs =
-    Scheduler::Instance()->ProcCtxs();
+      Scheduler::Instance()->ProcCtxs();
 
   uint32_t pid = cr->processor_id();
   if (!(pid >= 0 && pid < ctxs.size())) {
@@ -82,7 +81,7 @@ bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   }
 
   std::unordered_map<uint64_t, uint32_t>& rt_ctx =
-    Scheduler::Instance()->RtCtx();
+      Scheduler::Instance()->RtCtx();
   if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
     rt_ctx[cr->id()] = cr->processor_id();
   }
@@ -103,18 +102,13 @@ bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
     cr_container_[cr->id()] = cr;
   }
 
-  PerfEventCache::Instance()->AddSchedEvent(
-      SchedPerf::RT_CREATE, cr->id(),
-      cr->processor_id());
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
+                                            cr->processor_id());
 
   std::lock_guard<std::mutex> lg(mtx_);
   cr_queue_.insert(
       std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
   return true;
-}
-
-bool TaskChoreoContext::RqEmpty() {
-  return !notified_.load();
 }
 
 }  // namespace scheduler

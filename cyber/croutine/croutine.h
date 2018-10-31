@@ -17,16 +17,16 @@
 #ifndef CYBER_CROUTINE_CROUTINE_H_
 #define CYBER_CROUTINE_CROUTINE_H_
 
+#include <atomic>
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <atomic>
 #include <set>
 #include <string>
 
-#include "cyber/croutine/routine_context.h"
 #include "cyber/common/log.h"
+#include "cyber/croutine/routine_context.h"
 
 namespace apollo {
 namespace cyber {
@@ -35,8 +35,7 @@ namespace croutine {
 using RoutineFunc = std::function<void()>;
 using Duration = std::chrono::microseconds;
 
-enum class RoutineState { READY, RUNNING, FINISHED,
-                          SLEEP, IO_WAIT, DATA_WAIT};
+enum class RoutineState { READY, RUNNING, FINISHED, SLEEP, IO_WAIT, DATA_WAIT };
 
 class CRoutine {
  public:
@@ -117,6 +116,9 @@ class CRoutine {
 
   std::atomic<bool> alock_{false};
   std::atomic<bool> notified_{false};
+
+  std::atomic_flag needs_updates = ATOMIC_FLAG_INIT;
+
   bool force_stop_ = false;
   double proc_num_ = 0.0;
   double vruntime_ = 0.0;
@@ -240,17 +242,11 @@ inline double CRoutine::proc_num() const { return proc_num_; }
 
 inline void CRoutine::set_proc_num(double num) { proc_num_ = num; }
 
-inline bool CRoutine::try_lock() {
-  return alock_.exchange(true);
-}
+inline bool CRoutine::try_lock() { return alock_.exchange(true); }
 
-inline bool CRoutine::unlock() {
-  return alock_.exchange(false);
-}
+inline bool CRoutine::unlock() { return alock_.exchange(false); }
 
-inline void CRoutine::set_notified() {
-  notified_.exchange(true);
-}
+inline void CRoutine::set_notified() { notified_.exchange(true); }
 
 }  // namespace croutine
 }  // namespace cyber
