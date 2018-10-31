@@ -5,11 +5,13 @@ package apollo.planning;
 message PlannerOpenSpaceConfig {
   // Hybrid A Star Warm Start
   optional WarmStartConfig warm_start_config = 1;
+  // Dual Variable Warm Start
+  optional DualVariableWarmStartConfig dual_variable_warm_start_config = 2;
   // Distance Approach COnfigs
-  optional DistanceApproachConfig distance_approach_config = 2;
-  optional double delta_t = 3 [default = 1.0];
-  optional double max_position_error_to_end_point = 4 [default = 0.5];
-  optional double max_theta_error_to_end_point = 5 [default = 0.2];
+  optional DistanceApproachConfig distance_approach_config = 3;
+  optional double delta_t = 4 [default = 1.0];
+  optional double max_position_error_to_end_point = 5 [default = 0.5];
+  optional double max_theta_error_to_end_point = 6 [default = 0.2];
 }
 
 message WarmStartConfig {
@@ -23,6 +25,12 @@ message WarmStartConfig {
   optional double gear_switch_penalty = 11 [default = 10.0];
   optional double steer_penalty = 12 [default = 100.0];
   optional double steer_change_penalty = 13 [default = 10.0];
+}
+
+
+message DualVariableWarmStartConfig {
+  // Dual variable Warm Start
+  optional double weight_dual_variable = 1 [default = 1.0];
 }
 
 message DistanceApproachConfig {
