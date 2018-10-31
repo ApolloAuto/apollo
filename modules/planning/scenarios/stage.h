@@ -90,14 +90,15 @@ class Stage {
   std::string name_;
 };
 
-#define DECLARE_STAGE(NAME, CONTEXT)                                       \
-  class NAME : public Stage {                                              \
-   public:                                                                 \
-    explicit NAME(const ScenarioConfig::StageConfig& config)               \
-        : Stage(config) {}                                                 \
-    Stage::StageStatus Process(                                            \
-        const common::TrajectoryPoint& planning_init_point, Frame* frame); \
-    CONTEXT* GetContext() { return GetContextAs<CONTEXT>(); }              \
+#define DECLARE_STAGE(NAME, CONTEXT)                          \
+  class NAME : public Stage {                                 \
+   public:                                                    \
+    explicit NAME(const ScenarioConfig::StageConfig& config)  \
+        : Stage(config) {}                                    \
+    Stage::StageStatus Process(                               \
+        const common::TrajectoryPoint& planning_init_point,   \
+        Frame* frame) override;                               \
+    CONTEXT* GetContext() { return GetContextAs<CONTEXT>(); } \
   }
 
 }  // namespace scenario

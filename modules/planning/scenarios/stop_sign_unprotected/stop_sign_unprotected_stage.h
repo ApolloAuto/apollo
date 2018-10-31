@@ -43,10 +43,11 @@ class StopSignUnprotectedCreep : public Stage {
  public:
   explicit StopSignUnprotectedCreep(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame);
 
  private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
   StopSignUnprotectedContext* GetContext() {
     return Stage::GetContextAs<StopSignUnprotectedContext>();
   }
@@ -56,14 +57,13 @@ class StopSignUnprotectedStop : public Stage {
  public:
   explicit StopSignUnprotectedStop(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame);
 
  private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
   StopSignUnprotectedContext* GetContext() {
     return GetContextAs<StopSignUnprotectedContext>();
   }
-
   int RemoveWatchVehicle(
       const Obstacle& obstacle,
       const std::vector<std::string>& watch_vehicle_ids,
@@ -81,10 +81,11 @@ class StopSignUnprotectedPreStop : public Stage {
  public:
   explicit StopSignUnprotectedPreStop(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame);
 
  private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
   StopSignUnprotectedContext* GetContext() {
     return GetContextAs<StopSignUnprotectedContext>();
   }

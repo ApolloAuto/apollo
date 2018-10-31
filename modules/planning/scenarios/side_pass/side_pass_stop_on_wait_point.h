@@ -57,7 +57,7 @@ class SidePassStopOnWaitPoint : public Stage {
   explicit SidePassStopOnWaitPoint(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame);
+                             Frame* frame) override;
   SidePassContext* GetContext() { return GetContextAs<SidePassContext>(); }
 
  private:
