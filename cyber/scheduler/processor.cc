@@ -60,6 +60,7 @@ void Processor::Run() {
       auto croutine = context_->NextRoutine();
       if (croutine) {
         croutine->Resume();
+        croutine->Release();
       } else {
         std::unique_lock<std::mutex> ul(mtx_rq_);
         cv_.wait_for(ul, std::chrono::milliseconds(1));

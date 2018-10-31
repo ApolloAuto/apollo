@@ -44,17 +44,22 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
   std::lock_guard<std::mutex> lock(mtx_);
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
-    cr->UpdateState();
+    // FIXME: Remove Acquire() and Release() if there is no race condtion.
+    if (!cr->Acquire()) {
+      continue;
+    }
+
     if (cr->state() == RoutineState::FINISHED) {
       it = cr_queue_.erase(it);
       continue;
     }
-    if (cr->state() == RoutineState::READY) {
-      cr->set_state(RoutineState::RUNNING);
+
+    if (cr->UpdateState() == RoutineState::READY) {
       PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
                                                 cr->processor_id());
       return cr;
     }
+    cr->Release();
     ++it;
   }
 
