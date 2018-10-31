@@ -17,6 +17,7 @@
 #ifndef CYBER_SCHEDULER_PROCESSOR_H_
 #define CYBER_SCHEDULER_PROCESSOR_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -34,7 +35,7 @@ class ProcessorContext;
 
 using croutine::CRoutine;
 using croutine::RoutineContext;
-using apollo::cyber::proto::ProcessStrategy;
+using apollo::cyber::proto::SchedStrategy;
 
 class Processor {
  public:
@@ -44,7 +45,7 @@ class Processor {
   void Run();
   void Start();
   void Stop() {
-    running_ = false;
+    running_.exchange(false);
     Notify();
   }
   void Notify() { cv_.notify_one(); }
@@ -56,7 +57,9 @@ class Processor {
   inline uint32_t id() const { return id_; }
   inline void set_id(uint32_t id) { id_ = id; }
 
-  void set_strategy(const ProcessStrategy strategy) { strategy_ = strategy; }
+  inline void set_strategy(const SchedStrategy strategy) {
+    strategy_ = strategy;
+  }
 
  private:
   std::mutex mtx_rq_;
@@ -65,12 +68,12 @@ class Processor {
 
   std::thread thread_;
 
-  ProcessStrategy strategy_ = ProcessStrategy::CHOREO;
+  SchedStrategy strategy_ = SchedStrategy::CHOREO;
 
   std::shared_ptr<ProcessorContext> context_;
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
 
-  bool running_ = true;
+  std::atomic<bool> running_{false};
   uint32_t id_ = 0;
 };
 

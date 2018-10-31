@@ -45,7 +45,7 @@ using apollo::cyber::proto::SchedulerConf;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
-using apollo::cyber::proto::ProcessStrategy;
+using apollo::cyber::proto::SchedStrategy;
 
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
@@ -73,25 +73,35 @@ class Scheduler {
     return proc_ctxs_;
   }
 
+  inline uint32_t proc_num() { return proc_num_; }
+  inline uint32_t ext_proc_num() { return ext_proc_num_; }
+  inline uint32_t task_pool_size() { return task_pool_size_; }
+
  private:
   Scheduler(Scheduler&) = delete;
   Scheduler& operator=(Scheduler&) = delete;
 
-  void CreateProcessor();
+  void CreateProc();
+  std::shared_ptr<ProcessorContext> CreatePctx();
   void StartSysmon();
 
   std::thread sysmon_;
   SchedulerConf sched_conf_;
   std::unordered_map<std::string, CRoutineConf> cr_confs_;
 
-  ProcessStrategy sched_policy_ = ProcessStrategy::CHOREO;
+  SchedStrategy sched_policy_ = SchedStrategy::CHOREO;
 
   AtomicRWLock rw_lock_;
   std::unordered_map<uint64_t, uint32_t> cr_ctx_;
   std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
 
-  uint32_t proc_num_;
-  uint32_t task_pool_size_;
+  // proc for real-time tasks,
+  uint32_t proc_num_ = 0;
+  // proc for un real-time tasks,
+  // tasks in dreamview for example
+  uint32_t ext_proc_num_ = 0;
+  // proc for croutine task pool
+  uint32_t task_pool_size_ = 0;
 
   std::atomic<bool> stop_;
 

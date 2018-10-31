@@ -42,10 +42,13 @@ Processor::~Processor() {
 }
 
 void Processor::Start() {
+  if (running_.exchange(true)) {
+    return;
+  }
   thread_ = std::thread(&Processor::Run, this);
 
   uint32_t core_num = std::thread::hardware_concurrency();
-  if (strategy_ != ProcessStrategy::CLASSIC && core_num != 0) {
+  if (strategy_ != SchedStrategy::CLASSIC && core_num != 0) {
     cpu_set_t set;
     CPU_ZERO(&set);
     CPU_SET(id_, &set);
