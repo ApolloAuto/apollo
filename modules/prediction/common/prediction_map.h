@@ -82,12 +82,20 @@ class PredictionMap {
   static std::shared_ptr<const hdmap::LaneInfo> LaneById(const std::string& id);
 
   /**
-   * @brief Get a shared pointer to a junction by lane ID.
+   * @brief Get a shared pointer to a junction by junction ID.
    * @param id The ID of the target junction ID in the form of string.
    * @return A shared pointer to the junction with the input junction ID.
    */
   static std::shared_ptr<const hdmap::JunctionInfo>
   JunctionById(const std::string& id);
+
+  /**
+   * @brief Get a shared pointer to a overlap by overlap ID.
+   * @param id The ID of the target overlap ID in the form of string.
+   * @return A shared pointer to the overlap with the input overlap ID.
+   */
+  static std::shared_ptr<const hdmap::OverlapInfo>
+  OverlapById(const std::string& id);
 
   /**
    * @brief Get the frenet coordinates (s, l) on a lane by a position.
