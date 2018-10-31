@@ -21,19 +21,43 @@
 namespace apollo {
 namespace prediction {
 
-JunctionAnalyzer::JunctionAnalyzer(const std::string& junction_id) {
-  // TODO(all) implement
+using apollo::hdmap::LaneInfo;
+using apollo::hdmap::JunctionInfo;
+
+std::shared_ptr<const apollo::hdmap::JunctionInfo>
+    JunctionAnalyzer::junction_info_ptr_;
+std::unordered_map<std::string, JunctionExit>
+    JunctionAnalyzer::junction_exits_;
+std::unordered_map<std::string, JunctionFeature>
+    JunctionAnalyzer::junction_features_;
+
+void JunctionAnalyzer::Init(const std::string& junction_id) {
+  // TODO(Hongyi) implement
+  // Initialize junction_info_ptr_
+  // Initialize junction_exits_ by SetAllJunctionExits()
+}
+
+void JunctionAnalyzer::Clear() {
+  // TODO(Hongyi) implement
+  // Clear all data
+}
+
+void JunctionAnalyzer::SetAllJunctionExits() {
+  // TODO(Hongyi) implement
+  // Set junction_exits_
 }
 
 std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     const std::string& start_lane_id) {
-  // TODO(all) implement
+  // TODO(kechxu) implement
+  // By BFS with junction_exits_
   std::vector<JunctionExit> junction_exits;
   return junction_exits;
 }
 
 bool JunctionAnalyzer::IsExitLane(const std::string& lane_id) {
   // TODO(kechxu) implement
+  // By junction_exits_
   return false;
 }
 
