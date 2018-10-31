@@ -18,10 +18,10 @@
 
 #include "modules/planning/proto/planning_config.pb.h"
 
+#include "modules/planning/planner/lattice/lattice_planner.h"
+#include "modules/planning/planner/open_space/open_space_planner.h"
 #include "modules/planning/planner/public_road/public_road_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/planner/lattice/lattice_planner.h"
-// #include "modules/planning/planner/open_space/open_space_planner.h"
 
 namespace apollo {
 namespace planning {
@@ -31,10 +31,10 @@ void PlannerDispatcher::RegisterPlanners() {
       RTK, []() -> Planner* { return new RTKReplayPlanner(); });
   planner_factory_.Register(
       PUBLIC_ROAD, []() -> Planner* { return new PublicRoadPlanner(); });
+  planner_factory_.Register(LATTICE,
+                            []() -> Planner* { return new LatticePlanner(); });
   planner_factory_.Register(
-      LATTICE, []() -> Planner* { return new LatticePlanner(); });
-  // planner_factory_.Register(
-  //     OPENSPACE, []() -> Planner* { return new OpenSpacePlanner(); });
+      OPEN_SPACE, []() -> Planner* { return new OpenSpacePlanner(); });
 }
 
 }  // namespace planning

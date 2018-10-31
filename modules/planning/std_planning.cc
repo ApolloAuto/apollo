@@ -41,12 +41,12 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Vec2d;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
+using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
@@ -83,6 +83,9 @@ bool IsDifferentRouting(const RoutingResponse& first,
 StdPlanning::~StdPlanning() {
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
+  }
+  if (FLAGS_enable_open_space_planner_thread) {
+    planner_->Stop();
   }
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
@@ -141,8 +144,7 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
                               ADCTrajectory* output_trajectory) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          start_time, vehicle_state,
-                         reference_line_provider_.get(),
-                         output_trajectory));
+                         reference_line_provider_.get(), output_trajectory));
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
