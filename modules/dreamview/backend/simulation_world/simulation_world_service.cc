@@ -805,6 +805,11 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
 
   size_t max_interval = 10;
 
+  // Update scenario
+  if (data.has_scenario()) {
+      planning_data->mutable_scenario()->CopyFrom(data.scenario());
+  }
+
   // Update Chart
   planning_data->mutable_chart()->CopyFrom(data.chart());
 
@@ -812,7 +817,9 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   planning_data->mutable_sl_frame()->CopyFrom(data.sl_frame());
 
   // Update DP path
-  planning_data->mutable_dp_poly_graph()->CopyFrom(data.dp_poly_graph());
+  if (data.has_dp_poly_graph()) {
+    planning_data->mutable_dp_poly_graph()->CopyFrom(data.dp_poly_graph());
+  }
 
   // Update ST Graph
   planning_data->clear_st_graph();
