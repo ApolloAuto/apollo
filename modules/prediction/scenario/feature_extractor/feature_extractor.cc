@@ -204,7 +204,6 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
   if (need_consider) {
     ptr_environment_features->SetFrontJunction(junction->id().id(),
           ego_trajectory_container->ADCDistanceToJunction());
-    return;
   }
 }
 
