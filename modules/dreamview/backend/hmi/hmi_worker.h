@@ -24,7 +24,6 @@
 #include "boost/thread/shared_mutex.hpp"
 
 #include "cyber/cyber.h"
-
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
@@ -47,10 +46,12 @@ using ChangeVehicleHandler = std::function<void(const std::string&)>;
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
  public:
+  HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
 
-  // High level HMI action trigger.
+  // HMI action trigger.
   bool Trigger(const HMIAction action);
+  bool Trigger(const HMIAction action, const std::string& value);
 
   // Run a command on current system mode.
   void RunModeCommand(const std::string& command_name);
@@ -134,6 +135,8 @@ class HMIWorker {
   void SetupMode();
   void ResetMode();
 
+  void RecordAudio(const std::string& data);
+
   HMIConfig config_;
   HMIStatus status_;
   mutable boost::shared_mutex status_mutex_;
@@ -143,7 +146,9 @@ class HMIWorker {
   std::vector<ChangeMapHandler> change_map_handlers_;
   std::vector<ChangeVehicleHandler> change_vehicle_handlers_;
 
+  // Cyber members.
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cyber::Writer<AudioCapture>> audio_capture_writer_;
   std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;

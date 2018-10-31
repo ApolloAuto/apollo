@@ -56,6 +56,9 @@ using apollo::common::util::LookupOrInsert;
 using apollo::common::util::StrCat;
 using apollo::common::util::StringTokenizer;
 using apollo::control::DrivingAction;
+using apollo::cyber::Node;
+using apollo::monitor::ComponentStatus;
+using apollo::monitor::SystemStatus;
 using google::protobuf::Map;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 using WLock = boost::unique_lock<boost::shared_mutex>;
@@ -63,10 +66,11 @@ using WLock = boost::unique_lock<boost::shared_mutex>;
 constexpr char kNavigationModeName[] = "Navigation";
 
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
-std::string TitleCase(const std::string &origin,
-                      const std::string &delimiter = "_") {
-  std::vector<std::string> parts = StringTokenizer::Split(origin, delimiter);
-  for (auto &part : parts) {
+std::string TitleCase(const std::string& origin) {
+  static const std::string kDelimiter = "_";
+  std::vector<std::string> parts =
+      apollo::common::util::StringTokenizer::Split(origin, kDelimiter);
+  for (auto& part : parts) {
     if (!part.empty()) {
       // Upper case the first char.
       part[0] = toupper(part[0]);
@@ -126,9 +130,18 @@ void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
   }
 }
 
+void System(const std::string& cmd) {
+  const int ret = std::system(cmd.c_str());
+  if (ret == 0) {
+    AINFO << "SUCCESS: " << cmd;
+  } else {
+    AERROR << "FAILED(" << ret << "): " << cmd;
+  }
+}
+
 }  // namespace
 
-HMIWorker::HMIWorker(const std::shared_ptr<apollo::cyber::Node> &node) {
+HMIWorker::HMIWorker(const std::shared_ptr<Node>& node) {
   // Init HMIConfig.
   CHECK(common::util::GetProtoFromFile(FLAGS_hmi_config_filename, &config_))
       << "Unable to parse HMI config file " << FLAGS_hmi_config_filename;
@@ -256,24 +269,23 @@ bool HMIWorker::CyberLaunch(const std::string& command) const {
   return true;
 }
 
-void HMIWorker::InitReadersAndWriters(
-    const std::shared_ptr<apollo::cyber::Node> &node) {
+void HMIWorker::InitReadersAndWriters(const std::shared_ptr<Node>& node) {
+  pad_writer_ = node->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
+  drive_event_writer_ = node->CreateWriter<DriveEvent>(FLAGS_drive_event_topic);
+  audio_capture_writer_ = node->CreateWriter<AudioCapture>(
+      FLAGS_audio_capture_topic);
+
   // Received Chassis, trigger action if there is high beam signal.
   chassis_reader_ = node->CreateReader<Chassis>(
-      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis> &chassis) {
+      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
         if (Clock::NowInSeconds() - chassis->header().timestamp_sec() <
             FLAGS_system_status_lifetime_seconds) {
           if (chassis->signal().high_beam()) {
-            const bool ret =
-                this->Trigger(this->GetConfig().chassis_high_beam_action());
+            const bool ret = Trigger(config_.chassis_high_beam_action());
             AERROR_IF(!ret) << "Failed to execute high_beam action.";
           }
         }
       });
-
-  pad_writer_ = node->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
-  drive_event_writer_ =
-      node->CreateWriter<apollo::common::DriveEvent>(FLAGS_drive_event_topic);
 }
 
 bool HMIWorker::Trigger(const HMIAction action) {
@@ -290,6 +302,20 @@ bool HMIWorker::Trigger(const HMIAction action) {
       return ChangeToDrivingMode(Chassis::COMPLETE_MANUAL);
     case HMIAction::RESET_MODE:
       ResetMode();
+      break;
+    default:
+      AERROR << "HMIAction not implemented, yet!";
+      return false;
+  }
+  return true;
+}
+
+bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
+  AINFO << "HMIAction " << HMIAction_Name(action)
+        << "(" << value << ") was triggered!";
+  switch (action) {
+    case HMIAction::RECORD_AUDIO:
+      RecordAudio(value);
       break;
     default:
       AERROR << "HMIAction not implemented, yet!";
@@ -317,7 +343,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const std::string &event_msg,
                                  const std::vector<std::string> &event_types) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
-  common::util::FillHeader("HMI", drive_event.get());
+  apollo::common::util::FillHeader("HMI", drive_event.get());
   drive_event->set_event(event_msg);
   for (const auto &type_name : event_types) {
     DriveEvent::Type type;
@@ -327,15 +353,15 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
       AERROR << "Failed to parse drive event type:" << type_name;
     }
   }
-  HMIWorker::drive_event_writer_->Write(drive_event);
+  drive_event_writer_->Write(drive_event);
 }
 
 bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
   // Always reset to MANUAL mode before changing to other mode.
+  const std::string mode_name = Chassis::DrivingMode_Name(mode);
   if (mode != Chassis::COMPLETE_MANUAL) {
     if (!ChangeToDrivingMode(Chassis::COMPLETE_MANUAL)) {
-      AERROR << "Failed to reset to MANUAL mode before changing to "
-             << Chassis::DrivingMode_Name(mode);
+      AERROR << "Failed to reset to MANUAL before changing to " << mode_name;
       return false;
     }
   }
@@ -349,8 +375,8 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
       pad->set_action(DrivingAction::START);
       break;
     default:
-      AFATAL << "Unknown action to change driving mode to "
-             << Chassis::DrivingMode_Name(mode);
+      AFATAL << "Change driving mode to " << mode_name << " not implemented!";
+      return false;
   }
 
   constexpr int kMaxTries = 3;
@@ -358,20 +384,18 @@ bool HMIWorker::ChangeToDrivingMode(const Chassis::DrivingMode mode) {
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
     common::util::FillHeader("HMI", pad.get());
-    HMIWorker::pad_writer_->Write(pad);
+    pad_writer_->Write(pad);
 
     std::this_thread::sleep_for(kTryInterval);
 
-    HMIWorker::chassis_reader_->Observe();
-    if (HMIWorker::chassis_reader_->Empty()) {
+    chassis_reader_->Observe();
+    if (chassis_reader_->Empty()) {
       AERROR << "No Chassis message received!";
-    } else if (HMIWorker::chassis_reader_->GetLatestObserved()
-                   ->driving_mode() == mode) {
+    } else if (chassis_reader_->GetLatestObserved()->driving_mode() == mode) {
       return true;
     }
   }
-  AERROR << "Failed to change driving mode to "
-         << Chassis::DrivingMode_Name(mode);
+  AERROR << "Failed to change driving mode to " << mode_name;
   return false;
 }
 
@@ -528,6 +552,12 @@ void HMIWorker::SetupMode() {
 
 void HMIWorker::ResetMode() {
   // TODO(xiaoxq): Stop everything corresponding to current mode.
+}
+
+void HMIWorker::RecordAudio(const std::string& data) {
+  AudioCapture audio;
+  audio.set_wav_stream(apollo::common::util::DecodeBase64(data));
+  audio_capture_writer_->Write(audio);
 }
 
 }  // namespace dreamview
