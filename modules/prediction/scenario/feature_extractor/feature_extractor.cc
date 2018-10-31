@@ -187,10 +187,6 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
     return;
   }
   JunctionInfoPtr junction = ego_trajectory_container->ADCJunction();
-  // if (junction!=nullptr) {
-  //   ptr_environment_features->SetFrontJunction(junction->id().id(),
-  //           ego_trajectory_container->ADCDistanceToJunction());
-  // }
   bool need_consider = false;
   if (junction != nullptr) {
     for (const auto &overlap_id : junction->junction().overlap_id()) {
