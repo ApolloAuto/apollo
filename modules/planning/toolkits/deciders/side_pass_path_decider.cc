@@ -100,11 +100,6 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
       reference_line_info->reference_line(),
       reference_line_info->path_decision()->obstacles());
 
-  for (const auto tp : lateral_bounds) {
-    ADEBUG << std::get<0>(tp) << ", " << std::get<1>(tp) << ", "
-           << std::get<2>(tp);
-  }
-
   // Call optimizer to generate smooth path.
   fem_qp_->SetVariableBounds(lateral_bounds);
   if (!fem_qp_->Optimize()) {
@@ -175,12 +170,14 @@ SidePassPathDecider::GetPathBoundaries(
     double road_right_width_at_curr_s = 0.0;
     reference_line.GetRoadWidth(curr_s, &road_left_width_at_curr_s,
                                 &road_right_width_at_curr_s);
-
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
 
+    // TODO(All): calculate drivable areas
+    // lower bound
     std::get<1>(lateral_bound) =
         -(road_right_width_at_curr_s - adc_half_width - kRoadBuffer);
+    // upper bound
     std::get<2>(lateral_bound) =
         road_left_width_at_curr_s - adc_half_width - kRoadBuffer;
 
@@ -188,7 +185,9 @@ SidePassPathDecider::GetPathBoundaries(
       if (decided_direction_ == SidePassDirection::LEFT) {
         std::get<1>(lateral_bound) =
             nearest_obs_sl_boundary.end_l() + kObstacleBuffer + adc_half_width;
+        std::get<2>(lateral_bound) += road_left_width_at_curr_s;
       } else if (decided_direction_ == SidePassDirection::RIGHT) {
+        std::get<1>(lateral_bound) -= road_right_width_at_curr_s;
         std::get<2>(lateral_bound) = nearest_obs_sl_boundary.start_l() -
                                      kObstacleBuffer - adc_half_width;
       } else {
@@ -196,6 +195,9 @@ SidePassPathDecider::GetPathBoundaries(
         return lateral_bounds;
       }
     }
+    ADEBUG << "obsrbound: " << std::get<0>(lateral_bound) << ", "
+           << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound);
+
     lateral_bounds.push_back(lateral_bound);
   }
 
