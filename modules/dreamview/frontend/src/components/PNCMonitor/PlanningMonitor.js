@@ -3,6 +3,8 @@ import { inject, observer } from "mobx-react";
 
 import SETTING from "store/config/PlanningGraph.yml";
 import ScatterGraph, { generateScatterGraph } from "components/PNCMonitor/ScatterGraph";
+import PlanningScenarioTable from "components/PNCMonitor/PlanningScenarioTable";
+import { timestampMsToTimeString } from "utils/misc";
 
 @inject("store") @observer
 export default class PlanningMonitor extends React.Component {
@@ -26,7 +28,7 @@ export default class PlanningMonitor extends React.Component {
     }
 
     render() {
-        const { planningTime, data, chartData } = this.props.store.planningData;
+        const { planningTime, data, chartData, scenarioHistory } = this.props.store.planningData;
 
         if (!planningTime) {
             return null;
@@ -34,6 +36,7 @@ export default class PlanningMonitor extends React.Component {
 
         return (
             <div>
+                <PlanningScenarioTable scenarios={scenarioHistory} />
                 {chartData.map(chart => {
                     return <ScatterGraph key={chart.title}
                                          title={chart.title}

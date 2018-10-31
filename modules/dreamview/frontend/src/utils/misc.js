@@ -36,7 +36,7 @@ export function millisecondsToTime(duration) {
     return minutes + ":" + seconds + "." + milliseconds;
 }
 
-export function timestampMsToTime(timestampMs) {
+export function timestampMsToTimeString(timestampMs, showMilliseconds = false) {
     const date = new Date(timestampMs);
     let hours = date.getHours();
     let minutes = date.getMinutes();
@@ -44,7 +44,19 @@ export function timestampMsToTime(timestampMs) {
     hours = (hours < 10) ? "0" + hours : hours;
     minutes = (minutes < 10) ? "0" + minutes : minutes;
     seconds = (seconds < 10) ? "0" + seconds : seconds;
-    return `${hours}:${minutes}:${seconds}`;
+    let timeString = `${hours}:${minutes}:${seconds}`;
+
+    if (showMilliseconds) {
+        let milliseconds = date.getMilliseconds();
+        if (milliseconds < 10) {
+            milliseconds = "00" + milliseconds;
+        } else if (milliseconds < 100) {
+            milliseconds = "0" + milliseconds;
+        }
+        timeString += `:${milliseconds}`;
+    }
+
+    return timeString;
 }
 
 export function calculateLaneMarkerPoints(autoDrivingCar, laneMarkerData) {

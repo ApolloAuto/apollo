@@ -2,12 +2,16 @@ import { action, computed, observable, runInAction } from 'mobx';
 import { LinearInterpolant } from 'three';
 import { parseChartDataFromProtoBuf } from 'utils/chart';
 
+const MAX_SCENARIO_LENGTH = 5;
+
 export default class PlanningData {
   @observable planningTime = null;
 
   data = this.initData();
 
   chartData = [];
+
+  scenarioHistory = [];
 
   @action updatePlanningTime(newTime) {
     this.planningTime = newTime;
@@ -216,11 +220,33 @@ export default class PlanningData {
     }
   }
 
+  updateScenario(newScenario, newTime) {
+    const currScenario = this.scenarioHistory.length > 0
+            ? this.scenarioHistory[this.scenarioHistory.length - 1] : {};
+
+    if (currScenario.scenarioType !== newScenario.scenarioType &&
+        currScenario.stageType !== newScenario.stageType) {
+      this.scenarioHistory.push({
+        time: newTime,
+        scenarioType: newScenario.scenarioType,
+        stageType: newScenario.stageType,
+      });
+      if (this.scenarioHistory.length > MAX_SCENARIO_LENGTH) {
+        this.scenarioHistory.shift();
+      }
+    }
+  }
+
   update(world) {
     const planningData = world.planningData;
     if (planningData) {
-      if (this.planningTime === world.planningTime) {
+      const newPlanningTime = world.latency.planning.timestampSec;
+      if (this.planningTime === newPlanningTime) {
         return;
+      }
+
+      if (planningData.scenario) {
+        this.updateScenario(planningData.scenario, newPlanningTime);
       }
 
       this.chartData = [];
@@ -259,7 +285,7 @@ export default class PlanningData {
         this.updateDpPolyGraph(planningData.dpPolyGraph);
       }
 
-      this.updatePlanningTime(world.latency.planning.timestampSec);
+      this.updatePlanningTime(newPlanningTime);
     }
   }
 }

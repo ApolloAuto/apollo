@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import warnIcon from "assets/images/icons/warning.png";
 import errorIcon from "assets/images/icons/error.png";
-import { timestampMsToTime } from "utils/misc";
+import { timestampMsToTimeString } from "utils/misc";
 
 @observer
 class MonitorItem extends React.Component {
@@ -40,7 +40,7 @@ export default class Console extends React.Component {
                         {monitor.items.map((item, index) => (
                             <MonitorItem key={index} text={item.msg}
                                          level={item.logLevel}
-                                         time={timestampMsToTime(item.timestampMs)} />
+                                         time={timestampMsToTimeString(item.timestampMs)} />
                          ))}
                     </ul>
                 </div>
