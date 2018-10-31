@@ -45,7 +45,7 @@ std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
   PlanningConfig planning_config;
   apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                          &planning_config);
-  if (FLAGS_enable_open_space_planner_thread) {
+  if (FLAGS_open_space_planner_switchable) {
     const hdmap::HDMap* hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
     CHECK_NOTNULL(hdmap_);
     common::VehicleState vehicle_state_ =

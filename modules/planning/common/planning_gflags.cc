@@ -417,13 +417,17 @@ DEFINE_bool(enable_open_space_roi_and_info, false,
             "enable the frame to load map data and calculate info for open "
             "space planner");
 
-DEFINE_bool(enable_open_space_planner_thread, false,
+DEFINE_bool(enable_open_space_planner_thread, true,
             "Enable thread in open space planner for trajectory publish.");
 
 DEFINE_bool(
     parking_inwards, false,
     "true for parking the car inwards in parking spot, false for parking "
     "the car towards the street");
+
+DEFINE_bool(open_space_planner_switchable, false,
+            "true for std planning being able to switch to open space planner "
+            "when close enough to target parking spot");
 
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");

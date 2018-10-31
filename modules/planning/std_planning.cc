@@ -84,9 +84,7 @@ StdPlanning::~StdPlanning() {
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
   }
-  if (FLAGS_enable_open_space_planner_thread) {
-    planner_->Stop();
-  }
+  planner_->Stop();
   last_publishable_trajectory_.reset(nullptr);
   frame_.reset(nullptr);
   planner_.reset(nullptr);
