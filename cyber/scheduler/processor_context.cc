@@ -52,14 +52,12 @@ void ProcessorContext::Notify(uint64_t cr_id) {
   auto iter = cr_container_.find(cr_id);
   if (likely(iter != cr_container_.end())) {
     auto& cr = iter->second;
-    if (cr->state() == RoutineState::DATA_WAIT) {
-      cr->SetUpdateFlag();
-    }
+    cr->SetUpdateFlag();
+  }
 
-    if (!notified_.test_and_set(std::memory_order_acquire)) {
-      processor_->Notify();
-      return;
-    }
+  if (!notified_.test_and_set(std::memory_order_acquire)) {
+    processor_->Notify();
+    return;
   }
 }
 

@@ -189,7 +189,6 @@ bool Scheduler::NotifyTask(uint64_t task_id) {
   if (stop_) {
     return true;
   }
-
   return NotifyProcessor(task_id);
 }
 
@@ -204,7 +203,6 @@ bool Scheduler::NotifyProcessor(uint64_t cr_id) {
     proc_ctxs_[itr->second]->Notify(cr_id);
     return true;
   }
-
   return false;
 }
 
@@ -218,7 +216,6 @@ bool Scheduler::RemoveTask(const std::string& name) {
     WriteLockGuard<AtomicRWLock> wg(rw_lock_);
     cr_ctx_.erase(task_id);
   }
-
   return RemoveCRoutine(task_id);
 }
 
@@ -233,7 +230,6 @@ bool Scheduler::RemoveCRoutine(uint64_t cr_id) {
     cr_ctx_.erase(cr_id);
     proc_ctxs_[p->second]->RemoveCRoutine(cr_id);
   }
-
   return true;
 }
 
