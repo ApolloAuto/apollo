@@ -77,6 +77,10 @@ Status SidePassPathDecider::BuildSidePathDecision(
 // subsequent obstacles)
 bool SidePassPathDecider::GeneratePath(Frame *frame,
                                        ReferenceLineInfo *reference_line_info) {
+  adc_frenet_frame_point_ =
+      reference_line_info->reference_line().GetFrenetPoint(
+          frame->PlanningStartPoint());
+
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -89,18 +93,18 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
     return false;
   }
 
-  auto list_s_leftbound_rightbound = GetPathBoundaries(
+  auto lateral_bounds = GetPathBoundaries(
       frame->PlanningStartPoint(), reference_line_info->AdcSlBoundary(),
       reference_line_info->reference_line(),
       reference_line_info->path_decision()->obstacles());
 
-  for (const auto tp : list_s_leftbound_rightbound) {
+  for (const auto tp : lateral_bounds) {
     ADEBUG << std::get<0>(tp) << ", " << std::get<1>(tp) << ", "
            << std::get<2>(tp);
   }
 
   // Call optimizer to generate smooth path.
-  fem_qp_->SetVariableBounds(list_s_leftbound_rightbound);
+  fem_qp_->SetVariableBounds(lateral_bounds);
   if (!fem_qp_->Optimize()) {
     AERROR << "Fail to optimize in SidePassPathDecider.";
     return false;
@@ -109,10 +113,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   // TODO(All): put optimized results into ReferenceLineInfo.
   // Update Reference_Line_Info with this newly generated path.
   std::vector<common::FrenetFramePoint> frenet_frame_path;
-  auto adc_frenet_frame_point =
-      reference_line_info->reference_line().GetFrenetPoint(
-          frame->PlanningStartPoint());
-  double accumulated_s = adc_frenet_frame_point.s();
+  double accumulated_s = adc_frenet_frame_point_.s();
   for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
     common::FrenetFramePoint frenet_frame_point;
     ADEBUG << "FrenetFramePath: s = " << accumulated_s
@@ -140,34 +141,26 @@ SidePassPathDecider::GetPathBoundaries(
     const TrajectoryPoint &planning_start_point,
     const SLBoundary &adc_sl_boundary, const ReferenceLine &reference_line,
     const IndexedList<std::string, Obstacle> &indexed_obstacles) {
-  std::vector<std::tuple<double, double, double>> list_s_leftbound_rightbound;
+  std::vector<std::tuple<double, double, double>> lateral_bounds;
 
   const auto nearest_obs_sl_boundary =
       GetNearestObstacle(adc_sl_boundary, reference_line, indexed_obstacles)
           ->PerceptionSLBoundary();
 
   // Get road info at every point and fill in the boundary condition vector.
-  common::PathPoint start_path_point = planning_start_point.path_point();
-  common::math::Vec2d start_path_point_vec2d(start_path_point.x(),
-                                             start_path_point.y());
-  common::SLPoint start_path_point_sl;
-  if (!reference_line.XYToSL(start_path_point_vec2d, &start_path_point_sl)) {
-    AERROR << "Failed to get the projection from TrajectoryPoint onto "
-              "reference_line";
-    return list_s_leftbound_rightbound;
-  }
-  double s_increment = 1.0;
-  double curr_s = start_path_point_sl.s();
-  bool bound_cond_gen_finished = false;
+  const double s_increment = 1.0;
   bool is_blocked_by_obs = false;
 
   // Currently, it only considers one obstacle.
   // For future scaling so that multiple obstacles can be considered,
   // a sweep-line method can be used. The code here leaves some room
   // for the sweep-line method.
-  while (!bound_cond_gen_finished) {
-    std::tuple<double, double, double> s_leftbound_rightbound;
-    std::get<0>(s_leftbound_rightbound) = curr_s;
+  for (double curr_s = adc_frenet_frame_point_.s();
+       curr_s < std::min(kPlanDistAfterObs + nearest_obs_sl_boundary.end_s(),
+                         reference_line.Length());
+       curr_s += s_increment) {
+    std::tuple<double, double, double> lateral_bound{curr_s, 0.0, 0.0};
+
     // Check if boundary should be dictated by obstacle or road
     if (curr_s >= nearest_obs_sl_boundary.start_s() - kObstacleBuffer &&
         curr_s <= nearest_obs_sl_boundary.end_s() + kObstacleBuffer) {
@@ -181,35 +174,27 @@ SidePassPathDecider::GetPathBoundaries(
     reference_line.GetRoadWidth(curr_s, &road_left_width_at_curr_s,
                                 &road_right_width_at_curr_s);
     if (!is_blocked_by_obs) {
-      std::get<1>(s_leftbound_rightbound) =
-          -std::abs(road_left_width_at_curr_s - kRoadBuffer);
-      std::get<2>(s_leftbound_rightbound) =
-          std::abs(road_right_width_at_curr_s - kRoadBuffer);
+      std::get<1>(lateral_bound) = -(road_right_width_at_curr_s - kRoadBuffer);
+      std::get<2>(lateral_bound) = road_left_width_at_curr_s - kRoadBuffer;
     } else {
       if (decided_direction_ == SidePassDirection::LEFT) {
-        std::get<1>(s_leftbound_rightbound) =
-            -std::abs(road_left_width_at_curr_s - kRoadBuffer);
-        std::get<2>(s_leftbound_rightbound) =
-            -nearest_obs_sl_boundary.end_l() - kObstacleBuffer;
+        std::get<1>(lateral_bound) =
+            nearest_obs_sl_boundary.end_l() + kObstacleBuffer;
+        std::get<2>(lateral_bound) = road_left_width_at_curr_s - kRoadBuffer;
       } else if (decided_direction_ == SidePassDirection::RIGHT) {
-        std::get<1>(s_leftbound_rightbound) =
-            -nearest_obs_sl_boundary.start_l() + kObstacleBuffer;
-        std::get<2>(s_leftbound_rightbound) =
-            std::abs(road_right_width_at_curr_s - kRoadBuffer);
+        std::get<1>(lateral_bound) =
+            -(road_right_width_at_curr_s - kRoadBuffer);
+        std::get<2>(lateral_bound) =
+            nearest_obs_sl_boundary.start_l() - kObstacleBuffer;
       } else {
         AERROR << "Side-pass direction undefined.";
-        return list_s_leftbound_rightbound;
+        return lateral_bounds;
       }
     }
-    list_s_leftbound_rightbound.push_back(s_leftbound_rightbound);
-    // Move to next s
-    curr_s += s_increment;
-    if (curr_s > kPlanDistAfterObs + nearest_obs_sl_boundary.end_s()) {
-      bound_cond_gen_finished = true;
-    }
+    lateral_bounds.push_back(lateral_bound);
   }
 
-  return list_s_leftbound_rightbound;
+  return lateral_bounds;
 }
 
 const Obstacle *SidePassPathDecider::GetNearestObstacle(
