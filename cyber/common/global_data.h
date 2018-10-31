@@ -67,7 +67,7 @@ class GlobalData {
 
  private:
   void InitHostInfo();
-  void InitConfig();
+  bool InitConfig();
 
   // global config
   CyberConfig config_;

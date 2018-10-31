@@ -77,12 +77,12 @@ bool Init() {
   std::signal(SIGINT, OnShutdown);
 
   // Initialize internal static objects
-  common::GlobalData::Instance();
-  transport::Transport::Instance();
-  service_discovery::TopologyManager::Instance();
-  scheduler::Scheduler::Instance();
-  TaskManager::Instance();
-  PerfEventCache::Instance();
+  CHECK_NOTNULL(common::GlobalData::Instance());
+  CHECK_NOTNULL(transport::Transport::Instance());
+  CHECK_NOTNULL(service_discovery::TopologyManager::Instance());
+  CHECK_NOTNULL(scheduler::Scheduler::Instance());
+  CHECK_NOTNULL(TaskManager::Instance());
+  CHECK_NOTNULL(PerfEventCache::Instance());
 
   // Register exit handlers
   if (!g_atexit_registered) {

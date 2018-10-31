@@ -17,6 +17,7 @@
 #ifndef CYBER_COMMON_MACROS_H_
 #define CYBER_COMMON_MACROS_H_
 
+#include <iostream>
 #include <memory>
 
 // There must be many copy-paste versions of these macros which are same
@@ -30,15 +31,16 @@
   classname(const classname &) = delete;    \
   classname &operator=(const classname &) = delete;
 
-#define DECLARE_SINGLETON(classname)                                    \
- public:                                                                \
-  static const std::shared_ptr<classname> &Instance() {                 \
-    static auto instance = std::shared_ptr<classname>(new classname()); \
-    return instance;                                                    \
-  }                                                                     \
-                                                                        \
- private:                                                               \
-  classname();                                                          \
+#define DECLARE_SINGLETON(classname)                                \
+ public:                                                            \
+  static const std::shared_ptr<classname> &Instance() {             \
+    static auto instance =                                          \
+        std::shared_ptr<classname>(new (std::nothrow) classname()); \
+    return instance;                                                \
+  }                                                                 \
+                                                                    \
+ private:                                                           \
+  classname();                                                      \
   DISALLOW_COPY_AND_ASSIGN(classname)
 
 #endif  // CYBER_COMMON_MACROS_H_
