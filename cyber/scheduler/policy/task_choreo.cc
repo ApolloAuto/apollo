@@ -44,11 +44,6 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
   std::lock_guard<std::mutex> lock(mtx_);
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
-    // FIXME: Remove Acquire() and Release() if there is no race condtion.
-    if (!cr->Acquire()) {
-      continue;
-    }
-
     if (cr->state() == RoutineState::FINISHED) {
       it = cr_queue_.erase(it);
       continue;
@@ -59,7 +54,6 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
                                                 cr->processor_id());
       return cr;
     }
-    cr->Release();
     ++it;
   }
 
@@ -76,7 +70,8 @@ bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
 
   uint32_t pid = cr->processor_id();
   if (!(pid >= 0 && pid < ctxs.size())) {
-    // fallback for those w/o proc idx in conf
+    // put crs in ext proc make unpredicted-rt
+    // won't influence real-time dag
     pid = psize + pnum;
     int qsize = ctxs[pid]->RqSize();
     for (uint32_t i = psize + pnum;

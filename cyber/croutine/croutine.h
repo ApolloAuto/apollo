@@ -57,6 +57,8 @@ class CRoutine {
   // It is caller's responsibility to check if state_ is valid before calling
   // SetUpdateFlag().
   void SetUpdateFlag();
+  // acquire && release should be called before Resum
+  // when work-steal like mechanism used
   RoutineState Resume();
   RoutineState UpdateState();
   RoutineContext *GetContext();
