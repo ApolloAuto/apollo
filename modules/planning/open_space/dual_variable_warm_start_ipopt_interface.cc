@@ -152,7 +152,6 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
       g_u[constraint_index + 2] = 0.0;
 
       // c. -g'*mu + (A*t - b)*lambda > min_safety_distance_
-      // TODO(QiL): Need to revise according to dual modeling
       g_l[constraint_index + 3] = 0.0;
       g_u[constraint_index + 3] = 0.0;
       constraint_index += 4;

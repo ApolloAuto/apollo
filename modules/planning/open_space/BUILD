@@ -64,20 +64,20 @@ cc_test(
     ],
 )
 
-#cc_library(
-#    name = "dual_variable_warm_start_problem",
-#    srcs = [
-#        "dual_variable_warm_start_problem.cc",
-#    ],
-#    hdrs = [
-#        "dual_variable_warm_start_problem.h",
-#    ],
-#    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-#    deps = [
-#        "dual_variable_warm_start_ipopt_interface",
-#    ],
-#)
-#
+cc_library(
+    name = "dual_variable_warm_start_problem",
+    srcs = [
+        "dual_variable_warm_start_problem.cc",
+    ],
+    hdrs = [
+        "dual_variable_warm_start_problem.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "dual_variable_warm_start_ipopt_interface",
+    ],
+)
+
 cc_library(
     name = "dual_variable_warm_start_ipopt_interface",
     srcs = [
