@@ -39,6 +39,7 @@ namespace stop_sign_protected {
 
 // stage context
 struct StopSignUnprotectedContext {
+  ScenarioStopSignUnprotectedConfig scenario_config;
   std::string stop_sign_id;
   double stop_start_time;
   std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
@@ -65,6 +66,7 @@ class StopSignUnprotectedScenario : public Scenario {
 
  private:
   static void RegisterStages();
+  bool GetScenarioConfig();
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
 
  private:
@@ -72,9 +74,6 @@ class StopSignUnprotectedScenario : public Scenario {
   StopSignUnprotectedContext context_;
 
   hdmap::StopSignInfoConstPtr next_stop_sign_ = nullptr;
-
-  // TODO(all): move to scenario conf later
-  const uint32_t conf_start_stop_sign_timer_ = 10;  // second
 
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,

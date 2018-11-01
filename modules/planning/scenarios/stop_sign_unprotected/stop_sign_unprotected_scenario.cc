@@ -57,6 +57,11 @@ void StopSignUnprotectedScenario::Init() {
 
   Scenario::Init();
 
+  if (!GetScenarioConfig()) {
+    AERROR << "fail to get scenario specific config";
+    return;
+  }
+
   const std::string stop_sign_overlap_id =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
   if (stop_sign_overlap_id.empty()) {
@@ -140,13 +145,13 @@ bool StopSignUnprotectedScenario::IsTransferable(
       common::VehicleStateProvider::Instance()->linear_velocity();
   const uint32_t time_distance = static_cast<uint32_t>(ceil(
       adc_distance_to_stop_sign / adc_speed));
-
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return (time_distance <= conf_start_stop_sign_timer_);
+      return (time_distance <=
+          config_.stop_sign_unprotected_config().start_stop_sign_timer());
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
@@ -161,6 +166,18 @@ bool StopSignUnprotectedScenario::IsTransferable(
   }
 
   return false;
+}
+
+/*
+ * read scenario specific configs and set in context_ for stages to read
+ */
+bool StopSignUnprotectedScenario::GetScenarioConfig() {
+  if (!config_.has_stop_sign_unprotected_config()) {
+    AERROR << "miss scenario specific config";
+    return false;
+  }
+  context_.scenario_config.CopyFrom(config_.stop_sign_unprotected_config());
+  return true;
 }
 
 /*

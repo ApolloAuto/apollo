@@ -54,18 +54,22 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
 
+  scenario_config_.CopyFrom(GetContext()->scenario_config);
+
   auto start_time = GetContext()->stop_start_time;
   double wait_time = Clock::NowInSeconds() - start_time;
   ADEBUG << "stop_start_time[" << start_time
       << "] wait_time[" << wait_time << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
-  if (wait_time >= conf_stop_duration_ && watch_vehicles.empty()) {
+  if (wait_time >= scenario_config_.stop_duration() &&
+      watch_vehicles.empty()) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
     return Stage::FINISHED;
   }
 
   // check timeout
-  if (wait_time > conf_wait_timeout_ && watch_vehicles.size() <= 1) {
+  if (wait_time > scenario_config_.wait_timeout() &&
+      watch_vehicles.size() <= 1) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
     return Stage::FINISHED;
   }
@@ -159,7 +163,8 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
     double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
     double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
     double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
-    if (distance_pass_stop_line > conf_min_pass_s_distance_ && !is_path_cross) {
+    if (distance_pass_stop_line > scenario_config_.min_pass_s_distance() &&
+        !is_path_cross) {
       erase = true;
 
       ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name

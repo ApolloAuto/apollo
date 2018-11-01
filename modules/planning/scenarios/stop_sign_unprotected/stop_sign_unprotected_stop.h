@@ -54,10 +54,7 @@ class StopSignUnprotectedStop : public Stage {
           watch_vehicles);
 
  private:
-  // TODO(all): move to scenario conf later
-  const float conf_stop_duration_ = 1.0f;
-  const double conf_min_pass_s_distance_ = 3.0;
-  const float conf_wait_timeout_ = 8.0;
+  ScenarioStopSignUnprotectedConfig scenario_config_;
 };
 
 }  // namespace stop_sign_protected

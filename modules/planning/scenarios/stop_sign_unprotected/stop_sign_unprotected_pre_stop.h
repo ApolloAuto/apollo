@@ -55,10 +55,7 @@ class StopSignUnprotectedPreStop : public Stage {
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
 
  private:
-  // TODO(all): move to scenario conf later
-  const double conf_watch_vehicle_max_valid_stop_distance_ = 5.0;
-  const double conf_max_valid_stop_distance_ = 3.5;
-  const double conf_max_adc_stop_speed_ = 0.3;
+  ScenarioStopSignUnprotectedConfig scenario_config_;
 };
 
 }  // namespace stop_sign_protected

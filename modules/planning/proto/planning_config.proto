@@ -115,7 +115,7 @@ message ScenarioConfig {
 
   message StageConfig {
       optional StageType stage_type = 1;
-      optional bool enabled = 2 [default=true];
+      optional bool enabled = 2 [default = true];
       // an ordered list of tasks that are used at runtime. Its order determines the runtime order of the tasks.
       repeated TaskConfig.TaskType task_type = 3;
       // an unordered task configurations
