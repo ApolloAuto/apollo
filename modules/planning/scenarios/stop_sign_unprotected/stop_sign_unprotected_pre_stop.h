@@ -36,47 +36,6 @@ namespace stop_sign_protected {
 
 struct StopSignUnprotectedContext;
 
-DECLARE_STAGE(StopSignUnprotectedIntersectionCruise,
-              StopSignUnprotectedContext);
-
-class StopSignUnprotectedCreep : public Stage {
- public:
-  explicit StopSignUnprotectedCreep(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
-
- private:
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-
-  StopSignUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<StopSignUnprotectedContext>();
-  }
-};
-
-class StopSignUnprotectedStop : public Stage {
- public:
-  explicit StopSignUnprotectedStop(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
-
- private:
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-  StopSignUnprotectedContext* GetContext() {
-    return GetContextAs<StopSignUnprotectedContext>();
-  }
-  int RemoveWatchVehicle(
-      const Obstacle& obstacle,
-      const std::vector<std::string>& watch_vehicle_ids,
-      std::unordered_map<std::string, std::vector<std::string>>*
-          watch_vehicles);
-
- private:
-  // TODO(all): move to scenario conf later
-  const float conf_stop_duration_ = 1.0f;
-  const double conf_min_pass_s_distance_ = 3.0;
-  const float conf_wait_timeout_ = 8.0;
-};
-
 class StopSignUnprotectedPreStop : public Stage {
  public:
   explicit StopSignUnprotectedPreStop(const ScenarioConfig::StageConfig& config)

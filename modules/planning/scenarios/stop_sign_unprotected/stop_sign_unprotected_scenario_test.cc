@@ -20,7 +20,7 @@
 
 #define protected public
 #define private public
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 
 #include <memory>
 
