@@ -202,8 +202,7 @@ int StopSignUnprotectedScenario::GetAssociatedLanes(
       if (lane == nullptr) {
         continue;
       }
-      const auto& stop_sign_overlaps = lane->stop_signs();
-      for (auto stop_sign_overlap : stop_sign_overlaps) {
+      for (const auto& stop_sign_overlap : lane->stop_signs()) {
         auto over_lap_info =
             stop_sign_overlap->GetObjectOverlapInfo(stop_sign.get()->id());
         if (over_lap_info != nullptr) {
