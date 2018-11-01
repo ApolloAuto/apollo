@@ -171,7 +171,7 @@ for i in range(0, size[0]):
                                       angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='y', facecolor='none')
     smoothing_arrow = patches.Arrow(
         opt_x_out[i], opt_y_out[i], 0.25*math.cos(opt_phi_out[i]), 0.25*math.sin(opt_phi_out[i]), 0.2, edgecolor='y',)
-    # ax.add_patch(smoothing_car)
+    ax.add_patch(smoothing_car)
     ax.add_patch(smoothing_arrow)
 
 ax.plot(sx, sy, "s")

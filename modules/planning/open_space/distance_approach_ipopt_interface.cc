@@ -276,7 +276,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       // a. norm(A'*lambda) = 1
-      g_l[constraint_index] = 1.0;
+      g_l[constraint_index] = 0.0;
       g_u[constraint_index] = 1.0;
 
       // b. G'*mu + R'*A*lambda = 0
