@@ -29,9 +29,10 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, sampler
 
 from sklearn.model_selection import train_test_split
+from sklearn.utils import class_weight
 
 from common.configure import parameters
 
@@ -41,8 +42,9 @@ dim_hidden_1 = parameters['cruise_mlp']['dim_hidden_1']
 dim_hidden_2 = parameters['cruise_mlp']['dim_hidden_2']
 dim_output = parameters['cruise_mlp']['dim_output']
 
-# CUDA setup
+# Setup
 cuda_is_available = torch.cuda.is_available()
+logging.basicConfig(filename='training.log', level=logging.INFO)
 
 #evaluation_log_path = os.path.join(os.getcwd(), "evaluation_report")
 #common.log.init_log(evaluation_log_path, level=logging.DEBUG)
@@ -134,7 +136,7 @@ class FCNN_CNN1D(torch.nn.Module):
                             nn.Dropout(0.1),\
 
                             nn.Linear(11, 1),\
-                            nn.Sigmoid()
+                            #nn.Sigmoid()
                                             )
         self.regress = torch.nn.Sequential(\
                             nn.Linear(124, 77),\
@@ -155,6 +157,7 @@ class FCNN_CNN1D(torch.nn.Module):
     def forward(self, x):
         lane_fea = x[:,23:]
         lane_fea = lane_fea.view(lane_fea.size(0), 6, 30)
+
         obs_fea = x[:,:23]
 
         lane_fea = self.lane_feature_conv(lane_fea)
@@ -178,7 +181,7 @@ Custom defined loss function that lumps the loss of classification and
 of regression together.
 '''
 def loss_fn(c_pred, r_pred, target):
-    loss_C = nn.BCELoss()
+    loss_C = nn.BCEWithLogitsLoss(pos_weight=torch.FloatTensor([39.0]).cuda()) #nn.BCELoss()
     loss_R = nn.MSELoss()
     loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
     #loss = 4 * loss_C(c_pred, target[:,0].view(target.shape[0],1)) + \
@@ -221,7 +224,7 @@ Preprocess the data:
     - shuffle data
 '''
 def data_preprocessing(data):
-    X = data[:, :dim_input]
+    X = data[:, :-dim_output]
     y = data[:, -dim_output:]
     y[:, 0] = (y[:, 0] > 0).astype(float)
 
@@ -246,6 +249,16 @@ def getListOfFiles(dirName):
     return allFiles
 
 '''
+Print the distribution of data labels.
+'''
+def print_dist(label):
+    unique_labels = np.unique(label)
+    for l in unique_labels:
+        print ('Label = {}: {}%'.format(l, np.sum(label==l)/len(label)*100))
+
+
+
+'''
 TODO: implement custom collate_fn to incorporate down-sampling function
 for certain labels.
 '''
@@ -261,9 +274,8 @@ class TrainValidDataset(Dataset):
       - root_dir (string): Directory containing all folders with different
         dates, each folder containing .cruise.h5 data files.
     '''
-    def __init__(self, root_dir):
-        self.root_dir_ = root_dir
-        self.list_of_files_ = getListOfFiles(self.root_dir_)
+    def __init__(self, list_of_files):
+        self.list_of_files_ = list_of_files
         self.data_size_until_this_file_ = []
         self.dataset_size = 0
         for file in self.list_of_files_:
@@ -312,6 +324,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
     logging.info('Epoch: {}'.format(epoch))
     num_of_data = train_X.shape[0]
     num_of_batch = int(num_of_data / batch_size) + 1
+    train_correct_class = 0.0
     for i in range(num_of_batch):
         optimizer.zero_grad()
         X = train_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
@@ -322,14 +335,21 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
         loss_history.append(loss.data[0])
         loss.backward()
         optimizer.step()
+        train_correct_class += \
+            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
+
 
         if i % 500 == 0:
             logging.info('Step: {}, train_loss: {}'.format(i, np.mean(loss_history[-100:])))
             print ("Step: {}, training loss: {}".format(i, np.mean(loss_history[-100:])))
 
+    train_classification_accuracy = train_correct_class / train_y.data.cpu().numpy().shape[0]
     train_loss = np.mean(loss_history)
     logging.info('Training loss: {}'.format(train_loss))
-    print ('Epoch: {}. Training Loss: {}'.format(epoch, train_loss))
+    print ('Epoch: {}.\n Training Loss: {}. Training classification accuracy: {}'\
+           .format(epoch, train_loss, train_classification_accuracy))
+    print ('Trainin accuracy: {}.'\
+        .format(train_classification_accuracy))
 
 '''
 Train the data. (using dataloader)
@@ -338,8 +358,11 @@ def train_dataloader(train_loader, model, optimizer, epoch):
     model.train()
 
     loss_history = []
+    train_correct_class = 0
+    total_size = 0
     logging.info('Epoch: {}'.format(epoch))
     for i, (inputs, targets) in enumerate(train_loader):
+        total_size += targets.shape[0]
         optimizer.zero_grad()
         if cuda_is_available:
             X = (inputs).float().cuda()
@@ -350,6 +373,9 @@ def train_dataloader(train_loader, model, optimizer, epoch):
         loss_history.append(loss.data[0])
         loss.backward()
         optimizer.step()
+
+        train_correct_class += \
+            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
         #if i > 100:
         #    break
@@ -461,24 +487,59 @@ if __name__ == "__main__":
     if (cuda_is_available):
         print ("Using CUDA to speed up training.")
         model.cuda()
-        #X_train = Variable(torch.FloatTensor(X_train).cuda())
-        #X_valid = Variable(torch.FloatTensor(X_valid).cuda())
-        #y_train = Variable(torch.FloatTensor(y_train).cuda())
-        #y_valid = Variable(torch.FloatTensor(y_valid).cuda())
+        X_train = Variable(torch.FloatTensor(X_train).cuda())
+        X_valid = Variable(torch.FloatTensor(X_valid).cuda())
+        y_train = Variable(torch.FloatTensor(y_train).cuda())
+        y_valid = Variable(torch.FloatTensor(y_valid).cuda())
 
     # Model training:
     for epoch in range(100):
-        train(X_train, y_train, model, optimizer, epoch)
-        valid_loss = validate(X_valid, y_valid, model)
+        train_vanilla(X_train, y_train, model, optimizer, epoch)
+        valid_loss = validate_vanilla(X_valid, y_valid, model)
         scheduler.step(valid_loss)
-        torch.save(model.state_dict(), './cruiseMLP_saved_model.pt')
+        #torch.save(model.state_dict(), './cruiseMLP_saved_model.pt')
+    
     '''
 
     train_dir = args.train_file
     valid_dir = args.valid_file
 
+    # Data preprocessing (training data balancing).
+    list_of_training_files = getListOfFiles(train_dir)
+    list_of_validation_files = getListOfFiles(valid_dir)
+
+    classes_train = []
+    for file in list_of_training_files:
+        with h5py.File(file, 'r') as h5_file:
+            data = h5_file[list(h5_file.keys())[0]][:,-2]
+            classes_train.append(data.tolist())
+    # "Flattening" the list of lists
+    classes_train = [item for sublist in classes_train for item in sublist]
+    classes_train = np.asarray(classes_train)
+    print ('Total number of training samples: {}'.format(len(classes_train)))
+    print ('Training set distribution:')
+    print_dist (classes_train)
+
+    classes_valid = []
+    for file in list_of_validation_files:
+        with h5py.File(file, 'r') as h5_file:
+            data = h5_file[list(h5_file.keys())[0]][:,-2]
+            classes_valid.append(data.tolist())
+    # "Flattening" the list of lists
+    classes_valid = [item for sublist in classes_valid for item in sublist]
+    classes_valid = np.asarray(classes_valid)
+    print ('Total number of validation samples: {}'.format(len(classes_valid)))
+    print ('Validation set distribution:')
+    print_dist (classes_valid)
+
+    #class_weights = class_weight.compute_class_weight('balanced', np.unique(classes_train), classes_train)
+    #weights = [class_weights[int(i+1)] for i in classes_train]
+    #weights = torch.DoubleTensor(weights)
+    #train_sampler = sampler.WeightedRandomSampler(weights, int(len(weights)/1), replacement=True)
+
+
     model = FCNN_CNN1D()
-    learning_rate = 1e-3
+    learning_rate = 6.561e-4
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau\
         (optimizer, factor=0.3, patience=2, min_lr=1e-8, verbose=1, mode='min')
@@ -486,15 +547,16 @@ if __name__ == "__main__":
         print ('Using CUDA to speed up training.')
         model.cuda()
 
-    train_dataset = TrainValidDataset(train_dir)
-    valid_dataset = TrainValidDataset(valid_dir)
+    train_dataset = TrainValidDataset(list_of_training_files)
+    valid_dataset = TrainValidDataset(list_of_validation_files)
 
-    train_loader  = DataLoader(train_dataset, batch_size=2048, num_workers=8, shuffle=True, pin_memory=True)
-    valid_loader = DataLoader(valid_dataset, batch_size=2048, num_workers=8, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=1024, num_workers=8, pin_memory=True, shuffle=True) #sampler=train_sampler)
+    valid_loader = DataLoader(valid_dataset, batch_size=1024, num_workers=8, pin_memory=True)
 
     for epoch in range(100):
         train_dataloader(train_loader, model, optimizer, epoch)
         valid_loss = validate_dataloader(valid_loader, model)
         scheduler.step(valid_loss)
+    
 
 # ========================================================================
