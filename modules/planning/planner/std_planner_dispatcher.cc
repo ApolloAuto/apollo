@@ -63,6 +63,7 @@ std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
                     nearest_lane->accumulate_s().back());
     std::vector<LaneSegment> segments_vector;
     int next_lanes_num = nearest_lane->lane().successor_id_size();
+    ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
     for (int i = 0; i < next_lanes_num; i++) {
       auto next_lane_id = nearest_lane->lane().successor_id(i);
       segments_vector.push_back(nearest_lanesegment);
@@ -74,7 +75,6 @@ std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
       std::unique_ptr<Path> path_ =
           std::unique_ptr<Path>(new Path(segments_vector));
       const auto& parking_space_overlaps = path_->parking_space_overlaps();
-      ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
       if (parking_space_overlaps.size() != 0) {
         for (const auto& parking_overlap : parking_space_overlaps) {
           if (parking_overlap.object_id == FLAGS_target_parking_spot_id) {

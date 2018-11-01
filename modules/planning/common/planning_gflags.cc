@@ -400,7 +400,7 @@ DEFINE_string(planner_open_space_config_filename,
               "/apollo/modules/planning/conf/planner_open_space_config.pb.txt",
               "The open space planner configuration file");
 
-DEFINE_string(target_parking_spot_id, "11315", "the test parking spot id");
+DEFINE_string(target_parking_spot_id, "11543", "the test parking spot id");
 
 DEFINE_double(
     parking_longitudinal_range, 15.0,
