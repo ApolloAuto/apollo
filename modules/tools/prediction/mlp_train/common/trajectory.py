@@ -224,7 +224,7 @@ class TrajectoryToSample(object):
                 # If step into another lane, label lane change to be started.
                 lane_id_j = trajectory[j].lane.lane_feature.lane_id
                 if lane_id_j not in curr_lane_seq:
-                    if has_started_lane_change = False:
+                    if has_started_lane_change == False:
                         has_started_lane_change = True
                         lane_change_start_time = time_span
                         lane_change_finish_time = 10.0
