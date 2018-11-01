@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/open_space/distance_approach_problem.h"
+#include "modules/planning/open_space/dual_variable_warm_start_problem.h"
 #include "modules/planning/open_space/hybrid_a_star.h"
 
 namespace apollo {
@@ -293,16 +294,52 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   double right_to_center = vehicle_param_.right_edge_to_center();
   ego_ << front_to_center, right_to_center, back_to_center, left_to_center;
 
+  // TODO(QiL) : add dual variable warm up here.
+
+  /*
+    const std::size_t obstacles_edges_num =
+        obstacles_ptr->GetObstaclesEdgesNum().sum();
+    Eigen::MatrixXd l_warm_up =
+        Eigen::MatrixXd::Ones(obstacles_edges_num, horizon_ + 1);
+
+    const std::size_t obstacles_num = obstacles_ptr->GetObstaclesNum();
+    Eigen::MatrixXd n_warm_up =
+        Eigen::MatrixXd::Ones(4 * obstacles_num, horizon_ + 1);
+  */
+
+  // result for distance approach problem
+  Eigen::MatrixXd l_warm_up;
+  Eigen::MatrixXd n_warm_up;
+
+  const double rx = xWS(0, horizon_);
+  const double ry = xWS(1, horizon_);
+  const double r_yaw = xWS(2, horizon_);
+
+  DualVariableWarmStartProblem* dual_variable_warm_start_ptr =
+      new DualVariableWarmStartProblem(planner_open_space_config_);
+
+  bool dual_variable_warm_start_status = dual_variable_warm_start_ptr->Solve(
+      horizon_, ts_, ego_, obstacles_ptr->GetObstaclesNum(),
+      obstacles_ptr->GetObstaclesEdgesNum(), obstacles_ptr->GetAMatrix(),
+      obstacles_ptr->GetbMatrix(), rx, ry, r_yaw, &l_warm_up, &n_warm_up);
+
+  if (dual_variable_warm_start_status) {
+    AINFO << "Dual variable problem solved successfully!";
+  } else {
+    AERROR << "DUal variable problem solving failed";
+    return false;
+  }
+
   DistanceApproachProblem* distance_approach_ptr =
       new DistanceApproachProblem(planner_open_space_config_);
 
   bool status = distance_approach_ptr->Solve(
-      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
-      obstacles_ptr->GetObstaclesNum(), obstacles_ptr->GetObstaclesEdgesNum(),
-      obstacles_ptr->GetAMatrix(), obstacles_ptr->GetbMatrix(),
-      result_ptr->PrepareStateResult(), result_ptr->PrepareControlResult(),
-      result_ptr->PrepareTimeResult(), result_ptr->PrepareLResult(),
-      result_ptr->PrepareNResult());
+      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, l_warm_up, n_warm_up,
+      XYbounds_, obstacles_ptr->GetObstaclesNum(),
+      obstacles_ptr->GetObstaclesEdgesNum(), obstacles_ptr->GetAMatrix(),
+      obstacles_ptr->GetbMatrix(), result_ptr->PrepareStateResult(),
+      result_ptr->PrepareControlResult(), result_ptr->PrepareTimeResult(),
+      result_ptr->PrepareLResult(), result_ptr->PrepareNResult());
   if (!status) {
     AINFO << "Distance fail";
     return false;

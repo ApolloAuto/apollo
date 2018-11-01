@@ -240,6 +240,7 @@ cc_binary(
     linkstatic = False,
     deps = [
         "//modules/planning/open_space:distance_approach_problem",
+        "//modules/planning/open_space:dual_variable_warm_start_problem",
         "//modules/planning/open_space:hybrid_a_star",
     ],
 )

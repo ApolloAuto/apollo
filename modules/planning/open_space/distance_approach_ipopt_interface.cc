@@ -26,17 +26,20 @@ namespace planning {
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     std::size_t horizon, float ts, Eigen::MatrixXd ego,
-    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS, Eigen::MatrixXd x0,
-    Eigen::MatrixXd xf, Eigen::MatrixXd last_time_u,
-    const std::vector<double>& XYbounds, Eigen::MatrixXd obstacles_edges_num,
-    std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-    const Eigen::MatrixXd& obstacles_b,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
+    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
+    const Eigen::MatrixXd& obstacles_edges_num, const std::size_t obstacles_num,
+    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
     : horizon_(horizon),
       ts_(ts),
       ego_(ego),
       xWS_(xWS),
       uWS_(uWS),
+      l_warm_up_(l_warm_up),
+      n_warm_up_(n_warm_up),
       x0_(x0),
       xf_(xf),
       last_time_u_(last_time_u),
@@ -365,7 +368,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * obstacles_edges_sum_;
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      x[index + j] = 0.5;
+      x[index + j] = l_warm_up_(j, i);
     }
   }
 
@@ -374,7 +377,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * 4 * obstacles_num_;
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      x[index + j] = 0.5;
+      x[index + j] = n_warm_up_(j, i);
     }
   }
   ADEBUG << "get_starting_point out";

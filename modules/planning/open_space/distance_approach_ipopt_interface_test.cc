@@ -72,9 +72,9 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
 void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
   obstacles_edges_num_ = 4 * Eigen::MatrixXd::Ones(obstacles_num_, 1);
   ptop_.reset(new DistanceApproachIPOPTInterface(
-      horizon_, ts_, ego_, xWS_, uWS_, x0_, xf_, last_time_u_, XYbounds_,
-      obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_,
-      planner_open_space_config_));
+      horizon_, ts_, ego_, xWS_, uWS_, l_warm_up_, n_warm_up_, x0_, xf_,
+      last_time_u_, XYbounds_, obstacles_edges_num_, obstacles_num_,
+      obstacles_A_, obstacles_b_, planner_open_space_config_));
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {

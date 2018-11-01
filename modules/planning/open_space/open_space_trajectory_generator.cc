@@ -148,9 +148,9 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
          << planner_open_space_config_.dual_variable_warm_start_config()
                 .ShortDebugString();
 
-  const double rx = 0.0;
-  const double ry = 0.0;
-  const double r_yaw = 0.0;
+  const double rx = xWS(0, horizon_);
+  const double ry = xWS(1, horizon_);
+  const double r_yaw = xWS(2, horizon_);
 
   // result for distance approach problem
   Eigen::MatrixXd l_warm_up;
@@ -181,8 +181,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 
   // TODO(QiL): Pass dual variable warm start result in.
   bool distance_approach_status = distance_approach_->Solve(
-      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
-      obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
+      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, l_warm_up, n_warm_up,
+      XYbounds_, obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
       &state_result_ds, &control_result_ds, &time_result_ds, &dual_l_result_ds,
       &dual_n_result_ds);
 
