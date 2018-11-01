@@ -11,3 +11,25 @@ extrinsic_file {
     file_path: "/apollo/modules/localization/msf/params/novatel_localization_extrinsics.yaml"
     enable: true
 }
+
+#extrinsic_file {
+#    frame_id: "world"
+#    child_frame_id: "novatel"
+#    file_path: "/apollo/modules/localization/msf/params/novatel_world_extrinsics.yaml"
+#    enable: true
+#}
+
+
+extrinsic_file {
+    frame_id: "velodyne128"
+    child_frame_id: "front_6mm"
+    file_path: "/apollo/modules/perception/production/data/perception/camera/params/front_6mm_extrinsics.yaml"
+    enable: true
+}
+
+extrinsic_file {
+    frame_id: "velodyne128"
+    child_frame_id: "front_12mm"
+    file_path: "/apollo/modules/perception/production/data/perception/camera/params/front_12mm_extrinsics.yaml"
+    enable: true
+}
