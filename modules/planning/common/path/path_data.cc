@@ -227,9 +227,10 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
 bool PathData::LeftTrimWithRefS(const double ref_s, const double ref_l) {
   CHECK_NOTNULL(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
-  common::FrenetFramePoint init_point;
-  init_point.set_s(ref_s);
-  init_point.set_l(ref_l);
+  frenet_frame_points.emplace_back();
+  frenet_frame_points.back().set_s(ref_s);
+  frenet_frame_points.back().set_l(ref_l);
+
   for (const common::FrenetFramePoint frenet_point : frenet_path_.points()) {
     if (std::fabs(frenet_point.s() - ref_s) < 1e-6) {
       continue;
@@ -241,7 +242,7 @@ bool PathData::LeftTrimWithRefS(const double ref_s, const double ref_l) {
   const FrenetFramePath frenet_path =
       FrenetFramePath(std::move(frenet_frame_points));
   SetFrenetPath(frenet_path);
-  return false;
+  return true;
 }
 
 bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
