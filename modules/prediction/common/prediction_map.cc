@@ -204,6 +204,36 @@ void PredictionMap::OnLane(
   }
 }
 
+std::shared_ptr<const LaneInfo> PredictionMap::GetMostLikelyCurrentLane(
+    const common::PointENU& position, const double radius,
+    const double heading, const double angle_diff_threshold) {
+  std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
+  if (HDMapUtil::BaseMap().GetLanesWithHeading(position, radius, heading,
+                                               angle_diff_threshold,
+                                               &candidate_lanes) != 0) {
+    return nullptr;
+  }
+  double min_angle_diff = 2.0 * M_PI;
+  std::shared_ptr<const LaneInfo> curr_lane_ptr = nullptr;
+  for (auto candidate_lane : candidate_lanes) {
+    if (!candidate_lane->IsOnLane({position.x(), position.y()})) {
+      continue;
+    }
+    double distance = 0.0;
+    common::PointENU nearest_point =
+        candidate_lane->GetNearestPoint(
+            {position.x(), position.y()}, &distance);
+    double nearest_point_heading = PathHeading(candidate_lane, nearest_point);
+    double angle_diff =
+        std::fabs(common::math::AngleDiff(heading, nearest_point_heading));
+    if (angle_diff < min_angle_diff) {
+      min_angle_diff = angle_diff;
+      curr_lane_ptr = candidate_lane;
+    }
+  }
+  return curr_lane_ptr;
+}
+
 bool PredictionMap::IsProjectionApproximateWithinLane(
     const Eigen::Vector2d& ego_position,
     const std::string& lane_id) {
