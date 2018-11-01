@@ -393,7 +393,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       feature_values->push_back(speed * speed * lane_point.kappa());
       // The lane-point's heading w.r.t. vehicle's facing direction:
       feature_values->push_back(common::math::AngleDiff
-                                    (heading, lane_pont.heading()));
+                                    (heading, lane_point.heading()));
       feature_values->push_back(diff_x);
       feature_values->push_back(diff_y);
     }
@@ -408,7 +408,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
                             feature_values->operator[](size - 6);
     double angle_new = std::atan2(diff_y_new, diff_x_new);
     double deviation_angle_new = angle_new - heading;
-    double relative_l_new = std::sqrt(diff_x_new * diff_x_new + 
+    double relative_l_new = std::sqrt(diff_x_new * diff_x_new +
                                       diff_y_new * diff_y_new)
                           * std::sin(deviation_angle_new);
     double centri_acc_new = 0.0;

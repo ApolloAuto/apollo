@@ -51,12 +51,13 @@ def extract_mlp_features(filename):
                 mlp_feature.append(lane_seq.features.mlp_features[j])
             mlp_feature.append(lane_seq.label)
             mlp_feature.append(lane_seq.time_to_lane_center)
+            mlp_feature.append(lane_seq.time_to_lane_edge)
             mlp_feature_np = np.array(mlp_feature)
             if mlp_features is None:
-                mlp_features = mlp_feature_np.reshape(1,mlp_feature_size+2)
+                mlp_features = mlp_feature_np.reshape(1,mlp_feature_size+3)
             else:
                 mlp_features = np.concatenate(
-                    (mlp_features, mlp_feature_np.reshape(1,mlp_feature_size+2)), axis=0)
+                    (mlp_features, mlp_feature_np.reshape(1,mlp_feature_size+3)), axis=0)
     if (mlp_features is None) or (np.size(mlp_features) == 0):
         return
     #mlp_features = mlp_features.reshape(
