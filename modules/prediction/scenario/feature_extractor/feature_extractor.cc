@@ -213,28 +213,21 @@ void FeatureExtractor::ExtractObstacleFeatures(
 
 LaneInfoPtr FeatureExtractor::GetEgoLane(const common::Point3D& position,
     const double heading) {
-  common::PointENU position_enu;
+  // TODO(all): move to gflags
+  apollo::common::PointENU position_enu;
   position_enu.set_x(position.x());
   position_enu.set_y(position.y());
   position_enu.set_z(position.z());
 
-  // TODO(all): make 1.0 a gflag
-  auto nearby_lanes = PredictionMap::GetNearbyLanes(position_enu, 1.0);
-  if (nearby_lanes.empty()) {
-    return nullptr;
-  }
-
-  // TODO(all): make this a gflag
-  double angle_threshold = M_PI * 0.25;
-
-  for (auto lane : nearby_lanes) {
-    auto heading_diff =
-        common::math::NormalizeAngle(heading - lane->Heading(0.0));
-    if (heading_diff < angle_threshold && heading_diff > -angle_threshold) {
-      return lane;
-    }
-  }
-  return nullptr;
+  double angle_diff_threshold = M_PI * 0.25;
+  double radius = 3.0;
+  std::shared_ptr<const LaneInfo> nearest_lane_ptr = nullptr;
+  double nearest_s = 0.0;
+  double nearest_l = 0.0;
+  HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+      position_enu, radius, heading, angle_diff_threshold,
+      &nearest_lane_ptr, &nearest_s, &nearest_l);
+  return nearest_lane_ptr;
 }
 
 }  // namespace prediction
