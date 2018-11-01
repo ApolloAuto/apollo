@@ -221,13 +221,8 @@ LaneInfoPtr FeatureExtractor::GetEgoLane(const common::Point3D& position,
 
   double angle_diff_threshold = M_PI * 0.25;
   double radius = 3.0;
-  std::shared_ptr<const LaneInfo> nearest_lane_ptr = nullptr;
-  double nearest_s = 0.0;
-  double nearest_l = 0.0;
-  HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-      position_enu, radius, heading, angle_diff_threshold,
-      &nearest_lane_ptr, &nearest_s, &nearest_l);
-  return nearest_lane_ptr;
+  return PredictionMap::GetMostLikelyCurrentLane(position_enu, radius,
+      heading, angle_diff_threshold);
 }
 
 }  // namespace prediction

@@ -151,6 +151,19 @@ class PredictionMap {
       std::vector<std::shared_ptr<const hdmap::LaneInfo>>* lanes);
 
   /**
+   * @brief Get the lane that the position is on with minimal angle diff
+   * @param position the position of an obstacle
+   * @param radius The searching radius
+   * @param heading The specified heading
+   * @param angle_diff_threshold Threshold of angle diff
+   * @return A pointer to a lane info
+   */
+  static std::shared_ptr<const apollo::hdmap::LaneInfo>
+  GetMostLikelyCurrentLane(
+      const common::PointENU& position, const double radius,
+      const double heading, const double angle_diff_threshold);
+
+  /**
    * @brief Check whether the projection of ego vehicle is on the target lane.
    *        Note: the direction of the lane is approximated
    *              by the terminal points.
