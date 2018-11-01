@@ -62,6 +62,21 @@ message TaskConfig {
   }
 }
 
+message ScenarioLaneFollowConfig {
+}
+
+message ScenarioSidePassConfig {
+}
+
+message ScenarioStopSignUnprotectedConfig {
+  optional uint32 start_stop_sign_timer = 1 [default = 10];  // sec
+  optional double watch_vehicle_max_valid_stop_distance = 2 [default = 5.0];  // meter
+  optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
+  optional double max_adc_stop_speed = 4 [default = 0.3];  // m/s
+  optional float stop_duration = 5 [default = 1.0];
+  optional double min_pass_s_distance = 6 [default = 3.0];  // meter
+  optional float wait_timeout = 7 [default = 8.0];  // secoond
+}
 
 // scenario configs
 message ScenarioConfig {
@@ -78,8 +93,6 @@ message ScenarioConfig {
     TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED = 9;
     TRAFFIC_LIGHT_GO_THROUGH = 10;
   }
-
-  optional ScenarioType scenario_type = 1;
 
   // StageType is a superset of stages from all scenarios.
   // It is created to keep different scenarios have uniform config interface
@@ -109,10 +122,16 @@ message ScenarioConfig {
       repeated TaskConfig task_config = 4;
   }
 
+  optional ScenarioType scenario_type = 1;
   // a list of stages that are used at runtime.  The first one is default stage.
   repeated StageType stage_type = 2;
   // an unordered list of stage configs.
   repeated StageConfig stage_config = 3;
+  oneof scenario_config {
+    ScenarioLaneFollowConfig lane_follow_config = 4;
+	ScenarioSidePassConfig side_pass_config = 5;
+	ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 6;
+  }
 }
 
 message PlannerPublicRoadConfig {
