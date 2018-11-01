@@ -50,6 +50,19 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     AERROR << "path data is empty.";
     return Stage::ERROR;
   }
+
+  if (!GetContext()->path_data_.UpdateFrenetFramePath(&reference_line)) {
+    return Stage::ERROR;
+  }
+
+  const auto adc_frenet_frame_point_ =
+      reference_line.GetFrenetPoint(frame->PlanningStartPoint());
+
+  if (!GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_.s(),
+                                                 adc_frenet_frame_point_.l())) {
+    return Stage::ERROR;
+  }
+
   PathPoint first_path_point =
       GetContext()->path_data_.discretized_path().path_points().front();
 

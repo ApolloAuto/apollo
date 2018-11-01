@@ -57,7 +57,7 @@ class PathData {
   bool GetPathPointWithRefS(const double ref_s,
                             common::PathPoint *const path_point) const;
 
-  bool LeftTrimWithRefS(const double ref_s);
+  bool LeftTrimWithRefS(const double ref_s, const double ref_l);
 
   bool UpdateFrenetFramePath(const ReferenceLine *reference_line);
 
