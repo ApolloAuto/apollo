@@ -50,9 +50,6 @@ class ObstacleClusters {
       const double start_s, const double length,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
-  static const JunctionFeature& GetJunctionFeature(
-      const std::string& start_lane_id, const std::string& junction_id);
-
   /**
    * @brief Get the nearest obstacle on lane sequence at s
    * @param Lane sequence
@@ -115,12 +112,8 @@ class ObstacleClusters {
 
   static void Clear();
 
-  static JunctionExit BuildJunctionExit(
-      const std::shared_ptr<const apollo::hdmap::LaneInfo> exit_lane);
-
  private:
   static std::unordered_map<std::string, LaneGraph> lane_graphs_;
-  static std::unordered_map<std::string, JunctionFeature> junction_features_;
   static std::unordered_map<std::string,
                             std::vector<LaneObstacle>> lane_obstacles_;
 };
