@@ -108,6 +108,24 @@ std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
   return junction_exits;
 }
 
+const JunctionFeature& JunctionAnalyzer::GetJunctionFeature(
+    const std::string& start_lane_id) {
+  if (junction_features_.find(start_lane_id) != junction_features_.end()) {
+    return junction_features_[start_lane_id];
+  }
+  JunctionFeature junction_feature;
+  // TODO(all) not fill enter_lane yet
+  junction_feature.set_junction_id(GetJunctionId());
+  junction_feature.set_junction_range(ComputeJunctionRange());
+  std::vector<JunctionExit> junction_exits = GetJunctionExits(start_lane_id);
+
+  for (const auto& junction_exit : junction_exits) {
+    junction_feature.add_junction_exit()->CopyFrom(junction_exit);
+  }
+  junction_features_[start_lane_id] = junction_feature;
+  return junction_features_[start_lane_id];
+}
+
 bool JunctionAnalyzer::IsExitLane(const std::string& lane_id) {
   return junction_exits_.find(lane_id) != junction_exits_.end();
 }

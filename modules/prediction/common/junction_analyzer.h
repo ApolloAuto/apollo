@@ -54,18 +54,26 @@ class JunctionAnalyzer {
   static double ComputeJunctionRange();
 
   /**
-   * @brief Get all filtered junction exits associated to start lane ID
+   * @brief Get junction feature starting from start_lane_id
    * @param start lane ID
-   * @return Filtered junction exits
+   * @return junction
    */
-  static std::vector<JunctionExit>
-  GetJunctionExits(const std::string& start_lane_id);
+  static const JunctionFeature& GetJunctionFeature(
+      const std::string& start_lane_id);
 
  private:
   /**
    * @brief Set all junction exits in the hashtable junction_exits_
    */
   static void SetAllJunctionExits();
+
+  /**
+   * @brief Get all filtered junction exits associated to start lane ID
+   * @param start lane ID
+   * @return Filtered junction exits
+   */
+  static std::vector<JunctionExit>
+  GetJunctionExits(const std::string& start_lane_id);
 
   /**
    * @brief Determine if a lane with lane_id is an exit lane of this junction
