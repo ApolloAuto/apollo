@@ -37,14 +37,16 @@ constexpr std::size_t N = 80;
 DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
     int num_of_variables, int num_of_constraints, std::size_t horizon, float ts,
     const Eigen::MatrixXd& ego, const Eigen::MatrixXd& obstacles_edges_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const double rx, const double ry, const double r_yaw)
+    const std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
+    const Eigen::MatrixXd& obstacles_b, const double rx, const double ry,
+    const double r_yaw)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
       ts_(ts),
       ego_(ego),
       obstacles_edges_num_(obstacles_edges_num),
+      obstacles_num_(obstacles_num),
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b),
       rx_(rx),
@@ -76,7 +78,16 @@ bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
   // number of nonzero hessian and lagrangian.
 
   // TODO(QiL) : Update nnz_jac_g;
-  nnz_jac_g = 0;
+  int tmp = 0;
+
+  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+      std::size_t current_edges_num = obstacles_edges_num_(j, 0);
+      tmp += current_edges_num * 4 + 9 + 4 + 1;
+    }
+  }
+
+  nnz_jac_g = tmp - 1;
 
   // TODO(QiL) : Update nnz_h_lag;
   nnz_h_lag = 0;
@@ -114,7 +125,6 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
       ++n_index;
     }
   }
-
   // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
@@ -255,7 +265,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_h(int n, const double* x,
                                                  bool new_lambda, int nele_hess,
                                                  int* iRow, int* jCol,
                                                  double* values) {
-  return true;
+  return false;
 }
 
 bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,

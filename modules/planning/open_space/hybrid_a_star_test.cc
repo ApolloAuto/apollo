@@ -24,6 +24,7 @@
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/hybrid_a_star.h"
 
 namespace apollo {
@@ -35,6 +36,10 @@ using apollo::common::math::Vec2d;
 class HybridATest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    FLAGS_planner_open_space_config_filename =
+        "/apollo/modules/planning/testdata/conf/"
+        "open_space_standard_parking_lot.pb.txt";
+
     CHECK(apollo::common::util::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "

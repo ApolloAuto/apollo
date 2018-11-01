@@ -30,6 +30,10 @@ namespace planning {
 class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    FLAGS_planner_open_space_config_filename =
+        "/apollo/modules/planning/testdata/conf/"
+        "open_space_standard_parking_lot.pb.txt";
+
     CHECK(apollo::common::util::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
@@ -46,22 +50,16 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
   std::size_t obstacles_num_ = 10;
   float ts_ = 0.01;
   Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
-  Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
-  Eigen::MatrixXd xf_ = 10 * Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
-  std::vector<double> XYbounds_ = {1.0, 1.0, 1.0, 1.0};
-  Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Ones(4, 6);
-  Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
   Eigen::MatrixXd obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
   Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
-  int num_of_variables_;
+  int num_of_variables_ = 0;
   double rx_ = 0.0;
   double ry_ = 0.0;
   double r_yaw_ = 0.0;
-  bool use_fix_time_ = false;
 
-  int num_of_constraints_;
+  int num_of_constraints_ = 0;
 
   std::unique_ptr<DualVariableWarmStartIPOPTInterface> ptop_ = nullptr;
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
@@ -78,7 +76,8 @@ void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
 
   ptop_.reset(new DualVariableWarmStartIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_,
-      obstacles_edges_num_, obstacles_A_, obstacles_b_, rx_, ry_, r_yaw_));
+      obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_, rx_,
+      ry_, r_yaw_));
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, initilization) {
@@ -91,7 +90,7 @@ TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_nlp_info) {
   ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
   EXPECT_EQ(n, num_of_variables_);
   EXPECT_EQ(m, num_of_constraints_);
-  EXPECT_EQ(nnz_jac_g, 0);
+  EXPECT_EQ(nnz_jac_g, 1799);
   EXPECT_EQ(nnz_h_lag, 0);
   EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
 }
@@ -130,6 +129,7 @@ TEST_F(DualVariableWarmStartIPOPTInterfaceTest, eval_f) {
   double x[kNumOfVariables];
   std::fill_n(x, kNumOfVariables, 1.2);
   bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
+  EXPECT_DOUBLE_EQ(obj_value, 72.000000000000085);
   EXPECT_TRUE(res);
 }
 

@@ -165,17 +165,17 @@ cc_test(
     ],
 )
 
-#cc_test(
-#    name = "dual_variable_warm_start_ipopt_interface_test",
-#    size = "small",
-#    srcs = [
-#        "dual_variable_warm_start_ipopt_interface_test.cc",
-#    ],
-#    deps = [
-#        ":dual_variable_warm_start_ipopt_interface",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "dual_variable_warm_start_ipopt_interface_test",
+    size = "small",
+    srcs = [
+        "dual_variable_warm_start_ipopt_interface_test.cc",
+    ],
+    deps = [
+        ":dual_variable_warm_start_ipopt_interface",
+        "@gtest//:main",
+    ],
+)
 
 cc_test(
     name = "dual_variable_warm_start_problem_test",
