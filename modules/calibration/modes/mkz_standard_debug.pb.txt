@@ -102,6 +102,9 @@ modules {
 monitored_components {
   key: "Recorder"
   value: {
+    process {
+      command_keywords: "cyber_recorder"
+    }
     resource {
       disk_spaces {
         # For logs.
@@ -119,6 +122,12 @@ monitored_components {
   }
 }
 monitored_components {
+  key: "GPS"
+  value: {
+    # Special GPSMonitor.
+  }
+}
+monitored_components {
   key: "Localization"
   value: {
     # Special LocalizationMonitor.
@@ -128,12 +137,6 @@ monitored_components {
   key: "ESD-CAN"
   value: {
     # Special EsdCanMonitor.
-  }
-}
-monitored_components {
-  key: "Localization"
-  value: {
-    # Special LocalizationMonitor.
   }
 }
 monitored_components {
