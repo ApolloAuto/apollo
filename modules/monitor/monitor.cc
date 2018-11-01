@@ -17,59 +17,62 @@
 
 #include "modules/common/time/time.h"
 #include "modules/monitor/common/monitor_manager.h"
-#include "modules/monitor/hardware/gps/gps_monitor.h"
+#include "modules/monitor/hardware/esdcan_monitor.h"
+#include "modules/monitor/hardware/gps_monitor.h"
 #include "modules/monitor/hardware/resource_monitor.h"
+#include "modules/monitor/hardware/socket_can_monitor.h"
+#include "modules/monitor/software/channel_monitor.h"
+#include "modules/monitor/software/functional_safety_monitor.h"
 #include "modules/monitor/software/localization_monitor.h"
 #include "modules/monitor/software/process_monitor.h"
 #include "modules/monitor/software/summary_monitor.h"
-#include "modules/monitor/software/topic_monitor.h"
 
-DEFINE_double(monitor_running_interval, 0.5, "Monitor running interval.");
+DEFINE_bool(enable_functional_safety, true,
+            "Whether to enable functional safety check.");
 
 namespace apollo {
 namespace monitor {
 
 bool Monitor::Init() {
-  MonitorManager::Init(node_);
+  MonitorManager::Instance()->Init(node_);
 
-  // TODO(xiaoxq): Migrate CAN monitor.
-  // runners_.emplace_back(new CanMonitor());
+  // Only the one CAN card corresponding to current mode will take effect.
+  runners_.emplace_back(new EsdCanMonitor());
+  runners_.emplace_back(new SocketCanMonitor());
+  // To enable the GpsMonitor, you must add FLAGS_gps_component_name to the
+  // mode's monitored_components.
   runners_.emplace_back(new GpsMonitor());
+  // To enable the LocalizationMonitor, you must add
+  // FLAGS_localization_component_name to the mode's monitored_components.
   runners_.emplace_back(new LocalizationMonitor());
+  // Monitor if processes are running.
   runners_.emplace_back(new ProcessMonitor());
+  // Monitor if channel messages are updated in time.
+  runners_.emplace_back(new ChannelMonitor());
+  // Monitor if resources are sufficient.
+  runners_.emplace_back(new ResourceMonitor());
 
-  const auto &config = MonitorManager::GetConfig();
-
-  for (const auto &module : config.modules()) {
-    if (module.has_topic_conf()) {
-      auto *module_status = MonitorManager::GetModuleStatus(module.name());
-      runners_.emplace_back(new TopicMonitor(
-          module.topic_conf(), module_status->mutable_topic_status()));
-    }
-  }
-  for (const auto &hardware : config.hardware()) {
-    if (hardware.has_topic_conf()) {
-      auto *hw_status = MonitorManager::GetHardwareStatus(hardware.name());
-      runners_.emplace_back(new TopicMonitor(
-          hardware.topic_conf(), hw_status->mutable_topic_status()));
-    }
-  }
-
-  // Register resource monitor.
-  runners_.emplace_back(new ResourceMonitor(config.resource_conf()));
-
-  // Register the SummaryMonitor as last runner, so it will monitor all changes
-  // made by the previous runners.
+  // Monitor all changes made by each sub-monitor, and summarize to a final
+  // overall status.
   runners_.emplace_back(new SummaryMonitor());
+  // Check functional safety according to the summary.
+  if (FLAGS_enable_functional_safety) {
+    runners_.emplace_back(new FunctionalSafetyMonitor());
+  }
+
   return true;
 }
 
 bool Monitor::Proc() {
+  if (!MonitorManager::Instance()->StartFrame()) {
+    return false;
+  }
   const double current_time = apollo::common::time::Clock::NowInSeconds();
-  MonitorManager::InitFrame(current_time);
-  for (auto &runner : runners_) {
+  for (auto& runner : runners_) {
     runner->Tick(current_time);
   }
+  MonitorManager::Instance()->EndFrame();
+
   return true;
 }
 

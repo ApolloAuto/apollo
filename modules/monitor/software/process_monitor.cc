@@ -16,11 +16,12 @@
 
 #include "modules/monitor/software/process_monitor.h"
 
-#include "gflags/gflags.h"
 #include "cyber/common/log.h"
+#include "gflags/gflags.h"
 #include "modules/common/util/file.h"
-#include "modules/common/util/string_util.h"
+#include "modules/common/util/map_util.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/monitor/software/summary_monitor.h"
 
 DEFINE_string(process_monitor_name, "ProcessMonitor",
               "Name of the process monitor.");
@@ -30,19 +31,6 @@ DEFINE_double(process_monitor_interval, 1.5,
 
 namespace apollo {
 namespace monitor {
-namespace {
-
-template <class Iterable>
-bool ContainsAll(const std::string &full, const Iterable &parts) {
-  for (const auto &part : parts) {
-    if (full.find(part) == std::string::npos) {
-      return false;
-    }
-  }
-  return true;
-}
-
-}  // namespace
 
 ProcessMonitor::ProcessMonitor()
     : RecurrentRunner(FLAGS_process_monitor_name,
@@ -51,50 +39,58 @@ ProcessMonitor::ProcessMonitor()
 
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.
-  std::map<std::string, std::string> running_processes;
-  const auto procs = common::util::ListSubPaths("/proc");
-  for (const auto &proc : procs) {
+  std::vector<std::string> running_processes;
+  for (const auto& cmd_file : apollo::common::util::Glob("/proc/*/cmdline")) {
     // Get process command string.
     std::string cmd_string;
-    const auto cmd_file = common::util::StrCat("/proc/", proc, "/cmdline");
-    if (common::util::GetContent(cmd_file, &cmd_string)) {
-      running_processes.emplace(proc, cmd_string);
+    if (apollo::common::util::GetContent(cmd_file, &cmd_string)) {
+      running_processes.push_back(cmd_string);
     }
   }
 
-  for (const auto &module : MonitorManager::GetConfig().modules()) {
-    if (module.has_process_conf()) {
-      UpdateModule(module.name(), module.process_conf(), running_processes);
+  auto& manager = MonitorManager::Instance();
+  const auto& mode = manager->GetHMIMode();
+
+  // Check HMI modules.
+  auto* hmi_modules = manager->GetStatus()->mutable_hmi_modules();
+  for (const auto& iter : mode.modules()) {
+    const std::string& module_name = iter.first;
+    const auto& config = iter.second.process_monitor_config();
+    UpdateStatus(running_processes, config, &hmi_modules->at(module_name));
+  }
+
+  // Check monitored components.
+  auto* components = manager->GetStatus()->mutable_components();
+  for (const auto& iter : mode.monitored_components()) {
+    const std::string& name = iter.first;
+    if (iter.second.has_process() &&
+        apollo::common::util::ContainsKey(*components, name)) {
+      const auto& config = iter.second.process();
+      auto* status = components->at(name).mutable_process_status();
+      UpdateStatus(running_processes, config, status);
     }
   }
 }
 
-void ProcessMonitor::UpdateModule(
-    const std::string &module_name, const ProcessConf &config,
-    const std::map<std::string, std::string> &running_processes) {
-  auto *status = MonitorManager::GetModuleStatus(module_name);
-  for (const auto &proc : running_processes) {
-    if (ContainsAll(proc.second, config.process_cmd_keywords())) {
-      status->mutable_process_status()->set_running(true);
-      ADEBUG << "Module " << module_name
-             << " is running on process " << proc.first;
+void ProcessMonitor::UpdateStatus(
+    const std::vector<std::string>& running_processes,
+    const apollo::dreamview::ProcessMonitorConfig& config,
+    ComponentStatus* status) {
+  for (const auto& command : running_processes) {
+    bool all_keywords_matched = true;
+    for (const auto& keyword : config.command_keywords()) {
+      if (command.find(keyword) == std::string::npos) {
+        all_keywords_matched = false;
+        break;
+      }
+    }
+    if (all_keywords_matched) {
+      // Process command keywords are all matched. The process is running.
+      SummaryMonitor::EscalateStatus(ComponentStatus::OK, command, status);
       return;
     }
   }
-
-  if (status->process_status().running()) {
-    // The process stopped. Send monitor log.
-    const std::string msg = apollo::common::util::StrCat(
-        module_name, " process stopped!");
-    // In autonomous driving mode, it's a critical error. Or else just warn.
-    if (MonitorManager::IsInAutonomousDriving()) {
-      MonitorManager::LogBuffer().ERROR(msg);
-    } else {
-      MonitorManager::LogBuffer().WARN(msg);
-    }
-  }
-
-  status->mutable_process_status()->set_running(false);
+  SummaryMonitor::EscalateStatus(ComponentStatus::FATAL, "", status);
 }
 
 }  // namespace monitor

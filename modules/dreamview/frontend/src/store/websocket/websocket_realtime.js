@@ -38,9 +38,6 @@ export default class RosWebSocketEndpoint {
         this.worker.onmessage = event => {
             const message = event.data;
             switch (message.type) {
-                case "HMIConfig":
-                    STORE.hmi.initialize(message.data);
-                    break;
                 case "HMIStatus":
                     STORE.hmi.updateStatus(message.data);
                     RENDERER.updateGroundImage(STORE.hmi.currentMap);
@@ -198,60 +195,51 @@ export default class RosWebSocketEndpoint {
 
     changeSetupMode(mode) {
         this.websocket.send(JSON.stringify({
-            type: "ChangeMode",
-            new_mode: mode,
-        }));
-    }
-
-    changeLaunch(launch) {
-        this.websocket.send(JSON.stringify({
-            type: "ChangeLaunch",
-            new_launch: launch,
+            type: "HMIAction",
+            action: "CHANGE_MODE",
+            value: mode,
         }));
     }
 
     changeMap(map) {
         this.websocket.send(JSON.stringify({
-            type: "ChangeMap",
-            new_map: map,
+            type: "HMIAction",
+            action: "CHANGE_MAP",
+            value: map,
         }));
         this.updatePOI = true;
     }
 
-    changeVehicle(vehcile) {
+    changeVehicle(vehicle) {
         this.websocket.send(JSON.stringify({
-            type: "ChangeVehicle",
-            new_vehicle: vehcile,
+            type: "HMIAction",
+            action: "CHANGE_VEHICLE",
+            value: vehicle,
         }));
     }
 
-    executeModeCommand(command) {
+    executeModeCommand(action) {
+        if (!['SETUP_MODE', 'RESET_MODE', 'ENTER_AUTO_MODE'].includes(action)) {
+            console.error("Unknown mode command found:", action);
+            return;
+        }
+
         this.websocket.send(JSON.stringify({
-            type: "ExecuteModeCommand",
-            command: command,
+            type: "HMIAction",
+            action: action,
         }));
     }
 
-    executeModuleCommand(module, command) {
-        this.websocket.send(JSON.stringify({
-            type: "ExecuteModuleCommand",
-            module: module,
-            command: command,
-        }));
-    }
+    executeModuleCommand(moduleName, command) {
+        if (!['START_MODULE', 'STOP_MODULE'].includes(command)) {
+            console.error("Unknown module command found:", command);
+            return;
+        }
 
-    executeToolCommand(tool, command) {
         this.websocket.send(JSON.stringify({
-            type: "ExecuteToolCommand",
-            tool: tool,
-            command: command,
-        }));
-    }
-
-    changeDrivingMode(mode) {
-        this.websocket.send(JSON.stringify({
-            type: "ChangeDrivingMode",
-            new_mode: mode,
+            type: "HMIAction",
+            action: command,
+            module: moduleName
         }));
     }
 
@@ -266,8 +254,9 @@ export default class RosWebSocketEndpoint {
 
     sendAudioPiece(data) {
         this.websocket.send(JSON.stringify({
-            type: "AudioPiece",
-            data: btoa(String.fromCharCode(...data)),
+            type: "HMIAction",
+            action: "RECORD_AUDIO",
+            value: btoa(String.fromCharCode(...data)),
         }));
     }
 

@@ -15,22 +15,22 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
-#include <vector>
-
+#include "modules/dreamview/proto/hmi_mode.pb.h"
 #include "modules/monitor/common/recurrent_runner.h"
-#include "modules/monitor/proto/monitor_conf.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
 
 namespace apollo {
 namespace monitor {
 
 class ResourceMonitor : public RecurrentRunner {
  public:
-  explicit ResourceMonitor(const ResourceConf& config);
+  ResourceMonitor();
   void RunOnce(const double current_time) override;
 
  private:
-  const ResourceConf& config_;
+  static void UpdateStatus(
+      const apollo::dreamview::ResourceMonitorConfig& config,
+      ComponentStatus* status);
 };
 
 }  // namespace monitor

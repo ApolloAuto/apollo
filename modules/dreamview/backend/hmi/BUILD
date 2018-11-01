@@ -63,25 +63,16 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
-        "//modules/common/kv_db",
         "//modules/common/proto:drive_event_proto",
         "//modules/common/util:map_util",
         "//modules/common/util:message_util",
+        "//modules/common/util:yaml_util",
         "//modules/data/util:info_collector",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/proto:hmi_config_proto",
+        "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/dreamview/proto:hmi_status_proto",
         "@com_google_protobuf//:protobuf",
-    ],
-)
-
-cc_test(
-    name = "hmi_worker_test",
-    size = "small",
-    srcs = ["hmi_worker_test.cc"],
-    deps = [
-        ":hmi_worker",
-        "@gtest//:main",
     ],
 )
 

@@ -2,15 +2,13 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
-import "modules/monitor/proto/monitor_config.proto";
-
 enum HMIAction {
   // Simple HMI action without any parameter.
   NONE = 0;
-  SETUP_MODE = 1;       // Setup current mode.
-  RESET_MODE = 2;       // Reset current mode.
+  SETUP_MODE = 1;  // Setup current mode.
+  RESET_MODE = 2;  // Reset current mode.
   ENTER_AUTO_MODE = 3;  // Enter into auto driving mode.
-  DISENGAGE = 4;        // Disengage from auto driving mode.
+  DISENGAGE = 4;   // Disengage from auto driving mode.
 
   // HMI action with a value string parameter.
   CHANGE_MODE = 5;     // value = mode_name
@@ -21,62 +19,10 @@ enum HMIAction {
   RECORD_AUDIO = 10;   // value = audio_piece
 }
 
-message Module {
-  optional string start_command = 1;
-  optional string stop_command = 2;
-
-  // We use these keywords in monitor to check if the module is running.
-  optional apollo.monitor.ProcessConfig process_monitor_config = 3;
-  // Whether to trigger safe-mode if the module is down.
-  optional bool required_for_functional_safety = 4 [default = true];
-}
-
-message Component {
-  optional string display_name = 1;
-  // If the path is given, HMI will check if it's available.
-  optional string path = 2;
-
-  message Command {
-    // Command to be executed for debugging purpose.
-    optional string debug_cmd = 1;
-
-    // Command to be executed for production, which could be more robust with
-    // recovery mechanism such as supervisor tool.
-    // HMI will fallback to the debug command if it's not provided.
-    optional string prod_cmd = 2;
-  }
-  map<string, Command> commands = 3;
-}
-
-message Launch {
-  // Major Cyber components are configured in the launch file.
-  optional string path = 1;
-  // Addtional components besides those in launch file, such as data recorder.
-  repeated string additional_modules = 2;
-}
-
-message Mode {
-  // Modules are now bound to Launch.additional_modules.
-  repeated string live_modules = 1 [deprecated = true];
-  repeated string live_hardware = 2;
-
-  // TODO(xiaoxq): Migrate to Cyber.
-  optional string path = 3;  // /apollo/modules/calibration/modes/<name>.
-  map<string, Launch> launches = 4;  // {launch_name: launch_conf}
-}
-
 message HMIConfig {
-  optional string docker_image = 1;
-  map<string, Component> modules = 2;          // {module_name: module}
-  map<string, Component> hardware = 3;         // {hardware_name: hardware}
-  map<string, Component> tools = 4;            // {tool_name: tool}
-  map<string, string> available_maps = 5;      // {map_name: map_dir}
-  map<string, string> available_vehicles = 6;  // {vehicle_name: vehicle_dir}
-  map<string, Mode> modes = 7;                 // {mode_name: mode_config}
-  optional int32 utm_zone_id = 8;              // FLAGS_local_utm_zone_id
-  optional HMIAction chassis_high_beam_action = 10;
-
-  reserved 9;
+  map<string, string> modes = 1;  // {mode_name: mode_path}
+  map<string, string> maps = 2;  // {map_name: map_path}
+  map<string, string> vehicles = 3;  // {vehicle_name: vehicle_path}
 }
 
 message AudioCapture {

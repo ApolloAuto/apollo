@@ -4,10 +4,8 @@ import WS from "store/websocket";
 import UTTERANCE from "store/utterance";
 
 export default class HMI {
-
-    modes = {};
+    modes = [];
     @observable currentMode = 'none';
-    @observable currentLaunch = 'none';
 
     vehicles = [];
     @observable currentVehicle = 'none';
@@ -26,7 +24,7 @@ export default class HMI {
     @observable currentMap = 'none';
 
     @observable moduleStatus = observable.map();
-    @observable hardwareStatus = observable.map();
+    @observable componentStatus = observable.map();
     @observable enableStartAuto = false;
 
     displayName = {};
@@ -38,35 +36,6 @@ export default class HMI {
 
     @observable isMute = false;
 
-    @action initialize(config) {
-        if (config.dockerImage) {
-            this.dockerImage = config.dockerImage;
-        }
-        if (config.modes) {
-            this.modes = config.modes;
-        }
-        if (config.utmZoneId) {
-            this.utmZoneId = config.utmZoneId;
-        }
-        this.vehicles = Object.keys(config.availableVehicles).sort()
-            .map(name => {
-                return name;
-            });
-        this.maps = Object.keys(config.availableMaps).sort()
-            .map(name => {
-                return name;
-            });
-
-        Object.keys(config.modules).forEach(key => {
-            this.moduleStatus.set(key, false);
-            this.displayName[key] = config.modules[key].displayName;
-        });
-        Object.keys(config.hardware).forEach(key => {
-            this.hardwareStatus.set(key, 'NOT_READY');
-            this.displayName[key] = config.hardware[key].displayName;
-        });
-    }
-
     @action toggleCoDriverFlag() {
         this.isCoDriver = !this.isCoDriver;
     }
@@ -77,33 +46,58 @@ export default class HMI {
     }
 
     @action updateStatus(newStatus) {
+        if (newStatus.dockerImage) {
+            this.dockerImage = newStatus.dockerImage;
+        }
+        if (newStatus.utmZoneId) {
+            this.utmZoneId = newStatus.utmZoneId;
+        }
+
+        if (newStatus.modes) {
+            this.modes = newStatus.modes.sort();
+        }
         if (newStatus.currentMode) {
             this.currentMode = newStatus.currentMode;
         }
-        if (newStatus.currentLaunch) {
-            this.currentLaunch = newStatus.currentLaunch;
+
+        if (newStatus.maps) {
+            this.maps = newStatus.maps.sort();
         }
         if (newStatus.currentMap) {
             this.currentMap = newStatus.currentMap;
         }
+
+        if (newStatus.vehicles) {
+            this.vehicles = newStatus.vehicles.sort();
+        }
         if (newStatus.currentVehicle) {
             this.currentVehicle = newStatus.currentVehicle;
         }
-        if (newStatus.systemStatus) {
-            if (newStatus.systemStatus.modules) {
-                for (const key in newStatus.systemStatus.modules) {
-                    this.moduleStatus.set(key,
-                        newStatus.systemStatus.modules[key].processStatus.running);
-                }
+
+        if (newStatus.modules) {
+            const newKeyList = JSON.stringify(Object.keys(newStatus.modules).sort());
+            const curKeyList = JSON.stringify(this.moduleStatus.keys().sort());
+            if (newKeyList !== curKeyList) {
+                this.moduleStatus.clear();
             }
-            if (newStatus.systemStatus.hardware) {
-                for (const key in newStatus.systemStatus.hardware) {
-                    this.hardwareStatus.set(key, newStatus.systemStatus.hardware[key].summary);
-                }
+            for (const key in newStatus.modules) {
+                this.moduleStatus.set(key, newStatus.modules[key]);
             }
-            if (typeof newStatus.systemStatus.passengerMsg === "string") {
-                UTTERANCE.speakRepeatedly(newStatus.systemStatus.passengerMsg);
+        }
+
+        if (newStatus.monitoredComponents) {
+            const newKeyList = JSON.stringify(Object.keys(newStatus.monitoredComponents).sort());
+            const curKeyList = JSON.stringify(this.componentStatus.keys().sort());
+            if (newKeyList !== curKeyList) {
+                this.componentStatus.clear();
             }
+            for (const key in newStatus.monitoredComponents) {
+                this.componentStatus.set(key, newStatus.monitoredComponents[key]);
+            }
+        }
+
+        if (typeof newStatus.passengerMsg === "string") {
+            UTTERANCE.speakRepeatedly(newStatus.passengerMsg);
         }
     }
 
@@ -117,12 +111,8 @@ export default class HMI {
 
     @action toggleModule(id) {
         this.moduleStatus.set(id, !this.moduleStatus.get(id));
-        const command = this.moduleStatus.get(id) ? "start" : "stop";
+        const command = this.moduleStatus.get(id) ? "START_MODULE" : "STOP_MODULE";
         WS.executeModuleCommand(id, command);
-    }
-
-    @computed get showRTKCommands() {
-        return this.currentMode === "RTK Record / Replay";
     }
 
     @computed get inNavigationMode() {

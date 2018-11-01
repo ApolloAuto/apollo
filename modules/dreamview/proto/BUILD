@@ -56,9 +56,18 @@ cc_proto_library(
 proto_library(
     name = "hmi_config_proto_lib",
     srcs = ["hmi_config.proto"],
+)
+
+cc_proto_library(
+    name = "hmi_mode_proto",
     deps = [
-        "//modules/monitor/proto:monitor_config_proto_lib",
+        ":hmi_mode_proto_lib",
     ],
+)
+
+proto_library(
+    name = "hmi_mode_proto_lib",
+    srcs = ["hmi_mode.proto"],
 )
 
 cc_proto_library(

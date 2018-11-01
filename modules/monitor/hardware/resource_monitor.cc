@@ -17,12 +17,17 @@
 #include "modules/monitor/hardware/resource_monitor.h"
 
 #include <sstream>
+#include <string>
+
 #include "boost/filesystem.hpp"
+#include "cyber/common/log.h"
 #include "gflags/gflags.h"
 
-#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/map_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/monitor/software/summary_monitor.h"
 
 DEFINE_string(resource_monitor_name, "ResourceMonitor",
               "Name of the resource monitor.");
@@ -33,26 +38,51 @@ DEFINE_double(resource_monitor_interval, 5,
 namespace apollo {
 namespace monitor {
 
-ResourceMonitor::ResourceMonitor(const ResourceConf& config)
+using apollo::common::util::FindOrNull;
+using apollo::common::util::StrCat;
+
+ResourceMonitor::ResourceMonitor()
     : RecurrentRunner(FLAGS_resource_monitor_name,
-                      FLAGS_resource_monitor_interval),
-      config_(config) {}
+                      FLAGS_resource_monitor_interval) {
+}
 
 void ResourceMonitor::RunOnce(const double current_time) {
-  // Monitor directory available size.
-  for (const auto& dir_space : config_.dir_spaces()) {
-    const int min_available_gb = dir_space.min_available_gb();
-    for (const auto& path : apollo::common::util::Glob(dir_space.path())) {
+  auto& manager = MonitorManager::Instance();
+  const auto& mode = manager->GetHMIMode();
+  auto* components = manager->GetStatus()->mutable_components();
+  for (const auto& iter : mode.monitored_components()) {
+    const std::string& name = iter.first;
+    const auto& config = iter.second;
+    if (config.has_resource()) {
+      UpdateStatus(config.resource(),
+                   components->at(name).mutable_resource_status());
+    }
+  }
+}
+
+void ResourceMonitor::UpdateStatus(
+    const apollo::dreamview::ResourceMonitorConfig& config,
+    ComponentStatus* status) {
+  status->clear_status();
+  // Monitor available disk space.
+  for (const auto& disk_space : config.disk_spaces()) {
+    for (const auto& path : apollo::common::util::Glob(disk_space.path())) {
       const auto space = boost::filesystem::space(path);
       const int available_gb = space.available >> 30;
-      if (available_gb < min_available_gb) {
-        std::stringstream ss;
-        ss << path << " has only " << available_gb << "GB space left, while "
-           << min_available_gb << "GB is required.";
-        MonitorManager::LogBuffer().ERROR(ss.str());
+      if (available_gb < disk_space.insufficient_space_error()) {
+        const std::string err = StrCat(
+            path, " has insufficient space: ",
+            available_gb, "GB < ", disk_space.insufficient_space_error());
+        SummaryMonitor::EscalateStatus(ComponentStatus::ERROR, err, status);
+      } else if (available_gb < disk_space.insufficient_space_warning()) {
+        const std::string err = StrCat(
+            path, " has insufficient space: ",
+            available_gb, "GB < ", disk_space.insufficient_space_warning());
+        SummaryMonitor::EscalateStatus(ComponentStatus::WARN, err, status);
       }
     }
   }
+  SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", status);
 }
 
 }  // namespace monitor

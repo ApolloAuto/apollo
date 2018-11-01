@@ -1,0 +1,69 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+// For ProcessMonitor.
+message ProcessMonitorConfig {
+  repeated string command_keywords = 1;
+}
+
+// For ChannelMonitor.
+message ChannelMonitorConfig {
+  optional string name = 1;
+  optional double delay_fatal = 2 [default = 3.0];  // In seconds.
+}
+
+// For ResourceMonitor.
+message ResourceMonitorConfig {
+  message DiskSpace {
+    // Path to monitor space. Support wildcards like ? and *.
+    // If the path doens't exist, raise UNKNWON which will be ignored.
+    optional string path = 1;
+    optional int32 insufficient_space_warning = 2;  // In GB.
+    optional int32 insufficient_space_error = 3;
+  }
+  repeated DiskSpace disk_spaces = 1;
+}
+
+message MonitoredComponent {
+  // Note that modules that can be started / stopped by HMI should be configered
+  // in HMIConfig.
+  optional ProcessMonitorConfig process = 1;
+
+  // Generate SystemStatus.components[i].channel_status.
+  // OK if delay is not notable.
+  // FATAL if delay is larger than fatal_delay.
+  optional ChannelMonitorConfig channel = 2;
+
+  // Generate SystemStatus.components[i].resource_status.
+  // OK if all requirements are met.
+  // WARN/ERROR/FATAL if any requirement is below expectation.
+  optional ResourceMonitorConfig resource = 3;
+
+  // Whether to trigger safe-mode if the component is down.
+  optional bool required_for_safety = 4 [default = true];
+}
+
+// An module which can be started and stopped by HMI.
+message Module {
+  optional string start_command = 1;
+  optional string stop_command = 2;
+
+  // We use these keywords in monitor to check if the module is running.
+  optional ProcessMonitorConfig process_monitor_config = 3;
+  // Whether to trigger safe-mode if the module is down.
+  optional bool required_for_safety = 4 [default = true];
+}
+
+// A CyberModule will be translated to a regular Module upon loading.
+message CyberModule {
+  optional string process_name = 1;
+  repeated string dag_files = 2;
+  optional bool required_for_safety = 3 [default = true];
+}
+
+message HMIMode {
+  map<string, CyberModule> cyber_modules = 1;
+  map<string, Module> modules = 2;
+  map<string, MonitoredComponent> monitored_components = 3;
+}
