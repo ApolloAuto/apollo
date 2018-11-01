@@ -39,8 +39,9 @@ using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::PathOverlap;
 
 constexpr double kRoadBuffer = 0.2;
-constexpr double kObstacleBuffer = 0.2;
-constexpr double kPlanDistAfterObs = 3.0;
+constexpr double kObstacleBuffer = 0.4;
+constexpr double kPlanDistAfterObs = 5.0;
+constexpr double kSidePassPathLength = 50.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {
@@ -130,6 +131,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   path_data->SetReferenceLine(&reference_line_info->reference_line());
   path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
 
+  RecordDebugInfo(reference_line_info);
   return true;
 }
 
@@ -153,14 +155,14 @@ SidePassPathDecider::GetPathBoundaries(
   // a sweep-line method can be used. The code here leaves some room
   // for the sweep-line method.
   for (double curr_s = adc_frenet_frame_point_.s();
-       curr_s < std::min(kPlanDistAfterObs + nearest_obs_sl_boundary.end_s(),
-                         reference_line.Length());
+       curr_s < std::min(kSidePassPathLength, reference_line.Length());
        curr_s += s_increment) {
-    std::tuple<double, double, double> lateral_bound{curr_s, 0.0, 0.0};
+    std::tuple<double, double, double> lateral_bound{
+        curr_s - adc_frenet_frame_point_.s(), 0.0, 0.0};
 
     // Check if boundary should be dictated by obstacle or road
-    if (curr_s >= nearest_obs_sl_boundary.start_s() - kObstacleBuffer &&
-        curr_s <= nearest_obs_sl_boundary.end_s() + kObstacleBuffer) {
+    if (curr_s >= nearest_obs_sl_boundary.start_s() - kPlanDistAfterObs &&
+        curr_s <= nearest_obs_sl_boundary.end_s() + kPlanDistAfterObs) {
       is_blocked_by_obs = true;
     } else {
       is_blocked_by_obs = false;
@@ -267,6 +269,17 @@ const Obstacle *SidePassPathDecider::GetNearestObstacle(
     }
   }
   return nearest_obstacle;
+}
+
+void SidePassPathDecider::RecordDebugInfo(
+    ReferenceLineInfo *reference_line_info) {
+  const auto &path_points =
+      reference_line_info->path_data().discretized_path().path_points();
+  auto *ptr_optimized_path =
+      reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
+  ptr_optimized_path->set_name(Name());
+  ptr_optimized_path->mutable_path_point()->CopyFrom(
+      {path_points.begin(), path_points.end()});
 }
 
 }  // namespace planning

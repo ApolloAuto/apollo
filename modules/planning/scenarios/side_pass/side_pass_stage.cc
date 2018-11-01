@@ -128,7 +128,8 @@ Stage::StageStatus SidePassDetectSafety::Process(
   const PathDecision& path_decision =
       frame->reference_line_info().front().path_decision();
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    if (obstacle->IsVirtual() &&
+    // TODO(All): check according to neighbor lane.
+    if (obstacle->IsVirtual() &&  // fix bug here.
         obstacle->PerceptionSLBoundary().start_s() >= adc_front_edge_s) {
       is_safe = false;
       break;
@@ -151,6 +152,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
   bool update_success = GetContext()->path_data_.UpdateFrenetFramePath(
       &reference_line_info.reference_line());
   if (!update_success) {
+    AERROR << "Fail to update path_data.";
     return Stage::ERROR;
   }
 
@@ -161,14 +163,29 @@ Stage::StageStatus SidePassPassObstacle::Process(
   bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
       adc_frenet_frame_point_.s(), adc_frenet_frame_point_.l());
   if (!trim_success) {
+    AERROR << "Fail to trim path_data. adc_frenet_frame_point: "
+           << adc_frenet_frame_point_.ShortDebugString();
     return Stage::ERROR;
   }
 
   auto& rfl_info = frame->mutable_reference_line_info()->front();
   *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
 
+  const auto& path_points =
+      rfl_info.path_data().discretized_path().path_points();
+  auto* debug_path =
+      rfl_info.mutable_debug()->mutable_planning_data()->add_path();
+
+  // TODO(All):
+  // Have to use DpPolyPathOptimizer to show in dreamview. Need change to
+  // correct name.
+  debug_path->set_name("DpPolyPathOptimizer");
+  debug_path->mutable_path_point()->CopyFrom(
+      {path_points.begin(), path_points.end()});
+
   bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
+    AERROR << "Fail to plan on reference line.";
     return Stage::ERROR;
   }
 

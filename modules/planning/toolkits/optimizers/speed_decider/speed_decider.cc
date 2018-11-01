@@ -166,7 +166,6 @@ Status SpeedDecider::MakeObjectDecision(
       AppendIgnoreDecision(mutable_obstacle);
       continue;
     }
-
     if (obstacle->HasLongitudinalDecision()) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
