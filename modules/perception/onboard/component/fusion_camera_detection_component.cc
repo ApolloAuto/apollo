@@ -181,31 +181,31 @@ bool FusionCameraDetectionComponent::Init() {
 
   if (InitConfig() != cyber::SUCC) {
     AERROR << "InitConfig() failed.";
-    return cyber::FAIL;
+    return false;
   }
   if (InitSensorInfo() != cyber::SUCC) {
     AERROR << "InitSensorInfo() failed.";
-    return cyber::FAIL;
+    return false;
   }
   if (InitAlgorithmPlugin() != cyber::SUCC) {
     AERROR << "InitAlgorithmPlugin() failed.";
-    return cyber::FAIL;
+    return false;
   }
   if (InitCameraFrames() != cyber::SUCC) {
     AERROR << "InitCameraFrames() failed.";
-    return cyber::FAIL;
+    return false;
   }
   if (InitProjectMatrix() != cyber::SUCC) {
     AERROR << "InitProjectMatrix() failed.";
-    return cyber::FAIL;
+    return false;
   }
   if (InitCameraListeners() != cyber::SUCC) {
     AERROR << "InitCameraListeners() failed.";
-    return cyber::FAIL;
+    return false;
   }
   SetCameraHeightAndPitch();
 
-  return cyber::SUCC;
+  return true;
 }
 
 void FusionCameraDetectionComponent::OnReceiveImage(
@@ -542,8 +542,8 @@ int FusionCameraDetectionComponent::InternalProc(
 
   // Get sensor to world pose from TF
   Eigen::Affine3d camera2world_trans;
-  if (camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
-          msg_timestamp, &camera2world_trans) != cyber::SUCC) {
+  if (!camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
+          msg_timestamp, &camera2world_trans)) {
     std::string err_str = "failed to get camera to world pose, ts: " +
                           std::to_string(msg_timestamp) +
                           " camera_name: " + camera_name;
