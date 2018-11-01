@@ -29,14 +29,11 @@ namespace prediction {
 using ::apollo::hdmap::LaneInfo;
 
 std::unordered_map<std::string, LaneGraph> ObstacleClusters::lane_graphs_;
-std::unordered_map<std::string, JunctionFeature>
-    ObstacleClusters::junction_features_;
 std::unordered_map<std::string, std::vector<LaneObstacle>>
     ObstacleClusters::lane_obstacles_;
 
 void ObstacleClusters::Clear() {
   lane_graphs_.clear();
-  junction_features_.clear();
   lane_obstacles_.clear();
 }
 
@@ -66,49 +63,6 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
   road_graph.BuildLaneGraph(&lane_graph);
   lane_graphs_[lane_id] = std::move(lane_graph);
   return lane_graphs_[lane_id];
-}
-
-const JunctionFeature& ObstacleClusters::GetJunctionFeature(
-    const std::string& start_lane_id, const std::string& junction_id) {
-  if (junction_features_.find(start_lane_id) != junction_features_.end()) {
-    return junction_features_[start_lane_id];
-  }
-  JunctionFeature junction_feature;
-  junction_feature.set_junction_id(junction_id);
-  junction_feature.mutable_enter_lane()->set_lane_id(start_lane_id);
-  std::queue<std::shared_ptr<const LaneInfo>> lane_queue;
-  lane_queue.push(PredictionMap::LaneById(start_lane_id));
-  while (!lane_queue.empty()) {
-    std::shared_ptr<const LaneInfo> curr_lane = lane_queue.front();
-    lane_queue.pop();
-    for (auto& succ_lane_id : curr_lane->lane().successor_id()) {
-      std::shared_ptr<const LaneInfo> succ_lane =
-          PredictionMap::LaneById(succ_lane_id.id());
-      if (PredictionMap::IsLaneInJunction(succ_lane, junction_id)) {
-        lane_queue.push(succ_lane);
-      } else {
-        JunctionExit junction_exit = BuildJunctionExit(succ_lane);
-        junction_feature.add_junction_exit()->CopyFrom(junction_exit);
-      }
-    }
-  }
-
-  junction_features_[start_lane_id] = std::move(junction_feature);
-  return junction_features_[start_lane_id];
-}
-
-JunctionExit ObstacleClusters::BuildJunctionExit(
-    const std::shared_ptr<const LaneInfo> exit_lane) {
-  JunctionExit junction_exit;
-  junction_exit.set_exit_lane_id(exit_lane->id().id());
-  // TODO(kechxu) set exit position and heading
-  double s = 0.5;  // TODO(all) think about this value
-  double exit_heading = exit_lane->Heading(s);
-  apollo::common::PointENU position = exit_lane->GetSmoothPoint(s);
-  junction_exit.set_exit_heading(exit_heading);
-  junction_exit.mutable_exit_position()->set_x(position.x());
-  junction_exit.mutable_exit_position()->set_y(position.y());
-  return junction_exit;
 }
 
 void ObstacleClusters::AddObstacle(
