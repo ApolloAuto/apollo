@@ -22,6 +22,7 @@ import math
 import numpy as np
 
 from configure import parameters
+from common.bounding_rectangle import BoundingRectangle
 param_fea = parameters['feature']
 
 
@@ -336,20 +337,24 @@ class TrajectoryToSample(object):
             heading = math.atan2(fea.raw_velocity.y, fea.raw_velocity.x)
             # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
             exit_dict = dict()
+            exit_pos_dict = dict()
             for junction_exit in fea.junction_feature.junction_exit:
                 if junction_exit.HasField('exit_lane_id'):
-                    exit_dict[junction_exit.exit_lane_id] = np.array([junction_exit.exit_position.x, junction_exit.exit_position.y])
+                    exit_dict[junction_exit.exit_lane_id] = BoundingRectangle(junction_exit.exit_position.x, junction_exit.exit_position.y, junction_exit.exit_heading, 0.01, junction_exit.exit_width)
+                    exit_pos_dict[junction_exit.exit_lane_id] = np.array([junction_exit.exit_position.x, junction_exit.exit_position.y])
             # Searching for up to 100 frames (10 seconds)
             for j in range(i, min(i + 100, traj_len)):
-                if trajectory[j].lane.lane_feature.lane_id in exit_dict:
-                    exit_pos = exit_dict[trajectory[j].lane.lane_feature.lane_id]
-                    delta_pos = exit_pos - curr_pos
-                    angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
-                    d_idx = int((angle / (2.0 * np.pi) + 1) * 12 % 12)
-                    label = [0 for idx in range(12)]
-                    label[d_idx] = 1
-                    fea.junction_feature.junction_mlp_label.extend(label)
-                    break
+                car_bounding = BoundingRectangle(trajectory[j].position.x, trajectory[j].position.y, math.atan2(trajectory[j].raw_velocity.y, trajectory[j].raw_velocity.x), trajectory[j].length, trajectory[j].width)
+                for key, value in exit_dict.items():
+                    if car_bounding.overlap(value):
+                        exit_pos = exit_pos_dict[key]
+                        delta_pos = exit_pos - curr_pos
+                        angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
+                        d_idx = int((angle / (2.0 * np.pi) + 1) * 12 % 12)
+                        label = [0 for idx in range(12)]
+                        label[d_idx] = 1
+                        fea.junction_feature.junction_mlp_label.extend(label)
+                        break
         return trajectory
 
     @abc.abstractmethod
