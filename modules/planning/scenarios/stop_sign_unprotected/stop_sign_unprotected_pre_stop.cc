@@ -54,6 +54,8 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
   ADEBUG << "stage: PreStop";
   CHECK_NOTNULL(frame);
 
+  scenario_config_.CopyFrom(GetContext()->scenario_config);
+
   const auto& reference_line_info = frame->reference_line_info().front();
   if (CheckADCStop(reference_line_info)) {
     GetContext()->stop_start_time = Clock::NowInSeconds();
@@ -150,7 +152,8 @@ int StopSignUnprotectedPreStop::AddWatchVehicle(
   double stop_line_s = over_lap_info->lane_overlap_info().start_s();
   double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
   double distance_to_stop_line = stop_line_s - obstacle_end_s;
-  if (distance_to_stop_line > conf_watch_vehicle_max_valid_stop_distance_) {
+  if (distance_to_stop_line >
+      scenario_config_.watch_vehicle_max_valid_stop_distance()) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
@@ -178,7 +181,7 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
     const ReferenceLineInfo& reference_line_info) {
   double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  if (adc_speed > conf_max_adc_stop_speed_) {
+  if (adc_speed > scenario_config_.max_adc_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
   }
@@ -194,7 +197,8 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
          << stop_line_start_s << "]; adc_front_edge_s[" << adc_front_edge_s
          << "]";
 
-  if (distance_stop_line_to_adc_front_edge > conf_max_valid_stop_distance_) {
+  if (distance_stop_line_to_adc_front_edge >
+      scenario_config_.max_valid_stop_distance()) {
     ADEBUG << "not a valid stop. too far from stop line.";
     return false;
   }
