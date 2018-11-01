@@ -60,11 +60,12 @@ RoutineFactory CreateRoutineFactory(
     return [=]() {
       std::shared_ptr<M0> msg;
       for (;;) {
+        CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         if (dv->TryFetch(msg)) {
           f(msg);
           CRoutine::Yield(RoutineState::READY);
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT);
+          CRoutine::Yield();
         }
       }
     };
@@ -83,11 +84,12 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M0> msg0;
       std::shared_ptr<M1> msg1;
       for (;;) {
+        CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         if (dv->TryFetch(msg0, msg1)) {
           f(msg0, msg1);
           CRoutine::Yield(RoutineState::READY);
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT);
+          CRoutine::Yield();
         }
       }
     };
@@ -106,11 +108,12 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M1> msg1;
       std::shared_ptr<M2> msg2;
       for (;;) {
+        CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         if (dv->TryFetch(msg0, msg1, msg2)) {
           f(msg0, msg1, msg2);
           CRoutine::Yield(RoutineState::READY);
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT);
+          CRoutine::Yield();
         }
       }
     };
@@ -130,11 +133,12 @@ RoutineFactory CreateRoutineFactory(
       std::shared_ptr<M2> msg2;
       std::shared_ptr<M3> msg3;
       for (;;) {
+        CRoutine::GetCurrentRoutine()->set_state(RoutineState::DATA_WAIT);
         if (dv->TryFetch(msg0, msg1, msg2, msg3)) {
           f(msg0, msg1, msg2, msg3);
           CRoutine::Yield(RoutineState::READY);
         } else {
-          CRoutine::Yield(RoutineState::DATA_WAIT);
+          CRoutine::Yield();
         }
       }
     };

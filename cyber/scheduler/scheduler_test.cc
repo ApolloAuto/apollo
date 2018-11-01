@@ -47,8 +47,11 @@ TEST(SchedulerTest, create_task) {
   apollo::cyber::proto::SchedulerConf sched_conf;
   sched_conf.CopyFrom(gconf.scheduler_conf());
   proc_num = sched_conf.proc_num();
+  auto task_pool_size = sched_conf.task_pool_size();
+  auto ext_proc_num = sched_conf.ext_proc_num();
   EXPECT_EQ(sched->ProcessorNum(), proc_num);
-  // EXPECT_EQ(sched->ProcCtxs().size(), proc_num + task_pool_size);
+  EXPECT_EQ(sched->ProcCtxs().size(),
+            proc_num + task_pool_size + ext_proc_num);
 }
 
 TEST(SchedulerTest, notify_task) {
