@@ -6,11 +6,17 @@ cc_library(
     name = "stop_sign_unprotected_scenario",
     srcs = [
         "stop_sign_unprotected_scenario.cc",
-        "stop_sign_unprotected_stage.cc",
+        "stop_sign_unprotected_pre_stop.cc",
+        "stop_sign_unprotected_stop.cc",
+        "stop_sign_unprotected_creep.cc",
+        "stop_sign_unprotected_intersection_cruise.cc",
     ],
     hdrs = [
         "stop_sign_unprotected_scenario.h",
-        "stop_sign_unprotected_stage.h",
+        "stop_sign_unprotected_pre_stop.h",
+        "stop_sign_unprotected_stop.h",
+        "stop_sign_unprotected_creep.h",
+        "stop_sign_unprotected_intersection_cruise.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

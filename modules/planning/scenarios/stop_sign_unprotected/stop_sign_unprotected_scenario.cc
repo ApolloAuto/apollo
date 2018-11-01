@@ -31,7 +31,10 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stage.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stop.h"
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_creep.h"
+#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
 
 namespace apollo {
 namespace planning {
