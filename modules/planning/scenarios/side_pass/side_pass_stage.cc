@@ -153,8 +153,13 @@ Stage::StageStatus SidePassPassObstacle::Process(
   if (!update_success) {
     return Stage::ERROR;
   }
+
+  const auto adc_frenet_frame_point_ =
+      reference_line_info.reference_line().GetFrenetPoint(
+          frame->PlanningStartPoint());
+
   bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
-      planning_start_point.path_point().s());
+      adc_frenet_frame_point_.s(), adc_frenet_frame_point_.l());
   if (!trim_success) {
     return Stage::ERROR;
   }

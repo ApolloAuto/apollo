@@ -154,9 +154,8 @@ std::string PathData::DebugString() const {
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
   return apollo::common::util::StrCat(
-      "[\n",
-      apollo::common::util::PrintDebugStringIter(
-          path_points.begin(), path_points.begin() + limit, ",\n"),
+      "[\n", apollo::common::util::PrintDebugStringIter(
+                 path_points.begin(), path_points.begin() + limit, ",\n"),
       "]\n");
 }
 
@@ -225,11 +224,17 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
   return true;
 }
 
-bool PathData::LeftTrimWithRefS(const double ref_s) {
+bool PathData::LeftTrimWithRefS(const double ref_s, const double ref_l) {
   CHECK_NOTNULL(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
+  common::FrenetFramePoint init_point;
+  init_point.set_s(ref_s);
+  init_point.set_l(ref_l);
   for (const common::FrenetFramePoint frenet_point : frenet_path_.points()) {
-    if (frenet_point.s() >= ref_s) {
+    if (std::fabs(frenet_point.s() - ref_s) < 1e-6) {
+      continue;
+    }
+    if (frenet_point.s() > ref_s) {
       frenet_frame_points.push_back(std::move(frenet_point));
     }
   }
@@ -241,7 +246,7 @@ bool PathData::LeftTrimWithRefS(const double ref_s) {
 
 bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
   reference_line_ = reference_line;
-  const DiscretizedPath& discretized_path = discretized_path_;
+  const DiscretizedPath &discretized_path = discretized_path_;
   bool success = SetDiscretizedPath(discretized_path);
   if (!success) {
     return false;
