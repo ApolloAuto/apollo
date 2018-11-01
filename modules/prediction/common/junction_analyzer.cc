@@ -61,6 +61,9 @@ void JunctionAnalyzer::SetAllJunctionExits() {
     if (overlap_info_ptr == nullptr) {
       continue;
     }
+    if (overlap_info_ptr->overlap().object_size() != 2) {
+      continue;
+    }
     for (const auto &object : overlap_info_ptr->overlap().object()) {
       if (object.has_lane_overlap_info()) {
         std::string lane_id = object.id().id();
@@ -93,8 +96,10 @@ std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     ConstLaneInfoPtr curr_lane = lane_info_queue.front().first;
     int level = lane_info_queue.front().second;
     lane_info_queue.pop();
-    if (IsExitLane(start_lane_id)) {
-      junction_exits.push_back(junction_exits_[start_lane_id]);
+    const std::string& curr_lane_id = curr_lane->id().id();
+    if (IsExitLane(curr_lane_id)) {
+      junction_exits.push_back(junction_exits_[curr_lane_id]);
+      continue;
     }
     if (level >= max_search_level) {
       continue;
