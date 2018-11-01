@@ -74,30 +74,30 @@ static int GetGpuId(
 
 bool TrafficLightsPerceptionComponent::Init() {
   writer_ = node_->CreateWriter<apollo::perception::TrafficLightDetection>(
-      "/perception/traffic_light");
+      "/apollo/perception/traffic_light");
 
   if (InitConfig() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitConfig failed.";
-    return cyber::FAIL;
+    return false;
   }
 
   if (InitAlgorithmPlugin() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitAlgorithmPlugin failed.";
-    return cyber::FAIL;
+    return false;
   }
 
   if (InitCameraListeners() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitCameraListeners failed.";
-    return cyber::FAIL;
+    return false;
   }
 
   if (InitCameraFrame() != cyber::SUCC) {
     AERROR << "TrafficLightsPerceptionComponent InitCameraFrame failed.";
-    return cyber::FAIL;
+    return false;
   }
 
   AINFO << "TrafficLight Preproc Init Success";
-  return cyber::SUCC;
+  return true;
 }
 
 int TrafficLightsPerceptionComponent::InitConfig() {
@@ -642,13 +642,13 @@ bool TrafficLightsPerceptionComponent::GetCarPose(
   }
 
   int state = 0;
-  int ret = cyber::FAIL;
+  bool ret = true;
   Eigen::Affine3d affine3d_trans;
   for (const auto &camera_name : camera_names_) {
     const auto trans_wrapper = camera2world_trans_wrapper_map_[camera_name];
     ret = trans_wrapper->GetSensor2worldTrans(timestamp, &affine3d_trans);
     pose_matrix = affine3d_trans.matrix();
-    if (ret != cyber::SUCC) {
+    if (!ret) {
       pose->ClearCameraPose(camera_name);
       AERROR << "get pose from tf failed, camera_name: "
                 << camera_name;
@@ -705,10 +705,10 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
     std::shared_ptr<TrafficLightDetection>* out_msg) {
   PERCEPTION_PERF_FUNCTION();
   const std::map<std::string, TLCamID> CAMERA_ID_TO_TLCAMERA_ID = {
-      {"onsemi_traffic", TrafficLightDetection::CAMERA_FRONT_LONG},
-      {"onsemi_narrow", TrafficLightDetection::CAMERA_FRONT_NARROW},
-      {"onsemi_obstacle", TrafficLightDetection::CAMERA_FRONT_SHORT},
-      {"onsemi_wide", TrafficLightDetection::CAMERA_FRONT_WIDE}
+      {"front_24mm", TrafficLightDetection::CAMERA_FRONT_LONG},
+      {"front_12mm", TrafficLightDetection::CAMERA_FRONT_NARROW},
+      {"front_6mm", TrafficLightDetection::CAMERA_FRONT_SHORT},
+      {"front_fisheye", TrafficLightDetection::CAMERA_FRONT_WIDE}
   };
 
   const auto &lights = frame->traffic_lights;
@@ -881,7 +881,7 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
     camera::CarPose pose;
     if (GetCarPose(frame->timestamp, &pose)) {
       Eigen::Matrix4d cam_pose;
-      pose.GetCameraPose("onsemi_traffic", &cam_pose);
+      pose.GetCameraPose("front_6mm", &cam_pose);
       double distance = stopline_distance(cam_pose);
       light_debug->set_distance_to_stop_line(distance);
     } else {

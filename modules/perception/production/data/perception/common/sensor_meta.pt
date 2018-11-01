@@ -1,4 +1,4 @@
-	sensor_meta {
+sensor_meta {
     name: "velodyne128"
     type: VELODYNE_128
     orientation: PANORAMIC
@@ -27,25 +27,25 @@ sensor_meta {
 }
 
 sensor_meta {
-    name: "onsemi_obstacle"
+    name: "front_6mm"
     type: MONOCULAR_CAMERA
     orientation: FRONT
 }
 
 sensor_meta {
-    name: "onsemi_narrow"
+    name: "front_12mm"
     type: MONOCULAR_CAMERA
     orientation: FRONT
 }
 
-sensor_meta {
-    name: "onsemi_wide"
-    type: MONOCULAR_CAMERA
-    orientation: FRONT
-}
+#sensor_meta {
+#    name: "onsemi_wide"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}
 
-sensor_meta {
-    name: "onsemi_traffic"
-    type: MONOCULAR_CAMERA
-    orientation: FRONT
-}
+#sensor_meta {
+#    name: "onsemi_traffic"
+#    type: MONOCULAR_CAMERA
+#    orientation: FRONT
+#}

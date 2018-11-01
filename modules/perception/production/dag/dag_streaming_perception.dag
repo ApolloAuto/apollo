@@ -24,7 +24,6 @@ module_config {
     }
  }
 
-
   components {
     class_name : "RecognitionComponent"
     config {
@@ -36,27 +35,27 @@ module_config {
     }
   }
 
-  components {
-    class_name: "RadarDetectionComponent"
-    config {
-      name: "FrontRadarDetection"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/radar/front_radar_component_conf.pb.txt"
-      readers {
-          channel: "/sensor/frontradar/radardata"
-        }
-    }
-  }
+  #components {
+  #  class_name: "RadarDetectionComponent"
+  #  config {
+  #    name: "FrontRadarDetection"
+  #    config_file_path: "/apollo/modules/perception/production/conf/perception/radar/front_radar_component_conf.pb.txt"
+  #    readers {
+  #        channel: "/sensor/frontradar/radardata"
+  #      }
+  #  }
+  #}
 
-  components {
-    class_name: "RadarDetectionComponent"
-    config {
-      name: "RearRadarDetection"
-      config_file_path: "/apollo/modules/perception/production/conf/perception/radar/rear_radar_component_conf.pb.txt"
-      readers {
-          channel: "/sensor/rearradar/radardata"
-        }
-    }
-  }
+  #components {
+  #  class_name: "RadarDetectionComponent"
+  #  config {
+  #    name: "RearRadarDetection"
+  #    config_file_path: "/apollo/modules/perception/production/conf/perception/radar/rear_radar_component_conf.pb.txt"
+  #    readers {
+  #        channel: "/sensor/rearradar/radardata"
+  #      }
+  #  }
+  #}
 
   components {
     class_name: "FusionComponent"
