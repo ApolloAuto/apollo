@@ -232,13 +232,9 @@ void Obstacle::BuildJunctionFeature() {
            << junction_id << "]";
     return;
   }
-  // TODO(kechxu) refactor this function
   Feature* latest_feature_ptr = mutable_latest_feature();
-  double junction_range = JunctionAnalyzer::ComputeJunctionRange();
   if (feature_history_.size() == 1) {
-    SetJunctionFeatureWithoutEnterLane(junction_range, latest_feature_ptr);
-    latest_feature_ptr->mutable_junction_feature()
-                      ->set_junction_range(junction_range);
+    SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
     return;
   }
   const Feature& prev_feature = feature(1);
@@ -247,29 +243,20 @@ void Obstacle::BuildJunctionFeature() {
     std::string enter_lane_id =
         prev_feature.junction_feature().enter_lane().lane_id();
     SetJunctionFeatureWithEnterLane(
-        enter_lane_id, junction_range, latest_feature_ptr);
+        enter_lane_id, latest_feature_ptr);
   } else {
-    SetJunctionFeatureWithoutEnterLane(junction_range, latest_feature_ptr);
+    SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
   }
 }
 
 void Obstacle::SetJunctionFeatureWithEnterLane(
-    const std::string& enter_lane_id, const double junction_range,
-    Feature* feature_ptr) {
-  std::vector<JunctionExit> junction_exits =
-      JunctionAnalyzer::GetJunctionExits(enter_lane_id);
-  for (const auto junction_exit : junction_exits) {
-    feature_ptr->mutable_junction_feature()->add_junction_exit()
-               ->CopyFrom(junction_exit);
-  }
-  feature_ptr->mutable_junction_feature()
-             ->set_junction_id(JunctionAnalyzer::GetJunctionId());
-  feature_ptr->mutable_junction_feature()
-             ->set_junction_range(junction_range);
+    const std::string& enter_lane_id, Feature* const feature_ptr) {
+  feature_ptr->mutable_junction_feature()->CopyFrom(
+      JunctionAnalyzer::GetJunctionFeature(enter_lane_id));
 }
 
 void Obstacle::SetJunctionFeatureWithoutEnterLane(
-    const double junction_range, Feature* feature_ptr) {
+    Feature* const feature_ptr) {
   if (!feature_ptr->has_lane()) {
     AERROR << "Obstacle [" << id_ << "] has no lane.";
     return;
@@ -288,16 +275,8 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
     return;
   }
   // TODO(kechxu) Maybe output all exits if no start lane found
-  std::vector<JunctionExit> junction_exits =
-      JunctionAnalyzer::GetJunctionExits(start_lane_id);
-  for (const auto junction_exit : junction_exits) {
-    feature_ptr->mutable_junction_feature()->add_junction_exit()
-               ->CopyFrom(junction_exit);
-  }
-  feature_ptr->mutable_junction_feature()
-             ->set_junction_id(JunctionAnalyzer::GetJunctionId());
-  feature_ptr->mutable_junction_feature()
-             ->set_junction_range(junction_range);
+  feature_ptr->mutable_junction_feature()->CopyFrom(
+      JunctionAnalyzer::GetJunctionFeature(start_lane_id));
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
