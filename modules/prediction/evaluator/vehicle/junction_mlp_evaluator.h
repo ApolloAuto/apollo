@@ -84,6 +84,10 @@ class JunctionMLPEvaluator : public Evaluator {
   void SaveOfflineFeatures(Feature* feature_ptr,
                            const std::vector<double>& feature_values);
 
+  bool IsClosedToJunctionExit(
+      const Obstacle* obstacle_ptr,
+      JunctionExit* const curr_junction_exit);
+
   /**
    * @brief Load mode file
    * @param Model file name
