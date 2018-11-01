@@ -92,12 +92,26 @@ function check_esd_files() {
 }
 
 function generate_build_targets() {
-  if [ -z $NOT_BUILD_PERCEPTION ] ; then
-    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
-  else
-    info 'Skip building perception module!'
+  COMMON_TARGETS="//cyber/... union //modules/common/kv_db/... union //modules/dreamview/..."
+  case $BUILD_FILTER in
+  control)
+    BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/control/... `
+    ;;
+  planning)
+    BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/routing/... union //modules/planning/...`
+    ;;
+  prediction)
+    BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/routing/... union //modules/prediction/...`
+    ;;
+  pnc)
+    BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/routing/... union //modules/prediction/... union //modules/planning/... union //modules/control/...`
+    ;;
+  no_perception)
     BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/... union //cyber/...`
-  fi
+    ;;
+  *)
+    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
+  esac
 
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
@@ -609,6 +623,10 @@ function print_usage() {
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
+  ${BLUE}build_planning${NONE}: compile planning and its dependencies.
+  ${BLUE}build_control${NONE}: compile control and its dependencies.
+  ${BLUE}build_prediction${NONE}: compile prediction and its dependencies.
+  ${BLUE}build_pnc${NONE}: compile pnc and its dependencies.
   ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}build_prof${NONE}: build for gprof support.
   ${BLUE}buildify${NONE}: fix style of BUILD files
@@ -661,7 +679,7 @@ function main() {
       ;;
     build_no_perception)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
-      NOT_BUILD_PERCEPTION=true
+      BUILD_FILTER="no_perception"
       if [ "$1" == "opt" ]; then
         shift
         apollo_build_opt $@
@@ -669,6 +687,22 @@ function main() {
         shift
         apollo_build_dbg $@
       fi
+      ;;
+    build_control)
+      BUILD_FILTER="control"
+      apollo_build_dbg $@
+      ;;
+    build_planning)
+      BUILD_FILTER="planning"
+      apollo_build_dbg $@
+      ;;
+    build_prediction)
+      BUILD_FILTER="prediction"
+      apollo_build_dbg $@
+      ;;
+    build_pnc)
+      BUILD_FILTER="pnc"
+      apollo_build_dbg $@
       ;;
     cibuild)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
