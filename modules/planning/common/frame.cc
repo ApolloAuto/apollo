@@ -48,7 +48,10 @@ using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
+using apollo::hdmap::Path;
 using apollo::hdmap::PathOverlap;
 using apollo::prediction::PredictionObstacles;
 
@@ -778,32 +781,88 @@ bool Frame::ObsHRep(
 }
 
 bool Frame::GetOpenSpaceROI() {
-  const ReferenceLineInfo *best_ref_info = FindDriveReferenceLineInfo();
-  if (!best_ref_info) {
-    std::string msg("fail to get the best reference line");
-    AERROR << msg;
-    return false;
-  }
-  ParkingSpaceInfoConstPtr target_parking_spot;
-  const hdmap::Path &nearby_path = best_ref_info->reference_line().GetMapPath();
-  const auto &parking_space_overlaps = nearby_path.parking_space_overlaps();
-  if (parking_space_overlaps.size() == 0) {
-    std::string msg("fail to get the best reference line");
-    AERROR << msg;
-    return false;
-  }
-  for (const PathOverlap &parking_overlap : parking_space_overlaps) {
-    if (parking_overlap.object_id == FLAGS_target_parking_spot_id) {
-      hdmap::Id id;
-      id.set_id(parking_overlap.object_id);
-      target_parking_spot = hdmap_->GetParkingSpaceById(id);
+  // Find parking spot by reference line
+  // const ReferenceLineInfo *best_ref_info = FindDriveReferenceLineInfo();
+  // if (!best_ref_info) {
+  //   std::string msg("fail to get the best reference line");
+  //   AERROR << msg;
+  //   return false;
+  // }
+  // ParkingSpaceInfoConstPtr target_parking_spot;
+  // const hdmap::Path &nearby_path =
+  // best_ref_info->reference_line().GetMapPath(); const auto
+  // &parking_space_overlaps = nearby_path.parking_space_overlaps(); if
+  // (parking_space_overlaps.size() == 0) {
+  //   std::string msg("fail to get the best reference line");
+  //   AERROR << msg;
+  //   return false;
+  // }
+  // for (const PathOverlap &parking_overlap : parking_space_overlaps) {
+  //   if (parking_overlap.object_id == FLAGS_target_parking_spot_id) {
+  //     hdmap::Id id;
+  //     id.set_id(parking_overlap.object_id);
+  //     target_parking_spot = hdmap_->GetParkingSpaceById(id);
+  //   }
+  // }
+  // if (target_parking_spot == nullptr) {
+  //   std::string msg("No such parking spot found ");
+  //   AERROR << msg << FLAGS_target_parking_spot_id;
+  //   return false;
+  // }
+
+  // Find parking spot by Get nearestlane
+  const hdmap::HDMap *hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(hdmap_);
+  common::VehicleState vehicle_state_ =
+      common::VehicleStateProvider::Instance()->vehicle_state();
+  auto point = common::util::MakePointENU(
+      vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
+  hdmap::LaneInfoConstPtr nearest_lane;
+  double vehicle_lane_s = 0.0;
+  double vehicle_lane_l = 0.0;
+  HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+      point, 5.0, vehicle_state_.heading(), M_PI / 3.0, &nearest_lane,
+      &vehicle_lane_s, &vehicle_lane_l);
+  LaneSegment nearest_lanesegment =
+      LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
+                  nearest_lane->accumulate_s().back());
+  std::vector<LaneSegment> segments_vector;
+  int next_lanes_num = nearest_lane->lane().successor_id_size();
+  ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
+  std::unique_ptr<Path> nearby_path;
+  for (int i = 0; i < next_lanes_num; i++) {
+    auto next_lane_id = nearest_lane->lane().successor_id(i);
+    segments_vector.push_back(nearest_lanesegment);
+    auto next_lane = hdmap_->GetLaneById(next_lane_id);
+    LaneSegment next_lanesegment =
+        LaneSegment(next_lane, next_lane->accumulate_s().front(),
+                    next_lane->accumulate_s().back());
+    segments_vector.emplace_back(next_lanesegment);
+    nearby_path = std::unique_ptr<Path>(new Path(segments_vector));
+    const auto &parking_space_overlaps = nearby_path->parking_space_overlaps();
+    if (parking_space_overlaps.size() != 0) {
+      for (const auto &parking_overlap : parking_space_overlaps) {
+        if (parking_overlap.object_id == FLAGS_target_parking_spot_id) {
+          hdmap::Id id;
+          id.set_id(parking_overlap.object_id);
+          target_parking_spot = hdmap_->GetParkingSpaceById(id);
+        }
+      }
+    }
+    if (target_parking_spot == nullptr) {
+      std::string msg("No target parking spot found on path");
+      ADEBUG << msg << nearest_lane->id().id() << " + " << next_lane->id().id();
+      segments_vector.clear();
+    } else {
+      break;
     }
   }
   if (target_parking_spot == nullptr) {
     std::string msg("No such parking spot found ");
-    AERROR << msg << FLAGS_target_parking_spot_id;
+    ADEBUG << msg << FLAGS_target_parking_spot_id;
     return false;
   }
+
   // left or right of the parking lot is decided when viewing the parking spot
   // open upward
   Vec2d left_top = target_parking_spot->polygon().points().at(3);
@@ -814,8 +873,8 @@ bool Frame::GetOpenSpaceROI() {
   double left_top_l = 0.0;
   double right_top_s = 0.0;
   double right_top_l = 0.0;
-  if (!(nearby_path.GetProjection(left_top, &left_top_s, &left_top_l) &&
-        nearby_path.GetProjection(right_top, &right_top_s, &right_top_l))) {
+  if (!(nearby_path->GetProjection(left_top, &left_top_s, &left_top_l) &&
+        nearby_path->GetProjection(right_top, &right_top_s, &right_top_l))) {
     std::string msg(
         "fail to get parking spot points' projections on reference line");
     AERROR << msg;
@@ -825,12 +884,12 @@ bool Frame::GetOpenSpaceROI() {
   double center_line_s = (left_top_s + right_top_s) / 2;
   double start_s = center_line_s - FLAGS_parking_longitudinal_range;
   double end_s = center_line_s + FLAGS_parking_longitudinal_range;
-  hdmap::MapPathPoint end_point = nearby_path.GetSmoothPoint(end_s);
-  hdmap::MapPathPoint start_point = nearby_path.GetSmoothPoint(start_s);
-  double start_left_width = nearby_path.GetRoadLeftWidth(start_s);
-  double start_right_width = nearby_path.GetRoadRightWidth(start_s);
-  double end_left_width = nearby_path.GetRoadLeftWidth(end_s);
-  double end_right_width = nearby_path.GetRoadRightWidth(end_s);
+  hdmap::MapPathPoint end_point = nearby_path->GetSmoothPoint(end_s);
+  hdmap::MapPathPoint start_point = nearby_path->GetSmoothPoint(start_s);
+  double start_left_width = nearby_path->GetRoadLeftWidth(start_s);
+  double start_right_width = nearby_path->GetRoadRightWidth(start_s);
+  double end_left_width = nearby_path->GetRoadLeftWidth(end_s);
+  double end_right_width = nearby_path->GetRoadRightWidth(end_s);
   double start_right_vec_cos = std::cos(start_point.heading() - M_PI / 2);
   double start_right_vec_sin = std::sin(start_point.heading() - M_PI / 2);
   double start_left_vec_cos = std::cos(start_point.heading() + M_PI / 2);
@@ -855,7 +914,7 @@ bool Frame::GetOpenSpaceROI() {
 
   // rotate the points to have the lane to be horizontal to x axis and scale
   // them base on the origin point
-  origin_heading_ = nearby_path.GetSmoothPoint(center_line_s).heading();
+  origin_heading_ = nearby_path->GetSmoothPoint(center_line_s).heading();
   origin_point_.set_x(left_top.x());
   origin_point_.set_y(left_top.y());
   left_top -= origin_point_;

@@ -21,27 +21,27 @@ dual_variable_warm_start_config : {
 distance_approach_config : {
   weight_u : 0.01
   weight_u : 0.1
-  weight_u_rate : 0.1
+  weight_u_rate : 0.2
   weight_u_rate : 0.1
   weight_state : 0.001
   weight_state : 0.001
   weight_state : 0.0001
   weight_state : 0.0001
-  weight_stitching : 0.1
+  weight_stitching : 0.2
   weight_stitching : 0.1
   weight_time : 0.5
   weight_time : 1
   min_safety_distance : 0.0
-  max_safety_distance : 1.0e10
+  max_safety_distance : 1.0e2
   max_steer_angle : 0.6
   max_steer_rate : 0.6
-  max_speed_forward : 3.0
-  max_speed_reverse : 2.0
+  max_speed_forward : 2.0
+  max_speed_reverse : 1.0
   max_acceleration_forward : 2.0
-  max_acceleration_reverse : 2.0
+  max_acceleration_reverse : 1.0
   min_time_sample_scaling : 0.1
-  max_time_sample_scaling : 10.0
-  max_miu : 1.0e10
-  max_lambda : 1.0e10
+  max_time_sample_scaling : 5.0
+  max_miu : 1.0e2
+  max_lambda : 1.0e2
   use_fix_time : false
 }
