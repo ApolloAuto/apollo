@@ -19,6 +19,7 @@
 #include <memory>
 #include <cmath>
 
+#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -36,6 +37,14 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
     ++count;
   }
   return (count == 0) ? 0.0 : sum / count;
+}
+
+bool IsClosed(const double x0, const double y0, const double theta0,
+              const double x1, const double y1, const double theta1) {
+  // TODO(all) move constants to gflags
+  double angle_diff = std::abs(common::math::AngleDiff(theta0, theta1));
+  return std::abs(x0 - x1) < 1.0 && std::abs(y0 - y1) &&
+         angle_diff < M_PI * 0.25;
 }
 
 JunctionMLPEvaluator::JunctionMLPEvaluator() {
@@ -56,6 +65,15 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  JunctionExit curr_junction_exit;
+  bool is_closed_to_junction_exit =
+      IsClosedToJunctionExit(obstacle_ptr, &curr_junction_exit);
+
+  if (is_closed_to_junction_exit) {
+    // TODO(all) Predict based on curr_junction_exit
+    return;
+  }
+
   std::vector<double> feature_values;
 
   ExtractFeatureValues(obstacle_ptr, &feature_values);
@@ -64,6 +82,35 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     FeatureOutput::Insert(obstacle_ptr->latest_feature());
     ADEBUG << "Insert junction feature into feature output";
   }
+}
+
+bool JunctionMLPEvaluator::IsClosedToJunctionExit(
+    const Obstacle* obstacle_ptr,
+    JunctionExit* const curr_junction_exit) {
+  if (obstacle_ptr == nullptr ||
+      obstacle_ptr->history_size() == 0) {
+    AERROR << "Null obstacle or no history found";
+    return false;
+  }
+  const Feature& latest_feature = obstacle_ptr->latest_feature();
+  double position_x = latest_feature.position().x();
+  double position_y = latest_feature.position().y();
+  double raw_velocity_heading = std::atan2(latest_feature.raw_velocity().x(),
+                                           latest_feature.raw_velocity().y());
+
+  for (const JunctionExit& junction_exit :
+       latest_feature.junction_feature().junction_exit()) {
+    double exit_x = junction_exit.exit_position().x();
+    double exit_y = junction_exit.exit_position().y();
+    double exit_heading = junction_exit.exit_heading();
+    if (IsClosed(position_x, position_y, raw_velocity_heading,
+                 exit_x, exit_y, exit_heading)) {
+      *curr_junction_exit = junction_exit;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(
@@ -155,6 +202,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double y = junction_exit.exit_position().y() - feature_ptr->position().y();
     double diff_x = std::cos(-heading) * x - std::sin(-heading) * y;
     double diff_y = std::sin(-heading) * x + std::cos(-heading) * y;
+    double diff_heading = apollo::common::math::AngleDiff(heading,
+                              junction_exit.exit_heading());
     double angle = std::atan2(diff_y, diff_x);
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
@@ -163,8 +212,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     feature_values->operator[](idx * 5 + 2) = diff_y / junction_range;
     feature_values->operator[](idx * 5 + 3) =
         std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
-    feature_values->operator[](idx * 5 + 4) =
-        junction_exit.exit_heading() - heading;
+    feature_values->operator[](idx * 5 + 4) = diff_heading;
   }
 }
 
