@@ -383,30 +383,42 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       double diff_x = lane_point.position().x() - feature.position().x();
       double diff_y = lane_point.position().y() - feature.position().y();
       double angle = std::atan2(diff_y, diff_x);
-      feature_values->push_back(lane_point.kappa());
+      double deviation_angle = angle - heading;
+      double relative_l = std::sqrt(diff_x * diff_x + diff_y * diff_y)
+                          * std::sin(deviation_angle);
+
+      // The lateral deviation of the lane-point from vehicle facing:
+      feature_values->push_back(relative_l);
+      // The extrapolated normal acceleration:
       feature_values->push_back(speed * speed * lane_point.kappa());
-      feature_values->push_back(std::sin(angle - heading));
-      feature_values->push_back(lane_point.relative_l());
-      feature_values->push_back(lane_point.heading());
-      feature_values->push_back(lane_point.angle_diff());
+      // The lane-point's heading w.r.t. vehicle's facing direction:
+      feature_values->push_back(common::math::AngleDiff
+                                    (heading, lane_pont.heading()));
+      feature_values->push_back(diff_x);
+      feature_values->push_back(diff_y);
     }
   }
 
   // If the lane points are not sufficient, apply a linear extrapolation.
   std::size_t size = feature_values->size();
-  while (size >= 6 && size < LANE_FEATURE_SIZE) {
-    double lane_kappa = feature_values->operator[](size - 6);
-    double centri_acc = feature_values->operator[](size - 5);
-    double heading_diff = feature_values->operator[](size - 4);
-    double lane_l_diff = feature_values->operator[](size - 3);
-    double heading = feature_values->operator[](size - 2);
-    double angle_diff = feature_values->operator[](size - 1);
-    feature_values->push_back(lane_kappa);
-    feature_values->push_back(centri_acc);
-    feature_values->push_back(heading_diff);
-    feature_values->push_back(lane_l_diff);
-    feature_values->push_back(heading);
-    feature_values->push_back(angle_diff);
+  while (size >= 10 && size < LANE_FEATURE_SIZE) {
+    double diff_x_new = 2 * feature_values->operator[](size - 2) -
+                            feature_values->operator[](size - 7);
+    double diff_y_new = 2 * feature_values->operator[](size - 1) -
+                            feature_values->operator[](size - 6);
+    double angle_new = std::atan2(diff_y_new, diff_x_new);
+    double deviation_angle_new = angle_new - heading;
+    double relative_l_new = std::sqrt(diff_x_new * diff_x_new + 
+                                      diff_y_new * diff_y_new)
+                          * std::sin(deviation_angle_new);
+    double centri_acc_new = 0.0;
+    double angle_diff_new = feature_values->operator[](size - 3);
+
+    feature_values->push_back(relative_l_new);
+    feature_values->push_back(centri_acc_new);
+    feature_values->push_back(angle_diff_new);
+    feature_values->push_back(diff_x_new);
+    feature_values->push_back(diff_y_new);
     size = feature_values->size();
   }
 }
