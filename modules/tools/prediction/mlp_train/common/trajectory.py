@@ -203,6 +203,7 @@ class TrajectoryToSample(object):
             new_lane_id = None
             has_started_lane_change = False
             has_finished_lane_change = False
+            lane_change_start_time = None
             lane_change_finish_time = 10.0
 
             # Go through all the subsequent features in this sequence
@@ -222,12 +223,14 @@ class TrajectoryToSample(object):
                 # If step into another lane, label lane change to be started.
                 lane_id_j = trajectory[j].lane.lane_feature.lane_id
                 if lane_id_j not in curr_lane_seq:
-                    has_started_lane_change = True
-                    lane_change_finish_time = 10.0
-                    if new_lane_id is None:
+                    if has_started_lane_change = False:
+                        has_started_lane_change = True
+                        lane_change_start_time = time_span
+                        lane_change_finish_time = 10.0
                         new_lane_id = lane_id_j
                 else:
                     has_started_lane_change = False
+                    new_lane_id = None
 
                 # If roughly get to the center of another lane, label lane change to be finished.
                 left_bound = trajectory[j].lane.lane_feature.dist_to_left_boundary
@@ -267,20 +270,24 @@ class TrajectoryToSample(object):
                         # Obstacle is following the original lane but is never at lane-center:
                         if lane_change_finish_time == 10.0:
                             lane_sequence.label = 4
+                            lane_sequence.time_to_lane_edge = 10.0
                             lane_sequence.time_to_lane_center = 10.0
                         # Obstacle is following the original lane and moved to lane-center
                         else:
                             lane_sequence.label = 1
+                            lane_sequence.time_to_lane_edge = 10.0
                             lane_sequence.time_to_lane_center = lane_change_finish_time
                     # Obs has stepped out of this lane within 6sec.
                     else:
                         lane_sequence.label = 0
+                        lane_sequence.time_to_lane_edge = lane_change_start_time
                         lane_sequence.time_to_lane_center = 100.0
                 # The current lane is NOT obstacle's original lane.
                 else:
                     # Obstacle is following the original lane.
                     if not has_started_lane_change:
                         lane_sequence.label = -1
+                        lane_sequence.time_to_lane_edge = 100.0
                         lane_sequence.time_to_lane_center = 100.0
                     else:
                         new_lane_id_is_in_this_lane_seq = False
@@ -293,15 +300,18 @@ class TrajectoryToSample(object):
                             # Obstacle has finished lane changing within 6 sec.
                             if has_finished_lane_change:
                                 lane_sequence.label = 2
+                                lane_sequence.time_to_lane_edge = lane_change_start_time
                                 lane_sequence.time_to_lane_center = lane_change_finish_time
                             # Obstacle started lane changing but haven't finished yet.
                             else:
                                 lane_sequence.label = 3
+                                lane_sequence.time_to_lane_edge = lane_change_start_time
                                 lane_sequence.time_to_lane_center = 10.0
 
                         # Obstacle has changed to some other lane.
                         else:
                             lane_sequence.label = -1
+                            lane_sequence.time_to_lane_edge = 100.0
                             lane_sequence.time_to_lane_center = 100.0
 
         return trajectory

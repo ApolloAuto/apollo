@@ -181,7 +181,7 @@ Custom defined loss function that lumps the loss of classification and
 of regression together.
 '''
 def loss_fn(c_pred, r_pred, target):
-    loss_C = nn.BCEWithLogitsLoss(pos_weight=torch.FloatTensor([39.0]).cuda()) #nn.BCELoss()
+    loss_C = nn.BCEWithLogitsLoss(pos_weight=torch.FloatTensor([1.0]).cuda()) #nn.BCELoss()
     loss_R = nn.MSELoss()
     loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
     #loss = 4 * loss_C(c_pred, target[:,0].view(target.shape[0],1)) + \
