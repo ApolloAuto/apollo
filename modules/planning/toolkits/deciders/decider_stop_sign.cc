@@ -34,7 +34,7 @@ using apollo::hdmap::PathOverlap;
 
 DeciderStopSign::DeciderStopSign(const TaskConfig& config) : Decider(config) {
   CHECK(config.has_decider_stop_sign_config());
-  SetName("DeciderCreep");
+  SetName("DeciderStopSign");
 }
 
 Status DeciderStopSign::Process(Frame* frame,

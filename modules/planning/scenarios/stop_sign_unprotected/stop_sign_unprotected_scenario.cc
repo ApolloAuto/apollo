@@ -41,6 +41,8 @@ namespace stop_sign_protected {
 using common::TrajectoryPoint;
 using common::time::Clock;
 using hdmap::HDMapUtil;
+using hdmap::StopSignInfo;
+using hdmap::StopSignInfoConstPtr;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
@@ -156,6 +158,46 @@ bool StopSignUnprotectedScenario::IsTransferable(
   }
 
   return false;
+}
+
+/*
+ * get all the lanes associated/guarded by a stop sign
+ */
+int StopSignUnprotectedScenario::GetAssociatedLanes(
+    const StopSignInfo& stop_sign_info) {
+  context_.associated_lanes.clear();
+
+  std::vector<StopSignInfoConstPtr> associated_stop_signs;
+  HDMapUtil::BaseMap().GetStopSignAssociatedStopSigns(stop_sign_info.id(),
+                                                      &associated_stop_signs);
+
+  for (const auto stop_sign : associated_stop_signs) {
+    if (stop_sign == nullptr) {
+      continue;
+    }
+
+    const auto& associated_lane_ids = stop_sign->OverlapLaneIds();
+    for (const auto& lane_id : associated_lane_ids) {
+      const auto lane = HDMapUtil::BaseMap().GetLaneById(lane_id);
+      if (lane == nullptr) {
+        continue;
+      }
+      const auto& stop_sign_overlaps = lane->stop_signs();
+      for (auto stop_sign_overlap : stop_sign_overlaps) {
+        auto over_lap_info =
+            stop_sign_overlap->GetObjectOverlapInfo(stop_sign.get()->id());
+        if (over_lap_info != nullptr) {
+          context_.associated_lanes.push_back(
+              std::make_pair(lane, stop_sign_overlap));
+          ADEBUG << "stop_sign: " << stop_sign_info.id().id()
+                 << "; associated_lane: " << lane_id.id()
+                 << "; associated_stop_sign: " << stop_sign.get()->id().id();
+        }
+      }
+    }
+  }
+
+  return 0;
 }
 
 }  // namespace stop_sign_protected
