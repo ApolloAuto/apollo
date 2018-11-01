@@ -18,8 +18,8 @@
  * @file
  **/
 #include "modules/planning/open_space/distance_approach_problem.h"
-
 #include "gtest/gtest.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -27,6 +27,10 @@ namespace planning {
 class DistanceApproachProblemTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    FLAGS_planner_open_space_config_filename =
+        "/apollo/modules/planning/testdata/conf/"
+        "open_space_standard_parking_lot.pb.txt";
+
     CHECK(apollo::common::util::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "

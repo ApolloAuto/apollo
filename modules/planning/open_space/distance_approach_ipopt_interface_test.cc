@@ -32,6 +32,9 @@ namespace planning {
 class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    FLAGS_planner_open_space_config_filename =
+        "/apollo/modules/planning/testdata/conf/"
+        "open_space_standard_parking_lot.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
@@ -135,6 +138,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
   double x[kNumOfVariables];
   std::fill_n(x, kNumOfVariables, 1.2);
   bool res = ptop_->eval_f(kNumOfVariables, x, true, obj_value);
+  EXPECT_DOUBLE_EQ(obj_value, 2013.0334574069707);
   EXPECT_TRUE(res);
 }
 
