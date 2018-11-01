@@ -33,45 +33,23 @@ export default class QuickStarter extends React.Component {
     constructor(props) {
         super(props);
 
-        this.rtKRecord = {
-            "Start": () => {
-                WS.executeToolCommand("rtk_record_replay", "start_recorder");
-                UTTERANCE.speakOnce('Start RTK recorder');
-            },
-            "Stop": () => {
-                WS.executeToolCommand("rtk_record_replay", "stop_recorder");
-                UTTERANCE.speakOnce('Stop RTK recorder');
-            },
-        };
-
-        this.rtkReplay = {
-            "Start": () => {
-                WS.executeToolCommand("rtk_record_replay", "start_player");
-                UTTERANCE.speakOnce('Start RTK replay');
-            },
-            "Stop": () => {
-                WS.executeToolCommand("rtk_record_replay", "stop_player");
-                UTTERANCE.speakOnce('Stop RTK replay');
-            },
-        };
-
         this.setup = {
             "Setup": () => {
-                WS.executeModeCommand("start");
+                WS.executeModeCommand("SETUP_MODE");
                 UTTERANCE.speakOnce('Setup');
             },
         };
 
         this.reset = {
             "Reset All": () => {
-                WS.executeModeCommand("stop");
+                WS.executeModeCommand("RESET_MODE");
                 UTTERANCE.speakOnce('Reset All');
             },
         };
 
         this.auto = {
             "Start Auto": () => {
-                WS.changeDrivingMode("COMPLETE_AUTO_DRIVE");
+                WS.executeModeCommand("ENTER_AUTO_MODE");
                 UTTERANCE.speakOnce('Start Auto');
             },
         };
@@ -95,14 +73,6 @@ export default class QuickStarter extends React.Component {
                                   commands={this.auto}
                                   extraButtonClass="start-auto-button"
                                   extraCommandClass="start-auto-command" />
-                    {hmi.showRTKCommands &&
-                        <CommandGroup name="Record"
-                                      disabled={lockTaskPanel}
-                                      commands={this.rtKRecord} />}
-                    {hmi.showRTKCommands &&
-                        <CommandGroup name="Replay"
-                                      disabled={lockTaskPanel}
-                                      commands={this.rtkReplay} />}
                 </div>
             </div>
         );

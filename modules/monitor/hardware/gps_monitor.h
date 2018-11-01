@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,15 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
-
-#include "modules/dreamview/proto/hmi_config.pb.h"
+#include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {
 namespace monitor {
 
-// Check if we need to switch to safety mode, and then
-// 1. Notify driver to take action.
-// 2. Trigger EStop if no proper action was taken.
-class SafetyManager {
+class GpsMonitor : public RecurrentRunner {
  public:
-  SafetyManager();
-  void CheckSafety(const double current_time);
-
- private:
-  bool ShouldTriggerSafeMode(const double current_time);
-
-  apollo::dreamview::HMIConfig hmi_config_;
+  GpsMonitor();
+  void RunOnce(const double current_time) override;
 };
 
 }  // namespace monitor

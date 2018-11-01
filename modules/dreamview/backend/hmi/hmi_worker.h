@@ -28,8 +28,8 @@
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
+#include "modules/dreamview/proto/hmi_mode.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
-#include "modules/monitor/proto/system_status.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -37,11 +37,6 @@
  */
 namespace apollo {
 namespace dreamview {
-
-using ChangeModeHandler = std::function<void(const std::string&)>;
-using ChangeLaunchHandler = std::function<void(const std::string&)>;
-using ChangeMapHandler = std::function<void(const std::string&)>;
-using ChangeVehicleHandler = std::function<void(const std::string&)>;
 
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
@@ -53,101 +48,64 @@ class HMIWorker {
   bool Trigger(const HMIAction action);
   bool Trigger(const HMIAction action, const std::string& value);
 
-  // Run a command on current system mode.
-  void RunModeCommand(const std::string& command_name);
-  // Run a command on given module.
-  int RunModuleCommand(const std::string& module, const std::string& command);
-  // Run a command on given hardware.
-  int RunHardwareCommand(const std::string& hardware,
-                         const std::string& command);
-  // Run a command on given tool.
-  int RunToolCommand(const std::string& tool, const std::string& command);
-
-  // Update system status.
-  void UpdateSystemStatus(const apollo::monitor::SystemStatus& system_status);
-
-  // Register event handlers.
-  void RegisterChangeModeHandler(ChangeModeHandler handler) {
-    change_mode_handlers_.emplace_back(handler);
+  // Register handler which will be called on HMIStatus update.
+  // It will be called ASAP if there are changes, or else periodically
+  // controlled by FLAGS_hmi_status_update_interval.
+  using StatusUpdateHandler = std::function<void(
+      const bool status_changed, HMIStatus* status)>;
+  inline void RegisterStatusUpdateHandler(StatusUpdateHandler handler) {
+    status_update_handlers_.push_back(handler);
   }
-  void RegisterChangeLaunchHandler(ChangeLaunchHandler handler) {
-    change_launch_handlers_.emplace_back(handler);
-  }
-  void RegisterChangeMapHandler(ChangeMapHandler handler) {
-    change_map_handlers_.emplace_back(handler);
-  }
-  void RegisterChangeVehicleHandler(ChangeVehicleHandler handler) {
-    change_vehicle_handlers_.emplace_back(handler);
-  }
-  // Change current mode, launch, map, vehicle and driving mode.
-  void ChangeToMode(const std::string& mode_name);
-  void ChangeToLaunch(const std::string& launch_name);
-  void ChangeToMap(const std::string& map_name);
-  void ChangeToVehicle(const std::string& vehicle_name);
-  bool ChangeToDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
 
   // Submit a DriveEvent.
   void SubmitDriveEvent(const uint64_t event_time_ms,
                         const std::string& event_msg,
                         const std::vector<std::string>& event_types);
 
-  // Get current config and status.
-  inline const HMIConfig& GetConfig() const { return config_; }
+  // Get current HMI status.
   HMIStatus GetStatus() const;
 
-  // HMIStatus is updated frequently by multiple threads, including web workers
-  // and ROS message callback. Please apply proper read/write lock when
-  // accessing it.
-  inline boost::shared_mutex& GetStatusMutex() { return status_mutex_; }
-
-  // Load modes configuration from FLAGS_modes_config_path to HMIConfig.modes().
-  //
-  // E.g. Modes directory:
-  // /path/to/modes/
-  //     mkz_standard/
-  //         close_loop.launch
-  //         map_collection.launch
-  //
-  // In HMIConfig it will be loaded as:
-  // modes {
-  //   key: "Mkz Standard"
-  //   value: {
-  //     path: "/path/to/modes/mkz_standard"
-  //     launches: {
-  //       key: "Close Loop"
-  //       value: "/path/to/modes/mkz_standard/close_loop.launch"
-  //     }
-  //     launches: {
-  //       key: "Map Collection"
-  //       value: "/path/to/modes/mkz_standard/map_collection.launch"
-  //     }
-  //   }
-  // }
-  static bool LoadModesConfig(
-      const std::string& modes_config_path, HMIConfig* config);
+  // Load HMIConfig and HMIMode.
+  static HMIConfig LoadConfig();
+  static HMIMode LoadMode(const std::string& mode_config_path);
 
  private:
-  void InitReadersAndWriters(
-      const std::shared_ptr<apollo::cyber::Node>& node);
+  void InitReadersAndWriters(const std::shared_ptr<apollo::cyber::Node>& node);
+  void InitStatus();
+  void StatusUpdateThreadLoop();
 
-  // Run command: scripts/cyber_launch.sh <command> <current_launch>
-  bool CyberLaunch(const std::string& command) const;
-  void SetupMode();
-  void ResetMode();
+  // Start / reset current mode.
+  void SetupMode() const;
+  void ResetMode() const;
+
+  // Change current mode, launch, map, vehicle and driving mode.
+  void ChangeMode(const std::string& mode_name);
+  void ChangeMap(const std::string& map_name);
+  void ChangeVehicle(const std::string& vehicle_name);
+  bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
+
+  // Find a module by name.
+  // 1. Lookup it in current Mode.modules.
+  // 2. The lookup it in config.global_modules.
+  const Module* FindModule(const std::string& module) const;
+  // Start / stop a module.
+  void StartModule(const std::string& module) const;
+  void StopModule(const std::string& module) const;
 
   void RecordAudio(const std::string& data);
 
-  HMIConfig config_;
-  HMIStatus status_;
-  mutable boost::shared_mutex status_mutex_;
+  const HMIConfig config_;
 
-  std::vector<ChangeModeHandler> change_mode_handlers_;
-  std::vector<ChangeLaunchHandler> change_launch_handlers_;
-  std::vector<ChangeMapHandler> change_map_handlers_;
-  std::vector<ChangeVehicleHandler> change_vehicle_handlers_;
+  // HMI status maintainence.
+  HMIStatus status_;
+  HMIMode current_mode_;
+  bool status_changed_ = false;
+  mutable boost::shared_mutex status_mutex_;
+  std::vector<StatusUpdateHandler> status_update_handlers_;
 
   // Cyber members.
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
   std::shared_ptr<cyber::Writer<AudioCapture>> audio_capture_writer_;
   std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>

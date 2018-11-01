@@ -9,7 +9,7 @@ export default class HMIControls extends React.Component {
     render() {
         const {
             dockerImage,
-            modes, currentMode, currentLaunch,
+            modes, currentMode,
             maps, currentMap,
             vehicles, currentVehicle,
             isCoDriver,
@@ -19,7 +19,7 @@ export default class HMIControls extends React.Component {
         return (
             <React.Fragment>
                 <button className="header-item header-button" onClick={() => alert(dockerImage)}>
-                    Check Version
+                    Docker Version
                 </button>
                 <button
                     className={classNames({
@@ -42,7 +42,6 @@ export default class HMIControls extends React.Component {
                 <HMISelectors
                     modes={modes}
                     currentMode={currentMode}
-                    currentLaunch={currentLaunch}
                     maps={maps}
                     currentMap={currentMap}
                     vehicles={vehicles}

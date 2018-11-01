@@ -25,9 +25,6 @@ DEFINE_double(
     "Dreamview profiling duration in ms. Negative value will not restrict the "
     "profiling time");
 
-DEFINE_string(hmi_config_filename, "/apollo/modules/dreamview/conf/hmi.conf",
-              "The HMI config file");
-
 DEFINE_string(static_file_dir, "/apollo/modules/dreamview/frontend/dist",
               "The path to the dreamview distribution directory. The default "
               "value points to built-in version from the Apollo project.");

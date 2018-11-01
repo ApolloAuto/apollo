@@ -68,6 +68,7 @@ DECLARE_string(localization_sins_pva_topic);
 DECLARE_string(localization_msf_status);
 DECLARE_string(relative_map_topic);
 DECLARE_string(navigation_topic);
+DECLARE_string(hmi_status_topic);
 DECLARE_string(audio_capture_topic);
 DECLARE_string(v2x_obstacle_topic);
 DECLARE_string(v2x_trafficlight_topic);

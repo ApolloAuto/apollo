@@ -17,13 +17,11 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
 #include "modules/monitor/common/recurrent_runner.h"
-#include "modules/monitor/proto/system_status.pb.h"
 
 /**
  * @namespace apollo::monitor

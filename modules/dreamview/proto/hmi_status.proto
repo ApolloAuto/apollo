@@ -28,7 +28,4 @@ message HMIStatus {
   // Message which will be read aloud to drivers and passengers through
   // Dreamview.
   optional string passenger_msg = 12;
-
-  optional apollo.monitor.SystemStatus system_status = 13 [deprecated = true];
-  optional string current_launch = 14 [deprecated = true];
 }

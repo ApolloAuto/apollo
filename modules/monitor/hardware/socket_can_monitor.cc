@@ -102,13 +102,14 @@ SocketCanMonitor::SocketCanMonitor() :
 
 void SocketCanMonitor::RunOnce(const double current_time) {
   auto& manager = MonitorManager::Instance();
-  auto* component = apollo::common::util::FindOrNull(
+  Component* component = apollo::common::util::FindOrNull(
       *manager->GetStatus()->mutable_components(),
       FLAGS_socket_can_component_name);
   if (component == nullptr) {
     // Canbus is not monitored in current mode, skip.
     return;
   }
+
   std::string message;
   const bool ret = SocketCanTest(&message);
   SummaryMonitor::EscalateStatus(

@@ -15,12 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <memory>
 #include <string>
 
 #include "modules/monitor/common/recurrent_runner.h"
-#include "modules/monitor/proto/monitor_conf.pb.h"
-#include "modules/monitor/software/safety_manager.h"
+#include "modules/monitor/proto/system_status.pb.h"
 
 namespace apollo {
 namespace monitor {
@@ -32,13 +30,15 @@ class SummaryMonitor : public RecurrentRunner {
   SummaryMonitor();
   void RunOnce(const double current_time) override;
 
- private:
-  static void SummarizeModules();
-  static void SummarizeHardware();
+  // Escalate the status to a higher priority new status:
+  //    FATAL > ERROR > WARN > OK > UNKNOWN.
+  static void EscalateStatus(const ComponentStatus::Status new_status,
+                             const std::string& message,
+                             ComponentStatus* current_status);
 
+ private:
   size_t system_status_fp_ = 0;
   double last_broadcast_ = 0;
-  std::unique_ptr<SafetyManager> safety_manager_;
 };
 
 }  // namespace monitor

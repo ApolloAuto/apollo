@@ -14,20 +14,23 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/monitor/hardware/gps/gps_monitor.h"
+#include "modules/monitor/hardware/gps_monitor.h"
 
 #include <algorithm>
+#include <string>
+#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/common/util/map_util.h"
 #include "modules/drivers/gnss/proto/gnss_status.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_string(gps_hardware_name, "GPS", "Name of the GPS hardware.");
 DEFINE_string(gps_monitor_name, "GpsMonitor", "Name of the GPS monitor.");
 DEFINE_double(gps_monitor_interval, 3, "GPS status checking interval (s).");
+DEFINE_string(gps_component_name, "GPS", "Localization component name.");
 
 namespace apollo {
 namespace monitor {
@@ -40,52 +43,58 @@ GpsMonitor::GpsMonitor() : RecurrentRunner(FLAGS_gps_monitor_name,
 }
 
 void GpsMonitor::RunOnce(const double current_time) {
-  static auto *status = MonitorManager::GetHardwareStatus(
-      FLAGS_gps_hardware_name);
+  auto& manager = MonitorManager::Instance();
+  Component* component = apollo::common::util::FindOrNull(
+      *manager->GetStatus()->mutable_components(), FLAGS_gps_component_name);
+  if (component == nullptr) {
+    // GPS is not monitored in current mode, skip.
+    return;
+  }
+  ComponentStatus* component_status = component->mutable_summary();
 
   // Check Gnss status.
   static auto gnss_status_reader =
-      MonitorManager::CreateReader<GnssStatus>(FLAGS_gnss_status_topic);
+      manager->CreateReader<GnssStatus>(FLAGS_gnss_status_topic);
   gnss_status_reader->Observe();
   const auto gnss_status = gnss_status_reader->GetLatestObserved();
   if (gnss_status == nullptr) {
-    status->set_status(HardwareStatus::ERR);
-    status->set_detailed_msg("No GNSS status message.");
+    SummaryMonitor::EscalateStatus(
+        ComponentStatus::ERROR, "No GNSS status message", component_status);
     return;
   }
   if (!gnss_status->solution_completed()) {
-    status->set_status(HardwareStatus::WARN);
-    status->set_detailed_msg("GNSS solution uncompleted.");
+    SummaryMonitor::EscalateStatus(
+        ComponentStatus::WARN, "GNSS solution uncompleted", component_status);
     return;
   }
 
   // Check Ins status.
   static auto ins_status_reader =
-      MonitorManager::CreateReader<InsStatus>(FLAGS_ins_status_topic);
+      manager->CreateReader<InsStatus>(FLAGS_ins_status_topic);
   ins_status_reader->Observe();
   const auto ins_status = ins_status_reader->GetLatestObserved();
   if (ins_status == nullptr) {
-    status->set_status(HardwareStatus::ERR);
-    status->set_detailed_msg("No INS status message.");
+    SummaryMonitor::EscalateStatus(
+        ComponentStatus::ERROR, "No INS status message", component_status);
     return;
   }
   switch (ins_status->type()) {
     case InsStatus::CONVERGING:
-      status->set_status(HardwareStatus::NOT_READY);
-      status->set_detailed_msg("INS ALIGNING");
-      return;
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::WARN, "INS not ready, converging", component_status);
+      break;
     case InsStatus::GOOD:
+      SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);
       break;
     case InsStatus::INVALID:
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::ERROR, "INS status invalid", component_status);
+      break;
     default:
-      status->set_status(HardwareStatus::ERR);
-      status->set_detailed_msg("INS status invalid.");
-      return;
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::ERROR, "INS status unknown", component_status);
+      break;
   }
-
-  // All check passed.
-  status->set_status(HardwareStatus::OK);
-  status->set_detailed_msg("OK");
 }
 
 }  // namespace monitor

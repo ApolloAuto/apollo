@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,22 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "modules/monitor/common/recurrent_runner.h"
+#include "modules/monitor/proto/system_status.pb.h"
 
 namespace apollo {
 namespace monitor {
 
-// AdapterManager is required to listen to ins_status and gnss_status.
-class GpsMonitor : public RecurrentRunner {
+// Check if we need to switch to safe mode, and then
+// 1. Notify driver to take action.
+// 2. Trigger Guardian if no proper action was taken.
+class FunctionalSafetyMonitor : public RecurrentRunner {
  public:
-  GpsMonitor();
-  void RunOnce(const double current_time) override;
+  FunctionalSafetyMonitor();
+  void RunOnce(const double current_time);
+
+ private:
+  bool CheckSafety();
 };
 
 }  // namespace monitor

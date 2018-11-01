@@ -8,39 +8,28 @@ import WS from "store/websocket";
 @inject("store") @observer
 export default class Header extends React.Component {
     render() {
-        const { modes, currentMode, currentLaunch,
-                moduleStatus, hardwareStatus, displayName } = this.props.store.hmi;
+        const { modes, currentMode, moduleStatus, componentStatus } = this.props.store.hmi;
 
-        const liveModules = (currentMode !== 'none' && currentLaunch !== 'none')
-            ? modes[currentMode].launches[currentLaunch].additionalModules
-            : Array.from(moduleStatus.keys());
-        const liveHardware = (currentMode !== 'none')
-                              ? modes[currentMode].liveHardware : Array.from(hardwareStatus.keys());
+        const moduleEntries = Array.from(moduleStatus.keys()).sort().map(key => {
+                return <CheckboxItem key={key} id={key} title={key}
+                                     disabled={false} isChecked={moduleStatus.get(key)}
+                                     onClick={() => {
+                                         this.props.store.hmi.toggleModule(key);
+                                     }}
+                                     extraClasses="controller" />;
+            });
 
-        const moduleEntries = liveModules.sort().map((key) => {
-                  return <CheckboxItem key={key}
-                                       id={key}
-                                       title={displayName[key]}
-                                       disabled={false}
-                                       isChecked={moduleStatus.get(key)}
-                                       onClick={() => {
-                                            this.props.store.hmi.toggleModule(key);
-                                       }}
-                                       extraClasses="controller"
-                                       />;
-                });
-        const hardwareEntries = liveHardware.map((key) => {
-                  return <StatusDisplay key={key}
-                                           title={displayName[key]}
-                                           status={hardwareStatus.get(key)}/>;
-                });
+        const componentEntries = Array.from(componentStatus.keys()).sort().map(key => {
+                return <StatusDisplay key={key} title={key}
+                                      status={componentStatus.get(key)} />;
+            });
 
         return (
             <div className="module-controller">
                 <div className="card">
-                    <div className="card-header"><span>Hardware</span></div>
+                    <div className="card-header"><span>Components</span></div>
                     <div className="card-content-column">
-                        {hardwareEntries}
+                        {componentEntries}
                     </div>
                 </div>
                 <div className="card">

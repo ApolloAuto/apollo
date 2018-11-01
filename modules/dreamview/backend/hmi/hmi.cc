@@ -28,104 +28,44 @@
 namespace apollo {
 namespace dreamview {
 
-using apollo::canbus::Chassis;
-using apollo::common::time::Clock;
 using apollo::common::util::JsonUtil;
 using Json = WebSocketHandler::Json;
 
-constexpr int HMI::kMinBroadcastIntervalMs;
-
 HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
-    : node_(cyber::CreateNode("hmi")),
+    : hmi_worker_(new HMIWorker()),
+      monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
       websocket_(websocket),
-      map_service_(map_service),
-      monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI) {
-  hmi_worker_.reset(new HMIWorker(node_));
-
-  // Register websocket message handlers.
+      map_service_(map_service) {
   if (websocket_) {
     RegisterMessageHandlers();
-    cyber::Async(&HMI::BroadcastStatusThreadLoop, this);
   }
 }
 
 void HMI::RegisterMessageHandlers() {
-  // Send current config and status to new HMI client.
+  // Broadcast HMIStatus to clients when status changed.
+  hmi_worker_->RegisterStatusUpdateHandler(
+      [this](const bool status_changed, HMIStatus* status) {
+        if (!status_changed) {
+          // Status doesn't change, skip broadcasting.
+          return;
+        }
+        websocket_->BroadcastData(
+            JsonUtil::ProtoToTypedJson("HMIStatus", *status).dump());
+        if (status->current_map().empty()) {
+          monitor_log_buffer_.WARN("You haven't selected a map yet!");
+        }
+        if (status->current_vehicle().empty()) {
+          monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
+        }
+      });
+
+  // Send current status and vehicle param to newly joined client.
   websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) {
-        const auto &config = hmi_worker_->GetConfig();
-        websocket_->SendData(
-            conn, JsonUtil::ProtoToTypedJson("HMIConfig", config).dump());
-        websocket_->SendData(conn, JsonUtil::ProtoToTypedJson(
-                                       "HMIStatus", hmi_worker_->GetStatus())
-                                       .dump());
-
+      [this](WebSocketHandler::Connection* conn) {
+        const auto status_json = JsonUtil::ProtoToTypedJson(
+            "HMIStatus", hmi_worker_->GetStatus());
+        websocket_->SendData(conn, status_json.dump());
         SendVehicleParam(conn);
-      });
-
-  // HMI client asks for executing module command.
-  websocket_->RegisterMessageHandler(
-      "ExecuteModuleCommand",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {module: "module_name", command: "command_name"}.
-        // If module_name is "all", then run the command on all modules.
-        std::string module;
-        std::string command;
-        if (JsonUtil::GetStringFromJson(json, "module", &module) &&
-            JsonUtil::GetStringFromJson(json, "command", &command)) {
-          hmi_worker_->RunModuleCommand(module, command);
-        } else {
-          AERROR << "Truncated module command.";
-        }
-      });
-
-  // HMI client asks for executing tool command.
-  websocket_->RegisterMessageHandler(
-      "ExecuteToolCommand",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {tool: "tool_name", command: "command_name"}.
-        std::string tool;
-        std::string command;
-        if (JsonUtil::GetStringFromJson(json, "tool", &tool) &&
-            JsonUtil::GetStringFromJson(json, "command", &command)) {
-          hmi_worker_->RunToolCommand(tool, command);
-        } else {
-          AERROR << "Truncated tool command.";
-        }
-      });
-
-  // HMI client asks for executing mode command.
-  websocket_->RegisterMessageHandler(
-      "ExecuteModeCommand",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {command: "command_name"}.
-        // Supported commands are: "start", "stop".
-        std::string command;
-        if (JsonUtil::GetStringFromJson(json, "command", &command)) {
-          hmi_worker_->RunModeCommand(command);
-        } else {
-          AERROR << "Truncated mode command.";
-        }
-      });
-
-  // HMI client asks for changing driving mode.
-  websocket_->RegisterMessageHandler(
-      "ChangeDrivingMode",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {new_mode: "DrivingModeName"}.
-        // DrivingModeName should be one of canbus::Chassis::DrivingMode.
-        // For now it is either COMPLETE_MANUAL or COMPLETE_AUTO_DRIVE.
-        std::string new_mode;
-        if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
-          Chassis::DrivingMode mode;
-          if (Chassis::DrivingMode_Parse(new_mode, &mode)) {
-            hmi_worker_->ChangeToDrivingMode(mode);
-          } else {
-            AERROR << "Unknown driving mode " << new_mode;
-          }
-        } else {
-          AERROR << "Truncated ChangeDrivingMode request.";
-        }
       });
 
   websocket_->RegisterMessageHandler(
@@ -148,85 +88,16 @@ void HMI::RegisterMessageHandlers() {
         } else {
           hmi_worker_->Trigger(hmi_action);
         }
-      });
 
-  // HMI client asks for changing map.
-  hmi_worker_->RegisterChangeMapHandler([this](const std::string &new_map) {
-    // Reload simulation map after changing map.
-    CHECK(map_service_->ReloadMap(true))
-        << "Failed to load new simulation map: " << new_map;
-    // And then broadcast new HMIStatus to all clients.
-    DeferredBroadcastHMIStatus();
-  });
-  websocket_->RegisterMessageHandler(
-      "ChangeMap",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {new_map: "MapName"}.
-        // MapName should be a key of config_.available_maps.
-        std::string new_map;
-        if (JsonUtil::GetStringFromJson(json, "new_map", &new_map)) {
-          hmi_worker_->ChangeToMap(new_map);
-        } else {
-          AERROR << "Truncated ChangeMap request.";
-        }
-      });
-
-  // HMI client asks for changing vehicle.
-  hmi_worker_->RegisterChangeVehicleHandler(
-      [this](const std::string &new_vehicle) {
-        // Reload lidar params for point cloud service.
-        PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
-        // Broadcast new HMIStatus and VehicleParam.
-        DeferredBroadcastHMIStatus();
-        SendVehicleParam();
-      });
-  websocket_->RegisterMessageHandler(
-      "ChangeVehicle",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {new_vehicle: "VehicleName"}.
-        // VehicleName should be a key of config_.available_vehicles.
-        std::string new_vehicle;
-        if (JsonUtil::GetStringFromJson(json, "new_vehicle", &new_vehicle)) {
-          hmi_worker_->ChangeToVehicle(new_vehicle);
-        } else {
-          AERROR << "Truncated ChangeVehicle request.";
-        }
-      });
-
-  // HMI client asks for changing mode or launch.
-  hmi_worker_->RegisterChangeModeHandler(
-      [this](const std::string &new_mode) {
-        // Broadcast new HMIStatus.
-        DeferredBroadcastHMIStatus();
-      });
-  hmi_worker_->RegisterChangeLaunchHandler(
-      [this](const std::string &new_launch) {
-        // Broadcast new HMIStatus.
-        DeferredBroadcastHMIStatus();
-      });
-  websocket_->RegisterMessageHandler(
-      "ChangeMode",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {new_mode: "ModeName"}.
-        // ModeName should be a key of config_.modes.
-        std::string new_mode;
-        if (JsonUtil::GetStringFromJson(json, "new_mode", &new_mode)) {
-          hmi_worker_->ChangeToMode(new_mode);
-        } else {
-          AERROR << "Truncated ChangeMode request.";
-        }
-      });
-
-  websocket_->RegisterMessageHandler(
-      "ChangeLaunch",
-      [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // json should contain {new_launch: "LaunchName"}.
-        // LaunchName should be a key of config_.modes[current_mode].launches.
-        std::string new_launch;
-        if (JsonUtil::GetStringFromJson(json, "new_launch", &new_launch)) {
-          hmi_worker_->ChangeToLaunch(new_launch);
-        } else {
-          AERROR << "Truncated ChangeLaunch request.";
+        // Extra works for current Dreamview.
+        if (hmi_action == HMIAction::CHANGE_MAP) {
+          // Reload simulation map after changing map.
+          CHECK(map_service_->ReloadMap(true))
+              << "Failed to load new simulation map: " << value;
+        } else if (hmi_action == HMIAction::CHANGE_VEHICLE) {
+          // Reload lidar params for point cloud service.
+          PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
+          SendVehicleParam();
         }
       });
 
@@ -250,52 +121,6 @@ void HMI::RegisterMessageHandlers() {
           monitor_log_buffer_.WARN("Failed to submit a drive event.");
         }
       });
-
-  // Received new system status, broadcast to clients.
-  node_->CreateReader<monitor::SystemStatus>(
-      FLAGS_system_status_topic,
-      [this](const std::shared_ptr<monitor::SystemStatus> &system_status) {
-        ADEBUG << "Received system status: run system_status callback.";
-        if (Clock::NowInSeconds() - system_status->header().timestamp_sec() <
-            FLAGS_system_status_lifetime_seconds) {
-          hmi_worker_->UpdateSystemStatus(*system_status);
-          DeferredBroadcastHMIStatus();
-        }
-      });
-}
-
-void HMI::BroadcastStatusThreadLoop() {
-  while (true) {
-    std::this_thread::sleep_for(
-        std::chrono::milliseconds(kMinBroadcastIntervalMs));
-
-    {
-      std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
-      if (!need_broadcast_) {
-        continue;
-      }
-      // Reset to false.
-      need_broadcast_ = false;
-    }
-
-    // Get a copy of status.
-    const auto status = hmi_worker_->GetStatus();
-    websocket_->BroadcastData(
-        JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
-
-    // Broadcast messages.
-    if (status.current_map().empty()) {
-      monitor_log_buffer_.WARN("You haven't selected a map yet!");
-    }
-    if (status.current_vehicle().empty()) {
-      monitor_log_buffer_.WARN("You haven't selected a vehicle yet!");
-    }
-  }
-}
-
-void HMI::DeferredBroadcastHMIStatus() {
-  std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
-  need_broadcast_ = true;
 }
 
 void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {

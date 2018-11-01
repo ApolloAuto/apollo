@@ -21,6 +21,7 @@
 #include "modules/common/util/map_util.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/monitor/software/summary_monitor.h"
 
 DEFINE_string(localization_monitor_name, "LocalizationMonitor",
               "Name of the localization monitor.");
@@ -28,63 +29,76 @@ DEFINE_string(localization_monitor_name, "LocalizationMonitor",
 DEFINE_double(localization_monitor_interval, 5,
               "Localization status checking interval (s).");
 
-DEFINE_string(localization_module_name, "localization",
-              "Localization module name.");
+DEFINE_string(localization_component_name, "Localization",
+              "Localization component name.");
 
 namespace apollo {
 namespace monitor {
 using apollo::common::util::StrCat;
 using apollo::localization::LocalizationStatus;
 using apollo::localization::MeasureState;
-using apollo::localization::MeasureState_Name;
 
 LocalizationMonitor::LocalizationMonitor()
     : RecurrentRunner(FLAGS_localization_monitor_name,
                       FLAGS_localization_monitor_interval) {}
 
 void LocalizationMonitor::RunOnce(const double current_time) {
-  static auto reader = MonitorManager::CreateReader<LocalizationStatus>(
-      FLAGS_localization_msf_status);
-  reader->Observe();
-  const auto status = reader->GetLatestObserved();
-  if (status == nullptr) {
-    AERROR << "No LocalizationStatus received.";
+  auto& manager = MonitorManager::Instance();
+  auto* component = apollo::common::util::FindOrNull(
+      *manager->GetStatus()->mutable_components(),
+      FLAGS_localization_component_name);
+  if (component == nullptr) {
+    // localization is not monitored in current mode, skip.
     return;
   }
 
-  auto& localization_status = apollo::common::util::LookupOrInsert(
-      MonitorManager::GetStatus()->mutable_modules(),
-      FLAGS_localization_module_name, {});
-  auto& dv_log = MonitorManager::LogBuffer();
+  static auto reader = manager->CreateReader<LocalizationStatus>(
+      FLAGS_localization_msf_status);
+  reader->Observe();
+  const auto status = reader->GetLatestObserved();
 
+  ComponentStatus* component_status = component->mutable_summary();
+  if (status == nullptr) {
+    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
+                                   "No LocalizationStatus received",
+                                   component_status);
+    return;
+  }
+
+  // Translate LocalizationStatus to ComponentStatus. Note that ERROR and FATAL
+  // will trigger safety mode in current settings.
   switch (status->fusion_status()) {
     case MeasureState::OK:
-      localization_status.set_summary(Summary::OK);
+      SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);
       break;
     case MeasureState::WARNNING:
-      AWARN << "Localization WARNNING: " << status->state_message();
-      localization_status.set_summary(Summary::WARN);
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::WARN,
+          StrCat("WARNNING: ", status->state_message()),
+          component_status);
       break;
     case MeasureState::ERROR:
-      dv_log.WARN(StrCat("Localization ERROR: ", status->state_message()));
-      localization_status.set_summary(Summary::WARN);
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::WARN,
+          StrCat("ERROR: ", status->state_message()),
+          component_status);
       break;
     case MeasureState::CRITICAL_ERROR:
-      dv_log.ERROR(StrCat(
-          "Localization CRITICAL_ERROR: ", status->state_message()));
-      localization_status.set_summary(Summary::WARN);
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::ERROR,
+          StrCat("CRITICAL_ERROR: ", status->state_message()),
+          component_status);
       break;
     case MeasureState::FATAL_ERROR:
-      dv_log.ERROR(StrCat(
-          "Localization FATAL_ERROR: ", status->state_message()));
-      // ERROR and FATAL will trigger safety stop.
-      localization_status.set_summary(Summary::FATAL);
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::FATAL,
+          StrCat("FATAL_ERROR: ", status->state_message()),
+          component_status);
       break;
     default:
       AFATAL << "Unknown fusion_status: " << status->fusion_status();
       break;
   }
-  localization_status.set_msg(status->state_message());
 }
 
 }  // namespace monitor

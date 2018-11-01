@@ -168,13 +168,14 @@ EsdCanMonitor::EsdCanMonitor() :
 }
 
 void EsdCanMonitor::RunOnce(const double current_time) {
-  auto& manager = MonitorManager::Instance();
-  auto* component = apollo::common::util::FindOrNull(
-      *manager->GetStatus()->mutable_components(), FLAGS_esdcan_component_name);
+  Component* component = apollo::common::util::FindOrNull(
+      *MonitorManager::Instance()->GetStatus()->mutable_components(),
+      FLAGS_esdcan_component_name);
   if (component == nullptr) {
     // Canbus is not monitored in current mode, skip.
     return;
   }
+
   ComponentStatus* component_status = component->mutable_summary();
   const auto ret = EsdCanTest(FLAGS_esdcan_id);
   if (ret == NTCAN_SUCCESS) {

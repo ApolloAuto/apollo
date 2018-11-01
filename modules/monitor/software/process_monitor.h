@@ -15,11 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include <map>
 #include <string>
+#include <vector>
 
+#include "modules/dreamview/proto/hmi_mode.pb.h"
 #include "modules/monitor/common/recurrent_runner.h"
-#include "modules/monitor/proto/monitor_conf.pb.h"
+#include "modules/monitor/proto/system_status.pb.h"
 
 namespace apollo {
 namespace monitor {
@@ -30,9 +31,10 @@ class ProcessMonitor : public RecurrentRunner {
   void RunOnce(const double current_time) override;
 
  private:
-  static void UpdateModule(
-      const std::string &module_name, const ProcessConf &process_conf,
-      const std::map<std::string, std::string> &running_processes);
+  static void UpdateStatus(
+      const std::vector<std::string>& running_processes,
+      const apollo::dreamview::ProcessMonitorConfig& config,
+      ComponentStatus* status);
 };
 
 }  // namespace monitor
