@@ -410,7 +410,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   // send msg
   writer_->Write(out_msg);
 
-  SendSimulationMsg();
+//  SendSimulationMsg();
 
   const auto send_message_time =
       PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(perf_indicator,
