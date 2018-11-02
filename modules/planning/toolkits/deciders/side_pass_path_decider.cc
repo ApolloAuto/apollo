@@ -28,6 +28,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -39,7 +40,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::PathOverlap;
 
 constexpr double kRoadBuffer = 0.2;
-constexpr double kObstacleBuffer = 0.4;
+constexpr double kObstacleBuffer = 0.1;
 constexpr double kPlanDistAfterObs = 5.0;
 constexpr double kSidePassPathLength = 50.0;
 
@@ -185,12 +186,14 @@ SidePassPathDecider::GetPathBoundaries(
 
     if (is_blocked_by_obs) {
       if (decided_direction_ == SidePassDirection::LEFT) {
-        std::get<1>(lateral_bound) =
-            nearest_obs_sl_boundary.end_l() + kObstacleBuffer + adc_half_width;
+        std::get<1>(lateral_bound) = nearest_obs_sl_boundary.end_l() +
+                                     FLAGS_static_decision_nudge_l_buffer +
+                                     kObstacleBuffer + adc_half_width;
         std::get<2>(lateral_bound) += road_left_width_at_curr_s;
       } else if (decided_direction_ == SidePassDirection::RIGHT) {
         std::get<1>(lateral_bound) -= road_right_width_at_curr_s;
         std::get<2>(lateral_bound) = nearest_obs_sl_boundary.start_l() -
+                                     FLAGS_static_decision_nudge_l_buffer -
                                      kObstacleBuffer - adc_half_width;
       } else {
         AERROR << "Side-pass direction undefined.";

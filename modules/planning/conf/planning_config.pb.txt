@@ -201,8 +201,8 @@ default_task_config : {
     max_dddl: 2.0
     l_weight: 1.0
     dl_weight: 1.0
-    ddl_weight: 1.0
-    dddl_weight: 1.0
+    ddl_weight: 1000.0
+    dddl_weight: 100.0
     guiding_line_weight: 1.0
   }
 }
