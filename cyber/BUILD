@@ -93,6 +93,7 @@ cc_library(
         "//cyber/croutine:croutine",
         "//cyber/data:data",
         "//cyber/event:perf_event_cache",
+        "//cyber/io:io",
         "//cyber:init",
         "//cyber/logger:logger",
         "//cyber/logger:async_logger",
