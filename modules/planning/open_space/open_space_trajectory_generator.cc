@@ -176,12 +176,15 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   Eigen::MatrixXd state_result_ds;
   Eigen::MatrixXd control_result_ds;
   Eigen::MatrixXd time_result_ds;
+  Eigen::MatrixXd dual_l_result_ds;
+  Eigen::MatrixXd dual_n_result_ds;
 
   // TODO(QiL): Pass dual variable warm start result in.
   bool distance_approach_status = distance_approach_->Solve(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, XYbounds_,
       obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
-      &state_result_ds, &control_result_ds, &time_result_ds);
+      &state_result_ds, &control_result_ds, &time_result_ds, &dual_l_result_ds,
+      &dual_n_result_ds);
 
   if (distance_approach_status) {
     ADEBUG << "Distance approach problem solved successfully!";

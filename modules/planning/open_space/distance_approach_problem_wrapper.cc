@@ -145,7 +145,7 @@ class ObstacleContainer {
 
   void AddDistanceApproachObstacle(
       const double* ROI_distance_approach_parking_boundary) {
-    // the obstacles are hard coded into vertice sets of 2, 3, 3, 2
+    // the obstacles are hard coded into vertice sets of 3, 2, 3, 2
     if (!(VPresentationObstacle(ROI_distance_approach_parking_boundary) &&
           HPresentationObstacle())) {
       AINFO << "obstacle presentation fails";
@@ -188,6 +188,8 @@ class ResultContainer {
   Eigen::MatrixXd* PrepareStateResult() { return &state_result_ds_; }
   Eigen::MatrixXd* PrepareControlResult() { return &control_result_ds_; }
   Eigen::MatrixXd* PrepareTimeResult() { return &time_result_ds_; }
+  Eigen::MatrixXd* PrepareLResult() { return &dual_l_result_ds_; }
+  Eigen::MatrixXd* PrepareNResult() { return &dual_n_result_ds_; }
 
  private:
   Result result_;
@@ -200,6 +202,8 @@ class ResultContainer {
   Eigen::MatrixXd state_result_ds_;
   Eigen::MatrixXd control_result_ds_;
   Eigen::MatrixXd time_result_ds_;
+  Eigen::MatrixXd dual_l_result_ds_;
+  Eigen::MatrixXd dual_n_result_ds_;
 };
 
 extern "C" {
@@ -297,18 +301,21 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       obstacles_ptr->GetObstaclesNum(), obstacles_ptr->GetObstaclesEdgesNum(),
       obstacles_ptr->GetAMatrix(), obstacles_ptr->GetbMatrix(),
       result_ptr->PrepareStateResult(), result_ptr->PrepareControlResult(),
-      result_ptr->PrepareTimeResult());
+      result_ptr->PrepareTimeResult(), result_ptr->PrepareLResult(),
+      result_ptr->PrepareNResult());
   if (!status) {
     AINFO << "Distance fail";
     return false;
   }
   return true;
 }
-void DistanceGetResult(ResultContainer* result_ptr, double* x, double* y,
+void DistanceGetResult(ResultContainer* result_ptr,
+                       ObstacleContainer* obstacles_ptr, double* x, double* y,
                        double* phi, double* v, double* a, double* steer,
                        double* opt_x, double* opt_y, double* opt_phi,
                        double* opt_v, double* opt_a, double* opt_steer,
-                       double* opt_time, std::size_t* output_size) {
+                       double* opt_time, double* opt_dual_l, double* opt_dual_n,
+                       std::size_t* output_size) {
   result_ptr->LoadHybridAResult();
   std::size_t size = result_ptr->GetX()->size();
   std::size_t size_by_distance = result_ptr->PrepareStateResult()->cols();
@@ -326,14 +333,24 @@ void DistanceGetResult(ResultContainer* result_ptr, double* x, double* y,
     a[i] = result_ptr->GetA()->at(i);
     steer[i] = result_ptr->GetSteer()->at(i);
   }
-  *output_size = size;
+  output_size[0] = size;
 
+  std::size_t obstacles_edges_sum = obstacles_ptr->GetObstaclesEdgesNum().sum();
+  std::size_t obstacles_num_to_car = 4 * obstacles_ptr->GetObstaclesNum();
   for (std::size_t i = 0; i < size_by_distance; i++) {
     opt_x[i] = (*(result_ptr->PrepareStateResult()))(0, i);
     opt_y[i] = (*(result_ptr->PrepareStateResult()))(1, i);
     opt_phi[i] = (*(result_ptr->PrepareStateResult()))(2, i);
     opt_v[i] = (*(result_ptr->PrepareStateResult()))(3, i);
     opt_time[i] = (*(result_ptr->PrepareTimeResult()))(0, i);
+    for (std::size_t j = 0; j < obstacles_edges_sum; j++) {
+      opt_dual_l[i * obstacles_edges_sum + j] =
+          (*(result_ptr->PrepareLResult()))(j, i);
+    }
+    for (std::size_t k = 0; k < obstacles_num_to_car; k++) {
+      opt_dual_n[i * obstacles_num_to_car + k] =
+          (*(result_ptr->PrepareNResult()))(k, i);
+    }
   }
 
   for (std::size_t i = 0; i < size_by_distance - 1; i++) {

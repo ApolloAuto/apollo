@@ -54,7 +54,8 @@ class DistanceApproachProblem {
              const Eigen::MatrixXd& obstacles_edges_num,
              const Eigen::MatrixXd& obstacles_A,
              const Eigen::MatrixXd& obstacles_b, Eigen::MatrixXd* state_result,
-             Eigen::MatrixXd* control_result, Eigen::MatrixXd* time_result);
+             Eigen::MatrixXd* control_result, Eigen::MatrixXd* time_result,
+             Eigen::MatrixXd* dual_l_result, Eigen::MatrixXd* dual_n_result);
 
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;
