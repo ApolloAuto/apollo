@@ -38,8 +38,6 @@ class GeneralMessage : public GeneralMessageBase {
 
   void Render(const Screen* s, int key) override;
 
-  RenderableMessage* Child(int lineNo) const override;
-
  private:
   GeneralMessage(const GeneralMessage&) = delete;
   GeneralMessage& operator=(const GeneralMessage&) = delete;

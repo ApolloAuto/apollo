@@ -48,7 +48,7 @@ class GeneralMessageBase : public RenderableMessage {
     children_map_.insert(std::make_pair(lineNo, item));
   }
 
-  RenderableMessage* Child(int lineNo) const;
+  RenderableMessage* Child(int lineNo) const override;
 
   explicit GeneralMessageBase(RenderableMessage* parent = nullptr)
       : RenderableMessage(parent), children_map_() {}

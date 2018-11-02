@@ -27,8 +27,6 @@ namespace {
 constexpr int ReaderWriterOffset = 4;
 }  // namespace
 
-double GeneralChannelMessage::max_frmae_ratio_ = 1.0;
-
 const char* GeneralChannelMessage::errCode2Str(
     GeneralChannelMessage::ErrorCode errCode) {
   const char* ret;
@@ -86,12 +84,10 @@ double GeneralChannelMessage::frame_ratio(void) {
 
   if (deltaTime.ToNanosecond() > 1000000000) {
     last_time_ = curTime;
-    frame_ratio_ = frame_counter_ / deltaTime.ToSecond();
     int old = frame_counter_;
     while(!frame_counter_.compare_exchange_strong(old, 0)) {}
+    frame_ratio_ = old / deltaTime.ToSecond();
   }
-
-  if (frame_ratio_ > max_frmae_ratio_) max_frmae_ratio_ = frame_ratio_;
 
   return (frame_ratio_);
 }
@@ -122,10 +118,6 @@ GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
     return castErrorCode2Ptr(ErrorCode::CreateReaderFailed);
   }
   return this;
-}
-
-RenderableMessage* GeneralChannelMessage::Child(int lineNo) const {
-  return GeneralMessageBase::Child(lineNo);
 }
 
 void GeneralChannelMessage::Render(const Screen* s, int key) {

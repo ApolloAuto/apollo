@@ -28,6 +28,10 @@
 #include <string>
 #include <thread>
 
+namespace{
+  constexpr double MinHalfFrameRatio = 12.5;
+}
+
 Screen* Screen::Instance(void) {
   static Screen s;
   return &s;
@@ -189,7 +193,7 @@ int Screen::SwitchState(int ch) {
         clear();
       }
       break;
-    default:;
+    default: {}
   }
   return ch;
 }
@@ -215,8 +219,12 @@ void Screen::Run() {
     ch = SwitchState(ch);
 
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
-    std::this_thread::sleep_for(std::chrono::milliseconds(
-        static_cast<int>(1000.0 / (GeneralChannelMessage::max_frame_ratio() + 10.0))));
+
+    double fr = current_render_obj_->frame_ratio();
+    if(fr < MinHalfFrameRatio) fr = MinHalfFrameRatio;
+    int period = static_cast<int>(1000.0 / fr);
+    period >>= 1;
+    std::this_thread::sleep_for(std::chrono::milliseconds(period));
   } while (canRun_);
 }
 
