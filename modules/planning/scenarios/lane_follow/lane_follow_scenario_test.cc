@@ -32,6 +32,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
+namespace lane_follow {
 
 class LaneFollowScenarioTest : public ::testing::Test {
  public:
@@ -64,6 +65,7 @@ TEST_F(LaneFollowScenarioTest, Init) {
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::LANE_FOLLOW);
 }
 
+}  // namespace lane_follow
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

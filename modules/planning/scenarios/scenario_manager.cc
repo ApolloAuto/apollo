@@ -46,8 +46,8 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     ScenarioConfig::ScenarioType scenario_type) {
   std::unique_ptr<Scenario> ptr;
   if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
-    ptr.reset(
-        new LaneFollowScenario(config_map_[scenario_type], &scenario_context_));
+    ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
+                                                  &scenario_context_));
   } else if (scenario_type == ScenarioConfig::SIDE_PASS) {
     ptr.reset(new scenario::side_pass::SidePassScenario(
         config_map_[scenario_type], &scenario_context_));
@@ -108,8 +108,7 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
-  PlanningContext::GetScenarioInfo()->next_stop_sign_overlap =
-      PathOverlap();
+  PlanningContext::GetScenarioInfo()->next_stop_sign_overlap = PathOverlap();
 
   const auto& reference_line_info = frame.reference_line_info().front();
 
@@ -128,8 +127,9 @@ void ScenarioManager::Observe(const Frame& frame) {
           stop_sign_overlap;
     }
   }
-  ADEBUG << "STOP SIGN: " <<
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  ADEBUG
+      << "STOP SIGN: "
+      << PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
