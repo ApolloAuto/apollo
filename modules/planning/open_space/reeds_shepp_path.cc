@@ -53,7 +53,7 @@ std::pair<double, double> ReedShepp::calc_tau_omega(double u, double v,
 
 bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                             const std::shared_ptr<Node3d> end_node,
-                            ReedSheppPath* optimal_path) {
+                            std::shared_ptr<ReedSheppPath> optimal_path) {
   std::vector<ReedSheppPath> all_possible_paths;
   if (!GenerateRSPs(start_node, end_node, &all_possible_paths)) {
     AINFO << "Fail to generate different combination of Reed Shepp "

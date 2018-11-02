@@ -63,7 +63,7 @@ class ReedShepp {
   // by Reed Shepp
   bool ShortestRSP(const std::shared_ptr<Node3d> start_node,
                    const std::shared_ptr<Node3d> end_node,
-                   ReedSheppPath* optimal_path);
+                   std::shared_ptr<ReedSheppPath> optimal_path);
 
  private:
   // Generate all possible combination of movement primitives by Reed Shepp and
