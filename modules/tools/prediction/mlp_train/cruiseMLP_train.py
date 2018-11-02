@@ -336,7 +336,8 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
         loss.backward()
         optimizer.step()
         train_correct_class += \
-            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
+            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
+                    y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
 
         if i % 500 == 0:
@@ -375,7 +376,8 @@ def train_dataloader(train_loader, model, optimizer, epoch):
         optimizer.step()
 
         train_correct_class += \
-            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
+            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == 
+                    y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
         #if i > 100:
         #    break
@@ -405,7 +407,8 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=1024):
         valid_loss = loss_fn(c_pred, r_pred, y)
         loss_history.append(valid_loss.data[0])
         valid_correct_class += \
-            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
+            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
+                    y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
     valid_classification_accuracy = valid_correct_class / valid_y.data.cpu().numpy().shape[0]
     logging.info('Validation loss: {}. Validation classification accuracy: {}'\
@@ -434,7 +437,8 @@ def validate_dataloader(valid_loader, model):
         valid_loss = loss_fn(c_pred, r_pred, y)
         loss_history.append(valid_loss.data[0])
         valid_correct_class += \
-            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
+            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
+                    y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
 
     valid_classification_accuracy = valid_correct_class / total_size
@@ -451,112 +455,115 @@ def validate_dataloader(valid_loader, model):
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description=\
-        'train neural network based on feature files and save parameters')
+    parser = argparse.ArgumentParser \
+        (description='train neural network based on feature files and save parameters')
     parser.add_argument('train_file', type=str, help='training data (h5)')
     parser.add_argument('valid_file', type=str, help='validation data (h5)')
+    parser.add_argument('-d', '--data_loader', action='store_true', \
+        help='Use the dataloader (when memory size is smaller than dataset size)')
+
 
     args = parser.parse_args()
 
-    '''
-    train_file = args.train_file
-    valid_file = args.valid_file
+    if !args.data_loader:
 
-    train_data = load_data(train_file)
-    valid_data = load_data(valid_file)
+        train_file = args.train_file
+        valid_file = args.valid_file
 
-    print ("Data load success.")
-    print ("Training data size = ", train_data.shape)
-    print ("Validation data size = ", valid_data.shape)
+        train_data = load_data(train_file)
+        valid_data = load_data(valid_file)
 
-    # Data preprocessing
-    X_train, y_train = data_preprocessing(train_data)
-    X_valid, y_valid = data_preprocessing(valid_data)
-    
-    # Model declaration
-    model = FCNN_CNN1D()
-    print ("The model used is: ")
-    print (model)
-    learning_rate = 5e-4
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau\
-        (optimizer, factor=0.5, patience=3, min_lr=1e-8, verbose=1, mode='min')
+        print ("Data load success.")
+        print ("Training data size = ", train_data.shape)
+        print ("Validation data size = ", valid_data.shape)
 
-    # CUDA set-up:
-    cuda_is_available = torch.cuda.is_available()
-    if (cuda_is_available):
-        print ("Using CUDA to speed up training.")
-        model.cuda()
-        X_train = Variable(torch.FloatTensor(X_train).cuda())
-        X_valid = Variable(torch.FloatTensor(X_valid).cuda())
-        y_train = Variable(torch.FloatTensor(y_train).cuda())
-        y_valid = Variable(torch.FloatTensor(y_valid).cuda())
+        # Data preprocessing
+        X_train, y_train = data_preprocessing(train_data)
+        X_valid, y_valid = data_preprocessing(valid_data)
+        
+        # Model declaration
+        model = FCNN_CNN1D()
+        print ("The model used is: ")
+        print (model)
+        learning_rate = 5e-4
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau\
+            (optimizer, factor=0.5, patience=3, min_lr=1e-8, verbose=1, mode='min')
 
-    # Model training:
-    for epoch in range(100):
-        train_vanilla(X_train, y_train, model, optimizer, epoch)
-        valid_loss = validate_vanilla(X_valid, y_valid, model)
-        scheduler.step(valid_loss)
-        #torch.save(model.state_dict(), './cruiseMLP_saved_model.pt')
-    
-    '''
+        # CUDA set-up:
+        cuda_is_available = torch.cuda.is_available()
+        if (cuda_is_available):
+            print ("Using CUDA to speed up training.")
+            model.cuda()
+            X_train = Variable(torch.FloatTensor(X_train).cuda())
+            X_valid = Variable(torch.FloatTensor(X_valid).cuda())
+            y_train = Variable(torch.FloatTensor(y_train).cuda())
+            y_valid = Variable(torch.FloatTensor(y_valid).cuda())
 
-    train_dir = args.train_file
-    valid_dir = args.valid_file
+        # Model training:
+        for epoch in range(100):
+            train_vanilla(X_train, y_train, model, optimizer, epoch)
+            valid_loss = validate_vanilla(X_valid, y_valid, model)
+            scheduler.step(valid_loss)
+            #torch.save(model.state_dict(), './cruiseMLP_saved_model.pt')
+        
+    else:
+        train_dir = args.train_file
+        valid_dir = args.valid_file
 
-    # Data preprocessing (training data balancing).
-    list_of_training_files = getListOfFiles(train_dir)
-    list_of_validation_files = getListOfFiles(valid_dir)
+        # Data preprocessing (training data balancing).
+        list_of_training_files = getListOfFiles(train_dir)
+        list_of_validation_files = getListOfFiles(valid_dir)
 
-    classes_train = []
-    for file in list_of_training_files:
-        with h5py.File(file, 'r') as h5_file:
-            data = h5_file[list(h5_file.keys())[0]][:,-2]
-            classes_train.append(data.tolist())
-    # "Flattening" the list of lists
-    classes_train = [item for sublist in classes_train for item in sublist]
-    classes_train = np.asarray(classes_train)
-    print ('Total number of training samples: {}'.format(len(classes_train)))
-    print ('Training set distribution:')
-    print_dist (classes_train)
+        classes_train = []
+        for file in list_of_training_files:
+            with h5py.File(file, 'r') as h5_file:
+                data = h5_file[list(h5_file.keys())[0]][:,-2]
+                classes_train.append(data.tolist())
+        # "Flattening" the list of lists
+        classes_train = [item for sublist in classes_train for item in sublist]
+        classes_train = np.asarray(classes_train)
+        print ('Total number of training samples: {}'.format(len(classes_train)))
+        print ('Training set distribution:')
+        print_dist (classes_train)
 
-    classes_valid = []
-    for file in list_of_validation_files:
-        with h5py.File(file, 'r') as h5_file:
-            data = h5_file[list(h5_file.keys())[0]][:,-2]
-            classes_valid.append(data.tolist())
-    # "Flattening" the list of lists
-    classes_valid = [item for sublist in classes_valid for item in sublist]
-    classes_valid = np.asarray(classes_valid)
-    print ('Total number of validation samples: {}'.format(len(classes_valid)))
-    print ('Validation set distribution:')
-    print_dist (classes_valid)
+        classes_valid = []
+        for file in list_of_validation_files:
+            with h5py.File(file, 'r') as h5_file:
+                data = h5_file[list(h5_file.keys())[0]][:,-2]
+                classes_valid.append(data.tolist())
+        # "Flattening" the list of lists
+        classes_valid = [item for sublist in classes_valid for item in sublist]
+        classes_valid = np.asarray(classes_valid)
+        print ('Total number of validation samples: {}'.format(len(classes_valid)))
+        print ('Validation set distribution:')
+        print_dist (classes_valid)
 
-    #class_weights = class_weight.compute_class_weight('balanced', np.unique(classes_train), classes_train)
-    #weights = [class_weights[int(i+1)] for i in classes_train]
-    #weights = torch.DoubleTensor(weights)
-    #train_sampler = sampler.WeightedRandomSampler(weights, int(len(weights)/1), replacement=True)
+        #class_weights = class_weight.compute_class_weight('balanced', np.unique(classes_train), classes_train)
+        #weights = [class_weights[int(i+1)] for i in classes_train]
+        #weights = torch.DoubleTensor(weights)
+        #train_sampler = sampler.WeightedRandomSampler(weights, int(len(weights)/1), replacement=True)
 
 
-    model = FCNN_CNN1D()
-    learning_rate = 6.561e-4
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau\
-        (optimizer, factor=0.3, patience=2, min_lr=1e-8, verbose=1, mode='min')
-    if (cuda_is_available):
-        print ('Using CUDA to speed up training.')
-        model.cuda()
+        model = FCNN_CNN1D()
+        learning_rate = 6.561e-4
+        optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau\
+            (optimizer, factor=0.3, patience=2, min_lr=1e-8, verbose=1, mode='min')
+        if (cuda_is_available):
+            print ('Using CUDA to speed up training.')
+            model.cuda()
 
-    train_dataset = TrainValidDataset(list_of_training_files)
-    valid_dataset = TrainValidDataset(list_of_validation_files)
+        train_dataset = TrainValidDataset(list_of_training_files)
+        valid_dataset = TrainValidDataset(list_of_validation_files)
 
-    train_loader = DataLoader(train_dataset, batch_size=1024, num_workers=8, pin_memory=True, shuffle=True) #sampler=train_sampler)
-    valid_loader = DataLoader(valid_dataset, batch_size=1024, num_workers=8, pin_memory=True)
+        train_loader = DataLoader(train_dataset, batch_size=1024, num_workers=8, pin_memory=True, shuffle=True) #sampler=train_sampler)
+        valid_loader = DataLoader(valid_dataset, batch_size=1024, num_workers=8, pin_memory=True)
 
-    for epoch in range(100):
-        train_dataloader(train_loader, model, optimizer, epoch)
-        valid_loss = validate_dataloader(valid_loader, model)
-        scheduler.step(valid_loss)
+        for epoch in range(100):
+            train_dataloader(train_loader, model, optimizer, epoch)
+            valid_loss = validate_dataloader(valid_loader, model)
+            scheduler.step(valid_loss)
     
 
 # ========================================================================

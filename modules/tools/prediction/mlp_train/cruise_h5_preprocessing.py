@@ -14,9 +14,8 @@
 # limitations under the License.
 ###############################################################################
 
-
 '''
-This .py will preprocess data by:
+This .py file includes functions for data preprocessing:
     - splitting data into two categories: go and cut-in for separate training.
     - balancing the datasets
 '''
@@ -24,11 +23,15 @@ This .py will preprocess data by:
 import os
 import argparse
 import datetime
-
 import numpy as np
 import h5py
 
+
 def getListOfFiles(dirName):
+    '''
+    Given a directory (dirName), return a list containing the full-path
+    of all files inside that directory (including all hierachy).
+    '''
     listOfFiles = os.listdir(dirName)
     allFiles = list()
     
@@ -57,6 +60,7 @@ def load_hdf5(filename):
     values = h5_file.values()[0]
     print ("load data size:", values.shape[0])
     return values
+
 
 def data_splitting(feature):
     '''
@@ -95,14 +99,18 @@ def down_sample(feature, label, drop_rate):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'generate training samples\
-            from a specified directory')
-    parser.add_argument('directory', type=str,
-            help='directory contains feature files in .h5')
-    args = parser.parse_args()
-    path = args.directory
+    parser = argparse.ArgumentParser(description = 'Data preprocessing.')
+    parser.add_argument('directory', type=str,\
+        help='directory contains feature files in .h5')
+    parser.add_argument('-m', '--merge_files', action='store_true', \
+        help='Merge output files into one.')
+    parser.add_argument('-s', '--split_category', action='store_true', \
+        help='Split the output into Go and Cutin.')
 
-    print ("load h5 from directory: {}".format(path))
+    args = parser.parse_args()
+
+    path = args.directory
+    print ("Loading h5 from directory: {}".format(path))
     if os.path.isdir(path):
         features_go = None
         features_cutin = None
