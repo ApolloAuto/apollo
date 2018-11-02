@@ -25,7 +25,6 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/common/macro.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
@@ -125,5 +124,3 @@ class %(car_type_cap)sController final : public VehicleController {
 }  // namespace %(car_type_lower)s
 }  // namespace canbus
 }  // namespace apollo
-
-

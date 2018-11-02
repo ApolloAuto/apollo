@@ -30,7 +30,7 @@ const int32_t %(classname)s::ID = 0x%(id_upper)s;
 %(classname)s::%(classname)s() { Reset(); }
 
 uint32_t %(classname)s::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(All) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -40,7 +40,7 @@ void %(classname)s::UpdateData(uint8_t* data) {
 }
 
 void %(classname)s::Reset() {
-  // TODO you should check this manually
+  // TODO(All) :  you should check this manually
 %(set_private_var_init_list)s
 }
 %(set_func_impl_list)s

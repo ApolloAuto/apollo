@@ -272,7 +272,7 @@ void %(car_type_cap)sController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void %(car_type_cap)sController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO Update brake value based on mode
+  // TODO(All) :  Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
