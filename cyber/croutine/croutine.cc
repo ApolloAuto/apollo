@@ -21,7 +21,6 @@
 #include "cyber/common/log.h"
 #include "cyber/croutine/routine_context.h"
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
