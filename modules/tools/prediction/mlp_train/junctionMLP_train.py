@@ -29,7 +29,7 @@ import tensorflow as tf
 import proto.fnn_model_pb2
 from proto.fnn_model_pb2 import FnnModel, Layer
 
-dim_input = 3+60
+dim_input = 3 + 60
 dim_output = 12
 
 def load_data(filename):
