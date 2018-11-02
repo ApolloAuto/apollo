@@ -16,16 +16,16 @@
 
 #pragma once
 
-
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace transit {
 
-class Llcdiagsteeringcontrol722 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+class Llcdiagsteeringcontrol722
+    : public ::apollo::drivers::canbus::ProtocolData<
+          ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -37,25 +37,54 @@ class Llcdiagsteeringcontrol722 : public ::apollo::drivers::canbus::ProtocolData
 
   void Reset() override;
 
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 0.0002, 'len': 16, 'name': 'LLC_DBG_SteeringSensorPosition', 'is_signed_var': True, 'physical_range': '[-6.5536|6.5534]', 'bit': 40, 'type': 'double', 'order': 'intel', 'physical_unit': 'rev'}
-  Llcdiagsteeringcontrol722* set_llc_dbg_steeringsensorposition(double llc_dbg_steeringsensorposition);
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 0.0002, 'len': 16, 'name':
+  // 'LLC_DBG_SteeringSensorPosition', 'is_signed_var': True, 'physical_range':
+  // '[-6.5536|6.5534]', 'bit': 40, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'rev'}
+  Llcdiagsteeringcontrol722* set_llc_dbg_steeringsensorposition(
+      double llc_dbg_steeringsensorposition);
 
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'LLC_DBG_SteeringRackInputTorque', 'is_signed_var': True, 'physical_range': '[-32768|32767]', 'bit': 24, 'type': 'int', 'order': 'intel', 'physical_unit': 'counts'}
-  Llcdiagsteeringcontrol722* set_llc_dbg_steeringrackinputtorque(int llc_dbg_steeringrackinputtorque);
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
+  // 'LLC_DBG_SteeringRackInputTorque', 'is_signed_var': True, 'physical_range':
+  // '[-32768|32767]', 'bit': 24, 'type': 'int', 'order': 'intel',
+  // 'physical_unit': 'counts'}
+  Llcdiagsteeringcontrol722* set_llc_dbg_steeringrackinputtorque(
+      int llc_dbg_steeringrackinputtorque);
 
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 1e-05, 'len': 24, 'name': 'LLC_DBG_SteeringMotorPosition', 'is_signed_var': True, 'physical_range': '[-83.88608|83.88607]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit': 'rev'}
-  Llcdiagsteeringcontrol722* set_llc_dbg_steeringmotorposition(double llc_dbg_steeringmotorposition);
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 1e-05, 'len': 24, 'name':
+  // 'LLC_DBG_SteeringMotorPosition', 'is_signed_var': True, 'physical_range':
+  // '[-83.88608|83.88607]', 'bit': 0, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'rev'}
+  Llcdiagsteeringcontrol722* set_llc_dbg_steeringmotorposition(
+      double llc_dbg_steeringmotorposition);
 
  private:
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 0.0002, 'len': 16, 'name':
+  // 'LLC_DBG_SteeringSensorPosition', 'is_signed_var': True, 'physical_range':
+  // '[-6.5536|6.5534]', 'bit': 40, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'rev'}
+  void set_p_llc_dbg_steeringsensorposition(
+      uint8_t* data, double llc_dbg_steeringsensorposition);
 
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 0.0002, 'len': 16, 'name': 'LLC_DBG_SteeringSensorPosition', 'is_signed_var': True, 'physical_range': '[-6.5536|6.5534]', 'bit': 40, 'type': 'double', 'order': 'intel', 'physical_unit': 'rev'}
-  void set_p_llc_dbg_steeringsensorposition(uint8_t* data, double llc_dbg_steeringsensorposition);
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
+  // 'LLC_DBG_SteeringRackInputTorque', 'is_signed_var': True, 'physical_range':
+  // '[-32768|32767]', 'bit': 24, 'type': 'int', 'order': 'intel',
+  // 'physical_unit': 'counts'}
+  void set_p_llc_dbg_steeringrackinputtorque(
+      uint8_t* data, int llc_dbg_steeringrackinputtorque);
 
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'LLC_DBG_SteeringRackInputTorque', 'is_signed_var': True, 'physical_range': '[-32768|32767]', 'bit': 24, 'type': 'int', 'order': 'intel', 'physical_unit': 'counts'}
-  void set_p_llc_dbg_steeringrackinputtorque(uint8_t* data, int llc_dbg_steeringrackinputtorque);
-
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 1e-05, 'len': 24, 'name': 'LLC_DBG_SteeringMotorPosition', 'is_signed_var': True, 'physical_range': '[-83.88608|83.88607]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit': 'rev'}
-  void set_p_llc_dbg_steeringmotorposition(uint8_t* data, double llc_dbg_steeringmotorposition);
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 1e-05, 'len': 24, 'name':
+  // 'LLC_DBG_SteeringMotorPosition', 'is_signed_var': True, 'physical_range':
+  // '[-83.88608|83.88607]', 'bit': 0, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'rev'}
+  void set_p_llc_dbg_steeringmotorposition(
+      uint8_t* data, double llc_dbg_steeringmotorposition);
 
  private:
   double llc_dbg_steeringsensorposition_;
@@ -66,5 +95,3 @@ class Llcdiagsteeringcontrol722 : public ::apollo::drivers::canbus::ProtocolData
 }  // namespace transit
 }  // namespace canbus
 }  // namespace apollo
-
-

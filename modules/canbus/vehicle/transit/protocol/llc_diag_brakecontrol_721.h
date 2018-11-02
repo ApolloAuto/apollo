@@ -16,16 +16,15 @@
 
 #pragma once
 
-
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace transit {
 
 class Llcdiagbrakecontrol721 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                                   ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -37,43 +36,97 @@ class Llcdiagbrakecontrol721 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'description': 'Brake control loop P contribution', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePidContribution_P', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 34, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  Llcdiagbrakecontrol721* set_llc_dbg_brakepidcontribution_p(double llc_dbg_brakepidcontribution_p);
+  // config detail: {'description': 'Brake control loop P contribution',
+  // 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name':
+  // 'LLC_DBG_BrakePidContribution_P', 'is_signed_var': True, 'physical_range':
+  // '[-51.2|51.1]', 'bit': 34, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  Llcdiagbrakecontrol721* set_llc_dbg_brakepidcontribution_p(
+      double llc_dbg_brakepidcontribution_p);
 
-  // config detail: {'description': 'Brake control loop I contribution', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePidContribution_I', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 44, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  Llcdiagbrakecontrol721* set_llc_dbg_brakepidcontribution_i(double llc_dbg_brakepidcontribution_i);
+  // config detail: {'description': 'Brake control loop I contribution',
+  // 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name':
+  // 'LLC_DBG_BrakePidContribution_I', 'is_signed_var': True, 'physical_range':
+  // '[-51.2|51.1]', 'bit': 44, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  Llcdiagbrakecontrol721* set_llc_dbg_brakepidcontribution_i(
+      double llc_dbg_brakepidcontribution_i);
 
-  // config detail: {'description': 'Brake control loop D contribution', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePidContribution_D', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 54, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  Llcdiagbrakecontrol721* set_llc_dbg_brakepidcontribution_d(double llc_dbg_brakepidcontribution_d);
+  // config detail: {'description': 'Brake control loop D contribution',
+  // 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name':
+  // 'LLC_DBG_BrakePidContribution_D', 'is_signed_var': True, 'physical_range':
+  // '[-51.2|51.1]', 'bit': 54, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  Llcdiagbrakecontrol721* set_llc_dbg_brakepidcontribution_d(
+      double llc_dbg_brakepidcontribution_d);
 
-  // config detail: {'description': 'Brake control loop output', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePID_Output', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 12, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  Llcdiagbrakecontrol721* set_llc_dbg_brakepid_output(double llc_dbg_brakepid_output);
+  // config detail: {'description': 'Brake control loop output', 'offset': 0.0,
+  // 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePID_Output',
+  // 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 12, 'type':
+  // 'double', 'order': 'intel', 'physical_unit': 'mrev'}
+  Llcdiagbrakecontrol721* set_llc_dbg_brakepid_output(
+      double llc_dbg_brakepid_output);
 
-  // config detail: {'description': 'Brake control loop error', 'offset': 0.0, 'precision': 1.0, 'len': 12, 'name': 'LLC_DBG_BrakePID_Error', 'is_signed_var': True, 'physical_range': '[-2048|2047]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': 'psi'}
-  Llcdiagbrakecontrol721* set_llc_dbg_brakepid_error(int llc_dbg_brakepid_error);
+  // config detail: {'description': 'Brake control loop error', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 12, 'name': 'LLC_DBG_BrakePID_Error',
+  // 'is_signed_var': True, 'physical_range': '[-2048|2047]', 'bit': 0, 'type':
+  // 'int', 'order': 'intel', 'physical_unit': 'psi'}
+  Llcdiagbrakecontrol721* set_llc_dbg_brakepid_error(
+      int llc_dbg_brakepid_error);
 
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 0.5, 'len': 12, 'name': 'LLC_DBG_BrakeFeedforward', 'is_signed_var': True, 'physical_range': '[-1024|1023.5]', 'bit': 22, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  Llcdiagbrakecontrol721* set_llc_dbg_brakefeedforward(double llc_dbg_brakefeedforward);
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 0.5, 'len': 12, 'name':
+  // 'LLC_DBG_BrakeFeedforward', 'is_signed_var': True, 'physical_range':
+  // '[-1024|1023.5]', 'bit': 22, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  Llcdiagbrakecontrol721* set_llc_dbg_brakefeedforward(
+      double llc_dbg_brakefeedforward);
 
  private:
+  // config detail: {'description': 'Brake control loop P contribution',
+  // 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name':
+  // 'LLC_DBG_BrakePidContribution_P', 'is_signed_var': True, 'physical_range':
+  // '[-51.2|51.1]', 'bit': 34, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  void set_p_llc_dbg_brakepidcontribution_p(
+      uint8_t* data, double llc_dbg_brakepidcontribution_p);
 
-  // config detail: {'description': 'Brake control loop P contribution', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePidContribution_P', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 34, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  void set_p_llc_dbg_brakepidcontribution_p(uint8_t* data, double llc_dbg_brakepidcontribution_p);
+  // config detail: {'description': 'Brake control loop I contribution',
+  // 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name':
+  // 'LLC_DBG_BrakePidContribution_I', 'is_signed_var': True, 'physical_range':
+  // '[-51.2|51.1]', 'bit': 44, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  void set_p_llc_dbg_brakepidcontribution_i(
+      uint8_t* data, double llc_dbg_brakepidcontribution_i);
 
-  // config detail: {'description': 'Brake control loop I contribution', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePidContribution_I', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 44, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  void set_p_llc_dbg_brakepidcontribution_i(uint8_t* data, double llc_dbg_brakepidcontribution_i);
+  // config detail: {'description': 'Brake control loop D contribution',
+  // 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name':
+  // 'LLC_DBG_BrakePidContribution_D', 'is_signed_var': True, 'physical_range':
+  // '[-51.2|51.1]', 'bit': 54, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  void set_p_llc_dbg_brakepidcontribution_d(
+      uint8_t* data, double llc_dbg_brakepidcontribution_d);
 
-  // config detail: {'description': 'Brake control loop D contribution', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePidContribution_D', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 54, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  void set_p_llc_dbg_brakepidcontribution_d(uint8_t* data, double llc_dbg_brakepidcontribution_d);
+  // config detail: {'description': 'Brake control loop output', 'offset': 0.0,
+  // 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePID_Output',
+  // 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 12, 'type':
+  // 'double', 'order': 'intel', 'physical_unit': 'mrev'}
+  void set_p_llc_dbg_brakepid_output(uint8_t* data,
+                                     double llc_dbg_brakepid_output);
 
-  // config detail: {'description': 'Brake control loop output', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'LLC_DBG_BrakePID_Output', 'is_signed_var': True, 'physical_range': '[-51.2|51.1]', 'bit': 12, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  void set_p_llc_dbg_brakepid_output(uint8_t* data, double llc_dbg_brakepid_output);
-
-  // config detail: {'description': 'Brake control loop error', 'offset': 0.0, 'precision': 1.0, 'len': 12, 'name': 'LLC_DBG_BrakePID_Error', 'is_signed_var': True, 'physical_range': '[-2048|2047]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': 'psi'}
+  // config detail: {'description': 'Brake control loop error', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 12, 'name': 'LLC_DBG_BrakePID_Error',
+  // 'is_signed_var': True, 'physical_range': '[-2048|2047]', 'bit': 0, 'type':
+  // 'int', 'order': 'intel', 'physical_unit': 'psi'}
   void set_p_llc_dbg_brakepid_error(uint8_t* data, int llc_dbg_brakepid_error);
 
-  // config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 0.5, 'len': 12, 'name': 'LLC_DBG_BrakeFeedforward', 'is_signed_var': True, 'physical_range': '[-1024|1023.5]', 'bit': 22, 'type': 'double', 'order': 'intel', 'physical_unit': 'mrev'}
-  void set_p_llc_dbg_brakefeedforward(uint8_t* data, double llc_dbg_brakefeedforward);
+  // config detail: {'description': 'Brake control feedforward contribution',
+  // 'offset': 0.0, 'precision': 0.5, 'len': 12, 'name':
+  // 'LLC_DBG_BrakeFeedforward', 'is_signed_var': True, 'physical_range':
+  // '[-1024|1023.5]', 'bit': 22, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': 'mrev'}
+  void set_p_llc_dbg_brakefeedforward(uint8_t* data,
+                                      double llc_dbg_brakefeedforward);
 
  private:
   double llc_dbg_brakepidcontribution_p_;
@@ -87,5 +140,3 @@ class Llcdiagbrakecontrol721 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace transit
 }  // namespace canbus
 }  // namespace apollo
-
-

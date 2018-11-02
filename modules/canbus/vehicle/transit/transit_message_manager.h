@@ -15,7 +15,6 @@ limitations under the License.
 
 #pragma once
 
-
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 
@@ -26,7 +25,7 @@ namespace transit {
 using ::apollo::drivers::canbus::MessageManager;
 
 class TransitMessageManager
-	: public MessageManager<::apollo::canbus::ChassisDetail> {
+    : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   TransitMessageManager();
   virtual ~TransitMessageManager();
@@ -35,5 +34,3 @@ class TransitMessageManager
 }  // namespace transit
 }  // namespace canbus
 }  // namespace apollo
-
-

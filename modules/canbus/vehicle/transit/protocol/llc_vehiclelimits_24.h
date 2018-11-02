@@ -16,33 +16,37 @@
 
 #pragma once
 
-
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace transit {
 
 class Llcvehiclelimits24 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                               ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Llcvehiclelimits24();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
+  // config detail: {'description': 'Steering angle feedback', 'offset': 0.0,
+  // 'precision': 1.0, 'len': 12, 'name': 'LLC_FBK_MaxSteeringAngle',
+  // 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 12, 'type':
+  // 'int', 'order': 'intel', 'physical_unit': 'deg'}
+  int llc_fbk_maxsteeringangle(const std::uint8_t* bytes,
+                               const int32_t length) const;
 
-  // config detail: {'description': 'Steering angle feedback', 'offset': 0.0, 'precision': 1.0, 'len': 12, 'name': 'LLC_FBK_MaxSteeringAngle', 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 12, 'type': 'int', 'order': 'intel', 'physical_unit': 'deg'}
-  int llc_fbk_maxsteeringangle(const std::uint8_t* bytes, const int32_t length) const;
-
-  // config detail: {'description': 'Front brake pressure feedback', 'offset': 0.0, 'precision': 1.0, 'len': 12, 'name': 'LLC_FBK_MaxBrakePressure', 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': 'psi'}
-  int llc_fbk_maxbrakepressure(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'description': 'Front brake pressure feedback', 'offset':
+  // 0.0, 'precision': 1.0, 'len': 12, 'name': 'LLC_FBK_MaxBrakePressure',
+  // 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 0, 'type':
+  // 'int', 'order': 'intel', 'physical_unit': 'psi'}
+  int llc_fbk_maxbrakepressure(const std::uint8_t* bytes,
+                               const int32_t length) const;
 };
 
 }  // namespace transit
 }  // namespace canbus
 }  // namespace apollo
-
-

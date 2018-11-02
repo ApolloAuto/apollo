@@ -30,7 +30,7 @@ const int32_t Llcdiagsteeringcontrol722::ID = 0x722;
 Llcdiagsteeringcontrol722::Llcdiagsteeringcontrol722() { Reset(); }
 
 uint32_t Llcdiagsteeringcontrol722::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -42,22 +42,28 @@ void Llcdiagsteeringcontrol722::UpdateData(uint8_t* data) {
 }
 
 void Llcdiagsteeringcontrol722::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :  you should check this manually
   llc_dbg_steeringsensorposition_ = 0.0;
   llc_dbg_steeringrackinputtorque_ = 0;
   llc_dbg_steeringmotorposition_ = 0.0;
 }
 
-Llcdiagsteeringcontrol722* Llcdiagsteeringcontrol722::set_llc_dbg_steeringsensorposition(
+Llcdiagsteeringcontrol722*
+Llcdiagsteeringcontrol722::set_llc_dbg_steeringsensorposition(
     double llc_dbg_steeringsensorposition) {
   llc_dbg_steeringsensorposition_ = llc_dbg_steeringsensorposition;
   return this;
- }
+}
 
-// config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 0.0002, 'len': 16, 'name': 'LLC_DBG_SteeringSensorPosition', 'is_signed_var': True, 'physical_range': '[-6.5536|6.5534]', 'bit': 40, 'type': 'double', 'order': 'intel', 'physical_unit': 'rev'}
-void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringsensorposition(uint8_t* data,
-    double llc_dbg_steeringsensorposition) {
-  llc_dbg_steeringsensorposition = ProtocolData::BoundedValue(-6.5536, 6.5534, llc_dbg_steeringsensorposition);
+// config detail: {'description': 'Brake control feedforward contribution',
+// 'offset': 0.0, 'precision': 0.0002, 'len': 16, 'name':
+// 'LLC_DBG_SteeringSensorPosition', 'is_signed_var': True, 'physical_range':
+// '[-6.5536|6.5534]', 'bit': 40, 'type': 'double', 'order': 'intel',
+// 'physical_unit': 'rev'}
+void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringsensorposition(
+    uint8_t* data, double llc_dbg_steeringsensorposition) {
+  llc_dbg_steeringsensorposition = ProtocolData::BoundedValue(
+      -6.5536, 6.5534, llc_dbg_steeringsensorposition);
   int x = llc_dbg_steeringsensorposition / 0.000200;
   uint8_t t = 0;
 
@@ -71,17 +77,22 @@ void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringsensorposition(uint8_t* da
   to_set1.set_value(t, 0, 8);
 }
 
-
-Llcdiagsteeringcontrol722* Llcdiagsteeringcontrol722::set_llc_dbg_steeringrackinputtorque(
+Llcdiagsteeringcontrol722*
+Llcdiagsteeringcontrol722::set_llc_dbg_steeringrackinputtorque(
     int llc_dbg_steeringrackinputtorque) {
   llc_dbg_steeringrackinputtorque_ = llc_dbg_steeringrackinputtorque;
   return this;
- }
+}
 
-// config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'LLC_DBG_SteeringRackInputTorque', 'is_signed_var': True, 'physical_range': '[-32768|32767]', 'bit': 24, 'type': 'int', 'order': 'intel', 'physical_unit': 'counts'}
-void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringrackinputtorque(uint8_t* data,
-    int llc_dbg_steeringrackinputtorque) {
-  llc_dbg_steeringrackinputtorque = ProtocolData::BoundedValue(-32768, 32767, llc_dbg_steeringrackinputtorque);
+// config detail: {'description': 'Brake control feedforward contribution',
+// 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
+// 'LLC_DBG_SteeringRackInputTorque', 'is_signed_var': True, 'physical_range':
+// '[-32768|32767]', 'bit': 24, 'type': 'int', 'order': 'intel',
+// 'physical_unit': 'counts'}
+void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringrackinputtorque(
+    uint8_t* data, int llc_dbg_steeringrackinputtorque) {
+  llc_dbg_steeringrackinputtorque = ProtocolData::BoundedValue(
+      -32768, 32767, llc_dbg_steeringrackinputtorque);
   int x = llc_dbg_steeringrackinputtorque;
   uint8_t t = 0;
 
@@ -95,17 +106,22 @@ void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringrackinputtorque(uint8_t* d
   to_set1.set_value(t, 0, 8);
 }
 
-
-Llcdiagsteeringcontrol722* Llcdiagsteeringcontrol722::set_llc_dbg_steeringmotorposition(
+Llcdiagsteeringcontrol722*
+Llcdiagsteeringcontrol722::set_llc_dbg_steeringmotorposition(
     double llc_dbg_steeringmotorposition) {
   llc_dbg_steeringmotorposition_ = llc_dbg_steeringmotorposition;
   return this;
- }
+}
 
-// config detail: {'description': 'Brake control feedforward contribution', 'offset': 0.0, 'precision': 1e-05, 'len': 24, 'name': 'LLC_DBG_SteeringMotorPosition', 'is_signed_var': True, 'physical_range': '[-83.88608|83.88607]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit': 'rev'}
-void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringmotorposition(uint8_t* data,
-    double llc_dbg_steeringmotorposition) {
-  llc_dbg_steeringmotorposition = ProtocolData::BoundedValue(-83.88608, 83.88607, llc_dbg_steeringmotorposition);
+// config detail: {'description': 'Brake control feedforward contribution',
+// 'offset': 0.0, 'precision': 1e-05, 'len': 24, 'name':
+// 'LLC_DBG_SteeringMotorPosition', 'is_signed_var': True, 'physical_range':
+// '[-83.88608|83.88607]', 'bit': 0, 'type': 'double', 'order': 'intel',
+// 'physical_unit': 'rev'}
+void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringmotorposition(
+    uint8_t* data, double llc_dbg_steeringmotorposition) {
+  llc_dbg_steeringmotorposition = ProtocolData::BoundedValue(
+      -83.88608, 83.88607, llc_dbg_steeringmotorposition);
   int x = llc_dbg_steeringmotorposition / 0.000010;
   uint8_t t = 0;
 

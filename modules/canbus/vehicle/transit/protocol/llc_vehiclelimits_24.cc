@@ -31,13 +31,21 @@ Llcvehiclelimits24::Llcvehiclelimits24() {}
 const int32_t Llcvehiclelimits24::ID = 0x24;
 
 void Llcvehiclelimits24::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_transit()->mutable_llc_vehiclelimits_24()->set_llc_fbk_maxsteeringangle(llc_fbk_maxsteeringangle(bytes, length));
-  chassis->mutable_transit()->mutable_llc_vehiclelimits_24()->set_llc_fbk_maxbrakepressure(llc_fbk_maxbrakepressure(bytes, length));
+                               ChassisDetail* chassis) const {
+  chassis->mutable_transit()
+      ->mutable_llc_vehiclelimits_24()
+      ->set_llc_fbk_maxsteeringangle(llc_fbk_maxsteeringangle(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_vehiclelimits_24()
+      ->set_llc_fbk_maxbrakepressure(llc_fbk_maxbrakepressure(bytes, length));
 }
 
-// config detail: {'description': 'Steering angle feedback', 'offset': 0.0, 'precision': 1.0, 'len': 12, 'name': 'llc_fbk_maxsteeringangle', 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 12, 'type': 'int', 'order': 'intel', 'physical_unit': 'deg'}
-int Llcvehiclelimits24::llc_fbk_maxsteeringangle(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Steering angle feedback', 'offset': 0.0,
+// 'precision': 1.0, 'len': 12, 'name': 'llc_fbk_maxsteeringangle',
+// 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 12, 'type':
+// 'int', 'order': 'intel', 'physical_unit': 'deg'}
+int Llcvehiclelimits24::llc_fbk_maxsteeringangle(const std::uint8_t* bytes,
+                                                 int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
@@ -50,8 +58,12 @@ int Llcvehiclelimits24::llc_fbk_maxsteeringangle(const std::uint8_t* bytes, int3
   return ret;
 }
 
-// config detail: {'description': 'Front brake pressure feedback', 'offset': 0.0, 'precision': 1.0, 'len': 12, 'name': 'llc_fbk_maxbrakepressure', 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': 'psi'}
-int Llcvehiclelimits24::llc_fbk_maxbrakepressure(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Front brake pressure feedback', 'offset':
+// 0.0, 'precision': 1.0, 'len': 12, 'name': 'llc_fbk_maxbrakepressure',
+// 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 0, 'type':
+// 'int', 'order': 'intel', 'physical_unit': 'psi'}
+int Llcvehiclelimits24::llc_fbk_maxbrakepressure(const std::uint8_t* bytes,
+                                                 int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 4);
 
