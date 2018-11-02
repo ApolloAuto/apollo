@@ -156,15 +156,21 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   Eigen::MatrixXd l_warm_up;
   Eigen::MatrixXd n_warm_up;
 
-  bool dual_variable_warm_start_status = dual_variable_warm_start_->Solve(
-      horizon_, ts_, ego_, obstacles_num, obstacles_edges_num, obstacles_A,
-      obstacles_b, rx, ry, r_yaw, &l_warm_up, &n_warm_up);
+  if (FLAGS_use_dual_variable_warm_start) {
+    bool dual_variable_warm_start_status = dual_variable_warm_start_->Solve(
+        horizon_, ts_, ego_, obstacles_num, obstacles_edges_num, obstacles_A,
+        obstacles_b, rx, ry, r_yaw, &l_warm_up, &n_warm_up);
 
-  if (dual_variable_warm_start_status) {
-    ADEBUG << "Dual variable problem solved successfully!";
+    if (dual_variable_warm_start_status) {
+      ADEBUG << "Dual variable problem solved successfully!";
+    } else {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Dual variable problem failed to solve");
+    }
   } else {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Dual variable problem failed to solve");
+    l_warm_up =
+        0.5 * Eigen::MatrixXd::Ones(obstacles_edges_num.sum(), horizon_ + 1);
+    n_warm_up = 0.5 * Eigen::MatrixXd::Ones(4 * obstacles_num, horizon_ + 1);
   }
 
   // Step 9 : Formulate distance approach problem
