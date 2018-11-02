@@ -129,17 +129,13 @@ void EvaluatorManager::Run(
       continue;
     }
 
-    const Scenario& scenario = ScenarioManager::Instance()->scenario();
-
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
-        if (obstacle->IsOnLane()) {
-          if (scenario.type() == Scenario::JUNCTION &&
-              obstacle->IsInJunction(scenario.junction_id())) {
-            evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
-          } else {
-            evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
-          }
+        if (obstacle->HasJunctionFeature()) {
+          evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
+          CHECK_NOTNULL(evaluator);
+        } else if (obstacle->IsOnLane()) {
+          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
           CHECK_NOTNULL(evaluator);
         }
         break;

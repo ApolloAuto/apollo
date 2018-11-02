@@ -127,6 +127,7 @@ const JunctionFeature& JunctionAnalyzer::GetJunctionFeature(
   for (const auto& junction_exit : junction_exits) {
     junction_feature.add_junction_exit()->CopyFrom(junction_exit);
   }
+  junction_feature.mutable_enter_lane()->set_lane_id(start_lane_id);
   junction_features_[start_lane_id] = junction_feature;
   return junction_features_[start_lane_id];
 }

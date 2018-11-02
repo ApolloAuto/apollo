@@ -51,9 +51,7 @@ void ADCTrajectoryContainer::Insert(
          << adc_trajectory_.ShortDebugString() << "].";
 
   // Find junction
-  if (IsProtected()) {
-    SetJunctionPolygon();
-  }
+  SetJunctionPolygon();
   ADEBUG << "Generate a polygon [" << adc_junction_polygon_.DebugString()
          << "].";
 
@@ -120,9 +118,9 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
       vertices.emplace_back(point.x(), point.y());
     }
     if (vertices.size() >= 3) {
-      adc_junction_polygon_ = Polygon2d{vertices};
       adc_junction_info_ptr_ = junction_info;
       s_dist_to_junction_ = s_at_junction - s_start;
+      adc_junction_polygon_ = Polygon2d{vertices};
     }
   }
 }

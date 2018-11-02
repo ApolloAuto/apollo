@@ -332,8 +332,9 @@ class TrajectoryToSample(object):
                 continue
             curr_pos = np.array([fea.position.x, fea.position.y])
             # Only keep speed > 1
-            if fea.speed <= 1:
-                continue
+            # TODO(all) consider recovery
+            # if fea.speed <= 1:
+            #     continue
             heading = math.atan2(fea.raw_velocity.y, fea.raw_velocity.x)
             # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
             exit_dict = dict()
@@ -350,7 +351,7 @@ class TrajectoryToSample(object):
                         exit_pos = exit_pos_dict[key]
                         delta_pos = exit_pos - curr_pos
                         angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
-                        d_idx = int((angle / (2.0 * np.pi) + 1) * 12 % 12)
+                        d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
                         label = [0 for idx in range(12)]
                         label[d_idx] = 1
                         fea.junction_feature.junction_mlp_label.extend(label)

@@ -74,6 +74,14 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  if (obstacle_ptr->history_size() == 0 ||
+      !obstacle_ptr->latest_feature().has_junction_feature() ||
+      obstacle_ptr->latest_feature().junction_feature()
+                                    .junction_exit_size() <= 1) {
+    // TODO(all) Predict based on only one exit
+    return;
+  }
+
   std::vector<double> feature_values;
 
   ExtractFeatureValues(obstacle_ptr, &feature_values);
@@ -95,8 +103,8 @@ bool JunctionMLPEvaluator::IsClosedToJunctionExit(
   const Feature& latest_feature = obstacle_ptr->latest_feature();
   double position_x = latest_feature.position().x();
   double position_y = latest_feature.position().y();
-  double raw_velocity_heading = std::atan2(latest_feature.raw_velocity().x(),
-                                           latest_feature.raw_velocity().y());
+  double raw_velocity_heading = std::atan2(latest_feature.raw_velocity().y(),
+                                           latest_feature.raw_velocity().x());
 
   for (const JunctionExit& junction_exit :
        latest_feature.junction_feature().junction_exit()) {

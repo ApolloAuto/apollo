@@ -168,6 +168,12 @@ class Obstacle {
   bool IsInJunction(const std::string& junction_id);
 
   /**
+   * @brief Check if the obstacle has junction feature.
+   * @return If the obstacle has junction feature.
+   */
+  bool HasJunctionFeature();
+
+  /**
    * @brief Build junction feature.
    */
   void BuildJunctionFeature();

@@ -70,6 +70,10 @@ bool Predictor::TrimTrajectory(
     const Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container,
     Trajectory* trajectory) {
+  if (!adc_trajectory_container->IsProtected()) {
+    ADEBUG << "Not in protection mode.";
+    return false;
+  }
   if (obstacle == nullptr || obstacle->history_size() == 0) {
     AERROR << "Invalid obstacle.";
     return false;

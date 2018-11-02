@@ -662,6 +662,13 @@ void Obstacle::SetIsNearJunction(
   feature->set_is_near_junction(is_near_junction);
 }
 
+bool Obstacle::HasJunctionFeature() {
+  if (history_size() == 0) {
+    return false;
+  }
+  return latest_feature().has_junction_feature();
+}
+
 void Obstacle::InitKFMotionTracker(const Feature& feature) {
   // Set transition matrix F
   // constant acceleration dynamic model
