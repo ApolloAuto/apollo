@@ -73,7 +73,6 @@ RoutineFactory CreateRoutineFactory(
   return factory;
 }
 
-// TODO(hewei03): Use parameter pack here.
 template <typename M0, typename M1, typename F>
 RoutineFactory CreateRoutineFactory(
     F&& f, const std::shared_ptr<data::DataVisitor<M0, M1>>& dv) {

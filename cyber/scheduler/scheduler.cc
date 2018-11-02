@@ -162,7 +162,6 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   if (cr_confs_.find(name) != cr_confs_.end()) {
     conf = cr_confs_[name];
     cr->set_priority(conf.priority());
-    cr->set_frequency(conf.frequency());
 
     if (conf.has_processor_index()) {
       auto proc_id = conf.processor_index();

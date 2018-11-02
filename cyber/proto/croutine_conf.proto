@@ -5,9 +5,7 @@ package apollo.cyber.proto;
 message CRoutineConf {
     optional string name = 1;
     optional int32 processor_index = 2;
-    optional double exec_time = 3;
-    optional double wait_time = 4;
-    optional double deadline = 5;
-    optional uint32 priority = 6 [default = 1];
-    optional int32 frequency = 7 [default = 1];
+    optional double wait_time = 3;
+    optional double deadline = 4;
+    optional uint32 priority = 5 [default = 1];
 }

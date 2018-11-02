@@ -82,24 +82,6 @@ class CRoutine {
   int processor_id() const;
   void set_processor_id(int processor_id);
 
-  double vfrequency() const;
-  void set_vfrequency(double frequency);
-
-  double frequency() const;
-  void set_frequency(double frequency);
-
-  double normalized_vfrequency() const;
-  void set_normalized_vfrequency(double frequency);
-
-  double vruntime() const;
-  void set_vruntime(double time);
-
-  uint64_t exec_time() const;
-  void set_exec_time(uint64_t time);
-
-  double normalized_vruntime() const;
-  void set_normalized_vruntime(double time);
-
   uint32_t priority() const;
   void set_priority(uint32_t priority);
 
@@ -121,15 +103,10 @@ class CRoutine {
 
   bool force_stop_ = false;
   double proc_num_ = 0.0;
-  double vruntime_ = 0.0;
-  double frequency_ = 1.0;
-  double vfrequency_ = 0.0;
-  double normalized_vruntime_ = 0.0;
-  double normalized_vfrequency_ = 0.0;
+
   int processor_id_ = -1;
   uint32_t priority_ = 1;
   uint64_t id_ = 0;
-  uint64_t exec_time_ = 0;
 
   static thread_local CRoutine *current_routine_;
   static thread_local std::shared_ptr<RoutineContext> main_context_;
@@ -203,42 +180,6 @@ inline RoutineState CRoutine::UpdateState() {
     }
   }
   return state_;
-}
-
-inline double CRoutine::vfrequency() const { return vfrequency_; }
-
-inline void CRoutine::set_vfrequency(double frequency) {
-  vfrequency_ = frequency;
-}
-
-inline double CRoutine::frequency() const { return frequency_; }
-
-inline void CRoutine::set_frequency(double frequency) {
-  frequency_ = frequency;
-}
-
-inline double CRoutine::normalized_vfrequency() const {
-  return normalized_vfrequency_;
-}
-
-inline void CRoutine::set_normalized_vfrequency(double frequency) {
-  normalized_vfrequency_ = frequency;
-}
-
-inline double CRoutine::vruntime() const { return vruntime_; }
-
-inline void CRoutine::set_vruntime(double time) { vruntime_ = time; }
-
-inline uint64_t CRoutine::exec_time() const { return exec_time_; }
-
-inline void CRoutine::set_exec_time(uint64_t time) { exec_time_ = time; }
-
-inline double CRoutine::normalized_vruntime() const {
-  return normalized_vruntime_;
-}
-
-inline void CRoutine::set_normalized_vruntime(double time) {
-  normalized_vruntime_ = time;
 }
 
 inline uint32_t CRoutine::priority() const { return priority_; }
