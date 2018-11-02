@@ -368,17 +368,18 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * obstacles_edges_sum_;
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      //  x[index + j] = l_warm_up_(j, i);
-      x[index + j] = 0.5;
+       x[l_start_index_+ index + j] = l_warm_up_(j, i);
+      // x[index + j] = 0.5;
     }
   }
 
-  // TODO(QiL) : better hot start m
+  // TODO(QiL) : better hot start n
   // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * 4 * obstacles_num_;
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      x[index + j] = 0.5;
+      x[n_start_index_ + index + j] = n_warm_up_(j, i);
+      // x[index + j] = 0.5;
     }
   }
   ADEBUG << "get_starting_point out";

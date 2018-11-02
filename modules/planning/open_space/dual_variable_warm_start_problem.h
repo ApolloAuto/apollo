@@ -41,9 +41,8 @@ class DualVariableWarmStartProblem {
              const Eigen::MatrixXd& ego, const std::size_t obstacles_num,
              const Eigen::MatrixXd& obstacles_edges_num,
              const Eigen::MatrixXd& obstacles_A,
-             const Eigen::MatrixXd& obstacles_b, const double rx,
-             const double ry, const double r_yaw, Eigen::MatrixXd* l_warm_up,
-             Eigen::MatrixXd* n_warm_up);
+             const Eigen::MatrixXd& obstacles_b, const Eigen::MatrixXd& xWS,
+             Eigen::MatrixXd* l_warm_up, Eigen::MatrixXd* n_warm_up);
 
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;

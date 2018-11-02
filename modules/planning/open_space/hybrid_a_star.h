@@ -32,6 +32,7 @@
 #pragma once
 
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <queue>
 #include <utility>
@@ -125,9 +126,10 @@ class HybridAStar {
   std::priority_queue<std::pair<std::size_t, double>,
                       std::vector<std::pair<std::size_t, double>>, cmp>
       open_pq_;
-  std::map<std::size_t, std::shared_ptr<Node3d>> open_set_;
-  std::map<std::size_t, std::shared_ptr<Node3d>> close_set_;
-  std::map<std::size_t, std::shared_ptr<ReedSheppPath>> ReedSheppPath_cache_;
+  std::unordered_map<std::size_t, std::shared_ptr<Node3d>> open_set_;
+  std::unordered_map<std::size_t, std::shared_ptr<Node3d>> close_set_;
+  std::unordered_map<std::size_t, std::shared_ptr<ReedSheppPath>>
+      ReedSheppPath_cache_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;
 };
 
