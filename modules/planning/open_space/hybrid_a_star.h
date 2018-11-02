@@ -73,27 +73,29 @@ class HybridAStar {
             ThreadSafeIndexedObstacles* obstacles, Result* result);
 
  private:
-  bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
-                         ReedSheppPath* reeds_shepp_to_end);
+  bool AnalyticExpansion(std::shared_ptr<Node3d> current_node);
   bool ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
-                          ReedSheppPath* reeds_shepp_to_end);
+                          std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
   // check collision and validity
   bool ValidityCheck(std::shared_ptr<Node3d> node);
   // check Reeds Shepp path collision and validity
-  bool RSPCheck(const ReedSheppPath* reeds_shepp_to_end);
+  bool RSPCheck(const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
   // load the whole RSP as nodes and add to the close set
-  std::shared_ptr<Node3d> LoadRSPinCS(const ReedSheppPath* reeds_shepp_to_end,
-                                      std::shared_ptr<Node3d> current_node);
+  std::shared_ptr<Node3d> LoadRSPinCS(
+      const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
+      std::shared_ptr<Node3d> current_node);
   std::shared_ptr<Node3d> Next_node_generator(
       std::shared_ptr<Node3d> current_node, std::size_t next_node_index);
-  void CalculateNodeCost(std::shared_ptr<Node3d> current_node,
-                         std::shared_ptr<Node3d> next_node,
-                         const ReedSheppPath* reeds_shepp_to_end);
+  void CalculateNodeCost(
+      std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node,
+      const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
   double HeuristicCost();
   double HoloObstacleHeuristic();
-  double NonHoloNoObstacleHeuristic(const ReedSheppPath* reeds_shepp_to_end);
-  double CalculateRSPCost(const ReedSheppPath* reeds_shepp_to_end);
-  bool GetResult(std::shared_ptr<Node3d> final_node, Result* result);
+  double NonHoloNoObstacleHeuristic(
+      const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
+  double CalculateRSPCost(
+      const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
+  bool GetResult(Result* result);
   bool GenerateSpeedAcceleration(Result* result);
 
  private:
@@ -113,6 +115,7 @@ class HybridAStar {
   ThreadSafeIndexedObstacles* obstacles_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;
+  std::shared_ptr<Node3d> final_node_;
   struct cmp {
     bool operator()(const std::pair<std::size_t, double>& left,
                     const std::pair<std::size_t, double>& right) const {
@@ -124,6 +127,7 @@ class HybridAStar {
       open_pq_;
   std::map<std::size_t, std::shared_ptr<Node3d>> open_set_;
   std::map<std::size_t, std::shared_ptr<Node3d>> close_set_;
+  std::map<std::size_t, std::shared_ptr<ReedSheppPath>> ReedSheppPath_cache_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;
 };
 

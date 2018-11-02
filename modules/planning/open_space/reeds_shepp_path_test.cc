@@ -46,25 +46,26 @@ class reeds_shepp : public ::testing::Test {
     XYbounds_.push_back(1000.0);
   }
   void check(std::shared_ptr<Node3d> start_node,
-             std::shared_ptr<Node3d> end_node, ReedSheppPath* optimal_path) {
-    ASSERT_LT(start_node->GetX() - (optimal_path->x).front(), 0.01);
-    ASSERT_LT(start_node->GetY() - (optimal_path->y).front(), 0.01);
-    ASSERT_LT(start_node->GetPhi() - (optimal_path->phi).front(), 0.01);
-    ASSERT_LT(end_node->GetX() - (optimal_path->x).back(), 0.01);
-    ASSERT_LT(end_node->GetY() - (optimal_path->y).back(), 0.01);
-    ASSERT_LT(end_node->GetPhi() - (optimal_path->phi).back(), 0.01);
-    ASSERT_GT(optimal_path->x.size(), 1);
-    for (std::size_t i = 1; i < optimal_path->x.size(); i++) {
+             std::shared_ptr<Node3d> end_node,
+             std::shared_ptr<ReedSheppPath> optimal_path) {
+    ASSERT_LT(start_node->GetX() - ((*optimal_path).x).front(), 0.01);
+    ASSERT_LT(start_node->GetY() - ((*optimal_path).y).front(), 0.01);
+    ASSERT_LT(start_node->GetPhi() - ((*optimal_path).phi).front(), 0.01);
+    ASSERT_LT(end_node->GetX() - ((*optimal_path).x).back(), 0.01);
+    ASSERT_LT(end_node->GetY() - ((*optimal_path).y).back(), 0.01);
+    ASSERT_LT(end_node->GetPhi() - ((*optimal_path).phi).back(), 0.01);
+    ASSERT_GT((*optimal_path).x.size(), 1);
+    for (std::size_t i = 1; i < (*optimal_path).x.size(); i++) {
       double gold_interval = std::sqrt(
           planner_open_space_config_.warm_start_config().step_size() *
               planner_open_space_config_.warm_start_config().step_size() +
           planner_open_space_config_.warm_start_config().step_size() *
               planner_open_space_config_.warm_start_config().step_size());
-      double interval =
-          std::sqrt((optimal_path->x.at(i) - optimal_path->x.at(i - 1)) *
-                        (optimal_path->x.at(i) - optimal_path->x.at(i - 1)) +
-                    (optimal_path->y.at(i) - optimal_path->y.at(i - 1)) *
-                        (optimal_path->y.at(i) - optimal_path->y.at(i - 1)));
+      double interval = std::sqrt(
+          ((*optimal_path).x.at(i) - (*optimal_path).x.at(i - 1)) *
+              ((*optimal_path).x.at(i) - (*optimal_path).x.at(i - 1)) +
+          ((*optimal_path).y.at(i) - (*optimal_path).y.at(i - 1)) *
+              ((*optimal_path).y.at(i) - (*optimal_path).y.at(i - 1)));
       ASSERT_LT(interval, gold_interval);
     }
   }
@@ -81,55 +82,60 @@ TEST_F(reeds_shepp, test_set_1) {
       0.0, 0.0, 10.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
       7.0, -8.0, 50.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
-  ReedSheppPath optimal_path;
-  if (!reedshepp_test->ShortestRSP(start_node, end_node, &optimal_path)) {
+  std::shared_ptr<ReedSheppPath> optimal_path =
+      std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
+  if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
     AINFO << "generating short RSP not successful";
   }
-  check(start_node, end_node, &optimal_path);
+  check(start_node, end_node, optimal_path);
 }
 TEST_F(reeds_shepp, test_set_2) {
   std::shared_ptr<Node3d> start_node = std::shared_ptr<Node3d>(new Node3d(
       0.0, 0.0, 10.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
       7.0, -8.0, -50.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
-  ReedSheppPath optimal_path;
-  if (!reedshepp_test->ShortestRSP(start_node, end_node, &optimal_path)) {
+  std::shared_ptr<ReedSheppPath> optimal_path =
+      std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
+  if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
     AINFO << "generating short RSP not successful";
   }
-  check(start_node, end_node, &optimal_path);
+  check(start_node, end_node, optimal_path);
 }
 TEST_F(reeds_shepp, test_set_3) {
   std::shared_ptr<Node3d> start_node = std::shared_ptr<Node3d>(new Node3d(
       0.0, 10.0, -10.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
       -7.0, -8.0, -50.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
-  ReedSheppPath optimal_path;
-  if (!reedshepp_test->ShortestRSP(start_node, end_node, &optimal_path)) {
+  std::shared_ptr<ReedSheppPath> optimal_path =
+      std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
+  if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
     AINFO << "generating short RSP not successful";
   }
-  check(start_node, end_node, &optimal_path);
+  check(start_node, end_node, optimal_path);
 }
 TEST_F(reeds_shepp, test_set_4) {
   std::shared_ptr<Node3d> start_node = std::shared_ptr<Node3d>(new Node3d(
       0.0, 10.0, -10.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
       -7.0, -8.0, 150.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
-  ReedSheppPath optimal_path;
-  if (!reedshepp_test->ShortestRSP(start_node, end_node, &optimal_path)) {
+  std::shared_ptr<ReedSheppPath> optimal_path =
+      std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
+  if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
     AINFO << "generating short RSP not successful";
   }
-  check(start_node, end_node, &optimal_path);
+  check(start_node, end_node, optimal_path);
 }
 TEST_F(reeds_shepp, test_set_5) {
   std::shared_ptr<Node3d> start_node = std::shared_ptr<Node3d>(new Node3d(
       0.0, 10.0, -10.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
   std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
       7.0, 8.0, 150.0 * M_PI / 180.0, XYbounds_, planner_open_space_config_));
-  ReedSheppPath optimal_path;
-  if (!reedshepp_test->ShortestRSP(start_node, end_node, &optimal_path)) {
+  std::shared_ptr<ReedSheppPath> optimal_path =
+      std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
+  if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
     AINFO << "generating short RSP not successful";
   }
-  check(start_node, end_node, &optimal_path);
+  check(start_node, end_node, optimal_path);
 }
 }  // namespace planning
 }  // namespace apollo
