@@ -1,25 +1,16 @@
 # Vehicle Modes
 
-This folder contains different modes configuration for Apollo vehicle. Each mode
-contains its runtime launch files to bring up all components.
+This folder contains modes configuration for Apollo vehicle. Each pb.txt should
+be an instance of apollo::dreamview::HMIMode. Check the proto for detailed
+information.
 
 ## Name Convention
 
-We'll convert the folder names to readable names automatically and display on
-Dreamview. Please make it simple, clean and meaningful.
+We'll convert the file name to a readable title-case name automatically to
+display on Dreamview. So please make it simple, clean and meaningful.
 
-An example mode files structure:
+Some examples:
 
-```text
-modes/
-      mkz_standard/
-                   close_loop.launch
-                   map_collection.launch
-                   ...
-```
-
-On Dreamview it can be selected in drop down menu:
-```text
-Mode:    "Mkz Standard"
-Config:  "Close Loop" or "Map Collection"
-```
+* mkz_standard_debug.pb.txt -> "Mkz Standard Debug"
+* mkz_close_loop.pb.txt     -> "Mkz Close Loop"
+* mkz_map_collection.pb.txt -> "Mkz Map Collection"
