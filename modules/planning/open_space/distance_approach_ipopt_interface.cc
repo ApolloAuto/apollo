@@ -368,7 +368,8 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * obstacles_edges_sum_;
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      x[index + j] = l_warm_up_(j, i);
+      //  x[index + j] = l_warm_up_(j, i);
+      x[index + j] = 0.5;
     }
   }
 
@@ -377,7 +378,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * 4 * obstacles_num_;
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      x[index + j] = n_warm_up_(j, i);
+      x[index + j] = 0.5;
     }
   }
   ADEBUG << "get_starting_point out";
