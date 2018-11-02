@@ -123,15 +123,15 @@ message ScenarioConfig {
   }
 
   optional ScenarioType scenario_type = 1;
-  // a list of stages that are used at runtime.  The first one is default stage.
-  repeated StageType stage_type = 2;
-  // an unordered list of stage configs.
-  repeated StageConfig stage_config = 3;
   oneof scenario_config {
-    ScenarioLaneFollowConfig lane_follow_config = 4;
-	ScenarioSidePassConfig side_pass_config = 5;
-	ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 6;
+    ScenarioLaneFollowConfig lane_follow_config = 2;
+	ScenarioSidePassConfig side_pass_config = 3;
+	ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 4;
   }
+  // a list of stages that are used at runtime.  The first one is default stage.
+  repeated StageType stage_type = 5;
+  // an unordered list of stage configs.
+  repeated StageConfig stage_config = 6;
 }
 
 message PlannerPublicRoadConfig {
