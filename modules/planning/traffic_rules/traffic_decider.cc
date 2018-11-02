@@ -26,10 +26,8 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/traffic_rules/backside_vehicle.h"
 #include "modules/planning/traffic_rules/change_lane.h"
-#include "modules/planning/traffic_rules/creeper.h"
 #include "modules/planning/traffic_rules/crosswalk.h"
 #include "modules/planning/traffic_rules/destination.h"
-#include "modules/planning/traffic_rules/front_vehicle.h"
 #include "modules/planning/traffic_rules/keep_clear.h"
 #include "modules/planning/traffic_rules/pull_over.h"
 #include "modules/planning/traffic_rules/reference_line_end.h"
@@ -63,10 +61,6 @@ void TrafficDecider::RegisterRules() {
   s_rule_factory.Register(TrafficRuleConfig::DESTINATION,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new Destination(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::FRONT_VEHICLE,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new FrontVehicle(config);
                           });
   s_rule_factory.Register(TrafficRuleConfig::KEEP_CLEAR,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
@@ -162,8 +156,6 @@ Status TrafficDecider::Execute(Frame *frame,
     ADEBUG << "Applied rule "
            << TrafficRuleConfig::RuleId_Name(rule_config.rule_id());
   }
-
-  // Creeper::Instance()->Run(frame, reference_line_info);
 
   BuildPlanningTarget(reference_line_info);
   return Status::OK();
