@@ -17,9 +17,9 @@ limitations under the License.
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
+#include "cyber/common/log.h"
 #include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -28,21 +28,21 @@ namespace apollo {
 namespace canbus {
 namespace transit {
 
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
+using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
 
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
-}
+}  // namespace
 
 ErrorCode TransitController::Init(
-	const VehicleParameter& params,
-	CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-    MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) {
+    const VehicleParameter& params,
+    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+    MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "TransitController has already been initiated.";
     return ErrorCode::CANBUS_ERROR;
@@ -66,46 +66,58 @@ ErrorCode TransitController::Init(
   message_manager_ = message_manager;
 
   // sender part
-  adc_auxiliarycontrol_110_ = dynamic_cast<Adcauxiliarycontrol110*>
-          (message_manager_->GetMutableProtocolDataById(Adcauxiliarycontrol110::ID));
+  adc_auxiliarycontrol_110_ = dynamic_cast<Adcauxiliarycontrol110*>(
+      message_manager_->GetMutableProtocolDataById(Adcauxiliarycontrol110::ID));
   if (adc_auxiliarycontrol_110_ == nullptr) {
-     AERROR << "Adcauxiliarycontrol110 does not exist in the TransitMessageManager!";
-     return ErrorCode::CANBUS_ERROR;
+    AERROR << "Adcauxiliarycontrol110 does not exist in the "
+              "TransitMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
   }
 
-  adc_motioncontrol1_10_ = dynamic_cast<Adcmotioncontrol110*>
-          (message_manager_->GetMutableProtocolDataById(Adcmotioncontrol110::ID));
+  adc_motioncontrol1_10_ = dynamic_cast<Adcmotioncontrol110*>(
+      message_manager_->GetMutableProtocolDataById(Adcmotioncontrol110::ID));
   if (adc_motioncontrol1_10_ == nullptr) {
-     AERROR << "Adcmotioncontrol110 does not exist in the TransitMessageManager!";
-     return ErrorCode::CANBUS_ERROR;
+    AERROR
+        << "Adcmotioncontrol110 does not exist in the TransitMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
   }
 
-  adc_motioncontrollimits1_12_ = dynamic_cast<Adcmotioncontrollimits112*>
-          (message_manager_->GetMutableProtocolDataById(Adcmotioncontrollimits112::ID));
+  adc_motioncontrollimits1_12_ = dynamic_cast<Adcmotioncontrollimits112*>(
+      message_manager_->GetMutableProtocolDataById(
+          Adcmotioncontrollimits112::ID));
   if (adc_motioncontrollimits1_12_ == nullptr) {
-     AERROR << "Adcmotioncontrollimits112 does not exist in the TransitMessageManager!";
-     return ErrorCode::CANBUS_ERROR;
+    AERROR << "Adcmotioncontrollimits112 does not exist in the "
+              "TransitMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
   }
 
-  llc_diag_brakecontrol_721_ = dynamic_cast<Llcdiagbrakecontrol721*>
-          (message_manager_->GetMutableProtocolDataById(Llcdiagbrakecontrol721::ID));
+  llc_diag_brakecontrol_721_ = dynamic_cast<Llcdiagbrakecontrol721*>(
+      message_manager_->GetMutableProtocolDataById(Llcdiagbrakecontrol721::ID));
   if (llc_diag_brakecontrol_721_ == nullptr) {
-     AERROR << "Llcdiagbrakecontrol721 does not exist in the TransitMessageManager!";
-     return ErrorCode::CANBUS_ERROR;
+    AERROR << "Llcdiagbrakecontrol721 does not exist in the "
+              "TransitMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
   }
 
-  llc_diag_steeringcontrol_722_ = dynamic_cast<Llcdiagsteeringcontrol722*>
-          (message_manager_->GetMutableProtocolDataById(Llcdiagsteeringcontrol722::ID));
+  llc_diag_steeringcontrol_722_ = dynamic_cast<Llcdiagsteeringcontrol722*>(
+      message_manager_->GetMutableProtocolDataById(
+          Llcdiagsteeringcontrol722::ID));
   if (llc_diag_steeringcontrol_722_ == nullptr) {
-     AERROR << "Llcdiagsteeringcontrol722 does not exist in the TransitMessageManager!";
-     return ErrorCode::CANBUS_ERROR;
+    AERROR << "Llcdiagsteeringcontrol722 does not exist in the "
+              "TransitMessageManager!";
+    return ErrorCode::CANBUS_ERROR;
   }
 
-  can_sender_->AddMessage(Adcauxiliarycontrol110::ID, adc_auxiliarycontrol_110_, false);
-  can_sender_->AddMessage(Adcmotioncontrol110::ID, adc_motioncontrol1_10_, false);
-  can_sender_->AddMessage(Adcmotioncontrollimits112::ID, adc_motioncontrollimits1_12_, false);
-  can_sender_->AddMessage(Llcdiagbrakecontrol721::ID, llc_diag_brakecontrol_721_, false);
-  can_sender_->AddMessage(Llcdiagsteeringcontrol722::ID, llc_diag_steeringcontrol_722_, false);
+  can_sender_->AddMessage(Adcauxiliarycontrol110::ID, adc_auxiliarycontrol_110_,
+                          false);
+  can_sender_->AddMessage(Adcmotioncontrol110::ID, adc_motioncontrol1_10_,
+                          false);
+  can_sender_->AddMessage(Adcmotioncontrollimits112::ID,
+                          adc_motioncontrollimits1_12_, false);
+  can_sender_->AddMessage(Llcdiagbrakecontrol721::ID,
+                          llc_diag_brakecontrol_721_, false);
+  can_sender_->AddMessage(Llcdiagsteeringcontrol722::ID,
+                          llc_diag_steeringcontrol_722_, false);
 
   // need sleep to ensure all messages received
   AINFO << "TransitController is initialized.";
@@ -157,7 +169,7 @@ Chassis TransitController::chassis() {
   // 3
   chassis_.set_engine_started(true);
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  */
+   */
   return chassis_;
 }
 
@@ -310,7 +322,7 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void TransitController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO Update brake value based on mode
+  // TODO(QiL) :  Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
@@ -416,7 +428,7 @@ void TransitController::ResetProtocol() {
 
 bool TransitController::CheckChassisError() {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  */
+   */
   return false;
 }
 
@@ -491,7 +503,7 @@ void TransitController::SecurityDogThreadFunc() {
 
 bool TransitController::CheckResponse(const int32_t flags, bool need_wait) {
   /* ADD YOUR OWN CAR CHASSIS OPERATION
-  */
+   */
   return false;
 }
 

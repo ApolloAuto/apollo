@@ -31,15 +31,29 @@ Llcmotionfeedback221::Llcmotionfeedback221() {}
 const int32_t Llcmotionfeedback221::ID = 0x21;
 
 void Llcmotionfeedback221::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_transit()->mutable_llc_motionfeedback2_21()->set_llc_motionfeedback2_counter(llc_motionfeedback2_counter(bytes, length));
-  chassis->mutable_transit()->mutable_llc_motionfeedback2_21()->set_llc_motionfeedback2_checksum(llc_motionfeedback2_checksum(bytes, length));
-  chassis->mutable_transit()->mutable_llc_motionfeedback2_21()->set_llc_fbk_steeringrate(llc_fbk_steeringrate(bytes, length));
-  chassis->mutable_transit()->mutable_llc_motionfeedback2_21()->set_llc_fbk_steeringangle(llc_fbk_steeringangle(bytes, length));
+                                 ChassisDetail* chassis) const {
+  chassis->mutable_transit()
+      ->mutable_llc_motionfeedback2_21()
+      ->set_llc_motionfeedback2_counter(
+          llc_motionfeedback2_counter(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motionfeedback2_21()
+      ->set_llc_motionfeedback2_checksum(
+          llc_motionfeedback2_checksum(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motionfeedback2_21()
+      ->set_llc_fbk_steeringrate(llc_fbk_steeringrate(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motionfeedback2_21()
+      ->set_llc_fbk_steeringangle(llc_fbk_steeringangle(bytes, length));
 }
 
-// config detail: {'description': 'Motion feedback 2 heartbeat counter', 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name': 'llc_motionfeedback2_counter', 'is_signed_var': False, 'physical_range': '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-int Llcmotionfeedback221::llc_motionfeedback2_counter(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Motion feedback 2 heartbeat counter',
+// 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
+// 'llc_motionfeedback2_counter', 'is_signed_var': False, 'physical_range':
+// '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
+int Llcmotionfeedback221::llc_motionfeedback2_counter(const std::uint8_t* bytes,
+                                                      int32_t length) const {
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(6, 2);
 
@@ -47,8 +61,12 @@ int Llcmotionfeedback221::llc_motionfeedback2_counter(const std::uint8_t* bytes,
   return ret;
 }
 
-// config detail: {'description': 'Motion feedback 2 checksum', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'llc_motionfeedback2_checksum', 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-int Llcmotionfeedback221::llc_motionfeedback2_checksum(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Motion feedback 2 checksum', 'offset': 0.0,
+// 'precision': 1.0, 'len': 8, 'name': 'llc_motionfeedback2_checksum',
+// 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type':
+// 'int', 'order': 'intel', 'physical_unit': ''}
+int Llcmotionfeedback221::llc_motionfeedback2_checksum(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
@@ -56,8 +74,13 @@ int Llcmotionfeedback221::llc_motionfeedback2_checksum(const std::uint8_t* bytes
   return ret;
 }
 
-// config detail: {'description': 'Steer wheel angle feedback from SbW motor (? rate)', 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name': 'llc_fbk_steeringrate', 'is_signed_var': True, 'physical_range': '[-1638.4|1638.3]', 'bit': 16, 'type': 'double', 'order': 'intel', 'physical_unit': 'deg/s'}
-double Llcmotionfeedback221::llc_fbk_steeringrate(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Steer wheel angle feedback from SbW motor (?
+// rate)', 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name':
+// 'llc_fbk_steeringrate', 'is_signed_var': True, 'physical_range':
+// '[-1638.4|1638.3]', 'bit': 16, 'type': 'double', 'order': 'intel',
+// 'physical_unit': 'deg/s'}
+double Llcmotionfeedback221::llc_fbk_steeringrate(const std::uint8_t* bytes,
+                                                  int32_t length) const {
   Byte t0(bytes + 3);
   int32_t x = t0.get_byte(0, 8);
 
@@ -73,8 +96,12 @@ double Llcmotionfeedback221::llc_fbk_steeringrate(const std::uint8_t* bytes, int
   return ret;
 }
 
-// config detail: {'description': 'Steering angle feedback', 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name': 'llc_fbk_steeringangle', 'is_signed_var': True, 'physical_range': '[-1638.4|1638.35]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit': 'deg'}
-double Llcmotionfeedback221::llc_fbk_steeringangle(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Steering angle feedback', 'offset': 0.0,
+// 'precision': 0.05, 'len': 16, 'name': 'llc_fbk_steeringangle',
+// 'is_signed_var': True, 'physical_range': '[-1638.4|1638.35]', 'bit': 0,
+// 'type': 'double', 'order': 'intel', 'physical_unit': 'deg'}
+double Llcmotionfeedback221::llc_fbk_steeringangle(const std::uint8_t* bytes,
+                                                   int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 

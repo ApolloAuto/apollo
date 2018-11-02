@@ -30,7 +30,7 @@ const int32_t Adcmotioncontrol110::ID = 0x10;
 Adcmotioncontrol110::Adcmotioncontrol110() { Reset(); }
 
 uint32_t Adcmotioncontrol110::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -49,7 +49,7 @@ void Adcmotioncontrol110::UpdateData(uint8_t* data) {
 }
 
 void Adcmotioncontrol110::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :  you should check this manually
   adc_cmd_steerwheelangle_ = 0.0;
   adc_cmd_steeringcontrolmode_ =
       Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE;

@@ -30,7 +30,7 @@ const int32_t Llcdiagbrakecontrol721::ID = 0x721;
 Llcdiagbrakecontrol721::Llcdiagbrakecontrol721() { Reset(); }
 
 uint32_t Llcdiagbrakecontrol721::GetPeriod() const {
-  // TODO modify every protocol's period manually
+  // TODO(QiL) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -45,7 +45,7 @@ void Llcdiagbrakecontrol721::UpdateData(uint8_t* data) {
 }
 
 void Llcdiagbrakecontrol721::Reset() {
-  // TODO you should check this manually
+  // TODO(QiL) :  you should check this manually
   llc_dbg_brakepidcontribution_p_ = 0.0;
   llc_dbg_brakepidcontribution_i_ = 0.0;
   llc_dbg_brakepidcontribution_d_ = 0.0;

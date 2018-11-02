@@ -16,30 +16,30 @@
 
 #pragma once
 
-
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace transit {
 
 class Llcvehiclestatus25 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                               ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Llcvehiclestatus25();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
-
-  // config detail: {'description': 'Vehicle 12V voltage feedback', 'offset': 0.0, 'precision': 0.1, 'len': 8, 'name': 'LLC_FBK_12Voltage', 'is_signed_var': False, 'physical_range': '[0|25.5]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit': 'Volt'}
-  double llc_fbk_12voltage(const std::uint8_t* bytes, const int32_t length) const;
+  // config detail: {'description': 'Vehicle 12V voltage feedback', 'offset':
+  // 0.0, 'precision': 0.1, 'len': 8, 'name': 'LLC_FBK_12Voltage',
+  // 'is_signed_var': False, 'physical_range': '[0|25.5]', 'bit': 0, 'type':
+  // 'double', 'order': 'intel', 'physical_unit': 'Volt'}
+  double llc_fbk_12voltage(const std::uint8_t* bytes,
+                           const int32_t length) const;
 };
 
 }  // namespace transit
 }  // namespace canbus
 }  // namespace apollo
-
-

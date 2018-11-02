@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <memory>
 #include <thread>
 
@@ -25,7 +24,6 @@
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/common/macro.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
@@ -41,15 +39,15 @@ namespace transit {
 
 class TransitController final : public VehicleController {
  public:
-
-  explicit TransitController() {};
+  TransitController() {}
 
   virtual ~TransitController();
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail> *const message_manager) override;
+      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      override;
 
   bool Start() override;
 
@@ -133,5 +131,3 @@ class TransitController final : public VehicleController {
 }  // namespace transit
 }  // namespace canbus
 }  // namespace apollo
-
-

@@ -16,9 +16,9 @@
 
 #include "modules/canbus/vehicle/transit/transit_vehicle_factory.h"
 
+#include "cyber/common/log.h"
 #include "modules/canbus/vehicle/transit/transit_controller.h"
 #include "modules/canbus/vehicle/transit/transit_message_manager.h"
-#include "cyber/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {
@@ -32,7 +32,7 @@ TransitVehicleFactory::CreateVehicleController() {
 std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
 TransitVehicleFactory::CreateMessageManager() {
   return std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>(
-	new transit::TransitMessageManager());
+      new transit::TransitMessageManager());
 }
 
 }  // namespace canbus

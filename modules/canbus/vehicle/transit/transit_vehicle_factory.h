@@ -20,7 +20,6 @@
 
 #pragma once
 
-
 #include <memory>
 
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
@@ -44,8 +43,8 @@ namespace canbus {
 class TransitVehicleFactory : public AbstractVehicleFactory {
  public:
   /**
-  * @brief destructor
-  */
+   * @brief destructor
+   */
   virtual ~TransitVehicleFactory() = default;
 
   /**
@@ -64,5 +63,3 @@ class TransitVehicleFactory : public AbstractVehicleFactory {
 
 }  // namespace canbus
 }  // namespace apollo
-
-

@@ -30,17 +30,37 @@ using ::apollo::drivers::canbus::Byte;
 Llcmotioncommandfeedback122::Llcmotioncommandfeedback122() {}
 const int32_t Llcmotioncommandfeedback122::ID = 0x22;
 
-void Llcmotioncommandfeedback122::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
-  chassis->mutable_transit()->mutable_llc_motioncommandfeedback1_22()->set_llc_fbk_steeringanglesetpoint(llc_fbk_steeringanglesetpoint(bytes, length));
-  chassis->mutable_transit()->mutable_llc_motioncommandfeedback1_22()->set_llc_fbk_throttlesetpoint(llc_fbk_throttlesetpoint(bytes, length));
-  chassis->mutable_transit()->mutable_llc_motioncommandfeedback1_22()->set_llc_fbk_brakepressuresetpoint(llc_fbk_brakepressuresetpoint(bytes, length));
-  chassis->mutable_transit()->mutable_llc_motioncommandfeedback1_22()->set_llc_motioncommandfeedback1_count(llc_motioncommandfeedback1_count(bytes, length));
-  chassis->mutable_transit()->mutable_llc_motioncommandfeedback1_22()->set_llc_motioncommandfeedback1_check(llc_motioncommandfeedback1_check(bytes, length));
+void Llcmotioncommandfeedback122::Parse(const std::uint8_t* bytes,
+                                        int32_t length,
+                                        ChassisDetail* chassis) const {
+  chassis->mutable_transit()
+      ->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_fbk_steeringanglesetpoint(
+          llc_fbk_steeringanglesetpoint(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_fbk_throttlesetpoint(llc_fbk_throttlesetpoint(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_fbk_brakepressuresetpoint(
+          llc_fbk_brakepressuresetpoint(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_motioncommandfeedback1_count(
+          llc_motioncommandfeedback1_count(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motioncommandfeedback1_22()
+      ->set_llc_motioncommandfeedback1_check(
+          llc_motioncommandfeedback1_check(bytes, length));
 }
 
-// config detail: {'description': 'Steering angle setpoint (after limits)', 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name': 'llc_fbk_steeringanglesetpoint', 'is_signed_var': True, 'physical_range': '[-1638.4|1638.35]', 'bit': 21, 'type': 'double', 'order': 'intel', 'physical_unit': 'deg'}
-double Llcmotioncommandfeedback122::llc_fbk_steeringanglesetpoint(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Steering angle setpoint (after limits)',
+// 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name':
+// 'llc_fbk_steeringanglesetpoint', 'is_signed_var': True, 'physical_range':
+// '[-1638.4|1638.35]', 'bit': 21, 'type': 'double', 'order': 'intel',
+// 'physical_unit': 'deg'}
+double Llcmotioncommandfeedback122::llc_fbk_steeringanglesetpoint(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 5);
 
@@ -61,8 +81,13 @@ double Llcmotioncommandfeedback122::llc_fbk_steeringanglesetpoint(const std::uin
   return ret;
 }
 
-// config detail: {'description': 'Current throttle setpoint (after limits)', 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name': 'llc_fbk_throttlesetpoint', 'is_signed_var': False, 'physical_range': '[0|102.3]', 'bit': 11, 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
-double Llcmotioncommandfeedback122::llc_fbk_throttlesetpoint(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Current throttle setpoint (after limits)',
+// 'offset': 0.0, 'precision': 0.1, 'len': 10, 'name':
+// 'llc_fbk_throttlesetpoint', 'is_signed_var': False, 'physical_range':
+// '[0|102.3]', 'bit': 11, 'type': 'double', 'order': 'intel', 'physical_unit':
+// '%'}
+double Llcmotioncommandfeedback122::llc_fbk_throttlesetpoint(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 5);
 
@@ -75,8 +100,13 @@ double Llcmotioncommandfeedback122::llc_fbk_throttlesetpoint(const std::uint8_t*
   return ret;
 }
 
-// config detail: {'description': 'Front brake pressure setpoint (after limits)', 'offset': 0.0, 'precision': 0.488519785051295, 'len': 11, 'name': 'llc_fbk_brakepressuresetpoint', 'is_signed_var': False, 'physical_range': '[0|1000]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
-double Llcmotioncommandfeedback122::llc_fbk_brakepressuresetpoint(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Front brake pressure setpoint (after
+// limits)', 'offset': 0.0, 'precision': 0.488519785051295, 'len': 11, 'name':
+// 'llc_fbk_brakepressuresetpoint', 'is_signed_var': False, 'physical_range':
+// '[0|1000]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit':
+// '%'}
+double Llcmotioncommandfeedback122::llc_fbk_brakepressuresetpoint(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 3);
 
@@ -89,8 +119,12 @@ double Llcmotioncommandfeedback122::llc_fbk_brakepressuresetpoint(const std::uin
   return ret;
 }
 
-// config detail: {'description': 'Motion command feedback 2 heartbeat counter', 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name': 'llc_motioncommandfeedback1_count', 'is_signed_var': False, 'physical_range': '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_count(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Motion command feedback 2 heartbeat counter',
+// 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
+// 'llc_motioncommandfeedback1_count', 'is_signed_var': False, 'physical_range':
+// '[0|3]', 'bit': 54, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
+int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_count(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 6);
   int32_t x = t0.get_byte(6, 2);
 
@@ -98,8 +132,12 @@ int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_count(const std::uin
   return ret;
 }
 
-// config detail: {'description': 'Motion command feedback 1 checksum', 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name': 'llc_motioncommandfeedback1_check', 'is_signed_var': False, 'physical_range': '[0|255]', 'bit': 56, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
-int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_check(const std::uint8_t* bytes, int32_t length) const {
+// config detail: {'description': 'Motion command feedback 1 checksum',
+// 'offset': 0.0, 'precision': 1.0, 'len': 8, 'name':
+// 'llc_motioncommandfeedback1_check', 'is_signed_var': False, 'physical_range':
+// '[0|255]', 'bit': 56, 'type': 'int', 'order': 'intel', 'physical_unit': ''}
+int Llcmotioncommandfeedback122::llc_motioncommandfeedback1_check(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 8);
 
