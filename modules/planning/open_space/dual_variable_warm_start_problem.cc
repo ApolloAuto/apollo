@@ -90,7 +90,7 @@ bool DualVariableWarmStartProblem::Solve(
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    ADEBUG
+    AINFO
         << "*** Dual variable wart start problem error during initialization!";
     return false;
   }
@@ -101,13 +101,13 @@ bool DualVariableWarmStartProblem::Solve(
       status == Ipopt::Solved_To_Acceptable_Level) {
     // Retrieve some statistics about the solve
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
-    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
+    AINFO << "*** The problem solved in " << iter_count << " iterations!";
 
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    ADEBUG << "*** The final value of the objective function is " << final_obj
-           << '.';
+    AINFO << "*** The final value of the objective function is " << final_obj
+          << '.';
   } else {
-    ADEBUG << "Return status: " << int(status);
+    AINFO << "Return status: " << int(status);
   }
 
   ptop->get_optimization_results(l_warm_up, n_warm_up);
