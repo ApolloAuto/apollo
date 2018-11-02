@@ -111,13 +111,13 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   std::size_t l_index = l_start_index_;
   std::size_t n_index = n_start_index_;
   std::size_t d_index = d_start_index_;
-  AINFO << "l_start_index_ : " << l_start_index_;
-  AINFO << "n_start_index_ : " << n_start_index_;
-  AINFO << "d_start_index_ : " << d_start_index_;
+  ADEBUG << "l_start_index_ : " << l_start_index_;
+  ADEBUG << "n_start_index_ : " << n_start_index_;
+  ADEBUG << "d_start_index_ : " << d_start_index_;
   // 1. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      x[l_index] = 0.2;
+      x[l_index] = 0.5;
       ++l_index;
     }
   }
@@ -125,7 +125,7 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   // 2. lagrange constraint m, 4*obstacles_num * (horizon_+1)
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      x[n_index] = 0.2;
+      x[n_index] = 0.5;
       ++n_index;
     }
   }
@@ -178,8 +178,8 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       // TODO(QiL): Load this from configuration
-      x_l[variable_index] = -100.0;
-      x_u[variable_index] = 100.0;
+      x_l[variable_index] = 0.0;
+      x_u[variable_index] = 1.0;
       ++variable_index;
     }
   }
@@ -476,7 +476,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         values[nz_index] = -1.0;  // w2
         ++nz_index;
 
-        AINFO << "eval_jac_g, after adding part 2";
+        ADEBUG << "eval_jac_g, after adding part 2";
         // 3. G' * mu + R' * lambda == 0, part 2
 
         // with respect to l
