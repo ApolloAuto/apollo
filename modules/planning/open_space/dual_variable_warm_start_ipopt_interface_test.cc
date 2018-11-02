@@ -77,7 +77,7 @@ void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
   ptop_.reset(new DualVariableWarmStartIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_,
       obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_, rx_,
-      ry_, r_yaw_));
+      ry_, r_yaw_, planner_open_space_config_));
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, initilization) {
@@ -90,7 +90,7 @@ TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_nlp_info) {
   ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
   EXPECT_EQ(n, num_of_variables_);
   EXPECT_EQ(m, num_of_constraints_);
-  EXPECT_EQ(nnz_jac_g, 1799);
+  EXPECT_EQ(nnz_jac_g, 1500);
   EXPECT_EQ(nnz_h_lag, 0);
   EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
 }

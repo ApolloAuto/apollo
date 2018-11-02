@@ -66,7 +66,7 @@ bool DualVariableWarmStartProblem::Solve(
       new DualVariableWarmStartIPOPTInterface(
           num_of_variables, num_of_constraints, horizon, ts, ego,
           obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, rx, ry,
-          r_yaw);
+          r_yaw, planner_open_space_config_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

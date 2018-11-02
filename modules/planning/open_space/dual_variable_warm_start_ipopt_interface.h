@@ -41,7 +41,8 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
       const Eigen::MatrixXd& obstacles_edges_num,
       const std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
       const Eigen::MatrixXd& obstacles_b, const double rx, const double ry,
-      const double r_yaw);
+      const double r_yaw,
+      const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DualVariableWarmStartIPOPTInterface() = default;
 
@@ -133,6 +134,8 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   double rx_;
   double ry_;
   double r_yaw_;
+
+  double weight_d_;
 };
 
 }  // namespace planning

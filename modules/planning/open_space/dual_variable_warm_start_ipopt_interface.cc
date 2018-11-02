@@ -39,7 +39,7 @@ DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
     const Eigen::MatrixXd& ego, const Eigen::MatrixXd& obstacles_edges_num,
     const std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
     const Eigen::MatrixXd& obstacles_b, const double rx, const double ry,
-    const double r_yaw)
+    const double r_yaw, const PlannerOpenSpaceConfig& planner_open_space_config)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
       horizon_(horizon),
@@ -63,6 +63,8 @@ DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
   d_start_index_ = n_start_index_ + 4 * obstacles_num_ * (horizon_ + 1);
   l_warm_up_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
   n_warm_up_ = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
+  weight_d_ =
+      planner_open_space_config.dual_variable_warm_start_config().weight_d();
 }
 
 bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
@@ -122,14 +124,14 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
     }
   }
 
-  // 2. lagrange constraint m, 4*obstacles_num * (horizon_+1)
+  // 2. lagrange constraint n, 4*obstacles_num * (horizon_+1)
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
       x[n_index] = 0.5;
       ++n_index;
     }
   }
-  // 3. dual variable n, [0, obstacles_num] * [0, horizon_]
+  // 3. d, [0, obstacles_num] * [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       x[d_index] = 0.2;
@@ -174,7 +176,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   }
   ADEBUG << "variable_index after adding lagrange n : " << variable_index;
 
-  // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
+  // 3. d, [0, obstacles_num-1] * [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       // TODO(QiL): Load this from configuration
@@ -183,7 +185,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
       ++variable_index;
     }
   }
-  ADEBUG << "variable_index after adding dual variables n : " << variable_index;
+  ADEBUG << "variable_index after adding d : " << variable_index;
 
   std::size_t constraint_index = 0;
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
@@ -217,8 +219,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_f(int n, const double* x,
   std::size_t d_index = d_start_index_;
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      // TODO(QiL): Change weight to configuration
-      obj_value += 1.0 * x[d_index];
+      obj_value += weight_d_ * x[d_index];
       ++d_index;
     }
   }
@@ -234,8 +235,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_grad_f(int n, const double* x,
   // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      // TODO(QiL): Change to weight configration
-      grad_f[d_index] = 1.0;
+      grad_f[d_index] = weight_d_;
       ++d_index;
     }
   }
