@@ -31,18 +31,18 @@ double GeneralChannelMessage::max_frmae_ratio_ = 1.0;
 
 const char* GeneralChannelMessage::errCode2Str(
     GeneralChannelMessage::ErrorCode errCode) {
-  const char* ret = "Unknown Error Code";
+  const char* ret;
   switch (errCode) {
     case GeneralChannelMessage::ErrorCode::NewSubClassFailed:
-      ret = "Cannot create Parser Object";
+      ret = "Cannot Create Parser Object";
       break;
 
     case GeneralChannelMessage::ErrorCode::CreateNodeFailed:
-      ret = "Cannot create Cyber Node";
+      ret = "Cannot Create Cyber Node";
       break;
 
     case GeneralChannelMessage::ErrorCode::CreateReaderFailed:
-      ret = "Cannot create Cyber Reader";
+      ret = "Cannot Create Cyber Reader";
       break;
 
     case GeneralChannelMessage::ErrorCode::MessageTypeIsEmpty:
@@ -54,8 +54,11 @@ const char* GeneralChannelMessage::errCode2Str(
       break;
 
     case GeneralChannelMessage::ErrorCode::NoCloseChannel:
-      ret = "No close Channel";
+      ret = "No Close Channel";
       break;
+
+    default: 
+      ret = "Unknown Error Code";
   }
   return ret;
 }
@@ -84,7 +87,8 @@ double GeneralChannelMessage::frame_ratio(void) {
   if (deltaTime.ToNanosecond() > 1000000000) {
     last_time_ = curTime;
     frame_ratio_ = frame_counter_ / deltaTime.ToSecond();
-    frame_counter_ = 0;
+    int old = frame_counter_;
+    while(!frame_counter_.compare_exchange_strong(old, 0)) {}
   }
 
   if (frame_ratio_ > max_frmae_ratio_) max_frmae_ratio_ = frame_ratio_;
@@ -168,20 +172,20 @@ void GeneralChannelMessage::Render(const Screen* s, int key) {
 void GeneralChannelMessage::RenderInfo(const Screen* s, int key,
                                        unsigned lineNo) {
   page_item_count_ = s->Height() - lineNo;
-  pages_ = (readers_.size() + writers_.size() + lineNo) / page_item_count_ + 1;
+  pages_ = static_cast<int>(readers_.size() + writers_.size() + lineNo) / page_item_count_ + 1;
   SplitPages(key);
 
   bool hasReader = true;
   std::vector<std::string>* vec = &readers_;
 
   auto iter = vec->cbegin();
-  unsigned y = page_index_ * page_item_count_;
+  unsigned int y = page_index_ * page_item_count_;
   if (y < vec->size()) {
     for (unsigned i = 0; i < y; ++i) {
       ++iter;
     }
   } else {
-    y -= vec->size();
+    y -= static_cast<unsigned int>(vec->size());
     vec = &writers_;
     iter = vec->cbegin();
     while (y) {
@@ -223,23 +227,31 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
       s->AddStr(0, lineNo++, "FrameRatio: ");
 
       std::ostringstream outStr;
-      outStr << std::fixed << std::setprecision(2) << frame_ratio();
+      outStr << std::fixed << std::setprecision(FrameRatio_Precision) << frame_ratio();
       s->AddStr(outStr.str().c_str());
 
       decltype(channel_message_) channelMsg = CopyMsgPtr();
 
-      if (raw_msg_class_->ParseFromString(channelMsg->message)) {
-        int lcount = lineCount(*raw_msg_class_, s->Width());
-        page_item_count_ = s->Height() - lineNo;
-        pages_ = lcount / page_item_count_ + 1;
-        SplitPages(key);
-        int jumpLines = page_index_ * page_item_count_;
-        jumpLines <<= 2;
-        jumpLines /= 5;
-        GeneralMessageBase::PrintMessage(this, *raw_msg_class_, jumpLines, s,
-                                         lineNo, 0);
+      if (channelMsg->message.size()) {
+        s->AddStr(0, lineNo++, "RawMessage Size: ");
+        outStr.str(""); 
+        outStr << channelMsg->message.size() << " Bytes";
+        s->AddStr(outStr.str().c_str());
+        if (raw_msg_class_->ParseFromString(channelMsg->message)) {
+          int lcount = lineCount(*raw_msg_class_, s->Width());
+          page_item_count_ = s->Height() - lineNo;
+          pages_ = lcount / page_item_count_ + 1;
+          SplitPages(key);
+          int jumpLines = page_index_ * page_item_count_;
+          jumpLines <<= 2;
+          jumpLines /= 5;
+          GeneralMessageBase::PrintMessage(this, *raw_msg_class_, jumpLines, s,
+                                          lineNo, 0);
+        } else {
+          s->AddStr(0, lineNo++, "Cannot parse the raw message");
+        }
       } else {
-        s->AddStr(0, lineNo++, "Cannot parse the raw message");
+        s->AddStr(0, lineNo++, "The size of this raw Message is Zero");
       }
     }
   } else {

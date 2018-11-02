@@ -17,6 +17,8 @@
 #ifndef TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_
 #define TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_
 
+#include <atomic>
+
 #include "cyber/message/raw_message.h"
 #include "general_message_base.h"
 
@@ -26,6 +28,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   static double max_frmae_ratio_;
 
  public:
+  static constexpr int FrameRatio_Precision = 4;
   static double max_frame_ratio(void) { return max_frmae_ratio_; }
 
   enum class ErrorCode {
@@ -170,7 +173,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   bool has_message_come_;
   std::string message_type_;
-  int frame_counter_;
+  std::atomic<int> frame_counter_;
   double frame_ratio_;
   apollo::cyber::Time last_time_;
 

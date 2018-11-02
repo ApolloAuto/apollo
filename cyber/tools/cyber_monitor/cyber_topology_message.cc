@@ -123,7 +123,7 @@ void CyberTopologyMessage::AddReaderWriter(
   }
 
   if (static_cast<int>(channelName.length()) > col1_width_) {
-    col1_width_ = channelName.length();
+    col1_width_ = static_cast<int>(channelName.length());
   }
 
   const std::string& nodeName = role.node_name();
@@ -199,13 +199,13 @@ void CyberTopologyMessage::ChangeState(const Screen* s, int key) {
       }
     }
 
-    default:;
+    default: {}
   }
 }
 
 void CyberTopologyMessage::Render(const Screen* s, int key) {
   page_item_count_ = s->Height() - 1;
-  pages_ = all_channels_map_.size() / page_item_count_ + 1;
+  pages_ = static_cast<int>(all_channels_map_.size()) / page_item_count_ + 1;
   ChangeState(s, key);
   SplitPages(key);
 
@@ -258,7 +258,7 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
           break;
         case SecondColumnType::MessageFrameRatio: {
           outStr.str("");
-          outStr << std::fixed << std::setprecision(2)
+          outStr << std::fixed << std::setprecision(GeneralChannelMessage::FrameRatio_Precision)
                  << iter->second->frame_ratio();
           s->AddStr(col1_width_ + SecondColumnOffset, line,
                     outStr.str().c_str());

@@ -27,7 +27,7 @@ class Screen;
 
 class GeneralMessageBase : public RenderableMessage {
  protected:
-  enum { Type = 0 };
+
   static void PrintMessage(GeneralMessageBase* baseMsg,
                            const google::protobuf::Message& msg, int& jumpLines,
                            const Screen* s, unsigned& lineNo, int indent);
