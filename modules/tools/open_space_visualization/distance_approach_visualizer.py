@@ -29,7 +29,7 @@ import math
 OpenSpacePlanner = DistancePlanner()
 
 # parameter(except max, min and car size is defined in proto)
-num_output_buffer = 100000
+num_output_buffer = 10000
 sx = -10.0
 sy = 3
 sphi = 0.0
@@ -101,6 +101,8 @@ opt_v = (c_double * num_output_buffer)()
 opt_a = (c_double * num_output_buffer)()
 opt_steer = (c_double * num_output_buffer)()
 opt_time = (c_double * num_output_buffer)()
+opt_dual_l = (c_double * num_output_buffer)()
+opt_dual_n = (c_double * num_output_buffer)()
 size = (c_ushort * 1)()
 XYbounds_ctype = (c_double * 4)(*XYbounds)
 
@@ -114,7 +116,8 @@ print("planning time is " + str(end - start))
 
 # load result
 OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
-                                   opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, size)
+                                   opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, 
+                                   opt_dual_l, opt_dual_n, size)
 x_out = []
 y_out = []
 phi_out = []
@@ -128,6 +131,8 @@ opt_v_out = []
 opt_a_out = []
 opt_steer_out = []
 opt_time_out = []
+opt_dual_l_out = []
+opt_dual_n_out = []
 for i in range(0, size[0]):
     x_out.append(float(x[i]))
     y_out.append(float(y[i]))
@@ -143,6 +148,10 @@ for i in range(0, size[0]):
     opt_steer_out.append(float(opt_steer[i]))
     opt_time_out.append(float(opt_time[i]))
 
+for i in range(0, size[0] * 6):
+    opt_dual_l_out.append(float(opt_dual_l[i]))
+for i in range(0, size[0] * 16):
+    opt_dual_n_out.append(float(opt_dual_n[i]))
 # trajectories plot
 fig1 = plt.figure(1)
 ax = fig1.add_subplot(111)
@@ -218,4 +227,12 @@ steer_graph.plot(np.linspace(0, size[0], size[0]), opt_steer_out)
 steer_graph = fig2.add_subplot(414)
 steer_graph.title.set_text('t')
 steer_graph.plot(np.linspace(0, size[0], size[0]), opt_time_out)
+# dual variables
+fig3 = plt.figure(3)
+dual_l_graph = fig3.add_subplot(211)
+dual_l_graph.title.set_text('dual_l')
+dual_l_graph.plot(np.linspace(0, size[0] * 6, size[0] * 6), opt_dual_l_out)
+dual_n_graph = fig3.add_subplot(212)
+dual_n_graph.title.set_text('dual_n')
+dual_n_graph.plot(np.linspace(0, size[0] * 16, size[0] * 16), opt_dual_n_out)
 plt.show()

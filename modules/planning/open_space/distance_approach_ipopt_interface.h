@@ -44,7 +44,6 @@ namespace planning {
 class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
  public:
   explicit DistanceApproachIPOPTInterface(
-      const int num_of_variables, const int num_of_constraints,
       std::size_t horizon, float ts, Eigen::MatrixXd ego,
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       Eigen::MatrixXd x0, Eigen::MatrixXd xf, Eigen::MatrixXd last_time_u,
@@ -104,7 +103,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   void get_optimization_results(Eigen::MatrixXd* state_result,
                                 Eigen::MatrixXd* control_result,
-                                Eigen::MatrixXd* time_result) const;
+                                Eigen::MatrixXd* time_result,
+                                Eigen::MatrixXd* dual_l_result,
+                                Eigen::MatrixXd* dual_n_result) const;
 
  private:
   int num_of_variables_;
@@ -144,6 +145,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double wheelbase_;
 
   Eigen::MatrixXd state_result_;
+  Eigen::MatrixXd dual_l_result_;
+  Eigen::MatrixXd dual_n_result_;
   Eigen::MatrixXd control_result_;
   Eigen::MatrixXd time_result_;
 

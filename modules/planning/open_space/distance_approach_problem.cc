@@ -39,47 +39,14 @@ bool DistanceApproachProblem::Solve(
     const Eigen::MatrixXd& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
-    Eigen::MatrixXd* time_result) {
-  // TODO(QiL) : set up number of variables and number of constaints, and rego
-  // so constants do not get set repeatedly
-
-  // n1 : states variables, 4 * (N+1)
-  int n1 = 4 * (horizon + 1);
-
-  // n2 : control inputs variables
-  int n2 = 2 * horizon;
-
-  // n3 : sampling time variables
-  int n3 = horizon + 1;
-
-  // n4 : dual multiplier associated with obstacleShape
-  int n4 = obstacles_edges_num.sum() * (horizon + 1);
-
-  // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
-  int n5 = obstacles_num * 4 * (horizon + 1);
-
-  // m1 : dynamics constatins
-  int m1 = 4 * horizon;
-
-  // m2 : control rate constraints (only steering)
-  int m2 = horizon;
-
-  // m3 : sampling time equality constraints
-  int m3 = horizon;
-
-  // m4 : obstacle constraints
-  int m4 = 4 * obstacles_num * (horizon + 1);
-
-  int num_of_variables = n1 + n2 + n3 + n4 + n5;
-  int num_of_constraints = m1 + m2 + m3 + m4;
-
+    Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
+    Eigen::MatrixXd* dual_n_result) {
   // TODO(QiL) : evaluate whether need to new it everytime
-
   auto t_start = cyber::Time::Now().ToSecond();
   DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
-      num_of_variables, num_of_constraints, horizon, ts, ego, xWS, uWS, x0, xF,
-      last_time_u, XYbounds, obstacles_edges_num, obstacles_num, obstacles_A,
-      obstacles_b, planner_open_space_config_);
+      horizon, ts, ego, xWS, uWS, x0, xF, last_time_u, XYbounds,
+      obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
+      planner_open_space_config_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
@@ -127,7 +94,8 @@ bool DistanceApproachProblem::Solve(
     AINFO << "Return status: " << int(status);
   }
 
-  ptop->get_optimization_results(state_result, control_result, time_result);
+  ptop->get_optimization_results(state_result, control_result, time_result,
+                                 dual_l_result, dual_n_result);
 
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;

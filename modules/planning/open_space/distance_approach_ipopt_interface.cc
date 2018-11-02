@@ -25,7 +25,6 @@ namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
-    const int num_of_variables, const int num_of_constraints,
     std::size_t horizon, float ts, Eigen::MatrixXd ego,
     const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS, Eigen::MatrixXd x0,
     Eigen::MatrixXd xf, Eigen::MatrixXd last_time_u,
@@ -33,9 +32,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
     std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
     const Eigen::MatrixXd& obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
-    : num_of_variables_(num_of_variables),
-      num_of_constraints_(num_of_constraints),
-      horizon_(horizon),
+    : horizon_(horizon),
       ts_(ts),
       ego_(ego),
       xWS_(xWS),
@@ -55,6 +52,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
   obstacles_edges_sum_ = std::size_t(obstacles_edges_num_.sum());
   state_result_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
+  dual_l_result_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
+  dual_n_result_ = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
   control_result_ = Eigen::MatrixXd::Zero(2, horizon_ + 1);
   time_result_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);
   state_start_index_ = 0;
@@ -103,6 +102,36 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
                                                   int& nnz_h_lag,
                                                   IndexStyleEnum& index_style) {
   ADEBUG << "get_nlp_info";
+  // n1 : states variables, 4 * (N+1)
+  int n1 = 4 * (horizon_ + 1);
+
+  // n2 : control inputs variables
+  int n2 = 2 * horizon_;
+
+  // n3 : sampling time variables
+  int n3 = horizon_ + 1;
+
+  // n4 : dual multiplier associated with obstacleShape
+  int n4 = obstacles_edges_num_.sum() * (horizon_ + 1);
+
+  // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
+  int n5 = obstacles_num_ * 4 * (horizon_ + 1);
+
+  // m1 : dynamics constatins
+  int m1 = 4 * horizon_;
+
+  // m2 : control rate constraints (only steering)
+  int m2 = horizon_;
+
+  // m3 : sampling time equality constraints
+  int m3 = horizon_;
+
+  // m4 : obstacle constraints
+  int m4 = 4 * obstacles_num_ * (horizon_ + 1);
+
+  num_of_variables_ = n1 + n2 + n3 + n4 + n5;
+  num_of_constraints_ = m1 + m2 + m3 + m4;
+
   // number of variables
   n = num_of_variables_;
   ADEBUG << "num_of_variables_ " << num_of_variables_;
@@ -336,7 +365,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * obstacles_edges_sum_;
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      x[index + j] = 0.2;
+      x[index + j] = 0.5;
     }
   }
 
@@ -345,7 +374,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     std::size_t index = i * 4 * obstacles_num_;
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      x[index + j] = 0.2;
+      x[index + j] = 0.5;
     }
   }
   ADEBUG << "get_starting_point out";
@@ -1445,23 +1474,32 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   std::size_t state_index = state_start_index_;
   std::size_t control_index = control_start_index_;
   std::size_t time_index = time_start_index_;
+  std::size_t dual_l_index = l_start_index_;
+  std::size_t dual_n_index = n_start_index_;
   // 1. state variables, 4 * [0, horizon]
   // 2. control variables, 2 * [0, horizon_-1]
-
   // 3. sampling time variables, 1 * [0, horizon_]
+  // 4. dual_l obstacles_edges_sum_ * [0, horizon]
+  // 5. dual_n obstacles_num * [0, horizon]
   for (std::size_t i = 0; i < horizon_; ++i) {
     state_result_(0, i) = x[state_index];
     state_result_(1, i) = x[state_index + 1];
     state_result_(2, i) = x[state_index + 2];
     state_result_(3, i) = x[state_index + 3];
-
     control_result_(0, i) = x[control_index];
     control_result_(1, i) = x[control_index];
-
     time_result_(0, i) = x[time_index];
+    for (std::size_t j = 0; j < obstacles_edges_sum_; j++) {
+      dual_l_result_(j, i) = x[dual_l_index + j];
+    }
+    for (std::size_t k = 0; k < 4 * obstacles_num_; k++) {
+      dual_n_result_(k, i) = x[dual_n_index + k];
+    }
     state_index += 4;
     control_index += 2;
     time_index += 1;
+    dual_l_index += obstacles_edges_sum_;
+    dual_n_index += 4 * obstacles_num_;
   }
   ADEBUG << "finalize_solution horizon done!";
   // push back last horizon for state and time variables
@@ -1469,18 +1507,26 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   state_result_(1, horizon_) = x[state_index + 1];
   state_result_(2, horizon_) = x[state_index + 2];
   state_result_(3, horizon_) = x[state_index + 3];
-
   time_result_(0, horizon_) = x[time_index];
+  for (std::size_t j = 0; j < obstacles_edges_sum_; j++) {
+    dual_l_result_(j, horizon_) = x[dual_l_index + j];
+  }
+  for (std::size_t k = 0; k < 4 * obstacles_num_; k++) {
+    dual_n_result_(k, horizon_) = x[dual_n_index + k];
+  }
   ADEBUG << "finalize_solution done!";
 }
 
 void DistanceApproachIPOPTInterface::get_optimization_results(
     Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
-    Eigen::MatrixXd* time_result) const {
+    Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
+    Eigen::MatrixXd* dual_n_result) const {
   ADEBUG << "get_optimization_results";
   *state_result = state_result_;
   *control_result = control_result_;
   *time_result = time_result_;
+  *dual_l_result = dual_l_result_;
+  *dual_n_result = dual_n_result_;
 }
 
 }  // namespace planning
