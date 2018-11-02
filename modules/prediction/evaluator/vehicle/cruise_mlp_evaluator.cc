@@ -54,7 +54,7 @@ std::pair<double, double> WorldCoordToObjCoord
   double x_diff = input_world_coord.first - obj_world_coord.first;
   double y_diff = input_world_coord.second - obj_world_coord.second;
   double rho = std::sqrt(x_diff * x_diff + y_diff * y_diff);
-  double theta = obj_world_angle - std::atan2(y_diff, x_diff);
+  double theta = std::atan2(y_diff, x_diff) - obj_world_angle;
 
   return std::make_pair(std::sin(theta)*rho, std::cos(theta)*rho);
 }
