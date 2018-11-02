@@ -57,7 +57,8 @@ def load_hdf5(filename):
         os._exit(1)
 
     h5_file = h5py.File(filename, 'r')
-    values = h5_file.values()[0]
+    values = h5_file[list(h5_file.keys())[0]]
+    #values = h5_file.values()[0]
     print ("load data size:", values.shape[0])
     return values
 
@@ -111,56 +112,91 @@ if __name__ == '__main__':
 
     path = args.directory
     print ("Loading h5 from directory: {}".format(path))
-    if os.path.isdir(path):
-        features_go = None
-        features_cutin = None
-        labels = None
 
-        h5_files = getListOfFiles(path)
-        print ("Total number of files:", len(h5_files))
-        for i, file in enumerate(h5_files):
-            print ("Process File", i, ":", file)
-            feature = load_hdf5(file)
-            if np.any(np.isinf(feature)):
-                print ("inf data found")
+    if not args.merge_files:
 
-            # Split data into two categories:
-            fea_go, fea_cutin = data_splitting(feature)
+        if os.path.isdir(path):
 
-            # Balance data by down-sampling over-sized bins:
-            #fea_go = down_sample(fea_go, [0, 1, 4], [0.0, 0.95, 0.83])
-            #fea_cutin = down_sample(fea_cutin, [-1, 2, 3], [0.985 ,0.0, 0.0])
+            h5_files = getListOfFiles(path)
+            print ("Total number of files:", len(h5_files))
 
-            #features_go = np.concatenate((features_go, fea_go), axis=0) if features_go is not None \
-            #        else fea_go
-            #features_cutin = np.concatenate((features_cutin, fea_cutin), axis=0) if features_cutin is not None \
-            #        else fea_cutin
+            # For each file in the total list of files:
+            for i, file in enumerate(h5_files):
+                print ("Process File", i, ":", file)
+                feature = load_hdf5(file)
+                if np.any(np.isinf(feature)):
+                    print ("inf data found")
 
+                if args.split_category:
+                    # Split data into two categories:
+                    fea_go, fea_cutin = data_splitting(feature)
 
-            go_path = path + 'go/' + file.split('/')[-2] + '-' + file.split('/')[-1]
-            h5_file = h5py.File(go_path, 'w')
-            h5_file.create_dataset('data', data=fea_go)
-            h5_file.close()
+                    # Balance data by down-sampling over-sized bins:
+                    #fea_go = down_sample(fea_go, [0, 1, 4], [0.0, 0.95, 0.83])
+                    #fea_cutin = down_sample(fea_cutin, [-1, 2, 3], [0.985 ,0.0, 0.0])
 
-            cutin_path = path + 'cutin/' + file.split('/')[-2] + '-' + file.split('/')[-1]
-            h5_file = h5py.File(cutin_path, 'w')
-            h5_file.create_dataset('data', data=fea_cutin)
-            h5_file.close()
+                    go_path = path + 'go/' + file.split('/')[-2] + '-' + file.split('/')[-1]
+                    h5_file = h5py.File(go_path, 'w')
+                    h5_file.create_dataset('data', data=fea_go)
+                    h5_file.close()
+
+                    cutin_path = path + 'cutin/' + file.split('/')[-2] + '-' + file.split('/')[-1]
+                    h5_file = h5py.File(cutin_path, 'w')
+                    h5_file.create_dataset('data', data=fea_cutin)
+                    h5_file.close()
+
+                else:
+                    print (None)
+                    #TODO: implement those non-splitting category
+        else:
+            print ("Fail to find", path)
+            os._exit(-1)
+
     else:
-        print ("Fail to find", path)
-        os._exit(-1)
 
-    '''
-    date = datetime.datetime.now().strftime('%Y-%m-%d')
-    sample_file = path + '/merged_go' + date + '.h5'
-    print ("Save samples file to:", sample_file)
-    h5_file = h5py.File(sample_file, 'w')
-    h5_file.create_dataset('data', data=features_go)
-    h5_file.close()
+        if os.path.isdir(path):
+            features_go = None
+            features_cutin = None
+            features = None
+            labels = None
 
-    sample_file = path + '/merged_cutin' + date + '.h5'
-    print ("Save samples file to:", sample_file)
-    h5_file = h5py.File(sample_file, 'w')
-    h5_file.create_dataset('data', data=features_cutin)
-    h5_file.close()
-    '''
+            h5_files = getListOfFiles(path)
+            print ("Total number of files:", len(h5_files))
+
+            # For each file in the total list of files:
+            for i, file in enumerate(h5_files):
+                print ("Process File", i, ":", file)
+                feature = load_hdf5(file)
+                if np.any(np.isinf(feature)):
+                    print ("inf data found")
+
+                if args.split_category:
+                    # Split data into two categories:
+                    fea_go, fea_cutin = data_splitting(feature)
+
+                    # Balance data by down-sampling over-sized bins:
+                    #fea_go = down_sample(fea_go, [0, 1, 4], [0.0, 0.95, 0.83])
+                    #fea_cutin = down_sample(fea_cutin, [-1, 2, 3], [0.985 ,0.0, 0.0])
+
+                    features_go = np.concatenate((features_go, fea_go), axis=0) if features_go is not None \
+                            else fea_go
+                    features_cutin = np.concatenate((features_cutin, fea_cutin), axis=0) if features_cutin is not None \
+                            else fea_cutin
+        else:
+            print ("Fail to find", path)
+            os._exit(-1)
+
+
+        if args.split_category:
+            date = datetime.datetime.now().strftime('%Y-%m-%d')
+            sample_file = path + 'merged_go' + date + '.h5'
+            print ("Save samples file to:", sample_file)
+            h5_file = h5py.File(sample_file, 'w')
+            h5_file.create_dataset('data', data=features_go)
+            h5_file.close()
+
+            sample_file = path + 'merged_cutin' + date + '.h5'
+            print ("Save samples file to:", sample_file)
+            h5_file = h5py.File(sample_file, 'w')
+            h5_file.create_dataset('data', data=features_cutin)
+            h5_file.close()
