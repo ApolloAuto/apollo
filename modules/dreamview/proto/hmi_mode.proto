@@ -2,6 +2,9 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+// This proto defines a mode showing in Dreamview, including how you will
+// display them and monitor their status.
+
 // For ProcessMonitor.
 message ProcessMonitorConfig {
   repeated string command_keywords = 1;
@@ -25,9 +28,15 @@ message ResourceMonitorConfig {
   repeated DiskSpace disk_spaces = 1;
 }
 
+// A monitored component will be listed on HMI which only shows its status but
+// user cannot operate.
+// The whole config will generate SystemStatus.components[i].summary by Monitor
+// module, which is generally the most severe one of process, channel or
+// resource status.
 message MonitoredComponent {
-  // Note that modules that can be started / stopped by HMI should be configered
-  // in HMIConfig.
+  // Generate SystemStatus.components[i].process_status.
+  // OK if the process is running.
+  // FATAL if the process is down.
   optional ProcessMonitorConfig process = 1;
 
   // Generate SystemStatus.components[i].channel_status.
@@ -44,12 +53,12 @@ message MonitoredComponent {
   optional bool required_for_safety = 4 [default = true];
 }
 
-// An module which can be started and stopped by HMI.
+// A module which can be started and stopped by HMI.
 message Module {
   optional string start_command = 1;
   optional string stop_command = 2;
 
-  // We use these keywords in monitor to check if the module is running.
+  // We use the config in ProcessMonitor to check if the module is running.
   optional ProcessMonitorConfig process_monitor_config = 3;
   // Whether to trigger safe-mode if the module is down.
   optional bool required_for_safety = 4 [default = true];
