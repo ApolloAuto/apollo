@@ -76,4 +76,14 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "hmi_worker_test",
+    size = "small",
+    srcs = ["hmi_worker_test.cc"],
+    deps = [
+        ":hmi_worker",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

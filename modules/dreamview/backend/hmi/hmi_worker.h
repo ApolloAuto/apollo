@@ -85,10 +85,6 @@ class HMIWorker {
   void ChangeVehicle(const std::string& vehicle_name);
   bool ChangeDrivingMode(const apollo::canbus::Chassis::DrivingMode mode);
 
-  // Find a module by name.
-  // 1. Lookup it in current Mode.modules.
-  // 2. The lookup it in config.global_modules.
-  const Module* FindModule(const std::string& module) const;
   // Start / stop a module.
   void StartModule(const std::string& module) const;
   void StopModule(const std::string& module) const;
