@@ -15,7 +15,7 @@ warm_start_config : {
 }
 
 dual_variable_warm_start_config : {
-   weight_dual_variable : 1.0
+   weight_d : 1.0
 }
 
 distance_approach_config : {
