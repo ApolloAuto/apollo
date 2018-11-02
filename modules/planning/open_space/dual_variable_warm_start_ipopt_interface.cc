@@ -111,7 +111,9 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   std::size_t l_index = l_start_index_;
   std::size_t n_index = n_start_index_;
   std::size_t d_index = d_start_index_;
-
+  AINFO << "l_start_index_ : " << l_start_index_;
+  AINFO << "n_start_index_ : " << n_start_index_;
+  AINFO << "d_start_index_ : " << d_start_index_;
   // 1. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
@@ -227,33 +229,14 @@ bool DualVariableWarmStartIPOPTInterface::eval_f(int n, const double* x,
 bool DualVariableWarmStartIPOPTInterface::eval_grad_f(int n, const double* x,
                                                       bool new_x,
                                                       double* grad_f) {
-  // 1. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
-  // horizon_]
-  std::size_t l_index = l_start_index_;
-  std::size_t n_index = n_start_index_;
+  std::fill(grad_f, grad_f + n, 0.0);
   std::size_t d_index = d_start_index_;
-
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
-      grad_f[l_index] = 0.0;
-      ++l_index;
-    }
-  }
-
-  // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
-      grad_f[n_index] = 0.0;
-      ++n_index;
-    }
-  }
-
   // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       // TODO(QiL): Change to weight configration
       grad_f[d_index] = 1.0;
-      ++n_index;
+      ++d_index;
     }
   }
   return true;
@@ -493,6 +476,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         values[nz_index] = -1.0;  // w2
         ++nz_index;
 
+        AINFO << "eval_jac_g, after adding part 2";
         // 3. G' * mu + R' * lambda == 0, part 2
 
         // with respect to l
@@ -523,15 +507,15 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {
-          values[nz_index] = (rx_ + std::cos(r_yaw_) * offset_) * Aj(k, 0) +
-                             (ry_ + std::sin(r_yaw_) * offset_) * Aj(k, 1) -
+          values[nz_index] = -(rx_ + std::cos(r_yaw_) * offset_) * Aj(k, 0) -
+                             (ry_ + std::sin(r_yaw_) * offset_) * Aj(k, 1) +
                              bj(k, 0);  // ddk
           ++nz_index;
         }
 
         // with respect to n
         for (std::size_t k = 0; k < 4; ++k) {
-          values[nz_index] = -g_[k];  // eek
+          values[nz_index] = g_[k];  // eek
           ++nz_index;
         }
 

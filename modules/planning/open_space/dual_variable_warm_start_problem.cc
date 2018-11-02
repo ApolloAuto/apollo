@@ -75,6 +75,8 @@ bool DualVariableWarmStartProblem::Solve(
 
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   // TODO(QiL) : Change IPOPT settings to flag or configs
+  // app->Options()->SetStringValue("derivative_test", "first-order");
+  // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
   int print_level = 5;
   app->Options()->SetIntegerValue("print_level", print_level);
   int num_iterations = 0;
