@@ -83,11 +83,13 @@ bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       std::size_t current_edges_num = obstacles_edges_num_(j, 0);
-      tmp += current_edges_num * 4 + 9 + 4 + 1;
+      tmp += current_edges_num * 4 + 2 + 2 + 4 + 1;
     }
   }
 
-  nnz_jac_g = tmp - 1;
+  nnz_jac_g = tmp;
+
+  ADEBUG << "nnz_jac_g : " << nnz_jac_g;
 
   // TODO(QiL) : Update nnz_h_lag;
   nnz_h_lag = 0;
@@ -125,7 +127,7 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
       ++n_index;
     }
   }
-  // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
+  // 3. dual variable n, [0, obstacles_num] * [0, horizon_]
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       x[d_index] = 0.2;
@@ -154,7 +156,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
       x_l[variable_index] = 0.0;
-      x_u[variable_index] = 0.0;
+      x_u[variable_index] = 100.0;
       ++variable_index;
     }
   }
@@ -164,8 +166,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
       x_l[variable_index] = 0.0;
-      x_u[variable_index] = 0.0;
-
+      x_u[variable_index] = 100.0;
       ++variable_index;
     }
   }
@@ -175,9 +176,8 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       // TODO(QiL): Load this from configuration
-      x_l[variable_index] = 0.0;
-      x_u[variable_index] = 0.0;
-
+      x_l[variable_index] = -100.0;
+      x_u[variable_index] = 100.0;
       ++variable_index;
     }
   }
@@ -187,7 +187,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (std::size_t i = 0; i < horizon_ + 1; ++i) {
     for (std::size_t j = 0; j < obstacles_num_; ++j) {
       // a. norm(A'*lambda) = 1
-      g_l[constraint_index] = 1.0;
+      g_l[constraint_index] = 0.0;
       g_u[constraint_index] = 1.0;
 
       // b. G'*mu + R'*A*lambda = 0
@@ -271,6 +271,11 @@ bool DualVariableWarmStartIPOPTInterface::eval_h(int n, const double* x,
 bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
                                                  bool new_x, int m, double* g) {
   ADEBUG << "eval_g";
+  ADEBUG << "eval_jac_g";
+  CHECK_EQ(n, num_of_variables_)
+      << "No. of variables wrong in eval_jac_g. n : " << n;
+  CHECK_EQ(m, num_of_constraints_)
+      << "No. of constraints wrong in eval_jac_g. n : " << m;
   // state start index
 
   // 1. Three obstacles related equal constraints, one equality constraints,
@@ -333,9 +338,8 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
       constraint_index += 4;
     }
   }
-  ADEBUG << "constraint_index after obstacles avoidance constraints "
-            "updated: "
-         << constraint_index;
+  CHECK_EQ(constraint_index, m)
+      << "No. of constraints wrong in eval_g. n : " << n;
   return true;
 }
 
@@ -423,6 +427,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         // with resepct to d
         iRow[nz_index] = constraint_index + 3;
         jCol[nz_index] = d_index;
+        ++nz_index;
 
         // Update index
         l_index += current_edges_num;
@@ -431,9 +436,12 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         constraint_index += 4;
       }
     }
+    CHECK_EQ(constraint_index, static_cast<std::size_t>(m))
+        << "No. of constraints wrong in eval_jac_g. ";
 
-    CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
-    CHECK_EQ(constraint_index, static_cast<std::size_t>(m));
+    //  CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
+    ADEBUG << "nz_index here in Part I is : " << nz_index
+           << " nele_jac is : " << nele_jac;
   } else {
     std::fill(values, values + nele_jac, 0.0);
     std::size_t nz_index = 0;
@@ -512,17 +520,6 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         for (std::size_t k = 0; k < current_edges_num; ++k) {
           tmp4 += bj(k, 0) * x[l_index + k];
         }
-
-        // With respect to x
-        values[nz_index] = tmp1;  // aa1
-        ++nz_index;
-
-        values[nz_index] = tmp2;  // bb1
-        ++nz_index;
-
-        values[nz_index] = -std::sin(r_yaw_) * offset_ * tmp1 +
-                           std::cos(r_yaw_) * offset_ * tmp2;  // cc1
-        ++nz_index;
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {
