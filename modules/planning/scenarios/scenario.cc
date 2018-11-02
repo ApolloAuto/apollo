@@ -49,7 +49,7 @@ void Scenario::Init() {
         << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
         << " has no config";
   }
-  AINFO << "init stage "
+  ADEBUG << "init stage "
         << ScenarioConfig::StageType_Name(config_.stage_type(0));
   current_stage_ = CreateStage(*stage_config_map_[config_.stage_type(0)]);
 }
@@ -57,38 +57,50 @@ void Scenario::Init() {
 Scenario::ScenarioStatus Scenario::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   if (current_stage_->stage_type() == ScenarioConfig::NO_STAGE) {
-    return STATUS_DONE;
+    scenario_status_ = STATUS_DONE;
+    return scenario_status_;
   }
   auto ret = current_stage_->Process(planning_init_point, frame);
-  if (ret == Stage::ERROR) {
-    AERROR << "Stage '" << current_stage_->Name() << "' returns error";
-    return STATUS_UNKNOWN;
-  } else if (ret == Stage::RUNNING) {
-    return STATUS_PROCESSING;
-  } else if (ret == Stage::FINISHED) {
-    auto next_stage = current_stage_->NextStage();
-    if (next_stage != current_stage_->stage_type()) {
-      AINFO << "switch stage from " << current_stage_->Name() << " to "
-            << ScenarioConfig::StageType_Name(next_stage);
-      if (next_stage == ScenarioConfig::NO_STAGE) {
-        return STATUS_DONE;
-      }
-      if (stage_config_map_.find(next_stage) == stage_config_map_.end()) {
-        AERROR << "Failed to find config for stage: " << next_stage;
-        return STATUS_UNKNOWN;
-      }
-      current_stage_ = CreateStage(*stage_config_map_[next_stage]);
+  switch (ret) {
+    case Stage::ERROR: {
+      AERROR << "Stage '" << current_stage_->Name() << "' returns error";
+      scenario_status_ = STATUS_UNKNOWN;
+      break;
     }
-    if (current_stage_ != nullptr &&
-        current_stage_->stage_type() != ScenarioConfig::NO_STAGE) {
-      return STATUS_PROCESSING;
-    } else {
-      return STATUS_DONE;
+    case Stage::RUNNING: {
+      scenario_status_ = STATUS_PROCESSING;
+      break;
     }
-  } else {
-    AWARN << "Unexpected Stage return value: " << ret;
-    return STATUS_UNKNOWN;
+    case Stage::FINISHED: {
+      auto next_stage = current_stage_->NextStage();
+      if (next_stage != current_stage_->stage_type()) {
+        AINFO << "switch stage from " << current_stage_->Name() << " to "
+              << ScenarioConfig::StageType_Name(next_stage);
+        if (next_stage == ScenarioConfig::NO_STAGE) {
+          scenario_status_ = STATUS_DONE;
+          return scenario_status_;
+        }
+        if (stage_config_map_.find(next_stage) == stage_config_map_.end()) {
+          AERROR << "Failed to find config for stage: " << next_stage;
+          scenario_status_ = STATUS_UNKNOWN;
+          return scenario_status_;
+        }
+        current_stage_ = CreateStage(*stage_config_map_[next_stage]);
+      }
+      if (current_stage_ != nullptr &&
+          current_stage_->stage_type() != ScenarioConfig::NO_STAGE) {
+        scenario_status_ = STATUS_PROCESSING;
+      } else {
+        scenario_status_ = STATUS_DONE;
+      }
+      break;
+    }
+    default: {
+      AWARN << "Unexpected Stage return value: " << ret;
+      scenario_status_ = STATUS_UNKNOWN;
+    }
   }
+  return scenario_status_;
 }
 
 const std::string& Scenario::Name() const { return name_; }
