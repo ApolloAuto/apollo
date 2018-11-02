@@ -15,6 +15,7 @@ proto_library(
         "chassis_detail.proto",
         "vehicle_parameter.proto",
         "lexus.proto",
+        "transit.proto"
     ],
     deps = [
         "//modules/common/proto:geometry_proto_lib",
