@@ -187,16 +187,18 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
     return;
   }
   JunctionInfoPtr junction = ego_trajectory_container->ADCJunction();
-  bool need_consider = false;
-  if (junction != nullptr) {
-    for (const auto &overlap_id : junction->junction().overlap_id()) {
-      if (PredictionMap::OverlapById(overlap_id.id()) != nullptr) {
-        for (const auto &object :
-          PredictionMap::OverlapById(overlap_id.id())->overlap().object()) {
-          if (object.has_signal_overlap_info() ||
-              object.has_stop_sign_overlap_info()) {
-            need_consider = true;
-          }
+  // TODO(all) change need_consider to false once map is fixed
+  bool need_consider = true;
+  if (junction == nullptr) {
+    return;
+  }
+  for (const auto &overlap_id : junction->junction().overlap_id()) {
+    if (PredictionMap::OverlapById(overlap_id.id()) != nullptr) {
+      for (const auto &object :
+        PredictionMap::OverlapById(overlap_id.id())->overlap().object()) {
+        if (object.has_signal_overlap_info() ||
+            object.has_stop_sign_overlap_info()) {
+          need_consider = true;
         }
       }
     }
