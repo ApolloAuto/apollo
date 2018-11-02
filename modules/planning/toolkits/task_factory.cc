@@ -28,6 +28,7 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/toolkits/deciders/decider_creep.h"
 #include "modules/planning/toolkits/deciders/decider_stop_sign.h"
+#include "modules/planning/toolkits/deciders/side_pass_safety.h"
 #include "modules/planning/toolkits/deciders/side_pass_path_decider.h"
 #include "modules/planning/toolkits/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/toolkits/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
@@ -95,6 +96,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::DECIDER_STOP_SIGN,
                          [](const TaskConfig& config) -> Task* {
                            return new DeciderStopSign(config);
+                         });
+  task_factory_.Register(TaskConfig::SIDE_PASS_SAFETY,
+                         [](const TaskConfig& config) -> Task* {
+                           return new SidePassSafety(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =
