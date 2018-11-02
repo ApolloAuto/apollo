@@ -340,7 +340,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
                     y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
 
-        if i % 500 == 0:
+        if i % 100 == 0:
             logging.info('Step: {}, train_loss: {}'.format(i, np.mean(loss_history[-100:])))
             print ("Step: {}, training loss: {}".format(i, np.mean(loss_history[-100:])))
 
@@ -440,7 +440,6 @@ def validate_dataloader(valid_loader, model):
             np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
                     y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
-
     valid_classification_accuracy = valid_correct_class / total_size
     logging.info('Validation loss: {}. Validation classification accuracy: {}'\
         .format(np.mean(loss_history), valid_classification_accuracy))
@@ -462,10 +461,9 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--data_loader', action='store_true', \
         help='Use the dataloader (when memory size is smaller than dataset size)')
 
-
     args = parser.parse_args()
 
-    if !args.data_loader:
+    if not args.data_loader:
 
         train_file = args.train_file
         valid_file = args.valid_file
