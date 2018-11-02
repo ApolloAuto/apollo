@@ -429,7 +429,7 @@ DEFINE_bool(open_space_planner_switchable, false,
             "true for std planning being able to switch to open space planner "
             "when close enough to target parking spot");
 
-DEFINE_bool(use_dual_variable_warm_start, false,
+DEFINE_bool(use_dual_variable_warm_start, true,
             "whether or not enable dual variable warm start ");
 
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,

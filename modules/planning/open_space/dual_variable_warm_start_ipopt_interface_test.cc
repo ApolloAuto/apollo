@@ -73,11 +73,11 @@ void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
                       obstacles_num_ * (horizon_ + 1);
 
   num_of_constraints_ = 4 * obstacles_num_ * (horizon_ + 1);
-
+  Eigen::MatrixXd xWS = Eigen::MatrixXd::Ones(4, horizon_ + 1);
   ptop_.reset(new DualVariableWarmStartIPOPTInterface(
       num_of_variables_, num_of_constraints_, horizon_, ts_, ego_,
-      obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_, rx_,
-      ry_, r_yaw_, planner_open_space_config_));
+      obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_, xWS,
+      planner_open_space_config_));
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, initilization) {

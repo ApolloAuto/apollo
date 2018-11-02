@@ -44,8 +44,8 @@ bool DualVariableWarmStartProblem::Solve(
     const std::size_t& horizon, const float& ts, const Eigen::MatrixXd& ego,
     std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const double rx, const double ry, const double r_yaw,
-    Eigen::MatrixXd* l_warm_up, Eigen::MatrixXd* n_warm_up) {
+    const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,
+    Eigen::MatrixXd* n_warm_up) {
   // n1 : lagrangian multiplier associated with obstacleShape
   int n1 = obstacles_edges_num.sum() * (horizon + 1);
 
@@ -65,8 +65,8 @@ bool DualVariableWarmStartProblem::Solve(
   DualVariableWarmStartIPOPTInterface* ptop =
       new DualVariableWarmStartIPOPTInterface(
           num_of_variables, num_of_constraints, horizon, ts, ego,
-          obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, rx, ry,
-          r_yaw, planner_open_space_config_);
+          obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, xWS,
+          planner_open_space_config_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

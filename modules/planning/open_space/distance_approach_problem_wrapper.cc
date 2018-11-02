@@ -311,23 +311,27 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   Eigen::MatrixXd l_warm_up;
   Eigen::MatrixXd n_warm_up;
 
-  const double rx = xWS(0, horizon_);
-  const double ry = xWS(1, horizon_);
-  const double r_yaw = xWS(2, horizon_);
-
   DualVariableWarmStartProblem* dual_variable_warm_start_ptr =
       new DualVariableWarmStartProblem(planner_open_space_config_);
 
-  bool dual_variable_warm_start_status = dual_variable_warm_start_ptr->Solve(
-      horizon_, ts_, ego_, obstacles_ptr->GetObstaclesNum(),
-      obstacles_ptr->GetObstaclesEdgesNum(), obstacles_ptr->GetAMatrix(),
-      obstacles_ptr->GetbMatrix(), rx, ry, r_yaw, &l_warm_up, &n_warm_up);
+  if (FLAGS_use_dual_variable_warm_start) {
+    bool dual_variable_warm_start_status = dual_variable_warm_start_ptr->Solve(
+        horizon_, ts_, ego_, obstacles_ptr->GetObstaclesNum(),
+        obstacles_ptr->GetObstaclesEdgesNum(), obstacles_ptr->GetAMatrix(),
+        obstacles_ptr->GetbMatrix(), xWS, &l_warm_up, &n_warm_up);
 
-  if (dual_variable_warm_start_status) {
-    AINFO << "Dual variable problem solved successfully!";
+    if (dual_variable_warm_start_status) {
+      AINFO << "Dual variable problem solved successfully!";
+    } else {
+      AERROR << "Dual variable problem solving failed";
+      return false;
+    }
   } else {
-    AERROR << "Dual variable problem solving failed";
-    return false;
+    l_warm_up =
+        0.5 * Eigen::MatrixXd::Ones(obstacles_ptr->GetObstaclesEdgesNum().sum(),
+                                    horizon_ + 1);
+    n_warm_up = 0.5 * Eigen::MatrixXd::Ones(
+                          4 * obstacles_ptr->GetObstaclesNum(), horizon_ + 1);
   }
 
   DistanceApproachProblem* distance_approach_ptr =
