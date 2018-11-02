@@ -312,6 +312,13 @@ bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                        double ephi, const std::vector<double>& XYbounds,
                        ThreadSafeIndexedObstacles* obstacles, Result* result) {
+  // clear containers
+  open_set_.clear();
+  close_set_.clear();
+  ReedSheppPath_cache_.clear();
+  while (!open_pq_.empty()) open_pq_.pop();
+  final_node_ = nullptr;
+
   // load XYbounds
   XYbounds_ = XYbounds;
   // load nodes and obstacles
