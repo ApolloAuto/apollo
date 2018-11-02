@@ -77,6 +77,11 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
   }
   auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
                                                  stage_config);
+  if (ptr == nullptr) {
+    AERROR << "Failed to create stage for config: "
+           << stage_config.DebugString();
+    return nullptr;
+  }
   ptr->SetContext(&side_pass_context_);
   return ptr;
 }
