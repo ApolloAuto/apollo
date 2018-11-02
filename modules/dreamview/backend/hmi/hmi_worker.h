@@ -43,6 +43,7 @@ class HMIWorker {
  public:
   HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
+  void Start();
 
   // HMI action trigger.
   bool Trigger(const HMIAction action);
@@ -70,7 +71,7 @@ class HMIWorker {
   static HMIMode LoadMode(const std::string& mode_config_path);
 
  private:
-  void InitReadersAndWriters(const std::shared_ptr<apollo::cyber::Node>& node);
+  void InitReadersAndWriters();
   void InitStatus();
   void StatusUpdateThreadLoop();
 
@@ -104,6 +105,7 @@ class HMIWorker {
   std::vector<StatusUpdateHandler> status_update_handlers_;
 
   // Cyber members.
+  std::shared_ptr<apollo::cyber::Node> node_;
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
   std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
   std::shared_ptr<cyber::Writer<AudioCapture>> audio_capture_writer_;

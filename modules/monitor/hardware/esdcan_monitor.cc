@@ -176,7 +176,7 @@ void EsdCanMonitor::RunOnce(const double current_time) {
     return;
   }
 
-  ComponentStatus* component_status = component->mutable_summary();
+  ComponentStatus* component_status = component->mutable_other_status();
   const auto ret = EsdCanTest(FLAGS_esdcan_id);
   if (ret == NTCAN_SUCCESS) {
     SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);

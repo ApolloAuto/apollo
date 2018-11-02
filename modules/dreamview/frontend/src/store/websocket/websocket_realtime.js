@@ -239,7 +239,7 @@ export default class RosWebSocketEndpoint {
         this.websocket.send(JSON.stringify({
             type: "HMIAction",
             action: command,
-            module: moduleName
+            value: moduleName
         }));
     }
 

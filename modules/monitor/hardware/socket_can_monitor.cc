@@ -114,7 +114,7 @@ void SocketCanMonitor::RunOnce(const double current_time) {
   const bool ret = SocketCanTest(&message);
   SummaryMonitor::EscalateStatus(
       ret ? ComponentStatus::OK : ComponentStatus::ERROR,
-      message, component->mutable_summary());
+      message, component->mutable_other_status());
 }
 
 }  // namespace monitor
