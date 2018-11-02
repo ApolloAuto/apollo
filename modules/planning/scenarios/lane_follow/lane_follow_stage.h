@@ -40,6 +40,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
+namespace lane_follow {
 
 class LaneFollowStage : public Stage {
  public:
@@ -68,6 +69,7 @@ class LaneFollowStage : public Stage {
   std::unique_ptr<Stage> stage_;
 };
 
+}  // namespace lane_follow
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

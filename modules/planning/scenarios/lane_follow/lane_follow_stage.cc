@@ -48,6 +48,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
+namespace lane_follow {
 
 using common::ErrorCode;
 using common::SLPoint;
@@ -298,6 +299,7 @@ SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
   return sl_point;
 }
 
+}  // namespace lane_follow
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
