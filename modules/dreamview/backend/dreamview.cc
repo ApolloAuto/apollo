@@ -96,6 +96,7 @@ Status Dreamview::Init() {
 Status Dreamview::Start() {
   sim_world_updater_->Start();
   point_cloud_updater_->Start();
+  hmi_->Start();
   return Status::OK();
 }
 

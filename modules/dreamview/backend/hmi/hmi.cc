@@ -41,6 +41,10 @@ HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
   }
 }
 
+void HMI::Start() {
+  hmi_worker_->Start();
+}
+
 void HMI::RegisterMessageHandlers() {
   // Broadcast HMIStatus to clients when status changed.
   hmi_worker_->RegisterStatusUpdateHandler(

@@ -63,6 +63,8 @@ void SummaryMonitor::RunOnce(const double current_time) {
     const auto& resource_status = component.second.resource_status();
     EscalateStatus(resource_status.status(), resource_status.message(),
                    summary);
+    const auto& other_status = component.second.other_status();
+    EscalateStatus(other_status.status(), other_status.message(), summary);
   }
 
   // Get fingerprint of current status.

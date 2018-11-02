@@ -43,7 +43,8 @@ void ProcessMonitor::RunOnce(const double current_time) {
   for (const auto& cmd_file : apollo::common::util::Glob("/proc/*/cmdline")) {
     // Get process command string.
     std::string cmd_string;
-    if (apollo::common::util::GetContent(cmd_file, &cmd_string)) {
+    if (apollo::common::util::GetContent(cmd_file, &cmd_string) &&
+        !cmd_string.empty()) {
       running_processes.push_back(cmd_string);
     }
   }
@@ -76,9 +77,10 @@ void ProcessMonitor::UpdateStatus(
     const std::vector<std::string>& running_processes,
     const apollo::dreamview::ProcessMonitorConfig& config,
     ComponentStatus* status) {
-  for (const auto& command : running_processes) {
+  status->clear_status();
+  for (const std::string& command : running_processes) {
     bool all_keywords_matched = true;
-    for (const auto& keyword : config.command_keywords()) {
+    for (const std::string& keyword : config.command_keywords()) {
       if (command.find(keyword) == std::string::npos) {
         all_keywords_matched = false;
         break;

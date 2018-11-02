@@ -129,10 +129,13 @@ void System(const std::string& cmd) {
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
-    : config_(LoadConfig()) {
-  InitReadersAndWriters(node);
+    : config_(LoadConfig())
+    , node_(node) {
   InitStatus();
+}
 
+void HMIWorker::Start() {
+  InitReadersAndWriters();
   RegisterStatusUpdateHandler([this](const bool status_changed,
                                      HMIStatus* status) {
     apollo::common::util::FillHeader("HMI", status);
@@ -166,21 +169,24 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     const CyberModule& cyber_module = iter.second;
     Module& module = LookupOrInsert(mode.mutable_modules(), module_name, {});
     module.set_required_for_safety(cyber_module.required_for_safety());
-    // Construct start_command: mainboard -p <process_name> -d <dag1> -d ...
-    const std::string process_head =
-        StrCat("mainboard -p ", cyber_module.process_name());
-    module.set_start_command(process_head);
+
+    // Construct start_command: nohup mainboard -p <process_name> -d <dag> ... &
+    const std::string& process_name = cyber_module.process_name();
+    module.set_start_command(StrCat("nohup mainboard -p ", process_name));
     for (const std::string& dag : cyber_module.dag_files()) {
       StrAppend(module.mutable_start_command(), " -d ", dag);
     }
-    // Construct stop_command: pkill 'mainboard -p <process_name> -d'
-    const std::string process_keywords = StrCat(process_head, " -d");
-    module.set_stop_command(StrCat("pkill '", process_keywords, "'"));
+    StrAppend(module.mutable_start_command(), " &");
+
+    // Construct stop_command: pkill -f 'mainboard -p <process_name> -d'
+    module.set_stop_command(StrCat(
+        "pkill -f \"mainboard -p ", process_name, "\""));
     // Construct process_monitor_config.
-    module.mutable_process_monitor_config()->add_command_keywords(
-        process_keywords);
+    module.mutable_process_monitor_config()->add_command_keywords("mainboard");
+    module.mutable_process_monitor_config()->add_command_keywords(process_name);
   }
   mode.clear_cyber_modules();
+  AINFO << "Loaded HMI mode: " << mode.DebugString();
   return mode;
 }
 
@@ -215,14 +221,15 @@ void HMIWorker::InitStatus() {
   }
 }
 
-void HMIWorker::InitReadersAndWriters(const std::shared_ptr<Node>& node) {
-  status_writer_ = node->CreateWriter<HMIStatus>(FLAGS_hmi_status_topic);
-  pad_writer_ = node->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
-  drive_event_writer_ = node->CreateWriter<DriveEvent>(FLAGS_drive_event_topic);
-  audio_capture_writer_ = node->CreateWriter<AudioCapture>(
+void HMIWorker::InitReadersAndWriters() {
+  status_writer_ = node_->CreateWriter<HMIStatus>(FLAGS_hmi_status_topic);
+  pad_writer_ = node_->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
+  drive_event_writer_ = node_->CreateWriter<DriveEvent>(
+      FLAGS_drive_event_topic);
+  audio_capture_writer_ = node_->CreateWriter<AudioCapture>(
       FLAGS_audio_capture_topic);
 
-  node->CreateReader<SystemStatus>(
+  node_->CreateReader<SystemStatus>(
       FLAGS_system_status_topic,
       [this](const std::shared_ptr<SystemStatus>& system_status) {
         WLock wlock(status_mutex_);
@@ -256,7 +263,7 @@ void HMIWorker::InitReadersAndWriters(const std::shared_ptr<Node>& node) {
       });
 
   // Received Chassis, trigger action if there is high beam signal.
-  chassis_reader_ = node->CreateReader<Chassis>(
+  chassis_reader_ = node_->CreateReader<Chassis>(
       FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
         if (Clock::NowInSeconds() - chassis->header().timestamp_sec() <
             FLAGS_system_status_lifetime_seconds) {

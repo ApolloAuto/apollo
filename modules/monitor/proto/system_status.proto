@@ -27,6 +27,7 @@ message Component {
   optional ComponentStatus process_status = 2;
   optional ComponentStatus channel_status = 3;
   optional ComponentStatus resource_status = 4;
+  optional ComponentStatus other_status = 5;
 }
 
 message SystemStatus {

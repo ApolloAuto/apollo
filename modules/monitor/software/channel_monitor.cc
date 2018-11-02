@@ -96,6 +96,7 @@ void ChannelMonitor::RunOnce(const double current_time) {
 void ChannelMonitor::UpdateStatus(
     const apollo::dreamview::ChannelMonitorConfig& config,
     ComponentStatus* status) {
+  status->clear_status();
   const double delay = GetReader(config.name())->GetDelaySec();
   if (delay < 0 || delay > config.delay_fatal()) {
     SummaryMonitor::EscalateStatus(
