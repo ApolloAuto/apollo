@@ -48,7 +48,7 @@ class SidePassSafety : public Decider {
 
  private:
   static constexpr char const* const SIDEPASS_VIRTUAL_OBSTACLE_ID =
-      "side_pass_safety";
+      "SL_side_pass_safety";
 };
 
 }  // namespace planning

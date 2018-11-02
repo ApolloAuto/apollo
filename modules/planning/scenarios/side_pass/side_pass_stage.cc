@@ -117,12 +117,42 @@ Stage::StageStatus SidePassGeneratePath::Process(
 
 Stage::StageStatus SidePassDetectSafety::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  if (PlanningOnReferenceLine(planning_start_point, frame)) {
+  const auto& reference_line_info = frame->reference_line_info().front();
+  bool update_success = GetContext()->path_data_.UpdateFrenetFramePath(
+      &reference_line_info.reference_line());
+  if (!update_success) {
+    AERROR << "Fail to update path_data.";
+    return Stage::ERROR;
+  }
+
+  const auto adc_frenet_frame_point_ =
+      reference_line_info.reference_line().GetFrenetPoint(
+          frame->PlanningStartPoint());
+
+  bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
+      adc_frenet_frame_point_.s(), adc_frenet_frame_point_.l());
+  if (!trim_success) {
+    AERROR << "Fail to trim path_data. adc_frenet_frame_point: "
+           << adc_frenet_frame_point_.ShortDebugString();
+    return Stage::ERROR;
+  }
+
+  auto& rfl_info = frame->mutable_reference_line_info()->front();
+  *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
+
+  const auto& path_points =
+      rfl_info.path_data().discretized_path().path_points();
+  auto* debug_path =
+      rfl_info.mutable_debug()->mutable_planning_data()->add_path();
+
+  debug_path->set_name("DpPolyPathOptimizer");
+  debug_path->mutable_path_point()->CopyFrom(
+      {path_points.begin(), path_points.end()});
+
+  if (!PlanningOnReferenceLine(planning_start_point, frame)) {
     return Stage::ERROR;
   }
   bool is_safe = true;
-  const ReferenceLineInfo& reference_line_info =
-      frame->reference_line_info().front();
   double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   const PathDecision& path_decision =
