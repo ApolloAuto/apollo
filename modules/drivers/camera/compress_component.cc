@@ -49,6 +49,7 @@ bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
   auto compressed_image = image_pool_->GetObject();
   compressed_image->mutable_header()->CopyFrom(image->header());
   compressed_image->set_frame_id(image->frame_id());
+  compressed_image->set_measurement_time(image->measurement_time());
   compressed_image->set_format(image->encoding() + "; jpeg compressed bgr8");
 
   std::vector<int> params;

@@ -1,0 +1,1 @@
+channel_name: "/apollo/sensor/camera/rear_6mm/image"
