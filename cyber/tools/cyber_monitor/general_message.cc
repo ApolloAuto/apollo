@@ -26,10 +26,6 @@ constexpr int INT_FLOAT_PRECISION = 6;
 constexpr int DOULBE_PRECISION = 9;
 }  // namespace
 
-RenderableMessage* GeneralMessage::Child(int lineNo) const {
-  return GeneralMessageBase::Child(lineNo);
-}
-
 GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
                                const google::protobuf::Message* msg,
                                const google::protobuf::Reflection* reflection,
@@ -60,7 +56,7 @@ void GeneralMessage::Render(const Screen* s, int key) {
     s->AddStr(parentPtr->message_type().c_str());
 
     std::ostringstream outStr;
-    outStr << std::fixed << std::setprecision(GeneralChannelMessage::FrameRatio_Precision) << parentPtr->frame_ratio();
+    outStr << std::fixed << std::setprecision(FrameRatio_Precision) << parentPtr->frame_ratio();
     s->AddStr(0, lineNo++, "FrameRatio: ");
     s->AddStr(outStr.str().c_str());
 

@@ -25,12 +25,7 @@
 class CyberTopologyMessage;
 
 class GeneralChannelMessage : public GeneralMessageBase {
-  static double max_frmae_ratio_;
-
  public:
-  static constexpr int FrameRatio_Precision = 4;
-  static double max_frame_ratio(void) { return max_frmae_ratio_; }
-
   enum class ErrorCode {
     NewSubClassFailed = -1,
     CreateNodeFailed = -2,
@@ -74,7 +69,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   bool is_enabled(void) const { return channel_reader_ != nullptr; }
   bool has_message_come(void) const { return has_message_come_; }
 
-  double frame_ratio(void);
+  double frame_ratio(void) override;
 
   const std::string& NodeName(void) const { return node_name_; }
 
@@ -90,8 +85,6 @@ class GeneralChannelMessage : public GeneralMessageBase {
   }
 
   void Render(const Screen* s, int key) override;
-
-  RenderableMessage* Child(int lineNo) const override;
 
   void CloseChannel(void) {
     if (channel_reader_ != nullptr) {
@@ -111,7 +104,6 @@ class GeneralChannelMessage : public GeneralMessageBase {
         has_message_come_(false),
         message_type_(),
         frame_counter_(0),
-        frame_ratio_(0.0),
         last_time_(apollo::cyber::Time::Now()),
         channel_node_(nullptr),
         node_name_(nodeName),
@@ -174,7 +166,6 @@ class GeneralChannelMessage : public GeneralMessageBase {
   bool has_message_come_;
   std::string message_type_;
   std::atomic<int> frame_counter_;
-  double frame_ratio_;
   apollo::cyber::Time last_time_;
 
   std::unique_ptr<apollo::cyber::Node> channel_node_;
