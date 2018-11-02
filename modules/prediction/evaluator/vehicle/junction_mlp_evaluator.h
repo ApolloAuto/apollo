@@ -100,7 +100,6 @@ class JunctionMLPEvaluator : public Evaluator {
   double ComputeProbability(const std::vector<double>& feature_values);
 
  private:
-  std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
   static const size_t OBSTACLE_FEATURE_SIZE = 3;
   static const size_t JUNCTION_FEATURE_SIZE = 60;
 };

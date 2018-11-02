@@ -61,14 +61,16 @@ void JunctionAnalyzer::SetAllJunctionExits() {
     if (overlap_info_ptr == nullptr) {
       continue;
     }
+    // TODO(all) consider to delete
     if (overlap_info_ptr->overlap().object_size() != 2) {
       continue;
     }
     for (const auto &object : overlap_info_ptr->overlap().object()) {
       if (object.has_lane_overlap_info()) {
-        std::string lane_id = object.id().id();
+        const std::string& lane_id = object.id().id();
         auto lane_info_ptr = PredictionMap::LaneById(lane_id);
-        if (object.lane_overlap_info().end_s() + 1e-3 <
+        // TODO(all) move 0.1 to gflags
+        if (object.lane_overlap_info().end_s() + 0.1 <
             lane_info_ptr->total_length()) {
           JunctionExit junction_exit;
           double s = object.lane_overlap_info().end_s();
@@ -98,6 +100,7 @@ std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     lane_info_queue.pop();
     const std::string& curr_lane_id = curr_lane->id().id();
     if (IsExitLane(curr_lane_id)) {
+      // TODO(kechxu) deal with duplicates
       junction_exits.push_back(junction_exits_[curr_lane_id]);
       continue;
     }
@@ -119,7 +122,6 @@ const JunctionFeature& JunctionAnalyzer::GetJunctionFeature(
     return junction_features_[start_lane_id];
   }
   JunctionFeature junction_feature;
-  // TODO(all) not fill enter_lane yet
   junction_feature.set_junction_id(GetJunctionId());
   junction_feature.set_junction_range(ComputeJunctionRange());
   std::vector<JunctionExit> junction_exits = GetJunctionExits(start_lane_id);
