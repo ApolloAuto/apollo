@@ -1004,7 +1004,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         // With respect to x
         iRow[nz_index] = constraint_index + 2;
         jCol[nz_index] = state_index + 2;
-        ++nz_index;  // FIXME()
+        ++nz_index;
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {
@@ -1037,11 +1037,11 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
         iRow[nz_index] = constraint_index + 3;
         jCol[nz_index] = state_index + 1;
-        ++nz_index;  // FIXME()
+        ++nz_index;
 
         iRow[nz_index] = constraint_index + 3;
         jCol[nz_index] = state_index + 2;
-        ++nz_index;  // FIXME()
+        ++nz_index;
 
         // with respect to l
         for (std::size_t k = 0; k < current_edges_num; ++k) {

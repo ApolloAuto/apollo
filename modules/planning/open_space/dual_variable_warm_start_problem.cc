@@ -73,9 +73,9 @@ bool DualVariableWarmStartProblem::Solve(
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  app->Options()->SetStringValue("hessian_approximation", "exact");
+  app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   // TODO(QiL) : Change IPOPT settings to flag or configs
-  int print_level = 0;
+  int print_level = 5;
   app->Options()->SetIntegerValue("print_level", print_level);
   int num_iterations = 0;
   app->Options()->SetIntegerValue("max_iter", num_iterations);
@@ -83,7 +83,7 @@ bool DualVariableWarmStartProblem::Solve(
   app->Options()->SetIntegerValue("mumps_mem_percent", mumps_mem_percent);
   int max_iter = 750;
   app->Options()->SetIntegerValue("max_iter", max_iter);
-  double tol = 1e-5;
+  double tol = 1e-3;
   app->Options()->SetNumericValue("tol", tol);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();

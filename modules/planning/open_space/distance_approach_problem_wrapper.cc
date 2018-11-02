@@ -326,7 +326,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   if (dual_variable_warm_start_status) {
     AINFO << "Dual variable problem solved successfully!";
   } else {
-    AERROR << "DUal variable problem solving failed";
+    AERROR << "Dual variable problem solving failed";
     return false;
   }
 
