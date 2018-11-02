@@ -35,7 +35,7 @@ function start() {
 }
 
 function stop() {
-  killall -9 /apollo/bazel-bin/modules/dreamview/dreamview
+  pkill -f modules/dreamview/dreamview
 }
 
 case $1 in

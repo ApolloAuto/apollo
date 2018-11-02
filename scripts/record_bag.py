@@ -205,7 +205,7 @@ class Recorder(object):
 
     def stop(self):
         """Stop recording."""
-        shell_cmd('kill -TERM $(pgrep -f "cyber_recorder record" | grep -v pgrep)')
+        shell_cmd('pkill -f "cyber_recorder record"')
 
     def record_task(self, disk, topics):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
