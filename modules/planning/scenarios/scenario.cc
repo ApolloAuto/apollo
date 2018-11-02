@@ -70,6 +70,9 @@ Scenario::ScenarioStatus Scenario::Process(
     if (next_stage != current_stage_->stage_type()) {
       AINFO << "switch stage from " << current_stage_->Name() << " to "
             << ScenarioConfig::StageType_Name(next_stage);
+      if (next_stage == ScenarioConfig::NO_STAGE) {
+        return STATUS_DONE;
+      }
       if (stage_config_map_.find(next_stage) == stage_config_map_.end()) {
         AERROR << "Failed to find config for stage: " << next_stage;
         return STATUS_UNKNOWN;
