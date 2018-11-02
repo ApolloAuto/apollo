@@ -315,7 +315,6 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
   // clear containers
   open_set_.clear();
   close_set_.clear();
-  ReedSheppPath_cache_.clear();
   while (!open_pq_.empty()) open_pq_.pop();
   final_node_ = nullptr;
 
