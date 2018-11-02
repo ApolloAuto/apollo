@@ -258,7 +258,7 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
           break;
         case SecondColumnType::MessageFrameRatio: {
           outStr.str("");
-          outStr << std::fixed << std::setprecision(GeneralChannelMessage::FrameRatio_Precision)
+          outStr << std::fixed << std::setprecision(FrameRatio_Precision)
                  << iter->second->frame_ratio();
           s->AddStr(col1_width_ + SecondColumnOffset, line,
                     outStr.str().c_str());
