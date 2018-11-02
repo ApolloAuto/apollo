@@ -43,8 +43,8 @@ bool IsClosed(const double x0, const double y0, const double theta0,
               const double x1, const double y1, const double theta1) {
   // TODO(all) move constants to gflags
   double angle_diff = std::abs(common::math::AngleDiff(theta0, theta1));
-  return std::abs(x0 - x1) < 1.0 && std::abs(y0 - y1) &&
-         angle_diff < M_PI * 0.25;
+  double distance = std::hypot(x0 - x1, y0 - y1);
+  return distance < 1.0 && angle_diff < M_PI * 0.25;
 }
 
 JunctionMLPEvaluator::JunctionMLPEvaluator() {
@@ -52,7 +52,6 @@ JunctionMLPEvaluator::JunctionMLPEvaluator() {
 }
 
 void JunctionMLPEvaluator::Clear() {
-  obstacle_feature_values_map_.clear();
 }
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
@@ -126,17 +125,13 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
 
-  auto it = obstacle_feature_values_map_.find(id);
-  if (it == obstacle_feature_values_map_.end()) {
-    std::vector<double> obstacle_feature_values;
-    SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
-    obstacle_feature_values_map_[id] = obstacle_feature_values;
-  }
+  std::vector<double> obstacle_feature_values;
+  SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
 
-  if (obstacle_feature_values_map_[id].size() != OBSTACLE_FEATURE_SIZE) {
+  if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
     AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected obstacle feature_values "
-           << obstacle_feature_values_map_[id].size() << ".";
+           << obstacle_feature_values.size() << ".";
     return;
   }
 
@@ -150,9 +145,10 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   }
 
   feature_values->insert(feature_values->end(),
-                         obstacle_feature_values_map_[id].begin(),
-                         obstacle_feature_values_map_[id].end());
-  feature_values->insert(feature_values->end(), junction_feature_values.begin(),
+                         obstacle_feature_values.begin(),
+                         obstacle_feature_values.end());
+  feature_values->insert(feature_values->end(),
+                         junction_feature_values.begin(),
                          junction_feature_values.end());
   if (FLAGS_prediction_offline_mode) {
     SaveOfflineFeatures(obstacle_ptr->mutable_latest_feature(),
@@ -196,11 +192,11 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
   std::string junction_id = feature_ptr->junction_feature().junction_id();
   double junction_range = feature_ptr->junction_feature().junction_range();
   for (int i = 0; i < 12; ++i) {
-    feature_values->push_back(0);
-    feature_values->push_back(1);
-    feature_values->push_back(1);
-    feature_values->push_back(1);
-    feature_values->push_back(0);
+    feature_values->push_back(0.0);
+    feature_values->push_back(1.0);
+    feature_values->push_back(1.0);
+    feature_values->push_back(1.0);
+    feature_values->push_back(0.0);
   }
   int num_junction_exit = feature_ptr->junction_feature().junction_exit_size();
   for (int i = 0; i < num_junction_exit; ++i) {
@@ -213,9 +209,10 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double diff_heading = apollo::common::math::AngleDiff(heading,
                               junction_exit.exit_heading());
     double angle = std::atan2(diff_y, diff_x);
+    // TODO(Hongyi) test d_idx
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
-    feature_values->operator[](idx * 5) = 1;
+    feature_values->operator[](idx * 5) = 1.0;
     feature_values->operator[](idx * 5 + 1) = diff_x / junction_range;
     feature_values->operator[](idx * 5 + 2) = diff_y / junction_range;
     feature_values->operator[](idx * 5 + 3) =

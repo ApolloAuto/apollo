@@ -242,6 +242,7 @@ void Obstacle::BuildJunctionFeature() {
     CHECK(prev_feature.junction_feature().enter_lane().has_lane_id());
     std::string enter_lane_id =
         prev_feature.junction_feature().enter_lane().lane_id();
+    // TODO(kechxu) deal with consecutive junctions
     SetJunctionFeatureWithEnterLane(
         enter_lane_id, latest_feature_ptr);
   } else {
@@ -267,6 +268,7 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
   } else {
     if (feature_ptr->lane().nearby_lane_feature_size() > 0) {
       // TODO(kechxu) start with multiple lane ids
+      // TODO(kechxu) enlarge searching range for lanes in junction
       start_lane_id = feature_ptr->lane().nearby_lane_feature(0).lane_id();
     }
   }
