@@ -26,6 +26,8 @@ import logging
 import argparse
 import numpy as np
 import tensorflow as tf
+import proto.fnn_model_pb2
+from proto.fnn_model_pb2 import FnnModel, Layer
 
 dim_input = 3+60
 dim_output = 12
@@ -52,6 +54,35 @@ def data_preprocessing(data):
     Y = data[:, -dim_output:]
     return X, Y
 
+def save_model(model, filename):
+    """
+    Save the trained model parameters into protobuf binary format file
+    """
+    net_params = FnnModel()
+    net_params.num_layer = 0
+    for layer in model.layers:
+        net_params.num_layer += 1
+        net_layer = net_params.layer.add()
+        config = layer.get_config()
+        net_layer.layer_input_dim = dim_input
+        net_layer.layer_output_dim = dim_output
+        if config['activation'] == 'relu':
+            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.RELU
+        elif config['activation'] == 'tanh':
+            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.TANH
+        elif config['activation'] == 'sigmoid':
+            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.SIGMOID
+
+        weights, bias = layer.get_weights()
+        net_layer.layer_bias.columns.extend(bias.reshape(-1).tolist())
+        for col in weights.tolist():
+            row = net_layer.layer_input_weight.rows.add()
+            row.columns.extend(col)
+    net_params.dim_input = dim_input
+    net_params.dim_output = dim_output
+    with open(filename, 'wb') as params_file:
+        params_file.write(net_params.SerializeToString())
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
@@ -65,13 +96,14 @@ if __name__ == "__main__":
     print("Data load success, with data shape: " + str(train_data.shape))
     X_train, Y_train = data_preprocessing(train_data)
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(60, activation=tf.nn.relu),
-        tf.keras.layers.Dropout(0.2),
         tf.keras.layers.Dense(30, activation=tf.nn.relu),
-        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(15, activation=tf.nn.relu),
         tf.keras.layers.Dense(12, activation=tf.nn.softmax)])
     model.compile(optimizer='adam',
                   loss='categorical_crossentropy',
                   # loss='MSE',
                   metrics=['accuracy'])
-    model.fit(X_train, Y_train, epochs=5)
+    model.fit(X_train, Y_train, epochs=10)
+    model_path = os.path.join(os.getcwd(), "junction_mlp_model.bin")
+    save_model(model, model_path)
+    print("Model saved to: " + model_path)
