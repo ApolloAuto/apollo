@@ -32,6 +32,7 @@ from proto.fnn_model_pb2 import FnnModel, Layer
 dim_input = 3 + 60
 dim_output = 12
 
+
 def load_data(filename):
     """
     Load the data from h5 file to the format of numpy
@@ -49,10 +50,12 @@ def load_data(filename):
     print("load file success")
     return samples['data']
 
+
 def data_preprocessing(data):
     X = data[:, :dim_input]
     Y = data[:, -dim_output:]
     return X, Y
+
 
 def save_model(model, filename):
     """
@@ -72,6 +75,8 @@ def save_model(model, filename):
             net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.TANH
         elif config['activation'] == 'sigmoid':
             net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.SIGMOID
+        elif config['activation'] == 'softmax':
+            net_layer.layer_activation_func = proto.fnn_model_pb2.Layer.SOFTMAX
 
         weights, bias = layer.get_weights()
         net_layer.layer_bias.columns.extend(bias.reshape(-1).tolist())
@@ -82,6 +87,7 @@ def save_model(model, filename):
     net_params.dim_output = dim_output
     with open(filename, 'wb') as params_file:
         params_file.write(net_params.SerializeToString())
+
 
 if __name__ == "__main__":
 
