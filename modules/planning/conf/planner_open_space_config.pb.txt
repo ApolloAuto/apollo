@@ -25,7 +25,7 @@ distance_approach_config : {
   weight_u_rate : 0.1
   weight_state : 0.01
   weight_state : 0.01
-  weight_state : 0.25
+  weight_state : 0.2
   weight_state : 0.00001
   weight_stitching : 0.1
   weight_stitching : 0.1
