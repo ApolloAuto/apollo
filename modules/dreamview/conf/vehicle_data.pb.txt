@@ -70,3 +70,11 @@ data_files {
   source_path: "camera_params/camera_long_conf.pb.txt"
   dest_path: "/apollo/modules/drivers/camera/conf/camera_long_conf.pb.txt"
 }
+data_files {
+  source_path: "cyber_conf/cyber.pb.conf"
+  dest_path: "/apollo/cyber/conf/cyber.pb.conf"
+}
+data_files {
+  source_path: "cyber_conf/user.pb.conf"
+  dest_path: "/apollo/cyber/conf/user.pb.conf"
+}
