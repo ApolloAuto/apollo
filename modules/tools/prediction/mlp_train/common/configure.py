@@ -41,7 +41,7 @@ parameters = {
     'feature': {
         'threshold_label_time_delta': 1.0,
         'prediction_label_timeframe': 3.0,
-        'maximum_maneuver_finish_time': 6.0,
+        'maximum_maneuver_finish_time': 3.0,
 
         # Lane change is defined to be finished if the ratio of deviation
         # from center-line to the lane width is within this: (must be < 0.5)
