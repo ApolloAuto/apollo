@@ -15,6 +15,7 @@ message Layer {
     RELU = 0;
     TANH = 1;
     SIGMOID = 2;
+    SOFTMAX = 3;
   }
   optional int32 layer_input_dim = 1;
   optional int32 layer_output_dim = 2;
