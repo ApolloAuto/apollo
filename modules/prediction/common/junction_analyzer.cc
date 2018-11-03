@@ -19,6 +19,7 @@
 #include <utility>
 #include <limits>
 #include <algorithm>
+#include <unordered_set>
 
 #include "modules/prediction/common/junction_analyzer.h"
 
@@ -99,9 +100,11 @@ std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     int level = lane_info_queue.front().second;
     lane_info_queue.pop();
     const std::string& curr_lane_id = curr_lane->id().id();
-    if (IsExitLane(curr_lane_id)) {
-      // TODO(kechxu) deal with duplicates
+    std::unordered_set<std::string> visited_exit_lanes;
+    if (IsExitLane(curr_lane_id) &&
+        visited_exit_lanes.find(curr_lane_id) == visited_exit_lanes.end()) {
       junction_exits.push_back(junction_exits_[curr_lane_id]);
+      visited_exit_lanes.insert(curr_lane_id);
       continue;
     }
     if (level >= max_search_level) {
