@@ -69,11 +69,12 @@ std::set<std::string> RecordReader::GetChannelList() const {
 bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
                                uint64_t end_time) {
   while (message_index_ < chunk_.messages_size()) {
-    const auto& next_message = chunk_.messages(message_index_++);
+    const auto& next_message = chunk_.messages(message_index_);
     uint64_t time = next_message.time();
     if (time > end_time) {
       return false;
     }
+    ++message_index_;
     if (time < begin_time) {
       continue;
     }

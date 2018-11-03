@@ -17,9 +17,12 @@
 #ifndef CYBER_RECORD_RECORD_VIEWER_H_
 #define CYBER_RECORD_RECORD_VIEWER_H_
 
+#include <cstddef>
+#include <map>
 #include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "cyber/record/record_message.h"
 #include "cyber/record/record_reader.h"
@@ -32,9 +35,15 @@ class RecordMessage;
 
 class RecordViewer {
  public:
-  RecordViewer(const std::shared_ptr<RecordReader>& reader,
+  using RecordReaderPtr = std::shared_ptr<RecordReader>;
+
+  RecordViewer(const RecordReaderPtr& reader, uint64_t begin_time = 0,
+               uint64_t end_time = UINT64_MAX,
+               const std::set<std::string>& channels = std::set<std::string>());
+  RecordViewer(const std::vector<RecordReaderPtr>& readers,
                uint64_t begin_time = 0, uint64_t end_time = UINT64_MAX,
                const std::set<std::string>& channels = std::set<std::string>());
+
   bool IsValid() const;
   bool Update(RecordMessage* message);
   uint64_t begin_time() const;
@@ -71,10 +80,22 @@ class RecordViewer {
 
  private:
   friend class Iterator;
+
+  void Sort();
+  void Reset();
+  void UpdateTime();
+  bool FillBuffer();
+
   uint64_t begin_time_ = 0;
   uint64_t end_time_ = UINT64_MAX;
   std::set<std::string> channels_;
-  std::shared_ptr<RecordReader> reader_ = nullptr;
+  std::vector<RecordReaderPtr> readers_;
+
+  uint64_t curr_begin_time_ = 0;
+  std::multimap<uint64_t, std::shared_ptr<RecordMessage>> msg_buffer_;
+
+  const uint64_t kStepTimeNanoSec = 1000000000UL;
+  const std::size_t kBufferMinSize = 128;
 };
 
 }  // namespace record
