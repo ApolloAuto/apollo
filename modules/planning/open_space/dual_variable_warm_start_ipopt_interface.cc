@@ -286,7 +286,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
       }
       g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2;
 
-      // G' * mu + R' * lambda == 0
+      // G' * mu + R' * A' * lambda == 0
       g[constraint_index + 1] = x[n_index] - x[n_index + 2] +
                                 std::cos(xWS_(2, i)) * tmp1 +
                                 std::sin(xWS_(2, i)) * tmp2;
@@ -349,7 +349,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
       for (std::size_t j = 0; j < obstacles_num_; ++j) {
         std::size_t current_edges_num = obstacles_edges_num_(j, 0);
 
-        // 1. norm(A* lambda == 1)
+        // 1. norm(A* lambda <= 1)
         for (std::size_t k = 0; k < current_edges_num; ++k) {
           // with respect to l
           iRow[nz_index] = constraint_index;
