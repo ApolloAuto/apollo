@@ -43,7 +43,7 @@ def label_file(input_file, output_file):
     # and label the rest.
     for fea_key, fea_traj in fea_trajs.items():
         fea_traj = fea_trajs[fea_key]
-        fea_traj = TrajectoryToSample.clean(fea_traj)
+        # fea_traj = TrajectoryToSample.clean(fea_traj)
         fea_traj = TrajectoryToSample.label_cruise(fea_traj)
         for i, fea in enumerate(fea_traj):
             if not fea.HasField('label_update_time_delta'):

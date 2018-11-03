@@ -49,6 +49,7 @@ DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_prioritize_obstacles);
 
 // Obstacle features
+DECLARE_uint32(cruise_historical_frame_length);
 DECLARE_bool(enable_kf_tracking);
 DECLARE_double(max_acc);
 DECLARE_double(min_acc);
