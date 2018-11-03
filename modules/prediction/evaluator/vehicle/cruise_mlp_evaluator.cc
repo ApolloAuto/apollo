@@ -56,13 +56,12 @@ std::pair<double, double> WorldCoordToObjCoord
   double rho = std::sqrt(x_diff * x_diff + y_diff * y_diff);
   double theta = std::atan2(y_diff, x_diff) - obj_world_angle;
 
-  return std::make_pair(std::sin(theta)*rho, std::cos(theta)*rho);
+  return std::make_pair(std::cos(theta)*rho, std::sin(theta)*rho);
 }
 
 double WorldAngleToObjAngle(double input_world_angle,
                             double obj_world_angle) {
-  return common::math::NormalizeAngle
-            (M_PI / 2 - (obj_world_angle - input_world_angle));
+  return common::math::NormalizeAngle(input_world_angle - obj_world_angle);
 }
 
 CruiseMLPEvaluator::CruiseMLPEvaluator() {
@@ -185,6 +184,24 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> speeds;
   std::vector<double> timestamps;
 
+  std::vector<std::pair<double, double>> pos_history
+      (FLAGS_cruise_historical_frame_length, std::make_pair(100.0, 100.0));
+  std::vector<std::pair<double, double>> vel_history
+      (FLAGS_cruise_historical_frame_length, std::make_pair(100.0, 100.0));
+  std::vector<std::pair<double, double>> acc_history
+      (FLAGS_cruise_historical_frame_length, std::make_pair(100.0, 100.0));
+  const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
+  double obs_heading = obs_curr_feature.velocity_heading();
+  std::pair<double, double> obs_pos =
+      std::make_pair(obs_curr_feature.position().x(),
+                     obs_curr_feature.position().y());
+  std::pair<double, double> obs_vel =
+      std::make_pair(obs_curr_feature.velocity().x(),
+                     obs_curr_feature.velocity().y());
+  std::pair<double, double> obs_acc =
+      std::make_pair(obs_curr_feature.acceleration().x(),
+                     obs_curr_feature.acceleration().y());
+
   double obs_feature_history_start_time =
       obstacle_ptr->timestamp() - FLAGS_prediction_duration;
   int count = 0;
@@ -207,6 +224,25 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
       timestamps.push_back(feature.timestamp());
       speeds.push_back(feature.speed());
       ++count;
+    }
+    if (feature.has_position() &&
+        i < FLAGS_cruise_historical_frame_length) {
+      pos_history[i] = WorldCoordToObjCoord
+          (std::make_pair(feature.position().x(), feature.position().y()),
+           obs_pos, obs_heading);
+    }
+    if (feature.has_velocity() &&
+        i < FLAGS_cruise_historical_frame_length) {
+      vel_history[i] = WorldCoordToObjCoord
+          (std::make_pair(feature.velocity().x(), feature.velocity().y()),
+           obs_vel, obs_heading);
+    }
+    if (feature.has_acceleration() &&
+        i < FLAGS_cruise_historical_frame_length) {
+      acc_history[i] = WorldCoordToObjCoord
+          (std::make_pair(feature.acceleration().x(),
+                          feature.acceleration().y()),
+           obs_acc, obs_heading);
     }
   }
   if (count <= 0) {
@@ -312,6 +348,15 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(lane_types.front() == 1 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 2 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 3 ? 1.0 : 0.0);
+
+  for (std::size_t i=0; i < FLAGS_cruise_historical_frame_length; i++) {
+    feature_values->push_back(pos_history[i].first);
+    feature_values->push_back(pos_history[i].second);
+    feature_values->push_back(vel_history[i].first);
+    feature_values->push_back(vel_history[i].second);
+    feature_values->push_back(acc_history[i].first);
+    feature_values->push_back(acc_history[i].second);
+  }
 }
 
 void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
@@ -406,15 +451,15 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
         continue;
       }
 
-      std::pair<double, double> relative_l_s = WorldCoordToObjCoord
+      std::pair<double, double> relative_s_l = WorldCoordToObjCoord
       (std::make_pair(lane_point.position().x(), lane_point.position().y()),
        std::make_pair(feature.position().x(), feature.position().y()),
        heading);
       double relative_ang = WorldAngleToObjAngle(lane_point.heading(),
                                                  heading);
 
-      feature_values->push_back(relative_l_s.first);
-      feature_values->push_back(relative_l_s.second);
+      feature_values->push_back(relative_s_l.second);
+      feature_values->push_back(relative_s_l.first);
       feature_values->push_back(relative_ang);
       feature_values->push_back(speed * speed * lane_point.kappa());
       feature_values->push_back(lane_point.kappa());

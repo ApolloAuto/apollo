@@ -32,6 +32,7 @@ from common.feature_io import build_trajectory
 from common.trajectory import TrajectoryToSample
 
 mlp_feature_size = parameters['cruise_mlp']['dim_input']
+num_output = parameters['cruise_mlp']['dim_output']
 
 def extract_mlp_features(filename):
     features = load_label_feature(filename)
@@ -50,19 +51,18 @@ def extract_mlp_features(filename):
             for j in range(mlp_feature_size):
                 mlp_feature.append(lane_seq.features.mlp_features[j])
             mlp_feature.append(lane_seq.label)
-            mlp_feature.append(lane_seq.time_to_lane_center)
             mlp_feature.append(lane_seq.time_to_lane_edge)
+            mlp_feature.append(lane_seq.time_to_lane_center)
             mlp_feature_np = np.array(mlp_feature)
             if mlp_features is None:
-                mlp_features = mlp_feature_np.reshape(1,mlp_feature_size+3)
+                mlp_features = mlp_feature_np.reshape(1,mlp_feature_size+num_output)
             else:
                 mlp_features = np.concatenate(
-                    (mlp_features, mlp_feature_np.reshape(1,mlp_feature_size+3)), axis=0)
+                    (mlp_features, mlp_feature_np.reshape(1,mlp_feature_size+num_output)), axis=0)
+    
     if (mlp_features is None) or (np.size(mlp_features) == 0):
-        return
-    #mlp_features = mlp_features.reshape(
-    #    (np.shape(mlp_features)[0] / (mlp_feature_size + 2),
-    #     (mlp_feature_size + 2)))
+        return None
+
     return mlp_features
 
 

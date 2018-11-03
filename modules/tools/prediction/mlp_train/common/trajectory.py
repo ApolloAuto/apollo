@@ -176,13 +176,13 @@ class TrajectoryToSample(object):
         return trajectory
 
     @classmethod
-    def label_cruise(cls, trajectory):
+    def label_cruise(cls, feature_sequence):
         '''
         Label feature trajectory according to real future lane sequence
         in 6sec
         '''
-        feature_seq_len = len(trajectory)
-        for i, fea in enumerate(trajectory):
+        feature_seq_len = len(feature_sequence)
+        for i, fea in enumerate(feature_sequence):
             # Sanity check.
             if not fea.HasField('lane') or \
                not fea.lane.HasField('lane_feature'):
@@ -196,7 +196,6 @@ class TrajectoryToSample(object):
                 if lane_sequence.vehicle_on_lane:
                     for lane_segment in lane_sequence.lane_segment:
                         curr_lane_seq.add(lane_segment.lane_id)
-
             if len(curr_lane_seq) == 0:
                 print "Obstacle is not on any lane."
                 continue
@@ -205,91 +204,142 @@ class TrajectoryToSample(object):
             has_started_lane_change = False
             has_finished_lane_change = False
             lane_change_start_time = None
-            lane_change_finish_time = 10.0
+            lane_change_finish_time = None
+            is_jittering = False
 
-            # Go through all the subsequent features in this sequence
-            # of features.
+            # This goes through all the subsequent features in this sequence
+            # of features (this is the GROUND_TRUTH!)
+            obs_actual_lane_ids = []
             for j in range(i, feature_seq_len):
                 # If timespan exceeds max. maneuver finish time, then break.
-                time_span = trajectory[j].timestamp - fea.timestamp
+                time_span = feature_sequence[j].timestamp - fea.timestamp
                 if time_span > param_fea['maximum_maneuver_finish_time']:
                     break
 
                 # Sanity check.
-                if not trajectory[j].HasField('lane') or \
-                   not trajectory[j].lane.HasField('lane_feature'):
+                if not feature_sequence[j].HasField('lane') or \
+                   not feature_sequence[j].lane.HasField('lane_feature'):
                     continue
                 fea.label_update_time_delta = time_span
 
                 # If step into another lane, label lane change to be started.
-                lane_id_j = trajectory[j].lane.lane_feature.lane_id
+                lane_id_j = feature_sequence[j].lane.lane_feature.lane_id
+
+                if lane_id_j not in obs_actual_lane_ids:
+                    obs_actual_lane_ids.append(lane_id_j)
+
                 if lane_id_j not in curr_lane_seq:
+                    # If it's the first time, log new_lane_id
                     if has_started_lane_change == False:
                         has_started_lane_change = True
                         lane_change_start_time = time_span
-                        lane_change_finish_time = 10.0
                         new_lane_id = lane_id_j
                 else:
-                    has_started_lane_change = False
-                    new_lane_id = None
+                    # If it stepped into other lanes and now comes back, it's jittering!
+                    if has_started_lane_change:
+                        is_jittering = True
+                        # This is to let such data not be eliminated by label_file function
+                        fea.label_update_time_delta = param_fea['maximum_maneuver_finish_time']
+                        break
 
                 # If roughly get to the center of another lane, label lane change to be finished.
-                left_bound = trajectory[j].lane.lane_feature.dist_to_left_boundary
-                right_bound = trajectory[j].lane.lane_feature.dist_to_right_boundary
+                left_bound = feature_sequence[j].lane.lane_feature.dist_to_left_boundary
+                right_bound = feature_sequence[j].lane.lane_feature.dist_to_right_boundary
                 if left_bound / (left_bound + right_bound) > (0.5 - param_fea['lane_change_finish_condition']) and \
                    left_bound / (left_bound + right_bound) < (0.5 + param_fea['lane_change_finish_condition']):
                     if has_started_lane_change:
                         has_finished_lane_change = True
                         lane_change_finish_time = time_span
-                        new_lane_id = lane_id_j
+                        # new_lane_id = lane_id_j
+
                         # This is to let such data not be eliminated by label_file function
                         fea.label_update_time_delta = param_fea['maximum_maneuver_finish_time']
                         break
                     else:
                         # This means that the obstacle moves back to the center
                         # of the original lane for the first time.
-                        if lane_change_finish_time == 10.0:
+                        if lane_change_finish_time is None:
                             lane_change_finish_time = time_span
-            
+
+            if len(obs_actual_lane_ids) < 1:
+                print "No lane id"
+                continue
+
             '''
             For every lane_sequence in the lane_graph,
             assign a label and a finish_time.
+
+            -10: Lane jittering
+            
             -1: False Cut-in
-            0:  False Follow-lane
-            1:  True Follow-lane
-            2:  True Cut-in
-            3:  True Cut-in but time_to_lane_center unknown (started lane-change but haven't finished)
-            4:  True Follow-lane but time_to_lane_center unknown
+            1: True Cut-in but not to lane_center
+            3: True Cut-in and reached lane_center
+
+            0: Fales Go
+            2: True Go but not to lane_center
+            4: True Go and reached lane_center
             '''
+
+            # This is to labl each saved lane_sequence.
             for lane_sequence in fea.lane.lane_graph.lane_sequence:
+                # Sanity check.
                 if len(lane_sequence.lane_segment) == 0:
                     continue
+                
+                if is_jittering:
+                    lane_sequence.label = -10
+                    time_to_lane_center = -1.0
+                    time_to_lane_edge = -1.0
+                    continue
+
                 # The current lane is obstacle's original lane.
                 if lane_sequence.vehicle_on_lane:
-                    # Obs is following this lane.
+
+                    # Obs is following ONE OF its original lanes:
                     if not has_started_lane_change:
-                        # Obstacle is following the original lane but is never at lane-center:
-                        if lane_change_finish_time == 10.0:
-                            lane_sequence.label = 4
-                            lane_sequence.time_to_lane_edge = 10.0
-                            lane_sequence.time_to_lane_center = 10.0
-                        # Obstacle is following the original lane and moved to lane-center
+                        # Record this lane_sequence's lane_ids
+                        current_lane_ids = []
+                        for k in range(len(lane_sequence.lane_segment)):
+                            if lane_sequence.lane_segment[k].HasField('lane_id'):
+                                current_lane_ids.append(lane_sequence.lane_segment[k].lane_id)
+
+                        is_following_this_lane = True
+                        for l_id in range(1, min(len(current_lane_ids), len(obs_actual_lane_ids))):
+                            if current_lane_ids[l_id] != obs_actual_lane_ids[l_id]:
+                                is_following_this_lane = False
+                                break
+
+                        # Obs is following this original lane:
+                        if is_following_this_lane:
+                            # Obstacle is following this original lane and moved to lane-center
+                            if lane_change_finish_time is not None:
+                                lane_sequence.label = 4
+                                lane_sequence.time_to_lane_edge = -1.0
+                                lane_sequence.time_to_lane_center = lane_change_finish_time
+                            # Obstacle is following this original lane but is never at lane-center:
+                            else:
+                                lane_sequence.label = 2
+                                lane_sequence.time_to_lane_edge = -1.0
+                                lane_sequence.time_to_lane_center = -1.0
+                        # Obs is following another original lane:
                         else:
-                            lane_sequence.label = 1
-                            lane_sequence.time_to_lane_edge = 10.0
-                            lane_sequence.time_to_lane_center = lane_change_finish_time
+                            lane_sequence.label = 0
+                            lane_sequence.time_to_lane_edge = -1.0
+                            lane_sequence.time_to_lane_center = -1.0
+
                     # Obs has stepped out of this lane within 6sec.
                     else:
                         lane_sequence.label = 0
-                        lane_sequence.time_to_lane_edge = lane_change_start_time
-                        lane_sequence.time_to_lane_center = 100.0
+                        lane_sequence.time_to_lane_edge = -1.0
+                        lane_sequence.time_to_lane_center = -1.0
+
                 # The current lane is NOT obstacle's original lane.
                 else:
                     # Obstacle is following the original lane.
                     if not has_started_lane_change:
                         lane_sequence.label = -1
-                        lane_sequence.time_to_lane_edge = 100.0
-                        lane_sequence.time_to_lane_center = 100.0
+                        lane_sequence.time_to_lane_edge = -1
+                        lane_sequence.time_to_lane_center = -1
                     else:
                         new_lane_id_is_in_this_lane_seq = False
                         for lane_segment in lane_sequence.lane_segment:
@@ -300,22 +350,23 @@ class TrajectoryToSample(object):
                         if new_lane_id_is_in_this_lane_seq:
                             # Obstacle has finished lane changing within 6 sec.
                             if has_finished_lane_change:
-                                lane_sequence.label = 2
+                                lane_sequence.label = 3
                                 lane_sequence.time_to_lane_edge = lane_change_start_time
                                 lane_sequence.time_to_lane_center = lane_change_finish_time
                             # Obstacle started lane changing but haven't finished yet.
                             else:
-                                lane_sequence.label = 3
+                                lane_sequence.label = 1
                                 lane_sequence.time_to_lane_edge = lane_change_start_time
-                                lane_sequence.time_to_lane_center = 10.0
+                                lane_sequence.time_to_lane_center = -1.0
 
                         # Obstacle has changed to some other lane.
                         else:
                             lane_sequence.label = -1
-                            lane_sequence.time_to_lane_edge = 100.0
-                            lane_sequence.time_to_lane_center = 100.0
+                            lane_sequence.time_to_lane_edge = -1.0
+                            lane_sequence.time_to_lane_center = -1.0
 
-        return trajectory
+        return feature_sequence
+
 
     @classmethod
     def label_junction(cls, trajectory):

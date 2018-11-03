@@ -69,6 +69,9 @@ DEFINE_bool(enable_prioritize_obstacles, false,
             "If to enable the functionality to prioritize obstacles");
 
 // Obstacle features
+DEFINE_uint32(cruise_historical_frame_length, 10,
+              "The number of historical frames of the obstacle"
+              "that the cruise model will look at.");
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
 DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
 DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
