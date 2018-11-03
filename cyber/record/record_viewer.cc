@@ -17,6 +17,7 @@
 #include "cyber/record/record_viewer.h"
 
 #include <algorithm>
+#include <utility>
 
 #include "cyber/common/log.h"
 
@@ -24,20 +25,23 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-RecordViewer::RecordViewer(const std::shared_ptr<RecordReader>& reader,
+RecordViewer::RecordViewer(const RecordReaderPtr& reader, uint64_t begin_time,
+                           uint64_t end_time,
+                           const std::set<std::string>& channels)
+    : begin_time_(begin_time), end_time_(end_time), channels_(channels) {
+  readers_.emplace_back(reader);
+  UpdateTime();
+}
+
+RecordViewer::RecordViewer(const std::vector<RecordReaderPtr>& readers,
                            uint64_t begin_time, uint64_t end_time,
                            const std::set<std::string>& channels)
     : begin_time_(begin_time),
       end_time_(end_time),
       channels_(channels),
-      reader_(reader) {
-  const auto& header = reader_->header();
-  if (begin_time_ < header.begin_time()) {
-    begin_time_ = header.begin_time();
-  }
-  if (end_time_ > header.end_time()) {
-    end_time_ = header.end_time();
-  }
+      readers_(readers) {
+  Sort();
+  UpdateTime();
 }
 
 bool RecordViewer::IsValid() const {
@@ -50,12 +54,19 @@ bool RecordViewer::IsValid() const {
 }
 
 bool RecordViewer::Update(RecordMessage* message) {
-  while (reader_->ReadMessage(message, begin_time_, end_time_)) {
-    if (channels_.empty() || channels_.count(message->channel_name) == 1) {
-      return true;
-    }
+  if (msg_buffer_.empty() && !FillBuffer()) {
+    return false;
   }
-  return false;
+
+  bool result = false;
+  auto& msg = msg_buffer_.begin()->second;
+  if (channels_.empty() || channels_.count(msg->channel_name) == 1) {
+    *message = *msg;
+    result = true;
+  }
+
+  msg_buffer_.erase(msg_buffer_.begin());
+  return result;
 }
 
 uint64_t RecordViewer::begin_time() const { return begin_time_; }
@@ -64,10 +75,14 @@ uint64_t RecordViewer::end_time() const { return end_time_; }
 
 std::set<std::string> RecordViewer::GetChannelList() const {
   std::set<std::string> channel_list;
-  auto all_channel = reader_->GetChannelList();
-  std::set_intersection(all_channel.begin(), all_channel.end(),
-                        channels_.begin(), channels_.end(),
-                        std::inserter(channel_list, channel_list.end()));
+
+  for (auto& reader : readers_) {
+    auto all_channel = reader->GetChannelList();
+    std::set_intersection(all_channel.begin(), all_channel.end(),
+                          channels_.begin(), channels_.end(),
+                          std::inserter(channel_list, channel_list.end()));
+  }
+
   return channel_list;
 }
 
@@ -75,12 +90,82 @@ RecordViewer::Iterator RecordViewer::begin() { return Iterator(this); }
 
 RecordViewer::Iterator RecordViewer::end() { return Iterator(this, true); }
 
+void RecordViewer::Sort() {
+  std::sort(readers_.begin(), readers_.end(),
+            [](const RecordReaderPtr& lhs, const RecordReaderPtr& rhs) {
+              const auto& lhs_header = lhs->header();
+              const auto& rhs_header = rhs->header();
+              if (lhs_header.begin_time() == rhs_header.begin_time()) {
+                return lhs_header.end_time() < rhs_header.end_time();
+              }
+              return lhs_header.begin_time() < rhs_header.begin_time();
+            });
+}
+
+void RecordViewer::Reset() {
+  for (auto& reader : readers_) {
+    reader->Reset();
+  }
+  curr_begin_time_ = begin_time_;
+}
+
+void RecordViewer::UpdateTime() {
+  uint64_t min_begin_time = UINT64_MAX;
+  uint64_t max_end_time = 0;
+
+  for (auto& reader : readers_) {
+    const auto& header = reader->header();
+    if (min_begin_time > header.begin_time()) {
+      min_begin_time = header.begin_time();
+    }
+    if (max_end_time < header.end_time()) {
+      max_end_time = header.end_time();
+    }
+  }
+
+  if (begin_time_ < min_begin_time) {
+    begin_time_ = min_begin_time;
+  }
+
+  if (end_time_ > max_end_time) {
+    end_time_ = max_end_time;
+  }
+
+  curr_begin_time_ = begin_time_;
+}
+
+bool RecordViewer::FillBuffer() {
+  while (curr_begin_time_ < end_time_ && msg_buffer_.size() < kBufferMinSize) {
+    uint64_t this_begin_time = curr_begin_time_;
+    uint64_t this_end_time = this_begin_time + kStepTimeNanoSec;
+    if (this_end_time > end_time_) {
+      this_end_time = end_time_;
+    }
+
+    for (auto& reader : readers_) {
+      while (true) {
+        auto record_msg = std::make_shared<RecordMessage>();
+        if (!reader->ReadMessage(record_msg.get(), this_begin_time,
+                                 this_end_time)) {
+          break;
+        }
+        msg_buffer_.emplace(std::make_pair(record_msg->time, record_msg));
+      }
+    }
+
+    // because ReadMessage of RecordReader is closed interval, so we add 1 here
+    curr_begin_time_ = this_end_time + 1;
+  }
+
+  return !msg_buffer_.empty();
+}
+
 RecordViewer::Iterator::Iterator(RecordViewer* viewer, bool end)
     : end_(end), viewer_(viewer) {
   if (end_) {
     return;
   }
-  viewer_->reader_->Reset();
+  viewer_->Reset();
   if (!viewer_->IsValid()) {
     end_ = true;
   } else {

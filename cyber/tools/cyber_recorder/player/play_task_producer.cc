@@ -30,7 +30,6 @@ namespace record {
 const uint32_t PlayTaskProducer::kMinTaskBufferSize = 500;
 const uint32_t PlayTaskProducer::kPreloadTimeSec = 3;
 const uint64_t PlayTaskProducer::kSleepIntervalNanoSec = 1000000;
-const uint64_t PlayTaskProducer::kPreloadTimeNanoSec = kPreloadTimeSec * 1e9;
 
 PlayTaskProducer::PlayTaskProducer(const TaskBufferPtr& task_buffer,
                                    const PlayParam& play_param)
@@ -110,10 +109,10 @@ bool PlayTaskProducer::ReadRecordInfo() {
 
   // loop each file
   for (auto& file : play_param_.files_to_play) {
-    RecordInfo record_info;
-    record_info.record_reader = std::make_shared<RecordReader>(file);
+    auto record_reader = std::make_shared<RecordReader>(file);
+    record_readers_.emplace_back(record_reader);
 
-    auto& channel_info = record_info.record_reader->channel_info();
+    auto& channel_info = record_reader->channel_info();
     // loop each channel info
     for (auto& item : channel_info) {
       auto& channel_name = item.first;
@@ -129,10 +128,7 @@ bool PlayTaskProducer::ReadRecordInfo() {
       pb_factory->RegisterMessage(proto_desc);
     }
 
-    auto& header = record_info.record_reader->header();
-    record_info.begin_time_ns = header.begin_time();
-    record_info.end_time_ns = header.end_time();
-
+    auto& header = record_reader->header();
     if (play_param_.is_play_all_channels) {
       total_msg_num_ += header.message_number();
     }
@@ -143,8 +139,6 @@ bool PlayTaskProducer::ReadRecordInfo() {
     if (header.end_time() > latest_end_time_) {
       latest_end_time_ = header.end_time();
     }
-
-    record_infos_[file] = record_info;
 
     std::cout << "file: " << file << ", chunk_number: " << header.chunk_number()
               << ", begin_time: " << header.begin_time()
@@ -222,23 +216,37 @@ void PlayTaskProducer::ThreadFunc() {
     preload_size = kMinTaskBufferSize;
   }
 
+  auto record_viewer = std::make_shared<RecordViewer>(
+      record_readers_, play_param_.begin_time_ns, play_param_.end_time_ns,
+      play_param_.channels_to_play);
+
   uint32_t loop_num = 0;
   while (!is_stopped_.load()) {
-    uint64_t curr_begin_time_ns = play_param_.begin_time_ns;
     uint64_t plus_time_ns = loop_num * loop_time_ns;
+    auto itr = record_viewer->begin();
+    auto itr_end = record_viewer->end();
 
-    while (curr_begin_time_ns < play_param_.end_time_ns &&
-           !is_stopped_.load()) {
-      uint64_t curr_end_time_ns = curr_begin_time_ns + kPreloadTimeNanoSec;
-
+    while (itr != itr_end && !is_stopped_.load()) {
       while (!is_stopped_.load() && task_buffer_->Size() > preload_size) {
         std::this_thread::sleep_for(
             std::chrono::nanoseconds(avg_interval_time_ns));
       }
 
-      CreateTask(curr_begin_time_ns, curr_end_time_ns, plus_time_ns);
+      for (; itr != itr_end; ++itr) {
+        if (task_buffer_->Size() > preload_size) {
+          break;
+        }
 
-      curr_begin_time_ns += kPreloadTimeNanoSec;
+        auto search = writers_.find(itr->channel_name);
+        if (search == writers_.end()) {
+          continue;
+        }
+
+        auto raw_msg = std::make_shared<message::RawMessage>(itr->content);
+        auto task = std::make_shared<PlayTask>(
+            raw_msg, search->second, itr->time, itr->time + plus_time_ns);
+        task_buffer_->Push(task);
+      }
     }
 
     if (!play_param_.is_loop_playback) {
@@ -246,41 +254,6 @@ void PlayTaskProducer::ThreadFunc() {
       break;
     }
     ++loop_num;
-  }
-}
-
-void PlayTaskProducer::CreateTask(uint64_t begin_time_ns, uint64_t end_time_ns,
-                                  uint64_t plus_time_ns) {
-  // loop each record file
-  for (auto& item : record_infos_) {
-    auto& record_info = item.second;
-    uint64_t this_begin_time_ns = begin_time_ns;
-    uint64_t this_end_time_ns = end_time_ns;
-    if (this_begin_time_ns < record_info.begin_time_ns) {
-      this_begin_time_ns = record_info.begin_time_ns;
-    }
-    if (this_end_time_ns > record_info.end_time_ns) {
-      this_end_time_ns = record_info.end_time_ns;
-    }
-    if (this_begin_time_ns > this_end_time_ns) {
-      continue;
-    }
-
-    auto record_viewer = std::make_shared<RecordViewer>(
-        record_info.record_reader, this_begin_time_ns, this_end_time_ns);
-    auto itr_end = record_viewer->end();
-
-    for (auto itr = record_viewer->begin(); itr != itr_end; ++itr) {
-      auto search = writers_.find(itr->channel_name);
-      if (search == writers_.end()) {
-        continue;
-      }
-
-      auto raw_msg = std::make_shared<message::RawMessage>(itr->content);
-      auto task = std::make_shared<PlayTask>(raw_msg, search->second, itr->time,
-                                             itr->time + plus_time_ns);
-      task_buffer_->Push(task);
-    }
   }
 }
 

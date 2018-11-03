@@ -25,6 +25,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <vector>
 
 #include "cyber/message/raw_message.h"
 #include "cyber/node/node.h"
@@ -37,20 +38,14 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-struct RecordInfo {
-  uint64_t begin_time_ns = 0;
-  uint64_t end_time_ns = UINT64_MAX;
-  std::shared_ptr<RecordReader> record_reader = nullptr;
-};
-
 class PlayTaskProducer {
  public:
   using NodePtr = std::shared_ptr<Node>;
   using ThreadPtr = std::unique_ptr<std::thread>;
   using TaskBufferPtr = std::shared_ptr<PlayTaskBuffer>;
+  using RecordReaderPtr = std::shared_ptr<RecordReader>;
   using WriterPtr = std::shared_ptr<Writer<message::RawMessage>>;
   using WriterMap = std::unordered_map<std::string, WriterPtr>;
-  using RecordInfoMap = std::map<std::string, RecordInfo>;
   using MessageTypeMap = std::unordered_map<std::string, std::string>;
 
   PlayTaskProducer(const TaskBufferPtr& task_buffer,
@@ -69,8 +64,6 @@ class PlayTaskProducer {
   bool UpdatePlayParam();
   bool CreateWriters();
   void ThreadFunc();
-  void CreateTask(uint64_t begin_time_ns, uint64_t end_time_ns,
-                  uint64_t plus_time_ns);
 
   PlayParam play_param_;
   TaskBufferPtr task_buffer_;
@@ -81,8 +74,8 @@ class PlayTaskProducer {
 
   NodePtr node_;
   WriterMap writers_;
-  RecordInfoMap record_infos_;
   MessageTypeMap msg_types_;
+  std::vector<RecordReaderPtr> record_readers_;
 
   uint64_t earliest_begin_time_;
   uint64_t latest_end_time_;
@@ -91,7 +84,6 @@ class PlayTaskProducer {
   static const uint32_t kMinTaskBufferSize;
   static const uint32_t kPreloadTimeSec;
   static const uint64_t kSleepIntervalNanoSec;
-  static const uint64_t kPreloadTimeNanoSec;
 };
 
 }  // namespace record
