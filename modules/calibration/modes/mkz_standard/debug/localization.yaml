@@ -1,8 +1,0 @@
-description: cyber modules list config
-version: 1.0.0
-module:
-    -
-        name: localization
-        dag: /apollo/modules/localization/dag/localization.dag
-        process_name: localization
-        version: 1.0.0.0
