@@ -19,6 +19,7 @@
 
 #include <atomic>
 #include <string>
+#include <vector>
 
 #include "cyber/proto/role_attributes.pb.h"
 
@@ -33,6 +34,10 @@ class WriterBase {
 
   virtual bool Init() = 0;
   virtual void Shutdown() = 0;
+
+  virtual bool HasReader() { return false; }
+  virtual void GetReaders(std::vector<proto::RoleAttributes>* readers) {}
+
   const std::string& GetChannelName() const {
     return role_attr_.channel_name();
   }

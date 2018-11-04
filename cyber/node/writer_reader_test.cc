@@ -153,6 +153,9 @@ TEST(WriterReaderTest, messaging) {
 
   EXPECT_EQ(recv_msgs.size(), 2);
 
+  EXPECT_TRUE(writer.HasReader());
+  EXPECT_TRUE(reader_a.HasWriter());
+
   writer.Shutdown();
   reader_a.Shutdown();
   reader_b.Shutdown();

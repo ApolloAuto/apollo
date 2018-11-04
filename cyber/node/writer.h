@@ -46,6 +46,9 @@ class Writer : public WriterBase {
   virtual bool Write(const MessageT& msg);
   virtual bool Write(const std::shared_ptr<MessageT>& msg_ptr);
 
+  bool HasReader() override;
+  void GetReaders(std::vector<proto::RoleAttributes>* readers) override;
+
  private:
   void JoinTheTopology();
   void LeaveTheTopology();
@@ -145,6 +148,28 @@ void Writer<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
   } else {
     transmitter_->Disable(reader_attr);
   }
+}
+
+template <typename MessageT>
+bool Writer<MessageT>::HasReader() {
+  if (!init_.load()) {
+    return false;
+  }
+
+  return channel_manager_->HasReader(role_attr_.channel_name());
+}
+
+template <typename MessageT>
+void Writer<MessageT>::GetReaders(std::vector<proto::RoleAttributes>* readers) {
+  if (readers == nullptr) {
+    return;
+  }
+
+  if (!init_.load()) {
+    return;
+  }
+
+  channel_manager_->GetReadersOfChannel(role_attr_.channel_name(), readers);
 }
 
 }  // namespace cyber
