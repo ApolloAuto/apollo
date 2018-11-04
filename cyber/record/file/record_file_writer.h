@@ -17,20 +17,28 @@
 #ifndef CYBER_RECORD_FILE_RECORD_FILE_WRITER_H_
 #define CYBER_RECORD_FILE_RECORD_FILE_WRITER_H_
 
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/text_format.h>
 #include <condition_variable>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include "cyber/common/log.h"
 #include "cyber/record/file/record_file_base.h"
 #include "cyber/record/file/section.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
 namespace record {
+
+using google::protobuf::io::ZeroCopyOutputStream;
+using google::protobuf::io::FileOutputStream;
 
 struct Chunk {
   Chunk() { clear(); }
@@ -44,7 +52,7 @@ struct Chunk {
   }
 
   inline void add(const SingleMessage& message) {
-    std::lock_guard<std::mutex> lg(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
     SingleMessage* p_message = body_.add_messages();
     *p_message = message;
     if (0 == header_.begin_time()) {
@@ -77,57 +85,72 @@ class RecordFileWriter : public RecordFileBase {
   bool WriteChannel(const Channel& channel);
   bool WriteMessage(const SingleMessage& message);
   uint64_t GetMessageNumber(const std::string& channel_name) const;
-
  private:
-  void RefreshIndex();
-  bool WriteIndex(const Index& index);
   bool WriteChunk(const ChunkHeader& chunk_header, const ChunkBody& chunk_body);
-  void Flush();
   template <typename T>
-  bool WriteSection(SectionType type, const T& message,
-                    uint64_t fixed_size = 0);
+  bool WriteSection(const T& message);
+  bool WriteIndex();
+  void Flush();
   bool is_writing_ = false;
   std::unique_ptr<Chunk> chunk_active_ = nullptr;
   std::unique_ptr<Chunk> chunk_flush_ = nullptr;
-  std::recursive_mutex chunk_mutex_;
   std::shared_ptr<std::thread> flush_thread_ = nullptr;
   std::mutex flush_mutex_;
   std::condition_variable flush_cv_;
   std::unordered_map<std::string, uint64_t> channel_message_number_map_;
-  std::ofstream ofstream_;
 };
 
 template <typename T>
-bool RecordFileWriter::WriteSection(SectionType type, const T& message,
-                                    uint64_t fixed_size) {
-  if (!ofstream_.is_open()) {
-    AERROR << "ofstream if not open, file: " << path_;
+bool RecordFileWriter::WriteSection(const T& message) {
+  SectionType type;
+  if (std::is_same<T, ChunkHeader>::value) {
+    type = SectionType::SECTION_CHUNK_HEADER;
+  } else if (std::is_same<T, ChunkBody>::value) {
+    type = SectionType::SECTION_CHUNK_BODY;
+  } else if (std::is_same<T, Channel>::value) {
+    type = SectionType::SECTION_CHANNEL;
+  } else if (std::is_same<T, Header>::value) {
+    type = SectionType::SECTION_HEADER;
+    if (!SetPosition(0)) {
+      AERROR << "Jump to position #0 failed";
+      return false;
+    }
+  } else if (std::is_same<T, Index>::value) {
+    type = SectionType::SECTION_INDEX;
+  } else {
+    AERROR << "Do not support is template typename.";
     return false;
   }
-
-  std::string message_str;
-  if (!message.SerializeToString(&message_str)) {
-    AERROR << "protobuf message serialize to string fail.";
+  Section section = {type, (uint64_t)message.ByteSize()};
+  ssize_t count = write(fd_, &section, sizeof(section));
+  if (count < 0) {
+    AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
     return false;
   }
-
-  if (fixed_size > 0 && message_str.size() > fixed_size) {
-    AERROR << "message string's size is already larger than fixed size"
-           << ", size: " << message_str.size()
-           << ", fixed size: " << fixed_size;
+  if (count != sizeof(section)) {
+    AERROR << "Write fd failed, fd: " << fd_
+           << ", expect count: " << sizeof(section)
+           << ", actual count: " << count;
     return false;
   }
-
-  Section section = {type, message_str.size()};
-  ofstream_.write((const char*)&section, static_cast<int>(sizeof(section)));
-  ofstream_.write((const char*)message_str.c_str(), message_str.size());
-
-  if (fixed_size > 0) {
+  ZeroCopyOutputStream* raw_output = new FileOutputStream(fd_);
+  message.SerializeToZeroCopyStream(raw_output);
+  delete raw_output;
+  if (type == SectionType::SECTION_HEADER) {
     static char blank[HEADER_LENGTH] = {'0'};
-    ofstream_.write((const char*)blank, HEADER_LENGTH - message_str.size());
+    count = write(fd_, &blank, HEADER_LENGTH - message.ByteSize());
+    if (count < 0) {
+      AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
+      return false;
+    }
+    if (count != HEADER_LENGTH - message.ByteSize()) {
+      AERROR << "Write fd failed, fd: " << fd_
+             << ", expect count: " << sizeof(section)
+             << ", actual count: " << count;
+      return false;
+    }
   }
-
-  // ofstream_.flush();
+  header_.set_size(CurrentPosition());
   return true;
 }
 

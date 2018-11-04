@@ -16,7 +16,9 @@
 
 #include "cyber/record/file/record_file_writer.h"
 
+#include <fcntl.h>
 #include "cyber/common/file.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
@@ -29,77 +31,85 @@ RecordFileWriter::~RecordFileWriter() { Close(); }
 bool RecordFileWriter::Open(const std::string& path) {
   std::lock_guard<std::mutex> lock(mutex_);
   path_ = path;
-  std::ios_base::openmode mode = std::ios::binary | std::ios::out;
-  ofstream_.open(path, mode);
-  if (!ofstream_.is_open()) {
-    AERROR << "file [" << path << "] open error.";
+  if (::apollo::cyber::common::PathExists(path_)) {
+    AWARN << "File exist and overwrite, file: " << path_;
+  }
+  fd_ = open(path_.data(), O_CREAT | O_WRONLY,
+             S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+  if (fd_ < 0) {
+    AERROR << "Open file failed, file: " << path_ << ", fd: " << fd_
+           << ", errno: " << errno;
     return false;
   }
   chunk_active_.reset(new Chunk());
   chunk_flush_.reset(new Chunk());
   is_writing_ = true;
-
-  // start flush thread
   flush_thread_ = std::make_shared<std::thread>([this]() { this->Flush(); });
   if (flush_thread_ == nullptr) {
-    AERROR << "init flush thread error.";
+    AERROR << "Init flush thread error.";
     return false;
   }
-  ADEBUG << "record file opened, file: " << path_;
   return true;
 }
 
 void RecordFileWriter::Close() {
-  if (!ofstream_.is_open()) {
-    return;
-  }
-
   if (is_writing_) {
-    std::lock_guard<std::recursive_mutex> lock(chunk_mutex_);
     // wait for the flush operation that may exist now
     while (!chunk_flush_->empty()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
+    // last swap
     {
       std::unique_lock<std::mutex> flush_lock(flush_mutex_);
       chunk_flush_.swap(chunk_active_);
       flush_cv_.notify_one();
     }
+
+    // wait for the last flush opertation
     while (!chunk_flush_->empty()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    // chunk_active_->clear();
+
     is_writing_ = false;
     flush_cv_.notify_all();
-  }
+    if (flush_thread_ && flush_thread_->joinable()) {
+      flush_thread_->join();
+      flush_thread_ = nullptr;
+    }
 
-  if (flush_thread_ && flush_thread_->joinable()) {
-    flush_thread_->join();
-    flush_thread_ = nullptr;
-  }
+    if (!WriteIndex()) {
+      AERROR << "Write index section failed, file: " << path_;
+    }
 
-  try {
-    RefreshIndex();
-    WriteIndex(index_);
     header_.set_is_complete(true);
-    WriteHeader(header_);
-  } catch (std::exception& e) {
-    AERROR << "record file closed with exception : " << e.what();
-  }
+    if (!WriteHeader(header_)) {
+      AERROR << "Overwrite header section failed, file: " << path_;
+    }
 
-  ofstream_.close();
-  ADEBUG << "record file closed, file: " << path_;
+    if (close(fd_) < 0) {
+      AERROR << "Close file failed, file: " << path_ << ", fd: " << fd_
+             << ", errno: " << errno;
+      return;
+    }
+  }
 }
 
-void RecordFileWriter::RefreshIndex() {
+bool RecordFileWriter::WriteHeader(const Header& header) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  header_ = header;
+  if (!WriteSection<Header>(header_)) {
+    AERROR << "Write header section fail";
+    return false;
+  }
+  return true;
+}
+
+bool RecordFileWriter::WriteIndex() {
+  std::lock_guard<std::mutex> lock(mutex_);
   for (int i = 0; i < index_.indexes_size(); i++) {
     SingleIndex* single_index = index_.mutable_indexes(i);
     if (single_index->type() == SectionType::SECTION_CHANNEL) {
-      if (!single_index->has_channel_cache()) {
-        AERROR << "single channel index do not have channel_cache field.";
-        continue;
-      }
       ChannelCache* channel_cache = single_index->mutable_channel_cache();
       if (channel_message_number_map_.find(channel_cache->name()) !=
           channel_message_number_map_.end()) {
@@ -108,78 +118,53 @@ void RecordFileWriter::RefreshIndex() {
       }
     }
   }
-}
-
-bool RecordFileWriter::WriteHeader(const Header& header) {
-  std::lock_guard<std::mutex> lock(mutex_);
-  header_ = header;
-  ofstream_.seekp(0, std::ios::beg);
-  if (!WriteSection<Header>(SectionType::SECTION_HEADER, header_,
-                            HEADER_LENGTH)) {
-    AERROR << "write section fail";
+  header_.set_index_position(CurrentPosition());
+  if (!WriteSection<Index>(index_)) {
+    AERROR << "Write section fail";
     return false;
   }
-  return true;
-}
-
-bool RecordFileWriter::WriteIndex(const Index& index) {
-  std::lock_guard<std::mutex> lock(mutex_);
-
-  // update header
-  header_.set_index_position(ofstream_.tellp());
-
-  if (!WriteSection<Index>(SectionType::SECTION_INDEX, index, 0)) {
-    AERROR << "write section fail";
-    return false;
-  }
-
-  // update header
-  header_.set_size(ofstream_.tellp());
   return true;
 }
 
 bool RecordFileWriter::WriteChannel(const Channel& channel) {
   std::lock_guard<std::mutex> lock(mutex_);
-  if (!WriteSection<Channel>(SectionType::SECTION_CHANNEL, channel, 0)) {
-    AERROR << "write section fail";
+  if (!WriteSection<Channel>(channel)) {
+    AERROR << "Write section fail";
     return false;
   }
-
-  // update header
-  header_.set_size(ofstream_.tellp());
   header_.set_channel_number(header_.channel_number() + 1);
-
-  // update index
   SingleIndex* single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHANNEL);
-  single_index->set_position(ofstream_.tellp());
+  single_index->set_position(CurrentPosition());
   ChannelCache* channel_cache = new ChannelCache();
   channel_cache->set_name(channel.name());
   channel_cache->set_message_number(0);
   channel_cache->set_message_type(channel.message_type());
   channel_cache->set_proto_desc(channel.proto_desc());
   single_index->set_allocated_channel_cache(channel_cache);
-
   return true;
 }
 
 bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
                                   const ChunkBody& chunk_body) {
   std::lock_guard<std::mutex> lock(mutex_);
-
-  if (!WriteSection<ChunkHeader>(SectionType::SECTION_CHUNK_HEADER,
-                                 chunk_header, 0)) {
-    AERROR << "write chunk header fail";
+  if (!WriteSection<ChunkHeader>(chunk_header)) {
+    AERROR << "Write chunk header fail";
     return false;
   }
-
-  if (!WriteSection<ChunkBody>(SectionType::SECTION_CHUNK_BODY, chunk_body,
-                               0)) {
-    AERROR << "write chunk body fail";
+  SingleIndex* single_index = index_.add_indexes();
+  single_index->set_type(SectionType::SECTION_CHUNK_HEADER);
+  single_index->set_position(CurrentPosition());
+  ChunkHeaderCache* chunk_header_cache = new ChunkHeaderCache();
+  chunk_header_cache->set_begin_time(chunk_header.begin_time());
+  chunk_header_cache->set_end_time(chunk_header.end_time());
+  chunk_header_cache->set_message_number(chunk_header.message_number());
+  chunk_header_cache->set_raw_size(chunk_header.raw_size());
+  single_index->set_allocated_chunk_header_cache(chunk_header_cache);
+  if (!WriteSection<ChunkBody>(chunk_body)) {
+    AERROR << "Write chunk body fail";
     return false;
   }
-
-  // update header
   header_.set_chunk_number(header_.chunk_number() + 1);
   if (header_.begin_time() == 0) {
     header_.set_begin_time(chunk_header.begin_time());
@@ -187,66 +172,42 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
   header_.set_end_time(chunk_header.end_time());
   header_.set_message_number(header_.message_number() +
                              chunk_header.message_number());
-
-  // update index
-  SingleIndex* single_index = index_.add_indexes();
-  single_index->set_type(SectionType::SECTION_CHUNK_HEADER);
-  single_index->set_position(ofstream_.tellp());
-  ChunkHeaderCache* chunk_header_cache = new ChunkHeaderCache();
-  chunk_header_cache->set_begin_time(chunk_header.begin_time());
-  chunk_header_cache->set_end_time(chunk_header.end_time());
-  chunk_header_cache->set_message_number(chunk_header.message_number());
-  chunk_header_cache->set_raw_size(chunk_header.raw_size());
-  single_index->set_allocated_chunk_header_cache(chunk_header_cache);
-
-  // update index
   single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHUNK_BODY);
-  single_index->set_position(ofstream_.tellp());
+  single_index->set_position(CurrentPosition());
   ChunkBodyCache* chunk_body_cache = new ChunkBodyCache();
   chunk_body_cache->set_message_number(chunk_body.messages_size());
   single_index->set_allocated_chunk_body_cache(chunk_body_cache);
-
   return true;
 }
 
 bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
-  std::lock_guard<std::recursive_mutex> lock(chunk_mutex_);
-
   chunk_active_->add(message);
-
-  std::string channel_name = message.channel_name();
-  auto it = channel_message_number_map_.find(channel_name);
+  auto it = channel_message_number_map_.find(message.channel_name());
   if (it != channel_message_number_map_.end()) {
     it->second++;
   } else {
-    channel_message_number_map_.insert(std::make_pair(channel_name, 1));
+    channel_message_number_map_.insert(
+        std::make_pair(message.channel_name(), 1));
   }
-
   bool need_flush = false;
-
   if (header_.chunk_interval() > 0 &&
       message.time() - chunk_active_->header_.begin_time() >
           header_.chunk_interval()) {
     need_flush = true;
   }
-
   if (header_.chunk_raw_size() > 0 &&
       chunk_active_->header_.raw_size() > header_.chunk_raw_size()) {
     need_flush = true;
   }
-
   if (!need_flush) {
     return true;
   }
-
   {
     std::unique_lock<std::mutex> flush_lock(flush_mutex_);
     chunk_flush_.swap(chunk_active_);
     flush_cv_.notify_one();
   }
-
-  chunk_active_->clear();
   return true;
 }
 
@@ -262,10 +223,11 @@ void RecordFileWriter::Flush() {
       continue;
     }
     if (!WriteChunk(chunk_flush_->header_, chunk_flush_->body_)) {
-      AERROR << "write chunk fail.";
+      AERROR << "Write chunk fail.";
     }
     chunk_flush_->clear();
   }
+  return;
 }
 
 uint64_t RecordFileWriter::GetMessageNumber(

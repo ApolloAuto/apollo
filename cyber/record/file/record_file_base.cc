@@ -14,42 +14,41 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_RECORD_RECORD_BASE_H_
-#define CYBER_RECORD_RECORD_BASE_H_
+#include "cyber/record/file/record_file_base.h"
 
-#include <stdint.h>
-#include <string>
-
-#include "cyber/proto/record.pb.h"
+#include <sys/types.h>
+#include <unistd.h>
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {
 namespace record {
 
-class RecordBase {
- public:
-  virtual ~RecordBase() = default;
+uint64_t RecordFileBase::CurrentPosition() {
+  off_t pos = lseek(fd_, 0, SEEK_CUR);
+  if (pos < 0) {
+    AERROR << "lseek failed, file: " << path_ << ", fd: " << fd_
+           << ", offset: 0, whence: SEEK_CUR"
+           << ", position: " << pos << ", errno: " << errno;
+  }
+  return pos;
+}
 
-  virtual uint64_t GetMessageNumber(const std::string& channel_name) const = 0;
-
-  virtual const std::string& GetMessageType(
-      const std::string& channel_name) const = 0;
-
-  virtual const std::string& GetProtoDesc(
-      const std::string& channel_name) const = 0;
-
-  const proto::Header& GetHeader() const { return header_; }
-  const std::string GetFile() const { return file_; }
-
- protected:
-  std::string file_;
-  std::string null_type_;
-  proto::Header header_;
-  bool is_opened_ = false;
-};
+bool RecordFileBase::SetPosition(uint64_t position) {
+  if (position > INT64_MAX) {
+    AERROR << "position > INT64_MAX";
+    return false;
+  }
+  off_t pos = lseek(fd_, position, SEEK_SET);
+  if (pos < 0) {
+    AERROR << "lseek failed, file: " << path_ << ", fd: " << fd_
+           << ", offset: 0, whence: SEEK_SET"
+           << ", position: " << pos << ", errno: " << errno;
+    return false;
+  }
+  return true;
+}
 
 }  // namespace record
 }  // namespace cyber
 }  // namespace apollo
-
-#endif  // CYBER_RECORD_RECORD_BASE_H_

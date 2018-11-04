@@ -17,6 +17,10 @@
 #ifndef CYBER_RECORD_FILE_RECORD_FILE_READER_H_
 #define CYBER_RECORD_FILE_RECORD_FILE_READER_H_
 
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/text_format.h>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -25,10 +29,15 @@
 #include "cyber/common/log.h"
 #include "cyber/record/file/record_file_base.h"
 #include "cyber/record/file/section.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
 namespace record {
+
+using google::protobuf::io::ZeroCopyInputStream;
+using google::protobuf::io::FileInputStream;
+using google::protobuf::io::CodedInputStream;
 
 class RecordFileReader : public RecordFileBase {
  public:
@@ -36,49 +45,60 @@ class RecordFileReader : public RecordFileBase {
   virtual ~RecordFileReader();
   bool Open(const std::string& path) override;
   void Close() override;
+  bool Reset();
   bool ReadSection(Section* section);
-  void SkipSection(uint64_t size, uint64_t fixed_size = 0);
+  bool SkipSection(uint64_t size);
   template <typename T>
-  bool ReadSection(uint64_t size, T* message, uint64_t fixed_size = 0);
-  bool ReadHeader();
+  bool ReadSection(uint64_t size, T* message);
   bool ReadIndex();
-  bool EndOfFile();
-  void Reset();
-
  private:
-  std::ifstream ifstream_;
+  bool ReadHeader();
 };
 
 template <typename T>
-bool RecordFileReader::ReadSection(uint64_t size, T* message,
-                                   uint64_t fixed_size) {
-  if (size == 0) {
-    AERROR << "size is zero.";
-    return false;
+bool RecordFileReader::ReadSection(uint64_t size, T* message) {
+  static int BUF_SIZE = 1024 * 1024;
+  uint64_t pos = CurrentPosition();
+  if (size > BUF_SIZE) {
+    ZeroCopyInputStream* raw_input = new FileInputStream(fd_);
+    CodedInputStream* coded_input = new CodedInputStream(raw_input);
+    CodedInputStream::Limit limit = coded_input->PushLimit(size);
+    if (!message->ParseFromCodedStream(coded_input)) {
+      AERROR << "Parse section message failed.";
+      return false;
+    }
+    if (!coded_input->ConsumedEntireMessage()) {
+      AERROR << "Do not consumed entire message.";
+      return false;
+    }
+    coded_input->PopLimit(limit);
+    if (message->ByteSize() != size) {
+      AERROR << "Message size is not consistent in section header"
+             << ", expect: " << size << ", actual: " << message->ByteSize();
+      return false;
+    }
+    delete coded_input;
+    delete raw_input;
+  } else {
+    char buf[BUF_SIZE];
+    int count = read(fd_, buf, size);
+    if (count < 0) {
+      AERROR << "Read fd failed, fd_: " << fd_ << ", errno: " << errno;
+      return false;
+    }
+    if (count != size) {
+      AERROR << "Read fd failed, fd_: " << fd_ << ", expect count: " << size
+             << ", actual count: " << count;
+      return false;
+    }
+    T msg;
+    if (!msg.ParseFromString(std::string(buf, count))) {
+      AERROR << "Failed to parse section info.";
+      return false;
+    }
+    message->Swap(&msg);
   }
-  std::string str;
-  str.resize(size);
-  if (0 < fixed_size && fixed_size < size) {
-    AERROR << "size is larger than fixed size, size: " << size
-           << ", fixed size: " << fixed_size;
-    return false;
-  }
-  int64_t backup_position = ifstream_.tellg();
-  ifstream_.read(reinterpret_cast<char*>(const_cast<char*>(str.c_str())), size);
-  if (ifstream_.gcount() != size) {
-    AERROR << "read section message fail, expect size: " << size
-           << ", actual size: " << ifstream_.gcount();
-    return false;
-  }
-  if (fixed_size > size) {
-    ifstream_.seekg(backup_position + fixed_size, std::ios::beg);
-  }
-  T msg;
-  if (!msg.ParseFromString(str)) {
-    AERROR << "Failed to parse section info.";
-    return false;
-  }
-  message->Swap(&msg);
+  SetPosition(pos + size);
   return true;
 }
 

@@ -75,12 +75,12 @@ console.setFormatter(color_formatter)
 logger = logging.Logger(__name__)
 logger.addHandler(console)
 
-log_dir_path = os.path.join(cyber_path, 'log')
-if not os.path.exists(log_dir_path):
-    os.makedirs(log_dir_path)
-log_file_path = os.path.join(log_dir_path, 'cyber_launch.' + str(g_process_pid))
-file_hd = logging.FileHandler(filename=log_file_path)
-logger.addHandler(file_hd)
+#log_dir_path = os.path.join(cyber_path, 'log')
+#if not os.path.exists(log_dir_path):
+#    os.makedirs(log_dir_path)
+#log_file_path = os.path.join(log_dir_path, 'cyber_launch.' + str(g_process_pid))
+#file_hd = logging.FileHandler(filename=log_file_path)
+#logger.addHandler(file_hd)
 
 def exit_handler():
     stop()

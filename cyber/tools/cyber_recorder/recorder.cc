@@ -44,7 +44,15 @@ bool Recorder::Start() {
     AERROR << " _init_readers error.";
     return false;
   }
+  message_count_ = 0;
+  message_time_ = 0;
   is_started_ = true;
+  display_thread_ =
+      std::make_shared<std::thread>([this]() { this->ShowProgress(); });
+  if (display_thread_ == nullptr) {
+    AERROR << "init display thread error.";
+    return false;
+  }
   return true;
 }
 
@@ -59,6 +67,12 @@ bool Recorder::Stop() {
   }
   writer_->Close();
   node_.reset();
+  if (display_thread_ && display_thread_->joinable()) {
+    display_thread_->join();
+    display_thread_ = nullptr;
+  }
+  is_started_ = false;
+  is_stopping_ = false;
   return true;
 }
 
@@ -144,7 +158,6 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
         return;
       }
       share_this->ReaderCallback(raw_message, channel_name);
-      share_this->writer_->ShowProgress();
     };
     ReaderConfig config;
     config.channel_name = channel_name;
@@ -174,11 +187,25 @@ void Recorder::ReaderCallback(const std::shared_ptr<RawMessage>& message,
     return;
   }
 
-  if (!writer_->WriteMessage(channel_name, message,
-                             Time::Now().ToNanosecond())) {
+  message_time_ = Time::Now().ToNanosecond();
+  if (!writer_->WriteMessage(channel_name, message, message_time_)) {
     AERROR << "write data fail, channel: " << channel_name;
     return;
   }
+
+  message_count_++;
+}
+
+void Recorder::ShowProgress() {
+  while (is_started_ && !is_stopping_) {
+    std::cout << "\r[RUNNING]  Record Time: " << std::setprecision(3)
+              << message_time_ / 1000000000
+              << "    Progress: " << channel_reader_map_.size() << " channels, "
+              << message_count_ << " messages";
+    std::cout.flush();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+  std::cout << std::endl;
 }
 
 }  // namespace record

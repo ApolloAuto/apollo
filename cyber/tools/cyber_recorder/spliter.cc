@@ -56,10 +56,6 @@ bool Spliter::Proc() {
     AERROR << "open input file failed, file: " << input_file_;
     return false;
   }
-  if (!reader_.ReadHeader()) {
-    AERROR << "read input file header fail, file: " << input_file_;
-    return false;
-  }
   Header header = reader_.GetHeader();
   if (begin_time_ > header.end_time() || end_time_ < header.begin_time()) {
     AERROR << "time range " << begin_time_ << " to " << end_time_
@@ -80,8 +76,8 @@ bool Spliter::Proc() {
 
   // read through record file
   bool skip_next_chunk_body(false);
-  reader_.ReadHeader();
-  while (!reader_.EndOfFile()) {
+  reader_.Reset();
+  while (true) {
     Section section;
     if (!reader_.ReadSection(&section)) {
       AERROR << "read section failed.";
