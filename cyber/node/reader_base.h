@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "cyber/common/macros.h"
 #include "cyber/common/util.h"
@@ -48,6 +49,9 @@ class ReaderBase {
   virtual bool HasReceived() const = 0;
   virtual double GetDelaySec() const = 0;
   virtual uint32_t PendingQueueSize() const = 0;
+
+  virtual bool HasWriter() { return false; }
+  virtual void GetWriters(std::vector<proto::RoleAttributes>* writers) {}
 
   const std::string& GetChannelName() const {
     return role_attr_.channel_name();

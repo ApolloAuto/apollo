@@ -103,6 +103,11 @@ void ChannelManager::GetWritersOfChannel(const std::string& channel_name,
   channel_writers_.Search(key, writers);
 }
 
+bool ChannelManager::HasReader(const std::string& channel_name) {
+  uint64_t key = common::GlobalData::RegisterChannel(channel_name);
+  return channel_readers_.Search(key);
+}
+
 void ChannelManager::GetReaders(RoleAttrVec* readers) {
   RETURN_IF_NULL(readers);
   channel_readers_.GetAllRoles(readers);

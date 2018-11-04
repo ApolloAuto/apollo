@@ -77,6 +77,9 @@ class Reader : public ReaderBase {
   virtual Iterator Begin() const { return observed_queue_.begin(); }
   virtual Iterator End() const { return observed_queue_.end(); }
 
+  bool HasWriter() override;
+  void GetWriters(std::vector<proto::RoleAttributes>* writers) override;
+
  protected:
   double latest_recv_time_sec_ = -1.0;
   double second_to_lastest_recv_time_sec_ = -1.0;
@@ -291,6 +294,28 @@ void Reader<MessageT>::SetHistoryDepth(const uint32_t& depth) {
 template <typename MessageT>
 uint32_t Reader<MessageT>::GetHistoryDepth() const {
   return history_depth_;
+}
+
+template <typename MessageT>
+bool Reader<MessageT>::HasWriter() {
+  if (!init_.load()) {
+    return false;
+  }
+
+  return channel_manager_->HasWriter(role_attr_.channel_name());
+}
+
+template <typename MessageT>
+void Reader<MessageT>::GetWriters(std::vector<proto::RoleAttributes>* writers) {
+  if (writers == nullptr) {
+    return;
+  }
+
+  if (!init_.load()) {
+    return;
+  }
+
+  channel_manager_->GetWritersOfChannel(role_attr_.channel_name(), writers);
 }
 
 }  // namespace cyber

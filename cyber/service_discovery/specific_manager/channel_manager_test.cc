@@ -187,6 +187,12 @@ TEST_F(ChannelManagerTest, get_writers_attr) {
   EXPECT_EQ(writers.size(), 100);
 }
 
+TEST_F(ChannelManagerTest, has_reader) {
+  for (int i = 0; i < channel_num_; ++i) {
+    EXPECT_TRUE(channel_manager_.HasReader("channel_" + std::to_string(i)));
+  }
+}
+
 TEST_F(ChannelManagerTest, get_readers_attr) {
   std::vector<proto::RoleAttributes> readers;
   EXPECT_TRUE(readers.empty());

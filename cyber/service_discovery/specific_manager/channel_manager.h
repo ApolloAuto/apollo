@@ -57,6 +57,7 @@ class ChannelManager : public Manager {
   void GetWritersOfChannel(const std::string& channel_name,
                            RoleAttrVec* writers);
 
+  bool HasReader(const std::string& channel_name);
   void GetReaders(RoleAttrVec* readers);
   void GetReadersOfNode(const std::string& node_name, RoleAttrVec* readers);
   void GetReadersOfChannel(const std::string& channel_name,
