@@ -13,8 +13,10 @@ cc_library(
 
 cc_library(
     name = "record_file_base",
+    srcs = [ "file/record_file_base.cc", ],
     hdrs = [ "file/record_file_base.h", ],
     deps = [
+        "//cyber/common:log",
         "//cyber/proto:record_cc_proto",
     ],
 )
@@ -26,8 +28,9 @@ cc_library(
     deps = [
         "record_file_base",
         "section",
-        "//cyber/common:log",
         "//cyber/common:file",
+        "//cyber/time:time",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 
@@ -38,8 +41,9 @@ cc_library(
     deps = [
         "record_file_base",
         "section",
-        "//cyber/common:log",
         "//cyber/common:file",
+        "//cyber/time:time",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 

@@ -60,7 +60,7 @@ void RecordWriter::Close() {
   }
 }
 
-void RecordWriter::SplitOutfile() {
+bool RecordWriter::SplitOutfile() {
   file_writer_.reset(new RecordFileWriter());
   if (file_index_ > 99999) {
     AWARN << "More than 9999 record files had been recored, will restart"
@@ -73,16 +73,25 @@ void RecordWriter::SplitOutfile() {
   path_ = file_ + sstream_.str();
   segment_raw_size_ = 0;
   segment_begin_time_ = 0;
-  file_writer_->Open(path_);
-  file_writer_->WriteHeader(header_);
+  if (!file_writer_->Open(path_)) {
+    AERROR << "Open file failed, file: " << path_;
+    return false;
+  }
+  if (!file_writer_->WriteHeader(header_)) {
+    AERROR << "Write header failed, file: " << path_;
+    return false;
+  }
   for (const auto& i : channel_message_number_map_) {
     Channel channel;
     channel.set_name(i.first);
     channel.set_message_type(channel_message_type_map_[i.first]);
     channel.set_proto_desc(channel_proto_desc_map_[i.first]);
-    file_writer_->WriteChannel(channel);
+    if (!file_writer_->WriteChannel(channel)) {
+      AERROR << "Write channel fail, file: " << path_;
+      return false;
+    }
   }
-  AINFO << "split out new file: " << path_;
+  return true;
 }
 
 bool RecordWriter::WriteChannel(const std::string& channel_name,
@@ -128,17 +137,12 @@ bool RecordWriter::WriteMessage(const SingleMessage& message) {
        segment_raw_size_ > header_.segment_raw_size())) {
     file_writer_backup_.swap(file_writer_);
     file_writer_backup_->Close();
-    SplitOutfile();
+    if (!SplitOutfile()) {
+      AERROR << "Split out file failed.";
+      return false;
+    }
   }
   return true;
-}
-
-void RecordWriter::ShowProgress() {
-  static int total = 0;
-  std::cout << "\r[RUNNING]  Record : "
-            << "    total channel num : " << channel_message_number_map_.size()
-            << "  total msg num : " << ++total;
-  std::cout.flush();
 }
 
 bool RecordWriter::SetSizeOfFileSegmentation(uint64_t size_kilobytes) {

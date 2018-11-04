@@ -30,46 +30,40 @@ bool Info::Display(const std::string& file) {
     AERROR << "open record file error. file: " << file;
     return false;
   }
-
-  // read header section
-  if (!file_reader.ReadHeader()) {
-    AERROR << "read header section of the file fail. file: " << file;
-    return false;
-  }
   Header hdr = file_reader.GetHeader();
-
-  auto begin_time_s = hdr.begin_time() / 1e9;
-  auto end_time_s = hdr.end_time() / 1e9;
-
-  if (hdr.end_time() < hdr.begin_time()) {
-    std::cout << "hdr time invalid, please \"cyber_recorder recover\" first."
-              << std::endl;
-    std::cout << "recorder begin_time: " << hdr.begin_time()
-              << ", end_time: " << hdr.end_time() << std::endl;
-    return false;
-  }
-
-  auto duration_s = end_time_s - begin_time_s;
-  auto begin_time_str = UnixSecondsToString(begin_time_s);
-  auto end_time_str = UnixSecondsToString(end_time_s);
 
   std::cout << setiosflags(std::ios::left);
   std::cout << setiosflags(std::ios::fixed);
   unsigned int w = 16;
-  std::cout << std::setw(w) << "record_file:" << file << std::endl
-            << std::setw(w) << "version:" << hdr.major_version() << "."
-            << hdr.minor_version() << std::endl
-            << std::setw(w) << "duration:" << duration_s << " Seconds"
-            << std::endl
-            << std::setw(w) << "begin_time:" << begin_time_str << std::endl
-            << std::setw(w) << "end_time:" << end_time_str << std::endl
-            << std::setw(w) << "size:" << hdr.size() << " Bytes";
+
+  // file name
+  std::cout << std::setw(w) << "record_file:" << file << std::endl;
+
+  // version
+  std::cout << std::setw(w) << "version:" << hdr.major_version() << "."
+            << hdr.minor_version() << std::endl;
+
+  // time and duration
+  auto begin_time_s = static_cast<double>(hdr.begin_time()) / 1e9;
+  auto end_time_s = static_cast<double>(hdr.end_time()) / 1e9;
+  auto duration_s = end_time_s - begin_time_s;
+  auto begin_time_str = UnixSecondsToString(static_cast<int>(begin_time_s));
+  auto end_time_str = UnixSecondsToString(static_cast<int>(end_time_s));
+  std::cout << std::setw(w) << "duration:" << duration_s << " Seconds"
+            << std::endl;
+  std::cout << std::setw(w) << "begin_time:" << begin_time_str << std::endl;
+  std::cout << std::setw(w) << "end_time:" << end_time_str << std::endl;
+
+  // size
+  std::cout << std::setw(w) << "size:" << hdr.size() << " Bytes";
   if (hdr.size() >= (1024 * 1024 * 1024)) {
-    std::cout << " (" << hdr.size() / (1024 * 1024 * 1024.0) << " GB)";
+    std::cout << " (" << static_cast<double>(hdr.size()) / (1024 * 1024 * 1024)
+              << " GB)";
   } else if (hdr.size() >= (1024 * 1024)) {
-    std::cout << " (" << hdr.size() / (1024 * 1024.0) << " MB)";
+    std::cout << " (" << static_cast<double>(hdr.size()) / (1024 * 1024)
+              << " MB)";
   } else if (hdr.size() >= 1024) {
-    std::cout << " (" << hdr.size() / 1024.0 << " KB)";
+    std::cout << " (" << static_cast<double>(hdr.size()) / 1024 << " KB)";
   }
   std::cout << std::endl;
 
@@ -82,9 +76,11 @@ bool Info::Display(const std::string& file) {
   }
   std::cout << std::endl;
 
-  // channel_number
+  // message_number
   std::cout << std::setw(w) << "message_number:" << hdr.message_number()
             << std::endl;
+
+  // channel_number
   std::cout << std::setw(w) << "channel_number:" << hdr.channel_number()
             << std::endl;
 
@@ -95,6 +91,7 @@ bool Info::Display(const std::string& file) {
   }
   Index idx = file_reader.GetIndex();
 
+  // channel info
   for (int i = 0; i < idx.indexes_size(); i++) {
     ChannelCache* cache = idx.mutable_indexes(i)->mutable_channel_cache();
     if (idx.mutable_indexes(i)->type() == SectionType::SECTION_CHANNEL) {

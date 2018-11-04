@@ -59,6 +59,7 @@ class RecordReader : public RecordBase {
  private:
   bool ReadNextChunk(uint64_t begin_time, uint64_t end_time);
 
+  bool reach_end_;
   proto::ChunkBody chunk_;
   proto::Index index_;
   int message_index_ = 0;

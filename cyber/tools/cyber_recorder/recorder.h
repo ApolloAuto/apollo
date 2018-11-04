@@ -57,6 +57,7 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   bool is_stopping_ = false;
   std::shared_ptr<Node> node_ = nullptr;
   std::shared_ptr<RecordWriter> writer_ = nullptr;
+  std::shared_ptr<std::thread> display_thread_ = nullptr;
   Connection<const ChangeMsg&> change_conn_;
   std::string output_;
   bool all_channels_ = true;
@@ -64,6 +65,8 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   std::unordered_map<std::string, std::shared_ptr<ReaderBase>>
       channel_reader_map_;
   RecordConf record_conf_;
+  uint64_t message_count_;
+  uint64_t message_time_;
 
   bool InitReadersImpl();
 
@@ -78,6 +81,8 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
                       const std::string& channel_name);
 
   void FindNewChannel(const RoleAttributes& role_attr);
+
+  void ShowProgress();
 };
 
 }  // namespace record

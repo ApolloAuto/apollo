@@ -28,6 +28,7 @@ RecordReader::~RecordReader() {}
 
 RecordReader::RecordReader(const std::string& file) {
   file_reader_.reset(new RecordFileReader());
+  reach_end_ = false;
   if (!file_reader_->Open(file)) {
     AERROR << "Open record file failed, file: " << file;
     return;
@@ -50,10 +51,12 @@ RecordReader::RecordReader(const std::string& file) {
           std::make_pair(channel_cache->name(), *channel_cache));
     }
   }
+  file_reader_->Reset();
 }
 
 void RecordReader::Reset() {
   file_reader_->Reset();
+  reach_end_ = false;
   message_index_ = 0;
   chunk_ = ChunkBody();
 }
@@ -94,11 +97,16 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
 
 bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
   bool skip_next_chunk_body = false;
-  Section section;
-  while (file_reader_->ReadSection(&section)) {
+  while (!reach_end_) {
+    Section section;
+    if (!file_reader_->ReadSection(&section)) {
+      AERROR << "Read section failed, file: " << file_reader_->GetPath();
+      return false;
+    }
     switch (section.type) {
       case SectionType::SECTION_INDEX: {
         file_reader_->SkipSection(section.size);
+        reach_end_ = true;
         break;
       }
       case SectionType::SECTION_CHANNEL: {
@@ -138,7 +146,8 @@ bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
         return true;
       }
       default: {
-        AERROR << "Invalid section type: " << section.type;
+        AERROR << "Invalid section, type: " << section.type
+               << ", size: " << section.size;
         return false;
       }
     }

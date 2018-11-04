@@ -50,12 +50,15 @@ class RecordFileBase {
   std::string GetPath() { return path_; }
   Header GetHeader() { return header_; }
   Index GetIndex() { return index_; }
+  uint64_t CurrentPosition();
+  bool SetPosition(uint64_t position);
 
  protected:
   std::mutex mutex_;
   std::string path_;
   Header header_;
   Index index_;
+  int fd_;
 };
 
 }  // namespace record

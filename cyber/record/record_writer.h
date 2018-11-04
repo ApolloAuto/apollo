@@ -59,8 +59,6 @@ class RecordWriter : public RecordBase {
                     const uint64_t time_nanosec,
                     const std::string& proto_desc = "");
 
-  void ShowProgress();
-
   bool SetSizeOfFileSegmentation(uint64_t size_kilobytes);
 
   bool SetIntervalOfFileSegmentation(uint64_t time_sec);
@@ -75,13 +73,14 @@ class RecordWriter : public RecordBase {
 
  private:
   bool WriteMessage(const proto::SingleMessage& single_msg);
-  void SplitOutfile();
+  bool SplitOutfile();
   bool IsNewChannel(const std::string& channel_name);
   void OnNewChannel(const std::string& channel_name,
                     const std::string& message_type,
                     const std::string& proto_desc);
   void OnNewMessage(const std::string& channel_name);
 
+  std::string path_;
   uint64_t segment_raw_size_ = 0;
   uint64_t segment_begin_time_ = 0;
   uint32_t file_index_ = 0;

@@ -164,14 +164,12 @@ TEST(RecordTest, TestMutiMessageFile) {
   ASSERT_EQ("", rr->CurrentRawMessage()->message);
   ASSERT_EQ(0, rr->CurrentMessageTime());
 
-  ASSERT_FALSE(rr->EndOfFile());
   ASSERT_TRUE(rr->ReadMessage());
 
   ASSERT_EQ(CHANNEL_NAME_2, rr->CurrentMessageChannelName());
   ASSERT_EQ(pbmsg_content, rr->CurrentRawMessage()->message);
   ASSERT_EQ(TIME_2, rr->CurrentMessageTime());
 
-  ASSERT_TRUE(rr->EndOfFile());
   ASSERT_FALSE(rr->ReadMessage());
 
   delete rr;

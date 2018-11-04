@@ -33,10 +33,6 @@ bool Recoverer::Proc() {
     AERROR << "open input file failed, file: " << input_file_;
     return false;
   }
-  if (!reader_.ReadHeader()) {
-    AERROR << "read input file header fail, file: " << input_file_;
-    return false;
-  }
 
   // open output file
   Header new_hdr = HeaderBuilder::GetHeader();
@@ -74,8 +70,8 @@ bool Recoverer::Proc() {
   }
 
   // read through record file
-  reader_.ReadHeader();
-  while (!reader_.EndOfFile()) {
+  reader_.Reset();
+  while (true) {
     Section section;
     if (!reader_.ReadSection(&section)) {
       AINFO << "read section failed, try next.";
