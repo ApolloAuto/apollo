@@ -28,6 +28,7 @@ import numpy as np
 import tensorflow as tf
 import proto.fnn_model_pb2
 from proto.fnn_model_pb2 import FnnModel, Layer
+from sklearn.model_selection import train_test_split
 
 dim_input = 3 + 60
 dim_output = 12
@@ -98,12 +99,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     file = args.filename
     # load_data
-    train_data = load_data(file)
-    print("Data load success, with data shape: " + str(train_data.shape))
+    data = load_data(file)
+    print("Data load success, with data shape: " + str(data.shape))
+    train_data, test_data = train_test_split(data, test_size=0.2)
     X_train, Y_train = data_preprocessing(train_data)
+    X_test, Y_test = data_preprocessing(test_data)
     model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(30, activation=tf.nn.relu),
-        tf.keras.layers.Dense(15, activation=tf.nn.relu),
+        tf.keras.layers.Dense(20, activation=tf.nn.relu),
         tf.keras.layers.Dense(12, activation=tf.nn.softmax)])
     model.compile(optimizer='adam',
                   loss='categorical_crossentropy',
@@ -113,3 +116,5 @@ if __name__ == "__main__":
     model_path = os.path.join(os.getcwd(), "junction_mlp_model.bin")
     save_model(model, model_path)
     print("Model saved to: " + model_path)
+    score = model.evaluate(X_test, Y_test)
+    print("Testing accuracy is: " + str(score))
