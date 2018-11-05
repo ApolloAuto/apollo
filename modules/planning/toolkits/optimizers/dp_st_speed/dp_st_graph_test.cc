@@ -69,7 +69,7 @@ class DpStGraphTest : public ::testing::Test {
     AERROR << dp_config_.ShortDebugString();
 
     // speed_limit:
-    for (float s = 0; s < 200.0; s += 1.0) {
+    for (double s = 0; s < 200.0; s += 1.0) {
       speed_limit_.AppendSpeedLimit(s, 25.0);
     }
   }
@@ -120,7 +120,7 @@ TEST_F(DpStGraphTest, simple) {
   init_point_.set_v(10.0);
   init_point_.set_a(0.0);
 
-  const float path_data_length = 120.0;
+  const double path_data_length = 120.0;
 
   st_graph_data_ =
       StGraphData(boundaries, init_point_, speed_limit_, path_data_length);

@@ -44,7 +44,7 @@ using apollo::common::math::Vec2d;
 
 namespace {
 
-constexpr float kInf = std::numeric_limits<float>::infinity();
+constexpr double kInf = std::numeric_limits<double>::infinity();
 
 bool CheckOverlapOnDpStGraph(const std::vector<const StBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
@@ -82,7 +82,7 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
 }
 
 Status DpStGraph::Search(SpeedData* const speed_data) {
-  constexpr float kBounadryEpsilon = 1e-2;
+  constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
     if (boundary->boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
@@ -91,7 +91,7 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
       std::vector<SpeedPoint> speed_profile;
-      float t = 0.0;
+      double t = 0.0;
       for (int i = 0; i < dp_st_speed_config_.matrix_dimension_t();
            ++i, t += unit_t_) {
         SpeedPoint speed_point;
@@ -107,15 +107,15 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
   if (st_graph_data_.st_boundaries().empty()) {
     ADEBUG << "No path obstacles, dp_st_graph output default speed profile.";
     std::vector<SpeedPoint> speed_profile;
-    float s = 0.0;
-    float t = 0.0;
+    double s = 0.0;
+    double t = 0.0;
     for (int i = 0; i < dp_st_speed_config_.matrix_dimension_t() &&
                     i < dp_st_speed_config_.matrix_dimension_s();
          ++i, t += unit_t_, s += unit_s_) {
       SpeedPoint speed_point;
       speed_point.set_s(s);
       speed_point.set_t(t);
-      const float v_default = unit_s_ / unit_t_;
+      const double v_default = unit_s_ / unit_t_;
       speed_point.set_v(v_default);
       speed_point.set_a(0.0);
       speed_profile.emplace_back(std::move(speed_point));
@@ -152,10 +152,10 @@ Status DpStGraph::InitCostTable() {
   cost_table_ = std::vector<std::vector<StGraphPoint>>(
       dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
 
-  float curr_t = 0.0;
+  double curr_t = 0.0;
   for (uint32_t i = 0; i < cost_table_.size(); ++i, curr_t += unit_t_) {
     auto& cost_table_i = cost_table_[i];
-    float curr_s = 0.0;
+    double curr_s = 0.0;
     for (uint32_t j = 0; j < cost_table_i.size(); ++j, curr_s += unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
     }
@@ -172,7 +172,7 @@ Status DpStGraph::CalculateTotalCost() {
 
   for (size_t c = 0; c < cost_table_.size(); ++c) {
     int highest_row = 0;
-    int lowest_row = cost_table_.back().size() - 1;
+    auto lowest_row = cost_table_.back().size() - 1;
 
     int count = next_highest_row - next_lowest_row + 1;
     if (count > 0) {
@@ -195,12 +195,12 @@ Status DpStGraph::CalculateTotalCost() {
 
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
-      if (cost_cr.total_cost() < std::numeric_limits<float>::infinity()) {
+      if (cost_cr.total_cost() < std::numeric_limits<double>::infinity()) {
         int h_r = 0;
         int l_r = 0;
         GetRowRange(cost_cr, &h_r, &l_r);
         highest_row = std::max(highest_row, h_r);
-        lowest_row = std::min(lowest_row, l_r);
+        lowest_row = std::min(lowest_row, static_cast<size_t>(l_r));
       }
     }
     next_highest_row = highest_row;
@@ -212,18 +212,18 @@ Status DpStGraph::CalculateTotalCost() {
 
 void DpStGraph::GetRowRange(const StGraphPoint& point, int* next_highest_row,
                             int* next_lowest_row) {
-  float v0 = 0.0;
+  double v0 = 0.0;
   if (!point.pre_point()) {
     v0 = init_point_.v();
   } else {
     v0 = (point.index_s() - point.pre_point()->index_s()) * unit_s_ / unit_t_;
   }
 
-  const int max_s_size = cost_table_.back().size() - 1;
+  const auto max_s_size = cost_table_.back().size() - 1;
 
-  const float speed_coeff = unit_t_ * unit_t_;
+  const double speed_coeff = unit_t_ * unit_t_;
 
-  const float delta_s_upper_bound =
+  const double delta_s_upper_bound =
       v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
   *next_highest_row =
       point.index_s() + static_cast<int>(delta_s_upper_bound / unit_s_);
@@ -231,7 +231,7 @@ void DpStGraph::GetRowRange(const StGraphPoint& point, int* next_highest_row,
     *next_highest_row = max_s_size;
   }
 
-  const float delta_s_lower_bound = std::fmax(
+  const double delta_s_lower_bound = std::fmax(
       0.0, v0 * unit_t_ + vehicle_param_.max_deceleration() * speed_coeff);
   *next_lowest_row =
       point.index_s() + static_cast<int>(delta_s_lower_bound / unit_s_);
@@ -247,7 +247,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
   const uint32_t r = msg->r;
   auto& cost_cr = cost_table_[c][r];
   cost_cr.SetObstacleCost(dp_st_cost_.GetObstacleCost(cost_cr));
-  if (cost_cr.obstacle_cost() > std::numeric_limits<float>::max()) {
+  if (cost_cr.obstacle_cost() > std::numeric_limits<double>::max()) {
     return;
   }
 
@@ -258,10 +258,10 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
     return;
   }
 
-  float speed_limit =
+  double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
   if (c == 1) {
-    const float acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
+    const double acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
     if (acc < dp_st_speed_config_.max_deceleration() ||
         acc > dp_st_speed_config_.max_acceleration()) {
       return;
@@ -277,7 +277,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
     return;
   }
 
-  constexpr float kSpeedRangeBuffer = 0.20;
+  constexpr double kSpeedRangeBuffer = 0.20;
   const uint32_t max_s_diff =
       static_cast<uint32_t>(FLAGS_planning_upper_speed_limit *
                             (1 + kSpeedRangeBuffer) * unit_t_ / unit_s_);
@@ -287,7 +287,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
 
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      const float acc =
+      const double acc =
           (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
       if (acc < dp_st_speed_config_.max_deceleration() ||
           acc > dp_st_speed_config_.max_acceleration()) {
@@ -299,8 +299,9 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
         continue;
       }
 
-      const float cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
-                         CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
+      const double cost = cost_cr.obstacle_cost() +
+          pre_col[r_pre].total_cost() +
+          CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
 
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
@@ -315,7 +316,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
       continue;
     }
 
-    const float curr_a = (cost_cr.index_s() * unit_s_ +
+    const double curr_a = (cost_cr.index_s() * unit_s_ +
                           pre_col[r_pre].pre_point()->index_s() * unit_s_ -
                           2 * pre_col[r_pre].index_s() * unit_s_) /
                          (unit_t_ * unit_t_);
@@ -341,7 +342,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
     const STPoint& prepre_point = prepre_graph_point.point();
     const STPoint& pre_point = pre_col[r_pre].point();
     const STPoint& curr_point = cost_cr.point();
-    float cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+    double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
                  CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
                                    curr_point, speed_limit);
 
@@ -353,7 +354,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
 }
 
 Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
-  float min_cost = std::numeric_limits<float>::infinity();
+  double min_cost = std::numeric_limits<double>::infinity();
   const StGraphPoint* best_end_point = nullptr;
   for (const StGraphPoint& cur_point : cost_table_.back()) {
     if (!std::isinf(cur_point.total_cost()) &&
@@ -389,7 +390,7 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   }
   std::reverse(speed_profile.begin(), speed_profile.end());
 
-  constexpr float kEpsilon = std::numeric_limits<float>::epsilon();
+  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
   if (speed_profile.front().t() > kEpsilon ||
       speed_profile.front().s() > kEpsilon) {
     const std::string msg = "Fail to retrieve speed profile.";
@@ -400,18 +401,18 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   return Status::OK();
 }
 
-float DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
+double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
                                    const STPoint& third, const STPoint& forth,
-                                   const float speed_limit) {
+                                   const double speed_limit) {
   return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
-float DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
-                                               const float speed_limit) {
-  float init_speed = init_point_.v();
-  float init_acc = init_point_.a();
+double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
+                                               const double speed_limit) {
+  double init_speed = init_point_.v();
+  double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
   const STPoint& curr_point = cost_table_[1][row].point();
   return dp_st_cost_.GetSpeedCost(pre_point, curr_point, speed_limit) +
@@ -421,10 +422,10 @@ float DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
                                             curr_point);
 }
 
-float DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
+double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
                                               const uint32_t pre_row,
-                                              const float speed_limit) {
-  float init_speed = init_point_.v();
+                                              const double speed_limit) {
+  double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();
   const STPoint& third = cost_table_[2][curr_row].point();

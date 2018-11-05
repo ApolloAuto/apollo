@@ -65,14 +65,14 @@ class DpStGraph {
   };
   void CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg);
 
-  float CalculateEdgeCost(const STPoint& first, const STPoint& second,
+  double CalculateEdgeCost(const STPoint& first, const STPoint& second,
                           const STPoint& third, const STPoint& forth,
-                          const float speed_limit);
-  float CalculateEdgeCostForSecondCol(const uint32_t row,
-                                      const float speed_limit);
-  float CalculateEdgeCostForThirdCol(const uint32_t curr_r,
+                          const double speed_limit);
+  double CalculateEdgeCostForSecondCol(const uint32_t row,
+                                      const double speed_limit);
+  double CalculateEdgeCostForThirdCol(const uint32_t curr_r,
                                      const uint32_t pre_r,
-                                     const float speed_limit);
+                                     const double speed_limit);
 
   void GetRowRange(const StGraphPoint& point, int* highest_row,
                    int* lowest_row);
@@ -98,8 +98,8 @@ class DpStGraph {
 
   const SLBoundary& adc_sl_boundary_;
 
-  float unit_s_ = 0.0;
-  float unit_t_ = 0.0;
+  double unit_s_ = 0.0;
+  double unit_t_ = 0.0;
 
   // cost_table_[t][s]
   // row: s, col: t --- NOTICE: Please do NOT change.

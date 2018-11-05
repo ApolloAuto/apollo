@@ -294,10 +294,11 @@ Box2d TrajectoryCost::GetBoxFromSLPoint(const common::SLPoint &sl,
 }
 
 // TODO(All): optimize obstacle cost calculation time
-ComparableCost TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
-                                         const double start_s, const double end_s,
-                                         const uint32_t curr_level,
-                                         const uint32_t total_level) {
+ComparableCost TrajectoryCost::Calculate(
+    const QuinticPolynomialCurve1d &curve,
+    const double start_s, const double end_s,
+    const uint32_t curr_level,
+    const uint32_t total_level) {
   ComparableCost total_cost;
   // path cost
   total_cost +=
