@@ -67,9 +67,15 @@ def data_splitting(feature):
     '''
     Split data into two categories: go and cut-in.
     '''
-    go_idx = (feature[:,-2]==0) + (feature[:,-2]==1) + (feature[:,-2]==4)
-    cutin_idx = (feature[:,-2]==-1) + (feature[:,-2]==2) + (feature[:,-2]==3)
 
+    # Don't consider those anomaly data
+    idx_normal = (feature[:, -3] != -10)
+    go_idx = (feature[:, -3] % 2 == 0)
+    cutin_idx = (feature[:, -3] % 2 == 1)
+
+    go_idx = np.logical_and(go_idx, idx_normal)
+    cutin_idx = np.logical_and(cutin_idx, idx_normal)
+    
     feature = np.asarray(feature)
 
     return feature[go_idx], feature[cutin_idx]
