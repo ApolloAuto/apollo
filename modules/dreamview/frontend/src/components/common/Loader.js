@@ -9,16 +9,20 @@ import loaderGif from "assets/images/loader_apollo.gif";
 
 export default class Loader extends React.Component {
     render() {
-        const { height, extraClasses } = this.props;
-        const message = OFFLINE_PLAYBACK
-                            ? "Loading ...." : "Please send car initial position and map data.";
+        const { height, extraClasses, offlineViewErr } = this.props;
+        let message = "Please send car initial position and map data.";
+        if (OFFLINE_PLAYBACK) {
+            message = offlineViewErr || "Loading ....";
+        }
         const imgSrc = OFFLINE_PLAYBACK ? loaderGif : loaderImg;
 
         return (
             <div className="loader"style={{height: height}}>
                 <div className={classNames("img-container", extraClasses)}>
                     <img src={imgSrc} alt="Loader"/>
-                    <div className="status-message">{message}</div>
+                    <div className={offlineViewErr ? 'error-message' : 'status-message'}>
+                        {message}
+                    </div>
                 </div>
             </div>
         );

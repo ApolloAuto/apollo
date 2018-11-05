@@ -33,12 +33,13 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
+        const { isInitialized, dimension, sceneDimension, options, hmi,
+            offlineViewErrorMsg } = this.props.store;
 
         if (!isInitialized) {
             return (
                 <div className="offlineview">
-                    <Loader extraClasses="offline-loader"/>
+                    <Loader extraClasses="offline-loader" offlineViewErr={offlineViewErrorMsg} />
                 </div>
             );
         }

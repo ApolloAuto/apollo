@@ -1349,6 +1349,15 @@ body {
             top: -4.5vw;
             font-size: 3vw;
         }
+
+        .error-message {
+            position: relative;
+            top: -2vw;
+            font-size: 1.5vw;
+            color: #B43131;
+            white-space: nowrap;
+            text-align: center;
+        }
     }
 }
 

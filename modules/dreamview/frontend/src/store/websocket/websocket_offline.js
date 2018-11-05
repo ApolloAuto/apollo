@@ -19,6 +19,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
             STORE.playback.setMapId(params.map);
         } else {
             console.error("ERROR: missing required parameter(s)");
+            STORE.setOfflineViewErrorMsg("Missing required parameter(s).");
             return;
         }
 
@@ -40,7 +41,10 @@ export default class OfflinePlaybackWebSocketEndpoint {
         };
         this.websocket.onmessage = event => {
             const message = JSON.parse(event.data);
-
+            if (message.load_error) {
+                STORE.setOfflineViewErrorMsg(message.load_error);
+                return;
+            }
             switch (message.type) {
                 case "GroundMetadata":
                     RENDERER.updateGroundMetadata(this.serverUrl, message.data);
