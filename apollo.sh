@@ -241,6 +241,10 @@ function cibuild() {
   fi
 }
 
+function apollo_build_fast() {
+  build "fastbuild" $@
+}
+
 function apollo_build_dbg() {
   build "dbg" $@
 }
@@ -667,7 +671,7 @@ function main() {
     build)
       DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       USE_GPU="1"
-      apollo_build_dbg $@
+      apollo_build_fast $@
       ;;
     build_cpu)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
