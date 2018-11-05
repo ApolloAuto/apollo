@@ -21,11 +21,6 @@
 #include <iomanip>
 #include <sstream>
 
-namespace {
-constexpr int INT_FLOAT_PRECISION = 6;
-constexpr int DOULBE_PRECISION = 9;
-}  // namespace
-
 GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
                                const google::protobuf::Message* msg,
                                const google::protobuf::Reflection* reflection,

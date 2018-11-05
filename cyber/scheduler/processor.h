@@ -40,7 +40,7 @@ using apollo::cyber::proto::SchedStrategy;
 class Processor {
  public:
   Processor();
-  virtual ~Processor();
+  ~Processor();
 
   void Run();
   void Start();

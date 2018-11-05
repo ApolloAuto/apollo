@@ -108,6 +108,7 @@ bool MultiValueWarehouse::Search(uint64_t key,
                                  std::vector<RolePtr>* matched_roles) {
   RETURN_VAL_IF_NULL(matched_roles, false);
   bool find = false;
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   auto range = roles_.equal_range(key);
   for_each(range.first, range.second,
            [&matched_roles, &find](RoleMap::value_type& item) {
@@ -121,6 +122,7 @@ bool MultiValueWarehouse::Search(
     uint64_t key, std::vector<RoleAttributes>* matched_roles_attr) {
   RETURN_VAL_IF_NULL(matched_roles_attr, false);
   bool find = false;
+  ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   auto range = roles_.equal_range(key);
   for_each(range.first, range.second,
            [&matched_roles_attr, &find](RoleMap::value_type& item) {
