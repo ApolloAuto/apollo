@@ -86,13 +86,13 @@ bool TrafficLightsPerceptionComponent::Init() {
     return false;
   }
 
-  if (InitCameraListeners() != cyber::SUCC) {
-    AERROR << "TrafficLightsPerceptionComponent InitCameraListeners failed.";
+  if (InitCameraFrame() != cyber::SUCC) {
+    AERROR << "TrafficLightsPerceptionComponent InitCameraFrame failed.";
     return false;
   }
 
-  if (InitCameraFrame() != cyber::SUCC) {
-    AERROR << "TrafficLightsPerceptionComponent InitCameraFrame failed.";
+  if (InitCameraListeners() != cyber::SUCC) {
+    AERROR << "TrafficLightsPerceptionComponent InitCameraListeners failed.";
     return false;
   }
 
