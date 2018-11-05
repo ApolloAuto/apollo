@@ -49,6 +49,7 @@ class Processor;
 class ProcessorContext {
  public:
   ProcessorContext() {}
+  virtual ~ProcessorContext() {}
 
   void ShutDown();
 

@@ -17,6 +17,7 @@
 #include "cyber/service_discovery/specific_manager/service_manager.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
+#include "cyber/common/util.h"
 #include "cyber/time/time.h"
 
 namespace apollo {
@@ -33,7 +34,7 @@ ServiceManager::ServiceManager() {
 ServiceManager::~ServiceManager() {}
 
 bool ServiceManager::HasService(const std::string& service_name) {
-  uint64_t key = common::GlobalData::RegisterService(service_name);
+  uint64_t key = common::Hash(service_name);
   return servers_.Search(key);
 }
 
@@ -45,7 +46,7 @@ void ServiceManager::GetServers(RoleAttrVec* servers) {
 void ServiceManager::GetClients(const std::string& service_name,
                                 RoleAttrVec* clients) {
   RETURN_IF_NULL(clients);
-  uint64_t key = common::GlobalData::RegisterService(service_name);
+  uint64_t key = common::Hash(service_name);
   clients_.Search(key, clients);
 }
 
