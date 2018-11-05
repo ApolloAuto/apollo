@@ -64,7 +64,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   // 1. Build Predicition Environments.
   predicted_bounding_rectangles_.clear();
-  {
+  if (FLAGS_enable_open_space_planner_thread) {
     std::lock_guard<std::mutex> lock(open_space_mutex_);
     BuildPredictedEnvironment(frame->obstacles());
 
@@ -91,6 +91,67 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // TODO(Jiaxuan): Choose the current_trajectory in trajectory_partition_
     // If the vehicle each the end point of current trajectory and stop
     // Then move to the next Trajectory
+    current_trajectory_ =
+        trajectory_partition_.adc_trajectory(current_trajectory_index_);
+
+    TrajectoryPoint end_point = current_trajectory_.trajectory_point(
+        current_trajectory_.trajectory_point_size() - 1);
+
+    if (vehicle_state_.linear_velocity() <= 1e-3 &&
+        std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
+                      (vehicle_state_.x() - end_point.path_point().x()) +
+                  (vehicle_state_.y() - end_point.path_point().y()) *
+                      (vehicle_state_.y() - end_point.path_point().y())) <
+            planner_open_space_config_.max_position_error_to_end_point() &&
+        std::abs(vehicle_state_.heading() - end_point.path_point().theta()) <
+            planner_open_space_config_.max_theta_error_to_end_point() &&
+        (current_trajectory_index_ <
+         trajectory_partition_.adc_trajectory_size() - 1)) {
+      current_trajectory_index_ += 1;
+    }
+
+    // 4. Collision check for updated trajectory, if pass, update frame, else,
+    // return error status
+
+    if (IsCollisionFreeTrajectory(current_trajectory_)) {
+      frame->mutable_trajectory()->CopyFrom(current_trajectory_);
+      return Status::OK();
+    } else {
+      // If collision happens, return wrong planning status and estop
+      // trajectory would be sent in std planning
+      return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+    }
+  } else {
+    // Single thread logic
+
+    vehicle_state_ = frame->vehicle_state();
+    rotate_angle_ = frame->origin_heading();
+    translate_origin_ = frame->origin_point();
+    end_pose_ = frame->open_space_end_pose();
+    obstacles_num_ = frame->obstacles_num();
+    obstacles_edges_num_ = frame->obstacles_edges_num();
+    obstacles_A_ = frame->obstacles_A();
+    obstacles_b_ = frame->obstacles_b();
+    obstalce_list_ = frame->openspace_warmstart_obstacles();
+    XYbounds_ = frame->ROI_xy_boundary();
+
+    // 2. Generate Trajectory;
+    Status status = open_space_trajectory_generator_->Plan(
+        vehicle_state_, XYbounds_, rotate_angle_, translate_origin_, end_pose_,
+        obstacles_num_, obstacles_edges_num_, obstacles_A_, obstacles_b_,
+        obstalce_list_);
+
+    // 3. If status is OK, update vehicle trajectory;
+    if (status == Status::OK()) {
+      open_space_trajectory_generator_->UpdateTrajectory(
+          &trajectory_partition_);
+      AINFO << "Trajectory caculation updated, new results : "
+            << trajectory_partition_.ShortDebugString();
+    } else {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Planning failed to generate open space trajectory");
+    }
+
     current_trajectory_ =
         trajectory_partition_.adc_trajectory(current_trajectory_index_);
 
