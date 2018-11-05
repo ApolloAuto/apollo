@@ -48,6 +48,13 @@ cyber_modules {
   }
 }
 cyber_modules {
+  key: "Traffic Light"
+  value: {
+    process_name: "perception_trafficlights"
+    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
+  }
+}
+cyber_modules {
   key: "Planning"
   value: {
     process_name: "planning"
