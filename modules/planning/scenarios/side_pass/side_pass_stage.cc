@@ -108,7 +108,7 @@ Stage::StageStatus SidePassGeneratePath::Process(
       return Stage::FINISHED;
     } else {
       return Stage::RUNNING;
-    } 
+    }
   }
   return Stage::ERROR;
 }
@@ -162,7 +162,7 @@ Stage::StageStatus SidePassDetectSafety::Process(
       frame->reference_line_info().front().path_decision();
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     // TODO(All): check according to neighbor lane.
-    if (obstacle->IsVirtual() &&  obstacle->Id().substr(0,3) == "SP_" && 
+    if (obstacle->IsVirtual() && obstacle->Id().substr(0, 3) == "SP_" &&
         obstacle->PerceptionSLBoundary().start_s() >= adc_front_edge_s) {
       is_safe = false;
       break;
