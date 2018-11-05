@@ -224,7 +224,7 @@ export default class PlanningData {
     const currScenario = this.scenarioHistory.length > 0
             ? this.scenarioHistory[this.scenarioHistory.length - 1] : {};
 
-    if (currScenario.scenarioType !== newScenario.scenarioType &&
+    if (currScenario.scenarioType !== newScenario.scenarioType ||
         currScenario.stageType !== newScenario.stageType) {
       this.scenarioHistory.push({
         time: newTime,
