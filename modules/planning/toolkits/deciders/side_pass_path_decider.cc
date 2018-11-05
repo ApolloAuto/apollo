@@ -102,6 +102,11 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
       reference_line_info->reference_line(),
       reference_line_info->path_decision()->obstacles());
 
+  for (const auto &bd : lateral_bounds) {
+    ADEBUG << std::get<0>(bd) << ": " << std::get<1>(bd) << ", "
+           << std::get<2>(bd);
+  }
+
   // Call optimizer to generate smooth path.
   fem_qp_->SetVariableBounds(lateral_bounds);
   if (!fem_qp_->Optimize()) {

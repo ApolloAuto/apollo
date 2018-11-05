@@ -71,10 +71,16 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     AERROR << "Fail to get move forward last path point.";
     return Stage::ERROR;
   }
+  ADEBUG << "first_path_point: " << first_path_point.ShortDebugString();
+  ADEBUG << "last_path_point : " << first_path_point.ShortDebugString();
+
   double move_forward_distance = last_path_point.s() - first_path_point.s();
+  ADEBUG << "move_forward_distance: " << move_forward_distance;
+
   if (!IsFarAwayFromObstacles(reference_line, path_decision.obstacles(),
                               first_path_point, last_path_point)) {
     // wait here, do nothing this cycle.
+    AINFO << "waiting until obstacles are far away.";
     return Stage::RUNNING;
   }
 
@@ -99,7 +105,10 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   rfl_info.SetTrajectory(trajectory);
   rfl_info.SetDrivable(true);
 
-  next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
+  constexpr double kBuffer = 0.3;
+  if (move_forward_distance < kBuffer) {
+    next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
+  }
   return Stage::FINISHED;
 }
 
