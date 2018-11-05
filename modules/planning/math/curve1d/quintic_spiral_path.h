@@ -47,7 +47,7 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
                     const double kappa1, const double dkappa1,
                     const double delta_s);
 
-  template <std::size_t N>
+  template <size_t N>
   double ComputeCartesianDeviationX(const double s) const {
     auto cos_theta = [this](const double s) {
       const auto a = Evaluate(0, s);
@@ -56,7 +56,7 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     return common::math::IntegrateByGaussLegendre<N>(cos_theta, 0.0, s);
   }
 
-  template <std::size_t N>
+  template <size_t N>
   double ComputeCartesianDeviationY(const double s) const {
     auto sin_theta = [this](const double s) {
       const auto a = Evaluate(0, s);
@@ -65,15 +65,15 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     return common::math::IntegrateByGaussLegendre<N>(sin_theta, 0.0, s);
   }
 
-  template <std::size_t N>
+  template <size_t N>
   std::pair<double, double> DeriveCartesianDeviation(
-      const std::size_t param_index) const {
+      const size_t param_index) const {
     auto gauss_points = common::math::GetGaussLegendrePoints<N>();
     std::array<double, N> x = gauss_points.first;
     std::array<double, N> w = gauss_points.second;
 
     std::pair<double, double> cartesian_deviation = {0.0, 0.0};
-    for (std::size_t i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       double r = 0.5 * x[i] + 0.5;
       auto curr_theta = Evaluate(0, r * param_);
       double derived_theta = DeriveTheta(param_index, r);
@@ -87,7 +87,7 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     cartesian_deviation.second *= param_ * 0.5;
 
     if (param_index == DELTA_S) {
-      for (std::size_t i = 0; i < N; ++i) {
+      for (size_t i = 0; i < N; ++i) {
         double r = 0.5 * x[i] + 0.5;
         auto theta_angle = Evaluate(0, r * param_);
 
@@ -98,25 +98,25 @@ class QuinticSpiralPath : public QuinticPolynomialCurve1d {
     return cartesian_deviation;
   }
 
-  double DeriveKappaDerivative(const std::size_t param_index,
+  double DeriveKappaDerivative(const size_t param_index,
                                const double ratio) const;
 
-  double DeriveDKappaDerivative(const std::size_t param_index,
+  double DeriveDKappaDerivative(const size_t param_index,
                                 const double ratio) const;
 
-  double DeriveD2KappaDerivative(const std::size_t param_index,
+  double DeriveD2KappaDerivative(const size_t param_index,
                                  const double r) const;
 
-  static const std::size_t THETA0 = 0;
-  static const std::size_t KAPPA0 = 1;
-  static const std::size_t DKAPPA0 = 2;
-  static const std::size_t THETA1 = 3;
-  static const std::size_t KAPPA1 = 4;
-  static const std::size_t DKAPPA1 = 5;
-  static const std::size_t DELTA_S = 6;
+  static const size_t THETA0 = 0;
+  static const size_t KAPPA0 = 1;
+  static const size_t DKAPPA0 = 2;
+  static const size_t THETA1 = 3;
+  static const size_t KAPPA1 = 4;
+  static const size_t DKAPPA1 = 5;
+  static const size_t DELTA_S = 6;
 
  private:
-  double DeriveTheta(const std::size_t param_index,
+  double DeriveTheta(const size_t param_index,
                      const double delta_s_ratio) const;
 
   std::array<std::array<double, 7>, 6> coef_deriv_;

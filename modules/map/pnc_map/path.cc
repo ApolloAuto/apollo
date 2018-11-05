@@ -220,9 +220,10 @@ std::vector<MapPathPoint> MapPathPoint::GetPointsFromLane(LaneInfoConstPtr lane,
       const auto& segment = lane->segments()[i];
       const double next_accumulate_s = accumulate_s + segment.length();
       if (start_s > accumulate_s && start_s < next_accumulate_s) {
-        points.emplace_back(segment.start() + segment.unit_direction() *
-                                                  (start_s - accumulate_s),
-                            lane->headings()[i], LaneWaypoint(lane, start_s));
+        points.emplace_back(
+            segment.start() +
+                segment.unit_direction() * (start_s - accumulate_s),
+            lane->headings()[i], LaneWaypoint(lane, start_s));
       }
       if (end_s > accumulate_s && end_s < next_accumulate_s) {
         points.emplace_back(
@@ -1105,7 +1106,7 @@ bool PathApproximation::GetProjection(const Path& path,
     distance_sqr_to_segments.push_back(distance_sqr);
     if (distance_sqr < min_distance_sqr) {
       min_distance_sqr = distance_sqr;
-      estimate_nearest_segment_idx = i;
+      estimate_nearest_segment_idx = static_cast<int>(i);
     }
   }
   if (estimate_nearest_segment_idx < 0) {

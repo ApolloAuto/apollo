@@ -110,7 +110,7 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
   if (first_join) {
     lower = std::lower_bound(accumulated_s.begin(), accumulated_s.end(),
                              first_sl.s());
-    std::size_t start_i = std::distance(accumulated_s.begin(), lower);
+    size_t start_i = std::distance(accumulated_s.begin(), lower);
     reference_points_.insert(reference_points_.begin(), other_points.begin(),
                              other_points.begin() + start_i);
   }
@@ -128,8 +128,8 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
 ReferencePoint ReferenceLine::GetNearestReferencePoint(
     const common::math::Vec2d& xy) const {
   double min_dist = std::numeric_limits<double>::max();
-  int min_index = 0;
-  for (std::size_t i = 0; i < reference_points_.size(); ++i) {
+  size_t min_index = 0;
+  for (size_t i = 0; i < reference_points_.size(); ++i) {
     const double distance = DistanceXY(xy, reference_points_[i]);
     if (distance < min_dist) {
       min_dist = distance;
@@ -233,7 +233,7 @@ ReferencePoint ReferenceLine::GetNearestReferencePoint(const double s) const {
   }
 }
 
-std::size_t ReferenceLine::GetNearestReferenceIndex(const double s) const {
+size_t ReferenceLine::GetNearestReferenceIndex(const double s) const {
   const auto& accumulated_s = map_path_.accumulated_s();
   if (s < accumulated_s.front() - 1e-2) {
     AWARN << "The requested s " << s << " < 0";
@@ -281,8 +281,8 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
 
   auto interpolate_index = map_path_.GetIndexFromS(s);
 
-  uint32_t index = interpolate_index.id;
-  uint32_t next_index = index + 1;
+  size_t index = interpolate_index.id;
+  size_t next_index = index + 1;
   if (next_index >= reference_points_.size()) {
     next_index = reference_points_.size() - 1;
   }
@@ -323,9 +323,9 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double x,
   };
 
   double d_min = func_distance_square(reference_points_.front(), x, y);
-  double index_min = 0;
+  size_t index_min = 0;
 
-  for (uint32_t i = 1; i < reference_points_.size(); ++i) {
+  for (size_t i = 1; i < reference_points_.size(); ++i) {
     double d_temp = func_distance_square(reference_points_[i], x, y);
     if (d_temp < d_min) {
       d_min = d_temp;
@@ -333,8 +333,8 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double x,
     }
   }
 
-  uint32_t index_start = (index_min == 0 ? index_min : index_min - 1);
-  uint32_t index_end =
+  size_t index_start = (index_min == 0 ? index_min : index_min - 1);
+  size_t index_end =
       (index_min + 1 == reference_points_.size() ? index_min : index_min + 1);
 
   if (index_start == index_end) {

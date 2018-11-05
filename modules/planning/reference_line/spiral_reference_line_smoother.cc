@@ -75,7 +75,7 @@ bool SpiralReferenceLineSmoother::Smooth(
     Smooth(raw_point2d, &opt_theta, &opt_kappa, &opt_dkappa, &opt_s, &opt_x,
            &opt_y);
   } else {
-    std::size_t start_index = 0;
+    size_t start_index = 0;
     for (const auto& anchor_point : anchor_points_) {
       if (anchor_point.enforced) {
         start_index++;
@@ -92,7 +92,7 @@ bool SpiralReferenceLineSmoother::Smooth(
       }
     } else {
       std::vector<double> overhead_s;
-      for (std::size_t i = 0; i + 1 < start_index; ++i) {
+      for (size_t i = 0; i + 1 < start_index; ++i) {
         const auto& p0 = anchor_points_[i];
         const auto& p1 = anchor_points_[i + 1];
         overhead_s.push_back(p1.path_point.s() - p0.path_point.s());
@@ -103,7 +103,7 @@ bool SpiralReferenceLineSmoother::Smooth(
       std::vector<double> overhead_dkappa;
       std::vector<double> overhead_x;
       std::vector<double> overhead_y;
-      for (std::size_t i = 0; i < anchor_points_.size(); ++i) {
+      for (size_t i = 0; i < anchor_points_.size(); ++i) {
         const auto& p = anchor_points_[i];
         if (i + 1 < start_index) {
           overhead_theta.push_back(p.path_point.theta());
@@ -323,7 +323,7 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
                     dkappa.front());
   smoothed_point2d.push_back(first_point);
 
-  for (std::size_t i = 0; i + 1 < theta.size(); ++i) {
+  for (size_t i = 0; i + 1 < theta.size(); ++i) {
     double start_x = x[i];
     double start_y = y[i];
 
@@ -350,9 +350,10 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
 
   QuinticSpiralPath spiral_curve(theta0, kappa0, dkappa0, theta0 + angle_diff,
                                  kappa1, dkappa1, delta_s);
-  std::size_t num_of_points = std::ceil(delta_s / resolution) + 1;
-  for (std::size_t i = 1; i <= num_of_points; ++i) {
-    const double inter_s = delta_s / num_of_points * i;
+  size_t num_of_points =
+      static_cast<size_t>(std::ceil(delta_s / resolution) + 1);
+  for (size_t i = 1; i <= num_of_points; ++i) {
+    const double inter_s = delta_s / static_cast<double>(num_of_points * i);
     const double dx = spiral_curve.ComputeCartesianDeviationX<10>(inter_s);
     const double dy = spiral_curve.ComputeCartesianDeviationY<10>(inter_s);
 
