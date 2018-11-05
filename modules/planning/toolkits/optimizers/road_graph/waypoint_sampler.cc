@@ -55,28 +55,28 @@ bool WaypointSampler::SamplePathWaypoints(
   points->clear();
   points->insert(points->begin(), std::vector<common::SLPoint>{init_sl_point_});
 
-  const float kMinSampleDistance = 40.0;
-  const float total_length = std::fmin(
+  const double kMinSampleDistance = 40.0;
+  const double total_length = std::fmin(
       init_sl_point_.s() + std::fmax(init_point.v() * 8.0, kMinSampleDistance),
       reference_line_info_->reference_line().Length());
   const auto &vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
-  const float half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
-  const size_t num_sample_per_level =
+  const double half_adc_width = vehicle_config.vehicle_param().width() / 2.0;
+  const double num_sample_per_level =
       FLAGS_use_navigation_mode ? config_.navigator_sample_num_each_level()
                                 : config_.sample_points_num_each_level();
 
   const bool has_sidepass = HasSidepass();
 
-  constexpr float kSamplePointLookForwardTime = 4.0;
-  const float step_length =
+  constexpr double kSamplePointLookForwardTime = 4.0;
+  const double step_length =
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
                           config_.step_length_min(), config_.step_length_max());
 
-  const float level_distance =
+  const double level_distance =
       (init_point.v() > FLAGS_max_stop_speed) ? step_length : step_length / 2.0;
-  float accumulated_s = init_sl_point_.s();
-  float prev_s = accumulated_s;
+  double accumulated_s = init_sl_point_.s();
+  double prev_s = accumulated_s;
 
   auto *status = PlanningContext::MutablePlanningStatus();
   if (!status->has_pull_over() && status->pull_over().in_pull_over()) {
@@ -108,8 +108,8 @@ bool WaypointSampler::SamplePathWaypoints(
     if (accumulated_s + level_distance / 2.0 > total_length) {
       accumulated_s = total_length;
     }
-    const float s = std::fmin(accumulated_s, total_length);
-    constexpr float kMinAllowedSampleStep = 1.0;
+    const double s = std::fmin(accumulated_s, total_length);
+    constexpr double kMinAllowedSampleStep = 1.0;
     if (std::fabs(s - prev_s) < kMinAllowedSampleStep) {
       continue;
     }
@@ -120,9 +120,9 @@ bool WaypointSampler::SamplePathWaypoints(
     reference_line_info_->reference_line().GetLaneWidth(s, &left_width,
                                                         &right_width);
 
-    constexpr float kBoundaryBuff = 0.20;
-    const float eff_right_width = right_width - half_adc_width - kBoundaryBuff;
-    const float eff_left_width = left_width - half_adc_width - kBoundaryBuff;
+    constexpr double kBoundaryBuff = 0.20;
+    const double eff_right_width = right_width - half_adc_width - kBoundaryBuff;
+    const double eff_left_width = left_width - half_adc_width - kBoundaryBuff;
 
     // the heuristic shift of L for lane change scenarios
     const double delta_dl = 1.2 / 20.0;
@@ -130,16 +130,16 @@ bool WaypointSampler::SamplePathWaypoints(
         level_distance * (std::fabs(init_frenet_frame_point_.dl()) + delta_dl),
         1.2, 3.5);
 
-    float kDefaultUnitL = kChangeLaneDeltaL / (num_sample_per_level - 1);
+    double kDefaultUnitL = kChangeLaneDeltaL / (num_sample_per_level - 1);
     if (reference_line_info_->IsChangeLanePath() &&
         !reference_line_info_->IsSafeToChangeLane()) {
       kDefaultUnitL = 1.0;
     }
-    const float sample_l_range = kDefaultUnitL * (num_sample_per_level - 1);
-    float sample_right_boundary = -eff_right_width;
-    float sample_left_boundary = eff_left_width;
+    const double sample_l_range = kDefaultUnitL * (num_sample_per_level - 1);
+    double sample_right_boundary = -eff_right_width;
+    double sample_left_boundary = eff_left_width;
 
-    const float kLargeDeviationL = 1.75;
+    const double kLargeDeviationL = 1.75;
     if (reference_line_info_->IsChangeLanePath() ||
         std::fabs(init_sl_point_.l()) > kLargeDeviationL) {
       sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
@@ -155,7 +155,7 @@ bool WaypointSampler::SamplePathWaypoints(
       }
     }
 
-    std::vector<float> sample_l;
+    std::vector<double> sample_l;
     if (reference_line_info_->IsChangeLanePath() &&
         !reference_line_info_->IsSafeToChangeLane()) {
       sample_l.push_back(reference_line_info_->OffsetToOtherReferenceLine());
@@ -175,8 +175,9 @@ bool WaypointSampler::SamplePathWaypoints(
           break;
       }
     } else {
-      common::util::uniform_slice(sample_right_boundary, sample_left_boundary,
-                                  num_sample_per_level - 1, &sample_l);
+      common::util::uniform_slice(
+          sample_right_boundary, sample_left_boundary,
+          static_cast<uint32_t>(num_sample_per_level - 1), &sample_l);
     }
     std::vector<common::SLPoint> level_points;
     planning_internal::SampleLayerDebug sample_layer_debug;

@@ -81,20 +81,20 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
     return false;
   }
   std::vector<common::FrenetFramePoint> frenet_path;
-  float accumulated_s = min_cost_path.front().sl_point.s();
-  const float path_resolution = config_.path_resolution();
+  double accumulated_s = min_cost_path.front().sl_point.s();
+  const double path_resolution = config_.path_resolution();
 
   for (std::size_t i = 1; i < min_cost_path.size(); ++i) {
     const auto &prev_node = min_cost_path[i - 1];
     const auto &cur_node = min_cost_path[i];
 
-    const float path_length = cur_node.sl_point.s() - prev_node.sl_point.s();
-    float current_s = 0.0;
+    const double path_length = cur_node.sl_point.s() - prev_node.sl_point.s();
+    double current_s = 0.0;
     const auto &curve = cur_node.min_cost_curve;
     while (current_s + path_resolution / 2.0 < path_length) {
-      const float l = curve.Evaluate(0, current_s);
-      const float dl = curve.Evaluate(1, current_s);
-      const float ddl = curve.Evaluate(2, current_s);
+      const double l = curve.Evaluate(0, current_s);
+      const double dl = curve.Evaluate(1, current_s);
+      const double ddl = curve.Evaluate(2, current_s);
       common::FrenetFramePoint frenet_frame_point;
       frenet_frame_point.set_s(accumulated_s + current_s);
       frenet_frame_point.set_l(l);
@@ -138,7 +138,7 @@ bool DpRoadGraph::GenerateMinCostPath(
 
   // find one point from first row
   const auto &first_row = path_waypoints.front();
-  int nearest_i = 0;
+  std::size_t nearest_i = 0;
   for (std::size_t i = 1; i < first_row.size(); ++i) {
     if (std::fabs(first_row[i].l() - init_sl_point_.l()) <
         std::fabs(first_row[nearest_i].l() - init_sl_point_.l())) {
@@ -216,8 +216,8 @@ void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
   for (const auto &prev_dp_node : msg->prev_nodes) {
     const auto &prev_sl_point = prev_dp_node.sl_point;
     const auto &cur_point = msg->cur_node->sl_point;
-    float init_dl = 0.0;
-    float init_ddl = 0.0;
+    double init_dl = 0.0;
+    double init_ddl = 0.0;
     if (msg->level == 1) {
       init_dl = init_frenet_frame_point_.dl();
       init_ddl = init_frenet_frame_point_.ddl();
@@ -239,8 +239,8 @@ void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
 
   // try to connect the current point with the first point directly
   if (msg->level >= 2) {
-    const float init_dl = init_frenet_frame_point_.dl();
-    const float init_ddl = init_frenet_frame_point_.ddl();
+    const double init_dl = init_frenet_frame_point_.dl();
+    const double init_ddl = init_frenet_frame_point_.ddl();
     QuinticPolynomialCurve1d curve(
         init_sl_point_.l(), init_dl, init_ddl, msg->cur_node->sl_point.l(), 0.0,
         0.0, msg->cur_node->sl_point.s() - init_sl_point_.s());
@@ -255,9 +255,9 @@ void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
 }
 
 bool DpRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
-  constexpr float kMaxLateralDistance = 20.0;
-  for (float s = 0.0; s < curve.ParamLength(); s += 2.0) {
-    const float l = curve.Evaluate(0, s);
+  constexpr double kMaxLateralDistance = 20.0;
+  for (double s = 0.0; s < curve.ParamLength(); s += 2.0) {
+    const double l = curve.Evaluate(0, s);
     if (std::fabs(l) > kMaxLateralDistance) {
       return false;
     }
@@ -267,7 +267,7 @@ bool DpRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
 
 void DpRoadGraph::GetCurveCost(TrajectoryCost trajectory_cost,
                                const QuinticPolynomialCurve1d &curve,
-                               const float start_s, const float end_s,
+                               const double start_s, const double end_s,
                                const uint32_t curr_level,
                                const uint32_t total_level,
                                ComparableCost *cost) {
