@@ -104,7 +104,7 @@ class FCNN_CNN1D(torch.nn.Module):
     def __init__(self):
         super(FCNN_CNN1D, self).__init__()
         self.lane_feature_conv = torch.nn.Sequential(\
-                            nn.Conv1d(6, 10, 3, stride=1),\
+                            nn.Conv1d(5, 10, 3, stride=1),\
                             nn.ReLU(),\
                             nn.Conv1d(10, 16, 3, stride=2),\
                             nn.ReLU(),\
@@ -115,7 +115,7 @@ class FCNN_CNN1D(torch.nn.Module):
         self.lane_feature_dropout = nn.Dropout(0.0)
 
         self.obs_feature_fc = torch.nn.Sequential(\
-                            nn.Linear(23, 17),\
+                            nn.Linear(24, 17),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
                             nn.Linear(17, 12),\
@@ -124,7 +124,7 @@ class FCNN_CNN1D(torch.nn.Module):
                             )
 
         self.classify = torch.nn.Sequential(\
-                            nn.Linear(123, 66),\
+                            nn.Linear(124, 66),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.3),\
 
@@ -140,7 +140,7 @@ class FCNN_CNN1D(torch.nn.Module):
                             #nn.Sigmoid()
                                             )
         self.regress = torch.nn.Sequential(\
-                            nn.Linear(124, 77),\
+                            nn.Linear(125, 77),\
                             nn.ReLU(),\
                             nn.Dropout(0.2),\
 
@@ -156,12 +156,13 @@ class FCNN_CNN1D(torch.nn.Module):
                             nn.ReLU()
                                             )
     def forward(self, x):
-        lane_fea = x[:,23:]
-        lane_fea = lane_fea.view(lane_fea.size(0), 6, 30)
+        lane_fea = x[:,24:]
+        lane_fea = lane_fea.view(lane_fea.size(0), 5, 30)
 
-        obs_fea = x[:,:23]
+        obs_fea = x[:,:24]
 
         lane_fea = self.lane_feature_conv(lane_fea)
+        #print (lane_fea.shape)
         lane_fea_max = self.lane_feature_maxpool(lane_fea)
         lane_fea_avg = self.lane_feature_avgpool(lane_fea)
 
@@ -346,7 +347,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
         c_pred, r_pred = model(X)
         loss = loss_fn(c_pred, r_pred, y)
         #loss.data[0].cpu().numpy()
-        loss_history.append(loss.data[0])
+        loss_history.append(loss.data)
         loss.backward()
         optimizer.step()
         train_correct_class += \
@@ -384,7 +385,7 @@ def train_dataloader(train_loader, model, optimizer, epoch):
         c_pred, r_pred = model(X)
         loss = loss_fn(c_pred, r_pred, y)
         #loss.data[0].cpu().numpy()
-        loss_history.append(loss.data[0])
+        loss_history.append(loss.data)
         loss.backward()
         optimizer.step()
 
@@ -419,7 +420,7 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
         y = valid_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         c_pred, r_pred = model(X)
         valid_loss = loss_fn(c_pred, r_pred, y)
-        loss_history.append(valid_loss.data[0])
+        loss_history.append(valid_loss.data)
 
         c_pred = c_pred.data.cpu().numpy()
         c_pred = c_pred.reshape(c_pred.shape[0],1)
@@ -472,7 +473,7 @@ def validate_dataloader(valid_loader, model):
             y = y.float().cuda()
         c_pred, r_pred = model(X)
         valid_loss = loss_fn(c_pred, r_pred, y)
-        loss_history.append(valid_loss.data[0])
+        loss_history.append(valid_loss.data)
         valid_correct_class += \
             np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
                     y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
@@ -518,7 +519,7 @@ if __name__ == "__main__":
         X_train, y_train, X_valid, y_valid = data_preprocessing(train_data)
 
         # Model declaration
-        model = FullyConn_NN()
+        model = FCNN_CNN1D()
         print ("The model used is: ")
         print (model)
         learning_rate = 6.561e-4
