@@ -147,7 +147,8 @@ function build() {
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
-  bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
+  unbuffer bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS | \
+      tee >(tools/stat_compile_warnings.py)
 
   if [ $? -ne 0 ]; then
     fail 'Build failed!'
