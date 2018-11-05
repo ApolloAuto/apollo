@@ -21,6 +21,13 @@ message DenseParameter {
   optional TensorParameter bias = 5;
 }
 
+message Conv1dParameter {
+  optional int32 units = 1;
+  optional bool use_bias = 2;
+  optional TensorParameter weights = 3;
+  optional TensorParameter bias = 4;
+}
+
 message BatchNormalizationParameter {
   optional double epsilon = 1 [default = 1e-5];
   optional int32 axis = 2;
@@ -83,5 +90,6 @@ message LayerParameter {
     LSTMParameter lstm = 8;
     FlattenParameter flatten = 9;
     ConcatenateParameter concatenate = 10;
+    Conv1dParameter conv1d = 11;
   }
 }
