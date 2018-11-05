@@ -31,6 +31,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader, sampler
 
+import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 
@@ -61,35 +62,35 @@ class FullyConn_NN(torch.nn.Module):
     def __init__(self):
         super(FullyConn_NN, self).__init__()
         self.classify = torch.nn.Sequential(\
-                            nn.Linear(83, 55),\
+                            nn.Linear(174, 88),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.3),\
 
-                            nn.Linear(55, 23),\
+                            nn.Linear(88, 55),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.2),\
 
-                            nn.Linear(23, 11),\
+                            nn.Linear(55, 23),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.3),\
 
-                            nn.Linear(11, 5),\
+                            nn.Linear(23, 10),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
 
-                            nn.Linear(5, 1),\
+                            nn.Linear(10, 1),\
                             nn.Sigmoid()
                                             )
         self.regress = torch.nn.Sequential(\
-                            nn.Linear(dim_input, dim_hidden_1),\
+                            nn.Linear(174, 88),\
                             nn.ReLU(),\
                             nn.Dropout(0.1),\
                               
-                            nn.Linear(dim_hidden_1, dim_hidden_2),\
+                            nn.Linear(88, 23),\
                             nn.ReLU(),\
                             nn.Dropout(0.1),\
                                
-                            nn.Linear(dim_hidden_2, 1),\
+                            nn.Linear(23, 1),\
                             nn.ReLU()
                                             )
     def forward(self, x):
@@ -183,6 +184,7 @@ of regression together.
 def loss_fn(c_pred, r_pred, target):
     loss_C = nn.BCEWithLogitsLoss(pos_weight=torch.FloatTensor([1.0]).cuda()) #nn.BCELoss()
     loss_R = nn.MSELoss()
+
     loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
     #loss = 4 * loss_C(c_pred, target[:,0].view(target.shape[0],1)) + \
           #loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
@@ -194,11 +196,11 @@ def loss_fn(c_pred, r_pred, target):
     return loss
 
 # ========================================================================
-# Data Loading and preprocessing
+# Data Loading and preprocessing (Non Data-Loader case)
 
 '''
 Load the data from h5 file to the numpy format.
-(Only works for small datasets that can be entirely loaded into memory)
+(Only for non data-loader case)
 '''
 def load_data(filename):
     
@@ -218,19 +220,29 @@ def load_data(filename):
     return samples['data']
 
 '''
-Preprocess the data:
+Preprocess the data.
+(Only for non data-loader case)
     - separate input X and output y
-    - process output label from {-1,0,1,2} to {0,1}
+    - process output label from {-1,0,1,2,3,4} to {0,1}
+    - Take out only those meaningful features
     - shuffle data
 '''
 def data_preprocessing(data):
-    X = data[:, :-dim_output]
+    X_obs_now = data[:, 23:29]
+    X_obs_hist_5 = data[:, 29:53]
+    mask5 = (data[:,53] != 100)
+    X_lane = data[:, 91:-dim_output]
+    X = np.concatenate((X_obs_hist_5, X_lane), axis=1)
+    X = X[mask5, :]
+
+    #X = data[:, :-dim_output]
     y = data[:, -dim_output:]
+    y = y[mask5, :]
     y[:, 0] = (y[:, 0] > 0).astype(float)
 
-    X_new, X_dummy, y_new, y_dummy = train_test_split(X, y, test_size=0.0, random_state=233)
+    X_new, X_dummy, y_new, y_dummy = train_test_split(X, y, test_size=0.1, random_state=233)
 
-    return X_new, y_new
+    return X_new, y_new, X_dummy, y_dummy
 
 '''
 Get the full path of all files under the directory: 'dirName'
@@ -255,6 +267,8 @@ def print_dist(label):
     unique_labels = np.unique(label)
     for l in unique_labels:
         print ('Label = {}: {}%'.format(l, np.sum(label==l)/len(label)*100))
+
+
 
 
 
@@ -324,7 +338,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
     logging.info('Epoch: {}'.format(epoch))
     num_of_data = train_X.shape[0]
     num_of_batch = int(num_of_data / batch_size) + 1
-    train_correct_class = 0.0
+    train_correct_class = 0
     for i in range(num_of_batch):
         optimizer.zero_grad()
         X = train_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
@@ -337,8 +351,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
         optimizer.step()
         train_correct_class += \
             np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
-                    y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
-
+                    y[:,0].data.cpu().numpy().reshape(y.data.cpu().numpy().shape[0],1))
 
         if i % 100 == 0:
             logging.info('Step: {}, train_loss: {}'.format(i, np.mean(loss_history[-100:])))
@@ -347,10 +360,10 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
     train_classification_accuracy = train_correct_class / train_y.data.cpu().numpy().shape[0]
     train_loss = np.mean(loss_history)
     logging.info('Training loss: {}'.format(train_loss))
-    print ('Epoch: {}.\n Training Loss: {}. Training classification accuracy: {}'\
-           .format(epoch, train_loss, train_classification_accuracy))
-    print ('Trainin accuracy: {}.'\
-        .format(train_classification_accuracy))
+    logging.info('Training Accuracy: {}.'.format(train_classification_accuracy))
+    print ('Epoch: {}.'.format(epoch))
+    print ('Training Loss: {}'.format(train_loss))
+    print ('Training Accuracy: {}.'.format(train_classification_accuracy))
 
 '''
 Train the data. (using dataloader)
@@ -393,30 +406,54 @@ def train_dataloader(train_loader, model, optimizer, epoch):
 '''
 Validation (vanilla version without dataloader)
 '''
-def validate_vanilla(valid_X, valid_y, model, batch_size=1024):
+def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
     model.eval()
 
     loss_history = []
     valid_correct_class = 0.0
     num_of_data = valid_X.shape[0]
     num_of_batch = int(num_of_data / batch_size) + 1
+    pred_y = None
     for i in range(num_of_batch):
         X = valid_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         y = valid_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         c_pred, r_pred = model(X)
         valid_loss = loss_fn(c_pred, r_pred, y)
         loss_history.append(valid_loss.data[0])
-        valid_correct_class += \
-            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
-                    y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
-    valid_classification_accuracy = valid_correct_class / valid_y.data.cpu().numpy().shape[0]
-    logging.info('Validation loss: {}. Validation classification accuracy: {}'\
-        .format(np.mean(loss_history), valid_classification_accuracy))
-    print ('Validation loss: {}. Classification accuracy: {}.'\
-        .format(np.mean(loss_history), valid_classification_accuracy))
+        c_pred = c_pred.data.cpu().numpy()
+        c_pred = c_pred.reshape(c_pred.shape[0],1)
+
+        pred_y = np.concatenate((pred_y, c_pred), axis=0) if pred_y is not None \
+                    else c_pred
+        #valid_correct_class += \
+        #    np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
+        #            y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
+
+    #valid_classification_accuracy = valid_correct_class / valid_y.data.cpu().numpy().shape[0]
+    pred_y = (pred_y > 0.5)
+    valid_y = valid_y.data.cpu().numpy()
+    #print (min(valid_y[:,0]))
+    #print (max(valid_y[:,0]))
+    #print (min(pred_y))
+    #print (max(pred_y))
+
+    valid_accuracy = sklearn.metrics.accuracy_score(valid_y[:,0], pred_y.reshape(-1))
+    valid_precision = sklearn.metrics.precision_score(valid_y[:,0], pred_y.reshape(-1))
+    valid_recall = sklearn.metrics.recall_score(valid_y[:,0], pred_y.reshape(-1))
+    valid_auc = sklearn.metrics.roc_auc_score(valid_y[:,0], pred_y.reshape(-1))
+
+    logging.info('Validation loss: {}. Accuracy: {}.\
+                  Precision: {}. Recall: {}. AUC: {}.'
+        .format(np.mean(loss_history), valid_accuracy, valid_precision,\
+                valid_recall, valid_auc))
+    print ('Validation loss: {}. Accuracy: {}.\
+            Precision: {}. Recall: {}. AUC: {}.'
+        .format(np.mean(loss_history), valid_accuracy, valid_precision,\
+                valid_recall, valid_auc))
 
     return valid_loss
+
 
 '''
 Validation (using dataloader)
@@ -476,17 +513,18 @@ if __name__ == "__main__":
         print ("Validation data size = ", valid_data.shape)
 
         # Data preprocessing
-        X_train, y_train = data_preprocessing(train_data)
-        X_valid, y_valid = data_preprocessing(valid_data)
-        
+        #X_train, y_train = data_preprocessing(train_data)
+        #X_valid, y_valid = data_preprocessing(valid_data)
+        X_train, y_train, X_valid, y_valid = data_preprocessing(train_data)
+
         # Model declaration
-        model = FCNN_CNN1D()
+        model = FullyConn_NN()
         print ("The model used is: ")
         print (model)
-        learning_rate = 5e-4
+        learning_rate = 6.561e-4
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau\
-            (optimizer, factor=0.5, patience=3, min_lr=1e-8, verbose=1, mode='min')
+            (optimizer, factor=0.3, patience=2, min_lr=1e-8, verbose=1, mode='min')
 
         # CUDA set-up:
         cuda_is_available = torch.cuda.is_available()
