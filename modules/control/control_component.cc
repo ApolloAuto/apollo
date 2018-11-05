@@ -260,19 +260,34 @@ bool ControlComponent::Proc() {
 
   chassis_reader_->Observe();
   const auto& chassis_msg = chassis_reader_->GetLatestObserved();
+  if (chassis_msg == nullptr) {
+    AERROR << "Chassis msg is not ready!";
+    return false;
+  }
+
   OnChassis(chassis_msg);
 
   trajectory_reader_->Observe();
   const auto& trajectory_msg = trajectory_reader_->GetLatestObserved();
+  if (trajectory_msg == nullptr) {
+    AERROR << "planning msg is not ready!";
+    return false;
+  }
   OnPlanning(trajectory_msg);
 
   localization_reader_->Observe();
   const auto& localization_msg = localization_reader_->GetLatestObserved();
+  if (localization_msg == nullptr) {
+    AERROR << "localization msg is not ready!";
+    return false;
+  }
   OnLocalization(localization_msg);
 
   pad_msg_reader_->Observe();
   const auto& pad_msg = pad_msg_reader_->GetLatestObserved();
-  OnPad(pad_msg);
+  if (pad_msg != nullptr) {
+    OnPad(pad_msg);
+  }
 
   if (control_conf_.is_control_test_mode() &&
       control_conf_.control_test_duration() > 0 &&
