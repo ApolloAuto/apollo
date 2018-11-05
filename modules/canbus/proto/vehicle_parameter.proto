@@ -9,6 +9,7 @@ message VehicleParameter {
     LINCOLN_MKZ = 0;
     GEM = 1;
     LEXUS = 2;
+    TRANSIT = 3;
   }
 
   optional VehicleBrand brand = 1;

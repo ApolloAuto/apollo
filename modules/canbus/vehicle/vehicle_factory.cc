@@ -19,6 +19,7 @@
 #include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
 #include "modules/canbus/vehicle/lexus/lexus_vehicle_factory.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
+#include "modules/canbus/vehicle/transit/transit_vehicle_factory.h"
 
 namespace apollo {
 namespace canbus {
@@ -33,6 +34,9 @@ void VehicleFactory::RegisterVehicleFactory() {
   Register(VehicleParameter::LEXUS, []() -> AbstractVehicleFactory * {
     return new LexusVehicleFactory();
   });
+  Register(VehicleParameter::TRANSIT, []() -> AbstractVehicleFactory * {
+    return new TransitVehicleFactory();
+  });
 }
 
 std::unique_ptr<AbstractVehicleFactory> VehicleFactory::CreateVehicle(
@@ -44,7 +48,7 @@ std::unique_ptr<AbstractVehicleFactory> VehicleFactory::CreateVehicle(
   } else {
     abstract_factory->SetVehicleParameter(vehicle_parameter);
     AINFO << "succesfully created vehicle factory with "
-           << vehicle_parameter.DebugString();
+          << vehicle_parameter.DebugString();
   }
   return abstract_factory;
 }
