@@ -3943,7 +3943,7 @@
             },
             "DualVariableWarmStartConfig": {
               "fields": {
-                "weightDualVariable": {
+                "weightD": {
                   "type": "double",
                   "id": 1,
                   "options": {
@@ -4371,16 +4371,96 @@
                 }
               }
             },
+            "ScenarioLaneFollowConfig": {
+              "fields": {}
+            },
+            "ScenarioSidePassConfig": {
+              "fields": {}
+            },
+            "ScenarioStopSignUnprotectedConfig": {
+              "fields": {
+                "startStopSignTimer": {
+                  "type": "uint32",
+                  "id": 1,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "watchVehicleMaxValidStopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 5
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 3.5
+                  }
+                },
+                "maxAdcStopSpeed": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 0.3
+                  }
+                },
+                "stopDuration": {
+                  "type": "float",
+                  "id": 5,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "minPassSDistance": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "waitTimeout": {
+                  "type": "float",
+                  "id": 7,
+                  "options": {
+                    "default": 8
+                  }
+                }
+              }
+            },
             "ScenarioConfig": {
+              "oneofs": {
+                "scenarioConfig": {
+                  "oneof": [
+                    "laneFollowConfig",
+                    "sidePassConfig",
+                    "stopSignUnprotectedConfig"
+                  ]
+                }
+              },
               "fields": {
                 "scenarioType": {
                   "type": "ScenarioType",
                   "id": 1
                 },
+                "laneFollowConfig": {
+                  "type": "ScenarioLaneFollowConfig",
+                  "id": 2
+                },
+                "sidePassConfig": {
+                  "type": "ScenarioSidePassConfig",
+                  "id": 3
+                },
+                "stopSignUnprotectedConfig": {
+                  "type": "ScenarioStopSignUnprotectedConfig",
+                  "id": 4
+                },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
-                  "id": 2,
+                  "id": 5,
                   "options": {
                     "packed": false
                   }
@@ -4388,7 +4468,7 @@
                 "stageConfig": {
                   "rule": "repeated",
                   "type": "StageConfig",
-                  "id": 3
+                  "id": 6
                 }
               },
               "nested": {
@@ -6085,45 +6165,6 @@
                 }
               }
             },
-            "FrontVehicleConfig": {
-              "fields": {
-                "enableSidePass": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "sidePassSThreshold": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "sidePassLThreshold": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "sidePassWaitTime": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 30
-                  }
-                },
-                "nudgeLBuffer": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 0.5
-                  }
-                }
-              }
-            },
             "KeepClearConfig": {
               "fields": {
                 "enableKeepClearZone": {
@@ -6374,7 +6415,6 @@
                     "changeLane",
                     "crosswalk",
                     "destination",
-                    "frontVehicle",
                     "keepClear",
                     "pullOver",
                     "referenceLineEnd",
@@ -6409,33 +6449,29 @@
                   "type": "DestinationConfig",
                   "id": 6
                 },
-                "frontVehicle": {
-                  "type": "FrontVehicleConfig",
-                  "id": 7
-                },
                 "keepClear": {
                   "type": "KeepClearConfig",
-                  "id": 8
+                  "id": 7
                 },
                 "pullOver": {
                   "type": "PullOverConfig",
-                  "id": 9
+                  "id": 8
                 },
                 "referenceLineEnd": {
                   "type": "ReferenceLineEndConfig",
-                  "id": 10
+                  "id": 9
                 },
                 "rerouting": {
                   "type": "ReroutingConfig",
-                  "id": 11
+                  "id": 10
                 },
                 "signalLight": {
                   "type": "SignalLightConfig",
-                  "id": 12
+                  "id": 11
                 },
                 "stopSign": {
                   "type": "StopSignConfig",
-                  "id": 13
+                  "id": 12
                 }
               },
               "nested": {
@@ -6445,13 +6481,12 @@
                     "CHANGE_LANE": 2,
                     "CROSSWALK": 3,
                     "DESTINATION": 4,
-                    "FRONT_VEHICLE": 5,
-                    "KEEP_CLEAR": 6,
-                    "PULL_OVER": 7,
-                    "REFERENCE_LINE_END": 8,
-                    "REROUTING": 9,
-                    "SIGNAL_LIGHT": 10,
-                    "STOP_SIGN": 11
+                    "KEEP_CLEAR": 5,
+                    "PULL_OVER": 6,
+                    "REFERENCE_LINE_END": 7,
+                    "REROUTING": 8,
+                    "SIGNAL_LIGHT": 9,
+                    "STOP_SIGN": 10
                   }
                 }
               }

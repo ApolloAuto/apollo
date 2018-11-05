@@ -1,5 +1,6 @@
 class Utterance {
-    utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
+    utterance = (window.speechSynthesis && !OFFLINE_PLAYBACK) ?
+        new SpeechSynthesisUtterance() : null;
     mute = false;
 
     isSpeaking() {

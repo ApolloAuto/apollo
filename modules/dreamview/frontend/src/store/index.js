@@ -56,6 +56,8 @@ class DreamviewStore {
 
     @observable newDisengagementReminder = false;
 
+    @observable offlineViewErrorMsg = null;
+
     @computed get enableHMIButtonsOnly() {
         return !this.isInitialized;
     }
@@ -88,6 +90,10 @@ class DreamviewStore {
     @action disablePNCMonitor() {
         this.updateWidthInPercentage(1.0);
         this.options.setPncMonitorOptions(false);
+    }
+
+    @action setOfflineViewErrorMsg(msg) {
+        this.offlineViewErrorMsg = msg;
     }
 
     @action updateModuleDelay(world) {
