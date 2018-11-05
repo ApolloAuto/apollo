@@ -130,6 +130,9 @@ class AtomicHashMap {
       Entry *new_entry = nullptr;
       while (true) {
         if (Find(key, &prev, &target)) {
+          if (new_entry) {
+            delete new_entry;
+          }
           // key exists, update value
           auto new_value = new V(value);
           auto old_val_ptr = target->value_ptr.load();
@@ -167,6 +170,9 @@ class AtomicHashMap {
       Entry *new_entry = nullptr;
       while (true) {
         if (Find(key, &prev, &target)) {
+          if (new_entry) {
+            delete new_entry;
+          }
           // key exists, update value
           auto new_value = new V(std::forward<V>(value));
           auto old_val_ptr = target->value_ptr.load();
@@ -204,6 +210,9 @@ class AtomicHashMap {
       Entry *new_entry = nullptr;
       while (true) {
         if (Find(key, &prev, &target)) {
+          if (new_entry) {
+            delete new_entry;
+          }
           // key exists, update value
           auto new_value = new V();
           auto old_val_ptr = target->value_ptr.load();
