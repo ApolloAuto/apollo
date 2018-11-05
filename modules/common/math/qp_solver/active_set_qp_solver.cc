@@ -71,11 +71,11 @@ bool ActiveSetQpSolver::Solve() {
     return false;
   }
   // definition of qpOASESproblem
-  const int kNumOfMatrixElements =
+  const auto kNumOfMatrixElements =
       kernel_matrix_.rows() * kernel_matrix_.cols();
   double h_matrix[kNumOfMatrixElements];  // NOLINT
 
-  const int kNumOfOffsetRows = offset_.rows();
+  const auto kNumOfOffsetRows = offset_.rows();
   double g_matrix[kNumOfOffsetRows];  // NOLINT
   int index = 0;
 

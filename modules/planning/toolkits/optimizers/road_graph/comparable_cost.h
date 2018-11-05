@@ -33,8 +33,8 @@ class ComparableCost {
  public:
   ComparableCost() = default;
   ComparableCost(const bool has_collision, const bool out_of_boundary,
-                 const bool out_of_lane, const float safety_cost_,
-                 const float smoothness_cost_)
+                 const bool out_of_lane, const double safety_cost_,
+                 const double smoothness_cost_)
       : safety_cost(safety_cost_), smoothness_cost(smoothness_cost_) {
     cost_items[HAS_COLLISION] = has_collision;
     cost_items[OUT_OF_BOUNDARY] = out_of_boundary;
@@ -59,8 +59,8 @@ class ComparableCost {
       }
     }
 
-    constexpr float kEpsilon = 1e-12;
-    const float diff = safety_cost + smoothness_cost - other.safety_cost -
+    constexpr double kEpsilon = 1e-12;
+    const double diff = safety_cost + smoothness_cost - other.safety_cost -
                        other.smoothness_cost;
     if (std::fabs(diff) < kEpsilon) {
       return 0;
@@ -110,9 +110,9 @@ class ComparableCost {
   std::array<bool, 3> cost_items = {{false, false, false}};
 
   // cost from distance to obstacles or boundaries
-  float safety_cost = 0.0f;
+  double safety_cost = 0.0f;
   // cost from deviation from lane center, path curvature etc
-  float smoothness_cost = 0.0f;
+  double smoothness_cost = 0.0f;
 };
 
 }  // namespace planning
