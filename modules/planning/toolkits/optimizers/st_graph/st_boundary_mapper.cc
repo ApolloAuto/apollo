@@ -370,7 +370,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
     const int default_num_point = 50;
     DiscretizedPath discretized_path;
     if (path_points.size() > 2 * default_num_point) {
-      const int ratio = path_points.size() / default_num_point;
+      const auto ratio = path_points.size() / default_num_point;
       std::vector<PathPoint> sampled_path_points;
       for (size_t i = 0; i < path_points.size(); ++i) {
         if (i % ratio == 0) {
