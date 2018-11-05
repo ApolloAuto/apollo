@@ -1,8 +1,7 @@
 # Vehicle Modes
 
 This folder contains modes configuration for Apollo vehicle. Each pb.txt should
-be an instance of apollo::dreamview::HMIMode. Check the proto for detailed
-information.
+be an instance of HMIMode. Check the proto for detailed information.
 
 ## Name Convention
 

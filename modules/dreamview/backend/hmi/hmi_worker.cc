@@ -33,7 +33,7 @@
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
-DEFINE_string(hmi_modes_config_path, "/apollo/modules/calibration/modes",
+DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
               "HMI modes config path.");
 DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
 DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
