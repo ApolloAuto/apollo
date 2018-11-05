@@ -40,7 +40,10 @@ Status SidePassSafety::Process(Frame *frame,
   CHECK_NOTNULL(reference_line_info);
 
   if (!IsSafeSidePass(frame, reference_line_info)) {
+    AINFO << "Side Pass Safety: False";
     BuildSidePathDecision(frame, reference_line_info);
+  } else {
+    AINFO << "Side Pass Safety: True";
   }
   return Status::OK();
 }
