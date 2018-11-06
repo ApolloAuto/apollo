@@ -47,7 +47,8 @@ message JunctionFeature {
   optional LaneFeature enter_lane = 3;
   repeated JunctionExit junction_exit = 4;
   repeated double junction_mlp_feature = 5;
-  repeated int32 junction_mlp_label = 6;  // dim is number of masks, i.e. 10
+  repeated int32 junction_mlp_label = 6;  // dim is number of masks, i.e. 12
+  repeated double junction_mlp_probability = 7;
 }
 
 message ObstaclePriority {
