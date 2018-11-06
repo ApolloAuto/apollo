@@ -150,7 +150,7 @@ function build() {
   unbuffer bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS | \
       tee >(tools/stat_compile_warnings.py)
 
-  if [ $? -ne 0 ]; then
+  if [ ${PIPESTATUS[0]} -ne 0 ]; then
     fail 'Build failed!'
   fi
 
