@@ -171,7 +171,7 @@ Status DpStGraph::CalculateTotalCost() {
   uint32_t next_lowest_row = 0;
 
   for (size_t c = 0; c < cost_table_.size(); ++c) {
-    int highest_row = 0;
+    size_t highest_row = 0;
     auto lowest_row = cost_table_.back().size() - 1;
 
     int count = next_highest_row - next_lowest_row + 1;
@@ -196,8 +196,8 @@ Status DpStGraph::CalculateTotalCost() {
     for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
       if (cost_cr.total_cost() < std::numeric_limits<double>::infinity()) {
-        int h_r = 0;
-        int l_r = 0;
+        size_t h_r = 0;
+        size_t l_r = 0;
         GetRowRange(cost_cr, &h_r, &l_r);
         highest_row = std::max(highest_row, h_r);
         lowest_row = std::min(lowest_row, static_cast<size_t>(l_r));
@@ -210,8 +210,8 @@ Status DpStGraph::CalculateTotalCost() {
   return Status::OK();
 }
 
-void DpStGraph::GetRowRange(const StGraphPoint& point, int* next_highest_row,
-                            int* next_lowest_row) {
+void DpStGraph::GetRowRange(const StGraphPoint& point, size_t* next_highest_row,
+                            size_t* next_lowest_row) {
   double v0 = 0.0;
   if (!point.pre_point()) {
     v0 = init_point_.v();
