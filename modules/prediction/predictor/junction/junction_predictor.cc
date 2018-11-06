@@ -16,14 +16,44 @@
 
 #include "modules/prediction/predictor/junction/junction_predictor.h"
 
+#include <utility>
+
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::TrajectoryPoint;
+
 void JunctionPredictor::Predict(Obstacle* obstacle) {
   // TODO(all) implement
+  Clear();
+  CHECK_NOTNULL(obstacle);
+  CHECK_GT(obstacle->history_size(), 0);
+
+  const Feature& latest_feature = obstacle->latest_feature();
+  std::vector<JunctionExit> junction_exits =
+      MostLikelyJunctions(latest_feature);
+  for (const auto& junction_exit : junction_exits) {
+    std::vector<TrajectoryPoint> trajectory_points;
+    DrawJunctionTrajectory(latest_feature, junction_exit, &trajectory_points);
+    Trajectory trajectory = GenerateTrajectory(trajectory_points);
+    trajectories_.push_back(std::move(trajectory));
+  }
+}
+
+void JunctionPredictor::DrawJunctionTrajectory(
+    const Feature& feature,
+    const JunctionExit& junction_exit,
+    std::vector<TrajectoryPoint>* trajectory_points) {
+  // TODO(all) implement
+}
+
+std::vector<JunctionExit> MostLikelyJunctions(const Feature& feature) {
+  // TODO(all) implement
+  std::vector<JunctionExit> junction_exits;
+  return junction_exits;
 }
 
 }  // namespace prediction
