@@ -29,7 +29,10 @@ if [[ ${MAP_VOLUME_CONF} == *"${MAP_VOLUME}"* ]]; then
 else
   docker stop ${MAP_VOLUME} > /dev/null 2>&1
 
-  MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${ARCH}-${map_version}
+  MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${map_version}
+  if [ "$ARCH" == 'aarch64' ]; then
+    MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${ARCH}-${map_version}
+  fi
   docker pull ${MAP_VOLUME_IMAGE}
   docker run -it -d --rm --name ${MAP_VOLUME} ${MAP_VOLUME_IMAGE}
   MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${MAP_VOLUME}"
