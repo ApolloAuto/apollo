@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage:
-#    restart_map_volume.sh <map_name> <map_version>
-
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -19,21 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-map_name=$1
-map_version=$2
-ARCH=$(uname -m)
+# Fail on first error.
+set -e
 
-MAP_VOLUME="apollo_map_volume-${map_name}"
-if [[ ${MAP_VOLUME_CONF} == *"${MAP_VOLUME}"* ]]; then
-  echo "Map ${map_name} has already been included!"
-else
-  docker stop ${MAP_VOLUME} > /dev/null 2>&1
+# Install Bazel.
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-  MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${map_version}
-  if [ "$ARCH" == 'aarch64' ]; then
-    MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${ARCH}-${map_version}
-  fi
-  docker pull ${MAP_VOLUME_IMAGE}
-  docker run -it -d --rm --name ${MAP_VOLUME} ${MAP_VOLUME_IMAGE}
-  MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${MAP_VOLUME}"
-fi
+wget http://123.57.58.164/apollo-docker/google-perftools-2.1.90.tar.gz
+tar zxvf google-perftools-2.1.90.tar.gz
+cp -d google-perftools-2.1.90/lib/* /usr/local/lib/
+cp -r google-perftools-2.1.90/include/google /usr/local/include
+
+# Clean up.
+rm -fr google-perftools-2.1.90 google-perftools-2.1.90.tar.gz

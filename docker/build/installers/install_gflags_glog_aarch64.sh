@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage:
-#    restart_map_volume.sh <map_name> <map_version>
-
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -19,21 +16,35 @@
 # limitations under the License.
 ###############################################################################
 
-map_name=$1
-map_version=$2
-ARCH=$(uname -m)
+# Fail on first error.
+set -e
 
-MAP_VOLUME="apollo_map_volume-${map_name}"
-if [[ ${MAP_VOLUME_CONF} == *"${MAP_VOLUME}"* ]]; then
-  echo "Map ${map_name} has already been included!"
-else
-  docker stop ${MAP_VOLUME} > /dev/null 2>&1
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-  MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${map_version}
-  if [ "$ARCH" == 'aarch64' ]; then
-    MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${ARCH}-${map_version}
-  fi
-  docker pull ${MAP_VOLUME_IMAGE}
-  docker run -it -d --rm --name ${MAP_VOLUME} ${MAP_VOLUME_IMAGE}
-  MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${MAP_VOLUME}"
-fi
+# Install gflags.
+wget http://123.57.58.164/apollo-docker/v2.2.0.tar.gz
+tar xzf v2.2.0.tar.gz
+mkdir gflags-2.2.0/build
+pushd gflags-2.2.0/build
+CXXFLAGS="-fPIC" cmake ..
+#maybe should use the command below
+#cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ../
+make -j8
+make install
+popd
+
+# Install glog which also depends on gflags.
+apt-get install -y autoconf libtool
+wget https://github.com/google/glog/archive/master.zip
+unzip master.zip
+cd glog-master/
+./autogen.sh
+./configure CPPFLAGS="-fPIC"
+make
+make install
+
+cd ../
+
+# Clean up.
+rm -fr /usr/local/lib/libglog.so*
+rm -fr master.zip glog-master/  gflags-2.2.0 v2.2.0.tar.gz

@@ -263,6 +263,19 @@ function main(){
         DOCKER_CMD="docker"
     fi
 
+    EXTRA_VOLUMES=""
+    if [ "$ARCH" == 'aarch64' ]; then
+        EXTRA_VOLUMES="
+        -v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra    \
+        -v /usr/lib/aarch64-linux-gnu/gstreamer-1.0:/usr/lib/aarch64-linux-gnu/gstreamer-1.0    \
+        -v /usr/lib/aarch64-linux-gnu/tegra-egl:/usr/lib/aarch64-linux-gnu/tegra-egl    \
+        -v /usr/lib/aarch64-linux-gnu/mesa-egl:/usr/lib/aarch64-linux-gnu/mesa-egl    \
+        -v /run:/run    \
+        -v /lib/firmware/tegra18x:/lib/firmware/tegra18x
+        "
+    fi
+
+
     ${DOCKER_CMD} run -it \
         -d \
         --privileged \
@@ -277,6 +290,7 @@ function main(){
         -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
+	${EXTRA_VOLUMES} \
         $(local_volumes) \
         --net host \
         -w /apollo \
