@@ -35,16 +35,16 @@ constexpr size_t N = 10;
 SpiralProblemInterface::SpiralProblemInterface(
     std::vector<Eigen::Vector2d> points)
     : init_points_(std::move(points)) {
-  num_of_points_ = init_points_.size();
+  num_of_points_ = static_cast<int>(init_points_.size());
   CHECK_GT(num_of_points_, 1);
 
   point_distances_.reserve(num_of_points_ - 1);
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     point_distances_.push_back((init_points_[i + 1] - init_points_[i]).norm());
   }
 
   std::vector<double> normalized_theta;
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     Eigen::Vector2d v = init_points_[i + 1] - init_points_[i];
     double theta = std::atan2(v.y(), v.x());
     normalized_theta.push_back(theta);
@@ -52,7 +52,7 @@ SpiralProblemInterface::SpiralProblemInterface(
   normalized_theta.push_back(normalized_theta.back());
 
   relative_theta_.push_back(normalized_theta.front());
-  for (size_t i = 1; i < num_of_points_; ++i) {
+  for (int i = 1; i < num_of_points_; ++i) {
     double theta_diff =
         common::math::AngleDiff(relative_theta_.back(), normalized_theta[i]);
     relative_theta_.push_back(relative_theta_.back() + theta_diff);
@@ -102,13 +102,13 @@ bool SpiralProblemInterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
 
 bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
                                              int m, double* g_l, double* g_u) {
-  CHECK_EQ(size_t(n), num_of_variables_);
-  CHECK_EQ(size_t(m), num_of_constraints_);
+  CHECK_EQ(n, num_of_variables_);
+  CHECK_EQ(m, num_of_constraints_);
 
   // variables
   // a. for theta, kappa, dkappa, x, y
-  for (size_t i = 0; i < num_of_points_; ++i) {
-    size_t index = i * 5;
+  for (int i = 0; i < num_of_points_; ++i) {
+    int index = i * 5;
 
     double theta_lower = 0.0;
     double theta_upper = 0.0;
@@ -189,8 +189,8 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
   }
 
   // b. for delta_s
-  size_t variable_offset = num_of_points_ * 5;
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  int variable_offset = num_of_points_ * 5;
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     x_l[variable_offset + i] =
         point_distances_[i] - 2.0 * default_max_point_deviation_;
     x_u[variable_offset + i] = point_distances_[i] * M_PI * 0.5;
@@ -198,7 +198,7 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
 
   // constraints
   // a. positional equality constraints
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     // for x
     g_l[i * 2] = 0.0;
     g_u[i * 2] = 0.0;
@@ -208,8 +208,8 @@ bool SpiralProblemInterface::get_bounds_info(int n, double* x_l, double* x_u,
     g_u[i * 2 + 1] = 0.0;
   }
   // b. positional deviation constraints
-  size_t constraint_offset = 2 * (num_of_points_ - 1);
-  for (size_t i = 0; i < num_of_points_; ++i) {
+  int constraint_offset = 2 * (num_of_points_ - 1);
+  for (int i = 0; i < num_of_points_; ++i) {
     g_l[constraint_offset + i] = 0.0;
     g_u[constraint_offset + i] =
         default_max_point_deviation_ * default_max_point_deviation_;
@@ -222,13 +222,13 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
                                                 double* z_U, int m,
                                                 bool init_lambda,
                                                 double* lambda) {
-  CHECK_EQ(size_t(n), num_of_variables_);
+  CHECK_EQ(n, num_of_variables_);
   CHECK(init_x == true);
   CHECK(init_z == false);
   CHECK(init_lambda == false);
 
-  for (size_t i = 0; i < num_of_points_; ++i) {
-    size_t index = i * 5;
+  for (int i = 0; i < num_of_points_; ++i) {
+    int index = i * 5;
     x[index] = relative_theta_[i];
     x[index + 1] = 0.0;
     x[index + 2] = 0.0;
@@ -236,13 +236,13 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
     x[index + 4] = init_points_[i].y();
   }
 
-  size_t variable_offset = num_of_points_ * 5;
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  int variable_offset = num_of_points_ * 5;
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     double delta_theta = relative_theta_[i + 1] - relative_theta_[i];
     x[variable_offset + i] = point_distances_[i] / std::cos(0.5 * delta_theta);
   }
 
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     double delta_theta = relative_theta_[i + 1] - relative_theta_[i];
     x[(i + 1) * 5 + 1] = delta_theta / x[variable_offset + i];
   }
@@ -258,20 +258,21 @@ bool SpiralProblemInterface::get_starting_point(int n, bool init_x, double* x,
 
 bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
                                     double& obj_value) {
-  CHECK_EQ(size_t(n), num_of_variables_);
+  CHECK_EQ(n, num_of_variables_);
   if (new_x) {
     update_piecewise_spiral_paths(x, n);
   }
 
   obj_value = 0.0;
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
     double delta_s = spiral_curve.ParamLength();
 
     obj_value += delta_s * weight_curve_length_;
 
-    for (size_t j = 0; j < num_of_internal_points_; ++j) {
-      double ratio = static_cast<double>(j) / num_of_internal_points_;
+    for (int j = 0; j < num_of_internal_points_; ++j) {
+      double ratio = static_cast<double>(j) /
+          static_cast<double>(num_of_internal_points_);
       double s = ratio * delta_s;
 
       double kappa = spiral_curve.Evaluate(1, s);
@@ -289,25 +290,26 @@ bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
 
 bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
                                          double* grad_f) {
-  CHECK_EQ(size_t(n), num_of_variables_);
+  CHECK_EQ(n, num_of_variables_);
   std::fill(grad_f, grad_f + n, 0.0);
 
   if (new_x) {
     update_piecewise_spiral_paths(x, n);
   }
 
-  size_t variable_offset = num_of_points_ * 5;
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
-    size_t index0 = i * 5;
-    size_t index1 = (i + 1) * 5;
+  int variable_offset = num_of_points_ * 5;
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
+    int index0 = i * 5;
+    int index1 = (i + 1) * 5;
 
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
     double delta_s = spiral_curve.ParamLength();
 
     grad_f[variable_offset + i] += weight_curve_length_ * 1.0;
 
-    for (size_t j = 0; j < num_of_internal_points_; ++j) {
-      double ratio = static_cast<double>(j) / num_of_internal_points_;
+    for (int j = 0; j < num_of_internal_points_; ++j) {
+      double ratio = static_cast<double>(j) /
+          static_cast<double>(num_of_internal_points_);
       double s = ratio * delta_s;
 
       double kappa = spiral_curve.Evaluate(1, s);
@@ -391,17 +393,17 @@ bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
 
 bool SpiralProblemInterface::eval_g(int n, const double* x, bool new_x, int m,
                                     double* g) {
-  CHECK_EQ(size_t(n), num_of_variables_);
-  CHECK_EQ(size_t(m), num_of_constraints_);
+  CHECK_EQ(n, num_of_variables_);
+  CHECK_EQ(m, num_of_constraints_);
 
   if (new_x) {
     update_piecewise_spiral_paths(x, n);
   }
 
   // first, fill in the positional equality constraints
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
-    size_t index0 = i * 5;
-    size_t index1 = (i + 1) * 5;
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
+    int index0 = i * 5;
+    int index1 = (i + 1) * 5;
 
     const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
     double delta_s = spiral_curve.ParamLength();
@@ -416,9 +418,9 @@ bool SpiralProblemInterface::eval_g(int n, const double* x, bool new_x, int m,
   }
 
   // second, fill in the positional deviation constraints
-  size_t constraint_offset = 2 * (num_of_points_ - 1);
-  for (size_t i = 0; i < num_of_points_; ++i) {
-    size_t variable_index = i * 5;
+  int constraint_offset = 2 * (num_of_points_ - 1);
+  for (int i = 0; i < num_of_points_; ++i) {
+    int variable_index = i * 5;
     double x_cor = x[variable_index + 3];
     double y_cor = x[variable_index + 4];
 
@@ -433,15 +435,15 @@ bool SpiralProblemInterface::eval_g(int n, const double* x, bool new_x, int m,
 bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
                                         int m, int nele_jac, int* iRow,
                                         int* jCol, double* values) {
-  CHECK_EQ(size_t(n), num_of_variables_);
-  CHECK_EQ(size_t(m), num_of_constraints_);
+  CHECK_EQ(n, num_of_variables_);
+  CHECK_EQ(m, num_of_constraints_);
 
   if (values == nullptr) {
-    size_t nz_index = 0;
+    int nz_index = 0;
 
-    size_t variable_offset = num_of_points_ * 5;
-    for (size_t i = 0; i + 1 < num_of_points_; ++i) {
-      int variable_index = static_cast<int>(i) * 5;
+    int variable_offset = num_of_points_ * 5;
+    for (int i = 0; i + 1 < num_of_points_; ++i) {
+      int variable_index = i * 5;
 
       // theta0
       iRow[nz_index] = i * 2;
@@ -534,8 +536,8 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
       ++nz_index;
     }
 
-    size_t constraint_offset = 2 * (num_of_points_ - 1);
-    for (size_t i = 0; i < num_of_points_; ++i) {
+    int constraint_offset = 2 * (num_of_points_ - 1);
+    for (int i = 0; i < num_of_points_; ++i) {
       iRow[nz_index] = constraint_offset + i;
       jCol[nz_index] = i * 5 + 3;
       ++nz_index;
@@ -553,11 +555,11 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
 
     std::fill(values, values + nnz_jac_g_, 0.0);
     // first, positional equality constraints
-    size_t nz_index = 0;
+    int nz_index = 0;
 
-    for (size_t i = 0; i + 1 < num_of_points_; ++i) {
-      size_t index0 = i * 5;
-      size_t index1 = (i + 1) * 5;
+    for (int i = 0; i + 1 < num_of_points_; ++i) {
+      int index0 = i * 5;
+      int index1 = (i + 1) * 5;
 
       const QuinticSpiralPath& spiral_curve = piecewise_paths_[i];
       double delta_s = spiral_curve.ParamLength();
@@ -659,7 +661,7 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
       ++nz_index;
     }
 
-    for (size_t i = 0; i < num_of_points_; ++i) {
+    for (int i = 0; i < num_of_points_; ++i) {
       values[nz_index] = 2.0 * (x[i * 5 + 3] - init_points_[i].x());
       ++nz_index;
 
@@ -678,9 +680,9 @@ bool SpiralProblemInterface::eval_h(int n, const double* x, bool new_x,
                                     int nele_hess, int* iRow, int* jCol,
                                     double* values) {
   if (values == nullptr) {
-    size_t index = 0;
-    for (size_t i = 0; i + 1 < num_of_points_; ++i) {
-      size_t variable_index = i * 5;
+    int index = 0;
+    for (int i = 0; i + 1 < num_of_points_; ++i) {
+      int variable_index = i * 5;
 
       iRow[index] = variable_index;
       jCol[index] = variable_index;
@@ -747,8 +749,8 @@ bool SpiralProblemInterface::eval_h(int n, const double* x, bool new_x,
       ++index;
     }
 
-    size_t variable_offset = 5 * num_of_points_;
-    for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+    int variable_offset = 5 * num_of_points_;
+    for (int i = 0; i + 1 < num_of_points_; ++i) {
       iRow[index] = i * 5;
       jCol[index] = i + variable_offset;
       ++index;
@@ -795,8 +797,8 @@ void SpiralProblemInterface::finalize_solution(
   opt_dkappa_.reserve(num_of_points_);
   opt_x_.reserve(num_of_points_);
   opt_y_.reserve(num_of_points_);
-  for (size_t i = 0; i < num_of_points_; ++i) {
-    size_t index = i * 5;
+  for (int i = 0; i < num_of_points_; ++i) {
+    int index = i * 5;
     opt_theta_.push_back(x[index]);
     opt_kappa_.push_back(x[index + 1]);
     opt_dkappa_.push_back(x[index + 2]);
@@ -805,18 +807,18 @@ void SpiralProblemInterface::finalize_solution(
   }
 
   opt_s_.reserve(num_of_points_ - 1);
-  size_t variable_offset = num_of_points_ * 5;
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
+  int variable_offset = num_of_points_ * 5;
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
     opt_s_.push_back(x[variable_offset + i]);
   }
 }
 
 void SpiralProblemInterface::update_piecewise_spiral_paths(const double* x,
                                                            const int n) {
-  size_t variable_offset = num_of_points_ * 5;
-  for (size_t i = 0; i + 1 < num_of_points_; ++i) {
-    size_t index0 = i * 5;
-    size_t index1 = (i + 1) * 5;
+  int variable_offset = num_of_points_ * 5;
+  for (int i = 0; i + 1 < num_of_points_; ++i) {
+    int index0 = i * 5;
+    int index1 = (i + 1) * 5;
 
     std::array<double, 3> x0 = {x[index0], x[index0 + 1], x[index0 + 2]};
     std::array<double, 3> x1 = {x[index1], x[index1 + 1], x[index1 + 2]};
