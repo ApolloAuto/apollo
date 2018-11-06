@@ -7,18 +7,12 @@ enum SchedStrategy {
   CHOREO = 1;
 }
 
-message SysMonConf {
-  optional int32 sysmon_hz = 1;
-  optional int32 sysmon_prio = 2;
-}
-
 message SchedConf {
   required string process_name = 1;
   optional SchedStrategy strategy = 2 [default = CLASSIC];
   optional uint32 proc_num = 3 [default = 2];
   optional uint32 task_pool_size = 4 [default = 4];
-  optional SysMonConf sys_mon = 5;
-  optional uint32 cpu_binding_start_index = 6 [default = 33];
+  optional uint32 cpu_binding_start_index = 5 [default = 33];
 }
 
 message SchedulerConf {
