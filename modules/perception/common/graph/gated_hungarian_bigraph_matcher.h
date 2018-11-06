@@ -196,7 +196,7 @@ void GatedHungarianMatcher<T>::ComputeConnectedComponents(
   for (int i = 0; i < rows_num_; ++i) {
     for (int j = 0; j < cols_num_; ++j) {
       if (is_valid_cost_(global_costs_(i, j))) {
-        nb_graph[i].push_back(rows_num_ + j);
+        nb_graph[i].push_back(static_cast<int>(rows_num_) + j);
         nb_graph[j + rows_num_].push_back(i);
       }
     }
@@ -214,7 +214,7 @@ void GatedHungarianMatcher<T>::ComputeConnectedComponents(
       if (id < rows_num_) {
         row_components->at(i).push_back(id);
       } else {
-        id -= rows_num_;
+        id -= static_cast<int>(rows_num_);
         col_components->at(i).push_back(id);
       }
     }

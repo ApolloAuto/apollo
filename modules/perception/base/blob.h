@@ -139,7 +139,7 @@ class Blob {
   inline int shape(int index) const {
     return shape_[CanonicalAxisIndex(index)];
   }
-  inline int num_axes() const { return shape_.size(); }
+  inline int num_axes() const { return static_cast<int>(shape_.size()); }
   inline int count() const { return count_; }
 
   /**

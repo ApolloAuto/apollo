@@ -39,7 +39,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-bool Equal(float x, float target, float eps = 1e-6);
+bool Equal(float x, float target, float eps = 1e-6f);
 bool Equal(double x, double target, double eps = 1e-6);
 
 // @brief whether rect1 is covered by rect2

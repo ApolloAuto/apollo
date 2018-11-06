@@ -178,11 +178,11 @@ class TrackObjectDistance {
   // SensorDataManager* sensor_data_manager_ =
   //     lib::Singleton<SensorDataManager>::get_instance();
   ProjectionCache projection_cache_;
-  float distance_thresh_ = 4.0;
-  const float vc_similarity2distance_penalize_thresh_ = 0.07;
-  const float vc_diff2distance_scale_factor_ = 0.8;
-  const float rc_similarity2distance_penalize_thresh_ = 0.1;
-  const float rc_x_similarity_params_2_welsh_loss_scale_ = 0.5;
+  float distance_thresh_ = 4.0f;
+  const float vc_similarity2distance_penalize_thresh_ = 0.07f;
+  const float vc_diff2distance_scale_factor_ = 0.8f;
+  const float rc_similarity2distance_penalize_thresh_ = 0.1f;
+  const float rc_x_similarity_params_2_welsh_loss_scale_ = 0.5f;
   const Eigen::Vector2d rc_min_box_size_ = Eigen::Vector2d(25, 25);
 
   XSimilarityParams rc_x_similarity_params_ = XSimilarityParams();

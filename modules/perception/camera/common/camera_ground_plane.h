@@ -64,7 +64,7 @@ class GroundPlaneTracker {
   void Restart();
 
   int GetCurTrackLength() {
-    int length = pitch_height_inlier_tracks_.size();
+    int length = static_cast<int>(pitch_height_inlier_tracks_.size());
     CHECK_GE(length, 0);
     return length;
   }

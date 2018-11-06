@@ -56,22 +56,22 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize_badcase1) {
       (*global_costs)(i, j) = 10;
     }
   }
-  (*global_costs)(1, 0) = 0.265;
-  (*global_costs)(2, 1) = 1.824;
-  (*global_costs)(3, 2) = 1.785;
-  (*global_costs)(3, 11) = 0.309;
-  (*global_costs)(4, 3) = 1.784;
-  (*global_costs)(5, 4) = 1.809;
-  (*global_costs)(6, 5) = 1.775;
-  (*global_costs)(7, 6) = 1.798;
-  (*global_costs)(8, 7) = 1.814;
-  (*global_costs)(9, 8) = 1.721;
-  (*global_costs)(10, 9) = 1.904;
-  (*global_costs)(11, 10) = 1.816;
-  (*global_costs)(12, 11) = 1.785;
-  (*global_costs)(13, 12) = 1.954;
-  (*global_costs)(14, 13) = 0.247;
-  (*global_costs)(15, 15) = 1.814;
+  (*global_costs)(1, 0) = 0.265f;
+  (*global_costs)(2, 1) = 1.824f;
+  (*global_costs)(3, 2) = 1.785f;
+  (*global_costs)(3, 11) = 0.309f;
+  (*global_costs)(4, 3) = 1.784f;
+  (*global_costs)(5, 4) = 1.809f;
+  (*global_costs)(6, 5) = 1.775f;
+  (*global_costs)(7, 6) = 1.798f;
+  (*global_costs)(8, 7) = 1.814f;
+  (*global_costs)(9, 8) = 1.721f;
+  (*global_costs)(10, 9) = 1.904f;
+  (*global_costs)(11, 10) = 1.816f;
+  (*global_costs)(12, 11) = 1.785f;
+  (*global_costs)(13, 12) = 1.954f;
+  (*global_costs)(14, 13) = 0.247f;
+  (*global_costs)(15, 15) = 1.814f;
 
   optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments,
                     &unassigned_rows, &unassigned_cols);
@@ -122,19 +122,19 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize_badcase_2) {
   global_costs->Resize(9, 9);
   for (size_t i = 0; i < 9; ++i) {
     for (size_t j = 0; j < 9; ++j) {
-      (*global_costs)(i, j) = 10;
+      (*global_costs)(i, j) = 10.0f;
     }
   }
-  (*global_costs)(0, 0) = 1.834;
-  (*global_costs)(1, 2) = 1.826;
-  (*global_costs)(2, 1) = 1.854;
-  (*global_costs)(3, 3) = 1.930;
-  (*global_costs)(4, 4) = 1.965;
-  (*global_costs)(5, 0) = 0.677;
-  (*global_costs)(5, 5) = 1.835;
-  (*global_costs)(6, 6) = 1.553;
-  (*global_costs)(7, 7) = 1.844;
-  (*global_costs)(8, 8) = 1.844;
+  (*global_costs)(0, 0) = 1.834f;
+  (*global_costs)(1, 2) = 1.826f;
+  (*global_costs)(2, 1) = 1.854f;
+  (*global_costs)(3, 3) = 1.930f;
+  (*global_costs)(4, 4) = 1.965f;
+  (*global_costs)(5, 0) = 0.677f;
+  (*global_costs)(5, 5) = 1.835f;
+  (*global_costs)(6, 6) = 1.553f;
+  (*global_costs)(7, 7) = 1.844f;
+  (*global_costs)(8, 8) = 1.844f;
 
   optimizer_->Match(cost_thresh, bound_value, opt_flag, &assignments,
                     &unassigned_rows, &unassigned_cols);
@@ -179,10 +179,10 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
    * (0->1, 1->0) */
   cost_thresh = 1.0;
   global_costs->Resize(2, 2);
-  (*global_costs)(0, 0) = 0.1;
-  (*global_costs)(1, 0) = 2.0;
-  (*global_costs)(0, 1) = 2.0;
-  (*global_costs)(1, 1) = 0.1;
+  (*global_costs)(0, 0) = 0.1f;
+  (*global_costs)(1, 0) = 2.0f;
+  (*global_costs)(0, 1) = 2.0f;
+  (*global_costs)(1, 1) = 0.1f;
 
   optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
                     &unassigned_cols);
@@ -202,10 +202,10 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
    * (0->0, 1->1) */
   cost_thresh = 1.0;
   global_costs->Resize(2, 2);
-  (*global_costs)(0, 0) = 0.0;
-  (*global_costs)(0, 1) = 0.0;
-  (*global_costs)(1, 0) = 0.0;
-  (*global_costs)(1, 1) = 0.0;
+  (*global_costs)(0, 0) = 0.0f;
+  (*global_costs)(0, 1) = 0.0f;
+  (*global_costs)(1, 0) = 0.0f;
+  (*global_costs)(1, 1) = 0.0f;
 
   optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
                     &unassigned_cols);
@@ -225,10 +225,10 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
    * (0->0, 1->1) */
   cost_thresh = 1.0;
   global_costs->Resize(2, 2);
-  (*global_costs)(0, 0) = 3.0;
-  (*global_costs)(0, 1) = 3.0;
-  (*global_costs)(1, 0) = 3.0;
-  (*global_costs)(1, 1) = 3.0;
+  (*global_costs)(0, 0) = 3.0f;
+  (*global_costs)(0, 1) = 3.0f;
+  (*global_costs)(1, 0) = 3.0f;
+  (*global_costs)(1, 1) = 3.0f;
 
   optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
                     &unassigned_cols);
@@ -250,18 +250,18 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
    * if cost_thresh = 4.0, matches: (0->2, 1->1, 2->0) */
   cost_thresh = 1.0;
   global_costs->Resize(3, 4);
-  (*global_costs)(0, 0) = 4.7;
-  (*global_costs)(0, 1) = 3.8;
-  (*global_costs)(0, 2) = 1.0;
-  (*global_costs)(0, 3) = 2.0;
-  (*global_costs)(1, 0) = 4.1;
-  (*global_costs)(1, 1) = 3.0;
-  (*global_costs)(1, 2) = 2.0;
-  (*global_costs)(1, 3) = 3.0;
-  (*global_costs)(2, 0) = 1.0;
-  (*global_costs)(2, 1) = 2.0;
-  (*global_costs)(2, 2) = 4.7;
-  (*global_costs)(2, 3) = 4.9;
+  (*global_costs)(0, 0) = 4.7f;
+  (*global_costs)(0, 1) = 3.8f;
+  (*global_costs)(0, 2) = 1.0f;
+  (*global_costs)(0, 3) = 2.0f;
+  (*global_costs)(1, 0) = 4.1f;
+  (*global_costs)(1, 1) = 3.0f;
+  (*global_costs)(1, 2) = 2.0f;
+  (*global_costs)(1, 3) = 3.0f;
+  (*global_costs)(2, 0) = 1.0f;
+  (*global_costs)(2, 1) = 2.0f;
+  (*global_costs)(2, 2) = 4.7f;
+  (*global_costs)(2, 3) = 4.9f;
 
   optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
                     &unassigned_cols);
@@ -318,48 +318,48 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
    * (0->2, 1->4, 2->0, 3->3, 6->1) */
   cost_thresh = 4.0;
   global_costs->Resize(7, 6);
-  (*global_costs)(0, 0) = 4.7;
-  (*global_costs)(0, 1) = 4.9;
-  (*global_costs)(0, 2) = 1.0;
-  (*global_costs)(0, 3) = 4.2;
-  (*global_costs)(0, 4) = 1.5;
-  (*global_costs)(0, 5) = 4.3;
-  (*global_costs)(1, 0) = 4.1;
-  (*global_costs)(1, 1) = 5.0;
-  (*global_costs)(1, 2) = 2.0;
-  (*global_costs)(1, 3) = 5.3;
-  (*global_costs)(1, 4) = 2.3;
-  (*global_costs)(1, 5) = 4.3;
-  (*global_costs)(2, 0) = 1.0;
-  (*global_costs)(2, 1) = 2.0;
-  (*global_costs)(2, 2) = 4.7;
-  (*global_costs)(2, 3) = 4.9;
-  (*global_costs)(2, 4) = 4.5;
-  (*global_costs)(2, 5) = 4.5;
-  (*global_costs)(3, 0) = 3.2;
-  (*global_costs)(3, 1) = 2.1;
-  (*global_costs)(3, 2) = 4.5;
-  (*global_costs)(3, 3) = 0.4;
-  (*global_costs)(3, 4) = 4.9;
-  (*global_costs)(3, 5) = 4.9;
-  (*global_costs)(4, 0) = 1.0;
-  (*global_costs)(4, 1) = 2.1;
-  (*global_costs)(4, 2) = 2.1;
-  (*global_costs)(4, 3) = 2.1;
-  (*global_costs)(4, 4) = 3.0;
-  (*global_costs)(4, 5) = 4.0;
-  (*global_costs)(5, 0) = 3.0;
-  (*global_costs)(5, 1) = 3.3;
-  (*global_costs)(5, 2) = 2.1;
-  (*global_costs)(5, 3) = 2.0;
-  (*global_costs)(5, 4) = 3.9;
-  (*global_costs)(5, 5) = 4.9;
-  (*global_costs)(6, 0) = 3.2;
-  (*global_costs)(6, 1) = 1.1;
-  (*global_costs)(6, 2) = 4.1;
-  (*global_costs)(6, 3) = 3.7;
-  (*global_costs)(6, 4) = 4.9;
-  (*global_costs)(6, 5) = 4.9;
+  (*global_costs)(0, 0) = 4.7f;
+  (*global_costs)(0, 1) = 4.9f;
+  (*global_costs)(0, 2) = 1.0f;
+  (*global_costs)(0, 3) = 4.2f;
+  (*global_costs)(0, 4) = 1.5f;
+  (*global_costs)(0, 5) = 4.3f;
+  (*global_costs)(1, 0) = 4.1f;
+  (*global_costs)(1, 1) = 5.0f;
+  (*global_costs)(1, 2) = 2.0f;
+  (*global_costs)(1, 3) = 5.3f;
+  (*global_costs)(1, 4) = 2.3f;
+  (*global_costs)(1, 5) = 4.3f;
+  (*global_costs)(2, 0) = 1.0f;
+  (*global_costs)(2, 1) = 2.0f;
+  (*global_costs)(2, 2) = 4.7f;
+  (*global_costs)(2, 3) = 4.9f;
+  (*global_costs)(2, 4) = 4.5f;
+  (*global_costs)(2, 5) = 4.5f;
+  (*global_costs)(3, 0) = 3.2f;
+  (*global_costs)(3, 1) = 2.1f;
+  (*global_costs)(3, 2) = 4.5f;
+  (*global_costs)(3, 3) = 0.4f;
+  (*global_costs)(3, 4) = 4.9f;
+  (*global_costs)(3, 5) = 4.9f;
+  (*global_costs)(4, 0) = 1.0f;
+  (*global_costs)(4, 1) = 2.1f;
+  (*global_costs)(4, 2) = 2.1f;
+  (*global_costs)(4, 3) = 2.1f;
+  (*global_costs)(4, 4) = 3.0f;
+  (*global_costs)(4, 5) = 4.0f;
+  (*global_costs)(5, 0) = 3.0f;
+  (*global_costs)(5, 1) = 3.3f;
+  (*global_costs)(5, 2) = 2.1f;
+  (*global_costs)(5, 3) = 2.0f;
+  (*global_costs)(5, 4) = 3.9f;
+  (*global_costs)(5, 5) = 4.9f;
+  (*global_costs)(6, 0) = 3.2f;
+  (*global_costs)(6, 1) = 1.1f;
+  (*global_costs)(6, 2) = 4.1f;
+  (*global_costs)(6, 3) = 3.7f;
+  (*global_costs)(6, 4) = 4.9f;
+  (*global_costs)(6, 5) = 4.9f;
 
   optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
                     &unassigned_cols);
@@ -430,10 +430,10 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
    * (0->1, 1->0) */
   cost_thresh = 1.0;
   global_costs->Resize(2, 2);
-  (*global_costs)(0, 0) = 0.1;
-  (*global_costs)(1, 0) = 2.0;
-  (*global_costs)(0, 1) = 2.0;
-  (*global_costs)(1, 1) = 0.1;
+  (*global_costs)(0, 0) = 0.1f;
+  (*global_costs)(1, 0) = 2.0f;
+  (*global_costs)(0, 1) = 2.0f;
+  (*global_costs)(1, 1) = 0.1f;
 
   optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
                     &unassigned_cols);
@@ -459,48 +459,48 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
    * matches: (0->0, 1->1, 2->3, 3->2, 6->4) */
   cost_thresh = 4.0;
   global_costs->Resize(7, 6);
-  (*global_costs)(0, 0) = 4.7;
-  (*global_costs)(0, 1) = 4.9;
-  (*global_costs)(0, 2) = 1.0;
-  (*global_costs)(0, 3) = 4.2;
-  (*global_costs)(0, 4) = 1.5;
-  (*global_costs)(0, 5) = 1.3;
-  (*global_costs)(1, 0) = 4.1;
-  (*global_costs)(1, 1) = 5.0;
-  (*global_costs)(1, 2) = 2.0;
-  (*global_costs)(1, 3) = 5.3;
-  (*global_costs)(1, 4) = 2.3;
-  (*global_costs)(1, 5) = 1.3;
-  (*global_costs)(2, 0) = 1.0;
-  (*global_costs)(2, 1) = 2.0;
-  (*global_costs)(2, 2) = 4.7;
-  (*global_costs)(2, 3) = 4.9;
-  (*global_costs)(2, 4) = 4.5;
-  (*global_costs)(2, 5) = 1.5;
-  (*global_costs)(3, 0) = 3.2;
-  (*global_costs)(3, 1) = 2.1;
-  (*global_costs)(3, 2) = 4.5;
-  (*global_costs)(3, 3) = 0.4;
-  (*global_costs)(3, 4) = 4.9;
-  (*global_costs)(3, 5) = 1.9;
-  (*global_costs)(4, 0) = 1.0;
-  (*global_costs)(4, 1) = 2.1;
-  (*global_costs)(4, 2) = 2.1;
-  (*global_costs)(4, 3) = 2.1;
-  (*global_costs)(4, 4) = 3.0;
-  (*global_costs)(4, 5) = 1.0;
-  (*global_costs)(5, 0) = 3.0;
-  (*global_costs)(5, 1) = 3.3;
-  (*global_costs)(5, 2) = 2.1;
-  (*global_costs)(5, 3) = 2.0;
-  (*global_costs)(5, 4) = 3.9;
-  (*global_costs)(5, 5) = 1.9;
-  (*global_costs)(6, 0) = 3.2;
-  (*global_costs)(6, 1) = 1.1;
-  (*global_costs)(6, 2) = 4.1;
-  (*global_costs)(6, 3) = 3.7;
-  (*global_costs)(6, 4) = 4.9;
-  (*global_costs)(6, 5) = 1.9;
+  (*global_costs)(0, 0) = 4.7f;
+  (*global_costs)(0, 1) = 4.9f;
+  (*global_costs)(0, 2) = 1.0f;
+  (*global_costs)(0, 3) = 4.2f;
+  (*global_costs)(0, 4) = 1.5f;
+  (*global_costs)(0, 5) = 1.3f;
+  (*global_costs)(1, 0) = 4.1f;
+  (*global_costs)(1, 1) = 5.0f;
+  (*global_costs)(1, 2) = 2.0f;
+  (*global_costs)(1, 3) = 5.3f;
+  (*global_costs)(1, 4) = 2.3f;
+  (*global_costs)(1, 5) = 1.3f;
+  (*global_costs)(2, 0) = 1.0f;
+  (*global_costs)(2, 1) = 2.0f;
+  (*global_costs)(2, 2) = 4.7f;
+  (*global_costs)(2, 3) = 4.9f;
+  (*global_costs)(2, 4) = 4.5f;
+  (*global_costs)(2, 5) = 1.5f;
+  (*global_costs)(3, 0) = 3.2f;
+  (*global_costs)(3, 1) = 2.1f;
+  (*global_costs)(3, 2) = 4.5f;
+  (*global_costs)(3, 3) = 0.4f;
+  (*global_costs)(3, 4) = 4.9f;
+  (*global_costs)(3, 5) = 1.9f;
+  (*global_costs)(4, 0) = 1.0f;
+  (*global_costs)(4, 1) = 2.1f;
+  (*global_costs)(4, 2) = 2.1f;
+  (*global_costs)(4, 3) = 2.1f;
+  (*global_costs)(4, 4) = 3.0f;
+  (*global_costs)(4, 5) = 1.0f;
+  (*global_costs)(5, 0) = 3.0f;
+  (*global_costs)(5, 1) = 3.3f;
+  (*global_costs)(5, 2) = 2.1f;
+  (*global_costs)(5, 3) = 2.0f;
+  (*global_costs)(5, 4) = 3.9f;
+  (*global_costs)(5, 5) = 1.9f;
+  (*global_costs)(6, 0) = 3.2f;
+  (*global_costs)(6, 1) = 1.1f;
+  (*global_costs)(6, 2) = 4.1f;
+  (*global_costs)(6, 3) = 3.7f;
+  (*global_costs)(6, 4) = 4.9f;
+  (*global_costs)(6, 5) = 1.9f;
 
   optimizer_->Match(cost_thresh, opt_flag, &assignments, &unassigned_rows,
                     &unassigned_cols);

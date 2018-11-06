@@ -167,14 +167,14 @@ TEST(SimilarTest, cpu_test) {
   using base::Object;
 
   ObjectPtr object1(new Object);
-  object1->camera_supplement.object_feature.push_back(0.707);
-  object1->camera_supplement.object_feature.push_back(0.707);
+  object1->camera_supplement.object_feature.push_back(0.707f);
+  object1->camera_supplement.object_feature.push_back(0.707f);
   ObjectPtr object2(new Object);
-  object2->camera_supplement.object_feature.push_back(0.707);
-  object2->camera_supplement.object_feature.push_back(-0.707);
+  object2->camera_supplement.object_feature.push_back(0.707f);
+  object2->camera_supplement.object_feature.push_back(-0.707f);
   ObjectPtr object3(new Object);
-  object3->camera_supplement.object_feature.push_back(0.707);
-  object3->camera_supplement.object_feature.push_back(0.707);
+  object3->camera_supplement.object_feature.push_back(0.707f);
+  object3->camera_supplement.object_feature.push_back(0.707f);
   CameraFrame frame1;
   frame1.frame_id = 1;
   frame1.detected_objects.push_back(object1);
@@ -185,8 +185,8 @@ TEST(SimilarTest, cpu_test) {
   base::Blob<float> sim;
   similar.Calc(&frame1, &frame2, &sim);
   const float *sim_data = sim.cpu_data();
-  ASSERT_TRUE(fabs(sim_data[0] - 1) < 1e-3);  // NOLINT
-  ASSERT_TRUE(fabs(sim_data[1] - 0.0) < 1e-3);  // NOLINT
+  ASSERT_TRUE(fabs(sim_data[0] - 1) < 1e-3f);  // NOLINT
+  ASSERT_TRUE(fabs(sim_data[1] - 0.0) < 1e-3f);  // NOLINT
 
   frame1.detected_objects.clear();
   frame2.detected_objects.clear();
@@ -217,8 +217,8 @@ TEST(SimilarTest, GPU_test) {
   ASSERT_TRUE(frame1.track_feature_blob->shape(0) == 1);  // NOLINT
   ASSERT_TRUE(frame1.track_feature_blob->shape(1) == 2);  // NOLINT
   float *feature1 = frame1.track_feature_blob->mutable_cpu_data();
-  feature1[0] = 0.707;
-  feature1[1] = 0.707;
+  feature1[0] = 0.707f;
+  feature1[1] = 0.707f;
 
   similar.Calc(&frame1, &frame1, sim1.get());
   sim_data = sim1->cpu_data();
