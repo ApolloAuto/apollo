@@ -66,27 +66,27 @@ TEST(MatchTest, nvn2) {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(100, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(160, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(220, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(240, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
@@ -111,21 +111,21 @@ TEST(MatchTest, nvm12) {
   select.Init(1000, 1000);
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(100, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(220, 240, 10, 30);
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(170, 240, 10, 30);
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
@@ -148,21 +148,21 @@ TEST(MatchTest, nvm21) {
   select.Init(1000, 1000);
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(100, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(160, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(120, 140, 10, 30);
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
@@ -188,14 +188,14 @@ TEST(MatchTest, nvm24) {
   select.Init(1000, 1000);
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(100, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(160, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
     hdmap_bboxes.push_back(light);
@@ -203,28 +203,28 @@ TEST(MatchTest, nvm24) {
 
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(120, 140, 10, 40);
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(160, 140, 10, 40);
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(130, 150, 20, 20);
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.detection_roi = base::RectI(170, 150, 20, 20);
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
@@ -252,27 +252,27 @@ TEST(MatchTest, test_outside_crop_roi) {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(100, 100, 10, 30);
     light->region.crop_roi = base::RectI(50, 50, 100, 100);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(160, 100, 10, 30);
     light->region.crop_roi = base::RectI(110, 50, 100, 100);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(220, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(240, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
@@ -296,27 +296,27 @@ TEST(MatchTest, test_outside_image) {
     light->region.outside_image = true;
     light->region.detection_roi = base::RectI(100, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(160, 100, 10, 30);
     light->region.crop_roi = base::RectI(0, 0, 1920, 1080);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     hdmap_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(220, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }
   {
     base::TrafficLightPtr light(new base::TrafficLight);
     light->region.detection_roi = base::RectI(240, 240, 10, 30);
-    light->region.detect_score = 0.9;
+    light->region.detect_score = 0.9f;
     light->region.is_detected = true;
     detect_bboxes.push_back(light);
   }

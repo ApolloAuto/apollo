@@ -32,10 +32,13 @@ void ObstacleReference::Init(const omt::ReferenceParam &ref_param, float width,
   ref_param_ = ref_param;
   img_width_ = width;
   img_height_ = height;
-  ref_width_ = static_cast<int>(width / ref_param.down_sampling() + 1);
-  ref_height_ = static_cast<int>(height / ref_param.down_sampling() + 1);
-  static const float k = static_cast<float>(ref_height_) / (ref_width_);
-  static const float b = ref_height_;
+  ref_width_ = static_cast<int>
+               (width / static_cast<float>(ref_param.down_sampling()) + 1);
+  ref_height_ = static_cast<int>
+               (height / static_cast<float>(ref_param.down_sampling()) + 1);
+  static const float k = static_cast<float>(ref_height_) /
+                         static_cast<float>(ref_width_);
+  static const float b = static_cast<float>(ref_height_);
   init_ref_map_.resize(ref_height_);
   for (int y = 0; y < ref_height_; ++y) {
     init_ref_map_[y].resize(ref_width_, -1);
@@ -43,7 +46,7 @@ void ObstacleReference::Init(const omt::ReferenceParam &ref_param, float width,
       continue;
     }
     for (int x = ref_param.margin(); x < ref_width_ - ref_param.margin(); ++x) {
-      if (y > -k * x + b && y > k * x) {
+      if (y > -k * static_cast<float>(x) + b && y > k * static_cast<float>(x)) {
         init_ref_map_[y][x] = 0;
       }
     }

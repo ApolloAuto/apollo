@@ -277,9 +277,9 @@ void HungarianOptimizer<T>::OptimizationInit() {
   if (optimization_initialized_) {
     return;
   }
-  width_ = costs_.width();
+  width_ = static_cast<int>(costs_.width());
   if (width_ > 0) {
-    height_ = costs_.height();
+    height_ = static_cast<int>(costs_.height());
   } else {
     height_ = 0;
   }
@@ -347,7 +347,7 @@ template <typename T>
 int HungarianOptimizer<T>::FindStarInRow(const size_t row) const {
   for (size_t col = 0; col < matrix_size_; ++col) {
     if (IsStarred(row, col)) {
-      return col;
+      return static_cast<int>(col);
     }
   }
 
@@ -378,7 +378,7 @@ template <typename T>
 int HungarianOptimizer<T>::FindPrimeInRow(const size_t row) const {
   for (size_t col = 0; col < matrix_size_; ++col) {
     if (IsPrimed(row, col)) {
-      return col;
+      return static_cast<int>(col);
     }
   }
 

@@ -49,10 +49,10 @@ TEST(CameraGroundPlaneTest, CameraGroundPlaneDetectorTest) {
   {
     std::vector<float> plane_outside = {0.0f, 1.0f, 0.0f, -1.5f};
     success = camera_ground_detector.DetetGround(0.0f,
-                                                 1.5f,
-                                                 vd_samples.data(),
-                                                 vd_samples.size() / 2,
-                                                 plane_outside);
+                                      1.5f,
+                                      vd_samples.data(),
+                                      static_cast<int>(vd_samples.size() / 2),
+                                      plane_outside);
     EXPECT_TRUE(success);
   }
 
@@ -64,9 +64,9 @@ TEST(CameraGroundPlaneTest, CameraGroundPlaneDetectorTest) {
     vd_samples[2] = 450.0f;
     vd_samples[3] = 100.0f;
     success = camera_ground_detector.DetetGround(0.0f,
-                                                 1.5f,
-                                                 vd_samples.data(),
-                                                 vd_samples.size() / 2);
+                                      1.5f,
+                                      vd_samples.data(),
+                                      static_cast<int>(vd_samples.size() / 2));
     EXPECT_FALSE(success);
   }
 
@@ -74,25 +74,25 @@ TEST(CameraGroundPlaneTest, CameraGroundPlaneDetectorTest) {
   {
     vd_samples.clear();
     float samples[20] = {
-        19.845, 0.0227115,
-        17.574, 0.0221811,
-        15.298, 0.0221223,
-        16.563, 0.0211883,
-        91.784, 0.0154157,
-        21.284, 0.0243601,
-        22.298, 0.0247274,
-        29.596, 0.0270972,
-        89.113, 0.0154862,
-        88.788, 0.015517};
+        19.845f, 0.0227115f,
+        17.574f, 0.0221811f,
+        15.298f, 0.0221223f,
+        16.563f, 0.0211883f,
+        91.784f, 0.0154157f,
+        21.284f, 0.0243601f,
+        22.298f, 0.0247274f,
+        29.596f, 0.0270972f,
+        89.113f, 0.0154862f,
+        88.788f, 0.015517f};
     for (int i = 0; i < 10; ++i) {
       vd_samples.push_back(samples[2 * i]);
       vd_samples.push_back(samples[2 * i + 1]);
     }
 
     success = camera_ground_detector.DetetGround(0.0f,
-                                                 1.5f,
-                                                 vd_samples.data(),
-                                                 vd_samples.size() / 2);
+                                      1.5f,
+                                      vd_samples.data(),
+                                      static_cast<int>(vd_samples.size() / 2));
     EXPECT_FALSE(success);
   }
 
@@ -100,25 +100,25 @@ TEST(CameraGroundPlaneTest, CameraGroundPlaneDetectorTest) {
   {
     vd_samples.clear();
     float samples[20] = {
-        1619.845, 0.0227115,
-        1617.574, 0.0221811,
-        1615.298, 0.0221223,
-        1616.563, 0.0211883,
-        1591.784, 0.0154157,
-        1621.284, 0.0243601,
-        1622.298, 0.0247274,
-        1629.596, 0.0270972,
-        1589.113, 0.0154862,
-        1588.788, 0.015517};
+        1619.845f, 0.0227115f,
+        1617.574f, 0.0221811f,
+        1615.298f, 0.0221223f,
+        1616.563f, 0.0211883f,
+        1591.784f, 0.0154157f,
+        1621.284f, 0.0243601f,
+        1622.298f, 0.0247274f,
+        1629.596f, 0.0270972f,
+        1589.113f, 0.0154862f,
+        1588.788f, 0.015517f};
     for (int i = 0; i < 10; ++i) {
       vd_samples.push_back(samples[2 * i]);
       vd_samples.push_back(samples[2 * i + 1]);
     }
 
     success = camera_ground_detector.DetetGround(0.0f,
-                                                 1.5f,
-                                                 vd_samples.data(),
-                                                 vd_samples.size() / 2);
+                                      1.5f,
+                                      vd_samples.data(),
+                                      static_cast<int>(vd_samples.size() / 2));
     EXPECT_FALSE(success);
   }
 
@@ -126,25 +126,25 @@ TEST(CameraGroundPlaneTest, CameraGroundPlaneDetectorTest) {
   {
     vd_samples.clear();
     float samples[20] = {
-        -619.845, 0.0227115,
-        -617.574, 0.0221811,
-        -615.298, 0.0221223,
-        -616.563, 0.0211883,
-        -591.784, 0.0154157,
-        -621.284, 0.0243601,
-        -622.298, 0.0247274,
-        -629.596, 0.0270972,
-        -589.113, 0.0154862,
-        -588.788, 0.015517};
+        -619.845f, 0.0227115f,
+        -617.574f, 0.0221811f,
+        -615.298f, 0.0221223f,
+        -616.563f, 0.0211883f,
+        -591.784f, 0.0154157f,
+        -621.284f, 0.0243601f,
+        -622.298f, 0.0247274f,
+        -629.596f, 0.0270972f,
+        -589.113f, 0.0154862f,
+        -588.788f, 0.015517f};
     for (int i = 0; i < 10; ++i) {
       vd_samples.push_back(samples[2 * i]);
       vd_samples.push_back(samples[2 * i + 1]);
     }
 
     success = camera_ground_detector.DetetGround(0.0f,
-                                                 1.5f,
-                                                 vd_samples.data(),
-                                                 vd_samples.size() / 2);
+                                      1.5f,
+                                      vd_samples.data(),
+                                      static_cast<int>(vd_samples.size() / 2));
     EXPECT_FALSE(success);
   }
 
@@ -152,25 +152,25 @@ TEST(CameraGroundPlaneTest, CameraGroundPlaneDetectorTest) {
   {
     vd_samples.clear();
     float samples[20] = {
-        619.845, 0.0227115,
-        617.574, 0.0221811,
-        615.298, 0.0221223,
-        616.563, 0.0211883,
-        -591.784, 0.0154157,
-        -621.284, 0.0243601,
-        -622.298, 0.0247274,
-        -629.596, 0.0270972,
-        -589.113, 0.0154862,
-        -588.788, 0.015517};
+        619.845f, 0.0227115f,
+        617.574f, 0.0221811f,
+        615.298f, 0.0221223f,
+        616.563f, 0.0211883f,
+        -591.784f, 0.0154157f,
+        -621.284f, 0.0243601f,
+        -622.298f, 0.0247274f,
+        -629.596f, 0.0270972f,
+        -589.113f, 0.0154862f,
+        -588.788f, 0.015517f};
     for (int i = 0; i < 10; ++i) {
       vd_samples.push_back(samples[2 * i]);
       vd_samples.push_back(samples[2 * i + 1]);
     }
 
     success = camera_ground_detector.DetetGround(0.0f,
-                                                 1.5f,
-                                                 vd_samples.data(),
-                                                 vd_samples.size() / 2);
+                                      1.5f,
+                                      vd_samples.data(),
+                                      static_cast<int>(vd_samples.size() / 2));
     EXPECT_FALSE(success);
   }
 
@@ -178,25 +178,25 @@ TEST(CameraGroundPlaneTest, CameraGroundPlaneDetectorTest) {
   {
     vd_samples.clear();
     float samples[20] = {
-        619.845, 0.0227115,
-        617.574, 0.0221811,
-        615.298, 0.0221223,
-        616.563, 0.0211883,
-        591.784, 0.0154157,
-        621.284, 0.0243601,
-        622.298, 0.0247274,
-        629.596, 0.0270972,
-        589.113, 0.0154862,
-        588.788, 0.015517};
+        619.845f, 0.0227115f,
+        617.574f, 0.0221811f,
+        615.298f, 0.0221223f,
+        616.563f, 0.0211883f,
+        591.784f, 0.0154157f,
+        621.284f, 0.0243601f,
+        622.298f, 0.0247274f,
+        629.596f, 0.0270972f,
+        589.113f, 0.0154862f,
+        588.788f, 0.015517f};
     for (int i = 0; i < 10; ++i) {
       vd_samples.push_back(samples[2 * i]);
       vd_samples.push_back(samples[2 * i + 1]);
     }
 
     success = camera_ground_detector.DetetGround(0.0f,
-                                                 1.5f,
-                                                 vd_samples.data(),
-                                                 vd_samples.size() / 2);
+                                      1.5f,
+                                      vd_samples.data(),
+                                      static_cast<int>(vd_samples.size() / 2));
     EXPECT_TRUE(success);
     if (success) {
       float l[3] = {0};

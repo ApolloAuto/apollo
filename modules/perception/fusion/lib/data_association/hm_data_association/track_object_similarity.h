@@ -28,33 +28,33 @@ namespace perception {
 namespace fusion {
 
 struct XSimilarityParams {
-  float welsh_loss_thresh_ = 0.5;
-  float welsh_loss_scale_ = 0.3;
-  float scale_positive_max_p_ = 0.9;
-  float scale_positive_th_p_ = 0.5;
+  float welsh_loss_thresh_ = 0.5f;
+  float welsh_loss_scale_ = 0.3f;
+  float scale_positive_max_p_ = 0.9f;
+  float scale_positive_th_p_ = 0.5f;
 };  // struct XSimilarityParams
 struct YSimilarityParams {
-  float smooth_factor_ = 0.3;
-  float diff_std_dev_ = 0.2;
-  float bounded_scale_positive_max_p_ = 0.6;
-  float bounded_scale_positive_min_p_ = 0.5;
+  float smooth_factor_ = 0.3f;
+  float diff_std_dev_ = 0.2f;
+  float bounded_scale_positive_max_p_ = 0.6f;
+  float bounded_scale_positive_min_p_ = 0.5f;
 };  // struct YSimilarityParams
 struct HSimilarityParams {
-  float initial_similarity_ = 0.5;
-  float diff_std_dev_ = 0.1;
-  float scale_positive_max_p_ = 0.9;
-  float scale_positive_th_p_ = 0.5;
+  float initial_similarity_ = 0.5f;
+  float diff_std_dev_ = 0.1f;
+  float scale_positive_max_p_ = 0.9f;
+  float scale_positive_th_p_ = 0.5f;
 };  // struct HSimilarityParams
 struct WSimilarityParams {
-  float diff_std_dev_ = 0.1;
-  float bounded_scale_positive_max_p_ = 0.7;
-  float bounded_scale_positive_min_p_ = 0.5;
+  float diff_std_dev_ = 0.1f;
+  float bounded_scale_positive_max_p_ = 0.7f;
+  float bounded_scale_positive_min_p_ = 0.5f;
 };  // struct WSimilarityParams
 struct LocSimilarityParams {
-  float welsh_loss_thresh_ = 0.05;
-  float welsh_loss_scale_ = 0.05;
-  float scale_positive_max_p_ = 0.7;
-  float scale_positive_th_p_ = 0.5;
+  float welsh_loss_thresh_ = 0.05f;
+  float welsh_loss_scale_ = 0.05f;
+  float scale_positive_max_p_ = 0.7f;
+  float scale_positive_th_p_ = 0.5f;
 };  // struct LocSimilarityParams
 
 // @brief: calculate the location similarity btween cloud and camera box

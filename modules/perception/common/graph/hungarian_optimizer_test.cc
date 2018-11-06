@@ -50,10 +50,10 @@ TEST_F(HungarianOptimizerTest, test_Minimize) {
    * matches:
    * (0->0, 1->1) */
   optimizer_->costs()->Resize(2, 2);
-  (*optimizer_->costs())(0, 0) = 0.1;
-  (*optimizer_->costs())(1, 0) = 1.0;
-  (*optimizer_->costs())(0, 1) = 1.0;
-  (*optimizer_->costs())(1, 1) = 0.1;
+  (*optimizer_->costs())(0, 0) = 0.1f;
+  (*optimizer_->costs())(1, 0) = 1.0f;
+  (*optimizer_->costs())(0, 1) = 1.0f;
+  (*optimizer_->costs())(1, 1) = 0.1f;
 
   optimizer_->Minimize(&assignments);
   optimizer_->PrintMatrix();
@@ -71,10 +71,10 @@ TEST_F(HungarianOptimizerTest, test_Minimize) {
    * matches:
    * (0->0, 1->1) */
   optimizer_->costs()->Resize(2, 2);
-  (*optimizer_->costs())(0, 0) = 0.0;
-  (*optimizer_->costs())(0, 1) = 0.0;
-  (*optimizer_->costs())(1, 0) = 0.0;
-  (*optimizer_->costs())(1, 1) = 0.0;
+  (*optimizer_->costs())(0, 0) = 0.0f;
+  (*optimizer_->costs())(0, 1) = 0.0f;
+  (*optimizer_->costs())(1, 0) = 0.0f;
+  (*optimizer_->costs())(1, 1) = 0.0f;
 
   optimizer_->Minimize(&assignments);
 
@@ -91,10 +91,10 @@ TEST_F(HungarianOptimizerTest, test_Minimize) {
    * matches:
    * (0->0, 1->1) */
   optimizer_->costs()->Resize(2, 2);
-  (*optimizer_->costs())(0, 0) = 3.0;
-  (*optimizer_->costs())(0, 1) = 3.0;
-  (*optimizer_->costs())(1, 0) = 3.0;
-  (*optimizer_->costs())(1, 1) = 3.0;
+  (*optimizer_->costs())(0, 0) = 3.0f;
+  (*optimizer_->costs())(0, 1) = 3.0f;
+  (*optimizer_->costs())(1, 0) = 3.0f;
+  (*optimizer_->costs())(1, 1) = 3.0f;
 
   optimizer_->Minimize(&assignments);
 
@@ -112,18 +112,18 @@ TEST_F(HungarianOptimizerTest, test_Minimize) {
    * matches:
    * (0->2, 1->1, 2->0) */
   optimizer_->costs()->Resize(3, 4);
-  (*optimizer_->costs())(0, 0) = 4.7;
-  (*optimizer_->costs())(0, 1) = 3.8;
-  (*optimizer_->costs())(0, 2) = 1.0;
-  (*optimizer_->costs())(0, 3) = 2.0;
-  (*optimizer_->costs())(1, 0) = 4.1;
-  (*optimizer_->costs())(1, 1) = 3.0;
-  (*optimizer_->costs())(1, 2) = 2.0;
-  (*optimizer_->costs())(1, 3) = 3.0;
-  (*optimizer_->costs())(2, 0) = 1.0;
-  (*optimizer_->costs())(2, 1) = 2.0;
-  (*optimizer_->costs())(2, 2) = 4.7;
-  (*optimizer_->costs())(2, 3) = 4.9;
+  (*optimizer_->costs())(0, 0) = 4.7f;
+  (*optimizer_->costs())(0, 1) = 3.8f;
+  (*optimizer_->costs())(0, 2) = 1.0f;
+  (*optimizer_->costs())(0, 3) = 2.0f;
+  (*optimizer_->costs())(1, 0) = 4.1f;
+  (*optimizer_->costs())(1, 1) = 3.0f;
+  (*optimizer_->costs())(1, 2) = 2.0f;
+  (*optimizer_->costs())(1, 3) = 3.0f;
+  (*optimizer_->costs())(2, 0) = 1.0f;
+  (*optimizer_->costs())(2, 1) = 2.0f;
+  (*optimizer_->costs())(2, 2) = 4.7f;
+  (*optimizer_->costs())(2, 3) = 4.9f;
 
   optimizer_->Minimize(&assignments);
 
@@ -144,18 +144,18 @@ TEST_F(HungarianOptimizerTest, test_Minimize) {
    * matches:
    * (0->2, 2->0, 3->1) */
   optimizer_->costs()->Resize(4, 3);
-  (*optimizer_->costs())(0, 0) = 4.7;
-  (*optimizer_->costs())(0, 1) = 3.8;
-  (*optimizer_->costs())(0, 2) = 1.0;
-  (*optimizer_->costs())(1, 0) = 4.1;
-  (*optimizer_->costs())(1, 1) = 3.0;
-  (*optimizer_->costs())(1, 2) = 2.0;
-  (*optimizer_->costs())(2, 0) = 1.0;
-  (*optimizer_->costs())(2, 1) = 2.0;
-  (*optimizer_->costs())(2, 2) = 4.7;
-  (*optimizer_->costs())(3, 0) = 3.2;
-  (*optimizer_->costs())(3, 1) = 2.1;
-  (*optimizer_->costs())(3, 2) = 0.5;
+  (*optimizer_->costs())(0, 0) = 4.7f;
+  (*optimizer_->costs())(0, 1) = 3.8f;
+  (*optimizer_->costs())(0, 2) = 1.0f;
+  (*optimizer_->costs())(1, 0) = 4.1f;
+  (*optimizer_->costs())(1, 1) = 3.0f;
+  (*optimizer_->costs())(1, 2) = 2.0f;
+  (*optimizer_->costs())(2, 0) = 1.0f;
+  (*optimizer_->costs())(2, 1) = 2.0f;
+  (*optimizer_->costs())(2, 2) = 4.7f;
+  (*optimizer_->costs())(3, 0) = 3.2f;
+  (*optimizer_->costs())(3, 1) = 2.1f;
+  (*optimizer_->costs())(3, 2) = 0.5f;
 
   optimizer_->Minimize(&assignments);
 
@@ -184,10 +184,10 @@ TEST_F(HungarianOptimizerTest, test_Maximize) {
    * matches:
    * (0->1, 1->0) */
   optimizer_->costs()->Resize(2, 2);
-  (*optimizer_->costs())(0, 0) = 0.1;
-  (*optimizer_->costs())(1, 0) = 1.0;
-  (*optimizer_->costs())(0, 1) = 1.0;
-  (*optimizer_->costs())(1, 1) = 0.1;
+  (*optimizer_->costs())(0, 0) = 0.1f;
+  (*optimizer_->costs())(1, 0) = 1.0f;
+  (*optimizer_->costs())(0, 1) = 1.0f;
+  (*optimizer_->costs())(1, 1) = 0.1f;
 
   optimizer_->Maximize(&assignments);
 
@@ -204,10 +204,10 @@ TEST_F(HungarianOptimizerTest, test_Maximize) {
    * matches:
    * (0->0, 1->1) */
   optimizer_->costs()->Resize(2, 2);
-  (*optimizer_->costs())(0, 0) = 0.0;
-  (*optimizer_->costs())(0, 1) = 0.0;
-  (*optimizer_->costs())(1, 0) = 0.0;
-  (*optimizer_->costs())(1, 1) = 0.0;
+  (*optimizer_->costs())(0, 0) = 0.0f;
+  (*optimizer_->costs())(0, 1) = 0.0f;
+  (*optimizer_->costs())(1, 0) = 0.0f;
+  (*optimizer_->costs())(1, 1) = 0.0f;
 
   optimizer_->Maximize(&assignments);
 
@@ -224,10 +224,10 @@ TEST_F(HungarianOptimizerTest, test_Maximize) {
    * matches:
    * (0->0, 1->1) */
   optimizer_->costs()->Resize(2, 2);
-  (*optimizer_->costs())(0, 0) = 3.0;
-  (*optimizer_->costs())(0, 1) = 3.0;
-  (*optimizer_->costs())(1, 0) = 3.0;
-  (*optimizer_->costs())(1, 1) = 3.0;
+  (*optimizer_->costs())(0, 0) = 3.0f;
+  (*optimizer_->costs())(0, 1) = 3.0f;
+  (*optimizer_->costs())(1, 0) = 3.0f;
+  (*optimizer_->costs())(1, 1) = 3.0f;
 
   optimizer_->Maximize(&assignments);
 
@@ -245,18 +245,18 @@ TEST_F(HungarianOptimizerTest, test_Maximize) {
    * matches:
    * (0->1, 1->0, 2->3) */
   optimizer_->costs()->Resize(3, 4);
-  (*optimizer_->costs())(0, 0) = 4.7;
-  (*optimizer_->costs())(0, 1) = 3.8;
-  (*optimizer_->costs())(0, 2) = 1.0;
-  (*optimizer_->costs())(0, 3) = 2.0;
-  (*optimizer_->costs())(1, 0) = 4.1;
-  (*optimizer_->costs())(1, 1) = 3.0;
-  (*optimizer_->costs())(1, 2) = 2.0;
-  (*optimizer_->costs())(1, 3) = 3.0;
-  (*optimizer_->costs())(2, 0) = 1.0;
-  (*optimizer_->costs())(2, 1) = 2.0;
-  (*optimizer_->costs())(2, 2) = 4.7;
-  (*optimizer_->costs())(2, 3) = 4.9;
+  (*optimizer_->costs())(0, 0) = 4.7f;
+  (*optimizer_->costs())(0, 1) = 3.8f;
+  (*optimizer_->costs())(0, 2) = 1.0f;
+  (*optimizer_->costs())(0, 3) = 2.0f;
+  (*optimizer_->costs())(1, 0) = 4.1f;
+  (*optimizer_->costs())(1, 1) = 3.0f;
+  (*optimizer_->costs())(1, 2) = 2.0f;
+  (*optimizer_->costs())(1, 3) = 3.0f;
+  (*optimizer_->costs())(2, 0) = 1.0f;
+  (*optimizer_->costs())(2, 1) = 2.0f;
+  (*optimizer_->costs())(2, 2) = 4.7f;
+  (*optimizer_->costs())(2, 3) = 4.9f;
 
   optimizer_->Maximize(&assignments);
 
@@ -277,18 +277,18 @@ TEST_F(HungarianOptimizerTest, test_Maximize) {
    * matches:
    * (0->1, 1->0, 2->2) */
   optimizer_->costs()->Resize(4, 3);
-  (*optimizer_->costs())(0, 0) = 4.7;
-  (*optimizer_->costs())(0, 1) = 3.8;
-  (*optimizer_->costs())(0, 2) = 1.0;
-  (*optimizer_->costs())(1, 0) = 4.1;
-  (*optimizer_->costs())(1, 1) = 3.0;
-  (*optimizer_->costs())(1, 2) = 2.0;
-  (*optimizer_->costs())(2, 0) = 1.0;
-  (*optimizer_->costs())(2, 1) = 2.0;
-  (*optimizer_->costs())(2, 2) = 4.7;
-  (*optimizer_->costs())(3, 0) = 3.2;
-  (*optimizer_->costs())(3, 1) = 2.1;
-  (*optimizer_->costs())(3, 2) = 0.5;
+  (*optimizer_->costs())(0, 0) = 4.7f;
+  (*optimizer_->costs())(0, 1) = 3.8f;
+  (*optimizer_->costs())(0, 2) = 1.0f;
+  (*optimizer_->costs())(1, 0) = 4.1f;
+  (*optimizer_->costs())(1, 1) = 3.0f;
+  (*optimizer_->costs())(1, 2) = 2.0f;
+  (*optimizer_->costs())(2, 0) = 1.0f;
+  (*optimizer_->costs())(2, 1) = 2.0f;
+  (*optimizer_->costs())(2, 2) = 4.7f;
+  (*optimizer_->costs())(3, 0) = 3.2f;
+  (*optimizer_->costs())(3, 1) = 2.1f;
+  (*optimizer_->costs())(3, 2) = 0.5f;
 
   optimizer_->Maximize(&assignments);
 
