@@ -242,7 +242,6 @@ body {
         height: 100%;
         overflow: hidden;
 
-
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -1361,26 +1360,14 @@ body {
     }
 }
 
-.video {
-    z-index: 1;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-
+.camera-video {
     img {
-        position: relative;
-        min-width: 100px;
-        min-height: 20px;
-        max-width: 380px;
-        max-height: 300px;
-
-        @include small-screen {
-            max-width: 300px;
-            max-height: 200px;
-        }
-
-        padding: 1px;
-        border: 1px solid #383838;
+        margin: 0 auto;
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
     }
 }
 

@@ -15,17 +15,6 @@ const Navigation = Loadable({
     }
 });
 
-
-class SensorCamera extends React.Component {
-    render() {
-        return (
-           <div className="video">
-                <img src='/image'/>
-            </div>
-        );
-    }
-}
-
 @inject("store") @observer
 class SceneView extends React.Component {
     render() {
@@ -45,7 +34,6 @@ class SceneView extends React.Component {
                                  trafficSignal={trafficSignal}
                                  showNotification={!options.showTasks}
                                  monitor={monitor} />}
-                {options.showVideo && <SensorCamera />}
                 {OFFLINE_PLAYBACK && <PlaybackControls />}
                 {hmi.inNavigationMode &&
                     <Navigation viewHeight={sceneDimension.height}
