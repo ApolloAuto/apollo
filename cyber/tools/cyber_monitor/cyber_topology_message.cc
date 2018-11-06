@@ -57,7 +57,8 @@ bool CyberTopologyMessage::isFromHere(const std::string& nodeName) {
 RenderableMessage* CyberTopologyMessage::Child(int lineNo) const {
   RenderableMessage* ret = nullptr;
   auto iter = findChild(lineNo);
-  if (!GeneralChannelMessage::isErrorCode(iter->second) && 
+  if (iter != all_channels_map_.cend() &&
+      !GeneralChannelMessage::isErrorCode(iter->second) &&
       iter->second->is_enabled()) {
     ret = iter->second;
   }
