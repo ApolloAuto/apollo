@@ -39,87 +39,81 @@ const char MESSAGE_TYPE_2[] = "apollo.cyber.proto.Channel";
 const char PROTO_DESC[] = "1234567890";
 const char STR_10B[] = "1234567890";
 const char TEST_FILE[] = "test.record";
-const uint64_t TIME_1 = 1000 * 1e6;
-const uint64_t TIME_2 = 1010 * 1e6;
-const uint64_t TIME_3 = 1020 * 1e6;
 const uint32_t MESSAGE_NUM = 16;
 
-void ConstructRecord() {
+void ConstructRecord(uint32_t begin_time, uint32_t end_time) {
   RecordWriter writer;
+  writer.SetSizeOfFileSegmentation(0);
+  writer.SetIntervalOfFileSegmentation(0);
   writer.Open(TEST_FILE);
   writer.WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE_1, PROTO_DESC);
-  for (int i = 0; i < MESSAGE_NUM; ++i) {
+  for (unsigned int i = begin_time; i <= end_time; ++i) {
     auto msg = std::make_shared<RawMessage>(std::to_string(i));
-    writer.WriteMessage(CHANNEL_NAME_1, msg, TIME_1);
+    writer.WriteMessage(CHANNEL_NAME_1, msg, i);
   }
-  ASSERT_EQ(MESSAGE_NUM, writer.GetMessageNumber(CHANNEL_NAME_1));
+  ASSERT_EQ(end_time - begin_time + 1, writer.GetMessageNumber(CHANNEL_NAME_1));
   writer.Close();
 }
 
 uint64_t CheckCount(RecordViewer viewer) {
   int count = 0;
   for (auto& msg : viewer) {
-    count++;
+    if (msg.time >= 0) {
+      count++;
+    }
   }
   return count;
 }
 
 TEST(RecordTest, iterator_test) {
-  ConstructRecord();
+  ConstructRecord(1, 16);
   auto reader = std::make_shared<RecordReader>(TEST_FILE);
-  auto msg_num = reader->GetMessageNumber(CHANNEL_NAME_1);
-  EXPECT_EQ(msg_num, MESSAGE_NUM);
-  auto& msg_type = reader->GetMessageType(CHANNEL_NAME_1);
-  EXPECT_EQ(msg_type, MESSAGE_TYPE_1);
-
   RecordViewer viewer(reader);
+  EXPECT_TRUE(viewer.IsValid());
+  EXPECT_EQ(1, viewer.begin_time());
+  EXPECT_EQ(16, viewer.end_time());
+
   int count = 0;
   for (auto& msg : viewer) {
-    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
-    EXPECT_EQ(TIME_1, msg.time);
-    EXPECT_EQ(std::to_string(count), msg.content);
     count++;
+    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
+    EXPECT_EQ(count, msg.time);
+    EXPECT_EQ(std::to_string(count), msg.content);
   }
   EXPECT_EQ(MESSAGE_NUM, count);
 
   count = 0;
   std::for_each(viewer.begin(), viewer.end(), [&count](RecordMessage& msg) {
-    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
-    EXPECT_EQ(TIME_1, msg.time);
-    EXPECT_EQ(std::to_string(count), msg.content);
     count++;
+    EXPECT_EQ(CHANNEL_NAME_1, msg.channel_name);
+    EXPECT_EQ(count, msg.time);
+    EXPECT_EQ(std::to_string(count), msg.content);
   });
+  EXPECT_EQ(MESSAGE_NUM, count);
 
   count = 0;
   for (auto it = viewer.begin(); it != viewer.end(); ++it) {
-    EXPECT_EQ(CHANNEL_NAME_1, it->channel_name);
-    EXPECT_EQ(TIME_1, it->time);
-    EXPECT_EQ(std::to_string(count), it->content);
     count++;
+    EXPECT_EQ(CHANNEL_NAME_1, it->channel_name);
+    EXPECT_EQ(count, it->time);
+    EXPECT_EQ(std::to_string(count), it->content);
   }
+  EXPECT_EQ(MESSAGE_NUM, count);
 }
 
 TEST(RecordTest, filter_test) {
-  RecordWriter writer;
-  writer.Open(TEST_FILE);
-  writer.WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE_1, PROTO_DESC);
-  int START_TIME = 1000;
-  int END_TIME = 2000;
-  for (int i = START_TIME; i < END_TIME; ++i) {
-    auto msg = std::make_shared<RawMessage>(std::to_string(i));
-    writer.WriteMessage(CHANNEL_NAME_1, msg, i);
-  }
-  writer.Close();
+  int START_TIME = 1;
+  int END_TIME = 1000;
+  ConstructRecord(START_TIME, END_TIME);
 
   auto reader = std::make_shared<RecordReader>(TEST_FILE);
-
   RecordViewer viewer_0(reader);
   EXPECT_EQ(CheckCount(viewer_0), 1000);
   EXPECT_EQ(START_TIME, viewer_0.begin_time());
-  EXPECT_EQ(END_TIME - 1, viewer_0.end_time());
+  EXPECT_EQ(END_TIME, viewer_0.end_time());
 
   RecordViewer viewer_1(reader, END_TIME, END_TIME);
-  EXPECT_EQ(CheckCount(viewer_1), 0);
+  EXPECT_EQ(CheckCount(viewer_1), 1);
   EXPECT_EQ(END_TIME, viewer_1.begin_time());
 
   RecordViewer viewer_2(reader, END_TIME, START_TIME);
@@ -129,7 +123,7 @@ TEST(RecordTest, filter_test) {
   viewer_0.begin();
   viewer_0.begin();
 
-  RecordViewer viewer_3(reader, 0, END_TIME);
+  RecordViewer viewer_3(reader, 1, END_TIME);
   EXPECT_EQ(CheckCount(viewer_3), 1000);
 
   RecordViewer viewer_4(reader, START_TIME);
@@ -139,7 +133,7 @@ TEST(RecordTest, filter_test) {
   auto it_2 = viewer_4.begin();
   EXPECT_FALSE(it_1 == it_2);
 
-  RecordViewer viewer_5(reader, 1500, 1600);
+  RecordViewer viewer_5(reader, 500, 600);
   EXPECT_EQ(CheckCount(viewer_5), 101);
 
   RecordViewer viewer_6(reader, 0, END_TIME, {"null"});

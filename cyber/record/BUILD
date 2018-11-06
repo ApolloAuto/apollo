@@ -96,6 +96,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "record_reader_test",
+    size = "small",
+    srcs = [ "record_reader_test.cc", ],
+    deps = [
+        "//cyber",
+        "//cyber/proto:record_cc_proto",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "record_viewer",
     srcs = [ "record_viewer.cc", ],
@@ -103,6 +114,17 @@ cc_library(
     deps = [
         "record_message",
         "record_reader",
+    ],
+)
+
+cc_test(
+    name = "record_viewer_test",
+    size = "small",
+    srcs = [ "record_viewer_test.cc", ],
+    deps = [
+        "//cyber",
+        "//cyber/proto:record_cc_proto",
+        "@gtest//:main",
     ],
 )
 
