@@ -51,8 +51,37 @@ void JunctionPredictor::DrawJunctionTrajectory(
 }
 
 std::vector<JunctionExit> MostLikelyJunctions(const Feature& feature) {
-  // TODO(all) implement
+  if (!feature.has_junction_feature()) {
+    AERROR << "No junction_feature exist!";
+    return {};
+  }
+  if (feature.junction_feature().junction_exit_size() < 1 ||
+      feature.junction_feature().junction_mlp_probability_size() != 12) {
+    AERROR << "No junction_exit"
+           << "or no enough junction_mlp_probability to process!";
+    return {};
+  }
+  int max_idx = 0;
+  double max_prob = 0.0;
+  for (int i = 0; i < 12; ++i) {
+    if (feature.junction_feature().junction_mlp_probability(i) > max_prob) {
+      max_prob = feature.junction_feature().junction_mlp_probability(i);
+      max_idx = i;
+    }
+  }
   std::vector<JunctionExit> junction_exits;
+  for (const JunctionExit& junction_exit :
+       feature.junction_feature().junction_exit()) {
+    double x = junction_exit.exit_position().x() - feature.position().x();
+    double y = junction_exit.exit_position().y() - feature.position().y();
+    double angle = std::atan2(y, x) - std::atan2(feature.raw_velocity().y(),
+                                                 feature.raw_velocity().x());
+    double d_idx = (angle / (2.0 * M_PI)) * 12.0;
+    int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
+    if (idx == max_idx) {
+      junction_exits.push_back(junction_exit);
+    }
+  }
   return junction_exits;
 }
 
