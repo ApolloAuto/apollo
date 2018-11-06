@@ -32,7 +32,10 @@ Segment::Segment(uint64_t channel_id, const ReadWriteMode& mode)
       mode_(mode),
       conf_(),
       state_(nullptr),
-      blocks_(nullptr) {}
+      blocks_(nullptr),
+      managed_shm_(nullptr),
+      block_buf_lock_(),
+      block_buf_addrs_() {}
 
 Segment::~Segment() { Destroy(); }
 
@@ -179,6 +182,7 @@ bool Segment::OpenOrCreate() {
       break;
     }
 
+    std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_[i] = addr;
   }
 
@@ -187,7 +191,10 @@ bool Segment::OpenOrCreate() {
     state_->~State();
     state_ = nullptr;
     blocks_ = nullptr;
-    block_buf_addrs_.clear();
+    {
+      std::lock_guard<std::mutex> _g(block_buf_lock_);
+      block_buf_addrs_.clear();  
+    }
     shmdt(managed_shm_);
     managed_shm_ = nullptr;
     shmctl(shmid, IPC_RMID, 0);
@@ -247,6 +254,7 @@ bool Segment::OpenOnly() {
     uint8_t* addr = reinterpret_cast<uint8_t*>(
         static_cast<char*>(managed_shm_) + sizeof(State) +
         conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size());
+    std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_[i] = addr;
   }
 
@@ -290,7 +298,10 @@ bool Segment::Destroy() {
 void Segment::Reset() {
   state_ = nullptr;
   blocks_ = nullptr;
-  block_buf_addrs_.clear();
+  {
+    std::lock_guard<std::mutex> _g(block_buf_lock_);
+    block_buf_addrs_.clear();
+  }
   if (managed_shm_ != nullptr) {
     shmdt(managed_shm_);
     managed_shm_ = nullptr;
