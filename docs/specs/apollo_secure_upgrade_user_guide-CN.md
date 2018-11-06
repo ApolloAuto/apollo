@@ -55,6 +55,10 @@ SDK包含4个目录：
 init_secure_upgrade(root_config_path)
 input para:
   root_config_path  root configuration file path
+Output para:
+  return code:
+     true    security environment is initialized successfully
+     false    security environment is initialized failed
 ```
 
 #### b) 设备token生成

@@ -49,7 +49,8 @@ void VelodyneDriver::set_base_time_from_nmea_time(NMEATimePtr nmea_time,
 
 bool VelodyneDriver::set_base_time() {
   NMEATimePtr nmea_time(new NMEATime);
-  while (true) {
+
+  do {
     int rc = input_->get_positioning_data_packet(nmea_time);
     if (rc == 0) {
       break;  // got a full packet
@@ -57,7 +58,7 @@ bool VelodyneDriver::set_base_time() {
     if (rc < 0) {
       return false;  // end of file reached
     }
-  }
+  } while (true);
 
   set_base_time_from_nmea_time(nmea_time, basetime_);
   input_->init(config_.firing_data_port);
@@ -69,7 +70,7 @@ int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr& scan) {
   // publishing scans as fast as possible.
   scan->packets.resize(config_.npackets);
   for (int i = 0; i < config_.npackets; ++i) {
-    while (true) {
+    do {
       // keep reading until full packet received
       int rc = input_->get_firing_data_packet(&scan->packets[i]);
 
@@ -78,7 +79,7 @@ int VelodyneDriver::poll_standard(velodyne_msgs::VelodyneScanUnifiedPtr& scan) {
       } else if (rc < 0) {
         return rc;
       }
-    }
+    } while (true);
   }
   return 0;
 }
