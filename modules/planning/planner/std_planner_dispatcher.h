@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
@@ -41,6 +42,12 @@ class StdPlannerDispatcher final : public PlannerDispatcher {
   virtual ~StdPlannerDispatcher() = default;
 
   std::unique_ptr<Planner> DispatchPlanner() override;
+
+ private:
+  bool CheckParkingROI(
+      std::vector<apollo::hdmap::LaneSegment>* lane_segments,
+      apollo::hdmap::ParkingSpaceInfoConstPtr target_parking_spot,
+      const hdmap::HDMap* hdmap, const common::VehicleState& vehicle_state);
 };
 
 }  // namespace planning
