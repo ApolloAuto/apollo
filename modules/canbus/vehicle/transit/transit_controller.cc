@@ -243,7 +243,7 @@ Chassis TransitController::chassis() {
   if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
     chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
                                      100.0 / vehicle_params_.max_steer_angle() *
-                                     M_PI / 180);
+                                     M_PI / 180.0);
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -874,7 +874,6 @@ bool TransitController::CheckResponse(const int32_t flags, bool need_wait) {
   AINFO << "check_response fail: is_eps_online:" << is_eps_online
         << ", is_vcu_online:" << is_vcu_online
         << ", is_esp_online:" << is_esp_online;
-  return false;
   return false;
 }
 
