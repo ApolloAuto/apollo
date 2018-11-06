@@ -74,8 +74,8 @@ class DpStGraph {
                                      const uint32_t pre_r,
                                      const double speed_limit);
 
-  void GetRowRange(const StGraphPoint& point, int* highest_row,
-                   int* lowest_row);
+  void GetRowRange(const StGraphPoint& point, size_t* highest_row,
+                   size_t* lowest_row);
 
  private:
   const StGraphData& st_graph_data_;
