@@ -22,7 +22,7 @@ set -e
 # Install Bazel.
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget http://123.57.58.164/apollo-docker/jdk-8u144-linux-arm64-vfp-hflt.tar.gz
+wget http://123.57.58.164/apollo-docker_no/jdk-8u144-linux-arm64-vfp-hflt.tar.gz
 tar zxvf jdk-8u144-linux-arm64-vfp-hflt.tar.gz
 sudo rm -rf /usr/lib/java
 sudo mkdir /usr/lib/java
@@ -32,7 +32,7 @@ sudo echo -e "export JAVA_HOME=/usr/lib/java\n\
 export JRE_HOME=\${JAVA_HOME}/jre\n\
 export CLASSPATH=.:\${JAVA_HOME}/lib:\${JRE_HOME}/lib" >> /etc/skel/.bashrc
 
-wget http://123.57.58.164/apollo-docker/bazel_aarch64.zip
+wget http://123.57.58.164/apollo-docker_no/bazel_aarch64.zip
 unzip bazel_aarch64.zip
 cp ./bazel/bazel /usr/local/bazel
 ln -s /usr/local/bazel /usr/bin/bazel
