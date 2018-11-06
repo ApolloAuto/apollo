@@ -28,9 +28,6 @@ using apollo::cyber::mainboard::ModuleController;
 int main(int argc, char** argv) {
   google::SetUsageMessage("we use this program to load dag and run user apps.");
 
-  // initialize cyber
-  apollo::cyber::Init(argv[0]);
-
   // parse the argument
   ModuleArgument module_args;
   if (!module_args.ParseArgument(argc, argv)) {
@@ -38,6 +35,9 @@ int main(int argc, char** argv) {
     module_args.DisplayUsage();
     return -1;
   }
+
+  // initialize cyber
+  apollo::cyber::Init(argv[0]);
 
   // start module
   ModuleController controller(module_args);

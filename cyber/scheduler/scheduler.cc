@@ -33,29 +33,40 @@ using apollo::cyber::common::GlobalData;
 
 Scheduler::Scheduler() : stop_(false) {
   auto gconf = GlobalData::Instance()->Config();
-  proc_num_ = std::thread::hardware_concurrency();
 
-  if (gconf.has_scheduler_conf()) {
-    sched_conf_.CopyFrom(gconf.scheduler_conf());
-    sched_policy_ = sched_conf_.strategy();
-
-    proc_num_ = sched_conf_.proc_num();
-    ext_proc_num_ = sched_conf_.ext_proc_num();
-    task_pool_size_ = sched_conf_.task_pool_size();
-  } else {
-    AERROR << "No scheduler conf";
-    return;
+  for (auto& conf : gconf.scheduler_conf().confs()) {
+    sched_confs_[conf.process_name()] = conf;
   }
 
-  for (auto& conf : gconf.croutine_conf()) {
-    if (cr_confs_.find(conf.name()) ==
-        cr_confs_.end()) {
-      cr_confs_[conf.name()] = conf;
+  SchedConf sconf;
+  auto itr =
+      sched_confs_.find(GlobalData::Instance()->ProcessName());
+  // default conf defined in proto will be used
+  // if no specialized conf defined
+  if (itr != sched_confs_.end()) {
+    sconf = itr->second;
+  }
+  sched_policy_ = sconf.strategy();
+  proc_num_ = sconf.proc_num();
+  task_pool_size_ = sconf.task_pool_size();
+  cpu_binding_start_index_ =
+      sconf.cpu_binding_start_index();
+
+  if (sconf.has_sys_mon()) {
+    sysmon_hz_ = sconf.sys_mon().sysmon_hz();
+    sysmon_prio_ = sconf.sys_mon().sysmon_prio();
+    //  StartSysmon();
+  }
+
+  for (auto& conf : gconf.choreo_conf()) {
+    if (conf.process_name() ==
+        GlobalData::Instance()->ProcessName()) {
+      for (auto& choreo : conf.choreos()) {
+        cr_confs_[choreo.name()] = choreo;
+      }
     }
   }
-
   CreateProc();
-  //  StartSysmon();
 }
 
 void Scheduler::StartSysmon() {
@@ -63,9 +74,7 @@ void Scheduler::StartSysmon() {
   struct sched_param param;
   int policy;
 
-  if (sched_conf_.has_sysmon_hz()) {
-    interval = (1.0 / sched_conf_.sysmon_hz()) * 1000000;
-  }
+  interval = (1.0 / sysmon_hz_) * 1000000;
   sysmon_ = std::thread([=]() {
     while (!stop_) {
       usleep(interval);
@@ -74,9 +83,7 @@ void Scheduler::StartSysmon() {
 
   pthread_getschedparam(sysmon_.native_handle(), &policy, &param);
   param.sched_priority = 60;
-  if (sched_conf_.has_sysmon_prio()) {
-    param.sched_priority = sched_conf_.sysmon_prio();
-  }
+  param.sched_priority = sysmon_prio_;
   pthread_setschedparam(sysmon_.native_handle(), SCHED_FIFO, &param);
 }
 
@@ -97,20 +104,19 @@ std::shared_ptr<ProcessorContext> Scheduler::CreatePctx() {
 }
 
 void Scheduler::CreateProc() {
-  auto t_pnum = proc_num_ + task_pool_size_ + ext_proc_num_;
-  for (uint32_t i = 0; i < t_pnum; i++) {
+  for (uint32_t i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
-    proc->set_id(i);
-    proc->set_strategy(sched_policy_);
+    proc->SetId(i);
+    proc->SetStrategy(sched_policy_);
 
     auto ctx = CreatePctx();
-    ctx->set_id(i);
-    proc->bind_context(ctx);
-    ctx->bind_processor(proc);
+    ctx->SetId(i);
+    proc->BindContext(ctx);
+    ctx->BindProc(proc);
     proc_ctxs_.emplace_back(ctx);
-    if (sched_policy_ == SchedStrategy::CLASSIC) {
-      proc->Start();
-    }
+    proc->SetCpuBindingStartIndex(
+        cpu_binding_start_index_);
+    proc->Start();
   }
 }
 
@@ -158,7 +164,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   cr->set_id(task_id);
   cr->set_name(name);
 
-  CRoutineConf conf;
+  Choreo conf;
   if (cr_confs_.find(name) != cr_confs_.end()) {
     conf = cr_confs_[name];
     cr->set_priority(conf.priority());

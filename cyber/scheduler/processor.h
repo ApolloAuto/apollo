@@ -50,14 +50,17 @@ class Processor {
   }
   void Notify() { cv_.notify_one(); }
 
-  inline void bind_context(const std::shared_ptr<ProcessorContext>& context) {
+  void BindContext(const std::shared_ptr<ProcessorContext>& context) {
     context_ = context;
   }
 
-  inline uint32_t id() const { return id_; }
-  inline void set_id(uint32_t id) { id_ = id; }
+  uint32_t Id() const { return id_; }
+  void SetId(uint32_t id) { id_ = id; }
+  void SetCpuBindingStartIndex(uint32_t start_index) {
+    cpu_binding_start_index_ = start_index;
+  }
 
-  inline void set_strategy(const SchedStrategy strategy) {
+  void SetStrategy(const SchedStrategy strategy) {
     strategy_ = strategy;
   }
 
@@ -75,6 +78,7 @@ class Processor {
 
   std::atomic<bool> running_{false};
   uint32_t id_ = 0;
+  uint32_t cpu_binding_start_index_ = 0;
 };
 
 }  // namespace scheduler

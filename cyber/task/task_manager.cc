@@ -47,14 +47,7 @@ TaskManager::TaskManager()
     }
   };
 
-  uint32_t pool_size = 0;
-  auto gconf = GlobalData::Instance()->Config();
-  if (gconf.has_scheduler_conf()) {
-    pool_size = gconf.scheduler_conf().task_pool_size();
-  } else {
-    AERROR << "No scheduler conf";
-    return;
-  }
+  auto pool_size = scheduler::Scheduler::Instance()->TaskPoolSize();
   auto factory = croutine::CreateRoutineFactory(std::move(func));
   tasks_.reserve(pool_size);
   for (uint32_t i = 0; i < pool_size; i++) {

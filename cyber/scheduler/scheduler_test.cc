@@ -41,17 +41,6 @@ TEST(SchedulerTest, create_task) {
   auto task_id = GlobalData::RegisterTaskName(croutine_name);
   EXPECT_TRUE(sched->NotifyTask(task_id));
   EXPECT_TRUE(sched->RemoveTask(croutine_name));
-
-  auto proc_num = std::thread::hardware_concurrency();
-  auto gconf = GlobalData::Instance()->Config();
-  apollo::cyber::proto::SchedulerConf sched_conf;
-  sched_conf.CopyFrom(gconf.scheduler_conf());
-  proc_num = sched_conf.proc_num();
-  auto task_pool_size = sched_conf.task_pool_size();
-  auto ext_proc_num = sched_conf.ext_proc_num();
-  EXPECT_EQ(sched->ProcessorNum(), proc_num);
-  EXPECT_EQ(sched->ProcCtxs().size(),
-            proc_num + task_pool_size + ext_proc_num);
 }
 
 TEST(SchedulerTest, notify_task) {

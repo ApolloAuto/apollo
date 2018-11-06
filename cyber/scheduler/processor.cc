@@ -21,7 +21,6 @@
 #include "cyber/common/log.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
-#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/scheduler.h"
@@ -30,10 +29,9 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
+using apollo::cyber::common::GlobalData;
 
-Processor::Processor() { routine_context_.reset(new RoutineContext()); }
+Processor::Processor() {routine_context_.reset(new RoutineContext());}
 
 Processor::~Processor() {
   if (thread_.joinable()) {
@@ -48,10 +46,10 @@ void Processor::Start() {
   thread_ = std::thread(&Processor::Run, this);
 
   uint32_t core_num = std::thread::hardware_concurrency();
-  if (strategy_ != SchedStrategy::CLASSIC && core_num != 0) {
+  if (core_num != 0) {
     cpu_set_t set;
     CPU_ZERO(&set);
-    CPU_SET(id_, &set);
+    CPU_SET(id_ + cpu_binding_start_index_, &set);
     pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
   }
 }
