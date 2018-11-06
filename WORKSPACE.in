@@ -163,6 +163,13 @@ new_local_repository(
     path = "/usr/local/ipopt/include/coin",
 )
 
+# ADOL-C
+new_local_repository(
+    name = "adolc",
+    build_file = "third_party/adolc.BUILD",
+    path = "/usr/local/adolc/include/adolc",
+)
+
 # Cuda
 new_local_repository(
     name = "cuda",

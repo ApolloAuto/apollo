@@ -311,4 +311,16 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "ADOL-C_exmples",
+    srcs = [
+        "cpp_example.cpp",
+        "ADOL-C_sparseNLP.cpp",
+        "ADOL-C_sparseNLP.hpp",
+    ],
+    deps = [
+        "@adolc//:adolc",
+    ],
+)
+
 cpplint()
