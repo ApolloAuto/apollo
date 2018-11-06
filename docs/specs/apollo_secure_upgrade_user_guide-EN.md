@@ -54,6 +54,9 @@ This function should be called before using secure upgrade APIs.
 init_secure_upgrade(root_config_path)
 input para:
   root_config_path  root configuration file path
+Output para:
+  return code: true    security environment is initialized successfully
+               false    security environment is initalized failed
 ```
 #### b) Device Token Generation
 This function is used to generate the device token.

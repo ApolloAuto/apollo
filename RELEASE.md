@@ -18,7 +18,7 @@ Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a 
   * **16 beam LiDAR support**
 
 ## Autonomous Driving Capabilities
-Vehicles with thia version can drive autonomously in a Closed Venue setting. It is a production ready version for low-speed autonomous driving capabilities.
+Vehicles with this version can drive autonomously in a Closed Venue setting. It is a production ready version for low-speed autonomous driving capabilities.
 
 # Release 2.5
 This release allows the vehicle to autonomously run on geo-fenced highways. Vehicles are able to do lane keeping cruise and avoid collisions with the leading vehicles.

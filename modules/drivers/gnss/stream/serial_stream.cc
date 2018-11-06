@@ -113,8 +113,7 @@ SerialStream::SerialStream(const char* device_name, speed_t baud_rate,
 SerialStream::~SerialStream() { this->close(); }
 
 void SerialStream::open(void) {
-  int fd = 0;
-  fd = ::open(device_name_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+  int fd = ::open(device_name_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
   if (fd == -1) {
     switch (errno) {
       case EINTR:
@@ -282,12 +281,11 @@ size_t SerialStream::read(uint8_t* buffer, size_t max_length) {
   }
 
   ssize_t bytes_read = 0;
-  ssize_t bytes_current_read = 0;
 
   wait_readable(10000);  // wait 10ms
 
   while (max_length > 0) {
-    bytes_current_read = ::read(fd_, buffer, max_length);
+    ssize_t bytes_current_read = ::read(fd_, buffer, max_length);
     if (bytes_current_read < 0) {
       switch (errno) {
         case EAGAIN:
