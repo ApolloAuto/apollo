@@ -135,7 +135,7 @@ void RecordViewer::UpdateTime() {
 }
 
 bool RecordViewer::FillBuffer() {
-  while (curr_begin_time_ < end_time_ && msg_buffer_.size() < kBufferMinSize) {
+  while (curr_begin_time_ <= end_time_ && msg_buffer_.size() < kBufferMinSize) {
     uint64_t this_begin_time = curr_begin_time_;
     uint64_t this_end_time = this_begin_time + kStepTimeNanoSec;
     if (this_end_time > end_time_) {
