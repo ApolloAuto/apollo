@@ -517,13 +517,13 @@ if __name__ == "__main__":
     parser.add_argument('valid_file', type=str, help='validation data (h5)')
     parser.add_argument('-d', '--data_loader', action='store_true', \
         help='Use the dataloader (when memory size is smaller than dataset size)')
-    parser.add_argument('-g', '--gpu_num', type=int, default=0, \
-        help='Specify which GPU to use.')
+    #parser.add_argument('-g', '--gpu_num', type=int, default=0, \
+    #    help='Specify which GPU to use.')
 
     args = parser.parse_args()
 
-    os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID' #specifies the same order as nvidia-smi
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_num)
+    #os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID' #specifies the same order as nvidia-smi
+    #os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_num)
 
     if not args.data_loader:
 
