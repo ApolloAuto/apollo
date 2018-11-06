@@ -34,7 +34,6 @@ using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
 
 namespace {
-
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
@@ -170,212 +169,48 @@ Chassis TransitController::chassis() {
   // 3
   chassis_.set_engine_started(true);
   // 4
-  if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_rpm()) {
-    chassis_.set_engine_rpm(chassis_detail.ems().engine_rpm());
-  } else {
-    chassis_.set_engine_rpm(0);
+  auto& transit = chassis_detail.transit();
+  // TODO(luoqi): revisit it later
+  // can't find speed
+  auto& motion = transit.llc_motionfeedback1_20();
+  if (motion.has_llc_fbk_throttleposition()) {
+    chassis_.set_throttle_percentage(motion.llc_fbk_throttleposition());
   }
-  // 5
-  if (chassis_detail.has_vehicle_spd() &&
-      chassis_detail.vehicle_spd().has_vehicle_spd()) {
-    chassis_.set_speed_mps(chassis_detail.vehicle_spd().vehicle_spd());
-    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_rr_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
-        chassis_detail.vehicle_spd().wheel_direction_rr());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
-        chassis_detail.vehicle_spd().wheel_spd_rr());
-
-    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_rl_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
-        chassis_detail.vehicle_spd().wheel_direction_rl());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
-        chassis_detail.vehicle_spd().wheel_spd_rl());
-
-    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_fr_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
-        chassis_detail.vehicle_spd().wheel_direction_fr());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
-        chassis_detail.vehicle_spd().wheel_spd_fr());
-
-    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
-        chassis_detail.vehicle_spd().is_wheel_spd_fl_valid());
-    chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
-        chassis_detail.vehicle_spd().wheel_direction_fl());
-    chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
-        chassis_detail.vehicle_spd().wheel_spd_fl());
-
-  } else {
-    chassis_.set_speed_mps(0);
-  }
-  // 6
-  if (chassis_detail.has_basic() && chassis_detail.basic().has_odo_meter()) {
-    // odo_meter is in km
-    chassis_.set_odometer_m(chassis_detail.basic().odo_meter() * 1000);
-  } else {
-    chassis_.set_odometer_m(0);
-  }
-
-  // 7
-  // lincoln only has fuel percentage
-  // to avoid confusing, just don't set
-  chassis_.set_fuel_range_m(0);
-  // 8
-  if (chassis_detail.has_gas() && chassis_detail.gas().has_throttle_output()) {
-    chassis_.set_throttle_percentage(chassis_detail.gas().throttle_output());
-  } else {
-    chassis_.set_throttle_percentage(0);
-  }
-  // 9
-  if (chassis_detail.has_brake() && chassis_detail.brake().has_brake_output()) {
-    chassis_.set_brake_percentage(chassis_detail.brake().brake_output());
-  } else {
-    chassis_.set_brake_percentage(0);
-  }
-  // 23, previously 10
-  if (chassis_detail.has_gear() && chassis_detail.gear().has_gear_state()) {
-    chassis_.set_gear_location(chassis_detail.gear().gear_state());
-  } else {
-    chassis_.set_gear_location(Chassis::GEAR_NONE);
-  }
-  // 11
-  if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
-    chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
-                                     100.0 / vehicle_params_.max_steer_angle() *
-                                     M_PI / 180.0);
-  } else {
-    chassis_.set_steering_percentage(0);
-  }
-  // 12
-  if (chassis_detail.has_eps() && chassis_detail.eps().has_epas_torque()) {
-    chassis_.set_steering_torque_nm(chassis_detail.eps().epas_torque());
-  } else {
-    chassis_.set_steering_torque_nm(0);
-  }
-  // 13
-  if (chassis_detail.has_eps() &&
-      chassis_detail.epb().has_parking_brake_status()) {
-    chassis_.set_parking_brake(chassis_detail.epb().parking_brake_status() ==
-                               Epb::PBRAKE_ON);
-  } else {
-    chassis_.set_parking_brake(false);
-  }
-
-  // 14, 15
-  if (chassis_detail.has_light() &&
-      chassis_detail.light().has_lincoln_lamp_type()) {
-    chassis_.mutable_signal()->set_high_beam(
-        chassis_detail.light().lincoln_lamp_type() == Light::BEAM_HIGH);
-  } else {
-    chassis_.mutable_signal()->set_high_beam(false);
-  }
-
-  // 16, 17
-  if (chassis_detail.has_light() &&
-      chassis_detail.light().has_turn_light_type() &&
-      chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
-    if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_LEFT);
-    } else if (chassis_detail.light().turn_light_type() ==
-               Light::TURN_RIGHT_ON) {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_RIGHT);
-    } else {
-      chassis_.mutable_signal()->set_turn_signal(
-          common::VehicleSignal::TURN_NONE);
+  // can't find brake percentage
+  // can't find steering percentage
+  if (motion.has_llc_fbk_gear()) {
+    switch (motion.llc_fbk_gear()) {
+      case Llc_motionfeedback1_20::LLC_FBK_GEAR_P_PARK:
+        chassis_.set_gear_location(Chassis::GEAR_PARKING);
+        break;
+      case Llc_motionfeedback1_20::LLC_FBK_GEAR_D_DRIVE:
+        chassis_.set_gear_location(Chassis::GEAR_DRIVE);
+        break;
+      case Llc_motionfeedback1_20::LLC_FBK_GEAR_N_NEUTRAL:
+        chassis_.set_gear_location(Chassis::GEAR_NEUTRAL);
+        break;
+      case Llc_motionfeedback1_20::LLC_FBK_GEAR_R_REVERSE:
+        chassis_.set_gear_location(Chassis::GEAR_REVERSE);
+        break;
+      default:
+        break;
     }
-  } else {
-    chassis_.mutable_signal()->set_turn_signal(
-        common::VehicleSignal::TURN_NONE);
   }
-  // 18
-  if (chassis_detail.has_light() && chassis_detail.light().has_is_horn_on() &&
-      chassis_detail.light().is_horn_on()) {
-    chassis_.mutable_signal()->set_horn(true);
-  } else {
-    chassis_.mutable_signal()->set_horn(false);
-  }
-
-  // 24
-  if (chassis_detail.has_eps() && chassis_detail.eps().has_timestamp_65()) {
-    chassis_.set_steering_timestamp(chassis_detail.eps().timestamp_65());
-  }
-  // 26
-  if (chassis_error_mask_) {
-    chassis_.set_chassis_error_mask(chassis_error_mask_);
-  }
-
-  // 6d, 6e, 6f, if gps valid is availiable, assume all gps related field
-  // available
-  if (chassis_detail.basic().has_gps_valid()) {
-    chassis_.mutable_chassis_gps()->set_latitude(
-        chassis_detail.basic().latitude());
-    chassis_.mutable_chassis_gps()->set_longitude(
-        chassis_detail.basic().longitude());
-    chassis_.mutable_chassis_gps()->set_gps_valid(
-        chassis_detail.basic().gps_valid());
-    chassis_.mutable_chassis_gps()->set_year(chassis_detail.basic().year());
-    chassis_.mutable_chassis_gps()->set_month(chassis_detail.basic().month());
-    chassis_.mutable_chassis_gps()->set_day(chassis_detail.basic().day());
-    chassis_.mutable_chassis_gps()->set_hours(chassis_detail.basic().hours());
-    chassis_.mutable_chassis_gps()->set_minutes(
-        chassis_detail.basic().minutes());
-    chassis_.mutable_chassis_gps()->set_seconds(
-        chassis_detail.basic().seconds());
-    chassis_.mutable_chassis_gps()->set_compass_direction(
-        chassis_detail.basic().compass_direction());
-    chassis_.mutable_chassis_gps()->set_pdop(chassis_detail.basic().pdop());
-    chassis_.mutable_chassis_gps()->set_is_gps_fault(
-        chassis_detail.basic().is_gps_fault());
-    chassis_.mutable_chassis_gps()->set_is_inferred(
-        chassis_detail.basic().is_inferred());
-    chassis_.mutable_chassis_gps()->set_altitude(
-        chassis_detail.basic().altitude());
-    chassis_.mutable_chassis_gps()->set_heading(
-        chassis_detail.basic().heading());
-    chassis_.mutable_chassis_gps()->set_hdop(chassis_detail.basic().hdop());
-    chassis_.mutable_chassis_gps()->set_vdop(chassis_detail.basic().vdop());
-    chassis_.mutable_chassis_gps()->set_quality(
-        chassis_detail.basic().quality());
-    chassis_.mutable_chassis_gps()->set_num_satellites(
-        chassis_detail.basic().num_satellites());
-    chassis_.mutable_chassis_gps()->set_gps_speed(
-        chassis_detail.basic().gps_speed());
-  } else {
-    chassis_.mutable_chassis_gps()->set_gps_valid(false);
-  }
-
-  // vin number will be written into KVDB once.
-  if (chassis_detail.license().has_vin()) {
-    chassis_.mutable_license()->set_vin(chassis_detail.license().vin());
-    if (!received_vin_) {
-      apollo::common::KVDB::Put("apollo:canbus:vin",
-                                chassis_detail.license().vin());
-      received_vin_ = true;
+  auto& aux = transit.llc_auxiliaryfeedback_120();
+  if (aux.has_llc_fbk_turnsignal()) {
+    switch (aux.llc_fbk_turnsignal()) {
+      case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT:
+        chassis_.mutable_signal()
+          ->set_turn_signal(common::VehicleSignal::TURN_LEFT);
+      case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT:
+        chassis_.mutable_signal()
+          ->set_turn_signal(common::VehicleSignal::TURN_RIGHT);
+      case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE:
+        chassis_.mutable_signal()
+          ->set_turn_signal(common::VehicleSignal::TURN_NONE);
     }
   }
 
-  if (chassis_detail.has_surround()) {
-    chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
-  }
-  // give engage_advice based on error_code and canbus feedback
-  if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
-      (chassis_.brake_percentage() == 0.0)) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason("Chassis error!");
-  } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "Vehicle is not in a safe state to engage!");
-  } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
-  }
   return chassis_;
 }
 
