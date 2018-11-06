@@ -22,9 +22,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "cyber/common/macros.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/prediction/predictor/predictor.h"
 
@@ -48,6 +50,13 @@ class JunctionPredictor : public Predictor {
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
+
+ private:
+  void DrawJunctionTrajectory(const Feature& feature,
+      const JunctionExit& junction_exit,
+      std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
+
+  std::vector<JunctionExit> MostLikelyJunctions(const Feature& feature);
 };
 
 }  // namespace prediction
