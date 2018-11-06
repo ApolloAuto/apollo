@@ -26,24 +26,24 @@ message PathDeciderConfig {
 
 // tasks are shared among all scenarios and stages.
 message TaskConfig {
-   enum TaskType {
-     DP_POLY_PATH_OPTIMIZER = 0;
-     DP_ST_SPEED_OPTIMIZER = 1;
-     QP_SPLINE_PATH_OPTIMIZER = 2;
-     QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
-     PATH_DECIDER = 4;
-     SPEED_DECIDER = 5;
-     POLY_ST_SPEED_OPTIMIZER = 6;
-     NAVI_PATH_DECIDER = 7;
-     NAVI_SPEED_DECIDER = 8;
-     NAVI_OBSTACLE_DECIDER = 9;
-     QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
-     DECIDER_CREEP = 11;
-     DECIDER_STOP_SIGN = 12;
-     SIDE_PASS_PATH_DECIDER = 13;
-     SIDE_PASS_SAFETY = 14;
-     PROCEED_WITH_CAUTION_SPEED = 15;
-   };
+  enum TaskType {
+    DP_POLY_PATH_OPTIMIZER = 0;
+    DP_ST_SPEED_OPTIMIZER = 1;
+    QP_SPLINE_PATH_OPTIMIZER = 2;
+    QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
+    PATH_DECIDER = 4;
+    SPEED_DECIDER = 5;
+    POLY_ST_SPEED_OPTIMIZER = 6;
+    NAVI_PATH_DECIDER = 7;
+    NAVI_SPEED_DECIDER = 8;
+    NAVI_OBSTACLE_DECIDER = 9;
+    QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
+    DECIDER_CREEP = 11;
+    DECIDER_STOP_SIGN = 12;
+    SIDE_PASS_PATH_DECIDER = 13;
+    SIDE_PASS_SAFETY = 14;
+    PROCEED_WITH_CAUTION_SPEED = 15;
+  };
   optional TaskType task_type = 1;
   oneof task_config {
     DpPolyPathConfig dp_poly_path_config = 2;
@@ -97,36 +97,36 @@ message ScenarioConfig {
   // StageType is a superset of stages from all scenarios.
   // It is created to keep different scenarios have uniform config interface
   enum StageType {
-      NO_STAGE = 0;
+    NO_STAGE = 0;
 
-      LANE_FOLLOW_DEFAULT_STAGE = 1;
+    LANE_FOLLOW_DEFAULT_STAGE = 1;
 
-      STOP_SIGN_UNPROTECTED_PRE_STOP = 100;
-      STOP_SIGN_UNPROTECTED_STOP = 101;
-      STOP_SIGN_UNPROTECTED_CREEP = 102 ;
-      STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE = 103;
+    STOP_SIGN_UNPROTECTED_PRE_STOP = 100;
+    STOP_SIGN_UNPROTECTED_STOP = 101;
+    STOP_SIGN_UNPROTECTED_CREEP = 102 ;
+    STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE = 103;
 
-      SIDE_PASS_APPROACH_OBSTACLE = 200;
-      SIDE_PASS_GENERATE_PATH= 201;
-      SIDE_PASS_STOP_ON_WAITPOINT = 202;
-      SIDE_PASS_DETECT_SAFETY = 203;
-      SIDE_PASS_PASS_OBSTACLE = 204;
+    SIDE_PASS_APPROACH_OBSTACLE = 200;
+    SIDE_PASS_GENERATE_PATH= 201;
+    SIDE_PASS_STOP_ON_WAITPOINT = 202;
+    SIDE_PASS_DETECT_SAFETY = 203;
+    SIDE_PASS_PASS_OBSTACLE = 204;
   };
 
   message StageConfig {
-      optional StageType stage_type = 1;
-      optional bool enabled = 2 [default = true];
-      // an ordered list of tasks that are used at runtime. Its order determines the runtime order of the tasks.
-      repeated TaskConfig.TaskType task_type = 3;
-      // an unordered task configurations
-      repeated TaskConfig task_config = 4;
+    optional StageType stage_type = 1;
+    optional bool enabled = 2 [default = true];
+    // an ordered list of tasks that are used at runtime. Its order determines the runtime order of the tasks.
+    repeated TaskConfig.TaskType task_type = 3;
+    // an unordered task configurations
+    repeated TaskConfig task_config = 4;
   }
 
   optional ScenarioType scenario_type = 1;
   oneof scenario_config {
     ScenarioLaneFollowConfig lane_follow_config = 2;
-	ScenarioSidePassConfig side_pass_config = 3;
-	ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 4;
+    ScenarioSidePassConfig side_pass_config = 3;
+    ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 4;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
   repeated StageType stage_type = 5;
