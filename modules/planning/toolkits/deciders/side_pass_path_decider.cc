@@ -174,29 +174,29 @@ SidePassPathDecider::GetPathBoundaries(
       is_blocked_by_obs = false;
     }
     // Get the road info at the current s.
-    double road_left_width_at_curr_s = 0.0;
-    double road_right_width_at_curr_s = 0.0;
-    reference_line.GetRoadWidth(curr_s, &road_left_width_at_curr_s,
-                                &road_right_width_at_curr_s);
+    double lane_left_width_at_curr_s = 0.0;
+    double lane_right_width_at_curr_s = 0.0;
+    reference_line.GetLaneWidth(curr_s, &lane_left_width_at_curr_s,
+                                &lane_right_width_at_curr_s);
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
 
     // TODO(All): calculate drivable areas
     // lower bound
     std::get<1>(lateral_bound) =
-        -(road_right_width_at_curr_s - adc_half_width - kRoadBuffer);
+        -(lane_right_width_at_curr_s - adc_half_width - kRoadBuffer);
     // upper bound
     std::get<2>(lateral_bound) =
-        road_left_width_at_curr_s - adc_half_width - kRoadBuffer;
+        lane_left_width_at_curr_s - adc_half_width - kRoadBuffer;
 
     if (is_blocked_by_obs) {
       if (decided_direction_ == SidePassDirection::LEFT) {
         std::get<1>(lateral_bound) = nearest_obs_sl_boundary.end_l() +
                                      FLAGS_static_decision_nudge_l_buffer +
                                      kObstacleBuffer + adc_half_width;
-        std::get<2>(lateral_bound) += road_left_width_at_curr_s;
+        std::get<2>(lateral_bound) += lane_left_width_at_curr_s;
       } else if (decided_direction_ == SidePassDirection::RIGHT) {
-        std::get<1>(lateral_bound) -= road_right_width_at_curr_s;
+        std::get<1>(lateral_bound) -= lane_right_width_at_curr_s;
         std::get<2>(lateral_bound) = nearest_obs_sl_boundary.start_l() -
                                      FLAGS_static_decision_nudge_l_buffer -
                                      kObstacleBuffer - adc_half_width;
