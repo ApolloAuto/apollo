@@ -42,10 +42,10 @@ enum ReadWriteMode {
   WRITE_ONLY,
 };
 
-class Segment {
+class Segment final {
  public:
   Segment(uint64_t channel_id, const ReadWriteMode& mode);
-  virtual ~Segment();
+  ~Segment();
 
   bool Write(const std::string& msg, const std::string& msg_info,
              uint32_t* block_index);
