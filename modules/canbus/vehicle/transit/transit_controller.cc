@@ -396,8 +396,8 @@ ErrorCode TransitController::EnableAutoMode() {
     Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
   adc_motioncontrol1_10_->
     set_adc_cmd_longitudinalcontrolmode(
-    Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE
-    );
+    Adc_motioncontrol1_10::
+    ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
@@ -466,8 +466,8 @@ ErrorCode TransitController::EnableSpeedOnlyMode() {
     Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE);
   adc_motioncontrol1_10_->
     set_adc_cmd_longitudinalcontrolmode(
-    Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE
-    );
+    Adc_motioncontrol1_10::
+    ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
