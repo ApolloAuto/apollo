@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -102,6 +103,8 @@ class JunctionMLPEvaluator : public Evaluator {
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 3;
   static const size_t JUNCTION_FEATURE_SIZE = 60;
+
+  std::unique_ptr<FnnVehicleModel> model_ptr_;
 };
 
 }  // namespace prediction
