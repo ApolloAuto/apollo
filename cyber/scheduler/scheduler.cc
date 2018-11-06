@@ -52,12 +52,6 @@ Scheduler::Scheduler() : stop_(false) {
   cpu_binding_start_index_ =
       sconf.cpu_binding_start_index();
 
-  if (sconf.has_sys_mon()) {
-    sysmon_hz_ = sconf.sys_mon().sysmon_hz();
-    sysmon_prio_ = sconf.sys_mon().sysmon_prio();
-    //  StartSysmon();
-  }
-
   for (auto& conf : gconf.choreo_conf()) {
     if (conf.process_name() ==
         GlobalData::Instance()->ProcessName()) {
@@ -67,24 +61,6 @@ Scheduler::Scheduler() : stop_(false) {
     }
   }
   CreateProcessor();
-}
-
-void Scheduler::StartSysmon() {
-  int interval = 1000;
-  struct sched_param param;
-  int policy;
-
-  interval = (1.0 / sysmon_hz_) * 1000000;
-  sysmon_ = std::thread([=]() {
-    while (!stop_) {
-      usleep(interval);
-    }
-  });
-
-  pthread_getschedparam(sysmon_.native_handle(), &policy, &param);
-  param.sched_priority = 60;
-  param.sched_priority = sysmon_prio_;
-  pthread_setschedparam(sysmon_.native_handle(), SCHED_FIFO, &param);
 }
 
 void Scheduler::CreateProcessor() {
@@ -123,10 +99,6 @@ void Scheduler::ShutDown() {
     proc_ctx->ShutDown();
   }
   proc_ctxs_.clear();
-
-  if (sysmon_.joinable()) {
-    sysmon_.join();
-  }
 }
 
 Scheduler::~Scheduler() {}

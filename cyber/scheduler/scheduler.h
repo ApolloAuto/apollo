@@ -82,9 +82,7 @@ class Scheduler {
 
   void CreateProcessor();
   std::shared_ptr<ProcessorContext> CreatePctx();
-  void StartSysmon();
 
-  std::thread sysmon_;
   std::unordered_map<std::string, SchedConf> sched_confs_;
   std::unordered_map<std::string, Choreo> cr_confs_;
 
@@ -95,8 +93,6 @@ class Scheduler {
 
   SchedStrategy sched_policy_ = SchedStrategy::CLASSIC;
 
-  int sysmon_hz_ = 0;
-  int sysmon_prio_ = 0;
   // proc for real-time tasks,
   uint32_t proc_num_ = 0;
   // proc for croutine task pool

@@ -62,6 +62,7 @@ bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
 
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
                                             cr->processor_id());
+
   WriteLockGuard<AtomicRWLock> rw_lock(rw_locks_[cr->priority()]);
   rq_[cr->priority()].emplace_back(cr);
 

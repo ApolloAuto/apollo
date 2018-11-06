@@ -20,13 +20,11 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/scheduler.h"
-#include "cyber/time/time.h"
 
 namespace apollo {
 namespace cyber {
@@ -113,7 +111,7 @@ bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
 
   std::lock_guard<std::mutex> lg(mtx_);
   cr_queue_.insert(
-      std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
+    std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
   return true;
 }
 
