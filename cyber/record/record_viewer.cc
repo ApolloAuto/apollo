@@ -54,19 +54,19 @@ bool RecordViewer::IsValid() const {
 }
 
 bool RecordViewer::Update(RecordMessage* message) {
-  if (msg_buffer_.empty() && !FillBuffer()) {
-    return false;
+  bool find = false;
+  while (!find) {
+    if (msg_buffer_.empty() && !FillBuffer()) {
+      break;
+    }
+    auto& msg = msg_buffer_.begin()->second;
+    if (channels_.empty() || channels_.count(msg->channel_name) == 1) {
+      *message = *msg;
+      find = true;
+    }
+    msg_buffer_.erase(msg_buffer_.begin());
   }
-
-  bool result = false;
-  auto& msg = msg_buffer_.begin()->second;
-  if (channels_.empty() || channels_.count(msg->channel_name) == 1) {
-    *message = *msg;
-    result = true;
-  }
-
-  msg_buffer_.erase(msg_buffer_.begin());
-  return result;
+  return find;
 }
 
 uint64_t RecordViewer::begin_time() const { return begin_time_; }
