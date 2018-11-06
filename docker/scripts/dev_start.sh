@@ -265,7 +265,7 @@ function main(){
 
     EXTRA_VOLUMES=""
     if [ "$ARCH" == 'aarch64' ]; then
-        EXTRA_VOLUMES= "
+        EXTRA_VOLUMES="
         -v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra    \
         -v /usr/lib/aarch64-linux-gnu/gstreamer-1.0:/usr/lib/aarch64-linux-gnu/gstreamer-1.0    \
         -v /usr/lib/aarch64-linux-gnu/tegra-egl:/usr/lib/aarch64-linux-gnu/tegra-egl    \
