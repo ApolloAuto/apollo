@@ -37,7 +37,7 @@ apt-get update -y && apt-get install -y \
 #libopenni-dev
 
 #Install openblas via sourcecode
-wget http://123.57.58.164/apollo-docker_no/openblas-0.2.18.tar.gz
+wget http://123.57.58.164/apollo-docker/openblas-0.2.18.tar.gz
 tar zxvf openblas-0.2.18.tar.gz
 mkdir /usr/include/openblas
 cp openblas-0.2.18/include/* /usr/include/openblas/
