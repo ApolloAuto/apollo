@@ -40,7 +40,7 @@ class MonitorManager {
   void Init(const std::shared_ptr<apollo::cyber::Node>& node);
 
   // Start and end a monitoring frame.
-  bool StartFrame();
+  bool StartFrame(const double current_time);
   void EndFrame();
 
   // Getters.
@@ -71,6 +71,7 @@ class MonitorManager {
   const apollo::dreamview::HMIConfig hmi_config_;
   apollo::dreamview::HMIMode mode_config_;
   bool in_autonomous_driving_ = false;
+  bool CheckAutonomousDriving(const double current_time);
 
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
   std::shared_ptr<apollo::cyber::Node> node_;

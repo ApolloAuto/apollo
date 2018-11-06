@@ -37,9 +37,12 @@ MonitorManager::MonitorManager()
 
 void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
   node_ = node;
+  if (FLAGS_use_sim_time) {
+    status_.set_is_realtime_in_simulation(true);
+  }
 }
 
-bool MonitorManager::StartFrame() {
+bool MonitorManager::StartFrame(const double current_time) {
   // Get latest HMIStatus.
   static auto hmi_status_reader = CreateReader<apollo::dreamview::HMIStatus>(
       FLAGS_hmi_status_topic);
@@ -69,20 +72,36 @@ bool MonitorManager::StartFrame() {
     }
   }
 
-  // Get current DrivingMode, which will affect how we monitor modules, but
-  // ignore old messages which are likely from replaying.
-  static auto chassis_reader = CreateReader<Chassis>(FLAGS_chassis_topic);
-  chassis_reader->Observe();
-  const auto chassis = chassis_reader->GetLatestObserved();
-  in_autonomous_driving_ = chassis != nullptr &&
-      chassis->driving_mode() == Chassis::COMPLETE_AUTO_DRIVE;
-
+  in_autonomous_driving_ = CheckAutonomousDriving(current_time);
   return true;
 }
 
 void MonitorManager::EndFrame() {
   // Print and publish all monitor logs.
   log_buffer_.Publish();
+}
+
+bool MonitorManager::CheckAutonomousDriving(const double current_time) {
+  // It's in offline mode if use_sim_time is set.
+  if (FLAGS_use_sim_time) {
+    return false;
+  }
+
+  // Get current DrivingMode, which will affect how we monitor modules.
+  static auto chassis_reader = CreateReader<Chassis>(FLAGS_chassis_topic);
+  chassis_reader->Observe();
+  const auto chassis = chassis_reader->GetLatestObserved();
+  if (chassis == nullptr) {
+    return false;
+  }
+
+  // Ignore old messages which are likely from playback.
+  const double msg_time = chassis->header().timestamp_sec();
+  if (msg_time + FLAGS_system_status_lifetime_seconds < current_time) {
+    return false;
+  }
+
+  return chassis->driving_mode() == Chassis::COMPLETE_AUTO_DRIVE;
 }
 
 }  // namespace monitor

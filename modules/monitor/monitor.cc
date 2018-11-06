@@ -64,10 +64,10 @@ bool Monitor::Init() {
 }
 
 bool Monitor::Proc() {
-  if (!MonitorManager::Instance()->StartFrame()) {
+  const double current_time = apollo::common::time::Clock::NowInSeconds();
+  if (!MonitorManager::Instance()->StartFrame(current_time)) {
     return false;
   }
-  const double current_time = apollo::common::time::Clock::NowInSeconds();
   for (auto& runner : runners_) {
     runner->Tick(current_time);
   }
