@@ -65,11 +65,12 @@ bool GeneralChannelMessage::isErrorCode(void* ptr) {
   GeneralChannelMessage::ErrorCode err =
       (GeneralChannelMessage::ErrorCode)(reinterpret_cast<intptr_t>(ptr));
   switch (err) {
-    case GeneralChannelMessage::ErrorCode::NewSubClassFailed:
-    case GeneralChannelMessage::ErrorCode::CreateNodeFailed:
-    case GeneralChannelMessage::ErrorCode::CreateReaderFailed:
-    case GeneralChannelMessage::ErrorCode::MessageTypeIsEmpty:
-    case GeneralChannelMessage::ErrorCode::ChannelNameOrNodeNameIsEmpty:
+    case ErrorCode::NewSubClassFailed:
+    case ErrorCode::CreateNodeFailed:
+    case ErrorCode::CreateReaderFailed:
+    case ErrorCode::MessageTypeIsEmpty:
+    case ErrorCode::ChannelNameOrNodeNameIsEmpty:
+    case ErrorCode::NoCloseChannel:
       return true;
 
     default: {}
