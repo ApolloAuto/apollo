@@ -29,8 +29,17 @@ namespace cyber {
 namespace message {
 
 // Template specialization for RawMessage
+inline bool SerializeToArray(const PyMessageWrap& message, void* data,
+                             int size) {
+  return message.SerializeToArray(data, size);
+}
+
 inline bool SerializeToString(const PyMessageWrap& message, std::string* str) {
   return message.SerializeToString(str);
+}
+
+inline bool ParseFromArray(const void* data, int size, PyMessageWrap* message) {
+  return message->ParseFromArray(data, size);
 }
 
 inline bool ParseFromString(const std::string& str, PyMessageWrap* message) {
@@ -56,6 +65,8 @@ inline void GetDescriptorString(const std::string& type,
                                 std::string* desc_str) {
   ProtobufFactory::Instance()->GetDescriptorString(type, desc_str);
 }
+
+inline int ByteSize(const PyMessageWrap& message) { return message.ByteSize(); }
 
 }  // namespace message
 }  // namespace cyber

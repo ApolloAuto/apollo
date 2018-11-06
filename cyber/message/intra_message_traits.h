@@ -30,8 +30,22 @@ namespace message {
 template <typename MessageT,
           typename std::enable_if<
               std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
+inline bool SerializeToArray(const MessageT& message, void* data, int size) {
+  return message.SerializeToArray(data, size);
+}
+
+template <typename MessageT,
+          typename std::enable_if<
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
 inline bool SerializeToString(const MessageT& message, std::string* str) {
   return message.SerializeToString(str);
+}
+
+template <typename MessageT,
+          typename std::enable_if<
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
+inline bool ParseFromArray(const void* data, int size, MessageT* message) {
+  return message->ParseFromArray(data, size);
 }
 
 template <typename MessageT,
@@ -61,6 +75,13 @@ template <typename MessageT,
 inline void GetDescriptorString(const std::string& type,
                                 std::string* desc_str) {
   *desc_str = IntraMessage::GetDescriptorString();
+}
+
+template <typename MessageT,
+          typename std::enable_if<
+              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
+inline int ByteSize(const MessageT& message) {
+  return message.ByteSize();
 }
 
 }  // namespace message
