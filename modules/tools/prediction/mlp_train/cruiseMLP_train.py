@@ -105,10 +105,13 @@ class FCNN_CNN1D(torch.nn.Module):
         super(FCNN_CNN1D, self).__init__()
         self.lane_feature_conv = torch.nn.Sequential(\
                             nn.Conv1d(5, 10, 3, stride=1),\
+                            nn.BatchNorm1d(10),\
                             nn.ReLU(),\
                             nn.Conv1d(10, 16, 3, stride=2),\
+                            nn.BatchNorm1d(16),\
                             nn.ReLU(),\
                             nn.Conv1d(16, 25, 3, stride=2),\
+                            nn.BatchNorm1d(25)
                             )
         self.lane_feature_maxpool = nn.MaxPool1d(3)
         self.lane_feature_avgpool = nn.AvgPool1d(3)
@@ -196,6 +199,38 @@ def loss_fn(c_pred, r_pred, target):
           #        target[:,1].view(target.shape[0],1))
     return loss
 
+
+
+# ========================================================================
+# Helper functions
+
+'''
+Get the full path of all files under the directory: 'dirName'
+'''
+def getListOfFiles(dirName):
+    listOfFiles = os.listdir(dirName)
+    allFiles = list()
+    
+    for entry in listOfFiles:
+        fullPath = os.path.join(dirName, entry)
+        if os.path.isdir(fullPath):
+            allFiles = allFiles + getListOfFiles(fullPath)
+        else:
+            allFiles.append(fullPath)
+    
+    return allFiles
+
+'''
+Print the distribution of data labels.
+'''
+def print_dist(label):
+    unique_labels = np.unique(label)
+    for l in unique_labels:
+        print ('Label = {}: {}%'.format(l, np.sum(label==l)/len(label)*100))
+
+# ========================================================================
+
+
 # ========================================================================
 # Data Loading and preprocessing (Non Data-Loader case)
 
@@ -229,49 +264,32 @@ Preprocess the data.
     - shuffle data
 '''
 def data_preprocessing(data):
+    X_other_obs = data[:, 83:91]
+    X_obs_old_features = data[:, 0:23]
     X_obs_now = data[:, 23:29]
     X_obs_hist_5 = data[:, 29:53]
+
+    # mask out those that don't have any history
     mask5 = (data[:,53] != 100)
+
     X_lane = data[:, 91:-dim_output]
     X = np.concatenate((X_obs_hist_5, X_lane), axis=1)
     X = X[mask5, :]
 
-    #X = data[:, :-dim_output]
     y = data[:, -dim_output:]
     y = y[mask5, :]
-    y[:, 0] = (y[:, 0] > 0).astype(float)
+    #y[:, 0] = (y[:, 0] > 0).astype(float)
+    y[:, 0] = np.logical_and((y[:, 0] > 0), (y[:, 1] < 1.0))
 
-    X_new, X_dummy, y_new, y_dummy = train_test_split(X, y, test_size=0.1, random_state=233)
+    X_new, X_dummy, y_new, y_dummy = train_test_split(X, y, test_size=0.0, random_state=233)
 
-    return X_new, y_new, X_dummy, y_dummy
+    return X_new, y_new #, X_dummy, y_dummy
 
-'''
-Get the full path of all files under the directory: 'dirName'
-'''
-def getListOfFiles(dirName):
-    listOfFiles = os.listdir(dirName)
-    allFiles = list()
-    
-    for entry in listOfFiles:
-        fullPath = os.path.join(dirName, entry)
-        if os.path.isdir(fullPath):
-            allFiles = allFiles + getListOfFiles(fullPath)
-        else:
-            allFiles.append(fullPath)
-    
-    return allFiles
-
-'''
-Print the distribution of data labels.
-'''
-def print_dist(label):
-    unique_labels = np.unique(label)
-    for l in unique_labels:
-        print ('Label = {}: {}%'.format(l, np.sum(label==l)/len(label)*100))
+# ========================================================================
 
 
-
-
+# ========================================================================
+# Data Loading and preprocessing (Data-Loader case)
 
 '''
 TODO: implement custom collate_fn to incorporate down-sampling function
@@ -346,7 +364,6 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
         y = train_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         c_pred, r_pred = model(X)
         loss = loss_fn(c_pred, r_pred, y)
-        #loss.data[0].cpu().numpy()
         loss_history.append(loss.data)
         loss.backward()
         optimizer.step()
@@ -432,17 +449,18 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
         #            y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
 
     #valid_classification_accuracy = valid_correct_class / valid_y.data.cpu().numpy().shape[0]
-    pred_y = (pred_y > 0.5)
     valid_y = valid_y.data.cpu().numpy()
     #print (min(valid_y[:,0]))
     #print (max(valid_y[:,0]))
     #print (min(pred_y))
     #print (max(pred_y))
 
+    valid_auc = sklearn.metrics.roc_auc_score(valid_y[:,0], pred_y.reshape(-1))
+    pred_y = (pred_y > 0.5)
+
     valid_accuracy = sklearn.metrics.accuracy_score(valid_y[:,0], pred_y.reshape(-1))
     valid_precision = sklearn.metrics.precision_score(valid_y[:,0], pred_y.reshape(-1))
     valid_recall = sklearn.metrics.recall_score(valid_y[:,0], pred_y.reshape(-1))
-    valid_auc = sklearn.metrics.roc_auc_score(valid_y[:,0], pred_y.reshape(-1))
 
     logging.info('Validation loss: {}. Accuracy: {}.\
                   Precision: {}. Recall: {}. AUC: {}.'
@@ -487,6 +505,7 @@ def validate_dataloader(valid_loader, model):
     return valid_loss
 # ========================================================================
 
+
 # ========================================================================
 # Main function:
 
@@ -498,8 +517,13 @@ if __name__ == "__main__":
     parser.add_argument('valid_file', type=str, help='validation data (h5)')
     parser.add_argument('-d', '--data_loader', action='store_true', \
         help='Use the dataloader (when memory size is smaller than dataset size)')
+    parser.add_argument('-g', '--gpu_num', type=int, default=0, \
+        help='Specify which GPU to use.')
 
     args = parser.parse_args()
+
+    os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID' #specifies the same order as nvidia-smi
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_num)
 
     if not args.data_loader:
 
@@ -514,9 +538,9 @@ if __name__ == "__main__":
         print ("Validation data size = ", valid_data.shape)
 
         # Data preprocessing
-        #X_train, y_train = data_preprocessing(train_data)
-        #X_valid, y_valid = data_preprocessing(valid_data)
-        X_train, y_train, X_valid, y_valid = data_preprocessing(train_data)
+        X_train, y_train = data_preprocessing(train_data)
+        X_valid, y_valid = data_preprocessing(valid_data)
+        #X_train, y_train, X_valid, y_valid = data_preprocessing(train_data)
 
         # Model declaration
         model = FCNN_CNN1D()
@@ -602,5 +626,4 @@ if __name__ == "__main__":
             valid_loss = validate_dataloader(valid_loader, model)
             scheduler.step(valid_loss)
     
-
 # ========================================================================
