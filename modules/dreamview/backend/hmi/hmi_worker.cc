@@ -233,22 +233,27 @@ void HMIWorker::InitReadersAndWriters() {
       FLAGS_system_status_topic,
       [this](const std::shared_ptr<SystemStatus>& system_status) {
         WLock wlock(status_mutex_);
-        // Update modules running status.
-        for (auto& module : *status_.mutable_modules()) {
-          auto* module_status = FindOrNull(system_status->hmi_modules(),
-                                           module.first);
-          module.second = module_status != nullptr &&
-              module_status->status() == ComponentStatus::OK;
+
+        const bool is_realtime_msg = FLAGS_use_sim_time ?
+            system_status->is_realtime_in_simulation() :
+            Clock::NowInSeconds() - system_status->header().timestamp_sec() <
+                FLAGS_system_status_lifetime_seconds;
+        // Update modules running status from realtime SystemStatus.
+        if (is_realtime_msg) {
+          for (auto& iter : *status_.mutable_modules()) {
+            auto* status = FindOrNull(system_status->hmi_modules(), iter.first);
+            iter.second = status != nullptr &&
+                          status->status() == ComponentStatus::OK;
+          }
         }
         // Update other components status.
-        for (auto& component : *status_.mutable_monitored_components()) {
-          auto* component_status = FindOrNull(system_status->components(),
-                                              component.first);
-          if (component_status != nullptr) {
-            component.second = component_status->summary();
+        for (auto& iter : *status_.mutable_monitored_components()) {
+          auto* status = FindOrNull(system_status->components(), iter.first);
+          if (status != nullptr) {
+            iter.second = status->summary();
           } else {
-            component.second.set_status(ComponentStatus::UNKNOWN);
-            component.second.set_message("Status not reported by Monitor.");
+            iter.second.set_status(ComponentStatus::UNKNOWN);
+            iter.second.set_message("Status not reported by Monitor.");
           }
         }
 
@@ -328,8 +333,8 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
 }
 
 void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
-                                 const std::string &event_msg,
-                                 const std::vector<std::string> &event_types) {
+                                 const std::string& event_msg,
+                                 const std::vector<std::string>& event_types) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
   apollo::common::util::FillHeader("HMI", drive_event.get());
   drive_event->set_event(event_msg);

@@ -47,5 +47,9 @@ message SystemStatus {
   optional double safety_mode_trigger_time = 5;
   optional bool require_emergency_stop = 6;
 
+  // In simulation mode, the monitor will publish message with this field set,
+  // so subscribers could identify it from the recorded messages.
+  optional bool is_realtime_in_simulation = 9;
+
   reserved 2, 3;
 }
