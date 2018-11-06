@@ -234,7 +234,9 @@ Stage::StageStatus SidePassPassObstacle::Process(
     return Stage::ERROR;
   }
 
-  if (adc_sl_boundary.end_s() > sl_point.s() - 1.0) {
+  // TOOD(all) put the parameter into stage config file
+  double side_pass_exit_distance = 10.0;
+  if (adc_sl_boundary.end_s() > sl_point.s() - side_pass_exit_distance) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }

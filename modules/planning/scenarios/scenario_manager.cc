@@ -147,6 +147,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   std::set<ScenarioConfig::ScenarioType> rejected_scenarios;
   if (current_scenario_->scenario_type() != default_scenario_type_ &&
       ReuseCurrentScenario(ego_point, frame)) {
+    ADEBUG << "reuse current scenario: " << current_scenario_->Name();
     return;
   }
   rejected_scenarios.insert(current_scenario_->scenario_type());
@@ -169,6 +170,8 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
       continue;
     }
     if (SelectScenario(preferred_scenario, ego_point, frame)) {
+      AINFO << "select prefered scenario: "
+            << ScenarioConfig::ScenarioType_Name(preferred_scenario);
       return;
     } else {
       rejected_scenarios.insert(preferred_scenario);
@@ -189,6 +192,8 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
       continue;
     }
     if (SelectScenario(scenario, ego_point, frame)) {
+      AINFO << "select transferable scenario: "
+            << ScenarioConfig::ScenarioType_Name(scenario);
       return;
     } else {
       rejected_scenarios.insert(scenario);
@@ -197,6 +202,8 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
 
   // finally use default transferrable scenario.
   if (current_scenario_->scenario_type() != default_scenario_type_) {
+    AINFO << "select default scenario: "
+          << ScenarioConfig::ScenarioType_Name(default_scenario_type_);
     current_scenario_ = CreateScenario(default_scenario_type_);
   }
 }
