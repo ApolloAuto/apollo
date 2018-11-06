@@ -126,19 +126,19 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   std::vector<double> point_distances_;
 
-  std::size_t num_of_variables_ = 0;
+  int num_of_variables_ = 0;
 
-  std::size_t num_of_constraints_ = 0;
+  int num_of_constraints_ = 0;
 
-  std::size_t nnz_jac_g_ = 0;
+  int nnz_jac_g_ = 0;
 
-  std::size_t nnz_h_lag_ = 0;
+  int nnz_h_lag_ = 0;
 
-  std::size_t num_of_points_ = 0;
+  int num_of_points_ = 0;
 
   double default_max_point_deviation_ = 0.0;
 
-  const std::size_t num_of_internal_points_ = 5;
+  const int num_of_internal_points_ = 5;
 
   std::vector<double> relative_theta_;
 
