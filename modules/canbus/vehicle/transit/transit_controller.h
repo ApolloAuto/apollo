@@ -100,7 +100,7 @@ class TransitController final : public VehicleController {
 
   void ResetProtocol();
   bool CheckChassisError();
-
+  bool CheckSafetyError(const canbus::ChassisDetail &chassis);
  private:
   void SecurityDogThreadFunc();
   virtual bool CheckResponse(const int32_t flags, bool need_wait);
@@ -126,6 +126,7 @@ class TransitController final : public VehicleController {
 
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
+  bool received_vin_ = false;
 };
 
 }  // namespace transit

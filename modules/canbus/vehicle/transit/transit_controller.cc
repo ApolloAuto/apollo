@@ -17,6 +17,7 @@ limitations under the License.
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
+#include "modules/common/kv_db/kv_db.h"
 #include "cyber/common/log.h"
 #include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
@@ -490,43 +491,43 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
   }
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
         Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_REVERSE: {
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
         Adc_motioncontrol1_10::ADC_CMD_GEAR_R_REVERSE);
       break;
     }
     case Chassis::GEAR_DRIVE: {
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
         Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_PARKING: {
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARKING);
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK);
       break;
     }
     case Chassis::GEAR_LOW: {
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
         Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_NONE: {
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
         Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_INVALID: {
       AERROR << "Gear command is invalid!";
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
         Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     default: {
-      adc_motioncontrol1_10_.set_adc_cmd_gear(
+      adc_motioncontrol1_10_->set_adc_cmd_gear(
         Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
@@ -547,7 +548,7 @@ void TransitController::Brake(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  adc_motioncontrol1_10_.set_adc_cmd_brakepressure(pedal);
+  adc_motioncontrol1_10_->set_adc_cmd_brakepressure(pedal);
 }
 
 // drive with old acceleration
@@ -558,8 +559,7 @@ void TransitController::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  adc_motioncontrol1_10_.set_adc_cmd_throttleposition(pedal);
-  adc_motioncontrollimits1_12_.set_adc_cmd_steeringrate(200);
+  adc_motioncontrol1_10_->set_adc_cmd_throttleposition(pedal);
 }
 
 // transit default, -470 ~ 470, left:+, right:-
@@ -572,12 +572,9 @@ void TransitController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd = ProtocolData::BoundedValue(
-      params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-      params_.max_steer_angle_spd() * angle_spd / 100.0);
-  adc_motioncontrol1_10_.set_adc_cmd_steerwheelangle(real_angle);
-  adc_motioncontrollimits1_12_.set_adc_cmd_steeringrate(real_angle_spd);
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
+  adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
+  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(200);
 }
 
 // steering with new angle speed
@@ -589,15 +586,22 @@ void TransitController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  adc_motioncontrol1_10_.set_adc_cmd_steerwheelangle(real_angle);
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
+  const double real_angle_spd =
+      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
+          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
+          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
+              100.0);
+  adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
+  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(real_angle_spd);
 }
 
 void TransitController::SetEpbBreak(const ControlCommand& command) {
   if (command.parking_brake()) {
-    adc_motioncontrol1_10_.set_adc_cmd_parkingbrake(true);
+    adc_motioncontrol1_10_->set_adc_cmd_parkingbrake(true);
   } else {
-    adc_motioncontrol1_10_.set_adc_cmd_parkingbrake(false);
+    adc_motioncontrol1_10_->set_adc_cmd_parkingbrake(false);
   }
 }
 
@@ -605,10 +609,10 @@ void TransitController::SetBeam(const ControlCommand& command) {
   if (command.signal().high_beam()) {
     adc_auxiliarycontrol_110_->set_adc_cmd_highbeam(true);
   } else if (command.signal().low_beam()) {
-    adc_auxiliarycontrol_110_->set_adc_cmd_lowbeaml(true);
+    adc_auxiliarycontrol_110_->set_adc_cmd_lowbeam(true);
   } else {
     adc_auxiliarycontrol_110_->set_adc_cmd_highbeam(false);
-    adc_auxiliarycontrol_110_->set_adc_cmd_lowbeaml(false);
+    adc_auxiliarycontrol_110_->set_adc_cmd_lowbeam(false);
   }
 }
 
@@ -623,10 +627,10 @@ void TransitController::SetHorn(const ControlCommand& command) {
 void TransitController::SetTurningSignal(const ControlCommand& command) {
   // Set Turn Signal
   auto signal = command.signal().turn_signal();
-  if (signal == Signal::TURN_LEFT) {
+  if (signal == common::VehicleSignal::TURN_LEFT) {
     adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
       Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT);
-  } else if (signal == Signal::TURN_RIGHT) {
+  } else if (signal == common::VehicleSignal::TURN_RIGHT) {
     adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
       Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT);
   } else {
@@ -896,6 +900,21 @@ void TransitController::set_chassis_error_code(
     const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
+}
+
+bool TransitController::CheckSafetyError(
+    const ::apollo::canbus::ChassisDetail &chassis_detail) {
+  bool safety_error =
+      chassis_detail.safety().is_passenger_door_open() ||
+      chassis_detail.safety().is_rearleft_door_open() ||
+      chassis_detail.safety().is_rearright_door_open() ||
+      chassis_detail.safety().is_hood_open() ||
+      chassis_detail.safety().is_trunk_open() ||
+      (chassis_detail.safety().is_passenger_detected() &&
+       (!chassis_detail.safety().is_passenger_airbag_enabled() ||
+        !chassis_detail.safety().is_passenger_buckled()));
+  ADEBUG << "Vehicle safety error status is : " << safety_error;
+  return safety_error;
 }
 
 }  // namespace transit
