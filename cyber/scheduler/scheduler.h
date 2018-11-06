@@ -80,7 +80,7 @@ class Scheduler {
   Scheduler(Scheduler&) = delete;
   Scheduler& operator=(Scheduler&) = delete;
 
-  void CreateProc();
+  void CreateProcessor();
   std::shared_ptr<ProcessorContext> CreatePctx();
   void StartSysmon();
 

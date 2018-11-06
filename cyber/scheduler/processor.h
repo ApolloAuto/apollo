@@ -60,18 +60,12 @@ class Processor {
     cpu_binding_start_index_ = start_index;
   }
 
-  void SetStrategy(const SchedStrategy strategy) {
-    strategy_ = strategy;
-  }
-
  private:
   std::mutex mtx_rq_;
   std::mutex mtx_pctx_;
   std::condition_variable cv_;
 
   std::thread thread_;
-
-  SchedStrategy strategy_ = SchedStrategy::CHOREO;
 
   std::shared_ptr<ProcessorContext> context_;
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;

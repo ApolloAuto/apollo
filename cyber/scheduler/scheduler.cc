@@ -66,7 +66,7 @@ Scheduler::Scheduler() : stop_(false) {
       }
     }
   }
-  CreateProc();
+  CreateProcessor();
 }
 
 void Scheduler::StartSysmon() {
@@ -87,29 +87,23 @@ void Scheduler::StartSysmon() {
   pthread_setschedparam(sysmon_.native_handle(), SCHED_FIFO, &param);
 }
 
-std::shared_ptr<ProcessorContext> Scheduler::CreatePctx() {
-  std::shared_ptr<ProcessorContext> ctx;
-  switch (sched_policy_) {
-    case SchedStrategy::CLASSIC:
-      ctx.reset(new ClassicContext());
-      break;
-    case SchedStrategy::CHOREO:
-      ctx.reset(new TaskChoreoContext());
-      break;
-    default:
-      ctx.reset(new TaskChoreoContext());
-      break;
-  }
-  return ctx;
-}
-
-void Scheduler::CreateProc() {
+void Scheduler::CreateProcessor() {
   for (uint32_t i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
     proc->SetId(i);
-    proc->SetStrategy(sched_policy_);
 
-    auto ctx = CreatePctx();
+    std::shared_ptr<ProcessorContext> ctx;
+    switch (sched_policy_) {
+      case SchedStrategy::CLASSIC:
+        ctx.reset(new ClassicContext());
+        break;
+      case SchedStrategy::CHOREO:
+        ctx.reset(new TaskChoreoContext());
+        break;
+      default:
+        ctx.reset(new TaskChoreoContext());
+        break;
+    }
     ctx->SetId(i);
     proc->BindContext(ctx);
     ctx->BindProc(proc);
