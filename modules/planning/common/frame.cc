@@ -540,7 +540,7 @@ const std::vector<const Obstacle *> Frame::obstacles() const {
 }
 
 bool Frame::VPresentationObstacle() {
-  std::size_t parking_boundaries_num = ROI_parking_boundary_.size();
+  size_t parking_boundaries_num = ROI_parking_boundary_.size();
 
   if (parking_boundaries_num != 4) {
     AERROR << "parking boundary obstacles size not right";
@@ -548,13 +548,13 @@ bool Frame::VPresentationObstacle() {
   }
 
   if (FLAGS_enable_perception_obstacles) {
-    std::size_t perception_obstacles_num = obstacles_.Items().size();
+    size_t perception_obstacles_num = obstacles_.Items().size();
     obstacles_num_ = perception_obstacles_num + parking_boundaries_num;
     if (perception_obstacles_num == 0) {
       AERROR << "no obstacle given by percption";
     }
     // load percption obstacle list for warm start
-    for (std::size_t i = 0; i < perception_obstacles_num; i++) {
+    for (size_t i = 0; i < perception_obstacles_num; i++) {
       Box2d original_box = obstacles_.Items().at(i)->PerceptionBoundingBox();
       original_box.Shift(-1.0 * origin_point_);
       original_box.RotateFromCenter(-1.0 * origin_heading_);
@@ -686,7 +686,7 @@ bool Frame::VPresentationObstacle() {
 
   // load vertices for parking boundary (not need to repeat the first vertice to
   // get close hull)
-  for (std::size_t i = 0; i < parking_boundaries_num; i++) {
+  for (size_t i = 0; i < parking_boundaries_num; i++) {
     // directly load the ROI_distance_approach_parking_boundary_ into
     // obstacles_vertices_vec_
     obstacles_vertices_vec_.emplace_back(ROI_parking_boundary_[i]);
@@ -707,8 +707,7 @@ bool Frame::HPresentationObstacle() {
 }
 
 bool Frame::ObsHRep(
-    const std::size_t &obstacles_num,
-    const Eigen::MatrixXd &obstacles_edges_num,
+    const size_t &obstacles_num, const Eigen::MatrixXd &obstacles_edges_num,
     const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
     Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all) {
   if (obstacles_num != obstacles_vertices_vec.size()) {
@@ -722,13 +721,13 @@ bool Frame::ObsHRep(
   int counter = 0;
   double kEpsilon = 1.0e-5;
   // start building H representation
-  for (std::size_t i = 0; i < obstacles_num; ++i) {
-    std::size_t current_vertice_num = obstacles_edges_num(i, 0);
+  for (size_t i = 0; i < obstacles_num; ++i) {
+    size_t current_vertice_num = obstacles_edges_num(i, 0);
     Eigen::MatrixXd A_i(current_vertice_num, 2);
     Eigen::MatrixXd b_i(current_vertice_num, 1);
 
     // take two subsequent vertices, and computer hyperplane
-    for (std::size_t j = 0; j < current_vertice_num; ++j) {
+    for (size_t j = 0; j < current_vertice_num; ++j) {
       Vec2d v1 = obstacles_vertices_vec[i][j];
       Vec2d v2 = obstacles_vertices_vec[i][j + 1];
 

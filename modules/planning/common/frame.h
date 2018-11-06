@@ -37,6 +37,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
+#include "modules/common/math/vec2d.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/change_lane_decider.h"
@@ -50,8 +51,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::math::Vec2d;
 
 /**
  * @class Frame
@@ -140,11 +139,12 @@ class Frame {
     return &openspace_warmstart_obstacles_;
   }
 
-  const std::size_t obstacles_num() { return obstacles_num_; }
+  const size_t obstacles_num() { return obstacles_num_; }
 
   const Eigen::MatrixXd &obstacles_edges_num() { return obstacles_edges_num_; }
 
-  const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec() {
+  const std::vector<std::vector<common::math::Vec2d>>
+      &obstacles_vertices_vec() {
     return obstacles_vertices_vec_;
   }
 
@@ -154,7 +154,7 @@ class Frame {
 
   const double origin_heading() { return origin_heading_; }
 
-  const Vec2d &origin_point() { return origin_point_; }
+  const common::math::Vec2d &origin_point() { return origin_point_; }
 
   ThreadSafeIndexedObstacles *openspace_warmstart_obstacles() {
     return &openspace_warmstart_obstacles_;
@@ -178,9 +178,10 @@ class Frame {
   bool HPresentationObstacle();
 
   // @brief Helper function for HPresentationObstacle()
-  bool ObsHRep(const std::size_t &obstacles_num,
+  bool ObsHRep(const size_t &obstacles_num,
                const Eigen::MatrixXd &obstacles_edges_num,
-               const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
+               const std::vector<std::vector<common::math::Vec2d>>
+                   &obstacles_vertices_vec,
                Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
 
   // @brief Represent the obstacles in vertices and load it into
@@ -242,7 +243,7 @@ class Frame {
 
   // @brief obstacles total num including perception obstacles and parking space
   // boundary
-  std::size_t obstacles_num_ = 0;
+  size_t obstacles_num_ = 0;
 
   // @brief the dimension needed for A and b matrix dimension in H
   // representation
@@ -281,29 +282,29 @@ class Frame {
   //                                ^
   //                          down_boundary
   // ROI_parking_boundary_ in form of {{1,2,3},{3,4},{4,5,6},{7,8}}
-  std::vector<std::vector<Vec2d>> ROI_parking_boundary_;
+  std::vector<std::vector<common::math::Vec2d>> ROI_parking_boundary_;
 
   // @brief open_space end configuration in order of x, y, heading and speed.
   // Speed is set to be always zero now for parking
   std::vector<double> open_space_end_pose_;
 
   // @brief vector storing the vertices of obstacles in counter-clock-wise order
-  std::vector<std::vector<Vec2d>> obstacles_vertices_vec_;
+  std::vector<std::vector<common::math::Vec2d>> obstacles_vertices_vec_;
 
   // @brief Linear inequality representation of the obstacles Ax>b
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
 
   // @brief origin heading for planning space rotation
-  double origin_heading_;
+  double origin_heading_ = 0.0;
 
   // @brief origin point for scaling down the numeric value of the optimization
   // problem in order of x , y
-  Vec2d origin_point_;
+  common::math::Vec2d origin_point_;
 
   // @brief parking_spot_heading_ is heading the direction pointing away from
   // the lane
-  double parking_spot_heading_;
+  double parking_spot_heading_ = 0.0;
   bool init_data_ = false;
 };
 

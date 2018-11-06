@@ -77,8 +77,8 @@ std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
             LaneSegment(next_lane, next_lane->accumulate_s().front(),
                         next_lane->accumulate_s().back());
         segments_vector.emplace_back(next_lanesegment);
-        bool status = CheckParkingROI(&segments_vector, target_parking_spot,
-                                      hdmap_, vehicle_state_);
+        bool status = CheckParkingROI(target_parking_spot, hdmap_,
+                                      vehicle_state_, &segments_vector);
         if (status) {
           return planner_factory_.CreateObject(
               planning_config.standard_planning_config().planner_type(1));
@@ -86,8 +86,8 @@ std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
       }
     } else {
       segments_vector.push_back(nearest_lanesegment);
-      bool status = CheckParkingROI(&segments_vector, target_parking_spot,
-                                    hdmap_, vehicle_state_);
+      bool status = CheckParkingROI(target_parking_spot, hdmap_, vehicle_state_,
+                                    &segments_vector);
       if (status) {
         return planner_factory_.CreateObject(
             planning_config.standard_planning_config().planner_type(1));
@@ -99,9 +99,9 @@ std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
 }
 
 bool StdPlannerDispatcher::CheckParkingROI(
-    std::vector<LaneSegment>* segments_vector,
     ParkingSpaceInfoConstPtr target_parking_spot, const hdmap::HDMap* hdmap,
-    const common::VehicleState& vehicle_state) {
+    const common::VehicleState& vehicle_state,
+    std::vector<apollo::hdmap::LaneSegment>* segments_vector) {
   std::unique_ptr<Path> path_ =
       std::unique_ptr<Path>(new Path(*segments_vector));
   const auto& parking_space_overlaps = path_->parking_space_overlaps();
