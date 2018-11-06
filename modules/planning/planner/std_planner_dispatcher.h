@@ -45,9 +45,9 @@ class StdPlannerDispatcher final : public PlannerDispatcher {
 
  private:
   bool CheckParkingROI(
-      std::vector<apollo::hdmap::LaneSegment>* lane_segments,
       apollo::hdmap::ParkingSpaceInfoConstPtr target_parking_spot,
-      const hdmap::HDMap* hdmap, const common::VehicleState& vehicle_state);
+      const hdmap::HDMap* hdmap, const common::VehicleState& vehicle_state,
+      std::vector<apollo::hdmap::LaneSegment>* segments_vector);
 };
 
 }  // namespace planning

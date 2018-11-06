@@ -34,6 +34,7 @@ namespace scenario {
 namespace side_pass {
 
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::Vec2d;
 
 constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
