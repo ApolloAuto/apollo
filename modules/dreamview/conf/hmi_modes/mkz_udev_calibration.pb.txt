@@ -13,6 +13,13 @@ cyber_modules {
   }
 }
 cyber_modules {
+  key: "Localization"
+  value: {
+    process_name: "localization"
+    dag_files: "/apollo/modules/localization/dag/localization.dag"
+  }
+}
+cyber_modules {
   key: "Radar"
   value: {
     process_name: "conti_radar"
@@ -69,5 +76,11 @@ monitored_components {
   key: "GPS"
   value: {
     # Special GPSMonitor.
+  }
+}
+monitored_components {
+  key: "Localization"
+  value: {
+    # Special LocalizationMonitor.
   }
 }
