@@ -69,7 +69,7 @@ std::string TitleCase(const std::string& origin) {
   for (auto& part : parts) {
     if (!part.empty()) {
       // Upper case the first char.
-      part[0] = toupper(part[0]);
+      part[0] = static_cast<char>(toupper(part[0]));
     }
   }
 

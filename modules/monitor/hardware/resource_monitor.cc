@@ -68,7 +68,7 @@ void ResourceMonitor::UpdateStatus(
   for (const auto& disk_space : config.disk_spaces()) {
     for (const auto& path : apollo::common::util::Glob(disk_space.path())) {
       const auto space = boost::filesystem::space(path);
-      const int available_gb = space.available >> 30;
+      const int available_gb = static_cast<int>(space.available >> 30);
       if (available_gb < disk_space.insufficient_space_error()) {
         const std::string err = StrCat(
             path, " has insufficient space: ",
