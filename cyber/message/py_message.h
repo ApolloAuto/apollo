@@ -27,8 +27,7 @@ namespace apollo {
 namespace cyber {
 namespace message {
 
-static const char* const PY_MESSAGE_FULLNAME =
-    "apollo.cyber.message.PyMessage";
+static const char* const PY_MESSAGE_FULLNAME = "apollo.cyber.message.PyMessage";
 // static const std::string data_split_pattern = "#@";
 
 class PyMessageWrap {
@@ -49,8 +48,11 @@ class PyMessageWrap {
   static const Descriptor* descriptor();
   static std::string TypeName();
 
+  bool SerializeToArray(void* data, int size) const;
   bool SerializeToString(std::string* output) const;
+  bool ParseFromArray(const void* data, int size);
   bool ParseFromString(const std::string& msgstr);
+  int ByteSize() const;
 
   const std::string& data() const;
   void set_data(const std::string& msg);
@@ -66,6 +68,15 @@ inline void PyMessageWrap::set_data(const std::string& msg) { data_ = msg; }
 
 inline const std::string& PyMessageWrap::data() const { return data_; }
 
+inline bool PyMessageWrap::ParseFromArray(const void* data, int size) {
+  if (data == nullptr || size <= 0) {
+    return false;
+  }
+
+  data_.assign(reinterpret_cast<const char*>(data), size);
+  return true;
+}
+
 inline bool PyMessageWrap::ParseFromString(const std::string& msgstr) {
   // todo : will use submsg type ywf
   // std::size_t pos = msgstr.rfind(data_split_pattern);
@@ -79,6 +90,19 @@ inline bool PyMessageWrap::ParseFromString(const std::string& msgstr) {
   return true;
 }
 
+inline bool PyMessageWrap::SerializeToArray(void* data, int size) const {
+  if (data == nullptr) {
+    return false;
+  }
+
+  if (size < ByteSize()) {
+    return false;
+  }
+
+  memcpy(data, data_.data(), data_.size());
+  return true;
+}
+
 inline bool PyMessageWrap::SerializeToString(std::string* output) const {
   if (!output) {
     return false;
@@ -87,6 +111,10 @@ inline bool PyMessageWrap::SerializeToString(std::string* output) const {
   // *output = data_ + data_split_pattern + type_name_;
   *output = data_;
   return true;
+}
+
+inline int PyMessageWrap::ByteSize() const {
+  return static_cast<int>(data_.size());
 }
 
 inline const std::string& PyMessageWrap::type_name() { return type_name_; }

@@ -17,6 +17,7 @@
 #ifndef CYBER_MESSAGE_RAW_MESSAGE_H_
 #define CYBER_MESSAGE_RAW_MESSAGE_H_
 
+#include <string.h>
 #include <cassert>
 #include <memory>
 #include <string>
@@ -47,6 +48,19 @@ struct RawMessage {
 
   ~RawMessage() {}
 
+  bool SerializeToArray(void *data, int size) const {
+    if (data == nullptr) {
+      return false;
+    }
+
+    if (size < ByteSize()) {
+      return false;
+    }
+
+    memcpy(data, message.data(), message.size());
+    return true;
+  }
+
   bool SerializeToString(std::string *str) const {
     if (str == nullptr) {
       return false;
@@ -55,14 +69,23 @@ struct RawMessage {
     return true;
   }
 
+  bool ParseFromArray(const void *data, int size) {
+    if (data == nullptr || size <= 0) {
+      return false;
+    }
+
+    message.assign(reinterpret_cast<const char *>(data), size);
+    return true;
+  }
+
   bool ParseFromString(const std::string &str) {
     message = str;
     return true;
   }
 
-  static std::string TypeName() {
-    return "apollo.cyber.message.RawMessage";
-  }
+  int ByteSize() const { return static_cast<int>(message.size()); }
+
+  static std::string TypeName() { return "apollo.cyber.message.RawMessage"; }
 
   std::string message;
   uint64_t timestamp;

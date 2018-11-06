@@ -27,13 +27,19 @@ namespace message {
 
 class IntraMessage {
  public:
+  bool SerializeToArray(void *data, int size) const { return false; }
+
   bool SerializeToString(std::string *str) const { return false; }
+
+  bool ParseFromArray(const void *data, int size) { return false; }
 
   bool ParseFromString(const std::string &str) { return false; }
 
   static std::string GetDescriptorString() { return ""; }
 
   static std::string TypeName() { return std::string(type_name_); }
+
+  int ByteSize() const { return -1; }
 
  protected:
   static const char *type_name_;

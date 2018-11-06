@@ -29,8 +29,16 @@ namespace cyber {
 namespace message {
 
 // Template specialization for RawMessage
+inline bool SerializeToArray(const RawMessage& message, void* data, int size) {
+  return message.SerializeToArray(data, size);
+}
+
 inline bool SerializeToString(const RawMessage& message, std::string* str) {
   return message.SerializeToString(str);
+}
+
+inline bool ParseFromArray(const void* data, int size, RawMessage* message) {
+  return message->ParseFromArray(data, size);
 }
 
 inline bool ParseFromString(const std::string& str, RawMessage* message) {
@@ -56,6 +64,8 @@ inline void GetDescriptorString(const std::string& type,
                                 std::string* desc_str) {
   ProtobufFactory::Instance()->GetDescriptorString(type, desc_str);
 }
+
+inline int ByteSize(const RawMessage& message) { return message.ByteSize(); }
 
 }  // namespace message
 }  // namespace cyber
