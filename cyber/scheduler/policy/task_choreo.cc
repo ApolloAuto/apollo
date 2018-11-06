@@ -67,7 +67,7 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
 bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   std::vector<std::shared_ptr<ProcessorContext>> ctxs =
       Scheduler::Instance()->ProcCtxs();
-  uint32_t pnum = Scheduler::Instance()->ProcNum();
+  uint32_t pnum = Scheduler::Instance()->ProcessorNum();
 
   uint32_t pid = cr->processor_id();
   if (pid >= 0 && pid < pnum) {

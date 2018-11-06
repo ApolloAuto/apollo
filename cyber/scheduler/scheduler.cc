@@ -46,7 +46,7 @@ Scheduler::Scheduler() : stop_(false) {
   if (itr != sched_confs_.end()) {
     sconf = itr->second;
   }
-  sched_policy_ = sconf.strategy();
+  sched_policy_ = sconf.policy();
   proc_num_ = sconf.proc_num();
   task_pool_size_ = sconf.task_pool_size();
   cpu_binding_start_index_ =
@@ -70,10 +70,10 @@ void Scheduler::CreateProcessor() {
 
     std::shared_ptr<ProcessorContext> ctx;
     switch (sched_policy_) {
-      case SchedStrategy::CLASSIC:
+      case SchedPolicy::CLASSIC:
         ctx.reset(new ClassicContext());
         break;
-      case SchedStrategy::CHOREO:
+      case SchedPolicy::CHOREO:
         ctx.reset(new TaskChoreoContext());
         break;
       default:
@@ -90,7 +90,7 @@ void Scheduler::CreateProcessor() {
   }
 
   // For taskchoreo policy: put tasks w/o processor assigned to a classic pool.
-  if (sched_policy_ == SchedStrategy::CHOREO) {
+  if (sched_policy_ == SchedPolicy::CHOREO) {
     for (uint32_t i = 0; i < task_pool_size_; i++) {
       auto proc = std::make_shared<Processor>();
 

@@ -2,14 +2,14 @@ syntax = "proto2";
 
 package apollo.cyber.proto;
 
-enum SchedStrategy {
+enum SchedPolicy {
   CLASSIC = 0;
   CHOREO = 1;
 }
 
 message SchedConf {
   required string process_name = 1;
-  optional SchedStrategy strategy = 2 [default = CLASSIC];
+  optional SchedPolicy policy = 2 [default = CLASSIC];
   optional uint32 proc_num = 3 [default = 2];
   optional uint32 task_pool_size = 4 [default = 4];
   optional uint32 cpu_binding_start_index = 5 [default = 33];

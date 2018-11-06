@@ -45,7 +45,7 @@ using apollo::cyber::proto::SchedConf;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
-using apollo::cyber::proto::SchedStrategy;
+using apollo::cyber::proto::SchedPolicy;
 
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
@@ -72,7 +72,7 @@ class Scheduler {
   inline std::vector<std::shared_ptr<ProcessorContext>> ProcCtxs() {
     return proc_ctxs_;
   }
-  uint32_t ProcNum() { return proc_num_; }
+
   uint32_t TaskPoolSize() { return task_pool_size_; }
   ProcessorContext* Classic4Choreo() { return classic_4_choreo_; }
 
@@ -91,7 +91,7 @@ class Scheduler {
   std::unordered_map<uint64_t, uint32_t> cr_ctx_;
   std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
 
-  SchedStrategy sched_policy_ = SchedStrategy::CLASSIC;
+  SchedPolicy sched_policy_ = SchedPolicy::CLASSIC;
 
   // proc for real-time tasks,
   uint32_t proc_num_ = 0;
