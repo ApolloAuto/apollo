@@ -14,7 +14,7 @@ export default class ToolView extends React.Component {
 
         return (
             <div className="tools">
-                {options.showTasks && <Tasks />}
+                {options.showTasks && <Tasks options={options}/>}
                 {options.showModuleController && <ModuleController />}
                 {options.showMenu && <Menu options={options} />}
                 {options.showPOI && (

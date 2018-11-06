@@ -84,7 +84,7 @@ export default class Dreamview extends React.Component {
                             </div>
                         </div>
                         <div className="right-pane">
-                            {options.showPNCMonitor && <PNCMonitor />}
+                            {options.showPNCMonitor && <PNCMonitor options={options}/>}
                         </div>
                     </SplitPane>
                 </div>
