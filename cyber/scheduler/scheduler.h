@@ -72,9 +72,9 @@ class Scheduler {
   inline std::vector<std::shared_ptr<ProcessorContext>> ProcCtxs() {
     return proc_ctxs_;
   }
-
   uint32_t ProcNum() { return proc_num_; }
   uint32_t TaskPoolSize() { return task_pool_size_; }
+  ProcessorContext* Classic4Choreo() { return classic_4_choreo_; }
 
  private:
   Scheduler(Scheduler&) = delete;
@@ -101,6 +101,8 @@ class Scheduler {
 
   std::atomic<bool> stop_;
   std::string process_name_;
+  ProcessorContext *classic_4_choreo_;
+
   DECLARE_SINGLETON(Scheduler)
 };
 
