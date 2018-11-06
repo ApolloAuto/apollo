@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,20 +23,11 @@
 #include "cyber/common/macros.h"
 #include "modules/prediction/network/net_model.h"
 
-/**
- * @namespace apollo::prediction::network
- * @brief apollo::prediction::network
- */
 namespace apollo {
 namespace prediction {
 namespace network {
 
-/**
- * @class RnnModel
- * @brief RnnModel is a derived class from NetModel, it has a specific layers
- * structure.
- */
-class RnnModel : public NetModel {
+class CruiseModel : public NetModel {
  public:
   /**
    * @brief Compute the model output from inputs according to a defined layers'
@@ -46,26 +37,6 @@ class RnnModel : public NetModel {
    */
   void Run(const std::vector<Eigen::MatrixXf>& inputs,
            Eigen::MatrixXf* output) const override;
-
-  /**
-   * @brief Set the internal state of a network model
-   * @param A specified internal state in a vector of Eigen::MatrixXf
-   */
-  void SetState(const std::vector<Eigen::MatrixXf>& states) override;
-
-  /**
-   * @brief Access to the internal state of a network model
-   * @return Internal state in a vector of Eigen::MatrixXf of the model
-   */
-  void State(std::vector<Eigen::MatrixXf>* states) const override;
-
-  /**
-   * @brief Set the internal state of a model
-   * @param A specified internal state in a vector of Eigen::MatrixXf
-   */
-  void ResetState() const override;
-
-  DECLARE_SINGLETON(RnnModel)
 };
 
 }  // namespace network
