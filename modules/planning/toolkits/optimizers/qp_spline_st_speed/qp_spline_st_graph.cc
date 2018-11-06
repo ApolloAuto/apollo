@@ -364,7 +364,8 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
   if (t_evaluated_.size() > 0) {
     spline_kernel->AddReferenceLineKernelMatrix(
         t_evaluated_, cruise_,
-        weight * qp_st_speed_config_.total_time() / t_evaluated_.size());
+        weight * qp_st_speed_config_.total_time() /
+            static_cast<double>(t_evaluated_.size()));
   }
 
   return Status::OK();
@@ -411,7 +412,8 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
   if (!ref_s.empty()) {
     spline_kernel->AddReferenceLineKernelMatrix(
         filtered_evaluate_t, ref_s,
-        weight * qp_st_speed_config_.total_time() / t_evaluated_.size());
+        weight * qp_st_speed_config_.total_time() /
+            static_cast<double>(t_evaluated_.size()));
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
@@ -457,7 +459,8 @@ Status QpSplineStGraph::AddYieldReferenceLineKernel(
   if (!ref_s.empty()) {
     spline_kernel->AddReferenceLineKernelMatrix(
         filtered_evaluate_t, ref_s,
-        weight * qp_st_speed_config_.total_time() / t_evaluated_.size());
+        weight * qp_st_speed_config_.total_time() /
+            static_cast<double>(t_evaluated_.size()));
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
@@ -477,7 +480,9 @@ bool QpSplineStGraph::AddDpStReferenceKernel(const double weight) const {
   auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   if (!t_pos.empty()) {
     spline_kernel->AddReferenceLineKernelMatrix(
-        t_pos, s_pos, weight * qp_st_speed_config_.total_time() / t_pos.size());
+        t_pos, s_pos,
+        weight * qp_st_speed_config_.total_time() /
+            static_cast<double>(t_pos.size()));
   }
   return true;
 }
@@ -542,8 +547,9 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
 
   if (static_cast<double>(t_evaluated_.size() +
                           speed_limit.speed_limit_points().size()) <
-      t_evaluated_.size() * std::log(static_cast<double>(
-                                speed_limit.speed_limit_points().size()))) {
+      static_cast<double>(t_evaluated_.size()) *
+          std::log(
+              static_cast<double>(speed_limit.speed_limit_points().size()))) {
     uint32_t i = 0;
     uint32_t j = 0;
     while (i < t_evaluated_.size() &&
@@ -571,7 +577,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
       }
     }
 
-    for (uint32_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
+    for (size_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
       speed_upper_bound->push_back(FLAGS_planning_upper_speed_limit);
       ADEBUG << "speed upper bound:" << speed_upper_bound->back();
     }

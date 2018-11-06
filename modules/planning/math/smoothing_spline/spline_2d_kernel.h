@@ -65,7 +65,7 @@ class Spline2dKernel {
   Eigen::MatrixXd offset_;
   std::vector<double> t_knots_;
   uint32_t spline_order_;
-  uint32_t total_params_;
+  size_t total_params_;
 };
 
 }  // namespace planning

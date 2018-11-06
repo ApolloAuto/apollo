@@ -116,7 +116,7 @@ bool Spline2dKernel::AddReferenceLineKernelMatrix(
   }
 
   for (uint32_t i = 0; i < t_coord.size(); ++i) {
-    double cur_index = find_index(t_coord[i]);
+    auto cur_index = find_index(t_coord[i]);
     double cur_rel_t = t_coord[i] - t_knots_[cur_index];
     // update offset
     double offset_coef_x = -ref_points[i].x() * weight;
