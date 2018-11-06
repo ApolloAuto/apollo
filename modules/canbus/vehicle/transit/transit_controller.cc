@@ -208,6 +208,8 @@ Chassis TransitController::chassis() {
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE:
         chassis_.mutable_signal()
           ->set_turn_signal(common::VehicleSignal::TURN_NONE);
+      default:
+        break;
     }
   }
 
@@ -670,50 +672,7 @@ void TransitController::SecurityDogThreadFunc() {
 }
 
 bool TransitController::CheckResponse(const int32_t flags, bool need_wait) {
-  int32_t retry_num = 20;
-  ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
-
-  do {
-    if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
-      AERROR_EVERY(100) << "get chassis detail failed.";
-      return false;
-    }
-    bool check_ok = true;
-    if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_eps_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_eps_online() &&
-                      chassis_detail.check_response().is_eps_online();
-      check_ok = check_ok && is_eps_online;
-    }
-
-    if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_vcu_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_vcu_online() &&
-                      chassis_detail.check_response().is_vcu_online();
-      is_esp_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_esp_online() &&
-                      chassis_detail.check_response().is_esp_online();
-      check_ok = check_ok && is_vcu_online && is_esp_online;
-    }
-    if (check_ok) {
-      return true;
-    } else {
-      AINFO << "Need to check response again.";
-    }
-    if (need_wait) {
-      --retry_num;
-      std::this_thread::sleep_for(
-          std::chrono::duration<double, std::milli>(20));
-    }
-  } while (need_wait && retry_num);
-
-  AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
-  return false;
+  return true;
 }
 
 void TransitController::set_chassis_error_mask(const int32_t mask) {
@@ -739,17 +698,7 @@ void TransitController::set_chassis_error_code(
 
 bool TransitController::CheckSafetyError(
     const ::apollo::canbus::ChassisDetail &chassis_detail) {
-  bool safety_error =
-      chassis_detail.safety().is_passenger_door_open() ||
-      chassis_detail.safety().is_rearleft_door_open() ||
-      chassis_detail.safety().is_rearright_door_open() ||
-      chassis_detail.safety().is_hood_open() ||
-      chassis_detail.safety().is_trunk_open() ||
-      (chassis_detail.safety().is_passenger_detected() &&
-       (!chassis_detail.safety().is_passenger_airbag_enabled() ||
-        !chassis_detail.safety().is_passenger_buckled()));
-  ADEBUG << "Vehicle safety error status is : " << safety_error;
-  return safety_error;
+  return true;
 }
 
 }  // namespace transit
