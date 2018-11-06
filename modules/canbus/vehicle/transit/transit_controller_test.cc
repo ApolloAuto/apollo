@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/gem/gem_controller.h"
+#include "modules/canbus/vehicle/transit/transit_controller.h"
 
 #include <string>
 
@@ -22,42 +22,42 @@
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/canbus/vehicle/gem/gem_message_manager.h"
+#include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
 namespace canbus {
-namespace gem {
+namespace transit {
 
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
 
-class GemControllerTest : public ::testing::Test {
+class TransitControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "/apollo/modules/canbus/testdata/conf/gem_canbus_conf_test.pb.txt";
+        "/apollo/modules/canbus/testdata/conf/transit_canbus_conf_test.pb.txt";
     ::apollo::common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
   }
 
  protected:
-  GemController controller_;
+  TransitController controller_;
   CanSender<::apollo::canbus::ChassisDetail> sender_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
-  GemMessageManager msg_manager_;
+  TransitMessageManager msg_manager_;
   ControlCommand control_cmd_;
 };
 
-TEST_F(GemControllerTest, Init) {
+TEST_F(TransitControllerTest, Init) {
   ErrorCode ret = controller_.Init(params_, &sender_, &msg_manager_);
   EXPECT_EQ(ret, ErrorCode::OK);
 }
 
-TEST_F(GemControllerTest, SetDrivingMode) {
+TEST_F(TransitControllerTest, SetDrivingMode) {
   Chassis chassis;
   chassis.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
 
@@ -68,7 +68,7 @@ TEST_F(GemControllerTest, SetDrivingMode) {
   EXPECT_EQ(controller_.SetDrivingMode(chassis.driving_mode()), ErrorCode::OK);
 }
 
-TEST_F(GemControllerTest, Status) {
+TEST_F(TransitControllerTest, Status) {
   controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
@@ -80,7 +80,7 @@ TEST_F(GemControllerTest, Status) {
   EXPECT_FALSE(controller_.CheckChassisError());
 }
 
-TEST_F(GemControllerTest, UpdateDrivingMode) {
+TEST_F(TransitControllerTest, UpdateDrivingMode) {
   controller_.Init(params_, &sender_, &msg_manager_);
 
   controller_.set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
@@ -88,6 +88,6 @@ TEST_F(GemControllerTest, UpdateDrivingMode) {
             ErrorCode::OK);
 }
 
-}  // namespace gem
+}  // namespace transit
 }  // namespace canbus
 }  // namespace apollo

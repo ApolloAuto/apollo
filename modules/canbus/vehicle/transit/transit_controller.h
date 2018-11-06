@@ -61,6 +61,9 @@ class TransitController final : public VehicleController {
    * @returns a copy of chassis. Use copy here to avoid multi-thread issues.
    */
   Chassis chassis() override;
+  FRIEND_TEST(TransitControllerTest, SetDrivingMode);
+  FRIEND_TEST(TransitControllerTest, Status);
+  FRIEND_TEST(TransitControllerTest, UpdateDrivingMode);
 
  private:
   // main logical function for operation the car enter or exit the auto driving
@@ -101,6 +104,7 @@ class TransitController final : public VehicleController {
   void ResetProtocol();
   bool CheckChassisError();
   bool CheckSafetyError(const canbus::ChassisDetail &chassis);
+
  private:
   void SecurityDogThreadFunc();
   virtual bool CheckResponse(const int32_t flags, bool need_wait);

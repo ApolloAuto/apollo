@@ -53,4 +53,28 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "transit_vehicle_factory_test",
+    size = "small",
+    srcs = ["transit_vehicle_factory_test.cc"],
+    deps = [
+        ":transit_vehicle_factory",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "transit_controller_test",
+    size = "small",
+    data = ["//modules/canbus:canbus_testdata"],
+    srcs = [
+        "transit_controller_test.cc",
+    ],
+    deps = [
+        ":transit_controller",
+        "//modules/common/util:util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
