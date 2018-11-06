@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+message Choreo {
+    optional string name = 1;
+    optional int32 processor_index = 2;
+    optional uint32 priority = 3 [default = 1];
+}
+
+message ChoreoConf {
+  required string process_name = 1;
+  repeated Choreo choreos = 2;
+}

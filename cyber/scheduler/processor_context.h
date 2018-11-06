@@ -53,15 +53,16 @@ class ProcessorContext {
 
   void ShutDown();
 
-  inline int id() const { return proc_index_; }
-  inline void set_id(int id) { proc_index_ = id; }
+  int Id() const { return proc_index_; }
+  void SetId(int id) { proc_index_ = id; }
+
   inline bool get_state(const uint64_t& cr_id, RoutineState* state);
   inline bool set_state(const uint64_t& cr_id, const RoutineState& state);
 
-  inline void bind_processor(const std::shared_ptr<Processor>& processor) {
+  void BindProc(const std::shared_ptr<Processor>& processor) {
     processor_ = processor;
   }
-  inline std::shared_ptr<Processor> processor() { return processor_; }
+  std::shared_ptr<Processor> Proc() { return processor_; }
 
   virtual void Notify(uint64_t cr_id);
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;

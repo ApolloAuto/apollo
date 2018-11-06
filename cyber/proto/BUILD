@@ -15,7 +15,7 @@ proto_library(
         "cyber_config.proto",
     ],
     deps = [
-        ":croutine_conf_proto",
+        ":choreo_conf_proto",
         ":scheduler_conf_proto",
         ":transport_conf_proto",
         ":log_conf_proto",
@@ -27,16 +27,16 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "croutine_conf_cc_proto",
+    name = "choreo_conf_cc_proto",
     deps = [
-        ":croutine_conf_proto",
+        ":choreo_conf_proto",
     ],
 )
 
 proto_library(
-    name = "croutine_conf_proto",
+    name = "choreo_conf_proto",
     srcs = [
-        "croutine_conf.proto",
+        "task_choreo_conf.proto",
     ],
 )
 

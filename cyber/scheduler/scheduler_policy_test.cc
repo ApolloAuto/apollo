@@ -30,8 +30,8 @@ TEST(SchedulerPolicyTest, task_choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
   ctx.reset(new TaskChoreoContext());
-  processor->bind_context(ctx);
-  ctx->bind_processor(processor);
+  processor->BindContext(ctx);
+  ctx->BindProc(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("task_choreo");
@@ -46,8 +46,8 @@ TEST(SchedulerPolicyTest, classic) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
   ctx.reset(new ClassicContext());
-  processor->bind_context(ctx);
-  ctx->bind_processor(processor);
+  processor->BindContext(ctx);
+  ctx->BindProc(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("classic");

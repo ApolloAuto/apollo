@@ -15,10 +15,12 @@
  *****************************************************************************/
 
 #include "cyber/init.h"
+#include "cyber/common/global_data.h"
 #include "modules/dreamview/backend/dreamview.h"
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
+  apollo::cyber::GlobalData::Instance()->SetProcessName("dreamview");
   apollo::cyber::Init(argv[0]);
 
   apollo::dreamview::Dreamview dreamview;

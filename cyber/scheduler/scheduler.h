@@ -33,15 +33,15 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
-#include "cyber/proto/croutine_conf.pb.h"
+#include "cyber/proto/task_choreo_conf.pb.h"
 #include "cyber/proto/scheduler_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::proto::CRoutineConf;
-using apollo::cyber::proto::SchedulerConf;
+using apollo::cyber::proto::Choreo;
+using apollo::cyber::proto::SchedConf;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
@@ -73,9 +73,8 @@ class Scheduler {
     return proc_ctxs_;
   }
 
-  inline uint32_t proc_num() { return proc_num_; }
-  inline uint32_t ext_proc_num() { return ext_proc_num_; }
-  inline uint32_t task_pool_size() { return task_pool_size_; }
+  uint32_t ProcNum() { return proc_num_; }
+  uint32_t TaskPoolSize() { return task_pool_size_; }
 
  private:
   Scheduler(Scheduler&) = delete;
@@ -86,25 +85,26 @@ class Scheduler {
   void StartSysmon();
 
   std::thread sysmon_;
-  SchedulerConf sched_conf_;
-  std::unordered_map<std::string, CRoutineConf> cr_confs_;
+  std::unordered_map<std::string, SchedConf> sched_confs_;
+  std::unordered_map<std::string, Choreo> cr_confs_;
 
-  SchedStrategy sched_policy_ = SchedStrategy::CHOREO;
 
   AtomicRWLock rw_lock_;
   std::unordered_map<uint64_t, uint32_t> cr_ctx_;
   std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
 
+  SchedStrategy sched_policy_ = SchedStrategy::CLASSIC;
+
+  int sysmon_hz_ = 0;
+  int sysmon_prio_ = 0;
   // proc for real-time tasks,
   uint32_t proc_num_ = 0;
-  // proc for un real-time tasks,
-  // tasks in dreamview for example
-  uint32_t ext_proc_num_ = 0;
   // proc for croutine task pool
   uint32_t task_pool_size_ = 0;
+  uint32_t cpu_binding_start_index_ = 0;
 
   std::atomic<bool> stop_;
-
+  std::string process_name_;
   DECLARE_SINGLETON(Scheduler)
 };
 

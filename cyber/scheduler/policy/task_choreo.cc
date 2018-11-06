@@ -53,7 +53,6 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
       it = cr_queue_.erase(it);
       continue;
     }
-
     if (cr->UpdateState() == RoutineState::READY) {
       PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
                                                 cr->processor_id());
@@ -70,18 +69,14 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
 bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   std::vector<std::shared_ptr<ProcessorContext>> ctxs =
       Scheduler::Instance()->ProcCtxs();
-  uint32_t pnum = Scheduler::Instance()->proc_num();
-  uint32_t ex_pnum = Scheduler::Instance()->ext_proc_num();
-  uint32_t psize = Scheduler::Instance()->task_pool_size();
+  uint32_t pnum = Scheduler::Instance()->ProcNum();
 
-  uint32_t pid = cr->processor_id();
-  if (!(pid >= 0 && pid < ctxs.size())) {
+  int pid = cr->processor_id();
+  if (!(pid >= 0 && pid < static_cast<int>(ctxs.size()))) {
     // fallback for those w/o proc idx in conf
-    // put crs without conf into ext-procs
-    pid = psize + pnum;
-    int qsize = ctxs[pid]->RqSize();
-    for (uint32_t i = psize + pnum;
-        i < pnum + psize + ex_pnum; i++) {
+    pid = 0;
+    int qsize = ctxs.front()->RqSize();
+    for (uint32_t i = 0; i < pnum; i++) {
       if (qsize > ctxs[i]->RqSize()) {
         qsize = ctxs[i]->RqSize();
         pid = i;
@@ -97,13 +92,11 @@ bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   } else {
     return false;
   }
-
-  ctxs[pid]->processor()->Start();
   return ctxs[pid]->Enqueue(cr);
 }
 
 bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
-  if (cr->processor_id() != id()) {
+  if (cr->processor_id() != Id()) {
     return false;
   }
 
