@@ -16,7 +16,6 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
-#include <memory>
 #include <cmath>
 
 #include "modules/common/math/math_utils.h"
@@ -231,9 +230,12 @@ void JunctionMLPEvaluator::SaveOfflineFeatures(
 }
 
 void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {
-  // TODO(all) implement
-  // 1. Make model file ready
-  // 2. Load model from file
+  model_ptr_.reset(new FnnVehicleModel());
+  CHECK(model_ptr_ != nullptr);
+  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+      << "Unable to load model file: " << model_file << ".";
+
+  AINFO << "Succeeded in loading the model file: " << model_file << ".";
 }
 
 double JunctionMLPEvaluator::ComputeProbability(

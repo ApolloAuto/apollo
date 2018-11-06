@@ -113,7 +113,7 @@ if __name__ == "__main__":
                   # loss='MSE',
                   metrics=['accuracy'])
     model.fit(X_train, Y_train, epochs=10)
-    model_path = os.path.join(os.getcwd(), "junction_mlp_model.bin")
+    model_path = os.path.join(os.getcwd(), "junction_mlp_vehicle_model.bin")
     save_model(model, model_path)
     print("Model saved to: " + model_path)
     score = model.evaluate(X_test, Y_test)
