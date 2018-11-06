@@ -69,28 +69,22 @@ bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
       Scheduler::Instance()->ProcCtxs();
   uint32_t pnum = Scheduler::Instance()->ProcNum();
 
-  int pid = cr->processor_id();
-  if (!(pid >= 0 && pid < static_cast<int>(ctxs.size()))) {
-    // fallback for those w/o proc idx in conf
-    pid = 0;
-    int qsize = ctxs.front()->RqSize();
-    for (uint32_t i = 0; i < pnum; i++) {
-      if (qsize > ctxs[i]->RqSize()) {
-        qsize = ctxs[i]->RqSize();
-        pid = i;
-      }
-    }
-    cr->set_processor_id(pid);
-  }
+  uint32_t pid = cr->processor_id();
+  if (pid >= 0 && pid < pnum) {
+    std::unordered_map<uint64_t, uint32_t>& rt_ctx =
+        Scheduler::Instance()->RtCtx();
 
-  std::unordered_map<uint64_t, uint32_t>& rt_ctx =
-      Scheduler::Instance()->RtCtx();
-  if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
-    rt_ctx[cr->id()] = cr->processor_id();
+    if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
+      rt_ctx[cr->id()] = cr->processor_id();
+    } else {
+      return false;
+    }
+
+    return ctxs[pid]->Enqueue(cr);
   } else {
-    return false;
+    // fallback for those w/o processor assigned.
+    return Scheduler::Instance()->Classic4Choreo()->DispatchTask(cr);
   }
-  return ctxs[pid]->Enqueue(cr);
 }
 
 bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {

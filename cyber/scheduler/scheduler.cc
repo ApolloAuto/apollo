@@ -88,6 +88,22 @@ void Scheduler::CreateProcessor() {
         cpu_binding_start_index_);
     proc->Start();
   }
+
+  // For taskchoreo policy: put tasks w/o processor assigned to a classic pool.
+  if (sched_policy_ == SchedStrategy::CHOREO) {
+    for (uint32_t i = 0; i < task_pool_size_; i++) {
+      auto proc = std::make_shared<Processor>();
+
+      std::shared_ptr<ProcessorContext> ctx;
+      ctx.reset(classic_4_choreo_ = new ClassicContext());
+
+      proc->BindContext(ctx);
+      ctx->BindProc(proc);
+      proc_ctxs_.emplace_back(ctx);
+
+      proc->Start();
+    }
+  }
 }
 
 void Scheduler::ShutDown() {
