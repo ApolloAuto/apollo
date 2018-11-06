@@ -168,8 +168,213 @@ Chassis TransitController::chassis() {
 
   // 3
   chassis_.set_engine_started(true);
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-   */
+  // 4
+  if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_rpm()) {
+    chassis_.set_engine_rpm(chassis_detail.ems().engine_rpm());
+  } else {
+    chassis_.set_engine_rpm(0);
+  }
+  // 5
+  if (chassis_detail.has_vehicle_spd() &&
+      chassis_detail.vehicle_spd().has_vehicle_spd()) {
+    chassis_.set_speed_mps(chassis_detail.vehicle_spd().vehicle_spd());
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_rr_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
+        chassis_detail.vehicle_spd().wheel_direction_rr());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
+        chassis_detail.vehicle_spd().wheel_spd_rr());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_rl_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
+        chassis_detail.vehicle_spd().wheel_direction_rl());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
+        chassis_detail.vehicle_spd().wheel_spd_rl());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_fr_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
+        chassis_detail.vehicle_spd().wheel_direction_fr());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
+        chassis_detail.vehicle_spd().wheel_spd_fr());
+
+    chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
+        chassis_detail.vehicle_spd().is_wheel_spd_fl_valid());
+    chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
+        chassis_detail.vehicle_spd().wheel_direction_fl());
+    chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
+        chassis_detail.vehicle_spd().wheel_spd_fl());
+
+  } else {
+    chassis_.set_speed_mps(0);
+  }
+  // 6
+  if (chassis_detail.has_basic() && chassis_detail.basic().has_odo_meter()) {
+    // odo_meter is in km
+    chassis_.set_odometer_m(chassis_detail.basic().odo_meter() * 1000);
+  } else {
+    chassis_.set_odometer_m(0);
+  }
+
+  // 7
+  // lincoln only has fuel percentage
+  // to avoid confusing, just don't set
+  chassis_.set_fuel_range_m(0);
+  // 8
+  if (chassis_detail.has_gas() && chassis_detail.gas().has_throttle_output()) {
+    chassis_.set_throttle_percentage(chassis_detail.gas().throttle_output());
+  } else {
+    chassis_.set_throttle_percentage(0);
+  }
+  // 9
+  if (chassis_detail.has_brake() && chassis_detail.brake().has_brake_output()) {
+    chassis_.set_brake_percentage(chassis_detail.brake().brake_output());
+  } else {
+    chassis_.set_brake_percentage(0);
+  }
+  // 23, previously 10
+  if (chassis_detail.has_gear() && chassis_detail.gear().has_gear_state()) {
+    chassis_.set_gear_location(chassis_detail.gear().gear_state());
+  } else {
+    chassis_.set_gear_location(Chassis::GEAR_NONE);
+  }
+  // 11
+  if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
+    chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
+                                     100.0 / vehicle_params_.max_steer_angle() *
+                                     M_PI / 180);
+  } else {
+    chassis_.set_steering_percentage(0);
+  }
+  // 12
+  if (chassis_detail.has_eps() && chassis_detail.eps().has_epas_torque()) {
+    chassis_.set_steering_torque_nm(chassis_detail.eps().epas_torque());
+  } else {
+    chassis_.set_steering_torque_nm(0);
+  }
+  // 13
+  if (chassis_detail.has_eps() &&
+      chassis_detail.epb().has_parking_brake_status()) {
+    chassis_.set_parking_brake(chassis_detail.epb().parking_brake_status() ==
+                               Epb::PBRAKE_ON);
+  } else {
+    chassis_.set_parking_brake(false);
+  }
+
+  // 14, 15
+  if (chassis_detail.has_light() &&
+      chassis_detail.light().has_lincoln_lamp_type()) {
+    chassis_.mutable_signal()->set_high_beam(
+        chassis_detail.light().lincoln_lamp_type() == Light::BEAM_HIGH);
+  } else {
+    chassis_.mutable_signal()->set_high_beam(false);
+  }
+
+  // 16, 17
+  if (chassis_detail.has_light() &&
+      chassis_detail.light().has_turn_light_type() &&
+      chassis_detail.light().turn_light_type() != Light::TURN_LIGHT_OFF) {
+    if (chassis_detail.light().turn_light_type() == Light::TURN_LEFT_ON) {
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_LEFT);
+    } else if (chassis_detail.light().turn_light_type() ==
+               Light::TURN_RIGHT_ON) {
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_RIGHT);
+    } else {
+      chassis_.mutable_signal()->set_turn_signal(
+          common::VehicleSignal::TURN_NONE);
+    }
+  } else {
+    chassis_.mutable_signal()->set_turn_signal(
+        common::VehicleSignal::TURN_NONE);
+  }
+  // 18
+  if (chassis_detail.has_light() && chassis_detail.light().has_is_horn_on() &&
+      chassis_detail.light().is_horn_on()) {
+    chassis_.mutable_signal()->set_horn(true);
+  } else {
+    chassis_.mutable_signal()->set_horn(false);
+  }
+
+  // 24
+  if (chassis_detail.has_eps() && chassis_detail.eps().has_timestamp_65()) {
+    chassis_.set_steering_timestamp(chassis_detail.eps().timestamp_65());
+  }
+  // 26
+  if (chassis_error_mask_) {
+    chassis_.set_chassis_error_mask(chassis_error_mask_);
+  }
+
+  // 6d, 6e, 6f, if gps valid is availiable, assume all gps related field
+  // available
+  if (chassis_detail.basic().has_gps_valid()) {
+    chassis_.mutable_chassis_gps()->set_latitude(
+        chassis_detail.basic().latitude());
+    chassis_.mutable_chassis_gps()->set_longitude(
+        chassis_detail.basic().longitude());
+    chassis_.mutable_chassis_gps()->set_gps_valid(
+        chassis_detail.basic().gps_valid());
+    chassis_.mutable_chassis_gps()->set_year(chassis_detail.basic().year());
+    chassis_.mutable_chassis_gps()->set_month(chassis_detail.basic().month());
+    chassis_.mutable_chassis_gps()->set_day(chassis_detail.basic().day());
+    chassis_.mutable_chassis_gps()->set_hours(chassis_detail.basic().hours());
+    chassis_.mutable_chassis_gps()->set_minutes(
+        chassis_detail.basic().minutes());
+    chassis_.mutable_chassis_gps()->set_seconds(
+        chassis_detail.basic().seconds());
+    chassis_.mutable_chassis_gps()->set_compass_direction(
+        chassis_detail.basic().compass_direction());
+    chassis_.mutable_chassis_gps()->set_pdop(chassis_detail.basic().pdop());
+    chassis_.mutable_chassis_gps()->set_is_gps_fault(
+        chassis_detail.basic().is_gps_fault());
+    chassis_.mutable_chassis_gps()->set_is_inferred(
+        chassis_detail.basic().is_inferred());
+    chassis_.mutable_chassis_gps()->set_altitude(
+        chassis_detail.basic().altitude());
+    chassis_.mutable_chassis_gps()->set_heading(
+        chassis_detail.basic().heading());
+    chassis_.mutable_chassis_gps()->set_hdop(chassis_detail.basic().hdop());
+    chassis_.mutable_chassis_gps()->set_vdop(chassis_detail.basic().vdop());
+    chassis_.mutable_chassis_gps()->set_quality(
+        chassis_detail.basic().quality());
+    chassis_.mutable_chassis_gps()->set_num_satellites(
+        chassis_detail.basic().num_satellites());
+    chassis_.mutable_chassis_gps()->set_gps_speed(
+        chassis_detail.basic().gps_speed());
+  } else {
+    chassis_.mutable_chassis_gps()->set_gps_valid(false);
+  }
+
+  // vin number will be written into KVDB once.
+  if (chassis_detail.license().has_vin()) {
+    chassis_.mutable_license()->set_vin(chassis_detail.license().vin());
+    if (!received_vin_) {
+      apollo::common::KVDB::Put("apollo:canbus:vin",
+                                chassis_detail.license().vin());
+      received_vin_ = true;
+    }
+  }
+
+  if (chassis_detail.has_surround()) {
+    chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
+  }
+  // give engage_advice based on error_code and canbus feedback
+  if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
+      (chassis_.brake_percentage() == 0.0)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason("Chassis error!");
+  } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Vehicle is not in a safe state to engage!");
+  } else {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+  }
   return chassis_;
 }
 
@@ -183,12 +388,16 @@ ErrorCode TransitController::EnableAutoMode() {
     AINFO << "already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_enable();
-  throttle_62_->set_enable();
-  steering_64_->set_enable();
-
+  adc_motioncontrol1_10_->
+    set_adc_cmd_autonomyrequest(
+    Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
+  adc_motioncontrol1_10_->
+    set_adc_cmd_steeringcontrolmode(
+    Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
+  adc_motioncontrol1_10_->
+    set_adc_cmd_longitudinalcontrolmode(
+    Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE
+    );
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
@@ -202,7 +411,6 @@ ErrorCode TransitController::EnableAutoMode() {
     AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
     return ErrorCode::OK;
   }
-  */
 }
 
 ErrorCode TransitController::DisableAutoMode() {
@@ -221,12 +429,15 @@ ErrorCode TransitController::EnableSteeringOnlyMode() {
     AINFO << "Already in AUTO_STEER_ONLY mode";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_disable();
-  throttle_62_->set_disable();
-  steering_64_->set_enable();
-
+  adc_motioncontrol1_10_->
+    set_adc_cmd_autonomyrequest(
+    Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
+  adc_motioncontrol1_10_->
+    set_adc_cmd_steeringcontrolmode(
+    Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
+  adc_motioncontrol1_10_->
+    set_adc_cmd_longitudinalcontrolmode(
+    Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_NONE);
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
@@ -238,7 +449,6 @@ ErrorCode TransitController::EnableSteeringOnlyMode() {
     AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
     return ErrorCode::OK;
   }
-  */
 }
 
 ErrorCode TransitController::EnableSpeedOnlyMode() {
@@ -248,12 +458,16 @@ ErrorCode TransitController::EnableSpeedOnlyMode() {
     AINFO << "Already in AUTO_SPEED_ONLY mode";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_enable();
-  throttle_62_->set_enable();
-  steering_64_->set_disable();
-
+  adc_motioncontrol1_10_->
+    set_adc_cmd_autonomyrequest(
+    Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
+  adc_motioncontrol1_10_->
+    set_adc_cmd_steeringcontrolmode(
+    Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE);
+  adc_motioncontrol1_10_->
+    set_adc_cmd_longitudinalcontrolmode(
+    Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE
+    );
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
@@ -265,7 +479,6 @@ ErrorCode TransitController::EnableSpeedOnlyMode() {
     AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
     return ErrorCode::OK;
   }
-  */
 }
 
 // NEUTRAL, REVERSE, DRIVE
@@ -275,44 +488,50 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
     AINFO << "this drive mode no need to set gear.";
     return;
   }
-  return;
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
-      gear_66_->set_gear_neutral();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_REVERSE: {
-      gear_66_->set_gear_reverse();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_R_REVERSE);
       break;
     }
     case Chassis::GEAR_DRIVE: {
-      gear_66_->set_gear_drive();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_PARKING: {
-      gear_66_->set_gear_park();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARKING);
       break;
     }
     case Chassis::GEAR_LOW: {
-      gear_66_->set_gear_low();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_NONE: {
-      gear_66_->set_gear_none();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_INVALID: {
       AERROR << "Gear command is invalid!";
-      gear_66_->set_gear_none();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     default: {
-      gear_66_->set_gear_none();
+      adc_motioncontrol1_10_.set_adc_cmd_gear(
+        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
   }
-  */
+  return;
 }
 
 // brake with new acceleration
@@ -328,9 +547,7 @@ void TransitController::Brake(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_60_->set_pedal(pedal);
-  */
+  adc_motioncontrol1_10_.set_adc_cmd_brakepressure(pedal);
 }
 
 // drive with old acceleration
@@ -341,9 +558,8 @@ void TransitController::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  throttle_62_->set_pedal(pedal);
-  */
+  adc_motioncontrol1_10_.set_adc_cmd_throttleposition(pedal);
+  adc_motioncontrollimits1_12_.set_adc_cmd_steeringrate(200);
 }
 
 // transit default, -470 ~ 470, left:+, right:-
@@ -356,11 +572,12 @@ void TransitController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  // const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  // reverse sign
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-  steering_64_->set_steering_angle(real_angle)->set_steering_angle_speed(200);
-  */
+  const double real_angle = params_.max_steer_angle() * angle / 100.0;
+  const double real_angle_spd = ProtocolData::BoundedValue(
+      params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
+      params_.max_steer_angle_spd() * angle_spd / 100.0);
+  adc_motioncontrol1_10_.set_adc_cmd_steerwheelangle(real_angle);
+  adc_motioncontrollimits1_12_.set_adc_cmd_steeringrate(real_angle_spd);
 }
 
 // steering with new angle speed
@@ -372,54 +589,50 @@ void TransitController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
   const double real_angle = params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd = ProtocolData::BoundedValue(
-      params_.min_steer_angle_spd(), params_.max_steer_angle_spd(),
-      params_.max_steer_angle_spd() * angle_spd / 100.0);
-  steering_64_->set_steering_angle(real_angle)
-      ->set_steering_angle_speed(real_angle_spd);
-  */
+  adc_motioncontrol1_10_.set_adc_cmd_steerwheelangle(real_angle);
 }
 
 void TransitController::SetEpbBreak(const ControlCommand& command) {
   if (command.parking_brake()) {
-    // None
+    adc_motioncontrol1_10_.set_adc_cmd_parkingbrake(true);
   } else {
-    // None
+    adc_motioncontrol1_10_.set_adc_cmd_parkingbrake(false);
   }
 }
 
 void TransitController::SetBeam(const ControlCommand& command) {
   if (command.signal().high_beam()) {
-    // None
+    adc_auxiliarycontrol_110_->set_adc_cmd_highbeam(true);
   } else if (command.signal().low_beam()) {
-    // None
+    adc_auxiliarycontrol_110_->set_adc_cmd_lowbeaml(true);
   } else {
-    // None
+    adc_auxiliarycontrol_110_->set_adc_cmd_highbeam(false);
+    adc_auxiliarycontrol_110_->set_adc_cmd_lowbeaml(false);
   }
 }
 
 void TransitController::SetHorn(const ControlCommand& command) {
   if (command.signal().horn()) {
-    // None
+    adc_auxiliarycontrol_110_->set_adc_cmd_horn(true);
   } else {
-    // None
+    adc_auxiliarycontrol_110_->set_adc_cmd_horn(false);
   }
 }
 
 void TransitController::SetTurningSignal(const ControlCommand& command) {
   // Set Turn Signal
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
   auto signal = command.signal().turn_signal();
   if (signal == Signal::TURN_LEFT) {
-    turnsignal_68_->set_turn_left();
+    adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
+      Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT);
   } else if (signal == Signal::TURN_RIGHT) {
-    turnsignal_68_->set_turn_right();
+    adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
+      Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT);
   } else {
-    turnsignal_68_->set_turn_none();
+    adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
+      Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE);
   }
-  */
 }
 
 void TransitController::ResetProtocol() {
@@ -427,8 +640,124 @@ void TransitController::ResetProtocol() {
 }
 
 bool TransitController::CheckChassisError() {
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-   */
+  // steer fault
+  ChassisDetail chassis_detail;
+  message_manager_->GetSensorData(&chassis_detail);
+
+  int32_t error_cnt = 0;
+  int32_t chassis_error_mask = 0;
+  if (!chassis_detail.has_eps()) {
+    AERROR_EVERY(100) << "ChassisDetail has NO eps."
+                      << chassis_detail.DebugString();
+    return false;
+  }
+  bool steer_fault = chassis_detail.eps().watchdog_fault() |
+                     chassis_detail.eps().channel_1_fault() |
+                     chassis_detail.eps().channel_2_fault() |
+                     chassis_detail.eps().calibration_fault() |
+                     chassis_detail.eps().connector_fault();
+
+  chassis_error_mask |=
+      ((chassis_detail.eps().watchdog_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.eps().channel_1_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.eps().channel_2_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.eps().calibration_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.eps().connector_fault()) << (error_cnt++));
+
+  if (!chassis_detail.has_brake()) {
+    AERROR_EVERY(100) << "ChassisDetail has NO brake."
+                      << chassis_detail.DebugString();
+    return false;
+  }
+  // brake fault
+  bool brake_fault = chassis_detail.brake().watchdog_fault() |
+                     chassis_detail.brake().channel_1_fault() |
+                     chassis_detail.brake().channel_2_fault() |
+                     chassis_detail.brake().boo_fault() |
+                     chassis_detail.brake().connector_fault();
+
+  chassis_error_mask |=
+      ((chassis_detail.brake().watchdog_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.brake().channel_1_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.brake().channel_2_fault()) << (error_cnt++));
+  chassis_error_mask |= ((chassis_detail.brake().boo_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.brake().connector_fault()) << (error_cnt++));
+
+  if (!chassis_detail.has_gas()) {
+    AERROR_EVERY(100) << "ChassisDetail has NO gas."
+                      << chassis_detail.DebugString();
+    return false;
+  }
+  // throttle fault
+  bool throttle_fault = chassis_detail.gas().watchdog_fault() |
+                        chassis_detail.gas().channel_1_fault() |
+                        chassis_detail.gas().channel_2_fault() |
+                        chassis_detail.gas().connector_fault();
+
+  chassis_error_mask |=
+      ((chassis_detail.gas().watchdog_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.gas().channel_1_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.gas().channel_2_fault()) << (error_cnt++));
+  chassis_error_mask |=
+      ((chassis_detail.gas().connector_fault()) << (error_cnt++));
+
+  if (!chassis_detail.has_gear()) {
+    AERROR_EVERY(100) << "ChassisDetail has NO gear."
+                      << chassis_detail.DebugString();
+    return false;
+  }
+  // gear fault
+  bool gear_fault = chassis_detail.gear().canbus_fault();
+
+  chassis_error_mask |=
+      ((chassis_detail.gear().canbus_fault()) << (error_cnt++));
+
+  set_chassis_error_mask(chassis_error_mask);
+
+  if (steer_fault) {
+    AERROR_EVERY(100) << "Steering fault detected: "
+                      << chassis_detail.eps().watchdog_fault() << ", "
+                      << chassis_detail.eps().channel_1_fault() << ", "
+                      << chassis_detail.eps().channel_2_fault() << ", "
+                      << chassis_detail.eps().calibration_fault() << ", "
+                      << chassis_detail.eps().connector_fault();
+  }
+
+  if (brake_fault) {
+    AERROR_EVERY(100) << "Brake fault detected: "
+                      << chassis_detail.brake().watchdog_fault() << ", "
+                      << chassis_detail.brake().channel_1_fault() << ", "
+                      << chassis_detail.brake().channel_2_fault() << ", "
+                      << chassis_detail.brake().boo_fault() << ", "
+                      << chassis_detail.brake().connector_fault();
+  }
+
+  if (throttle_fault) {
+    AERROR_EVERY(100) << "Throttle fault detected: "
+                      << chassis_detail.gas().watchdog_fault() << ", "
+                      << chassis_detail.gas().channel_1_fault() << ", "
+                      << chassis_detail.gas().channel_2_fault() << ", "
+                      << chassis_detail.gas().connector_fault();
+  }
+
+  if (gear_fault) {
+    AERROR_EVERY(100) << "Gear fault detected: "
+                      << chassis_detail.gear().canbus_fault();
+  }
+
+  if (steer_fault || brake_fault || throttle_fault) {
+    return true;
+  }
+
   return false;
 }
 
@@ -502,8 +831,50 @@ void TransitController::SecurityDogThreadFunc() {
 }
 
 bool TransitController::CheckResponse(const int32_t flags, bool need_wait) {
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-   */
+  int32_t retry_num = 20;
+  ChassisDetail chassis_detail;
+  bool is_eps_online = false;
+  bool is_vcu_online = false;
+  bool is_esp_online = false;
+
+  do {
+    if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
+      AERROR_EVERY(100) << "get chassis detail failed.";
+      return false;
+    }
+    bool check_ok = true;
+    if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
+      is_eps_online = chassis_detail.has_check_response() &&
+                      chassis_detail.check_response().has_is_eps_online() &&
+                      chassis_detail.check_response().is_eps_online();
+      check_ok = check_ok && is_eps_online;
+    }
+
+    if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
+      is_vcu_online = chassis_detail.has_check_response() &&
+                      chassis_detail.check_response().has_is_vcu_online() &&
+                      chassis_detail.check_response().is_vcu_online();
+      is_esp_online = chassis_detail.has_check_response() &&
+                      chassis_detail.check_response().has_is_esp_online() &&
+                      chassis_detail.check_response().is_esp_online();
+      check_ok = check_ok && is_vcu_online && is_esp_online;
+    }
+    if (check_ok) {
+      return true;
+    } else {
+      AINFO << "Need to check response again.";
+    }
+    if (need_wait) {
+      --retry_num;
+      std::this_thread::sleep_for(
+          std::chrono::duration<double, std::milli>(20));
+    }
+  } while (need_wait && retry_num);
+
+  AINFO << "check_response fail: is_eps_online:" << is_eps_online
+        << ", is_vcu_online:" << is_vcu_online
+        << ", is_esp_online:" << is_esp_online;
+  return false;
   return false;
 }
 
