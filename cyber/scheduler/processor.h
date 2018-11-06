@@ -35,7 +35,6 @@ class ProcessorContext;
 
 using croutine::CRoutine;
 using croutine::RoutineContext;
-using apollo::cyber::proto::SchedStrategy;
 
 class Processor {
  public:
