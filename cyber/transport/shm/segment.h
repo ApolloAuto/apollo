@@ -70,8 +70,9 @@ class Segment {
 
   State* state_;
   Block* blocks_;
+  void* managed_shm_;
+  std::mutex block_buf_lock_;
   std::unordered_map<uint32_t, uint8_t*> block_buf_addrs_;
-  void* managed_shm_ = nullptr;
 };
 
 }  // namespace transport
