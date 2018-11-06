@@ -96,11 +96,14 @@ void Scheduler::CreateProcessor() {
 
       std::shared_ptr<ProcessorContext> ctx;
       ctx.reset(classic_4_choreo_ = new ClassicContext());
+      ctx->SetId(proc_num_ + i);
 
       proc->BindContext(ctx);
       ctx->BindProc(proc);
       proc_ctxs_.emplace_back(ctx);
 
+      proc->SetCpuBindingStartIndex(
+          cpu_binding_start_index_);
       proc->Start();
     }
   }
