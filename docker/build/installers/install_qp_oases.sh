@@ -21,7 +21,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget https://github.com/startcode/qp-oases/archive/v3.2.1-1.tar.gz
+wget https://github.com/ApolloAuto/qp-oases/archive/v3.2.1-1.tar.gz
 tar xzf v3.2.1-1.tar.gz
 
 pushd qp-oases-3.2.1-1
