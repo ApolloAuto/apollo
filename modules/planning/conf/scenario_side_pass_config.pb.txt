@@ -4,7 +4,11 @@ stage_type: SIDE_PASS_GENERATE_PATH
 stage_type: SIDE_PASS_STOP_ON_WAITPOINT
 stage_type: SIDE_PASS_DETECT_SAFETY
 stage_type: SIDE_PASS_PASS_OBSTACLE
-
+side_pass_config : {
+  side_pass_exit_distance : 10.0
+  approach_obstacle_max_stop_speed : 1.0e-5
+  approach_obstacle_min_stop_distance : 4.0
+}
 stage_config : {
   stage_type: SIDE_PASS_APPROACH_OBSTACLE
   enabled: true
