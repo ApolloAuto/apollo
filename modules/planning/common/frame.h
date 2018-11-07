@@ -141,7 +141,7 @@ class Frame {
 
   const size_t obstacles_num() { return obstacles_num_; }
 
-  const Eigen::MatrixXd &obstacles_edges_num() { return obstacles_edges_num_; }
+  const Eigen::MatrixXi &obstacles_edges_num() { return obstacles_edges_num_; }
 
   const std::vector<std::vector<common::math::Vec2d>>
       &obstacles_vertices_vec() {
@@ -178,8 +178,8 @@ class Frame {
   bool HPresentationObstacle();
 
   // @brief Helper function for HPresentationObstacle()
-  bool ObsHRep(const size_t &obstacles_num,
-               const Eigen::MatrixXd &obstacles_edges_num,
+  bool ObsHRep(const std::size_t &obstacles_num,
+               const Eigen::MatrixXi &obstacles_edges_num,
                const std::vector<std::vector<common::math::Vec2d>>
                    &obstacles_vertices_vec,
                Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
@@ -247,7 +247,7 @@ class Frame {
 
   // @brief the dimension needed for A and b matrix dimension in H
   // representation
-  Eigen::MatrixXd obstacles_edges_num_;
+  Eigen::MatrixXi obstacles_edges_num_;
 
   // @brief obstacle list for open space warm start as warm start needs all
   // obstacles in shape of box while distance approach only requires lines for

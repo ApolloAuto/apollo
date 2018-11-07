@@ -60,7 +60,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   std::vector<double> XYbounds_ = {1.0, 1.0, 1.0, 1.0};
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Ones(4, 6);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
-  Eigen::MatrixXd obstacles_edges_num_;
+  Eigen::MatrixXi obstacles_edges_num_;
   std::size_t obstacles_edges_sum_;
   Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
   Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
@@ -71,7 +71,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
 };
 
 void DistanceApproachIPOPTInterfaceTest::ProblemSetup() {
-  obstacles_edges_num_ = 4 * Eigen::MatrixXd::Ones(obstacles_num_, 1);
+  obstacles_edges_num_ = 4 * Eigen::MatrixXi::Ones(obstacles_num_, 1);
   obstacles_edges_sum_ = obstacles_edges_num_.sum();
   Eigen::MatrixXd l_warm_up_ =
       Eigen::MatrixXd::Ones(obstacles_edges_sum_, horizon_ + 1);

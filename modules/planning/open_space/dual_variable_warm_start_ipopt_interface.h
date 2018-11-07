@@ -38,7 +38,7 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   explicit DualVariableWarmStartIPOPTInterface(
       int num_of_variables, int num_of_constraints, std::size_t horizon,
       float ts, const Eigen::MatrixXd& ego,
-      const Eigen::MatrixXd& obstacles_edges_num,
+      const Eigen::MatrixXi& obstacles_edges_num,
       const std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
       const Eigen::MatrixXd& obstacles_b, const Eigen::MatrixXd& xWS,
       const PlannerOpenSpaceConfig& planner_open_space_config);
@@ -110,7 +110,7 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   double l_ev_;
   std::vector<double> g_;
   double offset_;
-  Eigen::MatrixXd obstacles_edges_num_;
+  Eigen::MatrixXi obstacles_edges_num_;
   std::size_t obstacles_num_;
   std::size_t obstacles_edges_sum_;
 
