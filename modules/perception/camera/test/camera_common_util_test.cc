@@ -1,24 +1,24 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
-#include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/test/camera_common_io_util.h"
+#include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/inference/utils/util.h"
 
 namespace apollo {
@@ -57,10 +57,8 @@ TEST(UtilTest, ContainTest) {
   }
   {
     base::ObjectSubType type = base::ObjectSubType::CAR;
-    std::vector<base::ObjectSubType> array
-        = {base::ObjectSubType::VAN,
-           base::ObjectSubType::PEDESTRIAN
-        };
+    std::vector<base::ObjectSubType> array = {base::ObjectSubType::VAN,
+                                              base::ObjectSubType::PEDESTRIAN};
     ASSERT_FALSE(Contain(array, type));
     array.push_back(base::ObjectSubType::CAR);
     ASSERT_TRUE(Contain(array, type));
@@ -97,14 +95,14 @@ TEST(UtilTest, BorderTest) {
     float width = 1.f;
     float height = 2.f;
 
-    ASSERT_FALSE(OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f),
-                                  width, height));
-    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f),
-                                 width, height, 0.1f));
-    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.5f, 0.f, 0.5f, 2.f),
-                                 width, height, 0.1f));
-    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.2f, 0.2f, 0.5f, 1.9f),
-                                 width, height, 0.1f));
+    ASSERT_FALSE(
+        OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f), width, height));
+    ASSERT_TRUE(
+        OutOfValidRegion(base::RectF(0.f, 0.f, 1.f, 2.f), width, height, 0.1f));
+    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.5f, 0.f, 0.5f, 2.f), width,
+                                 height, 0.1f));
+    ASSERT_TRUE(OutOfValidRegion(base::RectF(0.2f, 0.2f, 0.5f, 1.9f), width,
+                                 height, 0.1f));
   }
 }
 
@@ -254,15 +252,14 @@ TEST(UtilTest, RefineBoxTest) {
   }
 }
 
-
 TEST(UtilTest, test_load_anchors) {
   std::string anchor_filepath = "non-exists";
   {
     std::vector<float> anchors;
     ASSERT_FALSE(LoadAnchors(anchor_filepath, &anchors));
   }
-  anchor_filepath = "/apollo/modules/perception/testdata/"
-    "camera/common/data/bad_anchors.txt";
+  anchor_filepath =
+      "/apollo/modules/perception/testdata/camera/common/data/bad_anchors.txt";
   {
     std::vector<float> anchors;
     ASSERT_FALSE(LoadAnchors(anchor_filepath, &anchors));
@@ -275,8 +272,8 @@ TEST(UtilTest, test_load_types) {
     std::vector<base::ObjectSubType> types;
     ASSERT_FALSE(LoadTypes(types_filepath, &types));
   }
-  types_filepath = "/apollo/modules/perception/testdata/"
-    "camera/common/data/bad_types.txt";
+  types_filepath =
+      "/apollo/modules/perception/testdata/camera/common/data/bad_types.txt";
   {
     std::vector<base::ObjectSubType> types;
     ASSERT_FALSE(LoadTypes(types_filepath, &types));
@@ -284,8 +281,9 @@ TEST(UtilTest, test_load_types) {
 }
 
 TEST(UtilTest, test_resize_cpu) {
-  cv::Mat img = cv::imread("/apollo/modules/perception/testdata/"
-    "camera/common/img/test.jpg");
+  cv::Mat img = cv::imread(
+      "/apollo/modules/perception/testdata/"
+      "camera/common/img/test.jpg");
 
   DataProvider data_provider;
   DataProvider::InitOptions init_options;
@@ -294,10 +292,9 @@ TEST(UtilTest, test_resize_cpu) {
   init_options.device_id = 0;
   data_provider.Init(init_options);
 
-  EXPECT_TRUE(data_provider.FillImageData(img.rows, img.cols,
-                                          img.data, "bgr8"));
-  std::shared_ptr<base::Blob<uint8_t> > src_blob(
-      new base::Blob<uint8_t>);
+  EXPECT_TRUE(
+      data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
+  std::shared_ptr<base::Blob<uint8_t>> src_blob(new base::Blob<uint8_t>);
 
   DataProvider::ImageOptions image_options;
   image_options.target_color = base::Color::BGR;
@@ -305,10 +302,8 @@ TEST(UtilTest, test_resize_cpu) {
 
   {
     std::vector<int> shape = {1, static_cast<int>(img.rows * 0.5),
-                              static_cast<int>(img.cols * 0.5),
-                              img.channels()};
-    std::shared_ptr<base::Blob<float>> dst_blob(
-        new base::Blob<float>(shape));
+                              static_cast<int>(img.cols * 0.5), img.channels()};
+    std::shared_ptr<base::Blob<float>> dst_blob(new base::Blob<float>(shape));
     EXPECT_TRUE(ResizeCPU(*src_blob, dst_blob, data_provider.src_width(), 0));
     EXPECT_EQ(dst_blob->shape(0), src_blob->shape(0));
     EXPECT_EQ(dst_blob->shape(1), src_blob->shape(1) * 0.5);
@@ -318,10 +313,8 @@ TEST(UtilTest, test_resize_cpu) {
 
   {
     std::vector<int> shape = {1, static_cast<int>(img.rows * 0.5),
-                              static_cast<int>(img.cols * 0.5),
-                              0};
-    std::shared_ptr<base::Blob<float>> dst_blob(
-        new base::Blob<float>(shape));
+                              static_cast<int>(img.cols * 0.5), 0};
+    std::shared_ptr<base::Blob<float>> dst_blob(new base::Blob<float>(shape));
     EXPECT_FALSE(ResizeCPU(*src_blob, dst_blob, data_provider.src_width(), 0));
   }
 }
@@ -375,29 +368,28 @@ TEST(UtilTest, FillObjectPolygonFromBBox3DTest) {
   EXPECT_EQ(object->polygon.size(), 4);
   EXPECT_NEAR(object->polygon[0].x, 0.0, eps);
   EXPECT_NEAR(object->polygon[0].y, 7.07, eps);
-  EXPECT_NEAR(object->polygon[1].x, -7.07, eps);
+  EXPECT_NEAR(object->polygon[1].x, 7.07, eps);
   EXPECT_NEAR(object->polygon[1].y, 0.0, eps);
   EXPECT_NEAR(object->polygon[2].x, 0.0, eps);
   EXPECT_NEAR(object->polygon[2].y, -7.07, eps);
-  EXPECT_NEAR(object->polygon[3].x, 7.07, eps);
+  EXPECT_NEAR(object->polygon[3].x, -7.07, eps);
   EXPECT_NEAR(object->polygon[3].y, 0.0, eps);
 }
-
 
 TEST(UtilTest, TestCalculateMeanAndVariance) {
   std::vector<double> data;
   double mean = 0.0;
   double var = 0.0;
 
-  CalculateMeanAndVariance(data, static_cast<double*>(nullptr), &var);
-  CalculateMeanAndVariance(data, &mean, static_cast<double*>(nullptr));
+  CalculateMeanAndVariance(data, static_cast<double *>(nullptr), &var);
+  CalculateMeanAndVariance(data, &mean, static_cast<double *>(nullptr));
   CalculateMeanAndVariance(data, &mean, &var);
 
-  data = std::vector<double>({
-      -4.771477549277996, -5.993583986626174, 2.021726801725549,
-      -0.13071376170261217, -0.4202989526699099, 3.3351565902424305,
-      -2.6686659382771882, 3.391145123909162, 7.645098267749905,
-      -3.0813026156194017});
+  data = std::vector<double>({-4.771477549277996, -5.993583986626174,
+                              2.021726801725549, -0.13071376170261217,
+                              -0.4202989526699099, 3.3351565902424305,
+                              -2.6686659382771882, 3.391145123909162,
+                              7.645098267749905, -3.0813026156194017});
   CalculateMeanAndVariance(data, &mean, &var);
   EXPECT_NEAR(mean, -0.06729160205462356, 1e-5);
   EXPECT_NEAR(var, 16.061274792441097, 1e-5);
