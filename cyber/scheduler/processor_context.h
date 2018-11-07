@@ -53,9 +53,6 @@ class ProcessorContext {
 
   void ShutDown();
 
-  int Id() const { return proc_index_; }
-  void SetId(int id) { proc_index_ = id; }
-
   inline bool get_state(const uint64_t& cr_id, RoutineState* state);
   inline bool set_state(const uint64_t& cr_id, const RoutineState& state);
 
@@ -79,7 +76,6 @@ class ProcessorContext {
   alignas(CACHELINE_SIZE) std::atomic_flag notified_ = ATOMIC_FLAG_INIT;
 
   bool stop_ = false;
-  int proc_index_ = -1;
   uint32_t index_ = 0;
   uint32_t status_;
 };

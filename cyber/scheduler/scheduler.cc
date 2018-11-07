@@ -20,6 +20,7 @@
 #include "cyber/common/global_data.h"
 #include "cyber/common/util.h"
 #include "cyber/data/data_visitor.h"
+#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/policy/classic.h"
 #include "cyber/scheduler/policy/task_choreo.h"
 #include "cyber/scheduler/processor.h"
@@ -30,6 +31,8 @@ namespace cyber {
 namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
+using apollo::cyber::event::PerfEventCache;
+using apollo::cyber::event::SchedPerf;
 
 Scheduler::Scheduler() : stop_(false) {
   auto gconf = GlobalData::Instance()->Config();
@@ -66,7 +69,6 @@ Scheduler::Scheduler() : stop_(false) {
 void Scheduler::CreateProcessor() {
   for (uint32_t i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
-    proc->SetId(i);
 
     std::shared_ptr<ProcessorContext> ctx;
     switch (sched_policy_) {
@@ -80,12 +82,12 @@ void Scheduler::CreateProcessor() {
         ctx.reset(new TaskChoreoContext());
         break;
     }
-    ctx->SetId(i);
     proc->BindContext(ctx);
     ctx->BindProc(proc);
     proc_ctxs_.emplace_back(ctx);
-    proc->SetCpuBindingStartIndex(
-        cpu_binding_start_index_);
+
+    proc->SetBindCpuIndex(
+        cpu_binding_start_index_ + i);
     proc->Start();
   }
 
@@ -96,14 +98,13 @@ void Scheduler::CreateProcessor() {
 
       std::shared_ptr<ProcessorContext> ctx;
       ctx.reset(classic_4_choreo_ = new ClassicContext());
-      ctx->SetId(proc_num_ + i);
 
       proc->BindContext(ctx);
       ctx->BindProc(proc);
       proc_ctxs_.emplace_back(ctx);
 
-      proc->SetCpuBindingStartIndex(
-          cpu_binding_start_index_);
+      proc->SetBindCpuIndex(
+          cpu_binding_start_index_ + proc_num_ + i);
       proc->Start();
     }
   }
@@ -190,6 +191,10 @@ bool Scheduler::NotifyProcessor(uint64_t cr_id) {
   ReadLockGuard<AtomicRWLock> rg(rw_lock_);
   auto itr = cr_ctx_.find(cr_id);
   if (itr != cr_ctx_.end()) {
+    PerfEventCache::Instance()->
+        AddSchedEvent(SchedPerf::NOTIFY_IN,
+                      cr_id, itr->second);
+
     proc_ctxs_[itr->second]->Notify(cr_id);
     return true;
   }

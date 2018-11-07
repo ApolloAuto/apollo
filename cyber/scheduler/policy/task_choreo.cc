@@ -65,33 +65,29 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
 }
 
 bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
-  std::vector<std::shared_ptr<ProcessorContext>> ctxs =
-      Scheduler::Instance()->ProcCtxs();
-  uint32_t pnum = Scheduler::Instance()->ProcessorNum();
+  auto& rt_ctx =
+      Scheduler::Instance()->RtCtx();
+  if (rt_ctx.find(cr->id()) == rt_ctx.end()) {
+    return false;
+  }
 
+  uint32_t pnum = Scheduler::Instance()->ProcessorNum();
+  uint32_t psize = Scheduler::Instance()->TaskPoolSize();
   uint32_t pid = cr->processor_id();
   if (pid >= 0 && pid < pnum) {
-    std::unordered_map<uint64_t, uint32_t>& rt_ctx =
-        Scheduler::Instance()->RtCtx();
-
-    if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
-      rt_ctx[cr->id()] = cr->processor_id();
-    } else {
-      return false;
-    }
-
+    rt_ctx[cr->id()] = pid;
+    auto ctxs =
+        Scheduler::Instance()->ProcCtxs();
     return ctxs[pid]->Enqueue(cr);
   } else {
     // fallback for those w/o processor assigned.
+    // FIXME: trick for task pool index set
+    rt_ctx[cr->id()] = pnum + psize -1;
     return Scheduler::Instance()->Classic4Choreo()->DispatchTask(cr);
   }
 }
 
 bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
-  if (cr->processor_id() != Id()) {
-    return false;
-  }
-
   {
     WriteLockGuard<AtomicRWLock> lg(rw_lock_);
     if (cr_container_.find(cr->id()) != cr_container_.end()) {

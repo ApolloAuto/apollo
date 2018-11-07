@@ -49,7 +49,7 @@ void Processor::Start() {
   if (core_num != 0) {
     cpu_set_t set;
     CPU_ZERO(&set);
-    CPU_SET(id_ + cpu_binding_start_index_, &set);
+    CPU_SET(cpu_bind_id_, &set);
     pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
   }
 }

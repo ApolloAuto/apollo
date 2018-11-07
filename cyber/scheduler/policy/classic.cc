@@ -38,10 +38,9 @@ std::array<std::vector<std::shared_ptr<CRoutine>>, MAX_SCHED_PRIORITY>
 bool ClassicContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   std::unordered_map<uint64_t, uint32_t>& rt_ctx =
       Scheduler::Instance()->RtCtx();
-  if (rt_ctx.find(cr->id()) != rt_ctx.end()) {
-    rt_ctx[cr->id()] = proc_index_;
+  if (rt_ctx.find(cr->id()) == rt_ctx.end()) {
+    return false;
   }
-  cr->set_processor_id(proc_index_);
 
   return Enqueue(cr);
 }
