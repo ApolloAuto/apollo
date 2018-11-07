@@ -1,0 +1,69 @@
+cyber_modules {
+  key: "Computer"
+  value: {
+    process_name: "cyber_computer"
+    dag_files: "/apollo/modules/drivers/camera/dag/camera_udev.dag"
+    dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
+    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
+    dag_files: "/apollo/modules/localization/dag/localization.dag"
+    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
+    dag_files: "/apollo/modules/planning/dag/planning.dag"
+    dag_files: "/apollo/modules/prediction/dag/prediction.dag"
+    dag_files: "/apollo/modules/routing/dag/routing.dag"
+    dag_files: "/apollo/modules/transform/dag/static_transform.dag"
+  }
+}
+cyber_modules {
+  key: "Controller"
+  value: {
+    process_name: "cyber_control"
+    dag_files: "/apollo/modules/canbus/dag/canbus.dag"
+    dag_files: "/apollo/modules/control/dag/control.dag"
+    dag_files: "/apollo/modules/guardian/dag/guardian.dag"
+  }
+}
+modules {
+  key: "Recorder"
+  value: {
+    start_command: "/apollo/scripts/record_bag.py --start"
+    stop_command: "/apollo/scripts/record_bag.py --stop"
+    process_monitor_config {
+      command_keywords: "cyber_recorder"
+    }
+  }
+}
+monitored_components {
+  key: "Recorder"
+  value: {
+    process {
+      command_keywords: "cyber_recorder"
+    }
+    resource {
+      disk_spaces {
+        # For logs.
+        path: "/apollo/data"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        # For records.
+        path: "/media/apollo/internal_nvme"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "GPS"
+  value: {
+    # Special GPSMonitor.
+  }
+}
+monitored_components {
+  key: "Localization"
+  value: {
+    # Special LocalizationMonitor.
+  }
+}
