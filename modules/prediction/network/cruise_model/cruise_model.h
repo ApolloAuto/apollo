@@ -31,6 +31,14 @@ namespace network {
 class CruiseModel : public NetModel {
  public:
   /**
+   * @brief Load cruise network parameters from a protobuf message
+   * @param CruiseModelParameter is a protobuf message
+   * @return True if successfully loaded, otherwise False
+   */
+  bool LoadModel(
+      const apollo::prediction::CruiseModelParameter& cruise_model_parameter);
+
+  /**
    * @brief Compute the model output from inputs according to a defined layers'
    * flow
    * @param Inputs to the network
@@ -38,6 +46,9 @@ class CruiseModel : public NetModel {
    */
   void Run(const std::vector<Eigen::MatrixXf>& inputs,
            Eigen::MatrixXf* output) const override;
+
+ private:
+  CruiseModelParameter cruise_model_parameter_;
 };
 
 }  // namespace network
