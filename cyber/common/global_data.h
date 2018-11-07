@@ -24,6 +24,7 @@
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
+#include "cyber/common/util.h"
 #include "cyber/proto/cyber_config.pb.h"
 
 namespace apollo {
@@ -52,6 +53,10 @@ class GlobalData {
   void DisableSimulationMode();
 
   bool IsRealityMode() const;
+
+  static uint64_t GenerateHashId(const std::string& name) {
+    return common::Hash(name);
+  }
 
   static uint64_t RegisterNode(const std::string& node_name);
   static std::string GetNodeById(uint64_t id);

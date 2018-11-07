@@ -26,7 +26,6 @@
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
-#include "cyber/common/util.h"
 
 namespace apollo {
 namespace cyber {

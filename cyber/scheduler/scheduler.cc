@@ -207,11 +207,12 @@ bool Scheduler::RemoveTask(const std::string& name) {
   }
 
   auto task_id = GlobalData::RegisterTaskName(name);
-  {
+  bool ret = RemoveCRoutine(task_id);
+  if (ret) {
     WriteLockGuard<AtomicRWLock> wg(rw_lock_);
     cr_ctx_.erase(task_id);
   }
-  return RemoveCRoutine(task_id);
+  return ret;
 }
 
 bool Scheduler::RemoveCRoutine(uint64_t cr_id) {
