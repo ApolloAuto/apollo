@@ -55,7 +55,6 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
     const Feature& feature, const JunctionExit& junction_exit,
     const double total_time, const double period,
     std::vector<TrajectoryPoint>* trajectory_points) {
-  // TODO(all) implement
   double speed = feature.speed();
   const std::array<double, 2> start_x = {feature.position().x(),
                                          feature.raw_velocity().x()};
@@ -71,25 +70,58 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
   std::array<double, 4> y_coeffs =
         ComputePolynomial<3>(start_y, end_y, exit_time);
   double t = 0.0;
+  // Trajectory in junction
   while (t <= exit_time) {
     PathPoint path_point;
     path_point.set_x(EvaluateCubicPolynomial(x_coeffs, t, 0));
     path_point.set_y(EvaluateCubicPolynomial(y_coeffs, t, 0));
     path_point.set_z(0.0);
     path_point.set_theta(std::atan2(EvaluateCubicPolynomial(y_coeffs, t, 1),
-                                   EvaluateCubicPolynomial(x_coeffs, t, 1)));
+                                    EvaluateCubicPolynomial(x_coeffs, t, 1)));
     TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(std::hypot(EvaluateCubicPolynomial(x_coeffs, t, 1),
                                     EvaluateCubicPolynomial(y_coeffs, t, 1)));
     trajectory_point.set_relative_time(t);
+    trajectory_points->emplace_back(std::move(trajectory_point));
     t += period;
   }
-  std::string exit_lane_id = junction_exit.exit_lane_id();
-  std::shared_ptr<const LaneInfo> exit_lane_info =
-      PredictionMap::LaneById(exit_lane_id);
+  std::string lane_id = junction_exit.exit_lane_id();
+  std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);
+  Eigen::Vector2d pos(junction_exit.exit_position().x(),
+                      junction_exit.exit_position().y());
+  double lane_s = 0.0;
+  double lane_l = 0.0;
+  double theta = M_PI;
+  PredictionMap::GetProjection(pos, lane_info, &lane_s, &lane_l);
+  // Trajectory after junction
   while (t <= total_time) {
-    // TODO(hongyi) implement after junction
+    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, 0.0, &pos,
+                                            &theta)) {
+      AERROR << "Unable to get smooth point from lane [" << lane_id
+             << "] with s [" << lane_s << "] and l [" << 0.0 << "]";
+      return;
+    }
+    TrajectoryPoint trajectory_point;
+    PathPoint path_point;
+    path_point.set_x(pos.x());
+    path_point.set_y(pos.y());
+    path_point.set_z(0.0);
+    path_point.set_theta(theta);
+    path_point.set_lane_id(lane_id);
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(speed);
+    trajectory_point.set_a(0.0);
+    trajectory_point.set_relative_time(t);
+    trajectory_points->emplace_back(std::move(trajectory_point));
+    lane_s += speed * period;
+    while (lane_s > PredictionMap::LaneById(lane_id)->total_length()) {
+      lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
+      if (PredictionMap::LaneById(lane_id)->lane().successor_id_size() < 1) {
+        return;
+      }
+      lane_id = PredictionMap::LaneById(lane_id)->lane().successor_id(0).id();
+    }
     t += period;
   }
   return;
