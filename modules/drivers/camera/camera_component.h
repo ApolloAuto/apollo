@@ -50,7 +50,7 @@ class CameraComponent : public Component<> {
   uint32_t spin_rate_ = 200;
   uint32_t device_wait_ = 2000;
   int index_ = 0;
-  int buffer_size_ = 8;
+  int buffer_size_ = 16;
 };
 
 CYBER_REGISTER_COMPONENT(CameraComponent)
