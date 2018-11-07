@@ -19,6 +19,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
@@ -39,6 +40,18 @@ double Sigmoid(const double value) {
 }
 
 double Relu(const double value) { return (value > 0.0) ? value : 0.0; }
+
+std::vector<double> Softmax(const std::vector<double>& value) {
+  std::vector<double> result;
+  double sum = 0.0;
+  for (std::size_t i = 0; i < value.size(); ++i) {
+    sum += std::exp(value[i]);
+  }
+  for (std::size_t i = 0; i < value.size(); ++i) {
+    result.push_back(std::exp(value[i]) / sum);
+  }
+  return result;
+}
 
 int SolveQuadraticEquation(const std::vector<double>& coefficients,
                            std::pair<double, double>* roots) {

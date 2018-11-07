@@ -42,6 +42,22 @@ TEST(PredictionUtilTest, sigmoid) {
   EXPECT_DOUBLE_EQ(Sigmoid(value), 0.88079707797788231);
 }
 
+TEST(PredictionUtilTest, softmax) {
+  std::vector<double> value = {0.0, 10.0, 100.0};
+  std::vector<double> result = Softmax(value);
+  EXPECT_NEAR(result[0], 0.0, 0.001);
+  EXPECT_NEAR(result[1], 0.0, 0.001);
+  EXPECT_NEAR(result[2], 1.0, 0.001);
+}
+
+TEST(PredictionUtilTest, softmax_balanced) {
+  std::vector<double> value = {10.0, 10.0, 10.0};
+  std::vector<double> result = Softmax(value);
+  EXPECT_NEAR(result[0], 0.3333, 0.001);
+  EXPECT_NEAR(result[1], 0.3333, 0.001);
+  EXPECT_NEAR(result[2], 0.3333, 0.001);
+}
+
 TEST(PredictionUtilTest, solvable_quadratic_equation) {
   std::vector<double> coefficients = {5.0, 6.0, 1.0};
   std::pair<double, double> roots;
