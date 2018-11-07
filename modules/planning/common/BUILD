@@ -410,4 +410,14 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_info",
+    deps = [
+        "//cyber/common:log",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:speed_data",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+    ],
+)
+
 cpplint()
