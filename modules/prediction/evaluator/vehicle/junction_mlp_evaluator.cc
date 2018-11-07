@@ -21,6 +21,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/prediction_map.h"
 
 using apollo::hdmap::LaneInfo;
@@ -81,8 +82,13 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   std::vector<double> feature_values;
-
   ExtractFeatureValues(obstacle_ptr, &feature_values);
+  std::vector<double> probability = ComputeProbability(feature_values);
+  for (double prob : probability) {
+    obstacle_ptr->mutable_latest_feature()
+                ->mutable_junction_feature()
+                ->add_junction_mlp_probability(prob);
+  }
 
   if (FLAGS_prediction_offline_mode) {
     FeatureOutput::Insert(obstacle_ptr->latest_feature());
@@ -208,7 +214,6 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double diff_heading = apollo::common::math::AngleDiff(heading,
                               junction_exit.exit_heading());
     double angle = std::atan2(diff_y, diff_x);
-    // TODO(Hongyi) test d_idx
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     feature_values->operator[](idx * 5) = 1.0;
@@ -238,10 +243,44 @@ void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {
   AINFO << "Succeeded in loading the model file: " << model_file << ".";
 }
 
-double JunctionMLPEvaluator::ComputeProbability(
+std::vector<double> JunctionMLPEvaluator::ComputeProbability(
     const std::vector<double>& feature_values) {
-  // TODO(all) implement
-  return 0.5;
+  CHECK_NOTNULL(model_ptr_.get());
+  if (model_ptr_->dim_input() != static_cast<int>(feature_values.size())) {
+    ADEBUG << "Model feature size not consistent with model proto definition. "
+           << "model input dim = " << model_ptr_->dim_input()
+           << "; feature value size = " << feature_values.size();
+    return {};
+  }
+  std::vector<double> layer_input;
+  layer_input.reserve(model_ptr_->dim_input());
+  std::vector<double> layer_output;
+  for (int i = 0; i < model_ptr_->num_layer(); ++i) {
+    if (i > 0) {
+      layer_input.swap(layer_output);
+      layer_output.clear();
+    }
+    const Layer& layer = model_ptr_->layer(i);
+    for (int col = 0; col < layer.layer_output_dim(); ++col) {
+      double neuron_output = layer.layer_bias().columns(col);
+      for (int row = 0; row < layer.layer_input_dim(); ++row) {
+        double weight = layer.layer_input_weight().rows(row).columns(col);
+        neuron_output += (layer_input[row] * weight);
+      }
+      if (layer.layer_activation_func() == Layer::RELU) {
+        neuron_output = apollo::prediction::math_util::Relu(neuron_output);
+      } else if (layer.layer_activation_func() == Layer::SIGMOID) {
+        neuron_output = apollo::prediction::math_util::Sigmoid(neuron_output);
+      } else if (layer.layer_activation_func() == Layer::TANH) {
+        neuron_output = std::tanh(neuron_output);
+      }
+      layer_output.push_back(neuron_output);
+      if (layer.layer_activation_func() == Layer::SOFTMAX) {
+        layer_output = apollo::prediction::math_util::Softmax(layer_output);
+      }
+    }
+  }
+  return layer_output;
 }
 
 }  // namespace prediction

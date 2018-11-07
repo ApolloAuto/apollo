@@ -98,7 +98,8 @@ class JunctionMLPEvaluator : public Evaluator {
   /**
    * @brief Compute probability of a junction exit
    */
-  double ComputeProbability(const std::vector<double>& feature_values);
+  std::vector<double> ComputeProbability(
+      const std::vector<double>& feature_values);
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 3;
