@@ -20,6 +20,9 @@
 
 #include "modules/prediction/network/net_layer.h"
 
+#include <algorithm>
+#include <limits>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -28,6 +31,8 @@ namespace network {
 
 using apollo::prediction::DenseParameter;
 using apollo::prediction::LayerParameter;
+using apollo::prediction::Conv1dParameter;
+using apollo::prediction::MaxPool1dParameter;
 
 bool Layer::Load(const LayerParameter& layer_pb) {
   if (!layer_pb.has_name()) {
@@ -93,6 +98,10 @@ bool Conv1d::Load(const LayerParameter& layer_pb) {
     return false;
   }
   Conv1dParameter conv1d_pb = layer_pb.conv1d();
+  return Load(conv1d_pb);
+}
+
+bool Conv1d::Load(const Conv1dParameter& conv1d_pb) {
   if (!conv1d_pb.has_kernel() ||
       !LoadTensor(conv1d_pb.kernel(), &kernel_)) {
     AERROR << "Fail to Load kernel!";
@@ -120,7 +129,7 @@ bool Conv1d::Load(const LayerParameter& layer_pb) {
 }
 
 void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                Eigen::MatrixXf* output) {
+                 Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1);
   CHECK_GT(kernel_.size(), 0);
   CHECK_EQ(kernel_[0].rows(), inputs[0].rows());
@@ -130,7 +139,7 @@ void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   output->resize(output_num_row, output_num_col);
   for (int i = 0; i < output_num_col; ++i) {
     for (int j = 0; j + kernel_size < inputs[0].cols(); j += stride_) {
-      double output_i_j = 0.0;
+      float output_i_j = 0.0;
       for (int p = 0; p < inputs[0].rows(); ++p) {
         for (int q = j; q < j + kernel_size; ++q) {
           output_i_j += inputs[0](p, q) * kernel_[i](p, q - j);
@@ -138,6 +147,92 @@ void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
       }
       (*output)(i, j) = output_i_j;
     }
+  }
+}
+
+bool MaxPool1d::Load(const LayerParameter& layer_pb) {
+  if (!Layer::Load(layer_pb)) {
+    AERROR << "Fail to Load LayerParameter!";
+    return false;
+  }
+  MaxPool1dParameter maxpool1d_pb = layer_pb.maxpool1d();
+  return Load(maxpool1d_pb);
+  return true;
+}
+
+bool MaxPool1d::Load(const MaxPool1dParameter& maxpool1d_pb) {
+  CHECK(maxpool1d_pb.has_kernel_size());
+  CHECK_GT(maxpool1d_pb.has_kernel_size(), 0);
+  kernel_size_ = maxpool1d_pb.kernel_size();
+  if (maxpool1d_pb.has_stride() && maxpool1d_pb.stride() > 0) {
+    stride_ = maxpool1d_pb.stride();
+  } else {
+    ADEBUG << "No valid stride found, use kernel size, instead";
+    stride_ = maxpool1d_pb.kernel_size();
+  }
+  return true;
+}
+
+void MaxPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
+                         Eigen::MatrixXf* output) {
+  CHECK_EQ(inputs.size(), 1);
+  int output_num_col = (inputs[0].cols() - kernel_size_) / stride_ + 1;
+  int output_num_row = inputs[0].rows();
+  output->resize(output_num_row, output_num_col);
+  int input_index = 0;
+  for (int j = 0; j < output_num_col; ++j) {
+    CHECK_LT(input_index + kernel_size_, inputs[0].cols());
+    for (int i = 0; i < output_num_row; ++i) {
+      float output_i_j = -std::numeric_limits<float>::infinity();
+      for (int k = input_index; k < input_index + kernel_size_; ++k) {
+        output_i_j = std::max(output_i_j, inputs[0](i, k));
+      }
+      (*output)(i, j) = output_i_j;
+    }
+    input_index += stride_;
+  }
+}
+
+bool AvgPool1d::Load(const LayerParameter& layer_pb) {
+  if (!Layer::Load(layer_pb)) {
+    AERROR << "Fail to Load LayerParameter!";
+    return false;
+  }
+  AvgPool1dParameter avgpool1d_pb = layer_pb.avgpool1d();
+  return Load(avgpool1d_pb);
+  return true;
+}
+
+bool AvgPool1d::Load(const AvgPool1dParameter& avgpool1d_pb) {
+  CHECK(avgpool1d_pb.has_kernel_size());
+  CHECK_GT(avgpool1d_pb.has_kernel_size(), 0);
+  kernel_size_ = avgpool1d_pb.kernel_size();
+  if (avgpool1d_pb.has_stride() && avgpool1d_pb.stride() > 0) {
+    stride_ = avgpool1d_pb.stride();
+  } else {
+    ADEBUG << "No valid stride found, use kernel size, instead";
+    stride_ = avgpool1d_pb.kernel_size();
+  }
+  return true;
+}
+
+void AvgPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
+                         Eigen::MatrixXf* output) {
+  CHECK_EQ(inputs.size(), 1);
+  int output_num_col = (inputs[0].cols() - kernel_size_) / stride_ + 1;
+  int output_num_row = inputs[0].rows();
+  output->resize(output_num_row, output_num_col);
+  int input_index = 0;
+  for (int j = 0; j < output_num_col; ++j) {
+    CHECK_LT(input_index + kernel_size_, inputs[0].cols());
+    for (int i = 0; i < output_num_row; ++i) {
+      float output_i_j_sum = 0.0;
+      for (int k = input_index; k < input_index + kernel_size_; ++k) {
+        output_i_j_sum += inputs[0](i, k);
+      }
+      (*output)(i, j) = output_i_j_sum / static_cast<float>(kernel_size_);
+    }
+    input_index += stride_;
   }
 }
 
