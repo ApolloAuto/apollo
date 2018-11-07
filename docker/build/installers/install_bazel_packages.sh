@@ -41,7 +41,7 @@ wget -O curlpp-0.8.1.tar.gz \
 wget -O yaml-cpp-0.5.3.zip \
     https://github.com/jbeder/yaml-cpp/archive/yaml-cpp-0.5.3.zip
 wget -O qp-oases-3.2.1-1.zip \
-    https://github.com/startcode/qp-oases/archive/v3.2.1-1.zip
+    https://github.com/ApolloAuto/qp-oases/archive/v3.2.1-1.zip
 wget -O proj.4-4.9.3.zip \
     https://github.com/OSGeo/proj.4/archive/4.9.3.zip
 wget -O tinyxml2-5.0.1.zip \
