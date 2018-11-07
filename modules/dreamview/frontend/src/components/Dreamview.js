@@ -1,5 +1,6 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
+import { Tab } from "react-tabs";
 
 import SplitPane from 'react-split-pane';
 import Header from "components/Header";
@@ -8,6 +9,7 @@ import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
 import SideBar from "components/SideBar";
 import AudioCapture from "components/AudioCapture";
+import { CameraVideo } from "components/Tasks/SensorCamera";
 
 import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
 import WS, {MAP_WS, POINT_CLOUD_WS} from "store/websocket";
@@ -84,6 +86,12 @@ export default class Dreamview extends React.Component {
                             </div>
                         </div>
                         <div className="right-pane">
+                            {options.showVideo &&
+                                <div>
+                                    <Tab><span>Camera Sensor</span></Tab>
+                                    <CameraVideo />
+                                </div>
+                            }
                             {options.showPNCMonitor && <PNCMonitor options={options}/>}
                         </div>
                     </SplitPane>
