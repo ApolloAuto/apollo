@@ -272,6 +272,7 @@ cc_library(
         ":indexed_queue",
         #":lag_prediction",
         ":obstacle",
+        ":trajectory_info",
         ":reference_line_info",
         "//modules/common/monitor_log",
         "//cyber/common:log",
@@ -412,8 +413,10 @@ cc_library(
 
 cc_library(
     name = "trajectory_info",
+    hdrs = [
+        "trajectory_info.h",
+    ],
     deps = [
-        "//cyber/common:log",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",

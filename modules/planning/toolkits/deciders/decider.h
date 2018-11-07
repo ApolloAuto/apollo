@@ -21,6 +21,7 @@
 #pragma once
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/toolkits/task.h"
 
 namespace apollo {

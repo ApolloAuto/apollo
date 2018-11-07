@@ -37,11 +37,11 @@ cc_library(
         "//modules/planning/toolkits/optimizers/dp_poly_path:dp_poly_path_optimizer",
         "//modules/planning/toolkits/optimizers/dp_st_speed:dp_st_speed_optimizer",
         "//modules/planning/toolkits/optimizers/path_decider",
+        "//modules/planning/toolkits/optimizers/proceed_with_caution_speed:proceed_with_caution_speed_generator",
         "//modules/planning/toolkits/optimizers/qp_piecewise_jerk_path:qp_piecewise_jerk_path_optimizer",
         "//modules/planning/toolkits/optimizers/qp_spline_path",
         "//modules/planning/toolkits/optimizers/qp_spline_st_speed:qp_spline_st_speed_optimizer",
         "//modules/planning/toolkits/optimizers/speed_decider",
-        "//modules/planning/toolkits/optimizers/proceed_with_caution_speed:proceed_with_caution_speed_generator",
     ],
 )
 

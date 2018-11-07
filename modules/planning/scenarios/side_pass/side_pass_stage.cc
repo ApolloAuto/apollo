@@ -104,16 +104,16 @@ Stage::StageStatus SidePassApproachObstacle::Process(
  */
 Stage::StageStatus SidePassGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  if (PlanningOnReferenceLine(planning_start_point, frame)) {
-    GetContext()->path_data_ = frame->reference_line_info().front().path_data();
-    if (frame->reference_line_info().front().TrajectoryLength() > 0.0) {
-      next_stage_ = ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT;
-      return Stage::FINISHED;
-    } else {
-      return Stage::RUNNING;
-    }
+  if (!PlanningOnReferenceLine(planning_start_point, frame)) {
+    AERROR << "Fail to plan on reference_line.";
+    return Stage::ERROR;
   }
-  return Stage::ERROR;
+  GetContext()->path_data_ = frame->reference_line_info().front().path_data();
+  if (frame->reference_line_info().front().trajectory().NumOfPoints() > 0) {
+    next_stage_ = ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT;
+    return Stage::FINISHED;
+  }
+  return Stage::RUNNING;
 }
 
 /*
