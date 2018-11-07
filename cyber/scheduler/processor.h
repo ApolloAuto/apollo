@@ -53,10 +53,8 @@ class Processor {
     context_ = context;
   }
 
-  uint32_t Id() const { return id_; }
-  void SetId(uint32_t id) { id_ = id; }
-  void SetCpuBindingStartIndex(uint32_t start_index) {
-    cpu_binding_start_index_ = start_index;
+  void SetBindCpuIndex(uint32_t id) {
+    cpu_bind_id_ = id;
   }
 
  private:
@@ -70,8 +68,7 @@ class Processor {
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
 
   std::atomic<bool> running_{false};
-  uint32_t id_ = 0;
-  uint32_t cpu_binding_start_index_ = 0;
+  uint32_t cpu_bind_id_ = 0;
 };
 
 }  // namespace scheduler

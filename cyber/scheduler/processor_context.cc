@@ -19,16 +19,12 @@
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
-#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
-
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 void ProcessorContext::RemoveCRoutine(uint64_t cr_id) {
   WriteLockGuard<AtomicRWLock> rw(rw_lock_);
@@ -45,9 +41,6 @@ int ProcessorContext::RqSize() {
 }
 
 void ProcessorContext::Notify(uint64_t cr_id) {
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, cr_id,
-                                            proc_index_);
-
   ReadLockGuard<AtomicRWLock> rw(rw_lock_);
   auto iter = cr_container_.find(cr_id);
   if (likely(iter != cr_container_.end())) {
