@@ -245,6 +245,101 @@ body {
         ::-webkit-scrollbar {
             width: 6px;
         }
+
+        .react-tabs {
+            &__tab-list {
+                display: table;
+                width: 100%;
+                margin: 0px;
+                border-bottom: 1px solid #000000;
+                padding: 0;
+            }
+    
+            &__tab {
+                display: table-cell;
+    
+                position: relative;
+                border: 1px solid transparent;
+                border-bottom: none;
+                padding: 6px 12px;
+    
+                background: #1D2226;
+                color: #999999;
+                list-style: none;
+                cursor: pointer;
+    
+                &--selected {
+                    background: #2A3238;
+                    color: #FFFFFF;
+                }
+                
+                span {
+                    color: #FFFFFF;
+                }
+            }
+    
+            &__tab-panel {
+                display: none;
+    
+                &--selected {
+                    display: block;
+                }
+            }
+        }
+
+        .pnc-monitor {
+            height: 100%;
+            border: 1px solid #000000;
+            box-sizing: border-box;
+        
+            background-color: #1D2226;
+            overflow: auto;
+        
+            .scatter-graph {
+                margin: 0px;
+                border: 1px #000000;
+                border-style: solid none;
+            }
+
+            .scenario-history-container {
+                padding: 10px;
+                font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+                font-weight: normal;
+        
+                .scenario-history-title {
+                    margin: 5px;
+                    border-bottom: 1px solid rgba(153, 153, 153, 0.5);
+                    padding-bottom: 5px;
+        
+                    font-size: 12px;
+                    font-weight: 600;
+                    text-align: center;
+                }
+        
+                .scenario-history-table {
+                    position: relative;
+                    width: 100%;
+        
+                    .scenario-history-item {
+                        position: relative;
+                        width: 100%;
+        
+                        .text {
+                            position: relative;
+                            width: 30%;
+                            padding: 2px 4px;
+        
+                            color: #999999;
+                            font-size: 12px;
+                        }
+        
+                        .time {
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     .SplitPane {
@@ -1365,9 +1460,8 @@ body {
 }
 
 .camera-video {
+    text-align: center;
     img {
-        margin: 0 auto;
-        display: block;
         width: auto;
         height: auto;
         max-width: 100%;
@@ -1424,101 +1518,6 @@ body {
 
         .syncup {
             padding-top: 0.5em;
-        }
-    }
-}
-
-.pnc-monitor {
-    height: 100%;
-    border: 1px solid #000000;
-    box-sizing: border-box;
-
-    background-color: #1D2226;
-    overflow: auto;
-
-    .scatter-graph {
-        margin: 0px;
-        border: 1px #000000;
-        border-style: solid none;
-    }
-
-    .react-tabs {
-        &__tab-list {
-            display: table;
-            width: 100%;
-            margin: 0px;
-            border-bottom: 1px solid #000000;
-            padding: 0;
-        }
-
-        &__tab {
-            display: table-cell;
-
-            position: relative;
-            border: 1px solid transparent;
-            border-bottom: none;
-            padding: 6px 12px;
-
-            background: #1D2226;
-            color: #999999;
-            list-style: none;
-            cursor: pointer;
-
-            &--selected {
-                background: #2A3238;
-                color: #FFFFFF;
-            }
-            
-            span {
-                color: #FFFFFF;
-            }
-        }
-
-        &__tab-panel {
-            display: none;
-
-            &--selected {
-                display: block;
-            }
-        }
-    }
-
-    .scenario-history-container {
-        padding: 10px;
-        font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-        font-weight: normal;
-
-        .scenario-history-title {
-            margin: 5px;
-            border-bottom: 1px solid rgba(153, 153, 153, 0.5);
-            padding-bottom: 5px;
-
-            font-size: 12px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .scenario-history-table {
-            position: relative;
-            width: 100%;
-
-            .scenario-history-item {
-                position: relative;
-                width: 100%;
-
-                .text {
-                    position: relative;
-                    width: 30%;
-                    padding: 2px 4px;
-
-                    color: #999999;
-                    font-size: 12px;
-                }
-
-                .time {
-                    text-align: center;
-                }
-            }
         }
     }
 }

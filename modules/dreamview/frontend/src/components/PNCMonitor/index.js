@@ -5,7 +5,6 @@ import { inject, observer } from "mobx-react";
 import PlanningMonitor from "components/PNCMonitor/PlanningMonitor";
 import ControlMonitor from "components/PNCMonitor/ControlMonitor";
 import LatencyMonitor from "components/PNCMonitor/LatencyMonitor";
-import { CameraVideo } from "../Tasks/SensorCamera";
 
 @inject("store") @observer
 export default class PNCMonitor extends React.Component {
@@ -14,12 +13,6 @@ export default class PNCMonitor extends React.Component {
         return (
             <div className="pnc-monitor">
                 <Tabs>
-                    {options.showVideo &&
-                        <div>
-                            <Tab><span>Camera Sensor</span></Tab>
-                            <CameraVideo />
-                        </div>
-                    }
                     <TabList>
                         <Tab>Planning</Tab>
                         <Tab>Control</Tab>
