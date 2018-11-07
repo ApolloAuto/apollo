@@ -21,6 +21,7 @@
 #include "Eigen/Dense"
 
 #include "cyber/common/macros.h"
+#include "modules/prediction/proto/cruise_model.pb.h"
 #include "modules/prediction/network/net_model.h"
 
 namespace apollo {

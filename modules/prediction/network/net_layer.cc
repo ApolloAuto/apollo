@@ -87,6 +87,60 @@ void Dense::Run(const std::vector<Eigen::MatrixXf>& inputs,
   CHECK_EQ(output->cols(), units_);
 }
 
+bool Conv1d::Load(const LayerParameter& layer_pb) {
+  if (!Layer::Load(layer_pb)) {
+    AERROR << "Fail to Load LayerParameter!";
+    return false;
+  }
+  Conv1dParameter conv1d_pb = layer_pb.conv1d();
+  if (!conv1d_pb.has_kernel() ||
+      !LoadTensor(conv1d_pb.kernel(), &kernel_)) {
+    AERROR << "Fail to Load kernel!";
+    return false;
+  }
+  if (!conv1d_pb.has_bias() || !LoadTensor(conv1d_pb.bias(), &bias_)) {
+    AERROR << "Fail to Load bias!";
+    return false;
+  }
+  if (!conv1d_pb.has_use_bias()) {
+    AWARN << "Set use_bias as false.";
+    use_bias_ = true;
+  } else {
+    use_bias_ = conv1d_pb.use_bias();
+  }
+  for (int sz : conv1d_pb.shape()) {
+    shape_.push_back(sz);
+  }
+  if (conv1d_pb.has_stride()) {
+    stride_ = conv1d_pb.stride();
+  } else {
+    stride_ = 1;
+  }
+  return true;
+}
+
+void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
+                Eigen::MatrixXf* output) {
+  CHECK_EQ(inputs.size(), 1);
+  CHECK_GT(kernel_.size(), 0);
+  CHECK_EQ(kernel_[0].rows(), inputs[0].rows());
+  int kernel_size = kernel_[0].cols();
+  int output_num_col = (inputs[0].cols() - kernel_size) / stride_ + 1;
+  int output_num_row = static_cast<int>(kernel_.size());
+  output->resize(output_num_row, output_num_col);
+  for (int i = 0; i < output_num_col; ++i) {
+    for (int j = 0; j + kernel_size < inputs[0].cols(); j += stride_) {
+      double output_i_j = 0.0;
+      for (int p = 0; p < inputs[0].rows(); ++p) {
+        for (int q = j; q < j + kernel_size; ++q) {
+          output_i_j += inputs[0](p, q) * kernel_[i](p, q - j);
+        }
+      }
+      (*output)(i, j) = output_i_j;
+    }
+  }
+}
+
 bool Activation::Load(const LayerParameter& layer_pb) {
   if (!Layer::Load(layer_pb)) {
     AERROR << "Fail to Load the layer parameters!";

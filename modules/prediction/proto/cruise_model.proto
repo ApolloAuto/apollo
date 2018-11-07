@@ -1,0 +1,56 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+import "modules/prediction/proto/network_layers.proto";
+
+// Intermediate building blocks:
+
+message LaneFeatureConv {
+  optional Conv1dParameter conv1d_0 = 1;
+  optional ActivationParameter activation_1 = 2;
+  optional Conv1dParameter conv1d_2 = 3;
+  optional ActivationParameter activation_3 = 4;
+  optional Conv1dParameter conv1d_4 = 5;
+}
+
+message ObsFeatureFC {
+  optional DenseParameter linear_0 = 1;
+  optional ActivationParameter activation_1 = 2;
+  optional DenseParameter linear_3 = 3;
+  optional ActivationParameter activation_4 = 4;
+}
+
+message Classify {
+  optional DenseParameter linear_0 = 1;
+  optional ActivationParameter activation_1 = 2;
+  optional DenseParameter linear_3 = 3;
+  optional ActivationParameter activation_4 = 4;
+  optional DenseParameter linear_6 = 5;
+  optional ActivationParameter activation_7 = 6;
+  optional DenseParameter linear_9 = 7;
+  optional ActivationParameter activation_10 = 8;
+}
+
+message Regress {
+  optional DenseParameter linear_0 = 1;
+  optional ActivationParameter activation_1 = 2;
+  optional DenseParameter linear_3 = 3;
+  optional ActivationParameter activation_4 = 4;
+  optional DenseParameter linear_6 = 5;
+  optional ActivationParameter activation_7 = 6;
+  optional DenseParameter linear_9 = 7;
+  optional ActivationParameter activation_10 = 8;
+}  
+
+
+// Final model
+
+message CruiseModel {
+  optional LaneFeatureConv lane_feature_conv = 1;
+  optional MaxPool1d lane_feature_maxpool = 2;
+  optional AvgPool1d lane_feature_avgpool = 3;
+  optional ObsFeatureFC obs_feature_fc = 5;
+  optional Classify classify = 6;
+  optional Regress regress = 7;
+}

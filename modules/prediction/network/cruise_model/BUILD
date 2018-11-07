@@ -14,7 +14,7 @@ cc_library(
         "//cyber",
         "//modules/prediction/network:net_layer",
         "//modules/prediction/network:net_model",
-        "//modules/prediction/proto:network_model_proto",
+        "//modules/prediction/proto:cruise_model_proto",
         "@eigen//:eigen",
     ],
 )
