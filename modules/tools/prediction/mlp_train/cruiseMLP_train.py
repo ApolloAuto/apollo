@@ -27,8 +27,8 @@ import argparse
 import proto.cruise_model_pb2
 from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
     Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1dParameter,\
-    AvgPool1dParameter, LaneFeatureConv, ObsFeatureFC, Classify, Regress,\
-    CruiseModel
+    AvgPool1dParameter, LaneFeatureConvParameter, ObsFeatureFCParameter,\
+    ClassifyParameter, RegressParameter, CruiseModelParameter
 
 import torch
 import torch.nn as nn
@@ -234,10 +234,10 @@ def load_DenseParameter(model, key):
 
 def save_FCNN_CNN1D(model, filename):
 
-    model_pb = CruiseModel()
+    model_pb = CruiseModelParameter()
 
 
-    lane_feature_conv = LaneFeatureConv()
+    lane_feature_conv = LaneFeatureConvParameter()
     lane_feature_conv.conv1d_0.CopyFrom(load_Conv1dParameter(model, 'lane_feature_conv.0', stride=1))
     lane_feature_conv.activation_1.activation = 'relu'
     lane_feature_conv.conv1d_2.CopyFrom(load_Conv1dParameter(model, 'lane_feature_conv.2', stride=2))
@@ -252,13 +252,13 @@ def save_FCNN_CNN1D(model, filename):
     lane_feature_avgpool.kernel_size = 3
     lane_feature_avgpool.stride = 3
 
-    obs_feature_fc = ObsFeatureFC()
+    obs_feature_fc = ObsFeatureFCParameter()
     obs_feature_fc.linear_0.CopyFrom(load_DenseParameter(model, 'obs_feature_fc.0'))
     obs_feature_fc.activation_1.activation = 'sigmoid'
     obs_feature_fc.linear_3.CopyFrom(load_DenseParameter(model, 'obs_feature_fc.3'))
     obs_feature_fc.activation_4.activation = 'sigmoid'
 
-    classify = Classify()
+    classify = ClassifyParameter()
     classify.linear_0.CopyFrom(load_DenseParameter(model, 'classify.0'))
     classify.activation_1.activation = 'sigmoid'
     classify.linear_3.CopyFrom(load_DenseParameter(model, 'classify.3'))
@@ -268,7 +268,7 @@ def save_FCNN_CNN1D(model, filename):
     classify.linear_9.CopyFrom(load_DenseParameter(model, 'classify.9'))
     classify.activation_10.activation = 'sigmoid'
 
-    regress = Regress()
+    regress = RegressParameter()
     regress.linear_0.CopyFrom(load_DenseParameter(model, 'regress.0'))
     regress.activation_1.activation = 'relu'
     regress.linear_3.CopyFrom(load_DenseParameter(model, 'regress.3'))
