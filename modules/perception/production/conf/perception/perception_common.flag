@@ -22,7 +22,7 @@
 # enable hdmap input for roi filter.
 # type: bool
 # default: true
---obs_enable_hdmap_input=false
+--obs_enable_hdmap_input=true
 
 # whether to send message for visualization.
 # type: bool
