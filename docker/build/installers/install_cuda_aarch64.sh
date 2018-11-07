@@ -35,6 +35,12 @@ dpkg -i libcudnn6_6.0.21-1+cuda8.0_arm64.deb
 wget http://123.57.58.164/apollo-docker/cuda8_cudnn6/libcudnn6-dev_6.0.21-1+cuda8.0_arm64.deb
 dpkg -i libcudnn6-dev_6.0.21-1+cuda8.0_arm64.deb
 
+wget http://www.baiduapollo.club/apollo-docker/nvblas.conf
+
+mv nvblas.conf /usr/local/cuda/
+
+ln -s /usr/local/cuda/lib64/stubs/libnvidia-ml.so /usr/local/cuda/lib64/stubs/libnvidia-ml.so.1
+
 
 # Clean up.
 rm -fr libcudnn6-dev_6.0.21-1+cuda8.0_arm64.deb libcudnn6_6.0.21-1+cuda8.0_arm64.deb cuda-repo-l4t-8-0-local_8.0.84-1_arm64.deb
