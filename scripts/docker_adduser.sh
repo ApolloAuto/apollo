@@ -27,7 +27,8 @@ cp -r /etc/skel/. /home/${DOCKER_USER}
 
 if [ "$ARCH" == 'aarch64' ]; then
   echo "
-export PATH=\$PATH:\${JAVA_HOME}/bin:/apollo/scripts:/usr/local/miniconda2/bin/
+export PATH=\$PATH:/usr/lib/java/bin:/apollo/scripts:/usr/local/miniconda2/bin/
+export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib:/usr/lib/aarch64-linux-gnu/tegra:/usr/local/ipopt/lib
 if [ -e "/apollo/scripts/apollo_base.sh" ]; then 
   source /apollo/scripts/apollo_base.sh; 
 fi

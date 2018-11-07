@@ -21,6 +21,9 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+apt-get update -y && apt-get install -y \
+	libgtest-dev
+
 # Install gflags.
 wget http://123.57.58.164/apollo-docker/v2.2.0.tar.gz
 tar xzf v2.2.0.tar.gz
