@@ -45,6 +45,7 @@ cc_library(
         "//modules/localization/proto:gnss_pnt_result_proto",
         "//modules/localization/proto:measure_proto",
         "//modules/localization/rtk:rtk_localization",
+        "//modules/localization/lmd:lmd_localization",
     ],
 )
 
