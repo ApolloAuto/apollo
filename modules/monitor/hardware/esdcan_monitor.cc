@@ -18,7 +18,9 @@
 
 #include <string>
 
+#if USE_ESD_CAN
 #include "esd_can/include/ntcan.h"
+#endif
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
@@ -36,6 +38,7 @@ namespace apollo {
 namespace monitor {
 namespace {
 
+#if USE_ESD_CAN
 std::string StatusString(const NTCAN_RESULT ntstatus) {
   switch (ntstatus) {
     case NTCAN_SUCCESS: return "NTCAN_SUCCESS";
@@ -154,12 +157,23 @@ NTCAN_RESULT EsdCanTest(const int can_id, NTCAN_HANDLE* handle) {
   return ret;
 }
 
-NTCAN_RESULT EsdCanTest(const int can_id) {
+void EsdCanTest(const int can_id, ComponentStatus* status) {
   NTCAN_HANDLE handle;
-  NTCAN_RESULT ret = EsdCanTest(can_id, &handle);
+  const NTCAN_RESULT ret = EsdCanTest(can_id, &handle);
   canClose(handle);
-  return ret;
+
+  SummaryMonitor::EscalateStatus(
+      ret == NTCAN_SUCCESS ? ComponentStatus::OK : ComponentStatus::ERROR,
+      StatusString(ret), status);
 }
+#else
+// USE_ESD_CAN is not set, do dummy check.
+void EsdCanTest(const int can_id, ComponentStatus* status) {
+  SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
+                                 "USE_ESD_CAN is not defined during compiling",
+                                 status);
+}
+#endif
 
 }  // namespace
 
@@ -176,14 +190,7 @@ void EsdCanMonitor::RunOnce(const double current_time) {
     return;
   }
 
-  ComponentStatus* component_status = component->mutable_other_status();
-  const auto ret = EsdCanTest(FLAGS_esdcan_id);
-  if (ret == NTCAN_SUCCESS) {
-    SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);
-  } else {
-    SummaryMonitor::EscalateStatus(
-        ComponentStatus::ERROR, StatusString(ret), component_status);
-  }
+  EsdCanTest(FLAGS_esdcan_id, component->mutable_other_status());
 }
 
 }  // namespace monitor
