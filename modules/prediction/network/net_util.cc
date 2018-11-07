@@ -17,6 +17,7 @@
 #include "modules/prediction/network/net_util.h"
 
 #include <unordered_map>
+#include <cmath>
 
 #include "cyber/common/log.h"
 
@@ -24,9 +25,13 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
-float sigmoid(const float x) { return 1 / (1 + exp(-x)); }
+float sigmoid(const float x) {
+  return static_cast<float>(1.0 / (1.0 + std::exp(-x)));
+}
 
-float tanh(const float x) { return std::tanh(x); }
+float tanh(const float x) {
+  return static_cast<float>(std::tanh(x));
+}
 
 float linear(const float x) { return x; }
 
@@ -95,7 +100,25 @@ bool LoadTensor(const TensorParameter& tensor_pb,
     AERROR << "Fail to load the necessary fields!";
     return false;
   }
-  // TODO(kechxu) implement
+  int num_depth = tensor_pb.shape(0);
+  int num_row = tensor_pb.shape(1);
+  int num_col = tensor_pb.shape(2);
+  CHECK_EQ(tensor_pb.data_size(), num_depth * num_row * num_col);
+  tensor3d->clear();
+  tensor3d->resize(num_depth);
+  for (int k = 0; k < num_depth; ++k) {
+    tensor3d->operator[](k).resize(num_row, num_col);
+  }
+  int tensor_pb_index = 0;
+  for (int k = 0; k < num_depth; ++k) {
+    for (int i = 0; i < num_row; ++i) {
+      for (int j = 0; j < num_col; ++j) {
+        tensor3d->operator[](k)(i, j) = tensor_pb.data(tensor_pb_index);
+        ++tensor_pb_index;
+      }
+    }
+  }
+  CHECK_EQ(tensor_pb_index, num_depth * num_row * num_col);
   return true;
 }
 
