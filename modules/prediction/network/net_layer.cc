@@ -139,13 +139,13 @@ void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   output->resize(output_num_row, output_num_col);
   for (int i = 0; i < output_num_col; ++i) {
     for (int j = 0; j + kernel_size < inputs[0].cols(); j += stride_) {
-      float output_i_j = 0.0;
+      float output_i_j_unbiased = 0.0;
       for (int p = 0; p < inputs[0].rows(); ++p) {
         for (int q = j; q < j + kernel_size; ++q) {
-          output_i_j += inputs[0](p, q) * kernel_[i](p, q - j);
+          output_i_j_unbiased += inputs[0](p, q) * kernel_[i](p, q - j);
         }
       }
-      (*output)(i, j) = output_i_j;
+      (*output)(i, j) = output_i_j_unbiased + bias_(i);
     }
   }
 }
