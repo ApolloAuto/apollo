@@ -45,10 +45,12 @@ std::vector<double> Softmax(const std::vector<double>& value) {
   std::vector<double> result;
   double sum = 0.0;
   for (std::size_t i = 0; i < value.size(); ++i) {
-    sum += std::exp(value[i]);
+    double exp_value = std::exp(value[i]);
+    sum += exp_value;
+    result.push_back(exp_value);
   }
   for (std::size_t i = 0; i < value.size(); ++i) {
-    result.push_back(std::exp(value[i]) / sum);
+    result[i] = result[i] / sum;
   }
   return result;
 }
