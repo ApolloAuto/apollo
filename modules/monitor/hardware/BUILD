@@ -40,8 +40,11 @@ cc_library(
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
         "//modules/monitor/software:summary_monitor",
-        "//third_party/can_card_library/esd_can",
-    ],
+    ] + select({
+        "//tools/platforms:use_esd_can": [
+            "//third_party/can_card_library/esd_can"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
