@@ -24,6 +24,12 @@ import numpy as np
 import logging
 import argparse
 
+import proto.cruise_model_pb2
+from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
+    Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1d,\
+    AvgPool1d, LaneFeatureConv, ObsFeatureFC, Classify, Regress,\
+    CruiseModel
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -105,13 +111,13 @@ class FCNN_CNN1D(torch.nn.Module):
         super(FCNN_CNN1D, self).__init__()
         self.lane_feature_conv = torch.nn.Sequential(\
                             nn.Conv1d(5, 10, 3, stride=1),\
-                            nn.BatchNorm1d(10),\
+                            #nn.BatchNorm1d(10),\
                             nn.ReLU(),\
                             nn.Conv1d(10, 16, 3, stride=2),\
-                            nn.BatchNorm1d(16),\
+                            #nn.BatchNorm1d(16),\
                             nn.ReLU(),\
                             nn.Conv1d(16, 25, 3, stride=2),\
-                            nn.BatchNorm1d(25)
+                            #nn.BatchNorm1d(25)
                             )
         self.lane_feature_maxpool = nn.MaxPool1d(3)
         self.lane_feature_avgpool = nn.AvgPool1d(3)
@@ -181,6 +187,108 @@ class FCNN_CNN1D(torch.nn.Module):
 
         return out_c, out_r
 
+
+def load_Conv1dParameter(model, key, stride=1):
+
+    model_pb = Conv1dParameter()
+
+    model_pb.shape.extend(list(model.state_dict()[key+'.weight'].shape))
+    
+    model_pb.use_bias = True
+    
+    kernel_param = TensorParameter()
+    kernel_param.shape.extend(list(model.state_dict()[key+'.weight'].shape))
+    kernel_param.data.extend(list(model.state_dict()[key+'.weight'].numpy().reshape(-1)))
+    model_pb.kernel.CopyFrom(kernel_param)
+
+    bias_param = TensorParameter()
+    bias_param.shape.extend(list(model.state_dict()[key+'.bias'].shape))
+    bias_param.data.extend(list(model.state_dict()[key+'.bias'].numpy().reshape(-1)))
+    model_pb.bias.CopyFrom(bias_param)
+
+    model_pb.stride = stride
+
+    return model_pb
+
+
+def load_DenseParameter(model, key):
+
+    model_pb = DenseParameter()
+
+    model_pb.use_bias = True
+
+    weights_param = TensorParameter()
+    weights_param.shape.extend(list(model.state_dict()[key+'.weight'].numpy().T.shape))
+    weights_param.data.extend(list(model.state_dict()[key+'.weight'].numpy().T.reshape(-1)))
+    model_pb.weights.CopyFrom(weights_param)
+
+    bias_param = TensorParameter()
+    bias_param.shape.extend(list(model.state_dict()[key+'.bias'].numpy().shape))
+    bias_param.data.extend(list(model.state_dict()[key+'.bias'].numpy()))
+    model_pb.bias.CopyFrom(bias_param)
+
+    model_pb.units = model_pb.bias.shape[0]
+
+    return model_pb
+
+
+def save_FCNN_CNN1D(model, filename):
+
+    model_pb = CruiseModel()
+
+
+    lane_feature_conv = LaneFeatureConv()
+    lane_feature_conv.conv1d_0.CopyFrom(load_Conv1dParameter(model, 'lane_feature_conv.0', stride=1))
+    lane_feature_conv.activation_1.activation = 'relu'
+    lane_feature_conv.conv1d_2.CopyFrom(load_Conv1dParameter(model, 'lane_feature_conv.2', stride=2))
+    lane_feature_conv.activation_3.activation = 'relu'
+    lane_feature_conv.conv1d_4.CopyFrom(load_Conv1dParameter(model, 'lane_feature_conv.4', stride=2))
+
+    lane_feature_maxpool = MaxPool1d()
+    lane_feature_maxpool.kernel_size = 3
+    lane_feature_maxpool.stride = 3
+
+    lane_feature_avgpool = AvgPool1d()
+    lane_feature_avgpool.kernel_size = 3
+    lane_feature_avgpool.stride = 3
+
+    obs_feature_fc = ObsFeatureFC()
+    obs_feature_fc.linear_0.CopyFrom(load_DenseParameter(model, 'obs_feature_fc.0'))
+    obs_feature_fc.activation_1.activation = 'sigmoid'
+    obs_feature_fc.linear_3.CopyFrom(load_DenseParameter(model, 'obs_feature_fc.3'))
+    obs_feature_fc.activation_4.activation = 'sigmoid'
+
+    classify = Classify()
+    classify.linear_0.CopyFrom(load_DenseParameter(model, 'classify.0'))
+    classify.activation_1.activation = 'sigmoid'
+    classify.linear_3.CopyFrom(load_DenseParameter(model, 'classify.3'))
+    classify.activation_4.activation = 'sigmoid'
+    classify.linear_6.CopyFrom(load_DenseParameter(model, 'classify.6'))
+    classify.activation_7.activation = 'sigmoid'
+    classify.linear_9.CopyFrom(load_DenseParameter(model, 'classify.9'))
+    classify.activation_10.activation = 'sigmoid'
+
+    regress = Regress()
+    regress.linear_0.CopyFrom(load_DenseParameter(model, 'regress.0'))
+    regress.activation_1.activation = 'relu'
+    regress.linear_3.CopyFrom(load_DenseParameter(model, 'regress.3'))
+    regress.activation_4.activation = 'relu'
+    regress.linear_6.CopyFrom(load_DenseParameter(model, 'regress.6'))
+    regress.activation_7.activation = 'relu'
+    regress.linear_9.CopyFrom(load_DenseParameter(model, 'regress.9'))
+    regress.activation_10.activation = 'relu'
+
+
+    model_pb.lane_feature_conv.CopyFrom(lane_feature_conv)
+    model_pb.lane_feature_maxpool.CopyFrom(lane_feature_maxpool)
+    model_pb.lane_feature_avgpool.CopyFrom(lane_feature_avgpool)
+    model_pb.obs_feature_fc.CopyFrom(obs_feature_fc)
+    model_pb.classify.CopyFrom(classify)
+    model_pb.regress.CopyFrom(regress)
+
+    with open(filename, 'wb') as params_file:
+        params_file.write(model_pb.SerializeToString())
+
 '''
 Custom defined loss function that lumps the loss of classification and
 of regression together.
@@ -227,6 +335,7 @@ def print_dist(label):
     unique_labels = np.unique(label)
     for l in unique_labels:
         print ('Label = {}: {}%'.format(l, np.sum(label==l)/len(label)*100))
+
 
 # ========================================================================
 
@@ -471,7 +580,7 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
         .format(np.mean(loss_history), valid_accuracy, valid_precision,\
                 valid_recall, valid_auc))
 
-    return valid_loss
+    return np.mean(loss_history)
 
 
 '''
@@ -562,10 +671,13 @@ if __name__ == "__main__":
             y_valid = Variable(torch.FloatTensor(y_valid).cuda())
 
         # Model training:
+        best_valid_loss = float('+inf')
         for epoch in range(100):
             train_vanilla(X_train, y_train, model, optimizer, epoch)
             valid_loss = validate_vanilla(X_valid, y_valid, model)
             scheduler.step(valid_loss)
+            if valid_loss < best_valid_loss:
+                torch.
             #torch.save(model.state_dict(), './cruiseMLP_saved_model.pt')
         
     else:
