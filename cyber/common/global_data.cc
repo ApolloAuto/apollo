@@ -18,6 +18,7 @@
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
+#include <limits.h>
 #include <netdb.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -38,13 +39,31 @@ AtomicHashMap<uint64_t, std::string, 256> GlobalData::task_id_map_;
 
 namespace {
 const char* empty_str_ = "";
+char* program_path() {
+  char* path = reinterpret_cast<char*>(malloc(PATH_MAX));
+  if (path != nullptr) {
+    auto len = readlink("/proc/self/exe", path, PATH_MAX);
+    if (len == -1) {
+      free(path);
+      return nullptr;
+    }
+    path[len] = '\0';
+  }
+  return path;
+}
 }  // namespace
 
 GlobalData::GlobalData() {
   InitHostInfo();
   CHECK(InitConfig());
   process_id_ = getpid();
-  process_name_ = "default_" + std::to_string(process_id_);
+  char* prog_path = program_path();
+  if (prog_path) {
+    process_name_ = GetFileName(prog_path) + "_" + std::to_string(process_id_);
+    delete prog_path;
+  } else {
+    process_name_ = "cyber_default_" + std::to_string(process_id_);
+  }
   is_reality_mode_ = (config_.has_run_mode_conf() &&
                       config_.run_mode_conf().run_mode() ==
                           apollo::cyber::proto::RunMode::MODE_SIMULATION)

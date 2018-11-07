@@ -21,6 +21,7 @@
 #include <thread>
 #include <unordered_map>
 
+#include "cyber/common/global_data.h"
 #include "cyber/logger/log_file_object.h"
 
 namespace apollo {
@@ -154,13 +155,15 @@ void AsyncLogger::RunThread() {
 
     for (const auto& msg : flushing_buf_->messages) {
       std::string module_name;
-      auto lpos = msg.message.find("[");
-      auto rpos = msg.message.find("]", lpos);
-      if (lpos != std::string::npos && rpos != std::string::npos) {
-        module_name = msg.message.substr(lpos + 1, rpos - lpos - 1);
+      auto lpos = msg.message.find('[');
+      if (lpos != std::string::npos) {
+        auto rpos = msg.message.find(']', lpos);
+        if (rpos != std::string::npos) {
+          module_name = msg.message.substr(lpos + 1, rpos - lpos - 1);
+        }
       }
       if (module_name.empty()) {
-        module_name = "unknown";
+        module_name = common::GlobalData::Instance()->ProcessName();
       }
       LogFileObject* fileobject = nullptr;
       if (moduleLoggerMap.find(module_name) != moduleLoggerMap.end()) {
