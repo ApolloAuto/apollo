@@ -27,7 +27,6 @@
 #include "modules/common/util/message_util.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/util/yaml_util.h"
 #include "modules/data/util/info_collector.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"

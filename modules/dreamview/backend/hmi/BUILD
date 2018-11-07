@@ -66,7 +66,6 @@ cc_library(
         "//modules/common/proto:drive_event_proto",
         "//modules/common/util:map_util",
         "//modules/common/util:message_util",
-        "//modules/common/util:yaml_util",
         "//modules/data/util:info_collector",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/proto:hmi_config_proto",
