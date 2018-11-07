@@ -18,7 +18,7 @@ export default class Tasks extends React.Component {
                 <Delay />
                 <Console />
                 {(options.showVideo && !options.showPNCMonitor) &&
-                    <SensorCamera options={options} />
+                    <SensorCamera />
                 }
             </div>
         );
