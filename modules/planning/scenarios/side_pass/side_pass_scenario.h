@@ -34,13 +34,13 @@ namespace side_pass {
 
 struct SidePassContext {
   PathData path_data_;
+  ScenarioSidePassConfig scenario_config_;
 };
 
 class SidePassScenario : public Scenario {
  public:
   explicit SidePassScenario(const ScenarioConfig& config,
-                            const ScenarioContext* scenario_context)
-      : Scenario(config, scenario_context) {}
+                            const ScenarioContext* scenario_context);
 
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,
