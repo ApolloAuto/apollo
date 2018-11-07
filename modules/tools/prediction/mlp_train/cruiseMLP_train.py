@@ -26,8 +26,8 @@ import argparse
 
 import proto.cruise_model_pb2
 from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
-    Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1d,\
-    AvgPool1d, LaneFeatureConv, ObsFeatureFC, Classify, Regress,\
+    Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1dParameter,\
+    AvgPool1dParameter, LaneFeatureConv, ObsFeatureFC, Classify, Regress,\
     CruiseModel
 
 import torch
@@ -244,11 +244,11 @@ def save_FCNN_CNN1D(model, filename):
     lane_feature_conv.activation_3.activation = 'relu'
     lane_feature_conv.conv1d_4.CopyFrom(load_Conv1dParameter(model, 'lane_feature_conv.4', stride=2))
 
-    lane_feature_maxpool = MaxPool1d()
+    lane_feature_maxpool = MaxPool1dParameter()
     lane_feature_maxpool.kernel_size = 3
     lane_feature_maxpool.stride = 3
 
-    lane_feature_avgpool = AvgPool1d()
+    lane_feature_avgpool = AvgPool1dParameter()
     lane_feature_avgpool.kernel_size = 3
     lane_feature_avgpool.stride = 3
 
