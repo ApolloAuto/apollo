@@ -1,7 +1,7 @@
 extrinsic_file {
     frame_id: "novatel"
     child_frame_id: "velodyne128"
-    file_path: "/apollo/modules/drivers/velodyne/params/velodyne128_novatel_extrinsics_example.yaml"
+    file_path: "/apollo/modules/drivers/velodyne/params/velodyne128_novatel_extrinsics.yaml"
     enable: true
 }
 
@@ -29,7 +29,7 @@ extrinsic_file {
 extrinsic_file {
     frame_id: "novatel"
     child_frame_id: "lidar16_front"
-    file_path: "/apollo/modules/drivers/velodyne/params/lidar16_novatel_extrinsics_example.yaml"
+    file_path: "/apollo/modules/drivers/velodyne/params/lidar16_front_novatel_extrinsics.yaml"
     enable: true
 }
 
