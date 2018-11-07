@@ -16,7 +16,7 @@ export default class PNCMonitor extends React.Component {
                 <Tabs>
                     {options.showVideo &&
                         <div>
-                            <Tab style={{color: '#FFFFFF'}}>Camera Sensor</Tab>
+                            <Tab><span>Camera Sensor</span></Tab>
                             <CameraVideo />
                         </div>
                     }
