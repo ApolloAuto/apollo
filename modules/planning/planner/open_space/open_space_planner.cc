@@ -230,11 +230,11 @@ bool OpenSpacePlanner::IsCollisionFreeTrajectory(
 
     for (const auto& obstacle_box : predicted_bounding_rectangles_[i]) {
       if (ego_box.HasOverlap(obstacle_box)) {
-        return true;
+        return false;
       }
     }
   }
-  return false;
+  return true;
 }
 
 void OpenSpacePlanner::BuildPredictedEnvironment(
