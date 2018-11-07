@@ -47,12 +47,12 @@ bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
                                               : PollStandard(scan);
 
   if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
-    return true;  // poll again
+    return false;  // poll again
   }
 
   if (scan->firing_pkts_size() <= 0) {
     AINFO << "Get a empty scan from port: " << config_.firing_data_port();
-    return true;
+    return false;
   }
 
   // publish message using time of last packet read
