@@ -52,6 +52,13 @@ double Sigmoid(const double value);
 double Relu(const double value);
 
 /**
+ * @brief Softmax function used in neural networks as an activation function.
+ * @param vector The input.
+ * @return The output of Softmax function.
+ */
+std::vector<double> Softmax(const std::vector<double>& value);
+
+/**
  * @brief Solve quadratic equation.
  * @param coefficients The coefficients of quadratic equation.
  * @param roots Two roots of the equation if any.
