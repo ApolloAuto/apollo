@@ -120,6 +120,7 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
       if (PredictionMap::LaneById(lane_id)->lane().successor_id_size() < 1) {
         return;
       }
+      // TODO(all) consider the logic to choose successor_id
       lane_id = PredictionMap::LaneById(lane_id)->lane().successor_id(0).id();
     }
     t += period;
