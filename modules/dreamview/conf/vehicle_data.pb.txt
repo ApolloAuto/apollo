@@ -35,10 +35,6 @@ data_files {
   dest_path: "/apollo/modules/perception/data/params"
 }
 data_files {
-  source_path: "gnss_params/gnss_conf.pb.txt"
-  dest_path: "/apollo/modules/drivers/gnss/conf/gnss_conf.pb.txt"
-}
-data_files {
   source_path: "gnss_params/ant_imu_leverarm.yaml"
   dest_path: "/apollo/modules/localization/msf/params/gnss_params/ant_imu_leverarm.yaml"
 }
@@ -51,30 +47,22 @@ data_files {
   dest_path: "/apollo/modules/tools/ota/vehicle_info.pb.txt"
 }
 data_files {
-  source_path: "velodyne_params/velodyne64_conf.pb.txt"
-  dest_path: "/apollo/modules/drivers/velodyne/conf/velodyne64_conf.pb.txt"
+  source_path: "radar_conf"
+  dest_path: "/apollo/modules/drivers/radar/conti_radar/conf"
 }
 data_files {
-  source_path: "velodyne_params/velodyne128_conf.pb.txt"
-  dest_path: "/apollo/modules/drivers/velodyne/conf/velodyne128_conf.pb.txt"
+  source_path: "gnss_conf"
+  dest_path: "/apollo/modules/drivers/gnss/conf"
 }
 data_files {
-  source_path: "camera_params/camera_front_conf.pb.txt"
-  dest_path: "/apollo/modules/drivers/camera/conf/camera_front_conf.pb.txt"
+  source_path: "velodyne_conf"
+  dest_path: "/apollo/modules/drivers/velodyne/conf"
 }
 data_files {
-  source_path: "camera_params/camera_short_conf.pb.txt"
-  dest_path: "/apollo/modules/drivers/camera/conf/camera_short_conf.pb.txt"
+  source_path: "camera_conf"
+  dest_path: "/apollo/modules/drivers/camera/conf"
 }
 data_files {
-  source_path: "camera_params/camera_long_conf.pb.txt"
-  dest_path: "/apollo/modules/drivers/camera/conf/camera_long_conf.pb.txt"
-}
-data_files {
-  source_path: "cyber_conf/cyber.pb.conf"
-  dest_path: "/apollo/cyber/conf/cyber.pb.conf"
-}
-data_files {
-  source_path: "cyber_conf/user.pb.conf"
-  dest_path: "/apollo/cyber/conf/user.pb.conf"
+  source_path: "cyber_conf"
+  dest_path: "/apollo/cyber/conf"
 }
