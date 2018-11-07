@@ -70,6 +70,12 @@ void SidePassScenario::RegisterStages() {
       });
 }
 
+SidePassScenario::SidePassScenario(
+  const ScenarioConfig& config, const ScenarioContext* scenario_context)
+      : Scenario(config, scenario_context) {
+    side_pass_context_.scenario_config_.CopyFrom(config.side_pass_config());
+  }
+
 std::unique_ptr<Stage> SidePassScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
   if (s_stage_factory_.Empty()) {

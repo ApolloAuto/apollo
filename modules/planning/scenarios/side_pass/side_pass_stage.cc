@@ -84,9 +84,11 @@ Stage::StageStatus SidePassApproachObstacle::Process(
            << "front obstacle has wrong position.";
     return Stage::ERROR;
   }
-  // TODO(all): stage params need to be in config file
-  double max_stop_velocity = 1.0e-5;
-  double min_stop_obstacle_distance = 4.0;
+
+  double max_stop_velocity =
+      GetContext()->scenario_config_.approach_obstacle_max_stop_speed();
+  double min_stop_obstacle_distance =
+      GetContext()->scenario_config_.approach_obstacle_min_stop_distance();
 
   if (adc_velocity < max_stop_velocity &&
       front_obstacle_distance > min_stop_obstacle_distance) {
@@ -234,9 +236,9 @@ Stage::StageStatus SidePassPassObstacle::Process(
     return Stage::ERROR;
   }
 
-  // TOOD(all) put the parameter into stage config file
-  double side_pass_exit_distance = 10.0;
-  if (adc_sl_boundary.end_s() > sl_point.s() - side_pass_exit_distance) {
+  double distance_to_path_end =
+      sl_point.s() - GetContext()->scenario_config_.side_pass_exit_distance();
+  if (adc_sl_boundary.end_s() > distance_to_path_end) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
