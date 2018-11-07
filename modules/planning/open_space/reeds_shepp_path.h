@@ -81,7 +81,7 @@ class ReedShepp {
       const std::shared_ptr<Node3d> end_node,
       std::vector<ReedSheppPath>* all_possible_paths);
   // Interpolation usde in GenetateLocalConfiguration
-  void Interpolation(double index, double pd, char m, double ox, double oy,
+  void Interpolation(int index, double pd, char m, double ox, double oy,
                      double ophi, std::vector<double>* px,
                      std::vector<double>* py, std::vector<double>* pphi,
                      std::vector<bool>* pgear);
