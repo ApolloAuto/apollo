@@ -188,9 +188,9 @@ void FillObjectPolygonFromBBox3D(base::Object* object_ptr) {
       object_ptr->center[1];
   object_ptr->polygon[0].z = 0.0;
 
-  object_ptr->polygon[1].x = x2 * cos_theta + y1 * sin_theta +
+  object_ptr->polygon[1].x = x1 * cos_theta + y2 * sin_theta +
       object_ptr->center[0];
-  object_ptr->polygon[1].y = y1 * cos_theta - x2 * sin_theta +
+  object_ptr->polygon[1].y = y2 * cos_theta - x1 * sin_theta +
       object_ptr->center[1];
   object_ptr->polygon[1].z = 0.0;
 
@@ -200,9 +200,9 @@ void FillObjectPolygonFromBBox3D(base::Object* object_ptr) {
       object_ptr->center[1];
   object_ptr->polygon[2].z = 0.0;
 
-  object_ptr->polygon[3].x = x1 * cos_theta + y2 * sin_theta +
+  object_ptr->polygon[3].x = x2 * cos_theta + y1 * sin_theta +
       object_ptr->center[0];
-  object_ptr->polygon[3].y = y2 * cos_theta - x1 * sin_theta +
+  object_ptr->polygon[3].y = y1 * cos_theta - x2 * sin_theta +
       object_ptr->center[1];
   object_ptr->polygon[3].z = 0.0;
 }
