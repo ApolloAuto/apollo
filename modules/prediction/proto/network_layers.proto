@@ -22,10 +22,21 @@ message DenseParameter {
 }
 
 message Conv1dParameter {
-  optional int32 units = 1;
+  repeated int32 shape = 1;
   optional bool use_bias = 2;
-  optional TensorParameter weights = 3;
+  optional TensorParameter kernel = 3;
   optional TensorParameter bias = 4;
+  optional int32 stride = 5;
+}
+
+message MaxPool1d {
+  optional int32 kernel_size = 1;
+  optional int32 stride = 2;
+}
+
+message AvgPool1d {
+  optional int32 kernel_size = 1;
+  optional int32 stride = 2;
 }
 
 message BatchNormalizationParameter {
@@ -91,5 +102,7 @@ message LayerParameter {
     FlattenParameter flatten = 9;
     ConcatenateParameter concatenate = 10;
     Conv1dParameter conv1d = 11;
+    MaxPool1d maxpool1d = 12;
+    AvgPool1d avgpool1d = 13;
   }
 }

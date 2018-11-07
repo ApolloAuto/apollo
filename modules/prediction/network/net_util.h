@@ -23,6 +23,7 @@
 
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "Eigen/Dense"
 
@@ -92,6 +93,15 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::MatrixXf* matrix);
  * @return True if load data successively, otherwise False
  */
 bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector);
+
+/**
+ * @brief load matrix value from a protobuf message
+ * @param protobuf message in the form of TensorParameter
+ * @param vector of Eigen::MatrixXf will be returned
+ * @return True if load data successively, otherwise False
+ */
+bool LoadTensor(const TensorParameter& tensor_pb,
+                std::vector<Eigen::MatrixXf>* tensor3d);
 
 }  // namespace network
 }  // namespace prediction

@@ -135,6 +135,90 @@ class Dense : public Layer {
 };
 
 /**
+ * @class Conv1d
+ * @brief Conv1d is the convolution 1d network layer.
+ *        Conv1d layer output is y = Conv(x, w),
+ *        where x is the input, w the weight
+ *
+ *        Parameter w and b can be loaded from pb message. if bias is
+ *        not used, b = 0.
+ */
+class Conv1d : public Layer {
+ public:
+  /**
+   * @brief Load the dense layer parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
+
+  /**
+   * @brief Compute the layer output from inputs
+   * @param Inputs to a network layer
+   * @param Output of a network layer will be returned
+   */
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
+
+ private:
+  std::vector<int> shape_;
+  bool use_bias_;
+  std::vector<Eigen::MatrixXf> kernel_;
+  Eigen::VectorXf bias_;
+  int stride_;
+};
+
+/**
+ * @class MaxPool1d
+ * @brief MaxPool1d is the max Pool 1d network layer.
+ */
+class MaxPool1d : public Layer {
+ public:
+  /**
+   * @brief Load the dense layer parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
+
+  /**
+   * @brief Compute the layer output from inputs
+   * @param Inputs to a network layer
+   * @param Output of a network layer will be returned
+   */
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
+
+ private:
+  int kernel_size_;
+};
+
+/**
+ * @class AvgPool1d
+ * @brief AvgPool1d is the average Pool 1d network layer.
+ */
+class AvgPool1d : public Layer {
+ public:
+  /**
+   * @brief Load the dense layer parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
+
+  /**
+   * @brief Compute the layer output from inputs
+   * @param Inputs to a network layer
+   * @param Output of a network layer will be returned
+   */
+  void Run(const std::vector<Eigen::MatrixXf>& inputs,
+           Eigen::MatrixXf* output) override;
+
+ private:
+  int kernel_size_;
+};
+
+/**
  * @class Activation
  * @brief Activation is an activation network layer.
  *        Activation layer output is y = f(x),

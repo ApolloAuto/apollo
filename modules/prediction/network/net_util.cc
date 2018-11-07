@@ -89,6 +89,16 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector) {
   return true;
 }
 
+bool LoadTensor(const TensorParameter& tensor_pb,
+                std::vector<Eigen::MatrixXf>* tensor3d) {
+  if (tensor_pb.data_size() == 0 || tensor_pb.shape_size() != 3) {
+    AERROR << "Fail to load the necessary fields!";
+    return false;
+  }
+  // TODO(kechxu) implement
+  return true;
+}
+
 }  // namespace network
 }  // namespace prediction
 }  // namespace apollo

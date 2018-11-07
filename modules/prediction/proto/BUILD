@@ -156,3 +156,20 @@ cc_proto_library(
         ":scenario_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "cruise_model_proto",
+    deps = [
+        ":cruise_model_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "cruise_model_proto_lib",
+    srcs = [
+        "cruise_model.proto",
+    ],
+    deps = [
+        ":network_model_proto_lib",
+    ]
+)
