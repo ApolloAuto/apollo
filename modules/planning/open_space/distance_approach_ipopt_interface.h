@@ -23,6 +23,7 @@
 #include <math.h>
 #include <utility>
 #include <vector>
+#include <limits>
 
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
@@ -49,7 +50,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
       const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
       const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-      const Eigen::MatrixXd& obstacles_edges_num,
+      const Eigen::MatrixXi& obstacles_edges_num,
       const std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
       const Eigen::MatrixXd& obstacles_b,
       const PlannerOpenSpaceConfig& planner_open_space_config);
@@ -112,7 +113,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
  private:
   int num_of_variables_;
   int num_of_constraints_;
-  std::size_t horizon_;
+  int horizon_;
   double ts_;
   Eigen::MatrixXd ego_;
   Eigen::MatrixXd xWS_;
@@ -143,9 +144,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   double l_ev_;
   std::vector<double> g_;
   double offset_;
-  Eigen::MatrixXd obstacles_edges_num_;
-  std::size_t obstacles_num_;
-  std::size_t obstacles_edges_sum_;
+  Eigen::MatrixXi obstacles_edges_num_;
+  int obstacles_num_;
+  int obstacles_edges_sum_;
   double wheelbase_;
 
   Eigen::MatrixXd state_result_;
@@ -164,19 +165,19 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   bool use_fix_time_ = false;
 
   // state start index
-  std::size_t state_start_index_ = 0;
+  int state_start_index_ = 0;
 
   // control start index.
-  std::size_t control_start_index_ = 0;
+  int control_start_index_ = 0;
 
   // time start index
-  std::size_t time_start_index_ = 0;
+  int time_start_index_ = 0;
 
   // lagrangian l start index
-  std::size_t l_start_index_ = 0;
+  int l_start_index_ = 0;
 
   // lagrangian n start index
-  std::size_t n_start_index_ = 0;
+  int n_start_index_ = 0;
 
   double min_safety_distance_ = 0.0;
 

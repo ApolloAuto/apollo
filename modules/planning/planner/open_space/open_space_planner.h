@@ -127,7 +127,7 @@ class OpenSpacePlanner : public Planner {
   apollo::common::math::Vec2d translate_origin_;
   std::vector<double> end_pose_;
   std::size_t obstacles_num_;
-  Eigen::MatrixXd obstacles_edges_num_;
+  Eigen::MatrixXi obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
   ThreadSafeIndexedObstacles* obstalce_list_;

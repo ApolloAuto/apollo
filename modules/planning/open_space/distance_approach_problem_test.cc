@@ -48,11 +48,11 @@ class DistanceApproachProblemTest : public ::testing::Test {
   Eigen::MatrixXd xf_ = Eigen::MatrixXd::Ones(4, 1);
   std::vector<double> XYbounds_ = {1.0, 1.0, 1.0, 1.0};
   Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
-  Eigen::MatrixXd obstacles_edges_num_ = Eigen::MatrixXd::Ones(12, 4);
+  Eigen::MatrixXi obstacles_edges_num_ = Eigen::MatrixXi::Ones(12, 4);
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Zero(2, horizon_);
   std::size_t obstacles_num = 10;
-  Eigen::MatrixXd obstacles_edges_num = Eigen::MatrixXd::Zero(1, horizon_ + 1);
+  Eigen::MatrixXi obstacles_edges_num = Eigen::MatrixXi::Zero(1, horizon_ + 1);
   Eigen::MatrixXd obstacles_A = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd obstacles_b = Eigen::MatrixXd::Ones(4, 1);
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;

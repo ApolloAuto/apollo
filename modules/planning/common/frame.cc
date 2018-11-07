@@ -564,9 +564,9 @@ bool Frame::VPresentationObstacle() {
       openspace_warmstart_obstacles_.Add(obstacle->Id(), *obstacle);
     }
     // load vertice vector for distance approach
-    Eigen::MatrixXd perception_obstacles_edges_num_ =
-        4 * Eigen::MatrixXd::Ones(perception_obstacles_num, 1);
-    Eigen::MatrixXd parking_boundaries_obstacles_edges_num(4, 1);
+    Eigen::MatrixXi perception_obstacles_edges_num_ =
+        4 * Eigen::MatrixXi::Ones(perception_obstacles_num, 1);
+    Eigen::MatrixXi parking_boundaries_obstacles_edges_num(4, 1);
     // the order is decided by the ROI()
     parking_boundaries_obstacles_edges_num << 2, 1, 2, 1;
     obstacles_edges_num_.resize(
@@ -596,7 +596,7 @@ bool Frame::VPresentationObstacle() {
   } else {
     obstacles_num_ = parking_boundaries_num;
     // load vertice vector for distance approach
-    Eigen::MatrixXd parking_boundaries_obstacles_edges_num(4, 1);
+    Eigen::MatrixXi parking_boundaries_obstacles_edges_num(4, 1);
     // the order is decided by the ROI()
     parking_boundaries_obstacles_edges_num << 2, 1, 2, 1;
     obstacles_edges_num_.resize(parking_boundaries_obstacles_edges_num.rows(),
@@ -707,7 +707,8 @@ bool Frame::HPresentationObstacle() {
 }
 
 bool Frame::ObsHRep(
-    const size_t &obstacles_num, const Eigen::MatrixXd &obstacles_edges_num,
+    const std::size_t &obstacles_num,
+    const Eigen::MatrixXi &obstacles_edges_num,
     const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
     Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all) {
   if (obstacles_num != obstacles_vertices_vec.size()) {

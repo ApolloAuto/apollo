@@ -52,7 +52,7 @@ class DistanceApproachProblem {
              const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
              const std::vector<double>& XYbounds,
              const std::size_t& obstacles_num,
-             const Eigen::MatrixXd& obstacles_edges_num,
+             const Eigen::MatrixXi& obstacles_edges_num,
              const Eigen::MatrixXd& obstacles_A,
              const Eigen::MatrixXd& obstacles_b, Eigen::MatrixXd* state_result,
              Eigen::MatrixXd* control_result, Eigen::MatrixXd* time_result,

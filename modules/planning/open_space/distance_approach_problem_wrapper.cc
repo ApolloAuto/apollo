@@ -37,7 +37,7 @@ class ObstacleContainer {
     std::size_t index = 0;
     for (std::size_t i = 0; i < obstacles_num_; i++) {
       std::vector<Vec2d> vertices_cw;
-      for (std::size_t j = 0; j < obstacles_edges_num_(i, 0) + 1; j++) {
+      for (int j = 0; j < obstacles_edges_num_(i, 0) + 1; j++) {
         Vec2d vertice =
             Vec2d(ROI_distance_approach_parking_boundary[index],
                   ROI_distance_approach_parking_boundary[index + 1]);
@@ -62,7 +62,7 @@ class ObstacleContainer {
   }
 
   bool ObsHRep(const std::size_t& obstacles_num,
-               const Eigen::MatrixXd& obstacles_edges_num,
+               const Eigen::MatrixXi& obstacles_edges_num,
                const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
                Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
     if (obstacles_num != obstacles_vertices_vec.size()) {
@@ -157,12 +157,12 @@ class ObstacleContainer {
   Eigen::MatrixXd GetAMatrix() { return obstacles_A_; }
   Eigen::MatrixXd GetbMatrix() { return obstacles_b_; }
   std::size_t GetObstaclesNum() { return obstacles_num_; }
-  Eigen::MatrixXd GetObstaclesEdgesNum() { return obstacles_edges_num_; }
+  Eigen::MatrixXi GetObstaclesEdgesNum() { return obstacles_edges_num_; }
 
  private:
   ThreadSafeIndexedObstacles obstacles_list;
   std::size_t obstacles_num_ = 0;
-  Eigen::MatrixXd obstacles_edges_num_;
+  Eigen::MatrixXi obstacles_edges_num_;
   std::vector<std::vector<Vec2d>> obstacles_vertices_vec_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
