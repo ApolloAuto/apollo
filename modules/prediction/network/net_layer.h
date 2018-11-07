@@ -146,11 +146,18 @@ class Dense : public Layer {
 class Conv1d : public Layer {
  public:
   /**
-   * @brief Load the dense layer parameter from a pb message
+   * @brief Load the layer parameter from a pb message
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
   bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
+
+  /**
+   * @brief Load the conv1d layer parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::Conv1dParameter& conv1d_pb);
 
   /**
    * @brief Compute the layer output from inputs
@@ -175,11 +182,18 @@ class Conv1d : public Layer {
 class MaxPool1d : public Layer {
  public:
   /**
-   * @brief Load the dense layer parameter from a pb message
+   * @brief Load the layer parameter from a pb message
    * @param A pb message contains the parameters
    * @return True is loaded successively, otherwise False
    */
   bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
+
+  /**
+   * @brief Load the max pool 1d layer parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::MaxPool1dParameter& maxpool1d_pb);
 
   /**
    * @brief Compute the layer output from inputs
@@ -191,6 +205,7 @@ class MaxPool1d : public Layer {
 
  private:
   int kernel_size_;
+  int stride_;
 };
 
 /**
@@ -207,6 +222,13 @@ class AvgPool1d : public Layer {
   bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
+   * @brief Load the avg pool 1d layer parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::AvgPool1dParameter& avgpool1d_pb);
+
+  /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
@@ -216,6 +238,7 @@ class AvgPool1d : public Layer {
 
  private:
   int kernel_size_;
+  int stride_;
 };
 
 /**

@@ -29,12 +29,12 @@ message Conv1dParameter {
   optional int32 stride = 5;
 }
 
-message MaxPool1d {
+message MaxPool1dParameter {
   optional int32 kernel_size = 1;
   optional int32 stride = 2;
 }
 
-message AvgPool1d {
+message AvgPool1dParameter {
   optional int32 kernel_size = 1;
   optional int32 stride = 2;
 }
@@ -102,7 +102,7 @@ message LayerParameter {
     FlattenParameter flatten = 9;
     ConcatenateParameter concatenate = 10;
     Conv1dParameter conv1d = 11;
-    MaxPool1d maxpool1d = 12;
-    AvgPool1d avgpool1d = 13;
+    MaxPool1dParameter maxpool1d = 12;
+    AvgPool1dParameter avgpool1d = 13;
   }
 }

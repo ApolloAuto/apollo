@@ -48,8 +48,8 @@ message Regress {
 
 message CruiseModel {
   optional LaneFeatureConv lane_feature_conv = 1;
-  optional MaxPool1d lane_feature_maxpool = 2;
-  optional AvgPool1d lane_feature_avgpool = 3;
+  optional MaxPool1dParameter lane_feature_maxpool = 2;
+  optional AvgPool1dParameter lane_feature_avgpool = 3;
   optional ObsFeatureFC obs_feature_fc = 5;
   optional Classify classify = 6;
   optional Regress regress = 7;
