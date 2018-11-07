@@ -52,11 +52,27 @@ class JunctionPredictor : public Predictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
-  void DrawJunctionTrajectory(const Feature& feature,
+  void DrawJunctionTrajectoryPoints(const Feature& feature,
       const JunctionExit& junction_exit,
+      const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
 
   std::vector<JunctionExit> MostLikelyJunctions(const Feature& feature);
+
+  /**
+   * @brief Get best pass time
+   * @param start_x, end_x, start_y, end_y
+   */
+  double GetBestTime(const std::array<double, 2>& start_x,
+                     const std::array<double, 2>& end_x,
+                     const std::array<double, 2>& start_y,
+                     const std::array<double, 2>& end_y);
+
+  double CostFunction(const std::array<double, 4>& x_coeffs,
+                      const std::array<double, 4>& y_coeffs,
+                      const double time_to_exit);
+
+  std::vector<double> GenerateCandidateTimes();
 };
 
 }  // namespace prediction

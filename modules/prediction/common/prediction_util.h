@@ -17,6 +17,7 @@
 #pragma once
 
 #include <utility>
+#include <limits>
 #include <vector>
 #include <array>
 
@@ -92,7 +93,8 @@ double EvaluateQuarticPolynomial(
 double EvaluateCubicPolynomial(
     const std::array<double, 4>& coefs,
     const double t, const uint32_t order,
-    const double end_t, const double end_v);
+    const double end_t = std::numeric_limits<double>::infinity(),
+    const double end_v = 0.0);
 
 template <std::size_t N>
 std::array<double, 2 * N - 2> ComputePolynomial(
