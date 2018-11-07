@@ -107,6 +107,7 @@ void RecordViewer::Reset() {
     reader->Reset();
   }
   curr_begin_time_ = begin_time_;
+  msg_buffer_.clear();
 }
 
 void RecordViewer::UpdateTime() {

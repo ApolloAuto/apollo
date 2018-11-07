@@ -94,7 +94,7 @@ class RecordViewer {
   uint64_t curr_begin_time_ = 0;
   std::multimap<uint64_t, std::shared_ptr<RecordMessage>> msg_buffer_;
 
-  const uint64_t kStepTimeNanoSec = 1000000000UL;
+  const uint64_t kStepTimeNanoSec = 1000000000UL;  // 1 second
   const std::size_t kBufferMinSize = 128;
 };
 
