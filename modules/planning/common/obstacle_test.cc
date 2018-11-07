@@ -110,15 +110,15 @@ TEST_F(ObstacleTest, GetPointAtTime) {
 
   // first
   const auto first_point = obstacle->GetPointAtTime(0.0);
-  EXPECT_FLOAT_EQ(0.0, first_point.relative_time());
-  EXPECT_FLOAT_EQ(76.684071405, first_point.path_point().x());
-  EXPECT_FLOAT_EQ(350.481852505, first_point.path_point().y());
+  EXPECT_DOUBLE_EQ(0.0, first_point.relative_time());
+  EXPECT_DOUBLE_EQ(76.684071405, first_point.path_point().x());
+  EXPECT_DOUBLE_EQ(350.481852505, first_point.path_point().y());
 
   // last
   const auto last_point = obstacle->GetPointAtTime(10.04415320);
-  EXPECT_FLOAT_EQ(10.0441531943, last_point.relative_time());
-  EXPECT_FLOAT_EQ(186.259371951, last_point.path_point().x());
-  EXPECT_FLOAT_EQ(341.853799387, last_point.path_point().y());
+  EXPECT_DOUBLE_EQ(10.0441531943, last_point.relative_time());
+  EXPECT_DOUBLE_EQ(186.259371951, last_point.path_point().x());
+  EXPECT_DOUBLE_EQ(341.853799387, last_point.path_point().y());
 
   // middle
   const auto middle_point = obstacle->GetPointAtTime(3.7300);
@@ -138,11 +138,11 @@ TEST_F(ObstacleTest, PerceptionBoundingBox) {
   std::vector<common::math::Vec2d> corners;
   box.GetAllCorners(&corners);
   EXPECT_EQ(4, corners.size());
-  EXPECT_FLOAT_EQ(3.832477, box.length());
-  EXPECT_FLOAT_EQ(1.73200099013, box.width());
-  EXPECT_FLOAT_EQ(76.684071405, box.center_x());
-  EXPECT_FLOAT_EQ(350.481852505, box.center_y());
-  EXPECT_FLOAT_EQ(0.00531211859358, box.heading());
+  EXPECT_DOUBLE_EQ(3.8324769804600001, box.length());
+  EXPECT_DOUBLE_EQ(1.73200099013, box.width());
+  EXPECT_DOUBLE_EQ(76.684071405, box.center_x());
+  EXPECT_DOUBLE_EQ(350.481852505, box.center_y());
+  EXPECT_DOUBLE_EQ(0.00531211859358, box.heading());
 }
 
 TEST_F(ObstacleTest, GetBoundingBox) {
@@ -153,11 +153,11 @@ TEST_F(ObstacleTest, GetBoundingBox) {
   std::vector<common::math::Vec2d> corners;
   box.GetAllCorners(&corners);
   EXPECT_EQ(4, corners.size());
-  EXPECT_FLOAT_EQ(3.832477, box.length());
-  EXPECT_FLOAT_EQ(1.73200099013, box.width());
-  EXPECT_FLOAT_EQ(83.2581699369, box.center_x());
-  EXPECT_FLOAT_EQ(350.779556678, box.center_y());
-  EXPECT_FLOAT_EQ(0.040689919, box.heading());
+  EXPECT_DOUBLE_EQ(3.8324769804600001, box.length());
+  EXPECT_DOUBLE_EQ(1.73200099013, box.width());
+  EXPECT_DOUBLE_EQ(83.2581699369, box.center_x());
+  EXPECT_DOUBLE_EQ(350.779556678, box.center_y());
+  EXPECT_DOUBLE_EQ(0.040689919196199999, box.heading());
 }
 
 TEST_F(ObstacleTest, PerceptionPolygon) {
@@ -167,12 +167,12 @@ TEST_F(ObstacleTest, PerceptionPolygon) {
 
   const auto& points = polygon.points();
   EXPECT_EQ(16, points.size());
-  EXPECT_FLOAT_EQ(74.766182, points[0].x());
-  EXPECT_FLOAT_EQ(350.72986, points[0].y());
-  EXPECT_FLOAT_EQ(74.783195, points[1].x());
-  EXPECT_FLOAT_EQ(350.32602, points[1].y());
-  EXPECT_FLOAT_EQ(74.770554, points[15].x());
-  EXPECT_FLOAT_EQ(350.87857, points[15].y());
+  EXPECT_DOUBLE_EQ(74.766181894499994, points[0].x());
+  EXPECT_DOUBLE_EQ(350.72985818299998, points[0].y());
+  EXPECT_DOUBLE_EQ(74.783198034400002, points[1].x());
+  EXPECT_DOUBLE_EQ(350.32601568799998, points[1].y());
+  EXPECT_DOUBLE_EQ(74.770555729799995, points[15].x());
+  EXPECT_DOUBLE_EQ(350.878567223, points[15].y());
 }
 
 TEST_F(ObstacleTest, Trajectory) {
@@ -198,11 +198,11 @@ TEST(Obstacle, CreateStaticVirtualObstacle) {
   EXPECT_TRUE(Obstacle::IsStaticObstacle(obstacle->Perception()));
   EXPECT_TRUE(Obstacle::IsVirtualObstacle(obstacle->Perception()));
   auto& perception_box = obstacle->PerceptionBoundingBox();
-  EXPECT_FLOAT_EQ(0.0, perception_box.center().x());
-  EXPECT_FLOAT_EQ(0.0, perception_box.center().y());
-  EXPECT_FLOAT_EQ(4.0, perception_box.length());
-  EXPECT_FLOAT_EQ(2.0, perception_box.width());
-  EXPECT_FLOAT_EQ(0.0, perception_box.heading());
+  EXPECT_DOUBLE_EQ(0.0, perception_box.center().x());
+  EXPECT_DOUBLE_EQ(0.0, perception_box.center().y());
+  EXPECT_DOUBLE_EQ(4.0, perception_box.length());
+  EXPECT_DOUBLE_EQ(2.0, perception_box.width());
+  EXPECT_DOUBLE_EQ(0.0, perception_box.heading());
 }
 
 TEST(IsLateralDecision, AllDecisions) {
