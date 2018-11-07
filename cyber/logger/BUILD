@@ -37,7 +37,7 @@ cc_library(
         "async_logger.h",
     ]),
     deps = [
-        "//cyber/common:macros",
+        "//cyber/common:common",
         "//cyber/logger:log_file_object",
     ]
 )

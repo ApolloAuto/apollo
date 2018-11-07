@@ -136,11 +136,11 @@ bool Init(const char* argv) {
   google::base::SetLogger(FLAGS_minloglevel, async_logger);
   async_logger->Start();
 
-  AINFO << "glog inited";
-  AINFO << "glog FLAGS_log_dir=" << FLAGS_log_dir;
-  AINFO << "glog FLAGS_minloglevel=" << FLAGS_minloglevel;
-  AINFO << "glog FLAGS_alsologtostderr=" << FLAGS_alsologtostderr;
-  AINFO << "glog FLAGS_colorlogtostderr=" << FLAGS_colorlogtostderr;
+  ADEBUG << "glog inited";
+  ADEBUG << "glog FLAGS_log_dir=" << FLAGS_log_dir;
+  ADEBUG << "glog FLAGS_minloglevel=" << FLAGS_minloglevel;
+  ADEBUG << "glog FLAGS_alsologtostderr=" << FLAGS_alsologtostderr;
+  ADEBUG << "glog FLAGS_colorlogtostderr=" << FLAGS_colorlogtostderr;
 
   return Init();
 }

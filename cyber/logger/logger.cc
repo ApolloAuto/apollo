@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "cyber/common/global_data.h"
 #include "cyber/logger/log_file_object.h"
 #include "cyber/logger/logger.h"
 
@@ -41,15 +42,17 @@ Logger::~Logger() {
 void Logger::Write(bool force_flush, time_t timestamp, const char* message,
                    int message_len) {
   std::string log_message = std::string(message);
-  std::string module_name("unknown");
+  std::string module_name = common::GlobalData::Instance()->ProcessName();
   // set the same bracket as the bracket in log.h
   auto lpos = log_message.find('[');
-  auto rpos = log_message.find(']', lpos);
-  if (lpos != std::string::npos && rpos != std::string::npos) {
-    module_name = log_message.substr(lpos + 1, rpos - lpos - 1);
-    auto cut_length = rpos - lpos + 1;
-    log_message.replace(lpos, cut_length, "");
-    message_len -= cut_length;
+  if (lpos != std::string::npos) {
+    auto rpos = log_message.find(']', lpos);
+    if (rpos != std::string::npos) {
+      module_name = log_message.substr(lpos + 1, rpos - lpos - 1);
+      auto cut_length = rpos - lpos + 1;
+      log_message.replace(lpos, cut_length, "");
+      message_len -= cut_length;
+    }
   }
 
   LogFileObject* fileobject = nullptr;
