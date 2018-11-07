@@ -49,11 +49,6 @@ void Convert::ConvertPacketsToPointcloud(
   }
 
   if (config_.organized()) {
-    ADEBUG << "reorder point cloud";
-    parser_->Order(point_cloud);
-  }
-
-  if (config_.organized()) {
     parser_->Order(point_cloud);
     point_cloud->set_is_dense(false);
   } else {
