@@ -46,53 +46,8 @@ std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
   apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                          &planning_config);
   if (FLAGS_open_space_planner_switchable) {
-    const hdmap::HDMap* hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
-    CHECK_NOTNULL(hdmap_);
-    common::VehicleState vehicle_state_ =
-        common::VehicleStateProvider::Instance()->vehicle_state();
-    auto point = common::util::MakePointENU(
-        vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
-    hdmap::LaneInfoConstPtr nearest_lane;
-    double vehicle_lane_s = 0.0;
-    double vehicle_lane_l = 0.0;
-    int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-        point, 5.0, vehicle_state_.heading(), M_PI / 3.0, &nearest_lane,
-        &vehicle_lane_s, &vehicle_lane_l);
-    if (status != 0) {
-      AERROR << "Getlane failed at dispatcher";
-      return nullptr;
-    }
-    LaneSegment nearest_lanesegment =
-        LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
-                    nearest_lane->accumulate_s().back());
-    std::vector<LaneSegment> segments_vector;
-    int next_lanes_num = nearest_lane->lane().successor_id_size();
-    ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
-    if (next_lanes_num == 0) {
-      for (int i = 0; i < next_lanes_num; i++) {
-        auto next_lane_id = nearest_lane->lane().successor_id(i);
-        segments_vector.push_back(nearest_lanesegment);
-        auto next_lane = hdmap_->GetLaneById(next_lane_id);
-        LaneSegment next_lanesegment =
-            LaneSegment(next_lane, next_lane->accumulate_s().front(),
-                        next_lane->accumulate_s().back());
-        segments_vector.emplace_back(next_lanesegment);
-        bool status = CheckParkingROI(target_parking_spot, hdmap_,
-                                      vehicle_state_, &segments_vector);
-        if (status) {
-          return planner_factory_.CreateObject(
-              planning_config.standard_planning_config().planner_type(1));
-        }
-      }
-    } else {
-      segments_vector.push_back(nearest_lanesegment);
-      bool status = CheckParkingROI(target_parking_spot, hdmap_, vehicle_state_,
-                                    &segments_vector);
-      if (status) {
-        return planner_factory_.CreateObject(
-            planning_config.standard_planning_config().planner_type(1));
-      }
-    }
+    return planner_factory_.CreateObject(
+        planning_config.standard_planning_config().planner_type(1));
   }
   return planner_factory_.CreateObject(
       planning_config.standard_planning_config().planner_type(0));
