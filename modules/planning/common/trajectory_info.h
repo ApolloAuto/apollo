@@ -32,13 +32,13 @@ class TrajectoryInfo {
   TrajectoryInfo() = default;
   ~TrajectoryInfo() = default;
 
-  const PathData& path_data() { return path_data_; }
+  const PathData& path_data() const { return path_data_; }
   PathData* mutable_path_data() { return &path_data_; }
 
-  const SpeedData& speed_data() { return speed_data_; }
+  const SpeedData& speed_data() const { return speed_data_; }
   SpeedData* mutable_speed_data() { return &speed_data_; }
 
-  const DiscretizedTrajectory& discretized_trajecotry() {
+  const DiscretizedTrajectory& discretized_trajecotry() const {
     return discretized_trajectory_;
   }
   DiscretizedTrajectory* mutable_discretized_trajecotry() {

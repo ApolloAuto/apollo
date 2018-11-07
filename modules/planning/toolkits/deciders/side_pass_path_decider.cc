@@ -71,7 +71,10 @@ Status SidePassPathDecider::Process(Frame *frame,
   adc_frenet_frame_point_ =
       reference_line_info->reference_line().GetFrenetPoint(
           frame->PlanningStartPoint());
-  GeneratePath(frame, reference_line_info);
+  if (!GeneratePath(frame, reference_line_info)) {
+    const std::string msg = "Fail to generate path.";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
   return Status::OK();
 }
 
