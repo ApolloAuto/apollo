@@ -52,8 +52,8 @@ class SidePassPathDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
-  common::Status BuildSidePathDecision(
-      Frame* frame, ReferenceLineInfo* const reference_line_info);
+  bool BuildSidePathDecision(Frame* frame,
+                             ReferenceLineInfo* const reference_line_info);
 
   bool GeneratePath(Frame* frame, ReferenceLineInfo* reference_line_info);
 
@@ -69,9 +69,10 @@ class SidePassPathDecider : public Decider {
   void RecordDebugInfo(ReferenceLineInfo* reference_line_info);
 
  private:
+  common::TrajectoryPoint adc_planning_start_point_;
   common::FrenetFramePoint adc_frenet_frame_point_;
   std::unique_ptr<Fem1dQpProblem> fem_qp_;
-  SidePassDirection decided_direction_;
+  SidePassDirection decided_direction_ = SidePassDirection::LEFT;
   double delta_s_ = 0.0;
 };
 
