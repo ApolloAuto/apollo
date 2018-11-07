@@ -37,7 +37,7 @@ class FrenetFramePath {
 
   void set_points(const std::vector<common::FrenetFramePoint> &points);
   const std::vector<common::FrenetFramePoint> &points() const;
-  std::uint32_t NumOfPoints() const;
+  size_t NumOfPoints() const;
   double Length() const;
   const common::FrenetFramePoint &PointAt(const std::uint32_t index) const;
   common::FrenetFramePoint EvaluateByS(const double s) const;

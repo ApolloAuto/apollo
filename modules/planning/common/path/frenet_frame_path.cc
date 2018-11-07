@@ -51,7 +51,7 @@ double FrenetFramePath::Length() const {
   return points_.back().s() - points_.front().s();
 }
 
-std::uint32_t FrenetFramePath::NumOfPoints() const { return points_.size(); }
+size_t FrenetFramePath::NumOfPoints() const { return points_.size(); }
 
 const FrenetFramePoint& FrenetFramePath::PointAt(
     const std::uint32_t index) const {

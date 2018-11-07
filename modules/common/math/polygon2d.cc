@@ -296,13 +296,13 @@ bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
     return true;
   }
   CHECK_NOTNULL(points);
-  const int n = points->size();
+  const size_t n = points->size();
   if (n < 3) {
     return false;
   }
   std::vector<double> prod(n);
   std::vector<int> side(n);
-  for (int i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n; ++i) {
     prod[i] = CrossProd(line_segment.start(), line_segment.end(), (*points)[i]);
     if (std::abs(prod[i]) <= kMathEpsilon) {
       side[i] = 0;
@@ -312,11 +312,11 @@ bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
   }
 
   std::vector<Vec2d> new_points;
-  for (int i = 0; i < n; ++i) {
+  for (size_t i = 0; i < n; ++i) {
     if (side[i] >= 0) {
       new_points.push_back((*points)[i]);
     }
-    const int j = ((i == n - 1) ? 0 : (i + 1));
+    const size_t j = ((i == n - 1) ? 0 : (i + 1));
     if (side[i] * side[j] < 0) {
       const double ratio = prod[j] / (prod[j] - prod[i]);
       new_points.emplace_back(
