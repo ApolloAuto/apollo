@@ -27,6 +27,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -38,6 +39,8 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::PathOverlap;
+using apollo::common::util::MakePointENU;
+using apollo::hdmap::HDMapUtil;
 
 constexpr double kRoadBuffer = 0.2;
 constexpr double kObstacleBuffer = 0.1;
@@ -64,6 +67,7 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
 
 Status SidePassPathDecider::Process(Frame *frame,
                                     ReferenceLineInfo *reference_line_info) {
+  adc_planning_start_point_ = frame->PlanningStartPoint();
   adc_frenet_frame_point_ =
       reference_line_info->reference_line().GetFrenetPoint(
           frame->PlanningStartPoint());
@@ -71,12 +75,35 @@ Status SidePassPathDecider::Process(Frame *frame,
   return Status::OK();
 }
 
-Status SidePassPathDecider::BuildSidePathDecision(
+bool SidePassPathDecider::BuildSidePathDecision(
     Frame *frame, ReferenceLineInfo *const reference_line_info) {
-  // TODO(All): decide side pass from left or right.
-  // For now, just go left at all times.
-  decided_direction_ = SidePassDirection::LEFT;
-  return Status().OK();
+  hdmap::LaneInfoConstPtr lane;
+  double s = 0.0;
+  double l = 0.0;
+  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
+          common::util::MakePointENU(
+              adc_planning_start_point_.path_point().x(),
+              adc_planning_start_point_.path_point().y(),
+              adc_planning_start_point_.path_point().z()),
+          1.0, adc_planning_start_point_.path_point().theta(), M_PI / 3.0,
+          &lane, &s, &l) != 0) {
+    AERROR << "Failed to find nearest lane from map at position: "
+           << adc_planning_start_point_.DebugString()
+           << ", heading:" << adc_planning_start_point_.path_point().theta();
+    return false;
+  }
+
+  const auto &lane_pb = lane->lane();
+  if (lane_pb.left_neighbor_forward_lane_id_size() > 0) {
+    decided_direction_ = SidePassDirection::LEFT;
+  } else if (lane_pb.right_neighbor_forward_lane_id_size() > 0) {
+    decided_direction_ = SidePassDirection::RIGHT;
+  } else if (lane_pb.left_neighbor_reverse_lane_id_size() > 0) {
+    decided_direction_ = SidePassDirection::LEFT;
+  } else {
+    decided_direction_ = SidePassDirection::RIGHT;
+  }
+  return true;
 }
 
 // TODO(All): currently it's the 1st version, and only consider one
@@ -92,7 +119,7 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   // TODO(All): Check if ADC has fully stopped.
 
   // Decide whether to side-pass from left or right.
-  if (BuildSidePathDecision(frame, reference_line_info) != Status().OK()) {
+  if (!BuildSidePathDecision(frame, reference_line_info)) {
     AERROR << "Failed to decide on a side-pass direction.";
     return false;
   }
@@ -176,8 +203,11 @@ SidePassPathDecider::GetPathBoundaries(
     // Get the road info at the current s.
     double lane_left_width_at_curr_s = 0.0;
     double lane_right_width_at_curr_s = 0.0;
-    reference_line.GetLaneWidth(curr_s, &lane_left_width_at_curr_s,
-                                &lane_right_width_at_curr_s);
+    if (!reference_line.GetLaneWidth(curr_s, &lane_left_width_at_curr_s,
+                                     &lane_right_width_at_curr_s)) {
+      AERROR << "Fail to get lane width at s = " << curr_s;
+      continue;
+    }
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
 
