@@ -325,7 +325,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
              << " ,_last_proc_image_ts: " << std::to_string(last_proc_image_ts_)
              << " , _proc_interval_seconds: "
              << std::to_string(proc_interval_seconds_);
-    SendSimulationMsg();
+//    SendSimulationMsg();
     return;
   }
   // sync image with cached projections
@@ -339,7 +339,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
     AINFO << "PreprocessComponent not publish image, ts:"
              << std::to_string(image_msg_ts)
              << ", camera_name: " << camera_name;
-    SendSimulationMsg();
+//    SendSimulationMsg();
     return;
   }
 
