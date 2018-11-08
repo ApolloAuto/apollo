@@ -1,43 +1,14 @@
 cyber_modules {
-  key: "Camera"
+  key: "Sensors"
   value: {
-    process_name: "camera"
-    dag_files: "/apollo/modules/drivers/camera/dag/camera_udev.dag"
-  }
-}
-cyber_modules {
-  key: "GPS"
-  value: {
-    process_name: "gnss"
+    process_name: "cyber_computer"
+    dag_files: "/apollo/modules/drivers/camera/dag/camera_udelv.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
-  }
-}
-cyber_modules {
-  key: "Localization"
-  value: {
-    process_name: "localization"
     dag_files: "/apollo/modules/localization/dag/localization.dag"
-  }
-}
-cyber_modules {
-  key: "Radar"
-  value: {
-    process_name: "conti_radar"
-    dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar_udev.dag"
-  }
-}
-cyber_modules {
-  key: "Transform"
-  value: {
-    process_name: "static_transform"
+    dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar_udelv.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
-  }
-}
-cyber_modules {
-  key: "Velodyne"
-  value: {
-    process_name: "velodyne"
-    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne_udev.dag"
+    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne_udelv.dag"
+    schedule: CYBER_COMPUTE
   }
 }
 modules {
