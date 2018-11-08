@@ -38,20 +38,68 @@ template <typename K, typename V, std::size_t TableSize = 128,
                                       (TableSize & (TableSize - 1)) == 0,
                                   int>::type = 0>
 class AtomicHashMap {
+ public:
+  AtomicHashMap() : capacity_(TableSize), mode_num_(capacity_ - 1) {}
+  AtomicHashMap(const AtomicHashMap &other) = delete;
+  AtomicHashMap &operator=(const AtomicHashMap &other) = delete;
+
+  bool Has(K key) {
+    uint64_t index = key & mode_num_;
+    return table_[index].Has(key);
+  }
+
+  bool Get(K key, V **value) {
+    uint64_t index = key & mode_num_;
+    return table_[index].Get(key, value);
+  }
+
+  bool Get(K key, V *value) {
+    uint64_t index = key & mode_num_;
+    V *val = nullptr;
+    bool res = table_[index].Get(key, &val);
+    if (res) {
+      *value = *val;
+    }
+    return res;
+  }
+
+  void Set(K key) {
+    uint64_t index = key & mode_num_;
+    table_[index].Insert(key);
+  }
+
+  void Set(K key, const V &value) {
+    uint64_t index = key & mode_num_;
+    table_[index].Insert(key, value);
+  }
+
+  void Set(K key, V &&value) {
+    uint64_t index = key & mode_num_;
+    table_[index].Insert(key, std::forward<V>(value));
+  }
+
+  bool Remove(K key) {
+    uint64_t index = key & mode_num_;
+    return table_[index].Remove(key);
+  }
+
  private:
-  class Entry {
-   public:
+  struct Entry {
     Entry() {}
     explicit Entry(K key) : key(key) { value_ptr.store(new V()); }
     Entry(K key, const V &value) : key(key) { value_ptr.store(new V(value)); }
     Entry(K key, V &&value) : key(key) {
       value_ptr.store(new V(std::forward<V>(value)));
     }
+    ~Entry() { delete value_ptr.load(); }
 
-    ~Entry() {
-      if (value_ptr.load()) {
+    bool Release() {
+      if (ref_count.fetch_sub(1) == 1) {
         delete value_ptr.load();
+        delete this;
+        return true;
       }
+      return false;
     }
 
     K key = 0;
@@ -59,17 +107,8 @@ class AtomicHashMap {
     std::atomic<Entry *> next = {nullptr};
     // reference counter, avoid ABA problem
     std::atomic<uint32_t> ref_count = {1};
-    void Release() {
-      if (ref_count.fetch_sub(1) == 1) {
-        if (value_ptr.load()) {
-          delete value_ptr.load();
-        }
-        delete this;
-      }
-    }
   };
 
-  // Hash bucket
   class Bucket {
    public:
     Bucket() : head_(new Entry()) {}
@@ -92,18 +131,34 @@ class AtomicHashMap {
       return reinterpret_cast<Entry *>(reinterpret_cast<uintptr_t>(entry) | 1);
     }
 
+    bool Has(K key) {
+      Entry *m_target = head_->next.load();
+      while (Entry *target = Unmark(m_target)) {
+        if (Marked(target->next.load())) {
+          m_target = head_->next.load();
+          continue;
+        }
+
+        if (target->key < key) {
+          m_target = target->next.load();
+          continue;
+        } else {
+          return target->key == key;
+        }
+      }
+      return false;
+    }
+
     bool Find(K key, Entry **prev_ptr, Entry **target_ptr) {
       Entry *prev = head_;
       Entry *m_target = head_->next.load();
-      while (Unmark(m_target)) {
-        Entry *target = Unmark(m_target);
-
-        // if marked, will remove target, find again
+      while (Entry *target = Unmark(m_target)) {
         if (Marked(target->next.load())) {
           prev = head_;
           m_target = head_->next.load();
           continue;
         }
+
         if (target->key == key) {
           target->ref_count++;
           *prev_ptr = prev;
@@ -148,10 +203,12 @@ class AtomicHashMap {
           delete new_value;
           continue;
         }
+
         // avoid new when retry
         if (new_entry == nullptr) {
           new_entry = new Entry(key, value);
         }
+
         new_entry->next.store(target);
         if (prev->next.compare_exchange_strong(target, new_entry)) {
           // Insert success
@@ -248,18 +305,23 @@ class AtomicHashMap {
       Entry *target = nullptr;
       while (true) {
         if (!Find(key, &prev, &target)) {
+          if (target) {
+            target->Release();
+          }
           return false;
         }
         Entry *old_next = target->next.load();
         // mark befor remove
         if (!target->next.compare_exchange_strong(old_next, Mark(old_next))) {
+          target->Release();
           continue;
         }
         target->value_ptr.store(nullptr);
 
         if (prev->next.compare_exchange_strong(target, Unmark(target->next))) {
+          // Release twice here.
           target->Release();
-          return true;
+          return target->Release();
         }
       }
       return false;
@@ -273,58 +335,14 @@ class AtomicHashMap {
         target->Release();
         return true;
       }
+      if (target) {
+        target->Release();
+      }
       return false;
     }
 
     Entry *head_;
   };
-
- public:
-  AtomicHashMap() : capacity_(TableSize), mode_num_(capacity_ - 1) {}
-  AtomicHashMap(const AtomicHashMap &other) = delete;
-  AtomicHashMap &operator=(const AtomicHashMap &other) = delete;
-
-  bool Get(K key, V **value) {
-    uint64_t index = key & mode_num_;
-    return table_[index].Get(key, value);
-  }
-
-  bool Get(K key, V *value) {
-    uint64_t index = key & mode_num_;
-    V *val = nullptr;
-    bool res = table_[index].Get(key, &val);
-    if (res) {
-      *value = *val;
-    }
-    return res;
-  }
-
-  void Set(K key) {
-    uint64_t index = key & mode_num_;
-    table_[index].Insert(key);
-  }
-
-  void Set(K key, const V &value) {
-    uint64_t index = key & mode_num_;
-    table_[index].Insert(key, value);
-  }
-
-  void Set(K key, V &&value) {
-    uint64_t index = key & mode_num_;
-    table_[index].Insert(key, std::forward<V>(value));
-  }
-
-  bool Remove(K key) {
-    uint64_t index = key & mode_num_;
-    return table_[index].Remove(key);
-  }
-
-  bool Has(K key) {
-    Entry *pred = nullptr;
-    Entry *item = nullptr;
-    uint64_t index = key & mode_num_;
-    return table_[index].Find(key, &pred, &item);
-  }
 
  private:
   Bucket table_[TableSize];

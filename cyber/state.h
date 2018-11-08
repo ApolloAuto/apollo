@@ -18,6 +18,7 @@
 #define CYBER_STATE_H_
 
 #include <cstdint>
+#include <thread>
 
 namespace apollo {
 namespace cyber {
@@ -32,9 +33,17 @@ enum State : std::uint8_t {
 State GetState();
 void SetState(const State& state);
 
-bool OK();
-bool IsShutdown();
-void WaitForShutdown();
+inline bool OK() { return GetState() == STATE_INITIALIZED; }
+
+inline bool IsShutdown() {
+  return GetState() == STATE_SHUTTING_DOWN || GetState() == STATE_SHUTDOWN;
+}
+
+inline void WaitForShutdown() {
+  while (OK()) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  }
+}
 
 }  // namespace cyber
 }  // namespace apollo
