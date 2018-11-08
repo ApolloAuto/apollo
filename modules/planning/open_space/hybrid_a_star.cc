@@ -62,7 +62,7 @@ bool HybridAStar::ReedSheppHeuristic(
     std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
   if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
                                           reeds_shepp_to_end)) {
-    AINFO << "ShortestRSP failed";
+    AERROR << "ShortestRSP failed";
     return false;
   }
   ReedSheppPath_cache_.insert(
@@ -107,8 +107,6 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
   end_node->SetPre(current_node);
   end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
-  AINFO << "end_node.GetX()" << end_node->GetX();
-  AINFO << "end_node.GetY()" << end_node->GetY();
   return end_node;
 }
 
@@ -236,7 +234,7 @@ bool HybridAStar::GetResult(Result* result) {
     std::vector<double> y = current_node->GetYs();
     std::vector<double> phi = current_node->GetPhis();
     if (x.size() == 0 || y.size() == 0 || phi.size() == 0) {
-      AINFO << "result size check failed";
+      AERROR << "result size check failed";
       return false;
     }
     std::reverse(x.begin(), x.end());
@@ -257,21 +255,21 @@ bool HybridAStar::GetResult(Result* result) {
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
   if (!GenerateSpeedAcceleration(result)) {
-    AINFO << "GenerateSpeedAcceleration fail";
+    AERROR << "GenerateSpeedAcceleration fail";
     return false;
   }
   if (result->x.size() != result->y.size() ||
       result->x.size() != result->v.size() ||
       result->x.size() != result->phi.size()) {
-    AINFO << "state sizes not equal";
+    AERROR << "state sizes not equal";
     return false;
   }
   if (result->a.size() != result->steer.size() ||
       result->x.size() - result->a.size() != 1) {
-    AINFO << "control sizes not equal or not right";
-    AINFO << result->a.size();
-    AINFO << result->steer.size();
-    AINFO << result->x.size();
+    AERROR << "control sizes not equal or not right";
+    AERROR << result->a.size();
+    AERROR << result->steer.size();
+    AERROR << result->x.size();
     return false;
   }
   return true;
@@ -279,7 +277,7 @@ bool HybridAStar::GetResult(Result* result) {
 
 bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
   if (result->x.size() < 2 || result->y.size() < 2 || result->phi.size() < 2) {
-    AINFO << "result size check when generating speed and acceleration fail";
+    AERROR << "result size check when generating speed and acceleration fail";
     return false;
   }
   std::size_t x_size = result->x.size();
@@ -335,11 +333,11 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                              planner_open_space_config_));
   obstacles_ = obstacles;
   if (!ValidityCheck(start_node_)) {
-    AINFO << "start_node in collision with obstacles";
+    AERROR << "start_node in collision with obstacles";
     return false;
   }
   if (!ValidityCheck(end_node_)) {
-    AINFO << "end_node in collision with obstacles";
+    AERROR << "end_node in collision with obstacles";
     return false;
   }
   // load open set, priority queue and ReedSheepPath_cache
@@ -350,7 +348,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
   if (!reed_shepp_generator_->ShortestRSP(start_node_, end_node_,
                                           reeds_shepp_first_node)) {
-    AINFO << "ShortestRSP failed";
+    AERROR << "ShortestRSP failed";
     return false;
   }
   ReedSheppPath_cache_.insert(
@@ -392,7 +390,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
         std::shared_ptr<ReedSheppPath> reeds_shepp_heuristic =
             std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
         if (!ReedSheppHeuristic(next_node, reeds_shepp_heuristic)) {
-          AINFO << "Heuristic fail";
+          AERROR << "Heuristic fail";
           continue;
         }
         CalculateNodeCost(current_node, next_node, reeds_shepp_heuristic);
@@ -407,11 +405,11 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     }
   }
   if (final_node_ == nullptr) {
-    AINFO << "Hybrid A searching return null ptr(open_set ran out)";
+    AERROR << "Hybrid A searching return null ptr(open_set ran out)";
     return false;
   }
   if (!GetResult(result)) {
-    AINFO << "GetResult failed";
+    AERROR << "GetResult failed";
     return false;
   }
   AINFO << "explored node num is " << explored_node_num;

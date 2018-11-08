@@ -71,7 +71,7 @@ bool DistanceApproachProblem::Solve(
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    AINFO << "*** Distiance Approach problem error during initialization!";
+    AERROR << "*** Distiance Approach problem error during initialization!";
     return false;
   }
 
@@ -92,7 +92,7 @@ bool DistanceApproachProblem::Solve(
     AINFO << "DistanceApproachProblem solving time in second : "
           << t_end - t_start;
   } else {
-    AINFO << "Return status: " << int(status);
+    AINFO << "Solve not succeeding, return status: " << int(status);
   }
 
   ptop->get_optimization_results(state_result, control_result, time_result,
