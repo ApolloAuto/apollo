@@ -17,6 +17,8 @@
 #include <limits>
 #include <utility>
 
+#include "Eigen/Dense"
+
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
@@ -33,6 +35,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::util::GetProtoFromFile;
 
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
@@ -43,6 +46,19 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
     ++count;
   }
   return (count == 0) ? 0.0 : sum / count;
+}
+
+Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
+    const int start_index, const int end_index) {
+  CHECK_LT(start_index, end_index);
+  CHECK_GE(start_index, 0);
+  CHECK_LE(end_index, static_cast<int>(nums.size()));
+  Eigen::MatrixXf output_matrix;
+  output_matrix.resize(1, end_index - start_index);
+  for (int i = start_index; i < end_index; ++i) {
+    output_matrix(1, i - start_index) = static_cast<float>(nums[i]);
+  }
+  return output_matrix;
 }
 
 // Helper function for converting world coordinate to relative coordinate
@@ -65,7 +81,9 @@ double WorldAngleToObjAngle(double input_world_angle,
 }
 
 CruiseMLPEvaluator::CruiseMLPEvaluator() {
-  LoadModel(FLAGS_evaluator_vehicle_cruise_mlp_file);
+  // TODO(kechxu) name go and cutin models
+  LoadModels(FLAGS_evaluator_cruise_vehicle_go_model_file,
+             FLAGS_evaluator_cruise_vehicle_go_model_file);
 }
 
 void CruiseMLPEvaluator::Clear() {
@@ -102,7 +120,20 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     CHECK_NOTNULL(lane_sequence_ptr);
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
-    double finish_time = ComputeFinishTime(feature_values);
+    Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
+        OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE);
+    Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(feature_values,
+        OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
+        static_cast<int>(feature_values.size()));
+    Eigen::MatrixXf model_output;
+    if (lane_sequence_ptr->vehicle_on_lane()) {
+      go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
+    } else {
+      cutin_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
+    }
+    double probability = model_output(0, 0);
+    double finish_time = model_output(0, 1);
+    lane_sequence_ptr->set_probability(probability);
     lane_sequence_ptr->set_time_to_lane_center(finish_time);
   }
 
@@ -525,15 +556,25 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
 }
 
 // TODO(all): uncomment this once the model is trained and ready.
-void CruiseMLPEvaluator::LoadModel(const std::string& model_file) {
-  // Currently, it's using FnnVehicleModel
-  // TODO(all) implement it using the generic "network" class.
-  // model_ptr_.reset(new FnnVehicleModel());
-  // CHECK(model_ptr_ != nullptr);
-  // CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
-  //     << "Unable to load model file: " << model_file << ".";
+void CruiseMLPEvaluator::LoadModels(const std::string& go_model_file,
+    const std::string& cutin_model_file) {
+  go_model_ptr_.reset(new network::CruiseModel());
+  cutin_model_ptr_.reset(new network::CruiseModel());
+  CHECK_NOTNULL(go_model_ptr_);
+  CHECK_NOTNULL(cutin_model_ptr_);
 
-  // AINFO << "Succeeded in loading the model file: " << model_file << ".";
+  CruiseModelParameter go_model_param;
+  CruiseModelParameter cutin_model_param;
+  CHECK(GetProtoFromFile(go_model_file, &go_model_param))
+      << "Unable to load go model file: " << go_model_file << ".";
+  CHECK(GetProtoFromFile(cutin_model_file, &cutin_model_param))
+      << "Unable to load cutin model file: " << cutin_model_file << ".";
+
+  go_model_ptr_->LoadModel(go_model_param);
+  cutin_model_ptr_->LoadModel(cutin_model_param);
+
+  ADEBUG << "Succeeded in loading go model: " << go_model_file << ".";
+  ADEBUG << "Succeeded in loading cutin model: " << cutin_model_file << ".";
 }
 
 // TODO(all): implement this once the model is trained and ready.

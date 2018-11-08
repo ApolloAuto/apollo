@@ -26,6 +26,7 @@
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/fnn_vehicle_model.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/prediction/network/cruise_model/cruise_model.h"
 
 namespace apollo {
 namespace prediction {
@@ -88,10 +89,12 @@ class CruiseMLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-   * @brief Load mode file
-   * @param Model file name
+   * @brief Load mode files
+   * @param Go model file name
+   * @param Cutin model file name
    */
-  void LoadModel(const std::string& model_file);
+  void LoadModels(const std::string& go_model_file,
+                  const std::string& cutin_model_file);
 
   /**
    * @brief Compute probability of a junction exit
@@ -110,7 +113,9 @@ class CruiseMLPEvaluator : public Evaluator {
   static const size_t OBSTACLE_FEATURE_SIZE = 23 + 60;
   static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t LANE_FEATURE_SIZE = 150;
-  std::unique_ptr<FnnVehicleModel> model_ptr_;
+
+  std::shared_ptr<network::CruiseModel> go_model_ptr_;
+  std::shared_ptr<network::CruiseModel> cutin_model_ptr_;
 };
 
 }  // namespace prediction
