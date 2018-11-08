@@ -42,7 +42,14 @@ TEST(CacheBufferTest, cache_buffer_test) {
   buffer.Fill(31);
   EXPECT_TRUE(buffer.Full());
   EXPECT_EQ(32, buffer.Size());
+
   CacheBuffer<int> buffer1(std::move(buffer));
+  EXPECT_EQ(buffer.Size(), buffer1.Size());
+  EXPECT_EQ(buffer.Head(), buffer1.Head());
+  EXPECT_EQ(buffer.Tail(), buffer1.Tail());
+  EXPECT_EQ(buffer.Front(), buffer1.Front());
+  EXPECT_EQ(buffer.Back(), buffer1.Back());
+  EXPECT_TRUE(buffer1.Full());
 }
 
 }  // namespace data
