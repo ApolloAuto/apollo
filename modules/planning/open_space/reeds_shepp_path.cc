@@ -56,7 +56,7 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                             std::shared_ptr<ReedSheppPath> optimal_path) {
   std::vector<ReedSheppPath> all_possible_paths;
   if (!GenerateRSPs(start_node, end_node, &all_possible_paths)) {
-    AINFO << "Fail to generate different combination of Reed Shepp "
+    AERROR << "Fail to generate different combination of Reed Shepp "
              "paths";
     return false;
   }
@@ -75,10 +75,10 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                end_node->GetY()) > 1e-3 ||
       std::abs(all_possible_paths[optimal_path_index].phi.back() -
                end_node->GetPhi()) > 1e-3) {
-    AINFO << "RSP end position not right";
+    AERROR << "RSP end position not right";
     for (size_t i = 0;
          i < all_possible_paths[optimal_path_index].segs_types.size(); i++) {
-      AINFO << "types are "
+      AERROR << "types are "
             << all_possible_paths[optimal_path_index].segs_types[i];
     }
     return false;
@@ -100,11 +100,11 @@ bool ReedShepp::GenerateRSPs(const std::shared_ptr<Node3d> start_node,
                              const std::shared_ptr<Node3d> end_node,
                              std::vector<ReedSheppPath>* all_possible_paths) {
   if (!GenerateRSP(start_node, end_node, all_possible_paths)) {
-    AINFO << "Fail to generate general profile of different RSPs";
+    AERROR << "Fail to generate general profile of different RSPs";
     return false;
   }
   if (!GenerateLocalConfigurations(start_node, end_node, all_possible_paths)) {
-    AINFO << "Fail to generate local configurations(x, y, phi) in RSP";
+    AERROR << "Fail to generate local configurations(x, y, phi) in RSP";
     return false;
   }
   return true;
@@ -122,22 +122,22 @@ bool ReedShepp::GenerateRSP(const std::shared_ptr<Node3d> start_node,
   double x = (c * dx + s * dy) * max_kappa_;
   double y = (-s * dx + c * dy) * max_kappa_;
   // if (!SCS(x, y, dphi, all_possible_paths)) {
-  //   AINFO << "Fail at SCS";
+  //   AERROR << "Fail at SCS";
   // }
   if (!CSC(x, y, dphi, all_possible_paths)) {
-    AINFO << "Fail at CSC";
+    AERROR << "Fail at CSC";
   }
   if (!CCC(x, y, dphi, all_possible_paths)) {
-    AINFO << "Fail at CCC";
+    AERROR << "Fail at CCC";
   }
   if (!CCCC(x, y, dphi, all_possible_paths)) {
-    AINFO << "Fail at CCCC";
+    AERROR << "Fail at CCCC";
   }
   if (!CCSC(x, y, dphi, all_possible_paths)) {
-    AINFO << "Fail at CCSC";
+    AERROR << "Fail at CCSC";
   }
   if (!CCSCC(x, y, dphi, all_possible_paths)) {
-    AINFO << "Fail at CCSCC";
+    AERROR << "Fail at CCSCC";
   }
   if (all_possible_paths->size() == 0) {
     return false;
@@ -153,7 +153,7 @@ bool ReedShepp::SCS(double x, double y, double phi,
   char SLS_types[] = "SLS";
   if (SLS_param.flag &&
       !SetRSP(3, SLS_lengths, SLS_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with SLS_param";
+    AERROR << "Fail at SetRSP with SLS_param";
     return false;
   }
   RSPParam SRS_param;
@@ -162,7 +162,7 @@ bool ReedShepp::SCS(double x, double y, double phi,
   char SRS_types[] = "SRS";
   if (SRS_param.flag &&
       !SetRSP(3, SRS_lengths, SRS_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with SRS_param";
+    AERROR << "Fail at SetRSP with SRS_param";
     return false;
   }
   return true;
@@ -176,7 +176,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSL1_types[] = "LSL";
   if (LSL1_param.flag &&
       !SetRSP(3, LSL1_lengths, LSL1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSL_param";
+    AERROR << "Fail at SetRSP with LSL_param";
     return false;
   }
 
@@ -186,7 +186,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSL2_types[] = "LSL";
   if (LSL2_param.flag &&
       !SetRSP(3, LSL2_lengths, LSL2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSL2_param";
+    AERROR << "Fail at SetRSP with LSL2_param";
     return false;
   }
 
@@ -196,7 +196,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSL3_types[] = "RSR";
   if (LSL3_param.flag &&
       !SetRSP(3, LSL3_lengths, LSL3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSL3_param";
+    AERROR << "Fail at SetRSP with LSL3_param";
     return false;
   }
 
@@ -206,7 +206,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSL4_types[] = "RSR";
   if (LSL4_param.flag &&
       !SetRSP(3, LSL4_lengths, LSL4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSL4_param";
+    AERROR << "Fail at SetRSP with LSL4_param";
     return false;
   }
 
@@ -216,7 +216,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSR1_types[] = "LSR";
   if (LSR1_param.flag &&
       !SetRSP(3, LSR1_lengths, LSR1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSR1_param";
+    AERROR << "Fail at SetRSP with LSR1_param";
     return false;
   }
 
@@ -226,7 +226,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSR2_types[] = "LSR";
   if (LSR2_param.flag &&
       !SetRSP(3, LSR2_lengths, LSR2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSR2_param";
+    AERROR << "Fail at SetRSP with LSR2_param";
     return false;
   }
 
@@ -236,7 +236,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSR3_types[] = "RSL";
   if (LSR3_param.flag &&
       !SetRSP(3, LSR3_lengths, LSR3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSR3_param";
+    AERROR << "Fail at SetRSP with LSR3_param";
     return false;
   }
 
@@ -246,7 +246,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   char LSR4_types[] = "RSL";
   if (LSR4_param.flag &&
       !SetRSP(3, LSR4_lengths, LSR4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LSR4_param";
+    AERROR << "Fail at SetRSP with LSR4_param";
     return false;
   }
   return true;
@@ -260,7 +260,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL1_types[] = "LRL";
   if (LRL1_param.flag &&
       !SetRSP(3, LRL1_lengths, LRL1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL_param";
+    AERROR << "Fail at SetRSP with LRL_param";
     return false;
   }
 
@@ -270,7 +270,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL2_types[] = "LRL";
   if (LRL2_param.flag &&
       !SetRSP(3, LRL2_lengths, LRL2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL2_param";
+    AERROR << "Fail at SetRSP with LRL2_param";
     return false;
   }
 
@@ -280,7 +280,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL3_types[] = "RLR";
   if (LRL3_param.flag &&
       !SetRSP(3, LRL3_lengths, LRL3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL3_param";
+    AERROR << "Fail at SetRSP with LRL3_param";
     return false;
   }
 
@@ -290,7 +290,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL4_types[] = "RLR";
   if (LRL4_param.flag &&
       !SetRSP(3, LRL4_lengths, LRL4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL4_param";
+    AERROR << "Fail at SetRSP with LRL4_param";
     return false;
   }
 
@@ -304,7 +304,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL5_types[] = "LRL";
   if (LRL5_param.flag &&
       !SetRSP(3, LRL5_lengths, LRL5_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL5_param";
+    AERROR << "Fail at SetRSP with LRL5_param";
     return false;
   }
 
@@ -314,7 +314,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL6_types[] = "LRL";
   if (LRL6_param.flag &&
       !SetRSP(3, LRL6_lengths, LRL6_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL6_param";
+    AERROR << "Fail at SetRSP with LRL6_param";
     return false;
   }
 
@@ -324,7 +324,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL7_types[] = "RLR";
   if (LRL7_param.flag &&
       !SetRSP(3, LRL7_lengths, LRL7_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL7_param";
+    AERROR << "Fail at SetRSP with LRL7_param";
     return false;
   }
 
@@ -334,7 +334,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   char LRL8_types[] = "RLR";
   if (LRL8_param.flag &&
       !SetRSP(3, LRL8_lengths, LRL8_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRL8_param";
+    AERROR << "Fail at SetRSP with LRL8_param";
     return false;
   }
   return true;
@@ -349,7 +349,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRn1_types[] = "LRLR";
   if (LRLRn1_param.flag &&
       !SetRSP(4, LRLRn1_lengths, LRLRn1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRn_param";
+    AERROR << "Fail at SetRSP with LRLRn_param";
     return false;
   }
 
@@ -360,7 +360,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRn2_types[] = "LRLR";
   if (LRLRn2_param.flag &&
       !SetRSP(4, LRLRn2_lengths, LRLRn2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRn2_param";
+    AERROR << "Fail at SetRSP with LRLRn2_param";
     return false;
   }
 
@@ -371,7 +371,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRn3_types[] = "RLRL";
   if (LRLRn3_param.flag &&
       !SetRSP(4, LRLRn3_lengths, LRLRn3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRn3_param";
+    AERROR << "Fail at SetRSP with LRLRn3_param";
     return false;
   }
 
@@ -382,7 +382,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRn4_types[] = "RLRL";
   if (LRLRn4_param.flag &&
       !SetRSP(4, LRLRn4_lengths, LRLRn4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRn4_param";
+    AERROR << "Fail at SetRSP with LRLRn4_param";
     return false;
   }
 
@@ -393,7 +393,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRp1_types[] = "LRLR";
   if (LRLRp1_param.flag &&
       !SetRSP(4, LRLRp1_lengths, LRLRp1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRp1_param";
+    AERROR << "Fail at SetRSP with LRLRp1_param";
     return false;
   }
 
@@ -404,7 +404,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRp2_types[] = "LRLR";
   if (LRLRp2_param.flag &&
       !SetRSP(4, LRLRp2_lengths, LRLRp2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRp2_param";
+    AERROR << "Fail at SetRSP with LRLRp2_param";
     return false;
   }
 
@@ -415,7 +415,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRp3_types[] = "RLRL";
   if (LRLRp3_param.flag &&
       !SetRSP(4, LRLRp3_lengths, LRLRp3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRp3_param";
+    AERROR << "Fail at SetRSP with LRLRp3_param";
     return false;
   }
 
@@ -426,7 +426,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   char LRLRp4_types[] = "RLRL";
   if (LRLRp4_param.flag &&
       !SetRSP(4, LRLRp4_lengths, LRLRp4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRp4_param";
+    AERROR << "Fail at SetRSP with LRLRp4_param";
     return false;
   }
   return true;
@@ -441,7 +441,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL1_types[] = "LRSL";
   if (LRSL1_param.flag &&
       !SetRSP(4, LRSL1_lengths, LRSL1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSL1_param";
+    AERROR << "Fail at SetRSP with LRSL1_param";
     return false;
   }
 
@@ -452,7 +452,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL2_types[] = "LRSL";
   if (LRSL2_param.flag &&
       !SetRSP(4, LRSL2_lengths, LRSL2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSL2_param";
+    AERROR << "Fail at SetRSP with LRSL2_param";
     return false;
   }
 
@@ -463,7 +463,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL3_types[] = "RLSR";
   if (LRSL3_param.flag &&
       !SetRSP(4, LRSL3_lengths, LRSL3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSL3_param";
+    AERROR << "Fail at SetRSP with LRSL3_param";
     return false;
   }
 
@@ -474,7 +474,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL4_types[] = "RLSR";
   if (LRSL4_param.flag &&
       !SetRSP(4, LRSL4_lengths, LRSL4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSL4_param";
+    AERROR << "Fail at SetRSP with LRSL4_param";
     return false;
   }
 
@@ -485,7 +485,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR1_types[] = "LRSR";
   if (LRSR1_param.flag &&
       !SetRSP(4, LRSR1_lengths, LRSR1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR1_param";
+    AERROR << "Fail at SetRSP with LRSR1_param";
     return false;
   }
 
@@ -496,7 +496,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR2_types[] = "LRSR";
   if (LRSR2_param.flag &&
       !SetRSP(4, LRSR2_lengths, LRSR2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR2_param";
+    AERROR << "Fail at SetRSP with LRSR2_param";
     return false;
   }
 
@@ -507,7 +507,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR3_types[] = "RLSL";
   if (LRSR3_param.flag &&
       !SetRSP(4, LRSR3_lengths, LRSR3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR3_param";
+    AERROR << "Fail at SetRSP with LRSR3_param";
     return false;
   }
 
@@ -518,7 +518,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR4_types[] = "RLSL";
   if (LRSR4_param.flag &&
       !SetRSP(4, LRSR4_lengths, LRSR4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR4_param";
+    AERROR << "Fail at SetRSP with LRSR4_param";
     return false;
   }
 
@@ -533,7 +533,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL5_types[] = "LSRL";
   if (LRSL5_param.flag &&
       !SetRSP(4, LRSL5_lengths, LRSL5_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRLRn_param";
+    AERROR << "Fail at SetRSP with LRLRn_param";
     return false;
   }
 
@@ -544,7 +544,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL6_types[] = "LSRL";
   if (LRSL6_param.flag &&
       !SetRSP(4, LRSL6_lengths, LRSL6_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSL6_param";
+    AERROR << "Fail at SetRSP with LRSL6_param";
     return false;
   }
 
@@ -555,7 +555,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL7_types[] = "RSLR";
   if (LRSL7_param.flag &&
       !SetRSP(4, LRSL7_lengths, LRSL7_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSL7_param";
+    AERROR << "Fail at SetRSP with LRSL7_param";
     return false;
   }
 
@@ -566,7 +566,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSL8_types[] = "RSLR";
   if (LRSL8_param.flag &&
       !SetRSP(4, LRSL8_lengths, LRSL8_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSL8_param";
+    AERROR << "Fail at SetRSP with LRSL8_param";
     return false;
   }
 
@@ -577,7 +577,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR5_types[] = "RSRL";
   if (LRSR5_param.flag &&
       !SetRSP(4, LRSR5_lengths, LRSR5_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR5_param";
+    AERROR << "Fail at SetRSP with LRSR5_param";
     return false;
   }
 
@@ -588,7 +588,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR6_types[] = "RSRL";
   if (LRSR6_param.flag &&
       !SetRSP(4, LRSR6_lengths, LRSR6_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR6_param";
+    AERROR << "Fail at SetRSP with LRSR6_param";
     return false;
   }
 
@@ -599,7 +599,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR7_types[] = "LSLR";
   if (LRSR7_param.flag &&
       !SetRSP(4, LRSR7_lengths, LRSR7_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR7_param";
+    AERROR << "Fail at SetRSP with LRSR7_param";
     return false;
   }
 
@@ -610,7 +610,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   char LRSR8_types[] = "LSLR";
   if (LRSR8_param.flag &&
       !SetRSP(4, LRSR8_lengths, LRSR8_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSR8_param";
+    AERROR << "Fail at SetRSP with LRSR8_param";
     return false;
   }
   return true;
@@ -624,7 +624,7 @@ bool ReedShepp::CCSCC(double x, double y, double phi,
   char LRSLR1_types[] = "LRSLR";
   if (LRSLR1_param.flag &&
       !SetRSP(5, LRSLR1_lengths, LRSLR1_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSLR1_param";
+    AERROR << "Fail at SetRSP with LRSLR1_param";
     return false;
   }
 
@@ -635,7 +635,7 @@ bool ReedShepp::CCSCC(double x, double y, double phi,
   char LRSLR2_types[] = "LRSLR";
   if (LRSLR2_param.flag &&
       !SetRSP(5, LRSLR2_lengths, LRSLR2_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSLR2_param";
+    AERROR << "Fail at SetRSP with LRSLR2_param";
     return false;
   }
 
@@ -646,7 +646,7 @@ bool ReedShepp::CCSCC(double x, double y, double phi,
   char LRSLR3_types[] = "RLSRL";
   if (LRSLR3_param.flag &&
       !SetRSP(5, LRSLR3_lengths, LRSLR3_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSLR3_param";
+    AERROR << "Fail at SetRSP with LRSLR3_param";
     return false;
   }
 
@@ -657,7 +657,7 @@ bool ReedShepp::CCSCC(double x, double y, double phi,
   char LRSLR4_types[] = "RLSRL";
   if (LRSLR4_param.flag &&
       !SetRSP(5, LRSLR4_lengths, LRSLR4_types, all_possible_paths)) {
-    AINFO << "Fail at SetRSP with LRSLR4_param";
+    AERROR << "Fail at SetRSP with LRSLR4_param";
     return false;
   }
   return true;
@@ -875,7 +875,7 @@ bool ReedShepp::SetRSP(int size, double lengths[], char types[],
   }
   path.total_length = sum;
   if (path.total_length <= 0.0) {
-    AINFO << "total length smaller than 0";
+    AERROR << "total length smaller than 0";
     return false;
   }
   all_possible_paths->emplace_back(path);
