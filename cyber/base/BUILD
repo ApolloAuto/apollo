@@ -5,12 +5,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "base",
     deps = [
-        "//cyber/base:any",
         "//cyber/base:atomic_fifo",
         "//cyber/base:atomic_hash_map",
         "//cyber/base:atomic_rw_lock",
         "//cyber/base:bounded_queue",
         "//cyber/base:concurrent_object_pool",
+        "//cyber/base:for_each",
         "//cyber/base:macros",
         "//cyber/base:object_pool",
         "//cyber/base:reentrant_rw_lock",
@@ -20,25 +20,6 @@ cc_library(
         "//cyber/base:thread_safe_queue",
         "//cyber/base:unbounded_queue",
         "//cyber/base:wait_strategy",
-    ],
-)
-
-cc_library(
-    name = "any",
-    hdrs = [
-        "any.h",
-    ],
-)
-
-cc_test(
-    name = "any_test",
-    size = "small",
-    srcs = [
-        "any_test.cc",
-    ],
-    deps = [
-        "//cyber/base:any",
-        "@gtest//:main",
     ],
 )
 
@@ -120,6 +101,25 @@ cc_library(
     hdrs = [
         "concurrent_object_pool.h",
     ],
+)
+
+cc_library(
+    name = "for_each",
+    hdrs = [
+        "for_each.h",
+    ],
+)
+
+cc_test(
+    name = "for_each_test",
+    size = "small",
+    srcs = [
+        "for_each_test.cc",
+    ],
+    deps = [
+        "//cyber/base:for_each",
+        "@gtest//:main",
+    ]
 )
 
 cc_library(

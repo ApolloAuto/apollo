@@ -16,6 +16,7 @@
 
 #include "cyber/tools/cyber_recorder/recoverer.h"
 
+#include "cyber/base/for_each.h"
 #include "cyber/record/header_builder.h"
 
 namespace apollo {
@@ -51,7 +52,7 @@ bool Recoverer::Proc() {
     AINFO << "all information in index section will lost";
   } else {
     Index index = reader_.GetIndex();
-    for (int i = 0; i < index.indexes_size(); i++) {
+    FOR_EACH(i, 0, index.indexes_size()) {
       SingleIndex* single_index = index.mutable_indexes(i);
       if (single_index->type() != SectionType::SECTION_CHANNEL) {
         continue;

@@ -75,6 +75,7 @@ cc_library(
     srcs = [ "recoverer.cc", ],
     hdrs = [ "recoverer.h", ],
     deps = [
+        "//cyber/base:for_each",
         "//cyber/common:log",
         "//cyber/proto:record_cc_proto",
         "//cyber/record:header_builder",

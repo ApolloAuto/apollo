@@ -14,20 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/state.h"
+#include <gtest/gtest.h>
+#include <iostream>
+#include <memory>
+#include <vector>
 
-#include <atomic>
+#include "cyber/base/for_each.h"
 
 namespace apollo {
 namespace cyber {
+namespace base {
 
-namespace {
-std::atomic<State> g_cyber_state;
+TEST(ForEachTest, base) {
+  std::vector<int> vec;
+  FOR_EACH(i, 0, 100) { vec.push_back(i); }
+  EXPECT_EQ(100, vec.size());
+
+  int index = 0;
+  FOR_EACH(it, vec.begin(), vec.end()) { EXPECT_EQ(index++, *it); }
+
+  FOR_EACH(i, 0, 'a') { EXPECT_GT('a', i); }
 }
 
-State GetState() { return g_cyber_state.load(); }
-
-void SetState(const State& state) { g_cyber_state.store(state); }
-
+}  // namespace base
 }  // namespace cyber
 }  // namespace apollo
