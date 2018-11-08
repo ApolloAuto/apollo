@@ -178,9 +178,14 @@ SidePassPathDecider::GetPathBoundaries(
     const IndexedList<std::string, Obstacle> &indexed_obstacles) {
   std::vector<std::tuple<double, double, double>> lateral_bounds;
 
-  const auto nearest_obs_sl_boundary =
-      GetNearestObstacle(adc_sl_boundary, reference_line, indexed_obstacles)
-          ->PerceptionSLBoundary();
+  const auto nearest_obstacle = GetNearestObstacle(
+      adc_sl_boundary, reference_line, indexed_obstacles);
+  if (nearest_obstacle == nullptr) {
+    AERROR << "Can't find nearest obstacle.";
+    return lateral_bounds;
+  }
+
+  const auto nearest_obs_sl_boundary = nearest_obstacle->PerceptionSLBoundary();
 
   // Get road info at every point and fill in the boundary condition vector.
   const double s_increment = 1.0;
