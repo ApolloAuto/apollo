@@ -36,7 +36,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign_protected {
+namespace stop_sign_unprotected {
 
 using common::TrajectoryPoint;
 using common::time::Clock;
@@ -213,7 +213,7 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
   return 0;
 }
 
-}  // namespace stop_sign_protected
+}  // namespace stop_sign_unprotected
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
