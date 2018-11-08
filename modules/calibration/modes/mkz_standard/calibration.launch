@@ -14,7 +14,7 @@
 
 	<module>
 		<name>velodyne</name>
-		<dag_conf>/apollo/modules/drivers/velodyne/dag/velodyne_udelv.dag</dag_conf>
+		<dag_conf>/apollo/modules/drivers/velodyne/dag/velodyne.dag</dag_conf>
 		<process_name>compute</process_name>
 		<sched_name>CYBER_COMPUTE</sched_name>
 		<version>1.0.0</version>
@@ -22,7 +22,7 @@
 
 	<module>
 		<name>camera</name>
-		<dag_conf>/apollo/modules/drivers/camera/dag/camera_udelv.dag</dag_conf>
+		<dag_conf>/apollo/modules/drivers/camera/dag/camera.dag</dag_conf>
 		<process_name>compute</process_name>
 		<sched_name>CYBER_COMPUTE</sched_name>
 		<version>1.0.0</version>
@@ -30,7 +30,7 @@
 
 	<module>
 		<name>conti_radar</name>
-		<dag_conf>/apollo/modules/drivers/radar/conti_radar/dag/conti_radar_udelv.dag</dag_conf>
+		<dag_conf>/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag</dag_conf>
 		<process_name>compute</process_name>
 		<sched_name>CYBER_COMPUTE</sched_name>
 		<version>1.0.0</version>
