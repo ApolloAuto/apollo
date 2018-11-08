@@ -30,6 +30,8 @@ from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
     AvgPool1dParameter, LaneFeatureConvParameter, ObsFeatureFCParameter,\
     ClassifyParameter, RegressParameter, CruiseModelParameter
 
+from cruise_models import FullyConn_NN, FCNN_CNN1D
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -43,6 +45,8 @@ from sklearn.utils import class_weight
 
 from common.configure import parameters
 
+# TODO(panjiacheng): the data-loader part needs to be modified.
+
 # Constants
 dim_input = parameters['cruise_mlp']['dim_input']
 dim_hidden_1 = parameters['cruise_mlp']['dim_hidden_1']
@@ -53,139 +57,6 @@ dim_output = parameters['cruise_mlp']['dim_output']
 cuda_is_available = torch.cuda.is_available()
 logging.basicConfig(filename='training.log', level=logging.INFO)
 
-#evaluation_log_path = os.path.join(os.getcwd(), "evaluation_report")
-#common.log.init_log(evaluation_log_path, level=logging.DEBUG)
-
-'''
-Model definition:
-    - Fully-connected layers for classification and regression, respectively.
-    - It will compute a classification score indicating the probability
-      of the obstacle choosing the given lane.
-    - It will also compute a time indicating how soon the obstacle will reach
-      the center of the given lane.
-'''
-class FullyConn_NN(torch.nn.Module):
-    def __init__(self):
-        super(FullyConn_NN, self).__init__()
-        self.classify = torch.nn.Sequential(\
-                            nn.Linear(174, 88),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.3),\
-
-                            nn.Linear(88, 55),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.2),\
-
-                            nn.Linear(55, 23),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.3),\
-
-                            nn.Linear(23, 10),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.0),\
-
-                            nn.Linear(10, 1),\
-                            nn.Sigmoid()
-                                            )
-        self.regress = torch.nn.Sequential(\
-                            nn.Linear(174, 88),\
-                            nn.ReLU(),\
-                            nn.Dropout(0.1),\
-                              
-                            nn.Linear(88, 23),\
-                            nn.ReLU(),\
-                            nn.Dropout(0.1),\
-                               
-                            nn.Linear(23, 1),\
-                            nn.ReLU()
-                                            )
-    def forward(self, x):
-        out_c = self.classify(x)
-        out_r = self.regress(x)
-        return out_c, out_r
-
-
-
-class FCNN_CNN1D(torch.nn.Module):
-    def __init__(self):
-        super(FCNN_CNN1D, self).__init__()
-        self.lane_feature_conv = torch.nn.Sequential(\
-                            nn.Conv1d(5, 10, 3, stride=1),\
-                            #nn.BatchNorm1d(10),\
-                            nn.ReLU(),\
-                            nn.Conv1d(10, 16, 3, stride=2),\
-                            #nn.BatchNorm1d(16),\
-                            nn.ReLU(),\
-                            nn.Conv1d(16, 25, 3, stride=2),\
-                            #nn.BatchNorm1d(25)
-                            )
-        self.lane_feature_maxpool = nn.MaxPool1d(3)
-        self.lane_feature_avgpool = nn.AvgPool1d(3)
-        self.lane_feature_dropout = nn.Dropout(0.0)
-
-        self.obs_feature_fc = torch.nn.Sequential(\
-                            nn.Linear(24, 17),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.0),\
-                            nn.Linear(17, 12),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.0),\
-                            )
-
-        self.classify = torch.nn.Sequential(\
-                            nn.Linear(124, 66),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.3),\
-
-                            nn.Linear(66, 48),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.1),\
-
-                            nn.Linear(48, 11),\
-                            nn.Sigmoid(),\
-                            nn.Dropout(0.1),\
-
-                            nn.Linear(11, 1),\
-                            #nn.Sigmoid()
-                                            )
-        self.regress = torch.nn.Sequential(\
-                            nn.Linear(125, 77),\
-                            nn.ReLU(),\
-                            nn.Dropout(0.2),\
-
-                            nn.Linear(77, 46),\
-                            nn.ReLU(),\
-                            nn.Dropout(0.2),\
-
-                            nn.Linear(46, 12),\
-                            nn.ReLU(),\
-                            nn.Dropout(0.1),\
-
-                            nn.Linear(12, 1),\
-                            nn.ReLU()
-                                            )
-    def forward(self, x):
-        lane_fea = x[:,24:]
-        lane_fea = lane_fea.view(lane_fea.size(0), 5, 30)
-
-        obs_fea = x[:,:24]
-
-        lane_fea = self.lane_feature_conv(lane_fea)
-        #print (lane_fea.shape)
-        lane_fea_max = self.lane_feature_maxpool(lane_fea)
-        lane_fea_avg = self.lane_feature_avgpool(lane_fea)
-
-        lane_fea = torch.cat([lane_fea_max.view(lane_fea_max.size(0),-1), \
-                              lane_fea_avg.view(lane_fea_avg.size(0),-1)], 1)
-        lane_fea = self.lane_feature_dropout(lane_fea)
-
-        #obs_fea = self.obs_feature_fc(obs_fea)
-        #print (lane_fea.shape)
-        tot_fea = torch.cat([lane_fea, obs_fea], 1)
-        out_c = self.classify(tot_fea)
-        out_r = self.regress(torch.cat([tot_fea, out_c], 1))
-
-        return out_c, out_r
 
 
 def load_Conv1dParameter(model, key, stride=1):
@@ -364,6 +235,7 @@ def load_data(filename):
     print("load file success")
     return samples['data']
 
+
 '''
 Preprocess the data.
 (Only for non data-loader case)
@@ -373,23 +245,26 @@ Preprocess the data.
     - shuffle data
 '''
 def data_preprocessing(data):
-    X_other_obs = data[:, 83:91]
+    # Various input features separation
     X_obs_old_features = data[:, 0:23]
+    X_surround_obs = data[:, 83:91]
     X_obs_now = data[:, 23:29]
     X_obs_hist_5 = data[:, 29:53]
+    X_lane = data[:, 91:-dim_output]
 
     # mask out those that don't have any history
     mask5 = (data[:,53] != 100)
 
-    X_lane = data[:, 91:-dim_output]
     X = np.concatenate((X_obs_hist_5, X_lane), axis=1)
     X = X[mask5, :]
-
     y = data[:, -dim_output:]
     y = y[mask5, :]
-    #y[:, 0] = (y[:, 0] > 0).astype(float)
-    y[:, 0] = np.logical_and((y[:, 0] > 0), (y[:, 1] < 1.0))
 
+    # Binary classification
+    y[:, 0] = (y[:, 0] > 0).astype(float)
+    #y[:, 0] = np.logical_and((y[:, 0] > 0), (y[:, 1] < 1.0))
+
+    # Random shuffling
     X_new, X_dummy, y_new, y_dummy = train_test_split(X, y, test_size=0.0, random_state=233)
 
     return X_new, y_new #, X_dummy, y_dummy
@@ -463,10 +338,11 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
     model.train()
 
     loss_history = []
-    logging.info('Epoch: {}'.format(epoch))
+    logging.info('Epoch: {}'.format(epoch+1))
+    print ('Epoch: {}.'.format(epoch+1))
     num_of_data = train_X.shape[0]
     num_of_batch = int(num_of_data / batch_size) + 1
-    train_correct_class = 0
+    pred_y = None
     for i in range(num_of_batch):
         optimizer.zero_grad()
         X = train_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
@@ -476,21 +352,68 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
         loss_history.append(loss.data)
         loss.backward()
         optimizer.step()
-        train_correct_class += \
-            np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
-                    y[:,0].data.cpu().numpy().reshape(y.data.cpu().numpy().shape[0],1))
 
-        if i % 100 == 0:
+        c_pred = c_pred.data.cpu().numpy()
+        c_pred = c_pred.reshape(c_pred.shape[0],1)
+        pred_y = np.concatenate((pred_y, c_pred), axis=0) if pred_y is not None \
+                    else c_pred
+
+        if (i > 0) and (i % 100 == 0):
             logging.info('Step: {}, train_loss: {}'.format(i, np.mean(loss_history[-100:])))
             print ("Step: {}, training loss: {}".format(i, np.mean(loss_history[-100:])))
 
-    train_classification_accuracy = train_correct_class / train_y.data.cpu().numpy().shape[0]
+    pred_y = (pred_y > 0.5)
+    train_y = train_y.data.cpu().numpy()
+    training_accuracy = sklearn.metrics.accuracy_score(train_y[:,0], pred_y.reshape(-1))
     train_loss = np.mean(loss_history)
     logging.info('Training loss: {}'.format(train_loss))
-    logging.info('Training Accuracy: {}.'.format(train_classification_accuracy))
-    print ('Epoch: {}.'.format(epoch))
-    print ('Training Loss: {}'.format(train_loss))
-    print ('Training Accuracy: {}.'.format(train_classification_accuracy))
+    logging.info('Training Accuracy: {}.'.format(training_accuracy))
+    
+    print ('Training Loss: {}. Training Accuracy: {}'\
+            .format(train_loss, training_accuracy))
+
+
+'''
+Validation (vanilla version without dataloader)
+'''
+def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
+    model.eval()
+
+    loss_history = []
+    num_of_data = valid_X.shape[0]
+    num_of_batch = int(num_of_data / batch_size) + 1
+    pred_y = None
+    for i in range(num_of_batch):
+        X = valid_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
+        y = valid_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
+        c_pred, r_pred = model(X)
+        valid_loss = loss_fn(c_pred, r_pred, y)
+        loss_history.append(valid_loss.data)
+
+        c_pred = c_pred.data.cpu().numpy()
+        c_pred = c_pred.reshape(c_pred.shape[0],1)
+
+        pred_y = np.concatenate((pred_y, c_pred), axis=0) if pred_y is not None \
+                    else c_pred
+        
+    valid_y = valid_y.data.cpu().numpy()
+    valid_auc = sklearn.metrics.roc_auc_score(valid_y[:,0], pred_y.reshape(-1))
+    pred_y = (pred_y > 0.5)
+    valid_accuracy = sklearn.metrics.accuracy_score(valid_y[:,0], pred_y.reshape(-1))
+    valid_precision = sklearn.metrics.precision_score(valid_y[:,0], pred_y.reshape(-1))
+    valid_recall = sklearn.metrics.recall_score(valid_y[:,0], pred_y.reshape(-1))
+
+    logging.info('Validation loss: {}. Accuracy: {}.\
+                  Precision: {}. Recall: {}. AUC: {}.'
+        .format(np.mean(loss_history), valid_accuracy, valid_precision,\
+                valid_recall, valid_auc))
+    print ('Validation loss: {}. Accuracy: {}.\
+            Precision: {}. Recall: {}. AUC: {}.'
+        .format(np.mean(loss_history), valid_accuracy, valid_precision,\
+                valid_recall, valid_auc))
+
+    return np.mean(loss_history)
+
 
 '''
 Train the data. (using dataloader)
@@ -528,59 +451,6 @@ def train_dataloader(train_loader, model, optimizer, epoch):
     train_loss = np.mean(loss_history)
     logging.info('Training loss: {}'.format(train_loss))
     print ('Epoch: {}. Training Loss: {}'.format(epoch, train_loss))
-
-
-'''
-Validation (vanilla version without dataloader)
-'''
-def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
-    model.eval()
-
-    loss_history = []
-    valid_correct_class = 0.0
-    num_of_data = valid_X.shape[0]
-    num_of_batch = int(num_of_data / batch_size) + 1
-    pred_y = None
-    for i in range(num_of_batch):
-        X = valid_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
-        y = valid_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
-        c_pred, r_pred = model(X)
-        valid_loss = loss_fn(c_pred, r_pred, y)
-        loss_history.append(valid_loss.data)
-
-        c_pred = c_pred.data.cpu().numpy()
-        c_pred = c_pred.reshape(c_pred.shape[0],1)
-
-        pred_y = np.concatenate((pred_y, c_pred), axis=0) if pred_y is not None \
-                    else c_pred
-        #valid_correct_class += \
-        #    np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
-        #            y[:,0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0],1))
-
-    #valid_classification_accuracy = valid_correct_class / valid_y.data.cpu().numpy().shape[0]
-    valid_y = valid_y.data.cpu().numpy()
-    #print (min(valid_y[:,0]))
-    #print (max(valid_y[:,0]))
-    #print (min(pred_y))
-    #print (max(pred_y))
-
-    valid_auc = sklearn.metrics.roc_auc_score(valid_y[:,0], pred_y.reshape(-1))
-    pred_y = (pred_y > 0.5)
-
-    valid_accuracy = sklearn.metrics.accuracy_score(valid_y[:,0], pred_y.reshape(-1))
-    valid_precision = sklearn.metrics.precision_score(valid_y[:,0], pred_y.reshape(-1))
-    valid_recall = sklearn.metrics.recall_score(valid_y[:,0], pred_y.reshape(-1))
-
-    logging.info('Validation loss: {}. Accuracy: {}.\
-                  Precision: {}. Recall: {}. AUC: {}.'
-        .format(np.mean(loss_history), valid_accuracy, valid_precision,\
-                valid_recall, valid_auc))
-    print ('Validation loss: {}. Accuracy: {}.\
-            Precision: {}. Recall: {}. AUC: {}.'
-        .format(np.mean(loss_history), valid_accuracy, valid_precision,\
-                valid_recall, valid_auc))
-
-    return np.mean(loss_history)
 
 
 '''
@@ -624,8 +494,14 @@ if __name__ == "__main__":
         (description='train neural network based on feature files and save parameters')
     parser.add_argument('train_file', type=str, help='training data (h5)')
     parser.add_argument('valid_file', type=str, help='validation data (h5)')
-    parser.add_argument('-d', '--data_loader', action='store_true', \
+    parser.add_argument('-n', '--network-structure', type=int, default=1, \
+        help='Specify which network to use:\n \
+              \t 0: Fully connected neural network.\n \
+              \t 1: 1D-CNN for lane feature extraction.')
+    parser.add_argument('-d', '--data-loader', action='store_true', \
         help='Use the dataloader (when memory size is smaller than dataset size)')
+    parser.add_argument('-s', '--save-path', type=str, default='./', \
+        help='Specify the directory to save trained models.')
     #parser.add_argument('-g', '--gpu_num', type=int, default=0, \
     #    help='Specify which GPU to use.')
 
@@ -636,23 +512,31 @@ if __name__ == "__main__":
 
     if not args.data_loader:
 
+        # Load from file and print out general information of the data.
         train_file = args.train_file
         valid_file = args.valid_file
-
         train_data = load_data(train_file)
         valid_data = load_data(valid_file)
-
-        print ("Data load success.")
-        print ("Training data size = ", train_data.shape)
-        print ("Validation data size = ", valid_data.shape)
+        print ('Data loaded successfully.')
+        classes_train = np.asarray(train_data[:,-dim_output])
+        print ('Total number of training samples: {}'.format(len(classes_train)))
+        print ('Training set distribution:')
+        print_dist (classes_train)
+        classes_valid = np.asarray(valid_data[:,-dim_output])
+        print ('Total number of validation samples: {}'.format(len(classes_valid)))
+        print ('Validation set distribution:')
+        print_dist (classes_valid)
 
         # Data preprocessing
         X_train, y_train = data_preprocessing(train_data)
         X_valid, y_valid = data_preprocessing(valid_data)
-        #X_train, y_train, X_valid, y_valid = data_preprocessing(train_data)
 
         # Model declaration
-        model = FCNN_CNN1D()
+        model = None
+        if args.network_structure == 0:
+            model = FullyConn_NN()
+        elif args.network_structure == 1:
+            model = FCNN_CNN1D()
         print ("The model used is: ")
         print (model)
         learning_rate = 6.561e-4
@@ -672,13 +556,14 @@ if __name__ == "__main__":
 
         # Model training:
         best_valid_loss = float('+inf')
-        for epoch in range(100):
+        for epoch in range(50):
             train_vanilla(X_train, y_train, model, optimizer, epoch)
             valid_loss = validate_vanilla(X_valid, y_valid, model)
             scheduler.step(valid_loss)
             if valid_loss < best_valid_loss:
-                torch.save(model.state_dict(), './cruiseMLP_saved_model.pt')
-        
+                torch.save(model.state_dict(), args.save_path + 'cruise_model{}_epoch{}_valloss{:.6f}.pt'\
+                           .format(args.network_structure, epoch+1, valid_loss))
+
     else:
         train_dir = args.train_file
         valid_dir = args.valid_file
