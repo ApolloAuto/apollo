@@ -30,7 +30,7 @@ TEST(AllTrajectoryTests, GetCostFromObsSL) {
   obs_sl_boundary.set_start_l(-1.5);
   obs_sl_boundary.set_end_l(-0.2);
   auto cost = tc.GetCostFromObsSL(5.0, 0.5, obs_sl_boundary);
-  EXPECT_FLOAT_EQ(cost.safety_cost, 3.0669413e-05);
+  EXPECT_FLOAT_EQ(cost.safety_cost, 0.0);
   EXPECT_FLOAT_EQ(cost.smoothness_cost, 0.0);
   EXPECT_FALSE(cost.cost_items.at(0));
   EXPECT_FALSE(cost.cost_items.at(1));
@@ -45,7 +45,7 @@ TEST(AllTrajectoryTests, GetCostFromObsSL) {
   obs_sl_boundary1.set_end_l(-0.2);
   auto cost1 = tc.GetCostFromObsSL(21.0, -0.5, obs_sl_boundary1);
 
-  EXPECT_FLOAT_EQ(cost1.safety_cost, 676.73517161369182);
+  EXPECT_FLOAT_EQ(cost1.safety_cost, 462.57016);
   EXPECT_FLOAT_EQ(cost1.smoothness_cost, 0.0);
   EXPECT_TRUE(cost1.cost_items.at(0));
   EXPECT_FALSE(cost1.cost_items.at(1));

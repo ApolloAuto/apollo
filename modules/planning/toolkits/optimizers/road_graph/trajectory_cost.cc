@@ -215,6 +215,9 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ComparableCost obstacle_cost;
+  if (obs_sl_boundary.start_l() * obs_sl_boundary.end_l() <= 0.0) {
+    return obstacle_cost;
+  }
 
   const double adc_front_s = adc_s + vehicle_param.front_edge_to_center();
   const double adc_end_s = adc_s - vehicle_param.back_edge_to_center();
@@ -252,11 +255,6 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
         Sigmoid(config_.obstacle_collision_distance() - delta_l);
   }
 
-  const double delta_s = std::fabs(
-      adc_s - (obs_sl_boundary.start_s() + obs_sl_boundary.end_s()) / 2.0);
-  obstacle_cost.safety_cost +=
-      config_.obstacle_collision_cost() *
-      Sigmoid(config_.obstacle_collision_distance() - delta_s);
   return obstacle_cost;
 }
 
@@ -294,11 +292,11 @@ Box2d TrajectoryCost::GetBoxFromSLPoint(const common::SLPoint &sl,
 }
 
 // TODO(All): optimize obstacle cost calculation time
-ComparableCost TrajectoryCost::Calculate(
-    const QuinticPolynomialCurve1d &curve,
-    const double start_s, const double end_s,
-    const uint32_t curr_level,
-    const uint32_t total_level) {
+ComparableCost TrajectoryCost::Calculate(const QuinticPolynomialCurve1d &curve,
+                                         const double start_s,
+                                         const double end_s,
+                                         const uint32_t curr_level,
+                                         const uint32_t total_level) {
   ComparableCost total_cost;
   // path cost
   total_cost +=
