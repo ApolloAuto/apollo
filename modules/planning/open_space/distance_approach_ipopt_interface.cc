@@ -19,7 +19,6 @@
  */
 
 #include "modules/planning/open_space/distance_approach_ipopt_interface.h"
-#include <iostream>
 
 namespace apollo {
 namespace planning {
@@ -723,7 +722,7 @@ bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
       Eigen::MatrixXd bj =
           obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-      // norm(A* lambda) = 1
+      // norm(A* lambda) <= 1
       double tmp1 = 0.0;
       double tmp2 = 0.0;
       for (int k = 0; k < current_edges_num; ++k) {

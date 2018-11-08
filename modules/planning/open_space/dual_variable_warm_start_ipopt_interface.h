@@ -21,6 +21,7 @@
 #pragma once
 
 #include <vector>
+#include <limits>
 
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
@@ -98,7 +99,7 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
  private:
   int num_of_variables_;
   int num_of_constraints_;
-  std::size_t horizon_;
+  int horizon_;
   float ts_;
   Eigen::MatrixXd ego_;
 
@@ -111,17 +112,17 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   std::vector<double> g_;
   double offset_;
   Eigen::MatrixXi obstacles_edges_num_;
-  std::size_t obstacles_num_;
-  std::size_t obstacles_edges_sum_;
+  int obstacles_num_;
+  int obstacles_edges_sum_;
 
   // lagrangian l start index
-  std::size_t l_start_index_ = 0;
+  int l_start_index_ = 0;
 
   // lagrangian n start index
-  std::size_t n_start_index_ = 0;
+  int n_start_index_ = 0;
 
   // lagrangian d start index
-  std::size_t d_start_index_ = 0;
+  int d_start_index_ = 0;
 
   // obstacles_A
   Eigen::MatrixXd obstacles_A_;

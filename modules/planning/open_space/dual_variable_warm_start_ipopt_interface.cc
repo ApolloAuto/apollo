@@ -32,30 +32,31 @@
 namespace apollo {
 namespace planning {
 
-constexpr std::size_t N = 80;
-
 DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
-    int num_of_variables, int num_of_constraints, std::size_t horizon, float ts,
+    int num_of_variables, int num_of_constraints, size_t horizon, float ts,
     const Eigen::MatrixXd& ego, const Eigen::MatrixXi& obstacles_edges_num,
-    const std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
+    const size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
     const Eigen::MatrixXd& obstacles_b, const Eigen::MatrixXd& xWS,
     const PlannerOpenSpaceConfig& planner_open_space_config)
     : num_of_variables_(num_of_variables),
       num_of_constraints_(num_of_constraints),
-      horizon_(horizon),
       ts_(ts),
       ego_(ego),
       obstacles_edges_num_(obstacles_edges_num),
-      obstacles_num_(obstacles_num),
       obstacles_A_(obstacles_A),
       obstacles_b_(obstacles_b),
       xWS_(xWS) {
+  CHECK(horizon < std::numeric_limits<int>::max())
+      << "Invalid cast on horizon in open space planner";
+  horizon_ = static_cast<int>(horizon);
+  CHECK(obstacles_num < std::numeric_limits<int>::max())
+      << "Invalid cast on obstacles_num in open space planner";
+  obstacles_num_ = static_cast<int>(obstacles_num);
   w_ev_ = ego_(1, 0) + ego_(3, 0);
   l_ev_ = ego_(0, 0) + ego_(2, 0);
-
   g_ = {l_ev_ / 2, w_ev_ / 2, l_ev_ / 2, w_ev_ / 2};
   offset_ = (ego_(0, 0) + ego_(2, 0)) / 2 - ego_(2, 0);
-  obstacles_edges_sum_ = std::size_t(obstacles_edges_num_.sum());
+  obstacles_edges_sum_ = obstacles_edges_num_.sum();
   l_start_index_ = 0;
   n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
   d_start_index_ = n_start_index_ + 4 * obstacles_num_ * (horizon_ + 1);
@@ -80,9 +81,9 @@ bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
   // TODO(QiL) : Update nnz_jac_g;
   int tmp = 0;
 
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      std::size_t current_edges_num = obstacles_edges_num_(j, 0);
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
+      int current_edges_num = obstacles_edges_num_(j, 0);
       tmp += current_edges_num * 4 + 2 + 2 + 4 + 1;
     }
   }
@@ -108,30 +109,30 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   CHECK(init_z == false) << "Warm start init_z setting failed";
   CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
 
-  std::size_t l_index = l_start_index_;
-  std::size_t n_index = n_start_index_;
-  std::size_t d_index = d_start_index_;
+  int l_index = l_start_index_;
+  int n_index = n_start_index_;
+  int d_index = d_start_index_;
   ADEBUG << "l_start_index_ : " << l_start_index_;
   ADEBUG << "n_start_index_ : " << n_start_index_;
   ADEBUG << "d_start_index_ : " << d_start_index_;
   // 1. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_edges_sum_; ++j) {
       x[l_index] = 0.5;
       ++l_index;
     }
   }
 
   // 2. lagrange constraint n, 4*obstacles_num * (horizon_+1)
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < 4 * obstacles_num_; ++j) {
       x[n_index] = 0.5;
       ++n_index;
     }
   }
   // 3. d, [0, obstacles_num] * [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
       x[d_index] = 0.0;
       ++d_index;
     }
@@ -152,11 +153,11 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
       << "num_of_constraints_ mismatch, m: " << m
       << ", num_of_constraints_: " << num_of_constraints_;
 
-  std::size_t variable_index = 0;
+  int variable_index = 0;
   // 1. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
   // horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_edges_sum_; ++j) {
       x_l[variable_index] = 0.0;
       x_u[variable_index] = 10.0;
       ++variable_index;
@@ -165,8 +166,8 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "variable_index after adding lagrange l : " << variable_index;
 
   // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < 4 * obstacles_num_; ++j) {
       x_l[variable_index] = 0.0;
       x_u[variable_index] = 10.0;
       ++variable_index;
@@ -175,8 +176,8 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   ADEBUG << "variable_index after adding lagrange n : " << variable_index;
 
   // 3. d, [0, obstacles_num-1] * [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
       // TODO(QiL): Load this from configuration
       x_l[variable_index] = 0.0;
       x_u[variable_index] = 10.0;
@@ -185,9 +186,9 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   }
   ADEBUG << "variable_index after adding d : " << variable_index;
 
-  std::size_t constraint_index = 0;
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+  int constraint_index = 0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
       // a. norm(A'*lambda) <= 1
       g_l[constraint_index] = 0.0;
       g_u[constraint_index] = 1.0;
@@ -214,9 +215,9 @@ bool DualVariableWarmStartIPOPTInterface::eval_f(int n, const double* x,
                                                  bool new_x,
                                                  double& obj_value) {
   obj_value = 0.0;
-  std::size_t d_index = d_start_index_;
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+  int d_index = d_start_index_;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
       obj_value += weight_d_ * x[d_index];
       ++d_index;
     }
@@ -229,10 +230,10 @@ bool DualVariableWarmStartIPOPTInterface::eval_grad_f(int n, const double* x,
                                                       bool new_x,
                                                       double* grad_f) {
   std::fill(grad_f, grad_f + n, 0.0);
-  std::size_t d_index = d_start_index_;
+  int d_index = d_start_index_;
   // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_num_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
       grad_f[d_index] = weight_d_;
       ++d_index;
     }
@@ -262,15 +263,15 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
   // 1. Three obstacles related equal constraints, one equality constraints,
   // [0, horizon_] * [0, obstacles_num_-1] * 4
 
-  std::size_t l_index = l_start_index_;
-  std::size_t n_index = n_start_index_;
-  std::size_t d_index = d_start_index_;
-  std::size_t constraint_index = 0;
+  int l_index = l_start_index_;
+  int n_index = n_start_index_;
+  int d_index = d_start_index_;
+  int constraint_index = 0;
 
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
     int edges_counter = 0;
-    for (std::size_t j = 0; j < obstacles_num_; ++j) {
-      std::size_t current_edges_num = obstacles_edges_num_(j, 0);
+    for (int j = 0; j < obstacles_num_; ++j) {
+      int current_edges_num = obstacles_edges_num_(j, 0);
       Eigen::MatrixXd Aj =
           obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
       Eigen::MatrixXd bj =
@@ -279,7 +280,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
       // norm(A* lambda) <= 1
       double tmp1 = 0.0;
       double tmp2 = 0.0;
-      for (std::size_t k = 0; k < current_edges_num; ++k) {
+      for (int k = 0; k < current_edges_num; ++k) {
         // TODO(QiL) : replace this one directly with x
         tmp1 += Aj(k, 0) * x[l_index + k];
         tmp2 += Aj(k, 1) * x[l_index + k];
@@ -298,12 +299,12 @@ bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
       //  d - (-g'*mu + (A*t - b)*lambda) = 0
       // TODO(QiL): Need to revise according to dual modeling
       double tmp3 = 0.0;
-      for (std::size_t k = 0; k < 4; ++k) {
+      for (int k = 0; k < 4; ++k) {
         tmp3 += g_[k] * x[n_index + k];
       }
 
       double tmp4 = 0.0;
-      for (std::size_t k = 0; k < current_edges_num; ++k) {
+      for (int k = 0; k < current_edges_num; ++k) {
         tmp4 += bj(k, 0) * x[l_index + k];
       }
 
@@ -337,20 +338,20 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
       << "No. of constraints wrong in eval_jac_g. n : " << m;
 
   if (values == nullptr) {
-    std::size_t nz_index = 0;
-    std::size_t constraint_index = 0;
+    int nz_index = 0;
+    int constraint_index = 0;
 
     // 1. Three obstacles related equal constraints, one equality constraints,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
-    std::size_t l_index = l_start_index_;
-    std::size_t n_index = n_start_index_;
-    std::size_t d_index = d_start_index_;
-    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-      for (std::size_t j = 0; j < obstacles_num_; ++j) {
-        std::size_t current_edges_num = obstacles_edges_num_(j, 0);
+    int l_index = l_start_index_;
+    int n_index = n_start_index_;
+    int d_index = d_start_index_;
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      for (int j = 0; j < obstacles_num_; ++j) {
+        int current_edges_num = obstacles_edges_num_(j, 0);
 
         // 1. norm(A* lambda <= 1)
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           // with respect to l
           iRow[nz_index] = constraint_index;
           jCol[nz_index] = l_index + k;
@@ -359,7 +360,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
 
         // 2. G' * mu + R' * lambda == 0, part 1
         // with respect to l
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           iRow[nz_index] = constraint_index + 1;
           jCol[nz_index] = l_index + k;
           ++nz_index;
@@ -376,7 +377,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
 
         // 2. G' * mu + R' * lambda == 0, part 2
         // with respect to l
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           iRow[nz_index] = constraint_index + 2;
           jCol[nz_index] = l_index + k;
           ++nz_index;
@@ -393,14 +394,14 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
 
         //  -g'*mu + (A*t - b)*lambda > 0
         // with respect to l
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           iRow[nz_index] = constraint_index + 3;
           jCol[nz_index] = l_index + k;
           ++nz_index;
         }
 
         // with respect to n
-        for (std::size_t k = 0; k < 4; ++k) {
+        for (int k = 0; k < 4; ++k) {
           iRow[nz_index] = constraint_index + 3;
           jCol[nz_index] = n_index + k;
           ++nz_index;
@@ -418,25 +419,23 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         constraint_index += 4;
       }
     }
-    CHECK_EQ(constraint_index, static_cast<std::size_t>(m))
-        << "No. of constraints wrong in eval_jac_g. ";
+    CHECK_EQ(constraint_index, m) << "No. of constraints wrong in eval_jac_g. ";
 
-    //  CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
     ADEBUG << "nz_index here in Part I is : " << nz_index
            << " nele_jac is : " << nele_jac;
   } else {
     std::fill(values, values + nele_jac, 0.0);
-    std::size_t nz_index = 0;
+    int nz_index = 0;
 
     // 1. Three obstacles related equal constraints, one equality constraints,
     // [0, horizon_] * [0, obstacles_num_-1] * 4
-    std::size_t l_index = l_start_index_;
-    std::size_t n_index = n_start_index_;
+    int l_index = l_start_index_;
+    int n_index = n_start_index_;
 
-    for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-      std::size_t edges_counter = 0;
-      for (std::size_t j = 0; j < obstacles_num_; ++j) {
-        std::size_t current_edges_num = obstacles_edges_num_(j, 0);
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      int edges_counter = 0;
+      for (int j = 0; j < obstacles_num_; ++j) {
+        int current_edges_num = obstacles_edges_num_(j, 0);
         Eigen::MatrixXd Aj =
             obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
         Eigen::MatrixXd bj =
@@ -445,14 +444,14 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         // TODO(QiL) : Remove redudant calculation
         double tmp1 = 0;
         double tmp2 = 0;
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           // TODO(QiL) : replace this one directly with x
           tmp1 += Aj(k, 0) * x[l_index + k];
           tmp2 += Aj(k, 1) * x[l_index + k];
         }
 
         // 1. norm(A* lambda == 1)
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           // with respect to l
           values[nz_index] =
               2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
@@ -462,7 +461,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         // 2. G' * mu + R' * lambda == 0, part 1
 
         // with respect to l
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           values[nz_index] = std::cos(xWS_(2, i)) * Aj(k, 0) +
                              std::sin(xWS_(2, i)) * Aj(k, 1);  // v0~vn
           ++nz_index;
@@ -479,7 +478,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         // 3. G' * mu + R' * lambda == 0, part 2
 
         // with respect to l
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           values[nz_index] = -std::sin(xWS_(2, i)) * Aj(k, 0) +
                              std::cos(xWS_(2, i)) * Aj(k, 1);  // y0~yn
           ++nz_index;
@@ -496,16 +495,16 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         // TODO(QiL) Revise dual vairables modeling here.
         double tmp3 = 0.0;
         double tmp4 = 0.0;
-        for (std::size_t k = 0; k < 4; ++k) {
+        for (int k = 0; k < 4; ++k) {
           tmp3 += -g_[k] * x[n_index + k];
         }
 
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           tmp4 += bj(k, 0) * x[l_index + k];
         }
 
         // with respect to l
-        for (std::size_t k = 0; k < current_edges_num; ++k) {
+        for (int k = 0; k < current_edges_num; ++k) {
           values[nz_index] =
               -(xWS_(0, i) + std::cos(xWS_(2, i)) * offset_) * Aj(k, 0) -
               (xWS_(1, i) + std::sin(xWS_(2, i)) * offset_) * Aj(k, 1) +
@@ -514,7 +513,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         }
 
         // with respect to n
-        for (std::size_t k = 0; k < 4; ++k) {
+        for (int k = 0; k < 4; ++k) {
           values[nz_index] = g_[k];  // eek
           ++nz_index;
         }
@@ -531,7 +530,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
     }
 
     ADEBUG << "eval_jac_g, fulfilled obstacle constraint values";
-    CHECK_EQ(nz_index, static_cast<std::size_t>(nele_jac));
+    CHECK_EQ(nz_index, nele_jac);
   }
 
   ADEBUG << "eval_jac_g done";
@@ -543,11 +542,11 @@ void DualVariableWarmStartIPOPTInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  std::size_t variable_index = 0;
+  int variable_index = 0;
   // 1. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
   // horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < obstacles_edges_sum_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_edges_sum_; ++j) {
       l_warm_up_(0, i) = x[variable_index];
       ++variable_index;
     }
@@ -555,8 +554,8 @@ void DualVariableWarmStartIPOPTInterface::finalize_solution(
   ADEBUG << "variable_index after adding lagrange l : " << variable_index;
 
   // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
-  for (std::size_t i = 0; i < horizon_ + 1; ++i) {
-    for (std::size_t j = 0; j < 4 * obstacles_num_; ++j) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < 4 * obstacles_num_; ++j) {
       n_warm_up_(0, i) = x[variable_index];
       ++variable_index;
     }
