@@ -38,7 +38,7 @@ class CacheBuffer {
   CacheBuffer(const CacheBuffer& rhs) {
     std::lock_guard<std::mutex> lg(rhs.mutex_);
     head_ = rhs.head_;
-    tail_ = rhs.head_;
+    tail_ = rhs.tail_;
     buffer_ = rhs.buffer_;
     capacity_ = rhs.capacity_;
   }
