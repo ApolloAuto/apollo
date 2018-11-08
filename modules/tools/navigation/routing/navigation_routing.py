@@ -23,6 +23,9 @@ import thread
 import requests
 import json
 import pyproj
+import urllib3.contrib.pyopenssl
+import certifi
+import urllib3
 from std_msgs.msg import String
 from flask import jsonify
 from flask import Flask
@@ -52,7 +55,8 @@ line_we = None
 line_revloop = None
 
 projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
-
+urllib3.contrib.pyopenssl.inject_into_urllib3()
+http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 def add_listener():
     global routing_pub
@@ -116,10 +120,10 @@ def request_routing(request_json):
     url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + \
           start_latlon + "&destination=" + end_latlon + "&key=" + API_KEY
 
-    res = requests.get(url)
-    if res.status_code != 200:
+    res = http.request('GET', url)
+    if res.status != 200:
         return None
-    response = json.loads(res.content)
+    response = json.loads(res.data)
     if len(response['routes']) < 1:
         return None
     steps = response['routes'][0]['legs'][0]['steps']
