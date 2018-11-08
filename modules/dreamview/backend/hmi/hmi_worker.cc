@@ -171,7 +171,9 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
 
     // Construct start_command: nohup mainboard -p <process_name> -d <dag> ... &
     const std::string& process_name = cyber_module.process_name();
-    module.set_start_command(StrCat("nohup mainboard -p ", process_name));
+    module.set_start_command(StrCat(
+        "nohup mainboard -p ", process_name,
+        " -s ", cyber::proto::SchedName_Name(cyber_module.schedule())));
     for (const std::string& dag : cyber_module.dag_files()) {
       StrAppend(module.mutable_start_command(), " -d ", dag);
     }
