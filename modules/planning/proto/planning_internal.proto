@@ -123,8 +123,13 @@ message ScenarioDebug {
   optional apollo.planning.ScenarioConfig.StageType stage_type = 2;
 }
 
+
+message Trajectories {
+  repeated apollo.common.Trajectory trajectory = 1;
+}
+
 message OpenSpaceDebug {
-  repeated apollo.common.Trajectory trajecotry = 1;
+  optional apollo.planning_internal.Trajectories trajectories = 1;
 }
 
 // next ID: 27
