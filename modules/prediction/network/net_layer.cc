@@ -33,6 +33,7 @@ using apollo::prediction::DenseParameter;
 using apollo::prediction::LayerParameter;
 using apollo::prediction::Conv1dParameter;
 using apollo::prediction::MaxPool1dParameter;
+using apollo::prediction::ActivationParameter;
 
 bool Layer::Load(const LayerParameter& layer_pb) {
   if (!layer_pb.has_name()) {
@@ -56,6 +57,10 @@ bool Dense::Load(const LayerParameter& layer_pb) {
     return false;
   }
   DenseParameter dense_pb = layer_pb.dense();
+  return Load(dense_pb);
+}
+
+bool Dense::Load(const DenseParameter& dense_pb) {
   if (!dense_pb.has_weights() || !LoadTensor(dense_pb.weights(), &weights_)) {
     AERROR << "Fail to Load weights!";
     return false;
@@ -245,6 +250,15 @@ bool Activation::Load(const LayerParameter& layer_pb) {
     kactivation_ = serialize_to_function("linear");
   } else {
     ActivationParameter activation_pb = layer_pb.activation();
+    kactivation_ = serialize_to_function(activation_pb.activation());
+  }
+  return true;
+}
+
+bool Activation::Load(const ActivationParameter& activation_pb) {
+  if (!activation_pb.has_activation()) {
+    kactivation_ = serialize_to_function("linear");
+  } else {
     kactivation_ = serialize_to_function(activation_pb.activation());
   }
   return true;

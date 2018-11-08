@@ -119,6 +119,13 @@ class Dense : public Layer {
   bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
 
   /**
+   * @brief Load the dense layer parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::DenseParameter& layer_pb);
+
+  /**
    * @brief Compute the layer output from inputs
    * @param Inputs to a network layer
    * @param Output of a network layer will be returned
@@ -257,6 +264,13 @@ class Activation : public Layer {
    * @return True is loaded successively, otherwise False
    */
   bool Load(const apollo::prediction::LayerParameter& layer_pb) override;
+
+  /**
+   * @brief Load the parameter from a pb message
+   * @param A pb message contains the parameters
+   * @return True is loaded successively, otherwise False
+   */
+  bool Load(const apollo::prediction::ActivationParameter& activation_pb);
 
   /**
    * @brief Compute the layer output from inputs
