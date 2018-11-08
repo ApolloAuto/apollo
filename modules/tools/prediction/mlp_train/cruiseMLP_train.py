@@ -164,8 +164,8 @@ def save_FCNN_CNN1D(model, filename):
 Custom defined loss function that lumps the loss of classification and
 of regression together.
 '''
-def loss_fn(c_pred, r_pred, target):
-    loss_C = nn.BCEWithLogitsLoss(pos_weight=torch.FloatTensor([1.0]).cuda()) #nn.BCELoss()
+def loss_fn(c_pred, r_pred, target, balance):
+    loss_C = nn.BCEWithLogitsLoss(pos_weight=torch.FloatTensor([balance]).cuda()) #nn.BCELoss()
     loss_R = nn.MSELoss()
 
     #loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
@@ -334,7 +334,7 @@ class TrainValidDataset(Dataset):
 '''
 Train the data. (vanilla version without dataloader)
 '''
-def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
+def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, balance=1.0):
     model.train()
 
     loss_history = []
@@ -348,7 +348,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
         X = train_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         y = train_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         c_pred, r_pred = model(X)
-        loss = loss_fn(c_pred, r_pred, y)
+        loss = loss_fn(c_pred, r_pred, y, balance)
         loss_history.append(loss.data)
         loss.backward()
         optimizer.step()
@@ -376,7 +376,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048):
 '''
 Validation (vanilla version without dataloader)
 '''
-def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
+def validate_vanilla(valid_X, valid_y, model, batch_size=2048, balance=1.0, pos_label=1.0):
     model.eval()
 
     loss_history = []
@@ -387,7 +387,7 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
         X = valid_X[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         y = valid_y[i*batch_size: min(num_of_data, (i+1)*batch_size),]
         c_pred, r_pred = model(X)
-        valid_loss = loss_fn(c_pred, r_pred, y)
+        valid_loss = loss_fn(c_pred, r_pred, y, balance)
         loss_history.append(valid_loss.data)
 
         c_pred = c_pred.data.cpu().numpy()
@@ -400,8 +400,8 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
     valid_auc = sklearn.metrics.roc_auc_score(valid_y[:,0], pred_y.reshape(-1))
     pred_y = (pred_y > 0.5)
     valid_accuracy = sklearn.metrics.accuracy_score(valid_y[:,0], pred_y.reshape(-1))
-    valid_precision = sklearn.metrics.precision_score(valid_y[:,0], pred_y.reshape(-1))
-    valid_recall = sklearn.metrics.recall_score(valid_y[:,0], pred_y.reshape(-1))
+    valid_precision = sklearn.metrics.precision_score(valid_y[:,0], pred_y.reshape(-1), pos_label=pos_label)
+    valid_recall = sklearn.metrics.recall_score(valid_y[:,0], pred_y.reshape(-1), pos_label=pos_label)
 
     logging.info('Validation loss: {}. Accuracy: {}.\
                   Precision: {}. Recall: {}. AUC: {}.'
@@ -418,7 +418,7 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048):
 '''
 Train the data. (using dataloader)
 '''
-def train_dataloader(train_loader, model, optimizer, epoch):
+def train_dataloader(train_loader, model, optimizer, epoch, balance=1.0):
     model.train()
 
     loss_history = []
@@ -432,7 +432,7 @@ def train_dataloader(train_loader, model, optimizer, epoch):
             X = (inputs).float().cuda()
             y = (targets).float().cuda()
         c_pred, r_pred = model(X)
-        loss = loss_fn(c_pred, r_pred, y)
+        loss = loss_fn(c_pred, r_pred, y, balance)
         #loss.data[0].cpu().numpy()
         loss_history.append(loss.data)
         loss.backward()
@@ -456,7 +456,7 @@ def train_dataloader(train_loader, model, optimizer, epoch):
 '''
 Validation (using dataloader)
 '''
-def validate_dataloader(valid_loader, model):
+def validate_dataloader(valid_loader, model, balance=1.0):
     model.eval()
 
     loss_history = []
@@ -469,7 +469,7 @@ def validate_dataloader(valid_loader, model):
             X = X.float().cuda()
             y = y.float().cuda()
         c_pred, r_pred = model(X)
-        valid_loss = loss_fn(c_pred, r_pred, y)
+        valid_loss = loss_fn(c_pred, r_pred, y, balance)
         loss_history.append(valid_loss.data)
         valid_correct_class += \
             np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) == \
@@ -502,6 +502,10 @@ if __name__ == "__main__":
         help='Use the dataloader (when memory size is smaller than dataset size)')
     parser.add_argument('-s', '--save-path', type=str, default='./', \
         help='Specify the directory to save trained models.')
+    parser.add_argument('-g', '--go', action='store_true', \
+        help='It is training lane-follow (go) cases.')
+    parser.add_argument('-b', '--balance', type=float, default=1.0, \
+        help='Specify the weight for positive predictions.')
     #parser.add_argument('-g', '--gpu_num', type=int, default=0, \
     #    help='Specify which GPU to use.')
 
@@ -555,10 +559,13 @@ if __name__ == "__main__":
             y_valid = Variable(torch.FloatTensor(y_valid).cuda())
 
         # Model training:
+        pos_label = 1.0
+        if args.go:
+            pos_label = 0.0
         best_valid_loss = float('+inf')
         for epoch in range(50):
-            train_vanilla(X_train, y_train, model, optimizer, epoch)
-            valid_loss = validate_vanilla(X_valid, y_valid, model)
+            train_vanilla(X_train, y_train, model, optimizer, epoch, balance=args.balance)
+            valid_loss = validate_vanilla(X_valid, y_valid, model, balance=args.balance, pos_label=pos_label)
             scheduler.step(valid_loss)
             if valid_loss < best_valid_loss:
                 torch.save(model.state_dict(), args.save_path + 'cruise_model{}_epoch{}_valloss{:.6f}.pt'\
