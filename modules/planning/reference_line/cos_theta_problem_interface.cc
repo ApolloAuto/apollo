@@ -42,19 +42,19 @@ bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
                                             int& nnz_h_lag,
                                             IndexStyleEnum& index_style) {
   // number of variables
-  n = num_of_points_ << 1;
+  n = static_cast<int>(num_of_points_ << 1);
   num_of_variables_ = n;
 
   // number of constraints
-  m = num_of_points_ << 1;
+  m = static_cast<int>(num_of_points_ << 1);
   num_of_constraints_ = m;
 
   // number of nonzero constraint jacobian.
-  nnz_jac_g = num_of_points_ << 1;
+  nnz_jac_g = static_cast<int>(num_of_points_ << 1);
   nnz_jac_g_ = nnz_jac_g;
 
   // number of nonzero hessian and lagrangian.
-  nnz_h_lag = num_of_points_ * 11 - 12;
+  nnz_h_lag = static_cast<int>(num_of_points_ * 11 - 12);
   nnz_h_lag_ = nnz_h_lag;
 
   // load hessian structure
@@ -270,7 +270,7 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
   CHECK_EQ(static_cast<std::size_t>(m), num_of_constraints_);
   if (values == nullptr) {
     // positional deviation constraints
-    for (std::size_t i = 0; i < num_of_variables_; ++i) {
+    for (int i = 0; i < static_cast<int>(num_of_variables_); ++i) {
       iRow[i] = i;
       jCol[i] = i;
     }
@@ -290,26 +290,26 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
                                       int nele_hess, int* iRow, int* jCol,
                                       double* values) {
   if (values == nullptr) {
-    std::size_t index = 0;
-    for (std::size_t i = 0; i < 6; ++i) {
-      for (std::size_t j = 0; j <= i; ++j) {
+    int index = 0;
+    for (int i = 0; i < 6; ++i) {
+      for (int j = 0; j <= i; ++j) {
         iRow[index] = i;
         jCol[index] = j;
         index++;
       }
     }
 
-    std::size_t shift = 0;
-    for (std::size_t i = 6; i < num_of_variables_; ++i) {
+    int shift = 0;
+    for (int i = 6; i < static_cast<int>(num_of_variables_); ++i) {
       if (i % 2 == 0) {
-        for (std::size_t j = 2 + shift; j <= 6 + shift; ++j) {
+        for (int j = 2 + shift; j <= 6 + shift; ++j) {
           iRow[index] = i;
           jCol[index] = j;
           index++;
         }
 
       } else {
-        for (std::size_t j = 2 + shift; j <= 7 + shift; ++j) {
+        for (int j = 2 + shift; j <= 7 + shift; ++j) {
           iRow[index] = i;
           jCol[index] = j;
           index++;
