@@ -255,7 +255,7 @@ def data_preprocessing(data):
     # mask out those that don't have any history
     mask5 = (data[:,53] != 100)
 
-    X = np.concatenate((X_obs_hist_5, X_lane), axis=1)
+    X = np.concatenate((X_obs_old_features, X_surround_obs, X_obs_hist_5, X_lane), axis=1)
     X = X[mask5, :]
     y = data[:, -dim_output:]
     y = y[mask5, :]
@@ -398,7 +398,7 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048, balance=1.0, pos_
         
     valid_y = valid_y.data.cpu().numpy()
     valid_auc = sklearn.metrics.roc_auc_score(valid_y[:,0], pred_y.reshape(-1))
-    pred_y = (pred_y > 0.5)
+    pred_y = (pred_y > 0.0)
     valid_accuracy = sklearn.metrics.accuracy_score(valid_y[:,0], pred_y.reshape(-1))
     valid_precision = sklearn.metrics.precision_score(valid_y[:,0], pred_y.reshape(-1), pos_label=pos_label)
     valid_recall = sklearn.metrics.recall_score(valid_y[:,0], pred_y.reshape(-1), pos_label=pos_label)

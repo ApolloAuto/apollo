@@ -115,10 +115,10 @@ class FCNN_CNN1D(torch.nn.Module):
         self.lane_feature_dropout = nn.Dropout(0.0)
 
         self.obs_feature_fc = torch.nn.Sequential(\
-                            nn.Linear(24, 17),\
+                            nn.Linear(55, 32),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
-                            nn.Linear(17, 12),\
+                            nn.Linear(32, 24),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
                             )
@@ -156,13 +156,13 @@ class FCNN_CNN1D(torch.nn.Module):
                             nn.ReLU()
                                             )
     def forward(self, x):
-        lane_fea = x[:,24:]
+        lane_fea = x[:,55:]
         lane_fea = lane_fea.view(lane_fea.size(0), 5, 30)
 
-        obs_fea = x[:,:24]
+        obs_fea = x[:,:55]
 
         lane_fea = self.lane_feature_conv(lane_fea)
-        #print (lane_fea.shape)
+
         lane_fea_max = self.lane_feature_maxpool(lane_fea)
         lane_fea_avg = self.lane_feature_avgpool(lane_fea)
 
@@ -170,8 +170,8 @@ class FCNN_CNN1D(torch.nn.Module):
                               lane_fea_avg.view(lane_fea_avg.size(0),-1)], 1)
         lane_fea = self.lane_feature_dropout(lane_fea)
 
-        #obs_fea = self.obs_feature_fc(obs_fea)
-        #print (lane_fea.shape)
+        obs_fea = self.obs_feature_fc(obs_fea)
+
         tot_fea = torch.cat([lane_fea, obs_fea], 1)
         out_c = self.classify(tot_fea)
         out_r = self.regress(torch.cat([tot_fea, out_c], 1))
