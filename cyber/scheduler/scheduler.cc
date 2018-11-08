@@ -38,12 +38,22 @@ Scheduler::Scheduler() : stop_(false) {
   auto gconf = GlobalData::Instance()->Config();
 
   for (auto& conf : gconf.scheduler_conf().confs()) {
-    sched_confs_[conf.process_name()] = conf;
+    sched_confs_[conf.name()] = conf;
+  }
+
+  int sname;
+  auto desc = SchedName_descriptor()->
+      FindValueByName(GlobalData::Instance()->SchedName());
+  if (desc) {
+    sname = desc->number();
+  } else {
+    AWARN << "Fatal Sched Name";
+    return;
   }
 
   SchedConf sconf;
   auto itr =
-      sched_confs_.find(GlobalData::Instance()->ProcessName());
+      sched_confs_.find(sname);
   // default conf defined in proto will be used
   // if no specialized conf defined
   if (itr != sched_confs_.end()) {
@@ -56,8 +66,7 @@ Scheduler::Scheduler() : stop_(false) {
       sconf.cpu_binding_start_index();
 
   for (auto& conf : gconf.choreo_conf()) {
-    if (conf.process_name() ==
-        GlobalData::Instance()->ProcessName()) {
+    if (conf.sched_name() == sname) {
       for (auto& choreo : conf.choreos()) {
         cr_confs_[choreo.name()] = choreo;
       }

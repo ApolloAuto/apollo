@@ -7,8 +7,16 @@ enum SchedPolicy {
   CHOREO = 1;
 }
 
+enum SchedName {
+  CYBER_DEFAULT = 0;
+  CYBER_COMPUTE = 1;
+  CYBER_CONTROL = 2;
+  CYBER_DEBUG1 = 3;
+  CYBER_DEBUG2 = 4;
+}
+
 message SchedConf {
-  required string process_name = 1;
+  required SchedName name = 1 [default = CYBER_DEFAULT];
   optional SchedPolicy policy = 2 [default = CLASSIC];
   optional uint32 proc_num = 3 [default = 2];
   optional uint32 task_pool_size = 4 [default = 2];

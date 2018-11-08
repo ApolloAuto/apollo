@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package apollo.cyber.proto;
 
+import  "cyber/proto/scheduler_conf.proto";
+
 message Choreo {
     optional string name = 1;
     optional int32 processor_index = 2;
@@ -9,6 +11,6 @@ message Choreo {
 }
 
 message ChoreoConf {
-  required string process_name = 1;
+  required SchedName sched_name = 1;
   repeated Choreo choreos = 2;
 }

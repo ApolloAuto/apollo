@@ -42,6 +42,7 @@ namespace scheduler {
 
 using apollo::cyber::proto::Choreo;
 using apollo::cyber::proto::SchedConf;
+using apollo::cyber::proto::SchedName_descriptor;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
@@ -83,7 +84,7 @@ class Scheduler {
   void CreateProcessor();
   std::shared_ptr<ProcessorContext> CreatePctx();
 
-  std::unordered_map<std::string, SchedConf> sched_confs_;
+  std::unordered_map<int, SchedConf> sched_confs_;
   std::unordered_map<std::string, Choreo> cr_confs_;
 
 
