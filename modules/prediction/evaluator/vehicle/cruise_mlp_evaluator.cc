@@ -81,9 +81,8 @@ double WorldAngleToObjAngle(double input_world_angle,
 }
 
 CruiseMLPEvaluator::CruiseMLPEvaluator() {
-  // TODO(kechxu) name go and cutin models
   LoadModels(FLAGS_evaluator_cruise_vehicle_go_model_file,
-             FLAGS_evaluator_cruise_vehicle_go_model_file);
+             FLAGS_evaluator_cruise_vehicle_cutin_model_file);
 }
 
 void CruiseMLPEvaluator::Clear() {
