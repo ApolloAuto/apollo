@@ -35,23 +35,19 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign_protected {
+namespace traffic_light_right_turn_unprotected {
 
 // stage context
-struct StopSignUnprotectedContext {
-  ScenarioStopSignUnprotectedConfig scenario_config;
-  std::string stop_sign_id;
-  double stop_start_time;
-  std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
-  std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
-      associated_lanes;
+struct TrafficLightRightTurnUnprotectedContext {
+  ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config;
+  std::string traffic_light_id;
 };
 
-class StopSignUnprotectedScenario : public Scenario {
+class TrafficLightRightTurnUnprotectedScenario : public Scenario {
  public:
-  explicit StopSignUnprotectedScenario(const ScenarioConfig& config,
-                                       const ScenarioContext* context)
-      : Scenario(config, context) {}
+  explicit TrafficLightRightTurnUnprotectedScenario(
+      const ScenarioConfig& config,
+      const ScenarioContext* context) : Scenario(config, context) {}
 
   void Init() override;
 
@@ -62,18 +58,17 @@ class StopSignUnprotectedScenario : public Scenario {
                       const common::TrajectoryPoint& ego_point,
                       const Frame& frame) const override;
 
-  StopSignUnprotectedContext* GetContext() { return &context_; }
+  TrafficLightRightTurnUnprotectedContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
-  int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
 
  private:
   bool init_ = false;
-  StopSignUnprotectedContext context_;
+  TrafficLightRightTurnUnprotectedContext context_;
 
-  hdmap::StopSignInfoConstPtr stop_sign_ = nullptr;
+  hdmap::SignalInfoConstPtr traffic_light_ = nullptr;
 
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
@@ -81,7 +76,7 @@ class StopSignUnprotectedScenario : public Scenario {
       s_stage_factory_;
 };
 
-}  // namespace stop_sign_protected
+}  // namespace traffic_light_right_turn_unprotected
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

@@ -69,14 +69,14 @@ void StopSignUnprotectedScenario::Init() {
   }
 
   context_.stop_sign_id = stop_sign_overlap_id;
-  next_stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
+  stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
       hdmap::MakeMapId(stop_sign_overlap_id));
-  if (!next_stop_sign_) {
+  if (!stop_sign_) {
     AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
   }
 
-  GetAssociatedLanes(*next_stop_sign_);
+  GetAssociatedLanes(*stop_sign_);
 
   init_ = true;
 }
@@ -151,7 +151,8 @@ bool StopSignUnprotectedScenario::IsTransferable(
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
       return (time_distance <=
-          config_.stop_sign_unprotected_config().start_stop_sign_timer());
+          config_.stop_sign_unprotected_config().
+              start_stop_sign_scenario_timer());
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:

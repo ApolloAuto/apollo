@@ -112,11 +112,11 @@ void ScenarioManager::Observe(const Frame& frame) {
 
   const auto& reference_line_info = frame.reference_line_info().front();
 
+  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+
   // find next stop_sign_overlap
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
@@ -127,9 +127,26 @@ void ScenarioManager::Observe(const Frame& frame) {
           stop_sign_overlap;
     }
   }
-  ADEBUG
-      << "STOP SIGN: "
+  ADEBUG << "Stop Sign: "
       << PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+
+  // find next traffic_light_overlap
+  const std::vector<hdmap::PathOverlap>& traffic_light_overlaps =
+      reference_line_info.reference_line().map_path().signal_overlaps();
+  min_start_s = std::numeric_limits<double>::max();
+
+  for (const PathOverlap& traffic_light_overlap : traffic_light_overlaps) {
+    if (adc_front_edge_s - traffic_light_overlap.end_s <=
+            conf_min_pass_s_distance_ &&
+            traffic_light_overlap.start_s < min_start_s) {
+      min_start_s = traffic_light_overlap.start_s;
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap =
+          traffic_light_overlap;
+    }
+  }
+  ADEBUG << "Traffic Light: "
+      << PlanningContext::GetScenarioInfo()->
+          next_traffic_light_overlap.object_id;
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
