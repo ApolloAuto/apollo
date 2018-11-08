@@ -3899,7 +3899,7 @@
                   }
                 },
                 "nextNodeNum": {
-                  "type": "double",
+                  "type": "uint64",
                   "id": 8,
                   "options": {
                     "default": 10
