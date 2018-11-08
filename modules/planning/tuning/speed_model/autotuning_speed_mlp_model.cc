@@ -49,7 +49,7 @@ double AutotuningSpeedMLPModel::Evaluate(
 
 void AutotuningSpeedMLPModel::FlattenFeatures(
     const autotuning::TrajectoryFeature& feature,
-    Eigen::MatrixXf* const flat_feature) const {
+    Eigen::MatrixXd* const flat_feature) const {
   int row_count = feature.point_feature_size();
   int col_count = 21;
   flat_feature->resize(row_count, col_count);
@@ -62,7 +62,7 @@ void AutotuningSpeedMLPModel::FlattenFeatures(
 
 void AutotuningSpeedMLPModel::FlattenFeatures(
     const autotuning::SpeedPointwiseFeature& speed_point_feature, const int row,
-    Eigen::MatrixXf* const flat_feature) const {
+    Eigen::MatrixXd* const flat_feature) const {
   double v = speed_point_feature.v();
   double acc = speed_point_feature.acc();
   double jerk = speed_point_feature.jerk();
