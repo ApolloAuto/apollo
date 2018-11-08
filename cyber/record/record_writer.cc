@@ -117,7 +117,7 @@ bool RecordWriter::WriteChannel(const std::string& channel_name,
 
 bool RecordWriter::WriteMessage(const SingleMessage& message) {
   std::lock_guard<std::mutex> lg(mutex_);
-
+  OnNewMessage(message.channel_name());
   if (!file_writer_->WriteMessage(message)) {
     AERROR << "write message fail.";
     return false;
