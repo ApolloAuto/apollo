@@ -20,7 +20,7 @@
 set -e
 
 # Install cuda8
-wget http://123.57.58.164/apollo-docker/cuda8_cudnn6/cuda-repo-l4t-8-0-local_8.0.84-1_arm64.deb
+wget http://www.baiduapollo.club/apollo-docker/cuda8_cudnn6/cuda-repo-l4t-8-0-local_8.0.84-1_arm64.deb
 dpkg -i cuda-repo-l4t-8-0-local_8.0.84-1_arm64.deb
 
 # Install toolkit
@@ -28,11 +28,11 @@ apt-get update -y
 apt-get -y install cuda-toolkit-8-0
 
 #Install cudnn7
-wget http://123.57.58.164/apollo-docker/cuda8_cudnn6/libcudnn6_6.0.21-1+cuda8.0_arm64.deb
+wget http://www.baiduapollo.club/apollo-docker/cuda8_cudnn6/libcudnn6_6.0.21-1+cuda8.0_arm64.deb
 dpkg -i libcudnn6_6.0.21-1+cuda8.0_arm64.deb
 
 #Install cudnn7-dev
-wget http://123.57.58.164/apollo-docker/cuda8_cudnn6/libcudnn6-dev_6.0.21-1+cuda8.0_arm64.deb
+wget http://www.baiduapollo.club/apollo-docker/cuda8_cudnn6/libcudnn6-dev_6.0.21-1+cuda8.0_arm64.deb
 dpkg -i libcudnn6-dev_6.0.21-1+cuda8.0_arm64.deb
 
 wget http://www.baiduapollo.club/apollo-docker/nvblas.conf

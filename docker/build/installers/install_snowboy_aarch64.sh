@@ -25,7 +25,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # compatible with the library.
 apt-get install -y --only-upgrade libstdc++
 
-wget http://123.57.58.164/apollo-docker/snowboy_aarch64.tar.gz
+wget http://www.baiduapollo.club/apollo-docker/snowboy_aarch64.tar.gz
 tar xzf snowboy_aarch64.tar.gz
 mkdir -p /usr/local/apollo
 mv snowboy /usr/local/apollo/
