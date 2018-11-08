@@ -1129,6 +1129,7 @@
                   "id": 1
                 },
                 "trajectoryPoint": {
+                  "rule": "repeated",
                   "type": "TrajectoryPoint",
                   "id": 2
                 }
