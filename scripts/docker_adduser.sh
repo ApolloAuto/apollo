@@ -72,7 +72,14 @@ fi
 
 # add authority of GPU devices on TX2
 # check /dev/nv*
-chmod a+rw /dev/nv*
+if [ "$ARCH" == 'aarch64' ]; then
+  chmod a+rw /dev/nv*
+
+  if [ -e "/usr/lib/aarch64-linux-gnu/tegra/libGL.so" ]; then
+    rm /usr/lib/aarch64-linux-gnu/libGL.so
+    ln -s /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu/libGL.so
+  fi
+fi
 
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data
