@@ -26,6 +26,9 @@ using apollo::prediction::CruiseModelParameter;
 void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
                       Eigen::MatrixXf* output) const {
   // TODO(kechxu) implement
+  // inputs = {lane_feature, obs_feature}
+  CHECK_EQ(inputs.size(), 2);
+
   // Step 1: Run lane feature conv 1d
 
   // Step 2: Run lane feature max pool 1d
@@ -52,7 +55,53 @@ bool CruiseModel::LoadModel(
   CHECK(cruise_model_parameter.has_classify());
   CHECK(cruise_model_parameter.has_regress());
 
-  cruise_model_parameter_.CopyFrom(cruise_model_parameter);
+  // Load LaneFeatureConvParameter
+  const auto& lane_conv1d_param = cruise_model_parameter.lane_feature_conv();
+  lane_conv1d_0_.Load(lane_conv1d_param.conv1d_0());
+  lane_activation_1_.Load(lane_conv1d_param.activation_1());
+  lane_conv1d_2_.Load(lane_conv1d_param.conv1d_2());
+  lane_activation_3_.Load(lane_conv1d_param.activation_3());
+  lane_conv1d_4_.Load(lane_conv1d_param.conv1d_4());
+
+  // Load MaxPool1dParameter
+  const auto& lane_maxpool1d_param =
+      cruise_model_parameter.lane_feature_maxpool();
+  lane_maxpool1d_.Load(lane_maxpool1d_param);
+
+  // Load AvgPool1dParameter
+  const auto& lane_avgpool1d_param =
+      cruise_model_parameter.lane_feature_avgpool();
+  lane_avgpool1d_.Load(lane_avgpool1d_param);
+
+  // Load ObsFeatureFCParameter
+  const auto& obs_fc_param = cruise_model_parameter.obs_feature_fc();
+  obs_linear_0_.Load(obs_fc_param.linear_0());
+  obs_activation_1_.Load(obs_fc_param.activation_1());
+  obs_linear_3_.Load(obs_fc_param.linear_3());
+  obs_activation_4_.Load(obs_fc_param.activation_4());
+
+  // Load ClassifyParameter
+  const auto& classify_param = cruise_model_parameter.classify();
+  classify_linear_0_.Load(classify_param.linear_0());
+  classify_activation_1_.Load(classify_param.activation_1());
+  classify_linear_3_.Load(classify_param.linear_3());
+  classify_activation_4_.Load(classify_param.activation_4());
+  classify_linear_6_.Load(classify_param.linear_6());
+  classify_activation_7_.Load(classify_param.activation_7());
+  classify_linear_9_.Load(classify_param.linear_9());
+  classify_activation_10_.Load(classify_param.activation_10());
+
+  // Load RegressParameter
+  const auto& regress_param = cruise_model_parameter.regress();
+  regress_linear_0_.Load(regress_param.linear_0());
+  regress_activation_1_.Load(regress_param.activation_1());
+  regress_linear_3_.Load(regress_param.linear_3());
+  regress_activation_4_.Load(regress_param.activation_4());
+  regress_linear_6_.Load(regress_param.linear_6());
+  regress_activation_7_.Load(regress_param.activation_7());
+  regress_linear_9_.Load(regress_param.linear_9());
+  regress_activation_10_.Load(regress_param.activation_10());
+
   return true;
 }
 

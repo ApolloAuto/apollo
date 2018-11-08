@@ -23,6 +23,7 @@
 #include "cyber/common/macros.h"
 #include "modules/prediction/proto/cruise_model.pb.h"
 #include "modules/prediction/network/net_model.h"
+#include "modules/prediction/network/net_layer.h"
 
 namespace apollo {
 namespace prediction {
@@ -48,7 +49,44 @@ class CruiseModel : public NetModel {
            Eigen::MatrixXf* output) const override;
 
  private:
-  CruiseModelParameter cruise_model_parameter_;
+  // LaneFeatureConvParameter
+  Conv1d lane_conv1d_0_;
+  Activation lane_activation_1_;
+  Conv1d lane_conv1d_2_;
+  Activation lane_activation_3_;
+  Conv1d lane_conv1d_4_;
+
+  // MaxPool1dParameter
+  MaxPool1d lane_maxpool1d_;
+
+  // AvgPool1dParameter
+  AvgPool1d lane_avgpool1d_;
+
+  // ObsFeatureFCParameter
+  Dense obs_linear_0_;
+  Activation obs_activation_1_;
+  Dense obs_linear_3_;
+  Activation obs_activation_4_;
+
+  // ClassifyParameter
+  Dense classify_linear_0_;
+  Activation classify_activation_1_;
+  Dense classify_linear_3_;
+  Activation classify_activation_4_;
+  Dense classify_linear_6_;
+  Activation classify_activation_7_;
+  Dense classify_linear_9_;
+  Activation classify_activation_10_;
+
+  // RegressParameter
+  Dense regress_linear_0_;
+  Activation regress_activation_1_;
+  Dense regress_linear_3_;
+  Activation regress_activation_4_;
+  Dense regress_linear_6_;
+  Activation regress_activation_7_;
+  Dense regress_linear_9_;
+  Activation regress_activation_10_;
 };
 
 }  // namespace network
