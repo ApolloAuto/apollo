@@ -328,7 +328,8 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
   if (!ref_s.empty()) {
     follow_kernel->AddReferenceLineKernelMatrix(
         index_list, ref_s,
-        weight * t_evaluated_.size() / qp_st_speed_config_.total_time());
+        weight * static_cast<double>(t_evaluated_.size()) /
+            qp_st_speed_config_.total_time());
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
@@ -380,8 +381,9 @@ Status QpPiecewiseStGraph::EstimateSpeedUpperBound(
 
   if (static_cast<double>(t_evaluated_.size() +
                           speed_limit.speed_limit_points().size()) <
-      t_evaluated_.size() * std::log(static_cast<double>(
-                                speed_limit.speed_limit_points().size()))) {
+      static_cast<double>(t_evaluated_.size()) *
+          std::log(
+              static_cast<double>(speed_limit.speed_limit_points().size()))) {
     uint32_t i = 0;
     uint32_t j = 0;
     const double kDistanceEpsilon = 1e-6;
