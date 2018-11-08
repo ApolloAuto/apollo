@@ -72,6 +72,13 @@ float hard_sigmoid(const float x);
 float relu(const float x);
 
 /**
+ * @brief flatten a matrix to a row vector
+ * @param Input matrix
+ * @return Flattened matrix
+ */
+Eigen::MatrixXf FlattenMatrix(const Eigen::MatrixXf& matrix);
+
+/**
  * @brief translate a string into a network activation function
  * @param string
  * @return activation function map to the string

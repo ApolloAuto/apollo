@@ -16,6 +16,8 @@
 
 #include "modules/prediction/network/cruise_model/cruise_model.h"
 #include "cyber/common/log.h"
+#include "modules/prediction/network/net_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -28,22 +30,107 @@ void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
   // TODO(kechxu) implement
   // inputs = {lane_feature, obs_feature}
   CHECK_EQ(inputs.size(), 2);
+  output->resize(1, 2);
 
   // Step 1: Run lane feature conv 1d
+  Eigen::MatrixXf lane_conv1d_0_output;
+  lane_conv1d_0_->Run({inputs[0]}, &lane_conv1d_0_output);
+  Eigen::MatrixXf lane_activation_1_output;
+  lane_activation_1_->Run({lane_conv1d_0_output}, &lane_activation_1_output);
+  Eigen::MatrixXf lane_conv1d_2_output;
+  lane_conv1d_2_->Run({lane_activation_1_output}, &lane_conv1d_2_output);
+  Eigen::MatrixXf lane_activation_3_output;
+  lane_activation_3_->Run({lane_conv1d_2_output}, &lane_activation_3_output);
+  Eigen::MatrixXf lane_conv1d_4_output;
+  lane_conv1d_4_->Run({lane_activation_3_output}, &lane_conv1d_4_output);
 
   // Step 2: Run lane feature max pool 1d
+  Eigen::MatrixXf lane_maxpool1d_output;
+  lane_maxpool1d_->Run({lane_conv1d_4_output}, &lane_maxpool1d_output);
 
   // Step 3: Run lane feature avg pool 1d
+  Eigen::MatrixXf lane_avgpool1d_output;
+  lane_avgpool1d_->Run({lane_maxpool1d_output}, &lane_avgpool1d_output);
+  // Flatten lane_avgpool1d_output
+  Eigen::MatrixXf lane_feature = FlattenMatrix(lane_avgpool1d_output);
 
   // Step 4: Run obstacle feature fully connected
+  Eigen::MatrixXf obs_linear_0_output;
+  obs_linear_0_->Run({inputs[1]}, &obs_linear_0_output);
+  Eigen::MatrixXf obs_activation_1_output;
+  obs_activation_1_->Run({obs_linear_0_output}, &obs_activation_1_output);
+  Eigen::MatrixXf obs_linear_3_output;
+  obs_linear_0_->Run({obs_activation_1_output}, &obs_linear_3_output);
+  Eigen::MatrixXf obs_feature;
+  obs_activation_1_->Run({obs_activation_1_output}, &obs_feature);
 
   // Step 5: Concatenate [lane_feature, obstacle_feature]
+  Eigen::MatrixXf feature_values;
+  concatenate_->Run({lane_feature, obs_feature}, &feature_values);
 
   // Step 6: Get classification result
+  Eigen::MatrixXf classify_linear_0_output;
+  classify_linear_0_->Run({feature_values}, &classify_linear_0_output);
+  Eigen::MatrixXf classify_activation_1_output;
+  classify_linear_0_->Run({classify_linear_0_output},
+                          &classify_activation_1_output);
+  Eigen::MatrixXf classify_linear_3_output;
+  classify_linear_0_->Run({classify_activation_1_output},
+                          &classify_linear_3_output);
+  Eigen::MatrixXf classify_activation_4_output;
+  classify_linear_0_->Run({classify_linear_3_output},
+                          &classify_activation_4_output);
+  Eigen::MatrixXf classify_linear_6_output;
+  classify_linear_0_->Run({classify_activation_4_output},
+                          &classify_linear_6_output);
+  Eigen::MatrixXf classify_activation_7_output;
+  classify_linear_0_->Run({classify_linear_6_output},
+                          &classify_activation_7_output);
+  Eigen::MatrixXf classify_linear_9_output;
+  classify_linear_0_->Run({classify_activation_7_output},
+                          &classify_linear_9_output);
+  Eigen::MatrixXf classify_activation_10_output;
+  classify_linear_0_->Run({classify_linear_9_output},
+                          &classify_activation_10_output);
+
+  CHECK_EQ(classify_activation_10_output.cols(), 1);
+  float probability = classify_activation_10_output(0, 0);
+  (*output)(0, 0) = probability;
 
   // Step 7: Get regression result
+  if (probability < FLAGS_lane_sequence_threshold) {
+    // TODO(kechxu) move to gflags
+    (*output)(0, 1) = 10.0;
+    return;
+  }
 
-  // Step 8: Output
+  Eigen::MatrixXf regress_linear_0_output;
+  regress_linear_0_->Run({feature_values}, &regress_linear_0_output);
+  Eigen::MatrixXf regress_activation_1_output;
+  regress_linear_0_->Run({regress_linear_0_output},
+                          &regress_activation_1_output);
+  Eigen::MatrixXf regress_linear_3_output;
+  regress_linear_0_->Run({regress_activation_1_output},
+                          &regress_linear_3_output);
+  Eigen::MatrixXf regress_activation_4_output;
+  regress_linear_0_->Run({regress_linear_3_output},
+                          &regress_activation_4_output);
+  Eigen::MatrixXf regress_linear_6_output;
+  regress_linear_0_->Run({regress_activation_4_output},
+                          &regress_linear_6_output);
+  Eigen::MatrixXf regress_activation_7_output;
+  regress_linear_0_->Run({regress_linear_6_output},
+                          &regress_activation_7_output);
+  Eigen::MatrixXf regress_linear_9_output;
+  regress_linear_0_->Run({regress_activation_7_output},
+                          &regress_linear_9_output);
+  Eigen::MatrixXf regress_activation_10_output;
+  regress_linear_0_->Run({regress_linear_9_output},
+                          &regress_activation_10_output);
+
+  CHECK_EQ(classify_activation_10_output.cols(), 1);
+  float time_to_lane_center = regress_activation_10_output(0, 0);
+  (*output)(0, 1) = time_to_lane_center;
 }
 
 bool CruiseModel::LoadModel(
@@ -57,50 +144,50 @@ bool CruiseModel::LoadModel(
 
   // Load LaneFeatureConvParameter
   const auto& lane_conv1d_param = cruise_model_parameter.lane_feature_conv();
-  lane_conv1d_0_.Load(lane_conv1d_param.conv1d_0());
-  lane_activation_1_.Load(lane_conv1d_param.activation_1());
-  lane_conv1d_2_.Load(lane_conv1d_param.conv1d_2());
-  lane_activation_3_.Load(lane_conv1d_param.activation_3());
-  lane_conv1d_4_.Load(lane_conv1d_param.conv1d_4());
+  lane_conv1d_0_->Load(lane_conv1d_param.conv1d_0());
+  lane_activation_1_->Load(lane_conv1d_param.activation_1());
+  lane_conv1d_2_->Load(lane_conv1d_param.conv1d_2());
+  lane_activation_3_->Load(lane_conv1d_param.activation_3());
+  lane_conv1d_4_->Load(lane_conv1d_param.conv1d_4());
 
   // Load MaxPool1dParameter
   const auto& lane_maxpool1d_param =
       cruise_model_parameter.lane_feature_maxpool();
-  lane_maxpool1d_.Load(lane_maxpool1d_param);
+  lane_maxpool1d_->Load(lane_maxpool1d_param);
 
   // Load AvgPool1dParameter
   const auto& lane_avgpool1d_param =
       cruise_model_parameter.lane_feature_avgpool();
-  lane_avgpool1d_.Load(lane_avgpool1d_param);
+  lane_avgpool1d_->Load(lane_avgpool1d_param);
 
   // Load ObsFeatureFCParameter
   const auto& obs_fc_param = cruise_model_parameter.obs_feature_fc();
-  obs_linear_0_.Load(obs_fc_param.linear_0());
-  obs_activation_1_.Load(obs_fc_param.activation_1());
-  obs_linear_3_.Load(obs_fc_param.linear_3());
-  obs_activation_4_.Load(obs_fc_param.activation_4());
+  obs_linear_0_->Load(obs_fc_param.linear_0());
+  obs_activation_1_->Load(obs_fc_param.activation_1());
+  obs_linear_3_->Load(obs_fc_param.linear_3());
+  obs_activation_4_->Load(obs_fc_param.activation_4());
 
   // Load ClassifyParameter
   const auto& classify_param = cruise_model_parameter.classify();
-  classify_linear_0_.Load(classify_param.linear_0());
-  classify_activation_1_.Load(classify_param.activation_1());
-  classify_linear_3_.Load(classify_param.linear_3());
-  classify_activation_4_.Load(classify_param.activation_4());
-  classify_linear_6_.Load(classify_param.linear_6());
-  classify_activation_7_.Load(classify_param.activation_7());
-  classify_linear_9_.Load(classify_param.linear_9());
-  classify_activation_10_.Load(classify_param.activation_10());
+  classify_linear_0_->Load(classify_param.linear_0());
+  classify_activation_1_->Load(classify_param.activation_1());
+  classify_linear_3_->Load(classify_param.linear_3());
+  classify_activation_4_->Load(classify_param.activation_4());
+  classify_linear_6_->Load(classify_param.linear_6());
+  classify_activation_7_->Load(classify_param.activation_7());
+  classify_linear_9_->Load(classify_param.linear_9());
+  classify_activation_10_->Load(classify_param.activation_10());
 
   // Load RegressParameter
   const auto& regress_param = cruise_model_parameter.regress();
-  regress_linear_0_.Load(regress_param.linear_0());
-  regress_activation_1_.Load(regress_param.activation_1());
-  regress_linear_3_.Load(regress_param.linear_3());
-  regress_activation_4_.Load(regress_param.activation_4());
-  regress_linear_6_.Load(regress_param.linear_6());
-  regress_activation_7_.Load(regress_param.activation_7());
-  regress_linear_9_.Load(regress_param.linear_9());
-  regress_activation_10_.Load(regress_param.activation_10());
+  regress_linear_0_->Load(regress_param.linear_0());
+  regress_activation_1_->Load(regress_param.activation_1());
+  regress_linear_3_->Load(regress_param.linear_3());
+  regress_activation_4_->Load(regress_param.activation_4());
+  regress_linear_6_->Load(regress_param.linear_6());
+  regress_activation_7_->Load(regress_param.activation_7());
+  regress_linear_9_->Load(regress_param.linear_9());
+  regress_activation_10_->Load(regress_param.activation_10());
 
   return true;
 }

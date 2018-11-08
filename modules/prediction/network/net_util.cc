@@ -42,6 +42,22 @@ float hard_sigmoid(const float x) {
 
 float relu(const float x) { return (x > 0.0) ? x : 0.0; }
 
+Eigen::MatrixXf FlattenMatrix(const Eigen::MatrixXf& matrix) {
+  CHECK_GT(matrix.rows(), 0);
+  CHECK_GT(matrix.cols(), 0);
+  int output_size = matrix.rows() * matrix.cols();
+  Eigen::MatrixXf output_matrix;
+  output_matrix.resize(1, output_size);
+  int output_index = 0;
+  for (int i = 0; i < matrix.rows(); ++i) {
+    for (int j = 0; j < matrix.cols(); ++j) {
+      output_matrix(1, output_index) = matrix(i, j);
+      ++output_index;
+    }
+  }
+  return output_matrix;
+}
+
 std::function<float(float)> serialize_to_function(const std::string& str) {
   static const std::unordered_map<std::string, std::function<float(float)> >
       func_map({{"linear", linear},

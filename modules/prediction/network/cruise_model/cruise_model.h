@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "Eigen/Dense"
 
@@ -50,43 +51,46 @@ class CruiseModel : public NetModel {
 
  private:
   // LaneFeatureConvParameter
-  Conv1d lane_conv1d_0_;
-  Activation lane_activation_1_;
-  Conv1d lane_conv1d_2_;
-  Activation lane_activation_3_;
-  Conv1d lane_conv1d_4_;
+  std::unique_ptr<Conv1d> lane_conv1d_0_;
+  std::unique_ptr<Activation> lane_activation_1_;
+  std::unique_ptr<Conv1d> lane_conv1d_2_;
+  std::unique_ptr<Activation> lane_activation_3_;
+  std::unique_ptr<Conv1d> lane_conv1d_4_;
 
   // MaxPool1dParameter
-  MaxPool1d lane_maxpool1d_;
+  std::unique_ptr<MaxPool1d> lane_maxpool1d_;
 
   // AvgPool1dParameter
-  AvgPool1d lane_avgpool1d_;
+  std::unique_ptr<AvgPool1d> lane_avgpool1d_;
 
   // ObsFeatureFCParameter
-  Dense obs_linear_0_;
-  Activation obs_activation_1_;
-  Dense obs_linear_3_;
-  Activation obs_activation_4_;
+  std::unique_ptr<Dense> obs_linear_0_;
+  std::unique_ptr<Activation> obs_activation_1_;
+  std::unique_ptr<Dense> obs_linear_3_;
+  std::unique_ptr<Activation> obs_activation_4_;
 
   // ClassifyParameter
-  Dense classify_linear_0_;
-  Activation classify_activation_1_;
-  Dense classify_linear_3_;
-  Activation classify_activation_4_;
-  Dense classify_linear_6_;
-  Activation classify_activation_7_;
-  Dense classify_linear_9_;
-  Activation classify_activation_10_;
+  std::unique_ptr<Dense> classify_linear_0_;
+  std::unique_ptr<Activation> classify_activation_1_;
+  std::unique_ptr<Dense> classify_linear_3_;
+  std::unique_ptr<Activation> classify_activation_4_;
+  std::unique_ptr<Dense> classify_linear_6_;
+  std::unique_ptr<Activation> classify_activation_7_;
+  std::unique_ptr<Dense> classify_linear_9_;
+  std::unique_ptr<Activation> classify_activation_10_;
 
   // RegressParameter
-  Dense regress_linear_0_;
-  Activation regress_activation_1_;
-  Dense regress_linear_3_;
-  Activation regress_activation_4_;
-  Dense regress_linear_6_;
-  Activation regress_activation_7_;
-  Dense regress_linear_9_;
-  Activation regress_activation_10_;
+  std::unique_ptr<Dense> regress_linear_0_;
+  std::unique_ptr<Activation> regress_activation_1_;
+  std::unique_ptr<Dense> regress_linear_3_;
+  std::unique_ptr<Activation> regress_activation_4_;
+  std::unique_ptr<Dense> regress_linear_6_;
+  std::unique_ptr<Activation> regress_activation_7_;
+  std::unique_ptr<Dense> regress_linear_9_;
+  std::unique_ptr<Activation> regress_activation_10_;
+
+  // Concatenate
+  std::unique_ptr<Concatenate> concatenate_;
 };
 
 }  // namespace network
