@@ -23,6 +23,8 @@ namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
+using proto::RoleAttributes;
+
 class WarehouseTest : public ::testing::Test {
  protected:
   WarehouseTest() : key_num_(256) {}

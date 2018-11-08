@@ -38,28 +38,29 @@ class WarehouseBase {
 
   virtual void Remove(uint64_t key) = 0;
   virtual void Remove(uint64_t key, const RolePtr& role) = 0;
-  virtual void Remove(const RoleAttributes& target_attr) = 0;
+  virtual void Remove(const proto::RoleAttributes& target_attr) = 0;
 
   virtual bool Search(uint64_t key) = 0;
   virtual bool Search(uint64_t key, RolePtr* first_matched_role) = 0;
   virtual bool Search(uint64_t key,
-                      RoleAttributes* first_matched_role_attr) = 0;
+                      proto::RoleAttributes* first_matched_role_attr) = 0;
   virtual bool Search(uint64_t key, std::vector<RolePtr>* matched_roles) = 0;
-  virtual bool Search(uint64_t key,
-                      std::vector<RoleAttributes>* matched_roles_attr) = 0;
+  virtual bool Search(
+      uint64_t key, std::vector<proto::RoleAttributes>* matched_roles_attr) = 0;
 
-  virtual bool Search(const RoleAttributes& target_attr) = 0;
-  virtual bool Search(const RoleAttributes& target_attr,
+  virtual bool Search(const proto::RoleAttributes& target_attr) = 0;
+  virtual bool Search(const proto::RoleAttributes& target_attr,
                       RolePtr* first_matched) = 0;
-  virtual bool Search(const RoleAttributes& target_attr,
-                      RoleAttributes* first_matched_role_attr) = 0;
-  virtual bool Search(const RoleAttributes& target_attr,
+  virtual bool Search(const proto::RoleAttributes& target_attr,
+                      proto::RoleAttributes* first_matched_role_attr) = 0;
+  virtual bool Search(const proto::RoleAttributes& target_attr,
                       std::vector<RolePtr>* matched_roles) = 0;
-  virtual bool Search(const RoleAttributes& target_attr,
-                      std::vector<RoleAttributes>* matched_roles_attr) = 0;
+  virtual bool Search(
+      const proto::RoleAttributes& target_attr,
+      std::vector<proto::RoleAttributes>* matched_roles_attr) = 0;
 
   virtual void GetAllRoles(std::vector<RolePtr>* roles) = 0;
-  virtual void GetAllRoles(std::vector<RoleAttributes>* roles_attr) = 0;
+  virtual void GetAllRoles(std::vector<proto::RoleAttributes>* roles_attr) = 0;
 };
 
 }  // namespace service_discovery

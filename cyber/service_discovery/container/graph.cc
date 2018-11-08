@@ -22,6 +22,10 @@ namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
+using base::AtomicRWLock;
+using base::ReadLockGuard;
+using base::WriteLockGuard;
+
 Vertice::Vertice(const std::string& val) : value_(val) {}
 
 Vertice::Vertice(const Vertice& other) { this->value_ = other.value_; }

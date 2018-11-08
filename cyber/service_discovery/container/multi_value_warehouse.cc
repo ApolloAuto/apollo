@@ -25,6 +25,11 @@ namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
+using base::AtomicRWLock;
+using base::ReadLockGuard;
+using base::WriteLockGuard;
+using proto::RoleAttributes;
+
 bool MultiValueWarehouse::Add(uint64_t key, const RolePtr& role,
                               bool ignore_if_exist) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);

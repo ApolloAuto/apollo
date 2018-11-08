@@ -22,12 +22,12 @@ namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
-RoleBase::RoleBase() : timestamp_(0) {}
+using proto::RoleAttributes;
 
-RoleBase::RoleBase(const RoleAttributes& attr, uint64_t timestamp)
-    : attributes_(attr), timestamp_(timestamp) {}
+RoleBase::RoleBase() : timestamp_ns_(0) {}
 
-RoleBase::~RoleBase() {}
+RoleBase::RoleBase(const RoleAttributes& attr, uint64_t timestamp_ns)
+    : attributes_(attr), timestamp_ns_(timestamp_ns) {}
 
 bool RoleBase::Match(const RoleAttributes& target_attr) const {
   if (target_attr.has_node_id() &&
@@ -49,15 +49,11 @@ bool RoleBase::Match(const RoleAttributes& target_attr) const {
 }
 
 bool RoleBase::IsEarlierThan(const RoleBase& other) const {
-  return timestamp_ < other.timestamp();
+  return timestamp_ns_ < other.timestamp_ns();
 }
 
-RoleWriter::RoleWriter() {}
-
-RoleWriter::RoleWriter(const RoleAttributes& attr, uint64_t timestamp)
-    : RoleBase(attr, timestamp) {}
-
-RoleWriter::~RoleWriter() {}
+RoleWriter::RoleWriter(const RoleAttributes& attr, uint64_t timestamp_ns)
+    : RoleBase(attr, timestamp_ns) {}
 
 bool RoleWriter::Match(const RoleAttributes& target_attr) const {
   if (target_attr.has_channel_id() &&
@@ -72,12 +68,8 @@ bool RoleWriter::Match(const RoleAttributes& target_attr) const {
   return RoleBase::Match(target_attr);
 }
 
-RoleServer::RoleServer() {}
-
-RoleServer::RoleServer(const RoleAttributes& attr, uint64_t timestamp)
-    : RoleBase(attr, timestamp) {}
-
-RoleServer::~RoleServer() {}
+RoleServer::RoleServer(const RoleAttributes& attr, uint64_t timestamp_ns)
+    : RoleBase(attr, timestamp_ns) {}
 
 bool RoleServer::Match(const RoleAttributes& target_attr) const {
   if (target_attr.has_service_id() &&
