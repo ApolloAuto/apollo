@@ -29,8 +29,7 @@
 namespace apollo {
 namespace cyber {
 
-bool Init();
-bool Init(const char* argv);
+bool Init(const char* binary_name);
 void Shutdown();
 inline void AsyncShutdown() {
   pid_t pid = getpid();

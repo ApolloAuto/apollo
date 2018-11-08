@@ -55,56 +55,16 @@ static std::recursive_mutex g_mutex;
 
 static ::apollo::cyber::logger::AsyncLogger* async_logger;
 
-void OnShutdown(int sig) {
-  (void)sig;
-  if (GetState() != STATE_SHUTDOWN) {
-    SetState(STATE_SHUTTING_DOWN);
-  }
-}
+namespace {
 
-void ExitHandle() {
-  AINFO << "Shutdown in ExitHandle";
-  Shutdown();
-}
-
-bool Init() {
-  std::lock_guard<std::recursive_mutex> lg(g_mutex);
-  if (GetState() != STATE_UNINITIALIZED) {
-    // avoid reinit
-    return false;
-  }
-
-  std::signal(SIGINT, OnShutdown);
-
-  // Initialize internal static objects
-  CHECK_NOTNULL(common::GlobalData::Instance());
-  CHECK_NOTNULL(transport::Transport::Instance());
-  CHECK_NOTNULL(service_discovery::TopologyManager::Instance());
-  CHECK_NOTNULL(scheduler::Scheduler::Instance());
-  // CHECK_NOTNULL(TaskManager::Instance());
-  CHECK_NOTNULL(PerfEventCache::Instance());
-
-  // Register exit handlers
-  if (!g_atexit_registered) {
-    if (std::atexit(ExitHandle) != 0) {
-      AERROR << "Register exit handle failed";
-      return false;
-    }
-    AINFO << "Register exit handle succ.";
-    g_atexit_registered = true;
-  }
-  SetState(STATE_INITIALIZED);
-  return true;
-}
-
-bool Init(const char* argv) {
-  const char* slash = strrchr(argv, '/');
+void InitLogger(const char* binary_name) {
+  const char* slash = strrchr(binary_name, '/');
   if (slash) {
     ::apollo::cyber::Binary::SetName(slash + 1);
   } else {
-    ::apollo::cyber::Binary::SetName(argv);
+    ::apollo::cyber::Binary::SetName(binary_name);
   }
-
+  CHECK_NOTNULL(common::GlobalData::Instance());
   // Get log conf object
   auto& log_conf = common::GlobalData::Instance()->Config().log_conf();
 
@@ -126,7 +86,7 @@ bool Init(const char* argv) {
   }
   FLAGS_alsologtostderr = log_conf.log_to_stderr();
   FLAGS_colorlogtostderr = log_conf.color_log_to_stderr();
-  google::InitGoogleLogging(argv);
+  google::InitGoogleLogging(binary_name);
   google::SetLogDestination(google::ERROR, "");
   google::SetLogDestination(google::WARNING, "");
   google::SetLogDestination(google::FATAL, "");
@@ -141,8 +101,51 @@ bool Init(const char* argv) {
   ADEBUG << "glog FLAGS_minloglevel=" << FLAGS_minloglevel;
   ADEBUG << "glog FLAGS_alsologtostderr=" << FLAGS_alsologtostderr;
   ADEBUG << "glog FLAGS_colorlogtostderr=" << FLAGS_colorlogtostderr;
+}
 
-  return Init();
+void CheckSingleton() {
+  // Initialize internal static objects
+  CHECK_NOTNULL(transport::Transport::Instance());
+  CHECK_NOTNULL(service_discovery::TopologyManager::Instance());
+  CHECK_NOTNULL(scheduler::Scheduler::Instance());
+  // CHECK_NOTNULL(TaskManager::Instance());
+  CHECK_NOTNULL(PerfEventCache::Instance());
+}
+}  // namespace
+
+void OnShutdown(int sig) {
+  (void)sig;
+  if (GetState() != STATE_SHUTDOWN) {
+    SetState(STATE_SHUTTING_DOWN);
+  }
+}
+
+void ExitHandle() {
+  AINFO << "Shutdown in ExitHandle";
+  Shutdown();
+}
+
+bool Init(const char* binary_name) {
+  std::lock_guard<std::recursive_mutex> lg(g_mutex);
+  // avoid reinit
+  if (GetState() != STATE_UNINITIALIZED) {
+    return false;
+  }
+
+  InitLogger(binary_name);
+  CheckSingleton();
+  std::signal(SIGINT, OnShutdown);
+  // Register exit handlers
+  if (!g_atexit_registered) {
+    if (std::atexit(ExitHandle) != 0) {
+      AERROR << "Register exit handle failed";
+      return false;
+    }
+    AINFO << "Register exit handle succ.";
+    g_atexit_registered = true;
+  }
+  SetState(STATE_INITIALIZED);
+  return true;
 }
 
 void Shutdown() {

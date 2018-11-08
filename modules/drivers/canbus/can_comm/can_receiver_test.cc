@@ -28,7 +28,7 @@ namespace drivers {
 namespace canbus {
 
 TEST(CanReceiverTest, ReceiveOne) {
-  cyber::Init();
+  cyber::Init("can_receiver_test");
   can::FakeCanClient can_client;
   MessageManager<::apollo::canbus::ChassisDetail> pm;
   CanReceiver<::apollo::canbus::ChassisDetail> receiver;
