@@ -17,6 +17,7 @@
 #include "cyber/mainboard/module_argument.h"
 
 #include <getopt.h>
+#include <libgen.h>
 
 using apollo::cyber::common::GlobalData;
 
@@ -39,14 +40,12 @@ void ModuleArgument::DisplayUsage() {
            "conf for hole process, sched_name should be conf in cyber.pb.conf\n"
         << "Example:\n"
         << "    " << binary_name_ << " -h\n"
-        << "    " << binary_name_
-        << " -d dag_conf_file1 -d dag_conf_file2 "
+        << "    " << binary_name_ << " -d dag_conf_file1 -d dag_conf_file2 "
         << "-p process_name -s sched_name\n";
 }
 
-bool ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
-  const std::string binary_name(argv[0]);
-  binary_name_ = binary_name.substr(binary_name.find_last_of("/") + 1);
+void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
+  binary_name_ = std::string(basename(argv[0]));
   GetOptions(argc, argv);
 
   if (process_name_.empty()) {
@@ -64,7 +63,6 @@ bool ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
   for (std::string& dag : dag_conf_list_) {
     AINFO << "dag_conf: " << dag;
   }
-  return true;
 }
 
 void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
