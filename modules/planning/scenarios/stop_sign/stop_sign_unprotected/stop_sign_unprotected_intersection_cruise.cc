@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
 
 #include <algorithm>
 #include <limits>
