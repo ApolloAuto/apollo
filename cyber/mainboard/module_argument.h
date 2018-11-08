@@ -36,7 +36,7 @@ class ModuleArgument {
   ModuleArgument();
   virtual ~ModuleArgument();
   void DisplayUsage();
-  bool ParseArgument(int argc, char* const argv[]);
+  void ParseArgument(int argc, char* const argv[]);
   void GetOptions(const int argc, char* const argv[]);
   inline std::string GetBinaryName() const { return binary_name_; }
   inline std::string GetProcessName() const { return process_name_; }

@@ -30,11 +30,7 @@ ModuleController::ModuleController(const ModuleArgument& args) { args_ = args; }
 
 ModuleController::~ModuleController() {}
 
-bool ModuleController::Init() {
-  // std::string process_name = args_.GetProcessName();
-  return LoadAll();
-  // return true;
-}
+bool ModuleController::Init() { return LoadAll(); }
 
 void ModuleController::Clear() {
   for (auto& component : component_list_) {
@@ -72,7 +68,7 @@ bool ModuleController::LoadAll() {
     }
     AINFO << "Start initialize dag: " << module_path;
     if (!LoadModule(module_path)) {
-      AERROR << "Failed to load module [" << module_path << "]";
+      AERROR << "Failed to load module: " << module_path;
       return false;
     }
   }
@@ -80,12 +76,12 @@ bool ModuleController::LoadAll() {
 }
 
 bool ModuleController::LoadModule(const DagConfig& dag_config) {
-  std::string work_root = common::WorkRoot();
-  std::string module_root = common::ModuleRoot();
+  const std::string work_root = common::WorkRoot();
+  const std::string module_root = common::ModuleRoot();
 
   for (auto module_config : dag_config.module_config()) {
     std::string load_path;
-    if (module_config.module_library()[0] == '/') {
+    if (module_config.module_library().front() == '/') {
       load_path = module_config.module_library();
     } else {
       load_path =
@@ -98,6 +94,7 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
 
     if (!common::PathExists(load_path)) {
       AERROR << "Path not exist: " << load_path;
+      return false;
     }
 
     class_loader_manager_.LoadLibrary(load_path);
@@ -135,11 +132,11 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
 
 bool ModuleController::LoadModule(const std::string& path) {
   DagConfig dag_config;
-  if (common::GetProtoFromFile(path, &dag_config)) {
-    return LoadModule(dag_config);
-  } else {
+  if (!common::GetProtoFromFile(path, &dag_config)) {
+    AERROR << "Get proto failed, file: " << path;
     return false;
   }
+  return LoadModule(dag_config);
 }
 
 }  // namespace mainboard

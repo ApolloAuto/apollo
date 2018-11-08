@@ -31,11 +31,7 @@ int main(int argc, char** argv) {
 
   // parse the argument
   ModuleArgument module_args;
-  if (!module_args.ParseArgument(argc, argv)) {
-    AERROR << "parse argument error!";
-    module_args.DisplayUsage();
-    return -1;
-  }
+  module_args.ParseArgument(argc, argv);
 
   // initialize cyber
   apollo::cyber::Init(argv[0]);

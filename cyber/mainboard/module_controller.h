@@ -42,13 +42,10 @@ class ModuleController {
   void Clear();
 
  private:
-  // void LoadModules();
-  // void UnloadModules();
   bool LoadModule(const std::string& path);
   bool LoadModule(const DagConfig& dag_config);
 
   ModuleArgument args_;
-
   class_loader::ClassLoaderManager class_loader_manager_;
   std::vector<std::shared_ptr<ComponentBase>> component_list_;
 };
