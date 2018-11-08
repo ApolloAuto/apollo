@@ -33,8 +33,6 @@ cc_library(
         ":end_condition_sampler",
         ":lateral_osqp_optimizer",
         ":lateral_qp_optimizer",
-        ":lateral_trajectory_optimizer",
-        ":lateral_trajectory_optimizer_interface",
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:path_time_graph",
@@ -122,37 +120,6 @@ cc_library(
         "//modules/common",
         "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/math/curve1d",
-    ],
-)
-
-cc_library(
-    name = "lateral_trajectory_optimizer_interface",
-    srcs = [
-        "lateral_trajectory_optimizer_interface.cc",
-    ],
-    hdrs = [
-        "lateral_trajectory_optimizer_interface.h",
-    ],
-    deps = [
-        "//modules/planning/lattice/trajectory1d:constant_jerk_trajectory1d",
-        "@ipopt",
-    ],
-)
-
-cc_library(
-    name = "lateral_trajectory_optimizer",
-    srcs = [
-        "lateral_trajectory_optimizer.cc",
-    ],
-    hdrs = [
-        "lateral_trajectory_optimizer.h",
-    ],
-    deps = [
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/lattice/behavior:path_time_graph",
-        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
-        "//modules/planning/lattice/trajectory_generation:lateral_trajectory_optimizer_interface",
-        "@ipopt",
     ],
 )
 
