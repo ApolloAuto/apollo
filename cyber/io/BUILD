@@ -29,19 +29,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "poll_test",
-    size = "small",
-    srcs = [ "poll_test.cc", ],
-    deps = [
-        "poll_data",
-        "poll_handler",
-        "poller",
-        "//cyber:cyber_core",
-        "@gtest",
-    ],
-)
-
 cc_library(
     name = "poller",
     srcs = [ "poller.cc", ],
@@ -52,6 +39,16 @@ cc_library(
         "//cyber/common:log",
         "//cyber/common:macros",
         "//cyber/time",
+    ],
+)
+
+cc_test(
+    name = "poller_test",
+    size = "small",
+    srcs = [ "poller_test.cc", ],
+    deps = [
+        "poller",
+        "@gtest",
     ],
 )
 

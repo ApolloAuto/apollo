@@ -54,6 +54,11 @@ bool Poller::Register(const PollRequest& req) {
     return false;
   }
 
+  if (req.fd < 0 || req.callback == nullptr) {
+    AERROR << "input is invalid";
+    return false;
+  }
+
   PollCtrlParam ctrl_param;
   ctrl_param.fd = req.fd;
   ctrl_param.event.data.fd = req.fd;
@@ -71,7 +76,7 @@ bool Poller::Register(const PollRequest& req) {
   }
 
   {
-    ReadLockGuard<AtomicRWLock> lck(changes_lock_);
+    WriteLockGuard<AtomicRWLock> lck(changes_lock_);
     changes_.push_back(ctrl_param);
   }
 
@@ -81,6 +86,11 @@ bool Poller::Register(const PollRequest& req) {
 
 bool Poller::Unregister(const PollRequest& req) {
   if (is_shutdown_.load()) {
+    return false;
+  }
+
+  if (req.fd < 0 || req.callback == nullptr) {
+    AERROR << "input is invalid";
     return false;
   }
 
@@ -98,7 +108,7 @@ bool Poller::Unregister(const PollRequest& req) {
   ctrl_param.fd = req.fd;
 
   {
-    ReadLockGuard<AtomicRWLock> lck(changes_lock_);
+    WriteLockGuard<AtomicRWLock> lck(changes_lock_);
     changes_.push_back(ctrl_param);
   }
 
@@ -146,8 +156,8 @@ bool Poller::Init() {
   ctrl_param.event.events = EPOLLIN;
   changes_.push_back(ctrl_param);
 
-  thread_ = std::thread(&Poller::ThreadFunc, this);
   is_shutdown_.exchange(false);
+  thread_ = std::thread(&Poller::ThreadFunc, this);
   return true;
 }
 
@@ -187,7 +197,8 @@ void Poller::Poll(int timeout_ms) {
   auto before_time_ns = Time::Now().ToNanosecond();
   int ready_num = epoll_wait(epoll_fd_, evt, kPollSize, timeout_ms);
   auto after_time_ns = Time::Now().ToNanosecond();
-  int interval_ms = (before_time_ns - after_time_ns) / 1000000;
+  int interval_ms =
+      static_cast<int>((after_time_ns - before_time_ns) / 1000000);
   if (interval_ms == 0) {
     interval_ms = 1;
   }
@@ -206,6 +217,7 @@ void Poller::Poll(int timeout_ms) {
 
       if (request->timeout_ms == 0) {
         responses[item.first] = PollResponse();
+        request->timeout_ms = -1;
       }
     }
   }
@@ -225,6 +237,7 @@ void Poller::Poll(int timeout_ms) {
     ReadLockGuard<AtomicRWLock> lck(requests_lock_);
     auto search = requests_.find(fd);
     if (search != requests_.end()) {
+      search->second->timeout_ms = -1;
       search->second->callback(response);
     }
   }
