@@ -47,10 +47,15 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
       << FLAGS_planner_open_space_config_filename;
 
   current_trajectory_index_ = 0;
-  // initialize open space trajectory generator;
+  // initialize open space trajectory generator
   open_space_trajectory_generator_.reset(new OpenSpaceTrajectoryGenerator());
 
   open_space_trajectory_generator_->Init(planner_open_space_config_);
+
+  // initialize open space region of interest generator
+  if (FLAGS_enable_open_space_roi_and_info) {
+    open_space_roi_generator_.reset(new OpenSpaceROI());
+  }
 
   if (FLAGS_enable_open_space_planner_thread) {
     task_future_ =
@@ -69,17 +74,21 @@ apollo::common::Status OpenSpacePlanner::Plan(
     BuildPredictedEnvironment(frame->obstacles());
 
     // 2. Update Vehicle information and obstacles information from frame.
-    // TODO(QiL, Jinyun): Refactor this to be more compact
+
     vehicle_state_ = frame->vehicle_state();
-    rotate_angle_ = frame->origin_heading();
-    translate_origin_ = frame->origin_point();
-    end_pose_ = frame->open_space_end_pose();
-    obstacles_num_ = frame->obstacles_num();
-    obstacles_edges_num_ = frame->obstacles_edges_num();
-    obstacles_A_ = frame->obstacles_A();
-    obstacles_b_ = frame->obstacles_b();
-    obstalce_list_ = frame->openspace_warmstart_obstacles();
-    XYbounds_ = frame->ROI_xy_boundary();
+    if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Generate Open Space ROI failed");
+    }
+    rotate_angle_ = open_space_roi_generator_->origin_heading();
+    translate_origin_ = open_space_roi_generator_->origin_point();
+    end_pose_ = open_space_roi_generator_->open_space_end_pose();
+    obstacles_num_ = open_space_roi_generator_->obstacles_num();
+    obstacles_edges_num_ = open_space_roi_generator_->obstacles_edges_num();
+    obstacles_A_ = open_space_roi_generator_->obstacles_A();
+    obstacles_b_ = open_space_roi_generator_->obstacles_b();
+    obstalce_list_ = open_space_roi_generator_->openspace_warmstart_obstacles();
+    XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
     // 3. Check if trajectory updated, if so, update internal
     // trajectory_partition_;
     if (trajectory_updated_) {
@@ -125,15 +134,19 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // Single thread logic
 
     vehicle_state_ = frame->vehicle_state();
-    rotate_angle_ = frame->origin_heading();
-    translate_origin_ = frame->origin_point();
-    end_pose_ = frame->open_space_end_pose();
-    obstacles_num_ = frame->obstacles_num();
-    obstacles_edges_num_ = frame->obstacles_edges_num();
-    obstacles_A_ = frame->obstacles_A();
-    obstacles_b_ = frame->obstacles_b();
-    obstalce_list_ = frame->openspace_warmstart_obstacles();
-    XYbounds_ = frame->ROI_xy_boundary();
+    if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Generate Open Space ROI failed");
+    }
+    rotate_angle_ = open_space_roi_generator_->origin_heading();
+    translate_origin_ = open_space_roi_generator_->origin_point();
+    end_pose_ = open_space_roi_generator_->open_space_end_pose();
+    obstacles_num_ = open_space_roi_generator_->obstacles_num();
+    obstacles_edges_num_ = open_space_roi_generator_->obstacles_edges_num();
+    obstacles_A_ = open_space_roi_generator_->obstacles_A();
+    obstacles_b_ = open_space_roi_generator_->obstacles_b();
+    obstalce_list_ = open_space_roi_generator_->openspace_warmstart_obstacles();
+    XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
 
     // 2. Generate Trajectory;
     Status status = open_space_trajectory_generator_->Plan(

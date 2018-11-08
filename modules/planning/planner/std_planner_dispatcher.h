@@ -42,12 +42,6 @@ class StdPlannerDispatcher final : public PlannerDispatcher {
   virtual ~StdPlannerDispatcher() = default;
 
   std::unique_ptr<Planner> DispatchPlanner() override;
-
- private:
-  bool CheckParkingROI(
-      apollo::hdmap::ParkingSpaceInfoConstPtr target_parking_spot,
-      const hdmap::HDMap* hdmap, const common::VehicleState& vehicle_state,
-      std::vector<apollo::hdmap::LaneSegment>* segments_vector);
 };
 
 }  // namespace planning

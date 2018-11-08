@@ -13,6 +13,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/open_space:open_space_trajectory_generator",
+        "//modules/planning/open_space:open_space_ROI",
         "//external:gflags",
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
