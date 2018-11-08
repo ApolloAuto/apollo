@@ -29,6 +29,7 @@ namespace cyber {
 namespace mainboard {
 
 static const char DEFAULT_process_name_[] = "mainboard_default";
+static const char DEFAULT_sched_name_[] = "CYBER_DEFAULT";
 
 class ModuleArgument {
  public:
@@ -39,6 +40,7 @@ class ModuleArgument {
   void GetOptions(const int argc, char* const argv[]);
   inline std::string GetBinaryName() const { return binary_name_; }
   inline std::string GetProcessName() const { return process_name_; }
+  inline std::string GetSchedName() const { return sched_name_; }
   inline std::list<std::string> GetDAGConfList() const {
     return dag_conf_list_;
   }
@@ -47,6 +49,7 @@ class ModuleArgument {
   std::list<std::string> dag_conf_list_;
   std::string binary_name_;
   std::string process_name_;
+  std::string sched_name_;
 };
 
 }  // namespace mainboard

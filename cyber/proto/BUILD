@@ -38,6 +38,9 @@ proto_library(
     srcs = [
         "task_choreo_conf.proto",
     ],
+    deps = [
+        ":scheduler_conf_proto",
+    ]
 )
 
 cc_proto_library(

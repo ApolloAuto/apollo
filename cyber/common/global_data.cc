@@ -69,6 +69,11 @@ void GlobalData::SetProcessName(const std::string& process_name) {
 }
 const std::string& GlobalData::ProcessName() const { return process_name_; }
 
+void GlobalData::SetSchedName(const std::string& sched_name) {
+  sched_name_ = sched_name;
+}
+const std::string& GlobalData::SchedName() const { return sched_name_; }
+
 const std::string& GlobalData::HostIp() const { return host_ip_; }
 
 const std::string& GlobalData::HostName() const { return host_name_; }

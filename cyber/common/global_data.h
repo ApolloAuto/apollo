@@ -43,6 +43,9 @@ class GlobalData {
   void SetProcessName(const std::string& process_name);
   const std::string& ProcessName() const;
 
+  void SetSchedName(const std::string& sched_name);
+  const std::string& SchedName() const;
+
   const std::string& HostIp() const;
 
   const std::string& HostName() const;
@@ -84,6 +87,9 @@ class GlobalData {
   // process info
   int process_id_;
   std::string process_name_;
+
+  // sched policy info
+  std::string sched_name_ = "CYBER_DEFAULT";
 
   // run mode
   bool is_reality_mode_;
