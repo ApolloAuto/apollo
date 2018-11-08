@@ -98,7 +98,6 @@ inline bool RecordWriter::WriteMessage(const std::string& channel_name,
                                        const std::string& content,
                                        const uint64_t time_nanosec,
                                        const std::string& proto_desc) {
-  OnNewMessage(channel_name);
   proto::SingleMessage single_msg;
   single_msg.set_channel_name(channel_name);
   single_msg.set_content(content);
