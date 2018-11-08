@@ -51,8 +51,11 @@ bool RadarDetectionComponent::Init() {
     return false;
   }
 
+  writer_ = node_->CreateWriter<SensorFrameMessage>(
+    comp_config.output_channel_name());
+
   // init algorithm plugin
-  CHECK(InitAlgorithmPlugin() == SUCC) << "Failed to init algorithm plugin.";
+  CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
   radar2world_trans_.Init(tf_child_frame_id_);
   radar2novatel_trans_.Init(tf_child_frame_id_);
   localization_subscriber_.Init(odometry_channel_name_,
@@ -97,7 +100,7 @@ int RadarDetectionComponent::InitAlgorithmPlugin() {
   CHECK(radar_perception_->Init(pipeline_name_))
       << "Failed to init radar perception.";
   AINFO << "Init algorithm plugin successfully.";
-  return SUCC;
+  return true;
 }
 
 bool RadarDetectionComponent::InternalProc(
@@ -137,14 +140,14 @@ bool RadarDetectionComponent::InternalProc(
   // init detector_options
   Eigen::Affine3d radar_trans;
   if (radar2world_trans_.GetSensor2worldTrans(timestamp, &radar_trans) !=
-      SUCC) {
+      true) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Fail to get pose at time: " << timestamp;
     return true;
   }
   Eigen::Affine3d radar2novatel_trans;
   if (radar2novatel_trans_.GetTrans(timestamp, &radar2novatel_trans, "novatel",
-                                    tf_child_frame_id_) != SUCC) {
+                                    tf_child_frame_id_) != true) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Fail to get radar2novatel trans at time: " << timestamp;
     return true;
@@ -157,10 +160,10 @@ bool RadarDetectionComponent::InternalProc(
   options.detector_options.radar2novatel_trans = &radar2novatel_trans_m;
   if (GetCarLocalizationSpeed(
           timestamp, &(options.detector_options.car_linear_speed),
-          &(options.detector_options.car_angular_speed)) != SUCC) {
+          &(options.detector_options.car_angular_speed)) != true) {
     AERROR << "Failed to call get_car_speed. [timestamp: "
               << std::to_string(timestamp);
-    return false;
+    // return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetCarSpeed");
   // init roi_filter_options
@@ -216,9 +219,9 @@ int RadarDetectionComponent::GetCarLocalizationSpeed(
   CHECK_NOTNULL(car_angular_speed);
   (*car_angular_speed) = Eigen::Vector3f::Zero();
   std::shared_ptr<LocalizationEstimate const> loct_ptr;
-  if (localization_subscriber_.LookupNearest(timestamp, &loct_ptr) != SUCC) {
+  if (localization_subscriber_.LookupNearest(timestamp, &loct_ptr) != true) {
     AERROR << "Can not get car speed.";
-    return FAIL;
+    return false;
   }
   (*car_linear_speed)[0] = loct_ptr->pose().linear_velocity().x();
   (*car_linear_speed)[1] = loct_ptr->pose().linear_velocity().y();
@@ -227,7 +230,7 @@ int RadarDetectionComponent::GetCarLocalizationSpeed(
   (*car_angular_speed)[1] = loct_ptr->pose().angular_velocity().y();
   (*car_angular_speed)[2] = loct_ptr->pose().angular_velocity().z();
 
-  return SUCC;
+  return true;
 }
 
 }  // namespace onboard
