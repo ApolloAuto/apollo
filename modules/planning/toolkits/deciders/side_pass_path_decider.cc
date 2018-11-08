@@ -73,6 +73,7 @@ Status SidePassPathDecider::Process(Frame *frame,
           frame->PlanningStartPoint());
   if (!GeneratePath(frame, reference_line_info)) {
     const std::string msg = "Fail to generate path.";
+    AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   return Status::OK();
@@ -97,14 +98,18 @@ bool SidePassPathDecider::BuildSidePathDecision(
   }
 
   const auto &lane_pb = lane->lane();
+  ADEBUG << lane_pb.ShortDebugString();
   if (lane_pb.left_neighbor_forward_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::LEFT;
   } else if (lane_pb.right_neighbor_forward_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::RIGHT;
   } else if (lane_pb.left_neighbor_reverse_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::LEFT;
-  } else {
+  } else if (lane_pb.right_neighbor_reverse_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::RIGHT;
+  } else {
+    AERROR << "Fail to find side pass direction.";
+    return false;
   }
   return true;
 }
@@ -164,6 +169,9 @@ bool SidePassPathDecider::GeneratePath(Frame *frame,
   }
 
   auto path_data = reference_line_info->mutable_path_data();
+  if (path_data == nullptr) {
+    return false;
+  }
   path_data->SetReferenceLine(&reference_line_info->reference_line());
   path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
 
@@ -227,6 +235,9 @@ SidePassPathDecider::GetPathBoundaries(
     std::get<2>(lateral_bound) =
         lane_left_width_at_curr_s - adc_half_width - kRoadBuffer;
 
+    ADEBUG << "default bound: " << std::get<1>(lateral_bound) << ", "
+           << std::get<2>(lateral_bound);
+
     if (is_blocked_by_obs) {
       if (decided_direction_ == SidePassDirection::LEFT) {
         std::get<1>(lateral_bound) = nearest_obs_sl_boundary.end_l() +
@@ -243,7 +254,7 @@ SidePassPathDecider::GetPathBoundaries(
         return lateral_bounds;
       }
     }
-    ADEBUG << "obsrbound: " << std::get<0>(lateral_bound) << ", "
+    ADEBUG << "obstacle bound: " << std::get<0>(lateral_bound) << ", "
            << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound);
 
     lateral_bounds.push_back(lateral_bound);
