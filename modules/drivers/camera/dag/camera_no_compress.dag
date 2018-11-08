@@ -18,13 +18,13 @@ module_config {
       }
     }
 
-    # components {
-    #   class_name : "CameraComponent"
-    #   config {
-    #     name : "camera_front_fisheye"
-    #     config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
-    #   }
-    # }
+    components {
+      class_name : "CameraComponent"
+      config {
+        name : "camera_front_fisheye"
+        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
+      }
+    }
 
     # components {
     #   class_name : "CameraComponent"
