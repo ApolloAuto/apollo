@@ -34,6 +34,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/open_space/open_space_ROI.h"
 #include "modules/planning/open_space/open_space_trajectory_generator.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
@@ -122,6 +123,7 @@ class OpenSpacePlanner : public Planner {
 
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 
+  std::unique_ptr<OpenSpaceROI> open_space_roi_generator_;
   apollo::common::VehicleState vehicle_state_;
   double rotate_angle_;
   apollo::common::math::Vec2d translate_origin_;
