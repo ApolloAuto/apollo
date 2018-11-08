@@ -17,7 +17,7 @@
 #ifndef CYBER_SERVICE_DISCOVERY_ROLE_GRAPH_H_
 #define CYBER_SERVICE_DISCOVERY_ROLE_GRAPH_H_
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 #include <unordered_map>
 
@@ -26,10 +26,6 @@
 namespace apollo {
 namespace cyber {
 namespace service_discovery {
-
-using apollo::cyber::base::AtomicRWLock;
-using apollo::cyber::base::ReadLockGuard;
-using apollo::cyber::base::WriteLockGuard;
 
 /**
  * @brief describe the flow direction between nodes

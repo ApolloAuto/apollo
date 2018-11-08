@@ -22,17 +22,19 @@ namespace apollo {
 namespace cyber {
 namespace service_discovery {
 
+using proto::RoleAttributes;
+
 TEST(RoleTest, constructor_getter_setter) {
   RoleBase role_a;
-  EXPECT_EQ(role_a.timestamp(), 0);
-  role_a.set_timestamp(123);
-  EXPECT_EQ(role_a.timestamp(), 123);
+  EXPECT_EQ(role_a.timestamp_ns(), 0);
+  role_a.set_timestamp_ns(123);
+  EXPECT_EQ(role_a.timestamp_ns(), 123);
 
   RoleWriter role_writer_a;
-  EXPECT_EQ(role_writer_a.timestamp(), 0);
+  EXPECT_EQ(role_writer_a.timestamp_ns(), 0);
 
   RoleServer role_server_a;
-  EXPECT_EQ(role_server_a.timestamp(), 0);
+  EXPECT_EQ(role_server_a.timestamp_ns(), 0);
 
   RoleAttributes attr;
   attr.set_host_name("caros");
@@ -42,20 +44,20 @@ TEST(RoleTest, constructor_getter_setter) {
   EXPECT_EQ(role_a.attributes().process_id(), 12345);
 
   RoleBase role_b(attr, 321);
-  EXPECT_EQ(role_b.timestamp(), 321);
+  EXPECT_EQ(role_b.timestamp_ns(), 321);
 
   RoleWriter role_writer_b(attr, 321);
-  EXPECT_EQ(role_writer_b.timestamp(), 321);
+  EXPECT_EQ(role_writer_b.timestamp_ns(), 321);
 
   RoleWriter role_server_b(attr, 321);
-  EXPECT_EQ(role_server_b.timestamp(), 321);
+  EXPECT_EQ(role_server_b.timestamp_ns(), 321);
 }
 
 TEST(RoleTest, is_earlier_than) {
   RoleBase role_a;
-  role_a.set_timestamp(123);
+  role_a.set_timestamp_ns(123);
   RoleBase role_b;
-  role_b.set_timestamp(456);
+  role_b.set_timestamp_ns(456);
   EXPECT_TRUE(role_a.IsEarlierThan(role_b));
   EXPECT_FALSE(role_b.IsEarlierThan(role_a));
 }

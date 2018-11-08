@@ -17,11 +17,10 @@
 #ifndef CYBER_SERVICE_DISCOVERY_ROLE_ROLE_H_
 #define CYBER_SERVICE_DISCOVERY_ROLE_ROLE_H_
 
-#include <cstdint>
+#include <stdint.h>
 #include <memory>
 #include <string>
 
-#include "cyber/common/types.h"
 #include "cyber/proto/role_attributes.pb.h"
 
 namespace apollo {
@@ -43,45 +42,45 @@ using RoleServerPtr = std::shared_ptr<RoleServer>;
 using RoleClient = RoleServer;
 using RoleClientPtr = std::shared_ptr<RoleClient>;
 
-using apollo::cyber::proto::RoleAttributes;
-
 class RoleBase {
  public:
   RoleBase();
-  explicit RoleBase(const RoleAttributes& attr, uint64_t timestamp = 0);
-  virtual ~RoleBase();
+  explicit RoleBase(const proto::RoleAttributes& attr,
+                    uint64_t timestamp_ns = 0);
+  virtual ~RoleBase() = default;
 
-  virtual bool Match(const RoleAttributes& target_attr) const;
+  virtual bool Match(const proto::RoleAttributes& target_attr) const;
   bool IsEarlierThan(const RoleBase& other) const;
 
-  uint64_t timestamp() const { return timestamp_; }
-  void set_timestamp(uint64_t timestamp) { timestamp_ = timestamp; }
+  const proto::RoleAttributes& attributes() const { return attributes_; }
+  void set_attributes(const proto::RoleAttributes& attr) { attributes_ = attr; }
 
-  // getter and setter
-  const RoleAttributes& attributes() const { return attributes_; }
-  void set_attributes(const RoleAttributes& attr) { attributes_ = attr; }
+  uint64_t timestamp_ns() const { return timestamp_ns_; }
+  void set_timestamp_ns(uint64_t timestamp_ns) { timestamp_ns_ = timestamp_ns; }
 
  protected:
-  RoleAttributes attributes_;
-  uint64_t timestamp_;
+  proto::RoleAttributes attributes_;
+  uint64_t timestamp_ns_;
 };
 
 class RoleWriter : public RoleBase {
  public:
-  RoleWriter();
-  explicit RoleWriter(const RoleAttributes& attr, uint64_t timestamp = 0);
-  virtual ~RoleWriter();
+  RoleWriter() {}
+  explicit RoleWriter(const proto::RoleAttributes& attr,
+                      uint64_t timestamp_ns = 0);
+  virtual ~RoleWriter() = default;
 
-  bool Match(const RoleAttributes& target_attr) const override;
+  bool Match(const proto::RoleAttributes& target_attr) const override;
 };
 
 class RoleServer : public RoleBase {
  public:
-  RoleServer();
-  explicit RoleServer(const RoleAttributes& attr, uint64_t timestamp = 0);
-  virtual ~RoleServer();
+  RoleServer() {}
+  explicit RoleServer(const proto::RoleAttributes& attr,
+                      uint64_t timestamp_ns = 0);
+  virtual ~RoleServer() = default;
 
-  bool Match(const RoleAttributes& target_attr) const override;
+  bool Match(const proto::RoleAttributes& target_attr) const override;
 };
 
 }  // namespace service_discovery
