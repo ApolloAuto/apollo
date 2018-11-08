@@ -27,7 +27,7 @@
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -36,25 +36,18 @@ namespace stop_sign_protected {
 
 struct StopSignUnprotectedContext;
 
-class StopSignUnprotectedStop : public Stage {
+class StopSignUnprotectedCreep : public Stage {
  public:
-  explicit StopSignUnprotectedStop(const ScenarioConfig::StageConfig& config)
+  explicit StopSignUnprotectedCreep(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
-  StopSignUnprotectedContext* GetContext() {
-    return GetContextAs<StopSignUnprotectedContext>();
-  }
-  int RemoveWatchVehicle(
-      const Obstacle& obstacle,
-      const std::vector<std::string>& watch_vehicle_ids,
-      std::unordered_map<std::string, std::vector<std::string>>*
-          watch_vehicles);
 
- private:
-  ScenarioStopSignUnprotectedConfig scenario_config_;
+  StopSignUnprotectedContext* GetContext() {
+    return Stage::GetContextAs<StopSignUnprotectedContext>();
+  }
 };
 
 }  // namespace stop_sign_protected

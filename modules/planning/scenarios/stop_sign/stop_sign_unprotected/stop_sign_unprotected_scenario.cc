@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -31,10 +31,10 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_stop.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_creep.h"
-#include "modules/planning/scenarios/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_stop.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_creep.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
 
 namespace apollo {
 namespace planning {
