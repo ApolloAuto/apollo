@@ -29,7 +29,7 @@ namespace monitor {
 
 class MonitorBufferTest : public ::testing::Test {
  protected:
-  void SetUp() override { cyber::Init(); }
+  void SetUp() override { cyber::Init("monitor_log_buffer_test"); }
   void TearDown() override {}
   MonitorLogBuffer buffer_{MonitorMessageItem::CONTROL};
 };

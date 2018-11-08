@@ -38,7 +38,7 @@ class ParameterServerTest : public ::testing::Test {
 
   virtual void SetUp() {
     // Called before every TEST_F(ParameterServerTest, *)
-    apollo::cyber::Init();
+    apollo::cyber::Init("parameter_server_test");
     node_ = CreateNode("parameter_server");
     ps_.reset(new ParameterServer(node_));
   }

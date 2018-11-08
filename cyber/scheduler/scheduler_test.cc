@@ -17,11 +17,11 @@
 #include <gtest/gtest.h>
 #include <string>
 
-#include "cyber/cyber.h"
-#include "cyber/scheduler/scheduler.h"
 #include "cyber/common/global_data.h"
+#include "cyber/cyber.h"
 #include "cyber/proto/scheduler_conf.pb.h"
 #include "cyber/scheduler/processor_context.h"
+#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
@@ -32,7 +32,7 @@ auto sched = Scheduler::Instance();
 void proc() {}
 
 TEST(SchedulerTest, create_task) {
-  cyber::Init();
+  cyber::Init("scheduler_test");
   std::string croutine_name = "DriverProc";
 
   EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));
@@ -44,7 +44,7 @@ TEST(SchedulerTest, create_task) {
 }
 
 TEST(SchedulerTest, notify_task) {
-  cyber::Init();
+  cyber::Init("scheduler_test");
   std::string name = "croutine";
   auto id = GlobalData::RegisterTaskName(name);
   // notify task that the id is not exist
@@ -52,7 +52,6 @@ TEST(SchedulerTest, notify_task) {
   EXPECT_TRUE(sched->CreateTask(&proc, name));
   EXPECT_TRUE(sched->NotifyTask(id));
 }
-
 
 }  // namespace scheduler
 }  // namespace cyber

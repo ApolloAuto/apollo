@@ -15,21 +15,19 @@
  *****************************************************************************/
 #include "gtest/gtest.h"
 
+#include "cyber/common/global_data.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
 #include "cyber/cyber.h"
-#include "cyber/common/global_data.h"
 
 namespace apollo {
 namespace cyber {
 namespace croutine {
 
-void function() {
-  CRoutine::Yield(RoutineState::IO_WAIT);
-}
+void function() { CRoutine::Yield(RoutineState::IO_WAIT); }
 
 TEST(Croutine, croutinetest) {
-  apollo::cyber::Init();
+  apollo::cyber::Init("croutine_test");
   auto context = std::make_shared<apollo::cyber::croutine::RoutineContext>();
   apollo::cyber::croutine::CRoutine::SetMainContext(context);
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(function);

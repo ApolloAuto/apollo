@@ -28,13 +28,12 @@
 
 #define LEFT_BRACKET "["
 #define RIGHT_BRACKET "] "
-#define DEFAULT_NAME "mainboard"
 
 #ifndef MODULE_NAME
 #define MODULE_NAME apollo::cyber::Binary::GetName().c_str()
 #endif
 
-#define ADEBUG_MODULE(module)                                             \
+#define ADEBUG_MODULE(module) \
   VLOG(4) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET << "[DEBUG] "
 #define ADEBUG ADEBUG_MODULE(MODULE_NAME)
 #define AINFO ALOG_MODULE(MODULE_NAME, INFO)
@@ -51,19 +50,19 @@
   ALOG_MODULE_STREAM(log_severity)(module)
 #endif
 
-#define ALOG_MODULE_STREAM_INFO(module)                                \
+#define ALOG_MODULE_STREAM_INFO(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::INFO).stream() \
       << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
 
-#define ALOG_MODULE_STREAM_WARN(module)                                   \
+#define ALOG_MODULE_STREAM_WARN(module)                            \
   google::LogMessage(__FILE__, __LINE__, google::WARNING).stream() \
       << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
 
-#define ALOG_MODULE_STREAM_ERROR(module)                                \
+#define ALOG_MODULE_STREAM_ERROR(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::ERROR).stream() \
       << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
 
-#define ALOG_MODULE_STREAM_FATAL(module)                                \
+#define ALOG_MODULE_STREAM_FATAL(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::FATAL).stream() \
       << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
 
