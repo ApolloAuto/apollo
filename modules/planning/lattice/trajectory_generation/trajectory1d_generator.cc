@@ -32,7 +32,6 @@
 #include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_osqp_optimizer.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
-#include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer.h"
 
 namespace apollo {
 namespace planning {
