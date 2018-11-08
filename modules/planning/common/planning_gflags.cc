@@ -43,7 +43,7 @@ DEFINE_string(scenario_stop_sign_unprotected_config_file,
 
 DEFINE_bool(enable_scenario_side_pass, false,
             "enable the side pass scenario in planning");
-DEFINE_bool(enable_scenario_stop_sign_unprotected, false,
+DEFINE_bool(enable_scenario_stop_sign_unprotected, true,
             "enable the stop_sign_unprotected scenario in planning");
 
 DEFINE_string(traffic_rule_config_filename,
