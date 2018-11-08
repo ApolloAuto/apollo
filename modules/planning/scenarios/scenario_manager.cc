@@ -52,7 +52,7 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     ptr.reset(new scenario::side_pass::SidePassScenario(
         config_map_[scenario_type], &scenario_context_));
   } else if (scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
-    ptr.reset(new scenario::stop_sign_protected::StopSignUnprotectedScenario(
+    ptr.reset(new scenario::stop_sign_unprotected::StopSignUnprotectedScenario(
         config_map_[scenario_type], &scenario_context_));
   } else {
     return nullptr;

@@ -33,7 +33,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign_protected {
+namespace stop_sign_unprotected {
 
 class StopSignUnprotectedScenarioTest : public ::testing::Test {
  public:
@@ -67,7 +67,7 @@ TEST_F(StopSignUnprotectedScenarioTest, Init) {
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
 }
 
-}  // namespace stop_sign_protected
+}  // namespace stop_sign_unprotected
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
