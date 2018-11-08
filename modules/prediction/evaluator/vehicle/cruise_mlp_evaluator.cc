@@ -394,7 +394,7 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
   feature_values->push_back(forward_obstacle.s());
   feature_values->push_back(forward_obstacle.l());
   if (!forward_obstacle.has_id()) {  // no forward obstacle
-    feature_values->push_back(100.0);
+    feature_values->push_back(0.0);
     feature_values->push_back(0.0);
   } else {
     Obstacle* forward_obs_ptr =
@@ -408,7 +408,7 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
   feature_values->push_back(backward_obstacle.s());
   feature_values->push_back(backward_obstacle.l());
   if (!backward_obstacle.has_id()) {  // no forward obstacle
-    feature_values->push_back(100.0);
+    feature_values->push_back(0.0);
     feature_values->push_back(0.0);
   } else {
     Obstacle* backward_obs_ptr =
