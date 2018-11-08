@@ -172,6 +172,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/common:validation_checker",
+        "//modules/prediction/network/cruise_model:cruise_model",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
