@@ -99,23 +99,25 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
     AERROR << "msg buffer is uninitialized.";
-    return cyber::FAIL;
+    return false;
   }
   if (buffer_queue_.empty()) {
     AERROR << "msg buffer is empty.";
-    return cyber::FAIL;
+    return false;
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
-    AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest "
-           << "timestamp (" << buffer_queue_.front().first << ").";
-    return cyber::FAIL;
+    AERROR << "Your timestamp (" << std::to_string(timestamp)
+           << ") is earlier than the oldest " << "timestamp ("
+           << std::to_string(buffer_queue_.front().first) << ").";
+    return false;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
-    AERROR << "Your timestamp (" << timestamp << ") is newer than the latest "
-           << "timestamp (" << buffer_queue_.back().first << ").";
-    return cyber::FAIL;
+    AERROR << "Your timestamp (" << std::to_string(timestamp)
+           << ") is newer than the latest " << "timestamp ("
+           << std::to_string(buffer_queue_.back().first) << ").";
+    return false;
   }
 
   // loop to find nearest
@@ -130,7 +132,7 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   }
   *msg = buffer_queue_[idx + 1].second;
 
-  return cyber::SUCC;
+  return true;
 }
 
 template <class T>
@@ -138,14 +140,14 @@ int MsgBuffer<T>::LookupLatest(ConstPtr* msg) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
     AERROR << "msg buffer is uninitialized.";
-    return cyber::FAIL;
+    return false;
   }
   if (buffer_queue_.empty()) {
     AERROR << "msg buffer is empty.";
-    return cyber::FAIL;
+    return false;
   }
   *msg = buffer_queue_.back().second;
-  return cyber::SUCC;
+  return true;
 }
 
 template <class T>
@@ -154,23 +156,23 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
     AERROR << "msg buffer is uninitialized.";
-    return cyber::FAIL;
+    return false;
   }
   if (buffer_queue_.empty()) {
     AERROR << "msg buffer is empty.";
-    return cyber::FAIL;
+    return false;
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is earlier than the oldest "
            << "timestamp (" << buffer_queue_.front().first << ").";
-    return cyber::FAIL;
+    return false;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
     AERROR << "Your timestamp (" << timestamp << ") is newer than the latest "
            << "timestamp (" << buffer_queue_.back().first << ").";
-    return cyber::FAIL;
+    return false;
   }
 
   const double lower_timestamp = timestamp - period;
@@ -188,7 +190,7 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
     }
   }
 
-  return cyber::SUCC;
+  return true;
 }
 
 }  // namespace onboard

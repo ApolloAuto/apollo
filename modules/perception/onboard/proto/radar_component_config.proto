@@ -10,4 +10,5 @@ message RadarComponentConfig {
   optional string radar_perception_method = 5;
   optional string radar_pipeline_name = 6;
   optional string odometry_channel_name = 7;
+  optional string output_channel_name = 8;
 }

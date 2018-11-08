@@ -97,6 +97,8 @@ bool RadarObstaclePerception::Perceive(
            << tracker_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");
 
+  *objects = tracker_frame_ptr->objects;
+
   return true;
 }
 
