@@ -18,7 +18,7 @@
 #include <assert.h>
 
 #include <algorithm>
-#include <iostream>
+#include <cfloat>
 #include <string>
 #include <tuple>
 #include <utility>

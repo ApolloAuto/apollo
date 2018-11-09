@@ -16,6 +16,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/common/util:file_util",
         "//modules/perception/lib/utils:perception_string_util",
     ],
 )

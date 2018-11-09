@@ -23,12 +23,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <algorithm>
 #include <cstring>
 #include <fstream>
 
 #include "cyber/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/lib/utils/string_util.h"
 
 namespace apollo {
@@ -39,6 +43,7 @@ using std::count;
 using std::istreambuf_iterator;
 using std::string;
 using std::vector;
+using apollo::common::util::PathExists;
 
 bool FileUtil::GetType(const string &filename, FileType *type) {
   struct stat stat_buf;
@@ -57,7 +62,7 @@ bool FileUtil::GetType(const string &filename, FileType *type) {
 }
 
 bool FileUtil::DeleteFile(const string &filename) {
-  if (!Exists(filename)) {
+  if (!PathExists(filename)) {
     return true;
   }
   FileType type;
@@ -111,15 +116,6 @@ bool FileUtil::DeleteFile(const string &filename) {
   return true;
 }
 
-bool FileUtil::Exists(const string &file) {
-  int ret = access(file.c_str(), F_OK);
-  if (ret != 0) {
-    AINFO << "file not exist. file: " << file << " ret: " << strerror(errno);
-    return false;
-  }
-  return true;
-}
-
 bool FileUtil::Exists(const string &path, const string &suffix) {
   boost::filesystem::recursive_directory_iterator itr(path);
   while (itr != boost::filesystem::recursive_directory_iterator()) {
@@ -152,7 +148,7 @@ bool FileUtil::CreateDir(const string &dir) {
   std::string multi_layer_dir;
   for (const auto &term : terms_vec) {
     multi_layer_dir = multi_layer_dir + term + "/";
-    if (term == "." || Exists(multi_layer_dir)) {
+    if (term == "." || PathExists(multi_layer_dir)) {
       continue;
     }
     int ret = mkdir(multi_layer_dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
@@ -230,7 +226,7 @@ std::string FileUtil::RemoveFileSuffix(std::string filename) {
 
 bool FileUtil::GetFileList(const std::string &path, const std::string &suffix,
                            std::vector<std::string> *files) {
-  if (!Exists(path)) {
+  if (!PathExists(path)) {
     AINFO << path << " not exist.";
     return false;
   }

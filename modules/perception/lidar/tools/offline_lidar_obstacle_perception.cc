@@ -23,12 +23,14 @@
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/singleton/singleton.h"
@@ -38,7 +40,6 @@
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/pcl_util.h"
-#include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 DEFINE_string(pcd_path, "./pcd/", "pcd path");
 DEFINE_string(pose_path, "", "pose path");
@@ -145,7 +146,7 @@ class OfflineLidarObstaclePerception {
         lib::FileUtil::GetFileName(pcd_file_names[i], &file_name);
         std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
         AINFO << "Pose file: " << pose_file_name;
-        if (!lib::FileUtil::Exists(pose_file_name)) {
+        if (!apollo::common::util::PathExists(pose_file_name)) {
           pose_file_name = pose_folder + "/" + file_name + ".pcd.pose";
         }
         int idt = 0;

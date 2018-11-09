@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "cyber/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -90,7 +91,7 @@ bool HDMapInput::InitHDMap() {
     AERROR << "hdmap_file not found.";
     return false;
   }
-  if (!lib::FileUtil::Exists(hdmap_file_)) {
+  if (!apollo::common::util::PathExists(hdmap_file_)) {
     AERROR << "Failed to find hadmap file: " << hdmap_file_;
     return false;
   }

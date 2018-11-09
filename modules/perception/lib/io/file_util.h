@@ -15,9 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
 
@@ -37,13 +34,6 @@ enum FileCompareType {
 
 class FileUtil {
  public:
-  FileUtil() {}
-
-  ~FileUtil() {}
-
-  // check whether file and directory exists
-  static bool Exists(const std::string &filename);
-
   // check whether file exists with [suffix] extension in [path]
   static bool Exists(const std::string &path, const std::string &suffix);
 
@@ -94,13 +84,11 @@ class FileUtil {
   static bool CompareFileByLexicographical(const std::string &file_left,
                                            const std::string &file_right);
 
-  FileUtil(const FileUtil &) = delete;
-  FileUtil &operator=(const FileUtil &) = delete;
-
  private:
   static bool CompareFile(const std::string &file_left,
                           const std::string &file_right, FileCompareType type);
 };
+
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo

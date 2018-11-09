@@ -95,8 +95,6 @@ TEST(FileUtilTest, TestExists) {
   ASSERT_EQ(system("touch ./tmp/a.txt"), 0);
   EXPECT_TRUE(FileUtil::Exists("./tmp", ".txt"));
   EXPECT_FALSE(FileUtil::Exists("./tmp", ".bat"));
-  EXPECT_TRUE(FileUtil::Exists("./tmp/a.txt"));
-  EXPECT_FALSE(FileUtil::Exists("./tmp1"));
   ASSERT_TRUE(FileUtil::DeleteFile("./tmp/a.txt"));
   ASSERT_TRUE(FileUtil::DeleteFile("./tmp"));
   // ASSERT_TRUE(FileUtil::DeleteFile("./tmp1"));
@@ -197,8 +195,6 @@ TEST(FileUtilTest, TestGetFileContent) {
       system("chmod a+r /apollo/modules/perception/testdata/lib/data3/1.txt"),
       0);
 }
-
-TEST(FileUtilTest, TestFileUtil) { FileUtil file_util; }
 
 }  // namespace lib
 }  // namespace perception

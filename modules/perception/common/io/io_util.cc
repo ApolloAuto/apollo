@@ -21,19 +21,21 @@
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
 #include <Eigen/Geometry>
+
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <vector>
 
 #include "cyber/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/camera.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace perception {
 namespace common {
+using apollo::common::util::PathExists;
 
 bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
                   int *frame_id, double *time_stamp) {
@@ -67,8 +69,7 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
     return false;
   }
 
-  lib::FileUtil file_util;
-  if (!file_util.Exists(yaml_file)) {
+  if (!PathExists(yaml_file)) {
     return false;
   }
 
@@ -108,8 +109,7 @@ bool LoadOmnidirectionalCameraIntrinsics(
     return false;
   }
 
-  lib::FileUtil file_util;
-  if (!file_util.Exists(yaml_file)) {
+  if (!PathExists(yaml_file)) {
     return false;
   }
 
