@@ -33,7 +33,7 @@ namespace cyber {
 namespace base {
 
 template <typename T>
-class ObjectPool {
+class ObjectPool : public std::enable_shared_from_this<ObjectPool<T>> {
  public:
   using InitFunc = std::function<void(T *)>;
   using ObjectPoolPtr = std::shared_ptr<ObjectPool<T>>;
@@ -47,7 +47,6 @@ class ObjectPool {
   virtual ~ObjectPool();
 
   std::shared_ptr<T> GetObject();
-  void Dump() const;
 
  private:
   struct Node {
@@ -122,19 +121,12 @@ template <typename T>
 std::shared_ptr<T> ObjectPool<T>::GetObject() {
   if (unlikely(free_head_ == nullptr)) return nullptr;
 
+  auto self = this->shared_from_this();
   auto obj =
       std::shared_ptr<T>(reinterpret_cast<T *>(free_head_),
-                         [this](T *object) { this->ReleaseObject(object); });
+                         [self](T *object) { self->ReleaseObject(object); });
   free_head_ = free_head_->next;
   return obj;
-}
-
-template <typename T>
-void ObjectPool<T>::Dump() const {
-  Node *n = free_head_;
-  while (n) {
-    n = n->next;
-  }
 }
 
 }  // namespace base

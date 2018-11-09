@@ -30,19 +30,19 @@ class TestNode {
 };
 
 TEST(ObjectPoolTest, get_object) {
-  auto pool = new ObjectPool<TestNode>(10, 100);
+  auto pool = std::make_shared<ObjectPool<TestNode>>(10, 100);
   for (int i = 0; i < 10; i++) {
     EXPECT_EQ(100, pool->GetObject()->value);
   }
   EXPECT_NE(nullptr, pool->GetObject());
-  delete pool;
+  pool.reset();
 
-  auto pool2 = new ObjectPool<TestNode>(10);
+  auto pool2 = std::make_shared<ObjectPool<TestNode>>(10);
   for (int i = 0; i < 10; i++) {
     EXPECT_EQ(0, pool2->GetObject()->value);
   }
   EXPECT_NE(nullptr, pool2->GetObject());
-  delete pool2;
+  pool2.reset();
 }
 
 }  // namespace base

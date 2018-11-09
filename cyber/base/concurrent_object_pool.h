@@ -33,7 +33,7 @@ namespace cyber {
 namespace base {
 
 template <typename T>
-class CCObjectPool {
+class CCObjectPool : public std::enable_shared_from_this<CCObjectPool<T>> {
  private:
   struct Node {
     T object;
@@ -58,7 +58,6 @@ class CCObjectPool {
 
   std::shared_ptr<T> GetObject();
   void ReleaseObject(T *);
-  void Dump() const;
 
  private:
   CCObjectPool(CCObjectPool &) = delete;
@@ -117,44 +116,35 @@ CCObjectPool<T>::~CCObjectPool() {
 
 template <typename T>
 std::shared_ptr<T> CCObjectPool<T>::GetObject() {
-  Head newh;
-  Head oldh = pool_.load(std::memory_order_acquire);
+  Head new_head;
+  Head old_head = pool_.load(std::memory_order_acquire);
   do {
-    if (unlikely(oldh.node == nullptr)) return nullptr;
+    if (unlikely(old_head.node == nullptr)) return nullptr;
 
-    newh.c = oldh.c + 1;
-    newh.node = oldh.node->next;
-  } while (!pool_.compare_exchange_weak(oldh, newh, std::memory_order_acq_rel,
+    new_head.c = old_head.c + 1;
+    new_head.node = old_head.node->next;
+  } while (!pool_.compare_exchange_weak(old_head, new_head,
+                                        std::memory_order_acq_rel,
                                         std::memory_order_acquire));
 
-  return std::shared_ptr<T>(&(oldh.node->object),
-                            [this](T *object) { this->ReleaseObject(object); });
+  auto self = this->shared_from_this();
+  return std::shared_ptr<T>(&(old_head.node->object),
+                            [self](T *object) { self->ReleaseObject(object); });
 }
 
 template <typename T>
 void CCObjectPool<T>::ReleaseObject(T *object) {
-  Head newh;
-  Node *n = reinterpret_cast<Node *>(object);
+  Head new_head;
+  Node *node = reinterpret_cast<Node *>(object);
 
-  Head oldh = pool_.load(std::memory_order_acquire);
+  Head old_head = pool_.load(std::memory_order_acquire);
   do {
-    n->next = oldh.node;
-    newh.c = oldh.c + 1;
-    newh.node = n;
-  } while (!pool_.compare_exchange_weak(oldh, newh, std::memory_order_acq_rel,
+    node->next = old_head.node;
+    new_head.c = old_head.c + 1;
+    new_head.node = node;
+  } while (!pool_.compare_exchange_weak(old_head, new_head,
+                                        std::memory_order_acq_rel,
                                         std::memory_order_acquire));
-}
-
-template <typename T>
-void CCObjectPool<T>::Dump() const {
-  Head h = pool_.load(std::memory_order_acquire);
-  Node *n = h.node;
-  int c = 0;
-
-  while (n) {
-    c++;
-    n = n->next;
-  }
 }
 
 }  // namespace base
