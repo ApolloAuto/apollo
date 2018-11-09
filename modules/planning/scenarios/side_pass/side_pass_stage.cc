@@ -44,6 +44,35 @@ constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
  */
 Stage::StageStatus SidePassApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  // check the status of side pass scenario
+  const SLBoundary& adc_sl_boundary =
+      frame->reference_line_info().front().AdcSlBoundary();
+  const PathDecision& path_decision =
+      frame->reference_line_info().front().path_decision();
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
+      continue;
+    }
+    CHECK(obstacle->IsStatic());
+
+    if (obstacle->PerceptionSLBoundary().start_s() <=
+        adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
+      continue;
+    }
+    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
+    if (obstacle->PerceptionSLBoundary().start_s() >
+        adc_sl_boundary.end_s() +
+            kAdcDistanceThreshold) {  // vehicles are far away
+      continue;
+    }
+    if (obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
+        obstacle->PerceptionSLBoundary().end_l() < -1.0) {
+      continue;
+    }
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+  // do path planning
   bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
     AERROR << "Stage " << Name() << " error: "
@@ -54,7 +83,6 @@ Stage::StageStatus SidePassApproachObstacle::Process(
       frame->reference_line_info().front();
   double adc_velocity = frame->vehicle_state().linear_velocity();
   double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const PathDecision& path_decision = reference_line_info.path_decision();
 
   double front_obstacle_distance = 1000;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
