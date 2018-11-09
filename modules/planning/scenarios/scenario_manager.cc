@@ -87,10 +87,9 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
-  // TODO(all): add conf
-  // CHECK(Scenario::LoadConfig(
-  //    FLAGS_scenario_traffic_light_right_turn_unprotected_config_file,
-  //    &config_map_[ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED]));
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_traffic_light_right_turn_unprotected_config_file,
+      &config_map_[ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED]));
 }
 
 bool ScenarioManager::SelectChangeLaneScenario(
