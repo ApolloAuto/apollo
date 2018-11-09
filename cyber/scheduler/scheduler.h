@@ -18,7 +18,6 @@
 #define CYBER_SCHEDULER_SCHEDULER_H_
 
 #include <unistd.h>
-
 #include <atomic>
 #include <map>
 #include <memory>
@@ -56,7 +55,9 @@ class ProcessorContext;
 
 class Scheduler {
  public:
-  ~Scheduler();
+  Scheduler() : stop_(false) {}
+  virtual ~Scheduler() {}
+  static Scheduler *Instance();
   bool CreateTask(const RoutineFactory& factory, const std::string& name);
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
@@ -77,11 +78,8 @@ class Scheduler {
   uint32_t TaskPoolSize() { return task_pool_size_; }
   ProcessorContext* Classic4Choreo() { return classic_4_choreo_; }
 
- private:
-  Scheduler(Scheduler&) = delete;
-  Scheduler& operator=(Scheduler&) = delete;
-
-  void CreateProcessor();
+ protected:
+  virtual void CreateProcessor() = 0;
   std::shared_ptr<ProcessorContext> CreatePctx();
 
   std::unordered_map<int, SchedConf> sched_confs_;
@@ -103,8 +101,6 @@ class Scheduler {
   std::atomic<bool> stop_;
   std::string process_name_;
   ProcessorContext *classic_4_choreo_;
-
-  DECLARE_SINGLETON(Scheduler)
 };
 
 }  // namespace scheduler
