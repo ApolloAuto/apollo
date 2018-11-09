@@ -17,6 +17,8 @@
 #ifndef CYBER_BASE_MACROS_H_
 #define CYBER_BASE_MACROS_H_
 
+#include <cstdlib>
+
 #if __GNUC__ >= 3
 #define likely(x) (__builtin_expect((x), 1))
 #define unlikely(x) (__builtin_expect((x), 0))
@@ -27,6 +29,22 @@
 
 #define CACHELINE_SIZE 64
 
-static inline void cpu_relax() { asm volatile("rep; nop" ::: "memory"); }
+inline void cpu_relax() { asm volatile("rep; nop" ::: "memory"); }
+
+inline void* CheckedMalloc(size_t size) {
+  void* ptr = std::malloc(size);
+  if (!ptr) {
+    throw std::bad_alloc();
+  }
+  return ptr;
+}
+
+inline void* CheckedCalloc(size_t num, size_t size) {
+  void* ptr = std::calloc(num, size);
+  if (!ptr) {
+    throw std::bad_alloc();
+  }
+  return ptr;
+}
 
 #endif  // CYBER_BASE_MACROS_H_
