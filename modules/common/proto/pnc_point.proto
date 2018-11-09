@@ -69,11 +69,22 @@ message TrajectoryPoint {
   optional double relative_time = 4;
   // longitudinal jerk
   optional double da = 5;
-  // vehicle front wheel angle to longitudinal axis
-  optional double steer = 6;
 }
 
 message Trajectory {
   optional string name = 1;
   repeated TrajectoryPoint trajectory_point = 2;
 }
+
+message VehicleMotionPoint {
+  // trajectory point
+  optional TrajectoryPoint trajectory_point = 1;
+  // The angle between vehicle front wheel and vehicle longitudinal axis
+  optional double steer = 2;
+}
+
+message VehicleMotion {
+  optional string name = 1;
+  repeated VehicleMotionPoint vehicle_motion_point = 2;
+}
+

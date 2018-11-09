@@ -286,14 +286,14 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 
   // record debug info
   if (FLAGS_enable_record_debug) {
-    RecordDebugInfo(trajectory_partition_, xWS, uWS, l_warm_up, n_warm_up,
-                    dual_l_result_ds, dual_n_result_ds);
+    RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
+                    dual_n_result_ds);
   }
 
   return Status::OK();
 }
 
-apollo::common::Status OpenSpaceTrajectoryGenerator::UpdateTrajectory(
+void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
     Trajectories* adc_trajectories,
     std::vector<canbus::Chassis::GearPosition>* gear_positions) {
   adc_trajectories->CopyFrom(trajectory_partition_);
@@ -305,29 +305,37 @@ void OpenSpaceTrajectoryGenerator::UpdateDebugInfo(
 }
 
 void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
-    const ADCTrajectories& trajectory_partition_, const Eigen::MatrixXd& xWS,
-    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& dual_l_result_ds,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    const Eigen::MatrixXd& dual_l_result_ds,
     const Eigen::MatrixXd& dual_n_result_ds) {
   open_space_debug_.reset(new planning_internal::OpenSpaceDebug());
+  // load trajectories by optimization and partition
+  open_space_debug_->mutable_trajectories()->CopyFrom(trajectory_partition_);
+  // load warm start trajectory
   auto* warm_start_trajecotry =
       open_space_debug_->mutable_warm_start_trajecotry();
-
-  // load warm start trajectory
   for (size_t i = 0; i < horizon_; i++) {
-    auto* warm_start_point = warm_start_trajecotry->add_trajectory_point();
-    warm_start_point->mutable_path_point()->set_x(xWS(0, i));
-    warm_start_point->mutable_path_point()->set_y(xWS(1, i));
-    warm_start_point->mutable_path_point()->set_theta(xWS(2, i));
-    warm_start_point->set_v(xWS(3, i));
+    auto* warm_start_point = warm_start_trajecotry->add_vehicle_motion_point();
+    warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+        xWS(0, i));
+    warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+        xWS(1, i));
+    warm_start_point->mutable_trajectory_point()
+        ->mutable_path_point()
+        ->set_theta(xWS(2, i));
+    warm_start_point->mutable_trajectory_point()->set_v(xWS(3, i));
     warm_start_point->set_steer(uWS(0, i));
-    warm_start_point->set_a(uWS(1, i));
+    warm_start_point->mutable_trajectory_point()->set_a(uWS(1, i));
   }
-  auto* warm_start_point = warm_start_trajecotry->add_trajectory_point();
-  warm_start_point->mutable_path_point()->set_x(xWS(0, horizon_));
-  warm_start_point->mutable_path_point()->set_y(xWS(1, horizon_));
-  warm_start_point->mutable_path_point()->set_theta(xWS(2, horizon_));
-  warm_start_point->set_v(xWS(3, horizon_));
+  auto* warm_start_point = warm_start_trajecotry->add_vehicle_motion_point();
+  warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+      xWS(0, horizon_));
+  warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+      xWS(1, horizon_));
+  warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_theta(
+      xWS(2, horizon_));
+  warm_start_point->mutable_trajectory_point()->set_v(xWS(3, horizon_));
 
   // load warm start dual variables
   size_t l_warm_up_cols = l_warm_up.rows();
