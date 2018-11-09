@@ -15,15 +15,18 @@
 *****************************************************************************/
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+
 #include <fstream>
 #include <iostream>
-#include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
-#include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
-#include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
+
 #include "cyber/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/camera/common/camera_frame.h"
+#include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
+#include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
+#include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
@@ -65,7 +68,7 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
   lane_postprocessor->Init(postprocessor_init_options);
   LanePostprocessorOptions postprocessor_options;
   std::string result_dir = "./result";
-  if (!lib::FileUtil::Exists(result_dir)) {
+  if (!apollo::common::util::PathExists(result_dir)) {
     lib::FileUtil::CreateDir(result_dir);
   }
   //  set pitch angle

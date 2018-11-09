@@ -16,23 +16,26 @@
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 #include <yaml-cpp/yaml.h>
+
 #include <fstream>
 #include <string>
+
+#include "cyber/common/log.h"
+#include "gflags/gflags.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 #include "modules/perception/base/box.h"
+#include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/base/distortion_model.h"
-#include "cyber/common/log.h"
 #include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"
+#include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/io/io_util.h"
-#include "gflags/gflags.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/utils/string_util.h"
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -130,8 +133,7 @@ int write_track_imgs(const std::string &out_path, const cv::Mat &frame,
 // @description: load camera extrinsics from yaml file
 bool LoadExtrinsics(const std::string &yaml_file,
                     Eigen::Matrix4d *camera_extrinsic) {
-  lib::FileUtil file_util;
-  if (!file_util.Exists(yaml_file)) {
+  if (!apollo::common::util::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
   }
@@ -219,8 +221,7 @@ bool GetProjectMatrix(const std::string &camera_name,
 // intrinsic_parm_ is a protected filed, cannot get directly
 bool LoadCameraIntrinsics(const std::string &yaml_file,
                           Eigen::Matrix3f *camera_intrinsic) {
-  lib::FileUtil file_util;
-  if (!file_util.Exists(yaml_file)) {
+  if (!apollo::common::util::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
   }

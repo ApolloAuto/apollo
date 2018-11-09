@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include "cyber/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
@@ -64,7 +65,7 @@ void lane_postprocessor_eval() {
   lane_postprocessor->Init(postprocessor_init_options);
   LanePostprocessorOptions postprocessor_options;
   std::string result_dir = FLAGS_save_dir;
-  if (!lib::FileUtil::Exists(result_dir)) {
+  if (!apollo::common::util::PathExists(result_dir)) {
     lib::FileUtil::CreateDir(result_dir);
   }
 

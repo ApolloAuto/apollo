@@ -17,10 +17,10 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
-
 #include <yaml-cpp/yaml.h>
 #include <Eigen/Core>
 #include <Eigen/Dense>
+
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
@@ -95,8 +95,7 @@ bool SetCameraHeight(const std::string &sensor_name,
 // @description: load camera extrinsics from yaml file
 bool LoadExtrinsics(const std::string &yaml_file,
                     Eigen::Matrix4d *camera_extrinsic) {
-  lib::FileUtil file_util;
-  if (!file_util.Exists(yaml_file)) {
+  if (!apollo::common::util::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
   }

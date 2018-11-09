@@ -14,18 +14,21 @@
 * limitations under the License.
 *****************************************************************************/
 #include <boost/algorithm/string.hpp>
-#include <yaml-cpp/yaml.h>
 #include <gflags/gflags.h>
 #include <opencv2/opencv.hpp>
+#include <yaml-cpp/yaml.h>
+
 #include <map>
 #include <iomanip>
-#include "modules/perception/lib/utils/string_util.h"
+
+#include "modules/common/util/file.h"
 #include "modules/perception/base/distortion_model.h"
-#include "modules/perception/common/io/io_util.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
+#include "modules/perception/common/io/io_util.h"
+#include "modules/perception/lib/utils/string_util.h"
+#include "modules/perception/lib/io/file_util.h"
 
 DEFINE_string(test_list, "full_test_list.txt", "exe image list");
 DEFINE_string(image_root, "", "root dir of images");
@@ -261,7 +264,7 @@ int work() {
     // save distortion images
     std::string save_dir = FLAGS_undistortion_save_dir + "/" + camera_name;
     if (FLAGS_do_undistortion && (FLAGS_undistortion_save_dir != "") &&
-        lib::FileUtil::Exists(save_dir)) {
+        apollo::common::util::PathExists(save_dir)) {
       base::Image8U image1;
       DataProvider::ImageOptions image_options;
       image_options.target_color = base::Color::BGR;
