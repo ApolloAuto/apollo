@@ -68,7 +68,8 @@ Duration Duration::operator-(const Duration &rhs) const {
 Duration Duration::operator-() const { return Duration(-nanoseconds_); }
 
 Duration Duration::operator*(double scale) const {
-  return Duration(int64_t(nanoseconds_ * scale));
+  return Duration(int64_t(static_cast<double>
+        (nanoseconds_) * scale));
 }
 
 Duration &Duration::operator+=(const Duration &rhs) {
@@ -82,7 +83,8 @@ Duration &Duration::operator-=(const Duration &rhs) {
 }
 
 Duration &Duration::operator*=(double scale) {
-  *this = Duration(int64_t(nanoseconds_ * scale));
+  *this = Duration(int64_t(static_cast<double>
+        (nanoseconds_) * scale));
   return *this;
 }
 

@@ -138,7 +138,9 @@ class AsyncLogger : public google::base::Logger {
     }
 
     inline void add(Msg&& msg, bool flush) {
-      size += sizeof(msg) + msg.message.size();
+      // FIXME: msg size may overflow
+      size += static_cast<int>(sizeof(msg)) +
+          static_cast<int>(msg.message.size());
       messages.emplace_back(std::move(msg));
       this->flush |= flush;
     }

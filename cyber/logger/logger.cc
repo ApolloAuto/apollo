@@ -51,7 +51,7 @@ void Logger::Write(bool force_flush, time_t timestamp, const char* message,
       module_name = log_message.substr(lpos + 1, rpos - lpos - 1);
       auto cut_length = rpos - lpos + 1;
       log_message.replace(lpos, cut_length, "");
-      message_len -= cut_length;
+      message_len -= static_cast<int>(cut_length);
     }
   }
 
