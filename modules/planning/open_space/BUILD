@@ -319,7 +319,7 @@ cc_binary(
         "ADOL-C_sparseNLP.hpp",
     ],
     deps = [
-        "@adolc//:adolc",
+        "@adolc",
         "@ipopt",
     ],
 )

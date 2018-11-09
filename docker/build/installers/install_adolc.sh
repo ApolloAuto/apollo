@@ -25,7 +25,7 @@ wget https://www.coin-or.org/download/source/ADOL-C/ADOL-C-2.6.3.zip -O ADOL-C-2
 unzip ADOL-C-2.6.3.zip
 
 pushd ADOL-C-2.6.3
-./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse
+./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC"
 
 make -j8 all
 make install
