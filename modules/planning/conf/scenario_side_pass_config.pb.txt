@@ -8,6 +8,7 @@ side_pass_config : {
   side_pass_exit_distance : 10.0
   approach_obstacle_max_stop_speed : 1.0e-5
   approach_obstacle_min_stop_distance : 4.0
+  block_obstacle_min_speed : 0.1
 }
 stage_config : {
   stage_type: SIDE_PASS_APPROACH_OBSTACLE

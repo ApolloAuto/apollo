@@ -69,6 +69,7 @@ message ScenarioSidePassConfig {
   optional double side_pass_exit_distance = 1 [default = 10.0];
   optional double approach_obstacle_max_stop_speed = 2 [default = 1.0e-5];
   optional double approach_obstacle_min_stop_distance = 3 [default = 4.0];
+  optional double block_obstacle_min_speed = 4 [default = 0.1]; // m/s
 }
 
 message ScenarioStopSignUnprotectedConfig {
