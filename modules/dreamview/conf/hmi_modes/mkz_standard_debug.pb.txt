@@ -133,10 +133,10 @@ monitored_components {
   }
 }
 monitored_components {
-  key: "Velodyne 64"
+  key: "Lidar 128"
   value: {
     channel {
-      name: "/apollo/sensor/velodyne64/compensator/PointCloud2"
+      name: "/apollo/sensor/lidar128/compensator/PointCloud2"
     }
   }
 }
