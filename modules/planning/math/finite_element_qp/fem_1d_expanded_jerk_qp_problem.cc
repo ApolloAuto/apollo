@@ -72,6 +72,11 @@ bool Fem1dExpandedJerkQpProblem::Optimize() {
                    A_data, A_indices, A_indptr, lower_bounds, upper_bounds, q,
                    data, &work, settings);
 
+  if (work == nullptr || work->solution == nullptr) {
+    AERROR << "Failed to find QP solution.";
+    return false;
+  }
+
   // extract primal results
   x_.resize(num_var_);
   x_derivative_.resize(num_var_);
