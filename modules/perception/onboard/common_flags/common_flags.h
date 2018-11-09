@@ -26,6 +26,7 @@ DECLARE_bool(obs_enable_visualization);
 DECLARE_string(obs_screen_output_dir);
 DECLARE_bool(obs_benchmark_mode);
 DECLARE_bool(obs_save_fusion_supplement);
+DECLARE_bool(start_visualizer);
 
 }  // namespace onboard
 }  // namespace perception

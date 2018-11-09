@@ -19,6 +19,10 @@
 #include <Eigen/Dense>
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/highgui/highgui_c.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -38,6 +42,7 @@
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lib/utils/time_util.h"
+#include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
@@ -102,14 +107,8 @@ bool TrafficLightsPerceptionComponent::Init() {
 
 int TrafficLightsPerceptionComponent::InitConfig() {
   apollo::perception::onboard::TrafficLight traffic_light_param;
-
-  const std::string proto_path =
-      "../production/conf/perception/camera_onboard/"
-      "trafficlights_perception_component.config";
-
   if (!GetProtoConfig(&traffic_light_param)) {
-    AINFO << "load trafficlights perception component proto param failed, "
-        "file dir";
+    AINFO << "load trafficlights perception component proto param failed";
     return false;
   }
 
@@ -806,90 +805,117 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
   PERCEPTION_PERF_FUNCTION();
   const auto &lights = frame->traffic_lights;
   // add traffic light debug info
-  apollo::perception::TrafficLightDebug *light_debug =
-      (*out_msg)->mutable_traffic_light_debug();
+  TrafficLightDebug* light_debug = (*out_msg)->mutable_traffic_light_debug();
 
   // signal number
   light_debug->set_signal_num(lights.size());
 
-  // Crop ROI
-  if (lights.size() > 0 && lights.at(0)->region.debug_roi.size() > 0) {
-    auto& crop_roi = lights.at(0)->region.debug_roi[0];
-    auto tl_cropbox = light_debug->mutable_cropbox();
-    TransRect2Box(crop_roi, tl_cropbox);
-  }
+  if (!lights.empty() && !lights[0]->region.debug_roi.empty()) {
+    const auto& debug_roi = lights[0]->region.debug_roi;
+    // Crop ROI
+    TransRect2Box(debug_roi[0], light_debug->mutable_cropbox());
 
-  // Rectified ROI
-  for (size_t i = 0; i < lights.size(); ++i) {
-    auto& rectified_roi = lights.at(i)->region.detection_roi;
-    auto tl_rectified_box = light_debug->add_box();
-    TransRect2Box(rectified_roi, tl_rectified_box);
-    tl_rectified_box->set_color(
-        static_cast<TrafficLight_Color>(lights.at(i)->status.color));
-    tl_rectified_box->set_selected(true);
-  }
-
-  // Projection ROI
-  for (size_t i = 0; i < lights.size(); ++i) {
-    auto& projection_roi = lights.at(i)->region.projection_roi;
-    auto tl_projection_box = light_debug->add_box();
-    TransRect2Box(projection_roi, tl_projection_box);
-  }
-
-  // debug ROI (candidate detection boxes)
-  if (lights.size() > 0 && lights.at(0)->region.debug_roi.size() > 0) {
-    for (size_t i = 1; i < lights.at(0)->region.debug_roi.size(); ++i) {
-      auto& debug_roi = lights.at(0)->region.debug_roi[i];
-      auto tl_debug_box = light_debug->add_box();
-      TransRect2Box(debug_roi, tl_debug_box);
+    // debug ROI (candidate detection boxes)
+    for (auto iter = debug_roi.begin() + 1; iter != debug_roi.end(); ++iter) {
+      TransRect2Box(*iter, light_debug->add_box());
+      TransRect2Box(*iter, light_debug->add_debug_roi());
     }
   }
 
-  // Crop ROI
-  for (size_t i = 0; i < lights.size(); ++i) {
-    auto& crop_roi = lights.at(i)->region.debug_roi[0];
-    auto tl_crop_box = light_debug->add_crop_roi();
-    TransRect2Box(crop_roi, tl_crop_box);
+  for (const auto& light : lights) {
+    // Detection ROI
+    auto* box = light_debug->add_box();
+    TransRect2Box(light->region.detection_roi, box);
+    box->set_color(static_cast<TrafficLight_Color>(light->status.color));
+    box->set_selected(true);
+
+    // Projection ROI
+    TransRect2Box(light->region.projection_roi, light_debug->add_box());
+    TransRect2Box(light->region.projection_roi,
+                  light_debug->add_projected_roi());
+
+    // Crop ROI
+    TransRect2Box(light->region.debug_roi[0], light_debug->add_crop_roi());
+
+    // Rectified ROI
+    auto* rectified_roi = light_debug->add_rectified_roi();
+    TransRect2Box(light->region.detection_roi, rectified_roi);
+    rectified_roi->set_color(
+        static_cast<TrafficLight_Color>(light->status.color));
+    rectified_roi->set_selected(true);
   }
 
-  // Detection ROI
-  for (size_t i = 0; i < lights.size(); ++i) {
-    auto& rectified_roi = lights.at(i)->region.detection_roi;
-    auto tl_rectified_box = light_debug->add_rectified_roi();
-    TransRect2Box(rectified_roi, tl_rectified_box);
-    tl_rectified_box->set_color(
-        static_cast<TrafficLight_Color>(lights.at(i)->status.color));
-    tl_rectified_box->set_selected(true);
-  }
-
-  // Projection ROI
-  for (size_t i = 0; i < lights.size(); ++i) {
-    auto& projection_roi = lights.at(i)->region.projection_roi;
-    auto tl_projection_box = light_debug->add_projected_roi();
-    TransRect2Box(projection_roi, tl_projection_box);
-  }
-
-  // debug ROI (candidate detection boxes)
-  if (lights.size() > 0 && lights.at(0)->region.debug_roi.size() > 0) {
-    for (size_t i = 1; i < lights.at(0)->region.debug_roi.size(); ++i) {
-      auto& debug_roi = lights.at(0)->region.debug_roi[i];
-      auto tl_debug_box = light_debug->add_debug_roi();
-      TransRect2Box(debug_roi, tl_debug_box);
-    }
-  }
   if (lights.size() > 0) {
     camera::CarPose pose;
     if (GetCarPose(frame->timestamp, &pose)) {
       Eigen::Matrix4d cam_pose;
       pose.GetCameraPose("front_6mm", &cam_pose);
-      double distance = stopline_distance(cam_pose);
-      light_debug->set_distance_to_stop_line(distance);
+      light_debug->set_distance_to_stop_line(stopline_distance(cam_pose));
     } else {
       AERROR << "error occured in calc distance to stop line";
     }
   }
 
+  if (FLAGS_start_visualizer) {
+    Visualize(*frame, lights);
+  }
+
   return true;
+}
+
+void TrafficLightsPerceptionComponent::Visualize(
+    const camera::CameraFrame& frame,
+    const std::vector<base::TrafficLightPtr>& lights) const {
+  if (lights.empty()) {
+    return;
+  }
+  cv::Mat output_image(image_height_, image_width_, CV_8UC3,
+                       cv::Scalar(0, 0, 0));
+  base::Image8U out_image(image_height_, image_width_, base::Color::RGB);
+  camera::DataProvider::ImageOptions image_options;
+  image_options.target_color = base::Color::BGR;
+  frame.data_provider->GetImage(image_options, &out_image);
+  memcpy(output_image.data, out_image.cpu_data(),
+         out_image.total() * sizeof(uint8_t));
+
+  // Crop ROI
+  if (!lights[0]->region.debug_roi.empty()) {
+      const auto& crop_roi = lights.at(0)->region.debug_roi[0];
+      const cv::Rect rect_crop(crop_roi.x, crop_roi.y,
+                               crop_roi.width, crop_roi.height);
+      cv::rectangle(output_image, rect_crop, cv::Scalar(255, 0, 0));
+  }
+
+  for (const auto& light : lights) {
+    // Project lights
+    const auto& projection_roi = light->region.projection_roi;
+    const cv::Rect projection_rect(projection_roi.x, projection_roi.y,
+                                   projection_roi.width, projection_roi.height);
+    cv::rectangle(output_image, projection_rect, cv::Scalar(255, 0, 0));
+
+    // Detect lights
+    const auto& rectified_roi = light->region.detection_roi;
+    const cv::Rect rectified_rect(rectified_roi.x, rectified_roi.y,
+                                  rectified_roi.width, rectified_roi.height);
+    switch (light->status.color) {
+      case base::TLColor::TL_RED:
+        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 0, 255), 2);
+        break;
+      case base::TLColor::TL_GREEN:
+        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 255, 0), 2);
+        break;
+      case base::TLColor::TL_YELLOW:
+        cv::rectangle(output_image, rectified_rect, cv::Scalar(255, 255, 0), 2);
+        break;
+      default:
+        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 0, 0), 2);
+        break;
+    }
+  }
+
+  cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
+  cv::imshow("Traffic Lihgt", output_image);
+  cvWaitKey(30);
 }
 
 void TrafficLightsPerceptionComponent::SendSimulationMsg() {

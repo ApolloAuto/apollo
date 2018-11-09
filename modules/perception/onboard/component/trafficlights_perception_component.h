@@ -105,6 +105,10 @@ class TrafficLightsPerceptionComponent :
       apollo::perception::TrafficLightBox* box);
 
  private:
+  void Visualize(const camera::CameraFrame& frame,
+                 const std::vector<base::TrafficLightPtr>& lights) const;
+
+ private:
   std::mutex mutex_;
 
   std::shared_ptr<camera::TLPreprocessor> preprocessor_;
