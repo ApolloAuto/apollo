@@ -21,6 +21,7 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/base/macros.h"
 #include "cyber/blocker/blocker_manager.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/types.h"
@@ -160,7 +161,7 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
 
   std::shared_ptr<Reader<M0>> reader = nullptr;
 
-  if (is_reality_mode) {
+  if (likely(is_reality_mode)) {
     reader = node_->CreateReader<M0>(reader_cfg);
   } else {
     reader = node_->CreateReader<M0>(reader_cfg, func);
@@ -172,7 +173,7 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
   }
   readers_.emplace_back(std::move(reader));
 
-  if (!is_reality_mode) {
+  if (unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -224,7 +225,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (is_reality_mode) {
+  if (likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1>> self =
@@ -247,7 +248,6 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
 
     reader0 = node_->template CreateReader<M0>(reader_cfg, func);
   }
-
   if (reader0 == nullptr || reader1 == nullptr) {
     AERROR << "Component create reader failed.";
     return false;
@@ -255,7 +255,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   readers_.push_back(std::move(reader0));
   readers_.push_back(std::move(reader1));
 
-  if (!is_reality_mode) {
+  if (unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -327,7 +327,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (is_reality_mode) {
+  if (likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, NullType>> self =
@@ -363,7 +363,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   readers_.push_back(std::move(reader1));
   readers_.push_back(std::move(reader2));
 
-  if (!is_reality_mode) {
+  if (unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -444,7 +444,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (is_reality_mode) {
+  if (likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, M3>> self =
@@ -487,7 +487,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   readers_.push_back(std::move(reader2));
   readers_.push_back(std::move(reader3));
 
-  if (!is_reality_mode) {
+  if (unlikely(!is_reality_mode)) {
     return true;
   }
 
