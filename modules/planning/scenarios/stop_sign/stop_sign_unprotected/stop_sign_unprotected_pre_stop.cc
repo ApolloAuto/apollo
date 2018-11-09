@@ -149,9 +149,9 @@ int StopSignUnprotectedPreStop::AddWatchVehicle(
     AERROR << "can't find over_lap_info for id: " << obstable_lane_id;
     return -1;
   }
-  double stop_line_s = over_lap_info->lane_overlap_info().start_s();
-  double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
-  double distance_to_stop_line = stop_line_s - obstacle_end_s;
+  const double stop_line_s = over_lap_info->lane_overlap_info().start_s();
+  const double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
+  const double distance_to_stop_line = stop_line_s - obstacle_end_s;
   if (distance_to_stop_line >
       scenario_config_.watch_vehicle_max_valid_stop_distance()) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
@@ -179,7 +179,7 @@ int StopSignUnprotectedPreStop::AddWatchVehicle(
  */
 bool StopSignUnprotectedPreStop::CheckADCStop(
     const ReferenceLineInfo& reference_line_info) {
-  double adc_speed =
+  const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > scenario_config_.max_adc_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
@@ -187,10 +187,10 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
   }
 
   // check stop close enough to stop line of the stop_sign
-  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  double stop_line_start_s =
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double stop_line_start_s =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
-  double distance_stop_line_to_adc_front_edge =
+  const double distance_stop_line_to_adc_front_edge =
       stop_line_start_s - adc_front_edge_s;
   ADEBUG << "distance_stop_line_to_adc_front_edge["
          << distance_stop_line_to_adc_front_edge << "]; stop_line_start_s["

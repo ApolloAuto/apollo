@@ -56,6 +56,8 @@ Stage::StageStatus TrafficLightRightTurnUnprotectedCreep::Process(
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
                            traffic_light_overlap_end_s)) {
+    next_stage_ = ScenarioConfig::
+        TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE;
     return Stage::FINISHED;
   }
 

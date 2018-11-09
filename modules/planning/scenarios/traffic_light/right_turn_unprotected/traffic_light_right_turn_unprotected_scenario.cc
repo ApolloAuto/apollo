@@ -31,7 +31,6 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_pre_stop.h"
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_stop.h"
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_creep.h"
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_intersection_cruise.h"
@@ -86,11 +85,6 @@ void TrafficLightRightTurnUnprotectedScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_PRE_STOP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightRightTurnUnprotectedPreStop(config);
-      });
-  s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new TrafficLightRightTurnUnprotectedStop(config);
@@ -138,17 +132,23 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
       traffic_light_overlap_start_s - adc_front_edge_s;
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  const uint32_t time_distance = static_cast<uint32_t>(ceil(
-      adc_distance_to_stop_line / adc_speed));
+
+  auto scenario_config = config_.traffic_light_right_turn_unprotected_config();
+
+  bool is_stopped_for_traffic_light = true;
+  if (adc_speed > scenario_config.max_adc_stop_speed() ||
+      adc_distance_to_stop_line > scenario_config.max_valid_stop_distance()) {
+    is_stopped_for_traffic_light = false;
+    ADEBUG << "ADC not stopped: speed[" << adc_speed
+        << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
+  }
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return (time_distance <=
-          config_.traffic_light_right_turn_unprotected_config()
-              .start_traffic_light_scenario_timer());
+      return is_stopped_for_traffic_light;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:

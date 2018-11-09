@@ -57,7 +57,7 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   auto start_time = GetContext()->stop_start_time;
-  double wait_time = Clock::NowInSeconds() - start_time;
+  const double wait_time = Clock::NowInSeconds() - start_time;
   ADEBUG << "stop_start_time[" << start_time
       << "] wait_time[" << wait_time << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
@@ -160,9 +160,9 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
       return -1;
     }
 
-    double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
-    double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
-    double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
+    const double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
+    const double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
+    const double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
     if (distance_pass_stop_line > scenario_config_.min_pass_s_distance() &&
         !is_path_cross) {
       erase = true;

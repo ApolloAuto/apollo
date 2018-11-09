@@ -54,7 +54,12 @@ Stage::StageStatus TrafficLightRightTurnUnprotectedStop::Process(
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   // TODO(all) : check traffic light color
+  bool waiting = true;
+  if (waiting) {
+    return Stage::RUNNING;
+  }
 
+  next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP;
   return Stage::FINISHED;
 }
 
