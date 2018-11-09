@@ -80,6 +80,20 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   if (!IsFarAwayFromObstacles(reference_line, path_decision.obstacles(),
                               first_path_point, last_path_point)) {
     // wait here, do nothing this cycle.
+    auto& rfl_info = frame->mutable_reference_line_info()->front();
+    *(rfl_info.mutable_speed_data()) =
+      SpeedProfileGenerator::GenerateFallbackSpeedProfile();
+    rfl_info.set_trajectory_type(ADCTrajectory::NORMAL);
+    DiscretizedTrajectory trajectory;
+    if (!rfl_info.CombinePathAndSpeedProfile(
+            frame->PlanningStartPoint().relative_time(),
+            frame->PlanningStartPoint().path_point().s(), &trajectory)) {
+      AERROR << "Fail to aggregate planning trajectory.";
+      return Stage::RUNNING;
+    }
+    rfl_info.SetTrajectory(trajectory);
+    rfl_info.SetDrivable(true);
+
     AINFO << "waiting until obstacles are far away.";
     return Stage::RUNNING;
   }
