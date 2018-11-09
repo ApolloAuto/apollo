@@ -35,16 +35,22 @@ DEFINE_string(
     "The lane follow scenario configuration file");
 DEFINE_string(scenario_side_pass_config_file,
               "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
-              "The side pass scenario configuration file");
+              "side pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario_stop_sign_unprotected_config.pb.txt",
-              "The stop_sign_unprotected scenario configuration file");
+              "stop_sign_unprotected scenario configuration file");
+DEFINE_string(scenario_traffic_light_right_turn_unprotected_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario_traffic_light_right_turn_unprotected_config.pb.txt",
+              "scenario_traffic_light_right_turn_unprotected config file");
 
 DEFINE_bool(enable_scenario_side_pass, false,
-            "enable the side pass scenario in planning");
+            "enable side pass scenario in planning");
 DEFINE_bool(enable_scenario_stop_sign_unprotected, true,
-            "enable the stop_sign_unprotected scenario in planning");
+            "enable stop_sign_unprotected scenario in planning");
+DEFINE_bool(enable_scenario_traffic_light_right_turn_unprotected, false,
+            "enable traffic_light_right_turn_unprotected scenario in planning");
 
 DEFINE_string(traffic_rule_config_filename,
               "/apollo/modules/planning/conf/traffic_rule_config.pb.txt",

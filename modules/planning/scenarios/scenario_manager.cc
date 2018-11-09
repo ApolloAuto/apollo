@@ -26,12 +26,16 @@
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
+#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_scenario.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
 using apollo::hdmap::PathOverlap;
+using stop_sign_unprotected::StopSignUnprotectedScenario;
+using traffic_light_right_turn_unprotected::
+    TrafficLightRightTurnUnprotectedScenario;
 
 bool ScenarioManager::Init(
     const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
@@ -45,18 +49,30 @@ bool ScenarioManager::Init(
 std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     ScenarioConfig::ScenarioType scenario_type) {
   std::unique_ptr<Scenario> ptr;
-  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
-    ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
-                                                  &scenario_context_));
-  } else if (scenario_type == ScenarioConfig::SIDE_PASS) {
-    ptr.reset(new scenario::side_pass::SidePassScenario(
-        config_map_[scenario_type], &scenario_context_));
-  } else if (scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
-    ptr.reset(new scenario::stop_sign_unprotected::StopSignUnprotectedScenario(
-        config_map_[scenario_type], &scenario_context_));
-  } else {
-    return nullptr;
+
+  switch (scenario_type) {
+    case ScenarioConfig::LANE_FOLLOW:
+      ptr.reset(new lane_follow::LaneFollowScenario(
+          config_map_[scenario_type], &scenario_context_));
+      break;
+    case ScenarioConfig::SIDE_PASS:
+      ptr.reset(new scenario::side_pass::SidePassScenario(
+          config_map_[scenario_type], &scenario_context_));
+      break;
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      ptr.reset(
+          new StopSignUnprotectedScenario(
+              config_map_[scenario_type], &scenario_context_));
+      break;
+    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
+      ptr.reset(
+          new TrafficLightRightTurnUnprotectedScenario(
+              config_map_[scenario_type], &scenario_context_));
+      break;
+    default:
+      return nullptr;
   }
+
   if (ptr != nullptr) {
     ptr->Init();
   }
@@ -71,6 +87,10 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
+  // TODO(all): add conf
+  // CHECK(Scenario::LoadConfig(
+  //    FLAGS_scenario_traffic_light_right_turn_unprotected_config_file,
+  //    &config_map_[ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED]));
 }
 
 bool ScenarioManager::SelectChangeLaneScenario(
@@ -174,12 +194,20 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
   for (const auto& overlap : first_overlaps) {
     auto preferred_scenario = ScenarioConfig::LANE_FOLLOW;
-    if (overlap.first == ReferenceLineInfo::STOP_SIGN &&
-        FLAGS_enable_scenario_stop_sign_unprotected) {
-      preferred_scenario = ScenarioConfig::STOP_SIGN_UNPROTECTED;
-    } else if (overlap.first == ReferenceLineInfo::OBSTACLE &&
-               FLAGS_enable_scenario_side_pass) {
+    if (overlap.first == ReferenceLineInfo::OBSTACLE &&
+        FLAGS_enable_scenario_side_pass) {
       preferred_scenario = ScenarioConfig::SIDE_PASS;
+    } else if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
+      // stop_sign scenarios
+      if (FLAGS_enable_scenario_stop_sign_unprotected) {
+        preferred_scenario = ScenarioConfig::STOP_SIGN_UNPROTECTED;
+      }
+    } else if (overlap.first == ReferenceLineInfo::SIGNAL) {
+      // traffic_light scenarios
+      if (FLAGS_enable_scenario_traffic_light_right_turn_unprotected) {
+        preferred_scenario =
+            ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED;
+      }
     }
     if (rejected_scenarios.find(preferred_scenario) !=
             rejected_scenarios.end() ||
