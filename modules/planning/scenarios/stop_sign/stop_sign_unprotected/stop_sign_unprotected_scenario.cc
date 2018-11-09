@@ -128,7 +128,7 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 bool StopSignUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario,
     const common::TrajectoryPoint& ego_point,
-    const Frame& frame) const {
+    const Frame& frame) {
   const std::string stop_sign_overlap_id =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
   if (stop_sign_overlap_id.empty()) {

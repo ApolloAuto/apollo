@@ -123,7 +123,7 @@ std::unique_ptr<Stage> TrafficLightRightTurnUnprotectedScenario::CreateStage(
 bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario,
     const common::TrajectoryPoint& ego_point,
-    const Frame& frame) const {
+    const Frame& frame) {
   const std::string traffic_light_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   if (traffic_light_overlap_id.empty()) {

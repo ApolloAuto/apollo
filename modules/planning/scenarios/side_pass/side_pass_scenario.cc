@@ -94,11 +94,20 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
 
 bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
                                       const common::TrajectoryPoint& ego_point,
-                                      const Frame& frame) const {
+                                      const Frame& frame) {
   if (frame.reference_line_info().size() > 1) {
     return false;
   }
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
+    const auto front_blocking_obstacle =
+        const_cast<Frame&>(frame).Find(front_blocking_obstacle_id_);
+    if (front_blocking_obstacle != nullptr &&
+        !front_blocking_obstacle->IsStatic()) {
+      AWARN << "obstacle: " << front_blocking_obstacle_id_
+            << " starts to move and scenario changes SIDE_PASS back to default "
+               "scenario.";
+      return false;
+    }
     return (current_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
@@ -110,7 +119,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 
 bool SidePassScenario::IsSidePassScenario(
     const common::TrajectoryPoint& planning_start_point,
-    const Frame& frame) const {
+    const Frame& frame) {
   const SLBoundary& adc_sl_boundary =
       frame.reference_line_info().front().AdcSlBoundary();
   const PathDecision& path_decision =
@@ -141,14 +150,16 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
 
 bool SidePassScenario::HasBlockingObstacle(
     const SLBoundary& adc_sl_boundary,
-    const PathDecision& path_decision) const {
+    const PathDecision& path_decision) {
+  // possible state change: default scenario => side_pass scenario
+  front_blocking_obstacle_id_ = "";
+
   // a blocking obstacle is an obstacle blocks the road when it is not blocked
   // (by other obstacles or traffic rules)
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       continue;
     }
-    CHECK(obstacle->IsStatic());
     if (obstacle->speed() >
         side_pass_context_.scenario_config_.block_obstacle_min_speed()) {
       continue;
@@ -193,6 +204,8 @@ bool SidePassScenario::HasBlockingObstacle(
       }
     }
     if (!is_blocked_by_others) {
+      // static obstacle id doesn't contain prediction trajectory suffix.
+      front_blocking_obstacle_id_ = obstacle->Id() + "_0";
       return true;
     }
   }
