@@ -2,7 +2,7 @@
 
 #include "cyber/common/util.h"
 #include "cyber/cyber.h"
-#include "cyber/scheduler/policy/task_choreo.h"
+#include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/processor.h"
 
 namespace apollo {
@@ -13,7 +13,7 @@ void func() {}
 TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
-  ctx.reset(new TaskChoreoContext(processor));
+  ctx.reset(new ChoreoGraphyContext(processor));
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   cr->SetId(common::Hash("choreo"));

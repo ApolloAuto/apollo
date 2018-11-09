@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SCHEDULER_POLICY_TASK_CHOREO_H_
-#define CYBER_SCHEDULER_POLICY_TASK_CHOREO_H_
+#ifndef CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_
+#define CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_
 
 #include <cstdint>
 #include <functional>
@@ -38,7 +38,7 @@ class Processor;
 
 using croutine::CRoutine;
 
-class TaskChoreoContext : public ProcessorContext {
+class ChoreoGraphyContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;

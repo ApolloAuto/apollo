@@ -10,7 +10,7 @@ cc_library(
         "scheduler.cc",
         "policy/scheduler_choreography.cc",
         "policy/scheduler_classic.cc",
-        "policy/task_choreo.cc",
+        "policy/choreography.cc",
         "policy/classic.cc",
     ],
     hdrs = [
@@ -19,7 +19,7 @@ cc_library(
         "scheduler.h",
         "policy/scheduler_choreography.h",
         "policy/scheduler_classic.h",
-        "policy/task_choreo.h",
+        "policy/choreography.h",
         "policy/classic.h",
     ],
     deps = [

@@ -19,7 +19,7 @@
 #include <memory>
 
 #include "cyber/scheduler/processor.h"
-#include "cyber/scheduler/policy/task_choreo.h"
+#include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/policy/classic.h"
 
 namespace apollo {
@@ -75,7 +75,7 @@ SchedulerChoreography::SchedulerChoreography() {
 void SchedulerChoreography::CreateProcessor() {
   for (uint32_t i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
-    auto ctx = std::make_shared<TaskChoreoContext>();
+    auto ctx = std::make_shared<ChoreoGraphyContext>();
 
     proc->BindContext(ctx);
     proc->SetBindCpuIndex(cpu_binding_start_index_ + i);

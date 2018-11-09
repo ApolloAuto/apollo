@@ -18,7 +18,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/scheduler/policy/classic.h"
-#include "cyber/scheduler/policy/task_choreo.h"
+#include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/processor.h"
 
 namespace apollo {
@@ -26,15 +26,15 @@ namespace cyber {
 namespace scheduler {
 
 void func() {}
-TEST(SchedulerPolicyTest, task_choreo) {
+TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
-  ctx.reset(new TaskChoreoContext());
+  ctx.reset(new ChoreoGraphyContext());
   processor->BindContext(ctx);
   ctx->BindProc(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
-  auto task_id = GlobalData::RegisterTaskName("task_choreo");
+  auto task_id = GlobalData::RegisterTaskName("choreo");
   cr->set_id(task_id);
   EXPECT_TRUE(ctx->Enqueue(cr));
   EXPECT_GT(ctx->RqSize(), 0);

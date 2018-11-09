@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/scheduler/policy/task_choreo.h"
+#include "cyber/scheduler/policy/choreography.h"
 
 #include <unordered_map>
 #include <utility>
@@ -34,7 +34,7 @@ using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 using croutine::RoutineState;
 
-std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
+std::shared_ptr<CRoutine> ChoreoGraphyContext::NextRoutine() {
   if (unlikely(stop_)) {
     return nullptr;
   }
@@ -64,7 +64,7 @@ std::shared_ptr<CRoutine> TaskChoreoContext::NextRoutine() {
   return nullptr;
 }
 
-bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
+bool ChoreoGraphyContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   auto& rt_ctx =
       Scheduler::Instance()->RtCtx();
   if (rt_ctx.find(cr->id()) == rt_ctx.end()) {
@@ -87,7 +87,7 @@ bool TaskChoreoContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   }
 }
 
-bool TaskChoreoContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
+bool ChoreoGraphyContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
   {
     WriteLockGuard<AtomicRWLock> lg(rw_lock_);
     if (cr_container_.find(cr->id()) != cr_container_.end()) {
