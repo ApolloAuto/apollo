@@ -18,11 +18,12 @@
  * @file
  **/
 
-#include "modules/planning/toolkits/deciders/decider_stop_sign.h"
+#include "modules/planning/toolkits/deciders/decider_rule_based_stop.h"
 
 #include <string>
 
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -32,32 +33,80 @@ using apollo::common::Status;
 using apollo::common::util::WithinBound;
 using apollo::hdmap::PathOverlap;
 
-DeciderStopSign::DeciderStopSign(const TaskConfig& config) : Decider(config) {
-  CHECK(config.has_decider_stop_sign_config());
-  SetName("DeciderStopSign");
+DeciderRuleBasedStop::DeciderRuleBasedStop(
+    const TaskConfig& config) : Decider(config) {
+  CHECK(config.has_decider_rule_based_stop_config());
+  SetName("DeciderRuleBasedStop");
 }
 
-Status DeciderStopSign::Process(Frame* frame,
+Status DeciderRuleBasedStop::Process(Frame* frame,
                                 ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  // TODO(all): to read from scenario context
-  const std::string stop_sign_id = "TEMP";
-  const double stop_line_s = 100;
+  StopSign(frame, reference_line_info);
 
-  const double stop_distance =
-      config_.decider_stop_sign_config().stop_distance();
-  const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_id;
-  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
-                    stop_distance);
+  TrafficLight(frame, reference_line_info);
 
   return Status::OK();
 }
 
-bool DeciderStopSign::BuildStopDecision(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info,
-    const std::string& stop_wall_id, const double stop_line_s,
+void DeciderRuleBasedStop::StopSign(
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  const std::string stop_sign_id =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  if (stop_sign_id.empty()) {
+    return;
+  }
+
+  const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_id;
+  const double stop_line_s =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+  const double stop_distance =
+      config_.decider_rule_based_stop_config().stop_distance();
+  AERROR << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+      << "] stop_line_s[" << stop_line_s << "]";
+
+  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
+                    stop_distance);
+}
+
+void DeciderRuleBasedStop::TrafficLight(
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  const std::string traffic_light_id =
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  if (traffic_light_id.empty()) {
+    return;
+  }
+
+  // TODO(all): check traffic light
+
+  const std::string stop_wall_id =
+      TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_id;
+  const double stop_line_s =
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
+  const double stop_distance =
+        config_.decider_rule_based_stop_config().stop_distance();
+
+  AERROR << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+      << "] stop_line_s[" << stop_line_s << "]";
+  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
+                    stop_distance);
+}
+
+bool DeciderRuleBasedStop::BuildStopDecision(
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info,
+    const std::string& stop_wall_id,
+    const double stop_line_s,
     const double stop_distance) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -97,8 +146,8 @@ bool DeciderStopSign::BuildStopDecision(
   stop_decision->mutable_stop_point()->set_z(0.0);
 
   auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision("DeciderStopSign", stop_wall->Id(),
-                                         stop);
+  path_decision->AddLongitudinalDecision(
+      "DeciderRuleBasedStop", stop_wall->Id(), stop);
 
   return 0;
 }

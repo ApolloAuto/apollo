@@ -42,6 +42,11 @@ class SunnyvaleLoopTest : public PlanningTestBase {
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_use_multi_thread_to_add_obstacles = false;
+
+    FLAGS_enable_scenario_side_pass = false;
+    FLAGS_enable_scenario_stop_sign_unprotected = false;
+    FLAGS_enable_scenario_traffic_light_right_turn_unprotected = false;
+
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
     ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
     ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
