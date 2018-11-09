@@ -137,6 +137,8 @@ class ArgManager(object):
         self.parser.add_argument('--all', default=False, action="store_true",
                                  help='Record all topics even without high '
                                  'performance disks.')
+        self.parser.add_argument('--small', default=False, action="store_true",
+                                 help='Record samll topics only.')
         self.parser.add_argument('--split_duration', default="1m",
                                  help='Duration to split bags, will be applied '
                                  'as parameter to "rosbag record --duration".')
@@ -191,8 +193,9 @@ class Recorder(object):
         disks = self.disk_manager.disks
         # To record all topics if
         # 1. User requested with '--all' argument.
-        # 2. Or we have a NVME disk.
-        record_all = self.args.all or (len(disks) > 0 and disks[0]['is_nvme'])
+        # 2. Or we have a NVME disk and '--small' is not set.
+        record_all = self.args.all or (
+            len(disks) > 0 and disks[0]['is_nvme'] and not self.args.small)
         # Use the best disk, or fallback '/apollo' if none available.
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
 
