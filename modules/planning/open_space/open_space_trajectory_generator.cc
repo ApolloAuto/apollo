@@ -237,6 +237,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
         current_trajectory->gear() == canbus::Chassis::GEAR_DRIVE) {
       current_trajectory = trajectory_partition.add_adc_trajectory();
       current_trajectory->set_gear(canbus::Chassis::GEAR_REVERSE);
+      distance_s = 0.0;
+      relative_time = 0.0;
     }
     // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
     // then add a new trajectory with GEAR_DRIVE
@@ -244,6 +246,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
         current_trajectory->gear() == canbus::Chassis::GEAR_REVERSE) {
       current_trajectory = trajectory_partition.add_adc_trajectory();
       current_trajectory->set_gear(canbus::Chassis::GEAR_DRIVE);
+      distance_s = 0.0;
+      relative_time = 0.0;
     }
 
     auto* point = current_trajectory->add_trajectory_point();
