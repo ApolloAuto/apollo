@@ -39,7 +39,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace traffic_light_right_turn_unprotected {
+namespace traffic_light {
 
 using common::TrajectoryPoint;
 using common::time::Clock;
@@ -181,7 +181,7 @@ bool TrafficLightRightTurnUnprotectedScenario::GetScenarioConfig() {
   return true;
 }
 
-}  // namespace traffic_light_right_turn_unprotected
+}  // namespace traffic_light
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

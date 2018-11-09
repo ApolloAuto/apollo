@@ -33,9 +33,6 @@ namespace planning {
 namespace scenario {
 
 using apollo::hdmap::PathOverlap;
-using stop_sign_unprotected::StopSignUnprotectedScenario;
-using traffic_light_right_turn_unprotected::
-    TrafficLightRightTurnUnprotectedScenario;
 
 bool ScenarioManager::Init(
     const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
@@ -61,13 +58,13 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       break;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       ptr.reset(
-          new StopSignUnprotectedScenario(
+          new scenario::stop_sign::StopSignUnprotectedScenario(
               config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
-      ptr.reset(
-          new TrafficLightRightTurnUnprotectedScenario(
-              config_map_[scenario_type], &scenario_context_));
+      ptr.reset(new scenario::traffic_light::
+                TrafficLightRightTurnUnprotectedScenario(
+                    config_map_[scenario_type], &scenario_context_));
       break;
     default:
       return nullptr;

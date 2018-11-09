@@ -32,7 +32,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace traffic_light_right_turn_unprotected {
+namespace traffic_light {
 
 struct TrafficLightRightTurnUnprotectedContext;
 
@@ -56,7 +56,7 @@ class TrafficLightRightTurnUnprotectedPreStop : public Stage {
   ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config_;
 };
 
-}  // namespace traffic_light_right_turn_unprotected
+}  // namespace traffic_light
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

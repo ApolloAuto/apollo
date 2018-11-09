@@ -36,7 +36,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign_unprotected {
+namespace stop_sign {
 
 using common::TrajectoryPoint;
 using common::time::Clock;
@@ -208,7 +208,7 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
   return true;
 }
 
-}  // namespace stop_sign_unprotected
+}  // namespace stop_sign
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
