@@ -54,6 +54,14 @@ double Damp(const double x, const double sigma) {
   return 1 / (1 + exp(1 / (std::fabs(x) + sigma)));
 }
 
+bool IsClosed(const double x0, const double y0, const double theta0,
+              const double x1, const double y1, const double theta1) {
+  // TODO(all) move constants to gflags
+  double angle_diff = std::abs(common::math::AngleDiff(theta0, theta1));
+  double distance = std::hypot(x0 - x1, y0 - y1);
+  return distance < 1.0 && angle_diff < M_PI * 0.25;
+}
+
 }  // namespace
 
 Obstacle::Obstacle() {
@@ -248,6 +256,27 @@ void Obstacle::BuildJunctionFeature() {
   } else {
     SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
   }
+}
+
+bool Obstacle::IsClosedToJunctionExit() {
+  CHECK(HasJunctionFeatureWithExits());
+  CHECK_GT(history_size(), 0);
+  const Feature& latest_feature = feature_history_.front();
+  double position_x = latest_feature.position().x();
+  double position_y = latest_feature.position().y();
+  double raw_velocity_heading = std::atan2(latest_feature.raw_velocity().y(),
+                                           latest_feature.raw_velocity().x());
+  for (const JunctionExit& junction_exit :
+       latest_feature.junction_feature().junction_exit()) {
+    double exit_x = junction_exit.exit_position().x();
+    double exit_y = junction_exit.exit_position().y();
+    double exit_heading = junction_exit.exit_heading();
+    if (IsClosed(position_x, position_y, raw_velocity_heading,
+                 exit_x, exit_y, exit_heading)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void Obstacle::SetJunctionFeatureWithEnterLane(
@@ -664,11 +693,12 @@ void Obstacle::SetIsNearJunction(
   feature->set_is_near_junction(is_near_junction);
 }
 
-bool Obstacle::HasJunctionFeature() {
+bool Obstacle::HasJunctionFeatureWithExits() {
   if (history_size() == 0) {
     return false;
   }
-  return latest_feature().has_junction_feature();
+  return latest_feature().has_junction_feature() &&
+         latest_feature().junction_feature().junction_exit_size() > 0;
 }
 
 void Obstacle::InitKFMotionTracker(const Feature& feature) {

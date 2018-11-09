@@ -29,6 +29,8 @@ using apollo::hdmap::LaneInfo;
 namespace apollo {
 namespace prediction {
 
+namespace {
+
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
   int count = 0;
   double sum = 0.0;
@@ -39,13 +41,7 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
   return (count == 0) ? 0.0 : sum / count;
 }
 
-bool IsClosed(const double x0, const double y0, const double theta0,
-              const double x1, const double y1, const double theta1) {
-  // TODO(all) move constants to gflags
-  double angle_diff = std::abs(common::math::AngleDiff(theta0, theta1));
-  double distance = std::hypot(x0 - x1, y0 - y1);
-  return distance < 1.0 && angle_diff < M_PI * 0.25;
-}
+}  // namespace
 
 JunctionMLPEvaluator::JunctionMLPEvaluator() {
   LoadModel(FLAGS_evaluator_vehicle_junction_mlp_file);
@@ -64,14 +60,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
-  JunctionExit curr_junction_exit;
-  bool is_closed_to_junction_exit =
-      IsClosedToJunctionExit(obstacle_ptr, &curr_junction_exit);
-
-  if (is_closed_to_junction_exit) {
-    // TODO(all) Predict based on curr_junction_exit
-    return;
-  }
+  // Assume obstacle is NOT closed to any junction exit
 
   if (obstacle_ptr->history_size() == 0 ||
       !obstacle_ptr->latest_feature().has_junction_feature() ||
@@ -94,35 +83,6 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     FeatureOutput::Insert(obstacle_ptr->latest_feature());
     ADEBUG << "Insert junction feature into feature output";
   }
-}
-
-bool JunctionMLPEvaluator::IsClosedToJunctionExit(
-    const Obstacle* obstacle_ptr,
-    JunctionExit* const curr_junction_exit) {
-  if (obstacle_ptr == nullptr ||
-      obstacle_ptr->history_size() == 0) {
-    AERROR << "Null obstacle or no history found";
-    return false;
-  }
-  const Feature& latest_feature = obstacle_ptr->latest_feature();
-  double position_x = latest_feature.position().x();
-  double position_y = latest_feature.position().y();
-  double raw_velocity_heading = std::atan2(latest_feature.raw_velocity().y(),
-                                           latest_feature.raw_velocity().x());
-
-  for (const JunctionExit& junction_exit :
-       latest_feature.junction_feature().junction_exit()) {
-    double exit_x = junction_exit.exit_position().x();
-    double exit_y = junction_exit.exit_position().y();
-    double exit_heading = junction_exit.exit_heading();
-    if (IsClosed(position_x, position_y, raw_velocity_heading,
-                 exit_x, exit_y, exit_heading)) {
-      *curr_junction_exit = junction_exit;
-      return true;
-    }
-  }
-
-  return false;
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(
