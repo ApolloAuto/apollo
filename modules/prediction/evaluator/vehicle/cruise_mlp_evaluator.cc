@@ -120,7 +120,7 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
-        OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE);
+        OBSTACLE_FEATURE_SIZE);
     Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(feature_values,
         OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
         static_cast<int>(feature_values.size()));
@@ -379,7 +379,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(lane_types.front() == 2 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 3 ? 1.0 : 0.0);
 
-  for (std::size_t i=0; i < FLAGS_cruise_historical_frame_length; i++) {
+  for (std::size_t i = 1; i < FLAGS_cruise_historical_frame_length; i++) {
     feature_values->push_back(pos_history[i].first);
     feature_values->push_back(pos_history[i].second);
     feature_values->push_back(vel_history[i].first);

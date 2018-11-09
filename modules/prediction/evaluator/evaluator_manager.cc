@@ -131,7 +131,8 @@ void EvaluatorManager::Run(
 
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
-        if (obstacle->HasJunctionFeature()) {
+        if (obstacle->HasJunctionFeatureWithExits() &&
+            !obstacle->IsClosedToJunctionExit()) {
           evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
           CHECK_NOTNULL(evaluator);
         } else if (obstacle->IsOnLane()) {

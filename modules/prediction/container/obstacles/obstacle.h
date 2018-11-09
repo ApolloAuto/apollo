@@ -168,10 +168,16 @@ class Obstacle {
   bool IsInJunction(const std::string& junction_id);
 
   /**
+   * @brief Check if the obstacle is closed to a junction exit.
+   * @return If the obstacle is closed to a junction exit.
+   */
+  bool IsClosedToJunctionExit();
+
+  /**
    * @brief Check if the obstacle has junction feature.
    * @return If the obstacle has junction feature.
    */
-  bool HasJunctionFeature();
+  bool HasJunctionFeatureWithExits();
 
   /**
    * @brief Build junction feature.
