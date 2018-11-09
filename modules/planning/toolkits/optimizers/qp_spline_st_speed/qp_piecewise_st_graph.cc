@@ -280,7 +280,8 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
   if (t_evaluated_.size() > 0) {
     ref_kernel->AddReferenceLineKernelMatrix(
         index_list, cruise_,
-        weight * t_evaluated_.size() / qp_st_speed_config_.total_time());
+        weight * static_cast<double>(t_evaluated_.size()) /
+            qp_st_speed_config_.total_time());
   }
 
   return Status::OK();
@@ -315,7 +316,7 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
     if (success && s_min < cruise_[i]) {
       filtered_evaluate_t.push_back(curr_t);
       ref_s.push_back(s_min);
-      index_list.push_back(i);
+      index_list.push_back(static_cast<uint32_t>(i));
       if (st_graph_debug_) {
         auto kernel_follow_ref = st_graph_debug_->mutable_kernel_follow_ref();
         kernel_follow_ref->mutable_t()->Add(curr_t);
@@ -407,7 +408,7 @@ Status QpPiecewiseStGraph::EstimateSpeedUpperBound(
       }
     }
 
-    for (uint32_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
+    for (size_t k = speed_upper_bound->size(); k < t_evaluated_.size(); ++k) {
       speed_upper_bound->push_back(FLAGS_planning_upper_speed_limit);
       ADEBUG << "speed upper bound:" << speed_upper_bound->back();
     }
