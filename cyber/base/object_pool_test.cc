@@ -14,33 +14,77 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/base/object_pool.h"
 #include <thread>
+
+#include "cyber/base/concurrent_object_pool.h"
+#include "cyber/base/object_pool.h"
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
 namespace base {
 
-class TestNode {
- public:
+struct TestNode {
   TestNode() {}
   explicit TestNode(int data) : value(data) {}
   int value = 0;
 };
 
-TEST(ObjectPoolTest, get_object) {
-  auto pool = std::make_shared<ObjectPool<TestNode>>(10, 100);
-  for (int i = 0; i < 10; i++) {
-    EXPECT_EQ(100, pool->GetObject()->value);
+TEST(CCObjectPoolTest, base) {
+  const uint32_t capacity = 1024;
+  std::vector<std::shared_ptr<TestNode>> vec;
+  vec.reserve(capacity);
+  auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
+
+  FOR_EACH(i, 0, capacity) {
+    auto obj = pool->GetObject(i);
+    vec.push_back(obj);
+    EXPECT_EQ(i, obj->value);
   }
+
+  FOR_EACH(i, 0, 10) { EXPECT_EQ(nullptr, pool->GetObject(10)); }
+
+  vec.clear();
+  EXPECT_EQ(10, pool->GetObject(10)->value);
+
+  pool.reset();
+}
+
+TEST(CCObjectPoolTest, multi_thread) {
+  const uint32_t capacity = 1024;
+  std::vector<std::shared_ptr<TestNode>> vec;
+  std::vector<std::thread> thread_pool;
+  vec.reserve(capacity);
+
+  auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
+  FOR_EACH(i, 0, 16) {
+    thread_pool.emplace_back([pool]() {
+      FOR_EACH(i, 0, 100000) { pool->GetObject(10); }
+    });
+  }
+  for (auto& thread : thread_pool) {
+    thread.join();
+  }
+
+  FOR_EACH(i, 0, capacity) {
+    auto obj = pool->GetObject(i);
+    vec.push_back(obj);
+    EXPECT_EQ(i, obj->value);
+  }
+
+  FOR_EACH(i, 0, 10) { EXPECT_EQ(nullptr, pool->GetObject(10)); }
+  vec.clear();
+  pool.reset();
+}
+
+TEST(ObjectPoolTest, get_object) {
+  auto pool = std::make_shared<ObjectPool<TestNode>>(100, 10);
+  FOR_EACH(i, 0, 10) { EXPECT_EQ(10, pool->GetObject()->value); }
   EXPECT_NE(nullptr, pool->GetObject());
   pool.reset();
 
   auto pool2 = std::make_shared<ObjectPool<TestNode>>(10);
-  for (int i = 0; i < 10; i++) {
-    EXPECT_EQ(0, pool2->GetObject()->value);
-  }
+  FOR_EACH(i, 0, 10) { EXPECT_EQ(0, pool2->GetObject()->value); }
   EXPECT_NE(nullptr, pool2->GetObject());
   pool2.reset();
 }

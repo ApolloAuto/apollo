@@ -151,8 +151,12 @@ cc_test(
     ],
     deps = [
         "//cyber/base:object_pool",
+        "//cyber/base:concurrent_object_pool",
         "@gtest//:main",
     ],
+    linkopts = [
+        "-latomic",
+    ]
 )
 
 cc_library(
