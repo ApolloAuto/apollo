@@ -43,7 +43,7 @@ apt-get update -y && apt-get install -y \
 #ros-indigo-catkin
 
 #Install ros-indigo-catkin via source code
-wget http://123.57.58.164/apollo-docker/ros-indigo-catkin-0.6.19.tar.gz
+wget http://www.baiduapollo.club/apollo-docker/ros-indigo-catkin-0.6.19.tar.gz
 tar zxvf ros-indigo-catkin-0.6.19.tar.gz
 if [[ ! -d "/opt" ]]; then
     mkdir /opt
@@ -64,7 +64,7 @@ FILENAME=ros-indigo-apollo-${VERSION}-aarch64.tar.gz
 
 mkdir -p /home/tmp
 cd /home/tmp
-wget http://123.57.58.164/ApolloAuto/apollo-platform/releases/download/${VERSION}/${FILENAME}
+wget http://www.baiduapollo.club/ApolloAuto/apollo-platform/releases/download/${VERSION}/${FILENAME}
 tar xzf ${FILENAME}
 
 ROS="/home/tmp/ros"

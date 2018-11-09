@@ -21,14 +21,17 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+apt-get update -y && apt-get install -y \
+	libgtest-dev
+
 # Install gflags.
-wget http://123.57.58.164/apollo-docker/v2.2.0.tar.gz
+wget http://www.baiduapollo.club/apollo-docker/v2.2.0.tar.gz
 tar xzf v2.2.0.tar.gz
 mkdir gflags-2.2.0/build
 pushd gflags-2.2.0/build
-CXXFLAGS="-fPIC" cmake ..
+#CXXFLAGS="-fPIC" cmake ..
 #maybe should use the command below
-#cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ../
+cmake CXXFLAGS="-fPIC" -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=ON ../
 make -j8
 make install
 popd

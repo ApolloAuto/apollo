@@ -22,10 +22,10 @@ set -e
 # Install Bazel.
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget http://123.57.58.164/apollo-docker/google-perftools-2.1.90.tar.gz
+wget http://www.baiduapollo.club/apollo-docker/google-perftools-2.1.90.tar.gz
 tar zxvf google-perftools-2.1.90.tar.gz
 cp -d google-perftools-2.1.90/lib/* /usr/local/lib/
-cp -r google-perftools-2.1.90/include/google /usr/local/include
+cp -r google-perftools-2.1.90/include/gperftools /usr/local/include
 
 # Clean up.
 rm -fr google-perftools-2.1.90 google-perftools-2.1.90.tar.gz

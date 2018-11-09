@@ -37,7 +37,7 @@ apt-get update -y && apt-get install -y \
 #libopenni-dev
 
 #Install openblas via sourcecode
-wget http://123.57.58.164/apollo-docker/openblas-0.2.18.tar.gz
+wget http://www.baiduapollo.club/apollo-docker/openblas-0.2.18.tar.gz
 tar zxvf openblas-0.2.18.tar.gz
 mkdir /usr/include/openblas
 cp openblas-0.2.18/include/* /usr/include/openblas/
@@ -45,7 +45,7 @@ cp -r -d openblas-0.2.18/lib/* /usr/lib/
 rm -rf openblas-0.2.18 openblas-0.2.18.tar.gz
 
 
-wget http://123.57.58.164/apollo-docker/caffe_aarch64.tar.gz
+wget http://www.baiduapollo.club/apollo-docker/caffe_aarch64.tar.gz
 tar xzf caffe_aarch64.tar.gz
 mv caffe_aarch64/output-GPU/include/caffe /usr/include/
 mv caffe_aarch64/output-GPU/lib/* /usr/lib/aarch64-linux-gnu/
