@@ -25,6 +25,8 @@
 #include "cyber/scheduler/policy/task_choreo.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
+#include "cyber/scheduler/policy/scheduler_classic.h"
+#include "cyber/scheduler/policy/scheduler_choreography.h"
 
 namespace apollo {
 namespace cyber {
@@ -34,89 +36,43 @@ using apollo::cyber::common::GlobalData;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-Scheduler::Scheduler() : stop_(false) {
-  auto gconf = GlobalData::Instance()->Config();
 
-  for (auto& conf : gconf.scheduler_conf().confs()) {
-    sched_confs_[conf.name()] = conf;
-  }
+Scheduler* Scheduler::Instance() {
+  static Scheduler *instance = nullptr;
 
-  int sname;
-  auto desc = SchedName_descriptor()->
-      FindValueByName(GlobalData::Instance()->SchedName());
-  if (desc) {
-    sname = desc->number();
-  } else {
-    AWARN << "Fatal Sched Name";
-    return;
-  }
+  if (unlikely(!instance)) {
+    SchedPolicy spolicy = SchedPolicy::CLASSIC;
+    // SchedPolicy spolicy = SchedPolicy::CHOREO;
 
-  SchedConf sconf;
-  auto itr =
-      sched_confs_.find(sname);
-  // default conf defined in proto will be used
-  // if no specialized conf defined
-  if (itr != sched_confs_.end()) {
-    sconf = itr->second;
-  }
-  sched_policy_ = sconf.policy();
-  proc_num_ = sconf.proc_num();
-  task_pool_size_ = sconf.task_pool_size();
-  cpu_binding_start_index_ =
-      sconf.cpu_binding_start_index();
+    // Get sched policy from conf
+    auto gconf = GlobalData::Instance()->Config();
+    std::unordered_map<int, SchedConf> sconfs;
+    for (auto& conf : gconf.scheduler_conf().confs()) {
+      sconfs[conf.name()] = conf;
+    }
 
-  for (auto& conf : gconf.choreo_conf()) {
-    if (conf.sched_name() == sname) {
-      for (auto& choreo : conf.choreos()) {
-        cr_confs_[choreo.name()] = choreo;
+    auto desc = SchedName_descriptor()->
+                FindValueByName(GlobalData::Instance()->SchedName());
+    if (desc) {
+      int sname = desc->number();
+      auto itr = sconfs.find(sname);
+      if (itr != sconfs.end()) {
+        spolicy = itr->second.policy();
       }
     }
-  }
-  CreateProcessor();
-}
 
-void Scheduler::CreateProcessor() {
-  for (uint32_t i = 0; i < proc_num_; i++) {
-    auto proc = std::make_shared<Processor>();
-
-    std::shared_ptr<ProcessorContext> ctx;
-    switch (sched_policy_) {
-      case SchedPolicy::CLASSIC:
-        ctx.reset(new ClassicContext());
-        break;
+    switch (spolicy) {
       case SchedPolicy::CHOREO:
-        ctx.reset(new TaskChoreoContext());
+        instance = new SchedulerChoreography();
         break;
+      case SchedPolicy::CLASSIC:
       default:
-        ctx.reset(new TaskChoreoContext());
+        instance = new SchedulerClassic();
         break;
     }
-    proc->BindContext(ctx);
-    ctx->BindProc(proc);
-    proc_ctxs_.emplace_back(ctx);
-
-    proc->SetBindCpuIndex(
-        cpu_binding_start_index_ + i);
-    proc->Start();
   }
 
-  // For taskchoreo policy: put tasks w/o processor assigned to a classic pool.
-  if (sched_policy_ == SchedPolicy::CHOREO) {
-    for (uint32_t i = 0; i < task_pool_size_; i++) {
-      auto proc = std::make_shared<Processor>();
-
-      std::shared_ptr<ProcessorContext> ctx;
-      ctx.reset(classic_4_choreo_ = new ClassicContext());
-
-      proc->BindContext(ctx);
-      ctx->BindProc(proc);
-      proc_ctxs_.emplace_back(ctx);
-
-      proc->SetBindCpuIndex(
-          cpu_binding_start_index_ + proc_num_ + i);
-      proc->Start();
-    }
-  }
+  return instance;
 }
 
 void Scheduler::ShutDown() {
@@ -129,8 +85,6 @@ void Scheduler::ShutDown() {
   }
   proc_ctxs_.clear();
 }
-
-Scheduler::~Scheduler() {}
 
 bool Scheduler::CreateTask(const RoutineFactory& factory,
                            const std::string& name) {
