@@ -33,21 +33,27 @@
 namespace apollo {
 namespace planning {
 
-class DeciderStopSign : public Decider {
+class DeciderRuleBasedStop : public Decider {
  public:
-  explicit DeciderStopSign(const TaskConfig& config);
+  explicit DeciderRuleBasedStop(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
+  void StopSign(Frame* const frame,
+                ReferenceLineInfo* const reference_line_info);
+  void TrafficLight(Frame* const frame,
+                    ReferenceLineInfo* const reference_line_info);
   bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
                          const std::string& stop_wall_id,
-                         const double stop_line_s, const double stop_distance);
+                         const double stop_line_s,
+                         const double stop_distance);
 
  private:
   static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
+  static constexpr const char* TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";
 };
 
 }  // namespace planning
