@@ -120,6 +120,7 @@ class OpenSpacePlanner : public Planner {
   int current_trajectory_index_;
   apollo::common::Trajectory current_trajectory_;
   apollo::planning_internal::Trajectories trajectory_partition_;
+  apollo::planning::ADCTrajectory publishable_trajectory_;
   std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
 
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;

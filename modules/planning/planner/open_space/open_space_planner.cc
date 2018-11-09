@@ -193,7 +193,9 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // return error status
 
     if (IsCollisionFreeTrajectory(current_trajectory_)) {
-      frame->mutable_trajectory()->CopyFrom(current_trajectory_);
+      publishable_trajectory_.Clear();
+      publishable_trajectory_.MergeFrom(current_trajectory_);
+      frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
       return Status::OK();
     } else {
       // If collision happens, return wrong planning status and estop
