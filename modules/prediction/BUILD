@@ -8,6 +8,9 @@ cc_library(
     hdrs = [
         "prediction_component.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//cyber",
         "//modules/common",
