@@ -183,7 +183,7 @@ class Slot {
 
  private:
   Callback cb_;
-  bool connected_;
+  bool connected_ = true;
 };
 
 }  // namespace base
