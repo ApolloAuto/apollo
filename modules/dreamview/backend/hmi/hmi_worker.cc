@@ -166,25 +166,29 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
   for (const auto& iter : mode.cyber_modules()) {
     const std::string& module_name = iter.first;
     const CyberModule& cyber_module = iter.second;
+    // Each cyber module should have at least one dag file.
+    CHECK(!cyber_module.dag_files().empty())
+        << "None dag file is provided for " << module_name << " module in "
+        << mode_config_path;
+
     Module& module = LookupOrInsert(mode.mutable_modules(), module_name, {});
     module.set_required_for_safety(cyber_module.required_for_safety());
 
-    // Construct start_command: nohup mainboard -p <process_name> -d <dag> ... &
-    const std::string& process_name = cyber_module.process_name();
+    // Construct start_command: nohup mainboard -s <schedule> -d <dag> ... &
     module.set_start_command(StrCat(
-        "nohup mainboard -p ", process_name,
-        " -s ", cyber::proto::SchedName_Name(cyber_module.schedule())));
+        "nohup mainboard -s ",
+        cyber::proto::SchedName_Name(cyber_module.schedule())));
     for (const std::string& dag : cyber_module.dag_files()) {
       StrAppend(module.mutable_start_command(), " -d ", dag);
     }
     StrAppend(module.mutable_start_command(), " &");
 
-    // Construct stop_command: pkill -f 'mainboard -p <process_name> -d'
-    module.set_stop_command(StrCat(
-        "pkill -f \"mainboard -p ", process_name, "\""));
+    // Construct stop_command: pkill -f '<dag[0]>'
+    const std::string& first_dag = cyber_module.dag_files(0);
+    module.set_stop_command(StrCat("pkill -f \"", first_dag, "\""));
     // Construct process_monitor_config.
     module.mutable_process_monitor_config()->add_command_keywords("mainboard");
-    module.mutable_process_monitor_config()->add_command_keywords(process_name);
+    module.mutable_process_monitor_config()->add_command_keywords(first_dag);
   }
   mode.clear_cyber_modules();
   AINFO << "Loaded HMI mode: " << mode.DebugString();

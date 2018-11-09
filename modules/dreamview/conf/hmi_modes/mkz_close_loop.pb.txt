@@ -1,7 +1,6 @@
 cyber_modules {
   key: "Computer"
   value: {
-    process_name: "cyber_computer"
     dag_files: "/apollo/modules/drivers/camera/dag/camera_no_compress.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
@@ -18,7 +17,6 @@ cyber_modules {
 cyber_modules {
   key: "Controller"
   value: {
-    process_name: "cyber_control"
     dag_files: "/apollo/modules/canbus/dag/canbus.dag"
     dag_files: "/apollo/modules/control/dag/control.dag"
     dag_files: "/apollo/modules/guardian/dag/guardian.dag"

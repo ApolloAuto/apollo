@@ -1,35 +1,30 @@
 cyber_modules {
   key: "Canbus"
   value: {
-    process_name: "canbus"
     dag_files: "/apollo/modules/canbus/dag/canbus.dag"
   }
 }
 cyber_modules {
   key: "Control"
   value: {
-    process_name: "control"
     dag_files: "/apollo/modules/control/dag/control.dag"
   }
 }
 cyber_modules {
   key: "GPS"
   value: {
-    process_name: "gnss"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
   }
 }
 cyber_modules {
   key: "Guardian"
   value: {
-    process_name: "guardian"
     dag_files: "/apollo/modules/guardian/dag/guardian.dag"
   }
 }
 cyber_modules {
   key: "Localization"
   value: {
-    process_name: "localization"
     dag_files: "/apollo/modules/localization/dag/localization.dag"
   }
 }
