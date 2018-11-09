@@ -82,9 +82,9 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   init_y_ = init_state_.y();
   init_phi_ = init_state_.heading();
   init_v_ = init_state_.linear_velocity();
+
   // rotate and scale the state according to the origin point defined in
   // frame
-
   init_x_ = init_x_ - translate_origin.x();
   init_y_ = init_y_ - translate_origin.y();
   double tmp_x = init_x_;
@@ -182,7 +182,6 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   Eigen::MatrixXd dual_l_result_ds;
   Eigen::MatrixXd dual_n_result_ds;
 
-  // TODO(QiL): Pass dual variable warm start result in.
   bool distance_approach_status = distance_approach_->Solve(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, l_warm_up, n_warm_up,
       XYbounds_, obstacles_num, obstacles_edges_num, obstacles_A, obstacles_b,
@@ -284,6 +283,13 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   }
 
   trajectory_partition_.CopyFrom(trajectory_partition);
+
+  // record debug info
+  if (FLAGS_enable_record_debug) {
+    RecordDebugInfo(trajectory_partition_, xWS, uWS, l_warm_up, n_warm_up,
+                    dual_l_result_ds, dual_n_result_ds);
+  }
+
   return Status::OK();
 }
 
@@ -291,7 +297,65 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::UpdateTrajectory(
     Trajectories* adc_trajectories,
     std::vector<canbus::Chassis::GearPosition>* gear_positions) {
   adc_trajectories->CopyFrom(trajectory_partition_);
-  return Status::OK();
+}
+
+void OpenSpaceTrajectoryGenerator::UpdateDebugInfo(
+    std::shared_ptr<planning_internal::OpenSpaceDebug> open_space_debug) {
+  open_space_debug->CopyFrom(*open_space_debug_);
+}
+
+void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
+    const ADCTrajectories& trajectory_partition_, const Eigen::MatrixXd& xWS,
+    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
+    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& dual_l_result_ds,
+    const Eigen::MatrixXd& dual_n_result_ds) {
+  open_space_debug_.reset(new planning_internal::OpenSpaceDebug());
+  auto* warm_start_trajecotry =
+      open_space_debug_->mutable_warm_start_trajecotry();
+
+  // load warm start trajectory
+  for (size_t i = 0; i < horizon_; i++) {
+    auto* warm_start_point = warm_start_trajecotry->add_trajectory_point();
+    warm_start_point->mutable_path_point()->set_x(xWS(0, i));
+    warm_start_point->mutable_path_point()->set_y(xWS(1, i));
+    warm_start_point->mutable_path_point()->set_theta(xWS(2, i));
+    warm_start_point->set_v(xWS(3, i));
+    warm_start_point->set_steer(uWS(0, i));
+    warm_start_point->set_a(uWS(1, i));
+  }
+  auto* warm_start_point = warm_start_trajecotry->add_trajectory_point();
+  warm_start_point->mutable_path_point()->set_x(xWS(0, horizon_));
+  warm_start_point->mutable_path_point()->set_y(xWS(1, horizon_));
+  warm_start_point->mutable_path_point()->set_theta(xWS(2, horizon_));
+  warm_start_point->set_v(xWS(3, horizon_));
+
+  // load warm start dual variables
+  size_t l_warm_up_cols = l_warm_up.rows();
+  for (size_t i = 0; i < horizon_; i++) {
+    for (std::size_t j = 0; j < l_warm_up_cols; j++) {
+      open_space_debug_->add_warm_start_dual_lambda(l_warm_up(j, i));
+    }
+  }
+  size_t n_warm_up_cols = n_warm_up.rows();
+  for (size_t i = 0; i < horizon_; i++) {
+    for (std::size_t j = 0; j < n_warm_up_cols; j++) {
+      open_space_debug_->add_warm_start_dual_miu(n_warm_up(j, i));
+    }
+  }
+
+  // load optimized dual variables
+  size_t dual_l_result_ds_cols = dual_l_result_ds.rows();
+  for (size_t i = 0; i < horizon_; i++) {
+    for (std::size_t j = 0; j < dual_l_result_ds_cols; j++) {
+      open_space_debug_->add_optimized_dual_lambda(dual_l_result_ds(j, i));
+    }
+  }
+  size_t dual_n_result_ds_cols = dual_n_result_ds.rows();
+  for (size_t i = 0; i < horizon_; i++) {
+    for (std::size_t j = 0; j < dual_n_result_ds_cols; j++) {
+      open_space_debug_->add_optimized_dual_miu(dual_n_result_ds(j, i));
+    }
+  }
 }
 
 }  // namespace planning

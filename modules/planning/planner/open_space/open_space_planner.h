@@ -39,6 +39,7 @@
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 /*
 Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
@@ -94,7 +95,8 @@ class OpenSpacePlanner : public Planner {
  private:
   std::unique_ptr<::apollo::planning::OpenSpaceTrajectoryGenerator>
       open_space_trajectory_generator_;
-
+  std::unique_ptr<OpenSpaceROI> open_space_roi_generator_;
+  std::shared_ptr<planning_internal::OpenSpaceDebug> open_space_debug_;
   common::VehicleState init_state_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
@@ -110,13 +112,10 @@ class OpenSpacePlanner : public Planner {
   double ts_ = 0;
   Eigen::MatrixXd ego_;
   std::vector<double> XYbounds_;
-
   std::future<void> task_future_;
   std::atomic<bool> is_stop_{false};
   std::atomic<bool> trajectory_updated_{false};
-
   std::mutex open_space_mutex_;
-
   int current_trajectory_index_;
   apollo::common::Trajectory current_trajectory_;
   apollo::planning_internal::Trajectories trajectory_partition_;
@@ -124,8 +123,6 @@ class OpenSpacePlanner : public Planner {
   std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
 
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
-
-  std::unique_ptr<OpenSpaceROI> open_space_roi_generator_;
   apollo::common::VehicleState vehicle_state_;
   double rotate_angle_;
   apollo::common::math::Vec2d translate_origin_;

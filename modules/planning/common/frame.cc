@@ -467,6 +467,7 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   planning_debug_data->mutable_prediction_header()->CopyFrom(
       local_view_.prediction_obstacles->header());
 
+  planning_debug_data->mutable_open_space()->CopyFrom(*open_space_debug_);
   /*
   auto relative_map = AdapterManager::GetRelativeMap();
   if (!relative_map->Empty()) {
