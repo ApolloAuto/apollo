@@ -67,7 +67,7 @@ SchedulerChoreography::SchedulerChoreography() {
   // Currently for compatible with task/task_manager.cc,
   // will be deleted at last:
   // auto pool_size = scheduler::Scheduler::Instance()->TaskPoolSize();
-  task_pool_size_ = std::thread::hardware_concurrency() / 4;
+  // task_pool_size_ = std::thread::hardware_concurrency() / 4;
 
   CreateProcessor();
 }
