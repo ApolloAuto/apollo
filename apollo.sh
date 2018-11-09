@@ -624,6 +624,7 @@ function print_usage() {
   echo -e "\n${RED}Options${NONE}:
   ${BLUE}build${NONE}: run build only
   ${BLUE}build_opt${NONE}: build optimized binary for the code
+  ${BLUE}build_cpu${NONE}: dbg build with CPU
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
