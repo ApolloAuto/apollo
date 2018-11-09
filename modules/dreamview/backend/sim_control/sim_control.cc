@@ -346,14 +346,15 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
         ++next_point_index_;
       }
 
+      if (next_point_index_ >= trajectory.size()) {
+        next_point_index_ = trajectory.size() - 1;
+      }
+
       if (next_point_index_ == 0) {
         AERROR << "First trajectory point is a future point!";
         return false;
       }
 
-      if (next_point_index_ >= trajectory.size()) {
-        next_point_index_ = trajectory.size() - 1;
-      }
       prev_point_index_ = next_point_index_ - 1;
 
       next_point_ = trajectory.Get(next_point_index_);
