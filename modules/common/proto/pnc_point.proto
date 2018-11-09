@@ -69,6 +69,8 @@ message TrajectoryPoint {
   optional double relative_time = 4;
   // longitudinal jerk
   optional double da = 5;
+  // vehicle front wheel angle to longitudinal axis
+  optional double steer = 6;
 }
 
 message Trajectory {

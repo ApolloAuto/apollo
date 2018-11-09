@@ -96,6 +96,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       gear_positions_.clear();
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
                                                          &gear_positions_);
+      open_space_trajectory_generator_->UpdateDebugInfo(open_space_debug_);
       AINFO << "Trajectory caculation updated, new results : "
             << trajectory_partition_.ShortDebugString();
     }
@@ -129,6 +130,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       publishable_trajectory_.Clear();
       publishable_trajectory_.MergeFrom(current_trajectory_);
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
+      frame->mutable_open_space_debug()->CopyFrom(*open_space_debug_);
       return Status::OK();
     } else {
       // If collision happens, return wrong planning status and estop
@@ -165,6 +167,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       gear_positions_.clear();
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
                                                          &gear_positions_);
+      open_space_trajectory_generator_->UpdateDebugInfo(open_space_debug_);
       AINFO << "Trajectory caculation updated, new results : "
             << trajectory_partition_.ShortDebugString();
     } else {
@@ -198,6 +201,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       publishable_trajectory_.Clear();
       publishable_trajectory_.MergeFrom(current_trajectory_);
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
+      frame->mutable_open_space_debug()->CopyFrom(*open_space_debug_);
       return Status::OK();
     } else {
       // If collision happens, return wrong planning status and estop
