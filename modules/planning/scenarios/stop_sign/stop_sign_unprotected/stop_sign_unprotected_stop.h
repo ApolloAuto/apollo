@@ -32,7 +32,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign_unprotected {
+namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
@@ -57,7 +57,7 @@ class StopSignUnprotectedStop : public Stage {
   ScenarioStopSignUnprotectedConfig scenario_config_;
 };
 
-}  // namespace stop_sign_unprotected
+}  // namespace stop_sign
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

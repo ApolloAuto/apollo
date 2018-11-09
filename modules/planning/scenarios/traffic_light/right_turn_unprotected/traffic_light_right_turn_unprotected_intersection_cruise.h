@@ -32,14 +32,14 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace traffic_light_right_turn_unprotected {
+namespace traffic_light {
 
 struct TrafficLightRightTurnUnprotectedContext;
 
 DECLARE_STAGE(TrafficLightRightTurnUnprotectedIntersectionCruise,
               TrafficLightRightTurnUnprotectedContext);
 
-}  // namespace traffic_light_right_turn_unprotected
+}  // namespace traffic_light
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
