@@ -101,6 +101,9 @@ cc_library(
     hdrs = [
         "concurrent_object_pool.h",
     ],
+    deps = [
+        "//cyber/base:for_each",
+    ],
 )
 
 cc_library(
@@ -135,6 +138,7 @@ cc_library(
         "object_pool.h",
     ],
     deps = [
+        "//cyber/base:for_each",
         "//cyber/base:macros",
     ],
 )

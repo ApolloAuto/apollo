@@ -25,6 +25,7 @@
 #include <new>
 #include <utility>
 
+#include "cyber/base/for_each.h"
 #include "cyber/base/macros.h"
 
 namespace apollo {
@@ -33,49 +34,47 @@ namespace base {
 
 template <typename T>
 class ObjectPool {
+ public:
+  using InitFunc = std::function<void(T *)>;
+  using ObjectPoolPtr = std::shared_ptr<ObjectPool<T>>;
+
+  template <typename... Args>
+  explicit ObjectPool(uint32_t num_objects, Args &&... args);
+
+  template <typename... Args>
+  ObjectPool(uint32_t num_objects, InitFunc f, Args &&... args);
+
+  virtual ~ObjectPool();
+
+  std::shared_ptr<T> GetObject();
+  void Dump() const;
+
  private:
   struct Node {
     T object;
     Node *next;
   };
 
-  using ObjectPoolPtr = std::shared_ptr<ObjectPool<T>>;
-  void ReleaseObject(T *);
-
- public:
-  using InitFunc = std::function<void(T *)>;
-  template <typename... Args>
-  explicit ObjectPool(int num_objects, Args &&... args);
-
-  template <typename... Args>
-  explicit ObjectPool(int num_objects, InitFunc f, Args &&... args);
-
-  ~ObjectPool();
-  std::shared_ptr<T> GetObject();
-
-  void Dump();
-
- private:
   ObjectPool(ObjectPool &) = delete;
   ObjectPool &operator=(ObjectPool &) = delete;
+  void ReleaseObject(T *);
 
-  int num_objects_;
-  char *object_arena_;
+  uint32_t num_objects_ = 0;
+  char *object_arena_ = nullptr;
   Node *free_head_ = nullptr;
 };
 
 template <typename T>
 template <typename... Args>
-ObjectPool<T>::ObjectPool(int num_objects, Args &&... args)
+ObjectPool<T>::ObjectPool(uint32_t num_objects, Args &&... args)
     : num_objects_(num_objects) {
-  int size = sizeof(Node);
-  object_arena_ = static_cast<char *>(malloc(num_objects_ * size));
+  const size_t size = sizeof(Node);
+  object_arena_ = static_cast<char *>(std::calloc(num_objects_, size));
   if (object_arena_ == nullptr) {
     throw std::bad_alloc();
   }
-  memset(object_arena_, 0, num_objects_ * size);
 
-  for (int i = 0; i < num_objects_; i++) {
+  FOR_EACH(i, 0, num_objects_) {
     T *obj = new (object_arena_ + i * size) T(std::forward<Args>(args)...);
     reinterpret_cast<Node *>(obj)->next = free_head_;
     free_head_ = reinterpret_cast<Node *>(obj);
@@ -84,19 +83,17 @@ ObjectPool<T>::ObjectPool(int num_objects, Args &&... args)
 
 template <typename T>
 template <typename... Args>
-ObjectPool<T>::ObjectPool(int num_objects, InitFunc f, Args &&... args)
+ObjectPool<T>::ObjectPool(uint32_t num_objects, InitFunc f, Args &&... args)
     : num_objects_(num_objects) {
-  int size = sizeof(Node);
-  object_arena_ = static_cast<char *>(malloc(num_objects_ * size));
+  const size_t size = sizeof(Node);
+  object_arena_ = static_cast<char *>(std::calloc(num_objects_, size));
   if (object_arena_ == nullptr) {
     throw std::bad_alloc();
   }
-  memset(object_arena_, 0, num_objects_ * size);
 
-  for (int i = 0; i < num_objects_; i++) {
+  FOR_EACH(i, 0, num_objects_) {
     T *obj = new (object_arena_ + i * size) T(std::forward<Args>(args)...);
     f(obj);
-
     reinterpret_cast<Node *>(obj)->next = free_head_;
     free_head_ = reinterpret_cast<Node *>(obj);
   }
@@ -105,11 +102,11 @@ ObjectPool<T>::ObjectPool(int num_objects, InitFunc f, Args &&... args)
 template <typename T>
 ObjectPool<T>::~ObjectPool() {
   if (object_arena_ != nullptr) {
-    int size = sizeof(Node);
-    for (int i = 0; i < num_objects_; i++) {
+    const size_t size = sizeof(Node);
+    FOR_EACH(i, 0, num_objects_) {
       reinterpret_cast<Node *>(object_arena_ + i * size)->object.~T();
     }
-    free(object_arena_);
+    std::free(object_arena_);
   }
 }
 
@@ -133,7 +130,7 @@ std::shared_ptr<T> ObjectPool<T>::GetObject() {
 }
 
 template <typename T>
-void ObjectPool<T>::Dump() {
+void ObjectPool<T>::Dump() const {
   Node *n = free_head_;
   while (n) {
     n = n->next;

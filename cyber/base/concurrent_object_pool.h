@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include "cyber/base/for_each.h"
 #include "cyber/base/macros.h"
 
 namespace apollo {
@@ -48,36 +49,37 @@ class CCObjectPool {
  public:
   using InitFunc = std::function<void(T *)>;
   template <typename... Args>
-  explicit CCObjectPool(int size, Args &&... args);
-  template <typename... Args>
-  explicit CCObjectPool(int size, InitFunc f, Args &&... args);
+  explicit CCObjectPool(uint32_t size, Args &&... args);
 
-  ~CCObjectPool();
+  template <typename... Args>
+  CCObjectPool(uint32_t size, InitFunc f, Args &&... args);
+
+  virtual ~CCObjectPool();
+
   std::shared_ptr<T> GetObject();
   void ReleaseObject(T *);
-
-  void Dump();
+  void Dump() const;
 
  private:
-  std::atomic<Head> pool_;
-  Node *node_arena_;
-  int num_object_;
-
   CCObjectPool(CCObjectPool &) = delete;
   CCObjectPool &operator=(CCObjectPool &) = delete;
+
+  std::atomic<Head> pool_;
+  Node *node_arena_ = nullptr;
+  uint32_t num_object_ = 0;
 };
 
 template <typename T>
 template <typename... Args>
-CCObjectPool<T>::CCObjectPool(int size, Args &&... args) : num_object_(size) {
-  node_arena_ = static_cast<Node *>(malloc(num_object_ * sizeof(Node)));
+CCObjectPool<T>::CCObjectPool(uint32_t size, Args &&... args)
+    : num_object_(size) {
+  node_arena_ = static_cast<Node *>(std::calloc(num_object_, sizeof(Node)));
   if (node_arena_ == nullptr) {
     throw std::bad_alloc();
   }
-  memset(node_arena_, 0, num_object_ * sizeof(Node));
 
   char *m = reinterpret_cast<char *>(node_arena_);
-  for (int i = 0; i < num_object_; i++) {
+  FOR_EACH(i, 0, num_object_) {
     new (m + i * sizeof(Node)) T(std::forward<Args>(args)...);
     node_arena_[i].next = node_arena_ + 1 + i;
   }
@@ -88,16 +90,15 @@ CCObjectPool<T>::CCObjectPool(int size, Args &&... args) : num_object_(size) {
 
 template <typename T>
 template <typename... Args>
-CCObjectPool<T>::CCObjectPool(int size, InitFunc f, Args &&... args)
+CCObjectPool<T>::CCObjectPool(uint32_t size, InitFunc f, Args &&... args)
     : num_object_(size) {
-  node_arena_ = static_cast<Node *>(malloc(num_object_ * sizeof(Node)));
+  node_arena_ = static_cast<Node *>(std::calloc(num_object_, sizeof(Node)));
   if (node_arena_ == nullptr) {
     throw std::bad_alloc();
   }
-  memset(node_arena_, 0, num_object_ * sizeof(Node));
 
   char *m = reinterpret_cast<char *>(node_arena_);
-  for (int i = 0; i < num_object_; i++) {
+  FOR_EACH(i, 0, num_object_) {
     T *obj = new (m + i * sizeof(Node)) T(std::forward<Args>(args)...);
     f(obj);
     node_arena_[i].next = node_arena_ + 1 + i;
@@ -109,18 +110,15 @@ CCObjectPool<T>::CCObjectPool(int size, InitFunc f, Args &&... args)
 template <typename T>
 CCObjectPool<T>::~CCObjectPool() {
   if (node_arena_ != nullptr) {
-    for (int i = 0; i < num_object_; i++) {
-      node_arena_[i].object.~T();
-    }
-    free(node_arena_);
+    FOR_EACH(i, 0, num_object_) { node_arena_[i].object.~T(); }
+    std::free(node_arena_);
   }
 }
 
 template <typename T>
 std::shared_ptr<T> CCObjectPool<T>::GetObject() {
-  Head oldh, newh;
-
-  oldh = pool_.load(std::memory_order_acquire);
+  Head newh;
+  Head oldh = pool_.load(std::memory_order_acquire);
   do {
     if (unlikely(oldh.node == nullptr)) return nullptr;
 
@@ -130,15 +128,15 @@ std::shared_ptr<T> CCObjectPool<T>::GetObject() {
                                         std::memory_order_acquire));
 
   return std::shared_ptr<T>(&(oldh.node->object),
-                            [this](T *object) { ReleaseObject(object); });
+                            [this](T *object) { this->ReleaseObject(object); });
 }
 
 template <typename T>
 void CCObjectPool<T>::ReleaseObject(T *object) {
-  Head oldh, newh;
+  Head newh;
   Node *n = reinterpret_cast<Node *>(object);
 
-  oldh = pool_.load(std::memory_order_acquire);
+  Head oldh = pool_.load(std::memory_order_acquire);
   do {
     n->next = oldh.node;
     newh.c = oldh.c + 1;
@@ -148,7 +146,7 @@ void CCObjectPool<T>::ReleaseObject(T *object) {
 }
 
 template <typename T>
-void CCObjectPool<T>::Dump() {
+void CCObjectPool<T>::Dump() const {
   Head h = pool_.load(std::memory_order_acquire);
   Node *n = h.node;
   int c = 0;
