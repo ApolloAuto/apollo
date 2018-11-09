@@ -38,6 +38,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::planning_internal::Trajectories;
 
 Status OpenSpaceTrajectoryGenerator::Init(
     const PlannerOpenSpaceConfig& planner_open_space_config) {
@@ -212,40 +213,45 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // Every time update, use trajectory_partition to store each ADCTrajectory
   double relative_time = 0.0;
   double distance_s = 0.0;
-  ADCTrajectories trajectory_partition;
-  ADCTrajectory* current_trajectory = trajectory_partition.add_adc_trajectory();
+
+  Trajectories trajectory_partition;
+  gear_positions_.clear();
+
+  ::apollo::common::Trajectory* current_trajectory =
+      trajectory_partition.add_trajectory();
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
   if (horizon_ < 3)
     return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
   if (state_result_ds(3, 0) > -1e-3 && state_result_ds(3, 1) > -1e-3 &&
       state_result_ds(3, 2) > -1e-3) {
-    current_trajectory->set_gear(canbus::Chassis::GEAR_DRIVE);
+    gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
   } else {
     if (state_result_ds(3, 0) < 1e-3 && state_result_ds(3, 1) < 1e-3 &&
         state_result_ds(3, 2) < 1e-3) {
-      current_trajectory->set_gear(canbus::Chassis::GEAR_REVERSE);
+      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
     } else {
       return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
     }
   }
+
   // partition trajectory points into each trajectory
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
     // then add a new trajectory with GEAR_REVERSE
     if (state_result_ds(3, i) < -1e-3 &&
-        current_trajectory->gear() == canbus::Chassis::GEAR_DRIVE) {
-      current_trajectory = trajectory_partition.add_adc_trajectory();
-      current_trajectory->set_gear(canbus::Chassis::GEAR_REVERSE);
+        gear_positions_.back() == canbus::Chassis::GEAR_DRIVE) {
+      current_trajectory = trajectory_partition.add_trajectory();
+      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
       distance_s = 0.0;
       relative_time = 0.0;
     }
     // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
     // then add a new trajectory with GEAR_DRIVE
     if (state_result_ds(3, i) > 1e-3 &&
-        current_trajectory->gear() == canbus::Chassis::GEAR_REVERSE) {
-      current_trajectory = trajectory_partition.add_adc_trajectory();
-      current_trajectory->set_gear(canbus::Chassis::GEAR_DRIVE);
+        gear_positions_.back() == canbus::Chassis::GEAR_REVERSE) {
+      current_trajectory = trajectory_partition.add_trajectory();
+      gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
       distance_s = 0.0;
       relative_time = 0.0;
     }
@@ -266,7 +272,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     }
     point->mutable_path_point()->set_s(distance_s);
     int gear_drive = 1;
-    if (current_trajectory->gear() == canbus::Chassis::GEAR_REVERSE)
+    if (gear_positions_.back() == canbus::Chassis::GEAR_REVERSE)
       gear_drive = -1;
 
     point->set_v(state_result_ds(3, i) * gear_drive);
@@ -282,7 +288,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 }
 
 apollo::common::Status OpenSpaceTrajectoryGenerator::UpdateTrajectory(
-    ADCTrajectories* adc_trajectories) {
+    Trajectories* adc_trajectories,
+    std::vector<canbus::Chassis::GearPosition>* gear_positions) {
   adc_trajectories->CopyFrom(trajectory_partition_);
   return Status::OK();
 }

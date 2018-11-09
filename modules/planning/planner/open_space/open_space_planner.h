@@ -85,7 +85,7 @@ class OpenSpacePlanner : public Planner {
 
   void GenerateTrajectoryThread();
 
-  bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
+  bool IsCollisionFreeTrajectory(const common::Trajectory& trajectory);
 
   void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
@@ -118,8 +118,9 @@ class OpenSpacePlanner : public Planner {
   std::mutex open_space_mutex_;
 
   int current_trajectory_index_;
-  ADCTrajectory current_trajectory_;
-  ADCTrajectories trajectory_partition_;
+  apollo::common::Trajectory current_trajectory_;
+  apollo::planning_internal::Trajectories trajectory_partition_;
+  std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
 
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 

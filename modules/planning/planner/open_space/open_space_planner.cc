@@ -92,8 +92,10 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // 3. Check if trajectory updated, if so, update internal
     // trajectory_partition_;
     if (trajectory_updated_) {
-      open_space_trajectory_generator_->UpdateTrajectory(
-          &trajectory_partition_);
+      trajectory_partition_.Clear();
+      gear_positions_.clear();
+      open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
+                                                         &gear_positions_);
       AINFO << "Trajectory caculation updated, new results : "
             << trajectory_partition_.ShortDebugString();
     }
@@ -101,7 +103,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // If the vehicle each the end point of current trajectory and stop
     // Then move to the next Trajectory
     current_trajectory_ =
-        trajectory_partition_.adc_trajectory(current_trajectory_index_);
+        trajectory_partition_.trajectory(current_trajectory_index_);
 
     TrajectoryPoint end_point = current_trajectory_.trajectory_point(
         current_trajectory_.trajectory_point_size() - 1);
@@ -115,7 +117,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
         std::abs(vehicle_state_.heading() - end_point.path_point().theta()) <
             planner_open_space_config_.max_theta_error_to_end_point() &&
         (current_trajectory_index_ <
-         trajectory_partition_.adc_trajectory_size() - 1)) {
+         trajectory_partition_.trajectory_size() - 1)) {
       current_trajectory_index_ += 1;
     }
 
@@ -123,7 +125,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // return error status
 
     if (IsCollisionFreeTrajectory(current_trajectory_)) {
-      frame->mutable_trajectory()->CopyFrom(current_trajectory_);
+      // Convet current trajectory to publishable_trajectory
+      //  frame->mutable_trajectory()->CopyFrom(current_trajectory_);
       return Status::OK();
     } else {
       // If collision happens, return wrong planning status and estop
@@ -156,8 +159,10 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
     // 3. If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
-      open_space_trajectory_generator_->UpdateTrajectory(
-          &trajectory_partition_);
+      trajectory_partition_.Clear();
+      gear_positions_.clear();
+      open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
+                                                         &gear_positions_);
       AINFO << "Trajectory caculation updated, new results : "
             << trajectory_partition_.ShortDebugString();
     } else {
@@ -166,7 +171,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     }
 
     current_trajectory_ =
-        trajectory_partition_.adc_trajectory(current_trajectory_index_);
+        trajectory_partition_.trajectory(current_trajectory_index_);
 
     TrajectoryPoint end_point = current_trajectory_.trajectory_point(
         current_trajectory_.trajectory_point_size() - 1);
@@ -180,7 +185,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
         std::abs(vehicle_state_.heading() - end_point.path_point().theta()) <
             planner_open_space_config_.max_theta_error_to_end_point() &&
         (current_trajectory_index_ <
-         trajectory_partition_.adc_trajectory_size() - 1)) {
+         trajectory_partition_.trajectory_size() - 1)) {
       current_trajectory_index_ += 1;
     }
 
@@ -221,16 +226,16 @@ void OpenSpacePlanner::Stop() {
 }
 
 bool OpenSpacePlanner::IsCollisionFreeTrajectory(
-    const ADCTrajectory& adc_trajectory) {
-  CHECK_LE(adc_trajectory.trajectory_point().size(),
+    const apollo::common::Trajectory& trajectory) {
+  CHECK_LE(trajectory.trajectory_point().size(),
            predicted_bounding_rectangles_.size());
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().width();
 
-  for (int i = 0; i < adc_trajectory.trajectory_point().size(); ++i) {
-    const auto& trajectory_point = adc_trajectory.trajectory_point(i);
+  for (int i = 0; i < trajectory.trajectory_point().size(); ++i) {
+    const auto& trajectory_point = trajectory.trajectory_point(i);
     double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
