@@ -4402,7 +4402,7 @@
             },
             "ScenarioStopSignUnprotectedConfig": {
               "fields": {
-                "startStopSignTimer": {
+                "startStopSignScenarioTimer": {
                   "type": "uint32",
                   "id": 1,
                   "options": {
@@ -4453,13 +4453,46 @@
                 }
               }
             },
+            "ScenarioTrafficLightRightTurnUnprotectedConfig": {
+              "fields": {
+                "startTrafficLightScenarioTimer": {
+                  "type": "uint32",
+                  "id": 1,
+                  "options": {
+                    "default": 20
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 3.5
+                  }
+                },
+                "maxAdcStopSpeed": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0.3
+                  }
+                },
+                "minPassSDistance": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 3
+                  }
+                }
+              }
+            },
             "ScenarioConfig": {
               "oneofs": {
                 "scenarioConfig": {
                   "oneof": [
                     "laneFollowConfig",
                     "sidePassConfig",
-                    "stopSignUnprotectedConfig"
+                    "stopSignUnprotectedConfig",
+                    "trafficLightRightTurnUnprotectedConfig"
                   ]
                 }
               },
@@ -4480,10 +4513,14 @@
                   "type": "ScenarioStopSignUnprotectedConfig",
                   "id": 4
                 },
+                "trafficLightRightTurnUnprotectedConfig": {
+                  "type": "ScenarioTrafficLightRightTurnUnprotectedConfig",
+                  "id": 5
+                },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
-                  "id": 5,
+                  "id": 6,
                   "options": {
                     "packed": false
                   }
@@ -4491,7 +4528,7 @@
                 "stageConfig": {
                   "rule": "repeated",
                   "type": "StageConfig",
-                  "id": 6
+                  "id": 7
                 }
               },
               "nested": {
@@ -4522,7 +4559,11 @@
                     "SIDE_PASS_GENERATE_PATH": 201,
                     "SIDE_PASS_STOP_ON_WAITPOINT": 202,
                     "SIDE_PASS_DETECT_SAFETY": 203,
-                    "SIDE_PASS_PASS_OBSTACLE": 204
+                    "SIDE_PASS_PASS_OBSTACLE": 204,
+                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_PRE_STOP": 300,
+                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP": 301,
+                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP": 302,
+                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE": 303
                   }
                 },
                 "StageConfig": {
@@ -6957,11 +6998,19 @@
                 }
               }
             },
-            "OpenSpaceDebug": {
+            "Trajectories": {
               "fields": {
-                "trajecotry": {
+                "trajectory": {
                   "rule": "repeated",
                   "type": "apollo.common.Trajectory",
+                  "id": 1
+                }
+              }
+            },
+            "OpenSpaceDebug": {
+              "fields": {
+                "trajectories": {
+                  "type": "apollo.planning_internal.Trajectories",
                   "id": 1
                 }
               }

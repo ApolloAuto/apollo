@@ -221,8 +221,17 @@ export default class PlanningData {
   }
 
   updateScenario(newScenario, newTime) {
+    if (!newScenario) {
+      return;
+    }
+
     const currScenario = this.scenarioHistory.length > 0
             ? this.scenarioHistory[this.scenarioHistory.length - 1] : {};
+
+    if (currScenario.time && newTime < currScenario.time) {
+        // new data set, clean up existing one
+        this.scenarioHistory = [];
+    }
 
     if (currScenario.scenarioType !== newScenario.scenarioType ||
         currScenario.stageType !== newScenario.stageType) {
