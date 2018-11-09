@@ -68,10 +68,9 @@ message Module {
 
 // A CyberModule will be translated to a regular Module upon loading.
 message CyberModule {
-  optional string process_name = 1;
-  repeated string dag_files = 2;
-  optional bool required_for_safety = 3 [default = true];
-  optional apollo.cyber.proto.SchedName schedule = 4 [default = CYBER_DEFAULT];
+  repeated string dag_files = 1;
+  optional bool required_for_safety = 2 [default = true];
+  optional apollo.cyber.proto.SchedName schedule = 3 [default = CYBER_DEFAULT];
 }
 
 message HMIMode {
