@@ -64,7 +64,8 @@ std::shared_ptr<cyber::ReaderBase> GetReader(const std::string& channel) {
     return manager->CreateReader<drivers::ContiRadar>(channel);
   } else if (channel == FLAGS_relative_map_topic) {
     return manager->CreateReader<relative_map::MapMsg>(channel);
-  } else if (channel == FLAGS_pointcloud_topic) {
+  } else if (channel == FLAGS_pointcloud_topic ||
+             channel == FLAGS_pointcloud_128_topic) {
     return manager->CreateReader<drivers::PointCloud>(channel);
   }
   // Add more channels here if you want to monitor.
