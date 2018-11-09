@@ -53,7 +53,7 @@ class LaneFollowScenario : public Scenario {
 
   bool IsTransferable(const Scenario& current_scenario,
                       const common::TrajectoryPoint& ego_point,
-                      const Frame& frame) const override;
+                      const Frame& frame) override;
 };
 
 }  // namespace lane_follow

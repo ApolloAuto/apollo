@@ -72,7 +72,7 @@ class Scenario {
   // should allow to transfer from other scenario ot itself.
   virtual bool IsTransferable(const Scenario& other_scenario,
                               const common::TrajectoryPoint& ego_point,
-                              const Frame& frame) const = 0;
+                              const Frame& frame) = 0;
 
   ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
                          Frame* frame);
