@@ -257,7 +257,7 @@ void MyADOLC_sparseNLP::generate_tapes(Index n, Index m, Index& nnz_jac_g, Index
   
   double dummy;
 
-  int i,j,k,l,ii;
+  //int i,j,k,l,ii;
 
   obj_lam   = new double[m+1];
 
