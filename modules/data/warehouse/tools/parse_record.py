@@ -19,7 +19,7 @@
 Parse Cyber record into apollo.data.Record.
 
 Use as command tool: parse_record.py <record>
-Use as util lib:     RecordParser.Parse(<record_file_path>)
+Use as util lib:     RecordParser.Parse(<record>)
 """
 
 import math
@@ -66,7 +66,8 @@ class RecordParser(object):
     def Parse(record_file):
         """Simple interface to parse a cyber record."""
         parser = RecordParser(record_file)
-        parser.ParseMeta()
+        if not parser.ParseMeta():
+            return None
         parser.ParseMessages()
         return parser.record
 
@@ -92,6 +93,10 @@ class RecordParser(object):
                                         self.record.header.size)
         for chan in self._reader.get_channellist():
             self.record.channels[chan] = self._reader.get_messagenumber(chan)
+        if len(self.record.channels) == 0:
+            glog.error('No message found in record')
+            return False
+        return True
 
     def ParseMessages(self):
         """Process all messages."""
