@@ -115,7 +115,7 @@ class FCNN_CNN1D(torch.nn.Module):
         self.lane_feature_dropout = nn.Dropout(0.0)
 
         self.obs_feature_fc = torch.nn.Sequential(\
-                            nn.Linear(55, 32),\
+                            nn.Linear(47, 32),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
                             nn.Linear(32, 24),\
@@ -156,10 +156,10 @@ class FCNN_CNN1D(torch.nn.Module):
                             nn.ReLU()
                                             )
     def forward(self, x):
-        lane_fea = x[:,55:]
+        lane_fea = x[:,-150:]
         lane_fea = lane_fea.view(lane_fea.size(0), 5, 30)
 
-        obs_fea = x[:,:55]
+        obs_fea = x[:,:-150]
 
         lane_fea = self.lane_feature_conv(lane_fea)
 

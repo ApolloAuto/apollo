@@ -362,7 +362,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, ba
             logging.info('Step: {}, train_loss: {}'.format(i, np.mean(loss_history[-100:])))
             print ("Step: {}, training loss: {}".format(i, np.mean(loss_history[-100:])))
 
-    pred_y = (pred_y > 0.5)
+    pred_y = (pred_y > 0.0)
     train_y = train_y.data.cpu().numpy()
     training_accuracy = sklearn.metrics.accuracy_score(train_y[:,0], pred_y.reshape(-1))
     train_loss = np.mean(loss_history)
@@ -568,6 +568,7 @@ if __name__ == "__main__":
             valid_loss = validate_vanilla(X_valid, y_valid, model, balance=args.balance, pos_label=pos_label)
             scheduler.step(valid_loss)
             if valid_loss < best_valid_loss:
+                best_valid_loss = valid_loss
                 torch.save(model.state_dict(), args.save_path + 'cruise_model{}_epoch{}_valloss{:.6f}.pt'\
                            .format(args.network_structure, epoch+1, valid_loss))
 
