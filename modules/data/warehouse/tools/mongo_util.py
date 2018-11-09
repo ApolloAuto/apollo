@@ -18,7 +18,7 @@
 """
 MongoDB util.
 
-Requirements: pymongo
+Requirements: pymongo 3.x
 """
 import os
 import sys
