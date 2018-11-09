@@ -466,8 +466,6 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
 
   planning_debug_data->mutable_prediction_header()->CopyFrom(
       local_view_.prediction_obstacles->header());
-
-  planning_debug_data->mutable_open_space()->CopyFrom(*open_space_debug_);
   /*
   auto relative_map = AdapterManager::GetRelativeMap();
   if (!relative_map->Empty()) {
@@ -475,6 +473,11 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
         relative_map->GetLatestObserved().header());
   }
   */
+}
+
+void Frame::RecordOpenSpacePlannerDebug(planning_internal::Debug *debug) {
+  auto *planning_debug_data = debug->mutable_planning_data();
+  planning_debug_data->mutable_open_space()->CopyFrom(*open_space_debug_);
 }
 
 void Frame::AlignPredictionTime(const double planning_start_time,
