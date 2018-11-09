@@ -320,6 +320,7 @@ cc_binary(
     ],
     deps = [
         "@adolc//:adolc",
+        "@ipopt",
     ],
 )
 

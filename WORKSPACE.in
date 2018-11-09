@@ -167,7 +167,7 @@ new_local_repository(
 new_local_repository(
     name = "adolc",
     build_file = "third_party/adolc.BUILD",
-    path = "/usr/local/adolc/include/adolc",
+    path = "/usr/local/adolc/include",
 )
 
 # Cuda

@@ -25,7 +25,7 @@ wget https://www.coin-or.org/download/source/ADOL-C/ADOL-C-2.6.3.zip -O ADOL-C-2
 unzip ADOL-C-2.6.3.zip
 
 pushd ADOL-C-2.6.3
-./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3"
+./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse
 
 make -j8 all
 make install
@@ -33,5 +33,5 @@ mkdir -p /usr/local/adolc
 cp -r include /usr/local/adolc/ && cp -r lib64 /usr/local/adolc/
 popd
 
-Clean up.
-# rm -fr ADOL-C-2.6.3.zip ADOL-C-2.6.3
+# Clean up.
+rm -fr ADOL-C-2.6.3.zip ADOL-C-2.6.3
