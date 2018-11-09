@@ -140,7 +140,7 @@ uint32_t Graph::GetNumOfEdge() {
   ReadLockGuard<AtomicRWLock> lock(rw_lock_);
   uint32_t num = 0;
   for (auto& item : list_) {
-    num += item.second.size();
+    num += static_cast<int>(item.second.size());
   }
   return num;
 }

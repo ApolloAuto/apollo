@@ -180,7 +180,7 @@ bool IsLibraryLoaded(const std::string& library_path,
   bool is_lib_loaded_by_anyone = IsLibraryLoadedByAnybody(library_path);
   ClassFactoryVector lib_class_factory_objs =
       GetAllClassFactoryObjectsOfLibrary(library_path);
-  int num_lib_class_factory_objs = lib_class_factory_objs.size();
+  auto num_lib_class_factory_objs = lib_class_factory_objs.size();
   if (is_lib_loaded_by_anyone && num_lib_class_factory_objs == 0) {
     return true;
   }
@@ -192,7 +192,7 @@ bool IsLibraryLoaded(const std::string& library_path,
     }
   }
 
-  int num_lib_loader_class_factory_objs = lib_loader_class_factory_objs.size();
+  auto num_lib_loader_class_factory_objs = lib_loader_class_factory_objs.size();
   return (is_lib_loaded_by_anyone &&
           (num_lib_loader_class_factory_objs <= num_lib_class_factory_objs));
 }
@@ -241,7 +241,7 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     return false;
   }
 
-  unsigned int num_lib_objs =
+  auto num_lib_objs =
       GetAllClassFactoryObjectsOfLibrary(library_path).size();
   if (num_lib_objs == 0) {
     AWARN << "class factory objs counts is 0, maybe registerclass failed";

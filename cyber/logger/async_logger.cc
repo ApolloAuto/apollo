@@ -176,7 +176,7 @@ void AsyncLogger::RunThread() {
       if (fileobject) {
         const bool should_flush = msg.level > 0;
         fileobject->Write(should_flush, msg.ts, msg.message.data(),
-                          msg.message.size());
+                          static_cast<int>(msg.message.size()));
       }
     }
 
