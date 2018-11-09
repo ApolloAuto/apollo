@@ -36,6 +36,7 @@
 #include "modules/planning/open_space/hybrid_a_star.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 /*
 Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
@@ -89,7 +90,8 @@ class OpenSpaceTrajectoryGenerator {
   void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
   apollo::common::Status UpdateTrajectory(
-      ADCTrajectories* trajectory_partition);
+      ::apollo::planning_internal::Trajectories* trajectory_partition,
+      std::vector<::apollo::canbus::Chassis::GearPosition>* gear_positions);
 
   void Stop();
 
@@ -114,7 +116,8 @@ class OpenSpaceTrajectoryGenerator {
   Eigen::MatrixXd ego_;
   std::vector<double> XYbounds_;
 
-  ADCTrajectories trajectory_partition_;
+  ::apollo::planning_internal::Trajectories trajectory_partition_;
+  std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
 };
 
 }  // namespace planning
