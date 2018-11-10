@@ -51,6 +51,7 @@ class RecordFileReader : public RecordFileBase {
   template <typename T>
   bool ReadSection(uint64_t size, T* message);
   bool ReadIndex();
+
  private:
   bool ReadHeader();
 };
@@ -58,11 +59,16 @@ class RecordFileReader : public RecordFileBase {
 template <typename T>
 bool RecordFileReader::ReadSection(uint64_t size, T* message) {
   static int BUF_SIZE = 1024 * 1024;
+  if (size > INT_MAX) {
+    AERROR << "Size is larger than " << INT_MAX;
+    return false;
+  }
   uint64_t pos = CurrentPosition();
   if (size > BUF_SIZE) {
     ZeroCopyInputStream* raw_input = new FileInputStream(fd_);
     CodedInputStream* coded_input = new CodedInputStream(raw_input);
-    CodedInputStream::Limit limit = coded_input->PushLimit(size);
+    CodedInputStream::Limit limit =
+        coded_input->PushLimit(static_cast<int>(size));
     if (!message->ParseFromCodedStream(coded_input)) {
       AERROR << "Parse section message failed.";
       return false;
@@ -81,7 +87,7 @@ bool RecordFileReader::ReadSection(uint64_t size, T* message) {
     delete raw_input;
   } else {
     char buf[BUF_SIZE];
-    int count = read(fd_, buf, size);
+    ssize_t count = read(fd_, buf, static_cast<ssize_t>(size));
     if (count < 0) {
       AERROR << "Read fd failed, fd_: " << fd_ << ", errno: " << errno;
       return false;

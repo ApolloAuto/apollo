@@ -270,7 +270,8 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
                        << "threadid file:line] msg" << '\n';
     const std::string& file_header_string = file_header_stream.str();
 
-    const int header_len = file_header_string.size();
+    const uint32_t header_len =
+        static_cast<uint32_t>(file_header_string.size());
     if (file_ == nullptr) {
       return;
     }
