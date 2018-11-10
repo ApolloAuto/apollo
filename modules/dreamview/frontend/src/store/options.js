@@ -3,6 +3,9 @@ import { observable, action, computed, extendObservable } from "mobx";
 import MENU_DATA from "store/config/MenuData";
 
 export default class Options {
+    // Toggles added by planning paths when pnc monitor is on
+    @observable customizedToggles = observable.map();
+
     constructor() {
         this.cameraAngleNames = null;
         this.mainSideBarOptions = [
@@ -32,12 +35,6 @@ export default class Options {
             perceptionLaneMarker: OFFLINE_PLAYBACK,
             planningCar: OFFLINE_PLAYBACK,
         };
-        for (const name in PARAMETERS.options) {
-            const option = PARAMETERS.options[name];
-            if (option.forPncMonitor) {
-                togglesToHide[option.menuId] = true;
-            }
-        }
         this.togglesToHide = observable(togglesToHide);
     }
 
@@ -56,9 +53,12 @@ export default class Options {
                this.cameraAngle === 'Monitor';
     }
 
-    @action toggle(option) {
-        this[option] = !this[option];
-
+    @action toggle(option, isCustomized) {
+        if (isCustomized) {
+            this.customizedToggles.set(option, !this.customizedToggles.get(option));
+        } else {
+            this[option] = !this[option];
+        }
         // Disable other mutually exclusive options
         if (this[option] && this.mainSideBarOptions.includes(option)) {
             for (const other of this.mainSideBarOptions) {
@@ -67,22 +67,11 @@ export default class Options {
                 }
             }
         }
-
-        if (option === "showPNCMonitor") {
-            for (const name in PARAMETERS.options) {
-                if (PARAMETERS.options[name].forPncMonitor) {
-                    this.togglesToHide[PARAMETERS.options[name].menuId] = !this[option];
-                }
-            }
-        }
     }
 
-    @action setPncMonitorOptions(value) {
-        for (const name in PARAMETERS.options) {
-            if (PARAMETERS.options[name].forPncMonitor) {
-                this[name] = value;
-            }
-        }
+    @action addCustomizedToggle(pathName) {
+        // Set additional toggle in observable map
+        this.customizedToggles.set(pathName, true);
     }
 
     isSideBarButtonDisabled(option, enableHMIButtonsOnly, inNavigationMode) {

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import STORE from "store";
 import { drawThickBandFromPoints } from "utils/draw";
 
@@ -54,22 +55,23 @@ export default class PlanningTrajectory {
 
         // Prepare data
         const newPaths = {};
-        if (planningData && planningData.path) {
-            planningData.path.forEach((path) => {
-                newPaths[path.name] = path.pathPoint;
-            });
-        }
         if (world.planningTrajectory) {
             newPaths['trajectory'] =
                 world.planningTrajectory.map((point) => {
                     return { x: point.positionX, y: point.positionY };
                 });
         }
-
+        if (planningData && planningData.path) {
+            planningData.path.forEach((path) => {
+                newPaths[path.name] = path.pathPoint;
+            });
+        }
         // Draw paths
-        for (const name in PARAMETERS.planning.pathProperties) {
-            const property = PARAMETERS.planning.pathProperties[name];
-            if (!STORE.options[property.optionName]) {
+        let propertyIndex = 0;
+        const totalPaths = _.union(Object.keys(this.paths), Object.keys(newPaths));
+        totalPaths.forEach((name) => {
+            const optionName = name === 'trajectory' ? 'showPlanningTrajectory': name;
+            if (!STORE.options[optionName] && !STORE.options.customizedToggles.get(optionName)) {
                 if (this.paths[name]) {
                     this.paths[name].visible = false;
                 }
@@ -80,7 +82,12 @@ export default class PlanningTrajectory {
                     oldPath.geometry.dispose();
                     oldPath.material.dispose();
                 }
-
+                if (propertyIndex >= PARAMETERS.planning.pathProperties.length) {
+                    console.error("No enough property to render the planning path, " +
+                                  "use a duplicated property instead.");
+                    propertyIndex = 0;
+                }
+                const property = PARAMETERS.planning.pathProperties[propertyIndex];
                 if (newPaths[name]) {
                     const points = normalizePlanningTrajectory(newPaths[name], coordinates);
                     this.paths[name] = drawThickBandFromPoints(points,
@@ -88,6 +95,7 @@ export default class PlanningTrajectory {
                     scene.add(this.paths[name]);
                 }
             }
-        }
+            propertyIndex += 1;
+        });
     }
 }

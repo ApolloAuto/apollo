@@ -84,12 +84,10 @@ class DreamviewStore {
 
     @action enablePNCMonitor() {
         this.updateWidthInPercentage(0.7);
-        this.options.setPncMonitorOptions(true);
     }
 
     @action disablePNCMonitor() {
         this.updateWidthInPercentage(1.0);
-        this.options.setPncMonitorOptions(false);
     }
 
     @action setOfflineViewErrorMsg(msg) {
@@ -175,6 +173,18 @@ class DreamviewStore {
             this.hmi.isCoDriver && wasAutoMode && !this.meters.isAutoMode;
         if (this.newDisengagementReminder && !this.options.showDataRecorder) {
             this.handleOptionToggle("showDataRecorder");
+        }
+        // If there is any other planning path when pnc monitor is on
+        if (world.planningData && world.planningData.path) {
+            world.planningData.path.forEach((path) => {
+                const pathName = path.name;
+                if (!this.options.customizedToggles.has(pathName)) {
+                    this.options.addCustomizedToggle(pathName);
+                }
+            });
+        } else if (this.options.customizedToggles.size > 0) {
+            // Clean the planning paths
+            this.options.customizedToggles.clear();
         }
 
         this.monitor.update(world);

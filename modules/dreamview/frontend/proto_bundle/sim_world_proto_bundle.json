@@ -2547,7 +2547,7 @@
                 }
               }
             },
-            "DeciderStopSignConfig": {
+            "DeciderRuleBasedStopConfig": {
               "fields": {
                 "stopDistance": {
                   "type": "double",
@@ -4284,7 +4284,7 @@
                     "proceedWithCautionSpeedConfig",
                     "qpPiecewiseJerkPathConfig",
                     "deciderCreepConfig",
-                    "deciderStopSignConfig",
+                    "deciderRuleBasedStopConfig",
                     "sidePassSafetyConfig",
                     "sidePassPathDeciderConfig",
                     "polyVtSpeedConfig"
@@ -4332,8 +4332,8 @@
                   "type": "DeciderCreepConfig",
                   "id": 10
                 },
-                "deciderStopSignConfig": {
-                  "type": "DeciderStopSignConfig",
+                "deciderRuleBasedStopConfig": {
+                  "type": "DeciderRuleBasedStopConfig",
                   "id": 11
                 },
                 "sidePassSafetyConfig": {
@@ -4364,7 +4364,7 @@
                     "NAVI_OBSTACLE_DECIDER": 9,
                     "QP_PIECEWISE_JERK_PATH_OPTIMIZER": 10,
                     "DECIDER_CREEP": 11,
-                    "DECIDER_STOP_SIGN": 12,
+                    "DECIDER_RULE_BASED_STOP": 12,
                     "SIDE_PASS_PATH_DECIDER": 13,
                     "SIDE_PASS_SAFETY": 14,
                     "PROCEED_WITH_CAUTION_SPEED": 15
@@ -4396,6 +4396,13 @@
                   "id": 3,
                   "options": {
                     "default": 4
+                  }
+                },
+                "blockObstacleMinSpeed": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 0.1
                   }
                 }
               }
