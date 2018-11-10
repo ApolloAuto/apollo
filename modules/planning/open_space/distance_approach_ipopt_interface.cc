@@ -158,7 +158,9 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
 
   ADEBUG << "nnz_jac_g_" << nnz_jac_g;
 
-  nnz_h_lag = 0;
+  nnz_h_lag = 100000;
+
+  generate_tapes(n, m);
 
   index_style = IndexStyleEnum::C_STYLE;
   ADEBUG << "get_nlp_info out";
@@ -390,386 +392,19 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
 bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
                                             double& obj_value) {
-  ADEBUG << "eval_f";
-  // Objective is :
-  // min control inputs
-  // min input rate
-  // min time (if the time step is not fixed)
-  // regularization wrt warm start trajectory
-  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
-  int control_index = control_start_index_;
-  int time_index = time_start_index_;
-  int state_index = state_start_index_;
-
-  // TODO(QiL): Initial implementation towards earlier understanding and debug
-  // purpose, later code refine towards improving efficiency
-
-  obj_value = 0.0;
-  // 1. objective to minimize state diff to warm up
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    double x1_diff = x[state_index] - xWS_(0, i);
-    double x2_diff = x[state_index + 1] - xWS_(1, i);
-    double x3_diff = x[state_index + 2] - xWS_(2, i);
-    double x4_abs = x[state_index + 3];
-    obj_value += weight_state_x_ * x1_diff * x1_diff +
-                 weight_state_y_ * x2_diff * x2_diff +
-                 weight_state_phi_ * x3_diff * x3_diff +
-                 weight_state_v_ * x4_abs * x4_abs;
-    state_index += 4;
-  }
-
-  // 2. objective to minimize u square
-  for (int i = 0; i < horizon_; ++i) {
-    obj_value += weight_input_steer_ * x[control_index] * x[control_index] +
-                 weight_input_a_ * x[control_index + 1] * x[control_index + 1];
-    control_index += 2;
-  }
-
-  // 3. objective to minimize input change rate for first horizon
-  control_index = control_start_index_;
-  double last_time_steer_rate =
-      (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
-  double last_time_a_rate =
-      (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
-  obj_value +=
-      weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
-      weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
-
-  // 4. objective to minimize input change rates, [0- horizon_ -2]
-  time_index++;
-  for (int i = 0; i < horizon_ - 1; ++i) {
-    double steering_rate =
-        (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
-    double a_rate =
-        (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
-    obj_value += weight_rate_steer_ * steering_rate * steering_rate +
-                 weight_rate_a_ * a_rate * a_rate;
-    control_index += 2;
-    time_index += 1;
-  }
-
-  // 5. objective to minimize total time [0, horizon_]
-  time_index = time_start_index_;
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    double first_order_penalty = weight_first_order_time_ * x[time_index];
-    double second_order_penalty =
-        weight_second_order_time_ * x[time_index] * x[time_index];
-    obj_value += first_order_penalty + second_order_penalty;
-    time_index += 1;
-  }
-
-  ADEBUG << "objective value after this iteration : " << obj_value;
+  eval_obj(n, x, obj_value);
   return true;
 }
 
 bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
                                                  bool new_x, double* grad_f) {
-  ADEBUG << "eval_grad_f";
-  std::fill(grad_f, grad_f + n, 0.0);
-  int control_index = control_start_index_;
-  int time_index = time_start_index_;
-  int state_index = state_start_index_;
-
-  // 1. Gradients on states
-  // a. From minimizing difference from warm start, [0, horizon_]
-  for (int i = 0; i < horizon_ + 1; i++) {
-    grad_f[state_index] +=
-        weight_state_x_ * 2.0 * (x[state_index] - xWS_(0, i));
-    grad_f[state_index + 1] +=
-        weight_state_y_ * 2.0 * (x[state_index + 1] - xWS_(1, i));
-    grad_f[state_index + 2] +=
-        weight_state_phi_ * 2.0 * (x[state_index + 2] - xWS_(2, i));
-    grad_f[state_index + 3] += weight_state_v_ * 2.0 * x[state_index + 3];
-    state_index += 4;
-  }
-
-  ADEBUG << "grad_f last index after over states " << state_index;
-  // 2. Gradients on control.
-  // a. from minimizing abosulte value square
-  for (int i = 0; i < horizon_; i++) {
-    grad_f[control_index] += weight_input_steer_ * 2.0 * x[control_index];
-    grad_f[control_index + 1] += weight_input_a_ * 2.0 * x[control_index + 1];
-    control_index += 2;
-  }
-
-  ADEBUG << "grad_f last index after over controls abs squares "
-         << control_index;
-
-  // b. from change rate first horizon.
-  control_index = control_start_index_;
-  grad_f[control_start_index_] +=
-      weight_stitching_steer_ *
-          (2 * x[control_start_index_] - 2 * last_time_u_(0, 0)) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
-      weight_rate_steer_ *
-          (2 * x[control_start_index_] - 2 * x[control_start_index_ + 2]) /
-          (ts_ * ts_ * x[time_start_index_ + 1] * x[time_start_index_ + 1]);
-
-  grad_f[control_start_index_ + 1] +=
-      weight_stitching_a_ *
-          (2 * x[control_start_index_ + 1] - 2 * last_time_u_(1, 0)) /
-          (ts_ * ts_ * x[time_start_index_] * x[time_start_index_]) +
-      weight_rate_a_ *
-          (2 * x[control_start_index_ + 1] - 2 * x[control_start_index_ + 3]) /
-          (ts_ * ts_ * x[time_start_index_ + 1] * x[time_start_index_ + 1]);
-
-  control_index += 2;
-  time_index += 1;
-
-  // c. from change rate horizon [1, horizon-2]
-  for (int i = 0; i < horizon_ - 2; i++) {
-    grad_f[control_index] +=
-        weight_rate_steer_ *
-        ((2 * x[control_index] - 2 * x[control_index + 2]) /
-             (ts_ * ts_ * x[time_index + 1] * x[time_index + 1]) +
-         (2 * x[control_index] - 2 * x[control_index - 2]) /
-             (ts_ * ts_ * x[time_index] * x[time_index]));
-
-    grad_f[control_index + 1] +=
-        weight_rate_a_ *
-        ((2 * x[control_index + 1] - 2 * x[control_index + 3]) /
-             (ts_ * ts_ * x[time_index + 1] * x[time_index + 1]) +
-         (2 * x[control_index + 1] - 2 * x[control_index - 1]) /
-             (ts_ * ts_ * x[time_index] * x[time_index]));
-    control_index += 2;
-    time_index += 1;
-  }
-
-  // d. from change rate last horizon.
-  grad_f[control_index] += weight_rate_steer_ *
-                           (2 * x[control_index] - 2 * x[control_index - 2]) /
-                           (ts_ * ts_ * x[time_index] * x[time_index]);
-
-  grad_f[control_index + 1] +=
-      weight_rate_a_ * (2 * x[control_index + 1] - 2 * x[control_index - 1]) /
-      (ts_ * ts_ * x[time_index] * x[time_index]);
-
-  ADEBUG << "grad_f last index after over controls change rate"
-         << control_index;
-
-  // 3. Grdients over time scale
-  time_index = time_start_index_;
-  state_index = state_start_index_;
-  control_index = control_start_index_;
-  // a. from  control rate change, first horizon
-  grad_f[time_start_index_] +=
-      -2 * weight_stitching_steer_ *
-          ((last_time_u_(0, 0) * last_time_u_(0, 0) +
-            x[control_start_index_] * x[control_start_index_] -
-            2 * last_time_u_(0, 0) * x[control_start_index_]) /
-           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_] *
-            x[time_start_index_])) -
-      2 * weight_stitching_a_ *
-          ((last_time_u_(1, 0) * last_time_u_(1, 0) +
-            x[control_start_index_ + 1] * x[control_start_index_ + 1] -
-            2 * last_time_u_(1, 0) * x[control_start_index_ + 1]) /
-           (ts_ * ts_ * x[time_start_index_] * x[time_start_index_] *
-            x[time_start_index_]));
-  time_index++;
-  // from gradients of control rate, horizon [0, horizon-2]
-  for (int i = 0; i < horizon_ - 1; ++i) {
-    grad_f[time_index] +=
-        -2 * weight_rate_steer_ * (x[control_index] - x[control_index + 2]) *
-            (x[control_index] - x[control_index + 2]) /
-            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]) -
-        2 * weight_rate_a_ * (x[control_index + 1] - x[control_index + 3]) *
-            (x[control_index + 1] - x[control_index + 3]) /
-            (ts_ * ts_ * x[time_index] * x[time_index] * x[time_index]);
-    control_index += 2;
-    time_index += 1;
-  }
-
-  // from time scale minimization, [0, horizon_]
-  time_index = time_start_index_;
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    grad_f[time_index] += weight_first_order_time_ +
-                          2 * weight_second_order_time_ * x[time_index];
-    time_index += 1;
-  }
-
-  // 4. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
-  // horizon_]
-  int l_index = l_start_index_;
-  int n_index = n_start_index_;
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      grad_f[l_index] = 0.0;
-      ++l_index;
-    }
-  }
-
-  // 5. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      grad_f[n_index] = 0.0;
-      ++n_index;
-    }
-  }
-
-  CHECK_EQ(n, n_index) << "No. of variables wrong in eval_grad_f. n : " << n;
-  ADEBUG << "eval_grad_f done";
+  gradient(tag_f, n, x, grad_f);
   return true;
 }
 
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
-  ADEBUG << "eval_g";
-  // state start index
-  int state_index = state_start_index_;
-
-  // control start index.
-  int control_index = control_start_index_;
-
-  // time start index
-  int time_index = time_start_index_;
-
-  int constraint_index = 0;
-
-  // // 1. state constraints 4 * [0, horizons-1]
-  for (int i = 0; i < horizon_; ++i) {
-    // x1
-    // TODO(QiL) : optimize and remove redundant calculation in next
-    // iteration.
-    g[constraint_index] =
-        x[state_index + 4] -
-        (x[state_index] +
-         ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             std::cos(x[state_index + 2] +
-                      ts_ * x[time_index] * 0.5 * x[state_index + 3] *
-                          std::tan(x[control_index]) / wheelbase_));
-    // x2
-    g[constraint_index + 1] =
-        x[state_index + 5] -
-        (x[state_index + 1] +
-         ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             std::sin(x[state_index + 2] +
-                      ts_ * x[time_index] * 0.5 * x[state_index + 3] *
-                          std::tan(x[control_index]) / wheelbase_));
-
-    // x3
-    g[constraint_index + 2] =
-        x[state_index + 6] -
-        (x[state_index + 2] +
-         ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             std::tan(x[control_index]) / wheelbase_);
-
-    // x4
-    g[constraint_index + 3] =
-        x[state_index + 7] -
-        (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
-
-    control_index += 2;
-    constraint_index += 4;
-    time_index += 1;
-    state_index += 4;
-  }
-
-  ADEBUG << "constraint_index after adding Euler forward dynamics constraints "
-            "updated: "
-         << constraint_index;
-
-  // 2. Control rate limit constraints, 1 * [0, horizons-1], only apply
-  // steering rate as of now
-  control_index = control_start_index_;
-  time_index = time_start_index_;
-
-  // First rate is compare first with stitch point
-  g[constraint_index] =
-      (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
-  control_index += 2;
-  constraint_index += 1;
-  time_index += 1;
-
-  for (int i = 1; i < horizon_; ++i) {
-    g[constraint_index] =
-        (x[control_index] - x[control_index - 2]) / x[time_index] / ts_;
-    constraint_index += 1;
-    control_index += 2;
-    time_index += 1;
-  }
-
-  // 3. Time constraints 1 * [0, horizons-1]
-  time_index = time_start_index_;
-  for (int i = 0; i < horizon_; ++i) {
-    g[constraint_index] = x[time_index + 1] - x[time_index];
-    constraint_index += 1;
-    time_index += 1;
-  }
-
-  ADEBUG << "constraint_index after adding time constraints "
-            "updated: "
-         << constraint_index;
-
-  // 4. Three obstacles related equal constraints, one equality constraints,
-  // [0, horizon_] * [0, obstacles_num_-1] * 4
-
-  state_index = state_start_index_;
-  int l_index = l_start_index_;
-  int n_index = n_start_index_;
-
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    int edges_counter = 0;
-    for (int j = 0; j < obstacles_num_; ++j) {
-      int current_edges_num = obstacles_edges_num_(j, 0);
-      Eigen::MatrixXd Aj =
-          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-      Eigen::MatrixXd bj =
-          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
-
-      // norm(A* lambda) <= 1
-      double tmp1 = 0.0;
-      double tmp2 = 0.0;
-      for (int k = 0; k < current_edges_num; ++k) {
-        // TODO(QiL) : replace this one directly with x
-        tmp1 += Aj(k, 0) * x[l_index + k];
-        tmp2 += Aj(k, 1) * x[l_index + k];
-      }
-      g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2;
-
-      // G' * mu + R' * lambda == 0
-      g[constraint_index + 1] = x[n_index] - x[n_index + 2] +
-                                std::cos(x[state_index + 2]) * tmp1 +
-                                std::sin(x[state_index + 2]) * tmp2;
-
-      g[constraint_index + 2] = x[n_index + 1] - x[n_index + 3] -
-                                std::sin(x[state_index + 2]) * tmp1 +
-                                std::cos(x[state_index + 2]) * tmp2;
-
-      //  -g'*mu + (A*t - b)*lambda > 0
-      double tmp3 = 0.0;
-      for (int k = 0; k < 4; ++k) {
-        tmp3 += -g_[k] * x[n_index + k];
-      }
-
-      double tmp4 = 0.0;
-      for (int k = 0; k < current_edges_num; ++k) {
-        tmp4 += bj(k, 0) * x[l_index + k];
-      }
-
-      g[constraint_index + 3] =
-          tmp3 +
-          (x[state_index] + std::cos(x[state_index + 2]) * offset_) * tmp1 +
-          (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) * tmp2 -
-          tmp4;
-
-      // Update index
-      edges_counter += current_edges_num;
-      l_index += current_edges_num;
-      n_index += 4;
-      constraint_index += 4;
-    }
-    state_index += 4;
-  }
-  ADEBUG << "constraint_index after obstacles avoidance constraints "
-            "updated: "
-         << constraint_index;
-
+  eval_constraints(n, x, m, g);
   return true;
 }
 
@@ -777,13 +412,10 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                                                 bool new_x, int m, int nele_jac,
                                                 int* iRow, int* jCol,
                                                 double* values) {
-  ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_)
-      << "No. of variables wrong in eval_jac_g. n : " << n;
-  CHECK_EQ(m, num_of_constraints_)
-      << "No. of constraints wrong in eval_jac_g. n : " << m;
+  if (values == NULL) {
+    // return the structure of the jacobian,
+    // assuming that the Jacobian is dense
 
-  if (values == nullptr) {
     int nz_index = 0;
     int constraint_index = 0;
     int state_index = state_start_index_;
@@ -1026,14 +658,6 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         jCol[nz_index] = n_index + 3;
         ++nz_index;
 
-        /*
-                CHECK_NE(constraint_index + 2, 300)
-                    << "index i : " << i << "index j : " << j
-                    << ", state_index + 2 : " << state_index + 2
-                    << ", l_index : " << l_index << ", n_index : " << n_index;
-        */
-        //  -g'*mu + (A*t - b)*lambda > 0
-
         // With respect to x
         iRow[nz_index] = constraint_index + 3;
         jCol[nz_index] = state_index;
@@ -1072,393 +696,15 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     CHECK_EQ(nz_index, static_cast<int>(nele_jac));
     CHECK_EQ(constraint_index, static_cast<int>(m));
   } else {
-    std::fill(values, values + nele_jac, 0.0);
-    int nz_index = 0;
+    // return the values of the jacobian of the constraints
 
-    int time_index = time_start_index_;
-    int state_index = state_start_index_;
-    int control_index = control_start_index_;
+    jacobian(tag_g, m, n, x, Jac);
 
-    // TODO(QiL) : initially implemented to be debug friendly, later iterate
-    // towards better efficiency
-    // 1. state constraints 4 * [0, horizons-1]
-    for (int i = 0; i < horizon_; ++i) {
-      values[nz_index] = -1.0;
-      ++nz_index;
-
-      values[nz_index] =
-          x[time_index] * ts_ *
-          (x[state_index + 3] +
-           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-          std::sin(x[state_index + 2] +
-                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                       std::tan(x[control_index]) / wheelbase_);  // a.
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 *
-          (x[time_index] * ts_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
-           x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               (-1) * x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // b
-      ++nz_index;
-
-      values[nz_index] = 1.0;
-      ++nz_index;
-
-      values[nz_index] =
-          x[time_index] * ts_ *
-          (x[state_index + 3] +
-           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-          std::sin(x[state_index + 2] +
-                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                       std::tan(x[control_index]) / wheelbase_) *
-          x[time_index] * ts_ * 0.5 * x[state_index + 3] /
-          (std::cos(x[control_index]) * std::cos(x[control_index])) /
-          wheelbase_;  // c
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // d
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
-           x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) -
-           x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // e
-      ++nz_index;
-
-      values[nz_index] = -1.0;
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // f.
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 *
-          (x[time_index] * ts_ *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
-           x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // g
-      ++nz_index;
-
-      values[nz_index] = 1.0;
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                  std::cos(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_) *
-                  x[time_index] * ts_ * 0.5 * x[state_index + 3] /
-                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
-                  wheelbase_);  // h
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::sin(x[state_index + 2] +
-                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                               std::tan(x[control_index]) / wheelbase_));  // i
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
-           x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-               std::sin(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_) +
-           x[time_index] * ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
-               wheelbase_ *
-               std::cos(x[state_index + 2] +
-                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
-                            std::tan(x[control_index]) / wheelbase_));  // j
-      ++nz_index;
-
-      values[nz_index] = -1.0;
-      ++nz_index;
-
-      values[nz_index] = -1.0 * x[time_index] * ts_ *
-                         std::tan(x[control_index]) / wheelbase_;  // k.
-      ++nz_index;
-
-      values[nz_index] = 1.0;
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ *
-                  (x[state_index + 3] +
-                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) /
-                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
-                  wheelbase_);  // l.
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
-                  std::tan(x[control_index]) / wheelbase_);  // m.
-      ++nz_index;
-
-      values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
-                      std::tan(x[control_index]) / wheelbase_ +
-                  x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
-                      std::tan(x[control_index]) / wheelbase_);  // n.
-      ++nz_index;
-
-      values[nz_index] = -1.0;
-      ++nz_index;
-
-      values[nz_index] = 1.0;
-      ++nz_index;
-
-      values[nz_index] = -1.0 * ts_ * x[time_index];  // o.
-      ++nz_index;
-
-      values[nz_index] = -1.0 * ts_ * x[control_index + 1];  // p.
-      ++nz_index;
-
-      state_index += 4;
-      control_index += 2;
-      time_index += 1;
-    }
-
-    // 2. control rate constraints 1 * [0, horizons-1]
-    control_index = control_start_index_;
-    state_index = state_start_index_;
-    time_index = time_start_index_;
-
-    // First horizon
-
-    // with respect to u(0, 0)
-    values[nz_index] = 1.0 / x[time_index] / ts_;  // q
-    ++nz_index;
-
-    // with respect to time
-    values[nz_index] = -1.0 * (x[control_index] - last_time_u_(0, 0)) /
-                       x[time_index] / x[time_index] / ts_;
-    ++nz_index;
-    time_index += 1;
-    control_index += 2;
-
-    for (int i = 1; i < horizon_; ++i) {
-      // with respect to u(0, i-1)
-
-      values[nz_index] = -1.0 / x[time_index] / ts_;
-      ++nz_index;
-
-      // with respect to u(0, i)
-      values[nz_index] = 1.0 / x[time_index] / ts_;
-      ++nz_index;
-
-      // with respect to time
-      values[nz_index] = -1.0 * (x[control_index] - x[control_index - 2]) /
-                         x[time_index] / x[time_index] / ts_;
-      ++nz_index;
-
-      control_index += 2;
-      time_index += 1;
-    }
-
-    ADEBUG << "After fulfilled control rate constraints derivative, nz_index : "
-           << nz_index << " nele_jac : " << nele_jac;
-
-    // 3. Time constraints [0, horizon_ -1]
-    time_index = time_start_index_;
-    for (int i = 0; i < horizon_; ++i) {
-      // with respect to timescale(0, i-1)
-      values[nz_index] = -1.0;
-      ++nz_index;
-
-      // with respect to timescale(0, i)
-      values[nz_index] = 1.0;
-      ++nz_index;
-
-      time_index += 1;
-    }
-
-    ADEBUG << "After fulfilled time constraints derivative, nz_index : "
-           << nz_index << " nele_jac : " << nele_jac;
-
-    // 4. Three obstacles related equal constraints, one equality constraints,
-    // [0, horizon_] * [0, obstacles_num_-1] * 4
-
-    state_index = state_start_index_;
-    int l_index = l_start_index_;
-    int n_index = n_start_index_;
-
-    for (int i = 0; i < horizon_ + 1; ++i) {
-      int edges_counter = 0;
-      for (int j = 0; j < obstacles_num_; ++j) {
-        int current_edges_num = obstacles_edges_num_(j, 0);
-        Eigen::MatrixXd Aj =
-            obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-        Eigen::MatrixXd bj =
-            obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
-
-        // TODO(QiL) : Remove redudant calculation
-        double tmp1 = 0;
-        double tmp2 = 0;
-        for (int k = 0; k < current_edges_num; ++k) {
-          // TODO(QiL) : replace this one directly with x
-          tmp1 += Aj(k, 0) * x[l_index + k];
-          tmp2 += Aj(k, 1) * x[l_index + k];
-        }
-
-        // 1. norm(A* lambda == 1)
-        for (int k = 0; k < current_edges_num; ++k) {
-          // with respect to l
-          values[nz_index] =
-              2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
-          ++nz_index;
-        }
-
-        // 2. G' * mu + R' * lambda == 0, part 1
-        // With respect to x
-        values[nz_index] = -std::sin(x[state_index + 2]) * tmp1 +
-                           std::cos(x[state_index + 2]) * tmp2;  // u
-        ++nz_index;
-
-        // with respect to l
-        for (int k = 0; k < current_edges_num; ++k) {
-          values[nz_index] = std::cos(x[state_index + 2]) * Aj(k, 0) +
-                             std::sin(x[state_index + 2]) * Aj(k, 1);  // v0~vn
-          ++nz_index;
-        }
-
-        // With respect to n
-        values[nz_index] = 1.0;  // w0
-        ++nz_index;
-
-        values[nz_index] = -1.0;  // w2
-        ++nz_index;
-
-        // 3. G' * mu + R' * lambda == 0, part 2
-        // With respect to x
-        values[nz_index] = -std::cos(x[state_index + 2]) * tmp1 -
-                           std::sin(x[state_index + 2]) * tmp2;  // x
-        ++nz_index;
-
-        // with respect to l
-        for (int k = 0; k < current_edges_num; ++k) {
-          values[nz_index] = -std::sin(x[state_index + 2]) * Aj(k, 0) +
-                             std::cos(x[state_index + 2]) * Aj(k, 1);  // y0~yn
-          ++nz_index;
-        }
-
-        // With respect to n
-        values[nz_index] = 1.0;  // z1
-        ++nz_index;
-
-        values[nz_index] = -1.0;  // z3
-        ++nz_index;
-
-        //  3. -g'*mu + (A*t - b)*lambda > 0
-        double tmp3 = 0.0;
-        double tmp4 = 0.0;
-        for (int k = 0; k < 4; ++k) {
-          tmp3 += -g_[k] * x[n_index + k];
-        }
-
-        for (int k = 0; k < current_edges_num; ++k) {
-          tmp4 += bj(k, 0) * x[l_index + k];
-        }
-
-        // With respect to x
-        values[nz_index] = tmp1;  // aa1
-        ++nz_index;
-
-        values[nz_index] = tmp2;  // bb1
-        ++nz_index;
-
-        values[nz_index] =
-            -std::sin(x[state_index + 2]) * offset_ * tmp1 +
-            std::cos(x[state_index + 2]) * offset_ * tmp2;  // cc1
-        ++nz_index;
-
-        // with respect to l
-        for (int k = 0; k < current_edges_num; ++k) {
-          values[nz_index] =
-              (x[state_index] + std::cos(x[state_index + 2]) * offset_) *
-                  Aj(k, 0) +
-              (x[state_index + 1] + std::sin(x[state_index + 2]) * offset_) *
-                  Aj(k, 1) -
-              bj(k, 0);  // ddk
-          ++nz_index;
-        }
-
-        // with respect to n
-        for (int k = 0; k < 4; ++k) {
-          values[nz_index] = -g_[k];  // eek
-          ++nz_index;
-        }
-
-        // Update index
-        edges_counter += current_edges_num;
-        l_index += current_edges_num;
-        n_index += 4;
-      }
-      state_index += 4;
-    }
-
-    ADEBUG << "eval_jac_g, fulfilled obstacle constraint values";
-    CHECK_EQ(nz_index, static_cast<int>(nele_jac));
+    int idx = 0;
+    for (int i = 0; i < m; i++)
+      for (int j = 0; j < n; j++) values[idx++] = Jac[i][j];
   }
 
-  ADEBUG << "eval_jac_g done";
   return true;
 }
 
@@ -1468,8 +714,40 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
                                             bool new_lambda, int nele_hess,
                                             int* iRow, int* jCol,
                                             double* values) {
-  ADEBUG << "eval_h";
-  return false;
+  if (values == NULL) {
+    // return the structure. This is a symmetric matrix, fill the lower left
+    // triangle only.
+
+    // the hessian for this problem is actually dense
+    int idx = 0;
+    for (int row = 0; row < n; row++) {
+      for (int col = 0; col <= row; col++) {
+        iRow[idx] = row;
+        jCol[idx] = col;
+        idx++;
+      }
+    }
+
+    assert(idx == nele_hess);
+  } else {
+    // return the values. This is a symmetric matrix, fill the lower left
+    // triangle only
+
+    obj_lam[0] = obj_factor;
+    for (int i = 0; i < m; i++) obj_lam[1 + i] = lambda[i];
+
+    set_param_vec(tag_L, m + 1, obj_lam);
+    hessian(tag_L, n, const_cast<double*>(x), Hess);
+
+    int idx = 0;
+
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j <= i; j++) {
+        values[idx++] = Hess[i][j];
+      }
+    }
+  }
+  return true;
 }
 
 void DistanceApproachIPOPTInterface::finalize_solution(
@@ -1521,6 +799,15 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   for (int k = 0; k < 4 * obstacles_num_; k++) {
     dual_n_result_(k, horizon_) = x[dual_n_index + k];
   }
+  // delete fields for ADOL-C
+  delete[] obj_lam;
+
+  for (int i = 0; i < m; i++) delete[] Jac[i];
+  delete[] Jac;
+
+  for (int i = 0; i < n; i++) delete[] Hess[i];
+  delete[] Hess;
+
   ADEBUG << "finalize_solution done!";
 }
 
@@ -1534,6 +821,315 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   *time_result = time_result_;
   *dual_l_result = dual_l_result_;
   *dual_n_result = dual_n_result_;
+}
+
+// ADOL-C part
+template <class T>
+bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x,
+                                              T& obj_value) {
+  ADEBUG << "eval_obj";
+  // Objective is :
+  // min control inputs
+  // min input rate
+  // min time (if the time step is not fixed)
+  // regularization wrt warm start trajectory
+  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
+  int control_index = control_start_index_;
+  int time_index = time_start_index_;
+  int state_index = state_start_index_;
+
+  // TODO(QiL): Initial implementation towards earlier understanding and debug
+  // purpose, later code refine towards improving efficiency
+
+  obj_value = 0.0;
+  // 1. objective to minimize state diff to warm up
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    T x1_diff = x[state_index] - xWS_(0, i);
+    T x2_diff = x[state_index + 1] - xWS_(1, i);
+    T x3_diff = x[state_index + 2] - xWS_(2, i);
+    T x4_abs = x[state_index + 3];
+    obj_value += weight_state_x_ * x1_diff * x1_diff +
+                 weight_state_y_ * x2_diff * x2_diff +
+                 weight_state_phi_ * x3_diff * x3_diff +
+                 weight_state_v_ * x4_abs * x4_abs;
+    state_index += 4;
+  }
+
+  // 2. objective to minimize u square
+  for (int i = 0; i < horizon_; ++i) {
+    obj_value += weight_input_steer_ * x[control_index] * x[control_index] +
+                 weight_input_a_ * x[control_index + 1] * x[control_index + 1];
+    control_index += 2;
+  }
+
+  // 3. objective to minimize input change rate for first horizon
+  control_index = control_start_index_;
+  T last_time_steer_rate =
+      (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+  T last_time_a_rate =
+      (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
+  obj_value +=
+      weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+      weight_stitching_a_ * last_time_a_rate * last_time_a_rate;
+
+  // 4. objective to minimize input change rates, [0- horizon_ -2]
+  time_index++;
+  for (int i = 0; i < horizon_ - 1; ++i) {
+    T steering_rate =
+        (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
+    T a_rate =
+        (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
+    obj_value += weight_rate_steer_ * steering_rate * steering_rate +
+                 weight_rate_a_ * a_rate * a_rate;
+    control_index += 2;
+    time_index += 1;
+  }
+
+  // 5. objective to minimize total time [0, horizon_]
+  time_index = time_start_index_;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    T first_order_penalty = weight_first_order_time_ * x[time_index];
+    T second_order_penalty =
+        weight_second_order_time_ * x[time_index] * x[time_index];
+    obj_value += first_order_penalty + second_order_penalty;
+    time_index += 1;
+  }
+
+  ADEBUG << "objective value after this iteration : " << obj_value;
+  return true;
+}
+
+template <class T>
+bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x,
+                                                      int m, T* g) {
+  ADEBUG << "eval_constraints";
+  // state start index
+  int state_index = state_start_index_;
+
+  // control start index.
+  int control_index = control_start_index_;
+
+  // time start index
+  int time_index = time_start_index_;
+
+  int constraint_index = 0;
+
+  // // 1. state constraints 4 * [0, horizons-1]
+  for (int i = 0; i < horizon_; ++i) {
+    // x1
+    // TODO(QiL) : optimize and remove redundant calculation in next
+    // iteration.
+    g[constraint_index] =
+        x[state_index + 4] -
+        (x[state_index] +
+         ts_ * x[time_index] *
+             (x[state_index + 3] +
+              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             cos(x[state_index + 2] +
+                      ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                          tan(x[control_index]) / wheelbase_));
+    // x2
+    g[constraint_index + 1] =
+        x[state_index + 5] -
+        (x[state_index + 1] +
+         ts_ * x[time_index] *
+             (x[state_index + 3] +
+              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             sin(x[state_index + 2] +
+                      ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                          tan(x[control_index]) / wheelbase_));
+
+    // x3
+    g[constraint_index + 2] =
+        x[state_index + 6] -
+        (x[state_index + 2] +
+         ts_ * x[time_index] *
+             (x[state_index + 3] +
+              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
+             tan(x[control_index]) / wheelbase_);
+
+    // x4
+    g[constraint_index + 3] =
+        x[state_index + 7] -
+        (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
+
+    control_index += 2;
+    constraint_index += 4;
+    time_index += 1;
+    state_index += 4;
+  }
+
+  ADEBUG << "constraint_index after adding Euler forward dynamics constraints "
+            "updated: "
+         << constraint_index;
+
+  // 2. Control rate limit constraints, 1 * [0, horizons-1], only apply
+  // steering rate as of now
+  control_index = control_start_index_;
+  time_index = time_start_index_;
+
+  // First rate is compare first with stitch point
+  g[constraint_index] =
+      (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+  control_index += 2;
+  constraint_index += 1;
+  time_index += 1;
+
+  for (int i = 1; i < horizon_; ++i) {
+    g[constraint_index] =
+        (x[control_index] - x[control_index - 2]) / x[time_index] / ts_;
+    constraint_index += 1;
+    control_index += 2;
+    time_index += 1;
+  }
+
+  // 3. Time constraints 1 * [0, horizons-1]
+  time_index = time_start_index_;
+  for (int i = 0; i < horizon_; ++i) {
+    g[constraint_index] = x[time_index + 1] - x[time_index];
+    constraint_index += 1;
+    time_index += 1;
+  }
+
+  ADEBUG << "constraint_index after adding time constraints "
+            "updated: "
+         << constraint_index;
+
+  // 4. Three obstacles related equal constraints, one equality constraints,
+  // [0, horizon_] * [0, obstacles_num_-1] * 4
+
+  state_index = state_start_index_;
+  int l_index = l_start_index_;
+  int n_index = n_start_index_;
+
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    int edges_counter = 0;
+    for (int j = 0; j < obstacles_num_; ++j) {
+      int current_edges_num = obstacles_edges_num_(j, 0);
+      Eigen::MatrixXd Aj =
+          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      Eigen::MatrixXd bj =
+          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+
+      // norm(A* lambda) <= 1
+      T tmp1 = 0.0;
+      T tmp2 = 0.0;
+      for (int k = 0; k < current_edges_num; ++k) {
+        // TODO(QiL) : replace this one directly with x
+        tmp1 += Aj(k, 0) * x[l_index + k];
+        tmp2 += Aj(k, 1) * x[l_index + k];
+      }
+      g[constraint_index] = tmp1 * tmp1 + tmp2 * tmp2;
+
+      // G' * mu + R' * lambda == 0
+      g[constraint_index + 1] = x[n_index] - x[n_index + 2] +
+                                cos(x[state_index + 2]) * tmp1 +
+                                sin(x[state_index + 2]) * tmp2;
+
+      g[constraint_index + 2] = x[n_index + 1] - x[n_index + 3] -
+                                sin(x[state_index + 2]) * tmp1 +
+                                cos(x[state_index + 2]) * tmp2;
+
+      //  -g'*mu + (A*t - b)*lambda > 0
+      T tmp3 = 0.0;
+      for (int k = 0; k < 4; ++k) {
+        tmp3 += -g_[k] * x[n_index + k];
+      }
+
+      T tmp4 = 0.0;
+      for (int k = 0; k < current_edges_num; ++k) {
+        tmp4 += bj(k, 0) * x[l_index + k];
+      }
+
+      g[constraint_index + 3] =
+          tmp3 +
+          (x[state_index] + cos(x[state_index + 2]) * offset_) * tmp1 +
+          (x[state_index + 1] + sin(x[state_index + 2]) * offset_) * tmp2 -
+          tmp4;
+
+      // Update index
+      edges_counter += current_edges_num;
+      l_index += current_edges_num;
+      n_index += 4;
+      constraint_index += 4;
+    }
+    state_index += 4;
+  }
+  ADEBUG << "constraint_index after obstacles avoidance constraints "
+            "updated: "
+         << constraint_index;
+
+  return true;
+}
+
+void DistanceApproachIPOPTInterface::generate_tapes(int n, int m) {
+  double* xp = new double[n];
+  double* lamp = new double[m];
+  double* zl = new double[m];
+  double* zu = new double[m];
+
+  adouble* xa = new adouble[n];
+  adouble* g = new adouble[m];
+  double* lam = new double[m];
+  double sig;
+  adouble obj_value;
+
+  double dummy;
+
+  Jac = new double*[m];
+  for (int i = 0; i < m; i++) Jac[i] = new double[n];
+
+  obj_lam = new double[m + 1];
+
+  Hess = new double*[n];
+  for (int i = 0; i < n; i++) Hess[i] = new double[i + 1];
+
+  get_starting_point(n, 1, xp, 0, zl, zu, m, 0, lamp);
+
+  trace_on(tag_f);
+
+  for (int i = 0; i < n; i++) xa[i] <<= xp[i];
+
+  eval_obj(n, xa, obj_value);
+
+  obj_value >>= dummy;
+
+  trace_off();
+
+  trace_on(tag_g);
+
+  for (int i = 0; i < n; i++) xa[i] <<= xp[i];
+
+  eval_constraints(n, xa, m, g);
+
+  for (int i = 0; i < m; i++) g[i] >>= dummy;
+
+  trace_off();
+
+  trace_on(tag_L);
+
+  for (int i = 0; i < n; i++) xa[i] <<= xp[i];
+  for (int i = 0; i < m; i++) lam[i] = 1.0;
+  sig = 1.0;
+
+  eval_obj(n, xa, obj_value);
+
+  obj_value *= mkparam(sig);
+  eval_constraints(n, xa, m, g);
+
+  for (int i = 0; i < m; i++) obj_value += g[i] * mkparam(lam[i]);
+
+  obj_value >>= dummy;
+
+  trace_off();
+
+  delete[] xa;
+  delete[] xp;
+  delete[] g;
+  delete[] lam;
+  delete[] lamp;
+  delete[] zu;
+  delete[] zl;
 }
 
 }  // namespace planning

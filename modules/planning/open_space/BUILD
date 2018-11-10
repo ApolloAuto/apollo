@@ -136,6 +136,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "@eigen",
         "@ipopt",
+        "@adolc",
     ],
 )
 

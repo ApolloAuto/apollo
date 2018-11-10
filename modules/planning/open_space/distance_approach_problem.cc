@@ -54,19 +54,19 @@ bool DistanceApproachProblem::Solve(
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  app->Options()->SetStringValue("hessian_approximation", "limited-memory");
+  // app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   // app->Options()->SetStringValue("jacobian_approximation",
   // "finite-difference-values");
   // app->Options()->SetStringValue("derivative_test", "first-order");
   // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
   // TODO(QiL) : Change IPOPT settings to flag or configs
-  app->Options()->SetIntegerValue("print_level", 0);
+  app->Options()->SetIntegerValue("print_level", 5);
   app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
   app->Options()->SetNumericValue("mumps_pivtol", 1e-6);
   app->Options()->SetIntegerValue("max_iter", 5000);
   app->Options()->SetNumericValue("tol", 1e-4);
-  app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
-  app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
+  // app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
+  // app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
   // app->Options()->SetStringValue("print_timing_statistics", "yes");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
