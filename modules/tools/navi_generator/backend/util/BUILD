@@ -19,6 +19,19 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "quad_tiles_maker",
+    srcs = [
+        "quad_tiles_maker.cc",
+    ],
+    hdrs = [
+        "quad_tiles_maker.h",
+    ],
+    deps = [
+        "//modules/common:log",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
@@ -37,6 +50,18 @@ cc_test(
     ],   
     deps = [
         ":trajectory_smoother",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "quad_tiles_maker_test",
+    size = "small",
+    srcs = [
+        "quad_tiles_maker_test.cc",
+    ],
+    deps = [
+        ":quad_tiles_maker",
         "@gtest//:main",
     ],
 )
