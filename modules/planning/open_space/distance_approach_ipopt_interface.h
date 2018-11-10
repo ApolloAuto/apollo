@@ -21,13 +21,15 @@
 #pragma once
 
 #include <math.h>
+#include <limits>
 #include <utility>
 #include <vector>
-#include <limits>
 
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
+#include "adolc/adolc.h"
+#include "adolc/adouble.h"
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
@@ -38,6 +40,10 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
+
+#define tag_f 1
+#define tag_g 2
+#define tag_L 3
 
 namespace apollo {
 namespace planning {
@@ -103,6 +109,15 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
                          const double* g, const double* lambda,
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
+
+  /** Method to generate the required tapes by ADOL-C*/
+  virtual void generate_tapes(int n, int m);
+
+  template <class T>
+  bool eval_obj(int n, const T* x, T& obj_value);
+
+  template <class T>
+  bool eval_constraints(int n, const T* x, int m, T* g);
 
   void get_optimization_results(Eigen::MatrixXd* state_result,
                                 Eigen::MatrixXd* control_result,
@@ -208,6 +223,12 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   PlannerOpenSpaceConfig planner_open_space_config_;
   const common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
+
+ private:
+  // private field for ADOL-C
+  double** Jac;
+  double* obj_lam;
+  double** Hess;
 };
 
 }  // namespace planning
