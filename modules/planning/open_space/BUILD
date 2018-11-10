@@ -253,6 +253,7 @@ cc_library(
     hdrs = [
         "open_space_trajectory_generator.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "distance_approach_problem",
         "hybrid_a_star",
@@ -296,6 +297,7 @@ cc_library(
     hdrs = [
         "open_space_ROI.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/common:frame",
         "//modules/planning/common:indexed_queue",
