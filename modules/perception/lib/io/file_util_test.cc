@@ -179,23 +179,6 @@ TEST(FileUtilTest, TestRenameFile) {
       "/apollo/modules/perception/testdata/lib/data2/222.txt"));
 }
 
-TEST(FileUtilTest, TestGetFileContent) {
-  std::string path = "/apollo/modules/perception/testdata/lib/data/1.txt";
-  std::string content;
-  EXPECT_FALSE(FileUtil::GetFileContent(path, nullptr));
-  EXPECT_FALSE(FileUtil::GetFileContent(
-      "/apollo/modules/perception/testdata/lib/data/2.txt", &content));
-  EXPECT_TRUE(FileUtil::GetFileContent(path, &content));
-  ASSERT_EQ(
-      system("chmod a-r /apollo/modules/perception/testdata/lib/data3/1.txt"),
-      0);
-  ASSERT_FALSE(FileUtil::GetFileContent(
-      "/apollo/modules/perception/testdata/lib/data3/1.txt", &content));
-  ASSERT_EQ(
-      system("chmod a+r /apollo/modules/perception/testdata/lib/data3/1.txt"),
-      0);
-}
-
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo

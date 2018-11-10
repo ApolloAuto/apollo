@@ -49,8 +49,6 @@ class FileUtil {
 
   // create folder
   static bool CreateDir(const std::string &dir);
-
-  static bool GetFileContent(const std::string &path, std::string *content);
   static bool ReadLines(const std::string &path,
                         std::vector<std::string> *lines);
 
