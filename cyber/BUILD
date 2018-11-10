@@ -26,20 +26,6 @@ cc_binary(
     ],
 )
 
-cc_binary(
-    name = "libcyber.so",
-    #TODO: Using deps instead.
-    linkopts = [
-      "-luuid",
-    ],
-    linkshared = True,
-    linkstatic = True,
-    deps = [
-      ":cyber_core",
-      "@fastrtps//:fastrtps",
-    ],
-)
-
 cc_library(
     name = "binary",
     hdrs = [

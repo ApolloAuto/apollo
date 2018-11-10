@@ -21,8 +21,6 @@ namespace cyber {
 namespace croutine {
 
 void MakeContext(const func &f1, const void *arg, RoutineContext *ctx) {
-  ctx->stack = reinterpret_cast<char *>(std::calloc(1, STACK_SIZE));
-  CHECK_NOTNULL(ctx->stack);
   char *sp = ctx->stack + STACK_SIZE - 2 * sizeof(void *);
   *reinterpret_cast<void **>(sp) = reinterpret_cast<void *>(f1);
   sp -= sizeof(void *);

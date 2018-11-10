@@ -18,6 +18,7 @@
 
 #include <utility>
 
+#include "cyber/base/concurrent_object_pool.h"
 #include "cyber/common/log.h"
 #include "cyber/croutine/routine_context.h"
 #include "cyber/event/perf_event_cache.h"
@@ -32,27 +33,34 @@ using apollo::cyber::event::SchedPerf;
 thread_local CRoutine *CRoutine::current_routine_;
 thread_local std::shared_ptr<RoutineContext> CRoutine::main_context_;
 
-static void CRoutineEntry(void *arg) {
+namespace {
+std::shared_ptr<base::CCObjectPool<RoutineContext>> context_pool = nullptr;
+
+void CRoutineEntry(void *arg) {
   CRoutine *r = static_cast<CRoutine *>(arg);
   r->Run();
   CRoutine::Yield(RoutineState::FINISHED);
 }
+}
 
-CRoutine::CRoutine(const std::function<void()> &func) {
-  func_ = func;
-  MakeContext(CRoutineEntry, this, &context_);
+CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
+  if (unlikely(context_pool == nullptr)) {
+    auto routine_num = 100;
+    auto global_conf = common::GlobalData::Instance()->Config();
+    if (global_conf.has_scheduler_conf() &&
+        global_conf.scheduler_conf().has_routine_num()) {
+      routine_num = global_conf.scheduler_conf().routine_num();
+    }
+    context_pool.reset(new base::CCObjectPool<RoutineContext>(routine_num));
+  }
+  context_ = context_pool->GetObject();
+  CHECK_NOTNULL(context_);
+  MakeContext(CRoutineEntry, this, context_.get());
   state_ = RoutineState::READY;
   updated_.test_and_set(std::memory_order_release);
 }
 
-CRoutine::CRoutine(std::function<void()> &&func) {
-  func_ = std::move(func);
-  MakeContext(CRoutineEntry, this, &context_);
-  state_ = RoutineState::READY;
-  updated_.test_and_set(std::memory_order_release);
-}
-
-CRoutine::~CRoutine() {}
+CRoutine::~CRoutine() { context_ = nullptr; }
 
 RoutineState CRoutine::Resume() {
   if (unlikely(force_stop_)) {

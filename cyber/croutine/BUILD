@@ -15,6 +15,7 @@ cc_library(
         "//cyber/base:atomic_hash_map",
         "//cyber/base:atomic_rw_lock",
         "//cyber/base:bounded_queue",
+        "//cyber/base:concurrent_object_pool",
         "//cyber/base:macros",
         "//cyber/base:wait_strategy",
         "//cyber/common:common",
@@ -24,6 +25,7 @@ cc_library(
         "//cyber/croutine:routine_factory",
         "//cyber/croutine:swap",
     ],
+    linkopts = ["-latomic"],
 )
 
 cc_library(
