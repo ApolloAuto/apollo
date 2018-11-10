@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 
+#include "modules/common/util/file.h"
 #define private public
 #define protected public
 #include "modules/perception/lib/io/file_util.h"
@@ -31,11 +32,6 @@ TEST(FileUtilTest, TestGetType) {
       "/apollo/modules/perception/testdata/lib/data/-/*/", &type));
   EXPECT_TRUE(
       FileUtil::GetType("/apollo/modules/perception/testdata/lib/data", &type));
-}
-
-TEST(FileUtilTest, TestCreateDir) {
-  EXPECT_TRUE(FileUtil::CreateDir(
-      "/apollo/modules/perception/testdata/lib/data3/data4/data5"));
 }
 
 TEST(FileUtilTest, TestGetAbsolutPath) {
@@ -89,8 +85,7 @@ TEST(FileUtilTest, TestCompareFile) {
 }
 
 TEST(FileUtilTest, TestExists) {
-  ASSERT_TRUE(FileUtil::CreateDir("./tmp"));
-  EXPECT_TRUE(FileUtil::CreateDir(""));
+  ASSERT_TRUE(apollo::common::util::EnsureDirectory("./tmp"));
   EXPECT_FALSE(FileUtil::Exists("./tmp", ".txt"));
   ASSERT_EQ(system("touch ./tmp/a.txt"), 0);
   EXPECT_TRUE(FileUtil::Exists("./tmp", ".txt"));

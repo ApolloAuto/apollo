@@ -142,25 +142,6 @@ bool FileUtil::RenameFile(const string &old_file, const string &new_file) {
   return true;
 }
 
-bool FileUtil::CreateDir(const string &dir) {
-  vector<string> terms_vec;
-  StringUtil::Explode(dir, '/', &terms_vec);
-  std::string multi_layer_dir;
-  for (const auto &term : terms_vec) {
-    multi_layer_dir = multi_layer_dir + term + "/";
-    if (term == "." || PathExists(multi_layer_dir)) {
-      continue;
-    }
-    int ret = mkdir(multi_layer_dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
-    if (ret != 0) {
-      AWARN << "failed to create dir. [dir: " << multi_layer_dir
-          << "] [err: " << strerror(errno) << "]";
-      return false;
-    }
-  }
-  return true;
-}
-
 bool FileUtil::ReadLines(const string &path, vector<string> *lines) {
   std::ifstream fin(path);
   if (!fin.good()) {
