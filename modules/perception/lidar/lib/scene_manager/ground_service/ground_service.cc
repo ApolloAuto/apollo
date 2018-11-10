@@ -137,9 +137,7 @@ bool GroundService::Init(const SceneServiceInitOptions& options) {
       dynamic_cast<GroundServiceContent*>(self_content_.get());
   // initialize ground service content from config manager and proto
   // including resolution, grid size, ...
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
+  auto& config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config))
       << "Failed to get model config: SceneManager";

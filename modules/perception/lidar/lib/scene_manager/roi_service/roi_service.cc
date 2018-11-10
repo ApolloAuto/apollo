@@ -83,9 +83,7 @@ bool ROIServiceContent::Check(const Eigen::Vector3d& world_point) const {
 bool ROIService::Init(const SceneServiceInitOptions& options) {
   self_content_.reset(new ROIServiceContent);
   roi_content_ref_ = dynamic_cast<ROIServiceContent*>(self_content_.get());
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
+  auto& config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();

@@ -32,12 +32,10 @@ using apollo::common::util::GetProtoFromFile;
 
 bool SpatioTemporalGroundDetector::Init(
     const GroundDetectorInitOptions& options) {
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig("SpatioTemporalGroundDetector",
-                                       &model_config))
+  auto& config_manager = lib::ConfigManager::Instance();
+  CHECK(config_manager->GetModelConfig(
+      "SpatioTemporalGroundDetector", &model_config))
       << "Failed to get model config: SpatioTemporalGroundDetector";
 
   const std::string& work_root = config_manager->work_root();

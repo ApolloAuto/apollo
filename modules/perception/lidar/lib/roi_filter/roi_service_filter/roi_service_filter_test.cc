@@ -49,9 +49,7 @@ class LidarLibROIServiceFilterTest : public testing::Test {
     FLAGS_work_root = "/apollo/modules/perception/testdata/"
         "lidar/lib/roi_filter/roi_service_filter";
     FLAGS_config_manager_path = "./conf";
-    lib::ConfigManager* config_manager =
-        lib::Singleton<lib::ConfigManager>::get_instance();
-    config_manager->Reset();
+    lib::ConfigManager::Instance()->Reset();
 
     map::HDMapInput* hdmap_input =
         lib::Singleton<map::HDMapInput>::get_instance();

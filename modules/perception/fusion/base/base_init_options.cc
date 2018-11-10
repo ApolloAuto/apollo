@@ -26,11 +26,9 @@ namespace fusion {
 bool GetFusionInitOptions(const std::string& module_name,
                           BaseInitOptions* options) {
   CHECK_NOTNULL(options);
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
   const lib::ModelConfig* model_config = nullptr;
-  if (!config_manager->GetModelConfig(module_name, &model_config)) {
+  if (!lib::ConfigManager::Instance()->GetModelConfig(module_name,
+                                                      &model_config)) {
     return false;
   }
   bool state = model_config->get_value("root_dir", &(options->root_dir)) &&

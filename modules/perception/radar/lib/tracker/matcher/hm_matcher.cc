@@ -14,9 +14,11 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/radar/lib/tracker/matcher/hm_matcher.h"
+
+#include <iomanip>
 #include <string>
 #include <utility>
-#include <iomanip>
+
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/io/file_util.h"
@@ -25,11 +27,13 @@
 namespace apollo {
 namespace perception {
 namespace radar {
+
 HMMatcher::HMMatcher() { name_ = "HMMatcher"; }
+
 HMMatcher::~HMMatcher() {}
+
 bool HMMatcher::Init() {
-  lib::ConfigManager *config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
+  auto& config_manager = lib::ConfigManager::Instance();
   std::string model_name = name_;
   const lib::ModelConfig *model_config = nullptr;
   AINFO << "matcher name: " << name_;

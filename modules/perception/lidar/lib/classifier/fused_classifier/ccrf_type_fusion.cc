@@ -34,9 +34,7 @@ using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 using apollo::perception::base::ObjectType;
 
 bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
+  auto& config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
@@ -131,9 +129,7 @@ bool CCRFOneShotTypeFusion::FuseOneShotTypeProbs(const ObjectPtr& object,
 
 bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
   CHECK(one_shot_fuser_.Init(option));
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
+  auto& config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();

@@ -41,7 +41,6 @@ using apollo::hdmap::JunctionBoundaryPtr;
 using apollo::hdmap::LineBoundary;
 using apollo::hdmap::SignalInfoConstPtr;
 using apollo::hdmap::LaneInfoConstPtr;
-using lib::ConfigManager;
 using base::PolygonDType;
 
 using base::PointD;
@@ -74,12 +73,10 @@ bool HDMapInput::Reset() {
 
 bool HDMapInput::InitHDMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
-  ConfigManager* config_manager =
-  lib::Singleton<ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
   std::string model_name = "HDMapInput";
   const lib::ModelConfig* model_config = nullptr;
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  if (!lib::ConfigManager::Instance()->GetModelConfig(model_name,
+                                                      &model_config)) {
     AERROR << "not found model: " << model_name;
     return false;
   }

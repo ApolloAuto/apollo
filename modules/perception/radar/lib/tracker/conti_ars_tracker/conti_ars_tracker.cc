@@ -36,12 +36,11 @@ ContiArsTracker::~ContiArsTracker() {
 }
 
 bool ContiArsTracker::Init() {
-  lib::ConfigManager *config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
   std::string model_name = name_;
   const lib::ModelConfig *model_config = nullptr;
   bool state = true;
-  if (!config_manager->GetModelConfig(model_name, &model_config)) {
+  if (!lib::ConfigManager::Instance()->GetModelConfig(model_name,
+                                                      &model_config)) {
     AERROR << "not found model: " << model_name;
     state = false;
   }
