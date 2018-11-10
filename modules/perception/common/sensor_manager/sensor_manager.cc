@@ -17,18 +17,19 @@
 
 #include <string>
 #include <utility>
-#include "google/protobuf/text_format.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/util/file.h"
+#include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/common/io/io_util.h"
 #include "modules/perception/proto/sensor_meta_schema.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace common {
 
+using apollo::common::util::GetProtoFromASCIIFile;
 using apollo::perception::base::BrownCameraDistortionModel;
 using apollo::perception::base::SensorInfo;
 using apollo::perception::base::SensorOrientation;
@@ -52,17 +53,10 @@ bool SensorManager::Init() {
   std::string file_path = lib::FileUtil::GetAbsolutePath(
       config_manager->work_root(), FLAGS_obs_sensor_meta_path);
 
-  std::string content;
-  if (!lib::FileUtil::GetFileContent(file_path, &content)) {
-    AERROR << "Failed to get SensorManager config path: "
-           << FLAGS_obs_sensor_meta_path;
-    return false;
-  }
-
   MultiSensorMeta sensor_list_proto;
-  if (!google::protobuf::TextFormat::ParseFromString(content,
-                                                     &sensor_list_proto)) {
-    AERROR << "Invalid MultiSensorMeta file!";
+  if (!GetProtoFromASCIIFile(file_path, &sensor_list_proto)) {
+    AERROR << "Invalid MultiSensorMeta file: "
+           << FLAGS_obs_sensor_meta_path;
     return false;
   }
 

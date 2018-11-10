@@ -161,41 +161,6 @@ bool FileUtil::CreateDir(const string &dir) {
   return true;
 }
 
-bool FileUtil::GetFileContent(const string &path, string *content) {
-  if (content == nullptr) {
-    return false;
-  }
-
-  int fd = ::open(path.c_str(), O_RDONLY);
-  if (fd < 0) {
-    AWARN << "failed to open file: " << path;
-    return false;
-  }
-  struct stat buf;
-  if (::fstat(fd, &buf) != 0) {
-    AWARN << "failed to lstat file: " << path;
-    ::close(fd);
-    return false;
-  }
-
-  size_t fsize = buf.st_size;
-  content->resize(fsize);
-  char *data = const_cast<char *>(content->data());
-  int size = 0;
-  size_t has_read = 0;
-  do {
-    size = ::read(fd, data + has_read, fsize - has_read);
-    if (size < 0) {
-      AWARN << "failed to read file: " << path;
-      ::close(fd);
-      return false;
-    }
-    has_read += size;
-  } while (size > 0);
-  ::close(fd);
-  return true;
-}
-
 bool FileUtil::ReadLines(const string &path, vector<string> *lines) {
   std::ifstream fin(path);
   if (!fin.good()) {

@@ -18,8 +18,7 @@
 #include <utility>
 
 #include "cyber/common/log.h"
-#include "google/protobuf/text_format.h"
-
+#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lib/io/file_util.h"
 
@@ -27,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace lib {
 
-using google::protobuf::TextFormat;
+using apollo::common::util::GetProtoFromASCIIFile;
 
 ConfigManager::ConfigManager() {
   work_root_ = FLAGS_work_root;
@@ -70,36 +69,20 @@ bool ConfigManager::InitInternal() {
     return false;
   }
 
-  for (auto &model_config_file : model_config_files) {
-    std::string content;
-    if (!FileUtil::GetFileContent(model_config_file, &content)) {
-      AERROR << "failed to get ConfigManager config path: "
+  for (const auto& model_config_file : model_config_files) {
+    ModelConfigFileListProto file_list_proto;
+    if (!GetProtoFromASCIIFile(model_config_file, &file_list_proto)) {
+      AERROR << "invalid ModelConfigFileListProto file: "
              << model_config_file;
       return false;
     }
 
-    ModelConfigFileListProto file_list_proto;
-
-    if (!TextFormat::ParseFromString(content, &file_list_proto)) {
-      AERROR << "invalid ModelConfigFileListProto file: "
-             << FLAGS_config_manager_path;
-      return false;
-    }
-
-    for (const std::string &model_config_file :
+    for (const std::string& model_config_path :
          file_list_proto.model_config_path()) {
-      std::string abs_path =
-          FileUtil::GetAbsolutePath(work_root_, model_config_file);
-      std::string config_content;
-      if (!FileUtil::GetFileContent(abs_path, &config_content)) {
-        AERROR << "failed to get file content: " << abs_path;
-        return false;
-      }
-
+      const std::string abs_path =
+          FileUtil::GetAbsolutePath(work_root_, model_config_path);
       MultiModelConfigProto multi_model_config_proto;
-
-      if (!TextFormat::ParseFromString(config_content,
-                                       &multi_model_config_proto)) {
+      if (!GetProtoFromASCIIFile(abs_path, &multi_model_config_proto)) {
         AERROR << "invalid MultiModelConfigProto file: " << abs_path;
         return false;
       }
