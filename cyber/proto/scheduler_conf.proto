@@ -26,4 +26,5 @@ message SchedConf {
 
 message SchedulerConf {
   repeated SchedConf confs = 1;
+  optional uint32 routine_num = 2;
 }

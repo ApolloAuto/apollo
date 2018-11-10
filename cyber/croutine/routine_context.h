@@ -30,13 +30,14 @@ namespace apollo {
 namespace cyber {
 namespace croutine {
 
-static const int STACK_SIZE = 8 * 1024 * 1024;
-static const int REGISTERS_SIZE = 56;
+constexpr size_t STACK_SIZE = 8 * 1024 * 1024;
+constexpr size_t REGISTERS_SIZE = 56;
 
 typedef void (*func)(void*);
 struct RoutineContext {
-  ~RoutineContext() { std::free(stack); }
-  char* stack = nullptr;
+  RoutineContext() {}
+  ~RoutineContext() { memset(stack, 0, STACK_SIZE); }
+  char stack[STACK_SIZE];
   char* sp = nullptr;
 };
 

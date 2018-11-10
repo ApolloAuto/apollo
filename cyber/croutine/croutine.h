@@ -40,7 +40,6 @@ enum class RoutineState { READY, FINISHED, SLEEP, IO_WAIT, DATA_WAIT };
 class CRoutine {
  public:
   explicit CRoutine(const RoutineFunc &func);
-  explicit CRoutine(RoutineFunc &&func);
   virtual ~CRoutine();
   virtual void Routine();
 
@@ -89,14 +88,16 @@ class CRoutine {
   void set_proc_num(double num);
 
  private:
+  CRoutine(CRoutine &) = delete;
+  CRoutine &operator=(CRoutine &) = delete;
+
   std::string name_;
   std::chrono::steady_clock::time_point wake_time_;
 
   RoutineFunc func_;
   RoutineState state_;
-  RoutineContext context_;
 
-  mutable std::mutex mutex_;
+  std::shared_ptr<RoutineContext> context_;
 
   std::atomic_flag lock_ = ATOMIC_FLAG_INIT;
   std::atomic_flag updated_ = ATOMIC_FLAG_INIT;
@@ -133,7 +134,7 @@ inline void CRoutine::SetMainContext(
   main_context_ = context;
 }
 
-inline RoutineContext *CRoutine::GetContext() { return &context_; }
+inline RoutineContext *CRoutine::GetContext() { return context_.get(); }
 RoutineState Resume();
 
 inline void CRoutine::Run() { func_(); }
