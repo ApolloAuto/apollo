@@ -70,14 +70,6 @@ class StringUtil {
   template <typename T>
   static std::string Digit2String(T number);
 
-  // @brief: judge raw_str start with prefix or not
-  //         StringUtil::StartWith("abcedf.txt", "abc") = true
-  static bool StartWith(const std::string &raw_str, const std::string &prefix);
-
-  // @brief: judge raw_str end with suffix or not
-  //         StringUtil::EndWith("abc.txt", "txt") = true
-  static bool EndWith(const std::string &raw_str, const std::string &suffix);
-
   // string to int
   static bool StrToInt(const std::string &str, int *ret_val);
 

@@ -89,20 +89,6 @@ TEST(StringUtilTest, TestDigit2String) {
   EXPECT_EQ("-123.100000", StringUtil::Digit2String(-123.1));
 }
 
-TEST(StringUtilTest, TestStartWith) {
-  EXPECT_TRUE(StringUtil::StartWith("abcd.txt", "ab"));
-  EXPECT_TRUE(StringUtil::StartWith("abcd.txt", "abcd.txt"));
-  EXPECT_FALSE(StringUtil::StartWith("abcd.txt", "abcd.txt.txt"));
-  EXPECT_FALSE(StringUtil::StartWith("", "abc"));
-}
-
-TEST(StringUtilTest, TestEndWith) {
-  EXPECT_TRUE(StringUtil::EndWith("abc.txt", "txt"));
-  EXPECT_TRUE(StringUtil::EndWith("abc.txt", "abc.txt"));
-  EXPECT_FALSE(StringUtil::EndWith("abc.txt", "png"));
-  EXPECT_FALSE(StringUtil::EndWith("abc.txt", "abc.txt.txt"));
-}
-
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
