@@ -51,7 +51,7 @@ Eigen::MatrixXf FlattenMatrix(const Eigen::MatrixXf& matrix) {
   int output_index = 0;
   for (int i = 0; i < matrix.rows(); ++i) {
     for (int j = 0; j < matrix.cols(); ++j) {
-      output_matrix(1, output_index) = matrix(i, j);
+      output_matrix(0, output_index) = matrix(i, j);
       ++output_index;
     }
   }
@@ -111,7 +111,7 @@ bool LoadTensor(const TensorParameter& tensor_pb, Eigen::VectorXf* vector) {
 }
 
 bool LoadTensor(const TensorParameter& tensor_pb,
-                std::vector<Eigen::MatrixXf>* tensor3d) {
+                std::vector<Eigen::MatrixXf>* const tensor3d) {
   if (tensor_pb.data_size() == 0 || tensor_pb.shape_size() != 3) {
     AERROR << "Fail to load the necessary fields!";
     return false;
@@ -120,19 +120,16 @@ bool LoadTensor(const TensorParameter& tensor_pb,
   int num_row = tensor_pb.shape(1);
   int num_col = tensor_pb.shape(2);
   CHECK_EQ(tensor_pb.data_size(), num_depth * num_row * num_col);
-  tensor3d->clear();
-  tensor3d->resize(num_depth);
-  for (int k = 0; k < num_depth; ++k) {
-    tensor3d->operator[](k).resize(num_row, num_col);
-  }
   int tensor_pb_index = 0;
   for (int k = 0; k < num_depth; ++k) {
+    Eigen::MatrixXf matrix = Eigen::MatrixXf::Zero(num_row, num_col);
     for (int i = 0; i < num_row; ++i) {
       for (int j = 0; j < num_col; ++j) {
-        tensor3d->operator[](k)(i, j) = tensor_pb.data(tensor_pb_index);
+        matrix(i, j) = tensor_pb.data(tensor_pb_index);
         ++tensor_pb_index;
       }
     }
+    tensor3d->push_back(matrix);
   }
   CHECK_EQ(tensor_pb_index, num_depth * num_row * num_col);
   return true;

@@ -122,10 +122,10 @@ DEFINE_string(evaluator_vehicle_rnn_file,
               "/apollo/modules/prediction/data/rnn_vehicle_model.bin",
               "rnn model file for vehicle evaluator");
 DEFINE_string(evaluator_cruise_vehicle_go_model_file,
-              "/apollo/modules/prediction/data/cruise_vehicle_go_model.bin",
+              "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.bin",
               "Vehicle cruise go model file");
 DEFINE_string(evaluator_cruise_vehicle_cutin_model_file,
-              "/apollo/modules/prediction/data/cruise_vehicle_cutin_model.bin",
+              "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.bin",
               "Vehicle cruise cutin model file");
 DEFINE_string(evaluator_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.bin",
