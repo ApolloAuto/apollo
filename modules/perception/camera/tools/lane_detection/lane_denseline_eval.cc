@@ -64,10 +64,7 @@ void lane_postprocessor_eval() {
   postprocessor_init_options.conf_file = "lane_postprocessor_config.pt";
   lane_postprocessor->Init(postprocessor_init_options);
   LanePostprocessorOptions postprocessor_options;
-  std::string result_dir = FLAGS_save_dir;
-  if (!apollo::common::util::PathExists(result_dir)) {
-    lib::FileUtil::CreateDir(result_dir);
-  }
+  apollo::common::util::EnsureDirectory(FLAGS_save_dir);
 
   //  read image list
   std::ifstream list_file(FLAGS_list.c_str());

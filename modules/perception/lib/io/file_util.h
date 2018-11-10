@@ -47,8 +47,6 @@ class FileUtil {
   static bool RenameFile(const std::string &old_file,
                          const std::string &new_file);
 
-  // create folder
-  static bool CreateDir(const std::string &dir);
   static bool ReadLines(const std::string &path,
                         std::vector<std::string> *lines);
 

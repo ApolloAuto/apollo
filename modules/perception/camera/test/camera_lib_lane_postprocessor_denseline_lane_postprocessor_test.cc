@@ -67,10 +67,9 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
   postprocessor_init_options.conf_file = "lane_postprocessor_config.pt";
   lane_postprocessor->Init(postprocessor_init_options);
   LanePostprocessorOptions postprocessor_options;
-  std::string result_dir = "./result";
-  if (!apollo::common::util::PathExists(result_dir)) {
-    lib::FileUtil::CreateDir(result_dir);
-  }
+  const std::string result_dir = "./result";
+  apollo::common::util::EnsureDirectory(result_dir);
+
   //  set pitch angle
   float pitch_angle = 0.0f;
   //  set camera_ground_height (unit:meter)
