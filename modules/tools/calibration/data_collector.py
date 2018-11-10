@@ -60,15 +60,15 @@ class DataCollector(object):
         self.cmd = map(float, cmd)
         out = ''
         if self.cmd[0] > 0:
-            out = out + 't'
+            out += 't'
         else:
-            out = out + 'b'
-        out = out + str(int(self.cmd[0]))
+            out += 'b'
+        out += str(int(self.cmd[0]))
         if self.cmd[2] > 0:
-            out = out + 't'
+            out += 't'
         else:
-            out = out + 'b'
-        out = out + str(int(self.cmd[2])) + 'r'
+            out += 'b'
+        out += str(int(self.cmd[2])) + 'r'
         i = 0
         self.outfile = out + str(i) + '.csv'
         while os.path.exists(self.outfile):
@@ -81,17 +81,17 @@ class DataCollector(object):
             "engine_rpm,driving_mode,throttle_percentage,brake_percentage,gear_location, imu\n"
         )
 
-        print "Send Reset Command"
+        print("Send Reset Command")
         self.controlcmd.header.module_name = "control"
         self.controlcmd.header.sequence_num = self.sequence_num
-        self.sequence_num = self.sequence_num + 1
+        self.sequence_num += 1
         self.controlcmd.header.timestamp_sec = rospy.get_time()
         self.controlcmd.pad_msg.action = 2
         self.control_pub.publish(self.controlcmd)
 
         rospy.sleep(0.2)
         # Set Default Message
-        print "Send Default Command"
+        print("Send Default Command")
         self.controlcmd.pad_msg.action = 1
         self.controlcmd.throttle = 0
         self.controlcmd.brake = 0
@@ -121,7 +121,7 @@ class DataCollector(object):
         New CANBUS
         """
         if not self.localization_received:
-            print "No Localization Message Yet"
+            print("No Localization Message Yet")
             return
         timenow = data.header.timestamp_sec
         self.vehicle_speed = data.speed_mps
@@ -140,7 +140,7 @@ class DataCollector(object):
         New Control Command
         """
         if not self.canmsg_received:
-            print "No CAN Message Yet"
+            print("No CAN Message Yet")
             return
 
         self.controlcmd.header.sequence_num = self.sequence_num
@@ -168,7 +168,7 @@ class DataCollector(object):
         self.controlcmd.header.timestamp_sec = rospy.get_time()
         self.control_pub.publish(self.controlcmd)
         self.write_file(self.controlcmd.header.timestamp_sec, 1)
-        if self.in_session == False:
+        if self.in_session is False:
             self.file.close()
 
     def write_file(self, time, io):
@@ -197,36 +197,35 @@ def main():
     canbussub = rospy.Subscriber('/apollo/canbus/chassis', chassis_pb2.Chassis,
                                  data_collector.callback_canbus)
 
-    print "Enter q to quit"
-    print "Enter p to plot result from last run"
-    print "Enter x to remove result from last run"
-    print "Enter x y z, where x is acceleration command, y is speed limit, z is decceleration command"
-    print "Positive number for throttle and negative number for brake"
+    print("Enter q to quit")
+    print("Enter p to plot result from last run")
+    print("Enter x to remove result from last run")
+    print("Enter x y z, where x is acceleration command, y is speed limit, z is decceleration command")
+    print("Positive number for throttle and negative number for brake")
 
     while True:
         cmd = raw_input("Enter commands: ").split()
         if len(cmd) == 0:
-            print "Quiting"
+            print("Quiting")
             break
         elif len(cmd) == 1:
             if cmd[0] == "q":
                 break
             elif cmd[0] == "p":
-                print "Plotting result"
+                print("Plotting result")
                 if os.path.exists(data_collector.outfile):
                     plotter.process_data(data_collector.outfile)
                     plotter.plot_result()
                 else:
-                    print "File does not exist"
+                    print("File does not exist")
             elif cmd[0] == "x":
-                print "Removing last result"
+                print("Removing last result")
                 if os.path.exists(data_collector.outfile):
                     os.remove(data_collector.outfile)
                 else:
-                    print "File does not exist"
+                    print("File does not exist")
         elif len(cmd) == 3:
             data_collector.run(cmd)
-
 
 if __name__ == '__main__':
     main()

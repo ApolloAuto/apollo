@@ -77,7 +77,7 @@ class Diagnostics(object):
                 self.stdscr.addstr(0, 70, "Min", curses.A_BOLD)
                 self.stdscr.addstr(0, 80, "Delay", curses.A_BOLD)
 
-                for idx in xrange(len(self.messages)):
+                for idx in range(len(self.messages)):
                     lidx = idx + 1
                     if idx == self.selection:
                         self.stdscr.addstr(lidx, 0, self.messages[idx].name,
@@ -87,7 +87,7 @@ class Diagnostics(object):
                     self.stdscr.addstr(
                         lidx, 15, self.messages[idx].topic,
                         curses.color_pair(2 if self.messages[idx]
-                                          .msg_received == True else 1))
+                                          .msg_received is True else 1))
 
                     self.stdscr.addstr(
                         lidx, 50,

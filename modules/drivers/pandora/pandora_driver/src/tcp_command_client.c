@@ -51,7 +51,6 @@ typedef struct TcpCommandClient_s {
 
 #ifdef DEBUG
 static void print_mem(char* mem, int len) {
-  int i = 0;
   for (int i = 0; i < len; ++i) {
     printf("%02x ", mem[i]);
   }

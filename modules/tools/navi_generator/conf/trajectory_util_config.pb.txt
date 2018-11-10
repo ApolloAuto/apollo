@@ -1,0 +1,4 @@
+smoother_config {
+    smoother_config_filename: "modules/planning/conf/qp_spline_smoother_config.pb.txt"
+    smooth_length: 200.0
+}
