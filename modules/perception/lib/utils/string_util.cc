@@ -84,38 +84,6 @@ string StringUtil::RTrim(const std::string &str) {
 
 string StringUtil::Trim(const std::string &str) { return Trim(TRIM_BOTH, str); }
 
-bool StringUtil::StartWith(const string &raw_str, const string &prefix) {
-  if (raw_str.size() < prefix.size()) {
-    return false;
-  }
-
-  auto raw_iter = raw_str.cbegin();
-  auto pre_iter = prefix.cbegin();
-  for (; pre_iter != prefix.end(); ++raw_iter, ++pre_iter) {
-    if (*raw_iter != *pre_iter) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-bool StringUtil::EndWith(const string &raw_str, const string &suffix) {
-  if (raw_str.size() < suffix.size()) {
-    return false;
-  }
-
-  auto raw_iter = raw_str.crbegin();
-  auto suffix_iter = suffix.crbegin();
-  for (; suffix_iter != suffix.crend(); ++suffix_iter, ++raw_iter) {
-    if (*suffix_iter != *raw_iter) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 bool StringUtil::StrToInt(const string &str, int *ret_val) {
   try {
     *ret_val = std::stoi(str);
