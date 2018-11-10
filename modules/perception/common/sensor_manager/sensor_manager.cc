@@ -47,11 +47,8 @@ bool SensorManager::Init() {
   distort_model_map_.clear();
   undistort_model_map_.clear();
 
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
   std::string file_path = lib::FileUtil::GetAbsolutePath(
-      config_manager->work_root(), FLAGS_obs_sensor_meta_path);
+      lib::ConfigManager::Instance()->work_root(), FLAGS_obs_sensor_meta_path);
 
   MultiSensorMeta sensor_list_proto;
   if (!GetProtoFromASCIIFile(file_path, &sensor_list_proto)) {

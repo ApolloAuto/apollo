@@ -26,7 +26,6 @@ namespace apollo {
 namespace perception {
 namespace map {
 
-// using apollo::perception::lib::ConfigManager;
 // using adu::hdmap::JunctionInfo;
 // using adu::hdmap::JunctionInfoConstPtr;
 // using adu::hdmap::RoiRoadBoundaryPtr;

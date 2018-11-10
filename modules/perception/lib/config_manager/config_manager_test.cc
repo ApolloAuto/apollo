@@ -35,12 +35,12 @@ class ConfigManagerTest : public testing::Test {
     char module_path[80] = "MODULE_PATH=";
     putenv(module_path);
     FLAGS_config_manager_path = "/apollo/modules/perception/testdata/lib/conf";
-    config_manager_ = lib::Singleton<ConfigManager>::get_instance();
+    config_manager_ = ConfigManager::Instance();
     ASSERT_TRUE(config_manager_ != nullptr);
   }
 
  protected:
-  ConfigManager* config_manager_;
+  std::shared_ptr<ConfigManager> config_manager_;
 };
 
 TEST_F(ConfigManagerTest, TestInit) {

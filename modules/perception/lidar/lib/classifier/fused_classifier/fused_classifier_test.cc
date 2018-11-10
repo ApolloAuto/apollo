@@ -71,7 +71,6 @@ class FusedClassifierTest : public testing::Test {
   std::vector<double> timestamps_;
   static const size_t kSequenceLength;
   static const size_t kObjectNum;
-  lib::ConfigManager* config_manager_;
 };
 
 const size_t FusedClassifierTest::kSequenceLength = 10;

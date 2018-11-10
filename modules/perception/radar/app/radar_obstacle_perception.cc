@@ -29,11 +29,9 @@ namespace perception {
 namespace radar {
 
 bool RadarObstaclePerception::Init(const std::string& pipeline_name) {
-  ConfigManager* config_manager = lib::Singleton<ConfigManager>::get_instance();
-  CHECK_NOTNULL(config_manager);
   std::string model_name = pipeline_name;
   const ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(model_name, &model_config))
+  CHECK(ConfigManager::Instance()->GetModelConfig(model_name, &model_config))
         << "not found model: " << model_name;
 
   std::string detector_name;

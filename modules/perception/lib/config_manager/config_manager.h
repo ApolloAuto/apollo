@@ -119,7 +119,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/perception/lib/singleton/singleton.h"
+#include "cyber/common/macros.h"
 #include "modules/perception/lib/thread/mutex.h"
 #include "modules/perception/proto/perception_config_schema.pb.h"
 
@@ -131,6 +131,8 @@ class ModelConfig;
 
 class ConfigManager {
  public:
+  ~ConfigManager();
+
   // thread-safe interface.
   bool Init();
 
@@ -146,29 +148,17 @@ class ConfigManager {
 
   void set_work_root(const std::string &work_root) { work_root_ = work_root; }
 
-  ConfigManager(const ConfigManager &) = delete;
-  ConfigManager operator=(const ConfigManager &) = delete;
-
  private:
-  ConfigManager();
-  ~ConfigManager();
-
   bool InitInternal();
   std::string get_env(const std::string &var_name);
-
-  friend class lib::Singleton<ConfigManager>;
-
-  /* TODO(all): to remove
-  typedef std::map<std::string, ModelConfig *> ModelConfigMap;
-  typedef ModelConfigMap::iterator ModelConfigMapIterator;
-  typedef ModelConfigMap::const_iterator ModelConfigMapConstIterator;
-  */
 
   // key: model_name
   std::map<std::string, ModelConfig *> model_config_map_;
   Mutex mutex_;  // multi-thread init safe.
   bool inited_ = false;
   std::string work_root_;  // ConfigManager work root dir.
+
+  DECLARE_SINGLETON(ConfigManager);
 };
 
 class ModelConfig {
@@ -242,19 +232,6 @@ class ModelConfig {
 
   std::string name_;
   std::string version_;
-
-  /* TODO(all): to remove
-  typedef std::map<std::string, int> IntegerParamMap;
-  typedef std::map<std::string, std::string> StringParamMap;
-  typedef std::map<std::string, double> DoubleParamMap;
-  typedef std::map<std::string, float> FloatParamMap;
-  typedef std::map<std::string, bool> BoolParamMap;
-  typedef std::map<std::string, std::vector<int>> ArrayIntegerParamMap;
-  typedef std::map<std::string, std::vector<std::string>> ArrayStringParamMap;
-  typedef std::map<std::string, std::vector<double>> ArrayDoubleParamMap;
-  typedef std::map<std::string, std::vector<float>> ArrayFloatParamMap;
-  typedef std::map<std::string, std::vector<bool>> ArrayBoolParamMap;
-  */
 
   std::map<std::string, int> integer_param_map_;
   std::map<std::string, std::string> string_param_map_;

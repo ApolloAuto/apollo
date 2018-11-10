@@ -35,9 +35,7 @@ class LidarLibGroundServiceDetectorTest : public testing::Test {
     FLAGS_work_root = "/apollo/modules/perception/testdata/"
         "lidar/lib/ground_detector/ground_service_detector";
     FLAGS_config_manager_path = "./conf";
-    lib::ConfigManager* config_manager =
-        lib::Singleton<lib::ConfigManager>::get_instance();
-    config_manager->Reset();
+    lib::ConfigManager::Instance()->Reset();
   }
 
   void TearDown() {}

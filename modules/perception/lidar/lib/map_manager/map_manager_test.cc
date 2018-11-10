@@ -32,9 +32,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_empty_test) {
 
   FLAGS_work_root = "/apollo/modules/perception/testdata/lidar/lib/map_manager";
   FLAGS_config_manager_path = "./empty_conf";
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  config_manager->Reset();
+  lib::ConfigManager::Instance()->Reset();
 
   map::HDMapInput* hdmap_input =
       lib::Singleton<map::HDMapInput>::get_instance();
@@ -52,9 +50,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_test) {
 
   FLAGS_work_root = "/apollo/modules/perception/testdata/lidar/lib/map_manager";
   FLAGS_config_manager_path = "./conf";
-  lib::ConfigManager* config_manager =
-      lib::Singleton<lib::ConfigManager>::get_instance();
-  config_manager->Reset();
+  lib::ConfigManager::Instance()->Reset();
 
   map::HDMapInput* hdmap_input =
       lib::Singleton<map::HDMapInput>::get_instance();

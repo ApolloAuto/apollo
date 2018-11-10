@@ -62,13 +62,8 @@ class OfflineLidarObstaclePerception {
 
   bool setup() {
     FLAGS_config_manager_path = "./conf";
-    config_manager_ = lib::Singleton<lib::ConfigManager>::get_instance();
-    if (config_manager_ == nullptr) {
-      AERROR << "Failed to get ConfigManager instance.";
-      return false;
-    }
-    if (!config_manager_->Init()) {
-      AERROR << "Failed to int ConfigManage.";
+    if (!lib::ConfigManager::Instance()->Init()) {
+      AERROR << "Failed to init ConfigManage.";
       return false;
     }
     lidar_segmentation_.reset(new LidarObstacleSegmentation);
@@ -325,7 +320,6 @@ class OfflineLidarObstaclePerception {
 
  protected:
   std::string output_dir_;
-  lib::ConfigManager* config_manager_ = nullptr;
   std::shared_ptr<LidarFrame> frame_;
   LidarObstacleSegmentationInitOptions segment_init_options_;
   LidarObstacleSegmentationOptions segment_options_;
