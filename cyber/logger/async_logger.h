@@ -17,6 +17,7 @@
 #ifndef INCLUDE_CYBER_COMMON_ASYNC_LOGGER_H_
 #define INCLUDE_CYBER_COMMON_ASYNC_LOGGER_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <cstdint>
 #include <ctime>
@@ -123,7 +124,7 @@ class AsyncLogger : public google::base::Logger {
     std::vector<Msg> messages;
 
     // Estimate of the size of 'messages'.
-    int size = 0;
+    std::atomic<int> size = {0};
 
     // Whether this buffer needs an explicit flush of the
     // underlying logger.
@@ -137,12 +138,10 @@ class AsyncLogger : public google::base::Logger {
       flush = false;
     }
 
-    inline void add(Msg&& msg, bool flush) {
-      // FIXME: msg size may overflow
-      size += static_cast<int>(sizeof(msg)) +
-          static_cast<int>(msg.message.size());
+    inline void add(Msg&& msg, bool force_flush) {
+      size += sizeof(msg) + msg.message.size();
       messages.emplace_back(std::move(msg));
-      this->flush |= flush;
+      flush |= force_flush;
     }
 
     inline bool needs_flush_or_write() const {

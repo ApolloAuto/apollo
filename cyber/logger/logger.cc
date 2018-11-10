@@ -14,15 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/logger/logger.h"
+
 #include <glog/logging.h>
 #include <stdlib.h>
 #include <string>
 #include <unordered_map>
 #include <utility>
 
-#include "cyber/common/global_data.h"
+#include "cyber/base/macros.h"
 #include "cyber/logger/log_file_object.h"
-#include "cyber/logger/logger.h"
+#include "cyber/logger/logger_util.h"
 
 namespace apollo {
 namespace cyber {
@@ -41,19 +43,13 @@ Logger::~Logger() {
 
 void Logger::Write(bool force_flush, time_t timestamp, const char* message,
                    int message_len) {
-  std::string log_message = std::string(message);
-  std::string module_name = common::GlobalData::Instance()->ProcessName();
-  // set the same bracket as the bracket in log.h
-  auto lpos = log_message.find('[');
-  if (lpos != std::string::npos) {
-    auto rpos = log_message.find(']', lpos);
-    if (rpos != std::string::npos) {
-      module_name = log_message.substr(lpos + 1, rpos - lpos - 1);
-      auto cut_length = rpos - lpos + 1;
-      log_message.replace(lpos, cut_length, "");
-      message_len -= static_cast<int>(cut_length);
-    }
+  if (unlikely(message_len <= 0)) {
+    return;
   }
+  std::string log_message = std::string(message, message_len);
+  std::string module_name;
+  // set the same bracket as the bracket in log.h
+  FindModuleName(&log_message, &module_name);
 
   LogFileObject* fileobject = nullptr;
   {
@@ -67,7 +63,8 @@ void Logger::Write(bool force_flush, time_t timestamp, const char* message,
     }
   }
   if (fileobject) {
-    fileobject->Write(force_flush, timestamp, log_message.c_str(), message_len);
+    fileobject->Write(force_flush, timestamp, log_message.c_str(),
+                      log_message.size());
   }
 }
 
