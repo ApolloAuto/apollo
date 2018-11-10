@@ -1,6 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import classNames from "classnames";
+import _ from "lodash";
 
 import RadioItem from 'components/common/RadioItem';
 
@@ -30,18 +31,19 @@ const MenuIconMapping = {
 @observer
 class MenuItemCheckbox extends React.Component {
     render() {
-        const {id, title, optionName, options} = this.props;
+        const {id, title, optionName, options, isCustomized} = this.props;
         return (
             <ul>
                 <li id={id} onClick={() => {
-                    options.toggle(optionName);
+                    options.toggle(optionName, isCustomized);
                     if (id === "perceptionPointCloud") {
                         POINT_CLOUD_WS.togglePointCloud(options.showPointCloud);
                     }
                 }}>
                     <div className="switch">
                         <input type="checkbox" name={id} className="toggle-switch"
-                        id={id} checked={options[optionName]} readOnly/>
+                        id={id} checked={isCustomized ? options.customizedToggles.get(optionName) :
+                            options[optionName]} readOnly/>
                         <label className="toggle-switch-label" htmlFor={id} />
                     </div>
                     <span>{title}</span>
@@ -79,9 +81,23 @@ class SubMenu extends React.Component {
                         <MenuItemCheckbox
                             key={key} id={key} title={item}
                             optionName={this.menuIdOptionMapping[key]}
-                            options={options} />
+                            options={options}
+                            isCustomized={false} />
                     );
                 });
+            if (tabId === 'planning' && options.customizedToggles.size > 0) {
+                const extraEntries = options.customizedToggles.keys().map(pathName => {
+                    const title = _.startCase(pathName);
+                    return (
+                        <MenuItemCheckbox
+                            key={pathName} id={pathName} title={title}
+                            optionName={pathName}
+                            options={options}
+                            isCustomized={true} />
+                    );
+                });
+                entries = entries.concat(extraEntries);
+            }
         } else if (tabType === 'radio') {
             entries = Object.keys(data)
                 .map(key => {

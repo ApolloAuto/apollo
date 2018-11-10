@@ -49,36 +49,32 @@
 		"defaults": {
 			"width": 1.4
 		},
-		"pathProperties": {
-			"trajectory": {
-				"optionName": "showPlanningTrajectory",
+		"pathProperties": [
+			{
 				"width": 0.8,
 				"color": 119233,
 				"opacity": 0.65,
 				"zOffset": 4
 			},
-			"planning_reference_line": {
-				"optionName": "showPlanningReference",
+			{
 				"width": 0.15,
 				"color": 3580651,
 				"opacity": 1,
 				"zOffset": 7
 			},
-			"DpPolyPathOptimizer": {
-				"optionName": "showPlanningDpOptimizer",
+			{
 				"width": 0.4,
 				"color": 9305268,
-				"opacity": 0.8,
+				"opacity": 0.7,
 				"zOffset": 6
 			},
-			"QpSplinePathOptimizer": {
-				"optionName": "showPlanningQpOptimizer",
+			{
 				"width": 0.65,
 				"color": 14177878,
 				"opacity": 0.8,
 				"zOffset": 5
 			}
-		}
+		]
 	},
 	"options": {
 		"showTasks": {
@@ -132,21 +128,6 @@
 		"showPlanningCar": {
 			"default": false,
 			"menuId": "planningCar"
-		},
-		"showPlanningReference": {
-			"default": false,
-			"menuId": "planningReference",
-			"forPncMonitor": true
-		},
-		"showPlanningDpOptimizer": {
-			"default": false,
-			"menuId": "planningDpOptimizer",
-			"forPncMonitor": true
-		},
-		"showPlanningQpOptimizer": {
-			"default": false,
-			"menuId": "planningQpOptimizer",
-			"forPncMonitor": true
 		},
 		"showRouting": {
 			"default": true,

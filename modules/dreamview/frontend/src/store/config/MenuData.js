@@ -64,9 +64,6 @@ export default [
         data: {
             planningCar: 'Planning Car',
             planningTrajectory: 'Planning Trajectory',
-            planningQpOptimizer: 'Qp Optimizer Line',
-            planningDpOptimizer: 'Dp Optimizer Line',
-            planningReference: 'Reference Line',
         },
         supportInOfflineView: true,
     }, {
