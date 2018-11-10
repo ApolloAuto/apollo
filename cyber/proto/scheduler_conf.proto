@@ -13,6 +13,7 @@ enum SchedName {
   CYBER_CONTROL = 2;
   CYBER_DEBUG1 = 3;
   CYBER_DEBUG2 = 4;
+  CYBER_DV = 5;
 }
 
 message SchedConf {
