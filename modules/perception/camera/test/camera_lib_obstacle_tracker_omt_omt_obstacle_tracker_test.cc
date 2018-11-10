@@ -34,7 +34,6 @@
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/lib/utils/string_util.h"
 
 namespace apollo {
 namespace perception {
@@ -256,7 +255,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
 
   // Init camera list
   std::vector<std::string> camera_names;
-  lib::StringUtil::Explode(FLAGS_sensor_name, ',', &camera_names);
+  apollo::common::util::Split(FLAGS_sensor_name, ',', &camera_names);
   // Init data provider
   DataProvider::InitOptions data_options;
   data_options.image_height = 1080;
@@ -344,7 +343,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   ASSERT_TRUE(fin.is_open());
   while (fin >> line) {
     std::vector<std::string> temp_strs;
-    lib::StringUtil::Explode(line, '/', &temp_strs);
+    apollo::common::util::Split(line, '/', &temp_strs);
     if (temp_strs.size() != 2) {
       AERROR << "invaid format in " << FLAGS_test_list;
     }

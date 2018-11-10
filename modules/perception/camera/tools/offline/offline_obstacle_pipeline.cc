@@ -27,7 +27,6 @@
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/lib/utils/string_util.h"
 #include "modules/perception/lib/io/file_util.h"
 
 DEFINE_string(test_list, "full_test_list.txt", "exe image list");
@@ -90,7 +89,7 @@ int work() {
 
   // Init camera list
   std::vector<std::string> camera_names;
-  lib::StringUtil::Explode(FLAGS_sensor_name, ',', &camera_names);
+  apollo::common::util::Split(FLAGS_sensor_name, ',', &camera_names);
 
   // Init data provider
   DataProvider::InitOptions data_options;
@@ -184,7 +183,7 @@ int work() {
 
   while (fin >> line) {
     std::vector<std::string> temp_strs;
-    lib::StringUtil::Explode(line, '/', &temp_strs);
+    apollo::common::util::Split(line, '/', &temp_strs);
     if (temp_strs.size() != 2) {
       AERROR << "invaid format in " << FLAGS_test_list;
     }

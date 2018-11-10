@@ -48,7 +48,7 @@ const char* tripletBase64(const int triplet) {
 
 }  // namespace
 
-int split(const std::string& str, char ch, std::vector<std::string>* result) {
+int Split(const std::string& str, char ch, std::vector<std::string>* result) {
   std::stringstream ss(str);
   std::string segment;
   int count = 0;
@@ -57,30 +57,6 @@ int split(const std::string& str, char ch, std::vector<std::string>* result) {
     ++count;
   }
   return count;
-}
-
-void trim(std::string* str) {
-  ltrim(str);
-  rtrim(str);
-}
-
-void ltrim(std::string* str) {
-  if (!str) {
-    return;
-  }
-  str->erase(str->begin(), std::find_if(str->begin(), str->end(), [](int ch) {
-               return !std::isspace(ch);
-             }));
-}
-
-void rtrim(std::string* str) {
-  if (!str) {
-    return;
-  }
-  str->erase(std::find_if(str->rbegin(), str->rend(),
-                          [](int ch) { return !std::isspace(ch); })
-                 .base(),
-             str->end());
 }
 
 std::string DecodeBase64(const std::string& base64_str) {

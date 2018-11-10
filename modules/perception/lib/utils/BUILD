@@ -51,23 +51,4 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "perception_string_util",
-    srcs = ["string_util.cc"],
-    hdrs = ["string_util.h"],
-    deps = [
-        "//cyber",
-    ],
-)
-
-cc_test(
-    name = "perception_string_util_test",
-    size = "small",
-    srcs = ["string_util_test.cc"],
-    deps = [
-        ":perception_string_util",
-        "@gtest//:main",
-    ],
-)
-
 cpplint()

@@ -760,7 +760,7 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
             // flag yielded obstacles
             for (auto obstacle_id : decision.stop().wait_for_obstacle()) {
               std::vector<std::string> id_segments;
-              apollo::common::util::split(obstacle_id, '_', &id_segments);
+              apollo::common::util::Split(obstacle_id, '_', &id_segments);
               if (id_segments.size() > 0) {
                 obj_map_[id_segments[0]].set_yielded_obstacle(true);
               }
