@@ -65,40 +65,7 @@ inline bool StartWith(const std::string& ori, const std::string& pat) {
  * @param [out]: result strings after exploded by character
  * @return: the number of elements splitted in the given str
  **/
-int split(const std::string& str, char ch, std::vector<std::string>* result);
-
-/**
- * @brief: trim the left side empty space of string
- * @param [in/out]: trimed string
- * @return: void
- **/
-void ltrim(std::string* str);
-inline std::string ltrim(std::string str) {
-  ltrim(&str);
-  return str;
-}
-
-/**
- * @brief: trim the right side empty space of string
- * @param [in/out]: trimed string
- * @return: void
- **/
-void rtrim(std::string* str);
-inline std::string rtrim(std::string str) {
-  rtrim(&str);
-  return str;
-}
-
-/**
- * @brief: trim the string, in place vesion
- * @param [in/out]: trimed string
- * @return: void
- **/
-void trim(std::string* str);
-inline std::string trim(std::string str) {
-  trim(&str);
-  return str;
-}
+int Split(const std::string& str, char ch, std::vector<std::string>* result);
 
 template <typename T>
 std::string Print(const T& val) {

@@ -536,7 +536,6 @@ cc_test(
 #         "//modules/perception/common/geometry:common",
 #         "//modules/perception/common/io:io_util",
 #         "//modules/perception/lib/io:file_util",
-#         "//modules/perception/lib/utils:perception_string_util",
 #         "@gtest//:main",
 #         "@yaml_cpp//:yaml",
 #     ]

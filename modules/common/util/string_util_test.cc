@@ -24,17 +24,17 @@ namespace apollo {
 namespace common {
 namespace util {
 
-TEST(StringUtilTest, split) {
+TEST(StringUtilTest, Split) {
   {
-    auto result = std::vector<std::string>();
-    split("abc.def", '.', &result);
+    std::vector<std::string> result;
+    Split("abc.def", '.', &result);
     EXPECT_EQ(result.size(), 2);
     EXPECT_EQ(result[0], "abc");
     EXPECT_EQ(result[1], "def");
   }
   {
-    auto result = std::vector<std::string>();
-    split("abc.def", 'x', &result);
+    std::vector<std::string> result;
+    Split("abc.def", 'x', &result);
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(result[0], "abc.def");
   }

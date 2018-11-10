@@ -33,7 +33,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/utils/string_util.h"
 
 namespace apollo {
 namespace perception {

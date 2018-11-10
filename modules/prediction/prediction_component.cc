@@ -147,7 +147,7 @@ bool PredictionComponent::Init() {
       return true;  // use listen to ROS topic mode
     }
     std::vector<std::string> inputs;
-    apollo::common::util::split(FLAGS_prediction_offline_bags, ':', &inputs);
+    apollo::common::util::Split(FLAGS_prediction_offline_bags, ':', &inputs);
     for (const auto& input : inputs) {
       std::vector<std::string> offline_bags;
       GetDataFileNames(boost::filesystem::path(input), &offline_bags);

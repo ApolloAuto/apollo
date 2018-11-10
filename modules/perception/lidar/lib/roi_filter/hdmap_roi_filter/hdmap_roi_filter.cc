@@ -21,7 +21,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/io/file_util.h"
-#include "modules/perception/lib/utils/string_util.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/polygon_mask.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/proto/hdmap_roi_filter.pb.h"
