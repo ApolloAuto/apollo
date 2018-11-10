@@ -21,8 +21,9 @@
 #include <thread>
 #include <unordered_map>
 
-#include "cyber/common/global_data.h"
+#include "cyber/base/macros.h"
 #include "cyber/logger/log_file_object.h"
+#include "cyber/logger/logger_util.h"
 
 namespace apollo {
 namespace cyber {
@@ -70,24 +71,17 @@ void AsyncLogger::Stop() {
 
 void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
                         int message_len) {
+  if (unlikely(message_len <= 0)) {
+    return;
+  }
+  // drop message when acitve buffer is full
+  if (unlikely(BufferFull(*active_buf_))) {
+    return;
+  }
   {
     std::unique_lock<std::mutex> lock(mutex_);
     if (state_ != RUNNING) {
       // std::cout << "Async Logger not running!" << std::endl;
-      return;
-    }
-
-    // origin implementation
-    // while (BufferFull(*active_buf_)) {
-    //  free_buffer_cv_.wait(lock);
-    //}
-
-    // drop message when acitve buffer is full
-    if (BufferFull(*active_buf_)) {
-      return;
-    }
-
-    if (message_len <= 0) {
       return;
     }
 
@@ -153,18 +147,10 @@ void AsyncLogger::RunThread() {
     active_buf_.swap(flushing_buf_);
     lock.unlock();
 
-    for (const auto& msg : flushing_buf_->messages) {
+    for (auto& msg : flushing_buf_->messages) {
       std::string module_name;
-      auto lpos = msg.message.find('[');
-      if (lpos != std::string::npos) {
-        auto rpos = msg.message.find(']', lpos);
-        if (rpos != std::string::npos) {
-          module_name = msg.message.substr(lpos + 1, rpos - lpos - 1);
-        }
-      }
-      if (module_name.empty()) {
-        module_name = common::GlobalData::Instance()->ProcessName();
-      }
+      FindModuleName(&msg.message, &module_name);
+
       LogFileObject* fileobject = nullptr;
       if (moduleLoggerMap.find(module_name) != moduleLoggerMap.end()) {
         fileobject = moduleLoggerMap[module_name];

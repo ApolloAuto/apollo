@@ -31,19 +31,20 @@
 #include <string>
 #include <vector>
 
+#include "cyber/common/global_data.h"
 #include "glog/logging.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
 
-int64_t CycleClock_Now() {
+inline int64_t CycleClock_Now() {
   struct timeval tv;
   gettimeofday(&tv, nullptr);
   return static_cast<int64_t>(tv.tv_sec) * 1000000 + tv.tv_usec;
 }
 
-static void GetHostName(std::string* hostname) {
+static inline void GetHostName(std::string* hostname) {
   struct utsname buf;
   if (0 != uname(&buf)) {
     *buf.nodename = '\0';
@@ -52,7 +53,7 @@ static void GetHostName(std::string* hostname) {
 }
 
 static std::vector<std::string>* logging_directories_list;
-const std::vector<std::string>& GetLoggingDirectories() {
+const inline std::vector<std::string>& GetLoggingDirectories() {
   if (logging_directories_list == nullptr) {
     logging_directories_list = new std::vector<std::string>;
 
@@ -67,9 +68,9 @@ const std::vector<std::string>& GetLoggingDirectories() {
 }
 
 static int32_t g_main_thread_pid = getpid();
-int32_t GetMainThreadPid() { return g_main_thread_pid; }
+inline int32_t GetMainThreadPid() { return g_main_thread_pid; }
 
-bool PidHasChanged() {
+inline bool PidHasChanged() {
   int32_t pid = getpid();
   if (g_main_thread_pid == pid) {
     return false;
@@ -78,8 +79,23 @@ bool PidHasChanged() {
   return true;
 }
 
-static int32_t MaxLogSize() {
+inline int32_t MaxLogSize() {
   return (FLAGS_max_log_size > 0 ? FLAGS_max_log_size : 1);
+}
+
+static void FindModuleName(std::string* log_message, std::string* module_name) {
+  auto lpos = log_message->find('[');
+  if (lpos != std::string::npos) {
+    auto rpos = log_message->find(']', lpos);
+    if (rpos != std::string::npos) {
+      *module_name = log_message->substr(lpos + 1, rpos - lpos - 1);
+      auto cut_length = rpos - lpos + 1;
+      log_message->replace(lpos, cut_length, "");
+    }
+  }
+  if (module_name->empty()) {
+    *module_name = common::GlobalData::Instance()->ProcessName();
+  }
 }
 
 }  // namespace logger

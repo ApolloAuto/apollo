@@ -11,6 +11,7 @@ cc_library(
         "logger.h",
     ]),
     deps = [
+        "//cyber/base:macros",
         "//cyber/common:common",
         "//cyber/logger:log_file_object",
     ],
@@ -37,6 +38,7 @@ cc_library(
         "async_logger.h",
     ]),
     deps = [
+        "//cyber/base:macros",
         "//cyber/common:common",
         "//cyber/logger:log_file_object",
     ]
@@ -62,6 +64,9 @@ cc_library(
     hdrs = glob([
         "logger_util.h",
     ]),
+    deps = [
+        "//cyber/common:global_data",
+    ]
 )
 
 cpplint()
