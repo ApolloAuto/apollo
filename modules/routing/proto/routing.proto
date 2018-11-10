@@ -5,6 +5,7 @@ package apollo.routing;
 import "modules/common/proto/header.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/error_code.proto";
+import "modules/map/proto/map_parking_space.proto";
 
 message LaneWaypoint {
   optional string id = 1;
@@ -26,6 +27,7 @@ message RoutingRequest {
   repeated LaneSegment blacklisted_lane = 3;
   repeated string blacklisted_road = 4;
   optional bool broadcast = 5 [default = true];
+  optional apollo.hdmap.ParkingSpace parking_space = 6;
 }
 
 message Measurement {
