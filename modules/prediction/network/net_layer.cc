@@ -142,14 +142,16 @@ void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   int output_num_col = (inputs[0].cols() - kernel_size) / stride_ + 1;
   int output_num_row = static_cast<int>(kernel_.size());
   output->resize(output_num_row, output_num_col);
-  for (int i = 0; i < output_num_col; ++i) {
-    for (int j = 0; j + kernel_size < inputs[0].cols(); j += stride_) {
+  for (int i = 0; i < output_num_row; ++i) {
+    for (int j = 0; j < output_num_col; ++j) {
       float output_i_j_unbiased = 0.0;
       for (int p = 0; p < inputs[0].rows(); ++p) {
-        for (int q = j; q < j + kernel_size; ++q) {
-          output_i_j_unbiased += inputs[0](p, q) * kernel_[i](p, q - j);
+        for (int q = j * stride_; q < j * stride_ + kernel_size; ++q) {
+          output_i_j_unbiased +=
+              inputs[0](p, q) * kernel_[i](p, q - j * stride_);
         }
       }
+
       (*output)(i, j) = output_i_j_unbiased + bias_(i);
     }
   }
@@ -186,7 +188,7 @@ void MaxPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   output->resize(output_num_row, output_num_col);
   int input_index = 0;
   for (int j = 0; j < output_num_col; ++j) {
-    CHECK_LT(input_index + kernel_size_, inputs[0].cols());
+    CHECK_LE(input_index + kernel_size_, inputs[0].cols());
     for (int i = 0; i < output_num_row; ++i) {
       float output_i_j = -std::numeric_limits<float>::infinity();
       for (int k = input_index; k < input_index + kernel_size_; ++k) {
@@ -229,7 +231,7 @@ void AvgPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   output->resize(output_num_row, output_num_col);
   int input_index = 0;
   for (int j = 0; j < output_num_col; ++j) {
-    CHECK_LT(input_index + kernel_size_, inputs[0].cols());
+    CHECK_LE(input_index + kernel_size_, inputs[0].cols());
     for (int i = 0; i < output_num_row; ++i) {
       float output_i_j_sum = 0.0;
       for (int k = input_index; k < input_index + kernel_size_; ++k) {

@@ -56,8 +56,28 @@ Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
   Eigen::MatrixXf output_matrix;
   output_matrix.resize(1, end_index - start_index);
   for (int i = start_index; i < end_index; ++i) {
-    output_matrix(1, i - start_index) = static_cast<float>(nums[i]);
+    output_matrix(0, i - start_index) = static_cast<float>(nums[i]);
   }
+  return output_matrix;
+}
+
+Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
+    const int start_index, const int end_index,
+    const int output_num_row, const int output_num_col) {
+  CHECK_LT(start_index, end_index);
+  CHECK_GE(start_index, 0);
+  CHECK_LE(end_index, static_cast<int>(nums.size()));
+  CHECK_EQ(end_index - start_index, output_num_row * output_num_col);
+  Eigen::MatrixXf output_matrix;
+  output_matrix.resize(output_num_row, output_num_col);
+  int input_index = start_index;
+  for (int i = 0; i < output_num_row; ++i) {
+    for (int j = 0; j < output_num_col; ++j) {
+      output_matrix(i, j) = static_cast<float>(nums[input_index]);
+      ++input_index;
+    }
+  }
+  CHECK_EQ(input_index, end_index);
   return output_matrix;
 }
 
@@ -119,11 +139,19 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     CHECK_NOTNULL(lane_sequence_ptr);
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
+    if (feature_values.size() != OBSTACLE_FEATURE_SIZE +
+                                 INTERACTION_FEATURE_SIZE +
+                                 LANE_FEATURE_SIZE) {
+      lane_sequence_ptr->set_probability(0.0);
+      AWARN << "Skip lane sequence due to incorrect feature size";
+      continue;
+    }
     Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
         OBSTACLE_FEATURE_SIZE);
+    // TODO(kechxu) move 5 and 30 to gflags
     Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(feature_values,
         OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
-        static_cast<int>(feature_values.size()));
+        static_cast<int>(feature_values.size()), 5, 30);
     Eigen::MatrixXf model_output;
     if (lane_sequence_ptr->vehicle_on_lane()) {
       go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
@@ -562,6 +590,8 @@ void CruiseMLPEvaluator::LoadModels(const std::string& go_model_file,
   CHECK_NOTNULL(go_model_ptr_);
   CHECK_NOTNULL(cutin_model_ptr_);
 
+  AINFO << "start loading models";
+
   CruiseModelParameter go_model_param;
   CruiseModelParameter cutin_model_param;
   CHECK(GetProtoFromFile(go_model_file, &go_model_param))
@@ -572,8 +602,8 @@ void CruiseMLPEvaluator::LoadModels(const std::string& go_model_file,
   go_model_ptr_->LoadModel(go_model_param);
   cutin_model_ptr_->LoadModel(cutin_model_param);
 
-  ADEBUG << "Succeeded in loading go model: " << go_model_file << ".";
-  ADEBUG << "Succeeded in loading cutin model: " << cutin_model_file << ".";
+  AINFO << "Succeeded in loading go model: " << go_model_file << ".";
+  AINFO << "Succeeded in loading cutin model: " << cutin_model_file << ".";
 }
 
 // TODO(all): implement this once the model is trained and ready.

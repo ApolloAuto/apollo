@@ -51,46 +51,74 @@ class CruiseModel : public NetModel {
 
  private:
   // LaneFeatureConvParameter
-  std::unique_ptr<Conv1d> lane_conv1d_0_;
-  std::unique_ptr<Activation> lane_activation_1_;
-  std::unique_ptr<Conv1d> lane_conv1d_2_;
-  std::unique_ptr<Activation> lane_activation_3_;
-  std::unique_ptr<Conv1d> lane_conv1d_4_;
+  std::unique_ptr<Conv1d> lane_conv1d_0_ =
+      std::unique_ptr<Conv1d>(new Conv1d());
+  std::unique_ptr<Activation> lane_activation_1_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Conv1d> lane_conv1d_2_ =
+      std::unique_ptr<Conv1d>(new Conv1d());
+  std::unique_ptr<Activation> lane_activation_3_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Conv1d> lane_conv1d_4_ =
+      std::unique_ptr<Conv1d>(new Conv1d());
 
   // MaxPool1dParameter
-  std::unique_ptr<MaxPool1d> lane_maxpool1d_;
+  std::unique_ptr<MaxPool1d> lane_maxpool1d_ =
+      std::unique_ptr<MaxPool1d>(new MaxPool1d());
 
   // AvgPool1dParameter
-  std::unique_ptr<AvgPool1d> lane_avgpool1d_;
+  std::unique_ptr<AvgPool1d> lane_avgpool1d_ =
+      std::unique_ptr<AvgPool1d>(new AvgPool1d());
 
   // ObsFeatureFCParameter
-  std::unique_ptr<Dense> obs_linear_0_;
-  std::unique_ptr<Activation> obs_activation_1_;
-  std::unique_ptr<Dense> obs_linear_3_;
-  std::unique_ptr<Activation> obs_activation_4_;
+  std::unique_ptr<Dense> obs_linear_0_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> obs_activation_1_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Dense> obs_linear_3_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> obs_activation_4_ =
+      std::unique_ptr<Activation>(new Activation());
 
   // ClassifyParameter
-  std::unique_ptr<Dense> classify_linear_0_;
-  std::unique_ptr<Activation> classify_activation_1_;
-  std::unique_ptr<Dense> classify_linear_3_;
-  std::unique_ptr<Activation> classify_activation_4_;
-  std::unique_ptr<Dense> classify_linear_6_;
-  std::unique_ptr<Activation> classify_activation_7_;
-  std::unique_ptr<Dense> classify_linear_9_;
-  std::unique_ptr<Activation> classify_activation_10_;
+  std::unique_ptr<Dense> classify_linear_0_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> classify_activation_1_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Dense> classify_linear_3_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> classify_activation_4_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Dense> classify_linear_6_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> classify_activation_7_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Dense> classify_linear_9_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> classify_activation_10_ =
+      std::unique_ptr<Activation>(new Activation());
 
   // RegressParameter
-  std::unique_ptr<Dense> regress_linear_0_;
-  std::unique_ptr<Activation> regress_activation_1_;
-  std::unique_ptr<Dense> regress_linear_3_;
-  std::unique_ptr<Activation> regress_activation_4_;
-  std::unique_ptr<Dense> regress_linear_6_;
-  std::unique_ptr<Activation> regress_activation_7_;
-  std::unique_ptr<Dense> regress_linear_9_;
-  std::unique_ptr<Activation> regress_activation_10_;
+  std::unique_ptr<Dense> regress_linear_0_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> regress_activation_1_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Dense> regress_linear_3_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> regress_activation_4_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Dense> regress_linear_6_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> regress_activation_7_ =
+      std::unique_ptr<Activation>(new Activation());
+  std::unique_ptr<Dense> regress_linear_9_ =
+      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Activation> regress_activation_10_ =
+      std::unique_ptr<Activation>(new Activation());
 
   // Concatenate
-  std::unique_ptr<Concatenate> concatenate_;
+  std::unique_ptr<Concatenate> concatenate_ =
+      std::unique_ptr<Concatenate>(new Concatenate());
 };
 
 }  // namespace network
