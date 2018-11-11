@@ -8,7 +8,7 @@ cc_library(
     hdrs = [
         "controller.h",
     ],
-    deps = [],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -38,6 +38,7 @@ cc_library(
         "//modules/control/proto:control_proto",
         "@eigen",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -63,6 +64,7 @@ cc_library(
         "//modules/control/common:trajectory_analyzer",
         "//modules/localization/common:localization_common",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -93,6 +95,7 @@ cc_library(
         "//modules/control/proto:control_proto",
         "@eigen",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -105,6 +108,7 @@ cc_library(
         ":mpc_controller",
         "@eigen",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -127,6 +131,7 @@ cc_library(
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'], 
 )
 
 cc_test(
