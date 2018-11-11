@@ -65,26 +65,24 @@ bool RecordFileReader::ReadSection(uint64_t size, T* message) {
   }
   uint64_t pos = CurrentPosition();
   if (size > BUF_SIZE) {
-    ZeroCopyInputStream* raw_input = new FileInputStream(fd_);
-    CodedInputStream* coded_input = new CodedInputStream(raw_input);
+    FileInputStream raw_input(fd_);
+    CodedInputStream coded_input(&raw_input);
     CodedInputStream::Limit limit =
-        coded_input->PushLimit(static_cast<int>(size));
-    if (!message->ParseFromCodedStream(coded_input)) {
+        coded_input.PushLimit(static_cast<int>(size));
+    if (!message->ParseFromCodedStream(&coded_input)) {
       AERROR << "Parse section message failed.";
       return false;
     }
-    if (!coded_input->ConsumedEntireMessage()) {
+    if (!coded_input.ConsumedEntireMessage()) {
       AERROR << "Do not consumed entire message.";
       return false;
     }
-    coded_input->PopLimit(limit);
+    coded_input.PopLimit(limit);
     if (message->ByteSize() != size) {
       AERROR << "Message size is not consistent in section header"
              << ", expect: " << size << ", actual: " << message->ByteSize();
       return false;
     }
-    delete coded_input;
-    delete raw_input;
   } else {
     char buf[BUF_SIZE];
     ssize_t count = read(fd_, buf, static_cast<ssize_t>(size));
