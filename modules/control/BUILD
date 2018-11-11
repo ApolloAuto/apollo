@@ -23,6 +23,7 @@ cc_library(
         "//cyber",
         "//external:gflags",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -36,7 +37,7 @@ cc_library(
     deps = [
         ":control_lib",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"']
+    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_binary(
