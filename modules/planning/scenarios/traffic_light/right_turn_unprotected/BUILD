@@ -30,15 +30,15 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "traffic_light_right_turn_unprotected_scenario_test",
-#    size = "small",
-#    srcs = ["traffic_light_right_turn_unprotected_scenario_test.cc",],
-#    data = ["//modules/planning:planning_conf",],
-#    deps = [
-#        ":traffic_light_right_turn_unprotected_scenario",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "traffic_light_right_turn_unprotected_scenario_test",
+    size = "small",
+    srcs = ["traffic_light_right_turn_unprotected_scenario_test.cc",],
+    data = ["//modules/planning:planning_conf",],
+    deps = [
+        ":traffic_light_right_turn_unprotected_scenario",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
