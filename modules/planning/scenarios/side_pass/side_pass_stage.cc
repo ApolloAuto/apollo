@@ -49,6 +49,8 @@ Stage::StageStatus SidePassApproachObstacle::Process(
       frame->reference_line_info().front().AdcSlBoundary();
   const PathDecision& path_decision =
       frame->reference_line_info().front().path_decision();
+
+  bool has_blocking_obstacle = false;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       continue;
@@ -69,6 +71,9 @@ Stage::StageStatus SidePassApproachObstacle::Process(
         obstacle->PerceptionSLBoundary().end_l() < -1.0) {
       continue;
     }
+    has_blocking_obstacle = true;
+  }
+  if (!has_blocking_obstacle) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
