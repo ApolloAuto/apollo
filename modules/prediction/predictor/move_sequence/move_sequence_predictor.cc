@@ -226,7 +226,12 @@ bool MoveSequencePredictor::
     }
 
     // Evaluate using the cost function, and decide whether to keep it or not.
-    double curr_cost = CostFunction(max_lat_acc, time_to_end_state);
+    // TODO(panjiacheng): update these two:
+    double time_to_lane_edge = time_to_end_state;
+    double bell_curve_mu = lane_sequence.time_to_lane_edge();
+
+    double curr_cost = CostFunction(max_lat_acc, time_to_end_state,
+                                    time_to_lane_edge, bell_curve_mu);
     if (j == 0 || curr_cost < cost_of_trajectory) {
       cost_of_trajectory = curr_cost;
       *points = curr_points;
@@ -544,9 +549,17 @@ std::vector<double> MoveSequencePredictor::GenerateCandidateTimes() {
 }
 
 double MoveSequencePredictor::CostFunction(
-    const double max_lat_acc, const double time_to_end_state) {
+    const double max_lat_acc, const double time_to_end_state,
+    const double time_to_lane_edge, const double bell_curve_mu) {
   double cost_of_trajectory = max_lat_acc +
                               FLAGS_cost_function_alpha * time_to_end_state;
+  if (FLAGS_use_bell_curve_for_cost_function) {
+    double bell_curve_weight =
+        1 / std::sqrt(2 * M_PI * std::pow(FLAGS_cost_function_sigma, 2.0))
+        * std::exp(- std::pow(time_to_lane_edge - bell_curve_mu, 2.0) /
+                   (2 * std::pow(FLAGS_cost_function_sigma, 2.0)));
+    cost_of_trajectory /= (bell_curve_weight + FLAGS_double_precision);
+  }
   return cost_of_trajectory;
 }
 
