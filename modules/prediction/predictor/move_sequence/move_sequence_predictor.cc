@@ -555,12 +555,12 @@ double MoveSequencePredictor::CostFunction(
                               FLAGS_cost_function_alpha * time_to_end_state;
   if (FLAGS_use_bell_curve_for_cost_function) {
     double bell_curve_weight =
-        1 / std::sqrt(2 * M_PI * FLAGS_cost_function_sigma *
+        1.0 / std::sqrt(2.0 * M_PI * FLAGS_cost_function_sigma *
                       FLAGS_cost_function_sigma)
         * std::exp(
           -(time_to_lane_edge - bell_curve_mu) *
            (time_to_lane_edge - bell_curve_mu) /
-           (2 * FLAGS_cost_function_sigma * FLAGS_cost_function_sigma));
+           (2.0 * FLAGS_cost_function_sigma * FLAGS_cost_function_sigma));
     cost_of_trajectory /= (bell_curve_weight + FLAGS_double_precision);
   }
   return cost_of_trajectory;
