@@ -80,14 +80,15 @@ bool HMTrackersObjectsAssociation::Associate(
                                 association_result->unassigned_measurements,
                                 &association_mat);
 
-  int num_track = fusion_tracks.size();
-  int num_measurement = sensor_objects.size();
+  int num_track = static_cast<int>(fusion_tracks.size());
+  int num_measurement = static_cast<int>(sensor_objects.size());
   association_result->track2measurements_dist.assign(num_track, 0);
   association_result->measurement2track_dist.assign(num_measurement, 0);
   std::vector<int> track_ind_g2l;
   track_ind_g2l.resize(num_track, -1);
   for (size_t i = 0; i < association_result->unassigned_tracks.size(); i++) {
-    track_ind_g2l[association_result->unassigned_tracks[i]] = i;
+    track_ind_g2l[association_result->unassigned_tracks[i]] =
+      static_cast<int>(i);
   }
   std::vector<int> measurement_ind_g2l;
   measurement_ind_g2l.resize(num_measurement, -1);
@@ -95,7 +96,8 @@ bool HMTrackersObjectsAssociation::Associate(
       association_result->unassigned_measurements;
   for (size_t i = 0; i < association_result->unassigned_measurements.size();
        i++) {
-    measurement_ind_g2l[association_result->unassigned_measurements[i]] = i;
+    measurement_ind_g2l[association_result->unassigned_measurements[i]] =
+      static_cast<int>(i);
   }
   std::vector<size_t> track_ind_l2g = association_result->unassigned_tracks;
 
@@ -199,8 +201,8 @@ bool HMTrackersObjectsAssociation::MinimizeAssignment(
   common::GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       common::GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
   common::SecureMat<float> global_costs = optimizer_.global_costs();
-  int rows = unassigned_tracks->size();
-  int cols = unassigned_measurements->size();
+  int rows = static_cast<int>(unassigned_tracks->size());
+  int cols = static_cast<int>(unassigned_measurements->size());
 
   global_costs.Resize(rows, cols);
   for (int r_i = 0; r_i < rows; r_i++) {
@@ -211,7 +213,8 @@ bool HMTrackersObjectsAssociation::MinimizeAssignment(
   std::vector<TrackMeasurmentPair> local_assignments;
   std::vector<size_t> local_unassigned_tracks;
   std::vector<size_t> local_unassigned_measurements;
-  optimizer_.Match(s_match_distance_thresh_, s_match_distance_bound_, opt_flag,
+  optimizer_.Match(static_cast<float>(s_match_distance_thresh_),
+                   static_cast<float>(s_match_distance_bound_), opt_flag,
                    &local_assignments, &local_unassigned_tracks,
                    &local_unassigned_measurements);
   for (auto assign : local_assignments) {
@@ -239,8 +242,9 @@ void HMTrackersObjectsAssociation::ComputeDistance(
     const std::vector<std::vector<double>>& association_mat,
     AssociationResult* association_result) {
   for (size_t i = 0; i < association_result->assignments.size(); i++) {
-    int track_ind = association_result->assignments[i].first;
-    int measurement_ind = association_result->assignments[i].second;
+    int track_ind = static_cast<int>(association_result->assignments[i].first);
+    int measurement_ind =
+      static_cast<int>(association_result->assignments[i].second);
     int track_ind_loc = track_ind_g2l[track_ind];
     int measurement_ind_loc = measurement_ind_g2l[measurement_ind];
     if (track_ind_loc >= 0 && measurement_ind_loc >= 0) {
@@ -251,7 +255,7 @@ void HMTrackersObjectsAssociation::ComputeDistance(
     }
   }
   for (size_t i = 0; i < association_result->unassigned_tracks.size(); i++) {
-    int track_ind = unassigned_fusion_tracks[i];
+    int track_ind = static_cast<int>(unassigned_fusion_tracks[i]);
     int track_ind_loc = track_ind_g2l[track_ind];
     association_result->track2measurements_dist[track_ind] =
         association_mat[track_ind_loc][0];
@@ -261,10 +265,10 @@ void HMTrackersObjectsAssociation::ComputeDistance(
           association_mat[track_ind_loc][j]) {
         association_result->track2measurements_dist[track_ind] =
             association_mat[track_ind_loc][j];
-        min_m_loc = j;
+        min_m_loc = static_cast<int>(j);
       }
     }
-    int min_m_ind = measurement_ind_l2g[min_m_loc];
+    int min_m_ind = static_cast<int>(measurement_ind_l2g[min_m_loc]);
     const SensorObjectPtr& min_sensor_object = sensor_objects[min_m_ind];
     const TrackPtr& fusion_track = fusion_tracks[track_ind];
     SensorObjectConstPtr lidar_object = fusion_track->GetLatestLidarObject();
@@ -292,7 +296,8 @@ void HMTrackersObjectsAssociation::ComputeDistance(
   }
   for (size_t i = 0; i < association_result->unassigned_measurements.size();
        i++) {
-    int m_ind = association_result->unassigned_measurements[i];
+    int m_ind = static_cast<int>(
+      association_result->unassigned_measurements[i]);
     int m_ind_loc = measurement_ind_g2l[m_ind];
     association_result->measurement2track_dist[m_ind] =
         association_mat[0][m_ind_loc];
@@ -320,11 +325,11 @@ void HMTrackersObjectsAssociation::ComputeAssociationDistanceMat(
   opt.ref_point = &tmp;
   association_mat->resize(unassigned_tracks.size());
   for (size_t i = 0; i < unassigned_tracks.size(); ++i) {
-    int fusion_idx = unassigned_tracks[i];
+    int fusion_idx = static_cast<int>(unassigned_tracks[i]);
     (*association_mat)[i].resize(unassigned_measurements.size());
     const TrackPtr& fusion_track = fusion_tracks[fusion_idx];
     for (size_t j = 0; j < unassigned_measurements.size(); ++j) {
-      int sensor_idx = unassigned_measurements[j];
+      int sensor_idx = static_cast<int>(unassigned_measurements[j]);
       const SensorObjectPtr& sensor_object = sensor_objects[sensor_idx];
       double distance = s_match_distance_thresh_;
       double center_dist =
@@ -381,7 +386,8 @@ void HMTrackersObjectsAssociation::IdAssign(
     if (obj == nullptr) {
       continue;
     }
-    sensor_id_2_track_ind[obj->GetBaseObject()->track_id] = i;
+    sensor_id_2_track_ind[obj->GetBaseObject()->track_id] =
+      static_cast<int>(i);
   }
   std::vector<bool> fusion_used(num_track, false);
   std::vector<bool> sensor_used(num_obj, false);

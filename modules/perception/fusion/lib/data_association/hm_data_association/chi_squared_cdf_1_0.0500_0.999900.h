@@ -73,7 +73,7 @@ inline double ChiSquaredCdf1TableFun(double dist) {
   static const size_t table_size =
       sizeof(ChiSquaredCdf1TableTable) / sizeof(double);
   double dist_ind = dist / step;
-  int dist_int = dist_ind;
+  int dist_int = static_cast<int>(dist_ind);
   double w = dist_ind - dist_int;
   if (dist_ind >= table_size - 1) {
     return 1.0;

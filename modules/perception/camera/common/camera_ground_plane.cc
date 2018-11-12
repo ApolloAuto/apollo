@@ -108,8 +108,8 @@ void GetGround3FromPitchHeight(const std::vector<float> &k_mat,
   CHECK_GT(cam_height, 0.0f);
   CHECK_NOTNULL(ground3);
   CHECK_EQ(ground3->size(), 3);
-  float sin_pitch = sin(pitch);
-  float cos_pitch = cos(pitch);
+  float sin_pitch = static_cast<float>(sin(pitch));
+  float cos_pitch = static_cast<float>(cos(pitch));
   std::vector<float> ground4 = {0, cos_pitch, -sin_pitch, -cam_height};
   ConvertGround4ToGround3(baseline, k_mat, ground4, ground3);
 }
@@ -336,7 +336,8 @@ bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd,
     memset(l_, 0, sizeof(float) * 3);
     return false;
   } else {
-    *inlier_ratio = nr_inliers * common::IRec(static_cast<float>(count_vd));
+    *inlier_ratio = static_cast<float>(nr_inliers) *
+                    common::IRec(static_cast<float>(count_vd));
   }
 
   if (*inlier_ratio < kMinInlierRatio) {

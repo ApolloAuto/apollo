@@ -142,17 +142,19 @@ class DenselineLanePostprocessor : public BaseLanePostprocessor {
   int input_crop_height_ = 640;
 
   int omit_bottom_line_num_ = 3;
-  float laneline_map_score_thresh_ = 0.4;
-  float laneline_point_score_thresh_ = 0.6;
+  float laneline_map_score_thresh_ = 0.4f;
+  float laneline_point_score_thresh_ = 0.6f;
   int laneline_point_min_num_thresh_ = 2;
-  float cc_valid_pixels_ratio_ = 2;
-  float laneline_reject_dist_thresh_ = 50;
+  float cc_valid_pixels_ratio_ = 2.0F;
+  float laneline_reject_dist_thresh_ = 50.0f;
 
   int lane_map_width_ = 192;
   int lane_map_height_ = 64;
   int lane_map_dim_ = lane_map_width_ * lane_map_height_;
   int net_model_channel_num_ = 7;
-  float lane_max_value_ = 1e6;
+  float lane_max_value_ = 1e6f;
+  float lane_map_width_inverse_ = 1.0f / static_cast<float>(lane_map_width_);
+  float lane_map_height_inverse_ = 1.0f / static_cast<float>(lane_map_height_);
 
   lane::LanePostprocessorParam lane_postprocessor_param_;
 

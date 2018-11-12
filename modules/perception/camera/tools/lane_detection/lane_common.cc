@@ -15,6 +15,7 @@
 *****************************************************************************/
 #include "modules/perception/camera/tools/lane_detection/lane_common.h"
 #include <algorithm>
+#include <cmath>
 #include <string>
 #include <vector>
 #include "cyber/common/log.h"
@@ -60,9 +61,9 @@ void show_detect_point_set(const cv::Mat& image,
     for (size_t i = 0;
       i < detect_laneline_point_set[line_idx].size(); ++i) {
       int point_x =
-        detect_laneline_point_set[line_idx][i].x;
+        static_cast<int>(detect_laneline_point_set[line_idx][i].x);
       int point_y =
-        detect_laneline_point_set[line_idx][i].y;
+        static_cast<int>(detect_laneline_point_set[line_idx][i].y);
       cv::Point draw_point(point_x, point_y);
       cv::circle(draw_mat, draw_point, draw_size, color, 4);
     }
@@ -78,8 +79,8 @@ void show_all_infer_point_set(const cv::Mat& image,
 
   cv::Mat draw_mat = image.clone();
   for (size_t i = 0; i < infer_point_set.size(); ++i) {
-    int point_x = infer_point_set[i].x;
-    int point_y = infer_point_set[i].y;
+    int point_x = static_cast<int>(infer_point_set[i].x);
+    int point_y = static_cast<int>(infer_point_set[i].y);
     cv::circle(draw_mat,
       cv::Point(point_x, point_y),
       draw_size, color, 4);
@@ -90,11 +91,11 @@ void show_all_infer_point_set(const cv::Mat& image,
 void show_lane_lines(const cv::Mat& image,
   const std::vector<base::LaneLine>& lane_marks,
   const std::string& save_path) {
-  const float range_x = 70;
-  const float range_y = 30;
-  const float pixels_per_meter = 7;
-  const int ipm_height = range_x * pixels_per_meter;
-  const int ipm_width = range_y * pixels_per_meter;
+  const float range_x = 70.0f;
+  const float range_y = 30.0f;
+  const float pixels_per_meter = 7.0f;
+  const int ipm_height = static_cast<int>(range_x * pixels_per_meter);
+  const int ipm_width = static_cast<int>(range_y * pixels_per_meter);
   cv::Mat draw_ipm = cv::Mat::zeros(ipm_height, ipm_width, CV_8UC3);
   //
   cv::Scalar color = cv::Scalar(0, 255, 0);
@@ -119,7 +120,8 @@ void show_lane_lines(const cv::Mat& image,
     float y0 = lane_marks[i].curve_image_coord.x_start;
     float y1 = lane_marks[i].curve_image_coord.x_end;
     for (int j = static_cast<int>(y0); j <= static_cast<int>(y1); ++j) {
-      int x = fa * pow(j, 3) + fb * pow(j, 2) + fc * j + fd;
+      int x = static_cast<int>(fa * pow(j, 3) +
+              fb * pow(j, 2) + fc * static_cast<float>(j) + fd);
       cv::circle(draw_mat, cv::Point(x, j), draw_size, color);
     }
     //  draw ipm curve
@@ -129,11 +131,12 @@ void show_lane_lines(const cv::Mat& image,
     float camera_fb = lane_marks[i].curve_camera_coord.b;
     float camera_fc = lane_marks[i].curve_camera_coord.c;
     float camera_fd = lane_marks[i].curve_camera_coord.d;
-    for (float j = camera_xs; j <= camera_xe; j += 0.1) {
-        float y = pow(j, 3) * camera_fa + pow(j, 2) * camera_fb
-          + j * camera_fc + camera_fd;
-        int draw_y = ipm_height - j * pixels_per_meter;
-        int draw_x = ipm_width / 2 + y * pixels_per_meter;
+    for (float j = camera_xs; j <= camera_xe; j += 0.1f) {
+        float y = static_cast<float>(pow(j, 3) *
+                  camera_fa + pow(j, 2) * camera_fb +
+                  static_cast<float>(j) * camera_fc + camera_fd);
+        int draw_y = ipm_height - static_cast<int>(j * pixels_per_meter);
+        int draw_x = ipm_width / 2 + static_cast<int>(y * pixels_per_meter);
         if (draw_x < 0 || draw_x >= ipm_width) {
             continue;
         }
@@ -149,7 +152,8 @@ void show_lane_lines(const cv::Mat& image,
     cv::Point(ipm_width / 2, ipm_height), cv::Scalar(255, 255, 255));
   for (int i = 10; i < static_cast<int>(range_x); i += 10) {
     int x = ipm_width / 2;
-    int y = static_cast<int>(ipm_height - i * pixels_per_meter);
+    int y = ipm_height -
+      static_cast<int>(static_cast<float>(i) * pixels_per_meter);
     cv::line(draw_ipm, cv::Point(0, y), cv::Point(ipm_width, y),
       cv::Scalar(255, 255, 255));
     std::string label = cv::format("%d", i);
@@ -170,8 +174,9 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
     cv::Mat::zeros(lane_map_height, lane_map_width, CV_8UC1);
   for (int y = 0; y < lane_map_height; ++y) {
     for (int x = 0; x < lane_map_width; x++) {
-      lane_map_draw.at<unsigned char>(y, x) = 255 -
-        lane_map[y * lane_map_width + x] * 255;
+      lane_map_draw.at<unsigned char>(y, x) =
+        static_cast<unsigned char>(255 -
+        lane_map[y * lane_map_width + x] * 255);
     }
   }
   cv::Mat lane_draw;
@@ -188,7 +193,7 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
           bbox1.xmax == bbox2.xmax &&
           bbox1.ymin == bbox2.ymin &&
           bbox1.ymax == bbox2.ymax) {
-        find_index = j;
+        find_index = static_cast<int>(j);
         break;
       }
     }
@@ -216,7 +221,7 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
 void output_laneline_to_json(const std::vector<base::LaneLine> &lane_objects,
   const std::string& save_path) {
   FILE *file_save = fopen(save_path.data(), "wt");
-  int lane_line_size = lane_objects.size();
+  int lane_line_size = static_cast<int>(lane_objects.size());
   AINFO << "lane line num: " << lane_line_size;
   std::string msg = "lane line info: ";
   fprintf(file_save, "[\n");
@@ -292,7 +297,7 @@ void output_laneline_to_json(const std::vector<base::LaneLine> &lane_objects,
 void output_laneline_to_txt(const std::vector<base::LaneLine> &lane_objects,
   const std::string& save_path) {
   FILE *file_save = fopen(save_path.data(), "wt");
-  int lane_line_size = lane_objects.size();
+  int lane_line_size = static_cast<int>(lane_objects.size());
   AINFO << "lane line num: " << lane_line_size;
   fprintf(file_save, "lane_line_num=%d\n", lane_line_size);
   for (int j = 0; j < lane_line_size; ++j) {
@@ -342,7 +347,7 @@ void show_detect_point_set(const cv::Mat& image,
   for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
     const base::Point2DF& point = img_laneline_point_set[i];
     cv::circle(draw_mat,
-      cv::Point(point.x, point.y),
+      cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
       draw_size, color, 4);
   }
   cv::imwrite(save_path, draw_mat);
@@ -360,7 +365,7 @@ void show_neighbor_point_set(const cv::Mat& image,
   for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
     const base::Point2DF& point = img_laneline_point_set[i];
     cv::circle(draw_mat,
-      cv::Point(point.x, point.y),
+      cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
       draw_size, color, 4);
     int neighbor_point_index = neighbor_point_info[i * 2];
     int pass_point_num = -1;
@@ -369,12 +374,14 @@ void show_neighbor_point_set(const cv::Mat& image,
       const base::Point2DF& neighbor_point =
         img_laneline_point_set[neighbor_point_index];
       cv::line(draw_mat,
-            cv::Point(point.x, point.y),
-            cv::Point(neighbor_point.x, neighbor_point.y),
-            color, 2);
+            cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
+            cv::Point(static_cast<int>(neighbor_point.x),
+                      static_cast<int>(neighbor_point.y)),
+                      color, 2);
     }
     std::string label = cv::format("%d", pass_point_num);
-    cv::putText(draw_mat, label, cv::Point(point.x, point.y),
+    cv::putText(draw_mat, label,
+      cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
       CV_FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(255, 255, 255));
   }
   cv::imwrite(save_path, draw_mat);
@@ -392,10 +399,11 @@ void show_detect_point_set(const cv::Mat& image,
   for (size_t i = 0; i < img_laneline_point_set.size(); ++i) {
     const base::Point2DF& point = img_laneline_point_set[i];
     std::string label = cv::format("%.2f", point_score_vec[i]);
-    cv::putText(draw_mat, label, cv::Point(point.x, point.y),
+    cv::putText(draw_mat, label,
+      cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
       CV_FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(255, 255, 255));
     cv::circle(draw_mat,
-      cv::Point(point.x, point.y),
+      cv::Point(static_cast<int>(point.x), static_cast<int>(point.y)),
       draw_size, color, 4);
   }
   cv::imwrite(save_path, draw_mat);

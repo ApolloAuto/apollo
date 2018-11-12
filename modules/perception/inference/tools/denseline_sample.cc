@@ -110,11 +110,11 @@ int main(int argc, char **argv) {
     for (int i = 0; i < height; ++i) {
       for (int j = 0; j < width; ++j) {
         input[(0 * height + i) * width + j] =
-            img.at<cv::Vec3b>(i, j)[0] - FLAGS_mean_b;
+            img.at<cv::Vec3b>(i, j)[0] - static_cast<float>(FLAGS_mean_b);
         input[(1 * height + i) * width + j] =
-            img.at<cv::Vec3b>(i, j)[1] - FLAGS_mean_g;
+            img.at<cv::Vec3b>(i, j)[1] - static_cast<float>(FLAGS_mean_g);
         input[(2 * height + i) * width + j] =
-            img.at<cv::Vec3b>(i, j)[2] - FLAGS_mean_r;
+            img.at<cv::Vec3b>(i, j)[2] - static_cast<float>(FLAGS_mean_r);
       }
     }
     cudaMemcpy(input_blob->mutable_gpu_data(), input.data(),

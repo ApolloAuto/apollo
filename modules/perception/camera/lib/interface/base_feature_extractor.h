@@ -67,10 +67,10 @@ class BaseFeatureExtractor {
       auto &ymin = obj->camera_supplement.box.ymin;
       auto &xmax = obj->camera_supplement.box.xmax;
       auto &ymax = obj->camera_supplement.box.ymax;
-      xmin = xmin * roi_w_ + roi_x_;
-      xmax = xmax * roi_w_ + roi_x_;
-      ymin = ymin * roi_h_ + roi_y_;
-      ymax = ymax * roi_h_ + roi_y_;
+      xmin = xmin * static_cast<float>(roi_w_) + static_cast<float>(roi_x_);
+      xmax = xmax * static_cast<float>(roi_w_) + static_cast<float>(roi_x_);
+      ymin = ymin * static_cast<float>(roi_h_) + static_cast<float>(roi_y_);
+      ymax = ymax * static_cast<float>(roi_h_) + static_cast<float>(roi_y_);
     }
   }
 
@@ -80,10 +80,10 @@ class BaseFeatureExtractor {
       auto &ymin = obj->camera_supplement.box.ymin;
       auto &xmax = obj->camera_supplement.box.xmax;
       auto &ymax = obj->camera_supplement.box.ymax;
-      xmin = (xmin - roi_x_) / roi_w_;
-      xmax = (xmax - roi_x_) / roi_w_;
-      ymin = (ymin - roi_y_) / roi_h_;
-      ymax = (ymax - roi_y_) / roi_h_;
+      xmin = (xmin - static_cast<float>(roi_x_)) / static_cast<float>(roi_w_);
+      xmax = (xmax - static_cast<float>(roi_x_)) / static_cast<float>(roi_w_);
+      ymin = (ymin - static_cast<float>(roi_y_)) / static_cast<float>(roi_h_);
+      ymax = (ymax - static_cast<float>(roi_y_)) / static_cast<float>(roi_h_);
     }
   }
 

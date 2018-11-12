@@ -364,7 +364,7 @@ int HungarianOptimizer<T>::FindStarInCol(const size_t col) const {
 
   for (size_t row = 0; row < matrix_size_; ++row) {
     if (IsStarred(row, col)) {
-      return row;
+      return static_cast<int>(row);
     }
   }
 

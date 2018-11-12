@@ -22,63 +22,65 @@ namespace perception {
 namespace camera {
 
 TEST(TwodThreedUtilTest, CalAngleDiffTest) {
-  const float eps = 1e-5;
+  const float eps = 1e-5f;
+  const float M_PI_float = static_cast<float>(M_PI);
 
   float a1 = 0.f;
-  float a2 = M_PI * 0.5f;
-  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI * 0.5f, eps);
+  float a2 = M_PI_float * 0.5f;
+  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI_float * 0.5f, eps);
 
-  a1 = M_PI * 0.5f;
+  a1 = M_PI_float * 0.5f;
   a2 = 0.f;
-  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI * 0.5f, eps);
+  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI_float * 0.5f, eps);
 
   a1 = 0.f;
-  a2 = M_PI;
-  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI, eps);
+  a2 = M_PI_float;
+  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI_float, eps);
 
-  a1 = M_PI;
+  a1 = M_PI_float;
   a2 = 0.f;
-  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI, eps);
+  EXPECT_NEAR(CalAngleDiff(a1, a2), M_PI_float, eps);
 
-  a1 = -M_PI;
-  a2 = M_PI;
+  a1 = -M_PI_float;
+  a2 = M_PI_float;
   EXPECT_NEAR(CalAngleDiff(a1, a2), 0.f, eps);
 
-  a1 = M_PI;
-  a2 = -M_PI;
+  a1 = M_PI_float;
+  a2 = -M_PI_float;
   EXPECT_NEAR(CalAngleDiff(a1, a2), 0.f, eps);
 
   a1 = 0.f;
-  a2 = 2.f * M_PI + 0.2;
+  a2 = 2.f * M_PI_float + 0.2f;
   EXPECT_NEAR(CalAngleDiff(a1, a2), 0.2f, eps);
 
-  a1 = 2.f * M_PI + 0.2;
+  a1 = 2.f * M_PI_float + 0.2f;
   a2 = 0.f;
   EXPECT_NEAR(CalAngleDiff(a1, a2), 0.2f, eps);
 }
 
 TEST(TwodThreedUtilTest, GetSharpAngleTest) {
-  const float eps = 1e-5;
+  const float eps = 1e-5f;
+  const float M_PI_float = static_cast<float>(M_PI);
 
   float a1 = 0.f;
-  float a2 = M_PI * 0.75f;
-  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI * 0.25f, eps);
+  float a2 = M_PI_float * 0.75f;
+  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI_float * 0.25f, eps);
 
-  a1 = M_PI * 0.75f;
+  a1 = M_PI_float * 0.75f;
   a2 = 0.f;
-  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI * 0.25f, eps);
+  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI_float * 0.25f, eps);
 
   a1 = 0.f;
-  a2 = M_PI * 0.25f;
-  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI * 0.25f, eps);
+  a2 = M_PI_float * 0.25f;
+  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI_float * 0.25f, eps);
 
-  a1 = M_PI * 0.25f;
+  a1 = M_PI_float * 0.25f;
   a2 = 0.f;
-  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI * 0.25f, eps);
+  EXPECT_NEAR(GetSharpAngle(a1, a2), M_PI_float * 0.25f, eps);
 }
 
 TEST(TwodThreedUtilTest, GetJaccardIndexTest) {
-  const float eps = 1e-5;
+  const float eps = 1e-5f;
 
   float bbox_ref[4] = {200, 200, 400, 400};
   {
@@ -156,7 +158,7 @@ TEST(TwodThreedUtilTest, OccludeTest) {
 }
 
 TEST(TwodThreedUtilTest, GetBboxFromPtsTest) {
-  const float eps = 1e-5;
+  const float eps = 1e-5f;
   {
     float pts[] = {0.5f, 0.6f};
     float bbox[4] = {0.f};
@@ -224,19 +226,19 @@ TEST(TwodThreedUtilTest, CheckXYTest) {
 TEST(TwodThreedUtilTest, GetScoreViaRotDimensionCenterTest) {
   float bbox_ref[4] = {0, 0, 0, 0};
   float hwl8[3] = {1.5f, 1.6f, 4.0f};
-  float object_center1[3] = {-3.32887, 1.86078, 17.2908};
+  float object_center1[3] = {-3.32887f, 1.86078f, 17.2908f};
 
-  float k_mat[9] = {2022.5639693330495, 0.0, 989.3893672805314,
-                    0.0, 2014.0535251884398, 570.6145712367711,
-                    0.0, 0.0, 1.0};
+  float k_mat[9] = {2022.5639693330495f, 0.0f, 989.3893672805314f,
+                    0.0f, 2014.0535251884398f, 570.6145712367711f,
+                    0.0f, 0.0f, 1.0f};
 
-  float rotation_y = 1.5;
+  float rotation_y = 1.5f;
   float rot[9];
-  rot[0] = cos(rotation_y);
-  rot[2] = sin(rotation_y);
-  rot[4] = static_cast<float>(1);
-  rot[6] = -sin(rotation_y);
-  rot[8] = cos(rotation_y);
+  rot[0] = static_cast<float>(cos(rotation_y));
+  rot[2] = static_cast<float>(sin(rotation_y));
+  rot[4] = 1.0f;
+  rot[6] = static_cast<float>(-sin(rotation_y));
+  rot[8] = static_cast<float>(cos(rotation_y));
   rot[1] = rot[3] = rot[5] = rot[7] = static_cast<float>(0);
 
   int image_width = 1920;
@@ -446,8 +448,8 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
         0.0f,
         0.0f,
         1.0f};
-    LineSegment2D<float> ls(424.105, 383.528,
-                            1106.85, 383.528);
+    LineSegment2D<float> ls(424.105f, 383.528f,
+                            1106.85f, 383.528f);
     float plane[4] = {0.0f, 1.0f, 0.0f, -0.0159766f};
     float pts_c[12] = {
         2.49833f,
@@ -461,7 +463,7 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
         17.058f,
         0.967046f,
         0.0501389f,
-        17.5344
+        17.5344f
     };
     float ratio_x_over_z = 0.123948f;
     float dx_dz[2] = {0};

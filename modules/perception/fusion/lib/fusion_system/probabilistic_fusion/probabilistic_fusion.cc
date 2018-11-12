@@ -78,7 +78,8 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   Track::SetMaxLidarInvisiblePeriod(params.max_lidar_invisible_period());
   Track::SetMaxRadarInvisiblePeriod(params.max_radar_invisible_period());
   Track::SetMaxCameraInvisiblePeriod(params.max_camera_invisible_period());
-  Sensor::SetMaxCachedFrameNum(params.max_cached_frame_num());
+  Sensor::SetMaxCachedFrameNum(
+    static_cast<int>(params.max_cached_frame_num()));
 
   sensor_data_manager_ = lib::Singleton<SensorDataManager>::get_instance();
 
@@ -322,8 +323,8 @@ void ProbabilisticFusion::FusebackgroundTrack(const SensorFramePtr& frame) {
 
   // 2. update assigned track
   for (size_t i = 0; i < assignments.size(); ++i) {
-    int track_ind = assignments[i].first;
-    int obj_ind = assignments[i].second;
+    int track_ind = static_cast<int>(assignments[i].first);
+    int obj_ind = static_cast<int>(assignments[i].second);
     background_tracks[track_ind]->UpdateWithSensorObject(frame_objs[obj_ind]);
   }
 
@@ -420,8 +421,8 @@ void ProbabilisticFusion::CollectObjectsByTrack(
   const SensorId2ObjectMap& lidar_measurements = track->GetLidarObjects();
   const SensorId2ObjectMap& radar_measurements = track->GetRadarObjects();
   const SensorId2ObjectMap& camera_measurements = track->GetCameraObjects();
-  int num_measurements = lidar_measurements.size() +
-                         camera_measurements.size() + radar_measurements.size();
+  int num_measurements = static_cast<int>(lidar_measurements.size() +
+                      camera_measurements.size() + radar_measurements.size());
   obj->fusion_supplement.on_use = true;
   std::vector<base::SensorObjectMeasurement>& measurements =
       obj->fusion_supplement.measurements;

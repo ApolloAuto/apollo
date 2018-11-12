@@ -41,34 +41,34 @@ TEST(DistortionModelTest, omnidirectional_model_get_set_test) {
   intrinsic_params(2, 2) = 1;
 
   params.resize(28);
-  params(0) = 559.892944;  // center["x"]
-  params(1) = 943.844226;  // center["y"]
-  params(2) = 0.998701;    // affine["c"]
-  params(3) = -0.000375;   // affine["d"]
-  params(4) = -0.000110;   // affine["e"]
+  params(0) = 559.892944f;  // center["x"]
+  params(1) = 943.844226f;  // center["y"]
+  params(2) = 0.998701f;    // affine["c"]
+  params(3) = -0.000375f;   // affine["d"]
+  params(4) = -0.000110f;   // affine["e"]
   params(5) = 300;         // focallength
   params(6) = 960;         // principal["x"]
   params(7) = 540;         // principal["y"]
   params(8) = 5;           // cam2world order
-  params(9) = -4.703335e+02;
-  params(10) = 0.000000e+00;
-  params(11) = 9.691211e-04;
-  params(12) = -9.422097e-07;
-  params(13) = 6.870575e-10;
+  params(9) = -4.703335e+02f;
+  params(10) = 0.000000e+00f;
+  params(11) = 9.691211e-04f;
+  params(12) = -9.422097e-07f;
+  params(13) = 6.870575e-10f;
   params(14) = 13;  // world2cam order
-  params(15) = 842.297583;
-  params(16) = 663.510034;
-  params(17) = -2.267809;
-  params(18) = -93.711075;
-  params(19) = 153.354928;
-  params(20) = 125.704918;
-  params(21) = -255.000729;
-  params(22) = -217.999819;
-  params(23) = 324.729462;
-  params(24) = 619.810504;
-  params(25) = 417.824966;
-  params(26) = 133.771693;
-  params(27) = 17.074414;
+  params(15) = 842.297583f;
+  params(16) = 663.510034f;
+  params(17) = -2.267809f;
+  params(18) = -93.711075f;
+  params(19) = 153.354928f;
+  params(20) = 125.704918f;
+  params(21) = -255.000729f;
+  params(22) = -217.999819f;
+  params(23) = 324.729462f;
+  params(24) = 619.810504f;
+  params(25) = 417.824966f;
+  params(26) = 133.771693f;
+  params(27) = 17.074414f;
 
   EXPECT_TRUE(distortion_model.set_params(w, h, params));
   std::shared_ptr<BaseCameraModel> camera_model =
@@ -98,34 +98,34 @@ TEST(DistortionModelTest, distortion_model_project_test) {
   size_t h = 1080;
 
   params.resize(28);
-  params(0) = 559.892944;  // center["x"]
-  params(1) = 943.844226;  // center["y"]
-  params(2) = 0.998701;    // affine["c"]
-  params(3) = -0.000375;   // affine["d"]
-  params(4) = -0.000110;   // affine["e"]
+  params(0) = 559.892944f;  // center["x"]
+  params(1) = 943.844226f;  // center["y"]
+  params(2) = 0.998701f;    // affine["c"]
+  params(3) = -0.000375f;   // affine["d"]
+  params(4) = -0.000110f;   // affine["e"]
   params(5) = 300;         // focallength
   params(6) = 960;         // principal["x"]
   params(7) = 540;         // principal["y"]
   params(8) = 5;           // cam2world order
-  params(9) = -4.703335e+02;
-  params(10) = 0.000000e+00;
-  params(11) = 9.691211e-04;
-  params(12) = -9.422097e-07;
-  params(13) = 6.870575e-10;
+  params(9) = -4.703335e+02f;
+  params(10) = 0.000000e+00f;
+  params(11) = 9.691211e-04f;
+  params(12) = -9.422097e-07f;
+  params(13) = 6.870575e-10f;
   params(14) = 13;  // world2cam order
-  params(15) = 842.297583;
-  params(16) = 663.510034;
-  params(17) = -2.267809;
-  params(18) = -93.711075;
-  params(19) = 153.354928;
-  params(20) = 125.704918;
-  params(21) = -255.000729;
-  params(22) = -217.999819;
-  params(23) = 324.729462;
-  params(24) = 619.810504;
-  params(25) = 417.824966;
-  params(26) = 133.771693;
-  params(27) = 17.074414;
+  params(15) = 842.297583f;
+  params(16) = 663.510034f;
+  params(17) = -2.267809f;
+  params(18) = -93.711075f;
+  params(19) = 153.354928f;
+  params(20) = 125.704918f;
+  params(21) = -255.000729f;
+  params(22) = -217.999819f;
+  params(23) = 324.729462f;
+  params(24) = 619.810504f;
+  params(25) = 417.824966f;
+  params(26) = 133.771693f;
+  params(27) = 17.074414f;
 
   EXPECT_TRUE(distortion_model.set_params(w, h, params));
 

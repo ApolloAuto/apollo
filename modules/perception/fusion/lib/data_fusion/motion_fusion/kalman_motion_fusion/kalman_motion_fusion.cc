@@ -44,8 +44,8 @@ bool KalmanMotionFusion::Init() {
 bool KalmanMotionFusion::InitFilter(const SensorObjectConstPtr& sensor_object) {
   const std::vector<bool> gain_break_down = {0, 0, 0, 0, 1, 1};
   const std::vector<bool> value_break_down = {0, 0, 1, 1, 0, 0};
-  const float gain_break_down_threshold = 2.0;
-  const float value_break_down_threshold = 0.05;
+  const float gain_break_down_threshold = 2.0f;
+  const float value_break_down_threshold = 0.05f;
   Eigen::MatrixXd global_uncertainty;
   Eigen::VectorXd global_states;
   // global_states: center(2), velocity(2), acceleration(2)
@@ -425,8 +425,9 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
     const Eigen::Vector4d& measurement) {
   /* initialize status variables */
   int trace_count = 0;
-  const float velocity_angle_change_thresh_ = M_PI / 20;
-  const float acceleration_angle_change_thresh_ = M_PI / 3;
+  const float velocity_angle_change_thresh_ = static_cast<float>(M_PI / 20.0);
+  const float acceleration_angle_change_thresh_
+                = static_cast<float>(M_PI / 3.0);
   Eigen::Vector4d pseudo_measurement = measurement;
   Eigen::Vector3d lidar_velocity =
       Eigen::Vector3d(measurement(2), measurement(3), 0);
@@ -494,8 +495,9 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
     const Eigen::Vector4d& measurement) {
   /* initialize status variables */
   int trace_count = 0;
-  const float velocity_angle_change_thresh_ = M_PI / 10;
-  const float acceleration_angle_change_thresh_ = M_PI / 3;
+  const float velocity_angle_change_thresh_ = static_cast<float>(M_PI / 10.0);
+  const float acceleration_angle_change_thresh_
+                = static_cast<float>(M_PI / 3.0);
   Eigen::Vector4d pseudo_measurement = measurement;
   Eigen::Vector3d camera_velocity =
       Eigen::Vector3d(measurement(2), measurement(3), 0);
@@ -708,7 +710,7 @@ int KalmanMotionFusion::GetSensorHistoryIndex(
   int history_index = 0;
   int history_count = 0;
   for (size_t i = 1; i <= history_sensor_type_.size(); ++i) {
-    history_index = history_sensor_type_.size() - i;
+    history_index = static_cast<int>(history_sensor_type_.size() - i);
     if (history_sensor_type_[history_index] == sensor_type) {
       history_count++;
     }

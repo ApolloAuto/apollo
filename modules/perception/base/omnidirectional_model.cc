@@ -48,8 +48,8 @@ Eigen::Vector2f OmnidirectionalCameraDistortionModel::Project(
   const double theta = atan(x[2] / norm);
   const double rho = world2cam_(theta);
 
-  const double u = x[0] / norm * rho;
-  const double v = x[1] / norm * rho;
+  const float u = static_cast<float>(x[0] / norm * rho);
+  const float v = static_cast<float>(x[1] / norm * rho);
   projection(1) = affine_[0] * u + affine_[1] * v + center_[0];
   projection(0) = affine_[2] * u + v + center_[1];
   return projection;
@@ -107,11 +107,11 @@ bool OmnidirectionalCameraDistortionModel::set_params(
   intrinsic_params_(1, 2) = params(7);
 
   for (size_t i = 0; i < cam2world_order; ++i) {
-    cam2world_[i] = params(9 + i);
+    cam2world_[i] = static_cast<size_t>(params(9 + i));
   }
 
   for (size_t i = 0; i < world2cam_order; ++i) {
-    world2cam_[i] = params(10 + cam2world_order + i);
+    world2cam_[i] = static_cast<size_t>(params(10 + cam2world_order + i));
   }
 
   return true;

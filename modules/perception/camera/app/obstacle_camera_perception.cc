@@ -86,8 +86,10 @@ bool ObstacleCameraPerception::Init(
   CHECK(perception_param_.has_tracker_param()) << "Failed to init tracker";
   {
     ObstacleTrackerInitOptions tracker_init_options;
-    tracker_init_options.image_width = model->get_width();
-    tracker_init_options.image_height = model->get_height();
+    tracker_init_options.image_width =
+      static_cast<float>(model->get_width());
+    tracker_init_options.image_height =
+      static_cast<float>(model->get_height());
     tracker_init_options.gpu_id = perception_param_.gpu_id();
     auto plugin_param = perception_param_.tracker_param().plugin_param();
     tracker_init_options.root_dir =
@@ -258,8 +260,10 @@ void ObstacleCameraPerception::InitCalibrationService(
     calibration_service_init_options.name_intrinsic_map = name_intrinsic_map_;
     calibration_service_init_options.calibrator_method =
                             calibration_service_param.calibrator_method();
-    calibration_service_init_options.image_height = model->get_height();
-    calibration_service_init_options.image_width = model->get_width();
+    calibration_service_init_options.image_height =
+      static_cast<int>(model->get_height());
+    calibration_service_init_options.image_width =
+      static_cast<int>(model->get_width());
     calibration_service_.reset(
           BaseCalibrationServiceRegisterer::GetInstanceByName(
                             calibration_service_param.plugin_param().name()));

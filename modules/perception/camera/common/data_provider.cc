@@ -232,11 +232,13 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
   blob->Reshape({1, roi.height, roi.width, image.channels()});
   if (image.channels() == 1) {
     nppiCopy_8u_C1R(image.gpu_data(), image.width_step(),
-                    blob->mutable_gpu_data(), blob->count(2) * sizeof(uint8_t),
+                    blob->mutable_gpu_data(),
+                    blob->count(2) * static_cast<int>(sizeof(uint8_t)),
                     roi);
   } else {
     nppiCopy_8u_C3R(image.gpu_data(), image.width_step(),
-                    blob->mutable_gpu_data(), blob->count(2) * sizeof(uint8_t),
+                    blob->mutable_gpu_data(),
+                    blob->count(2) * static_cast<int>(sizeof(uint8_t)),
                     roi);
   }
 

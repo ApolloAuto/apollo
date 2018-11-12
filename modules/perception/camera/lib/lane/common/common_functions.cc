@@ -215,8 +215,8 @@ bool ImagePoint2Camera(
   pt_m << img_point.x, img_point.y, 1;
   const Eigen::MatrixXf& org_camera_point = intrinsic_params_inverse * pt_m;
   //
-  float cos_pitch = cos(pitch_angle);
-  float sin_pitch = sin(pitch_angle);
+  float cos_pitch = static_cast<float>(cos(pitch_angle));
+  float sin_pitch = static_cast<float>(sin(pitch_angle));
   Eigen::Matrix3f pitch_matrix;
   pitch_matrix << 1, 0, 0,
                   0, cos_pitch, sin_pitch,

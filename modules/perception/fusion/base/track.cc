@@ -32,7 +32,7 @@ Track::Track() { fused_object_.reset(new FusedObject()); }
 
 bool Track::Initialize(SensorObjectPtr obj, bool is_background) {
   Reset();
-  int track_id = GenerateNewTrackId();
+  int track_id = static_cast<int>(GenerateNewTrackId());
   is_background_ = is_background;
   std::shared_ptr<base::Object> fused_base_obj
       = fused_object_->GetBaseObject();

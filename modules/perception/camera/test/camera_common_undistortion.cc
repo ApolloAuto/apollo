@@ -54,9 +54,9 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
   }
 
   size_t img_size = _height * _width;
-  _in_size = img_size * CHANNEL * sizeof(uint8_t);
+  _in_size = img_size * static_cast<size_t>(CHANNEL) * sizeof(uint8_t);
 
-  _out_size = img_size * CHANNEL * sizeof(uint8_t);
+  _out_size = img_size * static_cast<size_t>(CHANNEL) * sizeof(uint8_t);
   // if input is rgb, its size is same as output's
   BASE_CUDA_CHECK(cudaMalloc(&_d_rgb, _out_size));
   BASE_CUDA_CHECK(cudaMalloc(&_d_dst, _out_size));

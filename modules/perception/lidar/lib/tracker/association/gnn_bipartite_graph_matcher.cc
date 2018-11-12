@@ -75,8 +75,8 @@ void GnnBipartiteGraphMatcher::Match(
   col_tag_.clear();
   common::SecureMat<float> *cost_matrix = cost_matrix_;
   float max_dist = options.cost_thresh;
-  int num_rows = cost_matrix->height();
-  int num_cols = cost_matrix->width();
+  int num_rows = static_cast<int>(cost_matrix->height());
+  int num_cols = static_cast<int>(cost_matrix->width());
   row_tag_.assign(num_rows, 0);
   col_tag_.assign(num_cols, 0);
 
