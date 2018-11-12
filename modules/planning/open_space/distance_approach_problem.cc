@@ -63,7 +63,7 @@ bool DistanceApproachProblem::Solve(
   app->Options()->SetIntegerValue("print_level", 0);
   app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
   app->Options()->SetNumericValue("mumps_pivtol", 1e-6);
-  app->Options()->SetIntegerValue("max_iter", 200);
+  app->Options()->SetIntegerValue("max_iter", 1000);
   app->Options()->SetNumericValue("tol", 1e-4);
   app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
   app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
