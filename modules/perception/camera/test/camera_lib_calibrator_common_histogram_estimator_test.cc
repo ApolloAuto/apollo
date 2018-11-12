@@ -38,60 +38,60 @@ TEST(HistogramEstimatorTest, histogram_estimator_test) {
   estimator.get_val_estimation();
   estimator.get_bin_value(0);
 
-  estimator.Push(params1.data_ep - 1.0);
-  estimator.Push(params1.data_ep + 1.0);
-  estimator.Push(params1.data_sp - 1.0);
-  estimator.Push(params1.data_sp + 1.0);
-  estimator.Push((params1.data_sp + params1.data_ep) / 2.0);
+  estimator.Push(params1.data_ep - 1.0f);
+  estimator.Push(params1.data_ep + 1.0f);
+  estimator.Push(params1.data_sp - 1.0f);
+  estimator.Push(params1.data_sp + 1.0f);
+  estimator.Push((params1.data_sp + params1.data_ep) / 2.0f);
   estimator.Process();
   estimator.Clear();
 
-  estimator.Push((params1.data_sp + params1.data_ep) / 2.0);
+  estimator.Push((params1.data_sp + params1.data_ep) / 2.0f);
   estimator.Process();
   estimator.Clear();
 
   for (int i = 0; i < 10; i++) {
-    estimator.Push((params1.data_sp + params1.data_ep) / 2.0);
+    estimator.Push((params1.data_sp + params1.data_ep) / 2.0f);
   }
   estimator.Process();
   estimator.Clear();
 
   for (int i = 0; i < 100; i++) {
-    estimator.Push((params1.data_sp + params1.data_ep) / 2.0);
+    estimator.Push((params1.data_sp + params1.data_ep) / 2.0f);
   }
   estimator.Process();
   estimator.Clear();
 
   for (int i = 0; i < 10; i++) {
-    estimator.Push(params1.data_sp * i / 100.0 +
-                   params1.data_ep * (1.0 - i / 100.0));
+    estimator.Push(params1.data_sp * static_cast<float>(i) / 100.0f +
+                   params1.data_ep * (1.0f - static_cast<float>(i) / 100.0f));
   }
   estimator.Process();
   estimator.Clear();
 
   for (int i = 0; i < 10; i++) {
-    estimator.Push(params1.data_ep * i / 10.0 +
-                   params1.data_sp * (1.0 - i / 10.0));
+    estimator.Push(params1.data_ep * static_cast<float>(i) / 10.0f +
+                   params1.data_sp * (1.0f - static_cast<float>(i) / 10.0f));
   }
   estimator.Process();
   estimator.Clear();
 
   for (int i = 0; i < 10; i++) {
-    estimator.Push(params1.data_sp * i / 10.0 +
-                   params1.data_ep * (1.0 - i / 10.0));
+    estimator.Push(params1.data_sp * static_cast<float>(i) / 10.0f +
+                   params1.data_ep * (1.0f - static_cast<float>(i) / 10.0f));
   }
   for (int i = 0; i < 10; i++) {
-    estimator.Push((params1.data_sp + params1.data_ep) / 2.0);
+    estimator.Push((params1.data_sp + params1.data_ep) / 2.0f);
   }
   estimator.Process();
   estimator.Clear();
 
   for (int i = 0; i < 10; i++) {
-    estimator.Push(params1.data_ep * i / 10.0 +
-                   params1.data_sp * (1.0 - i / 10.0));
+    estimator.Push(params1.data_ep * static_cast<float>(i) / 10.0f +
+                   params1.data_sp * (1.0f - static_cast<float>(i) / 10.0f));
   }
   for (int i = 0; i < 10; i++) {
-    estimator.Push((params1.data_sp + params1.data_ep) / 2.0);
+    estimator.Push((params1.data_sp + params1.data_ep) / 2.0f);
   }
   estimator.Process();
   params1.smooth_kernel_radius = params1.nr_bins_in_histogram;

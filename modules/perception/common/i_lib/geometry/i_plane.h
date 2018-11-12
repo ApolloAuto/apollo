@@ -178,7 +178,9 @@ inline void IPlaneFitTotalLeastSquare(T *X, T *pi, int n) {
 // pi is stored as 4 - vector[a, b, c, d]. x will be destroyed after calling
 // this routine.
 template <typename T> inline void IPlaneFitTotalLeastSquare3(T *X, T *pi) {
-  T mat_a[9], eigv[3], mat_q[9];
+  T mat_a[9];
+  T eigv[3];
+  T mat_q[9];
   // compute the centroid of input Data points
   IZero4(pi);
   T xm = (X[0] + X[3] + X[6]) / 3;
