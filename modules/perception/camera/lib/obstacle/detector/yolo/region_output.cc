@@ -128,9 +128,10 @@ void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
       float cur_overlap = 0.;
       cur_overlap = get_jaccard_overlap(best_bbox, cur_bbox);
       if (is_linear) {
-        (*scores)[cur_idx] *= (1.0 - cur_overlap);
+        (*scores)[cur_idx] *= static_cast<float>((1.0 - cur_overlap));
       } else {
-        (*scores)[cur_idx] *= exp(-1.0 * pow(cur_overlap, 2) / sigma);
+        (*scores)[cur_idx] *=
+          static_cast<float>(exp(-1.0 * pow(cur_overlap, 2) / sigma));
       }
       ++it;
     }
@@ -184,7 +185,8 @@ void apply_boxvoting_fast(std::vector<NormalizedBBox> *bboxes,
       if (sigma == 0) {
         (*bboxes)[sub_it].mask = true;
       } else {
-        (*scores)[sub_it] *= exp(-1.0 * pow(cur_overlap, 2) / sigma);
+        (*scores)[sub_it] *=
+          static_cast<float>(exp(-1.0 * pow(cur_overlap, 2) / sigma));
       }
       (*bboxes)[sub_it].score = (*scores)[sub_it];
 
@@ -279,12 +281,14 @@ void recover_bbox(int roi_w, int roi_h, int offset_y,
     float ymin = obj->camera_supplement.box.ymin;
     float xmax = obj->camera_supplement.box.xmax;
     float ymax = obj->camera_supplement.box.ymax;
-    int x = xmin * roi_w;
-    int w = (xmax - xmin) * roi_w;
-    int y = ymin * roi_h + offset_y;
-    int h = (ymax - ymin) * roi_h;
-    base::RectF rect_det(x, y, w, h);
-    base::RectF rect_img(0, 0, roi_w, roi_h + offset_y);
+    int x = static_cast<int>(xmin * static_cast<float>(roi_w));
+    int w = static_cast<int>((xmax - xmin) * static_cast<float>(roi_w));
+    int y = static_cast<int>(ymin * static_cast<float>(roi_h)) + offset_y;
+    int h = static_cast<int>((ymax - ymin) * static_cast<float>(roi_h));
+    base::RectF rect_det(static_cast<float>(x), static_cast<float>(y),
+      static_cast<float>(w), static_cast<float>(h));
+    base::RectF rect_img(0, 0, static_cast<float>(roi_w),
+      static_cast<float>(roi_h + offset_y));
     base::RectF rect = rect_det & rect_img;
     obj->camera_supplement.box = rect;
 
@@ -302,20 +306,20 @@ void recover_bbox(int roi_w, int roi_h, int offset_y,
       obj->camera_supplement.truncated_horizontal = 0.0;
     }
 
-    obj->camera_supplement.front_box.xmin *= roi_w;
-    obj->camera_supplement.front_box.ymin *= roi_h;
-    obj->camera_supplement.front_box.xmax *= roi_w;
-    obj->camera_supplement.front_box.ymax *= roi_h;
+    obj->camera_supplement.front_box.xmin *= static_cast<float>(roi_w);
+    obj->camera_supplement.front_box.ymin *= static_cast<float>(roi_h);
+    obj->camera_supplement.front_box.xmax *= static_cast<float>(roi_w);
+    obj->camera_supplement.front_box.ymax *= static_cast<float>(roi_h);
 
-    obj->camera_supplement.back_box.xmin *= roi_w;
-    obj->camera_supplement.back_box.ymin *= roi_h;
-    obj->camera_supplement.back_box.xmax *= roi_w;
-    obj->camera_supplement.back_box.ymax *= roi_h;
+    obj->camera_supplement.back_box.xmin *= static_cast<float>(roi_w);
+    obj->camera_supplement.back_box.ymin *= static_cast<float>(roi_h);
+    obj->camera_supplement.back_box.xmax *= static_cast<float>(roi_w);
+    obj->camera_supplement.back_box.ymax *= static_cast<float>(roi_h);
 
-    obj->camera_supplement.front_box.ymin += offset_y;
-    obj->camera_supplement.front_box.ymax += offset_y;
-    obj->camera_supplement.back_box.ymin += offset_y;
-    obj->camera_supplement.back_box.ymax += offset_y;
+    obj->camera_supplement.front_box.ymin += static_cast<float>(offset_y);
+    obj->camera_supplement.front_box.ymax += static_cast<float>(offset_y);
+    obj->camera_supplement.back_box.ymin += static_cast<float>(offset_y);
+    obj->camera_supplement.back_box.ymax += static_cast<float>(offset_y);
   }
 }
 
@@ -394,7 +398,7 @@ int get_area_id(float visible_ratios[4]) {
   }
   int left_face = (max_face + 1) % 4;
   int right_face = (max_face + 3) % 4;
-  const float eps = 1e-3;
+  const float eps = 1e-3f;
   float max_ratio = visible_ratios[max_face];
   float left_ratio = visible_ratios[left_face];
   float right_ratio = visible_ratios[right_face];

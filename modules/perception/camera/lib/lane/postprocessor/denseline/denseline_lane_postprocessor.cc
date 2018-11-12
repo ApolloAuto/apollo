@@ -149,9 +149,9 @@ void DenselineLanePostprocessor::ConvertImagePoint2Camera(
       const base::Point2DF& image_point = image_point_set[i];
       ImagePoint2Camera(image_point, pitch_angle, camera_ground_height,
         intrinsic_params_inverse, &camera_point3d);
-      camera_point.x = camera_point3d(0);
-      camera_point.y = camera_point3d(1);
-      camera_point.z = camera_point3d(2);
+      camera_point.x = static_cast<float>(camera_point3d(0));
+      camera_point.y = static_cast<float>(camera_point3d(1));
+      camera_point.z = static_cast<float>(camera_point3d(2));
       camera_point_set.push_back(camera_point);
     }
   }
@@ -185,7 +185,7 @@ void DenselineLanePostprocessor::CalLaneMap(
       //  utilize softmax to get the probability
       float sum_score = 0;
       for (int i = 0; i < 4; i++) {
-        score_channel[i] = exp(score_channel[i]);
+        score_channel[i] = static_cast<float>(exp(score_channel[i]));
         sum_score += score_channel[i];
       }
       for (int i = 0; i < 4; i++) {
@@ -283,7 +283,8 @@ void DenselineLanePostprocessor::InferPointSetFromOneCC(
 
     float score = lane_output_[lane_map_dim * 2 + pixel_pos];
     float dist_left = lane_output_[pixel_pos];
-    float x_left_map = pixel_x - dist_left * lane_map_width_;
+    float x_left_map = static_cast<float>(pixel_x) - dist_left *
+                       static_cast<float>(lane_map_width_);
     int x_left = static_cast<int>(x_left_map);
     if (left_index != -1 && x_left > 0 &&
       x_left < lane_map_width_ - 1) {
@@ -294,7 +295,8 @@ void DenselineLanePostprocessor::InferPointSetFromOneCC(
     }
 
     float dist_right = lane_output_[lane_map_dim + pixel_pos];
-    float x_right_map = pixel_x + dist_right * lane_map_width_;
+    float x_right_map = static_cast<float>(pixel_x) + dist_right *
+                        static_cast<float>(lane_map_width_);
     int x_right = static_cast<int>(x_right_map);
     if (right_index != -1 && x_right < lane_map_width_ - 1 &&
       x_right > 0) {
@@ -353,9 +355,11 @@ bool DenselineLanePostprocessor::MaxScorePoint(const float *score_pointer,
   if (!flag) {
     return false;
   }
-  (*point_info).x = x_pointer[max_x] / x_count_pointer[max_x];
-  (*point_info).y = y_pos;
-  (*point_info).score = max_score / x_count_pointer[max_x];
+  (*point_info).x = x_pointer[max_x] /
+                    static_cast<float>(x_count_pointer[max_x]);
+  (*point_info).y = static_cast<float>(y_pos);
+  (*point_info).score = max_score /
+                        static_cast<float>(x_count_pointer[max_x]);
   return true;
 }
 
@@ -369,7 +373,8 @@ bool DenselineLanePostprocessor::SelectLanecenterCCs(
     return false;
   }
   //  select top 3 ccs with largest pixels size
-  int valid_pixels_num = cc_valid_pixels_ratio_ * lane_map_height_;
+  int valid_pixels_num = static_cast<int>(cc_valid_pixels_ratio_ *
+                          static_cast<float>(lane_map_height_));
   std::vector<ConnectedComponent> valid_lane_ccs;
   for (int i = 0; i < lane_ccs_num; i++) {
     const std::vector<base::Point2DI>& pixels = lane_ccs[i].GetPixels();
@@ -472,7 +477,7 @@ bool DenselineLanePostprocessor::ClassifyLaneCCsPosTypeInImage(
   std::vector<float> cc_bottom_center_x(ccs_num);
   float min_dist = 1e6;
   int min_index = -1;
-  float lane_map_center_x = lane_map_width_ / 2.0;
+  float lane_map_center_x = static_cast<float>(lane_map_width_ >> 1);
   for (int i = 0; i < ccs_num; i++) {
     const std::vector<base::Point2DI>& pixels = select_lane_ccs[i].GetPixels();
     const base::BBox2DI& bbox = select_lane_ccs[i].GetBBox();
@@ -496,8 +501,9 @@ bool DenselineLanePostprocessor::ClassifyLaneCCsPosTypeInImage(
         x_max = std::max(x_max, pixel_x);
       }
     }
-    cc_bottom_center_x[i] = (x_min + x_max) / 2.0;
-    float dist = fabs(cc_bottom_center_x[i] - lane_map_center_x);
+    cc_bottom_center_x[i] = static_cast<float>(x_min + x_max) / 2.0f;
+    float dist =
+      static_cast<float>(fabs(cc_bottom_center_x[i] - lane_map_center_x));
     if (dist < min_dist) {
       min_dist = dist;
       min_index = i;
@@ -541,7 +547,7 @@ void DenselineLanePostprocessor::ClassifyLanelinePosTypeInImage(
   int ego_right_index = -1;
   float ego_left_value = -1e6;
   float ego_right_value = 1e6;
-  float lane_center_pos = input_image_width_ / 2.0;
+  float lane_center_pos = static_cast<float>(input_image_width_ >> 1);
   for (int i = 0; i < set_size; i++) {
     int point_num = static_cast<int>(image_group_point_set[i].size());
     if (point_num <= laneline_point_min_num_thresh_) {
@@ -558,7 +564,8 @@ void DenselineLanePostprocessor::ClassifyLanelinePosTypeInImage(
     } else {
       float fk = dif_x / dif_y;
       float fb = fx1 - fk * fy1;
-      latitude_intersection[i] = fk * (input_image_height_ - 1) + fb;
+      latitude_intersection[i] =
+        fk * static_cast<float>(input_image_height_ - 1) + fb;
     }
     if (latitude_intersection[i] <= lane_center_pos &&
       latitude_intersection[i] > ego_left_value) {
@@ -643,16 +650,20 @@ bool DenselineLanePostprocessor::LocateNeighborLaneLine(
 void DenselineLanePostprocessor::Convert2OriginalCoord(
   const std::vector<std::vector<LanePointInfo> >& lane_map_group_point_set,
   std::vector<std::vector<LanePointInfo> >* image_group_point_set) {
-  float x_ratio = input_crop_width_ * 1.0f / lane_map_width_;
-  float y_ratio = input_crop_height_ * 1.0f / lane_map_height_;
+  float x_ratio = static_cast<float>(input_crop_width_) *
+                  lane_map_width_inverse_;
+  float y_ratio = static_cast<float>(input_crop_height_) *
+                  lane_map_height_inverse_;
   for (int i = 0; i < static_cast<int>(lane_map_group_point_set.size());
     i++) {
     for (int j = 0; j < static_cast<int>(lane_map_group_point_set[i].size());
     j++) {
       LanePointInfo lane_map_info = lane_map_group_point_set[i][j];
       LanePointInfo original_info;
-      original_info.x = lane_map_info.x * x_ratio + input_offset_x_;
-      original_info.y = lane_map_info.y * y_ratio + input_offset_y_;
+      original_info.x = lane_map_info.x * x_ratio +
+                        static_cast<float>(input_offset_x_);
+      original_info.y = lane_map_info.y * y_ratio +
+                        static_cast<float>(input_offset_y_);
       original_info.score = lane_map_info.score;
       (*image_group_point_set)[i].push_back(original_info);
     }
@@ -677,8 +688,8 @@ void DenselineLanePostprocessor::AddImageLaneline(
   std::vector<Eigen::Matrix<float, 2, 1> > img_pos_vec(image_point_set_size);
   Eigen::Matrix<float, max_poly_order + 1, 1> img_coeff;
   bool is_x_axis = false;
-  int r_start = -1;
-  int r_end = -1;
+  float r_start = -1;
+  float r_end = -1;
   float confidence = 0.0f;
   lane_mark.curve_image_point_set.resize(image_point_set_size);
   for (int i = 0; i < image_point_set_size; i++) {
@@ -699,7 +710,7 @@ void DenselineLanePostprocessor::AddImageLaneline(
     }
     confidence += image_point_set[i].score;
   }
-  confidence /= image_point_set_size;
+  confidence /= static_cast<float>(image_point_set_size);
 
   bool fit_flag =
     PolyFit(img_pos_vec, max_poly_order, &img_coeff, is_x_axis);
@@ -715,12 +726,12 @@ void DenselineLanePostprocessor::AddImageLaneline(
     float y_pos = img_pos_vec[i](1, 0);
     float x_poly = 0;
     PolyEval(y_pos, max_poly_order, img_coeff, &x_poly);
-    float dist = fabs(x_poly - x_pos);
+    float dist = static_cast<float>(fabs(x_poly - x_pos));
     sum_dist += dist;
     count++;
   }
   if (count > 0) {
-    avg_dist = sum_dist / count;
+    avg_dist = sum_dist / static_cast<float>(count);
   }
   if (avg_dist >= laneline_reject_dist_thresh_) {
     AERROR << "avg_dist>=laneline_reject_dist_thresh_";
@@ -787,10 +798,13 @@ std::vector<std::vector<LanePointInfo> >
 
 std::vector<LanePointInfo>
   DenselineLanePostprocessor::GetAllInferLinePointSet() {
-  float x_ratio = input_crop_width_ * 1.0f / lane_map_width_;
-  float y_ratio = input_crop_height_ * 1.0f / lane_map_height_;
+  float x_ratio = static_cast<float>(input_crop_width_) *
+                  lane_map_width_inverse_;
+  float y_ratio = static_cast<float>(input_crop_height_) *
+                  lane_map_height_inverse_;
   image_laneline_point_set_.clear();
   int lane_map_dim = lane_map_width_ * lane_map_height_;
+  float lane_map_width_float = static_cast<float>(lane_map_width_);
   for (int i = 0; i < lane_map_height_; i++) {
     for (int j = 0; j < lane_map_width_; j++) {
       int pixel_pos = i * lane_map_width_ + j;
@@ -800,20 +814,25 @@ std::vector<LanePointInfo>
       }
       float dist_left = lane_output_[pixel_pos];
       float dist_right = lane_output_[lane_map_dim + pixel_pos];
-      float map_x_left = j - dist_left * lane_map_width_;
-      float map_x_right = j + dist_right * lane_map_width_;
-      float org_img_y = i * y_ratio + input_offset_y_;
+      float map_x_left = static_cast<float>(j) - dist_left *
+                         lane_map_width_float;
+      float map_x_right = static_cast<float>(j) + dist_right *
+                          lane_map_width_float;
+      float org_img_y = static_cast<float>(i) * y_ratio +
+                        static_cast<float>(input_offset_y_);
       if (map_x_left > 0) {
         LanePointInfo left_point;
-        float org_img_x_left = map_x_left * x_ratio + input_offset_x_;
+        float org_img_x_left = map_x_left * x_ratio +
+                               static_cast<float>(input_offset_x_);
         left_point.x = org_img_x_left;
         left_point.y = org_img_y;
         left_point.score = score;
         image_laneline_point_set_.push_back(left_point);
       }
-      if (map_x_right < lane_map_width_) {
+      if (map_x_right < lane_map_width_float) {
         LanePointInfo right_point;
-        float org_img_x_right = map_x_right * x_ratio + input_offset_x_;
+        float org_img_x_right = map_x_right * x_ratio +
+                                static_cast<float>(input_offset_x_);
         right_point.x = org_img_x_right;
         right_point.y = org_img_y;
         right_point.score = score;

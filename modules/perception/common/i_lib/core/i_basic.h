@@ -32,11 +32,13 @@ inline double IAbs(double a) { return a < 0.0 ? -a : a; }
 // Compute a/b, should not template this function, IRec(int, int) should return
 //  * double
 inline float IDiv(float a, float b) { return ((b != 0.f) ? (a / b) : 1.0f); }
-inline float IDiv(float a, int b) { return ((b != 0) ? (a / b) : 1.0f); }
+inline float IDiv(float a, int b) {
+  return ((b != 0) ? (a / static_cast<float>(b)) : 1.0f);
+}
 inline float IDiv(float a, unsigned int b) {
   float result = 1.0f;
   if (b != 0) {
-    result = a / b;
+    result = a / static_cast<float>(b);
   }
   return result;
 }

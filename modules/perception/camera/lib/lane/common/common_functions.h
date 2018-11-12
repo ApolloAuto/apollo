@@ -72,7 +72,8 @@ bool PolyFit(const std::vector<Eigen::Matrix<Dtype, 2, 1> >& pos_vec,
   Eigen::Matrix<Dtype, Eigen::Dynamic, 1> result;
   for (int i = 0; i < n; ++i) {
       for (int j = 0; j <= order; ++j) {
-          A(i, j) = std::pow(is_x_axis ? pos_vec[i].x() : pos_vec[i].y(), j);
+          A(i, j) = static_cast<Dtype>(
+            std::pow(is_x_axis ? pos_vec[i].x() : pos_vec[i].y(), j));
       }
       y(i) = is_x_axis ? pos_vec[i].y() : pos_vec[i].x();
   }
@@ -101,7 +102,7 @@ bool PolyEval(const Dtype& x, int order,
 
   *y = static_cast<Dtype>(0);
   for (int j = 0; j <= poly_order; ++j) {
-      *y += coeff(j) * std::pow(x, j);
+      *y += static_cast<Dtype>(coeff(j) * std::pow(x, j));
   }
 
   return true;

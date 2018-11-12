@@ -81,9 +81,10 @@ TEST(YoloCameraDetectorTest, demo_test) {
     // AINFO << static_cast<int>(obj->type) << "\t"
     //          << static_cast<int>(obj->sub_type);
     auto &box = obj->camera_supplement.box;
-    cv::rectangle(cv_img, cv::Point(box.xmin, box.ymin),
-                  cv::Point(box.xmax, box.ymax),
-                  cv::Scalar(0, 255, 0), 2);
+    cv::rectangle(cv_img,
+      cv::Point(static_cast<int>(box.xmin), static_cast<int>(box.ymin)),
+      cv::Point(static_cast<int>(box.xmax), static_cast<int>(box.ymax)),
+      cv::Scalar(0, 255, 0), 2);
     std::stringstream text;
     text << static_cast<int>(obj->sub_type)
          << " - " << obj_id++;
@@ -107,7 +108,9 @@ TEST(YoloCameraDetectorTest, demo_test) {
             obj->camera_supplement.visible_ratios[3],
             obj->camera_supplement.cut_off_ratios[0],
             obj->camera_supplement.cut_off_ratios[1]);
-    cv::putText(cv_img, text.str(), cv::Point(box.xmin, box.ymin),
+    cv::putText(cv_img, text.str(),
+              cv::Point(static_cast<int>(box.xmin),
+                static_cast<int>(box.ymin)),
                 cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(255, 0, 0), 2);
   }
   cv::imwrite("output.jpg", cv_img);

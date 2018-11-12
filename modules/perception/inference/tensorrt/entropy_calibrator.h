@@ -53,7 +53,7 @@ class ICaffePoolOutputDimensionsFormula : public IOutputDimensionsFormula {
     if (str_name.find("as_conv") == std::string::npos) {
       return DimsHW(ceil(h_temp) + 1, ceil(w_temp) + 1);
     } else {
-      return DimsHW(floor(h_temp) + 1, floor(w_temp) + 1);
+      return DimsHW(static_cast<int>(h_temp) + 1, static_cast<int>(w_temp) + 1);
     }
   }
 

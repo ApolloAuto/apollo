@@ -83,8 +83,10 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
   name_intrinsic_map["onsemi_obstacle"] = frame.camera_k_matrix;
   calibration_service_init_options.name_intrinsic_map = name_intrinsic_map;
   calibration_service_init_options.calibrator_method = "LaneLineCalibrator";
-  calibration_service_init_options.image_height = model.get_height();
-  calibration_service_init_options.image_width = model.get_width();
+  calibration_service_init_options.image_height =
+    static_cast<int>(model.get_height());
+  calibration_service_init_options.image_width =
+    static_cast<int>(model.get_width());
   OnlineCalibrationService calibration_service;
   CHECK(calibration_service.Init(calibration_service_init_options));
 

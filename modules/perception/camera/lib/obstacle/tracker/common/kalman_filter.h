@@ -164,7 +164,7 @@ class MeanFilter {
   const Eigen::VectorXd &get_state() const;
   const Eigen::MatrixXd &get_variance() const;
   int size() const {
-    return measures_.size();
+    return static_cast<int>(measures_.size());
   }
  private:
   std::vector<Eigen::VectorXd> measures_;

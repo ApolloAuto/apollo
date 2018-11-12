@@ -35,7 +35,8 @@ class HMTrackersObjectsAssociation : public BaseDataAssociation {
       delete;
 
   bool Init() override {
-    track_object_distance_.set_distance_thresh(s_match_distance_thresh_);
+    track_object_distance_.set_distance_thresh(
+      static_cast<float>(s_match_distance_thresh_));
     return true;
   }
 

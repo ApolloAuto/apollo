@@ -61,9 +61,9 @@ TEST(PbfShapeFusion, lidar_track) {
   base::ObjectPtr base_track_lidar(new base::Object);
   base_track_lidar->center = Eigen::Vector3d(10, 0, 0);
   base_track_lidar->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_track_lidar->theta = SHAPE_FUSION_PI / 4;
-  base_track_lidar->direction = Eigen::Vector3f(0.707, 0.707, 0.0);
-  base_track_lidar->size = Eigen::Vector3f(3.0, 2.0, 1.0);
+  base_track_lidar->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_track_lidar->direction = Eigen::Vector3f(0.707f, 0.707f, 0.0);
+  base_track_lidar->size = Eigen::Vector3f(3.0f, 2.0f, 1.0f);
   std::vector<base::ObjectPtr> lidar_track_objects;
   lidar_track_objects.push_back(base_track_lidar);
 
@@ -84,8 +84,8 @@ TEST(PbfShapeFusion, lidar_track) {
   base_object_lidar->center = Eigen::Vector3d(10, 0, 0);
   base_object_lidar->anchor_point = Eigen::Vector3d(10, 0, 0);
   base_object_lidar->theta = 0.0;
-  base_object_lidar->direction = Eigen::Vector3f(1, 0, 0);
-  base_object_lidar->size = Eigen::Vector3f(5.0, 2.0, 1.8);
+  base_object_lidar->direction = Eigen::Vector3f(1.0f, 0, 0);
+  base_object_lidar->size = Eigen::Vector3f(5.0f, 2.0f, 1.8f);
   std::vector<base::ObjectPtr> lidar_objects;
   lidar_objects.push_back(base_object_lidar);
 
@@ -103,9 +103,9 @@ TEST(PbfShapeFusion, lidar_track) {
   base::ObjectPtr base_object_radar(new base::Object);
   base_object_radar->center = Eigen::Vector3d(10, 0, 0);
   base_object_radar->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_object_radar->theta = SHAPE_FUSION_PI / 4;
-  base_object_radar->direction = Eigen::Vector3f(0.707, 0.707, 0);
-  base_object_radar->size = Eigen::Vector3f(2.0, 1.0, 3.0);
+  base_object_radar->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_object_radar->direction = Eigen::Vector3f(0.707f, 0.707f, 0);
+  base_object_radar->size = Eigen::Vector3f(2.0f, 1.0f, 3.0f);
   std::vector<base::ObjectPtr> radar_objects;
   radar_objects.push_back(base_object_radar);
 
@@ -123,9 +123,9 @@ TEST(PbfShapeFusion, lidar_track) {
   base::ObjectPtr base_object_camera(new base::Object);
   base_object_camera->center = Eigen::Vector3d(10, 0, 0);
   base_object_camera->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_object_camera->theta = SHAPE_FUSION_PI / 4;
-  base_object_camera->direction = Eigen::Vector3f(0.707, 0.707, 0);
-  base_object_camera->size = Eigen::Vector3f(3.5, 2.5, 1.5);
+  base_object_camera->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_object_camera->direction = Eigen::Vector3f(0.707f, 0.707f, 0);
+  base_object_camera->size = Eigen::Vector3f(3.5f, 2.5f, 1.5f);
   std::vector<base::ObjectPtr> camera_objects;
   camera_objects.push_back(base_object_camera);
 
@@ -142,7 +142,7 @@ TEST(PbfShapeFusion, lidar_track) {
 
   PbfShapeFusion shape_fusion(lidar_track);
   shape_fusion.UpdateWithMeasurement(lidar_measurement, 100.0);
-  Eigen::Vector3f size(5.0, 2.0, 1.8);
+  Eigen::Vector3f size(5.0f, 2.0f, 1.8f);
   EXPECT_LT(
       (size - shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->size)
           .norm(),
@@ -201,8 +201,8 @@ TEST(PbfShapeFusion, radar_track) {
   base_track_radar->center = Eigen::Vector3d(10, 0, 0);
   base_track_radar->anchor_point = Eigen::Vector3d(10, 0, 0);
   base_track_radar->theta = 0.0;
-  base_track_radar->direction = Eigen::Vector3f(1.0, 0.0, 0.0);
-  base_track_radar->size = Eigen::Vector3f(3.2, 2.2, 1.2);
+  base_track_radar->direction = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
+  base_track_radar->size = Eigen::Vector3f(3.2f, 2.2f, 1.2f);
   std::vector<base::ObjectPtr> radar_track_objects;
   radar_track_objects.push_back(base_track_radar);
 
@@ -224,8 +224,8 @@ TEST(PbfShapeFusion, radar_track) {
   base_object_lidar->center = Eigen::Vector3d(10, 0, 0);
   base_object_lidar->anchor_point = Eigen::Vector3d(10, 0, 0);
   base_object_lidar->theta = 0.0;
-  base_object_lidar->direction = Eigen::Vector3f(1, 0, 0);
-  base_object_lidar->size = Eigen::Vector3f(5.0, 2.0, 1.8);
+  base_object_lidar->direction = Eigen::Vector3f(1.0f, 0, 0);
+  base_object_lidar->size = Eigen::Vector3f(5.0f, 2.0f, 1.8f);
   std::vector<base::ObjectPtr> lidar_objects;
   lidar_objects.push_back(base_object_lidar);
 
@@ -243,9 +243,9 @@ TEST(PbfShapeFusion, radar_track) {
   base::ObjectPtr base_object_radar(new base::Object);
   base_object_radar->center = Eigen::Vector3d(10, 0, 0);
   base_object_radar->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_object_radar->theta = SHAPE_FUSION_PI / 4;
-  base_object_radar->direction = Eigen::Vector3f(0.707, 0.707, 0);
-  base_object_radar->size = Eigen::Vector3f(2.0, 1.0, 3.0);
+  base_object_radar->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_object_radar->direction = Eigen::Vector3f(0.707f, 0.707f, 0);
+  base_object_radar->size = Eigen::Vector3f(2.0f, 1.0f, 3.0f);
   std::vector<base::ObjectPtr> radar_objects;
   radar_objects.push_back(base_object_radar);
 
@@ -263,9 +263,9 @@ TEST(PbfShapeFusion, radar_track) {
   base::ObjectPtr base_object_camera(new base::Object);
   base_object_camera->center = Eigen::Vector3d(10, 0, 0);
   base_object_camera->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_object_camera->theta = SHAPE_FUSION_PI / 4;
-  base_object_camera->direction = Eigen::Vector3f(0.707, 0.707, 0);
-  base_object_camera->size = Eigen::Vector3f(3.5, 2.5, 1.5);
+  base_object_camera->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_object_camera->direction = Eigen::Vector3f(0.707f, 0.707f, 0);
+  base_object_camera->size = Eigen::Vector3f(3.5f, 2.5f, 1.5f);
   std::vector<base::ObjectPtr> camera_objects;
   camera_objects.push_back(base_object_camera);
 
@@ -283,9 +283,9 @@ TEST(PbfShapeFusion, radar_track) {
   base::ObjectPtr base_object_unknown(new base::Object);
   base_object_unknown->center = Eigen::Vector3d(10, 0, 0);
   base_object_unknown->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_object_unknown->theta = SHAPE_FUSION_PI / 4;
-  base_object_unknown->direction = Eigen::Vector3f(0.707, 0.707, 0);
-  base_object_unknown->size = Eigen::Vector3f(3.5, 2.5, 1.5);
+  base_object_unknown->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_object_unknown->direction = Eigen::Vector3f(0.707f, 0.707f, 0);
+  base_object_unknown->size = Eigen::Vector3f(3.5f, 2.5f, 1.5f);
   std::vector<base::ObjectPtr> unknown_objects;
   unknown_objects.push_back(base_object_unknown);
 
@@ -302,7 +302,7 @@ TEST(PbfShapeFusion, radar_track) {
 
   PbfShapeFusion shape_fusion(radar_track);
   shape_fusion.UpdateWithMeasurement(lidar_measurement, 100.0);
-  Eigen::Vector3f size(5.0, 2.0, 1.8);
+  Eigen::Vector3f size(5.0f, 2.0f, 1.8f);
   EXPECT_LT(
       (size - shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->size)
           .norm(),
@@ -311,7 +311,7 @@ TEST(PbfShapeFusion, radar_track) {
       shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->theta, 0.0);
 
   shape_fusion.UpdateWithMeasurement(radar_measurement, 100.0);
-  size << 2.0, 1.0, 3.0;
+  size << 2.0f, 1.0f, 3.0f;
   EXPECT_LT(
       (size - shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->size)
           .norm(),
@@ -321,7 +321,7 @@ TEST(PbfShapeFusion, radar_track) {
       SHAPE_FUSION_PI / 4);
 
   shape_fusion.UpdateWithMeasurement(camera_measurement, 100.0);
-  size << 3.5, 2.5, 1.5;
+  size << 3.5f, 2.5f, 1.5f;
   EXPECT_LT(
       (size - shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->size)
           .norm(),
@@ -369,11 +369,11 @@ TEST(PbfShapeFusion, camera_track) {
 
   // camera track
   base::ObjectPtr base_track_camera(new base::Object);
-  base_track_camera->center = Eigen::Vector3d(10, 0, 0);
-  base_track_camera->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_track_camera->theta = SHAPE_FUSION_PI / 2;
+  base_track_camera->center = Eigen::Vector3d(10.0, 0, 0);
+  base_track_camera->anchor_point = Eigen::Vector3d(10.0, 0, 0);
+  base_track_camera->theta = static_cast<float>(SHAPE_FUSION_PI / 2.0);
   base_track_camera->direction = Eigen::Vector3f(0.0, 1.0, 0.0);
-  base_track_camera->size = Eigen::Vector3f(3.1, 2.1, 1.1);
+  base_track_camera->size = Eigen::Vector3f(3.1f, 2.1f, 1.1f);
   std::vector<base::ObjectPtr> camera_track_objects;
   camera_track_objects.push_back(base_track_camera);
 
@@ -396,7 +396,7 @@ TEST(PbfShapeFusion, camera_track) {
   base_object_lidar->anchor_point = Eigen::Vector3d(10, 0, 0);
   base_object_lidar->theta = 0.0;
   base_object_lidar->direction = Eigen::Vector3f(1, 0, 0);
-  base_object_lidar->size = Eigen::Vector3f(5.0, 2.0, 1.8);
+  base_object_lidar->size = Eigen::Vector3f(5.0f, 2.0f, 1.8f);
   std::vector<base::ObjectPtr> lidar_objects;
   lidar_objects.push_back(base_object_lidar);
 
@@ -414,8 +414,8 @@ TEST(PbfShapeFusion, camera_track) {
   base::ObjectPtr base_object_radar(new base::Object);
   base_object_radar->center = Eigen::Vector3d(10, 0, 0);
   base_object_radar->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_object_radar->theta = SHAPE_FUSION_PI / 4;
-  base_object_radar->direction = Eigen::Vector3f(0.707, 0.707, 0);
+  base_object_radar->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_object_radar->direction = Eigen::Vector3f(0.707f, 0.707f, 0);
   base_object_radar->size = Eigen::Vector3f(2.0, 1.0, 3.0);
   std::vector<base::ObjectPtr> radar_objects;
   radar_objects.push_back(base_object_radar);
@@ -444,9 +444,9 @@ TEST(PbfShapeFusion, camera_track) {
   base::ObjectPtr base_object_camera(new base::Object);
   base_object_camera->center = Eigen::Vector3d(10, 0, 0);
   base_object_camera->anchor_point = Eigen::Vector3d(10, 0, 0);
-  base_object_camera->theta = SHAPE_FUSION_PI / 4;
-  base_object_camera->direction = Eigen::Vector3f(0.707, 0.707, 0);
-  base_object_camera->size = Eigen::Vector3f(3.5, 2.5, 1.5);
+  base_object_camera->theta = static_cast<float>(SHAPE_FUSION_PI / 4.0);
+  base_object_camera->direction = Eigen::Vector3f(0.707f, 0.707f, 0.0f);
+  base_object_camera->size = Eigen::Vector3f(3.5f, 2.5f, 1.5f);
   std::vector<base::ObjectPtr> camera_objects;
   camera_objects.push_back(base_object_camera);
 
@@ -463,7 +463,7 @@ TEST(PbfShapeFusion, camera_track) {
 
   PbfShapeFusion shape_fusion(camera_track);
   shape_fusion.UpdateWithMeasurement(lidar_measurement, 100.0);
-  Eigen::Vector3f size(5.0, 2.0, 1.8);
+  Eigen::Vector3f size(5.0f, 2.0f, 1.8f);
   EXPECT_LT(
       (size - shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->size)
           .norm(),
@@ -472,7 +472,7 @@ TEST(PbfShapeFusion, camera_track) {
       shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->theta, 0.0);
 
   shape_fusion.UpdateWithMeasurement(radar_measurement, 100.0);
-  size << 3.1, 2.1, 1.1;
+  size << 3.1f, 2.1f, 1.1f;
   EXPECT_LT(
       (size - shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->size)
           .norm(),
@@ -482,7 +482,7 @@ TEST(PbfShapeFusion, camera_track) {
       SHAPE_FUSION_PI / 2);
 
   shape_fusion.UpdateWithMeasurement(camera_measurement, 100.0);
-  size << 3.5, 2.5, 1.5;
+  size << 3.5f, 2.5f, 1.5f;
   EXPECT_LT(
       (size - shape_fusion.GetTrack()->GetFusedObject()->GetBaseObject()->size)
           .norm(),

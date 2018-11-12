@@ -173,20 +173,20 @@ Type CalculateIou2DXY(const Eigen::Matrix<Type, 3, 1> &center0,
                       const Eigen::Matrix<Type, 3, 1> &size0,
                       const Eigen::Matrix<Type, 3, 1> &center1,
                       const Eigen::Matrix<Type, 3, 1> &size1) {
-  Type min_x_bbox_0 = center0(0) - size0(0) * 0.5;
-  Type min_x_bbox_1 = center1(0) - size1(0) * 0.5;
-  Type max_x_bbox_0 = center0(0) + size0(0) * 0.5;
-  Type max_x_bbox_1 = center1(0) + size1(0) * 0.5;
+  Type min_x_bbox_0 = center0(0) - size0(0) * static_cast<Type>(0.5);
+  Type min_x_bbox_1 = center1(0) - size1(0) * static_cast<Type>(0.5);
+  Type max_x_bbox_0 = center0(0) + size0(0) * static_cast<Type>(0.5);
+  Type max_x_bbox_1 = center1(0) + size1(0) * static_cast<Type>(0.5);
   Type start_x = std::max(min_x_bbox_0, min_x_bbox_1);
   Type end_x = std::min(max_x_bbox_0, max_x_bbox_1);
   Type length_x = end_x - start_x;
   if (length_x <= 0) {
     return 0;
   }
-  Type min_y_bbox_0 = center0(1) - size0(1) * 0.5;
-  Type min_y_bbox_1 = center1(1) - size1(1) * 0.5;
-  Type max_y_bbox_0 = center0(1) + size0(1) * 0.5;
-  Type max_y_bbox_1 = center1(1) + size1(1) * 0.5;
+  Type min_y_bbox_0 = center0(1) - size0(1) * static_cast<Type>(0.5);
+  Type min_y_bbox_1 = center1(1) - size1(1) * static_cast<Type>(0.5);
+  Type max_y_bbox_0 = center0(1) + size0(1) * static_cast<Type>(0.5);
+  Type max_y_bbox_1 = center1(1) + size1(1) * static_cast<Type>(0.5);
   Type start_y = std::max(min_y_bbox_0, min_y_bbox_1);
   Type end_y = std::min(max_y_bbox_0, max_y_bbox_1);
   Type length_y = end_y - start_y;

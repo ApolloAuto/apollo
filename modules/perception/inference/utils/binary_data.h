@@ -31,8 +31,8 @@ static const int kMaxStrLen = 64;
 static const int kMinDim = 1;
 static const int kMaxDim = INT_MAX;
 
-int BinaryReadString(FILE *fp, char *name);
-int BinaryWriteString(FILE *fp, const std::string &str);
+size_t BinaryReadString(FILE *fp, char *name);
+size_t BinaryWriteString(FILE *fp, const std::string &str);
 
 template<typename Dtype>
 boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp);

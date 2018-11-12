@@ -196,8 +196,8 @@ class TrackObjectDistance {
   static double s_lidar2lidar_association_center_dist_threshold_;
   static double s_lidar2radar_association_center_dist_threshold_;
   static double s_radar2radar_association_center_dist_threshold_;
-  static int s_lidar2camera_projection_downsample_target_pts_num_;
-  static int s_lidar2camera_projection_vertices_check_pts_num_;
+  static size_t s_lidar2camera_projection_downsample_target_pts_num_;
+  static size_t s_lidar2camera_projection_vertices_check_pts_num_;
 };  // class TrackObjectDistance
 
 }  // namespace fusion

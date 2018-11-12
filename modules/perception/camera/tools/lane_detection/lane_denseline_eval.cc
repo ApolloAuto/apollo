@@ -85,8 +85,8 @@ void lane_postprocessor_eval() {
   //  lane process for each image
   for (int i = 0; i < static_cast<int>(imnames.size()); i++) {
     std::string impath = imnames[i];
-    int pos1 = impath.rfind("/");
-    int pos2 = impath.rfind(".jpg");
+    int pos1 = static_cast<int>(impath.rfind("/"));
+    int pos2 = static_cast<int>(impath.rfind(".jpg"));
     FLAGS_file_title = impath.substr(pos1 + 1, pos2 - pos1 - 1);
     if (FLAGS_debug_file.length() > 0) {
       std::size_t find_pos = FLAGS_file_title.find(FLAGS_debug_file);
@@ -146,8 +146,10 @@ void lane_postprocessor_eval() {
     name_intrinsic_map["onsmi_obstacle"] = frame.camera_k_matrix;
     calibration_service_init_options.name_intrinsic_map = name_intrinsic_map;
     calibration_service_init_options.calibrator_method = "LaneLineCalibrator";
-    calibration_service_init_options.image_height = model.get_height();
-    calibration_service_init_options.image_width = model.get_width();
+    calibration_service_init_options.image_height =
+      static_cast<int>(model.get_height());
+    calibration_service_init_options.image_width =
+      static_cast<int>(model.get_width());
     std::shared_ptr<BaseCalibrationService> calibration_service;
     calibration_service.reset(
         BaseCalibrationServiceRegisterer::GetInstanceByName(

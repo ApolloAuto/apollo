@@ -105,11 +105,11 @@ T GetJaccardIndex(const T *bbox_ref, const T &x_min, const T &y_min,
 
 template<typename T>
 void GenRotMatrix(const T &ry, T *rot) {
-  rot[0] = cos(ry);
-  rot[2] = sin(ry);
+  rot[0] = static_cast<T>(cos(ry));
+  rot[2] = static_cast<T>(sin(ry));
   rot[4] = static_cast<T>(1.0f);
-  rot[6] = -sin(ry);
-  rot[8] = cos(ry);
+  rot[6] = static_cast<T>(-sin(ry));
+  rot[8] = static_cast<T>(cos(ry));
   rot[1] = rot[3] = rot[5] = rot[7] = static_cast<T>(0);
 }
 
@@ -335,7 +335,7 @@ void GetDxDzForCenterFromGroundLineSeg(const LineSegment2D<T> &ls,
       pt_of_line_seg_r[0] - pt_of_line_seg_l[0],
       pt_of_line_seg_r[1] - pt_of_line_seg_l[1],
       pt_of_line_seg_r[2] - pt_of_line_seg_l[2]};
-  T ry = -atan2(v[2], v[0]);
+  T ry = static_cast<T>(-atan2(v[2], v[0]));
   GenRotMatrix(ry, rot);
   common::ITranspose3x3(rot);
   common::IScale3(pos, (T) -1);

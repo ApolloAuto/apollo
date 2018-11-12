@@ -59,7 +59,7 @@ float LocationDistance(
       ref_dir(1) * measure_predict_diff(1);
     double dy = ref_o_dir(0) * measure_predict_diff(0) +
       ref_o_dir(1) * measure_predict_diff(1);
-    location_dist = sqrt(dx * dx * 0.5 + dy * dy * 2);
+    location_dist = static_cast<float>(sqrt(dx * dx * 0.5 + dy * dy * 2));
   }
 
   return location_dist;
@@ -91,7 +91,7 @@ float DirectionDistance(
     cos_theta = common::CalculateCosTheta2DXY<float>(track_motion_dir,
         anchor_point_shift_dir);
   }
-  float direction_dist = -cos_theta + 1.0;
+  float direction_dist = static_cast<float>(-cos_theta) + 1.0f;
 
   return direction_dist;
 }
@@ -114,18 +114,22 @@ float BboxSizeDistance(
       old_bbox_dir(1) * new_bbox_dir(1));
   double dot_val_01 = fabs(old_bbox_dir(0) * new_bbox_dir(1) -
       old_bbox_dir(1) * new_bbox_dir(0));
-  float temp_val_0 = 0.0;
-  float temp_val_1 = 0.0;
+  float temp_val_0 = 0.0f;
+  float temp_val_1 = 0.0f;
   if (dot_val_00 > dot_val_01) {
-    temp_val_0 = fabs(old_bbox_size(0) - new_bbox_size(0)) /
+    temp_val_0 =
+      static_cast<float>(fabs(old_bbox_size(0) - new_bbox_size(0))) /
       std::max(old_bbox_size(0), new_bbox_size(0));
-    temp_val_1 = fabs(old_bbox_size(1) - new_bbox_size(1)) /
+    temp_val_1 =
+      static_cast<float>(fabs(old_bbox_size(1) - new_bbox_size(1))) /
       std::max(old_bbox_size(1), new_bbox_size(1));
     size_dist = std::min(temp_val_0, temp_val_1);
   } else {
-    temp_val_0 = fabs(old_bbox_size(0) - new_bbox_size(1)) /
+    temp_val_0 =
+      static_cast<float>(fabs(old_bbox_size(0) - new_bbox_size(1))) /
       std::max(old_bbox_size(0), new_bbox_size(1));
-    temp_val_1 = fabs(old_bbox_size(1) - new_bbox_size(0)) /
+    temp_val_1 =
+      static_cast<float>(fabs(old_bbox_size(1) - new_bbox_size(0))) /
       std::max(old_bbox_size(1), new_bbox_size(0));
     size_dist = std::min(temp_val_0, temp_val_1);
   }
@@ -142,11 +146,14 @@ float PointNumDistance(
   // range from 0 and 1
 
   int old_point_number =
-    (last_object->object_ptr->lidar_supplement).cloud_world.size();
+    static_cast<int>(
+      (last_object->object_ptr->lidar_supplement).cloud_world.size());
   int new_point_number =
-    (new_object->object_ptr->lidar_supplement).cloud_world.size();
+    static_cast<int>(
+      (new_object->object_ptr->lidar_supplement).cloud_world.size());
 
-  float point_num_dist = fabs(old_point_number - new_point_number) *
+  float point_num_dist =
+    static_cast<float>(fabs(old_point_number - new_point_number)) *
     1.0f / std::max(old_point_number, new_point_number);
 
   return point_num_dist;
@@ -206,17 +213,19 @@ float BboxIouDistance(
   old_dir.normalize();
   new_dir.normalize();
   // handle randomness
-  old_size(0) = old_size(0) > 0.3 ? old_size(0) : 0.3;
-  old_size(1) = old_size(1) > 0.3 ? old_size(1) : 0.3;
-  new_size(0) = new_size(0) > 0.3 ? new_size(0) : 0.3;
-  new_size(1) = new_size(1) > 0.3 ? new_size(1) : 0.3;
+  old_size(0) = old_size(0) > 0.3f ? old_size(0) : 0.3f;
+  old_size(1) = old_size(1) > 0.3f ? old_size(1) : 0.3f;
+  new_size(0) = new_size(0) > 0.3f ? new_size(0) : 0.3f;
+  new_size(1) = new_size(1) > 0.3f ? new_size(1) : 0.3f;
   int last_object_num_pts =
-    (last_object->object_ptr->lidar_supplement).cloud_world.size();
+    static_cast<int>(
+      (last_object->object_ptr->lidar_supplement).cloud_world.size());
   int cur_obj_num_pts =
-    (new_object->object_ptr->lidar_supplement).cloud_world.size();
+    static_cast<int>(
+      (new_object->object_ptr->lidar_supplement).cloud_world.size());
   bool change_cur_obj_bbox =
     last_object_num_pts > cur_obj_num_pts ? true : false;
-  float minimum_edge_length = 0.01;
+  float minimum_edge_length = 0.01f;
   base::PointDCloud &cloud = (
       new_object->object_ptr->lidar_supplement).cloud_world;
   if (change_cur_obj_bbox) {
@@ -254,7 +263,7 @@ float BboxIouDistance(
       new_size_tmp);
   // Step 4: compute dist
   double dist = (1 - iou) * match_threshold;
-  return dist;
+  return static_cast<float>(dist);
 }
 
 }  // namespace lidar

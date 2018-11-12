@@ -102,7 +102,7 @@ TEST(TargetTest, target_test) {
   object1->camera_supplement.projected_box = bbox1;
   object1->type = base::ObjectType::VEHICLE;
   object1->sub_type = base::ObjectSubType::CAR;
-  object->size << 1.5, 1.6, 3.7;
+  object->size << 1.5f, 1.6f, 3.7f;
   object->camera_supplement.local_center << 18, 30, 24;
   frame1.detected_objects.push_back(object1);
   frame1.frame_id = 1;
@@ -176,7 +176,7 @@ TEST(TargetTest, target_test) {
   object5->type = base::ObjectType::UNKNOWN_UNMOVABLE;
   object5->sub_type =
       base::ObjectSubType::TRAFFICCONE;
-  object5->size << 1.6, 1.7, 3.8;
+  object5->size << 1.6f, 1.7f, 3.8f;
   object5->camera_supplement.local_center << 18, 30, 24;
   frame5.detected_objects.push_back(object5);
   frame5.frame_id = 0;
@@ -264,7 +264,7 @@ TEST(TargetTest, clapping_velocity_test) {
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta1.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
-      double ts = i * 0.066;
+      double ts = static_cast<double>(i) * 0.066;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
       base::BBox2DF bbox(100, 100, 200, 200);
@@ -273,14 +273,14 @@ TEST(TargetTest, clapping_velocity_test) {
       object->type = base::ObjectType::VEHICLE;
       object->sub_type =
           base::ObjectSubType::CAR;
-      object->size << 3.8, 1.8, 1.6;
+      object->size << 3.8f, 1.8f, 1.6f;
       object->camera_supplement.local_center << 20, 30, 30;
-      object->theta = pos_and_theta_vec[i][3];
+      object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
       object->center << pos_and_theta_vec[i][0],
           pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
-      frame.frame_id = i;
+      frame.frame_id = static_cast<int>(i);
       frame.timestamp = ts;
       frame.data_provider = &provider;
       if (i > 0) {
@@ -288,7 +288,8 @@ TEST(TargetTest, clapping_velocity_test) {
       }
 
       TrackObjectPtr track_obj(new TrackObject);
-      track_obj->indicator = PatchIndicator(i, 0, sensor_name);
+      track_obj->indicator =
+        PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);
@@ -331,21 +332,22 @@ TEST(TargetTest, clapping_velocity_test) {
       object->type = base::ObjectType::VEHICLE;
       object->sub_type =
           base::ObjectSubType::CAR;
-      object->size << 1.6, 1.7, 3.8;
+      object->size << 1.6f, 1.7f, 3.8f;
       object->camera_supplement.local_center << 18, 30, 24;
-      object->theta = pos_and_theta_vec[i][3];
+      object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
       object->center << pos_and_theta_vec[i][0],
           pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
-      frame.frame_id = i;
-      frame.timestamp = i * 0.066;
+      frame.frame_id = static_cast<int>(i);
+      frame.timestamp = static_cast<double>(i) * 0.066;
       frame.data_provider = &provider;
 
       TrackObjectPtr track_obj(new TrackObject);
-      track_obj->indicator = PatchIndicator(i, 0, sensor_name);
+      track_obj->indicator =
+        PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
-      track_obj->timestamp = i * 0.066;
+      track_obj->timestamp = static_cast<double>(i) * 0.066;
       target.Add(track_obj);
       ASSERT_EQ(target.Size(), i + 1);
       target.lost_age = 0;
@@ -378,7 +380,7 @@ TEST(TargetTest, clapping_velocity_test) {
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta2.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
-      double ts = i * 0.066;
+      double ts = static_cast<double>(i) * 0.066;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
       base::BBox2DF bbox(100, 100, 200, 200);
@@ -387,14 +389,14 @@ TEST(TargetTest, clapping_velocity_test) {
       object->type = base::ObjectType::VEHICLE;
       object->sub_type =
           base::ObjectSubType::CAR;
-      object->size << 3.8, 1.8, 1.6;
+      object->size << 3.8f, 1.8f, 1.6f;
       object->camera_supplement.local_center << 20, 30, 30;
-      object->theta = pos_and_theta_vec[i][3];
+      object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
       object->center << pos_and_theta_vec[i][0],
           pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
-      frame.frame_id = i;
+      frame.frame_id = static_cast<int>(i);
       frame.timestamp = ts;
       frame.data_provider = &provider;
       if (i > 0) {
@@ -402,7 +404,8 @@ TEST(TargetTest, clapping_velocity_test) {
       }
 
       TrackObjectPtr track_obj(new TrackObject);
-      track_obj->indicator = PatchIndicator(i, 0, sensor_name);
+      track_obj->indicator =
+        PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);
@@ -436,7 +439,7 @@ TEST(TargetTest, clapping_velocity_test) {
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta3.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
-      double ts = i * 0.033;
+      double ts = static_cast<double>(i) * 0.033;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
       base::BBox2DF bbox(100, 100, 200, 200);
@@ -445,14 +448,14 @@ TEST(TargetTest, clapping_velocity_test) {
       object->type = base::ObjectType::VEHICLE;
       object->sub_type =
           base::ObjectSubType::CAR;
-      object->size << 3.8, 1.8, 1.6;
+      object->size << 3.8f, 1.8f, 1.6f;
       object->camera_supplement.local_center << 20, 30, 30;
-      object->theta = pos_and_theta_vec[i][3];
+      object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
       object->center << pos_and_theta_vec[i][0],
           pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
-      frame.frame_id = i;
+      frame.frame_id = static_cast<int>(i);
       frame.timestamp = ts;
       frame.data_provider = &provider;
       if (i > 0) {
@@ -460,7 +463,8 @@ TEST(TargetTest, clapping_velocity_test) {
       }
 
       TrackObjectPtr track_obj(new TrackObject);
-      track_obj->indicator = PatchIndicator(i, 0, sensor_name);
+      track_obj->indicator =
+        PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);
@@ -495,7 +499,7 @@ TEST(TargetTest, clapping_velocity_test) {
       "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta4.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
-      double ts = i * 0.033;
+      double ts = static_cast<double>(i) * 0.033;
       CameraFrame frame;
       base::ObjectPtr object(new base::Object);
       base::BBox2DF bbox(100, 100, 200, 200);
@@ -504,14 +508,14 @@ TEST(TargetTest, clapping_velocity_test) {
       object->type = base::ObjectType::PEDESTRIAN;
       object->sub_type =
           base::ObjectSubType::PEDESTRIAN;
-      object->size << 0.5, 0.7, 1.7;
+      object->size << 0.5f, 0.7f, 1.7f;
       object->camera_supplement.local_center << 20, 30, 30;
-      object->theta = pos_and_theta_vec[i][3];
+      object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
       object->center << pos_and_theta_vec[i][0],
           pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
-      frame.frame_id = i;
+      frame.frame_id = static_cast<int>(i);
       frame.timestamp = ts;
       frame.data_provider = &provider;
       if (i > 0) {
@@ -519,7 +523,8 @@ TEST(TargetTest, clapping_velocity_test) {
       }
 
       TrackObjectPtr track_obj(new TrackObject);
-      track_obj->indicator = PatchIndicator(i, 0, sensor_name);
+      track_obj->indicator =
+        PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);

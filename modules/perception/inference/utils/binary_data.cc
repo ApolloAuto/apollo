@@ -32,9 +32,9 @@ inline std::string get_dtype(const base::Blob<float> &blob) {
   return "float32";
 }
 
-int BinaryReadString(FILE *fp, char *name) {
-  int len = 0;
-  int nmemb = fread(&len, sizeof(len), 1, fp);
+size_t BinaryReadString(FILE *fp, char *name) {
+  size_t len = 0;
+  size_t nmemb = fread(&len, sizeof(len), 1, fp);
   if (nmemb != 1 || len == 0) {
     return 0;
   }
@@ -45,8 +45,8 @@ int BinaryReadString(FILE *fp, char *name) {
   return len;
 }
 
-int BinaryWriteString(FILE *fp, const std::string &str) {
-  int len = str.length();
+size_t BinaryWriteString(FILE *fp, const std::string &str) {
+  size_t len = str.length();
   fwrite(&len, sizeof(len), 1, fp);
   fwrite(str.c_str(), sizeof(str[0]), len, fp);
   return len;
@@ -59,7 +59,7 @@ boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
   char dtype[kMaxStrLen];
 
   // read dtype
-  int nmemb = BinaryReadString(fp, dtype);
+  size_t nmemb = BinaryReadString(fp, dtype);
   CHECK_GT(nmemb, 0);
   CHECK_EQ(get_dtype(*blob), dtype);
 

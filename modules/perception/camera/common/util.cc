@@ -106,10 +106,10 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
   auto dst = dst_blob->mutable_cpu_data();
   for (int dst_y = 0; dst_y < height; dst_y++) {
     for (int dst_x = 0; dst_x < width; dst_x++) {
-      float src_x = (dst_x + 0.5) * fx - 0.5;
-      float src_y = (dst_y + 0.5) * fy - 0.5;
-      const int x1 = round(src_x);
-      const int y1 = round(src_y);
+      float src_x = (static_cast<float>(dst_x) + 0.5f) * fx - 0.5f;
+      float src_y = (static_cast<float>(dst_y) + 0.5f) * fy - 0.5f;
+      const int x1 = static_cast<int>(src_x + 0.5);
+      const int y1 = static_cast<int>(src_y + 0.5);
       const int x1_read = std::max(x1, 0);
       const int y1_read = std::max(y1, 0);
       const int x2 = x1 + 1;
@@ -122,18 +122,25 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
 
         int idx11 = (y1_read * stepwidth + x1_read) * channel;
         src_reg = src[idx11 + c];
-        out = out + (x2 - src_x) * (y2 - src_y) * src_reg;
+        out = out + (static_cast<float>(x2) - src_x) *
+              (static_cast<float>(y2) - src_y) * static_cast<float>(src_reg);
         int idx12 = (y1_read * stepwidth + x2_read) * channel;
         src_reg = src[idx12 + c];
-        out = out + src_reg * (src_x - x1) * (y2 - src_y);
+        out = out + static_cast<float>(src_reg) *
+              (static_cast<float>(src_x) - x1) *
+              (y2 - static_cast<float>(src_y));
 
         int idx21 = (y2_read * stepwidth + x1_read) * channel;
         src_reg = src[idx21 + c];
-        out = out + src_reg * (x2 - src_x) * (src_y - y1);
+        out = out + static_cast<float>(src_reg) *
+              (static_cast<float>(x2) - src_x) *
+              (src_y - static_cast<float>(y1));
 
         int idx22 = (y2_read * stepwidth + x2_read) * channel;
         src_reg = src[idx22 + c];
-        out = out + src_reg * (src_x - x1) * (src_y - y1);
+        out = out + static_cast<float>(src_reg) *
+              (src_x - static_cast<float>(x1)) *
+              (src_y - static_cast<float>(y1));
         if (out < 0) {
           out = 0;
         }

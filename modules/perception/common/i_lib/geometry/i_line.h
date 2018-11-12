@@ -38,7 +38,9 @@ inline void ILineFit2dTotalLeastSquare(T *x, T *l, int n) {
   if (n < 2) {
     return;
   }
-  T ma[4], eigv[2], mq[4];
+  T ma[4], eigv[2];
+  T mq[4]={static_cast<T>(0.0), static_cast<T>(0.0),
+           static_cast<T>(0.0), static_cast<T>(0.0)};
   //   //  compute the centroid of input data points
   int i, length = 2 * n;
   T xm = static_cast<T>(0.0);

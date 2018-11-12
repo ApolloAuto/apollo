@@ -79,8 +79,8 @@ inline typename PointT::Type CalculateEuclidenDist2DXY(const PointT &pt1,
 template <typename T>
 T CalculateCosTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
                         const Eigen::Matrix<T, 3, 1> &v2) {
-  T v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
-  T v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+  T v1_len = static_cast<T>(sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum()));
+  T v2_len = static_cast<T>(sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum()));
   if (v1_len < std::numeric_limits<T>::epsilon() ||
       v2_len < std::numeric_limits<T>::epsilon()) {
     return 0.0;
@@ -94,8 +94,8 @@ T CalculateCosTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
 template <typename T>
 T CalculateTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
                      const Eigen::Matrix<T, 3, 1> &v2) {
-  T v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
-  T v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+  T v1_len = static_cast<T>(sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum()));
+  T v2_len = static_cast<T>(sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum()));
   if (v1_len < std::numeric_limits<T>::epsilon() ||
       v2_len < std::numeric_limits<T>::epsilon()) {
     return 0.0;
@@ -116,8 +116,8 @@ T CalculateTheta2DXY(const Eigen::Matrix<T, 3, 1> &v1,
 template <typename T>
 Eigen::Matrix<T, 3, 3> CalculateRotationMat2DXY(
     const Eigen::Matrix<T, 3, 1> &v1, const Eigen::Matrix<T, 3, 1> &v2) {
-  T v1_len = sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum());
-  T v2_len = sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum());
+  T v1_len = static_cast<T>(sqrt((v1.head(2).cwiseProduct(v1.head(2))).sum()));
+  T v2_len = static_cast<T>(sqrt((v2.head(2).cwiseProduct(v2.head(2))).sum()));
   if (v1_len < std::numeric_limits<T>::epsilon() ||
       v2_len < std::numeric_limits<T>::epsilon()) {
     return Eigen::Matrix<T, 3, 3>::Zero(3, 3);
