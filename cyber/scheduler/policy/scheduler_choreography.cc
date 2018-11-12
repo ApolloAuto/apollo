@@ -75,7 +75,7 @@ SchedulerChoreography::SchedulerChoreography() {
 void SchedulerChoreography::CreateProcessor() {
   for (uint32_t i = 0; i < proc_num_; i++) {
     auto proc = std::make_shared<Processor>();
-    auto ctx = std::make_shared<ChoreoGraphyContext>();
+    auto ctx = std::make_shared<ChoreographyContext>();
 
     proc->BindContext(ctx);
     proc->SetBindCpuIndex(cpu_binding_start_index_ + i);
@@ -126,7 +126,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
       WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
       cr_ctx_[cr->id()] = pid;
     }
-    return pctxs_[pid]->Enqueue(cr);
+    return static_cast<ChoreographyContext *>(pctxs_[pid].get())->Enqueue(cr);
   } else {
     // fallback for tasks w/o processor assigned.
 
@@ -154,7 +154,8 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
     WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
     auto p = cr_ctx_.find(crid);
     if (p != cr_ctx_.end()) {
-      pctxs_[p->second]->RemoveCRoutine(crid);
+      static_cast<ChoreographyContext *>(pctxs_[p->second].get())
+          ->RemoveCRoutine(crid);
       cr_ctx_.erase(crid);
     }
   }
@@ -184,11 +185,11 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
   ReadLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
   auto it = cr_ctx_.find(crid);
   if (it != cr_ctx_.end()) {
-    PerfEventCache::Instance()->
-        AddSchedEvent(SchedPerf::NOTIFY_IN,
+    PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN,
                       crid, it->second);
 
-    pctxs_[it->second]->Notify(crid);
+    static_cast<ChoreographyContext *>(pctxs_[it->second].get())->Notify(crid);
+
     return true;
   }
 

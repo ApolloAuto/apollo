@@ -24,6 +24,7 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
