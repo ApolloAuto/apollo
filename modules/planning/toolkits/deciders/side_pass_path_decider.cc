@@ -186,8 +186,8 @@ SidePassPathDecider::GetPathBoundaries(
     const IndexedList<std::string, Obstacle> &indexed_obstacles) {
   std::vector<std::tuple<double, double, double>> lateral_bounds;
 
-  const auto nearest_obstacle = GetNearestObstacle(
-      adc_sl_boundary, reference_line, indexed_obstacles);
+  const auto nearest_obstacle =
+      GetNearestObstacle(adc_sl_boundary, reference_line, indexed_obstacles);
   if (nearest_obstacle == nullptr) {
     AERROR << "Can't find nearest obstacle.";
     return lateral_bounds;
@@ -304,11 +304,6 @@ const Obstacle *SidePassPathDecider::GetNearestObstacle(
 
     // filter out-of-lane obstacles
     if (obs_start_l > lane_left_width || obs_end_l < -lane_right_width) {
-      continue;
-    }
-    // do NOT sidepass non-vehicle obstacles.
-    if (obstacle->Perception().type() !=
-        perception::PerceptionObstacle::VEHICLE) {
       continue;
     }
     // For obstacles of interests, select the nearest one.
