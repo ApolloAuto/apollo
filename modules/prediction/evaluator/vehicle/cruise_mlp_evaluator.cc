@@ -117,8 +117,6 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
     return;
   }
-  // AINFO << "Obstacle [" << obstacle_ptr->id()
-  //       << "] is using cruise mlp evaluator.";
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
