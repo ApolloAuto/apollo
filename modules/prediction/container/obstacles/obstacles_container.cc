@@ -134,6 +134,10 @@ void ObstaclesContainer::BuildLaneGraph() {
       ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
       continue;
     }
+    if (obstacle_ptr->HasJunctionFeatureWithExits() &&
+        !obstacle_ptr->IsClosedToJunctionExit()) {
+      continue;
+    }
     obstacle_ptr->BuildLaneGraph();
   }
 }

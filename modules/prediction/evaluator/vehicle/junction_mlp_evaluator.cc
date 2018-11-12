@@ -60,6 +60,8 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  // AINFO << "Obstacle [" << id << "] is using junction evaluator.";
+
   // Assume obstacle is NOT closed to any junction exit
   if (obstacle_ptr->history_size() == 0 ||
       !obstacle_ptr->latest_feature().has_junction_feature() ||
@@ -109,7 +111,7 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   std::vector<double> junction_feature_values;
   SetJunctionFeatureValues(obstacle_ptr, &junction_feature_values);
   if (junction_feature_values.size() != JUNCTION_FEATURE_SIZE) {
-    ADEBUG << "Obstacle [" << id << "] has fewer than "
+    AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected junction feature_values"
            << junction_feature_values.size() << ".";
     return;
@@ -227,9 +229,10 @@ std::vector<double> JunctionMLPEvaluator::ComputeProbability(
       layer_output.clear();
     }
     const Layer& layer = model_ptr_->layer(i);
-    for (int col = 0; col < layer.layer_output_dim(); ++col) {
+    for (int col = 0; col < layer.layer_input_weight().rows(0).columns_size();
+         ++col) {
       double neuron_output = layer.layer_bias().columns(col);
-      for (int row = 0; row < layer.layer_input_dim(); ++row) {
+      for (int row = 0; row < layer.layer_input_weight().rows_size(); ++row) {
         double weight = layer.layer_input_weight().rows(row).columns(col);
         neuron_output += (layer_input[row] * weight);
       }
@@ -241,9 +244,9 @@ std::vector<double> JunctionMLPEvaluator::ComputeProbability(
         neuron_output = std::tanh(neuron_output);
       }
       layer_output.push_back(neuron_output);
-      if (layer.layer_activation_func() == Layer::SOFTMAX) {
-        layer_output = apollo::prediction::math_util::Softmax(layer_output);
-      }
+    }
+    if (layer.layer_activation_func() == Layer::SOFTMAX) {
+      layer_output = apollo::prediction::math_util::Softmax(layer_output);
     }
   }
   return layer_output;

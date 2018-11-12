@@ -39,6 +39,9 @@ void JunctionPredictor::Predict(Obstacle* obstacle) {
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
+  // AINFO << "Obstacle [" << obstacle->id()
+  //       << "] is using junction evaluator.";
+
   const Feature& latest_feature = obstacle->latest_feature();
   std::vector<JunctionExit> junction_exits =
       MostLikelyJunctions(latest_feature);

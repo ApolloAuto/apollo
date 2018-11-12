@@ -28,6 +28,7 @@
 #include "modules/prediction/predictor/single_lane/single_lane_predictor.h"
 #include "modules/prediction/predictor/regional/regional_predictor.h"
 #include "modules/prediction/predictor/empty/empty_predictor.h"
+#include "modules/prediction/predictor/junction/junction_predictor.h"
 
 namespace apollo {
 namespace prediction {
@@ -46,6 +47,7 @@ void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
   RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
   RegisterPredictor(ObstacleConf::EMPTY_PREDICTOR);
+  RegisterPredictor(ObstacleConf::JUNCTION_PREDICTOR);
 }
 
 void PredictorManager::Init(const PredictionConf& config) {
@@ -167,10 +169,13 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       } else {
         switch (perception_obstacle.type()) {
           case PerceptionObstacle::VEHICLE: {
-            if (obstacle->IsOnLane()) {
+            if (obstacle->HasJunctionFeatureWithExits() &&
+                !obstacle->IsClosedToJunctionExit()) {
+              predictor = GetPredictor(vehicle_in_junction_predictor_);
+              CHECK_NOTNULL(predictor);
+            } else if (obstacle->IsOnLane()) {
               predictor = GetPredictor(vehicle_on_lane_predictor_);
-            } else {
-              predictor = GetPredictor(vehicle_off_lane_predictor_);
+              CHECK_NOTNULL(predictor);
             }
             break;
           }
@@ -244,6 +249,10 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
     }
     case ObstacleConf::REGIONAL_PREDICTOR: {
       predictor_ptr.reset(new RegionalPredictor());
+      break;
+    }
+    case ObstacleConf::JUNCTION_PREDICTOR: {
+      predictor_ptr.reset(new JunctionPredictor());
       break;
     }
     default: { break; }

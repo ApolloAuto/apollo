@@ -98,6 +98,9 @@ class PredictorManager {
   ObstacleConf::PredictorType vehicle_off_lane_predictor_ =
       ObstacleConf::FREE_MOVE_PREDICTOR;
 
+  ObstacleConf::PredictorType vehicle_in_junction_predictor_ =
+      ObstacleConf::JUNCTION_PREDICTOR;
+
   ObstacleConf::PredictorType cyclist_on_lane_predictor_ =
       ObstacleConf::LANE_SEQUENCE_PREDICTOR;
 
