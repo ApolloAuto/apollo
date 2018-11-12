@@ -79,6 +79,9 @@ cc_library(
     hdrs = [
         "py_message.h",
     ],
+    deps = [
+        "protobuf_factory"
+    ],
 )
 
 cc_library(
@@ -96,6 +99,9 @@ cc_library(
     name = "raw_message",
     hdrs = [
         "raw_message.h",
+    ],
+    deps = [
+        "protobuf_factory"
     ],
 )
 

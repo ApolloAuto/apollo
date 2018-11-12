@@ -118,6 +118,7 @@ cc_library(
     srcs = [ "dispatcher/intra_dispatcher.cc", ],
     hdrs = [ "dispatcher/intra_dispatcher.h", ],
     deps = [
+        "//cyber/message:message_traits",
         "//cyber/proto:role_attributes_cc_proto",
         "dispatcher",
     ],

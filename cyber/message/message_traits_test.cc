@@ -24,14 +24,88 @@ namespace apollo {
 namespace cyber {
 namespace message {
 
+class Data {
+  uint64_t timestamp;
+  std::string content;
+};
+
+class Message {
+ public:
+  std::string content;
+  bool SerializeToString(std::string* str) const {
+    *str = content;
+    return true;
+  }
+  bool ParseFromString(const std::string& str) {
+    content = str;
+    return true;
+  }
+
+  static void GetDescriptorString(const std::string&, std::string* str) {
+    *str = "message";
+  }
+  std::string TypeName() { return "type"; }
+};
+
+class Intra : public IntraMessage {};
+
+TEST(MessageTraitsTest, type_trait) {
+  EXPECT_FALSE(HasType<Data>::value);
+  EXPECT_FALSE(HasSerializer<Data>::value);
+  EXPECT_FALSE(HasDescriptor<Data>::value);
+
+  EXPECT_TRUE(HasType<Message>::value);
+  EXPECT_TRUE(HasSerializer<Message>::value);
+  EXPECT_TRUE(HasDescriptor<Message>::value);
+
+  EXPECT_TRUE(HasSerializer<proto::UnitTest>::value);
+
+  EXPECT_TRUE(HasType<IntraMessage>::value);
+  EXPECT_TRUE(HasSerializer<IntraMessage>::value);
+  EXPECT_FALSE(HasDescriptor<IntraMessage>::value);
+
+  EXPECT_TRUE(HasType<Intra>::value);
+  EXPECT_TRUE(HasSerializer<Intra>::value);
+  EXPECT_FALSE(HasDescriptor<Intra>::value);
+
+  EXPECT_TRUE(HasType<PyMessageWrap>::value);
+  EXPECT_TRUE(HasSerializer<PyMessageWrap>::value);
+  EXPECT_TRUE(HasDescriptor<PyMessageWrap>::value);
+
+  EXPECT_TRUE(HasType<RawMessage>::value);
+  EXPECT_TRUE(HasSerializer<RawMessage>::value);
+  EXPECT_TRUE(HasDescriptor<RawMessage>::value);
+}
+
 TEST(MessageTraitsTest, serialize_to_string) {
   std::string str("");
+
+  // protobuf message
   proto::UnitTest ut;
   ut.set_class_name("MessageTraits");
   ut.set_case_name("serialize_to_string");
-
   EXPECT_TRUE(SerializeToString(ut, &str));
   EXPECT_EQ(str, "\n\rMessageTraits\x12\x13serialize_to_string");
+
+  str = "";
+  Data data;
+  EXPECT_FALSE(SerializeToString(data, &str));
+  EXPECT_EQ("", str);
+
+  str = "";
+  Message msg{"content"};
+  EXPECT_TRUE(SerializeToString(msg, &str));
+  EXPECT_EQ("content", str);
+
+  str = "";
+  Intra intra;
+  EXPECT_FALSE(SerializeToString(intra, &str));
+  EXPECT_EQ("", str);
+
+  str = "";
+  RawMessage raw("content");
+  EXPECT_TRUE(SerializeToString(raw, &str));
+  EXPECT_EQ("content", str);
 }
 
 TEST(MessageTraitsTest, parse_from_string) {
@@ -40,6 +114,20 @@ TEST(MessageTraitsTest, parse_from_string) {
   EXPECT_TRUE(ParseFromString(str, &ut));
   EXPECT_EQ(ut.class_name(), "MessageTraits");
   EXPECT_EQ(ut.case_name(), "parse_from_string");
+
+  Data data;
+  EXPECT_FALSE(ParseFromString(str, &data));
+
+  Message msg{"content"};
+  EXPECT_TRUE(ParseFromString(str, &msg));
+  EXPECT_EQ("\n\rMessageTraits\x12\x11parse_from_string", msg.content);
+
+  Intra intra;
+  EXPECT_FALSE(ParseFromString(str, &intra));
+
+  RawMessage raw;
+  EXPECT_TRUE(ParseFromString(str, &raw));
+  EXPECT_EQ(str, raw.message);
 }
 
 TEST(MessageTraitsTest, message_type) {
@@ -49,6 +137,47 @@ TEST(MessageTraitsTest, message_type) {
   proto::UnitTest ut;
   msg_type = MessageType(ut);
   EXPECT_EQ(msg_type, "apollo.cyber.proto.UnitTest");
+
+  msg_type = MessageType<IntraMessage>();
+  EXPECT_EQ(msg_type, "IntraMessage");
+
+  msg_type = MessageType<Intra>();
+  EXPECT_EQ(msg_type, "IntraMessage");
+
+  Intra intra;
+  msg_type = MessageType(intra);
+  EXPECT_EQ(msg_type, "IntraMessage");
+}
+
+TEST(MessageTraitsTest, descriptor) {
+  const std::string pb_desc =
+      "\nd\n\x1B"
+      "cyber/proto/unit_test.proto\x12\x12"
+      "apollo.cyber.proto\"1\n\bUnitTest\x12\x12\n\nclass_name\x18\x1 "
+      "\x1(\t\x12\x11\n\tcase_name\x18\x2 \x1(\t";
+  std::string desc;
+  GetDescriptorString<proto::UnitTest>("apollo.cyber.proto.UnitTest", &desc);
+  EXPECT_EQ(pb_desc, desc);
+
+  desc = "";
+  GetDescriptorString<RawMessage>("apollo.cyber.proto.UnitTest", &desc);
+  EXPECT_EQ(pb_desc, desc);
+
+  desc = "";
+  GetDescriptorString<IntraMessage>("apollo", &desc);
+  EXPECT_EQ("", desc);
+
+  desc = "";
+  GetDescriptorString<Intra>("apollo", &desc);
+  EXPECT_EQ("", desc);
+
+  desc = "";
+  GetDescriptorString<Data>("apollo", &desc);
+  EXPECT_EQ("", desc);
+
+  desc = "";
+  GetDescriptorString<Message>("apollo", &desc);
+  EXPECT_EQ("message", desc);
 }
 
 }  // namespace message

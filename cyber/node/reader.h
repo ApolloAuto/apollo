@@ -200,7 +200,8 @@ void Reader<MessageT>::JoinTheTopology() {
   for (auto& writer : writers) {
     receiver_->Enable(writer);
   }
-  channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_READER);
+  channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_READER,
+                         message::HasSerializer<MessageT>::value);
 }
 
 template <typename MessageT>

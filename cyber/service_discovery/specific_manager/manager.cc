@@ -92,7 +92,8 @@ void Manager::Shutdown() {
   signal_.DisconnectAllSlots();
 }
 
-bool Manager::Join(const RoleAttributes& attr, RoleType role) {
+bool Manager::Join(const RoleAttributes& attr, RoleType role,
+                   bool need_publish) {
   if (is_shutdown_.load()) {
     ADEBUG << "the manager has been shut down.";
     return false;
@@ -102,7 +103,7 @@ bool Manager::Join(const RoleAttributes& attr, RoleType role) {
   ChangeMsg msg;
   Convert(attr, role, OperateType::OPT_JOIN, &msg);
   Dispose(msg);
-  if (NeedPublish(msg)) {
+  if (need_publish) {
     return Publish(msg);
   }
   return true;

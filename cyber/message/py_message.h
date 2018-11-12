@@ -22,13 +22,13 @@
 #include <string>
 
 #include "cyber/common/macros.h"
+#include "cyber/message/protobuf_factory.h"
 
 namespace apollo {
 namespace cyber {
 namespace message {
 
-static const char* const PY_MESSAGE_FULLNAME = "apollo.cyber.message.PyMessage";
-// static const std::string data_split_pattern = "#@";
+const char* const PY_MESSAGE_FULLNAME = "apollo.cyber.message.PyMessage";
 
 class PyMessageWrap {
  public:
@@ -53,6 +53,8 @@ class PyMessageWrap {
   bool ParseFromArray(const void* data, int size);
   bool ParseFromString(const std::string& msgstr);
   int ByteSize() const;
+  static void GetDescriptorString(const std::string& type,
+                                  std::string* desc_str);
 
   const std::string& data() const;
   void set_data(const std::string& msg);
@@ -63,6 +65,11 @@ class PyMessageWrap {
   std::string data_;
   std::string type_name_;
 };
+
+inline void PyMessageWrap::GetDescriptorString(const std::string& type,
+                                               std::string* desc_str) {
+  ProtobufFactory::Instance()->GetDescriptorString(type, desc_str);
+}
 
 inline void PyMessageWrap::set_data(const std::string& msg) { data_ = msg; }
 

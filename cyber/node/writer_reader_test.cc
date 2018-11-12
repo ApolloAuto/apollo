@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "cyber/common/global_data.h"
+#include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/node/reader.h"
 #include "cyber/node/writer.h"
@@ -246,6 +247,49 @@ TEST(WriterReaderTest, get_delay_sec) {
   sleep(1);
   reader.Enqueue(std::make_shared<proto::UnitTest>());
   EXPECT_GT(reader.GetDelaySec(), 1);
+}
+
+class Message {
+ public:
+  uint64_t timestamp;
+  std::string content;
+  // void GetDescriptorString(const std::string& type, std::string* desc_str) {}
+};
+
+TEST(WriterReaderTest, user_defined_message) {
+  proto::RoleAttributes attr;
+  attr.set_channel_name("/internal_channel");
+  auto channel_id = common::GlobalData::RegisterChannel(attr.channel_name());
+  attr.set_channel_id(channel_id);
+  attr.mutable_qos_profile()->set_depth(10);
+
+  EXPECT_EQ(false, message::HasSerializer<Message>::value);
+  EXPECT_EQ(false, message::HasType<Message>::value);
+
+  auto node = CreateNode("node");
+
+  auto writer = node->CreateWriter<Message>(attr);
+  auto reader = node->CreateReader<Message>(attr);
+
+  auto msg = std::make_shared<Message>();
+  msg->timestamp = 100;
+  msg->content = "message";
+
+  writer->Write(msg);
+  usleep(10000);
+
+  writer->Write(msg);
+  usleep(10000);
+
+  writer->Write(msg);
+  usleep(10000);
+
+  reader->Observe();
+  ASSERT_TRUE(reader->HasReceived());
+  ASSERT_FALSE(reader->Empty());
+  auto latest = reader->GetLatestObserved();
+  EXPECT_EQ(latest->timestamp, 100);
+  EXPECT_EQ(latest->content, "message");
 }
 
 }  // namespace cyber

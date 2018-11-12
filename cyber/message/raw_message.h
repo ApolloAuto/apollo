@@ -22,12 +22,13 @@
 #include <memory>
 #include <string>
 
+#include "cyber/message/protobuf_factory.h"
+
 namespace apollo {
 namespace cyber {
 namespace message {
 
 struct RawMessage {
- public:
   RawMessage() : message(""), timestamp(0) {}
 
   explicit RawMessage(const std::string &data) : message(data), timestamp(0) {}
@@ -47,6 +48,11 @@ struct RawMessage {
   }
 
   ~RawMessage() {}
+
+  static void GetDescriptorString(const std::string &type,
+                                  std::string *desc_str) {
+    ProtobufFactory::Instance()->GetDescriptorString(type, desc_str);
+  }
 
   bool SerializeToArray(void *data, int size) const {
     if (data == nullptr) {
