@@ -50,7 +50,7 @@ TEST_F(StopSignUnprotectedScenarioTest, VerifyConf) {
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_side_pass_config_file, &config));
+      FLAGS_scenario_stop_sign_unprotected_config_file, &config));
 }
 
 TEST_F(StopSignUnprotectedScenarioTest, Init) {
@@ -61,8 +61,8 @@ TEST_F(StopSignUnprotectedScenarioTest, Init) {
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
       FLAGS_scenario_stop_sign_unprotected_config_file, &config));
-  ScenarioContext context;
 
+  ScenarioContext context;
   scenario_.reset(new StopSignUnprotectedScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
 }

@@ -33,7 +33,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign_protected {
+namespace traffic_light {
 
 class TrafficLightRightTurnUnprotectedScenarioTest : public ::testing::Test {
  public:
@@ -46,28 +46,32 @@ class TrafficLightRightTurnUnprotectedScenarioTest : public ::testing::Test {
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
       "//apollo/modules/planning/conf/"
-      "scenario_stop_sign_unprotected_config.pb.txt";
+      "scenario_traffic_light_right_turn_unprotected_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_side_pass_config_file, &config));
+      FLAGS_scenario_traffic_light_right_turn_unprotected_config_file,
+      &config));
 }
 
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, Init) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
       "//apollo/modules/planning/testdata/conf/"
-      "scenario_stop_sign_unprotected_config.pb.txt";
+      "scenario_traffic_light_right_turn_unprotected_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_stop_sign_unprotected_config_file, &config));
-  ScenarioContext context;
+      FLAGS_scenario_traffic_light_right_turn_unprotected_config_file,
+      &config));
 
-  scenario_.reset(new TrafficLightRightTurnUnprotectedScenario(config, &context));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::STOP_SIGN_UNPROTECTED);
+  ScenarioContext context;
+  scenario_.reset(new TrafficLightRightTurnUnprotectedScenario(config,
+                                                               &context));
+  EXPECT_EQ(scenario_->scenario_type(),
+            ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED);
 }
 
-}  // namespace stop_sign_protected
+}  // namespace traffic_light
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
