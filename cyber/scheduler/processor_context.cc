@@ -35,11 +35,6 @@ void ProcessorContext::RemoveCRoutine(uint64_t cr_id) {
   }
 }
 
-int ProcessorContext::RqSize() {
-  ReadLockGuard<AtomicRWLock> rw(rw_lock_);
-  return cr_container_.size();
-}
-
 void ProcessorContext::Notify(uint64_t cr_id) {
   ReadLockGuard<AtomicRWLock> rw(rw_lock_);
   auto iter = cr_container_.find(cr_id);

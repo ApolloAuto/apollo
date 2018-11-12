@@ -19,16 +19,28 @@
 
 #include "cyber/scheduler/scheduler.h"
 
+#include <unordered_map>
+#include <memory>
+#include <string>
+
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::base::AtomicRWLock;
+
 class SchedulerChoreography : public Scheduler {
  public:
   SchedulerChoreography();
+  bool RemoveTask(const std::string& name) override;
 
  private:
   void CreateProcessor() override;
+  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
+  bool NotifyProcessor(uint64_t crid) override;
+
+  AtomicRWLock cr_ctx_lock_;
+  std::unordered_map<uint64_t, uint32_t> cr_ctx_;
 };
 
 }  // namespace scheduler

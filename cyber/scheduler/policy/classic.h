@@ -22,31 +22,24 @@
 #include <memory>
 #include <vector>
 
-#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/scheduler/processor_context.h"
-
-#define MAX_SCHED_PRIORITY 20
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
 using croutine::CRoutine;
-using apollo::cyber::base::AtomicRWLock;
-using apollo::cyber::base::ReadLockGuard;
-using apollo::cyber::base::WriteLockGuard;
+
+#define MAX_PRIO 20
 
 class ClassicContext : public ProcessorContext {
  public:
-  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
-  bool Enqueue(const std::shared_ptr<CRoutine> cr) override;
   std::shared_ptr<CRoutine> NextRoutine() override;
 
- private:
   alignas(CACHELINE_SIZE) static std::array<AtomicRWLock,
-                                            MAX_SCHED_PRIORITY> rw_locks_;
+                                            MAX_PRIO> rq_locks_;
   alignas(CACHELINE_SIZE) static std::array<
-      std::vector<std::shared_ptr<CRoutine>>, MAX_SCHED_PRIORITY> rq_;
+      std::vector<std::shared_ptr<CRoutine>>, MAX_PRIO> rq_;
 };
 
 }  // namespace scheduler

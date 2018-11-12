@@ -16,13 +16,9 @@
 
 #include "cyber/scheduler/policy/classic.h"
 
-#include <functional>
-#include <memory>
-#include <unordered_map>
-
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
-#include "cyber/scheduler/scheduler.h"
+#include "cyber/scheduler/policy/scheduler_classic.h"
 
 namespace apollo {
 namespace cyber {
@@ -31,56 +27,21 @@ namespace scheduler {
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-std::array<AtomicRWLock, MAX_SCHED_PRIORITY> ClassicContext::rw_locks_;
-std::array<std::vector<std::shared_ptr<CRoutine>>, MAX_SCHED_PRIORITY>
+std::array<AtomicRWLock, MAX_PRIO> ClassicContext::rq_locks_;
+std::array<std::vector<std::shared_ptr<CRoutine>>, MAX_PRIO>
     ClassicContext::rq_;
-
-bool ClassicContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
-  std::unordered_map<uint64_t, uint32_t>& rt_ctx =
-      Scheduler::Instance()->RtCtx();
-  if (rt_ctx.find(cr->id()) == rt_ctx.end()) {
-    return false;
-  }
-
-  return Enqueue(cr);
-}
-
-bool ClassicContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
-  {
-    WriteLockGuard<AtomicRWLock> rw(rw_lock_);
-    if (cr->priority() < 0 || cr->priority() >= MAX_SCHED_PRIORITY) {
-      return false;
-    }
-
-    if (cr_container_.find(cr->id()) != cr_container_.end()) {
-      return false;
-    }
-
-    cr_container_[cr->id()] = cr;
-  }
-
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
-                                            cr->processor_id());
-
-  WriteLockGuard<AtomicRWLock> rw_lock(rw_locks_[cr->priority()]);
-  rq_[cr->priority()].emplace_back(cr);
-
-  return true;
-}
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   if (unlikely(stop_)) {
     return nullptr;
   }
-
-  for (int i = MAX_SCHED_PRIORITY - 1; i >= 0; --i) {
-    ReadLockGuard<AtomicRWLock> rw_lock(rw_locks_[i]);
+  for (int i = MAX_PRIO - 1; i >= 0; --i) {
+    ReadLockGuard<AtomicRWLock> lk(rq_locks_[i]);
     for (auto it = rq_[i].begin(); it != rq_[i].end(); ++it) {
       auto cr = (*it);
       if (!cr->Acquire()) {
         continue;
       }
-
       if (cr->UpdateState() == RoutineState::READY) {
         PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
                                                   cr->processor_id());
@@ -90,7 +51,6 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
     }
   }
 
-  notified_.clear();
   return nullptr;
 }
 

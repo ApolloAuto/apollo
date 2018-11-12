@@ -62,10 +62,8 @@ class ProcessorContext {
   std::shared_ptr<Processor> Proc() { return processor_; }
 
   virtual void Notify(uint64_t cr_id);
-  virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;
-  virtual bool Enqueue(const std::shared_ptr<CRoutine>) = 0;
+  virtual bool Enqueue(const std::shared_ptr<CRoutine>) { return true; }  //= 0;
   void RemoveCRoutine(uint64_t cr_id);
-  int RqSize();
 
   virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
 

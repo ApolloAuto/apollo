@@ -19,6 +19,11 @@
 
 #include "cyber/scheduler/scheduler.h"
 
+#include <memory>
+#include <string>
+
+#include "cyber/base/atomic_rw_lock.h"
+
 namespace apollo {
 namespace cyber {
 namespace scheduler {
@@ -26,9 +31,13 @@ namespace scheduler {
 class SchedulerClassic : public Scheduler {
  public:
   SchedulerClassic();
+  std::shared_ptr<CRoutine> NextRoutine();
+  bool RemoveTask(const std::string& name) override;
 
  private:
   void CreateProcessor() override;
+  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
+  bool NotifyProcessor(uint64_t crid) override;
 };
 
 }  // namespace scheduler

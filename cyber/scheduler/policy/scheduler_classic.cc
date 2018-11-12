@@ -20,12 +20,15 @@
 
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/policy/classic.h"
+#include "cyber/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
+using apollo::cyber::event::PerfEventCache;
+using apollo::cyber::event::SchedPerf;
 
 SchedulerClassic::SchedulerClassic() {
   sched_policy_ = SchedPolicy::CLASSIC;
@@ -43,8 +46,6 @@ SchedulerClassic::SchedulerClassic() {
     auto itr = sched_confs_.find(sname);
     if (itr != sched_confs_.end()) {
       proc_num_ = itr->second.proc_num();
-      // just for compatible
-      task_pool_size_ = proc_num_;
       cpu_binding_start_index_ = itr->second.cpu_binding_start_index();
     }
   }
@@ -53,7 +54,6 @@ SchedulerClassic::SchedulerClassic() {
   if (proc_num_ == 0) {
     proc_num_ = std::thread::hardware_concurrency();
     // FIXME: other vals ... ?
-    proc_num_ = 2;
   }
   // Currently for compatible with task/task_manager.cc,
   // will be deleted at last:
@@ -71,14 +71,85 @@ void SchedulerClassic::CreateProcessor() {
     proc->BindContext(ctx);
     proc->SetBindCpuIndex(cpu_binding_start_index_ + i);
     ctx->BindProc(proc);
-    proc_ctxs_.emplace_back(ctx);
+    pctxs_.emplace_back(ctx);
 
     proc->Start();
   }
 }
 
+bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
+  // Check if task exists already.
+  for (int i = MAX_PRIO - 1; i >= 0; --i) {
+    ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
+
+    for (auto it = ClassicContext::rq_[i].begin();
+          it != ClassicContext::rq_[i].end(); ++it) {
+      if ((*it)->id() == cr->id()) {
+        return false;
+      }
+    }
+  }
+
+  // Check if task prio is resonable.
+  if (cr->priority() < 0 || cr->priority() >= MAX_PRIO) {
+    return false;
+  }
+
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
+                                            cr->processor_id());
+
+  // Enqueue task.
+  WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[cr->priority()]);
+  ClassicContext::rq_[cr->priority()].emplace_back(cr);
+
+  return true;
+}
+
+bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
+  if (unlikely(stop_)) {
+    return true;
+  }
+
+  for (int i = MAX_PRIO - 1; i >= 0; --i) {
+    ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
+
+    for (auto it = ClassicContext::rq_[i].begin();
+          it != ClassicContext::rq_[i].end(); ++it) {
+      if ((*it)->id() == crid) {
+        if ((*it)->state() == RoutineState::DATA_WAIT) {
+          (*it)->SetUpdateFlag();
+        }
+        // FIXME: notify processor.
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+bool SchedulerClassic::RemoveTask(const std::string& name) {
+  if (unlikely(stop_)) {
+    return true;
+  }
+
+  auto crid = GlobalData::RegisterTaskName(name);
+
+  for (int i = MAX_PRIO - 1; i >= 0; --i) {
+    WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
+
+    for (auto it = ClassicContext::rq_[i].begin();
+          it != ClassicContext::rq_[i].end(); ++it) {
+      if ((*it)->id() == crid) {
+        ClassicContext::rq_[i].erase(it);
+        break;
+      }
+    }
+  }
+
+  return true;
+}
+
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
-
-
