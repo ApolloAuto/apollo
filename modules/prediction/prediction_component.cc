@@ -216,15 +216,15 @@ void PredictionComponent::OnPerception(
   // Scenario analysis
   // ScenarioManager::Instance()->Run();
 
-  // TODO(kechxu) refactor logic of build lane graph and build junction feature
-  // Set up obstacle cluster
-  obstacles_container->BuildLaneGraph();
-
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
     JunctionAnalyzer::Init(scenario.junction_id());
     obstacles_container->BuildJunctionFeature();
   }
+
+  // TODO(kechxu) refactor logic of build lane graph and build junction feature
+  // Set up obstacle cluster
+  obstacles_container->BuildLaneGraph();
 
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";

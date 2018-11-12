@@ -188,7 +188,7 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
   }
   JunctionInfoPtr junction = ego_trajectory_container->ADCJunction();
   // TODO(all) change need_consider to false once map is fixed
-  bool need_consider = false;
+  bool need_consider = true;
   if (junction == nullptr) {
     return;
   }
