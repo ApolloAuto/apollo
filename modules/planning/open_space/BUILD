@@ -211,7 +211,7 @@ cc_library(
 
 cc_test(
     name = "hybrid_a_star_test",
-    size = "medium",
+    size = "small",
     srcs = [
         "hybrid_a_star_test.cc",
     ],

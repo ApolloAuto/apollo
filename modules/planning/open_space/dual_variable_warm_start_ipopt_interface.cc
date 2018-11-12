@@ -214,16 +214,6 @@ bool DualVariableWarmStartIPOPTInterface::eval_f(int n, const double* x,
 bool DualVariableWarmStartIPOPTInterface::eval_grad_f(int n, const double* x,
                                                       bool new_x,
                                                       double* grad_f) {
-  // std::fill(grad_f, grad_f + n, 0.0);
-  // int d_index = d_start_index_;
-  // // 3. dual variable n, [0, obstacles_num-1] * [0, horizon_]
-  // for (int i = 0; i < horizon_ + 1; ++i) {
-  //   for (int j = 0; j < obstacles_num_; ++j) {
-  //     grad_f[d_index] = weight_d_;
-  //     ++d_index;
-  //   }
-  // }
-  // return true;
   gradient(tag_f, n, x, grad_f);
   return true;
 }
@@ -474,7 +464,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
 
   ADEBUG << "eval_jac_g done";
   return true;
-}  // namespace planning
+}
 
 void DualVariableWarmStartIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,

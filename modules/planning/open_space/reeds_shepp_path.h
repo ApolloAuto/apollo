@@ -76,10 +76,9 @@ class ReedShepp {
                    const std::shared_ptr<Node3d> end_node,
                    std::vector<ReedSheppPath>* all_possible_paths);
   // Set local exact configurations profile of each movement primitive
-  bool GenerateLocalConfigurations(
-      const std::shared_ptr<Node3d> start_node,
-      const std::shared_ptr<Node3d> end_node,
-      std::vector<ReedSheppPath>* all_possible_paths);
+  bool GenerateLocalConfigurations(const std::shared_ptr<Node3d> start_node,
+                                   const std::shared_ptr<Node3d> end_node,
+                                   ReedSheppPath* shortest_path);
   // Interpolation usde in GenetateLocalConfiguration
   void Interpolation(int index, double pd, char m, double ox, double oy,
                      double ophi, std::vector<double>* px,
