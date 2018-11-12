@@ -130,7 +130,7 @@ bool SegmentationComponent::InternalProc(
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Fail to get pose at time: " << std::to_string(
                                                   lidar_query_tf_timestamp);
-    return true;
+    return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
       sensor_name_, "segmentation_1::get_lidar_to_world_pose");
@@ -146,6 +146,7 @@ bool SegmentationComponent::InternalProc(
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     AERROR << "Lidar segmentation process error, " << ret.log;
+    return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name_,
                                            "segmentation_2::segment_obstacle");
