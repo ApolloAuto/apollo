@@ -21,8 +21,8 @@
 #include "cyber/common/util.h"
 #include "cyber/data/data_visitor.h"
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/policy/scheduler_classic.h"
@@ -42,7 +42,6 @@ Scheduler* Scheduler::Instance() {
 
   if (unlikely(!instance)) {
     SchedPolicy spolicy = SchedPolicy::CLASSIC;
-    // SchedPolicy spolicy = SchedPolicy::CHOREO;
 
     // Get sched policy from conf
     auto gconf = GlobalData::Instance()->Config();
@@ -80,10 +79,10 @@ void Scheduler::ShutDown() {
     return;
   }
 
-  for (auto& proc_ctx : proc_ctxs_) {
-    proc_ctx->ShutDown();
+  for (auto& ctx : pctxs_) {
+    ctx->ShutDown();
   }
-  proc_ctxs_.clear();
+  pctxs_.clear();
 }
 
 bool Scheduler::CreateTask(const RoutineFactory& factory,
@@ -100,14 +99,6 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   }
 
   auto task_id = GlobalData::RegisterTaskName(name);
-  {
-    ReadLockGuard<AtomicRWLock> rg(rw_lock_);
-    if (cr_ctx_.find(task_id) != cr_ctx_.end()) {
-      AERROR << "Routine [" << name << "] has been exists";
-      return false;
-    }
-    cr_ctx_[task_id] = 0;
-  }
 
   auto cr = std::make_shared<CRoutine>(func);
   cr->set_id(task_id);
@@ -124,10 +115,10 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
     }
   }
 
-  WriteLockGuard<AtomicRWLock> rg(rw_lock_);
-  if (!proc_ctxs_[0]->DispatchTask(cr)) {
-    return false;
+  if (!DispatchTask(cr)) {
+      return false;
   }
+
   if (visitor != nullptr) {
     visitor->RegisterNotifyCallback([this, task_id, name]() {
       if (stop_) {
@@ -139,57 +130,11 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   return true;
 }
 
-bool Scheduler::NotifyTask(uint64_t task_id) {
+bool Scheduler::NotifyTask(uint64_t crid) {
   if (stop_) {
     return true;
   }
-  return NotifyProcessor(task_id);
-}
-
-bool Scheduler::NotifyProcessor(uint64_t cr_id) {
-  if (stop_) {
-    return true;
-  }
-
-  ReadLockGuard<AtomicRWLock> rg(rw_lock_);
-  auto itr = cr_ctx_.find(cr_id);
-  if (itr != cr_ctx_.end()) {
-    PerfEventCache::Instance()->
-        AddSchedEvent(SchedPerf::NOTIFY_IN,
-                      cr_id, itr->second);
-
-    proc_ctxs_[itr->second]->Notify(cr_id);
-    return true;
-  }
-  return false;
-}
-
-bool Scheduler::RemoveTask(const std::string& name) {
-  if (stop_) {
-    return true;
-  }
-
-  auto task_id = GlobalData::RegisterTaskName(name);
-  bool ret = RemoveCRoutine(task_id);
-  if (ret) {
-    WriteLockGuard<AtomicRWLock> wg(rw_lock_);
-    cr_ctx_.erase(task_id);
-  }
-  return ret;
-}
-
-bool Scheduler::RemoveCRoutine(uint64_t cr_id) {
-  if (stop_) {
-    return true;
-  }
-
-  WriteLockGuard<AtomicRWLock> rw(rw_lock_);
-  auto p = cr_ctx_.find(cr_id);
-  if (p != cr_ctx_.end()) {
-    cr_ctx_.erase(cr_id);
-    proc_ctxs_[p->second]->RemoveCRoutine(cr_id);
-  }
-  return true;
+  return NotifyProcessor(crid);
 }
 
 }  // namespace scheduler

@@ -64,29 +64,6 @@ std::shared_ptr<CRoutine> ChoreoGraphyContext::NextRoutine() {
   return nullptr;
 }
 
-bool ChoreoGraphyContext::DispatchTask(const std::shared_ptr<CRoutine> cr) {
-  auto& rt_ctx =
-      Scheduler::Instance()->RtCtx();
-  if (rt_ctx.find(cr->id()) == rt_ctx.end()) {
-    return false;
-  }
-
-  uint32_t pnum = Scheduler::Instance()->ProcessorNum();
-  uint32_t psize = Scheduler::Instance()->TaskPoolSize();
-  uint32_t pid = cr->processor_id();
-  if (pid >= 0 && pid < pnum) {
-    rt_ctx[cr->id()] = pid;
-    auto ctxs =
-        Scheduler::Instance()->ProcCtxs();
-    return ctxs[pid]->Enqueue(cr);
-  } else {
-    // fallback for those w/o processor assigned.
-    // FIXME: trick for task pool index set
-    rt_ctx[cr->id()] = pnum + psize -1;
-    return Scheduler::Instance()->Classic4Choreo()->DispatchTask(cr);
-  }
-}
-
 bool ChoreoGraphyContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
   {
     WriteLockGuard<AtomicRWLock> lg(rw_lock_);

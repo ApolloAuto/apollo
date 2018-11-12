@@ -41,7 +41,6 @@ using croutine::CRoutine;
 class ChoreoGraphyContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
-  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool Enqueue(const std::shared_ptr<CRoutine>) override;
 
  private:
@@ -54,4 +53,4 @@ class ChoreoGraphyContext : public ProcessorContext {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SCHEDULER_POLICY_CHOREO_H_
+#endif  // CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_

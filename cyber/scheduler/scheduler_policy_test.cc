@@ -37,7 +37,6 @@ TEST(SchedulerPolicyTest, choreo) {
   auto task_id = GlobalData::RegisterTaskName("choreo");
   cr->set_id(task_id);
   EXPECT_TRUE(ctx->Enqueue(cr));
-  EXPECT_GT(ctx->RqSize(), 0);
   processor->Start();
   ctx->ShutDown();
 }
@@ -53,7 +52,6 @@ TEST(SchedulerPolicyTest, classic) {
   auto task_id = GlobalData::RegisterTaskName("classic");
   cr->set_id(task_id);
   EXPECT_TRUE(ctx->Enqueue(cr));
-  EXPECT_GT(ctx->RqSize(), 0);
   processor->Start();
   ctx->ShutDown();
 }

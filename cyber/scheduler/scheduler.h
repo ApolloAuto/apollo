@@ -47,10 +47,6 @@ using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
 using apollo::cyber::proto::SchedPolicy;
 
-using apollo::cyber::base::AtomicRWLock;
-using apollo::cyber::base::ReadLockGuard;
-using apollo::cyber::base::WriteLockGuard;
-
 class ProcessorContext;
 
 class Scheduler {
@@ -61,46 +57,25 @@ class Scheduler {
   bool CreateTask(const RoutineFactory& factory, const std::string& name);
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
-  bool RemoveTask(const std::string& name);
-  bool RemoveCRoutine(uint64_t cr_id);
-
-  bool NotifyProcessor(uint64_t cr_id);
-  bool NotifyTask(uint64_t task_id);
-
+  virtual bool RemoveTask(const std::string& name) = 0;
+  bool NotifyTask(uint64_t crid);
   void ShutDown();
-
-  uint32_t ProcessorNum() { return proc_num_; }
-  inline std::unordered_map<uint64_t, uint32_t>& RtCtx() { return cr_ctx_; }
-  inline std::vector<std::shared_ptr<ProcessorContext>> ProcCtxs() {
-    return proc_ctxs_;
-  }
-
   uint32_t TaskPoolSize() { return task_pool_size_; }
-  ProcessorContext* Classic4Choreo() { return classic_4_choreo_; }
 
  protected:
   virtual void CreateProcessor() = 0;
-  std::shared_ptr<ProcessorContext> CreatePctx();
+  virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;
+  virtual bool NotifyProcessor(uint64_t crid) = 0;
 
   std::unordered_map<int, SchedConf> sched_confs_;
   std::unordered_map<std::string, Choreo> cr_confs_;
-
-
-  AtomicRWLock rw_lock_;
-  std::unordered_map<uint64_t, uint32_t> cr_ctx_;
-  std::vector<std::shared_ptr<ProcessorContext>> proc_ctxs_;
-
-  SchedPolicy sched_policy_ = SchedPolicy::CLASSIC;
-
-  // proc for real-time tasks,
+  std::vector<std::shared_ptr<ProcessorContext>> pctxs_;
+  SchedPolicy sched_policy_;
   uint32_t proc_num_ = 0;
-  // proc for croutine task pool
   uint32_t task_pool_size_ = 0;
   uint32_t cpu_binding_start_index_ = 0;
-
   std::atomic<bool> stop_;
   std::string process_name_;
-  ProcessorContext *classic_4_choreo_;
 };
 
 }  // namespace scheduler
