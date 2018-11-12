@@ -53,8 +53,24 @@ Stage::StageStatus TrafficLightRightTurnUnprotectedStop::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  // TODO(all) : check traffic light color
-  bool waiting = true;
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+
+  bool waiting = false;
+  const std::string traffic_light_id =
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  for (const auto* obstacle :
+       reference_line_info.path_decision()->obstacles().Items()) {
+    if (obstacle->Id() != traffic_light_id) {
+      continue;
+    }
+    if (obstacle->LongitudinalDecision().has_stop() &&
+        obstacle->LongitudinalDecision().stop().reason_code() ==
+            STOP_REASON_SIGNAL) {
+      waiting = true;
+      break;
+    }
+  }
+
   if (waiting) {
     return Stage::RUNNING;
   }
