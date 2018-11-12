@@ -71,8 +71,11 @@ void DeciderRuleBasedStop::StopSign(
   AERROR << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
 
-  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
-                    stop_distance);
+  BuildStopDecision(frame, reference_line_info,
+                    stop_wall_id,
+                    stop_line_s,
+                    stop_distance,
+                    StopReasonCode::STOP_REASON_STOP_SIGN);
 }
 
 void DeciderRuleBasedStop::TrafficLight(
@@ -98,8 +101,11 @@ void DeciderRuleBasedStop::TrafficLight(
 
   AERROR << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
-  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
-                    stop_distance);
+  BuildStopDecision(frame, reference_line_info,
+                    stop_wall_id,
+                    stop_line_s,
+                    stop_distance,
+                    StopReasonCode::STOP_REASON_SIGNAL);
 }
 
 bool DeciderRuleBasedStop::BuildStopDecision(
@@ -107,7 +113,8 @@ bool DeciderRuleBasedStop::BuildStopDecision(
     ReferenceLineInfo* const reference_line_info,
     const std::string& stop_wall_id,
     const double stop_line_s,
-    const double stop_distance) {
+    const double stop_distance,
+    const StopReasonCode& stop_reason_code) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -138,7 +145,7 @@ bool DeciderRuleBasedStop::BuildStopDecision(
 
   ObjectDecisionType stop;
   auto stop_decision = stop.mutable_stop();
-  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_STOP_SIGN);
+  stop_decision->set_reason_code(stop_reason_code);
   stop_decision->set_distance_s(-stop_distance);
   stop_decision->set_stop_heading(stop_heading);
   stop_decision->mutable_stop_point()->set_x(stop_point.x());

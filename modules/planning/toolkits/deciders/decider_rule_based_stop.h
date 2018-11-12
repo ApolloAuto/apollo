@@ -49,7 +49,8 @@ class DeciderRuleBasedStop : public Decider {
                          ReferenceLineInfo* const reference_line_info,
                          const std::string& stop_wall_id,
                          const double stop_line_s,
-                         const double stop_distance);
+                         const double stop_distance,
+                         const StopReasonCode& stop_reason_code);
 
  private:
   static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
