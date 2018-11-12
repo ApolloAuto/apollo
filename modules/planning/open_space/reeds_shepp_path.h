@@ -80,39 +80,49 @@ class ReedShepp {
                                    const std::shared_ptr<Node3d> end_node,
                                    ReedSheppPath* shortest_path);
   // Interpolation usde in GenetateLocalConfiguration
-  void Interpolation(int index, double pd, char m, double ox, double oy,
-                     double ophi, std::vector<double>* px,
-                     std::vector<double>* py, std::vector<double>* pphi,
-                     std::vector<bool>* pgear);
+  void Interpolation(const int& index, const double& pd, const char& m,
+                     const double& ox, const double& oy, const double& ophi,
+                     std::vector<double>* px, std::vector<double>* py,
+                     std::vector<double>* pphi, std::vector<bool>* pgear);
   // motion primitives combination setup function
-  bool SetRSP(int size, double lengths[], char types[],
+  bool SetRSP(const int& size, const double* lengths, const char* types,
               std::vector<ReedSheppPath>* all_possible_paths);
   // Six different combination of motion primitive in Reed Shepp path used in
   // GenerateRSP()
-  bool SCS(double x, double y, double phi,
+  bool SCS(const double& x, const double& y, const double& phi,
            std::vector<ReedSheppPath>* all_possible_paths);
-  bool CSC(double x, double y, double phi,
+  bool CSC(const double& x, const double& y, const double& phi,
            std::vector<ReedSheppPath>* all_possible_paths);
-  bool CCC(double x, double y, double phi,
+  bool CCC(const double& x, const double& y, const double& phi,
            std::vector<ReedSheppPath>* all_possible_paths);
-  bool CCCC(double x, double y, double phi,
+  bool CCCC(const double& x, const double& y, const double& phi,
             std::vector<ReedSheppPath>* all_possible_paths);
-  bool CCSC(double x, double y, double phi,
+  bool CCSC(const double& x, const double& y, const double& phi,
             std::vector<ReedSheppPath>* all_possible_paths);
-  bool CCSCC(double x, double y, double phi,
+  bool CCSCC(const double& x, const double& y, const double& phi,
              std::vector<ReedSheppPath>* all_possible_paths);
   // different options for different combination of motion primitives
-  void LSL(double x, double y, double phi, RSPParam* param);
-  void LSR(double x, double y, double phi, RSPParam* param);
-  void LRL(double x, double y, double phi, RSPParam* param);
-  void SLS(double x, double y, double phi, RSPParam* param);
-  void LRLRn(double x, double y, double phi, RSPParam* param);
-  void LRLRp(double x, double y, double phi, RSPParam* param);
-  void LRSR(double x, double y, double phi, RSPParam* param);
-  void LRSL(double x, double y, double phi, RSPParam* param);
-  void LRSLR(double x, double y, double phi, RSPParam* param);
-  std::pair<double, double> calc_tau_omega(double u, double v, double xi,
-                                           double eta, double phi);
+  void LSL(const double& x, const double& y, const double& phi,
+           RSPParam* param);
+  void LSR(const double& x, const double& y, const double& phi,
+           RSPParam* param);
+  void LRL(const double& x, const double& y, const double& phi,
+           RSPParam* param);
+  void SLS(const double& x, const double& y, const double& phi,
+           RSPParam* param);
+  void LRLRn(const double& x, const double& y, const double& phi,
+             RSPParam* param);
+  void LRLRp(const double& x, const double& y, const double& phi,
+             RSPParam* param);
+  void LRSR(const double& x, const double& y, const double& phi,
+            RSPParam* param);
+  void LRSL(const double& x, const double& y, const double& phi,
+            RSPParam* param);
+  void LRSLR(const double& x, const double& y, const double& phi,
+             RSPParam* param);
+  std::pair<double, double> calc_tau_omega(const double& u, const double& v,
+                                           const double& xi, const double& eta,
+                                           const double& phi);
 
  private:
   common::VehicleParam vehicle_param_;
