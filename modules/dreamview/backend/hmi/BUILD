@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["vehicle_manager.h"],
     deps = [
         "//cyber",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util",
         "//modules/common/util:string_util",
         "//modules/dreamview/proto:hmi_config_proto",
