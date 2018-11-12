@@ -32,7 +32,7 @@ using Eigen::MatrixXd;
 
 TEST(OSQPSolverTest, solver_test_01) {
   std::vector<double> t_knots{0, 1, 2, 3, 4, 5};
-  std::size_t order = 5;
+  uint32_t order = 5;
   OsqpSpline2dSolver spline_solver(t_knots, order);
 
   Spline2dConstraint* constraint = spline_solver.mutable_constraint();
