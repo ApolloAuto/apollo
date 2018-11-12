@@ -122,7 +122,8 @@ void Writer<MessageT>::JoinTheTopology() {
     transmitter_->Enable(reader);
   }
 
-  channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_WRITER);
+  channel_manager_->Join(this->role_attr_, proto::RoleType::ROLE_WRITER,
+                         message::HasSerializer<MessageT>::value);
 }
 
 template <typename MessageT>

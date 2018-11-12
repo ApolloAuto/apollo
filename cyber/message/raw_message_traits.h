@@ -21,7 +21,6 @@
 #include <memory>
 #include <string>
 
-#include "cyber/message/protobuf_factory.h"
 #include "cyber/message/raw_message.h"
 
 namespace apollo {
@@ -33,36 +32,8 @@ inline bool SerializeToArray(const RawMessage& message, void* data, int size) {
   return message.SerializeToArray(data, size);
 }
 
-inline bool SerializeToString(const RawMessage& message, std::string* str) {
-  return message.SerializeToString(str);
-}
-
 inline bool ParseFromArray(const void* data, int size, RawMessage* message) {
   return message->ParseFromArray(data, size);
-}
-
-inline bool ParseFromString(const std::string& str, RawMessage* message) {
-  return message->ParseFromString(str);
-}
-
-inline std::string MessageType(const RawMessage& message) {
-  (void)message;
-  return RawMessage::TypeName();
-}
-
-template <typename MessageT,
-          typename std::enable_if<std::is_same<RawMessage, MessageT>::value,
-                                  int>::type = 0>
-inline std::string MessageType() {
-  return RawMessage::TypeName();
-}
-
-template <typename MessageT,
-          typename std::enable_if<std::is_same<RawMessage, MessageT>::value,
-                                  int>::type = 0>
-inline void GetDescriptorString(const std::string& type,
-                                std::string* desc_str) {
-  ProtobufFactory::Instance()->GetDescriptorString(type, desc_str);
 }
 
 inline int ByteSize(const RawMessage& message) { return message.ByteSize(); }

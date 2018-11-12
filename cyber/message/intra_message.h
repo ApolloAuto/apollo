@@ -35,8 +35,6 @@ class IntraMessage {
 
   bool ParseFromString(const std::string &str) { return false; }
 
-  static std::string GetDescriptorString() { return ""; }
-
   static std::string TypeName() { return std::string(type_name_); }
 
   int ByteSize() const { return -1; }

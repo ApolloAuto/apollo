@@ -37,44 +37,8 @@ inline bool SerializeToArray(const MessageT& message, void* data, int size) {
 template <typename MessageT,
           typename std::enable_if<
               std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
-inline bool SerializeToString(const MessageT& message, std::string* str) {
-  return message.SerializeToString(str);
-}
-
-template <typename MessageT,
-          typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
 inline bool ParseFromArray(const void* data, int size, MessageT* message) {
   return message->ParseFromArray(data, size);
-}
-
-template <typename MessageT,
-          typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
-inline bool ParseFromString(const std::string& str, MessageT* message) {
-  return message->ParseFromString(str);
-}
-
-template <typename MessageT,
-          typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
-inline std::string MessageType() {
-  return MessageT::TypeName();
-}
-
-template <typename MessageT,
-          typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
-std::string MessageType(const MessageT& message) {
-  return message.TypeName();
-}
-
-template <typename MessageT,
-          typename std::enable_if<
-              std::is_base_of<IntraMessage, MessageT>::value, int>::type = 0>
-inline void GetDescriptorString(const std::string& type,
-                                std::string* desc_str) {
-  *desc_str = IntraMessage::GetDescriptorString();
 }
 
 template <typename MessageT,

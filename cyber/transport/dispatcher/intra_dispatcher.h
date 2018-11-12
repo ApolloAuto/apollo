@@ -24,6 +24,7 @@
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
+#include "cyber/message/message_traits.h"
 #include "cyber/message/raw_message.h"
 #include "cyber/transport/dispatcher/dispatcher.h"
 
@@ -61,7 +62,7 @@ void IntraDispatcher::OnMessage(uint64_t channel_id,
           std::dynamic_pointer_cast<ListenerHandler<message::RawMessage>>(
               *handler_base);
       auto msg = std::make_shared<message::RawMessage>();
-      message->SerializeToString(&msg->message);
+      message::SerializeToString(*message, &msg->message);
       handler->Run(msg, message_info);
     } else {
       auto handler =

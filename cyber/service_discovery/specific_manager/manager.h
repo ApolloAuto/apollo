@@ -60,7 +60,8 @@ class Manager {
   void StopDiscovery();
   virtual void Shutdown();
 
-  bool Join(const RoleAttributes& attr, RoleType role);
+  bool Join(const RoleAttributes& attr, RoleType role,
+            bool need_publish = true);
   bool Leave(const RoleAttributes& attr, RoleType role);
 
   ChangeConnection AddChangeListener(const ChangeFunc& func);
