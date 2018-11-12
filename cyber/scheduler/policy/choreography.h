@@ -17,36 +17,39 @@
 #ifndef CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_
 #define CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_
 
-#include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 
 #include "cyber/scheduler/processor_context.h"
 
 namespace apollo {
 namespace cyber {
-namespace croutine {
-class CRoutine;
-}
-
 namespace scheduler {
 
-class Processor;
-
+using apollo::cyber::base::AtomicRWLock;
+using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::WriteLockGuard;
 using croutine::CRoutine;
+using CRoutineContainer =
+    std::unordered_map<uint64_t, std::shared_ptr<CRoutine>>;
 
-class ChoreoGraphyContext : public ProcessorContext {
+class ChoreographyContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
-  bool Enqueue(const std::shared_ptr<CRoutine>) override;
+  bool Enqueue(const std::shared_ptr<CRoutine>);
+  void Notify(uint64_t crid);
+  void RemoveCRoutine(uint64_t crid);
 
  private:
-  std::mutex mtx_;
+  std::mutex mtx_cr_queue_;
   std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
       cr_queue_;
+  alignas(CACHELINE_SIZE) CRoutineContainer id_cr_;
+  alignas(CACHELINE_SIZE) AtomicRWLock id_cr_lock_;
 };
 
 }  // namespace scheduler

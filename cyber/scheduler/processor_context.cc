@@ -26,31 +26,6 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-void ProcessorContext::RemoveCRoutine(uint64_t cr_id) {
-  WriteLockGuard<AtomicRWLock> rw(rw_lock_);
-  auto it = cr_container_.find(cr_id);
-  if (it != cr_container_.end()) {
-    it->second->Stop();
-    cr_container_.erase(it);
-  }
-}
-
-void ProcessorContext::Notify(uint64_t cr_id) {
-  ReadLockGuard<AtomicRWLock> rw(rw_lock_);
-  auto iter = cr_container_.find(cr_id);
-  if (likely(iter != cr_container_.end())) {
-    auto& cr = iter->second;
-    if (cr->state() == RoutineState::DATA_WAIT) {
-      cr->SetUpdateFlag();
-    }
-
-    if (!notified_.test_and_set(std::memory_order_acquire)) {
-      processor_->Notify();
-      return;
-    }
-  }
-}
-
 void ProcessorContext::ShutDown() {
   if (!stop_) {
     stop_ = true;

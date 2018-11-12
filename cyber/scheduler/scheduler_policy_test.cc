@@ -29,14 +29,14 @@ void func() {}
 TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   std::shared_ptr<ProcessorContext> ctx;
-  ctx.reset(new ChoreoGraphyContext());
+  ctx.reset(new ChoreographyContext());
   processor->BindContext(ctx);
   ctx->BindProc(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("choreo");
   cr->set_id(task_id);
-  EXPECT_TRUE(ctx->Enqueue(cr));
+  EXPECT_TRUE(static_cast<ChoreographyContext *>(ctx.get())->Enqueue(cr));
   processor->Start();
   ctx->ShutDown();
 }
@@ -51,7 +51,6 @@ TEST(SchedulerPolicyTest, classic) {
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("classic");
   cr->set_id(task_id);
-  EXPECT_TRUE(ctx->Enqueue(cr));
   processor->Start();
   ctx->ShutDown();
 }
