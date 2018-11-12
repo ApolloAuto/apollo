@@ -32,9 +32,11 @@ ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
                vehicle_param_.wheel_base();
 }
 
-std::pair<double, double> ReedShepp::calc_tau_omega(double u, double v,
-                                                    double xi, double eta,
-                                                    double phi) {
+std::pair<double, double> ReedShepp::calc_tau_omega(const double& u,
+                                                    const double& v,
+                                                    const double& xi,
+                                                    const double& eta,
+                                                    const double& phi) {
   double delta = common::math::NormalizeAngle(u - v);
   double A = std::sin(u) - std::sin(delta);
   double B = std::cos(u) - std::cos(delta) - 1.0;
@@ -151,7 +153,7 @@ bool ReedShepp::GenerateRSP(const std::shared_ptr<Node3d> start_node,
   return true;
 }
 
-bool ReedShepp::SCS(double x, double y, double phi,
+bool ReedShepp::SCS(const double& x, const double& y, const double& phi,
                     std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam SLS_param;
   SLS(x, y, phi, &SLS_param);
@@ -174,7 +176,7 @@ bool ReedShepp::SCS(double x, double y, double phi,
   return true;
 }
 
-bool ReedShepp::CSC(double x, double y, double phi,
+bool ReedShepp::CSC(const double& x, const double& y, const double& phi,
                     std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam LSL1_param;
   LSL(x, y, phi, &LSL1_param);
@@ -258,7 +260,7 @@ bool ReedShepp::CSC(double x, double y, double phi,
   return true;
 }
 
-bool ReedShepp::CCC(double x, double y, double phi,
+bool ReedShepp::CCC(const double& x, const double& y, const double& phi,
                     std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam LRL1_param;
   LRL(x, y, phi, &LRL1_param);
@@ -346,7 +348,7 @@ bool ReedShepp::CCC(double x, double y, double phi,
   return true;
 }
 
-bool ReedShepp::CCCC(double x, double y, double phi,
+bool ReedShepp::CCCC(const double& x, const double& y, const double& phi,
                      std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam LRLRn1_param;
   LRLRn(x, y, phi, &LRLRn1_param);
@@ -438,7 +440,7 @@ bool ReedShepp::CCCC(double x, double y, double phi,
   return true;
 }
 
-bool ReedShepp::CCSC(double x, double y, double phi,
+bool ReedShepp::CCSC(const double& x, const double& y, const double& phi,
                      std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam LRSL1_param;
   LRLRn(x, y, phi, &LRSL1_param);
@@ -622,7 +624,7 @@ bool ReedShepp::CCSC(double x, double y, double phi,
   return true;
 }
 
-bool ReedShepp::CCSCC(double x, double y, double phi,
+bool ReedShepp::CCSCC(const double& x, const double& y, const double& phi,
                       std::vector<ReedSheppPath>* all_possible_paths) {
   RSPParam LRSLR1_param;
   LRSLR(x, y, phi, &LRSLR1_param);
@@ -670,7 +672,8 @@ bool ReedShepp::CCSCC(double x, double y, double phi,
   return true;
 }
 
-void ReedShepp::LSL(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LSL(const double& x, const double& y, const double& phi,
+                    RSPParam* param) {
   std::pair<double, double> polar =
       common::math::Cartesian2Polar(x - std::sin(phi), y - 1.0 + std::cos(phi));
   double u = polar.first;
@@ -687,7 +690,8 @@ void ReedShepp::LSL(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::LSR(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LSR(const double& x, const double& y, const double& phi,
+                    RSPParam* param) {
   std::pair<double, double> polar =
       common::math::Cartesian2Polar(x + std::sin(phi), y - 1.0 - std::cos(phi));
   double u1 = polar.first * polar.first;
@@ -710,7 +714,8 @@ void ReedShepp::LSR(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::LRL(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LRL(const double& x, const double& y, const double& phi,
+                    RSPParam* param) {
   std::pair<double, double> polar =
       common::math::Cartesian2Polar(x - std::sin(phi), y - 1.0 + std::cos(phi));
   double u1 = polar.first;
@@ -731,7 +736,8 @@ void ReedShepp::LRL(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::SLS(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::SLS(const double& x, const double& y, const double& phi,
+                    RSPParam* param) {
   double phi_mod = common::math::NormalizeAngle(phi);
   double xd = 0.0;
   double u = 0.0;
@@ -759,7 +765,8 @@ void ReedShepp::SLS(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::LRLRn(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LRLRn(const double& x, const double& y, const double& phi,
+                      RSPParam* param) {
   double xi = x + std::sin(phi);
   double eta = y - 1.0 - std::cos(phi);
   double rho = 0.25 * (2.0 + std::sqrt(xi * xi + eta * eta));
@@ -778,7 +785,8 @@ void ReedShepp::LRLRn(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::LRLRp(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LRLRp(const double& x, const double& y, const double& phi,
+                      RSPParam* param) {
   double xi = x + std::sin(phi);
   double eta = y - 1.0 - std::cos(phi);
   double rho = (20.0 - xi * xi - eta * eta) / 16.0;
@@ -797,7 +805,8 @@ void ReedShepp::LRLRp(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::LRSR(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LRSR(const double& x, const double& y, const double& phi,
+                     RSPParam* param) {
   double xi = x + std::sin(phi);
   double eta = y - 1.0 - std::cos(phi);
   std::pair<double, double> polar = common::math::Cartesian2Polar(-eta, xi);
@@ -819,7 +828,8 @@ void ReedShepp::LRSR(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::LRSL(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LRSL(const double& x, const double& y, const double& phi,
+                     RSPParam* param) {
   double xi = x - std::sin(phi);
   double eta = y - 1.0 + std::cos(phi);
   std::pair<double, double> polar = common::math::Cartesian2Polar(xi, eta);
@@ -844,7 +854,8 @@ void ReedShepp::LRSL(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-void ReedShepp::LRSLR(double x, double y, double phi, RSPParam* param) {
+void ReedShepp::LRSLR(const double& x, const double& y, const double& phi,
+                      RSPParam* param) {
   double xi = x + std::sin(phi);
   double eta = y - 1.0 - std::cos(phi);
   std::pair<double, double> polar = common::math::Cartesian2Polar(xi, eta);
@@ -869,7 +880,8 @@ void ReedShepp::LRSLR(double x, double y, double phi, RSPParam* param) {
   }
 }
 
-bool ReedShepp::SetRSP(int size, double lengths[], char types[],
+bool ReedShepp::SetRSP(const int& size, const double* lengths,
+                       const char* types,
                        std::vector<ReedSheppPath>* all_possible_paths) {
   ReedSheppPath path;
   std::vector<double> length_vec(lengths, lengths + size);
@@ -896,9 +908,9 @@ bool ReedShepp::GenerateLocalConfigurations(
   double step_scaled =
       planner_open_space_config_.warm_start_config().step_size() * max_kappa_;
 
-  size_t point_num =
-      static_cast<size_t>(std::floor(shortest_path->total_length / step_scaled +
-                                     shortest_path->segs_lengths.size() + 4));
+  size_t point_num = static_cast<size_t>(
+      std::floor(shortest_path->total_length / step_scaled +
+                 static_cast<double>(shortest_path->segs_lengths.size()) + 4));
   std::vector<double> px(point_num, 0.0);
   std::vector<double> py(point_num, 0.0);
   std::vector<double> pphi(point_num, 0.0);
@@ -971,8 +983,9 @@ bool ReedShepp::GenerateLocalConfigurations(
   return true;
 }
 
-void ReedShepp::Interpolation(int index, double pd, char m, double ox,
-                              double oy, double ophi, std::vector<double>* px,
+void ReedShepp::Interpolation(const int& index, const double& pd, const char& m,
+                              const double& ox, const double& oy,
+                              const double& ophi, std::vector<double>* px,
                               std ::vector<double>* py,
                               std::vector<double>* pphi,
                               std::vector<bool>* pgear) {
