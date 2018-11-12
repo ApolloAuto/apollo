@@ -61,18 +61,24 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   // Assume obstacle is NOT closed to any junction exit
-
   if (obstacle_ptr->history_size() == 0 ||
       !obstacle_ptr->latest_feature().has_junction_feature() ||
       obstacle_ptr->latest_feature().junction_feature()
-                                    .junction_exit_size() <= 1) {
-    // TODO(all) Predict based on only one exit
+                                    .junction_exit_size() < 1) {
     return;
   }
 
   std::vector<double> feature_values;
   ExtractFeatureValues(obstacle_ptr, &feature_values);
-  std::vector<double> probability = ComputeProbability(feature_values);
+  std::vector<double> probability;
+  if (obstacle_ptr->latest_feature().junction_feature()
+                                    .junction_exit_size() > 1) {
+    probability = ComputeProbability(feature_values);
+  } else {
+    for (int i = 0; i < 12; ++i) {
+      probability.push_back(feature_values[3+5*i]);
+    }
+  }
   for (double prob : probability) {
     obstacle_ptr->mutable_latest_feature()
                 ->mutable_junction_feature()
