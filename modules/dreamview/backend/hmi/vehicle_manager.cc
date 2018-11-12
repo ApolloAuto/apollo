@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 #include "gflags/gflags.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 
@@ -55,6 +56,10 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
     AINFO_IF(ret) << "Copied " << source_path << " to " << dest_path;
   }
 
+  // Reload vehicle config for current process.
+  apollo::common::VehicleConfigHelper::Init();
+
+  // Broadcast new extrinsics.
   static const std::string kBroadcastExtrinsicsCmd =
       "bash /apollo/scripts/broadcast_extrinsics.sh";
   const int ret = std::system(kBroadcastExtrinsicsCmd.c_str());
