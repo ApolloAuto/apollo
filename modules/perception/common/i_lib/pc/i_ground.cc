@@ -66,7 +66,7 @@ bool PlaneFitGroundDetectorParam::Validate() const {
 int PlaneFitPointCandIndices::Prune(unsigned int min_nr_samples,
                                     unsigned int max_nr_samples) {
   assert(min_nr_samples < max_nr_samples);
-  unsigned int size = indices.size();
+  unsigned int size = static_cast<unsigned int>(indices.size());
   unsigned int half = 0;
   if (size > max_nr_samples) {
     IRandomizedShuffle1(indices.data(), static_cast<int>(indices.size()),
@@ -114,7 +114,7 @@ void PlaneFitGroundDetector::InitOrderTable(const VoxelGridXY<float> *vg,
   int id = 0;
   for (i = 0; i < vg->NrVoxel(); ++i) {
     const auto &voxel = vg->GetConstVoxels()[i];
-    radius = voxel.dim_x_ * 0.5;
+    radius = voxel.dim_x_ * 0.5f;
     cx = voxel.v_[0] + radius;
     cy = voxel.v_[1] + radius;
     dist2 = cx * cx + cy * cy;
@@ -639,7 +639,8 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
   int nr_samples = candi->Prune(param_.nr_samples_min_threshold,
                                 param_.nr_samples_max_threshold);
   int nr_inliers_termi =
-      IRound(nr_samples * param_.termi_inlier_percen_threshold);
+      IRound(static_cast<float>(nr_samples) *
+             param_.termi_inlier_percen_threshold);
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
@@ -678,7 +679,8 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
     // Assign number of supports
     plane.SetNrSupport(nr_inliers);
 
-    fit_cost = nr_inliers > 0 ? (fit_cost / nr_inliers) : dist_thre;
+    fit_cost = nr_inliers > 0 ?
+               (fit_cost / static_cast<float>(nr_inliers)) : dist_thre;
     // record the best plane
     if (nr_inliers >= nr_inliers_best) {
       if (nr_inliers == nr_inliers_best) {
@@ -784,7 +786,7 @@ int PlaneFitGroundDetector::FilterCandidates(
     }
   }
   if (count > 0) {
-    avg_z /= count;
+    avg_z /= static_cast<float>(count);
     ground_z_[r][c].first = avg_z;
     ground_z_[r][c].second = true;
     for (i = 0; i < candi->Size(); ++i) {
@@ -828,7 +830,8 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   }
 
   GroundPlaneLiDAR plane;
-  int kNr_iter = param_.nr_ransac_iter_threshold + neighbors.size();
+  int kNr_iter = param_.nr_ransac_iter_threshold +
+                 static_cast<int>(neighbors.size());
   GroundPlaneLiDAR hypothesis[kNr_iter];
   float ptp_dist = 0;
   int best = -1;
@@ -841,7 +844,8 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   int nr_samples = candi.Prune(param_.nr_samples_min_threshold,
                                param_.nr_samples_max_threshold);
   int nr_inliers_termi =
-      IRound(nr_samples * param_.termi_inlier_percen_threshold);
+      IRound(static_cast<float>(nr_samples) *
+             param_.termi_inlier_percen_threshold);
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
@@ -971,7 +975,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   }
 
   const auto &voxel_cur = (*vg_coarse_)(r, c);
-  float radius = voxel_cur.dim_x_ * 0.5;
+  float radius = voxel_cur.dim_x_ * 0.5f;
   float cx = voxel_cur.v_[0] + radius;
   float cy = voxel_cur.v_[1] + radius;
   float cz = -(groundplane->params[0] * cx + groundplane->params[1] * cy +
@@ -1002,7 +1006,7 @@ float PlaneFitGroundDetector::CalculateAngleDist(
   if (count == 0) {
     return -1;
   }
-  return angle_dist / count;
+  return angle_dist / static_cast<float>(count);
 }
 
 int PlaneFitGroundDetector::FitInOrder() {
@@ -1123,14 +1127,19 @@ int PlaneFitGroundDetector::CompleteGrid(const GroundPlaneSpherical &lt,
   supports[1] = rt.GetNrSupport();
   supports[2] = up.GetNrSupport();
   supports[3] = dn.GetNrSupport();
-  int support_sum = ISum4(supports);
+  int support_sum = 0;
+  support_sum = ISum4(supports);
   if (!support_sum) {
     return 0;
   }
-  weights[0] = static_cast<float>(supports[0]) / support_sum;
-  weights[1] = static_cast<float>(supports[1]) / support_sum;
-  weights[2] = static_cast<float>(supports[2]) / support_sum;
-  weights[3] = static_cast<float>(supports[3]) / support_sum;
+  weights[0] = static_cast<float>(supports[0]) /
+               static_cast<float>(support_sum);
+  weights[1] = static_cast<float>(supports[1]) /
+               static_cast<float>(support_sum);
+  weights[2] = static_cast<float>(supports[2]) /
+               static_cast<float>(support_sum);
+  weights[3] = static_cast<float>(supports[3]) /
+               static_cast<float>(support_sum);
   // weighted average:
   gp->theta = weights[0] * lt.theta + weights[1] * rt.theta +
               weights[2] * up.theta + weights[3] * dn.theta;
@@ -1173,17 +1182,23 @@ int PlaneFitGroundDetector::SmoothGrid(const GroundPlaneSpherical &g,
     supports[3] = dn.GetNrSupport();
   }
   supports[4] = (g.GetNrSupport() << 2);
-  int support_sum = ISum4(supports);
+  int support_sum = 0;
+  support_sum = ISum4(supports);
   if (support_sum == 0) {
     *gp = g;
     return 0;
   }
   support_sum += supports[4];
-  weights[0] = static_cast<float>(supports[0]) / support_sum;
-  weights[1] = static_cast<float>(supports[1]) / support_sum;
-  weights[2] = static_cast<float>(supports[2]) / support_sum;
-  weights[3] = static_cast<float>(supports[3]) / support_sum;
-  weights[4] = static_cast<float>(supports[4]) / support_sum;
+  weights[0] = static_cast<float>(supports[0]) /
+               static_cast<float>(support_sum);
+  weights[1] = static_cast<float>(supports[1]) /
+               static_cast<float>(support_sum);
+  weights[2] = static_cast<float>(supports[2]) /
+               static_cast<float>(support_sum);
+  weights[3] = static_cast<float>(supports[3]) /
+               static_cast<float>(support_sum);
+  weights[4] = static_cast<float>(supports[4]) /
+               static_cast<float>(support_sum);
   // weighted average:
   gp->theta = weights[0] * lt.theta + weights[1] * rt.theta +
               weights[2] * up.theta + weights[3] * dn.theta +

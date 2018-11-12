@@ -142,8 +142,8 @@ void Target::Predict(CameraFrame *frame) {
 void Target::Update2D(CameraFrame *frame) {
   // measurements
   auto obj = latest_object->object;
-  float width = frame->data_provider->src_width();
-  float height = frame->data_provider->src_height();
+  float width = static_cast<float>(frame->data_provider->src_width());
+  float height = static_cast<float>(frame->data_provider->src_height());
   base::RectF rect(latest_object->projected_box);
   base::Point2DF center = rect.Center();
 
@@ -177,11 +177,11 @@ void Target::Update3D(CameraFrame *frame) {
     z << std::sin(object->theta * 2), std::cos(object->theta * 2);
     direction.AddMeasure(z);
     z = direction.get_state();
-    float theta = std::atan2(z[0], z[1]) / 2;
+    float theta = static_cast<float>(std::atan2(z[0], z[1]) / 2.0);
     AINFO << "dir " << id << " " << object->theta << " " << theta;
     object->theta = theta;
-    object->direction[0] = cos(object->theta);
-    object->direction[1] = sin(object->theta);
+    object->direction[0] = static_cast<float>(cos(object->theta));
+    object->direction[1] = static_cast<float>(sin(object->theta));
     object->direction[2] = 0;
 
     z << object->center(0), object->center(1);
@@ -215,8 +215,8 @@ void Target::Update3D(CameraFrame *frame) {
     const Eigen::MatrixXd &var = world_center_for_unmovable.get_variance();
     object->center(0) = x(0);
     object->center(1) = x(1);
-    object->center_uncertainty(0) = var(0);
-    object->center_uncertainty(1) = var(1);
+    object->center_uncertainty(0) = static_cast<float>(var(0));
+    object->center_uncertainty(1) = static_cast<float>(var(1));
     object->velocity(0) = 0;
     object->velocity(1) = 0;
     object->velocity(2) = 0;
@@ -261,18 +261,20 @@ void Target::Update3D(CameraFrame *frame) {
     object->center(0) = x(0);
     object->center(1) = x(1);
     object->center_uncertainty.setConstant(0);
-    object->center_uncertainty(0, 0) = world_center.variance_(0, 0);
-    object->center_uncertainty(1, 1) = world_center.variance_(1, 1);
-    object->velocity(0) = x(2);
-    object->velocity(1) = x(3);
+    object->center_uncertainty(0, 0) =
+      static_cast<float>(world_center.variance_(0, 0));
+    object->center_uncertainty(1, 1) =
+      static_cast<float>(world_center.variance_(1, 1));
+    object->velocity(0) = static_cast<float>(x(2));
+    object->velocity(1) = static_cast<float>(x(3));
     object->velocity(2) = 0;
     world_velocity.AddMeasure(object->velocity.cast<double>());
     object->velocity_uncertainty = world_velocity.get_variance().cast<float>();
     if (speed > target_param_.velocity_threshold()) {
-      object->direction(0) = x(2) / speed;
-      object->direction(1) = x(3) / speed;
+      object->direction(0) = static_cast<float>(x(2) / speed);
+      object->direction(1) = static_cast<float>(x(3) / speed);
       object->direction(2) = 0;
-      object->theta = std::atan2(x(3), x(2));
+      object->theta = static_cast<float>(std::atan2(x(3), x(2)));
     }
   }
 
@@ -422,7 +424,7 @@ bool Target::CheckStatic() {
                                           obj1.velocity + obj2.velocity;
                                       return ret_obj;
                                     });
-  tmp_obj_vel_avg.velocity /= min_vel_size;
+  tmp_obj_vel_avg.velocity /= static_cast<float>(min_vel_size);
   double speed_avg = tmp_obj_vel_avg.velocity.head(2).norm();
   const auto &obj_type = history_world_states_.back().type;
   // check speed by type
@@ -440,12 +442,12 @@ bool Target::CheckStatic() {
   if (static_cast<int>(history_world_states_.size()) >=
       std::max(target_param_.min_cached_position_size(),
                target_param_.calc_avg_position_window_size())) {
-    double move_distance = 0.0f;
+    double move_distance = 0.0;
     Eigen::Vector3d start_position(0.0, 0.0, 0.0);
     Eigen::Vector3d end_position(0.0, 0.0, 0.0);
-    const int start_idx = history_world_states_.size() -
-        target_param_.min_cached_position_size();
-    const int end_idx = history_world_states_.size() - 1;
+    const int start_idx = static_cast<int>(history_world_states_.size()) -
+        static_cast<int>(target_param_.min_cached_position_size());
+    const int end_idx = static_cast<int>(history_world_states_.size()) - 1;
     // calculate window-averaged start and end positions
     // and calculate moved distance
     if (end_idx - start_idx >=

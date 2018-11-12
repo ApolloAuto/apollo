@@ -199,7 +199,9 @@ struct PlaneFitPointCandIndices {
   void Clear() { indices.clear(); }
   inline void PushIndex(int i) { indices.push_back(i); }
   int Prune(unsigned int min_nr_samples, unsigned int max_nr_samples);
-  unsigned int Size() const { return indices.size(); }
+  unsigned int Size() const {
+    return static_cast<unsigned int>(indices.size());
+  }
   int &operator[](unsigned int i) {
     assert(i >= 0 && i < indices.size());
     return indices.at(i);
