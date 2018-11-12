@@ -202,3 +202,10 @@ DEFINE_double(cost_function_alpha, 0.25,
               "and that by the total time. The larger alpha gets, the"
               "more cost function values trajectory with shorter times,"
               "and vice versa.");
+DEFINE_double(cost_function_sigma, 5.0,
+              "This is the sigma for the bell curve that is used by"
+              "the cost function in move-sequence-trajectory-predictor."
+              "The bell curve has its average equal to the time to cross"
+              "lane predicted by the model.");
+DEFINE_bool(use_bell_curve_for_cost_function, false,
+            "Whether to use bell curve for the cost function or not.");
