@@ -62,6 +62,7 @@ bool DualVariableWarmStartProblem::Solve(
   int num_of_variables = n1 + n2 + n3;
   int num_of_constraints = m1;
 
+  auto t_start = cyber::Time::Now().ToSecond();
   DualVariableWarmStartIPOPTInterface* ptop =
       new DualVariableWarmStartIPOPTInterface(
           num_of_variables, num_of_constraints, horizon, ts, ego,
@@ -106,6 +107,10 @@ bool DualVariableWarmStartProblem::Solve(
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
     AINFO << "*** The final value of the objective function is " << final_obj
           << '.';
+    auto t_end = cyber::Time::Now().ToSecond();
+
+    AINFO << "Dual vairable warm start solving time in second : "
+          << t_end - t_start;
   } else {
     AINFO << "Solve not succeeding, return status: " << int(status);
   }

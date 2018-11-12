@@ -29,6 +29,7 @@
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
 #include "adolc/adolc.h"
+#include "adolc/adolc_sparse.h"
 #include "adolc/adouble.h"
 
 #include "cyber/common/log.h"
@@ -44,6 +45,7 @@
 #define tag_f 1
 #define tag_g 2
 #define tag_L 3
+#define HPOFF 30
 
 namespace apollo {
 namespace planning {
@@ -110,20 +112,24 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
-  /** Method to generate the required tapes by ADOL-C*/
-  virtual void generate_tapes(int n, int m);
-
-  template <class T>
-  bool eval_obj(int n, const T* x, T& obj_value);
-
-  template <class T>
-  bool eval_constraints(int n, const T* x, int m, T* g);
-
   void get_optimization_results(Eigen::MatrixXd* state_result,
                                 Eigen::MatrixXd* control_result,
                                 Eigen::MatrixXd* time_result,
                                 Eigen::MatrixXd* dual_l_result,
                                 Eigen::MatrixXd* dual_n_result) const;
+
+  //***************    start ADOL-C part ***********************************
+  /** Template to return the objective value */
+  template <class T>
+  bool eval_obj(int n, const T* x, T* obj_value);
+
+  /** Template to compute contraints */
+  template <class T>
+  bool eval_constraints(int n, const T* x, int m, T* g);
+
+  /** Method to generate the required tapes by ADOL-C*/
+  void generate_tapes(int n, int m, int* nnz_h_lag);
+  //***************    end   ADOL-C part ***********************************
 
  private:
   int num_of_variables_;
@@ -225,10 +231,14 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
  private:
-  // private field for ADOL-C
-  double** Jac;
-  double* obj_lam;
-  double** Hess;
+  //***************    start ADOL-C part ***********************************
+  double *obj_lam;
+  unsigned int* rind_L; /* row indices    */
+  unsigned int* cind_L; /* column indices */
+  double* hessval;      /* values */
+  int nnz_L;
+  int options_L[4];
+  //***************    end   ADOL-C part ***********************************
 };
 
 }  // namespace planning

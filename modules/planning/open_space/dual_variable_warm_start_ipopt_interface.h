@@ -20,16 +20,23 @@
 
 #pragma once
 
-#include <vector>
 #include <limits>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
+#include "adolc/adolc.h"
+#include "adolc/adolc_sparse.h"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
+
+#define tag_f 1
+#define tag_g 2
+#define tag_L 3
+#define HPOFF 30
 
 namespace apollo {
 namespace planning {
@@ -96,6 +103,19 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
+  //***************    start ADOL-C part ***********************************
+  /** Template to return the objective value */
+  template <class T>
+  bool eval_obj(int n, const T* x, T* obj_value);
+
+  /** Template to compute contraints */
+  template <class T>
+  bool eval_constraints(int n, const T* x, int m, T* g);
+
+  /** Method to generate the required tapes */
+  void generate_tapes(int n, int m, int* nnz_h_lag);
+  //***************    end   ADOL-C part ***********************************
+
  private:
   int num_of_variables_;
   int num_of_constraints_;
@@ -134,6 +154,15 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd xWS_;
 
   double weight_d_;
+
+  //***************    start ADOL-C part ***********************************
+  double* obj_lam;
+  unsigned int* rind_L; /* row indices    */
+  unsigned int* cind_L; /* column indices */
+  double* hessval;      /* values */
+  int nnz_L;
+  int options_L[4];
+  //***************    end   ADOL-C part ***********************************
 };
 
 }  // namespace planning
