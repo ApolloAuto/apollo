@@ -101,6 +101,7 @@ DECLARE_uint32(max_num_lane_point);
 DECLARE_double(centripetal_acc_coeff);
 
 // Obstacle trajectory
+DECLARE_bool(enable_cruise_regression);
 DECLARE_double(lane_sequence_threshold);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
