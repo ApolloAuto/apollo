@@ -106,11 +106,11 @@ bool OsqpSpline2dSolver::Solve() {
   const MatrixXd& equality_constraint_boundary =
       constraint_.equality_constraint().constraint_boundary();
 
-  int constraint_num = inequality_constraint_boundary.rows() +
-                       equality_constraint_boundary.rows();
+  auto constraint_num = inequality_constraint_boundary.rows() +
+                        equality_constraint_boundary.rows();
 
-  constexpr float kEpsilon = 1e-9;
-  constexpr float kUpperLimit = 1e9;
+  constexpr float kEpsilon = 1e-9f;
+  constexpr float kUpperLimit = 1e9f;
   c_float l[constraint_num];  // NOLINT
   c_float u[constraint_num];  // NOLINT
   for (int i = 0; i < constraint_num; ++i) {
@@ -118,7 +118,7 @@ bool OsqpSpline2dSolver::Solve() {
       l[i] = inequality_constraint_boundary(i, 0);
       u[i] = kUpperLimit;
     } else {
-      const int idx = i - inequality_constraint_boundary.rows();
+      const auto idx = i - inequality_constraint_boundary.rows();
       l[i] = equality_constraint_boundary(idx, 0) - kEpsilon;
       u[i] = equality_constraint_boundary(idx, 0) + kEpsilon;
     }
@@ -160,8 +160,8 @@ bool OsqpSpline2dSolver::Solve() {
     solved_params(i, 0) = work->solution->x[i];
   }
 
-  last_num_param_ = P.rows();
-  last_num_constraint_ = constraint_num;
+  last_num_param_ = static_cast<int>(P.rows());
+  last_num_constraint_ = static_cast<int>(constraint_num);
 
   // Cleanup
   osqp_cleanup(work);
