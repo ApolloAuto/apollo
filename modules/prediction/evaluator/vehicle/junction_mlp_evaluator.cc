@@ -60,8 +60,6 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
-  // AINFO << "Obstacle [" << id << "] is using junction evaluator.";
-
   // Assume obstacle is NOT closed to any junction exit
   if (obstacle_ptr->history_size() == 0 ||
       !obstacle_ptr->latest_feature().has_junction_feature() ||

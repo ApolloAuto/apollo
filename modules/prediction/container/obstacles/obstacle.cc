@@ -251,8 +251,10 @@ void Obstacle::BuildJunctionFeature() {
     std::string enter_lane_id =
         prev_feature.junction_feature().enter_lane().lane_id();
     // TODO(kechxu) deal with consecutive junctions
-    SetJunctionFeatureWithEnterLane(
-        enter_lane_id, latest_feature_ptr);
+    //              fix enter lane bugs
+    // SetJunctionFeatureWithEnterLane(
+    //     enter_lane_id, latest_feature_ptr);
+    SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
   } else {
     SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
   }
@@ -1204,10 +1206,8 @@ void Obstacle::SetMotionStatus() {
   int history_size = static_cast<int>(feature_history_.size());
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
-           << "is considered moving.";
-    if (history_size > 0) {
-      feature_history_.front().set_is_still(false);
-    }
+           << "is considered still.";
+    feature_history_.front().set_is_still(true);
     return;
   }
 
