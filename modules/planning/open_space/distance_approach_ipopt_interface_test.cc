@@ -87,21 +87,9 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, initilization) {
   EXPECT_NE(ptop_, nullptr);
 }
 
-TEST_F(DistanceApproachIPOPTInterfaceTest, get_nlp_info) {
-  int n, m, nnz_jac_g, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
-  ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
-  EXPECT_EQ(n, 520);
-  EXPECT_EQ(m, 270);
-  EXPECT_EQ(nnz_jac_g, 1884);
-  EXPECT_EQ(nnz_h_lag, 0);
-  EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
-}
-
 TEST_F(DistanceApproachIPOPTInterfaceTest, get_bounds_info) {
-  int n, m, nnz_jac_g, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
-  ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+  int n = 520;
+  int m = 270;
   double x_l[520];
   double x_u[520];
   double g_l[270];
@@ -111,9 +99,8 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_bounds_info) {
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, get_starting_point) {
-  int n, m, nnz_jac_g, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
-  ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+  int n = 520;
+  int m = 270;
   bool init_x = true;
   bool init_z = false;
   bool init_lambda = false;
@@ -127,9 +114,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_starting_point) {
 }
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
-  int n, m, nnz_jac_g, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
-  ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
+  int n = 520;
   double obj_value;
   double x[520];
   std::fill_n(x, n, 1.2);

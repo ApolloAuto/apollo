@@ -96,6 +96,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "@eigen",
         "@ipopt",
+        "@adolc",
     ],
 )
 
@@ -309,22 +310,6 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/planning/common:planning_gflags",
         "@eigen",
-    ],
-)
-
-cc_binary(
-    name = "ADOL-C_exmples",
-    srcs = [
-        "cpp_example.cpp",
-        "ADOL-C_NLP.cpp",
-        "ADOL-C_NLP.hpp",
-    ],
-    deps = [
-        "@adolc",
-        "@ipopt",
-    ],
-    linkopts = [
-        "-L/usr/local/adolc/lib64 -ladolc",
     ],
 )
 

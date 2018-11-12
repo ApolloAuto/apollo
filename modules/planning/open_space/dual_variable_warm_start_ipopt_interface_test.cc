@@ -84,17 +84,6 @@ TEST_F(DualVariableWarmStartIPOPTInterfaceTest, initilization) {
   EXPECT_NE(ptop_, nullptr);
 }
 
-TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_nlp_info) {
-  int n, m, nnz_jac_g, nnz_h_lag;
-  Ipopt::TNLP::IndexStyleEnum index_style;
-  ptop_->get_nlp_info(n, m, nnz_jac_g, nnz_h_lag, index_style);
-  EXPECT_EQ(n, num_of_variables_);
-  EXPECT_EQ(m, num_of_constraints_);
-  EXPECT_EQ(nnz_jac_g, 1500);
-  EXPECT_EQ(nnz_h_lag, 0);
-  EXPECT_EQ(index_style, Ipopt::TNLP::C_STYLE);
-}
-
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, get_bounds_info) {
   int kNumOfVariables = 540;
   int kNumOfConstraints = 240;

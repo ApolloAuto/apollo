@@ -37,11 +37,11 @@ distance_approach_config : {
   max_steer_rate : 0.6
   max_speed_forward : 2.0
   max_speed_reverse : 1.0
-  max_acceleration_forward : 2.0
+  max_acceleration_forward : 1.0
   max_acceleration_reverse : 1.0
   min_time_sample_scaling : 0.1
-  max_time_sample_scaling : 5.0
-  max_miu : 2.5
-  max_lambda : 2.5
+  max_time_sample_scaling : 2.0
+  max_miu : 1.5
+  max_lambda : 2.0
   use_fix_time : false
 }

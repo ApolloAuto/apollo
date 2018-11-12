@@ -28,6 +28,7 @@ echo "Build and install ColPack"
 git clone https://github.com/CSCsw/ColPack.git
 
 pushd ColPack
+autoreconf -vif
 autoreconf --install
 automake
 fullpath=$(pwd)
@@ -39,7 +40,7 @@ mkdir -p /usr/local/colpack
 cp -r include /usr/local/colpack/ && cp -r lib /usr/local/colpack/
 popd
 
-export LD_LIBRARY_PATH=/usr/local/colpack/lib:$LD_LIBRARY_PATH 
+# export LD_LIBRARY_PATH=/usr/local/colpack/lib:$LD_LIBRARY_PATH 
 
 echo "Build and install ADOL-C"
 
@@ -49,7 +50,7 @@ unzip ADOL-C-2.6.3.zip
 pushd ADOL-C-2.6.3
 autoreconf --install
 automake
-./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse --with-colpack="/usr/local/colpack/lib" ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC" --enable-addexa
+./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse --with-colpack="/usr/local/colpack" ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC" --enable-addexa
 
 make -j8 all
 make install
@@ -58,8 +59,8 @@ mkdir -p /usr/local/adolc
 cp -r include /usr/local/adolc/ && cp -r lib64 /usr/local/adolc/
 popd
 
-export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH 
+# export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH 
 
 # Clean up.
-# apt-get clean && rm -rf /var/lib/apt/lists/*
-# rm -fr ADOL-C-2.6.3.zip ADOL-C-2.6.3 ColPack
+apt-get clean && rm -rf /var/lib/apt/lists/*
+rm -fr ADOL-C-2.6.3.zip ADOL-C-2.6.3 ColPack
