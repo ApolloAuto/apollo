@@ -112,7 +112,7 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   bool eval_constraints(int n, const T* x, int m, T* g);
 
   /** Method to generate the required tapes */
-  void generate_tapes(int n, int m, int* nnz_jac_g, int* nnz_h_lag);
+  void generate_tapes(int n, int m, int* nnz_h_lag);
   //***************    end   ADOL-C part ***********************************
 
  private:
@@ -121,6 +121,9 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   int horizon_;
   float ts_;
   Eigen::MatrixXd ego_;
+  int lambda_horizon_ = 0;
+  int miu_horizon_ = 0;
+  int dual_formulation_horizon_ = 0;
 
   Eigen::MatrixXd l_warm_up_;
   Eigen::MatrixXd n_warm_up_;
@@ -156,13 +159,9 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
 
   //***************    start ADOL-C part ***********************************
   double* obj_lam;
-  unsigned int* rind_g; /* row indices    */
-  unsigned int* cind_g; /* column indices */
-  double* jacval;       /* values         */
   unsigned int* rind_L; /* row indices    */
   unsigned int* cind_L; /* column indices */
   double* hessval;      /* values */
-  int nnz_jac;
   int nnz_L;
   int options_g[4];
   int options_L[4];

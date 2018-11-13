@@ -60,7 +60,7 @@ bool DistanceApproachProblem::Solve(
   // app->Options()->SetStringValue("derivative_test", "first-order");
   // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
   // TODO(QiL) : Change IPOPT settings to flag or configs
-  app->Options()->SetIntegerValue("print_level", 5);
+  app->Options()->SetIntegerValue("print_level", 0);
   app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
   app->Options()->SetNumericValue("mumps_pivtol", 1e-6);
   app->Options()->SetIntegerValue("max_iter", 1000);

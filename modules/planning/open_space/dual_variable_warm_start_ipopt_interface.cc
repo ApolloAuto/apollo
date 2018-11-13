@@ -67,21 +67,16 @@ DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
 bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
     int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
     IndexStyleEnum& index_style) {
-  // n1 : lagrangian multiplier associated with obstacleShape
-  int n1 = obstacles_edges_sum_ * (horizon_ + 1);
+  lambda_horizon_ = obstacles_edges_sum_ * (horizon_ + 1);
 
-  // n2 : lagrangian multipier associated with car shape, obstacles_num*4 *
-  // (N+1)
-  int n2 = obstacles_num_ * 4 * (horizon_ + 1);
+  miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
 
-  // n3 : dual variable, obstacles_num * (N+1)
-  int n3 = obstacles_num_ * (horizon_ + 1);
+  dual_formulation_horizon_ = obstacles_num_ * (horizon_ + 1);
 
-  // m1 : obstacle constraints
-  int m1 = 4 * obstacles_num_ * (horizon_ + 1);
+  num_of_variables_ =
+      lambda_horizon_ + miu_horizon_ + dual_formulation_horizon_;
 
-  num_of_variables_ = n1 + n2 + n3;
-  num_of_constraints_ = m1 + num_of_variables_;
+  num_of_constraints_ = 4 * obstacles_num_ * (horizon_ + 1) + num_of_variables_;
 
   // number of variables
   n = num_of_variables_;
@@ -90,16 +85,16 @@ bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
   m = num_of_constraints_;
 
   // number of nonzero Jacobian and Lagrangian.
-  generate_tapes(n, m, &nnz_jac_g, &nnz_h_lag);
+  generate_tapes(n, m, &nnz_h_lag);
 
-  // int tmp = 0;
-  // for (int i = 0; i < horizon_ + 1; ++i) {
-  //   for (int j = 0; j < obstacles_num_; ++j) {
-  //     int current_edges_num = obstacles_edges_num_(j, 0);
-  //     tmp += current_edges_num * 4 + 2 + 2 + 4 + 1;
-  //   }
-  // }
-  // nnz_jac_g = tmp;
+  int tmp = 0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
+      int current_edges_num = obstacles_edges_num_(j, 0);
+      tmp += current_edges_num * 4 + 2 + 2 + 4 + 1;
+    }
+  }
+  nnz_jac_g = tmp + num_of_variables_;
 
   ADEBUG << "nnz_jac_g : " << nnz_jac_g;
   index_style = IndexStyleEnum::C_STYLE;
@@ -216,22 +211,20 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   int l_index = l_start_index_;
   int n_index = n_start_index_;
   int d_index = d_start_index_;
-  int lambda_horizon = obstacles_edges_sum_ * (horizon_ + 1);
-  int miu_horizon = obstacles_num_ * 4 * (horizon_ + 1);
-  int dual_formulation_horizon = obstacles_num_ * (horizon_ + 1);
-  for (int i = 0; i < lambda_horizon; ++i) {
+
+  for (int i = 0; i < lambda_horizon_; ++i) {
     g_l[constraint_index] = 0.0;
     g_u[constraint_index] = 2e19;
     constraint_index++;
     l_index++;
   }
-  for (int i = 0; i < miu_horizon; ++i) {
+  for (int i = 0; i < miu_horizon_; ++i) {
     g_l[constraint_index] = 0.0;
     g_u[constraint_index] = 2e19;
     constraint_index++;
     n_index++;
   }
-  for (int i = 0; i < dual_formulation_horizon; ++i) {
+  for (int i = 0; i < dual_formulation_horizon_; ++i) {
     g_l[constraint_index] = 0.0;
     g_u[constraint_index] = 2e19;
     constraint_index++;
@@ -267,6 +260,281 @@ bool DualVariableWarmStartIPOPTInterface::eval_grad_f(int n, const double* x,
   // return true;
 }
 
+bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
+                                                 bool new_x, int m, double* g) {
+  eval_constraints(n, x, m, g);
+  return true;
+}
+
+bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
+                                                     bool new_x, int m,
+                                                     int nele_jac, int* iRow,
+                                                     int* jCol,
+                                                     double* values) {
+  // if (values == NULL) {
+  //   // return the structure of the jacobian
+
+  //   for (int idx = 0; idx < nnz_jac; idx++) {
+  //     iRow[idx] = rind_g[idx];
+  //     jCol[idx] = cind_g[idx];
+  //   }
+  // } else {
+  //   // return the values of the jacobian of the constraints
+
+  //   sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
+  //              options_g);
+
+  //   for (int idx = 0; idx < nnz_jac; idx++) {
+  //     values[idx] = jacval[idx];
+  //   }
+  // }
+  // return true;
+  ADEBUG << "eval_jac_g";
+  CHECK_EQ(n, num_of_variables_)
+      << "No. of variables wrong in eval_jac_g. n : " << n;
+  CHECK_EQ(m, num_of_constraints_)
+      << "No. of constraints wrong in eval_jac_g. n : " << m;
+
+  if (values == nullptr) {
+    int nz_index = 0;
+    int constraint_index = 0;
+
+    // 1. Three obstacles related equal constraints, one equality
+    // constraints,
+    // [0, horizon_] * [0, obstacles_num_-1] * 4
+    int l_index = l_start_index_;
+    int n_index = n_start_index_;
+    int d_index = d_start_index_;
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      for (int j = 0; j < obstacles_num_; ++j) {
+        int current_edges_num = obstacles_edges_num_(j, 0);
+
+        // 1. norm(A* lambda <= 1)
+        for (int k = 0; k < current_edges_num; ++k) {
+          // with respect to l
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+
+        // 2. G' * mu + R' * lambda == 0, part 1
+        // with respect to l
+        for (int k = 0; k < current_edges_num; ++k) {
+          iRow[nz_index] = constraint_index + 1;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+
+        // With respect to n
+        iRow[nz_index] = constraint_index + 1;
+        jCol[nz_index] = n_index;
+        ++nz_index;
+
+        iRow[nz_index] = constraint_index + 1;
+        jCol[nz_index] = n_index + 2;
+        ++nz_index;
+
+        // 2. G' * mu + R' * lambda == 0, part 2
+        // with respect to l
+        for (int k = 0; k < current_edges_num; ++k) {
+          iRow[nz_index] = constraint_index + 2;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+
+        // With respect to n
+        iRow[nz_index] = constraint_index + 2;
+        jCol[nz_index] = n_index + 1;
+        ++nz_index;
+
+        iRow[nz_index] = constraint_index + 2;
+        jCol[nz_index] = n_index + 3;
+        ++nz_index;
+
+        //  -g'*mu + (A*t - b)*lambda > 0
+        // with respect to l
+        for (int k = 0; k < current_edges_num; ++k) {
+          iRow[nz_index] = constraint_index + 3;
+          jCol[nz_index] = l_index + k;
+          ++nz_index;
+        }
+
+        // with respect to n
+        for (int k = 0; k < 4; ++k) {
+          iRow[nz_index] = constraint_index + 3;
+          jCol[nz_index] = n_index + k;
+          ++nz_index;
+        }
+
+        // with resepct to d
+        iRow[nz_index] = constraint_index + 3;
+        jCol[nz_index] = d_index;
+        ++nz_index;
+
+        // Update index
+        l_index += current_edges_num;
+        n_index += 4;
+        d_index += 1;
+        constraint_index += 4;
+      }
+    }
+
+    l_index = l_start_index_;
+    n_index = n_start_index_;
+    d_index = d_start_index_;
+    for (int i = 0; i < lambda_horizon_; ++i) {
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = l_index;
+          ++nz_index;
+          ++constraint_index;
+          ++l_index;
+    }
+    for (int i = 0; i < miu_horizon_; ++i) {
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = n_index;
+          ++nz_index;
+          ++constraint_index;
+          ++n_index;
+    }
+    for (int i = 0; i < dual_formulation_horizon_; ++i) {
+          iRow[nz_index] = constraint_index;
+          jCol[nz_index] = d_index;
+          ++nz_index;
+          ++constraint_index;
+          ++d_index;
+    }
+
+    CHECK_EQ(constraint_index, m) << "No. of constraints wrong in eval_jac_g.";
+
+    ADEBUG << "nz_index here : " << nz_index << " nele_jac is : " << nele_jac;
+  } else {
+    std::fill(values, values + nele_jac, 0.0);
+    int nz_index = 0;
+
+    // 1. Three obstacles related equal constraints, one equality
+    // constraints,
+    // [0, horizon_] * [0, obstacles_num_-1] * 4
+    int l_index = l_start_index_;
+    int n_index = n_start_index_;
+
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      int edges_counter = 0;
+      for (int j = 0; j < obstacles_num_; ++j) {
+        int current_edges_num = obstacles_edges_num_(j, 0);
+        Eigen::MatrixXd Aj =
+            obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+        Eigen::MatrixXd bj =
+            obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+
+        // TODO(QiL) : Remove redudant calculation
+        double tmp1 = 0;
+        double tmp2 = 0;
+        for (int k = 0; k < current_edges_num; ++k) {
+          // TODO(QiL) : replace this one directly with x
+          tmp1 += Aj(k, 0) * x[l_index + k];
+          tmp2 += Aj(k, 1) * x[l_index + k];
+        }
+
+        // 1. norm(A* lambda == 1)
+        for (int k = 0; k < current_edges_num; ++k) {
+          // with respect to l
+          values[nz_index] =
+              2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
+          ++nz_index;
+        }
+
+        // 2. G' * mu + R' * lambda == 0, part 1
+
+        // with respect to l
+        for (int k = 0; k < current_edges_num; ++k) {
+          values[nz_index] = std::cos(xWS_(2, i)) * Aj(k, 0) +
+                             std::sin(xWS_(2, i)) * Aj(k, 1);  // v0~vn
+          ++nz_index;
+        }
+
+        // With respect to n
+        values[nz_index] = 1.0;  // w0
+        ++nz_index;
+
+        values[nz_index] = -1.0;  // w2
+        ++nz_index;
+
+        ADEBUG << "eval_jac_g, after adding part 2";
+        // 3. G' * mu + R' * lambda == 0, part 2
+
+        // with respect to l
+        for (int k = 0; k < current_edges_num; ++k) {
+          values[nz_index] = -std::sin(xWS_(2, i)) * Aj(k, 0) +
+                             std::cos(xWS_(2, i)) * Aj(k, 1);  // y0~yn
+          ++nz_index;
+        }
+
+        // With respect to n
+        values[nz_index] = 1.0;  // z1
+        ++nz_index;
+
+        values[nz_index] = -1.0;  // z3
+        ++nz_index;
+
+        //  3. -g'*mu + (A*t - b)*lambda > 0
+        // TODO(QiL) Revise dual vairables modeling here.
+        double tmp3 = 0.0;
+        double tmp4 = 0.0;
+        for (int k = 0; k < 4; ++k) {
+          tmp3 += -g_[k] * x[n_index + k];
+        }
+
+        for (int k = 0; k < current_edges_num; ++k) {
+          tmp4 += bj(k, 0) * x[l_index + k];
+        }
+
+        // with respect to l
+        for (int k = 0; k < current_edges_num; ++k) {
+          values[nz_index] =
+              -(xWS_(0, i) + std::cos(xWS_(2, i)) * offset_) * Aj(k, 0) -
+              (xWS_(1, i) + std::sin(xWS_(2, i)) * offset_) * Aj(k, 1) +
+              bj(k, 0);  // ddk
+          ++nz_index;
+        }
+
+        // with respect to n
+        for (int k = 0; k < 4; ++k) {
+          values[nz_index] = g_[k];  // eek
+          ++nz_index;
+        }
+
+        // with respect to d
+        values[nz_index] = 1;  // ffk
+        ++nz_index;
+
+        // Update index
+        edges_counter += current_edges_num;
+        l_index += current_edges_num;
+        n_index += 4;
+      }
+    }
+
+    for (int i = 0; i < lambda_horizon_; ++i) {
+          values[nz_index] = 1;
+          ++nz_index;
+    }
+    for (int i = 0; i < miu_horizon_; ++i) {
+          values[nz_index] = 1;
+          ++nz_index;
+    }
+    for (int i = 0; i < dual_formulation_horizon_; ++i) {
+          values[nz_index] = 1;
+          ++nz_index;
+    }
+
+    ADEBUG << "eval_jac_g, fulfilled obstacle constraint values";
+    CHECK_EQ(nz_index, nele_jac);
+  }
+
+  ADEBUG << "eval_jac_g done";
+  return true;
+}
+
 bool DualVariableWarmStartIPOPTInterface::eval_h(int n, const double* x,
                                                  bool new_x, double obj_factor,
                                                  int m, const double* lambda,
@@ -298,244 +566,6 @@ bool DualVariableWarmStartIPOPTInterface::eval_h(int n, const double* x,
   return true;
 }
 
-bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
-                                                 bool new_x, int m, double* g) {
-  eval_constraints(n, x, m, g);
-  return true;
-}
-
-bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
-                                                     bool new_x, int m,
-                                                     int nele_jac, int* iRow,
-                                                     int* jCol,
-                                                     double* values) {
-  if (values == NULL) {
-    // return the structure of the jacobian
-
-    for (int idx = 0; idx < nnz_jac; idx++) {
-      iRow[idx] = rind_g[idx];
-      jCol[idx] = cind_g[idx];
-    }
-  } else {
-    // return the values of the jacobian of the constraints
-
-    sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
-               options_g);
-
-    for (int idx = 0; idx < nnz_jac; idx++) {
-      values[idx] = jacval[idx];
-    }
-  }
-  return true;
-  // ADEBUG << "eval_jac_g";
-  // CHECK_EQ(n, num_of_variables_)
-  //     << "No. of variables wrong in eval_jac_g. n : " << n;
-  // CHECK_EQ(m, num_of_constraints_)
-  //     << "No. of constraints wrong in eval_jac_g. n : " << m;
-
-  // if (values == nullptr) {
-  //   int nz_index = 0;
-  //   int constraint_index = 0;
-
-  //   // 1. Three obstacles related equal constraints, one equality
-  //   constraints,
-  //   // [0, horizon_] * [0, obstacles_num_-1] * 4
-  //   int l_index = l_start_index_;
-  //   int n_index = n_start_index_;
-  //   int d_index = d_start_index_;
-  //   for (int i = 0; i < horizon_ + 1; ++i) {
-  //     for (int j = 0; j < obstacles_num_; ++j) {
-  //       int current_edges_num = obstacles_edges_num_(j, 0);
-
-  //       // 1. norm(A* lambda <= 1)
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         // with respect to l
-  //         iRow[nz_index] = constraint_index;
-  //         jCol[nz_index] = l_index + k;
-  //         ++nz_index;
-  //       }
-
-  //       // 2. G' * mu + R' * lambda == 0, part 1
-  //       // with respect to l
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         iRow[nz_index] = constraint_index + 1;
-  //         jCol[nz_index] = l_index + k;
-  //         ++nz_index;
-  //       }
-
-  //       // With respect to n
-  //       iRow[nz_index] = constraint_index + 1;
-  //       jCol[nz_index] = n_index;
-  //       ++nz_index;
-
-  //       iRow[nz_index] = constraint_index + 1;
-  //       jCol[nz_index] = n_index + 2;
-  //       ++nz_index;
-
-  //       // 2. G' * mu + R' * lambda == 0, part 2
-  //       // with respect to l
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         iRow[nz_index] = constraint_index + 2;
-  //         jCol[nz_index] = l_index + k;
-  //         ++nz_index;
-  //       }
-
-  //       // With respect to n
-  //       iRow[nz_index] = constraint_index + 2;
-  //       jCol[nz_index] = n_index + 1;
-  //       ++nz_index;
-
-  //       iRow[nz_index] = constraint_index + 2;
-  //       jCol[nz_index] = n_index + 3;
-  //       ++nz_index;
-
-  //       //  -g'*mu + (A*t - b)*lambda > 0
-  //       // with respect to l
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         iRow[nz_index] = constraint_index + 3;
-  //         jCol[nz_index] = l_index + k;
-  //         ++nz_index;
-  //       }
-
-  //       // with respect to n
-  //       for (int k = 0; k < 4; ++k) {
-  //         iRow[nz_index] = constraint_index + 3;
-  //         jCol[nz_index] = n_index + k;
-  //         ++nz_index;
-  //       }
-
-  //       // with resepct to d
-  //       iRow[nz_index] = constraint_index + 3;
-  //       jCol[nz_index] = d_index;
-  //       ++nz_index;
-
-  //       // Update index
-  //       l_index += current_edges_num;
-  //       n_index += 4;
-  //       d_index += 1;
-  //       constraint_index += 4;
-  //     }
-  //   }
-  //   CHECK_EQ(constraint_index, m) << "No. of constraints wrong in eval_jac_g.
-  //   ";
-
-  //   ADEBUG << "nz_index here in Part I is : " << nz_index
-  //          << " nele_jac is : " << nele_jac;
-  // } else {
-  //   std::fill(values, values + nele_jac, 0.0);
-  //   int nz_index = 0;
-
-  //   // 1. Three obstacles related equal constraints, one equality
-  //   constraints,
-  //   // [0, horizon_] * [0, obstacles_num_-1] * 4
-  //   int l_index = l_start_index_;
-  //   int n_index = n_start_index_;
-
-  //   for (int i = 0; i < horizon_ + 1; ++i) {
-  //     int edges_counter = 0;
-  //     for (int j = 0; j < obstacles_num_; ++j) {
-  //       int current_edges_num = obstacles_edges_num_(j, 0);
-  //       Eigen::MatrixXd Aj =
-  //           obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-  //       Eigen::MatrixXd bj =
-  //           obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
-
-  //       // TODO(QiL) : Remove redudant calculation
-  //       double tmp1 = 0;
-  //       double tmp2 = 0;
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         // TODO(QiL) : replace this one directly with x
-  //         tmp1 += Aj(k, 0) * x[l_index + k];
-  //         tmp2 += Aj(k, 1) * x[l_index + k];
-  //       }
-
-  //       // 1. norm(A* lambda == 1)
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         // with respect to l
-  //         values[nz_index] =
-  //             2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
-  //         ++nz_index;
-  //       }
-
-  //       // 2. G' * mu + R' * lambda == 0, part 1
-
-  //       // with respect to l
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         values[nz_index] = std::cos(xWS_(2, i)) * Aj(k, 0) +
-  //                            std::sin(xWS_(2, i)) * Aj(k, 1);  // v0~vn
-  //         ++nz_index;
-  //       }
-
-  //       // With respect to n
-  //       values[nz_index] = 1.0;  // w0
-  //       ++nz_index;
-
-  //       values[nz_index] = -1.0;  // w2
-  //       ++nz_index;
-
-  //       ADEBUG << "eval_jac_g, after adding part 2";
-  //       // 3. G' * mu + R' * lambda == 0, part 2
-
-  //       // with respect to l
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         values[nz_index] = -std::sin(xWS_(2, i)) * Aj(k, 0) +
-  //                            std::cos(xWS_(2, i)) * Aj(k, 1);  // y0~yn
-  //         ++nz_index;
-  //       }
-
-  //       // With respect to n
-  //       values[nz_index] = 1.0;  // z1
-  //       ++nz_index;
-
-  //       values[nz_index] = -1.0;  // z3
-  //       ++nz_index;
-
-  //       //  3. -g'*mu + (A*t - b)*lambda > 0
-  //       // TODO(QiL) Revise dual vairables modeling here.
-  //       double tmp3 = 0.0;
-  //       double tmp4 = 0.0;
-  //       for (int k = 0; k < 4; ++k) {
-  //         tmp3 += -g_[k] * x[n_index + k];
-  //       }
-
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         tmp4 += bj(k, 0) * x[l_index + k];
-  //       }
-
-  //       // with respect to l
-  //       for (int k = 0; k < current_edges_num; ++k) {
-  //         values[nz_index] =
-  //             -(xWS_(0, i) + std::cos(xWS_(2, i)) * offset_) * Aj(k, 0) -
-  //             (xWS_(1, i) + std::sin(xWS_(2, i)) * offset_) * Aj(k, 1) +
-  //             bj(k, 0);  // ddk
-  //         ++nz_index;
-  //       }
-
-  //       // with respect to n
-  //       for (int k = 0; k < 4; ++k) {
-  //         values[nz_index] = g_[k];  // eek
-  //         ++nz_index;
-  //       }
-
-  //       // with respect to d
-  //       values[nz_index] = 1;  // ffk
-  //       ++nz_index;
-
-  //       // Update index
-  //       edges_counter += current_edges_num;
-  //       l_index += current_edges_num;
-  //       n_index += 4;
-  //     }
-  //   }
-
-  //   ADEBUG << "eval_jac_g, fulfilled obstacle constraint values";
-  //   CHECK_EQ(nz_index, nele_jac);
-  // }
-
-  // ADEBUG << "eval_jac_g done";
-  // return true;
-}
-
 void DualVariableWarmStartIPOPTInterface::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
@@ -563,11 +593,8 @@ void DualVariableWarmStartIPOPTInterface::finalize_solution(
 
   // memory deallocation of ADOL-C variables
   delete[] obj_lam;
-  free(rind_g);
-  free(cind_g);
   free(rind_L);
   free(cind_L);
-  free(jacval);
   free(hessval);
 }
 
@@ -665,20 +692,17 @@ bool DualVariableWarmStartIPOPTInterface::eval_constraints(int n, const T* x,
   l_index = l_start_index_;
   n_index = n_start_index_;
   d_index = d_start_index_;
-  int lambda_horizon = obstacles_edges_sum_ * (horizon_ + 1);
-  int miu_horizon = obstacles_num_ * 4 * (horizon_ + 1);
-  int dual_formulation_horizon = obstacles_num_ * (horizon_ + 1);
-  for (int i = 0; i < lambda_horizon; ++i) {
+  for (int i = 0; i < lambda_horizon_; ++i) {
     g[constraint_index] = x[l_index];
     constraint_index++;
     l_index++;
   }
-  for (int i = 0; i < miu_horizon; ++i) {
+  for (int i = 0; i < miu_horizon_; ++i) {
     g[constraint_index] = x[n_index];
     constraint_index++;
     n_index++;
   }
-  for (int i = 0; i < dual_formulation_horizon; ++i) {
+  for (int i = 0; i < dual_formulation_horizon_; ++i) {
     g[constraint_index] = x[d_index];
     constraint_index++;
     d_index++;
@@ -691,7 +715,6 @@ bool DualVariableWarmStartIPOPTInterface::eval_constraints(int n, const T* x,
 
 /** Method to generate the required tapes */
 void DualVariableWarmStartIPOPTInterface::generate_tapes(int n, int m,
-                                                         int* nnz_jac_g,
                                                          int* nnz_h_lag) {
   double* xp = new double[n];
   double* lamp = new double[m];
@@ -747,22 +770,10 @@ void DualVariableWarmStartIPOPTInterface::generate_tapes(int n, int m,
 
   trace_off();
 
-  rind_g = NULL;
-  cind_g = NULL;
   rind_L = NULL;
   cind_L = NULL;
 
-  options_g[0] = 0; /* sparsity pattern by index domains (default) */
-  options_g[1] = 0; /*                         safe mode (default) */
-  options_g[2] = 0;
-  options_g[3] = 0; /*                column compression (default) */
-
-  jacval = NULL;
   hessval = NULL;
-  sparse_jac(tag_g, m, n, 0, xp, &nnz_jac, &rind_g, &cind_g, &jacval,
-             options_g);
-
-  *nnz_jac_g = nnz_jac;
 
   options_L[0] = 0;
   options_L[1] = 1;
