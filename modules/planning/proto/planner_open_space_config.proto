@@ -49,8 +49,5 @@ message DistanceApproachConfig {
   optional double max_acceleration_reverse = 12 [default = 2.0];
   optional double min_time_sample_scaling = 13 [default = 0.1];
   optional double max_time_sample_scaling = 14 [default = 10.0];
-  optional double max_miu = 15 [default = 1.0e10];
-  optional double max_lambda = 16 [default = 0.2];
-  optional double max_safety_distance = 17 [default = 1.0e10];
   optional bool use_fix_time = 18 [default = false];
 }

@@ -33,14 +33,12 @@ namespace apollo {
 namespace planning {
 
 DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
-    int num_of_variables, int num_of_constraints, size_t horizon, float ts,
-    const Eigen::MatrixXd& ego, const Eigen::MatrixXi& obstacles_edges_num,
-    const size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-    const Eigen::MatrixXd& obstacles_b, const Eigen::MatrixXd& xWS,
+    size_t horizon, float ts, const Eigen::MatrixXd& ego,
+    const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    const Eigen::MatrixXd& xWS,
     const PlannerOpenSpaceConfig& planner_open_space_config)
-    : num_of_variables_(num_of_variables),
-      num_of_constraints_(num_of_constraints),
-      ts_(ts),
+    : ts_(ts),
       ego_(ego),
       obstacles_edges_num_(obstacles_edges_num),
       obstacles_A_(obstacles_A),
@@ -69,6 +67,22 @@ DualVariableWarmStartIPOPTInterface::DualVariableWarmStartIPOPTInterface(
 bool DualVariableWarmStartIPOPTInterface::get_nlp_info(
     int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
     IndexStyleEnum& index_style) {
+  // n1 : lagrangian multiplier associated with obstacleShape
+  int n1 = obstacles_edges_sum_ * (horizon_ + 1);
+
+  // n2 : lagrangian multipier associated with car shape, obstacles_num*4 *
+  // (N+1)
+  int n2 = obstacles_num_ * 4 * (horizon_ + 1);
+
+  // n3 : dual variable, obstacles_num * (N+1)
+  int n3 = obstacles_num_ * (horizon_ + 1);
+
+  // m1 : obstacle constraints
+  int m1 = 4 * obstacles_num_ * (horizon_ + 1);
+
+  num_of_variables_ = n1 + n2 + n3;
+  num_of_constraints_ = m1;
+
   // number of variables
   n = num_of_variables_;
 
@@ -152,7 +166,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
       x_l[variable_index] = 0.0;
-      x_u[variable_index] = 10.0;
+      x_u[variable_index] = 2e19;
       ++variable_index;
     }
   }
@@ -162,7 +176,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
       x_l[variable_index] = 0.0;
-      x_u[variable_index] = 10.0;
+      x_u[variable_index] = 2e19;  // nlp_upper_bound_limit
       ++variable_index;
     }
   }
@@ -173,7 +187,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
     for (int j = 0; j < obstacles_num_; ++j) {
       // TODO(QiL): Load this from configuration
       x_l[variable_index] = 0.0;
-      x_u[variable_index] = 10.0;
+      x_u[variable_index] = 2e19;  // nlp_upper_bound_limit
       ++variable_index;
     }
   }

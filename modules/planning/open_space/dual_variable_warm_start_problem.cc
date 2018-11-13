@@ -46,28 +46,11 @@ bool DualVariableWarmStartProblem::Solve(
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,
     Eigen::MatrixXd* n_warm_up) {
-  // n1 : lagrangian multiplier associated with obstacleShape
-  int n1 = obstacles_edges_num.sum() * (horizon + 1);
-
-  // n2 : lagrangian multipier associated with car shape, obstacles_num*4 *
-  // (N+1)
-  int n2 = obstacles_num * 4 * (horizon + 1);
-
-  // n3 : dual variable, obstacles_num * (N+1)
-  int n3 = obstacles_num * (horizon + 1);
-
-  // m1 : obstacle constraints
-  int m1 = 4 * obstacles_num * (horizon + 1);
-
-  int num_of_variables = n1 + n2 + n3;
-  int num_of_constraints = m1;
-
   auto t_start = cyber::Time::Now().ToSecond();
   DualVariableWarmStartIPOPTInterface* ptop =
       new DualVariableWarmStartIPOPTInterface(
-          num_of_variables, num_of_constraints, horizon, ts, ego,
-          obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b, xWS,
-          planner_open_space_config_);
+          horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+          obstacles_b, xWS, planner_open_space_config_);
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
@@ -78,7 +61,7 @@ bool DualVariableWarmStartProblem::Solve(
   // TODO(QiL) : Change IPOPT settings to flag or configs
   // app->Options()->SetStringValue("derivative_test", "first-order");
   // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
-  int print_level = 0;
+  int print_level = 5;
   app->Options()->SetIntegerValue("print_level", print_level);
   int num_iterations = 0;
   app->Options()->SetIntegerValue("max_iter", num_iterations);

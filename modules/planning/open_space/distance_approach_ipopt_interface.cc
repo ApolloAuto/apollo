@@ -83,7 +83,6 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   weight_first_order_time_ = distance_approach_config_.weight_time(0);
   weight_second_order_time_ = distance_approach_config_.weight_time(1);
   min_safety_distance_ = distance_approach_config_.min_safety_distance();
-  max_safety_distance_ = distance_approach_config_.max_safety_distance();
   max_steer_angle_ = distance_approach_config_.max_steer_angle();
   max_speed_forward_ = distance_approach_config_.max_speed_forward();
   max_speed_reverse_ = distance_approach_config_.max_speed_reverse();
@@ -96,8 +95,6 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   max_time_sample_scaling_ =
       distance_approach_config_.max_time_sample_scaling();
   max_steer_rate_ = distance_approach_config_.max_steer_rate();
-  max_lambda_ = distance_approach_config_.max_lambda();
-  max_miu_ = distance_approach_config_.max_miu();
   use_fix_time_ = distance_approach_config_.use_fix_time();
   wheelbase_ = vehicle_param_.wheel_base();
 }
@@ -188,8 +185,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
     x_u[variable_index + 1] = XYbounds_[3];
 
     // phi
-    x_l[variable_index + 2] = -M_PI;
-    x_u[variable_index + 2] = M_PI;
+    x_l[variable_index + 2] = -2e19;
+    x_u[variable_index + 2] = 2e19;
 
     // v
     x_l[variable_index + 3] = -max_speed_reverse_;
@@ -241,7 +238,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
       x_l[variable_index] = 0.0;
-      x_u[variable_index] = max_lambda_;
+      x_u[variable_index] = 2e19;  // nlp_upper_bound_limit
       ++variable_index;
     }
   }
@@ -251,7 +248,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
       x_l[variable_index] = 0.0;
-      x_u[variable_index] = max_miu_;
+      x_u[variable_index] = 2e19;  // nlp_upper_bound_limit
 
       ++variable_index;
     }
@@ -309,7 +306,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
       // c. -g'*mu + (A*t - b)*lambda > min_safety_distance_
       g_l[constraint_index + 3] = min_safety_distance_;
-      g_u[constraint_index + 3] = max_safety_distance_;
+      g_u[constraint_index + 3] = 2e19;  // nlp_upper_bound_limit
       constraint_index += 4;
     }
   }
@@ -1204,16 +1201,16 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
     T x3_diff = x[state_index + 2] - xWS_(2, i);
     T x4_abs = x[state_index + 3];
     *obj_value += weight_state_x_ * x1_diff * x1_diff +
-                 weight_state_y_ * x2_diff * x2_diff +
-                 weight_state_phi_ * x3_diff * x3_diff +
-                 weight_state_v_ * x4_abs * x4_abs;
+                  weight_state_y_ * x2_diff * x2_diff +
+                  weight_state_phi_ * x3_diff * x3_diff +
+                  weight_state_v_ * x4_abs * x4_abs;
     state_index += 4;
   }
 
   // 2. objective to minimize u square
   for (int i = 0; i < horizon_; ++i) {
     *obj_value += weight_input_steer_ * x[control_index] * x[control_index] +
-                 weight_input_a_ * x[control_index + 1] * x[control_index + 1];
+                  weight_input_a_ * x[control_index + 1] * x[control_index + 1];
     control_index += 2;
   }
 
@@ -1235,7 +1232,7 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
     T a_rate =
         (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
     *obj_value += weight_rate_steer_ * steering_rate * steering_rate +
-                 weight_rate_a_ * a_rate * a_rate;
+                  weight_rate_a_ * a_rate * a_rate;
     control_index += 2;
     time_index += 1;
   }
