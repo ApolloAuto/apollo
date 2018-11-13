@@ -2,6 +2,7 @@ import { observable, action, computed } from "mobx";
 
 import WS from "store/websocket";
 import UTTERANCE from "store/utterance";
+import RENDERER from "renderer";
 
 export default class HMI {
     modes = [];
@@ -9,6 +10,11 @@ export default class HMI {
 
     vehicles = [];
     @observable currentVehicle = 'none';
+    defaultVehicleSize = {
+        height: 1.48,
+        width: 2.11,
+        length: 4.933,
+    };
     vehicleParam = {
         frontEdgeToCenter: 3.89,
         backEdgeToCenter: 1.04,
@@ -107,6 +113,9 @@ export default class HMI {
 
     updateVehicleParam(vehicleParam) {
         this.vehicleParam = vehicleParam;
+        RENDERER.adc.resizeCarScale(this.vehicleParam.length / this.defaultVehicleSize.length,
+            this.vehicleParam.width / this.defaultVehicleSize.width,
+            this.vehicleParam.height / this.defaultVehicleSize.height);
     }
 
     @action toggleModule(id) {
