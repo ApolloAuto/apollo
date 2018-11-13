@@ -70,8 +70,6 @@ void TrafficLightRightTurnUnprotectedScenario::Init() {
     return;
   }
 
-  // TODO(all): check light color
-
   init_ = true;
 }
 
