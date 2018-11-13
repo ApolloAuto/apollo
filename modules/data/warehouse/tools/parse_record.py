@@ -30,7 +30,7 @@ import gflags
 import glog
 import utm
 
-import cyber.record
+from cyber_py import record
 from cyber.proto.record_pb2 import Header
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.data.proto.record_pb2 import Record

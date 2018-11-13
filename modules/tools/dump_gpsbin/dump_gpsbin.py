@@ -32,8 +32,8 @@ import time
 import gflags
 import glog
 
-from cyber import cyber
-from cyber import record
+from cyber_py import cyber
+from cyber_py import record
 from modules.drivers.gnss.proto.gnss_pb2 import RawData
 
 # Requried flags.
