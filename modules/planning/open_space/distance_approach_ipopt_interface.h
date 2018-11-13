@@ -141,7 +141,6 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd uWS_;
   Eigen::MatrixXd l_warm_up_;
   Eigen::MatrixXd n_warm_up_;
-  Eigen::MatrixXd timeWS_;
   Eigen::MatrixXd x0_;
   Eigen::MatrixXd xf_;
   Eigen::MatrixXd last_time_u_;
