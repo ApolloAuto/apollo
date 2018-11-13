@@ -61,16 +61,14 @@ bool DualVariableWarmStartProblem::Solve(
   // TODO(QiL) : Change IPOPT settings to flag or configs
   // app->Options()->SetStringValue("derivative_test", "first-order");
   // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
-  int print_level = 5;
-  app->Options()->SetIntegerValue("print_level", print_level);
-  int num_iterations = 0;
-  app->Options()->SetIntegerValue("max_iter", num_iterations);
-  int mumps_mem_percent = 6000;
-  app->Options()->SetIntegerValue("mumps_mem_percent", mumps_mem_percent);
-  int max_iter = 750;
-  app->Options()->SetIntegerValue("max_iter", max_iter);
-  double tol = 1e-3;
-  app->Options()->SetNumericValue("tol", tol);
+  app->Options()->SetIntegerValue("print_level", 0);
+  app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
+  app->Options()->SetNumericValue("mumps_pivtol", 1e-6);
+  app->Options()->SetIntegerValue("max_iter", 750);
+  app->Options()->SetNumericValue("tol", 1e-3);
+  app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
+  app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
+  app->Options()->SetStringValue("print_timing_statistics", "yes");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
