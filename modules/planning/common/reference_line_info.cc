@@ -516,12 +516,11 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   }
 }
 
-bool ReferenceLineInfo::IsRightTurnPath() const {
+bool ReferenceLineInfo::IsRightTurnPath(const double forward_buffer) const {
   double route_s = 0.0;
   const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
-  constexpr double kRightTurnStartBuff = 1.0;
   for (const auto& seg : Lanes()) {
-    if (route_s > adc_s + kRightTurnStartBuff) {
+    if (route_s > adc_s + forward_buffer) {
       break;
     }
     route_s += seg.end_s - seg.start_s;

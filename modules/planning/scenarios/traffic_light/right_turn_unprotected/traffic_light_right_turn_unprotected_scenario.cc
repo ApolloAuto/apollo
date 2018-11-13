@@ -141,16 +141,17 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
         << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
   }
 
+  const double forward_buffer = 5.0;
+  bool right_turn = reference_line_info.IsRightTurnPath(forward_buffer);
+
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return is_stopped_for_traffic_light;
+      return (is_stopped_for_traffic_light && right_turn);
     case ScenarioConfig::STOP_SIGN_PROTECTED:
-      return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      return false;
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
