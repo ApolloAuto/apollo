@@ -152,6 +152,8 @@ class Frame {
   ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
 
  private:
+  common::Status InitFrameData();
+
   bool CreateReferenceLineInfo(const std::list<ReferenceLine> &reference_lines,
                                const std::list<hdmap::RouteSegments> &segments);
 
