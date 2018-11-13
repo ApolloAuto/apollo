@@ -325,8 +325,6 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
   CHECK(init_x == true) << "Warm start init_x setting failed";
-  CHECK(init_z == false) << "Warm start init_z setting failed";
-  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
 
   CHECK_EQ(horizon_, uWS_.cols());
   CHECK_EQ(horizon_ + 1, xWS_.cols());
@@ -348,26 +346,22 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
   // 2. time scale variable initialization, horizon_ + 1
   for (int i = 0; i < horizon_ + 1; ++i) {
-    x[time_start_index_ + i] = 1.0;
+    x[time_start_index_ + i] = 0.5;
   }
 
-  // TODO(QiL) : better hot start l
   // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
   for (int i = 0; i < horizon_ + 1; ++i) {
     int index = i * obstacles_edges_sum_;
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
       x[l_start_index_ + index + j] = l_warm_up_(j, i);
-      // x[index + j] = 0.5;
     }
   }
 
-  // TODO(QiL) : better hot start n
   // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
   for (int i = 0; i < horizon_ + 1; ++i) {
     int index = i * 4 * obstacles_num_;
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
       x[n_start_index_ + index + j] = n_warm_up_(j, i);
-      // x[index + j] = 0.5;
     }
   }
   ADEBUG << "get_starting_point out";
