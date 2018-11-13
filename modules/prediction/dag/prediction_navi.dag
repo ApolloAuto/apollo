@@ -1,0 +1,24 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/prediction/libprediction_component.so"
+    components {
+        class_name : "PredictionComponent"
+        config {
+            name: "prediction"
+            flag_file_path: "/apollo/modules/prediction/conf/prediction_navi.conf"
+            readers: [
+                {
+                    channel: "/apollo/perception/obstacles"
+                    qos_profile: {
+                        depth : 1
+                    }
+                },
+                {
+                    channel: "/apollo/localization/pose"
+                    qos_profile: {
+                        depth : 1
+                    }
+                }
+            ]
+        }
+    }
+}
