@@ -19,7 +19,7 @@
 import time
 import argparse
 import google.protobuf.text_format as text_format
-from cyber import cyber
+from cyber_py import cyber
 from modules.perception.proto import perception_obstacle_pb2
 
 
