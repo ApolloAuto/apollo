@@ -211,7 +211,7 @@ void PredictionComponent::OnPerception(
   obstacles_container->Insert(perception_obstacles);
 
   // Scenario analysis
-  ScenarioManager::Instance()->Run();
+  // ScenarioManager::Instance()->Run();
 
   // Set up obstacle cluster
   obstacles_container->BuildLaneGraph();
@@ -220,6 +220,7 @@ void PredictionComponent::OnPerception(
          << perception_obstacles.ShortDebugString() << "].";
 
   // Update ADC status
+  /*
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
   ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
@@ -238,6 +239,7 @@ void PredictionComponent::OnPerception(
            << ", " << std::fixed << std::setprecision(6) << y << "].";
     adc_container->SetPosition({x, y});
   }
+  */
 
   // Make evaluations
   EvaluatorManager::Instance()->Run(perception_obstacles);
