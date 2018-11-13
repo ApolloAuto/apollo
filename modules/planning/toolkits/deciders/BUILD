@@ -25,6 +25,7 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/perception/proto:perception_proto",
         "//modules/planning/math/finite_element_qp:fem_1d_expanded_jerk_qp_problem",
         "//modules/planning/toolkits:task",
     ],

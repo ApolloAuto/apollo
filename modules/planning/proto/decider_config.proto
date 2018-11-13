@@ -16,6 +16,7 @@ message DeciderCreepConfig {
 message DeciderRuleBasedStopConfig {
   // stop distance(m) to the stop line of the stop sign
   optional double stop_distance = 1 [default = 1.0];  // meter
+  optional double traffic_light_signal_expire_time_sec = 2 [default = 5.0];  // second
 }
 
 message SidePassSafetyConfig {
