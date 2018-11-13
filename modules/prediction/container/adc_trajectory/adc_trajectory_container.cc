@@ -64,7 +64,7 @@ void ADCTrajectoryContainer::Insert(
 }
 
 bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
-  if (adc_junction_polygon_.num_points() < 3) {
+  if (adc_junction_polygon_.points().size() < 3) {
     return false;
   }
   bool in_polygon = adc_junction_polygon_.IsPointIn({point.x(), point.y()});
