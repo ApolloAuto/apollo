@@ -32,7 +32,7 @@ from mongo_util import Mongo
 from parse_record import RecordParser
 
 
-gflags.DEFINE_string('collection', 'apollo_record', 'MongoDB collection name.')
+gflags.DEFINE_string('collection', 'record', 'MongoDB collection name.')
 
 gflags.DEFINE_string('import_mode', 'insert',
                      'Strategy when importing record to MongoDB:'
