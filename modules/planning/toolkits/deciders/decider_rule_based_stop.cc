@@ -22,16 +22,22 @@
 
 #include <string>
 
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+
+#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::time::Clock;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::util::WithinBound;
 using apollo::hdmap::PathOverlap;
+using apollo::perception::TrafficLight;
+using apollo::perception::TrafficLightDetection;
 
 DeciderRuleBasedStop::DeciderRuleBasedStop(
     const TaskConfig& config) : Decider(config) {
@@ -44,14 +50,14 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  StopSign(frame, reference_line_info);
+  CheckStopSign(frame, reference_line_info);
 
-  TrafficLight(frame, reference_line_info);
+  CheckTrafficLight(frame, reference_line_info);
 
   return Status::OK();
 }
 
-void DeciderRuleBasedStop::StopSign(
+void DeciderRuleBasedStop::CheckStopSign(
     Frame* const frame,
     ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
@@ -78,7 +84,7 @@ void DeciderRuleBasedStop::StopSign(
                     StopReasonCode::STOP_REASON_STOP_SIGN);
 }
 
-void DeciderRuleBasedStop::TrafficLight(
+void DeciderRuleBasedStop::CheckTrafficLight(
     Frame* const frame,
     ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
@@ -90,7 +96,14 @@ void DeciderRuleBasedStop::TrafficLight(
     return;
   }
 
-  // TODO(all): check traffic light
+  const TrafficLight traffic_light = ReadTrafficLight(
+      *frame, traffic_light_id);
+
+  // TODO(all): add stop_deceleration check based on signal colors
+
+  if (traffic_light.color() == TrafficLight::GREEN) {
+    return;
+  }
 
   const std::string stop_wall_id =
       TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_id;
@@ -106,6 +119,36 @@ void DeciderRuleBasedStop::TrafficLight(
                     stop_line_s,
                     stop_distance,
                     StopReasonCode::STOP_REASON_SIGNAL);
+}
+
+TrafficLight DeciderRuleBasedStop::ReadTrafficLight(
+    const Frame& frame,
+    const std::string& traffic_light_id) {
+  const auto traffic_light_detection = frame.local_view().traffic_light;
+  if (traffic_light_detection == nullptr) {
+    ADEBUG << "traffic_light_detection is null";
+  } else {
+    const double delay = traffic_light_detection->header().timestamp_sec() -
+        Clock::NowInSeconds();
+    if (delay > config_.decider_rule_based_stop_config().
+        traffic_light_signal_expire_time_sec()) {
+      ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
+    } else {
+      for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
+        if (traffic_light_detection->traffic_light(i).id() ==
+            traffic_light_id) {
+          return traffic_light_detection->traffic_light(i);
+        }
+      }
+    }
+  }
+
+  TrafficLight traffic_light;
+  traffic_light.set_id(traffic_light_id);
+  traffic_light.set_color(TrafficLight::UNKNOWN);
+  traffic_light.set_confidence(0.0);
+  traffic_light.set_tracking_time(0.0);
+  return traffic_light;
 }
 
 bool DeciderRuleBasedStop::BuildStopDecision(
