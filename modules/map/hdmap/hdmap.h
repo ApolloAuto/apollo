@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "cyber/common/macros.h"
 
@@ -274,6 +275,18 @@ class HDMap {
    */
   int GetStopSignAssociatedLanes(const Id& id,
                                  std::vector<LaneInfoConstPtr>* lanes) const;
+
+  /**
+   * @brief get a local map which is identical to the origin map except that all map elements 
+   *   without overlap with the given region are deleted.
+   * @param point the target position
+   * @param range the size of local map region, [width, height]
+   * @param local_map local map in proto format
+   * @return 0:success, otherwise failed
+   */
+  int GetLocalMap(const apollo::common::PointENU& point,
+                const std::pair<double, double>& range,
+                Map* local_map) const;
 
  private:
   HDMapImpl impl_;

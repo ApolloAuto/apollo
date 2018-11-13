@@ -19,6 +19,7 @@ limitations under the License.
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 #include "modules/common/math/aabox2d.h"
 #include "modules/common/math/aaboxkdtree2d.h"
@@ -299,6 +300,18 @@ class HDMapImpl {
    */
   int GetStopSignAssociatedLanes(const Id& id,
                                  std::vector<LaneInfoConstPtr>* lanes) const;
+
+  /**
+   * @brief get a local map which is identical to the origin map except that all map elements 
+   *   without overlap with the given region are deleted.
+   * @param point the target position
+   * @param range the size of local map region, [width, height]
+   * @param local_map local map in proto format
+   * @return 0:success, otherwise failed
+   */
+  int GetLocalMap(const apollo::common::PointENU& point,
+                const std::pair<double, double>& range,
+                Map* local_map) const;
 
  private:
   int GetLanes(const apollo::common::math::Vec2d& point, double distance,
