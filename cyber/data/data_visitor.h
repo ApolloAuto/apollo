@@ -65,6 +65,13 @@ class DataVisitor : public DataVisitorBase {
         buffer_m0_, buffer_m1_, buffer_m2_, buffer_m3_);
   }
 
+  ~DataVisitor() {
+    if (data_fusion_) {
+      delete data_fusion_;
+      data_fusion_ = nullptr;
+    }
+  }
+
   bool TryFetch(std::shared_ptr<M0>& m0, std::shared_ptr<M1>& m1,    // NOLINT
                 std::shared_ptr<M2>& m2, std::shared_ptr<M3>& m3) {  // NOLINT
     if (data_fusion_->Fusion(&next_msg_index_, m0, m1, m2, m3)) {
@@ -75,7 +82,7 @@ class DataVisitor : public DataVisitorBase {
   }
 
  private:
-  fusion::DataFusion<M0, M1, M2, M3>* data_fusion_;
+  fusion::DataFusion<M0, M1, M2, M3>* data_fusion_ = nullptr;
   ChannelBuffer<M0> buffer_m0_;
   ChannelBuffer<M1> buffer_m1_;
   ChannelBuffer<M2> buffer_m2_;
@@ -103,6 +110,7 @@ class DataVisitor<M0, M1, M2, NullType> : public DataVisitorBase {
   ~DataVisitor() {
     if (data_fusion_) {
       delete data_fusion_;
+      data_fusion_ = nullptr;
     }
   }
 
@@ -116,7 +124,7 @@ class DataVisitor<M0, M1, M2, NullType> : public DataVisitorBase {
   }
 
  private:
-  fusion::DataFusion<M0, M1, M2>* data_fusion_;
+  fusion::DataFusion<M0, M1, M2>* data_fusion_ = nullptr;
   ChannelBuffer<M0> buffer_m0_;
   ChannelBuffer<M1> buffer_m1_;
   ChannelBuffer<M2> buffer_m2_;
@@ -139,6 +147,7 @@ class DataVisitor<M0, M1, NullType, NullType> : public DataVisitorBase {
   ~DataVisitor() {
     if (data_fusion_) {
       delete data_fusion_;
+      data_fusion_ = nullptr;
     }
   }
 
@@ -151,7 +160,7 @@ class DataVisitor<M0, M1, NullType, NullType> : public DataVisitorBase {
   }
 
  private:
-  fusion::DataFusion<M0, M1>* data_fusion_;
+  fusion::DataFusion<M0, M1>* data_fusion_ = nullptr;
   ChannelBuffer<M0> buffer_m0_;
   ChannelBuffer<M1> buffer_m1_;
 };
