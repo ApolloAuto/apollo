@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,12 @@ class Llcmotionfeedback221 : public ::apollo::drivers::canbus::ProtocolData<
              ChassisDetail* chassis) const override;
 
  private:
+  // config detail: {'name': 'LLC_FBK_VehicleSpeed', 'offset': 0.0, 'precision':
+  // 0.01, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|655.35]',
+  // 'bit': 32, 'type': 'double', 'order': 'intel', 'physical_unit': 'm/s'}
+  double llc_fbk_vehiclespeed(const std::uint8_t* bytes,
+                              const int32_t length) const;
+
   // config detail: {'description': 'Motion feedback 2 heartbeat counter',
   // 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':
   // 'LLC_MotionFeedback2_Counter', 'is_signed_var': False, 'physical_range':
