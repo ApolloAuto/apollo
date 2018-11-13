@@ -65,7 +65,7 @@ bool Poller::Register(const PollRequest& req) {
   ctrl_param.event.events = req.events;
 
   {
-    WriteLockGuard<AtomicRWLock> lck(requests_lock_);
+    WriteLockGuard<AtomicRWLock> lck(poll_data_lock_);
     if (requests_.count(req.fd) == 0) {
       ctrl_param.operation = EPOLL_CTL_ADD;
       requests_[req.fd] = std::make_shared<PollRequest>();
@@ -73,11 +73,7 @@ bool Poller::Register(const PollRequest& req) {
       ctrl_param.operation = EPOLL_CTL_MOD;
     }
     *requests_[req.fd] = req;
-  }
-
-  {
-    WriteLockGuard<AtomicRWLock> lck(changes_lock_);
-    changes_.push_back(ctrl_param);
+    ctrl_params_[ctrl_param.fd] = ctrl_param;
   }
 
   Notify();
@@ -95,21 +91,17 @@ bool Poller::Unregister(const PollRequest& req) {
   }
 
   {
-    WriteLockGuard<AtomicRWLock> lck(requests_lock_);
+    WriteLockGuard<AtomicRWLock> lck(poll_data_lock_);
     auto size = requests_.erase(req.fd);
     if (size == 0) {
       AERROR << "unregister failed, can't find fd: " << req.fd;
       return false;
     }
-  }
 
-  PollCtrlParam ctrl_param;
-  ctrl_param.operation = EPOLL_CTL_DEL;
-  ctrl_param.fd = req.fd;
-
-  {
-    WriteLockGuard<AtomicRWLock> lck(changes_lock_);
-    changes_.push_back(ctrl_param);
+    PollCtrlParam ctrl_param;
+    ctrl_param.operation = EPOLL_CTL_DEL;
+    ctrl_param.fd = req.fd;
+    ctrl_params_[ctrl_param.fd] = ctrl_param;
   }
 
   Notify();
@@ -154,7 +146,7 @@ bool Poller::Init() {
   ctrl_param.fd = pipe_fd_[0];
   ctrl_param.event.data.fd = pipe_fd_[0];
   ctrl_param.event.events = EPOLLIN;
-  changes_.push_back(ctrl_param);
+  ctrl_params_[ctrl_param.fd] = ctrl_param;
 
   is_shutdown_.exchange(false);
   thread_ = std::thread(&Poller::ThreadFunc, this);
@@ -182,13 +174,9 @@ void Poller::Clear() {
   }
 
   {
-    WriteLockGuard<AtomicRWLock> lck(requests_lock_);
+    WriteLockGuard<AtomicRWLock> lck(poll_data_lock_);
     requests_.clear();
-  }
-
-  {
-    WriteLockGuard<AtomicRWLock> lck(changes_lock_);
-    changes_.clear();
+    ctrl_params_.clear();
   }
 }
 
@@ -205,9 +193,13 @@ void Poller::Poll(int timeout_ms) {
 
   std::unordered_map<int, PollResponse> responses;
   {
-    ReadLockGuard<AtomicRWLock> lck(requests_lock_);
+    ReadLockGuard<AtomicRWLock> lck(poll_data_lock_);
     for (auto& item : requests_) {
       auto& request = item.second;
+      if (ctrl_params_.count(request->fd) != 0) {
+        continue;
+      }
+
       if (request->timeout_ms > 0) {
         request->timeout_ms -= interval_ms;
         if (request->timeout_ms < 0) {
@@ -234,7 +226,7 @@ void Poller::Poll(int timeout_ms) {
     int fd = item.first;
     auto& response = item.second;
 
-    ReadLockGuard<AtomicRWLock> lck(requests_lock_);
+    ReadLockGuard<AtomicRWLock> lck(poll_data_lock_);
     auto search = requests_.find(fd);
     if (search != requests_.end()) {
       search->second->timeout_ms = -1;
@@ -264,16 +256,17 @@ void Poller::ThreadFunc() {
 }
 
 void Poller::HandleChanges() {
-  ChangeList local_changes;
+  CtrlParamMap local_params;
   {
-    ReadLockGuard<AtomicRWLock> lck(changes_lock_);
-    if (changes_.empty()) {
+    ReadLockGuard<AtomicRWLock> lck(poll_data_lock_);
+    if (ctrl_params_.empty()) {
       return;
     }
-    local_changes.swap(changes_);
+    local_params.swap(ctrl_params_);
   }
 
-  for (auto& item : local_changes) {
+  for (auto& pair : local_params) {
+    auto& item = pair.second;
     ADEBUG << "epoll ctl, op[" << item.operation << "] fd[" << item.fd
            << "] events[" << item.event.events << "]";
     if (epoll_ctl(epoll_fd_, item.operation, item.fd, &item.event) != 0 &&
@@ -286,10 +279,10 @@ void Poller::HandleChanges() {
 // we may use min heap to opt
 int Poller::GetTimeoutMs() {
   int timeout_ms = kPollTimeoutMs;
-  ReadLockGuard<AtomicRWLock> lck(requests_lock_);
+  ReadLockGuard<AtomicRWLock> lck(poll_data_lock_);
   for (auto& item : requests_) {
     auto& req = item.second;
-    if (req->timeout_ms > 0 && req->timeout_ms < timeout_ms) {
+    if (req->timeout_ms >= 0 && req->timeout_ms < timeout_ms) {
       timeout_ms = req->timeout_ms;
     }
   }
