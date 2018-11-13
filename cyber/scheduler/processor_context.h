@@ -55,8 +55,6 @@ class ProcessorContext {
   alignas(CACHELINE_SIZE) std::shared_ptr<Processor> processor_ = nullptr;
   alignas(CACHELINE_SIZE) std::atomic_flag notified_ = ATOMIC_FLAG_INIT;
   bool stop_ = false;
-  uint32_t index_ = 0;
-  uint32_t status_;
 };
 
 }  // namespace scheduler
