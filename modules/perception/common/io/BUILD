@@ -10,13 +10,17 @@ cc_library(
     hdrs = [
         "io_util.h",
     ],
+    linkopts = [
+        "-lboost_filesystem",
+    ],
     deps = [
         "//cyber",
+        "//modules/common/util:file_util",
         "//modules/perception/base:camera",
         "//modules/perception/base:distortion_model",
         "//modules/perception/base:omnidirectional_model",
         "//modules/perception/common/geometry:basic",
-        "//modules/perception/lib/io:file_util",
+        "@eigen",
         "@yaml_cpp//:yaml",
     ],
 )

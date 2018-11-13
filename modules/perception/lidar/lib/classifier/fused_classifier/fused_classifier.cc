@@ -17,7 +17,6 @@
 #include <string>
 #include <vector>
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/proto/fused_classifier_config.pb.h"
 
 namespace apollo {

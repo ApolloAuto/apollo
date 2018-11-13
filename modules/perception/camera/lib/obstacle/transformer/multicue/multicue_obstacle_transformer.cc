@@ -18,7 +18,6 @@
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/singleton/singleton.h"
 
 namespace apollo {

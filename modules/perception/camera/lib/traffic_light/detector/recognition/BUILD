@@ -33,7 +33,6 @@ cc_library(
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "//modules/perception/lib/io:file_util",
     ],
 )
 
@@ -50,7 +49,6 @@ cc_library(
         ":trafficlight_detector_recognition_proto",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/lib/io:file_util",
         "//modules/common/util:file_util",
     ],
 )

@@ -36,7 +36,6 @@ cc_library(
         "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/camera/lib/lane/common:common_functions",
         "//modules/perception/camera/lib/lane/common:denseline_proto",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/registerer:registerer",
         "//modules/perception/lib/singleton:singleton",
         "//modules/perception/lib/utils:utils",

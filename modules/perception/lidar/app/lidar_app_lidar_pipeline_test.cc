@@ -17,7 +17,6 @@
 
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
@@ -71,7 +70,7 @@ TEST_F(LidarAppPipelineTest, lidar_app_pipeline_test) {
   std::string pose_path =
       "modules/perception/testdata/lidar/app/data/perception/lidar/poses/";
   std::vector<std::string> pcd_file_names;
-  lib::FileUtil::GetFileList(pcd_path, ".pcd", &pcd_file_names);
+  common::GetFileList(pcd_path, ".pcd", &pcd_file_names);
   std::string file_name;
   std::sort(pcd_file_names.begin(), pcd_file_names.end(),
             [](const std::string& lhs, const std::string& rhs) {
@@ -114,7 +113,7 @@ TEST_F(LidarAppPipelineTest, lidar_app_pipeline_test2) {
   std::string pcd_path = "./data/perception/lidar/files/";
   std::string pose_path = "./data/perception/lidar/poses/";
   std::vector<std::string> pcd_file_names;
-  lib::FileUtil::GetFileList(pcd_path, ".pcd", &pcd_file_names);
+  common::GetFileList(pcd_path, ".pcd", &pcd_file_names);
   std::string file_name;
   std::sort(pcd_file_names.begin(), pcd_file_names.end(),
             [](const std::string& lhs, const std::string& rhs) {

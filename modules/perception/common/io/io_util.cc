@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/common/io/io_util.h"
 
+#include <boost/filesystem.hpp>
 #include <fcntl.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/gzip_stream.h>
@@ -25,7 +26,6 @@
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
@@ -35,6 +35,7 @@
 namespace apollo {
 namespace perception {
 namespace common {
+
 using apollo::common::util::PathExists;
 
 bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
@@ -171,6 +172,29 @@ bool LoadOmnidirectionalCameraIntrinsics(
     return false;
   }
 
+  return true;
+}
+
+bool GetFileList(const std::string &path, const std::string &suffix,
+                 std::vector<std::string> *files) {
+  if (!PathExists(path)) {
+    AINFO << path << " not exist.";
+    return false;
+  }
+
+  boost::filesystem::recursive_directory_iterator itr(path);
+  while (itr != boost::filesystem::recursive_directory_iterator()) {
+    try {
+      if (suffix.empty() ||
+          boost::algorithm::ends_with(itr->path().string(), suffix)) {
+        files->push_back(itr->path().string());
+      }
+      ++itr;
+    } catch (const std::exception &ex) {
+      AWARN << "Caught execption: " << ex.what();
+      continue;
+    }
+  }
   return true;
 }
 

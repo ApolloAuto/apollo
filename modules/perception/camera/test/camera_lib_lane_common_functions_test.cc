@@ -21,7 +21,6 @@
 #include "cyber/common/log.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {

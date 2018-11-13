@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "google/protobuf/message.h"
@@ -38,6 +39,9 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
 bool LoadOmnidirectionalCameraIntrinsics(
     const std::string &yaml_file,
     base::OmnidirectionalCameraDistortionModel *model);
+
+bool GetFileList(const std::string &path, const std::string &suffix,
+                 std::vector<std::string> *files);
 
 }  // namespace common
 }  // namespace perception

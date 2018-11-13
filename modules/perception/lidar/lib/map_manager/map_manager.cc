@@ -21,7 +21,6 @@
 
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {

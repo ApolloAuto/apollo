@@ -19,7 +19,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/proto/spatio_temporal_ground_detector_config.pb.h"

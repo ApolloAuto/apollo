@@ -26,7 +26,6 @@ cc_library(
         "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/singleton",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/segmentation/cnnseg/spp_engine",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_config_proto",

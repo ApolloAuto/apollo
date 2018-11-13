@@ -27,7 +27,6 @@
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
 #include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {

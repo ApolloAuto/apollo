@@ -25,7 +25,6 @@
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {

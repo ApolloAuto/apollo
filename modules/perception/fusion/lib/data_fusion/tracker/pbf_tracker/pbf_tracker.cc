@@ -22,7 +22,6 @@
 #include "modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion/pbf_shape_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {

@@ -29,7 +29,6 @@
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 #include "modules/perception/camera/tools/lane_detection/lane_common.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/utils/timer.h"
 
 namespace apollo {

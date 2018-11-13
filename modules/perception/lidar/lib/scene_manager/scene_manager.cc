@@ -17,7 +17,6 @@
 
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
 #include "modules/perception/proto/perception_config_schema.pb.h"

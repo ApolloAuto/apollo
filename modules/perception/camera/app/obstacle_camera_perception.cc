@@ -29,7 +29,6 @@
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/utils/perf.h"
 

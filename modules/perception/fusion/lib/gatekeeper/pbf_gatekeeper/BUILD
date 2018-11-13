@@ -18,7 +18,6 @@ cc_library(
         "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto:pbf_gatekeeper_config_proto",
         "//modules/perception/fusion/lib/interface",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/io:file_util",
     ],
 )
 

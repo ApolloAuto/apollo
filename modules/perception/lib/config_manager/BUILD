@@ -13,10 +13,11 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/common:perception_gflags",
-        "//modules/perception/lib/io:file_util",
+        "//modules/perception/common/io:io_util",
         "//modules/perception/lib/singleton",
         "//modules/perception/lib/thread",
         "//modules/perception/proto:perception_config_schema_proto",
+        "@eigen",
     ],
 )
 

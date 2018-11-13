@@ -18,7 +18,6 @@
 
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {

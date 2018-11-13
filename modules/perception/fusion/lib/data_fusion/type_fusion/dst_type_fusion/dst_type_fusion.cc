@@ -23,7 +23,6 @@
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/proto/dst_type_fusion_config.pb.h"
 
 namespace apollo {

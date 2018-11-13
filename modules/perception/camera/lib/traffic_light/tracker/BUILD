@@ -28,7 +28,6 @@ cc_library(
       ":trafficlight_tracker_semantic_proto",
       "//modules/common/util:file_util",
       "//modules/perception/camera/lib/interface:interface",
-      "//modules/perception/lib/io:file_util",
     ],
 )
 
