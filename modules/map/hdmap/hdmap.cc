@@ -192,5 +192,11 @@ int HDMap::GetStopSignAssociatedLanes(
   return impl_.GetStopSignAssociatedLanes(id, lanes);
 }
 
+int HDMap::GetLocalMap(const apollo::common::PointENU& point,
+                const std::pair<double, double>& range,
+                Map* local_map) const {
+  return impl_.GetLocalMap(point, range, local_map);
+}
+
 }  // namespace hdmap
 }  // namespace apollo

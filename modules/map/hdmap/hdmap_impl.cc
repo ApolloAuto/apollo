@@ -57,6 +57,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   } else if (!apollo::common::util::GetProtoFromFile(map_filename, &map_)) {
     return -1;
   }
+
   return LoadMapFromProto(map_);
 }
 
@@ -989,6 +990,143 @@ int HDMapImpl::GetStopSignAssociatedLanes(
       continue;
     }
     lanes->push_back(lane);
+  }
+
+  return 0;
+}
+
+int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
+                const std::pair<double, double>& range,
+                Map* local_map) const {
+  CHECK_NOTNULL(local_map);
+
+  double distance = std::max(range.first, range.second);
+  CHECK_GT(distance, 0.0);
+
+  std::vector<LaneInfoConstPtr> lanes;
+  GetLanes(point, distance, &lanes);
+
+  std::vector<JunctionInfoConstPtr> junctions;
+  GetJunctions(point, distance, &junctions);
+
+  std::vector<CrosswalkInfoConstPtr> crosswalks;
+  GetCrosswalks(point, distance, &crosswalks);
+
+  std::vector<SignalInfoConstPtr> signals;
+  GetSignals(point, distance, &signals);
+
+  std::vector<StopSignInfoConstPtr> stop_signs;
+  GetStopSigns(point, distance, &stop_signs);
+
+  std::vector<YieldSignInfoConstPtr> yield_signs;
+  GetYieldSigns(point, distance, &yield_signs);
+
+  std::vector<ClearAreaInfoConstPtr> clear_areas;
+  GetClearAreas(point, distance, &clear_areas);
+
+  std::vector<SpeedBumpInfoConstPtr> speed_bumps;
+  GetSpeedBumps(point, distance, &speed_bumps);
+
+  std::vector<RoadInfoConstPtr> roads;
+  GetRoads(point, distance, &roads);
+
+  std::vector<ParkingSpaceInfoConstPtr> parking_spaces;
+  GetParkingSpaces(point, distance, &parking_spaces);
+
+  std::unordered_set<std::string> map_element_ids;
+  std::vector<Id> overlap_ids;
+
+  for (auto& lane_ptr : lanes) {
+    map_element_ids.insert(lane_ptr->id().id());
+    std::copy(lane_ptr->lane().overlap_id().begin(),
+      lane_ptr->lane().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_lane() = lane_ptr->lane();
+  }
+
+  for (auto& crosswalk_ptr : crosswalks) {
+    map_element_ids.insert(crosswalk_ptr->id().id());
+    std::copy(crosswalk_ptr->crosswalk().overlap_id().begin(),
+      crosswalk_ptr->crosswalk().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_crosswalk() = crosswalk_ptr->crosswalk();
+  }
+
+  for (auto& junction_ptr : junctions) {
+    map_element_ids.insert(junction_ptr->id().id());
+    std::copy(junction_ptr->junction().overlap_id().begin(),
+      junction_ptr->junction().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_junction() = junction_ptr->junction();
+  }
+
+  for (auto& signal_ptr : signals) {
+    map_element_ids.insert(signal_ptr->id().id());
+    std::copy(signal_ptr->signal().overlap_id().begin(),
+      signal_ptr->signal().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_signal() = signal_ptr->signal();
+  }
+
+  for (auto& stop_sign_ptr : stop_signs) {
+    map_element_ids.insert(stop_sign_ptr->id().id());
+    std::copy(stop_sign_ptr->stop_sign().overlap_id().begin(),
+      stop_sign_ptr->stop_sign().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_stop_sign() = stop_sign_ptr->stop_sign();
+  }
+
+  for (auto& yield_sign_ptr : yield_signs) {
+    std::copy(yield_sign_ptr->yield_sign().overlap_id().begin(),
+      yield_sign_ptr->yield_sign().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    map_element_ids.insert(yield_sign_ptr->id().id());
+    *local_map->add_yield() = yield_sign_ptr->yield_sign();
+  }
+
+  for (auto& clear_area_ptr : clear_areas) {
+    map_element_ids.insert(clear_area_ptr->id().id());
+    std::copy(clear_area_ptr->clear_area().overlap_id().begin(),
+      clear_area_ptr->clear_area().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_clear_area() = clear_area_ptr->clear_area();
+  }
+
+  for (auto& speed_bump_ptr : speed_bumps) {
+    map_element_ids.insert(speed_bump_ptr->id().id());
+    std::copy(speed_bump_ptr->speed_bump().overlap_id().begin(),
+      speed_bump_ptr->speed_bump().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_speed_bump() = speed_bump_ptr->speed_bump();
+  }
+
+  for (auto& road_ptr : roads) {
+    map_element_ids.insert(road_ptr->id().id());
+    *local_map->add_road() = road_ptr->road();
+  }
+
+  for (auto& parking_space_ptr : parking_spaces) {
+    map_element_ids.insert(parking_space_ptr->id().id());
+    std::copy(parking_space_ptr->parking_space().overlap_id().begin(),
+      parking_space_ptr->parking_space().overlap_id().end(),
+      std::back_inserter(overlap_ids));
+    *local_map->add_parking_space() = parking_space_ptr->parking_space();
+  }
+
+  for (auto& overlap_id : overlap_ids) {
+    auto overlap_ptr = GetOverlapById(overlap_id);
+    CHECK_NOTNULL(overlap_ptr);
+
+    bool need_delete = false;
+    for (auto& overlap_object : overlap_ptr->overlap().object()) {
+      if (map_element_ids.count(overlap_object.id().id()) <= 0) {
+        need_delete = true;
+      }
+    }
+
+    if (!need_delete) {
+      *local_map->add_overlap() = overlap_ptr->overlap();
+    }
   }
 
   return 0;

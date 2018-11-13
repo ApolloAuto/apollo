@@ -18,7 +18,10 @@ limitations under the License.
 #include <vector>
 
 #include "gtest/gtest.h"
+#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_impl.h"
+
+DEFINE_string(output_dir, "/tmp", "output map directory");
 
 namespace {
 
@@ -404,6 +407,24 @@ TEST_F(HDMapImplTestSuite, GetRoadBounrariesAndJunctions) {
                                              &junctions));
   ASSERT_EQ(1, roads_roi.size());
   ASSERT_EQ(0, junctions.size());
+}
+
+TEST_F(HDMapImplTestSuite, GetLocalMap) {
+  apollo::common::PointENU point;
+  point.set_x(586441.73);
+  point.set_y(4140745.25);
+
+  Map local_map;
+  std::pair<double, double> range{10.0, 10.0};
+  ASSERT_EQ(0, hdmap_impl_.GetLocalMap(point, range, &local_map));
+
+  const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
+  CHECK(apollo::common::util::SetProtoToBinaryFile(local_map, output_bin_file))
+      << "failed to output binary format base map";
+
+  local_map.Clear();
+  CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &local_map))
+      << "failed to load map";
 }
 
 }  // namespace hdmap
