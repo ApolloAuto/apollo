@@ -54,6 +54,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetFileName;
+
 class OfflineLidarObstaclePerception {
  public:
   OfflineLidarObstaclePerception() = default;
@@ -112,22 +114,18 @@ class OfflineLidarObstaclePerception {
     std::string pose_folder = FLAGS_pose_path;
     std::string output_path = FLAGS_output_path;
     std::vector<std::string> pcd_file_names;
-    std::string file_name;
     lib::FileUtil::GetFileList(pcd_folder, ".pcd", &pcd_file_names);
     std::sort(pcd_file_names.begin(), pcd_file_names.end(),
               [](const std::string& lhs, const std::string& rhs) {
-                if (lhs.length() < rhs.length()) {
-                  return true;
-                } else if (lhs.length() == rhs.length()) {
-                  return lhs <= rhs;
-                } else {
-                  return false;
+                if (lhs.length() != rhs.length()) {
+                  return lhs.length() < rhs.length();
                 }
+                return lhs <= rhs;
               });
     for (size_t i = 0; i < pcd_file_names.size(); i++) {
       AINFO << "***************** Frame " << i << " ******************";
       AINFO << pcd_file_names[i];
-      lib::FileUtil::GetFileName(pcd_file_names[i], &file_name);
+      const std::string file_name = GetFileName(pcd_file_names[i]);
       frame_ = LidarFramePool::Instance().Get();
       frame_->sensor_info = sensor_info_;
       frame_->reserve = file_name;
@@ -138,7 +136,6 @@ class OfflineLidarObstaclePerception {
       AINFO << "Read point cloud from " << pcd_file_names[i]
                << " with cloud size: " << frame_->cloud->size();
       if (pose_folder != "") {
-        lib::FileUtil::GetFileName(pcd_file_names[i], &file_name);
         std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
         AINFO << "Pose file: " << pose_file_name;
         if (!apollo::common::util::PathExists(pose_file_name)) {

@@ -31,10 +31,6 @@ class FileUtil {
 
   static std::string GetAbsolutePath(const std::string &prefix,
                                      const std::string &relative_path);
-
-  // get file name
-  // "/home/work/data/1.txt" -> 1
-  static void GetFileName(const std::string &file, std::string *name);
 };
 
 }  // namespace lib

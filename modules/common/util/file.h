@@ -262,7 +262,8 @@ bool RemoveAllFiles(const std::string &directory_path);
 std::vector<std::string> ListSubPaths(const std::string &directory_path,
                                       const unsigned char d_type = DT_DIR);
 
-std::string GetFileName(const std::string &path);
+std::string GetFileName(const std::string &path,
+                        const bool remove_extension = false);
 
 void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,
                               std::vector<std::string> *ret);

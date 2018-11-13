@@ -85,16 +85,6 @@ string FileUtil::GetAbsolutePath(const string &prefix,
   return result.append(relative_path);
 }
 
-void FileUtil::GetFileName(const string &file, string *name) {
-  size_t pos_left = file.find_last_of('/');
-  size_t pos_right = file.find_last_of('.');
-  if (pos_right == string::npos) {
-    *name = file.substr(pos_left + 1);
-  } else {
-    *name = file.substr(pos_left + 1, pos_right - pos_left - 1);
-  }
-}
-
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
