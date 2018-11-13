@@ -40,8 +40,8 @@ bool compare(const SemanticTable& s1, const SemanticTable& s2) {
 }
 
 bool SemanticReviser::Init(const TrafficLightTrackerInitOptions& options) {
-  std::string proto_path =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string proto_path = apollo::common::util::GetAbsolutePath(
+      options.root_dir, options.conf_file);
   if (!apollo::common::util::GetProtoFromFile(proto_path, &semantic_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;

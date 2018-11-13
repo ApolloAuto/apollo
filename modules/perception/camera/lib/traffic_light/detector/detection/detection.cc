@@ -32,10 +32,12 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
+using apollo::common::util::GetAbsolutePath;
+
 bool TrafficLightDetection::Init(
   const camera::TrafficLightDetectorInitOptions &options) {
-  std::string proto_path =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
   AINFO << "proto_path " << proto_path;
   if (!apollo::common::util::GetProtoFromFile(proto_path, &detection_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
@@ -47,18 +49,15 @@ bool TrafficLightDetection::Init(
   AINFO << "TL detection param: " << param_str;
 
   std::string model_root =
-      lib::FileUtil::GetAbsolutePath(options.root_dir,
-                                     detection_param_.model_name());
+      GetAbsolutePath(options.root_dir, detection_param_.model_name());
   AINFO << "model_root " << model_root;
 
   std::string proto_file =
-      lib::FileUtil::GetAbsolutePath(model_root,
-                                     detection_param_.proto_file());
+      GetAbsolutePath(model_root, detection_param_.proto_file());
   AINFO << "proto_file " << proto_file;
 
   std::string weight_file =
-      lib::FileUtil::GetAbsolutePath(model_root,
-                                     detection_param_.weight_file());
+      GetAbsolutePath(model_root, detection_param_.weight_file());
   AINFO << "weight_file " << weight_file;
 
   if (detection_param_.is_bgr()) {

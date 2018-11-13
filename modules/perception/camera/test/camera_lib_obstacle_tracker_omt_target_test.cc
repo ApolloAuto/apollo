@@ -40,7 +40,7 @@ TEST(TargetTest, target_test) {
   CHECK(object_template_manager->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
-  std::string omt_config = lib::FileUtil::GetAbsolutePath(
+  std::string omt_config = apollo::common::util::GetAbsolutePath(
     "/apollo/modules/perception/testdata/"
     "camera/lib/obstacle/tracker/omt/data/models/"
     "omt_obstacle_tracker",
@@ -217,7 +217,7 @@ TEST(TargetTest, clapping_velocity_test) {
   CHECK(object_template_manager->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
-  std::string omt_config = lib::FileUtil::GetAbsolutePath(
+  std::string omt_config = apollo::common::util::GetAbsolutePath(
     "/apollo/modules/perception/testdata/"
     "camera/lib/obstacle/tracker/omt/data/models/"
     "omt_obstacle_tracker",

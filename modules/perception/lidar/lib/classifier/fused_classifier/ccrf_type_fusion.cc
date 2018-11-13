@@ -31,6 +31,7 @@ namespace perception {
 namespace lidar {
 
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using apollo::common::util::GetAbsolutePath;
 using apollo::perception::base::ObjectType;
 
 bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
@@ -41,12 +42,11 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file =
-      lib::FileUtil::GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
   CHECK(common::util::GetProtoFromFile(config_file, &config));
-  std::string classifiers_property_file_path = lib::FileUtil::GetAbsolutePath(
+  std::string classifiers_property_file_path = GetAbsolutePath(
       work_root, config.classifiers_property_file_path());
   CHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
                                        &smooth_matrices_));
@@ -136,12 +136,11 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file =
-      lib::FileUtil::GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
   CHECK(common::util::GetProtoFromFile(config_file, &config));
-  std::string transition_property_file_path = lib::FileUtil::GetAbsolutePath(
+  std::string transition_property_file_path = GetAbsolutePath(
       work_root, config.transition_property_file_path());
   s_alpha_ = config.transition_matrix_alpha();
   CHECK(util::LoadSingleMatrixFile(transition_property_file_path,

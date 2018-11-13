@@ -43,13 +43,15 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
+using apollo::common::util::GetAbsolutePath;
+
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
   std::string work_root = "";
   camera::GetCyberWorkRoot(&work_root);
   std::string config_file =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, config_file);
+      GetAbsolutePath(options.root_dir, options.conf_file);
+  config_file = GetAbsolutePath(work_root, config_file);
   if (!apollo::common::util::GetProtoFromFile<camera::app::PerceptionParam>(
           config_file, &perception_param)) {
     AERROR << "Read config failed: " << config_file;

@@ -25,6 +25,7 @@ namespace perception {
 namespace lidar {
 
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
+using apollo::common::util::GetAbsolutePath;
 using apollo::perception::base::ObjectType;
 
 bool FusedClassifier::Init(const ClassifierInitOptions& options) {
@@ -35,9 +36,8 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file =
-      lib::FileUtil::GetAbsolutePath(config_file, "fused_classifier.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "fused_classifier.conf");
   FusedClassifierConfig config;
   CHECK(common::util::GetProtoFromFile(config_file, &config));
   temporal_window_ = config.temporal_window();

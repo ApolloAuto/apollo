@@ -27,8 +27,8 @@ namespace camera {
 
 bool MultiCueObstacleTransformer::Init(
     const ObstacleTransformerInitOptions &options) {
-  std::string transformer_config =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string transformer_config = apollo::common::util::GetAbsolutePath(
+      options.root_dir, options.conf_file);
 
   if (!apollo::common::util::GetProtoFromFile
       <multicue::MulticueParam>(transformer_config, &multicue_param_)) {

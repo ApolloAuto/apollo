@@ -43,8 +43,8 @@ bool SpatioTemporalGroundDetector::Init(
   CHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(
+  config_file = apollo::common::util::GetAbsolutePath(work_root, root_path);
+  config_file = apollo::common::util::GetAbsolutePath(
       config_file, "spatio_temporal_ground_detector.conf");
 
   // get config params

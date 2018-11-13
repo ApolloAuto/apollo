@@ -26,6 +26,7 @@ namespace apollo {
 namespace perception {
 namespace lib {
 
+using apollo::common::util::GetAbsolutePath;
 using apollo::common::util::GetProtoFromASCIIFile;
 
 ConfigManager::ConfigManager() {
@@ -57,7 +58,7 @@ bool ConfigManager::InitInternal() {
   model_config_map_.clear();
 
   std::string config_module_path =
-      FileUtil::GetAbsolutePath(work_root_, FLAGS_config_manager_path);
+      GetAbsolutePath(work_root_, FLAGS_config_manager_path);
   AINFO << "WORK_ROOT: " << work_root_
         << " config_root_path: " << config_module_path;
 
@@ -80,7 +81,7 @@ bool ConfigManager::InitInternal() {
     for (const std::string& model_config_path :
          file_list_proto.model_config_path()) {
       const std::string abs_path =
-          FileUtil::GetAbsolutePath(work_root_, model_config_path);
+          GetAbsolutePath(work_root_, model_config_path);
       MultiModelConfigProto multi_model_config_proto;
       if (!GetProtoFromASCIIFile(abs_path, &multi_model_config_proto)) {
         AERROR << "invalid MultiModelConfigProto file: " << abs_path;

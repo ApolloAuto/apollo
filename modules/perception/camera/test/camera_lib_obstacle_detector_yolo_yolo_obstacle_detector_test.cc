@@ -25,6 +25,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 TEST(YoloCameraDetectorTest, demo_test) {
   inference::CudaUtil::set_device_id(0);
   cv::Mat cv_img = cv::imread("/apollo/modules/perception/testdata/"
@@ -142,8 +144,7 @@ TEST(YoloCameraDetectorTest, inference_init_test) {
     "camera/lib/obstacle/detector/yolo/data/";
   init_options.conf_file = "config.pt";
   std::string config_path =
-      lib::FileUtil::GetAbsolutePath(init_options.root_dir,
-                                     init_options.conf_file);
+      GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
   yolo::YoloParam origin_yolo_param;
@@ -184,8 +185,7 @@ TEST(YoloCameraDetectorTest, anchor_init_test) {
     "camera/lib/obstacle/detector/yolo/data/";
   init_options.conf_file = "config.pt";
   std::string config_path =
-      lib::FileUtil::GetAbsolutePath(init_options.root_dir,
-                                     init_options.conf_file);
+      GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
   apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
@@ -225,8 +225,7 @@ TEST(YoloCameraDetectorTest, type_init_test) {
     "camera/lib/obstacle/detector/yolo/data/";
   init_options.conf_file = "config.pt";
   std::string config_path =
-      lib::FileUtil::GetAbsolutePath(init_options.root_dir,
-                                     init_options.conf_file);
+      GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
   apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
@@ -266,8 +265,7 @@ TEST(YoloCameraDetectorTest, feature_init_test) {
     "camera/lib/obstacle/detector/yolo/data/";
   init_options.conf_file = "config.pt";
   std::string config_path =
-      lib::FileUtil::GetAbsolutePath(init_options.root_dir,
-                                     init_options.conf_file);
+      GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
   apollo::common::util::GetProtoFromFile(config_path, &yolo_param);

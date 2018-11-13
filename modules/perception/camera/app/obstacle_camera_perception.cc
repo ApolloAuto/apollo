@@ -37,6 +37,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool ObstacleCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
@@ -44,9 +46,8 @@ bool ObstacleCameraPerception::Init(
     GetCyberWorkRoot(&work_root);
   }
   std::string config_file =
-      lib::FileUtil::GetAbsolutePath(options.root_dir,
-                                     options.conf_file);
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, config_file);
+      GetAbsolutePath(options.root_dir, options.conf_file);
+  config_file = GetAbsolutePath(work_root, config_file);
   CHECK(apollo::common::util::GetProtoFromFile<app::PerceptionParam>(
         config_file, &perception_param_)) << "Read config failed: ";
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
@@ -61,7 +62,7 @@ bool ObstacleCameraPerception::Init(
     app::DetectorParam detector_param = perception_param_.detector_param(i);
     auto plugin_param = detector_param.plugin_param();
     detector_init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root, plugin_param.root_dir());
+        GetAbsolutePath(work_root, plugin_param.root_dir());
     detector_init_options.conf_file = plugin_param.config_file();
     detector_init_options.gpu_id = perception_param_.gpu_id();
 
@@ -93,7 +94,7 @@ bool ObstacleCameraPerception::Init(
     tracker_init_options.gpu_id = perception_param_.gpu_id();
     auto plugin_param = perception_param_.tracker_param().plugin_param();
     tracker_init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root, plugin_param.root_dir());
+        GetAbsolutePath(work_root, plugin_param.root_dir());
     tracker_init_options.conf_file = plugin_param.config_file();
     tracker_.reset(BaseObstacleTrackerRegisterer::GetInstanceByName(
         plugin_param.name()));
@@ -109,7 +110,7 @@ bool ObstacleCameraPerception::Init(
     ObstacleTransformerInitOptions transformer_init_options;
     auto plugin_param = perception_param_.transformer_param().plugin_param();
     transformer_init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root, plugin_param.root_dir());
+        GetAbsolutePath(work_root, plugin_param.root_dir());
     transformer_init_options.conf_file = plugin_param.config_file();
     transformer_.reset(BaseObstacleTransformerRegisterer::
                        GetInstanceByName(plugin_param.name()));
@@ -125,7 +126,7 @@ bool ObstacleCameraPerception::Init(
     ObstaclePostprocessorInitOptions obstacle_postprocessor_init_options;
     auto plugin_param = perception_param_.postprocessor_param().plugin_param();
     obstacle_postprocessor_init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root, plugin_param.root_dir());
+        GetAbsolutePath(work_root, plugin_param.root_dir());
     obstacle_postprocessor_init_options.conf_file = plugin_param.config_file();
     obstacle_postprocessor_.reset(BaseObstaclePostprocessorRegisterer::
                                   GetInstanceByName(plugin_param.name()));
@@ -141,8 +142,7 @@ bool ObstacleCameraPerception::Init(
   } else {
     FeatureExtractorInitOptions init_options;
     auto plugin_param = perception_param_.feature_param().plugin_param();
-    init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root, plugin_param.root_dir());
+    init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
     init_options.conf_file = plugin_param.config_file();
     extractor_.reset(BaseFeatureExtractorRegisterer::
                      GetInstanceByName(plugin_param.name()));
@@ -178,8 +178,7 @@ bool ObstacleCameraPerception::Init(
     ObjectTemplateManagerInitOptions init_options;
     auto plugin_param =
         perception_param_.object_template_param().plugin_param();
-    init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root, plugin_param.root_dir());
+    init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
     init_options.conf_file = plugin_param.config_file();
     object_template_manager_ =
         lib::Singleton<ObjectTemplateManager>::get_instance();
@@ -208,8 +207,7 @@ void ObstacleCameraPerception::InitLane(
     lane_detector_init_options.conf_file =
         lane_detector_plugin_param.config_file();
     lane_detector_init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root,
-                                       lane_detector_plugin_param.root_dir());
+        GetAbsolutePath(work_root, lane_detector_plugin_param.root_dir());
     lane_detector_init_options.gpu_id = perception_param_.gpu_id();
     lane_detector_init_options.base_camera_model = model;
     AINFO << "lane_detector_name: " << lane_detector_plugin_param.name();
@@ -225,13 +223,11 @@ void ObstacleCameraPerception::InitLane(
         perception_param_.lane_param().lane_postprocessor_param();
     LanePostprocessorInitOptions postprocessor_init_options;
     postprocessor_init_options.detect_config_root =
-        lib::FileUtil::GetAbsolutePath(work_root,
-                                       lane_detector_plugin_param.root_dir());
+        GetAbsolutePath(work_root, lane_detector_plugin_param.root_dir());
     postprocessor_init_options.detect_config_name =
         lane_detector_plugin_param.config_file();
     postprocessor_init_options.root_dir =
-        lib::FileUtil::GetAbsolutePath(work_root,
-                                       lane_postprocessor_param.root_dir());
+        GetAbsolutePath(work_root, lane_postprocessor_param.root_dir());
     postprocessor_init_options.conf_file =
         lane_postprocessor_param.config_file();
     lane_postprocessor_.reset(

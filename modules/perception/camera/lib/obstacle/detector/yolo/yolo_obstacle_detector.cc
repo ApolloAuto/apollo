@@ -25,6 +25,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
   float offset_ratio = model_param.offset_ratio();
   float cropped_ratio = model_param.cropped_ratio();
@@ -78,9 +80,9 @@ bool YoloObstacleDetector::InitNet(const yolo::YoloParam &yolo_param,
   const auto &model_param = yolo_param.model_param();
 
   std::string proto_file =
-      lib::FileUtil::GetAbsolutePath(model_root, model_param.proto_file());
+      GetAbsolutePath(model_root, model_param.proto_file());
   std::string weight_file =
-      lib::FileUtil::GetAbsolutePath(model_root, model_param.weight_file());
+      GetAbsolutePath(model_root, model_param.weight_file());
   std::vector<std::string> input_names;
   std::vector<std::string> output_names;
   // init Net
@@ -199,20 +201,20 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   base_camera_model_ = options.base_camera_model;
   CHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
   std::string config_path =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+      GetAbsolutePath(options.root_dir, options.conf_file);
   if (!apollo::common::util::GetProtoFromFile(config_path, &yolo_param_)) {
     AERROR << "read proto_config fail";
     return false;
   }
   const auto &model_param = yolo_param_.model_param();
-  std::string model_root = lib::FileUtil::GetAbsolutePath(
+  std::string model_root = GetAbsolutePath(
       options.root_dir, model_param.model_name());
   std::string anchors_file =
-      lib::FileUtil::GetAbsolutePath(model_root, model_param.anchors_file());
+      GetAbsolutePath(model_root, model_param.anchors_file());
   std::string types_file =
-      lib::FileUtil::GetAbsolutePath(model_root, model_param.types_file());
+      GetAbsolutePath(model_root, model_param.types_file());
   std::string expand_file =
-      lib::FileUtil::GetAbsolutePath(model_root, model_param.expand_file());
+      GetAbsolutePath(model_root, model_param.expand_file());
   LoadInputShape(model_param);
   LoadParam(yolo_param_);
   min_dims_.min_2d_height /= static_cast<float>(height_);

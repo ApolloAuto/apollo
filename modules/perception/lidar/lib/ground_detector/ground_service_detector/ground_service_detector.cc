@@ -26,6 +26,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   auto& config_manager = lib::ConfigManager::Instance();
 
@@ -37,9 +39,8 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
 
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file,
-                                               "ground_service_detector.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "ground_service_detector.conf");
 
   GroundServiceDetectorConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));

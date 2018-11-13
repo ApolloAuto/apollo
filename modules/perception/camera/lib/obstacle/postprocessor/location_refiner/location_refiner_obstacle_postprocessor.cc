@@ -34,7 +34,7 @@ namespace camera {
 bool LocationRefinerObstaclePostprocessor::Init(
     const ObstaclePostprocessorInitOptions &options) {
   std::string postprocessor_config =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+      apollo::common::util::GetAbsolutePath(options.root_dir, options.conf_file);
 
   if (!apollo::common::util::GetProtoFromFile
       <location_refiner::LocationRefinerParam>(postprocessor_config,

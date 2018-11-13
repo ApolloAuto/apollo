@@ -28,6 +28,8 @@ namespace apollo {
 namespace perception {
 namespace radar {
 
+using apollo::common::util::GetAbsolutePath;
+
 HMMatcher::HMMatcher() { name_ = "HMMatcher"; }
 
 HMMatcher::~HMMatcher() {}
@@ -47,9 +49,8 @@ bool HMMatcher::Init() {
   CHECK(model_config->get_value("root_path", &root_path))
        << "Failed to get value of root_path.";
   std::string config_file;
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file,
-                                            "hm_matcher.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "hm_matcher.conf");
   // get config params
   MatcherConfig config_params;
   CHECK(apollo::common::util::GetProtoFromFile<MatcherConfig>(

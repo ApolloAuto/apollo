@@ -28,6 +28,8 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
+using apollo::common::util::GetAbsolutePath;
+
 // TODO(all) fix the static string lint issue
 std::string PbfTracker::s_type_fusion_method_ = "DstTypeFusion";  // NOLINT
 std::string PbfTracker::s_existance_fusion_method_ = "DstExistanceFusion";  // NOLINT
@@ -44,11 +46,10 @@ bool PbfTracker::InitParams() {
     return false;
   }
 
-  std::string woork_root_config = lib::FileUtil::GetAbsolutePath(
+  std::string woork_root_config = GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), options.root_dir);
 
-  std::string config =
-      lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
+  std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   AINFO << "Config file : " << config;
   PbfTrackerConfig params;
   if (!apollo::common::util::GetProtoFromFile<PbfTrackerConfig>(

@@ -29,18 +29,19 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool ExternalFeatureExtractor::Init(const FeatureExtractorInitOptions
                                     &options) {
-  std::string efx_config =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string efx_config = GetAbsolutePath(options.root_dir, options.conf_file);
   CHECK(apollo::common::util::GetProtoFromFile
       <tracking_feature::ExternalParam>(efx_config, &param_))
   << "Read config failed: " << efx_config;
   AINFO << "Load config Success: " << param_.ShortDebugString();
   std::string proto_file =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, param_.proto_file());
+      GetAbsolutePath(options.root_dir, param_.proto_file());
   std::string weight_file =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, param_.weight_file());
+      GetAbsolutePath(options.root_dir, param_.weight_file());
   std::vector<std::string> input_names;
   std::vector<std::string> output_names;
   input_names.push_back(param_.input_blob());

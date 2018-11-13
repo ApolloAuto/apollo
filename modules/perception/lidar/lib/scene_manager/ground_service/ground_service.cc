@@ -28,6 +28,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
+
 void GroundServiceContent::GetCopy(SceneServiceContent* content) const {
   GroundServiceContent* ground_content =
       dynamic_cast<GroundServiceContent*>(content);
@@ -148,9 +150,8 @@ bool GroundService::Init(const SceneServiceInitOptions& options) {
       << "Failed to get value of root_path.";
 
   std::string config_file;
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file =
-      lib::FileUtil::GetAbsolutePath(config_file, "ground_service.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "ground_service.conf");
 
   GroundServiceConfig config_params;
   CHECK(apollo::common::util::GetProtoFromFile<GroundServiceConfig>(

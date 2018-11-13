@@ -63,28 +63,6 @@ bool FileUtil::GetFileList(const std::string &path, const std::string &suffix,
   return true;
 }
 
-string FileUtil::GetAbsolutePath(const string &prefix,
-                                 const string &relative_path) {
-  if (relative_path.empty()) {
-    return prefix;
-  }
-
-  if (prefix.empty()) {
-    return relative_path;
-  }
-
-  string result = prefix;
-
-  if (relative_path[0] == '/') {
-    return relative_path;
-  }
-
-  if (prefix[prefix.length() - 1] != '/') {
-    result.append("/");
-  }
-  return result.append(relative_path);
-}
-
 }  // namespace lib
 }  // namespace perception
 }  // namespace apollo
