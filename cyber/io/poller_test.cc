@@ -27,6 +27,7 @@ namespace io {
 TEST(PollerTest, operation) {
   auto poller = Poller::Instance();
   ASSERT_NE(poller, nullptr);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   // invalid input
   PollRequest request;
