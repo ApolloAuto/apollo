@@ -67,7 +67,7 @@ void MSFLocalization::InitParams(const msf_config::Config &config) {
   localization_param_.enable_ins_aid_rtk = FLAGS_enable_ins_aid_rtk;
 
   // lidar module
-  localization_param_.map_path = config.map_dir() + "/" + FLAGS_local_map_name;
+  localization_param_.map_path = FLAGS_map_dir + "/" + FLAGS_local_map_name;
   localization_param_.lidar_extrinsic_file = FLAGS_lidar_extrinsics_file;
   localization_param_.lidar_height_file = FLAGS_lidar_height_file;
   localization_param_.lidar_height_default = FLAGS_lidar_height_default;
