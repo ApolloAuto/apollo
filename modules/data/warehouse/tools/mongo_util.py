@@ -41,11 +41,17 @@ class Mongo(object):
     @staticmethod
     def db():
         """Connect to MongoDB instance."""
+        # Try to read config from environ, and the flags.
         G = gflags.FLAGS
-        client = pymongo.MongoClient(G.mongo_host, G.mongo_port)
+        host = os.environ.get('MONGO_HOST', G.mongo_host)
+        port = int(os.environ.get('MONGO_PORT', G.mongo_port))
+        user = os.environ.get('MONGO_USER', G.mongo_user)
+        passwd = os.environ.get('MONGO_PASS', G.mongo_pass)
+
+        client = pymongo.MongoClient(host, port)
         db = client[G.mongo_db_name]
-        if G.mongo_user and G.mongo_pass:
-            db.authenticate(G.mongo_user, G.mongo_pass)
+        if user and passwd:
+            db.authenticate(user, passwd)
         return db
 
     @staticmethod
