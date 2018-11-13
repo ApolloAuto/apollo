@@ -25,9 +25,11 @@ import collections
 import math
 import sys
 
-from rosbag.bag import Bag
-
+import cyber
+from cyber.record import RecordReader
+from modules.canbus.proto import chassis_pb2
 from modules.canbus.proto.chassis_pb2 import Chassis
+from modules.localization.proto import localization_pb2
 
 
 kChassisTopic = '/apollo/canbus/chassis'
@@ -48,31 +50,32 @@ class MileageCalculator(object):
         last_pos = None
         cur_mode = 'Unknown'
         mileage = collections.defaultdict(lambda: 0.0)
-
-        with Bag(bag_file, 'r') as bag:
-            for topic, msg, t in bag.read_messages(topics=[kChassisTopic,
-                                                           kLocalizationTopic]):
-                if topic == kChassisTopic:
-                    # Mode changed
-                    if cur_mode != msg.driving_mode:
-                        if (cur_mode == Chassis.COMPLETE_AUTO_DRIVE and
-                                msg.driving_mode == Chassis.EMERGENCY_MODE):
-                            self.disengagements += 1
-                        cur_mode = msg.driving_mode
-                        # Reset start position.
-                        last_pos = None
-                elif topic == kLocalizationTopic:
-                    cur_pos = msg.pose.position
-                    if last_pos:
-                        # Accumulate mileage, from xyz-distance to miles.
-                        mileage[cur_mode] += 0.000621371 * math.sqrt(
-                            (cur_pos.x - last_pos.x) ** 2 +
-                            (cur_pos.y - last_pos.y) ** 2 +
-                            (cur_pos.z - last_pos.z) ** 2)
-                    last_pos = cur_pos
+        chassis = chassis_pb2.Chassis()
+        localization = localization_pb2.LocalizationEstimate()
+        reader = RecordReader(bag_file)
+        for msg in reader.read_messages():
+            if msg.topic == kChassisTopic:
+                chassis.ParseFromString(msg.message)
+                # Mode changed
+                if cur_mode != chassis.driving_mode:
+                    if (cur_mode == Chassis.COMPLETE_AUTO_DRIVE and
+                            chassis.driving_mode == Chassis.EMERGENCY_MODE):
+                        self.disengagements += 1
+                    cur_mode = chassis.driving_mode
+                    # Reset start position.
+                    last_pos = None
+            elif msg.topic == kLocalizationTopic:
+                localization.ParseFromString(msg.message)
+                cur_pos = localization.pose.position
+                if last_pos:
+                    # Accumulate mileage, from xyz-distance to miles.
+                    mileage[cur_mode] += 0.000621371 * math.sqrt(
+                        (cur_pos.x - last_pos.x) ** 2 +
+                        (cur_pos.y - last_pos.y) ** 2 +
+                        (cur_pos.z - last_pos.z) ** 2)
+                last_pos = cur_pos
         self.auto_mileage += mileage[Chassis.COMPLETE_AUTO_DRIVE]
-        self.manual_mileage += (
-            mileage[Chassis.COMPLETE_MANUAL] + mileage[Chassis.EMERGENCY_MODE])
+        self.manual_mileage += (mileage[Chassis.COMPLETE_MANUAL] + mileage[Chassis.EMERGENCY_MODE])
 
 
 def main():
