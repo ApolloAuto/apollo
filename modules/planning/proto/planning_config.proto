@@ -15,6 +15,7 @@ import "modules/planning/proto/poly_vt_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
+import "modules/planning/proto/planner_open_space_config.proto";
 
 message PathDeciderConfig {
   // place holder
@@ -184,14 +185,20 @@ message NavigationPlanningConfig {
   optional PlannerNaviConfig planner_navi_config = 4;
 }
 
+message OpenSpacePlanningConfig {
+  repeated PlannerType planner_type = 1;  // supported planners
+  optional PlannerOpenSpaceConfig planner_open_space_config = 2;
+}
+
 message PlanningConfig {
   oneof planning_config {
     RtkPlanningConfig rtk_planning_config = 1;
     StandardPlanningConfig standard_planning_config = 2;
     NavigationPlanningConfig navigation_planning_config = 3;
+    OpenSpacePlanningConfig open_space_planning_config = 4;
   }
 
   // default task config, it will be used if there is no scenario-specific
   // task config.
-  repeated TaskConfig default_task_config = 4;
+  repeated TaskConfig default_task_config = 5;
 }
