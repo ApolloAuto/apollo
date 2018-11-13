@@ -214,7 +214,7 @@ void PredictionComponent::OnPerception(
   }
 
   // Scenario analysis
-  // ScenarioManager::Instance()->Run();
+  ScenarioManager::Instance()->Run();
 
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
