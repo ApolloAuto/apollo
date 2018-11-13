@@ -17,7 +17,6 @@ cc_library(
         "//modules/perception/base",
         "//modules/perception/lib/registerer",
         "//modules/perception/lib/singleton",
-        "//modules/perception/lib/io:file_util",
         #"//modules/perception/lib/io:protobuf_util",
         "//modules/perception/common/i_lib",
         "//modules/perception/common/point_cloud_processing",

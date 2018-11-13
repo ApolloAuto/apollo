@@ -56,7 +56,6 @@ cc_binary(
         "//modules/perception/base:base",
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/camera/common:common",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/utils:utils",
     ]
 )

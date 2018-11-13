@@ -32,7 +32,6 @@
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
@@ -113,7 +112,7 @@ class OfflineLidarObstaclePerception {
     std::string pose_folder = FLAGS_pose_path;
     std::string output_path = FLAGS_output_path;
     std::vector<std::string> pcd_file_names;
-    lib::FileUtil::GetFileList(pcd_folder, ".pcd", &pcd_file_names);
+    common::GetFileList(pcd_folder, ".pcd", &pcd_file_names);
     std::sort(pcd_file_names.begin(), pcd_file_names.end(),
               [](const std::string& lhs, const std::string& rhs) {
                 if (lhs.length() != rhs.length()) {

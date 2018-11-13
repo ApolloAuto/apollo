@@ -21,7 +21,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/common/i_lib/geometry/i_plane.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/proto/ground_service_config.pb.h"
 
 namespace apollo {

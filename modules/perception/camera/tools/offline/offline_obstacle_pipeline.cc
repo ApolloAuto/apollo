@@ -27,7 +27,6 @@
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/lib/io/file_util.h"
 
 DEFINE_string(test_list, "full_test_list.txt", "exe image list");
 DEFINE_string(image_root, "", "root dir of images");

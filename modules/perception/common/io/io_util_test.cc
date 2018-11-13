@@ -91,6 +91,15 @@ TEST(CommonIoTest, load_ocamera_intrinsic) {
   EXPECT_FALSE(LoadOmnidirectionalCameraIntrinsics(yaml_file, &model));
 }
 
+TEST(CommonIoTest, GetFileList) {
+  std::string path = "/apollo/modules/perception/testdata/lib/data";
+  std::vector<std::string> files;
+  EXPECT_TRUE(GetFileList(path, "", &files));
+  EXPECT_FALSE(GetFileList("/not_exist_path", "", &files));
+  EXPECT_TRUE(GetFileList(
+      "/apollo/modules/perception/testdata/lib/data", "txt", &files));
+}
+
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo

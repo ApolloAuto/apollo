@@ -23,7 +23,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/utils/util.h"
 #include "modules/perception/inference/utils/resize.h"

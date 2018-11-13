@@ -22,7 +22,6 @@ cc_library(
         "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/registerer:registerer",
     ],
 )

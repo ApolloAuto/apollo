@@ -80,7 +80,6 @@ cc_library(
         "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
         "//modules/perception/common/io:io_util",
         "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/singleton:singleton",
         "//modules/perception/lib/thread:thread",
     ],

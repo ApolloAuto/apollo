@@ -63,7 +63,6 @@ cc_library(
         "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/utils:utils",
         "//modules/perception/lib/singleton:singleton",
     ],
@@ -87,7 +86,6 @@ cc_library(
         "//modules/perception/camera/lib/traffic_light/detector/detection:detection",
         "//modules/perception/camera/lib/traffic_light/detector/recognition:recognition",
         "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lib/utils:utils",
     ],
 )

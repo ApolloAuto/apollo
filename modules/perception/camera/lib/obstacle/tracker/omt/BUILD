@@ -83,7 +83,6 @@ cc_library(
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/camera/lib/obstacle/tracker/common:common",
-        "//modules/perception/lib/io:file_util",
     ],
 )
 

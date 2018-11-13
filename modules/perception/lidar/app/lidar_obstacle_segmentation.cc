@@ -17,7 +17,6 @@
 
 #include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_segmentation_config.pb.h"
 #include "modules/perception/lidar/common/lidar_log.h"

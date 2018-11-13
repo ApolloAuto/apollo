@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 
 #include "modules/perception/camera/common/object_template_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {

@@ -24,7 +24,6 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {

@@ -20,7 +20,6 @@
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/geometry/convex_hull_2d.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 // #include "modules/perception/lib/io/protobuf_util.h"
 
 namespace apollo {

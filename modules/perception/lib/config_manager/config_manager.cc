@@ -19,8 +19,8 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/io/file_util.h"
 
 namespace apollo {
 namespace perception {
@@ -63,8 +63,8 @@ bool ConfigManager::InitInternal() {
         << " config_root_path: " << config_module_path;
 
   std::vector<std::string> model_config_files;
-  if (!FileUtil::GetFileList(config_module_path, "config_manager.config",
-                             &model_config_files)) {
+  if (!common::GetFileList(config_module_path, "config_manager.config",
+                           &model_config_files)) {
     AERROR << "config_root_path : " << config_module_path
            << " get file list error.";
     return false;

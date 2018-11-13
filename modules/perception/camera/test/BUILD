@@ -211,7 +211,6 @@ cc_test(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/camera/common:object_template_manager",
-        "//modules/perception/lib/io:file_util",
         "@tensorrt",
         "@gtest//:main",
         "@yaml_cpp//:yaml",
@@ -380,7 +379,6 @@ cc_test(
         "//modules/perception/camera/lib/lane/common:common_functions",
         "//modules/perception/base:base",
         "//modules/perception/common/io:io_util",
-        "//modules/perception/lib/io:file_util",
         "@gtest//:main",
         "@yaml_cpp//:yaml",
     ]
@@ -426,7 +424,6 @@ cc_test(
         "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
         "//modules/perception/base:base",
         "//modules/perception/common/io:io_util",
-        "//modules/perception/lib/io:file_util",
         "@gtest//:main",
     ]
 )
@@ -535,7 +532,6 @@ cc_test(
 #         "//modules/perception/camera/lib/interface:interface",
 #         "//modules/perception/common/geometry:common",
 #         "//modules/perception/common/io:io_util",
-#         "//modules/perception/lib/io:file_util",
 #         "@gtest//:main",
 #         "@yaml_cpp//:yaml",
 #     ]
@@ -553,7 +549,6 @@ cc_test(
 #         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
 #         "//modules/perception/camera/lib/obstacle/tracker/omt:omt_proto",
 #         "//modules/perception/camera/lib/obstacle/tracker/omt:target",
-#         "//modules/perception/lib/io:file_util",
 #         "//modules/common/util:file_util",
 #         "@gtest//:main",
 #     ]
@@ -572,7 +567,6 @@ cc_test(
         "//modules/perception/camera/lib/obstacle/tracker/omt:omt_proto",
         "//modules/perception/camera/lib/obstacle/tracker/omt:target",
         "//modules/perception/inference/utils:inference_gemm_lib",
-        "//modules/perception/lib/io:file_util",
         "//modules/common/util:file_util",
         "@gtest//:main",
     ]
@@ -710,7 +704,6 @@ cc_test(
 #    ],
 #    deps = [
 #        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
-#        "//modules/perception/lib/io:file_util",
 #        "//modules/perception/common/sensor_manager:sensor_manager",
 #        "//modules/perception/inference:inference_factory_lib",
 #        "//modules/perception/inference/operators:perception_inference_operators",

@@ -16,7 +16,6 @@ cc_library(
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/geometry:common",
         "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/io:file_util",
         "//modules/perception/lidar/lib/interface:base_object_filter",
         "//cyber",
         "@eigen",

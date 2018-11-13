@@ -38,7 +38,6 @@
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lib/utils/time_util.h"
