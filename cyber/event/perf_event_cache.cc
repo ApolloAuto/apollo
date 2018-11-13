@@ -14,32 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <chrono>
-#include <sstream>
+#include "cyber/event/perf_event_cache.h"
+
 #include <string>
-#include <unordered_map>
 
 #include "cyber/common/global_data.h"
-#include "cyber/event/perf_event_cache.h"
+#include "cyber/common/log.h"
 #include "cyber/init.h"
 #include "cyber/time/time.h"
-#include "cyber/proto/perf_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
 namespace event {
 
-using apollo::cyber::proto::PerfConf;
+using common::GlobalData;
+using proto::PerfConf;
+using proto::PerfType;
 
 PerfEventCache::PerfEventCache() {
-  auto global_conf = GlobalData::Instance()->Config();
+  auto& global_conf = GlobalData::Instance()->Config();
   if (global_conf.has_perf_conf()) {
     perf_conf_.CopyFrom(global_conf.perf_conf());
     enable_ = perf_conf_.enable();
   }
 
   if (enable_) {
-    if (!event_queue_.Init(MAX_EVENT_SIZE)) {
+    if (!event_queue_.Init(kEventQueueSize)) {
       AERROR << "Event queue init failed.";
       throw std::runtime_error("Event queue init failed.");
     }
@@ -70,12 +70,12 @@ void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
     return;
   }
 
-  if (perf_conf_.type() != apollo::cyber::proto::SCHED
-      && perf_conf_.type() != apollo::cyber::proto::ALL) {
+  if (perf_conf_.type() != PerfType::SCHED &&
+      perf_conf_.type() != PerfType::ALL) {
     return;
   }
 
-  std::shared_ptr<EventBase> e = std::make_shared<SchedEvent>();
+  EventBasePtr e = std::make_shared<SchedEvent>();
   e->set_eid(static_cast<int>(event_id));
   e->set_stamp(Time::Now().ToNanosecond());
   e->set_cr_state(cr_state);
@@ -92,12 +92,12 @@ void PerfEventCache::AddTransportEvent(const TransPerf event_id,
     return;
   }
 
-  if (perf_conf_.type() != apollo::cyber::proto::TRANSPORT
-      && perf_conf_.type() != apollo::cyber::proto::ALL) {
+  if (perf_conf_.type() != PerfType::TRANSPORT &&
+      perf_conf_.type() != PerfType::ALL) {
     return;
   }
 
-  std::shared_ptr<EventBase> e = std::make_shared<TransportEvent>();
+  EventBasePtr e = std::make_shared<TransportEvent>();
   e->set_eid(static_cast<int>(event_id));
   e->set_channel_id(channel_id);
   e->set_msg_seq(msg_seq);
@@ -107,13 +107,13 @@ void PerfEventCache::AddTransportEvent(const TransPerf event_id,
 }
 
 void PerfEventCache::Run() {
-  std::shared_ptr<EventBase> event;
+  EventBasePtr event;
   int buf_size = 0;
   while (!shutdown_ && !apollo::cyber::IsShutdown()) {
     if (event_queue_.WaitDequeue(&event)) {
       of_ << event->SerializeToString() << std::endl;
       buf_size++;
-      if (buf_size >= 500) {
+      if (buf_size >= kFlushSize) {
         of_.flush();
         buf_size = 0;
       }

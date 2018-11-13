@@ -20,30 +20,24 @@
 #include <chrono>
 #include <fstream>
 #include <memory>
-#include <sstream>
 #include <thread>
 
 #include "cyber/base/bounded_queue.h"
-#include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/event/perf_event.h"
 #include "cyber/proto/perf_conf.pb.h"
-
-#define MAX_EVENT_SIZE 5096
 
 namespace apollo {
 namespace cyber {
 namespace event {
 
-using apollo::cyber::base::BoundedQueue;
-using apollo::cyber::proto::PerfConf;
-
 class PerfEventCache {
  public:
+  using EventBasePtr = std::shared_ptr<EventBase>;
+
   ~PerfEventCache();
-  void AddSchedEvent(const SchedPerf event_id,
-                     const uint64_t cr_id, const int proc_id,
-                     const int cr_state = -1);
+  void AddSchedEvent(const SchedPerf event_id, const uint64_t cr_id,
+                     const int proc_id, const int cr_state = -1);
   void AddTransportEvent(const TransPerf event_id, const uint64_t channel_id,
                          const uint64_t msg_seq);
 
@@ -57,8 +51,11 @@ class PerfEventCache {
   bool enable_ = false;
   bool shutdown_ = false;
 
-  BoundedQueue<std::shared_ptr<EventBase>> event_queue_;
-  PerfConf perf_conf_;
+  proto::PerfConf perf_conf_;
+  base::BoundedQueue<EventBasePtr> event_queue_;
+
+  const int kFlushSize = 512;
+  const uint64_t kEventQueueSize = 8192;
 
   DECLARE_SINGLETON(PerfEventCache)
 };

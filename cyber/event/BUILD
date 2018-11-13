@@ -9,15 +9,25 @@ cc_library(
     ],
     hdrs = [
         "perf_event_cache.h",
-        "perf_event.h",
     ],
     deps = [
-          "//cyber:init",
-          "//cyber/base:bounded_queue",
-          "//cyber/common",
-          "//cyber/proto:perf_conf_cc_proto",
-          "//cyber/time:time",
+        "perf_event",
+        "//cyber/base:bounded_queue",
+        "//cyber/common:global_data",
+        "//cyber/common:log",
+        "//cyber/common:macros",
+        "//cyber:init",
+        "//cyber/proto:perf_conf_cc_proto",
+        "//cyber/time:time",
     ]
+)
+
+cc_library(
+    name = "perf_event",
+    hdrs = [ "perf_event.h", ],
+    deps = [
+        "//cyber/common:global_data",
+    ],
 )
 
 cpplint()

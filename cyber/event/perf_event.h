@@ -17,25 +17,15 @@
 #ifndef CYBER_EVENT_PERF_EVENT_H_
 #define CYBER_EVENT_PERF_EVENT_H_
 
-#include <chrono>
-#include <cstdarg>
-#include <fstream>
+#include <stdint.h>
 #include <sstream>
 #include <string>
-#include <thread>
-#include <unordered_map>
 
-#include "cyber/base/bounded_queue.h"
 #include "cyber/common/global_data.h"
-#include "cyber/common/log.h"
-#include "cyber/common/macros.h"
 
 namespace apollo {
 namespace cyber {
 namespace event {
-
-using apollo::cyber::base::BoundedQueue;
-using apollo::cyber::common::GlobalData;
 
 enum class EventType { SCHED_EVENT = 0, TRANS_EVENT = 1, TRY_FETCH_EVENT = 3 };
 
@@ -53,17 +43,17 @@ class EventBase {
  public:
   virtual std::string SerializeToString() = 0;
 
-  inline void set_eid(int eid) {eid_ = eid;}
-  inline void set_etype(int etype) {etype_ = etype;}
-  inline void set_stamp(uint64_t stamp) {stamp_ = stamp;}
+  void set_eid(int eid) { eid_ = eid; }
+  void set_etype(int etype) { etype_ = etype; }
+  void set_stamp(uint64_t stamp) { stamp_ = stamp; }
 
   virtual void set_cr_id(uint64_t cr_id) {}
   virtual void set_cr_state(int cr_state) {}
   virtual void set_proc_id(int proc_id) {}
-  virtual void set_fetch_res_(int fetch_res) {}
+  virtual void set_fetch_res(int fetch_res) {}
 
-  virtual void set_msg_seq(const uint64_t msg_seq) {}
-  virtual void set_channel_id(const uint64_t channel_id) {}
+  virtual void set_msg_seq(uint64_t msg_seq) {}
+  virtual void set_channel_id(uint64_t channel_id) {}
 
  protected:
   int etype_;
@@ -78,25 +68,22 @@ class EventBase {
 // 4 next_routine
 class SchedEvent : public EventBase {
  public:
-  SchedEvent() {
-    etype_ = static_cast<int>(EventType::SCHED_EVENT);
-  }
+  SchedEvent() { etype_ = static_cast<int>(EventType::SCHED_EVENT); }
 
-  virtual std::string SerializeToString() {
+  std::string SerializeToString() override {
     std::stringstream ss;
     ss << etype_ << "\t";
     ss << eid_ << "\t";
-    ss << apollo::cyber::common::
-        GlobalData::GetTaskNameById(cr_id_) << "\t";
+    ss << common::GlobalData::GetTaskNameById(cr_id_) << "\t";
     ss << proc_id_ << "\t";
     ss << cr_state_ << "\t";
     ss << stamp_;
     return ss.str();
   }
 
-  inline void set_cr_id(uint64_t cr_id) override {cr_id_ = cr_id;}
-  inline void set_cr_state(int cr_state) override {cr_state_ = cr_state;}
-  inline void set_proc_id(int proc_id) override {proc_id_ = proc_id;}
+  void set_cr_id(uint64_t cr_id) override { cr_id_ = cr_id; }
+  void set_cr_state(int cr_state) override { cr_state_ = cr_state; }
+  void set_proc_id(int proc_id) override { proc_id_ = proc_id; }
 
  private:
   int cr_state_;
@@ -109,29 +96,26 @@ class SchedEvent : public EventBase {
 // 2 write_data_cache & notify listener
 class TransportEvent : public EventBase {
  public:
-  TransportEvent() {
-    etype_ = static_cast<int>(EventType::TRANS_EVENT);
-  }
+  TransportEvent() { etype_ = static_cast<int>(EventType::TRANS_EVENT); }
 
   std::string SerializeToString() override {
     std::stringstream ss;
     ss << etype_ << "\t";
     ss << eid_ << "\t";
-    ss << apollo::cyber::common::
-        GlobalData::GetChannelById(channel_id_) << "\t";
+    ss << common::GlobalData::GetChannelById(channel_id_) << "\t";
     ss << msg_seq_ << "\t";
     ss << stamp_;
     return ss.str();
   }
 
-  inline void set_msg_seq(const uint64_t msg_seq) override {msg_seq_ = msg_seq;}
-  inline void set_channel_id(const uint64_t channel_id) override {
+  void set_msg_seq(uint64_t msg_seq) override { msg_seq_ = msg_seq; }
+  void set_channel_id(uint64_t channel_id) override {
     channel_id_ = channel_id;
   }
 
  private:
   uint64_t msg_seq_ = 0;
-  uint64_t channel_id_ = -1;
+  uint64_t channel_id_ = UINT64_MAX;
 };
 
 }  // namespace event
