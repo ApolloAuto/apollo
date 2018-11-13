@@ -32,8 +32,9 @@ import time
 import gflags
 import glog
 
-from cyber_py import cyber
-from cyber_py import record
+from cyber import cyber
+from cyber import record
+from modules.drivers.gnss.proto.gnss_pb2 import RawData
 
 # Requried flags.
 gflags.DEFINE_string('input_file', None, 'Input record file path.')
@@ -52,10 +53,12 @@ def process_record_file(args):
     glog.info('#processing record file {}'.format(args.input_file))
     time.sleep(1)
     output_file = os.path.join(args.output_dir, 'gpsimu.bin')
-    with open(output_file, 'w') as outfile:
+    with open(output_file, 'wb') as outfile:
         for channel, message, _type, _timestamp in freader.read_messages():
             if channel == args.gps_raw_data_channel:
-                outfile.write(str(message))
+                raw_data = RawData()
+                raw_data.ParseFromString(message)
+                outfile.write(raw_data.data)
 
 def main():
     """Entry point."""
