@@ -67,15 +67,8 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
 
 void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
   obstacles_edges_num_ = 4 * Eigen::MatrixXi::Ones(obstacles_num_, 1);
-
-  num_of_variables_ = obstacles_edges_num_.sum() * (horizon_ + 1) +
-                      4 * obstacles_num_ * (horizon_ + 1) +
-                      obstacles_num_ * (horizon_ + 1);
-
-  num_of_constraints_ = 4 * obstacles_num_ * (horizon_ + 1);
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Ones(4, horizon_ + 1);
-  ptop_.reset(new DualVariableWarmStartIPOPTInterface(
-      num_of_variables_, num_of_constraints_, horizon_, ts_, ego_,
+  ptop_.reset(new DualVariableWarmStartIPOPTInterface(horizon_, ts_, ego_,
       obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_, xWS,
       planner_open_space_config_));
 }
