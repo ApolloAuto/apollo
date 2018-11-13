@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@ void Llcmotionfeedback221::Parse(const std::uint8_t* bytes, int32_t length,
                                  ChassisDetail* chassis) const {
   chassis->mutable_transit()
       ->mutable_llc_motionfeedback2_21()
+      ->set_llc_fbk_vehiclespeed(llc_fbk_vehiclespeed(bytes, length));
+  chassis->mutable_transit()
+      ->mutable_llc_motionfeedback2_21()
       ->set_llc_motionfeedback2_counter(
           llc_motionfeedback2_counter(bytes, length));
   chassis->mutable_transit()
@@ -46,6 +49,23 @@ void Llcmotionfeedback221::Parse(const std::uint8_t* bytes, int32_t length,
   chassis->mutable_transit()
       ->mutable_llc_motionfeedback2_21()
       ->set_llc_fbk_steeringangle(llc_fbk_steeringangle(bytes, length));
+}
+
+// config detail: {'name': 'llc_fbk_vehiclespeed', 'offset': 0.0, 'precision':
+// 0.01, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|655.35]',
+// 'bit': 32, 'type': 'double', 'order': 'intel', 'physical_unit': 'm/s'}
+double Llcmotionfeedback221::llc_fbk_vehiclespeed(const std::uint8_t* bytes,
+                                                  int32_t length) const {
+  Byte t0(bytes + 5);
+  int32_t x = t0.get_byte(0, 8);
+
+  Byte t1(bytes + 4);
+  int32_t t = t1.get_byte(0, 8);
+  x <<= 8;
+  x |= t;
+
+  double ret = x * 0.010000;
+  return ret;
 }
 
 // config detail: {'description': 'Motion feedback 2 heartbeat counter',

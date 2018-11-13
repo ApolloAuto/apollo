@@ -27,8 +27,8 @@ message Adc_motioncontrol1_10 {
   enum Adc_cmd_autonomyrequestType {
     ADC_CMD_AUTONOMYREQUEST_AUTONOMY_NOT_REQUESTED = 0;
     ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED = 1;
-    ADC_CMD_AUTONOMYREQUEST_RESERVED = 2;
-    ADC_CMD_AUTONOMYREQUEST_RESERVED_1 = 3;
+    ADC_CMD_AUTONOMYREQUEST_RESERVED0 = 2;
+    ADC_CMD_AUTONOMYREQUEST_RESERVED1 = 3;
   }
   enum Adc_cmd_longitudinalcontrolmodeType {
     ADC_CMD_LONGITUDINALCONTROLMODE_NONE = 0;
@@ -46,8 +46,8 @@ message Adc_motioncontrol1_10 {
   optional Adc_cmd_gearType adc_cmd_gear = 4;
   // Motion Control 1 checksum [] [0|255]
   optional int32 adc_motioncontrol1_checksum = 5;
-  // Brake pressure for direct longitudinal control [%] [0|1000]
-  optional double adc_cmd_brakepressure = 6;
+  // Brake pressure for direct longitudinal control [PSI] [0|2047]
+  optional int32 adc_cmd_brakepressure = 6;
   // Throttle pedal position percentage for direct longitudinal control [%] [0|100]
   optional double adc_cmd_throttleposition = 7;
   // Motion control 1 Heartbeat counter [] [0|3]
@@ -79,8 +79,8 @@ message Llc_motionfeedback1_20 {
   enum Llc_fbk_steeringcontrolmodeType {
     LLC_FBK_STEERINGCONTROLMODE_NONE = 0;
     LLC_FBK_STEERINGCONTROLMODE_ANGLE = 1;
-    LLC_FBK_STEERINGCONTROLMODE_RESERVED_CURVATURE = 2;
-    LLC_FBK_STEERINGCONTROLMODE_RESERVED = 3;
+    LLC_FBK_STEERINGCONTROLMODE_RESERVED1_CURVATURE = 2;
+    LLC_FBK_STEERINGCONTROLMODE_RESERVED0 = 3;
   }
   enum Llc_fbk_longitudinalcontrolmodeType {
     LLC_FBK_LONGITUDINALCONTROLMODE_NONE = 0;
@@ -89,19 +89,19 @@ message Llc_motionfeedback1_20 {
     LLC_FBK_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE = 3;
   }
   enum Llc_fbk_stateType {
-    LLC_FBK_STATE_RESERVED = 0;
+    LLC_FBK_STATE_RESERVED9 = 0;
     LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED = 1;
     LLC_FBK_STATE_AUTONOMY_ALLOWED = 2;
     LLC_FBK_STATE_AUTONOMY_REQUESTED = 3;
     LLC_FBK_STATE_AUTONOMY = 4;
-    LLC_FBK_STATE_RESERVED_1 = 5;
-    LLC_FBK_STATE_RESERVED_2 = 6;
-    LLC_FBK_STATE_RESERVED_3 = 7;
-    LLC_FBK_STATE_RESERVED_4 = 8;
-    LLC_FBK_STATE_RESERVED_5 = 9;
-    LLC_FBK_STATE_RESERVED_6 = 10;
-    LLC_FBK_STATE_RESERVED_7 = 11;
-    LLC_FBK_STATE_RESERVED_8 = 12;
+    LLC_FBK_STATE_RESERVED7 = 5;
+    LLC_FBK_STATE_RESERVED6 = 6;
+    LLC_FBK_STATE_RESERVED5 = 7;
+    LLC_FBK_STATE_RESERVED4 = 8;
+    LLC_FBK_STATE_RESERVED3 = 9;
+    LLC_FBK_STATE_RESERVED2 = 10;
+    LLC_FBK_STATE_RESERVED1 = 11;
+    LLC_FBK_STATE_RESERVED0 = 12;
     LLC_FBK_STATE_DISENGAGE_REQUESTED = 13;
     LLC_FBK_STATE_DISENGAGED = 14;
     LLC_FBK_STATE_FAULT = 15;
@@ -112,10 +112,10 @@ message Llc_motionfeedback1_20 {
   optional bool llc_fbk_parkingbrake = 2;
   // Throttle position feedback [%] [0|102.3]
   optional double llc_fbk_throttleposition = 3;
-  // Rear brake pressure feedback [psi] [0|2047]
-  optional int32 llc_fbk_brakepressurerear = 4;
-  // Front brake pressure feedback [psi] [0|2047]
-  optional int32 llc_fbk_brakepressurefront = 5;
+  // Rear brake pressure feedback [%] [0|100]
+  optional double llc_fbk_brakepressurerear = 4;
+  // Front brake pressure feedback [psi] [0|100]
+  optional double llc_fbk_brakepressurefront = 5;
   // Current steering control mode [] [0|3]
   optional Llc_fbk_steeringcontrolmodeType llc_fbk_steeringcontrolmode = 6;
   // Motion feedback 1 heartbeat counter [] [0|3]
@@ -138,14 +138,16 @@ message Llc_motionfeedback1_20 {
 
 message Llc_motionfeedback2_21 {
 // Report Message
+  // [m/s] [0|655.35]
+  optional double llc_fbk_vehiclespeed = 1;
   // Motion feedback 2 heartbeat counter [] [0|3]
-  optional int32 llc_motionfeedback2_counter = 1;
+  optional int32 llc_motionfeedback2_counter = 2;
   // Motion feedback 2 checksum [] [0|255]
-  optional int32 llc_motionfeedback2_checksum = 2;
+  optional int32 llc_motionfeedback2_checksum = 3;
   // Steer wheel angle feedback from SbW motor (? rate) [deg/s] [-1638.4|1638.3]
-  optional double llc_fbk_steeringrate = 3;
+  optional double llc_fbk_steeringrate = 4;
   // Steering angle feedback [deg] [-1638.4|1638.35]
-  optional double llc_fbk_steeringangle = 4;
+  optional double llc_fbk_steeringangle = 5;
 }
 
 message Llc_motioncommandfeedback1_22 {
@@ -154,8 +156,8 @@ message Llc_motioncommandfeedback1_22 {
   optional double llc_fbk_steeringanglesetpoint = 1;
   // Current throttle setpoint (after limits) [%] [0|102.3]
   optional double llc_fbk_throttlesetpoint = 2;
-  // Front brake pressure setpoint (after limits) [%] [0|1000]
-  optional double llc_fbk_brakepressuresetpoint = 3;
+  // Front brake pressure setpoint (after limits) [psi] [0|2047]
+  optional int32 llc_fbk_brakepressuresetpoint = 3;
   // Motion command feedback 2 heartbeat counter [] [0|3]
   optional int32 llc_motioncommandfeedback1_count = 4;
   // Motion command feedback 1 checksum [] [0|255]
