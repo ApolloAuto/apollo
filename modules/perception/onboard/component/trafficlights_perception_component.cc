@@ -49,6 +49,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 typedef apollo::perception::TrafficLightDetection::CameraID TLCamID;
+using apollo::common::util::GetAbsolutePath;
 using apollo::perception::common::SensorManager;
 
 static int GetGpuId(
@@ -57,9 +58,8 @@ static int GetGpuId(
   std::string work_root = "";
   apollo::perception::camera::GetCyberWorkRoot(&work_root);
   std::string config_file =
-    lib::FileUtil::GetAbsolutePath(options.root_dir,
-                                   options.conf_file);
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, config_file);
+      GetAbsolutePath(options.root_dir, options.conf_file);
+  config_file = GetAbsolutePath(work_root, config_file);
   if (!apollo::common::util::GetProtoFromFile<camera::app::TrafficLightParam>(
         config_file,
         &trafficlight_param)) {

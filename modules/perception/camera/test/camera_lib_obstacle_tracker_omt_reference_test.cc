@@ -42,7 +42,7 @@ TEST(RefTest, update_test) {
 
   ObstacleReference ref;
   omt::OmtParam omt_param;
-  std::string omt_config = lib::FileUtil::GetAbsolutePath(
+  std::string omt_config = apollo::common::util::GetAbsolutePath(
     "/apollo/modules/perception/testdata/"
     "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
     "config.pt");

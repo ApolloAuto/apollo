@@ -32,6 +32,7 @@ namespace lidar {
 
 using Eigen::Matrix4d;
 using DirectionMajor = Bitmap2D::DirectionMajor;
+using apollo::common::util::GetAbsolutePath;
 using base::PolygonDType;
 
 template <typename T>
@@ -46,9 +47,8 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file =
-      lib::FileUtil::GetAbsolutePath(config_file, "hdmap_roi_filter.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "hdmap_roi_filter.conf");
   HDMapRoiFilterConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   range_ = config.range();

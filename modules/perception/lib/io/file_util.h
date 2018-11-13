@@ -28,9 +28,6 @@ class FileUtil {
   // should be removed later
   static bool GetFileList(const std::string &path, const std::string &suffix,
                           std::vector<std::string> *files);
-
-  static std::string GetAbsolutePath(const std::string &prefix,
-                                     const std::string &relative_path);
 };
 
 }  // namespace lib

@@ -27,6 +27,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool MlfShapeFilter::Init(const MlfFilterInitOptions& options) {
   auto& config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
@@ -35,9 +37,8 @@ bool MlfShapeFilter::Init(const MlfFilterInitOptions& options) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file =
-      lib::FileUtil::GetAbsolutePath(config_file, "mlf_shape_filter.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "mlf_shape_filter.conf");
   MlfShapeFilterConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
 

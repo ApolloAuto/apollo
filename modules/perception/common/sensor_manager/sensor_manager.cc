@@ -47,7 +47,7 @@ bool SensorManager::Init() {
   distort_model_map_.clear();
   undistort_model_map_.clear();
 
-  std::string file_path = lib::FileUtil::GetAbsolutePath(
+  std::string file_path = apollo::common::util::GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), FLAGS_obs_sensor_meta_path);
 
   MultiSensorMeta sensor_list_proto;

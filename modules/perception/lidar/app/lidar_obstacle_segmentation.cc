@@ -38,11 +38,10 @@ bool LidarObstacleSegmentation::Init(
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file, sensor_name);
-  config_file
-    = lib::FileUtil::GetAbsolutePath(config_file,
-        "lidar_obstacle_segmentation.conf");
+  config_file = apollo::common::util::GetAbsolutePath(work_root, root_path);
+  config_file = apollo::common::util::GetAbsolutePath(config_file, sensor_name);
+  config_file = apollo::common::util::GetAbsolutePath(config_file,
+      "lidar_obstacle_segmentation.conf");
 
   LidarObstacleSegmentationConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));

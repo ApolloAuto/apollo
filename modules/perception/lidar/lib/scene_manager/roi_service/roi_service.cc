@@ -24,6 +24,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
+
 void ROIServiceContent::GetCopy(SceneServiceContent* content) const {
   ROIServiceContent* roi_content = dynamic_cast<ROIServiceContent*>(content);
   if (roi_content == nullptr) {
@@ -90,8 +92,8 @@ bool ROIService::Init(const SceneServiceInitOptions& options) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file, "roi_service.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "roi_service.conf");
   ROIServiceConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   roi_content_ref_->cell_size_ = config.cell_size();

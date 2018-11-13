@@ -26,8 +26,8 @@ namespace camera {
 
 bool
 TrafficLightRecognition::Init(const TrafficLightDetectorInitOptions& options) {
-  std::string proto_path =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string proto_path = apollo::common::util::GetAbsolutePath(
+      options.root_dir, options.conf_file);
 
   AINFO << "proto_path " << proto_path;
   if (!apollo::common::util::GetProtoFromFile(proto_path, &recognize_param_)) {

@@ -32,13 +32,14 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool DenselineLanePostprocessor::Init(
   const LanePostprocessorInitOptions& options) {
   // read detector config parameter
   denseline::DenselineParam denseline_param;
   const std::string& proto_path =
-      lib::FileUtil::GetAbsolutePath(options.detect_config_root,
-      options.detect_config_name);
+      GetAbsolutePath(options.detect_config_root, options.detect_config_name);
   if (!apollo::common::util::GetProtoFromFile(proto_path, &denseline_param)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
@@ -56,7 +57,7 @@ bool DenselineLanePostprocessor::Init(
   const std::string& root_dir = options.root_dir;
   const std::string& conf_file = options.conf_file;
   const std::string& postprocessor_config =
-      lib::FileUtil::GetAbsolutePath(root_dir, conf_file);
+      GetAbsolutePath(root_dir, conf_file);
   AINFO << "postprocessor_config:" << postprocessor_config;
   if (!apollo::common::util::GetProtoFromFile(
     postprocessor_config, &lane_postprocessor_param_)) {

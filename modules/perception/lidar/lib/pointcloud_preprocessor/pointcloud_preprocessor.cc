@@ -29,6 +29,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
+
 const float PointCloudPreprocessor::kPointInfThreshold = 1e3;
 
 bool PointCloudPreprocessor::Init(
@@ -40,12 +42,9 @@ bool PointCloudPreprocessor::Init(
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file,
-                                               options.sensor_name);
-  config_file
-    = lib::FileUtil::GetAbsolutePath(config_file,
-        "pointcloud_preprocessor.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, options.sensor_name);
+  config_file = GetAbsolutePath(config_file, "pointcloud_preprocessor.conf");
   PointCloudPreprocessorConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();

@@ -33,6 +33,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
 using base::AttributePointCloud;
 using base::PointF;
 using base::PointD;
@@ -435,19 +436,17 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
   CHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file, sensor_name_);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file, "cnnseg.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, sensor_name_);
+  config_file = GetAbsolutePath(config_file, "cnnseg.conf");
 
   CNNSegConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
-  *param_file = lib::FileUtil::GetAbsolutePath(work_root, config.param_file());
-  *proto_file = lib::FileUtil::GetAbsolutePath(work_root, config.proto_file());
-  *weight_file =
-      lib::FileUtil::GetAbsolutePath(work_root, config.weight_file());
-  *engine_file =
-      lib::FileUtil::GetAbsolutePath(work_root, config.engine_file());
+  *param_file = GetAbsolutePath(work_root, config.param_file());
+  *proto_file = GetAbsolutePath(work_root, config.proto_file());
+  *weight_file = GetAbsolutePath(work_root, config.weight_file());
+  *engine_file = GetAbsolutePath(work_root, config.engine_file());
 
   return true;
 }

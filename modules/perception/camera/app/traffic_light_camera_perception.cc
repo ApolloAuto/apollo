@@ -31,15 +31,16 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool TrafficLightCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
   if (options.use_cyber_work_root) {
     GetCyberWorkRoot(&work_root);
   }
-  std::string proto_path =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
-  proto_path = lib::FileUtil::GetAbsolutePath(work_root, proto_path);
+  std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
+  proto_path = GetAbsolutePath(work_root, proto_path);
   AINFO << "proto_path " << proto_path;
   if (!apollo::common::util::GetProtoFromFile(proto_path, &tl_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
@@ -49,8 +50,7 @@ bool TrafficLightCameraPerception::Init(
   TrafficLightDetectorInitOptions init_options;
   auto plugin_param = tl_param_.detector_param(0).plugin_param();
 
-  init_options.root_dir = lib::FileUtil::GetAbsolutePath(work_root,
-      plugin_param.root_dir());
+  init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
   init_options.conf_file = plugin_param.config_file();
   init_options.gpu_id = tl_param_.gpu_id();
   detector_.reset(BaseTrafficLightDetectorRegisterer::
@@ -62,8 +62,7 @@ bool TrafficLightCameraPerception::Init(
   }
 
   plugin_param = tl_param_.detector_param(1).plugin_param();
-  init_options.root_dir = lib::FileUtil::GetAbsolutePath(work_root,
-      plugin_param.root_dir());
+  init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
   init_options.conf_file = plugin_param.config_file();
   init_options.gpu_id = tl_param_.gpu_id();
   recognizer_.reset(BaseTrafficLightDetectorRegisterer::
@@ -76,8 +75,8 @@ bool TrafficLightCameraPerception::Init(
 
   TrafficLightTrackerInitOptions tracker_init_options;
   auto tracker_plugin_param = tl_param_.tracker_param().plugin_param();
-  tracker_init_options.root_dir = lib::FileUtil::GetAbsolutePath(work_root,
-      tracker_plugin_param.root_dir());
+  tracker_init_options.root_dir =
+      GetAbsolutePath(work_root, tracker_plugin_param.root_dir());
   tracker_init_options.conf_file = tracker_plugin_param.config_file();
   tracker_.reset(BaseTrafficLightTrackerRegisterer::
                  GetInstanceByName(tracker_plugin_param.name()));

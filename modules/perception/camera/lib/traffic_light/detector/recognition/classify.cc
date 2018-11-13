@@ -18,6 +18,7 @@
 #include <string>
 #include <map>
 
+#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/lib/io/file_util.h"
 #include "modules/perception/inference/utils/resize.h"
@@ -26,6 +27,8 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
+using apollo::common::util::GetAbsolutePath;
 
 void ClassifyBySimple::Init(
     const traffic_light::recognition::ClassifyParam& model_config,
@@ -49,14 +52,14 @@ void ClassifyBySimple::Init(
   }
 
   std::string model_root =
-      lib::FileUtil::GetAbsolutePath(work_root, model_config.model_name());
+      GetAbsolutePath(work_root, model_config.model_name());
 
   std::string proto_file =
-      lib::FileUtil::GetAbsolutePath(work_root, model_config.proto_file());
+      GetAbsolutePath(work_root, model_config.proto_file());
   AINFO << "proto_file " << proto_file;
 
   std::string weight_file =
-      lib::FileUtil::GetAbsolutePath(work_root, model_config.weight_file());
+      GetAbsolutePath(work_root, model_config.weight_file());
 
   AINFO << "model_root" << model_root;
 

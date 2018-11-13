@@ -25,6 +25,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool MlfTracker::Init(const MlfTrackerInitOptions options) {
   auto& config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
@@ -33,8 +35,8 @@ bool MlfTracker::Init(const MlfTrackerInitOptions options) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file = lib::FileUtil::GetAbsolutePath(config_file, "mlf_tracker.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "mlf_tracker.conf");
   MlfTrackerConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
 

@@ -21,18 +21,6 @@ namespace apollo {
 namespace perception {
 namespace lib {
 
-TEST(FileUtilTest, TestGetAbsolutPath) {
-  EXPECT_EQ(FileUtil::GetAbsolutePath("", "./xx.txt"), "./xx.txt");
-  EXPECT_EQ(FileUtil::GetAbsolutePath("/abc", ""), "/abc");
-  EXPECT_EQ(FileUtil::GetAbsolutePath("/home/work", "xx.txt"),
-            "/home/work/xx.txt");
-  EXPECT_EQ(FileUtil::GetAbsolutePath("/home/work/", "xx.txt"),
-            "/home/work/xx.txt");
-  EXPECT_EQ(FileUtil::GetAbsolutePath("/home/work", "/xx.txt"), "/xx.txt");
-  EXPECT_EQ(FileUtil::GetAbsolutePath("/home/work", "./xx.txt"),
-            "/home/work/./xx.txt");
-}
-
 TEST(FileUtilTest, TestGetFileList) {
   std::string path = "/apollo/modules/perception/testdata/lib/data";
   std::vector<std::string> files;

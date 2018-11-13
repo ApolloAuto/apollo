@@ -31,6 +31,8 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
+using apollo::common::util::GetAbsolutePath;
+
 const char* DstExistanceFusion::name_ = "DstExistanceFusion";
 const char* DstExistanceFusion::toic_name_ = "DstToicFusion";
 ExistanceDstMaps DstExistanceFusion::existance_dst_maps_;
@@ -49,11 +51,10 @@ bool DstExistanceFusion::Init() {
     return false;
   }
 
-  std::string woork_root_config = lib::FileUtil::GetAbsolutePath(
+  std::string woork_root_config = GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), options.root_dir);
 
-  std::string config =
-      lib::FileUtil::GetAbsolutePath(woork_root_config, options.conf_file);
+  std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   DstExistanceFusionConfig params;
 
   if (!apollo::common::util::GetProtoFromFile<DstExistanceFusionConfig>(

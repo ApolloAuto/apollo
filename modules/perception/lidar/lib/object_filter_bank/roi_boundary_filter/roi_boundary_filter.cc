@@ -26,6 +26,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::GetAbsolutePath;
 using apollo::perception::base::PointD;
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
@@ -36,9 +37,8 @@ bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = lib::FileUtil::GetAbsolutePath(work_root, root_path);
-  config_file =
-      lib::FileUtil::GetAbsolutePath(config_file, "roi_boundary_filter.conf");
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "roi_boundary_filter.conf");
   ROIBoundaryFilterConfig config;
   CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
   distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();

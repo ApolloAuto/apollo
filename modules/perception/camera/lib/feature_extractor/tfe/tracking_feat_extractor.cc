@@ -34,8 +34,8 @@ bool TrackingFeatureExtractor::Init(const FeatureExtractorInitOptions
       init_options.input_width == 0 ? feat_width : init_options.input_width;
   tracking_feature::FeatureParam feat_param;
   std::string config_path =
-      lib::FileUtil::GetAbsolutePath(init_options.root_dir,
-                                     init_options.conf_file);
+      apollo::common::util::GetAbsolutePath(init_options.root_dir,
+                                            init_options.conf_file);
   if (!apollo::common::util::GetProtoFromFile(config_path, &feat_param)) {
     AERROR << "read proto_config fail";
     return false;

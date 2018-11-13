@@ -38,9 +38,10 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
-  std::string omt_config =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string omt_config = GetAbsolutePath(options.root_dir, options.conf_file);
   if (!apollo::common::util::GetProtoFromFile
       <omt::OmtParam>(omt_config, &omt_param_)) {
     AERROR << "Read config failed: " << omt_config;
@@ -65,8 +66,7 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   height_ = options.image_height;
   reference_.Init(omt_param_.reference(), width_, height_);
   std::string type_change_cost =
-      lib::FileUtil::GetAbsolutePath(options.root_dir,
-                                     omt_param_.type_change_cost());
+      GetAbsolutePath(options.root_dir, omt_param_.type_change_cost());
   std::ifstream fin(type_change_cost);
   CHECK(fin.is_open());
   kTypeAssociatedCost_.clear();

@@ -28,9 +28,10 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+using apollo::common::util::GetAbsolutePath;
+
 bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
-  std::string proto_path =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
   if (!apollo::common::util::GetProtoFromFile(proto_path, &denseline_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
@@ -41,14 +42,11 @@ bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
 
   const auto model_param = denseline_param_.model_param();
   std::string model_root =
-      lib::FileUtil::GetAbsolutePath(options.root_dir,
-                                     model_param.model_name());
+      GetAbsolutePath(options.root_dir, model_param.model_name());
   std::string proto_file =
-      lib::FileUtil::GetAbsolutePath(model_root,
-                                     model_param.proto_file());
+      GetAbsolutePath(model_root, model_param.proto_file());
   std::string weight_file =
-      lib::FileUtil::GetAbsolutePath(model_root,
-                                     model_param.weight_file());
+      GetAbsolutePath(model_root, model_param.weight_file());
   base_camera_model_ = options.base_camera_model;
   if (base_camera_model_ == nullptr) {
     AERROR << "options.intrinsic is nullptr!";

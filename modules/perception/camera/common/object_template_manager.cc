@@ -60,8 +60,8 @@ bool ObjectTemplateManager::Init(
 
   nr_dim_per_tmplt_ = 3;
 
-  std::string config =
-      lib::FileUtil::GetAbsolutePath(options.root_dir, options.conf_file);
+  std::string config = apollo::common::util::GetAbsolutePath(options.root_dir,
+                                                             options.conf_file);
   ObjectTemplateMeta proto;
   if (!apollo::common::util::GetProtoFromFile<ObjectTemplateMeta>(
         config, &proto)) {
