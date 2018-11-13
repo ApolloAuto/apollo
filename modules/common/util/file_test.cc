@@ -139,6 +139,19 @@ TEST_F(FileTest, GetAbsolutePath) {
   EXPECT_EQ("/home/work/./xx.txt", GetAbsolutePath("/home/work", "./xx.txt"));
 }
 
+TEST_F(FileTest, GetFileName) {
+  EXPECT_EQ("xx.txt", GetFileName("xx.txt"));
+  EXPECT_EQ("xx", GetFileName("./xx.txt", true));
+  EXPECT_EQ("xx.txt", GetFileName("./xx.txt"));
+  EXPECT_EQ("xx", GetFileName("./xx.txt", true));
+  EXPECT_EQ(".txt", GetFileName("./.txt"));
+  EXPECT_EQ("", GetFileName("./.txt", true));
+  EXPECT_EQ("txt", GetFileName("/path/.to/txt"));
+  EXPECT_EQ("txt", GetFileName("/path/.to/txt", true));
+  EXPECT_EQ("", GetFileName("/path/to/"));
+  EXPECT_EQ("", GetFileName("/path/to/", true));
+}
+
 TEST_F(FileTest, GetFileNamesInFolderById) {
   std::string data_path = "modules/common/util/testdata/hm_tracker_test/";
   std::vector<std::string> seg_filenames;

@@ -232,15 +232,25 @@ std::vector<std::string> ListSubPaths(const std::string &directory_path,
   return result;
 }
 
-std::string GetFileName(const std::string &path) {
-  std::string filename;
-  std::string::size_type loc = path.rfind('/');
-  if (loc == std::string::npos) {
-    filename = path;
+std::string GetFileName(const std::string &path, const bool remove_extension) {
+  std::string::size_type start = path.rfind('/');
+  if (start == std::string::npos) {
+    start = 0;
   } else {
-    filename = path.substr(loc + 1);
+    // Move to the next char after '/'.
+    ++start;
   }
-  return filename;
+
+  std::string::size_type end = std::string::npos;
+  if (remove_extension) {
+    end = path.rfind('.');
+    // The last '.' is found before last '/', ignore.
+    if (end != std::string::npos && end < start) {
+      end = std::string::npos;
+    }
+  }
+  const auto len = (end != std::string::npos) ? end - start : end;
+  return path.substr(start, len);
 }
 
 void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,

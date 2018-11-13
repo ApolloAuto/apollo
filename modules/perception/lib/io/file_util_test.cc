@@ -33,19 +33,6 @@ TEST(FileUtilTest, TestGetAbsolutPath) {
             "/home/work/./xx.txt");
 }
 
-TEST(FileUtilTest, TestGetFileName) {
-  std::string name;
-  FileUtil::GetFileName("/home/work/data/1.txt", &name);
-  EXPECT_EQ("1", name);
-  FileUtil::GetFileName(
-      "/apollo/modules/perception/testdata/lib/data/data/11.txt", &name);
-  EXPECT_EQ("11", name);
-  FileUtil::GetFileName("111.txt", &name);
-  EXPECT_EQ("111", name);
-  FileUtil::GetFileName("111", &name);
-  EXPECT_EQ("111", name);
-}
-
 TEST(FileUtilTest, TestGetFileList) {
   std::string path = "/apollo/modules/perception/testdata/lib/data";
   std::vector<std::string> files;
