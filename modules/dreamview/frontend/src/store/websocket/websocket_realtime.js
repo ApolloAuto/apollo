@@ -4,7 +4,7 @@ import MAP_NAVIGATOR from "components/Navigation/MapNavigator";
 import UTTERANCE from "store/utterance";
 import Worker from 'utils/webworker.js';
 
-export default class RosWebSocketEndpoint {
+export default class RealtimeWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
         this.websocket = null;

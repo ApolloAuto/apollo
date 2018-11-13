@@ -6,7 +6,7 @@ import StatusDisplay from "components/ModuleController/StatusDisplay";
 import WS from "store/websocket";
 
 @inject("store") @observer
-export default class Header extends React.Component {
+export default class ModuleController extends React.Component {
     render() {
         const { modes, currentMode, moduleStatus, componentStatus } = this.props.store.hmi;
 

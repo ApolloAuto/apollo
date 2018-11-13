@@ -11,6 +11,20 @@ const StatusColorMapping = {
 
 @observer
 export default class StatusDisplay extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.showStatusMessage = this.showStatusMessage.bind(this);
+    }
+
+    showStatusMessage() {
+        if (this.props.status['message']) {
+            alert(this.props.title + ': ' + this.props.status['message']);
+        } else {
+            alert('No message from ' + this.props.title );
+        }
+    }
+
     render() {
         const { title, status } = this.props;
         const status_code = status["status"];
@@ -18,7 +32,7 @@ export default class StatusDisplay extends React.Component {
         return (
             <div className="status-display">
                 <div className="name">{title}</div>
-                <div className="status">
+                <div className="status" onClick={this.showStatusMessage}>
                     <span>{status_code}</span>
                     <span className="status-icon"
                           style={{

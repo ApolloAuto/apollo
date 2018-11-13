@@ -1140,9 +1140,13 @@ body {
     .status-display {
         display: flex;
         flex-wrap: nowrap;
-        justify-content: space-between;
+        justify-content: space-around;
         min-width: 250px;
         padding: 5px 20px 5px 5px;
+
+        &:hover {
+            background: #2A3238;
+        }
 
         .name {
             padding: 10px;

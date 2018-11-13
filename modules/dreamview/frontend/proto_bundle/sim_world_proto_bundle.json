@@ -2580,6 +2580,13 @@
                   "options": {
                     "default": 1
                   }
+                },
+                "trafficLightSignalExpireTimeSec": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 5
+                  }
                 }
               }
             },
@@ -4281,15 +4288,6 @@
                     "PATH_FALLBACK": 2,
                     "SPEED_FALLBACK": 3
                   }
-                }
-              }
-            },
-            "ADCTrajectories": {
-              "fields": {
-                "adcTrajectory": {
-                  "rule": "repeated",
-                  "type": "ADCTrajectory",
-                  "id": 1
                 }
               }
             },
