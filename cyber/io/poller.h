@@ -35,9 +35,9 @@ namespace io {
 
 class Poller {
  public:
-  using ChangeList = std::list<PollCtrlParam>;
   using RequestPtr = std::shared_ptr<PollRequest>;
   using RequestMap = std::unordered_map<int, RequestPtr>;
+  using CtrlParamMap = std::unordered_map<int, PollCtrlParam>;
 
   virtual ~Poller();
 
@@ -63,10 +63,8 @@ class Poller {
   std::mutex pipe_mutex_;
 
   RequestMap requests_;
-  base::AtomicRWLock requests_lock_;
-
-  ChangeList changes_;
-  base::AtomicRWLock changes_lock_;
+  CtrlParamMap ctrl_params_;
+  base::AtomicRWLock poll_data_lock_;
 
   const int kPollSize = 32;
   const int kPollTimeoutMs = 100;
