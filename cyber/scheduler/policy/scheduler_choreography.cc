@@ -149,7 +149,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
   }
 
   // Remove from processor's runqueue
-  auto crid = GlobalData::RegisterTaskName(name);
+  auto crid = GlobalData::GenerateHashId(name);
   {
     WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
     auto p = cr_ctx_.find(crid);

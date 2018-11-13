@@ -31,7 +31,6 @@ namespace scheduler {
 class SchedulerClassic : public Scheduler {
  public:
   SchedulerClassic();
-  std::shared_ptr<CRoutine> NextRoutine();
   bool RemoveTask(const std::string& name) override;
 
  private:

@@ -135,7 +135,7 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
     return true;
   }
 
-  auto crid = GlobalData::RegisterTaskName(name);
+  auto crid = GlobalData::GenerateHashId(name);
 
   for (int i = MAX_PRIO - 1; i >= 0; --i) {
     WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);

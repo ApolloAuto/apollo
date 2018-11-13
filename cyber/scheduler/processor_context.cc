@@ -20,7 +20,6 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/scheduler/processor_context.h"
-#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
