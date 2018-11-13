@@ -78,9 +78,9 @@ bool ActiveSetSpline2dSolver::Solve() {
     return false;
   }
 
-  int num_param = kernel_matrix.rows();
-  int num_constraint =
-      equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
+  int num_param = static_cast<int>(kernel_matrix.rows());
+  int num_constraint = static_cast<int>(equality_constraint_matrix.rows() +
+                                        inequality_constraint_matrix.rows());
   ADEBUG << "num_param: " << num_param
          << ", last_num_param_: " << last_num_param_;
   ADEBUG << "num_constraint: " << num_constraint
@@ -106,11 +106,11 @@ bool ActiveSetSpline2dSolver::Solve() {
   }
 
   // definition of qpOASESproblem
-  const int kNumOfMatrixElements = kernel_matrix.rows() * kernel_matrix.cols();
+  const auto kNumOfMatrixElements = kernel_matrix.rows() * kernel_matrix.cols();
   double h_matrix[kNumOfMatrixElements];  // NOLINT
   memset(h_matrix, 0, sizeof h_matrix);
 
-  const int kNumOfOffsetRows = offset.rows();
+  const auto kNumOfOffsetRows = offset.rows();
   double g_matrix[kNumOfOffsetRows];  // NOLINT
   memset(g_matrix, 0, sizeof g_matrix);
 
