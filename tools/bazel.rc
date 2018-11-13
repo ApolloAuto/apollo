@@ -72,6 +72,6 @@ build --copt="-Werror=switch"
 build --copt="-Wconversion"
 
 # Enable C++14
-# build --cxxopt="-std=c++14"
+build --cxxopt="-std=c++1y"
 # Enable colorful output of GCC
 # build --cxxopt="-fdiagnostics-color=always"
