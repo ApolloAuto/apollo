@@ -17,10 +17,10 @@ limitations under the License.
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
-#include "modules/common/kv_db/kv_db.h"
 #include "cyber/common/log.h"
 #include "modules/canbus/vehicle/transit/transit_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/kv_db/kv_db.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -172,14 +172,14 @@ Chassis TransitController::chassis() {
   auto& transit = chassis_detail.transit();
   // TODO(luoqi): revisit it later
   // can't find speed
-  auto& motion = transit.llc_motionfeedback1_20();
-  if (motion.has_llc_fbk_throttleposition()) {
-    chassis_.set_throttle_percentage(motion.llc_fbk_throttleposition());
+  auto& motion20 = transit.llc_motionfeedback1_20();
+  if (motion20.has_llc_fbk_throttleposition()) {
+    chassis_.set_throttle_percentage(motion20.llc_fbk_throttleposition());
   }
   // can't find brake percentage
   // can't find steering percentage
-  if (motion.has_llc_fbk_gear()) {
-    switch (motion.llc_fbk_gear()) {
+  if (motion20.has_llc_fbk_gear()) {
+    switch (motion20.llc_fbk_gear()) {
       case Llc_motionfeedback1_20::LLC_FBK_GEAR_P_PARK:
         chassis_.set_gear_location(Chassis::GEAR_PARKING);
         break;
@@ -196,18 +196,24 @@ Chassis TransitController::chassis() {
         break;
     }
   }
+
+  auto& motion21 = transit.llc_motionfeedback2_21();
+  if (motion21.has_llc_fbk_vehiclespeed()) {
+    chassis_.set_speed_mps(motion21.llc_fbk_vehiclespeed());
+  }
+
   auto& aux = transit.llc_auxiliaryfeedback_120();
   if (aux.has_llc_fbk_turnsignal()) {
     switch (aux.llc_fbk_turnsignal()) {
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT:
-        chassis_.mutable_signal()
-          ->set_turn_signal(common::VehicleSignal::TURN_LEFT);
+        chassis_.mutable_signal()->set_turn_signal(
+            common::VehicleSignal::TURN_LEFT);
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT:
-        chassis_.mutable_signal()
-          ->set_turn_signal(common::VehicleSignal::TURN_RIGHT);
+        chassis_.mutable_signal()->set_turn_signal(
+            common::VehicleSignal::TURN_RIGHT);
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE:
-        chassis_.mutable_signal()
-          ->set_turn_signal(common::VehicleSignal::TURN_NONE);
+        chassis_.mutable_signal()->set_turn_signal(
+            common::VehicleSignal::TURN_NONE);
       default:
         break;
     }
@@ -226,16 +232,13 @@ ErrorCode TransitController::EnableAutoMode() {
     AINFO << "already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
-  adc_motioncontrol1_10_->
-    set_adc_cmd_autonomyrequest(
-    Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
-  adc_motioncontrol1_10_->
-    set_adc_cmd_steeringcontrolmode(
-    Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
-  adc_motioncontrol1_10_->
-    set_adc_cmd_longitudinalcontrolmode(
-    Adc_motioncontrol1_10::
-    ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
+  adc_motioncontrol1_10_->set_adc_cmd_autonomyrequest(
+      Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
+  adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
+      Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
+  adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
+      Adc_motioncontrol1_10::
+          ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
   const int32_t flag =
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
@@ -267,15 +270,12 @@ ErrorCode TransitController::EnableSteeringOnlyMode() {
     AINFO << "Already in AUTO_STEER_ONLY mode";
     return ErrorCode::OK;
   }
-  adc_motioncontrol1_10_->
-    set_adc_cmd_autonomyrequest(
-    Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
-  adc_motioncontrol1_10_->
-    set_adc_cmd_steeringcontrolmode(
-    Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
-  adc_motioncontrol1_10_->
-    set_adc_cmd_longitudinalcontrolmode(
-    Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_NONE);
+  adc_motioncontrol1_10_->set_adc_cmd_autonomyrequest(
+      Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
+  adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
+      Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_ANGLE);
+  adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
+      Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_NONE);
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
@@ -296,16 +296,13 @@ ErrorCode TransitController::EnableSpeedOnlyMode() {
     AINFO << "Already in AUTO_SPEED_ONLY mode";
     return ErrorCode::OK;
   }
-  adc_motioncontrol1_10_->
-    set_adc_cmd_autonomyrequest(
-    Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
-  adc_motioncontrol1_10_->
-    set_adc_cmd_steeringcontrolmode(
-    Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE);
-  adc_motioncontrol1_10_->
-    set_adc_cmd_longitudinalcontrolmode(
-    Adc_motioncontrol1_10::
-    ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
+  adc_motioncontrol1_10_->set_adc_cmd_autonomyrequest(
+      Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
+  adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
+      Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE);
+  adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
+      Adc_motioncontrol1_10::
+          ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
   if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
@@ -329,43 +326,43 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_REVERSE: {
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_R_REVERSE);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_R_REVERSE);
       break;
     }
     case Chassis::GEAR_DRIVE: {
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_PARKING: {
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK);
       break;
     }
     case Chassis::GEAR_LOW: {
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_D_DRIVE);
       break;
     }
     case Chassis::GEAR_NONE: {
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     case Chassis::GEAR_INVALID: {
       AERROR << "Gear command is invalid!";
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
     default: {
       adc_motioncontrol1_10_->set_adc_cmd_gear(
-        Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
+          Adc_motioncontrol1_10::ADC_CMD_GEAR_N_NEUTRAL);
       break;
     }
   }
@@ -466,13 +463,13 @@ void TransitController::SetTurningSignal(const ControlCommand& command) {
   auto signal = command.signal().turn_signal();
   if (signal == common::VehicleSignal::TURN_LEFT) {
     adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
-      Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT);
+        Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT);
   } else if (signal == common::VehicleSignal::TURN_RIGHT) {
     adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
-      Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT);
+        Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT);
   } else {
     adc_auxiliarycontrol_110_->set_adc_cmd_turnsignal(
-      Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE);
+        Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE);
   }
 }
 
@@ -697,7 +694,7 @@ void TransitController::set_chassis_error_code(
 }
 
 bool TransitController::CheckSafetyError(
-    const ::apollo::canbus::ChassisDetail &chassis_detail) {
+    const ::apollo::canbus::ChassisDetail& chassis_detail) {
   return true;
 }
 
