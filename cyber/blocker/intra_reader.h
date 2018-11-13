@@ -152,7 +152,7 @@ uint32_t IntraReader<MessageT>::GetHistoryDepth() const {
   auto blocker = BlockerManager::Instance()->GetBlocker<MessageT>(
       this->role_attr_.channel_name());
   if (blocker != nullptr) {
-    return blocker->capacity();
+    return static_cast<uint32_t>(blocker->capacity());
   }
   return 0;
 }
