@@ -97,15 +97,15 @@ bool SidePassPathDecider::BuildSidePathDecision(
     return false;
   }
 
-  const auto &lane_pb = lane->lane();
-  ADEBUG << lane_pb.ShortDebugString();
-  if (lane_pb.left_neighbor_forward_lane_id_size() > 0) {
+  curr_lane_ = lane->lane();
+  ADEBUG << curr_lane_.ShortDebugString();
+  if (curr_lane_.left_neighbor_forward_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::LEFT;
-  } else if (lane_pb.right_neighbor_forward_lane_id_size() > 0) {
+  } else if (curr_lane_.right_neighbor_forward_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::RIGHT;
-  } else if (lane_pb.left_neighbor_reverse_lane_id_size() > 0) {
+  } else if (curr_lane_.left_neighbor_reverse_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::LEFT;
-  } else if (lane_pb.right_neighbor_reverse_lane_id_size() > 0) {
+  } else if (curr_lane_.right_neighbor_reverse_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::RIGHT;
   } else {
     AERROR << "Fail to find side pass direction.";
@@ -203,6 +203,7 @@ SidePassPathDecider::GetPathBoundaries(
   // For future scaling so that multiple obstacles can be considered,
   // a sweep-line method can be used. The code here leaves some room
   // for the sweep-line method.
+  constexpr double kLargeBoundary = 10.0;
   for (double curr_s = adc_frenet_frame_point_.s();
        curr_s < std::min(kSidePassPathLength, reference_line.Length());
        curr_s += s_increment) {
@@ -222,36 +223,45 @@ SidePassPathDecider::GetPathBoundaries(
     if (!reference_line.GetLaneWidth(curr_s, &lane_left_width_at_curr_s,
                                      &lane_right_width_at_curr_s)) {
       AERROR << "Fail to get lane width at s = " << curr_s;
+      std::get<1>(lateral_bound) = -kLargeBoundary;
+      std::get<2>(lateral_bound) = kLargeBoundary;
+      lateral_bounds.push_back(lateral_bound);
       continue;
     }
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
 
     // TODO(All): calculate drivable areas
-    // lower bound
-    std::get<1>(lateral_bound) =
-        -(lane_right_width_at_curr_s - adc_half_width - kRoadBuffer);
-    // upper bound
-    std::get<2>(lateral_bound) =
-        lane_left_width_at_curr_s - adc_half_width - kRoadBuffer;
+    const double lane_width =
+        lane_right_width_at_curr_s + lane_left_width_at_curr_s;
 
-    ADEBUG << "default bound: " << std::get<1>(lateral_bound) << ", "
-           << std::get<2>(lateral_bound);
+    if (decided_direction_ == SidePassDirection::LEFT) {
+      std::get<1>(lateral_bound) =
+          -(lane_right_width_at_curr_s - adc_half_width - kRoadBuffer);
+      std::get<2>(lateral_bound) =
+          lane_width + lane_left_width_at_curr_s - adc_half_width - kRoadBuffer;
+    } else {  // SidePassDirection::RIGHT
+      std::get<1>(lateral_bound) = -(lane_width + lane_right_width_at_curr_s -
+                                     adc_half_width - kRoadBuffer);
+      std::get<2>(lateral_bound) =
+          lane_left_width_at_curr_s - adc_half_width - kRoadBuffer;
+    }
 
     if (is_blocked_by_obs) {
       if (decided_direction_ == SidePassDirection::LEFT) {
         std::get<1>(lateral_bound) = nearest_obs_sl_boundary.end_l() +
                                      FLAGS_static_decision_nudge_l_buffer +
                                      kObstacleBuffer + adc_half_width;
-        std::get<2>(lateral_bound) += lane_left_width_at_curr_s;
       } else if (decided_direction_ == SidePassDirection::RIGHT) {
-        std::get<1>(lateral_bound) -= lane_right_width_at_curr_s;
         std::get<2>(lateral_bound) = nearest_obs_sl_boundary.start_l() -
                                      FLAGS_static_decision_nudge_l_buffer -
                                      kObstacleBuffer - adc_half_width;
       } else {
         AERROR << "Side-pass direction undefined.";
-        return lateral_bounds;
+        std::get<1>(lateral_bound) = -kLargeBoundary;
+        std::get<2>(lateral_bound) = kLargeBoundary;
+        lateral_bounds.push_back(lateral_bound);
+        continue;
       }
     }
     ADEBUG << "obstacle bound: " << std::get<0>(lateral_bound) << ", "
