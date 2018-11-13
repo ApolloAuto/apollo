@@ -156,8 +156,8 @@ message Llc_motioncommandfeedback1_22 {
   optional double llc_fbk_steeringanglesetpoint = 1;
   // Current throttle setpoint (after limits) [%] [0|102.3]
   optional double llc_fbk_throttlesetpoint = 2;
-  // Front brake pressure setpoint (after limits) [psi] [0|2047]
-  optional int32 llc_fbk_brakepressuresetpoint = 3;
+  // Front brake pressure setpoint (after limits) [%] [0|100]
+  optional double llc_fbk_brakepressuresetpoint = 3;
   // Motion command feedback 2 heartbeat counter [] [0|3]
   optional int32 llc_motioncommandfeedback1_count = 4;
   // Motion command feedback 1 checksum [] [0|255]
