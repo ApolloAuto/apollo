@@ -81,6 +81,19 @@ Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
       monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING),
       init_data_(true) {}
 
+Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
+             const common::TrajectoryPoint &planning_start_point,
+             const double start_time, const common::VehicleState &vehicle_state,
+             ADCTrajectory *output_trajectory)
+    : sequence_num_(sequence_num),
+      local_view_(local_view),
+      planning_start_point_(planning_start_point),
+      start_time_(start_time),
+      vehicle_state_(vehicle_state),
+      output_trajectory_(output_trajectory),
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING),
+      init_data_(true) {}
+
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;
 }
@@ -384,6 +397,47 @@ Status Frame::Init(
                   "failed to init reference line info");
   }
   future_route_waypoints_ = future_route_waypoints;
+
+  return Status::OK();
+}
+
+Status Frame::InitForOpenSpace() {
+  hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(hdmap_);
+  vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
+  const auto &point = common::util::MakePointENU(
+      vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
+  if (std::isnan(point.x()) || std::isnan(point.y())) {
+    AERROR << "init point is not set";
+    return Status(ErrorCode::PLANNING_ERROR, "init point is not set");
+  }
+  ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
+         << FLAGS_align_prediction_time;
+
+  // if (FLAGS_enable_lag_prediction && lag_predictor_) {
+  // lag_predictor_->GetLaggedPrediction(
+  //    local_view_.prediction_obstacles.get());
+  //}
+  auto prediction = *(local_view_.prediction_obstacles);
+
+  if (FLAGS_align_prediction_time) {
+    AlignPredictionTime(vehicle_state_.timestamp(), &prediction);
+    local_view_.prediction_obstacles->CopyFrom(prediction);
+  }
+  for (auto &ptr :
+       Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
+    AddObstacle(*ptr);
+  }
+  if (FLAGS_enable_collision_detection) {
+    const auto *collision_obstacle =
+        FindCollisionObstacleWithInExtraRadius(FLAGS_max_collision_distance);
+    if (collision_obstacle) {
+      std::string err_str =
+          "Found collision with obstacle: " + collision_obstacle->Id();
+      monitor_logger_buffer_.ERROR(err_str);
+      return Status(ErrorCode::PLANNING_ERROR, err_str);
+    }
+  }
 
   return Status::OK();
 }
