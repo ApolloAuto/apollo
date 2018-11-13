@@ -44,7 +44,6 @@ export default class AutoDrivingCar {
 
         const optionName = CAR_PROPERTIES[this.name].menuOptionName;
         this.mesh.visible = STORE.options[optionName];
-
         const position = coordinates.applyOffset({x: pose.positionX, y: pose.positionY});
         if (position === null) {
             return;
@@ -52,5 +51,12 @@ export default class AutoDrivingCar {
 
         this.mesh.position.set(position.x, position.y, 0);
         this.mesh.rotation.y = pose.heading;
+    }
+
+    resizeCarScale(x, y, z) {
+        if (!this.mesh) {
+            return;
+        }
+        this.mesh.scale.set(x, y, z);
     }
 }

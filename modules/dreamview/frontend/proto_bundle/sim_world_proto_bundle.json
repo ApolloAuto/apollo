@@ -1135,6 +1135,31 @@
                 }
               }
             },
+            "VehicleMotionPoint": {
+              "fields": {
+                "trajectoryPoint": {
+                  "type": "TrajectoryPoint",
+                  "id": 1
+                },
+                "steer": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
+            "VehicleMotion": {
+              "fields": {
+                "name": {
+                  "type": "string",
+                  "id": 1
+                },
+                "vehicleMotionPoint": {
+                  "rule": "repeated",
+                  "type": "VehicleMotionPoint",
+                  "id": 2
+                }
+              }
+            },
             "VehicleSignal": {
               "fields": {
                 "turnSignal": {
@@ -3853,7 +3878,7 @@
                   "id": 3
                 },
                 "deltaT": {
-                  "type": "double",
+                  "type": "float",
                   "id": 4,
                   "options": {
                     "default": 1
@@ -4567,10 +4592,9 @@
                     "SIDE_PASS_STOP_ON_WAITPOINT": 202,
                     "SIDE_PASS_DETECT_SAFETY": 203,
                     "SIDE_PASS_PASS_OBSTACLE": 204,
-                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_PRE_STOP": 300,
-                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP": 301,
-                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP": 302,
-                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE": 303
+                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP": 300,
+                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP": 301,
+                    "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE": 302
                   }
                 },
                 "StageConfig": {
@@ -7019,6 +7043,42 @@
                 "trajectories": {
                   "type": "apollo.planning_internal.Trajectories",
                   "id": 1
+                },
+                "warmStartTrajecotry": {
+                  "type": "apollo.common.VehicleMotion",
+                  "id": 2
+                },
+                "warmStartDualLambda": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "warmStartDualMiu": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "optimizedDualLambda": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "optimizedDualMiu": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "packed": false
+                  }
                 }
               }
             },
@@ -7828,6 +7888,10 @@
                   "options": {
                     "default": true
                   }
+                },
+                "parkingSpace": {
+                  "type": "apollo.hdmap.ParkingSpace",
+                  "id": 6
                 }
               }
             },
