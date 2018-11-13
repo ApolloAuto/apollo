@@ -68,12 +68,20 @@ class Frame {
                  ReferenceLineProvider *reference_line_provider,
                  ADCTrajectory *output_trajectory);
 
+  explicit Frame(uint32_t sequence_num, const LocalView &local_view,
+                 const common::TrajectoryPoint &planning_start_point,
+                 const double start_time,
+                 const common::VehicleState &vehicle_state,
+                 ADCTrajectory *output_trajectory);
+
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
   common::Status Init(
       const std::list<ReferenceLine> &reference_lines,
       const std::list<hdmap::RouteSegments> &segments,
       const std::vector<routing::LaneWaypoint> &future_route_waypoints);
+
+  common::Status InitForOpenSpace();
 
   uint32_t SequenceNum() const;
 
