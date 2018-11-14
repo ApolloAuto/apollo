@@ -134,8 +134,7 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
 
-  if (FLAGS_prediction_offline_mode &&
-      !obstacle_ptr->IsNearJunction()) {
+  if (FLAGS_prediction_offline_mode && !obstacle_ptr->IsNearJunction()) {
     SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
   }
 }
@@ -185,8 +184,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
   if (count <= 0) {
     return;
   }
-  int curr_size = 5;
-  int hist_size = obstacle_ptr->history_size();
+  size_t curr_size = 5;
+  size_t hist_size = obstacle_ptr->history_size();
   double theta_mean = ComputeMean(thetas, 0, hist_size - 1);
   double theta_filtered = ComputeMean(thetas, 0, curr_size - 1);
   double lane_l_mean = ComputeMean(lane_ls, 0, hist_size - 1);
@@ -203,8 +202,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
 
   double delta_t = 0.0;
   if (timestamps.size() > 1) {
-    delta_t =
-        (timestamps.front() - timestamps.back()) / (timestamps.size() - 1);
+    delta_t = (timestamps.front() - timestamps.back()) /
+              static_cast<double>(timestamps.size() - 1);
   }
   double angle_curr = ComputeMean(thetas, 0, curr_size - 1);
   double angle_prev = ComputeMean(thetas, curr_size, 2 * curr_size - 1);
@@ -219,18 +218,19 @@ void MLPEvaluator::SetObstacleFeatureValues(
   double angle_diff_rate = 0.0;
   double lane_l_diff_rate = 0.0;
   if (delta_t > std::numeric_limits<double>::epsilon()) {
-    angle_diff_rate = angle_diff / (delta_t * curr_size);
-    lane_l_diff_rate = lane_l_diff / (delta_t * curr_size);
+    angle_diff_rate = angle_diff / (delta_t * static_cast<double>(curr_size));
+    lane_l_diff_rate = lane_l_diff / (delta_t * static_cast<float>(curr_size));
   }
 
   double acc = 0.0;
-  if (static_cast<int>(speeds.size()) >= 3 * curr_size &&
+  if (speeds.size() >= 3 * curr_size &&
       delta_t > std::numeric_limits<double>::epsilon()) {
     double speed_1 = ComputeMean(speeds, 0, curr_size - 1);
     double speed_2 = ComputeMean(speeds, curr_size, 2 * curr_size - 1);
     double speed_3 = ComputeMean(speeds, 2 * curr_size, 3 * curr_size - 1);
     acc = (speed_1 - 2 * speed_2 + speed_3) /
-          (curr_size * curr_size * delta_t * delta_t);
+          (static_cast<float>(curr_size) * static_cast<float>(curr_size) *
+           delta_t * delta_t);
   }
 
   double dist_lb_rate_curr = 0.0;
@@ -238,7 +238,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
       delta_t > std::numeric_limits<double>::epsilon()) {
     double dist_lb_curr = ComputeMean(dist_lbs, 0, curr_size - 1);
     double dist_lb_prev = ComputeMean(dist_lbs, curr_size, 2 * curr_size - 1);
-    dist_lb_rate_curr = (dist_lb_curr - dist_lb_prev) / (curr_size * delta_t);
+    dist_lb_rate_curr = (dist_lb_curr - dist_lb_prev) /
+                        (static_cast<float>(curr_size) * delta_t);
   }
 
   double dist_rb_rate_curr = 0.0;
@@ -246,7 +247,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
       delta_t > std::numeric_limits<double>::epsilon()) {
     double dist_rb_curr = ComputeMean(dist_rbs, 0, curr_size - 1);
     double dist_rb_prev = ComputeMean(dist_rbs, curr_size, 2 * curr_size - 1);
-    dist_rb_rate_curr = (dist_rb_curr - dist_rb_prev) / (curr_size * delta_t);
+    dist_rb_rate_curr = (dist_rb_curr - dist_rb_prev) /
+                        (static_cast<float>(curr_size) * delta_t);
   }
 
   // setup obstacle feature values

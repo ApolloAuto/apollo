@@ -61,21 +61,20 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
     prediction_total_time = FLAGS_prediction_pedestrian_total_time;
   }
   DrawFreeMoveTrajectoryPoints(position, velocity, acc, theta,
-      prediction_total_time, FLAGS_prediction_period, &points);
+                               prediction_total_time, FLAGS_prediction_period,
+                               &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
-  int start_index = 0;
   trajectories_.push_back(std::move(trajectory));
-  SetEqualProbability(1.0, start_index);
+  SetEqualProbability(1.0, 0);
   ADEBUG << "Obstacle [" << obstacle->id() << "] has " << trajectories_.size()
          << " trajectories.";
 }
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acc, const double theta,
-    const double total_time, const double period,
-    std::vector<TrajectoryPoint>* points) {
+    const Eigen::Vector2d& acc, const double theta, const double total_time,
+    const double period, std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 6, 1> state;
   state.setZero();
   state(0, 0) = 0.0;

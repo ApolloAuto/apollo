@@ -93,7 +93,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     model_ptr_->SetState(states);
     model_ptr_->Run({obstacle_feature_mat, lane_feature_mat}, &pred_mat);
     double probability = pred_mat(0, 0);
-    ADEBUG << "-------- Probability = " << probability;
+    ADEBUG << "Probability = " << probability;
     double acceleration = pred_mat(0, 1);
     if (std::isnan(probability) || std::isinf(probability)) {
       ADEBUG << "Fail to compute probability.";
@@ -194,18 +194,18 @@ int RNNEvaluator::SetupObstacleFeature(
       continue;
     }
     LaneFeature* p_lane_fea = fea->mutable_lane()->mutable_lane_feature();
-    lane_l = p_lane_fea->lane_l();
-    theta = p_lane_fea->angle_diff();
-    dist_lb = p_lane_fea->dist_to_left_boundary();
-    dist_rb = p_lane_fea->dist_to_right_boundary();
+    lane_l = static_cast<float>(p_lane_fea->lane_l());
+    theta = static_cast<float>(p_lane_fea->angle_diff());
+    dist_lb = static_cast<float>(p_lane_fea->dist_to_left_boundary());
+    dist_rb = static_cast<float>(p_lane_fea->dist_to_right_boundary());
 
     if (!fea->has_speed() || !fea->velocity_heading()) {
       ADEBUG << "Fail to access speed and velocity heading from " << i
              << "-the feature";
       continue;
     }
-    speed = fea->speed();
-    heading = fea->velocity_heading();
+    speed = static_cast<float>(fea->speed());
+    heading = static_cast<float>(fea->velocity_heading());
     success_setup = true;
     ADEBUG << "Success to setup obstacle feature!";
 
@@ -264,13 +264,15 @@ int RNNEvaluator::SetupLaneFeature(const Feature& feature,
         ADEBUG << "Feature or lane_point has no position!";
         continue;
       }
-      float diff_x = p_lane_point->position().x() - feature.position().x();
-      float diff_y = p_lane_point->position().y() - feature.position().y();
+      float diff_x = static_cast<float>(p_lane_point->position().x() -
+                                        feature.position().x());
+      float diff_y = static_cast<float>(p_lane_point->position().y() -
+                                        feature.position().y());
       float angle = std::atan2(diff_y, diff_x);
-      feature_values->push_back(p_lane_point->heading());
-      feature_values->push_back(p_lane_point->angle_diff());
-      feature_values->push_back(p_lane_point->relative_l() -
-                                feature.lane().lane_feature().lane_l());
+      feature_values->push_back(static_cast<float>(p_lane_point->heading()));
+      feature_values->push_back(static_cast<float>(p_lane_point->angle_diff()));
+      feature_values->push_back(static_cast<float>(
+          p_lane_point->relative_l() - feature.lane().lane_feature().lane_l()));
       feature_values->push_back(angle);
       ++counter;
       if (counter > LENGTH_LANE_POINT_SEQUENCE) {

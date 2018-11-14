@@ -37,7 +37,7 @@ const std::vector<Trajectory>& Predictor::trajectories() {
   return trajectories_;
 }
 
-int Predictor::NumOfTrajectories() { return trajectories_.size(); }
+size_t Predictor::NumOfTrajectories() { return trajectories_.size(); }
 
 Trajectory Predictor::GenerateTrajectory(
     const std::vector<apollo::common::TrajectoryPoint>& points) {
@@ -46,11 +46,11 @@ Trajectory Predictor::GenerateTrajectory(
   return trajectory;
 }
 
-void Predictor::SetEqualProbability(double probability, int start_index) {
-  int num = NumOfTrajectories();
+void Predictor::SetEqualProbability(double probability, size_t start_index) {
+  size_t num = NumOfTrajectories();
   if (start_index >= 0 && num > start_index) {
     probability /= static_cast<double>(num - start_index);
-    for (int i = start_index; i < num; ++i) {
+    for (size_t i = start_index; i < num; ++i) {
       trajectories_[i].set_probability(probability);
     }
   }
