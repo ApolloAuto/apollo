@@ -96,35 +96,38 @@ bool PredictionComponent::Init() {
   component_start_time_ = Clock::NowInSeconds();
 
   // Load prediction conf
-  prediction_conf_.Clear();
+
+  PredictionConf prediction_conf;
+  // prediction_conf_.Clear();
   if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                      &prediction_conf_)) {
+                                      &prediction_conf)) {
     AERROR << "Unable to load prediction conf file: "
            << FLAGS_prediction_conf_file;
     return false;
   } else {
     ADEBUG << "Prediction config file is loaded into: "
-           << prediction_conf_.ShortDebugString();
+           << prediction_conf.ShortDebugString();
   }
 
-  adapter_conf_.Clear();
+  common::adapter::AdapterManagerConfig adapter_conf;
+  // adapter_conf_.Clear();
   if (!common::util::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
-                                      &adapter_conf_)) {
+                                      &adapter_conf)) {
     AERROR << "Unable to load adapter conf file: "
            << FLAGS_prediction_adapter_config_filename;
     return false;
   } else {
     ADEBUG << "Adapter config file is loaded into: "
-           << adapter_conf_.ShortDebugString();
+           << adapter_conf.ShortDebugString();
   }
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic, nullptr);
 
   // Initialization of all managers
-  ContainerManager::Instance()->Init(adapter_conf_);
-  EvaluatorManager::Instance()->Init(prediction_conf_);
-  PredictorManager::Instance()->Init(prediction_conf_);
+  ContainerManager::Instance()->Init(adapter_conf);
+  EvaluatorManager::Instance()->Init(prediction_conf);
+  PredictorManager::Instance()->Init(prediction_conf);
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Map cannot be loaded.";

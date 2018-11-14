@@ -90,10 +90,6 @@ class PredictionComponent
 
   double frame_start_time_ = 0.0;
 
-  PredictionConf prediction_conf_;
-
-  common::adapter::AdapterManagerConfig adapter_conf_;
-
   std::shared_ptr<apollo::cyber::Reader<planning::ADCTrajectory>>
       planning_reader_;
 
