@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,23 +22,25 @@
 #ifndef MODULES_LOCALIZATION_LMD_LMD_LOCALIZATION_H_
 #define MODULES_LOCALIZATION_LMD_LMD_LOCALIZATION_H_
 
-#include <algorithm>
-#include <sstream>
+#include <chrono>
+#include <future>
+#include <list>
+#include <map>
+#include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "ros/include/ros/ros.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/status/status.h"
+#include "modules/localization/lmd/predictor/predictor.h"
+#include "modules/localization/localization_base.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/status/status.h"
-#include "modules/localization/localization_base.h"
 
 /**
  * @namespace apollo::localization
@@ -53,6 +55,23 @@ namespace localization {
  * @brief Generate localization info based on LMD.
  */
 class LMDLocalization : public LocalizationBase {
+  struct PredictorHandler {
+    std::shared_ptr<Predictor> predictor;
+    std::future<apollo::common::Status> fut;
+
+    PredictorHandler() = default;
+
+    explicit PredictorHandler(Predictor *predictor) {
+      this->predictor.reset(predictor);
+    }
+
+    bool Busy() const {
+      if (!fut.valid()) return false;
+      auto s = fut.wait_for(std::chrono::seconds::zero());
+      return s != std::future_status::ready;
+    }
+  };
+
  public:
   LMDLocalization();
   virtual ~LMDLocalization();
@@ -70,32 +89,28 @@ class LMDLocalization : public LocalizationBase {
   apollo::common::Status Stop() override;
 
  private:
+  void OnImu(const CorrectedImu &imu);
   void OnGps(const Gps &gps);
+  void OnChassis(const apollo::canbus::Chassis &chassis);
   void OnPerceptionObstacles(
       const apollo::perception::PerceptionObstacles &obstacles);
   void OnTimer(const ros::TimerEvent &event);
-  void PrepareLocalizationMsg(LocalizationEstimate *localization);
-  bool GetGpsPose(const Gps &gps, Pose *pose, double *timestamp_sec);
-  bool PredictPose(const Pose &old_pose, double old_timestamp_sec,
-                   double new_timestamp_sec, Pose *new_pose);
 
-  bool FindMatchingGPS(double timestamp_sec, Gps *gps_msg);
-  bool FindMatchingIMU(double timestamp_sec, CorrectedImu *imu_msg);
-  bool FindMatchingChassis(double timestamp_sec,
-                           apollo::canbus::Chassis *chassis_msg);
-  bool PredictByLinearIntergrate(const Pose &old_pose, double old_timestamp_sec,
-                                 double new_timestamp_sec, Pose *new_pose);
-
-  void PrintPoseError(const Pose &pose, double timestamp_sec);
+  void Predicting();
   void RunWatchDog();
 
  private:
   ros::Timer timer_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
   const std::vector<double> map_offset_;
-  bool has_last_pose_ = false;
-  Pose last_pose_;
-  double last_pose_timestamp_sec_;
+
+  std::map<std::string, PredictorHandler> predictors_;
+  PredictorHandler *gps_;
+  PredictorHandler *imu_;
+  PredictorHandler *output_;
+  std::list<CorrectedImu> imu_list_;
+  std::list<Gps> gps_list_;
+  std::list<apollo::perception::PerceptionObstacles> obstacles_list_;
 };
 
 }  // namespace localization
