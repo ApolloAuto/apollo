@@ -38,7 +38,7 @@ class BoundedQueue {
   using size_type = uint64_t;
   // avoid false sharing
   struct AtomicBool {
-    alignas(CACHELINE_SIZE) volatile bool flag;
+    alignas(CACHELINE_SIZE) std::atomic_bool flag;
   };
 
  public:
@@ -84,7 +84,7 @@ BoundedQueue<T>::~BoundedQueue() {
 }
 
 template <typename T>
-bool BoundedQueue<T>::Init(uint64_t size) {
+inline bool BoundedQueue<T>::Init(uint64_t size) {
   return Init(size, new SleepWaitStrategy());
 }
 
@@ -120,15 +120,15 @@ bool BoundedQueue<T>::Enqueue(const T& element) {
     if (new_tail == head_.load(std::memory_order_acquire)) {
       return false;
     }
+    if (unlikely(flags_[old_tail].flag.load(std::memory_order_acquire))) {
+      // pool_[old_tail] has not been read yet
+      continue;
+    }
   } while (!tail_.compare_exchange_weak(old_tail, new_tail,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
-  // make sure the value of pool_[old_tail] has been read
-  while (flags_[old_tail].flag) {
-    cpu_relax();
-  }
   pool_[old_tail] = element;
-  flags_[old_tail].flag = true;
+  flags_[old_tail].flag.store(true, std::memory_order_release);
   wait_strategy_->NotifyOne();
   return true;
 }
@@ -142,15 +142,15 @@ bool BoundedQueue<T>::Dequeue(T* element) {
     if (new_head == tail_.load(std::memory_order_acquire)) {
       return false;
     }
+    if (unlikely(!flags_[new_head].flag.load(std::memory_order_acquire))) {
+      // pool_[old_tail] has not been written yet
+      continue;
+    }
   } while (!head_.compare_exchange_weak(old_head, new_head,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
-  // make sure the value of pool_[new_head] has been written
-  while (!flags_[new_head].flag) {
-    cpu_relax();
-  }
   *element = pool_[new_head];
-  flags_[new_head].flag = false;
+  flags_[new_head].flag.store(false, std::memory_order_release);
   return true;
 }
 
@@ -166,6 +166,10 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
         wait = true;
         break;
       }
+      if (unlikely(!flags_[new_head].flag.load(std::memory_order_acquire))) {
+        // pool_[old_tail] has not been written yet
+        continue;
+      }
     } while (!head_.compare_exchange_weak(old_head, new_head,
                                           std::memory_order_acq_rel,
                                           std::memory_order_relaxed));
@@ -176,18 +180,15 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
       }
       continue;
     }
-    while (!flags_[new_head].flag) {
-      cpu_relax();
-    }
     *element = pool_[new_head];
-    flags_[new_head].flag = false;
+    flags_[new_head].flag.store(false, std::memory_order_release);
     return true;
   }
   return false;
 }
 
 template <typename T>
-uint64_t BoundedQueue<T>::Size() {
+inline uint64_t BoundedQueue<T>::Size() {
   if (head_ >= tail_) {
     return tail_ + pool_size_ - head_ - 1;
   } else {
@@ -196,14 +197,14 @@ uint64_t BoundedQueue<T>::Size() {
 }
 
 template <typename T>
-bool BoundedQueue<T>::Empty() {
+inline bool BoundedQueue<T>::Empty() {
   return Size() == 0;
 }
 
 // In most cases num is less than pool_size_, this implementation is faster than
 // %.
 template <typename T>
-uint64_t BoundedQueue<T>::GetIndex(uint64_t num) {
+inline uint64_t BoundedQueue<T>::GetIndex(uint64_t num) {
   while (num >= pool_size_) {
     num -= pool_size_;
   }
@@ -211,12 +212,12 @@ uint64_t BoundedQueue<T>::GetIndex(uint64_t num) {
 }
 
 template <typename T>
-void BoundedQueue<T>::SetWaitStrategy(WaitStrategy* strategy) {
+inline void BoundedQueue<T>::SetWaitStrategy(WaitStrategy* strategy) {
   wait_strategy_.reset(strategy);
 }
 
 template <typename T>
-void BoundedQueue<T>::BreakAllWait() {
+inline void BoundedQueue<T>::BreakAllWait() {
   break_all_wait_ = true;
   wait_strategy_->BreakAllWait();
 }
