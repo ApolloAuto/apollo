@@ -184,6 +184,9 @@ class OpenSpaceROI {
   // @brief parking_spot_heading_ is heading the direction pointing away from
   // the lane
   double parking_spot_heading_ = 0.0;
+
+  // @brief parking_spot_id from routing
+  std::string target_parking_spot_id_ = "";
 };
 
 }  // namespace planning

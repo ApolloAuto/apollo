@@ -42,6 +42,18 @@ bool OpenSpaceROI::GenerateRegionOfInterest(Frame *frame) {
   // open space planner to save computation effort
   vehicle_state_ = frame->vehicle_state();
   obstacles_by_frame_ = frame->GetObstacleList();
+  if (frame->local_view().routing->routing_request().has_parking_space() &&
+      frame->local_view().routing->routing_request().parking_space().has_id()) {
+    target_parking_spot_id_ = frame->local_view()
+                                  .routing->routing_request()
+                                  .parking_space()
+                                  .id()
+                                  .id();
+  } else {
+    AERROR << "Failed to get parking space id from routing";
+    return false;
+  }
+
   if (FLAGS_enable_open_space_roi_and_info) {
     if (!(GetOpenSpaceROI() && GetOpenSpaceInfo())) {
       AERROR << "Fail to get open space roi";
@@ -481,7 +493,7 @@ void OpenSpaceROI::SearchTargetParkingSpotOnPath(
   const auto &parking_space_overlaps = nearby_path->parking_space_overlaps();
   if (parking_space_overlaps.size() != 0) {
     for (const auto &parking_overlap : parking_space_overlaps) {
-      if (parking_overlap.object_id == FLAGS_target_parking_spot_id) {
+      if (parking_overlap.object_id == target_parking_spot_id_) {
         hdmap::Id id;
         id.set_id(parking_overlap.object_id);
         target_parking_spot = hdmap_->GetParkingSpaceById(id);
@@ -545,7 +557,7 @@ bool OpenSpaceROI::GetMapInfo(ParkingSpaceInfoConstPtr target_parking_spot,
   if (target_parking_spot == nullptr) {
     std::string msg(
         "No such parking spot found after searching all path forward possible");
-    AERROR << msg << FLAGS_target_parking_spot_id;
+    AERROR << msg << target_parking_spot_id_;
     return false;
   }
 
@@ -553,7 +565,7 @@ bool OpenSpaceROI::GetMapInfo(ParkingSpaceInfoConstPtr target_parking_spot,
     std::string msg(
         "target parking spot found, but too far, distance larger than "
         "pre-defined distance");
-    AERROR << msg << FLAGS_target_parking_spot_id;
+    AERROR << msg << target_parking_spot_id_;
     return false;
   }
 

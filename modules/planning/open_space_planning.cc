@@ -191,9 +191,6 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     // TODO(QiL): Get latest parking info from new routing
   }
 
-  // Update reference line provider and reset pull over if necessary
-  reference_line_provider_->UpdateVehicleState(vehicle_state);
-
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
