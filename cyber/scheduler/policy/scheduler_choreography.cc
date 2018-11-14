@@ -157,6 +157,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
       static_cast<ChoreographyContext *>(pctxs_[p->second].get())
           ->RemoveCRoutine(crid);
       cr_ctx_.erase(crid);
+      return true;
     }
   }
 
@@ -168,12 +169,12 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
           it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == crid) {
         ClassicContext::rq_[i].erase(it);
-        break;
+        return true;
       }
     }
   }
 
-  return true;
+  return false;
 }
 
 bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {

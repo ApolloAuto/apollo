@@ -41,6 +41,10 @@ TEST(SchedulerTest, create_task) {
   auto task_id = GlobalData::RegisterTaskName(croutine_name);
   EXPECT_TRUE(sched->NotifyTask(task_id));
   EXPECT_TRUE(sched->RemoveTask(croutine_name));
+  // remove the same task twice
+  EXPECT_FALSE(sched->RemoveTask(croutine_name));
+  // remove a not exist task
+  EXPECT_FALSE(sched->RemoveTask("driver"));
 }
 
 TEST(SchedulerTest, notify_task) {
