@@ -65,12 +65,23 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
                       config.side_pass_path_decider_config().max_dddl()));
 }
 
-Status SidePassPathDecider::Process(Frame *frame,
-                                    ReferenceLineInfo *reference_line_info) {
+Status SidePassPathDecider::Process(
+    Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   adc_planning_start_point_ = frame->PlanningStartPoint();
   adc_frenet_frame_point_ =
       reference_line_info->reference_line().GetFrenetPoint(
           frame->PlanningStartPoint());
+
+  nearest_obstacle_ =
+      GetNearestObstacle(reference_line_info->AdcSlBoundary(),
+                         reference_line_info->reference_line(),
+                         reference_line_info->path_decision()->obstacles());
+  if (nearest_obstacle_ == nullptr) {
+    const std::string msg = "Fail to get nearest obstacle.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   if (!GeneratePath(frame, reference_line_info)) {
     const std::string msg = "Fail to generate path.";
     AERROR << msg;
@@ -80,7 +91,7 @@ Status SidePassPathDecider::Process(Frame *frame,
 }
 
 bool SidePassPathDecider::BuildSidePathDecision(
-    Frame *frame, ReferenceLineInfo *const reference_line_info) {
+    Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   hdmap::LaneInfoConstPtr lane;
   double s = 0.0;
   double l = 0.0;
@@ -99,6 +110,7 @@ bool SidePassPathDecider::BuildSidePathDecision(
 
   curr_lane_ = lane->lane();
   ADEBUG << curr_lane_.ShortDebugString();
+
   if (curr_lane_.left_neighbor_forward_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::LEFT;
   } else if (curr_lane_.right_neighbor_forward_lane_id_size() > 0) {
@@ -108,8 +120,44 @@ bool SidePassPathDecider::BuildSidePathDecision(
   } else if (curr_lane_.right_neighbor_reverse_lane_id_size() > 0) {
     decided_direction_ = SidePassDirection::RIGHT;
   } else {
-    AERROR << "Fail to find side pass direction.";
-    return false;
+    const double obs_start_s =
+        nearest_obstacle_->PerceptionSLBoundary().start_s();
+    const double obs_end_s = nearest_obstacle_->PerceptionSLBoundary().end_s();
+
+    // Filter out those out-of-lane obstacles.
+    double lane_left_width_at_start_s = 0.0;
+    double lane_right_width_at_start_s = 0.0;
+    reference_line_info->reference_line().GetLaneWidth(
+        obs_start_s, &lane_left_width_at_start_s, &lane_right_width_at_start_s);
+
+    double lane_left_width_at_end_s = 0.0;
+    double lane_right_width_at_end_s = 0.0;
+    reference_line_info->reference_line().GetLaneWidth(
+        obs_end_s, &lane_left_width_at_end_s, &lane_right_width_at_end_s);
+
+    double lane_left_width = std::min(std::abs(lane_left_width_at_start_s),
+                                      std::abs(lane_left_width_at_end_s));
+    double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
+                                       std::abs(lane_right_width_at_end_s));
+
+    const double obs_start_l =
+        nearest_obstacle_->PerceptionSLBoundary().start_l();
+    const double obs_end_l = nearest_obstacle_->PerceptionSLBoundary().end_l();
+
+    const double left_space = lane_left_width - obs_end_l;
+    const double right_space = lane_right_width - obs_start_l;
+
+    const double adc_half_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+
+    if (left_space > adc_half_width + kRoadBuffer) {
+      decided_direction_ = SidePassDirection::LEFT;
+    } else if (right_space > adc_half_width + kRoadBuffer) {
+      decided_direction_ = SidePassDirection::RIGHT;
+    } else {
+      AERROR << "Fail to find side pass direction.";
+      return false;
+    }
   }
   return true;
 }
@@ -118,8 +166,8 @@ bool SidePassPathDecider::BuildSidePathDecision(
 // vehicular obstacle ahead. It side-passes that obstacle and move
 // back to original reference_line immediately. (without considering
 // subsequent obstacles)
-bool SidePassPathDecider::GeneratePath(Frame *frame,
-                                       ReferenceLineInfo *reference_line_info) {
+bool SidePassPathDecider::GeneratePath(
+    Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -334,7 +382,7 @@ const Obstacle *SidePassPathDecider::GetNearestObstacle(
 }
 
 void SidePassPathDecider::RecordDebugInfo(
-    ReferenceLineInfo *reference_line_info) {
+    ReferenceLineInfo *const reference_line_info) {
   const auto &path_points =
       reference_line_info->path_data().discretized_path().path_points();
   auto *ptr_optimized_path =
