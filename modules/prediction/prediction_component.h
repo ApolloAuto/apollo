@@ -101,6 +101,10 @@ class PredictionComponent
       prediction_writer_;
 
   std::mutex mutex_;
+
+  planning::ADCTrajectory adc_trajectory_msg_;
+  localization::LocalizationEstimate localization_msg_;
+  perception::PerceptionObstacles perception_obstacles_msg_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictionComponent)

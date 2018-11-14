@@ -171,12 +171,16 @@ void PredictionComponent::Stop() {
 
 void PredictionComponent::OnLocalization(
     const LocalizationEstimate& localization) {
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    localization_msg_.CopyFrom(localization);
+  }
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
   if (!pose_container) {
     return;
   }
-  pose_container->Insert(localization);
+  pose_container->Insert(localization_msg_);
 
   ADEBUG << "Received a localization message ["
          << localization.ShortDebugString() << "].";
@@ -184,6 +188,10 @@ void PredictionComponent::OnLocalization(
 
 void PredictionComponent::OnPlanning(
     const planning::ADCTrajectory& adc_trajectory) {
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    adc_trajectory_msg_.CopyFrom(adc_trajectory);
+  }
   ADCTrajectoryContainer* adc_trajectory_container =
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::Instance()->GetContainer(
@@ -191,7 +199,7 @@ void PredictionComponent::OnPlanning(
   if (!adc_trajectory_container) {
     return;
   }
-  adc_trajectory_container->Insert(adc_trajectory);
+  adc_trajectory_container->Insert(adc_trajectory_msg_);
 
   ADEBUG << "Received a planning message ["
          << adc_trajectory.ShortDebugString() << "].";
@@ -199,6 +207,10 @@ void PredictionComponent::OnPlanning(
 
 void PredictionComponent::OnPerception(
     const PerceptionObstacles& perception_obstacles) {
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    perception_obstacles_msg_.CopyFrom(perception_obstacles);
+  }
   // Insert obstacle
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::Instance()->GetContainer(
@@ -206,12 +218,7 @@ void PredictionComponent::OnPerception(
   if (!obstacles_container) {
     return;
   }
-  obstacles_container->Insert(perception_obstacles);
-
-  const auto& adc_trajectory_msg = planning_reader_->GetLatestObserved();
-  if (adc_trajectory_msg != nullptr) {
-    OnPlanning(*adc_trajectory_msg);
-  }
+  obstacles_container->Insert(perception_obstacles_msg_);
 
   // Scenario analysis
   ScenarioManager::Instance()->Run();
@@ -228,7 +235,7 @@ void PredictionComponent::OnPerception(
   obstacles_container->BuildLaneGraph();
 
   ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
+         << perception_obstacles_msg_.ShortDebugString() << "].";
 
   // Update ADC status
 
@@ -252,7 +259,7 @@ void PredictionComponent::OnPerception(
   }
 
   // Make evaluations
-  EvaluatorManager::Instance()->Run(perception_obstacles);
+  EvaluatorManager::Instance()->Run(perception_obstacles_msg_);
 
   // No prediction trajectories for offline mode
   if (FLAGS_prediction_offline_mode) {
@@ -260,7 +267,7 @@ void PredictionComponent::OnPerception(
   }
 
   // Make predictions
-  PredictorManager::Instance()->Run(perception_obstacles);
+  PredictorManager::Instance()->Run(perception_obstacles_msg_);
 
   // Get predicted obstacles
   auto prediction_obstacles =
@@ -268,11 +275,11 @@ void PredictionComponent::OnPerception(
   prediction_obstacles.set_start_timestamp(frame_start_time_);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
   prediction_obstacles.mutable_header()->set_lidar_timestamp(
-      perception_obstacles.header().lidar_timestamp());
+      perception_obstacles_msg_.header().lidar_timestamp());
   prediction_obstacles.mutable_header()->set_camera_timestamp(
-      perception_obstacles.header().camera_timestamp());
+      perception_obstacles_msg_.header().camera_timestamp());
   prediction_obstacles.mutable_header()->set_radar_timestamp(
-      perception_obstacles.header().radar_timestamp());
+      perception_obstacles_msg_.header().radar_timestamp());
 
   if (FLAGS_prediction_test_mode) {
     for (auto const& prediction_obstacle :
@@ -314,6 +321,11 @@ bool PredictionComponent::Proc(
   frame_start_time_ = Clock::NowInSeconds();
 
   OnLocalization(*localization);
+  planning_reader_->Observe();
+  const auto& adc_trajectory_msg = planning_reader_->GetLatestObserved();
+  if (adc_trajectory_msg != nullptr) {
+    OnPlanning(*adc_trajectory_msg);
+  }
   OnPerception(*perception_obstacles);
 
   return true;
