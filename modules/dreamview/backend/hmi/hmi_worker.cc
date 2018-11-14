@@ -174,9 +174,9 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     Module& module = LookupOrInsert(mode.mutable_modules(), module_name, {});
     module.set_required_for_safety(cyber_module.required_for_safety());
 
-    // Construct start_command: nohup mainboard -s <schedule> -d <dag> ... &
+    // Construct start_command: nohup mainboard -p <schedule> -d <dag> ... &
     module.set_start_command(StrCat(
-        "nohup mainboard -s ", cyber_module.schedule()));
+        "nohup mainboard -p ", cyber_module.schedule()));
     for (const std::string& dag : cyber_module.dag_files()) {
       StrAppend(module.mutable_start_command(), " -d ", dag);
     }
