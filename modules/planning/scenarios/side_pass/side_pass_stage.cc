@@ -56,7 +56,10 @@ Stage::StageStatus SidePassApproachObstacle::Process(
       continue;
     }
     CHECK(obstacle->IsStatic());
-
+    if (obstacle->speed() >
+        GetContext()->scenario_config_.block_obstacle_min_speed()) {
+      continue;
+    }
     if (obstacle->PerceptionSLBoundary().start_s() <=
         adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
       continue;
