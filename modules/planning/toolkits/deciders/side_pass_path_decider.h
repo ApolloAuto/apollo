@@ -49,13 +49,14 @@ class SidePassPathDecider : public Decider {
   };
 
  private:
-  common::Status Process(Frame* frame,
-                         ReferenceLineInfo* reference_line_info) override;
+  common::Status Process(Frame* const frame,
+                         ReferenceLineInfo* const reference_line_info) override;
 
-  bool BuildSidePathDecision(Frame* frame,
+  bool BuildSidePathDecision(Frame* const frame,
                              ReferenceLineInfo* const reference_line_info);
 
-  bool GeneratePath(Frame* frame, ReferenceLineInfo* reference_line_info);
+  bool GeneratePath(Frame* const frame,
+                    ReferenceLineInfo* const reference_line_info);
 
   std::vector<std::tuple<double, double, double>> GetPathBoundaries(
       const common::TrajectoryPoint& planning_start_point,
@@ -66,7 +67,7 @@ class SidePassPathDecider : public Decider {
       const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
-  void RecordDebugInfo(ReferenceLineInfo* reference_line_info);
+  void RecordDebugInfo(ReferenceLineInfo* const reference_line_info);
 
  private:
   common::TrajectoryPoint adc_planning_start_point_;
@@ -76,6 +77,7 @@ class SidePassPathDecider : public Decider {
   double delta_s_ = 0.0;
 
   hdmap::Lane curr_lane_;
+  const Obstacle* nearest_obstacle_ = nullptr;
 };
 
 }  // namespace planning
