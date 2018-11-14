@@ -261,7 +261,10 @@ void Obstacle::BuildJunctionFeature() {
 }
 
 bool Obstacle::IsClosedToJunctionExit() {
-  CHECK(HasJunctionFeatureWithExits());
+  if (!HasJunctionFeatureWithExits()) {
+    AERROR << "No junction feature found";
+    return false;
+  }
   CHECK_GT(history_size(), 0);
   const Feature& latest_feature = feature_history_.front();
   double position_x = latest_feature.position().x();

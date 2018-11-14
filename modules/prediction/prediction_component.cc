@@ -217,7 +217,8 @@ void PredictionComponent::OnPerception(
   ScenarioManager::Instance()->Run();
 
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
-  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
+  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
+      FLAGS_enable_junction_feature) {
     JunctionAnalyzer::Init(scenario.junction_id());
     obstacles_container->BuildJunctionFeature();
   }
