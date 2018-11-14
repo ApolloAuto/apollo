@@ -132,10 +132,12 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   //***************    end   ADOL-C part ***********************************
 
  private:
-  int num_of_variables_;
-  int num_of_constraints_;
-  int horizon_;
-  double ts_;
+  int num_of_variables_ = 0;
+  int num_of_constraints_ = 0;
+  int horizon_ = 0;
+  int lambda_horizon_ = 0;
+  int miu_horizon_ = 0;
+  double ts_ = 0.0;
   Eigen::MatrixXd ego_;
   Eigen::MatrixXd xWS_;
   Eigen::MatrixXd uWS_;
@@ -147,27 +149,27 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   std::vector<double> XYbounds_;
 
   // penalty
-  double weight_state_x_;
-  double weight_state_y_;
-  double weight_state_phi_;
-  double weight_state_v_;
-  double weight_input_steer_;
-  double weight_input_a_;
-  double weight_rate_steer_;
-  double weight_rate_a_;
-  double weight_stitching_steer_;
-  double weight_stitching_a_;
-  double weight_first_order_time_;
-  double weight_second_order_time_;
+  double weight_state_x_ = 0.0;
+  double weight_state_y_ = 0.0;
+  double weight_state_phi_ = 0.0;
+  double weight_state_v_ = 0.0;
+  double weight_input_steer_ = 0.0;
+  double weight_input_a_ = 0.0;
+  double weight_rate_steer_ = 0.0;
+  double weight_rate_a_ = 0.0;
+  double weight_stitching_steer_ = 0.0;
+  double weight_stitching_a_ = 0.0;
+  double weight_first_order_time_ = 0.0;
+  double weight_second_order_time_ = 0.0;
 
-  double w_ev_;
-  double l_ev_;
+  double w_ev_ = 0.0;
+  double l_ev_ = 0.0;
   std::vector<double> g_;
-  double offset_;
+  double offset_ = 0.0;
   Eigen::MatrixXi obstacles_edges_num_;
-  int obstacles_num_;
-  int obstacles_edges_sum_;
-  double wheelbase_;
+  int obstacles_num_ = 0;
+  int obstacles_edges_sum_ = 0;
+  double wheelbase_ = 0.0;
 
   Eigen::MatrixXd state_result_;
   Eigen::MatrixXd dual_l_result_;
@@ -231,11 +233,11 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
  private:
   //***************    start ADOL-C part ***********************************
-  double *obj_lam;
+  double* obj_lam;
   unsigned int* rind_L; /* row indices    */
   unsigned int* cind_L; /* column indices */
   double* hessval;      /* values */
-  int nnz_L;
+  int nnz_L = 0;
   int options_L[4];
   //***************    end   ADOL-C part ***********************************
 };
