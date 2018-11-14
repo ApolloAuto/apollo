@@ -32,16 +32,25 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using ::google::protobuf::Message;
 
+
 ObstaclesContainer::ObstaclesContainer()
     : obstacles_(FLAGS_max_num_obstacles) {}
 
-void ObstaclesContainer::Insert(const Message& message) {
+// This is called by Perception module at every frame to insert all
+// detected obstacles.
+void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
+  // Clean up the history and get the PerceptionObstacles
   curr_frame_predictable_obstacle_ids_.clear();
   PerceptionObstacles perception_obstacles;
   perception_obstacles.CopyFrom(
       dynamic_cast<const PerceptionObstacles&>(message));
 
-  // Update the timestamp_ of the ObstaclesContainer
+  // Get the new timestamp and update it in the class
+  // - If it's more than 10sec later than the most recent one, clear the 
+  //   obstacle history.
+  // - If it's not a valid time (earlier than history), continue.
+  // - Also consider the offline_mode case.
+
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
@@ -92,19 +101,23 @@ void ObstaclesContainer::Insert(const Message& message) {
   }
 }
 
+
 Obstacle* ObstaclesContainer::GetObstacle(const int id) {
   return obstacles_.GetSilently(id);
 }
+
 
 const std::vector<int>&
 ObstaclesContainer::GetCurrentFramePredictableObstacleIds() const {
   return curr_frame_predictable_obstacle_ids_;
 }
 
+
 void ObstaclesContainer::Clear() {
   obstacles_.Clear();
   timestamp_ = -1.0;
 }
+
 
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
@@ -133,7 +146,10 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   }
 }
 
+
 void ObstaclesContainer::BuildLaneGraph() {
+  // Go through every obstacle in the current frame, after some
+  // sanity checks, build lane graph for non-junction cases.
   for (const int id : curr_frame_predictable_obstacle_ids_) {
     Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
     if (obstacle_ptr == nullptr) {
@@ -148,7 +164,10 @@ void ObstaclesContainer::BuildLaneGraph() {
   }
 }
 
+
 void ObstaclesContainer::BuildJunctionFeature() {
+  // Go through every obstacle in the current frame, after some
+  // sanit checks, build junction features for those that are in junction.
   for (const int id : curr_frame_predictable_obstacle_ids_) {
     Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
     if (obstacle_ptr == nullptr) {
@@ -167,6 +186,7 @@ void ObstaclesContainer::BuildJunctionFeature() {
     }
   }
 }
+
 
 bool ObstaclesContainer::IsPredictable(
     const PerceptionObstacle& perception_obstacle) {
