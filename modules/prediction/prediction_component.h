@@ -43,8 +43,7 @@ namespace apollo {
 namespace prediction {
 
 class PredictionComponent
-    : public cyber::Component<perception::PerceptionObstacles,
-                                  localization::LocalizationEstimate> {
+    : public cyber::Component<perception::PerceptionObstacles> {
  public:
   /**
    * @brief Destructor
@@ -66,12 +65,9 @@ class PredictionComponent
   /**
    * @brief Data callback upon receiving a perception obstacle message.
    * @param Perception obstacle message.
-   * @param Localization message.
-   * @param Planning trajectory message.
    */
   bool Proc(
-      const std::shared_ptr<perception::PerceptionObstacles> &,
-      const std::shared_ptr<localization::LocalizationEstimate> &) override;
+      const std::shared_ptr<perception::PerceptionObstacles> &) override;
 
  private:
   void OnLocalization(const localization::LocalizationEstimate &localization);
@@ -90,17 +86,14 @@ class PredictionComponent
 
   double frame_start_time_ = 0.0;
 
-  std::shared_ptr<apollo::cyber::Reader<planning::ADCTrajectory>>
+  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>>
       planning_reader_;
 
-  std::shared_ptr<apollo::cyber::Writer<PredictionObstacles>>
+  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
+      localization_reader_;
+
+  std::shared_ptr<cyber::Writer<PredictionObstacles>>
       prediction_writer_;
-
-  std::mutex mutex_;
-
-  planning::ADCTrajectory adc_trajectory_msg_;
-  localization::LocalizationEstimate localization_msg_;
-  perception::PerceptionObstacles perception_obstacles_msg_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictionComponent)
