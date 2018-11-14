@@ -16,8 +16,8 @@
 
 #include "modules/prediction/network/net_util.h"
 
-#include <unordered_map>
 #include <cmath>
+#include <unordered_map>
 
 #include "cyber/common/log.h"
 
@@ -25,27 +25,23 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
-float sigmoid(const float x) {
-  return static_cast<float>(1.0 / (1.0 + std::exp(-x)));
-}
+float sigmoid(const float x) { return 1.0f / (1.0f + std::exp(-x)); }
 
-float tanh(const float x) {
-  return static_cast<float>(std::tanh(x));
-}
+float tanh(const float x) { return std::tanh(x); }
 
 float linear(const float x) { return x; }
 
 float hard_sigmoid(const float x) {
-  const float z = 0.2 * x + 0.5;
-  return z <= 0.0 ? 0.0 : (z <= 1.0 ? z : 1.0);
+  const float z = 0.2f * x + 0.5f;
+  return z <= 0.0f ? 0.0f : (z <= 1.0f ? z : 1.0f);
 }
 
-float relu(const float x) { return (x > 0.0) ? x : 0.0; }
+float relu(const float x) { return (x > 0.0f) ? x : 0.0f; }
 
 Eigen::MatrixXf FlattenMatrix(const Eigen::MatrixXf& matrix) {
   CHECK_GT(matrix.rows(), 0);
   CHECK_GT(matrix.cols(), 0);
-  int output_size = matrix.rows() * matrix.cols();
+  int output_size = static_cast<int>(matrix.rows() * matrix.cols());
   Eigen::MatrixXf output_matrix;
   output_matrix.resize(1, output_size);
   int output_index = 0;
@@ -59,7 +55,7 @@ Eigen::MatrixXf FlattenMatrix(const Eigen::MatrixXf& matrix) {
 }
 
 std::function<float(float)> serialize_to_function(const std::string& str) {
-  static const std::unordered_map<std::string, std::function<float(float)> >
+  static const std::unordered_map<std::string, std::function<float(float)>>
       func_map({{"linear", linear},
                 {"tanh", tanh},
                 {"sigmoid", sigmoid},
