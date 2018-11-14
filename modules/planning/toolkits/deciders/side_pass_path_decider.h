@@ -49,6 +49,7 @@ class SidePassPathDecider : public Decider {
   };
 
  private:
+  void InitSolver();
   common::Status Process(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) override;
 
