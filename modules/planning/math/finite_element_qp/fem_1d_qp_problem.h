@@ -75,6 +75,10 @@ class Fem1dQpProblem {
   virtual void AddReferenceLineKernel(const std::vector<double>& ref_line,
                                       const double wweight) {}
 
+  virtual void ResetInitConditions(const std::array<double, 3>& x_init) {
+    x_init_ = x_init;
+  }
+
   // x_bounds: tuple(s, lower_bounds, upper_bounds)
   // s doesn't need to be sorted
   virtual void SetVariableBounds(
