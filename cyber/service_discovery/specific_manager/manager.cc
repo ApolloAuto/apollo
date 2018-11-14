@@ -172,7 +172,7 @@ void Manager::Convert(const RoleAttributes& attr, RoleType role,
   msg->set_role_type(role);
   auto role_attr = msg->mutable_role_attr();
   role_attr->CopyFrom(attr);
-  if (!role_attr->has_node_name()) {
+  if (!role_attr->has_host_name()) {
     role_attr->set_host_name(host_name_);
   }
   if (!role_attr->has_process_id()) {
