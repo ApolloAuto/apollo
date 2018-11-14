@@ -46,6 +46,8 @@ void Processor::Start() {
   }
   thread_ = std::thread(&Processor::Run, this);
 
+#if 0
+  // FIXME: later, we will deal with cpu affinity.
   uint32_t core_num = std::thread::hardware_concurrency();
   if (core_num != 0) {
     cpu_set_t set;
@@ -53,6 +55,7 @@ void Processor::Start() {
     CPU_SET(cpu_bind_id_, &set);
     pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
   }
+#endif
 }
 
 void Processor::Run() {

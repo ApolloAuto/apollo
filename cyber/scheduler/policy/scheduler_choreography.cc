@@ -19,9 +19,11 @@
 #include <memory>
 #include <string>
 
+#include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/policy/classic.h"
-#include "cyber/scheduler/processor.h"
+#include "cyber/common/environment.h"
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace cyber {
@@ -30,35 +32,26 @@ namespace scheduler {
 using apollo::cyber::common::GlobalData;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
+using apollo::cyber::common::GetAbsolutePath;
+using apollo::cyber::common::PathExists;
+using apollo::cyber::common::GetProtoFromFile;
+using apollo::cyber::common::WorkRoot;
 
 SchedulerChoreography::SchedulerChoreography() {
-  sched_policy_ = SchedPolicy::CHOREO;
+  // get sched config
+  std::string conf("conf/");
+  conf.append(GlobalData::Instance()->ProcessName()).append(".conf");
+  auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
 
-  auto& gconf = GlobalData::Instance()->Config();
-  for (auto& conf : gconf.scheduler_conf().confs()) {
-    sched_confs_[conf.name()] = conf;
-  }
-
-  auto desc = SchedName_descriptor()->FindValueByName(
-      GlobalData::Instance()->SchedName());
-  int sname;
-  if (desc) {
-    sname = desc->number();
-
-    SchedConf sconf;
-    auto itr = sched_confs_.find(sname);
-    if (itr != sched_confs_.end()) {
-      proc_num_ = itr->second.proc_num();
-      task_pool_size_ = itr->second.task_pool_size();
-      cpu_binding_start_index_ = itr->second.cpu_binding_start_index();
-    }
-  }
-
-  for (auto& conf : gconf.choreo_conf()) {
-    if (conf.sched_name() == sname) {
-      for (auto& choreo : conf.choreos()) {
-        cr_confs_[choreo.name()] = choreo;
-      }
+  apollo::cyber::proto::CyberConfig cfg;
+  if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
+    proc_num_ = cfg.scheduler_conf().choreography_conf()
+                  .choreography_processor_num();
+    task_pool_size_ = cfg.scheduler_conf().choreography_conf().
+                        pool_processor_num();
+    // FIXME: pool cpuset
+    for (auto& task : cfg.scheduler_conf().choreography_conf().tasks()) {
+      cr_confs_[task.name()] = task;
     }
   }
 
@@ -78,7 +71,6 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ChoreographyContext>();
 
     proc->BindContext(ctx);
-    proc->SetBindCpuIndex(cpu_binding_start_index_ + i);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
 
@@ -91,7 +83,6 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ClassicContext>();
 
     proc->BindContext(ctx);
-    proc->SetBindCpuIndex(cpu_binding_start_index_ + proc_num_ + i);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
 
@@ -100,6 +91,16 @@ void SchedulerChoreography::CreateProcessor() {
 }
 
 bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
+  // Assign sched cfg to tasks according to configuration.
+  if (cr_confs_.find(cr->name()) != cr_confs_.end()) {
+    ChoreographyTask taskconf = cr_confs_[cr->name()];
+    cr->set_priority(taskconf.prio());
+
+    if (taskconf.has_processor()) {
+      cr->set_processor_id(taskconf.processor());
+    }
+  }
+
   // Check if task exists in choreography processor rq already.
   {
     WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
@@ -120,13 +121,15 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
     }
   }
 
+  // Enqueue task.
   uint32_t pid = cr->processor_id();
   if (pid < proc_num_) {
     {
       WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
       cr_ctx_[cr->id()] = pid;
     }
-    return static_cast<ChoreographyContext*>(pctxs_[pid].get())->Enqueue(cr);
+    // Enqueue task to processor runqueue.
+    return static_cast<ChoreographyContext *>(pctxs_[pid].get())->Enqueue(cr);
   } else {
     // fallback for tasks w/o processor assigned.
 
@@ -135,7 +138,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
       return false;
     }
 
-    // Enqueue task.
+    // Enqueue task to pool runqueue.
     WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[cr->priority()]);
     ClassicContext::rq_[cr->priority()].emplace_back(cr);
   }

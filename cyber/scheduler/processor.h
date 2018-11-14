@@ -53,8 +53,6 @@ class Processor {
     context_ = context;
   }
 
-  void SetBindCpuIndex(uint32_t id) { cpu_bind_id_ = id; }
-
  private:
   std::mutex mtx_rq_;
   std::mutex mtx_pctx_;
@@ -66,7 +64,6 @@ class Processor {
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
 
   std::atomic<bool> running_{false};
-  uint32_t cpu_bind_id_ = 0;
 };
 
 }  // namespace scheduler

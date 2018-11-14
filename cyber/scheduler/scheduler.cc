@@ -28,6 +28,8 @@
 #include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
+#include "cyber/common/environment.h"
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace cyber {
@@ -36,38 +38,35 @@ namespace scheduler {
 using apollo::cyber::common::GlobalData;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
+using apollo::cyber::common::GetAbsolutePath;
+using apollo::cyber::common::PathExists;
+using apollo::cyber::common::GetProtoFromFile;
+using apollo::cyber::common::WorkRoot;
 
 Scheduler* Scheduler::Instance() {
   static Scheduler* instance = nullptr;
 
   if (unlikely(!instance)) {
-    SchedPolicy spolicy = SchedPolicy::CLASSIC;
+    std::string policy = "classic";
 
     // Get sched policy from conf
-    auto gconf = GlobalData::Instance()->Config();
-    std::unordered_map<int, SchedConf> sconfs;
-    for (auto& conf : gconf.scheduler_conf().confs()) {
-      sconfs[conf.name()] = conf;
+    std::string conf("conf/");
+    conf.append(GlobalData::Instance()->SchedName()).append(".conf");
+    auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
+
+    apollo::cyber::proto::CyberConfig cfg;
+    if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
+      policy = cfg.scheduler_conf().policy();
+    } else {
+      AERROR << "Pls make sure schedconf exist and which format is correct.\n";
     }
 
-    auto desc = SchedName_descriptor()->FindValueByName(
-        GlobalData::Instance()->SchedName());
-    if (desc) {
-      int sname = desc->number();
-      auto itr = sconfs.find(sname);
-      if (itr != sconfs.end()) {
-        spolicy = itr->second.policy();
-      }
-    }
-
-    switch (spolicy) {
-      case SchedPolicy::CHOREO:
-        instance = new SchedulerChoreography();
-        break;
-      case SchedPolicy::CLASSIC:
-      default:
-        instance = new SchedulerClassic();
-        break;
+    if (!policy.compare(std::string("classic"))) {
+      instance = new SchedulerClassic();
+    } else if (!policy.compare(std::string("choreography"))) {
+      instance = new SchedulerChoreography();
+    } else {
+      instance = new SchedulerClassic();
     }
   }
 
@@ -103,17 +102,6 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   auto cr = std::make_shared<CRoutine>(func);
   cr->set_id(task_id);
   cr->set_name(name);
-
-  Choreo conf;
-  if (cr_confs_.find(name) != cr_confs_.end()) {
-    conf = cr_confs_[name];
-    cr->set_priority(conf.priority());
-
-    if (conf.has_processor_index()) {
-      auto proc_id = conf.processor_index();
-      cr->set_processor_id(proc_id);
-    }
-  }
 
   if (!DispatchTask(cr)) {
     return false;

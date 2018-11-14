@@ -159,16 +159,7 @@ bool GlobalData::InitConfig() {
     AERROR << "read cyber default conf failed!";
     return false;
   }
-  auto user_config_path = GetAbsolutePath(WorkRoot(), "conf/user.pb.conf");
-  if (PathExists(user_config_path)) {
-    apollo::cyber::proto::CyberConfig user_config;
-    if (!GetProtoFromFile(user_config_path, &user_config)) {
-      AERROR << "read cyber user conf failed!";
-      return false;
-    } else {
-      config_.MergeFrom(user_config);
-    }
-  }
+
   return true;
 }
 
