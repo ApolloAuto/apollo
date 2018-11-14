@@ -199,7 +199,7 @@ class Recorder(object):
         # Use the best disk, or fallback '/apollo' if none available.
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
 
-        topics = SMALL_TOPICS.copy()
+        topics = list(SMALL_TOPICS)
         if record_all:
             topics.extend(LARGE_TOPICS)
         if self.args.additional_topics:
