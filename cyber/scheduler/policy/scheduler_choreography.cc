@@ -121,7 +121,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   }
 
   uint32_t pid = cr->processor_id();
-  if (pid >= 0 && pid < proc_num_) {
+  if (pid < proc_num_) {
     {
       WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
       cr_ctx_[cr->id()] = pid;
@@ -130,8 +130,8 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   } else {
     // fallback for tasks w/o processor assigned.
 
-    // Check if task prio is resonable.
-    if (cr->priority() < 0 || cr->priority() >= MAX_PRIO) {
+    // Check if task prio is reasonable.
+    if (cr->priority() >= MAX_PRIO) {
       return false;
     }
 
