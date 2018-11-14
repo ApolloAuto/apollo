@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "cyber/base/concurrent_object_pool.h"
+#include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/croutine/routine_context.h"
 #include "cyber/event/perf_event_cache.h"
@@ -41,12 +42,12 @@ void CRoutineEntry(void *arg) {
   r->Run();
   CRoutine::Yield(RoutineState::FINISHED);
 }
-}
+}  // namespace
 
 CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
   if (unlikely(context_pool == nullptr)) {
     auto routine_num = 100;
-    auto global_conf = common::GlobalData::Instance()->Config();
+    auto &global_conf = common::GlobalData::Instance()->Config();
     if (global_conf.has_scheduler_conf() &&
         global_conf.scheduler_conf().has_routine_num()) {
       routine_num = global_conf.scheduler_conf().routine_num();
