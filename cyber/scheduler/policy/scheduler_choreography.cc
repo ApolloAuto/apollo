@@ -19,9 +19,9 @@
 #include <memory>
 #include <string>
 
-#include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {
@@ -34,13 +34,13 @@ using apollo::cyber::event::SchedPerf;
 SchedulerChoreography::SchedulerChoreography() {
   sched_policy_ = SchedPolicy::CHOREO;
 
-  auto gconf = GlobalData::Instance()->Config();
+  auto& gconf = GlobalData::Instance()->Config();
   for (auto& conf : gconf.scheduler_conf().confs()) {
     sched_confs_[conf.name()] = conf;
   }
 
-  auto desc = SchedName_descriptor()->
-      FindValueByName(GlobalData::Instance()->SchedName());
+  auto desc = SchedName_descriptor()->FindValueByName(
+      GlobalData::Instance()->SchedName());
   int sname;
   if (desc) {
     sname = desc->number();
@@ -113,7 +113,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
     ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
 
     for (auto it = ClassicContext::rq_[i].begin();
-          it != ClassicContext::rq_[i].end(); ++it) {
+         it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == cr->id()) {
         return false;
       }
@@ -126,7 +126,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
       WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
       cr_ctx_[cr->id()] = pid;
     }
-    return static_cast<ChoreographyContext *>(pctxs_[pid].get())->Enqueue(cr);
+    return static_cast<ChoreographyContext*>(pctxs_[pid].get())->Enqueue(cr);
   } else {
     // fallback for tasks w/o processor assigned.
 
@@ -154,7 +154,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
     WriteLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
     auto p = cr_ctx_.find(crid);
     if (p != cr_ctx_.end()) {
-      static_cast<ChoreographyContext *>(pctxs_[p->second].get())
+      static_cast<ChoreographyContext*>(pctxs_[p->second].get())
           ->RemoveCRoutine(crid);
       cr_ctx_.erase(crid);
       return true;
@@ -166,7 +166,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
     WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
 
     for (auto it = ClassicContext::rq_[i].begin();
-          it != ClassicContext::rq_[i].end(); ++it) {
+         it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == crid) {
         ClassicContext::rq_[i].erase(it);
         return true;
@@ -186,10 +186,10 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
   ReadLockGuard<AtomicRWLock> lk(cr_ctx_lock_);
   auto it = cr_ctx_.find(crid);
   if (it != cr_ctx_.end()) {
-    PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN,
-                      crid, it->second);
+    PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, crid,
+                                              it->second);
 
-    static_cast<ChoreographyContext *>(pctxs_[it->second].get())->Notify(crid);
+    static_cast<ChoreographyContext*>(pctxs_[it->second].get())->Notify(crid);
 
     return true;
   }
@@ -199,7 +199,7 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
     ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
 
     for (auto it = ClassicContext::rq_[i].begin();
-          it != ClassicContext::rq_[i].end(); ++it) {
+         it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == crid) {
         if ((*it)->state() == RoutineState::DATA_WAIT) {
           (*it)->SetUpdateFlag();
@@ -216,4 +216,3 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
-

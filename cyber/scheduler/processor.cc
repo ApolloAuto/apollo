@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/scheduler/processor.h"
+
 #include <sched.h>
 #include <chrono>
 
@@ -21,7 +23,6 @@
 #include "cyber/common/log.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
-#include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
 #include "cyber/scheduler/scheduler.h"
 
@@ -31,7 +32,7 @@ namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
 
-Processor::Processor() {routine_context_.reset(new RoutineContext());}
+Processor::Processor() { routine_context_.reset(new RoutineContext()); }
 
 Processor::~Processor() {
   if (thread_.joinable()) {

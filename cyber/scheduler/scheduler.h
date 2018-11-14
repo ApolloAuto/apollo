@@ -32,19 +32,19 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
-#include "cyber/proto/task_choreo_conf.pb.h"
 #include "cyber/proto/scheduler_conf.pb.h"
+#include "cyber/proto/task_choreo_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::proto::Choreo;
-using apollo::cyber::proto::SchedConf;
-using apollo::cyber::proto::SchedName_descriptor;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
+using apollo::cyber::proto::Choreo;
+using apollo::cyber::proto::SchedConf;
+using apollo::cyber::proto::SchedName_descriptor;
 using apollo::cyber::proto::SchedPolicy;
 
 class ProcessorContext;
@@ -53,7 +53,7 @@ class Scheduler {
  public:
   Scheduler() : stop_(false) {}
   virtual ~Scheduler() {}
-  static Scheduler *Instance();
+  static Scheduler* Instance();
   bool CreateTask(const RoutineFactory& factory, const std::string& name);
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);

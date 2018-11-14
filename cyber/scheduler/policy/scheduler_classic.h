@@ -17,12 +17,11 @@
 #ifndef CYBER_SCHEDULER_POLICY_SCHEDULER_CLASSIC_H_
 #define CYBER_SCHEDULER_POLICY_SCHEDULER_CLASSIC_H_
 
-#include "cyber/scheduler/scheduler.h"
-
 #include <memory>
 #include <string>
 
 #include "cyber/base/atomic_rw_lock.h"
+#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {

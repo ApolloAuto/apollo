@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "cyber/scheduler/scheduler.h"
 
 #include <utility>
@@ -21,12 +22,12 @@
 #include "cyber/common/util.h"
 #include "cyber/data/data_visitor.h"
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/scheduler/policy/classic.h"
 #include "cyber/scheduler/policy/choreography.h"
+#include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/policy/scheduler_choreography.h"
+#include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
-#include "cyber/scheduler/policy/scheduler_classic.h"
-#include "cyber/scheduler/policy/scheduler_choreography.h"
 
 namespace apollo {
 namespace cyber {
@@ -36,9 +37,8 @@ using apollo::cyber::common::GlobalData;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-
 Scheduler* Scheduler::Instance() {
-  static Scheduler *instance = nullptr;
+  static Scheduler* instance = nullptr;
 
   if (unlikely(!instance)) {
     SchedPolicy spolicy = SchedPolicy::CLASSIC;
@@ -50,8 +50,8 @@ Scheduler* Scheduler::Instance() {
       sconfs[conf.name()] = conf;
     }
 
-    auto desc = SchedName_descriptor()->
-                FindValueByName(GlobalData::Instance()->SchedName());
+    auto desc = SchedName_descriptor()->FindValueByName(
+        GlobalData::Instance()->SchedName());
     if (desc) {
       int sname = desc->number();
       auto itr = sconfs.find(sname);
@@ -116,7 +116,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   }
 
   if (!DispatchTask(cr)) {
-      return false;
+    return false;
   }
 
   if (visitor != nullptr) {

@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/scheduler/processor.h"
+#include "cyber/scheduler/processor_context.h"
 
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
-#include "cyber/scheduler/processor_context.h"
+#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {

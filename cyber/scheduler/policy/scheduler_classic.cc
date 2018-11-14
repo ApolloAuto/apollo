@@ -18,9 +18,9 @@
 
 #include <memory>
 
-#include "cyber/scheduler/processor.h"
-#include "cyber/scheduler/policy/classic.h"
 #include "cyber/event/perf_event_cache.h"
+#include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {
@@ -35,13 +35,13 @@ using apollo::cyber::event::SchedPerf;
 SchedulerClassic::SchedulerClassic() {
   sched_policy_ = SchedPolicy::CLASSIC;
 
-  auto gconf = GlobalData::Instance()->Config();
+  auto& gconf = GlobalData::Instance()->Config();
   for (auto& conf : gconf.scheduler_conf().confs()) {
     sched_confs_[conf.name()] = conf;
   }
 
-  auto desc = SchedName_descriptor()->
-      FindValueByName(GlobalData::Instance()->SchedName());
+  auto desc = SchedName_descriptor()->FindValueByName(
+      GlobalData::Instance()->SchedName());
   if (desc) {
     int sname = desc->number();
     SchedConf sconf;
@@ -85,7 +85,7 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
     ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
 
     for (auto it = ClassicContext::rq_[i].begin();
-          it != ClassicContext::rq_[i].end(); ++it) {
+         it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == cr->id()) {
         return false;
       }
@@ -116,7 +116,7 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
     ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
 
     for (auto it = ClassicContext::rq_[i].begin();
-          it != ClassicContext::rq_[i].end(); ++it) {
+         it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == crid) {
         if ((*it)->state() == RoutineState::DATA_WAIT) {
           (*it)->SetUpdateFlag();
@@ -141,7 +141,7 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
     WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
 
     for (auto it = ClassicContext::rq_[i].begin();
-          it != ClassicContext::rq_[i].end(); ++it) {
+         it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == crid) {
         ClassicContext::rq_[i].erase(it);
         return true;
