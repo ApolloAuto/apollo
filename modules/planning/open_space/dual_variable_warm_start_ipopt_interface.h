@@ -33,10 +33,10 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
-#define tag_f 1
-#define tag_g 2
+// #define tag_f 1
+// #define tag_g 2
 #define tag_L 3
-#define HPOFF 30
+// #define HPOFF 30
 
 namespace apollo {
 namespace planning {
@@ -163,7 +163,6 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   unsigned int* cind_L; /* column indices */
   double* hessval;      /* values */
   int nnz_L;
-  int options_g[4];
   int options_L[4];
   //***************    end   ADOL-C part ***********************************
 };
