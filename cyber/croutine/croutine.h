@@ -76,16 +76,13 @@ class CRoutine {
   void set_id(uint64_t id);
 
   const std::string &name() const;
-  void set_name(std::string name);
+  void set_name(const std::string &name);
 
   int processor_id() const;
   void set_processor_id(int processor_id);
 
   uint32_t priority() const;
   void set_priority(uint32_t priority);
-
-  double proc_num() const;
-  void set_proc_num(double num);
 
  private:
   CRoutine(CRoutine &) = delete;
@@ -103,7 +100,6 @@ class CRoutine {
   std::atomic_flag updated_ = ATOMIC_FLAG_INIT;
 
   bool force_stop_ = false;
-  double proc_num_ = 0.0;
 
   int processor_id_ = -1;
   uint32_t priority_ = 1;
@@ -135,7 +131,6 @@ inline void CRoutine::SetMainContext(
 }
 
 inline RoutineContext *CRoutine::GetContext() { return context_.get(); }
-RoutineState Resume();
 
 inline void CRoutine::Run() { func_(); }
 
@@ -158,7 +153,7 @@ inline void CRoutine::set_id(uint64_t id) { id_ = id; }
 
 inline const std::string &CRoutine::name() const { return name_; }
 
-inline void CRoutine::set_name(std::string name) { name_ = name; }
+inline void CRoutine::set_name(const std::string &name) { name_ = name; }
 
 inline int CRoutine::processor_id() const { return processor_id_; }
 
@@ -186,10 +181,6 @@ inline RoutineState CRoutine::UpdateState() {
 inline uint32_t CRoutine::priority() const { return priority_; }
 
 inline void CRoutine::set_priority(uint32_t priority) { priority_ = priority; }
-
-inline double CRoutine::proc_num() const { return proc_num_; }
-
-inline void CRoutine::set_proc_num(double num) { proc_num_ = num; }
 
 inline bool CRoutine::Acquire() {
   return !lock_.test_and_set(std::memory_order_acquire);

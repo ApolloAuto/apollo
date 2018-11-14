@@ -30,10 +30,6 @@ namespace apollo {
 namespace cyber {
 namespace croutine {
 
-using common::GlobalData;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
-
 class RoutineFactory {
  public:
   using VoidFunc = std::function<void()>;
