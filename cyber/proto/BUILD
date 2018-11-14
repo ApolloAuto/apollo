@@ -15,7 +15,7 @@ proto_library(
         "cyber_config.proto",
     ],
     deps = [
-        ":choreo_conf_proto",
+        ":choreography_conf_proto",
         ":scheduler_conf_proto",
         ":transport_conf_proto",
         ":log_conf_proto",
@@ -27,20 +27,31 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "choreo_conf_cc_proto",
+    name = "choreography_conf_cc_proto",
     deps = [
-        ":choreo_conf_proto",
+        ":choreography_conf_proto",
     ],
 )
 
 proto_library(
-    name = "choreo_conf_proto",
+    name = "choreography_conf_proto",
     srcs = [
-        "task_choreo_conf.proto",
+        "choreography_conf.proto",
     ],
+)
+
+cc_proto_library(
+    name = "classic_conf_cc_proto",
     deps = [
-        ":scheduler_conf_proto",
-    ]
+        ":classic_conf_proto",
+    ],
+)
+
+proto_library(
+    name = "classic_conf_proto",
+    srcs = [
+        "classic_conf.proto",
+    ],
 )
 
 cc_proto_library(
@@ -55,6 +66,10 @@ proto_library(
     srcs = [
         "scheduler_conf.proto",
     ],
+    deps = [
+      ":classic_conf_proto",
+      ":choreography_conf_proto"
+    ]
 )
 
 cc_proto_library(

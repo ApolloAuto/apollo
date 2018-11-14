@@ -2,29 +2,12 @@ syntax = "proto2";
 
 package apollo.cyber.proto;
 
-enum SchedPolicy {
-  CLASSIC = 0;
-  CHOREO = 1;
-}
-
-enum SchedName {
-  CYBER_DEFAULT = 0;
-  CYBER_COMPUTE = 1;
-  CYBER_CONTROL = 2;
-  CYBER_DEBUG1 = 3;
-  CYBER_DEBUG2 = 4;
-  CYBER_DV = 5;
-}
-
-message SchedConf {
-  required SchedName name = 1 [default = CYBER_DEFAULT];
-  optional SchedPolicy policy = 2 [default = CLASSIC];
-  optional uint32 proc_num = 3 [default = 2];
-  optional uint32 task_pool_size = 4 [default = 2];
-  optional uint32 cpu_binding_start_index = 5 [default = 33];
-}
+import "cyber/proto/classic_conf.proto";
+import "cyber/proto/choreography_conf.proto";
 
 message SchedulerConf {
-  repeated SchedConf confs = 1;
+  optional string policy = 1;
   optional uint32 routine_num = 2;
+  optional ClassicConf classic_conf = 3;
+  optional ChoreographyConf choreography_conf = 4;
 }

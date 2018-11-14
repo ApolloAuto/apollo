@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package apollo.cyber.proto;
+
+message ClassicTask {
+  optional string name = 1;
+  optional uint32 prio = 2 [default = 1];
+}
+
+message SchedGroup {
+  optional uint32 processor_num = 1;
+  optional string affinity = 2; 
+  optional string cpuset = 3;
+  repeated ClassicTask tasks = 4;
+}
+
+message ClassicConf {
+  repeated SchedGroup groups = 1;
+}

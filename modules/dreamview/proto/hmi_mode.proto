@@ -2,8 +2,6 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
-import "cyber/proto/scheduler_conf.proto";
-
 // This proto defines a mode showing in Dreamview, including how you will
 // display them and monitor their status.
 
@@ -70,7 +68,7 @@ message Module {
 message CyberModule {
   repeated string dag_files = 1;
   optional bool required_for_safety = 2 [default = true];
-  optional apollo.cyber.proto.SchedName schedule = 3 [default = CYBER_DEFAULT];
+  optional string schedule = 3;
 }
 
 message HMIMode {

@@ -32,8 +32,8 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
+#include "cyber/proto/choreography_conf.pb.h"
 #include "cyber/proto/scheduler_conf.pb.h"
-#include "cyber/proto/task_choreo_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
@@ -42,10 +42,6 @@ namespace scheduler {
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
-using apollo::cyber::proto::Choreo;
-using apollo::cyber::proto::SchedConf;
-using apollo::cyber::proto::SchedName_descriptor;
-using apollo::cyber::proto::SchedPolicy;
 
 class ProcessorContext;
 
@@ -67,10 +63,7 @@ class Scheduler {
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
 
-  std::unordered_map<int, SchedConf> sched_confs_;
-  std::unordered_map<std::string, Choreo> cr_confs_;
   std::vector<std::shared_ptr<ProcessorContext>> pctxs_;
-  SchedPolicy sched_policy_;
   uint32_t proc_num_ = 0;
   uint32_t task_pool_size_ = 0;
   uint32_t cpu_binding_start_index_ = 0;
