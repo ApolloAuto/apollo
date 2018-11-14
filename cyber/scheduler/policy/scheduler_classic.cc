@@ -144,12 +144,12 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
           it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == crid) {
         ClassicContext::rq_[i].erase(it);
-        break;
+        return true;
       }
     }
   }
 
-  return true;
+  return false;
 }
 
 }  // namespace scheduler
