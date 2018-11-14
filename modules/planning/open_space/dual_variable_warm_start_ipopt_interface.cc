@@ -160,7 +160,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   // horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      x_l[variable_index] = -2e19;
+      x_l[variable_index] = 0.0;
       x_u[variable_index] = 2e19;
       ++variable_index;
     }
@@ -170,7 +170,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      x_l[variable_index] = -2e19;
+      x_l[variable_index] = 0.0;
       x_u[variable_index] = 2e19;  // nlp_upper_bound_limit
       ++variable_index;
     }
@@ -383,25 +383,25 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
     n_index = n_start_index_;
     d_index = d_start_index_;
     for (int i = 0; i < lambda_horizon_; ++i) {
-          iRow[nz_index] = constraint_index;
-          jCol[nz_index] = l_index;
-          ++nz_index;
-          ++constraint_index;
-          ++l_index;
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = l_index;
+      ++nz_index;
+      ++constraint_index;
+      ++l_index;
     }
     for (int i = 0; i < miu_horizon_; ++i) {
-          iRow[nz_index] = constraint_index;
-          jCol[nz_index] = n_index;
-          ++nz_index;
-          ++constraint_index;
-          ++n_index;
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = n_index;
+      ++nz_index;
+      ++constraint_index;
+      ++n_index;
     }
     for (int i = 0; i < dual_formulation_horizon_; ++i) {
-          iRow[nz_index] = constraint_index;
-          jCol[nz_index] = d_index;
-          ++nz_index;
-          ++constraint_index;
-          ++d_index;
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = d_index;
+      ++nz_index;
+      ++constraint_index;
+      ++d_index;
     }
 
     CHECK_EQ(constraint_index, m) << "No. of constraints wrong in eval_jac_g.";
@@ -504,7 +504,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         }
 
         // with respect to d
-        values[nz_index] = 1;  // ffk
+        values[nz_index] = 1.0;  // ffk
         ++nz_index;
 
         // Update index
@@ -515,16 +515,16 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
     }
 
     for (int i = 0; i < lambda_horizon_; ++i) {
-          values[nz_index] = 1;
-          ++nz_index;
+      values[nz_index] = 1.0;
+      ++nz_index;
     }
     for (int i = 0; i < miu_horizon_; ++i) {
-          values[nz_index] = 1;
-          ++nz_index;
+      values[nz_index] = 1.0;
+      ++nz_index;
     }
     for (int i = 0; i < dual_formulation_horizon_; ++i) {
-          values[nz_index] = 1;
-          ++nz_index;
+      values[nz_index] = 1.0;
+      ++nz_index;
     }
 
     ADEBUG << "eval_jac_g, fulfilled obstacle constraint values";

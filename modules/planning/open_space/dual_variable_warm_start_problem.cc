@@ -62,8 +62,8 @@ bool DualVariableWarmStartProblem::Solve(
   // app->Options()->SetStringValue("derivative_test", "first-order");
   // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
   app->Options()->SetIntegerValue("print_level", 0);
-  app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
-  app->Options()->SetNumericValue("mumps_pivtol", 1e-6);
+  app->Options()->SetIntegerValue("mumps_mem_percent", 10000);
+  app->Options()->SetNumericValue("mumps_pivtol", 1e-5);
   app->Options()->SetIntegerValue("max_iter", 750);
   app->Options()->SetNumericValue("tol", 1e-3);
   app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);

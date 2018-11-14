@@ -113,11 +113,11 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   // n3 : sampling time variables
   int n3 = horizon_ + 1;
 
-  // n4 : dual multiplier associated with obstacleShape
-  int n4 = obstacles_edges_num_.sum() * (horizon_ + 1);
+  // n4 : dual multiplier associated with obstacle shape
+  lambda_horizon_ = obstacles_edges_num_.sum() * (horizon_ + 1);
 
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
-  int n5 = obstacles_num_ * 4 * (horizon_ + 1);
+  miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
 
   // m1 : dynamics constatins
   int m1 = 4 * horizon_;
@@ -131,8 +131,9 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   // m4 : obstacle constraints
   int m4 = 4 * obstacles_num_ * (horizon_ + 1);
 
-  num_of_variables_ = n1 + n2 + n3 + n4 + n5;
-  num_of_constraints_ = m1 + m2 + m3 + m4;
+  num_of_variables_ = n1 + n2 + n3 + lambda_horizon_ + miu_horizon_;
+  num_of_constraints_ =
+      m1 + m2 + m3 + m4 + (num_of_variables_ - (horizon_ + 1) + 2);
 
   // number of variables
   n = num_of_variables_;
@@ -150,7 +151,8 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
       tmp += current_edges_num * 4 + 9 + 4;
     }
   }
-  nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1;
+  nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1 +
+              (num_of_variables_ - (horizon_ + 1) + 2);
 
   index_style = IndexStyleEnum::C_STYLE;
   ADEBUG << "get_nlp_info out";
@@ -169,36 +171,36 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // start point pose
   int variable_index = 0;
   for (int i = 0; i < 4; ++i) {
-    x_l[i] = x0_(i, 0);
-    x_u[i] = x0_(i, 0);
+    x_l[i] = -2e19;
+    x_u[i] = 2e19;
   }
   variable_index += 4;
 
   // During horizons, 2 ~ N-1
   for (int i = 1; i < horizon_; ++i) {
     // x
-    x_l[variable_index] = XYbounds_[0];
-    x_u[variable_index] = XYbounds_[1];
+    x_l[variable_index] = -2e19;
+    x_u[variable_index] = 2e19;
 
     // y
-    x_l[variable_index + 1] = XYbounds_[2];
-    x_u[variable_index + 1] = XYbounds_[3];
+    x_l[variable_index + 1] = -2e19;
+    x_u[variable_index + 1] = 2e19;
 
     // phi
     x_l[variable_index + 2] = -2e19;
     x_u[variable_index + 2] = 2e19;
 
     // v
-    x_l[variable_index + 3] = -max_speed_reverse_;
-    x_u[variable_index + 3] = max_speed_forward_;
+    x_l[variable_index + 3] = -2e19;
+    x_u[variable_index + 3] = 2e19;
 
     variable_index += 4;
   }
 
   // end point pose
   for (int i = 0; i < 4; ++i) {
-    x_l[variable_index + i] = xf_(i, 0);
-    x_u[variable_index + i] = xf_(i, 0);
+    x_l[variable_index + i] = -2e19;
+    x_u[variable_index + i] = 2e19;
   }
   variable_index += 4;
   ADEBUG << "variable_index after adding state variables : " << variable_index;
@@ -206,12 +208,12 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // 2. control variables, 2 * [0, horizon_-1]
   for (int i = 0; i < horizon_; ++i) {
     // u1
-    x_l[variable_index] = -max_steer_angle_;
-    x_u[variable_index] = max_steer_angle_;
+    x_l[variable_index] = -2e19;
+    x_u[variable_index] = 2e19;
 
     // u2
-    x_l[variable_index + 1] = -max_acceleration_reverse_;
-    x_u[variable_index + 1] = max_acceleration_forward_;
+    x_l[variable_index + 1] = -2e19;
+    x_u[variable_index + 1] = 2e19;
 
     variable_index += 2;
   }
@@ -220,14 +222,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 3. sampling time variables, 1 * [0, horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
-    if (!use_fix_time_) {
-      x_l[variable_index] = min_time_sample_scaling_;
-      x_u[variable_index] = max_time_sample_scaling_;
-    } else {
-      x_l[variable_index] = 1.0;
-      x_u[variable_index] = 1.0;
-    }
-
+    x_l[variable_index] = -2e19;
+    x_u[variable_index] = 2e19;
     ++variable_index;
   }
   ADEBUG << "variable_index after adding sample time : " << variable_index;
@@ -294,8 +290,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   // [0, horizon_] * [0, obstacles_num_-1] * 4
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_num_; ++j) {
-      // a. norm(A'*lambda) = 1
-      g_l[constraint_index] = 0.0;
+      // a. norm(A'*lambda) <= 1
+      g_l[constraint_index] = -2e19;
       g_u[constraint_index] = 1.0;
 
       // b. G'*mu + R'*A*lambda = 0
@@ -309,6 +305,70 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
       g_u[constraint_index + 3] = 2e19;  // nlp_upper_bound_limit
       constraint_index += 4;
     }
+  }
+
+  // 5. load variable bounds as constraints
+  // start configuration
+  g_l[constraint_index] = x0_(0, 0);
+  g_u[constraint_index] = x0_(0, 0);
+  g_l[constraint_index + 1] = x0_(1, 0);
+  g_u[constraint_index + 1] = x0_(1, 0);
+  g_l[constraint_index + 2] = x0_(2, 0);
+  g_u[constraint_index + 2] = x0_(2, 0);
+  g_l[constraint_index + 3] = x0_(3, 0);
+  g_u[constraint_index + 3] = x0_(3, 0);
+  constraint_index += 4;
+
+  for (int i = 1; i < horizon_; i++) {
+    g_l[constraint_index] = XYbounds_[0];
+    g_u[constraint_index] = XYbounds_[1];
+    g_l[constraint_index + 1] = XYbounds_[2];
+    g_u[constraint_index + 1] = XYbounds_[3];
+    g_l[constraint_index + 2] = -max_speed_reverse_;
+    g_u[constraint_index + 2] = max_speed_forward_;
+    constraint_index += 3;
+  }
+
+  // end configuration
+  g_l[constraint_index] = xf_(0, 0);
+  g_u[constraint_index] = xf_(0, 0);
+  g_l[constraint_index + 1] = xf_(1, 0);
+  g_u[constraint_index + 1] = xf_(1, 0);
+  g_l[constraint_index + 2] = xf_(2, 0);
+  g_u[constraint_index + 2] = xf_(2, 0);
+  g_l[constraint_index + 3] = xf_(3, 0);
+  g_u[constraint_index + 3] = xf_(3, 0);
+  constraint_index += 4;
+
+  for (int i = 0; i < horizon_; i++) {
+    g_l[constraint_index] = -max_steer_angle_;
+    g_u[constraint_index] = max_steer_angle_;
+    g_l[constraint_index + 1] = -max_acceleration_reverse_;
+    g_u[constraint_index + 1] = max_acceleration_forward_;
+    constraint_index += 2;
+  }
+
+  for (int i = 0; i < horizon_ + 1; i++) {
+    if (!use_fix_time_) {
+      g_l[constraint_index] = min_time_sample_scaling_;
+      g_u[constraint_index] = max_time_sample_scaling_;
+    } else {
+      g_l[constraint_index] = 1.0;
+      g_u[constraint_index] = 1.0;
+    }
+    constraint_index++;
+  }
+
+  for (int i = 0; i < lambda_horizon_; ++i) {
+    g_l[constraint_index] = 0.0;
+    g_u[constraint_index] = 2e19;
+    constraint_index++;
+  }
+
+  for (int i = 0; i < miu_horizon_; ++i) {
+    g_l[constraint_index] = 0.0;
+    g_u[constraint_index] = 2e19;
+    constraint_index++;
   }
 
   ADEBUG << "constraint_index after adding obstacles constraints: "
@@ -512,7 +572,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
       state_index += 4;
       control_index += 2;
-      time_index += 1;
+      time_index++;
       constraint_index += 4;
     }
 
@@ -532,8 +592,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     ++nz_index;
 
     control_index += 2;
-    time_index += 1;
-    constraint_index += 1;
+    time_index++;
+    constraint_index++;
 
     for (int i = 1; i < horizon_; ++i) {
       // with respect to u(0, i-1)
@@ -553,8 +613,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
       // only consider rate limits on u0
       control_index += 2;
-      constraint_index += 1;
-      time_index += 1;
+      constraint_index++;
+      time_index++;
     }
 
     // 3. Time constraints [0, horizon_ -1]
@@ -571,8 +631,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       jCol[nz_index] = time_index + 1;
       ++nz_index;
 
-      time_index += 1;
-      constraint_index += 1;
+      time_index++;
+      constraint_index++;
     }
 
     // 4. Three obstacles related equal constraints, one equality constraints,
@@ -636,14 +696,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
         jCol[nz_index] = n_index + 3;
         ++nz_index;
 
-        /*
-                CHECK_NE(constraint_index + 2, 300)
-                    << "index i : " << i << "index j : " << j
-                    << ", state_index + 2 : " << state_index + 2
-                    << ", l_index : " << l_index << ", n_index : " << n_index;
-        */
         //  -g'*mu + (A*t - b)*lambda > 0
-
         // With respect to x
         iRow[nz_index] = constraint_index + 3;
         jCol[nz_index] = state_index;
@@ -671,12 +724,100 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
           ++nz_index;
         }
 
-        // Update inde
+        // Update index
         l_index += current_edges_num;
         n_index += 4;
         constraint_index += 4;
       }
       state_index += 4;
+    }
+
+    // 5. load variable bounds as constraints
+    state_index = state_start_index_;
+    control_index = control_start_index_;
+    time_index = time_start_index_;
+    l_index = l_start_index_;
+    n_index = n_start_index_;
+
+    // start configuration
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = state_index;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 1;
+    jCol[nz_index] = state_index + 1;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 2;
+    jCol[nz_index] = state_index + 2;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 3;
+    jCol[nz_index] = state_index + 3;
+    nz_index++;
+    constraint_index += 4;
+    state_index += 4;
+
+    for (int i = 1; i < horizon_; i++) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = state_index;
+      nz_index++;
+      iRow[nz_index] = constraint_index + 1;
+      jCol[nz_index] = state_index + 1;
+      nz_index++;
+      iRow[nz_index] = constraint_index + 2;
+      jCol[nz_index] = state_index + 3;
+      nz_index++;
+      constraint_index += 3;
+      state_index += 4;
+    }
+
+    // end configuration
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = state_index;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 1;
+    jCol[nz_index] = state_index + 1;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 2;
+    jCol[nz_index] = state_index + 2;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 3;
+    jCol[nz_index] = state_index + 3;
+    nz_index++;
+    constraint_index += 4;
+    state_index += 4;
+
+    for (int i = 0; i < horizon_; i++) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = control_index;
+      nz_index++;
+      iRow[nz_index] = constraint_index + 1;
+      jCol[nz_index] = control_index + 1;
+      nz_index++;
+      constraint_index += 2;
+      control_index += 2;
+    }
+
+    for (int i = 0; i < horizon_ + 1; i++) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = time_index;
+      nz_index++;
+      constraint_index++;
+      time_index++;
+    }
+
+    for (int i = 0; i < lambda_horizon_; ++i) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = l_index;
+      nz_index++;
+      constraint_index++;
+      l_index++;
+    }
+
+    for (int i = 0; i < miu_horizon_; ++i) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = n_index;
+      nz_index++;
+      constraint_index++;
+      n_index++;
     }
 
     CHECK_EQ(nz_index, static_cast<int>(nele_jac));
@@ -883,7 +1024,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
       state_index += 4;
       control_index += 2;
-      time_index += 1;
+      time_index++;
     }
 
     // 2. control rate constraints 1 * [0, horizons-1]
@@ -901,7 +1042,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     values[nz_index] = -1.0 * (x[control_index] - last_time_u_(0, 0)) /
                        x[time_index] / x[time_index] / ts_;
     ++nz_index;
-    time_index += 1;
+    time_index++;
     control_index += 2;
 
     for (int i = 1; i < horizon_; ++i) {
@@ -920,7 +1061,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       ++nz_index;
 
       control_index += 2;
-      time_index += 1;
+      time_index++;
     }
 
     ADEBUG << "After fulfilled control rate constraints derivative, nz_index : "
@@ -937,7 +1078,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       values[nz_index] = 1.0;
       ++nz_index;
 
-      time_index += 1;
+      time_index++;
     }
 
     ADEBUG << "After fulfilled time constraints derivative, nz_index : "
@@ -1064,6 +1205,64 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       state_index += 4;
     }
 
+    // 5. load variable bounds as constraints
+    state_index = state_start_index_;
+    control_index = control_start_index_;
+    time_index = time_start_index_;
+    l_index = l_start_index_;
+    n_index = n_start_index_;
+
+    // start configuration
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+
+    for (int i = 1; i < horizon_; i++) {
+      values[nz_index] = 1.0;
+      nz_index++;
+      values[nz_index] = 1.0;
+      nz_index++;
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    // end configuration
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+
+    for (int i = 0; i < horizon_; i++) {
+      values[nz_index] = 1.0;
+      nz_index++;
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    for (int i = 0; i < horizon_ + 1; i++) {
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    for (int i = 0; i < lambda_horizon_; ++i) {
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    for (int i = 0; i < miu_horizon_; ++i) {
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
     ADEBUG << "eval_jac_g, fulfilled obstacle constraint values";
     CHECK_EQ(nz_index, static_cast<int>(nele_jac));
   }
@@ -1137,7 +1336,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     }
     state_index += 4;
     control_index += 2;
-    time_index += 1;
+    time_index++;
     dual_l_index += obstacles_edges_sum_;
     dual_n_index += 4 * obstacles_num_;
   }
@@ -1234,7 +1433,7 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
     *obj_value += weight_rate_steer_ * steering_rate * steering_rate +
                   weight_rate_a_ * a_rate * a_rate;
     control_index += 2;
-    time_index += 1;
+    time_index++;
   }
 
   // 5. objective to minimize total time [0, horizon_]
@@ -1244,7 +1443,7 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
     T second_order_penalty =
         weight_second_order_time_ * x[time_index] * x[time_index];
     *obj_value += first_order_penalty + second_order_penalty;
-    time_index += 1;
+    time_index++;
   }
 
   ADEBUG << "objective value after this iteration : " << *obj_value;
@@ -1307,7 +1506,7 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
 
     control_index += 2;
     constraint_index += 4;
-    time_index += 1;
+    time_index++;
     state_index += 4;
   }
 
@@ -1324,23 +1523,23 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   g[constraint_index] =
       (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
   control_index += 2;
-  constraint_index += 1;
-  time_index += 1;
+  constraint_index++;
+  time_index++;
 
   for (int i = 1; i < horizon_; ++i) {
     g[constraint_index] =
         (x[control_index] - x[control_index - 2]) / x[time_index] / ts_;
-    constraint_index += 1;
+    constraint_index++;
     control_index += 2;
-    time_index += 1;
+    time_index++;
   }
 
   // 3. Time constraints 1 * [0, horizons-1]
   time_index = time_start_index_;
   for (int i = 0; i < horizon_; ++i) {
     g[constraint_index] = x[time_index + 1] - x[time_index];
-    constraint_index += 1;
-    time_index += 1;
+    constraint_index++;
+    time_index++;
   }
 
   ADEBUG << "constraint_index after adding time constraints "
@@ -1409,6 +1608,62 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   ADEBUG << "constraint_index after obstacles avoidance constraints "
             "updated: "
          << constraint_index;
+
+  // 5. load variable bounds as constraints
+  state_index = state_start_index_;
+  control_index = control_start_index_;
+  time_index = time_start_index_;
+  l_index = l_start_index_;
+  n_index = n_start_index_;
+
+  // start configuration
+  g[constraint_index] = x[state_index];
+  g[constraint_index + 1] = x[state_index + 1];
+  g[constraint_index + 2] = x[state_index + 2];
+  g[constraint_index + 3] = x[state_index + 3];
+  constraint_index += 4;
+  state_index += 4;
+
+  for (int i = 1; i < horizon_; i++) {
+    g[constraint_index] = x[state_index];
+    g[constraint_index + 1] = x[state_index + 1];
+    g[constraint_index + 2] = x[state_index + 3];
+    constraint_index += 3;
+    state_index += 4;
+  }
+
+  // end configuration
+  g[constraint_index] = x[state_index];
+  g[constraint_index + 1] = x[state_index + 1];
+  g[constraint_index + 2] = x[state_index + 2];
+  g[constraint_index + 3] = x[state_index + 3];
+  constraint_index += 4;
+  state_index += 4;
+
+  for (int i = 0; i < horizon_; i++) {
+    g[constraint_index] = x[control_index];
+    g[constraint_index + 1] = x[control_index + 1];
+    constraint_index += 2;
+    control_index += 2;
+  }
+
+  for (int i = 0; i < horizon_ + 1; i++) {
+    g[constraint_index] = x[time_index];
+    constraint_index++;
+    time_index++;
+  }
+
+  for (int i = 0; i < lambda_horizon_; ++i) {
+    g[constraint_index] = x[l_index];
+    constraint_index++;
+    l_index++;
+  }
+
+  for (int i = 0; i < miu_horizon_; ++i) {
+    g[constraint_index] = x[n_index];
+    constraint_index++;
+    n_index++;
+  }
 
   return true;
 }
