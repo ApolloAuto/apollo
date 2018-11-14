@@ -554,7 +554,8 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
       if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
         return false;
       }
-      constexpr double kEpsilon = 1e-6;
+      // use large epsilon to allow projection diff
+      constexpr double kEpsilon = 0.5;
       if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
         continue;
       }
