@@ -47,6 +47,7 @@ DECLARE_double(junction_search_radius);
 // Scenario
 DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_prioritize_obstacles);
+DECLARE_bool(enable_junction_feature);
 
 // Obstacle features
 DECLARE_uint32(cruise_historical_frame_length);
