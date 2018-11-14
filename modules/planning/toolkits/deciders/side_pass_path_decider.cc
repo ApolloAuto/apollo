@@ -71,7 +71,9 @@ Status SidePassPathDecider::Process(
   adc_frenet_frame_point_ =
       reference_line_info->reference_line().GetFrenetPoint(
           frame->PlanningStartPoint());
-
+  fem_qp_->ResetInitConditions({adc_frenet_frame_point_.l(),
+                                adc_frenet_frame_point_.dl(),
+                                adc_frenet_frame_point_.ddl()});
   nearest_obstacle_ =
       GetNearestObstacle(reference_line_info->AdcSlBoundary(),
                          reference_line_info->reference_line(),

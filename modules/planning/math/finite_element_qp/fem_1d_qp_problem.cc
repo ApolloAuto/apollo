@@ -26,6 +26,10 @@
 namespace apollo {
 namespace planning {
 
+namespace {
+constexpr double kMaxVariableRange = 1e10;
+}  // namespace
+
 bool Fem1dQpProblem::Init(const size_t num_var,
                           const std::array<double, 3>& x_init,
                           const double delta_s, const std::array<double, 5>& w,
@@ -53,7 +57,6 @@ bool Fem1dQpProblem::Init(const size_t num_var,
   delta_s_penta_ = delta_s_sq_ * delta_s_tri_;
   delta_s_hex_ = delta_s_tri_ * delta_s_tri_;
 
-  constexpr double kMaxVariableRange = 1e10;
   x_bounds_.resize(num_var_,
                    std::make_pair(-kMaxVariableRange, kMaxVariableRange));
   dx_bounds_.resize(num_var_,
@@ -105,6 +108,11 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
 void Fem1dQpProblem::ProcessBound(
     const std::vector<std::tuple<double, double, double>>& src,
     std::vector<std::pair<double, double>>* dst) {
+  DCHECK_NOTNULL(dst);
+
+  *dst = std::vector<std::pair<double, double>>(
+      num_var_, std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+
   for (size_t i = 0; i < src.size(); ++i) {
     size_t index = static_cast<size_t>(std::get<0>(src[i]) / delta_s_ + 0.5);
     if (index < dst->size()) {
