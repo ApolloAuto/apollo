@@ -47,10 +47,7 @@ bool Recoverer::Proc() {
   }
 
   // write channel sections
-  if (!reader_.ReadIndex()) {
-    AINFO << "read input file index fail, file: " << input_file_;
-    AINFO << "all information in index section will lost";
-  } else {
+  if (reader_.ReadIndex()) {
     Index index = reader_.GetIndex();
     FOR_EACH(i, 0, index.indexes_size()) {
       SingleIndex* single_index = index.mutable_indexes(i);
@@ -72,7 +69,7 @@ bool Recoverer::Proc() {
 
   // read through record file
   reader_.Reset();
-  while (true) {
+  while (!reader_.EndOfFile()) {
     Section section;
     if (!reader_.ReadSection(&section)) {
       AINFO << "read section failed, try next.";

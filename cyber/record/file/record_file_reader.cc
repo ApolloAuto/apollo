@@ -22,7 +22,7 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-RecordFileReader::RecordFileReader() {}
+RecordFileReader::RecordFileReader() : end_of_file_(false) {}
 
 RecordFileReader::~RecordFileReader() {}
 
@@ -39,6 +39,7 @@ bool RecordFileReader::Open(const std::string& path) {
            << ", errno: " << errno;
     return false;
   }
+  end_of_file_ = false;
   if (!ReadHeader()) {
     AERROR << "Read header section fail, file: " << path_;
     return false;
@@ -53,6 +54,7 @@ bool RecordFileReader::Reset() {
     AERROR << "Reset position fail, file: " << path_;
     return false;
   }
+  end_of_file_ = false;
   return true;
 }
 
@@ -82,6 +84,10 @@ bool RecordFileReader::ReadHeader() {
 }
 
 bool RecordFileReader::ReadIndex() {
+  if (!header_.is_complete()) {
+    AERROR << "Record file is not complete.";
+    return false;
+  }
   if (!SetPosition(header_.index_position())) {
     AERROR << "Skip bytes for reaching the index section failed.";
     return false;
@@ -107,8 +113,18 @@ bool RecordFileReader::ReadIndex() {
 }
 
 bool RecordFileReader::ReadSection(Section* section) {
-  if (read(fd_, section, sizeof(struct Section)) < 0) {
-    AERROR << "Read section header fail, file: " << path_;
+  ssize_t count = read(fd_, section, sizeof(struct Section));
+  if (count < 0) {
+    AERROR << "Read fd failed, fd_: " << fd_ << ", errno: " << errno;
+    return false;
+  } else if (count == 0) {
+    end_of_file_ = true;
+    AINFO << "Reach end of file.";
+    return false;
+  } else if (count != sizeof(struct Section)) {
+    AERROR << "Read fd failed, fd_: " << fd_
+           << ", expect count: " << sizeof(struct Section)
+           << ", actual count: " << count;
     return false;
   }
   return true;

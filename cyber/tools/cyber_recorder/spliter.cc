@@ -77,7 +77,7 @@ bool Spliter::Proc() {
   // read through record file
   bool skip_next_chunk_body(false);
   reader_.Reset();
-  while (true) {
+  while (!reader_.EndOfFile()) {
     Section section;
     if (!reader_.ReadSection(&section)) {
       AERROR << "read section failed.";

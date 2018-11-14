@@ -51,58 +51,40 @@ class RecordFileReader : public RecordFileBase {
   template <typename T>
   bool ReadSection(uint64_t size, T* message);
   bool ReadIndex();
+  bool EndOfFile() { return end_of_file_; }
 
  private:
   bool ReadHeader();
+  bool end_of_file_;
 };
 
 template <typename T>
 bool RecordFileReader::ReadSection(uint64_t size, T* message) {
-  static int BUF_SIZE = 1024 * 1024;
   if (size > INT_MAX) {
     AERROR << "Size is larger than " << INT_MAX;
     return false;
+  } else if (size == 0) {
+    AERROR << "Size is zero.";
+    return false;
   }
-  uint64_t pos = CurrentPosition();
-  if (size > BUF_SIZE) {
-    FileInputStream raw_input(fd_);
-    CodedInputStream coded_input(&raw_input);
-    CodedInputStream::Limit limit =
-        coded_input.PushLimit(static_cast<int>(size));
-    if (!message->ParseFromCodedStream(&coded_input)) {
-      AERROR << "Parse section message failed.";
-      return false;
-    }
-    if (!coded_input.ConsumedEntireMessage()) {
-      AERROR << "Do not consumed entire message.";
-      return false;
-    }
-    coded_input.PopLimit(limit);
-    if (message->ByteSize() != size) {
-      AERROR << "Message size is not consistent in section header"
-             << ", expect: " << size << ", actual: " << message->ByteSize();
-      return false;
-    }
-  } else {
-    char buf[BUF_SIZE];
-    ssize_t count = read(fd_, buf, static_cast<ssize_t>(size));
-    if (count < 0) {
-      AERROR << "Read fd failed, fd_: " << fd_ << ", errno: " << errno;
-      return false;
-    }
-    if (count != size) {
-      AERROR << "Read fd failed, fd_: " << fd_ << ", expect count: " << size
-             << ", actual count: " << count;
-      return false;
-    }
-    T msg;
-    if (!msg.ParseFromString(std::string(buf, count))) {
-      AERROR << "Failed to parse section info.";
-      return false;
-    }
-    message->Swap(&msg);
+  FileInputStream raw_input(fd_, size);
+  CodedInputStream coded_input(&raw_input);
+  CodedInputStream::Limit limit = coded_input.PushLimit(static_cast<int>(size));
+  if (!message->ParseFromCodedStream(&coded_input)) {
+    AERROR << "Parse section message failed.";
+    end_of_file_ = coded_input.ExpectAtEnd();
+    return false;
   }
-  SetPosition(pos + size);
+  if (!coded_input.ConsumedEntireMessage()) {
+    AERROR << "Do not consumed entire message.";
+    return false;
+  }
+  coded_input.PopLimit(limit);
+  if (message->ByteSize() != size) {
+    AERROR << "Message size is not consistent in section header"
+           << ", expect: " << size << ", actual: " << message->ByteSize();
+    return false;
+  }
   return true;
 }
 
