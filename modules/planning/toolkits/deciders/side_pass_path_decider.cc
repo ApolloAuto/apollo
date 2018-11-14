@@ -48,12 +48,18 @@ constexpr double kPlanDistAfterObs = 5.0;
 constexpr double kSidePassPathLength = 50.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
-    : Decider(config) {
+    : Decider(config) {}
+
+void SidePassPathDecider::InitSolver() {
+  const TaskConfig &config = Decider::config_;
   fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
   delta_s_ = config.side_pass_path_decider_config().path_resolution();
   const int n = static_cast<int>(
       config.side_pass_path_decider_config().total_path_length() / delta_s_);
-  std::array<double, 3> l_init = {0.0, 0.0, 0.0};
+  std::array<double, 3> l_init = {adc_frenet_frame_point_.l(),
+                                  adc_frenet_frame_point_.dl(),
+                                  adc_frenet_frame_point_.ddl()};
+
   std::array<double, 5> w = {
       config.side_pass_path_decider_config().l_weight(),
       config.side_pass_path_decider_config().dl_weight(),
@@ -71,9 +77,8 @@ Status SidePassPathDecider::Process(
   adc_frenet_frame_point_ =
       reference_line_info->reference_line().GetFrenetPoint(
           frame->PlanningStartPoint());
-  fem_qp_->ResetInitConditions({adc_frenet_frame_point_.l(),
-                                adc_frenet_frame_point_.dl(),
-                                adc_frenet_frame_point_.ddl()});
+  InitSolver();
+
   nearest_obstacle_ =
       GetNearestObstacle(reference_line_info->AdcSlBoundary(),
                          reference_line_info->reference_line(),
