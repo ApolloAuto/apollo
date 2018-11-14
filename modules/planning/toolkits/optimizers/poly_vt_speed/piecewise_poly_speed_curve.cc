@@ -163,10 +163,10 @@ void PiecewisePolySpeedCurve::SampleSpeedPoints(
   if (num_points <= 1) {
     speed_points->emplace_back(init_point_);
   } else {
-    double unit_t = param_t_ / (num_points - 1);
+    double unit_t = param_t_ / (static_cast<double>(num_points) - 1);
     for (size_t i = 0; i < num_points; ++i) {
       speed_points->emplace_back();
-      Evaluate(i * unit_t, &speed_points->back());
+      Evaluate(static_cast<double>(i) * unit_t, &speed_points->back());
       speed_points->back().set_s(std::fmax(pre_s, speed_points->back().s()));
       pre_s = speed_points->back().s();
     }
