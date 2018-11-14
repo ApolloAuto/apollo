@@ -128,7 +128,7 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   // 2. lagrange constraint n, 4*obstacles_num * (horizon_+1)
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      x[n_index] = 0.5;
+      x[n_index] = 1.0;
       ++n_index;
     }
   }
@@ -160,7 +160,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   // horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      x_l[variable_index] = 0.0;
+      x_l[variable_index] = -2e19;
       x_u[variable_index] = 2e19;
       ++variable_index;
     }
@@ -170,7 +170,7 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
   // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      x_l[variable_index] = 0.0;
+      x_l[variable_index] = -2e19;
       x_u[variable_index] = 2e19;  // nlp_upper_bound_limit
       ++variable_index;
     }
@@ -247,17 +247,17 @@ bool DualVariableWarmStartIPOPTInterface::eval_f(int n, const double* x,
 bool DualVariableWarmStartIPOPTInterface::eval_grad_f(int n, const double* x,
                                                       bool new_x,
                                                       double* grad_f) {
-  gradient(tag_f, n, x, grad_f);
-  return true;
-  // std::fill(grad_f, grad_f + n, 0.0);
-  // int d_index = d_start_index_;
-  // for (int i = 0; i < horizon_ + 1; ++i) {
-  //   for (int j = 0; j < obstacles_num_; ++j) {
-  //     grad_f[d_index] = weight_d_;
-  //     ++d_index;
-  //   }
-  // }
+  // gradient(tag_f, n, x, grad_f);
   // return true;
+  std::fill(grad_f, grad_f + n, 0.0);
+  int d_index = d_start_index_;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
+      grad_f[d_index] = weight_d_;
+      ++d_index;
+    }
+  }
+  return true;
 }
 
 bool DualVariableWarmStartIPOPTInterface::eval_g(int n, const double* x,
@@ -733,25 +733,25 @@ void DualVariableWarmStartIPOPTInterface::generate_tapes(int n, int m,
 
   get_starting_point(n, 1, xp, 0, zl, zu, m, 0, lamp);
 
-  trace_on(tag_f);
+  // trace_on(tag_f);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  // for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
 
-  eval_obj(n, xa, &obj_value);
+  // eval_obj(n, xa, &obj_value);
 
-  obj_value >>= dummy;
+  // obj_value >>= dummy;
 
-  trace_off();
+  // trace_off();
 
-  trace_on(tag_g);
+  // trace_on(tag_g);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  // for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
 
-  eval_constraints(n, xa, m, g);
+  // eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
+  // for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
 
-  trace_off();
+  // trace_off();
 
   trace_on(tag_L);
 
