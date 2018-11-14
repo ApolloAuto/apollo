@@ -7,6 +7,7 @@ module_config {
       config {
         name : "msf_localization"
         config_file_path : "/apollo/modules/localization/conf/msf_localization.pb.txt"
+        flag_file_path : "/apollo/modules/localization/conf/localization.conf"
         readers: [
           {
             channel: "/apollo/sensor/gnss/imu"
