@@ -92,8 +92,8 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
     }
   }
 
-  // Check if task prio is resonable.
-  if (cr->priority() < 0 || cr->priority() >= MAX_PRIO) {
+  // Check if task prio is reasonable.
+  if (cr->priority() >= MAX_PRIO) {
     return false;
   }
 
