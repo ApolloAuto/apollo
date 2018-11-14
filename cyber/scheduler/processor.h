@@ -53,9 +53,7 @@ class Processor {
     context_ = context;
   }
 
-  void SetBindCpuIndex(uint32_t id) {
-    cpu_bind_id_ = id;
-  }
+  void SetBindCpuIndex(uint32_t id) { cpu_bind_id_ = id; }
 
  private:
   std::mutex mtx_rq_;

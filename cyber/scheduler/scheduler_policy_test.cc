@@ -17,8 +17,8 @@
 #include <gtest/gtest.h>
 
 #include "cyber/cyber.h"
-#include "cyber/scheduler/policy/classic.h"
 #include "cyber/scheduler/policy/choreography.h"
+#include "cyber/scheduler/policy/classic.h"
 #include "cyber/scheduler/processor.h"
 
 namespace apollo {

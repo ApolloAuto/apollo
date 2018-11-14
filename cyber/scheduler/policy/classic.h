@@ -36,8 +36,7 @@ class ClassicContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
 
-  alignas(CACHELINE_SIZE) static std::array<AtomicRWLock,
-                                            MAX_PRIO> rq_locks_;
+  alignas(CACHELINE_SIZE) static std::array<AtomicRWLock, MAX_PRIO> rq_locks_;
   alignas(CACHELINE_SIZE) static std::array<
       std::vector<std::shared_ptr<CRoutine>>, MAX_PRIO> rq_;
 };

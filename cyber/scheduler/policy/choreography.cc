@@ -78,7 +78,7 @@ bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
 
   std::lock_guard<std::mutex> lk(mtx_cr_queue_);
   cr_queue_.insert(
-    std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
+      std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));
   return true;
 }
 

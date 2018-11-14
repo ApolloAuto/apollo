@@ -17,11 +17,11 @@
 #ifndef CYBER_SCHEDULER_POLICY_SCHEDULER_CHOREOGRAPHY_H_
 #define CYBER_SCHEDULER_POLICY_SCHEDULER_CHOREOGRAPHY_H_
 
-#include "cyber/scheduler/scheduler.h"
-
-#include <unordered_map>
 #include <memory>
 #include <string>
+#include <unordered_map>
+
+#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {

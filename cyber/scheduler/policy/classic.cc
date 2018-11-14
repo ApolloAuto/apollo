@@ -17,8 +17,8 @@
 #include "cyber/scheduler/policy/classic.h"
 
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/policy/scheduler_classic.h"
+#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {

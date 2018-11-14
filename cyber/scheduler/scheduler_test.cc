@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/scheduler/scheduler.h"
+
 #include <gtest/gtest.h>
 #include <string>
 
@@ -21,7 +23,6 @@
 #include "cyber/cyber.h"
 #include "cyber/proto/scheduler_conf.pb.h"
 #include "cyber/scheduler/processor_context.h"
-#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
