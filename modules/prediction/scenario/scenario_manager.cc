@@ -50,9 +50,8 @@ const Scenario& ScenarioManager::scenario() const { return current_scenario_; }
 void ScenarioManager::PrioritizeObstacles(
     const EnvironmentFeatures& environment_features,
     const std::shared_ptr<ScenarioFeatures> ptr_scenario_features) {
-  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+  auto obstacles_container = ContainerManager::Instance()->GetContainer<
+      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
 
   if (obstacles_container == nullptr) {
     AERROR << "Obstacles container pointer is a null pointer.";

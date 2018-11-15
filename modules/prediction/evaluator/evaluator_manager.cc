@@ -105,9 +105,9 @@ Evaluator* EvaluatorManager::GetEvaluator(
 
 void EvaluatorManager::Run(
     const perception::PerceptionObstacles& perception_obstacles) {
-  ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+  auto container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(container);
 
   Evaluator* evaluator = nullptr;

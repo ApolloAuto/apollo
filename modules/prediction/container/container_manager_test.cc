@@ -21,6 +21,8 @@
 
 #include "modules/common/util/file.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -43,11 +45,15 @@ TEST_F(ContainerManagerTest, GetContainer) {
   EXPECT_TRUE(conf_.IsInitialized());
 
   manager_->Init(conf_);
-  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::PERCEPTION_OBSTACLES) !=
-              nullptr);
-  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::LOCALIZATION) != nullptr);
-  EXPECT_TRUE(manager_->GetContainer(AdapterConfig::CONTROL_COMMAND) ==
-              nullptr);
+  EXPECT_TRUE(
+      manager_->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES) != nullptr);
+  EXPECT_TRUE(
+      manager_->GetContainer<PoseContainer>(AdapterConfig::LOCALIZATION)
+          != nullptr);
+  EXPECT_TRUE(
+      manager_->GetContainer<PoseContainer>(AdapterConfig::CONTROL_COMMAND)
+          == nullptr);
 }
 
 }  // namespace prediction

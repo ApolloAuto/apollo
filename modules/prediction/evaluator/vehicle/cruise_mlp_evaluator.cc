@@ -445,9 +445,8 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
     }
   }
 
-  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+  auto obstacles_container = ContainerManager::Instance()->GetContainer<
+      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
   // Set feature values for forward obstacle
   feature_values->push_back(forward_obstacle.s());
   feature_values->push_back(forward_obstacle.l());

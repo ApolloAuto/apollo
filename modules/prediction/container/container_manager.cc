@@ -44,17 +44,8 @@ void ContainerManager::RegisterContainers() {
   }
 }
 
-Container* ContainerManager::GetContainer(
-    const common::adapter::AdapterConfig::MessageType& type) {
-  if (containers_.find(type) != containers_.end()) {
-    return containers_[type].get();
-  } else {
-    return nullptr;
-  }
-}
-
 std::unique_ptr<Container> ContainerManager::CreateContainer(
-    const common::adapter::AdapterConfig::MessageType& type) {
+    const AdapterConfig::MessageType& type) {
   std::unique_ptr<Container> container_ptr(nullptr);
   if (type == AdapterConfig::PERCEPTION_OBSTACLES) {
     container_ptr.reset(new ObstaclesContainer());
@@ -67,8 +58,8 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
 }
 
 void ContainerManager::RegisterContainer(
-    const common::adapter::AdapterConfig::MessageType& type) {
-  containers_[type] = CreateContainer(type);
+    const AdapterConfig::MessageType& type) {
+  containers_[static_cast<int>(type)] = CreateContainer(type);
   AINFO << "Container [" << type << "] is registered.";
 }
 

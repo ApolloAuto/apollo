@@ -26,7 +26,6 @@
 #include <unordered_map>
 
 #include "cyber/common/macros.h"
-
 #include "gtest/gtest.h"
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -52,8 +51,15 @@ class ContainerManager {
    * @param Type of the container
    * @return Pointer to the container given the name
    */
-  Container *GetContainer(
-      const common::adapter::AdapterConfig::MessageType &type);
+  template <typename T>
+  T* GetContainer(
+      const common::adapter::AdapterConfig::MessageType &type) {
+    auto key_type = static_cast<int>(type);
+    if (containers_.find(key_type) != containers_.end()) {
+      return static_cast<T*>(containers_[key_type].get());
+    }
+    return nullptr;
+  }
 
   FRIEND_TEST(FeatureExtractorTest, junction);
   FRIEND_TEST(ScenarioManagerTest, run);
@@ -80,9 +86,7 @@ class ContainerManager {
   void RegisterContainers();
 
  private:
-  std::unordered_map<common::adapter::AdapterConfig::MessageType,
-           std::unique_ptr<Container>>
-      containers_;
+  std::unordered_map<int, std::unique_ptr<Container>> containers_;
 
   common::adapter::AdapterManagerConfig config_;
 

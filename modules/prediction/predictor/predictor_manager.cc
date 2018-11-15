@@ -133,13 +133,11 @@ Predictor* PredictorManager::GetPredictor(
 
 void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   prediction_obstacles_.Clear();
-  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
-  ADCTrajectoryContainer* adc_trajectory_container =
-      dynamic_cast<ADCTrajectoryContainer*>(
-          ContainerManager::Instance()->GetContainer(
-              AdapterConfig::PLANNING_TRAJECTORY));
+  auto obstacles_container = ContainerManager::Instance()->GetContainer<
+      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+
+  auto adc_trajectory_container = ContainerManager::Instance()->GetContainer<
+      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
 
   CHECK_NOTNULL(obstacles_container);
 
