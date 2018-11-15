@@ -158,6 +158,13 @@ function setup_device() {
 
   MACHINE_ARCH=$(uname -m)
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
+    NODE_NAME=$(uname -n)
+    if [ "$NODE_NAME" == 'tegra-ubuntu' ]; then
+      sudo modprobe can
+      sudo modprobe can_raw
+      sudo modprobe mttcan
+    fi
+
     sudo ip link set can0 type can bitrate 500000
     sudo ip link set can0 up
   fi
