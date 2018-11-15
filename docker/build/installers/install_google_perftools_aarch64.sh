@@ -22,6 +22,10 @@ set -e
 # Install Bazel.
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+apt-update -y && apt-get install -y \
+	libunwind8 \
+	libunwind8-dev
+
 wget http://www.baiduapollo.club/apollo-docker/google-perftools-2.1.90.tar.gz
 tar zxvf google-perftools-2.1.90.tar.gz
 cp -d google-perftools-2.1.90/lib/* /usr/local/lib/
