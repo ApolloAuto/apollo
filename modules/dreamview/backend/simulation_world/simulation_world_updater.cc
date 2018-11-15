@@ -196,6 +196,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           for (const auto &landmark : poi_.landmark()) {
             Json place;
             place["name"] = landmark.name();
+            place["parkingSpaceId"] = landmark.parking_space_id();
             Json waypoint_list;
             for (const auto &waypoint : landmark.waypoint()) {
               Json point;
@@ -299,6 +300,12 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     return false;
   }
 
+  // set parking space
+  if (ContainsKey(json, "parkingSpaceId")) {
+    routing_request->mutable_parking_space()->mutable_id()->set_id(
+        json["parkingSpaceId"]);
+  }
+
   AINFO << "Constructed RoutingRequest to be sent:\n"
         << routing_request->DebugString();
 
@@ -319,7 +326,7 @@ bool SimulationWorldUpdater::ValidateCoordinate(const nlohmann::json &json) {
 
 void SimulationWorldUpdater::Start() {
   timer_.reset(new cyber::Timer(kSimWorldTimeIntervalMs,
-                                    [this]() { this->OnTimer(); }, false));
+                                [this]() { this->OnTimer(); }, false));
   timer_->Start();
 }
 
