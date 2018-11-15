@@ -301,7 +301,8 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
   }
 
   // set parking space
-  if (ContainsKey(json, "parkingSpaceId")) {
+  if (ContainsKey(json, "parkingSpaceId") &&
+      json.find("parkingSpaceId")->is_string()) {
     routing_request->mutable_parking_space()->mutable_id()->set_id(
         json["parkingSpaceId"]);
   }

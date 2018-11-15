@@ -6982,6 +6982,22 @@
                   "rule": "repeated",
                   "type": "DecisionTag",
                   "id": 3
+                },
+                "verticesXCoords": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "verticesYCoords": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "packed": false
+                  }
                 }
               }
             },
@@ -7098,6 +7114,19 @@
                   "options": {
                     "packed": false
                   }
+                },
+                "xyBoundary": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "obstacles": {
+                  "rule": "repeated",
+                  "type": "apollo.planning_internal.ObstacleDebug",
+                  "id": 9
                 }
               }
             },
