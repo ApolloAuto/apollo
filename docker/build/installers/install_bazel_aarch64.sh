@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage:
-#    restart_map_volume.sh <map_name> <map_version>
-
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -19,21 +16,27 @@
 # limitations under the License.
 ###############################################################################
 
-map_name=$1
-map_version=$2
-ARCH=$(uname -m)
+# Fail on first error.
+set -e
 
-MAP_VOLUME="apollo_map_volume-${map_name}"
-if [[ ${MAP_VOLUME_CONF} == *"${MAP_VOLUME}"* ]]; then
-  echo "Map ${map_name} has already been included!"
-else
-  docker stop ${MAP_VOLUME} > /dev/null 2>&1
+# Install Bazel.
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-  MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${map_version}
-  if [ "$ARCH" == 'aarch64' ]; then
-    MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${ARCH}-${map_version}
-  fi
-  docker pull ${MAP_VOLUME_IMAGE}
-  docker run -it -d --rm --name ${MAP_VOLUME} ${MAP_VOLUME_IMAGE}
-  MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${MAP_VOLUME}"
-fi
+wget http://www.baiduapollo.club/apollo-docker/jdk-8u144-linux-arm64-vfp-hflt.tar.gz
+tar zxvf jdk-8u144-linux-arm64-vfp-hflt.tar.gz
+sudo rm -rf /usr/lib/java
+sudo mkdir /usr/lib/java
+sudo cp -r jdk1.8.0_144/* /usr/lib/java/
+
+sudo echo -e "export JAVA_HOME=/usr/lib/java\n\
+export JRE_HOME=\${JAVA_HOME}/jre\n\
+export CLASSPATH=.:\${JAVA_HOME}/lib:\${JRE_HOME}/lib" >> /etc/skel/.bashrc
+
+wget http://www.baiduapollo.club/apollo-docker/bazel_aarch64.zip
+unzip bazel_aarch64.zip
+cp ./bazel/bazel /usr/local/bazel
+ln -s /usr/local/bazel /usr/bin/bazel
+chmod +x /usr/bin/bazel
+
+# Clean up.
+rm -fr bazel_aarch64.zip bazel jdk-8u144-linux-arm64-vfp-hflt.tar.gz jdk1.8.0_144
