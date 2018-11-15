@@ -220,7 +220,7 @@ class RtkPlayer(object):
             adc_point.path_point.kappa = self.data['curvature'][i]
             adc_point.path_point.dkappa = self.data['curvature_change_rate'][i]
 
-            if planningdata.gear == canbus::Chassis::GEAR_REVERSE:
+            if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
                 adc_point.a = -adc_point.a
                 adc_point.kappa = -adc_point.kappa
                 adc_point.dkappa = -adc_point.dkappa
