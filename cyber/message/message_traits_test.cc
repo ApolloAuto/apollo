@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include <gtest/gtest.h>
+#include <string.h>
 #include <string>
 
+#include "cyber/message/intra_message.h"
 #include "cyber/message/message_traits.h"
 #include "cyber/proto/unit_test.pb.h"
 
@@ -32,10 +34,31 @@ class Data {
 class Message {
  public:
   std::string content;
+
+  int ByteSize() const { return static_cast<int>(content.size()); }
+
+  bool SerializeToArray(void* data, int size) const {
+    if (data == nullptr || size < ByteSize()) {
+      return false;
+    }
+
+    memcpy(data, content.data(), content.size());
+    return true;
+  }
+
   bool SerializeToString(std::string* str) const {
     *str = content;
     return true;
   }
+
+  bool ParseFromArray(const void* data, int size) {
+    if (data == nullptr || size <= 0) {
+      return false;
+    }
+    content.assign(static_cast<const char*>(data), size);
+    return true;
+  }
+
   bool ParseFromString(const std::string& str) {
     content = str;
     return true;
@@ -44,6 +67,7 @@ class Message {
   static void GetDescriptorString(const std::string&, std::string* str) {
     *str = "message";
   }
+
   std::string TypeName() { return "type"; }
 };
 
@@ -77,6 +101,77 @@ TEST(MessageTraitsTest, type_trait) {
   EXPECT_TRUE(HasDescriptor<RawMessage>::value);
 }
 
+TEST(MessageTraitsTest, byte_size) {
+  Data data;
+  EXPECT_EQ(ByteSize(data), -1);
+
+  Message msg;
+  EXPECT_EQ(ByteSize(msg), 0);
+  msg.content = "123";
+  EXPECT_EQ(ByteSize(msg), 3);
+
+  IntraMessage intra_msg;
+  EXPECT_EQ(ByteSize(intra_msg), -1);
+
+  Intra intra;
+  EXPECT_EQ(ByteSize(intra), -1);
+
+  proto::UnitTest ut;
+  ut.set_class_name("MessageTraitsTest");
+  ut.set_case_name("byte_size");
+  EXPECT_GT(ByteSize(ut), 0);
+
+  RawMessage raw_msg;
+  EXPECT_EQ(ByteSize(raw_msg), 0);
+  raw_msg.message = "123";
+  EXPECT_EQ(ByteSize(raw_msg), 3);
+
+  PyMessageWrap py_msg;
+  EXPECT_EQ(ByteSize(py_msg), 0);
+  py_msg.set_data("123");
+  EXPECT_EQ(ByteSize(py_msg), 3);
+}
+
+TEST(MessageTraitsTest, serialize_to_array) {
+  const int kArraySize = 256;
+  char array[kArraySize] = {0};
+
+  proto::UnitTest ut;
+  ut.set_class_name("MessageTraits");
+  ut.set_case_name("serialize_to_string");
+  EXPECT_TRUE(SerializeToArray(ut, array, sizeof(array)));
+  {
+    std::string arr_str(array);
+    EXPECT_EQ(arr_str, "\n\rMessageTraits\x12\x13serialize_to_string");
+  }
+
+  memset(array, 0, sizeof(array));
+  Data data;
+  EXPECT_FALSE(SerializeToArray(data, array, sizeof(array)));
+  EXPECT_EQ(strlen(array), 0);
+
+  memset(array, 0, sizeof(array));
+  Message msg{"content"};
+  EXPECT_TRUE(SerializeToArray(msg, array, sizeof(array)));
+  {
+    std::string arr_str(array);
+    EXPECT_EQ("content", arr_str);
+  }
+
+  memset(array, 0, sizeof(array));
+  Intra intra;
+  EXPECT_FALSE(SerializeToArray(intra, array, sizeof(array)));
+  EXPECT_EQ(strlen(array), 0);
+
+  memset(array, 0, sizeof(array));
+  RawMessage raw("content");
+  EXPECT_TRUE(SerializeToArray(raw, array, sizeof(array)));
+  {
+    std::string arr_str(array);
+    EXPECT_EQ("content", arr_str);
+  }
+}
+
 TEST(MessageTraitsTest, serialize_to_string) {
   std::string str("");
 
@@ -106,6 +201,31 @@ TEST(MessageTraitsTest, serialize_to_string) {
   RawMessage raw("content");
   EXPECT_TRUE(SerializeToString(raw, &str));
   EXPECT_EQ("content", str);
+}
+
+TEST(MessageTraitsTest, parse_from_array) {
+  const int kArraySize = 256;
+  char array[kArraySize] = "\n\rMessageTraits\x12\x11parse_from_string";
+  std::string arr_str(array);
+
+  proto::UnitTest ut;
+  EXPECT_TRUE(ParseFromArray(array, strlen(array), &ut));
+  EXPECT_EQ(ut.class_name(), "MessageTraits");
+  EXPECT_EQ(ut.case_name(), "parse_from_string");
+
+  Data data;
+  EXPECT_FALSE(ParseFromArray(array, strlen(array), &data));
+
+  Message msg{"content"};
+  EXPECT_TRUE(ParseFromArray(array, strlen(array), &msg));
+  EXPECT_EQ(msg.content, arr_str);
+
+  Intra intra;
+  EXPECT_FALSE(ParseFromArray(array, strlen(array), &intra));
+
+  RawMessage raw;
+  EXPECT_TRUE(ParseFromArray(array, strlen(array), &raw));
+  EXPECT_EQ(raw.message, arr_str);
 }
 
 TEST(MessageTraitsTest, parse_from_string) {
