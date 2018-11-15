@@ -195,6 +195,19 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
                   "Distance approach problem failed to solve");
   }
 
+  // record debug info
+  if (FLAGS_enable_record_debug) {
+    int trajectory_partition_status =
+        TrajectoryPartition(state_result_ds, control_result_ds, time_result_ds);
+    if (trajectory_partition_status == 1) {
+      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
+    } else if (trajectory_partition_status == 2) {
+      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
+    }
+    RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
+                    dual_n_result_ds, XYbounds_, obstalce_list);
+  }
+
   // rescale the states to the world frame
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
     double tmp_x = state_result_ds(0, i);
@@ -207,91 +220,19 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     state_result_ds(2, i) += rotate_angle;
   }
 
-  // TODO(Jiaxuan): Step 9 : Trajectory Partition and  Publish TrajectoryPoint
+  // Step 9 : Trajectory Partition and  Publish TrajectoryPoint
   // in planning trajectory. Result saved in trajectory_partition_.
   // Every time update, use trajectory_partition to store each ADCTrajectory
-  double relative_time = 0.0;
-  double distance_s = 0.0;
-
-  Trajectories trajectory_partition;
-  gear_positions_.clear();
-
-  ::apollo::common::Trajectory* current_trajectory =
-      trajectory_partition.add_trajectory();
-  // set initial gear position for first ADCTrajectory depending on v
-  // and check potential edge cases
-  if (horizon_ < 3)
+  int trajectory_partition_status =
+      TrajectoryPartition(state_result_ds, control_result_ds, time_result_ds);
+  if (trajectory_partition_status == 1) {
     return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
-  if (state_result_ds(3, 0) > -1e-3 && state_result_ds(3, 1) > -1e-3 &&
-      state_result_ds(3, 2) > -1e-3) {
-    gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
-  } else {
-    if (state_result_ds(3, 0) < 1e-3 && state_result_ds(3, 1) < 1e-3 &&
-        state_result_ds(3, 2) < 1e-3) {
-      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
-    } else {
-      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
-    }
-  }
-
-  // partition trajectory points into each trajectory
-  for (std::size_t i = 0; i < horizon_ + 1; i++) {
-    // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
-    // then add a new trajectory with GEAR_REVERSE
-    if (state_result_ds(3, i) < -1e-3 &&
-        gear_positions_.back() == canbus::Chassis::GEAR_DRIVE) {
-      current_trajectory = trajectory_partition.add_trajectory();
-      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
-      distance_s = 0.0;
-      relative_time = 0.0;
-    }
-    // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
-    // then add a new trajectory with GEAR_DRIVE
-    if (state_result_ds(3, i) > 1e-3 &&
-        gear_positions_.back() == canbus::Chassis::GEAR_REVERSE) {
-      current_trajectory = trajectory_partition.add_trajectory();
-      gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
-      distance_s = 0.0;
-      relative_time = 0.0;
-    }
-
-    auto* point = current_trajectory->add_trajectory_point();
-    relative_time += time_result_ds(0, i);
-    point->set_relative_time(relative_time);
-    point->mutable_path_point()->set_x(state_result_ds(0, i));
-    point->mutable_path_point()->set_y(state_result_ds(1, i));
-    point->mutable_path_point()->set_z(0);
-    point->mutable_path_point()->set_theta(state_result_ds(2, i));
-    if (i > 0) {
-      distance_s +=
-          std::sqrt((state_result_ds(0, i) - state_result_ds(0, i - 1)) *
-                        (state_result_ds(0, i) - state_result_ds(0, i - 1)) +
-                    (state_result_ds(1, i) - state_result_ds(1, i - 1)) *
-                        (state_result_ds(1, i) - state_result_ds(1, i - 1)));
-    }
-    point->mutable_path_point()->set_s(distance_s);
-    int gear_drive = 1;
-    if (gear_positions_.back() == canbus::Chassis::GEAR_REVERSE)
-      gear_drive = -1;
-
-    point->set_v(state_result_ds(3, i) * gear_drive);
-    // TODO(Jiaxuan): Verify this steering to kappa equation
-    point->mutable_path_point()->set_kappa(
-        std::tanh(control_result_ds(0, i) * 470 * M_PI / 180.0 / 16) / 2.85 *
-        gear_drive);
-    point->set_a(control_result_ds(1, i) * gear_drive);
-  }
-
-  trajectory_partition_.CopyFrom(trajectory_partition);
-
-  // record debug info
-  if (FLAGS_enable_record_debug) {
-    RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
-                    dual_n_result_ds);
+  } else if (trajectory_partition_status == 2) {
+    return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
   }
 
   return Status::OK();
-}
+}  // namespace planning
 
 void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
     Trajectories* adc_trajectories,
@@ -308,7 +249,9 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
     const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
     const Eigen::MatrixXd& dual_l_result_ds,
-    const Eigen::MatrixXd& dual_n_result_ds) {
+    const Eigen::MatrixXd& dual_n_result_ds,
+    const std::vector<double>& XYbounds,
+    ThreadSafeIndexedObstacles* obstalce_list) {
   open_space_debug_.reset(new planning_internal::OpenSpaceDebug());
   // load trajectories by optimization and partition
   open_space_debug_->mutable_trajectories()->CopyFrom(trajectory_partition_);
@@ -364,6 +307,102 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
       open_space_debug_->add_optimized_dual_miu(dual_n_result_ds(j, i));
     }
   }
+  // load xy boundary (xmin, xmax, ymin, ymax)
+  open_space_debug_->add_xy_boundary(XYbounds[0]);
+  open_space_debug_->add_xy_boundary(XYbounds[1]);
+  open_space_debug_->add_xy_boundary(XYbounds[2]);
+  open_space_debug_->add_xy_boundary(XYbounds[3]);
+
+  // load obstacles
+  for (const auto& obstacle_box : (*obstalce_list).Items()) {
+    auto* obstacle_ptr = open_space_debug_->add_obstacles();
+    std::vector<Vec2d> vertices =
+        obstacle_box->PerceptionBoundingBox().GetAllCorners();
+    size_t vertices_size = vertices.size();
+    for (size_t i = 0; i < vertices_size; i++) {
+      obstacle_ptr->add_vertices_x_coords(vertices[i].x());
+      obstacle_ptr->add_vertices_y_coords(vertices[i].y());
+    }
+  }
+}
+
+int OpenSpaceTrajectoryGenerator::TrajectoryPartition(
+    const Eigen::MatrixXd& state_result_ds,
+    const Eigen::MatrixXd& control_result_ds,
+    const Eigen::MatrixXd& time_result_ds) {
+  double relative_time = 0.0;
+  double distance_s = 0.0;
+
+  Trajectories trajectory_partition;
+  gear_positions_.clear();
+
+  ::apollo::common::Trajectory* current_trajectory =
+      trajectory_partition.add_trajectory();
+  // set initial gear position for first ADCTrajectory depending on v
+  // and check potential edge cases
+  if (horizon_ < 3) return 1;
+  if (state_result_ds(3, 0) > -1e-3 && state_result_ds(3, 1) > -1e-3 &&
+      state_result_ds(3, 2) > -1e-3) {
+    gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
+  } else {
+    if (state_result_ds(3, 0) < 1e-3 && state_result_ds(3, 1) < 1e-3 &&
+        state_result_ds(3, 2) < 1e-3) {
+      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
+    } else {
+      return 2;
+    }
+  }
+
+  // partition trajectory points into each trajectory
+  for (std::size_t i = 0; i < horizon_ + 1; i++) {
+    // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
+    // then add a new trajectory with GEAR_REVERSE
+    if (state_result_ds(3, i) < -1e-3 &&
+        gear_positions_.back() == canbus::Chassis::GEAR_DRIVE) {
+      current_trajectory = trajectory_partition.add_trajectory();
+      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
+      distance_s = 0.0;
+      relative_time = 0.0;
+    }
+    // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
+    // then add a new trajectory with GEAR_DRIVE
+    if (state_result_ds(3, i) > 1e-3 &&
+        gear_positions_.back() == canbus::Chassis::GEAR_REVERSE) {
+      current_trajectory = trajectory_partition.add_trajectory();
+      gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
+      distance_s = 0.0;
+      relative_time = 0.0;
+    }
+
+    auto* point = current_trajectory->add_trajectory_point();
+    relative_time += time_result_ds(0, i);
+    point->set_relative_time(relative_time);
+    point->mutable_path_point()->set_x(state_result_ds(0, i));
+    point->mutable_path_point()->set_y(state_result_ds(1, i));
+    point->mutable_path_point()->set_z(0);
+    point->mutable_path_point()->set_theta(state_result_ds(2, i));
+    if (i > 0) {
+      distance_s +=
+          std::sqrt((state_result_ds(0, i) - state_result_ds(0, i - 1)) *
+                        (state_result_ds(0, i) - state_result_ds(0, i - 1)) +
+                    (state_result_ds(1, i) - state_result_ds(1, i - 1)) *
+                        (state_result_ds(1, i) - state_result_ds(1, i - 1)));
+    }
+    point->mutable_path_point()->set_s(distance_s);
+    int gear_drive = 1;
+    if (gear_positions_.back() == canbus::Chassis::GEAR_REVERSE)
+      gear_drive = -1;
+
+    point->set_v(state_result_ds(3, i) * gear_drive);
+    // TODO(Jiaxuan): Verify this steering to kappa equation
+    point->mutable_path_point()->set_kappa(
+        std::tanh(control_result_ds(0, i) * 470 * M_PI / 180.0 / 16) / 2.85 *
+        gear_drive);
+    point->set_a(control_result_ds(1, i) * gear_drive);
+  }
+
+  trajectory_partition_.CopyFrom(trajectory_partition);
+  return 0;
 }
 
 }  // namespace planning
