@@ -20,6 +20,7 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 #include "boost/filesystem.hpp"
 #include "boost/range/iterator_range.hpp"
@@ -202,6 +203,7 @@ void PredictionComponent::OnPlanning(
 void PredictionComponent::OnPerception(
     const PerceptionObstacles& perception_msg) {
   // Insert obstacle
+  auto end_time1 = std::chrono::system_clock::now();
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::Instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
@@ -209,9 +211,17 @@ void PredictionComponent::OnPerception(
     return;
   }
   obstacles_container->Insert(perception_msg);
+  auto end_time2 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_time2 - end_time1;
+  ADEBUG << "Time to insert obstacles: "
+         << diff.count() * 1000 << " msec.";
 
   // Scenario analysis
   ScenarioManager::Instance()->Run();
+  auto end_time3 = std::chrono::system_clock::now();
+  diff = end_time3 - end_time2;
+  ADEBUG << "Time for scenario_manager: "
+         << diff.count() * 1000 << " msec.";
 
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
@@ -219,10 +229,18 @@ void PredictionComponent::OnPerception(
     JunctionAnalyzer::Init(scenario.junction_id());
     obstacles_container->BuildJunctionFeature();
   }
+  auto end_time4 = std::chrono::system_clock::now();
+  diff = end_time4 - end_time3;
+  ADEBUG << "Time to build junction features: "
+         << diff.count() * 1000 << " msec.";
 
   // TODO(kechxu) refactor logic of build lane graph and build junction feature
   // Set up obstacle cluster
   obstacles_container->BuildLaneGraph();
+  auto end_time5 = std::chrono::system_clock::now();
+  diff = end_time5 - end_time4;
+  ADEBUG << "Time to build cruise features: "
+         << diff.count() * 1000 << " msec.";
 
   ADEBUG << "Received a perception message ["
          << perception_msg.ShortDebugString() << "].";
@@ -247,9 +265,15 @@ void PredictionComponent::OnPerception(
            << ", " << std::fixed << std::setprecision(6) << y << "].";
     adc_container->SetPosition({x, y});
   }
+  auto end_time6 = std::chrono::system_clock::now();
+
 
   // Make evaluations
   EvaluatorManager::Instance()->Run(perception_msg);
+  auto end_time7 = std::chrono::system_clock::now();
+  diff = end_time7 - end_time6;
+  ADEBUG << "Time to evaluate: "
+        << diff.count() * 1000 << " msec.";
 
   // No prediction trajectories for offline mode
   if (FLAGS_prediction_offline_mode) {
@@ -258,6 +282,10 @@ void PredictionComponent::OnPerception(
 
   // Make predictions
   PredictorManager::Instance()->Run(perception_msg);
+  auto end_time8 = std::chrono::system_clock::now();
+  diff = end_time8 - end_time7;
+  ADEBUG << "Time to predict: "
+        << diff.count() * 1000 << " msec.";
 
   // Get predicted obstacles
   auto prediction_obstacles =
@@ -308,6 +336,7 @@ bool PredictionComponent::Proc(
   }
 
   frame_start_time_ = Clock::NowInSeconds();
+  auto end_time1 = std::chrono::system_clock::now();
 
   localization_reader_->Observe();
   auto ptr_localization_msg = localization_reader_->GetLatestObserved();
@@ -317,6 +346,10 @@ bool PredictionComponent::Proc(
   }
   auto localization_msg = *ptr_localization_msg;
   OnLocalization(localization_msg);
+  auto end_time2 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_time2 - end_time1;
+  ADEBUG << "Time for updating PoseContainer: "
+        << diff.count() * 1000 << " msec.";
 
   planning_reader_->Observe();
   auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
@@ -324,9 +357,18 @@ bool PredictionComponent::Proc(
     auto trajectory_msg = *ptr_trajectory_msg;
     OnPlanning(trajectory_msg);
   }
+  auto end_time3 = std::chrono::system_clock::now();
+  diff = end_time3 - end_time2;
+  ADEBUG << "Time for updating ADCTrajectoryContainer: "
+        << diff.count() * 1000 << " msec.";
 
   auto perception_msg = *perception_obstacles;
   OnPerception(perception_msg);
+  auto end_time4 = std::chrono::system_clock::now();
+  diff = end_time4 - end_time3;
+  ADEBUG << "Time for updating PerceptionContainer: "
+        << diff.count() * 1000 << " msec.";
+
   return true;
 }
 
