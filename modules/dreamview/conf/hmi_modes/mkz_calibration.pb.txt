@@ -7,7 +7,7 @@ cyber_modules {
     dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
     dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
-    schedule: "compute_sched"
+    process_group: "compute_sched"
   }
 }
 modules {
