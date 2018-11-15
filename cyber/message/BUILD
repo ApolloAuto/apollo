@@ -13,22 +13,12 @@ cc_library(
 )
 
 cc_library(
-    name = "intra_message_traits",
-    hdrs = [
-        "intra_message_traits.h",
-    ],
-    deps = [
-        "intra_message"
-    ],
-)
-
-cc_library(
     name = "message_traits",
     hdrs = [
         "message_traits.h",
     ],
     deps = [
-        "intra_message_traits",
+        "intra_message",
         "protobuf_traits",
         "py_message_traits",
         "raw_message_traits",

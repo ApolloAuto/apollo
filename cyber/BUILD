@@ -87,7 +87,6 @@ cc_library(
         "//cyber/message:raw_message_traits",
         "//cyber/message:py_message_traits",
         "//cyber/message:protobuf_traits",
-        "//cyber/message:intra_message_traits",
         "//cyber/node:node",
         "//cyber/proto:run_mode_conf_cc_proto",
         "//cyber/parameter:parameter_client",
