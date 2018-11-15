@@ -48,10 +48,10 @@ TEST(StBoundaryTest, basic_test) {
 
   EXPECT_EQ(boundary.id(), "");
   EXPECT_EQ(boundary.boundary_type(), StBoundary::BoundaryType::UNKNOWN);
-  EXPECT_FLOAT_EQ(0.0, boundary.min_s());
-  EXPECT_FLOAT_EQ(5.0, boundary.max_s());
-  EXPECT_FLOAT_EQ(0.0, boundary.min_t());
-  EXPECT_FLOAT_EQ(10.0, boundary.max_t());
+  EXPECT_DOUBLE_EQ(0.0, boundary.min_s());
+  EXPECT_DOUBLE_EQ(5.0, boundary.max_s());
+  EXPECT_DOUBLE_EQ(0.0, boundary.min_t());
+  EXPECT_DOUBLE_EQ(10.0, boundary.max_t());
 }
 
 TEST(StBoundaryTest, boundary_range) {
