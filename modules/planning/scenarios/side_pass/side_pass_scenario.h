@@ -52,13 +52,11 @@ class SidePassScenario : public Scenario {
  private:
   static void RegisterStages();
 
-  bool IsSidePassScenario(const common::TrajectoryPoint& planning_start_point,
-                          const Frame& frame);
+  bool IsSidePassScenario(const Frame& frame);
 
   bool IsFarFromIntersection(const Frame& frame);
 
-  bool HasBlockingObstacle(const SLBoundary& adc_sl_boundary,
-                           const PathDecision& path_decision);
+  bool HasBlockingObstacle(const Frame& frame);
 
  private:
   static apollo::common::util::Factory<

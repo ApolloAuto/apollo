@@ -18,6 +18,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/common/util:factory",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:speed_profile_generator",

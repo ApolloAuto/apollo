@@ -25,9 +25,11 @@
 #include <utility>
 
 #include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stage.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stop_on_wait_point.h"
 
@@ -35,6 +37,8 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace side_pass {
+
+using apollo::common::VehicleConfigHelper;
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
@@ -118,18 +122,12 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     return false;
   } else {
-    return IsSidePassScenario(ego_point, frame);
+    return IsSidePassScenario(frame);
   }
 }
 
-bool SidePassScenario::IsSidePassScenario(
-    const common::TrajectoryPoint& planning_start_point,
-    const Frame& frame) {
-  const SLBoundary& adc_sl_boundary =
-      frame.reference_line_info().front().AdcSlBoundary();
-  const PathDecision& path_decision =
-      frame.reference_line_info().front().path_decision();
-  return HasBlockingObstacle(adc_sl_boundary, path_decision);
+bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
+  return HasBlockingObstacle(frame);
 }
 
 bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
@@ -153,11 +151,17 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
   return true;
 }
 
-bool SidePassScenario::HasBlockingObstacle(
-    const SLBoundary& adc_sl_boundary,
-    const PathDecision& path_decision) {
+bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   // possible state change: default scenario => side_pass scenario
   front_blocking_obstacle_id_ = "";
+
+  if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
+
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
+  const PathDecision& path_decision = reference_line_info.path_decision();
 
   // a blocking obstacle is an obstacle blocks the road when it is not blocked
   // (by other obstacles or traffic rules)
@@ -165,6 +169,7 @@ bool SidePassScenario::HasBlockingObstacle(
     if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       continue;
     }
+
     if (obstacle->speed() >
         side_pass_context_.scenario_config_.block_obstacle_min_speed()) {
       continue;
@@ -174,14 +179,38 @@ bool SidePassScenario::HasBlockingObstacle(
         adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
       continue;
     }
+
+    // check s distance
     constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
     if (obstacle->PerceptionSLBoundary().start_s() >
-        adc_sl_boundary.end_s() +
-            kAdcDistanceThreshold) {  // vehicles are far away
+        adc_sl_boundary.end_s() + kAdcDistanceThreshold) {
+      // vehicles are far away
       continue;
     }
-    if (obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
-        obstacle->PerceptionSLBoundary().end_l() < -1.0) {
+
+    // check l
+    constexpr double kLThreshold = 0.3;  // unit: m
+    const auto& reference_line = reference_line_info.reference_line();
+    double lane_left_width_at_start_s = 0.0;
+    double lane_right_width_at_start_s = 0.0;
+    reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().start_s(),
+                                &lane_left_width_at_start_s,
+                                &lane_right_width_at_start_s);
+    double lane_left_width_at_end_s = 0.0;
+    double lane_right_width_at_end_s = 0.0;
+    reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().end_s(),
+                                &lane_left_width_at_end_s,
+                                &lane_right_width_at_end_s);
+    double lane_width = std::min(
+        lane_left_width_at_start_s + lane_right_width_at_start_s,
+        lane_left_width_at_end_s + lane_right_width_at_end_s);
+    const double adc_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width();
+    double driving_width = lane_width - adc_width -
+        FLAGS_static_decision_nudge_l_buffer;
+    ADEBUG << "lane_width[" << lane_width
+        << "] driving_width[" << driving_width << "]";
+    if (driving_width > kLThreshold) {
       continue;
     }
 
@@ -208,6 +237,7 @@ bool SidePassScenario::HasBlockingObstacle(
         // is_blocked_by_others = true; break;
       }
     }
+
     if (!is_blocked_by_others) {
       // static obstacle id doesn't contain prediction trajectory suffix.
       front_blocking_obstacle_id_ = obstacle->Id() + "_0";
