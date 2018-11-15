@@ -21,17 +21,12 @@ In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, an
 
 #### Rear Panel Connectors 
 
-1. Micro USB to UART port (reserved for debug) 
-2. Micro USB to UART port (ASU configuration port) 
-3. Micro SIM card holder for built-in LTE module 
-4. General purpose UART port(reserved) 
-5. USB 3.0 type A port (2 Ports)
-6. External PCI Express Port (Support X4 or X8)
-7. GPS PPS / GPRMC Output Port ( 3 Ports)
-8. Micro USB 2.0 OTG
-9. Power and PPS/GPRMC Output Port for Stereo Camera
-10. CAN Bus (4 Ports)
-11. Main Power Input Connector 
+1. Micro USB to UART Port (System Configuration Port)
+2. External PCI Express Port (Support X4 or X8)
+3. GPS PPS / GPRMC Output Port ( 3 Ports)
+4. Power and PPS/GPRMC Output Port for Stereo Camera
+5. CAN Bus (4 Ports)
+6. Main Power Input Connector 
 
 ### Purchase Channels
 
