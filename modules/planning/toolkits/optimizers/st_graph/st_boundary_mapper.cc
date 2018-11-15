@@ -392,8 +392,9 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       }
 
       const double step_length = vehicle_param_.front_edge_to_center();
-      for (double path_s = 0.0; path_s < discretized_path.Length();
-           path_s += step_length) {
+      auto path_len =
+          std::min(FLAGS_max_trajectory_len, discretized_path.Length());
+      for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
         const auto curr_adc_path_point = discretized_path.Evaluate(
             path_s + discretized_path.StartPoint().s());
         if (CheckOverlap(curr_adc_path_point, obs_box,
