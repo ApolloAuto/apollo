@@ -62,7 +62,7 @@ TEST_F(RegionalPredictorTest, Predict) {
   RegionalPredictor predictor;
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
-  EXPECT_EQ(trajectories.size(), 0);
+  EXPECT_EQ(trajectories.size(), 2);
 }
 
 TEST_F(RegionalPredictorTest, MovingPedestrian) {
