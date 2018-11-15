@@ -171,6 +171,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
     for (auto it = ClassicContext::rq_[i].begin();
          it != ClassicContext::rq_[i].end(); ++it) {
       if ((*it)->id() == crid) {
+        (*it)->Stop();
         ClassicContext::rq_[i].erase(it);
         return true;
       }
