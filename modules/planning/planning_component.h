@@ -31,7 +31,9 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 
+#include "modules/planning/open_space_planning.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/std_planning.h"
 
@@ -39,12 +41,15 @@ namespace apollo {
 namespace planning {
 
 class PlanningComponent final
-    : public cyber::Component<prediction::PredictionObstacles,
-                                  canbus::Chassis,
-                                  localization::LocalizationEstimate> {
+    : public cyber::Component<prediction::PredictionObstacles, canbus::Chassis,
+                              localization::LocalizationEstimate> {
  public:
   PlanningComponent() {
-    planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    if (FLAGS_open_space_planner_switchable) {
+      planning_base_ = std::unique_ptr<PlanningBase>(new OpenSpacePlanning());
+    } else {
+      planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    }
   }
 
   ~PlanningComponent() = default;

@@ -22,17 +22,16 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
 using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
-using apollo::common::time::Clock;
 
 bool PlanningComponent::Init() {
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,

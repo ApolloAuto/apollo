@@ -366,11 +366,6 @@ Status StdPlanning::Plan(
 
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
 
-  if (status.ok() && FLAGS_enable_record_debug &&
-      FLAGS_open_space_planner_switchable) {
-    frame_.get()->RecordOpenSpacePlannerDebug(ptr_debug);
-  }
-
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
       EgoInfo::Instance()->front_clear_distance());
 
