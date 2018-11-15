@@ -22,6 +22,7 @@
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
@@ -38,6 +39,8 @@ DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
 DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
               "Vehicles config path.");
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
+DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
+              "Key to store hmi_status.current_mode in KV DB.");
 
 namespace apollo {
 namespace dreamview {
@@ -45,6 +48,7 @@ namespace {
 
 using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
+using apollo::common::KVDB;
 using apollo::common::time::Clock;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
@@ -225,7 +229,9 @@ void HMIWorker::InitStatus() {
   if (FLAGS_use_navigation_mode && ContainsKey(modes, kNavigationModeName)) {
     ChangeMode(kNavigationModeName);
   } else {
-    ChangeMode(modes.begin()->first);
+    // Change to the last active mode, or else the first one in options.
+    const std::string cached_mode = KVDB::Get(FLAGS_current_mode_db_key);
+    ChangeMode(!cached_mode.empty() ? cached_mode : modes.begin()->first);
   }
 }
 
@@ -474,6 +480,7 @@ void HMIWorker::ChangeMode(const std::string& mode_name) {
     }
     status_changed_ = true;
   }
+  KVDB::Put(FLAGS_current_mode_db_key, mode_name);
 }
 
 void HMIWorker::StartModule(const std::string& module) const {
