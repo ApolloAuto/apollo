@@ -178,7 +178,7 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     module.set_start_command("nohup mainboard");
     const auto& schedule = cyber_module.schedule();
     if (!schedule.empty()) {
-      StrAppend(module.mutable_start_command(), " -s ", schedule);
+      StrAppend(module.mutable_start_command(), " -p ", schedule);
     }
     for (const std::string& dag : cyber_module.dag_files()) {
       StrAppend(module.mutable_start_command(), " -d ", dag);

@@ -94,7 +94,7 @@ static void FindModuleName(std::string* log_message, std::string* module_name) {
     }
   }
   if (module_name->empty()) {
-    *module_name = common::GlobalData::Instance()->ProcessName();
+    *module_name = common::GlobalData::Instance()->ProcessGroup();
   }
 }
 

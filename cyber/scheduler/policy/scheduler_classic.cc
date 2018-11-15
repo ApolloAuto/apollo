@@ -41,7 +41,7 @@ using apollo::cyber::common::WorkRoot;
 SchedulerClassic::SchedulerClassic() {
   // get sched config
   std::string conf("conf/");
-  conf.append(GlobalData::Instance()->ProcessName()).append(".conf");
+  conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
   auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
 
   apollo::cyber::proto::CyberConfig cfg;

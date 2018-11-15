@@ -34,32 +34,32 @@ void ModuleArgument::DisplayUsage() {
         << "Description: \n"
         << "    -h, --help : help infomation \n"
         << "    -d, --dag_conf=CONFIG_FILE : module dag config file\n"
-        << "    -p, --process_name=process_name: the process "
+        << "    -p, --process_group=process_group: the process "
            "namespace for running this module, default in manager process\n"
         << "    -s, --sched_name=sched_name: sched policy "
            "conf for hole process, sched_name should be conf in cyber.pb.conf\n"
         << "Example:\n"
         << "    " << binary_name_ << " -h\n"
         << "    " << binary_name_ << " -d dag_conf_file1 -d dag_conf_file2 "
-        << "-p process_name -s sched_name\n";
+        << "-p process_group -s sched_name\n";
 }
 
 void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
   binary_name_ = std::string(basename(argv[0]));
   GetOptions(argc, argv);
 
-  if (process_name_.empty()) {
-    process_name_ = DEFAULT_process_name_;
+  if (process_group_.empty()) {
+    process_group_ = DEFAULT_process_group_;
   }
 
   if (sched_name_.empty()) {
     sched_name_ = DEFAULT_sched_name_;
   }
 
-  GlobalData::Instance()->SetProcessName(process_name_);
+  GlobalData::Instance()->SetProcessGroup(process_group_);
   GlobalData::Instance()->SetSchedName(sched_name_);
-  AINFO << "binary_name_ is " << binary_name_ << ", process_name_ is "
-        << process_name_ << ", has " << dag_conf_list_.size() << " dag conf";
+  AINFO << "binary_name_ is " << binary_name_ << ", process_group_ is "
+        << process_group_ << ", has " << dag_conf_list_.size() << " dag conf";
   for (std::string& dag : dag_conf_list_) {
     AINFO << "dag_conf: " << dag;
   }
@@ -104,7 +104,7 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
         }
         break;
       case 'p':
-        process_name_ = std::string(optarg);
+        process_group_ = std::string(optarg);
         break;
       case 's':
         sched_name_ = std::string(optarg);
