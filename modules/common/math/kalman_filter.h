@@ -61,6 +61,12 @@ class KalmanFilter {
     H_.setIdentity();
     R_.setZero();
     B_.setZero();
+
+    x_.setZero();
+    P_.setZero();
+    y_.setZero();
+    S_.setZero();
+    K_.setZero();
   }
 
   /**
@@ -209,7 +215,7 @@ class KalmanFilter {
    * @brief Get initialization state of the filter
    * @return True if the filter is initialized
    */
-  bool IsInitialized() { return is_initialized_; }
+  bool IsInitialized() const { return is_initialized_; }
 
  private:
   // Mean of current state belief distribution

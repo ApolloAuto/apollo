@@ -45,14 +45,15 @@ class Pandar40P {
    *        start_angle       The start angle of every point cloud ,
    *                          should be <real angle> * 100.
    */
-  Pandar40P(std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
+  Pandar40P(const std::string &device_ip,
+            uint16_t lidar_port, uint16_t gps_port,
             boost::function<void(boost::shared_ptr<PPointCloud>, double)>
                 pcl_callback,
             boost::function<void(double)> gps_callback, uint16_t start_angle,
             int tz, std::string frame_id);
 
   /**
-   * @brief deconstructor
+   * @brief destructor
    */
   ~Pandar40P();
 
@@ -60,7 +61,7 @@ class Pandar40P {
    * @brief load the lidar correction file
    * @param contents The correction contents of lidar correction
    */
-  int LoadCorrectionFile(std::string contents);
+  int LoadCorrectionFile(const std::string &contents);
 
   /**
    * @brief Reset Lidar's start angle.

@@ -38,7 +38,7 @@ class DummyROIFilter : public BaseROIFilter {
 
   bool Init() override { return result_init_; }
 
-  bool Filter(const pcl_util::PointCloudPtr &cloud,
+  bool Filter(pcl_util::PointCloudPtr cloud,
               const ROIFilterOptions &roi_filter_options,
               pcl_util::PointIndices *roi_indices) override;
 
@@ -80,7 +80,7 @@ class DummySegmentation : public BaseSegmentation {
 
   bool Init() override { return result_init_; }
 
-  bool Segment(const pcl_util::PointCloudPtr &cloud,
+  bool Segment(pcl_util::PointCloudPtr cloud,
                const pcl_util::PointIndices &non_ground_indices,
                const SegmentationOptions &options,
                std::vector<std::shared_ptr<Object>> *objects) override;

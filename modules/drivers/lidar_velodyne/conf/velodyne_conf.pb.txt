@@ -1,0 +1,19 @@
+is_fusion : false
+conf {
+  index: 0
+  position: "centre"
+  frame_id: "velodyne64"
+  firing_data_port: 2368
+  positioning_data_port: 8308
+  rpm: 600.0
+  model: V64E_S3D_STRONGEST
+  calibration_file: "modules/drivers/lidar_velodyne/data/params/64E_S3_calibration_example.yaml"
+  min_range: 0.9
+  max_range: 70
+  organized: false
+  cache_size: 1
+}
+fusion_conf {
+  major_index : 0
+  slave_index : 1
+}

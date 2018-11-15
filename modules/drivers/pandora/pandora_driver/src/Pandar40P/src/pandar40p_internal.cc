@@ -38,7 +38,7 @@ static const float pandar40p_elev_angle_map[] = {
     -4.321, -4.657, -4.986,  -5.311,  -5.647,  -5.974, -6.957,  -7.934,
     -8.908, -9.871, -10.826, -11.772, -12.705, -13.63, -14.543, -15.444};
 
-// Line 40 Lidar azimuth Horizatal offset ,  Line 1 - Line 40
+// Line 40 Lidar azimuth Horizontal offset ,  Line 1 - Line 40
 static const float pandar40p_horizatal_azimuth_offset_map[] = {
     0.005,  0.006,  0.006,  0.006,  -2.479, -2.479, 2.491,  -4.953,
     -2.479, 2.492,  -4.953, -2.479, 2.492,  -4.953, 0.007,  2.491,
@@ -47,7 +47,7 @@ static const float pandar40p_horizatal_azimuth_offset_map[] = {
     0.004,  0.004,  0.003,  0.003,  -2.466, -2.463, -2.46,  -2.457};
 
 Pandar40P_Internal::Pandar40P_Internal(
-    std::string device_ip, uint16_t lidar_port, uint16_t gps_port,
+    const std::string &device_ip, uint16_t lidar_port, uint16_t gps_port,
     boost::function<void(boost::shared_ptr<PPointCloud>, double)> pcl_callback,
     boost::function<void(double)> gps_callback, uint16_t start_angle, int tz,
     std::string frame_id) {
@@ -148,7 +148,7 @@ Pandar40P_Internal::~Pandar40P_Internal() {
  * @brief load the correction file
  * @param file The path of correction file
  */
-int Pandar40P_Internal::LoadCorrectionFile(std::string correction_content) {
+int Pandar40P_Internal::LoadCorrectionFile(const std::string &correction_content) {  // NOLINT
   std::istringstream ifs(correction_content);
 
   std::string line;
@@ -193,7 +193,7 @@ int Pandar40P_Internal::LoadCorrectionFile(std::string correction_content) {
 }
 
 /**
- * @brief load the correction file
+ * @brief reset the start angle
  * @param angle The start angle
  */
 void Pandar40P_Internal::ResetStartAngle(uint16_t start_angle) {
@@ -278,7 +278,7 @@ void Pandar40P_Internal::ProcessLiarPacket() {
       if (ret != 0) {
         continue;
       }
-      // increate pakcet_index
+
       packetIndex++;
 
       for (int i = 0; i < BLOCKS_PER_PACKET; ++i) {
@@ -331,8 +331,8 @@ void Pandar40P_Internal::ProcessGps(const PandarGPS &gpsMsg) {
 
   // UTC's month start from 1, but mktime only accept month from 0.
   t.tm_mon = gpsMsg.month - 1;
-  // UTC's year only include 0 - 99 year , which indicate 2000 to 2099.
-  // and mktime's year start from 1900 which is 0. so we need add 100 year.
+  // UTC's year only include 0 - 99 year , which indicates 2000 to 2099.
+  // and mktime's year start from 1900 which is 0, so we need to add 100 years.
   t.tm_year = gpsMsg.year + 100;
   t.tm_isdst = 0;
 
@@ -393,7 +393,7 @@ int Pandar40P_Internal::ParseRawData(Pandar40PPacket *packet,
   // parse the UTC Time.
 
   // UTC's year only include 0 - 99 year , which indicate 2000 to 2099.
-  // and mktime's year start from 1900 which is 0. so we need add 100 year.
+  // and mktime's year start from 1900 which is 0, so we need to add 100 years.
   packet->t.tm_year = (buf[index + 0] & 0xff) + 100;
   // UTC's month start from 1, but mktime only accept month from 0.
   packet->t.tm_mon = (buf[index + 1] & 0xff) - 1;

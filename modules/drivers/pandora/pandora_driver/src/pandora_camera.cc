@@ -38,7 +38,7 @@ static int CameraClientCallback(void *handle, int cmd, void *param,
 }
 
 PandoraCamera::PandoraCamera(
-    std::string device_ip, const uint16_t pandoraCameraPort,
+    const std::string &device_ip, const uint16_t pandoraCameraPort,
     boost::function<void(boost::shared_ptr<cv::Mat> matp, double timestamp,
                          int picid, bool distortion)>
         camera_callback,
@@ -178,8 +178,8 @@ void PandoraCamera::processPic() {
   }
 }
 
-bool PandoraCamera::loadIntrinsics(const std::vector<cv::Mat> cameras_k,
-                                   const std::vector<cv::Mat> cameras_d) {
+bool PandoraCamera::loadIntrinsics(const std::vector<cv::Mat> &cameras_k,
+                                   const std::vector<cv::Mat> &cameras_d) {
   for (int i = 0; i < CAMERA_NUM; i++) {
     cv::Mat mapx = cv::Mat(HesaiLidarSDK_IMAGE_SIZE, CV_32FC1);
     cv::Mat mapy = cv::Mat(HesaiLidarSDK_IMAGE_SIZE, CV_32FC1);
@@ -250,8 +250,7 @@ void PandoraCamera::yuv422ToCvmat(boost::shared_ptr<cv::Mat> dst,
 static void my_output_message(j_common_ptr ptr) { return; }
 
 static void print_mem(unsigned char *mem, unsigned int size) {
-  int i = 0;
-  for (i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++) {
     printf("%02x ", mem[i]);
   }
   printf("\n");

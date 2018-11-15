@@ -56,36 +56,26 @@ class Frame {
 
   void get_orientation(double *q0, double *q1, double *q2, double *q3) const;
 
-  void set_translation(const Eigen::Vector3d &translation) {
-    t_ = translation;
-  }
+  void set_translation(const Eigen::Vector3d &translation) { t_ = translation; }
 
   void set_translation(double x, double y, double z);
 
-  void set_rotation(const Eigen::Quaterniond &rotation) {
-    q_ = rotation;
-  }
+  void set_rotation(const Eigen::Quaterniond &rotation) { q_ = rotation; }
 
   void set_rotation(double q0, double q1, double q2, double q3);
 
   void set_translation_and_rotation(const Eigen::Vector3d &translation,
                                     const Eigen::Quaterniond &rotation);
 
-  Eigen::Vector3d translation() const {
-    return t_;
-  }
+  Eigen::Vector3d translation() const { return t_; }
 
-  Eigen::Quaterniond rotation() const {
-    return q_;
-  }
+  Eigen::Quaterniond rotation() const { return q_; }
 
   void get_translation(double *x, double *y, double *z) const;
 
   void get_rotation(double *q0, double *q1, double *q2, double *q3) const;
 
-  const Frame *reference_frame() const {
-    return reference_frame_;
-  }
+  const Frame *reference_frame() const { return reference_frame_; }
 
   void set_reference_frame(const Frame *const refFrame);
 

@@ -31,8 +31,11 @@ def readVarint32(stream):
     """
     read block size from file stream
     """
-    mask = 0x80 #(1 << 7)
+    mask = 0x80  #(1 << 7)
     raw_varint32 = []
+    # In Python 3.x, the 'True' is becomes a keyword and a real contant.
+    # Hence, we can replace '1' with 'True' in an infinite loop without
+    # performance regression.
     while 1:
         b = stream.read(1)
         if b == "":
@@ -47,14 +50,10 @@ def load_protobuf(filename):
     """
     read a file in protobuf binary
     """
-    features = []
     offline_features = offline_features_pb2.Features()
     with open(filename, 'rb') as file_in:
         offline_features.ParseFromString(file_in.read())
-    for i in range(len(offline_features.feature)):
-        features.append(offline_features.feature[i])
-
-    return features
+    return offline_features.feature
 
 
 def load_label_feature(filename):
@@ -65,7 +64,7 @@ def load_label_feature(filename):
             read_bytes, _ = decoder._DecodeVarint32(size, 0)
             data = f.read(read_bytes)
             if len(data) < read_bytes:
-                print "Fail to load protobuf"
+                print("Failed to load protobuf.")
                 break
             fea = feature_pb2.Feature()
             fea.ParseFromString(data)
@@ -85,9 +84,6 @@ def save_protobuf(filename, feature_trajectories):
                 delimiter = encoder._VarintBytes(len(serializedMessage))
                 f.write(delimiter + serializedMessage)
 
-    f.close()
-
-
 def build_trajectory(features):
     """
     classify features by id and build trajectories of feature
@@ -103,7 +99,6 @@ def build_trajectory(features):
         if len(fea_dict[k]) < 2:
             del fea_dict[k]
             continue
-        fea_dict[k].sort(key = lambda x: x.timestamp)
-    feature_trajectories = fea_dict
+        fea_dict[k].sort(key=lambda x: x.timestamp)
 
-    return feature_trajectories
+    return fea_dict

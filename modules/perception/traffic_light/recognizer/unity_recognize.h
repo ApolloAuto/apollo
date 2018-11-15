@@ -20,7 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/traffic_light/recognizer_config.pb.h"
+
 #include "modules/perception/traffic_light/interface/base_recognizer.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
 
@@ -54,9 +55,7 @@ class UnityRecognize : public BaseRecognizer {
   std::shared_ptr<IRefine> classify_day_;
   std::shared_ptr<IRefine> classify_night_;
 
-  bool InitModel(const ConfigManager *config_manager,
-                 const ModelConfig *model_config,
-                 std::shared_ptr<IRefine> *classify);
+  traffic_light::recognizer_config::ModelConfigs config_;
 };
 
 REGISTER_RECOGNIZER(UnityRecognize);

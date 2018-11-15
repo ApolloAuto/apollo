@@ -42,8 +42,8 @@ function start_compensator() {
 }
 
 function stop() {
-    pkill -f pandora_driver
-    pkill -f compensator_node
+    pkill -SIGKILL -f pandora_driver
+    pkill -SIGKILL -f compensator_node
 }
 
 # run command_name module_name

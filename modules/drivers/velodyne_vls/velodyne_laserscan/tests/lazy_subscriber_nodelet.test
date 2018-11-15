@@ -1,0 +1,21 @@
+<!-- -*- mode: XML -*- -->
+<!-- rostest of the lazy subscriber -->
+
+<launch>
+
+  <!-- Select log or screen output -->
+  <arg name="output" default="log"/> <!-- screen/log -->
+
+  <!-- Start the laserscan nodelet -->
+  <arg name="manager" default="nodelet_manager" />
+  <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager"  output="$(arg output)" />
+  <node pkg="nodelet" type="nodelet" name="velodyne_laserscan"  output="$(arg output)"
+        args="load velodyne_laserscan/LaserScanNodelet $(arg manager)">
+  </node>
+
+  <!-- Start the rostest -->
+  <test test-name="test_lazy_subscriber_nodelet" pkg="velodyne_laserscan"
+        type="test_lazy_subscriber_nodelet" name="test_lazy_subscriber">
+  </test>
+
+</launch>

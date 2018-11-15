@@ -1,0 +1,23 @@
+<launch>
+
+  <arg name="fixed_frame_id" default="map"/>
+  <arg name="child_frame_id" default="lslidar"/>
+
+  <include file="$(find lslidar_driver)/launch/lslidar_c16_driver_nodelet.launch"/>
+
+  <node pkg="nodelet" type="nodelet" name="lslidar_decoder_nodelet"
+    args="load lslidar_decoder/LslidarDecoderNodelet
+    lslidar_nodelet_manager"
+    output="screen">
+    <param name="fixed_frame_id" value="$(arg fixed_frame_id)"/>
+    <param name="child_frame_id" value="$(arg child_frame_id)"/>
+
+    <param name="min_range" value="0.3"/>
+    <param name="max_range" value="100.0"/>
+    <param name="frequency" value="10.0"/>
+    <param name="publish_point_cloud" value="true"/>
+  </node>
+  
+ <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find lslidar_decoder)/launch/lslidar.rviz" output="screen"/>
+-->
+</launch>

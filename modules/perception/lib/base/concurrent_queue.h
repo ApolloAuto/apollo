@@ -135,9 +135,7 @@ class FixedSizeConQueue : public ConcurrentQueue<Data> {
     return true;
   }
 
-  bool full() const {
-    return this->queue_.size() >= max_count_;
-  }
+  bool full() const { return this->queue_.size() >= max_count_; }
 
  private:
   CondVar condition_full_;

@@ -17,4 +17,5 @@ message ModelConfigs {
   optional string publish_sensor = 11 [ default = "velodyne_64" ];
   optional bool use_radar = 12 [ default = true ];
   optional bool use_lidar = 13 [ default = true ];
+  optional float max_camera_invisible_period = 14 [ default = 0.25 ];
 }

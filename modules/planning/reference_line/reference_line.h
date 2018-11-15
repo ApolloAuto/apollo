@@ -44,7 +44,7 @@ class ReferenceLine {
   template <typename Iterator>
   explicit ReferenceLine(const Iterator begin, const Iterator end)
       : reference_points_(begin, end),
-        map_path_(hdmap::Path(std::vector<hdmap::MapPathPoint>(begin, end))) {}
+        map_path_(std::move(std::vector<hdmap::MapPathPoint>(begin, end))) {}
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
   explicit ReferenceLine(const hdmap::Path& hdmap_path);
 
@@ -86,6 +86,9 @@ class ReferenceLine {
 
   ReferencePoint GetNearestReferencePoint(const common::math::Vec2d& xy) const;
 
+  std::vector<hdmap::LaneSegment> GetLaneSegments(const double start_s,
+                                                  const double end_s) const;
+
   ReferencePoint GetNearestReferencePoint(const double s) const;
 
   ReferencePoint GetReferencePoint(const double x, const double y) const;
@@ -107,17 +110,32 @@ class ReferenceLine {
     return XYToSL(common::math::Vec2d(xy.x(), xy.y()), sl_point);
   }
 
-  bool GetLaneWidth(const double s, double* const left_width,
-                    double* const right_width) const;
+  bool GetLaneWidth(const double s, double* const lane_left_width,
+                    double* const lane_right_width) const;
+
+  bool GetRoadWidth(const double s, double* const road_left_width,
+                    double* const road_right_width) const;
+
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
 
+  /**
+   * @brief: check if a box/point is on lane along reference line
+   */
+  bool IsOnLane(const common::SLPoint& sl_point) const;
+  bool IsOnLane(const common::math::Vec2d& vec2d_point) const;
+  template <class XYPoint>
+  bool IsOnLane(const XYPoint& xy) const {
+    return IsOnLane(common::math::Vec2d(xy.x(), xy.y()));
+  }
+  bool IsOnLane(const SLBoundary& sl_boundary) const;
+
+  /**
+   * @brief: check if a box/point is on road
+   *         (not on sideways/medians) along reference line
+   */
   bool IsOnRoad(const common::SLPoint& sl_point) const;
   bool IsOnRoad(const common::math::Vec2d& vec2d_point) const;
-  template <class XYPoint>
-  bool IsOnRoad(const XYPoint& xy) const {
-    return IsOnRoad(common::math::Vec2d(xy.x(), xy.y()));
-  }
   bool IsOnRoad(const SLBoundary& sl_boundary) const;
 
   /**
@@ -143,6 +161,9 @@ class ReferenceLine {
 
   void AddSpeedLimit(const hdmap::SpeedControl& speed_control);
   void AddSpeedLimit(double start_s, double end_s, double speed_limit);
+
+  uint32_t GetPriority() const { return priority_; }
+  void SetPriority(uint32_t priority) { priority_ = priority; }
 
  private:
   /**
@@ -189,6 +210,7 @@ class ReferenceLine {
   std::vector<SpeedLimit> speed_limit_;
   std::vector<ReferencePoint> reference_points_;
   hdmap::Path map_path_;
+  uint32_t priority_ = 0;
 };
 
 }  // namespace planning

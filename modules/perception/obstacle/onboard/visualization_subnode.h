@@ -26,10 +26,11 @@
 #include "modules/perception/obstacle/onboard/camera_shared_data.h"
 #include "modules/perception/obstacle/onboard/fusion_shared_data.h"
 #include "modules/perception/obstacle/onboard/lane_shared_data.h"
+#include "modules/perception/obstacle/onboard/motion_service.h"
 #include "modules/perception/obstacle/onboard/object_shared_data.h"
+#include "modules/perception/obstacle/onboard/scene_shared_data.h"
 #include "modules/perception/onboard/subnode.h"
 #include "modules/perception/onboard/subnode_helper.h"
-#include "modules/perception/obstacle/onboard/motion_service.h"
 
 namespace apollo {
 namespace perception {
@@ -56,6 +57,16 @@ class VisualizationSubnode : public Subnode {
   void SetFrameContent(const Event& event, const std::string& device_id,
                        const std::string& data_key, const double timestamp,
                        FrameContent* content);
+  void SetFusionContent(const std::string& data_key, FrameContent* content,
+                        double timestamp);
+  void SetCameraContent(const std::string& data_key, FrameContent* content,
+                        double timestamp);
+  void SetRadarContent(const std::string& data_key, FrameContent* content,
+                       double timestamp);
+  void SetLaneContent(const std::string& data_key, FrameContent* content,
+                      double timestamp);
+  void SetLidarContent(const std::string& data_key, FrameContent* content,
+                       double timestamp);
 
   RadarObjectData* radar_object_data_ = nullptr;
   CameraObjectData* camera_object_data_ = nullptr;
@@ -63,6 +74,9 @@ class VisualizationSubnode : public Subnode {
   CameraSharedData* camera_shared_data_ = nullptr;
   LaneSharedData* lane_shared_data_ = nullptr;
   FusionSharedData* fusion_data_ = nullptr;
+  LidarObjectData* lidar_object_data_ = nullptr;
+  SceneSharedData* scene_shared_data_ = nullptr;
+
   std::unique_ptr<BaseVisualizer> frame_visualizer_;
   MotionService* motion_service_ = nullptr;
   FrameContent content_;
@@ -74,6 +88,7 @@ class VisualizationSubnode : public Subnode {
   EventID motion_event_id_;
   EventID cipv_event_id_;
   EventID lane_event_id_;
+  EventID lidar_event_id_;
 
   //    MotionBufferPtr motion_buffer_;
   Eigen::Matrix4d camera_to_car_pose_;

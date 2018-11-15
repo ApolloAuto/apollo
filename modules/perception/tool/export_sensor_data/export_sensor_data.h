@@ -55,7 +55,7 @@ class ExportSensorData {
   void WriteRadar(const std::string &file_pre, const ContiRadar &radar_obs);
   void WritePose(const std::string &file_pre, const double timestamp,
                  const int seq_num, const Eigen::Matrix4d &pose);
-  void WriteVelocityInfo(const std::string &file_pre, const double &timestamp,
+  void WriteVelocityInfo(const std::string &file_pre, const double timestamp,
                          const int seq_num, const Eigen::Vector3f &velocity);
   void WritePCD(const std::string &file_pre,
                 const sensor_msgs::PointCloud2 &in_msg);

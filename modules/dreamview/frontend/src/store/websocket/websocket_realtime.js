@@ -56,9 +56,9 @@ export default class RosWebSocketEndpoint {
                     const updateCoordination = (this.currentMode !== STORE.hmi.currentMode);
                     this.currentMode = STORE.hmi.currentMode;
                     if (STORE.hmi.inNavigationMode) {
-                        // In navigation mode, relative map is set and the relative position
-                        // of auto driving car is (0, 0). Absolute position of the car
-                        // only needed in MAP_NAVIGATOR.
+                        // In navigation mode, the coordinate system is FLU and
+                        // relative position of the ego-car is (0, 0). But,
+                        // absolute position of the ego-car is needed in MAP_NAVIGATOR.
                         if (MAP_NAVIGATOR.isInitialized()) {
                             MAP_NAVIGATOR.update(message);
                         }
@@ -73,22 +73,13 @@ export default class RosWebSocketEndpoint {
                         this.mapUpdatePeriodMs = 1000;
                     }
 
-                    STORE.updateTimestamp(message.timestamp);
-                    STORE.updateModuleDelay(message);
+                    STORE.update(message);
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
                         message.autoDrivingCar.positionY,
                         updateCoordination);
-                    STORE.meters.update(message);
-                    STORE.monitor.update(message);
-                    STORE.trafficSignal.update(message);
-                    STORE.hmi.update(message);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
-                    if (STORE.options.showPNCMonitor) {
-                        STORE.planningData.update(message);
-                        STORE.controlData.update(message, STORE.hmi.vehicleParam);
-                    }
                     if (this.routingTime !== message.routingTime) {
                         // A new routing needs to be fetched from backend.
                         this.requestRoutePath();
@@ -143,9 +134,16 @@ export default class RosWebSocketEndpoint {
     checkMessage(world) {
         const now = new Date().getTime();
         const duration = now - this.simWorldLastUpdateTimestamp;
-        if (this.simWorldLastUpdateTimestamp !== 0 && duration > 250) {
-            console.log("Last sim_world_update took " + duration + "ms");
+        if (this.simWorldLastUpdateTimestamp !== 0 && duration > 200) {
+            console.warn("Last sim_world_update took " + duration + "ms");
         }
+        if (this.secondLastSeqNum === world.sequenceNum) {
+            // Receiving multiple duplicated simulation_world messages
+            // indicates a backend lag.
+            console.warn("Received duplicate simulation_world:", this.lastSeqNum);
+        }
+        this.secondLastSeqNum = this.lastSeqNum;
+        this.lastSeqNum = world.sequenceNum;
         this.simWorldLastUpdateTimestamp = now;
     }
 
@@ -235,17 +233,18 @@ export default class RosWebSocketEndpoint {
         }));
     }
 
-    submitDriveEvent(eventTimeMs, eventMessage) {
+    submitDriveEvent(eventTimeMs, eventMessage, eventTypes) {
     	this.websocket.send(JSON.stringify({
             type: "SubmitDriveEvent",
             event_time_ms: eventTimeMs,
             event_msg: eventMessage,
+            event_type: eventTypes,
         }));
     }
 
-    sendVoicePiece(data) {
+    sendAudioPiece(data) {
         this.websocket.send(JSON.stringify({
-            type: "VoicePiece",
+            type: "AudioPiece",
             data: btoa(String.fromCharCode(...data)),
         }));
     }

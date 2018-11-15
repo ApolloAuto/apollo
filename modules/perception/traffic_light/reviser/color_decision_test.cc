@@ -25,7 +25,7 @@ class DecisionTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     reviser_ = new ColorReviser;
-    ASSERT_TRUE(reviser_->Init());
+    EXPECT_TRUE(reviser_->Init());
     AINFO << "Setup";
   }
   ~DecisionTest() { delete reviser_; }

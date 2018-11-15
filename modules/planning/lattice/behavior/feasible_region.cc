@@ -22,7 +22,7 @@
 
 #include <cmath>
 
-#include "glog/logging.h"
+#include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

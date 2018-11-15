@@ -57,6 +57,8 @@ std::string GetSensorType(SensorType sensor_type) {
       return "radar";
     case SensorType::CAMERA:
       return "camera";
+    case SensorType::ULTRASONIC:
+      return "ultrasonic";
     case SensorType::UNKNOWN_SENSOR_TYPE:
       return "unknown_sensor_type";
   }

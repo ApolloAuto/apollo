@@ -1,0 +1,48 @@
+header {
+  module_name: "std_planning"
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    cruise {
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+  }
+  vehicle_signal {
+    turn_signal: TURN_LEFT
+  }
+}
+routing_header {
+  timestamp_sec: 1522096757.9018941
+  module_name: "routing"
+  sequence_num: 136
+}
+right_of_way_status: PROTECTED
+lane_id {
+  id: "812_1_-1"
+}
+lane_id {
+  id: "204_1_-1"
+}
+lane_id {
+  id: "11042_1_-1"
+}
+lane_id {
+  id: "11041_1_-1"
+}
+lane_id {
+  id: "1697a_1_-1"
+}
+lane_id {
+  id: "368_1_-1"
+}
+lane_id {
+  id: "449_1_-1"
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}
+trajectory_type: NORMAL

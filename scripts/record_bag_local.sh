@@ -26,6 +26,7 @@ function start() {
   cd "${TASK_DIR}"
 
   # Start recording.
+  record_bag_env_log
   LOG="/tmp/apollo_record.out"
   NUM_PROCESSES="$(pgrep -c -f "rosbag record")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
@@ -58,7 +59,6 @@ function stop() {
 function help() {
   echo "Usage:"
   echo "$0 [start]                     Record bag to data/bag."
-  echo "$0 [start] --portable-disk     Record bag to the largest portable disk."
   echo "$0 stop                        Stop recording."
   echo "$0 help                        Show this help message."
 }

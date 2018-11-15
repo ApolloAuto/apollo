@@ -202,9 +202,11 @@ For more information about the NovAtel SPAN ProPak6 and the IMU-IGM-A1, see:
 
 ## The GPS Receiver/Antenna
 
-The GPS Receiver/Antenna used with the GPS-IMU component is the **NovAtel GPS-703-GGG-HV**.
+The GPS Receiver/Antenna used with the GPS-IMU component is:
 
-**NOTE: **The GPS NovAtelGPS-703-GGG-HV works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).
+### Option 1: The **NovAtel GPS-703-GGG-HV**.
+
+**NOTE:**The GPS NovAtelGPS-703-GGG-HV works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).
 
 ![gps_receiver](images/gps_receiver.png)
 
@@ -213,6 +215,19 @@ For more information about the NovAtel GPS-703-GGG-HV, see:
   ![online](images/online_icon.png) NovAtel GPS-703-GGG-HV Product Page:
 
 [https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/](https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/)
+
+### Option 2: **Dual NovAtel GNSS-502** 
+
+**NOTE:**The NovAtel GNSS-502 works with either model of the two GPS-IMU options that are described in the previous section, Global Positioning System (GPS) and Inertial Measurement Unit (IMU).  Dual antenna receivers, such as the ProPak6 can take advantage of better quality heading information, by using 2 antennas.
+
+![gps_receiver](images/novatel_gnss-502.png)
+
+For more information about the NovAtel GNSS-502, see:
+
+  ![online](images/online_icon.png) NovAtel GNSS-502 Product Page:
+
+[https://www.novatel.com/products/gnss-antennas/vexxis-series-antennas/vexxis-gnss-500-series-antennas/](https://www.novatel.com/products/gnss-antennas/vexxis-series-antennas/vexxis-gnss-500-series-antennas/)
+
 
 ## Light Detection and Ranging System (LiDAR)
 The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
@@ -487,7 +502,7 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 
 2. Start the installation
 ```
-sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s
+sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s --no-kernel-module
 ```
 
 ##### Optional: Test the ESD CAN device node
@@ -1025,6 +1040,11 @@ Use the components that you were required to provide to perform the following ta
 1.   Connect a monitor using the DVI or the HDMI cables and connect the keyboard and mouse to perform debugging tasks at the car onsite.
 
 2.   Establish a Wi-Fi connection on the Apple iPad Pro to access the HMI and control the Apollo ADS that is running on the IPC.
+
+# Time Sync Script Setup [Optional]
+
+In order to, sync the computer time to the NTP server on the internet, you could use the [Time Sync script](https://github.com/ApolloAuto/apollo/blob/master/scripts/time_sync.sh)
+
 
 # Next Steps
 

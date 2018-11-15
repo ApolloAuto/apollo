@@ -63,11 +63,17 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
 double EvaluateQuinticPolynomial(
     const std::array<double, 6>& coeffs,
     const double t, const uint32_t order,
-    const double end_t, const double end_value) {
+    const double end_t, const double end_v) {
   if (t >= end_t) {
     switch (order) {
       case 0: {
-        return end_value;
+        double end_value = ((((coeffs[5] * end_t + coeffs[4]) * end_t +
+            coeffs[3]) * end_t + coeffs[2]) * end_t + coeffs[1]) * end_t +
+            coeffs[0];
+        return end_value + end_v * (t - end_t);
+      }
+      case 1: {
+        return end_v;
       }
       default: {
         return 0.0;
@@ -104,11 +110,16 @@ double EvaluateQuinticPolynomial(
 double EvaluateQuarticPolynomial(
     const std::array<double, 5>& coeffs,
     const double t, const uint32_t order,
-    const double end_t, const double end_value) {
+    const double end_t, const double end_v) {
   if (t >= end_t) {
     switch (order) {
       case 0: {
-        return end_value;
+        double end_value = (((coeffs[4] * end_t + coeffs[3]) * end_t +
+            coeffs[2]) * end_t + coeffs[1]) * end_t + coeffs[0];
+        return end_value + (t - end_t) * end_v;
+      }
+      case 1: {
+        return end_v;
       }
       default: {
         return 0.0;

@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.common;
+
+message Scenario {
+  enum Type {
+    UNKNOWN = 0;
+    CRUISE_UNKNOWN = 1000;
+    CRUISE_URBAN = 1001;
+    CRUISE_HIGHWAY = 1002;
+    JUNCTION_UNKNOWN = 2000;
+    JUNCTION_TRAFFIC_LIGHT = 2001;
+    JUNCTION_STOP_SIGN = 2002;
+  }
+  optional Type type = 1 [default = UNKNOWN];
+}

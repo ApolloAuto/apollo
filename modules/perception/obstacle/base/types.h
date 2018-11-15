@@ -19,12 +19,14 @@
 
 #include <string>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/perception/common/pcl_types.h"
 
 namespace apollo {
 namespace perception {
 
-enum class ObjectType {
+enum ObjectType {
   UNKNOWN = 0,
   UNKNOWN_MOVABLE = 1,
   UNKNOWN_UNMOVABLE = 2,
@@ -44,18 +46,13 @@ enum InternalObjectType {
   INT_MAX_OBJECT_TYPE = 6,
 };
 
-enum class SensorType {
+enum SensorType {
   VELODYNE_64 = 0,
   VELODYNE_16 = 1,
   RADAR = 2,
   CAMERA = 3,
+  ULTRASONIC = 4,
   UNKNOWN_SENSOR_TYPE = 10,
-};
-
-enum class ScoreType {
-  UNKNOWN_SCORE_TYPE = 0,
-  SCORE_CNN = 1,
-  SCORE_RADAR = 2,
 };
 
 typedef pcl_util::PointCloud PolygonType;

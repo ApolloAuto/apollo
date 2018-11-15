@@ -9,19 +9,19 @@ message Ultrasonic{
 //               x axis
 //		       ^
 //                     |
-//                  *  |  *                           
-//               *     |     *                
+//                  *  |  *
+//               *     |     *
 //        \    *       |       *    /
-//          \ *     range(i)    * /   
-//            \        |        /   
+//          \ *     range(i)    * /
+//            \        |        /
 //              \      |      /
 //                \    |    /
-//       y axis     \  |  / 
+//       y axis     \  |  /
 //      <---------------
-//        ooooooooooooo   //ulrasonic radar front surface
+//        ooooooooooooo   //ultrasonic radar front surface
 //
-// In erery working cycle, each radar of the ultrasonic system 
-// return a range to form a range array, 'ranges'. 
+// In every working cycle, each radar of the ultrasonic system
+// return a range to form a range array, 'ranges'.
 
   optional apollo.common.Header header = 1;
   repeated float ranges = 2;

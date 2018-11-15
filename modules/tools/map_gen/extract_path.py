@@ -20,11 +20,14 @@ import sys
 import rosbag
 from modules.localization.proto import localization_pb2
 
-if __name__ == '__main__':
-    filename = sys.argv[1]
-    f = open(filename, 'w')
-    fbags = sys.argv[2:]
+if len(sys.argv) < 3:
+    print("Usage: %s <filename> <fbags>" % sys.argv[0])
+    sys.exit(1)
 
+filename = sys.argv[1]
+fbags = sys.argv[2:]
+
+with open(filename, 'w') as f:
     for fbag in fbags:
         bag = rosbag.Bag(fbag)
         for topic, localization_pb, t in bag.read_messages(
@@ -32,5 +35,4 @@ if __name__ == '__main__':
             x = localization_pb.pose.position.x
             y = localization_pb.pose.position.y
             f.write(str(x) + "," + str(y) + "\n")
-        bag.close()
-    print("File written to: %s" % filename)
+print("File written to: %s" % filename)

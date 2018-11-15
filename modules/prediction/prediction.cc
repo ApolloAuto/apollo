@@ -16,8 +16,16 @@
 
 #include "modules/prediction/prediction.h"
 
+#include <algorithm>
 #include <cmath>
+#include <vector>
 
+#include "boost/filesystem.hpp"
+#include "boost/range/iterator_range.hpp"
+#include "rosbag/bag.h"
+#include "rosbag/view.h"
+
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
@@ -36,18 +44,69 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::common::Status;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::common::adapter::AdapterManager;
-using ::apollo::common::math::Vec2d;
-using ::apollo::common::time::Clock;
-using ::apollo::localization::LocalizationEstimate;
-using ::apollo::perception::PerceptionObstacle;
-using ::apollo::perception::PerceptionObstacles;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManager;
+using apollo::common::math::Vec2d;
+using apollo::common::time::Clock;
+using apollo::common::util::DirectoryExists;
+using apollo::common::util::Glob;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 
 std::string Prediction::Name() const { return FLAGS_prediction_module_name; }
+
+void GetBagFiles(const boost::filesystem::path& p,
+                 std::vector<std::string>* bag_files) {
+  CHECK(bag_files);
+  if (!boost::filesystem::exists(p)) {
+    return;
+  }
+  if (boost::filesystem::is_regular_file(p)) {
+    const auto ext = p.extension();
+    if (ext == ".bag" || ext == ".BAG") {
+      AINFO << "Found bag file: " << p.c_str();
+      bag_files->push_back(p.c_str());
+    }
+    return;
+  }
+  if (boost::filesystem::is_directory(p)) {
+    for (auto& entry : boost::make_iterator_range(
+             boost::filesystem::directory_iterator(p), {})) {
+      GetBagFiles(entry.path(), bag_files);
+    }
+  }
+}
+
+void Prediction::ProcessRosbag(const std::string& filename) {
+  const std::vector<std::string> topics{FLAGS_perception_obstacle_topic,
+                                        FLAGS_localization_topic};
+  rosbag::Bag bag;
+  try {
+    bag.open(filename, rosbag::bagmode::Read);
+  } catch (const rosbag::BagIOException& e) {
+    AERROR << "BagIOException when open bag: " << filename
+           << " Exception: " << e.what();
+    bag.close();
+    return;
+  } catch (...) {
+    AERROR << "Failed to open bag: " << filename;
+    bag.close();
+    return;
+  }
+  rosbag::View view(bag, rosbag::TopicQuery(topics));
+  for (auto it = view.begin(); it != view.end(); ++it) {
+    if (it->getTopic() == FLAGS_localization_topic) {
+      OnLocalization(*(it->instantiate<LocalizationEstimate>()));
+    } else if (it->getTopic() == FLAGS_perception_obstacle_topic) {
+      RunOnce(*(it->instantiate<PerceptionObstacles>()));
+    }
+  }
+  bag.close();
+}
 
 Status Prediction::Init() {
   start_time_ = Clock::NowInSeconds();
@@ -98,8 +157,26 @@ Status Prediction::Init() {
     if (!FeatureOutput::Ready()) {
       return OnError("Feature output is not ready.");
     }
+    if (FLAGS_prediction_offline_bags.empty()) {
+      return Status::OK();  // use listen to ROS topic mode
+    }
+    std::vector<std::string> inputs;
+    apollo::common::util::split(FLAGS_prediction_offline_bags, ':', &inputs);
+    for (const auto& input : inputs) {
+      std::vector<std::string> offline_bags;
+      GetBagFiles(boost::filesystem::path(input), &offline_bags);
+      std::sort(offline_bags.begin(), offline_bags.end());
+      AINFO << "For input " << input << ", found " << offline_bags.size()
+            << "  rosbags to process";
+      for (std::size_t i = 0; i < offline_bags.size(); ++i) {
+        AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
+              << " ]: " << offline_bags[i];
+        ProcessRosbag(offline_bags[i]);
+      }
+    }
+    Stop();
+    ros::shutdown();
   }
-
   return Status::OK();
 }
 
@@ -134,7 +211,7 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
 }
 
 void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
-  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0 &&
+  if (FLAGS_prediction_test_mode && FLAGS_prediction_test_duration > 0.0 &&
       (Clock::NowInSeconds() - start_time_ > FLAGS_prediction_test_duration)) {
     AINFO << "Prediction finished running in test mode";
     ros::shutdown();
@@ -194,6 +271,12 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
       PredictorManager::instance()->prediction_obstacles();
   prediction_obstacles.set_start_timestamp(start_timestamp);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
+  prediction_obstacles.mutable_header()->set_lidar_timestamp(
+      perception_obstacles.header().lidar_timestamp());
+  prediction_obstacles.mutable_header()->set_camera_timestamp(
+      perception_obstacles.header().camera_timestamp());
+  prediction_obstacles.mutable_header()->set_radar_timestamp(
+      perception_obstacles.header().radar_timestamp());
 
   if (FLAGS_prediction_test_mode) {
     for (auto const& prediction_obstacle :

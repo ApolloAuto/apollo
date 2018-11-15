@@ -22,13 +22,12 @@
 #ifndef MODULES_COMMON_UTIL_STRING_UTIL_H_
 #define MODULES_COMMON_UTIL_STRING_UTIL_H_
 
-#include <boost/algorithm/string.hpp>
-
 #include <functional>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "boost/algorithm/string.hpp"
 #include "google/protobuf/stubs/stringprintf.h"
 #include "google/protobuf/stubs/strutil.h"
 
@@ -65,8 +64,9 @@ inline bool StartWith(const std::string& ori, const std::string& pat) {
  * @param [in]: the string you want to split
  * @param [in]: the character
  * @param [out]: result strings after exploded by character
+ * @return: the number of elements splitted in the given str
  **/
-void split(const std::string& str, char ch, std::vector<std::string>* result);
+int split(const std::string& str, char ch, std::vector<std::string>* result);
 
 /**
  * @brief: trim the left side empty space of string
@@ -200,7 +200,9 @@ std::string PrintDebugStringIter(const Container& container,
   return PrintDebugStringIter(container.begin(), container.end(), delimiter);
 }
 
-std::string Base64Decode(const std::string &base64_str);
+std::string DecodeBase64(const std::string& base64_str);
+
+std::string EncodeBase64(const std::string& in);
 
 }  // namespace util
 }  // namespace common

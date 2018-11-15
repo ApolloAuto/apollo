@@ -1,0 +1,17 @@
+<package>
+
+  <name>rslidar</name>
+  <version>1.0.0</version>
+  <description>
+    Basic ROS support for the Robosense 3D LIDARs.
+  </description>
+  <maintainer email="tony.zhang@robosense.cn">Tony Zhang</maintainer>
+  <license>Licensed under the Apache License, Version 2.0 </license>
+  
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>rslidar_driver</run_depend>
+  <run_depend>rslidar_msgs</run_depend>
+  <run_depend>rslidar_pointcloud</run_depend>
+
+</package>

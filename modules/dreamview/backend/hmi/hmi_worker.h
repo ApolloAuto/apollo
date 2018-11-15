@@ -18,16 +18,15 @@
 #define MODULES_DREAMVIEW_BACKEND_HMI_HMI_WORKER_H_
 
 #include <string>
+#include <vector>
 
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/macro.h"
-#include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/proto/hmi_config.pb.h"
 #include "modules/dreamview/proto/hmi_status.pb.h"
-#include "modules/dreamview/proto/voice_detection.pb.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 /**
@@ -36,6 +35,10 @@
  */
 namespace apollo {
 namespace dreamview {
+
+using ChangeModeHandler = std::function<void(const std::string&)>;
+using ChangeMapHandler = std::function<void(const std::string&)>;
+using ChangeVehicleHandler = std::function<void(const std::string&)>;
 
 // Singleton worker which does the actual work of HMI actions.
 class HMIWorker {
@@ -56,20 +59,32 @@ class HMIWorker {
   // Update system status.
   void UpdateSystemStatus(const apollo::monitor::SystemStatus& system_status);
 
+  // Register event handlers.
+  void RegisterChangeModeHandler(ChangeModeHandler handler) {
+    change_mode_handlers_.emplace_back(handler);
+  }
+  void RegisterChangeMapHandler(ChangeMapHandler handler) {
+    change_map_handlers_.emplace_back(handler);
+  }
+  void RegisterChangeVehicleHandler(ChangeVehicleHandler handler) {
+    change_vehicle_handlers_.emplace_back(handler);
+  }
   // Change current mode, map, vehicle and driving mode.
   void ChangeToMode(const std::string& mode_name);
-  void ChangeToMap(const std::string& map_name, MapService* map_service);
+  void ChangeToMap(const std::string& map_name);
   void ChangeToVehicle(const std::string& vehicle_name);
   static bool ChangeToDrivingMode(
       const apollo::canbus::Chassis::DrivingMode mode);
 
   // Submit a DriveEvent.
   static void SubmitDriveEvent(const uint64_t event_time_ms,
-                               const std::string& event_msg);
+                               const std::string& event_msg,
+                               const std::vector<std::string>& event_types);
 
   // Get current config and status.
   inline const HMIConfig& GetConfig() const { return config_; }
-  inline const HMIStatus& GetStatus() const { return status_; }
+  const HMIStatus GetStatus() const;
+
   // HMIStatus is updated frequently by multiple threads, including web workers
   // and ROS message callback. Please apply proper read/write lock when
   // accessing it.
@@ -79,6 +94,10 @@ class HMIWorker {
   HMIConfig config_;
   HMIStatus status_;
   mutable boost::shared_mutex status_mutex_;
+
+  std::vector<ChangeModeHandler> change_mode_handlers_;
+  std::vector<ChangeMapHandler> change_map_handlers_;
+  std::vector<ChangeVehicleHandler> change_vehicle_handlers_;
 
   DECLARE_SINGLETON(HMIWorker);
 };

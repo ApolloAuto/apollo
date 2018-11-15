@@ -6,12 +6,12 @@ You can download the elo (aka Ego Localization) module here [elo-1.5.zip](https:
 
 Baidu ego localization system is an accurate ego localization solution for self-driving. By combining sensor information, Global navigation satellite systems (GNSS), and Baidu HD Map into one system, Baidu ego localization system is able to offer a localization solution with high accuracy.
 
-GNSS positioning observes range measurements from orbiting GNSS satellites, while GNSS in general has some restrictions that it may not be available for high accuracy requirements of self-driving. Baidu ego localization system combines sensor information with HD Map and GNSS solution to provide high-accuracy localization solution. System extracts features from sensors and Baidu HD Map for feature matching. After feature matching, system is able to locate current vehicle in HD Map. Motion compensation is proposed to compensate current localization solution. 
+GNSS positioning observes range measurements from orbiting GNSS satellites, while GNSS in general has some restrictions that it may not be available for high accuracy requirements of self-driving. Baidu ego localization system combines sensor information with HD Map and GNSS solution to provide high-accuracy localization solution. System extracts features from sensors and Baidu HD Map for feature matching. After feature matching, system is able to locate current vehicle in HD Map. Motion compensation is proposed to compensate current localization solution.
 
 ![components of Baidu ego localization system](flowchart.jpg)
 
 The main components of Baidu ego localization system is introduced as follow:
-* Sensors: inlcude vision sensors (in-vehicle cameras, industrial camera CCDs and other image collecting sensors) and position sensors (include GPS, GLONASS, Beidou and other GNSS).
+* Sensors: include vision sensors (in-vehicle cameras, industrial camera CCDs and other image collecting sensors) and position sensors (include GPS, GLONASS, Beidou and other GNSS).
 * HD Map: HD Map provides road information within specific area.
 * Real-time location feature: Baidu ego localization system applies deep neural network architecture `ENet` (see: [ENet: A Deep Neural Network Architecture for Real-Time Semantic Segmentation](https://arxiv.org/abs/1606.02147)) to extract lane lines and mark features by sensor for feature matching.
 * Pre-stored location feature: obtains lane lines and mark features provided by HD Map.
@@ -26,11 +26,11 @@ The main components of Baidu ego localization system is introduced as follow:
 
 * Requirements for `OpenCV 3.X` (see: [OpenCV installation instructions](http://docs.opencv.org/master/df/d65/tutorial_table_of_content_introduction.html))
 
-* Recommended requirements for `Protobuf` (see: [github](https://github.com/google/protobuf)) 
+* Recommended requirements for `Protobuf` (see: [github](https://github.com/google/protobuf))
 
-* Recommended requirements for `CUDA` (see: [CUDA installation instructions](http://docs.nvidia.com/cuda/index.html#installation-guides)) 
+* Recommended requirements for `CUDA` (see: [CUDA installation instructions](http://docs.nvidia.com/cuda/index.html#installation-guides))
 
-* Recommended requirements for `Eigen 3` (see: [Eigen installation instructions](http://eigen.tuxfamily.org/dox/)) 
+* Recommended requirements for `Eigen 3` (see: [Eigen installation instructions](http://eigen.tuxfamily.org/dox/))
 
 * Recommended requirements for `jsoncpp` (see: [github](https://github.com/open-source-parsers/jsoncpp))
 
@@ -48,7 +48,7 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
 
 * Input file:
 
-  Note that optimum solution from SPAN-CPT (ground_truth_longitude` and `ground_truth_latitude`) are provided to make comparison with solution from Baidu ego localization system.
+  Note that optimum solution from SPAN-CPT (`ground_truth_longitude` and `ground_truth_latitude`) are provided to make comparison with solution from Baidu ego localization system.
 
   ```
   image_name longitude latitude ground_truth_longitude ground_truth_latitude
@@ -61,12 +61,12 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
 
   # width and height of ENet input image, pixel
   segmented_image_width segmented_image_height
- 
+
   # camera parameters: principal point, focal length and rotation angle of camera related to vehicle coordinate system, pixel and radian
   principal_point_x principal_point_y focal_length_x focal_length_y pitch yaw roll
 
   # center point of image, pixel
-  center_point_x center_point_y 
+  center_point_x center_point_y
 
   # ENet parameters file
   enet_para_path
@@ -77,7 +77,7 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
   # camera parameters: translation of camera related to vehicle coordinate system, pixel
   translation_x translation_y
 
-  # database of HD Map 
+  # database of HD Map
   database_path
   ```
   Sample config parameters
@@ -112,7 +112,7 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
 
 * Install and build dependencies in `2. Recommended requirements: software`, then do the following steps.
 
-* a. System software dependencies can be installed with: 
+* a. System software dependencies can be installed with:
 
    ```Shell
    sudo apt-get install cmake libhdf5-dev liblmdb-dev libleveldb-dev libatlas-dev libatlas-base-dev libgflags-dev libgoogle-glog-dev libopencv-dev libmatio-dev libcurl4-openssl-dev
@@ -123,7 +123,7 @@ Deployed on NVIDIA Drive PX2 (PDK 4.1.4.0).
    We'll call the directory `elo` into `P_ROOT`
 
 * c. Compile and run localization:
-   
+
    ```Shell
    cd $P_ROOT
    mkdir build

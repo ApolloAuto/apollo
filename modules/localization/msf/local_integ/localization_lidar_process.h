@@ -22,21 +22,21 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_LIDAR_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_LOCALIZATION_LIDAR_PROCESS_H_
 
+#include <cstdint>
 #include <list>
 #include <string>
-#include <cstdint>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
+#include "include/pose_forcast.h"
+#include "include/sins_struct.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
-#include "include/pose_forcast.h"
-#include "include/sins_struct.h"
 
 /**
  * @namespace apollo::localization
@@ -46,17 +46,9 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-enum class ForcastState {
-    NOT_VALID = 0,
-    INITIAL,
-    INCREMENT
-};
+enum class ForcastState { NOT_VALID = 0, INITIAL, INCREMENT };
 
-enum class LidarState {
-  NOT_VALID = 0,
-  NOT_STABLE,
-  OK
-};
+enum class LidarState { NOT_VALID = 0, NOT_STABLE, OK };
 
 enum class PredictLocationState {
   NOT_VALID = 0,
@@ -86,37 +78,34 @@ class LocalizationLidarProcess {
   ~LocalizationLidarProcess();
 
   // Initialization.
-  apollo::common::Status Init(const LocalizationIntegParam& params);
+  apollo::common::Status Init(const LocalizationIntegParam &params);
   // Lidar pcd process and get result.
-  void PcdProcess(const LidarFrame& lidar_frame);
-  void GetResult(int *lidar_status,
-                 TransformD *location,
+  void PcdProcess(const LidarFrame &lidar_frame);
+  void GetResult(int *lidar_status, TransformD *location,
                  Matrix3D *covariance) const;
   int GetResult(LocalizationEstimate *lidar_local_msg);
   // Integrated navagation pva process.
-  void IntegPvaProcess(const InsPva& sins_pva_msg);
+  void IntegPvaProcess(const InsPva &sins_pva_msg);
   // Raw Imu process.
-  void RawImuProcess(const ImuData& imu_msg);
+  void RawImuProcess(const ImuData &imu_msg);
 
  private:
   // Sub-functions for process.
-  bool GetPredictPose(const double lidar_time,
-                      TransformD *inspva_pose,
+  bool GetPredictPose(const double lidar_time, TransformD *inspva_pose,
                       ForcastState *forcast_state);
   bool CheckState();
-  bool CheckDelta(const LidarFrame& frame, const TransformD& inspva_pose);
+  bool CheckDelta(const LidarFrame &frame, const TransformD &inspva_pose);
   void UpdateState(const int ret, const double time);
 
   // Load lidar-imu extrinsic parameter.
-  bool LoadLidarExtrinsic(const std::string& file_path,
+  bool LoadLidarExtrinsic(const std::string &file_path,
                           TransformD *lidar_extrinsic);
   // Load lidar height (the distance between lidar and ground).
-  bool LoadLidarHeight(const std::string& file_path, LidarHeight *height);
+  bool LoadLidarHeight(const std::string &file_path, LidarHeight *height);
 
   double ComputeDeltaYawLimit(const int64_t index_cur,
                               const int64_t index_stable,
-                              const double limit_min,
-                              const double limit_max);
+                              const double limit_min, const double limit_max);
 
  private:
   // Lidar localization.
@@ -126,7 +115,6 @@ class LocalizationLidarProcess {
   std::string map_path_;
   std::string lidar_extrinsic_file_;
   std::string lidar_height_file_;
-  bool debug_log_flag_;
   int localization_mode_;
   int yaw_align_mode_;
   int lidar_filter_size_;

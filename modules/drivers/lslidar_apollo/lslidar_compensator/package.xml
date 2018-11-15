@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+
+  <name>lslidar_compensator</name>
+  <version>2.0.0</version>
+  <description>
+    Point cloud conversions for Leishen C16 LIDARs.
+  </description>
+  <maintainer email="yutongyan@lslidar.com">yutongyan</maintainer>
+  <author>yutongyan</author>
+  <license>Licensed under the Apache License, Version 2.0 </license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>nodelet</depend>
+  <depend>angles</depend>
+  <depend>eigen_conversions</depend>
+  <depend>pcl_ros</depend>
+  <depend>pcl_conversions</depend>
+  <depend>libpcl-all-dev</depend>
+  <depend>libpcl-all</depend>
+
+  <depend>lslidar_msgs</depend>
+  <export>
+    <nodelet plugin="${prefix}/nodelet_lslidar_compensator.xml"/>
+  </export>
+</package>

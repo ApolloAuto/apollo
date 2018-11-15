@@ -1,0 +1,48 @@
+<launch>
+    <arg name="min_range" default="0.2" />
+    <arg name="max_range" default="150.0" />
+    <arg name="rpm" default="600"/>
+    <arg name="model" default="RS16" />
+    <arg name="frame_id" default="rslidar"/>
+    <arg name="msop_data_port" default="6699"/>
+    <arg name="difop_data_port" default="7788"/>
+    <arg name="curves_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/curves.csv"/>
+    <arg name="angle_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/angle.csv"/>
+    <arg name="channel_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/ChannelNum.csv"/>
+    <!-- 100ms -->
+    <arg name="tf_query_timeout" default="0.1"/>
+    <arg name="nodelet_manager_name" default="rslidar_nodelet_manager"/>
+
+
+  <include file="$(find rslidar_pointcloud)/launch/nodelet_manager.launch">
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
+  </include>
+
+  <!--  RS16 -->
+    <!--  driver nodelets -->
+  <include file="$(find rslidar_driver)/launch/driver_nodelet.launch">
+    <arg name="node_name" value="sensor_rslidar16_driver"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="rpm" value="$(arg rpm)"/>
+    <arg name="frame_id" value="$(arg frame_id)"/>
+    <arg name="topic" value="/apollo/sensor/rslidar/rslidarScan"/>
+    <arg name="msop_data_port" value="$(arg msop_data_port)"/>
+    <arg name="difop_data_port" value="$(arg difop_data_port)"/>
+  </include>
+
+  <!-- start cloud nodelet using test calibration file -->
+  <include file="$(find rslidar_pointcloud)/launch/convert_nodelet.launch">
+    <arg name="node_name" value="sensor_rslidar16_convert"/>
+    <arg name="nodelet_manager_name" value="$(arg nodelet_manager_name)"/>
+    <arg name="model" value="$(arg model)"/>
+    <arg name="curves_path" default="$(arg curves_path)" />
+    <arg name="angle_path" default="$(arg angle_path)" />
+    <arg name="channel_path" default="$(arg channel_path)" />
+    <arg name="min_range" default="$(arg min_range)" />
+    <arg name="max_range" default="$(arg max_range)" />
+    <arg name="topic_pointcloud" default="/apollo/sensor/rslidar/PointCloud2"/>
+    <arg name="topic_packets" default="/apollo/sensor/rslidar/rslidarScan"/>
+  </include>
+
+</launch>

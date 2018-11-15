@@ -95,11 +95,28 @@ cc_library(
 
 cc_library(
     name = "matrix_operations",
+    srcs = [
+        "matrix_operations.cc",
+    ],
     hdrs = [
         "matrix_operations.h",
     ],
     deps = [
         "@eigen",
+        "//modules/common:log",
+    ],
+)
+
+
+cc_test(
+    name = "matrix_operations_test",
+    size = "small",
+    srcs = [
+        "matrix_operations_test.cc",
+    ],
+    deps = [
+        ":matrix_operations",
+        "@gtest//:main",
     ],
 )
 
@@ -116,12 +133,14 @@ cc_library(
 )
 
 cc_library(
-    name = "kalman_filter_1d",
-    srcs = ["kalman_filter_1d.cc"],
-    hdrs = ["kalman_filter_1d.h"],
+    name = "extended_kalman_filter",
+    hdrs = [
+        "extended_kalman_filter.h",
+    ],
     deps = [
+        "//modules/common:log",
+        "//modules/common/math:matrix_operations",
         "@eigen",
-        "@yaml_cpp//:yaml",
     ],
 )
 

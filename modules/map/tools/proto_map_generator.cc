@@ -27,7 +27,7 @@ limitations under the License.
  * A map tool to transform opendrive map to pb map
  */
 
-DEFINE_string(output_dir, "/tmp/", "output map directory");
+DEFINE_string(output_dir, "/tmp", "output map directory");
 
 int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
@@ -43,15 +43,15 @@ int main(int argc, char **argv) {
 
   const std::string output_ascii_file = FLAGS_output_dir + "/base_map.txt";
   CHECK(apollo::common::util::SetProtoToASCIIFile(pb_map, output_ascii_file))
-      << "failed to outpupt ASCII format base map";
+      << "failed to output ASCII format base map";
 
   const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
   CHECK(apollo::common::util::SetProtoToBinaryFile(pb_map, output_bin_file))
-      << "failed to outpupt binary format base map";
+      << "failed to output binary format base map";
 
   pb_map.Clear();
   CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &pb_map))
-      << "load map fail";
+      << "failed to load map";
 
   AINFO << "load map success";
 

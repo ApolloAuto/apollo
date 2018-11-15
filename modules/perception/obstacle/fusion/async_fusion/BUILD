@@ -18,6 +18,7 @@ cc_library(
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/fusion/interface",
         "//modules/perception/obstacle/fusion/probabilistic_fusion",
+        "//modules/perception/proto:async_fusion_config_lib_proto",
         "@eigen",
     ],
 )

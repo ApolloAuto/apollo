@@ -41,9 +41,14 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
 CollisionChecker::CollisionChecker(
-    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
+    const std::vector<const Obstacle*>& obstacles,
+    const double ego_vehicle_s,
     const double ego_vehicle_d,
-    const std::vector<PathPoint>& discretized_reference_line) {
+    const std::vector<PathPoint>& discretized_reference_line,
+    const ReferenceLineInfo* ptr_reference_line_info,
+    const std::shared_ptr<PathTimeGraph>& ptr_path_time_graph) {
+  ptr_reference_line_info_ = ptr_reference_line_info;
+  ptr_path_time_graph_ = ptr_path_time_graph;
   BuildPredictedEnvironment(obstacles, ego_vehicle_s, ego_vehicle_d,
                             discretized_reference_line);
 }
@@ -79,23 +84,27 @@ bool CollisionChecker::InCollision(
 }
 
 void CollisionChecker::BuildPredictedEnvironment(
-    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
+    const std::vector<const Obstacle*>& obstacles,
+    const double ego_vehicle_s,
     const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line) {
   CHECK(predicted_bounding_rectangles_.empty());
 
   // If the ego vehicle is in lane,
   // then, ignore all obstacles from the same lane.
-  bool ego_vehicle_in_lane = IsEgoVehicleInLane(ego_vehicle_d);
+  bool ego_vehicle_in_lane = IsEgoVehicleInLane(ego_vehicle_s, ego_vehicle_d);
   std::vector<const Obstacle*> obstacles_considered;
   for (const Obstacle* obstacle : obstacles) {
     if (obstacle->IsVirtual()) {
       continue;
     }
     if (ego_vehicle_in_lane &&
-        ShouldIgnore(obstacle, ego_vehicle_s, discretized_reference_line)) {
+        (IsObstacleBehindEgoVehicle(obstacle, ego_vehicle_s,
+                                    discretized_reference_line) ||
+         !ptr_path_time_graph_->IsObstacleInGraph(obstacle->Id()))) {
       continue;
     }
+
     obstacles_considered.push_back(obstacle);
   }
 
@@ -116,11 +125,16 @@ void CollisionChecker::BuildPredictedEnvironment(
   }
 }
 
-bool CollisionChecker::IsEgoVehicleInLane(const double ego_vehicle_d) {
-  return std::fabs(ego_vehicle_d) < FLAGS_default_reference_line_width * 0.5;
+bool CollisionChecker::IsEgoVehicleInLane(
+    const double ego_vehicle_s, const double ego_vehicle_d) {
+  double left_width = FLAGS_default_reference_line_width * 0.5;
+  double right_width = FLAGS_default_reference_line_width * 0.5;
+  ptr_reference_line_info_->reference_line().GetLaneWidth(
+      ego_vehicle_s, &left_width, &right_width);
+  return ego_vehicle_d < left_width && ego_vehicle_d > -right_width;
 }
 
-bool CollisionChecker::ShouldIgnore(
+bool CollisionChecker::IsObstacleBehindEgoVehicle(
     const Obstacle* obstacle, const double ego_vehicle_s,
     const std::vector<PathPoint>& discretized_reference_line) {
   double half_lane_width = FLAGS_default_reference_line_width * 0.5;

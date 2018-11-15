@@ -29,6 +29,7 @@ namespace perception {
 
 class CNNAdapter {
  public:
+  virtual ~CNNAdapter() = default;
   virtual void forward() = 0;
 
   virtual boost::shared_ptr<caffe::Blob<float>> get_blob_by_name(

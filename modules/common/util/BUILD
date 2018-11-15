@@ -10,6 +10,7 @@ cc_library(
         "util.cc",
     ],
     hdrs = [
+        "blocking_queue.h",
         "file.h",
         "string_tokenizer.h",
         "util.h",
@@ -34,6 +35,7 @@ cc_test(
     ],
     deps = [
         ":util",
+        "//modules/common/util/testdata:simple_proto",
         "@gtest//:main",
     ],
 )
@@ -59,23 +61,6 @@ cc_test(
 cc_library(
     name = "lru_cache",
     hdrs = ["lru_cache.h"],
-)
-
-cc_library(
-    name = "ctpl_stl",
-    hdrs = ["ctpl_stl.h"],
-)
-
-cc_test(
-    name = "ctpl_stl_test",
-    size = "small",
-    srcs = [
-        "ctpl_stl_test.cc",
-    ],
-    deps = [
-        "//modules/common/util:ctpl_stl",
-        "@gtest//:main",
-    ],
 )
 
 cc_library(
@@ -244,6 +229,20 @@ cc_library(
         "//modules/common/util:string_util",
         "//third_party/json",
         "@curlpp",
+    ],
+)
+
+cc_library(
+    name = "thread_pool",
+    hdrs = [
+        "thread_pool.h",
+    ],
+    srcs = [
+        "thread_pool.cc",
+    ],
+    deps = [
+        "//modules/common:macro",
+        "@ctpl",
     ],
 )
 

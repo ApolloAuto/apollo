@@ -42,7 +42,7 @@ namespace perception {
 
 struct LaneFrameOptions {
   // used for initialization
-  SpaceType space_type = SpaceType::IMAGE;  // space type
+  SpaceType space_type = SpaceType::IMAGECOR;  // space type
   cv::Rect image_roi;
   bool use_cc = true;
   int min_cc_pixel_num = 10;  // minimum number of pixels of CC
@@ -81,15 +81,13 @@ class LaneFrame {
  public:
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
             const std::shared_ptr<NonMask>& non_mask,
-            const LaneFrameOptions& options,
-            const double scale,
+            const LaneFrameOptions& options, const double scale,
             const int start_y_pos);
 
   bool Init(const std::vector<ConnectedComponentPtr>& input_cc,
             const std::shared_ptr<NonMask>& non_mask,
             const std::shared_ptr<Projector<ScalarType>>& projector,
-            const LaneFrameOptions& options,
-            const double scale,
+            const LaneFrameOptions& options, const double scale,
             const int start_y_pos);
 
   void SetTransformer(const std::shared_ptr<Projector<ScalarType>>& projector) {
@@ -111,7 +109,7 @@ class LaneFrame {
 
   Bbox bbox(int i) const { return boxes_.at(i); }
 
-  bool FitPolyCurve(const int& graph_id, const ScalarType& graph_siz,
+  bool FitPolyCurve(const int graph_id, const ScalarType& graph_siz,
                     PolyModel* poly_coef, ScalarType* lateral_distance) const;
 
  protected:
@@ -125,8 +123,8 @@ class LaneFrame {
   int AddGroupIntoGraph(const Group& group, Graph* graph,
                         std::unordered_set<int>* hash_marker_idx);
 
-  int AddGroupIntoGraph(const Group& group, const int& start_marker_ascend_id,
-                        const int& end_marker_descend_id, Graph* graph,
+  int AddGroupIntoGraph(const Group& group, const int start_marker_ascend_id,
+                        const int end_marker_descend_id, Graph* graph,
                         std::unordered_set<int>* hash_marker_idx);
 
   void ComputeBbox();

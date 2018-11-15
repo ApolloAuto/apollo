@@ -21,7 +21,7 @@ namespace drivers {
 namespace velodyne {
 
 int OnlineCalibration::decode(
-    const velodyne_msgs::VelodyneScanUnified::ConstPtr& scan_msgs) {
+    velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msgs) {
   if (inited_) {
     return 0;
   }

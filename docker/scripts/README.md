@@ -4,10 +4,23 @@
 
 Please follow the
 [official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
+we also provide a bash script to install docker-ce
+
+```bash
+bash docker/setup_host/install_docker.sh
+```
 
 Don't forget the
 [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
+
+## Install nvidia-docker (optional)
+
+To use the host machine's GPUs, you need to install nvidia docker.
+
+```bash
+bash docker/setup_host/install_nvidia_docker.sh
+```
 ### Mac support
 
 We always recommend to run Apollo container on Ubuntu with the same version of

@@ -63,10 +63,8 @@ float get_jaccard_overlap(const NormalizedBBox &bbox1,
                           const NormalizedBBox &bbox2) {
   NormalizedBBox intersect_bbox;
   get_intersect_bbox(bbox1, bbox2, &intersect_bbox);
-  float intersect_width = 0.f;
-  float intersect_height = 0.f;
-  intersect_width = intersect_bbox.xmax - intersect_bbox.xmin;
-  intersect_height = intersect_bbox.ymax - intersect_bbox.ymin;
+  float intersect_width = intersect_bbox.xmax - intersect_bbox.xmin;
+  float intersect_height = intersect_bbox.ymax - intersect_bbox.ymin;
 
   if (intersect_width > 0 && intersect_height > 0) {
     float intersect_size = intersect_width * intersect_height;
@@ -80,7 +78,7 @@ float get_jaccard_overlap(const NormalizedBBox &bbox1,
 
 void get_max_score_index(const std::vector<float> &scores,
                          const float threshold, const int top_k,
-                         std::vector<std::pair<float, int> > *score_index_vec) {
+                         std::vector<std::pair<float, int>> *score_index_vec) {
   // Generate index score pairs.
   for (int i = 0; i < static_cast<int>(scores.size()); ++i) {
     if (scores[i] > threshold) {
@@ -107,7 +105,7 @@ void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
       << "bboxes and scores have different size.";
 
   // Get top_k scores (with corresponding indices).
-  std::vector<std::pair<float, int> > score_index_vec;
+  std::vector<std::pair<float, int>> score_index_vec;
   get_max_score_index(scores, score_threshold, top_k, &score_index_vec);
 
   // Do nms.
@@ -154,7 +152,7 @@ void cross_class_merge(std::vector<int> *indices_ref,
           bbox_target.ymax <= bbox_ref.ymax) {
         it = indices_target->erase(it);
       } else {
-        it++;
+        ++it;
       }
     }
   }

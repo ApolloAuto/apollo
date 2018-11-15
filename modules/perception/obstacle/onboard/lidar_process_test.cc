@@ -62,28 +62,9 @@ TEST_F(LidarProcessTest, test_Init) {
   EXPECT_TRUE(lidar_process_.Init());
   lidar_process_.inited_ = false;
 
-  FLAGS_work_root = "modules/perception/data";
-  FLAGS_enable_hdmap_input = false;
-  EXPECT_FALSE(lidar_process_.InitFrameDependence());
-  EXPECT_FALSE(lidar_process_.Init());
-  FLAGS_config_manager_path = "./config_manager_test/config_manager.config";
   FLAGS_enable_hdmap_input = false;
   EXPECT_TRUE(lidar_process_.InitFrameDependence());
-
-  FLAGS_onboard_roi_filter = "not_exit_algo";
-  FLAGS_onboard_segmentor = "not_exit_algo";
-  FLAGS_onboard_object_builder = "not_exit_algo";
-  FLAGS_onboard_tracker = "not_exit_algo";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-  FLAGS_onboard_roi_filter = "DummyROIFilter";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-
-  FLAGS_onboard_segmentor = "DummySegmentation";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-
-  FLAGS_onboard_object_builder = "DummyObjectBuilder";
-  EXPECT_FALSE(lidar_process_.InitAlgorithmPlugin());
-  EXPECT_FALSE(lidar_process_.Init());
+  EXPECT_TRUE(lidar_process_.Init());
 
   FLAGS_onboard_tracker = "DummyTracker";
   EXPECT_TRUE(lidar_process_.InitAlgorithmPlugin());
@@ -94,12 +75,13 @@ TEST_F(LidarProcessTest, test_Init) {
 
 TEST_F(LidarProcessTest, test_Process) {
   std::string pcd_file =
-      "modules/perception/data/hm_tracker_test/"
-      "QN68P2_12_1476265365_1476265665_2.pcd";
+      "modules/perception/data/cnnseg_test/"
+      "uscar_12_1470770225_1470770492_1349.pcd";
   PointCloudPtr point_cloud(new PointCloud);
   pcl::PointCloud<pcl_util::PointXYZIT>::Ptr org_cloud(
       new pcl::PointCloud<pcl_util::PointXYZIT>);
-  pcl::io::loadPCDFile(pcd_file, *org_cloud);
+  CHECK_NE(-1, pcl::io::loadPCDFile(pcd_file, *org_cloud));
+
   point_cloud->points.reserve(org_cloud->points.size());
   for (size_t i = 0; i < org_cloud->points.size(); ++i) {
     pcl_util::Point pt;

@@ -41,9 +41,7 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-std::string Control::Name() const {
-  return FLAGS_control_node_name;
-}
+std::string Control::Name() const { return FLAGS_control_node_name; }
 
 Status Control::Init() {
   init_time_ = Clock::NowInSeconds();
@@ -121,6 +119,7 @@ void Control::OnPad(const PadMessage &pad) {
   if (pad_msg_.action() == DrivingAction::RESET) {
     AINFO << "Control received RESET action!";
     estop_ = false;
+    estop_reason_.clear();
   }
   pad_received_ = true;
 }
@@ -147,6 +146,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
     control_command->mutable_engage_advice()->set_reason(
         status.error_message());
     estop_ = true;
+    estop_reason_ = status.error_message();
   } else {
     Status status_ts = CheckTimestamp();
     if (!status_ts.ok()) {
@@ -167,7 +167,12 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
 
   // check estop
-  estop_ = estop_ || trajectory_.estop().is_estop();
+  estop_ = FLAGS_enable_persistent_estop ?
+    estop_ || trajectory_.estop().is_estop() : trajectory_.estop().is_estop();
+
+  if (trajectory_.estop().is_estop()) {
+    estop_reason_ = "estop from planning";
+  }
 
   // if planning set estop, then no control process triggered
   if (!estop_) {
@@ -192,6 +197,7 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
              << " with cmd: " << control_command->ShortDebugString()
              << " status:" << status_compute.error_message();
       estop_ = true;
+      estop_reason_ = status_compute.error_message();
       status = status_compute;
     }
   }
@@ -240,6 +246,11 @@ void Control::OnTimer(const ros::TimerEvent &) {
       time_diff_ms < control_conf_.control_period());
   ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
+
+  // forward estop reason among following control frames.
+  if (estop_) {
+    control_command.mutable_header()->mutable_status()->set_msg(estop_reason_);
+  }
 
   SendCmd(&control_command);
 }
@@ -329,6 +340,17 @@ Status Control::CheckTimestamp() {
 
 void Control::SendCmd(ControlCommand *control_command) {
   // set header
+  if (AdapterManager::GetPlanning() &&
+      !AdapterManager::GetPlanning()->Empty()) {
+    const auto& planning =
+        AdapterManager::GetPlanning()->GetLatestObserved();
+    control_command->mutable_header()->set_lidar_timestamp(
+        planning.header().lidar_timestamp());
+    control_command->mutable_header()->set_camera_timestamp(
+        planning.header().camera_timestamp());
+    control_command->mutable_header()->set_radar_timestamp(
+        planning.header().radar_timestamp());
+  }
   AdapterManager::FillControlCommandHeader(Name(), control_command);
 
   ADEBUG << control_command->ShortDebugString();

@@ -18,29 +18,28 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
-#include "modules/common/util/file.h"
-#include "modules/drivers/canbus/can_comm/can_sender.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
+#include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
 
 namespace apollo {
 namespace canbus {
 namespace lincoln {
 
 using apollo::common::ErrorCode;
-using apollo::control::ControlCommand;
 using apollo::common::VehicleSignal;
+using apollo::control::ControlCommand;
 
 class LincolnControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     std::string canbus_conf_file =
-        "modules/canbus/testdata/conf/canbus_conf_test.pb.txt";
+        "modules/canbus/testdata/conf/mkz_canbus_conf_test.pb.txt";
     common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
     control_cmd_.set_throttle(20.0);

@@ -27,6 +27,7 @@ export default [
             perceptionVelocity: 'Velocity',
             perceptionHeading: 'Heading',
             perceptionId: 'Id',
+            perceptionObstacleInfo: 'Distance and Speed',
             perceptionLaneMarker: 'Lane Marker',
         },
         supportInOfflineView: true,
@@ -76,7 +77,7 @@ export default [
             positionLocalization: 'Localization',
             positionGps: 'GPS',
         },
-        supportInOfflineView: false,
+        supportInOfflineView: true,
     }, {
         id: 'map',
         title: 'Map',

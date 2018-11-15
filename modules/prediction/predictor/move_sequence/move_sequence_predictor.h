@@ -27,7 +27,9 @@
 #include <vector>
 #include <utility>
 #include "Eigen/Dense"
+#include "gtest/gtest.h"
 
+#include "modules/common/macro.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
@@ -54,18 +56,21 @@ class MoveSequencePredictor : public SequencePredictor {
    */
   void Predict(Obstacle* obstacle) override;
 
+  FRIEND_TEST(MoveSequencePredictorTest, Polynomial);
+  FRIEND_TEST(MoveSequencePredictorTest, Utils);
+
  private:
   void DrawMoveSequenceTrajectoryPoints(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
-  void GetLongitudinalPolynomial(
+  bool GetLongitudinalPolynomial(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
       std::pair<double, double>* lon_end_state,
       std::array<double, 5>* coefficients);
 
-  void GetLateralPolynomial(const Obstacle& obstacle,
+  bool GetLateralPolynomial(const Obstacle& obstacle,
                             const LaneSequence& lane_sequence,
                             const double time_to_end_state,
                             std::array<double, 6>* coefficients);

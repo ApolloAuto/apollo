@@ -1,0 +1,9 @@
+<library path="lib/libdriver_nodelet">
+  <class name="rslidar_driver/DriverNodelet"
+         type="apollo::drivers::rslidar::DriverNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description> 
+      Publish raw rslidar data packets.
+    </description>
+  </class>
+</library>

@@ -33,7 +33,7 @@ class PbfTrackManager {
 
   const std::vector<PbfTrackPtr> &GetTracks() const { return tracks_; }
 
-  void AddTrack(const PbfTrackPtr &track) { tracks_.push_back(track); }
+  void AddTrack(PbfTrackPtr track) { tracks_.push_back(track); }
 
   int RemoveLostTracks();
 

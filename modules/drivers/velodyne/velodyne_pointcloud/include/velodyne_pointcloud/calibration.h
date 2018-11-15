@@ -37,7 +37,7 @@ namespace velodyne {
 
 /** \brief correction values for a single laser
  *
- * Correction values for a single laser (as provided by db.xml from veleodyne)
+ * Correction values for a single laser (as provided by db.xml from velodyne)
  * Includes parameters for Velodyne HDL-64E S2.1 calibration.
  * http://velodynelidar.com/lidar/products/manual/63-HDL64E%20S2%20Manual_Rev%20D_2011_web.pdf
  **/

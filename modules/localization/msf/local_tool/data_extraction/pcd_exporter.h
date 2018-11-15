@@ -42,7 +42,7 @@ class PCDExporter : public BaseExporter {
 
  private:
   void WritePcdFile(const std::string &filename,
-                    const sensor_msgs::PointCloud2::ConstPtr &msg);
+                    sensor_msgs::PointCloud2::ConstPtr msg);
 
   std::string pcd_folder_;
   FILE *stamp_file_handle_;

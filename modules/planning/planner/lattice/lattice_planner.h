@@ -21,24 +21,25 @@
 #ifndef MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
 #define MODULES_PLANNING_PLANNER_LATTICE_LATTICE_PLANNER_H_
 
+#include <string>
 #include <vector>
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/lattice/behavior/behavior_decider.h"
-#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-class LatticePlanner : public Planner {
+class LatticePlanner : public PlannerWithReferenceLine {
  public:
   LatticePlanner() = default;
 
   virtual ~LatticePlanner() = default;
+
+  std::string Name() override { return "LATTICE"; }
 
   common::Status Init(const PlanningConfig& config) override {
     return common::Status::OK();
@@ -69,7 +70,7 @@ class LatticePlanner : public Planner {
 
   bool MapFutureTrajectoryToSL(
       const DiscretizedTrajectory& future_trajectory,
-      const std::vector<apollo::common::PathPoint>& discretized_reference_line,
+      const std::vector<common::PathPoint>& discretized_reference_line,
       std::vector<common::SpeedPoint>* st_points,
       std::vector<common::FrenetFramePoint>* sl_points);
 };

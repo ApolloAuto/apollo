@@ -48,12 +48,13 @@ class ProbabilisticFusion : public BaseFusion {
   // @param [out]: fused objects.
   // @return true if fuse successfully, otherwise return false
   virtual bool Fuse(const std::vector<SensorObjects> &multi_sensor_objects,
-                    std::vector<std::shared_ptr<Object>> *fused_objects);
+                    std::vector<std::shared_ptr<Object>> *fused_objects,
+                    FusionOptions *options);
 
   virtual std::string name() const;
 
  protected:
-  void FuseFrame(const PbfSensorFramePtr &frame);
+  void FuseFrame(PbfSensorFramePtr frame);
 
   /**@brief create new tracks for objects not assigned to current tracks*/
   void CreateNewTracks(
@@ -85,7 +86,8 @@ class ProbabilisticFusion : public BaseFusion {
   void FuseForegroundObjects(
       std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
       Eigen::Vector3d ref_point, const SensorType &sensor_type,
-      const std::string &sensor_id, double timestamp);
+      const std::string &sensor_id, double timestamp,
+      const Eigen::Matrix4d &sensor_world_pose);
 
  protected:
   /**@brief produce fusion result for PNC only when fusing sensor with
@@ -97,10 +99,7 @@ class ProbabilisticFusion : public BaseFusion {
   PbfTrackManager *track_manager_ = nullptr;
   std::mutex sensor_data_rw_mutex_;
   std::mutex fusion_mutex_;
-  bool use_radar_ = true;
-  bool use_lidar_ = true;
   bool use_camera_ = true;
-
   probabilistic_fusion_config::ModelConfigs config_;
 
  private:

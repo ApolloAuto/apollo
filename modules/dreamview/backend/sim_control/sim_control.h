@@ -95,8 +95,12 @@ class SimControl : SimControlInterface {
 
   void PublishLocalization(const apollo::common::TrajectoryPoint &point);
 
-  // Reset the start point, which can be a dummy point on the map or received
-  // from the routing module.
+  void InitAdapter();
+
+  void InitStartPoint(double start_velocity, double start_acceleration);
+
+  // Reset the start point, which can be a dummy point on the map, a current
+  // localization pose, or a start position received from the routing module.
   void SetStartPoint(const apollo::common::TrajectoryPoint &point);
 
   void Freeze();
@@ -126,11 +130,17 @@ class SimControl : SimControlInterface {
   // Number of planning received in terms of one RoutingResponse.
   int planning_count_ = -1;
 
+  // Whether planning has requested a re-routing.
   bool re_routing_triggered_ = false;
 
-  // Whether the sim control is enabled / initialized.
+  // Whether the sim control is enabled.
   bool enabled_ = false;
-  bool inited_ = false;
+
+  // Whether the adapter setup has been initialized.
+  bool adapter_inited_ = false;
+
+  // Whether start point is initialized from actual localization data
+  bool start_point_from_localization_ = false;
 
   // The header of the routing planning is following.
   apollo::common::Header current_routing_header_;
@@ -139,10 +149,6 @@ class SimControl : SimControlInterface {
   apollo::common::TrajectoryPoint next_point_;
 
   common::PathPoint adc_position_;
-
-  // Initial velocity and acceleration of the main vehicle
-  double start_velocity_ = 0.0;
-  double start_acceleration_ = 0.0;
 
   static constexpr int kPlanningCountToStart = 5;
 

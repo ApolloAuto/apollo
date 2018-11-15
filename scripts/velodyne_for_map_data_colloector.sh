@@ -33,7 +33,7 @@ function start() {
 }
 
 function stop() {
-    pkill -f start_velodyne
+    pkill -SIGTERM -f start_velodyne_for_map_data_collector.launch
 }
 
 # run command_name module_name

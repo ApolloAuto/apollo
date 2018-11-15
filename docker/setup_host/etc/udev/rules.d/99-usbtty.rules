@@ -1,0 +1,3 @@
+SUBSYSTEM=="tty", SUBSYSTEMS=="usb-serial", DRIVERS=="novatel_gps", ATTRS{port_number}=="0", MODE="0666", SYMLINK+="novatel0", OWNER="apollo", GROUP="apollo"
+SUBSYSTEM=="tty", SUBSYSTEMS=="usb-serial", DRIVERS=="novatel_gps", ATTRS{port_number}=="1", MODE="0666", SYMLINK+="novatel1", OWNER="apollo", GROUP="apollo"
+SUBSYSTEM=="tty", SUBSYSTEMS=="usb-serial", DRIVERS=="novatel_gps", ATTRS{port_number}=="2", MODE="0666", SYMLINK+="novatel2", OWNER="apollo", GROUP="apollo"

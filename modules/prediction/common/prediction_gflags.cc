@@ -27,7 +27,7 @@ DEFINE_string(prediction_conf_file,
 DEFINE_string(prediction_adapter_config_filename,
               "modules/prediction/conf/adapter.conf",
               "Default conf file for prediction");
-DEFINE_string(prediction_data_file_prefix, "data/prediction/feature",
+DEFINE_string(prediction_data_dir, "data/prediction/",
               "Prefix of files to store feature data");
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
@@ -36,8 +36,13 @@ DEFINE_double(
     "restrict the runtime duration.");
 
 DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
+DEFINE_string(
+    prediction_offline_bags, "",
+    "a list of bag files or directories for offline mode. The items need to be "
+    "separated by colon ':'.  If this value is not set, the prediction module "
+    "will use the listen to published ros topic mode.");
 
-DEFINE_double(prediction_duration, 5.0, "Prediction duration (in seconds)");
+DEFINE_double(prediction_duration, 8.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 20.0,
@@ -46,6 +51,8 @@ DEFINE_double(min_prediction_length, 20.0,
 // Bag replay timestamp gap
 DEFINE_double(replay_timestamp_gap, 10.0,
               "Max timestamp gap for rosbag replay");
+DEFINE_int32(max_num_dump_feature, 200000,
+             "Max number of features to dump");
 
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
@@ -58,13 +65,17 @@ DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
 DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
 DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
 DEFINE_double(max_speed, 35.0, "Max speed");
+DEFINE_double(max_angle_diff_to_adjust_velocity, M_PI / 6.0,
+              "The maximal angle diff to adjust velocity heading.");
 DEFINE_double(q_var, 0.01, "Processing noise covariance");
 DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
 DEFINE_double(go_approach_rate, 0.995,
               "The rate to approach to the reference line of going straight");
 
-DEFINE_int32(still_obstacle_history_length, 10,
+DEFINE_int32(min_still_obstacle_history_length, 4,
+             "Min # historical frames for still obstacles");
+DEFINE_int32(max_still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
 DEFINE_double(still_obstacle_speed_threshold, 2.0,
               "Speed threshold for still obstacles");
@@ -112,7 +123,11 @@ DEFINE_bool(adjust_velocity_by_obstacle_heading, false,
             "Use obstacle heading for velocity.");
 DEFINE_bool(adjust_velocity_by_position_shift, false,
             "adjust velocity heading to lane heading");
+DEFINE_bool(adjust_vehicle_heading_by_lane, true,
+            "adjust vehicle heading by lane");
 DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
+DEFINE_uint32(max_num_lane_point, 20,
+              "The maximal number of lane points to store");
 
 // Validation checker
 DEFINE_double(centripetal_acc_coeff, 0.5,

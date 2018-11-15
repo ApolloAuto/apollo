@@ -2,7 +2,7 @@
 该驱动基于ROS开发，支持ultrasonic ARS。
 
 ### 运行
-该驱动需要在apollo dock环境中运行。
+该驱动需要在apollo docker环境中运行。
 ```bash
 # in docker
 cd /apollo

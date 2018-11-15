@@ -17,21 +17,21 @@
 #ifndef MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
 #define MODULES_LOCALIZATION_MSF_LOCALIZATION_IMU_PROCESS_H_
 
+#include <atomic>
+#include <condition_variable>
 #include <list>
 #include <mutex>
 #include <queue>
 #include <string>
 #include <thread>
-#include <atomic>
-#include <condition_variable>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
+#include "include/sins.h"
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "include/sins.h"
 
 /**
  * @namespace apollo::localization::msf
@@ -57,26 +57,25 @@ class LocalizationIntegProcess {
   ~LocalizationIntegProcess();
 
   // Initialization.
-  apollo::common::Status Init(const LocalizationIntegParam& params);
+  apollo::common::Status Init(const LocalizationIntegParam &params);
 
   // Raw Imu process.
   void RawImuProcess(const ImuData &imu_msg);
   void GetState(IntegState *state);
   void GetResult(IntegState *state, LocalizationEstimate *localization);
-  void GetResult(IntegState *state,
-                 InsPva *sins_pva,
+  void GetResult(IntegState *state, InsPva *sins_pva,
                  double pva_covariance[9][9]);
 
   // itegration measure data process
-  void MeasureDataProcess(const MeasureData& measure_msg);
+  void MeasureDataProcess(const MeasureData &measure_msg);
 
  private:
-  bool CheckIntegMeasureData(const MeasureData& measure_data);
+  bool CheckIntegMeasureData(const MeasureData &measure_data);
 
   bool LoadGnssAntennaExtrinsic(const std::string &file_path,
                                 TransformD *extrinsic) const;
 
-  void MeasureDataProcessImpl(const MeasureData& measure_msg);
+  void MeasureDataProcessImpl(const MeasureData &measure_msg);
   void MeasureDataThreadLoop();
   void StartThreadLoop();
   void StopThreadLoop();
@@ -89,7 +88,6 @@ class LocalizationIntegProcess {
   // config
   TransformD gnss_antenna_extrinsic_;
 
-  bool debug_log_flag_;
   // double imu_rate_;
 
   IntegState integ_state_;

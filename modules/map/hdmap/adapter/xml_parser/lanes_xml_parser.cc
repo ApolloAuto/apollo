@@ -618,6 +618,10 @@ Status LanesXmlParser::ToPbLaneType(const std::string& type,
     *lane_type = hdmap::Lane::BIKING;
   } else if (upper_str == "PARKING") {
     *lane_type = hdmap::Lane::PARKING;
+  } else if (upper_str == "SHOULDER") {
+    *lane_type = hdmap::Lane::SHOULDER;
+  } else if (upper_str == "SIDEWALK") {
+    *lane_type = hdmap::Lane::SIDEWALK;
   } else {
     std::string err_msg = "Error or unsupport lane type:" + type;
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

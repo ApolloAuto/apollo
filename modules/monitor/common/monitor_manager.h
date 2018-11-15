@@ -34,16 +34,20 @@ namespace monitor {
 class MonitorManager {
  public:
   static const MonitorConf &GetConfig();
+  static void InitFrame(const double current_time);
   static SystemStatus *GetStatus();
   static HardwareStatus *GetHardwareStatus(const std::string &hardware_name);
   static ModuleStatus *GetModuleStatus(const std::string &module_name);
   static apollo::common::monitor::MonitorLogBuffer &LogBuffer();
+
+  static bool IsInAutonomousDriving();
 
  private:
   MonitorConf config_;
   SystemStatus status_;
   apollo::common::monitor::MonitorLogger logger_;
   apollo::common::monitor::MonitorLogBuffer log_buffer_;
+  bool in_autonomous_driving_ = false;
 
   DECLARE_SINGLETON(MonitorManager);
 };

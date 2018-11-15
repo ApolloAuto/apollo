@@ -1,0 +1,83 @@
+header {
+  module_name: "std_planning"
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    stop {
+      reason_code: STOP_REASON_STOP_SIGN
+      reason: "stop by SS_2203"
+      stop_point {
+        x: 586979.95439842215
+        y: 4141241.73174152
+      }
+      stop_heading: 2.7491778522192512
+      change_lane_type: FORWARD
+    }
+  }
+  object_decision {
+    decision {
+      id: "SS_2203"
+      perception_id: -1178283030
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_STOP_SIGN
+          distance_s: -1
+          stop_point {
+            x: 586979.95439842215
+            y: 4141241.73174152
+            z: 0
+          }
+          stop_heading: 2.7491778522192512
+        }
+      }
+    }
+  }
+  vehicle_signal {
+    turn_signal: TURN_RIGHT
+  }
+}
+routing_header {
+  timestamp_sec: 1526665914.2124095
+  module_name: "routing"
+  sequence_num: 2
+}
+right_of_way_status: PROTECTED
+lane_id {
+  id: "2687_1_-1"
+}
+lane_id {
+  id: "732_1_-1"
+}
+lane_id {
+  id: "141_1_-1"
+}
+lane_id {
+  id: "11108a_1_-1"
+}
+lane_id {
+  id: "11107_1_-1"
+}
+lane_id {
+  id: "18_1_-1"
+}
+lane_id {
+  id: "1811_1_-1"
+}
+lane_id {
+  id: "1809_1_-1"
+}
+lane_id {
+  id: "1808_1_-1"
+}
+lane_id {
+  id: "1805_1_-1"
+}
+lane_id {
+  id: "1804_1_-1"
+}
+engage_advice {
+  advice: KEEP_ENGAGED
+}
+trajectory_type: NORMAL

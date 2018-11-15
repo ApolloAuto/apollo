@@ -34,4 +34,5 @@ wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-ins
 bash bazel-0.5.3-installer-linux-x86_64.sh
 
 # Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
 rm -fr bazel-0.5.3-installer-linux-x86_64.sh /etc/apt/sources.list.d/bazel.list

@@ -220,7 +220,7 @@ unsigned int LossyMapMatrix2D::LoadBinary(unsigned char* buf) {
   cols_ = *p;
   ++p;
   // std::cerr << "rows: " << rows_ << ", clos: " << cols_ << std::endl;
-  float* pf = reinterpret_cast<float*>(p);
+  float* pf = reinterpret_cast<float*>(reinterpret_cast<void*>(p));
   alt_avg_min_ = *pf;
   ++pf;
   alt_avg_max_ = *pf;
@@ -316,7 +316,7 @@ unsigned int LossyMapMatrix2D::CreateBinary(unsigned char* buf,
     ++p;
     buf_size -= sizeof(unsigned int) * 2;
 
-    float* pf = reinterpret_cast<float*>(p);
+    float* pf = reinterpret_cast<float*>(reinterpret_cast<void*>(p));
     alt_avg_min_ = 1e8;
     alt_avg_max_ = -1e8;
     for (unsigned int y = 0; y < rows_; ++y) {

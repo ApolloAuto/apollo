@@ -20,6 +20,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include "modules/perception/proto/traffic_light/reviser_config.pb.h"
+
+#include "modules/common/util/file.h"
 #include "modules/perception/traffic_light/interface/base_reviser.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
 
@@ -57,10 +60,10 @@ class ColorReviser : public BaseReviser {
   std::string name() const override;
 
  private:
-  float blink_time_ = 0.0;
-  int enable_ = 0.0;
   std::unordered_map<std::string, TLColor> color_map_;
   std::unordered_map<std::string, double> time_map_;
+
+  traffic_light::reviser_config::ModelConfigs config_;
 };
 REGISTER_REVISER(ColorReviser);
 

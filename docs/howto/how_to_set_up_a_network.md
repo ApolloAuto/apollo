@@ -1,6 +1,6 @@
-# Setting up the Network
+### How to Set up the Network
 
-## Helpful hints before you begin:
+### Helpful hints before you begin:
 
 * The IPC that is running the Apollo software must access the Internet to acquire the Real Time Kinematic (RTK) data for accurate localization. A mobile device also needs to connect to the IPC to run the Apollo software.
 * It is recommended that you configure a fixed IP instead of using DHCP on the IPC to make it easier to connect to from a mobile terminal.
@@ -8,7 +8,7 @@
 
 ![4G_network_setup](https://github.com/tc87/apollo/blob/master/docs/quickstart/images/4G_network_setup.png)
 
-## Setting up the network:
+### Setting up the network:
 
 1.   Install and configure a 4G LTE router with Wi-Fi Access Point (AP) capability and Gigabit Ethernet ports.
 

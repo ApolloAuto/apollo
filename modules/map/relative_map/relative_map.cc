@@ -67,6 +67,9 @@ Status RelativeMap::Init() {
   }
 
   navigation_lane_.SetConfig(config_.navigation_lane());
+  const auto& map_param = config_.map_param();
+  navigation_lane_.SetDefaultWidth(map_param.default_left_width(),
+                                   map_param.default_right_width());
 
   AdapterManager::Init(adapter_conf_);
   if (!AdapterManager::GetPerceptionObstacles()) {
@@ -132,13 +135,19 @@ void RelativeMap::RunOnce() {
   AdapterManager::Observe();
 
   MapMsg map_msg;
-  CreateMapFromNavigationLane(&map_msg);
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    CreateMapFromNavigationLane(&map_msg);
+  }
   Publish(&map_msg);
 }
 
 void RelativeMap::OnReceiveNavigationInfo(
     const NavigationInfo& navigation_info) {
-  navigation_lane_.UpdateNavigationInfo(navigation_info);
+  {
+    std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
+    navigation_lane_.UpdateNavigationInfo(navigation_info);
+  }
 }
 
 bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
@@ -171,21 +180,26 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   }
 
   if (!navigation_lane_.GeneratePath()) {
-    LogErrorStatus(map_msg, "navigation lane fails to generate path");
+    LogErrorStatus(map_msg, "Failed to generate a navigation path.");
     return false;
   }
 
   if (navigation_lane_.Path().path().path_point_size() == 0) {
-    LogErrorStatus(map_msg, "navigation lane has no path points");
+    LogErrorStatus(map_msg,
+                   "There is no path point in currnet navigation path.");
     return false;
   }
 
   // create map proto from navigation_path
   if (!navigation_lane_.CreateMap(config_.map_param(), map_msg)) {
-    LogErrorStatus(map_msg, "Failed to create map from navigation path");
-    AERROR << "Failed to create map from navigation path";
+    LogErrorStatus(map_msg,
+                   "Failed to create map from current navigation path.");
+    AERROR << "Failed to create map from navigation path.";
     return false;
   }
+
+  ADEBUG << "There is/are " << map_msg->navigation_path().size()
+        << " navigation path(s) in the current reltative map.";
   return true;
 }
 

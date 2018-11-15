@@ -27,7 +27,6 @@
 #include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sequence_type_fuser/sequence_type_fuser.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/lidar/dummy/dummy_algorithms.h"
 #include "modules/perception/obstacle/lidar/object_builder/min_box/min_box.h"
 #include "modules/perception/obstacle/lidar/object_filter/low_object_filter/low_object_filter.h"
@@ -78,10 +77,8 @@ bool LidarProcessSubnode::InitInternal() {
     return false;
   }
   device_id_ = reserve_field_map["device_id"];
+  AddMessageCallback();
 
-  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
-  AdapterManager::AddPointCloudCallback(&LidarProcessSubnode::OnPointCloud,
-                                        this);
   inited_ = true;
 
   return true;
@@ -101,7 +98,7 @@ void LidarProcessSubnode::OnPointCloud(
 
   std::shared_ptr<SensorObjects> out_sensor_objects(new SensorObjects);
   out_sensor_objects->timestamp = timestamp_;
-  out_sensor_objects->sensor_type = SensorType::VELODYNE_64;
+  out_sensor_objects->sensor_type = GetSensorType();
   out_sensor_objects->sensor_id = device_id_;
   out_sensor_objects->seq_num = seq_num_;
 
@@ -111,8 +108,6 @@ void LidarProcessSubnode::OnPointCloud(
   if (!GetVelodyneTrans(kTimeStamp, velodyne_trans.get())) {
     AERROR << "failed to get trans at timestamp: "
            << GLOG_TIMESTAMP(kTimeStamp);
-    out_sensor_objects->error_code = common::PERCEPTION_ERROR_TF;
-    PublishDataAndEvent(timestamp_, out_sensor_objects);
     return;
   }
   out_sensor_objects->sensor2world_pose = *velodyne_trans;
@@ -128,6 +123,9 @@ void LidarProcessSubnode::OnPointCloud(
   // error_code_ = common::OK;
 
   /// call hdmap to get ROI
+  if (FLAGS_use_navigation_mode) {
+    AdapterManager::Observe();
+  }
   HdmapStructPtr hdmap = nullptr;
   if (hdmap_input_) {
     PointD velodyne_pose = {0.0, 0.0, 0.0, 0};  // (0,0,0)
@@ -151,8 +149,6 @@ void LidarProcessSubnode::OnPointCloud(
       roi_indices_ = roi_indices;
     } else {
       AERROR << "failed to call roi filter.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -174,8 +170,6 @@ void LidarProcessSubnode::OnPointCloud(
     if (!segmentor_->Segment(roi_cloud, non_ground_indices,
                              segmentation_options, &objects)) {
       AERROR << "failed to call segmention.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -191,8 +185,6 @@ void LidarProcessSubnode::OnPointCloud(
 
     if (!object_filter_->Filter(object_filter_options, &objects)) {
       AERROR << "failed to call object filter.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -205,8 +197,6 @@ void LidarProcessSubnode::OnPointCloud(
     ObjectBuilderOptions object_builder_options;
     if (!object_builder_->Build(object_builder_options, &objects)) {
       AERROR << "failed to call object builder.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -222,8 +212,6 @@ void LidarProcessSubnode::OnPointCloud(
     if (!tracker_->Track(objects, timestamp_, tracker_options,
                          &(out_sensor_objects->objects))) {
       AERROR << "failed to call tracker.";
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
@@ -237,15 +225,14 @@ void LidarProcessSubnode::OnPointCloud(
     type_fuser_options.timestamp = timestamp_;
     if (!type_fuser_->FuseType(type_fuser_options,
                                &(out_sensor_objects->objects))) {
-      out_sensor_objects->error_code = common::PERCEPTION_ERROR_PROCESS;
-      PublishDataAndEvent(timestamp_, out_sensor_objects);
       return;
     }
   }
   ADEBUG << "lidar process succ.";
   PERF_BLOCK_END("lidar_type_fuser");
 
-  PublishDataAndEvent(timestamp_, out_sensor_objects);
+  // if visualization mode, add the point cloud outside
+  PublishDataAndEvent(timestamp_, out_sensor_objects, &point_cloud);
   return;
 }
 
@@ -276,6 +263,16 @@ bool LidarProcessSubnode::InitFrameDependence() {
            << lidar_processing_data_name;
     return false;
   }
+
+  const std::string scene_processing_data_name("SceneSharedData");
+  scene_data_ = dynamic_cast<SceneSharedData*>(
+      shared_data_manager_->GetSharedData(scene_processing_data_name));
+  if (scene_data_ == nullptr) {
+    AERROR << "Failed to get shared data instance "
+           << scene_processing_data_name;
+    return false;
+  }
+
   AINFO << "Init shared data successfully, data: " << processing_data_->name();
 
   /// init hdmap
@@ -283,10 +280,6 @@ bool LidarProcessSubnode::InitFrameDependence() {
     hdmap_input_ = HDMapInput::instance();
     if (!hdmap_input_) {
       AERROR << "failed to get HDMapInput instance.";
-      return false;
-    }
-    if (!hdmap_input_->Init()) {
-      AERROR << "failed to Init HDMapInput";
       return false;
     }
     AINFO << "get and Init hdmap_input succ.";
@@ -339,10 +332,10 @@ bool LidarProcessSubnode::InitAlgorithmPlugin() {
         << object_builder_->name();
 
   /// init pre object filter
-  object_filter_.reset(
-      BaseObjectFilterRegisterer::GetInstanceByName("LowObjectFilter"));
+  object_filter_.reset(BaseObjectFilterRegisterer::GetInstanceByName(
+      FLAGS_onboard_object_filter));
   if (!object_filter_) {
-    AERROR << "Failed to get instance: ExtHdmapObjectFilter";
+    AERROR << "Failed to get instance: " << FLAGS_onboard_object_filter;
     return false;
   }
   if (!object_filter_->Init()) {
@@ -412,7 +405,8 @@ void LidarProcessSubnode::TransPointCloudToPCL(
 }
 
 void LidarProcessSubnode::PublishDataAndEvent(
-    double timestamp, const SharedDataPtr<SensorObjects>& data) {
+    double timestamp, const SharedDataPtr<SensorObjects>& data,
+    PointCloudPtr* cloud) {
   // set shared data
   std::string key;
   if (!SubnodeHelper::ProduceSharedDataKey(timestamp, device_id_, &key)) {
@@ -421,7 +415,19 @@ void LidarProcessSubnode::PublishDataAndEvent(
     return;
   }
 
+  AINFO << "lidar object size is " << data->objects.size();
+
   processing_data_->Add(key, data);
+
+  // adding point cloud to scene
+  if (cloud != nullptr) {
+    SharedDataPtr<SceneItem> sdata(new SceneItem());
+    sdata->timestamp = timestamp;
+    sdata->cloud = *cloud;
+    sdata->pose = data->sensor2world_pose;
+    scene_data_->Add(key, sdata);
+  }
+
   // pub events
   for (size_t idx = 0; idx < pub_meta_events_.size(); ++idx) {
     const EventMeta& event_meta = pub_meta_events_[idx];
@@ -431,6 +437,26 @@ void LidarProcessSubnode::PublishDataAndEvent(
     event.reserve = device_id_;
     event_manager_->Publish(event);
   }
+}
+SensorType Lidar64ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_64;
+}
+
+void Lidar64ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetPointCloud()) << "PointCloud is not initialized.";
+  AdapterManager::AddPointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
+}
+
+SensorType Lidar16ProcessSubnode::GetSensorType() const {
+  return SensorType::VELODYNE_16;
+}
+
+void Lidar16ProcessSubnode::AddMessageCallback() {
+  CHECK(AdapterManager::GetVLP16PointCloud())
+      << "VLP16 PointCloud is not initialized.";
+  AdapterManager::AddVLP16PointCloudCallback<LidarProcessSubnode>(
+      &LidarProcessSubnode::OnPointCloud, this);
 }
 
 }  // namespace perception

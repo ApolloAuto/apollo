@@ -31,8 +31,6 @@ using std::string;
 using std::map;
 using std::vector;
 
-using google::protobuf::TextFormat;
-
 DEFINE_int32(max_allowed_congestion_value, 0,
              "When DAGStreaming event_queues max length greater than "
              "max_allowed_congestion_value, reset DAGStreaming."
@@ -57,16 +55,8 @@ bool DAGStreaming::Init(const string& dag_config_path) {
   }
 
   DAGConfig dag_config;
-  string content;
-  if (!apollo::common::util::GetContent(dag_config_path, &content)) {
-    AERROR << "failed to laod DAGConfig file: " << dag_config_path;
-    return false;
-  }
-
-  if (!TextFormat::ParseFromString(content, &dag_config)) {
-    AERROR << "failed to Parse DAGConfig proto: " << dag_config_path;
-    return false;
-  }
+  CHECK(apollo::common::util::GetProtoFromFile(dag_config_path, &dag_config))
+      << "failed to load DAGConfig file: " << dag_config_path;
 
   if (!event_manager_.Init(dag_config.edge_config())) {
     AERROR << "failed to Init EventManager. file: " << dag_config_path;
@@ -128,9 +118,8 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
   map<SubnodeID, vector<EventID>> subnode_pub_events_map;
 
   for (auto& subnode_proto : subnode_config.subnodes()) {
-    std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool>
-        result = subnode_config_map.insert(
-            std::make_pair(subnode_proto.id(), subnode_proto));
+    std::pair<map<SubnodeID, DAGConfig::Subnode>::iterator, bool> result =
+        subnode_config_map.emplace(subnode_proto.id(), subnode_proto);
     if (!result.second) {
       AERROR << "duplicate SubnodeID: " << subnode_proto.id();
       return false;
@@ -160,9 +149,9 @@ bool DAGStreaming::InitSubnodes(const DAGConfig& dag_config) {
     const SubnodeID subnode_id = pair.first;
     Subnode* inst = SubnodeRegisterer::GetInstanceByName(subnode_config.name());
 
-//    AINFO << "subnode_name: " << subnode_config.name();
-//    AINFO << "subnode_id: " << subnode_id;
-    if (inst == NULL) {
+    //    AINFO << "subnode_name: " << subnode_config.name();
+    //    AINFO << "subnode_id: " << subnode_id;
+    if (inst == nullptr) {
       AERROR << "failed to get subnode instance. name: "
              << subnode_config.name();
       return false;
@@ -230,7 +219,7 @@ void DAGStreamingMonitor::Run() {
   }
 }
 
-Subnode* DAGStreaming::GetSubnodeByName(std::string name) {
+Subnode* DAGStreaming::GetSubnodeByName(const std::string& name) {
   std::map<std::string, SubnodeID>::iterator iter =
       subnode_name_map_.find(name);
   if (iter != subnode_name_map_.end()) {

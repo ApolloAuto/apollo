@@ -50,6 +50,7 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
+  ReferenceLineInfo() = default;
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
                              const common::TrajectoryPoint& adc_planning_point,
                              const ReferenceLine& reference_line,
@@ -61,12 +62,11 @@ class ReferenceLineInfo {
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   PathObstacle* AddObstacle(const Obstacle* obstacle);
-  void AddObstacleHelper(const Obstacle* obstacle, int* ret);
+  bool AddObstacleHelper(const Obstacle* obstacle);
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
   const ReferenceLine& reference_line() const;
-  const common::TrajectoryPoint& AdcPlanningPoint() const;
 
   bool ReachedDestination() const;
 
@@ -109,6 +109,7 @@ class ReferenceLineInfo {
       DiscretizedTrajectory* discretized_trajectory);
 
   const SLBoundary& AdcSlBoundary() const;
+  const SLBoundary& VehicleSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
   /**
@@ -116,6 +117,13 @@ class ReferenceLineInfo {
    * ADC's current position is not on this reference line.
    */
   bool IsChangeLanePath() const;
+
+  /**
+   * Check if the current reference line is the neighbor of the vehicle
+   * current position
+   */
+  bool IsNeighborLanePath() const;
+
   /**
    * Set if the vehicle can drive following this reference line
    * A planner need to set this value to true if the reference line is OK
@@ -124,6 +132,8 @@ class ReferenceLineInfo {
   bool IsDrivable() const;
 
   void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
+
+  bool IsSafeToChangeLane() const { return is_safe_to_change_lane_; }
 
   const hdmap::RouteSegments& Lanes() const;
   const std::list<hdmap::Id> TargetLaneId() const;
@@ -145,7 +155,22 @@ class ReferenceLineInfo {
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
+  uint32_t GetPriority() const { return reference_line_.GetPriority(); }
+
+  void SetPriority(uint32_t priority) { reference_line_.SetPriority(priority); }
+
+  void set_trajectory_type(
+      const ADCTrajectory::TrajectoryType trajectory_type) {
+    trajectory_type_ = trajectory_type;
+  }
+
+  ADCTrajectory::TrajectoryType trajectory_type() const {
+    return trajectory_type_;
+  }
+
  private:
+  bool CheckChangeLane() const;
+
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
   bool IsUnrelaventObstacle(PathObstacle* path_obstacle);
@@ -176,7 +201,18 @@ class ReferenceLineInfo {
 
   DiscretizedTrajectory discretized_trajectory_;
 
-  SLBoundary adc_sl_boundary_;
+  struct {
+    /**
+     * @brief SL boundary of stitching point (starting point of plan trajectory)
+     * relative to the reference line
+     */
+    SLBoundary adc_sl_boundary_;
+    /**
+     * @brief SL boundary of vehicle realtime state relative to the reference
+     * line
+     */
+    SLBoundary vehicle_sl_boundary_;
+  } sl_boundary_info_;
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;
@@ -185,6 +221,8 @@ class ReferenceLineInfo {
 
   bool is_on_reference_line_ = false;
 
+  bool is_safe_to_change_lane_ = false;
+
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 
   double offset_to_other_reference_line_ = 0.0;
@@ -192,6 +230,8 @@ class ReferenceLineInfo {
   double priority_cost_ = 0.0;
 
   PlanningTarget planning_target_;
+
+  ADCTrajectory::TrajectoryType trajectory_type_ = ADCTrajectory::UNKNOWN;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

@@ -82,7 +82,7 @@ bool ObjectBuilder::Build(const ContiRadar &raw_obstacles,
     object_ptr->width = 1.0;
     object_ptr->height = 1.0;
     object_ptr->type = ObjectType::UNKNOWN;
-    object_ptr->score_type = ScoreType::SCORE_RADAR;
+    object_ptr->score_type = PerceptionObstacle::CONFIDENCE_RADAR;
     object_ptr->score =
         static_cast<float>(raw_obstacles.contiobs(i).probexist());
 

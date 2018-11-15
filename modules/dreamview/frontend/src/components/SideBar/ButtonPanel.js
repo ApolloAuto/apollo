@@ -27,40 +27,35 @@ class SideBarButton extends React.PureComponent {
 
 export default class ButtonPanel extends React.PureComponent {
     render() {
-        const { enableHMIButtonsOnly, inNavigationMode,
-                onTasks, showTasks,
-                onModuleController, showModuleController,
-                onMenu, showMenu,
-                onRouteEditingBar, showRouteEditingBar,
-                onDataRecorder, showDataRecorder } = this.props;
+        const { settings } = this.props;
 
         return (
             <div className="main-panel">
                 <SideBarButton label="Tasks"
-                               disabled={false}
+                               disabled={settings.showTasks.disabled}
                                iconSrc={TasksIcon}
-                               onClick={onTasks}
-                               active={showTasks}/>
+                               onClick={settings.showTasks.onClick}
+                               active={settings.showTasks.active} />
                 <SideBarButton label="Module Controller"
-                               disabled={false}
+                               disabled={settings.showModuleController.disabled}
                                iconSrc={ModuleControllerIcon}
-                               onClick={onModuleController}
-                               active={showModuleController}/>
+                               onClick={settings.showModuleController.onClick}
+                               active={settings.showModuleController.active} />
                 <SideBarButton label="Layer Menu"
-                               disabled={enableHMIButtonsOnly}
+                               disabled={settings.showMenu.disabled}
                                iconSrc={LayerMenuIcon}
-                               onClick={onMenu}
-                               active={showMenu} />
+                               onClick={settings.showMenu.onClick}
+                               active={settings.showMenu.active} />
                 <SideBarButton label="Route Editing"
-                               disabled={enableHMIButtonsOnly || inNavigationMode}
+                               disabled={settings.showRouteEditingBar.disabled}
                                iconSrc={RouteEditingIcon}
-                               onClick={onRouteEditingBar}
-                               active={showRouteEditingBar} />
+                               onClick={settings.showRouteEditingBar.onClick}
+                               active={settings.showRouteEditingBar.active} />
                 <SideBarButton label="Data Recorder"
-                               disabled={enableHMIButtonsOnly}
+                               disabled={settings.showDataRecorder.disabled}
                                iconSrc={DataRecorderIcon}
-                               onClick={onDataRecorder}
-                               active={showDataRecorder} />
+                               onClick={settings.showDataRecorder.onClick}
+                               active={settings.showDataRecorder.active} />
             </div>
         );
     }

@@ -6,3 +6,7 @@ message SimpleMessage {
   optional int32 integer = 1;
   optional string text = 2;
 }
+
+message SimpleRepeatedMessage {
+    repeated SimpleMessage message = 1;
+}

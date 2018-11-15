@@ -16,6 +16,8 @@
 
 #include "modules/common/util/file.h"
 
+#include "boost/filesystem.hpp"
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "modules/common/log.h"
 #include "modules/common/util/testdata/simple.pb.h"
@@ -27,8 +29,9 @@ namespace util {
 class FileTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    system("exec rm -rf ${TEST_TMPDIR}/*");
     temp_dir = std::getenv("TEST_TMPDIR");
+    boost::filesystem::remove_all(temp_dir);
+    boost::filesystem::create_directory(temp_dir);
   }
 
   std::string FilePath(const std::string &file_name) {
@@ -98,9 +101,9 @@ TEST_F(FileTest, RemoveAllFiles) {
   EXPECT_FALSE(GetProtoFromASCIIFile(path2, &message));
 }
 
-TEST_F(FileTest, ListSubDirectories) {
+TEST_F(FileTest, ListSubPaths) {
   // Expect {'modules/common/util/testdata'}
-  const auto root_subdirs = ListSubDirectories("/");
+  const auto root_subdirs = ListSubPaths("/");
 
   // Some common root subdirs should exist.
   EXPECT_NE(root_subdirs.end(),
@@ -110,6 +113,19 @@ TEST_F(FileTest, ListSubDirectories) {
   // Something shouldn't exist.
   EXPECT_EQ(root_subdirs.end(),
             std::find(root_subdirs.begin(), root_subdirs.end(), "impossible"));
+}
+
+TEST_F(FileTest, Glob) {
+  // Match none.
+  EXPECT_TRUE(Glob("/path/impossible/*").empty());
+  // Match one.
+  EXPECT_THAT(Glob("/apollo"), testing::ElementsAre(std::string("/apollo")));
+  EXPECT_THAT(Glob("/apol?o"), testing::ElementsAre(std::string("/apollo")));
+  // Match multiple.
+  EXPECT_THAT(Glob("/apol?o/modules/p*"), testing::AllOf(
+      testing::Contains(std::string("/apollo/modules/perception")),
+      testing::Contains(std::string("/apollo/modules/planning")),
+      testing::Contains(std::string("/apollo/modules/prediction"))));
 }
 
 TEST_F(FileTest, GetAbsolutePath) {

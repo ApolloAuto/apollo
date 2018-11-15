@@ -18,8 +18,11 @@
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_CIPV_H_
 
 #include <array>
+#include <map>
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "Eigen/Eigen"
@@ -34,21 +37,24 @@ namespace apollo {
 namespace perception {
 
 struct CipvOptions {
-  float velocity = 0.0f;
+  float velocity = 5.0f;
   float yaw_rate = 0.0f;
   float yaw_angle = 0.0f;
 };
 
 const float MAX_DIST_OBJECT_TO_LANE_METER = 20.0f;
 const float MAX_VEHICLE_WIDTH_METER = 5.0f;
+const float EPSILON = 1.0e-6f;
+const std::size_t DROPS_HISTORY_SIZE = 100;
+const std::size_t MAX_OBJECT_NUM = 100;
+const std::size_t MAX_ALLOWED_SKIP_OBJECT = 10;
 
-// TODO(All) averatge image frame rate should come from other header file.
+// TODO(All) average image frame rate should come from other header file.
 const float AVERAGE_FRATE_RATE = 0.1f;
 
 class Cipv {
   // Member functions
  public:
-  //    friend class ::adu::perception::OnlineCalibrationService;
   Cipv(void);
   virtual ~Cipv(void);
 
@@ -56,8 +62,13 @@ class Cipv {
   virtual std::string Name() const;
 
   // Determine CIPV among multiple objects
-  bool DetermineCipv(std::shared_ptr<SensorObjects> sensor_objects,
-                     CipvOptions *options);  // override;
+  bool DetermineCipv(const LaneObjectsPtr lane_objects,
+                     const CipvOptions &options,
+                     std::vector<std::shared_ptr<Object>> *objects);
+
+  // Collect drops for tailgating
+  bool CollectDrops(const MotionBuffer &motion_buffer,
+                    std::vector<std::shared_ptr<Object>> *objects);
 
  private:
   // Distance from a point to a line segment
@@ -77,12 +88,12 @@ class Cipv {
                        const float yaw_rate, const float velocity,
                        EgoLane *egolane_image, EgoLane *egolane_ground);
 
-  // Get closest edge of an object in image cooridnate
+  // Get closest edge of an object in image coordinate
   bool FindClosestEdgeOfObjectImage(const std::shared_ptr<Object> &object,
                                     const EgoLane &egolane_image,
                                     LineSegment2Df *closted_object_edge);
 
-  // Get closest edge of an object in ground cooridnate
+  // Get closest edge of an object in ground coordinate
   bool FindClosestEdgeOfObjectGround(const std::shared_ptr<Object> &object,
                                      const EgoLane &egolane_ground,
                                      LineSegment2Df *closted_object_edge);
@@ -131,6 +142,10 @@ class Cipv {
                                      const float offset_distance,
                                      LaneLine *left_lane_line,
                                      LaneLine *right_lane_line);
+
+  // transform point to another using motion
+  bool TranformPoint(const Eigen::VectorXf &in, const MotionType &motion_matrix,
+                     Eigen::Vector3d *out);
   // Member variables
   bool b_image_based_cipv_ = false;
   int32_t debug_level_ = 0;
@@ -142,6 +157,11 @@ class Cipv {
   const float EGO_CAR_MARGIN_METER;
   const float EGO_CAR_VIRTUAL_LANE;
   const float EGO_CAR_HALF_VIRTUAL_LANE;
+
+  std::map<int, size_t> object_id_skip_count_;
+  std::map<int, boost::circular_buffer<std::pair<float, float>>>
+      object_trackjectories_;
+  std::map<int, std::vector<double>> object_timestamps_;
 };
 
 }  // namespace perception

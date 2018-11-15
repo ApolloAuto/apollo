@@ -64,6 +64,10 @@ class GemController final : public VehicleController {
    */
   Chassis chassis() override;
 
+  FRIEND_TEST(GemControllerTest, SetDrivingMode);
+  FRIEND_TEST(GemControllerTest, Status);
+  FRIEND_TEST(GemControllerTest, UpdateDrivingMode);
+
  private:
   // main logical function for operation the car enter or exit the auto driving
   void Emergency() override;

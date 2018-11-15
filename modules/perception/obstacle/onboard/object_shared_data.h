@@ -30,9 +30,7 @@ namespace perception {
    public:                                                   \
     data_name() : CommonSharedData<SensorObjects>() {}       \
     virtual ~data_name() {}                                  \
-    std::string name() const override {                      \
-      return #data_name;                                     \
-    }                                                        \
+    std::string name() const override { return #data_name; } \
                                                              \
    private:                                                  \
     DISALLOW_COPY_AND_ASSIGN(data_name);                     \
@@ -42,11 +40,13 @@ OBJECT_SHARED_DATA(LidarObjectData);
 OBJECT_SHARED_DATA(RadarObjectData);
 OBJECT_SHARED_DATA(CameraObjectData);
 OBJECT_SHARED_DATA(CIPVObjectData);
+OBJECT_SHARED_DATA(UltrasonicObjectData);
 
 REGISTER_SHAREDDATA(LidarObjectData);
 REGISTER_SHAREDDATA(RadarObjectData);
 REGISTER_SHAREDDATA(CameraObjectData);
 REGISTER_SHAREDDATA(CIPVObjectData);
+REGISTER_SHAREDDATA(UltrasonicObjectData);
 
 }  // namespace perception
 }  // namespace apollo

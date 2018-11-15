@@ -24,6 +24,7 @@ cc_library(
         "//modules/perception/obstacle/base",
         "//modules/perception/obstacle/lidar/interface",
         "//modules/perception/obstacle/onboard:hdmapinput",
+        "//modules/perception/proto:hdmap_roi_filter_config_lib_proto",
         "@eigen",
         "@pcl",
     ],
@@ -37,6 +38,7 @@ cc_test(
     ],
     data = [
         "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
     ],
     deps = [
         "//external:gflags",

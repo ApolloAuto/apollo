@@ -32,7 +32,7 @@ double TrackObjectDistance::s_point_num_distance_weight_ = 0.1;
 double TrackObjectDistance::s_histogram_distance_weight_ = 0.5;
 
 bool TrackObjectDistance::SetLocationDistanceWeight(
-    const float& location_distance_weight) {
+    const float location_distance_weight) {
   if (location_distance_weight >= 0) {
     s_location_distance_weight_ = location_distance_weight;
     AINFO << "location distance weight of TrackObjectDistance is "
@@ -44,7 +44,7 @@ bool TrackObjectDistance::SetLocationDistanceWeight(
 }
 
 bool TrackObjectDistance::SetDirectionDistanceWeight(
-    const float& direction_distance_weight) {
+    const float direction_distance_weight) {
   if (direction_distance_weight >= 0) {
     s_direction_distance_weight_ = direction_distance_weight;
     AINFO << "direction distance weight of TrackObjectDistance is "
@@ -56,7 +56,7 @@ bool TrackObjectDistance::SetDirectionDistanceWeight(
 }
 
 bool TrackObjectDistance::SetBboxSizeDistanceWeight(
-    const float& bbox_size_distance_weight) {
+    const float bbox_size_distance_weight) {
   if (bbox_size_distance_weight >= 0) {
     s_bbox_size_distance_weight_ = bbox_size_distance_weight;
     AINFO << "bbox size distance weight of TrackObjectDistance is "
@@ -68,7 +68,7 @@ bool TrackObjectDistance::SetBboxSizeDistanceWeight(
 }
 
 bool TrackObjectDistance::SetPointNumDistanceWeight(
-    const float& point_num_distance_weight) {
+    const float point_num_distance_weight) {
   if (point_num_distance_weight >= 0) {
     s_point_num_distance_weight_ = point_num_distance_weight;
     AINFO << "point num distance weight of TrackObjectDistance is "
@@ -80,7 +80,7 @@ bool TrackObjectDistance::SetPointNumDistanceWeight(
 }
 
 bool TrackObjectDistance::SetHistogramDistanceWeight(
-    const float& histogram_distance_weight) {
+    const float histogram_distance_weight) {
   if (histogram_distance_weight >= 0) {
     s_histogram_distance_weight_ = histogram_distance_weight;
     AINFO << "histogram distance weight of TrackObjectDistance is "
@@ -92,9 +92,9 @@ bool TrackObjectDistance::SetHistogramDistanceWeight(
 }
 
 float TrackObjectDistance::ComputeDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
     const std::shared_ptr<TrackedObject>& new_object) {
-  // Compute distance for given trakc & object
+  // Compute distance for given track & object
   float location_distance =
       ComputeLocationDistance(track, track_predict, new_object);
   float direction_distance =
@@ -112,9 +112,9 @@ float TrackObjectDistance::ComputeDistance(
 }
 
 float TrackObjectDistance::ComputeLocationDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
     const std::shared_ptr<TrackedObject>& new_object) {
-  // Compute locatin distance for given track & object
+  // Compute location distance for given track & object
   // range from 0 to positive infinity
   const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
   Eigen::Vector2f measured_anchor_point = new_object->anchor_point.head(2);
@@ -146,7 +146,7 @@ float TrackObjectDistance::ComputeLocationDistance(
 }
 
 float TrackObjectDistance::ComputeDirectionDistance(
-    const ObjectTrackPtr& track, const Eigen::VectorXf& track_predict,
+    ObjectTrackPtr track, const Eigen::VectorXf& track_predict,
     const std::shared_ptr<TrackedObject>& new_object) {
   // Compute direction distance for given track & object
   // range from 0 to 2
@@ -168,8 +168,7 @@ float TrackObjectDistance::ComputeDirectionDistance(
 }
 
 float TrackObjectDistance::ComputeBboxSizeDistance(
-    const ObjectTrackPtr& track,
-    const std::shared_ptr<TrackedObject>& new_object) {
+    ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object) {
   // Compute bbox size distance for given track & object
   // range from 0 to 1
   const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
@@ -202,8 +201,7 @@ float TrackObjectDistance::ComputeBboxSizeDistance(
 }
 
 float TrackObjectDistance::ComputePointNumDistance(
-    const ObjectTrackPtr& track,
-    const std::shared_ptr<TrackedObject>& new_object) {
+    ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object) {
   // Compute point num distance for given track & object
   // range from 0 and 1
   const std::shared_ptr<TrackedObject>& last_object = track->current_object_;
@@ -216,8 +214,7 @@ float TrackObjectDistance::ComputePointNumDistance(
 }
 
 float TrackObjectDistance::ComputeHistogramDistance(
-    const ObjectTrackPtr& track,
-    const std::shared_ptr<TrackedObject>& new_object) {
+    ObjectTrackPtr track, const std::shared_ptr<TrackedObject>& new_object) {
   // Compute histogram distance for given track & object
   // range from 0 to 3
   const std::shared_ptr<TrackedObject>& last_object = track->current_object_;

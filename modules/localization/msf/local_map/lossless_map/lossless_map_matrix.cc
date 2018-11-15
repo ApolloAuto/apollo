@@ -72,8 +72,8 @@ unsigned int LosslessMapSingleCell::LoadBinary(unsigned char* buf) {
   ++p;
   altitude_var = *p;
   ++p;
-  // TODO(Localization): this cast is NOT portable between different platforms
-  unsigned int* pp = reinterpret_cast<unsigned int*>(p);
+  unsigned int* pp = reinterpret_cast<unsigned int*>(
+          reinterpret_cast<void*>(p));
   count = *pp;
   return GetBinarySize();
 }
@@ -91,8 +91,8 @@ unsigned int LosslessMapSingleCell::CreateBinary(unsigned char* buf,
     ++p;
     *p = altitude_var;
     ++p;
-    // TODO(Localization): this cast is NOT portable between different platforms
-    unsigned int* pp = reinterpret_cast<unsigned int*>(p);
+    unsigned int* pp = reinterpret_cast<unsigned int*>(
+            reinterpret_cast<void*>(p));
     *pp = count;
   }
   return target_size;

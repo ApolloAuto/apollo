@@ -18,6 +18,7 @@
 #define MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "modules/map/relative_map/proto/navigation.pb.h"
@@ -81,6 +82,7 @@ class RelativeMap : public RelativeMapInterface {
   apollo::common::monitor::MonitorLogger monitor_logger_;
 
   NavigationLane navigation_lane_;
+  std::mutex navigation_lane_mutex_;
   ros::Timer timer_;
 };
 

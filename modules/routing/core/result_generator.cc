@@ -137,7 +137,7 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
   }
 
   bool allowed_to_explore = true;
-  while (allowed_to_explore) {
+  do {
     std::vector<NodeWithRange> pred_set;
     for (const auto& edge :
          curr_passage->nodes.front().GetTopoNode()->InFromPreEdge()) {
@@ -151,8 +151,9 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
       NodeWithRange reachable_node(pred_node, 0, 1);
       if (IsReachableToWithChangeLane(pred_node, prev_passage,
                                       &reachable_node)) {
-        if (range_manager.Find(pred_node)) {
-          double black_s_end = range_manager.RangeEnd(pred_node);
+        const auto* pred_range = range_manager.Find(pred_node);
+        if (pred_range != nullptr && !pred_range->empty()) {
+          double black_s_end = pred_range->back().EndS();
           if (!IsCloseEnough(black_s_end, pred_node->Length())) {
             pred_set.emplace_back(pred_node, black_s_end, pred_node->Length());
           }
@@ -164,12 +165,11 @@ void ResultGenerator::ExtendBackward(const TopoRangeManager& range_manager,
     if (pred_set.empty()) {
       allowed_to_explore = false;
     } else {
-      allowed_to_explore = true;
       const auto& node_to_insert = GetLargestRange(pred_set);
       curr_passage->nodes.insert(curr_passage->nodes.begin(), node_to_insert);
       node_set_of_curr_passage.emplace(node_to_insert.GetTopoNode());
     }
-  }
+  } while (allowed_to_explore);
 }
 
 void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
@@ -197,7 +197,7 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
   }
 
   bool allowed_to_explore = true;
-  while (allowed_to_explore) {
+  do {
     std::vector<NodeWithRange> succ_set;
     for (const auto& edge :
          curr_passage->nodes.back().GetTopoNode()->OutToSucEdge()) {
@@ -210,8 +210,9 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
       NodeWithRange reachable_node(succ_node, 0, 1.0);
       if (IsReachableFromWithChangeLane(succ_node, next_passage,
                                         &reachable_node)) {
-        if (range_manager.Find(succ_node)) {
-          double black_s_start = range_manager.RangeStart(succ_node);
+        const auto* succ_range = range_manager.Find(succ_node);
+        if (succ_range != nullptr && !succ_range->empty()) {
+          double black_s_start = succ_range->front().StartS();
           if (!IsCloseEnough(black_s_start, 0.0)) {
             succ_set.emplace_back(succ_node, 0.0, black_s_start);
           }
@@ -231,12 +232,11 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
     if (succ_set.empty()) {
       allowed_to_explore = false;
     } else {
-      allowed_to_explore = true;
       const auto& node_to_insert = GetLargestRange(succ_set);
       curr_passage->nodes.push_back(node_to_insert);
       node_set_of_curr_passage.emplace(node_to_insert.GetTopoNode());
     }
-  }
+  } while (allowed_to_explore);
 }
 
 void ResultGenerator::ExtendPassages(const TopoRangeManager& range_manager,

@@ -125,6 +125,7 @@ class LincolnController final : public VehicleController {
 
   void ResetProtocol();
   bool CheckChassisError();
+  bool CheckSafetyError(const canbus::ChassisDetail &chassis);
 
  private:
   void SecurityDogThreadFunc();

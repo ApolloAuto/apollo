@@ -195,12 +195,22 @@ void VisualizationEngine::Preprocess(const std::string &map_folder,
   std::string image_resolution_path = image_path + buf;
   AINFO << "image_resolution_path: " << image_resolution_path;
 
-  EnsureDirectory(image_visual_path);
-
-  if (DirectoryExists(image_visual_resolution_path_)) {
+  if (!EnsureDirectory(image_visual_path)) {
+    AERROR << "image_visual_path: " << image_visual_path
+           << " cannot be created.";
     return;
   }
-  EnsureDirectory(image_visual_resolution_path_);
+
+  if (DirectoryExists(image_visual_resolution_path_)) {
+    AINFO << "image_visual_resolution_path: " << image_visual_resolution_path_
+          << "already exists.";
+    return;
+  }
+  if (!EnsureDirectory(image_visual_resolution_path_)) {
+    AERROR << "image_visual_resolution_path: " << image_visual_resolution_path_
+           << " cannot be created.";
+    return;
+  }
 
   boost::filesystem::path image_resolution_path_boost(image_resolution_path);
   // push path of map's images to vector
@@ -256,8 +266,8 @@ void VisualizationEngine::Draw() {
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      subMat_[i]
-             [j].copyTo(big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
+      subMat_[i][j].copyTo(
+          big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
     }
   }
 
@@ -491,9 +501,10 @@ void VisualizationEngine::DrawLegend() {
     unsigned char b = color_table[i % 3][0];
     unsigned char g = color_table[i % 3][1];
     unsigned char r = color_table[i % 3][2];
-    cv::circle(image_window_, cv::Point(755, (15 + textSize.height) * (i + 1) -
-                                                 textSize.height / 2),
-               8, cv::Scalar(b, g, r), 3);
+    cv::circle(
+        image_window_,
+        cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2),
+        8, cv::Scalar(b, g, r), 3);
   }
 }
 

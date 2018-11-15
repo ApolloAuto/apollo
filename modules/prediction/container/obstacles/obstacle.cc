@@ -179,6 +179,11 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetNearbyLanes(&feature);
   SetLaneGraphFeature(&feature);
 
+  if (FLAGS_adjust_vehicle_heading_by_lane &&
+     type_ == PerceptionObstacle::VEHICLE) {
+    AdjustHeadingByLane(&feature);
+  }
+
   // Insert obstacle feature to history
   InsertFeatureToHistory(feature);
 
@@ -426,6 +431,23 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
          << std::setprecision(6) << velocity_heading << "] ";
   ADEBUG << "Obstacle [" << id_ << "] has speed [" << std::fixed
          << std::setprecision(6) << speed << "].";
+}
+
+void Obstacle::AdjustHeadingByLane(Feature* feature) {
+  if (!feature->has_lane() ||
+      !feature->lane().has_lane_feature()) {
+    return;
+  }
+  double velocity_heading = feature->velocity_heading();
+  double lane_heading = feature->lane().lane_feature().lane_heading();
+  double angle_diff = feature->lane().lane_feature().angle_diff();
+  if (std::abs(angle_diff) < FLAGS_max_angle_diff_to_adjust_velocity) {
+    velocity_heading = lane_heading;
+    double speed = feature->speed();
+    feature->mutable_velocity()->set_x(speed * std::cos(velocity_heading));
+    feature->mutable_velocity()->set_y(speed * std::sin(velocity_heading));
+    feature->set_velocity_heading(velocity_heading);
+  }
 }
 
 void Obstacle::UpdateVelocity(const double theta, double* velocity_x,
@@ -733,6 +755,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     lane_feature->set_lane_s(s);
     lane_feature->set_lane_l(l);
     lane_feature->set_angle_diff(angle_diff);
+    lane_feature->set_lane_heading(nearest_point_heading);
     lane_feature->set_dist_to_left_boundary(left - l);
     lane_feature->set_dist_to_right_boundary(right + l);
     if (std::fabs(angle_diff) < min_heading_diff) {
@@ -899,7 +922,9 @@ void Obstacle::SetLanePoints(Feature* feature) {
     double start_s = lane_sequence->lane_segment(lane_index).start_s();
     double total_s = 0.0;
     double lane_seg_s = start_s;
-    while (lane_index < lane_sequence->lane_segment_size()) {
+    std::size_t count_point = 0;
+    while (lane_index < lane_sequence->lane_segment_size() &&
+           count_point < FLAGS_max_num_lane_point) {
       if (lane_seg_s > lane_segment->end_s()) {
         start_s = lane_seg_s - lane_segment->end_s();
         lane_seg_s = start_s;
@@ -937,6 +962,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
         lane_point.set_angle_diff(lane_point_angle_diff);
         lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
         lane_segment->add_lane_point()->CopyFrom(lane_point);
+        ++count_point;
         total_s += FLAGS_target_lane_gap;
         lane_seg_s += FLAGS_target_lane_gap;
       }
@@ -992,7 +1018,8 @@ void Obstacle::SetMotionStatus() {
   double start_y = 0.0;
   double avg_drift_x = 0.0;
   double avg_drift_y = 0.0;
-  int len = std::min(history_size, FLAGS_still_obstacle_history_length);
+  int len = std::min(history_size, FLAGS_max_still_obstacle_history_length);
+  len = std::max(len, FLAGS_min_still_obstacle_history_length);
   CHECK_GT(len, 1);
 
   auto feature_riter = feature_history_.rbegin();

@@ -33,7 +33,7 @@ class RadarTrack {
  public:
   RadarTrack();
 
-  RadarTrack(const Object &obs, const double &timestamp);
+  RadarTrack(const Object &obs, const double timestamp);
 
   RadarTrack(const RadarTrack &track);
 
@@ -57,7 +57,7 @@ class RadarTrack {
 
   double GetTrackingTime();
 
-  static void SetTrackedTimesThreshold(const int &threshold) {
+  static void SetTrackedTimesThreshold(const int threshold) {
     s_tracked_times_threshold_ = threshold;
   }
 

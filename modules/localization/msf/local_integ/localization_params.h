@@ -38,8 +38,13 @@ namespace localization {
 namespace msf {
 
 struct ImuToAntOffset {
-  ImuToAntOffset() : offset_x(0.0), offset_y(0.0), offset_z(0.0),
-      uncertainty_x(0.0), uncertainty_y(0.0), uncertainty_z(0.0) {}
+  ImuToAntOffset()
+      : offset_x(0.0),
+        offset_y(0.0),
+        offset_z(0.0),
+        uncertainty_x(0.0),
+        uncertainty_y(0.0),
+        uncertainty_z(0.0) {}
   double offset_x;
   double offset_y;
   double offset_z;
@@ -60,21 +65,18 @@ struct LocalizationIntegParam {
   double sins_state_span_time = 60.0;
   double sins_state_pos_std = 1.0;
   double vel_threshold_get_yaw = 5.0;
-  bool integ_debug_log_flag = true;
   bool is_trans_gpstime_to_utctime = true;
   bool is_using_raw_gnsspos = true;
 
   // gnss module
   bool enable_ins_aid_rtk = false;
   ImuToAntOffset imu_to_ant_offset;
-  bool gnss_debug_log_flag = true;
 
   // lidar module
   std::string map_path = "";
   std::string lidar_extrinsic_file = "";
   std::string lidar_height_file = "";
   double lidar_height_default = 1.7;
-  bool lidar_debug_log_flag = true;
   int localization_mode = 2;
   int lidar_yaw_align_mode = 2;
   int lidar_filter_size = 17;
@@ -93,12 +95,8 @@ class LocalizationResult {
   LocalizationResult(const LocalizationMeasureState& state,
                      const LocalizationEstimate& localiztion)
       : state_(state), localization_(localiztion) {}
-  LocalizationMeasureState state() const {
-    return state_;
-  }
-  LocalizationEstimate localization() const {
-    return localization_;
-  }
+  LocalizationMeasureState state() const { return state_; }
+  LocalizationEstimate localization() const { return localization_; }
 
  private:
   LocalizationMeasureState state_;

@@ -22,3 +22,6 @@ set -e
 apt-get install -y supervisor
 # Add supervisord config file
 echo_supervisord_conf > /etc/supervisord.conf
+
+# Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*

@@ -22,6 +22,7 @@
 #define MODULES_PREDICTION_PREDICTION_H_
 
 #include <string>
+#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -81,6 +82,12 @@ class Prediction : public PredictionInterface {
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
   void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+
+  /**
+   * @brief process rosbag in offline mode, mainly for extracting prediction
+   * features.
+   */
+  void ProcessRosbag(const std::string &filename);
 
  private:
   double start_time_ = 0.0;

@@ -20,9 +20,14 @@ import os
 import logging
 import logging.handlers
 
-def init_log(log_path, level=logging.INFO, when="D", backup=7,
-             format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(message)s",
-             datefmt="%m-%d %H:%M:%S"):
+
+def init_log(
+        log_path,
+        level=logging.INFO,
+        when="D",
+        backup=7,
+        format="%(levelname)s: %(asctime)s: %(filename)s:%(lineno)d * %(thread)d %(message)s",
+        datefmt="%m-%d %H:%M:%S"):
     formatter = logging.Formatter(format, datefmt)
     logger = logging.getLogger()
     logger.setLevel(level)
@@ -31,16 +36,14 @@ def init_log(log_path, level=logging.INFO, when="D", backup=7,
     if not os.path.isdir(dir):
         os.makedirs(dir)
 
-    handler = logging.handlers.TimedRotatingFileHandler(log_path + ".log",
-                                                        when=when,
-                                                        backupCount=backup)
+    handler = logging.handlers.TimedRotatingFileHandler(
+        log_path + ".log", when=when, backupCount=backup)
     handler.setLevel(level)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
-    handler = logging.handlers.TimedRotatingFileHandler(log_path + ".log.wf",
-                                                        when=when,
-                                                        backupCount=backup)
+    handler = logging.handlers.TimedRotatingFileHandler(
+        log_path + ".log.wf", when=when, backupCount=backup)
     handler.setLevel(logging.WARNING)
     handler.setFormatter(formatter)
     logger.addHandler(handler)

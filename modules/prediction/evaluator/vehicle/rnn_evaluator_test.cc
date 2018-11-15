@@ -22,8 +22,12 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
+#include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -40,7 +44,25 @@ class RNNEvaluatorTest : public KMLMapBasedTest {
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
-TEST_F(RNNEvaluatorTest, OnLaneCase) {}
+TEST_F(RNNEvaluatorTest, OnLaneCase) {
+  EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
+                   1501183430.161906);
+  apollo::perception::PerceptionObstacle perception_obstacle =
+      perception_obstacles_.perception_obstacle(0);
+  EXPECT_EQ(perception_obstacle.id(), 1);
+  RNNEvaluator rnn_evaluator;
+  ObstaclesContainer container;
+  container.Insert(perception_obstacles_);
+  Obstacle* obstacle_ptr = container.GetObstacle(1);
+  EXPECT_TRUE(obstacle_ptr != nullptr);
+  rnn_evaluator.Evaluate(obstacle_ptr);
+  const Feature& feature = obstacle_ptr->latest_feature();
+  const LaneGraph& lane_graph = feature.lane().lane_graph();
+  for (const auto& lane_sequence : lane_graph.lane_sequence()) {
+    EXPECT_TRUE(lane_sequence.has_probability());
+  }
+  rnn_evaluator.Clear();
+}
 
 }  // namespace prediction
 }  // namespace apollo

@@ -28,7 +28,7 @@ function start() {
 }
 
 function stop() {
-    pkill -f pad_terminal
+    pkill -SIGKILL -f pad_terminal
 }
 
 case $1 in

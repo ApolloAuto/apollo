@@ -1,0 +1,8 @@
+name: "UnityRectify"
+version: "1.0.0"
+crop_scale: 2.5
+crop_min_size: 300
+detection_model: "modules/perception/model/traffic_light/det_all/2017-11-17/baidu_iter_120000.caffemodel"
+detection_net: "modules/perception/model/traffic_light/det_all/2017-11-17/deploy.prototxt"
+crop_method: 0
+detect_method: 0

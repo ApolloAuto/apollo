@@ -27,9 +27,7 @@ class MinBoxObjectBuilderTest : public testing::Test {
  protected:
   MinBoxObjectBuilderTest() {}
   ~MinBoxObjectBuilderTest() {}
-  void SetUp() {
-    min_box_object_builder_ = new MinBoxObjectBuilder();
-  }
+  void SetUp() { min_box_object_builder_ = new MinBoxObjectBuilder(); }
   void TearDown() {
     delete min_box_object_builder_;
     min_box_object_builder_ = nullptr;

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+PATH=/usr/local/cuda-8.0/bin:/apollo/scripts:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin: \
+LD_LIBRARY_PATH=/usr/lib64:$LD_LIBRARY_PATH \
+exec clang-6.0 "$@"
+

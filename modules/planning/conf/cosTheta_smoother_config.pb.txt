@@ -1,0 +1,17 @@
+max_constraint_interval : 5.0
+longitudinal_boundary_bound : 2.0
+lateral_boundary_bound : 0.25
+num_of_total_points : 500
+curb_shift : 0.2
+driving_side : RIGHT
+wide_lane_threshold_factor : 2.0
+wide_lane_shift_remain_factor : 0.5
+
+cos_theta {
+  max_point_deviation: 0.5
+  relax: 0.25
+  num_of_iteration: 500
+  weight_cos_included_angle: 1e6
+  acceptable_tol: 1e-1
+  reopt_qp_bound: 0.05
+}

@@ -195,7 +195,7 @@ void MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
   }
 }
 
-void MoveSequencePredictor::GetLongitudinalPolynomial(
+bool MoveSequencePredictor::GetLongitudinalPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
     std::pair<double, double>* lon_end_vt,
     std::array<double, 5>* coefficients) {
@@ -234,9 +234,10 @@ void MoveSequencePredictor::GetLongitudinalPolynomial(
   coefficients->operator[](4) = -0.5 / p3 * b0 + 0.25 / p2 * b1;
   lon_end_vt->first = lon_end_state.first;
   lon_end_vt->second = lon_end_state.second;
+  return true;
 }
 
-void MoveSequencePredictor::GetLateralPolynomial(
+bool MoveSequencePredictor::GetLateralPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
     const double time_to_end_state, std::array<double, 6>* coefficients) {
   CHECK_GT(obstacle.history_size(), 0);
@@ -278,6 +279,7 @@ void MoveSequencePredictor::GetLateralPolynomial(
   coefficients->operator[](3) = 0.5 * (20.0 * c0 - 8.0 * c1 + c2);
   coefficients->operator[](4) = (-15.0 * c0 + 7.0 * c1 - c2) / p;
   coefficients->operator[](5) = (6.0 * c0 - 3.0 * c1 + 0.5 * c2) / p2;
+  return true;
 }
 
 double MoveSequencePredictor::ComputeTimeToLatEndConditionByVelocity(

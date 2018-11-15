@@ -109,6 +109,7 @@ class Control : public apollo::common::ApolloApp {
   ControllerAgent controller_agent_;
 
   bool estop_ = false;
+  std::string estop_reason_;
   bool pad_received_ = false;
 
   unsigned int status_lost_ = 0;

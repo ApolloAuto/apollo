@@ -44,6 +44,8 @@
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "std_msgs/String.h"
+#include "velodyne_msgs/VelodyneScanUnified.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -196,7 +198,7 @@ class Adapter : public AdapterBase {
    * @brief Data callback when receiving a message. Under the hood it calls
    * the callback ROS would invoke, useful when trying to emulate the callback
    * behavior when there's not a ROS.
-   * @param data the input data.
+   * @param message the input data.
    */
   void OnReceive(const D& message) {
     RosCallback(boost::make_shared<D const>(message));
@@ -230,9 +232,9 @@ class Adapter : public AdapterBase {
   /**
    * @brief returns the most recent message in the observing queue.
    *
-   * /note
+   * \note
    * Please call Empty() to make sure that there is data in the
-   * queue before calling GetOldestObserved().
+   * queue before calling GetLatestObserved().
    */
   const D& GetLatestObserved() const {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -328,7 +330,7 @@ class Adapter : public AdapterBase {
     latest_published_data_.reset(new D(data));
   }
 
-  const D* GetLatestPublished() { return latest_published_data_.get(); }
+  const D* GetLatestPublished() const { return latest_published_data_.get(); }
 
   /**
    * @brief Gets message delay.
@@ -389,6 +391,14 @@ class Adapter : public AdapterBase {
   }
   bool FeedFile(const std::string& message_file,
                 IdentifierType<::sensor_msgs::Image>) {
+    return false;
+  }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<::std_msgs::String>) {
+    return false;
+  }
+  bool FeedFile(const std::string& message_file,
+                IdentifierType<velodyne_msgs::VelodyneScanUnified>) {
     return false;
   }
   // HasSequenceNumber returns false for non-proto-message data types.
@@ -463,7 +473,7 @@ class Adapter : public AdapterBase {
    * message is received.
    * @param message the newly received message.
    */
-  void RosCallback(const DataPtr& message) {
+  void RosCallback(DataPtr message) {
     last_receive_time_ = apollo::common::time::Clock::NowInSeconds();
     EnqueueData(message);
     FireCallbacks(*message);
@@ -484,7 +494,7 @@ class Adapter : public AdapterBase {
    * @brief push the shared-pointer-guarded data to the data queue of
    * the adapter.
    */
-  void EnqueueData(const DataPtr& data) {
+  void EnqueueData(DataPtr data) {
     if (enable_dump_) {
       DumpMessage<D>(*data);
     }
@@ -538,6 +548,17 @@ class Adapter : public AdapterBase {
 
   friend class AdapterManager;
 };
+
+#define CHECK_ADAPTER(NAME)                                               \
+  if (AdapterManager::Get##NAME() == nullptr) {                           \
+    AERROR << #NAME << " is not registered";                              \
+    return Status(ErrorCode::PLANNING_ERROR, #NAME " is not registered"); \
+  }
+
+#define CHECK_ADAPTER_IF(CONDITION, NAME) \
+  if (CONDITION) {                        \
+    CHECK_ADAPTER(NAME);                  \
+  }
 
 }  // namespace adapter
 }  // namespace common

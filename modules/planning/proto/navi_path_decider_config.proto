@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message NaviPathDeciderConfig {
+  optional double min_path_length = 1 [default = 5];
+  optional uint32 min_look_forward_time = 2 [default = 2];
+  optional double max_keep_lane_distance = 3 [default = 0.8];
+  optional double max_keep_lane_shift_y = 4 [default = 20.0];
+  optional double min_keep_lane_offset = 5 [default = 15.0];
+  optional double keep_lane_shift_compensation = 6 [default = 0.01];
+  optional MoveDestLaneConfigTable move_dest_lane_config_talbe = 7;
+  optional double move_dest_lane_compensation = 8 [default = 0.35];
+  optional double max_kappa_threshold = 9 [default = 0.0];
+  optional double kappa_move_dest_lane_compensation = 10 [default = 0.0];
+  optional uint32 start_plan_point_from = 11 [default = 0];
+}
+
+message MoveDestLaneConfigTable {
+  repeated ShiftConfig lateral_shift = 1;
+}
+
+message ShiftConfig {
+  optional double max_speed = 1 [default = 4.16];
+  optional double max_move_dest_lane_shift_y = 3 [default = 0.4];
+}

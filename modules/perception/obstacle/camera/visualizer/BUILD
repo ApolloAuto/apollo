@@ -26,6 +26,7 @@ cc_library(
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/base",
+        "//modules/perception/obstacle/camera/cipv:camera_cipv",
         "//modules/perception/obstacle/camera/lane_post_process/common:type",
         "//modules/perception/obstacle/camera/lane_post_process/common:util",
         "//modules/perception/obstacle/camera/visualizer/common",

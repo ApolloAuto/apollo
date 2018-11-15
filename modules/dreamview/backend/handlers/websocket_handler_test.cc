@@ -82,5 +82,26 @@ TEST(WebSocketTest, IntegrationTest) {
   EXPECT_THAT(client.GetReceivedMessages(), ElementsAre("0", "1", "2"));
 }
 
+TEST(WebSocketTest, handleData) {
+  // NOTE: Here a magic number is picked up as the port, which is not ideal but
+  // in almost all cases this should be fine for a small integration test.
+  CivetServer server({"listening_ports", "32695"});
+  server.addWebSocketHandler("/websocket", handler);
+  handler.RegisterMessageHandler("test",
+                                 [this](const WebSocketHandler::Json &json,
+                                        WebSocketHandler::Connection *conn) {
+                                   AINFO << "Received test request.";
+                                 });
+
+  // Wait for a small amount of time to make sure that the server is up.
+  std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+  mg_connection *conn;
+  std::string data = "{\"type\":\"test\"}";
+  char *data_char = const_cast<char *>(data.c_str());
+  EXPECT_TRUE(
+      handler.handleData(&server, conn, 0x81, data_char, data.length()));
+}
+
 }  // namespace dreamview
 }  // namespace apollo

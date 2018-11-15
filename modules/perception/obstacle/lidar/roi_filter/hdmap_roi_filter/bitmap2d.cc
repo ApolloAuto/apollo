@@ -33,8 +33,8 @@ void Bitmap2D::Set(const double x, const double min_y, const double max_y) {
   Set(x_id, min_y_id, max_y_id);
 }
 
-void Bitmap2D::Set(const size_t& x_id, const size_t& min_y_id,
-                   const size_t& max_y_id) {
+void Bitmap2D::Set(const size_t x_id, const size_t min_y_id,
+                   const size_t max_y_id) {
   size_t left_block_id = min_y_id >> 6;  // min_y_id / 64
   size_t left_bit_id = min_y_id & 63;    // min_y_id % 64
 
@@ -54,16 +54,16 @@ void Bitmap2D::Set(const size_t& x_id, const size_t& min_y_id,
   }
 }
 
-inline void Bitmap2D::SetUint64RangeBits(const size_t& head, const size_t& tail,
+inline void Bitmap2D::SetUint64RangeBits(const size_t head, const size_t tail,
                                          uint64_t* block) {
   *block |= (all_ones >> head) & (~(all_ones >> tail));
 }
 
-inline void Bitmap2D::SetUint64HeadBits(const size_t& head, uint64_t* block) {
+inline void Bitmap2D::SetUint64HeadBits(const size_t head, uint64_t* block) {
   *block |= all_ones >> head;
 }
 
-inline void Bitmap2D::SetUint64TailBits(const size_t& tail, uint64_t* block) {
+inline void Bitmap2D::SetUint64TailBits(const size_t tail, uint64_t* block) {
   *block |= (~(all_ones >> tail));
 }
 
@@ -88,7 +88,7 @@ bool Bitmap2D::Check(const Eigen::Vector2d& p) const {
   size_t block_id = major_grid_pt.y() >> 6;  // major_grid_pt.y() / 64
   size_t bit_id = major_grid_pt.y() & 63;    // major_grid_pt.y() % 64
 
-  const uint64_t& block = bitmap_[x_id][block_id];
+  const uint64_t block = bitmap_[x_id][block_id];
 
   const uint64_t first_one = static_cast<uint64_t>(1) << 63;
   return block & (first_one >> bit_id);

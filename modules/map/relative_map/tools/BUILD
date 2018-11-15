@@ -12,4 +12,15 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "navigator",
+    srcs = ["navigator.cc"],
+    deps = [
+        "//modules/common",
+        "//modules/map/relative_map:relative_map_lib",
+        "//third_party/json",
+        "@ros//:ros_common",
+    ],
+)
+
 cpplint()

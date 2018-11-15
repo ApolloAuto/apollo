@@ -93,7 +93,7 @@ bool FeatureGenerator<Dtype>::Init(const FeatureParam& feature_param,
 
 template <typename Dtype>
 void FeatureGenerator<Dtype>::Generate(
-    const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr) {
+    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr) {
   const auto& points = pc_ptr->points;
 
   // DO NOT remove this line!!!
@@ -159,13 +159,13 @@ template bool FeatureGenerator<float>::Init(const FeatureParam& feature_param,
                                             caffe::Blob<float>* blob);
 
 template void FeatureGenerator<float>::Generate(
-    const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
+    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
 
 template bool FeatureGenerator<double>::Init(const FeatureParam& feature_param,
                                              caffe::Blob<double>* blob);
 
 template void FeatureGenerator<double>::Generate(
-    const apollo::perception::pcl_util::PointCloudConstPtr& pc_ptr);
+    apollo::perception::pcl_util::PointCloudConstPtr pc_ptr);
 
 }  // namespace cnnseg
 }  // namespace perception

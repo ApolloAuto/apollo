@@ -46,7 +46,7 @@ options:
     showModuleController: false
     showMenu: false
     showPOI: false
-    enableVoiceCommand: false
+    enableAudioCapture: false
     showPNCMonitor: false
     showRouteEditingBar: false
     showDataRecorder: false
@@ -74,6 +74,7 @@ options:
     showObstaclesVelocity: true
     showObstaclesHeading: true
     showObstaclesId: true
+    showObstaclesInfo: true
     showPointCloud: false
     showPositionGps: false
     showPositionLocalization: true

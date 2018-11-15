@@ -18,7 +18,7 @@ find_package( PCL REQUIRED COMPONENTS common )
 find_package( OpenCV REQUIRED )
 
 catkin_package()
-set (CMAKE_CXX_FLAGS "-fPIC --std=c++11")
+set (CMAKE_CXX_FLAGS "-fPIC -std=c++11")
 
 add_subdirectory(src/Pandar40P)
 

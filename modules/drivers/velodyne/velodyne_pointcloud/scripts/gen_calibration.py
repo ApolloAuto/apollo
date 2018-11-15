@@ -182,7 +182,7 @@ for el in db.find('DB/points_'):
                     addLaserCalibration(index, 'vert_correction',
                                         math.radians(float(field.text)))
                 elif field.tag == 'distCorrection_':
-                    addLaserCalibration(index, 'dist_correction', 
+                    addLaserCalibration(index, 'dist_correction',
                                         float(field.text) * cm2meters)
                 elif field.tag == 'distCorrectionX_':
                     addLaserCalibration(index, 'dist_correction_x',
@@ -197,7 +197,7 @@ for el in db.find('DB/points_'):
                     addLaserCalibration(index, 'horiz_offset_correction',
                                         float(field.text) * cm2meters)
                 elif field.tag == 'focalDistance_':
-                    addLaserCalibration(index, 'focal_distance', 
+                    addLaserCalibration(index, 'focal_distance',
                                         float(field.text) * cm2meters)
                 elif field.tag == 'focalSlope_':
                     addLaserCalibration(index, 'focal_slope', float(field.text))

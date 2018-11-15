@@ -49,7 +49,7 @@ class CIPVSubnode : public Subnode {
 
   bool GetSharedData(const Event& event,
                      std::shared_ptr<SensorObjects>* sensor_objects);
-  void PublishDataAndEvent(const float& timestamp,
+  void PublishDataAndEvent(const float timestamp,
                            const SharedDataPtr<SensorObjects>& sensor_objects,
                            CIPVObjectData* cipv_object_data);
 

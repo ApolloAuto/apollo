@@ -26,8 +26,24 @@ cc_library(
         ":trajectory",
         "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:planning_util",
+        "//modules/planning/common:planning_context",
         "@eigen//:eigen",
+    ],
+)
+
+cc_test(
+    name = "discretized_trajectory_test",
+    size = "small",
+    srcs = [
+        "discretized_trajectory_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":discretized_trajectory",
+        "//modules/common/util",
+        "@gtest//:main",
     ],
 )
 
@@ -42,6 +58,22 @@ cc_library(
     deps = [
         ":discretized_trajectory",
         "//modules/planning/proto:planning_proto",
+    ],
+)
+
+cc_test(
+    name = "publishable_trajectory_test",
+    size = "small",
+    srcs = [
+        "publishable_trajectory_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":publishable_trajectory",
+        "//modules/common/util",
+        "@gtest//:main",
     ],
 )
 

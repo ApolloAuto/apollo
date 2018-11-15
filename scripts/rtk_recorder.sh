@@ -21,8 +21,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 cd "${DIR}/.."
 
-set -x
-
 function setup() {
   bash scripts/canbus.sh start
   bash scripts/gps.sh start
@@ -43,7 +41,7 @@ function start() {
 }
 
 function stop() {
-  pkill -f rtk_recorder.py
+  pkill -SIGKILL -f rtk_recorder.py
 }
 
 case $1 in

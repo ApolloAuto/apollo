@@ -24,10 +24,11 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include <limits>
 
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/common/math/polygon2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map_id.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -56,8 +57,8 @@ double PredictionMap::HeadingOnLane(std::shared_ptr<const LaneInfo> lane_info,
   return lane_info->Heading(s);
 }
 
-double PredictionMap::CurvatureOnLane(
-    const std::string& lane_id, const double s) {
+double PredictionMap::CurvatureOnLane(const std::string& lane_id,
+                                      const double s) {
   std::shared_ptr<const hdmap::LaneInfo> lane_info = LaneById(lane_id);
   return lane_info->Curvature(s);
 }
@@ -139,21 +140,20 @@ void PredictionMap::OnLane(
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
 
   common::PointENU hdmap_point;
-  hdmap_point.set_x(point[0]);
-  hdmap_point.set_y(point[1]);
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
   if (HDMapUtil::BaseMap().GetLanesWithHeading(hdmap_point, radius, heading,
                                                max_lane_angle_diff,
                                                &candidate_lanes) != 0) {
     return;
   }
 
-  const common::math::Vec2d vec_point(point[0], point[1]);
   std::vector<std::pair<std::shared_ptr<const LaneInfo>, double>> lane_pairs;
   for (const auto& candidate_lane : candidate_lanes) {
     if (candidate_lane == nullptr) {
       continue;
     }
-    if (on_lane && !candidate_lane->IsOnLane(vec_point)) {
+    if (on_lane && !candidate_lane->IsOnLane({point.x(), point.y()})) {
       continue;
     }
     if (!FLAGS_use_navigation_mode &&
@@ -165,7 +165,7 @@ void PredictionMap::OnLane(
     }
     double distance = 0.0;
     common::PointENU nearest_point =
-        candidate_lane->GetNearestPoint(vec_point, &distance);
+        candidate_lane->GetNearestPoint({point.x(), point.y()}, &distance);
     double nearest_point_heading = PathHeading(candidate_lane, nearest_point);
     double diff =
         std::fabs(common::math::AngleDiff(heading, nearest_point_heading));
@@ -212,16 +212,15 @@ std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
   return junctions;
 }
 
-bool PredictionMap::InJunction(
-    const Eigen::Vector2d& point, const double radius) {
+bool PredictionMap::InJunction(const Eigen::Vector2d& point,
+                               const double radius) {
   auto junction_infos = GetJunctions(point, radius);
   Vec2d vec(point[0], point[1]);
   if (junction_infos.empty()) {
     return false;
   }
   for (const auto junction_info : junction_infos) {
-    if (junction_info == nullptr ||
-        !junction_info->junction().has_polygon()) {
+    if (junction_info == nullptr || !junction_info->junction().has_polygon()) {
       continue;
     }
     std::vector<Vec2d> vertices;
@@ -244,8 +243,11 @@ double PredictionMap::PathHeading(std::shared_ptr<const LaneInfo> lane_info,
   common::math::Vec2d vec_point = {point.x(), point.y()};
   double s = -1.0;
   double l = 0.0;
-  lane_info->GetProjection(vec_point, &s, &l);
-  return HeadingOnLane(lane_info, s);
+  if (lane_info->GetProjection(vec_point, &s, &l)) {
+    return HeadingOnLane(lane_info, s);
+  } else {
+    return M_PI;
+  }
 }
 
 bool PredictionMap::SmoothPointFromLane(const std::string& id, const double s,
@@ -268,7 +270,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
     const int max_num_lane,
     std::vector<std::shared_ptr<const LaneInfo>>* nearby_lanes) {
   if (lanes.size() == 0) {
-    std::vector<std::shared_ptr<const LaneInfo>> prev_lanes(0);
+    std::vector<std::shared_ptr<const LaneInfo>> prev_lanes;
     OnLane(prev_lanes, point, heading, radius, false, max_num_lane,
            FLAGS_max_lane_angle_diff, nearby_lanes);
   } else {
@@ -309,6 +311,67 @@ void PredictionMap::NearbyLanesByCurrentLanes(
       }
     }
   }
+}
+
+std::shared_ptr<const LaneInfo> PredictionMap::GetLeftNeighborLane(
+    const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
+    const Eigen::Vector2d& ego_position,
+    const double threshold) {
+
+  std::vector<std::string> neighbor_ids;
+  for (const auto& lane_id :
+      ptr_ego_lane->lane().left_neighbor_forward_lane_id()) {
+    neighbor_ids.push_back(lane_id.id());
+  }
+
+  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids,
+      threshold);
+}
+
+std::shared_ptr<const LaneInfo> PredictionMap::GetRightNeighborLane(
+    const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
+    const Eigen::Vector2d& ego_position,
+    const double threshold) {
+
+  std::vector<std::string> neighbor_ids;
+  for (const auto& lane_id :
+      ptr_ego_lane->lane().right_neighbor_forward_lane_id()) {
+    neighbor_ids.push_back(lane_id.id());
+  }
+
+  return GetNeighborLane(ptr_ego_lane, ego_position, neighbor_ids,
+      threshold);
+}
+
+std::shared_ptr<const LaneInfo> PredictionMap::GetNeighborLane(
+    const std::shared_ptr<const LaneInfo>& ptr_ego_lane,
+    const Eigen::Vector2d& ego_position,
+    const std::vector<std::string>& neighbor_lane_ids,
+    const double threshold) {
+  double ego_s = 0.0;
+  double ego_l = 0.0;
+  GetProjection(ego_position, ptr_ego_lane, &ego_s, &ego_l);
+
+  double s_diff_min = std::numeric_limits<double>::max();
+  std::shared_ptr<const LaneInfo> ptr_lane_min = nullptr;
+
+  for (auto& lane_id : neighbor_lane_ids) {
+    std::shared_ptr<const LaneInfo> ptr_lane = LaneById(lane_id);
+    double s = -1.0;
+    double l = 0.0;
+    GetProjection(ego_position, ptr_lane, &s, &l);
+
+    double s_diff = std::fabs(s - ego_s);
+    if (s_diff < s_diff_min) {
+      s_diff_min = s_diff;
+      ptr_lane_min = ptr_lane;
+    }
+  }
+
+  if (s_diff_min > threshold) {
+    return nullptr;
+  }
+  return ptr_lane_min;
 }
 
 std::vector<std::string> PredictionMap::NearbyLaneIds(

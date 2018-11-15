@@ -7,7 +7,6 @@ cc_library(
     srcs = [
         "compression.cc",
         "system_utility.cc",
-        "timer.cc",
         "frame_transform.cc",
     ],
     hdrs = [
@@ -16,8 +15,6 @@ cc_library(
         "rect2d.h",
         "system_utility.h",
         "threadpool.h",
-        "time_conversion.h",
-        "timer.h",
         "voxel_grid_covariance_hdmap.h",
         "frame_transform.h",
     ],

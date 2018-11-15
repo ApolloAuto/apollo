@@ -116,7 +116,7 @@ void PbfSensorManager::GetLatestFrames(const double time_stamp,
     }
   }
   std::sort(frames->begin(), frames->end(),
-            [](const PbfSensorFramePtr &p1, const PbfSensorFramePtr &p2) {
+            [](PbfSensorFramePtr p1, PbfSensorFramePtr p2) {
               return p1->timestamp < p2->timestamp;
             });
 }

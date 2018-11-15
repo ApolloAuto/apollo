@@ -39,6 +39,7 @@
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
+#include "modules/guardian/proto/guardian.pb.h"
 
 /**
  * @namespace apollo::canbus
@@ -48,37 +49,37 @@ namespace apollo {
 namespace canbus {
 
 /**
-* @class Canbus
-*
-* @brief canbus module main class.
-* It processes the control data to send protocol messages to can card.
-*/
+ * @class Canbus
+ *
+ * @brief canbus module main class.
+ * It processes the control data to send protocol messages to can card.
+ */
 class Canbus : public apollo::common::ApolloApp {
  public:
-  Canbus() :
-    monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+  Canbus()
+      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
-  * @brief obtain module name
-  * @return module name
-  */
+   * @brief obtain module name
+   * @return module name
+   */
   std::string Name() const override;
 
   /**
-  * @brief module initialization function
-  * @return initialization status
-  */
+   * @brief module initialization function
+   * @return initialization status
+   */
   apollo::common::Status Init() override;
 
   /**
-  * @brief module start function
-  * @return start status
-  */
+   * @brief module start function
+   * @return start status
+   */
   apollo::common::Status Start() override;
 
   /**
-  * @brief module stop function
-  */
+   * @brief module stop function
+   */
   void Stop() override;
 
  private:
@@ -86,6 +87,8 @@ class Canbus : public apollo::common::ApolloApp {
   void PublishChassisDetail();
   void OnTimer(const ros::TimerEvent &event);
   void OnControlCommand(const apollo::control::ControlCommand &control_command);
+  void OnGuardianCommand(
+      const apollo::guardian::GuardianCommand &guardian_command);
   apollo::common::Status OnError(const std::string &error_msg);
   void RegisterCanClients();
 

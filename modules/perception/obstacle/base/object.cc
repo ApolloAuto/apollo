@@ -123,7 +123,7 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
   pb_obj->set_height(height);
 
   if (polygon.size() /*pb_obs.polygon_point_size() */ >= 4) {
-    for (auto point : polygon.points) {
+    for (const auto& point : polygon.points) {
       Point* p = pb_obj->add_polygon_point();
       p->set_x(point.x);
       p->set_y(point.y);
@@ -136,7 +136,7 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
   }
 
   if (FLAGS_is_serialize_point_cloud) {
-    for (auto point : cloud->points) {
+    for (const auto& point : cloud->points) {
       pb_obj->add_point_cloud(point.x);
       pb_obj->add_point_cloud(point.y);
       pb_obj->add_point_cloud(point.z);
@@ -144,8 +144,7 @@ void Object::Serialize(PerceptionObstacle* pb_obj) const {
   }
 
   pb_obj->set_confidence(score);
-  pb_obj->set_confidence_type(
-      static_cast<PerceptionObstacle::ConfidenceType>(score_type));
+  pb_obj->set_confidence_type(score_type);
   pb_obj->set_tracking_time(tracking_time);
   pb_obj->set_type(static_cast<PerceptionObstacle::Type>(type));
   pb_obj->set_timestamp(latest_tracked_time);  // in seconds.
@@ -178,7 +177,7 @@ void Object::Deserialize(const PerceptionObstacle& pb_obs) {
   }
 
   score = pb_obs.confidence();
-  score_type = static_cast<ScoreType>(pb_obs.confidence_type());
+  score_type = pb_obs.confidence_type();
   tracking_time = pb_obs.tracking_time();
   latest_tracked_time = pb_obs.timestamp();
   type = static_cast<ObjectType>(pb_obs.type());

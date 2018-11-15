@@ -1,0 +1,7 @@
+<launch>
+<node  name="driver_node" pkg="rslidar_driver" type="driver_node" output="screen" >
+    <param name="model" value="RS16"/>
+    <!-- Set the Lidar data port on the PC side, default is 6699 -->
+    <param name="msop_data_port" value="6699"/>
+  </node>
+</launch>

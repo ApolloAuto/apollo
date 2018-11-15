@@ -29,7 +29,7 @@ function start() {
 }
 
 function stop() {
-    pkill -f roscore
+    pkill -SIGTERM -f roscore
     echo "roscore: stopped"
 }
 

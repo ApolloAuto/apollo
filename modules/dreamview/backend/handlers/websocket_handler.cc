@@ -34,9 +34,9 @@ void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
     std::unique_lock<std::mutex> lock(mutex_);
     connections_.emplace(conn, std::make_shared<std::mutex>());
-    AINFO << name_ << ": Accepted connection. Total connections: "
-          << connections_.size();
   }
+  AINFO << name_
+        << ": Accepted connection. Total connections: " << connections_.size();
 
   // Trigger registered new connection handlers.
   for (const auto handler : connection_ready_handlers_) {
@@ -46,20 +46,25 @@ void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
 
 void WebSocketHandler::handleClose(CivetServer *server,
                                    const Connection *conn) {
+  // Remove from the store of currently open connections. Copy the mutex out
+  // so that it won't be reclaimed during map.erase().
+  Connection *connection = const_cast<Connection *>(conn);
+
+  std::shared_ptr<std::mutex> connection_lock;
   {
     std::unique_lock<std::mutex> lock(mutex_);
-
-    // Remove from the store of currently open connections. Copy the mutex out
-    // so that it won't be reclaimed during map.erase().
-    Connection *connection = const_cast<Connection *>(conn);
-    std::shared_ptr<std::mutex> connection_lock = connections_[connection];
-    {
-      std::unique_lock<std::mutex> lock(*connection_lock);
-      connections_.erase(connection);
-    }
-    AINFO << name_
-          << ": Connection closed. Total connections: " << connections_.size();
+    connection_lock = connections_[connection];
   }
+
+  {
+    // Make sure there's no data being sent via the connection
+    std::unique_lock<std::mutex> lock_connection(*connection_lock);
+    std::unique_lock<std::mutex> lock(mutex_);
+    connections_.erase(connection);
+  }
+
+  AINFO << name_
+        << ": Connection closed. Total connections: " << connections_.size();
 }
 
 bool WebSocketHandler::BroadcastData(const std::string &data, bool skippable) {
@@ -112,6 +117,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
     // being sent.
     // 2. The connection has been closed.
     if (skippable) {
+      AWARN << "Skip sending a droppable message!";
       return false;
     } else {
       connection_lock->lock();  // Block to acquire the lock.

@@ -1,19 +1,20 @@
 # How to add a new GPS Receiver
 
 ## Introduction
-GPS receiver is a device that receives information from GPS satellites and then calculates the device's geographical position, velocity and precise time. The device usually includes a receiver, an IMU, an interface to a wheel encoder, and a fusion engine that combines information from those sensors. Default GPS receiver used in Apollo is Novatel cards. The instruction demonstrates how to use a new GPS Receiver.
+GPS receiver is a device that receives information from GPS satellites and then calculates the device's geographical position, velocity and precise time. The device usually includes a receiver, an IMU (depends on the model), an interface to a wheel encoder, and a fusion engine that combines information from those sensors. The Default GPS receiver used in Apollo is Novatel cards. The instruction demonstrates how to add and use a new GPS Receiver.
 
 ## Steps to add a new GPS Receiver
 Please follow the steps below to add a new GPS Receiver.
+  1. Implement the new data parser for the new GPS receiver, by inheriting class `Parser`
+  2. Add new interfaces in `Parser` class for the new GPS receiver
+  3. In `config.proto`, add the new data format for the new GPS receiver
+  4. In function `create_parser` from file data_parser.cpp, add the new parser instance for the new GPS receiver
 
-  * implement the new data parser for new GPS receiver, by inheriting class `Parser`
-  * add new interfaces in `Parser` class for the new GPS receiver
-  * in config.proto, add the new data format for the new GPS receiver
-  * in function `create_parser` from file data_parser.cpp, add new parser instance for new GPS receiver
+Let's look at how to add the GPS Receiver using the above mentioned steps for Reciever: `u-blox`.
 
-Assuming that we would like to add a new GPS Receiver: `u-blox`.
+### Step 1
 
-### Step 1: implement the new data parser for new GPS receiver, by inheriting class `Parser`
+Let us implement the new data parser for the new GPS receiver, by inheriting class `Parser`:
 
 ```cpp
 class UbloxParser : public Parser {
@@ -59,7 +60,9 @@ private:
 
 ```
 
-### Step 2: add new interfaces in Parser class for the new GPS receiver 
+### Step 2
+
+Let us now add the new interfaces in the Parser class for the new GPS receiver:
 
 Add the function `create_ublox` in `Parser` class:
 
@@ -117,7 +120,9 @@ Parser* Parser::create_ublox() {
 }
 ```
 
-### Step 3: in config.proto, add the new data format definition for the new GPS receiver
+### Step 3
+
+In config.proto, let us add the new data format definition for the new GPS receiver:
 
 Add `UBLOX_TEXT` and `UBLOX_BINARY` in the config file: modules/drivers/gnss/proto/config.proto
 
@@ -138,9 +143,10 @@ message Stream {
 ... ...
 ```
 
-### Step 4: in function `create_parser` from file data_parser.cpp, add new parser instance for new GPS receiver
+### Step 4
 
-Add code to process config::Stream::UBLOX_BINARY as below:
+In function `create_parser` from file data_parser.cpp, let us add the new parser instance for the new GPS receiver.
+We will do so by adding code to process `config::Stream::UBLOX_BINARY` as below:
 
 ``` cpp
 Parser* create_parser(config::Stream::Format format, bool is_base_station = false) {

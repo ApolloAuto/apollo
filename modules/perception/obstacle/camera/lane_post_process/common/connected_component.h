@@ -17,16 +17,15 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CC_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_LANE_POST_PROCESS_COMMON_CC_H_
 
-#include <Eigen/Core>
-#include <opencv2/core/core.hpp>
-
+#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <iostream>
 
-// #include "modules/common/log.h"
+#include "Eigen/Core"
+#include "opencv2/core/core.hpp"
+
 #include "modules/perception/obstacle/camera/lane_post_process/common/base_type.h"
 
 namespace apollo {

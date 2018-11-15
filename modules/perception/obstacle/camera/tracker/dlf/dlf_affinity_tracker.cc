@@ -19,9 +19,7 @@
 namespace apollo {
 namespace perception {
 
-bool DLFAffinityTracker::Init() {
-  return true;
-}
+bool DLFAffinityTracker::Init() { return true; }
 
 bool DLFAffinityTracker::GetAffinityMatrix(
     const cv::Mat &img, const std::vector<Tracked> &tracked,

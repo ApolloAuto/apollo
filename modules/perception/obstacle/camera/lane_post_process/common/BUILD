@@ -6,8 +6,8 @@ cc_library(
     name = "type",
     srcs = ["type.cc"],
     hdrs = [
-        "type.h",
         "base_type.h",
+        "type.h",
     ],
     deps = [
         "//modules/common:log",
@@ -31,11 +31,10 @@ cc_library(
     name = "connected_component",
     srcs = ["connected_component.cc"],
     hdrs = [
-        "connected_component.h",
         "base_type.h",
+        "connected_component.h",
     ],
     deps = [
-        #"//modules/common:log",
         "@eigen",
         "@opencv2//:core",
     ],

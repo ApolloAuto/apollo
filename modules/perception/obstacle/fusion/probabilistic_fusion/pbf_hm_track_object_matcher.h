@@ -58,6 +58,7 @@ class PbfHmTrackObjectMatcher : public PbfBaseTrackObjectMatcher {
       const std::vector<int> &unassigned_fusion_tracks,
       const std::vector<int> &unassigned_sensor_objects,
       const Eigen::Vector3d &ref_point,
+      const Eigen::Matrix4d &sensor_world_pose,
       std::vector<std::vector<double>> *association_mat);
   bool HmAssign(const std::vector<std::vector<double>> &association_mat,
                 std::vector<std::pair<int, int>> *assignments,

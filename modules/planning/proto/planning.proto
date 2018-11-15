@@ -108,8 +108,8 @@ message ADCTrajectory {
   repeated ADCTrajectoryPoint adc_trajectory_point = 4 [deprecated=true];
   optional apollo.common.VehicleSignal signal = 11 [deprecated=true];
   enum RightOfWayStatus {
-        UNPROTECTED = 0;
-        PROTECTED = 1;
+    UNPROTECTED = 0;
+    PROTECTED = 1;
   }
   optional RightOfWayStatus right_of_way_status = 17;
 
@@ -127,4 +127,12 @@ message ADCTrajectory {
   // critial region will be empty when planning is NOT sure which region is critical
   // critial regions may or may not overlap
   optional CriticalRegion critical_region = 20;
+
+  enum TrajectoryType {
+    UNKNOWN = 0;
+    NORMAL = 1;
+    PATH_FALLBACK = 2;
+    SPEED_FALLBACK = 3;
+  }
+  optional TrajectoryType trajectory_type = 21 [ default = UNKNOWN];
 }

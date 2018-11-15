@@ -4,7 +4,7 @@
   <arg name="loop" default="" />
   <arg name="required" default="true" />
   <arg name="bag" default=""/>
-  <node pkg="rosbag" type="play" name="replay" 
+  <node pkg="rosbag" type="play" name="replay"
     args="--clock --rate=$(arg rate) --start=$(arg start) $(arg bag)" required="$(arg required)">
     <param name="rate" value="$(arg rate)"/>
     <param name="start" value="$(arg start)"/>

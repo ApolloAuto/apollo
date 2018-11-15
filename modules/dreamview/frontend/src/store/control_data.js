@@ -197,16 +197,15 @@ export default class ControlData {
             this.data.trajectoryGraph.pose[0].x = adc.positionX;
             this.data.trajectoryGraph.pose[0].y = adc.positionY;
             this.data.trajectoryGraph.pose[0].rotation = adc.heading;
-
-            this.updateTime(world.planningTime);
         }
 
         if (world.controlData) {
-            const data = world.controlData;
-            const timestamp = data.timestampSec;
-            this.updateErrorGraph(this.data.stationErrorGraph, timestamp, data.stationError);
-            this.updateErrorGraph(this.data.lateralErrorGraph, timestamp, data.lateralError);
-            this.updateErrorGraph(this.data.headingErrorGraph, timestamp, data.headingError);
+            const control = world.controlData;
+            const timestamp = control.timestampSec;
+            this.updateErrorGraph(this.data.stationErrorGraph, timestamp, control.stationError);
+            this.updateErrorGraph(this.data.lateralErrorGraph, timestamp, control.lateralError);
+            this.updateErrorGraph(this.data.headingErrorGraph, timestamp, control.headingError);
+            this.updateTime(timestamp);
         }
     }
 }

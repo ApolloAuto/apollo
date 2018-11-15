@@ -35,7 +35,8 @@ class PredictionQuerier {
  public:
   explicit PredictionQuerier(
       const std::vector<const Obstacle*>& obstacles,
-      std::shared_ptr<std::vector<common::PathPoint>> ptr_reference_line);
+      const std::shared_ptr<std::vector<common::PathPoint>>&
+      ptr_reference_line);
 
   virtual ~PredictionQuerier() = default;
 

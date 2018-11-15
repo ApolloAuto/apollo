@@ -440,7 +440,7 @@ void ConnectedComponent::SplitContourVertical(int len_split, bool is_clockwise,
   int height = start_pos - end_pos + 1;
   vector<int> lens = GetSplitRanges(height, len_split);
 
-  // create start and end vertice
+  // create start and end vertices
   int x = is_clockwise ? bbox_.right_contour->at(start_pos - this->y_min())
                        : bbox_.left_contour->at(start_pos - this->y_min());
   vertices_->push_back(Vertex(x, start_pos));
@@ -615,8 +615,8 @@ void ConnectedComponent::SplitContour(int split_len) {
     }
 
   } else {
-    std::cerr << "unknown bounding box split type: "
-              << bbox_.split << std::endl;
+    std::cerr << "unknown bounding box split type: " << bbox_.split
+              << std::endl;
   }
 }
 
@@ -633,12 +633,11 @@ void ConnectedComponent::Process(ScalarType split_siz, int split_len) {
 
 vector<int> ConnectedComponent::GetSplitRanges(int siz, int len_split) {
   if (siz <= 0) {
-    std::cerr << "siz should be a positive number: "
-              << siz << std::endl;
+    std::cerr << "siz should be a positive number: " << siz << std::endl;
   }
   if (len_split <= 0) {
-    std::cerr << "len_split should be a positive number: "
-              << len_split << std::endl;
+    std::cerr << "len_split should be a positive number: " << len_split
+              << std::endl;
   }
 
   int num_split = siz / len_split;

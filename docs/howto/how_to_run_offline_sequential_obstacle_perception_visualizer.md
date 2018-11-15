@@ -94,7 +94,7 @@ The `-c opt` option is used to build the program with optimized performance, whi
 2. (Optional) If you want to run the perception module with GPU, use this command:
 
 ```
-bazel build -c opt --cxxopt=-DUSE_CAFFE_GPU //modules/perception/tool/offline_visualizer_tool:offline_sequential_obstacle_perception_test
+bazel build -c opt --cxxopt=-DUSE_GPU //modules/perception/tool/offline_visualizer_tool:offline_sequential_obstacle_perception_test
 ```
 
 ## Run the Tool

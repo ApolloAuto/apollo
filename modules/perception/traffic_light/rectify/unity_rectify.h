@@ -20,7 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/traffic_light/rectifier_config.pb.h"
+
 #include "modules/perception/traffic_light/interface/base_rectifier.h"
 #include "modules/perception/traffic_light/interface/green_interface.h"
 
@@ -51,20 +52,14 @@ class UnityRectify : public BaseRectifier {
   bool Rectify(const Image &image, const RectifyOption &option,
                std::vector<LightPtr> *lights) override;
 
-  bool InitDetection(const ConfigManager *config_manager,
-                     const ModelConfig *model_config,
-                     std::shared_ptr<IRefine> *detection,
-                     std::shared_ptr<IGetBox> *crop);
-
-  /**
-   * @brief name
-   */
   std::string name() const override;
 
  private:
-  std::shared_ptr<ISelectLight> select_;
   std::shared_ptr<IRefine> detect_;
   std::shared_ptr<IGetBox> crop_;
+  std::shared_ptr<ISelectLight> select_;
+
+  traffic_light::rectifier_config::ModelConfigs config_;
 };
 
 REGISTER_RECTIFIER(UnityRectify);

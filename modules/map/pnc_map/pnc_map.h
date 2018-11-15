@@ -40,6 +40,10 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/route_segments.h"
 
+DECLARE_double(look_backward_distance);
+DECLARE_double(look_forward_short_distance);
+DECLARE_double(look_forward_long_distance);
+
 namespace apollo {
 namespace hdmap {
 
@@ -57,9 +61,16 @@ class PncMap {
   static bool CreatePathFromLaneSegments(const RouteSegments &segments,
                                          Path *const path);
 
+  static double LookForwardDistance(const double velocity);
+
   bool GetRouteSegments(const common::VehicleState &vehicle_state,
                         const double backward_length,
                         const double forward_length,
+                        std::list<RouteSegments> *const route_segments);
+  /**
+   * @brief use heuristic forward length and backward length
+   */
+  bool GetRouteSegments(const common::VehicleState &vehicle_state,
                         std::list<RouteSegments> *const route_segments);
 
   /**

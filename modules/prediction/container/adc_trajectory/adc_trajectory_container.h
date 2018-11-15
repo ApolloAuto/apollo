@@ -26,6 +26,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <mutex>
 
 #include "Eigen/Dense"
 
@@ -35,6 +36,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
+#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -44,7 +46,7 @@ class ADCTrajectoryContainer : public Container {
   /**
    * @brief Constructor
    */
-  ADCTrajectoryContainer() = default;
+  ADCTrajectoryContainer();
 
   /**
    * @brief Destructor
@@ -68,7 +70,7 @@ class ADCTrajectoryContainer : public Container {
    * @param Point
    * @return True if the point is in the first junction of the adc trajectory
    */
-  bool IsPointInJunction(const apollo::common::PathPoint& point) const;
+  bool IsPointInJunction(const common::PathPoint& point) const;
 
   /**
    * @brief Has overlap with ADC trajectory
@@ -79,7 +81,25 @@ class ADCTrajectoryContainer : public Container {
   /**
    * @brief Set ADC position
    */
-  void SetPosition(const ::apollo::common::math::Vec2d& position);
+  void SetPosition(const common::math::Vec2d& position);
+
+  /**
+   * @brief Get ADC junction
+   * @return A pointer to ADC junction information
+   */
+  std::shared_ptr<const hdmap::JunctionInfo> ADCJunction() const;
+
+  /**
+   * @brief Compute ADC's distance to junction
+   * @return ADC's distance to junction
+   */
+  double ADCDistanceToJunction() const;
+
+  /**
+   * @brief Get ADC planning trajectory
+   * @return ADC planning trajectory
+   */
+  const planning::ADCTrajectory& adc_trajectory() const;
 
  private:
   void SetJunctionPolygon();
@@ -91,10 +111,13 @@ class ADCTrajectoryContainer : public Container {
   std::string ToString(const std::vector<std::string>& lane_ids);
 
  private:
-  ::apollo::planning::ADCTrajectory adc_trajectory_;
-  ::apollo::common::math::Polygon2d adc_junction_polygon_;
+  planning::ADCTrajectory adc_trajectory_;
+  common::math::Polygon2d adc_junction_polygon_;
+  std::shared_ptr<const hdmap::JunctionInfo> adc_junction_info_ptr_;
+  double s_dist_to_junction_;
   std::unordered_set<std::string> adc_lane_ids_;
   std::vector<std::string> adc_lane_seq_;
+  std::mutex adc_trajectory_mutex_;
 };
 
 }  // namespace prediction

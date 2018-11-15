@@ -21,8 +21,8 @@
 #include "modules/common/macro.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/obstacle/fusion/probabilistic_fusion/dst_evidence_initiator.h"
 #include "modules/perception/obstacle/fusion/probabilistic_fusion/pbf_hm_track_object_matcher.h"
-
 namespace apollo {
 namespace perception {
 
@@ -45,57 +45,27 @@ bool ProbabilisticFusion::Init() {
   CHECK(GetProtoFromFile(FLAGS_probabilistic_fusion_config_file, &config_));
 
   // matching parameters
-  std::string match_method = config_.match_method();
-  if (match_method == "hm_matcher") {
-    matcher_ = new PbfHmTrackObjectMatcher();
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
-  } else {
-    AERROR << "undefined match_method " << match_method
+  if (config_.match_method() != "hm_matcher") {
+    AERROR << "undefined match_method " << config_.match_method()
            << " and use default hm_matcher";
-    matcher_ = new PbfHmTrackObjectMatcher();
-    if (matcher_->Init()) {
-      AINFO << "Initialize " << matcher_->name() << " successfully!";
-    } else {
-      AERROR << "Failed to initialize " << matcher_->name();
-      return false;
-    }
+  }
+  matcher_ = new PbfHmTrackObjectMatcher();
+  if (!matcher_->Init()) {
+    AERROR << "Failed to initialize " << matcher_->name();
+    return false;
   }
 
-  float max_match_distance = config_.max_match_distance();
-  ADEBUG << "Probabilistic_fusion max_match_distance: " << max_match_distance;
-  PbfBaseTrackObjectMatcher::SetMaxMatchDistance(max_match_distance);
+  PbfBaseTrackObjectMatcher::SetMaxMatchDistance(config_.max_match_distance());
 
   // track related parameters
-  float max_lidar_invisible_period = config_.max_lidar_invisible_period();
-  PbfTrack::SetMaxLidarInvisiblePeriod(max_lidar_invisible_period);
-  ADEBUG << "max_lidar_invisible_period: " << max_lidar_invisible_period;
-
-  float max_radar_invisible_period = config_.max_radar_invisible_period();
-  PbfTrack::SetMaxRadarInvisiblePeriod(max_radar_invisible_period);
-  ADEBUG << "max_radar_invisible_period: " << max_radar_invisible_period;
-
-  float max_radar_confident_angle = config_.max_radar_confident_angle();
-  PbfTrack::SetMaxRadarConfidentAngle(max_radar_confident_angle);
-  ADEBUG << "max_radar_confident_angle: " << max_radar_confident_angle;
-
-  float min_radar_confident_distance = config_.min_radar_confident_distance();
-  PbfTrack::SetMinRadarConfidentDistance(min_radar_confident_distance);
-  AINFO << "min_radar_confident_distance: " << min_radar_confident_distance;
-
-  bool publish_if_has_lidar = config_.publish_if_has_lidar();
-  PbfTrack::SetPublishIfHasLidar(publish_if_has_lidar);
-  ADEBUG << "publish_if_has_lidar: "
-         << (publish_if_has_lidar ? "true" : "false");
-
-  bool publish_if_has_radar = config_.publish_if_has_radar();
-  PbfTrack::SetPublishIfHasRadar(publish_if_has_radar);
-  ADEBUG << "publish_if_has_radar: "
-         << (publish_if_has_radar ? "true" : "false");
+  PbfTrack::SetMaxLidarInvisiblePeriod(config_.max_lidar_invisible_period());
+  PbfTrack::SetMaxRadarInvisiblePeriod(config_.max_radar_invisible_period());
+  PbfTrack::SetMaxCameraInvisiblePeriod(config_.max_camera_invisible_period());
+  PbfTrack::SetMaxRadarConfidentAngle(config_.max_radar_confident_angle());
+  PbfTrack::SetMinRadarConfidentDistance(
+      config_.min_radar_confident_distance());
+  PbfTrack::SetPublishIfHasLidar(config_.publish_if_has_lidar());
+  PbfTrack::SetPublishIfHasRadar(config_.publish_if_has_radar());
 
   // publish driven
   publish_sensor_id_ = FLAGS_fusion_publish_sensor_id;
@@ -105,10 +75,12 @@ bool ProbabilisticFusion::Init() {
   }
   ADEBUG << "publish_sensor: " << publish_sensor_id_;
 
-  use_radar_ = config_.use_radar();
-  ADEBUG << "use_radar :" << use_radar_;
-  use_lidar_ = config_.use_lidar();
-  ADEBUG << "use_lidar:" << use_lidar_;
+  // add camera front narrow intrinsic if have
+  // initialize BBAManager
+  if (!DSTInitiator::instance().initialize_bba_manager()) {
+    AERROR << "failed to initialize BBAManager!";
+    return false;
+  }
 
   ADEBUG << "ProbabilisticFusion initialize successfully";
   return true;
@@ -116,7 +88,8 @@ bool ProbabilisticFusion::Init() {
 
 bool ProbabilisticFusion::Fuse(
     const std::vector<SensorObjects> &multi_sensor_objects,
-    std::vector<std::shared_ptr<Object>> *fused_objects) {
+    std::vector<std::shared_ptr<Object>> *fused_objects,
+    FusionOptions *options) {
   ACHECK(fused_objects != nullptr) << "parameter fused_objects is nullptr";
 
   std::vector<PbfSensorFramePtr> frames;
@@ -127,19 +100,24 @@ bool ProbabilisticFusion::Fuse(
     // 1. collect sensor objects data
     for (size_t i = 0; i < multi_sensor_objects.size(); ++i) {
       auto sensor_type = multi_sensor_objects[i].sensor_type;
-      AINFO << "add sensor measurement: " << GetSensorType(sensor_type)
-            << ", obj_cnt : " << multi_sensor_objects[i].objects.size() << ", "
-            << std::fixed << std::setprecision(12)
-            << multi_sensor_objects[i].timestamp;
-      if (is_lidar(sensor_type) && !use_lidar_) {
+      ADEBUG << "add sensor measurement: " << GetSensorType(sensor_type)
+             << ", obj_cnt : " << multi_sensor_objects[i].objects.size() << ", "
+             << std::fixed << std::setprecision(12)
+             << multi_sensor_objects[i].timestamp;
+      if (is_lidar(sensor_type) && !config_.use_lidar()) {
         continue;
       }
-      if (is_radar(sensor_type) && !use_radar_) {
+      if (is_radar(sensor_type) && !config_.use_radar()) {
         continue;
       }
       if (is_camera(sensor_type) && !use_camera_) {
         continue;
       }
+
+      AINFO << "GetSensorType(multi_sensor_objects[i].sensor_type)"
+            << GetSensorType(multi_sensor_objects[i].sensor_type);
+
+      AINFO << "publish_sensor_id_" << publish_sensor_id_;
 
       if (GetSensorType(multi_sensor_objects[i].sensor_type) ==
           publish_sensor_id_) {
@@ -152,6 +130,7 @@ bool ProbabilisticFusion::Fuse(
       }
     }
 
+    options->fused = need_to_fusion;
     if (!need_to_fusion) {
       sensor_data_rw_mutex_.unlock();
       return true;
@@ -167,6 +146,18 @@ bool ProbabilisticFusion::Fuse(
     fusion_mutex_.lock();
     // 3.peform fusion on related frames
     for (size_t i = 0; i < frames.size(); ++i) {
+      if (frames[i]->sensor_id == "velodyne_64") {
+        options->fused_frame_ts.insert(options->fused_frame_ts.begin(),
+                                       frames[i]->timestamp);
+        options->fused_frame_device_id.insert(
+            options->fused_frame_device_id.begin(), frames[i]->sensor_id);
+      } else {
+        options->fused_frame_ts.push_back(frames[i]->timestamp);
+        options->fused_frame_device_id.push_back(frames[i]->sensor_id);
+      }
+      AINFO << "adding frame ts " << std::fixed << std::setprecision(12)
+            << frames[i]->timestamp;
+      AINFO << "adding frame sensor id " << frames[i]->sensor_id;
       FuseFrame(frames[i]);
     }
 
@@ -180,7 +171,7 @@ bool ProbabilisticFusion::Fuse(
 
 std::string ProbabilisticFusion::name() const { return "ProbabilisticFusion"; }
 
-void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
+void ProbabilisticFusion::FuseFrame(PbfSensorFramePtr frame) {
   AINFO << "Fusing frame: " << frame->sensor_id << ","
         << "object_number: " << frame->objects.size() << ","
         << "timestamp: " << std::fixed << std::setprecision(12)
@@ -192,7 +183,8 @@ void ProbabilisticFusion::FuseFrame(const PbfSensorFramePtr &frame) {
 
   Eigen::Vector3d ref_point = frame->sensor2world_pose.topRightCorner(3, 1);
   FuseForegroundObjects(&foreground_objects, ref_point, frame->sensor_type,
-                        frame->sensor_id, frame->timestamp);
+                        frame->sensor_id, frame->timestamp,
+                        frame->sensor2world_pose);
   track_manager_->RemoveLostTracks();
 }
 
@@ -247,6 +239,19 @@ void ProbabilisticFusion::CollectFusedObjects(
       std::shared_ptr<Object> obj(new Object());
       obj->clone(*(fused_object->object));
       obj->track_id = tracks[i]->GetTrackId();
+      std::shared_ptr<PbfSensorObject> pobj =
+          tracks[i]->GetLidarObject("lidar");
+      if (pobj != nullptr) {
+        obj->local_lidar_track_id = pobj->object->track_id;
+      }
+      pobj = tracks[i]->GetCameraObject("camera");
+      if (pobj != nullptr) {
+        obj->local_camera_track_id = pobj->object->track_id;
+      }
+      pobj = tracks[i]->GetRadarObject("radar");
+      if (pobj != nullptr) {
+        obj->local_radar_track_id = pobj->object->track_id;
+      }
       obj->latest_tracked_time = timestamp;
       obj->tracking_time = tracks[i]->GetTrackingPeriod();
       fused_objects->push_back(obj);
@@ -277,7 +282,8 @@ void ProbabilisticFusion::DecomposeFrameObjects(
 void ProbabilisticFusion::FuseForegroundObjects(
     std::vector<std::shared_ptr<PbfSensorObject>> *foreground_objects,
     Eigen::Vector3d ref_point, const SensorType &sensor_type,
-    const std::string &sensor_id, double timestamp) {
+    const std::string &sensor_id, double timestamp,
+    const Eigen::Matrix4d &sensor_world_pose) {
   std::vector<int> unassigned_tracks;
   std::vector<int> unassigned_objects;
   std::vector<std::pair<int, int>> assignments;
@@ -286,6 +292,7 @@ void ProbabilisticFusion::FuseForegroundObjects(
 
   TrackObjectMatcherOptions options;
   options.ref_point = &ref_point;
+  options.sensor_world_pose = &sensor_world_pose;
 
   std::vector<double> track2measurements_dist;
   std::vector<double> measurement2tracks_dist;
@@ -306,11 +313,13 @@ void ProbabilisticFusion::FuseForegroundObjects(
                          sensor_type, sensor_id, timestamp);
 
   if (FLAGS_use_navigation_mode) {
-    if (is_camera(sensor_type)) {
+    if (is_camera(sensor_type) || is_lidar(sensor_type)) {
       CreateNewTracks(*foreground_objects, unassigned_objects);
     }
   } else {
-    CreateNewTracks(*foreground_objects, unassigned_objects);
+    if (is_lidar(sensor_type)) {
+      CreateNewTracks(*foreground_objects, unassigned_objects);
+    }
   }
 }
 

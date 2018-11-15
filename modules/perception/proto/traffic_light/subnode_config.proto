@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.perception.traffic_light.subnode_config;
+
+message TLPreprocessorSubnodeConfig {
+  optional string name = 1 [ default = "TLPreprocessorSubnode" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional float max_ahead_seconds = 3 [ default = 0.3 ];
+  optional float max_process_image_fps = 4 [ default = 8.0 ];
+  optional float query_tf_inverval_seconds = 5 [ default = 0.2 ];
+}
+
+message TLProcSubnodeConfig {
+  optional string name = 1 [ default = "TLProcSubnode" ];
+  optional string version = 2 [ default = "1.0.0" ];
+  optional int32 image_border = 3 [ default = 100 ];
+  optional float valid_ts_interval = 4 [ default = 0.5 ];
+}
+
+message SubnodeConfig {
+  optional TLPreprocessorSubnodeConfig tl_preprocessor_subnode_config = 1;
+  optional TLProcSubnodeConfig tl_proc_subnode_config = 2;
+}

@@ -6,7 +6,7 @@ export default class Playback {
     FPS = 10; // frames per sec
 
     msPerFrame = 100;
-    jobId = null;
+    recordId = null;
     mapId = null;
 
     // real frame number starts from 1
@@ -22,8 +22,8 @@ export default class Playback {
         this.mapId = mapId;
     }
 
-    setJobId(jobId) {
-        this.jobId = jobId;
+    setRecordId(recordId) {
+        this.recordId = recordId;
     }
 
     setNumFrames(numFrames) {
@@ -38,7 +38,7 @@ export default class Playback {
     }
 
     initialized() {
-        return this.numFrames && this.jobId !== null && this.mapId !== null;
+        return this.numFrames && this.recordId !== null && this.mapId !== null;
     }
 
     hasNext() {

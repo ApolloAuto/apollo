@@ -77,8 +77,8 @@ std::ostream &operator<<(
 #define GET_ELEMENT_BY_ID(TYPE)                                     \
   const TYPE##InfoConstPtr Get##TYPE(const std::string &id) {       \
     auto ret = HDMapUtil::BaseMap().Get##TYPE##ById(MakeMapId(id)); \
-    AERROR_IF(ret == nullptr)                                       \
-        << "failed to find " << #TYPE << " with id: " << id;        \
+    AERROR_IF(ret == nullptr) << "failed to find " << #TYPE         \
+                              << " with id: " << id;                \
     return ret;                                                     \
   }
 
@@ -122,9 +122,7 @@ class MapUtil {
                 PointENU *point, double *heading) const {
     QUIT_IF(point == nullptr, -1, ERROR, "arg point is null");
     QUIT_IF(heading == nullptr, -2, ERROR, "arg heading is null");
-    QUIT_IF(lane_ptr == nullptr, -3, ERROR,
-            "get_smooth_point_from_lane[%s] failed",
-            lane_ptr->id().id().c_str());
+    QUIT_IF(lane_ptr == nullptr, -3, ERROR, "the provided lane_ptr is null");
     *point = lane_ptr->GetSmoothPoint(s);
     *heading = lane_ptr->Heading(s);
     auto normal_vec =
@@ -151,10 +149,13 @@ class MapUtil {
 
   void PrintOverlap(const std::string &overlap_id) {
     const auto *overlap_ptr = GetOverlap(FLAGS_overlap);
-    if (overlap_ptr != nullptr) {
-      std::cout << "overlap[" << overlap_ptr->id().id() << "] info["
-                << overlap_ptr->overlap().DebugString() << "]" << std::endl;
+    if (overlap_ptr == nullptr) {
+      AERROR << "overlap_ptr is nullptr.";
+      return;
     }
+    ADEBUG << "overlap[" << overlap_ptr->id().id() << "] info["
+           << overlap_ptr->overlap().DebugString() << "]" << std::endl;
+
     for (const auto &object_info : overlap_ptr->overlap().object()) {
       if (object_info.has_lane_overlap_info()) {
         std::cout << "Lane : " << object_info.id().id() << std::endl;

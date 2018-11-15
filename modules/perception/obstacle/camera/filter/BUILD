@@ -7,7 +7,22 @@ cc_library(
     srcs = ["object_camera_filter.cc"],
     hdrs = ["object_camera_filter.h"],
     deps = [
-        "//modules/common/math:kalman_filter_1d",
+        "//modules/perception/lib/base",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/obstacle/camera/common",
+        "//modules/perception/obstacle/camera/interface",
+        "@eigen",
+        "@opencv2//:core",
+        "@yaml_cpp//:yaml",
+    ],
+)
+
+cc_library(
+    name = "camera_extended_kalman_filter",
+    srcs = ["object_camera_extended_kalman_filter.cc"],
+    hdrs = ["object_camera_extended_kalman_filter.h"],
+    deps = [
+        "//modules/common/math:extended_kalman_filter",
         "//modules/perception/lib/base",
         "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/camera/common",

@@ -39,7 +39,7 @@ namespace planning {
  *        outputs proper segment of the trajectory according to vehicle
  * position.
  */
-class RTKReplayPlanner : public Planner {
+class RTKReplayPlanner : public PlannerWithReferenceLine {
  public:
   /**
    * @brief Constructor
@@ -50,6 +50,8 @@ class RTKReplayPlanner : public Planner {
    * @brief Destructor
    */
   virtual ~RTKReplayPlanner() = default;
+
+  std::string Name() override { return "RTK"; }
 
   apollo::common::Status Init(const PlanningConfig& config) override;
 

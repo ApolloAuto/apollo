@@ -1,0 +1,25 @@
+<launch>
+  <arg name="model" default="RS16" />
+  <arg name="min_range" default="0.2" />
+  <arg name="max_range" default="150.0" />
+  <arg name="curves_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/curves.csv"/>
+  <arg name="angle_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/angle.csv"/>
+  <arg name="channel_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/ChannelNum.csv"/>
+
+  <arg name="topic_pointcloud" default="/apollo/sensor/rslidar/PointCloud2"/>
+  <arg name="topic_packets" default="/apollo/sensor/rslidar/rslidarScan"/>
+  <arg name="node_name" default="convert_nodelet"/>
+  <arg name="nodelet_manager_name" default="rslidar_nodelet_manager" />
+
+  <node pkg="nodelet" type="nodelet" name="$(arg node_name)"
+        args="load rslidar_pointcloud/ConvertNodelet $(arg nodelet_manager_name)" output="screen">
+    <param name="curves_path" value="$(arg curves_path)"/>
+    <param name="angle_path" value="$(arg angle_path)"/>
+    <param name="channel_path" value="$(arg channel_path)"/>
+    <param name="min_range" value="$(arg min_range)"/>
+    <param name="max_range" value="$(arg max_range)"/>
+    <param name="model" value="$(arg model)"/>
+    <param name="topic_pointcloud" value="$(arg topic_pointcloud)"/>
+    <param name="topic_packets" value="$(arg topic_packets)"/>
+  </node>
+</launch>

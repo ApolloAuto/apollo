@@ -26,7 +26,6 @@
 #include "modules/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/camera/lane_post_process/common/util.h"
 
 namespace apollo {
@@ -57,8 +56,6 @@ class CCLanePostProcessorTest : public ::testing::Test {
 };
 
 TEST_F(CCLanePostProcessorTest, test_lane_post_process_vis) {
-  FLAGS_work_root = "modules/perception";
-
   CHECK(GetProtoFromFile(FLAGS_cc_lane_post_processor_config_file, &config_));
 
   cc_lane_post_processor_->set_vis(true);

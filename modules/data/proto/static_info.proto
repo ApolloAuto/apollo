@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.data;
 
 import "modules/canbus/proto/canbus_conf.proto";
-import "modules/canbus/proto/chassis_detail.proto";
+import "modules/canbus/proto/chassis.proto";
 import "modules/common/configs/proto/vehicle_config.proto";
 import "modules/control/proto/control_conf.proto";
 import "modules/routing/proto/routing.proto";

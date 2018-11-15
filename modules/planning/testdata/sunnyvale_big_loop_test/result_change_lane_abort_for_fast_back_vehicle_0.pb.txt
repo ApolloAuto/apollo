@@ -1,0 +1,30 @@
+header {
+  module_name: "std_planning"
+}
+is_replan: true
+gear: GEAR_DRIVE
+decision {
+  main_decision {
+    cruise {
+      change_lane_type: LEFT
+    }
+  }
+  object_decision {
+  }
+  vehicle_signal {
+    turn_signal: TURN_LEFT
+  }
+}
+routing_header {
+  timestamp_sec: 1522102330.936367
+  module_name: "routing"
+  sequence_num: 1621
+}
+right_of_way_status: UNPROTECTED
+lane_id {
+  id: "3143_1_-1"
+}
+engage_advice {
+  advice: KEEP_ENGAGED
+}
+trajectory_type: NORMAL

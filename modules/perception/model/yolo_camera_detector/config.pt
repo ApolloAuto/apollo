@@ -3,7 +3,7 @@ model_param {
   proto_file: "deploy.pt"
   weight_file: "deploy.md"
   offset_ratio: 0.28843
-  confidence_threshold: 0.8 # 0.5
+  confidence_threshold: 0.8
   min_2d_height: 17
   min_3d_height: 0.5
   model_type: Caffe

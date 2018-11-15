@@ -38,6 +38,17 @@ DEFINE_string(msf_visual_adapter_config_file,
               "modules/localization/conf/msf_visual_adapter.conf",
               "msf visualization adapter configuration");
 
+DEFINE_string(lmd_adapter_config_file,
+              "modules/localization/conf/lmd_adapter.conf",
+              "lmd adapter configuration");
+
+DEFINE_string(lmd_rawinput_bag_file, "/apollo/data/bag/data.bag",
+              "lmd rawinput bag file");
+
+DEFINE_string(lmd_rawinput_bin_file,
+              "modules/localization/testdata/OdometryLaneMarkers.bin",
+              "lmd rawinput bin file");
+
 // features
 DEFINE_bool(enable_gps_imu_interprolate, true, "enable GPU/IMU interprolate");
 DEFINE_bool(enable_map_reference_unify, true,
@@ -62,6 +73,13 @@ DEFINE_double(report_gps_imu_time_diff_threshold, 0.02,
 
 DEFINE_bool(enable_gps_timestamp, false,
             "True to set gps timestamp as localization header timestamp");
+
+DEFINE_bool(enable_lmd_premapping, true, "True to enable premapping for lmd");
+DEFINE_bool(enable_lmd_mapping, false,
+            "True to enable realtime mapping for lmd");
+DEFINE_bool(enable_lmd_imu_filter, false, "True to enable imu filter for lmd");
+DEFINE_bool(enable_lmd_chassis_speed, false,
+            "True to get speed from chassis for lmd");
 
 // msf parame
 DEFINE_string(local_map_name, "local_map", "The path of localization map.");
@@ -97,7 +115,6 @@ DEFINE_bool(integ_sins_state_check, false, "");
 DEFINE_double(integ_sins_state_span_time, 60.0, "");
 DEFINE_double(integ_sins_state_pos_std, 1.0, "");
 DEFINE_double(vel_threshold_get_yaw, 5.0, "");
-DEFINE_bool(integ_debug_log_flag, false, "");
 
 // gnss module
 DEFINE_bool(enable_ins_aid_rtk, false, "");

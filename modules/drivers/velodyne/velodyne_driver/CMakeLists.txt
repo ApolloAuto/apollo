@@ -10,7 +10,7 @@ set(${PROJECT_NAME}_CATKIN_DEPS
 )
 
 #set define for unittest
-set(ENABLE_GPS_DISCARD false)
+#set(ENABLE_GPS_DISCARD false)
 
 find_package(catkin REQUIRED COMPONENTS ${${PROJECT_NAME}_CATKIN_DEPS})
 
@@ -40,7 +40,7 @@ if (CATKIN_ENABLE_TESTING)
   # these dependencies are only needed for unit testing
   find_package(roslaunch REQUIRED)
   find_package(rostest REQUIRED)
-    
+
   # parse check all the launch/*.launch files
   roslaunch_add_file_check(launch)
 

@@ -6,10 +6,6 @@ export default class PlanningData {
 
   data = this.initData();
 
-  latencyGraph = {
-      planning: []
-  };
-
   @action updatePlanningTime(newTime) {
     this.planningTime = newTime;
   }
@@ -200,32 +196,6 @@ export default class PlanningData {
     }
   }
 
-  updateLatencyGraph(currentTime, latencyStates) {
-    const timeRange = 300000; // 5 min
-    for (const moduleName in this.latencyGraph) {
-      let graph = this.latencyGraph[moduleName];
-      if (graph.length > 0) {
-        const startTime = graph[0].x;
-        const endTime = graph[graph.length - 1].x;
-        const diff = currentTime - startTime;
-        if (currentTime < endTime) {
-          // new data set, clean up existing one
-          this.latencyGraph[moduleName] = [];
-          graph = this.latencyGraph[moduleName];
-
-        } else if (diff > timeRange) {
-          // shift out old data
-          graph.shift();
-        }
-      }
-
-      if (graph.length === 0 ||
-          graph[graph.length - 1].x !== currentTime) {
-          graph.push({x: currentTime, y: latencyStates.planning});
-      }
-    }
-  }
-
   updateDpPolyGraph(dpPolyData) {
     const graph = this.data.dpPolyGraph;
 
@@ -279,11 +249,7 @@ export default class PlanningData {
         this.updateDpPolyGraph(planningData.dpPolyGraph);
       }
 
-      if (world.latency) {
-        this.updateLatencyGraph(world.planningTime, world.latency);
-      }
-
-      this.updatePlanningTime(world.planningTime);
+      this.updatePlanningTime(world.latency.planning.timestampSec);
     }
   }
 }

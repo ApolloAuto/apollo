@@ -29,8 +29,11 @@ export default class HMI {
 
     displayName = {};
     utmZoneId = 10;
+    utterance = window.speechSynthesis ? new SpeechSynthesisUtterance() : null;
 
     @observable dockerImage = 'unknown';
+
+    @observable isCoDriver = false;
 
     @action initialize(config) {
         if (config.dockerImage) {
@@ -61,6 +64,10 @@ export default class HMI {
         });
     }
 
+    @action toggleCoDriverFlag() {
+        this.isCoDriver = !this.isCoDriver;
+    }
+
     @action updateStatus(newStatus) {
         if (newStatus.currentMode) {
             this.currentMode = newStatus.currentMode;
@@ -83,6 +90,28 @@ export default class HMI {
                     this.hardwareStatus.set(key, newStatus.systemStatus.hardware[key].summary);
                 }
             }
+            if (this.utterance &&
+                typeof newStatus.systemStatus.passengerMsg === "string" &&
+                newStatus.systemStatus.passengerMsg !== this.utterance.text) {
+                    this.utterance.text = newStatus.systemStatus.passengerMsg;
+                this.speakPassengerMessage();
+            }
+        }
+    }
+
+    speakPassengerMessage() {
+        if (this.utterance.text) {
+            // if speaking, don't interrupt
+            if (!window.speechSynthesis.speaking) {
+                window.speechSynthesis.speak(this.utterance);
+            }
+
+            // repeat this message until a new one is given
+            this.utterance.onend = () => {
+                window.speechSynthesis.speak(this.utterance);
+            };
+        } else {
+            this.utterance.onend = null;
         }
     }
 

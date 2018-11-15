@@ -27,8 +27,8 @@ namespace perception {
 
 class FeatureDescriptor {
  public:
-  // @brief intialize feature descriptor
-  // @params[IN] cloud: given cloud for feature extraction
+  // @brief initialize feature descriptor
+  // @param[IN] cloud: given cloud for feature extraction
   // @return nothing
   explicit FeatureDescriptor(
       apollo::perception::pcl_util::PointCloudPtr cloud) {
@@ -37,8 +37,8 @@ class FeatureDescriptor {
   ~FeatureDescriptor() {}
 
   // @brief compute histogram feature of given cloud
-  // @params[IN] bin_size: bin size of histogram
-  // @params[OUT] feature: histogram feature of given cloud
+  // @param[IN] bin_size: bin size of histogram
+  // @param[OUT] feature: histogram feature of given cloud
   // @return nothing
   void ComputeHistogram(const int bin_size, std::vector<float>* feature);
 

@@ -137,7 +137,6 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
               AdapterConfig::PLANNING_TRAJECTORY));
 
   CHECK_NOTNULL(obstacles_container);
-  CHECK_NOTNULL(adc_trajectory_container);
 
   Predictor* predictor = nullptr;
   for (const auto& perception_obstacle :
@@ -196,6 +195,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         predictor->Predict(obstacle);
         if (FLAGS_enable_trim_prediction_trajectory &&
             obstacle->type() == PerceptionObstacle::VEHICLE) {
+          CHECK_NOTNULL(adc_trajectory_container);
           predictor->TrimTrajectories(obstacle, adc_trajectory_container);
         }
         for (const auto& trajectory : predictor->trajectories()) {

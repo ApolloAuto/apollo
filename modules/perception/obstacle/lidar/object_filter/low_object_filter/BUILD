@@ -12,9 +12,9 @@ cc_library(
         "//modules/perception/common",
         "//modules/perception/common:pcl_util",
         "//modules/perception/lib/base",
-        "//modules/perception/lib/config_manager",
         "//modules/perception/obstacle/common",
         "//modules/perception/obstacle/lidar/interface",
+        "//modules/perception/proto:low_object_filter_config_lib_proto",
         "@eigen",
     ],
 )
@@ -24,6 +24,10 @@ cc_test(
     size = "small",
     srcs = [
         "low_object_filter_test.cc",
+    ],
+    data = [
+        "//modules/perception:perception_data",
+        "//modules/perception:perception_model",
     ],
     deps = [
         ":low_object_filter",

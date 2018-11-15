@@ -24,7 +24,6 @@
 
 #include "modules/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/obstacle/base/object.h"
 #include "modules/perception/obstacle/common/pose_util.h"
 #include "modules/perception/onboard/transform_input.h"
@@ -111,7 +110,7 @@ void ExportSensorData::WritePose(const std::string& file_pre,
 }
 
 void ExportSensorData::WriteVelocityInfo(const std::string& file_pre,
-                                         const double& timestamp,
+                                         const double timestamp,
                                          const int seq_num,
                                          const Eigen::Vector3f& velocity) {
   std::string filename = file_pre + ".velocity";

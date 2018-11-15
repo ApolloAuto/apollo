@@ -2,11 +2,28 @@ syntax = "proto2";
 
 package apollo.dreamview;
 
+enum HMIAction {
+  NONE = 0;
+  SETUP = 1;
+  AUTO_MODE = 2;
+  DISENGAGE = 3;
+}
+
 message Component {
   optional string display_name = 1;
   // If the path is given, HMI will check if it's available.
   optional string path = 2;
-  map<string, string> supported_commands = 3;
+
+  message Command {
+    // Command to be executed for debugging purpose.
+    optional string debug_cmd = 1;
+
+    // Command to be executed for production, which could be more robust with
+    // recovery mechanism such as supervisor tool.
+    // HMI will fallback to the debug command if it's not provided.
+    optional string prod_cmd = 2;
+  }
+  map<string, Command> commands = 3;
 }
 
 message Mode {
@@ -31,6 +48,7 @@ message HMIConfig {
   map<string, Mode> modes = 7;                 // {mode_name: mode_config}
   optional int32 utm_zone_id = 8;              // FLAGS_local_utm_zone_id
   optional AudioCapturingConfig audio_capturing_conf = 9;
+  optional HMIAction chassis_high_beam_action = 10;
 }
 
 message VehicleData {

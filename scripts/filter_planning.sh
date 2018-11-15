@@ -26,6 +26,7 @@ function print_help() {
    echo "  -wp filter for planning and its dependencies, produces *.wp.bag"
    echo "  -pn filter out planning and prediction, produces *.npp.bag"
    echo "  -co filter out perception, prediction and planning, produces *.co.bag"
+   echo "  -ni filter out pointcloud and images, produces *.ni.bag"
 }
 
 routing_topic="topic == '/apollo/routing_response'"
@@ -37,16 +38,22 @@ perfect_control_topic="$perception_topic  \
    or $routing_topic \
    or topic == '/apollo/perception/obstacles' \
    or topic == '/apollo/prediction' \
+   or topic == '/apollo/control' \
    or topic == '/apollo/perception/traffic_light'"
 
 planning_deps="$perfect_control_topic \
     or topic == '/apollo/canbus/chassis' \
     or topic == '/apollo/localization/pose' \
     or topic == '/apollo/navigation' \
+    or topic == '/apollo/guardian' \
+    or topic == '/apollo/monitor/system_status' \
     or topic == '/apollo/relative_map'"
 
 planning_topic="topic == '/apollo/planning'"
 prediction_topic="topic == '/apollo/prediction'"
+pointcloud_topic="topic == '/apollo/sensor/velodyne64/compensator/PointCloud2'"
+image_topic="topic == '/apollo/sensor/camera/traffic/image_long' \
+    or topic == '/apollo/sensor/camera/traffic/image_short'"
 
 planning_all="topic == '/apollo/planning' \
     or topic == '/apollo/drive_event' \
@@ -72,6 +79,9 @@ is_no_prediction_planning=false;
 
 #no perception, no prediction and no planning, with only camera topic
 is_camera_only=false;
+
+# no pointcloud, no image
+is_no_pointcloud_image=false;
 
 work_mode_num=0
 
@@ -112,6 +122,11 @@ case $key in
     work_mode_num=$((work_mode_num+1))
     shift # past value
     ;;
+    -ni|--noimage)
+    is_no_pointcloud_image=true
+    work_mode_num=$((work_mode_num+1))
+    shift # past argument
+    ;;
     -d|--dir)
     target_dir="$2"
     shift # past argument
@@ -150,7 +165,6 @@ function filter() {
         rosbag filter $1 "$target" "not ($prediction_topic) and not ($planning_topic)"
     fi
 
-
     if $is_perception; then
         target="$2/${name%.*}.po.bag"
         rosbag filter $1 "$target" "$perception_topic"
@@ -165,11 +179,17 @@ function filter() {
         target="$2/${name%.*}.wp.bag"
         rosbag filter $1 "$target" "$planning_all"
     fi
-    
+
     if $is_camera_only; then
 	target="$2/${name%.*}.co.bag"
 	rosbag filter $1 "$target" "$camera_only"
     fi
+
+    if $is_no_pointcloud_image; then
+        target="$2/${name%.*}.ni.bag"
+        rosbag filter $1 "$target" "not ($pointcloud_topic) and not ($image_topic)"
+    fi
+
     echo "filtered ${bag} to $target"
 }
 

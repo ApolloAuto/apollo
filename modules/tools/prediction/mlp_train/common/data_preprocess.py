@@ -26,7 +26,7 @@ from time import time
 
 
 def load_h5(filename):
-    if not(os.path.exists(filename)):
+    if not (os.path.exists(filename)):
         logging.error("file: {}, does not exist".format(filename))
         os._exit(1)
     if os.path.splitext(filename)[1] != '.h5':
@@ -57,15 +57,17 @@ def down_sample(data):
 
     rand = np.random.random((size))
 
-    cutin_false_select = np.logical_and(cutin_false_index, rand > cutin_false_drate)
-    cutin_true_select = np.logical_and(cutin_true_index, rand > cutin_true_drate)
+    cutin_false_select = np.logical_and(cutin_false_index,
+                                        rand > cutin_false_drate)
+    cutin_true_select = np.logical_and(cutin_true_index,
+                                       rand > cutin_true_drate)
     go_false_select = np.logical_and(go_false_index, rand > go_false_drate)
     go_true_select = np.logical_and(go_true_index, rand > go_true_drate)
 
     all_select = np.logical_or(cutin_false_select, cutin_true_select)
     all_select = np.logical_or(all_select, go_false_select)
     all_select = np.logical_or(all_select, go_true_select)
-    
+
     data_downsampled = data[all_select, :]
 
     return data_downsampled
@@ -74,6 +76,6 @@ def down_sample(data):
 def train_test_split(data, train_rate):
     data_size = np.shape(data)[0]
     train_size = int(data_size * train_rate)
-    train = data[0 : train_size,]
-    test = data[train_size :,]
+    train = data[0:train_size, ]
+    test = data[train_size:, ]
     return train, test

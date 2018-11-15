@@ -21,8 +21,10 @@ cc_library(
         "//modules/perception/obstacle/onboard:lidar_subnode",
         "//modules/perception/obstacle/onboard:perception_obstacle_shared_data",
         "//modules/perception/obstacle/onboard:radar_subnode",
+        "//modules/perception/obstacle/onboard:ultrasonic_obstacle_subnode",
         "//modules/perception/obstacle/onboard:visualization_subnode",
         "//modules/perception/onboard",
+        "//modules/perception/proto:cnn_segmentation_config_lib_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/perception/traffic_light/onboard",
         "@com_google_protobuf//:protobuf",
@@ -45,14 +47,14 @@ cc_binary(
 filegroup(
     name = "perception_data",
     srcs = glob([
-        "data/**",
+        "data/**/*",
     ]),
 )
 
 filegroup(
     name = "perception_model",
     srcs = glob([
-        "model/**",
+        "model/**/*",
     ]),
 )
 

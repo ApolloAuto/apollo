@@ -23,6 +23,7 @@
 
 #include <cstdint>
 #include <list>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -36,6 +37,7 @@
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
+#include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
@@ -110,13 +112,19 @@ class Frame {
 
   const bool is_near_destination() const { return is_near_destination_; }
 
+  /**
+   * @brief Adjust reference line priority according to actual road conditions
+   * @id_to_priority lane id and reference line priority mapping relationship
+   */
+  void UpdateReferenceLinePriority(
+      const std::map<std::string, uint32_t> &id_to_priority);
+
  private:
   bool CreateReferenceLineInfo();
 
   /**
    * Find an obstacle that collides with ADC (Autonomous Driving Car) if
-   * such
-   * obstacle exists.
+   * such obstacle exists.
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
@@ -134,7 +142,7 @@ class Frame {
   uint32_t sequence_num_ = 0;
   const hdmap::HDMap *hdmap_ = nullptr;
   common::TrajectoryPoint planning_start_point_;
-  const double start_time_;
+  const double start_time_ = 0.0;
   common::VehicleState vehicle_state_;
   std::list<ReferenceLineInfo> reference_line_info_;
   bool is_near_destination_ = false;
@@ -146,11 +154,11 @@ class Frame {
 
   prediction::PredictionObstacles prediction_;
   ThreadSafeIndexedObstacles obstacles_;
-  perception::CIPVInfo cipv_info_;
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
   std::unique_ptr<LagPrediction> lag_predictor_;
   ReferenceLineProvider *reference_line_provider_ = nullptr;
+  apollo::common::monitor::MonitorLogger monitor_logger_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

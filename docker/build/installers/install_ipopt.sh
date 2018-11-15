@@ -39,4 +39,5 @@ cp -r include /usr/local/ipopt/ && cp -r lib /usr/local/ipopt/
 popd
 
 # Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
 rm -fr Ipopt-3.12.8.zip Ipopt-3.12.8

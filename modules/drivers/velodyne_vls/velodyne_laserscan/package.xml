@@ -1,0 +1,31 @@
+<package format="2">
+
+  <name>velodyne_laserscan</name>
+  <version>1.3.0</version>
+  <description>
+    Extract a single ring of a Velodyne PointCloud2 and publish it as a LaserScan message
+  </description>
+  <maintainer email="jwhitley@autonomoustuff.com">Josh Whitley</maintainer>
+  <author>Micho Radovnikovich</author>
+  <author>Kevin Hallenbeck</author>
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/velodyne_laserscan</url>
+  <url type="repository">https://github.com/ros-drivers/velodyne</url>
+  <url type="bugtracker">https://github.com/ros-drivers/velodyne/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>nodelet</depend>
+  <depend>sensor_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
+
+  <test_depend>roslaunch</test_depend>
+  <test_depend>rostest</test_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelets.xml" />
+  </export>
+
+</package>

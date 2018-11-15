@@ -13,6 +13,11 @@ hdmap {
         line_segment {
           point {
             x: 0.0
+            y: 0.0
+            z: 0.0
+          }
+          point {
+            x: 0.0
             y: 0.275390625
             z: 0.0
           }

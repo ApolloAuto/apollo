@@ -48,7 +48,7 @@ using apollo::hdmap::InterpolatedIndex;
 ReferenceLine::ReferenceLine(
     const std::vector<ReferencePoint>& reference_points)
     : reference_points_(reference_points),
-      map_path_(MapPath(std::vector<hdmap::MapPathPoint>(
+      map_path_(std::move(std::vector<hdmap::MapPathPoint>(
           reference_points.begin(), reference_points.end()))) {
   CHECK_EQ(map_path_.num_points(), reference_points_.size());
 }
@@ -118,8 +118,8 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
     reference_points_.insert(reference_points_.end(),
                              other_points.begin() + end_i, other_points.end());
   }
-  map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
-      reference_points_.begin(), reference_points_.end()));
+  map_path_ = MapPath(std::move(std::vector<hdmap::MapPathPoint>(
+      reference_points_.begin(), reference_points_.end())));
   return true;
 }
 
@@ -167,8 +167,8 @@ bool ReferenceLine::Shrink(const common::math::Vec2d& point,
     AERROR << "Too few reference points after shrinking.";
     return false;
   }
-  map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
-      reference_points_.begin(), reference_points_.end()));
+  map_path_ = MapPath(std::move(std::vector<hdmap::MapPathPoint>(
+      reference_points_.begin(), reference_points_.end())));
   return true;
 }
 
@@ -407,12 +407,20 @@ const std::vector<ReferencePoint>& ReferenceLine::reference_points() const {
 
 const MapPath& ReferenceLine::map_path() const { return map_path_; }
 
-bool ReferenceLine::GetLaneWidth(const double s, double* const left_width,
-                                 double* const right_width) const {
+bool ReferenceLine::GetLaneWidth(const double s, double* const lane_left_width,
+                                 double* const lane_right_width) const {
   if (map_path_.path_points().empty()) {
     return false;
   }
-  return map_path_.GetWidth(s, left_width, right_width);
+  return map_path_.GetLaneWidth(s, lane_left_width, lane_right_width);
+}
+
+bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
+                                 double* const road_right_width) const {
+  if (map_path_.path_points().empty()) {
+    return false;
+  }
+  return map_path_.GetRoadWidth(s, road_left_width, road_right_width);
 }
 
 void ReferenceLine::GetLaneFromS(
@@ -428,6 +436,45 @@ void ReferenceLine::GetLaneFromS(
   }
 }
 
+bool ReferenceLine::IsOnLane(const common::math::Vec2d& vec2d_point) const {
+  common::SLPoint sl_point;
+  if (!XYToSL(vec2d_point, &sl_point)) {
+    return false;
+  }
+  return IsOnLane(sl_point);
+}
+
+bool ReferenceLine::IsOnLane(const SLBoundary& sl_boundary) const {
+  if (sl_boundary.end_s() < 0 || sl_boundary.start_s() > Length()) {
+    return false;
+  }
+  double middle_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  map_path_.GetLaneWidth(middle_s, &lane_left_width, &lane_right_width);
+  return !(sl_boundary.start_l() > lane_left_width ||
+           sl_boundary.end_l() < -lane_right_width);
+}
+
+bool ReferenceLine::IsOnLane(const SLPoint& sl_point) const {
+  if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
+    return false;
+  }
+  double left_width = 0.0;
+  double right_width = 0.0;
+
+  if (!GetLaneWidth(sl_point.s(), &left_width, &right_width)) {
+    return false;
+  }
+
+  return !(sl_point.l() < -right_width || sl_point.l() > left_width);
+}
+
+bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
+                                double gap) const {
+  return map_path_.OverlapWith(box2d, gap);
+}
+
 bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
   common::SLPoint sl_point;
   if (!XYToSL(vec2d_point, &sl_point)) {
@@ -441,30 +488,25 @@ bool ReferenceLine::IsOnRoad(const SLBoundary& sl_boundary) const {
     return false;
   }
   double middle_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
-  double left_width = 0.0;
-  double right_width = 0.0;
-  map_path_.GetWidth(middle_s, &left_width, &right_width);
-  return !(sl_boundary.start_l() > left_width ||
-           sl_boundary.end_l() < -right_width);
-}
-
-bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
-                                double gap) const {
-  return map_path_.OverlapWith(box2d, gap);
+  double road_left_width = 0.0;
+  double road_right_width = 0.0;
+  map_path_.GetRoadWidth(middle_s, &road_left_width, &road_right_width);
+  return !(sl_boundary.start_l() > road_left_width ||
+           sl_boundary.end_l() < -road_right_width);
 }
 
 bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
   if (sl_point.s() <= 0 || sl_point.s() > map_path_.length()) {
     return false;
   }
-  double left_width = 0.0;
-  double right_width = 0.0;
+  double road_left_width = 0.0;
+  double road_right_width = 0.0;
 
-  if (!GetLaneWidth(sl_point.s(), &left_width, &right_width)) {
+  if (!GetRoadWidth(sl_point.s(), &road_left_width, &road_right_width)) {
     return false;
   }
 
-  return !(sl_point.l() < -right_width || sl_point.l() > left_width);
+  return !(sl_point.l() < -road_right_width || sl_point.l() > road_left_width);
 }
 
 // return a rough approximated SLBoundary using box length. It is guaranteed to
@@ -535,6 +577,11 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
   return true;
 }
 
+std::vector<hdmap::LaneSegment> ReferenceLine::GetLaneSegments(
+    const double start_s, const double end_s) const {
+  return map_path_.GetLaneSegments(start_s, end_s);
+}
+
 bool ReferenceLine::GetSLBoundary(const hdmap::Polygon& polygon,
                                   SLBoundary* const sl_boundary) const {
   double start_s(std::numeric_limits<double>::max());
@@ -573,21 +620,21 @@ bool ReferenceLine::HasOverlap(const common::math::Box2d& box) const {
     return false;
   }
 
-  double left_width = 0.0;
-  double right_width = 0.0;
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
   const double mid_s = (sl_boundary.start_s() + sl_boundary.end_s()) / 2.0;
   if (mid_s < 0 || mid_s > Length()) {
     ADEBUG << "ref_s out of range:" << mid_s;
     return false;
   }
-  if (!map_path_.GetWidth(mid_s, &left_width, &right_width)) {
+  if (!map_path_.GetLaneWidth(mid_s, &lane_left_width, &lane_right_width)) {
     AERROR << "failed to get width at s = " << mid_s;
     return false;
   }
   if (sl_boundary.start_l() > 0) {
-    return sl_boundary.start_l() < left_width;
+    return sl_boundary.start_l() < lane_left_width;
   } else {
-    return sl_boundary.end_l() > -right_width;
+    return sl_boundary.end_l() > -lane_right_width;
   }
 }
 
@@ -623,7 +670,7 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
 void ReferenceLine::AddSpeedLimit(const hdmap::SpeedControl& speed_control) {
   SLBoundary sl_boundary;
   if (GetSLBoundary(speed_control.polygon(), &sl_boundary) &&
-      IsOnRoad(sl_boundary)) {
+      IsOnLane(sl_boundary)) {
     AddSpeedLimit(sl_boundary.start_s(), sl_boundary.end_s(),
                   speed_control.speed_limit());
   }

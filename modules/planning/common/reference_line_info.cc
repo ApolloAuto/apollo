@@ -29,12 +29,12 @@
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/thread_pool.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/planning_thread_pool.h"
-#include "modules/planning/common/planning_util.h"
 
 namespace apollo {
 namespace planning {
@@ -48,7 +48,7 @@ using apollo::common::VehicleSignal;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::planning::util::GetPlanningStatus;
+using apollo::common::util::ThreadPool;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -61,6 +61,7 @@ ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
 
 bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   const auto& param = VehicleConfigHelper::GetConfig().vehicle_param();
+  // stitching point
   const auto& path_point = adc_planning_point_.path_point();
   Vec2d position(path_point.x(), path_point.y());
   Vec2d vec_to_center(
@@ -68,23 +69,42 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
   Vec2d center(position + vec_to_center.rotate(path_point.theta()));
   Box2d box(center, path_point.theta(), param.length(), param.width());
-  if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
+  // realtime vehicle position
+  Vec2d vehicle_position(vehicle_state_.x(), vehicle_state_.y());
+  Vec2d vehicle_center(vehicle_position +
+                       vec_to_center.rotate(vehicle_state_.heading()));
+  Box2d vehicle_box(vehicle_center, vehicle_state_.heading(), param.length(),
+                    param.width());
+
+  if (!reference_line_.GetSLBoundary(vehicle_box,
+                                     &sl_boundary_info_.vehicle_sl_boundary_)) {
+    AERROR << "Failed to get ADC boundary from vehicle_box(realtime position "
+              "of the car): "
+           << box.DebugString();
+    return false;
+  }
+
+  if (!reference_line_.GetSLBoundary(box,
+                                     &sl_boundary_info_.adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
-  if (adc_sl_boundary_.end_s() < 0 ||
-      adc_sl_boundary_.start_s() > reference_line_.Length()) {
-    AWARN << "Vehicle SL " << adc_sl_boundary_.ShortDebugString()
+
+  if (sl_boundary_info_.adc_sl_boundary_.end_s() < 0 ||
+      sl_boundary_info_.adc_sl_boundary_.start_s() > reference_line_.Length()) {
+    AWARN << "Vehicle SL "
+          << sl_boundary_info_.adc_sl_boundary_.ShortDebugString()
           << " is not on reference line:[0, " << reference_line_.Length()
           << "]";
   }
   constexpr double kOutOfReferenceLineL = 10.0;  // in meters
-  if (adc_sl_boundary_.start_l() > kOutOfReferenceLineL ||
-      adc_sl_boundary_.end_l() < -kOutOfReferenceLineL) {
+  if (sl_boundary_info_.adc_sl_boundary_.start_l() > kOutOfReferenceLineL ||
+      sl_boundary_info_.adc_sl_boundary_.end_l() < -kOutOfReferenceLineL) {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
-  is_on_reference_line_ = reference_line_.IsOnRoad(adc_sl_boundary_);
+  is_on_reference_line_ =
+      reference_line_.IsOnLane(sl_boundary_info_.adc_sl_boundary_);
   if (!AddObstacles(obstacles)) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
@@ -97,17 +117,9 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     }
   }
 
-  if (FLAGS_use_navigation_mode &&
-      !AdapterManager::GetPerceptionObstacles()->Empty()) {
-    const auto& cipv_info = AdapterManager::GetPerceptionObstacles()
-                                ->GetLatestObserved()
-                                .cipv_info();
-    path_decision_.SetCIPVInfo(cipv_info);
-  }
   // set lattice planning target speed limit;
-  double cruise_speed = std::min(FLAGS_speed_upper_bound,
-      reference_line().GetSpeedLimitFromS(adc_sl_boundary_.end_s()));
-  SetCruiseSpeed(std::min(FLAGS_default_cruise_speed, cruise_speed));
+  SetCruiseSpeed(FLAGS_default_cruise_speed);
+  is_safe_to_change_lane_ = CheckChangeLane();
   is_inited_ = true;
   return true;
 }
@@ -134,27 +146,65 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
   auto* right_of_way = GetPlanningStatus()->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
-    if (overlap.end_s < adc_sl_boundary_.start_s()) {
+    if (overlap.end_s < sl_boundary_info_.adc_sl_boundary_.start_s()) {
       junction_right_of_way->erase(overlap.object_id);
-    } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
+    } else if (WithinOverlap(overlap,
+                             sl_boundary_info_.adc_sl_boundary_.end_s())) {
       auto is_protected = (*junction_right_of_way)[overlap.object_id];
       if (is_protected) {
         return ADCTrajectory::PROTECTED;
       } else {
-        double junction_s = (overlap.end_s + overlap.start_s) / 2.0;
-        auto ref_point = reference_line_.GetReferencePoint(junction_s);
-        if (ref_point.lane_waypoints().empty()) {
-          return ADCTrajectory::PROTECTED;
-        }
-        for (const auto& waypoint : ref_point.lane_waypoints()) {
-          if (waypoint.lane->lane().turn() == hdmap::Lane::NO_TURN) {
-            return ADCTrajectory::PROTECTED;
+        const auto lane_segments =
+            reference_line_.GetLaneSegments(overlap.start_s, overlap.end_s);
+        for (const auto& segment : lane_segments) {
+          if (segment.lane->lane().turn() != hdmap::Lane::NO_TURN) {
+            return ADCTrajectory::UNPROTECTED;
           }
         }
+        return ADCTrajectory::PROTECTED;
       }
     }
   }
   return ADCTrajectory::UNPROTECTED;
+}
+
+bool ReferenceLineInfo::CheckChangeLane() const {
+  if (!IsChangeLanePath()) {
+    ADEBUG << "Not a change lane path.";
+    return false;
+  }
+
+  for (const auto* path_obstacle : path_decision_.path_obstacles().Items()) {
+    const auto& sl_boundary = path_obstacle->PerceptionSLBoundary();
+
+    constexpr float kLateralShift = 2.5;
+    if (sl_boundary.start_l() < -kLateralShift ||
+        sl_boundary.end_l() > kLateralShift) {
+      continue;
+    }
+
+    constexpr float kSafeTime = 3.0;
+    constexpr float kForwardMinSafeDistance = 6.0;
+    constexpr float kBackwardMinSafeDistance = 8.0;
+
+    const float kForwardSafeDistance =
+        std::max(kForwardMinSafeDistance,
+                 static_cast<float>((adc_planning_point_.v() -
+                                     path_obstacle->obstacle()->Speed()) *
+                                    kSafeTime));
+    const float kBackwardSafeDistance =
+        std::max(kBackwardMinSafeDistance,
+                 static_cast<float>((path_obstacle->obstacle()->Speed() -
+                                     adc_planning_point_.v()) *
+                                    kSafeTime));
+    if (sl_boundary.end_s() > sl_boundary_info_.adc_sl_boundary_.start_s() -
+                                  kBackwardSafeDistance &&
+        sl_boundary.start_s() <
+            sl_boundary_info_.adc_sl_boundary_.end_s() + kForwardSafeDistance) {
+      return false;
+    }
+  }
+  return true;
 }
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
@@ -168,16 +218,17 @@ const std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
 }
 
 const SLBoundary& ReferenceLineInfo::AdcSlBoundary() const {
-  return adc_sl_boundary_;
+  return sl_boundary_info_.adc_sl_boundary_;
+}
+
+const SLBoundary& ReferenceLineInfo::VehicleSlBoundary() const {
+  return sl_boundary_info_.vehicle_sl_boundary_;
 }
 
 PathDecision* ReferenceLineInfo::path_decision() { return &path_decision_; }
 
 const PathDecision& ReferenceLineInfo::path_decision() const {
   return path_decision_;
-}
-const TrajectoryPoint& ReferenceLineInfo::AdcPlanningPoint() const {
-  return adc_planning_point_;
 }
 
 const ReferenceLine& ReferenceLineInfo::reference_line() const {
@@ -188,9 +239,8 @@ void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
   discretized_trajectory_ = trajectory;
 }
 
-void ReferenceLineInfo::AddObstacleHelper(const Obstacle* obstacle, int* ret) {
-  auto* path_obstacle = AddObstacle(obstacle);
-  *ret = path_obstacle == nullptr ? 0 : 1;
+bool ReferenceLineInfo::AddObstacleHelper(const Obstacle* obstacle) {
+  return AddObstacle(obstacle) != nullptr;
 }
 
 // AddObstacle is thread safe
@@ -223,8 +273,8 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "NO build reference line st boundary. id:" << obstacle->Id();
   } else {
     ADEBUG << "build reference line st boundary. id:" << obstacle->Id();
-    path_obstacle->BuildReferenceLineStBoundary(reference_line_,
-                                                adc_sl_boundary_.start_s());
+    path_obstacle->BuildReferenceLineStBoundary(
+        reference_line_, sl_boundary_info_.adc_sl_boundary_.start_s());
 
     ADEBUG << "reference line st boundary: "
            << path_obstacle->reference_line_st_boundary().min_t() << ", "
@@ -239,15 +289,20 @@ PathObstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 bool ReferenceLineInfo::AddObstacles(
     const std::vector<const Obstacle*>& obstacles) {
   if (FLAGS_use_multi_thread_to_add_obstacles) {
-    std::vector<int> ret(obstacles.size(), 0);
-    for (size_t i = 0; i < obstacles.size(); ++i) {
-      const auto* obstacle = obstacles.at(i);
-      PlanningThreadPool::instance()->Push(std::bind(
-          &ReferenceLineInfo::AddObstacleHelper, this, obstacle, &(ret[i])));
+    std::vector<std::future<bool>> futures;
+    for (const auto* obstacle : obstacles) {
+      futures.push_back(ThreadPool::pool()->push(
+          std::bind(&ReferenceLineInfo::AddObstacleHelper, this, obstacle)));
     }
-    PlanningThreadPool::instance()->Synchronize();
-    if (std::find(ret.begin(), ret.end(), 0) != ret.end()) {
-      return false;
+
+    for (const auto& f : futures) {
+      f.wait();
+    }
+
+    for (auto& f : futures) {
+      if (!f.get()) {
+        return false;
+      }
     }
   } else {
     for (const auto* obstacle : obstacles) {
@@ -257,6 +312,7 @@ bool ReferenceLineInfo::AddObstacles(
       }
     }
   }
+
   return true;
 }
 
@@ -268,8 +324,8 @@ bool ReferenceLineInfo::IsUnrelaventObstacle(PathObstacle* path_obstacle) {
   }
   if (is_on_reference_line_ &&
       path_obstacle->PerceptionSLBoundary().end_s() <
-          adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnRoad(path_obstacle->PerceptionSLBoundary())) {
+          sl_boundary_info_.adc_sl_boundary_.end_s() &&
+      reference_line_.IsOnLane(path_obstacle->PerceptionSLBoundary())) {
     return true;
   }
   return false;
@@ -305,7 +361,7 @@ bool ReferenceLineInfo::IsStartFrom(
       previous_reference_line_info.reference_line();
   common::SLPoint sl_point;
   prev_reference_line.XYToSL(start_point, &sl_point);
-  return previous_reference_line_info.reference_line_.IsOnRoad(sl_point);
+  return previous_reference_line_info.reference_line_.IsOnLane(sl_point);
 }
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
@@ -367,6 +423,10 @@ bool ReferenceLineInfo::IsChangeLanePath() const {
   return !Lanes().IsOnSegment();
 }
 
+bool ReferenceLineInfo::IsNeighborLanePath() const {
+  return Lanes().IsNeighborSegment();
+}
+
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
   return apollo::common::util::StrCat("path_data:", path_data_.DebugString(),
                                       "speed_data:", speed_data_.DebugString());
@@ -388,7 +448,7 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   }
   // check lane's turn type
   double route_s = 0.0;
-  const double adc_s = adc_sl_boundary_.end_s();
+  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   for (const auto& seg : Lanes()) {
     if (route_s > adc_s + FLAGS_turn_signal_distance) {
       break;
@@ -426,7 +486,7 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
 
 bool ReferenceLineInfo::IsRightTurnPath() const {
   double route_s = 0.0;
-  const double adc_s = adc_sl_boundary_.end_s();
+  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   constexpr double kRightTurnStartBuff = 1.0;
   for (const auto& seg : Lanes()) {
     if (route_s > adc_s + kRightTurnStartBuff) {
@@ -453,13 +513,14 @@ bool ReferenceLineInfo::ReachedDestination() const {
   if (!dest_ptr->LongitudinalDecision().has_stop()) {
     return false;
   }
-  if (!reference_line_.IsOnRoad(
+  if (!reference_line_.IsOnLane(
           dest_ptr->obstacle()->PerceptionBoundingBox().center())) {
     return false;
   }
   const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +
                         dest_ptr->LongitudinalDecision().stop().distance_s();
-  return adc_sl_boundary_.end_s() + kDestinationDeltaS > stop_s;
+  return sl_boundary_info_.adc_sl_boundary_.end_s() + kDestinationDeltaS >
+         stop_s;
 }
 
 void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
@@ -500,18 +561,21 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   if (main_stop.reason_code() != STOP_REASON_DESTINATION) {
     return;
   }
-  const auto& adc_pos = AdcPlanningPoint().path_point();
+  const auto& adc_pos = adc_planning_point_.path_point();
   if (common::util::DistanceXY(adc_pos, main_stop.stop_point()) >
       FLAGS_destination_check_distance) {
     return;
   }
-  if (ReachedDestination()) {
-    return;
-  }
+
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
-  mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
-  mission_complete->set_stop_heading(main_stop.stop_heading());
+  if (ReachedDestination()) {
+    GetPlanningStatus()->mutable_destination()->set_has_passed_destination(
+        true);
+  } else {
+    mission_complete->mutable_stop_point()->CopyFrom(main_stop.stop_point());
+    mission_complete->set_stop_heading(main_stop.stop_heading());
+  }
 }
 
 int ReferenceLineInfo::MakeMainStopDecision(
@@ -613,8 +677,8 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     prev_advice->set_reason("Not on reference line");
   } else {
     // check heading
-    auto ref_point =
-        reference_line_.GetReferencePoint(adc_sl_boundary_.end_s());
+    auto ref_point = reference_line_.GetReferencePoint(
+        sl_boundary_info_.adc_sl_boundary_.end_s());
     if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
         kMaxAngleDiff) {
       if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {

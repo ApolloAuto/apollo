@@ -34,7 +34,7 @@ const trafficLightScales = {
     z: TRAFFIC_LIGHT_SCALE
 };
 
-const STOP_SIGN_SCALE = 2;
+const STOP_SIGN_SCALE = 0.01;
 const stopSignScales = {
     x: STOP_SIGN_SCALE,
     y: STOP_SIGN_SCALE,
@@ -43,8 +43,6 @@ const stopSignScales = {
 
 export default class Map {
     constructor() {
-        loadObject(trafficLightMaterial, trafficLightObject, trafficLightScales);
-        loadObject(stopSignMaterial, stopSignObject, stopSignScales);
         this.hash = -1;
         this.data = {};
         this.laneHeading = {};
@@ -352,11 +350,10 @@ export default class Map {
         const drewObjects = [];
         const posAndHeading = this.getStopSignPositionAndHeading(stopSign, coordinates);
         if (posAndHeading) {
-            loadObject(stopSignMaterial, stopSignObject,
-                stopSignScales,
+            loadObject(stopSignMaterial, stopSignObject, stopSignScales,
                 mesh => {
                     mesh.rotation.x = Math.PI / 2;
-                    mesh.rotation.y = posAndHeading.heading + Math.PI / 2;
+                    mesh.rotation.y = posAndHeading.heading - Math.PI / 2;
                     mesh.position.set(posAndHeading.pos.x, posAndHeading.pos.y, 0);
                     mesh.matrixAutoUpdate = false;
                     mesh.updateMatrix();

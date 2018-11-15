@@ -45,7 +45,7 @@ namespace apollo {
 namespace perception {
 namespace traffic_light {
 void Yuyv2rgb(unsigned char *YUV, unsigned char *RGB, int NumPixels);
-#ifdef  __USE_AVX__
+#ifdef __USE_AVX__
 
 #define SIMD_INLINE inline __attribute__((always_inline))
 

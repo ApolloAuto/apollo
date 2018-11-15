@@ -42,7 +42,7 @@ namespace relative_map {
 class RelativeMapInterface : public apollo::common::ApolloApp {
  public:
   /**
-   * @brief main logic of the relativem map module, triggered by timer.
+   * @brief main logic of the relative map module, triggered by timer.
    */
   virtual void RunOnce() = 0;
 

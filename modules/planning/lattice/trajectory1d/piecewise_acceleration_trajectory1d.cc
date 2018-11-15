@@ -30,7 +30,7 @@
 namespace apollo {
 namespace planning {
 
-ConstantAccelerationTrajectory1d::ConstantAccelerationTrajectory1d(
+PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(
     const double start_s, const double start_v) {
   s_.push_back(start_s);
   v_.push_back(start_v);
@@ -38,7 +38,7 @@ ConstantAccelerationTrajectory1d::ConstantAccelerationTrajectory1d(
   t_.push_back(0.0);
 }
 
-void ConstantAccelerationTrajectory1d::AppendSegment(
+void PiecewiseAccelerationTrajectory1d::AppendSegment(
     const double a, const double t_duration) {
   double s0 = s_.back();
   double v0 = v_.back();
@@ -59,7 +59,7 @@ void ConstantAccelerationTrajectory1d::AppendSegment(
   t_.push_back(t1);
 }
 
-void ConstantAccelerationTrajectory1d::PopSegment() {
+void PiecewiseAccelerationTrajectory1d::PopSegment() {
   if (a_.size() > 0) {
     s_.pop_back();
     v_.pop_back();
@@ -68,12 +68,12 @@ void ConstantAccelerationTrajectory1d::PopSegment() {
   }
 }
 
-double ConstantAccelerationTrajectory1d::ParamLength() const {
+double PiecewiseAccelerationTrajectory1d::ParamLength() const {
   CHECK_GT(t_.size(), 1);
   return t_.back() - t_.front();
 }
 
-std::string ConstantAccelerationTrajectory1d::ToString() const {
+std::string PiecewiseAccelerationTrajectory1d::ToString() const {
   return apollo::common::util::StrCat(apollo::common::util::PrintIter(s_, "\t"),
                                       apollo::common::util::PrintIter(t_, "\t"),
                                       apollo::common::util::PrintIter(v_, "\t"),
@@ -81,7 +81,7 @@ std::string ConstantAccelerationTrajectory1d::ToString() const {
                                       "\n");
 }
 
-double ConstantAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
+double PiecewiseAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
                                                   const double param) const {
   CHECK_GT(t_.size(), 1);
   CHECK(t_.front() <= param && param <= t_.back());
@@ -99,7 +99,7 @@ double ConstantAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
   return 0.0;
 }
 
-double ConstantAccelerationTrajectory1d::Evaluate_s(const double t) const {
+double PiecewiseAccelerationTrajectory1d::Evaluate_s(const double t) const {
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
   auto index = std::distance(t_.begin(), it_lower);
 
@@ -107,39 +107,39 @@ double ConstantAccelerationTrajectory1d::Evaluate_s(const double t) const {
   double v0 = v_[index - 1];
   double t0 = t_[index - 1];
 
-  double v1 = v_.back();
-  double t1 = t_.back();
+  double v1 = v_[index];
+  double t1 = t_[index];
 
   double v = common::math::lerp(v0, t0, v1, t1, t);
   double s = (v0 + v) * (t - t0) * 0.5 + s0;
   return s;
 }
 
-double ConstantAccelerationTrajectory1d::Evaluate_v(const double t) const {
+double PiecewiseAccelerationTrajectory1d::Evaluate_v(const double t) const {
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
   auto index = std::distance(t_.begin(), it_lower);
 
   double v0 = v_[index - 1];
   double t0 = t_[index - 1];
 
-  double v1 = v_.back();
-  double t1 = t_.back();
+  double v1 = v_[index];
+  double t1 = t_[index];
 
   double v = apollo::common::math::lerp(v0, t0, v1, t1, t);
   return v;
 }
 
-double ConstantAccelerationTrajectory1d::Evaluate_a(const double t) const {
+double PiecewiseAccelerationTrajectory1d::Evaluate_a(const double t) const {
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
   auto index = std::distance(t_.begin(), it_lower);
   return a_[index - 1];
 }
 
-double ConstantAccelerationTrajectory1d::Evaluate_j(const double t) const {
+double PiecewiseAccelerationTrajectory1d::Evaluate_j(const double t) const {
   return 0.0;
 }
 
-std::array<double, 4> ConstantAccelerationTrajectory1d::Evaluate(
+std::array<double, 4> PiecewiseAccelerationTrajectory1d::Evaluate(
     const double t) const {
   CHECK_GT(t_.size(), 1);
   CHECK(t_.front() <= t && t <= t_.back());
@@ -151,8 +151,8 @@ std::array<double, 4> ConstantAccelerationTrajectory1d::Evaluate(
   double v0 = v_[index - 1];
   double t0 = t_[index - 1];
 
-  double v1 = v_.back();
-  double t1 = t_.back();
+  double v1 = v_[index];
+  double t1 = t_[index];
 
   double v = common::math::lerp(v0, t0, v1, t1, t);
   double s = (v0 + v) * (t - t0) * 0.5 + s0;

@@ -43,15 +43,19 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
   if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap) {
-    if (FLAGS_prediction_offline_mode) {
-      FeatureOutput::Write();
-    }
     obstacles_.Clear();
     ADEBUG << "Replay mode is enabled.";
   } else if (timestamp <= timestamp_) {
     AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
            << timestamp_ << "].";
     return;
+  }
+
+  if (FLAGS_prediction_offline_mode) {
+    if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+        FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
+      FeatureOutput::Write();
+    }
   }
 
   timestamp_ = timestamp;

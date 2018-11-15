@@ -93,8 +93,6 @@ Obstacle::Obstacle(const std::string& id,
         common::util::DistanceXY(prev.path_point(), cur.path_point());
     trajectory_points[i].mutable_path_point()->set_s(cumulative_s);
   }
-  speed_ = std::hypot(perception_obstacle.velocity().x(),
-                      perception_obstacle.velocity().y());
 }
 
 double Obstacle::Speed() const { return speed_; }

@@ -26,7 +26,7 @@
 
 #include "modules/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
-#include "modules/planning/common/planning_util.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -66,7 +66,7 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
       *(it_lower - 1), *it_lower, relative_time);
 }
 
-std::uint32_t DiscretizedTrajectory::QueryNearestPoint(
+std::uint32_t DiscretizedTrajectory::QueryLowerBoundPoint(
     const double relative_time) const {
   CHECK(!trajectory_points_.empty());
 
@@ -131,22 +131,6 @@ double DiscretizedTrajectory::GetSpatialLength() const {
   return trajectory_points_.back().path_point().s() -
          trajectory_points_.front().path_point().s();
 }
-
-std::uint32_t DiscretizedTrajectory::NumOfPoints() const {
-  return trajectory_points_.size();
-}
-
-const std::vector<TrajectoryPoint>& DiscretizedTrajectory::trajectory_points()
-    const {
-  return trajectory_points_;
-}
-
-void DiscretizedTrajectory::SetTrajectoryPoints(
-    const std::vector<common::TrajectoryPoint>& trajectory_points) {
-  trajectory_points_ = trajectory_points;
-}
-
-void DiscretizedTrajectory::Clear() { trajectory_points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo

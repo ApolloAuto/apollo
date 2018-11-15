@@ -17,6 +17,13 @@ config_setting(
 )
 
 config_setting(
+    name = "use_gpu",
+    values = {
+        "define": "USE_GPU=true",
+    },
+)
+
+config_setting(
     name = "use_esd_can",
     values = {
         "define": "CAN_CARD=esd_can",

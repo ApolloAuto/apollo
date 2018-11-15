@@ -18,10 +18,9 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/common/configs/config_gflags.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
-#include "modules/planning/planning.h"
 
 namespace apollo {
 namespace planning {
@@ -58,6 +57,12 @@ TEST_F(GarageTest, stop_obstacle) {
   FLAGS_test_localization_file = "stop_obstacle_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_obstacle_chassis.pb.txt";
   PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
   RUN_GOLDEN_TEST(0);
 }
 
@@ -68,18 +73,34 @@ TEST_F(GarageTest, follow) {
   FLAGS_test_prediction_file = "follow_prediction.pb.txt";
   FLAGS_test_localization_file = "follow_localization.pb.txt";
   FLAGS_test_chassis_file = "follow_chassis.pb.txt";
+
   PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
   RUN_GOLDEN_TEST(0);
 }
 
 /*
- * test stop for destination
+ * test destination stop
  */
-TEST_F(GarageTest, stop_dest) {
+TEST_F(GarageTest, dest_stop_01) {
+  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
+  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
+
   FLAGS_test_prediction_file = "stop_dest_prediction.pb.txt";
   FLAGS_test_localization_file = "stop_dest_localization.pb.txt";
   FLAGS_test_chassis_file = "stop_dest_chassis.pb.txt";
   PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
   RUN_GOLDEN_TEST(0);
 }
 
@@ -104,6 +125,12 @@ TEST_F(GarageTest, stop_over_line) {
   FLAGS_test_localization_file = seq_num + "_localization.pb.txt";
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
+
+  // set config
+  auto* destination_config =
+      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
+  destination_config->mutable_destination()->set_enable_pull_over(false);
+
   RUN_GOLDEN_TEST(0);
 }
 

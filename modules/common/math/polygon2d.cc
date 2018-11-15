@@ -398,6 +398,17 @@ bool Polygon2d::GetOverlap(const LineSegment2d &line_segment,
   return min_proj <= max_proj + kMathEpsilon;
 }
 
+void Polygon2d::GetAllVertices(std::vector<Vec2d> *const vertices) const {
+  if (vertices == nullptr) {
+    return;
+  }
+  *vertices = points_;
+}
+
+std::vector<Vec2d> Polygon2d::GetAllVertices() const {
+  return points_;
+}
+
 std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
     const LineSegment2d &line_segment) const {
   CHECK_GE(points_.size(), 3);

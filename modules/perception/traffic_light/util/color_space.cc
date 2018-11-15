@@ -167,7 +167,7 @@ void YUV2RGB(const unsigned char y, const unsigned char u,
 }
 
 void Yuyv2rgb(unsigned char* YUV, unsigned char* RGB, int NumPixels) {
-  for (int i = 0, int j = 0; i < (NumPixels << 1); i += 4, j += 6) {
+  for (int i = 0, j = 0; i < (NumPixels << 1); i += 4, j += 6) {
     unsigned char y0 = (unsigned char)YUV[i + 0];
     unsigned char u = (unsigned char)YUV[i + 1];
     unsigned char y1 = (unsigned char)YUV[i + 2];

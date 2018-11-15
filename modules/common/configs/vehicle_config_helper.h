@@ -27,8 +27,8 @@
 #include "modules/common/macro.h"
 
 /**
- * @namespace apollo::common::config
- * @brief apollo::common::config
+ * @namespace apollo::common
+ * @brief apollo::common
  */
 namespace apollo {
 namespace common {
@@ -45,8 +45,8 @@ class VehicleConfigHelper {
   /**
    * @brief Initialize vehicle configurations with default configuration file
    * pointed by gflags FLAGS_vehicle_config_path. The code will crash if
-   * FLAGS_vehicle_config_path does not exit or it points to a file with invalid
-   * format.
+   * FLAGS_vehicle_config_path does not exist or it points to a file with
+   * invalid format.
    */
   static void Init();
 
@@ -74,7 +74,7 @@ class VehicleConfigHelper {
   static const VehicleConfig &GetConfig();
 
   /**
-   * @brief Get the safe turnning radius when the vehicle is turning with
+   * @brief Get the safe turning radius when the vehicle is turning with
    * maximum steering angle.
    *
    * The calculation is described by the following figure.

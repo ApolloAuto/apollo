@@ -78,6 +78,29 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "cos_theta_reference_line_smoother",
+    srcs = [
+        "cos_theta_problem_interface.cc",
+        "cos_theta_reference_line_smoother.cc",
+    ],
+    hdrs = [
+        "cos_theta_problem_interface.h",
+        "cos_theta_reference_line_smoother.h",
+    ],
+    deps = [
+        ":qp_spline_reference_line_smoother",
+        ":reference_line",
+        ":reference_line_smoother",
+        "//modules/common/math",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/math:curve_math",
+        "//modules/planning/proto:planning_proto",
+        "@eigen",
+        "@ipopt",
+    ],
+)
+
 cc_test(
     name = "qp_spline_reference_line_smoother_test",
     size = "small",
@@ -95,6 +118,23 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "cos_theta_reference_line_smoother_test",
+    size = "small",
+    srcs = [
+        "cos_theta_reference_line_smoother_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":cos_theta_reference_line_smoother",
+        "//modules/map/hdmap",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "reference_line_provider",
     srcs = [
@@ -104,13 +144,18 @@ cc_library(
         "reference_line_provider.h",
     ],
     deps = [
+        ":cos_theta_reference_line_smoother",
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/util:factory",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/map/pnc_map",
+        "//modules/planning/common:indexed_queue",
+        "//modules/planning/common:planning_context",
         "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_status_proto",
     ],
 )
 
@@ -120,8 +165,20 @@ cc_binary(
         "smoother_util.cc",
     ],
     deps = [
+        ":cos_theta_reference_line_smoother",
         ":qp_spline_reference_line_smoother",
         ":reference_line",
+        ":spiral_reference_line_smoother",
+        "//modules/planning/proto:planning_config_proto",
+    ],
+)
+
+cc_binary(
+    name = "spiral_smoother_util",
+    srcs = [
+        "spiral_smoother_util.cc",
+    ],
+    deps = [
         ":spiral_reference_line_smoother",
         "//modules/planning/proto:planning_config_proto",
     ],

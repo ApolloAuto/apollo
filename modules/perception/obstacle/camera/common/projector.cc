@@ -29,7 +29,7 @@ using std::ifstream;
 using Eigen::MatrixXf;
 using Eigen::Map;
 
-bool MatrixProjector::project(vector<float>* feature) {
+bool MatrixProjector::project(vector<float> *feature) {
   if (feature == nullptr) {
     AERROR << "feature is a null pointer.";
     return false;
@@ -50,7 +50,7 @@ bool MatrixProjector::project(vector<float>* feature) {
   return true;
 }
 
-MatrixProjector::MatrixProjector(string weight_file) {
+MatrixProjector::MatrixProjector(const string &weight_file) {
   ifstream f_in(weight_file.c_str());
   int height = 0;
   int width = 0;

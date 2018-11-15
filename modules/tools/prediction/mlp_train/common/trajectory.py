@@ -22,6 +22,7 @@ import logging
 from configure import parameters
 param_fea = parameters['feature']
 
+
 class TrajectoryToSample(object):
 
     __metaclass__ = abc.ABCMeta
@@ -48,7 +49,6 @@ class TrajectoryToSample(object):
             if lane_seq_sz == 0:
                 continue
             elif lane_seq_sz > 10:
-                print trajectory[i]
                 print "Too many lane sequences:", lane_seq_sz
 
             fea_prev = trajectory[i - 1]
@@ -79,7 +79,6 @@ class TrajectoryToSample(object):
         results.reverse()
         return results
 
-
     @staticmethod
     def cmp_lane_seq(real_seq, predict_seq):
         '''
@@ -107,7 +106,6 @@ class TrajectoryToSample(object):
                     return -1
             return 2
 
-
     def is_successor_lane(self, feature, lane_id):
         '''
         return True if lane_id is the successor lane of feature
@@ -125,7 +123,6 @@ class TrajectoryToSample(object):
             return False
         else:
             return True
-
 
     @classmethod
     def label(cls, trajectory):
@@ -146,7 +143,7 @@ class TrajectoryToSample(object):
                     break
                 if not trajectory[j].HasField('lane') or \
                    not trajectory[j].lane.HasField('lane_feature'):
-                    continue;
+                    continue
 
                 lane_id_j = trajectory[j].lane.lane_feature.lane_id
                 trajectory[i].label_update_time_delta = time_span
@@ -158,7 +155,6 @@ class TrajectoryToSample(object):
             if len(future_lane_ids) < 1:
                 print "No lane id"
                 continue
-            print "Future lane ids = ", future_lane_ids
 
             seq_size = len(fea.lane.lane_graph.lane_sequence)
             for j in range(seq_size):
@@ -169,10 +165,8 @@ class TrajectoryToSample(object):
                 for k in range(len(seq.lane_segment)):
                     if seq.lane_segment[k].HasField('lane_id'):
                         predict_lane_ids.append(seq.lane_segment[k].lane_id)
-                print "Predicted lane ids = ", predict_lane_ids
 
                 seq.label = cls.cmp_lane_seq(future_lane_ids, predict_lane_ids)
-                print "Label is set to be ", seq.label
         return trajectory
 
     @abc.abstractmethod

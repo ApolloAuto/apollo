@@ -85,7 +85,7 @@ class ActiveSetQpSolver : public QpSolver {
   bool sanity_check() override;
 
  private:
-  // equality constriant + inequality constraint
+  // equality constraint + inequality constraint
   int num_constraint_ = 0;
   // number of parameters
   int num_param_ = 0;

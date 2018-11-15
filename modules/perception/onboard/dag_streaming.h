@@ -20,7 +20,6 @@
 #include <map>
 #include <memory>
 #include <string>
-// #include <unordered_map>
 #include <vector>
 
 #include "gflags/gflags.h"
@@ -61,7 +60,7 @@ class DAGStreaming : public Thread {
 
   size_t CongestionValue() const;
 
-  static Subnode *GetSubnodeByName(std::string name);
+  static Subnode *GetSubnodeByName(const std::string &name);
 
  protected:
   void Run() override;

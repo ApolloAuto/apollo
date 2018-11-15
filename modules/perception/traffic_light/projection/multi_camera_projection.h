@@ -21,7 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/traffic_light/multi_camera_projection_config.pb.h"
+
 #include "modules/perception/traffic_light/interface/base_projection.h"
 
 namespace apollo {
@@ -42,6 +43,8 @@ class MultiCamerasProjection {
   std::vector<CameraCoeffient> camera_coeffient_;
   std::vector<std::string> camera_names_;
   std::unique_ptr<BaseProjection> projection_;
+
+  traffic_light::multi_camera_projection_config::ModelConfigs config_;
 };
 
 }  // namespace traffic_light

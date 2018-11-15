@@ -21,6 +21,7 @@
 #ifndef MODULES_COMMON_UTIL_FILE_H_
 #define MODULES_COMMON_UTIL_FILE_H_
 
+#include <dirent.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -207,6 +208,13 @@ bool PathExists(const std::string &path);
 bool DirectoryExists(const std::string &directory_path);
 
 /**
+ * @brief Expand path pattern to matched pathes.
+ * @param pattern Path pattern, which may contain wildcards [?*].
+ * @return Matched path list.
+ */
+std::vector<std::string> Glob(const std::string& pattern);
+
+/**
  * @brief Copy a file.
  * @param from The file path to copy from.
  * @param to The file path to copy to.
@@ -247,11 +255,13 @@ bool EnsureDirectory(const std::string &directory_path);
 bool RemoveAllFiles(const std::string &directory_path);
 
 /**
- * @brief List sub-directories.
+ * @brief List sub-paths.
  * @param directory_path Directory path.
- * @return A vector of sub-directories, without the directory_path prefix.
+ * @param d_type Sub-path type, DT_DIR for directory, or DT_REG for file.
+ * @return A vector of sub-paths, without the directory_path prefix.
  */
-std::vector<std::string> ListSubDirectories(const std::string &directory_path);
+std::vector<std::string> ListSubPaths(const std::string &directory_path,
+                                      const unsigned char d_type = DT_DIR);
 
 std::string GetFileName(const std::string &path);
 

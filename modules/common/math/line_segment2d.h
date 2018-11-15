@@ -109,7 +109,7 @@ class LineSegment2d {
    * @brief Compute the shortest distance from a point on the line segment
    *        to a point in 2-D.
    * @param point The point to compute the distance to.
-   * @return The shortest ditance from points on the line segment to point.
+   * @return The shortest distance from points on the line segment to point.
    */
   double DistanceTo(const Vec2d &point) const;
 
@@ -119,7 +119,7 @@ class LineSegment2d {
    * @param point The point to compute the distance to.
    * @param nearest_pt The nearest point on the line segment
    *        to the input point.
-   * @return The shortest ditance from points on the line segment
+   * @return The shortest distance from points on the line segment
    *         to the input point.
    */
   double DistanceTo(const Vec2d &point, Vec2d *const nearest_pt) const;
@@ -128,7 +128,7 @@ class LineSegment2d {
    * @brief Compute the square of the shortest distance from a point
    *        on the line segment to a point in 2-D.
    * @param point The point to compute the squared of the distance to.
-   * @return The square of the shortest ditance from points
+   * @return The square of the shortest distance from points
    *         on the line segment to the input point.
    */
   double DistanceSquareTo(const Vec2d &point) const;
@@ -140,14 +140,14 @@ class LineSegment2d {
    * @param point The point to compute the squared of the distance to.
    * @param nearest_pt The nearest point on the line segment
    *        to the input point.
-   * @return The shortest ditance from points on the line segment
+   * @return The shortest distance from points on the line segment
    *         to the input point.
    */
   double DistanceSquareTo(const Vec2d &point, Vec2d *const nearest_pt) const;
 
   /**
    * @brief Check if a point is within the line segment.
-   * @param point The point to ckeck if it is within the line segment.
+   * @param point The point to check if it is within the line segment.
    * @return Whether the input point is within the line segment or not.
    */
   bool IsPointIn(const Vec2d &point) const;

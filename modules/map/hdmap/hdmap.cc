@@ -71,6 +71,10 @@ RoadInfoConstPtr HDMap::GetRoadById(const Id& id) const {
   return impl_.GetRoadById(id);
 }
 
+ParkingSpaceInfoConstPtr HDMap::GetParkingSpaceById(const Id& id) const {
+  return impl_.GetParkingSpaceById(id);
+}
+
 int HDMap::GetLanes(const apollo::common::PointENU& point, double distance,
                     std::vector<LaneInfoConstPtr>* lanes) const {
   return impl_.GetLanes(point, distance, lanes);
@@ -117,6 +121,12 @@ int HDMap::GetSpeedBumps(
 int HDMap::GetRoads(const apollo::common::PointENU& point, double distance,
                     std::vector<RoadInfoConstPtr>* roads) const {
   return impl_.GetRoads(point, distance, roads);
+}
+
+int HDMap::GetParkingSpaces(
+    const apollo::common::PointENU& point, double distance,
+    std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const {
+  return impl_.GetParkingSpaces(point, distance, parking_spaces);
 }
 
 int HDMap::GetNearestLane(const common::PointENU& point,

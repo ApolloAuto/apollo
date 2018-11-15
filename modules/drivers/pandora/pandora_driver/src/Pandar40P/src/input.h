@@ -39,9 +39,9 @@ class Input {
  public:
   Input(uint16_t port, uint16_t gpsPort);
   ~Input();
-  Input(std::string filePath, int type);
+  Input(std::string filePath, int type);  // not implemented
   int getPacket(PandarPacket *pkt);
-  int getPacketFromPcap(PandarPacket *pkt);
+  int getPacketFromPcap(PandarPacket *pkt);  // not implemented
 
  private:
   int socketForLidar;

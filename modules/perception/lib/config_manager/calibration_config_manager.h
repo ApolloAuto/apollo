@@ -44,14 +44,17 @@
 #ifndef MODULES_PERCEPTION_LIB_CALIBRATION_CONFIG_MANAGER_H_
 #define MODULES_PERCEPTION_LIB_CALIBRATION_CONFIG_MANAGER_H_
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+
 #include "modules/common/macro.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/cuda_util/undistortion.h"
@@ -118,7 +121,6 @@ class CalibrationConfigManager {
   std::string camera_extrinsic_path_;
   std::string camera_intrinsic_path_;
   std::string radar_extrinsic_path_;
-  std::string work_root_;
   CameraCalibrationPtr camera_calibration_;
   RadarCalibrationPtr radar_calibration_;
 
@@ -146,18 +148,44 @@ class CameraCalibration {
     return *_car2camera_pose;
   }
 
+  void SetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4> matrix,
+                                  bool adjusted) {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
+    camera2car_adj_ = matrix;
+    adjusted_extrinsic_ = adjusted;
+
+    auto c_int_inv = camera_intrinsic_.block(0, 0, 3, 3).inverse();
+    auto car2camera_3_4 = (camera2car_adj_.inverse()).block(0, 0, 3, 4);
+    Eigen::Matrix3d camera_2car_stripped;
+    camera_2car_stripped.col(0) = car2camera_3_4.col(0);
+    camera_2car_stripped.col(1) = car2camera_3_4.col(1);
+    camera_2car_stripped.col(2) = car2camera_3_4.col(3);
+
+    homography_camera2car_adj_ = camera_2car_stripped.inverse() * c_int_inv;
+    homography_camera2car_adj_inverse_ = homography_camera2car_adj_.inverse();
+  }
+
+  bool GetCar2CameraExtrinsicsAdj(Eigen::Matrix<double, 4, 4>* matrix) {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
+    *matrix = camera2car_adj_;
+    return adjusted_extrinsic_;
+  }
+
   inline CameraUndistortionPtr get_camera_undistort_handler() {
     return undistort_handler_;
   }
 
   inline CameraDistortPtr get_camera_model() { return camera_model_; }
 
-  //
   Eigen::Matrix<double, 3, 3> get_camera2car_homography_mat() {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
+    if (adjusted_extrinsic_) return homography_camera2car_adj_;
     return homography_mat_;
   }
 
   Eigen::Matrix<double, 3, 3> get_car2camera_homography_mat() {
+    std::lock_guard<std::mutex> lock(adj_mtx_);
+    if (adjusted_extrinsic_) return homography_camera2car_adj_inverse_;
     return homography_mat_inverse_;
   }
 
@@ -176,21 +204,34 @@ class CameraCalibration {
   void init_camera_model();
 
   Eigen::Matrix<double, 3, 4> camera_intrinsic_;  // camera intrinsic
+
   std::shared_ptr<Eigen::Matrix<double, 4, 4>>
       _camera2car_pose;  // camera to ego car pose
   std::shared_ptr<Eigen::Matrix<double, 4, 4>>
       _car2camera_pose;  // car to camera pose
+
+  // Pitch angle adjusted extrinsics to ego car space on the ground
+  // always available, but retreat to static one if above is false
+  std::mutex adj_mtx_;
+  bool adjusted_extrinsic_ = false;
+  Eigen::Matrix<double, 4, 4> camera2car_adj_;
+  Eigen::Matrix<double, 3, 3> homography_camera2car_adj_;
+
   Eigen::Matrix<double, 3, 4> camera_projection_mat_;
   Eigen::Matrix<double, 3, 3>
       homography_mat_;  // homography mat from camera 2 car
   Eigen::Matrix<double, 3, 3>
       homography_mat_inverse_;  // homography mat from car 2 camera
+  Eigen::Matrix<double, 3, 3> homography_camera2car_adj_inverse_;
   volatile std::shared_ptr<Eigen::Matrix<double, 3, 3>>
       camera_homography_;  // final homography based on online calibration
+
   CameraUndistortionPtr undistort_handler_;
   CameraDistortPtr camera_model_;
+
   size_t image_height_;
   size_t image_width_;
+
   Eigen::Quaterniond extrinsic_quat_;
   CameraCoeffient camera_coefficient_;
 };

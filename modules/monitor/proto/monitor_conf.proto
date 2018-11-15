@@ -15,10 +15,19 @@ message ProcessStatus {
 // For topic monitor.
 message TopicConf {
   optional apollo.common.adapter.AdapterConfig.MessageType type = 1;
-  optional double acceptable_delay = 2 [default = 1];  // In seconds.
+  optional double acceptable_delay = 2 [default = 3.0];  // In seconds.
 }
 message TopicStatus {
   optional double message_delay = 1;
+}
+
+message ResourceConf {
+  message DirSpace {
+    // Path to monitor space. Support wildcards like ? and *.
+    optional string path = 1;
+    optional int32 min_available_gb = 2;
+  }
+  repeated DirSpace dir_spaces = 1;
 }
 
 message MonitorConf {
@@ -37,4 +46,6 @@ message MonitorConf {
 
   // End point for vehicle to report status.
   optional string online_report_endpoint = 3;
+
+  optional ResourceConf resource_conf = 4;
 }

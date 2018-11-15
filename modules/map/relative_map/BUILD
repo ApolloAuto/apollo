@@ -64,4 +64,29 @@ cc_binary(
     ],
 )
 
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "testdata/**",
+    ]),
+)
+
+cc_test(
+    name = "navigation_lane_test",
+    size = "small",
+    srcs = [
+        "navigation_lane_test.cc",
+    ], 
+    data = [
+        ":relative_map_conf",
+        ":testdata",
+    ],   
+    deps = [
+        ":relative_map_lib",
+        "//modules/common",        
+        "//third_party/json",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

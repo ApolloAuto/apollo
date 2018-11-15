@@ -100,7 +100,7 @@ class BaseAffinityTracker {
   }
 
   // @brief Set the selection matrix to full entries
-  virtual bool SelectFull(const int &row, const int &col) {
+  virtual bool SelectFull(const int row, const int col) {
     selected_entry_matrix_.clear();
     selected_entry_matrix_ =
         std::vector<std::vector<bool>>(row, std::vector<bool>(col, true));

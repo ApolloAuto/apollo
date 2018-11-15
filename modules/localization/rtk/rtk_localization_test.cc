@@ -62,17 +62,17 @@ class RTKLocalizationTest : public ::testing::Test {
 TEST_F(RTKLocalizationTest, InterpolateIMU) {
   // timestamp inbetween + time_diff is big enough(>0.001), interpolate
   {
-    apollo::localization::Imu imu1;
+    apollo::localization::CorrectedImu imu1;
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &imu1);
 
-    apollo::localization::Imu imu2;
+    apollo::localization::CorrectedImu imu2;
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
-    apollo::localization::Imu expected_result;
+    apollo::localization::CorrectedImu expected_result;
     load_data("modules/localization/testdata/1_imu_result.pb.txt",
               &expected_result);
 
-    apollo::localization::Imu imu;
+    apollo::localization::CorrectedImu imu;
     double timestamp = 1173545122.69;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
@@ -81,17 +81,17 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
 
   // timestamp inbetween + time_diff is too small(<0.001), no interpolate
   {
-    apollo::localization::Imu imu1;
+    apollo::localization::CorrectedImu imu1;
     load_data("modules/localization/testdata/2_imu_1.pb.txt", &imu1);
 
-    apollo::localization::Imu imu2;
+    apollo::localization::CorrectedImu imu2;
     load_data("modules/localization/testdata/2_imu_2.pb.txt", &imu2);
 
-    apollo::localization::Imu expected_result;
+    apollo::localization::CorrectedImu expected_result;
     load_data("modules/localization/testdata/2_imu_result.pb.txt",
               &expected_result);
 
-    apollo::localization::Imu imu;
+    apollo::localization::CorrectedImu imu;
     double timestamp = 1173545122.2001;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
@@ -100,16 +100,16 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
 
   // timestamp < imu1.timestamp
   {
-    apollo::localization::Imu imu1;
+    apollo::localization::CorrectedImu imu1;
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &imu1);
 
-    apollo::localization::Imu imu2;
+    apollo::localization::CorrectedImu imu2;
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
-    apollo::localization::Imu expected_result;
+    apollo::localization::CorrectedImu expected_result;
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
 
-    apollo::localization::Imu imu;
+    apollo::localization::CorrectedImu imu;
     double timestamp = 1173545122;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
@@ -118,16 +118,16 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
 
   // timestamp > imu2.timestamp
   {
-    apollo::localization::Imu imu1;
+    apollo::localization::CorrectedImu imu1;
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &imu1);
 
-    apollo::localization::Imu imu2;
+    apollo::localization::CorrectedImu imu2;
     load_data("modules/localization/testdata/1_imu_2.pb.txt", &imu2);
 
-    apollo::localization::Imu expected_result;
+    apollo::localization::CorrectedImu expected_result;
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &expected_result);
 
-    apollo::localization::Imu imu;
+    apollo::localization::CorrectedImu imu;
     double timestamp = 1173545122.70;
     rtk_localizatoin_->InterpolateIMU(imu1, imu2, timestamp, &imu);
 
@@ -143,7 +143,7 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     apollo::localization::Gps gps;
     load_data("modules/localization/testdata/3_gps_1.pb.txt", &gps);
 
-    apollo::localization::Imu imu;
+    apollo::localization::CorrectedImu imu;
     load_data("modules/localization/testdata/3_imu_1.pb.txt", &imu);
 
     apollo::localization::LocalizationEstimate expected_result;
@@ -166,7 +166,7 @@ TEST_F(RTKLocalizationTest, ComposeLocalizationMsg) {
     apollo::localization::Gps gps;
     load_data("modules/localization/testdata/3_gps_1.pb.txt", &gps);
 
-    apollo::localization::Imu imu;
+    apollo::localization::CorrectedImu imu;
     load_data("modules/localization/testdata/3_imu_1.pb.txt", &imu);
 
     apollo::localization::LocalizationEstimate expected_result;

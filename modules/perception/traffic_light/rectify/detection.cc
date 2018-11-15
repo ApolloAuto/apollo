@@ -69,7 +69,7 @@ void Detection::Perform(const cv::Mat &ros_image,
   AINFO << "Running detection_: " << elapsed_time << " ms";
 }
 
-void Detection::Init(const int &resize_len, const std::string &refine_net,
+void Detection::Init(const int resize_len, const std::string &refine_net,
                      const std::string &refine_model) {
   refine_net_ptr_.reset(new caffe::Net<float>(refine_net, caffe::TEST));
   refine_net_ptr_->CopyTrainedLayersFrom(refine_model);

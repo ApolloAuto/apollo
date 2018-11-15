@@ -38,9 +38,11 @@ std::vector<std::shared_ptr<Image>> g_cached_images;
 const int kMaxCachedImageNum = 10;
 
 void OnPerception(const PerceptionObstacles &);
-void OnImageShort(const sensor_msgs::ImagePtr &);
+void OnImageShort(sensor_msgs::ImagePtr);
 
 int main(int argc, char **argv) {
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
   ros::init(argc, argv, "camera_visualizer");
   ros::NodeHandle n;
 
@@ -66,7 +68,7 @@ void OnPerception(const PerceptionObstacles &obstacles) {
   cv::waitKey(10);
 }
 
-void OnImage(CameraId camera_id, const sensor_msgs::ImagePtr &msg) {
+void OnImage(CameraId camera_id, sensor_msgs::ImagePtr msg) {
   boost::shared_ptr<sensor_msgs::Image> img(new sensor_msgs::Image);
   *img = *msg;
   boost::shared_ptr<const sensor_msgs::Image> img_msg(img);
@@ -81,6 +83,6 @@ void OnImage(CameraId camera_id, const sensor_msgs::ImagePtr &msg) {
   }
 }
 
-void OnImageShort(const sensor_msgs::ImagePtr &msg) {
+void OnImageShort(sensor_msgs::ImagePtr msg) {
   OnImage(CameraId::SHORT_FOCUS, msg);
 }

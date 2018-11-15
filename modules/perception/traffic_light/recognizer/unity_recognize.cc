@@ -17,90 +17,44 @@
 #include "modules/perception/traffic_light/recognizer/unity_recognize.h"
 
 #include "modules/common/util/file.h"
+#include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/traffic_light/recognizer/classify.h"
 
 namespace apollo {
 namespace perception {
 namespace traffic_light {
 
-using apollo::common::util::GetAbsolutePath;
+using apollo::common::util::GetProtoFromFile;
 
 bool UnityRecognize::Init() {
-  ConfigManager *config_manager = ConfigManager::instance();
-  if (config_manager == nullptr) {
-    AERROR << "failed to get ConfigManager instance.";
+  if (!GetProtoFromFile(FLAGS_traffic_light_recognizer_config, &config_)) {
+    AERROR << "Cannot get config proto from file: "
+           << FLAGS_traffic_light_recognizer_config;
     return false;
   }
 
-  const ModelConfig *model_config_night =
-      config_manager->GetModelConfig(name() + "Night");
-  if (model_config_night == nullptr) {
-    AERROR << "not found model config: " << name() + "Night";
+  if (config_.recognizer_config_size() != 2) {
+    AERROR << "RecognizeConfig size should be 2.";
     return false;
   }
-  if (!InitModel(config_manager, model_config_night, &classify_night_)) {
-    AERROR << "init night model failed";
-    return false;
+  for (const auto &recognizer_config : config_.recognizer_config()) {
+    if (recognizer_config.name() == "UnityRecognizeNight") {
+      classify_night_ = std::make_shared<ClassifyBySimple>(
+          recognizer_config.classify_net(), recognizer_config.classify_model(),
+          recognizer_config.classify_threshold(),
+          static_cast<unsigned int>(recognizer_config.classify_resize_width()),
+          static_cast<unsigned int>(
+              recognizer_config.classify_resize_height()));
+    }
+    if (recognizer_config.name() == "UnityRecognize") {
+      classify_day_ = std::make_shared<ClassifyBySimple>(
+          recognizer_config.classify_net(), recognizer_config.classify_model(),
+          recognizer_config.classify_threshold(),
+          static_cast<unsigned int>(recognizer_config.classify_resize_width()),
+          static_cast<unsigned int>(
+              recognizer_config.classify_resize_height()));
+    }
   }
-
-  const ModelConfig *model_config_day = config_manager->GetModelConfig(name());
-  if (model_config_day == nullptr) {
-    AERROR << "not found model config: " << name();
-    return false;
-  }
-
-  if (!InitModel(config_manager, model_config_day, &classify_day_)) {
-    AERROR << "init day model failed";
-    return false;
-  }
-
-  return true;
-}
-
-bool UnityRecognize::InitModel(const ConfigManager *config_manager,
-                               const ModelConfig *model_config,
-                               std::shared_ptr<IRefine> *classify) {
-  std::string classify_model;
-  std::string classify_net;
-
-  if (!model_config->GetValue("classify_model", &classify_model)) {
-    AERROR << "classify_model not found." << name();
-    return false;
-  }
-  classify_model = GetAbsolutePath(config_manager->WorkRoot(), classify_model);
-  if (!model_config->GetValue("classify_net", &classify_net)) {
-    AERROR << "classify_net not found." << name();
-    return false;
-  }
-  classify_net = GetAbsolutePath(config_manager->WorkRoot(), classify_net);
-
-  float classify_threshold = 0.0;
-  int classify_resize_width = 0;
-  int classify_resize_height = 0;
-
-  if (!model_config->GetValue("classify_threshold", &classify_threshold)) {
-    AERROR << "classify_threshold not found." << name();
-    return false;
-  }
-
-  if (!model_config->GetValue("classify_resize_width",
-                              &classify_resize_width)) {
-    AERROR << "classify_resize_width not found." << name();
-    return false;
-  }
-  if (!model_config->GetValue("classify_resize_height",
-                              &classify_resize_height)) {
-    AERROR << "classify_resize_height not found." << name();
-    return false;
-  }
-  if (!model_config->GetValue("classify_threshold", &classify_threshold)) {
-    AERROR << "classify_threshold not found." << name();
-    return false;
-  }
-  classify->reset(new ClassifyBySimple(classify_net, classify_model,
-                                       classify_threshold,
-                                       (unsigned int)classify_resize_width,
-                                       (unsigned int)classify_resize_height));
   return true;
 }
 

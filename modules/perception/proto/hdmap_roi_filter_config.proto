@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package apollo.perception.hdmap_roi_filter_config;
+
+// hdmap ROI filter model
+message ModelConfigs {
+  optional string name = 1 [ default = "HdmapROIFilter" ];
+  optional string version = 2 [ default = "1.0.0" ];
+
+  // @name: range
+  // @brief: create a bitmap mask which represents [-range, range]*[-range, range]
+  // square area around the car.
+  // @required: range > 0.0 && range - (-range) > cell_size
+  optional double range = 3 [ default = 70.0 ];
+
+  // @name: cell_size
+  // @brief: discretize the area using small cells.
+  // @required: cell_size > 0.0
+  optional double cell_size = 4 [ default = 0.25 ];
+
+  // @name: extend_dist
+  // @brief: extend the intervals returned by polygon scans conversion algorithm
+  // @required: none
+  optional double extend_dist = 5 [ default = 0.0 ];
+}

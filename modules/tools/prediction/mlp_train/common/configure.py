@@ -17,7 +17,7 @@
 ###############################################################################
 
 parameters = {
-    'mlp':{
+    'mlp': {
         'train_data_rate': 0.8,
         'size_obstacle_feature': 22,
         'size_lane_sequence_feature': 40,
@@ -26,16 +26,10 @@ parameters = {
         'dim_hidden_2': 15,
         'dim_output': 1
     },
-
     'feature': {
         'threshold_label_time_delta': 1.0,
-        'prediction_label_timeframe':3.0
+        'prediction_label_timeframe': 3.0
     }
 }
 
-labels = {
-    'go_false': 0,
-    'go_true': 1,
-    'cutin_false': -1,
-    'cutin_true': 2
-}
+labels = {'go_false': 0, 'go_true': 1, 'cutin_false': -1, 'cutin_true': 2}

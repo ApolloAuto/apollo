@@ -1,0 +1,54 @@
+syntax = "proto2";
+
+package apollo.drivers.racobit_radar;
+
+import "modules/drivers/canbus/proto/can_card_parameter.proto";
+
+message CanConf {
+  optional apollo.drivers.canbus.CANCardParameter can_card_parameter = 1;
+  optional bool enable_debug_mode = 2 [default = false];
+  optional bool enable_receiver_log = 3 [default = false];
+  optional bool enable_sender_log = 4 [default = false];
+}
+
+enum OutputType {
+  OUTPUT_TYPE_NONE = 0;
+  OUTPUT_TYPE_OBJECTS = 1;
+  OUTPUT_TYPE_CLUSTERS = 2;
+  OUTPUT_TYPE_ERROR = 3;
+}
+
+enum RcsThreshold {
+  RCS_THRESHOLD_STANDARD = 0;
+  RCS_THRESHOLD_HIGH_SENSITIVITY = 1;
+  RCS_THRESHOLD_ERROR = 2;
+}
+
+message RadarConf {
+  optional bool max_distance_valid = 1 [default = false];
+  optional bool sensor_id_valid = 2 [default = false];
+  optional bool radar_power_valid = 3 [default = false];
+  optional bool output_type_valid = 4 [default = true];
+  optional bool send_quality_valid = 5 [default = true];
+  optional bool send_ext_info_valid = 6 [default = true];
+  optional bool sort_index_valid = 7 [default = false];
+  optional bool store_in_nvm_valid = 8 [default = true];
+  optional bool ctrl_relay_valid = 9 [default = false];
+  optional bool rcs_threshold_valid = 10 [default = true];
+
+  optional uint32 max_distance = 11 [default = 248];
+  optional uint32 sensor_id = 12 [default = 0];
+  optional OutputType output_type = 13 [default = OUTPUT_TYPE_OBJECTS];
+  optional uint32 radar_power = 14 [default = 0];
+  optional uint32 ctrl_relay = 15 [default = 0];
+  optional bool send_ext_info = 16 [default = true];
+  optional bool send_quality = 17 [default = true];
+  optional uint32 sort_index = 18 [default = 0];
+  optional uint32 store_in_nvm = 19 [default = 1];
+  optional RcsThreshold rcs_threshold = 20 [default = RCS_THRESHOLD_STANDARD];
+}
+
+message RacobitRadarConf {
+  optional CanConf can_conf = 1;
+  optional RadarConf radar_conf = 2;
+}

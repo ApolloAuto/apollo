@@ -35,7 +35,7 @@
 
 #include "src/util.h"
 
-#define DEFAULT_TIMEOUT 10 /*secondes waitting for read/write*/
+#define DEFAULT_TIMEOUT 10 /*seconds, waiting for read/write*/
 
 int sys_readn(int fd, void* vptr, int n) {
   // printf("start sys_readn: %d....\n", n);

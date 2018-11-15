@@ -13,4 +13,18 @@ cc_inc_library(
     ],
 )
 
+cc_library(
+    name = "resource_monitor",
+    srcs = ["resource_monitor.cc"],
+    hdrs = ["resource_monitor.h"],
+    linkopts = [
+        "-lboost_filesystem",
+    ],
+    deps = [
+        "//modules/common/util",
+        "//modules/monitor/common:monitor_manager",
+        "//modules/monitor/common:recurrent_runner",
+    ],
+)
+
 cpplint()

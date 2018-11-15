@@ -127,6 +127,10 @@ void Box2d::GetAllCorners(std::vector<Vec2d> *const corners) const {
   *corners = corners_;
 }
 
+std::vector<Vec2d> Box2d::GetAllCorners() const {
+  return corners_;
+}
+
 bool Box2d::IsPointIn(const Vec2d &point) const {
   const double x0 = point.x() - center_.x();
   const double y0 = point.y() - center_.y();

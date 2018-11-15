@@ -50,7 +50,7 @@ class PandoraCamera {
    *        type       				The device type
    */
   PandoraCamera(
-      std::string device_ip, const uint16_t pandoraCameraPort,
+      const std::string &device_ip, const uint16_t pandoraCameraPort,
       boost::function<void(boost::shared_ptr<cv::Mat> matp, double timestamp,
                            int picid, bool distortion)>
           camera_callback,
@@ -62,8 +62,8 @@ class PandoraCamera {
    * @param angle The start angle
    */
 
-  bool loadIntrinsics(const std::vector<cv::Mat> cameras_k,
-                      const std::vector<cv::Mat> cameras_d);
+  bool loadIntrinsics(const std::vector<cv::Mat> &cameras_k,
+                      const std::vector<cv::Mat> &cameras_d);
 
   int Start();
   void Stop();

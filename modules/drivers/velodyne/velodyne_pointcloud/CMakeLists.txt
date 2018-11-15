@@ -35,7 +35,7 @@ find_path(YAML_CPP_INCLUDE_DIR
 find_library(YAML_CPP_LIBRARY
              NAMES YAML_CPP
              PATHS ${YAML_CPP_LIBRARY_DIRS})
-             
+
 if(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
     add_definitions(-DHAVE_NEW_YAMLCPP)
 endif(NOT ${YAML_CPP_VERSION} VERSION_LESS "0.5")
@@ -57,7 +57,7 @@ add_executable(convert_node src/convert_node.cpp src/convert.cpp)
 target_link_libraries(convert_node
     velodyne_parser
 	${catkin_LIBRARIES})
-    
+
 add_library(convert_nodelet src/convert_nodelet.cpp src/convert.cpp)
 target_link_libraries(convert_nodelet
     velodyne_parser
@@ -70,9 +70,9 @@ add_executable(pointcloud_dump_node src/pointcloud_dump_node.cpp src/pointcloud_
 target_link_libraries(pointcloud_dump_node
     velodyne_parser
 	${catkin_LIBRARIES})
-    
+
 add_library(pointcloud_dump_nodelet src/pointcloud_dump_nodelet.cpp src/pointcloud_dump.cpp)
-target_link_libraries(pointcloud_dump_nodelet 
+target_link_libraries(pointcloud_dump_nodelet
     velodyne_parser
 	${catkin_LIBRARIES})
 
@@ -94,7 +94,7 @@ target_link_libraries(pcd_exporter_nodelet
 #     compensator    #
 ######################
 add_library(compensator_node src/compensator_nodelet.cpp src/compensator.cpp)
-target_link_libraries(compensator_node 
+target_link_libraries(compensator_node
 	${catkin_LIBRARIES}
     ${PCL_LIBRARIES})
 
@@ -103,21 +103,21 @@ target_link_libraries(compensator_nodelet
 	${catkin_LIBRARIES}
     ${PCL_LIBRARIES})
 
-catkin_install_python(PROGRAMS 
+catkin_install_python(PROGRAMS
     src/extrinsics_broadcaster.py
     src/velodyne_check.py
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(
-    TARGETS 
+    TARGETS
     convert_node
     compensator_node
     pcd_exporter_node
     pointcloud_dump_node
-    convert_nodelet 
+    convert_nodelet
     compensator_nodelet
     pcd_exporter_nodelet
-    pointcloud_dump_nodelet 
+    pointcloud_dump_nodelet
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

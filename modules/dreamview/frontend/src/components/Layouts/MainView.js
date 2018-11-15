@@ -32,10 +32,11 @@ class SceneView extends React.Component {
         const { sceneDimension, meters, monitor,
                 options, trafficSignal, video, hmi } = this.props.store;
 
+        const sceneHeightOffset = OFFLINE_PLAYBACK ? 40 /* height of playback control */ : 0;
         return (
             <div className="main-view" style={{ height: sceneDimension.height }}>
                 <Scene  width={sceneDimension.width}
-                        height={sceneDimension.height}
+                        height={sceneDimension.height - sceneHeightOffset}
                         options={options}
                         invisible={false} />
                 {options.showRouteEditingBar

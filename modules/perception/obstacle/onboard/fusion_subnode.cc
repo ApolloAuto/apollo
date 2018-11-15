@@ -16,12 +16,16 @@
 
 #include "modules/perception/obstacle/onboard/fusion_subnode.h"
 
+#include <algorithm>
 #include <unordered_map>
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/log.h"
+#include "modules/common/time/time_util.h"
+#include "modules/common/time/timer.h"
 #include "modules/perception/common/perception_gflags.h"
+#include "modules/perception/onboard/dag_streaming.h"
 #include "modules/perception/onboard/event_manager.h"
 #include "modules/perception/onboard/shared_data_manager.h"
 #include "modules/perception/onboard/subnode_helper.h"
@@ -82,10 +86,22 @@ bool FusionSubnode::InitInternal() {
 
   lane_objects_.reset(new LaneObjects());
 
+  // init motion service
+  if (motion_event_id_ != -1) {
+    motion_service_ = dynamic_cast<MotionService *>(
+        DAGStreaming::GetSubnodeByName("MotionService"));
+    if (motion_service_ == nullptr) {
+      AWARN << "motion service not inited";
+    }
+  }
+
   if (!InitOutputStream()) {
     AERROR << "Failed to init output stream.";
     return false;
   }
+
+  // init Cipv
+  cipv_.Init();
 
   AINFO << "Init FusionSubnode succ. Using fusion:" << fusion_->name();
   return true;
@@ -145,6 +161,16 @@ bool FusionSubnode::InitOutputStream() {
     lane_event_id_ = static_cast<EventID>(atoi((lane_iter->second).c_str()));
   }
 
+  auto motion_iter = reserve_field_map.find("motion_event_id");
+  if (motion_iter == reserve_field_map.end()) {
+    AWARN << "Failed to find motion_event_id:" << reserve_;
+    AINFO << "motion_event_id will be set -1";
+    motion_event_id_ = -1;
+  } else {
+    motion_event_id_ =
+        static_cast<EventID>(atoi((motion_iter->second).c_str()));
+  }
+
   return true;
 }
 
@@ -177,13 +203,14 @@ Status FusionSubnode::ProcEvents() {
       common::adapter::AdapterManager::PublishPerceptionObstacles(obstacles);
     }
     AINFO << "Publish 3d perception fused msg. timestamp:"
-          << GLOG_TIMESTAMP(timestamp_) << " obj_cnt:" << objects_.size();
+          << GLOG_TIMESTAMP(lidar_timestamp_) << " obj_cnt:" << objects_.size();
   }
   return Status::OK();
 }
 
 Status FusionSubnode::Process(const EventMeta &event_meta,
                               const std::vector<Event> &events) {
+  CipvOptions cipv_options;
   std::vector<SensorObjects> sensor_objs;
   if (!BuildSensorObjs(events, &sensor_objs)) {
     AERROR << "Failed to build_sensor_objs";
@@ -192,7 +219,11 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   }
   PERF_BLOCK_START();
   objects_.clear();
-  if (!fusion_->Fuse(sensor_objs, &objects_)) {
+  double latest_fused_ts = sensor_objs.back().timestamp;
+
+  FusionOptions options;
+
+  if (!fusion_->Fuse(sensor_objs, &objects_, &options)) {
     AWARN << "Failed to call fusion plugin."
           << " event_meta: [" << event_meta.to_string()
           << "] event_cnt:" << events.size() << " event_0: ["
@@ -207,35 +238,107 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
   } else if (event_meta.event_id == camera_event_id_) {
     for (auto &obj : sensor_objs) {
       if (obj.sensor_type == SensorType::CAMERA) {
+        AINFO << "camera object size is " << obj.objects.size();
         AINFO << "fusion received image : " << GLOG_TIMESTAMP(obj.timestamp)
               << " at time: " << GLOG_TIMESTAMP(TimeUtil::GetCurrentTime());
         break;
       }
     }
     PERF_BLOCK_END("fusion_camera");
+  } else if (event_meta.event_id == motion_event_id_) {
+    if (motion_service_ != nullptr) {
+      motion_buffer_ = motion_service_->GetMotionBuffer();
+    }
   }
 
-  if (objects_.size() > 0 && FLAGS_publish_fusion_event) {
+  AINFO << "number of objects after fuse is " << objects_.size();
+
+  // Process CIPV
+  if (motion_service_ != nullptr) {
+    motion_buffer_ = motion_service_->GetMotionBuffer();
+    if (motion_buffer_.size() == 0) {
+      AWARN << "motion_buffer_ is empty";
+      cipv_options.velocity = 5.0f;
+      cipv_options.yaw_rate = 0.0f;
+    } else {
+      cipv_options.velocity = motion_buffer_[0].velocity;
+      cipv_options.yaw_rate = motion_buffer_[0].yaw_rate;
+    }
+    ADEBUG << "[CIPVSubnode] velocity " << cipv_options.velocity
+          << ", yaw rate: " << cipv_options.yaw_rate;
+    camera_timestamp_ = 0;
+    lidar_timestamp_ = 0;
+    radar_timestamp_ = 0;
+    for (auto &obj : sensor_objs) {
+      if (obj.sensor_type == SensorType::CAMERA) {
+        cipv_.DetermineCipv(lane_objects_, cipv_options, &objects_);
+        camera_timestamp_ = obj.timestamp;
+      } else if (obj.sensor_type == SensorType::VELODYNE_64) {
+        lidar_timestamp_ = obj.timestamp;
+      } else if (obj.sensor_type == SensorType::RADAR) {
+        radar_timestamp_ = obj.timestamp;
+      }
+    }
+
+    apollo::common::time::Timer timer;
+    timer.Start();
+    // Get Drop points
+    //  motion_buffer_ = motion_service_->GetMotionBuffer();
+    if (motion_buffer_.size() > 0) {
+      cipv_.CollectDrops(motion_buffer_, &objects_);
+    } else {
+      AWARN << "motion_buffer is empty";
+    }
+
+    ++seq_num_;
+    uint64_t t = timer.End("CollectDrops");
+    min_processing_time_ = std::min(min_processing_time_, t);
+    max_processing_time_ = std::max(max_processing_time_, t);
+    tot_processing_time_ += t;
+    ADEBUG << "CollectDrops Runtime: "
+           << "MIN (" << min_processing_time_ << " ms), "
+           << "MAX (" << max_processing_time_ << " ms), "
+           << "AVE (" << tot_processing_time_ / seq_num_ << " ms).";
+  }
+
+  if (FLAGS_publish_fusion_event && options.fused) {
     SharedDataPtr<FusionItem> fusion_item_ptr(new FusionItem);
-    fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
+
+    if (objects_.size() > 0) {
+      fusion_item_ptr->timestamp = objects_[0]->latest_tracked_time;
+    } else {
+      fusion_item_ptr->timestamp = latest_fused_ts;
+    }
+
+    fusion_item_ptr->fused_sensor_ts = latest_fused_ts;
     const std::string &device_id = events[0].reserve;
+    fusion_item_ptr->fused_sensor_device_id = device_id;
+
+    for (int i = 0; i < options.fused_frame_ts.size(); ++i) {
+      fusion_item_ptr->frame_ts.push_back(options.fused_frame_ts[i]);
+      fusion_item_ptr->frame_device_id.push_back(
+          options.fused_frame_device_id[i]);
+    }
+
     for (auto obj : objects_) {
       std::shared_ptr<Object> objclone(new Object());
+      if (obj->b_cipv) {
+        AINFO << "CIPV ID: " << obj->track_id;
+      }
       objclone->clone(*obj);
       fusion_item_ptr->obstacles.push_back(objclone);
     }
     AINFO << "publishing event for timestamp deviceid and size of fusion object"
           << fusion_item_ptr->timestamp << " " << device_id << " "
           << fusion_item_ptr->obstacles.size();
-    PublishDataAndEvent(fusion_item_ptr->timestamp, device_id, fusion_item_ptr);
+    PublishDataAndEvent(latest_fused_ts, device_id, fusion_item_ptr);
   }
 
-  timestamp_ = sensor_objs[0].timestamp;
   error_code_ = common::OK;
   return Status::OK();
 }
 
-void FusionSubnode::PublishDataAndEvent(const double &timestamp,
+void FusionSubnode::PublishDataAndEvent(const double timestamp,
                                         const std::string &device_id,
                                         const SharedDataPtr<FusionItem> &data) {
   CommonSharedDataKey key(timestamp, device_id);
@@ -334,20 +437,26 @@ bool FusionSubnode::GeneratePbMsg(PerceptionObstacles *obstacles) {
   common::adapter::AdapterManager::FillPerceptionObstaclesHeader(
       FLAGS_obstacle_module_name, obstacles);
   common::Header *header = obstacles->mutable_header();
-  if (pub_driven_event_id_ == lidar_event_id_) {
-    header->set_lidar_timestamp(timestamp_ * 1e9);  // in ns
-    header->set_camera_timestamp(0);
-    header->set_radar_timestamp(0);
-  } else if (pub_driven_event_id_ == camera_event_id_) {
-    header->set_lidar_timestamp(0);  // in ns
-    header->set_camera_timestamp(timestamp_ * 1e9);
-    header->set_radar_timestamp(0);
-  }
+  header->set_lidar_timestamp(lidar_timestamp_ * 1e9);  // in ns
+  header->set_camera_timestamp(camera_timestamp_ * 1e9);
+  header->set_radar_timestamp(radar_timestamp_ * 1e9);
 
   obstacles->set_error_code(error_code_);
 
   for (const auto &obj : objects_) {
     PerceptionObstacle *obstacle = obstacles->add_perception_obstacle();
+    // add CIPV
+    if (obj->b_cipv) {
+      CIPVInfo *cipv = obstacles->mutable_cipv_info();
+      cipv->set_cipv_id(obj->track_id);
+    }
+    // add drops
+    for (size_t i = 0; i < obj->drops.size(); i++) {
+      Point *drops = obstacle->add_drops();
+      drops->set_x(obj->drops[i][0]);
+      drops->set_y(obj->drops[i][1]);
+      drops->set_z(obj->drops[i][2]);
+    }
     obj->Serialize(obstacle);
   }
 

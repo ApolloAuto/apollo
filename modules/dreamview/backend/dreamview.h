@@ -49,6 +49,8 @@ class Dreamview : public apollo::common::ApolloApp {
 
  private:
   void TerminateProfilingMode(const ros::TimerEvent& event);
+  void CheckAdapters();
+
   ros::Timer exit_timer_;
 
   std::unique_ptr<SimulationWorldUpdater> sim_world_updater_;

@@ -58,7 +58,7 @@ void CanMonitor::RunOnce(const double current_time) {
   CHECK_EQ(can_rslt.size(), 1);
 
   status->set_status(static_cast<HardwareStatus::Status>(can_rslt[0].status));
-  status->set_msg(can_rslt[0].mssg);
+  status->set_detailed_msg(can_rslt[0].mssg);
   ADEBUG << "Done checking " << FLAGS_can_hardware_name
          << ", status=" << status->status();
 }

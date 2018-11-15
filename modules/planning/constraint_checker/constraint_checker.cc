@@ -33,7 +33,7 @@ bool WithinRange(const T v, const T lower, const T upper) {
 }
 }  // namespace
 
-bool ConstraintChecker::ValidTrajectory(
+ConstraintChecker::Result ConstraintChecker::ValidTrajectory(
     const DiscretizedTrajectory& trajectory) {
   const double kMaxCheckRelativeTime = FLAGS_trajectory_time_length;
   for (const auto& p : trajectory.trajectory_points()) {
@@ -47,7 +47,7 @@ bool ConstraintChecker::ValidTrajectory(
              << " exceeds bound, value: " << lon_v << ", bound ["
              << FLAGS_speed_lower_bound << ", " << FLAGS_speed_upper_bound
              << "].";
-      return false;
+      return Result::LON_VELOCITY_OUT_OF_BOUND;
     }
 
     double lon_a = p.a();
@@ -57,7 +57,7 @@ bool ConstraintChecker::ValidTrajectory(
              << " exceeds bound, value: " << lon_a << ", bound ["
              << FLAGS_longitudinal_acceleration_lower_bound << ", "
              << FLAGS_longitudinal_acceleration_upper_bound << "].";
-      return false;
+      return Result::LON_ACCELERATION_OUT_OF_BOUND;
     }
 
     double kappa = p.path_point().kappa();
@@ -65,7 +65,7 @@ bool ConstraintChecker::ValidTrajectory(
       ADEBUG << "Kappa at relative time " << t
              << " exceeds bound, value: " << kappa << ", bound ["
              << -FLAGS_kappa_bound << ", " << FLAGS_kappa_bound << "].";
-      return false;
+      return Result::CURVATURE_OUT_OF_BOUND;
     }
   }
 
@@ -88,7 +88,7 @@ bool ConstraintChecker::ValidTrajectory(
              << " exceeds bound, value: " << lon_jerk << ", bound ["
              << FLAGS_longitudinal_jerk_lower_bound << ", "
              << FLAGS_longitudinal_jerk_upper_bound << "].";
-      return false;
+      return Result::LON_JERK_OUT_OF_BOUND;
     }
 
     double lat_a = p1.v() * p1.v() * p1.path_point().kappa();
@@ -98,12 +98,14 @@ bool ConstraintChecker::ValidTrajectory(
              << " exceeds bound, value: " << lat_a << ", bound ["
              << -FLAGS_lateral_acceleration_bound << ", "
              << FLAGS_lateral_acceleration_bound << "].";
-      return false;
+      return Result::LAT_ACCELERATION_OUT_OF_BOUND;
     }
 
+    // TODO(zhangyajia): this is temporarily disabled
+    // due to low quality reference line.
+    /**
     double d_lat_a = p1.v() * p1.v() * p1.path_point().kappa() -
                      p0.v() * p0.v() * p0.path_point().kappa();
-
     double lat_jerk = d_lat_a / dt;
     if (!WithinRange(lat_jerk, -FLAGS_lateral_jerk_bound,
                      FLAGS_lateral_jerk_bound)) {
@@ -111,11 +113,12 @@ bool ConstraintChecker::ValidTrajectory(
              << " exceeds bound, value: " << lat_jerk << ", bound ["
              << -FLAGS_lateral_jerk_bound << ", " << FLAGS_lateral_jerk_bound
              << "].";
-      return false;
+      return Result::LAT_JERK_OUT_OF_BOUND;
     }
+    **/
   }
 
-  return true;
+  return Result::VALID;
 }
 
 }  // namespace planning

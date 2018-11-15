@@ -1,15 +1,16 @@
+$small-screen-width: 1280px;
 $small-screen-height: 800px;
 
 // Including ipad mini and MacBook.
 @mixin small-screen {
-    @media (max-height: #{$small-screen-height}) {
+    @media (max-height: #{$small-screen-height}), (max-width: #{$small-screen-width}) {
         @content;
     }
 }
 
 // Including desktop and ipad pro.
 @mixin large-screen {
-    @media (min-height: #{$small-screen-height}) {
+    @media (min-height: #{$small-screen-height}) and (min-width: #{$small-screen-width}) {
         @content;
     }
 }
