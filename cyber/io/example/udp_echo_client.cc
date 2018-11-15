@@ -40,15 +40,15 @@ int main(int argc, char* argv[]) {
         struct sockaddr_in server_addr;
         server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons(server_port);
+        server_addr.sin_port = htons((uint16_t)server_port);
 
         std::string user_input;
         std::vector<char> server_reply(2049);
-        int nbytes = 0;
+        ssize_t nbytes = 0;
         uint32_t count = 0;
 
         Session session;
-        session.Socket(AF_INET, SOCK_STREAM, 0);
+        session.Socket(AF_INET, SOCK_DGRAM, 0);
         if (session.Connect((struct sockaddr*)&server_addr,
                             sizeof(server_addr)) < 0) {
           std::cout << "connect to server failed, " << strerror(errno)
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
                  itr < server_reply.begin() + nbytes; ++itr) {
               std::cout << *itr;
             }
-            count += nbytes;
+            count += (uint32_t)nbytes;
             if (count >= user_input.length()) {
               break;
             }
