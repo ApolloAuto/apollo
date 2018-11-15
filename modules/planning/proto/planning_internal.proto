@@ -98,6 +98,8 @@ message ObstacleDebug {
   optional string id = 1;
   optional apollo.planning.SLBoundary sl_boundary = 2;
   repeated DecisionTag decision_tag = 3;
+  repeated double vertices_x_coords = 4;
+  repeated double vertices_y_coords = 5;
 }
 
 message ReferenceLineDebug {
@@ -135,6 +137,8 @@ message OpenSpaceDebug {
   repeated double warm_start_dual_miu = 5;
   repeated double optimized_dual_lambda = 6;
   repeated double optimized_dual_miu = 7;
+  repeated double xy_boundary = 8;
+  repeated apollo.planning_internal.ObstacleDebug obstacles = 9;
 }
 
 // next ID: 27

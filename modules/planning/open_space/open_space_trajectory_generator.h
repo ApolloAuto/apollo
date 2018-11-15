@@ -96,13 +96,19 @@ class OpenSpaceTrajectoryGenerator {
   void UpdateDebugInfo(
       std::shared_ptr<planning_internal::OpenSpaceDebug> open_space_debug);
 
+  int TrajectoryPartition(const Eigen::MatrixXd& state_result_ds,
+                          const Eigen::MatrixXd& control_result_ds,
+                          const Eigen::MatrixXd& time_result_ds);
+
   void Stop();
 
   void RecordDebugInfo(const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWs,
                        const Eigen::MatrixXd& l_warm_up,
                        const Eigen::MatrixXd& n_warm_up,
                        const Eigen::MatrixXd& dual_l_result_ds,
-                       const Eigen::MatrixXd& dual_n_result_ds);
+                       const Eigen::MatrixXd& dual_n_result_ds,
+                       const std::vector<double>& XYbounds,
+                       ThreadSafeIndexedObstacles* obstalce_list);
 
  private:
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
