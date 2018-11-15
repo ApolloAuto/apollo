@@ -21,15 +21,15 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
+
+#include "cyber/common/macros.h"
 
 #include "gtest/gtest.h"
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-
-#include "cyber/common/macros.h"
 #include "modules/prediction/container/container.h"
 
 /**
@@ -80,7 +80,7 @@ class ContainerManager {
   void RegisterContainers();
 
  private:
-  std::map<common::adapter::AdapterConfig::MessageType,
+  std::unordered_map<common::adapter::AdapterConfig::MessageType,
            std::unique_ptr<Container>>
       containers_;
 
