@@ -76,8 +76,8 @@ class PlanningBase {
                       ADCTrajectory* const trajectory_pb);
   void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
 
-  void ExportChart(const planning_internal::Debug& debug_info,
-                   planning_internal::Debug* debug_chart);
+  virtual void ExportChart(const planning_internal::Debug& debug_info,
+                           planning_internal::Debug* debug_chart);
 
   LocalView local_view_;
   const hdmap::HDMap* hdmap_ = nullptr;

@@ -185,7 +185,6 @@ void PlanningBase::ExportChart(const planning_internal::Debug& debug_info,
 
   AddSpeedPlan(debug_info.planning_data().speed_plan(),
                debug_chart->mutable_planning_data()->add_chart());
-  // TODO(all) add more debug for visualization if needed.
 }
 
 }  // namespace planning

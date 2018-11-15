@@ -47,7 +47,9 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
+using apollo::dreamview::Chart;
 using apollo::hdmap::HDMapUtil;
+using apollo::planning_internal::OpenSpaceDebug;
 using apollo::routing::RoutingResponse;
 
 namespace {
@@ -295,6 +297,54 @@ Status OpenSpacePlanning::Plan(
   trajectory_pb->CopyFrom(frame_->trajectory());
 
   return status;
+}
+
+void AddTrajectory(const OpenSpaceDebug& open_space, Chart* chart) {
+  chart->set_title("Open Space Trajectory Visualization");
+  auto* options = chart->mutable_options();
+  options->mutable_x()->set_min(open_space.xy_boundary(0));
+  options->mutable_x()->set_max(open_space.xy_boundary(1));
+  options->mutable_x()->set_label_string("x (meter)");
+  options->mutable_y()->set_min(open_space.xy_boundary(2));
+  options->mutable_y()->set_max(open_space.xy_boundary(3));
+  options->mutable_y()->set_label_string("y (meter)");
+
+  for (const auto& obstacle : open_space.obstacles()) {
+    auto* polygon = chart->add_polygon();
+    polygon->set_label(obstacle.id());
+    for (int vertice_index = 0;
+         vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
+      auto* point_debug = polygon->add_point();
+      point_debug->set_x(obstacle.vertices_x_coords(vertice_index));
+      point_debug->set_y(obstacle.vertices_y_coords(vertice_index));
+    }
+  }
+
+  for (const auto& trajectory : open_space.trajectories().trajectory()) {
+    auto* line = chart->add_line();
+    line->set_label(trajectory.name());
+    for (const auto& point : trajectory.trajectory_point()) {
+      auto* point_debug = line->add_point();
+      point_debug->set_x(point.path_point().x());
+      point_debug->set_y(point.path_point().y());
+    }
+
+    // Set chartJS's dataset properties
+    auto* properties = line->mutable_properties();
+    (*properties)["borderWidth"] = "2";
+    (*properties)["pointRadius"] = "0";
+    (*properties)["fill"] = "false";
+    (*properties)["showLine"] = "true";
+  }
+}
+
+void OpenSpacePlanning::ExportChart(const planning_internal::Debug& debug_info,
+                                    planning_internal::Debug* debug_chart) {
+  // Export Trajectory Visualization Chart.
+  if (FLAGS_open_space_planner_switchable && FLAGS_enable_record_debug) {
+    AddTrajectory(debug_info.planning_data().open_space(),
+                  debug_chart->mutable_planning_data()->add_chart());
+  }
 }
 
 bool OpenSpacePlanning::CheckPlanningConfig(const PlanningConfig& config) {
