@@ -26,6 +26,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 
 namespace apollo {
@@ -35,6 +36,7 @@ namespace side_pass {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
+using apollo::common::VehicleConfigHelper;
 
 constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
@@ -70,16 +72,43 @@ Stage::StageStatus SidePassBackup::Process(
             kAdcDistanceThreshold) {  // vehicles are far away
       continue;
     }
-    if (obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
-        obstacle->PerceptionSLBoundary().end_l() < -1.0) {
+
+    // check l
+    constexpr double kLThreshold = 0.3;  // unit: m
+    const auto& reference_line =
+        frame->reference_line_info().front().reference_line();
+    double lane_left_width_at_start_s = 0.0;
+    double lane_right_width_at_start_s = 0.0;
+    reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().start_s(),
+                                &lane_left_width_at_start_s,
+                                &lane_right_width_at_start_s);
+    double lane_left_width_at_end_s = 0.0;
+    double lane_right_width_at_end_s = 0.0;
+    reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().end_s(),
+                                &lane_left_width_at_end_s,
+                                &lane_right_width_at_end_s);
+    double lane_width = std::min(
+        lane_left_width_at_start_s + lane_right_width_at_start_s,
+        lane_left_width_at_end_s + lane_right_width_at_end_s);
+    const double adc_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width();
+    double driving_width = lane_width - adc_width -
+        FLAGS_static_decision_nudge_l_buffer;
+    ADEBUG << "lane_width[" << lane_width
+        << "] driving_width[" << driving_width << "]";
+    if (driving_width > kLThreshold) {
       continue;
     }
+
     has_blocking_obstacle = true;
+    break;
   }
+
   if (!has_blocking_obstacle) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
+
   // do path planning
   bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
@@ -139,6 +168,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
            << "planning on reference line failed.";
     return Stage::ERROR;
   }
+
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
   double adc_velocity = frame->vehicle_state().linear_velocity();
@@ -183,6 +213,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     next_stage_ = ScenarioConfig::SIDE_PASS_GENERATE_PATH;
     return Stage::FINISHED;
   }
+
   return Stage::RUNNING;
 }
 
