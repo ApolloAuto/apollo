@@ -176,6 +176,9 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
             } else if (obstacle->IsOnLane()) {
               predictor = GetPredictor(vehicle_on_lane_predictor_);
               CHECK_NOTNULL(predictor);
+            } else {
+              predictor = GetPredictor(vehicle_off_lane_predictor_);
+              CHECK_NOTNULL(predictor);
             }
             break;
           }
