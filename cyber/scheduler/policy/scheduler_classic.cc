@@ -92,7 +92,9 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
 
   // Check if task prio is reasonable.
   if (cr->priority() >= MAX_PRIO) {
-    return false;
+    AWARN << cr->name()
+          << " prio great than MAX_PRIO.";
+    cr->set_priority(MAX_PRIO - 1);
   }
 
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
