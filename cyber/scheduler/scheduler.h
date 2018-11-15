@@ -68,7 +68,6 @@ class Scheduler {
   uint32_t task_pool_size_ = 0;
   uint32_t cpu_binding_start_index_ = 0;
   std::atomic<bool> stop_;
-  std::string process_name_;
 };
 
 }  // namespace scheduler

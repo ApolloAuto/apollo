@@ -59,10 +59,10 @@ GlobalData::GlobalData() {
   process_id_ = getpid();
   char* prog_path = program_path();
   if (prog_path) {
-    process_name_ = GetFileName(prog_path) + "_" + std::to_string(process_id_);
+    process_group_ = GetFileName(prog_path) + "_" + std::to_string(process_id_);
     delete prog_path;
   } else {
-    process_name_ = "cyber_default_" + std::to_string(process_id_);
+    process_group_ = "cyber_default_" + std::to_string(process_id_);
   }
   is_reality_mode_ = (config_.has_run_mode_conf() &&
                       config_.run_mode_conf().run_mode() ==
@@ -83,10 +83,10 @@ GlobalData::~GlobalData() {}
 
 int GlobalData::ProcessId() const { return process_id_; }
 
-void GlobalData::SetProcessName(const std::string& process_name) {
-  process_name_ = process_name;
+void GlobalData::SetProcessGroup(const std::string& process_group) {
+  process_group_ = process_group;
 }
-const std::string& GlobalData::ProcessName() const { return process_name_; }
+const std::string& GlobalData::ProcessGroup() const { return process_group_; }
 
 void GlobalData::SetSchedName(const std::string& sched_name) {
   sched_name_ = sched_name;

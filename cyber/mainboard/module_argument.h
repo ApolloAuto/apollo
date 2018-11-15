@@ -28,7 +28,7 @@ namespace apollo {
 namespace cyber {
 namespace mainboard {
 
-static const char DEFAULT_process_name_[] = "mainboard_default";
+static const char DEFAULT_process_group_[] = "mainboard_default";
 static const char DEFAULT_sched_name_[] = "CYBER_DEFAULT";
 
 class ModuleArgument {
@@ -39,7 +39,7 @@ class ModuleArgument {
   void ParseArgument(int argc, char* const argv[]);
   void GetOptions(const int argc, char* const argv[]);
   inline std::string GetBinaryName() const { return binary_name_; }
-  inline std::string GetProcessName() const { return process_name_; }
+  inline std::string GetProcessGroup() const { return process_group_; }
   inline std::string GetSchedName() const { return sched_name_; }
   inline std::list<std::string> GetDAGConfList() const {
     return dag_conf_list_;
@@ -48,7 +48,7 @@ class ModuleArgument {
  private:
   std::list<std::string> dag_conf_list_;
   std::string binary_name_;
-  std::string process_name_;
+  std::string process_group_;
   std::string sched_name_;
 };
 

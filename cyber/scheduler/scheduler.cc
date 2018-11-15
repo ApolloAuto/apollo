@@ -51,7 +51,7 @@ Scheduler* Scheduler::Instance() {
 
     // Get sched policy from conf
     std::string conf("conf/");
-    conf.append(GlobalData::Instance()->SchedName()).append(".conf");
+    conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
     auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
 
     apollo::cyber::proto::CyberConfig cfg;
