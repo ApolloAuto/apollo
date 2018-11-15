@@ -62,6 +62,10 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
                                                  adc_frenet_frame_point_.l())) {
     return Stage::ERROR;
   }
+  if (GetContext()->path_data_.discretized_path().path_points().empty()) {
+    AERROR << "path data is empty after trim.";
+    return Stage::ERROR;
+  }
 
   PathPoint first_path_point =
       GetContext()->path_data_.discretized_path().path_points().front();
@@ -81,6 +85,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
                               first_path_point, last_path_point)) {
     // wait here, do nothing this cycle.
     auto& rfl_info = frame->mutable_reference_line_info()->front();
+    *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
     *(rfl_info.mutable_speed_data()) =
       SpeedProfileGenerator::GenerateFallbackSpeedProfile();
     rfl_info.set_trajectory_type(ADCTrajectory::NORMAL);
