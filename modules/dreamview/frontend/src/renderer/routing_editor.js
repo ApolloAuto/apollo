@@ -33,6 +33,7 @@ export default class RoutingEditor {
     disableEditingMode(scene) {
         this.inEditingMode = false;
         this.removeAllRoutePoints(scene);
+        this.parkingSpaceId = null;
     }
 
     addRoutingPoint(point, coordinates, scene) {

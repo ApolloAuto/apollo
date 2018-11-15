@@ -167,13 +167,18 @@ export default class RealtimeWebSocketEndpoint {
     }
 
     requestRoute(start, waypoint, end, parkingSpaceId) {
-        this.websocket.send(JSON.stringify({
+        const request = {
             type: "SendRoutingRequest",
             start: start,
             end: end,
             waypoint: waypoint,
-            parkingSpaceId: parkingSpaceId,
-        }));
+        };
+
+        if (parkingSpaceId) {
+            request.parkingSpaceId = parkingSpaceId;
+        }
+
+        this.websocket.send(JSON.stringify(request));
     }
 
     requestDefaultRoutingEndPoint() {
