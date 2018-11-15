@@ -1207,10 +1207,10 @@ void Obstacle::SetNearbyObstacles() {
 
 void Obstacle::SetMotionStatus() {
   int history_size = static_cast<int>(feature_history_.size());
-  if (history_size < 2) {
+  if (history_size < 2 && history_size >= 1) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
-           << "is considered still.";
-    feature_history_.front().set_is_still(true);
+           << "is considered moving.";
+    feature_history_.front().set_is_still(false);
     return;
   }
 
