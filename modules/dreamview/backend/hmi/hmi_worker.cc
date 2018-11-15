@@ -231,7 +231,8 @@ void HMIWorker::InitStatus() {
   } else {
     // Change to the last active mode, or else the first one in options.
     const std::string cached_mode = KVDB::Get(FLAGS_current_mode_db_key);
-    ChangeMode(!cached_mode.empty() ? cached_mode : modes.begin()->first);
+    ChangeMode(
+        ContainsKey(modes, cached_mode) ? cached_mode : modes.begin()->first);
   }
 }
 
