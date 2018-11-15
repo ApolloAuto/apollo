@@ -4,6 +4,7 @@ stage_type: SIDE_PASS_GENERATE_PATH
 stage_type: SIDE_PASS_STOP_ON_WAITPOINT
 stage_type: SIDE_PASS_DETECT_SAFETY
 stage_type: SIDE_PASS_PASS_OBSTACLE
+stage_type: SIDE_PASS_BACKUP
 side_pass_config : {
   side_pass_exit_distance : 10.0
   approach_obstacle_max_stop_speed : 1.0e-5
@@ -34,7 +35,30 @@ stage_config : {
     task_type : QP_SPLINE_ST_SPEED_OPTIMIZER
   }
 }
-
+stage_config : {
+  stage_type: SIDE_PASS_BACKUP
+  enabled: true
+  task_type: DP_POLY_PATH_OPTIMIZER
+  task_type: PATH_DECIDER
+  task_type: DP_ST_SPEED_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_config : {
+    task_type : DP_POLY_PATH_OPTIMIZER
+  }
+  task_config : {
+    task_type : PATH_DECIDER
+  }
+  task_config : {
+    task_type : DP_ST_SPEED_OPTIMIZER
+  }
+  task_config : {
+    task_type : SPEED_DECIDER
+  }
+  task_config : {
+    task_type : QP_SPLINE_ST_SPEED_OPTIMIZER
+  }
+}
 stage_config : {
   stage_type: SIDE_PASS_GENERATE_PATH
   enabled: true

@@ -68,6 +68,11 @@ void SidePassScenario::RegisterStages() {
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new SidePassPassObstacle(config);
       });
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_BACKUP,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new SidePassBackup(config);
+      });
 }
 
 SidePassScenario::SidePassScenario(

@@ -35,7 +35,7 @@ DECLARE_STAGE(SidePassGeneratePath, SidePassContext);
 // DECLARE_STAGE(SidePassStopOnWaitPoint, SidePassContext);
 DECLARE_STAGE(SidePassDetectSafety, SidePassContext);
 DECLARE_STAGE(SidePassPassObstacle, SidePassContext);
-
+DECLARE_STAGE(SidePassBackup, SidePassContext);
 }  // namespace side_pass
 }  // namespace scenario
 }  // namespace planning

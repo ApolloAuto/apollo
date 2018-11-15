@@ -40,6 +40,58 @@ constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
 /*
  * @brief:
+ * STAGE: SidePassBackup
+ */
+Stage::StageStatus SidePassBackup::Process(
+    const TrajectoryPoint& planning_start_point, Frame* frame) {
+  // check the status of side pass scenario
+  const SLBoundary& adc_sl_boundary =
+      frame->reference_line_info().front().AdcSlBoundary();
+  const PathDecision& path_decision =
+      frame->reference_line_info().front().path_decision();
+
+  bool has_blocking_obstacle = false;
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
+      continue;
+    }
+    CHECK(obstacle->IsStatic());
+    if (obstacle->speed() >
+        GetContext()->scenario_config_.block_obstacle_min_speed()) {
+      continue;
+    }
+    if (obstacle->PerceptionSLBoundary().start_s() <=
+        adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
+      continue;
+    }
+    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
+    if (obstacle->PerceptionSLBoundary().start_s() >
+        adc_sl_boundary.end_s() +
+            kAdcDistanceThreshold) {  // vehicles are far away
+      continue;
+    }
+    if (obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
+        obstacle->PerceptionSLBoundary().end_l() < -1.0) {
+      continue;
+    }
+    has_blocking_obstacle = true;
+  }
+  if (!has_blocking_obstacle) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+  // do path planning
+  bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
+  if (!plan_ok) {
+    AERROR << "Stage " << Name() << " error: "
+           << "planning on reference line failed.";
+    return Stage::ERROR;
+  }
+  return Stage::RUNNING;
+}
+
+/*
+ * @brief:
  * STAGE: SidePassApproachObstacle
  */
 Stage::StageStatus SidePassApproachObstacle::Process(
@@ -142,7 +194,8 @@ Stage::StageStatus SidePassGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   if (!PlanningOnReferenceLine(planning_start_point, frame)) {
     AERROR << "Fail to plan on reference_line.";
-    return Stage::ERROR;
+    next_stage_ = ScenarioConfig::SIDE_PASS_BACKUP;
+    return Stage::FINISHED;
   }
   GetContext()->path_data_ = frame->reference_line_info().front().path_data();
   if (frame->reference_line_info().front().trajectory().NumOfPoints() > 0) {
