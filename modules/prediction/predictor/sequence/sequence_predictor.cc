@@ -169,11 +169,12 @@ SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
 
 double SequencePredictor::GetLaneChangeDistanceWithADC(
     const LaneSequence& lane_sequence) {
-  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
-  ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PLANNING_TRAJECTORY));
+  auto pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
+  auto adc_container = ContainerManager::Instance()->GetContainer<
+      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
+
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
 

@@ -39,9 +39,9 @@ namespace prediction {
 EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
   EnvironmentFeatures environment_features;
 
-  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::LOCALIZATION));
+  auto pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
 
   if (pose_container == nullptr) {
     AERROR << "Null pose container found.";
@@ -90,9 +90,9 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
 
 void FeatureExtractor::ExtractEgoVehicleFeatures(
     EnvironmentFeatures* ptr_environment_features) {
-  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::LOCALIZATION));
+  auto pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
   const PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
   if (pose_ptr == nullptr) {
     AERROR << "Null pose pointer";
@@ -178,10 +178,8 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 
 void FeatureExtractor::ExtractFrontJunctionFeatures(
     EnvironmentFeatures* ptr_environment_features) {
-  ADCTrajectoryContainer* ego_trajectory_container =
-      dynamic_cast<ADCTrajectoryContainer*>(
-          ContainerManager::Instance()->GetContainer(
-              AdapterConfig::PLANNING_TRAJECTORY));
+  auto ego_trajectory_container = ContainerManager::Instance()->GetContainer<
+      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
   if (ego_trajectory_container == nullptr) {
     AERROR << "Null ego trajectory container";
     return;

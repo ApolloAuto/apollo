@@ -63,9 +63,8 @@ TEST_F(PredictorManagerTest, General) {
   EvaluatorManager::Instance()->Init(prediction_conf_);
   PredictorManager::Instance()->Init(prediction_conf_);
 
-  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+  auto obstacles_container = ContainerManager::Instance()->GetContainer<
+      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 

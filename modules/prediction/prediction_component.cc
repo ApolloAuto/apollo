@@ -169,13 +169,14 @@ void PredictionComponent::Stop() {
     AINFO << "write when stop";
     FeatureOutput::Close();
   }
-  apollo::cyber::Shutdown();
+  cyber::Shutdown();
 }
 
 void PredictionComponent::OnLocalization(
     const LocalizationEstimate& localization_msg) {
-  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
+  auto pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
   if (!pose_container) {
     return;
   }
@@ -187,10 +188,8 @@ void PredictionComponent::OnLocalization(
 
 void PredictionComponent::OnPlanning(
     const planning::ADCTrajectory& planning_msg) {
-  ADCTrajectoryContainer* adc_trajectory_container =
-      dynamic_cast<ADCTrajectoryContainer*>(
-          ContainerManager::Instance()->GetContainer(
-              AdapterConfig::PLANNING_TRAJECTORY));
+  auto adc_trajectory_container = ContainerManager::Instance()->GetContainer<
+      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
   if (!adc_trajectory_container) {
     return;
   }
@@ -204,9 +203,8 @@ void PredictionComponent::OnPerception(
     const PerceptionObstacles& perception_msg) {
   // Insert obstacle
   auto end_time1 = std::chrono::system_clock::now();
-  ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PERCEPTION_OBSTACLES));
+  auto obstacles_container = ContainerManager::Instance()->GetContainer<
+      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
   if (!obstacles_container) {
     return;
   }
@@ -247,11 +245,12 @@ void PredictionComponent::OnPerception(
 
   // Update ADC status
 
-  PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
-      ContainerManager::Instance()->GetContainer(AdapterConfig::LOCALIZATION));
-  ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
-      ContainerManager::Instance()->GetContainer(
-          AdapterConfig::PLANNING_TRAJECTORY));
+  auto pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
+  auto adc_container = ContainerManager::Instance()->GetContainer<
+      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
+
   if (!pose_container || !adc_container) {
     return;
   }
