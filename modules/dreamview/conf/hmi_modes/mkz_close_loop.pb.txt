@@ -11,7 +11,7 @@ cyber_modules {
     dag_files: "/apollo/modules/prediction/dag/prediction.dag"
     dag_files: "/apollo/modules/routing/dag/routing.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
-    schedule: "compute_sched"
+    process_group: "compute_sched"
   }
 }
 cyber_modules {
@@ -20,7 +20,7 @@ cyber_modules {
     dag_files: "/apollo/modules/canbus/dag/canbus.dag"
     dag_files: "/apollo/modules/control/dag/control.dag"
     dag_files: "/apollo/modules/guardian/dag/guardian.dag"
-    schedule: "control_sched"
+    process_group: "control_sched"
   }
 }
 modules {
