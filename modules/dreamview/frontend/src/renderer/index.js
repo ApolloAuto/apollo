@@ -265,6 +265,10 @@ class Renderer {
         }
     }
 
+    setParkingSpaceId(id) {
+        this.routingEditor.setParkingSpaceId(id);
+    }
+
     removeAllRoutingPoints() {
         this.routingEditor.removeAllRoutePoints(this.scene);
     }
@@ -377,7 +381,7 @@ class Renderer {
 
     updateMapIndex(hash, elementIds, radius) {
         if (!this.routingEditor.isInEditingMode() ||
-             this.routingEditor.EDITING_MAP_RADIUS === radius) {
+            PARAMETERS.routingEditor.radiusOfMapRequest === radius) {
             this.map.updateIndex(hash, elementIds, this.scene);
         }
     }

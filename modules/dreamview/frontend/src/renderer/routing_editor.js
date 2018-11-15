@@ -10,6 +10,7 @@ import { drawImage } from "utils/draw";
 export default class RoutingEditor {
     constructor() {
         this.routePoints = [];
+        this.parkingSpaceId = null;
         this.inEditingMode = false;
     }
 
@@ -26,7 +27,7 @@ export default class RoutingEditor {
         camera.far = PARAMETERS.camera[pov].far;
 
         camera.updateProjectionMatrix();
-        WS.requestMapElementIdsByRadius(this.EDITING_MAP_RADIUS);
+        WS.requestMapElementIdsByRadius(PARAMETERS.routingEditor.radiusOfMapRequest);
     }
 
     disableEditingMode(scene) {
@@ -39,6 +40,10 @@ export default class RoutingEditor {
         const pointMesh = drawImage(routingPointPin, 3.5, 3.5, offsetPoint.x, offsetPoint.y, 0.3);
         this.routePoints.push(pointMesh);
         scene.add(pointMesh);
+    }
+
+    setParkingSpaceId(id) {
+        this.parkingSpaceId = id;
     }
 
     removeLastRoutingPoint(scene) {
@@ -82,10 +87,8 @@ export default class RoutingEditor {
                          : coordinates.applyOffset(carOffsetPosition, true);
         const end      = points[points.length-1];
         const waypoint = (points.length > 1) ? points.slice(1,-1) : [];
-        WS.requestRoute(start, waypoint, end);
+        WS.requestRoute(start, waypoint, end, this.parkingSpaceId);
 
         return true;
     }
 }
-
-RoutingEditor.prototype.EDITING_MAP_RADIUS = 1500.0; //meters

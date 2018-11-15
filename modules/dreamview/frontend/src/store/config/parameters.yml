@@ -185,6 +185,9 @@ options:
     default: true
     menuId: mapParkingSpace
 
+routingEditor:
+  radiusOfMapRequest: 2000.0 # meters
+
 navigation:
   # possible options: BaiduMap or GoogleMap
   map: "BaiduMap"

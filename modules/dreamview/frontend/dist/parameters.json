@@ -242,6 +242,9 @@
 			"menuId": "mapParkingSpace"
 		}
 	},
+	"routingEditor": {
+		"radiusOfMapRequest": 2000
+	},
 	"navigation": {
 		"map": "BaiduMap",
 		"mapAPiUrl": "https://api.map.baidu.com/api?v=3.0&ak=0kKZnWWhXEPfzIkklmzAa3dZ&callback=initMap"

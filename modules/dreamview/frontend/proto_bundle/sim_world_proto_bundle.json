@@ -4710,13 +4710,30 @@
                 }
               }
             },
+            "OpenSpacePlanningConfig": {
+              "fields": {
+                "plannerType": {
+                  "rule": "repeated",
+                  "type": "PlannerType",
+                  "id": 1,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "plannerOpenSpaceConfig": {
+                  "type": "PlannerOpenSpaceConfig",
+                  "id": 2
+                }
+              }
+            },
             "PlanningConfig": {
               "oneofs": {
                 "planningConfig": {
                   "oneof": [
                     "rtkPlanningConfig",
                     "standardPlanningConfig",
-                    "navigationPlanningConfig"
+                    "navigationPlanningConfig",
+                    "openSpacePlanningConfig"
                   ]
                 }
               },
@@ -4733,10 +4750,14 @@
                   "type": "NavigationPlanningConfig",
                   "id": 3
                 },
+                "openSpacePlanningConfig": {
+                  "type": "OpenSpacePlanningConfig",
+                  "id": 4
+                },
                 "defaultTaskConfig": {
                   "rule": "repeated",
                   "type": "TaskConfig",
-                  "id": 4
+                  "id": 5
                 }
               }
             },
