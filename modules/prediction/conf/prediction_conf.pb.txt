@@ -8,7 +8,7 @@ obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: IN_JUNCTION
   evaluator_type: JUNCTION_MLP_EVALUATOR
-  predictor_type: MOVE_SEQUENCE_PREDICTOR
+  predictor_type: JUNCTION_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: VEHICLE
