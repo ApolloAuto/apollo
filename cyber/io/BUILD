@@ -63,16 +63,32 @@ cc_library(
 )
 
 cc_binary(
-    name = "echo_client",
-    srcs = [ "example/echo_client.cc", ],
+    name = "tcp_echo_client",
+    srcs = [ "example/tcp_echo_client.cc", ],
     deps = [
       "//cyber:cyber_core",
     ],
 )
 
 cc_binary(
-    name = "echo_server",
-    srcs = [ "example/echo_server.cc", ],
+    name = "tcp_echo_server",
+    srcs = [ "example/tcp_echo_server.cc", ],
+    deps = [
+      "//cyber:cyber_core",
+    ],
+)
+
+cc_binary(
+    name = "udp_echo_client",
+    srcs = [ "example/udp_echo_client.cc", ],
+    deps = [
+      "//cyber:cyber_core",
+    ],
+)
+
+cc_binary(
+    name = "udp_echo_server",
+    srcs = [ "example/udp_echo_server.cc", ],
     deps = [
       "//cyber:cyber_core",
     ],
