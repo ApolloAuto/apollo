@@ -102,7 +102,7 @@ class CRoutine {
   bool force_stop_ = false;
 
   int processor_id_ = -1;
-  uint32_t priority_ = 1;
+  uint32_t priority_ = 0;
   uint64_t id_ = 0;
 
   static thread_local CRoutine *current_routine_;
