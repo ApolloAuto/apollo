@@ -67,6 +67,9 @@ class OpenSpacePlanning : public PlanningBase {
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* const trajectory) override;
 
+  void ExportChart(const planning_internal::Debug& debug_info,
+                   planning_internal::Debug* debug_chart) override;
+
  private:
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
