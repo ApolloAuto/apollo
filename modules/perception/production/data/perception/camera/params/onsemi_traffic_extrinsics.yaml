@@ -2,7 +2,7 @@ header:
   stamp:
     secs: 0
     nsecs: 0
-  frame_id: onsemi_obstacle
+  frame_id: front_6mm
   seq: 0
 child_frame_id: onsemi_traffic
 transform:

@@ -55,9 +55,9 @@ TEST(PbfGatekeeperTest, test) {
   EXPECT_TRUE(sensor_manager->GetSensorInfo("velodyne64", &lidar_info));
   EXPECT_TRUE(sensor_manager->GetSensorInfo("radar_front", &radar_front_info));
   EXPECT_TRUE(
-      sensor_manager->GetSensorInfo("onsemi_obstacle", &camera_obstacle_info));
+      sensor_manager->GetSensorInfo("front_6mm", &camera_obstacle_info));
   EXPECT_TRUE(
-      sensor_manager->GetSensorInfo("onsemi_narrow", &camera_narrow_info));
+      sensor_manager->GetSensorInfo("front_12mm", &camera_narrow_info));
   EXPECT_TRUE(sensor_manager->GetSensorInfo("radar_rear", &radar_rear_info));
 
   SensorPtr lidar_sensor(new Sensor(lidar_info));

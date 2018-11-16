@@ -300,7 +300,7 @@ bool ObstacleCameraPerception::Perception(
       frame->data_provider->sensor_name());
   CHECK(frame->calibration_service != nullptr);
 
-  //  lane detector and postprocessor: work on onsemi_obstacle only
+  //  lane detector and postprocessor: work on front_6mm only
   if (lane_calibration_working_sensor_name_
       == frame->data_provider->sensor_name()) {
     LaneDetectorOptions lane_detetor_options;

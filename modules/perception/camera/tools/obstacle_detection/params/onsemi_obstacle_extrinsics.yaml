@@ -4,7 +4,7 @@ header:
     nsecs: 0
   seq: 0
   frame_id: velodyne64
-child_frame_id: onsemi_obstacle
+child_frame_id: front_6mm
 transform:
   rotation:
     x: -0.5038530686895437

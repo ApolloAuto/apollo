@@ -43,7 +43,7 @@ void lane_postprocessor_eval() {
   init_options.root_dir = "data/";
   base::BrownCameraDistortionModel model;
   bool flag = common::LoadBrownCameraIntrinsic(
-    "params/onsemi_obstacle_intrinsics.yaml", &model);
+    "params/front_6mm_intrinsics.yaml", &model);
   if (!flag) {
     AERROR << "LoadBrownCameraIntrinsic Error!";
     return;

@@ -41,7 +41,6 @@ class CameraPerceptionVizMessage : public cyber::message::IntraMessage {
   }
   ~CameraPerceptionVizMessage() = default;
 
-  CameraPerceptionVizMessage(const CameraPerceptionVizMessage&) = delete;
   CameraPerceptionVizMessage& operator=(
       const CameraPerceptionVizMessage&) = delete;
 

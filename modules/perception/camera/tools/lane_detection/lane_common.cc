@@ -33,7 +33,7 @@ DEFINE_bool(lane_ego_debug, false, "lane ego debug");
 DEFINE_bool(lane_result_output, false, "output the lane result");
 DEFINE_bool(lane_points_output, false, "output the detected lane points");
 DEFINE_string(image_dir, "./image/", "test image directory");
-DEFINE_string(camera_intrinsics_yaml, "params/onsemi_obstacle_intrinsics.yaml",
+DEFINE_string(camera_intrinsics_yaml, "params/front_6mm_intrinsics.yaml",
   "camera intrinsics_yaml");
 
 namespace apollo {

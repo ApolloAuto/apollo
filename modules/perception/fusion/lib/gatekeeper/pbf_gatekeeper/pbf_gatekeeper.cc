@@ -181,8 +181,8 @@ bool PbfGatekeeper::RadarAbleToPublish(const TrackPtr &track, bool is_night) {
 bool PbfGatekeeper::CameraAbleToPublish(const TrackPtr &track, bool is_night) {
   bool visible_in_camera = track->IsCameraVisible();
   SensorId2ObjectMap &camera_objects = track->GetCameraObjects();
-  auto iter = camera_objects.find("onsemi_obstacle");
-  auto iter_narrow = camera_objects.find("onsemi_narrow");
+  auto iter = camera_objects.find("front_6mm");
+  auto iter_narrow = camera_objects.find("front_12mm");
   iter = iter != camera_objects.end() ? iter : iter_narrow;
   if (params_.publish_if_has_camera && visible_in_camera &&
       iter != camera_objects.end() && params_.use_camera_3d && !is_night) {

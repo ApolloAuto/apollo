@@ -44,7 +44,7 @@ struct DstExistanceFusionOptions {
       {"camera_smartereye", 110},
       {"camera_front_obstacle", 110},
       {"camera_front_narrow", 150},
-      {"onsemi_obstacle", 110},
+      {"front_6mm", 110},
   };
   double track_object_max_match_distance_ = 4.0;
 };

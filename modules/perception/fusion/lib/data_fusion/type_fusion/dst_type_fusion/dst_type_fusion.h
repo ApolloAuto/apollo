@@ -71,7 +71,7 @@ struct DstTypeFusionOptions {
   std::map<std::string, double> camera_max_valid_dist_ = {
       {"camera_smartereye", 110},
       {"camera_front_obstacle", 110},
-      {"onsemi_obstacle", 110},
+      {"front_6mm", 110},
       {"camera_front_narrow", 150},
   };
   std::map<std::string, double> sensor_reliability_ = {
@@ -79,7 +79,7 @@ struct DstTypeFusionOptions {
       {"velodyne_64", 0.5},
       {"velodyne128", 0.5},
       {"camera_smartereye", 0.95},
-      {"onsemi_obstacle", 0.95},
+      {"front_6mm", 0.95},
       {"camera_front_obstacle", 0.95},
       {"camera_front_narrow", 0.5},
   };
@@ -88,7 +88,7 @@ struct DstTypeFusionOptions {
       {"velodyne_64", 0.5},
       {"velodyne128", 0.5},
       {"camera_smartereye", 0.2},
-      {"onsemi_obstacle", 0.2},
+      {"front_6mm", 0.2},
       {"camera_front_obstacle", 0.2},
       {"camera_front_narrow", 0.2},
   };

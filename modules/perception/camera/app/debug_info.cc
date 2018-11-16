@@ -331,7 +331,7 @@ void WriteFusionTracking(std::ofstream &fout,
     return;
   }
   AINFO << "Write track results:" << frame_num;
-  if (camera_name == "onsemi_narrow") {
+  if (camera_name == "front_12mm") {
     for (size_t i = 0; i < tracked_object.size(); ++i) {
       base::ObjectPtr ptr = tracked_object[i];
       char output[300];
@@ -361,7 +361,7 @@ void WriteFusionTracking(std::ofstream &fout,
                ptr->velocity[2]);
       fout << output << std::endl;
     }
-  } else if (camera_name == "onsemi_obstacle") {
+  } else if (camera_name == "front_6mm") {
     for (size_t i = 0; i < tracked_object.size(); ++i) {
       base::ObjectPtr ptr = tracked_object[i];
       char output[300];

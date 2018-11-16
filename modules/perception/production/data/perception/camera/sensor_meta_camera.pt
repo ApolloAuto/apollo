@@ -5,13 +5,13 @@ sensor_meta {
 }
 
 sensor_meta {
-    name: "onsemi_narrow"
+    name: "front_12mm"
     type: MONOCULAR_CAMERA
     orientation: FRONT
 }
 
 sensor_meta {
-    name: "onsemi_obstacle"
+    name: "front_6mm"
     type: MONOCULAR_CAMERA
     orientation: FRONT
 }
