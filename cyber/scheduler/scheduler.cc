@@ -125,6 +125,37 @@ bool Scheduler::NotifyTask(uint64_t crid) {
   return NotifyProcessor(crid);
 }
 
+void Scheduler::ParseCpuset(const std::string &str, std::vector<int> *cpuset) {
+  std::vector<std::string> lines;
+  std::stringstream ss(str);
+  std::string l;
+
+  while (getline(ss, l, ',')) {
+    lines.push_back(l);
+  }
+
+  for (std::vector<std::string>::const_iterator it = lines.begin(),
+        e = lines.end(); it != e; it++) {
+    std::stringstream ss(*it);
+    std::vector<std::string> range;
+
+    while (getline(ss, l, '-')) {
+      range.push_back(l);
+    }
+
+    if (range.size() == 1) {
+      cpuset->push_back(std::stoi(range[0]));
+    } else if (range.size() == 2) {
+      for (int i = std::stoi(range[0]), e = std::stoi(range[1]); i <= e; i++) {
+        cpuset->push_back(i);
+      }
+    } else {
+      AERROR << "Parsing cpuset format error.";
+      exit(0);
+    }
+  }
+}
+
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

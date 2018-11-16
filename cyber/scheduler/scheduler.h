@@ -59,9 +59,9 @@ class Scheduler {
   uint32_t TaskPoolSize() { return task_pool_size_; }
 
  protected:
-  virtual void CreateProcessor() = 0;
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
+  void ParseCpuset(const std::string&, std::vector<int>*);
 
   std::vector<std::shared_ptr<ProcessorContext>> pctxs_;
   uint32_t proc_num_ = 0;

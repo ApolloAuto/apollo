@@ -32,7 +32,11 @@ namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
 
-Processor::Processor() { routine_context_.reset(new RoutineContext()); }
+Processor::Processor() {
+  running_.exchange(true);
+  routine_context_.reset(new RoutineContext());
+  thread_ = std::thread(&Processor::Run, this);
+}
 
 Processor::~Processor() {
   if (thread_.joinable()) {
@@ -40,22 +44,23 @@ Processor::~Processor() {
   }
 }
 
-void Processor::Start() {
-  if (running_.exchange(true)) {
-    return;
-  }
-  thread_ = std::thread(&Processor::Run, this);
+void Processor::SetAffinity(const std::vector<int> &cpus,
+                            const std::string &affinity, int p) {
+  cpu_set_t set;
+  CPU_ZERO(&set);
 
-#if 0
-  // FIXME: later, we will deal with cpu affinity.
-  uint32_t core_num = std::thread::hardware_concurrency();
-  if (core_num != 0) {
-    cpu_set_t set;
-    CPU_ZERO(&set);
-    CPU_SET(cpu_bind_id_, &set);
-    pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
+  if (cpus.size()) {
+    if (!affinity.compare("range")) {
+      for (std::vector<int>::const_iterator it = cpus.begin(), e = cpus.end();
+            it != e; it++) {
+        CPU_SET(*it, &set);
+      }
+      pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
+    } else if (!affinity.compare("1to1")) {
+      CPU_SET(cpus[p], &set);
+      pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
+    }
   }
-#endif
 }
 
 void Processor::Run() {

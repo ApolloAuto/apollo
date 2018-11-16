@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "cyber/scheduler/scheduler.h"
 
@@ -36,13 +37,18 @@ class SchedulerChoreography : public Scheduler {
   bool RemoveTask(const std::string& name) override;
 
  private:
-  void CreateProcessor() override;
+  void CreateProcessor();
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool NotifyProcessor(uint64_t crid) override;
 
   std::unordered_map<std::string, ChoreographyTask> cr_confs_;
   AtomicRWLock cr_ctx_lock_;
   std::unordered_map<uint64_t, uint32_t> cr_ctx_;
+
+  std::string choreography_affinity_;
+  std::vector<int> choreography_cpuset_;
+  std::string pool_affinity_;
+  std::vector<int> pool_cpuset_;
 };
 
 }  // namespace scheduler
