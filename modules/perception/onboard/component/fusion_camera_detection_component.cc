@@ -177,8 +177,12 @@ bool GetProjectMatrix(
 FusionCameraDetectionComponent::~FusionCameraDetectionComponent() {}
 
 bool FusionCameraDetectionComponent::Init() {
+  // TODO(someone): read output-channel name from config
   writer_ = node_->CreateWriter<PerceptionObstacles>("/perception/obstacles");
-
+  sensorframe_writer_ = node_->CreateWriter<SensorFrameMessage>(
+      "/perception/inner/PrefusedObjects");
+  camera_viz_writer_ = node_->CreateWriter<CameraPerceptionVizMessage>(
+      "/perception/inner/camera_viz_msg");
   if (InitConfig() != cyber::SUCC) {
     AERROR << "InitConfig() failed.";
     return false;
@@ -239,7 +243,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
   // protobuf msg
   std::shared_ptr<apollo::perception::PerceptionObstacles> out_message(
       new (std::nothrow) apollo::perception::PerceptionObstacles);
-  apollo::common::ErrorCode error_code = apollo::common::PERCEPTION_ERROR_NONE;
+  apollo::common::ErrorCode error_code = apollo::common::OK;
 
   // prefused msg
   std::shared_ptr<SensorFrameMessage> prefused_message(new (std::nothrow)
@@ -259,6 +263,10 @@ void FusionCameraDetectionComponent::OnReceiveImage(
     return;
   }
 
+  bool send_sensorframe_ret =
+      sensorframe_writer_->Write(prefused_message);
+  AINFO << "send out prefused msg, ts: " << std::to_string(msg_timestamp)
+      << "ret: " << send_sensorframe_ret;
   // Send output msg
   if (output_final_obstacles_) {
     writer_->Write(out_message);
@@ -609,7 +617,7 @@ int FusionCameraDetectionComponent::InternalProc(
     prefused_message->error_code_ = *error_code;
     return cyber::FAIL;
   }
-  *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_NONE;
+  *error_code = apollo::common::ErrorCode::OK;
   prefused_message->error_code_ = *error_code;
 
   prefused_message->frame_->camera_frame_supplement.on_use = true;
@@ -636,7 +644,9 @@ int FusionCameraDetectionComponent::InternalProc(
             camera_name, msg_timestamp, camera2world_trans.matrix(), image_blob,
             camera_frame.tracked_objects, camera_frame.lane_objects,
             *error_code));
-    // Send(camera_perception_viz_message_channel_name_, viz_msg);
+    bool send_viz_ret = camera_viz_writer_->Write(viz_msg);
+    AINFO << "send out camera visualization msg, ts: "
+        << std::to_string(msg_timestamp) << " send_viz_ret: " << send_viz_ret;
   }
 
   return cyber::SUCC;

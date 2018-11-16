@@ -73,7 +73,7 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
       // send msg for visualization
       if (FLAGS_obs_enable_visualization) {
         // Send("/apollo/perception/inner/PrefusedObjects", viz_message);
-        writer_->Write(out_message);
+        inner_writer_->Write(viz_message);
       }
     }
   }

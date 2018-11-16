@@ -146,11 +146,11 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
 
   if (frame.timestamp - last_timestamp_ > 0.02) {
     cv::Mat bigimg(world_h_, small_w_ + wide_pixel_, CV_8UC3);
-    camera_image_["onsemi_obstacle"].copyTo(bigimg(cv::Rect(0,
+    camera_image_["front_6mm"].copyTo(bigimg(cv::Rect(0,
                                                             0,
                                                             small_w_,
                                                             small_h_)));
-    camera_image_["onsemi_narrow"].copyTo(bigimg(cv::Rect(0,
+    camera_image_["front_12mm"].copyTo(bigimg(cv::Rect(0,
                                                           small_h_,
                                                           small_w_,
                                                           small_h_)));

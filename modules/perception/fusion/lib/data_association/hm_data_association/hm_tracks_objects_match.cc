@@ -111,15 +111,6 @@ bool HMTrackersObjectsAssociation::Associate(
       &association_result->assignments, &association_result->unassigned_tracks,
       &association_result->unassigned_measurements);
 
-  // const auto& assignments = association_result->assignments;
-  // for (size_t i = 0; i < assignments.size(); ++i) {
-  //  int track_id =
-  //    fusion_tracks[assignments[i].first]->GetTrackId();
-  //  int obs_id =
-  //    sensor_objects[assignments[i].second]->GetBaseObject()->track_id;
-  //  ADEBUG << "local_track_id_assign: " << track_id << ", " << obs_id;
-  //}
-
   // start do post assign
   std::vector<TrackMeasurmentPair> post_assignments;
   PostIdAssign(fusion_tracks, sensor_objects,
@@ -146,15 +137,6 @@ bool HMTrackersObjectsAssociation::Associate(
         << association_result->unassigned_tracks.size()
         << ", unassigned_measuremnets = "
         << association_result->unassigned_measurements.size();
-
-  // const auto& final_assignments = association_result->assignments;
-  // for (size_t i = 0; i < final_assignments.size(); ++i) {
-  //  int track_id =
-  //    fusion_tracks[final_assignments[i].first]->GetTrackId();
-  //  int obs_id =
-  //    sensor_objects[final_assignments[i].second]->GetBaseObject()->track_id;
-  //  ADEBUG << "final_track_id_assign: " << track_id << ", " << obs_id;
-  //}
 
   return state;
 }
@@ -200,14 +182,14 @@ bool HMTrackersObjectsAssociation::MinimizeAssignment(
     std::vector<size_t>* unassigned_measurements) {
   common::GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       common::GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
-  common::SecureMat<float> global_costs = optimizer_.global_costs();
+  common::SecureMat<float>* global_costs = optimizer_.mutable_global_costs();
   int rows = static_cast<int>(unassigned_tracks->size());
   int cols = static_cast<int>(unassigned_measurements->size());
 
-  global_costs.Resize(rows, cols);
+  global_costs->Resize(rows, cols);
   for (int r_i = 0; r_i < rows; r_i++) {
     for (int c_i = 0; c_i < cols; c_i++) {
-      global_costs(r_i, c_i) = static_cast<float>(association_mat[r_i][c_i]);
+      (*global_costs)(r_i, c_i) = static_cast<float>(association_mat[r_i][c_i]);
     }
   }
   std::vector<TrackMeasurmentPair> local_assignments;
@@ -380,7 +362,7 @@ void HMTrackersObjectsAssociation::IdAssign(
     /* when camera system has sub-fusion of obstacle & narrow, they share
      * the same track-id sequence. thus, latest camera object is ok for
      * camera id assign and its information is more up to date. */
-    if (sensor_id == "onsemi_obstacle" || sensor_id == "onsemi_narrow") {
+    if (sensor_id == "front_6mm" || sensor_id == "front_12mm") {
       obj = fusion_tracks[i]->GetLatestCameraObject();
     }
     if (obj == nullptr) {
@@ -399,7 +381,7 @@ void HMTrackersObjectsAssociation::IdAssign(
     // with the track which only have narrow camera object
     // In post id_assign, we do this.
     if (post == false &&
-        (sensor_id == "onsemi_obstacle" || sensor_id == "onsemi_narrow"))
+        (sensor_id == "front_6mm" || sensor_id == "front_12mm"))
       continue;
 
     if (it != sensor_id_2_track_ind.end()) {

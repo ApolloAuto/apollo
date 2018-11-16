@@ -37,6 +37,7 @@
 #include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/onboard/component/camera_perception_viz_message.h"
 
 namespace apollo {
 namespace perception {
@@ -160,8 +161,11 @@ class FusionCameraDetectionComponent :
   std::shared_ptr<apollo::cyber::Writer<
         apollo::perception::PerceptionObstacles>> writer_;
 
-//   std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>>
-//         sensorframe_writer_;
+  std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>>
+        sensorframe_writer_;
+
+  std::shared_ptr<apollo::cyber::Writer<
+        CameraPerceptionVizMessage>> camera_viz_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);

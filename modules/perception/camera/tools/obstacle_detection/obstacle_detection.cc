@@ -154,7 +154,7 @@ int main() {
   }
 
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.sensor_name = "onsemi_obstacle";
+  dp_init_options.sensor_name = "front_6mm";
 
   dp_init_options.image_height = FLAGS_height;
   dp_init_options.image_width = FLAGS_width;
@@ -169,7 +169,7 @@ int main() {
   init_options.conf_file = FLAGS_detector_conf;
 
   base::BrownCameraDistortionModel model;
-  common::LoadBrownCameraIntrinsic("params/onsemi_obstacle_intrinsics.yaml",
+  common::LoadBrownCameraIntrinsic("params/front_6mm_intrinsics.yaml",
                                    &model);
   init_options.base_camera_model = model.get_camera_model();
   auto pinhole =
