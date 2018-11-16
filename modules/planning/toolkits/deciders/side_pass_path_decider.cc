@@ -43,8 +43,8 @@ using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
 constexpr double kRoadBuffer = 0.2;
-constexpr double kObstacleBuffer = 0.1;
-constexpr double kPlanDistAfterObs = 5.0;
+constexpr double kObstacleLBuffer = 0.2;
+constexpr double kObstacleSBuffer = 0.5;
 constexpr double kSidePassPathLength = 50.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
@@ -236,11 +236,11 @@ SidePassPathDecider::GetPathBoundaries(
   std::vector<std::tuple<double, double, double>> lateral_bounds;
 
   constexpr double kLargeBoundary = 10.0;
-  constexpr double s_increment = 1.0;
   for (double curr_s = adc_frenet_frame_point_.s();
        curr_s < std::min(adc_frenet_frame_point_.s() + kSidePassPathLength,
                          reference_line.Length());
-       curr_s += s_increment) {
+       curr_s +=
+       Decider::config_.side_pass_path_decider_config().path_resolution()) {
     std::tuple<double, double, double> lateral_bound = std::make_tuple(
         curr_s - adc_frenet_frame_point_.s(), -kLargeBoundary, kLargeBoundary);
 
@@ -273,13 +273,17 @@ SidePassPathDecider::GetPathBoundaries(
     }
 
     for (const auto *obstacle : indexed_obstacles.Items()) {
-      const auto obs_sl = obstacle->PerceptionSLBoundary();
-      AINFO << obstacle->Perception().ShortDebugString();
-      // not overlap with obstacle
-      if (curr_s < obs_sl.start_s() || curr_s > obs_sl.end_s()) {
+      if (obstacle->IsVirtual()) {
         continue;
       }
+      const auto obs_sl = obstacle->PerceptionSLBoundary();
+      ADEBUG << obs_sl.ShortDebugString();
 
+      // not overlap with obstacle
+      if (curr_s < obs_sl.start_s() - kObstacleSBuffer ||
+          curr_s > obs_sl.end_s() + kObstacleSBuffer) {
+        continue;
+      }
       // not within lateral range
       if (obs_sl.start_l() > std::get<2>(lateral_bound) ||
           obs_sl.end_l() < std::get<1>(lateral_bound)) {
@@ -289,19 +293,19 @@ SidePassPathDecider::GetPathBoundaries(
       if (std::get<2>(lateral_bound) - obs_sl.end_l() >
           obs_sl.start_l() - std::get<1>(lateral_bound)) {
         const double lower_bound = FLAGS_static_decision_nudge_l_buffer +
-                                   kObstacleBuffer + obs_sl.end_l();
+                                   kObstacleLBuffer + obs_sl.end_l();
         if (std::get<2>(lateral_bound) - lower_bound - 2.0 * adc_half_width -
                 FLAGS_static_decision_nudge_l_buffer - kRoadBuffer >=
             0.0) {
-          std::get<1>(lateral_bound) = lower_bound;
+          std::get<1>(lateral_bound) = lower_bound + adc_half_width;
         }
       } else {
         const double upper_bound = -FLAGS_static_decision_nudge_l_buffer -
-                                   kObstacleBuffer + obs_sl.start_l();
+                                   kObstacleLBuffer + obs_sl.start_l();
         if (upper_bound - std::get<1>(lateral_bound) - 2.0 * adc_half_width -
                 FLAGS_static_decision_nudge_l_buffer - kRoadBuffer >=
             0.0) {
-          std::get<2>(lateral_bound) = upper_bound;
+          std::get<2>(lateral_bound) = upper_bound - adc_half_width;
         }
       }
     }

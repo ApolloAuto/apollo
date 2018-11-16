@@ -247,12 +247,7 @@ bool PathData::LeftTrimWithRefS(const double ref_s, const double ref_l) {
 
 bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
   reference_line_ = reference_line;
-  const DiscretizedPath &discretized_path = discretized_path_;
-  bool success = SetDiscretizedPath(discretized_path);
-  if (!success) {
-    return false;
-  }
-  return true;
+  return SetDiscretizedPath(discretized_path_);
 }
 
 }  // namespace planning

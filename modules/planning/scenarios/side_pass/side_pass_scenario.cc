@@ -79,11 +79,11 @@ void SidePassScenario::RegisterStages() {
       });
 }
 
-SidePassScenario::SidePassScenario(
-  const ScenarioConfig& config, const ScenarioContext* scenario_context)
-      : Scenario(config, scenario_context) {
-    side_pass_context_.scenario_config_.CopyFrom(config.side_pass_config());
-  }
+SidePassScenario::SidePassScenario(const ScenarioConfig& config,
+                                   const ScenarioContext* scenario_context)
+    : Scenario(config, scenario_context) {
+  side_pass_context_.scenario_config_.CopyFrom(config.side_pass_config());
+}
 
 std::unique_ptr<Stage> SidePassScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
@@ -201,16 +201,16 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().end_s(),
                                 &lane_left_width_at_end_s,
                                 &lane_right_width_at_end_s);
-    double lane_width = std::min(
-        lane_left_width_at_start_s + lane_right_width_at_start_s,
-        lane_left_width_at_end_s + lane_right_width_at_end_s);
+    double lane_width =
+        std::min(lane_left_width_at_start_s + lane_right_width_at_start_s,
+                 lane_left_width_at_end_s + lane_right_width_at_end_s);
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
-    double driving_width = lane_width - adc_width -
-        FLAGS_static_decision_nudge_l_buffer;
-    ADEBUG << "lane_width[" << lane_width
-        << "] driving_width[" << driving_width << "]";
-    if (driving_width > kLThreshold) {
+    double driving_width =
+        lane_width - adc_width - FLAGS_static_decision_nudge_l_buffer;
+    ADEBUG << "lane_width[" << lane_width << "] driving_width[" << driving_width
+           << "]";
+    if (driving_width < kLThreshold) {
       continue;
     }
 
