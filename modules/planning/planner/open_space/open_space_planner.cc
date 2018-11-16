@@ -52,11 +52,6 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
 
   open_space_trajectory_generator_->Init(planner_open_space_config_);
 
-  // initialize open space region of interest generator
-  if (FLAGS_enable_open_space_roi_and_info) {
-    open_space_roi_generator_.reset(new OpenSpaceROI());
-  }
-
   if (FLAGS_enable_open_space_planner_thread) {
     task_future_ =
         cyber::Async(&OpenSpacePlanner::GenerateTrajectoryThread, this);
@@ -76,6 +71,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // 2. Update Vehicle information and obstacles information from frame.
 
     vehicle_state_ = frame->vehicle_state();
+    open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
@@ -128,7 +124,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     if (IsCollisionFreeTrajectory(current_trajectory_)) {
       // Convet current trajectory to publishable_trajectory
       publishable_trajectory_.Clear();
-      publishable_trajectory_.MergeFrom(current_trajectory_);
+      publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
+          *(current_trajectory_.mutable_trajectory_point()));
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
       frame->mutable_open_space_debug()->CopyFrom(*open_space_debug_);
       return Status::OK();
@@ -139,8 +136,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     }
   } else {
     // Single thread logic
-
     vehicle_state_ = frame->vehicle_state();
+    open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
@@ -168,8 +165,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
                                                          &gear_positions_);
       open_space_trajectory_generator_->UpdateDebugInfo(open_space_debug_);
-      AINFO << "Trajectory caculation updated, new results : "
-            << trajectory_partition_.ShortDebugString();
+      // AINFO << "Trajectory caculation updated, new results : "
+      // << trajectory_partition_.ShortDebugString();
     } else {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Planning failed to generate open space trajectory");
@@ -199,7 +196,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
     if (IsCollisionFreeTrajectory(current_trajectory_)) {
       publishable_trajectory_.Clear();
-      publishable_trajectory_.MergeFrom(current_trajectory_);
+      publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
+          *(current_trajectory_.mutable_trajectory_point()));
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
       frame->mutable_open_space_debug()->CopyFrom(*open_space_debug_);
       return Status::OK();
@@ -235,14 +233,12 @@ void OpenSpacePlanner::Stop() {
 
 bool OpenSpacePlanner::IsCollisionFreeTrajectory(
     const apollo::common::Trajectory& trajectory) {
-  CHECK_LE(trajectory.trajectory_point().size(),
-           predicted_bounding_rectangles_.size());
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().width();
-
-  for (int i = 0; i < trajectory.trajectory_point().size(); ++i) {
+  int point_size = trajectory.trajectory_point().size();
+  for (int i = 0; i < point_size; ++i) {
     const auto& trajectory_point = trajectory.trajectory_point(i);
     double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
@@ -253,10 +249,11 @@ bool OpenSpacePlanner::IsCollisionFreeTrajectory(
     Vec2d shift_vec{shift_distance * std::cos(ego_theta),
                     shift_distance * std::sin(ego_theta)};
     ego_box.Shift(shift_vec);
-
-    for (const auto& obstacle_box : predicted_bounding_rectangles_[i]) {
-      if (ego_box.HasOverlap(obstacle_box)) {
-        return false;
+    if (predicted_bounding_rectangles_.size() != 0) {
+      for (const auto& obstacle_box : predicted_bounding_rectangles_[i]) {
+        if (ego_box.HasOverlap(obstacle_box)) {
+          return false;
+        }
       }
     }
   }

@@ -219,7 +219,6 @@ DECLARE_string(planner_open_space_config_filename);
 DECLARE_double(parking_longitudinal_range);
 DECLARE_double(parking_start_range);
 DECLARE_bool(enable_perception_obstacles);
-DECLARE_bool(enable_open_space_roi_and_info);
 DECLARE_bool(parking_inwards);
 DECLARE_bool(enable_open_space_planner_thread);
 DECLARE_bool(open_space_planner_switchable);

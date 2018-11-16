@@ -417,10 +417,6 @@ DEFINE_bool(enable_perception_obstacles, true,
             "enable the open space planner to take percetion obstacles into "
             "consideration");
 
-DEFINE_bool(enable_open_space_roi_and_info, false,
-            "enable the frame to load map data and calculate info for open "
-            "space planner");
-
 DEFINE_bool(enable_open_space_planner_thread, true,
             "Enable thread in open space planner for trajectory publish.");
 

@@ -34,16 +34,19 @@ using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
+  if (FLAGS_open_space_planner_switchable) {
+    planning_base_ = std::unique_ptr<PlanningBase>(new OpenSpacePlanning());
+  } else {
+    planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+  }
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
-
   planning_base_->Init(config_);
 
   if (FLAGS_use_sim_time) {
     Clock::SetMode(Clock::MOCK);
   }
-
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
@@ -52,7 +55,6 @@ bool PlanningComponent::Init() {
         std::lock_guard<std::mutex> lock(mutex_);
         routing_.CopyFrom(*routing);
       });
-
   traffic_light_reader_ = node_->CreateReader<TrafficLightDetection>(
       FLAGS_traffic_light_detection_topic,
       [this](const std::shared_ptr<TrafficLightDetection>& traffic_light) {
@@ -77,7 +79,6 @@ bool PlanningComponent::Init() {
           relative_map_.CopyFrom(*map_message);
         });
   }
-
   planning_writer_ =
       node_->CreateWriter<ADCTrajectory>(FLAGS_planning_trajectory_topic);
 
@@ -98,7 +99,6 @@ bool PlanningComponent::Proc(
   if (FLAGS_use_sim_time) {
     Clock::SetNowInSeconds(localization_estimate->header().timestamp_sec());
   }
-
   // check and process possible rerouting request
   CheckRerouting();
 
@@ -128,9 +128,7 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
-
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
-
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
   planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
   return true;

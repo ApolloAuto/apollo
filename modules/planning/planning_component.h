@@ -26,12 +26,12 @@
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-#include "modules/planning/common/planning_gflags.h"
 
 #include "modules/planning/open_space_planning.h"
 #include "modules/planning/planning_base.h"
@@ -44,13 +44,7 @@ class PlanningComponent final
     : public cyber::Component<prediction::PredictionObstacles, canbus::Chassis,
                               localization::LocalizationEstimate> {
  public:
-  PlanningComponent() {
-    if (FLAGS_open_space_planner_switchable) {
-      planning_base_ = std::unique_ptr<PlanningBase>(new OpenSpacePlanning());
-    } else {
-      planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
-    }
-  }
+  PlanningComponent() = default;
 
   ~PlanningComponent() = default;
 

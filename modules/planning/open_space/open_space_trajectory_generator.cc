@@ -42,8 +42,6 @@ using apollo::planning_internal::Trajectories;
 
 Status OpenSpaceTrajectoryGenerator::Init(
     const PlannerOpenSpaceConfig& planner_open_space_config) {
-  AINFO << "In OpenSpaceTrajectoryGenerator::Init()";
-
   // nominal sampling time
   ts_ = planner_open_space_config.delta_t();
 
@@ -65,7 +63,6 @@ Status OpenSpaceTrajectoryGenerator::Init(
   // initialize distance approach class pointer
   distance_approach_.reset(
       new DistanceApproachProblem(planner_open_space_config));
-
   return Status::OK();
 }
 
@@ -97,6 +94,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   init_a_ = 0;
   Eigen::MatrixXd x0(4, 1);
   x0 << init_x_, init_y_, init_phi_, init_v_;
+
   Eigen::MatrixXd last_time_u(2, 1);
   last_time_u << init_steer_, init_a_;
 
