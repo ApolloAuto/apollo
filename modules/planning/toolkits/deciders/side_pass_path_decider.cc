@@ -152,7 +152,7 @@ bool SidePassPathDecider::BuildSidePathDecision(
     const double obs_end_l = nearest_obstacle_->PerceptionSLBoundary().end_l();
 
     const double left_space = lane_left_width - obs_end_l;
-    const double right_space = lane_right_width - obs_start_l;
+    const double right_space = lane_right_width + obs_start_l;
 
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
@@ -169,17 +169,11 @@ bool SidePassPathDecider::BuildSidePathDecision(
   return true;
 }
 
-// TODO(All): currently it's the 1st version, and only consider one
-// vehicular obstacle ahead. It side-passes that obstacle and move
-// back to original reference_line immediately. (without considering
-// subsequent obstacles)
 bool SidePassPathDecider::GeneratePath(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-
-  // TODO(All): Check if ADC has fully stopped.
 
   // Decide whether to side-pass from left or right.
   if (!BuildSidePathDecision(frame, reference_line_info)) {
@@ -241,90 +235,82 @@ SidePassPathDecider::GetPathBoundaries(
     const IndexedList<std::string, Obstacle> &indexed_obstacles) {
   std::vector<std::tuple<double, double, double>> lateral_bounds;
 
-  const auto nearest_obstacle =
-      GetNearestObstacle(adc_sl_boundary, reference_line, indexed_obstacles);
-  if (nearest_obstacle == nullptr) {
-    AERROR << "Can't find nearest obstacle.";
-    return lateral_bounds;
-  }
-
-  const auto nearest_obs_sl_boundary = nearest_obstacle->PerceptionSLBoundary();
-
-  // Get road info at every point and fill in the boundary condition vector.
-  const double s_increment = 1.0;
-  bool is_blocked_by_obs = false;
-
-  // Currently, it only considers one obstacle.
-  // For future scaling so that multiple obstacles can be considered,
-  // a sweep-line method can be used. The code here leaves some room
-  // for the sweep-line method.
   constexpr double kLargeBoundary = 10.0;
+  constexpr double s_increment = 1.0;
   for (double curr_s = adc_frenet_frame_point_.s();
-       curr_s < std::min(kSidePassPathLength, reference_line.Length());
+       curr_s < std::min(adc_frenet_frame_point_.s() + kSidePassPathLength,
+                         reference_line.Length());
        curr_s += s_increment) {
-    std::tuple<double, double, double> lateral_bound{
-        curr_s - adc_frenet_frame_point_.s(), 0.0, 0.0};
+    std::tuple<double, double, double> lateral_bound = std::make_tuple(
+        curr_s - adc_frenet_frame_point_.s(), -kLargeBoundary, kLargeBoundary);
 
-    // Check if boundary should be dictated by obstacle or road
-    if (curr_s >= nearest_obs_sl_boundary.start_s() - kPlanDistAfterObs &&
-        curr_s <= nearest_obs_sl_boundary.end_s() + kPlanDistAfterObs) {
-      is_blocked_by_obs = true;
-    } else {
-      is_blocked_by_obs = false;
-    }
-    // Get the road info at the current s.
-    double lane_left_width_at_curr_s = 0.0;
-    double lane_right_width_at_curr_s = 0.0;
-    if (!reference_line.GetLaneWidth(curr_s, &lane_left_width_at_curr_s,
-                                     &lane_right_width_at_curr_s)) {
+    double lane_left_width = 0.0;
+    double lane_right_width = 0.0;
+    if (!reference_line.GetLaneWidth(curr_s, &lane_left_width,
+                                     &lane_right_width)) {
       AERROR << "Fail to get lane width at s = " << curr_s;
-      std::get<1>(lateral_bound) = -kLargeBoundary;
-      std::get<2>(lateral_bound) = kLargeBoundary;
       lateral_bounds.push_back(lateral_bound);
       continue;
     }
+
+    std::get<1>(lateral_bound) = -lane_right_width + kRoadBuffer;
+    std::get<2>(lateral_bound) = lane_left_width - kRoadBuffer;
+
+    const double lane_width = lane_left_width + lane_right_width;
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
 
-    // TODO(All): calculate drivable areas
-    const double lane_width =
-        lane_right_width_at_curr_s + lane_left_width_at_curr_s;
-
-    if (decided_direction_ == SidePassDirection::LEFT) {
+    if (decided_direction_ == SidePassDirection::LEFT &&
+        (curr_lane_.left_neighbor_forward_lane_id_size() > 0 ||
+         curr_lane_.left_neighbor_reverse_lane_id_size() > 0)) {
+      std::get<2>(lateral_bound) =
+          lane_left_width + lane_width - adc_half_width - kRoadBuffer;
+    } else if (decided_direction_ == SidePassDirection::RIGHT &&
+               (curr_lane_.right_neighbor_forward_lane_id_size() > 0 ||
+                curr_lane_.right_neighbor_reverse_lane_id_size() > 0)) {
       std::get<1>(lateral_bound) =
-          -(lane_right_width_at_curr_s - adc_half_width - kRoadBuffer);
-      std::get<2>(lateral_bound) =
-          lane_width + lane_left_width_at_curr_s - adc_half_width - kRoadBuffer;
-    } else {  // SidePassDirection::RIGHT
-      std::get<1>(lateral_bound) = -(lane_width + lane_right_width_at_curr_s -
-                                     adc_half_width - kRoadBuffer);
-      std::get<2>(lateral_bound) =
-          lane_left_width_at_curr_s - adc_half_width - kRoadBuffer;
+          -lane_right_width - lane_width + adc_half_width + kRoadBuffer;
     }
 
-    if (is_blocked_by_obs) {
-      if (decided_direction_ == SidePassDirection::LEFT) {
-        std::get<1>(lateral_bound) = nearest_obs_sl_boundary.end_l() +
-                                     FLAGS_static_decision_nudge_l_buffer +
-                                     kObstacleBuffer + adc_half_width;
-      } else if (decided_direction_ == SidePassDirection::RIGHT) {
-        std::get<2>(lateral_bound) = nearest_obs_sl_boundary.start_l() -
-                                     FLAGS_static_decision_nudge_l_buffer -
-                                     kObstacleBuffer - adc_half_width;
-      } else {
-        AERROR << "Side-pass direction undefined.";
-        std::get<1>(lateral_bound) = -kLargeBoundary;
-        std::get<2>(lateral_bound) = kLargeBoundary;
-        lateral_bounds.push_back(lateral_bound);
+    for (const auto *obstacle : indexed_obstacles.Items()) {
+      const auto obs_sl = obstacle->PerceptionSLBoundary();
+      AINFO << obstacle->Perception().ShortDebugString();
+      // not overlap with obstacle
+      if (curr_s < obs_sl.start_s() || curr_s > obs_sl.end_s()) {
         continue;
       }
+
+      // not within lateral range
+      if (obs_sl.start_l() > std::get<2>(lateral_bound) ||
+          obs_sl.end_l() < std::get<1>(lateral_bound)) {
+        continue;
+      }
+
+      if (std::get<2>(lateral_bound) - obs_sl.end_l() >
+          obs_sl.start_l() - std::get<1>(lateral_bound)) {
+        const double lower_bound = FLAGS_static_decision_nudge_l_buffer +
+                                   kObstacleBuffer + obs_sl.end_l();
+        if (std::get<2>(lateral_bound) - lower_bound - 2.0 * adc_half_width -
+                FLAGS_static_decision_nudge_l_buffer - kRoadBuffer >=
+            0.0) {
+          std::get<1>(lateral_bound) = lower_bound;
+        }
+      } else {
+        const double upper_bound = -FLAGS_static_decision_nudge_l_buffer -
+                                   kObstacleBuffer + obs_sl.start_l();
+        if (upper_bound - std::get<1>(lateral_bound) - 2.0 * adc_half_width -
+                FLAGS_static_decision_nudge_l_buffer - kRoadBuffer >=
+            0.0) {
+          std::get<2>(lateral_bound) = upper_bound;
+        }
+      }
     }
+
     ADEBUG << "obstacle bound: " << std::get<0>(lateral_bound) << ", "
            << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound);
 
     lateral_bounds.push_back(lateral_bound);
   }
-
   return lateral_bounds;
 }
 
