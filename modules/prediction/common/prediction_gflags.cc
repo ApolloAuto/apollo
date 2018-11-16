@@ -106,7 +106,7 @@ DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
               "Max angle difference for a candiate lane");
 DEFINE_int32(max_num_current_lane_in_junction, 1,
              "Max number to search current lanes");
-DEFINE_int32(max_num_nearby_lane_in_junction, 0,
+DEFINE_int32(max_num_nearby_lane_in_junction, 1,
              "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff_in_junction, M_PI / 6.0,
               "Max angle difference for a candiate lane");

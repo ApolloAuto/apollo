@@ -61,6 +61,14 @@ class JunctionAnalyzer {
   static const JunctionFeature& GetJunctionFeature(
       const std::string& start_lane_id);
 
+  /**
+   * @brief Get junction feature starting from start_lane_ids
+   * @param start lane IDs
+   * @return junction
+   */
+  static JunctionFeature GetJunctionFeature(
+      const std::vector<std::string>& start_lane_ids);
+
  private:
   /**
    * @brief Set all junction exits in the hashtable junction_exits_

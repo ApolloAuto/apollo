@@ -296,23 +296,26 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
     AERROR << "Obstacle [" << id_ << "] has no lane.";
     return;
   }
-  std::string start_lane_id = "";
-  if (feature_ptr->mutable_lane()->has_lane_feature()) {
-    start_lane_id = feature_ptr->lane().lane_feature().lane_id();
-  } else {
-    if (feature_ptr->lane().nearby_lane_feature_size() > 0) {
-      // TODO(kechxu) start with multiple lane ids
-      // TODO(kechxu) enlarge searching range for lanes in junction
-      start_lane_id = feature_ptr->lane().nearby_lane_feature(0).lane_id();
+  // TODO(kechxu) enlarge searching range for lanes in junction
+  std::vector<std::string> start_lane_ids;
+  if (feature_ptr->lane().current_lane_feature_size() > 0) {
+    for (const auto& lane_feature :
+         feature_ptr->lane().current_lane_feature()) {
+      start_lane_ids.push_back(lane_feature.lane_id());
+    }
+  } else if (feature_ptr->lane().nearby_lane_feature_size() > 0) {
+    for (const auto& lane_feature :
+         feature_ptr->lane().nearby_lane_feature()) {
+      start_lane_ids.push_back(lane_feature.lane_id());
     }
   }
-  if (start_lane_id == "") {
+  if (start_lane_ids.empty()) {
     AERROR << "Obstacle [" << id_ << "] has no lane in junction";
     return;
   }
   // TODO(kechxu) Maybe output all exits if no start lane found
   feature_ptr->mutable_junction_feature()->CopyFrom(
-      JunctionAnalyzer::GetJunctionFeature(start_lane_id));
+      JunctionAnalyzer::GetJunctionFeature(start_lane_ids));
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
