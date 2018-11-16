@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     AERROR << "Failed to initialize dreamview server";
     return -1;
   }
-
   apollo::cyber::WaitForShutdown();
+  apollo::cyber::Shutdown();
   return 0;
 }
