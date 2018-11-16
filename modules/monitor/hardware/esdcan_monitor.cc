@@ -190,7 +190,9 @@ void EsdCanMonitor::RunOnce(const double current_time) {
     return;
   }
 
-  EsdCanTest(FLAGS_esdcan_id, component->mutable_other_status());
+  auto* status = component->mutable_other_status();
+  status->clear_status();
+  EsdCanTest(FLAGS_esdcan_id, status);
 }
 
 }  // namespace monitor

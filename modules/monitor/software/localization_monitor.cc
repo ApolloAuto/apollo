@@ -58,6 +58,7 @@ void LocalizationMonitor::RunOnce(const double current_time) {
   const auto status = reader->GetLatestObserved();
 
   ComponentStatus* component_status = component->mutable_other_status();
+  component_status->clear_status();
   if (status == nullptr) {
     SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
                                    "No LocalizationStatus received",
