@@ -180,15 +180,19 @@ bool ReferenceLine::Shrink(const double s, double look_backward,
 }
 
 common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
-    const common::TrajectoryPoint& traj_point) const {
+    const common::PathPoint& path_point) const {
+  if (reference_points_.empty()) {
+    return common::FrenetFramePoint();
+  }
+
   common::SLPoint sl_point;
-  XYToSL({traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
+  XYToSL({path_point.x(), path_point.y()}, &sl_point);
   common::FrenetFramePoint frenet_frame_point;
   frenet_frame_point.set_s(sl_point.s());
   frenet_frame_point.set_l(sl_point.l());
 
-  const double theta = traj_point.path_point().theta();
-  const double kappa = traj_point.path_point().kappa();
+  const double theta = path_point.theta();
+  const double kappa = path_point.kappa();
   const double l = frenet_frame_point.l();
 
   ReferencePoint ref_point = GetReferencePoint(frenet_frame_point.s());

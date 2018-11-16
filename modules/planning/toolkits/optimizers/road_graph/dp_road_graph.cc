@@ -69,7 +69,8 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
            << init_point.DebugString();
     return false;
   }
-  init_frenet_frame_point_ = reference_line_.GetFrenetPoint(init_point_);
+  init_frenet_frame_point_ =
+      reference_line_.GetFrenetPoint(init_point_.path_point());
 
   waypoint_sampler_->Init(&reference_line_info_, init_sl_point_,
                           init_frenet_frame_point_);

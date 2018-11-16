@@ -301,6 +301,9 @@ void StdPlanning::RunOnce(const LocalView& local_view,
 
   status = Plan(start_timestamp, stitching_trajectory, trajectory_pb);
 
+  for (const auto& p : trajectory_pb->trajectory_point()) {
+    ADEBUG << p.DebugString();
+  }
   const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 

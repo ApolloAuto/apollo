@@ -7,6 +7,9 @@ cc_library(
     hdrs = [
         "indexed_list.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     linkopts = [
         "-lboost_thread",
     ],
@@ -32,6 +35,9 @@ cc_library(
     name = "indexed_queue",
     hdrs = [
         "indexed_queue.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//modules/common/util:map_util",
@@ -65,6 +71,9 @@ cc_library(
     ],
     hdrs = [
         "obstacle.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":indexed_list",
@@ -101,6 +110,9 @@ cc_library(
     hdrs = [
         "planning_context.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":planning_gflags",
         "//cyber/common:log",
@@ -120,6 +132,9 @@ cc_library(
     hdrs = [
         "path_decision.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":obstacle",
         "//modules/planning/reference_line",
@@ -134,6 +149,9 @@ cc_library(
     hdrs = [
         "planning_gflags.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//external:gflags",
     ],
@@ -146,6 +164,9 @@ cc_library(
     ],
     hdrs = [
         "reference_line_info.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":ego_info",
@@ -185,6 +206,9 @@ cc_library(
     ],
     hdrs = [
         "speed_profile_generator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":frame",
@@ -234,6 +258,9 @@ cc_library(
     hdrs = [
         "change_lane_decider.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":planning_gflags",
         ":reference_line_info",
@@ -246,6 +273,9 @@ cc_library(
     name = "local_view",
     hdrs = [
         "local_view.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//modules/localization/proto:localization_proto",
@@ -265,6 +295,9 @@ cc_library(
     hdrs = [
         "frame.h",
         "frame_manager.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":local_view",
@@ -315,6 +348,9 @@ cc_library(
     hdrs = [
         "speed_limit.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//modules/common/math",
         "//modules/planning/proto:planning_proto",
@@ -341,6 +377,9 @@ cc_library(
     hdrs = [
         "ego_info.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":obstacle",
         "//cyber/common:log",
@@ -360,6 +399,9 @@ cc_library(
     ],
     hdrs = [
         "threshold.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":frame",
@@ -398,6 +440,9 @@ cc_test(
 
 cc_library(
     name = "planning_common",
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "threshold",
         ":ego_info",
@@ -415,6 +460,9 @@ cc_library(
     name = "trajectory_info",
     hdrs = [
         "trajectory_info.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//modules/planning/common/path:path_data",

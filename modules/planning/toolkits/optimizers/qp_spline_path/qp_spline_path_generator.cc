@@ -92,7 +92,7 @@ bool QpSplinePathGenerator::Generate(
     last_discretized_path_ = &path_data_history.back().first;
   }
 
-  init_frenet_point_ = reference_line_.GetFrenetPoint(init_point);
+  init_frenet_point_ = reference_line_.GetFrenetPoint(init_point.path_point());
 
   if (is_change_lane_path_) {
     ref_l_ = init_frenet_point_.l();

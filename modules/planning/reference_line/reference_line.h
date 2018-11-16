@@ -81,7 +81,7 @@ class ReferenceLine {
   ReferencePoint GetReferencePoint(const double s) const;
 
   common::FrenetFramePoint GetFrenetPoint(
-      const common::TrajectoryPoint& traj_point) const;
+      const common::PathPoint& path_point) const;
 
   std::vector<ReferencePoint> GetReferencePoints(double start_s,
                                                  double end_s) const;

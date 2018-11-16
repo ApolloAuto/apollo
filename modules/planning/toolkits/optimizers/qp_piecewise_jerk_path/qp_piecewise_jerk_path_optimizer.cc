@@ -211,7 +211,8 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
 Status QpPiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
-  const auto frenet_point = reference_line.GetFrenetPoint(init_point);
+  const auto frenet_point =
+      reference_line.GetFrenetPoint(init_point.path_point());
   const auto& qp_config = config_.qp_piecewise_jerk_path_config();
   const auto& adc_sl = reference_line_info_->AdcSlBoundary();
   const double qp_delta_s = qp_config.qp_delta_s();

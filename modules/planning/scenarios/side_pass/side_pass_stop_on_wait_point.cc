@@ -56,7 +56,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   }
 
   const auto adc_frenet_frame_point_ =
-      reference_line.GetFrenetPoint(frame->PlanningStartPoint());
+      reference_line.GetFrenetPoint(frame->PlanningStartPoint().path_point());
 
   if (!GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_.s(),
                                                  adc_frenet_frame_point_.l())) {
