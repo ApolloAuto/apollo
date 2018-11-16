@@ -100,10 +100,13 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
   for (const JunctionExit& junction_exit :
        latest_feature_ptr->junction_feature().junction_exit()) {
-    double x = junction_exit.exit_position().x() - latest_feature_ptr->position().x();
-    double y = junction_exit.exit_position().y() - latest_feature_ptr->position().y();
-    double angle = std::atan2(y, x) - std::atan2(latest_feature_ptr->raw_velocity().y(),
-                                                 latest_feature_ptr->raw_velocity().x());
+    double x = junction_exit.exit_position().x()
+             - latest_feature_ptr->position().x();
+    double y = junction_exit.exit_position().y()
+             - latest_feature_ptr->position().y();
+    double angle = std::atan2(y, x)
+                 - std::atan2(latest_feature_ptr->raw_velocity().y(),
+                   latest_feature_ptr->raw_velocity().x());
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     if (idx == max_idx) {
