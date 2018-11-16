@@ -33,7 +33,7 @@ class SchedulerClassic : public Scheduler {
   bool RemoveTask(const std::string& name) override;
 
  private:
-  void CreateProcessor() override;
+  void CreateProcessor();
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool NotifyProcessor(uint64_t crid) override;
 };

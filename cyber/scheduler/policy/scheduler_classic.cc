@@ -72,8 +72,6 @@ void SchedulerClassic::CreateProcessor() {
     proc->BindContext(ctx);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
-
-    proc->Start();
   }
 }
 

@@ -46,10 +46,19 @@ SchedulerChoreography::SchedulerChoreography() {
   apollo::cyber::proto::CyberConfig cfg;
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
     proc_num_ = cfg.scheduler_conf().choreography_conf()
-                  .choreography_processor_num();
-    task_pool_size_ = cfg.scheduler_conf().choreography_conf().
-                        pool_processor_num();
-    // FIXME: pool cpuset
+        .choreography_processor_num();
+    choreography_affinity_ = cfg.scheduler_conf().choreography_conf()
+        .choreography_affinity();
+    ParseCpuset(cfg.scheduler_conf().choreography_conf().choreography_cpuset(),
+        &choreography_cpuset_);
+
+    task_pool_size_ = cfg.scheduler_conf().choreography_conf()
+        .pool_processor_num();
+    pool_affinity_ = cfg.scheduler_conf().choreography_conf()
+        .pool_affinity();
+    ParseCpuset(cfg.scheduler_conf().choreography_conf().pool_cpuset(),
+        &pool_cpuset_);
+
     for (auto& task : cfg.scheduler_conf().choreography_conf().tasks()) {
       cr_confs_[task.name()] = task;
     }
@@ -71,10 +80,9 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ChoreographyContext>();
 
     proc->BindContext(ctx);
+    proc->SetAffinity(choreography_cpuset_, choreography_affinity_, i);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
-
-    proc->Start();
   }
 
   // Put tasks w/o processor assigned into a classic pool.
@@ -83,10 +91,9 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ClassicContext>();
 
     proc->BindContext(ctx);
+    proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
-
-    proc->Start();
   }
 }
 

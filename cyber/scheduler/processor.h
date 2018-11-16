@@ -22,6 +22,8 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <string>
+#include <vector>
 
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
@@ -42,13 +44,12 @@ class Processor {
   ~Processor();
 
   void Run();
-  void Start();
+  void SetAffinity(const std::vector<int>&, const std::string&, int);
+  void Notify() { cv_.notify_one(); }
   void Stop() {
     running_.exchange(false);
     Notify();
   }
-  void Notify() { cv_.notify_one(); }
-
   void BindContext(const std::shared_ptr<ProcessorContext>& context) {
     context_ = context;
   }

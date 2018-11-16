@@ -37,7 +37,6 @@ TEST(SchedulerPolicyTest, choreo) {
   auto task_id = GlobalData::RegisterTaskName("choreo");
   cr->set_id(task_id);
   EXPECT_TRUE(static_cast<ChoreographyContext *>(ctx.get())->Enqueue(cr));
-  processor->Start();
   ctx->ShutDown();
 }
 
@@ -51,7 +50,6 @@ TEST(SchedulerPolicyTest, classic) {
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("classic");
   cr->set_id(task_id);
-  processor->Start();
   ctx->ShutDown();
 }
 
