@@ -71,6 +71,9 @@ void AsyncLogger::Stop() {
 
 void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
                         int message_len) {
+  if (unlikely(message_len <= 0)) {
+    return;
+  }
   // drop message when acitve buffer is full
   if (unlikely(BufferFull(*active_buf_))) {
     return;
