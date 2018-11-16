@@ -51,6 +51,7 @@ void GpsMonitor::RunOnce(const double current_time) {
     return;
   }
   ComponentStatus* component_status = component->mutable_other_status();
+  component_status->clear_status();
 
   // Check Gnss status.
   static auto gnss_status_reader =

@@ -109,12 +109,13 @@ void SocketCanMonitor::RunOnce(const double current_time) {
     // Canbus is not monitored in current mode, skip.
     return;
   }
+  auto* status = component->mutable_other_status();
+  status->clear_status();
 
   std::string message;
   const bool ret = SocketCanTest(&message);
   SummaryMonitor::EscalateStatus(
-      ret ? ComponentStatus::OK : ComponentStatus::ERROR,
-      message, component->mutable_other_status());
+      ret ? ComponentStatus::OK : ComponentStatus::ERROR, message, status);
 }
 
 }  // namespace monitor
