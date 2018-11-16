@@ -55,7 +55,9 @@ CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
     context_pool.reset(new base::CCObjectPool<RoutineContext>(routine_num));
   }
   context_ = context_pool->GetObject();
-  CHECK_NOTNULL(context_);
+  if (context_ == nullptr) {
+    context_.reset(new RoutineContext());
+  }
   MakeContext(CRoutineEntry, this, context_.get());
   state_ = RoutineState::READY;
   updated_.test_and_set(std::memory_order_release);
