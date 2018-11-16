@@ -66,8 +66,15 @@ class SidePassStopOnWaitPoint : public Stage {
       const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
       const common::PathPoint& first_path_point,
       const common::PathPoint& last_path_point);
-  bool GetMoveForwardLastPathPoint(const ReferenceLine& reference_line,
-                                   common::PathPoint* const last_path_point);
+  bool GetTheSOfNearestObstacle(
+      const ReferenceLine& reference_line,
+      const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
+      const Obstacle* nearest_obstacle);
+  bool GetMoveForwardLastPathPoint(
+      const ReferenceLine& reference_line,
+      const Obstacle* nearest_obstacle,
+      common::PathPoint* const last_path_point,
+      bool* should_not_move_at_all);
 };
 
 }  // namespace side_pass

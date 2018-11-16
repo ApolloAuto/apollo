@@ -72,20 +72,44 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     ADEBUG << p.ShortDebugString();
   }
 
+  // Get the nearest obstacle
+  Obstacle* nearest_obstacle = nullptr;
+  if (!GetTheSOfNearestObstacle(reference_line, path_decision.obstacles(),
+      nearest_obstacle)) {
+    AERROR << "Failed while running the function to get nearest obstacle.";
+    return Stage::ERROR;
+  }
+
+  // If the nearest obstacle, provided it exists, is moving,
+  // then quit the side_pass stage.
+  if (!nearest_obstacle) {
+    if (nearest_obstacle->speed() >
+        GetContext()->scenario_config_.block_obstacle_min_speed()) {
+      next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+    }
+  }
+
+  // Get the "wait point".
   PathPoint first_path_point =
       GetContext()->path_data_.discretized_path().path_points().front();
-
   PathPoint last_path_point;
-  if (!GetMoveForwardLastPathPoint(reference_line, &last_path_point)) {
+  bool should_not_move_at_all = false;
+  if (!GetMoveForwardLastPathPoint(reference_line, nearest_obstacle,
+      &last_path_point, &should_not_move_at_all)) {
     AERROR << "Fail to get move forward last path point.";
     return Stage::ERROR;
   }
-  ADEBUG << "first_path_point: " << first_path_point.ShortDebugString();
-  ADEBUG << "last_path_point : " << first_path_point.ShortDebugString();
+  if (should_not_move_at_all) {
+    return Stage::FINISHED;  // return FINISHED if it's already at "wait point".
+  }
 
+  ADEBUG << "first_path_point: " << first_path_point.ShortDebugString();
+  ADEBUG << "last_path_point : " << last_path_point.ShortDebugString();
   double move_forward_distance = last_path_point.s() - first_path_point.s();
   ADEBUG << "move_forward_distance: " << move_forward_distance;
 
+  // Wait until everything is clear.
   if (!IsFarAwayFromObstacles(reference_line, path_decision.obstacles(),
                               first_path_point, last_path_point)) {
     // wait here, do nothing this cycle.
@@ -161,7 +185,7 @@ bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
   }
 
   // Go through every obstacle, check if there is any in the no_obs_zone,
-  // which will used by the proceed_with_caution movement.
+  // which will be used by the proceed_with_caution movement.
   for (const auto* obstacle : indexed_obstacle_list.Items()) {
     if (obstacle->IsVirtual()) {
       continue;
@@ -195,15 +219,88 @@ bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
   return true;
 }
 
-bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
+bool SidePassStopOnWaitPoint::GetTheSOfNearestObstacle(
     const ReferenceLine& reference_line,
-    common::PathPoint* const last_path_point) {
+    const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
+    const Obstacle* nearest_obstacle) {
+
+  // Get the first path point. This can be used later to
+  // filter out other obstaces that are behind ADC.
+  PathPoint first_path_point =
+      GetContext()->path_data_.discretized_path().path_points().front();
+  common::SLPoint first_sl_point;
+  if (!reference_line.XYToSL(Vec2d(first_path_point.x(), first_path_point.y()),
+                             &first_sl_point)) {
+    AERROR << "Failed to get the projection from TrajectoryPoint onto "
+              "reference_line";
+    return false;
+  }
+
+  // Go through every obstacle.
+  bool exist_nearest_obs = false;
+  nearest_obstacle = nullptr;
+  double s_of_nearest_obs = 0.0;
+  for (const auto* obstacle : indexed_obstacle_list.Items()) {
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
+    // Check the s-direction. Rule out those obstacles that are behind ADC.
+    double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
+    double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
+    if (obs_end_s <= first_sl_point.s()) {
+      continue;
+    }
+    // Check the l-direction. Rule out those obstacles that are completely
+    // outside the current lane of ADC.
+    double lane_left_width_at_start_s = 0.0;
+    double lane_left_width_at_end_s = 0.0;
+    double lane_right_width_at_start_s = 0.0;
+    double lane_right_width_at_end_s = 0.0;
+    reference_line.GetLaneWidth(obs_start_s, &lane_left_width_at_start_s,
+                                &lane_right_width_at_start_s);
+    reference_line.GetLaneWidth(obs_end_s, &lane_left_width_at_end_s,
+                                &lane_right_width_at_end_s);
+    double lane_left_width = std::min(std::abs(lane_left_width_at_start_s),
+                                      std::abs(lane_left_width_at_end_s));
+    double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
+                                       std::abs(lane_right_width_at_end_s));
+    double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
+    double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
+    // Refresh the s of the nearest obstacle if needed.
+    if (obs_start_l < lane_left_width && -obs_end_l < lane_right_width) {
+      if (!exist_nearest_obs) {
+        exist_nearest_obs = true;
+        nearest_obstacle = obstacle;
+        s_of_nearest_obs = obs_start_s;
+      } else {
+        if (obs_start_s < s_of_nearest_obs) {
+          nearest_obstacle = obstacle;
+          s_of_nearest_obs = obs_start_s;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+
+bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
+    const ReferenceLine& reference_line, const Obstacle* nearest_obstacle,
+    PathPoint* const last_path_point, bool* should_not_move_at_all) {
+  *should_not_move_at_all = false;
   int count = 0;
+  bool exist_nearest_obs = (nearest_obstacle != nullptr);
+  double s_max = 0.0;
+  if (exist_nearest_obs) {
+    s_max = nearest_obstacle->PerceptionSLBoundary().start_s();;
+  }
+
   for (const auto& path_point :
        GetContext()->path_data_.discretized_path().path_points()) {
     // Get the four corner points ABCD of ADC at every path point,
-    // and check if that's within the current lane until it reaches
-    // out of current lane.
+    // and keep checking until it gets out of the current lane or
+    // reaches the nearest obstacle (in the same lane) ahead.
     const auto& vehicle_box =
         common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
     std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
@@ -227,19 +324,26 @@ bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
         is_out_of_curr_lane = true;
         break;
       }
+      // Check if this corner point is before the nearest obstacle:
+      if (exist_nearest_obs &&
+          curr_point_sl.s() > s_max) {
+        is_out_of_curr_lane = true;
+        break;
+      }
     }
+
     if (is_out_of_curr_lane) {
       if (count == 0) {
         // The current ADC, without moving at all, is already at least
         // partially out of the current lane.
-        return Stage::FINISHED;
+        *should_not_move_at_all = true;
+        return true;
       }
       break;
     } else {
       *last_path_point = path_point;
     }
-    // check if the ego car on path_point will partially go into the
-    // neighbor lane, and retain only those within-lane path-points.
+
     CHECK_GE(path_point.s(), 0.0);
     ++count;
   }
