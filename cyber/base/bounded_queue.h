@@ -127,6 +127,9 @@ bool BoundedQueue<T>::Enqueue(const T& element) {
   } while (!tail_.compare_exchange_weak(old_tail, new_tail,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
+  while (unlikely(flags_[old_tail].flag.load(std::memory_order_acquire))) {
+    cpu_relax();
+  }
   pool_[old_tail] = element;
   flags_[old_tail].flag.store(true, std::memory_order_release);
   wait_strategy_->NotifyOne();
@@ -149,6 +152,9 @@ bool BoundedQueue<T>::Dequeue(T* element) {
   } while (!head_.compare_exchange_weak(old_head, new_head,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
+  while (unlikely(!flags_[new_head].flag.load(std::memory_order_acquire))) {
+    cpu_relax();
+  }
   *element = pool_[new_head];
   flags_[new_head].flag.store(false, std::memory_order_release);
   return true;
