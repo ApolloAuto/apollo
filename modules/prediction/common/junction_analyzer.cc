@@ -91,7 +91,7 @@ void JunctionAnalyzer::SetAllJunctionExits() {
 
 std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     const std::string& start_lane_id) {
-  int max_search_level = 4;
+  int max_search_level = 5;
   std::vector<JunctionExit> junction_exits;
   std::queue<std::pair<ConstLaneInfoPtr, int>> lane_info_queue;
   lane_info_queue.emplace(PredictionMap::LaneById(start_lane_id), 0);
