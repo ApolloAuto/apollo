@@ -50,7 +50,7 @@ unzip ADOL-C-2.6.3.zip
 pushd ADOL-C-2.6.3
 autoreconf --install
 automake
-./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse --with-colpack="/usr/local/colpack" ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC" --enable-addexa
+./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse --with-colpack="/usr/local/colpack" ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC" 
 
 make -j8 all
 make install

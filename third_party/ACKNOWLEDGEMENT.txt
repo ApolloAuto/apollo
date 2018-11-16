@@ -2,6 +2,9 @@
 * Redistributions in binary form must reproduce all third party copyright notice
   in the documentation and/or other materials provided with the distribution.
 
+* ADOL-C
+    Eclipse Public License 1.0
+    https://projects.coin-or.org/ADOL-C
 * bazel:
     Apache 2.0
     https://github.com/bazelbuild/bazel/blob/master/LICENSE
@@ -15,6 +18,9 @@
 * Buildify
     Apache 2.0
     https://github.com/bazelbuild/bazel/blob/master/LICENSE
+* ColPack
+    GNU Lesser General Public License v3.0
+    https://github.com/CSCsw/ColPack/blob/master/COPYING
 * civetweb
     MIT
     https://github.com/civetweb/civetweb/blob/master/LICENSE.md
@@ -78,3 +84,4 @@
 * socketio
     MIT License
     https://github.com/socketio/socket.io-client/blob/master/LICENSE
+
