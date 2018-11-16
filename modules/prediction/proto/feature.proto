@@ -49,6 +49,7 @@ message JunctionFeature {
   repeated double junction_mlp_feature = 5;
   repeated int32 junction_mlp_label = 6;  // dim is number of masks, i.e. 12
   repeated double junction_mlp_probability = 7;
+  repeated string start_lane_id = 8;
 }
 
 message ObstaclePriority {

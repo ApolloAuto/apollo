@@ -133,8 +133,37 @@ const JunctionFeature& JunctionAnalyzer::GetJunctionFeature(
     junction_feature.add_junction_exit()->CopyFrom(junction_exit);
   }
   junction_feature.mutable_enter_lane()->set_lane_id(start_lane_id);
+  junction_feature.add_start_lane_id(start_lane_id);
   junction_features_[start_lane_id] = junction_feature;
   return junction_features_[start_lane_id];
+}
+
+JunctionFeature JunctionAnalyzer::GetJunctionFeature(
+    const std::vector<std::string>& start_lane_ids) {
+  JunctionFeature merged_junction_feature;
+  bool initialized = false;
+  std::unordered_map<std::string, JunctionExit> junction_exits_map;
+  for (const std::string& start_lane_id : start_lane_ids) {
+    JunctionFeature junction_feature = GetJunctionFeature(start_lane_id);
+    if (!initialized) {
+      merged_junction_feature.set_junction_id(
+          junction_feature.junction_id());
+      merged_junction_feature.set_junction_range(
+          junction_feature.junction_range());
+      initialized = true;
+    }
+    for (const JunctionExit& junction_exit : junction_feature.junction_exit()) {
+      if (junction_exits_map.find(junction_exit.exit_lane_id()) ==
+          junction_exits_map.end()) {
+        junction_exits_map[junction_exit.exit_lane_id()] = junction_exit;
+      }
+    }
+  }
+  for (const auto& exit : junction_exits_map) {
+    merged_junction_feature.add_start_lane_id(exit.first);
+    merged_junction_feature.add_junction_exit()->CopyFrom(exit.second);
+  }
+  return merged_junction_feature;
 }
 
 bool JunctionAnalyzer::IsExitLane(const std::string& lane_id) {
