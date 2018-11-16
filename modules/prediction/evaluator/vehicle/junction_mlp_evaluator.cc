@@ -17,6 +17,7 @@
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
 #include <cmath>
+#include <unordered_map>
 
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/feature_output.h"
@@ -98,6 +99,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  std::unordered_map<std::string, double> junction_exit_prob;
   for (const JunctionExit& junction_exit :
        latest_feature_ptr->junction_feature().junction_exit()) {
     double x = junction_exit.exit_position().x()
@@ -109,17 +111,19 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
                               latest_feature_ptr->raw_velocity().x());
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
-    std::string exit_lane_id = junction_exit.exit_lane_id();
+    junction_exit_prob[junction_exit.exit_lane_id()] = probability[idx];
+  }
 
-    for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
-      LaneSequence* lane_sequence_ptr =
-          lane_graph_ptr->mutable_lane_sequence(i);
-      CHECK_NOTNULL(lane_sequence_ptr);
-      for (const LaneSegment& lane_segment :
-           lane_sequence_ptr->lane_segment()) {
-        if (exit_lane_id == lane_segment.lane_id()) {
-          lane_sequence_ptr->set_probability(probability[idx]);
-        }
+  for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
+    LaneSequence* lane_sequence_ptr =
+        lane_graph_ptr->mutable_lane_sequence(i);
+    CHECK_NOTNULL(lane_sequence_ptr);
+    for (const LaneSegment& lane_segment :
+         lane_sequence_ptr->lane_segment()) {
+      if (junction_exit_prob.find(lane_segment.lane_id()) !=
+          junction_exit_prob.end()) {
+        lane_sequence_ptr->set_probability(
+          junction_exit_prob[lane_segment.lane_id()]);
       }
     }
   }
