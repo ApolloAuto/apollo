@@ -21,7 +21,7 @@ message Param {
         double double_value = 6;
         string string_value = 7;
     }
-    optional string proto_desc = 8;
+    optional bytes proto_desc = 8;
 }
 
 message NodeName {
