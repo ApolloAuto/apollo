@@ -67,6 +67,11 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     return Stage::ERROR;
   }
 
+  for (const auto& p :
+       GetContext()->path_data_.discretized_path().path_points()) {
+    ADEBUG << p.ShortDebugString();
+  }
+
   PathPoint first_path_point =
       GetContext()->path_data_.discretized_path().path_points().front();
 
@@ -87,7 +92,8 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     auto& rfl_info = frame->mutable_reference_line_info()->front();
     *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
     *(rfl_info.mutable_speed_data()) =
-      SpeedProfileGenerator::GenerateFallbackSpeedProfile();
+        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
+
     rfl_info.set_trajectory_type(ADCTrajectory::NORMAL);
     DiscretizedTrajectory trajectory;
     if (!rfl_info.CombinePathAndSpeedProfile(
@@ -109,6 +115,10 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   *(rfl_info.mutable_speed_data()) =
       SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
           move_forward_distance, kSidePassCreepSpeed);
+
+  for (const auto& sd : rfl_info.mutable_speed_data()->speed_vector()) {
+    ADEBUG << sd.ShortDebugString();
+  }
 
   // (2) combine path and speed.
   *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
