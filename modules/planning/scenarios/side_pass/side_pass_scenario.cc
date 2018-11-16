@@ -25,6 +25,7 @@
 #include <utility>
 
 #include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/planning/common/frame.h"
@@ -191,16 +192,17 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
     reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().start_s(),
-                                &lane_left_width,
-                                &lane_right_width);
-    double driving_width = std::max(
-        lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
-        lane_right_width + obstacle->PerceptionSLBoundary().start_l());
+                                &lane_left_width, &lane_right_width);
+    double driving_width =
+        std::max(lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
+                 lane_right_width + obstacle->PerceptionSLBoundary().start_l());
     driving_width =
         std::min(lane_left_width + lane_right_width, driving_width) -
-            FLAGS_static_decision_nudge_l_buffer;
+        FLAGS_static_decision_nudge_l_buffer;
     ADEBUG << "driving_width[" << driving_width << "]";
-    if (driving_width > kLBufferThreshold) {
+    if (driving_width >
+        common::VehicleConfigHelper::GetConfig().vehicle_param().width() +
+            kLBufferThreshold) {
       continue;
     }
 
