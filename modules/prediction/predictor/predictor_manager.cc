@@ -72,6 +72,9 @@ void PredictorManager::Init(const PredictionConf& config) {
           } else if (obstacle_conf.obstacle_status() ==
                      ObstacleConf::OFF_LANE) {
             vehicle_off_lane_predictor_ = obstacle_conf.predictor_type();
+          } else if (obstacle_conf.obstacle_status() ==
+                     ObstacleConf::IN_JUNCTION) {
+            vehicle_in_junction_predictor_ = obstacle_conf.predictor_type();
           }
         }
         break;
