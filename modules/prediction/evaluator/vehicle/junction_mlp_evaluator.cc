@@ -59,35 +59,73 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
     return;
   }
+  Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
+  CHECK_NOTNULL(latest_feature_ptr);
 
   // Assume obstacle is NOT closed to any junction exit
-  if (obstacle_ptr->history_size() == 0 ||
-      !obstacle_ptr->latest_feature().has_junction_feature() ||
-      obstacle_ptr->latest_feature().junction_feature()
-                                    .junction_exit_size() < 1) {
+  if (!latest_feature_ptr->has_junction_feature() ||
+      latest_feature_ptr->junction_feature().junction_exit_size() < 1) {
+    ADEBUG << "Obstacle [" << id << "] has no junction_exit.";
     return;
   }
 
   std::vector<double> feature_values;
   ExtractFeatureValues(obstacle_ptr, &feature_values);
   std::vector<double> probability;
-  if (obstacle_ptr->latest_feature().junction_feature()
-                                    .junction_exit_size() > 1) {
+  if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
     probability = ComputeProbability(feature_values);
   } else {
     for (int i = 0; i < 12; ++i) {
-      probability.push_back(feature_values[3+5*i]);
+      probability.push_back(feature_values[3 + 5 * i]);
     }
   }
   for (double prob : probability) {
-    obstacle_ptr->mutable_latest_feature()
-                ->mutable_junction_feature()
-                ->add_junction_mlp_probability(prob);
+    latest_feature_ptr->mutable_junction_feature()
+                      ->add_junction_mlp_probability(prob);
   }
 
   if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::Insert(obstacle_ptr->latest_feature());
+    FeatureOutput::Insert(*latest_feature_ptr);
     ADEBUG << "Insert junction feature into feature output";
+  }
+
+  int max_idx = 0;
+  double max_prob = 0.0;
+  std::string exit_lane_id;
+  for (int i = 0; i < 12; ++i) {
+    if (probability[i] > max_prob) {
+      max_prob = probability[i];
+      max_idx = i;
+    }
+  }
+  for (const JunctionExit& junction_exit :
+       latest_feature_ptr->junction_feature().junction_exit()) {
+    double x = junction_exit.exit_position().x() - latest_feature_ptr->position().x();
+    double y = junction_exit.exit_position().y() - latest_feature_ptr->position().y();
+    double angle = std::atan2(y, x) - std::atan2(latest_feature_ptr->raw_velocity().y(),
+                                                 latest_feature_ptr->raw_velocity().x());
+    double d_idx = (angle / (2.0 * M_PI)) * 12.0;
+    int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
+    if (idx == max_idx) {
+      exit_lane_id = junction_exit.exit_lane_id();
+    }
+  }
+  // assign the lane_sequence probability
+  LaneGraph* lane_graph_ptr =
+      latest_feature_ptr->mutable_lane()->mutable_lane_graph();
+  CHECK_NOTNULL(lane_graph_ptr);
+  if (lane_graph_ptr->lane_sequence_size() == 0) {
+    AERROR << "Obstacle [" << id << "] has no lane sequences.";
+    return;
+  }
+  for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
+    LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
+    CHECK_NOTNULL(lane_sequence_ptr);
+    for (auto lane_segment : lane_sequence_ptr->lane_segment()) {
+      if (exit_lane_id == lane_segment.lane_id()) {
+        lane_sequence_ptr->set_probability(max_prob);
+      }
+    }
   }
 }
 
