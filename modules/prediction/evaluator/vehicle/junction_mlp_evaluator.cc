@@ -124,7 +124,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK_NOTNULL(lane_sequence_ptr);
-    for (auto lane_segment : lane_sequence_ptr->lane_segment()) {
+    for (const auto& lane_segment : lane_sequence_ptr->lane_segment()) {
       if (exit_lane_id == lane_segment.lane_id()) {
         lane_sequence_ptr->set_probability(max_prob);
       }
