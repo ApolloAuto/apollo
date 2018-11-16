@@ -28,7 +28,7 @@ message VehicleInfo {
 }
 
 message EnvironmentInfo {
-  optional string map_name = 1;
+  optional string map_name = 1 [deprecated = true];
   optional float temperature = 2;  // Temperature in degrees Celsius.
   // TODO(xiaoxq): weather, rare condition, etc.
 }
@@ -39,9 +39,9 @@ message HardwareInfo {
 }
 
 message SoftwareInfo {
-  optional string docker_image = 1;
+  optional string docker_image = 1 [deprecated = true];
   optional string commit_id = 2;
-  optional string mode = 3;
+  optional string mode = 3 [deprecated = true];
   // Entries of software config file path and its content.
   map<string, string> configs = 4;
   optional apollo.routing.RoutingRequest latest_routing_request = 5;

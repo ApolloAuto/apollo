@@ -62,17 +62,20 @@ cc_library(
     deps = [
         ":vehicle_manager",
         "//cyber",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
+        "//modules/common/kv_db",
         "//modules/common/proto:drive_event_proto",
         "//modules/common/util:map_util",
         "//modules/common/util:message_util",
-        "//modules/data/util:info_collector",
+        "//modules/control/proto:control_proto",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/proto:hmi_config_proto",
         "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/dreamview/proto:hmi_status_proto",
         "@com_google_protobuf//:protobuf",
+        "@yaml_cpp//:yaml",
     ],
 )
 

@@ -16,8 +16,6 @@
 
 #include "modules/data/util/info_collector.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <string>
 
 #include "gflags/gflags.h"
@@ -29,9 +27,6 @@
 DEFINE_string(static_info_conf_file,
               "/apollo/modules/data/conf/static_info_conf.pb.txt",
               "Path of the StaticInfo config file.");
-
-DEFINE_string(container_meta_ini, "/apollo/meta.ini",
-              "Container meta info file.");
 
 namespace apollo {
 namespace data {
@@ -92,11 +87,6 @@ const StaticInfo &InfoCollector::GetStaticInfo() {
 const VehicleInfo &InfoCollector::GetVehicleInfo() {
   VehicleInfo *vehicle = Instance()->static_info_.mutable_vehicle();
 
-  const std::string vehicle_name = KVDB::Get("apollo:dreamview:vehicle");
-  if (!vehicle_name.empty()) {
-    vehicle->set_name(vehicle_name);
-  }
-
   const std::string vehicle_vin = KVDB::Get("apollo:canbus:vin");
   if (!vehicle_vin.empty()) {
     vehicle->mutable_license()->set_vin(vehicle_vin);
@@ -106,13 +96,8 @@ const VehicleInfo &InfoCollector::GetVehicleInfo() {
 }
 
 const EnvironmentInfo &InfoCollector::GetEnvironmentInfo() {
-  EnvironmentInfo *environment = Instance()->static_info_.mutable_environment();
-
-  const std::string map_name = KVDB::Get("apollo:dreamview:map");
-  if (!map_name.empty()) {
-    environment->set_map_name(map_name);
-  }
-  return *environment;
+  // TODO(xiaoxq): Populate information like temperature, etc.
+  return Instance()->static_info_.environment();
 }
 
 const HardwareInfo &InfoCollector::GetHardwareInfo() {
@@ -124,16 +109,10 @@ const HardwareInfo &InfoCollector::GetHardwareInfo() {
 
 const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
   SoftwareInfo *software = Instance()->static_info_.mutable_software();
-  software->set_docker_image(GetDockerImage());
 
   const std::string commit_id = KVDB::Get("apollo:data:commit_id");
   if (!commit_id.empty()) {
     software->set_commit_id(commit_id);
-  }
-
-  const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
-  if (!mode_name.empty()) {
-    software->set_mode(mode_name);
   }
 
   *software->mutable_configs() =
@@ -155,21 +134,8 @@ const SoftwareInfo &InfoCollector::GetSoftwareInfo() {
 }
 
 const UserInfo &InfoCollector::GetUserInfo() {
+  // TODO(xiaoxq): Populate information like driver, co-dirver, etc.
   return Instance()->static_info_.user();
-}
-
-std::string InfoCollector::GetDockerImage() {
-  // In release docker container, the actual image name is in meta.ini.
-  if (apollo::common::util::PathExists(FLAGS_container_meta_ini)) {
-    YAML::Node meta = YAML::LoadFile(FLAGS_container_meta_ini);
-    if (meta["tag"]) {
-      return meta["tag"].as<std::string>();
-    }
-  }
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
-    return docker_image;
-  }
-  return "";
 }
 
 }  // namespace data

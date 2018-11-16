@@ -11,7 +11,6 @@ cc_library(
         "//modules/common/kv_db",
         "//modules/common/util",
         "//modules/data/proto:static_info_proto",
-        "@yaml_cpp//:yaml",
     ],
 )
 

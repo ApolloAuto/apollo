@@ -44,9 +44,6 @@ class InfoCollector {
   static const SoftwareInfo &GetSoftwareInfo();
   static const UserInfo &GetUserInfo();
 
-  // Utils.
-  static std::string GetDockerImage();
-
  private:
   StaticInfo static_info_;
   StaticInfoConf config_;

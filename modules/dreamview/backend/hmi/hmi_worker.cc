@@ -16,6 +16,8 @@
 
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
+#include <yaml-cpp/yaml.h>
+
 #include <chrono>
 #include <memory>
 #include <vector>
@@ -28,19 +30,25 @@
 #include "modules/common/util/message_util.h"
 #include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
-#include "modules/data/util/info_collector.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
 
 DEFINE_string(hmi_modes_config_path, "/apollo/modules/dreamview/conf/hmi_modes",
               "HMI modes config path.");
+
 DEFINE_string(maps_data_path, "/apollo/modules/map/data", "Maps data path.");
+
 DEFINE_string(vehicles_config_path, "/apollo/modules/calibration/data",
               "Vehicles config path.");
+
 DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
+
 DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
               "Key to store hmi_status.current_mode in KV DB.");
+
+DEFINE_string(container_meta_ini, "/apollo/meta.ini",
+              "Container meta info file.");
 
 namespace apollo {
 namespace dreamview {
@@ -129,6 +137,20 @@ void System(const std::string& cmd) {
   }
 }
 
+std::string GetDockerImage() {
+  // In release docker container, the actual image name is in meta.ini.
+  if (apollo::common::util::PathExists(FLAGS_container_meta_ini)) {
+    YAML::Node meta = YAML::LoadFile(FLAGS_container_meta_ini);
+    if (meta["tag"]) {
+      return meta["tag"].as<std::string>();
+    }
+  }
+  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
+    return docker_image;
+  }
+  return "";
+}
+
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
@@ -203,7 +225,7 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
 }
 
 void HMIWorker::InitStatus() {
-  status_.set_docker_image(apollo::data::InfoCollector::GetDockerImage());
+  status_.set_docker_image(GetDockerImage());
   status_.set_utm_zone_id(FLAGS_local_utm_zone_id);
 
   // Populate modes and current_mode.
