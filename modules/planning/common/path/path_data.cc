@@ -177,6 +177,7 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
     double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());
+    ADEBUG << "frenet_point: " << frenet_point.ShortDebugString();
     double kappa = CartesianFrenetConverter::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
         frenet_point.dl(), frenet_point.ddl());
@@ -209,15 +210,23 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   const double max_len = reference_line_->Length();
   for (const auto &path_point : discretized_path.path_points()) {
-    SLPoint sl_point;
-    if (!reference_line_->XYToSL({path_point.x(), path_point.y()}, &sl_point)) {
-      AERROR << "Fail to transfer cartesian point to frenet point.";
-      return false;
+    common::FrenetFramePoint frenet_point =
+        reference_line_->GetFrenetPoint(path_point);
+    if (!frenet_point.has_s()) {
+      SLPoint sl_point;
+      if (!reference_line_->XYToSL({path_point.x(), path_point.y()},
+                                   &sl_point)) {
+        AERROR << "Fail to transfer cartesian point to frenet point.";
+        return false;
+      }
+      common::FrenetFramePoint frenet_point;
+      // NOTICE: does not set dl and ddl here. Add if needed.
+      frenet_point.set_s(std::max(0.0, std::min(sl_point.s(), max_len)));
+      frenet_point.set_l(sl_point.l());
+      frenet_frame_points.push_back(std::move(frenet_point));
+      continue;
     }
-    common::FrenetFramePoint frenet_point;
-    // NOTICE: does not set dl and ddl here. Add if needed.
-    frenet_point.set_s(std::max(0.0, std::min(sl_point.s(), max_len)));
-    frenet_point.set_l(sl_point.l());
+    frenet_point.set_s(std::max(0.0, std::min(frenet_point.s(), max_len)));
     frenet_frame_points.push_back(std::move(frenet_point));
   }
   *frenet_path = FrenetFramePath(std::move(frenet_frame_points));

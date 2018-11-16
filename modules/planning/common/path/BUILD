@@ -10,10 +10,13 @@ cc_library(
     hdrs = [
         "discretized_path.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
-        "//modules/common/proto:pnc_point_proto",
         "//modules/common",
         "//modules/common/math:linear_interpolation",
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_context",
     ],
 )
@@ -38,6 +41,9 @@ cc_library(
     ],
     hdrs = [
         "frenet_frame_path.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//modules/common/math:linear_interpolation",
@@ -65,6 +71,9 @@ cc_library(
     ],
     hdrs = [
         "path_data.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":discretized_path",

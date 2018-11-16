@@ -43,7 +43,7 @@ using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
 constexpr double kRoadBuffer = 0.2;
-constexpr double kObstacleLBuffer = 0.2;
+constexpr double kObstacleLBuffer = 1.0;
 constexpr double kObstacleSBuffer = 0.5;
 constexpr double kSidePassPathLength = 50.0;
 
@@ -76,7 +76,7 @@ Status SidePassPathDecider::Process(
   adc_planning_start_point_ = frame->PlanningStartPoint();
   adc_frenet_frame_point_ =
       reference_line_info->reference_line().GetFrenetPoint(
-          frame->PlanningStartPoint());
+          frame->PlanningStartPoint().path_point());
   InitSolver();
 
   nearest_obstacle_ =
@@ -205,7 +205,9 @@ bool SidePassPathDecider::GeneratePath(
   for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
     common::FrenetFramePoint frenet_frame_point;
     ADEBUG << "FrenetFramePath: s = " << accumulated_s
-           << ", l = " << fem_qp_->x()[i];
+           << ", l = " << fem_qp_->x()[i]
+           << ", dl = " << fem_qp_->x_derivative()[i]
+           << ", ddl = " << fem_qp_->x_second_order_derivative()[i];
     if (accumulated_s >= reference_line_info->reference_line().Length()) {
       break;
     }

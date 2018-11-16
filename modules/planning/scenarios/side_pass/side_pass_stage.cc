@@ -78,14 +78,13 @@ Stage::StageStatus SidePassBackup::Process(
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
     reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().start_s(),
-                                &lane_left_width,
-                                &lane_right_width);
-    double driving_width = std::max(
-        lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
-        lane_right_width + obstacle->PerceptionSLBoundary().start_l());
+                                &lane_left_width, &lane_right_width);
+    double driving_width =
+        std::max(lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
+                 lane_right_width + obstacle->PerceptionSLBoundary().start_l());
     driving_width =
         std::min(lane_left_width + lane_right_width, driving_width) -
-            FLAGS_static_decision_nudge_l_buffer;
+        FLAGS_static_decision_nudge_l_buffer;
     ADEBUG << "driving_width[" << driving_width << "]";
     if (driving_width > kLBufferThreshold) {
       continue;
@@ -244,7 +243,7 @@ Stage::StageStatus SidePassDetectSafety::Process(
 
   const auto adc_frenet_frame_point_ =
       reference_line_info.reference_line().GetFrenetPoint(
-          frame->PlanningStartPoint());
+          frame->PlanningStartPoint().path_point());
 
   bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
       adc_frenet_frame_point_.s(), adc_frenet_frame_point_.l());
@@ -305,7 +304,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
 
   const auto adc_frenet_frame_point_ =
       reference_line_info.reference_line().GetFrenetPoint(
-          frame->PlanningStartPoint());
+          frame->PlanningStartPoint().path_point());
 
   bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
       adc_frenet_frame_point_.s(), adc_frenet_frame_point_.l());
