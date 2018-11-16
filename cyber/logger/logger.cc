@@ -43,6 +43,9 @@ Logger::~Logger() {
 
 void Logger::Write(bool force_flush, time_t timestamp, const char* message,
                    int message_len) {
+  if (unlikely(message_len <= 0)) {
+    return;
+  }
   std::string log_message = std::string(message, message_len);
   std::string module_name;
   // set the same bracket as the bracket in log.h

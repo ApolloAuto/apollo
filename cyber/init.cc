@@ -157,7 +157,6 @@ void Shutdown() {
   scheduler::Scheduler::Instance()->ShutDown();
   service_discovery::TopologyManager::Instance()->Shutdown();
   transport::Transport::Instance()->Shutdown();
-  async_logger->Stop();
   SetState(STATE_SHUTDOWN);
 }
 
