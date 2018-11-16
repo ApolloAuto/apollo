@@ -39,6 +39,8 @@ int main(int argc, char** argv) {
   // start module
   ModuleController controller(module_args);
   if (!controller.Init()) {
+    controller.Clear();
+    apollo::cyber::Shutdown();
     AERROR << "module start error.";
     return -1;
   }
