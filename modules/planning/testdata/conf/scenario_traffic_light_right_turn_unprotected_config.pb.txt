@@ -8,9 +8,14 @@ traffic_light_right_turn_unprotected_config : {
 stage_type: TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP
 stage_type: TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP
 stage_type: TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE
+
 stage_config: {
   stage_type: TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP
   enabled : true
+  task_type: DECIDER_RULE_BASED_STOP
+  task_config : {
+    task_type : DECIDER_RULE_BASED_STOP
+  }
 }
 
 stage_config: {
