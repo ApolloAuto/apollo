@@ -49,6 +49,7 @@ class PlanningContext {
   struct ScenarioInfo {
     apollo::hdmap::PathOverlap next_stop_sign_overlap;
     apollo::hdmap::PathOverlap next_traffic_light_overlap;
+    apollo::hdmap::PathOverlap next_crosswalk_overlap;
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
   };
 
