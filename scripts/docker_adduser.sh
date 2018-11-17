@@ -44,7 +44,7 @@ else
    ulimit -c unlimited
   ' >> "/home/${DOCKER_USER}/.bashrc"
 fi
- echo '
+echo '
 genhtml_branch_coverage = 1
 lcov_branch_coverage = 1
 ' > "/home/${DOCKER_USER}/.lcovrc"
