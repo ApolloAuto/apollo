@@ -73,20 +73,12 @@ Stage::StageStatus SidePassBackup::Process(
       continue;
     }
 
-    // check l
+    // check driving_width
     constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line =
         frame->reference_line_info().front().reference_line();
-    double lane_left_width = 0.0;
-    double lane_right_width = 0.0;
-    reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().start_s(),
-                                &lane_left_width, &lane_right_width);
-    double driving_width =
-        std::max(lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
-                 lane_right_width + obstacle->PerceptionSLBoundary().start_l());
-    driving_width =
-        std::min(lane_left_width + lane_right_width, driving_width);
-    ADEBUG << "driving_width[" << driving_width << "]";
+    const double driving_width = reference_line.GetDrivingWidth(
+        obstacle->PerceptionSLBoundary());
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
@@ -146,20 +138,12 @@ Stage::StageStatus SidePassApproachObstacle::Process(
       continue;
     }
 
-    // check l
+    // check driving_width
     constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line =
         frame->reference_line_info().front().reference_line();
-    double lane_left_width = 0.0;
-    double lane_right_width = 0.0;
-    reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().start_s(),
-                                &lane_left_width, &lane_right_width);
-    double driving_width =
-        std::max(lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
-                 lane_right_width + obstacle->PerceptionSLBoundary().start_l());
-    driving_width =
-        std::min(lane_left_width + lane_right_width, driving_width);
-    ADEBUG << "driving_width[" << driving_width << "]";
+    const double driving_width = reference_line.GetDrivingWidth(
+        obstacle->PerceptionSLBoundary());
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
