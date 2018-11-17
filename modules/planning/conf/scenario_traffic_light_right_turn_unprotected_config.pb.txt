@@ -15,10 +15,6 @@ stage_config: {
   task_type: DECIDER_RULE_BASED_STOP
   task_config : {
     task_type : DECIDER_RULE_BASED_STOP
-    decider_rule_based_stop_config : {
-      stop_distance : 1.0
-      traffic_light_signal_expire_time_sec : 5.0
-    }
   }
 }
 
