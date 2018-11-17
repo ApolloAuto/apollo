@@ -96,7 +96,7 @@ void ObjectCameraExtendedKalmanFilter::Predict(const int track_id,
 
   Eigen::Vector4f state =
       tracked_filters_[track_id].object_config_filter_.GetStateMean();
-  Eigen::Matrix4f F = UpdateTransitionMatrix(state[2], state[3], time_diff);
+  Eigen::Matrix4f F = GetTransitionMatrix(state[2], state[3], time_diff);
   tracked_filters_[track_id].object_config_filter_.SetTransitionModel(f, F);
 
   tracked_filters_[track_id].object_config_filter_.Predict();
@@ -171,7 +171,7 @@ ObjectCameraExtendedKalmanFilter::InitObjectFilter(const float x, const float y,
   return filter;
 }
 
-Eigen::Matrix4f ObjectCameraExtendedKalmanFilter::UpdateTransitionMatrix(
+Eigen::Matrix4f ObjectCameraExtendedKalmanFilter::GetTransitionMatrix(
     const double theta, const double v, const double dt) const {
   Eigen::Matrix4f F;
   F << 1.0, 0.0, v * dt * (-1.0) * std::sin(theta), dt * std::cos(theta), 0.0,
