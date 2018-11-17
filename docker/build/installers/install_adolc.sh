@@ -38,9 +38,8 @@ make install
 
 mkdir -p /usr/local/colpack
 cp -r include /usr/local/colpack/ && cp -r lib /usr/local/colpack/
-popd
-
-# export LD_LIBRARY_PATH=/usr/local/colpack/lib:$LD_LIBRARY_PATH 
+cp COPYING.LESSER /usr/local/colpack/
+popd 
 
 echo "Build and install ADOL-C"
 
@@ -57,6 +56,7 @@ make install
 
 mkdir -p /usr/local/adolc
 cp -r include /usr/local/adolc/ && cp -r lib64 /usr/local/adolc/
+cp LICENSE /usr/local/adolc/
 popd
 
 # export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH 
