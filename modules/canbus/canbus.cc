@@ -99,7 +99,7 @@ Status Canbus::Init() {
 
   CHECK(AdapterManager::GetControlCommand()) << "Control is not initialized.";
   CHECK(AdapterManager::GetGuardian()) << "Guardian is not initialized.";
-  // TODO(QiL) : depreacte this
+  // TODO(QiL) : deprecate this
   if (!FLAGS_receive_guardian) {
     AdapterManager::AddControlCommandCallback(&Canbus::OnControlCommand, this);
   } else {
