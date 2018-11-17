@@ -88,6 +88,11 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
     RemoveWatchVehicle(*obstacle, watch_vehicle_ids, &watch_vehicles);
   }
 
+  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedPreStop planning error";
+  }
+
   return Stage::RUNNING;
 }
 
