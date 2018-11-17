@@ -123,6 +123,8 @@ class ReferenceLine {
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;
 
+  double GetDrivingWidth(const SLBoundary& sl_boundary) const;
+
   /**
    * @brief: check if a box/point is on lane along reference line
    */

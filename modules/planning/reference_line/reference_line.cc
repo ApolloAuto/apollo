@@ -475,6 +475,18 @@ void ReferenceLine::GetLaneFromS(
   }
 }
 
+double ReferenceLine::GetDrivingWidth(const SLBoundary& sl_boundary) const {
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  GetLaneWidth(sl_boundary.start_s(), &lane_left_width, &lane_right_width);
+
+  double driving_width = std::max(lane_left_width - sl_boundary.end_l(),
+                                  lane_right_width + sl_boundary.start_l());
+  driving_width = std::min(lane_left_width + lane_right_width, driving_width);
+  ADEBUG << "driving_width[" << driving_width << "]";
+  return driving_width;
+}
+
 bool ReferenceLine::IsOnLane(const common::math::Vec2d& vec2d_point) const {
   common::SLPoint sl_point;
   if (!XYToSL(vec2d_point, &sl_point)) {
