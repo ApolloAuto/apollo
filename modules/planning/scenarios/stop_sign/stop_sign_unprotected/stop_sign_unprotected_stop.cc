@@ -67,18 +67,28 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
     return Stage::FINISHED;
   }
 
-  // check timeout
-  if (wait_time > scenario_config_.wait_timeout() &&
-      watch_vehicles.size() <= 1) {
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
-    return Stage::FINISHED;
-  }
-
   // get all vehicles currently watched
   std::vector<std::string> watch_vehicle_ids;
   for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
     std::copy(it->second.begin(), it->second.end(),
               std::back_inserter(watch_vehicle_ids));
+
+    // for debug
+    std::string associated_lane_id = it->first;
+    std::string s;
+    for (size_t i = 0; i < watch_vehicle_ids.size(); ++i) {
+      std::string vehicle = watch_vehicle_ids[i];
+      s = s.empty() ? vehicle : s + "," + vehicle;
+    }
+    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id
+         << "] vehicle[" << s << "]";
+  }
+
+  // check timeout
+  if (wait_time > scenario_config_.wait_timeout() &&
+      watch_vehicle_ids.size() <= 1) {
+    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
+    return Stage::FINISHED;
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();

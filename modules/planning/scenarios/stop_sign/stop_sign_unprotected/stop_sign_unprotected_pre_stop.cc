@@ -66,6 +66,19 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 
   const PathDecision& path_decision = reference_line_info.path_decision();
   auto& watch_vehicles = GetContext()->watch_vehicles;
+
+  // for debug
+  for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
+    std::string associated_lane_id = it->first;
+    std::string s;
+    for (size_t i = 0; i < it->second.size(); ++i) {
+      std::string vehicle = (it->second)[i];
+      s = s.empty() ? vehicle : s + "," + vehicle;
+    }
+    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id
+         << "] vehicle[" << s << "]";
+  }
+
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     // add to watch_vehicles if adc is still proceeding to stop sign
     AddWatchVehicle(*obstacle, &watch_vehicles);
@@ -84,6 +97,7 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 int StopSignUnprotectedPreStop::AddWatchVehicle(
     const Obstacle& obstacle, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
+
 
   const PerceptionObstacle& perception_obstacle = obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());

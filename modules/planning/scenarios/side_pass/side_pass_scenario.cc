@@ -38,6 +38,8 @@ namespace planning {
 namespace scenario {
 namespace side_pass {
 
+using apollo::common::VehicleConfigHelper;
+
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
@@ -197,12 +199,12 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         std::max(lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
                  lane_right_width + obstacle->PerceptionSLBoundary().start_l());
     driving_width =
-        std::min(lane_left_width + lane_right_width, driving_width) -
-        FLAGS_static_decision_nudge_l_buffer;
+        std::min(lane_left_width + lane_right_width, driving_width);
     ADEBUG << "driving_width[" << driving_width << "]";
-    if (driving_width >
-        common::VehicleConfigHelper::GetConfig().vehicle_param().width() +
-            kLBufferThreshold) {
+    const double adc_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width();
+    if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
+        kLBufferThreshold) {
       continue;
     }
 
