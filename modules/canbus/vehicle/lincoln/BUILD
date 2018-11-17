@@ -15,6 +15,7 @@ cc_library(
         ":lincoln_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -31,6 +32,7 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -52,6 +54,7 @@ cc_library(
         "//modules/drivers/canbus/common:canbus_common",
         "@gtest//:gtest",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(

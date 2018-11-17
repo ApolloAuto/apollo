@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//external:gflags",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cpplint()

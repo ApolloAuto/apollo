@@ -15,6 +15,7 @@ cc_library(
         ":lexus_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -31,6 +32,7 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/lexus/protocol:canbus_lexus_protocol",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -50,6 +52,7 @@ cc_library(
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/lexus/protocol:canbus_lexus_protocol",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cpplint()

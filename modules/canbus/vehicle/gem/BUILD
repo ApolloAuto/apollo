@@ -15,6 +15,7 @@ cc_library(
         ":gem_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
@@ -41,6 +42,7 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
@@ -72,6 +74,7 @@ cc_library(
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
