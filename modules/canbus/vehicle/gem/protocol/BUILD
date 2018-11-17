@@ -74,6 +74,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
