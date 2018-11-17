@@ -938,6 +938,7 @@ int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
   return adv_trigger_enable(camera_dev_.c_str(), fps, internal);
 #else 
    return ADV_TRIGGER_ENABLE;
+#endif
 }
 
 int UsbCam::trigger_disable() {
