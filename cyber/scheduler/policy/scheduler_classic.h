@@ -20,7 +20,6 @@
 #include <memory>
 #include <string>
 
-#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/scheduler/scheduler.h"
 
 namespace apollo {

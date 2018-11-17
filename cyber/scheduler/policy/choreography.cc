@@ -65,14 +65,6 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
 }
 
 bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
-  {
-    WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    if (id_cr_.find(cr->id()) != id_cr_.end()) {
-      return false;
-    }
-    id_cr_[cr->id()] = cr;
-  }
-
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
                                             cr->processor_id());
 
@@ -82,30 +74,14 @@ bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
   return true;
 }
 
-void ChoreographyContext::Notify(uint64_t crid) {
-  ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
-
-  auto it = id_cr_.find(crid);
-  if (it != id_cr_.end()) {
-    auto& cr = it->second;
-    if (cr->state() == RoutineState::DATA_WAIT) {
-      cr->SetUpdateFlag();
-    }
-
-    if (!notified_.test_and_set(std::memory_order_acquire)) {
-      processor_->Notify();
-      return;
-    }
+void ChoreographyContext::Notify() {
+  if (!notified_.test_and_set(std::memory_order_acquire)) {
+    processor_->Notify();
+    return;
   }
 }
 
 void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
-  WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
-  auto it = id_cr_.find(crid);
-  if (it != id_cr_.end()) {
-    it->second->Stop();
-    id_cr_.erase(it);
-  }
 }
 
 }  // namespace scheduler
