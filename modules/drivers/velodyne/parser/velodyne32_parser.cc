@@ -47,6 +47,8 @@ void Velodyne32Parser::GeneratePointcloud(
     // we discard this pointcloud if empty
     AERROR << "All points is NAN!Please check velodyne:" << config_.model();
   }
+  // set default width
+  out_msg->set_width(out_msg->point_size());
 }
 
 uint64_t Velodyne32Parser::GetTimestamp(double base_time, float time_offset,
