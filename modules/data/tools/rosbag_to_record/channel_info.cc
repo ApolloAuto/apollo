@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/tools/rosbag_to_record/channel_info.h"
+#include "modules/data/tools/rosbag_to_record/channel_info.h"
 
 #include "modules/transform/proto/transform.pb.h"
 
 namespace apollo {
-namespace tools {
+namespace data {
 
 namespace {
 static const char* empty_str_ = "";
@@ -119,5 +119,5 @@ void ChannelInfo::InitChannels() {
       "apollo.drivers.PointCloud");
 }
 
-}  // namespace tools
+}  // namespace data
 }  // namespace apollo

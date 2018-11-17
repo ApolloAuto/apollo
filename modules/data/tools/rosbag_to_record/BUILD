@@ -5,22 +5,18 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "rosbag_to_record",
     srcs = ["rosbag_to_record.cc"],
-    linkopts = [
-       "-lprotobuf",
-    ],
     deps = [
-        ":rosbag_to_record_lib",
+        ":channel_info",
         "@ros//:ros_common",
     ],
 )
 
 cc_library(
-    name = "rosbag_to_record_lib",
+    name = "channel_info",
     srcs = [
         "channel_info.cc",
     ],
     hdrs = [
-        "rosbag_to_record.h",
         "channel_info.h",
     ],
     deps = [

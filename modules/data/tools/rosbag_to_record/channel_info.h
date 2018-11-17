@@ -54,10 +54,7 @@
 #include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
-namespace tools {
-
-// using namespace apollo::cyber::message;
-using apollo::cyber::message::ProtobufFactory;
+namespace data {
 
 class ChannelInfo {
  public:
@@ -86,7 +83,8 @@ class ChannelInfo {
     support_channels_.push_back(channel_name);
     std::string proto_desc("");
     M m;
-    ProtobufFactory::Instance()->GetDescriptorString(msg_type, &proto_desc);
+    apollo::cyber::message::ProtobufFactory::Instance()->GetDescriptorString(
+        msg_type, &proto_desc);
     channel_proto_desc_[channel_name] = proto_desc;
   }
 
@@ -97,5 +95,5 @@ class ChannelInfo {
   std::vector<std::string> support_channels_;
 };
 
-}  // namespace tools
+}  // namespace data
 }  // namespace apollo
