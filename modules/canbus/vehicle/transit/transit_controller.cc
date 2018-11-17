@@ -48,6 +48,9 @@ ErrorCode TransitController::Init(
     return ErrorCode::CANBUS_ERROR;
   }
 
+  vehicle_params_.CopyFrom(
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
+
   params_.CopyFrom(params);
   if (!params_.has_driving_mode()) {
     AERROR << "Vehicle conf pb not set driving_mode.";
@@ -170,14 +173,17 @@ Chassis TransitController::chassis() {
   chassis_.set_engine_started(true);
   // 4
   auto& transit = chassis_detail.transit();
-  // TODO(luoqi): revisit it later
-  // can't find speed
+
   auto& motion20 = transit.llc_motionfeedback1_20();
   if (motion20.has_llc_fbk_throttleposition()) {
     chassis_.set_throttle_percentage(motion20.llc_fbk_throttleposition());
   }
-  // can't find brake percentage
-  // can't find steering percentage
+
+  // TODO(QiL): revisit after fix done on Transit.
+  if (motion20.has_llc_fbk_brakepressurerear()) {
+    chassis_.set_brake_percentage(motion20.llc_fbk_brakepressurerear());
+  }
+
   if (motion20.has_llc_fbk_gear()) {
     switch (motion20.llc_fbk_gear()) {
       case Llc_motionfeedback1_20::LLC_FBK_GEAR_P_PARK:
@@ -200,6 +206,11 @@ Chassis TransitController::chassis() {
   auto& motion21 = transit.llc_motionfeedback2_21();
   if (motion21.has_llc_fbk_vehiclespeed()) {
     chassis_.set_speed_mps(motion21.llc_fbk_vehiclespeed());
+  }
+
+  // TODO(QiL): revisit to fix scaling
+  if (motion21.has_llc_fbk_steeringangle()) {
+    chassis_.set_steering_percentage(motion21.llc_fbk_steeringangle());
   }
 
   auto& aux = transit.llc_auxiliaryfeedback_120();
@@ -376,7 +387,7 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void TransitController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  // TODO(QiL) :  Update brake value based on mode
+  // TODO(QiL):  Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "The current drive mode does not need to set acceleration.";
@@ -478,125 +489,8 @@ void TransitController::ResetProtocol() {
 }
 
 bool TransitController::CheckChassisError() {
-  // steer fault
-  ChassisDetail chassis_detail;
-  message_manager_->GetSensorData(&chassis_detail);
-
-  int32_t error_cnt = 0;
-  int32_t chassis_error_mask = 0;
-  if (!chassis_detail.has_eps()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO eps."
-                      << chassis_detail.DebugString();
-    return false;
-  }
-  bool steer_fault = chassis_detail.eps().watchdog_fault() |
-                     chassis_detail.eps().channel_1_fault() |
-                     chassis_detail.eps().channel_2_fault() |
-                     chassis_detail.eps().calibration_fault() |
-                     chassis_detail.eps().connector_fault();
-
-  chassis_error_mask |=
-      ((chassis_detail.eps().watchdog_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.eps().channel_1_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.eps().channel_2_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.eps().calibration_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.eps().connector_fault()) << (error_cnt++));
-
-  if (!chassis_detail.has_brake()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO brake."
-                      << chassis_detail.DebugString();
-    return false;
-  }
-  // brake fault
-  bool brake_fault = chassis_detail.brake().watchdog_fault() |
-                     chassis_detail.brake().channel_1_fault() |
-                     chassis_detail.brake().channel_2_fault() |
-                     chassis_detail.brake().boo_fault() |
-                     chassis_detail.brake().connector_fault();
-
-  chassis_error_mask |=
-      ((chassis_detail.brake().watchdog_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.brake().channel_1_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.brake().channel_2_fault()) << (error_cnt++));
-  chassis_error_mask |= ((chassis_detail.brake().boo_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.brake().connector_fault()) << (error_cnt++));
-
-  if (!chassis_detail.has_gas()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO gas."
-                      << chassis_detail.DebugString();
-    return false;
-  }
-  // throttle fault
-  bool throttle_fault = chassis_detail.gas().watchdog_fault() |
-                        chassis_detail.gas().channel_1_fault() |
-                        chassis_detail.gas().channel_2_fault() |
-                        chassis_detail.gas().connector_fault();
-
-  chassis_error_mask |=
-      ((chassis_detail.gas().watchdog_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.gas().channel_1_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.gas().channel_2_fault()) << (error_cnt++));
-  chassis_error_mask |=
-      ((chassis_detail.gas().connector_fault()) << (error_cnt++));
-
-  if (!chassis_detail.has_gear()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO gear."
-                      << chassis_detail.DebugString();
-    return false;
-  }
-  // gear fault
-  bool gear_fault = chassis_detail.gear().canbus_fault();
-
-  chassis_error_mask |=
-      ((chassis_detail.gear().canbus_fault()) << (error_cnt++));
-
-  set_chassis_error_mask(chassis_error_mask);
-
-  if (steer_fault) {
-    AERROR_EVERY(100) << "Steering fault detected: "
-                      << chassis_detail.eps().watchdog_fault() << ", "
-                      << chassis_detail.eps().channel_1_fault() << ", "
-                      << chassis_detail.eps().channel_2_fault() << ", "
-                      << chassis_detail.eps().calibration_fault() << ", "
-                      << chassis_detail.eps().connector_fault();
-  }
-
-  if (brake_fault) {
-    AERROR_EVERY(100) << "Brake fault detected: "
-                      << chassis_detail.brake().watchdog_fault() << ", "
-                      << chassis_detail.brake().channel_1_fault() << ", "
-                      << chassis_detail.brake().channel_2_fault() << ", "
-                      << chassis_detail.brake().boo_fault() << ", "
-                      << chassis_detail.brake().connector_fault();
-  }
-
-  if (throttle_fault) {
-    AERROR_EVERY(100) << "Throttle fault detected: "
-                      << chassis_detail.gas().watchdog_fault() << ", "
-                      << chassis_detail.gas().channel_1_fault() << ", "
-                      << chassis_detail.gas().channel_2_fault() << ", "
-                      << chassis_detail.gas().connector_fault();
-  }
-
-  if (gear_fault) {
-    AERROR_EVERY(100) << "Gear fault detected: "
-                      << chassis_detail.gear().canbus_fault();
-  }
-
-  if (steer_fault || brake_fault || throttle_fault) {
-    return true;
-  }
-
-  return false;
+  // TODO(QiL): re-design later
+  return true;
 }
 
 void TransitController::SecurityDogThreadFunc() {

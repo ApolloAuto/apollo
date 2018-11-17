@@ -77,7 +77,7 @@ TEST_F(TransitControllerTest, Status) {
   controller_.SetHorn(control_cmd_);
   controller_.SetBeam(control_cmd_);
   controller_.SetTurningSignal(control_cmd_);
-  EXPECT_FALSE(controller_.CheckChassisError());
+  EXPECT_TRUE(controller_.CheckChassisError());
 }
 
 TEST_F(TransitControllerTest, UpdateDrivingMode) {
