@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/tools/rosbag_to_record/rosbag_to_record.h"
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
 
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/Transform.h>
@@ -22,22 +23,30 @@
 #include <sensor_msgs/PointCloud.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf2_msgs/TFMessage.h>
+
+#include <cstdint>
+#include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "cyber/proto/record.pb.h"
+#include "cyber/record/file/record_file_writer.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
+#include "modules/data/tools/rosbag_to_record/channel_info.h"
 #include "modules/guardian/proto/guardian.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/tools/rosbag_to_record/channel_info.h"
 #include "modules/transform/proto/transform.pb.h"
 
 using apollo::cyber::proto::SingleMessage;
-using apollo::tools::ChannelInfo;
+using apollo::data::ChannelInfo;
 
 void PrintUsage() {
   std::cout << "Usage:\n"
@@ -117,7 +126,7 @@ int main(int argc, char **argv) {
   auto channel_info = ChannelInfo::Instance();
 
   auto record_writer =
-      std::make_shared<apollo::cyber::record::RecordWriter>();
+      std::make_shared<apollo::cyber::record::RecordFileWriter>();
   if (!record_writer->Open(record_file_name)) {
     std::cerr << "Error: open file[" << record_file_name << "] failed.";
   }
@@ -140,9 +149,14 @@ int main(int argc, char **argv) {
       AWARN << "can not find desc or message type for channel: "
             << channel_name;
     }
+
+    apollo::cyber::proto::Channel channel;
+    channel.set_name(channel_name);
+    channel.set_message_type(record_message_type);
+    channel.set_proto_desc(desc);
     if (std::find(channel_write_flag.begin(), channel_write_flag.end(),
                   channel_name) == channel_write_flag.end() &&
-        !record_writer->WriteChannel(channel_name, record_message_type, desc)) {
+        !record_writer->WriteChannel(channel)) {
       AERROR << "write channel info failed";
     } else {
       channel_write_flag.push_back(channel_name);
@@ -291,23 +305,11 @@ int main(int argc, char **argv) {
       continue;
     }
 
-    //    auto desc = channel_info->GetProtoDesc(channel_name);
-    //    auto record_message_type = channel_info->GetMessageType(channel_name);
-    //    if (desc == "" || record_message_type == "") {
-    //      AWARN << "can not find desc or message type";
-    //    }
-    //    if (!record_writer->WriteChannel(channel_name, record_message_type,
-    //    desc)) {
-    //      AERROR << "write channel info failed";
-    //    }
-    //    SingleMessage single_msg;
-    //    single_msg.set_channel_name(channel_name);
-    //
-    //    single_msg.set_content(serialized_str);
-    //    single_msg.set_time(nsec);
-    auto raw_message = std::make_shared<apollo::cyber::message::RawMessage>(
-        serialized_str);
-    if (!record_writer->WriteMessage(channel_name, raw_message, nsec)) {
+    SingleMessage single_msg;
+    single_msg.set_channel_name(channel_name);
+    single_msg.set_content(serialized_str);
+    single_msg.set_time(nsec);
+    if (!record_writer->WriteMessage(single_msg)) {
       AERROR << "write single msg fail";
     }
   }
