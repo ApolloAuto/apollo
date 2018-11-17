@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "modules/common/util/string_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
@@ -51,7 +52,7 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   std::vector<LaneSegment> lane_segments;
   double accumulated_s = 0.0;
   ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_, &lane_segments,
-                      lane_graph_ptr);
+                      lane_graph_ptr, FLAGS_road_graph_max_search_horizon);
 
   return Status::OK();
 }
@@ -78,9 +79,16 @@ void RoadGraph::ComputeLaneSequence(
     const double accumulated_s, const double start_s,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
     std::vector<LaneSegment>* const lane_segments,
-    LaneGraph* const lane_graph_ptr) const {
+    LaneGraph* const lane_graph_ptr,
+    const int graph_search_horizon) const {
   if (lane_info_ptr == nullptr) {
     AERROR << "Invalid lane.";
+    return;
+  }
+
+  if (graph_search_horizon < 0) {
+    AERROR << "The lane search has already reached the limits";
+    AERROR << "Possible map error found!";
     return;
   }
 
@@ -110,7 +118,8 @@ void RoadGraph::ComputeLaneSequence(
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
       auto successor_lane = PredictionMap::LaneById(successor_lane_id.id());
       ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
-                          lane_segments, lane_graph_ptr);
+                          lane_segments, lane_graph_ptr,
+                          graph_search_horizon - 1);
     }
   }
   lane_segments->pop_back();

@@ -59,7 +59,8 @@ class RoadGraph {
   void ComputeLaneSequence(const double accumulated_s, const double start_s,
                            std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
                            std::vector<LaneSegment>* const lane_segments,
-                           LaneGraph* const lane_graph_ptr) const;
+                           LaneGraph* const lane_graph_ptr,
+                           const int graph_search_horizon) const;
 
  private:
   double start_s_ = 0;

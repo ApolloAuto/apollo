@@ -127,3 +127,5 @@ DECLARE_double(speed_at_upper_curvature);
 DECLARE_double(cost_function_alpha);
 DECLARE_double(cost_function_sigma);
 DECLARE_bool(use_bell_curve_for_cost_function);
+
+DECLARE_int32(road_graph_max_search_horizon);
