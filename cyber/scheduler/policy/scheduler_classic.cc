@@ -76,16 +76,16 @@ void SchedulerClassic::CreateProcessor() {
 }
 
 bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
-  // Check if task exists already.
-  for (int i = MAX_PRIO - 1; i >= 0; --i) {
-    ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
+  // we use multi-key mutex to prevent race condition
+  // when del && add cr with same crid
+  std::lock_guard<std::mutex> lg(cr_del_lock_[cr->id()]);
 
-    for (auto it = ClassicContext::rq_[i].begin();
-         it != ClassicContext::rq_[i].end(); ++it) {
-      if ((*it)->id() == cr->id()) {
-        return false;
-      }
+  {
+    WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    if (id_cr_.find(cr->id()) != id_cr_.end()) {
+      return false;
     }
+    id_cr_[cr->id()] = cr;
   }
 
   // Check if task prio is reasonable.
@@ -95,13 +95,12 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
     cr->set_priority(MAX_PRIO - 1);
   }
 
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
-                                            cr->processor_id());
-
   // Enqueue task.
   WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[cr->priority()]);
   ClassicContext::rq_[cr->priority()].emplace_back(cr);
 
+  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
+                                            cr->processor_id());
   return true;
 }
 
@@ -110,21 +109,16 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
     return true;
   }
 
-  for (int i = MAX_PRIO - 1; i >= 0; --i) {
-    ReadLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
-
-    for (auto it = ClassicContext::rq_[i].begin();
-         it != ClassicContext::rq_[i].end(); ++it) {
-      if ((*it)->id() == crid) {
-        if ((*it)->state() == RoutineState::DATA_WAIT) {
-          (*it)->SetUpdateFlag();
+  {
+    ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    if (id_cr_.find(crid) != id_cr_.end()) {
+        auto cr = id_cr_[crid];
+        if (cr->state() == RoutineState::DATA_WAIT) {
+          cr->SetUpdateFlag();
         }
-        // FIXME: notify processor.
         return true;
-      }
     }
   }
-
   return false;
 }
 
@@ -135,16 +129,36 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
 
   auto crid = GlobalData::GenerateHashId(name);
 
-  for (int i = MAX_PRIO - 1; i >= 0; --i) {
-    WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[i]);
+  // we use multi-key mutex to prevent race condition
+  // when del && add cr with same crid
+  std::lock_guard<std::mutex> lg(cr_del_lock_[crid]);
 
-    for (auto it = ClassicContext::rq_[i].begin();
-         it != ClassicContext::rq_[i].end(); ++it) {
-      if ((*it)->id() == crid) {
-        (*it)->Stop();
-        ClassicContext::rq_[i].erase(it);
-        return true;
-      }
+  std::shared_ptr<CRoutine> cr = nullptr;
+  int prio;
+  {
+    ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    if (id_cr_.find(crid) != id_cr_.end()) {
+      cr = id_cr_[crid];
+      prio = cr->priority();
+    } else {
+      return false;
+    }
+  }
+
+  WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[prio]);
+  for (auto it = ClassicContext::rq_[prio].begin();
+       it != ClassicContext::rq_[prio].end(); ++it) {
+    if ((*it)->id() == crid) {
+      ClassicContext::rq_[prio].erase(it);
+      return true;
+    }
+  }
+
+  {
+    WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    if (id_cr_.find(crid) != id_cr_.end()) {
+      id_cr_[crid]->Stop();
+      id_cr_.erase(crid);
     }
   }
 

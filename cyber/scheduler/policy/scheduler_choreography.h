@@ -28,7 +28,6 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::proto::ChoreographyTask;
 
 class SchedulerChoreography : public Scheduler {
@@ -42,8 +41,6 @@ class SchedulerChoreography : public Scheduler {
   bool NotifyProcessor(uint64_t crid) override;
 
   std::unordered_map<std::string, ChoreographyTask> cr_confs_;
-  AtomicRWLock cr_ctx_lock_;
-  std::unordered_map<uint64_t, uint32_t> cr_ctx_;
 
   std::string choreography_affinity_;
   std::vector<int> choreography_cpuset_;

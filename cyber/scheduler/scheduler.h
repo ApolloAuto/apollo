@@ -21,6 +21,7 @@
 #include <atomic>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -39,6 +40,7 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
@@ -63,7 +65,12 @@ class Scheduler {
   virtual bool NotifyProcessor(uint64_t crid) = 0;
   void ParseCpuset(const std::string&, std::vector<int>*);
 
+  std::unordered_map<uint64_t, std::mutex> cr_del_lock_;
+  AtomicRWLock id_cr_lock_;
+
+  std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> id_cr_;
   std::vector<std::shared_ptr<ProcessorContext>> pctxs_;
+
   uint32_t proc_num_ = 0;
   uint32_t task_pool_size_ = 0;
   uint32_t cpu_binding_start_index_ = 0;

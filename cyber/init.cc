@@ -108,7 +108,7 @@ void CheckSingleton() {
   CHECK_NOTNULL(transport::Transport::Instance());
   CHECK_NOTNULL(service_discovery::TopologyManager::Instance());
   CHECK_NOTNULL(scheduler::Scheduler::Instance());
-  // CHECK_NOTNULL(TaskManager::Instance());
+  CHECK_NOTNULL(TaskManager::Instance());
   CHECK_NOTNULL(PerfEventCache::Instance());
 }
 }  // namespace
