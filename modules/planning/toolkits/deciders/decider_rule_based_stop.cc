@@ -63,6 +63,10 @@ void DeciderRuleBasedStop::CheckStopSign(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  if (!config_.decider_rule_based_stop_config().stop_sign().enabled()) {
+      return;
+  }
+
   const std::string stop_sign_id =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
   if (stop_sign_id.empty()) {
@@ -73,7 +77,7 @@ void DeciderRuleBasedStop::CheckStopSign(
   const double stop_line_s =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
   const double stop_distance =
-      config_.decider_rule_based_stop_config().stop_distance();
+      config_.decider_rule_based_stop_config().stop_sign().stop_distance();
   ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
 
@@ -89,6 +93,10 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
+
+  if (!config_.decider_rule_based_stop_config().traffic_light().enabled()) {
+      return;
+  }
 
   const std::string traffic_light_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
@@ -110,7 +118,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
   const double stop_line_s =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
   const double stop_distance =
-        config_.decider_rule_based_stop_config().stop_distance();
+      config_.decider_rule_based_stop_config().traffic_light().stop_distance();
 
   ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
@@ -130,8 +138,8 @@ TrafficLight DeciderRuleBasedStop::ReadTrafficLight(
   } else {
     const double delay = traffic_light_detection->header().timestamp_sec() -
         Clock::NowInSeconds();
-    if (delay > config_.decider_rule_based_stop_config().
-        traffic_light_signal_expire_time_sec()) {
+    if (delay > config_.decider_rule_based_stop_config().traffic_light().
+        signal_expire_time_sec()) {
       ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
     } else {
       for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
