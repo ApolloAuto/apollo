@@ -74,7 +74,7 @@ void DeciderRuleBasedStop::CheckStopSign(
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
   const double stop_distance =
       config_.decider_rule_based_stop_config().stop_distance();
-  AERROR << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+  ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
 
   BuildStopDecision(frame, reference_line_info,
@@ -112,7 +112,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
   const double stop_distance =
         config_.decider_rule_based_stop_config().stop_distance();
 
-  AERROR << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+  ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
   BuildStopDecision(frame, reference_line_info,
                     stop_wall_id,

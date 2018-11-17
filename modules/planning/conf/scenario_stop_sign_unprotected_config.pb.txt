@@ -1,6 +1,7 @@
 scenario_type : STOP_SIGN_UNPROTECTED
 stop_sign_unprotected_config : {
   start_stop_sign_scenario_timer : 10
+  start_stop_sign_scenario_distance: 100.0
   watch_vehicle_max_valid_stop_distance : 5.0
   max_valid_stop_distance : 3.5
   max_adc_stop_speed : 0.3

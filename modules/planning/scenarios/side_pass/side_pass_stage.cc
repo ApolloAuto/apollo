@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -35,6 +36,7 @@ namespace side_pass {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
+using apollo::common::VehicleConfigHelper;
 
 constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
@@ -83,10 +85,12 @@ Stage::StageStatus SidePassBackup::Process(
         std::max(lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
                  lane_right_width + obstacle->PerceptionSLBoundary().start_l());
     driving_width =
-        std::min(lane_left_width + lane_right_width, driving_width) -
-        FLAGS_static_decision_nudge_l_buffer;
+        std::min(lane_left_width + lane_right_width, driving_width);
     ADEBUG << "driving_width[" << driving_width << "]";
-    if (driving_width > kLBufferThreshold) {
+    const double adc_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width();
+    if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
+        kLBufferThreshold) {
       continue;
     }
 
@@ -141,12 +145,32 @@ Stage::StageStatus SidePassApproachObstacle::Process(
             kAdcDistanceThreshold) {  // vehicles are far away
       continue;
     }
-    if (obstacle->PerceptionSLBoundary().start_l() > 1.0 ||
-        obstacle->PerceptionSLBoundary().end_l() < -1.0) {
+
+    // check l
+    constexpr double kLBufferThreshold = 0.3;  // unit: m
+    const auto& reference_line =
+        frame->reference_line_info().front().reference_line();
+    double lane_left_width = 0.0;
+    double lane_right_width = 0.0;
+    reference_line.GetLaneWidth(obstacle->PerceptionSLBoundary().start_s(),
+                                &lane_left_width, &lane_right_width);
+    double driving_width =
+        std::max(lane_left_width - obstacle->PerceptionSLBoundary().end_l(),
+                 lane_right_width + obstacle->PerceptionSLBoundary().start_l());
+    driving_width =
+        std::min(lane_left_width + lane_right_width, driving_width);
+    ADEBUG << "driving_width[" << driving_width << "]";
+    const double adc_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width();
+    if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
+        kLBufferThreshold) {
       continue;
     }
+
     has_blocking_obstacle = true;
+    break;
   }
+
   if (!has_blocking_obstacle) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;

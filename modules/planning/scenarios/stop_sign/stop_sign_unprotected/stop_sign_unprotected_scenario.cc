@@ -31,6 +31,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_stop.h"
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_creep.h"
@@ -75,6 +76,7 @@ void StopSignUnprotectedScenario::Init() {
     AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
   }
+  context_.watch_vehicles.clear();
 
   GetAssociatedLanes(*stop_sign_);
 
@@ -143,15 +145,22 @@ bool StopSignUnprotectedScenario::IsTransferable(
       stop_sign_overlap_start_s - adc_front_edge_s;
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  const uint32_t time_distance = static_cast<uint32_t>(ceil(
-      adc_distance_to_stop_sign / adc_speed));
+  const uint32_t time_distance = (adc_speed > FLAGS_max_stop_speed) ?
+      static_cast<uint32_t>(ceil(
+          adc_distance_to_stop_sign / adc_speed)) : 0;
+  ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
+      << "] adc_speed[" << adc_speed
+      << "] time_distance[" << time_distance << "]";
+
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return (time_distance <=
+      return (adc_distance_to_stop_sign <=
           config_.stop_sign_unprotected_config().
+              start_stop_sign_scenario_distance() ||
+          time_distance <= config_.stop_sign_unprotected_config().
               start_stop_sign_scenario_timer());
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
