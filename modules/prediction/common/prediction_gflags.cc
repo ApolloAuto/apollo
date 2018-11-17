@@ -211,3 +211,6 @@ DEFINE_double(cost_function_sigma, 5.0,
               "lane predicted by the model.");
 DEFINE_bool(use_bell_curve_for_cost_function, false,
             "Whether to use bell curve for the cost function or not.");
+
+DEFINE_int32(road_graph_max_search_horizon, 20,
+             "Maximal search depth for buiding road graph");
