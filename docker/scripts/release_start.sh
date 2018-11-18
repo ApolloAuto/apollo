@@ -51,7 +51,8 @@ function main() {
     echo "Type 'y' or 'Y' to pull docker image from China mirror or any other key from US mirror."
     read -t 10 -n 1 INCHINA
     if [ "$INCHINA" == "y" ] || [ "$INCHINA" == "Y" ]; then
-        docker pull "registry.docker-cn.com/${IMG}"
+        IMG="registry.docker-cn.com/${IMG}"
+        docker pull $IMG
     else
         docker pull $IMG
     fi
