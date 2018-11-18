@@ -37,12 +37,6 @@ try:
         file_path, row, col = (
             matched.group('file'), matched.group('row'), matched.group('col'))
 
-        # Skip generated and third-party sources.
-        if file_path.startswith('bazel-out/'):
-            continue
-        if '/third_party/' in file_path:
-            continue
-
         # Stat.
         warnings_id = '{}-{}-{}'.format(file_path, row, col)
         if warnings_id not in warnings_recorded:
