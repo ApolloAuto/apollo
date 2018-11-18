@@ -111,6 +111,12 @@ void CheckSingleton() {
   CHECK_NOTNULL(TaskManager::Instance());
   CHECK_NOTNULL(PerfEventCache::Instance());
 }
+
+void StopLogger() {
+  if (async_logger != nullptr) {
+    async_logger->Stop();
+  }
+}
 }  // namespace
 
 void OnShutdown(int sig) {
@@ -157,6 +163,7 @@ void Shutdown() {
   scheduler::Scheduler::Instance()->ShutDown();
   service_discovery::TopologyManager::Instance()->Shutdown();
   transport::Transport::Instance()->Shutdown();
+  StopLogger();
   SetState(STATE_SHUTDOWN);
 }
 
