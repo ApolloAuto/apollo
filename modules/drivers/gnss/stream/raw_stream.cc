@@ -139,7 +139,15 @@ RawStream::RawStream(const config::Config &config,
 RawStream::~RawStream() {
   this->Logout();
   this->Disconnect();
-  gpsbin_stream_->close();
+  if (gpsbin_stream_ != nullptr) {
+    gpsbin_stream_->close();
+  }
+  if (data_thread_ptr_ != nullptr && data_thread_ptr_->joinable()) {
+    data_thread_ptr_->join();
+  }
+  if (rtk_thread_ptr_ != nullptr && rtk_thread_ptr_->joinable()) {
+    rtk_thread_ptr_->join();
+  }
 }
 
 bool RawStream::Init() {
