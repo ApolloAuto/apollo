@@ -449,3 +449,7 @@ DEFINE_double(
 
 DEFINE_double(max_trajectory_len, 1000.0,
               "(unit: meter) max possible trajectory length.");
+
+DEFINE_double(side_pass_min_front_obstacle_distance, 2.0,
+              "(unit: meter) if the distance between front obstacle is less "
+              "than this threshold, side_pass scenario is skipped for safety.");
