@@ -53,12 +53,15 @@ class Participant {
       eprosima::fastrtps::ParticipantListener* listener);
 
   std::atomic<bool> shutdown_;
+
   std::string name_;
   int send_port_;
+
   eprosima::fastrtps::ParticipantListener* listener_;
-  UnderlayMessageType type_;
   eprosima::fastrtps::Participant* fastrtps_participant_;
+
   std::mutex mutex_;
+  UnderlayMessageType type_;
 };
 
 }  // namespace transport

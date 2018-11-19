@@ -306,8 +306,8 @@ bool Segment::Remove() {
     AERROR << "remove shm failed, error code: " << strerror(errno);
     return false;
   }
-  ADEBUG << "remove success.";
 
+  ADEBUG << "remove success.";
   return true;
 }
 
@@ -338,6 +338,7 @@ void Segment::Reset() {
     std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_.clear();
   }
+
   if (managed_shm_ != nullptr) {
     shmdt(managed_shm_);
     managed_shm_ = nullptr;

@@ -62,6 +62,7 @@ void ShmReceiver<M>::Enable() {
   if (this->enabled_) {
     return;
   }
+
   dispatcher_->AddListener<M>(
       this->attr_, std::bind(&ShmReceiver<M>::OnNewMessage, this,
                              std::placeholders::_1, std::placeholders::_2));
@@ -73,6 +74,7 @@ void ShmReceiver<M>::Disable() {
   if (!this->enabled_) {
     return;
   }
+
   dispatcher_->RemoveListener<M>(this->attr_);
   this->enabled_ = false;
 }

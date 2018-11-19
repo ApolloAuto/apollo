@@ -73,12 +73,15 @@ class HybridReceiver : public Receiver<M> {
 
  private:
   void InitMode();
-  void ObtainConfig();
   void InitHistory();
-  void InitReceivers();
+  void ObtainConfig();
+
   void ClearReceivers();
-  void InitTransmitters();
+  void InitReceivers();
+
   void ClearTransmitters();
+  void InitTransmitters();
+
   void ReceiveHistoryMsg(const RoleAttributes& opposite_attr);
   void ThreadFunc(const RoleAttributes& opposite_attr);
   Relation GetRelation(const RoleAttributes& opposite_attr);
@@ -86,6 +89,7 @@ class HybridReceiver : public Receiver<M> {
   HistoryPtr history_;
   ReceiverContainer receivers_;
   TransmitterContainer transmitters_;
+
   std::mutex mutex_;
 
   CommunicationModePtr mode_;
@@ -192,12 +196,14 @@ void HybridReceiver<M>::InitHistory() {
 
 template <typename M>
 void HybridReceiver<M>::InitReceivers() {
+  auto listener = std::bind(&HybridReceiver<M>::OnNewMessage, this,
+                            std::placeholders::_1, std::placeholders::_2);
+
   std::set<OptionalMode> modes;
   modes.insert(mode_->same_proc());
   modes.insert(mode_->diff_proc());
   modes.insert(mode_->diff_host());
-  auto listener = std::bind(&HybridReceiver<M>::OnNewMessage, this,
-                            std::placeholders::_1, std::placeholders::_2);
+
   for (auto& mode : modes) {
     switch (mode) {
       case OptionalMode::INTRA:
@@ -256,24 +262,29 @@ void HybridReceiver<M>::ThreadFunc(const RoleAttributes& opposite_attr) {
   std::string channel_name =
       std::to_string(opposite_attr.id()) + std::to_string(this->attr_.id());
   uint64_t channel_id = common::GlobalData::RegisterChannel(channel_name);
+
   RoleAttributes attr(this->attr_);
   attr.set_channel_name(channel_name);
   attr.set_channel_id(channel_id);
   attr.mutable_qos_profile()->CopyFrom(opposite_attr.qos_profile());
+
   volatile bool is_msg_arrived = false;
   auto listener = [&](const std::shared_ptr<M>& msg,
                       const MessageInfo& msg_info, const RoleAttributes& attr) {
     is_msg_arrived = true;
     this->OnNewMessage(msg, msg_info);
   };
+
   auto receiver = std::make_shared<RtpsReceiver<M>>(attr, listener);
   receiver->Enable();
+
   do {
     if (is_msg_arrived) {
       is_msg_arrived = false;
     }
     cyber::USleep(1000000);
   } while (is_msg_arrived);
+
   receiver->Disable();
   ADEBUG << "recv threadfunc exit.";
 }
@@ -283,9 +294,11 @@ Relation HybridReceiver<M>::GetRelation(const RoleAttributes& opposite_attr) {
   if (opposite_attr.channel_name() != this->attr_.channel_name()) {
     return NO_RELATION;
   }
+
   if (opposite_attr.host_ip() != this->attr_.host_ip()) {
     return DIFF_HOST;
   }
+
   if (opposite_attr.process_id() != this->attr_.process_id()) {
     return DIFF_PROC;
   }

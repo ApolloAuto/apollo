@@ -50,6 +50,7 @@ void RtpsDispatcher::AddSubscriber(const RoleAttributes& self_attr) {
   if (subs_.count(channel_id) > 0) {
     return;
   }
+
   Subscriber new_sub;
   eprosima::fastrtps::SubscriberAttributes sub_attr;
   auto& qos = self_attr.qos_profile();

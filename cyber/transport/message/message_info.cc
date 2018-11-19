@@ -55,9 +55,11 @@ bool MessageInfo::operator==(const MessageInfo& another) const {
   if (sender_id_ != another.sender_id_) {
     return false;
   }
+
   if (seq_num_ != another.seq_num_) {
     return false;
   }
+
   if (spare_id_ != another.spare_id_) {
     return false;
   }

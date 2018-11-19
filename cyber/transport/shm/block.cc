@@ -49,6 +49,7 @@ bool Block::TryLockForRead() {
     ADEBUG << "block is writing.";
     return false;
   }
+
   reading_reference_counts_.fetch_add(1);
   return true;
 }
@@ -56,7 +57,6 @@ bool Block::TryLockForRead() {
 void Block::ReleaseWriteLock() { is_writing_.store(false); }
 
 void Block::ReleaseReadLock() { reading_reference_counts_.fetch_sub(1); }
-
 }  // namespace transport
 }  // namespace cyber
 }  // namespace apollo

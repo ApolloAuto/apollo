@@ -39,7 +39,7 @@ void Participant::Shutdown() {
     return;
   }
 
-  std::lock_guard<std::mutex> lck(mutex_);
+  std::lock_guard<std::mutex> lk(mutex_);
   if (fastrtps_participant_ != nullptr) {
     eprosima::fastrtps::Domain::removeParticipant(fastrtps_participant_);
     fastrtps_participant_ = nullptr;
@@ -52,10 +52,11 @@ eprosima::fastrtps::Participant* Participant::fastrtps_participant() {
     return nullptr;
   }
 
-  std::lock_guard<std::mutex> lck(mutex_);
+  std::lock_guard<std::mutex> lk(mutex_);
   if (fastrtps_participant_ != nullptr) {
     return fastrtps_participant_;
   }
+
   CreateFastRtpsParticipant(name_, send_port_, listener_);
   return fastrtps_participant_;
 }
@@ -64,6 +65,7 @@ void Participant::CreateFastRtpsParticipant(
     const std::string& name, int send_port,
     eprosima::fastrtps::ParticipantListener* listener) {
   uint32_t domain_id = 80;
+
   const char* val = ::getenv("CYBER_DOMAIN_ID");
   if (val != nullptr) {
     try {
