@@ -19,6 +19,8 @@
 #include <cmath>
 #include <memory>
 #include <string>
+#include <thread>
+#include <chrono>
 
 #include "Eigen/Geometry"
 #include "boost/array.hpp"
@@ -339,6 +341,15 @@ void DataParser::GpsToTransformStamped(const std::shared_ptr<Gps> &gps,
   rotation->set_qy(gps->localization().orientation().qy());
   rotation->set_qz(gps->localization().orientation().qz());
   rotation->set_qw(gps->localization().orientation().qw());
+}
+
+DataParser::~DataParser() {
+  if (insstatus_writer_ != nullptr) {
+    ins_status_.set_type(apollo::drivers::gnss::InsStatus::INVALID);
+    common::util::FillHeader("gnss", &ins_status_);
+    insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
+  }
+  std::this_thread::sleep_for(std::chrono::microseconds(1500));
 }
 
 }  // namespace gnss
