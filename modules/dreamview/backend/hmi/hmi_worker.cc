@@ -16,8 +16,6 @@
 
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
-#include <yaml-cpp/yaml.h>
-
 #include <chrono>
 #include <memory>
 #include <vector>
@@ -138,17 +136,8 @@ void System(const std::string& cmd) {
 }
 
 std::string GetDockerImage() {
-  // In release docker container, the actual image name is in meta.ini.
-  if (apollo::common::util::PathExists(FLAGS_container_meta_ini)) {
-    YAML::Node meta = YAML::LoadFile(FLAGS_container_meta_ini);
-    if (meta["tag"]) {
-      return meta["tag"].as<std::string>();
-    }
-  }
-  if (const char* docker_image = std::getenv("DOCKER_IMG")) {
-    return docker_image;
-  }
-  return "";
+  const char* docker_image = std::getenv("DOCKER_IMG");
+  return docker_image != nullptr ? docker_image : "";
 }
 
 }  // namespace
