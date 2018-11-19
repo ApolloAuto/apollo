@@ -184,7 +184,7 @@ class AdapterManager {
 
   /**
    * @brief Resets the \class AdapterManager so that it could be
-   * re-initiailized.
+   * re-initialized.
    */
   static void Reset();
 
