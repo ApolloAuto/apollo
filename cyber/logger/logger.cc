@@ -61,7 +61,7 @@ void Logger::Write(bool force_flush, time_t timestamp, const char* message,
   }
   if (fileobject) {
     fileobject->Write(force_flush, timestamp, log_message.c_str(),
-                      log_message.size());
+                      static_cast<int>(log_message.size()));
   }
 }
 

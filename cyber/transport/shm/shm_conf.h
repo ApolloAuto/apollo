@@ -17,7 +17,7 @@
 #ifndef CYBER_TRANSPORT_SHM_SHM_CONF_H_
 #define CYBER_TRANSPORT_SHM_SHM_CONF_H_
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 
 namespace apollo {
@@ -40,7 +40,7 @@ class ShmConf {
  private:
   uint64_t GetCeilingMessageSize(const uint64_t& real_msg_size);
   uint64_t GetBlockBufSize(const uint64_t& ceiling_msg_size);
-  uint64_t GetBlockNum(const uint64_t& ceiling_msg_size);
+  uint32_t GetBlockNum(const uint64_t& ceiling_msg_size);
 
   uint64_t ceiling_msg_size_;
   uint64_t block_buf_size_;

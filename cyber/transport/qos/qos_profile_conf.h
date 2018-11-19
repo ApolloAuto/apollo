@@ -17,7 +17,7 @@
 #ifndef CYBER_TRANSPORT_QOS_QOS_PROFILE_CONF_H_
 #define CYBER_TRANSPORT_QOS_QOS_PROFILE_CONF_H_
 
-#include <cstddef>
+#include <stdint.h>
 
 #include "cyber/proto/qos_profile.pb.h"
 
@@ -36,12 +36,12 @@ class QosProfileConf {
   virtual ~QosProfileConf();
 
   static QosProfile CreateQosProfile(const QosHistoryPolicy& history,
-                                     size_t depth, size_t mps,
+                                     uint32_t depth, uint32_t mps,
                                      const QosReliabilityPolicy& reliability,
                                      const QosDurabilityPolicy& durability);
 
-  static const size_t QOS_HISTORY_DEPTH_SYSTEM_DEFAULT;
-  static const size_t QOS_MPS_SYSTEM_DEFAULT;
+  static const uint32_t QOS_HISTORY_DEPTH_SYSTEM_DEFAULT;
+  static const uint32_t QOS_MPS_SYSTEM_DEFAULT;
 
   static const QosProfile QOS_PROFILE_DEFAULT;
   static const QosProfile QOS_PROFILE_SENSOR_DATA;

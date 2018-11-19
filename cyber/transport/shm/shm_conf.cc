@@ -80,8 +80,8 @@ uint64_t ShmConf::GetBlockBufSize(const uint64_t& ceiling_msg_size) {
   return ceiling_msg_size + MESSAGE_INFO_SIZE;
 }
 
-uint64_t ShmConf::GetBlockNum(const uint64_t& ceiling_msg_size) {
-  uint64_t num = 0;
+uint32_t ShmConf::GetBlockNum(const uint64_t& ceiling_msg_size) {
+  uint32_t num = 0;
   switch (ceiling_msg_size) {
     case MESSAGE_SIZE_16K:
       num = BLOCK_NUM_16K;
@@ -102,7 +102,7 @@ uint64_t ShmConf::GetBlockNum(const uint64_t& ceiling_msg_size) {
       num = BLOCK_NUM_MORE;
       break;
     default:
-      AERROR << "unknown ceiling_msg_size.";
+      AERROR << "unknown ceiling_msg_size[" << ceiling_msg_size << "]";
       break;
   }
   return num;

@@ -25,7 +25,7 @@ QosProfileConf::QosProfileConf() {}
 QosProfileConf::~QosProfileConf() {}
 
 QosProfile QosProfileConf::CreateQosProfile(
-    const QosHistoryPolicy& history, size_t depth, size_t mps,
+    const QosHistoryPolicy& history, uint32_t depth, uint32_t mps,
     const QosReliabilityPolicy& reliability,
     const QosDurabilityPolicy& durability) {
   QosProfile qos_profile;
@@ -38,8 +38,8 @@ QosProfile QosProfileConf::CreateQosProfile(
   return qos_profile;
 }
 
-const size_t QosProfileConf::QOS_HISTORY_DEPTH_SYSTEM_DEFAULT = 0;
-const size_t QosProfileConf::QOS_MPS_SYSTEM_DEFAULT = 0;
+const uint32_t QosProfileConf::QOS_HISTORY_DEPTH_SYSTEM_DEFAULT = 0;
+const uint32_t QosProfileConf::QOS_MPS_SYSTEM_DEFAULT = 0;
 
 const QosProfile QosProfileConf::QOS_PROFILE_DEFAULT = CreateQosProfile(
     QosHistoryPolicy::HISTORY_KEEP_LAST, 1, QOS_MPS_SYSTEM_DEFAULT,

@@ -35,9 +35,9 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-using google::protobuf::io::ZeroCopyInputStream;
-using google::protobuf::io::FileInputStream;
 using google::protobuf::io::CodedInputStream;
+using google::protobuf::io::FileInputStream;
+using google::protobuf::io::ZeroCopyInputStream;
 
 class RecordFileReader : public RecordFileBase {
  public:
@@ -67,7 +67,7 @@ bool RecordFileReader::ReadSection(uint64_t size, T* message) {
     AERROR << "Size is zero.";
     return false;
   }
-  FileInputStream raw_input(fd_, size);
+  FileInputStream raw_input(fd_, static_cast<int>(size));
   CodedInputStream coded_input(&raw_input);
   CodedInputStream::Limit limit = coded_input.PushLimit(static_cast<int>(size));
   if (!message->ParseFromCodedStream(&coded_input)) {

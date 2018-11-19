@@ -50,7 +50,7 @@ class TimerTask {
  public:
   uint64_t init_time_ = 0;
   uint64_t deadline_ = 0;
-  uint32_t interval_ = 0;
+  uint64_t interval_ = 0;
   CallHandler handler_;
   uint64_t rest_rounds_ = 0;
   bool oneshot_ = true;

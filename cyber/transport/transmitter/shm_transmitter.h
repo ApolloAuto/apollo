@@ -101,7 +101,7 @@ void ShmTransmitter<M>::Enable() {
 
   mcast_addr_.sin_family = AF_INET;
   mcast_addr_.sin_addr.s_addr = inet_addr(locator_->ip().c_str());
-  mcast_addr_.sin_port = htons(locator_->port());
+  mcast_addr_.sin_port = htons(static_cast<uint16_t>(locator_->port()));
 
   segment_ = std::make_shared<Segment>(channel_id_, WRITE_ONLY);
   this->enabled_ = true;
@@ -137,7 +137,7 @@ bool ShmTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   }
 
   ADEBUG << "block index: " << wb.index;
-  if (!message::SerializeToArray(msg, wb.buf, msg_size)) {
+  if (!message::SerializeToArray(msg, wb.buf, static_cast<int>(msg_size))) {
     AERROR << "serialize to array failed.";
     segment_->ReleaseWrittenBlock(wb);
     return false;
@@ -159,7 +159,7 @@ bool ShmTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   ADEBUG << "Writing sharedmem message: "
          << common::GlobalData::GetChannelById(channel_id_)
          << " to block: " << wb.index;
-  int write_bytes =
+  ssize_t write_bytes =
       sendto(sfd_, readable_info_str.c_str(), readable_info_str.size(), 0,
              (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_));
   RETURN_VAL_IF(write_bytes < 0, false);

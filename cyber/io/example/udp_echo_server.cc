@@ -33,11 +33,12 @@ void Echo(const std::shared_ptr<Session>& session) {
   struct sockaddr_in client_addr;
   std::vector<char> recv_buffer(2049);
   int nbytes = 0;
-  socklen_t sock_len = sizeof(client_addr);
+  socklen_t sock_len = static_cast<socklen_t>(sizeof(client_addr));
 
   while (true) {
-    nbytes = session->RecvFrom(recv_buffer.data(), recv_buffer.size(), 0,
-                               (struct sockaddr*)&client_addr, &sock_len);
+    nbytes = static_cast<int>(
+        session->RecvFrom(recv_buffer.data(), recv_buffer.size(), 0,
+                          (struct sockaddr*)&client_addr, &sock_len));
     if (nbytes < 0) {
       std::cout << "recv from client failed." << std::endl;
       continue;
@@ -55,7 +56,7 @@ int main(int argc, char* argv[]) {
 
   apollo::cyber::Init(argv[0]);
 
-  int server_port = atoi(argv[1]);
+  uint16_t server_port = static_cast<uint16_t>(atoi(argv[1]));
   Scheduler::Instance()->CreateTask(
       [&server_port]() {
         struct sockaddr_in server_addr;

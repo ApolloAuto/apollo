@@ -28,14 +28,15 @@ namespace transport {
 
 Segment::Segment(uint64_t channel_id, const ReadWriteMode& mode)
     : init_(false),
-      id_(channel_id),
       mode_(mode),
       conf_(),
       state_(nullptr),
       blocks_(nullptr),
       managed_shm_(nullptr),
       block_buf_lock_(),
-      block_buf_addrs_() {}
+      block_buf_addrs_() {
+  id_ = static_cast<key_t>(channel_id);
+}
 
 Segment::~Segment() { Destroy(); }
 

@@ -17,11 +17,11 @@
 #ifndef CYBER_TRANSPORT_SHM_SEGMENT_H_
 #define CYBER_TRANSPORT_SHM_SEGMENT_H_
 
+#include <stdint.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/types.h>
 #include <cstddef>
-#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -74,7 +74,7 @@ class Segment final {
   uint32_t GetNextWritableBlockIndex();
 
   bool init_;
-  uint64_t id_;
+  key_t id_;
   ReadWriteMode mode_;
   ShmConf conf_;
 

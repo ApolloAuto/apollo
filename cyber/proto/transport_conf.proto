@@ -11,14 +11,14 @@ enum OptionalMode {
 
 message ShmMulticastLocator {
     optional string ip = 1;
-    optional int32 port = 2;
+    optional uint32 port = 2;
 };
 
 message RtpsParticipantAttr {
     optional int32 lease_duration = 1;
     optional int32 announcement_period = 2;
-    optional int32 domain_id_gain = 3;
-    optional int32 port_base = 4;
+    optional uint32 domain_id_gain = 3;
+    optional uint32 port_base = 4;
 };
 
 message CommunicationMode {
