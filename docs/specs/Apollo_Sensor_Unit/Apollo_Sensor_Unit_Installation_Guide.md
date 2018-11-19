@@ -1,4 +1,4 @@
-3## Guide for Apollo Sensor Unit
+## Guide for Apollo Sensor Unit
 
 Apollo Sensor Unit (ASU) is designed to work with Industrial PC (IPC) to implement sensor fusion, vehicle control and network access in Apollo's autonomous driving platform.
 
