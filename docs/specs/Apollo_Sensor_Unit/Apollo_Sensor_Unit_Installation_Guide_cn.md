@@ -21,17 +21,12 @@ ASU和IPC的通讯通过PCI Express接口。ASU收集传感器数据并通过PCI
 
 #### 后面板接口
 
-1. Micro USB到UART接口（保留为调试使用）
-2. Micro USB到UART接口（ASU配置端口）
-3. 供内置LTE模块使用的Micro SIM 卡片支架 
-4. 通用UART接口（保留） 
-5. USB 3.0 type A port（2个接口）
-6. 外部PCI Express接口（支持X4或X8）
-7. GPS PPS / GPRMC输出接口（3个接口）
-8. Micro USB 2.0 OTG
-9. 连接Stereo Camera的电源和PPS/GPRMC输出接口
-10. CAN Bus（4个接口）
-11. 主电源输入接口
+1. 通用UART接口（保留）
+2. 外部PCI Express接口（支持X4或X8）连接IPC请使用EXTN
+3. GPS PPS / GPRMC输出接口（3个接口）
+4. 连接Stereo Camera的电源和PPS/GPRMC输出接口
+5. CAN Bus（4个接口）
+6. 主电源输入接口
 
 ### 购买渠道
 
