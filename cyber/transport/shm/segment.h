@@ -20,6 +20,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <sys/types.h>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -42,14 +43,23 @@ enum ReadWriteMode {
   WRITE_ONLY,
 };
 
+struct WritableBlock {
+  uint32_t index = 0;
+  Block* block = nullptr;
+  uint8_t* buf = nullptr;
+};
+using ReadableBlock = WritableBlock;
+
 class Segment final {
  public:
   Segment(uint64_t channel_id, const ReadWriteMode& mode);
   ~Segment();
 
-  bool Write(const std::string& msg, const std::string& msg_info,
-             uint32_t* block_index);
-  bool Read(uint32_t block_index, std::string* msg, std::string* msg_info);
+  bool AcquireBlockToWrite(std::size_t msg_size, WritableBlock* writable_block);
+  void ReleaseWrittenBlock(const WritableBlock& writable_block);
+
+  bool AcquireBlockToRead(ReadableBlock* readable_block);
+  void ReleaseReadBlock(const ReadableBlock& readable_block);
 
  private:
   bool Init();

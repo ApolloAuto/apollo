@@ -57,29 +57,6 @@ void Block::ReleaseWriteLock() { is_writing_.store(false); }
 
 void Block::ReleaseReadLock() { reading_reference_counts_.fetch_sub(1); }
 
-// for radical write, we should call TryLockForWrite() firstly
-bool Block::Write(uint8_t* dst, const std::string& msg,
-                  const std::string& msg_info) {
-  msg_size_ = msg.length();
-  msg_info_size_ = msg_info.length();
-  std::memcpy(dst, const_cast<char*>(msg.data()), msg_size_);
-  std::memcpy(dst + msg_size_, const_cast<char*>(msg_info.data()),
-              msg_info_size_);
-  return true;
-}
-
-// for radical read, we should call TryLockForRead() firstly
-bool Block::Read(const uint8_t* src, std::string* msg, std::string* msg_info) {
-  if (msg == nullptr || msg_info == nullptr) {
-    return false;
-  }
-  const char* ptr = (const char*)(src);
-  msg->assign(ptr, msg_size_);
-  ptr += msg_size_;
-  msg_info->assign(ptr, msg_info_size_);
-  return true;
-}
-
 }  // namespace transport
 }  // namespace cyber
 }  // namespace apollo

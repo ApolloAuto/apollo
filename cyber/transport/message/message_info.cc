@@ -24,6 +24,8 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
+const std::size_t MessageInfo::kSize = 2 * ID_SIZE + sizeof(uint64_t);
+
 MessageInfo::MessageInfo() : sender_id_(false), seq_num_(0), spare_id_(false) {}
 
 MessageInfo::MessageInfo(const Identity& sender_id, uint64_t seq_num)
@@ -73,16 +75,35 @@ bool MessageInfo::SerializeTo(std::string* dst) const {
   return true;
 }
 
-bool MessageInfo::DeserializeFrom(const std::string& src) {
-  auto given_size = src.size();
-  static size_t target_size = 2 * ID_SIZE + sizeof(seq_num_);
-  if (given_size != target_size) {
-    AWARN << "src size mismatch, given[" << given_size << "] target["
-          << target_size << "]";
+bool MessageInfo::SerializeTo(char* dst, std::size_t len) const {
+  RETURN_VAL_IF_NULL(dst, false);
+  if (len < kSize) {
     return false;
   }
 
-  char* ptr = const_cast<char*>(src.data());
+  char* ptr = dst;
+  memcpy(ptr, sender_id_.data(), ID_SIZE);
+  ptr += ID_SIZE;
+  memcpy(ptr, reinterpret_cast<char*>(const_cast<uint64_t*>(&seq_num_)),
+         sizeof(seq_num_));
+  ptr += sizeof(seq_num_);
+  memcpy(ptr, spare_id_.data(), ID_SIZE);
+
+  return true;
+}
+
+bool MessageInfo::DeserializeFrom(const std::string& src) {
+  return DeserializeFrom(src.data(), src.size());
+}
+
+bool MessageInfo::DeserializeFrom(const char* src, std::size_t len) {
+  RETURN_VAL_IF_NULL(src, false);
+  if (len != kSize) {
+    AWARN << "src size mismatch, given[" << len << "] target[" << kSize << "]";
+    return false;
+  }
+
+  char* ptr = const_cast<char*>(src);
   sender_id_.set_data(ptr);
   ptr += ID_SIZE;
   memcpy(reinterpret_cast<char*>(&seq_num_), ptr, sizeof(seq_num_));

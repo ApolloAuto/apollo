@@ -128,18 +128,37 @@ bool ShmTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
     ADEBUG << "not enable.";
     return false;
   }
-  std::string msg_str = "";
-  RETURN_VAL_IF(!message::SerializeToString(msg, &msg_str), false);
 
-  std::string msg_info_str = "";
-  msg_info.SerializeTo(&msg_info_str);
-  uint32_t block_index = 0;
+  WritableBlock wb;
+  std::size_t msg_size = message::ByteSize(msg);
+  if (!segment_->AcquireBlockToWrite(msg_size, &wb)) {
+    AERROR << "acquire block failed.";
+    return false;
+  }
 
-  RETURN_VAL_IF(!segment_->Write(msg_str, msg_info_str, &block_index), false);
+  ADEBUG << "block index: " << wb.index;
+  if (!message::SerializeToArray(msg, wb.buf, msg_size)) {
+    AERROR << "serialize to array failed.";
+    segment_->ReleaseWrittenBlock(wb);
+    return false;
+  }
+  wb.block->set_msg_size(msg_size);
 
-  ReadableInfo readable_info(host_id_, block_index, channel_id_);
+  char* msg_info_addr = reinterpret_cast<char*>(wb.buf) + msg_size;
+  if (!msg_info.SerializeTo(msg_info_addr, MessageInfo::kSize)) {
+    AERROR << "serialize message info failed.";
+    segment_->ReleaseWrittenBlock(wb);
+    return false;
+  }
+  wb.block->set_msg_info_size(MessageInfo::kSize);
+  segment_->ReleaseWrittenBlock(wb);
+
+  ReadableInfo readable_info(host_id_, wb.index, channel_id_);
   std::string readable_info_str = "";
   readable_info.SerializeTo(&readable_info_str);
+  ADEBUG << "Writing sharedmem message: "
+         << common::GlobalData::GetChannelById(channel_id_)
+         << " to block: " << wb.index;
   int write_bytes =
       sendto(sfd_, readable_info_str.c_str(), readable_info_str.size(), 0,
              (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_));

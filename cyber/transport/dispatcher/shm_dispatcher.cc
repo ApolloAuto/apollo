@@ -34,10 +34,15 @@ void ShmDispatcher::Shutdown() {
     return;
   }
 
-  segments_.clear();
   if (thread_.joinable()) {
     thread_.join();
   }
+
+  {
+    ReadLockGuard<AtomicRWLock> lock(segments_lock_);
+    segments_.clear();
+  }
+
   CloseAndReset(&sfd_);
 }
 
@@ -49,28 +54,54 @@ void ShmDispatcher::AddSegment(const RoleAttributes& self_attr) {
   }
   auto segment = std::make_shared<Segment>(channel_id, READ_ONLY);
   segments_[channel_id] = segment;
+  previous_indexes_[channel_id] = UINT32_MAX;
+}
+
+void ShmDispatcher::ReadMessage(uint64_t channel_id, uint32_t block_index) {
+  ADEBUG << "Reading sharedmem message: "
+         << GlobalData::GetChannelById(channel_id)
+         << " from block: " << block_index;
+  auto rb = std::make_shared<ReadableBlock>();
+  rb->index = block_index;
+  if (!segments_[channel_id]->AcquireBlockToRead(rb.get())) {
+    AERROR << "acquire block failed, channel: "
+           << GlobalData::GetChannelById(channel_id);
+    return;
+  }
+
+  MessageInfo msg_info;
+  const char* msg_info_addr =
+      reinterpret_cast<char*>(rb->buf) + rb->block->msg_size();
+
+  if (msg_info.DeserializeFrom(msg_info_addr, rb->block->msg_info_size())) {
+    OnMessage(channel_id, rb, msg_info);
+  } else {
+    AERROR << "error msg info of channel:"
+           << GlobalData::GetChannelById(channel_id);
+  }
+  segments_[channel_id]->ReleaseReadBlock(*rb);
 }
 
 void ShmDispatcher::OnMessage(uint64_t channel_id,
-                              const std::shared_ptr<std::string>& msg_str,
+                              const std::shared_ptr<ReadableBlock>& rb,
                               const MessageInfo& msg_info) {
   if (is_shutdown_.load()) {
     return;
   }
   ListenerHandlerBasePtr* handler_base = nullptr;
   if (msg_listeners_.Get(channel_id, &handler_base)) {
-    auto handler =
-        std::dynamic_pointer_cast<ListenerHandler<std::string>>(*handler_base);
-    handler->Run(msg_str, msg_info);
+    auto handler = std::dynamic_pointer_cast<ListenerHandler<ReadableBlock>>(
+        *handler_base);
+    handler->Run(rb, msg_info);
+  } else {
+    AERROR << "Cant find " << GlobalData::GetChannelById(channel_id)
+           << "'s handler.";
   }
 }
 
 void ShmDispatcher::ThreadFunc() {
   char buf[1024] = {0};
   int addr_len = sizeof(local_addr_);
-  MessageInfo msg_info;
-  std::string msg_info_str("");
-  std::shared_ptr<std::string> msg_str_ptr = std::make_shared<std::string>();
 
   while (!is_shutdown_.load()) {
     int read_bytes =
@@ -81,9 +112,12 @@ void ShmDispatcher::ThreadFunc() {
       continue;
     }
 
-    std::string readable_info_str(buf, read_bytes);
     ReadableInfo readable_info;
-    readable_info.DeserializeFrom(readable_info_str);
+    if (!readable_info.DeserializeFrom(buf, read_bytes)) {
+      AERROR << "deserialize readable info failed.";
+      continue;
+    }
+
     uint64_t host_id = readable_info.host_id();
     if (host_id != host_id_) {
       ADEBUG << "shm readable info from other host.";
@@ -95,20 +129,29 @@ void ShmDispatcher::ThreadFunc() {
 
     {
       ReadLockGuard<AtomicRWLock> lock(segments_lock_);
-      if (segments_.count(channel_id) > 0) {
-        if (!segments_[channel_id]->Read(block_index, msg_str_ptr.get(),
-                                         &msg_info_str)) {
-          AERROR << "read msg failed, channel:"
-                 << GlobalData::GetChannelById(channel_id);
-          continue;
-        }
-        if (msg_info.DeserializeFrom(msg_info_str)) {
-          OnMessage(channel_id, msg_str_ptr, msg_info);
-        } else {
-          AERROR << "error msg info of channel:"
-                 << GlobalData::GetChannelById(channel_id);
+      if (segments_.count(channel_id) == 0) {
+        continue;
+      }
+      // check block index
+      if (previous_indexes_.count(channel_id) == 0) {
+        previous_indexes_[channel_id] = UINT32_MAX;
+      }
+      uint32_t& previous_index = previous_indexes_[channel_id];
+      if (block_index != 0 && previous_index != UINT32_MAX) {
+        if (block_index == previous_index) {
+          ADEBUG << "Receive SAME index " << block_index << " of channel "
+                 << channel_id;
+        } else if (block_index < previous_index) {
+          ADEBUG << "Receive PREVIOUS message. last: " << previous_index
+                 << ", now: " << block_index;
+        } else if (block_index - previous_index > 1) {
+          ADEBUG << "Receive JUMP message. last: " << previous_index
+                 << ", now: " << block_index;
         }
       }
+      previous_index = block_index;
+
+      ReadMessage(channel_id, block_index);
     }
   }
 }

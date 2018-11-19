@@ -34,19 +34,26 @@ using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
 
 class Block {
+  friend class Segment;
+
  public:
   Block();
   virtual ~Block();
 
+  uint64_t msg_size() const { return msg_size_; }
+  void set_msg_size(uint64_t msg_size) { msg_size_ = msg_size; }
+
+  uint64_t msg_info_size() const { return msg_info_size_; }
+  void set_msg_info_size(uint64_t msg_info_size) {
+    msg_info_size_ = msg_info_size;
+  }
+
+ private:
   bool TryLockForWrite();
   bool TryLockForRead();
   void ReleaseWriteLock();
   void ReleaseReadLock();
 
-  bool Write(uint8_t* dst, const std::string& msg, const std::string& msg_info);
-  bool Read(const uint8_t* src, std::string* msg, std::string* msg_info);
-
- private:
   std::atomic<bool> is_writing_;
   std::atomic<uint32_t> reading_reference_counts_;
   base::AtomicRWLock read_write_mutex_;

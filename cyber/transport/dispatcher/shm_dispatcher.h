@@ -69,8 +69,8 @@ class ShmDispatcher : public Dispatcher {
 
  private:
   void AddSegment(const RoleAttributes& self_attr);
-  void OnMessage(uint64_t channel_id,
-                 const std::shared_ptr<std::string>& msg_str,
+  void ReadMessage(uint64_t channel_id, uint32_t block_index);
+  void OnMessage(uint64_t channel_id, const std::shared_ptr<ReadableBlock>& rb,
                  const MessageInfo& msg_info);
   void ThreadFunc();
   bool Init();
@@ -78,6 +78,7 @@ class ShmDispatcher : public Dispatcher {
 
   uint64_t host_id_;
   SegmentContainer segments_;
+  std::unordered_map<uint64_t, uint32_t> previous_indexes_;
   AtomicRWLock segments_lock_;
   std::thread thread_;
   int sfd_;
@@ -87,47 +88,37 @@ class ShmDispatcher : public Dispatcher {
   DECLARE_SINGLETON(ShmDispatcher)
 };
 
-// template <>
-// void ShmDispatcher::AddListener(
-//    const RoleAttributes& self_attr,
-//    const std::function<void(const std::shared_ptr<message::RawMessage>&,
-//                             const MessageInfo&)>& listener);
-
 template <typename MessageT>
 void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                                 const MessageListener<MessageT>& listener) {
-  auto listener_adapter = [listener](
-      const std::shared_ptr<std::string>& msg_str,
-      const MessageInfo& msg_info) {
+  // FIXME: make it more clean
+  auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
+                                     const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
-    RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
+    RETURN_IF(
+        !message::ParseFromArray(rb->buf, rb->block->msg_size(), msg.get()));
     listener(msg, msg_info);
   };
 
-  Dispatcher::AddListener<std::string>(self_attr, listener_adapter);
+  Dispatcher::AddListener<ReadableBlock>(self_attr, listener_adapter);
   AddSegment(self_attr);
 }
-
-// template <>
-// void ShmDispatcher::AddListener(
-//    const RoleAttributes& self_attr, const RoleAttributes& opposite_attr,
-//    const std::function<void(const std::shared_ptr<message::RawMessage>&,
-//                             const MessageInfo&)>& listener);
 
 template <typename MessageT>
 void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
                                 const RoleAttributes& opposite_attr,
                                 const MessageListener<MessageT>& listener) {
-  auto listener_adapter = [listener](
-      const std::shared_ptr<std::string>& msg_str,
-      const MessageInfo& msg_info) {
+  // FIXME: make it more clean
+  auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
+                                     const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
-    RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
+    RETURN_IF(
+        !message::ParseFromArray(rb->buf, rb->block->msg_size(), msg.get()));
     listener(msg, msg_info);
   };
 
-  Dispatcher::AddListener<std::string>(self_attr, opposite_attr,
-                                       listener_adapter);
+  Dispatcher::AddListener<ReadableBlock>(self_attr, opposite_attr,
+                                         listener_adapter);
   AddSegment(self_attr);
 }
 
