@@ -49,10 +49,10 @@ class Block {
   }
 
  private:
-  bool TryLockForWrite();
-  bool TryLockForRead();
-  void ReleaseWriteLock();
   void ReleaseReadLock();
+  void ReleaseWriteLock();
+  bool TryLockForRead();
+  bool TryLockForWrite();
 
   std::atomic<bool> is_writing_;
   std::atomic<uint32_t> reading_reference_counts_;

@@ -50,8 +50,8 @@ class ShmTransmitter : public Transmitter<M> {
   explicit ShmTransmitter(const RoleAttributes& attr);
   virtual ~ShmTransmitter();
 
-  void Enable() override;
   void Disable() override;
+  void Enable() override;
 
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
@@ -59,10 +59,13 @@ class ShmTransmitter : public Transmitter<M> {
   bool Transmit(const M& msg, const MessageInfo& msg_info);
 
   SegmentPtr segment_;
-  std::string channel_name_;
+
+  int sfd_;
   uint64_t channel_id_;
   uint64_t host_id_;
-  int sfd_;
+
+  std::string channel_name_;
+
   struct sockaddr_in mcast_addr_;
   std::shared_ptr<proto::ShmMulticastLocator> locator_;
 };
@@ -71,9 +74,9 @@ template <typename M>
 ShmTransmitter<M>::ShmTransmitter(const RoleAttributes& attr)
     : Transmitter<M>(attr),
       segment_(nullptr),
-      channel_name_(attr.channel_name()),
-      channel_id_(attr.channel_id()),
       sfd_(-1),
+      channel_id_(attr.channel_id()),
+      channel_name_(attr.channel_name()),
       locator_(nullptr) {
   host_id_ = common::Hash(attr.host_ip());
   memset(&mcast_addr_, 0, sizeof(mcast_addr_));

@@ -36,6 +36,7 @@ ReadableInfo::~ReadableInfo() {}
 
 bool ReadableInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
+
   dst->assign(reinterpret_cast<char*>(const_cast<uint64_t*>(&host_id_)),
               sizeof(host_id_));
   dst->append(reinterpret_cast<char*>(const_cast<uint32_t*>(&block_index_)),

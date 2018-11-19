@@ -32,9 +32,11 @@ bool AttributesFiller::FillInPubAttr(
     const std::string& channel_name, const QosProfile& qos,
     eprosima::fastrtps::PublisherAttributes* pub_attr) {
   RETURN_VAL_IF_NULL(pub_attr, false);
+
   pub_attr->topic.topicName = channel_name;
   pub_attr->topic.topicDataType = "UnderlayMessage";
   pub_attr->topic.topicKind = eprosima::fastrtps::NO_KEY;
+
   switch (qos.history()) {
     case QosHistoryPolicy::HISTORY_KEEP_LAST:
       pub_attr->topic.historyQos.kind =

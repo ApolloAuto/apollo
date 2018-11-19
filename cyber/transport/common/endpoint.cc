@@ -26,9 +26,11 @@ Endpoint::Endpoint(const RoleAttributes& attr)
   if (!attr_.has_host_name()) {
     attr_.set_host_name(common::GlobalData::Instance()->HostName());
   }
+
   if (!attr_.has_process_id()) {
     attr_.set_process_id(common::GlobalData::Instance()->ProcessId());
   }
+
   if (!attr_.has_id()) {
     attr_.set_id(id_.HashValue());
   }

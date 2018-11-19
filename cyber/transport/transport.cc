@@ -41,9 +41,11 @@ void Transport::Shutdown() {
   if (is_shutdown_.exchange(true)) {
     return;
   }
+
   intra_dispatcher_->Shutdown();
   shm_dispatcher_->Shutdown();
   rtps_dispatcher_->Shutdown();
+
   if (participant_ != nullptr) {
     participant_->Shutdown();
     participant_ = nullptr;

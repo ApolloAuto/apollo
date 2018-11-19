@@ -63,13 +63,16 @@ class Segment final {
 
  private:
   bool Init();
+
   bool OpenOrCreate();
   bool OpenOnly();
-  bool Remove();
-  bool Destroy();
-  void Reset();
-  bool Remap();
   bool Recreate();
+
+  bool Destroy();
+
+  bool Remove();
+  bool Remap();
+  void Reset();
 
   uint32_t GetNextWritableBlockIndex();
 
@@ -79,8 +82,10 @@ class Segment final {
   ShmConf conf_;
 
   State* state_;
+
   Block* blocks_;
   void* managed_shm_;
+
   std::mutex block_buf_lock_;
   std::unordered_map<uint32_t, uint8_t*> block_buf_addrs_;
 };

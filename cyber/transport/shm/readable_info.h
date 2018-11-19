@@ -35,9 +35,9 @@ class ReadableInfo {
   ReadableInfo(uint64_t host_id, uint32_t block_index, uint64_t channel_id);
   virtual ~ReadableInfo();
 
-  bool SerializeTo(std::string* dst) const;
   bool DeserializeFrom(const std::string& src);
   bool DeserializeFrom(const char* src, std::size_t len);
+  bool SerializeTo(std::string* dst) const;
 
   uint64_t host_id() const { return host_id_; }
   void set_host_id(uint64_t host_id) { host_id_ = host_id; }

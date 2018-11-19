@@ -100,6 +100,7 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id,
   if (!connection.IsConnected()) {
     return;
   }
+
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   signal_conns_[self_id] = connection;
 }
@@ -111,10 +112,14 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
   if (signals_.find(oppo_id) == signals_.end()) {
     signals_[oppo_id] = std::make_shared<MessageSignal>();
   }
+
   auto connection = signals_[oppo_id]->Connect(listener);
   if (!connection.IsConnected()) {
+    AWARN << oppo_id << " "
+          << self_id << "connect failed!";
     return;
   }
+
   if (signals_conns_.find(oppo_id) == signals_conns_.end()) {
     signals_conns_[oppo_id] = ConnectionMap();
   }
@@ -128,6 +133,7 @@ void ListenerHandler<MessageT>::Disconnect(uint64_t self_id) {
   if (signal_conns_.find(self_id) == signal_conns_.end()) {
     return;
   }
+
   signal_conns_[self_id].Disconnect();
   signal_conns_.erase(self_id);
 }
@@ -138,9 +144,11 @@ void ListenerHandler<MessageT>::Disconnect(uint64_t self_id, uint64_t oppo_id) {
   if (signals_conns_.find(oppo_id) == signals_conns_.end()) {
     return;
   }
+
   if (signals_conns_[oppo_id].find(self_id) == signals_conns_[oppo_id].end()) {
     return;
   }
+
   signals_conns_[oppo_id][self_id].Disconnect();
   signals_conns_[oppo_id].erase(self_id);
 }
@@ -154,6 +162,7 @@ void ListenerHandler<MessageT>::Run(const Message& msg,
   if (signals_.find(oppo_id) == signals_.end()) {
     return;
   }
+
   (*signals_[oppo_id])(msg, msg_info);
 }
 

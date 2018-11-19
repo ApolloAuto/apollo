@@ -36,8 +36,8 @@ class IntraTransmitter : public Transmitter<M> {
   explicit IntraTransmitter(const RoleAttributes& attr);
   virtual ~IntraTransmitter();
 
-  void Enable() override;
   void Disable() override;
+  void Enable() override;
 
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
@@ -80,6 +80,7 @@ bool IntraTransmitter<M>::Transmit(const MessagePtr& msg,
     ADEBUG << "not enable.";
     return false;
   }
+
   dispatcher_->OnMessage(channel_id_, msg, msg_info);
   return true;
 }

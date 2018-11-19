@@ -84,12 +84,14 @@ auto Transport::CreateTransmitter(const RoleAttributes& attr,
     AINFO << "transport has been shut down.";
     return nullptr;
   }
+
   std::shared_ptr<Transmitter<M>> transmitter = nullptr;
   RoleAttributes modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
     modified_attr.mutable_qos_profile()->CopyFrom(
         QosProfileConf::QOS_PROFILE_DEFAULT);
   }
+
   switch (mode) {
     case OptionalMode::INTRA:
       transmitter = std::make_shared<IntraTransmitter<M>>(modified_attr);
@@ -126,12 +128,14 @@ auto Transport::CreateReceiver(
     AINFO << "transport has been shut down.";
     return nullptr;
   }
+
   std::shared_ptr<Receiver<M>> receiver = nullptr;
   RoleAttributes modified_attr = attr;
   if (!modified_attr.has_qos_profile()) {
     modified_attr.mutable_qos_profile()->CopyFrom(
         QosProfileConf::QOS_PROFILE_DEFAULT);
   }
+
   switch (mode) {
     case OptionalMode::INTRA:
       receiver =
