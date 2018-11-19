@@ -75,7 +75,6 @@ cc_library(
         "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/dreamview/proto:hmi_status_proto",
         "@com_google_protobuf//:protobuf",
-        "@yaml_cpp//:yaml",
     ],
 )
 
