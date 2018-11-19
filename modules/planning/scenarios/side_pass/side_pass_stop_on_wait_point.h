@@ -69,7 +69,7 @@ class SidePassStopOnWaitPoint : public Stage {
   bool GetTheSOfNearestObstacle(
       const ReferenceLine& reference_line,
       const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
-      const Obstacle* nearest_obstacle);
+      const Obstacle*& nearest_obstacle);
   bool GetMoveForwardLastPathPoint(
       const ReferenceLine& reference_line,
       const Obstacle* nearest_obstacle,
