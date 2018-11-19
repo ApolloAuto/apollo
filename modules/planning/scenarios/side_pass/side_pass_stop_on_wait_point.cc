@@ -74,7 +74,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   }
 
   // Get the nearest obstacle
-  Obstacle* nearest_obstacle = nullptr;
+  const Obstacle* nearest_obstacle = nullptr;
   if (!GetTheSOfNearestObstacle(reference_line, path_decision.obstacles(),
       nearest_obstacle)) {
     AERROR << "Failed while running the function to get nearest obstacle.";
@@ -171,12 +171,14 @@ bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
     const PathPoint& first_path_point, const PathPoint& last_path_point) {
   common::SLPoint first_sl_point;
+
   if (!reference_line.XYToSL(Vec2d(first_path_point.x(), first_path_point.y()),
                              &first_sl_point)) {
     AERROR << "Failed to get the projection from TrajectoryPoint onto "
               "reference_line";
     return false;
   }
+
   common::SLPoint last_sl_point;
   if (!reference_line.XYToSL(Vec2d(last_path_point.x(), last_path_point.y()),
                              &last_sl_point)) {
@@ -223,7 +225,7 @@ bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
 bool SidePassStopOnWaitPoint::GetTheSOfNearestObstacle(
     const ReferenceLine& reference_line,
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
-    const Obstacle* nearest_obstacle) {
+    const Obstacle*& nearest_obstacle) {
 
   // Get the first path point. This can be used later to
   // filter out other obstaces that are behind ADC.
@@ -291,10 +293,12 @@ bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
     PathPoint* const last_path_point, bool* should_not_move_at_all) {
   *should_not_move_at_all = false;
   int count = 0;
+
   bool exist_nearest_obs = (nearest_obstacle != nullptr);
   double s_max = 0.0;
   if (exist_nearest_obs) {
-    s_max = nearest_obstacle->PerceptionSLBoundary().start_s();;
+    ADEBUG << "There exists a nearest obstacle.";
+    s_max = nearest_obstacle->PerceptionSLBoundary().start_s();
   }
 
   for (const auto& path_point :
