@@ -99,7 +99,7 @@ bool AttributesFiller::FillInPubAttr(
 
     uint64_t fractions = (256ull << 32) / mps;
     uint32_t fraction = fractions & 0xffffffff;
-    int32_t seconds = fractions >> 32;
+    int32_t seconds = static_cast<int32_t>(fractions >> 32);
 
     pub_attr->times.heartbeatPeriod.seconds = seconds;
     pub_attr->times.heartbeatPeriod.fraction = fraction;

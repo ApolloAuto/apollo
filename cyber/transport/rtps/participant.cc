@@ -86,8 +86,9 @@ void Participant::CreateFastRtpsParticipant(
 
   eprosima::fastrtps::ParticipantAttributes attr;
   attr.rtps.defaultSendPort = send_port;
-  attr.rtps.port.domainIDGain = part_attr_conf->domain_id_gain();
-  attr.rtps.port.portBase = part_attr_conf->port_base();
+  attr.rtps.port.domainIDGain =
+      static_cast<uint16_t>(part_attr_conf->domain_id_gain());
+  attr.rtps.port.portBase = static_cast<uint16_t>(part_attr_conf->port_base());
   attr.rtps.use_IP6_to_send = false;
   attr.rtps.builtin.use_SIMPLE_RTPSParticipantDiscoveryProtocol = true;
   attr.rtps.builtin.use_SIMPLE_EndpointDiscoveryProtocol = true;

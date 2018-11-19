@@ -158,7 +158,8 @@ bool PlayTaskProducer::UpdatePlayParam() {
     play_param_.begin_time_ns = earliest_begin_time_;
   }
   if (play_param_.start_time_s > 0) {
-    play_param_.begin_time_ns += play_param_.start_time_s * 1e9;
+    play_param_.begin_time_ns += static_cast<uint64_t>(
+        static_cast<double>(play_param_.start_time_s) * 1e9);
   }
   if (play_param_.end_time_ns > latest_end_time_) {
     play_param_.end_time_ns = latest_end_time_;
@@ -210,7 +211,8 @@ void PlayTaskProducer::ThreadFunc() {
     avg_interval_time_ns = loop_time_ns / total_msg_num_;
   }
 
-  double avg_freq_hz = total_msg_num_ / (loop_time_ns * 1e-9);
+  double avg_freq_hz = static_cast<double>(total_msg_num_) /
+                       (static_cast<double>(loop_time_ns) * 1e-9);
   uint32_t preload_size = (uint32_t)avg_freq_hz * kPreloadTimeSec;
   if (preload_size < kMinTaskBufferSize) {
     preload_size = kMinTaskBufferSize;

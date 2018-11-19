@@ -54,7 +54,7 @@ char TerminalController::ReadChar() {
   if (select(max_fd_, &select_fd_set, nullptr, nullptr, &tv) <= 0) {
     return EOF;
   }
-  auto ch = getc(stdin);
+  char ch = static_cast<char>(getc(stdin));
   return ch;
 }
 

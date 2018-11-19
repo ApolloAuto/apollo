@@ -104,7 +104,7 @@ void ShmDispatcher::ThreadFunc() {
   int addr_len = sizeof(local_addr_);
 
   while (!is_shutdown_.load()) {
-    int read_bytes =
+    ssize_t read_bytes =
         recvfrom(sfd_, buf, 1024, 0, (struct sockaddr*)&local_addr_,
                  reinterpret_cast<socklen_t*>(&addr_len));
     if (read_bytes == -1) {
@@ -183,7 +183,7 @@ bool ShmDispatcher::InitMulticast() {
   memset(&local_addr_, 0, sizeof(local_addr_));
   local_addr_.sin_family = AF_INET;
   local_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
-  local_addr_.sin_port = htons(locator_->port());
+  local_addr_.sin_port = htons(static_cast<uint16_t>(locator_->port()));
 
   int yes = 1;
   RETURN_VAL_IF(

@@ -95,8 +95,8 @@ void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
   auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
                                      const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
-    RETURN_IF(
-        !message::ParseFromArray(rb->buf, rb->block->msg_size(), msg.get()));
+    RETURN_IF(!message::ParseFromArray(
+        rb->buf, static_cast<int>(rb->block->msg_size()), msg.get()));
     listener(msg, msg_info);
   };
 
@@ -112,8 +112,8 @@ void ShmDispatcher::AddListener(const RoleAttributes& self_attr,
   auto listener_adapter = [listener](const std::shared_ptr<ReadableBlock>& rb,
                                      const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
-    RETURN_IF(
-        !message::ParseFromArray(rb->buf, rb->block->msg_size(), msg.get()));
+    RETURN_IF(!message::ParseFromArray(
+        rb->buf, static_cast<int>(rb->block->msg_size()), msg.get()));
     listener(msg, msg_info);
   };
 

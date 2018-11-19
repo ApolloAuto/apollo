@@ -32,8 +32,8 @@ using apollo::cyber::scheduler::Scheduler;
 void Echo(const std::shared_ptr<Session>& session) {
   std::vector<char> recv_buffer(2049);
   int nbytes = 0;
-  while ((nbytes = session->Recv(recv_buffer.data(), recv_buffer.size(), 0)) >
-         0) {
+  while ((nbytes = static_cast<int>(
+              session->Recv(recv_buffer.data(), recv_buffer.size(), 0))) > 0) {
     session->Write(recv_buffer.data(), nbytes);
   }
 
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 
   apollo::cyber::Init(argv[0]);
 
-  int server_port = atoi(argv[1]);
+  uint16_t server_port = static_cast<uint16_t>(atoi(argv[1]));
   Scheduler::Instance()->CreateTask(
       [&server_port]() {
         struct sockaddr_in server_addr;

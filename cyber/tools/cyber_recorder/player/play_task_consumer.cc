@@ -81,7 +81,9 @@ void PlayTaskConsumer::ThreadFunc() {
       base_msg_play_time_ns_ = task->msg_play_time_ns();
       base_msg_real_time_ns_ = task->msg_real_time_ns();
       if (base_msg_play_time_ns_ > begin_time_ns_) {
-        sleep_ns = (base_msg_play_time_ns_ - begin_time_ns_) / play_rate_;
+        sleep_ns = static_cast<uint64_t>(
+            static_cast<double>(base_msg_play_time_ns_ - begin_time_ns_) /
+            play_rate_);
         std::this_thread::sleep_for(std::chrono::nanoseconds(sleep_ns));
       }
       base_real_time_ns = Time::Now().ToNanosecond();
@@ -89,8 +91,9 @@ void PlayTaskConsumer::ThreadFunc() {
              << "base_real_time_ns: " << base_real_time_ns;
     }
 
-    uint64_t task_interval_ns =
-        (task->msg_play_time_ns() - base_msg_play_time_ns_) / play_rate_;
+    uint64_t task_interval_ns = static_cast<uint64_t>(
+        static_cast<double>(task->msg_play_time_ns() - base_msg_play_time_ns_) /
+        play_rate_);
     uint64_t real_time_interval_ns = Time::Now().ToNanosecond() -
                                      base_real_time_ns -
                                      accumulated_pause_time_ns;

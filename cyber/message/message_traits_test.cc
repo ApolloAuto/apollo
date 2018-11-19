@@ -205,26 +205,27 @@ TEST(MessageTraitsTest, serialize_to_string) {
 
 TEST(MessageTraitsTest, parse_from_array) {
   const int kArraySize = 256;
-  char array[kArraySize] = "\n\rMessageTraits\x12\x11parse_from_string";
-  std::string arr_str(array);
+  const char array[kArraySize] = "\n\rMessageTraits\x12\x11parse_from_string";
+  const int arr_str_len = static_cast<int>(strlen(array));
+  const std::string arr_str(array);
 
   proto::UnitTest ut;
-  EXPECT_TRUE(ParseFromArray(array, strlen(array), &ut));
+  EXPECT_TRUE(ParseFromArray(array, arr_str_len, &ut));
   EXPECT_EQ(ut.class_name(), "MessageTraits");
   EXPECT_EQ(ut.case_name(), "parse_from_string");
 
   Data data;
-  EXPECT_FALSE(ParseFromArray(array, strlen(array), &data));
+  EXPECT_FALSE(ParseFromArray(array, arr_str_len, &data));
 
   Message msg{"content"};
-  EXPECT_TRUE(ParseFromArray(array, strlen(array), &msg));
+  EXPECT_TRUE(ParseFromArray(array, arr_str_len, &msg));
   EXPECT_EQ(msg.content, arr_str);
 
   Intra intra;
-  EXPECT_FALSE(ParseFromArray(array, strlen(array), &intra));
+  EXPECT_FALSE(ParseFromArray(array, arr_str_len, &intra));
 
   RawMessage raw;
-  EXPECT_TRUE(ParseFromArray(array, strlen(array), &raw));
+  EXPECT_TRUE(ParseFromArray(array, arr_str_len, &raw));
   EXPECT_EQ(raw.message, arr_str);
 }
 
