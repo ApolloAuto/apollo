@@ -188,6 +188,12 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
       continue;
     }
 
+    if (adc_sl_boundary.end_s() + FLAGS_side_pass_min_front_obstacle_distance >
+        obstacle->PerceptionSLBoundary().start_s()) {
+      // front obstacle is too close to side pass
+      continue;
+    }
+
     // check driving_width
     constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line = reference_line_info.reference_line();
