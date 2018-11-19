@@ -122,12 +122,13 @@ bool BoundedQueue<T>::Enqueue(const T& element) {
     }
     if (unlikely(flags_[old_tail].flag.load(std::memory_order_acquire))) {
       // pool_[old_tail] has not been read yet
-      continue;
+      return false;
     }
   } while (!tail_.compare_exchange_weak(old_tail, new_tail,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
   while (unlikely(flags_[old_tail].flag.load(std::memory_order_acquire))) {
+    // pool_[old_tail] has not been read yet
     cpu_relax();
   }
   pool_[old_tail] = element;
@@ -147,12 +148,13 @@ bool BoundedQueue<T>::Dequeue(T* element) {
     }
     if (unlikely(!flags_[new_head].flag.load(std::memory_order_acquire))) {
       // pool_[old_tail] has not been written yet
-      continue;
+      return false;
     }
   } while (!head_.compare_exchange_weak(old_head, new_head,
                                         std::memory_order_acq_rel,
                                         std::memory_order_relaxed));
   while (unlikely(!flags_[new_head].flag.load(std::memory_order_acquire))) {
+    // pool_[old_tail] has not been written yet
     cpu_relax();
   }
   *element = pool_[new_head];
@@ -174,7 +176,7 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
       }
       if (unlikely(!flags_[new_head].flag.load(std::memory_order_acquire))) {
         // pool_[old_tail] has not been written yet
-        continue;
+        return false;
       }
     } while (!head_.compare_exchange_weak(old_head, new_head,
                                           std::memory_order_acq_rel,
@@ -185,6 +187,10 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
         return false;
       }
       continue;
+    }
+    while (unlikely(!flags_[new_head].flag.load(std::memory_order_acquire))) {
+      // pool_[old_tail] has not been written yet
+      cpu_relax();
     }
     *element = pool_[new_head];
     flags_[new_head].flag.store(false, std::memory_order_release);
