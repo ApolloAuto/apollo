@@ -41,6 +41,7 @@ constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
   const ReferenceLine& reference_line = reference_line_info.reference_line();
@@ -82,7 +83,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
 
   // If the nearest obstacle, provided it exists, is moving,
   // then quit the side_pass stage.
-  if (!nearest_obstacle) {
+  if (nearest_obstacle) {
     if (nearest_obstacle->speed() >
         GetContext()->scenario_config_.block_obstacle_min_speed()) {
       next_stage_ = ScenarioConfig::NO_STAGE;
