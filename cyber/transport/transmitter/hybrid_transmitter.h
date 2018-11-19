@@ -22,7 +22,6 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -31,6 +30,7 @@
 #include "cyber/common/types.h"
 #include "cyber/proto/role_attributes.pb.h"
 #include "cyber/proto/transport_conf.pb.h"
+#include "cyber/task/task.h"
 #include "cyber/transport/message/history.h"
 #include "cyber/transport/rtps/participant.h"
 #include "cyber/transport/transmitter/intra_transmitter.h"
@@ -80,7 +80,8 @@ class HybridTransmitter : public Transmitter<M> {
   void InitReceivers();
   void ClearReceivers();
   void TransmitHistoryMsg(const RoleAttributes& opposite_attr);
-  void ThreadFunc(const RoleAttributes& opposite_attr);
+  void ThreadFunc(const RoleAttributes& opposite_attr,
+                  const std::vector<typename History<M>::CachedMessage>& msgs);
   Relation GetRelation(const RoleAttributes& opposite_attr);
 
   HistoryPtr history_;
@@ -253,19 +254,21 @@ void HybridTransmitter<M>::TransmitHistoryMsg(
     return;
   }
 
-  auto trans_th =
-      std::thread(&HybridTransmitter<M>::ThreadFunc, this, opposite_attr);
-  trans_th.detach();
-}
-
-template <typename M>
-void HybridTransmitter<M>::ThreadFunc(const RoleAttributes& opposite_attr) {
   // get unsent messages
   std::vector<typename History<M>::CachedMessage> unsent_msgs;
   history_->GetCachedMessage(&unsent_msgs);
   if (unsent_msgs.empty()) {
     return;
   }
+
+  auto attr = opposite_attr;
+  cyber::Async(&HybridTransmitter<M>::ThreadFunc, this, attr, unsent_msgs);
+}
+
+template <typename M>
+void HybridTransmitter<M>::ThreadFunc(
+    const RoleAttributes& opposite_attr,
+    const std::vector<typename History<M>::CachedMessage>& msgs) {
   // create upper_reach to transmit msgs
   RoleAttributes new_attr;
   new_attr.CopyFrom(this->attr_);
@@ -278,8 +281,9 @@ void HybridTransmitter<M>::ThreadFunc(const RoleAttributes& opposite_attr) {
       std::make_shared<RtpsTransmitter<M>>(new_attr, participant_);
   new_upper_reach->Enable();
 
-  for (auto& item : unsent_msgs) {
+  for (auto& item : msgs) {
     new_upper_reach->Transmit(item.msg, item.msg_info);
+    cyber::USleep(1000);
   }
   new_upper_reach->Disable();
   ADEBUG << "trans threadfunc exit.";

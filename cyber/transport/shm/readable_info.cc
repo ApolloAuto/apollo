@@ -24,6 +24,8 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
+const size_t ReadableInfo::kSize = sizeof(uint64_t) * 2 + sizeof(uint32_t);
+
 ReadableInfo::ReadableInfo() : host_id_(0), block_index_(0), channel_id_(0) {}
 
 ReadableInfo::ReadableInfo(uint64_t host_id, uint32_t block_index,
@@ -44,17 +46,22 @@ bool ReadableInfo::SerializeTo(std::string* dst) const {
 }
 
 bool ReadableInfo::DeserializeFrom(const std::string& src) {
-  if (src.size() != READABLE_INFO_SIZE) {
-    AWARN << "src size[" << src.size() << "] mismatch.";
+  return DeserializeFrom(src.data(), src.size());
+}
+
+bool ReadableInfo::DeserializeFrom(const char* src, std::size_t len) {
+  RETURN_VAL_IF_NULL(src, false);
+  if (len != kSize) {
+    AWARN << "src size[" << len << "] mismatch.";
     return false;
   }
 
-  char* ptr = const_cast<char*>(src.data());
-  memcpy(reinterpret_cast<char*>(&host_id_), ptr, 8);
-  ptr += 8;
-  memcpy(reinterpret_cast<char*>(&block_index_), ptr, 4);
-  ptr += 4;
-  memcpy(reinterpret_cast<char*>(&channel_id_), ptr, 8);
+  char* ptr = const_cast<char*>(src);
+  memcpy(reinterpret_cast<char*>(&host_id_), ptr, sizeof(host_id_));
+  ptr += sizeof(host_id_);
+  memcpy(reinterpret_cast<char*>(&block_index_), ptr, sizeof(block_index_));
+  ptr += sizeof(block_index_);
+  memcpy(reinterpret_cast<char*>(&channel_id_), ptr, sizeof(channel_id_));
 
   return true;
 }

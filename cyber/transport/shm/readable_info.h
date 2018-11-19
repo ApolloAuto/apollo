@@ -17,6 +17,7 @@
 #ifndef CYBER_TRANSPORT_SHM_READABLE_INFO_H_
 #define CYBER_TRANSPORT_SHM_READABLE_INFO_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -36,6 +37,7 @@ class ReadableInfo {
 
   bool SerializeTo(std::string* dst) const;
   bool DeserializeFrom(const std::string& src);
+  bool DeserializeFrom(const char* src, std::size_t len);
 
   uint64_t host_id() const { return host_id_; }
   void set_host_id(uint64_t host_id) { host_id_ = host_id; }
@@ -46,12 +48,12 @@ class ReadableInfo {
   uint64_t channel_id() const { return channel_id_; }
   void set_channel_id(uint64_t channel_id) { channel_id_ = channel_id; }
 
+  static const size_t kSize;
+
  private:
   uint64_t host_id_;
   uint32_t block_index_;
   uint64_t channel_id_;
-
-  static const uint32_t READABLE_INFO_SIZE = 20;
 };
 
 }  // namespace transport

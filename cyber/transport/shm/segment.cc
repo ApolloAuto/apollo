@@ -39,9 +39,9 @@ Segment::Segment(uint64_t channel_id, const ReadWriteMode& mode)
 
 Segment::~Segment() { Destroy(); }
 
-bool Segment::Write(const std::string& msg, const std::string& msg_info,
-                    uint32_t* block_index) {
-  RETURN_VAL_IF_NULL(block_index, false);
+bool Segment::AcquireBlockToWrite(std::size_t msg_size,
+                                  WritableBlock* writable_block) {
+  RETURN_VAL_IF_NULL(writable_block, false);
   if (!init_ && !Init()) {
     AERROR << "init failed, can't write now.";
     return false;
@@ -52,8 +52,8 @@ bool Segment::Write(const std::string& msg, const std::string& msg_info,
     result = Remap();
   }
 
-  if (msg.size() > conf_.ceiling_msg_size()) {
-    conf_.Update(msg.size());
+  if (msg_size > conf_.ceiling_msg_size()) {
+    conf_.Update(msg_size);
     result = Recreate();
   }
 
@@ -62,24 +62,31 @@ bool Segment::Write(const std::string& msg, const std::string& msg_info,
     return false;
   }
 
-  uint32_t blk_idx = GetNextWritableBlockIndex();
-  blocks_[blk_idx].Write(block_buf_addrs_[blk_idx], msg, msg_info);
-  state_->IncreaseWroteNum();
-  blocks_[blk_idx].ReleaseWriteLock();
-  *block_index = blk_idx;
+  uint32_t index = GetNextWritableBlockIndex();
+  writable_block->index = index;
+  writable_block->block = &blocks_[index];
+  writable_block->buf = block_buf_addrs_[index];
   return true;
 }
 
-bool Segment::Read(uint32_t block_index, std::string* msg,
-                   std::string* msg_info) {
+void Segment::ReleaseWrittenBlock(const WritableBlock& writable_block) {
+  auto index = writable_block.index;
+  if (index >= conf_.block_num()) {
+    return;
+  }
+  blocks_[index].ReleaseWriteLock();
+}
+
+bool Segment::AcquireBlockToRead(ReadableBlock* readable_block) {
+  RETURN_VAL_IF_NULL(readable_block, false);
+
   if (!init_ && !Init()) {
     AERROR << "init failed, can't read now.";
     return false;
   }
-
-  if (block_index >= conf_.block_num() || msg == nullptr ||
-      msg_info == nullptr) {
-    AERROR << "invalid input param.";
+  auto index = readable_block->index;
+  if (index >= conf_.block_num()) {
+    AERROR << "invalid block_index[" << index << "].";
     return false;
   }
 
@@ -93,12 +100,20 @@ bool Segment::Read(uint32_t block_index, std::string* msg,
     return false;
   }
 
-  if (blocks_[block_index].TryLockForRead()) {
-    blocks_[block_index].Read(block_buf_addrs_[block_index], msg, msg_info);
-    blocks_[block_index].ReleaseReadLock();
-    return true;
+  if (!blocks_[index].TryLockForRead()) {
+    return false;
   }
-  return false;
+  readable_block->block = blocks_ + index;
+  readable_block->buf = block_buf_addrs_[index];
+  return true;
+}
+
+void Segment::ReleaseReadBlock(const ReadableBlock& readable_block) {
+  auto index = readable_block.index;
+  if (index >= conf_.block_num()) {
+    return;
+  }
+  blocks_[index].ReleaseReadLock();
 }
 
 bool Segment::Init() {
@@ -254,8 +269,28 @@ bool Segment::OpenOnly() {
     uint8_t* addr = reinterpret_cast<uint8_t*>(
         static_cast<char*>(managed_shm_) + sizeof(State) +
         conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size());
+
+    if (addr == nullptr) {
+      break;
+    }
+
     std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_[i] = addr;
+  }
+
+  if (i != conf_.block_num()) {
+    AERROR << "open only failed.";
+    state_->~State();
+    state_ = nullptr;
+    blocks_ = nullptr;
+    {
+      std::lock_guard<std::mutex> _g(block_buf_lock_);
+      block_buf_addrs_.clear();
+    }
+    shmdt(managed_shm_);
+    managed_shm_ = nullptr;
+    shmctl(shmid, IPC_RMID, 0);
+    return false;
   }
 
   state_->IncreaseReferenceCounts();
@@ -334,6 +369,7 @@ uint32_t Segment::GetNextWritableBlockIndex() {
     }
 
     if (blocks_[try_idx].TryLockForWrite()) {
+      state_->IncreaseWroteNum();
       return try_idx;
     }
 

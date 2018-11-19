@@ -17,6 +17,7 @@
 #ifndef CYBER_TRANSPORT_MESSAGE_MESSAGE_INFO_H_
 #define CYBER_TRANSPORT_MESSAGE_MESSAGE_INFO_H_
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -39,7 +40,9 @@ class MessageInfo {
   bool operator==(const MessageInfo& another) const;
 
   bool SerializeTo(std::string* dst) const;
+  bool SerializeTo(char* dst, std::size_t len) const;
   bool DeserializeFrom(const std::string& src);
+  bool DeserializeFrom(const char* src, std::size_t len);
 
   // getter and setter
   const Identity& sender_id() const { return sender_id_; }
@@ -50,6 +53,8 @@ class MessageInfo {
 
   const Identity& spare_id() const { return spare_id_; }
   void set_spare_id(const Identity& spare_id) { spare_id_ = spare_id; }
+
+  static const std::size_t kSize;
 
  private:
   Identity sender_id_;

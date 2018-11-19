@@ -21,7 +21,6 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <thread>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -31,8 +30,8 @@
 #include "cyber/common/types.h"
 #include "cyber/proto/role_attributes.pb.h"
 #include "cyber/service_discovery/role/role.h"
+#include "cyber/task/task.h"
 #include "cyber/time/time.h"
-#include "cyber/timer/timer_manager.h"
 #include "cyber/transport/receiver/intra_receiver.h"
 #include "cyber/transport/receiver/rtps_receiver.h"
 #include "cyber/transport/receiver/shm_receiver.h"
@@ -248,9 +247,8 @@ void HybridReceiver<M>::ReceiveHistoryMsg(const RoleAttributes& opposite_attr) {
     return;
   }
 
-  auto recv_th =
-      std::thread(&HybridReceiver<M>::ThreadFunc, this, opposite_attr);
-  recv_th.detach();
+  auto attr = opposite_attr;
+  cyber::Async(&HybridReceiver<M>::ThreadFunc, this, attr);
 }
 
 template <typename M>
@@ -262,20 +260,20 @@ void HybridReceiver<M>::ThreadFunc(const RoleAttributes& opposite_attr) {
   attr.set_channel_name(channel_name);
   attr.set_channel_id(channel_id);
   attr.mutable_qos_profile()->CopyFrom(opposite_attr.qos_profile());
-  bool no_more_msg = false;
-  auto task = [&no_more_msg]() { no_more_msg = true; };
-  uint64_t timer_id = TimerManager::Instance()->Add(1000, task, true);
+  volatile bool is_msg_arrived = false;
   auto listener = [&](const std::shared_ptr<M>& msg,
                       const MessageInfo& msg_info, const RoleAttributes& attr) {
-    TimerManager::Instance()->Remove(timer_id);
+    is_msg_arrived = true;
     this->OnNewMessage(msg, msg_info);
-    timer_id = TimerManager::Instance()->Add(1000, task, true);
   };
   auto receiver = std::make_shared<RtpsReceiver<M>>(attr, listener);
   receiver->Enable();
-  while (!no_more_msg) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-  }
+  do {
+    if (is_msg_arrived) {
+      is_msg_arrived = false;
+    }
+    cyber::USleep(1000000);
+  } while (is_msg_arrived);
   receiver->Disable();
   ADEBUG << "recv threadfunc exit.";
 }
