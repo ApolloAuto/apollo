@@ -78,6 +78,7 @@ class HDMap {
   OverlapInfoConstPtr GetOverlapById(const Id& id) const;
   RoadInfoConstPtr GetRoadById(const Id& id) const;
   ParkingSpaceInfoConstPtr GetParkingSpaceById(const Id& id) const;
+  PNCJunctionInfoConstPtr GetPNCJunctionById(const Id& id) const;
 
   /**
    * @brief get all lanes in certain range
@@ -170,6 +171,15 @@ class HDMap {
   int GetParkingSpaces(
       const apollo::common::PointENU& point, double distance,
       std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const;
+  /**
+   * @brief get all pnc junctions in certain range
+   * @param point the central point of the range
+   * @param distance the search radius
+   * @param junctions store all junctions in target range
+   * @return 0:success, otherwise failed
+   */
+  int GetPNCJunctions(const apollo::common::PointENU& point, double distance,
+                   std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const;
   /**
    * @brief get nearest lane from target point,
    * @param point the target point

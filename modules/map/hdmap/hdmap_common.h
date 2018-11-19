@@ -37,6 +37,7 @@ limitations under the License.
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
+#include "modules/map/proto/map_pnc_junction.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -82,6 +83,7 @@ class ClearAreaInfo;
 class SpeedBumpInfo;
 class RoadInfo;
 class ParkingSpaceInfo;
+class PNCJunctionInfo;
 class HDMapImpl;
 
 struct LineBoundary {
@@ -131,6 +133,7 @@ using ParkingSpaceInfoConstPtr = std::shared_ptr<const ParkingSpaceInfo>;
 using RoadROIBoundaryPtr = std::shared_ptr<RoadROIBoundary>;
 using PolygonRoiPtr = std::shared_ptr<PolygonRoi>;
 using RoadRoiPtr = std::shared_ptr<RoadRoi>;
+using PNCJunctionInfoConstPtr = std::shared_ptr<const PNCJunctionInfo>;
 
 class LaneInfo {
  public:
@@ -178,6 +181,9 @@ class LaneInfo {
   }
   const std::vector<OverlapInfoConstPtr> &parking_spaces() const {
     return parking_spaces_;
+  }
+  const std::vector<OverlapInfoConstPtr> &pnc_junctions() const {
+    return pnc_junctions_;
   }
   double total_length() const { return total_length_; }
   using SampledWidth = std::pair<double, double>;
@@ -244,6 +250,7 @@ class LaneInfo {
   std::vector<OverlapInfoConstPtr> clear_areas_;
   std::vector<OverlapInfoConstPtr> speed_bumps_;
   std::vector<OverlapInfoConstPtr> parking_spaces_;
+  std::vector<OverlapInfoConstPtr> pnc_junctions_;
   double total_length_ = 0.0;
   std::vector<SampledWidth> sampled_left_width_;
   std::vector<SampledWidth> sampled_right_width_;
@@ -475,6 +482,28 @@ using ParkingSpacePolygonBox =
     ObjectWithAABox<ParkingSpaceInfo, apollo::common::math::Polygon2d>;
 using ParkingSpacePolygonKDTree =
     apollo::common::math::AABoxKDTree2d<ParkingSpacePolygonBox>;
+
+class PNCJunctionInfo {
+ public:
+  explicit PNCJunctionInfo(const PNCJunction &pnc_junction);
+
+  const Id &id() const { return junction_.id(); }
+  const PNCJunction &pnc_junction() const { return junction_; }
+  const apollo::common::math::Polygon2d &polygon() const { return polygon_; }
+
+ private:
+  void Init();
+
+ private:
+  const PNCJunction &junction_;
+  apollo::common::math::Polygon2d polygon_;
+
+  std::vector<Id> overlap_ids_;
+};
+using PNCJunctionPolygonBox =
+    ObjectWithAABox<PNCJunctionInfo, apollo::common::math::Polygon2d>;
+using PNCJunctionPolygonKDTree =
+    apollo::common::math::AABoxKDTree2d<PNCJunctionPolygonBox>;
 
 struct JunctionBoundary {
   JunctionInfoConstPtr junction_info;

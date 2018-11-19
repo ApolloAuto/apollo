@@ -129,6 +129,12 @@ int HDMap::GetParkingSpaces(
   return impl_.GetParkingSpaces(point, distance, parking_spaces);
 }
 
+int HDMap::GetPNCJunctions(const apollo::common::PointENU& point,
+              double distance,
+              std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
+  return impl_.GetPNCJunctions(point, distance, pnc_junctions);
+}
+
 int HDMap::GetNearestLane(const common::PointENU& point,
                           LaneInfoConstPtr* nearest_lane, double* nearest_s,
                           double* nearest_l) const {

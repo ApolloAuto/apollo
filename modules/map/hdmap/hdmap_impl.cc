@@ -97,6 +97,10 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
     parking_space_table_[parking_space.id().id()].reset(
         new ParkingSpaceInfo(parking_space));
   }
+  for (const auto& pnc_junction : map_.pnc_junction()) {
+    pnc_junction_table_[pnc_junction.id().id()].reset(
+        new PNCJunctionInfo(pnc_junction));
+  }
   for (const auto& overlap : map_.overlap()) {
     overlap_table_[overlap.id().id()].reset(new OverlapInfo(overlap));
   }
@@ -137,6 +141,7 @@ int HDMapImpl::LoadMapFromProto(const Map& map_proto) {
   BuildClearAreaPolygonKDTree();
   BuildSpeedBumpSegmentKDTree();
   BuildParkingSpacePolygonKDTree();
+  BuildPNCJunctionPolygonKDTree();
   return 0;
 }
 
@@ -193,6 +198,11 @@ RoadInfoConstPtr HDMapImpl::GetRoadById(const Id& id) const {
 ParkingSpaceInfoConstPtr HDMapImpl::GetParkingSpaceById(const Id& id) const {
   ParkingSpaceTable::const_iterator it = parking_space_table_.find(id.id());
   return it != parking_space_table_.end() ? it->second : nullptr;
+}
+
+PNCJunctionInfoConstPtr HDMapImpl::GetPNCJunctionById(const Id& id) const {
+  PNCJunctionTable::const_iterator it = pnc_junction_table_.find(id.id());
+  return it != pnc_junction_table_.end() ? it->second : nullptr;
 }
 
 int HDMapImpl::GetLanes(const PointENU& point, double distance,
@@ -444,6 +454,12 @@ int HDMapImpl::GetParkingSpaces(
     parking_spaces->emplace_back(GetParkingSpaceById(CreateHDMapId(id)));
   }
 
+  return 0;
+}
+
+int HDMapImpl::GetPNCJunctions(const apollo::common::PointENU& point,
+                  double distance,
+                  std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
   return 0;
 }
 
@@ -1235,6 +1251,15 @@ void HDMapImpl::BuildParkingSpacePolygonKDTree() {
   BuildPolygonKDTree(parking_space_table_, params,
                      &parking_space_polygon_boxes_,
                      &parking_space_polygon_kdtree_);
+}
+
+void HDMapImpl::BuildPNCJunctionPolygonKDTree() {
+  AABoxKDTreeParams params;
+  params.max_leaf_dimension = 5.0;  // meters.
+  params.max_leaf_size = 1;
+  BuildPolygonKDTree(pnc_junction_table_, params,
+                    &pnc_junction_polygon_boxes_,
+                    &pnc_junction_polygon_kdtree_);
 }
 
 template <class KDTree>
