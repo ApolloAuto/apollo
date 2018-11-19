@@ -75,8 +75,8 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
 
   // Get the nearest obstacle
   const Obstacle* nearest_obstacle = nullptr;
-  if (!GetTheSOfNearestObstacle(reference_line, path_decision.obstacles(),
-      nearest_obstacle)) {
+  if (!GetTheNearestObstacle(reference_line, path_decision.obstacles(),
+      &nearest_obstacle)) {
     AERROR << "Failed while running the function to get nearest obstacle.";
     return Stage::ERROR;
   }
@@ -222,10 +222,10 @@ bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
   return true;
 }
 
-bool SidePassStopOnWaitPoint::GetTheSOfNearestObstacle(
+bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
     const ReferenceLine& reference_line,
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
-    const Obstacle*& nearest_obstacle) {
+    const Obstacle** nearest_obstacle) {
 
   // Get the first path point. This can be used later to
   // filter out other obstaces that are behind ADC.
@@ -241,7 +241,7 @@ bool SidePassStopOnWaitPoint::GetTheSOfNearestObstacle(
 
   // Go through every obstacle.
   bool exist_nearest_obs = false;
-  nearest_obstacle = nullptr;
+  *nearest_obstacle = nullptr;
   double s_of_nearest_obs = 0.0;
   for (const auto* obstacle : indexed_obstacle_list.Items()) {
     if (obstacle->IsVirtual()) {
@@ -273,11 +273,11 @@ bool SidePassStopOnWaitPoint::GetTheSOfNearestObstacle(
     if (obs_start_l < lane_left_width && -obs_end_l < lane_right_width) {
       if (!exist_nearest_obs) {
         exist_nearest_obs = true;
-        nearest_obstacle = obstacle;
+        *nearest_obstacle = obstacle;
         s_of_nearest_obs = obs_start_s;
       } else {
         if (obs_start_s < s_of_nearest_obs) {
-          nearest_obstacle = obstacle;
+          *nearest_obstacle = obstacle;
           s_of_nearest_obs = obs_start_s;
         }
       }
