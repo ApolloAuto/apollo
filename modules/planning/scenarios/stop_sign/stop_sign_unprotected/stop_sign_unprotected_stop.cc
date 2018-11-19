@@ -64,6 +64,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   if (wait_time >= scenario_config_.stop_duration() &&
       watch_vehicles.empty()) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
+    PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
+        GetContext()->stop_sign_id;
     return Stage::FINISHED;
   }
 
@@ -88,6 +90,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   if (wait_time > scenario_config_.wait_timeout() &&
       watch_vehicle_ids.size() <= 1) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
+    PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
+        GetContext()->stop_sign_id;
     return Stage::FINISHED;
   }
 

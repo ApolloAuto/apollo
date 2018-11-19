@@ -88,6 +88,11 @@ void DeciderRuleBasedStop::CheckStopSign(
     return;
   }
 
+  if (stop_sign_id ==
+      PlanningContext::GetScenarioInfo()->stop_done_overlap_id) {
+    return;
+  }
+
   const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_id;
   const double stop_line_s =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
@@ -116,6 +121,11 @@ void DeciderRuleBasedStop::CheckTrafficLight(
   const std::string traffic_light_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   if (traffic_light_id.empty()) {
+    return;
+  }
+
+  if (traffic_light_id ==
+      PlanningContext::GetScenarioInfo()->stop_done_overlap_id) {
     return;
   }
 
