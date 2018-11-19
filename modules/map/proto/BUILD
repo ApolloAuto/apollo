@@ -27,6 +27,7 @@ proto_library(
         "map_speed_control.proto",
         "map_stop_sign.proto",
         "map_yield_sign.proto",
+        "map_pnc_junction.proto",
     ],
     deps = [
         "//modules/common/proto:geometry_proto_lib",

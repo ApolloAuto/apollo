@@ -507,6 +507,9 @@ void LaneInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       if (map_instance.GetParkingSpaceById(object_map_id) != nullptr) {
         parking_spaces_.emplace_back(overlap_ptr);
       }
+      if (map_instance.GetPNCJunctionById(object_map_id) != nullptr) {
+        pnc_junctions_.emplace_back(overlap_ptr);
+      }
     }
   }
 }
@@ -697,6 +700,20 @@ ParkingSpaceInfo::ParkingSpaceInfo(const ParkingSpace &parking_space)
 void ParkingSpaceInfo::Init() {
   polygon_ = ConvertToPolygon2d(parking_space_.polygon());
   CHECK_GT(polygon_.num_points(), 2);
+}
+
+PNCJunctionInfo::PNCJunctionInfo(const PNCJunction &pnc_junction)
+  : junction_(pnc_junction) {
+  Init();
+}
+
+void PNCJunctionInfo::Init() {
+  polygon_ = ConvertToPolygon2d(junction_.polygon());
+  CHECK_GT(polygon_.num_points(), 2);
+
+  for (const auto &overlap_id : junction_.overlap_id()) {
+    overlap_ids_.emplace_back(overlap_id);
+  }
 }
 
 }  // namespace hdmap
