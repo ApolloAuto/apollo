@@ -35,6 +35,7 @@ namespace side_pass {
 struct SidePassContext {
   PathData path_data_;
   ScenarioSidePassConfig scenario_config_;
+  int pass_obstacle_stuck_cycle_num_;
 };
 
 class SidePassScenario : public Scenario {
