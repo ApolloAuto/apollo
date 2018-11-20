@@ -41,7 +41,6 @@ constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-
   ADEBUG << "Processing SidePassStopOnWaitPoint";
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
@@ -60,8 +59,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   const auto adc_frenet_frame_point_ =
       reference_line.GetFrenetPoint(frame->PlanningStartPoint().path_point());
 
-  if (!GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_.s(),
-                                                 adc_frenet_frame_point_.l())) {
+  if (!GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_)) {
     return Stage::ERROR;
   }
   if (GetContext()->path_data_.discretized_path().path_points().empty()) {
@@ -77,7 +75,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   // Get the nearest obstacle
   const Obstacle* nearest_obstacle = nullptr;
   if (!GetTheNearestObstacle(reference_line, path_decision.obstacles(),
-      &nearest_obstacle)) {
+                             &nearest_obstacle)) {
     AERROR << "Failed while running the function to get nearest obstacle.";
     return Stage::ERROR;
   }
@@ -88,7 +86,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     if (nearest_obstacle->speed() >
         GetContext()->scenario_config_.block_obstacle_min_speed()) {
       next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+      return Stage::FINISHED;
     }
   }
 
@@ -99,7 +97,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   PathPoint last_path_point;
   bool should_not_move_at_all = false;
   if (!GetMoveForwardLastPathPoint(reference_line, nearest_obstacle,
-      &last_path_point, &should_not_move_at_all)) {
+                                   &last_path_point, &should_not_move_at_all)) {
     ADEBUG << "Fail to get move forward last path point.";
     return Stage::ERROR;
   }
@@ -230,7 +228,6 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
     const ReferenceLine& reference_line,
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
     const Obstacle** nearest_obstacle) {
-
   // Get the first path point. This can be used later to
   // filter out other obstaces that are behind ADC.
   PathPoint first_path_point =
@@ -291,7 +288,6 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
   return true;
 }
 
-
 bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
     const ReferenceLine& reference_line, const Obstacle* nearest_obstacle,
     PathPoint* const last_path_point, bool* should_not_move_at_all) {
@@ -334,8 +330,7 @@ bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
         break;
       }
       // Check if this corner point is before the nearest obstacle:
-      if (exist_nearest_obs &&
-          curr_point_sl.s() > s_max) {
+      if (exist_nearest_obs && curr_point_sl.s() > s_max) {
         is_out_of_curr_lane = true;
         break;
       }
