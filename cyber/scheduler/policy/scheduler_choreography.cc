@@ -222,10 +222,13 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, crid,
                                             cr->processor_id());
 
-  // notify processor in choreo context
   if (cr->processor_id() != -1) {
+    // Notify processor in choreo context.
     auto pid = cr->processor_id();
     static_cast<ChoreographyContext*>(pctxs_[pid].get())->Notify();
+  } else {
+    // Notify processor in pool.
+    ClassicContext::Notify();
   }
 
   return true;

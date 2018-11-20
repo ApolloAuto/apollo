@@ -76,12 +76,14 @@ bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
 
 void ChoreographyContext::Notify() {
   if (!notified_.test_and_set(std::memory_order_acquire)) {
-    processor_->Notify();
+    cv_wq_.notify_one();
     return;
   }
 }
 
-void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
+void ChoreographyContext::Wait() {
+  std::unique_lock<std::mutex> lk(mtx_wq_);
+  cv_wq_.wait_for(lk, std::chrono::milliseconds(1));
 }
 
 }  // namespace scheduler

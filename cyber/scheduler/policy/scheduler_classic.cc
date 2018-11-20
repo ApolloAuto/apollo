@@ -116,6 +116,9 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
         if (cr->state() == RoutineState::DATA_WAIT) {
           cr->SetUpdateFlag();
         }
+
+        ClassicContext::Notify();
+
         return true;
     }
   }
