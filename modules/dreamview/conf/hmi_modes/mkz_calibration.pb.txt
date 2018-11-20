@@ -45,7 +45,7 @@ monitored_components {
 monitored_components {
   key: "GPS"
   value: {
-    process_monitor_config {
+    process {
       command_keywords: "mainboard"
       command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     }
