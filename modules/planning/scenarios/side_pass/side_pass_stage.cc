@@ -77,8 +77,8 @@ Stage::StageStatus SidePassBackup::Process(
     constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line =
         frame->reference_line_info().front().reference_line();
-    const double driving_width = reference_line.GetDrivingWidth(
-        obstacle->PerceptionSLBoundary());
+    const double driving_width =
+        reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
@@ -142,8 +142,8 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line =
         frame->reference_line_info().front().reference_line();
-    const double driving_width = reference_line.GetDrivingWidth(
-        obstacle->PerceptionSLBoundary());
+    const double driving_width =
+        reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
@@ -253,8 +253,8 @@ Stage::StageStatus SidePassDetectSafety::Process(
       reference_line_info.reference_line().GetFrenetPoint(
           frame->PlanningStartPoint().path_point());
 
-  bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
-      adc_frenet_frame_point_.s(), adc_frenet_frame_point_.l());
+  bool trim_success =
+      GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_);
   if (!trim_success) {
     AERROR << "Fail to trim path_data. adc_frenet_frame_point: "
            << adc_frenet_frame_point_.ShortDebugString();
@@ -314,8 +314,8 @@ Stage::StageStatus SidePassPassObstacle::Process(
       reference_line_info.reference_line().GetFrenetPoint(
           frame->PlanningStartPoint().path_point());
 
-  bool trim_success = GetContext()->path_data_.LeftTrimWithRefS(
-      adc_frenet_frame_point_.s(), adc_frenet_frame_point_.l());
+  bool trim_success =
+      GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_);
   if (!trim_success) {
     AERROR << "Fail to trim path_data. adc_frenet_frame_point: "
            << adc_frenet_frame_point_.ShortDebugString();
