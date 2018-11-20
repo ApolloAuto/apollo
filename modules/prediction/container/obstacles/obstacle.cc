@@ -491,12 +491,24 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
   if (perception_obstacle.has_velocity()) {
     if (perception_obstacle.velocity().has_x()) {
       velocity_x = perception_obstacle.velocity().x();
+      if (std::isnan(velocity_x)) {
+        AERROR << "found nan velocity x from perception obstacle";
+        velocity_x = 0.0;
+      }
     }
     if (perception_obstacle.velocity().has_y()) {
       velocity_y = perception_obstacle.velocity().y();
+      if (std::isnan(velocity_y)) {
+        AERROR << "found nan velocity y from perception obstacle";
+        velocity_y = 0.0;
+      }
     }
     if (perception_obstacle.velocity().has_z()) {
       velocity_z = perception_obstacle.velocity().z();
+      if (std::isnan(velocity_z)) {
+        AERROR << "found nan velocity z from perception obstacle";
+        velocity_z = 0.0;
+      }
     }
   }
 
