@@ -105,8 +105,6 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(n == num_of_variables_)
-      << "No. of variables wrong in get_starting_point. n : " << n;
   CHECK(init_x == true) << "Warm start init_x setting failed";
   CHECK(init_z == false) << "Warm start init_z setting failed";
   CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
@@ -147,14 +145,6 @@ bool DualVariableWarmStartIPOPTInterface::get_bounds_info(int n, double* x_l,
                                                           double* x_u, int m,
                                                           double* g_l,
                                                           double* g_u) {
-  // here, the n and m we gave IPOPT in get_nlp_info are passed back to us.
-  // If desired, we could assert to make sure they are what we think they are.
-  CHECK(n == num_of_variables_) << "num_of_variables_ mismatch, n: " << n
-                                << ", num_of_variables_: " << num_of_variables_;
-  CHECK(m == num_of_constraints_)
-      << "num_of_constraints_ mismatch, m: " << m
-      << ", num_of_constraints_: " << num_of_constraints_;
-
   int variable_index = 0;
   // 1. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
   // horizon_]
@@ -290,10 +280,6 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
   // }
   // return true;
   ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_)
-      << "No. of variables wrong in eval_jac_g. n : " << n;
-  CHECK_EQ(m, num_of_constraints_)
-      << "No. of constraints wrong in eval_jac_g. n : " << m;
 
   if (values == nullptr) {
     int nz_index = 0;
@@ -626,10 +612,6 @@ template <class T>
 bool DualVariableWarmStartIPOPTInterface::eval_constraints(int n, const T* x,
                                                            int m, T* g) {
   ADEBUG << "eval_constraints";
-  CHECK_EQ(n, num_of_variables_)
-      << "No. of variables wrong in eval_jac_g. n : " << n;
-  CHECK_EQ(m, num_of_constraints_)
-      << "No. of constraints wrong in eval_jac_g. n : " << m;
   // state start index
 
   // 1. Three obstacles related equal constraints, one equality constraints,

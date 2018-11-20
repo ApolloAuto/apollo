@@ -119,7 +119,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
   double x[520];
   std::fill_n(x, n, 1.2);
   bool res = ptop_->eval_f(n, x, true, obj_value);
-  EXPECT_DOUBLE_EQ(obj_value, 2013.0334574069707);
+  EXPECT_DOUBLE_EQ(obj_value, 2013.3729758069705);
   EXPECT_TRUE(res);
 }
 
