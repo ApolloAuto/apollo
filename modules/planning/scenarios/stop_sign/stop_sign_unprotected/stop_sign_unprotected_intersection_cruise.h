@@ -36,8 +36,24 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-DECLARE_STAGE(StopSignUnprotectedIntersectionCruise,
-              StopSignUnprotectedContext);
+class StopSignUnprotectedIntersectionCruise : public Stage {
+ public:
+  explicit StopSignUnprotectedIntersectionCruise(
+      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+
+ private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
+  StopSignUnprotectedContext* GetContext() {
+    return GetContextAs<StopSignUnprotectedContext>();
+  }
+
+  bool CheckPassIntersection(Frame* frame);
+
+ private:
+  ScenarioStopSignUnprotectedConfig scenario_config_;
+};
 
 }  // namespace stop_sign
 }  // namespace scenario

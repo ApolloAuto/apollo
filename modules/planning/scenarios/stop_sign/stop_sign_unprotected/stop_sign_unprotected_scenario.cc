@@ -131,11 +131,11 @@ bool StopSignUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario,
     const common::TrajectoryPoint& ego_point,
     const Frame& frame) {
-  const std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (stop_sign_overlap_id.empty()) {
-    return false;
-  }
+  // const std::string stop_sign_overlap_id =
+  //     PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  // if (stop_sign_overlap_id.empty()) {
+  //   return false;
+  // }
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -149,23 +149,28 @@ bool StopSignUnprotectedScenario::IsTransferable(
       static_cast<uint32_t>(ceil(
           adc_distance_to_stop_sign / adc_speed)) : 0;
   ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
+      << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s
       << "] adc_speed[" << adc_speed
       << "] time_distance[" << time_distance << "]";
+  ADEBUG << "IsTransferable: current: " << current_scenario.Name()
+      << "; status: " << current_scenario.GetStatus();
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return (adc_distance_to_stop_sign <=
-          config_.stop_sign_unprotected_config().
-              start_stop_sign_scenario_distance() ||
-          time_distance <= config_.stop_sign_unprotected_config().
-              start_stop_sign_scenario_timer());
+      return (adc_distance_to_stop_sign > 0 &&
+          (adc_distance_to_stop_sign <=
+              config_.stop_sign_unprotected_config().
+                  start_stop_sign_scenario_distance() ||
+           time_distance <= config_.stop_sign_unprotected_config().
+              start_stop_sign_scenario_timer()));
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      return true;
+      return (current_scenario.GetStatus() !=
+              Scenario::ScenarioStatus::STATUS_DONE);
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
