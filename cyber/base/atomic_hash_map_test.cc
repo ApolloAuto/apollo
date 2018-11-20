@@ -62,9 +62,48 @@ TEST(AtomicHashMapTest, int_str) {
     EXPECT_FALSE(map.Get(i, &value));
     EXPECT_FALSE(map.Remove(i));
   }
+  map.Set(100);
+  EXPECT_TRUE(map.Get(100, &value));
+  EXPECT_TRUE(value.empty());
+  map.Set(100, std::move(std::string("test")));
+  EXPECT_TRUE(map.Get(100, &value));
+  EXPECT_EQ("test", value);
 }
 
-TEST(AtomicHashMapTest, concurrency) {}
+TEST(AtomicHashMapTest, concurrency) {
+  AtomicHashMap<int, std::string, 1024> map;
+  int thread_num = 32;
+  std::thread t[thread_num];
+  volatile bool ready = false;
+
+  for (int i = 0; i < thread_num; i++) {
+    t[i] = std::thread([&, i]() {
+      while (!ready) {
+        asm volatile("rep; nop" ::: "memory");
+      }
+      for (int j = 0; j < thread_num * 1024; j++) {
+        auto j_str = std::to_string(j);
+        map.Remove(j);
+        map.Set(j);
+        map.Set(j, j_str);
+        map.Set(j, std::move(std::to_string(j)));
+      }
+    });
+  }
+  ready = true;
+  for (int i = 0; i < thread_num; i++) {
+    t[i].join();
+  }
+
+  std::string value("");
+  for (int i = 1; i < thread_num * 1000; i++) {
+    EXPECT_TRUE(map.Get(i, &value));
+    EXPECT_EQ(std::to_string(i), value);
+  }
+  std::string* str;
+  EXPECT_TRUE(map.Get(0, &str));
+  EXPECT_EQ("0", *str);
+}
 
 }  // namespace base
 }  // namespace cyber
