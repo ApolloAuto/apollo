@@ -570,6 +570,8 @@ void Path::InitOverlaps() {
   GetAllOverlaps(std::bind(&LaneInfo::stop_signs, _1), &stop_sign_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::crosswalks, _1), &crosswalk_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::junctions, _1), &junction_overlaps_);
+  GetAllOverlaps(std::bind(&LaneInfo::pnc_junctions, _1),
+                 &pnc_junction_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::clear_areas, _1), &clear_area_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::speed_bumps, _1), &speed_bump_overlaps_);
   GetAllOverlaps(std::bind(&LaneInfo::parking_spaces, _1),
