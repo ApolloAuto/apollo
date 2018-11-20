@@ -7,7 +7,8 @@ class PlanningScenarioItem extends React.Component {
         const { scenario } = this.props;
 
         const type = scenario.scenarioType;
-        const stage = scenario.stageType.replace(type + '_', '');
+        const stage = scenario.stageType ? scenario.stageType.replace(type + '_', '') : '-';
+
         return (
             <tr className="scenario-history-item">
                 <td className="text time">{timestampMsToTimeString(scenario.time, true)}</td>
