@@ -93,13 +93,11 @@ class AtomicHashMap {
     }
     ~Entry() { delete value_ptr.load(); }
 
-    bool Release() {
+    void Release() {
       if (ref_count.fetch_sub(1) == 1) {
         delete value_ptr.load();
         delete this;
-        return true;
       }
-      return false;
     }
 
     K key = 0;
@@ -153,7 +151,8 @@ class AtomicHashMap {
       Entry *prev = head_;
       Entry *m_target = head_->next.load();
       while (Entry *target = Unmark(m_target)) {
-        if (Marked(target->next.load())) {
+        auto next = target->next.load();
+        if (Marked(next) && Unmark(next)) {
           prev = head_;
           m_target = head_->next.load();
           continue;
@@ -182,56 +181,11 @@ class AtomicHashMap {
     void Insert(K key, const V &value) {
       Entry *prev = nullptr;
       Entry *target = nullptr;
-      Entry *new_entry = nullptr;
+      Entry *new_entry = new Entry(key, value);
+      V *new_value = new V(value);
       while (true) {
         if (Find(key, &prev, &target)) {
-          if (new_entry) {
-            delete new_entry;
-          }
           // key exists, update value
-          auto new_value = new V(value);
-          auto old_val_ptr = target->value_ptr.load();
-          // value_ptr will be set to nullptr befor remove, so check first
-          while (old_val_ptr) {
-            if (target->value_ptr.compare_exchange_strong(
-                    old_val_ptr, new_value, std::memory_order_acq_rel,
-                    std::memory_order_relaxed)) {
-              target->Release();
-              return;
-            }
-          }
-          delete new_value;
-          continue;
-        }
-
-        // avoid new when retry
-        if (new_entry == nullptr) {
-          new_entry = new Entry(key, value);
-        }
-
-        new_entry->next.store(target);
-        if (prev->next.compare_exchange_strong(target, new_entry)) {
-          // Insert success
-          if (target) {
-            target->Release();
-          }
-          return;
-        }
-        // another entry has been inserted, retry
-      }
-    }
-
-    void Insert(K key, V &&value) {
-      Entry *prev = nullptr;
-      Entry *target = nullptr;
-      Entry *new_entry = nullptr;
-      while (true) {
-        if (Find(key, &prev, &target)) {
-          if (new_entry) {
-            delete new_entry;
-          }
-          // key exists, update value
-          auto new_value = new V(std::forward<V>(value));
           auto old_val_ptr = target->value_ptr.load();
           // value_ptr will be set to nullptr befor remove, so check first
           while (old_val_ptr) {
@@ -239,64 +193,92 @@ class AtomicHashMap {
                     old_val_ptr, new_value, std::memory_order_acquire,
                     std::memory_order_relaxed)) {
               target->Release();
+              delete new_entry;
               return;
             }
           }
-          delete new_value;
           continue;
-        }
-        // avoid new when retry
-        if (new_entry == nullptr) {
-          new_entry = new Entry(key, std::forward<V>(value));
-        }
-        new_entry->next.store(target);
-        if (prev->next.compare_exchange_strong(target, new_entry)) {
-          // Insert success
-          if (target) {
-            target->Release();
+        } else {
+          new_entry->next.store(target);
+          if (prev->next.compare_exchange_strong(target, new_entry)) {
+            // Insert success
+            if (target) {
+              target->Release();
+            }
+            delete new_value;
+            return;
           }
-          return;
+          // another entry has been inserted, retry
         }
-        // another entry has been inserted, retry
+      }
+    }
+
+    void Insert(K key, V &&value) {
+      Entry *prev = nullptr;
+      Entry *target = nullptr;
+      Entry *new_entry = new Entry(key, value);
+      auto new_value = new V(std::forward<V>(value));
+      while (true) {
+        if (Find(key, &prev, &target)) {
+          // key exists, update value
+          auto old_val_ptr = target->value_ptr.load();
+          // value_ptr will be set to nullptr befor remove, so check first
+          while (old_val_ptr) {
+            if (target->value_ptr.compare_exchange_strong(
+                    old_val_ptr, new_value, std::memory_order_acquire,
+                    std::memory_order_relaxed)) {
+              target->Release();
+              delete new_entry;
+              return;
+            }
+          }
+          continue;
+        } else {
+          new_entry->next.store(target);
+          if (prev->next.compare_exchange_strong(target, new_entry)) {
+            // Insert success
+            if (target) {
+              target->Release();
+            }
+            delete new_value;
+            return;
+          }
+          // another entry has been inserted, retry
+        }
       }
     }
 
     void Insert(K key) {
       Entry *prev = nullptr;
       Entry *target = nullptr;
-      Entry *new_entry = nullptr;
+      Entry *new_entry = new Entry(key);
+      auto new_value = new V();
       while (true) {
         if (Find(key, &prev, &target)) {
-          if (new_entry) {
-            delete new_entry;
-          }
           // key exists, update value
-          auto new_value = new V();
           auto old_val_ptr = target->value_ptr.load();
           // value_ptr will be set to nullptr befor remove, so check first
           while (old_val_ptr) {
             if (target->value_ptr.compare_exchange_strong(old_val_ptr,
                                                           new_value)) {
               target->Release();
+              delete new_entry;
               return;
             }
           }
-          delete new_value;
           continue;
-        }
-        // avoid new when retry
-        if (new_entry == nullptr) {
-          new_entry = new Entry(key);
-        }
-        new_entry->next.store(target);
-        if (prev->next.compare_exchange_strong(target, new_entry)) {
-          // Insert success
-          if (target) {
-            target->Release();
+        } else {
+          new_entry->next.store(target);
+          if (prev->next.compare_exchange_strong(target, new_entry)) {
+            // Insert success
+            if (target) {
+              target->Release();
+            }
+            delete new_value;
+            return;
           }
-          return;
+          // another entry has been inserted, retry
         }
-        // another entry has been inserted, retry
       }
     }
 
@@ -318,13 +300,12 @@ class AtomicHashMap {
         }
         target->value_ptr.store(nullptr);
 
-        if (prev->next.compare_exchange_strong(target, Unmark(target->next))) {
-          // Release twice here.
+        if (prev->next.compare_exchange_strong(target,
+                                               Unmark(target->next.load()))) {
           target->Release();
-          return target->Release();
+          return true;
         }
       }
-      return false;
     }
 
     bool Get(K key, V **value) {
