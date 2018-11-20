@@ -43,13 +43,12 @@ class Processor;
 
 class ProcessorContext {
  public:
-  ProcessorContext() {}
-  virtual ~ProcessorContext() {}
+  virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
+  virtual void Wait() = 0;
   void ShutDown();
   void BindProc(const std::shared_ptr<Processor>& processor) {
     processor_ = processor;
   }
-  virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
 
  protected:
   alignas(CACHELINE_SIZE) std::shared_ptr<Processor> processor_ = nullptr;

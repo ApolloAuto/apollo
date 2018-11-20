@@ -38,11 +38,14 @@ using croutine::CRoutine;
 class ChoreographyContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
+  void Wait() override;
   bool Enqueue(const std::shared_ptr<CRoutine>);
   void Notify();
-  void RemoveCRoutine(uint64_t crid);
 
  private:
+  std::mutex mtx_wq_;
+  std::condition_variable cv_wq_;
+
   std::mutex mtx_cr_queue_;
   std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
       cr_queue_;

@@ -45,26 +45,18 @@ class Processor {
 
   void Run();
   void SetAffinity(const std::vector<int>&, const std::string&, int);
-  void Notify() { cv_.notify_one(); }
-  void Stop() {
-    running_.exchange(false);
-    Notify();
-  }
+  void Stop() { running_.exchange(false); }
   void BindContext(const std::shared_ptr<ProcessorContext>& context) {
     context_ = context;
   }
 
  private:
-  std::mutex mtx_rq_;
-  std::mutex mtx_pctx_;
-  std::condition_variable cv_;
-
   std::thread thread_;
-
   std::shared_ptr<ProcessorContext> context_;
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
-
   std::atomic<bool> running_{false};
+  std::mutex mtx_ctx_;
+  std::condition_variable cv_ctx_;
 };
 
 }  // namespace scheduler

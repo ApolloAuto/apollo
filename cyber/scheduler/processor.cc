@@ -65,6 +65,7 @@ void Processor::SetAffinity(const std::vector<int> &cpus,
 
 void Processor::Run() {
   CRoutine::SetMainContext(routine_context_);
+
   while (likely(running_)) {
     if (likely(context_ != nullptr)) {
       auto croutine = context_->NextRoutine();
@@ -72,12 +73,11 @@ void Processor::Run() {
         croutine->Resume();
         croutine->Release();
       } else {
-        std::unique_lock<std::mutex> ul(mtx_rq_);
-        cv_.wait_for(ul, std::chrono::milliseconds(1));
+        context_->Wait();
       }
     } else {
-      std::unique_lock<std::mutex> lk_rq(mtx_rq_);
-      cv_.wait(lk_rq, [this] { return !this->running_; });
+      std::unique_lock<std::mutex> lk(mtx_ctx_);
+      cv_ctx_.wait(lk, [this]{ return this->context_ != nullptr; });
     }
   }
 }

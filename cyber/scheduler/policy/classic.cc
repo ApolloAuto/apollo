@@ -28,6 +28,9 @@ using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
+std::mutex ClassicContext::mtx_wq_;
+std::condition_variable ClassicContext::cv_wq_;
+
 std::array<AtomicRWLock, MAX_PRIO> ClassicContext::rq_locks_;
 std::array<std::vector<std::shared_ptr<CRoutine>>, MAX_PRIO>
     ClassicContext::rq_;
@@ -53,6 +56,15 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   }
 
   return nullptr;
+}
+
+void ClassicContext::Wait() {
+  std::unique_lock<std::mutex> lk(mtx_wq_);
+  cv_wq_.wait_for(lk, std::chrono::milliseconds(1));
+}
+
+void ClassicContext::Notify() {
+  cv_wq_.notify_one();
 }
 
 }  // namespace scheduler

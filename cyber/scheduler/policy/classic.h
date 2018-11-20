@@ -35,6 +35,11 @@ using croutine::CRoutine;
 class ClassicContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
+  void Wait() override;
+  static void Notify();
+
+  alignas(CACHELINE_SIZE) static std::mutex mtx_wq_;
+  alignas(CACHELINE_SIZE) static std::condition_variable cv_wq_;
 
   alignas(CACHELINE_SIZE) static std::array<AtomicRWLock, MAX_PRIO> rq_locks_;
   alignas(CACHELINE_SIZE) static std::array<
