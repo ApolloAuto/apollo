@@ -129,7 +129,6 @@ bool PlanningComponent::Proc(
   }
 
   ADCTrajectory adc_trajectory_pb;
-  AINFO << "Call RunOnce in Planning";
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
   planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
