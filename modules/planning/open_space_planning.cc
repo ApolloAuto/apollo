@@ -122,6 +122,9 @@ Status OpenSpacePlanning::Init(const PlanningConfig& config) {
   }
 
   start_time_ = Clock::NowInSeconds();
+
+  AINFO << "Open Space Planner Init Done";
+
   return planner_->Init(config_);
 }
 
@@ -144,6 +147,8 @@ Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
     AERROR << "failed to init frame:" << status.ToString();
     return status;
   }
+
+  AINFO << "Open Space Planner Init Frame Done";
 
   return Status::OK();
 }
@@ -205,10 +210,6 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
   const uint32_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
                      vehicle_state, trajectory_pb);
-
-  if (FLAGS_enable_record_debug) {
-    frame_->RecordInputDebug(trajectory_pb->mutable_debug());
-  }
 
   trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
@@ -272,6 +273,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
   frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+
   const uint32_t n = frame_->SequenceNum();
   FrameHistory::Instance()->Add(n, std::move(frame_));
 }
@@ -280,36 +282,46 @@ Status OpenSpacePlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* const trajectory_pb) {
+  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+  // TODO(QiL): update last_publishable_trajectory_ for stitching
+  trajectory_pb->CopyFrom(frame_->trajectory());
+
   auto* ptr_debug = trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
         stitching_trajectory.back());
+    ADEBUG << "Open space init point added!";
   }
 
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
-
-  if (status.ok() && FLAGS_enable_record_debug &&
-      FLAGS_open_space_planner_switchable) {
-    frame_.get()->RecordOpenSpacePlannerDebug(ptr_debug);
+  if (status.ok() && FLAGS_enable_record_debug) {
+    ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
+        frame_->open_space_debug());
+    ADEBUG << "Open space debug information added!";
   }
 
-  // TODO(QiL): update last_publishable_trajectory_ for stitching
-  trajectory_pb->CopyFrom(frame_->trajectory());
+  if (FLAGS_export_chart) {
+    ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
+    ADEBUG << "Open Space Planning debug from frame is : "
+           << frame_->open_space_debug().ShortDebugString();
+    ADEBUG << "Open Space Planning export chart with : "
+           << trajectory_pb->ShortDebugString();
+  }
 
   return status;
 }
 
-void AddTrajectory(const OpenSpaceDebug& open_space, Chart* chart) {
+void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
+                            Chart* chart) {
   chart->set_title("Open Space Trajectory Visualization");
   auto* options = chart->mutable_options();
-  options->mutable_x()->set_min(open_space.xy_boundary(0));
-  options->mutable_x()->set_max(open_space.xy_boundary(1));
+  options->mutable_x()->set_min(open_space_debug.xy_boundary(0));
+  options->mutable_x()->set_max(open_space_debug.xy_boundary(1));
   options->mutable_x()->set_label_string("x (meter)");
-  options->mutable_y()->set_min(open_space.xy_boundary(2));
-  options->mutable_y()->set_max(open_space.xy_boundary(3));
+  options->mutable_y()->set_min(open_space_debug.xy_boundary(2));
+  options->mutable_y()->set_max(open_space_debug.xy_boundary(3));
   options->mutable_y()->set_label_string("y (meter)");
 
-  for (const auto& obstacle : open_space.obstacles()) {
+  for (const auto& obstacle : open_space_debug.obstacles()) {
     auto* polygon = chart->add_polygon();
     polygon->set_label(obstacle.id());
     for (int vertice_index = 0;
@@ -320,7 +332,7 @@ void AddTrajectory(const OpenSpaceDebug& open_space, Chart* chart) {
     }
   }
 
-  for (const auto& trajectory : open_space.trajectories().trajectory()) {
+  for (const auto& trajectory : open_space_debug.trajectories().trajectory()) {
     auto* line = chart->add_line();
     line->set_label(trajectory.name());
     for (const auto& point : trajectory.trajectory_point()) {
@@ -338,12 +350,13 @@ void AddTrajectory(const OpenSpaceDebug& open_space, Chart* chart) {
   }
 }
 
-void OpenSpacePlanning::ExportChart(const planning_internal::Debug& debug_info,
-                                    planning_internal::Debug* debug_chart) {
+void OpenSpacePlanning::ExportOpenSpaceChart(
+    const planning_internal::OpenSpaceDebug& debug_info,
+    planning_internal::Debug* debug_chart) {
   // Export Trajectory Visualization Chart.
-  if (FLAGS_open_space_planner_switchable && FLAGS_enable_record_debug) {
-    AddTrajectory(debug_info.planning_data().open_space(),
-                  debug_chart->mutable_planning_data()->add_chart());
+  if (FLAGS_enable_record_debug) {
+    AddOpenSpaceTrajectory(debug_info,
+                           debug_chart->mutable_planning_data()->add_chart());
   }
 }
 
