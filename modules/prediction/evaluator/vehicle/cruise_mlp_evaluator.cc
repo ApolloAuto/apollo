@@ -143,7 +143,7 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
                                  INTERACTION_FEATURE_SIZE +
                                  LANE_FEATURE_SIZE) {
       lane_sequence_ptr->set_probability(0.0);
-      AWARN << "Skip lane sequence due to incorrect feature size";
+      ADEBUG << "Skip lane sequence due to incorrect feature size";
       continue;
     }
     Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
