@@ -348,7 +348,7 @@ bool Spline2dConstraint::AddSmoothConstraint() {
 // guarantee upto derivative are joint
 bool Spline2dConstraint::AddDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
-    return false;
+    return true;
   }
   Eigen::MatrixXd affine_equality =
       Eigen::MatrixXd::Zero(4 * (t_knots_.size() - 2), total_param_);
@@ -379,7 +379,7 @@ bool Spline2dConstraint::AddDerivativeSmoothConstraint() {
 // guarantee upto second order derivative are joint
 bool Spline2dConstraint::AddSecondDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
-    return false;
+    return true;
   }
   Eigen::MatrixXd affine_equality =
       Eigen::MatrixXd::Zero(6 * (t_knots_.size() - 2), total_param_);
