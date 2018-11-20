@@ -493,11 +493,6 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   */
 }
 
-void Frame::RecordOpenSpacePlannerDebug(planning_internal::Debug *debug) {
-  auto *planning_debug_data = debug->mutable_planning_data();
-  planning_debug_data->mutable_open_space()->CopyFrom(*open_space_debug_);
-}
-
 void Frame::AlignPredictionTime(const double planning_start_time,
                                 PredictionObstacles *prediction_obstacles) {
   if (!prediction_obstacles || !prediction_obstacles->has_header() ||

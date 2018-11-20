@@ -133,8 +133,11 @@ class Frame {
 
   ADCTrajectory *output_trajectory() { return output_trajectory_; }
 
-  std::shared_ptr<planning_internal::OpenSpaceDebug>
-  mutable_open_space_debug() {
+  planning_internal::OpenSpaceDebug *mutable_open_space_debug() {
+    return &open_space_debug_;
+  }
+
+  const planning_internal::OpenSpaceDebug &open_space_debug() {
     return open_space_debug_;
   }
 
@@ -194,13 +197,12 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
+  // debug info for open space planner
+  planning_internal::OpenSpaceDebug open_space_debug_;
 
   // TODO(all): change to use shared_ptr.
   // output trajectory pb
   ADCTrajectory *output_trajectory_ = nullptr;  // not owned
-
-  // debug info for open space planner
-  std::shared_ptr<planning_internal::OpenSpaceDebug> open_space_debug_;
 
   // TODO(All): add lag_predictor back
   // std::unique_ptr<LagPrediction> lag_predictor_;
