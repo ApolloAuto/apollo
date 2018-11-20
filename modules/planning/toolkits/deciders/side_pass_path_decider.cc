@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <string>
 #include <utility>
+#include <unordered_map>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -244,6 +245,7 @@ SidePassPathDecider::GetPathBoundaries(
   std::vector<std::tuple<double, double, double>> lateral_bounds;
 
   constexpr double kLargeBoundary = 10.0;
+  std::unordered_map<std::string, SidePassDirection> obs_id_to_side_pass_dir;
   for (double curr_s = adc_frenet_frame_point_.s();
        curr_s < std::min(adc_frenet_frame_point_.s() + kSidePassPathLength,
                          reference_line.Length());
@@ -299,7 +301,7 @@ SidePassPathDecider::GetPathBoundaries(
       }
 
       ADEBUG << "Obstacles that are considered is at: "
-            << "curr_s = " << curr_s
+            << "curr_s = " << curr_s - adc_frenet_frame_point_.s()
             << " start_s = "
             << obs_sl.start_s() - adc_frenet_frame_point_.s()
             << " end_s = "
@@ -310,8 +312,19 @@ SidePassPathDecider::GetPathBoundaries(
       ADEBUG << "ADC width = " << 2.0 * adc_half_width;
       *fail_to_find_boundary = false;
 
-      if (std::get<2>(lateral_bound) - obs_sl.end_l() >
-          obs_sl.start_l() - std::get<1>(lateral_bound)) {
+      SidePassDirection side_pass_direction = SidePassDirection::LEFT;
+      if (obs_id_to_side_pass_dir.count(obstacle->Id()) == 0) {
+        // We haven't decided the side-pass direction for this obstacle yet.
+        if (std::get<2>(lateral_bound) - obs_sl.end_l() >
+            obs_sl.start_l() - std::get<1>(lateral_bound)) {
+          obs_id_to_side_pass_dir[obstacle->Id()] = SidePassDirection::LEFT;
+        } else {
+          obs_id_to_side_pass_dir[obstacle->Id()] = SidePassDirection::RIGHT;
+        }
+      }
+      side_pass_direction = obs_id_to_side_pass_dir[obstacle->Id()];
+
+      if (side_pass_direction == SidePassDirection::LEFT) {
         const double lower_bound = FLAGS_static_decision_nudge_l_buffer +
                                    obs_sl.end_l();
         ADEBUG << "Should pass from left. Lower bound = " << lower_bound;
