@@ -42,6 +42,7 @@ constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 Stage::StageStatus SidePassStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
 
+  ADEBUG << "Processing SidePassStopOnWaitPoint";
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
   const ReferenceLine& reference_line = reference_line_info.reference_line();
@@ -91,6 +92,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     }
   }
 
+  ADEBUG << "Got the nearest obstacle if there is one.";
   // Get the "wait point".
   PathPoint first_path_point =
       GetContext()->path_data_.discretized_path().path_points().front();
@@ -98,10 +100,12 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   bool should_not_move_at_all = false;
   if (!GetMoveForwardLastPathPoint(reference_line, nearest_obstacle,
       &last_path_point, &should_not_move_at_all)) {
-    AERROR << "Fail to get move forward last path point.";
+    ADEBUG << "Fail to get move forward last path point.";
     return Stage::ERROR;
   }
   if (should_not_move_at_all) {
+    ADEBUG << "The ADC is already at a stop point.";
+    next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
     return Stage::FINISHED;  // return FINISHED if it's already at "wait point".
   }
 
@@ -130,7 +134,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
     rfl_info.SetTrajectory(trajectory);
     rfl_info.SetDrivable(true);
 
-    AINFO << "waiting until obstacles are far away.";
+    ADEBUG << "waiting until obstacles are far away.";
     return Stage::RUNNING;
   }
 

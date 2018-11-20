@@ -62,7 +62,8 @@ class SidePassPathDecider : public Decider {
   std::vector<std::tuple<double, double, double>> GetPathBoundaries(
       const common::TrajectoryPoint& planning_start_point,
       const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,
-      const IndexedList<std::string, Obstacle>& indexed_obstacles);
+      const IndexedList<std::string, Obstacle>& indexed_obstacles,
+      bool* fail_to_find_boundary);
 
   const Obstacle* GetNearestObstacle(
       const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,

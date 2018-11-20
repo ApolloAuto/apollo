@@ -42,9 +42,9 @@ using apollo::hdmap::PathOverlap;
 using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
-constexpr double kRoadBuffer = 0.2;
-constexpr double kObstacleLBuffer = 1.0;
-constexpr double kObstacleSBuffer = 0.5;
+constexpr double kRoadBuffer = 0.0;
+constexpr double kObstacleLBuffer = 0.0;
+constexpr double kObstacleSBuffer = 1.0;
 constexpr double kSidePassPathLength = 50.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
@@ -181,10 +181,15 @@ bool SidePassPathDecider::GeneratePath(
     return false;
   }
 
+  bool fail_to_find_boundary = false;
   auto lateral_bounds = GetPathBoundaries(
       frame->PlanningStartPoint(), reference_line_info->AdcSlBoundary(),
       reference_line_info->reference_line(),
-      reference_line_info->path_decision()->obstacles());
+      reference_line_info->path_decision()->obstacles(),
+      &fail_to_find_boundary);
+  if (fail_to_find_boundary) {
+    return false;
+  }
 
   for (const auto &bd : lateral_bounds) {
     ADEBUG << std::get<0>(bd) << ": " << std::get<1>(bd) << ", "
@@ -234,7 +239,8 @@ std::vector<std::tuple<double, double, double>>
 SidePassPathDecider::GetPathBoundaries(
     const TrajectoryPoint &planning_start_point,
     const SLBoundary &adc_sl_boundary, const ReferenceLine &reference_line,
-    const IndexedList<std::string, Obstacle> &indexed_obstacles) {
+    const IndexedList<std::string, Obstacle> &indexed_obstacles,
+    bool* fail_to_find_boundary) {
   std::vector<std::tuple<double, double, double>> lateral_bounds;
 
   constexpr double kLargeBoundary = 10.0;
@@ -292,24 +298,48 @@ SidePassPathDecider::GetPathBoundaries(
         continue;
       }
 
+      ADEBUG << "Obstacles that are considered is at: "
+            << "curr_s = " << curr_s
+            << " start_s = "
+            << obs_sl.start_s() - adc_frenet_frame_point_.s()
+            << " end_s = "
+            << obs_sl.end_s() - adc_frenet_frame_point_.s()
+            << " start_l = " << obs_sl.start_l()
+            << " end_l = " << obs_sl.end_l();
+
+      ADEBUG << "ADC width = " << 2.0 * adc_half_width;
+      *fail_to_find_boundary = false;
+
       if (std::get<2>(lateral_bound) - obs_sl.end_l() >
           obs_sl.start_l() - std::get<1>(lateral_bound)) {
         const double lower_bound = FLAGS_static_decision_nudge_l_buffer +
                                    kObstacleLBuffer + obs_sl.end_l();
+        ADEBUG << "Should pass from left. Lower bound = " << lower_bound;
         if (std::get<2>(lateral_bound) - lower_bound - 2.0 * adc_half_width -
-                FLAGS_static_decision_nudge_l_buffer - kRoadBuffer >=
-            0.0) {
+                kRoadBuffer >= 0.0) {
+          ADEBUG << "Reseting the right boundary for left-side-pass.";
           std::get<1>(lateral_bound) = lower_bound + adc_half_width;
+        } else {
+          *fail_to_find_boundary = true;
+          break;
         }
       } else {
         const double upper_bound = -FLAGS_static_decision_nudge_l_buffer -
                                    kObstacleLBuffer + obs_sl.start_l();
+        ADEBUG << "Should pass from right. Upper bound = " << upper_bound;
         if (upper_bound - std::get<1>(lateral_bound) - 2.0 * adc_half_width -
-                FLAGS_static_decision_nudge_l_buffer - kRoadBuffer >=
-            0.0) {
+                kRoadBuffer >= 0.0) {
+          ADEBUG << "Reseting the left boundary for right-side-pass.";
           std::get<2>(lateral_bound) = upper_bound - adc_half_width;
+        } else {
+          *fail_to_find_boundary = true;
+          break;
         }
       }
+    }
+
+    if (*fail_to_find_boundary) {
+      return lateral_bounds;
     }
 
     ADEBUG << "obstacle bound: " << std::get<0>(lateral_bound) << ", "
@@ -377,6 +407,7 @@ const Obstacle *SidePassPathDecider::GetNearestObstacle(
       nearest_obs_start_s = obs_start_s;
     }
   }
+
   return nearest_obstacle;
 }
 
