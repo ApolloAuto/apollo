@@ -132,7 +132,7 @@ DEFINE_string(evaluator_cruise_vehicle_cutin_model_file,
 DEFINE_string(evaluator_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.bin",
               "Vehicle junction MLP model file");
-DEFINE_int32(max_num_obstacles, 100,
+DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,
               "threshold of valid position difference");
