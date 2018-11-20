@@ -90,11 +90,12 @@ apollo::common::Status OpenSpacePlanner::Plan(
     if (trajectory_updated_) {
       trajectory_partition_.Clear();
       gear_positions_.clear();
+      open_space_debug_.Clear();
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
                                                          &gear_positions_);
-      open_space_trajectory_generator_->UpdateDebugInfo(open_space_debug_);
-      AINFO << "Trajectory caculation updated, new results : "
-            << trajectory_partition_.ShortDebugString();
+      open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
+      ADEBUG << "Trajectory caculation updated, new results : "
+             << trajectory_partition_.ShortDebugString();
     }
     // TODO(Jiaxuan): Choose the current_trajectory in trajectory_partition_
     // If the vehicle each the end point of current trajectory and stop
@@ -127,7 +128,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
           *(current_trajectory_.mutable_trajectory_point()));
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
-      frame->mutable_open_space_debug()->CopyFrom(*open_space_debug_);
+      frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
       return Status::OK();
     } else {
       // If collision happens, return wrong planning status and estop
@@ -162,11 +163,12 @@ apollo::common::Status OpenSpacePlanner::Plan(
     if (status == Status::OK()) {
       trajectory_partition_.Clear();
       gear_positions_.clear();
+      open_space_debug_.Clear();
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
                                                          &gear_positions_);
-      open_space_trajectory_generator_->UpdateDebugInfo(open_space_debug_);
-      // AINFO << "Trajectory caculation updated, new results : "
-      // << trajectory_partition_.ShortDebugString();
+      open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
+      ADEBUG << "Trajectory caculation updated, new results : "
+             << trajectory_partition_.ShortDebugString();
     } else {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Planning failed to generate open space trajectory");
@@ -199,7 +201,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
           *(current_trajectory_.mutable_trajectory_point()));
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
-      frame->mutable_open_space_debug()->CopyFrom(*open_space_debug_);
+      frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
       return Status::OK();
     } else {
       // If collision happens, return wrong planning status and estop

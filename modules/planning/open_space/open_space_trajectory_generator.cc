@@ -195,13 +195,6 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 
   // record debug info
   if (FLAGS_enable_record_debug) {
-    int trajectory_partition_status =
-        TrajectoryPartition(state_result_ds, control_result_ds, time_result_ds);
-    if (trajectory_partition_status == 1) {
-      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
-    } else if (trajectory_partition_status == 2) {
-      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
-    }
     RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
                     dual_n_result_ds, XYbounds_, obstalce_list);
   }
@@ -221,15 +214,10 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // Step 9 : Trajectory Partition and  Publish TrajectoryPoint
   // in planning trajectory. Result saved in trajectory_partition_.
   // Every time update, use trajectory_partition to store each ADCTrajectory
-  int trajectory_partition_status =
+  Status trajectory_partition_status =
       TrajectoryPartition(state_result_ds, control_result_ds, time_result_ds);
-  if (trajectory_partition_status == 1) {
-    return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
-  } else if (trajectory_partition_status == 2) {
-    return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
-  }
 
-  return Status::OK();
+  return trajectory_partition_status;
 }  // namespace planning
 
 void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
@@ -239,8 +227,8 @@ void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
 }
 
 void OpenSpaceTrajectoryGenerator::UpdateDebugInfo(
-    std::shared_ptr<planning_internal::OpenSpaceDebug> open_space_debug) {
-  open_space_debug->CopyFrom(*open_space_debug_);
+    planning_internal::OpenSpaceDebug* open_space_debug) {
+  open_space_debug->CopyFrom(open_space_debug_);
 }
 
 void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
@@ -250,12 +238,12 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const Eigen::MatrixXd& dual_n_result_ds,
     const std::vector<double>& XYbounds,
     ThreadSafeIndexedObstacles* obstalce_list) {
-  open_space_debug_.reset(new planning_internal::OpenSpaceDebug());
+  open_space_debug_.Clear();
   // load trajectories by optimization and partition
-  open_space_debug_->mutable_trajectories()->CopyFrom(trajectory_partition_);
+  open_space_debug_.mutable_trajectories()->CopyFrom(trajectory_partition_);
   // load warm start trajectory
   auto* warm_start_trajecotry =
-      open_space_debug_->mutable_warm_start_trajecotry();
+      open_space_debug_.mutable_warm_start_trajecotry();
   for (size_t i = 0; i < horizon_; i++) {
     auto* warm_start_point = warm_start_trajecotry->add_vehicle_motion_point();
     warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_x(
@@ -282,13 +270,13 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
   size_t l_warm_up_cols = l_warm_up.rows();
   for (size_t i = 0; i < horizon_; i++) {
     for (std::size_t j = 0; j < l_warm_up_cols; j++) {
-      open_space_debug_->add_warm_start_dual_lambda(l_warm_up(j, i));
+      open_space_debug_.add_warm_start_dual_lambda(l_warm_up(j, i));
     }
   }
   size_t n_warm_up_cols = n_warm_up.rows();
   for (size_t i = 0; i < horizon_; i++) {
     for (std::size_t j = 0; j < n_warm_up_cols; j++) {
-      open_space_debug_->add_warm_start_dual_miu(n_warm_up(j, i));
+      open_space_debug_.add_warm_start_dual_miu(n_warm_up(j, i));
     }
   }
 
@@ -296,24 +284,24 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
   size_t dual_l_result_ds_cols = dual_l_result_ds.rows();
   for (size_t i = 0; i < horizon_; i++) {
     for (std::size_t j = 0; j < dual_l_result_ds_cols; j++) {
-      open_space_debug_->add_optimized_dual_lambda(dual_l_result_ds(j, i));
+      open_space_debug_.add_optimized_dual_lambda(dual_l_result_ds(j, i));
     }
   }
   size_t dual_n_result_ds_cols = dual_n_result_ds.rows();
   for (size_t i = 0; i < horizon_; i++) {
     for (std::size_t j = 0; j < dual_n_result_ds_cols; j++) {
-      open_space_debug_->add_optimized_dual_miu(dual_n_result_ds(j, i));
+      open_space_debug_.add_optimized_dual_miu(dual_n_result_ds(j, i));
     }
   }
   // load xy boundary (xmin, xmax, ymin, ymax)
-  open_space_debug_->add_xy_boundary(XYbounds[0]);
-  open_space_debug_->add_xy_boundary(XYbounds[1]);
-  open_space_debug_->add_xy_boundary(XYbounds[2]);
-  open_space_debug_->add_xy_boundary(XYbounds[3]);
+  open_space_debug_.add_xy_boundary(XYbounds[0]);
+  open_space_debug_.add_xy_boundary(XYbounds[1]);
+  open_space_debug_.add_xy_boundary(XYbounds[2]);
+  open_space_debug_.add_xy_boundary(XYbounds[3]);
 
   // load obstacles
   for (const auto& obstacle_box : (*obstalce_list).Items()) {
-    auto* obstacle_ptr = open_space_debug_->add_obstacles();
+    auto* obstacle_ptr = open_space_debug_.add_obstacles();
     std::vector<Vec2d> vertices =
         obstacle_box->PerceptionBoundingBox().GetAllCorners();
     size_t vertices_size = vertices.size();
@@ -324,7 +312,7 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
   }
 }
 
-int OpenSpaceTrajectoryGenerator::TrajectoryPartition(
+Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
     const Eigen::MatrixXd& state_result_ds,
     const Eigen::MatrixXd& control_result_ds,
     const Eigen::MatrixXd& time_result_ds) {
@@ -338,7 +326,9 @@ int OpenSpaceTrajectoryGenerator::TrajectoryPartition(
       trajectory_partition.add_trajectory();
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
-  if (horizon_ < 3) return 1;
+  if (horizon_ < 3)
+    return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
+
   if (state_result_ds(3, 0) > -1e-3 && state_result_ds(3, 1) > -1e-3 &&
       state_result_ds(3, 2) > -1e-3) {
     gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
@@ -347,7 +337,7 @@ int OpenSpaceTrajectoryGenerator::TrajectoryPartition(
         state_result_ds(3, 2) < 1e-3) {
       gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
     } else {
-      return 2;
+      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
     }
   }
 
@@ -400,7 +390,7 @@ int OpenSpaceTrajectoryGenerator::TrajectoryPartition(
   }
 
   trajectory_partition_.CopyFrom(trajectory_partition);
-  return 0;
+  return Status::OK();
 }
 
 }  // namespace planning
