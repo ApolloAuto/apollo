@@ -2572,21 +2572,80 @@
                 }
               }
             },
-            "DeciderRuleBasedStopConfig": {
+            "RuleCrosswalkConfig": {
               "fields": {
+                "enabled": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                },
                 "stopDistance": {
                   "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
+            "RuleStopSignConfig": {
+              "fields": {
+                "enabled": {
+                  "type": "bool",
                   "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "stopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
+            "RuleTrafficLightConfig": {
+              "fields": {
+                "enabled": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "stopDistance": {
+                  "type": "double",
+                  "id": 2,
                   "options": {
                     "default": 1
                   }
                 },
-                "trafficLightSignalExpireTimeSec": {
+                "signalExpireTimeSec": {
                   "type": "double",
-                  "id": 2,
+                  "id": 3,
                   "options": {
                     "default": 5
                   }
+                }
+              }
+            },
+            "DeciderRuleBasedStopConfig": {
+              "fields": {
+                "crosswalk": {
+                  "type": "RuleCrosswalkConfig",
+                  "id": 1
+                },
+                "stopSign": {
+                  "type": "RuleStopSignConfig",
+                  "id": 2
+                },
+                "trafficLight": {
+                  "type": "RuleTrafficLightConfig",
+                  "id": 3
                 }
               }
             },
@@ -4439,44 +4498,51 @@
                     "default": 10
                   }
                 },
-                "watchVehicleMaxValidStopDistance": {
+                "startStopSignScenarioDistance": {
                   "type": "double",
                   "id": 2,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "watchVehicleMaxValidStopDistance": {
+                  "type": "double",
+                  "id": 3,
                   "options": {
                     "default": 5
                   }
                 },
                 "maxValidStopDistance": {
                   "type": "double",
-                  "id": 3,
+                  "id": 4,
                   "options": {
                     "default": 3.5
                   }
                 },
                 "maxAdcStopSpeed": {
                   "type": "double",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": 0.3
                   }
                 },
                 "stopDuration": {
                   "type": "float",
-                  "id": 5,
+                  "id": 6,
                   "options": {
                     "default": 1
                   }
                 },
                 "minPassSDistance": {
                   "type": "double",
-                  "id": 6,
+                  "id": 7,
                   "options": {
                     "default": 3
                   }
                 },
                 "waitTimeout": {
                   "type": "float",
-                  "id": 7,
+                  "id": 8,
                   "options": {
                     "default": 8
                   }
@@ -4590,6 +4656,7 @@
                     "SIDE_PASS_STOP_ON_WAITPOINT": 202,
                     "SIDE_PASS_DETECT_SAFETY": 203,
                     "SIDE_PASS_PASS_OBSTACLE": 204,
+                    "SIDE_PASS_BACKUP": 205,
                     "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP": 300,
                     "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP": 301,
                     "TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE": 302
@@ -8144,6 +8211,11 @@
                   "rule": "repeated",
                   "type": "ParkingSpace",
                   "id": 12
+                },
+                "pncJunction": {
+                  "rule": "repeated",
+                  "type": "PNCJunction",
+                  "id": 13
                 }
               }
             },
@@ -8618,6 +8690,23 @@
               }
             },
             "ParkingLot": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "polygon": {
+                  "type": "Polygon",
+                  "id": 2
+                },
+                "overlapId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                }
+              }
+            },
+            "PNCJunction": {
               "fields": {
                 "id": {
                   "type": "Id",
