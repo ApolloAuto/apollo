@@ -47,15 +47,17 @@ SchedulerClassic::SchedulerClassic() {
   apollo::cyber::proto::CyberConfig cfg;
   // FIXME: later, we will add grp support for classic policy.
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
+    proc_num_ = cfg.scheduler_conf().classic_conf().groups(0).processor_num();
+    affinity_ = cfg.scheduler_conf().classic_conf().groups(0).affinity();
+    ParseCpuset(cfg.scheduler_conf().classic_conf().groups(0).cpuset(),
+                &cpuset_);
   } else {
-    // fallback default sched config: 1 group w/ all cpus
-  }
-
-  // default val for case w/o config:
-  if (proc_num_ == 0) {
-    proc_num_ = std::thread::hardware_concurrency();
+    // fallback default sched config. To avoid every process launchs
+    // too many threads, limit to 2 cpus for process w/o explicit config.
+    proc_num_ = 2;
     // FIXME: other vals ... ?
   }
+
   // Currently for compatible with task/task_manager.cc:
   // auto pool_size = scheduler::Scheduler::Instance()->TaskPoolSize();
   // which will be deleted at last.
@@ -70,6 +72,7 @@ void SchedulerClassic::CreateProcessor() {
     auto ctx = std::make_shared<ClassicContext>();
 
     proc->BindContext(ctx);
+    proc->SetAffinity(cpuset_, affinity_, i);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
   }
