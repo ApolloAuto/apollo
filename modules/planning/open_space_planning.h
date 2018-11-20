@@ -67,8 +67,8 @@ class OpenSpacePlanning : public PlanningBase {
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* const trajectory) override;
 
-  void ExportChart(const planning_internal::Debug& debug_info,
-                   planning_internal::Debug* debug_chart) override;
+  void ExportOpenSpaceChart(const planning_internal::OpenSpaceDebug& debug_info,
+                            planning_internal::Debug* debug_chart);
 
  private:
   common::Status InitFrame(const uint32_t sequence_num,
@@ -76,7 +76,6 @@ class OpenSpacePlanning : public PlanningBase {
                            const double start_time,
                            const common::VehicleState& vehicle_state,
                            ADCTrajectory* output_trajectory);
-  void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);
 
  private:
