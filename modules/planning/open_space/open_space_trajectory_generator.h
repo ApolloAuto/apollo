@@ -94,11 +94,12 @@ class OpenSpaceTrajectoryGenerator {
       std::vector<::apollo::canbus::Chassis::GearPosition>* gear_positions);
 
   void UpdateDebugInfo(
-      std::shared_ptr<planning_internal::OpenSpaceDebug> open_space_debug);
+      ::apollo::planning_internal::OpenSpaceDebug* open_space_debug);
 
-  int TrajectoryPartition(const Eigen::MatrixXd& state_result_ds,
-                          const Eigen::MatrixXd& control_result_ds,
-                          const Eigen::MatrixXd& time_result_ds);
+  apollo::common::Status TrajectoryPartition(
+      const Eigen::MatrixXd& state_result_ds,
+      const Eigen::MatrixXd& control_result_ds,
+      const Eigen::MatrixXd& time_result_ds);
 
   void Stop();
 
@@ -132,7 +133,7 @@ class OpenSpaceTrajectoryGenerator {
   std::vector<double> XYbounds_;
   ::apollo::planning_internal::Trajectories trajectory_partition_;
   std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
-  std::shared_ptr<planning_internal::OpenSpaceDebug> open_space_debug_;
+  apollo::planning_internal::OpenSpaceDebug open_space_debug_;
 };
 
 }  // namespace planning
