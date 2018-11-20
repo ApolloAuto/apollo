@@ -309,7 +309,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
     AERROR << "Fail to update path_data.";
     return Stage::ERROR;
   }
-
+  ADEBUG << "Processing SidePassPassObstacle.";
   const auto adc_frenet_frame_point_ =
       reference_line_info.reference_line().GetFrenetPoint(
           frame->PlanningStartPoint().path_point());
