@@ -43,8 +43,8 @@ using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
 constexpr double kRoadBuffer = 0.0;
-constexpr double kObstacleLBuffer = 0.0;
-constexpr double kObstacleSBuffer = 1.0;
+constexpr double kObstacleLBuffer = 0.4;
+constexpr double kObstacleSBuffer = 3.0;
 constexpr double kSidePassPathLength = 50.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
@@ -313,24 +313,26 @@ SidePassPathDecider::GetPathBoundaries(
       if (std::get<2>(lateral_bound) - obs_sl.end_l() >
           obs_sl.start_l() - std::get<1>(lateral_bound)) {
         const double lower_bound = FLAGS_static_decision_nudge_l_buffer +
-                                   kObstacleLBuffer + obs_sl.end_l();
+                                   obs_sl.end_l();
         ADEBUG << "Should pass from left. Lower bound = " << lower_bound;
         if (std::get<2>(lateral_bound) - lower_bound - 2.0 * adc_half_width -
                 kRoadBuffer >= 0.0) {
           ADEBUG << "Reseting the right boundary for left-side-pass.";
-          std::get<1>(lateral_bound) = lower_bound + adc_half_width;
+          std::get<1>(lateral_bound) = lower_bound + adc_half_width +
+                                       kObstacleLBuffer;
         } else {
           *fail_to_find_boundary = true;
           break;
         }
       } else {
-        const double upper_bound = -FLAGS_static_decision_nudge_l_buffer -
-                                   kObstacleLBuffer + obs_sl.start_l();
+        const double upper_bound = -FLAGS_static_decision_nudge_l_buffer +
+                                   obs_sl.start_l();
         ADEBUG << "Should pass from right. Upper bound = " << upper_bound;
         if (upper_bound - std::get<1>(lateral_bound) - 2.0 * adc_half_width -
                 kRoadBuffer >= 0.0) {
           ADEBUG << "Reseting the left boundary for right-side-pass.";
-          std::get<2>(lateral_bound) = upper_bound - adc_half_width;
+          std::get<2>(lateral_bound) = upper_bound - adc_half_width -
+                                       kObstacleLBuffer;
         } else {
           *fail_to_find_boundary = true;
           break;
