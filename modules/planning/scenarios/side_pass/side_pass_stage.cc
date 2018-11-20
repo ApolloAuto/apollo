@@ -356,11 +356,8 @@ Stage::StageStatus SidePassPassObstacle::Process(
 
   double distance_to_path_end =
       sl_point.s() - GetContext()->scenario_config_.side_pass_exit_distance();
-  double adc_velocity = frame->vehicle_state().linear_velocity();
-  double max_velocity_for_stop =
-      GetContext()->scenario_config_.approach_obstacle_max_stop_speed();
-  if (adc_sl_boundary.end_s() > distance_to_path_end ||
-      adc_velocity < max_velocity_for_stop) {
+
+  if (adc_sl_boundary.end_s() > distance_to_path_end) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
