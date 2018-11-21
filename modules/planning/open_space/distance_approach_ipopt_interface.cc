@@ -1269,7 +1269,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
   ADEBUG << "eval_jac_g done";
   return true;
-} // NOLINT
+}  // NOLINT
 
 bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
                                             double obj_factor, int m,
