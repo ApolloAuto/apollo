@@ -82,13 +82,13 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 
   // rotate and scale the state according to the origin point defined in
   // frame
-  init_x_ = init_x_ - translate_origin.x();
-  init_y_ = init_y_ - translate_origin.y();
+  init_x_ -= translate_origin.x();
+  init_y_ -= translate_origin.y();
   double tmp_x = init_x_;
   init_x_ =
       init_x_ * std::cos(-rotate_angle) - init_y_ * std::sin(-rotate_angle);
   init_y_ = tmp_x * std::sin(-rotate_angle) + init_y_ * std::cos(-rotate_angle);
-
+  init_phi_ = common::math::NormalizeAngle(init_phi_ - rotate_angle);
   // TODO(Jinyun) how to initial input not decided yet
   init_steer_ = 0;
   init_a_ = 0;
@@ -198,7 +198,6 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
                     dual_n_result_ds, XYbounds_, obstalce_list);
   }
-
   // rescale the states to the world frame
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
     double tmp_x = state_result_ds(0, i);
@@ -208,7 +207,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
                             state_result_ds(1, i) * std::cos(rotate_angle);
     state_result_ds(0, i) += translate_origin.x();
     state_result_ds(1, i) += translate_origin.y();
-    state_result_ds(2, i) += rotate_angle;
+    state_result_ds(2, i) =
+        common::math::NormalizeAngle(state_result_ds(2, i) + rotate_angle);
   }
 
   // Step 9 : Trajectory Partition and  Publish TrajectoryPoint
@@ -224,6 +224,7 @@ void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
     Trajectories* adc_trajectories,
     std::vector<canbus::Chassis::GearPosition>* gear_positions) {
   adc_trajectories->CopyFrom(trajectory_partition_);
+  *gear_positions = gear_positions_;
 }
 
 void OpenSpaceTrajectoryGenerator::UpdateDebugInfo(
@@ -329,23 +330,22 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
   if (horizon_ < 3)
     return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
 
-  if (state_result_ds(3, 0) > -1e-3 && state_result_ds(3, 1) > -1e-3 &&
-      state_result_ds(3, 2) > -1e-3) {
+  if (state_result_ds(3, 0) > -1e-16 && state_result_ds(3, 1) > -1e-16 &&
+      state_result_ds(3, 2) > -1e-16) {
     gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
+  } else if (state_result_ds(3, 0) < -1e-16 && state_result_ds(3, 1) < -1e-16 &&
+             state_result_ds(3, 2) < -1e-16) {
+    gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
   } else {
-    if (state_result_ds(3, 0) < 1e-3 && state_result_ds(3, 1) < 1e-3 &&
-        state_result_ds(3, 2) < 1e-3) {
-      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
-    } else {
-      return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory start!");
-    }
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Invalid trajectory start! initial speed too small");
   }
 
   // partition trajectory points into each trajectory
   for (std::size_t i = 0; i < horizon_ + 1; i++) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
     // then add a new trajectory with GEAR_REVERSE
-    if (state_result_ds(3, i) < -1e-3 &&
+    if (state_result_ds(3, i) < -1e-16 &&
         gear_positions_.back() == canbus::Chassis::GEAR_DRIVE) {
       current_trajectory = trajectory_partition.add_trajectory();
       gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
@@ -354,7 +354,7 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
     }
     // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
     // then add a new trajectory with GEAR_DRIVE
-    if (state_result_ds(3, i) > 1e-3 &&
+    if (state_result_ds(3, i) > -1e-16 &&
         gear_positions_.back() == canbus::Chassis::GEAR_REVERSE) {
       current_trajectory = trajectory_partition.add_trajectory();
       gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
@@ -363,11 +363,10 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
     }
 
     auto* point = current_trajectory->add_trajectory_point();
-    relative_time += time_result_ds(0, i);
     point->set_relative_time(relative_time);
+    relative_time += time_result_ds(0, i);
     point->mutable_path_point()->set_x(state_result_ds(0, i));
     point->mutable_path_point()->set_y(state_result_ds(1, i));
-    point->mutable_path_point()->set_z(0);
     point->mutable_path_point()->set_theta(state_result_ds(2, i));
     if (i > 0) {
       distance_s +=

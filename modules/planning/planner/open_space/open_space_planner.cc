@@ -91,6 +91,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       trajectory_partition_.Clear();
       gear_positions_.clear();
       open_space_debug_.Clear();
+      current_trajectory_index_ = 0;
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
                                                          &gear_positions_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
@@ -106,8 +107,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     TrajectoryPoint end_point = current_trajectory_.trajectory_point(
         current_trajectory_.trajectory_point_size() - 1);
 
-    if (vehicle_state_.linear_velocity() <= 1e-3 &&
-        std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
+    if (std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
                       (vehicle_state_.x() - end_point.path_point().x()) +
                   (vehicle_state_.y() - end_point.path_point().y()) *
                       (vehicle_state_.y() - end_point.path_point().y())) <
@@ -158,12 +158,12 @@ apollo::common::Status OpenSpacePlanner::Plan(
         vehicle_state_, XYbounds_, rotate_angle_, translate_origin_, end_pose_,
         obstacles_num_, obstacles_edges_num_, obstacles_A_, obstacles_b_,
         obstalce_list_);
-
     // 3. If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
       trajectory_partition_.Clear();
       gear_positions_.clear();
       open_space_debug_.Clear();
+      current_trajectory_index_ = 0;
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
                                                          &gear_positions_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
@@ -173,15 +173,11 @@ apollo::common::Status OpenSpacePlanner::Plan(
       return Status(ErrorCode::PLANNING_ERROR,
                     "Planning failed to generate open space trajectory");
     }
-
     current_trajectory_ =
         trajectory_partition_.trajectory(current_trajectory_index_);
-
     TrajectoryPoint end_point = current_trajectory_.trajectory_point(
         current_trajectory_.trajectory_point_size() - 1);
-
-    if (vehicle_state_.linear_velocity() <= 1e-3 &&
-        std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
+    if (std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
                       (vehicle_state_.x() - end_point.path_point().x()) +
                   (vehicle_state_.y() - end_point.path_point().y()) *
                       (vehicle_state_.y() - end_point.path_point().y())) <
@@ -190,7 +186,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
             planner_open_space_config_.max_theta_error_to_end_point() &&
         (current_trajectory_index_ <
          trajectory_partition_.trajectory_size() - 1)) {
-      current_trajectory_index_ += 1;
+      current_trajectory_index_++;
     }
 
     // 4. Collision check for updated trajectory, if pass, update frame, else,
@@ -200,6 +196,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
       publishable_trajectory_.Clear();
       publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
           *(current_trajectory_.mutable_trajectory_point()));
+      publishable_trajectory_.set_gear(
+          gear_positions_[current_trajectory_index_]);
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
       frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
       return Status::OK();
