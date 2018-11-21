@@ -48,10 +48,12 @@ class SchedulerChoreography : public Scheduler {
 
   std::string choreography_affinity_;
   std::string choreography_processor_policy_;
-  uint32_t choreography_processor_prio_;
+  int32_t choreography_processor_prio_;
   std::vector<int> choreography_cpuset_;
   std::string pool_affinity_;
   std::vector<int> pool_cpuset_;
+  std::string pool_processor_policy_;
+  int32_t pool_processor_prio_;
 };
 
 }  // namespace scheduler

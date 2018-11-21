@@ -16,6 +16,8 @@
 
 #include "cyber/scheduler/processor.h"
 
+#include <sys/syscall.h>
+#include <sys/resource.h>
 #include <sched.h>
 #include <chrono>
 
@@ -67,21 +69,26 @@ void Processor::SetSchedPolicy(std::string spolicy, int sched_priority) {
   struct sched_param sp;
   int policy;
 
-  if (!spolicy.compare("SCHED_FIFO")) {
-    policy = SCHED_FIFO;
-  } else if (!spolicy.compare("SCHED_RR")) {
-    policy = SCHED_RR;
-  } else {
-    return;
-  }
-
   memset(reinterpret_cast<void *>(&sp), 0, sizeof(sp));
   sp.sched_priority = sched_priority;
 
-  pthread_setschedparam(thread_.native_handle(), policy, &sp);
+  if (!spolicy.compare("SCHED_FIFO")) {
+    policy = SCHED_FIFO;
+    pthread_setschedparam(thread_.native_handle(), policy, &sp);
+  } else if (!spolicy.compare("SCHED_RR")) {
+    policy = SCHED_RR;
+    pthread_setschedparam(thread_.native_handle(), policy, &sp);
+  } else if (!spolicy.compare("SCHED_OTHER")) {
+    // Set normal thread nice value.
+    while (tid_.load() == -1) {
+      cpu_relax();
+    }
+    setpriority(PRIO_PROCESS, tid_.load(), sched_priority);
+  }
 }
 
 void Processor::Run() {
+  tid_.store(static_cast<int>(syscall(SYS_gettid)));
   CRoutine::SetMainContext(routine_context_);
 
   while (likely(running_)) {
