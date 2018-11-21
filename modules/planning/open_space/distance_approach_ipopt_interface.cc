@@ -1326,7 +1326,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     state_result_(2, i) = x[state_index + 2];
     state_result_(3, i) = x[state_index + 3];
     control_result_(0, i) = x[control_index];
-    control_result_(1, i) = x[control_index];
+    control_result_(1, i) = x[control_index + 1];
     time_result_(0, i) = x[time_index];
     for (int j = 0; j < obstacles_edges_sum_; j++) {
       dual_l_result_(j, i) = x[dual_l_index + j];
@@ -1347,6 +1347,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   state_result_(2, horizon_) = x[state_index + 2];
   state_result_(3, horizon_) = x[state_index + 3];
   time_result_(0, horizon_) = x[time_index];
+  time_result_ = ts_ * time_result_;
   for (int j = 0; j < obstacles_edges_sum_; j++) {
     dual_l_result_(j, horizon_) = x[dual_l_index + j];
   }
