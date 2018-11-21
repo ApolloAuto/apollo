@@ -288,8 +288,8 @@ class TrajectoryToSample(object):
                 
                 if is_jittering:
                     lane_sequence.label = -10
-                    time_to_lane_center = -1.0
-                    time_to_lane_edge = -1.0
+                    lane_sequence.time_to_lane_center = -1.0
+                    lane_sequence.time_to_lane_edge = -1.0
                     continue
 
                 # The current lane is obstacle's original lane.
@@ -338,8 +338,8 @@ class TrajectoryToSample(object):
                     # Obstacle is following the original lane.
                     if not has_started_lane_change:
                         lane_sequence.label = -1
-                        lane_sequence.time_to_lane_edge = -1
-                        lane_sequence.time_to_lane_center = -1
+                        lane_sequence.time_to_lane_edge = -1.0
+                        lane_sequence.time_to_lane_center = -1.0
                     else:
                         new_lane_id_is_in_this_lane_seq = False
                         for lane_segment in lane_sequence.lane_segment:
