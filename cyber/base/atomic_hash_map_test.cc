@@ -73,7 +73,7 @@ TEST(AtomicHashMapTest, int_str) {
 TEST(AtomicHashMapTest, concurrency) {
   AtomicHashMap<int, std::string, 1024> map;
   int thread_num = 32;
-  std::thread t[thread_num];
+  std::thread t[32];
   volatile bool ready = false;
 
   for (int i = 0; i < thread_num; i++) {
