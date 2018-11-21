@@ -335,8 +335,8 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
   if (horizon_ < 3)
     return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
 
-  if (state_result_ds(3, 0) > -1e-3 && state_result_ds(3, 1) > -1e-3 &&
-      state_result_ds(3, 2) > -1e-3) {
+  if (state_result_ds(3, 0) > 1e-16 && state_result_ds(3, 1) > 1e-16 &&
+      state_result_ds(3, 2) > 1e-16) {
     gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
   } else {
     if (state_result_ds(3, 0) < 1e-3 && state_result_ds(3, 1) < 1e-3 &&
@@ -360,12 +360,12 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
     }
     // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
     // then add a new trajectory with GEAR_DRIVE
+<<<<<<< HEAD
     if (state_result_ds(3, i) > 1e-3 &&
-        gear_positions_.back() == canbus::Chassis::GEAR_REVERSE) {
-      current_trajectory = trajectory_partition.add_trajectory();
-      gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
+=======
+    if (state_result_ds(3, i) > 1e-16 &&
+>>>>>>> 0d5506d... Planning: OpenSpace: fix wrong relative time adjustment in FillplanningPb
       distance_s = 0.0;
-      relative_time = 0.0;
     }
 
     auto* point = current_trajectory->add_trajectory_point();
