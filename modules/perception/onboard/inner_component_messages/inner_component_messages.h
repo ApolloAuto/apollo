@@ -49,15 +49,12 @@ class Descriptor {
   std::string full_name() { return "name"; }
 };
 
-class SensorFrameMessage : public apollo::cyber::message::IntraMessage {
+class SensorFrameMessage {
  public:
   SensorFrameMessage() { type_name_ = "SensorFrameMessage"; }
   ~SensorFrameMessage() = default;
   std::string GetTypeName() { return type_name_; }
   SensorFrameMessage* New() const { return new SensorFrameMessage; }
-  bool SerializeToString(std::string* str) const { return false; }
-  bool ParseFromString(const std::string& str) { return false; }
-  static Descriptor* descriptor() { return new Descriptor(); }
 
  public:
   apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;
@@ -65,6 +62,7 @@ class SensorFrameMessage : public apollo::cyber::message::IntraMessage {
   std::string sensor_id_;
   double timestamp_ = 0.0;
   uint32_t seq_num_ = 0;
+  std::string type_name_;
   base::HdmapStructConstPtr hdmap_;
 
   base::FramePtr frame_;

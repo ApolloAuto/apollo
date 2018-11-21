@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class LidarFrameMessage : public apollo::cyber::message::IntraMessage {
+class LidarFrameMessage {
  public:
   LidarFrameMessage() : lidar_frame_(nullptr) {
     type_name_ = "LidarFrameMessage";
@@ -39,14 +39,10 @@ class LidarFrameMessage : public apollo::cyber::message::IntraMessage {
 
   LidarFrameMessage* New() const { return new LidarFrameMessage; }
 
-  bool SerializeToString(std::string* str) const { return false; }
-  bool ParseFromString(const std::string& str) { return false; }
-
-  static Descriptor* descriptor() { return new Descriptor(); }
-
  public:
   double timestamp_ = 0.0;
   uint32_t seq_num_ = 0;
+  std::string type_name_;
   ProcessStage process_stage_ = ProcessStage::UNKNOWN_STAGE;
   apollo::common::ErrorCode error_code_ = apollo::common::ErrorCode::OK;
   std::shared_ptr<lidar::LidarFrame> lidar_frame_;
