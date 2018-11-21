@@ -24,10 +24,13 @@
 #include "cyber/base/macros.h"
 #include "cyber/logger/log_file_object.h"
 #include "cyber/logger/logger_util.h"
+#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
+
+using cyber::scheduler::Scheduler;
 
 static std::unordered_map<std::string, LogFileObject*> moduleLoggerMap;
 
@@ -53,6 +56,7 @@ void AsyncLogger::Start() {
   CHECK_EQ(state_, INITTED);
   state_ = RUNNING;
   thread_ = std::thread(&AsyncLogger::RunThread, this);
+  Scheduler::Instance()->SetInnerThreadAttr(&thread_, "async_log");
   // std::cout << "Async Logger Start!" << std::endl;
 }
 

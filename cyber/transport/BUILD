@@ -173,6 +173,7 @@ cc_library(
         "syscall_wrapper",
         "segment",
         "readable_info",
+        "//cyber/scheduler:scheduler",
         "//cyber/proto:proto_desc_cc_proto",
         "//cyber/message:message_traits",
     ],

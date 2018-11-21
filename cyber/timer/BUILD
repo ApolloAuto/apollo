@@ -19,6 +19,7 @@ cc_library(
     deps = [
           "timing_wheel",
           "//cyber/common:macros",
+          "//cyber/scheduler:scheduler",
           "//cyber/task:task",
           "//cyber/time:rate",
           "//cyber/time:time",
