@@ -125,10 +125,10 @@ bool OsqpSpline1dSolver::Solve() {
   const MatrixXd& equality_constraint_boundary =
       constraint_.equality_constraint().constraint_boundary();
 
-  int constraint_num = inequality_constraint_boundary.rows() +
-                       equality_constraint_boundary.rows();
+  int constraint_num = static_cast<int>(inequality_constraint_boundary.rows() +
+                                        equality_constraint_boundary.rows());
 
-  constexpr float kEpsilon = 1e-9;
+  constexpr double kEpsilon = 1e-9;
   constexpr float kUpperLimit = 1e9;
   c_float l[constraint_num];  // NOLINT
   c_float u[constraint_num];  // NOLINT
@@ -137,7 +137,8 @@ bool OsqpSpline1dSolver::Solve() {
       l[i] = inequality_constraint_boundary(i, 0);
       u[i] = kUpperLimit;
     } else {
-      const int idx = i - inequality_constraint_boundary.rows();
+      const int idx =
+          i - static_cast<int>(inequality_constraint_boundary.rows());
       l[i] = equality_constraint_boundary(idx, 0) - kEpsilon;
       u[i] = equality_constraint_boundary(idx, 0) + kEpsilon;
     }
@@ -163,7 +164,7 @@ bool OsqpSpline1dSolver::Solve() {
     solved_params(i, 0) = work_->solution->x[i];
   }
 
-  last_num_param_ = P.rows();
+  last_num_param_ = static_cast<int>(P.rows());
   last_num_constraint_ = constraint_num;
 
   return spline_.SetSplineSegs(solved_params, spline_.spline_order());
