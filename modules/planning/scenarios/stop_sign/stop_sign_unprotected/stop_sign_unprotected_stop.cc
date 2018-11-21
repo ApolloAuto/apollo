@@ -86,14 +86,23 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
          << "] vehicle[" << s << "]";
   }
 
+  if (watch_vehicle_ids.size() == 0) {
+    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
+    PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
+        GetContext()->stop_sign_id;
+    return Stage::FINISHED;
+  }
+
   // check timeout
-  if (wait_time > scenario_config_.wait_timeout() &&
+  /* TODO(all): need revisit
+   if (wait_time > scenario_config_.wait_timeout() &&
       watch_vehicle_ids.size() <= 1) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
     PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
         GetContext()->stop_sign_id;
     return Stage::FINISHED;
   }
+  */
 
   const auto& reference_line_info = frame->reference_line_info().front();
   const PathDecision& path_decision = reference_line_info.path_decision();
@@ -114,7 +123,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
 int StopSignUnprotectedStop::RemoveWatchVehicle(
-    const Obstacle& obstacle, const std::vector<std::string>& watch_vehicle_ids,
+    const Obstacle& obstacle,
+    const std::vector<std::string>& watch_vehicle_ids,
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
@@ -122,14 +132,6 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
-
-  // check if being watched
-  if (std::find(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-                obstacle_id) == watch_vehicle_ids.end()) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "] not being watched. skip";
-    return 0;
-  }
 
   // check type
   if (obstacle_type != PerceptionObstacle::UNKNOWN &&
@@ -141,91 +143,70 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
     return 0;
   }
 
-  auto point = common::util::MakePointENU(perception_obstacle.position().x(),
-                                          perception_obstacle.position().y(),
-                                          perception_obstacle.position().z());
-  double obstacle_s = 0.0;
-  double obstacle_l = 0.0;
-  LaneInfoConstPtr obstacle_lane;
-  if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-          point, 5.0, perception_obstacle.theta(), M_PI / 3.0, &obstacle_lane,
-          &obstacle_s, &obstacle_l) != 0) {
+  // check if being watched
+  if (std::find(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
+                obstacle_id) == watch_vehicle_ids.end()) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "]: Failed to find nearest lane from map for position: "
-           << point.DebugString()
-           << "; heading:" << perception_obstacle.theta();
-    return -1;
+           << "] not being watched. skip";
+    return 0;
   }
 
-  bool erase = false;
-
-  bool is_path_cross = !obstacle.reference_line_st_boundary().IsEmpty();
-
-  // check obstacle is on an associate lane guarded by stop sign
-  const std::string& obstable_lane_id = obstacle_lane.get()->id().id();
-  auto assoc_lane_it = std::find_if(
-      GetContext()->associated_lanes.begin(),
-      GetContext()->associated_lanes.end(),
-      [&obstable_lane_id](
-          std::pair<LaneInfoConstPtr, OverlapInfoConstPtr>& assc_lane) {
-        return assc_lane.first.get()->id().id() == obstable_lane_id;
-      });
-  if (assoc_lane_it != GetContext()->associated_lanes.end()) {
-    // check pass stop line of the stop_sign
-    auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
-        obstacle_lane.get()->id());
-    if (over_lap_info == nullptr) {
-      ADEBUG << "can't find over_lap_info for id: " << obstable_lane_id;
-      return -1;
+  for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
+    if (std::find(it->second.begin(), it->second.end(),
+                  obstacle_id) == it->second.end()) {
+      continue;
     }
 
-    const double stop_line_end_s = over_lap_info->lane_overlap_info().end_s();
-    const double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
-    const double distance_pass_stop_line = obstacle_end_s - stop_line_end_s;
-    if (distance_pass_stop_line > scenario_config_.min_pass_s_distance() &&
-        !is_path_cross) {
-      erase = true;
-
-      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-             << "] distance_pass_stop_line[" << distance_pass_stop_line
-             << "] stop_line_end_s[" << stop_line_end_s << "] obstacle_end_s["
-             << obstacle_end_s << "] is_path_cross[" << is_path_cross
-             << "] passed stop sign, AND path not crosses. "
-             << "erase from watch_vehicles";
+    std::string associated_lane_id = it->first;
+    auto assoc_lane_it = std::find_if(
+        GetContext()->associated_lanes.begin(),
+        GetContext()->associated_lanes.end(),
+        [&associated_lane_id](
+            std::pair<LaneInfoConstPtr, OverlapInfoConstPtr>& assc_lane) {
+          return assc_lane.first.get()->id().id() == associated_lane_id;
+        });
+    if (assoc_lane_it == GetContext()->associated_lanes.end()) {
+      continue;
     }
-  } else {
-    // passes associated lane (in junction)
-    if (!is_path_cross) {
-      erase = true;
-      ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-             << "] obstable_lane_id[" << obstable_lane_id << "] is_path_cross["
-             << is_path_cross
-             << "] passed associated lane, AND path not crosses. "
-             << "erase from watch_vehicles";
-    }
-  }
 
-  // check if obstacle stops
-  /*
-  if (!erase) {
-    auto speed = std::hypot(perception_obstacle.velocity().x(),
-                            perception_obstacle.velocity().y());
-    if (speed > config_.stop_sign().max_watch_vehicle_stop_speed()) {
-      ADEBUG << "obstacle_id[" << obstacle_id
-          << "] type[" << obstacle_type_name
-          << "] velocity[" << speed
-          << "] not stopped. erase from watch_vehicles";
-      erase = true;
+    auto stop_sign_over_lap_info =
+        assoc_lane_it->second.get()->GetObjectOverlapInfo(
+            hdmap::MakeMapId(associated_lane_id));
+    if (stop_sign_over_lap_info == nullptr) {
+      AERROR << "can't find stop_sign_over_lap_info for id: "
+          << associated_lane_id;
+      continue;
     }
-  }
-  */
+    const double stop_line_end_s =
+        stop_sign_over_lap_info->lane_overlap_info().end_s();
 
-  if (erase) {
-    for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-         it != watch_vehicles->end(); ++it) {
-      std::vector<std::string>& vehicles = it->second;
-      vehicles.erase(std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
-                     vehicles.end());
+    const auto lane = HDMapUtil::BaseMap().GetLaneById(
+        hdmap::MakeMapId(associated_lane_id));
+    if (lane == nullptr) {
+      continue;
+    }
+    auto stop_sign_point = lane.get()->GetSmoothPoint(stop_line_end_s);
+    auto obstacle_point = common::util::MakePointENU(
+        perception_obstacle.position().x(),
+        perception_obstacle.position().y(),
+        perception_obstacle.position().z());
+
+    double distance = common::util::DistanceXY(
+        stop_sign_point, obstacle_point);
+    AERROR << "obstacle_id[" << obstacle_id
+        << "] distance[" << distance << "]";
+
+    // TODO(all): move 10.0 to conf
+    if (distance > 10.0) {
+      ADEBUG << "ERASE obstacle_id[" << obstacle_id << "]";
+      for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
+           it != watch_vehicles->end(); ++it) {
+        std::vector<std::string>& vehicles = it->second;
+        vehicles.erase(std::remove(vehicles.begin(), vehicles.end(),
+                                   obstacle_id),
+                                   vehicles.end());
+      }
+      return 0;
     }
   }
 
