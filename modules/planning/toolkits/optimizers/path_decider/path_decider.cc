@@ -110,12 +110,6 @@ bool PathDecider::MakeStaticObstacleDecision(
       // STOP decision
       continue;
     }
-    if (obstacle->HasLateralDecision() &&
-        obstacle->LateralDecision().has_sidepass()) {
-      // SIDE_PASS decision
-      continue;
-    }
-
     if (obstacle->reference_line_st_boundary().boundary_type() ==
         StBoundary::BoundaryType::KEEP_CLEAR) {
       continue;

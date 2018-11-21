@@ -58,9 +58,7 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
 const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
                          Obstacle::ObjectTagCaseHash>
     Obstacle::s_lateral_decision_safety_sorter_ = {
-        {ObjectDecisionType::kIgnore, 0},
-        {ObjectDecisionType::kNudge, 100},
-        {ObjectDecisionType::kSidepass, 200}};
+        {ObjectDecisionType::kIgnore, 0}, {ObjectDecisionType::kNudge, 100}};
 
 Obstacle::Obstacle(const std::string& id,
                    const PerceptionObstacle& perception_obstacle)
@@ -490,8 +488,7 @@ const std::vector<ObjectDecisionType>& Obstacle::decisions() const {
 }
 
 bool Obstacle::IsLateralDecision(const ObjectDecisionType& decision) {
-  return decision.has_ignore() || decision.has_nudge() ||
-         decision.has_sidepass();
+  return decision.has_ignore() || decision.has_nudge();
 }
 
 bool Obstacle::IsLongitudinalDecision(const ObjectDecisionType& decision) {
@@ -571,7 +568,7 @@ ObjectDecisionType Obstacle::MergeLateralDecision(
   } else if (lhs_val > rhs_val) {
     return lhs;
   } else {
-    if (lhs.has_ignore() || lhs.has_sidepass()) {
+    if (lhs.has_ignore()) {
       return rhs;
     } else if (lhs.has_nudge()) {
       DCHECK(lhs.nudge().type() == rhs.nudge().type())

@@ -68,18 +68,6 @@ void PlanningBase::FillPlanningPb(const double timestamp,
       trajectory_pb->trajectory_point_size() == 0) {
     SetFallbackTrajectory(trajectory_pb);
   }
-
-  // NOTICE:
-  // Since we are using the time at each cycle beginning as timestamp, the
-  // relative time of each trajectory point should be modified so that we can
-  // use the current timestamp in header.
-
-  if (!FLAGS_planning_test_mode) {
-    const double dt = timestamp - Clock::NowInSeconds();
-    for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
-      p.set_relative_time(p.relative_time() + dt);
-    }
-  }
 }
 
 void PlanningBase::SetFallbackTrajectory(ADCTrajectory* const trajectory_pb) {

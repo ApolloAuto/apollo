@@ -59,9 +59,6 @@ class WaypointSampler {
       std::vector<std::vector<common::SLPoint>> *const points);
 
  protected:
-  virtual bool HasSidepass();
-
- protected:
   const WaypointSamplerConfig &config_;
   const ReferenceLineInfo *reference_line_info_ = nullptr;
   common::SLPoint init_sl_point_;

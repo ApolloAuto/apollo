@@ -41,7 +41,7 @@ using apollo::prediction::PredictionObstacles;
 namespace apollo {
 namespace dreamview {
 
-const float kEpsilon = 0.01;
+const float kEpsilon = 0.01f;
 
 class SimulationWorldServiceTest : public ::testing::Test {
  public:
@@ -328,7 +328,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
 
   apollo::planning::ObjectDecisions* obj_decisions =
       decision_res.mutable_object_decision();
-  // The 1st obstacle is from perception and has 2 decisions: nudge or sidepass.
+  // The 1st obstacle is from perception and has 1 decisions: nudge.
   apollo::planning::ObjectDecision* obj_decision1 =
       obj_decisions->add_decision();
   obj_decision1->set_perception_id(1);
@@ -352,7 +352,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
     }
   }
   obj_decision1->add_object_decision()->mutable_nudge()->set_distance_l(1.8);
-  obj_decision1->add_object_decision()->mutable_sidepass();
+
   // The 2nd obstacle is virtual and has only 1 decision: yield.
   apollo::planning::ObjectDecision* obj_decision2 =
       obj_decisions->add_decision();
@@ -394,14 +394,12 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
       EXPECT_DOUBLE_EQ(4.0, obj_dec.length());
       EXPECT_DOUBLE_EQ(5.0, obj_dec.width());
       EXPECT_DOUBLE_EQ(6.0, obj_dec.height());
-      EXPECT_EQ(obj_dec.decision_size(), 2);
+      EXPECT_EQ(obj_dec.decision_size(), 1);
       for (int j = 0; j < obj_dec.decision_size(); ++j) {
         const Decision& decision = obj_dec.decision(j);
         if (j == 0) {
           EXPECT_EQ(decision.type(), Decision_Type_NUDGE);
           EXPECT_EQ(decision.polygon_point_size(), 67);
-        } else {
-          EXPECT_EQ(decision.type(), Decision_Type_SIDEPASS);
         }
       }
     } else {
