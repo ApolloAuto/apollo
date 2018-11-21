@@ -130,12 +130,13 @@ monitored_components {
     # Special LocalizationMonitor.
   }
 }
-monitored_components {
-  key: "ESD-CAN"
-  value: {
-    # Special EsdCanMonitor.
-  }
-}
+# Disbale ESD-CAN for a while as in some cars we are using B-CAN.
+# monitored_components {
+#   key: "ESD-CAN"
+#   value: {
+#     # Special EsdCanMonitor.
+#   }
+# }
 monitored_components {
   key: "Lidar 128"
   value: {
