@@ -29,18 +29,22 @@ namespace cyber {
 namespace scheduler {
 
 using apollo::cyber::proto::ChoreographyTask;
+using apollo::cyber::proto::InnerThread;
 
 class SchedulerChoreography : public Scheduler {
  public:
   SchedulerChoreography();
-  bool RemoveTask(const std::string& name) override;
+  void SetInnerThreadAttr(const std::thread* thr,
+                          const std::string& name) override;
 
+  bool RemoveTask(const std::string& name) override;
  private:
   void CreateProcessor();
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool NotifyProcessor(uint64_t crid) override;
 
   std::unordered_map<std::string, ChoreographyTask> cr_confs_;
+  std::unordered_map<std::string, InnerThread> inner_thr_confs_;
 
   std::string choreography_affinity_;
   std::string choreography_processor_policy_;

@@ -17,11 +17,14 @@
 #include "cyber/timer/timer_manager.h"
 
 #include "cyber/common/log.h"
+#include "cyber/scheduler/scheduler.h"
 #include "cyber/time/duration.h"
 #include "cyber/time/rate.h"
 
 namespace apollo {
 namespace cyber {
+
+using cyber::scheduler::Scheduler;
 
 TimerManager::TimerManager()
     : timing_wheel_(Duration(0.01)),
@@ -40,6 +43,7 @@ void TimerManager::Start() {
     ADEBUG << "TimerManager->Start() ok";
     running_ = true;
     scheduler_thread_ = std::thread([this]() { this->ThreadFuncImpl(); });
+    Scheduler::Instance()->SetInnerThreadAttr(&scheduler_thread_, "timer");
   }
 }
 

@@ -26,6 +26,7 @@ cc_library(
     ],
     deps = [
         "service_base",
+        "//cyber/scheduler:scheduler",
     ],
 )
 

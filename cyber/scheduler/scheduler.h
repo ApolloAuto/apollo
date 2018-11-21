@@ -52,21 +52,27 @@ class Scheduler {
   Scheduler() : stop_(false) {}
   virtual ~Scheduler() {}
   static Scheduler* Instance();
+
   bool CreateTask(const RoutineFactory& factory, const std::string& name);
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
-  virtual bool RemoveTask(const std::string& name) = 0;
   bool NotifyTask(uint64_t crid);
-  void ShutDown();
+  virtual bool RemoveTask(const std::string& name) = 0;
+
   uint32_t TaskPoolSize() { return task_pool_size_; }
+  void ShutDown();
+
+  virtual void SetInnerThreadAttr(const std::thread* thr,
+                                  const std::string& name) = 0;
 
  protected:
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
+
   void ParseCpuset(const std::string&, std::vector<int>*);
 
-  std::unordered_map<uint64_t, std::mutex> cr_del_lock_;
   AtomicRWLock id_cr_lock_;
+  std::unordered_map<uint64_t, std::mutex> id_cr_wl_;
 
   std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> id_cr_;
   std::vector<std::shared_ptr<ProcessorContext>> pctxs_;

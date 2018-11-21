@@ -23,9 +23,12 @@
 #include "cyber/common/types.h"
 #include "cyber/node/node_channel_impl.h"
 #include "cyber/service/service_base.h"
+#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
+
+using cyber::scheduler::Scheduler;
 
 template <typename Request, typename Response>
 class Service : public ServiceBase {
@@ -113,6 +116,7 @@ bool Service<Request, Response>::Init() {
         (void)reader_attr;
         std::thread _thread =
             std::thread(request_callback_, request, message_info);
+        Scheduler::Instance()->SetInnerThreadAttr(&_thread, "service");
         _thread.detach();
       },
       proto::OptionalMode::RTPS);

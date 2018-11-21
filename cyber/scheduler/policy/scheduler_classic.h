@@ -32,6 +32,9 @@ class SchedulerClassic : public Scheduler {
   SchedulerClassic();
   bool RemoveTask(const std::string& name) override;
 
+  void SetInnerThreadAttr(const std::thread* thr,
+                          const std::string& name) {}
+
  private:
   void CreateProcessor();
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;

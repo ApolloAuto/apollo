@@ -16,6 +16,7 @@
 
 #include "cyber/scheduler/policy/scheduler_choreography.h"
 
+#include <sched.h>
 #include <memory>
 #include <string>
 
@@ -63,6 +64,10 @@ SchedulerChoreography::SchedulerChoreography() {
     ParseCpuset(cfg.scheduler_conf().choreography_conf().pool_cpuset(),
         &pool_cpuset_);
 
+    for (auto& thr : cfg.scheduler_conf().choreography_conf().threads()) {
+      inner_thr_confs_[thr.name()] = thr;
+    }
+
     for (auto& task : cfg.scheduler_conf().choreography_conf().tasks()) {
       cr_confs_[task.name()] = task;
     }
@@ -106,7 +111,7 @@ void SchedulerChoreography::CreateProcessor() {
 bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  std::lock_guard<std::mutex> lg(cr_del_lock_[cr->id()]);
+  std::lock_guard<std::mutex> lg(id_cr_wl_[cr->id()]);
 
   // Assign sched cfg to tasks according to configuration.
   if (cr_confs_.find(cr->name()) != cr_confs_.end()) {
@@ -161,7 +166,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
 
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  std::lock_guard<std::mutex> lg(cr_del_lock_[crid]);
+  std::lock_guard<std::mutex> lg(id_cr_wl_[crid]);
 
   // Find cr from id_cr &&
   // get cr prio if cr found
@@ -238,6 +243,42 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
   }
 
   return true;
+}
+
+void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
+                                               const std::string& name) {
+  if (inner_thr_confs_.find(name) !=
+     inner_thr_confs_.end()) {
+    auto th = const_cast<std::thread*>(thr);
+    auto th_conf = inner_thr_confs_[name];
+    auto cpuset = th_conf.cpuset();
+
+    std::vector<int> cpus;
+    ParseCpuset(cpuset, &cpus);
+    cpu_set_t set;
+    CPU_ZERO(&set);
+    for (std::vector<int>::const_iterator it = cpus.begin();
+         it != cpus.end(); it++) {
+      CPU_SET(*it, &set);
+    }
+    pthread_setaffinity_np(th->native_handle(), sizeof(set), &set);
+
+    auto policy = th_conf.policy();
+    auto prio = th_conf.prio();
+    struct sched_param sp;
+    int p;
+    if (!policy.compare("SCHED_FIFO")) {
+      p = SCHED_FIFO;
+    } else if (!policy.compare("SCHED_RR")) {
+      p = SCHED_RR;
+    } else {
+      return;
+    }
+    memset(reinterpret_cast<void *>(&sp), 0, sizeof(sp));
+    sp.sched_priority = prio;
+    pthread_setschedparam(th->native_handle(), p, &sp);
+  }
+  return;
 }
 
 }  // namespace scheduler
