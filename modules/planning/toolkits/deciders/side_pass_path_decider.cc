@@ -167,6 +167,13 @@ bool SidePassPathDecider::BuildSidePathDecision(
       return false;
     }
   }
+
+  if (decided_direction_ == SidePassDirection::LEFT) {
+    ADEBUG << "Decided to side-pass from LEFT.";
+  } else {
+    ADEBUG << "Decided to side-pass from RIGHT.";
+  }
+
   return true;
 }
 
@@ -270,14 +277,22 @@ SidePassPathDecider::GetPathBoundaries(
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
 
+    ADEBUG << "Number of left lanes: "
+           << curr_lane_.left_neighbor_forward_lane_id_size() +
+              curr_lane_.left_neighbor_reverse_lane_id_size();
+    ADEBUG << "Number of right lanes: "
+           << curr_lane_.right_neighbor_forward_lane_id_size() +
+              curr_lane_.right_neighbor_reverse_lane_id_size();
     if (decided_direction_ == SidePassDirection::LEFT &&
         (curr_lane_.left_neighbor_forward_lane_id_size() > 0 ||
          curr_lane_.left_neighbor_reverse_lane_id_size() > 0)) {
+      ADEBUG << "Expanding the upper limit (left).";
       std::get<2>(lateral_bound) =
           lane_left_width + lane_width - adc_half_width - kRoadBuffer;
     } else if (decided_direction_ == SidePassDirection::RIGHT &&
                (curr_lane_.right_neighbor_forward_lane_id_size() > 0 ||
                 curr_lane_.right_neighbor_reverse_lane_id_size() > 0)) {
+      ADEBUG << "Expanding the lower limit (right).";
       std::get<1>(lateral_bound) =
           -lane_right_width - lane_width + adc_half_width + kRoadBuffer;
     }
