@@ -107,7 +107,7 @@ function generate_build_targets() {
     BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/routing/... union //modules/prediction/... union //modules/planning/... union //modules/control/...`
     ;;
   no_perception)
-    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... except //modules/calibration/lidar_ex_checker/... union //cyber/...`
+    BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... union //cyber/...`
     ;;
   *)
     BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
