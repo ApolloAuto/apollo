@@ -14,6 +14,11 @@ message ShmMulticastLocator {
     optional uint32 port = 2;
 };
 
+message ShmConf {
+    optional string notifier_type = 1;
+    optional ShmMulticastLocator shm_locator = 2;
+};
+
 message RtpsParticipantAttr {
     optional int32 lease_duration = 1;
     optional int32 announcement_period = 2;
@@ -32,7 +37,7 @@ message ResourceLimit {
 };
 
 message TransportConf {
-    optional ShmMulticastLocator shm_locator = 1;
+    optional ShmConf shm_conf = 1;
     optional RtpsParticipantAttr participant_attr = 2;
     optional CommunicationMode  communication_mode = 3;
     optional ResourceLimit resource_limit = 4;

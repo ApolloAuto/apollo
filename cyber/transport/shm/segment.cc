@@ -135,6 +135,10 @@ bool Segment::OpenOrCreate() {
   int shmid = 0;
   while (retry < 2) {
     shmid = shmget(id_, conf_.managed_shm_size(), 0644 | IPC_CREAT | IPC_EXCL);
+    if (shmid != -1) {
+      break;
+    }
+
     if (EINVAL == errno) {
       AINFO << "need larger space, recreate.";
       Reset();

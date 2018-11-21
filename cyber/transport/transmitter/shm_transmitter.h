@@ -17,12 +17,6 @@
 #ifndef CYBER_TRANSPORT_TRANSMITTER_SHM_TRANSMITTER_H_
 #define CYBER_TRANSPORT_TRANSMITTER_SHM_TRANSMITTER_H_
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -32,8 +26,7 @@
 #include "cyber/common/log.h"
 #include "cyber/common/util.h"
 #include "cyber/message/message_traits.h"
-#include "cyber/proto/transport_conf.pb.h"
-#include "cyber/transport/common/syscall_wrapper.h"
+#include "cyber/transport/shm/notifier_factory.h"
 #include "cyber/transport/shm/readable_info.h"
 #include "cyber/transport/shm/segment.h"
 #include "cyber/transport/transmitter/transmitter.h"
@@ -59,28 +52,18 @@ class ShmTransmitter : public Transmitter<M> {
   bool Transmit(const M& msg, const MessageInfo& msg_info);
 
   SegmentPtr segment_;
-
-  int sfd_;
   uint64_t channel_id_;
   uint64_t host_id_;
-
-  std::string channel_name_;
-
-  struct sockaddr_in mcast_addr_;
-  std::shared_ptr<proto::ShmMulticastLocator> locator_;
+  NotifierPtr notifier_;
 };
 
 template <typename M>
 ShmTransmitter<M>::ShmTransmitter(const RoleAttributes& attr)
     : Transmitter<M>(attr),
       segment_(nullptr),
-      sfd_(-1),
       channel_id_(attr.channel_id()),
-      channel_name_(attr.channel_name()),
-      locator_(nullptr) {
+      notifier_(nullptr) {
   host_id_ = common::Hash(attr.host_ip());
-  memset(&mcast_addr_, 0, sizeof(mcast_addr_));
-  locator_ = std::make_shared<proto::ShmMulticastLocator>();
 }
 
 template <typename M>
@@ -94,19 +77,8 @@ void ShmTransmitter<M>::Enable() {
     return;
   }
 
-  auto global_conf = common::GlobalData::Instance()->Config();
-  RETURN_IF(!global_conf.has_transport_conf());
-  RETURN_IF(!global_conf.transport_conf().has_shm_locator());
-  locator_->CopyFrom(global_conf.transport_conf().shm_locator());
-
-  sfd_ = socket(AF_INET, SOCK_DGRAM, 0);
-  RETURN_IF(sfd_ == -1);
-
-  mcast_addr_.sin_family = AF_INET;
-  mcast_addr_.sin_addr.s_addr = inet_addr(locator_->ip().c_str());
-  mcast_addr_.sin_port = htons(static_cast<uint16_t>(locator_->port()));
-
   segment_ = std::make_shared<Segment>(channel_id_, WRITE_ONLY);
+  notifier_ = NotifierFactory::CreateNotifier();
   this->enabled_ = true;
 }
 
@@ -114,7 +86,7 @@ template <typename M>
 void ShmTransmitter<M>::Disable() {
   if (this->enabled_) {
     segment_ = nullptr;
-    CloseAndReset(&sfd_);
+    notifier_ = nullptr;
     this->enabled_ = false;
   }
 }
@@ -157,16 +129,11 @@ bool ShmTransmitter<M>::Transmit(const M& msg, const MessageInfo& msg_info) {
   segment_->ReleaseWrittenBlock(wb);
 
   ReadableInfo readable_info(host_id_, wb.index, channel_id_);
-  std::string readable_info_str = "";
-  readable_info.SerializeTo(&readable_info_str);
+
   ADEBUG << "Writing sharedmem message: "
          << common::GlobalData::GetChannelById(channel_id_)
          << " to block: " << wb.index;
-  ssize_t write_bytes =
-      sendto(sfd_, readable_info_str.c_str(), readable_info_str.size(), 0,
-             (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_));
-  RETURN_VAL_IF(write_bytes < 0, false);
-  return true;
+  return notifier_->Notify(readable_info);
 }
 
 }  // namespace transport
