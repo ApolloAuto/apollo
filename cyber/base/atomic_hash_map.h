@@ -86,16 +86,20 @@ class AtomicHashMap {
  private:
   struct Entry {
     Entry() {}
-    explicit Entry(K key) : key(key) { value_ptr.store(new V()); }
-    Entry(K key, const V &value) : key(key) { value_ptr.store(new V(value)); }
-    Entry(K key, V &&value) : key(key) {
-      value_ptr.store(new V(std::forward<V>(value)));
+    explicit Entry(K key) : key(key) {
+      value_ptr.store(new V(), std::memory_order_release);
     }
-    ~Entry() { delete value_ptr.load(); }
+    Entry(K key, const V &value) : key(key) {
+      value_ptr.store(new V(value), std::memory_order_release);
+    }
+    Entry(K key, V &&value) : key(key) {
+      value_ptr.store(new V(std::forward<V>(value)), std::memory_order_release);
+    }
+    ~Entry() { delete value_ptr.load(std::memory_order_acquire); }
 
     void Release() {
       if (ref_count.fetch_sub(1) == 1) {
-        delete value_ptr.load();
+        delete value_ptr.load(std::memory_order_acquire);
         delete this;
       }
     }
@@ -113,7 +117,7 @@ class AtomicHashMap {
     ~Bucket() {
       Entry *ite = head_;
       while (ite) {
-        auto tmp = ite->next.load();
+        auto tmp = ite->next.load(std::memory_order_acquire);
         delete ite;
         ite = tmp;
       }
@@ -130,15 +134,15 @@ class AtomicHashMap {
     }
 
     bool Has(K key) {
-      Entry *m_target = head_->next.load();
+      Entry *m_target = head_->next.load(std::memory_order_acquire);
       while (Entry *target = Unmark(m_target)) {
-        if (Marked(target->next.load())) {
-          m_target = head_->next.load();
+        if (Marked(target->next.load(std::memory_order_acquire))) {
+          m_target = head_->next.load(std::memory_order_acquire);
           continue;
         }
 
         if (target->key < key) {
-          m_target = target->next.load();
+          m_target = target->next.load(std::memory_order_acquire);
           continue;
         } else {
           return target->key == key;
@@ -149,12 +153,12 @@ class AtomicHashMap {
 
     bool Find(K key, Entry **prev_ptr, Entry **target_ptr) {
       Entry *prev = head_;
-      Entry *m_target = head_->next.load();
+      Entry *m_target = head_->next.load(std::memory_order_acquire);
       while (Entry *target = Unmark(m_target)) {
-        auto next = target->next.load();
+        auto next = target->next.load(std::memory_order_acquire);
         if (Marked(next) && Unmark(next)) {
           prev = head_;
-          m_target = head_->next.load();
+          m_target = head_->next.load(std::memory_order_acquire);
           continue;
         }
 
@@ -170,7 +174,7 @@ class AtomicHashMap {
           return false;
         } else {
           prev = target;
-          m_target = target->next.load();
+          m_target = target->next.load(std::memory_order_acquire);
         }
       }
       *prev_ptr = prev;
@@ -186,11 +190,11 @@ class AtomicHashMap {
       while (true) {
         if (Find(key, &prev, &target)) {
           // key exists, update value
-          auto old_val_ptr = target->value_ptr.load();
+          auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
           // value_ptr will be set to nullptr befor remove, so check first
           while (old_val_ptr) {
             if (target->value_ptr.compare_exchange_strong(
-                    old_val_ptr, new_value, std::memory_order_acquire,
+                    old_val_ptr, new_value, std::memory_order_acq_rel,
                     std::memory_order_relaxed)) {
               target->Release();
               delete new_entry;
@@ -199,8 +203,10 @@ class AtomicHashMap {
           }
           continue;
         } else {
-          new_entry->next.store(target);
-          if (prev->next.compare_exchange_strong(target, new_entry)) {
+          new_entry->next.store(target, std::memory_order_release);
+          if (prev->next.compare_exchange_strong(target, new_entry,
+                                                 std::memory_order_acq_rel,
+                                                 std::memory_order_relaxed)) {
             // Insert success
             if (target) {
               target->Release();
@@ -221,11 +227,11 @@ class AtomicHashMap {
       while (true) {
         if (Find(key, &prev, &target)) {
           // key exists, update value
-          auto old_val_ptr = target->value_ptr.load();
+          auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
           // value_ptr will be set to nullptr befor remove, so check first
           while (old_val_ptr) {
             if (target->value_ptr.compare_exchange_strong(
-                    old_val_ptr, new_value, std::memory_order_acquire,
+                    old_val_ptr, new_value, std::memory_order_acq_rel,
                     std::memory_order_relaxed)) {
               target->Release();
               delete new_entry;
@@ -234,8 +240,10 @@ class AtomicHashMap {
           }
           continue;
         } else {
-          new_entry->next.store(target);
-          if (prev->next.compare_exchange_strong(target, new_entry)) {
+          new_entry->next.store(target, std::memory_order_release);
+          if (prev->next.compare_exchange_strong(target, new_entry,
+                                                 std::memory_order_acq_rel,
+                                                 std::memory_order_relaxed)) {
             // Insert success
             if (target) {
               target->Release();
@@ -256,11 +264,12 @@ class AtomicHashMap {
       while (true) {
         if (Find(key, &prev, &target)) {
           // key exists, update value
-          auto old_val_ptr = target->value_ptr.load();
+          auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
           // value_ptr will be set to nullptr befor remove, so check first
           while (old_val_ptr) {
-            if (target->value_ptr.compare_exchange_strong(old_val_ptr,
-                                                          new_value)) {
+            if (target->value_ptr.compare_exchange_strong(
+                    old_val_ptr, new_value, std::memory_order_acq_rel,
+                    std::memory_order_relaxed)) {
               target->Release();
               delete new_entry;
               return;
@@ -268,8 +277,10 @@ class AtomicHashMap {
           }
           continue;
         } else {
-          new_entry->next.store(target);
-          if (prev->next.compare_exchange_strong(target, new_entry)) {
+          new_entry->next.store(target, std::memory_order_release);
+          if (prev->next.compare_exchange_strong(target, new_entry,
+                                                 std::memory_order_acq_rel,
+                                                 std::memory_order_relaxed)) {
             // Insert success
             if (target) {
               target->Release();
@@ -292,16 +303,19 @@ class AtomicHashMap {
           }
           return false;
         }
-        Entry *old_next = target->next.load();
+        Entry *old_next = target->next.load(std::memory_order_acquire);
         // mark befor remove
-        if (!target->next.compare_exchange_strong(old_next, Mark(old_next))) {
+        if (!target->next.compare_exchange_strong(old_next, Mark(old_next),
+                                                  std::memory_order_acq_rel,
+                                                  std::memory_order_relaxed)) {
           target->Release();
           continue;
         }
-        target->value_ptr.store(nullptr);
+        target->value_ptr.store(nullptr, std::memory_order_release);
 
-        if (prev->next.compare_exchange_strong(target,
-                                               Unmark(target->next.load()))) {
+        if (prev->next.compare_exchange_strong(
+                target, Unmark(target->next.load(std::memory_order_acquire)),
+                std::memory_order_acq_rel, std::memory_order_relaxed)) {
           target->Release();
           return true;
         }
@@ -312,7 +326,7 @@ class AtomicHashMap {
       Entry *prev = nullptr;
       Entry *target = nullptr;
       if (Find(key, &prev, &target)) {
-        *value = target->value_ptr.load();
+        *value = target->value_ptr.load(std::memory_order_acquire);
         target->Release();
         return true;
       }
