@@ -49,6 +49,10 @@ SchedulerChoreography::SchedulerChoreography() {
         .choreography_processor_num();
     choreography_affinity_ = cfg.scheduler_conf().choreography_conf()
         .choreography_affinity();
+    choreography_processor_policy_ = cfg.scheduler_conf().choreography_conf()
+        .choreography_processor_policy();
+    choreography_processor_prio_ = cfg.scheduler_conf().choreography_conf()
+        .choreography_processor_prio();
     ParseCpuset(cfg.scheduler_conf().choreography_conf().choreography_cpuset(),
         &choreography_cpuset_);
 
@@ -81,6 +85,8 @@ void SchedulerChoreography::CreateProcessor() {
 
     proc->BindContext(ctx);
     proc->SetAffinity(choreography_cpuset_, choreography_affinity_, i);
+    proc->SetSchedPolicy(choreography_processor_policy_,
+                        choreography_processor_prio_);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
   }

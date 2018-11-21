@@ -63,6 +63,24 @@ void Processor::SetAffinity(const std::vector<int> &cpus,
   }
 }
 
+void Processor::SetSchedPolicy(std::string spolicy, int sched_priority) {
+  struct sched_param sp;
+  int policy;
+
+  if (!spolicy.compare("SCHED_FIFO")) {
+    policy = SCHED_FIFO;
+  } else if (!spolicy.compare("SCHED_RR")) {
+    policy = SCHED_RR;
+  } else {
+    return;
+  }
+
+  memset(reinterpret_cast<void *>(&sp), 0, sizeof(sp));
+  sp.sched_priority = sched_priority;
+
+  pthread_setschedparam(thread_.native_handle(), policy, &sp);
+}
+
 void Processor::Run() {
   CRoutine::SetMainContext(routine_context_);
 
