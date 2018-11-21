@@ -79,6 +79,7 @@ bool MlfMotionRefiner::Refine(const MlfTrackDataConstPtr& track_data,
 
   if (is_static_hypothesis) {
     new_object->output_velocity = Eigen::Vector3d::Zero();
+    new_object->state.tail<2>().setZero();
     AINFO << "Track_id " << track_data->track_id_
           << ", set velocity to zero because of noise claping.";
     return true;
