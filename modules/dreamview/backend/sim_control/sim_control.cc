@@ -229,8 +229,8 @@ void SimControl::OnRoutingResponse(
     TrajectoryPoint point;
     point.mutable_path_point()->set_x(start_pose.x());
     point.mutable_path_point()->set_y(start_pose.y());
-    point.set_a(0.0);
-    point.set_v(0.0);
+    point.set_a(next_point_.has_a() ? next_point_.a() : 0.0);
+    point.set_v(next_point_.has_v() ? next_point_.v() : 0.0);
     double theta = 0.0;
     double s = 0.0;
     map_service_->GetPoseWithRegardToLane(start_pose.x(), start_pose.y(),
@@ -260,7 +260,9 @@ void SimControl::Start() {
     // When localization is already available, we do not need to
     // reset/override the start point.
     localization_reader_->Observe();
-    Init(localization_reader_->Empty());
+    Init(localization_reader_->Empty(),
+      next_point_.has_v() ? next_point_.v() : 0.0,
+      next_point_.has_a() ? next_point_.a() : 0.0);
 
     InternalReset();
     sim_control_timer_->Start();
