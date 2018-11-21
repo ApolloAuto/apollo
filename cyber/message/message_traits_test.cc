@@ -71,8 +71,6 @@ class Message {
   std::string TypeName() { return "type"; }
 };
 
-class Intra : public IntraMessage {};
-
 TEST(MessageTraitsTest, type_trait) {
   EXPECT_FALSE(HasType<Data>::value);
   EXPECT_FALSE(HasSerializer<Data>::value);
@@ -83,14 +81,6 @@ TEST(MessageTraitsTest, type_trait) {
   EXPECT_TRUE(HasDescriptor<Message>::value);
 
   EXPECT_TRUE(HasSerializer<proto::UnitTest>::value);
-
-  EXPECT_TRUE(HasType<IntraMessage>::value);
-  EXPECT_TRUE(HasSerializer<IntraMessage>::value);
-  EXPECT_FALSE(HasDescriptor<IntraMessage>::value);
-
-  EXPECT_TRUE(HasType<Intra>::value);
-  EXPECT_TRUE(HasSerializer<Intra>::value);
-  EXPECT_FALSE(HasDescriptor<Intra>::value);
 
   EXPECT_TRUE(HasType<PyMessageWrap>::value);
   EXPECT_TRUE(HasSerializer<PyMessageWrap>::value);
@@ -109,12 +99,6 @@ TEST(MessageTraitsTest, byte_size) {
   EXPECT_EQ(ByteSize(msg), 0);
   msg.content = "123";
   EXPECT_EQ(ByteSize(msg), 3);
-
-  IntraMessage intra_msg;
-  EXPECT_EQ(ByteSize(intra_msg), -1);
-
-  Intra intra;
-  EXPECT_EQ(ByteSize(intra), -1);
 
   proto::UnitTest ut;
   ut.set_class_name("MessageTraitsTest");
@@ -159,11 +143,6 @@ TEST(MessageTraitsTest, serialize_to_array) {
   }
 
   memset(array, 0, sizeof(array));
-  Intra intra;
-  EXPECT_FALSE(SerializeToArray(intra, array, sizeof(array)));
-  EXPECT_EQ(strlen(array), 0);
-
-  memset(array, 0, sizeof(array));
   RawMessage raw("content");
   EXPECT_TRUE(SerializeToArray(raw, array, sizeof(array)));
   {
@@ -193,11 +172,6 @@ TEST(MessageTraitsTest, serialize_to_string) {
   EXPECT_EQ("content", str);
 
   str = "";
-  Intra intra;
-  EXPECT_FALSE(SerializeToString(intra, &str));
-  EXPECT_EQ("", str);
-
-  str = "";
   RawMessage raw("content");
   EXPECT_TRUE(SerializeToString(raw, &str));
   EXPECT_EQ("content", str);
@@ -221,9 +195,6 @@ TEST(MessageTraitsTest, parse_from_array) {
   EXPECT_TRUE(ParseFromArray(array, arr_str_len, &msg));
   EXPECT_EQ(msg.content, arr_str);
 
-  Intra intra;
-  EXPECT_FALSE(ParseFromArray(array, arr_str_len, &intra));
-
   RawMessage raw;
   EXPECT_TRUE(ParseFromArray(array, arr_str_len, &raw));
   EXPECT_EQ(raw.message, arr_str);
@@ -243,9 +214,6 @@ TEST(MessageTraitsTest, parse_from_string) {
   EXPECT_TRUE(ParseFromString(str, &msg));
   EXPECT_EQ("\n\rMessageTraits\x12\x11parse_from_string", msg.content);
 
-  Intra intra;
-  EXPECT_FALSE(ParseFromString(str, &intra));
-
   RawMessage raw;
   EXPECT_TRUE(ParseFromString(str, &raw));
   EXPECT_EQ(str, raw.message);
@@ -258,16 +226,6 @@ TEST(MessageTraitsTest, message_type) {
   proto::UnitTest ut;
   msg_type = MessageType(ut);
   EXPECT_EQ(msg_type, "apollo.cyber.proto.UnitTest");
-
-  msg_type = MessageType<IntraMessage>();
-  EXPECT_EQ(msg_type, "IntraMessage");
-
-  msg_type = MessageType<Intra>();
-  EXPECT_EQ(msg_type, "IntraMessage");
-
-  Intra intra;
-  msg_type = MessageType(intra);
-  EXPECT_EQ(msg_type, "IntraMessage");
 }
 
 TEST(MessageTraitsTest, descriptor) {
@@ -283,14 +241,6 @@ TEST(MessageTraitsTest, descriptor) {
   desc = "";
   GetDescriptorString<RawMessage>("apollo.cyber.proto.UnitTest", &desc);
   EXPECT_EQ(pb_desc, desc);
-
-  desc = "";
-  GetDescriptorString<IntraMessage>("apollo", &desc);
-  EXPECT_EQ("", desc);
-
-  desc = "";
-  GetDescriptorString<Intra>("apollo", &desc);
-  EXPECT_EQ("", desc);
 
   desc = "";
   GetDescriptorString<Data>("apollo", &desc);

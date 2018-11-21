@@ -34,7 +34,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class CameraPerceptionVizMessage : public cyber::message::IntraMessage {
+class CameraPerceptionVizMessage {
  public:
   CameraPerceptionVizMessage() {
     type_name_ = "CameraPerceptionVizMessage";
@@ -62,6 +62,7 @@ class CameraPerceptionVizMessage : public cyber::message::IntraMessage {
 
  public:
   std::string camera_name_;
+  std::string type_name_;
   double msg_timestamp_ = 0.0;
 
   Eigen::Matrix4d pose_camera_to_world_;

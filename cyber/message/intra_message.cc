@@ -15,13 +15,3 @@
  *****************************************************************************/
 
 #include "cyber/message/intra_message.h"
-
-namespace apollo {
-namespace cyber {
-namespace message {
-
-const char* IntraMessage::type_name_ = "IntraMessage";
-
-}  // namespace message
-}  // namespace cyber
-}  // namespace apollo
