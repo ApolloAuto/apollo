@@ -62,7 +62,7 @@ function check_machine_arch() {
   # the machine type, currently support x86_64, aarch64
   MACHINE_ARCH=$(uname -m)
 
-  # Generate WORKSPACE file based on marchine architecture
+  # Generate WORKSPACE file based on machine architecture
   if [ "$MACHINE_ARCH" == 'x86_64' ]; then
     sed "s/MACHINE_ARCH/x86_64/g" WORKSPACE.in > WORKSPACE
   elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
