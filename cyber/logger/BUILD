@@ -62,6 +62,9 @@ cc_library(
 
 cc_library(
     name = "logger_util",
+    srcs = [
+        "logger_util.cc"
+    ],
     hdrs = glob([
         "logger_util.h",
     ]),

@@ -14,12 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
-#ifndef CYBER_LOGGER_LOGGER_UTIL_H_
-#define CYBER_LOGGER_LOGGER_UTIL_H_
 
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -33,52 +27,40 @@
 
 #include "cyber/common/global_data.h"
 #include "glog/logging.h"
+#include "cyber/logger/logger_util.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
 
-inline int64_t CycleClock_Now() {
-  struct timeval tv;
-  gettimeofday(&tv, nullptr);
-  return static_cast<int64_t>(tv.tv_sec) * 1000000 + tv.tv_usec;
+namespace {
+  static int32_t g_main_thread_pid = getpid();
 }
 
-static inline void GetHostName(std::string* hostname) {
-  struct utsname buf;
-  if (0 != uname(&buf)) {
-    *buf.nodename = '\0';
+int32_t GetMainThreadPid() { return g_main_thread_pid; }
+
+bool PidHasChanged() {
+  int32_t pid = getpid();
+  if (g_main_thread_pid == pid) {
+    return false;
   }
-  *hostname = buf.nodename;
+  g_main_thread_pid = pid;
+  return true;
 }
 
-const std::vector<std::string>& GetLoggingDirectories();
-
-int32_t GetMainThreadPid();
-
-bool PidHasChanged();
-
-inline int32_t MaxLogSize() {
-  return (FLAGS_max_log_size > 0 ? FLAGS_max_log_size : 1);
-}
-
-inline void FindModuleName(std::string* log_message, std::string* module_name) {
-  auto lpos = log_message->find('[');
-  if (lpos != std::string::npos) {
-    auto rpos = log_message->find(']', lpos);
-    if (rpos != std::string::npos) {
-      module_name->assign(*log_message, lpos + 1, rpos - lpos - 1);
-      auto cut_length = rpos - lpos + 1;
-      log_message->erase(lpos, cut_length);
+const std::vector<std::string>& GetLoggingDirectories() {
+  static std::vector<std::string> logging_directories_list;
+  if (logging_directories_list.empty()) {
+    if (!FLAGS_log_dir.empty()) {
+      logging_directories_list.emplace_back(FLAGS_log_dir.c_str());
+    } else {
+      logging_directories_list.emplace_back("./");
     }
   }
-  if (module_name->empty()) {
-    *module_name = common::GlobalData::Instance()->ProcessGroup();
-  }
+  return logging_directories_list;
 }
 
 }  // namespace logger
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_LOGGER_LOGGER_UTIL_H_
