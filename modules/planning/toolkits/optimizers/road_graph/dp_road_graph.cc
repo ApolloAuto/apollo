@@ -85,7 +85,7 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   double accumulated_s = min_cost_path.front().sl_point.s();
   const double path_resolution = config_.path_resolution();
 
-  for (std::size_t i = 1; i < min_cost_path.size(); ++i) {
+  for (size_t i = 1; i < min_cost_path.size(); ++i) {
     const auto &prev_node = min_cost_path[i - 1];
     const auto &cur_node = min_cost_path[i];
 
@@ -139,8 +139,8 @@ bool DpRoadGraph::GenerateMinCostPath(
 
   // find one point from first row
   const auto &first_row = path_waypoints.front();
-  std::size_t nearest_i = 0;
-  for (std::size_t i = 1; i < first_row.size(); ++i) {
+  size_t nearest_i = 0;
+  for (size_t i = 1; i < first_row.size(); ++i) {
     if (std::fabs(first_row[i].l() - init_sl_point_.l()) <
         std::fabs(first_row[nearest_i].l() - init_sl_point_.l())) {
       nearest_i = i;
@@ -152,7 +152,7 @@ bool DpRoadGraph::GenerateMinCostPath(
   auto &front = graph_nodes.front().front();
   size_t total_level = path_waypoints.size();
 
-  for (std::size_t level = 1; level < path_waypoints.size(); ++level) {
+  for (size_t level = 1; level < path_waypoints.size(); ++level) {
     const auto &prev_dp_nodes = graph_nodes.back();
     const auto &level_points = path_waypoints[level];
 

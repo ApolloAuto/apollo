@@ -290,14 +290,13 @@ void SimulationWorldService::InitWriters() {
     routing_request_attr.set_channel_name(FLAGS_routing_request_topic);
     auto qos = routing_request_attr.mutable_qos_profile();
     // only keeps the last message in history
-    qos->set_history(
-        apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+    qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
     // reliable transfer
     qos->set_reliability(
         apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
     // when writer find new readers, send all its history messsage
-    qos->set_durability(apollo::cyber::proto::QosDurabilityPolicy::
-                            DURABILITY_TRANSIENT_LOCAL);
+    qos->set_durability(
+        apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
     routing_request_writer_ =
         node_->CreateWriter<RoutingRequest>(routing_request_attr);
   }
@@ -777,8 +776,6 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
             continue;
           }
           FindNudgeRegion(decision, world_obj, world_decision);
-        } else if (decision.has_sidepass()) {
-          world_decision->set_type(Decision_Type_SIDEPASS);
         }
       }
 
@@ -807,7 +804,7 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
 
   // Update scenario
   if (data.has_scenario()) {
-      planning_data->mutable_scenario()->CopyFrom(data.scenario());
+    planning_data->mutable_scenario()->CopyFrom(data.scenario());
   }
 
   // Update Chart

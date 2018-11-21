@@ -99,8 +99,7 @@ message ObjectDecisionType {
     ObjectYield yield = 4;
     ObjectOvertake overtake = 5;
     ObjectNudge nudge = 6;
-    ObjectSidePass sidepass = 7;
-    ObjectAvoid avoid = 8;
+    ObjectAvoid avoid = 7;
   }
 }
 

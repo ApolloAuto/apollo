@@ -229,10 +229,6 @@ TEST(IsLateralDecision, AllDecisions) {
   ObjectDecisionType decision_nudge;
   decision_nudge.mutable_nudge();
   EXPECT_TRUE(Obstacle::IsLateralDecision(decision_nudge));
-
-  ObjectDecisionType decision_sidepass;
-  decision_sidepass.mutable_sidepass();
-  EXPECT_TRUE(Obstacle::IsLateralDecision(decision_sidepass));
 }
 
 TEST(IsLongitudinalDecision, AllDecisions) {
@@ -259,10 +255,6 @@ TEST(IsLongitudinalDecision, AllDecisions) {
   ObjectDecisionType decision_nudge;
   decision_nudge.mutable_nudge();
   EXPECT_FALSE(Obstacle::IsLongitudinalDecision(decision_nudge));
-
-  ObjectDecisionType decision_sidepass;
-  decision_sidepass.mutable_sidepass();
-  EXPECT_FALSE(Obstacle::IsLongitudinalDecision(decision_sidepass));
 }
 
 TEST(MergeLongitudinalDecision, AllDecisions) {
@@ -283,9 +275,6 @@ TEST(MergeLongitudinalDecision, AllDecisions) {
 
   ObjectDecisionType decision_nudge;
   decision_nudge.mutable_nudge();
-
-  ObjectDecisionType decision_sidepass;
-  decision_sidepass.mutable_sidepass();
 
   // vertical decision comparison
   EXPECT_TRUE(
@@ -413,9 +402,6 @@ TEST(MergeLateralDecision, AllDecisions) {
 
   ObjectDecisionType decision_nudge;
   decision_nudge.mutable_nudge()->set_type(ObjectNudge::LEFT_NUDGE);
-
-  ObjectDecisionType decision_sidepass;
-  decision_sidepass.mutable_sidepass();
 
   EXPECT_TRUE(Obstacle::MergeLateralDecision(decision_nudge, decision_ignore)
                   .has_nudge());

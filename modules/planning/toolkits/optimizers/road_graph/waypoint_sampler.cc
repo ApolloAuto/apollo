@@ -66,8 +66,6 @@ bool WaypointSampler::SamplePathWaypoints(
       FLAGS_use_navigation_mode ? config_.navigator_sample_num_each_level()
                                 : config_.sample_points_num_each_level();
 
-  const bool has_sidepass = HasSidepass();
-
   constexpr double kSamplePointLookForwardTime = 4.0;
   const double step_length =
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
@@ -159,21 +157,6 @@ bool WaypointSampler::SamplePathWaypoints(
     if (reference_line_info_->IsChangeLanePath() &&
         !reference_line_info_->IsSafeToChangeLane()) {
       sample_l.push_back(reference_line_info_->OffsetToOtherReferenceLine());
-    } else if (has_sidepass) {
-      // currently only left nudge is supported. Need road hard boundary for
-      // both sides
-      switch (sidepass_.type()) {
-        case ObjectSidePass::LEFT: {
-          sample_l.push_back(eff_left_width + config_.sidepass_distance());
-          break;
-        }
-        case ObjectSidePass::RIGHT: {
-          sample_l.push_back(-eff_right_width - config_.sidepass_distance());
-          break;
-        }
-        default:
-          break;
-      }
     } else {
       common::util::uniform_slice(
           sample_right_boundary, sample_left_boundary,
@@ -186,12 +169,6 @@ bool WaypointSampler::SamplePathWaypoints(
       sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }
-    if (!reference_line_info_->IsChangeLanePath() && has_sidepass) {
-      auto sl_zero = common::util::MakeSLPoint(s, 0.0);
-      sample_layer_debug.add_sl_point()->CopyFrom(sl_zero);
-      level_points.push_back(std::move(sl_zero));
-    }
-
     if (!level_points.empty()) {
       planning_debug_->mutable_planning_data()
           ->mutable_dp_poly_graph()
@@ -201,17 +178,6 @@ bool WaypointSampler::SamplePathWaypoints(
     }
   }
   return true;
-}
-
-bool WaypointSampler::HasSidepass() {
-  const auto &path_decision = reference_line_info_->path_decision();
-  for (const auto &obstacle : path_decision.obstacles().Items()) {
-    if (obstacle->LateralDecision().has_sidepass()) {
-      sidepass_ = obstacle->LateralDecision().sidepass();
-      return true;
-    }
-  }
-  return false;
 }
 
 }  // namespace planning
