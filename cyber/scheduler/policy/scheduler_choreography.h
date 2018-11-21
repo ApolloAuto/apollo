@@ -43,6 +43,8 @@ class SchedulerChoreography : public Scheduler {
   std::unordered_map<std::string, ChoreographyTask> cr_confs_;
 
   std::string choreography_affinity_;
+  std::string choreography_processor_policy_;
+  uint32_t choreography_processor_prio_;
   std::vector<int> choreography_cpuset_;
   std::string pool_affinity_;
   std::vector<int> pool_cpuset_;

@@ -11,9 +11,11 @@ message ChoreographyTask {
 message ChoreographyConf {
   optional uint32 choreography_processor_num = 1;
   optional string choreography_affinity = 2;
-  optional string choreography_cpuset = 3;
-  optional uint32 pool_processor_num = 4;
-  optional string pool_affinity = 5;
-  optional string pool_cpuset = 6; 
-  repeated ChoreographyTask tasks = 7;
+  optional string choreography_processor_policy = 3;
+  optional uint32 choreography_processor_prio = 4;
+  optional string choreography_cpuset = 5;
+  optional uint32 pool_processor_num = 6;
+  optional string pool_affinity = 7;
+  optional string pool_cpuset = 8; 
+  repeated ChoreographyTask tasks = 9;
 }
