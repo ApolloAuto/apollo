@@ -65,11 +65,13 @@ bool MlfMotionFilter::Init(const MlfFilterInitOptions& options) {
 void MlfMotionFilter::UpdateWithObject(const MlfFilterOptions& options,
                                        const MlfTrackDataConstPtr& track_data,
                                        TrackedObjectPtr new_object) {
-  if (new_object->is_background) {
-    return;
-  }
   if (track_data->age_ == 0) {
     InitializeTrackState(new_object);
+    return;
+  }
+  if (new_object->is_background) {
+    new_object->output_velocity.setZero();
+    new_object->output_velocity_uncertainty = Eigen::Matrix3d::Identity();
     return;
   }
   // 1. compute measurement
@@ -129,6 +131,9 @@ void MlfMotionFilter::InitializeTrackState(TrackedObjectPtr new_object) {
   new_object->state_covariance = Eigen::Matrix4d::Identity();
   new_object->state_covariance.block<2, 2>(0, 0) *= init_velocity_variance_;
   new_object->state_covariance.block<2, 2>(2, 2) *= init_acceleration_variance_;
+
+  StateToBelief(new_object);
+  BeliefToOutput(new_object);
 }
 
 void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
@@ -292,6 +297,10 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
         velocity_resisual.head<2>() * velocity_resisual.head<2>().transpose();
   }
   object->belief_velocity_online_covariance /= evaluate_window;
+  object->belief_velocity_online_covariance += Eigen::Matrix3d::Identity() *
+      noise_maximum_ * noise_maximum_;
+  object->output_velocity_uncertainty =
+      object->belief_velocity_online_covariance;
 }
 
 void MlfMotionFilter::ConvergenceEstimationAndBoostUp(
