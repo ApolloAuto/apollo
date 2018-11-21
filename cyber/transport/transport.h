@@ -33,6 +33,7 @@
 #include "cyber/transport/receiver/rtps_receiver.h"
 #include "cyber/transport/receiver/shm_receiver.h"
 #include "cyber/transport/rtps/participant.h"
+#include "cyber/transport/shm/notifier_factory.h"
 #include "cyber/transport/transmitter/hybrid_transmitter.h"
 #include "cyber/transport/transmitter/intra_transmitter.h"
 #include "cyber/transport/transmitter/rtps_transmitter.h"
@@ -69,6 +70,7 @@ class Transport {
 
   std::atomic<bool> is_shutdown_;
   ParticipantPtr participant_;
+  NotifierPtr notifier_;
   IntraDispatcherPtr intra_dispatcher_;
   ShmDispatcherPtr shm_dispatcher_;
   RtpsDispatcherPtr rtps_dispatcher_;

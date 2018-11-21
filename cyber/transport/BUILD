@@ -170,6 +170,7 @@ cc_library(
     hdrs = [ "dispatcher/shm_dispatcher.h", ],
     deps = [
         "dispatcher",
+        "notifier_factory",
         "syscall_wrapper",
         "segment",
         "readable_info",
@@ -356,6 +357,51 @@ cc_library(
     hdrs = [ "shm/block.h", ],
     deps = [
         "//cyber/base:atomic_rw_lock",
+        "//cyber/common:log",
+    ],
+)
+
+cc_library(
+    name = "condition_notifier",
+    srcs = [ "shm/condition_notifier.cc", ],
+    hdrs = [ "shm/condition_notifier.h", ],
+    deps = [
+        "notifier_base",
+        "//cyber/common:global_data",
+        "//cyber/common:log",
+        "//cyber/common:util",
+    ],
+)
+
+cc_library(
+    name = "multicast_notifier",
+    srcs = [ "shm/multicast_notifier.cc", ],
+    hdrs = [ "shm/multicast_notifier.h", ],
+    deps = [
+        "notifier_base",
+        "//cyber/common:global_data",
+        "//cyber/common:log",
+        "//cyber/common:macros",
+    ],
+)
+
+cc_library(
+    name = "notifier_base",
+    hdrs = [ "shm/notifier_base.h", ],
+    deps = [
+        "readable_info",
+    ],
+)
+
+cc_library(
+    name = "notifier_factory",
+    srcs = [ "shm/notifier_factory.cc", ],
+    hdrs = [ "shm/notifier_factory.h", ],
+    deps = [
+        "condition_notifier",
+        "multicast_notifier",
+        "notifier_base",
+        "//cyber/common:global_data",
         "//cyber/common:log",
     ],
 )

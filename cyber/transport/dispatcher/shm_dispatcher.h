@@ -17,12 +17,6 @@
 #ifndef CYBER_TRANSPORT_DISPATCHER_SHM_DISPATCHER_H_
 #define CYBER_TRANSPORT_DISPATCHER_SHM_DISPATCHER_H_
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 #include <cstring>
 #include <memory>
 #include <string>
@@ -34,9 +28,8 @@
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/message/message_traits.h"
-#include "cyber/proto/transport_conf.pb.h"
-#include "cyber/transport/common/syscall_wrapper.h"
 #include "cyber/transport/dispatcher/dispatcher.h"
+#include "cyber/transport/shm/notifier_factory.h"
 #include "cyber/transport/shm/segment.h"
 
 namespace apollo {
@@ -74,16 +67,13 @@ class ShmDispatcher : public Dispatcher {
                  const MessageInfo& msg_info);
   void ThreadFunc();
   bool Init();
-  bool InitMulticast();
 
   uint64_t host_id_;
   SegmentContainer segments_;
   std::unordered_map<uint64_t, uint32_t> previous_indexes_;
   AtomicRWLock segments_lock_;
   std::thread thread_;
-  int sfd_;
-  struct sockaddr_in local_addr_;
-  std::shared_ptr<proto::ShmMulticastLocator> locator_;
+  NotifierPtr notifier_;
 
   DECLARE_SINGLETON(ShmDispatcher)
 };

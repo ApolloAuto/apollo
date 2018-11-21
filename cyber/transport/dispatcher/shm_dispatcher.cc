@@ -20,15 +20,14 @@
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/transport/shm/readable_info.h"
 
-using apollo::cyber::common::GlobalData;
-
 namespace apollo {
 namespace cyber {
 namespace transport {
 
-using cyber::scheduler::Scheduler;
+using common::GlobalData;
+using scheduler::Scheduler;
 
-ShmDispatcher::ShmDispatcher() : host_id_(0), sfd_(-1) { Init(); }
+ShmDispatcher::ShmDispatcher() : host_id_(0) { Init(); }
 
 ShmDispatcher::~ShmDispatcher() { Shutdown(); }
 
@@ -45,8 +44,6 @@ void ShmDispatcher::Shutdown() {
     ReadLockGuard<AtomicRWLock> lock(segments_lock_);
     segments_.clear();
   }
-
-  CloseAndReset(&sfd_);
 }
 
 void ShmDispatcher::AddSegment(const RoleAttributes& self_attr) {
@@ -103,21 +100,10 @@ void ShmDispatcher::OnMessage(uint64_t channel_id,
 }
 
 void ShmDispatcher::ThreadFunc() {
-  char buf[1024] = {0};
-  int addr_len = sizeof(local_addr_);
-
+  ReadableInfo readable_info;
   while (!is_shutdown_.load()) {
-    ssize_t read_bytes =
-        recvfrom(sfd_, buf, 1024, 0, (struct sockaddr*)&local_addr_,
-                 reinterpret_cast<socklen_t*>(&addr_len));
-    if (read_bytes == -1) {
-      usleep(10);
-      continue;
-    }
-
-    ReadableInfo readable_info;
-    if (!readable_info.DeserializeFrom(buf, read_bytes)) {
-      AERROR << "deserialize readable info failed.";
+    if (!notifier_->Listen(100, &readable_info)) {
+      ADEBUG << "listen failed.";
       continue;
     }
 
@@ -160,55 +146,10 @@ void ShmDispatcher::ThreadFunc() {
 }
 
 bool ShmDispatcher::Init() {
-  host_id_ = common::Hash(common::GlobalData::Instance()->HostIp());
-
-  if (!InitMulticast()) {
-    CloseAndReset(&sfd_);
-    return false;
-  }
-
+  host_id_ = common::Hash(GlobalData::Instance()->HostIp());
+  notifier_ = NotifierFactory::CreateNotifier();
   thread_ = std::thread(&ShmDispatcher::ThreadFunc, this);
   Scheduler::Instance()->SetInnerThreadAttr(&thread_, "shm_disp");
-  return true;
-}
-
-bool ShmDispatcher::InitMulticast() {
-  auto global_conf = common::GlobalData::Instance()->Config();
-  RETURN_VAL_IF(!global_conf.has_transport_conf(), false);
-  RETURN_VAL_IF(!global_conf.transport_conf().has_shm_locator(), false);
-
-  locator_ = std::make_shared<proto::ShmMulticastLocator>();
-  locator_->CopyFrom(global_conf.transport_conf().shm_locator());
-
-  sfd_ = socket(AF_INET, SOCK_DGRAM, 0);
-  RETURN_VAL_IF(sfd_ == -1, false);
-  RETURN_VAL_IF(!SetNonBlocking(sfd_), false);
-
-  memset(&local_addr_, 0, sizeof(local_addr_));
-  local_addr_.sin_family = AF_INET;
-  local_addr_.sin_addr.s_addr = htonl(INADDR_ANY);
-  local_addr_.sin_port = htons(static_cast<uint16_t>(locator_->port()));
-
-  int yes = 1;
-  RETURN_VAL_IF(
-      setsockopt(sfd_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0, false);
-
-  RETURN_VAL_IF(
-      bind(sfd_, (struct sockaddr*)&local_addr_, sizeof(local_addr_)) < 0,
-      false);
-
-  int loop = 1;
-  RETURN_VAL_IF(
-      setsockopt(sfd_, IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)) < 0,
-      false);
-
-  struct ip_mreq mreq;
-  mreq.imr_multiaddr.s_addr = inet_addr(locator_->ip().c_str());
-  mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-  RETURN_VAL_IF(
-      setsockopt(sfd_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0,
-      false);
-
   return true;
 }
 
