@@ -34,6 +34,15 @@ ReadableInfo::ReadableInfo(uint64_t host_id, uint32_t block_index,
 
 ReadableInfo::~ReadableInfo() {}
 
+ReadableInfo& ReadableInfo::operator=(const ReadableInfo& other) {
+  if (this != &other) {
+    this->host_id_ = other.host_id_;
+    this->block_index_ = other.block_index_;
+    this->channel_id_ = other.channel_id_;
+  }
+  return *this;
+}
+
 bool ReadableInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
 
