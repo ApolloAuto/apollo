@@ -58,6 +58,7 @@ class Processor {
   std::atomic<bool> running_{false};
   std::mutex mtx_ctx_;
   std::condition_variable cv_ctx_;
+  std::atomic<pid_t> tid_{-1};
 };
 
 }  // namespace scheduler
