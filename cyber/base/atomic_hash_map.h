@@ -78,11 +78,6 @@ class AtomicHashMap {
     table_[index].Insert(key, std::forward<V>(value));
   }
 
-  bool Remove(K key) {
-    uint64_t index = key & mode_num_;
-    return table_[index].Remove(key);
-  }
-
  private:
   struct Entry {
     Entry() {}
@@ -97,18 +92,9 @@ class AtomicHashMap {
     }
     ~Entry() { delete value_ptr.load(std::memory_order_acquire); }
 
-    void Release() {
-      if (ref_count.fetch_sub(1) == 1) {
-        delete value_ptr.load(std::memory_order_acquire);
-        delete this;
-      }
-    }
-
     K key = 0;
     std::atomic<V *> value_ptr = {nullptr};
     std::atomic<Entry *> next = {nullptr};
-    // reference counter, avoid ABA problem
-    std::atomic<uint32_t> ref_count = {1};
   };
 
   class Bucket {
@@ -123,24 +109,9 @@ class AtomicHashMap {
       }
     }
 
-    bool Marked(Entry *entry) { return reinterpret_cast<uintptr_t>(entry) & 1; }
-    Entry *Unmark(Entry *entry) {
-      return reinterpret_cast<Entry *>((reinterpret_cast<uintptr_t>(entry) >> 1)
-                                       << 1);
-    }
-
-    Entry *Mark(Entry *entry) {
-      return reinterpret_cast<Entry *>(reinterpret_cast<uintptr_t>(entry) | 1);
-    }
-
     bool Has(K key) {
       Entry *m_target = head_->next.load(std::memory_order_acquire);
-      while (Entry *target = Unmark(m_target)) {
-        if (Marked(target->next.load(std::memory_order_acquire))) {
-          m_target = head_->next.load(std::memory_order_acquire);
-          continue;
-        }
-
+      while (Entry *target = m_target) {
         if (target->key < key) {
           m_target = target->next.load(std::memory_order_acquire);
           continue;
@@ -154,21 +125,12 @@ class AtomicHashMap {
     bool Find(K key, Entry **prev_ptr, Entry **target_ptr) {
       Entry *prev = head_;
       Entry *m_target = head_->next.load(std::memory_order_acquire);
-      while (Entry *target = Unmark(m_target)) {
-        auto next = target->next.load(std::memory_order_acquire);
-        if (Marked(next) && Unmark(next)) {
-          prev = head_;
-          m_target = head_->next.load(std::memory_order_acquire);
-          continue;
-        }
-
+      while (Entry *target = m_target) {
         if (target->key == key) {
-          target->ref_count++;
           *prev_ptr = prev;
           *target_ptr = target;
           return true;
         } else if (target->key > key) {
-          target->ref_count++;
           *prev_ptr = prev;
           *target_ptr = target;
           return false;
@@ -191,15 +153,11 @@ class AtomicHashMap {
         if (Find(key, &prev, &target)) {
           // key exists, update value
           auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
-          // value_ptr will be set to nullptr befor remove, so check first
-          while (old_val_ptr) {
-            if (target->value_ptr.compare_exchange_strong(
-                    old_val_ptr, new_value, std::memory_order_acq_rel,
-                    std::memory_order_relaxed)) {
-              target->Release();
-              delete new_entry;
-              return;
-            }
+          if (target->value_ptr.compare_exchange_strong(
+                  old_val_ptr, new_value, std::memory_order_acq_rel,
+                  std::memory_order_relaxed)) {
+            delete new_entry;
+            return;
           }
           continue;
         } else {
@@ -208,9 +166,6 @@ class AtomicHashMap {
                                                  std::memory_order_acq_rel,
                                                  std::memory_order_relaxed)) {
             // Insert success
-            if (target) {
-              target->Release();
-            }
             delete new_value;
             return;
           }
@@ -228,15 +183,11 @@ class AtomicHashMap {
         if (Find(key, &prev, &target)) {
           // key exists, update value
           auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
-          // value_ptr will be set to nullptr befor remove, so check first
-          while (old_val_ptr) {
-            if (target->value_ptr.compare_exchange_strong(
-                    old_val_ptr, new_value, std::memory_order_acq_rel,
-                    std::memory_order_relaxed)) {
-              target->Release();
-              delete new_entry;
-              return;
-            }
+          if (target->value_ptr.compare_exchange_strong(
+                  old_val_ptr, new_value, std::memory_order_acq_rel,
+                  std::memory_order_relaxed)) {
+            delete new_entry;
+            return;
           }
           continue;
         } else {
@@ -245,9 +196,6 @@ class AtomicHashMap {
                                                  std::memory_order_acq_rel,
                                                  std::memory_order_relaxed)) {
             // Insert success
-            if (target) {
-              target->Release();
-            }
             delete new_value;
             return;
           }
@@ -265,15 +213,11 @@ class AtomicHashMap {
         if (Find(key, &prev, &target)) {
           // key exists, update value
           auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
-          // value_ptr will be set to nullptr befor remove, so check first
-          while (old_val_ptr) {
-            if (target->value_ptr.compare_exchange_strong(
-                    old_val_ptr, new_value, std::memory_order_acq_rel,
-                    std::memory_order_relaxed)) {
-              target->Release();
-              delete new_entry;
-              return;
-            }
+          if (target->value_ptr.compare_exchange_strong(
+                  old_val_ptr, new_value, std::memory_order_acq_rel,
+                  std::memory_order_relaxed)) {
+            delete new_entry;
+            return;
           }
           continue;
         } else {
@@ -282,42 +226,10 @@ class AtomicHashMap {
                                                  std::memory_order_acq_rel,
                                                  std::memory_order_relaxed)) {
             // Insert success
-            if (target) {
-              target->Release();
-            }
             delete new_value;
             return;
           }
           // another entry has been inserted, retry
-        }
-      }
-    }
-
-    bool Remove(K key) {
-      Entry *prev = nullptr;
-      Entry *target = nullptr;
-      while (true) {
-        if (!Find(key, &prev, &target)) {
-          if (target) {
-            target->Release();
-          }
-          return false;
-        }
-        Entry *old_next = target->next.load(std::memory_order_acquire);
-        // mark befor remove
-        if (!target->next.compare_exchange_strong(old_next, Mark(old_next),
-                                                  std::memory_order_acq_rel,
-                                                  std::memory_order_relaxed)) {
-          target->Release();
-          continue;
-        }
-        target->value_ptr.store(nullptr, std::memory_order_release);
-
-        if (prev->next.compare_exchange_strong(
-                target, Unmark(target->next.load(std::memory_order_acquire)),
-                std::memory_order_acq_rel, std::memory_order_relaxed)) {
-          target->Release();
-          return true;
         }
       }
     }
@@ -327,11 +239,7 @@ class AtomicHashMap {
       Entry *target = nullptr;
       if (Find(key, &prev, &target)) {
         *value = target->value_ptr.load(std::memory_order_acquire);
-        target->Release();
         return true;
-      }
-      if (target) {
-        target->Release();
       }
       return false;
     }
