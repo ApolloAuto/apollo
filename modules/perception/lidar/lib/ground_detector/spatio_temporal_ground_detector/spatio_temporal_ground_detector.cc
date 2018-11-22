@@ -48,8 +48,7 @@ bool SpatioTemporalGroundDetector::Init(
 
   // get config params
   SpatioTemporalGroundDetectorConfig config_params;
-  CHECK(GetProtoFromFile<SpatioTemporalGroundDetectorConfig>(
-      config_file, &config_params))
+  CHECK(GetProtoFromFile(config_file, &config_params))
       << "Failed to parse SpatioTemporalGroundDetectorConfig config file.";
   ground_thres_ = config_params.ground_thres();
   use_roi_ = config_params.use_roi();

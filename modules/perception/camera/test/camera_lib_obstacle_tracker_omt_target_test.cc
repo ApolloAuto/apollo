@@ -45,8 +45,7 @@ TEST(TargetTest, target_test) {
     "omt_obstacle_tracker",
     "config.pt");
 
-  ASSERT_TRUE(apollo::common::util::GetProtoFromFile<omt::OmtParam>(
-      omt_config, &omt_param));
+  ASSERT_TRUE(apollo::common::util::GetProtoFromFile(omt_config, &omt_param));
 
   // first frame with one car object
   std::string sensor_name = "onsemi_obstacle";
@@ -222,8 +221,7 @@ TEST(TargetTest, clapping_velocity_test) {
     "omt_obstacle_tracker",
     "config.pt");
 
-  ASSERT_TRUE(apollo::common::util::GetProtoFromFile<omt::OmtParam>(
-      omt_config, &omt_param));
+  ASSERT_TRUE(apollo::common::util::GetProtoFromFile(omt_config, &omt_param));
 
   auto read_pos_and_theta_vec = [](const std::string& fname)
       -> std::vector<std::vector<double> > {

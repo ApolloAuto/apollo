@@ -51,8 +51,7 @@ bool PbfTracker::InitParams() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   AINFO << "Config file : " << config;
   PbfTrackerConfig params;
-  if (!apollo::common::util::GetProtoFromFile<PbfTrackerConfig>(
-      config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

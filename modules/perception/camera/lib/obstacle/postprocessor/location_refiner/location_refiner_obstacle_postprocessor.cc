@@ -35,9 +35,8 @@ bool LocationRefinerObstaclePostprocessor::Init(
   std::string postprocessor_config = apollo::common::util::GetAbsolutePath(
       options.root_dir, options.conf_file);
 
-  if (!apollo::common::util::GetProtoFromFile
-      <location_refiner::LocationRefinerParam>(postprocessor_config,
-        &location_refiner_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(postprocessor_config,
+                                              &location_refiner_param_)) {
     AERROR << "Read config failed: " << postprocessor_config;
     return false;
   }

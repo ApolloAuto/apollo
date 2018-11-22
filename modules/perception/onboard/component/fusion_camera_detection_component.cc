@@ -51,8 +51,7 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  if (!apollo::common::util::GetProtoFromFile<camera::app::PerceptionParam>(
-          config_file, &perception_param)) {
+  if (!apollo::common::util::GetProtoFromFile(config_file, &perception_param)) {
     AERROR << "Read config failed: " << config_file;
     return -1;
   }

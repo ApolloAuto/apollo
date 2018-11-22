@@ -33,6 +33,7 @@ namespace perception {
 namespace lidar {
 
 using apollo::common::util::GetAbsolutePath;
+using apollo::common::util::GetProtoFromFile;
 using base::AttributePointCloud;
 using base::PointF;
 using base::PointD;
@@ -52,11 +53,9 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   AINFO << "--    engine_file: " << engine_file;
 
   // get cnnseg params
-  CHECK(apollo::common::util::GetProtoFromFile<CNNSegParam>(
-      param_file, &cnnseg_param_))
+  CHECK(GetProtoFromFile(param_file, &cnnseg_param_))
       << "Failed to parse CNNSegParam config file." << param_file;
-  CHECK(apollo::common::util::GetProtoFromFile<SppEngineConfig>(engine_file,
-                                                    &spp_engine_config_))
+  CHECK(GetProtoFromFile(engine_file, &spp_engine_config_))
       << "Failed to parse SppEngine config file." << engine_file;
 
   // init feature parameters
