@@ -287,23 +287,26 @@ Status OpenSpacePlanning::Plan(
   trajectory_pb->CopyFrom(frame_->trajectory());
 
   auto* ptr_debug = trajectory_pb->mutable_debug();
-  if (status.ok()) {
-    if (FLAGS_enable_record_debug) {
-      ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
-          stitching_trajectory.back());
-      ADEBUG << "Open space init point added!";
-      ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
-          frame_->open_space_debug());
-      ADEBUG << "Open space debug information added!";
-    }
-    if (FLAGS_enable_record_debug && FLAGS_export_chart) {
-      ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
-      ADEBUG << "Open Space Planning debug from frame is : "
-             << frame_->open_space_debug().ShortDebugString();
-      ADEBUG << "Open Space Planning export chart with : "
-             << trajectory_pb->ShortDebugString();
-    }
+  if (FLAGS_enable_record_debug) {
+    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
+        stitching_trajectory.back());
+    ADEBUG << "Open space init point added!";
   }
+
+  if (status.ok() && FLAGS_enable_record_debug) {
+    ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
+        frame_->open_space_debug());
+    ADEBUG << "Open space debug information added!";
+  }
+
+  if (FLAGS_export_chart) {
+    ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
+    ADEBUG << "Open Space Planning debug from frame is : "
+           << frame_->open_space_debug().ShortDebugString();
+    ADEBUG << "Open Space Planning export chart with : "
+           << trajectory_pb->ShortDebugString();
+  }
+
   return status;
 }
 
@@ -311,7 +314,6 @@ void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
                             Chart* chart) {
   chart->set_title("Open Space Trajectory Visualization");
   auto* options = chart->mutable_options();
-  CHECK(open_space_debug.xy_boundary_size() == 4);
   options->mutable_x()->set_min(open_space_debug.xy_boundary(0));
   options->mutable_x()->set_max(open_space_debug.xy_boundary(1));
   options->mutable_x()->set_label_string("x (meter)");
