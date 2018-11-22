@@ -72,8 +72,8 @@ class PlanningBase {
       ADCTrajectory* const trajectory) = 0;
 
  protected:
-  virtual void FillPlanningPb(const double timestamp,
-                              ADCTrajectory* const trajectory_pb);
+  void FillPlanningPb(const double timestamp,
+                      ADCTrajectory* const trajectory_pb);
   void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
 
   virtual void ExportChart(const planning_internal::Debug& debug_info,

@@ -30,8 +30,8 @@ OpenSpacePlanner = DistancePlanner()
 
 # parameter(except max, min and car size is defined in proto)
 num_output_buffer = 10000
-sx = -8
-sy = 4
+sx = -10.0
+sy = 3
 sphi = 0.0
 
 scenario = "backward"
@@ -110,7 +110,7 @@ start = time.time()
 print("planning start")
 if not OpenSpacePlanner.DistancePlan(sx, sy, sphi, ex, ey, ephi, XYbounds_ctype):
     print("planning fail")
- #   exit()
+    exit()
 end = time.time()
 print("planning time is " + str(end - start))
 

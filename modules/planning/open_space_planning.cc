@@ -311,7 +311,7 @@ void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
                             Chart* chart) {
   chart->set_title("Open Space Trajectory Visualization");
   auto* options = chart->mutable_options();
-  CHECK_EQ(open_space_debug.xy_boundary_size(), 4);
+  CHECK(open_space_debug.xy_boundary_size() == 4);
   options->mutable_x()->set_min(open_space_debug.xy_boundary(0));
   options->mutable_x()->set_max(open_space_debug.xy_boundary(1));
   options->mutable_x()->set_label_string("x (meter)");
@@ -363,24 +363,5 @@ bool OpenSpacePlanning::CheckPlanningConfig(const PlanningConfig& config) {
   return true;
 }
 
-void OpenSpacePlanning::FillPlanningPb(const double timestamp,
-                    ADCTrajectory* const trajectory_pb) {
-  trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
-  if (!local_view_.prediction_obstacles->has_header()) {
-    trajectory_pb->mutable_header()->set_lidar_timestamp(
-        local_view_.prediction_obstacles->header().lidar_timestamp());
-    trajectory_pb->mutable_header()->set_camera_timestamp(
-        local_view_.prediction_obstacles->header().camera_timestamp());
-    trajectory_pb->mutable_header()->set_radar_timestamp(
-        local_view_.prediction_obstacles->header().radar_timestamp());
-  }
-  trajectory_pb->mutable_routing_header()->CopyFrom(
-      local_view_.routing->header());
-
-  if (FLAGS_use_planning_fallback &&
-      trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackTrajectory(trajectory_pb);
-  }
-}
 }  // namespace planning
 }  // namespace apollo
