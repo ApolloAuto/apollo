@@ -283,6 +283,8 @@ Status OpenSpacePlanning::Plan(
     const std::vector<TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* const trajectory_pb) {
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+
+  if (status != Status::OK()) return status;
   // TODO(QiL): update last_publishable_trajectory_ for stitching
   trajectory_pb->CopyFrom(frame_->trajectory());
 

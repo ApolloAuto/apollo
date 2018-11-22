@@ -73,6 +73,12 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     ThreadSafeIndexedObstacles* obstalce_list) {
+  if (!vehicle_state.has_x() || XYbounds.size() == 0 || end_pose.size() == 0 ||
+      obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
+      obstacles_b.cols() == 0) {
+    return Status(ErrorCode::PLANNING_ERROR, "Generator input data not ready");
+  }
+
   // initial state
   init_state_ = vehicle_state;
   init_x_ = init_state_.x();
@@ -218,7 +224,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
       TrajectoryPartition(state_result_ds, control_result_ds, time_result_ds);
 
   return trajectory_partition_status;
-}  // namespace planning
+}
 
 void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
     Trajectories* adc_trajectories,

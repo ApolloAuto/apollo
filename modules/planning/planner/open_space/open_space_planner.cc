@@ -65,11 +65,10 @@ apollo::common::Status OpenSpacePlanner::Plan(
   // 1. Build Predicition Environments.
   predicted_bounding_rectangles_.clear();
   if (FLAGS_enable_open_space_planner_thread) {
-    std::lock_guard<std::mutex> lock(open_space_mutex_);
+    ADEBUG << "Open space plan in multi-threads mode";
     BuildPredictedEnvironment(frame->obstacles());
 
     // 2. Update Vehicle information and obstacles information from frame.
-
     vehicle_state_ = frame->vehicle_state();
     open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
@@ -88,6 +87,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // 3. Check if trajectory updated, if so, update internal
     // trajectory_partition_;
     if (trajectory_updated_) {
+      AINFO << "Trajectories have been updated!";
+      std::lock_guard<std::mutex> lock(open_space_mutex_);
       trajectory_partition_.Clear();
       gear_positions_.clear();
       open_space_debug_.Clear();
@@ -97,9 +98,15 @@ apollo::common::Status OpenSpacePlanner::Plan(
       ADEBUG << "Trajectory caculation updated, new results : "
              << trajectory_partition_.ShortDebugString();
     }
+
     // TODO(Jiaxuan): Choose the current_trajectory in trajectory_partition_
     // If the vehicle each the end point of current trajectory and stop
     // Then move to the next Trajectory
+
+    if (trajectory_partition_.trajectory_size() == 0) {
+      return Status(ErrorCode::PLANNING_ERROR, "Trajectory partition failed.");
+    }
+
     current_trajectory_ =
         trajectory_partition_.trajectory(current_trajectory_index_);
 
@@ -133,7 +140,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     } else {
       // If collision happens, return wrong planning status and estop
       // trajectory would be sent in std planning
-      return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Collision Check failed in multi-threads");
     }
   } else {
     // Single thread logic
@@ -214,13 +222,17 @@ apollo::common::Status OpenSpacePlanner::Plan(
 void OpenSpacePlanner::GenerateTrajectoryThread() {
   while (!is_stop_) {
     {
-      std::lock_guard<std::mutex> lock(open_space_mutex_);
-      trajectory_updated_ = false;
-      if (open_space_trajectory_generator_->Plan(
-              vehicle_state_, XYbounds_, rotate_angle_, translate_origin_,
-              end_pose_, obstacles_num_, obstacles_edges_num_, obstacles_A_,
-              obstacles_b_, obstalce_list_) == Status::OK()) {
-        trajectory_updated_ = true;
+      ADEBUG << "Open space plan in multi-threads mode : start to generate new "
+                "trajectories";
+      {
+        std::lock_guard<std::mutex> lock(open_space_mutex_);
+        trajectory_updated_ = false;
+        if (open_space_trajectory_generator_->Plan(
+                vehicle_state_, XYbounds_, rotate_angle_, translate_origin_,
+                end_pose_, obstacles_num_, obstacles_edges_num_, obstacles_A_,
+                obstacles_b_, obstalce_list_) == Status::OK()) {
+          trajectory_updated_ = false;
+        }
       }
     }
   }
