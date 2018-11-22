@@ -69,8 +69,6 @@ class OpenSpacePlanning : public PlanningBase {
 
   void ExportOpenSpaceChart(const planning_internal::OpenSpaceDebug& debug_info,
                             planning_internal::Debug* debug_chart);
-  void FillPlanningPb(const double timestamp,
-                      ADCTrajectory* const trajectory_pb) override;
 
  private:
   common::Status InitFrame(const uint32_t sequence_num,
