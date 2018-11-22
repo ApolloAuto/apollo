@@ -62,8 +62,7 @@ bool ObjectTemplateManager::Init(
   std::string config = apollo::common::util::GetAbsolutePath(options.root_dir,
                                                              options.conf_file);
   ObjectTemplateMeta proto;
-  if (!apollo::common::util::GetProtoFromFile<ObjectTemplateMeta>(
-        config, &proto)) {
+  if (!apollo::common::util::GetProtoFromFile(config, &proto)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

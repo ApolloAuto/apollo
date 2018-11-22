@@ -153,8 +153,7 @@ bool GroundService::Init(const SceneServiceInitOptions& options) {
   config_file = GetAbsolutePath(config_file, "ground_service.conf");
 
   GroundServiceConfig config_params;
-  CHECK(apollo::common::util::GetProtoFromFile<GroundServiceConfig>(
-      config_file, &config_params))
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_params))
       << "Failed to parse GroundServiceConfig config file.";
 
   double roi_region_rad_x = config_params.roi_rad_x();

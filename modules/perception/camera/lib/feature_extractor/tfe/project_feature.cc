@@ -33,9 +33,8 @@ using apollo::common::util::GetAbsolutePath;
 
 bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
   std::string efx_config = GetAbsolutePath(options.root_dir, options.conf_file);
-  CHECK(apollo::common::util::GetProtoFromFile
-      <tracking_feature::ExternalParam>(efx_config, &param_))
-  << "Read config failed: " << efx_config;
+  CHECK(apollo::common::util::GetProtoFromFile(efx_config, &param_))
+      << "Read config failed: " << efx_config;
   AINFO << "Load config Success: " << param_.ShortDebugString();
   std::string proto_file =
       GetAbsolutePath(options.root_dir, param_.proto_file());

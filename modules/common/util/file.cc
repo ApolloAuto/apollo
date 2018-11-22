@@ -30,6 +30,87 @@ namespace apollo {
 namespace common {
 namespace util {
 
+bool SetProtoToASCIIFile(const google::protobuf::Message &message,
+                         int file_descriptor) {
+  using google::protobuf::TextFormat;
+  using google::protobuf::io::FileOutputStream;
+  using google::protobuf::io::ZeroCopyOutputStream;
+  if (file_descriptor < 0) {
+    AERROR << "Invalid file descriptor.";
+    return false;
+  }
+  ZeroCopyOutputStream *output = new FileOutputStream(file_descriptor);
+  bool success = TextFormat::Print(message, output);
+  delete output;
+  close(file_descriptor);
+  return success;
+}
+
+bool SetProtoToASCIIFile(const google::protobuf::Message &message,
+                         const std::string &file_name) {
+  int fd = open(file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+  if (fd < 0) {
+    AERROR << "Unable to open file " << file_name << " to write.";
+    return false;
+  }
+  return SetProtoToASCIIFile(message, fd);
+}
+
+bool GetProtoFromASCIIFile(const std::string &file_name,
+                           google::protobuf::Message *message) {
+  using google::protobuf::TextFormat;
+  using google::protobuf::io::FileInputStream;
+  using google::protobuf::io::ZeroCopyInputStream;
+  int file_descriptor = open(file_name.c_str(), O_RDONLY);
+  if (file_descriptor < 0) {
+    AERROR << "Failed to open file " << file_name << " in text mode.";
+    // Failed to open;
+    return false;
+  }
+
+  ZeroCopyInputStream *input = new FileInputStream(file_descriptor);
+  bool success = TextFormat::Parse(input, message);
+  if (!success) {
+    AERROR << "Failed to parse file " << file_name << " as text proto.";
+  }
+  delete input;
+  close(file_descriptor);
+  return success;
+}
+
+bool SetProtoToBinaryFile(const google::protobuf::Message &message,
+                          const std::string &file_name) {
+  std::fstream output(file_name,
+                      std::ios::out | std::ios::trunc | std::ios::binary);
+  return message.SerializeToOstream(&output);
+}
+
+bool GetProtoFromBinaryFile(const std::string &file_name,
+                            google::protobuf::Message *message) {
+  std::fstream input(file_name, std::ios::in | std::ios::binary);
+  if (!input.good()) {
+    AERROR << "Failed to open file " << file_name << " in binary mode.";
+    return false;
+  }
+  if (!message->ParseFromIstream(&input)) {
+    AERROR << "Failed to parse file " << file_name << " as binary proto.";
+    return false;
+  }
+  return true;
+}
+
+bool GetProtoFromFile(const std::string &file_name,
+                      google::protobuf::Message *message) {
+  // Try the binary parser first if it's much likely a binary proto.
+  if (EndWith(file_name, ".bin")) {
+    return GetProtoFromBinaryFile(file_name, message) ||
+           GetProtoFromASCIIFile(file_name, message);
+  }
+
+  return GetProtoFromASCIIFile(file_name, message) ||
+         GetProtoFromBinaryFile(file_name, message);
+}
+
 bool GetContent(const std::string &file_name, std::string *content) {
   std::ifstream fin(file_name);
   if (!fin) {

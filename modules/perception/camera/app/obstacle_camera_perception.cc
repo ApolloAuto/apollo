@@ -47,7 +47,7 @@ bool ObstacleCameraPerception::Init(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(apollo::common::util::GetProtoFromFile<app::PerceptionParam>(
+  CHECK(apollo::common::util::GetProtoFromFile(
         config_file, &perception_param_)) << "Read config failed: ";
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 

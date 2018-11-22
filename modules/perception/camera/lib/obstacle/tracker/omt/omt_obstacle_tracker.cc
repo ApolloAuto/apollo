@@ -41,8 +41,7 @@ using apollo::common::util::GetAbsolutePath;
 
 bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   std::string omt_config = GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile
-      <omt::OmtParam>(omt_config, &omt_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(omt_config, &omt_param_)) {
     AERROR << "Read config failed: " << omt_config;
     return false;
   }

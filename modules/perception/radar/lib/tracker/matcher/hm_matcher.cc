@@ -52,8 +52,7 @@ bool HMMatcher::Init() {
   config_file = GetAbsolutePath(config_file, "hm_matcher.conf");
   // get config params
   MatcherConfig config_params;
-  CHECK(apollo::common::util::GetProtoFromFile<MatcherConfig>(
-                                  config_file, &config_params))
+  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_params))
        << "Failed to parse MatcherConfig config file.";
   double max_match_distance = config_params.max_match_distance();
   double bound_match_distance = config_params.bound_match_distance();

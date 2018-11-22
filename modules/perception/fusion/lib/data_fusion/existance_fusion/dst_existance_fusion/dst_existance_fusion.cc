@@ -56,8 +56,7 @@ bool DstExistanceFusion::Init() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   DstExistanceFusionConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile<DstExistanceFusionConfig>(
-      config, &params)) {
+  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

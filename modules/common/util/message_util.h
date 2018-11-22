@@ -94,12 +94,6 @@ inline size_t MessageFingerprint(const google::protobuf::Message& message) {
   return hash_fn(proto_bytes);
 }
 
-// template <typename T, typename std::enable_if<
-//                           std::is_base_of<Message, T>::value, int>::type = 0>
-// double GetDelaySec(const std::shared_ptr<T>& msg) {
-//   auto now = apollo::common::time::Clock::NowInSeconds();
-//   return now - msg->header().timestamp_sec();
-
 }  // namespace util
 }  // namespace common
 }  // namespace apollo

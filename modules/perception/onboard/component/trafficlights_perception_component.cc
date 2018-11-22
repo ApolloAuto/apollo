@@ -59,9 +59,8 @@ static int GetGpuId(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  if (!apollo::common::util::GetProtoFromFile<camera::app::TrafficLightParam>(
-        config_file,
-        &trafficlight_param)) {
+  if (!apollo::common::util::GetProtoFromFile(config_file,
+                                              &trafficlight_param)) {
     AERROR << "Read config failed: " << config_file;
     return -1;
   }

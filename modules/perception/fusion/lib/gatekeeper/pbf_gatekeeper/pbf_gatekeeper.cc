@@ -45,8 +45,7 @@ bool PbfGatekeeper::Init() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   PbfGatekeeperConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile<PbfGatekeeperConfig>(config,
-                                                                   &params)) {
+  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

@@ -45,8 +45,7 @@ TEST(RefTest, update_test) {
     "/apollo/modules/perception/testdata/"
     "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
     "config.pt");
-  CHECK(apollo::common::util::GetProtoFromFile<omt::OmtParam>(
-      omt_config, &omt_param));
+  CHECK(apollo::common::util::GetProtoFromFile(omt_config, &omt_param));
   ref.Init(omt_param.reference(), 1920.0f, 1080.0f);
   std::string sensor_name = "onsemi_obstacle";
   DataProvider provider;

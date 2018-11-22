@@ -29,8 +29,8 @@ bool MultiCueObstacleTransformer::Init(
   std::string transformer_config = apollo::common::util::GetAbsolutePath(
       options.root_dir, options.conf_file);
 
-  if (!apollo::common::util::GetProtoFromFile
-      <multicue::MulticueParam>(transformer_config, &multicue_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(transformer_config,
+                                              &multicue_param_)) {
     AERROR << "Read config failed: " << transformer_config;
     return false;
   }
