@@ -244,22 +244,22 @@ bool LSTM::Load(const LayerParameter& layer_pb) {
   }
   if (!lstm_pb.has_recurrent_weights_input() ||
       !LoadTensor(lstm_pb.recurrent_weights_input(), &r_wi_)) {
-    AERROR << "Fail to Load reccurent input weights!";
+    AERROR << "Fail to Load recurrent input weights!";
     return false;
   }
   if (!lstm_pb.has_recurrent_weights_forget() ||
       !LoadTensor(lstm_pb.recurrent_weights_forget(), &r_wf_)) {
-    AERROR << "Fail to Load reccurent forget weights!";
+    AERROR << "Fail to Load recurrent forget weights!";
     return false;
   }
   if (!lstm_pb.has_recurrent_weights_cell() ||
       !LoadTensor(lstm_pb.recurrent_weights_cell(), &r_wc_)) {
-    AERROR << "Fail to Load reccurent cell weights!";
+    AERROR << "Fail to Load recurrent cell weights!";
     return false;
   }
   if (!lstm_pb.has_recurrent_weights_output() ||
       !LoadTensor(lstm_pb.recurrent_weights_output(), &r_wo_)) {
-    AERROR << "Fail to Load reccurent output weights!";
+    AERROR << "Fail to Load recurrent output weights!";
     return false;
   }
   ResetState();
