@@ -28,17 +28,19 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-auto sched = Scheduler::Instance();
-
 void proc() {}
 
 TEST(SchedulerTest, create_task) {
+  GlobalData::Instance()->SetProcessGroup("example_classic_sched");
+  auto sched = Scheduler::Instance();
   cyber::Init("scheduler_test");
-  std::string croutine_name = "DriverProc";
+  // read example_classic_sched.conf task 'ABC' prio
+  std::string croutine_name = "ABC";
 
   EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));
   // create a croutine with the same name
   EXPECT_FALSE(sched->CreateTask(&proc, croutine_name));
+
   auto task_id = GlobalData::RegisterTaskName(croutine_name);
   EXPECT_TRUE(sched->NotifyTask(task_id));
   EXPECT_TRUE(sched->RemoveTask(croutine_name));
@@ -49,6 +51,7 @@ TEST(SchedulerTest, create_task) {
 }
 
 TEST(SchedulerTest, notify_task) {
+  auto sched = Scheduler::Instance();
   cyber::Init("scheduler_test");
   std::string name = "croutine";
   auto id = GlobalData::RegisterTaskName(name);
