@@ -20,6 +20,9 @@
 #include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/policy/classic.h"
 #include "cyber/scheduler/processor.h"
+#include "cyber/scheduler/policy/scheduler_classic.h"
+#include "cyber/scheduler/policy/scheduler_choreography.h"
+#include "cyber/common/global_data.h"
 
 namespace apollo {
 namespace cyber {
@@ -51,6 +54,12 @@ TEST(SchedulerPolicyTest, classic) {
   auto task_id = GlobalData::RegisterTaskName("classic");
   cr->set_id(task_id);
   ctx->ShutDown();
+}
+
+TEST(SchedulerPolicyTest, sched_classic) {
+  GlobalData::Instance()->SetProcessGroup("example_classic_sched");
+  Scheduler* sched1 = new SchedulerClassic();
+  sched1->ShutDown();
 }
 
 }  // namespace scheduler

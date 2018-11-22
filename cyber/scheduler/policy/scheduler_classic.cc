@@ -47,10 +47,16 @@ SchedulerClassic::SchedulerClassic() {
   apollo::cyber::proto::CyberConfig cfg;
   // FIXME: later, we will add grp support for classic policy.
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
-    proc_num_ = cfg.scheduler_conf().classic_conf().groups(0).processor_num();
-    affinity_ = cfg.scheduler_conf().classic_conf().groups(0).affinity();
-    ParseCpuset(cfg.scheduler_conf().classic_conf().groups(0).cpuset(),
-                &cpuset_);
+    auto& groups = cfg.scheduler_conf().classic_conf().groups();
+    proc_num_ = groups[0].processor_num();
+    affinity_ = groups[0].affinity();
+    ParseCpuset(groups[0].cpuset(), &cpuset_);
+
+    for (auto& group : groups) {
+      for (auto& task : group.tasks()) {
+        cr_tasks[task.name()] = task;
+      }
+    }
   } else {
     // fallback default sched config. To avoid every process launchs
     // too many threads, limit to 2 cpus for process w/o explicit config.
@@ -91,10 +97,13 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
     id_cr_[cr->id()] = cr;
   }
 
+  if (cr_tasks.find(cr->name()) != cr_tasks.end()) {
+    cr->set_priority(cr_tasks[cr->name()].prio());
+  }
+
   // Check if task prio is reasonable.
   if (cr->priority() >= MAX_PRIO) {
-    AWARN << cr->name()
-          << " prio great than MAX_PRIO.";
+    AWARN << cr->name() << " prio great than MAX_PRIO.";
     cr->set_priority(MAX_PRIO - 1);
   }
 

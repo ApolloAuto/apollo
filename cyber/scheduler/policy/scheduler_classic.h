@@ -20,12 +20,15 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
+
+using apollo::cyber::proto::ClassicTask;
 
 class SchedulerClassic : public Scheduler {
  public:
@@ -39,6 +42,7 @@ class SchedulerClassic : public Scheduler {
   void CreateProcessor();
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool NotifyProcessor(uint64_t crid) override;
+  std::map<std::string, ClassicTask> cr_tasks;
 
   std::string affinity_;
   std::vector<int> cpuset_;
