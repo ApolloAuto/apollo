@@ -15,15 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-"""
-Use after `apollo.sh build`:
-    ./filter_small_channels.sh <input_record> <output_record>
-
-The output_record will only contain channels with small data.
-"""
+#
+# Use after "apollo.sh build":
+#    ./filter_small_channels.sh <input_record> <output_record>
+#
+# The output_record will only contain channels with small data.
 
 INPUT_RECORD=$1
 OUTPUT_RECORD=$2
+
+source "$( dirname "${BASH_SOURCE[0]}" )/apollo_base.sh"
+
+mkdir -p "$( dirname "${OUTPUT_RECORD}" )"
 
 cyber_recorder split -f "${INPUT_RECORD}" -o "${OUTPUT_RECORD}" \
     -c "/apollo/canbus/chassis" \
