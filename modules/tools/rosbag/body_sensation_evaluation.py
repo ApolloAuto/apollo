@@ -26,9 +26,11 @@ import math
 import sys
 import time
 
-from rosbag.bag import Bag
-
+from cyber_py import cyber
+from cyber_py.record import RecordReader
+from modules.canbus.proto import chassis_pb2
 from modules.canbus.proto.chassis_pb2 import Chassis
+from modules.localization.proto import localization_pb2
 
 BUMP_TIME_THRESHOLD = 3
 ACCELERATE_TIME_THRESHOLD = 1
@@ -73,14 +75,19 @@ class BodySensationCalculator(object):
 
     def get_driving_mode(self, bag_file):
         """get driving mode, which is stored in a dict"""
-        with Bag(bag_file, 'r') as bag:
-            mode={}
-            mode["status"] = 'UNKNOW'
-            mode["start_time"] = 0.0
-            mode["end_time"] = 0.0
-            for topic, msg, _t in bag.read_messages([kChassisTopic]):
+        mode = {}
+        mode["status"] = 'UNKNOW'
+        mode["start_time"] = 0.0
+        mode["end_time"] = 0.0
+        chassis = chassis_pb2.Chassis()
+        reader = RecordReader(bag_file)
+
+        for msg in reader.read_messages():
+            if msg.topic == kChassisTopic:
+                chassis.ParseFromString(msg.message)
+                _t = msg.timestamp
                 t = long(str(_t)) * pow(10, -9)
-                cur_status = msg.driving_mode
+                cur_status = chassis.driving_mode
                 if mode["status"] != cur_status:
                     if mode["status"] != 'UNKNOW':
                         self.driving_mode.append(mode)
@@ -133,16 +140,20 @@ class BodySensationCalculator(object):
 
     def calculate(self, bag_file):
         """calculate body sensation, it should be after get driving mode"""
-        with Bag(bag_file, 'r') as bag:
-            for topic, msg, _t in bag.read_messages([kLocalizationTopic]):
+        localization = localization_pb2.LocalizationEstimate()
+        reader = RecordReader(bag_file)
+        for msg in reader.read_messages():
+            if msg.topic == kLocalizationTopic:
+                localization.ParseFromString(msg.message)
+                _t = msg.timestamp
                 t = long(str(_t)) * pow(10, -9)
                 self.timestamp = t
                 diff_bump_time = t - self._last_bump_time
                 if diff_bump_time <= BUMP_TIME_THRESHOLD:
                     continue
-                acc_x = msg.pose.linear_acceleration.x
-                acc_y = msg.pose.linear_acceleration.y
-                acc_z = msg.pose.linear_acceleration.z
+                acc_x = localization.pose.linear_acceleration.x
+                acc_y = localization.pose.linear_acceleration.y
+                acc_z = localization.pose.linear_acceleration.z
                 
                 if abs(acc_z) >= SPEED_UP_THRESHOLD_2 and diff_bump_time >= BUMP_TIME_THRESHOLD:
                     self._bumps_rollback(t)
