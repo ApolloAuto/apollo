@@ -507,7 +507,7 @@ bool OpenSpaceROI::GetMapInfo(ParkingSpaceInfoConstPtr *target_parking_spot,
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
   int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-      point, 10.0, vehicle_state_.heading(), M_PI / 2.0, &nearest_lane,
+      point, 5.0, vehicle_state_.heading(), M_PI / 3.0, &nearest_lane,
       &vehicle_lane_s, &vehicle_lane_l);
   if (status != 0) {
     AERROR << "Getlane failed at OpenSpaceROI::GetOpenSpaceROI()";
