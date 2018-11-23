@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_
-#define CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_
+#ifndef CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_CONTEXT_H_
+#define CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_CONTEXT_H_
 
 #include <functional>
 #include <map>
@@ -24,6 +24,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "cyber/base/atomic_rw_lock.h"
+#include "cyber/croutine/croutine.h"
 #include "cyber/scheduler/processor_context.h"
 
 namespace apollo {
@@ -39,6 +41,7 @@ class ChoreographyContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
   void Wait() override;
+
   bool Enqueue(const std::shared_ptr<CRoutine>);
   void Notify();
 
@@ -55,4 +58,4 @@ class ChoreographyContext : public ProcessorContext {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_H_
+#endif  // CYBER_SCHEDULER_POLICY_CHOREOGRAPHY_CONTEXT_H_

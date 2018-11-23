@@ -14,20 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SCHEDULER_POLICY_CLASSIC_H_
-#define CYBER_SCHEDULER_POLICY_CLASSIC_H_
+#ifndef CYBER_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
+#define CYBER_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_
 
 #include <array>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <vector>
 
+#include "cyber/base/atomic_rw_lock.h"
+#include "cyber/croutine/croutine.h"
 #include "cyber/scheduler/processor_context.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using base::AtomicRWLock;
 using croutine::CRoutine;
 
 #define MAX_PRIO 20
@@ -36,6 +40,7 @@ class ClassicContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
   void Wait() override;
+
   static void Notify();
 
   alignas(CACHELINE_SIZE) static std::mutex mtx_wq_;
@@ -50,4 +55,4 @@ class ClassicContext : public ProcessorContext {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SCHEDULER_POLICY_CLASSIC_H_
+#endif  // CYBER_SCHEDULER_POLICY_CLASSIC_CONTEXT_H_

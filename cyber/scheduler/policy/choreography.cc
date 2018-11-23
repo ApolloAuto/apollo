@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "cyber/common/types.h"
-#include "cyber/croutine/croutine.h"
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/scheduler.h"
@@ -30,9 +29,9 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
-using croutine::RoutineState;
 
 std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
   if (unlikely(stop_)) {
@@ -51,11 +50,14 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
       it = cr_queue_.erase(it);
       continue;
     }
+
     if (cr->UpdateState() == RoutineState::READY) {
-      PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
+      PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT,
+                                                cr->id(),
                                                 cr->processor_id());
       return cr;
     }
+
     cr->Release();
     ++it;
   }
@@ -67,7 +69,6 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
 bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine> cr) {
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
                                             cr->processor_id());
-
   std::lock_guard<std::mutex> lk(mtx_cr_queue_);
   cr_queue_.insert(
       std::pair<uint32_t, std::shared_ptr<CRoutine>>(cr->priority(), cr));

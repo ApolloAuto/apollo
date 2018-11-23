@@ -17,47 +17,42 @@
 #ifndef CYBER_SCHEDULER_POLICY_PROCESSOR_CONTEXT_H_
 #define CYBER_SCHEDULER_POLICY_PROCESSOR_CONTEXT_H_
 
-#include <future>
 #include <limits>
-#include <list>
-#include <map>
 #include <memory>
 #include <mutex>
-#include <unordered_map>
-#include <vector>
 
-#include "cyber/base/atomic_hash_map.h"
-#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/base/macros.h"
 #include "cyber/croutine/croutine.h"
+#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::base::AtomicRWLock;
 using croutine::CRoutine;
-using croutine::RoutineState;
 
 class Processor;
 
 class ProcessorContext {
  public:
-  virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
-  virtual void Wait() = 0;
   void ShutDown();
+
   void BindProc(const std::shared_ptr<Processor>& processor) {
     processor_ = processor;
   }
 
+  virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
+  virtual void Wait() = 0;
+
  protected:
+  bool stop_ = false;
+
   alignas(CACHELINE_SIZE) std::shared_ptr<Processor> processor_ = nullptr;
   alignas(CACHELINE_SIZE) std::atomic_flag notified_ = ATOMIC_FLAG_INIT;
-  bool stop_ = false;
 };
 
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SCHEDULER_POLICY_PROCESSOR_CONTEXT_H_
+#endif  // CYBER_SCHEDULER_PROCESSOR_CONTEXT_H_

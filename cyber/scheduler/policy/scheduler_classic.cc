@@ -18,25 +18,26 @@
 
 #include <memory>
 
-#include "cyber/event/perf_event_cache.h"
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
-#include "cyber/scheduler/processor.h"
+#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
 using apollo::cyber::common::GlobalData;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::cyber::common::PathExists;
 using apollo::cyber::common::GetProtoFromFile;
 using apollo::cyber::common::WorkRoot;
+using apollo::cyber::event::PerfEventCache;
+using apollo::cyber::event::SchedPerf;
 
 SchedulerClassic::SchedulerClassic() {
   // get sched config
