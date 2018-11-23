@@ -22,22 +22,27 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/croutine/croutine.h"
+#include "cyber/proto/choreography_conf.pb.h"
 #include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::proto::ChoreographyTask;
 using apollo::cyber::proto::InnerThread;
 
 class SchedulerChoreography : public Scheduler {
  public:
   SchedulerChoreography();
+
   void SetInnerThreadAttr(const std::thread* thr,
                           const std::string& name) override;
 
   bool RemoveTask(const std::string& name) override;
+
  private:
   void CreateProcessor();
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
@@ -46,14 +51,17 @@ class SchedulerChoreography : public Scheduler {
   std::unordered_map<std::string, ChoreographyTask> cr_confs_;
   std::unordered_map<std::string, InnerThread> inner_thr_confs_;
 
-  std::string choreography_affinity_;
-  std::string choreography_processor_policy_;
   int32_t choreography_processor_prio_;
-  std::vector<int> choreography_cpuset_;
-  std::string pool_affinity_;
-  std::vector<int> pool_cpuset_;
-  std::string pool_processor_policy_;
   int32_t pool_processor_prio_;
+
+  std::string choreography_affinity_;
+  std::string pool_affinity_;
+
+  std::string choreography_processor_policy_;
+  std::string pool_processor_policy_;
+
+  std::vector<int> choreography_cpuset_;
+  std::vector<int> pool_cpuset_;
 };
 
 }  // namespace scheduler

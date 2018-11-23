@@ -47,17 +47,20 @@ class Processor {
   void SetAffinity(const std::vector<int>&, const std::string&, int);
   void SetSchedPolicy(std::string spolicy, int sched_priority);
   void Stop() { running_.exchange(false); }
+
   void BindContext(const std::shared_ptr<ProcessorContext>& context) {
     context_ = context;
   }
 
  private:
-  std::thread thread_;
   std::shared_ptr<ProcessorContext> context_;
   std::shared_ptr<RoutineContext> routine_context_ = nullptr;
-  std::atomic<bool> running_{false};
-  std::mutex mtx_ctx_;
+
   std::condition_variable cv_ctx_;
+  std::mutex mtx_ctx_;
+  std::thread thread_;
+
+  std::atomic<bool> running_{false};
   std::atomic<pid_t> tid_{-1};
 };
 

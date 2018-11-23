@@ -22,17 +22,21 @@
 #include <vector>
 #include <map>
 
+#include "cyber/croutine/croutine.h"
+#include "cyber/proto/classic_conf.pb.h"
 #include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::proto::ClassicTask;
 
 class SchedulerClassic : public Scheduler {
  public:
   SchedulerClassic();
+
   bool RemoveTask(const std::string& name) override;
 
   void SetInnerThreadAttr(const std::thread* thr,
@@ -42,6 +46,7 @@ class SchedulerClassic : public Scheduler {
   void CreateProcessor();
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool NotifyProcessor(uint64_t crid) override;
+
   std::map<std::string, ClassicTask> cr_tasks;
 
   std::string affinity_;

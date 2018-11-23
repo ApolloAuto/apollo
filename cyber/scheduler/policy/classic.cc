@@ -17,13 +17,12 @@
 #include "cyber/scheduler/policy/classic.h"
 
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/scheduler/policy/scheduler_classic.h"
-#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
@@ -43,11 +42,14 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
     ReadLockGuard<AtomicRWLock> lk(rq_locks_[i]);
     for (auto it = rq_[i].begin(); it != rq_[i].end(); ++it) {
       auto cr = (*it);
+
       if (!cr->Acquire()) {
         continue;
       }
+
       if (cr->UpdateState() == RoutineState::READY) {
-        PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
+        PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT,
+                                                  cr->id(),
                                                   cr->processor_id());
         return cr;
       }

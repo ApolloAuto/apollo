@@ -16,11 +16,6 @@
 
 #include "cyber/scheduler/processor_context.h"
 
-#include "cyber/common/log.h"
-#include "cyber/common/types.h"
-#include "cyber/croutine/croutine.h"
-#include "cyber/scheduler/processor.h"
-
 namespace apollo {
 namespace cyber {
 namespace scheduler {
@@ -29,6 +24,7 @@ void ProcessorContext::ShutDown() {
   if (!stop_) {
     stop_ = true;
   }
+
   processor_->Stop();
 }
 
