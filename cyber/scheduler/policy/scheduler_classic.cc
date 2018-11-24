@@ -59,10 +59,13 @@ SchedulerClassic::SchedulerClassic() {
       }
     }
   } else {
-    // fallback default sched config. To avoid every process launchs
-    // too many threads, limit to 2 cpus for process w/o explicit config.
-    proc_num_ = 2;
-    // FIXME: other vals ... ?
+    auto& global_conf = GlobalData::Instance()->Config();
+    if (global_conf.has_scheduler_conf() &&
+        global_conf.scheduler_conf().has_default_proc_num()) {
+      proc_num_ = global_conf.scheduler_conf().default_proc_num();
+    } else {
+      proc_num_ = 2;
+    }
   }
 
   // Currently for compatible with task/task_manager.cc:
