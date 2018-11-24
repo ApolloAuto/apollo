@@ -27,24 +27,28 @@ import glob
 import os
 import shutil
 
-import rosbag
-import std_msgs
-from std_msgs.msg import String
+from cyber_py import cyber
+from cyber_py.record import RecordReader
+from modules.drivers.gnss.proto import gnss_pb2
+
 
 g_args = None
-
+kRawDataTopic = '/apollo/sensor/gnss/raw_data'
 
 def dump_bag(in_dir):
     """out_bag = in_bag"""
+    print "begin"
+    gnss = gnss_pb2.RawData()
     global g_args
-    bag_files = glob.glob(in_dir + "/*.bag")
+    bag_files = glob.glob(in_dir + "/*.record.*")
     f = file("/tmp/gpsimu.bin", 'w')
     for bag_file in sorted(bag_files):
         print "Processing ", bag_file, " ..."
-        bag = rosbag.Bag(bag_file, 'r')
-        for topic, msg, t in bag.read_messages():
-            if topic == "/apollo/sensor/gnss/raw_data":
-                f.write(str(msg))
+        reader = RecordReader(bag_file)
+        for msg in reader.read_messages():
+            if msg.topic == kRawDataTopic:
+                gnss.ParseFromString(msg.message)
+                f.write(str(gnss))
     f.close()
 
 
