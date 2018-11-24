@@ -8,6 +8,7 @@ import "cyber/proto/choreography_conf.proto";
 message SchedulerConf {
   optional string policy = 1;
   optional uint32 routine_num = 2;
-  optional ClassicConf classic_conf = 3;
-  optional ChoreographyConf choreography_conf = 4;
+  optional uint32 default_proc_num = 3;
+  optional ClassicConf classic_conf = 4;
+  optional ChoreographyConf choreography_conf = 5;
 }
