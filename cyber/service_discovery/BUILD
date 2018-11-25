@@ -11,7 +11,6 @@ cc_library(
         "channel_manager",
         "node_manager",
         "service_manager",
-        "//cyber:init",
         "//cyber/transport:participant",
     ],
 )
@@ -119,6 +118,7 @@ cc_library(
     hdrs = [ "specific_manager/manager.h", ],
     deps = [
         "subscriber_listener",
+        "//cyber:state",
         "//cyber/base:signal",
         "//cyber/message:message_traits",
         "//cyber/message:protobuf_factory",
@@ -150,7 +150,7 @@ cc_test(
     srcs = [ "specific_manager/channel_manager_test.cc", ],
     deps = [
         "//cyber",
-        "//cyber/proto:chatter_cc_proto",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )

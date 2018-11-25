@@ -104,7 +104,7 @@ cc_library(
         "//cyber/common:file",
         "//cyber/common:macros",
         "//cyber/common:util",
-        "//cyber/proto:cyber_config_cc_proto",
+        "//cyber/proto:cyber_conf_cc_proto",
     ],
 )
 

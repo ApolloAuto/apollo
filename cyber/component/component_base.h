@@ -26,7 +26,7 @@
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/node/node.h"
-#include "cyber/proto/component_config.pb.h"
+#include "cyber/proto/component_conf.pb.h"
 #include "gflags/gflags.h"
 
 namespace apollo {

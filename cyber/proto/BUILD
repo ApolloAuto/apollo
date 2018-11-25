@@ -3,16 +3,16 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
-    name = "cyber_config_cc_proto",
+    name = "cyber_conf_cc_proto",
     deps = [
-        ":cyber_config_proto",
+        ":cyber_conf_proto",
     ],
 )
 
 proto_library(
-    name = "cyber_config_proto",
+    name = "cyber_conf_proto",
     srcs = [
-        "cyber_config.proto",
+        "cyber_conf.proto",
     ],
     deps = [
         ":choreography_conf_proto",
@@ -199,34 +199,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "driver_cc_proto",
-    deps = [
-        ":driver_proto",
-    ],
-)
-
-proto_library(
-    name = "driver_proto",
-    srcs = [
-        "driver.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "chatter_cc_proto",
-    deps = [
-        ":chatter_proto",
-    ],
-)
-
-proto_library(
-    name = "chatter_proto",
-    srcs = [
-        "chatter.proto",
-    ],
-)
-
-cc_proto_library(
     name = "parameter_cc_proto",
     deps = [
         ":parameter_proto",
@@ -255,16 +227,16 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "component_config_cc_proto",
+    name = "component_conf_cc_proto",
     deps = [
-        ":component_config_proto",
+        ":component_conf_proto",
     ],
 )
 
 proto_library(
-    name = "component_config_proto",
+    name = "component_conf_proto",
     srcs = [
-        "component_config.proto",
+        "component_conf.proto",
     ],
     deps = [
         ":qos_profile_proto",
@@ -272,19 +244,19 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "dag_config_cc_proto",
+    name = "dag_conf_cc_proto",
     deps = [
-        ":dag_config_proto",
+        ":dag_conf_proto",
     ],
 )
 
 proto_library(
-    name = "dag_config_proto",
+    name = "dag_conf_proto",
     srcs = [
-        "dag_config.proto",
+        "dag_conf.proto",
     ],
     deps = [
-        ":component_config_proto",
+        ":component_conf_proto",
     ],
 )
 
