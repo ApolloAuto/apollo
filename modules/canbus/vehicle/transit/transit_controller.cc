@@ -181,7 +181,8 @@ Chassis TransitController::chassis() {
 
   // TODO(QiL): revisit after fix done on Transit.
   if (motion20.has_llc_fbk_brakepressurerear()) {
-    chassis_.set_brake_percentage(motion20.llc_fbk_brakepressurerear());
+  //  TODO(Udelv): fix scaling
+    chassis_.set_brake_percentage(motion20.llc_fbk_brakepressurerear() / 1780 * 100 );
   }
 
   if (motion20.has_llc_fbk_gear()) {
@@ -210,7 +211,7 @@ Chassis TransitController::chassis() {
 
   // TODO(QiL): revisit to fix scaling
   if (motion21.has_llc_fbk_steeringangle()) {
-    chassis_.set_steering_percentage(motion21.llc_fbk_steeringangle());
+    chassis_.set_steering_percentage(motion21.llc_fbk_steeringangle() *  M_PI / 180/  vehicle_params_.max_steer_angle() * 100);
   }
 
   auto& aux = transit.llc_auxiliaryfeedback_120();
@@ -243,6 +244,8 @@ ErrorCode TransitController::EnableAutoMode() {
     AINFO << "already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
+
+  AINFO << "Try to COMPLETE_AUTO_DRIVE mode";
   adc_motioncontrol1_10_->set_adc_cmd_autonomyrequest(
       Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
   adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
@@ -251,18 +254,8 @@ ErrorCode TransitController::EnableAutoMode() {
       Adc_motioncontrol1_10::
           ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
-  const int32_t flag =
-      CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
-  if (!CheckResponse(flag, true)) {
-    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
-    Emergency();
-    set_chassis_error_code(Chassis::CHASSIS_ERROR);
-    return ErrorCode::CANBUS_ERROR;
-  } else {
     set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-    AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
     return ErrorCode::OK;
-  }
 }
 
 ErrorCode TransitController::DisableAutoMode() {
@@ -288,16 +281,8 @@ ErrorCode TransitController::EnableSteeringOnlyMode() {
   adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
       Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_NONE);
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
-    AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
-    Emergency();
-    set_chassis_error_code(Chassis::CHASSIS_ERROR);
-    return ErrorCode::CANBUS_ERROR;
-  } else {
     set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
     return ErrorCode::OK;
-  }
 }
 
 ErrorCode TransitController::EnableSpeedOnlyMode() {
@@ -539,10 +524,6 @@ void TransitController::SecurityDogThreadFunc() {
       }
     } else {
       vertical_ctrl_fail = 0;
-    }
-    if (CheckChassisError()) {
-      set_chassis_error_code(Chassis::CHASSIS_ERROR);
-      emergency_mode = true;
     }
 
     if (emergency_mode && mode != Chassis::EMERGENCY_MODE) {
