@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
@@ -24,7 +23,7 @@
 #include "cyber/class_loader/class_loader_manager.h"
 #include "cyber/component/component.h"
 #include "cyber/mainboard/module_argument.h"
-#include "cyber/proto/dag_config.pb.h"
+#include "cyber/proto/dag_conf.pb.h"
 
 namespace apollo {
 namespace cyber {

@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/cyber.h"
-#include "cyber/proto/chatter.pb.h"
+#include "cyber/proto/unit_test.pb.h"
 #include "cyber/py_wrapper/py_node.h"
 
 apollo::cyber::PyReader *pr = NULL;

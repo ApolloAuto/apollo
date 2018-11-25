@@ -25,7 +25,7 @@
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/common/util.h"
-#include "cyber/proto/cyber_config.pb.h"
+#include "cyber/proto/cyber_conf.pb.h"
 
 namespace apollo {
 namespace cyber {

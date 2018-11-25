@@ -25,7 +25,7 @@
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/data/data_notifier.h"
-#include "cyber/proto/component_config.pb.h"
+#include "cyber/proto/component_conf.pb.h"
 
 namespace apollo {
 namespace cyber {

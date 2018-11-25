@@ -25,7 +25,7 @@ cc_library(
     deps = [
         "//cyber/croutine:croutine",
         "//cyber/data:data",
-        "//cyber/proto:component_config_cc_proto",
+        "//cyber/proto:component_conf_cc_proto",
     ],
 )
 

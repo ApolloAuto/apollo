@@ -17,7 +17,7 @@
 #include <string>
 
 #include "cyber/cyber.h"
-#include "cyber/proto/chatter.pb.h"
+#include "cyber/proto/unit_test.pb.h"
 #include "cyber/py_wrapper/py_record.h"
 
 const char TEST_RECORD_FILE[] = "test02.record";

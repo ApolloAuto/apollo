@@ -14,7 +14,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//cyber/proto:component_config_cc_proto",
+        "//cyber/proto:component_conf_cc_proto",
         "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",

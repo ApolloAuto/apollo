@@ -19,7 +19,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/message/py_message.h"
-#include "cyber/proto/chatter.pb.h"
+#include "cyber/proto/unit_test.pb.h"
 #include "cyber/py_wrapper/py_node.h"
 #include "gtest/gtest.h"
 

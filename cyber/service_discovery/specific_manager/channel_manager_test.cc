@@ -22,7 +22,7 @@
 #include "cyber/common/global_data.h"
 #include "cyber/message/message_traits.h"
 #include "cyber/message/protobuf_factory.h"
-#include "cyber/proto/chatter.pb.h"
+#include "cyber/proto/unit_test.pb.h"
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
 #include "cyber/transport/common/identity.h"
 

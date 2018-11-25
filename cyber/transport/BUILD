@@ -108,7 +108,7 @@ cc_test(
     ],
     deps = [
         "//cyber:cyber_core",
-        "//cyber/proto:chatter_cc_proto",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )
@@ -132,7 +132,7 @@ cc_test(
     ],
     deps = [
         "//cyber:cyber_core",
-        "//cyber/proto:chatter_cc_proto",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )
@@ -159,7 +159,7 @@ cc_test(
     ],
     deps = [
         "//cyber:cyber_core",
-        "//cyber/proto:chatter_cc_proto",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest",
     ],
 )
@@ -188,7 +188,7 @@ cc_test(
     ],
     deps = [
         "//cyber:cyber_core",
-        "//cyber/proto:chatter_cc_proto",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )
