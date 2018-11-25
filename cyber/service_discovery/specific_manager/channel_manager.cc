@@ -22,10 +22,10 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
-#include "cyber/init.h"
 #include "cyber/message/message_traits.h"
 #include "cyber/message/py_message.h"
 #include "cyber/message/raw_message.h"
+#include "cyber/state.h"
 #include "cyber/time/time.h"
 
 namespace apollo {

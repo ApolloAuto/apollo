@@ -16,6 +16,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"

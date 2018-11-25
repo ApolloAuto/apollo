@@ -17,8 +17,15 @@
 #ifndef CYBER_STATE_H_
 #define CYBER_STATE_H_
 
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cerrno>
 #include <cstdint>
+#include <cstring>
 #include <thread>
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {
@@ -42,6 +49,13 @@ inline bool IsShutdown() {
 inline void WaitForShutdown() {
   while (OK()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  }
+}
+
+inline void AsyncShutdown() {
+  pid_t pid = getpid();
+  if (kill(pid, SIGINT) != 0) {
+    AERROR << strerror(errno);
   }
 }
 

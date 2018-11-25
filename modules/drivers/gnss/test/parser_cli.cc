@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/record/record_reader.h"
 
 #include "modules/drivers/gnss/parser/data_parser.h"

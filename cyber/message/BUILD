@@ -47,7 +47,6 @@ cc_library(
         "protobuf_factory.h",
     ],
     deps = [
-        "//cyber:init",
         "//cyber/common:macros",
         "//cyber/common:log",
         "//cyber/proto:proto_desc_cc_proto",

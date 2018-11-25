@@ -31,7 +31,6 @@
 #include "cyber/data/data_dispatcher.h"
 #include "cyber/event/perf_event_cache.h"
 #include "cyber/logger/async_logger.h"
-#include "cyber/node/node.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/task/task.h"

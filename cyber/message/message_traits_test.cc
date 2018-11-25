@@ -230,10 +230,15 @@ TEST(MessageTraitsTest, message_type) {
 
 TEST(MessageTraitsTest, descriptor) {
   const std::string pb_desc =
-      "\nd\n\x1B"
+      "\n\xFA\x1\n\x1B"
       "cyber/proto/unit_test.proto\x12\x12"
       "apollo.cyber.proto\"1\n\bUnitTest\x12\x12\n\nclass_name\x18\x1 "
-      "\x1(\t\x12\x11\n\tcase_name\x18\x2 \x1(\t";
+      "\x1(\t\x12\x11\n\tcase_name\x18\x2 "
+      "\x1(\t\"S\n\aChatter\x12\x11\n\ttimestamp\x18\x1 "
+      "\x1(\x4\x12\x17\n\xFlidar_timestamp\x18\x2 \x1(\x4\x12\v\n\x3seq\x18\x3 "
+      "\x1(\x4\x12\xF\n\acontent\x18\x4 \x1(\f\"?\n\x10"
+      "ChatterBenchmark\x12\r\n\x5stamp\x18\x1 \x1(\x4\x12\v\n\x3seq\x18\x2 "
+      "\x1(\x4\x12\xF\n\acontent\x18\x3 \x1(\t";
   std::string desc;
   GetDescriptorString<proto::UnitTest>("apollo.cyber.proto.UnitTest", &desc);
   EXPECT_EQ(pb_desc, desc);

@@ -24,7 +24,7 @@
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/data/channel_buffer.h"
-#include "cyber/init.h"
+#include "cyber/state.h"
 #include "cyber/time/time.h"
 
 namespace apollo {

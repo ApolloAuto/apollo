@@ -16,6 +16,7 @@
 #include "modules/prediction/prediction_component.h"
 
 #include "gtest/gtest.h"
+#include "cyber/init.h"
 
 namespace apollo {
 namespace prediction {
