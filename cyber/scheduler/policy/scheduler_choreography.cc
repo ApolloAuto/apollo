@@ -149,8 +149,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
 
     // Check if task prio is reasonable.
     if (cr->priority() >= MAX_PRIO) {
-      AWARN << cr->name()
-            << " prio great than MAX_PRIO.";
+      AWARN << cr->name() << " prio great than MAX_PRIO.";
       cr->set_priority(MAX_PRIO - 1);
     }
 
@@ -264,9 +263,8 @@ void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
     ParseCpuset(cpuset, &cpus);
     cpu_set_t set;
     CPU_ZERO(&set);
-    for (std::vector<int>::const_iterator it = cpus.begin();
-         it != cpus.end(); it++) {
-      CPU_SET(*it, &set);
+    for (const auto cpu : cpus) {
+      CPU_SET(cpu, &set);
     }
     pthread_setaffinity_np(th->native_handle(), sizeof(set), &set);
 
