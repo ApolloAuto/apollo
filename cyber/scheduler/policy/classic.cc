@@ -40,9 +40,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   }
   for (int i = MAX_PRIO - 1; i >= 0; --i) {
     ReadLockGuard<AtomicRWLock> lk(rq_locks_[i]);
-    for (auto it = rq_[i].begin(); it != rq_[i].end(); ++it) {
-      auto cr = (*it);
-
+    for (auto& cr : rq_[i]) {
       if (!cr->Acquire()) {
         continue;
       }
