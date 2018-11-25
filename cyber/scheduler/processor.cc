@@ -49,9 +49,8 @@ void Processor::SetAffinity(const std::vector<int> &cpus,
 
   if (cpus.size()) {
     if (!affinity.compare("range")) {
-      for (std::vector<int>::const_iterator it = cpus.begin(), e = cpus.end();
-            it != e; it++) {
-        CPU_SET(*it, &set);
+      for (const auto cpu : cpus) {
+        CPU_SET(cpu, &set);
       }
       pthread_setaffinity_np(thread_.native_handle(), sizeof(set), &set);
     } else if (!affinity.compare("1to1")) {
