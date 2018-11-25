@@ -22,6 +22,7 @@
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
+#include "cyber/init.h"
 
 namespace apollo {
 namespace common {

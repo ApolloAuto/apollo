@@ -17,12 +17,6 @@
 #ifndef CYBER_INIT_H_
 #define CYBER_INIT_H_
 
-#include <signal.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <cerrno>
-#include <cstring>
-
 #include "cyber/common/log.h"
 #include "cyber/state.h"
 
@@ -31,12 +25,6 @@ namespace cyber {
 
 bool Init(const char* binary_name);
 void Shutdown();
-inline void AsyncShutdown() {
-  pid_t pid = getpid();
-  if (kill(pid, SIGINT) != 0) {
-    AERROR << strerror(errno);
-  }
-}
 
 }  // namespace cyber
 }  // namespace apollo

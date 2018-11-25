@@ -30,6 +30,7 @@
 
 #include <iostream>
 
+#include "cyber/init.h"
 #include "modules/tools/visualizer/fixedaspectratiowidget.h"
 #include "modules/tools/visualizer/grid.h"
 #include "modules/tools/visualizer/main_window.h"

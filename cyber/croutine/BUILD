@@ -11,7 +11,6 @@ cc_library(
         "croutine.h",
     ],
     deps = [
-        "//cyber:init",
         "//cyber/base:atomic_hash_map",
         "//cyber/base:atomic_rw_lock",
         "//cyber/base:bounded_queue",

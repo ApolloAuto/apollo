@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 
 #include "modules/data/proto/data.pb.h"
 #include "modules/data/proto/data_conf.pb.h"

@@ -21,6 +21,7 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/proto/scheduler_conf.pb.h"
 #include "cyber/scheduler/processor_context.h"
 

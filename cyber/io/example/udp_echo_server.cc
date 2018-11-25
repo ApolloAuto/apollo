@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/task/task.h"

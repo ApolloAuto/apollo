@@ -19,6 +19,7 @@
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 
 namespace apollo {
 namespace cyber {

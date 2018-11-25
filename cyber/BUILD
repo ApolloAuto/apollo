@@ -22,7 +22,7 @@ cc_binary(
     linkstatic = False,
     deps = [
       ":cyber_core",
-      "//cyber/proto:dag_config_cc_proto",
+      "//cyber/proto:dag_conf_cc_proto",
     ],
 )
 
@@ -41,70 +41,79 @@ cc_library(
     hdrs = [
       "state.h",
     ],
+    deps = [
+        "//cyber/common",
+    ],
 )
 
 cc_library(
     name = "init",
+    srcs = [
+        "init.cc",
+    ],
     hdrs = [
-      "cyber.h",
       "init.h",
     ],
     deps = [
-      "state",
+      "//cyber:state",
+      "//cyber/node",
+      "//cyber/logger:async_logger",
     ],
 )
 
 cc_library(
     name = "cyber_core",
-    srcs = [
-        "cyber.cc",
-        "init.cc",
-    ],
     linkopts = [
-        "-luuid",
-        "-lprotobuf",
         "-lglog",
         "-lgflags",
+        "-lprotobuf",
+        "-luuid",
+    ],
+    srcs = [
+        "cyber.cc",
+    ],
+    hdrs = [
+      "cyber.h",
     ],
     deps = [
         "//cyber:binary",
-        "//cyber:state",
         "//cyber/base",
         "//cyber/blocker:blocker_manager",
         "//cyber/common",
-        "//cyber/component:component",
+        "//cyber/component",
         "//cyber/component:timer_component",
-        "//cyber/class_loader:class_loader",
+        "//cyber/class_loader",
         "//cyber/class_loader:class_loader_manager",
-        "//cyber/croutine:croutine",
-        "//cyber/data:data",
+        "//cyber/croutine",
+        "//cyber/data",
         "//cyber/event:perf_event_cache",
-        "//cyber/io:io",
+        "//cyber/io",
         "//cyber:init",
-        "//cyber/logger:logger",
+        "//cyber/logger",
         "//cyber/logger:async_logger",
         "//cyber/message:message_traits",
         "//cyber/message:raw_message_traits",
         "//cyber/message:py_message_traits",
         "//cyber/message:protobuf_traits",
-        "//cyber/node:node",
+        "//cyber/node",
         "//cyber/proto:run_mode_conf_cc_proto",
         "//cyber/parameter:parameter_client",
         "//cyber/parameter:parameter_server",
-        "//cyber/record:record",
-        "//cyber/scheduler:scheduler",
+        "//cyber/record",
+        "//cyber/scheduler",
         "//cyber/service:client",
-        "//cyber/service:service",
+        "//cyber/service",
         "//cyber/service_discovery:topology_manager",
-        "//cyber/task:task",
-        "//cyber/time:time",
+        "//cyber:state",
+        "//cyber/task",
+        "//cyber/time",
         "//cyber/time:duration",
         "//cyber/time:rate",
-        "//cyber/timer:timer",
-        "//cyber/transport:transport",
+        "//cyber/timer",
+        "//cyber/transport",
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
-        "//third_party/tf2:tf2",
+        "//third_party/tf2",
         "@fastrtps",
     ],
 )

@@ -12,11 +12,11 @@ cc_library(
     ],
     deps = [
         "perf_event",
+        "//cyber:state",
         "//cyber/base:bounded_queue",
         "//cyber/common:global_data",
         "//cyber/common:log",
         "//cyber/common:macros",
-        "//cyber:init",
         "//cyber/proto:perf_conf_cc_proto",
         "//cyber/time:time",
     ]

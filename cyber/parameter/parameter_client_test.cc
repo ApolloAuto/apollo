@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/message/protobuf_factory.h"
 #include "cyber/parameter/parameter_client.h"
 #include "cyber/parameter/parameter_server.h"

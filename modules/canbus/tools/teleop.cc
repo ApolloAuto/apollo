@@ -22,6 +22,7 @@
 
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/time/time.h"
 
 #include "modules/canbus/proto/chassis.pb.h"

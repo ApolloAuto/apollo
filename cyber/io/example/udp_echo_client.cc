@@ -24,6 +24,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/io/session.h"
+#include "cyber/init.h"
 #include "cyber/scheduler/scheduler.h"
 
 using apollo::cyber::io::Session;

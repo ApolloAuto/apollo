@@ -76,6 +76,7 @@ cc_test(
     srcs = [ "timing_wheel_test.cc", ],
     deps = [
         "//cyber:cyber_core",
+        "//cyber:init",
         "@gtest//:main",
     ],
 )

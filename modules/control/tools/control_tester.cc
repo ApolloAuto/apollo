@@ -23,9 +23,10 @@
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
 
+#include "cyber/common/log.h"
+#include "cyber/init.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/pad_msg.pb.h"

@@ -20,6 +20,7 @@
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/task/task.h"
 
 namespace apollo {
