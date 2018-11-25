@@ -229,7 +229,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
                 vehicle_state_, XYbounds_, rotate_angle_, translate_origin_,
                 end_pose_, obstacles_num_, obstacles_edges_num_, obstacles_A_,
                 obstacles_b_, obstalce_list_) == Status::OK()) {
-          trajectory_updated_ = false;
+          trajectory_updated_ = true;
         }
       }
     }
