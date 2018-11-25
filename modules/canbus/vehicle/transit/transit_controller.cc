@@ -179,10 +179,10 @@ Chassis TransitController::chassis() {
     chassis_.set_throttle_percentage(motion20.llc_fbk_throttleposition());
   }
 
-  // TODO(QiL): revisit after fix done on Transit.
   if (motion20.has_llc_fbk_brakepressurerear()) {
-  //  TODO(Udelv): fix scaling
-    chassis_.set_brake_percentage(motion20.llc_fbk_brakepressurerear() / 1780 * 100 );
+    // TODO(Udelv): fix scaling
+    chassis_.set_brake_percentage(motion20.llc_fbk_brakepressurerear() / 1780 *
+                                  100);
   }
 
   if (motion20.has_llc_fbk_gear()) {
@@ -209,9 +209,10 @@ Chassis TransitController::chassis() {
     chassis_.set_speed_mps(motion21.llc_fbk_vehiclespeed());
   }
 
-  // TODO(QiL): revisit to fix scaling
   if (motion21.has_llc_fbk_steeringangle()) {
-    chassis_.set_steering_percentage(motion21.llc_fbk_steeringangle() *  M_PI / 180/  vehicle_params_.max_steer_angle() * 100);
+    chassis_.set_steering_percentage(motion21.llc_fbk_steeringangle() * M_PI /
+                                     180 / vehicle_params_.max_steer_angle() *
+                                     100);
   }
 
   auto& aux = transit.llc_auxiliaryfeedback_120();
@@ -254,8 +255,8 @@ ErrorCode TransitController::EnableAutoMode() {
       Adc_motioncontrol1_10::
           ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
-    set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-    return ErrorCode::OK;
+  set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  return ErrorCode::OK;
 }
 
 ErrorCode TransitController::DisableAutoMode() {
@@ -281,8 +282,8 @@ ErrorCode TransitController::EnableSteeringOnlyMode() {
   adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
       Adc_motioncontrol1_10::ADC_CMD_LONGITUDINALCONTROLMODE_NONE);
   can_sender_->Update();
-    set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    return ErrorCode::OK;
+  set_driving_mode(Chassis::AUTO_STEER_ONLY);
+  return ErrorCode::OK;
 }
 
 ErrorCode TransitController::EnableSpeedOnlyMode() {
