@@ -17,10 +17,10 @@
 #ifndef CYBER_SCHEDULER_POLICY_SCHEDULER_CLASSIC_H_
 #define CYBER_SCHEDULER_POLICY_SCHEDULER_CLASSIC_H_
 
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "cyber/croutine/croutine.h"
 #include "cyber/proto/classic_conf.pb.h"
@@ -47,7 +47,7 @@ class SchedulerClassic : public Scheduler {
   bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool NotifyProcessor(uint64_t crid) override;
 
-  std::map<std::string, ClassicTask> cr_tasks;
+  std::unordered_map<std::string, ClassicTask> cr_confs_;
 
   std::string affinity_;
   std::vector<int> cpuset_;

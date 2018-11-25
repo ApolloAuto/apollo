@@ -55,7 +55,7 @@ SchedulerClassic::SchedulerClassic() {
 
     for (auto& group : groups) {
       for (auto& task : group.tasks()) {
-        cr_tasks[task.name()] = task;
+        cr_confs_[task.name()] = task;
       }
     }
   } else {
@@ -101,8 +101,8 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
     id_cr_[cr->id()] = cr;
   }
 
-  if (cr_tasks.find(cr->name()) != cr_tasks.end()) {
-    cr->set_priority(cr_tasks[cr->name()].prio());
+  if (cr_confs_.find(cr->name()) != cr_confs_.end()) {
+    cr->set_priority(cr_confs_[cr->name()].prio());
   }
 
   // Check if task prio is reasonable.
