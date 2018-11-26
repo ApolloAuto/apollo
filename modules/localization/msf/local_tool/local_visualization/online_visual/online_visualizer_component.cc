@@ -23,12 +23,12 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_tokenizer.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
-#include "modules/localization/proto/msf_config.pb.h"
 
 namespace apollo {
 namespace localization {
@@ -60,20 +60,25 @@ bool OnlineVisualizerComponent::Init() {
 }
 
 bool OnlineVisualizerComponent::InitConfig() {
-  msf_config::Config msf_config;
-  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                                   &msf_config)) {
-    return false;
-  }
-  AINFO << "Msf localization config: " << msf_config.DebugString();
+//  msf_config::Config msf_config;
+//  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
+//                                                   &msf_config)) {
+//    return false;
+//  }
+//  AINFO << "Msf localization config: " << msf_config.DebugString();
 
-  map_folder_ = msf_config.map_dir() + "/" + FLAGS_local_map_name;
+//  map_folder_ = msf_config.map_dir() + "/" + FLAGS_local_map_name;
+  map_folder_ = FLAGS_map_dir + "/" + FLAGS_local_map_name;
   map_visual_folder_ = FLAGS_map_visual_dir;
   lidar_extrinsic_file_ = FLAGS_lidar_extrinsics_file;
 
-  lidar_local_topic_ = msf_config.lidar_localization_topic();
-  gnss_local_topic_ = msf_config.gnss_localization_topic();
-  fusion_local_topic_ = msf_config.localization_topic();
+  lidar_local_topic_ = FLAGS_localization_lidar_topic;
+  gnss_local_topic_ = FLAGS_localization_gnss_topic;
+  fusion_local_topic_ = FLAGS_localization_topic;
+
+//  lidar_local_topic_ = msf_config.lidar_localization_topic();
+//  gnss_local_topic_ = msf_config.gnss_localization_topic();
+//  fusion_local_topic_ = msf_config.localization_topic();
 
   Eigen::Affine3d velodyne_extrinsic;
   bool success =

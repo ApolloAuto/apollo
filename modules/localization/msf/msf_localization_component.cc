@@ -21,7 +21,8 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 
-#include "modules/localization/proto/msf_config.pb.h"
+#include "modules/localization/common/localization_gflags.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {
 namespace localization {
@@ -49,22 +50,16 @@ bool MSFLocalizationComponent::Init() {
 }
 
 bool MSFLocalizationComponent::InitConfig() {
-  msf_config::Config msf_config;
-  if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                                   &msf_config)) {
-    return false;
-  }
-  AINFO << "Msf localization config: " << msf_config.DebugString();
+  lidar_topic_ = FLAGS_lidar_topic;
+  bestgnsspos_topic_ = FLAGS_gnss_best_pose_topic;
+  gnss_heading_topic_ = FLAGS_heading_topic;
 
-  lidar_topic_ = msf_config.lidar_topic();
-  bestgnsspos_topic_ = msf_config.bestgnsspos_topic();
-
-  if (publisher_->InitConfig(msf_config) != true) {
+  if (publisher_->InitConfig() != true) {
     AERROR << "Init publisher config failed.";
     return false;
   }
 
-  if (localization_.Init(msf_config).ok() != true) {
+  if (localization_.Init().ok() != true) {
     AERROR << "Init class MSFLocalization failed.";
     return false;
   }
@@ -92,6 +87,12 @@ bool MSFLocalizationComponent::InitIO() {
       this->node_->CreateReader<drivers::gnss::GnssBestPose>(
           bestgnsspos_topic_, bestgnsspos_register_call);
 
+  std::function<void(const std::shared_ptr<drivers::gnss::Heading>&)>
+      gnss_heading_call = std::bind(&MSFLocalization::OnGnssHeading,
+                                    &localization_, std::placeholders::_1);
+  gnss_heading_listener_ = this->node_->CreateReader<drivers::gnss::Heading>(
+      gnss_heading_topic_, gnss_heading_call);
+
   // init writer
   if (publisher_->InitIO() != true) {
     AERROR << "Init publisher io failed.";
@@ -113,13 +114,14 @@ LocalizationMsgPublisher::LocalizationMsgPublisher(
     const std::shared_ptr<cyber::Node>& node)
     : node_(node), tf2_broadcaster_(node) {}
 
-bool LocalizationMsgPublisher::InitConfig(const msf_config::Config& config) {
-  localization_topic_ = config.localization_topic();
-  broadcast_tf_frame_id_ = config.broadcast_tf_frame_id();
-  broadcast_tf_child_frame_id_ = config.broadcast_tf_child_frame_id();
-  lidar_local_topic_ = config.lidar_localization_topic();
-  gnss_local_topic_ = config.gnss_localization_topic();
-  localization_status_topic_ = config.localization_status_topic();
+bool LocalizationMsgPublisher::InitConfig() {
+  localization_topic_ = FLAGS_localization_topic;
+  broadcast_tf_frame_id_ = FLAGS_broadcast_tf_frame_id;
+  broadcast_tf_child_frame_id_ = FLAGS_broadcast_tf_child_frame_id;
+  lidar_local_topic_ = FLAGS_localization_lidar_topic;
+  gnss_local_topic_ = FLAGS_localization_gnss_topic;
+  localization_status_topic_ = FLAGS_localization_msf_status;
+
   return true;
 }
 

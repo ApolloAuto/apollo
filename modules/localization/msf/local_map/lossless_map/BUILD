@@ -4,7 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "localization_msf_lossless_map",
-    srcs = glob(["*.cc"]),
+    srcs = ["lossless_map_config.cc",
+            "lossless_map_matrix.cc",
+            "lossless_map_node.cc",
+            "lossless_map_pool.cc",
+            "lossless_map.cc"],
     hdrs = glob(["*.h"]),
     linkopts = [
         "-lopencv_core",
@@ -13,8 +17,47 @@ cc_library(
     ],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
+        "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@eigen",
+    ],
+)
+
+filegroup(
+    name = "localization_msf_local_map_test_data",
+    srcs = glob([
+        "modules/localization/msf/local_map/test_data/**",
+    ]),
+)
+
+cc_test(
+    name = "localization_msf_local_map_pool_test",
+    size = "medium",
+    timeout = "short",
+    srcs = ["map_pool_test.cc"],
+    deps = [
+        "//cyber",
+        "//modules/localization/msf/common/util:localization_msf_common_util",
+        "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
+        "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
+        "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "localization_msf_lossless_map_config_test",
+    size = "medium",
+    timeout = "short",
+    srcs = ["lossless_map_config_test.cc"],
+    data = [":localization_msf_local_map_test_data"],
+    deps = [
+        "//cyber",
+        "//modules/localization/msf/common/util:localization_msf_common_util",
+        "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
+        "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
+        "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
+        "@gtest//:main",
     ],
 )
 

@@ -34,7 +34,6 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/msf_config.pb.h"
 #include "modules/transform/transform_broadcaster.h"
 
 namespace apollo {
@@ -55,13 +54,16 @@ class MSFLocalizationComponent final
   bool InitIO();
 
  private:
-  std::shared_ptr<cyber::Reader<drivers::PointCloud>> lidar_listener_ =
-      nullptr;
+  std::shared_ptr<cyber::Reader<drivers::PointCloud>> lidar_listener_ = nullptr;
   std::string lidar_topic_ = "";
 
   std::shared_ptr<cyber::Reader<drivers::gnss::GnssBestPose>>
       bestgnsspos_listener_ = nullptr;
   std::string bestgnsspos_topic_ = "";
+
+  std::shared_ptr<cyber::Reader<drivers::gnss::Heading>>
+      gnss_heading_listener_ = nullptr;
+  std::string gnss_heading_topic_ = "";
 
  private:
   std::shared_ptr<LocalizationMsgPublisher> publisher_;
@@ -72,11 +74,10 @@ CYBER_REGISTER_COMPONENT(MSFLocalizationComponent);
 
 class LocalizationMsgPublisher {
  public:
-  explicit LocalizationMsgPublisher(
-      const std::shared_ptr<cyber::Node>& node);
+  explicit LocalizationMsgPublisher(const std::shared_ptr<cyber::Node>& node);
   ~LocalizationMsgPublisher() = default;
 
-  bool InitConfig(const msf_config::Config& config);
+  bool InitConfig();
   bool InitIO();
 
   void PublishPoseBroadcastTF(const LocalizationEstimate& localization);
@@ -90,8 +91,8 @@ class LocalizationMsgPublisher {
   std::shared_ptr<cyber::Node> node_;
 
   std::string localization_topic_ = "";
-  std::shared_ptr<cyber::Writer<LocalizationEstimate>>
-      localization_talker_ = nullptr;
+  std::shared_ptr<cyber::Writer<LocalizationEstimate>> localization_talker_ =
+      nullptr;
 
   std::string broadcast_tf_frame_id_ = "";
   std::string broadcast_tf_child_frame_id_ = "";

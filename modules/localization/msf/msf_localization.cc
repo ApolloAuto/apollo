@@ -44,13 +44,13 @@ MSFLocalization::MSFLocalization()
       localization_state_(msf::LocalizationMeasureState::OK),
       pcd_msg_index_(-1) {}
 
-Status MSFLocalization::Init(const msf_config::Config &config) {
-  InitParams(config);
+Status MSFLocalization::Init() {
+  InitParams();
 
   return localization_integ_.Init(localization_param_);
 }
 
-void MSFLocalization::InitParams(const msf_config::Config &config) {
+void MSFLocalization::InitParams() {
   // integration module
   localization_param_.is_ins_can_self_align = FLAGS_integ_ins_can_self_align;
   localization_param_.is_sins_align_with_vel = FLAGS_integ_sins_align_with_vel;
@@ -336,6 +336,17 @@ void MSFLocalization::OnGnssRtkEph(
   }
 
   localization_integ_.RawEphemerisProcess(*gnss_orbit_msg);
+  return;
+}
+
+void MSFLocalization::OnGnssHeading(
+    const std::shared_ptr<drivers::gnss::Heading> &gnss_heading_msg) {
+  if ((localization_state_ == msf::LocalizationMeasureState::OK ||
+       localization_state_ == msf::LocalizationMeasureState::VALID) &&
+      FLAGS_gnss_only_init) {
+    return;
+  }
+  localization_integ_.GnssHeadingProcess(*gnss_heading_msg);
   return;
 }
 

@@ -158,16 +158,4 @@ proto_library(
     srcs = ["rtk_config.proto"],
 )
 
-cc_proto_library(
-    name = "msf_config_proto",
-    deps = [
-        ":msf_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "msf_config_proto_lib",
-    srcs = ["msf_config.proto"],
-)
-
 cpplint()

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,6 @@ class BaseMap {
   /**@brief The destructor. */
   virtual ~BaseMap();
 
-  /**@brief Init load threadpool and preload threadpool. */
-  void InitThreadPool(int load_thread_num, int preload_thread_num);
   /**@brief Init load threadpool and preload threadpool. */
   virtual void InitMapNodeCaches(int cacheL1_size, int cahceL2_size);
 
@@ -115,10 +113,6 @@ class BaseMap {
   MapNodeCacheL2<MapNodeIndex, BaseMapNode>* map_node_cache_lvl2_;
   /**@brief The map node memory pool pointer. */
   BaseMapNodePool* map_node_pool_;
-  /**@brief The dynamic map node loading thread pool pointer. */
-  ThreadPool* p_map_load_threads_;
-  /**@brief The dynamic map node preloading thread pool pointer. */
-  ThreadPool* p_map_preload_threads_;
   /**@bried Keep the index of preloading nodes. */
   std::set<MapNodeIndex> map_preloading_task_index_;
   /**@brief The mutex for preload map node. **/

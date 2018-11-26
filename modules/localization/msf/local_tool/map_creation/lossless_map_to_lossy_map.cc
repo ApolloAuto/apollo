@@ -135,7 +135,6 @@ int main(int argc, char** argv) {
   lossless_map_node_pool.Initial(&lossless_config);
 
   LosslessMap lossless_map(&lossless_config);
-  lossless_map.InitThreadPool(1, 6);
   lossless_map.InitMapNodeCaches(12, 24);
   lossless_map.AttachMapNodePool(&lossless_map_node_pool);
   if (!lossless_map.SetMapFolderPath(src_map_folder)) {
@@ -164,7 +163,6 @@ int main(int argc, char** argv) {
   LossyMapNodePool lossy_map_node_pool(25, 8);
   lossy_map_node_pool.Initial(&lossy_config);
   LossyMap lossy_map(&lossy_config);
-  lossy_map.InitThreadPool(1, 6);
   lossy_map.InitMapNodeCaches(12, 24);
   lossy_map.AttachMapNodePool(&lossy_map_node_pool);
   if (!lossy_map.SetMapFolderPath(dst_map_folder)) {

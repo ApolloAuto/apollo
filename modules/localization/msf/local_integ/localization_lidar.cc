@@ -59,7 +59,6 @@ bool LocalizationLidar::Init(const std::string& map_path,
     return false;
   }
   map_node_pool_.Initial(&(map_.GetConfig()));
-  map_.InitThreadPool(1, 6);
   map_.InitMapNodeCaches(12, 24);
   map_.AttachMapNodePool(&map_node_pool_);
 
