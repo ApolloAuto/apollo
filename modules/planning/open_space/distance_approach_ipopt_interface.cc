@@ -1340,12 +1340,15 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     dual_l_index += obstacles_edges_sum_;
     dual_n_index += 4 * obstacles_num_;
   }
-  ADEBUG << "finalize_solution horizon done!";
+  state_result_(0, 0) = x0_(0, 0);
+  state_result_(1, 0) = x0_(1, 0);
+  state_result_(2, 0) = x0_(2, 0);
+  state_result_(3, 0) = x0_(3, 0);
   // push back last horizon for state and time variables
-  state_result_(0, horizon_) = x[state_index];
-  state_result_(1, horizon_) = x[state_index + 1];
-  state_result_(2, horizon_) = x[state_index + 2];
-  state_result_(3, horizon_) = x[state_index + 3];
+  state_result_(0, horizon_) = xf_(0, 0);
+  state_result_(1, horizon_) = xf_(1, 0);
+  state_result_(2, horizon_) = xf_(2, 0);
+  state_result_(3, horizon_) = xf_(3, 0);
   time_result_(0, horizon_) = x[time_index];
   time_result_ = ts_ * time_result_;
   for (int j = 0; j < obstacles_edges_sum_; j++) {
@@ -1354,7 +1357,6 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   for (int k = 0; k < 4 * obstacles_num_; k++) {
     dual_n_result_(k, horizon_) = x[dual_n_index + k];
   }
-
   // memory deallocation of ADOL-C variables
   delete[] obj_lam;
   free(rind_L);
