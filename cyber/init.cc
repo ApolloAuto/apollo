@@ -155,7 +155,8 @@ bool Init(const char* binary_name) {
 
 void Shutdown() {
   std::lock_guard<std::recursive_mutex> lg(g_mutex);
-  if (GetState() == STATE_SHUTDOWN) {
+  // TODO(hewei): Add more safeguard on the components to shutdown.
+  if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
     return;
   }
   scheduler::Scheduler::Instance()->ShutDown();
