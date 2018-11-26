@@ -17,10 +17,10 @@
 #include "modules/prediction/prediction_component.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <memory>
 #include <vector>
-#include <chrono>
 
 #include "boost/filesystem.hpp"
 #include "boost/range/iterator_range.hpp"
@@ -49,8 +49,6 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::ErrorCode;
-using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
@@ -174,13 +172,11 @@ void PredictionComponent::Stop() {
 
 void PredictionComponent::OnLocalization(
     const LocalizationEstimate& localization_msg) {
-  auto pose_container =
+  auto ptr_ego_pose_container =
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
-  if (!pose_container) {
-    return;
-  }
-  pose_container->Insert(localization_msg);
+  CHECK(ptr_ego_pose_container != nullptr);
+  ptr_ego_pose_container->Insert(localization_msg);
 
   ADEBUG << "Received a localization message ["
          << localization_msg.ShortDebugString() << "].";
@@ -188,12 +184,11 @@ void PredictionComponent::OnLocalization(
 
 void PredictionComponent::OnPlanning(
     const planning::ADCTrajectory& planning_msg) {
-  auto adc_trajectory_container = ContainerManager::Instance()->GetContainer<
-      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
-  if (!adc_trajectory_container) {
-    return;
-  }
-  adc_trajectory_container->Insert(planning_msg);
+  auto ptr_ego_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  CHECK(ptr_ego_trajectory_container != nullptr);
+  ptr_ego_trajectory_container->Insert(planning_msg);
 
   ADEBUG << "Received a planning message ["
          << planning_msg.ShortDebugString() << "].";
@@ -203,12 +198,11 @@ void PredictionComponent::OnPerception(
     const PerceptionObstacles& perception_msg) {
   // Insert obstacle
   auto end_time1 = std::chrono::system_clock::now();
-  auto obstacles_container = ContainerManager::Instance()->GetContainer<
+  auto ptr_obstacles_container = ContainerManager::Instance()->GetContainer<
       ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
-  if (!obstacles_container) {
-    return;
-  }
-  obstacles_container->Insert(perception_msg);
+  CHECK(ptr_obstacles_container != nullptr);
+
+  ptr_obstacles_container->Insert(perception_msg);
   auto end_time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time2 - end_time1;
   ADEBUG << "Time to insert obstacles: "
@@ -225,7 +219,7 @@ void PredictionComponent::OnPerception(
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
       FLAGS_enable_junction_feature) {
     JunctionAnalyzer::Init(scenario.junction_id());
-    obstacles_container->BuildJunctionFeature();
+    ptr_obstacles_container->BuildJunctionFeature();
   }
   auto end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;
@@ -234,7 +228,7 @@ void PredictionComponent::OnPerception(
 
   // TODO(kechxu) refactor logic of build lane graph and build junction feature
   // Set up obstacle cluster
-  obstacles_container->BuildLaneGraph();
+  ptr_obstacles_container->BuildLaneGraph();
   auto end_time5 = std::chrono::system_clock::now();
   diff = end_time5 - end_time4;
   ADEBUG << "Time to build cruise features: "
@@ -243,29 +237,27 @@ void PredictionComponent::OnPerception(
   ADEBUG << "Received a perception message ["
          << perception_msg.ShortDebugString() << "].";
 
-  // Update ADC status
+  auto ptr_ego_pose_container = ContainerManager::Instance()->GetContainer<
+      PoseContainer>(AdapterConfig::LOCALIZATION);
+  auto ptr_ego_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
 
-  auto pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  auto adc_container = ContainerManager::Instance()->GetContainer<
-      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
+  CHECK(ptr_ego_pose_container != nullptr &&
+      ptr_ego_trajectory_container != nullptr);
 
-  if (!pose_container || !adc_container) {
-    return;
-  }
-
-  const PerceptionObstacle* adc = pose_container->ToPerceptionObstacle();
-  if (adc != nullptr) {
-    obstacles_container->InsertPerceptionObstacle(*adc, adc->timestamp());
-    double x = adc->position().x();
-    double y = adc->position().y();
+  const PerceptionObstacle* ptr_ego_vehicle =
+      ptr_ego_pose_container->ToPerceptionObstacle();
+  if (ptr_ego_vehicle != nullptr) {
+    ptr_obstacles_container->InsertPerceptionObstacle(*ptr_ego_vehicle,
+        ptr_ego_vehicle->timestamp());
+    double x = ptr_ego_vehicle->position().x();
+    double y = ptr_ego_vehicle->position().y();
     ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x
-           << ", " << std::fixed << std::setprecision(6) << y << "].";
-    adc_container->SetPosition({x, y});
+              << ", " << std::fixed << std::setprecision(6) << y << "].";
+    ptr_ego_trajectory_container->SetPosition({x, y});
   }
   auto end_time6 = std::chrono::system_clock::now();
-
 
   // Make evaluations
   EvaluatorManager::Instance()->Run(perception_msg);
