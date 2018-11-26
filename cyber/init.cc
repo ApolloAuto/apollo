@@ -158,8 +158,8 @@ void Shutdown() {
   if (GetState() == STATE_SHUTDOWN) {
     return;
   }
-  TaskManager::Instance()->Shutdown();
   scheduler::Scheduler::Instance()->ShutDown();
+  TaskManager::Instance()->Shutdown();
   service_discovery::TopologyManager::Instance()->Shutdown();
   transport::Transport::Instance()->Shutdown();
   StopLogger();

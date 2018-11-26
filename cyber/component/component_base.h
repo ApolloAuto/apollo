@@ -26,12 +26,14 @@
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/node/node.h"
+#include "cyber/scheduler/scheduler.h"
 #include "cyber/proto/component_conf.pb.h"
 #include "gflags/gflags.h"
 
 namespace apollo {
 namespace cyber {
 
+using apollo::cyber::scheduler::Scheduler;
 using apollo::cyber::proto::ComponentConfig;
 using apollo::cyber::proto::TimerComponentConfig;
 
@@ -44,7 +46,14 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
 
   virtual bool Initialize(const ComponentConfig& config) { return false; }
   virtual bool Initialize(const TimerComponentConfig& config) { return false; }
-  virtual void Shutdown() { is_shutdown_.exchange(true); }
+  virtual void Shutdown() {
+    if (is_shutdown_.exchange(true)) {
+      return;
+    }
+
+    Clear();
+    Scheduler::Instance()->RemoveTask(node_->Name());
+  }
 
   template <typename T>
   bool GetProtoConfig(T* config) const {
@@ -53,6 +62,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
 
  protected:
   virtual bool Init() = 0;
+  virtual void Clear() { return; }
   const std::string& ConfigFilePath() const { return config_file_path_; }
 
   void LoadConfigFiles(const ComponentConfig& config) {

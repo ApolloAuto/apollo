@@ -41,6 +41,7 @@ class SchedulerChoreography : public Scheduler {
   void SetInnerThreadAttr(const std::thread* thr,
                           const std::string& name) override;
 
+  bool RemoveCRoutine(uint64_t crid) override;
   bool RemoveTask(const std::string& name) override;
 
  private:

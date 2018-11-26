@@ -74,17 +74,6 @@ Scheduler* Scheduler::Instance() {
   return instance;
 }
 
-void Scheduler::ShutDown() {
-  if (stop_.exchange(true)) {
-    return;
-  }
-
-  for (auto& ctx : pctxs_) {
-    ctx->ShutDown();
-  }
-  pctxs_.clear();
-}
-
 bool Scheduler::CreateTask(const RoutineFactory& factory,
                            const std::string& name) {
   return CreateTask(factory.create_routine(),
@@ -160,6 +149,32 @@ void Scheduler::ParseCpuset(const std::string &str,
   }
 }
 
+void Scheduler::ShutDown() {
+  if (stop_.exchange(true)) {
+    return;
+  }
+
+  for (auto& ctx : pctxs_) {
+    ctx->ShutDown();
+  }
+
+  std::vector<uint64_t> cr_list;
+  {
+    ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    for (auto it = id_cr_.begin();
+         it != id_cr_.end(); ++it) {
+      auto cr = it->second;
+      auto id = cr->id();
+      cr_list.emplace_back(id);
+    }
+  }
+
+  for (auto& id : cr_list) {
+    RemoveCRoutine(id);
+  }
+
+  pctxs_.clear();
+}
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

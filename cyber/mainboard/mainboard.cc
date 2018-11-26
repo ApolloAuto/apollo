@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
   }
 
   apollo::cyber::WaitForShutdown();
-  apollo::cyber::Shutdown();
   controller.Clear();
+  apollo::cyber::Shutdown();
   AINFO << "exit mainboard.";
 
   return 0;

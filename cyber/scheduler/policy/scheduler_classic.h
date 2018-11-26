@@ -37,6 +37,7 @@ class SchedulerClassic : public Scheduler {
  public:
   SchedulerClassic();
 
+  bool RemoveCRoutine(uint64_t crid) override;
   bool RemoveTask(const std::string& name) override;
 
   void SetInnerThreadAttr(const std::thread* thr,
