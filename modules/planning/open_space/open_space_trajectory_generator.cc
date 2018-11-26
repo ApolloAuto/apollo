@@ -69,7 +69,7 @@ Status OpenSpaceTrajectoryGenerator::Init(
 apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const VehicleState& vehicle_state, const std::vector<double>& XYbounds,
     const double rotate_angle, const Vec2d& translate_origin,
-    const std::vector<double>& end_pose, std::size_t obstacles_num,
+    const std::vector<double>& end_pose, size_t obstacles_num,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     ThreadSafeIndexedObstacles* obstalce_list) {
@@ -205,7 +205,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
                     dual_n_result_ds, XYbounds_, obstalce_list);
   }
   // rescale the states to the world frame
-  for (std::size_t i = 0; i < horizon_ + 1; i++) {
+  for (size_t i = 0; i < horizon_ + 1; i++) {
     double tmp_x = state_result_ds(0, i);
     state_result_ds(0, i) = state_result_ds(0, i) * std::cos(rotate_angle) -
                             state_result_ds(1, i) * std::sin(rotate_angle);
@@ -276,13 +276,13 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
   // load warm start dual variables
   size_t l_warm_up_cols = l_warm_up.rows();
   for (size_t i = 0; i < horizon_; i++) {
-    for (std::size_t j = 0; j < l_warm_up_cols; j++) {
+    for (size_t j = 0; j < l_warm_up_cols; j++) {
       open_space_debug_.add_warm_start_dual_lambda(l_warm_up(j, i));
     }
   }
   size_t n_warm_up_cols = n_warm_up.rows();
   for (size_t i = 0; i < horizon_; i++) {
-    for (std::size_t j = 0; j < n_warm_up_cols; j++) {
+    for (size_t j = 0; j < n_warm_up_cols; j++) {
       open_space_debug_.add_warm_start_dual_miu(n_warm_up(j, i));
     }
   }
@@ -290,13 +290,13 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
   // load optimized dual variables
   size_t dual_l_result_ds_cols = dual_l_result_ds.rows();
   for (size_t i = 0; i < horizon_; i++) {
-    for (std::size_t j = 0; j < dual_l_result_ds_cols; j++) {
+    for (size_t j = 0; j < dual_l_result_ds_cols; j++) {
       open_space_debug_.add_optimized_dual_lambda(dual_l_result_ds(j, i));
     }
   }
   size_t dual_n_result_ds_cols = dual_n_result_ds.rows();
   for (size_t i = 0; i < horizon_; i++) {
-    for (std::size_t j = 0; j < dual_n_result_ds_cols; j++) {
+    for (size_t j = 0; j < dual_n_result_ds_cols; j++) {
       open_space_debug_.add_optimized_dual_miu(dual_n_result_ds(j, i));
     }
   }
@@ -333,22 +333,53 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
       trajectory_partition.add_trajectory();
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
-  if (horizon_ < 3)
+  size_t initial_gear_check_horizon = 3;
+  if (horizon_ < initial_gear_check_horizon)
     return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
-
-  if (state_result_ds(3, 0) > 1e-16 && state_result_ds(3, 1) > 1e-16 &&
-      state_result_ds(3, 2) > 1e-16) {
+  int direction_flag = 0;
+  size_t i = 0;
+  int j = 0;
+  int init_direction = 0;
+  while (i != initial_gear_check_horizon) {
+    if (state_result_ds(3, j) > 1e-16) {
+      i++;
+      j++;
+      direction_flag++;
+      if (init_direction == 0) {
+        init_direction++;
+      }
+    } else if (state_result_ds(3, j) < -1e-16) {
+      i++;
+      j++;
+      direction_flag--;
+      if (init_direction == 0) {
+        init_direction--;
+      }
+    } else {
+      j++;
+    }
+  }
+  if (direction_flag > 1) {
     gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
-  } else if (state_result_ds(3, 0) < -1e-16 && state_result_ds(3, 1) < -1e-16 &&
-             state_result_ds(3, 2) < -1e-16) {
+  } else if (direction_flag < -1) {
     gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
   } else {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Invalid trajectory start! initial speed too small");
+    if (init_direction > 0) {
+      ADEBUG << "initial speed oscillate too "
+                "frequent around zero";
+      gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
+    } else if (init_direction < 0) {
+      ADEBUG << "initial speed oscillate too "
+                "frequent around zero";
+      gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
+    } else {
+      return Status(
+          ErrorCode::PLANNING_ERROR,
+          "Invalid trajectory start! initial speeds too small to decide gear");
+    }
   }
-
   // partition trajectory points into each trajectory
-  for (std::size_t i = 0; i < horizon_ + 1; i++) {
+  for (size_t i = 0; i < horizon_ + 1; i++) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
     // then add a new trajectory with GEAR_REVERSE
     if (state_result_ds(3, i) < -1e-16 &&

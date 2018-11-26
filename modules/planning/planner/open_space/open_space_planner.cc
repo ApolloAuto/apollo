@@ -178,11 +178,11 @@ apollo::common::Status OpenSpacePlanner::Plan(
       ADEBUG << "Trajectory caculation updated, new results : "
              << trajectory_partition_.ShortDebugString();
     } else {
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "Planning failed to generate open space trajectory");
+      return status;
     }
     current_trajectory_ =
         trajectory_partition_.trajectory(current_trajectory_index_);
+    CHECK_GT(current_trajectory_.trajectory_point_size(), 0);
     TrajectoryPoint end_point = current_trajectory_.trajectory_point(
         current_trajectory_.trajectory_point_size() - 1);
     if (std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
