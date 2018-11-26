@@ -29,11 +29,12 @@ namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using ::google::protobuf::Message;
 
 ObstaclesContainer::ObstaclesContainer()
     : obstacles_(FLAGS_max_num_obstacles) {}
 
-void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
+void ObstaclesContainer::Insert(const Message& message) {
   curr_frame_predictable_obstacle_ids_.clear();
   PerceptionObstacles perception_obstacles;
   perception_obstacles.CopyFrom(
