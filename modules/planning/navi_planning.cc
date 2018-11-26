@@ -109,8 +109,7 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
                                ADCTrajectory* output_trajectory) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          start_time, vehicle_state,
-                         reference_line_provider_.get(),
-                         output_trajectory));
+                         reference_line_provider_.get(), output_trajectory));
 
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
@@ -220,8 +219,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state,
-                              frame_->obstacles());
+  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
 
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());

@@ -44,8 +44,8 @@ class EgoInfo {
   ~EgoInfo() = default;
 
   bool Update(const common::TrajectoryPoint& start_point,
-              const common::VehicleState& vehicle_state,
-              const std::vector<const Obstacle*>& obstacles);
+              const common::VehicleState& vehicle_state);
+
   void Clear();
 
   common::TrajectoryPoint start_point() const { return start_point_; }
@@ -53,6 +53,11 @@ class EgoInfo {
   common::VehicleState vehicle_state() const { return vehicle_state_; }
 
   double front_clear_distance() const { return front_clear_distance_; }
+
+  common::math::Box2d ego_box() const { return ego_box_; }
+
+  void CalculateFrontObstacleClearDistance(
+      const std::vector<const Obstacle*>& obstacles);
 
  private:
   FRIEND_TEST(EgoInfoTest, EgoInfoSimpleTest);
@@ -65,8 +70,7 @@ class EgoInfo {
     start_point_ = start_point;
   }
 
-  void CalculateFrontObstacleClearDistance(
-      const std::vector<const Obstacle*>& obstacles);
+  void CalculateEgoBox(const common::VehicleState& vehicle_state);
 
   // stitched point (at stitching mode)
   // or real vehicle point (at non-stitching mode)
@@ -78,6 +82,8 @@ class EgoInfo {
   double front_clear_distance_ = FLAGS_default_front_clear_distance;
 
   common::VehicleConfig ego_vehicle_config_;
+
+  common::math::Box2d ego_box_;
 
   DECLARE_SINGLETON(EgoInfo);
 };
