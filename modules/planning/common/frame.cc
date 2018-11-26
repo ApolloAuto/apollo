@@ -36,6 +36,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -48,6 +49,7 @@ using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::math::Polygon2d;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
@@ -393,10 +395,9 @@ Status Frame::InitFrameData() {
        Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
     AddObstacle(*ptr);
   }
-  if (FLAGS_enable_collision_detection) {
-    const auto *collision_obstacle =
-        FindCollisionObstacleWithInExtraRadius(FLAGS_max_collision_distance);
-    if (collision_obstacle) {
+  if (FLAGS_enable_collision_detection && planning_start_point_.v() < 1e-3) {
+    const auto *collision_obstacle = FindCollisionObstacle();
+    if (collision_obstacle != nullptr) {
       std::string err_str =
           "Found collision with obstacle: " + collision_obstacle->Id();
       monitor_logger_buffer_.ERROR(err_str);
@@ -406,53 +407,19 @@ Status Frame::InitFrameData() {
   return Status::OK();
 }
 
-const Obstacle *Frame::FindCollisionObstacleWithInExtraRadius(
-    const double radius) const {
-  CHECK_GT(radius, kMathEpsilon)
-      << "Extra safety radius must be positive number!";
+const Obstacle *Frame::FindCollisionObstacle() const {
   if (obstacles_.Items().empty()) {
     return nullptr;
   }
-  const auto &param =
-      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
-  Vec2d position(vehicle_state_.x(), vehicle_state_.y());
-  Vec2d vec_to_center(
-      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
-      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
-  Vec2d center(position + vec_to_center.rotate(vehicle_state_.heading()));
-  Box2d adc_box(center, vehicle_state_.heading(), param.length(),
-                param.width());
-  const double adc_half_diagnal = adc_box.diagonal() / 2.0;
+
+  const auto &adc_polygon = Polygon2d(EgoInfo::Instance()->ego_box());
   for (const auto &obstacle : obstacles_.Items()) {
     if (obstacle->IsVirtual()) {
       continue;
     }
 
-    double center_dist =
-        adc_box.center().DistanceTo(obstacle->PerceptionBoundingBox().center());
-    if (center_dist > obstacle->PerceptionBoundingBox().diagonal() / 2.0 +
-                          adc_half_diagnal + radius) {
-      ADEBUG << "Obstacle : " << obstacle->Id() << " is too far to collide";
-      continue;
-    }
-    double distance = obstacle->PerceptionPolygon().DistanceTo(adc_box);
-    if (FLAGS_ignore_overlapped_obstacle && distance < kMathEpsilon) {
-      bool all_points_in = true;
-      for (const auto &point : obstacle->PerceptionPolygon().points()) {
-        if (!adc_box.IsPointIn(point)) {
-          all_points_in = false;
-          break;
-        }
-      }
-      if (all_points_in) {
-        ADEBUG << "Skip overlapped obstacle, which is often caused by lidar "
-                  "calibration error";
-        continue;
-      }
-    }
-    if (distance < radius) {
-      AERROR << "Found collision with obstacle " << obstacle->Id()
-             << "Within extra safety radius of : " << radius;
+    const auto &obstacle_polygon = obstacle->PerceptionPolygon();
+    if (obstacle_polygon.HasOverlap(adc_polygon)) {
       return obstacle;
     }
   }

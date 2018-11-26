@@ -30,17 +30,31 @@ using common::math::Vec2d;
 using common::math::Box2d;
 
 EgoInfo::EgoInfo() {
-  common::VehicleConfig ego_vehicle_config_ =
-      common::VehicleConfigHelper::GetConfig();
+  ego_vehicle_config_ = common::VehicleConfigHelper::GetConfig();
 }
 
 bool EgoInfo::Update(const common::TrajectoryPoint& start_point,
-                     const common::VehicleState& vehicle_state,
-                     const std::vector<const Obstacle*>& obstacles) {
+                     const common::VehicleState& vehicle_state) {
   set_start_point(start_point);
   set_vehicle_state(vehicle_state);
-  CalculateFrontObstacleClearDistance(obstacles);
+  CalculateEgoBox(vehicle_state);
   return true;
+}
+
+void EgoInfo::CalculateEgoBox(const common::VehicleState& vehicle_state) {
+  const auto& param = ego_vehicle_config_.vehicle_param();
+  AINFO << "param: " << param.DebugString();
+
+  Vec2d vec_to_center(
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
+
+  Vec2d position(vehicle_state.x(), vehicle_state.y());
+  Vec2d center(position + vec_to_center.rotate(vehicle_state.heading()));
+
+  const double buffer = 0.1;  // in meters
+  ego_box_ = Box2d(center, vehicle_state.heading(), param.length() + buffer,
+                   param.width() + buffer);
 }
 
 void EgoInfo::Clear() {
@@ -60,15 +74,11 @@ void EgoInfo::CalculateFrontObstacleClearDistance(
 
   Vec2d center(position + vec_to_center.rotate(vehicle_state_.heading()));
 
-  const double buffer = 0.1;  // in meters
-  Box2d ego_box(center, vehicle_state_.heading(), param.length() + buffer,
-                param.width() + buffer);
-  const double adc_half_diagnal = ego_box.diagonal() / 2.0;
-
   Vec2d unit_vec_heading = Vec2d::CreateUnitVec2d(vehicle_state_.heading());
 
   // Due to the error of ego heading, only short range distance is meaningful
-  const double kDistanceThreshold = 50.0;
+  constexpr double kDistanceThreshold = 50.0;
+  constexpr double buffer = 0.1;  // in meters
   const double impact_region_length =
       param.length() + buffer + kDistanceThreshold;
   Box2d ego_front_region(center + unit_vec_heading * kDistanceThreshold / 2.0,
@@ -81,9 +91,9 @@ void EgoInfo::CalculateFrontObstacleClearDistance(
       continue;
     }
 
-    double dist = ego_box.center().DistanceTo(
+    double dist = ego_box_.center().DistanceTo(
                       obstacle->PerceptionBoundingBox().center()) -
-                  adc_half_diagnal;
+                  ego_box_.diagonal() / 2.0;
 
     if (front_clear_distance_ < 0.0 || dist < front_clear_distance_) {
       front_clear_distance_ = dist;

@@ -247,10 +247,15 @@ void StdPlanning::RunOnce(const LocalView& local_view,
       last_publishable_trajectory_.get());
 
   const uint32_t frame_num = seq_num_++;
+  bool update_ego_info =
+      EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
                      vehicle_state, trajectory_pb);
-  bool update_ego_info = EgoInfo::Instance()->Update(
-      stitching_trajectory.back(), vehicle_state, frame_->obstacles());
+
+  if (update_ego_info && status.ok()) {
+    EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
+        frame_->obstacles());
+  }
 
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
