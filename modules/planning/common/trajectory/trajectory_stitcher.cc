@@ -90,10 +90,11 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
                 });
 }
 
-// Planning from current vehicle state:
-// if 1. the auto-driving mode is off or
-//    2. we don't have the trajectory from last planning cycle or
-//    3. the position deviation from actual and target is too high
+/* Planning from current vehicle state if:
+   1. the auto-driving mode is off
+   (or) 2. we don't have the trajectory from last planning cycle
+   (or) 3. the position deviation from actual and target is too high
+*/
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const VehicleState& vehicle_state, const double current_timestamp,
     const double planning_cycle_time,
@@ -143,7 +144,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   std::size_t position_matched_index =
       prev_trajectory->QueryNearestPointWithBuffer(
-      {vehicle_state.x(), vehicle_state.y()}, 1.0e-6);
+          {vehicle_state.x(), vehicle_state.y()}, 1.0e-6);
 
   auto frenet_sd = ComputePositionProjection(
       vehicle_state.x(), vehicle_state.y(),
@@ -175,10 +176,12 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   auto matched_index = std::min(time_matched_index, position_matched_index);
 
+  constexpr size_t kNumPreCyclePoint = 20;
   std::vector<TrajectoryPoint> stitching_trajectory(
       prev_trajectory->trajectory_points().begin() +
-          std::max(0, static_cast<int>(matched_index - 1)),
+          std::max(0, static_cast<int>(matched_index - kNumPreCyclePoint)),
       prev_trajectory->trajectory_points().begin() + forward_time_index + 1);
+  ADEBUG << "stitching_trajectory size: " << stitching_trajectory.size();
 
   const double zero_s = stitching_trajectory.back().path_point().s();
   for (auto& tp : stitching_trajectory) {
