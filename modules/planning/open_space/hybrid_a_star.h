@@ -86,7 +86,7 @@ class HybridAStar {
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
       std::shared_ptr<Node3d> current_node);
   std::shared_ptr<Node3d> Next_node_generator(
-      std::shared_ptr<Node3d> current_node, std::size_t next_node_index);
+      std::shared_ptr<Node3d> current_node, size_t next_node_index);
   void CalculateNodeCost(
       std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node,
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
@@ -103,7 +103,7 @@ class HybridAStar {
   PlannerOpenSpaceConfig planner_open_space_config_;
   common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-  std::size_t next_node_num_ = 0;
+  size_t next_node_num_ = 0;
   double max_steer_ = 0.0;
   double step_size_ = 0.0;
   double xy_grid_resolution_ = 0.0;
@@ -118,17 +118,17 @@ class HybridAStar {
   std::shared_ptr<Node3d> end_node_;
   std::shared_ptr<Node3d> final_node_;
   struct cmp {
-    bool operator()(const std::pair<std::size_t, double>& left,
-                    const std::pair<std::size_t, double>& right) const {
+    bool operator()(const std::pair<size_t, double>& left,
+                    const std::pair<size_t, double>& right) const {
       return left.second >= right.second;
     }
   };
-  std::priority_queue<std::pair<std::size_t, double>,
-                      std::vector<std::pair<std::size_t, double>>, cmp>
+  std::priority_queue<std::pair<size_t, double>,
+                      std::vector<std::pair<size_t, double>>, cmp>
       open_pq_;
-  std::unordered_map<std::size_t, std::shared_ptr<Node3d>> open_set_;
-  std::unordered_map<std::size_t, std::shared_ptr<Node3d>> close_set_;
-  std::unordered_map<std::size_t, std::shared_ptr<ReedSheppPath>>
+  std::unordered_map<size_t, std::shared_ptr<Node3d>> open_set_;
+  std::unordered_map<size_t, std::shared_ptr<Node3d>> close_set_;
+  std::unordered_map<size_t, std::shared_ptr<ReedSheppPath>>
       ReedSheppPath_cache_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;
 };

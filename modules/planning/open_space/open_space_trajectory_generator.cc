@@ -84,8 +84,9 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   init_x_ = init_state_.x();
   init_y_ = init_state_.y();
   init_phi_ = init_state_.heading();
-  init_v_ = init_state_.linear_velocity();
-
+  // TODO(Jinyun) workaround the initial small speed to avoid problem in
+  // trajectory partition
+  init_v_ = 0.0;
   // rotate and scale the state according to the origin point defined in
   // frame
   init_x_ -= translate_origin.x();
@@ -96,8 +97,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   init_y_ = tmp_x * std::sin(-rotate_angle) + init_y_ * std::cos(-rotate_angle);
   init_phi_ = common::math::NormalizeAngle(init_phi_ - rotate_angle);
   // TODO(Jinyun) how to initial input not decided yet
-  init_steer_ = 0;
-  init_a_ = 0;
+  init_steer_ = 0.0;
+  init_a_ = 0.0;
   Eigen::MatrixXd x0(4, 1);
   x0 << init_x_, init_y_, init_phi_, init_v_;
 
@@ -333,7 +334,8 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
       trajectory_partition.add_trajectory();
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
-  size_t initial_gear_check_horizon = 3;
+  const size_t initial_gear_check_horizon = 3;
+  const double kepsilon = 1e-2;
   if (horizon_ < initial_gear_check_horizon)
     return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
   int direction_flag = 0;
@@ -341,14 +343,14 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
   int j = 0;
   int init_direction = 0;
   while (i != initial_gear_check_horizon) {
-    if (state_result_ds(3, j) > 1e-16) {
+    if (state_result_ds(3, j) > kepsilon) {
       i++;
       j++;
       direction_flag++;
       if (init_direction == 0) {
         init_direction++;
       }
-    } else if (state_result_ds(3, j) < -1e-16) {
+    } else if (state_result_ds(3, j) < -kepsilon) {
       i++;
       j++;
       direction_flag--;
@@ -382,7 +384,7 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
   for (size_t i = 0; i < horizon_ + 1; i++) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
     // then add a new trajectory with GEAR_REVERSE
-    if (state_result_ds(3, i) < -1e-16 &&
+    if (state_result_ds(3, i) < -kepsilon &&
         gear_positions_.back() == canbus::Chassis::GEAR_DRIVE) {
       current_trajectory = trajectory_partition.add_trajectory();
       gear_positions_.push_back(canbus::Chassis::GEAR_REVERSE);
@@ -391,7 +393,7 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
     }
     // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
     // then add a new trajectory with GEAR_DRIVE
-    if (state_result_ds(3, i) > 1e-16 &&
+    if (state_result_ds(3, i) > kepsilon &&
         gear_positions_.back() == canbus::Chassis::GEAR_REVERSE) {
       current_trajectory = trajectory_partition.add_trajectory();
       gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
