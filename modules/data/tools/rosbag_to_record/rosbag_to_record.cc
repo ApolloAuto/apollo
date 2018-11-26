@@ -64,24 +64,22 @@ int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
   proto->set_width(rawdata->width);
   proto->set_height(rawdata->height);
 
-  int field_size = rawdata->fields.size();
   int x_offset = -1;
   int y_offset = -1;
   int z_offset = -1;
   int stamp_offset = -1;
   int intensity_offset = -1;
-  for (int i = 0; i < field_size; ++i) {
-    auto f = rawdata->fields[i];
-    if (f.name == "x") {
-      x_offset = f.offset;
-    } else if (f.name == "y") {
-      y_offset = f.offset;
-    } else if (f.name == "z") {
-      z_offset = f.offset;
-    } else if (f.name == "timestamp") {
-      stamp_offset = f.offset;
-    } else if (f.name == "intensity") {
-      intensity_offset = f.offset;
+  for (const auto& field : rawdata->fields) {
+    if (field.name == "x") {
+      x_offset = field.offset;
+    } else if (field.name == "y") {
+      y_offset = field.offset;
+    } else if (field.name == "z") {
+      z_offset = field.offset;
+    } else if (field.name == "timestamp") {
+      stamp_offset = field.offset;
+    } else if (field.name == "intensity") {
+      intensity_offset = field.offset;
     }
   }
 
@@ -102,8 +100,8 @@ int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
     cyber_point->set_z(*reinterpret_cast<float *>(&data[offset + z_offset]));
     cyber_point->set_intensity(
         *reinterpret_cast<uint8_t *>(&data[offset + intensity_offset]));
-    cyber_point->set_timestamp(
-        *reinterpret_cast<double *>(&data[offset + stamp_offset]) * 1e9);
+    cyber_point->set_timestamp(static_cast<std::uint64_t>(
+        *reinterpret_cast<double *>(&data[offset + stamp_offset]) * 1e9));
   }
 
   return 1;

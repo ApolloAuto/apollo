@@ -70,6 +70,8 @@ build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
 build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Wconversion
+# Strict check on cleared modules.
+build --per_file_copt=^modules/data/.*\.cc,^modules/monitor/.*\.cc,^modules/dreamview/backend/hmi/.*\.cc@-Werror=conversion
 
 # Enable C++14
 build --cxxopt="-std=c++1y"
