@@ -27,7 +27,7 @@ namespace msf {
 
 BaseMapNodePool::BaseMapNodePool(unsigned int pool_size,
                                  unsigned int thread_size)
-    : pool_size_(pool_size), node_reset_workers_(thread_size) {}
+    : pool_size_(pool_size) {}
 
 BaseMapNodePool::~BaseMapNodePool() { Release(); }
 
@@ -43,7 +43,9 @@ void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
 }
 
 void BaseMapNodePool::Release() {
-  node_reset_workers_.wait();
+  if (node_reset_workers_.valid()) {
+    node_reset_workers_.get();
+  }
   typename std::list<BaseMapNode*>::iterator i = free_list_.begin();
   while (i != free_list_.end()) {
     FinalizeMapNode(*i);
@@ -63,7 +65,9 @@ void BaseMapNodePool::Release() {
 
 BaseMapNode* BaseMapNodePool::AllocMapNode() {
   if (free_list_.empty()) {
-    node_reset_workers_.wait();
+    if (node_reset_workers_.valid()) {
+      node_reset_workers_.wait();
+    }
   }
   boost::unique_lock<boost::mutex> lock(mutex_);
   if (free_list_.empty()) {
@@ -84,8 +88,8 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
 }
 
 void BaseMapNodePool::FreeMapNode(BaseMapNode* map_node) {
-  node_reset_workers_.schedule(
-      boost::bind(&BaseMapNodePool::FreeMapNodeTask, this, map_node));
+  node_reset_workers_ =
+    cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
 }
 
 void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {

@@ -16,13 +16,13 @@
 
 #include "modules/localization/msf/local_integ/localization_integ.h"
 
-#include <map>
 #include <list>
+#include <map>
 
 #include "modules/common/time/time_util.h"
-#include "modules/localization/msf/local_integ/localization_integ_impl.h"
-#include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/localization/msf/local_integ/lidar_msg_transfer.h"
+#include "modules/localization/msf/local_integ/localization_integ_impl.h"
 
 namespace apollo {
 namespace localization {
@@ -39,8 +39,7 @@ LocalizationInteg::~LocalizationInteg() {
   localization_integ_impl_ = nullptr;
 }
 
-Status LocalizationInteg::Init(
-    const LocalizationIntegParam& params) {
+Status LocalizationInteg::Init(const LocalizationIntegParam &params) {
   return localization_integ_impl_->Init(params);
 }
 
@@ -52,14 +51,14 @@ void LocalizationInteg::PcdProcess(const drivers::PointCloud &message) {
   return;
 }
 
-void LocalizationInteg::RawImuProcessFlu(const drivers::gnss::Imu& imu_msg) {
+void LocalizationInteg::RawImuProcessFlu(const drivers::gnss::Imu &imu_msg) {
   ImuData imu;
   TransferImuFlu(imu_msg, &imu);
   localization_integ_impl_->RawImuProcessRfu(imu);
   return;
 }
 
-void LocalizationInteg::RawImuProcessRfu(const drivers::gnss::Imu& imu_msg) {
+void LocalizationInteg::RawImuProcessRfu(const drivers::gnss::Imu &imu_msg) {
   ImuData imu;
   TransferImuRfu(imu_msg, &imu);
   localization_integ_impl_->RawImuProcessRfu(imu);
@@ -67,44 +66,47 @@ void LocalizationInteg::RawImuProcessRfu(const drivers::gnss::Imu& imu_msg) {
 }
 
 void LocalizationInteg::RawObservationProcess(
-    const drivers::gnss::EpochObservation& raw_obs_msg) {
+    const drivers::gnss::EpochObservation &raw_obs_msg) {
   localization_integ_impl_->RawObservationProcess(raw_obs_msg);
   return;
 }
 
 void LocalizationInteg::RawEphemerisProcess(
-    const drivers::gnss::GnssEphemeris& gnss_orbit_msg) {
+    const drivers::gnss::GnssEphemeris &gnss_orbit_msg) {
   localization_integ_impl_->RawEphemerisProcess(gnss_orbit_msg);
   return;
 }
 
 void LocalizationInteg::GnssBestPoseProcess(
-    const drivers::gnss::GnssBestPose& bestgnsspos_msg) {
+    const drivers::gnss::GnssBestPose &bestgnsspos_msg) {
   localization_integ_impl_->GnssBestPoseProcess(bestgnsspos_msg);
   return;
 }
 
+void LocalizationInteg::GnssHeadingProcess(
+    const drivers::gnss::Heading &gnssheading_msg) {
+  localization_integ_impl_->GnssHeadingProcess(gnssheading_msg);
+  return;
+}
+
 void LocalizationInteg::GetLastestLidarLocalization(
-    LocalizationMeasureState *state,
-    LocalizationEstimate *lidar_localization) {
-  localization_integ_impl_->GetLastestLidarLocalization(
-      state, lidar_localization);
+    LocalizationMeasureState *state, LocalizationEstimate *lidar_localization) {
+  localization_integ_impl_->GetLastestLidarLocalization(state,
+                                                        lidar_localization);
   return;
 }
 
 void LocalizationInteg::GetLastestIntegLocalization(
-    LocalizationMeasureState *state,
-    LocalizationEstimate *integ_localization) {
-  localization_integ_impl_->GetLastestIntegLocalization(
-      state, integ_localization);
+    LocalizationMeasureState *state, LocalizationEstimate *integ_localization) {
+  localization_integ_impl_->GetLastestIntegLocalization(state,
+                                                        integ_localization);
   return;
 }
 
 void LocalizationInteg::GetLastestGnssLocalization(
-    LocalizationMeasureState *state,
-    LocalizationEstimate *gnss_localization) {
-  localization_integ_impl_->GetLastestGnssLocalization(
-      state, gnss_localization);
+    LocalizationMeasureState *state, LocalizationEstimate *gnss_localization) {
+  localization_integ_impl_->GetLastestGnssLocalization(state,
+                                                       gnss_localization);
   return;
 }
 

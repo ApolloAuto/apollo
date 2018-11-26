@@ -253,7 +253,6 @@ int main(int argc, char** argv) {
 
   LosslessMapNodePool lossless_map_node_pool(25, 8);
   lossless_map_node_pool.Initial(&loss_less_config);
-  map.InitThreadPool(1, 6);
   map.InitMapNodeCaches(12, 24);
   map.AttachMapNodePool(&lossless_map_node_pool);
 

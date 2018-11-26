@@ -16,6 +16,8 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 
+#include <vector>
+#include "cyber/task/task.h"
 #include "cyber/common/log.h"
 #include "modules/localization/msf/common/util/system_utility.h"
 
@@ -27,19 +29,9 @@ BaseMap::BaseMap(BaseMapConfig* map_config)
     : map_config_(map_config),
       map_node_cache_lvl1_(nullptr),
       map_node_cache_lvl2_(nullptr),
-      map_node_pool_(nullptr),
-      p_map_load_threads_(nullptr),
-      p_map_preload_threads_(nullptr) {}
+      map_node_pool_(nullptr) {}
 
 BaseMap::~BaseMap() {
-  if (p_map_load_threads_) {
-    delete p_map_load_threads_;
-    p_map_load_threads_ = nullptr;
-  }
-  if (p_map_preload_threads_) {
-    delete p_map_preload_threads_;
-    p_map_preload_threads_ = nullptr;
-  }
   if (map_node_cache_lvl1_) {
     delete map_node_cache_lvl1_;
     map_node_cache_lvl1_ = nullptr;
@@ -48,20 +40,6 @@ BaseMap::~BaseMap() {
     delete map_node_cache_lvl2_;
     map_node_cache_lvl2_ = nullptr;
   }
-}
-
-void BaseMap::InitThreadPool(int load_thread_num, int preload_thread_num) {
-  if (p_map_load_threads_) {
-    delete p_map_load_threads_;
-    p_map_load_threads_ = nullptr;
-  }
-  if (p_map_preload_threads_) {
-    delete p_map_preload_threads_;
-    p_map_preload_threads_ = nullptr;
-  }
-  p_map_load_threads_ = new ThreadPool(load_thread_num);
-  p_map_preload_threads_ = new ThreadPool(preload_thread_num);
-  return;
 }
 
 void BaseMap::InitMapNodeCaches(int cacheL1_size, int cahceL2_size) {
@@ -134,7 +112,6 @@ void BaseMap::AddDataset(const std::string dataset_path) {
 
 void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
   CHECK_LE(static_cast<int>(map_ids->size()), map_node_cache_lvl1_->Capacity());
-  // std::cout << "LoadMapNodes size: " << map_ids->size() << std::endl;
   // check in cacheL1
   typename std::set<MapNodeIndex>::iterator itr = map_ids->begin();
   while (itr != map_ids->end()) {
@@ -166,24 +143,26 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
   lock.unlock();
 
   // load from disk sync
+  std::vector<std::future<void>> load_futures;
   itr = map_ids->begin();
   while (itr != map_ids->end()) {
-    p_map_load_threads_->schedule(
-        boost::bind(&BaseMap::LoadMapNodeThreadSafety, this, *itr, true));
+    AERROR << "Preload map node failed!";
+    load_futures.emplace_back(
+      cyber::Async(&BaseMap::LoadMapNodeThreadSafety, this, *itr, true));
     ++itr;
   }
 
-  // std::cout << "before wait" << std::endl;
-  p_map_load_threads_->wait();
-  // std::cout << "after wait" << std::endl;
-
+  for (auto& future : load_futures) {
+    if (future.valid()) {
+      future.get();
+    }
+  }
   // check in cacheL2 again
   itr = map_ids->begin();
   node = nullptr;
   boost::unique_lock<boost::recursive_mutex> lock2(map_load_mutex_);
   while (itr != map_ids->end()) {
     if (map_node_cache_lvl2_->Get(*itr, &node)) {
-      // std::cout << "LoadMapNodes load from disk" << std::endl;
       AINFO << "LoadMapNodes: preload missed, load this node in main thread.\n"
             << *itr;
       node->SetIsReserved(true);
@@ -231,17 +210,18 @@ void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>* map_ids) {
   }
 
   // load form disk sync
+  std::vector<std::future<void>> preload_futures;
   itr = map_ids->begin();
+  AINFO << "Preload map node size: " << map_ids->size();
   while (itr != map_ids->end()) {
-    AINFO << "Preload map node: " << *itr;
-    boost::unique_lock<boost::recursive_mutex> lock(map_load_mutex_);
+    AINFO << "Preload map node: " << *itr << std::endl;
+    boost::unique_lock<boost::recursive_mutex> lock3(map_load_mutex_);
     map_preloading_task_index_.insert(*itr);
-    lock.unlock();
-    p_map_preload_threads_->schedule(
-        boost::bind(&BaseMap::LoadMapNodeThreadSafety, this, *itr, false));
+    lock3.unlock();
+    preload_futures.emplace_back(
+      cyber::Async(&BaseMap::LoadMapNodeThreadSafety, this, *itr, false));
     ++itr;
   }
-
   return;
 }
 
@@ -285,7 +265,6 @@ void BaseMap::LoadMapNodeThreadSafety(MapNodeIndex index, bool is_reserved) {
 void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
                              const Eigen::Vector3d& trans_diff,
                              unsigned int resolution_id, unsigned int zone_id) {
-  CHECK_NOTNULL(p_map_preload_threads_);
   CHECK_NOTNULL(map_node_pool_);
 
   int x_direction = trans_diff[0] > 0 ? 1 : -1;
@@ -422,7 +401,6 @@ void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
 bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
                           unsigned int resolution_id, unsigned int zone_id,
                           int filter_size_x, int filter_size_y) {
-  CHECK_NOTNULL(p_map_load_threads_);
   CHECK_NOTNULL(map_node_pool_);
   std::set<MapNodeIndex> map_ids;
   float map_pixel_resolution =

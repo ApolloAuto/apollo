@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
+#include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
 #include <gtest/gtest.h>
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-class LosslessMapConfigTestSuite : public ::testing::Test {
+class LossyMapConfig2DTestSuite : public ::testing::Test {
  protected:
-  LosslessMapConfigTestSuite() {}
-  virtual ~LosslessMapConfigTestSuite() {}
+  LossyMapConfig2DTestSuite() {}
+  virtual ~LossyMapConfig2DTestSuite() {}
   virtual void SetUp() {}
   virtual void TearDown() {}
 };
 
-/**@brief Test load and set methods in LosslessMapConfig. */
-TEST_F(LosslessMapConfigTestSuite, LoadSetTest) {
-  BaseMapConfig config("lossless_map");
-  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/test_data/"
-                        "lossless_single_map/config.xml"),
+/**@brief Test load and set methods in LossyMapConfig2D. */
+TEST_F(LossyMapConfig2DTestSuite, LoadSetTest) {
+  BaseMapConfig config("lossy_map");
+  ASSERT_EQ(config.Load("/apollo/modules/localization/msf/local_map/test_data/"
+                        "lossy_single_map/config.xml"),
             true);
   config.SetMultiResolutions();
   ASSERT_EQ(config.map_resolutions_.size(), 10);
@@ -50,18 +50,18 @@ TEST_F(LosslessMapConfigTestSuite, LoadSetTest) {
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.125);
 
   BaseMapConfig config2;
-  EXPECT_EQ(config2.Load("modules/localization/msf/local_map/test/test_data/"
-                         "lossless_single_map/config.xml"),
+  EXPECT_EQ(config2.Load("/apollo/modules/localization/msf/local_map/test_data/"
+                         "lossy_single_map/config.xml"),
             false);
 }
 
 /**@brief Test save method. */
-TEST_F(LosslessMapConfigTestSuite, SaveTest) {
-  BaseMapConfig config("lossless_map");
-  ASSERT_EQ(config.Load("modules/localization/msf/local_map/test/test_data/"
-                        "lossless_single_map/config.xml"),
+TEST_F(LossyMapConfig2DTestSuite, SaveTest) {
+  BaseMapConfig config("lossy_map");
+  ASSERT_EQ(config.Load("/apollo/modules/localization/msf/local_map/test_data/"
+                        "lossy_single_map/config.xml"),
             true);
-  EXPECT_EQ(config.Save("modules/localization/msf/local_map/test/test_data/"
+  EXPECT_EQ(config.Save("/apollo/modules/localization/msf/local_map/test_data/"
                         "temp_output_file.xml"),
             true);
 }

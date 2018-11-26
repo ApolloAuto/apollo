@@ -126,6 +126,12 @@ DEFINE_bool(gnss_only_init, false,
 DEFINE_bool(enable_lidar_localization, true,
             "Enable lidar-based localization.");
 
+DEFINE_string(lidar_topic, "/apollo/sensor/lidar128/compensator/PointCloud2",
+              "lidar pointcloud topic");
+DEFINE_string(broadcast_tf_frame_id, "world",
+              "world frame id in tf");
+DEFINE_string(broadcast_tf_child_frame_id, "localization",
+              "localization frame id in tf");
 // imu vehicle extrinsic
 DEFINE_string(vehicle_imu_file,
               "/apollo/modules/localization/msf/params"

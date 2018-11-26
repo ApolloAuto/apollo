@@ -50,7 +50,7 @@ LocalizationIntegImpl::LocalizationIntegImpl()
       gnss_antenna_extrinsic_(Eigen::Affine3d::Identity()) {}
 
 LocalizationIntegImpl::~LocalizationIntegImpl() {
-  StopThreadLoop();
+  //  StopThreadLoop();
 
   delete republish_process_;
   delete lidar_process_;
@@ -104,7 +104,7 @@ Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
 
   expert_.Init(params);
 
-  StartThreadLoop();
+  //  StartThreadLoop();
 
   return Status::OK();
 }
@@ -125,6 +125,11 @@ void LocalizationIntegImpl::StartThreadLoop() {
   gnss_queue_max_size_ = 100;
   const auto gnss_loop_func = [this] { GnssThreadLoop(); };
   gnss_function_thread_ = std::thread(gnss_loop_func);
+
+  keep_gnss_heading_running_ = true;
+  gnss_heading_queue_max_size_ = 100;
+  const auto& gnss_heading_loop_func = [this] { GnssHeadingThreadLoop(); };
+  gnss_heading_function_thread_ = std::thread(gnss_heading_loop_func);
 }
 
 void LocalizationIntegImpl::StopThreadLoop() {
@@ -144,6 +149,12 @@ void LocalizationIntegImpl::StopThreadLoop() {
     keep_gnss_running_ = false;
     gnss_function_signal_.notify_one();
     gnss_function_thread_.join();
+  }
+
+  if (keep_gnss_heading_running_.load()) {
+    keep_gnss_heading_running_ = false;
+    gnss_heading_function_signal_.notify_one();
+    gnss_heading_function_thread_.join();
   }
 }
 
@@ -337,8 +348,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
 
   integ_localization_mutex_.lock();
   integ_localization_list_.emplace_back(
-                         LocalizationMeasureState(static_cast<int>(state)),
-                         integ_localization, integ_status);
+      LocalizationMeasureState(static_cast<int>(state)), integ_localization,
+      integ_status);
   if (integ_localization_list_.size() > integ_localization_list_max_size_) {
     integ_localization_list_.pop_front();
   }
@@ -514,6 +525,62 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     gnss_localization_mutex_.unlock();
   }
   return;
+}
+
+void LocalizationIntegImpl::GnssHeadingProcess(
+    const drivers::gnss::Heading& gnssheading_msg) {
+  GnssHeadingProcessImpl(gnssheading_msg);
+  //  gnss_heading_function_queue_mutex_.lock();
+  //  gnss_heading_function_queue_.push(std::function<void()>(std::bind(
+  //                  &LocalizationIntegImpl::GnssHeadingProcessImpl, this,
+  //                  gnssheading_msg)));
+  //  gnss_heading_function_signal_.notify_one();
+  //  gnss_heading_function_queue_mutex_.unlock();
+  return;
+}
+
+void LocalizationIntegImpl::GnssHeadingThreadLoop() {
+  AINFO << "Started gnss process thread";
+  while (keep_gnss_heading_running_.load()) {
+    {
+      std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
+      int size = gnss_heading_function_queue_.size();
+      while (size > gnss_heading_queue_max_size_) {
+        gnss_heading_function_queue_.pop();
+        --size;
+      }
+      if (gnss_heading_function_queue_.size() == 0) {
+        gnss_heading_function_signal_.wait(lock);
+        continue;
+      }
+    }
+
+    std::function<void()> gnss_heading_func;
+    int waiting_num = 0;
+    {
+      std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
+      gnss_heading_func = gnss_heading_function_queue_.front();
+      gnss_heading_function_queue_.pop();
+      waiting_num = gnss_heading_function_queue_.size();
+    }
+
+    if (waiting_num > 2) {
+      AWARN << waiting_num << " gnss_heading function are waiting to process.";
+    }
+    gnss_heading_func();
+  }
+  AINFO << "Exited gnss_heading process thread";
+  return;
+}
+
+void LocalizationIntegImpl::GnssHeadingProcessImpl(
+    const drivers::gnss::Heading& gnssheading_msg) {
+  MeasureData measure;
+  int heading_status = 0;
+  if (republish_process_->GnssHeadingProcess(gnssheading_msg, &measure,
+                                             &heading_status)) {
+    integ_process_->MeasureDataProcess(measure);
+  }
 }
 
 void LocalizationIntegImpl::TransferGnssMeasureToLocalization(

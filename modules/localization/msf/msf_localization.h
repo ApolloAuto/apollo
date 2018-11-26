@@ -36,7 +36,6 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/localization/proto/msf_config.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
@@ -61,8 +60,8 @@ class MSFLocalization {
  public:
   MSFLocalization();
 
-  apollo::common::Status Init(const msf_config::Config &config);
-  void InitParams(const msf_config::Config &config);
+  apollo::common::Status Init();
+  void InitParams();
   void OnPointCloud(const std::shared_ptr<drivers::PointCloud> &message);
   void OnRawImu(const std::shared_ptr<drivers::gnss::Imu> &imu_msg);
   void OnGnssRtkObs(
@@ -71,6 +70,8 @@ class MSFLocalization {
       const std::shared_ptr<drivers::gnss::GnssEphemeris> &gnss_orbit_msg);
   void OnGnssBestPose(
       const std::shared_ptr<drivers::gnss::GnssBestPose> &bestgnsspos_msg);
+  void OnGnssHeading(
+      const std::shared_ptr<drivers::gnss::Heading> &gnss_heading_msg);
 
   void SetPublisher(const std::shared_ptr<LocalizationMsgPublisher> &publisher);
 

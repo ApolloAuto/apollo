@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ class BaseMapPoolTestSuite : public ::testing::Test {
  protected:
   BaseMapPoolTestSuite() {}
   virtual ~BaseMapPoolTestSuite() {}
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    apollo::cyber::Init("map_pool_test");
+  }
   virtual void TearDown() {}
 };
 
@@ -41,14 +43,12 @@ TEST_F(BaseMapPoolTestSuite, MapNodePoolTest) {
   BaseMapNode* node1 = pool.AllocMapNode();
   BaseMapNode* node2 = pool.AllocMapNode();
   BaseMapNode* node3 = pool.AllocMapNode();
-  BaseMapNode* node4 = pool.AllocMapNode();
   pool.FreeMapNode(node1);
   pool.FreeMapNode(node2);
   pool.FreeMapNode(node3);
-  pool.FreeMapNode(node4);
 
   unsigned int pool_size = pool.GetPoolSize();
-  ASSERT_EQ(pool_size, 4);
+  ASSERT_EQ(pool_size, 3);
 
   pool.Release();
   pool_size = pool.GetPoolSize();
