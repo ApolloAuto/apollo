@@ -25,9 +25,9 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/reference_line/reference_line.h"
 
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/reference_line/reference_line.h"
 
 namespace apollo {
 namespace planning {
@@ -36,8 +36,8 @@ class TrajectoryStitcher {
  public:
   TrajectoryStitcher() = delete;
 
-  static void TransformLastPublishedTrajectory(const double x_diff,
-      const double y_diff, const double theta_diff,
+  static void TransformLastPublishedTrajectory(
+      const double x_diff, const double y_diff, const double theta_diff,
       PublishableTrajectory* prev_trajectory);
 
   static std::vector<common::TrajectoryPoint> ComputeStitchingTrajectory(
@@ -46,8 +46,9 @@ class TrajectoryStitcher {
       const PublishableTrajectory* prev_trajectory);
 
  private:
-  static std::pair<double, double> ComputePositionProjection(const double x,
-      const double y, const common::TrajectoryPoint& matched_trajectory_point);
+  static std::pair<double, double> ComputePositionProjection(
+      const double x, const double y,
+      const common::TrajectoryPoint& matched_trajectory_point);
 
   static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
       const common::VehicleState& vehicle_state);

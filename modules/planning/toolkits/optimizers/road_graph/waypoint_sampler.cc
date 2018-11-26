@@ -28,6 +28,7 @@
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -137,19 +138,22 @@ bool WaypointSampler::SamplePathWaypoints(
     double sample_right_boundary = -eff_right_width;
     double sample_left_boundary = eff_left_width;
 
-    const double kLargeDeviationL = 1.75;
+    constexpr double kLargeDeviationL = 1.75;
+    constexpr double kTwentyMilesPerHour = 8.94;
     if (reference_line_info_->IsChangeLanePath() ||
         std::fabs(init_sl_point_.l()) > kLargeDeviationL) {
-      sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
-      sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
+      if (EgoInfo::Instance()->start_point().v() > kTwentyMilesPerHour) {
+        sample_right_boundary = std::fmin(-eff_right_width, init_sl_point_.l());
+        sample_left_boundary = std::fmax(eff_left_width, init_sl_point_.l());
 
-      if (init_sl_point_.l() > eff_left_width) {
-        sample_right_boundary = std::fmax(sample_right_boundary,
-                                          init_sl_point_.l() - sample_l_range);
-      }
-      if (init_sl_point_.l() < eff_right_width) {
-        sample_left_boundary = std::fmin(sample_left_boundary,
-                                         init_sl_point_.l() + sample_l_range);
+        if (init_sl_point_.l() > eff_left_width) {
+          sample_right_boundary = std::fmax(
+              sample_right_boundary, init_sl_point_.l() - sample_l_range);
+        }
+        if (init_sl_point_.l() < eff_right_width) {
+          sample_left_boundary = std::fmin(sample_left_boundary,
+                                           init_sl_point_.l() + sample_l_range);
+        }
       }
     }
 
