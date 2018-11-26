@@ -60,7 +60,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    */
   virtual apollo::transform::TransformStamped lookupTransform(
       const std::string& target_frame, const std::string& source_frame,
-      const cyber::Time& time, const float timeout_second = 0.01) const;
+      const cyber::Time& time, const float timeout_second = 0.01f) const;
 
   /** \brief Get the transform between two frames by frame ID assuming fixed
    *frame.
@@ -81,7 +81,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
   virtual apollo::transform::TransformStamped lookupTransform(
       const std::string& target_frame, const cyber::Time& target_time,
       const std::string& source_frame, const cyber::Time& source_time,
-      const std::string& fixed_frame, const float timeout_second = 0.01) const;
+      const std::string& fixed_frame, const float timeout_second = 0.01f) const;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform
@@ -95,7 +95,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
   virtual bool canTransform(const std::string& target_frame,
                             const std::string& source_frame,
                             const cyber::Time& target_time,
-                            const float timeout_second = 0.01,
+                            const float timeout_second = 0.01f,
                             std::string* errstr = nullptr) const;
 
   /** \brief Test if a transform is possible
@@ -115,7 +115,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
                             const std::string& source_frame,
                             const cyber::Time& source_time,
                             const std::string& fixed_frame,
-                            const float timeout_second = 0.01,
+                            const float timeout_second = 0.01f,
                             std::string* errstr = nullptr) const;
 
  private:

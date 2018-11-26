@@ -86,7 +86,7 @@ class PointCloudUpdater {
       const std::shared_ptr<apollo::localization::LocalizationEstimate>
           &localization);
 
-  constexpr static float kDefaultLidarHeight = 1.91;
+  constexpr static float kDefaultLidarHeight = 1.91f;
 
   std::unique_ptr<cyber::Node> node_;
 
