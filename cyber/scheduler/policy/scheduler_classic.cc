@@ -147,7 +147,10 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
   }
 
   auto crid = GlobalData::GenerateHashId(name);
+  return RemoveCRoutine(crid);
+}
 
+bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
   std::lock_guard<std::mutex> lg(id_cr_wl_[crid]);
@@ -155,10 +158,12 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
   std::shared_ptr<CRoutine> cr = nullptr;
   int prio;
   {
-    ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(crid) != id_cr_.end()) {
       cr = id_cr_[crid];
       prio = cr->priority();
+      id_cr_[crid]->Stop();
+      id_cr_.erase(crid);
     } else {
       return false;
     }
@@ -168,16 +173,15 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
   for (auto it = ClassicContext::rq_[prio].begin();
        it != ClassicContext::rq_[prio].end(); ++it) {
     if ((*it)->id() == crid) {
-      ClassicContext::rq_[prio].erase(it);
-      return true;
-    }
-  }
+      auto cr = *it;
+      while (!cr->Acquire()) {
+        usleep(10000);
+      }
 
-  {
-    WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    if (id_cr_.find(crid) != id_cr_.end()) {
-      id_cr_[crid]->Stop();
-      id_cr_.erase(crid);
+      (*it)->Stop();
+      it = ClassicContext::rq_[prio].erase(it);
+      cr->Release();
+      return true;
     }
   }
 

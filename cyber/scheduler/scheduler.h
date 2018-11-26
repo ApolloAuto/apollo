@@ -55,17 +55,18 @@ class Scheduler {
   bool CreateTask(std::function<void()>&& func, const std::string& name,
                   std::shared_ptr<DataVisitorBase> visitor = nullptr);
   bool NotifyTask(uint64_t crid);
-  virtual bool RemoveTask(const std::string& name) = 0;
 
-  uint32_t TaskPoolSize() { return task_pool_size_; }
   void ShutDown();
+  uint32_t TaskPoolSize() { return task_pool_size_; }
 
+  virtual bool RemoveTask(const std::string& name) = 0;
   virtual void SetInnerThreadAttr(const std::thread* thr,
                                   const std::string& name) = 0;
 
  protected:
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
+  virtual bool RemoveCRoutine(uint64_t crid) = 0;
 
   void ParseCpuset(const std::string&, std::vector<int>*);
 
