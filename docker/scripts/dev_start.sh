@@ -21,7 +21,7 @@ LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
 VERSION_X86_64="dev-x86_64-20180906_2002"
-VERSION_AARCH64="dev-aarch64-20170927_1111"
+VERSION_AARCH64="dev-aarch64-20181108_1330"
 VERSION_OPT=""
 
 # Check whether user has agreed license agreement
@@ -263,6 +263,19 @@ function main(){
         DOCKER_CMD="docker"
     fi
 
+    EXTRA_VOLUMES=""
+    if [ "$ARCH" == 'aarch64' ]; then
+        EXTRA_VOLUMES="
+        -v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra    \
+        -v /usr/lib/aarch64-linux-gnu/gstreamer-1.0:/usr/lib/aarch64-linux-gnu/gstreamer-1.0    \
+        -v /usr/lib/aarch64-linux-gnu/tegra-egl:/usr/lib/aarch64-linux-gnu/tegra-egl    \
+        -v /usr/lib/aarch64-linux-gnu/mesa-egl:/usr/lib/aarch64-linux-gnu/mesa-egl    \
+        -v /run:/run    \
+        -v /lib/firmware/tegra18x:/lib/firmware/tegra18x
+        "
+    fi
+
+
     ${DOCKER_CMD} run -it \
         -d \
         --privileged \
@@ -277,6 +290,7 @@ function main(){
         -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
+	${EXTRA_VOLUMES} \
         $(local_volumes) \
         --net host \
         -w /apollo \
