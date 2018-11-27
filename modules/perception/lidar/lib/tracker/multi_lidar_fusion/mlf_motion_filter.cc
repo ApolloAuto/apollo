@@ -148,6 +148,9 @@ void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
 
   double time_diff = new_object->object_ptr->latest_tracked_time -
                      latest_object->object_ptr->latest_tracked_time;
+  if (time_diff < EPSION_TIME) {  // Very small time than assign
+    time_diff = DEFAULT_FPS;
+  }
   Eigen::Matrix4d transition = Eigen::Matrix4d::Identity();
   transition(0, 2) = transition(1, 3) = time_diff;
 

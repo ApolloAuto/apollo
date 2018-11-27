@@ -133,9 +133,9 @@ bool OMTObstacleTracker::CombineDuplicateTargets() {
                 << "," << targets_[j].id
                 << ") score " << score
                 << " count " << count;
-      hypo.target = i;
-      hypo.object = j;
-      hypo.score = (count > 0) ? score / (count) : 0;
+      hypo.target = static_cast<int>(i);
+      hypo.object = static_cast<int>(j);
+      hypo.score = (count > 0) ? score / static_cast<float>(count) : 0;
       if (hypo.score < omt_param_.target_combine_iou_threshold()) {
         continue;
       }
@@ -185,8 +185,8 @@ void OMTObstacleTracker::GenerateHypothesis(const TrackObjectPtrs &objects) {
   for (size_t i = 0; i < targets_.size(); ++i) {
     ADEBUG << "Target " << targets_[i].id;
     for (size_t j = 0; j < objects.size(); ++j) {
-      hypo.target = i;
-      hypo.object = j;
+      hypo.target = static_cast<int>(i);
+      hypo.object = static_cast<int>(j);
       float sa = ScoreAppearance(targets_[i], objects[j]);
       float sm = ScoreMotion(targets_[i], objects[j]);
       float ss = ScoreShape(targets_[i], objects[j]);
@@ -279,7 +279,7 @@ float OMTObstacleTracker::ScoreAppearance(const Target &target,
     count += 1;
   }
 
-  return energy / (0.1f + count * 0.9f);
+  return energy / (0.1f + static_cast<float>(count) * 0.9f);
 }
 
 // [new]
@@ -347,8 +347,8 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
         continue;
       }
       for (auto &&target_rect : target_rects) {
-        if (IsCovered(rect, target_rect, 0.4) ||
-            IsCoveredHorizon(rect, target_rect, 0.5)) {
+        if (IsCovered(rect, target_rect, 0.4f) ||
+            IsCoveredHorizon(rect, target_rect, 0.5f)) {
           is_covered = true;
           break;
         }
@@ -391,9 +391,9 @@ bool OMTObstacleTracker::Associate2D(const ObstacleTrackerOptions &options,
     // TODO(gaohan): use pool
     TrackObjectPtr track_ptr(new TrackObject);
     track_ptr->object = frame->detected_objects[i];
-    track_ptr->object->id = i;
+    track_ptr->object->id = static_cast<int>(i);
     track_ptr->timestamp = frame->timestamp;
-    track_ptr->indicator = PatchIndicator(frame->frame_id, i,
+    track_ptr->indicator = PatchIndicator(frame->frame_id, static_cast<int>(i),
                                           frame->data_provider->sensor_name());
     track_ptr->object->camera_supplement.sensor_name =
         frame->data_provider->sensor_name();

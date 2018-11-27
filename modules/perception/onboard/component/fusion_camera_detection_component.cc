@@ -331,9 +331,10 @@ int FusionCameraDetectionComponent::InitConfig() {
       fusion_camera_detection_param.output_final_obstacles();
   prefused_channel_name_ =
       fusion_camera_detection_param.prefused_channel_name();
-  default_camera_pitch_ = fusion_camera_detection_param.default_camera_pitch();
+  default_camera_pitch_ =
+    static_cast<float>(fusion_camera_detection_param.default_camera_pitch());
   default_camera_height_ =
-      fusion_camera_detection_param.default_camera_height();
+    static_cast<float>(fusion_camera_detection_param.default_camera_height());
   output_camera_debug_msg_ =
       fusion_camera_detection_param.output_camera_debug_msg();
   camera_debug_channel_name_ =
@@ -398,8 +399,8 @@ int FusionCameraDetectionComponent::InitSensorInfo() {
   // assume all camera have same image size
   base::BaseCameraModelPtr camera_model_ptr =
       sensor_manager->GetUndistortCameraModel(camera_names_[0]);
-  image_width_ = camera_model_ptr->get_width();
-  image_height_ = camera_model_ptr->get_height();
+  image_width_ = static_cast<int>(camera_model_ptr->get_width());
+  image_height_ = static_cast<int>(camera_model_ptr->get_height());
 
   std::string format_str = R"(
       camera_names: %s %s
@@ -704,7 +705,7 @@ int FusionCameraDetectionComponent::ConvertObjectToPb(
   pb_msg->set_height(object_ptr->size(2));
 
   // convert 3d bbox to polygon
-  int polygon_point_size = object_ptr->polygon.size();
+  int polygon_point_size = static_cast<int>(object_ptr->polygon.size());
   for (int i = 0; i < polygon_point_size; ++i) {
     auto &pt = object_ptr->polygon.at(i);
     apollo::common::Point3D *p = pb_msg->add_polygon_point();

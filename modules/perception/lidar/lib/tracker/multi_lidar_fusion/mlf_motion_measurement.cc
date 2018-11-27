@@ -41,7 +41,9 @@ void MlfMotionMeasurement::ComputeMotionMeasurment(
   double latest_time = latest_object->object_ptr->latest_tracked_time;
   double current_time = new_object->object_ptr->latest_tracked_time;
   double time_diff = current_time - latest_time;
-
+  if (fabs(time_diff) < EPSILON_TIME) {
+    time_diff = DEFAULT_FPS;
+  }
   MeasureAnchorPointVelocity(new_object, latest_object, time_diff);
   MeasureBboxCenterVelocity(new_object, latest_object, time_diff);
   MeasureBboxCornerVelocity(new_object, latest_object, time_diff);

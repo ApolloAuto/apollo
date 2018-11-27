@@ -28,7 +28,7 @@ bool KalmanFilter::Init(const Eigen::VectorXd &initial_belief_states,
     AERROR << "the cols and rows of uncertainty martix should be equal";
     return false;
   }
-  states_num_ = initial_uncertainty.rows();
+  states_num_ = static_cast<int>(initial_uncertainty.rows());
 
   if (states_num_ <= 0) {
     AERROR << "state_num should be greater than zero";
