@@ -87,25 +87,6 @@ void ChoreographyContext::Wait() {
   cv_wq_.wait_for(lk, std::chrono::milliseconds(1));
 }
 
-void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
-  std::lock_guard<std::mutex> lock(mtx_cr_queue_);
-  for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
-    auto cr = it->second;
-    while (!cr->Acquire()) {
-      usleep(10000);
-    }
-
-    if (cr->id() == crid) {
-      cr->Stop();
-      it = cr_queue_.erase(it);
-      cr->Release();
-      return;
-    }
-
-    cr->Release();
-    ++it;
-  }
-}
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

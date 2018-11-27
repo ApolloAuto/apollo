@@ -66,6 +66,7 @@ void ClassicContext::Wait() {
 void ClassicContext::Notify() {
   cv_wq_.notify_one();
 }
+
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

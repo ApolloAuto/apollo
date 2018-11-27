@@ -50,6 +50,10 @@ class Processor {
     if (!running_.exchange(false)) {
       return;
     }
+
+    if (thread_.joinable()) {
+      thread_.join();
+    }
   }
 
   void BindContext(const std::shared_ptr<ProcessorContext>& context) {
