@@ -41,16 +41,18 @@ class SchedulerClassic : public Scheduler {
 
   void SetInnerThreadAttr(const std::thread* thr,
                           const std::string& name) {}
+  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
 
  private:
   void CreateProcessor();
-  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
   bool NotifyProcessor(uint64_t crid) override;
 
   std::unordered_map<std::string, ClassicTask> cr_confs_;
 
   std::string affinity_;
   std::vector<int> cpuset_;
+  int32_t processor_prio_;
+  std::string processor_policy_;
 };
 
 }  // namespace scheduler

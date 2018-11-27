@@ -11,7 +11,9 @@ message SchedGroup {
   optional uint32 processor_num = 1;
   optional string affinity = 2; 
   optional string cpuset = 3;
-  repeated ClassicTask tasks = 4;
+  optional string processor_policy = 4;
+  optional int32 processor_prio = 5 [default = 0];
+  repeated ClassicTask tasks = 6;
 }
 
 message ClassicConf {
