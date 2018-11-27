@@ -46,15 +46,7 @@ class Processor {
   void Run();
   void SetAffinity(const std::vector<int>&, const std::string&, int);
   void SetSchedPolicy(std::string spolicy, int sched_priority);
-  void Stop() {
-    if (!running_.exchange(false)) {
-      return;
-    }
-
-    if (thread_.joinable()) {
-      thread_.join();
-    }
-  }
+  void Stop() { running_.exchange(false); }
 
   void BindContext(const std::shared_ptr<ProcessorContext>& context) {
     context_ = context;
