@@ -42,6 +42,7 @@ cc_library(
         "//modules/planning/toolkits/optimizers/qp_spline_path",
         "//modules/planning/toolkits/optimizers/qp_spline_st_speed:qp_spline_st_speed_optimizer",
         "//modules/planning/toolkits/optimizers/speed_decider",
+        "//modules/planning/toolkits/rss:decider_rss",
     ],
 )
 

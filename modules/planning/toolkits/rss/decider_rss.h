@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,29 @@
  * @file
  **/
 
-#include <gtest/gtest.h>
-#include "rss/core/RssResponseTransformation.hpp"
+#pragma once
 
-namespace rss {
-namespace core {
+#include <algorithm>
+#include <limits>
+#include "modules/planning/toolkits/task.h"
+#include "rss/core/RssCheck.hpp"
+#include "rss/test_support/TestSupport.hpp"
 
-using state::LateralResponse;
-using state::LongitudinalResponse;
+namespace apollo {
+namespace planning {
 
-TEST(RssResponseTransformationTests, invalidTimeStamp) {
-  ::rss::world::WorldModel worldModel;
-  ::rss::state::ResponseState responseState;
-  ::rss::world::AccelerationRestriction accelerationRestriction;
+class RssDecider : public Task {
+ public:
+  explicit RssDecider(const TaskConfig &config);
 
-  worldModel.timeIndex = 1u;
-  responseState.timeIndex = 0u;
+  apollo::common::Status Execute(
+      Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
-  ASSERT_FALSE(::rss::core::RssResponseTransformation::transformProperResponse(
-    worldModel, responseState, accelerationRestriction));
-}
+ private:
+  apollo::common::Status Process(
+      Frame *frame, ReferenceLineInfo *reference_line_info);
+};
 
-}   //  namespace core
-}   //  namespace rss
+}  // namespace planning
+}  // namespace apollo
+
