@@ -52,6 +52,9 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
     }
 
     Clear();
+    for (auto& reader : readers_) {
+      reader->Shutdown();
+    }
     Scheduler::Instance()->RemoveTask(node_->Name());
   }
 
