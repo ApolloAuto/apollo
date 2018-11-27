@@ -80,9 +80,14 @@ SchedulerChoreography::SchedulerChoreography() {
 
   // default val for case w/o config:
   if (proc_num_ == 0) {
-    proc_num_ = std::thread::hardware_concurrency() / 4 * 3;
-    task_pool_size_ = std::thread::hardware_concurrency() / 4;
-    // FIXME: other vals ... ?
+    auto& global_conf = GlobalData::Instance()->Config();
+    if (global_conf.has_scheduler_conf() &&
+        global_conf.scheduler_conf().has_default_proc_num()) {
+      proc_num_ = global_conf.scheduler_conf().default_proc_num();
+    } else {
+      proc_num_ = 2;
+    }
+    task_pool_size_ = proc_num_;
   }
 
   CreateProcessor();
