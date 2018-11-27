@@ -196,7 +196,8 @@ void CruiseMLPEvaluator::ExtractFeatureValues
     return;
   }
   ADEBUG << "Obstacle feature size = " << obstacle_feature_values.size();
-  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
+  feature_values->insert(feature_values->end(),
+                         obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
 
   // Extract interaction features.
@@ -224,8 +225,13 @@ void CruiseMLPEvaluator::ExtractFeatureValues
            << ".";
     return;
   }
+<<<<<<< f21750a16c089e4ea73213ca7f280eef518e48b9
   ADEBUG << "Lane feature size = " << lane_feature_values.size();
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
+=======
+  feature_values->insert(feature_values->end(),
+                         lane_feature_values.begin(),
+>>>>>>> Prediction: input feature refactor.
                          lane_feature_values.end());
 
   // For offline training, write the extracted features into proto.
@@ -250,29 +256,26 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   std::vector<int> lane_types;
   std::vector<double> speeds;
   std::vector<double> timestamps;
+
+  std::vector<int> has_history
+      (FLAGS_cruise_historical_frame_length, 1);
   std::vector<std::pair<double, double>> pos_history
-      (FLAGS_cruise_historical_frame_length, std::make_pair(100.0, 100.0));
+      (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
   std::vector<std::pair<double, double>> vel_history
-      (FLAGS_cruise_historical_frame_length, std::make_pair(100.0, 100.0));
+      (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
   std::vector<std::pair<double, double>> acc_history
       (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
   std::vector<double> vel_heading_history
-      (FLAGS_cruise_historical_frame_length, 100.0);
+      (FLAGS_cruise_historical_frame_length, 0.0);
   std::vector<double> vel_heading_changing_rate_history
       (FLAGS_cruise_historical_frame_length, 0.0);
 
   // Get obstacle's current position to set up the relative coord. system.
   const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
-  double obs_heading = obs_curr_feature.velocity_heading();
-  std::pair<double, double> obs_pos =
+  double obs_curr_heading = obs_curr_feature.velocity_heading();
+  std::pair<double, double> obs_curr_pos =
       std::make_pair(obs_curr_feature.position().x(),
                      obs_curr_feature.position().y());
-  //std::pair<double, double> obs_vel =
-  //    std::make_pair(obs_curr_feature.velocity().x(),
-  //                   obs_curr_feature.velocity().y());
-  //std::pair<double, double> obs_acc =
-  //    std::make_pair(obs_curr_feature.acceleration().x(),
-  //                   obs_curr_feature.acceleration().y());
   double obs_feature_history_start_time =
       obstacle_ptr->timestamp() - FLAGS_prediction_trajectory_time_length;
   int count = 0;
@@ -308,44 +311,57 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
       ADEBUG << "Feature has no lane_feature!!!";
       ADEBUG << feature.lane().current_lane_feature_size();
     }
+
     // These are for the new features based on the relative coord. system.
+    if (i != 0 && has_history[i-1] == 0) {
+      has_history[i] = 0;
+      continue;
+    }
     if (feature.has_position() &&
         i < FLAGS_cruise_historical_frame_length) {
       pos_history[i] = WorldCoordToObjCoord
           (std::make_pair(feature.position().x(), feature.position().y()),
-           obs_pos, obs_heading);
+           obs_curr_pos, obs_curr_heading);
+    } else {
+      has_history[i] = 0;
     }
     if (feature.has_velocity() &&
         i < FLAGS_cruise_historical_frame_length) {
       auto vel_end = WorldCoordToObjCoord
           (std::make_pair(feature.velocity().x(), feature.velocity().y()),
-           obs_pos, obs_heading);
+           obs_curr_pos, obs_curr_heading);
       auto vel_begin = WorldCoordToObjCoord
-          (std::make_pair(0.0, 0.0), obs_pos, obs_heading);
+          (std::make_pair(0.0, 0.0), obs_curr_pos, obs_curr_heading);
       vel_history[i] = std::make_pair(vel_end.first - vel_begin.first,
                                       vel_end.second - vel_begin.second);
+    } else {
+      has_history[i] = 0;
     }
     if (feature.has_acceleration() &&
         i < FLAGS_cruise_historical_frame_length) {
       auto acc_end = WorldCoordToObjCoord
           (std::make_pair(feature.acceleration().x(),
                           feature.acceleration().y()),
-           obs_pos, obs_heading);
+           obs_curr_pos, obs_curr_heading);
       auto acc_begin = WorldCoordToObjCoord
-          (std::make_pair(0.0, 0.0), obs_pos, obs_heading);
+          (std::make_pair(0.0, 0.0), obs_curr_pos, obs_curr_heading);
       acc_history[i] = std::make_pair(acc_end.first - acc_begin.first,
                                       acc_end.second - acc_begin.second);
+    } else {
+      has_history[i] = 0;
     }
     if (feature.has_velocity_heading() &&
         i < FLAGS_cruise_historical_frame_length) {
       vel_heading_history[i] = WorldAngleToObjAngle
-          (feature.velocity_heading(), obs_heading);
+          (feature.velocity_heading(), obs_curr_heading);
       if(i != 0) {
         vel_heading_changing_rate_history[i] =
             (vel_heading_history[i-1] - vel_heading_history[i]) /
             (FLAGS_double_precision + feature.timestamp() - prev_timestamp);
         prev_timestamp = feature.timestamp();
       }
+    } else {
+      has_history[i] = 0;
     }
   }
   if (count <= 0) {
@@ -455,6 +471,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(lane_types.front() == 3 ? 1.0 : 0.0);
   ///////////////////////////////////////////////////////////////
 
+  /*
   for (std::size_t i = 0; i < FLAGS_cruise_historical_frame_length; i++) {
     // If not enough history, extrapolate in the following way:
     // assume constant velocity, zero acceleration, no heading change.
@@ -488,6 +505,18 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
       feature_values->push_back(vel_heading_history[i]);
     }
     // Set up vel heading changeing rate (append zero if not enough hist.):
+    feature_values->push_back(vel_heading_changing_rate_history[i]);
+  }
+  */
+  for (std::size_t i = 0; i < FLAGS_cruise_historical_frame_length; i++) {
+    feature_values->push_back(has_history[i]);
+    feature_values->push_back(pos_history[i].first);
+    feature_values->push_back(pos_history[i].second);
+    feature_values->push_back(vel_history[i].first);
+    feature_values->push_back(vel_history[i].second);
+    feature_values->push_back(acc_history[i].first);
+    feature_values->push_back(acc_history[i].second);
+    feature_values->push_back(vel_heading_history[i]);
     feature_values->push_back(vel_heading_changing_rate_history[i]);
   }
 }
