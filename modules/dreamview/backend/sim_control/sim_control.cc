@@ -107,9 +107,9 @@ void SimControl::InitTimerAndIO() {
   // Start timer to publish localization and chassis messages.
   sim_control_timer_.reset(new cyber::Timer(
       kSimControlIntervalMs, [this]() { this->RunOnce(); }, false));
-  sim_prediction_timer_.reset(new cyber::Timer(
-      kSimPredictionIntervalMs, [this]() { this->PublishDummyPrediction(); },
-      false));
+  sim_prediction_timer_.reset(
+      new cyber::Timer(kSimPredictionIntervalMs,
+                       [this]() { this->PublishDummyPrediction(); }, false));
 }
 
 void SimControl::Init(bool set_start_point, double start_velocity,
@@ -189,9 +189,6 @@ void SimControl::InternalReset() {
 void SimControl::ClearPlanning() {
   current_trajectory_->Clear();
   received_planning_ = false;
-  if (planning_count_ > 0) {
-    planning_count_ = 0;
-  }
 }
 
 void SimControl::OnReceiveNavigationInfo(
@@ -261,8 +258,8 @@ void SimControl::Start() {
     // reset/override the start point.
     localization_reader_->Observe();
     Init(localization_reader_->Empty(),
-      next_point_.has_v() ? next_point_.v() : 0.0,
-      next_point_.has_a() ? next_point_.a() : 0.0);
+         next_point_.has_v() ? next_point_.v() : 0.0,
+         next_point_.has_a() ? next_point_.a() : 0.0);
 
     InternalReset();
     sim_control_timer_->Start();
@@ -292,16 +289,10 @@ void SimControl::OnPlanning(const std::shared_ptr<ADCTrajectory>& trajectory) {
   // The routing SimControl owns must match with the one Planning has.
   if (re_routing_triggered_ ||
       IsSameHeader(trajectory->routing_header(), current_routing_header_)) {
-    // Hold a few cycles until the position information is fully refreshed on
-    // planning side. Don't wait for the very first planning received.
-    ++planning_count_;
-    if (planning_count_ == 0 || planning_count_ >= kPlanningCountToStart) {
-      planning_count_ = kPlanningCountToStart;
-      current_trajectory_ = trajectory;
-      prev_point_index_ = 0;
-      next_point_index_ = 0;
-      received_planning_ = true;
-    }
+    current_trajectory_ = trajectory;
+    prev_point_index_ = 0;
+    next_point_index_ = 0;
+    received_planning_ = true;
   } else {
     ClearPlanning();
   }
