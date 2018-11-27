@@ -132,7 +132,8 @@ message Trajectories {
 
 message OpenSpaceDebug {
   optional apollo.planning_internal.Trajectories trajectories = 1;
-  optional apollo.common.VehicleMotion warm_start_trajecotry = 2;
+  optional apollo.common.VehicleMotion warm_start_trajectory = 2;
+  optional apollo.common.VehicleMotion smoothed_trajectory = 3;
   repeated double warm_start_dual_lambda = 4;
   repeated double warm_start_dual_miu = 5;
   repeated double optimized_dual_lambda = 6;

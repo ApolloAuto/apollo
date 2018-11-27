@@ -202,8 +202,10 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 
   // record debug info
   if (FLAGS_enable_record_debug) {
+    open_space_debug_.Clear();
     RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
-                    dual_n_result_ds, XYbounds_, obstalce_list);
+                    dual_n_result_ds, state_result_ds, control_result_ds,
+                    XYbounds_, obstalce_list);
   }
   // rescale the states to the world frame
   for (size_t i = 0; i < horizon_ + 1; i++) {
@@ -223,6 +225,11 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // Every time update, use trajectory_partition to store each ADCTrajectory
   Status trajectory_partition_status =
       TrajectoryPartition(state_result_ds, control_result_ds, time_result_ds);
+
+  // record debug info
+  if (trajectory_partition_status.ok() && FLAGS_enable_record_debug) {
+    RecordDebugInfo();
+  }
 
   return trajectory_partition_status;
 }
@@ -244,16 +251,15 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
     const Eigen::MatrixXd& dual_l_result_ds,
     const Eigen::MatrixXd& dual_n_result_ds,
+    const Eigen::MatrixXd& state_result_ds,
+    const Eigen::MatrixXd& control_result_ds,
     const std::vector<double>& XYbounds,
     ThreadSafeIndexedObstacles* obstalce_list) {
-  open_space_debug_.Clear();
-  // load trajectories by optimization and partition
-  open_space_debug_.mutable_trajectories()->CopyFrom(trajectory_partition_);
   // load warm start trajectory
-  auto* warm_start_trajecotry =
-      open_space_debug_.mutable_warm_start_trajecotry();
+  auto* warm_start_trajectory =
+      open_space_debug_.mutable_warm_start_trajectory();
   for (size_t i = 0; i < horizon_; i++) {
-    auto* warm_start_point = warm_start_trajecotry->add_vehicle_motion_point();
+    auto* warm_start_point = warm_start_trajectory->add_vehicle_motion_point();
     warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_x(
         xWS(0, i));
     warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_y(
@@ -265,7 +271,7 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     warm_start_point->set_steer(uWS(0, i));
     warm_start_point->mutable_trajectory_point()->set_a(uWS(1, i));
   }
-  auto* warm_start_point = warm_start_trajecotry->add_vehicle_motion_point();
+  auto* warm_start_point = warm_start_trajectory->add_vehicle_motion_point();
   warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_x(
       xWS(0, horizon_));
   warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_y(
@@ -301,6 +307,31 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
       open_space_debug_.add_optimized_dual_miu(dual_n_result_ds(j, i));
     }
   }
+
+  // load smoothed trajectory
+  auto* smoothed_trajectory = open_space_debug_.mutable_smoothed_trajectory();
+  for (size_t i = 0; i < horizon_; i++) {
+    auto* smoothed_point = smoothed_trajectory->add_vehicle_motion_point();
+    smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+        state_result_ds(0, i));
+    smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+        state_result_ds(1, i));
+    smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_theta(
+        state_result_ds(2, i));
+    smoothed_point->mutable_trajectory_point()->set_v(state_result_ds(3, i));
+    smoothed_point->set_steer(control_result_ds(0, i));
+    smoothed_point->mutable_trajectory_point()->set_a(control_result_ds(1, i));
+  }
+  auto* smoothed_point = smoothed_trajectory->add_vehicle_motion_point();
+  smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+      state_result_ds(0, horizon_));
+  smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+      state_result_ds(1, horizon_));
+  smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_theta(
+      state_result_ds(2, horizon_));
+  smoothed_point->mutable_trajectory_point()->set_v(
+      state_result_ds(3, horizon_));
+
   // load xy boundary (xmin, xmax, ymin, ymax)
   open_space_debug_.add_xy_boundary(XYbounds[0]);
   open_space_debug_.add_xy_boundary(XYbounds[1]);
@@ -318,6 +349,11 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
       obstacle_ptr->add_vertices_y_coords(vertices[i].y());
     }
   }
+}
+
+void OpenSpaceTrajectoryGenerator::RecordDebugInfo() {
+  // load trajectories by optimization and partition
+  open_space_debug_.mutable_trajectories()->CopyFrom(trajectory_partition_);
 }
 
 Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
