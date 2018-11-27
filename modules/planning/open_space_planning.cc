@@ -323,7 +323,7 @@ void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
 
   for (const auto& obstacle : open_space_debug.obstacles()) {
     auto* polygon = chart->add_polygon();
-    polygon->set_label(obstacle.id());
+    polygon->set_label("boundary");
     for (int vertice_index = 0;
          vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
       auto* point_debug = polygon->add_point();
@@ -332,22 +332,35 @@ void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
     }
   }
 
-  for (const auto& trajectory : open_space_debug.trajectories().trajectory()) {
-    auto* line = chart->add_line();
-    line->set_label(trajectory.name());
-    for (const auto& point : trajectory.trajectory_point()) {
-      auto* point_debug = line->add_point();
-      point_debug->set_x(point.path_point().x());
-      point_debug->set_y(point.path_point().y());
-    }
-
-    // Set chartJS's dataset properties
-    auto* properties = line->mutable_properties();
-    (*properties)["borderWidth"] = "2";
-    (*properties)["pointRadius"] = "0";
-    (*properties)["fill"] = "false";
-    (*properties)["showLine"] = "true";
+  auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+  auto* smoothed_line = chart->add_line();
+  smoothed_line->set_label("smoothed");
+  for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
+    auto* point_debug = smoothed_line->add_point();
+    point_debug->set_x(point.trajectory_point().path_point().x());
+    point_debug->set_y(point.trajectory_point().path_point().y());
   }
+  // Set chartJS's dataset properties
+  auto* smoothed_properties = smoothed_line->mutable_properties();
+  (*smoothed_properties)["borderWidth"] = "2";
+  (*smoothed_properties)["pointRadius"] = "0";
+  (*smoothed_properties)["fill"] = "false";
+  (*smoothed_properties)["showLine"] = "true";
+
+  auto warm_start_trajectory = open_space_debug.warm_start_trajectory();
+  auto* warm_start_line = chart->add_line();
+  warm_start_line->set_label("warm_start");
+  for (const auto& point : warm_start_trajectory.vehicle_motion_point()) {
+    auto* point_debug = warm_start_line->add_point();
+    point_debug->set_x(point.trajectory_point().path_point().x());
+    point_debug->set_y(point.trajectory_point().path_point().y());
+  }
+  // Set chartJS's dataset properties
+  auto* warm_start_properties = warm_start_line->mutable_properties();
+  (*warm_start_properties)["borderWidth"] = "2";
+  (*warm_start_properties)["pointRadius"] = "0";
+  (*warm_start_properties)["fill"] = "false";
+  (*warm_start_properties)["showLine"] = "true";
 }
 
 void OpenSpacePlanning::ExportOpenSpaceChart(
@@ -366,7 +379,7 @@ bool OpenSpacePlanning::CheckPlanningConfig(const PlanningConfig& config) {
 }
 
 void OpenSpacePlanning::FillPlanningPb(const double timestamp,
-                    ADCTrajectory* const trajectory_pb) {
+                                       ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   if (!local_view_.prediction_obstacles->has_header()) {
     trajectory_pb->mutable_header()->set_lidar_timestamp(

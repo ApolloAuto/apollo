@@ -108,8 +108,11 @@ class OpenSpaceTrajectoryGenerator {
                        const Eigen::MatrixXd& n_warm_up,
                        const Eigen::MatrixXd& dual_l_result_ds,
                        const Eigen::MatrixXd& dual_n_result_ds,
+                       const Eigen::MatrixXd& state_result_ds,
+                       const Eigen::MatrixXd& control_result_ds,
                        const std::vector<double>& XYbounds,
                        ThreadSafeIndexedObstacles* obstalce_list);
+  void RecordDebugInfo();
 
  private:
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
