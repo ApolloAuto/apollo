@@ -40,7 +40,11 @@ Processor::Processor() {
   thread_ = std::thread(&Processor::Run, this);
 }
 
-Processor::~Processor() {}
+Processor::~Processor() {
+  if (thread_.joinable()) {
+    thread_.join();
+  }
+}
 
 void Processor::SetAffinity(const std::vector<int> &cpus,
                             const std::string &affinity, int p) {
