@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>commontest</name>
+        <dag_conf>/apollo/cyber/samples/commontestcomponent/commontest.dag</dag_conf>
+        <process_name>commontest</process_name>
+    </module>
+</cyber>
