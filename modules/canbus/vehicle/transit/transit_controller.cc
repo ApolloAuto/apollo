@@ -254,6 +254,8 @@ ErrorCode TransitController::EnableAutoMode() {
   adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
       Adc_motioncontrol1_10::
           ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
+  adc_motioncontrollimits1_12_->set_adc_cmd_throttlecommandlimit(100);
+  adc_motioncontrollimits1_12_->set_adc_cmd_steerwheelanglelimit(1275);
   can_sender_->Update();
   set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   return ErrorCode::OK;
