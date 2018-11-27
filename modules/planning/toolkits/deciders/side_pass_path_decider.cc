@@ -43,7 +43,7 @@ using apollo::hdmap::PathOverlap;
 using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
-constexpr double kRoadBuffer = 0.0;
+constexpr double kRoadBuffer = 0.05;
 constexpr double kObstacleLBuffer = 0.1;
 constexpr double kObstacleSBuffer = 1.0;
 constexpr double kSidePassPathLength = 50.0;
@@ -169,9 +169,9 @@ bool SidePassPathDecider::BuildSidePathDecision(
   }
 
   if (decided_direction_ == SidePassDirection::LEFT) {
-    ADEBUG << "Decided to side-pass from LEFT.";
+    ADEBUG << "Decided to side-pass from LEFT.\n";
   } else {
-    ADEBUG << "Decided to side-pass from RIGHT.";
+    ADEBUG << "Decided to side-pass from RIGHT.\n";
   }
 
   return true;
@@ -260,7 +260,10 @@ SidePassPathDecider::GetPathBoundaries(
        Decider::config_.side_pass_path_decider_config().path_resolution()) {
     std::tuple<double, double, double> lateral_bound = std::make_tuple(
         curr_s - adc_frenet_frame_point_.s(), -kLargeBoundary, kLargeBoundary);
+    ADEBUG << "====================================";
+    ADEBUG << "At curr_s = " << curr_s - adc_frenet_frame_point_.s();
 
+    // Initialize the lateral bound with current lane's width.
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
     if (!reference_line.GetLaneWidth(curr_s, &lane_left_width,
@@ -269,41 +272,110 @@ SidePassPathDecider::GetPathBoundaries(
       lateral_bounds.push_back(lateral_bound);
       continue;
     }
-
-    std::get<1>(lateral_bound) = -lane_right_width + kRoadBuffer;
-    std::get<2>(lateral_bound) = lane_left_width - kRoadBuffer;
-
-    const double lane_width = lane_left_width + lane_right_width;
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+    std::get<1>(lateral_bound) =
+        -lane_right_width + adc_half_width + kRoadBuffer;
+    std::get<2>(lateral_bound) =
+        lane_left_width - adc_half_width - kRoadBuffer;
+    ADEBUG << "lateral_bound initialized: "
+           << std::get<1>(lateral_bound) << ", "
+           << std::get<2>(lateral_bound) << ".";
 
+    // Update the lateral bound based on the road info and side-pass direction.
+    const double curr_lane_width = lane_left_width + lane_right_width;
+    ADEBUG << "Current lane's width = " << curr_lane_width;
     ADEBUG << "Number of left lanes: "
            << curr_lane_.left_neighbor_forward_lane_id_size() +
-              curr_lane_.left_neighbor_reverse_lane_id_size();
-    ADEBUG << "Number of right lanes: "
+              curr_lane_.left_neighbor_reverse_lane_id_size()
+           << ". Number of right lanes: "
            << curr_lane_.right_neighbor_forward_lane_id_size() +
               curr_lane_.right_neighbor_reverse_lane_id_size();
     if (decided_direction_ == SidePassDirection::LEFT &&
         (curr_lane_.left_neighbor_forward_lane_id_size() > 0 ||
          curr_lane_.left_neighbor_reverse_lane_id_size() > 0)) {
       ADEBUG << "Expanding the upper limit (left).";
-      std::get<2>(lateral_bound) =
-          lane_left_width + lane_width - adc_half_width - kRoadBuffer;
+      double adjacent_lane_width = 0.0;
+      hdmap::LaneInfoConstPtr adjacent_lane;
+      // Get the LaneInfo of the left lane.
+      if (curr_lane_.left_neighbor_forward_lane_id_size() > 0) {
+        adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+            curr_lane_.left_neighbor_forward_lane_id(0));
+      } else if (curr_lane_.left_neighbor_reverse_lane_id_size() > 0) {
+        adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+            curr_lane_.left_neighbor_reverse_lane_id(0));
+      }
+      // Get the XY point of the curr_s.
+      common::math::Vec2d xy_curr_s;
+      common::SLPoint sl_curr_s;
+      sl_curr_s.set_s(curr_s);
+      sl_curr_s.set_l(0.0);
+      reference_line.SLToXY(sl_curr_s, &xy_curr_s);
+      // Get the projection of the XY point onto the left lane,
+      // and use that s to get the left lane's width.
+      double adjacent_lane_s = 0.0;
+      double adjacent_lane_l = 0.0;
+      if (!adjacent_lane->GetProjection
+          (xy_curr_s, &adjacent_lane_s, &adjacent_lane_l)) {
+        ADEBUG << "Unable to get the left lane's width due to "
+                  "failure in getting projection.";
+        ADEBUG << "Therefore, treat the current lane's width as"
+                  "the left lane's width.";
+        adjacent_lane_width = curr_lane_width;
+      } else {
+        adjacent_lane_width = adjacent_lane->GetWidth(adjacent_lane_s);
+      }
+      ADEBUG << "Upper limit expanded by " << adjacent_lane_width;
+      // Update the lateral_bound accordingly.
+      std::get<2>(lateral_bound) += adjacent_lane_width;
     } else if (decided_direction_ == SidePassDirection::RIGHT &&
                (curr_lane_.right_neighbor_forward_lane_id_size() > 0 ||
                 curr_lane_.right_neighbor_reverse_lane_id_size() > 0)) {
       ADEBUG << "Expanding the lower limit (right).";
-      std::get<1>(lateral_bound) =
-          -lane_right_width - lane_width + adc_half_width + kRoadBuffer;
+      double adjacent_lane_width = 0.0;
+      hdmap::LaneInfoConstPtr adjacent_lane;
+      // Get the LaneInfo of the right lane.
+      if (curr_lane_.right_neighbor_forward_lane_id_size() > 0) {
+        adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+            curr_lane_.right_neighbor_forward_lane_id(0));
+      } else if (curr_lane_.right_neighbor_reverse_lane_id_size() > 0) {
+        adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+            curr_lane_.right_neighbor_reverse_lane_id(0));
+      }
+      // Get the XY point of the curr_s.
+      common::math::Vec2d xy_curr_s;
+      common::SLPoint sl_curr_s;
+      sl_curr_s.set_s(curr_s);
+      sl_curr_s.set_l(0.0);
+      reference_line.SLToXY(sl_curr_s, &xy_curr_s);
+      // Get the projection of the XY point onto the left lane,
+      // and use that s to get the left lane's width.
+      double adjacent_lane_s = 0.0;
+      double adjacent_lane_l = 0.0;
+      if (!adjacent_lane->GetProjection
+          (xy_curr_s, &adjacent_lane_s, &adjacent_lane_l)) {
+        ADEBUG << "Unable to get the right lane's width due to "
+                  "failure in getting projection.";
+        ADEBUG << "Therefore, treat the current lane's width as"
+                  "the right lane's width.";
+        adjacent_lane_width = curr_lane_width;
+      } else {
+        adjacent_lane_width = adjacent_lane->GetWidth(adjacent_lane_s);
+      }
+      ADEBUG << "Lower limit expanded by " << adjacent_lane_width;
+      std::get<1>(lateral_bound) -= adjacent_lane_width;
     }
+    ADEBUG << "lateral_bound updated based on direction: "
+           << std::get<1>(lateral_bound) << ", "
+           << std::get<2>(lateral_bound) << ".";
 
+    // Update lateral_bound based on obstacles:
     for (const auto *obstacle : indexed_obstacles.Items()) {
       if (obstacle->IsVirtual()) {
         continue;
       }
       const auto obs_sl = obstacle->PerceptionSLBoundary();
-      ADEBUG << obs_sl.ShortDebugString();
-
+      // ADEBUG << obs_sl.ShortDebugString();
       // not overlap with obstacle
       if (curr_s < obs_sl.start_s() - kObstacleSBuffer ||
           curr_s > obs_sl.end_s() + kObstacleSBuffer) {
@@ -314,14 +386,11 @@ SidePassPathDecider::GetPathBoundaries(
           obs_sl.end_l() < std::get<1>(lateral_bound)) {
         continue;
       }
-
-      ADEBUG << "Obstacles that are considered is at: "
-             << "curr_s = " << curr_s - adc_frenet_frame_point_.s()
+      ADEBUG << "Obstacle within consideration: "
              << " start_s = " << obs_sl.start_s() - adc_frenet_frame_point_.s()
              << " end_s = " << obs_sl.end_s() - adc_frenet_frame_point_.s()
              << " start_l = " << obs_sl.start_l()
              << " end_l = " << obs_sl.end_l();
-
       ADEBUG << "ADC width = " << 2.0 * adc_half_width;
       *fail_to_find_boundary = false;
 
@@ -339,28 +408,24 @@ SidePassPathDecider::GetPathBoundaries(
 
       if (side_pass_direction == SidePassDirection::LEFT) {
         const double lower_bound =
-            FLAGS_static_decision_nudge_l_buffer + obs_sl.end_l();
+            FLAGS_static_decision_nudge_l_buffer + obs_sl.end_l() +
+            adc_half_width + kObstacleLBuffer;
         ADEBUG << "Should pass from left. Lower bound = " << lower_bound;
-        if (std::get<2>(lateral_bound) - lower_bound - 2.0 * adc_half_width -
-                kRoadBuffer >=
-            0.0) {
+        if (std::get<2>(lateral_bound) >= lower_bound) {
           ADEBUG << "Reseting the right boundary for left-side-pass.";
-          std::get<1>(lateral_bound) =
-              lower_bound + adc_half_width + kObstacleLBuffer;
+          std::get<1>(lateral_bound) = lower_bound;
         } else {
           *fail_to_find_boundary = true;
           break;
         }
       } else {
         const double upper_bound =
-            -FLAGS_static_decision_nudge_l_buffer + obs_sl.start_l();
+            -FLAGS_static_decision_nudge_l_buffer + obs_sl.start_l() -
+            adc_half_width - kObstacleLBuffer;
         ADEBUG << "Should pass from right. Upper bound = " << upper_bound;
-        if (upper_bound - std::get<1>(lateral_bound) - 2.0 * adc_half_width -
-                kRoadBuffer >=
-            0.0) {
+        if (upper_bound >= std::get<1>(lateral_bound)) {
           ADEBUG << "Reseting the left boundary for right-side-pass.";
-          std::get<2>(lateral_bound) =
-              upper_bound - adc_half_width - kObstacleLBuffer;
+          std::get<2>(lateral_bound) = upper_bound;
         } else {
           *fail_to_find_boundary = true;
           break;
@@ -369,12 +434,14 @@ SidePassPathDecider::GetPathBoundaries(
     }
 
     if (*fail_to_find_boundary) {
+      ADEBUG << "Failed to get a feasible boundary.";
       return lateral_bounds;
     }
 
-    ADEBUG << "obstacle bound: " << std::get<0>(lateral_bound) << ", "
-           << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound);
-
+    ADEBUG << "lateral_bound updated based on obstacles: "
+           << std::get<1>(lateral_bound) << ", "
+           << std::get<2>(lateral_bound) << ".";
+    ADEBUG << "\n";
     lateral_bounds.push_back(lateral_bound);
   }
   return lateral_bounds;
