@@ -44,6 +44,7 @@ message TaskConfig {
     SIDE_PASS_PATH_DECIDER = 13;
     SIDE_PASS_SAFETY = 14;
     PROCEED_WITH_CAUTION_SPEED = 15;
+    DECIDER_RSS = 16;
   };
   optional TaskType task_type = 1;
   oneof task_config {

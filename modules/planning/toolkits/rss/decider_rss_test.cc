@@ -18,25 +18,27 @@
  * @file
  **/
 
-#pragma once
+#include <gtest/gtest.h>
+#include "rss/core/RssResponseTransformation.hpp"
 
-#include "modules/planning/toolkits/task.h"
 
-namespace apollo {
-namespace planning {
+namespace rss {
+namespace core {
 
-class RssDecider : public Task {
- public:
-  explicit RssDecider(const TaskConfig &config);
+using rss::state::LateralResponse;
+using rss::state::LongitudinalResponse;
 
-  apollo::common::Status Execute(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
+TEST(RssResponseTransformationTests, invalidTimeStamp) {
+  ::rss::world::WorldModel worldModel;
+  ::rss::state::ResponseState responseState;
+  ::rss::world::AccelerationRestriction accelerationRestriction;
 
- private:
-  apollo::common::Status Process(const PathData &path_data,
-                                 PathDecision *const path_decision);
-};
+  worldModel.timeIndex = 1u;
+  responseState.timeIndex = 0u;
 
-}  // namespace planning
-}  // namespace apollo
+  ASSERT_FALSE(::rss::core::RssResponseTransformation::transformProperResponse(
+    worldModel, responseState, accelerationRestriction));
+}
 
+}   //  namespace core
+}   //  namespace rss

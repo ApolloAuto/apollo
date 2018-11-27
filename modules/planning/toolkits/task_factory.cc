@@ -39,6 +39,7 @@
 #include "modules/planning/toolkits/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 #include "modules/planning/toolkits/optimizers/speed_decider/speed_decider.h"
 #include "modules/planning/toolkits/task.h"
+#include "modules/planning/toolkits/rss/decider_rss.h"
 
 namespace apollo {
 namespace planning {
@@ -100,6 +101,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::SIDE_PASS_SAFETY,
                          [](const TaskConfig& config) -> Task* {
                            return new SidePassSafety(config);
+                         });
+  task_factory_.Register(TaskConfig::DECIDER_RSS,
+                         [](const TaskConfig& config) -> Task* {
+                           return new RssDecider(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =
