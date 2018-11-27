@@ -119,8 +119,6 @@ class MeasureRepublishProcess {
 
   GnssMode gnss_mode_;
 
-  static constexpr double DEG_TO_RAD = 0.017453292519943;
-  static constexpr double RAD_TO_DEG = 57.295779513082323;
   static constexpr double GNSS_XY_STD_THRESHOLD = 5.0;
   static constexpr double BESTPOSE_TIME_MAX_INTERVAL = 1.05;
   static constexpr int BESTPOSE_GOOD_COUNT = 10;

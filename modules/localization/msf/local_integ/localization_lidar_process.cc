@@ -87,6 +87,7 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
 
   is_unstable_reset_ = params.is_lidar_unstable_reset;
   unstable_threshold_ = params.unstable_reset_threshold;
+  if_use_avx_ = params.if_use_avx;
 
   lidar_status_ = LidarState::NOT_VALID;
 
@@ -197,7 +198,7 @@ void LocalizationLidarProcess::PcdProcess(const LidarFrame& lidar_frame) {
   velocity_ = cur_predict_location_.translation() - pre_location_.translation();
 
   int ret = locator_->Update(pcd_index++, cur_predict_location_, velocity_,
-                             lidar_frame);
+                             lidar_frame, if_use_avx_);
 
   UpdateState(ret, lidar_frame.measurement_time);
 

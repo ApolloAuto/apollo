@@ -76,6 +76,7 @@ void MSFLocalization::InitParams() {
   localization_param_.lidar_filter_size = FLAGS_lidar_filter_size;
   localization_param_.map_coverage_theshold = FLAGS_lidar_map_coverage_theshold;
   localization_param_.imu_lidar_max_delay_time = FLAGS_lidar_imu_max_delay_time;
+  localization_param_.if_use_avx = FLAGS_if_use_avx;
 
   AINFO << "map: " << localization_param_.map_path;
   AINFO << "lidar_extrin: " << localization_param_.lidar_extrinsic_file;
@@ -148,6 +149,7 @@ void MSFLocalization::InitParams() {
     CHECK(LoadGnssAntennaExtrinsic(ant_imu_leverarm_file, &offset_x, &offset_y,
                                    &offset_z, &uncertainty_x, &uncertainty_y,
                                    &uncertainty_z));
+    localization_param_.ant_imu_leverarm_file = ant_imu_leverarm_file;
 
     localization_param_.imu_to_ant_offset.offset_x = offset_x;
     localization_param_.imu_to_ant_offset.offset_y = offset_y;

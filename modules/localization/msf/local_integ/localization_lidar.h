@@ -102,7 +102,8 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
   void SetDeltaPitchRollLimit(double limit);
 
   int Update(const unsigned int frame_idx, const Eigen::Affine3d& pose,
-             const Eigen::Vector3d velocity, const LidarFrame& lidar_frame);
+             const Eigen::Vector3d velocity, const LidarFrame& lidar_frame,
+             bool use_avx = false);
 
   void GetResult(Eigen::Affine3d *location,
                  Eigen::Matrix3d *covariance,

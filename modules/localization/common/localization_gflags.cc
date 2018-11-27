@@ -89,6 +89,9 @@ DEFINE_double(lidar_map_coverage_theshold, 0.9,
               "Threshold to detect wether vehicle is out of map");
 DEFINE_bool(lidar_debug_log_flag, false, "Lidar Debug switch.");
 DEFINE_int32(point_cloud_step, 2, "Point cloud step");
+DEFINE_bool(if_use_avx, false,
+            "if use avx to accelerate lidar localization, "
+            "need cpu to support AVX intel instrinsics");
 
 // integ module
 DEFINE_bool(integ_ins_can_self_align, false, "");

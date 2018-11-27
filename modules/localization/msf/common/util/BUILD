@@ -34,13 +34,10 @@ cc_library(
     name = "localization_msf_common_util_frame_transform",
     srcs = ["frame_transform.cc"],
     hdrs = ["frame_transform.h"],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
         "@eigen",
+        "@proj4",
     ],
 )
 
