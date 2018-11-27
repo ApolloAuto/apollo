@@ -24,7 +24,7 @@ else
 	rm -rf modules/map/data/${MAP}
 	mkdir modules/map/data/${MAP}
 	if [ "$2" == "" ]; then
-	    echo "Geerating map with a single lane"
+	    echo "Generating map with a single lane"
 		python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt
 	else
 		LEFT_LANES=$2
