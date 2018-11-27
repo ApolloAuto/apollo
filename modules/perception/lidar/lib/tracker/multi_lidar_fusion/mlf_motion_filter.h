@@ -135,6 +135,8 @@ class MlfMotionFilter : public MlfBaseFilter {
   void BeliefToOutput(TrackedObjectPtr object);
 
  protected:
+  const double EPSION_TIME = 1e-3;
+  const double DEFAULT_FPS = 0.1;
   // motion measurement
   std::shared_ptr<MlfMotionMeasurement> motion_measurer_;
   // motion refiner

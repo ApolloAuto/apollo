@@ -55,9 +55,9 @@ class KalmanFilter : public BaseFilter {
   bool DeCorrelation(int x, int y, int x_len, int y_len);
   void CorrectionBreakdown();
   bool SetGainBreakdownThresh(const std::vector<bool> &break_down,
-                              const float threshold = 2.0);
+                              const float threshold = 2.0f);
   bool SetValueBreakdownThresh(const std::vector<bool> &break_down,
-                               const float threshold = 0.05);
+                               const float threshold = 0.05f);
 
  private:
   // @brief kalman gain
@@ -66,8 +66,8 @@ class KalmanFilter : public BaseFilter {
   Eigen::VectorXd value_break_down_;
   Eigen::MatrixXd kalman_gain_;
 
-  float value_break_down_threshold_ = 999.0;
-  float gain_break_down_threshold_ = 0.0;
+  float value_break_down_threshold_ = 999.0f;
+  float gain_break_down_threshold_ = 0.0f;
 };
 
 }  // namespace fusion

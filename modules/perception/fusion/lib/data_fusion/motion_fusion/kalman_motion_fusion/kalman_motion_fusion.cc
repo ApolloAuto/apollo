@@ -372,8 +372,8 @@ void KalmanMotionFusion::RewardRMatrix(const base::SensorType& sensor_type,
                                        Eigen::MatrixXd* r_matrix) {
   common::SensorManager* sensor_manager =
       lib::Singleton<common::SensorManager>::get_instance();
-  const float converged_scale = 0.01;
-  const float unconverged_scale = 1000.0;
+  const float converged_scale = 0.01f;
+  const float unconverged_scale = 1000.0f;
   if (sensor_manager->IsLidar(sensor_type)) {
     if (converged) {
       r_matrix->setIdentity();

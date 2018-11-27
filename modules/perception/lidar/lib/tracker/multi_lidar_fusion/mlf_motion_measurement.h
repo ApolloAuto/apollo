@@ -51,6 +51,8 @@ class MlfMotionMeasurement {
       TrackedObjectPtr new_object);
 
  private:
+  const double EPSILON_TIME = 1e-3;  // or numeric_limits<double>::epsilon()
+  const double DEFAULT_FPS = 0.1;
   DISALLOW_COPY_AND_ASSIGN(MlfMotionMeasurement);
 };  // class MlfMotionMeasurement
 

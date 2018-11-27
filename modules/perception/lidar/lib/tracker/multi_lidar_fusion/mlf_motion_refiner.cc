@@ -56,7 +56,12 @@ bool MlfMotionRefiner::Refine(const MlfTrackDataConstPtr& track_data,
   double time_diff = new_object->object_ptr->latest_tracked_time -
                      latest_object->object_ptr->latest_tracked_time;
   Eigen::Vector3d filter_velocity_gain = new_object->belief_velocity_gain;
-  double filter_acceleration_gain = filter_velocity_gain.norm() / time_diff;
+  double filter_acceleration_gain = 0.0;
+  if (fabs(time_diff) < EPSION_TIME) {
+    filter_acceleration_gain = 0.0;
+  } else {
+    filter_acceleration_gain = filter_velocity_gain.norm() / time_diff;
+  }
   bool need_keep_motion =
       filter_acceleration_gain > claping_acceleration_threshold_;
   // use tighter threshold for pedestrian
