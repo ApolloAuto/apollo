@@ -169,9 +169,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
   }
 
   auto crid = GlobalData::GenerateHashId(name);
-  return RemoveCRoutine(crid);
-}
-bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
+
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
   std::lock_guard<std::mutex> lg(id_cr_wl_[crid]);
@@ -181,14 +179,12 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   int prio;
   int pid;
   {
-    WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
     auto p = id_cr_.find(crid);
     if (p != id_cr_.end()) {
       auto cr = p->second;
       prio = cr->priority();
       pid = cr->processor_id();
-      id_cr_[crid]->Stop();
-      id_cr_.erase(crid);
     } else {
       return false;
     }
@@ -200,23 +196,22 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
     for (auto it = ClassicContext::rq_[prio].begin();
          it != ClassicContext::rq_[prio].end(); ++it) {
       if ((*it)->id() == crid) {
-        auto cr = *it;
-        while (!cr->Acquire()) {
-          usleep(10000);
-        }
-
-        cr->Stop();
         ClassicContext::rq_[prio].erase(it);
-        cr->Release();
         return true;
       }
     }
-  } else {
-    static_cast<ChoreographyContext *>(pctxs_[pid].get())
-        ->RemoveCRoutine(crid);
-    return true;
   }
 
+  // Remove cr from id_cr &&
+  // Set CRoutine Stop Tag, Choreo policy will
+  // rm finished task by it-self
+  {
+    WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
+    if (id_cr_.find(crid) != id_cr_.end()) {
+      id_cr_[crid]->Stop();
+      id_cr_.erase(crid);
+    }
+  }
   return false;
 }
 
@@ -290,6 +285,7 @@ void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
   }
   return;
 }
+
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
