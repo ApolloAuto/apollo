@@ -60,7 +60,7 @@ class TrajectoryAnalyzer {
   ~TrajectoryAnalyzer() = default;
 
   /**
-   * @brief get sequence number of the trajecotry
+   * @brief get sequence number of the trajectory
    * @return sequence number.
    */
   unsigned int seq_num() { return seq_num_; }
