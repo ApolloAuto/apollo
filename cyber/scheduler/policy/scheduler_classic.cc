@@ -51,6 +51,8 @@ SchedulerClassic::SchedulerClassic() {
     auto& groups = cfg.scheduler_conf().classic_conf().groups();
     proc_num_ = groups[0].processor_num();
     affinity_ = groups[0].affinity();
+    processor_policy_ = groups[0].processor_policy();
+    processor_prio_ = groups[0].processor_prio();
     ParseCpuset(groups[0].cpuset(), &cpuset_);
 
     for (auto& group : groups) {
@@ -68,9 +70,6 @@ SchedulerClassic::SchedulerClassic() {
     }
   }
 
-  // Currently for compatible with task/task_manager.cc:
-  // auto pool_size = scheduler::Scheduler::Instance()->TaskPoolSize();
-  // which will be deleted at last.
   task_pool_size_ = proc_num_;
 
   CreateProcessor();
@@ -83,6 +82,7 @@ void SchedulerClassic::CreateProcessor() {
 
     proc->BindContext(ctx);
     proc->SetAffinity(cpuset_, affinity_, i);
+    proc->SetSchedPolicy(processor_policy_, processor_prio_);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
   }
