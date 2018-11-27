@@ -112,7 +112,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     return;
   }
   curr_frame_predictable_obstacle_ids_.push_back(id);
-  Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
+  Obstacle* obstacle_ptr = obstacles_.Get(id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->Insert(perception_obstacle, timestamp);
     ADEBUG << "Insert obstacle [" << id << "]";
