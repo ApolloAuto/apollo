@@ -162,9 +162,6 @@ class SimControl : SimControlInterface {
   // Whether there's a planning received after the most recent routing.
   bool received_planning_ = false;
 
-  // Number of planning received in terms of one RoutingResponse.
-  int planning_count_ = -1;
-
   // Whether planning has requested a re-routing.
   bool re_routing_triggered_ = false;
 
@@ -187,8 +184,6 @@ class SimControl : SimControlInterface {
 
   // Linearize reader/timer callbacks and external operations.
   std::mutex mutex_;
-
-  static constexpr int kPlanningCountToStart = 5;
 
   FRIEND_TEST(SimControlTest, Test);
   FRIEND_TEST(SimControlTest, TestDummyPrediction);
