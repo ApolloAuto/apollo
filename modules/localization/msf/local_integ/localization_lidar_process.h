@@ -143,6 +143,9 @@ class LocalizationLidarProcess {
 
   bool reinit_flag_ = false;
 
+  // if use avx to accelerate lidar localization algorithm
+  bool if_use_avx_ = false;
+
   // imu and lidar max delay time
   double imu_lidar_max_delay_time_ = 0.4;
 

@@ -92,6 +92,7 @@ struct LocalizationIntegParam {
   int utm_zone_id = 50;
   bool is_lidar_unstable_reset = true;
   double unstable_reset_threshold = 0.3;
+  bool if_use_avx = false;
 
   bool is_using_novatel_heading = true;
   std::string ant_imu_leverarm_file = "";

@@ -595,7 +595,8 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   headerpb->set_timestamp_sec(timestamp);
 
   UTMCoor utm_xy;
-  LatlonToUtmXY(measure.gnss_pos.longitude, measure.gnss_pos.latitude, &utm_xy);
+  FrameTransform::LatlonToUtmXY(measure.gnss_pos.longitude,
+                                measure.gnss_pos.latitude, &utm_xy);
 
   apollo::common::PointENU* position = posepb->mutable_position();
   position->set_x(utm_xy.x);

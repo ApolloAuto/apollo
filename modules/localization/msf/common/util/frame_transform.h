@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #pragma once
 
-#include <Eigen/Core>
+#include <proj_api.h>
 #include <Eigen/Geometry>
-#include <cstdio>
 
 namespace apollo {
 namespace localization {
 namespace msf {
+
+typedef Eigen::Vector3d Vector3d;
 
 /**@brief the UTM coordinate struct including x and y. */
 struct UTMCoor {
@@ -39,15 +39,18 @@ struct WGS84Corr {
   double lat;      // latitude
 };
 
-void LatlonToUtmXY(const double lon, const double lat, UTMCoor *xy);
+class FrameTransform {
+ public:
+  static bool LatlonToUtmXY(double lon, double lat, UTMCoor *utm_xy);
+  static bool UtmXYToLatlon(double x, double y, int zone, bool southhemi,
+                            WGS84Corr *latlon);
+  static bool XYZToBlh(const Vector3d& xyz, Vector3d *blh);
+  static bool BlhToXYZ(const Vector3d& blh, Vector3d *xyz);
 
-void UtmXYToLatlon(const double x, const double y, const int zone,
-                     const bool southhemi, WGS84Corr *latlon);
+//  static bool XyzToBlh(const Vector3d& xyz, Position *blh);
+//  static bool BlhToXyz(const Position& blh, Vector3d *xyz);
+};
 
-void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh);
-
-void BlhToXYZ(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz);
-
-}   // namespace msf
-}   // namespace localization
-}   // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo

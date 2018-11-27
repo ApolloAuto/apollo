@@ -184,7 +184,8 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   apollo::common::PointENU *position_loc = posepb_loc->mutable_position();
   apollo::common::Quaternion *quaternion = posepb_loc->mutable_orientation();
   UTMCoor utm_xy;
-  LatlonToUtmXY(ins_pva_.pos.longitude, ins_pva_.pos.latitude, &utm_xy);
+  FrameTransform::LatlonToUtmXY(ins_pva_.pos.longitude, ins_pva_.pos.latitude,
+                                &utm_xy);
   position_loc->set_x(utm_xy.x);
   position_loc->set_y(utm_xy.y);
   position_loc->set_z(ins_pva_.pos.height);

@@ -206,7 +206,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
   pos_xyz[2] = measure_data.gnss_pos.height;
 
   Eigen::Vector3d pos_blh = Eigen::Vector3d::Zero();
-  apollo::localization::msf::XYZToBlh(pos_xyz, &pos_blh);
+  apollo::localization::msf::FrameTransform::XYZToBlh(pos_xyz, &pos_blh);
   measure_data.gnss_pos.longitude = pos_blh[0];
   measure_data.gnss_pos.latitude = pos_blh[1];
   measure_data.gnss_pos.height = pos_blh[2];
@@ -343,7 +343,7 @@ bool MeasureRepublishProcess::LidarLocalProcess(
   measure_data.time = lidar_local_msg.measurement_time();
 
   apollo::localization::msf::WGS84Corr temp_wgs;
-  apollo::localization::msf::UtmXYToLatlon(
+  apollo::localization::msf::FrameTransform::UtmXYToLatlon(
       lidar_local_msg.pose().position().x(),
       lidar_local_msg.pose().position().y(), local_utm_zone_id_, false,
       &temp_wgs);

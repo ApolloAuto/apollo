@@ -118,7 +118,8 @@ void LocalizationLidar::SetDeltaPitchRollLimit(double limit) {
 int LocalizationLidar::Update(const unsigned int frame_idx,
                               const Eigen::Affine3d& pose,
                               const Eigen::Vector3d velocity,
-                              const LidarFrame& lidar_frame) {
+                              const LidarFrame& lidar_frame,
+                              bool use_avx) {
   // check whether loaded map
   if (is_map_loaded_ == false) {
     map_.LoadMapArea(pose.translation(), resolution_id_,
@@ -167,7 +168,8 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
                                      pose_quat.x(),
                                      pose_quat.y(),
                                      pose_quat.z(),
-                                     pose_quat.w());
+                                     pose_quat.w(),
+                                     use_avx);
 
   return error;
 }

@@ -61,6 +61,7 @@ DECLARE_double(lidar_imu_max_delay_time);
 DECLARE_double(lidar_map_coverage_theshold);
 DECLARE_bool(lidar_debug_log_flag);
 DECLARE_int32(point_cloud_step);
+DECLARE_bool(if_use_avx);
 
 // integ module
 DECLARE_bool(integ_ins_can_self_align);
