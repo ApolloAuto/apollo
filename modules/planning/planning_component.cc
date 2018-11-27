@@ -130,7 +130,10 @@ bool PlanningComponent::Proc(
 
   ADCTrajectory adc_trajectory_pb;
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
+  auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
+  // fix header timestamp with planning start time
+  adc_trajectory_pb.mutable_header()->set_timestamp_sec(start_time);
   planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
   return true;
 }
