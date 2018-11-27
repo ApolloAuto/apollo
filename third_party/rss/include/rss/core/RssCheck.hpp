@@ -23,7 +23,7 @@
 #include <memory>
 #include "rss/world/AccelerationRestriction.hpp"
 #include "rss/world/WorldModel.hpp"
-#include "rss/utils/utils.hpp"
+//#include "rss/utils/utils.hpp"
 
 
 /*!
