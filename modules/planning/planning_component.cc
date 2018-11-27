@@ -132,8 +132,12 @@ bool PlanningComponent::Proc(
   planning_base_->RunOnce(local_view_, &adc_trajectory_pb);
   auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
-  // fix header timestamp with planning start time
-  adc_trajectory_pb.mutable_header()->set_timestamp_sec(start_time);
+
+  // modify trajecotry relative time due to the timestamp change in header
+  const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
+  for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
+    p.set_relative_time(p.relative_time() + dt);
+  }
   planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
   return true;
 }

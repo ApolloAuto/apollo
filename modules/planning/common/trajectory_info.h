@@ -38,10 +38,10 @@ class TrajectoryInfo {
   const SpeedData& speed_data() const { return speed_data_; }
   SpeedData* mutable_speed_data() { return &speed_data_; }
 
-  const DiscretizedTrajectory& discretized_trajecotry() const {
+  const DiscretizedTrajectory& discretized_trajectory() const {
     return discretized_trajectory_;
   }
-  DiscretizedTrajectory* mutable_discretized_trajecotry() {
+  DiscretizedTrajectory* mutable_discretized_trajectory() {
     return &discretized_trajectory_;
   }
 
