@@ -170,23 +170,28 @@ bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
 
 bool Obstacle::IsValidPerceptionObstacle(const PerceptionObstacle& obstacle) {
   if (obstacle.length() <= 0.0) {
+    AERROR << "invalid obstacle length:" << obstacle.length();
     return false;
   }
   if (obstacle.width() <= 0.0) {
+    AERROR << "invalid obstacle width:" << obstacle.width();
     return false;
   }
   if (obstacle.height() <= 0.0) {
+    AERROR << "invalid obstacle height:" << obstacle.height();
     return false;
   }
   if (obstacle.has_velocity()) {
     if (std::isnan(obstacle.velocity().x()) ||
-        std::isnan(obstacle.velocity().y()) ||
-        std::isnan(obstacle.velocity().z())) {
+        std::isnan(obstacle.velocity().y())) {
+      AERROR << "invalid obstacle velocity:"
+             << obstacle.velocity().DebugString();
       return false;
     }
   }
   for (auto pt : obstacle.polygon_point()) {
-    if (std::isnan(pt.x()) || std::isnan(pt.y()) || std::isnan(pt.z())) {
+    if (std::isnan(pt.x()) || std::isnan(pt.y())) {
+      AERROR << "invalid obstacle polygon point:" << pt.DebugString();
       return false;
     }
   }
