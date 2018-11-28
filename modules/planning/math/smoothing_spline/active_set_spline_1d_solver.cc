@@ -60,9 +60,9 @@ bool ActiveSetSpline1dSolver::Solve() {
     return false;
   }
 
-  int num_param = kernel_matrix.rows();
-  int num_constraint =
-      equality_constraint_matrix.rows() + inequality_constraint_matrix.rows();
+  int num_param = static_cast<int>(kernel_matrix.rows());
+  int num_constraint = static_cast<int>(equality_constraint_matrix.rows() +
+                                        inequality_constraint_matrix.rows());
 
   bool use_hotstart =
       last_problem_success_ &&
@@ -84,10 +84,10 @@ bool ActiveSetSpline1dSolver::Solve() {
   }
 
   // definition of qpOASESproblem
-  const int kNumOfMatrixElements = kernel_matrix.rows() * kernel_matrix.cols();
+  const auto kNumOfMatrixElements = kernel_matrix.rows() * kernel_matrix.cols();
   double h_matrix[kNumOfMatrixElements];  // NOLINT
 
-  const int kNumOfOffsetRows = offset.rows();
+  const auto kNumOfOffsetRows = offset.rows();
   double g_matrix[kNumOfOffsetRows];  // NOLINT
   int index = 0;
 
