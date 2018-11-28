@@ -71,6 +71,8 @@ DEFINE_bool(enable_junction_feature, false,
             "If to enable building junction feature for obstacles");
 
 // Obstacle features
+DEFINE_double(scan_length, 100.0, "The length of the obstacles scan area");
+DEFINE_double(scan_width, 12.0, "The width of the obstacles scan area");
 DEFINE_uint32(cruise_historical_frame_length, 5,
               "The number of historical frames of the obstacle"
               "that the cruise model will look at.");
