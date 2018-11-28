@@ -121,6 +121,10 @@ class Obstacle {
     return perception_obstacle.id() < 0;
   }
 
+  static bool IsValidPerceptionObstacle(
+      const perception::PerceptionObstacle& obstacle);
+
+
   static bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
 
   // const Obstacle* obstacle() const;

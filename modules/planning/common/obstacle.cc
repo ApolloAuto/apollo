@@ -168,10 +168,40 @@ bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
          moving_speed <= FLAGS_static_obstacle_speed_threshold;
 }
 
+bool Obstacle::IsValidPerceptionObstacle(const PerceptionObstacle& obstacle) {
+  if (obstacle.length() <= 0.0) {
+    return false;
+  }
+  if (obstacle.width() <= 0.0) {
+    return false;
+  }
+  if (obstacle.height() <= 0.0) {
+    return false;
+  }
+  if (obstacle.has_velocity()) {
+    if (std::isnan(obstacle.velocity().x()) ||
+        std::isnan(obstacle.velocity().y()) ||
+        std::isnan(obstacle.velocity().z())) {
+      return false;
+    }
+  }
+  for (auto pt : obstacle.polygon_point()) {
+    if (std::isnan(pt.x()) || std::isnan(pt.y()) || std::isnan(pt.z())) {
+      return false;
+    }
+  }
+  return true;
+}
+
 std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     const prediction::PredictionObstacles& predictions) {
   std::list<std::unique_ptr<Obstacle>> obstacles;
   for (const auto& prediction_obstacle : predictions.prediction_obstacle()) {
+    if (!IsValidPerceptionObstacle(prediction_obstacle.perception_obstacle())) {
+      AERROR << "Invalid perception obstacle: "
+             << prediction_obstacle.perception_obstacle().DebugString();
+      continue;
+    }
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
     if (prediction_obstacle.trajectory().empty()) {
