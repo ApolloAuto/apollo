@@ -108,7 +108,8 @@ void ScenarioManager::PrioritizeObstacles(
     bool is_on_lane = obstacle_ptr->IsOnLane();
     bool is_pedestrian_in_front = (latest_feature_ptr->type() == 3 && s > 0.0);
 
-    bool need_consider = is_in_scan_area || is_on_lane || is_pedestrian_in_front;
+    bool need_consider = is_in_scan_area || is_on_lane ||
+                         is_pedestrian_in_front;
 
     if (scenario_type == Scenario::JUNCTION ||
         scenario_type == Scenario::JUNCTION_TRAFFIC_LIGHT ||
