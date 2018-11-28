@@ -133,6 +133,7 @@ class TransitController final : public VehicleController {
   std::mutex chassis_mask_mutex_;
   int32_t chassis_error_mask_ = 0;
   bool received_vin_ = false;
+  bool button_pressed_ = false;
 };
 
 }  // namespace transit

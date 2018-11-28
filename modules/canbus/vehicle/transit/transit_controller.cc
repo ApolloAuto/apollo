@@ -179,6 +179,9 @@ Chassis TransitController::chassis() {
     chassis_.set_throttle_percentage(motion20.llc_fbk_throttleposition());
   }
 
+  button_pressed_ = (transit.llc_motionfeedback1_20().llc_fbk_state() ==
+                     Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY);
+
   if (motion20.has_llc_fbk_brakepressurerear()) {
     // TODO(Udelv): fix scaling
     chassis_.set_brake_percentage(motion20.llc_fbk_brakepressurerear() / 1780 *
@@ -387,7 +390,11 @@ void TransitController::Brake(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  adc_motioncontrol1_10_->set_adc_cmd_brakepressure(pedal);
+  if (button_pressed_) {
+    adc_motioncontrol1_10_->set_adc_cmd_brakepressure(pedal);
+  } else {
+    adc_motioncontrol1_10_->set_adc_cmd_brakepressure(0.0);
+  }
 }
 
 // drive with old acceleration
@@ -398,7 +405,11 @@ void TransitController::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  adc_motioncontrol1_10_->set_adc_cmd_throttleposition(pedal);
+  if (button_pressed_) {
+    adc_motioncontrol1_10_->set_adc_cmd_throttleposition(pedal);
+  } else {
+    adc_motioncontrol1_10_->set_adc_cmd_throttleposition(0.0);
+  }
 }
 
 // transit default, -470 ~ 470, left:+, right:-
@@ -411,9 +422,11 @@ void TransitController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
+  const double real_angle =
+      button_pressed_
+          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI / 2
+          : 0;
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
-  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(200);
 }
 
 // steering with new angle speed
@@ -425,15 +438,13 @@ void TransitController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
-              100.0);
+  const double real_angle =
+      button_pressed_
+          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI
+          : 0;
+
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
-  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(real_angle_spd);
+  // TODO(QiL) : re-enable the angle_spd ajustment
 }
 
 void TransitController::SetEpbBreak(const ControlCommand& command) {
