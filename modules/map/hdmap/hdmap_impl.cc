@@ -460,6 +460,28 @@ int HDMapImpl::GetParkingSpaces(
 int HDMapImpl::GetPNCJunctions(const apollo::common::PointENU& point,
                   double distance,
                   std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
+  return GetPNCJunctions({point.x(), point.y()}, distance, pnc_junctions);
+}
+
+int HDMapImpl::GetPNCJunctions(const apollo::common::math::Vec2d& point,
+                  double distance,
+                  std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
+  if (pnc_junctions == nullptr || pnc_junction_polygon_kdtree_ == nullptr) {
+    return -1;
+  }
+  pnc_junctions->clear();
+
+  std::vector<std::string> ids;
+  const int status =
+      SearchObjects(point, distance, *pnc_junction_polygon_kdtree_, &ids);
+  if (status < 0) {
+    return status;
+  }
+
+  for (const auto& id : ids) {
+    pnc_junctions->emplace_back(GetPNCJunctionById(CreateHDMapId(id)));
+  }
+
   return 0;
 }
 
@@ -1308,6 +1330,8 @@ void HDMapImpl::Clear() {
   speed_bump_segment_kdtree_.reset(nullptr);
   parking_space_polygon_boxes_.clear();
   parking_space_polygon_kdtree_.reset(nullptr);
+  pnc_junction_polygon_boxes_.clear();
+  pnc_junction_polygon_kdtree_.reset(nullptr);
 }
 
 }  // namespace hdmap

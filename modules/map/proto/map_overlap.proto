@@ -38,6 +38,9 @@ message SpeedBumpOverlapInfo {
 message ParkingSpaceOverlapInfo {
 }
 
+message PNCJunctionOverlapInfo {
+}
+
 message RegionOverlapInfo {
   optional Id id = 1;
   repeated Polygon polygon = 2;
@@ -57,6 +60,7 @@ message ObjectOverlapInfo {
     ClearAreaOverlapInfo clear_area_overlap_info = 9;
     SpeedBumpOverlapInfo speed_bump_overlap_info = 10;
     ParkingSpaceOverlapInfo parking_space_overlap_info = 11;
+    PNCJunctionOverlapInfo pnc_junction_overlap_info = 12;
   }
 }
 

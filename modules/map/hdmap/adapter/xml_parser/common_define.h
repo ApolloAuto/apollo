@@ -52,6 +52,7 @@ using PbPolygon = apollo::hdmap::Polygon;
 using PbBoundaryPolygon = apollo::hdmap::BoundaryPolygon;
 using PbBoundaryEdge = apollo::hdmap::BoundaryEdge;
 using PbRegionOverlap = apollo::hdmap::RegionOverlapInfo;
+using PbPNCJunction = apollo::hdmap::PNCJunction;
 
 using PbLaneDirection = apollo::hdmap::Lane_LaneDirection;
 using PbSignalType = apollo::hdmap::Signal_Type;
@@ -133,6 +134,7 @@ struct RoadInternal {
   std::vector<PbSpeedBump> speed_bumps;
   std::vector<StopLineInternal> stop_lines;
   std::vector<PbParkingSpace> parking_spaces;
+  std::vector<PbPNCJunction> pnc_junctions;
 
   RoadInternal() : in_junction(false) { junction_id = ""; }
 };
