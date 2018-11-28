@@ -112,10 +112,17 @@ void ScenarioManager::PrioritizeObstacles(
     bool need_consider = is_in_scan_area || is_on_lane ||
                          is_pedestrian_in_front;
 
+    // For junction scenario, need_consider if obstacle is in junction_polygon
     if (scenario_type == Scenario::JUNCTION ||
         scenario_type == Scenario::JUNCTION_TRAFFIC_LIGHT ||
         scenario_type == Scenario::JUNCTION_STOP_SIGN) {
-      bool is_in_junction = false;  // TODO(all) update
+      std::string junction_id =
+          ptr_scenario_features->scenario().junction_id();
+      std::shared_ptr<const apollo::hdmap::JunctionInfo> junction_info_ptr =
+          PredictionMap::JunctionById(junction_id);
+      CHECK_NOTNULL(junction_info_ptr);
+      bool is_in_junction =
+          junction_info_ptr->polygon().IsPointIn({obstacle_x, obstacle_y});
       need_consider = need_consider || is_in_junction;
     }
 
