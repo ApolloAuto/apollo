@@ -65,7 +65,7 @@ DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
 // Scenario
 DEFINE_double(junction_distance_threshold, 10.0, "Distance threshold "
               "to junction to consider as junction scenario");
-DEFINE_bool(enable_prioritize_obstacles, false,
+DEFINE_bool(enable_prioritize_obstacles, true,
             "If to enable the functionality to prioritize obstacles");
 DEFINE_bool(enable_junction_feature, true,
             "If to enable building junction feature for obstacles");
