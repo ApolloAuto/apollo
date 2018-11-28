@@ -112,7 +112,7 @@ class CruiseMLPEvaluator : public Evaluator {
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 23 + 5 * 9;
   static const size_t INTERACTION_FEATURE_SIZE = 8;
-  static const size_t SINGLE_LANE_FEATURE_SIZE = 5;
+  static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 20;
 
   std::shared_ptr<network::CruiseModel> go_model_ptr_;
