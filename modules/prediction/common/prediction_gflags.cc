@@ -73,6 +73,8 @@ DEFINE_bool(enable_junction_feature, false,
 // Obstacle features
 DEFINE_double(scan_length, 100.0, "The length of the obstacles scan area");
 DEFINE_double(scan_width, 12.0, "The width of the obstacles scan area");
+DEFINE_double(back_dist_ignore_ped, -2.0,
+              "Backward distance to ignore pedestrians.");
 DEFINE_uint32(cruise_historical_frame_length, 5,
               "The number of historical frames of the obstacle"
               "that the cruise model will look at.");
