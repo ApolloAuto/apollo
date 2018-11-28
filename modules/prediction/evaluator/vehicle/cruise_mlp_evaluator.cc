@@ -135,7 +135,8 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   ADEBUG << "There are " << lane_graph_ptr->lane_sequence_size()
          << " lane sequences with probabilities:";
-  // For every possible lane sequence, extract needed features.
+  // For every possible lane sequence, extract features that are needed
+  // to feed into our trained model.
   // Then compute the likelihood of the obstacle moving onto that laneseq.
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
@@ -623,7 +624,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       feature_values->push_back(relative_s_l.second);
       feature_values->push_back(relative_s_l.first);
       feature_values->push_back(relative_ang);
-      feature_values->push_back(speed * speed * lane_point.kappa());
+      // feature_values->push_back(speed * speed * lane_point.kappa());
       feature_values->push_back(lane_point.kappa());
     }
   }
@@ -641,7 +642,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
     feature_values->push_back(relative_l_new);
     feature_values->push_back(relative_s_new);
     feature_values->push_back(relative_ang_new);
-    feature_values->push_back(centri_acc_new);
+    // feature_values->push_back(centri_acc_new);
     feature_values->push_back(0.0);
 
     size = feature_values->size();
