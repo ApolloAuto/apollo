@@ -106,26 +106,3 @@ config: {
     }
   }
 }
-
-config: {
-  rule_id: STOP_SIGN
-  enabled: true
-  stop_sign {
-    stop_distance: 1.0
-    min_pass_s_distance: 3.0
-    max_stop_speed: 0.3
-    max_valid_stop_distance: 3.5
-    stop_duration : 1.0
-    watch_vehicle_max_valid_stop_speed: 0.5
-    watch_vehicle_max_valid_stop_distance: 5.0
-    wait_timeout: 8.0
-    creep {
-      enabled: true
-      creep_distance_to_stop_line: 1.5
-      stop_distance: 0.3
-      speed_limit: 1.0
-      max_valid_stop_distance: 0.4
-      min_boundary_t: 6.0
-    }
-  }
-}
