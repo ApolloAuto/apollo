@@ -33,7 +33,6 @@
 #include "modules/planning/traffic_rules/reference_line_end.h"
 #include "modules/planning/traffic_rules/rerouting.h"
 #include "modules/planning/traffic_rules/signal_light.h"
-#include "modules/planning/traffic_rules/stop_sign.h"
 
 namespace apollo {
 namespace planning {
@@ -81,10 +80,6 @@ void TrafficDecider::RegisterRules() {
   s_rule_factory.Register(TrafficRuleConfig::SIGNAL_LIGHT,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new SignalLight(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new StopSign(config);
                           });
 }
 
