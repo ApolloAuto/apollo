@@ -104,6 +104,10 @@ void ProtoOrganizer::GetRoadElements(std::vector<RoadInternal>* roads) {
       }
       proto_data_.pb_yield_signs[yield_sign.id().id()] = yield_sign;
     }
+    // pnc junctions
+    for (auto& pnc_junction : road_internal.pnc_junctions) {
+      proto_data_.pb_pnc_junctions[pnc_junction.id().id()] = pnc_junction;
+    }
   }
 }
 
@@ -123,7 +127,8 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
     if (proto_data_.pb_crosswalks.count(object_id) <= 0 &&
         proto_data_.pb_clear_areas.count(object_id) <= 0 &&
         proto_data_.pb_speed_bumps.count(object_id) <= 0 &&
-        proto_data_.pb_parking_spaces.count(object_id) <= 0) {
+        proto_data_.pb_parking_spaces.count(object_id) <= 0 &&
+        proto_data_.pb_pnc_junctions.count(object_id) <= 0) {
       continue;
     }
     PbOverlap overlap;
@@ -167,6 +172,10 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
     } else if (proto_data_.pb_parking_spaces.count(object_id)) {
       object_overlap->mutable_parking_space_overlap_info();
       proto_data_.pb_parking_spaces[object_id].add_overlap_id()->set_id(
+          overlap_id);
+    } else if (proto_data_.pb_pnc_junctions.count(object_id)) {
+      object_overlap->mutable_pnc_junction_overlap_info();
+      proto_data_.pb_pnc_junctions[object_id].add_overlap_id()->set_id(
           overlap_id);
     } else {
       AERROR << "unknown object, object id:" << object_id;
@@ -400,6 +409,9 @@ void ProtoOrganizer::OutputData(apollo::hdmap::Map* pb_map) {
   for (auto& yield_sign_pair : proto_data_.pb_yield_signs) {
     *(pb_map->add_yield()) = yield_sign_pair.second;
   }
+  for (auto& pnc_junction_pair : proto_data_.pb_pnc_junctions) {
+    *(pb_map->add_pnc_junction()) = pnc_junction_pair.second;
+  }
   for (auto& junction_pair : proto_data_.pb_junctions) {
     *(pb_map->add_junction()) = junction_pair.second;
   }
@@ -415,7 +427,8 @@ void ProtoOrganizer::OutputData(apollo::hdmap::Map* pb_map) {
         << proto_data_.pb_speed_bumps.size() << ",signals-"
         << proto_data_.pb_signals.size() << ",stop signs-"
         << proto_data_.pb_stop_signs.size() << ",yield signs-"
-        << proto_data_.pb_yield_signs.size() << ",junctions-"
+        << proto_data_.pb_yield_signs.size() << ",pnc-junctions-"
+        << proto_data_.pb_pnc_junctions.size() << ",junctions-"
         << proto_data_.pb_junctions.size() << ",overlaps-"
         << proto_data_.pb_overlaps.size();
 }

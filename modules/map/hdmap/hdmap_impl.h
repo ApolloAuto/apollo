@@ -344,9 +344,12 @@ class HDMapImpl {
                     std::vector<ClearAreaInfoConstPtr>* clear_areas) const;
   int GetSpeedBumps(const apollo::common::math::Vec2d& point, double distance,
                     std::vector<SpeedBumpInfoConstPtr>* speed_bumps) const;
-  int GetParkingSpaces(
-      const apollo::common::math::Vec2d& point, double distance,
-      std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const;
+  int GetParkingSpaces(const apollo::common::math::Vec2d& point,
+                double distance,
+                std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const;
+  int GetPNCJunctions(const apollo::common::math::Vec2d& point,
+                double distance,
+                std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const;
   int GetNearestLane(const apollo::common::math::Vec2d& point,
                      LaneInfoConstPtr* nearest_lane, double* nearest_s,
                      double* nearest_l) const;

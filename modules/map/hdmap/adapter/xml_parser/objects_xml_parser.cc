@@ -212,6 +212,40 @@ Status ObjectsXmlParser::ParseParkingSpaces(
   return Status::OK();
 }
 
+Status ObjectsXmlParser::ParsePNCJunctions(
+        const tinyxml2::XMLElement& xml_node,
+        std::vector<PbPNCJunction>* pnc_junctions) {
+  CHECK_NOTNULL(pnc_junctions);
+  const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
+  while (sub_node) {
+    std::string object_type;
+    std::string object_id;
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "type", &object_type);
+    checker += UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse object type.";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    if (object_type == "PNCJunction") {
+      PbPNCJunction pnc_junction;
+      pnc_junction.mutable_id()->set_id(object_id);
+
+      PbPolygon* polygon = pnc_junction.mutable_polygon();
+      const auto* outline_node = sub_node->FirstChildElement("outline");
+      if (outline_node == nullptr) {
+        std::string err_msg = "Error parse pnc junction outline";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      }
+      RETURN_IF_ERROR(UtilXmlParser::ParseOutline(*outline_node, polygon));
+      pnc_junctions->emplace_back(pnc_junction);
+    }
+    sub_node = sub_node->NextSiblingElement("object");
+  }
+  return Status::OK();
+}
+
 }  // namespace adapter
 }  // namespace hdmap
 }  // namespace apollo

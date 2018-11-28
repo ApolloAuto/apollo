@@ -72,6 +72,9 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       // parking_spaces
       ObjectsXmlParser::ParseParkingSpaces(
                                     *sub_node, &road_internal.parking_spaces);
+      // pnc_junctions
+      ObjectsXmlParser::ParsePNCJunctions(
+                                    *sub_node, &road_internal.pnc_junctions);
     }
 
     // signals
