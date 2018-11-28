@@ -66,9 +66,8 @@ class Angle {
    * @param value Angle in degrees
    * @return Angle object
    */
-  static Angle from_deg(double value) {
-    Angle a(std::lround(value * DEG_TO_RAW));
-    return a;
+  static Angle from_deg(const double value) {
+    return Angle(static_cast<T>(std::lround(value * DEG_TO_RAW)));
   }
 
   /**
@@ -76,9 +75,8 @@ class Angle {
    * @param value Angle in radians
    * @return Angle object
    */
-  static Angle from_rad(double value) {
-    Angle a(std::lround(value * RAD_TO_RAW));
-    return a;
+  static Angle from_rad(const double value) {
+    return Angle(static_cast<T>(std::lround(value * RAD_TO_RAW)));
   }
 
   /**
@@ -86,17 +84,24 @@ class Angle {
   * @param value Angle in degrees
   * @return Angle object
   */
-  explicit Angle(T value = 0) : value_(value) {}
+  explicit Angle(const T value = 0) : value_(value) {}
+
   /// Internal representation of pi
   static constexpr T RAW_PI = std::numeric_limits<T>::min();
+
   /// Internal representation of pi/2
-  static constexpr T RAW_PI_2 = -(std::numeric_limits<T>::min() >> 1);
+  static constexpr T RAW_PI_2 =
+      static_cast<T>(-(std::numeric_limits<T>::min() >> 1));
+
   /// Used for converting angle units
   static constexpr double DEG_TO_RAW = RAW_PI / -180.0;
+
   /// Used for converting angle units
   static constexpr double RAD_TO_RAW = RAW_PI * -M_1_PI;
+
   /// Used for converting angle units
   static constexpr double RAW_TO_DEG = -180.0 / RAW_PI;
+
   /// Used for converting angle units
   static constexpr double RAW_TO_RAD = -M_PI / RAW_PI;
 
@@ -124,7 +129,7 @@ class Angle {
    * @return Result of sum
    */
   Angle operator+=(Angle other) {
-    value_ += other.value_;
+    value_ = static_cast<T>(value_ + other.value_);
     return *this;
   }
 
@@ -134,7 +139,7 @@ class Angle {
    * @return Result of subtraction
    */
   Angle operator-=(Angle other) {
-    value_ -= other.value_;
+    value_ = static_cast<T>(value_ - other.value_);
     return *this;
   }
 
@@ -145,7 +150,7 @@ class Angle {
    */
   template <typename Scalar>
   Angle operator*=(Scalar s) {
-    value_ = std::lround(value_ * s);
+    value_ = static_cast<T>(std::lround(value_ * s));
     return *this;
   }
 
@@ -156,7 +161,7 @@ class Angle {
    */
   template <typename Scalar>
   Angle operator/=(Scalar s) {
-    value_ = std::lround(value_ / s);
+    value_ = static_cast<T>(std::lround(value_ / s));
     return *this;
   }
 
@@ -164,10 +169,10 @@ class Angle {
   T value_;
 };
 
-using Angle8 = Angle<std::int8_t>;
-using Angle16 = Angle<std::int16_t>;
-using Angle32 = Angle<std::int32_t>;
-using Angle64 = Angle<std::int64_t>;
+using Angle8 = Angle<int8_t>;
+using Angle16 = Angle<int16_t>;
+using Angle32 = Angle<int32_t>;
+using Angle64 = Angle<int64_t>;
 
 /**
  * @brief Sums two angles

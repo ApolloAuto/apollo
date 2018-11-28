@@ -37,15 +37,15 @@ cc_library(
     name = "planning_lib",
     srcs = [
         "navi_planning.cc",
+        "open_space_planning.cc",
         "planning_base.cc",
         "std_planning.cc",
-        "open_space_planning.cc",
     ],
     hdrs = [
         "navi_planning.h",
+        "open_space_planning.h",
         "planning_base.h",
         "std_planning.h",
-        "open_space_planning.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
