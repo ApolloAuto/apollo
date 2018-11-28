@@ -67,7 +67,7 @@ DEFINE_double(junction_distance_threshold, 10.0, "Distance threshold "
               "to junction to consider as junction scenario");
 DEFINE_bool(enable_prioritize_obstacles, false,
             "If to enable the functionality to prioritize obstacles");
-DEFINE_bool(enable_junction_feature, false,
+DEFINE_bool(enable_junction_feature, true,
             "If to enable building junction feature for obstacles");
 
 // Obstacle features
@@ -151,7 +151,7 @@ DEFINE_bool(adjust_velocity_by_position_shift, false,
             "adjust velocity heading to lane heading");
 DEFINE_bool(adjust_vehicle_heading_by_lane, true,
             "adjust vehicle heading by lane");
-DEFINE_double(heading_filter_param, 0.99, "heading filter parameter");
+DEFINE_double(heading_filter_param, 0.98, "heading filter parameter");
 DEFINE_uint32(max_num_lane_point, 20,
               "The maximal number of lane points to store");
 
