@@ -58,18 +58,39 @@ void ScenarioManager::PrioritizeObstacles(
     return;
   }
   const auto& scenario_type = ptr_scenario_features->scenario().type();
-  if (scenario_type == Scenario::CRUISE ||
-      scenario_type == Scenario::CRUISE_URBAN ||
-      scenario_type == Scenario::CRUISE_HIGHWAY) {
-    PrioritizeObstaclesForCruiseScenario(
-        environment_features,
-        std::dynamic_pointer_cast<CruiseScenarioFeatures>(
-            ptr_scenario_features),
-        obstacles_container);
-  } else if (scenario_type == Scenario::JUNCTION ||
-             scenario_type == Scenario::JUNCTION_TRAFFIC_LIGHT ||
-             scenario_type == Scenario::JUNCTION_STOP_SIGN) {
-    // TODO(kechxu) PrioritizeObstaclesInJunction
+  const auto& obstacle_ids =
+      obstacles_container->GetCurrentFramePredictableObstacleIds();
+  // TODO(all) build rectangular scan area
+  for (const int& obstacle_id : obstacle_ids) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr->history_size() == 0) {
+      AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
+      continue;
+    }
+    Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
+
+    bool need_consider = false;
+
+    bool is_in_scan_area = false;  // TODO(all) update by scan area
+    bool is_on_lane = obstacle_ptr->IsOnLane();
+    bool is_pedestrian_in_front = false;  // TODO(all) update
+
+    need_consider = is_in_scan_area || is_on_lane || is_pedestrian_in_front;
+
+    if (scenario_type == Scenario::JUNCTION ||
+        scenario_type == Scenario::JUNCTION_TRAFFIC_LIGHT ||
+        scenario_type == Scenario::JUNCTION_STOP_SIGN) {
+      bool is_in_junction = false;  // TODO(all) update
+      need_consider = need_consider || is_in_junction;
+    }
+
+    if (!need_consider) {
+      latest_feature_ptr->mutable_priority()->set_priority(
+            ObstaclePriority::IGNORE);
+    } else {
+      latest_feature_ptr->mutable_priority()->set_priority(
+            ObstaclePriority::NORMAL);
+    }
   }
 }
 
