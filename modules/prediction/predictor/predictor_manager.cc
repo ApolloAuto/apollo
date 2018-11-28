@@ -162,10 +162,12 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     // Checkout the logic of non-predictable in obstacle.cc
     if (obstacle != nullptr) {
       if (obstacle->ToIgnore()) {
-        ADEBUG << "Ignore obstacle[" << id << "]";
-        continue;
-      }
-      if (obstacle->IsStill()) {
+        ADEBUG << "Ignore obstacle [" << id << "]";
+        predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
+        prediction_obstacle.mutable_priority()
+            ->set_priority(ObstaclePriority::IGNORE);
+      } else if (obstacle->IsStill()) {
+        ADEBUG << "Still obstacle [" << id << "]";
         predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
       } else {
         switch (perception_obstacle.type()) {
