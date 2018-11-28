@@ -246,7 +246,8 @@ ErrorCode TransitController::EnableAutoMode() {
     return ErrorCode::OK;
   }
 
-  AINFO << "Try to COMPLETE_AUTO_DRIVE mode";
+  SetLimits();
+
   adc_motioncontrol1_10_->set_adc_cmd_autonomyrequest(
       Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
   adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
@@ -254,8 +255,7 @@ ErrorCode TransitController::EnableAutoMode() {
   adc_motioncontrol1_10_->set_adc_cmd_longitudinalcontrolmode(
       Adc_motioncontrol1_10::
           ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
-  adc_motioncontrollimits1_12_->set_adc_cmd_throttlecommandlimit(100);
-  adc_motioncontrollimits1_12_->set_adc_cmd_steerwheelanglelimit(1275);
+
   can_sender_->Update();
   set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   return ErrorCode::OK;
@@ -277,6 +277,9 @@ ErrorCode TransitController::EnableSteeringOnlyMode() {
     AINFO << "Already in AUTO_STEER_ONLY mode";
     return ErrorCode::OK;
   }
+
+  SetLimits();
+
   adc_motioncontrol1_10_->set_adc_cmd_autonomyrequest(
       Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
   adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
@@ -295,6 +298,9 @@ ErrorCode TransitController::EnableSpeedOnlyMode() {
     AINFO << "Already in AUTO_SPEED_ONLY mode";
     return ErrorCode::OK;
   }
+
+  SetLimits();
+
   adc_motioncontrol1_10_->set_adc_cmd_autonomyrequest(
       Adc_motioncontrol1_10::ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED);
   adc_motioncontrol1_10_->set_adc_cmd_steeringcontrolmode(
@@ -574,6 +580,12 @@ void TransitController::set_chassis_error_code(
 bool TransitController::CheckSafetyError(
     const ::apollo::canbus::ChassisDetail& chassis_detail) {
   return true;
+}
+
+void TransitController::SetLimits() {
+  adc_motioncontrollimits1_12_->set_adc_cmd_throttlecommandlimit(100);
+  adc_motioncontrollimits1_12_->set_adc_cmd_steerwheelanglelimit(1275);
+  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(1000);
 }
 
 }  // namespace transit
