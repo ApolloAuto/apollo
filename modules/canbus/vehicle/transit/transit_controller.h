@@ -103,7 +103,9 @@ class TransitController final : public VehicleController {
 
   void ResetProtocol();
   bool CheckChassisError();
-  bool CheckSafetyError(const canbus::ChassisDetail &chassis);
+  bool CheckSafetyError(const canbus::ChassisDetail& chassis);
+
+  void SetLimits() override;
 
  private:
   void SecurityDogThreadFunc();
