@@ -54,7 +54,8 @@ class HybridTransmitter : public Transmitter<M> {
   using HistoryPtr = std::shared_ptr<History<M>>;
 
   using TransmitterPtr = std::shared_ptr<Transmitter<M>>;
-  using TransmitterMap = std::map<OptionalMode, TransmitterPtr>;
+  using TransmitterMap =
+      std::unordered_map<OptionalMode, TransmitterPtr, std::hash<int>>;
 
   using MappingTable =
       std::unordered_map<Relation, OptionalMode, std::hash<int>>;
