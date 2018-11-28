@@ -29,6 +29,7 @@ namespace prediction {
 
 using common::adapter::AdapterConfig;
 using common::math::Vec2d;
+using apollo::perception::PerceptionObstacle;
 
 ScenarioManager::ScenarioManager() {}
 
@@ -57,6 +58,28 @@ void ScenarioManager::PrioritizeObstacles(
     AERROR << "Obstacles container pointer is a null pointer.";
     return;
   }
+
+  auto pose_container = ContainerManager::Instance()->GetContainer<
+      PoseContainer>(AdapterConfig::LOCALIZATION);
+  if (pose_container == nullptr) {
+    AERROR << "Pose container pointer is a null pointer.";
+    return;
+  }
+
+  const PerceptionObstacle* pose_obstacle_ptr =
+      pose_container->ToPerceptionObstacle();
+  if (pose_container == nullptr) {
+    AERROR << "Pose obstacle pointer is a null pointer.";
+    return;
+  }
+
+  double pose_theta = pose_obstacle_ptr->theta();
+  double pose_x = pose_obstacle_ptr->position().x();
+  double pose_y = pose_obstacle_ptr->position().y();
+
+  ADEBUG << "Get pose (" << pose_x << ", " << pose_y
+         << ", " << pose_theta << ")";
+
   const auto& scenario_type = ptr_scenario_features->scenario().type();
   const auto& obstacle_ids =
       obstacles_container->GetCurrentFramePredictableObstacleIds();
