@@ -146,7 +146,7 @@ class VehicleController {
   virtual void SetHorn(const control::ControlCommand &command) = 0;
   virtual void SetTurningSignal(const control::ControlCommand &command) = 0;
 
-  virtual void SetLimits(){};
+  virtual void SetLimits() {}
 
  protected:
   virtual Chassis::DrivingMode driving_mode();
