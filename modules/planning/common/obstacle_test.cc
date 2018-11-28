@@ -69,6 +69,29 @@ TEST(Obstacle, IsStaticObstacle) {
   EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
 }
 
+TEST(Obstacle, IsValidPerceptionObstacle) {
+  PerceptionObstacle perception_obstacle;
+  EXPECT_FALSE(Obstacle::IsValidPerceptionObstacle(perception_obstacle));
+
+  perception_obstacle.mutable_position()->set_x(2.5);
+  perception_obstacle.mutable_position()->set_y(0.5);
+  perception_obstacle.mutable_position()->set_z(0.5);
+
+  perception_obstacle.mutable_velocity()->set_x(2.5);
+  perception_obstacle.mutable_velocity()->set_y(0.5);
+  perception_obstacle.mutable_velocity()->set_z(0.5);
+  EXPECT_FALSE(Obstacle::IsValidPerceptionObstacle(perception_obstacle));
+
+  perception_obstacle.set_length(0.1);
+  EXPECT_FALSE(Obstacle::IsValidPerceptionObstacle(perception_obstacle));
+
+  perception_obstacle.set_width(0.1);
+  EXPECT_FALSE(Obstacle::IsValidPerceptionObstacle(perception_obstacle));
+
+  perception_obstacle.set_height(0.1);
+  EXPECT_TRUE(Obstacle::IsValidPerceptionObstacle(perception_obstacle));
+}
+
 class ObstacleTest : public ::testing::Test {
  public:
   virtual void SetUp() {
