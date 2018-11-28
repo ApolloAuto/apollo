@@ -143,17 +143,8 @@ bool StopSignUnprotectedScenario::IsTransferable(
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
   const double adc_distance_to_stop_sign =
       stop_sign_overlap_start_s - adc_front_edge_s;
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
-  const uint32_t time_distance = (adc_speed > FLAGS_max_stop_speed) ?
-      static_cast<uint32_t>(ceil(
-          adc_distance_to_stop_sign / adc_speed)) : 0;
   ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
-      << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s
-      << "] adc_speed[" << adc_speed
-      << "] time_distance[" << time_distance << "]";
-  ADEBUG << "IsTransferable: current: " << current_scenario.Name()
-      << "; status: " << current_scenario.GetStatus();
+      << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
@@ -161,11 +152,8 @@ bool StopSignUnprotectedScenario::IsTransferable(
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
       return (adc_distance_to_stop_sign > 0 &&
-          (adc_distance_to_stop_sign <=
-              config_.stop_sign_unprotected_config().
-                  start_stop_sign_scenario_distance() ||
-           time_distance <= config_.stop_sign_unprotected_config().
-              start_stop_sign_scenario_timer()));
+          adc_distance_to_stop_sign <= config_.stop_sign_unprotected_config().
+              start_stop_sign_scenario_distance());
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
