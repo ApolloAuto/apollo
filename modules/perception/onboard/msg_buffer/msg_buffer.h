@@ -70,7 +70,7 @@ class MsgBuffer {
 
 template <class T>
 void MsgBuffer<T>::Init(const std::string& channel, const std::string& name) {
-  int index = name.find_last_of('/');
+  int index = static_cast<int>(name.find_last_of('/'));
   if (index != -1) {
     node_name_ = name.substr(index + 1) + "_subscriber";
   } else {
@@ -122,7 +122,7 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
 
   // loop to find nearest
   double distance = DBL_MAX;
-  int idx = buffer_queue_.size() - 1;
+  int idx = static_cast<int>(buffer_queue_.size()) - 1;
   for (; idx >= 0; --idx) {
     double temp_distance = fabs(timestamp - buffer_queue_[idx].first);
     if (temp_distance >= distance) {
