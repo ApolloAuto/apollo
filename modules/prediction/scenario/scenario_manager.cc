@@ -29,6 +29,7 @@ namespace prediction {
 
 using common::adapter::AdapterConfig;
 using common::math::Vec2d;
+using common::math::Box2d;
 using apollo::perception::PerceptionObstacle;
 
 ScenarioManager::ScenarioManager() {}
@@ -80,10 +81,15 @@ void ScenarioManager::PrioritizeObstacles(
   ADEBUG << "Get pose (" << pose_x << ", " << pose_y
          << ", " << pose_theta << ")";
 
+  // Build rectangular scan_area
+  Box2d scan_box({pose_x + FLAGS_scan_length / 2.0 * std::cos(pose_theta),
+                  pose_y + FLAGS_scan_length / 2.0 * std::sin(pose_theta)},
+                  pose_theta, FLAGS_scan_length, FLAGS_scan_width);
+
   const auto& scenario_type = ptr_scenario_features->scenario().type();
   const auto& obstacle_ids =
       obstacles_container->GetCurrentFramePredictableObstacleIds();
-  // TODO(all) build rectangular scan area
+
   for (const int& obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     if (obstacle_ptr->history_size() == 0) {
@@ -91,14 +97,18 @@ void ScenarioManager::PrioritizeObstacles(
       continue;
     }
     Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
+    double obstacle_x = latest_feature_ptr->position().x();
+    double obstacle_y = latest_feature_ptr->position().y();
+    Vec2d ego_to_obstacle_vec(obstacle_x - pose_x, obstacle_y - pose_y);
+    Vec2d ego_vec = Vec2d::CreateUnitVec2d(pose_theta);
+    double s = ego_to_obstacle_vec.InnerProd(ego_vec);
 
-    bool need_consider = false;
-
-    bool is_in_scan_area = false;  // TODO(all) update by scan area
+    // Decide if we need consider this obstacle
+    bool is_in_scan_area = scan_box.IsPointIn({obstacle_x, obstacle_y});
     bool is_on_lane = obstacle_ptr->IsOnLane();
-    bool is_pedestrian_in_front = false;  // TODO(all) update
+    bool is_pedestrian_in_front = (latest_feature_ptr->type() == 3 && s > 0.0);
 
-    need_consider = is_in_scan_area || is_on_lane || is_pedestrian_in_front;
+    bool need_consider = is_in_scan_area || is_on_lane || is_pedestrian_in_front;
 
     if (scenario_type == Scenario::JUNCTION ||
         scenario_type == Scenario::JUNCTION_TRAFFIC_LIGHT ||
