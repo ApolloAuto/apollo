@@ -1,33 +1,33 @@
 standard_planning_config {
-  planner_type : PUBLIC_ROAD
-  planner_type : OPEN_SPACE
+  planner_type: PUBLIC_ROAD
+  planner_type: OPEN_SPACE
   planner_public_road_config {
-     scenario_type : LANE_FOLLOW
-     scenario_type : SIDE_PASS
-     scenario_type : STOP_SIGN_UNPROTECTED
+     scenario_type: LANE_FOLLOW
+     scenario_type: SIDE_PASS
+     scenario_type: STOP_SIGN_UNPROTECTED
   }
 }
 
-default_task_config : {
-  task_type : DECIDER_RULE_BASED_STOP
-  decider_rule_based_stop_config : {
-    crosswalk : {
-      enabled : false
-      stop_distance : 1.0
+default_task_config: {
+  task_type: DECIDER_RULE_BASED_STOP
+  decider_rule_based_stop_config: {
+    crosswalk: {
+      enabled: false
+      stop_distance: 1.0
     }
-    stop_sign : {
-      enabled : true
-      stop_distance : 1.0
+    stop_sign: {
+      enabled: true
+      stop_distance: 1.0
     }
-    traffic_light : {
-      enabled : false
-      stop_distance : 1.0
-      signal_expire_time_sec : 5.0
+    traffic_light: {
+      enabled: false
+      stop_distance: 1.0
+      signal_expire_time_sec: 5.0
     }
   }
 }
-default_task_config : {
-  task_type : QP_PIECEWISE_JERK_PATH_OPTIMIZER
+default_task_config: {
+  task_type: QP_PIECEWISE_JERK_PATH_OPTIMIZER
   qp_piecewise_jerk_path_config {
     path_resolution: 1.0
     qp_delta_s: 1.0
@@ -37,8 +37,8 @@ default_task_config : {
     path_output_resolution: 0.1
   }
 }
-default_task_config : {
-  task_type : DP_POLY_PATH_OPTIMIZER
+default_task_config: {
+  task_type: DP_POLY_PATH_OPTIMIZER
   dp_poly_path_config {
     waypoint_sampler_config {
       sample_points_num_each_level: 7
@@ -65,8 +65,8 @@ default_task_config : {
     path_end_l_cost: 1.0e4
   }
 }
-default_task_config : {
-  task_type : DP_ST_SPEED_OPTIMIZER
+default_task_config: {
+  task_type: DP_ST_SPEED_OPTIMIZER
   dp_st_speed_config {
     total_path_length: 149
     total_time: 7.0
@@ -112,8 +112,8 @@ default_task_config : {
     }
   }
 }
-default_task_config : {
-  task_type : SPEED_DECIDER
+default_task_config: {
+  task_type: SPEED_DECIDER
   dp_st_speed_config {
     total_path_length: 149
     total_time: 7.0
@@ -153,8 +153,8 @@ default_task_config : {
     }
   }
 }
-default_task_config : {
-  task_type : QP_SPLINE_ST_SPEED_OPTIMIZER
+default_task_config: {
+  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
   qp_st_speed_config {
     total_path_length: 250.0
     total_time: 7.0
@@ -205,14 +205,14 @@ default_task_config : {
     }
   }
 }
-default_task_config : {
-  task_type : SIDE_PASS_SAFETY
+default_task_config: {
+  task_type: SIDE_PASS_SAFETY
   side_pass_safety_config {
     min_obstacle_lateral_distance: 1.0
   }
 }
-default_task_config : {
-  task_type : SIDE_PASS_PATH_DECIDER
+default_task_config: {
+  task_type: SIDE_PASS_PATH_DECIDER
   side_pass_path_decider_config {
     total_path_length: 50.0
     path_resolution: 0.5
