@@ -106,7 +106,8 @@ void ScenarioManager::PrioritizeObstacles(
     // Decide if we need consider this obstacle
     bool is_in_scan_area = scan_box.IsPointIn({obstacle_x, obstacle_y});
     bool is_on_lane = obstacle_ptr->IsOnLane();
-    bool is_pedestrian_in_front = (latest_feature_ptr->type() == 3 && s > 0.0);
+    bool is_pedestrian_in_front = s > -2.0 &&
+        latest_feature_ptr->type() == PerceptionObstacle::PEDESTRIAN;
 
     bool need_consider = is_in_scan_area || is_on_lane ||
                          is_pedestrian_in_front;
