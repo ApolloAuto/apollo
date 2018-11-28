@@ -82,6 +82,7 @@ function set_lib_path() {
     source /apollo/ros/setup.bash
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/usr/local/apollo/local_integ/lib:/home/caros/secure_upgrade/depend_lib
     export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/apollo/third_party/rss/lib:$LD_LIBRARY_PATH
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
@@ -93,6 +94,7 @@ function set_lib_path() {
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib:/home/caros/secure_upgrade/depend_lib
     export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/apollo/third_party/rss/lib:$LD_LIBRARY_PATH
   fi
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
