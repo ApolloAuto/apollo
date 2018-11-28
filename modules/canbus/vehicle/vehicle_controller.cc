@@ -129,6 +129,7 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
     Throttle(control_command.throttle());
     Brake(control_command.brake());
     SetEpbBreak(control_command);
+    SetLimits();
   }
 
   if (driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE ||
