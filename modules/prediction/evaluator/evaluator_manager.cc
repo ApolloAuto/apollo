@@ -128,6 +128,10 @@ void EvaluatorManager::Run(
     if (obstacle == nullptr) {
       continue;
     }
+    if (obstacle->ToIgnore()) {
+      ADEBUG << "Ignore obstacle [" << id << "] in evaluator_manager";
+      continue;
+    }
 
     switch (perception_obstacle.type()) {
       case PerceptionObstacle::VEHICLE: {
