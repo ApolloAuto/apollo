@@ -52,6 +52,7 @@ DECLARE_bool(enable_junction_feature);
 // Obstacle features
 DECLARE_double(scan_length);
 DECLARE_double(scan_width);
+DECLARE_double(back_dist_ignore_ped);
 DECLARE_uint32(cruise_historical_frame_length);
 DECLARE_bool(enable_kf_tracking);
 DECLARE_double(max_acc);
