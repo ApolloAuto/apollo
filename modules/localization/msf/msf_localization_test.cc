@@ -14,46 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/localization/msf/msf_localization.h"
-
 #include "gtest/gtest.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/common/localization_gflags.h"
-
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
 
 namespace apollo {
 namespace localization {
+namespace msf {
 
 class MSFLocalizationTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     msf_localizatoin_.reset(new MSFLocalization());
-
-    // Setup AdapterManager.
-    AdapterManagerConfig config;
-    config.set_is_ros(false);
-    {
-      auto *sub_config = config.add_config();
-      sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-      sub_config->set_type(AdapterConfig::LOCALIZATION);
-    }
-    AdapterManager::Init(config);
   }
 
  protected:
   std::unique_ptr<MSFLocalization> msf_localizatoin_;
 };
 
-// TEST_F(MSFLocalizationTest, InitParams) {
-// FLAGS_imuant_from_gnss_conf_file = false;
-// FLAGS_imu_to_ant_offset_x = 5;
-// msf_localizatoin_->InitParams();
-// double imu_ant_offset_x =
-//     (msf_localizatoin_->localizaiton_param_).imu_to_ant_offset.offset_x;
-// ASSERT_LT(std::abs(imu_ant_offset_x - 5.0), 1e-5);
-// }
+TEST_F(MSFLocalizationTest, InitParams) {
+  FLAGS_imu_delay_time_threshold_1 = 5;
+  msf_localizatoin_->InitParams();
+  double imu_delay_time_threshold =
+      (msf_localizatoin_->localization_param_).imu_delay_time_threshold_1;
+  ASSERT_LT(std::abs(imu_delay_time_threshold - 5.0), 1e-5);
+}
 
+}  // namespace msf
 }  // namespace localization
 }  // namespace apollo

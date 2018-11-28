@@ -63,6 +63,8 @@ cc_library(
 cc_test(
     name = "localization_msf_common_util_compression_test",
     srcs = ["compression_test.cc"],
+    timeout = "short",
+    size = "small",
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "@gtest//:main"
@@ -72,6 +74,8 @@ cc_test(
 cc_test(
     name = "localization_msf_common_util_rect2d_test",
     srcs = ["rect2d_test.cc"],
+    timeout = "short",
+    size = "small",
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "@gtest//:main"
@@ -85,12 +89,23 @@ filegroup(
 
 cc_test(
     name = "localization_msf_common_system_utility_test",
-    size = "medium",
     timeout = "short",
+    size = "medium",
     srcs = ["system_utility_test.cc"],
     data = ["localization_msf_common_test_data"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
+        "@gtest//:main"
+    ]
+)
+
+cc_test(
+    name = "localization_msf_common_frame_transform_test",
+    timeout = "short",
+    size = "medium",
+    srcs = ["frame_transform_test.cc"],
+    deps = [
+        "//modules/localization/msf/common/util:localization_msf_common_util_frame_transform",
         "@gtest//:main"
     ]
 )

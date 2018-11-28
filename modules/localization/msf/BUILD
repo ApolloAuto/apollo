@@ -60,20 +60,24 @@ cc_binary(
 )
 
 
-# cc_test(
-#     name = "msf_localization_test",
-#     size = "small",
-#     srcs = [
-#         "msf_localization_test.cc",
-#     ],
-#     data = ["//modules/localization:localization_testdata"],
-#     deps = [
-#         ":msf_localization",
-#         "//cyber",
-#         "//modules/common/time",
-#         "//modules/common/util",
-#         "@gtest//:main",
-#     ],
-# )
+cc_test(
+    name = "msf_localization_test",
+    timeout = "short",
+    size = "small",
+    srcs = [
+        "msf_localization_test.cc",
+    ],
+    data = ["//modules/localization:localization_testdata"],
+    copts = [
+        "-Dprivate=public",
+    ],
+    deps = [
+        "//modules/localization/msf:msf_localization_component_lib",
+        "//cyber",
+        "//modules/common/time",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
