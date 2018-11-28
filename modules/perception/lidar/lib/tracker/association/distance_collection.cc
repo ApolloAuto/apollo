@@ -40,8 +40,8 @@ float LocationDistance(
     predicted_anchor_point;
 
   float location_dist =
-    sqrt((measure_predict_diff.head(2).cwiseProduct(
-            measure_predict_diff.head(2))).sum());
+    static_cast<float>(sqrt((measure_predict_diff.head(2).cwiseProduct(
+      measure_predict_diff.head(2))).sum()));
 
   /* NEED TO NOTICE: All the states would be collected mainly based on
    * states of tracked objects. Thus, update tracked object when you
@@ -154,7 +154,7 @@ float PointNumDistance(
 
   float point_num_dist =
     static_cast<float>(fabs(old_point_number - new_point_number)) *
-    1.0f / std::max(old_point_number, new_point_number);
+    1.0f / static_cast<float>(std::max(old_point_number, new_point_number));
 
   return point_num_dist;
 }
@@ -191,8 +191,8 @@ float CentroidShiftDistance(
     const Eigen::VectorXf& track_predict,
     const TrackedObjectConstPtr& new_object,
     const double time_diff) {
-  float dist = (last_object->barycenter.head(2) -
-      new_object->barycenter.head(2)).norm();
+  float dist = static_cast<float>((last_object->barycenter.head(2) -
+      new_object->barycenter.head(2)).norm());
   return dist;
 }
 
@@ -249,8 +249,10 @@ float BboxIouDistance(
   trans_mat(0, 1) = (old_dir.cast<double>())(1);
   trans_mat(1, 0) = -(old_dir.cast<double>())(1);
   trans_mat(1, 1) = (old_dir.cast<double>())(0);
-  Eigen::Vector2d old_center_transformed_2d = trans_mat * old_center.head(2);
-  Eigen::Vector2d new_center_transformed_2d = trans_mat * new_center.head(2);
+  Eigen::Vector2d old_center_transformed_2d =
+    trans_mat * old_center.head(2);
+  Eigen::Vector2d new_center_transformed_2d =
+    trans_mat * new_center.head(2);
   old_center(0) = old_center_transformed_2d(0);
   old_center(1) = old_center_transformed_2d(1);
   new_center(0) = new_center_transformed_2d(0);

@@ -223,12 +223,18 @@ int RadarDetectionComponent::GetCarLocalizationSpeed(
     AERROR << "Can not get car speed.";
     return false;
   }
-  (*car_linear_speed)[0] = loct_ptr->pose().linear_velocity().x();
-  (*car_linear_speed)[1] = loct_ptr->pose().linear_velocity().y();
-  (*car_linear_speed)[2] = loct_ptr->pose().linear_velocity().z();
-  (*car_angular_speed)[0] = loct_ptr->pose().angular_velocity().x();
-  (*car_angular_speed)[1] = loct_ptr->pose().angular_velocity().y();
-  (*car_angular_speed)[2] = loct_ptr->pose().angular_velocity().z();
+  (*car_linear_speed)[0] =
+    static_cast<float>(loct_ptr->pose().linear_velocity().x());
+  (*car_linear_speed)[1] =
+    static_cast<float>(loct_ptr->pose().linear_velocity().y());
+  (*car_linear_speed)[2] =
+    static_cast<float>(loct_ptr->pose().linear_velocity().z());
+  (*car_angular_speed)[0] =
+    static_cast<float>(loct_ptr->pose().angular_velocity().x());
+  (*car_angular_speed)[1] =
+    static_cast<float>(loct_ptr->pose().angular_velocity().y());
+  (*car_angular_speed)[2] =
+    static_cast<float>(loct_ptr->pose().angular_velocity().z());
 
   return true;
 }
