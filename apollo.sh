@@ -296,39 +296,78 @@ function release() {
   APOLLO_RELEASE_DIR="${RELEASE_DIR}/apollo"
   mkdir -p "${APOLLO_RELEASE_DIR}"
 
-  # Find binaries and convert from //path:target to path/target
-  BINARIES=$(bazel query "kind(cc_binary, //...)" | sed 's/^\/\///' | sed 's/:/\//')
-  # Copy binaries to release dir.
-  for BIN in ${BINARIES}; do
-    SRC_PATH="bazel-bin/${BIN}"
-    DST_PATH="${APOLLO_RELEASE_DIR}/${BIN}"
-    if [ -e "${SRC_PATH}" ]; then
-      mkdir -p "$(dirname "${DST_PATH}")"
-      cp "${SRC_PATH}" "${DST_PATH}"
-    fi
+  # cp built dynamic libraries
+  LIBS=$(find bazel-out/* -name "*.so" )
+  for LIB in ${LIBS}; do
+    cp -a --parent ${LIB} ${APOLLO_RELEASE_DIR}
+  done
+  mkdir ${APOLLO_RELEASE_DIR}/bazel-bin
+  mv ${APOLLO_RELEASE_DIR}/bazel-out/local-dbg/bin/* ${APOLLO_RELEASE_DIR}/bazel-bin/
+  rm -rf ${APOLLO_RELEASE_DIR}/bazel-out
+
+  # reset softlinks
+  cd ${APOLLO_RELEASE_DIR}/bazel-bin
+  LIST=("_solib_k8")
+  for DIR in "${LIST[@]}"; do
+    LINKS=$(find ${DIR}/* -name "*.so" -type l | sed '/.*@.*/d' | sed '/.*third_Uparty.*/d')
+    for LINK in $LINKS; do
+      LIB=$(echo $LINK | sed 's/_S/\//g' | sed 's/_U/_/g')
+      if [[ $LIB == *"_solib_k8/lib"* ]]; then
+        LIB="/apollo/bazel-bin/$(echo $LIB | awk -F "_solib_k8/lib" '{print $NF}')"
+      elif [[ $LIB == *"___"* ]]; then
+        LIB="/apollo/bazel-bin/$(echo $LIB | awk -F "___" '{print $NF}')"
+      else
+        LIB="/apollo/bazel-bin/$(echo $LIB | awk -F "apollo/" '{print $NF}')"
+      fi
+      ln -sf $LIB $LINK
+    done
+  done
+  cd -
+
+  # setup cyber binaries and convert from //path:target to path/target
+  CYBERBIN=$(bazel query "kind(cc_binary, //cyber/...)" | sed 's/^\/\///' | sed 's/:/\//' | sed '/.*.so$/d')
+  for BIN in ${CYBERBIN}; do
+    cp -P --parent "bazel-bin/${BIN}" ${APOLLO_RELEASE_DIR}
+  done
+  cp --parent "cyber/setup.bash" "${APOLLO_RELEASE_DIR}"
+  cp --parent -a "cyber/tools/cyber_launch" "${APOLLO_RELEASE_DIR}"
+  cp --parent -a "cyber/tools/cyber_tools_auto_complete.bash" "${APOLLO_RELEASE_DIR}"
+
+
+  # setup tools
+  TOOLSBIN=$(bazel query "kind(cc_binary, //modules/tools/...)" | sed 's/^\/\///' | sed 's/:/\//' | sed '/.*.so$/d')
+  for BIN in ${TOOLSBIN}; do
+    cp -P --parent "bazel-bin/${BIN}" ${APOLLO_RELEASE_DIR}
+  done
+  TOOLSPY=$(find modules/tools/* -name "*.py")
+  for PY in ${TOOLSPY}; do
+    cp -P --parent "${PY}" "${APOLLO_RELEASE_DIR}/bazel-bin"
   done
 
-  # modules data and conf
+  # modules data, conf and dag
   CONFS=$(find modules/ -name "conf")
   DATAS=$(find modules/ -name "data")
-  OTHER=("modules/tools"
-         "modules/perception/model")
+  DAGS=$(find modules/ -name "dag")
+  LAUNCHS=$(find modules/ -name "launch")
+
   rm -rf test/*
-  for conf in $CONFS; do
-    mkdir -p $APOLLO_RELEASE_DIR/$conf
-    rsync -a $conf/* $APOLLO_RELEASE_DIR/$conf
+  for CONF in $CONFS; do
+    cp -P --parent -a "${CONF}" "${APOLLO_RELEASE_DIR}"
   done
-  for data in $DATAS; do
-    mkdir -p $APOLLO_RELEASE_DIR/$data
-    if [ $data != "modules/map/data" ]; then
-      rsync -a $data/* $APOLLO_RELEASE_DIR/$data
+  for DATA in $DATAS; do
+    if [[ $DATA != *"map"* && $DATA != *"testdata"* ]]; then
+        cp -P --parent -a "${DATA}" "${APOLLO_RELEASE_DIR}"
     fi
   done
-  # Other
-  for path in "${OTHER[@]}"; do
-    mkdir -p $APOLLO_RELEASE_DIR/$path
-    rsync -a $path/* $APOLLO_RELEASE_DIR/$path
+  for DAG in $DAGS; do
+    cp -P --parent -a "${DAG}" "${APOLLO_RELEASE_DIR}"
   done
+  for LAUNCH in $LAUNCHS; do
+    cp -P --parent -a "${LAUNCH}" "${APOLLO_RELEASE_DIR}"
+  done
+  # perception model 
+  MODEL="modules/perception/model"
+  cp -P --parent -a "${MODEL}" "${APOLLO_RELEASE_DIR}"
 
   # dreamview frontend
   cp -a modules/dreamview/frontend $APOLLO_RELEASE_DIR/modules/dreamview
@@ -348,10 +387,11 @@ function release() {
   if $USE_ESD_CAN; then
     warn_proprietary_sw
   fi
-  cp -r third_party/can_card_library/*/lib/* $LIB_DIR
-  cp -r bazel-genfiles/external $LIB_DIR
+  THIRDLIBS=$(find third_party/* -name "*.so" -type f)
+  for LIB in ${THIRDLIBS}; do
+    cp -a "${LIB}" $LIB_DIR
+  done
   cp -r py_proto/modules $LIB_DIR
-  cp /apollo/bazel-apollo/bazel-out/local-opt/bin/modules/perception/cuda_util/libintegrated_cuda_util.so $LIB_DIR
 
   # doc
   cp LICENSE "${APOLLO_RELEASE_DIR}"
