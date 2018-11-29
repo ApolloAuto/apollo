@@ -101,7 +101,7 @@ void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
   (*output)(0, 0) = probability;
 
   // Step 7: Get regression result
-  if (probability < FLAGS_lane_sequence_threshold ||
+  if (probability < FLAGS_lane_sequence_threshold_cruise ||
       !FLAGS_enable_cruise_regression) {
     // TODO(kechxu) move to gflags
     (*output)(0, 1) = 10.0;

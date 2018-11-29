@@ -162,8 +162,10 @@ DEFINE_double(centripetal_acc_coeff, 0.5,
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,
             "If enable using regression in cruise model");
-DEFINE_double(lane_sequence_threshold, 0.5,
-              "Threshold for trimming lane sequence trajectories");
+DEFINE_double(lane_sequence_threshold_cruise, 0.5,
+              "Threshold for trimming lane sequence trajectories in cruise");
+DEFINE_double(lane_sequence_threshold_junction, 0.5,
+              "Threshold for trimming lane sequence trajectories in junction");
 DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
 DEFINE_bool(enable_lane_sequence_acc, false,
             "If use acceleration in lane sequence.");

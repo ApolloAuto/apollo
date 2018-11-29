@@ -91,7 +91,7 @@ void SingleLanePredictor::GenerateTrajectoryPoints(
 
   double probability = lane_sequence.probability();
   double approach_rate = FLAGS_go_approach_rate;
-  if (probability < FLAGS_lane_sequence_threshold) {
+  if (probability < FLAGS_lane_sequence_threshold_cruise) {
     approach_rate = 1.0;
   }
 
