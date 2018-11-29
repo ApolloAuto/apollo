@@ -77,7 +77,7 @@ void FunctionalSafetyMonitor::RunOnce(const double current_time) {
 
 bool FunctionalSafetyMonitor::CheckSafety() {
   // We only check safety in self driving mode.
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   if (!manager->IsInAutonomousMode()) {
     return true;
   }

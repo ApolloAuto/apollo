@@ -26,7 +26,7 @@ namespace cyber {
 namespace transport {
 
 class NotifierBase;
-using NotifierPtr = std::shared_ptr<NotifierBase>;
+using NotifierPtr = NotifierBase*;
 
 class NotifierBase {
  public:

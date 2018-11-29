@@ -30,10 +30,6 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-TEST(ShmDispatcherTest, constructor) {
-  auto dispatcher = ShmDispatcher::Instance();
-}
-
 TEST(ShmDispatcherTest, add_listener) {
   auto dispatcher = ShmDispatcher::Instance();
   RoleAttributes self_attr;

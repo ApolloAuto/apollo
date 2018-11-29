@@ -34,7 +34,7 @@ class ScenarioManagerTest : public ::testing::Test {
   }
 
  protected:
-  std::shared_ptr<ScenarioManager> manager_ = nullptr;
+  ScenarioManager* manager_ = nullptr;
 };
 
 TEST_F(ScenarioManagerTest, init) {

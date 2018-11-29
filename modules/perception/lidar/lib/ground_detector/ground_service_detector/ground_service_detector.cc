@@ -28,7 +28,7 @@ namespace lidar {
 using apollo::common::util::GetAbsolutePath;
 
 bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
-  auto& config_manager = lib::ConfigManager::Instance();
+  auto config_manager = lib::ConfigManager::Instance();
 
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));

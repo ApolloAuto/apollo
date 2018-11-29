@@ -424,7 +424,7 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
                                  std::string* proto_file,
                                  std::string* weight_file,
                                  std::string* engine_file) {
-  auto& config_manager = lib::ConfigManager::Instance();
+  auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig("CNNSegmentation", &model_config))
       << "Failed to get model config: CNNSegmentation";

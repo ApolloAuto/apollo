@@ -28,7 +28,7 @@ namespace lidar {
 bool LidarObstacleTracking::Init(
     const LidarObstacleTrackingInitOptions& options) {
   auto& sensor_name = options.sensor_name;
-  auto& config_manager = lib::ConfigManager::Instance();
+  auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
   CHECK(config_manager->GetModelConfig(Name(), &model_config));
 

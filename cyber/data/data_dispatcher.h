@@ -46,7 +46,7 @@ class DataDispatcher {
   bool Dispatch(const uint64_t channel_id, const std::shared_ptr<T>& msg);
 
  private:
-  std::shared_ptr<DataNotifier> notifier_ = DataNotifier::Instance();
+  DataNotifier* notifier_ = DataNotifier::Instance();
   std::mutex buffers_map_mutex_;
   AtomicHashMap<uint64_t, BufferVector> buffers_map_;
 

@@ -43,7 +43,7 @@ LocalizationMonitor::LocalizationMonitor()
                       FLAGS_localization_monitor_interval) {}
 
 void LocalizationMonitor::RunOnce(const double current_time) {
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   auto* component = apollo::common::util::FindOrNull(
       *manager->GetStatus()->mutable_components(),
       FLAGS_localization_component_name);

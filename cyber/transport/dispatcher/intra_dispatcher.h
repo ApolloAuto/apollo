@@ -33,7 +33,7 @@ namespace cyber {
 namespace transport {
 
 class IntraDispatcher;
-using IntraDispatcherPtr = std::shared_ptr<IntraDispatcher>;
+using IntraDispatcherPtr = IntraDispatcher*;
 
 class IntraDispatcher : public Dispatcher {
  public:

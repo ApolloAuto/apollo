@@ -25,12 +25,12 @@ namespace apollo {
 namespace cyber {
 
 TEST(TimerManagerTest, Basic) {
-  std::shared_ptr<TimerManager> tm_ = TimerManager::Instance();
-  ASSERT_EQ(tm_->IsRunning(), false);
-  tm_->Start();
-  ASSERT_EQ(tm_->IsRunning(), true);
-  tm_->Shutdown();
-  ASSERT_EQ(tm_->IsRunning(), false);
+  auto tm = TimerManager::Instance();
+  ASSERT_EQ(tm->IsRunning(), false);
+  tm->Start();
+  ASSERT_EQ(tm->IsRunning(), true);
+  tm->Shutdown();
+  ASSERT_EQ(tm->IsRunning(), false);
 }
 
 }  // namespace cyber

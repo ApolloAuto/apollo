@@ -74,7 +74,7 @@ class Timer {
 
  private:
   TimerOption timer_opt_;
-  std::shared_ptr<TimerManager> tm_ = nullptr;
+  TimerManager* tm_ = nullptr;
   uint64_t timer_id_ = 0;
 };
 

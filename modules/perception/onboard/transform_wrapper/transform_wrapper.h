@@ -92,7 +92,7 @@ class TransformWrapper {
  private:
   bool inited_ = false;
 
-  std::shared_ptr<Buffer> tf2_buffer_ = Buffer::Instance();
+  Buffer* tf2_buffer_ = Buffer::Instance();
 
   std::string sensor2novatel_tf2_frame_id_;
   std::string sensor2novatel_tf2_child_frame_id_;

@@ -47,7 +47,7 @@ ResourceMonitor::ResourceMonitor()
 }
 
 void ResourceMonitor::RunOnce(const double current_time) {
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   const auto& mode = manager->GetHMIMode();
   auto* components = manager->GetStatus()->mutable_components();
   for (const auto& iter : mode.monitored_components()) {

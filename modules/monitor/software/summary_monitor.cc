@@ -51,7 +51,7 @@ SummaryMonitor::SummaryMonitor()
 }
 
 void SummaryMonitor::RunOnce(const double current_time) {
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   auto* status = manager->GetStatus();
   // Escalate the summary status to the most severe one.
   for (auto& component : *status->mutable_components()) {
