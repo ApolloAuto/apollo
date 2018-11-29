@@ -216,7 +216,7 @@ function decide_task_dir() {
 function is_stopped_customized_path() {
   MODULE_PATH=$1
   MODULE=$2
-  NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE}/launch/${MODULE}.launch")"
+  NUM_PROCESSES="$(pgrep -c -f "modules/${MODULE_PATH}/launch/${MODULE}.launch")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
     return 1
   else
