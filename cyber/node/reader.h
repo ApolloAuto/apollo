@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/blocker/blocker.h"
 #include "cyber/common/global_data.h"
 #include "cyber/croutine/routine_factory.h"
 #include "cyber/data/data_visitor.h"
@@ -49,6 +50,7 @@ const uint32_t DEFAULT_PENDING_QUEUE_SIZE = 1;
 template <typename MessageT>
 class Reader : public ReaderBase {
  public:
+  using BlockerPtr = std::unique_ptr<blocker::Blocker<MessageT>>;
   using ReceiverPtr = std::shared_ptr<transport::Receiver<MessageT>>;
   using ChangeConnection =
       typename service_discovery::Manager::ChangeConnection;
@@ -74,8 +76,8 @@ class Reader : public ReaderBase {
   virtual uint32_t GetHistoryDepth() const;
   virtual std::shared_ptr<MessageT> GetLatestObserved() const;
   virtual std::shared_ptr<MessageT> GetOldestObserved() const;
-  virtual Iterator Begin() const { return observed_queue_.begin(); }
-  virtual Iterator End() const { return observed_queue_.end(); }
+  virtual Iterator Begin() const { return blocker_->ObservedBegin(); }
+  virtual Iterator End() const { return blocker_->ObservedEnd(); }
 
   bool HasWriter() override;
   void GetWriters(std::vector<proto::RoleAttributes>* writers) override;
@@ -94,23 +96,20 @@ class Reader : public ReaderBase {
   ReceiverPtr receiver_ = nullptr;
   std::string croutine_name_;
 
+  BlockerPtr blocker_ = nullptr;
+
   ChangeConnection change_conn_;
   service_discovery::ChannelManagerPtr channel_manager_ = nullptr;
-
-  mutable std::mutex mutex_;
-  uint32_t history_depth_;
-  std::list<std::shared_ptr<MessageT>> history_queue_;
-  std::list<std::shared_ptr<MessageT>> observed_queue_;
 };
 
 template <typename MessageT>
 Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
                          const CallbackFunc<MessageT>& reader_func,
                          uint32_t pending_queue_size)
-    : ReaderBase(role_attr),
-      reader_func_(reader_func),
-      history_depth_(role_attr.qos_profile().depth()) {
+    : ReaderBase(role_attr), reader_func_(reader_func) {
   pending_queue_size_ = pending_queue_size;
+  blocker_.reset(new blocker::Blocker<MessageT>(blocker::BlockerAttr(
+      role_attr.qos_profile().depth(), role_attr.channel_name())));
 }
 
 template <typename MessageT>
@@ -122,17 +121,12 @@ template <typename MessageT>
 void Reader<MessageT>::Enqueue(const std::shared_ptr<MessageT>& msg) {
   second_to_lastest_recv_time_sec_ = latest_recv_time_sec_;
   latest_recv_time_sec_ = Time::Now().ToSecond();
-  std::lock_guard<std::mutex> lg(mutex_);
-  history_queue_.push_front(msg);
-  while (history_queue_.size() > history_depth_) {
-    history_queue_.pop_back();
-  }
+  blocker_->Publish(msg);
 }
 
 template <typename MessageT>
 void Reader<MessageT>::Observe() {
-  std::lock_guard<std::mutex> lg(mutex_);
-  observed_queue_ = history_queue_;
+  blocker_->Observe();
 }
 
 template <typename MessageT>
@@ -231,14 +225,12 @@ void Reader<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
 
 template <typename MessageT>
 bool Reader<MessageT>::HasReceived() const {
-  std::lock_guard<std::mutex> lg(mutex_);
-  return !history_queue_.empty();
+  return !blocker_->IsPublishedEmpty();
 }
 
 template <typename MessageT>
 bool Reader<MessageT>::Empty() const {
-  std::lock_guard<std::mutex> lg(mutex_);
-  return observed_queue_.empty();
+  return blocker_->IsObservedEmpty();
 }
 
 template <typename MessageT>
@@ -260,41 +252,28 @@ uint32_t Reader<MessageT>::PendingQueueSize() const {
 
 template <typename MessageT>
 std::shared_ptr<MessageT> Reader<MessageT>::GetLatestObserved() const {
-  std::lock_guard<std::mutex> lg(mutex_);
-  if (observed_queue_.empty()) {
-    return nullptr;
-  }
-  return observed_queue_.front();
+  return blocker_->GetLatestObservedPtr();
 }
 
 template <typename MessageT>
 std::shared_ptr<MessageT> Reader<MessageT>::GetOldestObserved() const {
-  std::lock_guard<std::mutex> lg(mutex_);
-  if (observed_queue_.empty()) {
-    return nullptr;
-  }
-  return observed_queue_.back();
+  return blocker_->GetOldestObservedPtr();
 }
 
 template <typename MessageT>
 void Reader<MessageT>::ClearData() {
-  std::lock_guard<std::mutex> lg(mutex_);
-  history_queue_.clear();
-  observed_queue_.clear();
+  blocker_->ClearPublished();
+  blocker_->ClearObserved();
 }
 
 template <typename MessageT>
 void Reader<MessageT>::SetHistoryDepth(const uint32_t& depth) {
-  std::lock_guard<std::mutex> lg(mutex_);
-  history_depth_ = depth;
-  while (history_queue_.size() > history_depth_) {
-    history_queue_.pop_back();
-  }
+  blocker_->set_capacity(depth);
 }
 
 template <typename MessageT>
 uint32_t Reader<MessageT>::GetHistoryDepth() const {
-  return history_depth_;
+  return static_cast<uint32_t>(blocker_->capacity());
 }
 
 template <typename MessageT>

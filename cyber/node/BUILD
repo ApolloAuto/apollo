@@ -58,6 +58,7 @@ cc_library(
     hdrs = [ "reader.h", ],
     deps = [
         "reader_base",
+        "//cyber/blocker:blocker",
         "//cyber/common:global_data",
         "//cyber/croutine:routine_factory",
         "//cyber/data:data_visitor",
