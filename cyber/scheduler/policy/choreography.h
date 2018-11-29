@@ -32,9 +32,6 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::base::AtomicRWLock;
-using apollo::cyber::base::ReadLockGuard;
-using apollo::cyber::base::WriteLockGuard;
 using croutine::CRoutine;
 
 class ChoreographyContext : public ProcessorContext {
@@ -42,7 +39,7 @@ class ChoreographyContext : public ProcessorContext {
   std::shared_ptr<CRoutine> NextRoutine() override;
   void Wait() override;
 
-  bool Enqueue(const std::shared_ptr<CRoutine>);
+  bool Enqueue(const std::shared_ptr<CRoutine>&);
   void Notify();
 
  private:

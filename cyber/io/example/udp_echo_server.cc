@@ -25,13 +25,12 @@
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/io/session.h"
-#include "cyber/scheduler/scheduler.h"
+#include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/task/task.h"
 #include "cyber/time/time.h"
 
 using apollo::cyber::Time;
 using apollo::cyber::io::Session;
-using apollo::cyber::scheduler::Scheduler;
 
 void Echo(const std::shared_ptr<Session>& session) {
   struct sockaddr_in client_addr;
@@ -61,7 +60,7 @@ int main(int argc, char* argv[]) {
   apollo::cyber::Init(argv[0]);
 
   uint16_t server_port = static_cast<uint16_t>(atoi(argv[1]));
-  Scheduler::Instance()->CreateTask(
+  apollo::cyber::scheduler::Instance()->CreateTask(
       [&server_port]() {
         struct sockaddr_in server_addr;
         server_addr.sin_family = AF_INET;

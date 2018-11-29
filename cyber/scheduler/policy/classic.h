@@ -34,7 +34,7 @@ namespace scheduler {
 using base::AtomicRWLock;
 using croutine::CRoutine;
 
-#define MAX_PRIO 20
+constexpr uint32_t MAX_PRIO = 20;
 
 class ClassicContext : public ProcessorContext {
  public:

@@ -38,7 +38,7 @@ class Compensator {
   virtual ~Compensator() {}
 
   bool MotionCompensation(const std::shared_ptr<const PointCloud>& msg,
-                           std::shared_ptr<PointCloud> msg_compensated);
+                          std::shared_ptr<PointCloud> msg_compensated);
 
  private:
   /**
@@ -46,23 +46,23 @@ class Compensator {
    *   novatel-preprocess broadcast the tf2 transfrom.
    */
   bool QueryPoseAffineFromTF2(const uint64_t& timestamp, void* pose,
-                                  const std::string& child_frame_id);
+                              const std::string& child_frame_id);
 
   /**
    * @brief motion compensation for point cloud
    */
   void MotionCompensation(const std::shared_ptr<const PointCloud>& msg,
-                           std::shared_ptr<PointCloud> msg_compensated,
-                           const uint64_t timestamp_min,
-                           const uint64_t timestamp_max,
-                           const Eigen::Affine3d& pose_min_time,
-                           const Eigen::Affine3d& pose_max_time);
+                          std::shared_ptr<PointCloud> msg_compensated,
+                          const uint64_t timestamp_min,
+                          const uint64_t timestamp_max,
+                          const Eigen::Affine3d& pose_min_time,
+                          const Eigen::Affine3d& pose_max_time);
   /**
    * @brief get min timestamp and max timestamp from points in pointcloud2
    */
-  inline void GetTimestampInterval(
-      const std::shared_ptr<const PointCloud>& msg, uint64_t* timestamp_min,
-      uint64_t* timestamp_max);
+  inline void GetTimestampInterval(const std::shared_ptr<const PointCloud>& msg,
+                                   uint64_t* timestamp_min,
+                                   uint64_t* timestamp_max);
 
   bool IsValid(const Eigen::Vector3d& point);
 

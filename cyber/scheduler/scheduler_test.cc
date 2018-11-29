@@ -24,6 +24,7 @@
 #include "cyber/init.h"
 #include "cyber/proto/scheduler_conf.pb.h"
 #include "cyber/scheduler/processor_context.h"
+#include "cyber/scheduler/scheduler_factory.h"
 
 namespace apollo {
 namespace cyber {
@@ -33,7 +34,7 @@ void proc() {}
 
 TEST(SchedulerTest, create_task) {
   GlobalData::Instance()->SetProcessGroup("example_classic_sched");
-  auto sched = Scheduler::Instance();
+  auto sched = Instance();
   cyber::Init("scheduler_test");
   // read example_classic_sched.conf task 'ABC' prio
   std::string croutine_name = "ABC";
@@ -52,7 +53,7 @@ TEST(SchedulerTest, create_task) {
 }
 
 TEST(SchedulerTest, notify_task) {
-  auto sched = Scheduler::Instance();
+  auto sched = Instance();
   cyber::Init("scheduler_test");
   std::string name = "croutine";
   auto id = GlobalData::RegisterTaskName(name);

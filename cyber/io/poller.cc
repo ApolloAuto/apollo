@@ -23,7 +23,7 @@
 #include <unistd.h>
 
 #include "cyber/common/log.h"
-#include "cyber/scheduler/scheduler.h"
+#include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/time/time.h"
 
 namespace apollo {
@@ -33,8 +33,6 @@ namespace io {
 using base::AtomicRWLock;
 using base::ReadLockGuard;
 using base::WriteLockGuard;
-
-using cyber::scheduler::Scheduler;
 
 Poller::Poller() {
   if (!Init()) {
@@ -153,7 +151,7 @@ bool Poller::Init() {
 
   is_shutdown_.exchange(false);
   thread_ = std::thread(&Poller::ThreadFunc, this);
-  Scheduler::Instance()->SetInnerThreadAttr(&thread_, "io_poller");
+  scheduler::Instance()->SetInnerThreadAttr(&thread_, "io_poller");
   return true;
 }
 

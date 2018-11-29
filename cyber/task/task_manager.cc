@@ -19,7 +19,7 @@
 #include "cyber/common/global_data.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
-#include "cyber/scheduler/scheduler.h"
+#include "cyber/scheduler/scheduler_factory.h"
 
 namespace apollo {
 namespace cyber {
@@ -47,13 +47,13 @@ TaskManager::TaskManager()
     }
   };
 
-  auto pool_size = scheduler::Scheduler::Instance()->TaskPoolSize();
+  auto pool_size = scheduler::Instance()->TaskPoolSize();
   auto factory = croutine::CreateRoutineFactory(std::move(func));
   tasks_.reserve(pool_size);
   for (uint32_t i = 0; i < pool_size; i++) {
     auto task_name = task_prefix + std::to_string(i);
     tasks_.push_back(common::GlobalData::RegisterTaskName(task_name));
-    scheduler::Scheduler::Instance()->CreateTask(factory, task_name);
+    scheduler::Instance()->CreateTask(factory, task_name);
   }
 }
 
@@ -64,8 +64,7 @@ void TaskManager::Shutdown() {
     return;
   }
   for (uint32_t i = 0; i < num_threads_; i++) {
-    scheduler::Scheduler::Instance()->RemoveTask(task_prefix +
-                                                 std::to_string(i));
+    scheduler::Instance()->RemoveTask(task_prefix + std::to_string(i));
   }
 }
 

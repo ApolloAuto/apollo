@@ -12,10 +12,13 @@ cc_library(
 
 cc_binary(
     name = "mainboard",
-    srcs = glob([
-      "mainboard/*.cc",
-      "mainboard/*.h",
-    ]),
+    srcs = [
+      "mainboard/mainboard.cc",
+      "mainboard/module_controller.cc",
+      "mainboard/module_controller.h",
+      "mainboard/module_argument.cc",
+      "mainboard/module_argument.h",
+    ],
     copts = [
       "-pthread",
     ],
@@ -101,6 +104,7 @@ cc_library(
         "//cyber/parameter:parameter_server",
         "//cyber/record",
         "//cyber/scheduler",
+        "//cyber/scheduler:scheduler_factory",
         "//cyber/service:client",
         "//cyber/service",
         "//cyber/service_discovery:topology_manager",

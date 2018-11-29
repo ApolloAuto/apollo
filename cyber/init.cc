@@ -49,7 +49,6 @@ using apollo::cyber::scheduler::Scheduler;
 using apollo::cyber::service_discovery::TopologyManager;
 
 static bool g_atexit_registered = false;
-// TODO(hewei03): why not use simple mutex?
 static std::recursive_mutex g_mutex;
 
 static ::apollo::cyber::logger::AsyncLogger* async_logger;
@@ -106,7 +105,7 @@ void CheckSingleton() {
   // Initialize internal static objects
   CHECK_NOTNULL(transport::Transport::Instance());
   CHECK_NOTNULL(service_discovery::TopologyManager::Instance());
-  CHECK_NOTNULL(scheduler::Scheduler::Instance());
+  CHECK_NOTNULL(scheduler::Instance());
   CHECK_NOTNULL(TaskManager::Instance());
   CHECK_NOTNULL(PerfEventCache::Instance());
 }
@@ -155,12 +154,11 @@ bool Init(const char* binary_name) {
 
 void Shutdown() {
   std::lock_guard<std::recursive_mutex> lg(g_mutex);
-  // TODO(hewei): Add more safeguard on the components to shutdown.
   if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
     return;
   }
   TaskManager::Instance()->Shutdown();
-  scheduler::Scheduler::Instance()->ShutDown();
+  scheduler::Instance()->ShutDown();
   service_discovery::TopologyManager::Instance()->Shutdown();
   transport::Transport::Instance()->Shutdown();
   StopLogger();

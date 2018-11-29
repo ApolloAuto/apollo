@@ -41,7 +41,6 @@ class CRoutine {
  public:
   explicit CRoutine(const RoutineFunc &func);
   virtual ~CRoutine();
-  virtual void Routine();
 
   // static interfaces
   static void Yield();

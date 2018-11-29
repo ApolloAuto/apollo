@@ -7,9 +7,9 @@ cc_library(
     srcs = [
         "logger.cc",
     ],
-    hdrs = glob([
+    hdrs = [
         "logger.h",
-    ]),
+    ],
     deps = [
         "//cyber/base:macros",
         "//cyber/common:common",
@@ -34,14 +34,14 @@ cc_library(
     srcs = [
         "async_logger.cc",
     ],
-    hdrs = glob([
+    hdrs = [
         "async_logger.h",
-    ]),
+    ],
     deps = [
         "//cyber/base:macros",
         "//cyber/common:common",
         "//cyber/logger:log_file_object",
-        "//cyber/scheduler:scheduler",
+        "//cyber/scheduler:scheduler_factory",
     ]
 )
 
@@ -50,9 +50,9 @@ cc_library(
     srcs = [
         "log_file_object.cc",
     ],
-    hdrs = glob([
+    hdrs = [
         "log_file_object.h",
-    ]),
+    ],
     deps = [
         "//cyber:binary",
         "//cyber/common:log",
@@ -65,9 +65,9 @@ cc_library(
     srcs = [
         "logger_util.cc"
     ],
-    hdrs = glob([
+    hdrs = [
         "logger_util.h",
-    ]),
+    ],
     deps = [
         "//cyber/common:global_data",
     ]

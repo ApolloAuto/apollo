@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "cyber/base/bounded_queue.h"
-#include "cyber/scheduler/scheduler.h"
+#include "cyber/scheduler/scheduler_factory.h"
 
 namespace apollo {
 namespace cyber {
@@ -45,7 +45,7 @@ class TaskManager {
         std::bind(std::forward<F>(func), std::forward<Args>(args)...));
     task_queue_->Enqueue([task]() { (*task)(); });
     for (auto& task : tasks_) {
-      scheduler::Scheduler::Instance()->NotifyTask(task);
+      scheduler::Instance()->NotifyTask(task);
     }
     std::future<return_type> res(task->get_future());
     return res;

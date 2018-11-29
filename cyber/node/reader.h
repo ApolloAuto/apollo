@@ -31,7 +31,7 @@
 #include "cyber/data/data_visitor.h"
 #include "cyber/node/reader_base.h"
 #include "cyber/proto/topology_change.pb.h"
-#include "cyber/scheduler/scheduler.h"
+#include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/time/time.h"
 #include "cyber/transport/transport.h"
@@ -150,7 +150,7 @@ bool Reader<MessageT>::Init() {
   } else {
     func = [this](const std::shared_ptr<MessageT>& msg) { this->Enqueue(msg); };
   }
-  auto sched = scheduler::Scheduler::Instance();
+  auto sched = scheduler::Instance();
   croutine_name_ = role_attr_.node_name() + "_" + role_attr_.channel_name();
   auto dv = std::make_shared<data::DataVisitor<MessageT>>(
       role_attr_.channel_id(), pending_queue_size_);
@@ -183,7 +183,7 @@ void Reader<MessageT>::Shutdown() {
   channel_manager_ = nullptr;
 
   if (!croutine_name_.empty()) {
-    scheduler::Scheduler::Instance()->RemoveTask(croutine_name_);
+    scheduler::Instance()->RemoveTask(croutine_name_);
   }
 }
 

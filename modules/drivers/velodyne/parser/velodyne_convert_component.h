@@ -22,6 +22,7 @@
 #include <thread>
 
 #include "cyber/cyber.h"
+#include "cyber/base/concurrent_object_pool.h"
 
 #include "modules/drivers/velodyne/parser/convert.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
@@ -36,6 +37,7 @@ using apollo::cyber::Reader;
 using apollo::cyber::Writer;
 using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::VelodyneScan;
+using apollo::cyber::base::CCObjectPool;
 
 class VelodyneConvertComponent : public Component<VelodyneScan> {
  public:
@@ -45,9 +47,8 @@ class VelodyneConvertComponent : public Component<VelodyneScan> {
  private:
   std::shared_ptr<Writer<PointCloud>> writer_;
   std::unique_ptr<Convert> conv_ = nullptr;
-  std::deque<std::shared_ptr<PointCloud>> point_cloud_deque_;
-  int queue_size_ = 8;
-  int index_ = 0;
+  std::shared_ptr<CCObjectPool<PointCloud>> point_cloud_pool_ = nullptr;
+  int pool_size_ = 8;
 };
 
 CYBER_REGISTER_COMPONENT(VelodyneConvertComponent)
