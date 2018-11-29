@@ -159,6 +159,8 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 function filter() {
     target=""
     name=$(basename $1)
+    ext=$(basename##*.)
+    name="$name.$ext"
     if $is_perfect_control; then
         target="$2/${name%.*}.pc.record"
         cyber_recorder split -f $1 $(echo ${perfect_control_topic[@]} | sed 's/^\| / -c /g') -o $target
