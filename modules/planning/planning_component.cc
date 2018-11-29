@@ -72,7 +72,7 @@ bool PlanningComponent::Init() {
           pad_message_.CopyFrom(*pad_message);
         });
     relative_map_reader_ = node_->CreateReader<MapMsg>(
-        FLAGS_planning_pad_topic,
+        FLAGS_relative_map_topic,
         [this](const std::shared_ptr<MapMsg>& map_message) {
           ADEBUG << "Received relative map data: run relative map callback.";
           std::lock_guard<std::mutex> lock(mutex_);
