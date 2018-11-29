@@ -124,6 +124,11 @@ void SequencePredictor::FilterLaneSequences(
     }
   }
 
+  double lane_sequence_threshold = FLAGS_lane_sequence_threshold_cruise;
+  if (feature.has_junction_feature()) {
+    lane_sequence_threshold = FLAGS_lane_sequence_threshold_junction;
+  }
+
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
@@ -133,7 +138,7 @@ void SequencePredictor::FilterLaneSequences(
     }
 
     double probability = sequence.probability();
-    if (probability < FLAGS_lane_sequence_threshold && i != all.first) {
+    if (probability < lane_sequence_threshold && i != all.first) {
       (*enable_lane_sequence)[i] = false;
     } else if (change.first >= 0 && change.first < num_lane_sequence &&
                (lane_change_type[i] == LaneChangeType::LEFT ||

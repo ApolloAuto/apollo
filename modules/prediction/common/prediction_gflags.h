@@ -106,7 +106,8 @@ DECLARE_double(centripetal_acc_coeff);
 
 // Obstacle trajectory
 DECLARE_bool(enable_cruise_regression);
-DECLARE_double(lane_sequence_threshold);
+DECLARE_double(lane_sequence_threshold_cruise);
+DECLARE_double(lane_sequence_threshold_junction);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
