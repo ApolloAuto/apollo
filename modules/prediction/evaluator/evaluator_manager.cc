@@ -128,7 +128,7 @@ void EvaluatorManager::Run(
     if (obstacle == nullptr) {
       continue;
     }
-    if (obstacle->ToIgnore()) {
+    if (obstacle->ToIgnore() || obstacle->IsStill()) {
       ADEBUG << "Ignore obstacle [" << id << "] in evaluator_manager";
       continue;
     }
