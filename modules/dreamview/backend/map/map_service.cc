@@ -34,6 +34,7 @@ using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::Id;
 using apollo::hdmap::JunctionInfoConstPtr;
+using apollo::hdmap::Lane;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::Map;
 using apollo::hdmap::MapPathPoint;
@@ -361,6 +362,14 @@ bool MapService::ConstructLaneWayPoint(
   double s, l;
   LaneInfoConstPtr lane;
   if (!GetNearestLane(x, y, &lane, &s, &l)) {
+    return false;
+  }
+
+  if (lane->lane().type() != Lane::CITY_DRIVING) {
+    AERROR
+        << "Failed to construct LaneWayPoint for RoutingRequest: Expected lane "
+        << lane->id().id() << " to be CITY_DRIVING, but was "
+        << apollo::hdmap::Lane::LaneType_Name(lane->lane().type());
     return false;
   }
 
