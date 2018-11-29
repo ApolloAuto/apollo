@@ -64,20 +64,25 @@ bool StopSignUnprotectedIntersectionCruise::CheckPassIntersection(
   constexpr double kIntersectionLength = 10.0;  // unit: m
 
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
-  double stop_sign_oberlap_end_s = 0;
+  double stop_sign_overlap_end_s = -1;
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (GetContext()->stop_sign_id == stop_sign_overlap.object_id) {
-      stop_sign_oberlap_end_s = stop_sign_overlap.end_s;
+      stop_sign_overlap_end_s = stop_sign_overlap.end_s;
       break;
     }
   }
 
+  // that stop sign not on reference line any more
+  if (stop_sign_overlap_end_s == -1) {
+    return true;
+  }
+
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
   ADEBUG << "adc_back_edge_s[" << adc_back_edge_s
-      << "] stop_sign_overlap_end_s[" << stop_sign_oberlap_end_s << "]";
-  if (adc_back_edge_s - stop_sign_oberlap_end_s >
+      << "] stop_sign_overlap_end_s[" << stop_sign_overlap_end_s << "]";
+  if (adc_back_edge_s - stop_sign_overlap_end_s >
       kIntersectionLength) {
     return true;
   }
