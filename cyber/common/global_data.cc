@@ -60,7 +60,7 @@ GlobalData::GlobalData() {
   char* prog_path = program_path();
   if (prog_path) {
     process_group_ = GetFileName(prog_path) + "_" + std::to_string(process_id_);
-    delete prog_path;
+    free(prog_path);
   } else {
     process_group_ = "cyber_default_" + std::to_string(process_id_);
   }
@@ -165,16 +165,13 @@ bool GlobalData::InitConfig() {
 
 const CyberConfig& GlobalData::Config() const { return config_; }
 
-// TODO(fengkaiwen01) need a better error handling mechanism when collision
-// happened
 uint64_t GlobalData::RegisterNode(const std::string& node_name) {
   auto id = Hash(node_name);
   if (node_id_map_.Has(id)) {
     std::string* name = nullptr;
     node_id_map_.Get(id, &name);
-    if (node_name != *name) {
-      AERROR << "Node name collision: " << node_name << " <=> " << *name;
-    }
+    CHECK(node_name == *name) << " Node name hash collision: " << node_name
+                              << " <=> " << *name;
   }
   node_id_map_.Set(id, node_name);
   return id;
@@ -188,16 +185,13 @@ std::string GlobalData::GetNodeById(uint64_t id) {
   return empty_str_;
 }
 
-// TODO(fengkaiwen01) need a better error handling mechanism when collision
-// happened
 uint64_t GlobalData::RegisterChannel(const std::string& channel) {
   auto id = Hash(channel);
   if (channel_id_map_.Has(id)) {
     std::string* name = nullptr;
     channel_id_map_.Get(id, &name);
-    if (channel != *name) {
-      AERROR << "Channel name collision: " << channel << " <=> " << *name;
-    }
+    CHECK(channel == *name) << "Channel name hash collision: " << channel
+                            << " <=> " << *name;
   }
   channel_id_map_.Set(id, channel);
   return id;
@@ -211,16 +205,13 @@ std::string GlobalData::GetChannelById(uint64_t id) {
   return empty_str_;
 }
 
-// TODO(fengkaiwen01) need a better error handling mechanism when collision
-// happened
 uint64_t GlobalData::RegisterService(const std::string& service) {
   auto id = Hash(service);
   if (service_id_map_.Has(id)) {
     std::string* name = nullptr;
     service_id_map_.Get(id, &name);
-    if (service != *name) {
-      AERROR << "Service name collision: " << service << " <=> " << *name;
-    }
+    CHECK(service == *name) << "Service name hash collision: " << service
+                            << " <=> " << *name;
   }
   service_id_map_.Set(id, service);
   return id;
@@ -234,16 +225,13 @@ std::string GlobalData::GetServiceById(uint64_t id) {
   return empty_str_;
 }
 
-// TODO(fengkaiwen01) need a better error handling mechanism when collision
-// happened
 uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
   auto id = Hash(task_name);
   if (task_id_map_.Has(id)) {
     std::string* name = nullptr;
     task_id_map_.Get(id, &name);
-    if (task_name != *name) {
-      AERROR << "Task name collision: " << task_name << " <=> " << *name;
-    }
+    CHECK(task_name == *name) << "Task name hash collision: " << task_name
+                              << " <=> " << *name;
   }
   task_id_map_.Set(id, task_name);
   return id;

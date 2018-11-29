@@ -37,9 +37,6 @@ inline const std::string GetEnv(const std::string& var_name) {
 
 inline const std::string WorkRoot() {
   std::string work_root = GetEnv("CYBER_PATH");
-  // ensure variable CYBER_PATH has been set.
-  // TODO(fengkaiwen01) need a better error handling mechanism
-  // assert(!work_root.empty());
   if (work_root.empty()) {
     work_root = "/apollo/cyber";
   }
