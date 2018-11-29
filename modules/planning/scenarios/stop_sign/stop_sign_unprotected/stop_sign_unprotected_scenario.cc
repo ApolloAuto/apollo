@@ -151,6 +151,10 @@ bool StopSignUnprotectedScenario::IsTransferable(
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
+      if (PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.
+          object_id.empty()) {
+        return false;
+      }
       return (adc_distance_to_stop_sign > 0 &&
           adc_distance_to_stop_sign <= config_.stop_sign_unprotected_config().
               start_stop_sign_scenario_distance());

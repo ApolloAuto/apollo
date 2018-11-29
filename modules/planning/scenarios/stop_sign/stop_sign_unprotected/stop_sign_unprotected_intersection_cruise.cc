@@ -64,7 +64,7 @@ bool StopSignUnprotectedIntersectionCruise::CheckPassIntersection(
   constexpr double kIntersectionLength = 10.0;  // unit: m
 
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
-  double stop_sign_overlap_end_s = -1;
+  double stop_sign_overlap_end_s = std::numeric_limits<double>::min();
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
@@ -75,7 +75,7 @@ bool StopSignUnprotectedIntersectionCruise::CheckPassIntersection(
   }
 
   // that stop sign not on reference line any more
-  if (stop_sign_overlap_end_s == -1) {
+  if (stop_sign_overlap_end_s == std::numeric_limits<double>::min()) {
     return true;
   }
 
