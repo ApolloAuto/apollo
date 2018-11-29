@@ -277,6 +277,7 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
 
       if (!map_service_->ConstructLaneWayPoint(point["x"], point["y"],
                                                waypoint->Add())) {
+        AERROR << "Failed to construct a LaneWayPoint, skipping.";
         waypoint->RemoveLast();
       }
     }
