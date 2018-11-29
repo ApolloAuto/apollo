@@ -120,7 +120,7 @@ class TrafficLightsPerceptionComponent :
   std::string tf2_child_frame_id_;
   double tf2_timeout_second_ = 0.01;
 
-  std::shared_ptr<Buffer> tf2_buffer_ = Buffer::Instance();
+  Buffer* tf2_buffer_ = Buffer::Instance();
 
   std::vector<std::string> camera_names_;
   std::vector<std::string> input_camera_channel_names_;

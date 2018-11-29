@@ -34,7 +34,7 @@ HMMatcher::HMMatcher() { name_ = "HMMatcher"; }
 HMMatcher::~HMMatcher() {}
 
 bool HMMatcher::Init() {
-  auto& config_manager = lib::ConfigManager::Instance();
+  auto config_manager = lib::ConfigManager::Instance();
   std::string model_name = name_;
   const lib::ModelConfig *model_config = nullptr;
   AINFO << "matcher name: " << name_;

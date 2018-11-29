@@ -27,10 +27,6 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-TEST(IntraDispatcherTest, constructor) {
-  auto dispatcher = IntraDispatcher::Instance();
-}
-
 TEST(IntraDispatcherTest, on_message) {
   auto dispatcher = IntraDispatcher::Instance();
 

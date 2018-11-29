@@ -33,7 +33,7 @@ class TopologyTest : public ::testing::Test {
 
   virtual void TearDown() {}
 
-  std::shared_ptr<TopologyManager> topology_;
+  TopologyManager* topology_;
 };
 
 TEST_F(TopologyTest, add_and_remove_change_listener) {

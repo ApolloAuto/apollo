@@ -43,7 +43,7 @@ GpsMonitor::GpsMonitor() : RecurrentRunner(FLAGS_gps_monitor_name,
 }
 
 void GpsMonitor::RunOnce(const double current_time) {
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   Component* component = apollo::common::util::FindOrNull(
       *manager->GetStatus()->mutable_components(), FLAGS_gps_component_name);
   if (component == nullptr) {

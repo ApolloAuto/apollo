@@ -101,7 +101,7 @@ SocketCanMonitor::SocketCanMonitor() :
 }
 
 void SocketCanMonitor::RunOnce(const double current_time) {
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   Component* component = apollo::common::util::FindOrNull(
       *manager->GetStatus()->mutable_components(),
       FLAGS_socket_can_component_name);

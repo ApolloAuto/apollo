@@ -37,7 +37,7 @@ namespace cyber {
 namespace transport {
 
 class ShmDispatcher;
-using ShmDispatcherPtr = std::shared_ptr<ShmDispatcher>;
+using ShmDispatcherPtr = ShmDispatcher*;
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;

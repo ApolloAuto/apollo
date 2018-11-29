@@ -40,7 +40,7 @@ class ConfigManagerTest : public testing::Test {
   }
 
  protected:
-  std::shared_ptr<ConfigManager> config_manager_;
+  ConfigManager* config_manager_;
 };
 
 TEST_F(ConfigManagerTest, TestInit) {

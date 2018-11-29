@@ -31,16 +31,15 @@
   classname(const classname &) = delete;    \
   classname &operator=(const classname &) = delete;
 
-#define DECLARE_SINGLETON(classname)                                \
- public:                                                            \
-  static const std::shared_ptr<classname> &Instance() {             \
-    static auto instance =                                          \
-        std::shared_ptr<classname>(new (std::nothrow) classname()); \
-    return instance;                                                \
-  }                                                                 \
-                                                                    \
- private:                                                           \
-  classname();                                                      \
+#define DECLARE_SINGLETON(classname)                       \
+ public:                                                   \
+  static classname *Instance() {                           \
+    static auto instance = new (std::nothrow) classname(); \
+    return instance;                                       \
+  }                                                        \
+                                                           \
+ private:                                                  \
+  classname();                                             \
   DISALLOW_COPY_AND_ASSIGN(classname)
 
 #endif  // CYBER_COMMON_MACROS_H_

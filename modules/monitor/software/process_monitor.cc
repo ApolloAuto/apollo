@@ -49,7 +49,7 @@ void ProcessMonitor::RunOnce(const double current_time) {
     }
   }
 
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   const auto& mode = manager->GetHMIMode();
 
   // Check HMI modules.

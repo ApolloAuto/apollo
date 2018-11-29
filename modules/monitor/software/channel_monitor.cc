@@ -49,7 +49,7 @@ using apollo::common::util::StrCat;
 // We have to specify exact type of each channel. This function is a wrapper for
 // those only need a ReaderBase.
 std::shared_ptr<cyber::ReaderBase> GetReader(const std::string& channel) {
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   if (channel == FLAGS_control_command_topic) {
     return manager->CreateReader<control::ControlCommand>(channel);
   } else if (channel == FLAGS_localization_topic) {
@@ -81,7 +81,7 @@ ChannelMonitor::ChannelMonitor()
 }
 
 void ChannelMonitor::RunOnce(const double current_time) {
-  auto& manager = MonitorManager::Instance();
+  auto manager = MonitorManager::Instance();
   const auto& mode = manager->GetHMIMode();
   auto* components = manager->GetStatus()->mutable_components();
   for (const auto& iter : mode.monitored_components()) {

@@ -85,7 +85,7 @@ class RNNEvaluator : public Evaluator {
   static const int DIM_OBSTACLE_FEATURE = 6;
   static const int DIM_LANE_POINT_FEATURE = 4;
   static const int LENGTH_LANE_POINT_SEQUENCE = 20;
-  std::shared_ptr<network::RnnModel> model_ptr_;
+  network::RnnModel* model_ptr_ = nullptr;
 };
 
 }  // namespace prediction

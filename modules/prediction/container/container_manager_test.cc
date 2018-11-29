@@ -34,7 +34,7 @@ class ContainerManagerTest : public ::testing::Test {
   virtual void SetUp() { manager_ = ContainerManager::Instance(); }
 
  protected:
-  std::shared_ptr<ContainerManager> manager_ = nullptr;
+  ContainerManager* manager_ = nullptr;
   common::adapter::AdapterManagerConfig conf_;
 };
 

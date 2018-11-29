@@ -28,11 +28,6 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-TEST(RtpsDispatcherTest, constructor) {
-  auto dispatcher = RtpsDispatcher::Instance();
-  //   EXPECT_EQ(dispatcher->NumberOfChannel(), 0);
-}
-
 TEST(RtpsDispatcherTest, add_listener) {
   auto dispatcher = RtpsDispatcher::Instance();
   RoleAttributes self_attr;

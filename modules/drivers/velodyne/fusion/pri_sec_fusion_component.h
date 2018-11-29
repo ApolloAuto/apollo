@@ -55,7 +55,7 @@ class PriSecFusionComponent : public Component<PointCloud> {
                         const Eigen::Affine3d& pose);
 
   FusionConfig conf_;
-  std::shared_ptr<apollo::transform::Buffer> buffer_ptr_;
+  apollo::transform::Buffer* buffer_ptr_ = nullptr;
   std::shared_ptr<Writer<PointCloud>> fusion_writer_;
   std::vector<std::shared_ptr<Reader<PointCloud>>> readers_;
 };

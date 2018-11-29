@@ -66,7 +66,7 @@ class Compensator {
 
   bool IsValid(const Eigen::Vector3d& point);
 
-  std::shared_ptr<Buffer> tf2_buffer_ptr_ = transform::Buffer::Instance();
+  Buffer* tf2_buffer_ptr_ = transform::Buffer::Instance();
   CompensatorConfig config_;
 };
 
