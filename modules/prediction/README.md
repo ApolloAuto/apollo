@@ -1,46 +1,82 @@
 # Prediction
 
 ## Introduction
-  The prediction module receives obstacles from the perception module with
-  their basic perception information including positions, headings, velocities,
-  accelerations, and generates predicted trajectories with probabilities for
-  those obstacles.
+The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module. 
+Prediction receives obstacle data along with basic perception information including positions, headings, velocities, accelerations, and then generates predicted trajectories with probabilities for those obstacles.
 
+```
+Note:
+The Prediction module only predicts the behavior of obstacles and not the EGO car. The Planning module plans the trajectory of the EGO car.
+
+```
+ 
 ## Input
-  * Obstacles from the perception module
-  * Localizaton from the localization module
+  * Obstacles information from the perception module
+  * Localization information from the localization module
+  * Planning trajectory of the previous computing cycle from the planning module
 
 ## Output
-  * Obstacles annotated with predicted trajectories
+  * Obstacles annotated with predicted trajectories and their priorities. Obstacle priority is now calculated as individual scenarios are prioritized differently. The priorities include: ignore, caution and normal (default)
 
 ## Functionalities
-  * Container
 
-      Container stores input data from subscribed channels. Current supported
-      inputs are **_perception obstacles_**, **_vehicle localization_** and **_vehicle planning_**.
+Based on the figure below, the prediction module comprises of 4 main functionalities. Container, Evaluator and Predictor existed in Apollo 3.0. In Apollo 3.5, we have taken a more scenario-based approach and hence the added the Scenario functionality into our prediction process.
+![](images/prediction.png)
 
-  * Evaluator
+### Container
 
-      The Evaluator predicts path and speed separately for any given obstacle.
-      An evaluator evaluates a path by outputing a probability for it (lane
-      sequence) using the given model stored in _prediction/data/_.
+Container stores input data from subscribed channels. Current supported
+inputs are **_perception obstacles_**, **_vehicle localization_** and **_vehicle planning_**.
 
-      Three types of evaluators will be provided including:
+### Scenario
 
-      * Cost evaluator: probability is calculated by a set of cost functions
+The Scenario sub-module analyzes scenarios that includes the ego vehicle.
+Currently, we have two defined scenarios:
+- **Cruise** : this scenario includes Lane keeping and following.
+- **Junction** : this scenario involves junctions. Junctions can either have traffic lights and/or STOP signs.
 
-      * MLP evaluator: probability is calculated with an MLP model
 
-      * RNN evaluator: probability is calculated with an RNN model
+### Evaluator
 
-  * Predictor
+The Evaluator predicts path and speed separately for any given obstacle.
+An evaluator evaluates a path by outputting a probability for it (lane
+sequence) using the given model stored in _prediction/data/_.
 
-      Predictor generates predicted trajectories for obstacles. Currently
-      supported predictors include:
+There exist 5 types of evaluators, two of which were added in Apollo 3.5. As Cruise and Junction scenarios have been included, their corresponding evaluators (Cruise MLP and Junction MLP) were added as well.
 
-      * Empty: obstacles have no predicted trajectories
-      * Single lane: Obstacles move along a single lane in highway navigation mode. Obstacles not on lane will be ignored.
-      * Lane sequence: obstacle moves along the lanes
-      * Move sequence: obstacle moves along the lanes by following its kinetic pattern
-      * Free movement: obstacle moves freely
-      * Regional movement: obstacle moves in a possible region
+* **Cost evaluator**: probability is calculated by a set of cost functions
+
+* **MLP evaluator**: probability is calculated using an MLP model
+
+* **RNN evaluator**: probability is calculated using an RNN model
+
+* **Cruise MLP + CNN-1d evaluator**: probability is calculated using a mix of MLP and CNN-1d models for the cruise scenario
+
+* **Junction MLP evaluator**: probability is calculated using an MLP model for junction scenario
+
+
+### Predictor
+
+Predictor generates predicted trajectories for obstacles. Currently supported predictors include:
+
+* **Empty**: obstacles have no predicted trajectories
+* **Single lane**: Obstacles move along a single lane in highway navigation mode. Obstacles not on lane will be ignored.
+* **Lane sequence**: obstacle moves along the lanes
+* **Move sequence**: obstacle moves along the lanes by following its kinetic pattern
+* **Free movement**: obstacle moves freely
+* **Regional movement**: obstacle moves in a possible region
+* **Junction**: Obstacles move toward junction exits with high probabilities
+
+## Prediction Architecture
+
+The prediction module estimates the future motion trajectories for all perceived obstacles. The output prediction message wraps the perception information. Prediction both subscribes to and is triggered by perception obstacle messages, as shown below:
+
+![](images/architecture.png)
+
+The prediction module also takes messages from both localization and planning as input. The structure is shown below:
+
+![](images/architecture2.png)
+
+
+
+
