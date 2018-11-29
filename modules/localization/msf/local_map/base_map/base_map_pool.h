@@ -18,11 +18,9 @@
 
 #include <list>
 #include <set>
-#include <queue>
 
 #include "boost/thread.hpp"
 
-// #include "modules/localization/msf/common/util/threadpool.h"
 #include "cyber/task/task.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
@@ -84,7 +82,7 @@ class BaseMapNodePool {
   /**@brief The size of memory pool. */
   unsigned int pool_size_;
   /**@brief The thread pool for release node. */
-  std::queue<std::future<void>> node_reset_workers_;
+  std::future<void> node_reset_workers_;
   /**@brief The mutex for release thread.*/
   boost::mutex mutex_;
   /**@brief The mutex for release thread.*/
