@@ -36,7 +36,6 @@ g_process_pid = os.getpid()
 g_process_name = g_script_name + "_" + str(g_process_pid)
 
 cyber_path = os.getenv('CYBER_PATH')
-module_path = os.getenv('MODULE_PATH')
 
 """
 colorful logging
@@ -74,13 +73,6 @@ console = logging.StreamHandler()
 console.setFormatter(color_formatter)
 logger = logging.Logger(__name__)
 logger.addHandler(console)
-
-#log_dir_path = os.path.join(cyber_path, 'log')
-#if not os.path.exists(log_dir_path):
-#    os.makedirs(log_dir_path)
-#log_file_path = os.path.join(log_dir_path, 'cyber_launch.' + str(g_process_pid))
-#file_hd = logging.FileHandler(filename=log_file_path)
-#logger.addHandler(file_hd)
 
 def exit_handler():
     stop()
@@ -140,7 +132,6 @@ class ProcessWrapper(object):
                 args_list.append('-s')
                 args_list.append(self.sched_name)
 
-        # manager will block, so if success to start, there's no return
         self.args = args_list
 
         try:
@@ -293,15 +284,11 @@ def start(launch_file = ''):
     start all modules in xml config
     """
     pmon = ProcessMonitor()
-
     # find launch file
     if launch_file[0] == '/':
         launch_file = launch_file
     elif launch_file == os.path.basename(launch_file):
-        if module_path != None and os.path.exists(os.path.join(module_path, 'launch', launch_file)):
-            launch_file = os.path.join(module_path, 'launch', launch_file)
-        else:
-            launch_file = os.path.join(cyber_path, 'launch', launch_file)
+        launch_file = os.path.join(cyber_path, 'launch', launch_file)
     else:
         if os.path.exists(os.path.join(g_pwd, launch_file)):
             launch_file = os.path.join(g_pwd, launch_file)
@@ -311,7 +298,6 @@ def start(launch_file = ''):
     logger.info('Launch file   [%s] ' % launch_file)
     logger.info("=" * 120)
 
-    # set PATH in setup.sh
     binary_path = g_binary_name
 
     if not os.path.isfile(launch_file):
@@ -402,11 +388,6 @@ def start(launch_file = ''):
                 if len(process_name) == 0:
                    logger.error('Start binary failed. Binary process_name is null')
                    continue
-                if '${MODULE_PATH}' in process_name:
-                    try:
-                        process_name = process_name.replace('${MODULE_PATH}', os.environ['MODULE_PATH'])
-                    except KeyError:
-                        process_name = process_name.replace('${MODULE_PATH}', os.environ['CYBER_PATH'])
                 pw = ProcessWrapper(process_name.split()[0], 0, [""], process_name, process_type, exception_handler)
             # default is library
             else:
@@ -417,13 +398,11 @@ def start(launch_file = ''):
                 stop()
             pmon.register(pw)
             process_list.append(process_name)
-            #print process_list
 
     # no module in xml
     if not process_list:
         logger.error("No module was found in xml config.")
         return
-    # start to monitor all process
     all_died = pmon.run()
     if not all_died:
         logger.info("Stop all processes...")
@@ -455,15 +434,6 @@ def stop_launch(launch_file):
     time.sleep(3)
     logger.info('Stop cyber launch finished.')
     sys.exit(0)
-
-#def restart(launch_file):
-#    """
-#    restart all modules
-#    """
-#    stop()
-#    time.sleep(2)
-#    start(launch_file)
-#    logger.info('Restart finished.')
 
 def signal_handler(sig, frame):
     logger.info('Keyboard interrupt received. Stop all processes.')
