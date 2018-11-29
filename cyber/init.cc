@@ -157,10 +157,10 @@ void Shutdown() {
   if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
     return;
   }
-  TaskManager::Instance()->Shutdown();
+  TaskManager::CleanUp();
   scheduler::Instance()->Shutdown();
-  service_discovery::TopologyManager::Instance()->Shutdown();
-  transport::Transport::Instance()->Shutdown();
+  service_discovery::TopologyManager::CleanUp();
+  transport::Transport::CleanUp();
   StopLogger();
   SetState(STATE_SHUTDOWN);
 }

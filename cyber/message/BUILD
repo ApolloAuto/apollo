@@ -22,6 +22,7 @@ cc_library(
         "protobuf_traits",
         "py_message_traits",
         "raw_message_traits",
+        "//cyber/base:macros",
     ],
 )
 

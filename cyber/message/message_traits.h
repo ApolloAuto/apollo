@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include "cyber/base/macros.h"
 #include "cyber/message/intra_message.h"
 #include "cyber/message/protobuf_traits.h"
 #include "cyber/message/py_message_traits.h"
@@ -27,22 +28,6 @@
 namespace apollo {
 namespace cyber {
 namespace message {
-
-#define DEFINE_TYPE_TRAIT(name, func)                            \
-  template <typename T>                                          \
-  class name {                                                   \
-   private:                                                      \
-    template <typename Class>                                    \
-    static char Test(decltype(&Class::func)*);                   \
-    template <typename>                                          \
-    static int Test(...);                                        \
-                                                                 \
-   public:                                                       \
-    static constexpr bool value = sizeof(Test<T>(nullptr)) == 1; \
-  };                                                             \
-                                                                 \
-  template <typename T>                                          \
-  constexpr bool name<T>::value;
 
 DEFINE_TYPE_TRAIT(HasByteSize, ByteSize)
 DEFINE_TYPE_TRAIT(HasType, TypeName)

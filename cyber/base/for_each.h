@@ -17,6 +17,8 @@
 #ifndef CYBER_BASE_FOR_EACH_H_
 #define CYBER_BASE_FOR_EACH_H_
 
+#include <type_traits>
+
 namespace apollo {
 namespace cyber {
 namespace base {

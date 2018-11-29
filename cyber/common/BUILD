@@ -108,10 +108,25 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "macros_test",
+    size = "small",
+    srcs = [
+        "macros_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "macros",
     hdrs = [
         "macros.h",
+    ],
+    deps = [
+        "//cyber/base:macros",
     ],
 )
 
