@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Usage:
-#    restart_map_volume.sh <map_name> <map_version>
-
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -19,21 +16,19 @@
 # limitations under the License.
 ###############################################################################
 
-map_name=$1
-map_version=$2
-ARCH=$(uname -m)
+# Fail on first error.
+set -e
 
-MAP_VOLUME="apollo_map_volume-${map_name}"
-if [[ ${MAP_VOLUME_CONF} == *"${MAP_VOLUME}"* ]]; then
-  echo "Map ${map_name} has already been included!"
-else
-  docker stop ${MAP_VOLUME} > /dev/null 2>&1
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-  MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${map_version}
-  if [ "$ARCH" == 'aarch64' ]; then
-    MAP_VOLUME_IMAGE=${DOCKER_REPO}:map_volume-${map_name}-${ARCH}-${map_version}
-  fi
-  docker pull ${MAP_VOLUME_IMAGE}
-  docker run -it -d --rm --name ${MAP_VOLUME} ${MAP_VOLUME_IMAGE}
-  MAP_VOLUME_CONF="${MAP_VOLUME_CONF} --volumes-from ${MAP_VOLUME}"
-fi
+# First we need to upgrade libstdc++.so.6.0.19 to libstdc++.so.6.0.24 to be
+# compatible with the library.
+apt-get install -y --only-upgrade libstdc++
+
+wget http://www.baiduapollo.club/apollo-docker/snowboy_aarch64.tar.gz
+tar xzf snowboy_aarch64.tar.gz
+mkdir -p /usr/local/apollo
+mv snowboy /usr/local/apollo/
+
+# Clean up.
+rm -fr snowboy_aarch64.tar.gz

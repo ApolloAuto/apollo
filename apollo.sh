@@ -62,7 +62,7 @@ function check_machine_arch() {
   # the machine type, currently support x86_64, aarch64
   MACHINE_ARCH=$(uname -m)
 
-  # Generate WORKSPACE file based on marchine architecture
+  # Generate WORKSPACE file based on machine architecture
   if [ "$MACHINE_ARCH" == 'x86_64' ]; then
     sed "s/MACHINE_ARCH/x86_64/g" WORKSPACE.in > WORKSPACE
   elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
@@ -134,7 +134,7 @@ function build() {
   MACHINE_ARCH=$(uname -m)
   JOB_ARG="--jobs=$(nproc)"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
-    JOB_ARG="--jobs=3"
+    JOB_ARG="--jobs=3 --local_resources 2048,.5,1.0"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
@@ -189,7 +189,7 @@ function cibuild() {
 
   JOB_ARG="--jobs=$(nproc)"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
-    JOB_ARG="--jobs=3"
+    JOB_ARG="--jobs=3  --local_resources 2048,.5,1.0"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
@@ -715,7 +715,7 @@ function print_usage() {
   ${BLUE}build_usbcam${NONE}: build usb camera driver
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
-  ${BLUE}build_no_perception [dbg|opt]${NONE}: run build build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
+  ${BLUE}build_no_perception [dbg|opt]${NONE}: run build skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}build_prof${NONE}: build for gprof support.
   ${BLUE}build_fuzz_test${NONE}: build fuzz test cases.
   ${BLUE}buildify${NONE}: fix style of BUILD files

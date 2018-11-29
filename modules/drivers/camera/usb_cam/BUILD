@@ -12,9 +12,13 @@ cc_library(
     ],
     deps = [
         "//modules/common:log",
-        "@adv_plat//:adv_plat",
         "@ros//:ros_common",
-    ],
+    ]  + select({
+        "//tools/platforms:aarch64": [],
+        "//conditions:default": [
+            "@adv_plat//:adv_plat",
+        ],
+    }) ,
 )
 
 # cpplint()
