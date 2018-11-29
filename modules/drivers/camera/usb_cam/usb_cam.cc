@@ -53,7 +53,10 @@
 #include <ros/ros.h>
 #include <sensor_msgs/fill_image.h>
 #include <boost/lexical_cast.hpp>
+
+#ifdef __x86_64__
 #include "adv_plat/include/adv_trigger.h"
+#endif
 
 #include <iostream>
 #include <sstream>
@@ -61,6 +64,11 @@
 #include "modules/common/log.h"
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
+
+#ifndef __x86_64__
+#define ADV_TRIGGER_ENABLE    1
+#define ADV_TRIGGER_DISABLE   0
+#endif
 
 namespace apollo {
 namespace drivers {
@@ -926,11 +934,19 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string &str) {
 int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
   AINFO << "Trigger enable, dev[" << camera_dev_ << "] fps["
       << fps << "] internal[" << internal << "]";
+#ifdef __x86_64__
   return adv_trigger_enable(camera_dev_.c_str(), fps, internal);
+#else 
+   return ADV_TRIGGER_ENABLE;
+#endif
 }
 
 int UsbCam::trigger_disable() {
+#ifdef __x86_64__
   return adv_trigger_disable(camera_dev_.c_str());
+#else
+   return ADV_TRIGGER_DISABLE;
+#endif
 }
 
 }  // namespace camera
