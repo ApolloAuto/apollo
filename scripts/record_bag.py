@@ -97,13 +97,13 @@ LARGE_TOPICS = [
     '/apollo/sensor/camera/traffic/image_short',
     '/apollo/sensor/radar/front',
     '/apollo/sensor/radar/rear',
-    '/apollo/sensor/lidar16/compensator/PointCloud2',
-    '/apollo/sensor/lidar128/compensator/PointCloud2',
-    '/apollo/sensor/lidar16/rear/right//PointCloud2',
-    '/apollo/sensor/lidar16/rear/left/center/PointCloud2',
     '/apollo/sensor/lidar16/front/center/PointCloud2',
+    '/apollo/sensor/lidar16/rear/left/center/PointCloud2',
+    '/apollo/sensor/lidar16/rear/right/PointCloud2',
+    '/apollo/sensor/lidar16/compensator/PointCloud2',
     '/apollo/sensor/velodyne64/compensator/PointCloud2',
     '/apollo/sensor/lidar128/PointCloud2',
+    '/apollo/sensor/lidar128/compensator/PointCloud2',
 ]
 
 
@@ -163,7 +163,7 @@ class DiskManager(object):
             disks.append({
                 'mountpoint': disk.mountpoint,
                 'available_size': DiskManager.disk_avail_size(disk.mountpoint),
-                'is_nvme': disk.device.startswith('/dev/nvme'),
+                'is_nvme': disk.mountpoint.startswith('/media/apollo/internal_nvme'),
             })
         # Prefer NVME disks and then larger disks.
         self.disks = sorted(
