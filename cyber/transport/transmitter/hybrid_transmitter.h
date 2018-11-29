@@ -279,7 +279,7 @@ template <typename M>
 void HybridTransmitter<M>::ThreadFunc(
     const RoleAttributes& opposite_attr,
     const std::vector<typename History<M>::CachedMessage>& msgs) {
-  // create upper_reach to transmit msgs
+  // create transmitter to transmit msgs
   RoleAttributes new_attr;
   new_attr.CopyFrom(this->attr_);
   std::string new_channel_name =
@@ -287,15 +287,15 @@ void HybridTransmitter<M>::ThreadFunc(
   uint64_t channel_id = common::GlobalData::RegisterChannel(new_channel_name);
   new_attr.set_channel_name(new_channel_name);
   new_attr.set_channel_id(channel_id);
-  auto new_upper_reach =
+  auto new_transmitter =
       std::make_shared<RtpsTransmitter<M>>(new_attr, participant_);
-  new_upper_reach->Enable();
+  new_transmitter->Enable();
 
   for (auto& item : msgs) {
-    new_upper_reach->Transmit(item.msg, item.msg_info);
+    new_transmitter->Transmit(item.msg, item.msg_info);
     cyber::USleep(1000);
   }
-  new_upper_reach->Disable();
+  new_transmitter->Disable();
   ADEBUG << "trans threadfunc exit.";
 }
 
