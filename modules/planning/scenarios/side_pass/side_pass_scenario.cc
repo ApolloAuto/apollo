@@ -127,7 +127,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 }
 
 bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  return HasBlockingObstacle(frame);
+  return (IsFarFromIntersection(frame) && HasBlockingObstacle(frame));
 }
 
 bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
@@ -136,15 +136,17 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
   }
   const SLBoundary& adc_sl_boundary =
       frame.reference_line_info().front().AdcSlBoundary();
-  const auto& first_encounters =
+  const auto& first_encountered_overlaps =
       frame.reference_line_info().front().FirstEncounteredOverlaps();
   const double kClearDistance = 15.0;  // in meters
-  for (const auto& encounter : first_encounters) {
-    if (encounter.first != ReferenceLineInfo::SIGNAL ||
-        encounter.first != ReferenceLineInfo::STOP_SIGN) {
+  for (const auto& overlap : first_encountered_overlaps) {
+    if (overlap.first != ReferenceLineInfo::CROSSWALK &&
+        overlap.first != ReferenceLineInfo::SIGNAL &&
+        overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;
     }
-    if (encounter.second.start_s - adc_sl_boundary.end_s() < kClearDistance) {
+    if (overlap.second.start_s - adc_sl_boundary.end_s() < kClearDistance) {
+      ADEBUG << "too close to overlap_type[" << overlap.first << "]";
       return false;
     }
   }

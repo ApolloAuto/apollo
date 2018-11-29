@@ -125,8 +125,15 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
 }
 
 void ReferenceLineInfo::InitFirstOverlaps() {
-  double start_s = sl_boundary_info_.adc_sl_boundary_.start_s();
+  double start_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   const auto& map_path = reference_line_.map_path();
+  for (const auto& overlap : map_path.crosswalk_overlaps()) {
+    if (overlap.end_s < start_s) {
+      continue;
+    }
+    first_encounter_overlaps_.push_back({CROSSWALK, overlap});
+    break;
+  }
   for (const auto& overlap : map_path.signal_overlaps()) {
     if (overlap.end_s < start_s) {
       continue;

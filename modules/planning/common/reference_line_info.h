@@ -172,9 +172,10 @@ class ReferenceLineInfo {
 
   // different types of overlaps that can be handleded by different scenarios.
   enum OverlapType {
-    STOP_SIGN = 1,
-    SIGNAL = 2,
-    OBSTACLE = 3,
+    CROSSWALK = 1,
+    STOP_SIGN = 2,
+    SIGNAL = 3,
+    OBSTACLE = 4,
   };
 
   const std::vector<std::pair<OverlapType, hdmap::PathOverlap>>&
