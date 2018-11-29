@@ -38,7 +38,7 @@ cc_library(
         "//cyber/base:atomic_rw_lock",
         "//cyber/common:log",
         "//cyber/common:macros",
-        "//cyber/scheduler:scheduler",
+        "//cyber/scheduler:scheduler_factory",
         "//cyber/time",
     ],
 )

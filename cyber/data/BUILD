@@ -41,7 +41,8 @@ cc_library(
         "channel_buffer.h",
     ],
     deps = [
-        "data_notifier"
+        "data_notifier",
+        "//cyber/proto:component_conf_cc_proto",
     ],        
 )
 

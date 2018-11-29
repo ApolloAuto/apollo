@@ -16,13 +16,14 @@
 
 #include <gtest/gtest.h>
 
+#include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
 #include "cyber/scheduler/policy/choreography.h"
 #include "cyber/scheduler/policy/classic.h"
-#include "cyber/scheduler/processor.h"
-#include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/policy/scheduler_choreography.h"
-#include "cyber/common/global_data.h"
+#include "cyber/scheduler/policy/scheduler_classic.h"
+#include "cyber/scheduler/processor.h"
+#include "cyber/scheduler/scheduler_factory.h"
 
 namespace apollo {
 namespace cyber {

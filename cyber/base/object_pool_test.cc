@@ -25,9 +25,14 @@ namespace cyber {
 namespace base {
 
 struct TestNode {
-  TestNode() {}
-  explicit TestNode(int data) : value(data) {}
+  TestNode() : inited(true) {}
+  ~TestNode() {
+    inited = false;
+    value = 1;
+  }
+  explicit TestNode(int data) : value(data), inited(true) {}
   int value = 0;
+  bool inited = false;
 };
 
 TEST(CCObjectPoolTest, base) {
@@ -37,15 +42,15 @@ TEST(CCObjectPoolTest, base) {
   auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
 
   FOR_EACH(i, 0, capacity) {
-    auto obj = pool->GetObject(i);
+    auto obj = pool->ConstructObject(i);
     vec.push_back(obj);
     EXPECT_EQ(i, obj->value);
   }
 
-  FOR_EACH(i, 0, 10) { EXPECT_EQ(nullptr, pool->GetObject(10)); }
+  FOR_EACH(i, 0, 10) { EXPECT_EQ(nullptr, pool->ConstructObject(10)); }
 
   vec.clear();
-  EXPECT_EQ(10, pool->GetObject(10)->value);
+  EXPECT_EQ(10, pool->ConstructObject(10)->value);
 
   pool.reset();
 }
@@ -59,7 +64,7 @@ TEST(CCObjectPoolTest, multi_thread) {
   auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
   FOR_EACH(i, 0, 16) {
     thread_pool.emplace_back([pool]() {
-      FOR_EACH(i, 0, 100000) { pool->GetObject(10); }
+      FOR_EACH(i, 0, 100000) { pool->ConstructObject(10); }
     });
   }
   for (auto& thread : thread_pool) {
@@ -67,14 +72,58 @@ TEST(CCObjectPoolTest, multi_thread) {
   }
 
   FOR_EACH(i, 0, capacity) {
-    auto obj = pool->GetObject(i);
+    auto obj = pool->ConstructObject(i);
     vec.push_back(obj);
     EXPECT_EQ(i, obj->value);
   }
 
-  FOR_EACH(i, 0, 10) { EXPECT_EQ(nullptr, pool->GetObject(10)); }
+  FOR_EACH(i, 0, 10) { EXPECT_EQ(nullptr, pool->ConstructObject(10)); }
   vec.clear();
-  pool.reset();
+}
+
+TEST(CCObjectPoolTest, construct_object) {
+  const uint32_t capacity = 1024;
+  auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
+  std::vector<std::shared_ptr<TestNode>> vec;
+
+  FOR_EACH(i, 0, capacity) {
+    auto obj = pool->GetObject();
+    vec.push_back(obj);
+    EXPECT_FALSE(obj->inited);
+    EXPECT_EQ(0, obj->value);
+  }
+  vec.clear();
+
+  FOR_EACH(i, 0, capacity) {
+    auto obj = pool->ConstructObject(i);
+    vec.push_back(obj);
+    EXPECT_TRUE(obj->inited);
+    EXPECT_EQ(i, obj->value);
+  }
+  vec.clear();
+
+  // check values after destructor
+  FOR_EACH(i, 0, capacity) {
+    auto obj = pool->GetObject();
+    vec.push_back(obj);
+    EXPECT_FALSE(obj->inited);
+    EXPECT_EQ(1, obj->value);
+  }
+  vec.clear();
+}
+
+TEST(CCObjectPoolTest, construct_all) {
+  const uint32_t capacity = 1024;
+  std::vector<std::shared_ptr<TestNode>> vec;
+  auto pool = std::make_shared<CCObjectPool<TestNode>>(capacity);
+  pool->ConstructAll();
+
+  FOR_EACH(i, 0, capacity) {
+    auto obj = pool->GetObject();
+    vec.push_back(obj);
+    EXPECT_TRUE(obj->inited);
+  }
+  vec.clear();
 }
 
 TEST(ObjectPoolTest, get_object) {

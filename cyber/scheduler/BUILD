@@ -3,31 +3,109 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "scheduler",
+    name = "processor",
     srcs = [
         "processor.cc",
         "processor_context.cc",
-        "scheduler.cc",
-        "policy/scheduler_choreography.cc",
-        "policy/scheduler_classic.cc",
-        "policy/choreography.cc",
-        "policy/classic.cc",
     ],
     hdrs = [
         "processor.h",
         "processor_context.h",
-        "scheduler.h",
-        "policy/scheduler_choreography.h",
-        "policy/scheduler_classic.h",
-        "policy/choreography.h",
-        "policy/classic.h",
     ],
     deps = [
         "//cyber/croutine:croutine",
         "//cyber/data:data",
+    ],
+)
+
+cc_library(
+    name = "scheduler",
+    srcs = [
+        "scheduler.cc",
+    ],
+    hdrs = [
+        "scheduler.h",
+    ],
+    deps = [
+        "//cyber/croutine:croutine",
+        "//cyber/scheduler:processor",
+    ],
+)
+
+cc_library(
+    name = "scheduler_factory",
+    srcs = [
+        "scheduler_factory.cc",
+    ],
+    hdrs = [
+        "scheduler_factory.h",
+    ],
+    deps = [
+        "//cyber/scheduler:scheduler_choreography",
+        "//cyber/scheduler:scheduler_classic",
         "//cyber/proto:component_conf_cc_proto",
     ],
 )
+
+cc_library(
+    name = "scheduler_choreography",
+    srcs = [
+        "policy/scheduler_choreography.cc",
+    ],
+    hdrs = [
+        "policy/scheduler_choreography.h",
+    ],
+    deps = [
+        "//cyber/scheduler",
+        "//cyber/scheduler:choreography",
+        "//cyber/scheduler:classic",
+    ],
+)
+
+cc_library(
+    name = "scheduler_classic",
+    srcs = [
+        "policy/scheduler_classic.cc",
+    ],
+    hdrs = [
+        "policy/scheduler_classic.h",
+    ],
+    deps = [
+        "//cyber/scheduler",
+        "//cyber/scheduler:classic",
+    ],
+)
+
+cc_library(
+    name = "choreography",
+    srcs = [
+        "policy/choreography.cc",
+    ],
+    hdrs = [
+        "policy/choreography.h",
+    ],
+    deps = [
+        "//cyber/croutine:croutine",
+        "//cyber/scheduler:processor",
+        "//cyber/proto:choreography_conf_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "classic",
+    srcs = [
+        "policy/classic.cc",
+    ],
+    hdrs = [
+        "policy/classic.h",
+    ],
+    deps = [
+        "//cyber/croutine:croutine",
+        "//cyber/scheduler:processor",
+        "//cyber/proto:classic_conf_cc_proto",
+    ],
+)
+
 
 cc_test(
     name = "scheduler_test",
@@ -37,6 +115,7 @@ cc_test(
     ],
     deps = [
         "//cyber",
+        "//cyber/scheduler:scheduler_factory",
         "@gtest//:main",
     ],
 )
@@ -49,6 +128,7 @@ cc_test(
     ],
     deps = [
         "//cyber",
+        "//cyber/scheduler:scheduler_factory",
         "@gtest//:main",
     ],
 )

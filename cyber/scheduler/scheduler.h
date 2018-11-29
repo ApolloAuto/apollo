@@ -61,7 +61,7 @@ class Scheduler {
   void ShutDown();
 
   virtual void SetInnerThreadAttr(const std::thread* thr,
-                                  const std::string& name) = 0;
+                                  const std::string& name) {}
 
  protected:
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;

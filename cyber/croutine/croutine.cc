@@ -36,16 +36,17 @@ thread_local std::shared_ptr<RoutineContext> CRoutine::main_context_;
 
 namespace {
 std::shared_ptr<base::CCObjectPool<RoutineContext>> context_pool = nullptr;
+std::once_flag pool_init_flag;
 
 void CRoutineEntry(void *arg) {
   CRoutine *r = static_cast<CRoutine *>(arg);
   r->Run();
   CRoutine::Yield(RoutineState::FINISHED);
 }
-}  // namespace
+}
 
 CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
-  if (unlikely(context_pool == nullptr)) {
+  std::call_once(pool_init_flag, [&]() {
     auto routine_num = 100;
     auto &global_conf = common::GlobalData::Instance()->Config();
     if (global_conf.has_scheduler_conf() &&
@@ -53,11 +54,15 @@ CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
       routine_num = global_conf.scheduler_conf().routine_num();
     }
     context_pool.reset(new base::CCObjectPool<RoutineContext>(routine_num));
-  }
+  });
+
   context_ = context_pool->GetObject();
   if (context_ == nullptr) {
+    AWARN << "Maximum routine context number exceeded! Please check "
+             "[routine_num] in config file.";
     context_.reset(new RoutineContext());
   }
+
   MakeContext(CRoutineEntry, this, context_.get());
   state_ = RoutineState::READY;
   updated_.test_and_set(std::memory_order_release);
@@ -82,14 +87,8 @@ RoutineState CRoutine::Resume() {
   SwapContext(GetMainContext(), this->GetContext());
   PerfEventCache::Instance()->AddSchedEvent(
       SchedPerf::SWAP_OUT, id_, processor_id_, static_cast<int>(state_));
+  current_routine_ = nullptr;
   return state_;
-}
-
-void CRoutine::Routine() {
-  while (true) {
-    AINFO << "inner routine" << std::endl;
-    usleep(1000000);
-  }
 }
 
 void CRoutine::Stop() { force_stop_ = true; }

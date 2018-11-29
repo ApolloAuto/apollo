@@ -37,13 +37,15 @@ bool VelodyneConvertComponent::Init() {
   conv_->init(velodyne_config);
   writer_ =
       node_->CreateWriter<PointCloud>(velodyne_config.convert_channel_name());
-  for (int i = 0; i < queue_size_; ++i) {
-    point_cloud_deque_.push_back(std::make_shared<PointCloud>());
-    if (point_cloud_deque_[i] == nullptr) {
-      AERROR << "point cloud fail to make shared.";
+  point_cloud_pool_.reset(new CCObjectPool<PointCloud>(pool_size_));
+  point_cloud_pool_->ConstructAll();
+  for (int i = 0; i < pool_size_; i++) {
+    auto point_cloud = point_cloud_pool_->GetObject();
+    if (point_cloud == nullptr) {
+      AERROR << "fail to getobject, i: " << i;
       return false;
     }
-    point_cloud_deque_[i]->mutable_point()->Reserve(140000);
+    point_cloud->mutable_point()->Reserve(140000);
   }
   AINFO << "Point cloud comp convert init success";
   return true;
@@ -51,15 +53,23 @@ bool VelodyneConvertComponent::Init() {
 
 bool VelodyneConvertComponent::Proc(
     const std::shared_ptr<VelodyneScan>& scan_msg) {
-  if (index_ >= queue_size_) {
-    index_ = 0;
+  std::shared_ptr<PointCloud> point_cloud_out = point_cloud_pool_->GetObject();
+  if (point_cloud_out == nullptr) {
+    AWARN << "poin cloud pool return nullptr, will be create new.";
+    point_cloud_out = std::make_shared<PointCloud>();
+    point_cloud_out->mutable_point()->Reserve(140000);
   }
-  std::shared_ptr<PointCloud> point_cloud_out = point_cloud_deque_[index_++];
   if (point_cloud_out == nullptr) {
     AWARN << "point cloud out is nullptr";
     return false;
   }
+  AINFO << "Clear before bytes:" << point_cloud_out->ByteSize();
   point_cloud_out->Clear();
+  AINFO << "Clear after bytes:" << point_cloud_out->ByteSize();
+  AINFO << "SpaceUsedExcludingSelf: "
+        << point_cloud_out->mutable_point()->SpaceUsedExcludingSelf()
+        << ", ClearedCount:"
+        << point_cloud_out->mutable_point()->ClearedCount();
   conv_->ConvertPacketsToPointcloud(scan_msg, point_cloud_out);
 
   if (point_cloud_out == nullptr || point_cloud_out->point_size() == 0) {

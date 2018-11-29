@@ -35,8 +35,6 @@ constexpr size_t REGISTERS_SIZE = 56;
 
 typedef void (*func)(void*);
 struct RoutineContext {
-  RoutineContext() {}
-  ~RoutineContext() { memset(stack, 0, STACK_SIZE); }
   char stack[STACK_SIZE];
   char* sp = nullptr;
 };

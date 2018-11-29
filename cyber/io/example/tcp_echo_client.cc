@@ -28,7 +28,6 @@
 #include "cyber/scheduler/scheduler.h"
 
 using apollo::cyber::io::Session;
-using apollo::cyber::scheduler::Scheduler;
 
 int main(int argc, char* argv[]) {
   if (argc != 2) {
@@ -39,7 +38,7 @@ int main(int argc, char* argv[]) {
   apollo::cyber::Init(argv[0]);
 
   int server_port = atoi(argv[1]);
-  Scheduler::Instance()->CreateTask(
+  apollo::cyber::scheduler::Instance()->CreateTask(
       [&server_port]() {
         struct sockaddr_in server_addr;
         server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");

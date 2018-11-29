@@ -38,6 +38,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   if (unlikely(stop_)) {
     return nullptr;
   }
+
   for (int i = MAX_PRIO - 1; i >= 0; --i) {
     ReadLockGuard<AtomicRWLock> lk(rq_locks_[i]);
     for (auto& cr : rq_[i]) {
@@ -46,8 +47,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
       }
 
       if (cr->UpdateState() == RoutineState::READY) {
-        PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT,
-                                                  cr->id(),
+        PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
                                                   cr->processor_id());
         return cr;
       }
@@ -63,9 +63,7 @@ void ClassicContext::Wait() {
   cv_wq_.wait_for(lk, std::chrono::milliseconds(1));
 }
 
-void ClassicContext::Notify() {
-  cv_wq_.notify_one();
-}
+void ClassicContext::Notify() { cv_wq_.notify_one(); }
 
 }  // namespace scheduler
 }  // namespace cyber

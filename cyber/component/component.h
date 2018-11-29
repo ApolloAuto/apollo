@@ -110,7 +110,6 @@ bool Component<M0, NullType, NullType, NullType>::Process(
   if (is_shutdown_.load()) {
     return true;
   }
-  // TODO(hewei03): Add some protection here.
   return Proc(msg);
 }
 
@@ -182,7 +181,7 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
   auto dv = std::make_shared<data::DataVisitor<M0>>(conf);
   croutine::RoutineFactory factory =
       croutine::CreateRoutineFactory<M0>(func, dv);
-  auto sched = scheduler::Scheduler::Instance();
+  auto sched = scheduler::Instance();
   return sched->CreateTask(factory, node_->Name());
 }
 
@@ -259,7 +258,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
     return true;
   }
 
-  auto sched = scheduler::Scheduler::Instance();
+  auto sched = scheduler::Instance();
   std::weak_ptr<Component<M0, M1>> self =
       std::dynamic_pointer_cast<Component<M0, M1>>(shared_from_this());
   auto func = [self](const std::shared_ptr<M0>& msg0,
@@ -367,7 +366,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
     return true;
   }
 
-  auto sched = scheduler::Scheduler::Instance();
+  auto sched = scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, NullType>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, NullType>>(
           shared_from_this());
@@ -491,7 +490,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
     return true;
   }
 
-  auto sched = scheduler::Scheduler::Instance();
+  auto sched = scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, M3>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(shared_from_this());
   auto func = [self](

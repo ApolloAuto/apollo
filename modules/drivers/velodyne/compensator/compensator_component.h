@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "cyber/cyber.h"
+#include "cyber/base/concurrent_object_pool.h"
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/compensator/compensator.h"
@@ -32,6 +33,7 @@ using apollo::cyber::Component;
 using apollo::cyber::Reader;
 using apollo::cyber::Writer;
 using apollo::drivers::PointCloud;
+using apollo::cyber::base::CCObjectPool;
 
 class CompensatorComponent : public Component<PointCloud> {
  public:
@@ -40,11 +42,10 @@ class CompensatorComponent : public Component<PointCloud> {
 
  private:
   std::unique_ptr<Compensator> compensator_ = nullptr;
-  std::vector<std::shared_ptr<PointCloud>> compensator_deque_;
-  int queue_size_ = 8;
-  int index_ = 0;
+  int pool_size_ = 8;
   int seq_ = 0;
   std::shared_ptr<Writer<PointCloud>> writer_ = nullptr;
+  std::shared_ptr<CCObjectPool<PointCloud>> compensator_pool_ = nullptr;
 };
 
 CYBER_REGISTER_COMPONENT(CompensatorComponent)

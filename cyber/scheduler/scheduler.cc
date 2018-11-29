@@ -18,16 +18,12 @@
 
 #include <utility>
 
-#include "cyber/data/data_visitor.h"
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/util.h"
+#include "cyber/data/data_visitor.h"
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/scheduler/policy/choreography.h"
-#include "cyber/scheduler/policy/classic.h"
-#include "cyber/scheduler/policy/scheduler_choreography.h"
-#include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
 
@@ -43,37 +39,6 @@ using apollo::cyber::common::WorkRoot;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-
-Scheduler* Scheduler::Instance() {
-  static Scheduler* instance = nullptr;
-
-  if (unlikely(!instance)) {
-    std::string policy = "classic";
-
-    // Get sched policy from conf
-    std::string conf("conf/");
-    conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
-    auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
-
-    apollo::cyber::proto::CyberConfig cfg;
-    if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
-      policy = cfg.scheduler_conf().policy();
-    } else {
-      ADEBUG << "Pls make sure schedconf exist and which format is correct.\n";
-    }
-
-    if (!policy.compare(std::string("classic"))) {
-      instance = new SchedulerClassic();
-    } else if (!policy.compare(std::string("choreography"))) {
-      instance = new SchedulerChoreography();
-    } else {
-      instance = new SchedulerClassic();
-    }
-  }
-
-  return instance;
-}
-
 void Scheduler::ShutDown() {
   if (stop_.exchange(true)) {
     return;
@@ -87,8 +52,7 @@ void Scheduler::ShutDown() {
 
 bool Scheduler::CreateTask(const RoutineFactory& factory,
                            const std::string& name) {
-  return CreateTask(factory.create_routine(),
-                    name, factory.GetDataVisitor());
+  return CreateTask(factory.create_routine(), name, factory.GetDataVisitor());
 }
 
 bool Scheduler::CreateTask(std::function<void()>&& func,
@@ -127,8 +91,7 @@ bool Scheduler::NotifyTask(uint64_t crid) {
   return NotifyProcessor(crid);
 }
 
-void Scheduler::ParseCpuset(const std::string &str,
-                            std::vector<int> *cpuset) {
+void Scheduler::ParseCpuset(const std::string& str, std::vector<int>* cpuset) {
   std::vector<std::string> lines;
   std::stringstream ss(str);
   std::string l;
@@ -138,7 +101,8 @@ void Scheduler::ParseCpuset(const std::string &str,
   }
 
   for (std::vector<std::string>::const_iterator it = lines.begin(),
-       e = lines.end(); it != e; it++) {
+                                                e = lines.end();
+       it != e; it++) {
     std::stringstream ss(*it);
     std::vector<std::string> range;
 
@@ -149,8 +113,7 @@ void Scheduler::ParseCpuset(const std::string &str,
     if (range.size() == 1) {
       cpuset->push_back(std::stoi(range[0]));
     } else if (range.size() == 2) {
-      for (int i = std::stoi(range[0]),
-           e = std::stoi(range[1]); i <= e; i++) {
+      for (int i = std::stoi(range[0]), e = std::stoi(range[1]); i <= e; i++) {
         cpuset->push_back(i);
       }
     } else {

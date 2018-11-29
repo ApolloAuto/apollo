@@ -33,14 +33,15 @@ bool CompensatorComponent::Init() {
   writer_ = node_->CreateWriter<PointCloud>(config.output_channel());
 
   compensator_.reset(new Compensator(config));
-
-  for (int i = 0; i < queue_size_; ++i) {
-    compensator_deque_.push_back(std::make_shared<PointCloud>());
-    if (compensator_deque_[i] == nullptr) {
-      AERROR << "fail to make shared:" << i;
+  compensator_pool_.reset(new CCObjectPool<PointCloud>(pool_size_));
+  compensator_pool_->ConstructAll();
+  for (int i = 0; i < pool_size_; ++i) {
+    auto point_cloud = compensator_pool_->GetObject();
+    if (point_cloud == nullptr) {
+      AERROR << "fail to getobject:" << i;
       return false;
     }
-    compensator_deque_[i]->mutable_point()->Reserve(240000);
+    point_cloud->mutable_point()->Reserve(140000);
   }
   return true;
 }
@@ -48,11 +49,17 @@ bool CompensatorComponent::Init() {
 bool CompensatorComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
   uint64_t start = cyber::Time().Now().ToNanosecond();
-  if (index_ >= queue_size_) {
-    index_ = 0;
-  }
   std::shared_ptr<PointCloud> point_cloud_compensated =
-      compensator_deque_[index_++];
+      compensator_pool_->GetObject();
+  if (point_cloud_compensated == nullptr) {
+    AWARN << "compensator fail to getobject, will be new";
+    point_cloud_compensated = std::make_shared<PointCloud>();
+    point_cloud_compensated->mutable_point()->Reserve(140000);
+  }
+  if (point_cloud_compensated == nullptr) {
+    AWARN << "compensator point_cloud is nullptr";
+    return false;
+  }
   point_cloud_compensated->Clear();
   if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
     uint64_t diff = cyber::Time().Now().ToNanosecond() - start;

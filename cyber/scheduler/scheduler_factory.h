@@ -14,46 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SCHEDULER_POLICY_SCHEDULER_CLASSIC_H_
-#define CYBER_SCHEDULER_POLICY_SCHEDULER_CLASSIC_H_
+#ifndef CYBER_SCHEDULER_SCHEDULER_FACTORY_H_
+#define CYBER_SCHEDULER_SCHEDULER_FACTORY_H_
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include "cyber/croutine/croutine.h"
-#include "cyber/proto/classic_conf.pb.h"
+#include "cyber/common/environment.h"
+#include "cyber/common/file.h"
+#include "cyber/common/global_data.h"
+#include "cyber/common/util.h"
+#include "cyber/scheduler/policy/scheduler_choreography.h"
+#include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::croutine::CRoutine;
-using apollo::cyber::proto::ClassicTask;
-
-class SchedulerClassic : public Scheduler {
- public:
-  SchedulerClassic();
-
-  bool RemoveTask(const std::string& name) override;
-  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
-
- private:
-  void CreateProcessor();
-  bool NotifyProcessor(uint64_t crid) override;
-
-  std::unordered_map<std::string, ClassicTask> cr_confs_;
-
-  std::string affinity_;
-  std::vector<int> cpuset_;
-  int32_t processor_prio_;
-  std::string processor_policy_;
-};
+Scheduler* Instance();
 
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_SCHEDULER_POLICY_SCHEDULER_CLASSIC_H_
+#endif  // CYBER_SCHEDULER_SCHEDULER_FACTORY_H_

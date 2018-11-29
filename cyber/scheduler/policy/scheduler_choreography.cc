@@ -20,22 +20,25 @@
 #include <memory>
 #include <string>
 
-#include "cyber/scheduler/processor.h"
-#include "cyber/scheduler/policy/choreography.h"
-#include "cyber/scheduler/policy/classic.h"
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
+#include "cyber/scheduler/policy/choreography.h"
+#include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::croutine::RoutineState;
+using apollo::cyber::base::AtomicRWLock;
+using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::WriteLockGuard;
 using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::cyber::common::PathExists;
 using apollo::cyber::common::GetProtoFromFile;
 using apollo::cyber::common::WorkRoot;
+using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
@@ -47,27 +50,27 @@ SchedulerChoreography::SchedulerChoreography() {
 
   apollo::cyber::proto::CyberConfig cfg;
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
-    proc_num_ = cfg.scheduler_conf().choreography_conf()
-        .choreography_processor_num();
-    choreography_affinity_ = cfg.scheduler_conf().choreography_conf()
-        .choreography_affinity();
-    choreography_processor_policy_ = cfg.scheduler_conf().choreography_conf()
-        .choreography_processor_policy();
-    choreography_processor_prio_ = cfg.scheduler_conf().choreography_conf()
-        .choreography_processor_prio();
+    proc_num_ =
+        cfg.scheduler_conf().choreography_conf().choreography_processor_num();
+    choreography_affinity_ =
+        cfg.scheduler_conf().choreography_conf().choreography_affinity();
+    choreography_processor_policy_ = cfg.scheduler_conf()
+                                         .choreography_conf()
+                                         .choreography_processor_policy();
+    choreography_processor_prio_ =
+        cfg.scheduler_conf().choreography_conf().choreography_processor_prio();
     ParseCpuset(cfg.scheduler_conf().choreography_conf().choreography_cpuset(),
-        &choreography_cpuset_);
+                &choreography_cpuset_);
 
-    task_pool_size_ = cfg.scheduler_conf().choreography_conf()
-        .pool_processor_num();
-    pool_affinity_ = cfg.scheduler_conf().choreography_conf()
-        .pool_affinity();
-    pool_processor_policy_ = cfg.scheduler_conf().choreography_conf()
-        .pool_processor_policy();
-    pool_processor_prio_ = cfg.scheduler_conf().choreography_conf()
-        .pool_processor_prio();
+    task_pool_size_ =
+        cfg.scheduler_conf().choreography_conf().pool_processor_num();
+    pool_affinity_ = cfg.scheduler_conf().choreography_conf().pool_affinity();
+    pool_processor_policy_ =
+        cfg.scheduler_conf().choreography_conf().pool_processor_policy();
+    pool_processor_prio_ =
+        cfg.scheduler_conf().choreography_conf().pool_processor_prio();
     ParseCpuset(cfg.scheduler_conf().choreography_conf().pool_cpuset(),
-        &pool_cpuset_);
+                &pool_cpuset_);
 
     for (auto& thr : cfg.scheduler_conf().choreography_conf().threads()) {
       inner_thr_confs_[thr.name()] = thr;
@@ -101,7 +104,7 @@ void SchedulerChoreography::CreateProcessor() {
     proc->BindContext(ctx);
     proc->SetAffinity(choreography_cpuset_, choreography_affinity_, i);
     proc->SetSchedPolicy(choreography_processor_policy_,
-                        choreography_processor_prio_);
+                         choreography_processor_prio_);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
   }
@@ -113,8 +116,7 @@ void SchedulerChoreography::CreateProcessor() {
 
     proc->BindContext(ctx);
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
-    proc->SetSchedPolicy(pool_processor_policy_,
-                        pool_processor_prio_);
+    proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
     ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
   }
@@ -148,7 +150,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
   uint32_t pid = cr->processor_id();
   if (pid < proc_num_) {
     // Enqueue task to Choreo Policy.
-    static_cast<ChoreographyContext *>(pctxs_[pid].get())->Enqueue(cr);
+    static_cast<ChoreographyContext*>(pctxs_[pid].get())->Enqueue(cr);
   } else {
     // fallback for tasks w/o processor assigned.
 
@@ -160,8 +162,8 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
 
     // Enqueue task to pool runqueue.
     {
-      WriteLockGuard<AtomicRWLock>
-          lk(ClassicContext::rq_locks_[cr->priority()]);
+      WriteLockGuard<AtomicRWLock> lk(
+          ClassicContext::rq_locks_[cr->priority()]);
       ClassicContext::rq_[cr->priority()].emplace_back(cr);
     }
   }
@@ -225,7 +227,7 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
     return true;
   }
 
-  std::shared_ptr<CRoutine> cr = nullptr;
+  std::shared_ptr<CRoutine> cr;
   // find cr from id_cr && Update cr Flag
   // policies will handle ready-state CRoutines
   {
@@ -258,8 +260,7 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
 
 void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
                                                const std::string& name) {
-  if (inner_thr_confs_.find(name) !=
-     inner_thr_confs_.end()) {
+  if (inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
     auto th = const_cast<std::thread*>(thr);
     auto th_conf = inner_thr_confs_[name];
     auto cpuset = th_conf.cpuset();
@@ -275,7 +276,6 @@ void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
 
     auto policy = th_conf.policy();
     auto prio = th_conf.prio();
-    struct sched_param sp;
     int p;
     if (!policy.compare("SCHED_FIFO")) {
       p = SCHED_FIFO;
@@ -284,7 +284,9 @@ void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
     } else {
       return;
     }
-    memset(reinterpret_cast<void *>(&sp), 0, sizeof(sp));
+
+    struct sched_param sp;
+    memset(static_cast<void*>(&sp), 0, sizeof(sp));
     sp.sched_priority = prio;
     pthread_setschedparam(th->native_handle(), p, &sp);
   }

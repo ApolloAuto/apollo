@@ -17,7 +17,7 @@
 #include "cyber/transport/dispatcher/shm_dispatcher.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/util.h"
-#include "cyber/scheduler/scheduler.h"
+#include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/transport/shm/readable_info.h"
 
 namespace apollo {
@@ -25,7 +25,6 @@ namespace cyber {
 namespace transport {
 
 using common::GlobalData;
-using scheduler::Scheduler;
 
 ShmDispatcher::ShmDispatcher() : host_id_(0) { Init(); }
 
@@ -149,7 +148,7 @@ bool ShmDispatcher::Init() {
   host_id_ = common::Hash(GlobalData::Instance()->HostIp());
   notifier_ = NotifierFactory::CreateNotifier();
   thread_ = std::thread(&ShmDispatcher::ThreadFunc, this);
-  Scheduler::Instance()->SetInnerThreadAttr(&thread_, "shm_disp");
+  scheduler::Instance()->SetInnerThreadAttr(&thread_, "shm_disp");
   return true;
 }
 

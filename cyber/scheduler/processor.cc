@@ -16,9 +16,9 @@
 
 #include "cyber/scheduler/processor.h"
 
-#include <sys/syscall.h>
-#include <sys/resource.h>
 #include <sched.h>
+#include <sys/resource.h>
+#include <sys/syscall.h>
 #include <chrono>
 
 #include "cyber/common/global_data.h"
@@ -26,7 +26,6 @@
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_context.h"
 #include "cyber/scheduler/processor_context.h"
-#include "cyber/scheduler/scheduler.h"
 
 namespace apollo {
 namespace cyber {
@@ -101,7 +100,7 @@ void Processor::Run() {
       }
     } else {
       std::unique_lock<std::mutex> lk(mtx_ctx_);
-      cv_ctx_.wait(lk, [this]{ return this->context_ != nullptr; });
+      cv_ctx_.wait(lk, [this] { return this->context_ != nullptr; });
     }
   }
 }
