@@ -44,9 +44,9 @@ TEST_F(BaseMapPoolTestSuite, MapNodePoolTest) {
   BaseMapNode* node1 = pool.AllocMapNode();
   BaseMapNode* node2 = pool.AllocMapNode();
   BaseMapNode* node3 = pool.AllocMapNode();
-  pool.FreeMapNode(node1);
-  pool.FreeMapNode(node2);
-  pool.FreeMapNode(node3);
+  pool.FreeMapNodeTask(node1);
+  pool.FreeMapNodeTask(node2);
+  pool.FreeMapNodeTask(node3);
 
   unsigned int pool_size = pool.GetPoolSize();
   ASSERT_EQ(pool_size, 3);
