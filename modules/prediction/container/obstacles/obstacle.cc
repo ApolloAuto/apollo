@@ -192,9 +192,11 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
     }
   }
 
-  // Set obstacle lane features
-  SetCurrentLanes(&feature);
-  SetNearbyLanes(&feature);
+  if (type_ != PerceptionObstacle::PEDESTRIAN) {
+    // Set obstacle lane features
+    SetCurrentLanes(&feature);
+    SetNearbyLanes(&feature);
+  }
 
   if (FLAGS_adjust_vehicle_heading_by_lane &&
      type_ == PerceptionObstacle::VEHICLE) {
@@ -1015,6 +1017,10 @@ void Obstacle::BuildLaneGraph() {
     return;
   }
   Feature* feature = mutable_latest_feature();
+  if (feature->is_still()) {
+    ADEBUG << "Not build lane graph for still obstacle";
+    return;
+  }
   double speed = feature->speed();
   double road_graph_distance = std::max(
       speed * FLAGS_prediction_duration +
