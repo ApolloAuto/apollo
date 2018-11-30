@@ -44,10 +44,19 @@ bool CameraComponent::Init() {
   } else if (camera_config_->output_type() == RGB) {
     raw_image_->image_size = raw_image_->width * raw_image_->height * 3;
   }
+  if (raw_image_->image_size > MAX_IMAGE_SIZE) {
+    AERROR << "image size is too big ,must less than " << MAX_IMAGE_SIZE
+           << " bytes.";
+    return false;
+  }
   raw_image_->is_new = 0;
   // free memory in this struct desturctor
   raw_image_->image =
       reinterpret_cast<char*>(calloc(raw_image_->image_size, sizeof(char)));
+  if (raw_image_->image == nullptr) {
+    AERROR << "system calloc memory error, size:" << raw_image_->image_size;
+    return false;
+  }
 
   for (int i = 0; i < buffer_size_; ++i) {
     auto pb_image = std::make_shared<Image>();

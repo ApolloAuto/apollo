@@ -17,6 +17,7 @@
 #include "modules/drivers/camera/compress_component.h"
 
 #include <vector>
+#include <exception>
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -58,17 +59,22 @@ bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
   params[0] = CV_IMWRITE_JPEG_QUALITY;
   params[1] = 95;
 
-  cv::Mat mat_image(image->height(), image->width(), CV_8UC3,
-                    const_cast<char*>(image->data().data()), image->step());
-  cv::Mat tmp_mat;
-  cv::cvtColor(mat_image, tmp_mat, cv::COLOR_RGB2BGR);
-  std::vector<uint8_t> compress_buffer;
-  if (!cv::imencode(".jpg", tmp_mat, compress_buffer, params)) {
-    AERROR << "cv::imencode (jpeg) failed on input image";
+  try {
+    cv::Mat mat_image(image->height(), image->width(), CV_8UC3,
+                      const_cast<char*>(image->data().data()), image->step());
+    cv::Mat tmp_mat;
+    cv::cvtColor(mat_image, tmp_mat, cv::COLOR_RGB2BGR);
+    std::vector<uint8_t> compress_buffer;
+    if (!cv::imencode(".jpg", tmp_mat, compress_buffer, params)) {
+      AERROR << "cv::imencode (jpeg) failed on input image";
+      return false;
+    }
+    compressed_image->set_data(compress_buffer.data(), compress_buffer.size());
+    writer_->Write(compressed_image);
+  } catch(std::exception &e) {
+    AERROR << "cv::imencode (jpeg) exception :" << e.what();
     return false;
   }
-  compressed_image->set_data(compress_buffer.data(), compress_buffer.size());
-  writer_->Write(compressed_image);
   return true;
 }
 
