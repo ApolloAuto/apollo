@@ -182,10 +182,9 @@ Chassis TransitController::chassis() {
   button_pressed_ = (transit.llc_motionfeedback1_20().llc_fbk_state() ==
                      Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY);
 
-  if (motion20.has_llc_fbk_brakepressurerear()) {
+  if (motion20.has_llc_fbk_brakepercentrear()) {
     // TODO(Udelv): fix scaling
-    chassis_.set_brake_percentage(motion20.llc_fbk_brakepressurerear() / 1780 *
-                                  100);
+    chassis_.set_brake_percentage(motion20.llc_fbk_brakepercentrear() * 100);
   }
 
   if (motion20.has_llc_fbk_gear()) {
@@ -391,9 +390,9 @@ void TransitController::Brake(double pedal) {
     return;
   }
   if (button_pressed_) {
-    adc_motioncontrol1_10_->set_adc_cmd_brakepressure(pedal);
+    adc_motioncontrol1_10_->set_adc_cmd_brakepercentage(pedal);
   } else {
-    adc_motioncontrol1_10_->set_adc_cmd_brakepressure(0.0);
+    adc_motioncontrol1_10_->set_adc_cmd_brakepercentage(0.0);
   }
 }
 
