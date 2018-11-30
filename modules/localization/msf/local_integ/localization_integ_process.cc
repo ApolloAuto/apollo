@@ -145,7 +145,7 @@ void LocalizationIntegProcess::GetValidFromOK() {
 }
 
 void LocalizationIntegProcess::GetState(IntegState *state) {
-  CHECK_NOTNULL(state);
+  CHECK(state);
 
   *state = integ_state_;
   return;
@@ -153,8 +153,8 @@ void LocalizationIntegProcess::GetState(IntegState *state) {
 
 void LocalizationIntegProcess::GetResult(IntegState *state,
                                          LocalizationEstimate *localization) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(localization);
+  CHECK(state);
+  CHECK(localization);
 
   // state
   *state = integ_state_;
@@ -235,9 +235,9 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
 
 void LocalizationIntegProcess::GetResult(IntegState *state, InsPva *sins_pva,
                                          double pva_covariance[9][9]) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(sins_pva);
-  CHECK_NOTNULL(pva_covariance);
+  CHECK(state);
+  CHECK(sins_pva);
+  CHECK(pva_covariance);
 
   *state = integ_state_;
   *sins_pva = ins_pva_;
@@ -335,7 +335,7 @@ bool LocalizationIntegProcess::CheckIntegMeasureData(
 
 bool LocalizationIntegProcess::LoadGnssAntennaExtrinsic(
     const std::string &file_path, TransformD *extrinsic) const {
-  CHECK_NOTNULL(extrinsic);
+  CHECK(extrinsic);
 
   YAML::Node confige = YAML::LoadFile(file_path);
   if (confige["leverarm"]) {

@@ -60,7 +60,7 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
   if (gnss_mode_ != GnssMode::NOVATEL) {
     return false;
   }
-  CHECK_NOTNULL(measure);
+  CHECK(measure);
 
   if (!CheckBestgnssposeStatus(bestgnsspos_msg)) {
     AWARN << "Discard a bestgnsspose msg. "
@@ -113,7 +113,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
     return;
   }
 
-  CHECK_NOTNULL(measure);
+  CHECK(measure);
 
   MeasureData measure_data = gnss_local_msg;
   if (is_trans_gpstime_to_utctime_) {
@@ -263,7 +263,7 @@ void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
 
 bool MeasureRepublishProcess::LidarLocalProcess(
     const LocalizationEstimate& lidar_local_msg, MeasureData* measure) {
-  CHECK_NOTNULL(measure);
+  CHECK(measure);
 
   MeasureData measure_data;
   measure_data.time = lidar_local_msg.measurement_time();
@@ -337,7 +337,7 @@ bool MeasureRepublishProcess::IsSinsAlign() {
 
 void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
-  CHECK_NOTNULL(measure);
+  CHECK(measure);
 
   measure->time = bestgnsspos_msg.measurement_time();
   if (is_trans_gpstime_to_utctime_) {
@@ -369,7 +369,7 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
 
 void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
-  CHECK_NOTNULL(measure);
+  CHECK(measure);
 
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
 
@@ -387,7 +387,7 @@ void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
 
 bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
     const GnssBestPose& bestgnsspos_msg, MeasureData* measure) {
-  CHECK_NOTNULL(measure);
+  CHECK(measure);
 
   TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
 

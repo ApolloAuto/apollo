@@ -70,7 +70,7 @@ double CrossProduct(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2) {
 void RegionalPredictor::Predict(Obstacle* obstacle) {
   Clear();
 
-  CHECK_NOTNULL(obstacle);
+  CHECK(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();

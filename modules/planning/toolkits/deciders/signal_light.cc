@@ -146,7 +146,7 @@ void SignalLight::MakeDecisions(Frame* const frame,
 void SignalLight::SetCreepForwardSignalDecision(
     ReferenceLineInfo* const reference_line_info,
     hdmap::PathOverlap* const signal_light) const {
-  CHECK_NOTNULL(signal_light);
+  CHECK(signal_light);
 
   if (EgoInfo::instance()->start_point().v() >
       config_.signal_light().righ_turn_creep().speed_limit()) {

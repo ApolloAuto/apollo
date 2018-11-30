@@ -319,7 +319,7 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double x,
 
 bool ReferenceLine::SLToXY(const SLPoint& sl_point,
                            common::math::Vec2d* const xy_point) const {
-  CHECK_NOTNULL(xy_point);
+  CHECK(xy_point);
   if (map_path_.num_points() < 2) {
     AERROR << "The reference line has too few points.";
     return false;
@@ -334,7 +334,7 @@ bool ReferenceLine::SLToXY(const SLPoint& sl_point,
 
 bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
                            SLPoint* const sl_point) const {
-  DCHECK_NOTNULL(sl_point);
+  DCHECK(sl_point);
   double s = 0.0;
   double l = 0.0;
   if (!map_path_.GetProjection(xy_point, &s, &l)) {
@@ -425,7 +425,7 @@ bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
 
 void ReferenceLine::GetLaneFromS(
     const double s, std::vector<hdmap::LaneInfoConstPtr>* lanes) const {
-  CHECK_NOTNULL(lanes);
+  CHECK(lanes);
   auto ref_point = GetReferencePoint(s);
   std::unordered_set<hdmap::LaneInfoConstPtr> lane_set;
   for (auto& lane_waypoint : ref_point.lane_waypoints()) {

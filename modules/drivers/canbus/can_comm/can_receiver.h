@@ -130,8 +130,8 @@ template <typename SensorType>
 template <typename SensorType>
 void CanReceiver<SensorType>::RecvThreadFunc() {
   AINFO << "Can client receiver thread starts.";
-  CHECK_NOTNULL(can_client_);
-  CHECK_NOTNULL(pt_manager_);
+  CHECK(can_client_);
+  CHECK(pt_manager_);
 
   int32_t receive_error_count = 0;
   int32_t receive_none_count = 0;

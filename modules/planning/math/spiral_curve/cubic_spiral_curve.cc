@@ -182,7 +182,7 @@ bool CubicSpiralCurve::CalculatePath() {
 
 Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
                                     std::vector<PathPoint>* path_points) const {
-  CHECK_NOTNULL(path_points);
+  CHECK(path_points);
 
   // initialization
   if (n < 2 || error() > spiral_config().newton_raphson_tol()) {
@@ -241,7 +241,7 @@ Status CubicSpiralCurve::GetPathVec(const std::uint32_t n,
 Status CubicSpiralCurve::GetPathVecWithS(
     const std::vector<double>& vec_s,
     std::vector<PathPoint>* path_points) const {
-  CHECK_NOTNULL(path_points);
+  CHECK(path_points);
 
   if (vec_s.empty() || error() > spiral_config().newton_raphson_tol()) {
     return Status(ErrorCode::PLANNING_ERROR,

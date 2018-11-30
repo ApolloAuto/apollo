@@ -32,7 +32,7 @@ class MockClient {
     conn = mg_connect_websocket_client(host, port, 0, error_buffer, 100,
                                        "/websocket", "", &MockClient::OnMessage,
                                        nullptr, nullptr);
-    CHECK_NOTNULL(conn);
+    CHECK(conn);
   }
 
   const std::vector<std::string> &GetReceivedMessages() {

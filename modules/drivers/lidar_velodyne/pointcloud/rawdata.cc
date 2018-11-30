@@ -180,10 +180,10 @@ void RawData::unpack(const velodyne_msgs::VelodynePacket &pkt,
 void RawData::compute_xyzi(const uint8_t chan_id, const uint16_t azimuth_uint,
                            const float distance, float *intensity,
                            float *x_coord, float *y_coord, float *z_coord) {
-  CHECK_NOTNULL(intensity);
-  CHECK_NOTNULL(x_coord);
-  CHECK_NOTNULL(y_coord);
-  CHECK_NOTNULL(z_coord);
+  CHECK(intensity);
+  CHECK(x_coord);
+  CHECK(y_coord);
+  CHECK(z_coord);
 
   float x, y, z;
   LaserCorrection &corrections = calibration_.laser_corrections[chan_id];

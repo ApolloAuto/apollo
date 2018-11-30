@@ -220,7 +220,7 @@ std::string NaviPlanning::GetCurrentLaneId() {
 
 void NaviPlanning::GetLeftNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
-  DCHECK_NOTNULL(lane_info_group);
+  DCHECK(lane_info_group);
   auto& ref_line_info_group = frame_->reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
@@ -248,7 +248,7 @@ void NaviPlanning::GetLeftNeighborLanesInfo(
 
 void NaviPlanning::GetRightNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
-  DCHECK_NOTNULL(lane_info_group);
+  DCHECK(lane_info_group);
   auto& ref_line_info_group = frame_->reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
@@ -487,7 +487,7 @@ void NaviPlanning::RunOnce() {
 }
 
 void NaviPlanning::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
-  CHECK_NOTNULL(trajectory_pb);
+  CHECK(trajectory_pb);
 
   const double v = VehicleStateProvider::instance()->linear_velocity();
   for (double t = 0.0; t < FLAGS_navigation_fallback_cruise_time; t += 0.1) {

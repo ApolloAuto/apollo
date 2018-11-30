@@ -203,7 +203,7 @@ bool TrajectorySmoother::CreateAnchorPoints(
     const planning::ReferencePoint& init_point,
     const planning::ReferenceLine& ref_line,
     std::vector<planning::AnchorPoint>* anchor_points) {
-  CHECK_NOTNULL(anchor_points);
+  CHECK(anchor_points);
 
   int num_of_anchors = std::max(
       2, static_cast<int>(ref_line.Length() /

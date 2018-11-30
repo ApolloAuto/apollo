@@ -60,7 +60,7 @@ std::string ReferencePoint::DebugString() const {
 }
 
 void ReferencePoint::RemoveDuplicates(std::vector<ReferencePoint>* points) {
-  CHECK_NOTNULL(points);
+  CHECK(points);
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
   for (size_t i = 0; i < points->size(); ++i) {

@@ -99,8 +99,8 @@ apollo::common::Status NaviPathDecider::Process(
     const common::TrajectoryPoint& init_point,
     const std::vector<const Obstacle*>& obstacles,
     PathDecision* const path_decision, PathData* const path_data) {
-  CHECK_NOTNULL(path_decision);
-  CHECK_NOTNULL(path_data);
+  CHECK(path_decision);
+  CHECK(path_data);
   start_plan_point_.set_x(vehicle_state_.x());
   start_plan_point_.set_y(vehicle_state_.y());
   start_plan_point_.set_theta(vehicle_state_.heading());
@@ -234,7 +234,7 @@ void NaviPathDecider::RecordDebugInfo(const PathData& path_data) {
 bool NaviPathDecider::GetBasicPathData(
     const ReferenceLine& reference_line,
     std::vector<common::PathPoint>* const path_points) {
-  CHECK_NOTNULL(path_points);
+  CHECK(path_points);
 
   double min_path_len = config_.min_path_length();
   // get min path plan lenth s = v0 * t + 1 / 2.0 * a * t^2

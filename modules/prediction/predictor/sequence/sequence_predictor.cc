@@ -43,7 +43,7 @@ using ::apollo::hdmap::LaneInfo;
 void SequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
-  CHECK_NOTNULL(obstacle);
+  CHECK(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 }
 
@@ -165,8 +165,8 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
   ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PLANNING_TRAJECTORY));
-  CHECK_NOTNULL(pose_container);
-  CHECK_NOTNULL(adc_container);
+  CHECK(pose_container);
+  CHECK(adc_container);
 
   if (!adc_container->HasOverlap(lane_sequence)) {
     ADEBUG << "The sequence [" << ToString(lane_sequence)

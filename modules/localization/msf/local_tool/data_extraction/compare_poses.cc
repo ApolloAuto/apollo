@@ -29,7 +29,7 @@
 
 static bool LoadGnssAntennaExtrinsic(
     const std::string &file_path, Eigen::Vector3d *imu_ant_offset) {
-  CHECK_NOTNULL(imu_ant_offset);
+  CHECK(imu_ant_offset);
 
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["leverarm"]) {

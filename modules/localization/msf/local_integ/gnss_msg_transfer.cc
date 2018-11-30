@@ -24,7 +24,7 @@ namespace msf {
 void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::BandObservation &in,
     BandObservationMsg* out) {
-  CHECK_NOTNULL(out);
+  CHECK(out);
   if (in.has_band_id()) {
     out->set_band_id(GnssBandID(in.band_id()));
   }
@@ -55,7 +55,7 @@ void GnssMagTransfer::Transfer(
 void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::SatelliteObservation &in,
     SatelliteObservationMsg* out) {
-  CHECK_NOTNULL(out);
+  CHECK(out);
   if (in.has_sat_prn()) {
     out->set_sat_prn(in.sat_prn());
   }
@@ -77,7 +77,7 @@ void GnssMagTransfer::Transfer(
 void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::EpochObservation &in,
     EpochObservationMsg* out) {
-  CHECK_NOTNULL(out);
+  CHECK(out);
   if (in.has_receiver_id()) {
     out->set_receiver_id(in.receiver_id());
   }
@@ -116,7 +116,7 @@ void GnssMagTransfer::Transfer(
 void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::KepplerOrbit &in,
     KepplerOrbitMsg* out) {
-  CHECK_NOTNULL(out);
+  CHECK(out);
   if (in.has_gnss_type()) {
     out->set_gnss_type(GnssType(in.gnss_type()));
   }
@@ -238,7 +238,7 @@ void GnssMagTransfer::Transfer(
 void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::GlonassOrbit &in,
     GlonassOrbitMsg* out) {
-  CHECK_NOTNULL(out);
+  CHECK(out);
   if (in.has_gnss_type()) {
     out->set_gnss_type(GnssType(in.gnss_type()));
   }
@@ -327,7 +327,7 @@ void GnssMagTransfer::Transfer(
 void GnssMagTransfer::Transfer(
     const apollo::drivers::gnss::GnssEphemeris &in,
     GnssEphemerisMsg* out) {
-  CHECK_NOTNULL(out);
+  CHECK(out);
   if (in.has_gnss_type()) {
     out->set_gnss_type(GnssType(in.gnss_type()));
   }

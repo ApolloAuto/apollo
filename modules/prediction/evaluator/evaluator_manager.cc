@@ -94,7 +94,7 @@ void EvaluatorManager::Run(
   ObstaclesContainer* container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
-  CHECK_NOTNULL(container);
+  CHECK(container);
 
   Evaluator* evaluator = nullptr;
   for (const auto& perception_obstacle :
@@ -119,14 +119,14 @@ void EvaluatorManager::Run(
       case PerceptionObstacle::VEHICLE: {
         if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
-          CHECK_NOTNULL(evaluator);
+          CHECK(evaluator);
         }
         break;
       }
       case PerceptionObstacle::BICYCLE: {
         if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(cyclist_on_lane_evaluator_);
-          CHECK_NOTNULL(evaluator);
+          CHECK(evaluator);
         }
         break;
       }
@@ -136,7 +136,7 @@ void EvaluatorManager::Run(
       default: {
         if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(default_on_lane_evaluator_);
-          CHECK_NOTNULL(evaluator);
+          CHECK(evaluator);
         }
         break;
       }

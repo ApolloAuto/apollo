@@ -74,9 +74,9 @@ Status CoordinateConvertTool::CoordiateConvert(const double longitude,
                                              const double height_ellipsoid,
                                              double* utm_x, double* utm_y,
                                              double* utm_z) {
-  CHECK_NOTNULL(utm_x);
-  CHECK_NOTNULL(utm_y);
-  CHECK_NOTNULL(utm_z);
+  CHECK(utm_x);
+  CHECK(utm_y);
+  CHECK(utm_z);
   if (!pj_from_ || !pj_to_) {
       std::string err_msg = "no transform param";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

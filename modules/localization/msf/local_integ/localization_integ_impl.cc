@@ -486,7 +486,7 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
 
 void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
     const MeasureData& measure, LocalizationEstimate* localization) {
-  CHECK_NOTNULL(localization);
+  CHECK(localization);
 
   apollo::common::Header* headerpb = localization->mutable_header();
   apollo::localization::Pose* posepb = localization->mutable_pose();
@@ -535,8 +535,8 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
 
 void LocalizationIntegImpl::GetLastestLidarLocalization(
     LocalizationMeasureState* state, LocalizationEstimate* lidar_localization) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(lidar_localization);
+  CHECK(state);
+  CHECK(lidar_localization);
 
   lidar_localization_mutex_.lock();
   if (lidar_localization_list_.size()) {
@@ -552,8 +552,8 @@ void LocalizationIntegImpl::GetLastestLidarLocalization(
 
 void LocalizationIntegImpl::GetLastestIntegLocalization(
     LocalizationMeasureState* state, LocalizationEstimate* integ_localization) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(integ_localization);
+  CHECK(state);
+  CHECK(integ_localization);
 
   integ_localization_mutex_.lock();
   if (integ_localization_list_.size()) {
@@ -569,8 +569,8 @@ void LocalizationIntegImpl::GetLastestIntegLocalization(
 
 void LocalizationIntegImpl::GetLastestGnssLocalization(
     LocalizationMeasureState* state, LocalizationEstimate* gnss_localization) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(gnss_localization);
+  CHECK(state);
+  CHECK(gnss_localization);
 
   gnss_localization_mutex_.lock();
   if (gnss_localization_list_.size()) {
@@ -586,7 +586,7 @@ void LocalizationIntegImpl::GetLastestGnssLocalization(
 
 void LocalizationIntegImpl::GetLidarLocalizationList(
     std::list<LocalizationResult>* results) {
-  CHECK_NOTNULL(results);
+  CHECK(results);
 
   lidar_localization_mutex_.lock();
   *results = lidar_localization_list_;
@@ -596,7 +596,7 @@ void LocalizationIntegImpl::GetLidarLocalizationList(
 
 void LocalizationIntegImpl::GetIntegLocalizationList(
     std::list<LocalizationResult>* results) {
-  CHECK_NOTNULL(results);
+  CHECK(results);
 
   integ_localization_mutex_.lock();
   *results = integ_localization_list_;
@@ -606,7 +606,7 @@ void LocalizationIntegImpl::GetIntegLocalizationList(
 
 void LocalizationIntegImpl::GetGnssLocalizationList(
     std::list<LocalizationResult>* results) {
-  CHECK_NOTNULL(results);
+  CHECK(results);
 
   gnss_localization_mutex_.lock();
   *results = gnss_localization_list_;

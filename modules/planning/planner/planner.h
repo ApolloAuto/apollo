@@ -92,7 +92,7 @@ class PlannerWithReferenceLine : public Planner {
   virtual apollo::common::Status PlanOnReferenceLine(
       const common::TrajectoryPoint& planning_init_point, Frame* frame,
       ReferenceLineInfo* reference_line_info) {
-    CHECK_NOTNULL(frame);
+    CHECK(frame);
     return apollo::common::Status::OK();
   }
 };

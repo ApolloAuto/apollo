@@ -52,7 +52,7 @@ void WaypointSampler::Init(
 bool WaypointSampler::SamplePathWaypoints(
     const common::TrajectoryPoint &init_point,
     std::vector<std::vector<common::SLPoint>> *const points) {
-  CHECK_NOTNULL(points);
+  CHECK(points);
 
   const float kMinSampleDistance = 40.0;
   const float total_length = std::fmin(

@@ -191,7 +191,7 @@ void NaviSpeedTsGraph::UpdateObstacleConstraints(double distance,
 }
 
 Status NaviSpeedTsGraph::Solve(std::vector<NaviSpeedTsPoint>* output) {
-  CHECK_NOTNULL(output);
+  CHECK(output);
 
   // make constraints of the first point
   auto& constraints = constraints_[0];

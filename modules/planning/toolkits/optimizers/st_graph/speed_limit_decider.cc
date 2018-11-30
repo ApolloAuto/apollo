@@ -53,7 +53,7 @@ SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
 void SpeedLimitDecider::GetAvgKappa(
     const std::vector<common::PathPoint>& path_points,
     std::vector<double>* kappa) const {
-  CHECK_NOTNULL(kappa);
+  CHECK(kappa);
   const int kHalfNumPoints = st_boundary_config_.num_points_to_avg_kappa() / 2;
   CHECK_GT(kHalfNumPoints, 0);
   kappa->clear();
@@ -85,7 +85,7 @@ void SpeedLimitDecider::GetAvgKappa(
 Status SpeedLimitDecider::GetSpeedLimits(
     const IndexedList<std::string, PathObstacle>& path_obstacles,
     SpeedLimit* const speed_limit_data) const {
-  CHECK_NOTNULL(speed_limit_data);
+  CHECK(speed_limit_data);
 
   std::vector<double> avg_kappa;
   GetAvgKappa(path_data_.discretized_path().path_points(), &avg_kappa);

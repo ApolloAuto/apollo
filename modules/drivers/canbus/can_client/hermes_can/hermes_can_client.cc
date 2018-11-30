@@ -110,7 +110,7 @@ apollo::common::ErrorCode HermesCanClient::Send(
       uint64_t bcan_msg_timestamp; // TBD
   } bcan_msg_t;
   */
-  CHECK_NOTNULL(frame_num);
+  CHECK(frame_num);
   CHECK_EQ(frames.size(), static_cast<size_t>(*frame_num));
 
   if (!_is_init) {

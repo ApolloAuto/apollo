@@ -146,8 +146,8 @@ void TrafficDecider::BuildPlanningTarget(
 
 Status TrafficDecider::Execute(Frame *frame,
                                ReferenceLineInfo *reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   for (const auto &rule_config : rule_configs_.config()) {
     if (!rule_config.enabled()) {

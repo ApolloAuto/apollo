@@ -48,8 +48,8 @@ FrontVehicle::FrontVehicle(const TrafficRuleConfig& config)
 
 Status FrontVehicle::ApplyRule(Frame* const frame,
                                ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   MakeDecisions(frame, reference_line_info);
 
@@ -61,8 +61,8 @@ Status FrontVehicle::ApplyRule(Frame* const frame,
  */
 void FrontVehicle::MakeDecisions(Frame* frame,
                                  ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   MakeSidePassDecision(reference_line_info);
 
@@ -74,7 +74,7 @@ void FrontVehicle::MakeDecisions(Frame* frame,
  */
 bool FrontVehicle::MakeSidePassDecision(
     ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   if (!config_.front_vehicle().enable_side_pass()) {
     return true;
@@ -108,7 +108,7 @@ bool FrontVehicle::MakeSidePassDecision(
 
 bool FrontVehicle::ProcessSidePass(
     ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   // find obstacle being blocked, to process SIDEPASS
   std::string passable_obstacle_id = FindPassableObstacle(reference_line_info);
@@ -226,7 +226,7 @@ bool FrontVehicle::ProcessSidePass(
  */
 std::string FrontVehicle::FindPassableObstacle(
     ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   std::string passable_obstacle_id;
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();

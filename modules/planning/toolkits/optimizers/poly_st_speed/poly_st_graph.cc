@@ -53,7 +53,7 @@ bool PolyStGraph::FindStTunnel(
     const common::TrajectoryPoint &init_point,
     const std::vector<const PathObstacle *> &obstacles,
     SpeedData *const speed_data) {
-  CHECK_NOTNULL(speed_data);
+  CHECK(speed_data);
 
   // set init point
   init_point_ = init_point;
@@ -90,7 +90,7 @@ bool PolyStGraph::GenerateMinCostSpeedProfile(
     const std::vector<std::vector<STPoint>> &points,
     const std::vector<const PathObstacle *> &obstacles,
     PolyStGraphNode *const min_cost_node) {
-  CHECK_NOTNULL(min_cost_node);
+  CHECK(min_cost_node);
   PolyStGraphNode start_node = {STPoint(0.0, 0.0), init_point_.v(),
                                 init_point_.a()};
   SpeedProfileCost cost(config_, obstacles, speed_limit_, init_point_);
@@ -119,7 +119,7 @@ bool PolyStGraph::GenerateMinCostSpeedProfile(
 
 bool PolyStGraph::SampleStPoints(
     std::vector<std::vector<STPoint>> *const points) {
-  CHECK_NOTNULL(points);
+  CHECK(points);
   constexpr double start_t = 6.0;
   constexpr double start_s = 0.0;
   for (double t = start_t; t <= planning_time_; t += unit_t_) {

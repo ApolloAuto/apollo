@@ -62,7 +62,7 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
 const std::string& PathObstacle::Id() const { return id_; }
 
 PathObstacle::PathObstacle(const Obstacle* obstacle) : obstacle_(obstacle) {
-  CHECK_NOTNULL(obstacle);
+  CHECK(obstacle);
   id_ = obstacle_->Id();
 }
 

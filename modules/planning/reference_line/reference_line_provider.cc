@@ -210,8 +210,8 @@ double ReferenceLineProvider::LastTimeDelay() {
 bool ReferenceLineProvider::GetReferenceLines(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
-  CHECK_NOTNULL(reference_lines);
-  CHECK_NOTNULL(segments);
+  CHECK(reference_lines);
+  CHECK(segments);
 
   if (FLAGS_use_navigation_mode) {
     double start_time = Clock::NowInSeconds();
@@ -257,7 +257,7 @@ bool ReferenceLineProvider::GetReferenceLines(
 
 void ReferenceLineProvider::PrioritzeChangeLane(
     std::list<hdmap::RouteSegments> *route_segments) {
-  CHECK_NOTNULL(route_segments);
+  CHECK(route_segments);
   auto iter = route_segments->begin();
   while (iter != route_segments->end()) {
     if (!iter->IsOnSegment()) {
@@ -273,8 +273,8 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
   DCHECK_GE(relative_map.navigation_path_size(), 0);
-  DCHECK_NOTNULL(reference_lines);
-  DCHECK_NOTNULL(segments);
+  DCHECK(reference_lines);
+  DCHECK(segments);
 
   if (relative_map.navigation_path().empty()) {
     AERROR << "There isn't any navigation path in current relative map.";
@@ -536,8 +536,8 @@ bool ReferenceLineProvider::CreateRouteSegments(
 bool ReferenceLineProvider::CreateReferenceLine(
     std::list<ReferenceLine> *reference_lines,
     std::list<hdmap::RouteSegments> *segments) {
-  CHECK_NOTNULL(reference_lines);
-  CHECK_NOTNULL(segments);
+  CHECK(reference_lines);
+  CHECK(segments);
 
   common::VehicleState vehicle_state;
   {
@@ -783,7 +783,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
 void ReferenceLineProvider::GetAnchorPoints(
     const ReferenceLine &reference_line,
     std::vector<AnchorPoint> *anchor_points) const {
-  CHECK_NOTNULL(anchor_points);
+  CHECK(anchor_points);
   const double interval = smoother_config_.max_constraint_interval();
   int num_of_anchors =
       std::max(2, static_cast<int>(reference_line.Length() / interval + 0.5));

@@ -30,7 +30,7 @@ BaseClassMap& GlobalFactoryMap() {
 bool GetRegisteredClasses(
     const std::string& base_class_name,
     std::vector<std::string>* registered_derived_classes_names) {
-  CHECK_NOTNULL(registered_derived_classes_names);
+  CHECK(registered_derived_classes_names);
   BaseClassMap& map = GlobalFactoryMap();
   auto iter = map.find(base_class_name);
   if (iter == map.end()) {

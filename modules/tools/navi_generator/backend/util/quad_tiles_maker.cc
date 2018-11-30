@@ -33,7 +33,7 @@ bool QuadTilesMaker::MakeQuadTile(const double lat, const double lon,
                                   const double altitude,
                                   const std::size_t level,
                                   QuadTile* const quad_tile) {
-  CHECK_NOTNULL(quad_tile);
+  CHECK(quad_tile);
   if (level < 1) {
     AERROR << "Cannot handle desired level " << level << " (< 1)";
     return false;
@@ -94,8 +94,8 @@ bool QuadTilesMaker::MakeQuadTile(const double lat, const double lon,
 bool QuadTilesMaker::IdAsString(const std::size_t level,
                                 QuadTile* const quad_tile,
                                 std::string* const id_string) {
-  CHECK_NOTNULL(quad_tile);
-  CHECK_NOTNULL(id_string);
+  CHECK(quad_tile);
+  CHECK(id_string);
   if (level < 1) {
     AERROR << "Cannot handle desired level " << level << " (< 1)";
     return false;
@@ -121,8 +121,8 @@ bool QuadTilesMaker::IdAsString(const std::size_t level,
 bool QuadTilesMaker::IdAsUint32(const std::size_t level,
                                 QuadTile* const quad_tile,
                                 std::uint32_t* const id_uint32) {
-  CHECK_NOTNULL(quad_tile);
-  CHECK_NOTNULL(id_uint32);
+  CHECK(quad_tile);
+  CHECK(id_uint32);
   if (level < 1) {
     AERROR << "Cannot handle desired level " << level << " (< 1)";
     return false;
@@ -143,7 +143,7 @@ bool QuadTilesMaker::IdAsUint32(const std::size_t level,
 
 bool QuadTilesMaker::MakePosition(double lat, double lon, double altitude,
                                   Position* const pos) {
-  CHECK_NOTNULL(pos);
+  CHECK(pos);
   if (lat < -90.0 || lat > 90.0 || lon <= -180.0 || lon > 180.0) {
     AERROR << "The latitude: " << lat << ", longitude: " << lon
            << ", altitude: " << altitude << " is out of range.";

@@ -101,8 +101,8 @@ bool PathData::GetPathPointWithPathS(
 
 bool PathData::GetPathPointWithRefS(const double ref_s,
                                     common::PathPoint *const path_point) const {
-  DCHECK_NOTNULL(reference_line_);
-  DCHECK_NOTNULL(path_point);
+  DCHECK(reference_line_);
+  DCHECK(path_point);
   DCHECK_EQ(discretized_path_.path_points().size(),
             frenet_path_.points().size());
   if (ref_s < 0) {
@@ -162,7 +162,7 @@ std::string PathData::DebugString() const {
 
 bool PathData::SLToXY(const FrenetFramePath &frenet_path,
                       DiscretizedPath *const discretized_path) {
-  DCHECK_NOTNULL(discretized_path);
+  DCHECK(discretized_path);
   std::vector<common::PathPoint> path_points;
   for (const common::FrenetFramePoint &frenet_point : frenet_path.points()) {
     common::SLPoint sl_point;
@@ -205,8 +205,8 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
 
 bool PathData::XYToSL(const DiscretizedPath &discretized_path,
                       FrenetFramePath *const frenet_path) {
-  CHECK_NOTNULL(frenet_path);
-  CHECK_NOTNULL(reference_line_);
+  CHECK(frenet_path);
+  CHECK(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   const double max_len = reference_line_->Length();
   for (const auto &path_point : discretized_path.path_points()) {

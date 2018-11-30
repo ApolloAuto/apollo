@@ -239,7 +239,7 @@ void Polygon2d::BuildFromPoints() {
 
 bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
                                   Polygon2d *const polygon) {
-  CHECK_NOTNULL(polygon);
+  CHECK(polygon);
   const int n = points.size();
   if (n < 3) {
     return false;
@@ -295,7 +295,7 @@ bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
   if (line_segment.length() <= kMathEpsilon) {
     return true;
   }
-  CHECK_NOTNULL(points);
+  CHECK(points);
   const int n = points->size();
   if (n < 3) {
     return false;
@@ -332,7 +332,7 @@ bool Polygon2d::ClipConvexHull(const LineSegment2d &line_segment,
 bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
                                Polygon2d *const overlap_polygon) const {
   CHECK_GE(points_.size(), 3);
-  CHECK_NOTNULL(overlap_polygon);
+  CHECK(overlap_polygon);
   CHECK(is_convex_ && other_polygon.is_convex());
   std::vector<Vec2d> points = other_polygon.points();
   for (int i = 0; i < num_points_; ++i) {
@@ -359,8 +359,8 @@ bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
 bool Polygon2d::GetOverlap(const LineSegment2d &line_segment,
                            Vec2d *const first, Vec2d *const last) const {
   CHECK_GE(points_.size(), 3);
-  CHECK_NOTNULL(first);
-  CHECK_NOTNULL(last);
+  CHECK(first);
+  CHECK(last);
 
   if (line_segment.length() <= kMathEpsilon) {
     if (!IsPointIn(line_segment.start())) {
@@ -466,8 +466,8 @@ std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
 void Polygon2d::ExtremePoints(const double heading, Vec2d *const first,
                               Vec2d *const last) const {
   CHECK_GE(points_.size(), 3);
-  CHECK_NOTNULL(first);
-  CHECK_NOTNULL(last);
+  CHECK(first);
+  CHECK(last);
 
   const Vec2d direction_vec = Vec2d::CreateUnitVec2d(heading);
   double min_proj = std::numeric_limits<double>::infinity();

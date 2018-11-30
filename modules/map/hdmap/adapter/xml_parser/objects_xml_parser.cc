@@ -26,7 +26,7 @@ namespace adapter {
 
 Status ObjectsXmlParser::ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
                                          std::vector<PbCrosswalk>* crosswalks) {
-  CHECK_NOTNULL(crosswalks);
+  CHECK(crosswalks);
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {
     std::string object_type;
@@ -60,7 +60,7 @@ Status ObjectsXmlParser::ParseCrosswalks(const tinyxml2::XMLElement& xml_node,
 Status ObjectsXmlParser::ParseClearAreas(
     const tinyxml2::XMLElement& xml_node,
     std::vector<PbClearArea>* clear_areas) {
-  CHECK_NOTNULL(clear_areas);
+  CHECK(clear_areas);
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {
     std::string object_type;
@@ -97,7 +97,7 @@ Status ObjectsXmlParser::ParseClearAreas(
 Status ObjectsXmlParser::ParseSpeedBumps(
     const tinyxml2::XMLElement& xml_node,
     std::vector<PbSpeedBump>* speed_bumps) {
-  CHECK_NOTNULL(speed_bumps);
+  CHECK(speed_bumps);
   const tinyxml2::XMLElement* object_node =
       xml_node.FirstChildElement("object");
   while (object_node) {
@@ -137,7 +137,7 @@ Status ObjectsXmlParser::ParseSpeedBumps(
 Status ObjectsXmlParser::ParseStopLines(
     const tinyxml2::XMLElement& xml_node,
     std::vector<StopLineInternal>* stop_lines) {
-  CHECK_NOTNULL(stop_lines);
+  CHECK(stop_lines);
   const tinyxml2::XMLElement* object_node =
       xml_node.FirstChildElement("object");
   while (object_node) {
@@ -173,7 +173,7 @@ Status ObjectsXmlParser::ParseStopLines(
 Status ObjectsXmlParser::ParseParkingSpaces(
         const tinyxml2::XMLElement& xml_node,
         std::vector<PbParkingSpace>* parking_spaces) {
-  CHECK_NOTNULL(parking_spaces);
+  CHECK(parking_spaces);
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {
     std::string object_type;

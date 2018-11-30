@@ -91,7 +91,7 @@ bool GetAllTrafficLights(std::vector<SignalInfoConstPtr> *traffic_lights) {
 
 bool GetTrafficLightsWithinDistance(
     std::vector<SignalInfoConstPtr> *traffic_lights) {
-  CHECK_NOTNULL(traffic_lights);
+  CHECK(traffic_lights);
   AdapterManager::Observe();
   if (AdapterManager::GetLocalization()->Empty()) {
     AERROR << "No localization received";
@@ -118,7 +118,7 @@ bool GetTrafficLightsWithinDistance(
 bool CreateTrafficLightDetection(const std::vector<SignalInfoConstPtr> &signals,
                                  TrafficLight::Color color,
                                  TrafficLightDetection *detection) {
-  CHECK_NOTNULL(detection);
+  CHECK(detection);
   for (const auto &iter : signals) {
     auto *light = detection->add_traffic_light();
     light->set_color(color);

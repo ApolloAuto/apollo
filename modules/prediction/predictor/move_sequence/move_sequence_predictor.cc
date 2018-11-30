@@ -51,7 +51,7 @@ using ::apollo::prediction::math_util::EvaluateQuinticPolynomial;
 void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
-  CHECK_NOTNULL(obstacle);
+  CHECK(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();

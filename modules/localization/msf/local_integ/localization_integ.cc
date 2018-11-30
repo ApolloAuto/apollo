@@ -127,7 +127,7 @@ void LocalizationInteg::GetGnssLocalizationList(
 
 void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_rfu) {
-  CHECK_NOTNULL(imu_rfu);
+  CHECK(imu_rfu);
 
   double measurement_time = TimeUtil::Gps2unix(imu_msg.measurement_time());
   imu_rfu->measurement_time = measurement_time;
@@ -143,7 +143,7 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
 
 void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
                                        ImuData *imu_flu) {
-  CHECK_NOTNULL(imu_flu);
+  CHECK(imu_flu);
 
   double measurement_time = TimeUtil::Gps2unix(imu_msg.measurement_time());
   imu_flu->measurement_time = measurement_time;

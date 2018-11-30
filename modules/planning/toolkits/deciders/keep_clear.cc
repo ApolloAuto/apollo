@@ -36,8 +36,8 @@ KeepClear::KeepClear(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 Status KeepClear::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   // keep_clear zone
   if (config_.keep_clear().enable_keep_clear_zone()) {
@@ -83,9 +83,9 @@ bool KeepClear::BuildKeepClearObstacle(
     Frame* const frame, ReferenceLineInfo* const reference_line_info,
     PathOverlap* const keep_clear_overlap,
     const std::string& virtual_obstacle_id) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-  CHECK_NOTNULL(keep_clear_overlap);
+  CHECK(frame);
+  CHECK(reference_line_info);
+  CHECK(keep_clear_overlap);
 
   // check
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();

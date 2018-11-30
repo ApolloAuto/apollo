@@ -59,8 +59,8 @@ StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 Status StopSign::ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   if (!FindNextStopSign(reference_line_info)) {
     GetPlanningStatus()->clear_stop_sign();
@@ -77,8 +77,8 @@ Status StopSign::ApplyRule(Frame* const frame,
  */
 void StopSign::MakeDecisions(Frame* frame,
                              ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   StopSignLaneVehicles watch_vehicles;
   GetWatchVehicles(*next_stop_sign_, &watch_vehicles);
@@ -162,7 +162,7 @@ void StopSign::MakeDecisions(Frame* frame,
  * @brief: fine next stop sign ahead of adc along reference line
  */
 bool StopSign::FindNextStopSign(ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   StopSignStatus stop_sign_status = GetPlanningStatus()->stop_sign();
   const std::vector<PathOverlap>& stop_sign_overlaps =
@@ -306,7 +306,7 @@ bool StopSign::CheckCreepDone(ReferenceLineInfo* const reference_line_info) {
 int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
                                 const StopSignInfo& stop_sign_info,
                                 StopSignLaneVehicles* watch_vehicles) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   // get stop status from PlanningStatus
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
@@ -387,7 +387,7 @@ int StopSign::ProcessStopStatus(ReferenceLineInfo* const reference_line_info,
  * @brief: check valid stop_sign stop
  */
 bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   double adc_speed =
       common::VehicleStateProvider::instance()->linear_velocity();
@@ -422,7 +422,7 @@ bool StopSign::CheckADCkStop(ReferenceLineInfo* const reference_line_info) {
  */
 void StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
                                 StopSignLaneVehicles* watch_vehicles) {
-  CHECK_NOTNULL(watch_vehicles);
+  CHECK(watch_vehicles);
 
   watch_vehicles->clear();
 
@@ -445,7 +445,7 @@ void StopSign::GetWatchVehicles(const StopSignInfo& stop_sign_info,
  * @brief: update PlanningStatus with watch vehicles
  */
 void StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
-  CHECK_NOTNULL(watch_vehicles);
+  CHECK(watch_vehicles);
 
   auto* stop_sign_status = GetPlanningStatus()->mutable_stop_sign();
   stop_sign_status->clear_lane_watch_vehicles();
@@ -469,7 +469,7 @@ void StopSign::UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles) {
  */
 int StopSign::AddWatchVehicle(const PathObstacle& path_obstacle,
                               StopSignLaneVehicles* watch_vehicles) {
-  CHECK_NOTNULL(watch_vehicles);
+  CHECK(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
@@ -567,7 +567,7 @@ int StopSign::RemoveWatchVehicle(
     const PathObstacle& path_obstacle,
     const std::vector<std::string>& watch_vehicle_ids,
     StopSignLaneVehicles* watch_vehicles) {
-  CHECK_NOTNULL(watch_vehicles);
+  CHECK(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle =
       path_obstacle.obstacle()->Perception();
@@ -685,8 +685,8 @@ int StopSign::RemoveWatchVehicle(
 
 int StopSign::ClearWatchVehicle(ReferenceLineInfo* const reference_line_info,
                                 StopSignLaneVehicles* watch_vehicles) {
-  CHECK_NOTNULL(reference_line_info);
-  CHECK_NOTNULL(watch_vehicles);
+  CHECK(reference_line_info);
+  CHECK(watch_vehicles);
 
   const auto& path_obstacles =
       reference_line_info->path_decision()->path_obstacles().Items();
@@ -745,8 +745,8 @@ int StopSign::BuildStopDecision(Frame* frame,
                                 const double stop_line_s,
                                 const double stop_distance,
                                 StopSignLaneVehicles* watch_vehicles) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   // check
   const auto& reference_line = reference_line_info->reference_line();

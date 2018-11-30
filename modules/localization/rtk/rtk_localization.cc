@@ -196,7 +196,7 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
 
 bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
   const CorrectedImu &imu2, const double timestamp_sec, CorrectedImu *imu_msg) {
-  DCHECK_NOTNULL(imu_msg);
+  DCHECK(imu_msg);
   if (!(imu1.has_header() && imu1.header().has_timestamp_sec() &&
         imu2.has_header() && imu2.header().has_timestamp_sec())) {
     AERROR << "imu1 and imu2 has no header or no timestamp_sec in header";

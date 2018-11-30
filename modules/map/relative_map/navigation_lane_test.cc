@@ -48,7 +48,7 @@ using nlohmann::json;
 namespace {
 bool GetNavigationPathFromFile(const std::string& filename,
                                NavigationPath* navigation_path) {
-  CHECK_NOTNULL(navigation_path);
+  CHECK(navigation_path);
 
   std::ifstream ifs(filename, std::ios::in);
   if (!ifs.is_open()) {
@@ -78,7 +78,7 @@ bool GetNavigationPathFromFile(const std::string& filename,
 bool GenerateNavigationInfo(
     const std::vector<std::string>& navigation_line_filenames,
     NavigationInfo* navigation_info) {
-  CHECK_NOTNULL(navigation_info);
+  CHECK(navigation_info);
 
   int i = 0;
   for (const std::string& filename : navigation_line_filenames) {

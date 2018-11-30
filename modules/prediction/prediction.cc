@@ -191,7 +191,7 @@ void Prediction::Stop() {
 void Prediction::OnLocalization(const LocalizationEstimate& localization) {
   PoseContainer* pose_container = dynamic_cast<PoseContainer*>(
       ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
-  CHECK_NOTNULL(pose_container);
+  CHECK(pose_container);
   pose_container->Insert(localization);
 
   ADEBUG << "Received a localization message ["
@@ -203,7 +203,7 @@ void Prediction::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
       dynamic_cast<ADCTrajectoryContainer*>(
           ContainerManager::instance()->GetContainer(
               AdapterConfig::PLANNING_TRAJECTORY));
-  CHECK_NOTNULL(adc_trajectory_container);
+  CHECK(adc_trajectory_container);
   adc_trajectory_container->Insert(adc_trajectory);
 
   ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
@@ -230,7 +230,7 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   ObstaclesContainer* obstacles_container = dynamic_cast<ObstaclesContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PERCEPTION_OBSTACLES));
-  CHECK_NOTNULL(obstacles_container);
+  CHECK(obstacles_container);
   obstacles_container->Insert(perception_obstacles);
 
   ADEBUG << "Received a perception message ["
@@ -242,8 +242,8 @@ void Prediction::RunOnce(const PerceptionObstacles& perception_obstacles) {
   ADCTrajectoryContainer* adc_container = dynamic_cast<ADCTrajectoryContainer*>(
       ContainerManager::instance()->GetContainer(
           AdapterConfig::PLANNING_TRAJECTORY));
-  CHECK_NOTNULL(pose_container);
-  CHECK_NOTNULL(adc_container);
+  CHECK(pose_container);
+  CHECK(adc_container);
 
   PerceptionObstacle* adc = pose_container->ToPerceptionObstacle();
   if (adc != nullptr) {

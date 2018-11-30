@@ -38,7 +38,7 @@ using ::apollo::perception::PerceptionObstacle;
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
-  CHECK_NOTNULL(obstacle);
+  CHECK(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
   const Feature& feature = obstacle->latest_feature();

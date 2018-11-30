@@ -238,7 +238,7 @@ double NavigationLane::EvaluateCubicPolynomial(const double c0, const double c1,
 
 void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
                                                       common::Path *path) {
-  CHECK_NOTNULL(path);
+  CHECK(path);
 
   // If the size of "path" points is smaller than 2, it indicates that a
   // navigation path needs to be generated firstly.
@@ -290,7 +290,7 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
                                                   const int start_index,
                                                   const double s,
                                                   int *matched_index) {
-  CHECK_NOTNULL(matched_index);
+  CHECK(matched_index);
   const int size = path.path_point_size();
 
   if (start_index < 0 || s < path.path_point(start_index).s()) {
@@ -324,7 +324,7 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
 
 bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
                                                  common::Path *path) {
-  CHECK_NOTNULL(path);
+  CHECK(path);
   if (!navigation_info_.navigation_path(line_index).has_path() ||
       navigation_info_.navigation_path(line_index).path().path_point_size() ==
           0) {
@@ -370,7 +370,7 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
       [this, &navigation_path, &enu_to_flu_func](
           const int start, const int end, const double ref_s_base,
           const double max_length, common::Path *path) {
-        CHECK_NOTNULL(path);
+        CHECK(path);
         const double ref_s = navigation_path.path_point(start).s();
         for (int i = start; i < end; ++i) {
           auto *point = path->add_path_point();
@@ -537,7 +537,7 @@ double NavigationLane::GetKappa(const double c1, const double c2,
 
 void NavigationLane::ConvertLaneMarkerToPath(
     const perception::LaneMarkers &lane_marker, common::Path *path) {
-  CHECK_NOTNULL(path);
+  CHECK(path);
 
   path->set_name("Path from lane markers.");
   const auto &left_lane = lane_marker.left_lane_marker();

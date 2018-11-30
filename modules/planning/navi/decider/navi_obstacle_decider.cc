@@ -250,7 +250,7 @@ void NaviObstacleDecider::RecordLastNudgeDistance(const double nudge_dist) {
 
 void NaviObstacleDecider::SmoothNudgeDistance(
     const common::VehicleState& vehicle_state, double* nudge_dist) {
-  CHECK_NOTNULL(nudge_dist);
+  CHECK(nudge_dist);
   if (vehicle_state.linear_velocity() < config_.max_allow_nudge_speed()) {
     limit_speed_num_ = limit_speed_num_ + 1;
   } else {
@@ -275,7 +275,7 @@ double NaviObstacleDecider::GetNudgeDistance(
     const ReferenceLine& reference_line, const PathDecision& path_decision,
     const std::vector<common::PathPoint>& path_data_points,
     const common::VehicleState& vehicle_state, int* lane_obstacles_num) {
-  CHECK_NOTNULL(lane_obstacles_num);
+  CHECK(lane_obstacles_num);
 
   // Calculating the left and right nudgeable distance on the lane
   double left_nudge_lane = 0.0;

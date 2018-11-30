@@ -173,7 +173,7 @@ double FootpointLatitude(const double y) {
  */
 void MaplatlonToXY(const double phi, const double lambda, double lambda0,
                    UTMCoor *xy) {
-  CHECK_NOTNULL(xy);
+  CHECK(xy);
 
   /* Precalculate ep2 */
   double ep2 = (pow(kSmA, 2.0) - pow(kSmB, 2.0)) / pow(kSmB, 2.0);
@@ -256,7 +256,7 @@ void MaplatlonToXY(const double phi, const double lambda, double lambda0,
  */
 void MapXYToLatlon(const double x, const double y, const double lambda0,
                    WGS84Corr *philambda) {
-  CHECK_NOTNULL(philambda);
+  CHECK(philambda);
 
   /* Get the value of phif, the footpoint latitude. */
   double phif = FootpointLatitude(y);
@@ -355,7 +355,7 @@ void MapXYToLatlon(const double x, const double y, const double lambda0,
  *
  */
 void LatlonToUtmXY(const double lon_rad, const double lat_rad, UTMCoor *xy) {
-  CHECK_NOTNULL(xy);
+  CHECK(xy);
 
   int zone = 0;
   zone = static_cast<int>((lon_rad * kSinsRadToDeg + 180) / 6) + 1;
@@ -394,7 +394,7 @@ void LatlonToUtmXY(const double lon_rad, const double lat_rad, UTMCoor *xy) {
  */
 void UtmXYToLatlon(const double x, const double y, const int zone,
                    const bool southhemi, WGS84Corr *latlon) {
-  CHECK_NOTNULL(latlon);
+  CHECK(latlon);
 
   double xx = x;
   xx -= 500000.0;
@@ -413,7 +413,7 @@ void UtmXYToLatlon(const double x, const double y, const int zone,
 }
 
 void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh) {
-  CHECK_NOTNULL(blh);
+  CHECK(blh);
 
   //    double e2=FE_WGS84*(2.0-FE_WGS84);
   double r2 = xyz[0] * xyz[0] + xyz[1] * xyz[1];
@@ -435,7 +435,7 @@ void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh) {
 }
 
 void BlhToXYZ(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz) {
-  CHECK_NOTNULL(xyz);
+  CHECK(xyz);
 
   double sin_lati_2 = sin(blh[1]) * sin(blh[1]);
   double temp_a = sqrt(1.0 - kSinsE2 * sin_lati_2);

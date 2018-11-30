@@ -328,8 +328,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
     const std::vector<PathPoint>& path_points, const Obstacle& obstacle,
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
-  DCHECK_NOTNULL(upper_points);
-  DCHECK_NOTNULL(lower_points);
+  DCHECK(upper_points);
+  DCHECK(lower_points);
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);

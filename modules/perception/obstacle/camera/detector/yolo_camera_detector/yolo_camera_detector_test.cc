@@ -64,7 +64,7 @@ TEST_F(YoloCameraDetectorTest, model_init_test) {
   CHECK(SetProtoToASCIIFile(yolo_param, yolo_config));
   BaseCameraDetector *camera_detector =
       BaseCameraDetectorRegisterer::GetInstanceByName("YoloCameraDetector");
-  CHECK_NOTNULL(camera_detector);
+  CHECK(camera_detector);
   CHECK(camera_detector->Init());
 
   // Recover to origin config.
@@ -81,7 +81,7 @@ TEST_F(YoloCameraDetectorTest, yolo_camera_detector_roipooling_test) {
   ADEBUG << "test image file: " << image_file;
 
   cv::Mat frame = cv::imread(image_file, CV_LOAD_IMAGE_COLOR);
-  CHECK_NOTNULL(frame.data);
+  CHECK(frame.data);
 
   CameraDetectorOptions options;
   CHECK_EQ(camera_detector->Detect(frame, options, NULL), false);
@@ -115,7 +115,7 @@ TEST_F(YoloCameraDetectorTest, multi_task_test) {
   ADEBUG << "test image file: " << image_file;
 
   cv::Mat frame = cv::imread(image_file, CV_LOAD_IMAGE_COLOR);
-  CHECK_NOTNULL(frame.data);
+  CHECK(frame.data);
 
   CameraDetectorOptions options;
   CHECK_EQ(camera_detector->Multitask(frame, options, NULL, NULL), false);

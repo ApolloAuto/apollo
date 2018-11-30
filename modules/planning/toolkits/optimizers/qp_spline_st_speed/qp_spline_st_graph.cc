@@ -525,7 +525,7 @@ const SpeedData QpSplineStGraph::GetHistorySpeed() const {
 Status QpSplineStGraph::EstimateSpeedUpperBound(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     std::vector<double>* speed_upper_bound) const {
-  DCHECK_NOTNULL(speed_upper_bound);
+  DCHECK(speed_upper_bound);
 
   speed_upper_bound->clear();
 

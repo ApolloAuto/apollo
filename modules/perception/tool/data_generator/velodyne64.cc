@@ -109,7 +109,7 @@ void Velodyne64::TransPointCloudMsgToPCL(
 bool Velodyne64::GetTrans(const std::string& to_frame,
                           const std::string& from_frame,
                           const double query_time, Matrix4d* trans) {
-  CHECK_NOTNULL(trans);
+  CHECK(trans);
   ros::Time query_stamp(query_time);
   const auto& tf2_buffer = AdapterManager::Tf2Buffer();
   const double kTf2BuffSize = 10 / 1000.0;  // buff size

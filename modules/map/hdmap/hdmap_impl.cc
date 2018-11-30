@@ -241,7 +241,7 @@ int HDMapImpl::GetRoads(const Vec2d& point, double distance,
 
   for (auto& road_id : road_ids) {
     RoadInfoConstPtr road = GetRoadById(CreateHDMapId(road_id));
-    CHECK_NOTNULL(road);
+    CHECK(road);
     roads->push_back(road);
   }
 
@@ -460,9 +460,9 @@ int HDMapImpl::GetNearestLane(const PointENU& point,
 int HDMapImpl::GetNearestLane(const Vec2d& point,
                               LaneInfoConstPtr* nearest_lane, double* nearest_s,
                               double* nearest_l) const {
-  CHECK_NOTNULL(nearest_lane);
-  CHECK_NOTNULL(nearest_s);
-  CHECK_NOTNULL(nearest_l);
+  CHECK(nearest_lane);
+  CHECK(nearest_s);
+  CHECK(nearest_l);
   const auto* segment_object = lane_segment_kdtree_->GetNearestObject(point);
   if (segment_object == nullptr) {
     return -1;
@@ -494,9 +494,9 @@ int HDMapImpl::GetNearestLaneWithHeading(
     const Vec2d& point, const double distance, const double central_heading,
     const double max_heading_difference, LaneInfoConstPtr* nearest_lane,
     double* nearest_s, double* nearest_l) const {
-  CHECK_NOTNULL(nearest_lane);
-  CHECK_NOTNULL(nearest_s);
-  CHECK_NOTNULL(nearest_l);
+  CHECK(nearest_lane);
+  CHECK(nearest_s);
+  CHECK(nearest_l);
 
   std::vector<LaneInfoConstPtr> lanes;
   if (GetLanesWithHeading(point, distance, central_heading,
@@ -546,7 +546,7 @@ int HDMapImpl::GetLanesWithHeading(const Vec2d& point, const double distance,
                                    const double central_heading,
                                    const double max_heading_difference,
                                    std::vector<LaneInfoConstPtr>* lanes) const {
-  CHECK_NOTNULL(lanes);
+  CHECK(lanes);
   std::vector<LaneInfoConstPtr> all_lanes;
   const int status = GetLanes(point, distance, &all_lanes);
   if (status < 0 || all_lanes.size() <= 0) {
@@ -576,8 +576,8 @@ int HDMapImpl::GetRoadBoundaries(
     const PointENU& point, double radius,
     std::vector<RoadROIBoundaryPtr>* road_boundaries,
     std::vector<JunctionBoundaryPtr>* junctions) const {
-  CHECK_NOTNULL(road_boundaries);
-  CHECK_NOTNULL(junctions);
+  CHECK(road_boundaries);
+  CHECK(junctions);
 
   road_boundaries->clear();
   junctions->clear();
@@ -598,7 +598,7 @@ int HDMapImpl::GetRoadBoundaries(
     }
     road_section_id_set.insert(unique_id);
     const auto road_ptr = GetRoadById(road_id);
-    CHECK_NOTNULL(road_ptr);
+    CHECK(road_ptr);
     if (road_ptr->has_junction_id()) {
       const Id junction_id = road_ptr->junction_id();
       if (junction_id_set.count(junction_id.id()) > 0) {
@@ -607,7 +607,7 @@ int HDMapImpl::GetRoadBoundaries(
       junction_id_set.insert(junction_id.id());
       JunctionBoundaryPtr junction_boundary_ptr(new JunctionBoundary());
       junction_boundary_ptr->junction_info = GetJunctionById(junction_id);
-      CHECK_NOTNULL(junction_boundary_ptr->junction_info);
+      CHECK(junction_boundary_ptr->junction_info);
       junctions->push_back(junction_boundary_ptr);
     } else {
       RoadROIBoundaryPtr road_boundary_ptr(new RoadROIBoundary());
@@ -628,7 +628,7 @@ int HDMapImpl::GetRoadBoundaries(
 int HDMapImpl::GetForwardNearestSignalsOnLane(
     const apollo::common::PointENU& point, const double distance,
     std::vector<SignalInfoConstPtr>* signals) const {
-  CHECK_NOTNULL(signals);
+  CHECK(signals);
 
   signals->clear();
   LaneInfoConstPtr lane_ptr = nullptr;
@@ -735,7 +735,7 @@ int HDMapImpl::GetForwardNearestSignalsOnLane(
 
 int HDMapImpl::GetStopSignAssociatedStopSigns(
     const Id& id, std::vector<StopSignInfoConstPtr>* stop_signs) const {
-  CHECK_NOTNULL(stop_signs);
+  CHECK(stop_signs);
 
   const auto& stop_sign = GetStopSignById(id);
   if (stop_sign == nullptr) {
@@ -772,7 +772,7 @@ int HDMapImpl::GetStopSignAssociatedStopSigns(
 
 int HDMapImpl::GetStopSignAssociatedLanes(
     const Id& id, std::vector<LaneInfoConstPtr>* lanes) const {
-  CHECK_NOTNULL(lanes);
+  CHECK(lanes);
 
   const auto& stop_sign = GetStopSignById(id);
   if (stop_sign == nullptr) {

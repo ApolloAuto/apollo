@@ -30,7 +30,7 @@ namespace adapter {
 
 Status UtilXmlParser::ParseCurve(const tinyxml2::XMLElement& xml_node,
                                  PbCurve* curve) {
-  CHECK_NOTNULL(curve);
+  CHECK(curve);
 
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("geometry");
   while (sub_node) {
@@ -44,7 +44,7 @@ Status UtilXmlParser::ParseCurve(const tinyxml2::XMLElement& xml_node,
 
 Status UtilXmlParser::ParseGeometry(const tinyxml2::XMLElement& xml_node,
                                     PbCurveSegment* curve_segment) {
-  CHECK_NOTNULL(curve_segment);
+  CHECK(curve_segment);
 
   // Read geometry attributes
   double s = 0.0;
@@ -150,7 +150,7 @@ Status UtilXmlParser::ParseOutline(const tinyxml2::XMLElement& xml_node,
 
 Status UtilXmlParser::ParsePoint(const tinyxml2::XMLElement& xml_node,
                                  PbPoint3D* pt) {
-  CHECK_NOTNULL(pt);
+  CHECK(pt);
 
   const auto sub_node = xml_node.FirstChildElement("centerPoint");
   CHECK(sub_node != nullptr);
@@ -205,7 +205,7 @@ double UtilXmlParser::CurveLength(const PbCurve& curve) {
 tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(
     const tinyxml2::XMLElement& xml_node, const std::string& name,
     std::string* value) {
-  CHECK_NOTNULL(value);
+  CHECK(value);
   const char* val = xml_node.Attribute(name.c_str());
   if (val == nullptr) {
     return tinyxml2::XML_NO_ATTRIBUTE;

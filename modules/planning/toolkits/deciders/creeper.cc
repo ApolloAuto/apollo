@@ -63,7 +63,7 @@ bool Creeper::BuildStopDecision(const PathOverlap& overlap,
                                 const double max_creeping_target_distance,
                                 Frame* frame,
                                 ReferenceLineInfo* reference_line_info) {
-  CHECK_NOTNULL(frame);
+  CHECK(frame);
 
   // check
   const auto& reference_line = reference_line_info->reference_line();

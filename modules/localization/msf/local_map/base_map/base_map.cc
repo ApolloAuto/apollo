@@ -285,8 +285,8 @@ void BaseMap::LoadMapNodeThreadSafety(MapNodeIndex index, bool is_reserved) {
 void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
                              const Eigen::Vector3d& trans_diff,
                              unsigned int resolution_id, unsigned int zone_id) {
-  CHECK_NOTNULL(p_map_preload_threads_);
-  CHECK_NOTNULL(map_node_pool_);
+  CHECK(p_map_preload_threads_);
+  CHECK(map_node_pool_);
 
   int x_direction = trans_diff[0] > 0 ? 1 : -1;
   int y_direction = trans_diff[1] > 0 ? 1 : -1;
@@ -422,8 +422,8 @@ void BaseMap::PreloadMapArea(const Eigen::Vector3d& location,
 bool BaseMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
                           unsigned int resolution_id, unsigned int zone_id,
                           int filter_size_x, int filter_size_y) {
-  CHECK_NOTNULL(p_map_load_threads_);
-  CHECK_NOTNULL(map_node_pool_);
+  CHECK(p_map_load_threads_);
+  CHECK(map_node_pool_);
   std::set<MapNodeIndex> map_ids;
   float map_pixel_resolution =
       this->map_config_->map_resolutions_[resolution_id];

@@ -70,7 +70,7 @@ bool TLPreprocessorSubnode::InitInternal() {
 }
 
 bool TLPreprocessorSubnode::InitSharedData() {
-  CHECK_NOTNULL(shared_data_manager_);
+  CHECK(shared_data_manager_);
 
   const std::string preprocessing_data_name("TLPreprocessingData");
   preprocessing_data_ = dynamic_cast<TLPreprocessingData *>(

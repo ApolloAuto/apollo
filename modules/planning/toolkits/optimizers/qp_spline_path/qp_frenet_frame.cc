@@ -266,7 +266,7 @@ bool QpFrenetFrame::MapNudgeLine(
     const common::SLPoint& start, const common::SLPoint& end,
     const ObjectNudge::Type nudge_type,
     std::vector<std::pair<double, double>>* const constraint) {
-  DCHECK_NOTNULL(constraint);
+  DCHECK(constraint);
 
   const common::SLPoint& near_point = (start.s() < end.s() ? start : end);
   const common::SLPoint& further_point = (start.s() < end.s() ? end : start);

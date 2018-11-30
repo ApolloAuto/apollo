@@ -211,7 +211,7 @@ double TrajectoryEvaluator::EvaluateDiscreteTrajectory(
     const std::vector<SpeedPoint>& st_points,
     const std::vector<FrenetFramePoint>& sl_points,
     std::vector<double>* cost_components) {
-  CHECK_NOTNULL(cost_components);
+  CHECK(cost_components);
 
   double lat_offset_cost = LatOffsetCost(sl_points);
   double lat_comfort_cost = LatComfortCost(sl_points);

@@ -106,7 +106,7 @@ void PlanningBase::PublishPlanningPb(ADCTrajectory* trajectory_pb,
 }
 
 void PlanningBase::SetFallbackTrajectory(ADCTrajectory* trajectory_pb) {
-  CHECK_NOTNULL(trajectory_pb);
+  CHECK(trajectory_pb);
   // use planning trajecotry from last cycle
   auto* last_planning = AdapterManager::GetPlanning();
   if (last_planning != nullptr && !last_planning->Empty()) {

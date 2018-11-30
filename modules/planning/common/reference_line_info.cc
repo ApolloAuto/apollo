@@ -434,7 +434,7 @@ std::string ReferenceLineInfo::PathSpeedDebugString() const {
 
 void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   // set vehicle change lane signal
-  CHECK_NOTNULL(signal);
+  CHECK(signal);
 
   signal->Clear();
   signal->set_turn_signal(VehicleSignal::TURN_NONE);
@@ -537,7 +537,7 @@ void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
 }
 
 void ReferenceLineInfo::MakeDecision(DecisionResult* decision_result) const {
-  CHECK_NOTNULL(decision_result);
+  CHECK(decision_result);
   decision_result->Clear();
 
   // cruise by default

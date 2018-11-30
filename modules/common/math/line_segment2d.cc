@@ -74,7 +74,7 @@ double LineSegment2d::DistanceTo(const Vec2d &point) const {
 
 double LineSegment2d::DistanceTo(const Vec2d &point,
                                  Vec2d *const nearest_pt) const {
-  CHECK_NOTNULL(nearest_pt);
+  CHECK(nearest_pt);
   if (length_ <= kMathEpsilon) {
     *nearest_pt = start_;
     return point.DistanceTo(start_);
@@ -112,7 +112,7 @@ double LineSegment2d::DistanceSquareTo(const Vec2d &point) const {
 
 double LineSegment2d::DistanceSquareTo(const Vec2d &point,
                                        Vec2d *const nearest_pt) const {
-  CHECK_NOTNULL(nearest_pt);
+  CHECK(nearest_pt);
   if (length_ <= kMathEpsilon) {
     *nearest_pt = start_;
     return point.DistanceSquareTo(start_);
@@ -160,7 +160,7 @@ bool LineSegment2d::HasIntersect(const LineSegment2d &other_segment) const {
 
 bool LineSegment2d::GetIntersect(const LineSegment2d &other_segment,
                                  Vec2d *const point) const {
-  CHECK_NOTNULL(point);
+  CHECK(point);
   if (IsPointIn(other_segment.start())) {
     *point = other_segment.start();
     return true;
@@ -201,7 +201,7 @@ bool LineSegment2d::GetIntersect(const LineSegment2d &other_segment,
 // return distance with perpendicular foot point.
 double LineSegment2d::GetPerpendicularFoot(const Vec2d &point,
                                            Vec2d *const foot_point) const {
-  CHECK_NOTNULL(foot_point);
+  CHECK(foot_point);
   if (length_ <= kMathEpsilon) {
     *foot_point = start_;
     return point.DistanceTo(start_);

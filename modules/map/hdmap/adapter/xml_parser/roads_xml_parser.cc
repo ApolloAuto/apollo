@@ -34,7 +34,7 @@ namespace adapter {
 
 Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                              std::vector<RoadInternal>* roads) {
-  CHECK_NOTNULL(roads);
+  CHECK(roads);
 
   auto road_node = xml_node.FirstChildElement("road");
   while (road_node) {

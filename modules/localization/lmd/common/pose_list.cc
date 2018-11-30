@@ -78,7 +78,7 @@ T InterpolateQuaternion(const T &p1, const T &p2, double frac1) {
 }  // namespace
 
 bool PoseList::FindMatchingPose(double timestamp_sec, Pose *pose) const {
-  CHECK_NOTNULL(pose);
+  CHECK(pose);
 
   auto p = RangeOf(timestamp_sec);
   if (p.first == end() || p.second == end()) {
@@ -91,7 +91,7 @@ bool PoseList::FindMatchingPose(double timestamp_sec, Pose *pose) const {
 }
 
 bool PoseList::FindNearestPose(double timestamp_sec, Pose *pose) const {
-  CHECK_NOTNULL(pose);
+  CHECK(pose);
 
   if (!FindMatchingPose(timestamp_sec, pose)) {
     auto it = Nearest(timestamp_sec);
@@ -109,7 +109,7 @@ void PoseList::InterpolatePose(double timestamp_sec1, const Pose &pose1,
                                double timestamp_sec, Pose *pose) {
   CHECK_GE(timestamp_sec, timestamp_sec1);
   CHECK_GE(timestamp_sec2, timestamp_sec);
-  CHECK_NOTNULL(pose);
+  CHECK(pose);
 
   auto time_diff = timestamp_sec2 - timestamp_sec1;
   if (fabs(time_diff) > 0.0) {

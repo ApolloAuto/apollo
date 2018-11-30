@@ -32,12 +32,12 @@ namespace adapter {
 Status LanesXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
                              const std::string& road_id,
                              std::vector<RoadSectionInternal>* sections) {
-  CHECK_NOTNULL(sections);
+  CHECK(sections);
   const auto lanes_node = xml_node.FirstChildElement("lanes");
-  CHECK_NOTNULL(lanes_node);
+  CHECK(lanes_node);
   const tinyxml2::XMLElement* sub_node =
       lanes_node->FirstChildElement("laneSection");
-  CHECK_NOTNULL(sub_node);
+  CHECK(sub_node);
 
   size_t section_cnt = 0;
   while (sub_node) {
@@ -62,7 +62,7 @@ Status LanesXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
 
 Status LanesXmlParser::ParseSectionBoundary(
     const tinyxml2::XMLElement& xml_node, PbBoundaryPolygon* boundary) {
-  CHECK_NOTNULL(boundary);
+  CHECK(boundary);
 
   auto boundaries_node = xml_node.FirstChildElement("boundaries");
   if (boundaries_node == nullptr) {
@@ -93,7 +93,7 @@ Status LanesXmlParser::ParseSectionBoundary(
 
 Status LanesXmlParser::ToPbBoundaryType(const std::string& type,
                                         PbBoundaryEdgeType* boundary_type) {
-  CHECK_NOTNULL(boundary_type);
+  CHECK(boundary_type);
 
   std::string upper_type = UtilXmlParser::ToUpper(type);
 
@@ -110,7 +110,7 @@ Status LanesXmlParser::ToPbBoundaryType(const std::string& type,
 
 Status LanesXmlParser::ParseLaneSection(const tinyxml2::XMLElement& xml_node,
                                         std::vector<LaneInternal>* lanes) {
-  CHECK_NOTNULL(lanes);
+  CHECK(lanes);
 
   // left
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("left");
@@ -135,9 +135,9 @@ Status LanesXmlParser::ParseLaneSection(const tinyxml2::XMLElement& xml_node,
   // center
   LaneInternal reference_lane_internal;
   sub_node = xml_node.FirstChildElement("center");
-  CHECK_NOTNULL(sub_node);
+  CHECK(sub_node);
   sub_node = sub_node->FirstChildElement("lane");
-  CHECK_NOTNULL(sub_node);
+  CHECK(sub_node);
   RETURN_IF_ERROR(ParseLane(*sub_node, &reference_lane_internal));
   *(reference_lane_internal.lane.mutable_left_boundary()) =
       reference_lane_internal.lane.right_boundary();
@@ -168,7 +168,7 @@ Status LanesXmlParser::ParseLaneSection(const tinyxml2::XMLElement& xml_node,
 
 Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
                                  LaneInternal* lane_internal) {
-  CHECK_NOTNULL(lane_internal);
+  CHECK(lane_internal);
 
   PbLane* lane = &lane_internal->lane;
   // lane id
@@ -304,7 +304,7 @@ Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
 
 Status LanesXmlParser::ParseDirection(const tinyxml2::XMLElement& xml_node,
                                       PbLane* lane) {
-  CHECK_NOTNULL(lane);
+  CHECK(lane);
   std::string direction;
   int checker =
       UtilXmlParser::QueryStringAttribute(xml_node, "direction", &direction);
@@ -325,7 +325,7 @@ Status LanesXmlParser::ParseDirection(const tinyxml2::XMLElement& xml_node,
 
 Status LanesXmlParser::ParseCenterCurve(const tinyxml2::XMLElement& xml_node,
                                         PbLane* lane) {
-  CHECK_NOTNULL(lane);
+  CHECK(lane);
   auto sub_node = xml_node.FirstChildElement("centerLine");
   if (!sub_node) {
     std::string err_msg = "Error parse lane center curve";
@@ -362,7 +362,7 @@ Status LanesXmlParser::ParseSpeed(const tinyxml2::XMLElement& xml_node,
 
 Status LanesXmlParser::ParseSampleAssociates(
     const tinyxml2::XMLElement& xml_node, PbLane* lane) {
-  CHECK_NOTNULL(lane);
+  CHECK(lane);
   auto sub_node = xml_node.FirstChildElement("sampleAssociates");
   if (sub_node == nullptr) {
     std::string err_msg = "Error parse sample associates";
@@ -402,7 +402,7 @@ Status LanesXmlParser::ParseSampleAssociates(
 
 Status LanesXmlParser::ParseRoadSampleAssociates(
     const tinyxml2::XMLElement& xml_node, PbLane* lane) {
-  CHECK_NOTNULL(lane);
+  CHECK(lane);
   auto sub_node = xml_node.FirstChildElement("roadSampleAssociations");
   if (sub_node == nullptr) {
     std::string err_msg = "Error parse road sample associations";
@@ -443,7 +443,7 @@ Status LanesXmlParser::ParseRoadSampleAssociates(
 Status LanesXmlParser::ParseObjectOverlapGroup(
     const tinyxml2::XMLElement& xml_node,
     std::vector<OverlapWithLane>* object_overlaps) {
-  CHECK_NOTNULL(object_overlaps);
+  CHECK(object_overlaps);
 
   auto object_overlap = xml_node.FirstChildElement("objectOverlapGroup");
   if (object_overlap) {
@@ -483,7 +483,7 @@ Status LanesXmlParser::ParseObjectOverlapGroup(
 Status LanesXmlParser::ParseSignalOverlapGroup(
     const tinyxml2::XMLElement& xml_node,
     std::vector<OverlapWithLane>* signal_overlaps) {
-  CHECK_NOTNULL(signal_overlaps);
+  CHECK(signal_overlaps);
 
   auto signal_overlap = xml_node.FirstChildElement("signalOverlapGroup");
   if (signal_overlap) {
@@ -524,7 +524,7 @@ Status LanesXmlParser::ParseSignalOverlapGroup(
 Status LanesXmlParser::ParseJunctionOverlapGroup(
     const tinyxml2::XMLElement& xml_node,
     std::vector<OverlapWithLane>* junction_overlaps) {
-  CHECK_NOTNULL(junction_overlaps);
+  CHECK(junction_overlaps);
 
   auto overlap_group = xml_node.FirstChildElement("junctionOverlapGroup");
   if (overlap_group) {
@@ -565,7 +565,7 @@ Status LanesXmlParser::ParseJunctionOverlapGroup(
 Status LanesXmlParser::ParseLaneOverlapGroup(
     const tinyxml2::XMLElement& xml_node,
     std::vector<OverlapWithLane>* lane_overlaps) {
-  CHECK_NOTNULL(lane_overlaps);
+  CHECK(lane_overlaps);
 
   auto overlap_node = xml_node.FirstChildElement("laneOverlapGroup");
   if (overlap_node) {
@@ -606,7 +606,7 @@ Status LanesXmlParser::ParseLaneOverlapGroup(
 
 Status LanesXmlParser::ToPbLaneType(const std::string& type,
                                     PbLaneType* lane_type) {
-  CHECK_NOTNULL(lane_type);
+  CHECK(lane_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(type);
 
@@ -632,7 +632,7 @@ Status LanesXmlParser::ToPbLaneType(const std::string& type,
 
 Status LanesXmlParser::ToPbTurnType(const std::string& type,
                                     PbTurnType* pb_turn_type) {
-  CHECK_NOTNULL(pb_turn_type);
+  CHECK(pb_turn_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(type);
 
@@ -654,7 +654,7 @@ Status LanesXmlParser::ToPbTurnType(const std::string& type,
 
 Status LanesXmlParser::ToPbDirection(const std::string& type,
                                      PbLaneDirection* pb_direction) {
-  CHECK_NOTNULL(pb_direction);
+  CHECK(pb_direction);
 
   std::string upper_str = UtilXmlParser::ToUpper(type);
 
@@ -674,7 +674,7 @@ Status LanesXmlParser::ToPbDirection(const std::string& type,
 
 void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
                                    PbLane* lane) {
-  CHECK_NOTNULL(lane);
+  CHECK(lane);
 
   const tinyxml2::XMLElement* sub_node =
       xml_node.FirstChildElement("predecessor");
@@ -724,7 +724,7 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
 Status LanesXmlParser::ParseLaneBorderMark(
     const tinyxml2::XMLElement& xml_node,
     PbLaneBoundaryTypeType* boundary_type) {
-  CHECK_NOTNULL(boundary_type);
+  CHECK(boundary_type);
 
   std::string type;
   std::string color;
@@ -748,7 +748,7 @@ Status LanesXmlParser::ParseLaneBorderMark(
 Status LanesXmlParser::ToPbLaneMarkType(const std::string& type,
                                         const std::string& color,
                                         PbLaneBoundaryTypeType* boundary_type) {
-  CHECK_NOTNULL(boundary_type);
+  CHECK(boundary_type);
 
   std::string upper_type = UtilXmlParser::ToUpper(type);
   std::string upper_color = UtilXmlParser::ToUpper(color);

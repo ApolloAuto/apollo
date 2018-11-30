@@ -60,7 +60,7 @@ bool DpRoadGraph::FindPathTunnel(
     const common::TrajectoryPoint &init_point,
     const std::vector<const PathObstacle *> &obstacles,
     PathData *const path_data) {
-  CHECK_NOTNULL(path_data);
+  CHECK(path_data);
 
   init_point_ = init_point;
   if (!reference_line_.XYToSL(
@@ -210,9 +210,9 @@ void DpRoadGraph::UpdateNode(const std::list<DpRoadGraphNode> &prev_nodes,
                              TrajectoryCost *trajectory_cost,
                              DpRoadGraphNode *front,
                              DpRoadGraphNode *cur_node) {
-  DCHECK_NOTNULL(trajectory_cost);
-  DCHECK_NOTNULL(front);
-  DCHECK_NOTNULL(cur_node);
+  DCHECK(trajectory_cost);
+  DCHECK(front);
+  DCHECK(cur_node);
   for (const auto &prev_dp_node : prev_nodes) {
     const auto &prev_sl_point = prev_dp_node.sl_point;
     const auto &cur_point = cur_node->sl_point;

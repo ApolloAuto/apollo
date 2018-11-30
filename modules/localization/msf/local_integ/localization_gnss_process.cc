@@ -198,7 +198,7 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(const InsPva &sins_pva_msg,
 
 LocalizationMeasureState LocalizationGnssProcess::GetResult(
     MeasureData *gnss_msg) {
-  CHECK_NOTNULL(gnss_msg);
+  CHECK(gnss_msg);
 
   // convert GnssPntResult to IntegMeasure
   // double sec_s = Clock::NowInSeconds(); // ros::Time::now().toSec();
@@ -305,7 +305,7 @@ inline void LocalizationGnssProcess::LogPnt(const GnssPntResultMsg &rover_pnt,
 }
 
 bool LocalizationGnssProcess::GnssPosition(EpochObservationMsg *raw_rover_obs) {
-  CHECK_NOTNULL(raw_rover_obs);
+  CHECK(raw_rover_obs);
 
   gnss_state_ = LocalizationMeasureState::NOT_VALID;
   if (raw_rover_obs->receiver_id() != 0) {

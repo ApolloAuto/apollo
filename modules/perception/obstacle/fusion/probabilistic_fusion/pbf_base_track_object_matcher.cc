@@ -38,9 +38,9 @@ void PbfBaseTrackObjectMatcher::IdAssign(
     std::vector<std::pair<int, int>> *assignments,
     std::vector<int> *unassigned_fusion_tracks,
     std::vector<int> *unassigned_sensor_objects) {
-  CHECK_NOTNULL(assignments);
-  CHECK_NOTNULL(unassigned_fusion_tracks);
-  CHECK_NOTNULL(unassigned_sensor_objects);
+  CHECK(assignments);
+  CHECK(unassigned_fusion_tracks);
+  CHECK(unassigned_sensor_objects);
 
   size_t num_track = fusion_tracks.size();
   size_t num_obj = sensor_objects.size();

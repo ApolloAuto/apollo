@@ -35,7 +35,7 @@ RNNEvaluator::RNNEvaluator() { LoadModel(FLAGS_evaluator_vehicle_rnn_file); }
 
 void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
-  CHECK_NOTNULL(obstacle_ptr);
+  CHECK(obstacle_ptr);
 
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
@@ -44,7 +44,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
-  CHECK_NOTNULL(latest_feature_ptr);
+  CHECK(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph()) {
     ADEBUG << "Obstacle [" << id << "] has no lane graph.";
@@ -53,7 +53,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
-  CHECK_NOTNULL(lane_graph_ptr);
+  CHECK(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     ADEBUG << "Obstacle [" << id << "] has no lane sequences.";
     return;

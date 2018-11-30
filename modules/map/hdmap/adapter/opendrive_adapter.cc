@@ -26,7 +26,7 @@ namespace adapter {
 
 bool OpendriveAdapter::LoadData(const std::string& filename,
                                 apollo::hdmap::Map* pb_map) {
-  CHECK_NOTNULL(pb_map);
+  CHECK(pb_map);
 
   tinyxml2::XMLDocument document;
   if (document.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS) {

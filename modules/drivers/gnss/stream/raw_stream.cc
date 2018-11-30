@@ -145,8 +145,8 @@ RawStream::~RawStream() {
 }
 
 bool RawStream::Init() {
-  CHECK_NOTNULL(data_parser_ptr_);
-  CHECK_NOTNULL(rtcm_parser_ptr_);
+  CHECK(data_parser_ptr_);
+  CHECK(rtcm_parser_ptr_);
   if (!data_parser_ptr_->Init()) {
     AERROR << "Init data parser failed.";
     return false;
@@ -498,7 +498,7 @@ void RawStream::RtkSpin() {
 
 void RawStream::PublishRtkData(size_t length) {
   std_msgs::StringPtr rtkmsg(new std_msgs::String);
-  CHECK_NOTNULL(rtkmsg);
+  CHECK(rtkmsg);
   rtkmsg->data.assign(reinterpret_cast<const char *>(buffer_rtk_), length);
   AdapterManager::PublishRtcmData(*rtkmsg);
   rtcm_parser_ptr_->ParseRtcmData(rtkmsg);

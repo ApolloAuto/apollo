@@ -218,7 +218,7 @@ Status QpPiecewiseStGraph::AddKernel(
     const std::vector<const StBoundary*>& boundaries,
     const SpeedLimit& speed_limit) {
   auto* kernel = generator_->mutable_kernel();
-  DCHECK_NOTNULL(kernel);
+  DCHECK(kernel);
 
   if (qp_st_speed_config_.qp_piecewise_config().accel_kernel_weight() > 0) {
     kernel->AddSecondOrderDerivativeMatrix(
@@ -369,7 +369,7 @@ Status QpPiecewiseStGraph::EstimateSpeedUpperBound(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
     std::vector<double>* speed_upper_bound) const {
   // TODO(Lianliang): define a QpStGraph class and move this function in it.
-  DCHECK_NOTNULL(speed_upper_bound);
+  DCHECK(speed_upper_bound);
 
   speed_upper_bound->clear();
 

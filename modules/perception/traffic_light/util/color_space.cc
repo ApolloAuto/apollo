@@ -48,10 +48,10 @@ namespace traffic_light {
 template <bool align>
 SIMD_INLINE void YuvSeperateAvx2(uint8_t *y, __m256i *y0, __m256i *y1,
                                  __m256i *u0, __m256i *v0) {
-  DCHECK_NOTNULL(y0);
-  DCHECK_NOTNULL(y1);
-  DCHECK_NOTNULL(u0);
-  DCHECK_NOTNULL(v0);
+  DCHECK(y0);
+  DCHECK(y1);
+  DCHECK(u0);
+  DCHECK(v0);
 
   __m256i yuv_m256[4];
 

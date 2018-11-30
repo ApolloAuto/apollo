@@ -193,7 +193,7 @@ bool QuinticSpiralCurve::CalculatePath() {
 
 Status QuinticSpiralCurve::GetPathVec(
     const std::uint32_t n, std::vector<common::PathPoint>* path_points) const {
-  CHECK_NOTNULL(path_points);
+  CHECK(path_points);
 
   if (n <= 1 || error() > spiral_config().newton_raphson_tol()) {
     return Status(ErrorCode::PLANNING_ERROR,
@@ -250,7 +250,7 @@ Status QuinticSpiralCurve::GetPathVec(
 Status QuinticSpiralCurve::GetPathVecWithS(
     const std::vector<double>& vec_s,
     std::vector<common::PathPoint>* path_points) const {
-  CHECK_NOTNULL(path_points);
+  CHECK(path_points);
 
   if (error() > spiral_config().newton_raphson_tol()) {
     return Status(ErrorCode::PLANNING_ERROR,

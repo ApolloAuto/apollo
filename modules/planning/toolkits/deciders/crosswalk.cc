@@ -59,8 +59,8 @@ Crosswalk::Crosswalk(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 Status Crosswalk::ApplyRule(Frame* const frame,
                             ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   if (!FindCrosswalks(reference_line_info)) {
     GetPlanningStatus()->clear_crosswalk();
@@ -73,8 +73,8 @@ Status Crosswalk::ApplyRule(Frame* const frame,
 
 void Crosswalk::MakeDecisions(Frame* const frame,
                               ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
@@ -319,7 +319,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 }
 
 bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   crosswalk_overlaps_.clear();
   const std::vector<hdmap::PathOverlap>& crosswalk_overlaps =
@@ -338,9 +338,9 @@ int Crosswalk::BuildStopDecision(Frame* const frame,
                                  ReferenceLineInfo* const reference_line_info,
                                  hdmap::PathOverlap* const crosswalk_overlap,
                                  std::vector<std::string> pedestrians) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-  CHECK_NOTNULL(crosswalk_overlap);
+  CHECK(frame);
+  CHECK(reference_line_info);
+  CHECK(crosswalk_overlap);
 
   // check
   const auto& reference_line = reference_line_info->reference_line();

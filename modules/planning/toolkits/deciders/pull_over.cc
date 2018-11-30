@@ -401,7 +401,7 @@ int PullOver::FindPullOverStop(PointENU* stop_point) {
     for (const auto& neighbor_lane_id :
          lane->lane().right_neighbor_forward_lane_id()) {
       const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
-      CHECK_NOTNULL(hdmap_ptr);
+      CHECK(hdmap_ptr);
       const auto& neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
       if (!neighbor_lane) {
         ADEBUG << "Failed to find lane[" << neighbor_lane_id.id() << "]";

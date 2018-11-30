@@ -33,7 +33,7 @@ using apollo::common::util::GetProtoFromFile;
 
 bool AsyncFusion::Init() {
   track_manager_ = PbfTrackManager::instance();
-  CHECK_NOTNULL(track_manager_);
+  CHECK(track_manager_);
 
   if (!GetProtoFromFile(FLAGS_async_fusion_config, &config_)) {
     AERROR << "Cannot get config proto from file: " << FLAGS_tracker_config;

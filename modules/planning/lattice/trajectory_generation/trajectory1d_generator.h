@@ -94,7 +94,7 @@ inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<4>(
     const std::array<double, 3>& init_state,
     const std::vector<std::pair<std::array<double, 3>, double>>& end_conditions,
     std::vector<std::shared_ptr<Curve1d>>* ptr_trajectory_bundle) const {
-  CHECK_NOTNULL(ptr_trajectory_bundle);
+  CHECK(ptr_trajectory_bundle);
   CHECK(!end_conditions.empty());
 
   ptr_trajectory_bundle->reserve(end_conditions.size());
@@ -115,7 +115,7 @@ inline void Trajectory1dGenerator::GenerateTrajectory1DBundle<5>(
     const std::array<double, 3>& init_state,
     const std::vector<std::pair<std::array<double, 3>, double>>& end_conditions,
     std::vector<std::shared_ptr<Curve1d>>* ptr_trajectory_bundle) const {
-  CHECK_NOTNULL(ptr_trajectory_bundle);
+  CHECK(ptr_trajectory_bundle);
   CHECK(!end_conditions.empty());
 
   ptr_trajectory_bundle->reserve(end_conditions.size());

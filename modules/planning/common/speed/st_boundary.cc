@@ -269,8 +269,8 @@ void StBoundary::SetCharacteristicLength(const double characteristic_length) {
 
 bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
                                   double* s_lower) const {
-  CHECK_NOTNULL(s_upper);
-  CHECK_NOTNULL(s_lower);
+  CHECK(s_upper);
+  CHECK(s_lower);
 
   *s_upper = s_high_limit_;
   *s_lower = 0.0;
@@ -310,8 +310,8 @@ bool StBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
 
 bool StBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
                                    double* s_lower) const {
-  CHECK_NOTNULL(s_upper);
-  CHECK_NOTNULL(s_lower);
+  CHECK(s_upper);
+  CHECK(s_lower);
   if (curr_time < min_t_ || curr_time > max_t_) {
     return false;
   }
@@ -343,8 +343,8 @@ double StBoundary::max_t() const { return max_t_; }
 bool StBoundary::GetIndexRange(const std::vector<STPoint>& points,
                                const double t, size_t* left,
                                size_t* right) const {
-  CHECK_NOTNULL(left);
-  CHECK_NOTNULL(right);
+  CHECK(left);
+  CHECK(right);
   if (t < points.front().t() || t > points.back().t()) {
     AERROR << "t is out of range. t = " << t;
     return false;

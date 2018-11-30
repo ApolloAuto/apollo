@@ -65,7 +65,7 @@ Transform::Transform(ros::NodeHandle node, ros::NodeHandle private_nh)
 }
 
 void Transform::reconfigure_callback(TransformNodeConf *config) {
-  CHECK_NOTNULL(config);
+  CHECK(config);
   ROS_INFO_STREAM("Reconfigure request.");
   data_->setParameters(config->min_range(), config->max_range(),
                        config->view_direction(), config->view_width());

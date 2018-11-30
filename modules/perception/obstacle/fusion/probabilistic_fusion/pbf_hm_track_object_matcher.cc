@@ -33,11 +33,11 @@ bool PbfHmTrackObjectMatcher::Match(
     std::vector<int> *unassigned_sensor_objects,
     std::vector<double> *track2measurements_dist,
     std::vector<double> *measurement2track_dist) {
-  CHECK_NOTNULL(assignments);
-  CHECK_NOTNULL(unassigned_fusion_tracks);
-  CHECK_NOTNULL(unassigned_sensor_objects);
-  CHECK_NOTNULL(track2measurements_dist);
-  CHECK_NOTNULL(measurement2track_dist);
+  CHECK(assignments);
+  CHECK(unassigned_fusion_tracks);
+  CHECK(unassigned_sensor_objects);
+  CHECK(track2measurements_dist);
+  CHECK(measurement2track_dist);
 
   if (options.ref_point == nullptr) {
     AERROR << "reference points is nullptr!";
@@ -127,7 +127,7 @@ void PbfHmTrackObjectMatcher::ComputeAssociationMat(
     const std::vector<int> &unassigned_sensor_objects,
     const Eigen::Vector3d &ref_point, const Eigen::Matrix4d &sensor_world_pose,
     std::vector<std::vector<double>> *association_mat) {
-  CHECK_NOTNULL(association_mat);
+  CHECK(association_mat);
 
   PbfTrackObjectDistance pbf_distance;
   Eigen::Vector3d local_ref_point = ref_point;

@@ -50,7 +50,7 @@ apollo::common::Status PathDecider::Execute(
 
 Status PathDecider::Process(const PathData &path_data,
                             PathDecision *const path_decision) {
-  CHECK_NOTNULL(path_decision);
+  CHECK(path_decision);
   if (!MakeObjectDecision(path_data, path_decision)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
@@ -60,7 +60,7 @@ Status PathDecider::Process(const PathData &path_data,
 
 bool PathDecider::MakeObjectDecision(const PathData &path_data,
                                      PathDecision *const path_decision) {
-  DCHECK_NOTNULL(path_decision);
+  DCHECK(path_decision);
   if (!MakeStaticObstacleDecision(path_data, path_decision)) {
     AERROR << "Failed to make decisions for static obstacles";
     return false;
@@ -70,7 +70,7 @@ bool PathDecider::MakeObjectDecision(const PathData &path_data,
 
 bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, PathDecision *const path_decision) {
-  DCHECK_NOTNULL(path_decision);
+  DCHECK(path_decision);
   const auto &frenet_path = path_data.frenet_frame_path();
   const auto &frenet_points = frenet_path.points();
   if (frenet_points.empty()) {

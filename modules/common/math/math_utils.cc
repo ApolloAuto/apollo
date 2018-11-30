@@ -86,8 +86,8 @@ double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
 
 void RotateAxis(const double theta, const double x0, const double y0,
                 double* x1, double* y1) {
-  CHECK_NOTNULL(x1);
-  CHECK_NOTNULL(y1);
+  CHECK(x1);
+  CHECK(y1);
 
   const double cos_theta = std::cos(theta);
   const double sin_theta = std::sin(theta);

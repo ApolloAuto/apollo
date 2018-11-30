@@ -27,7 +27,7 @@ namespace adapter {
 Status SignalsXmlParser::ParseTrafficLights(
     const tinyxml2::XMLElement& xml_node,
     std::vector<TrafficLightInternal>* traffic_lights) {
-  CHECK_NOTNULL(traffic_lights);
+  CHECK(traffic_lights);
   auto signal_node = xml_node.FirstChildElement("signal");
   while (signal_node) {
     std::string object_type;
@@ -116,7 +116,7 @@ Status SignalsXmlParser::ParseTrafficLights(
 
 Status SignalsXmlParser::ToPbSignalType(const std::string& xml_type,
                                         PbSignalType* signal_type) {
-  CHECK_NOTNULL(signal_type);
+  CHECK(signal_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
 
@@ -142,7 +142,7 @@ Status SignalsXmlParser::ToPbSignalType(const std::string& xml_type,
 
 Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
                                            PbSubSignalType* sub_signal_type) {
-  CHECK_NOTNULL(sub_signal_type);
+  CHECK(sub_signal_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
 
@@ -172,7 +172,7 @@ Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
 Status SignalsXmlParser::ParseStopSigns(
     const tinyxml2::XMLElement& xml_node,
     std::vector<StopSignInternal>* stop_signs) {
-  CHECK_NOTNULL(stop_signs);
+  CHECK(stop_signs);
 
   auto signal_node = xml_node.FirstChildElement("signal");
   while (signal_node) {
@@ -219,7 +219,7 @@ Status SignalsXmlParser::ParseStopSigns(
 Status SignalsXmlParser::ParseYieldSigns(
     const tinyxml2::XMLElement& xml_node,
     std::vector<YieldSignInternal>* yield_signs) {
-  CHECK_NOTNULL(yield_signs);
+  CHECK(yield_signs);
 
   auto signal_node = xml_node.FirstChildElement("signal");
   while (signal_node) {

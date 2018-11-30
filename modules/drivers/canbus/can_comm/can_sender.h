@@ -271,7 +271,7 @@ int32_t SenderMessage<SensorType>::curr_period() const {
 
 template <typename SensorType>
 void CanSender<SensorType>::PowerSendThreadFunc() {
-  CHECK_NOTNULL(can_client_);
+  CHECK(can_client_);
   sched_param sch;
   sch.sched_priority = 99;
   pthread_setschedparam(pthread_self(), SCHED_FIFO, &sch);

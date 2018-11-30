@@ -151,7 +151,7 @@ void RelativeMap::OnReceiveNavigationInfo(
 }
 
 bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
-  CHECK_NOTNULL(map_msg);
+  CHECK(map_msg);
 
   if (AdapterManager::GetLocalization()->Empty()) {
     LogErrorStatus(map_msg, "localization is not ready");

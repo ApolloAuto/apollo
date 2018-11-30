@@ -53,7 +53,7 @@ bool ObjectCameraFilter::Filter(
 std::string ObjectCameraFilter::Name() const { return "ObjectCameraFilter"; }
 
 void ObjectCameraFilter::InitFilter(const float x, KalmanFilter1D* filter) {
-  CHECK_NOTNULL(filter);
+  CHECK(filter);
 
   Eigen::Matrix<float, 2, 1> state_x;
   state_x << x, 0.0f;

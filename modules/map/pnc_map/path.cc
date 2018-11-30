@@ -108,7 +108,7 @@ LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
   }
   auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
   auto map_ptr = HDMapUtil::BaseMapPtr();
-  CHECK_NOTNULL(map_ptr);
+  CHECK(map_ptr);
   for (const auto& lane_id :
        waypoint.lane->lane().left_neighbor_forward_lane_id()) {
     auto lane = map_ptr->GetLaneById(lane_id);
@@ -164,7 +164,7 @@ LaneWaypoint RightNeighborWaypoint(const LaneWaypoint& waypoint) {
   }
   auto point = waypoint.lane->GetSmoothPoint(waypoint.s);
   auto map_ptr = HDMapUtil::BaseMapPtr();
-  CHECK_NOTNULL(map_ptr);
+  CHECK(map_ptr);
   for (const auto& lane_id :
        waypoint.lane->lane().right_neighbor_forward_lane_id()) {
     auto lane = map_ptr->GetLaneById(lane_id);
@@ -371,7 +371,7 @@ void Path::InitWidth() {
       AWARN << "path point:" << point.DebugString() << " has invalid width.";
     } else {
       const LaneWaypoint waypoint = point.lane_waypoints()[0];
-      CHECK_NOTNULL(waypoint.lane);
+      CHECK(waypoint.lane);
 
       double lane_left_width = 0.0;
       double lane_right_width = 0.0;
@@ -777,8 +777,8 @@ double Path::GetLaneRightWidth(const double s) const {
 
 bool Path::GetLaneWidth(const double s, double* lane_left_width,
                         double* lane_right_width) const {
-  CHECK_NOTNULL(lane_left_width);
-  CHECK_NOTNULL(lane_right_width);
+  CHECK(lane_left_width);
+  CHECK(lane_right_width);
 
   if (s < 0.0 || s > length_) {
     return false;
@@ -798,8 +798,8 @@ double Path::GetRoadRightWidth(const double s) const {
 
 bool Path::GetRoadWidth(const double s, double* road_left_width,
                         double* road_right_width) const {
-  CHECK_NOTNULL(road_left_width);
-  CHECK_NOTNULL(road_right_width);
+  CHECK(road_left_width);
+  CHECK(road_right_width);
 
   if (s < 0.0 || s > length_) {
     return false;

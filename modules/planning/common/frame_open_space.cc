@@ -78,7 +78,7 @@ const common::VehicleState &FrameOpenSpace::vehicle_state() const {
 
 Status FrameOpenSpace::Init() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
-  CHECK_NOTNULL(hdmap_);
+  CHECK(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::instance()->vehicle_state();
   const auto &point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());

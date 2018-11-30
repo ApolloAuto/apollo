@@ -53,7 +53,7 @@ Status DpPolyPathOptimizer::Process(const SpeedData &speed_data,
     AERROR << "Please call Init() before Process().";
     return Status(ErrorCode::PLANNING_ERROR, "Not inited.");
   }
-  CHECK_NOTNULL(path_data);
+  CHECK(path_data);
   DpRoadGraph dp_road_graph(config_, *reference_line_info_, speed_data);
   dp_road_graph.SetDebugLogger(reference_line_info_->mutable_debug());
   dp_road_graph.SetWaypointSampler(

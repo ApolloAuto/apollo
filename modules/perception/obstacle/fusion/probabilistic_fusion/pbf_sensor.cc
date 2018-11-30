@@ -30,7 +30,7 @@ PbfSensor::~PbfSensor() {}
 
 void PbfSensor::QueryLatestFrames(const double time_stamp,
                                   std::vector<PbfSensorFramePtr> *frames) {
-  CHECK_NOTNULL(frames);
+  CHECK(frames);
   frames->clear();
   for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->timestamp > latest_query_timestamp_ &&
@@ -79,7 +79,7 @@ void PbfSensor::AddFrame(const SensorObjects &frame) {
 
 bool PbfSensor::GetPose(const double time_stamp, const double time_range,
                         Eigen::Matrix4d *pose) {
-  CHECK_NOTNULL(pose);
+  CHECK(pose);
   CHECK_GE(time_range, 0.0);
 
   for (auto rit = frames_.rbegin(); rit != frames_.rend(); ++rit) {

@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
 bool ParseNavigationLineFileNames(
     int argc, char** argv,
     std::vector<std::string>* navigation_line_filenames) {
-  CHECK_NOTNULL(navigation_line_filenames);
+  CHECK(navigation_line_filenames);
   bool initialized = false;
   if (argc > 1) {
     try {
@@ -134,7 +134,7 @@ bool ParseNavigationLineFileNames(
 
 bool GetNavigationPathFromFile(const std::string& filename,
                                NavigationPath* navigation_path) {
-  CHECK_NOTNULL(navigation_path);
+  CHECK(navigation_path);
 
   std::ifstream ifs(filename, std::ios::in);
   if (!ifs.is_open()) {

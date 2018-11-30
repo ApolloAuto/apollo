@@ -68,7 +68,7 @@ const double kDuplicatedPointsEpsilon = 1e-7;
 const double kTrajectoryApproximationMaxError = 2.0;
 
 void RemoveDuplicates(std::vector<MapPathPoint> *points) {
-  CHECK_NOTNULL(points);
+  CHECK(points);
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
   for (size_t i = 0; i < points->size(); ++i) {
@@ -375,7 +375,7 @@ int PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
 
 bool PncMap::PassageToSegments(routing::Passage passage,
                                RouteSegments *segments) const {
-  CHECK_NOTNULL(segments);
+  CHECK(segments);
   segments->clear();
   for (const auto &lane : passage.segment()) {
     auto lane_ptr = hdmap_->GetLaneById(hdmap::MakeMapId(lane.id()));
@@ -648,7 +648,7 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     AERROR << "The input segments is empty";
     return false;
   }
-  CHECK_NOTNULL(truncated_segments);
+  CHECK(truncated_segments);
   truncated_segments->SetProperties(segments);
 
   if (start_s >= end_s) {

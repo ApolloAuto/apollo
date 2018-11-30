@@ -42,8 +42,8 @@ Destination::Destination(const TrafficRuleConfig& config)
 
 Status Destination::ApplyRule(Frame* frame,
                               ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   if (!frame->is_near_destination()) {
     return Status::OK();
@@ -73,8 +73,8 @@ Status Destination::ApplyRule(Frame* frame,
  */
 int Destination::BuildStopDecision(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   const auto& routing =
       AdapterManager::GetRoutingResponse()->GetLatestObserved();
@@ -122,8 +122,8 @@ int Destination::BuildStopDecision(
 int Destination::Stop(Frame* const frame,
                       ReferenceLineInfo* const reference_line_info,
                       const std::string lane_id, const double lane_s) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(frame);
+  CHECK(reference_line_info);
 
   const auto& reference_line = reference_line_info->reference_line();
 
@@ -174,7 +174,7 @@ bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
                                 const std::string& dest_lane_id,
                                 const double dest_lane_s,
                                 common::PointENU* dest_point) {
-  CHECK_NOTNULL(reference_line_info);
+  CHECK(reference_line_info);
 
   if (!config_.destination().enable_pull_over()) {
     return false;

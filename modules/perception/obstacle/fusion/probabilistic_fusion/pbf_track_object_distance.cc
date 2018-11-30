@@ -328,7 +328,7 @@ float PbfTrackObjectDistance::ComputeEuclideanDistance(
 
 bool PbfTrackObjectDistance::ComputePolygonCenter(const PolygonDType &polygon,
                                                   Eigen::Vector3d *center) {
-  CHECK_NOTNULL(center);
+  CHECK(center);
   if (polygon.empty()) {
     return false;
   }
@@ -345,7 +345,7 @@ bool PbfTrackObjectDistance::ComputePolygonCenter(const PolygonDType &polygon,
 bool PbfTrackObjectDistance::ComputePolygonCenter(
     const PolygonDType &polygon, const Eigen::Vector3d &ref_pos, int range,
     Eigen::Vector3d *center) {
-  CHECK_NOTNULL(center);
+  CHECK(center);
   PolygonDType polygon_part;
   std::set<std::pair<double, int>> distance2idx_set;
 
