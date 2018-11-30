@@ -226,10 +226,11 @@ void HMIWorker::InitStatus() {
   // Populate maps and current_map.
   for (const auto& map_entry : config_.maps()) {
     status_.add_maps(map_entry.first);
-  }
-  // If current FLAG_map_dir is still available, set it as current_map.
-  if (ContainsKey(config_.maps(), FLAGS_map_dir)) {
-    status_.set_current_map(FLAGS_map_dir);
+
+    // If current FLAG_map_dir is available, set it as current_map.
+    if (map_entry.second == FLAGS_map_dir) {
+      status_.set_current_map(map_entry.first);
+    }
   }
 
   // Populate vehicles and current_vehicle.
