@@ -280,7 +280,7 @@ class TrajectoryToSample(object):
             4: True Go and reached lane_center
             '''
 
-            # This is to labl each saved lane_sequence.
+            # This is to label each saved lane_sequence.
             for lane_sequence in fea.lane.lane_graph.lane_sequence:
                 # Sanity check.
                 if len(lane_sequence.lane_segment) == 0:
