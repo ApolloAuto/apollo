@@ -204,19 +204,24 @@ class Recorder(object):
             topics.extend(LARGE_TOPICS)
         if self.args.additional_topics:
             topics.extend(self.args.additional_topics)
+        self.record_task(disk_to_use, SMALL_TOPICS, True)
         self.record_task(disk_to_use, topics)
 
     def stop(self):
         """Stop recording."""
         shell_cmd('pkill -f "cyber_recorder record"')
 
-    def record_task(self, disk, topics):
+    def record_task(self, disk, topics, is_small_topic=False):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        if is_small_topic:
+            task_id = task_id + "_s"
         task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
 
         log_file = '/apollo/data/log/apollo_record.out'
+        if is_small_topic:
+            log_file = log_file + "_s"
         topics_str = ' -c '.join(topics)
 
         os.makedirs(task_dir)
