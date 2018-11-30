@@ -135,8 +135,8 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  auto time_matched_point =
-      prev_trajectory->TrajectoryPointAt(time_matched_index);
+  auto time_matched_point = prev_trajectory->TrajectoryPointAt(
+      static_cast<uint32_t>(time_matched_index));
 
   if (!time_matched_point.has_path_point()) {
     return ComputeReinitStitchingTrajectory(vehicle_state);
@@ -148,7 +148,8 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   auto frenet_sd = ComputePositionProjection(
       vehicle_state.x(), vehicle_state.y(),
-      prev_trajectory->TrajectoryPointAt(position_matched_index));
+      prev_trajectory->TrajectoryPointAt(
+          static_cast<uint32_t>(position_matched_index)));
 
   auto lon_diff = time_matched_point.path_point().s() - frenet_sd.first;
   auto lat_diff = frenet_sd.second;
@@ -165,7 +166,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   }
 
   double forward_rel_time =
-      prev_trajectory->TrajectoryPointAt(time_matched_index).relative_time() +
+      prev_trajectory
+          ->TrajectoryPointAt(static_cast<uint32_t>(time_matched_index))
+          .relative_time() +
       planning_cycle_time;
 
   std::size_t forward_time_index =
