@@ -1,8 +1,7 @@
 # Control
 
 ## Introduction
-  Based on planning and current car status, the Control module uses different control algorithms to
-  generate a comfortable driving experience. The Control module can work both in normal mode and navigation mode.
+Based on the planning trajectory and the car's current status, the Control module uses different control algorithms to generate a comfortable driving experience. The Control module can work both in normal and navigation modes.
 
 ## Input
   * Planning trajectory
@@ -11,4 +10,4 @@
   * Dreamview AUTO mode change request
 
 ## Output
-  * Control command (steering, throttle, brake) to the chassis.
+  * Control commands (steering, throttle, brake) to the chassis.
