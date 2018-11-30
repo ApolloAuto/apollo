@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,12 +50,12 @@ class Llcmotioncommandfeedback122
                                   const int32_t length) const;
 
   // config detail: {'description': 'Front brake pressure setpoint (after
-  // limits)', 'offset': 0.0, 'precision': 0.488519785051295, 'len': 11, 'name':
-  // 'LLC_FBK_BrakePressureSetpoint', 'is_signed_var': False, 'physical_range':
-  // '[0|1000]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit':
-  // '%'}
-  double llc_fbk_brakepressuresetpoint(const std::uint8_t* bytes,
-                                       const int32_t length) const;
+  // limits)', 'offset': 0.0, 'precision': 0.0556, 'len': 11, 'name':
+  // 'LLC_FBK_BrakePercentSetpoint', 'is_signed_var': False, 'physical_range':
+  // '[0|113.8132]', 'bit': 0, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': '%'}
+  double llc_fbk_brakepercentsetpoint(const std::uint8_t* bytes,
+                                      const int32_t length) const;
 
   // config detail: {'description': 'Motion command feedback 2 heartbeat
   // counter', 'offset': 0.0, 'precision': 1.0, 'len': 2, 'name':

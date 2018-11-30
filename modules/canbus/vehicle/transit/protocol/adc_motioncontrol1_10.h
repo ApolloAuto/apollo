@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   void Reset() override;
 
   // config detail: {'description': 'Setpoint for steering wheel angle. Positive
-  // for CW', 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name':
+  // for CW', 'offset': 0.0, 'precision': -0.05, 'len': 16, 'name':
   // 'ADC_CMD_SteerWheelAngle', 'is_signed_var': True, 'physical_range':
   // '[-1638.4|1638.35]', 'bit': 27, 'type': 'double', 'order': 'intel',
   // 'physical_unit': 'deg'}
@@ -78,11 +78,12 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
       int adc_motioncontrol1_checksum);
 
   // config detail: {'description': 'Brake pressure for direct longitudinal
-  // control', 'offset': 0.0, 'precision': 0.488519785051295, 'len': 11, 'name':
-  // 'ADC_CMD_BrakePressure', 'is_signed_var': False, 'physical_range':
-  // '[0|1000]', 'bit': 6, 'type': 'double', 'order': 'intel', 'physical_unit':
-  // '%'}
-  Adcmotioncontrol110* set_adc_cmd_brakepressure(double adc_cmd_brakepressure);
+  // control', 'offset': 0.0, 'precision': 0.0556, 'len': 11, 'name':
+  // 'ADC_CMD_BrakePercentage', 'is_signed_var': False, 'physical_range':
+  // '[0|113.8132]', 'bit': 6, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': '%'}
+  Adcmotioncontrol110* set_adc_cmd_brakepercentage(
+      double adc_cmd_brakepercentage);
 
   // config detail: {'description': 'Throttle pedal position percentage for
   // direct longitudinal control', 'offset': 0.0, 'precision': 0.1, 'len': 10,
@@ -102,10 +103,11 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'description': 'Request from ADC to LLC for autonomy',
   // 'enum': {0: 'ADC_CMD_AUTONOMYREQUEST_AUTONOMY_NOT_REQUESTED', 1:
   // 'ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED', 2:
-  // 'ADC_CMD_AUTONOMYREQUEST_RESERVED', 3: 'ADC_CMD_AUTONOMYREQUEST_RESERVED'},
-  // 'precision': 1.0, 'len': 2, 'name': 'ADC_CMD_AutonomyRequest',
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 0,
-  // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+  // 'ADC_CMD_AUTONOMYREQUEST_RESERVED0', 3:
+  // 'ADC_CMD_AUTONOMYREQUEST_RESERVED1'}, 'precision': 1.0, 'len': 2, 'name':
+  // 'ADC_CMD_AutonomyRequest', 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|3]', 'bit': 0, 'type': 'enum', 'order': 'intel',
+  // 'physical_unit': ''}
   Adcmotioncontrol110* set_adc_cmd_autonomyrequest(
       Adc_motioncontrol1_10::Adc_cmd_autonomyrequestType
           adc_cmd_autonomyrequest);
@@ -124,7 +126,7 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   // config detail: {'description': 'Setpoint for steering wheel angle. Positive
-  // for CW', 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name':
+  // for CW', 'offset': 0.0, 'precision': -0.05, 'len': 16, 'name':
   // 'ADC_CMD_SteerWheelAngle', 'is_signed_var': True, 'physical_range':
   // '[-1638.4|1638.35]', 'bit': 27, 'type': 'double', 'order': 'intel',
   // 'physical_unit': 'deg'}
@@ -165,11 +167,12 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
                                          int adc_motioncontrol1_checksum);
 
   // config detail: {'description': 'Brake pressure for direct longitudinal
-  // control', 'offset': 0.0, 'precision': 0.488519785051295, 'len': 11, 'name':
-  // 'ADC_CMD_BrakePressure', 'is_signed_var': False, 'physical_range':
-  // '[0|1000]', 'bit': 6, 'type': 'double', 'order': 'intel', 'physical_unit':
-  // '%'}
-  void set_p_adc_cmd_brakepressure(uint8_t* data, double adc_cmd_brakepressure);
+  // control', 'offset': 0.0, 'precision': 0.0556, 'len': 11, 'name':
+  // 'ADC_CMD_BrakePercentage', 'is_signed_var': False, 'physical_range':
+  // '[0|113.8132]', 'bit': 6, 'type': 'double', 'order': 'intel',
+  // 'physical_unit': '%'}
+  void set_p_adc_cmd_brakepercentage(uint8_t* data,
+                                     double adc_cmd_brakepercentage);
 
   // config detail: {'description': 'Throttle pedal position percentage for
   // direct longitudinal control', 'offset': 0.0, 'precision': 0.1, 'len': 10,
@@ -189,10 +192,11 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   // config detail: {'description': 'Request from ADC to LLC for autonomy',
   // 'enum': {0: 'ADC_CMD_AUTONOMYREQUEST_AUTONOMY_NOT_REQUESTED', 1:
   // 'ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED', 2:
-  // 'ADC_CMD_AUTONOMYREQUEST_RESERVED', 3: 'ADC_CMD_AUTONOMYREQUEST_RESERVED'},
-  // 'precision': 1.0, 'len': 2, 'name': 'ADC_CMD_AutonomyRequest',
-  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 0,
-  // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+  // 'ADC_CMD_AUTONOMYREQUEST_RESERVED0', 3:
+  // 'ADC_CMD_AUTONOMYREQUEST_RESERVED1'}, 'precision': 1.0, 'len': 2, 'name':
+  // 'ADC_CMD_AutonomyRequest', 'is_signed_var': False, 'offset': 0.0,
+  // 'physical_range': '[0|3]', 'bit': 0, 'type': 'enum', 'order': 'intel',
+  // 'physical_unit': ''}
   void set_p_adc_cmd_autonomyrequest(
       uint8_t* data, Adc_motioncontrol1_10::Adc_cmd_autonomyrequestType
                          adc_cmd_autonomyrequest);
@@ -216,7 +220,7 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   bool adc_cmd_parkingbrake_;
   Adc_motioncontrol1_10::Adc_cmd_gearType adc_cmd_gear_;
   int adc_motioncontrol1_checksum_;
-  double adc_cmd_brakepressure_;
+  double adc_cmd_brakepercentage_;
   double adc_cmd_throttleposition_;
   int adc_motioncontrol1_counter_;
   Adc_motioncontrol1_10::Adc_cmd_autonomyrequestType adc_cmd_autonomyrequest_;

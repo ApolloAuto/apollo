@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ void Llcmotioncommandfeedback122::Parse(const std::uint8_t* bytes,
       ->set_llc_fbk_throttlesetpoint(llc_fbk_throttlesetpoint(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motioncommandfeedback1_22()
-      ->set_llc_fbk_brakepressuresetpoint(
-          llc_fbk_brakepressuresetpoint(bytes, length));
+      ->set_llc_fbk_brakepercentsetpoint(
+          llc_fbk_brakepercentsetpoint(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motioncommandfeedback1_22()
       ->set_llc_motioncommandfeedback1_count(
@@ -101,11 +101,11 @@ double Llcmotioncommandfeedback122::llc_fbk_throttlesetpoint(
 }
 
 // config detail: {'description': 'Front brake pressure setpoint (after
-// limits)', 'offset': 0.0, 'precision': 0.488519785051295, 'len': 11, 'name':
-// 'llc_fbk_brakepressuresetpoint', 'is_signed_var': False, 'physical_range':
-// '[0|1000]', 'bit': 0, 'type': 'double', 'order': 'intel', 'physical_unit':
-// '%'}
-double Llcmotioncommandfeedback122::llc_fbk_brakepressuresetpoint(
+// limits)', 'offset': 0.0, 'precision': 0.0556, 'len': 11, 'name':
+// 'llc_fbk_brakepercentsetpoint', 'is_signed_var': False, 'physical_range':
+// '[0|113.8132]', 'bit': 0, 'type': 'double', 'order': 'intel',
+// 'physical_unit': '%'}
+double Llcmotioncommandfeedback122::llc_fbk_brakepercentsetpoint(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 3);
@@ -115,7 +115,7 @@ double Llcmotioncommandfeedback122::llc_fbk_brakepressuresetpoint(
   x <<= 8;
   x |= t;
 
-  double ret = x * 0.488520;
+  double ret = x * 0.055600;
   return ret;
 }
 

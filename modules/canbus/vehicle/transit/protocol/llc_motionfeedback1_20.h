@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,18 +56,18 @@ class Llcmotionfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
                                   const int32_t length) const;
 
   // config detail: {'description': 'Rear brake pressure feedback', 'offset':
-  // 0.0, 'precision': 1.0, 'len': 11, 'name': 'LLC_FBK_BrakePressureRear',
-  // 'is_signed_var': False, 'physical_range': '[0|2047]', 'bit': 27, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': 'psi'}
-  int llc_fbk_brakepressurerear(const std::uint8_t* bytes,
-                                const int32_t length) const;
+  // 0.0, 'precision': 0.0556, 'len': 11, 'name': 'LLC_FBK_BrakePercentRear',
+  // 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 27,
+  // 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
+  double llc_fbk_brakepercentrear(const std::uint8_t* bytes,
+                                  const int32_t length) const;
 
   // config detail: {'description': 'Front brake pressure feedback', 'offset':
-  // 0.0, 'precision': 1.0, 'len': 11, 'name': 'LLC_FBK_BrakePressureFront',
-  // 'is_signed_var': False, 'physical_range': '[0|2047]', 'bit': 16, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': 'psi'}
-  int llc_fbk_brakepressurefront(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+  // 0.0, 'precision': 0.0556, 'len': 11, 'name': 'LLC_FBK_BrakePercentFront',
+  // 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 16,
+  // 'type': 'double', 'order': 'intel', 'physical_unit': '%'}
+  double llc_fbk_brakepercentfront(const std::uint8_t* bytes,
+                                   const int32_t length) const;
 
   // config detail: {'description': 'Current steering control mode', 'enum': {0:
   // 'LLC_FBK_STEERINGCONTROLMODE_NONE', 1: 'LLC_FBK_STEERINGCONTROLMODE_ANGLE',
@@ -137,13 +137,13 @@ class Llcmotionfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
                                   const int32_t length) const;
 
   // config detail: {'description': 'Current Autonomy State', 'enum': {0:
-  // 'LLC_FBK_STATE_RESERVED', 1: 'LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED', 2:
+  // 'LLC_FBK_STATE_RESERVED0', 1: 'LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED', 2:
   // 'LLC_FBK_STATE_AUTONOMY_ALLOWED', 3: 'LLC_FBK_STATE_AUTONOMY_REQUESTED', 4:
-  // 'LLC_FBK_STATE_AUTONOMY', 5: 'LLC_FBK_STATE_RESERVED', 6:
-  // 'LLC_FBK_STATE_RESERVED', 7: 'LLC_FBK_STATE_RESERVED', 8:
-  // 'LLC_FBK_STATE_RESERVED', 9: 'LLC_FBK_STATE_RESERVED', 10:
-  // 'LLC_FBK_STATE_RESERVED', 11: 'LLC_FBK_STATE_RESERVED', 12:
-  // 'LLC_FBK_STATE_RESERVED', 13: 'LLC_FBK_STATE_DISENGAGE_REQUESTED', 14:
+  // 'LLC_FBK_STATE_AUTONOMY', 5: 'LLC_FBK_STATE_RESERVED1', 6:
+  // 'LLC_FBK_STATE_RESERVED2', 7: 'LLC_FBK_STATE_RESERVED3', 8:
+  // 'LLC_FBK_STATE_RESERVED4', 9: 'LLC_FBK_STATE_RESERVED5', 10:
+  // 'LLC_FBK_STATE_RESERVED6', 11: 'LLC_FBK_STATE_RESERVED7', 12:
+  // 'LLC_FBK_STATE_RESERVED8', 13: 'LLC_FBK_STATE_DISENGAGE_REQUESTED', 14:
   // 'LLC_FBK_STATE_DISENGAGED', 15: 'LLC_FBK_STATE_FAULT'}, 'precision': 1.0,
   // 'len': 4, 'name': 'LLC_FBK_State', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|15]', 'bit': 0, 'type': 'enum', 'order': 'intel',

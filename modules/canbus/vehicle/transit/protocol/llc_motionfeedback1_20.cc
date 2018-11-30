@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,10 @@ void Llcmotionfeedback120::Parse(const std::uint8_t* bytes, int32_t length,
       ->set_llc_fbk_throttleposition(llc_fbk_throttleposition(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_brakepressurerear(llc_fbk_brakepressurerear(bytes, length));
+      ->set_llc_fbk_brakepercentrear(llc_fbk_brakepercentrear(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motionfeedback1_20()
-      ->set_llc_fbk_brakepressurefront(
-          llc_fbk_brakepressurefront(bytes, length));
+      ->set_llc_fbk_brakepercentfront(llc_fbk_brakepercentfront(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_motionfeedback1_20()
       ->set_llc_fbk_steeringcontrolmode(
@@ -130,11 +129,11 @@ double Llcmotionfeedback120::llc_fbk_throttleposition(const std::uint8_t* bytes,
 }
 
 // config detail: {'description': 'Rear brake pressure feedback', 'offset': 0.0,
-// 'precision': 1.0, 'len': 11, 'name': 'llc_fbk_brakepressurerear',
-// 'is_signed_var': False, 'physical_range': '[0|2047]', 'bit': 27, 'type':
-// 'int', 'order': 'intel', 'physical_unit': 'psi'}
-int Llcmotionfeedback120::llc_fbk_brakepressurerear(const std::uint8_t* bytes,
-                                                    int32_t length) const {
+// 'precision': 0.0556, 'len': 11, 'name': 'llc_fbk_brakepercentrear',
+// 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 27, 'type':
+// 'double', 'order': 'intel', 'physical_unit': '%'}
+double Llcmotionfeedback120::llc_fbk_brakepercentrear(const std::uint8_t* bytes,
+                                                      int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 6);
 
@@ -143,16 +142,16 @@ int Llcmotionfeedback120::llc_fbk_brakepressurerear(const std::uint8_t* bytes,
   x <<= 5;
   x |= t;
 
-  int ret = x;
+  double ret = x * 0.055600;
   return ret;
 }
 
 // config detail: {'description': 'Front brake pressure feedback', 'offset':
-// 0.0, 'precision': 1.0, 'len': 11, 'name': 'llc_fbk_brakepressurefront',
-// 'is_signed_var': False, 'physical_range': '[0|2047]', 'bit': 16, 'type':
-// 'int', 'order': 'intel', 'physical_unit': 'psi'}
-int Llcmotionfeedback120::llc_fbk_brakepressurefront(const std::uint8_t* bytes,
-                                                     int32_t length) const {
+// 0.0, 'precision': 0.0556, 'len': 11, 'name': 'llc_fbk_brakepercentfront',
+// 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 16, 'type':
+// 'double', 'order': 'intel', 'physical_unit': '%'}
+double Llcmotionfeedback120::llc_fbk_brakepercentfront(
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 3);
   int32_t x = t0.get_byte(0, 3);
 
@@ -161,7 +160,7 @@ int Llcmotionfeedback120::llc_fbk_brakepressurefront(const std::uint8_t* bytes,
   x <<= 8;
   x |= t;
 
-  int ret = x;
+  double ret = x * 0.055600;
   return ret;
 }
 
@@ -282,13 +281,13 @@ Llcmotionfeedback120::llc_fbk_longitudinalcontrolmode(const std::uint8_t* bytes,
 }
 
 // config detail: {'description': 'Current Autonomy State', 'enum': {0:
-// 'LLC_FBK_STATE_RESERVED', 1: 'LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED', 2:
+// 'LLC_FBK_STATE_RESERVED0', 1: 'LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED', 2:
 // 'LLC_FBK_STATE_AUTONOMY_ALLOWED', 3: 'LLC_FBK_STATE_AUTONOMY_REQUESTED', 4:
-// 'LLC_FBK_STATE_AUTONOMY', 5: 'LLC_FBK_STATE_RESERVED', 6:
-// 'LLC_FBK_STATE_RESERVED', 7: 'LLC_FBK_STATE_RESERVED', 8:
-// 'LLC_FBK_STATE_RESERVED', 9: 'LLC_FBK_STATE_RESERVED', 10:
-// 'LLC_FBK_STATE_RESERVED', 11: 'LLC_FBK_STATE_RESERVED', 12:
-// 'LLC_FBK_STATE_RESERVED', 13: 'LLC_FBK_STATE_DISENGAGE_REQUESTED', 14:
+// 'LLC_FBK_STATE_AUTONOMY', 5: 'LLC_FBK_STATE_RESERVED1', 6:
+// 'LLC_FBK_STATE_RESERVED2', 7: 'LLC_FBK_STATE_RESERVED3', 8:
+// 'LLC_FBK_STATE_RESERVED4', 9: 'LLC_FBK_STATE_RESERVED5', 10:
+// 'LLC_FBK_STATE_RESERVED6', 11: 'LLC_FBK_STATE_RESERVED7', 12:
+// 'LLC_FBK_STATE_RESERVED8', 13: 'LLC_FBK_STATE_DISENGAGE_REQUESTED', 14:
 // 'LLC_FBK_STATE_DISENGAGED', 15: 'LLC_FBK_STATE_FAULT'}, 'precision': 1.0,
 // 'len': 4, 'name': 'llc_fbk_state', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|15]', 'bit': 0, 'type': 'enum', 'order': 'intel',
