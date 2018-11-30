@@ -77,12 +77,28 @@ bool SpeedData::EvaluateByTime(const double t,
     double t0 = p0.t();
     double t1 = p1.t();
 
-    double s = common::math::lerp(p0.s(), t0, p1.s(), t1, t);
-    double v = common::math::lerp(p0.v(), t0, p1.v(), t1, t);
-    double a = common::math::lerp(p0.a(), t0, p1.a(), t1, t);
-    double j = common::math::lerp(p0.da(), t0, p1.da(), t1, t);
+    common::SpeedPoint res;
+    res.set_t(t);
 
-    *speed_point = common::util::MakeSpeedPoint(s, t, v, a, j);
+    double s = common::math::lerp(p0.s(), t0, p1.s(), t1, t);
+    res.set_s(s);
+
+    if (p0.has_v() && p1.has_v()) {
+      double v = common::math::lerp(p0.v(), t0, p1.v(), t1, t);
+      res.set_v(v);
+    }
+
+    if (p0.has_a() && p1.has_a()) {
+      double a = common::math::lerp(p0.a(), t0, p1.a(), t1, t);
+      res.set_a(a);
+    }
+
+    if (p0.has_da() && p1.has_da()) {
+      double da = common::math::lerp(p0.da(), t0, p1.da(), t1, t);
+      res.set_da(da);
+    }
+
+    *speed_point = res;
   }
   return true;
 }

@@ -97,6 +97,8 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
         SpeedPoint speed_point;
         speed_point.set_s(0.0);
         speed_point.set_t(t);
+        speed_point.set_v(0.0);
+        speed_point.set_a(0.0);
         speed_profile.emplace_back(speed_point);
       }
       speed_data->set_speed_vector(speed_profile);
@@ -300,8 +302,8 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
       }
 
       const double cost = cost_cr.obstacle_cost() +
-          pre_col[r_pre].total_cost() +
-          CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
+                          pre_col[r_pre].total_cost() +
+                          CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
 
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
@@ -317,9 +319,9 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
     }
 
     const double curr_a = (cost_cr.index_s() * unit_s_ +
-                          pre_col[r_pre].pre_point()->index_s() * unit_s_ -
-                          2 * pre_col[r_pre].index_s() * unit_s_) /
-                         (unit_t_ * unit_t_);
+                           pre_col[r_pre].pre_point()->index_s() * unit_s_ -
+                           2 * pre_col[r_pre].index_s() * unit_s_) /
+                          (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
@@ -343,8 +345,8 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
     const STPoint& pre_point = pre_col[r_pre].point();
     const STPoint& curr_point = cost_cr.point();
     double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
-                 CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
-                                   curr_point, speed_limit);
+                  CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
+                                    curr_point, speed_limit);
 
     if (cost < cost_cr.total_cost()) {
       cost_cr.SetTotalCost(cost);
@@ -397,20 +399,27 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  for (size_t i = 0; i + 1 < speed_profile.size(); ++i) {
+    const double v = (speed_profile[i + 1].s() - speed_profile[i].s()) /
+                     (speed_profile[i + 1].t() - speed_profile[i].t() + 1e-3);
+    speed_profile[i].set_v(v);
+  }
+
   speed_data->set_speed_vector(speed_profile);
   return Status::OK();
 }
 
 double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
-                                   const STPoint& third, const STPoint& forth,
-                                   const double speed_limit) {
+                                    const STPoint& third, const STPoint& forth,
+                                    const double speed_limit) {
   return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
 double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
-                                               const double speed_limit) {
+                                                const double speed_limit) {
   double init_speed = init_point_.v();
   double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
@@ -423,8 +432,8 @@ double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
 }
 
 double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
-                                              const uint32_t pre_row,
-                                              const double speed_limit) {
+                                               const uint32_t pre_row,
+                                               const double speed_limit) {
   double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();
