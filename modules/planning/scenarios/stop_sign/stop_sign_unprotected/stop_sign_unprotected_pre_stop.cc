@@ -56,6 +56,11 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
+  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedPreStop planning error";
+  }
+
   const auto& reference_line_info = frame->reference_line_info().front();
   if (CheckADCStop(reference_line_info)) {
     GetContext()->stop_start_time = Clock::NowInSeconds();
@@ -84,10 +89,6 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
     AddWatchVehicle(*obstacle, &watch_vehicles);
   }
 
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedPreStop planning error";
-  }
   return Stage::RUNNING;
 }
 
