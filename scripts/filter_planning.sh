@@ -159,7 +159,7 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 function filter() {
     target=""
     name=$(basename $1)
-    ext=$(basename##*.)
+    ext=${name##*.}
     name="$name.$ext"
     if $is_perfect_control; then
         target="$2/${name%.*}.pc.record"
