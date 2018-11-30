@@ -1,7 +1,7 @@
 load("@com_github_grpc_grpc//:bazel/generate_cc.bzl", "generate_cc")
 
 def cc_grpc_library(name,
-		            srcs = [],
+                    srcs = [],
                     deps = [],
                     deps_cc = [],
                     proto_only = False,

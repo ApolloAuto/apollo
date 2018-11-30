@@ -1,0 +1,16 @@
+
+syntax = "proto2";
+
+package apollo.v2x;
+
+import "modules/perception/proto/perception_obstacle.proto";
+import "modules/v2x/proto/v2x_carstatus.proto";
+
+service CarToObu {
+  rpc PushCarStatus (apollo.v2x.CarStatus) returns (UpdateStatus) {}
+  rpc PushPerceptionResult (apollo.perception.PerceptionObstacles) returns (UpdateStatus) {}
+}
+
+message UpdateStatus {
+  required bool updated = 1 [default = false];
+}
