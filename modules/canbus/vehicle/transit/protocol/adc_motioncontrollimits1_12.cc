@@ -16,10 +16,7 @@
 
 #include "modules/canbus/vehicle/transit/protocol/adc_motioncontrollimits1_12.h"
 
-#include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
 
 namespace apollo {
 namespace canbus {
@@ -27,68 +24,100 @@ namespace transit {
 
 using ::apollo::drivers::canbus::Byte;
 
-Adcmotioncontrollimits112::Adcmotioncontrollimits112() {}
 const int32_t Adcmotioncontrollimits112::ID = 0x12;
 
-void Adcmotioncontrollimits112::Parse(const std::uint8_t* bytes, int32_t length,
-                                      ChassisDetail* chassis) const {
-  chassis->mutable_transit()
-      ->mutable_adc_motioncontrollimits1_12()
-      ->set_adc_cmd_throttlecommandlimit(
-          adc_cmd_throttlecommandlimit(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_adc_motioncontrollimits1_12()
-      ->set_adc_cmd_steeringrate(adc_cmd_steeringrate(bytes, length));
-  chassis->mutable_transit()
-      ->mutable_adc_motioncontrollimits1_12()
-      ->set_adc_cmd_steerwheelanglelimit(
-          adc_cmd_steerwheelanglelimit(bytes, length));
+// public
+Adcmotioncontrollimits112::Adcmotioncontrollimits112() { Reset(); }
+
+uint32_t Adcmotioncontrollimits112::GetPeriod() const {
+  // TODO(All) :  modify every protocol's period manually
+  static const uint32_t PERIOD = 20 * 1000;
+  return PERIOD;
+}
+
+void Adcmotioncontrollimits112::UpdateData(uint8_t* data) {
+  set_p_adc_cmd_throttlecommandlimit(data, adc_cmd_throttlecommandlimit_);
+  set_p_adc_cmd_steeringrate(data, adc_cmd_steeringrate_);
+  set_p_adc_cmd_steerwheelanglelimit(data, adc_cmd_steerwheelanglelimit_);
+}
+
+void Adcmotioncontrollimits112::Reset() {
+  // TODO(All) :  you should check this manually
+  adc_cmd_throttlecommandlimit_ = 0.0;
+  adc_cmd_steeringrate_ = 0.0;
+  adc_cmd_steerwheelanglelimit_ = 0.0;
+}
+
+Adcmotioncontrollimits112*
+Adcmotioncontrollimits112::set_adc_cmd_throttlecommandlimit(
+    double adc_cmd_throttlecommandlimit) {
+  adc_cmd_throttlecommandlimit_ = adc_cmd_throttlecommandlimit;
+  return this;
 }
 
 // config detail: {'description': 'Set limit for throttle position', 'offset':
-// 0.0, 'precision': 0.5, 'len': 8, 'name': 'adc_cmd_throttlecommandlimit',
+// 0.0, 'precision': 0.5, 'len': 8, 'name': 'ADC_CMD_ThrottleCommandLimit',
 // 'is_signed_var': False, 'physical_range': '[0|100]', 'bit': 24, 'type':
 // 'double', 'order': 'intel', 'physical_unit': '%'}
-double Adcmotioncontrollimits112::adc_cmd_throttlecommandlimit(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 3);
-  int32_t x = t0.get_byte(0, 8);
+void Adcmotioncontrollimits112::set_p_adc_cmd_throttlecommandlimit(
+    uint8_t* data, double adc_cmd_throttlecommandlimit) {
+  adc_cmd_throttlecommandlimit =
+      ProtocolData::BoundedValue(0.0, 100.0, adc_cmd_throttlecommandlimit);
+  int x = adc_cmd_throttlecommandlimit / 0.500000;
 
-  double ret = x * 0.500000;
-  return ret;
+  Byte to_set(data + 3);
+  to_set.set_value(x, 0, 8);
+}
+
+Adcmotioncontrollimits112* Adcmotioncontrollimits112::set_adc_cmd_steeringrate(
+    double adc_cmd_steeringrate) {
+  adc_cmd_steeringrate_ = adc_cmd_steeringrate;
+  return this;
 }
 
 // config detail: {'description': 'Set steering rate', 'offset': 0.0,
-// 'precision': 0.05, 'len': 16, 'name': 'adc_cmd_steeringrate',
+// 'precision': 0.05, 'len': 16, 'name': 'ADC_CMD_SteeringRate',
 // 'is_signed_var': False, 'physical_range': '[0|3276.75]', 'bit': 0, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'deg/s'}
-double Adcmotioncontrollimits112::adc_cmd_steeringrate(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 1);
-  int32_t x = t0.get_byte(0, 8);
+void Adcmotioncontrollimits112::set_p_adc_cmd_steeringrate(
+    uint8_t* data, double adc_cmd_steeringrate) {
+  adc_cmd_steeringrate =
+      ProtocolData::BoundedValue(0.0, 3276.75, adc_cmd_steeringrate);
+  int x = adc_cmd_steeringrate / 0.050000;
+  uint8_t t = 0;
 
-  Byte t1(bytes + 0);
-  int32_t t = t1.get_byte(0, 8);
-  x <<= 8;
-  x |= t;
+  t = x & 0xFF;
+  Byte to_set0(data + 0);
+  to_set0.set_value(t, 0, 8);
+  x >>= 8;
 
-  double ret = x * 0.050000;
-  return ret;
+  t = x & 0xFF;
+  Byte to_set1(data + 1);
+  to_set1.set_value(t, 0, 8);
+}
+
+Adcmotioncontrollimits112*
+Adcmotioncontrollimits112::set_adc_cmd_steerwheelanglelimit(
+    double adc_cmd_steerwheelanglelimit) {
+  adc_cmd_steerwheelanglelimit_ = adc_cmd_steerwheelanglelimit;
+  return this;
 }
 
 // config detail: {'description': 'Set limit for steering wheel angle. Applies
 // in both positive and negative', 'offset': 0.0, 'precision': 5.0, 'len': 8,
-// 'name': 'adc_cmd_steerwheelanglelimit', 'is_signed_var': False,
+// 'name': 'ADC_CMD_SteerWheelAngleLimit', 'is_signed_var': False,
 // 'physical_range': '[0|1275]', 'bit': 16, 'type': 'double', 'order': 'intel',
 // 'physical_unit': 'deg'}
-double Adcmotioncontrollimits112::adc_cmd_steerwheelanglelimit(
-    const std::uint8_t* bytes, int32_t length) const {
-  Byte t0(bytes + 2);
-  int32_t x = t0.get_byte(0, 8);
+void Adcmotioncontrollimits112::set_p_adc_cmd_steerwheelanglelimit(
+    uint8_t* data, double adc_cmd_steerwheelanglelimit) {
+  adc_cmd_steerwheelanglelimit =
+      ProtocolData::BoundedValue(0.0, 1275.0, adc_cmd_steerwheelanglelimit);
+  int x = adc_cmd_steerwheelanglelimit / 5.000000;
 
-  double ret = x * 5.000000;
-  return ret;
+  Byte to_set(data + 2);
+  to_set.set_value(x, 0, 8);
 }
+
 }  // namespace transit
 }  // namespace canbus
 }  // namespace apollo
