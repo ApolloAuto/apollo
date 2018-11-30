@@ -25,7 +25,7 @@ namespace lincoln {
 TEST(Steering64Test, General) {
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
   Steering64 steering;
-  EXPECT_EQ(steering.GetPeriod(), 20 * 1000);
+  EXPECT_EQ(steering.GetPeriod(), 10 * 1000);
   steering.UpdateData(data);
   EXPECT_EQ(data[0], 0b00000000);
   EXPECT_EQ(data[1], 0b00000000);
