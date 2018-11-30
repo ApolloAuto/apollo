@@ -30,7 +30,7 @@ class Accel6bTest : public ::testing::Test {
 TEST_F(Accel6bTest, Parse) {
   Gear66 gear;
   uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
-  EXPECT_EQ(gear.GetPeriod(), 20 * 1000);
+  EXPECT_EQ(gear.GetPeriod(), 10 * 1000);
   gear.UpdateData(data);
 
   EXPECT_EQ(data[0], 0b01100000);
