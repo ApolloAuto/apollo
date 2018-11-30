@@ -15,14 +15,14 @@ extrinsic_file {
 extrinsic_file {
     frame_id: "velodyne128"
     child_frame_id: "front_6mm"
-    file_path: "/apollo/modules/perception/production/data/perception/camera/params/front_6mm_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/front_6mm_extrinsics.yaml"
     enable: true
 }
 
 extrinsic_file {
     frame_id: "velodyne128"
     child_frame_id: "front_12mm"
-    file_path: "/apollo/modules/perception/production/data/perception/camera/params/front_12mm_extrinsics.yaml"
+    file_path: "/apollo/modules/perception/data/params/front_12mm_extrinsics.yaml"
     enable: true
 }
 

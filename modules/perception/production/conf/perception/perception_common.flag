@@ -14,7 +14,7 @@
 # The intrinsics/extrinsics dir
 # type: string
 # default:
---obs_sensor_intrinsic_path=/apollo/modules/perception/production/data/perception/camera/params
+--obs_sensor_intrinsic_path=/apollo/modules/perception/data/params
 
 ###########################################################################
 # Flags from common_flags
