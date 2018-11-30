@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ void Llcvehiclelimits24::Parse(const std::uint8_t* bytes, int32_t length,
       ->set_llc_fbk_maxsteeringangle(llc_fbk_maxsteeringangle(bytes, length));
   chassis->mutable_transit()
       ->mutable_llc_vehiclelimits_24()
-      ->set_llc_fbk_maxbrakepressure(llc_fbk_maxbrakepressure(bytes, length));
+      ->set_llc_fbk_maxbrakepercent(llc_fbk_maxbrakepercent(bytes, length));
 }
 
 // config detail: {'description': 'Steering angle feedback', 'offset': 0.0,
@@ -59,11 +59,11 @@ int Llcvehiclelimits24::llc_fbk_maxsteeringangle(const std::uint8_t* bytes,
 }
 
 // config detail: {'description': 'Front brake pressure feedback', 'offset':
-// 0.0, 'precision': 1.0, 'len': 12, 'name': 'llc_fbk_maxbrakepressure',
-// 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 0, 'type':
-// 'int', 'order': 'intel', 'physical_unit': 'psi'}
-int Llcvehiclelimits24::llc_fbk_maxbrakepressure(const std::uint8_t* bytes,
-                                                 int32_t length) const {
+// 0.0, 'precision': 1.0, 'len': 12, 'name': 'llc_fbk_maxbrakepercent',
+// 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 0, 'type':
+// 'double', 'order': 'intel', 'physical_unit': '%'}
+double Llcvehiclelimits24::llc_fbk_maxbrakepercent(const std::uint8_t* bytes,
+                                                   int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 4);
 
@@ -72,7 +72,7 @@ int Llcvehiclelimits24::llc_fbk_maxbrakepressure(const std::uint8_t* bytes,
   x <<= 8;
   x |= t;
 
-  int ret = x;
+  double ret = x;
   return ret;
 }
 }  // namespace transit

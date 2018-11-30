@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,11 @@ class Llcvehiclelimits24 : public ::apollo::drivers::canbus::ProtocolData<
                                const int32_t length) const;
 
   // config detail: {'description': 'Front brake pressure feedback', 'offset':
-  // 0.0, 'precision': 1.0, 'len': 12, 'name': 'LLC_FBK_MaxBrakePressure',
-  // 'is_signed_var': False, 'physical_range': '[0|4095]', 'bit': 0, 'type':
-  // 'int', 'order': 'intel', 'physical_unit': 'psi'}
-  int llc_fbk_maxbrakepressure(const std::uint8_t* bytes,
-                               const int32_t length) const;
+  // 0.0, 'precision': 1.0, 'len': 12, 'name': 'LLC_FBK_MaxBrakePercent',
+  // 'is_signed_var': False, 'physical_range': '[0|113.8132]', 'bit': 0, 'type':
+  // 'double', 'order': 'intel', 'physical_unit': '%'}
+  double llc_fbk_maxbrakepercent(const std::uint8_t* bytes,
+                                 const int32_t length) const;
 };
 
 }  // namespace transit

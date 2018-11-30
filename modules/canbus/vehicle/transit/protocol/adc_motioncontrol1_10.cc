@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ const int32_t Adcmotioncontrol110::ID = 0x10;
 Adcmotioncontrol110::Adcmotioncontrol110() { Reset(); }
 
 uint32_t Adcmotioncontrol110::GetPeriod() const {
-  // TODO(QiL) :  modify every protocol's period manually
+  // TODO(All) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -41,7 +41,7 @@ void Adcmotioncontrol110::UpdateData(uint8_t* data) {
   set_p_adc_cmd_parkingbrake(data, adc_cmd_parkingbrake_);
   set_p_adc_cmd_gear(data, adc_cmd_gear_);
   set_p_adc_motioncontrol1_checksum(data, adc_motioncontrol1_checksum_);
-  set_p_adc_cmd_brakepressure(data, adc_cmd_brakepressure_);
+  set_p_adc_cmd_brakepercentage(data, adc_cmd_brakepercentage_);
   set_p_adc_cmd_throttleposition(data, adc_cmd_throttleposition_);
   set_p_adc_motioncontrol1_counter(data, adc_motioncontrol1_counter_);
   set_p_adc_cmd_autonomyrequest(data, adc_cmd_autonomyrequest_);
@@ -49,14 +49,14 @@ void Adcmotioncontrol110::UpdateData(uint8_t* data) {
 }
 
 void Adcmotioncontrol110::Reset() {
-  // TODO(QiL) :  you should check this manually
+  // TODO(All) :  you should check this manually
   adc_cmd_steerwheelangle_ = 0.0;
   adc_cmd_steeringcontrolmode_ =
       Adc_motioncontrol1_10::ADC_CMD_STEERINGCONTROLMODE_NONE;
   adc_cmd_parkingbrake_ = false;
   adc_cmd_gear_ = Adc_motioncontrol1_10::ADC_CMD_GEAR_P_PARK;
   adc_motioncontrol1_checksum_ = 0;
-  adc_cmd_brakepressure_ = 0.0;
+  adc_cmd_brakepercentage_ = 0.0;
   adc_cmd_throttleposition_ = 0.0;
   adc_motioncontrol1_counter_ = 0;
   adc_cmd_autonomyrequest_ =
@@ -72,7 +72,7 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_steerwheelangle(
 }
 
 // config detail: {'description': 'Setpoint for steering wheel angle. Positive
-// for CW', 'offset': 0.0, 'precision': 0.05, 'len': 16, 'name':
+// for CW', 'offset': 0.0, 'precision': -0.05, 'len': 16, 'name':
 // 'ADC_CMD_SteerWheelAngle', 'is_signed_var': True, 'physical_range':
 // '[-1638.4|1638.35]', 'bit': 27, 'type': 'double', 'order': 'intel',
 // 'physical_unit': 'deg'}
@@ -80,7 +80,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_steerwheelangle(
     uint8_t* data, double adc_cmd_steerwheelangle) {
   adc_cmd_steerwheelangle =
       ProtocolData::BoundedValue(-1638.4, 1638.35, adc_cmd_steerwheelangle);
-  int x = adc_cmd_steerwheelangle / 0.050000;
+  int x = adc_cmd_steerwheelangle / -0.050000;
   uint8_t t = 0;
 
   t = x & 0x1F;
@@ -179,22 +179,22 @@ void Adcmotioncontrol110::set_p_adc_motioncontrol1_checksum(
   to_set.set_value(x, 0, 8);
 }
 
-Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_brakepressure(
-    double adc_cmd_brakepressure) {
-  adc_cmd_brakepressure_ = adc_cmd_brakepressure;
+Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_brakepercentage(
+    double adc_cmd_brakepercentage) {
+  adc_cmd_brakepercentage_ = adc_cmd_brakepercentage;
   return this;
 }
 
 // config detail: {'description': 'Brake pressure for direct longitudinal
-// control', 'offset': 0.0, 'precision': 0.488519785051295, 'len': 11, 'name':
-// 'ADC_CMD_BrakePressure', 'is_signed_var': False, 'physical_range':
-// '[0|1000]', 'bit': 6, 'type': 'double', 'order': 'intel', 'physical_unit':
-// '%'}
-void Adcmotioncontrol110::set_p_adc_cmd_brakepressure(
-    uint8_t* data, double adc_cmd_brakepressure) {
-  adc_cmd_brakepressure =
-      ProtocolData::BoundedValue(0.0, 1000.0, adc_cmd_brakepressure);
-  int x = adc_cmd_brakepressure / 0.488520;
+// control', 'offset': 0.0, 'precision': 0.0556, 'len': 11, 'name':
+// 'ADC_CMD_BrakePercentage', 'is_signed_var': False, 'physical_range':
+// '[0|113.8132]', 'bit': 6, 'type': 'double', 'order': 'intel',
+// 'physical_unit': '%'}
+void Adcmotioncontrol110::set_p_adc_cmd_brakepercentage(
+    uint8_t* data, double adc_cmd_brakepercentage) {
+  adc_cmd_brakepercentage =
+      ProtocolData::BoundedValue(0.0, 113.8132, adc_cmd_brakepercentage);
+  int x = adc_cmd_brakepercentage / 0.055600;
   uint8_t t = 0;
 
   t = x & 0x3;
@@ -270,7 +270,7 @@ Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_autonomyrequest(
 // config detail: {'description': 'Request from ADC to LLC for autonomy',
 // 'enum': {0: 'ADC_CMD_AUTONOMYREQUEST_AUTONOMY_NOT_REQUESTED', 1:
 // 'ADC_CMD_AUTONOMYREQUEST_AUTONOMY_REQUESTED', 2:
-// 'ADC_CMD_AUTONOMYREQUEST_RESERVED', 3: 'ADC_CMD_AUTONOMYREQUEST_RESERVED'},
+// 'ADC_CMD_AUTONOMYREQUEST_RESERVED0', 3: 'ADC_CMD_AUTONOMYREQUEST_RESERVED1'},
 // 'precision': 1.0, 'len': 2, 'name': 'ADC_CMD_AutonomyRequest',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 0,
 // 'type': 'enum', 'order': 'intel', 'physical_unit': ''}

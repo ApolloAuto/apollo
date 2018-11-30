@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ const int32_t Adcauxiliarycontrol110::ID = 0x110;
 Adcauxiliarycontrol110::Adcauxiliarycontrol110() { Reset(); }
 
 uint32_t Adcauxiliarycontrol110::GetPeriod() const {
-  // TODO(QiL) :  modify every protocol's period manually
+  // TODO(All) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -58,7 +58,7 @@ void Adcauxiliarycontrol110::UpdateData(uint8_t* data) {
 }
 
 void Adcauxiliarycontrol110::Reset() {
-  // TODO(QiL) :  you should check this manually
+  // TODO(All) :  you should check this manually
   adc_auxcontrol_counter_ = 0;
   adc_auxcontrol_checksum_ = 0;
   adc_cmd_inverter_controlenable_ = false;

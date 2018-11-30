@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ const int32_t Llcdiagbrakecontrol721::ID = 0x721;
 Llcdiagbrakecontrol721::Llcdiagbrakecontrol721() { Reset(); }
 
 uint32_t Llcdiagbrakecontrol721::GetPeriod() const {
-  // TODO(QiL) :  modify every protocol's period manually
+  // TODO(All) :  modify every protocol's period manually
   static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
@@ -45,7 +45,7 @@ void Llcdiagbrakecontrol721::UpdateData(uint8_t* data) {
 }
 
 void Llcdiagbrakecontrol721::Reset() {
-  // TODO(QiL) :  you should check this manually
+  // TODO(All) :  you should check this manually
   llc_dbg_brakepidcontribution_p_ = 0.0;
   llc_dbg_brakepidcontribution_i_ = 0.0;
   llc_dbg_brakepidcontribution_d_ = 0.0;
