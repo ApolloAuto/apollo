@@ -286,7 +286,7 @@ void GenerateFreeMoveTrajectoryPoints(
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed);
     trajectory_point.set_a(acc);
-    trajectory_point.set_relative_time(i * period);
+    trajectory_point.set_relative_time(static_cast<double>(i) * period);
     points->emplace_back(std::move(trajectory_point));
 
     // Update position, velocity and acceleration
