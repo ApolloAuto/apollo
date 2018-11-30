@@ -14,7 +14,11 @@
   - GPS - The Global Positioning System
   - IMU - Inertial Measurement Unit
   - LiDAR - Light Detection And Ranging Sensor
-  For more information, refer to [multi-sensor fusion localization](https://github.com/ApolloAuto/apollo/tree/master/modules/localization/msf/README.md).
+
+  For more information, refer to
+
+  Guowei Wan, Xiaolong Yang, Renlan Cai, Hao Li, Yao Zhou, Hao Wang, Shiyu Song. "Robust and Precise Vehicle Localization Based on Multi-Sensor Fusion in Diverse City Scenes," 2018 IEEE International Conference on Robotics and Automation (ICRA), Brisbane, QLD, 2018, pp. 4670-4677.
+  doi: 10.1109/ICRA.2018.8461224. [link](https://ieeexplore.ieee.org/document/8461224)
 
 ## Output 
 An object instance defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`.
