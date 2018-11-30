@@ -59,7 +59,7 @@ message Adc_motioncontrol1_10 {
 }
 
 message Adc_motioncontrollimits1_12 {
-// Report Message
+// Control Message
   // Set limit for throttle position [%] [0|100]
   optional double adc_cmd_throttlecommandlimit = 1;
   // Set steering rate [deg/s] [0|3276.75]
@@ -315,7 +315,7 @@ message Llc_diag_brakecontrol_721 {
 message Transit {
   optional Llc_vehiclelimits_24 llc_vehiclelimits_24 = 1; // report message
   optional Adc_motioncontrol1_10 adc_motioncontrol1_10 = 2; // control message
-  optional Adc_motioncontrollimits1_12 adc_motioncontrollimits1_12 = 3; // report message
+  optional Adc_motioncontrollimits1_12 adc_motioncontrollimits1_12 = 3; // control message
   optional Llc_motionfeedback1_20 llc_motionfeedback1_20 = 4; // report message
   optional Llc_motionfeedback2_21 llc_motionfeedback2_21 = 5; // report message
   optional Llc_motioncommandfeedback1_22 llc_motioncommandfeedback1_22 = 6; // report message
