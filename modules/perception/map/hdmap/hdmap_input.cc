@@ -22,6 +22,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -73,6 +74,7 @@ bool HDMapInput::Reset() {
 bool HDMapInput::InitHDMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
   std::string model_name = "HDMapInput";
+  std::string filename;
   const lib::ModelConfig* model_config = nullptr;
   if (!lib::ConfigManager::Instance()->GetModelConfig(model_name,
                                                       &model_config)) {
@@ -83,10 +85,16 @@ bool HDMapInput::InitHDMap() {
     AERROR << "hdmap_sample_step not found.";
     hdmap_sample_step_ = 5;
   }
-  if (!model_config->get_value("hdmap_file", &hdmap_file_)) {
-    AERROR << "hdmap_file not found.";
-    return false;
-  }
+
+  // TO DO: Decide which map to use
+  // Option 1: Use global hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+  // hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
+
+  // Option2: Load own map with different hdmap_sample_step_
+  // Load hdmap path from global_flagfile.txt
+  hdmap_file_ =
+    apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.bin", filename);
+  AINFO << "hdmap_file_: " << hdmap_file_;
   if (!apollo::common::util::PathExists(hdmap_file_)) {
     AERROR << "Failed to find hadmap file: " << hdmap_file_;
     return false;
