@@ -46,15 +46,16 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
+  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedIntersectionCruise plan error";
+  }
+
   if (CheckPassIntersection(frame)) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
 
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedIntersectionCruise plan error";
-  }
   return Stage::RUNNING;
 }
 

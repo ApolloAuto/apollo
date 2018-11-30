@@ -56,6 +56,11 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
+  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedPreStop planning error";
+  }
+
   auto start_time = GetContext()->stop_start_time;
   const double wait_time = Clock::NowInSeconds() - start_time;
   ADEBUG << "stop_start_time[" << start_time
@@ -109,11 +114,6 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     // remove from watch_vehicles_ if adc is stopping/waiting at stop sign
     RemoveWatchVehicle(*obstacle, watch_vehicle_ids, &watch_vehicles);
-  }
-
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedPreStop planning error";
   }
 
   return Stage::RUNNING;

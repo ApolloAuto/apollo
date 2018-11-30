@@ -56,6 +56,11 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
                            stop_sign_overlap_end_s)) {
+    bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+    if (!plan_ok) {
+      AERROR << "StopSignUnprotectedCreep planning error";
+    }
+
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
     return Stage::FINISHED;
   }
