@@ -29,7 +29,7 @@ const int32_t Gear66::ID = 0x66;
 
 uint32_t Gear66::GetPeriod() const {
   // on event, so value nonsense
-  static const uint32_t PERIOD = 20 * 1000;
+  static const uint32_t PERIOD = 10 * 1000;
   return PERIOD;
 }
 
