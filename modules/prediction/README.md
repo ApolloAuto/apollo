@@ -20,7 +20,7 @@ The Prediction module only predicts the behavior of obstacles and not the EGO ca
 
 ## Functionalities
 
-Based on the figure below, the prediction module comprises of 4 main functionalities. Container, Evaluator and Predictor existed in Apollo 3.0. In Apollo 3.5, we have taken a more scenario-based approach and hence the added the Scenario functionality into our prediction process.
+Based on the figure below, the prediction module comprises of 4 main functionalities: Container, Scenario, Evaluator and Predictor.  Container, Evaluator and Predictor existed in Apollo 3.0. In Apollo 3.5, we introduced the Scenario functionality as we have moved towards a more scenario-based approach for Apollo's autonomous driving capabilities.
 ![](images/prediction.png)
 
 ### Container
@@ -42,7 +42,7 @@ The Evaluator predicts path and speed separately for any given obstacle.
 An evaluator evaluates a path by outputting a probability for it (lane
 sequence) using the given model stored in _prediction/data/_.
 
-There exist 5 types of evaluators, two of which were added in Apollo 3.5. As Cruise and Junction scenarios have been included, their corresponding evaluators (Cruise MLP and Junction MLP) were added as well.
+There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cruise and Junction scenarios have been included, their corresponding evaluators (Cruise MLP and Junction MLP) were added as well. The list of available evaluators include:
 
 * **Cost evaluator**: probability is calculated by a set of cost functions
 
@@ -57,7 +57,7 @@ There exist 5 types of evaluators, two of which were added in Apollo 3.5. As Cru
 
 ### Predictor
 
-Predictor generates predicted trajectories for obstacles. Currently supported predictors include:
+Predictor generates predicted trajectories for obstacles. Currently, the supported predictors include:
 
 * **Empty**: obstacles have no predicted trajectories
 * **Single lane**: Obstacles move along a single lane in highway navigation mode. Obstacles not on lane will be ignored.
