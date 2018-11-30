@@ -66,7 +66,7 @@ Stage::StageStatus TrafficLightRightTurnUnprotectedCreep::Process(
       ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
                                         traffic_light_overlap_end_s);
 
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "TrafficLightRightTurnUnprotectedCreep planning error";
   }

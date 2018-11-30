@@ -79,7 +79,7 @@ class Stage {
   ScenarioConfig::StageType NextStage() const { return next_stage_; }
 
  protected:
-  bool PlanningOnReferenceLine(
+  bool ExecuteTaskOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
   std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;

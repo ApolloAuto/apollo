@@ -23,11 +23,18 @@
 #include <unordered_map>
 #include <utility>
 
+#include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/toolkits/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
+
+namespace {
+constexpr double kPathOptimizationFallbackCost = 2e4;
+constexpr double kSpeedOptimizationFallbackCost = 2e4;
+constexpr double kStraightForwardLineCost = 10.0;
+}  // namespace
 
 Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
   name_ = ScenarioConfig::StageType_Name(config_.stage_type());
@@ -59,7 +66,7 @@ Task* Stage::FindTask(TaskConfig::TaskType task_type) const {
   }
 }
 
-bool Stage::PlanningOnReferenceLine(
+bool Stage::ExecuteTaskOnReferenceLine(
     const common::TrajectoryPoint& planning_start_point, Frame* frame) {
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (!reference_line_info.IsDrivable()) {
@@ -77,7 +84,14 @@ bool Stage::PlanningOnReferenceLine(
       }
     }
 
-    reference_line_info.set_trajectory_type(ADCTrajectory::NORMAL);
+    if (reference_line_info.speed_data().Empty()) {
+      *reference_line_info.mutable_speed_data() =
+          SpeedProfileGenerator::GenerateFallbackSpeedProfile();
+      reference_line_info.AddCost(kSpeedOptimizationFallbackCost);
+      reference_line_info.set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
+    } else {
+      reference_line_info.set_trajectory_type(ADCTrajectory::NORMAL);
+    }
     DiscretizedTrajectory trajectory;
     if (!reference_line_info.CombinePathAndSpeedProfile(
             planning_start_point.relative_time(),
