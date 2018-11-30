@@ -274,7 +274,6 @@ void StdPlanning::RunOnce(const LocalView& local_view,
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
-      FillPlanningPb(start_timestamp, &estop_trajectory);
       trajectory_pb->CopyFrom(estop_trajectory);
     } else {
       trajectory_pb->mutable_decision()
@@ -282,7 +281,6 @@ void StdPlanning::RunOnce(const LocalView& local_view,
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
-      FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
     FillPlanningPb(start_timestamp, trajectory_pb);
