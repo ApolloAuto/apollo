@@ -27,6 +27,7 @@ from common.feature_io import load_protobuf
 from common.feature_io import save_protobuf
 from common.feature_io import build_trajectory
 from common.trajectory import TrajectoryToSample
+from common.online_to_offline import OnlineRawDataToDataTrain
 
 
 def label_file(input_file, output_file):
@@ -63,8 +64,11 @@ if __name__ == "__main__":
     parser.add_argument('output', type=str, help='output file')
     args = parser.parse_args()
 
+    data_conversion = OnlineRawDataToDataTrain()
+
     print("Create Label {} -> {}".format(args.input, args.output))
     if os.path.isfile(args.input):
         label_file(args.input, args.output)
+        #data_conversion.LoadFeaturePBAndSaveLabelFiles(args.input, args.output)
     else:
         print("{} is not a valid file".format(args.input))

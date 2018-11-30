@@ -17,6 +17,10 @@
 ###############################################################################
 
 parameters = {
+    'config': {
+        'need_to_label': True,
+        'maximum_observation_time': 8.0
+    },
     'mlp': {
         'train_data_rate': 0.8,
         'size_obstacle_feature': 22,
@@ -45,7 +49,8 @@ parameters = {
 
         # Lane change is defined to be finished if the ratio of deviation
         # from center-line to the lane width is within this: (must be < 0.5)
-        'lane_change_finish_condition': 0.1
+        'lane_change_finish_condition': 0.1,
+        'maximum_observation_time': 3.0
     }
 }
 

@@ -284,6 +284,7 @@ SidePassPathDecider::GetPathBoundaries(
 
     // Update the lateral bound based on the road info and side-pass direction.
     const double curr_lane_width = lane_left_width + lane_right_width;
+    ADEBUG << "Current lane's ID: " << curr_lane_.id().id();
     ADEBUG << "Current lane's width = " << curr_lane_width;
     ADEBUG << "Number of left lanes: "
            << curr_lane_.left_neighbor_forward_lane_id_size() +
@@ -376,14 +377,18 @@ SidePassPathDecider::GetPathBoundaries(
       }
       const auto obs_sl = obstacle->PerceptionSLBoundary();
       // ADEBUG << obs_sl.ShortDebugString();
+      // ADEBUG << "Offset = " << adc_frenet_frame_point_.s();
       // not overlap with obstacle
       if (curr_s < obs_sl.start_s() - kObstacleSBuffer ||
           curr_s > obs_sl.end_s() + kObstacleSBuffer) {
         continue;
       }
       // not within lateral range
-      if (obs_sl.start_l() > std::get<2>(lateral_bound) ||
-          obs_sl.end_l() < std::get<1>(lateral_bound)) {
+      if (obs_sl.start_l() >
+          std::get<2>(lateral_bound) + kObstacleLBuffer + adc_half_width ||
+          obs_sl.end_l() <
+          std::get<1>(lateral_bound) - kObstacleLBuffer - adc_half_width) {
+        ADEBUG << "Obstacle not considered.";
         continue;
       }
       ADEBUG << "Obstacle within consideration: "
