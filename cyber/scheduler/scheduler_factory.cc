@@ -38,8 +38,6 @@ using apollo::cyber::common::GetProtoFromFile;
 using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 Scheduler* Instance() {
   static Scheduler* instance = nullptr;

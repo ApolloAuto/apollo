@@ -31,13 +31,7 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::common::GetAbsolutePath;
-using apollo::cyber::common::GetProtoFromFile;
 using apollo::cyber::common::GlobalData;
-using apollo::cyber::common::PathExists;
-using apollo::cyber::common::WorkRoot;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 void Scheduler::ShutDown() {
   if (stop_.exchange(true)) {
