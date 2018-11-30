@@ -56,7 +56,7 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "StopSignUnprotectedPreStop planning error";
   }
@@ -80,8 +80,8 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
       std::string vehicle = (it->second)[i];
       s = s.empty() ? vehicle : s + "," + vehicle;
     }
-    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id
-         << "] vehicle[" << s << "]";
+    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
+           << s << "]";
   }
 
   for (const auto* obstacle : path_decision.obstacles().Items()) {
@@ -98,7 +98,6 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 int StopSignUnprotectedPreStop::AddWatchVehicle(
     const Obstacle& obstacle, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
-
 
   const PerceptionObstacle& perception_obstacle = obstacle.Perception();
   const std::string& obstacle_id = std::to_string(perception_obstacle.id());

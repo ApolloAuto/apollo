@@ -46,7 +46,7 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "StopSignUnprotectedIntersectionCruise plan error";
   }
@@ -82,14 +82,12 @@ bool StopSignUnprotectedIntersectionCruise::CheckPassIntersection(
 
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
   ADEBUG << "adc_back_edge_s[" << adc_back_edge_s
-      << "] stop_sign_overlap_end_s[" << stop_sign_overlap_end_s << "]";
-  if (adc_back_edge_s - stop_sign_overlap_end_s >
-      kIntersectionLength) {
+         << "] stop_sign_overlap_end_s[" << stop_sign_overlap_end_s << "]";
+  if (adc_back_edge_s - stop_sign_overlap_end_s > kIntersectionLength) {
     return true;
   }
   return false;
 }
-
 
 }  // namespace stop_sign
 }  // namespace scenario

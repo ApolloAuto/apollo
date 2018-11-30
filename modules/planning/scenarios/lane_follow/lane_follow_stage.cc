@@ -198,7 +198,12 @@ Status LaneFollowStage::PlanOnReferenceLine(
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
   }
 
-  reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
+  if (!(reference_line_info->trajectory_type() ==
+            ADCTrajectory::PATH_FALLBACK ||
+        reference_line_info->trajectory_type() ==
+            ADCTrajectory::SPEED_FALLBACK)) {
+    reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
+  }
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),

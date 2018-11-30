@@ -46,13 +46,13 @@ Stage::StageStatus TrafficLightRightTurnUnprotectedIntersectionCruise::Process(
   CHECK_NOTNULL(frame);
 
   if (GetContext()->traffic_light_id !=
-      PlanningContext::GetScenarioInfo()->
-        next_traffic_light_overlap.object_id) {
+      PlanningContext::GetScenarioInfo()
+          ->next_traffic_light_overlap.object_id) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
 
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "TrafficLightRightTurnUnprotectedIntersectionCruise plan error";
   }

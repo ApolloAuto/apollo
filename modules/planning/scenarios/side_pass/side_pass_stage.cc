@@ -96,7 +96,7 @@ Stage::StageStatus SidePassBackup::Process(
   }
 
   // do path planning
-  bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
     AERROR << "Stage " << Name() << " error: "
            << "planning on reference line failed.";
@@ -160,7 +160,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     return Stage::FINISHED;
   }
   // do path planning
-  bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
     AERROR << "Stage " << Name() << " error: "
            << "planning on reference line failed.";
@@ -221,7 +221,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
  */
 Stage::StageStatus SidePassGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  if (!PlanningOnReferenceLine(planning_start_point, frame)) {
+  if (!ExecuteTaskOnReferenceLine(planning_start_point, frame)) {
     AERROR << "Fail to plan on reference_line.";
     next_stage_ = ScenarioConfig::SIDE_PASS_BACKUP;
     return Stage::FINISHED;
@@ -273,7 +273,7 @@ Stage::StageStatus SidePassDetectSafety::Process(
   debug_path->mutable_path_point()->CopyFrom(
       {path_points.begin(), path_points.end()});
 
-  if (!PlanningOnReferenceLine(planning_start_point, frame)) {
+  if (!ExecuteTaskOnReferenceLine(planning_start_point, frame)) {
     return Stage::ERROR;
   }
   bool is_safe = true;
@@ -338,7 +338,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
   debug_path->mutable_path_point()->CopyFrom(
       {path_points.begin(), path_points.end()});
 
-  bool plan_ok = PlanningOnReferenceLine(planning_start_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
     AERROR << "Fail to plan on reference line.";
     return Stage::ERROR;

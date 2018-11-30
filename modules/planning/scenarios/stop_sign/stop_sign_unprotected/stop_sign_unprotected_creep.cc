@@ -56,7 +56,7 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
                            stop_sign_overlap_end_s)) {
-    bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+    bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
     if (!plan_ok) {
       AERROR << "StopSignUnprotectedCreep planning error";
     }
@@ -70,7 +70,7 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
       ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
                                         stop_sign_overlap_end_s);
 
-  bool plan_ok = PlanningOnReferenceLine(planning_init_point, frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "StopSignUnprotectedCreep planning error";
   }
