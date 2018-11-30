@@ -44,19 +44,6 @@ TEST(EnvironmentTest, work_root) {
   EXPECT_EQ(after, before);
 }
 
-TEST(EnvironmentTest, module_root) {
-  std::string before = GetEnv("MODULE_PATH");
-  unsetenv("MODULE_PATH");
-  EXPECT_EQ(ModuleRoot(), WorkRoot());
-
-  setenv("MODULE_PATH", "/home/caros", 1);
-  EXPECT_EQ(ModuleRoot(), "/home/caros/");
-  setenv("MODULE_PATH", "/home/caros/", 1);
-  EXPECT_EQ(ModuleRoot(), "/home/caros/");
-
-  setenv("MODULE_PATH", before.c_str(), 1);
-}
-
 }  // namespace common
 }  // namespace cyber
 }  // namespace apollo

@@ -58,7 +58,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
   void LoadConfigFiles(const ComponentConfig& config) {
     if (!config.config_file_path().empty()) {
       if (config.config_file_path()[0] != '/') {
-        config_file_path_ = common::GetAbsolutePath(common::ModuleRoot(),
+        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(),
                                                     config.config_file_path());
       } else {
         config_file_path_ = config.config_file_path();
@@ -69,7 +69,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
       std::string flag_file_path = config.flag_file_path();
       if (flag_file_path[0] != '/') {
         flag_file_path =
-            common::GetAbsolutePath(common::ModuleRoot(), flag_file_path);
+            common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
       }
       google::SetCommandLineOption("flagfile", flag_file_path.c_str());
     }
@@ -78,7 +78,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
   void LoadConfigFiles(const TimerComponentConfig& config) {
     if (!config.config_file_path().empty()) {
       if (config.config_file_path()[0] != '/') {
-        config_file_path_ = common::GetAbsolutePath(common::ModuleRoot(),
+        config_file_path_ = common::GetAbsolutePath(common::WorkRoot(),
                                                     config.config_file_path());
       } else {
         config_file_path_ = config.config_file_path();
@@ -89,7 +89,7 @@ class ComponentBase : public std::enable_shared_from_this<ComponentBase> {
       std::string flag_file_path = config.flag_file_path();
       if (flag_file_path[0] != '/') {
         flag_file_path =
-            common::GetAbsolutePath(common::ModuleRoot(), flag_file_path);
+            common::GetAbsolutePath(common::WorkRoot(), flag_file_path);
       }
       google::SetCommandLineOption("flagfile", flag_file_path.c_str());
     }
