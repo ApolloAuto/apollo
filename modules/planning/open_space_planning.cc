@@ -200,7 +200,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
-  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+  const double planning_cycle_time = FLAGS_open_space_planning_period;
 
   std::vector<TrajectoryPoint> stitching_trajectory;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
@@ -282,30 +282,52 @@ Status OpenSpacePlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* const trajectory_pb) {
+  auto* ptr_debug = trajectory_pb->mutable_debug();
+  if (FLAGS_enable_record_debug) {
+    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
+        stitching_trajectory.back());
+  }
+
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
 
-  if (status != Status::OK()) return status;
-  // TODO(QiL): update last_publishable_trajectory_ for stitching
-  trajectory_pb->CopyFrom(frame_->trajectory());
-
-  auto* ptr_debug = trajectory_pb->mutable_debug();
-  if (status.ok()) {
-    if (FLAGS_enable_record_debug) {
-      ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
-          stitching_trajectory.back());
-      ADEBUG << "Open space init point added!";
-      ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
-          frame_->open_space_debug());
-      ADEBUG << "Open space debug information added!";
-    }
-    if (FLAGS_enable_record_debug && FLAGS_export_chart) {
-      ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
-      ADEBUG << "Open Space Planning debug from frame is : "
-             << frame_->open_space_debug().ShortDebugString();
-      ADEBUG << "Open Space Planning export chart with : "
-             << trajectory_pb->ShortDebugString();
-    }
+  if (status != Status::OK()) {
+    return status;
   }
+
+  if (FLAGS_enable_record_debug) {
+    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
+        stitching_trajectory.back());
+    ADEBUG << "Open space init point added!";
+    ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
+        frame_->open_space_debug());
+    ADEBUG << "Open space debug information added!";
+  }
+  if (FLAGS_enable_record_debug && FLAGS_export_chart) {
+    ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
+    ADEBUG << "Open Space Planning debug from frame is : "
+           << frame_->open_space_debug().ShortDebugString();
+    ADEBUG << "Open Space Planning export chart with : "
+           << trajectory_pb->ShortDebugString();
+  }
+
+  ADCTrajectory* trajectory_after_stitching_point =
+      frame_->mutable_trajectory();
+
+  trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
+      current_time_stamp);
+
+  last_publishable_trajectory_.reset(
+      new PublishableTrajectory(*trajectory_after_stitching_point));
+
+  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+
+  if (FLAGS_enable_stitch_last_trajectory) {
+    last_publishable_trajectory_->PrependTrajectoryPoints(
+        stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+  }
+
+  last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+
   return status;
 }
 

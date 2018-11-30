@@ -67,6 +67,7 @@ Status OpenSpaceTrajectoryGenerator::Init(
 }
 
 apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
+    const common::TrajectoryPoint& planning_init_point,
     const VehicleState& vehicle_state, const std::vector<double>& XYbounds,
     const double rotate_angle, const Vec2d& translate_origin,
     const std::vector<double>& end_pose, size_t obstacles_num,
@@ -80,13 +81,13 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   }
 
   // initial state
-  init_state_ = vehicle_state;
+  init_state_ = planning_init_point.path_point();
   init_x_ = init_state_.x();
   init_y_ = init_state_.y();
-  init_phi_ = init_state_.heading();
+  init_phi_ = init_state_.theta();
   // TODO(Jinyun) workaround the initial small speed to avoid problem in
   // trajectory partition
-  init_v_ = 0.0;
+  init_v_ = planning_init_point.v();
   // rotate and scale the state according to the origin point defined in
   // frame
   init_x_ -= translate_origin.x();
@@ -96,9 +97,10 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
       init_x_ * std::cos(-rotate_angle) - init_y_ * std::sin(-rotate_angle);
   init_y_ = tmp_x * std::sin(-rotate_angle) + init_y_ * std::cos(-rotate_angle);
   init_phi_ = common::math::NormalizeAngle(init_phi_ - rotate_angle);
-  // TODO(Jinyun) how to initial input not decided yet
+  // TODO(Jinyun) not able to get gear from trajectory point
   init_steer_ = 0.0;
-  init_a_ = 0.0;
+  init_a_ = planning_init_point.a();
+
   Eigen::MatrixXd x0(4, 1);
   x0 << init_x_, init_y_, init_phi_, init_v_;
 

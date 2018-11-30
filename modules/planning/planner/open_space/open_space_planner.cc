@@ -62,8 +62,12 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
 
 apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  
   // 1. Build Predicition Environments.
   predicted_bounding_rectangles_.clear();
+
+  planning_init_point_ = planning_init_point;
+
   if (FLAGS_enable_open_space_planner_thread) {
     ADEBUG << "Open space plan in multi-threads mode";
     BuildPredictedEnvironment(frame->obstacles());
@@ -166,9 +170,9 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
     // 2. Generate Trajectory;
     Status status = open_space_trajectory_generator_->Plan(
-        vehicle_state_, XYbounds_, rotate_angle_, translate_origin_, end_pose_,
-        obstacles_num_, obstacles_edges_num_, obstacles_A_, obstacles_b_,
-        open_space_roi_generator_->openspace_warmstart_obstacles());
+        planning_init_point_, vehicle_state_, XYbounds_, rotate_angle_,
+        translate_origin_, end_pose_, obstacles_num_, obstacles_edges_num_,
+        obstacles_A_, obstacles_b_, obstalce_list_);
     // 3. If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
       trajectory_partition_.Clear();
