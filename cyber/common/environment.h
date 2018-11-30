@@ -43,18 +43,6 @@ inline const std::string WorkRoot() {
   return work_root;
 }
 
-inline const std::string ModuleRoot() {
-  std::string module_root = GetEnv("MODULE_PATH");
-  if (module_root.empty()) {
-    return WorkRoot();
-  }
-
-  if (module_root.back() != '/') {
-    module_root += '/';
-  }
-  return module_root;
-}
-
 }  // namespace common
 }  // namespace cyber
 }  // namespace apollo

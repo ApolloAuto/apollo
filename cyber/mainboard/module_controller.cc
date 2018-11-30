@@ -43,19 +43,13 @@ void ModuleController::Clear() {
 bool ModuleController::LoadAll() {
   const std::string work_root = common::WorkRoot();
   const std::string current_path = common::GetCurrentPath();
-  const std::string module_root = common::ModuleRoot();
   const std::string dag_root_path = common::GetAbsolutePath(work_root, "dag");
-  const std::string dag_module_path =
-      common::GetAbsolutePath(module_root, "dag");
 
   for (auto& dag_conf : args_.GetDAGConfList()) {
     std::string module_path = "";
     if (dag_conf == common::GetFileName(dag_conf)) {
       // case dag conf argument var is a filename
-      module_path = common::GetAbsolutePath(dag_module_path, dag_conf);
-      if (!common::PathExists(module_path)) {
-        module_path = common::GetAbsolutePath(dag_root_path, dag_conf);
-      }
+      module_path = common::GetAbsolutePath(dag_root_path, dag_conf);
     } else if (dag_conf[0] == '/') {
       // case dag conf argument var is an absolute path
       module_path = dag_conf;
@@ -77,7 +71,6 @@ bool ModuleController::LoadAll() {
 
 bool ModuleController::LoadModule(const DagConfig& dag_config) {
   const std::string work_root = common::WorkRoot();
-  const std::string module_root = common::ModuleRoot();
 
   for (auto module_config : dag_config.module_config()) {
     std::string load_path;
@@ -85,11 +78,7 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
       load_path = module_config.module_library();
     } else {
       load_path =
-          common::GetAbsolutePath(module_root, module_config.module_library());
-      if (!common::PathExists(load_path)) {
-        load_path =
-            common::GetAbsolutePath(work_root, module_config.module_library());
-      }
+          common::GetAbsolutePath(work_root, module_config.module_library());
     }
 
     if (!common::PathExists(load_path)) {
