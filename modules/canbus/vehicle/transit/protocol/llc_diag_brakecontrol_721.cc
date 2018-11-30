@@ -31,7 +31,7 @@ Llcdiagbrakecontrol721::Llcdiagbrakecontrol721() { Reset(); }
 
 uint32_t Llcdiagbrakecontrol721::GetPeriod() const {
   // TODO(All) :  modify every protocol's period manually
-  static const uint32_t PERIOD = 20 * 1000;
+  static const uint32_t PERIOD = 10 * 1000;
   return PERIOD;
 }
 
