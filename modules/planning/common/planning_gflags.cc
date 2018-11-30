@@ -400,6 +400,9 @@ DEFINE_string(planner_open_space_config_filename,
               "/apollo/modules/planning/conf/planner_open_space_config.pb.txt",
               "The open space planner configuration file");
 
+DEFINE_double(open_space_planning_period, 4.0,
+              "estimated time for open space planner planning period");
+
 DEFINE_double(
     parking_longitudinal_range, 15.0,
     "the distance serving as the parking range when solving the problem");

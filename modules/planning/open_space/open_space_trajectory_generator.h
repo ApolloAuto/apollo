@@ -77,6 +77,7 @@ class OpenSpaceTrajectoryGenerator {
    * @brief plan for open space trajectory generators.
    */
   apollo::common::Status Plan(
+      const common::TrajectoryPoint& planning_init_point,
       const apollo::common::VehicleState& vehicle_state,
       const std::vector<double>& XYbounds, const double rotate_angle,
       const apollo::common::math::Vec2d& translate_origin,
@@ -120,7 +121,7 @@ class OpenSpaceTrajectoryGenerator {
       distance_approach_;
   std::unique_ptr<::apollo::planning::DualVariableWarmStartProblem>
       dual_variable_warm_start_;
-  common::VehicleState init_state_;
+  common::PathPoint init_state_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;

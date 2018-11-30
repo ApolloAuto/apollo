@@ -110,6 +110,7 @@ class OpenSpacePlanner : public Planner {
   std::unique_ptr<OpenSpaceROI> open_space_roi_generator_;
   planning_internal::OpenSpaceDebug open_space_debug_;
   common::VehicleState init_state_;
+  common::TrajectoryPoint planning_init_point_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
