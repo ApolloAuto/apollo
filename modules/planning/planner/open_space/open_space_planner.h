@@ -82,6 +82,7 @@ class OpenSpacePlanner : public Planner {
     Eigen::MatrixXi obstacles_edges_num;
     Eigen::MatrixXd obstacles_A;
     Eigen::MatrixXd obstacles_b;
+    std::vector<double> XYbounds;
   };
 
   std::string Name() override { return "OPEN_SPACE"; }
@@ -142,7 +143,7 @@ class OpenSpacePlanner : public Planner {
   Eigen::MatrixXi obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
-  ThreadData thead_data_;
+  ThreadData thread_data_;
 };
 
 }  // namespace planning
