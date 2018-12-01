@@ -158,7 +158,7 @@ void Shutdown() {
     return;
   }
   TaskManager::Instance()->Shutdown();
-  scheduler::Instance()->ShutDown();
+  scheduler::Instance()->Shutdown();
   service_discovery::TopologyManager::Instance()->Shutdown();
   transport::Transport::Instance()->Shutdown();
   StopLogger();

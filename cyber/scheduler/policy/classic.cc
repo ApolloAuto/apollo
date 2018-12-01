@@ -29,9 +29,12 @@ using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
+namespace {
+static constexpr auto MIN_SLEEP_INTERVAL = std::chrono::milliseconds(1);
+}
+
 std::mutex ClassicContext::mtx_wq_;
 std::condition_variable ClassicContext::cv_wq_;
-
 std::array<AtomicRWLock, MAX_PRIO> ClassicContext::rq_locks_;
 std::array<std::vector<std::shared_ptr<CRoutine>>, MAX_PRIO>
     ClassicContext::rq_;
@@ -53,6 +56,12 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
                                                   cr->processor_id());
         return cr;
       }
+
+      if (cr->state() == RoutineState::SLEEP &&
+          (!need_sleep_ || wake_time_ > cr->wake_time())) {
+        need_sleep_ = true;
+        wake_time_ = cr->wake_time();
+      }
       cr->Release();
     }
   }
@@ -62,7 +71,28 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 
 void ClassicContext::Wait() {
   std::unique_lock<std::mutex> lk(mtx_wq_);
-  cv_wq_.wait_for(lk, std::chrono::milliseconds(1));
+  if (stop_) {
+    return;
+  }
+
+  if (need_sleep_) {
+    auto duration = wake_time_ - std::chrono::steady_clock::now();
+    cv_wq_.wait_for(lk, duration);
+    need_sleep_ = false;
+  } else {
+    cv_wq_.wait(lk);
+  }
+}
+
+void ClassicContext::Shutdown() {
+  {
+    std::lock_guard<std::mutex> lg(mtx_wq_);
+    if (!stop_) {
+      stop_ = true;
+    }
+  }
+  cv_wq_.notify_all();
+  processor_->Stop();
 }
 
 void ClassicContext::Notify() { cv_wq_.notify_one(); }

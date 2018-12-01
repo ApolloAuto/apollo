@@ -58,7 +58,7 @@ class Scheduler {
   virtual bool RemoveTask(const std::string& name) = 0;
 
   uint32_t TaskPoolSize() { return task_pool_size_; }
-  void ShutDown();
+  void Shutdown();
 
   virtual void SetInnerThreadAttr(const std::thread* thr,
                                   const std::string& name) {}

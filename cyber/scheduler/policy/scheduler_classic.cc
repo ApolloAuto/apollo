@@ -113,11 +113,14 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   }
 
   // Enqueue task.
-  WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[cr->priority()]);
-  ClassicContext::rq_[cr->priority()].emplace_back(cr);
+  {
+    WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[cr->priority()]);
+    ClassicContext::rq_[cr->priority()].emplace_back(cr);
+  }
 
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
                                             cr->processor_id());
+  ClassicContext::Notify();
   return true;
 }
 

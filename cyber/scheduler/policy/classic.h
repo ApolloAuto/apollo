@@ -31,14 +31,13 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-namespace {
-constexpr uint32_t MAX_PRIO = 20;
-}
+static constexpr uint32_t MAX_PRIO = 20;
 
 class ClassicContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
   void Wait() override;
+  void Shutdown() override;
 
   static void Notify();
 
@@ -50,6 +49,9 @@ class ClassicContext : public ProcessorContext {
  private:
   alignas(CACHELINE_SIZE) static std::mutex mtx_wq_;
   alignas(CACHELINE_SIZE) static std::condition_variable cv_wq_;
+
+  std::chrono::steady_clock::time_point wake_time_;
+  bool need_sleep_ = false;
 };
 
 }  // namespace scheduler

@@ -33,13 +33,13 @@ namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
 
-void Scheduler::ShutDown() {
+void Scheduler::Shutdown() {
   if (stop_.exchange(true)) {
     return;
   }
 
   for (auto& ctx : pctxs_) {
-    ctx->ShutDown();
+    ctx->Shutdown();
   }
   pctxs_.clear();
 }
