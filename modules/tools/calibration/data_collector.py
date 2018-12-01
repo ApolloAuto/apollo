@@ -24,8 +24,7 @@ import time
 import signal
 import time
 
-from cyber_py import pynode
-from std_msgs.msg import String
+from cyber_py import cyber
 
 from plot_data import Plotter
 
@@ -191,7 +190,7 @@ def main():
     """
     Main function
     """
-    node = pynode.Node("data_collector")
+    node = cyber.Node("data_collector")
 
     data_collector = DataCollector(node)
     plotter = Plotter()
