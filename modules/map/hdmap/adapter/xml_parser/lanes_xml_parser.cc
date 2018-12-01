@@ -722,9 +722,17 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
         UtilXmlParser::QueryStringAttribute(*sub_node, "direction", &direction);
     if (checker == tinyxml2::XML_SUCCESS) {
       if (side == "left") {
-        lane->add_left_neighbor_forward_lane_id()->set_id(lane_id);
+        if (direction == "same") {
+          lane->add_left_neighbor_forward_lane_id()->set_id(lane_id);
+        } else {
+          lane->add_left_neighbor_reverse_lane_id()->set_id(lane_id);
+        }
       } else if (side == "right") {
-        lane->add_right_neighbor_forward_lane_id()->set_id(lane_id);
+        if (direction == "same") {
+          lane->add_right_neighbor_forward_lane_id()->set_id(lane_id);
+        } else {
+          lane->add_right_neighbor_reverse_lane_id()->set_id(lane_id);
+        }
       }
     }
     sub_node = sub_node->NextSiblingElement("neighbor");
