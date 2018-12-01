@@ -350,8 +350,9 @@ Status ControlComponent::CheckInput(LocalView *local_view) {
   if (!local_view->trajectory.estop().is_estop() &&
       local_view->trajectory.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
-                  "planning has no trajectory point.");
+    std::string msg("planning has no trajectory point. planning_seq_num:");
+    msg += std::to_string(local_view->trajectory.header().sequence_num());
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, msg);
   }
 
   for (auto &trajectory_point :
