@@ -140,6 +140,8 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
       frame.reference_line_info().front().FirstEncounteredOverlaps();
   const double kClearDistance = 15.0;  // in meters
   for (const auto& overlap : first_encountered_overlaps) {
+    ADEBUG << "AdcSL: " << adc_sl_boundary.ShortDebugString();
+    ADEBUG << overlap.first << ", " << overlap.second.DebugString();
     if (overlap.first != ReferenceLineInfo::CROSSWALK &&
         overlap.first != ReferenceLineInfo::SIGNAL &&
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
@@ -199,8 +201,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     // check driving_width
     constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line = reference_line_info.reference_line();
-    const double driving_width = reference_line.GetDrivingWidth(
-        obstacle->PerceptionSLBoundary());
+    const double driving_width =
+        reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >

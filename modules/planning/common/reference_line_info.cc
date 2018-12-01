@@ -124,48 +124,43 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   return true;
 }
 
+bool ReferenceLineInfo::GetFirstOverlap(
+    const std::vector<hdmap::PathOverlap>& path_overlaps,
+    hdmap::PathOverlap* path_overlap) {
+  CHECK_NOTNULL(path_overlap);
+  const double start_s = sl_boundary_info_.adc_sl_boundary_.end_s();
+  constexpr double kMaxOverlapRange = 500.0;
+  double overlap_min_s = kMaxOverlapRange;
+
+  for (const auto& overlap : path_overlaps) {
+    if (overlap.end_s < start_s) {
+      continue;
+    }
+    if (overlap_min_s > overlap.start_s) {
+      *path_overlap = overlap;
+      overlap_min_s = overlap.start_s;
+    }
+  }
+  return overlap_min_s < kMaxOverlapRange;
+}
+
 void ReferenceLineInfo::InitFirstOverlaps() {
-  double start_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   const auto& map_path = reference_line_.map_path();
-  for (const auto& overlap : map_path.crosswalk_overlaps()) {
-    if (overlap.end_s < start_s) {
-      continue;
-    }
-    first_encounter_overlaps_.push_back({CROSSWALK, overlap});
-    break;
+
+  hdmap::PathOverlap crosswalk_overlap;
+  if (GetFirstOverlap(map_path.crosswalk_overlaps(), &crosswalk_overlap)) {
+    first_encounter_overlaps_.push_back({CROSSWALK, crosswalk_overlap});
   }
-  for (const auto& overlap : map_path.signal_overlaps()) {
-    if (overlap.end_s < start_s) {
-      continue;
-    }
-    first_encounter_overlaps_.push_back({SIGNAL, overlap});
-    break;
+
+  hdmap::PathOverlap signal_overlap;
+  if (GetFirstOverlap(map_path.signal_overlaps(), &signal_overlap)) {
+    first_encounter_overlaps_.push_back({CROSSWALK, signal_overlap});
   }
-  for (const auto& overlap : map_path.stop_sign_overlaps()) {
-    if (overlap.end_s < start_s) {
-      continue;
-    }
-    first_encounter_overlaps_.push_back({STOP_SIGN, overlap});
-    break;
+
+  hdmap::PathOverlap stop_sign_overlap;
+  if (GetFirstOverlap(map_path.stop_sign_overlaps(), &stop_sign_overlap)) {
+    first_encounter_overlaps_.push_back({CROSSWALK, stop_sign_overlap});
   }
-  for (const auto& obstacle : path_decision_.obstacles().Items()) {
-    if (!obstacle->IsBlockingObstacle()) {
-      continue;
-    }
-    if (obstacle->PerceptionSLBoundary().end_s() < start_s) {
-      continue;
-    }
-    hdmap::PathOverlap overlap;
-    overlap.start_s = obstacle->PerceptionSLBoundary().start_s();
-    overlap.end_s = obstacle->PerceptionSLBoundary().end_s();
-    overlap.object_id = obstacle->Id();
-    first_encounter_overlaps_.push_back({OBSTACLE, overlap});
-  }
-  std::sort(first_encounter_overlaps_.begin(), first_encounter_overlaps_.end(),
-            [](const std::pair<OverlapType, hdmap::PathOverlap>& lhs,
-               const std::pair<OverlapType, hdmap::PathOverlap>& rhs) {
-              return lhs.second.start_s < rhs.second.start_s;
-            });
 }
 
 bool ReferenceLineInfo::IsInited() const { return is_inited_; }
