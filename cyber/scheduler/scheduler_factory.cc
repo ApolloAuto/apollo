@@ -54,7 +54,7 @@ Scheduler* Instance() {
     if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
       policy = cfg.scheduler_conf().policy();
     } else {
-      ADEBUG << "Pls make sure schedconf exist and which format is correct.\n";
+      AWARN << "Pls make sure schedconf exist and which format is correct.\n";
     }
 
     if (!policy.compare("classic")) {
@@ -62,6 +62,7 @@ Scheduler* Instance() {
     } else if (!policy.compare("choreography")) {
       instance = new SchedulerChoreography();
     } else {
+      AWARN << "Invalid scheduler policy: " << policy;
       instance = new SchedulerClassic();
     }
   }

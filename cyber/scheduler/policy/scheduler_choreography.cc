@@ -122,7 +122,7 @@ void SchedulerChoreography::CreateProcessor() {
   }
 }
 
-bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine> cr) {
+bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
   std::lock_guard<std::mutex> lg(id_cr_wl_[cr->id()]);

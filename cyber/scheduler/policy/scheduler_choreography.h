@@ -42,7 +42,7 @@ class SchedulerChoreography : public Scheduler {
                           const std::string& name) override;
 
   bool RemoveTask(const std::string& name) override;
-  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
+  bool DispatchTask(const std::shared_ptr<CRoutine>&) override;
 
  private:
   void CreateProcessor();

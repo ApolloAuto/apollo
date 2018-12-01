@@ -64,7 +64,7 @@ class Scheduler {
                                   const std::string& name) {}
 
  protected:
-  virtual bool DispatchTask(const std::shared_ptr<CRoutine>) = 0;
+  virtual bool DispatchTask(const std::shared_ptr<CRoutine>&) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
 
   void ParseCpuset(const std::string&, std::vector<int>*);

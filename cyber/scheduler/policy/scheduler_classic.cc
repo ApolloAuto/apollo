@@ -88,7 +88,7 @@ void SchedulerClassic::CreateProcessor() {
   }
 }
 
-bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
+bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
   std::lock_guard<std::mutex> lg(id_cr_wl_[cr->id()]);
@@ -107,7 +107,8 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine> cr) {
 
   // Check if task prio is reasonable.
   if (cr->priority() >= MAX_PRIO) {
-    AWARN << cr->name() << " prio great than MAX_PRIO.";
+    AWARN << cr->name() << " prio is greater than MAX_PRIO[ << " << MAX_PRIO
+          << "].";
     cr->set_priority(MAX_PRIO - 1);
   }
 
