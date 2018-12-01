@@ -17,6 +17,7 @@
 #include "modules/planning/open_space_planning.h"
 
 #include <algorithm>
+#include <limits>
 #include <list>
 #include <memory>
 #include <utility>
@@ -24,6 +25,8 @@
 
 #include "gtest/gtest_prod.h"
 
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/math/quaternion.h"
@@ -45,6 +48,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
+using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::dreamview::Chart;
@@ -101,13 +105,6 @@ Status OpenSpacePlanning::Init(const PlanningConfig& config) {
   PlanningBase::Init(config_);
 
   planner_dispatcher_->Init();
-
-  /*
-    CHECK(apollo::common::util::GetProtoFromFile(
-        FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
-        << "Failed to load traffic rule config file "
-        << FLAGS_traffic_rule_config_filename;
-  */
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -198,8 +195,6 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     // TODO(QiL): Get latest parking info from new routing
   }
 
-  // planning is triggered by prediction data, but we can still use an estimated
-  // cycle time for stitching
   const double planning_cycle_time = FLAGS_open_space_planning_period;
 
   std::vector<TrajectoryPoint> stitching_trajectory;
@@ -283,6 +278,7 @@ Status OpenSpacePlanning::Plan(
     const std::vector<TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* const trajectory_pb) {
   auto* ptr_debug = trajectory_pb->mutable_debug();
+
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
         stitching_trajectory.back());
@@ -302,6 +298,7 @@ Status OpenSpacePlanning::Plan(
         frame_->open_space_debug());
     ADEBUG << "Open space debug information added!";
   }
+
   if (FLAGS_enable_record_debug && FLAGS_export_chart) {
     ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
     ADEBUG << "Open Space Planning debug from frame is : "
@@ -316,6 +313,19 @@ Status OpenSpacePlanning::Plan(
   trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
       current_time_stamp);
 
+  // adjust the relative time
+  int size_of_trajectory_after_stitching_point =
+      trajectory_after_stitching_point->trajectory_point_size();
+  double last_stitching_trajectory_relative_time =
+      stitching_trajectory.back().relative_time();
+  for (int i = 0; i < size_of_trajectory_after_stitching_point; i++) {
+    trajectory_after_stitching_point->mutable_trajectory_point(i)
+        ->set_relative_time(
+            trajectory_after_stitching_point->mutable_trajectory_point(i)
+                ->relative_time() +
+            last_stitching_trajectory_relative_time);
+  }
+
   last_publishable_trajectory_.reset(
       new PublishableTrajectory(*trajectory_after_stitching_point));
 
@@ -326,9 +336,182 @@ Status OpenSpacePlanning::Plan(
         stitching_trajectory.begin(), stitching_trajectory.end() - 1);
   }
 
-  last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+  // trajectory partition and choose the current trajectory to follow
+  auto trajectory_partition_status =
+      TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
 
-  return status;
+  if (trajectory_partition_status != Status::OK()) {
+    return trajectory_partition_status;
+  }
+
+  BuildPredictedEnvironment(frame_.get()->obstacles());
+
+  if (!IsCollisionFreeTrajectory(*trajectory_pb)) {
+    return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+  }
+
+  return Status::OK();
+}
+
+Status OpenSpacePlanning::TrajectoryPartition(
+    const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
+    ADCTrajectory* const trajectory_pb) {
+  std::vector<common::TrajectoryPoint> stitched_trajectory_to_end =
+      last_publishable_trajectory->trajectory_points();
+
+  double distance_s = 0.0;
+
+  apollo::planning_internal::Trajectories trajectory_partition;
+  std::vector<apollo::canbus::Chassis::GearPosition> gear_positions;
+
+  apollo::common::Trajectory* current_trajectory =
+      trajectory_partition.add_trajectory();
+
+  // set initial gear position for first ADCTrajectory depending on v
+  // and check potential edge cases
+  const size_t initial_gear_check_horizon = 3;
+  const double kepsilon = 1e-2;
+  size_t horizon = stitched_trajectory_to_end.size();
+  if (horizon < initial_gear_check_horizon)
+    return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
+  int direction_flag = 0;
+  size_t i = 0;
+  int j = 0;
+  int init_direction = 0;
+  while (i != initial_gear_check_horizon) {
+    if (stitched_trajectory_to_end[j].v() > kepsilon) {
+      i++;
+      j++;
+      direction_flag++;
+      if (init_direction == 0) {
+        init_direction++;
+      }
+    } else if (stitched_trajectory_to_end[j].v() < -kepsilon) {
+      i++;
+      j++;
+      direction_flag--;
+      if (init_direction == 0) {
+        init_direction--;
+      }
+    } else {
+      j++;
+    }
+  }
+  if (direction_flag > 1) {
+    gear_positions.push_back(canbus::Chassis::GEAR_DRIVE);
+  } else if (direction_flag < -1) {
+    gear_positions.push_back(canbus::Chassis::GEAR_REVERSE);
+  } else {
+    if (init_direction > 0) {
+      ADEBUG << "initial speed oscillate too "
+                "frequent around zero";
+      gear_positions.push_back(canbus::Chassis::GEAR_DRIVE);
+    } else if (init_direction < 0) {
+      ADEBUG << "initial speed oscillate too "
+                "frequent around zero";
+      gear_positions.push_back(canbus::Chassis::GEAR_REVERSE);
+    } else {
+      return Status(
+          ErrorCode::PLANNING_ERROR,
+          "Invalid trajectory start! initial speeds too small to decide gear");
+    }
+  }
+  // partition trajectory points into each trajectory
+  for (size_t i = 0; i < horizon; i++) {
+    // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
+    // then add a new trajectory with GEAR_REVERSE
+    if (stitched_trajectory_to_end[i].v() < -kepsilon &&
+        gear_positions.back() == canbus::Chassis::GEAR_DRIVE) {
+      current_trajectory = trajectory_partition.add_trajectory();
+      gear_positions.push_back(canbus::Chassis::GEAR_REVERSE);
+      distance_s = 0.0;
+    }
+    // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
+    // then add a new trajectory with GEAR_DRIVE
+    if (stitched_trajectory_to_end[i].v() > kepsilon &&
+        gear_positions.back() == canbus::Chassis::GEAR_REVERSE) {
+      current_trajectory = trajectory_partition.add_trajectory();
+      gear_positions.push_back(canbus::Chassis::GEAR_DRIVE);
+      distance_s = 0.0;
+    }
+
+    auto* point = current_trajectory->add_trajectory_point();
+
+    point->set_relative_time(stitched_trajectory_to_end[i].relative_time());
+    point->mutable_path_point()->set_x(
+        stitched_trajectory_to_end[i].path_point().x());
+    point->mutable_path_point()->set_y(
+        stitched_trajectory_to_end[i].path_point().y());
+    point->mutable_path_point()->set_theta(
+        stitched_trajectory_to_end[i].path_point().theta());
+    if (i > 0) {
+      distance_s +=
+          std::sqrt((stitched_trajectory_to_end[i].path_point().x() -
+                     stitched_trajectory_to_end[i - 1].path_point().x()) *
+                        (stitched_trajectory_to_end[i].path_point().x() -
+                         stitched_trajectory_to_end[i - 1].path_point().x()) +
+                    (stitched_trajectory_to_end[i].path_point().y() -
+                     stitched_trajectory_to_end[i - 1].path_point().y()) *
+                        (stitched_trajectory_to_end[i].path_point().y() -
+                         stitched_trajectory_to_end[i - 1].path_point().y()));
+    }
+    point->mutable_path_point()->set_s(distance_s);
+    int gear_drive = 1;
+    if (gear_positions.back() == canbus::Chassis::GEAR_REVERSE) gear_drive = -1;
+
+    point->set_v(stitched_trajectory_to_end[i].v() * gear_drive);
+    // TODO(Jiaxuan): Verify this steering to kappa equation
+    point->mutable_path_point()->set_kappa(
+        std::tanh(stitched_trajectory_to_end[i].steer() * 470 * M_PI / 180.0 /
+                  16) /
+        2.85 * gear_drive);
+    point->set_a(stitched_trajectory_to_end[i].a() * gear_drive);
+  }
+
+  // Choose the one to follow based on the closest partitioned trajectory
+  size_t current_trajectory_index = 0;
+  int closest_trajectory_point_index = 0;
+  // Could have a big error in vehicle state in single thread mode!!! As the
+  // vehicle state is only updated at the every beginning at RunOnce()
+  VehicleState vehicle_state =
+      VehicleStateProvider::Instance()->vehicle_state();
+  double min_distance = std::numeric_limits<double>::max();
+  for (size_t i = 0; i < gear_positions.size(); i++) {
+    const apollo::common::Trajectory trajectory =
+        trajectory_partition.trajectory(i);
+    for (int j = 0; j < trajectory.trajectory_point_size(); j++) {
+      const apollo::common::TrajectoryPoint trajectory_point =
+          trajectory.trajectory_point(j);
+      const apollo::common::PathPoint path_point =
+          trajectory_point.path_point();
+      double distance = (path_point.x() - vehicle_state.x()) *
+                            (path_point.x() - vehicle_state.x()) +
+                        (path_point.y() - vehicle_state.y()) *
+                            (path_point.y() - vehicle_state.y());
+      if (distance < min_distance) {
+        min_distance = distance;
+        current_trajectory_index = i;
+        closest_trajectory_point_index = j;
+      }
+    }
+  }
+
+  trajectory_pb->mutable_trajectory_point()->CopyFrom(
+      *(trajectory_partition.mutable_trajectory(current_trajectory_index)
+            ->mutable_trajectory_point()));
+  double time_shift =
+      trajectory_pb->trajectory_point(closest_trajectory_point_index)
+          .relative_time();
+  int trajectory_size = trajectory_pb->trajectory_point_size();
+  for (int i = 0; i < trajectory_size; i++) {
+    apollo::common::TrajectoryPoint* trajectory_point =
+        trajectory_pb->mutable_trajectory_point(i);
+    trajectory_point->set_relative_time(trajectory_point->relative_time() -
+                                        time_shift);
+  }
+  trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
+
+  return Status::OK();
 }
 
 void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
@@ -426,6 +609,57 @@ void OpenSpacePlanning::FillPlanningPb(const double timestamp,
       trajectory_pb->trajectory_point_size() == 0) {
     SetFallbackTrajectory(trajectory_pb);
   }
+  const double dt = timestamp - Clock::NowInSeconds();
+  ;
+  for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
+    p.set_relative_time(p.relative_time() - dt);
+  }
 }
+
+bool OpenSpacePlanning::IsCollisionFreeTrajectory(
+    const ADCTrajectory& trajectory_pb) {
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::Instance()->GetConfig();
+  double ego_length = vehicle_config.vehicle_param().length();
+  double ego_width = vehicle_config.vehicle_param().width();
+  int point_size = trajectory_pb.trajectory_point().size();
+  for (int i = 0; i < point_size; ++i) {
+    const auto& trajectory_point = trajectory_pb.trajectory_point(i);
+    double ego_theta = trajectory_point.path_point().theta();
+    Box2d ego_box(
+        {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
+        ego_theta, ego_length, ego_width);
+    double shift_distance =
+        ego_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
+    Vec2d shift_vec{shift_distance * std::cos(ego_theta),
+                    shift_distance * std::sin(ego_theta)};
+    ego_box.Shift(shift_vec);
+    if (predicted_bounding_rectangles_.size() != 0) {
+      for (const auto& obstacle_box : predicted_bounding_rectangles_[i]) {
+        if (ego_box.HasOverlap(obstacle_box)) {
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
+
+void OpenSpacePlanning::BuildPredictedEnvironment(
+    const std::vector<const Obstacle*>& obstacles) {
+  predicted_bounding_rectangles_.clear();
+  double relative_time = 0.0;
+  while (relative_time < FLAGS_trajectory_time_length) {
+    std::vector<Box2d> predicted_env;
+    for (const Obstacle* obstacle : obstacles) {
+      TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
+      Box2d box = obstacle->GetBoundingBox(point);
+      predicted_env.push_back(std::move(box));
+    }
+    predicted_bounding_rectangles_.push_back(std::move(predicted_env));
+    relative_time += FLAGS_trajectory_time_resolution;
+  }
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -98,10 +98,6 @@ class OpenSpacePlanner : public Planner {
 
   void GenerateTrajectoryThread();
 
-  bool IsCollisionFreeTrajectory(const common::Trajectory& trajectory);
-
-  void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
-
   void Stop() override;
 
  private:
@@ -129,13 +125,11 @@ class OpenSpacePlanner : public Planner {
   std::atomic<bool> is_stop_{false};
   std::atomic<bool> trajectory_updated_{false};
   std::mutex open_space_mutex_;
-  int current_trajectory_index_;
-  apollo::common::Trajectory current_trajectory_;
-  apollo::planning_internal::Trajectories trajectory_partition_;
+  
   apollo::planning::ADCTrajectory publishable_trajectory_;
-  std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
 
-  std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
+  apollo::common::Trajectory trajectory_to_end_;
+
   apollo::common::VehicleState vehicle_state_;
   double rotate_angle_;
   apollo::common::math::Vec2d translate_origin_;
