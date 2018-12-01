@@ -147,40 +147,12 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
 void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
     const ReferenceLineInfo& reference_line_info) {
   const auto& path_decision = reference_line_info.path_decision();
-  const auto& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   for (auto* obstacle : path_decision.obstacles().Items()) {
     auto id = obstacle->Id();
     const double speed = obstacle->speed();
     if (!obstacle->st_boundary().IsEmpty()) {
       // fill discretized boundary info
       ConvertToDiscretizedBoundaries(obstacle->st_boundary(), speed);
-    } else if (FLAGS_enable_side_vehicle_st_boundary &&
-               (adc_sl_boundary.start_l() > 2.0 ||
-                adc_sl_boundary.end_l() < -2.0)) {
-      if (path_decision.Find(id)->reference_line_st_boundary().IsEmpty()) {
-        continue;
-      }
-      ADEBUG << "obstacle " << id << " is NOT blocking.";
-      auto st_boundary_copy =
-          path_decision.Find(id)->reference_line_st_boundary();
-      auto st_boundary = st_boundary_copy.CutOffByT(3.5);
-      if (!st_boundary.IsEmpty()) {
-        auto decision = obstacle->LongitudinalDecision();
-        if (decision.has_yield()) {
-          st_boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
-        } else if (decision.has_overtake()) {
-          st_boundary.SetBoundaryType(StBoundary::BoundaryType::OVERTAKE);
-        } else if (decision.has_follow()) {
-          st_boundary.SetBoundaryType(StBoundary::BoundaryType::FOLLOW);
-        } else if (decision.has_stop()) {
-          st_boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
-        }
-        st_boundary.SetId(st_boundary_copy.id());
-        st_boundary.SetCharacteristicLength(
-            st_boundary_copy.characteristic_length());
-        boundaries_.push_back(&obstacle->st_boundary());
-        ConvertToDiscretizedBoundaries(obstacle->st_boundary(), speed);
-      }
     }
   }
 }
