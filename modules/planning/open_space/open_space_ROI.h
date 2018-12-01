@@ -62,8 +62,8 @@ class OpenSpaceROI {
 
   const common::math::Vec2d &origin_point() { return origin_point_; }
 
-  ThreadSafeIndexedObstacles *openspace_warmstart_obstacles() {
-    return &openspace_warmstart_obstacles_;
+  const ThreadSafeIndexedObstacles &openspace_warmstart_obstacles() {
+    return openspace_warmstart_obstacles_;
   }
 
   const std::vector<double> &ROI_xy_boundary() { return ROI_xy_boundary_; }
@@ -78,19 +78,19 @@ class OpenSpaceROI {
 
   // @brief generate the path by vehicle location and return the target parking
   // spot on that path
-  bool GetMapInfo(hdmap::ParkingSpaceInfoConstPtr* target_parking_spot,
-                  std::shared_ptr<hdmap::Path>* nearby_path);
+  bool GetMapInfo(hdmap::ParkingSpaceInfoConstPtr *target_parking_spot,
+                  std::shared_ptr<hdmap::Path> *nearby_path);
 
   // @brief search target parking spot on the path by vehicle location, if
   // no return a nullptr in target_parking_spot
   void SearchTargetParkingSpotOnPath(
-      std::shared_ptr<hdmap::Path>* nearby_path,
-      hdmap::ParkingSpaceInfoConstPtr* target_parking_spot);
+      std::shared_ptr<hdmap::Path> *nearby_path,
+      hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
 
   // @brief if not close enough to parking spot, return false
   bool CheckDistanceToParkingSpot(
-      std::shared_ptr<hdmap::Path>* nearby_path,
-      hdmap::ParkingSpaceInfoConstPtr* target_parking_spot);
+      std::shared_ptr<hdmap::Path> *nearby_path,
+      hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
 
   // @brief "Region of Interest", load open space xy boundary and parking
   // space boundary from pnc map (only for T shape parking space) to
