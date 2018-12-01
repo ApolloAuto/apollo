@@ -20,7 +20,15 @@
 #include "cyber/py_wrapper/py_init.h"
 
 static PyObject *cyber_py_init(PyObject *self, PyObject *args) {
-  bool is_init = apollo::cyber::py_init();
+  char *data = nullptr;
+  Py_ssize_t len = 0;
+  if (!PyArg_ParseTuple(args, const_cast<char *>("s#:cyber_py_init"), &data,
+                        &len)) {
+    AERROR << "cyber_py_init:PyArg_ParseTuple failed!";
+    Py_RETURN_FALSE;
+  }
+  std::string module_name(data, len);
+  bool is_init = apollo::cyber::py_init(module_name);
   if (is_init) {
     Py_RETURN_TRUE;
   } else {
@@ -61,7 +69,7 @@ static PyObject *cyber_py_waitforshutdown(PyObject *self, PyObject *args) {
 /////////////////////////////////////////////////////////////////////
 static PyMethodDef _cyber_init_methods[] = {
     // global fun
-    {"py_init", cyber_py_init, METH_NOARGS, ""},
+    {"py_init", cyber_py_init, METH_VARARGS, ""},
     {"py_ok", cyber_py_ok, METH_NOARGS, ""},
     {"py_shutdown", cyber_py_shutdown, METH_NOARGS, ""},
     {"py_is_shutdown", cyber_py_is_shutdown, METH_NOARGS, ""},
@@ -72,6 +80,5 @@ static PyMethodDef _cyber_init_methods[] = {
 
 /// Init function of this module
 PyMODINIT_FUNC init_cyber_init(void) {
-  AINFO << "init _cyber_init";
   Py_InitModule("_cyber_init", _cyber_init_methods);
 }

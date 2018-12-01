@@ -18,6 +18,7 @@
 #define PYTHON_WRAPPER_PY_INIT_H_
 
 #include <unistd.h>
+#include <string>
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
@@ -25,22 +26,29 @@
 namespace apollo {
 namespace cyber {
 
-bool py_init() {
-  if (!Init("cyber_python")) {
-    AWARN << "py_cyber_init failed.";
-    return false;
+bool py_init(const std::string& module_name) {
+  static bool inited = false;
+  if (inited) {
+    AINFO << "cyber already inited.";
+    return true;
   }
 
+  if (!apollo::cyber::Init(module_name.c_str())) {
+    AERROR << "cyber::Init failed:" << module_name;
+    return false;
+  }
+  inited = true;
+  AINFO << "cyber init succ.";
   return true;
 }
 
-bool py_ok() { return OK(); }
+bool py_ok() { return apollo::cyber::OK(); }
 
-void py_shutdown() { return Shutdown(); }
+void py_shutdown() { return apollo::cyber::Shutdown(); }
 
-bool py_is_shutdown() { return IsShutdown(); }
+bool py_is_shutdown() { return apollo::cyber::IsShutdown(); }
 
-void py_waitforshutdown() { return WaitForShutdown(); }
+void py_waitforshutdown() { return apollo::cyber::WaitForShutdown(); }
 
 }  // namespace cyber
 }  // namespace apollo

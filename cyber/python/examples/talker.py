@@ -46,6 +46,6 @@ def test_talker_class():
 
 
 if __name__ == '__main__':
-    cyber.init()
+    cyber.init("talker_sample")
     test_talker_class()
     cyber.shutdown()
