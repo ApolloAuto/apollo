@@ -69,20 +69,25 @@ apollo::common::Status OpenSpacePlanner::Plan(
     BuildPredictedEnvironment(frame->obstacles());
 
     // 2. Update Vehicle information and obstacles information from frame.
-
+    vehicle_state_ = frame->vehicle_state();
     open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
     }
-    rotate_angle_ = open_space_roi_generator_->origin_heading();
-    translate_origin_ = open_space_roi_generator_->origin_point();
-    end_pose_ = open_space_roi_generator_->open_space_end_pose();
-    obstacles_num_ = open_space_roi_generator_->obstacles_num();
-    obstacles_edges_num_ = open_space_roi_generator_->obstacles_edges_num();
-    obstacles_A_ = open_space_roi_generator_->obstacles_A();
-    obstacles_b_ = open_space_roi_generator_->obstacles_b();
-    XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
+
+    {
+      std::lock_guard<std::mutex> lock(open_space_mutex_);
+      thread_data_.rotate_angle = open_space_roi_generator_->origin_heading();
+      thread_data_.translate_origin = open_space_roi_generator_->origin_point();
+      thread_data_.end_pose = open_space_roi_generator_->open_space_end_pose();
+      thread_data_.obstacles_num = open_space_roi_generator_->obstacles_num();
+      thread_data_.obstacles_edges_num =
+          open_space_roi_generator_->obstacles_edges_num();
+      thread_data_.obstacles_A = open_space_roi_generator_->obstacles_A();
+      thread_data_.obstacles_b = open_space_roi_generator_->obstacles_b();
+      thread_data_.XYbounds = open_space_roi_generator_->ROI_xy_boundary();
+    }
     // 3. Check if trajectory updated, if so, update internal
     // trajectory_partition_;
     if (trajectory_updated_) {
@@ -223,12 +228,17 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
       {
         std::lock_guard<std::mutex> lock(open_space_mutex_);
         trajectory_updated_ = false;
-        if (open_space_trajectory_generator_->Plan(
-                vehicle_state_, XYbounds_, rotate_angle_, translate_origin_,
-                end_pose_, obstacles_num_, obstacles_edges_num_, obstacles_A_,
-                obstacles_b_,
-                open_space_roi_generator_->openspace_warmstart_obstacles()) ==
-            Status::OK()) {
+      }
+      if (open_space_trajectory_generator_->Plan(
+              thread_data_.vehicle_state, thread_data_.XYbounds,
+              thread_data_.rotate_angle, thread_data_.translate_origin,
+              thread_data_.end_pose, thread_data_.obstacles_num,
+              thread_data_.obstacles_edges_num, thread_data_.obstacles_A,
+              thread_data_.obstacles_b,
+              open_space_roi_generator_->openspace_warmstart_obstacles()) ==
+          Status::OK()) {
+        {
+          std::lock_guard<std::mutex> lock(open_space_mutex_);
           trajectory_updated_ = true;
         }
       }
