@@ -43,11 +43,11 @@ _CYBER_INIT = importlib.import_module('_cyber_init')
 _CYBER_NODE = importlib.import_module('_cyber_node')
 
 
-def init():
+def init(module_name="cyber_py"):
     """
     init cyber.
     """
-    return _CYBER_INIT.py_init()
+    return _CYBER_INIT.py_init(module_name)
 
 
 def ok():
@@ -238,7 +238,7 @@ class Node(object):
         spin in wait and process message.
         @param self
         """
-        while not _CYBER_NODE.py_is_shutdown():
+        while not _CYBER_INIT.py_is_shutdown():
             time.sleep(0.002)
             self.do_executable()
 
