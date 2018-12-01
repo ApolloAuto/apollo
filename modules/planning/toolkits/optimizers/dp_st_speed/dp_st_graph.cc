@@ -92,7 +92,7 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
       std::vector<SpeedPoint> speed_profile;
       double t = 0.0;
-      for (int i = 0; i < dp_st_speed_config_.matrix_dimension_t();
+      for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t();
            ++i, t += unit_t_) {
         SpeedPoint speed_point;
         speed_point.set_s(0.0);
@@ -111,8 +111,8 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
     std::vector<SpeedPoint> speed_profile;
     double s = 0.0;
     double t = 0.0;
-    for (int i = 0; i < dp_st_speed_config_.matrix_dimension_t() &&
-                    i < dp_st_speed_config_.matrix_dimension_s();
+    for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t() &&
+                    i <= dp_st_speed_config_.matrix_dimension_s();
          ++i, t += unit_t_, s += unit_s_) {
       SpeedPoint speed_point;
       speed_point.set_s(s);
@@ -169,8 +169,8 @@ Status DpStGraph::CalculateTotalCost() {
   // col and row are for STGraph
   // t corresponding to col
   // s corresponding to row
-  uint32_t next_highest_row = 0;
-  uint32_t next_lowest_row = 0;
+  size_t next_highest_row = 0;
+  size_t next_lowest_row = 0;
 
   for (size_t c = 0; c < cost_table_.size(); ++c) {
     size_t highest_row = 0;
@@ -179,7 +179,7 @@ Status DpStGraph::CalculateTotalCost() {
     int count = next_highest_row - next_lowest_row + 1;
     if (count > 0) {
       std::vector<std::future<void>> results;
-      for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
+      for (size_t r = next_lowest_row; r <= next_highest_row; ++r) {
         auto msg = std::make_shared<StGraphMessage>(c, r);
         if (FLAGS_enable_multi_thread_in_dp_st_graph) {
           results.push_back(
@@ -195,7 +195,7 @@ Status DpStGraph::CalculateTotalCost() {
       }
     }
 
-    for (uint32_t r = next_lowest_row; r <= next_highest_row; ++r) {
+    for (size_t r = next_lowest_row; r <= next_highest_row; ++r) {
       const auto& cost_cr = cost_table_[c][r];
       if (cost_cr.total_cost() < std::numeric_limits<double>::infinity()) {
         size_t h_r = 0;
