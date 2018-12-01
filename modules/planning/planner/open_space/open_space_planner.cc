@@ -82,7 +82,6 @@ apollo::common::Status OpenSpacePlanner::Plan(
     obstacles_edges_num_ = open_space_roi_generator_->obstacles_edges_num();
     obstacles_A_ = open_space_roi_generator_->obstacles_A();
     obstacles_b_ = open_space_roi_generator_->obstacles_b();
-    obstalce_list_ = open_space_roi_generator_->openspace_warmstart_obstacles();
     XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
     // 3. Check if trajectory updated, if so, update internal
     // trajectory_partition_;
@@ -158,14 +157,13 @@ apollo::common::Status OpenSpacePlanner::Plan(
     obstacles_edges_num_ = open_space_roi_generator_->obstacles_edges_num();
     obstacles_A_ = open_space_roi_generator_->obstacles_A();
     obstacles_b_ = open_space_roi_generator_->obstacles_b();
-    obstalce_list_ = open_space_roi_generator_->openspace_warmstart_obstacles();
     XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
 
     // 2. Generate Trajectory;
     Status status = open_space_trajectory_generator_->Plan(
         vehicle_state_, XYbounds_, rotate_angle_, translate_origin_, end_pose_,
         obstacles_num_, obstacles_edges_num_, obstacles_A_, obstacles_b_,
-        obstalce_list_);
+        open_space_roi_generator_->openspace_warmstart_obstacles());
     // 3. If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
       trajectory_partition_.Clear();
@@ -228,7 +226,9 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
         if (open_space_trajectory_generator_->Plan(
                 vehicle_state_, XYbounds_, rotate_angle_, translate_origin_,
                 end_pose_, obstacles_num_, obstacles_edges_num_, obstacles_A_,
-                obstacles_b_, obstalce_list_) == Status::OK()) {
+                obstacles_b_,
+                open_space_roi_generator_->openspace_warmstart_obstacles()) ==
+            Status::OK()) {
           trajectory_updated_ = true;
         }
       }

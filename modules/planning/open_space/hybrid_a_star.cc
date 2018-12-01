@@ -45,10 +45,12 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   delta_t_ = planner_open_space_config_.delta_t();
 }
 
-bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
+bool HybridAStar::AnalyticExpansion(
+    std::shared_ptr<Node3d> current_node,
+    const ThreadSafeIndexedObstacles& obstacles) {
   std::shared_ptr<ReedSheppPath> reeds_shepp_to_check =
       ReedSheppPath_cache_[current_node->GetIndex()];
-  if (!RSPCheck(reeds_shepp_to_check)) {
+  if (!RSPCheck(reeds_shepp_to_check, obstacles)) {
     return false;
   }
   AINFO << "Reach the end configuration with Reed Sharp";
@@ -71,23 +73,25 @@ bool HybridAStar::ReedSheppHeuristic(
 }
 
 bool HybridAStar::RSPCheck(
-    const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
+    const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
+    const ThreadSafeIndexedObstacles& obstacles) {
   for (size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
     std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
         reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
         reeds_shepp_to_end->phi[i], XYbounds_, planner_open_space_config_));
-    if (!ValidityCheck(node)) {
+    if (!ValidityCheck(node, obstacles)) {
       return false;
     }
   }
   return true;
 }
 
-bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
-  if ((*obstacles_).Items().empty()) {
+bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node,
+                                const ThreadSafeIndexedObstacles& obstacles) {
+  if (obstacles.Items().empty()) {
     return true;
   }
-  for (const auto& obstacle_box : (*obstacles_).Items()) {
+  for (const auto& obstacle_box : obstacles.Items()) {
     if (node->GetBoundingBox(vehicle_param_)
             .HasOverlap(obstacle_box->PerceptionBoundingBox())) {
       return false;
@@ -198,8 +202,7 @@ double HybridAStar::CalculateRSPCost(
     }
   }
 
-  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size() - 1;
-       i++) {
+  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size() - 1; i++) {
     if (reeds_shepp_to_end->segs_lengths[i] *
             reeds_shepp_to_end->segs_lengths[i + 1] <
         0.0) {
@@ -311,7 +314,8 @@ bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
 
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                        double ephi, const std::vector<double>& XYbounds,
-                       ThreadSafeIndexedObstacles* obstacles, Result* result) {
+                       const ThreadSafeIndexedObstacles& obstacles,
+                       Result* result) {
   // clear containers
   open_set_.clear();
   close_set_.clear();
@@ -331,12 +335,11 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                                XYbounds_, planner_open_space_config_));
   end_node_.reset(new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec, XYbounds_,
                              planner_open_space_config_));
-  obstacles_ = obstacles;
-  if (!ValidityCheck(start_node_)) {
+  if (!ValidityCheck(start_node_, obstacles)) {
     AERROR << "start_node in collision with obstacles";
     return false;
   }
-  if (!ValidityCheck(end_node_)) {
+  if (!ValidityCheck(end_node_, obstacles)) {
     AERROR << "end_node in collision with obstacles";
     return false;
   }
@@ -367,7 +370,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     // check if a analystic curve could be connected from current configuration
     // to the end configuration without collision. if so, search ends.
     start_timestamp = Clock::NowInSeconds();
-    if (AnalyticExpansion(current_node)) {
+    if (AnalyticExpansion(current_node, obstacles)) {
       break;
     }
     close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
@@ -376,7 +379,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     for (size_t i = 0; i < next_node_num_; i++) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary and validity check
-      if (!ValidityCheck(next_node)) {
+      if (!ValidityCheck(next_node, obstacles)) {
         continue;
       }
       // check if the node is already in the close set

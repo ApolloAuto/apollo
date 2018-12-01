@@ -72,7 +72,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const std::vector<double>& end_pose, size_t obstacles_num,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    ThreadSafeIndexedObstacles* obstalce_list) {
+    const ThreadSafeIndexedObstacles& obstalce_list) {
   if (!vehicle_state.has_x() || XYbounds.size() == 0 || end_pose.size() == 0 ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
@@ -254,7 +254,7 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const Eigen::MatrixXd& state_result_ds,
     const Eigen::MatrixXd& control_result_ds,
     const std::vector<double>& XYbounds,
-    ThreadSafeIndexedObstacles* obstalce_list) {
+    const ThreadSafeIndexedObstacles& obstalce_list) {
   // load warm start trajectory
   auto* warm_start_trajectory =
       open_space_debug_.mutable_warm_start_trajectory();
@@ -339,7 +339,7 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
   open_space_debug_.add_xy_boundary(XYbounds[3]);
 
   // load obstacles
-  for (const auto& obstacle_box : (*obstalce_list).Items()) {
+  for (const auto& obstacle_box : obstalce_list.Items()) {
     auto* obstacle_ptr = open_space_debug_.add_obstacles();
     std::vector<Vec2d> vertices =
         obstacle_box->PerceptionBoundingBox().GetAllCorners();

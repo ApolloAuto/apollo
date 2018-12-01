@@ -83,7 +83,7 @@ class OpenSpaceTrajectoryGenerator {
       const std::vector<double>& end_pose, std::size_t obstacles_num,
       const Eigen::MatrixXi& obstacles_edges_num,
       const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      ThreadSafeIndexedObstacles* obstalce_list);
+      const ThreadSafeIndexedObstacles& obstalce_list);
 
   bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
 
@@ -111,7 +111,7 @@ class OpenSpaceTrajectoryGenerator {
                        const Eigen::MatrixXd& state_result_ds,
                        const Eigen::MatrixXd& control_result_ds,
                        const std::vector<double>& XYbounds,
-                       ThreadSafeIndexedObstacles* obstalce_list);
+                       const ThreadSafeIndexedObstacles& obstalce_list);
   void RecordDebugInfo();
 
  private:
