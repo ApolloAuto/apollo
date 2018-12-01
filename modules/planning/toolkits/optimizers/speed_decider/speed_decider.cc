@@ -25,31 +25,28 @@
 #include <utility>
 #include <vector>
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::ErrorCode;
-using apollo::common::Status;
-using apollo::common::math::Vec2d;
-using apollo::perception::PerceptionObstacle;
+using common::ErrorCode;
+using common::Status;
+using common::math::Vec2d;
+using perception::PerceptionObstacle;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
   SetName("SpeedDecider");
-  CHECK(config.has_dp_st_speed_config());
-  dp_st_speed_config_ = config.dp_st_speed_config();
-  st_boundary_config_ = dp_st_speed_config_.st_boundary_config();
 }
 
-apollo::common::Status SpeedDecider::Execute(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+common::Status SpeedDecider::Execute(Frame* frame,
+                                     ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
   init_point_ = frame_->PlanningStartPoint();
   adc_sl_boundary_ = reference_line_info_->AdcSlBoundary();
