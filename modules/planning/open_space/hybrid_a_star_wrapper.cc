@@ -36,7 +36,7 @@ class HybridAObstacleContainer {
         std::to_string(id), obstacle_box);
     obstacles_list.Add(obstacle->Id(), *obstacle);
   }
-  ThreadSafeIndexedObstacles* GetObstacleList() { return &obstacles_list; }
+  const ThreadSafeIndexedObstacles& GetObstacleList() { return obstacles_list; }
 
  private:
   ThreadSafeIndexedObstacles obstacles_list;

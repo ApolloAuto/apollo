@@ -153,7 +153,7 @@ class ObstacleContainer {
     }
   }
 
-  ThreadSafeIndexedObstacles* GetObstacleList() { return &obstacles_list; }
+  const ThreadSafeIndexedObstacles& GetObstacleList() { return obstacles_list; }
   Eigen::MatrixXd GetAMatrix() { return obstacles_A_; }
   Eigen::MatrixXd GetbMatrix() { return obstacles_b_; }
   std::size_t GetObstaclesNum() { return obstacles_num_; }

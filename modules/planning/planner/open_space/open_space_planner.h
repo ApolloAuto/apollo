@@ -131,7 +131,6 @@ class OpenSpacePlanner : public Planner {
   Eigen::MatrixXi obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
-  ThreadSafeIndexedObstacles* obstalce_list_;
 };
 
 }  // namespace planning

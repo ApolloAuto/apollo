@@ -76,7 +76,7 @@ TEST_F(HybridATest, test1) {
       Obstacle::CreateStaticVirtualObstacles("a box in center", obstacle_box);
   obstacles_list.Add(obstacle->Id(), *obstacle);
   ASSERT_TRUE(hybrid_test->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
-                                &obstacles_list, &result));
+                                obstacles_list, &result));
 }
 }  // namespace planning
 }  // namespace apollo
