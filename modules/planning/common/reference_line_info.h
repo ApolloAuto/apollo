@@ -194,6 +194,10 @@ class ReferenceLineInfo {
   void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
   void MakeEStopDecision(DecisionResult* decision_result) const;
   void SetObjectDecisions(ObjectDecisions* object_decisions) const;
+
+  bool GetFirstOverlap(const std::vector<hdmap::PathOverlap>& path_overlaps,
+                       hdmap::PathOverlap* path_overlap);
+
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
   ReferenceLine reference_line_;

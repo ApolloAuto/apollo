@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"  // NOINT
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -32,10 +32,10 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_stop.h"
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_creep.h"
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_stop.h"
 
 namespace apollo {
 namespace planning {
@@ -128,8 +128,7 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 }
 
 bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario,
-    const common::TrajectoryPoint& ego_point,
+    const Scenario& current_scenario, const common::TrajectoryPoint& ego_point,
     const Frame& frame) {
   // const std::string stop_sign_overlap_id =
   //     PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
@@ -144,20 +143,21 @@ bool StopSignUnprotectedScenario::IsTransferable(
   const double adc_distance_to_stop_sign =
       stop_sign_overlap_start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
-      << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
+         << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      if (PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.
-          object_id.empty()) {
+      if (PlanningContext::GetScenarioInfo()
+              ->next_stop_sign_overlap.object_id.empty()) {
         return false;
       }
       return (adc_distance_to_stop_sign > 0 &&
-          adc_distance_to_stop_sign <= config_.stop_sign_unprotected_config().
-              start_stop_sign_scenario_distance());
+              adc_distance_to_stop_sign <=
+                  config_.stop_sign_unprotected_config()
+                      .start_stop_sign_scenario_distance());
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
