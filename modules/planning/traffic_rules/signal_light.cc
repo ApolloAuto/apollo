@@ -235,14 +235,6 @@ bool SignalLight::BuildStopDecision(
   stop_decision->mutable_stop_point()->set_z(0.0);
 
   auto* path_decision = reference_line_info->path_decision();
-  if (!path_decision->MergeWithMainStop(stop.stop(), stop_wall->Id(),
-                                        reference_line_info->reference_line(),
-                                        reference_line_info->AdcSlBoundary())) {
-    ADEBUG << "signal " << signal_light->object_id
-           << " is not the closest stop.";
-    return false;
-  }
-
   path_decision->AddLongitudinalDecision(
       TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
 
