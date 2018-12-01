@@ -160,9 +160,9 @@ Status SpeedDecider::MakeObjectDecision(
     auto* mutable_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = mutable_obstacle->st_boundary();
 
+    constexpr double kMaxTimeRange = 6.0;
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
-        boundary.max_t() < 0.0 ||
-        boundary.min_t() > dp_st_speed_config_.total_time()) {
+        boundary.max_t() < 0.0 || boundary.min_t() > kMaxTimeRange) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
     }
