@@ -33,8 +33,8 @@ class SpeedDecider : public Task {
  public:
   explicit SpeedDecider(const TaskConfig& config);
 
-  apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  common::Status Execute(Frame* frame,
+                         ReferenceLineInfo* reference_line_info) override;
 
  private:
   enum StPosition {
@@ -77,8 +77,8 @@ class SpeedDecider : public Task {
       const Obstacle& obstacle,
       ObjectDecisionType* const overtake_decision) const;
 
-  apollo::common::Status MakeObjectDecision(
-      const SpeedData& speed_profile, PathDecision* const path_decision) const;
+  common::Status MakeObjectDecision(const SpeedData& speed_profile,
+                                    PathDecision* const path_decision) const;
 
   void AppendIgnoreDecision(Obstacle* obstacle) const;
 
@@ -90,10 +90,8 @@ class SpeedDecider : public Task {
   bool IsFollowTooClose(const Obstacle& obstacle) const;
 
  private:
-  DpStSpeedConfig dp_st_speed_config_;
-  StBoundaryConfig st_boundary_config_;
   SLBoundary adc_sl_boundary_;
-  apollo::common::TrajectoryPoint init_point_;
+  common::TrajectoryPoint init_point_;
   const ReferenceLine* reference_line_ = nullptr;
 };
 

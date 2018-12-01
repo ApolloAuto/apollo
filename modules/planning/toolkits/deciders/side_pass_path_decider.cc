@@ -260,7 +260,6 @@ SidePassPathDecider::GetPathBoundaries(
        Decider::config_.side_pass_path_decider_config().path_resolution()) {
     std::tuple<double, double, double> lateral_bound = std::make_tuple(
         curr_s - adc_frenet_frame_point_.s(), -kLargeBoundary, kLargeBoundary);
-    ADEBUG << "====================================";
     ADEBUG << "At curr_s = " << curr_s - adc_frenet_frame_point_.s();
 
     // Initialize the lateral bound with current lane's width.
@@ -276,11 +275,9 @@ SidePassPathDecider::GetPathBoundaries(
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
     std::get<1>(lateral_bound) =
         -lane_right_width + adc_half_width + kRoadBuffer;
-    std::get<2>(lateral_bound) =
-        lane_left_width - adc_half_width - kRoadBuffer;
-    ADEBUG << "lateral_bound initialized: "
-           << std::get<1>(lateral_bound) << ", "
-           << std::get<2>(lateral_bound) << ".";
+    std::get<2>(lateral_bound) = lane_left_width - adc_half_width - kRoadBuffer;
+    ADEBUG << "lateral_bound initialized: " << std::get<1>(lateral_bound)
+           << ", " << std::get<2>(lateral_bound) << ".";
 
     // Update the lateral bound based on the road info and side-pass direction.
     const double curr_lane_width = lane_left_width + lane_right_width;
@@ -288,10 +285,10 @@ SidePassPathDecider::GetPathBoundaries(
     ADEBUG << "Current lane's width = " << curr_lane_width;
     ADEBUG << "Number of left lanes: "
            << curr_lane_.left_neighbor_forward_lane_id_size() +
-              curr_lane_.left_neighbor_reverse_lane_id_size()
+                  curr_lane_.left_neighbor_reverse_lane_id_size()
            << ". Number of right lanes: "
            << curr_lane_.right_neighbor_forward_lane_id_size() +
-              curr_lane_.right_neighbor_reverse_lane_id_size();
+                  curr_lane_.right_neighbor_reverse_lane_id_size();
     if (decided_direction_ == SidePassDirection::LEFT &&
         (curr_lane_.left_neighbor_forward_lane_id_size() > 0 ||
          curr_lane_.left_neighbor_reverse_lane_id_size() > 0)) {
@@ -316,8 +313,8 @@ SidePassPathDecider::GetPathBoundaries(
       // and use that s to get the left lane's width.
       double adjacent_lane_s = 0.0;
       double adjacent_lane_l = 0.0;
-      if (!adjacent_lane->GetProjection
-          (xy_curr_s, &adjacent_lane_s, &adjacent_lane_l)) {
+      if (!adjacent_lane->GetProjection(xy_curr_s, &adjacent_lane_s,
+                                        &adjacent_lane_l)) {
         ADEBUG << "Unable to get the left lane's width due to "
                   "failure in getting projection.";
         ADEBUG << "Therefore, treat the current lane's width as"
@@ -353,8 +350,8 @@ SidePassPathDecider::GetPathBoundaries(
       // and use that s to get the left lane's width.
       double adjacent_lane_s = 0.0;
       double adjacent_lane_l = 0.0;
-      if (!adjacent_lane->GetProjection
-          (xy_curr_s, &adjacent_lane_s, &adjacent_lane_l)) {
+      if (!adjacent_lane->GetProjection(xy_curr_s, &adjacent_lane_s,
+                                        &adjacent_lane_l)) {
         ADEBUG << "Unable to get the right lane's width due to "
                   "failure in getting projection.";
         ADEBUG << "Therefore, treat the current lane's width as"
@@ -367,12 +364,12 @@ SidePassPathDecider::GetPathBoundaries(
       std::get<1>(lateral_bound) -= adjacent_lane_width;
     }
     ADEBUG << "lateral_bound updated based on direction: "
-           << std::get<1>(lateral_bound) << ", "
-           << std::get<2>(lateral_bound) << ".";
+           << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound)
+           << ".";
 
     // Update lateral_bound based on obstacles:
     for (const auto *obstacle : indexed_obstacles.Items()) {
-      if (obstacle->IsVirtual()) {
+      if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
         continue;
       }
       const auto obs_sl = obstacle->PerceptionSLBoundary();
@@ -385,9 +382,9 @@ SidePassPathDecider::GetPathBoundaries(
       }
       // not within lateral range
       if (obs_sl.start_l() >
-          std::get<2>(lateral_bound) + kObstacleLBuffer + adc_half_width ||
+              std::get<2>(lateral_bound) + kObstacleLBuffer + adc_half_width ||
           obs_sl.end_l() <
-          std::get<1>(lateral_bound) - kObstacleLBuffer - adc_half_width) {
+              std::get<1>(lateral_bound) - kObstacleLBuffer - adc_half_width) {
         ADEBUG << "Obstacle not considered.";
         continue;
       }
@@ -412,9 +409,9 @@ SidePassPathDecider::GetPathBoundaries(
       side_pass_direction = obs_id_to_side_pass_dir[obstacle->Id()];
 
       if (side_pass_direction == SidePassDirection::LEFT) {
-        const double lower_bound =
-            FLAGS_static_decision_nudge_l_buffer + obs_sl.end_l() +
-            adc_half_width + kObstacleLBuffer;
+        const double lower_bound = FLAGS_static_decision_nudge_l_buffer +
+                                   obs_sl.end_l() + adc_half_width +
+                                   kObstacleLBuffer;
         ADEBUG << "Should pass from left. Lower bound = " << lower_bound;
         if (std::get<2>(lateral_bound) >= lower_bound) {
           ADEBUG << "Reseting the right boundary for left-side-pass.";
@@ -424,9 +421,9 @@ SidePassPathDecider::GetPathBoundaries(
           break;
         }
       } else {
-        const double upper_bound =
-            -FLAGS_static_decision_nudge_l_buffer + obs_sl.start_l() -
-            adc_half_width - kObstacleLBuffer;
+        const double upper_bound = -FLAGS_static_decision_nudge_l_buffer +
+                                   obs_sl.start_l() - adc_half_width -
+                                   kObstacleLBuffer;
         ADEBUG << "Should pass from right. Upper bound = " << upper_bound;
         if (upper_bound >= std::get<1>(lateral_bound)) {
           ADEBUG << "Reseting the left boundary for right-side-pass.";
@@ -444,8 +441,8 @@ SidePassPathDecider::GetPathBoundaries(
     }
 
     ADEBUG << "lateral_bound updated based on obstacles: "
-           << std::get<1>(lateral_bound) << ", "
-           << std::get<2>(lateral_bound) << ".";
+           << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound)
+           << ".";
     ADEBUG << "\n";
     lateral_bounds.push_back(lateral_bound);
   }
