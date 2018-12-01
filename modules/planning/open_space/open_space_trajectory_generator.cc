@@ -228,6 +228,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   Status trajectory_partition_status =
       TrajectoryPartition(state_result_ds, control_result_ds, time_result_ds);
 
+  LoadTrajectory(state_result_ds, control_result_ds, time_result_ds);
+
   // record debug info
   if (trajectory_partition_status.ok() && FLAGS_enable_record_debug) {
     RecordDebugInfo();
@@ -237,10 +239,9 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 }
 
 void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
-    Trajectories* adc_trajectories,
-    std::vector<canbus::Chassis::GearPosition>* gear_positions) {
-  adc_trajectories->CopyFrom(trajectory_partition_);
-  *gear_positions = gear_positions_;
+    apollo::common::Trajectory* trajectory_to_end) {
+  trajectory_to_end->mutable_trajectory_point()->CopyFrom(
+      *(trajectory_to_end_.mutable_trajectory_point()));
 }
 
 void OpenSpaceTrajectoryGenerator::UpdateDebugInfo(
@@ -358,6 +359,25 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo() {
   open_space_debug_.mutable_trajectories()->CopyFrom(trajectory_partition_);
 }
 
+void OpenSpaceTrajectoryGenerator::LoadTrajectory(
+    const Eigen::MatrixXd& state_result_ds,
+    const Eigen::MatrixXd& control_result_ds,
+    const Eigen::MatrixXd& time_result_ds) {
+  trajectory_to_end_.Clear();
+  double relative_time = 0.0;
+  for (size_t i = 0; i < horizon_ + 1; i++) {
+    auto* point = trajectory_to_end_.add_trajectory_point();
+    point->mutable_path_point()->set_x(state_result_ds(0, i));
+    point->mutable_path_point()->set_y(state_result_ds(1, i));
+    point->mutable_path_point()->set_theta(state_result_ds(2, i));
+    point->set_relative_time(relative_time);
+    relative_time += time_result_ds(0, i);
+    point->set_v(state_result_ds(3, i));
+    point->set_steer(control_result_ds(0, i));
+    point->set_a(control_result_ds(1, i));
+  }
+}
+
 Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
     const Eigen::MatrixXd& state_result_ds,
     const Eigen::MatrixXd& control_result_ds,
@@ -368,7 +388,7 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
   Trajectories trajectory_partition;
   gear_positions_.clear();
 
-  ::apollo::common::Trajectory* current_trajectory =
+  apollo::common::Trajectory* current_trajectory =
       trajectory_partition.add_trajectory();
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
@@ -436,6 +456,7 @@ Status OpenSpaceTrajectoryGenerator::TrajectoryPartition(
       current_trajectory = trajectory_partition.add_trajectory();
       gear_positions_.push_back(canbus::Chassis::GEAR_DRIVE);
       distance_s = 0.0;
+      relative_time = 0.0;
     }
 
     auto* point = current_trajectory->add_trajectory_point();

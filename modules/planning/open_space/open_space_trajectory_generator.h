@@ -90,9 +90,7 @@ class OpenSpaceTrajectoryGenerator {
 
   void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
-  void UpdateTrajectory(
-      ::apollo::planning_internal::Trajectories* trajectory_partition,
-      std::vector<::apollo::canbus::Chassis::GearPosition>* gear_positions);
+  void UpdateTrajectory(apollo::common::Trajectory* trajectory_to_end);
 
   void UpdateDebugInfo(
       ::apollo::planning_internal::OpenSpaceDebug* open_space_debug);
@@ -101,6 +99,10 @@ class OpenSpaceTrajectoryGenerator {
       const Eigen::MatrixXd& state_result_ds,
       const Eigen::MatrixXd& control_result_ds,
       const Eigen::MatrixXd& time_result_ds);
+
+  void LoadTrajectory(const Eigen::MatrixXd& state_result_ds,
+                      const Eigen::MatrixXd& control_result_ds,
+                      const Eigen::MatrixXd& time_result_ds);
 
   void Stop();
 
@@ -135,7 +137,8 @@ class OpenSpaceTrajectoryGenerator {
   double ts_ = 0;
   Eigen::MatrixXd ego_;
   std::vector<double> XYbounds_;
-  ::apollo::planning_internal::Trajectories trajectory_partition_;
+  apollo::common::Trajectory trajectory_to_end_;
+  apollo::planning_internal::Trajectories trajectory_partition_;
   std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
   apollo::planning_internal::OpenSpaceDebug open_space_debug_;
 };

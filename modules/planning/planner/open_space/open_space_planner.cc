@@ -46,7 +46,6 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
 
-  current_trajectory_index_ = 0;
   // initialize open space trajectory generator
   open_space_trajectory_generator_.reset(new OpenSpaceTrajectoryGenerator());
 
@@ -62,15 +61,10 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
 
 apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
-  
-  // 1. Build Predicition Environments.
-  predicted_bounding_rectangles_.clear();
-
   planning_init_point_ = planning_init_point;
 
   if (FLAGS_enable_open_space_planner_thread) {
     ADEBUG << "Open space plan in multi-threads mode";
-    BuildPredictedEnvironment(frame->obstacles());
 
     // 2. Update Vehicle information and obstacles information from frame.
     vehicle_state_ = frame->vehicle_state();
@@ -97,60 +91,20 @@ apollo::common::Status OpenSpacePlanner::Plan(
     if (trajectory_updated_) {
       AINFO << "Trajectories have been updated!";
       std::lock_guard<std::mutex> lock(open_space_mutex_);
-      trajectory_partition_.Clear();
-      gear_positions_.clear();
+      trajectory_to_end_.Clear();
       open_space_debug_.Clear();
-      current_trajectory_index_ = 0;
-      open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
-                                                         &gear_positions_);
+      open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
-      ADEBUG << "Trajectory caculation updated, new results : "
-             << trajectory_partition_.ShortDebugString();
     }
 
-    // TODO(Jiaxuan): Choose the current_trajectory in trajectory_partition_
-    // If the vehicle each the end point of current trajectory and stop
-    // Then move to the next Trajectory
+    publishable_trajectory_.Clear();
+    publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
+        *(trajectory_to_end_.mutable_trajectory_point()));
+    frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
+    frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
 
-    if (trajectory_partition_.trajectory_size() == 0) {
-      return Status(ErrorCode::PLANNING_ERROR, "Trajectory partition failed.");
-    }
+    return Status::OK();
 
-    current_trajectory_ =
-        trajectory_partition_.trajectory(current_trajectory_index_);
-
-    TrajectoryPoint end_point = current_trajectory_.trajectory_point(
-        current_trajectory_.trajectory_point_size() - 1);
-
-    if (std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
-                      (vehicle_state_.x() - end_point.path_point().x()) +
-                  (vehicle_state_.y() - end_point.path_point().y()) *
-                      (vehicle_state_.y() - end_point.path_point().y())) <
-            planner_open_space_config_.max_position_error_to_end_point() &&
-        std::abs(vehicle_state_.heading() - end_point.path_point().theta()) <
-            planner_open_space_config_.max_theta_error_to_end_point() &&
-        (current_trajectory_index_ <
-         trajectory_partition_.trajectory_size() - 1)) {
-      current_trajectory_index_ += 1;
-    }
-
-    // 4. Collision check for updated trajectory, if pass, update frame, else,
-    // return error status
-
-    if (IsCollisionFreeTrajectory(current_trajectory_)) {
-      // Convet current trajectory to publishable_trajectory
-      publishable_trajectory_.Clear();
-      publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
-          *(current_trajectory_.mutable_trajectory_point()));
-      frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
-      frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
-      return Status::OK();
-    } else {
-      // If collision happens, return wrong planning status and estop
-      // trajectory would be sent in std planning
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "Collision Check failed in multi-threads");
-    }
   } else {
     // Single thread logic
     vehicle_state_ = frame->vehicle_state();
@@ -175,51 +129,18 @@ apollo::common::Status OpenSpacePlanner::Plan(
         obstacles_A_, obstacles_b_, obstalce_list_);
     // 3. If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
-      trajectory_partition_.Clear();
-      gear_positions_.clear();
+      trajectory_to_end_.Clear();
       open_space_debug_.Clear();
-      current_trajectory_index_ = 0;
-      open_space_trajectory_generator_->UpdateTrajectory(&trajectory_partition_,
-                                                         &gear_positions_);
+      open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
-      ADEBUG << "Trajectory caculation updated, new results : "
-             << trajectory_partition_.ShortDebugString();
-    } else {
-      return status;
-    }
-    current_trajectory_ =
-        trajectory_partition_.trajectory(current_trajectory_index_);
-    CHECK_GT(current_trajectory_.trajectory_point_size(), 0);
-    TrajectoryPoint end_point = current_trajectory_.trajectory_point(
-        current_trajectory_.trajectory_point_size() - 1);
-    if (std::sqrt((vehicle_state_.x() - end_point.path_point().x()) *
-                      (vehicle_state_.x() - end_point.path_point().x()) +
-                  (vehicle_state_.y() - end_point.path_point().y()) *
-                      (vehicle_state_.y() - end_point.path_point().y())) <
-            planner_open_space_config_.max_position_error_to_end_point() &&
-        std::abs(vehicle_state_.heading() - end_point.path_point().theta()) <
-            planner_open_space_config_.max_theta_error_to_end_point() &&
-        (current_trajectory_index_ <
-         trajectory_partition_.trajectory_size() - 1)) {
-      current_trajectory_index_++;
-    }
-
-    // 4. Collision check for updated trajectory, if pass, update frame, else,
-    // return error status
-
-    if (IsCollisionFreeTrajectory(current_trajectory_)) {
       publishable_trajectory_.Clear();
       publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
-          *(current_trajectory_.mutable_trajectory_point()));
-      publishable_trajectory_.set_gear(
-          gear_positions_[current_trajectory_index_]);
+          *(trajectory_to_end_.mutable_trajectory_point()));
       frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
       frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
-      return Status::OK();
+      return status;
     } else {
-      // If collision happens, return wrong planning status and estop
-      // trajectory would be sent in std planning
-      return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+      return status;
     }
   }
 }
@@ -254,51 +175,6 @@ void OpenSpacePlanner::Stop() {
   is_stop_ = true;
   if (FLAGS_enable_open_space_planner_thread) {
     task_future_.get();
-  }
-}
-
-bool OpenSpacePlanner::IsCollisionFreeTrajectory(
-    const apollo::common::Trajectory& trajectory) {
-  const auto& vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  double ego_length = vehicle_config.vehicle_param().length();
-  double ego_width = vehicle_config.vehicle_param().width();
-  int point_size = trajectory.trajectory_point().size();
-  for (int i = 0; i < point_size; ++i) {
-    const auto& trajectory_point = trajectory.trajectory_point(i);
-    double ego_theta = trajectory_point.path_point().theta();
-    Box2d ego_box(
-        {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
-        ego_theta, ego_length, ego_width);
-    double shift_distance =
-        ego_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
-    Vec2d shift_vec{shift_distance * std::cos(ego_theta),
-                    shift_distance * std::sin(ego_theta)};
-    ego_box.Shift(shift_vec);
-    if (predicted_bounding_rectangles_.size() != 0) {
-      for (const auto& obstacle_box : predicted_bounding_rectangles_[i]) {
-        if (ego_box.HasOverlap(obstacle_box)) {
-          return false;
-        }
-      }
-    }
-  }
-  return true;
-}
-
-void OpenSpacePlanner::BuildPredictedEnvironment(
-    const std::vector<const Obstacle*>& obstacles) {
-  CHECK(predicted_bounding_rectangles_.empty());
-  double relative_time = 0.0;
-  while (relative_time < FLAGS_trajectory_time_length) {
-    std::vector<Box2d> predicted_env;
-    for (const Obstacle* obstacle : obstacles) {
-      TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
-      Box2d box = obstacle->GetBoundingBox(point);
-      predicted_env.push_back(std::move(box));
-    }
-    predicted_bounding_rectangles_.push_back(std::move(predicted_env));
-    relative_time += FLAGS_trajectory_time_resolution;
   }
 }
 

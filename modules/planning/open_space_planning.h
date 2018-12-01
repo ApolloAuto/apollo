@@ -72,17 +72,26 @@ class OpenSpacePlanning : public PlanningBase {
   void FillPlanningPb(const double timestamp,
                       ADCTrajectory* const trajectory_pb) override;
 
+  apollo::common::Status TrajectoryPartition(
+      const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
+      ADCTrajectory* const trajectory_pb);
+
  private:
-  common::Status InitFrame(const uint32_t sequence_num,
-                           const common::TrajectoryPoint& planning_start_point,
-                           const double start_time,
-                           const common::VehicleState& vehicle_state,
-                           ADCTrajectory* output_trajectory);
+  apollo::common::Status InitFrame(
+      const uint32_t sequence_num,
+      const common::TrajectoryPoint& planning_start_point,
+      const double start_time, const common::VehicleState& vehicle_state,
+      ADCTrajectory* output_trajectory);
   bool CheckPlanningConfig(const PlanningConfig& config);
+
+  bool IsCollisionFreeTrajectory(const ADCTrajectory& trajectory_pb);
+
+  void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
  private:
   routing::RoutingResponse last_routing_;
   std::unique_ptr<Frame> frame_;
+  std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
 };
 
 }  // namespace planning
