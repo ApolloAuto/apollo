@@ -24,6 +24,8 @@ namespace scheduler {
 
 using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::AtomicRWLock;
+using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 

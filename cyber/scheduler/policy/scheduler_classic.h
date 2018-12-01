@@ -38,7 +38,7 @@ class SchedulerClassic : public Scheduler {
   SchedulerClassic();
 
   bool RemoveTask(const std::string& name) override;
-  bool DispatchTask(const std::shared_ptr<CRoutine>) override;
+  bool DispatchTask(const std::shared_ptr<CRoutine>&) override;
 
  private:
   void CreateProcessor();
@@ -48,7 +48,7 @@ class SchedulerClassic : public Scheduler {
 
   std::string affinity_;
   std::vector<int> cpuset_;
-  int32_t processor_prio_;
+  int32_t processor_prio_ = 0;
   std::string processor_policy_;
 };
 

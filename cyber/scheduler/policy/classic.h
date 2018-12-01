@@ -31,10 +31,9 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using base::AtomicRWLock;
-using croutine::CRoutine;
-
+namespace {
 constexpr uint32_t MAX_PRIO = 20;
+}
 
 class ClassicContext : public ProcessorContext {
  public:
@@ -43,12 +42,14 @@ class ClassicContext : public ProcessorContext {
 
   static void Notify();
 
+  alignas(
+      CACHELINE_SIZE) static std::array<base::AtomicRWLock, MAX_PRIO> rq_locks_;
+  alignas(CACHELINE_SIZE) static std::array<
+      std::vector<std::shared_ptr<croutine::CRoutine>>, MAX_PRIO> rq_;
+
+ private:
   alignas(CACHELINE_SIZE) static std::mutex mtx_wq_;
   alignas(CACHELINE_SIZE) static std::condition_variable cv_wq_;
-
-  alignas(CACHELINE_SIZE) static std::array<AtomicRWLock, MAX_PRIO> rq_locks_;
-  alignas(CACHELINE_SIZE) static std::array<
-      std::vector<std::shared_ptr<CRoutine>>, MAX_PRIO> rq_;
 };
 
 }  // namespace scheduler
