@@ -41,8 +41,7 @@ class DataCollector(object):
     def __init__(self, node):
         self.sequence_num = 0
         self.control_pub = node.create_writer('/apollo/control',
-                            control_cmd_pb2.DESCRIPTOR.
-                            message_types_by_name['ControlCommand'].full_name)
+                            control_cmd_pb2.ControlCommand)
         time.sleep(0.3)
         self.controlcmd = control_cmd_pb2.ControlCommand()
 
@@ -232,4 +231,6 @@ def main():
 
 
 if __name__ == '__main__':
+    cyber.init()
     main()
+    cyber.shutdown()
