@@ -39,7 +39,7 @@ export default class Text3D {
         }
         // 32 is the ASCII code for white space.
         const charIndices = _.map(text, l => l.charCodeAt(0) - 32);
-        const letterOffset = 0.4;
+        const letterOffset = 0.43;
         const textMesh = new THREE.Object3D();
         for (let j = 0; j < charIndices.length; j++) {
             const idx = charIndices[j];
@@ -63,6 +63,10 @@ export default class Text3D {
 
             let additionalOffset = 0;
             switch (text[j]) {
+                case 'I':
+                case 'i':
+                    additionalOffset = 0.15;
+                    break;
                 case ',':
                     additionalOffset = 0.35;
                     break;

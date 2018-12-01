@@ -141,6 +141,10 @@
 			"default": true,
 			"menuId": "predictionMinor"
 		},
+		"showPredictionPriority": {
+			"default": true,
+			"menuId": "predictionPriority"
+		},
 		"showPointCloud": {
 			"default": false,
 			"menuId": "perceptionPointCloud"

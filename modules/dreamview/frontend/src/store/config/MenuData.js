@@ -37,7 +37,8 @@ export default [
         type: 'checkbox',
         data: {
             predictionMajor: 'Major Prediction Line',
-            predictionMinor: 'Minor Prediction Line'
+            predictionMinor: 'Minor Prediction Line',
+            predictionPriority: 'Priority'
         },
         supportInOfflineView: true,
     }, {
