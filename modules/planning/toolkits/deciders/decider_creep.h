@@ -48,10 +48,10 @@ class DeciderCreep : public Decider {
       const ReferenceLineInfo& reference_line_info,
       const double stop_sign_overlap_end_s);
 
- private:
   double FindCreepDistance(const Frame& frame,
                            const ReferenceLineInfo& reference_line_info);
 
+ private:
   bool BuildStopDecision(const double stop_sign_overlap_end_s,
                          Frame* frame, ReferenceLineInfo* reference_line_info);
 

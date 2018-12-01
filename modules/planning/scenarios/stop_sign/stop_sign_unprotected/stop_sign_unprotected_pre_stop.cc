@@ -29,6 +29,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/toolkits/deciders/decider_creep.h"
@@ -44,6 +45,7 @@ using hdmap::HDMapUtil;
 using hdmap::LaneInfo;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
+using hdmap::PathOverlap;
 using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
@@ -62,13 +64,57 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
-  if (CheckADCStop(reference_line_info)) {
-    GetContext()->stop_start_time = Clock::NowInSeconds();
 
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP;
+  // check if the stop_sign is still along referenceline
+  std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
+  const std::vector<PathOverlap>& stop_sign_overlaps =
+      reference_line_info.reference_line().map_path().stop_sign_overlaps();
+  auto stop_sign_overlap_it = std::find_if(
+      stop_sign_overlaps.begin(),
+      stop_sign_overlaps.end(),
+      [&stop_sign_overlap_id](const PathOverlap &overlap) {
+        return overlap.object_id == stop_sign_overlap_id;
+      });
+  if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
 
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double distance_adc_to_stop_sign =
+      stop_sign_overlap_it->start_s - adc_front_edge_s;
+  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
+
+  if (distance_adc_to_stop_sign > -1.0 * kPassStopLineBuffer) {
+    // clost enough to stop_sign
+    if (CheckADCStop(reference_line_info) &&
+        distance_adc_to_stop_sign <
+            scenario_config_.max_valid_stop_distance()) {
+      GetContext()->stop_start_time = Clock::NowInSeconds();
+
+      next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP;
+      return Stage::FINISHED;
+    }
+  } else {
+    // adc has passed stop sign
+    const double creep_distance =
+        dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+            ->FindCreepDistance(*frame, reference_line_info);
+    const double creep_fence_s = stop_sign_overlap_it->end_s + creep_distance;
+    if (adc_front_edge_s < creep_fence_s) {
+      PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
+          GetContext()->stop_sign_id;
+      next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
+      return Stage::FINISHED;
+    } else {
+      PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
+          GetContext()->stop_sign_id;
+      next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
+      return Stage::FINISHED;
+    }
+  }
+
+  // PRE-STOP
   const PathDecision& path_decision = reference_line_info.path_decision();
   auto& watch_vehicles = GetContext()->watch_vehicles;
 
@@ -199,25 +245,6 @@ bool StopSignUnprotectedPreStop::CheckADCStop(
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
   }
-
-  // check stop close enough to stop line of the stop_sign
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double stop_line_start_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
-  const double distance_stop_line_to_adc_front_edge =
-      stop_line_start_s - adc_front_edge_s;
-  ADEBUG << "distance_stop_line_to_adc_front_edge["
-         << distance_stop_line_to_adc_front_edge << "]; stop_line_start_s["
-         << stop_line_start_s << "]; adc_front_edge_s[" << adc_front_edge_s
-         << "]";
-
-  if (distance_stop_line_to_adc_front_edge >
-      scenario_config_.max_valid_stop_distance()) {
-    ADEBUG << "not a valid stop. too far from stop line.";
-    return false;
-  }
-
-  // TODO(all): check no BICYCLE in between.
 
   return true;
 }
