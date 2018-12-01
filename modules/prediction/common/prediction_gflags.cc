@@ -71,7 +71,7 @@ DEFINE_bool(enable_junction_feature, true,
             "If to enable building junction feature for obstacles");
 
 // Obstacle features
-DEFINE_double(scan_length, 100.0, "The length of the obstacles scan area");
+DEFINE_double(scan_length, 80.0, "The length of the obstacles scan area");
 DEFINE_double(scan_width, 12.0, "The width of the obstacles scan area");
 DEFINE_double(back_dist_ignore_ped, -2.0,
               "Backward distance to ignore pedestrians.");
@@ -106,7 +106,7 @@ DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
 DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
-DEFINE_double(max_lane_angle_diff, M_PI / 2.0,
+DEFINE_double(max_lane_angle_diff, M_PI / 3.0,
               "Max angle difference for a candiate lane");
 DEFINE_int32(max_num_current_lane_in_junction, 1,
              "Max number to search current lanes");
