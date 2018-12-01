@@ -49,8 +49,6 @@ class StopSignUnprotectedIntersectionCruise : public Stage {
     return GetContextAs<StopSignUnprotectedContext>();
   }
 
-  bool CheckPassIntersection(Frame* frame);
-
  private:
   ScenarioStopSignUnprotectedConfig scenario_config_;
 };

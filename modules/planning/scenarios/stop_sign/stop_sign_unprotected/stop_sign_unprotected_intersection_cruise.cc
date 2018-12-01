@@ -38,8 +38,8 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using apollo::hdmap::PathOverlap;
 using common::TrajectoryPoint;
+using hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -51,42 +51,34 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
     AERROR << "StopSignUnprotectedIntersectionCruise plan error";
   }
 
-  if (CheckPassIntersection(frame)) {
+  const auto& reference_line_info = frame->reference_line_info().front();
+
+  // check if the stop_sign is still along referenceline
+  std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
+  const std::vector<PathOverlap>& stop_sign_overlaps =
+      reference_line_info.reference_line().map_path().stop_sign_overlaps();
+  auto stop_sign_overlap_it = std::find_if(
+      stop_sign_overlaps.begin(),
+      stop_sign_overlaps.end(),
+      [&stop_sign_overlap_id](const PathOverlap &overlap) {
+        return overlap.object_id == stop_sign_overlap_id;
+      });
+  if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+
+  // check pass intersection
+  // TODO(all): update when pnc-junction is ready
+  constexpr double kIntersectionLength = 10.0;  // unit: m
+  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
+  if (adc_back_edge_s - stop_sign_overlap_it->end_s >
+      kIntersectionLength) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
 
   return Stage::RUNNING;
-}
-
-bool StopSignUnprotectedIntersectionCruise::CheckPassIntersection(
-    Frame* frame) {
-  // TODO(all): update when pnc-junction is ready
-  constexpr double kIntersectionLength = 10.0;  // unit: m
-
-  auto& reference_line_info = frame->mutable_reference_line_info()->front();
-  double stop_sign_overlap_end_s = std::numeric_limits<double>::min();
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
-    if (GetContext()->stop_sign_id == stop_sign_overlap.object_id) {
-      stop_sign_overlap_end_s = stop_sign_overlap.end_s;
-      break;
-    }
-  }
-
-  // that stop sign not on reference line any more
-  if (stop_sign_overlap_end_s == std::numeric_limits<double>::min()) {
-    return true;
-  }
-
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  ADEBUG << "adc_back_edge_s[" << adc_back_edge_s
-         << "] stop_sign_overlap_end_s[" << stop_sign_overlap_end_s << "]";
-  if (adc_back_edge_s - stop_sign_overlap_end_s > kIntersectionLength) {
-    return true;
-  }
-  return false;
 }
 
 }  // namespace stop_sign
