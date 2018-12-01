@@ -73,6 +73,17 @@ class OpenSpacePlanner : public Planner {
    */
   virtual ~OpenSpacePlanner() = default;
 
+  struct ThreadData {
+    apollo::common::VehicleState vehicle_state;
+    double rotate_angle;
+    apollo::common::math::Vec2d translate_origin;
+    std::vector<double> end_pose;
+    std::size_t obstacles_num;
+    Eigen::MatrixXi obstacles_edges_num;
+    Eigen::MatrixXd obstacles_A;
+    Eigen::MatrixXd obstacles_b;
+  };
+
   std::string Name() override { return "OPEN_SPACE"; }
 
   apollo::common::Status Init(const PlanningConfig& config) override;
@@ -131,6 +142,7 @@ class OpenSpacePlanner : public Planner {
   Eigen::MatrixXi obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
+  ThreadData thead_data_;
 };
 
 }  // namespace planning

@@ -69,7 +69,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     BuildPredictedEnvironment(frame->obstacles());
 
     // 2. Update Vehicle information and obstacles information from frame.
-    vehicle_state_ = frame->vehicle_state();
+
     open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
