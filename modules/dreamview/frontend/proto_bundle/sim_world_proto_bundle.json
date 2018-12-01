@@ -278,6 +278,13 @@
                   "options": {
                     "default": 1
                   }
+                },
+                "obstaclePriority": {
+                  "type": "ObstaclePriority",
+                  "id": 33,
+                  "options": {
+                    "default": "NORMAL"
+                  }
                 }
               },
               "nested": {
@@ -302,6 +309,13 @@
                     "VEHICLE": 5,
                     "VIRTUAL": 6,
                     "CIPV": 7
+                  }
+                },
+                "ObstaclePriority": {
+                  "values": {
+                    "CAUTION": 1,
+                    "NORMAL": 2,
+                    "IGNORE": 3
                   }
                 }
               }
@@ -2846,7 +2860,6 @@
                     "yield",
                     "overtake",
                     "nudge",
-                    "sidepass",
                     "avoid"
                   ]
                 }
@@ -2876,13 +2889,9 @@
                   "type": "ObjectNudge",
                   "id": 6
                 },
-                "sidepass": {
-                  "type": "ObjectSidePass",
-                  "id": 7
-                },
                 "avoid": {
                   "type": "ObjectAvoid",
-                  "id": 8
+                  "id": 7
                 }
               }
             },
@@ -4149,27 +4158,6 @@
                     "default": 10
                   }
                 },
-                "maxMiu": {
-                  "type": "double",
-                  "id": 15,
-                  "options": {
-                    "default": 10000000000
-                  }
-                },
-                "maxLambda": {
-                  "type": "double",
-                  "id": 16,
-                  "options": {
-                    "default": 0.2
-                  }
-                },
-                "maxSafetyDistance": {
-                  "type": "double",
-                  "id": 17,
-                  "options": {
-                    "default": 10000000000
-                  }
-                },
                 "useFixTime": {
                   "type": "bool",
                   "id": 18,
@@ -4449,7 +4437,8 @@
                     "DECIDER_RULE_BASED_STOP": 12,
                     "SIDE_PASS_PATH_DECIDER": 13,
                     "SIDE_PASS_SAFETY": 14,
-                    "PROCEED_WITH_CAUTION_SPEED": 15
+                    "PROCEED_WITH_CAUTION_SPEED": 15,
+                    "DECIDER_RSS": 16
                   }
                 }
               }
@@ -4491,58 +4480,51 @@
             },
             "ScenarioStopSignUnprotectedConfig": {
               "fields": {
-                "startStopSignScenarioTimer": {
-                  "type": "uint32",
-                  "id": 1,
-                  "options": {
-                    "default": 10
-                  }
-                },
                 "startStopSignScenarioDistance": {
                   "type": "double",
-                  "id": 2,
+                  "id": 1,
                   "options": {
-                    "default": 100
+                    "default": 5
                   }
                 },
                 "watchVehicleMaxValidStopDistance": {
                   "type": "double",
-                  "id": 3,
+                  "id": 2,
                   "options": {
                     "default": 5
                   }
                 },
                 "maxValidStopDistance": {
                   "type": "double",
-                  "id": 4,
+                  "id": 3,
                   "options": {
                     "default": 3.5
                   }
                 },
                 "maxAdcStopSpeed": {
                   "type": "double",
-                  "id": 5,
+                  "id": 4,
                   "options": {
                     "default": 0.3
                   }
                 },
                 "stopDuration": {
                   "type": "float",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": 1
                   }
                 },
                 "minPassSDistance": {
                   "type": "double",
-                  "id": 7,
+                  "id": 6,
                   "options": {
                     "default": 3
                   }
                 },
                 "waitTimeout": {
                   "type": "float",
-                  "id": 8,
+                  "id": 7,
                   "options": {
                     "default": 8
                   }
@@ -7146,9 +7128,13 @@
                   "type": "apollo.planning_internal.Trajectories",
                   "id": 1
                 },
-                "warmStartTrajecotry": {
+                "warmStartTrajectory": {
                   "type": "apollo.common.VehicleMotion",
                   "id": 2
+                },
+                "smoothedTrajectory": {
+                  "type": "apollo.common.VehicleMotion",
+                  "id": 3
                 },
                 "warmStartDualLambda": {
                   "rule": "repeated",
@@ -8578,6 +8564,9 @@
             "ParkingSpaceOverlapInfo": {
               "fields": {}
             },
+            "PNCJunctionOverlapInfo": {
+              "fields": {}
+            },
             "RegionOverlapInfo": {
               "fields": {
                 "id": {
@@ -8603,7 +8592,8 @@
                     "yieldSignOverlapInfo",
                     "clearAreaOverlapInfo",
                     "speedBumpOverlapInfo",
-                    "parkingSpaceOverlapInfo"
+                    "parkingSpaceOverlapInfo",
+                    "pncJunctionOverlapInfo"
                   ]
                 }
               },
@@ -8647,6 +8637,10 @@
                 "parkingSpaceOverlapInfo": {
                   "type": "ParkingSpaceOverlapInfo",
                   "id": 11
+                },
+                "pncJunctionOverlapInfo": {
+                  "type": "PNCJunctionOverlapInfo",
+                  "id": 12
                 }
               }
             },

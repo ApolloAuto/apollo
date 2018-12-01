@@ -141,23 +141,37 @@ export default class PerceptionObstacles {
     }
 
     updateTexts(adc, obstacle, obstaclePosition, scene) {
-        const textPosition = {
+        const initPosition = {
             x: obstaclePosition.x,
             y: obstaclePosition.y,
             z: obstacle.height || 3
         };
         let lineCount = 0;
-
         if (STORE.options.showObstaclesInfo) {
             const distance = adc.distanceTo(obstaclePosition).toFixed(1);
             const speed = obstacle.speed.toFixed(1);
-            this.drawTexts(`(${distance}m, ${speed}m/s)`, textPosition, scene);
-            lineCount ++;
+            this.drawTexts(`(${distance}m, ${speed}m/s)`, initPosition, scene);
+            lineCount++;
         }
         if (STORE.options.showObstaclesId) {
-            textPosition.z += (lineCount * 0.7);
-            textPosition.y += (lineCount * 0.7);
+            const textPosition = {
+                x: initPosition.x,
+                y: initPosition.y + (lineCount * 0.7),
+                z: initPosition.z + (lineCount * 1),
+            };
             this.drawTexts(obstacle.id, textPosition, scene);
+            lineCount++;
+        }
+        if (STORE.options.showPredictionPriority) {
+            const priority = obstacle.obstaclePriority;
+            if (priority && priority !== "NORMAL") {
+                const textPosition = {
+                    x: initPosition.x,
+                    y: initPosition.y + (lineCount * 0.7),
+                    z: initPosition.z + (lineCount * 1),
+                };
+                this.drawTexts(priority, textPosition, scene);
+            }
         }
     }
 
