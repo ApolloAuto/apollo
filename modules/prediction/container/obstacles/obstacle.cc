@@ -526,7 +526,7 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
 
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = std::atan2(velocity_y, velocity_x);
-  if (FLAGS_adjust_velocity_by_obstacle_heading) {
+  if (FLAGS_adjust_velocity_by_obstacle_heading || speed < 0.1) {
     velocity_heading = perception_obstacle.theta();
   }
 
