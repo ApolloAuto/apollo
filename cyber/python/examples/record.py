@@ -25,7 +25,7 @@ from cyber_py import record
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
-TEST_RECORD_FILE = "test02.record"
+TEST_RECORD_FILE = "test02.record.00000"
 CHAN_1 = "channel/chatter"
 CHAN_2 = "/test2"
 MSG_TYPE = "apollo.common.util.test.SimpleMessage"
