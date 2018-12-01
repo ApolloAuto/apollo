@@ -83,12 +83,15 @@ class CRoutine {
   uint32_t priority() const;
   void set_priority(uint32_t priority);
 
+  std::chrono::steady_clock::time_point wake_time() const;
+
  private:
   CRoutine(CRoutine &) = delete;
   CRoutine &operator=(CRoutine &) = delete;
 
   std::string name_;
-  std::chrono::steady_clock::time_point wake_time_;
+  std::chrono::steady_clock::time_point wake_time_ =
+      std::chrono::steady_clock::now();
 
   RoutineFunc func_;
   RoutineState state_;
@@ -136,6 +139,10 @@ inline void CRoutine::Run() { func_(); }
 inline void CRoutine::set_state(const RoutineState &state) { state_ = state; }
 
 inline RoutineState CRoutine::state() const { return state_; }
+
+inline std::chrono::steady_clock::time_point CRoutine::wake_time() const {
+  return wake_time_;
+}
 
 inline void CRoutine::Wake() { state_ = RoutineState::READY; }
 

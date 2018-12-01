@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 
+#include "cyber/base/for_each.h"
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
 #include "cyber/scheduler/policy/choreography.h"
@@ -24,6 +25,7 @@
 #include "cyber/scheduler/policy/scheduler_classic.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/scheduler_factory.h"
+#include "cyber/task/task.h"
 
 namespace apollo {
 namespace cyber {
@@ -40,7 +42,7 @@ TEST(SchedulerPolicyTest, choreo) {
   auto task_id = GlobalData::RegisterTaskName("choreo");
   cr->set_id(task_id);
   EXPECT_TRUE(static_cast<ChoreographyContext*>(ctx.get())->Enqueue(cr));
-  ctx->ShutDown();
+  ctx->Shutdown();
 }
 
 TEST(SchedulerPolicyTest, classic) {
@@ -48,7 +50,26 @@ TEST(SchedulerPolicyTest, classic) {
   auto ctx = std::make_shared<ClassicContext>();
   processor->BindContext(ctx);
   ctx->BindProc(processor);
-  ctx->ShutDown();
+  std::vector<std::future<void>> res;
+
+  // test single routine
+  auto future = Async([]() {
+    FOR_EACH(i, 0, 20) { cyber::SleepFor(std::chrono::milliseconds(i)); }
+  });
+  future.get();
+
+  // test multiple routine
+  FOR_EACH(i, 0, 20) {
+    res.emplace_back(Async([i]() {
+      FOR_EACH(time, 0, 50) { cyber::SleepFor(std::chrono::milliseconds(i)); }
+    }));
+  };
+  for (auto& future : res) {
+    future.get();
+  }
+  res.clear();
+
+  ctx->Shutdown();
 }
 
 TEST(SchedulerPolicyTest, sched_classic) {
@@ -61,7 +82,7 @@ TEST(SchedulerPolicyTest, sched_classic) {
   // dispatch the same task
   EXPECT_FALSE(sched1->DispatchTask(cr));
   EXPECT_TRUE(sched1->RemoveTask("ABC"));
-  sched1->ShutDown();
+  sched1->Shutdown();
 }
 
 }  // namespace scheduler

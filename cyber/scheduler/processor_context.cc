@@ -20,7 +20,7 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-void ProcessorContext::ShutDown() {
+void ProcessorContext::Shutdown() {
   if (!stop_) {
     stop_ = true;
   }

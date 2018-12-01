@@ -35,7 +35,7 @@ class Processor;
 
 class ProcessorContext {
  public:
-  void ShutDown();
+  virtual void Shutdown();
 
   void BindProc(const std::shared_ptr<Processor>& processor) {
     processor_ = processor;
