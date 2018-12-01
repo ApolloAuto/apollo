@@ -38,7 +38,7 @@ void Spline1dSolver::GenerateProblemProto(
   const MatrixXd& equality_constraint_boundary =
       constraint_.equality_constraint().constraint_boundary();
 
-  qp_proto->set_param_size(kernel_matrix.rows());
+  qp_proto->set_param_size(static_cast<int32_t>(kernel_matrix.rows()));
   ConvertMatrixXdToProto(kernel_matrix, qp_proto->mutable_quadratic_matrix());
 
   for (int i = 0; i < offset.rows(); ++i) {
@@ -73,8 +73,8 @@ void Spline1dSolver::GenerateProblemProto(
 
 void Spline1dSolver::ConvertMatrixXdToProto(const Eigen::MatrixXd& matrix,
                                             QPMatrix* const proto) const {
-  int row_size = matrix.rows();
-  int col_size = matrix.cols();
+  int row_size = static_cast<int>(matrix.rows());
+  int col_size = static_cast<int>(matrix.cols());
 
   proto->set_row_size(row_size);
   proto->set_col_size(col_size);
