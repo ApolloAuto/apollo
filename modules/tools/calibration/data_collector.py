@@ -87,7 +87,7 @@ class DataCollector(object):
         self.sequence_num = self.sequence_num + 1
         self.controlcmd.header.timestamp_sec = time.time()
         self.controlcmd.pad_msg.action = 2
-        self.control_pub.publish(self.controlcmd)
+        self.control_pub.write(self.controlcmd)
 
         time.sleep(0.2)
         # Set Default Message
@@ -168,7 +168,7 @@ class DataCollector(object):
                 self.in_session = False
 
         self.controlcmd.header.timestamp_sec = time.time()
-        self.control_pub.publish(self.controlcmd)
+        self.control_pub.write(self.controlcmd)
         self.write_file(self.controlcmd.header.timestamp_sec, 1)
         if self.in_session == False:
             self.file.close()
