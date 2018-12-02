@@ -153,13 +153,14 @@ Status SpeedDecider::MakeObjectDecision(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
   for (const auto* obstacle : path_decision->obstacles().Items()) {
     auto* mutable_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = mutable_obstacle->st_boundary();
 
-    constexpr double kMaxTimeRange = 6.0;
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
-        boundary.max_t() < 0.0 || boundary.min_t() > kMaxTimeRange) {
+        boundary.max_t() < 0.0 ||
+        boundary.min_t() >= speed_profile.speed_vector().back().t()) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
     }
