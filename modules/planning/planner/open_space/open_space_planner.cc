@@ -66,7 +66,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
   if (FLAGS_enable_open_space_planner_thread) {
     ADEBUG << "Open space plan in multi-threads mode";
 
-    // 2. Update Vehicle information and obstacles information from frame.
+    // Update Vehicle information and obstacles information from frame.
     vehicle_state_ = frame->vehicle_state();
     open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
@@ -122,12 +122,20 @@ apollo::common::Status OpenSpacePlanner::Plan(
     obstacles_b_ = open_space_roi_generator_->obstacles_b();
     XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
 
-    // 2. Generate Trajectory;
+    // Check destination
+    if (CheckDestination(planning_init_point, end_pose_)) {
+      GenerateDestinationStop(planning_init_point, frame);
+      ADEBUG << "Init point reach destination, stop trajectory is "
+                "sent";
+      return Status::OK();
+    }
+
+    // Generate Trajectory;
     Status status = open_space_trajectory_generator_->Plan(
         planning_init_point_, vehicle_state_, XYbounds_, rotate_angle_,
         translate_origin_, end_pose_, obstacles_num_, obstacles_edges_num_,
         obstacles_A_, obstacles_b_, obstalce_list_);
-    // 3. If status is OK, update vehicle trajectory;
+    // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
       trajectory_to_end_.Clear();
       open_space_debug_.Clear();
@@ -143,6 +151,50 @@ apollo::common::Status OpenSpacePlanner::Plan(
       return status;
     }
   }
+}
+
+bool OpenSpacePlanner::CheckDestination(
+    const common::TrajectoryPoint& planning_init_point,
+    const std::vector<double>& end_pose) {
+  CHECK_EQ(end_pose.size(), 4);
+  constexpr double kepsilon = 1e-4;
+  const apollo::common::PathPoint path_point = planning_init_point.path_point();
+  double distance =
+      (path_point.x() - end_pose[0]) * (path_point.x() - end_pose[0]) +
+      (path_point.y() - end_pose[1]) * (path_point.y() - end_pose[1]);
+  if (distance < kepsilon) {
+    return true;
+  }
+  return false;
+}
+
+void OpenSpacePlanner::GenerateDestinationStop(
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  constexpr int stop_trajectory_length = 10;
+  constexpr double relative_stop_time = 0.1;
+  apollo::common::Trajectory trajectory_to_stop;
+  double stop_x = planning_init_point.path_point().x();
+  double stop_y = planning_init_point.path_point().y();
+  double stop_theta = planning_init_point.path_point().theta();
+  double relative_time = 0;
+  for (int i = 0; i < stop_trajectory_length; i++) {
+    apollo::common::TrajectoryPoint* point =
+        trajectory_to_stop.add_trajectory_point();
+    point->mutable_path_point()->set_x(stop_x);
+    point->mutable_path_point()->set_x(stop_y);
+    point->mutable_path_point()->set_x(stop_theta);
+    point->mutable_path_point()->set_s(0.0);
+    point->mutable_path_point()->set_kappa(0.0);
+    point->set_relative_time(relative_time);
+    point->set_v(0.0);
+    point->set_a(0.0);
+    relative_time += relative_stop_time;
+  }
+  trajectory_to_end_.Clear();
+  publishable_trajectory_.Clear();
+  publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
+      *(trajectory_to_end_.mutable_trajectory_point()));
+  frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
 }
 
 void OpenSpacePlanner::GenerateTrajectoryThread() {

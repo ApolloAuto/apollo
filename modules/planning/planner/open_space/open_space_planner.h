@@ -96,6 +96,12 @@ class OpenSpacePlanner : public Planner {
       const common::TrajectoryPoint& planning_init_point,
       Frame* frame) override;
 
+  bool CheckDestination(const common::TrajectoryPoint& planning_init_point,
+                        const std::vector<double>& end_pose);
+
+  void GenerateDestinationStop(
+      const common::TrajectoryPoint& planning_init_point, Frame* frame);
+      
   void GenerateTrajectoryThread();
 
   void Stop() override;
@@ -125,7 +131,7 @@ class OpenSpacePlanner : public Planner {
   std::atomic<bool> is_stop_{false};
   std::atomic<bool> trajectory_updated_{false};
   std::mutex open_space_mutex_;
-  
+
   apollo::planning::ADCTrajectory publishable_trajectory_;
 
   apollo::common::Trajectory trajectory_to_end_;
