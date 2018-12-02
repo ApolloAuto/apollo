@@ -409,22 +409,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "decision_data",
-    srcs = [
-        "decision_data.cc",
-    ],
-    hdrs = [
-        "decision_data.h",
-    ],
-    deps = [
-        ":obstacle",
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/planning/reference_line",
-        "//modules/prediction/proto:prediction_proto",
-    ],
-)
-
 cc_test(
     name = "ego_info_test",
     size = "small",

@@ -1563,13 +1563,13 @@ trajectory_point {
 decision {
   main_decision {
     stop {
-      reason_code: STOP_REASON_OBSTACLE
+      reason_code: STOP_REASON_HEAD_VEHICLE
       reason: "stop by 1_0"
       stop_point {
-        x: 586345.024806922
-        y: 4140703.1907692137
+        x: 586344.69672288909
+        y: 4140702.1881655315
       }
-      stop_heading: 1.254365561004684
+      stop_heading: 1.2556795395861462
       change_lane_type: FORWARD
     }
   }
@@ -1579,13 +1579,13 @@ decision {
       perception_id: 1
       object_decision {
         stop {
-          reason_code: STOP_REASON_OBSTACLE
           distance_s: -6
           stop_point {
-            x: 586345.024806922
-            y: 4140703.1907692137
+            x: 586344.69672288909
+            y: 4140702.1881655315
+            z: 0
           }
-          stop_heading: 1.254365561004684
+          stop_heading: 1.2556795395861462
         }
       }
     }

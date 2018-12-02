@@ -61,11 +61,17 @@ namespace planning {
 class Obstacle {
  public:
   Obstacle() = default;
-  explicit Obstacle(const std::string& id,
-                    const perception::PerceptionObstacle& perception_obstacle);
-  explicit Obstacle(const std::string& id,
-                    const perception::PerceptionObstacle& perception_obstacle,
-                    const prediction::Trajectory& trajectory);
+  explicit Obstacle(
+      const std::string& id,
+      const perception::PerceptionObstacle& perception_obstacle,
+      const prediction::ObstaclePriority::Priority& obstacle_priority,
+      const bool is_static);
+  explicit Obstacle(
+      const std::string& id,
+      const perception::PerceptionObstacle& perception_obstacle,
+      const prediction::Trajectory& trajectory,
+      const prediction::ObstaclePriority::Priority& obstacle_priority,
+      const bool is_static);
 
   const std::string& Id() const { return id_; }
   void SetId(const std::string& id) { id_ = id; }
@@ -113,9 +119,6 @@ class Obstacle {
   static std::unique_ptr<Obstacle> CreateStaticVirtualObstacles(
       const std::string& id, const common::math::Box2d& obstacle_box);
 
-  static bool IsStaticObstacle(
-      const perception::PerceptionObstacle& perception_obstacle);
-
   static bool IsVirtualObstacle(
       const perception::PerceptionObstacle& perception_obstacle) {
     return perception_obstacle.id() < 0;
@@ -123,7 +126,6 @@ class Obstacle {
 
   static bool IsValidPerceptionObstacle(
       const perception::PerceptionObstacle& obstacle);
-
 
   static bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
 

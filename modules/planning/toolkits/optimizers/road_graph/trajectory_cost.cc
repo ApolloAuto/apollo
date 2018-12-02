@@ -86,8 +86,7 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
     if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
       // Virtual obstacle
       continue;
-    } else if (Obstacle::IsStaticObstacle(ptr_obstacle->Perception()) ||
-               is_bycycle_or_pedestrian) {
+    } else if (ptr_obstacle->IsStatic() || is_bycycle_or_pedestrian) {
       static_obstacle_sl_boundaries_.push_back(std::move(sl_boundary));
     } else {
       std::vector<Box2d> box_by_time;

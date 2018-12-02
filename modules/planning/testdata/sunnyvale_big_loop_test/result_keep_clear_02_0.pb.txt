@@ -21,14 +21,14 @@ decision {
       id: "9830"
       perception_id: 9830
       object_decision {
-        stop {
-          reason_code: STOP_REASON_OBSTACLE
-          distance_s: -6
-          stop_point {
-            x: 586427.42409684742
-            y: 4140689.4706909908
+        follow {
+          distance_s: -5.4097223281860352
+          fence_point {
+            x: 586426.49758902891
+            y: 4140685.4610236813
+            z: 0
           }
-          stop_heading: 1.3460085746193724
+          fence_heading: 1.3398228192102641
         }
       }
     }
