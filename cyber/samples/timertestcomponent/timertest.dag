@@ -5,7 +5,7 @@
         class_name : "TimertestComponent"
         config {
             name : "Timertest"
-            interval : 100
+            interval : 10
         }
     }    
 

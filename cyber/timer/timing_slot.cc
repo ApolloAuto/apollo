@@ -35,7 +35,7 @@ void TimingSlot::EnumTaskList(
     it++;
     // std::cout << "judge: task->" << task->deadline << " : " << deadline;
     if (task->deadline_ <= deadline) {
-      if (task->rest_rounds_ <= 0) {
+      if (task->rest_rounds_ == 0) {
         if (async) {
           HandlePackage hp;
           hp.handle = task->handler_;
