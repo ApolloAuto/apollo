@@ -94,7 +94,7 @@ DEFINE_int32(min_still_obstacle_history_length, 4,
              "Min # historical frames for still obstacles");
 DEFINE_int32(max_still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
-DEFINE_double(still_obstacle_speed_threshold, 2.0,
+DEFINE_double(still_obstacle_speed_threshold, 1.8,
               "Speed threshold for still obstacles");
 DEFINE_double(still_pedestrian_speed_threshold, 0.5,
               "Speed threshold for still pedestrians");
