@@ -36,6 +36,7 @@ class Component_Timer : public TimerComponent {
 TEST(TimerComponent, timertest) {
   ret_proc = true;
   ret_init = true;
+  cyber::Init("timer component test");
   apollo::cyber::proto::TimerComponentConfig compcfg;
   compcfg.set_name("driver");
   compcfg.set_interval(100);
@@ -48,6 +49,7 @@ TEST(TimerComponent, timertest) {
 TEST(TimerComponentFalse, timerfail) {
   ret_proc = false;
   ret_init = false;
+  cyber::Init("timer component test");
   apollo::cyber::proto::TimerComponentConfig compcfg;
   compcfg.set_name("driver1");
   compcfg.set_interval(100);
