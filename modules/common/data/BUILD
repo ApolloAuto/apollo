@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "vehicle_config_data",
-    srcs = ["mkz_config.pb.txt"],
+    srcs = ["vehicle_param.pb.txt"],
 )
 
 filegroup(
