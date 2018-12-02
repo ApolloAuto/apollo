@@ -40,7 +40,7 @@ using apollo::cyber::record::Recorder;
 using apollo::cyber::record::Recoverer;
 using apollo::cyber::record::Spliter;
 
-const char INFO_OPTIONS[] = "f:h";
+const char INFO_OPTIONS[] = "h";
 const char RECORD_OPTIONS[] = "o:ac:h";
 const char PLAY_OPTIONS[] = "f:c:lr:b:e:s:d:h";
 const char SPLIT_OPTIONS[] = "f:o:c:k:b:e:h";
@@ -63,11 +63,17 @@ void DisplayUsage(const std::string& binary) {
 }
 
 void DisplayUsage(const std::string& binary, const std::string& command) {
+  if (command == "info") {
+    std::cout << "usage: cyber_recorder info file" << std::endl;
+    std::cout << "usage: " << binary << " " << command << " [options]"
+              << std::endl;
+    DisplayUsage(binary, command, INFO_OPTIONS);
+    return;
+  }
+
   std::cout << "usage: " << binary << " " << command << " [options]"
             << std::endl;
-  if (command == "info") {
-    DisplayUsage(binary, command, INFO_OPTIONS);
-  } else if (command == "record") {
+  if (command == "record") {
     DisplayUsage(binary, command, RECORD_OPTIONS);
   } else if (command == "play") {
     DisplayUsage(binary, command, PLAY_OPTIONS);
@@ -145,6 +151,10 @@ int main(int argc, char** argv) {
     return -1;
   }
   const std::string command(argv[1]);
+  std::string file_path;
+  if (argc >= 3) {
+    file_path = std::string(argv[2]);
+  }
 
   int long_index = 0;
   const std::string short_opts = "f:c:k:o:alr:b:e:s:d:h";
@@ -283,16 +293,13 @@ int main(int argc, char** argv) {
 
   // cyber_recorder info
   if (command == "info") {
-    if (opt_file_vec.empty()) {
-      std::cout << "MUST specify file option (-f)." << std::endl;
+    if (file_path.empty()) {
+      std::cout << "usage: cyber_recorder info file" << std::endl;
       return -1;
     }
     ::apollo::cyber::Init(argv[0]);
     Info info;
-    bool info_result = true;
-    for (auto& opt_file : opt_file_vec) {
-      info_result = info_result && info.Display(opt_file) ? true : false;
-    }
+    bool info_result = info.Display(file_path);
     ::apollo::cyber::Shutdown();
     return info_result ? 0 : -1;
   } else if (command == "recover") {
