@@ -46,7 +46,7 @@ decision {
       object_decision {
         nudge {
           type: RIGHT_NUDGE
-          distance_l: -0.5
+          distance_l: -0.3
         }
       }
     }

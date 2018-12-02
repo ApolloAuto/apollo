@@ -202,7 +202,7 @@ DEFINE_double(max_stop_distance_obstacle, 10.0,
               "max stop distance from in-lane obstacle (meters)");
 DEFINE_double(min_stop_distance_obstacle, 6.0,
               "min stop distance from in-lane obstacle (meters)");
-DEFINE_double(nudge_distance_obstacle, 0.5,
+DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
