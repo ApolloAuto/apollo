@@ -876,15 +876,13 @@ void TrafficLightsPerceptionComponent::Visualize(
   memcpy(output_image.data, out_image.cpu_data(),
          out_image.total() * sizeof(uint8_t));
 
-  // Crop ROI
-  if (!lights[0]->region.debug_roi.empty()) {
-      const auto& crop_roi = lights.at(0)->region.debug_roi[0];
-      const cv::Rect rect_crop(crop_roi.x, crop_roi.y,
-                               crop_roi.width, crop_roi.height);
-      cv::rectangle(output_image, rect_crop, cv::Scalar(255, 0, 0));
-  }
-
   for (const auto& light : lights) {
+    // Crop ROI
+    const auto& crop_roi = light->region.debug_roi[0];
+    const cv::Rect rect_crop(crop_roi.x, crop_roi.y,
+                               crop_roi.width, crop_roi.height);
+    cv::rectangle(output_image, rect_crop, cv::Scalar(255, 255, 255));
+
     // Project lights
     const auto& projection_roi = light->region.projection_roi;
     const cv::Rect projection_rect(projection_roi.x, projection_roi.y,
@@ -903,7 +901,7 @@ void TrafficLightsPerceptionComponent::Visualize(
         cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 255, 0), 2);
         break;
       case base::TLColor::TL_YELLOW:
-        cv::rectangle(output_image, rectified_rect, cv::Scalar(255, 255, 0), 2);
+        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 255, 255), 2);
         break;
       default:
         cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 0, 0), 2);
