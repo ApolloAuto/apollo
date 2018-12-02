@@ -183,6 +183,29 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
+void StdPlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
+  trajectory_pb->clear_trajectory_point();
+
+  const auto& vehicle_state =
+      VehicleStateProvider::Instance()->vehicle_state();
+  const double max_t = FLAGS_fallback_total_time;
+  const double unit_t = FLAGS_fallback_time_unit;
+
+  TrajectoryPoint tp;
+  auto path_point = tp.mutable_path_point();
+  path_point->set_x(vehicle_state.x());
+  path_point->set_y(vehicle_state.y());
+  path_point->set_theta(vehicle_state.heading());
+  path_point->set_s(0.0);
+  tp.set_v(0.0);
+  tp.set_a(0.0);
+  for (double t = 0.0; t < max_t; t += unit_t) {
+    tp.set_relative_time(t);
+    auto next_point = trajectory_pb->add_trajectory_point();
+    next_point->CopyFrom(tp);
+  }
+}
+
 void StdPlanning::RunOnce(const LocalView& local_view,
                           ADCTrajectory* const trajectory_pb) {
   local_view_ = local_view;
@@ -225,6 +248,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
     FillPlanningPb(start_timestamp, trajectory_pb);
+    GenerateStopTrajectory(trajectory_pb);
     return;
   }
 
@@ -281,6 +305,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
+      GenerateStopTrajectory(trajectory_pb);
     }
 
     FillPlanningPb(start_timestamp, trajectory_pb);

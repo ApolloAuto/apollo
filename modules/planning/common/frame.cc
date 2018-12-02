@@ -349,10 +349,10 @@ Status Frame::Init(
     const std::list<ReferenceLine> &reference_lines,
     const std::list<hdmap::RouteSegments> &segments,
     const std::vector<routing::LaneWaypoint> &future_route_waypoints) {
-  if (InitFrameData() != Status::OK()) {
-    const std::string msg = "Failed to init frame data.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+  auto status = InitFrameData();
+  if (!status.ok()) {
+    AERROR << "failed to init frame:" << status.ToString();
+    return status;
   }
   if (!CreateReferenceLineInfo(reference_lines, segments)) {
     const std::string msg = "Failed to init reference line info.";

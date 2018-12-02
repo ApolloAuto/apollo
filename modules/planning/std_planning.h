@@ -75,6 +75,7 @@ class StdPlanning : public PlanningBase {
                            ADCTrajectory* output_trajectory);
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);
+  void GenerateStopTrajectory(ADCTrajectory* trajectory_pb);
 
  private:
   routing::RoutingResponse last_routing_;
