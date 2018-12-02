@@ -65,9 +65,7 @@ bool DeciderCreep::BuildStopDecision(const double stop_sign_overlap_end_s,
       stop_sign_overlap_end_s + FindCreepDistance(*frame, *reference_line_info);
 
   // create virtual stop wall
-  // TODO(all)
-  // std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + overlap.object_id;
-  std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + std::string("test");
+  std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + std::string("SS");
   auto* obstacle = frame->CreateStopObstacle(reference_line_info,
                                              virtual_obstacle_id, creep_stop_s);
   if (!obstacle) {
