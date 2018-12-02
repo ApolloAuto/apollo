@@ -184,7 +184,7 @@ Chassis TransitController::chassis() {
 
   if (motion20.has_llc_fbk_brakepercentrear()) {
     // TODO(Udelv): fix scaling
-    chassis_.set_brake_percentage(motion20.llc_fbk_brakepercentrear() * 100);
+    chassis_.set_brake_percentage(motion20.llc_fbk_brakepercentrear());
   }
 
   if (motion20.has_llc_fbk_gear()) {
