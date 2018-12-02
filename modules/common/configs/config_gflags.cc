@@ -35,7 +35,7 @@ DEFINE_string(speed_control_filename, "speed_control.pb.txt",
               "The speed control region in a map.");
 
 DEFINE_string(vehicle_config_path,
-              "/apollo/modules/common/data/mkz_config.pb.txt",
+              "/apollo/modules/common/data/vehicle_param.pb.txt",
               "the file path of vehicle config file");
 
 DEFINE_bool(use_cyber_time, false,
