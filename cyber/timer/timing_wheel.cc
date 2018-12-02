@@ -97,10 +97,11 @@ void TimingWheel::Step() {
   FillAddSlot();
   time_slots_[idx].EnumTaskList(deadline, true, &handler_queue_,
                                 &repeat_queue_);
-  FillRepeatSlot();
 
   // timing wheel tick one time
   tick_++;
+
+  FillRepeatSlot();
 
   while (!handler_queue_.Empty()) {
     HandlePackage hp;
@@ -158,7 +159,11 @@ void TimingWheel::FillSlot(const std::shared_ptr<TimerTask>& task) {
 
   // Calculate how many tickes have been run since the time wheel start
   uint64_t t = task->deadline_ / tick_duration_;  // perTick = 1ms
-  task->rest_rounds_ = (t - tick_) / TIMING_WHEEL_SIZE;
+  if (t < tick_) {
+    task->rest_rounds_ = 0;
+  } else {
+    task->rest_rounds_ = (t - tick_) / TIMING_WHEEL_SIZE;
+  }
   uint64_t ticks = std::max(t, tick_);  // right now
   uint64_t idx = ticks & mask_;
   time_slots_[idx].AddTask(task);
