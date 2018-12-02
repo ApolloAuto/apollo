@@ -83,7 +83,8 @@ Obstacle::Obstacle(const std::string& id,
   }
   CHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
                                                    &perception_polygon_))
-      << "object[" << id << "] polygon is not a valid convex hull";
+      << "object[" << id << "] polygon is not a valid convex hull.\n"
+      << perception_obstacle.DebugString();
 
   is_static_ = IsStaticObstacle(perception_obstacle);
   is_virtual_ = IsVirtualObstacle(perception_obstacle);
