@@ -110,6 +110,11 @@ bool PlayTaskProducer::ReadRecordInfo() {
   // loop each file
   for (auto& file : play_param_.files_to_play) {
     auto record_reader = std::make_shared<RecordReader>(file);
+    if (!record_reader->header().is_complete()) {
+      std::cout << "file: " << file << " is not complete." << std::endl;
+      continue;
+    }
+
     record_readers_.emplace_back(record_reader);
 
     auto& channel_info = record_reader->channel_info();
