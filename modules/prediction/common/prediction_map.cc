@@ -489,17 +489,17 @@ std::vector<std::string> PredictionMap::NearbyLaneIds(
 }
 
 bool PredictionMap::IsLeftNeighborLane(
-    std::shared_ptr<const LaneInfo> left_lane,
+    std::shared_ptr<const LaneInfo> target_lane,
     std::shared_ptr<const LaneInfo> curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
-  if (left_lane == nullptr) {
+  if (target_lane == nullptr) {
     return false;
   }
   for (const auto& left_lane_id :
        curr_lane->lane().left_neighbor_forward_lane_id()) {
-    if (left_lane->id().id() == left_lane_id.id()) {
+    if (target_lane->id().id() == left_lane_id.id()) {
       return true;
     }
   }
@@ -507,13 +507,13 @@ bool PredictionMap::IsLeftNeighborLane(
 }
 
 bool PredictionMap::IsLeftNeighborLane(
-    std::shared_ptr<const LaneInfo> left_lane,
+    std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
   if (lanes.size() == 0) {
     return true;
   }
   for (auto& lane : lanes) {
-    if (IsLeftNeighborLane(left_lane, lane)) {
+    if (IsLeftNeighborLane(target_lane, lane)) {
       return true;
     }
   }
@@ -521,17 +521,17 @@ bool PredictionMap::IsLeftNeighborLane(
 }
 
 bool PredictionMap::IsRightNeighborLane(
-    std::shared_ptr<const LaneInfo> right_lane,
+    std::shared_ptr<const LaneInfo> target_lane,
     std::shared_ptr<const LaneInfo> curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
-  if (right_lane == nullptr) {
+  if (target_lane == nullptr) {
     return false;
   }
   for (auto& right_lane_id :
        curr_lane->lane().right_neighbor_forward_lane_id()) {
-    if (right_lane->id().id() == right_lane_id.id()) {
+    if (target_lane->id().id() == right_lane_id.id()) {
       return true;
     }
   }
@@ -539,29 +539,29 @@ bool PredictionMap::IsRightNeighborLane(
 }
 
 bool PredictionMap::IsRightNeighborLane(
-    std::shared_ptr<const LaneInfo> right_lane,
+    std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
   if (lanes.size() == 0) {
     return true;
   }
   for (const auto& lane : lanes) {
-    if (IsRightNeighborLane(right_lane, lane)) {
+    if (IsRightNeighborLane(target_lane, lane)) {
       return true;
     }
   }
   return false;
 }
 
-bool PredictionMap::IsSuccessorLane(std::shared_ptr<const LaneInfo> succ_lane,
+bool PredictionMap::IsSuccessorLane(std::shared_ptr<const LaneInfo> target_lane,
                                     std::shared_ptr<const LaneInfo> curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
-  if (succ_lane == nullptr) {
+  if (target_lane == nullptr) {
     return false;
   }
-  for (auto& successor_lane_id : curr_lane->lane().successor_id()) {
-    if (succ_lane->id().id() == successor_lane_id.id()) {
+  for (const auto& successor_lane_id : curr_lane->lane().successor_id()) {
+    if (target_lane->id().id() == successor_lane_id.id()) {
       return true;
     }
   }
@@ -569,13 +569,13 @@ bool PredictionMap::IsSuccessorLane(std::shared_ptr<const LaneInfo> succ_lane,
 }
 
 bool PredictionMap::IsSuccessorLane(
-    std::shared_ptr<const LaneInfo> succ_lane,
+    std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
   if (lanes.size() == 0) {
     return true;
   }
   for (auto& lane : lanes) {
-    if (IsSuccessorLane(succ_lane, lane)) {
+    if (IsSuccessorLane(target_lane, lane)) {
       return true;
     }
   }
@@ -583,16 +583,16 @@ bool PredictionMap::IsSuccessorLane(
 }
 
 bool PredictionMap::IsPredecessorLane(
-    std::shared_ptr<const LaneInfo> pred_lane,
+    std::shared_ptr<const LaneInfo> target_lane,
     std::shared_ptr<const LaneInfo> curr_lane) {
   if (curr_lane == nullptr) {
     return true;
   }
-  if (pred_lane == nullptr) {
+  if (target_lane == nullptr) {
     return false;
   }
-  for (auto& predecessor_lane_id : curr_lane->lane().predecessor_id()) {
-    if (pred_lane->id().id() == predecessor_lane_id.id()) {
+  for (const auto& predecessor_lane_id : curr_lane->lane().predecessor_id()) {
+    if (target_lane->id().id() == predecessor_lane_id.id()) {
       return true;
     }
   }
@@ -600,13 +600,13 @@ bool PredictionMap::IsPredecessorLane(
 }
 
 bool PredictionMap::IsPredecessorLane(
-    std::shared_ptr<const LaneInfo> pred_lane,
+    std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
   if (lanes.size() == 0) {
     return true;
   }
   for (auto& lane : lanes) {
-    if (IsPredecessorLane(pred_lane, lane)) {
+    if (IsPredecessorLane(target_lane, lane)) {
       return true;
     }
   }

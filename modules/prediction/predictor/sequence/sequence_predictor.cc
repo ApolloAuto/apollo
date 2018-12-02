@@ -34,11 +34,11 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::common::math::Vec2d;
-using ::apollo::hdmap::LaneInfo;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::math::Vec2d;
+using apollo::hdmap::LaneInfo;
 
 void SequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -159,13 +159,12 @@ SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
   if (lane_id == lane_change_id) {
     return LaneChangeType::STRAIGHT;
   } else {
-    if (PredictionMap::IsLeftNeighborLane(
-            PredictionMap::LaneById(lane_change_id),
-            PredictionMap::LaneById(lane_id))) {
+    auto ptr_change_lane = PredictionMap::LaneById(lane_change_id);
+    auto ptr_current_lane = PredictionMap::LaneById(lane_id);
+    if (PredictionMap::IsLeftNeighborLane(ptr_change_lane, ptr_current_lane)) {
       return LaneChangeType::LEFT;
-    } else if (PredictionMap::IsRightNeighborLane(
-                   PredictionMap::LaneById(lane_change_id),
-                   PredictionMap::LaneById(lane_id))) {
+    } else if (PredictionMap::IsRightNeighborLane(ptr_change_lane,
+        ptr_current_lane)) {
       return LaneChangeType::RIGHT;
     }
   }

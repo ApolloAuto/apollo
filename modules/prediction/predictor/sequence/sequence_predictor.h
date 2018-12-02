@@ -30,9 +30,8 @@
 
 #include "cyber/common/macros.h"
 
-#include "modules/prediction/proto/lane_graph.pb.h"
-
 #include "modules/prediction/predictor/predictor.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
