@@ -421,10 +421,11 @@ void TransitController::Steer(double angle) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      button_pressed_
-          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI / 2
-          : 0;
+  // TODO(All): remove -1.0 once Udelv has a complete fix.
+  const double real_angle = button_pressed_
+                                ? -1.0 * vehicle_params_.max_steer_angle() *
+                                      angle / 100.0 * 180 / M_PI / 2
+                                : 0;
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
 }
 
@@ -437,10 +438,12 @@ void TransitController::Steer(double angle, double angle_spd) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
-  const double real_angle =
-      button_pressed_
-          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI
-          : 0;
+
+  // TODO(All): remove -1.0 once Udelv has a complete fix.
+  const double real_angle = button_pressed_
+                                ? -1.0 * vehicle_params_.max_steer_angle() *
+                                      angle / 100.0 * 180 / M_PI
+                                : 0;
 
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
   // TODO(QiL) : re-enable the angle_spd ajustment
@@ -595,7 +598,7 @@ bool TransitController::CheckSafetyError(
 void TransitController::SetLimits() {
   adc_motioncontrollimits1_12_->set_adc_cmd_throttlecommandlimit(100);
   adc_motioncontrollimits1_12_->set_adc_cmd_steerwheelanglelimit(1275);
-  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(1000);
+  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(3200);
 }
 
 }  // namespace transit
