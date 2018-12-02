@@ -29,6 +29,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Vec2d;
 using apollo::planning::ADCTrajectory;
@@ -40,19 +41,20 @@ const std::vector<Trajectory>& Predictor::trajectories() {
 size_t Predictor::NumOfTrajectories() { return trajectories_.size(); }
 
 Trajectory Predictor::GenerateTrajectory(
-    const std::vector<apollo::common::TrajectoryPoint>& points) {
+    const std::vector<TrajectoryPoint>& points) {
   Trajectory trajectory;
   *trajectory.mutable_trajectory_point() = {points.begin(), points.end()};
   return trajectory;
 }
 
-void Predictor::SetEqualProbability(double probability, size_t start_index) {
+void Predictor::SetEqualProbability(const double total_probability,
+                                    const size_t start_index) {
   size_t num = NumOfTrajectories();
-  if (start_index >= 0 && num > start_index) {
-    probability /= static_cast<double>(num - start_index);
-    for (size_t i = start_index; i < num; ++i) {
-      trajectories_[i].set_probability(probability);
-    }
+  CHECK(num > start_index);
+
+  const auto prob = total_probability / static_cast<double>(num - start_index);
+  for (size_t i = start_index; i < num; ++i) {
+    trajectories_[i].set_probability(prob);
   }
 }
 
@@ -61,8 +63,8 @@ void Predictor::Clear() { trajectories_.clear(); }
 void Predictor::TrimTrajectories(
     const Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container) {
-  for (size_t i = 0; i < trajectories_.size(); ++i) {
-    TrimTrajectory(obstacle, adc_trajectory_container, &trajectories_[i]);
+  for (auto& trajectory : trajectories_) {
+    TrimTrajectory(obstacle, adc_trajectory_container, &trajectory);
   }
 }
 
@@ -78,20 +80,20 @@ bool Predictor::TrimTrajectory(
     AERROR << "Invalid obstacle.";
     return false;
   }
-  int num_point = trajectory->trajectory_point_size();
-  if (num_point == 0) {
+  int num_of_point = trajectory->trajectory_point_size();
+  if (num_of_point == 0) {
     return false;
   }
   const Feature& feature = obstacle->latest_feature();
-  double length = feature.length();
-  double heading = feature.velocity_heading();
+  double vehicle_length = feature.length();
+  double vehicle_heading = feature.velocity_heading();
   double forward_length =
-      std::max(length / 2.0 - FLAGS_distance_beyond_junction, 0.0);
+      std::fmax(vehicle_length / 2.0 - FLAGS_distance_beyond_junction, 0.0);
 
   double front_x = trajectory->trajectory_point(0).path_point().x() +
-                   forward_length * std::cos(heading);
+                   forward_length * std::cos(vehicle_heading);
   double front_y = trajectory->trajectory_point(0).path_point().y() +
-                   forward_length * std::sin(heading);
+                   forward_length * std::sin(vehicle_heading);
   PathPoint front_point;
   front_point.set_x(front_x);
   front_point.set_y(front_y);
@@ -107,7 +109,7 @@ bool Predictor::TrimTrajectory(
   }
 
   int index = 0;
-  while (index < num_point) {
+  while (index < num_of_point) {
     const PathPoint& point = trajectory->trajectory_point(index).path_point();
     if (adc_trajectory_container->IsPointInJunction(point)) {
       break;
@@ -116,11 +118,11 @@ bool Predictor::TrimTrajectory(
   }
 
   // if no intersect
-  if (index == num_point) {
+  if (index == num_of_point) {
     return false;
   }
 
-  for (int i = index; i < num_point; ++i) {
+  for (int i = index; i < num_of_point; ++i) {
     trajectory->mutable_trajectory_point()->RemoveLast();
   }
   return true;

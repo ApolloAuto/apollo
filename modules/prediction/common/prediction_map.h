@@ -278,81 +278,82 @@ class PredictionMap {
 
   /**
    * @brief Check if a lane is a left neighbor of another lane.
-   * @param left_lane The lane to check if it is a left neighbor.
+   * @param target_lane The lane to check if it is a left neighbor.
    * @param curr_lane The current lane.
    * @return If left_lane is a left neighbor of curr_lane.
    */
   static bool IsLeftNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> left_lane,
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
       std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
-   * @brief Check if a lane is a left neighbor of one of some lanes.
-   * @param left_lane The lane to check if it is a left neighbor.
+   * @brief Check if the target lane is a left neighbor of one of some lanes.
+   * @param target_lane The lane to check if it is a left neighbor.
    * @param lanes The current lanes.
    * @return If left_lane is a left neighbor of one of lanes.
    */
   static bool IsLeftNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> left_lane,
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
    * @brief Check if a lane is a right neighbor of another lane.
-   * @param right_lane The lane to check if it is a right neighbor.
+   * @param target_lane The lane to check if it is a right neighbor.
    * @param curr_lane The current lane.
    * @return If right_lane is a right neighbor of curr_lane.
    */
   static bool IsRightNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> right_lane,
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
       std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
-   * @brief Check if a lane is a right neighbor of one of some lanes.
-   * @param right_lane The lane to check if it is a right neighbor.
+   * @brief Check if the target lane is a right neighbor of one of some lanes.
+   * @param target_lane The lane to check if it is a right neighbor.
    * @param lanes The current lanes.
    * @return If right_lane is a right neighbor of one of lanes.
    */
   static bool IsRightNeighborLane(
-      std::shared_ptr<const hdmap::LaneInfo> right_lane,
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
-   * @brief Check if a lane is a successor of another lane.
-   * @param succ_lane The lane to check if it is a successor.
+   * @brief Check if the target lane is a successor of another lane.
+   * @param target_lane The lane to check if it is a successor.
    * @param curr_lane The current lane.
    * @return If succ_lane is a successor of curr_lane.
    */
-  static bool IsSuccessorLane(std::shared_ptr<const hdmap::LaneInfo> succ_lane,
-                              std::shared_ptr<const hdmap::LaneInfo> curr_lane);
+  static bool IsSuccessorLane(
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
+      std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
-   * @brief Check if a lane is a successor of one of some lanes.
-   * @param succ_lane The lane to check if it is a successor.
+   * @brief Check if the target lane is a successor of one of some lanes.
+   * @param target_lane The lane to check if it is a successor.
    * @param lanes The current lanes.
    * @return If succ_lane is a successor of one of lanes.
    */
   static bool IsSuccessorLane(
-      std::shared_ptr<const hdmap::LaneInfo> succ_lane,
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**
-   * @brief Check if a lane is a predecessor of another lane.
-   * @param pred_lane The lane to check if it is a predecessor.
+   * @brief Check if the target lane is a predecessor of another lane.
+   * @param target_lane The lane to check if it is a predecessor.
    * @param curr_lane The current lane.
    * @return If pred_lane is a predecessor of curr_lane.
    */
   static bool IsPredecessorLane(
-      std::shared_ptr<const hdmap::LaneInfo> pred_lane,
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
       std::shared_ptr<const hdmap::LaneInfo> curr_lane);
 
   /**
-   * @brief Check if a lane is a predecessor of one of some lanes.
-   * @param pred_lane The lane to check if it is a predecessor.
+   * @brief Check if the target lane is a predecessor of one of some lanes.
+   * @param target_lane The lane to check if it is a predecessor.
    * @param lanes The current lanes.
    * @return If pred_lane is a predecessor of one of lanes.
    */
   static bool IsPredecessorLane(
-      std::shared_ptr<const hdmap::LaneInfo> pred_lane,
+      std::shared_ptr<const hdmap::LaneInfo> target_lane,
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lanes);
 
   /**

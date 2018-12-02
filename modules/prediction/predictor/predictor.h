@@ -92,10 +92,11 @@ class Predictor {
    * @param probability total probability
    * @param start_index The start index to set equal probability
    */
-  void SetEqualProbability(double probability, size_t start_index);
+  void SetEqualProbability(const double probability, const size_t start_index);
 
   /**
-   * @brief Trim a single prediction trajectory
+   * @brief Trim a single prediction trajectory,
+   *        keep the portion that is not in junction.
    * @param adc_segments trajectory segments of ADC trajectory
    * @param trajectory The trimed prediction trajectory
    * @return If the prediction trajectory is trimed
