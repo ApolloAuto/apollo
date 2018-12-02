@@ -383,9 +383,9 @@ Status Frame::InitFrameData() {
   // lag_predictor_->GetLaggedPrediction(
   //    local_view_.prediction_obstacles.get());
   //}
-  auto prediction = *(local_view_.prediction_obstacles);
 
   if (FLAGS_align_prediction_time) {
+    auto prediction = *(local_view_.prediction_obstacles);
     AlignPredictionTime(vehicle_state_.timestamp(), &prediction);
     local_view_.prediction_obstacles->CopyFrom(prediction);
   }

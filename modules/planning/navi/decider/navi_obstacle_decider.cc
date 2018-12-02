@@ -134,7 +134,7 @@ bool NaviObstacleDecider::IsNeedFilterObstacle(
   }
   if ((obstacle_start_position - vehicle_frontedge_position) >
       config_.safe_distance()) {
-    if (!Obstacle::IsStaticObstacle(current_obstacle->Perception())) {
+    if (!current_obstacle->IsStatic()) {
       if (current_obstacle->Perception().velocity().x() > 0.0) {
         return is_filter;
       }

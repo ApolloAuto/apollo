@@ -34,6 +34,7 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::util::MakePathPoint;
 using apollo::perception::PerceptionObstacle;
+using apollo::prediction::ObstaclePriority;
 
 namespace apollo {
 namespace planning {
@@ -126,7 +127,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForStaticObstacle) {
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
   std::string id = "1";
-  obstacle_buf.emplace(id, Obstacle(id, perception_obstacle));
+  obstacle_buf.emplace(
+      id, Obstacle(id, perception_obstacle, ObstaclePriority::NORMAL, false));
   obstacles.emplace_back(&obstacle_buf[id]);
 
   SpeedData speed_data;
@@ -179,7 +181,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
   std::string id = "1";
-  obstacle_buf.emplace(id, Obstacle(id, perception_obstacle));
+  obstacle_buf.emplace(
+      id, Obstacle(id, perception_obstacle, ObstaclePriority::NORMAL, false));
   obstacles.emplace_back(&obstacle_buf[id]);
 
   // obstacle2
@@ -190,7 +193,8 @@ TEST(NaviSpeedDeciderTest, CreateSpeedDataForObstacles) {
   perception_obstacle.set_length(3.0);
   perception_obstacle.set_width(3.0);
   id = "2";
-  obstacle_buf.emplace(id, Obstacle(id, perception_obstacle));
+  obstacle_buf.emplace(
+      id, Obstacle(id, perception_obstacle, ObstaclePriority::NORMAL, false));
   obstacles.emplace_back(&obstacle_buf[id]);
 
   SpeedData speed_data;

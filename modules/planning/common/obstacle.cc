@@ -39,6 +39,7 @@ namespace planning {
 using apollo::common::VehicleConfigHelper;
 using apollo::common::util::FindOrDie;
 using apollo::perception::PerceptionObstacle;
+using apollo::prediction::ObstaclePriority;
 
 namespace {
 const double kStBoundaryDeltaS = 0.2;        // meters
@@ -61,7 +62,9 @@ const std::unordered_map<ObjectDecisionType::ObjectTagCase, int,
         {ObjectDecisionType::kIgnore, 0}, {ObjectDecisionType::kNudge, 100}};
 
 Obstacle::Obstacle(const std::string& id,
-                   const PerceptionObstacle& perception_obstacle)
+                   const PerceptionObstacle& perception_obstacle,
+                   const ObstaclePriority::Priority& obstacle_priority,
+                   const bool is_static)
     : id_(id),
       perception_id_(perception_obstacle.id()),
       perception_obstacle_(perception_obstacle),
@@ -86,7 +89,7 @@ Obstacle::Obstacle(const std::string& id,
       << "object[" << id << "] polygon is not a valid convex hull.\n"
       << perception_obstacle.DebugString();
 
-  is_static_ = IsStaticObstacle(perception_obstacle);
+  is_static_ = (is_static || obstacle_priority == ObstaclePriority::IGNORE);
   is_virtual_ = IsVirtualObstacle(perception_obstacle);
   speed_ = std::hypot(perception_obstacle.velocity().x(),
                       perception_obstacle.velocity().y());
@@ -94,8 +97,10 @@ Obstacle::Obstacle(const std::string& id,
 
 Obstacle::Obstacle(const std::string& id,
                    const PerceptionObstacle& perception_obstacle,
-                   const prediction::Trajectory& trajectory)
-    : Obstacle(id, perception_obstacle) {
+                   const prediction::Trajectory& trajectory,
+                   const ObstaclePriority::Priority& obstacle_priority,
+                   const bool is_static)
+    : Obstacle(id, perception_obstacle, obstacle_priority, is_static) {
   trajectory_ = trajectory;
   auto& trajectory_points = *trajectory_.mutable_trajectory_point();
   double cumulative_s = 0.0;
@@ -159,16 +164,6 @@ common::math::Box2d Obstacle::GetBoundingBox(
                              perception_obstacle_.width());
 }
 
-bool Obstacle::IsStaticObstacle(const PerceptionObstacle& perception_obstacle) {
-  if (perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
-    return true;
-  }
-  auto moving_speed = std::hypot(perception_obstacle.velocity().x(),
-                                 perception_obstacle.velocity().y());
-  return std::isnan(moving_speed) ||
-         moving_speed <= FLAGS_static_obstacle_speed_threshold;
-}
-
 bool Obstacle::IsValidPerceptionObstacle(const PerceptionObstacle& obstacle) {
   if (obstacle.length() <= 0.0) {
     AERROR << "invalid obstacle length:" << obstacle.length();
@@ -211,8 +206,10 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
     const auto perception_id =
         std::to_string(prediction_obstacle.perception_obstacle().id());
     if (prediction_obstacle.trajectory().empty()) {
-      obstacles.emplace_back(new Obstacle(
-          perception_id, prediction_obstacle.perception_obstacle()));
+      obstacles.emplace_back(
+          new Obstacle(perception_id, prediction_obstacle.perception_obstacle(),
+                       prediction_obstacle.priority().priority(),
+                       prediction_obstacle.is_static()));
       continue;
     }
 
@@ -234,8 +231,10 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
 
       const std::string obstacle_id =
           apollo::common::util::StrCat(perception_id, "_", trajectory_index);
-      obstacles.emplace_back(new Obstacle(
-          obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
+      obstacles.emplace_back(
+          new Obstacle(obstacle_id, prediction_obstacle.perception_obstacle(),
+                       trajectory, prediction_obstacle.priority().priority(),
+                       prediction_obstacle.is_static()));
       ++trajectory_index;
     }
   }
@@ -270,7 +269,8 @@ std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
     point->set_x(corner_point.x());
     point->set_y(corner_point.y());
   }
-  auto* obstacle = new Obstacle(id, perception_obstacle);
+  auto* obstacle =
+      new Obstacle(id, perception_obstacle, ObstaclePriority::NORMAL, true);
   obstacle->is_virtual_ = true;
   return std::unique_ptr<Obstacle>(obstacle);
 }

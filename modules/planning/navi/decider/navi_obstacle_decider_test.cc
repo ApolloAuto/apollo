@@ -25,15 +25,17 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/planning_gflags.h"
 
 using apollo::common::PathPoint;
 using apollo::common::util::MakePathPoint;
 using apollo::perception::PerceptionObstacle;
-using std::vector;
+using apollo::prediction::ObstaclePriority;
 
 namespace apollo {
 namespace planning {
@@ -52,7 +54,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist1) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(2.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  Obstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle, ObstaclePriority::NORMAL, false);
 
   PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   p1.set_s(0.0);
@@ -94,7 +96,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist2) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(-2.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  Obstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle, ObstaclePriority::NORMAL, false);
   b1.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddObstacle(b1);
 
@@ -135,7 +137,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(3.0);
   perception_obstacle.mutable_position()->set_y(0.0);
-  Obstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle, ObstaclePriority::NORMAL, false);
   obstacle_boundary.set_start_l(1.6);
   b1.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddObstacle(b1);
@@ -145,7 +147,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist3) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(4.0);
   perception_obstacle.mutable_position()->set_y(0.0);
-  Obstacle b2("2", perception_obstacle);
+  Obstacle b2("2", perception_obstacle, ObstaclePriority::NORMAL, false);
   obstacle_boundary.set_start_l(1.5);
   b2.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddObstacle(b2);
@@ -196,7 +198,7 @@ TEST(NaviObstacleDeciderTest, ComputeNudgeDist4) {
   perception_obstacle.set_length(1.0);
   perception_obstacle.mutable_position()->set_x(-3.0);
   perception_obstacle.mutable_position()->set_y(1.0);
-  Obstacle b1("1", perception_obstacle);
+  Obstacle b1("1", perception_obstacle, ObstaclePriority::NORMAL, false);
 
   b1.SetPerceptionSlBoundary(obstacle_boundary);
   path_decision.AddObstacle(b1);
@@ -235,7 +237,7 @@ TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   perception_obstacle.mutable_position()->set_y(3.0);
   perception_obstacle.mutable_velocity()->set_x(10.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
-  Obstacle b1("5", perception_obstacle);
+  Obstacle b1("5", perception_obstacle, ObstaclePriority::NORMAL, false);
 
   // obstacle 2
   perception_obstacle.set_width(2.6);
@@ -244,7 +246,7 @@ TEST(NaviObstacleDeciderTest, GetUnsafeObstaclesID) {
   perception_obstacle.mutable_position()->set_y(-1.0);
   perception_obstacle.mutable_velocity()->set_x(5.0);
   perception_obstacle.mutable_velocity()->set_y(0.0);
-  Obstacle b2("6", perception_obstacle);
+  Obstacle b2("6", perception_obstacle, ObstaclePriority::NORMAL, false);
 
   PathPoint p1 = MakePathPoint(0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   p1.set_s(0.0);

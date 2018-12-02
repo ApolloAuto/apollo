@@ -62,7 +62,6 @@ class ReferenceLineInfo {
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   Obstacle* AddObstacle(const Obstacle* obstacle);
-  bool AddObstacleHelper(const std::shared_ptr<Obstacle>& obstacle);
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
@@ -185,15 +184,22 @@ class ReferenceLineInfo {
 
  private:
   bool CheckChangeLane() const;
+
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
   bool IsUnrelaventObstacle(const Obstacle* obstacle);
 
   void MakeDecision(DecisionResult* decision_result) const;
+
   int MakeMainStopDecision(DecisionResult* decision_result) const;
+
   void MakeMainMissionCompleteDecision(DecisionResult* decision_result) const;
+
   void MakeEStopDecision(DecisionResult* decision_result) const;
+
   void SetObjectDecisions(ObjectDecisions* object_decisions) const;
+
+  bool AddObstacleHelper(const std::shared_ptr<Obstacle>& obstacle);
 
   bool GetFirstOverlap(const std::vector<hdmap::PathOverlap>& path_overlaps,
                        hdmap::PathOverlap* path_overlap);

@@ -38,37 +38,6 @@ namespace planning {
 
 using apollo::perception::PerceptionObstacle;
 
-TEST(Obstacle, IsStaticObstacle) {
-  PerceptionObstacle perception_obstacle;
-  EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.mutable_velocity()->set_x(2.5);
-  perception_obstacle.mutable_velocity()->set_y(0.5);
-  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN);
-  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN_UNMOVABLE);
-  EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.set_type(PerceptionObstacle::UNKNOWN_MOVABLE);
-  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.set_type(PerceptionObstacle::PEDESTRIAN);
-  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.set_type(PerceptionObstacle::BICYCLE);
-  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.set_type(PerceptionObstacle::VEHICLE);
-  EXPECT_FALSE(Obstacle::IsStaticObstacle(perception_obstacle));
-
-  perception_obstacle.mutable_velocity()->set_x(0.5);
-  perception_obstacle.mutable_velocity()->set_y(0.5);
-  EXPECT_TRUE(Obstacle::IsStaticObstacle(perception_obstacle));
-}
-
 TEST(Obstacle, IsValidPerceptionObstacle) {
   PerceptionObstacle perception_obstacle;
   EXPECT_FALSE(Obstacle::IsValidPerceptionObstacle(perception_obstacle));
@@ -218,7 +187,6 @@ TEST(Obstacle, CreateStaticVirtualObstacle) {
       Obstacle::CreateStaticVirtualObstacles("abc", box);
   EXPECT_EQ("abc", obstacle->Id());
   EXPECT_EQ(-314721735, obstacle->PerceptionId());
-  EXPECT_TRUE(Obstacle::IsStaticObstacle(obstacle->Perception()));
   EXPECT_TRUE(Obstacle::IsVirtualObstacle(obstacle->Perception()));
   auto& perception_box = obstacle->PerceptionBoundingBox();
   EXPECT_DOUBLE_EQ(0.0, perception_box.center().x());
