@@ -460,7 +460,6 @@ bool MoveSequencePredictor::GetLateralPolynomial(
   const Feature& feature = obstacle.latest_feature();
   double theta = feature.velocity_heading();
   double v = feature.speed();
-  double a = feature.acc();
   Point3D position = feature.position();
   const LanePoint& start_lane_point =
       lane_sequence.lane_segment(0).lane_point(0);
@@ -479,7 +478,7 @@ bool MoveSequencePredictor::GetLateralPolynomial(
   // Set the initial conditions for solving diff. eqn.
   double l0 = (cross_prod > 0) ? shift : -shift;
   double dl0 = v * std::sin(theta - start_lane_point.heading());
-  double ddl0 = a * std::sin(theta - start_lane_point.heading());
+  double ddl0 = 0.0;
   double l1 = 0.0;
   double dl1 = 0.0;
   double ddl1 = 0.0;
