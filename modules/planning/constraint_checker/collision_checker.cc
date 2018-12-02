@@ -57,7 +57,8 @@ bool CollisionChecker::InCollision(
     const DiscretizedTrajectory& ego_trajectory, const double ego_length,
     const double ego_width, const double ego_back_edge_to_center) {
   for (std::size_t i = 0; i < ego_trajectory.NumOfPoints(); ++i) {
-    const auto& ego_point = ego_trajectory.TrajectoryPointAt(i);
+    const auto& ego_point = ego_trajectory.TrajectoryPointAt(
+        static_cast<std::uint32_t>(i));
     const auto relative_time = ego_point.relative_time();
     const auto ego_theta = ego_point.path_point().theta();
 
@@ -93,7 +94,8 @@ bool CollisionChecker::InCollision(
   double ego_width = vehicle_config.vehicle_param().width();
 
   for (std::size_t i = 0; i < discretized_trajectory.NumOfPoints(); ++i) {
-    const auto& trajectory_point = discretized_trajectory.TrajectoryPointAt(i);
+    const auto& trajectory_point = discretized_trajectory.TrajectoryPointAt(
+        static_cast<std::uint32_t>(i));
     double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
