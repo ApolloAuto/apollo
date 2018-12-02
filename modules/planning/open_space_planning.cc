@@ -471,6 +471,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
   // Choose the one to follow based on the closest partitioned trajectory
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
+  constexpr double kepsilon = 1e-4;
   // Could have a big error in vehicle state in single thread mode!!! As the
   // vehicle state is only updated at the every beginning at RunOnce()
   VehicleState vehicle_state =
@@ -479,7 +480,24 @@ Status OpenSpacePlanning::TrajectoryPartition(
   for (size_t i = 0; i < gear_positions.size(); i++) {
     const apollo::common::Trajectory trajectory =
         trajectory_partition.trajectory(i);
-    for (int j = 0; j < trajectory.trajectory_point_size(); j++) {
+    int trajectory_size = trajectory.trajectory_point_size();
+
+    const apollo::common::TrajectoryPoint trajectory_end_point =
+        trajectory.trajectory_point(trajectory_size - 1);
+    const apollo::common::PathPoint path_end_point =
+        trajectory_end_point.path_point();
+    double distance_to_trajs_end =
+        (path_end_point.x() - vehicle_state.x()) *
+            (path_end_point.x() - vehicle_state.x()) +
+        (path_end_point.y() - vehicle_state.y()) *
+            (path_end_point.y() - vehicle_state.y());
+    if (distance_to_trajs_end <= kepsilon) {
+      current_trajectory_index = i + 1;
+      closest_trajectory_point_index = 0;
+      break;
+    }
+
+    for (int j = 0; j < trajectory_size; j++) {
       const apollo::common::TrajectoryPoint trajectory_point =
           trajectory.trajectory_point(j);
       const apollo::common::PathPoint path_point =
