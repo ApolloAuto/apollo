@@ -97,46 +97,28 @@ class OpenSpacePlanner : public Planner {
       const common::TrajectoryPoint& planning_init_point,
       Frame* frame) override;
 
-  bool CheckDestination(const common::TrajectoryPoint& planning_init_point,
-                        const std::vector<double>& end_pose);
-
-  void GenerateDestinationStop(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame);
-
   void GenerateTrajectoryThread();
 
   void Stop() override;
 
  private:
+  bool CheckDestination(const common::TrajectoryPoint& planning_init_point,
+                        const std::vector<double>& end_pose);
+
+  void GenerateStopTrajectory(
+      const common::TrajectoryPoint& planning_init_point,
+      common::Trajectory* trajectory_to_end);
+  void LoadTrajectoryToFrame(Frame* frame);
+
+ private:
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  apollo::planning::DistanceApproachConfig distance_approach_config_;
   std::unique_ptr<::apollo::planning::OpenSpaceTrajectoryGenerator>
       open_space_trajectory_generator_;
   std::unique_ptr<OpenSpaceROI> open_space_roi_generator_;
-  planning_internal::OpenSpaceDebug open_space_debug_;
+
   common::VehicleState init_state_;
   common::TrajectoryPoint planning_init_point_;
-  const common::VehicleParam& vehicle_param_ =
-      common::VehicleConfigHelper::GetConfig().vehicle_param();
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  apollo::planning::DistanceApproachConfig distance_approach_config_;
-  double init_x_ = 0.0;
-  double init_y_ = 0.0;
-  double init_phi_ = 0.0;
-  double init_v_ = 0.0;
-  double init_steer_ = 0.0;
-  double init_a_ = 0.0;
-  size_t horizon_ = 0;
-  double ts_ = 0;
-  Eigen::MatrixXd ego_;
-  std::vector<double> XYbounds_;
-  std::future<void> task_future_;
-  std::atomic<bool> is_stop_{false};
-  std::atomic<bool> trajectory_updated_{false};
-  std::mutex open_space_mutex_;
-
-  apollo::planning::ADCTrajectory publishable_trajectory_;
-
-  apollo::common::Trajectory trajectory_to_end_;
-
   apollo::common::VehicleState vehicle_state_;
   double rotate_angle_;
   apollo::common::math::Vec2d translate_origin_;
@@ -145,7 +127,17 @@ class OpenSpacePlanner : public Planner {
   Eigen::MatrixXi obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
+  std::vector<double> XYbounds_;
+
+  planning_internal::OpenSpaceDebug open_space_debug_;
+  apollo::common::Trajectory trajectory_to_end_;
+  apollo::planning::ADCTrajectory publishable_trajectory_;
+
   ThreadData thread_data_;
+  std::future<void> task_future_;
+  std::atomic<bool> is_stop_{false};
+  std::atomic<bool> trajectory_updated_{false};
+  std::mutex open_space_mutex_;
 };
 
 }  // namespace planning
