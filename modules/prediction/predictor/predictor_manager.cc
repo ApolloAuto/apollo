@@ -220,9 +220,9 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         }
       }
       prediction_obstacle.set_timestamp(obstacle->timestamp());
+      prediction_obstacle.set_is_static(obstacle->IsStill());
     }
 
-    prediction_obstacle.set_is_static(obstacle->IsStill());
     prediction_obstacle.set_predicted_period(FLAGS_prediction_duration);
     prediction_obstacle.mutable_perception_obstacle()->CopyFrom(
         perception_obstacle);
