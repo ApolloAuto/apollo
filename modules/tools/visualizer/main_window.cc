@@ -261,7 +261,6 @@ MainWindow::~MainWindow() {
 
   pointcloud_reader_mutex_.unlock();
 
-  apollo::cyber::Shutdown();
 
   if (pointcloud_channel_Reader_) {
     delete pointcloud_channel_Reader_;

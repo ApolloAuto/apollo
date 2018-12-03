@@ -30,7 +30,6 @@ void MessageCallback(
     std::ofstream dump_file(FLAGS_routing_dump_file);
     dump_file << trajectory->debug().planning_data().routing().DebugString();
     dump_file.close();
-    apollo::cyber::Shutdown();
     exit(0);
   }
 }

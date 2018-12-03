@@ -23,7 +23,7 @@ void MessageCallback(
   AINFO << "msgcontent->" << msg->content();
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   // init cyber framework
   apollo::cyber::Init(argv[0]);
   // create listener node
@@ -33,6 +33,5 @@ int main(int argc, char *argv[]) {
       listener_node->CreateReader<apollo::cyber::samples::proto::Chatter>(
           "channel/chatter", MessageCallback);
   apollo::cyber::WaitForShutdown();
-  apollo::cyber::Shutdown();
   return 0;
 }

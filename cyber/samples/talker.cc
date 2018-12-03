@@ -42,6 +42,5 @@ int main(int argc, char *argv[]) {
     AINFO << "talker sent a message!";
     rate.Sleep();
   }
-  apollo::cyber::Shutdown();
   return 0;
 }

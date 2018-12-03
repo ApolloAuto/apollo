@@ -22,7 +22,6 @@
 
 TEST(CyberInitTest, test_init) {
   EXPECT_TRUE(apollo::cyber::OK());
-  apollo::cyber::Shutdown();
   EXPECT_TRUE(apollo::cyber::IsShutdown());
 }
 

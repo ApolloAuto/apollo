@@ -31,6 +31,5 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   apollo::cyber::WaitForShutdown();
-  apollo::cyber::Shutdown();
   return 0;
 }

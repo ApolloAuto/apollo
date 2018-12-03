@@ -299,6 +299,5 @@ int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   apollo::cyber::Init(argv[0]);
   auto res = RUN_ALL_TESTS();
-  apollo::cyber::Shutdown();
   return res;
 }
