@@ -85,8 +85,6 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   init_x_ = init_state_.x();
   init_y_ = init_state_.y();
   init_phi_ = init_state_.theta();
-  // TODO(Jinyun) workaround the initial small speed to avoid problem in
-  // trajectory partition
   init_v_ = planning_init_point.v();
   // rotate and scale the state according to the origin point defined in
   // frame
@@ -97,8 +95,9 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
       init_x_ * std::cos(-rotate_angle) - init_y_ * std::sin(-rotate_angle);
   init_y_ = tmp_x * std::sin(-rotate_angle) + init_y_ * std::cos(-rotate_angle);
   init_phi_ = common::math::NormalizeAngle(init_phi_ - rotate_angle);
-  // TODO(Jinyun) not able to get gear from trajectory point
-  init_steer_ = 0.0;
+
+  // initial control input
+  init_steer_ = planning_init_point.steer();
   init_a_ = planning_init_point.a();
 
   Eigen::MatrixXd x0(4, 1);
