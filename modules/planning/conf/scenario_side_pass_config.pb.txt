@@ -11,6 +11,7 @@ side_pass_config: {
   approach_obstacle_min_stop_distance: 4.0
   block_obstacle_min_speed: 0.1
   enable_obstacle_blocked_check: true
+  max_backup_stage_cycle_num: 30
 }
 stage_config: {
   stage_type: SIDE_PASS_APPROACH_OBSTACLE
