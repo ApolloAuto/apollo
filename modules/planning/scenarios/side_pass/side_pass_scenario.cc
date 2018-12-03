@@ -230,7 +230,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
       } else {
         // TODO(All): fixed the segmentation bug for large vehicles, otherwise
         // the follow line will be problematic.
-        // is_blocked_by_others = true; break;
+        is_blocked_by_others = true;
+        break;
       }
     }
 
