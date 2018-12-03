@@ -95,11 +95,6 @@ class OpenSpaceTrajectoryGenerator {
   void UpdateDebugInfo(
       ::apollo::planning_internal::OpenSpaceDebug* open_space_debug);
 
-  apollo::common::Status TrajectoryPartition(
-      const Eigen::MatrixXd& state_result_ds,
-      const Eigen::MatrixXd& control_result_ds,
-      const Eigen::MatrixXd& time_result_ds);
-
   void LoadTrajectory(const Eigen::MatrixXd& state_result_ds,
                       const Eigen::MatrixXd& control_result_ds,
                       const Eigen::MatrixXd& time_result_ds);
@@ -115,7 +110,6 @@ class OpenSpaceTrajectoryGenerator {
                        const Eigen::MatrixXd& control_result_ds,
                        const std::vector<double>& XYbounds,
                        const ThreadSafeIndexedObstacles& obstalce_list);
-  void RecordDebugInfo();
 
  private:
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
@@ -138,8 +132,6 @@ class OpenSpaceTrajectoryGenerator {
   Eigen::MatrixXd ego_;
   std::vector<double> XYbounds_;
   apollo::common::Trajectory trajectory_to_end_;
-  apollo::planning_internal::Trajectories trajectory_partition_;
-  std::vector<::apollo::canbus::Chassis::GearPosition> gear_positions_;
   apollo::planning_internal::OpenSpaceDebug open_space_debug_;
 };
 

@@ -372,13 +372,12 @@ Status OpenSpacePlanning::TrajectoryPartition(
   const size_t initial_gear_check_horizon = 3;
   const double kepsilon = 1e-2;
   size_t horizon = stitched_trajectory_to_end.size();
-  if (horizon < initial_gear_check_horizon)
-    return Status(ErrorCode::PLANNING_ERROR, "Invalid trajectory length!");
+  size_t initial_horizon = std::min(horizon, initial_gear_check_horizon);
   int direction_flag = 0;
   size_t i = 0;
   int j = 0;
   int init_direction = 0;
-  while (i != initial_gear_check_horizon) {
+  while (i != initial_horizon) {
     if (stitched_trajectory_to_end[j].v() > kepsilon) {
       i++;
       j++;
@@ -469,6 +468,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
   }
 
   // Choose the one to follow based on the closest partitioned trajectory
+  int trajectories_size = trajectory_partition.trajectory_size();
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
   constexpr double kepsilon_to_destination = 1e-4;
@@ -477,7 +477,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
   double min_distance = std::numeric_limits<double>::max();
-  for (size_t i = 0; i < gear_positions.size(); i++) {
+  for (int i = 0; i < trajectories_size; i++) {
     const apollo::common::Trajectory trajectory =
         trajectory_partition.trajectory(i);
     int trajectory_size = trajectory.trajectory_point_size();
@@ -492,7 +492,8 @@ Status OpenSpacePlanning::TrajectoryPartition(
         (path_end_point.y() - vehicle_state.y()) *
             (path_end_point.y() - vehicle_state.y());
     if (distance_to_trajs_end <= kepsilon_to_destination) {
-      current_trajectory_index = i + 1;
+      current_trajectory_index =
+          (i + 1) >= trajectories_size ? trajectories_size - 1 : i + 1;
       closest_trajectory_point_index = 0;
       break;
     }
