@@ -39,7 +39,6 @@ cc_library(
         "player/player.cc",
         "player/play_task_buffer.cc",
         "player/play_task_producer.cc",
-        "player/terminal_controller.cc",
     ],
     hdrs = [
         "player/play_param.h",
@@ -48,7 +47,6 @@ cc_library(
         "player/player.h",
         "player/play_task_buffer.h",
         "player/play_task_producer.h",
-        "player/terminal_controller.h",
     ],
     deps = [
         "//cyber/common:log",

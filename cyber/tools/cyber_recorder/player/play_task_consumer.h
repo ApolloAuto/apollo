@@ -40,6 +40,7 @@ class PlayTaskConsumer {
   void Start(uint64_t begin_time_ns);
   void Stop();
   void Pause() { is_paused_.exchange(true); }
+  void PlayOnce() { is_playonce_.exchange(true); }
   void Continue() { is_paused_.exchange(false); }
 
   uint64_t base_msg_play_time_ns() const { return base_msg_play_time_ns_; }
@@ -56,6 +57,7 @@ class PlayTaskConsumer {
   TaskBufferPtr task_buffer_;
   std::atomic<bool> is_stopped_;
   std::atomic<bool> is_paused_;
+  std::atomic<bool> is_playonce_;
   uint64_t begin_time_ns_;
   uint64_t base_msg_play_time_ns_;
   uint64_t base_msg_real_time_ns_;
