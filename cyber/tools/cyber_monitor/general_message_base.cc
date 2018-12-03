@@ -64,9 +64,9 @@ int GeneralMessageBase::lineCount(const google::protobuf::Message& msg,
     reflection->ListFields(msg, &fields);
   }
 
-  int fsize = static_cast<int>(fields.size());
+  auto fsize = fields.size();
   int ret = 0;
-  for (int i = 0; i < fsize; ++i) {
+  for (decltype(fsize) i = 0; i < fsize; ++i) {
     ret += lineCountOfField(msg, screenWidth, fields[i], reflection);
   }  // end for
 
