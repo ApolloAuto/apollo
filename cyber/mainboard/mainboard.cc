@@ -40,14 +40,12 @@ int main(int argc, char** argv) {
   ModuleController controller(module_args);
   if (!controller.Init()) {
     controller.Clear();
-    apollo::cyber::Shutdown();
     AERROR << "module start error.";
     return -1;
   }
 
   apollo::cyber::WaitForShutdown();
   controller.Clear();
-  apollo::cyber::Shutdown();
   AINFO << "exit mainboard.";
 
   return 0;

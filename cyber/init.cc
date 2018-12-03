@@ -124,10 +124,7 @@ void OnShutdown(int sig) {
   }
 }
 
-void ExitHandle() {
-  AINFO << "Shutdown in ExitHandle";
-  Shutdown();
-}
+void ExitHandle() { Clear(); }
 
 bool Init(const char* binary_name) {
   std::lock_guard<std::recursive_mutex> lg(g_mutex);
@@ -152,7 +149,7 @@ bool Init(const char* binary_name) {
   return true;
 }
 
-void Shutdown() {
+void Clear() {
   std::lock_guard<std::recursive_mutex> lg(g_mutex);
   if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
     return;

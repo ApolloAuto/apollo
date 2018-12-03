@@ -38,7 +38,7 @@ TEST(CanReceiverTest, ReceiveOne) {
   EXPECT_TRUE(receiver.IsRunning());
   receiver.Stop();
   EXPECT_FALSE(receiver.IsRunning());
-  cyber::Shutdown();
+  // cyber::Clear();
 }
 
 }  // namespace canbus

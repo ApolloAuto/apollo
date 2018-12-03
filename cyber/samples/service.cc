@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
@@ -48,6 +47,5 @@ int main(int argc, char* argv[]) {
   }
 
   apollo::cyber::WaitForShutdown();
-  apollo::cyber::Shutdown();
   return 0;
 }

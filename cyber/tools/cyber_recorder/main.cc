@@ -300,7 +300,6 @@ int main(int argc, char** argv) {
     ::apollo::cyber::Init(argv[0]);
     Info info;
     bool info_result = info.Display(file_path);
-    ::apollo::cyber::Shutdown();
     return info_result ? 0 : -1;
   } else if (command == "recover") {
     if (opt_file_vec.empty()) {
@@ -318,7 +317,6 @@ int main(int argc, char** argv) {
     ::apollo::cyber::Init(argv[0]);
     Recoverer recoverer(opt_file_vec[0], opt_output_vec[0]);
     bool recover_result = recoverer.Proc();
-    ::apollo::cyber::Shutdown();
     return recover_result ? 0 : -1;
   }
 
@@ -343,7 +341,6 @@ int main(int argc, char** argv) {
     Player player(play_param);
     play_result = play_result && player.Init() ? true : false;
     play_result = play_result && player.Start() ? true : false;
-    ::apollo::cyber::Shutdown();
     return play_result ? 0 : -1;
   } else if (command == "record") {
     if (opt_white_channels.empty() && !opt_all) {
@@ -372,7 +369,6 @@ int main(int argc, char** argv) {
       }
       record_result = record_result && recorder->Stop() ? true : false;
     }
-    ::apollo::cyber::Shutdown();
     return record_result ? 0 : -1;
   } else if (command == "split") {
     if (opt_file_vec.empty()) {
@@ -391,7 +387,6 @@ int main(int argc, char** argv) {
     Spliter spliter(opt_file_vec[0], opt_output_vec[0], opt_white_channels,
                     opt_black_channels, opt_begin, opt_end);
     bool split_result = spliter.Proc();
-    ::apollo::cyber::Shutdown();
     return split_result ? 0 : -1;
   }
 

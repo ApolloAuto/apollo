@@ -119,7 +119,6 @@ int main(int argc, char *argv[]) {
   s->Init();
   s->Run();
 
-  apollo::cyber::Shutdown();
 
   return 0;
 }

@@ -57,7 +57,6 @@ namespace planning {
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
     using apollo::common::time::Clock;                   \
     int ret = RUN_ALL_TESTS();                           \
-    ::apollo::cyber::Shutdown();                     \
     return ret;                                          \
   }
 

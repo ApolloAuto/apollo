@@ -36,7 +36,6 @@ Dreamview::~Dreamview() { Stop(); }
 
 void Dreamview::TerminateProfilingMode() {
   Stop();
-  apollo::cyber::Shutdown();
   AWARN << "Profiling timer called shutdown!";
 }
 

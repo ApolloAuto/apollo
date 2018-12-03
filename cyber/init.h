@@ -24,7 +24,7 @@ namespace apollo {
 namespace cyber {
 
 bool Init(const char* binary_name);
-void Shutdown();
+void Clear();
 
 }  // namespace cyber
 }  // namespace apollo

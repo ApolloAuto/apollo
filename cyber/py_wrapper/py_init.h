@@ -44,7 +44,7 @@ bool py_init(const std::string& module_name) {
 
 bool py_ok() { return apollo::cyber::OK(); }
 
-void py_shutdown() { return apollo::cyber::Shutdown(); }
+void py_shutdown() { return apollo::cyber::Clear(); }
 
 bool py_is_shutdown() { return apollo::cyber::IsShutdown(); }
 

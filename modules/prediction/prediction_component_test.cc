@@ -25,7 +25,6 @@ TEST(PredictionComponentTest, Simple) {
   cyber::Init("prediction_component_test");
   PredictionComponent prediction_component;
   EXPECT_EQ(prediction_component.Name(), "prediction");
-  cyber::Shutdown();
 }
 
 }  // namespace prediction

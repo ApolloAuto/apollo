@@ -79,6 +79,5 @@ int main(int argc, char *argv[]) {
   test_write(TEST_FILE);
   sleep(1);
   test_read(TEST_FILE);
-  apollo::cyber::Shutdown();
   return 0;
 }
