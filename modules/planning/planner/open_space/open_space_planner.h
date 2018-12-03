@@ -74,6 +74,7 @@ class OpenSpacePlanner : public Planner {
   virtual ~OpenSpacePlanner() = default;
 
   struct ThreadData {
+    apollo::common::TrajectoryPoint planning_init_point;
     apollo::common::VehicleState vehicle_state;
     double rotate_angle;
     apollo::common::math::Vec2d translate_origin;
@@ -101,7 +102,7 @@ class OpenSpacePlanner : public Planner {
 
   void GenerateDestinationStop(
       const common::TrajectoryPoint& planning_init_point, Frame* frame);
-      
+
   void GenerateTrajectoryThread();
 
   void Stop() override;

@@ -628,7 +628,6 @@ void OpenSpacePlanning::FillPlanningPb(const double timestamp,
     SetFallbackTrajectory(trajectory_pb);
   }
   const double dt = timestamp - Clock::NowInSeconds();
-  ;
   for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() - dt);
   }

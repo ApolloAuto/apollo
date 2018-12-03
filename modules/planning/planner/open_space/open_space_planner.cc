@@ -61,8 +61,6 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
 
 apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
-  planning_init_point_ = planning_init_point;
-
   if (FLAGS_enable_open_space_planner_thread) {
     ADEBUG << "Open space plan in multi-threads mode";
 
@@ -76,6 +74,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
     {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
+      thread_data_.planning_init_point = planning_init_point;
       thread_data_.rotate_angle = open_space_roi_generator_->origin_heading();
       thread_data_.translate_origin = open_space_roi_generator_->origin_point();
       thread_data_.end_pose = open_space_roi_generator_->open_space_end_pose();
@@ -107,6 +106,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   } else {
     // Single thread logic
+    planning_init_point_ = planning_init_point;
     vehicle_state_ = frame->vehicle_state();
     open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
@@ -134,7 +134,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     Status status = open_space_trajectory_generator_->Plan(
         planning_init_point_, vehicle_state_, XYbounds_, rotate_angle_,
         translate_origin_, end_pose_, obstacles_num_, obstacles_edges_num_,
-        obstacles_A_, obstacles_b_, obstalce_list_);
+        obstacles_A_, obstacles_b_,
+        open_space_roi_generator_->openspace_warmstart_obstacles());
     // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
       trajectory_to_end_.Clear();
@@ -207,11 +208,11 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
         trajectory_updated_ = false;
       }
       if (open_space_trajectory_generator_->Plan(
-              thread_data_.vehicle_state, thread_data_.XYbounds,
-              thread_data_.rotate_angle, thread_data_.translate_origin,
-              thread_data_.end_pose, thread_data_.obstacles_num,
-              thread_data_.obstacles_edges_num, thread_data_.obstacles_A,
-              thread_data_.obstacles_b,
+              thread_data_.planning_init_point, thread_data_.vehicle_state,
+              thread_data_.XYbounds, thread_data_.rotate_angle,
+              thread_data_.translate_origin, thread_data_.end_pose,
+              thread_data_.obstacles_num, thread_data_.obstacles_edges_num,
+              thread_data_.obstacles_A, thread_data_.obstacles_b,
               open_space_roi_generator_->openspace_warmstart_obstacles()) ==
           Status::OK()) {
         {
