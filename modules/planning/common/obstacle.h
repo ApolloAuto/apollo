@@ -119,11 +119,6 @@ class Obstacle {
   static std::unique_ptr<Obstacle> CreateStaticVirtualObstacles(
       const std::string& id, const common::math::Box2d& obstacle_box);
 
-  static bool IsVirtualObstacle(
-      const perception::PerceptionObstacle& perception_obstacle) {
-    return perception_obstacle.id() < 0;
-  }
-
   static bool IsValidPerceptionObstacle(
       const perception::PerceptionObstacle& obstacle);
 

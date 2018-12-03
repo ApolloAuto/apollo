@@ -90,7 +90,7 @@ Obstacle::Obstacle(const std::string& id,
       << perception_obstacle.DebugString();
 
   is_static_ = (is_static || obstacle_priority == ObstaclePriority::IGNORE);
-  is_virtual_ = IsVirtualObstacle(perception_obstacle);
+  is_virtual_ = (perception_obstacle.id() < 0);
   speed_ = std::hypot(perception_obstacle.velocity().x(),
                       perception_obstacle.velocity().y());
 }
