@@ -708,7 +708,7 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
       {"front_fisheye", TrafficLightDetection::CAMERA_FRONT_WIDE}
   };
 
-  const auto &lights = frame->traffic_lights;
+  auto &lights = frame->traffic_lights;
   auto *header = (*out_msg)->mutable_header();
   double publish_time = apollo::cyber::Time::Now().ToSecond();
   header->set_timestamp_sec(publish_time);  // message publishing time
@@ -725,20 +725,75 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   }
   (*out_msg)->set_camera_id(CAMERA_ID_TO_TLCAMERA_ID.at(camera_name));
 
-  // add traffic light result
+  // add traffic light result based on voting
+  int cnt_r = 0;
+  int max_r_id = -1;
+  double max_r_conf = 0;
+
+  int cnt_g = 0;
+  int max_g_id = -1;
+  double max_g_conf = 0;
+
+  int cnt_y = 0;
+  int max_y_id = -1;
+  double max_y_conf = 0;
+
+  int max_n_id = -1;
+
   for (size_t i = 0; i < lights.size(); i++) {
-    apollo::perception::TrafficLight *light_result =
-        (*out_msg)->add_traffic_light();
-    light_result->set_id(lights.at(i)->id);
-    light_result->set_confidence(lights.at(i)->status.confidence);
-    light_result->set_color(static_cast<apollo::perception::TrafficLight_Color>
-                            (lights.at(i)->status.color));
-    light_result->set_blink(lights.at(i)->status.blink);
+    switch (lights.at(i)->status.color) {
+      case base::TLColor::TL_RED:
+        cnt_r++;
+        if (lights.at(i)->status.confidence >= max_r_conf) {
+          max_r_id = i;
+          max_r_conf = lights.at(i)->status.confidence;
+        }
+        break;
+      case base::TLColor::TL_GREEN:
+        cnt_g++;
+        if (lights.at(i)->status.confidence >= max_g_conf) {
+          max_g_id = i;
+          max_g_conf = lights.at(i)->status.confidence;
+        }
+        break;
+      case base::TLColor::TL_YELLOW:
+        cnt_y++;
+        if (lights.at(i)->status.confidence >= max_y_conf) {
+          max_y_id = i;
+          max_y_conf = lights.at(i)->status.confidence;
+        }
+        break;
+      default:
+        max_n_id = i;
+        break;
+    }
   }
 
-  // set contain_lights
-  (*out_msg)->set_contain_lights(lights.size() > 0);
+  int max_light_id = -1;
+  if (cnt_r >= cnt_g && cnt_r >= cnt_y && cnt_r > 0)
+    max_light_id = max_r_id;
+  else if (cnt_y > cnt_r && cnt_y >= cnt_g)
+    max_light_id = max_y_id;
+  else if (cnt_g > cnt_r && cnt_g > cnt_y)
+    max_light_id = max_g_id;
+  else if (cnt_r == 0 && cnt_g == 0 && cnt_y == 0)
+    max_light_id = max_n_id;
 
+  // swap the final output light to the first place
+  if (max_light_id > 0)
+    std::swap(lights[0], lights[max_light_id]);
+
+  if (max_light_id > 0) {
+    apollo::perception::TrafficLight *light_result =
+          (*out_msg)->add_traffic_light();
+    light_result->set_id(lights.at(0)->id);
+    light_result->set_confidence(lights.at(0)->status.confidence);
+    light_result->set_color(static_cast<apollo::perception::TrafficLight_Color>
+                            (lights.at(0)->status.color));
+    light_result->set_blink(lights.at(0)->status.blink);
+    // set contain_lights
+    (*out_msg)->set_contain_lights(lights.size() > 0);
+  }
   // add traffic light debug info
   if (!TransformDebugMessage(frame, out_msg)) {
     AERROR << "ProcComponent::Proc failed to transform debug msg.";
@@ -881,7 +936,10 @@ void TrafficLightsPerceptionComponent::Visualize(
     const auto& crop_roi = light->region.debug_roi[0];
     const cv::Rect rect_crop(crop_roi.x, crop_roi.y,
                                crop_roi.width, crop_roi.height);
-    cv::rectangle(output_image, rect_crop, cv::Scalar(255, 255, 255));
+    if (light == lights[0])
+      cv::rectangle(output_image, rect_crop, cv::Scalar(255, 255, 255), 2);
+    else
+      cv::rectangle(output_image, rect_crop, cv::Scalar(255, 255, 255));
 
     // Project lights
     const auto& projection_roi = light->region.projection_roi;
@@ -911,6 +969,8 @@ void TrafficLightsPerceptionComponent::Visualize(
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
   cv::imshow("Traffic Lihgt", output_image);
+  // cv::imwrite("/apollo/debug_vis/" +
+  // std::to_string(frame.timestamp) + ".jpg", output_image);
   cvWaitKey(30);
 }
 
