@@ -105,7 +105,6 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
                                   const double stop_sign_overlap_end_s) {
   const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
-
   double creep_stop_s =
       stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
   const double distance =
@@ -119,6 +118,17 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
       }
       if (obstacle->reference_line_st_boundary().min_t() <
           creep_config.min_boundary_t()) {
+        double obstacle_traveled_s =
+            obstacle->reference_line_st_boundary().BottomLeftPoint().s() -
+            obstacle->reference_line_st_boundary().BottomRightPoint().s();
+        const double kepsilon = 1e-6;
+        // ignore the obstacle which is already on reference line and moving
+        // along the direction of ADC
+        if (obstacle_traveled_s < kepsilon &&
+            obstacle->reference_line_st_boundary().min_t() <
+                creep_config.max_tolerance_t()) {
+          continue;
+        }
         all_far_away = false;
         break;
       }
@@ -129,8 +139,7 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
 }
 
 void DeciderCreep::SetProceedWithCautionSpeedParam(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info,
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const double stop_sign_overlap_end_s) {
   double creep_stop_s =
       stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
@@ -141,9 +150,8 @@ void DeciderCreep::SetProceedWithCautionSpeedParam(
       ->proceed_with_caution_speed.is_fixed_distance = true;
   PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.distance =
       creep_distance;
-  ADEBUG << "creep_stop_s[" << creep_stop_s
-      << "] adc_front_end_s[" <<  adc_front_end_s
-      << "] creep distance[" << creep_distance << "]";
+  ADEBUG << "creep_stop_s[" << creep_stop_s << "] adc_front_end_s["
+         << adc_front_end_s << "] creep distance[" << creep_distance << "]";
 }
 
 }  // namespace planning
