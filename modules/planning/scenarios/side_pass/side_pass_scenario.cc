@@ -1,3 +1,4 @@
+
 /******************************************************************************
  * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
@@ -211,27 +212,29 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     }
 
     bool is_blocked_by_others = false;
-    for (const auto* other_obstacle : path_decision.obstacles().Items()) {
-      if (other_obstacle->Id() == obstacle->Id()) {
-        continue;
-      }
-      if (other_obstacle->PerceptionSLBoundary().start_l() >
-              obstacle->PerceptionSLBoundary().end_l() ||
-          other_obstacle->PerceptionSLBoundary().end_l() <
-              obstacle->PerceptionSLBoundary().start_l()) {
-        // not blocking the backside vehicle
-        continue;
-      }
+    if (side_pass_context_.scenario_config_.enable_obstacle_blocked_check()) {
+      for (const auto* other_obstacle : path_decision.obstacles().Items()) {
+        if (other_obstacle->Id() == obstacle->Id()) {
+          continue;
+        }
+        if (other_obstacle->PerceptionSLBoundary().start_l() >
+                obstacle->PerceptionSLBoundary().end_l() ||
+            other_obstacle->PerceptionSLBoundary().end_l() <
+                obstacle->PerceptionSLBoundary().start_l()) {
+          // not blocking the backside vehicle
+          continue;
+        }
 
-      double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-                       obstacle->PerceptionSLBoundary().end_s();
-      if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
-        continue;
-      } else {
-        // TODO(All): fixed the segmentation bug for large vehicles, otherwise
-        // the follow line will be problematic.
-        is_blocked_by_others = true;
-        break;
+        double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
+            obstacle->PerceptionSLBoundary().end_s();
+        if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
+          continue;
+        } else {
+          // TODO(All): fixed the segmentation bug for large vehicles, otherwise
+          // the follow line will be problematic.
+          is_blocked_by_others = true;
+          break;
+        }
       }
     }
 
