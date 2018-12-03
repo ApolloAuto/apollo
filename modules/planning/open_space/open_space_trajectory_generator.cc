@@ -229,12 +229,14 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
 
 void OpenSpaceTrajectoryGenerator::UpdateTrajectory(
     apollo::common::Trajectory* trajectory_to_end) {
+  trajectory_to_end->Clear();
   trajectory_to_end->mutable_trajectory_point()->CopyFrom(
       *(trajectory_to_end_.mutable_trajectory_point()));
 }
 
 void OpenSpaceTrajectoryGenerator::UpdateDebugInfo(
     planning_internal::OpenSpaceDebug* open_space_debug) {
+  open_space_debug->Clear();
   open_space_debug->CopyFrom(open_space_debug_);
 }
 

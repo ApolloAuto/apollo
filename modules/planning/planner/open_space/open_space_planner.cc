@@ -65,12 +65,12 @@ apollo::common::Status OpenSpacePlanner::Plan(
     ADEBUG << "Open space plan in multi-threads mode";
 
     // Update Vehicle information and obstacles information from frame.
-    vehicle_state_ = frame->vehicle_state();
     open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
     }
+    vehicle_state_ = frame->vehicle_state();
 
     {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
@@ -85,34 +85,39 @@ apollo::common::Status OpenSpacePlanner::Plan(
       thread_data_.obstacles_b = open_space_roi_generator_->obstacles_b();
       thread_data_.XYbounds = open_space_roi_generator_->ROI_xy_boundary();
     }
-    // 3. Check if trajectory updated, if so, update internal
-    // trajectory_partition_;
+
+    // Check destination
+    if (CheckDestination(thread_data_.planning_init_point,
+                         thread_data_.end_pose)) {
+      GenerateStopTrajectory(thread_data_.planning_init_point,
+                             &trajectory_to_end_);
+      LoadTrajectoryToFrame(frame);
+      AINFO << "Init point reach destination, stop trajectory is "
+               "sent";
+      return Status::OK();
+    }
+
+    // Check if trajectory updated
     if (trajectory_updated_) {
       AINFO << "Trajectories have been updated!";
       std::lock_guard<std::mutex> lock(open_space_mutex_);
-      trajectory_to_end_.Clear();
-      open_space_debug_.Clear();
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
+      LoadTrajectoryToFrame(frame);
     }
-
-    publishable_trajectory_.Clear();
-    publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
-        *(trajectory_to_end_.mutable_trajectory_point()));
-    frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
-    frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
 
     return Status::OK();
 
   } else {
     // Single thread logic
-    planning_init_point_ = planning_init_point;
-    vehicle_state_ = frame->vehicle_state();
     open_space_roi_generator_.reset(new OpenSpaceROI());
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
     }
+
+    planning_init_point_ = planning_init_point;
+    vehicle_state_ = frame->vehicle_state();
     rotate_angle_ = open_space_roi_generator_->origin_heading();
     translate_origin_ = open_space_roi_generator_->origin_point();
     end_pose_ = open_space_roi_generator_->open_space_end_pose();
@@ -123,8 +128,9 @@ apollo::common::Status OpenSpacePlanner::Plan(
     XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
 
     // Check destination
-    if (CheckDestination(planning_init_point, end_pose_)) {
-      GenerateDestinationStop(planning_init_point, frame);
+    if (CheckDestination(planning_init_point_, end_pose_)) {
+      GenerateStopTrajectory(planning_init_point, &trajectory_to_end_);
+      LoadTrajectoryToFrame(frame);
       AINFO << "Init point reach destination, stop trajectory is "
                "sent";
       return Status::OK();
@@ -136,66 +142,17 @@ apollo::common::Status OpenSpacePlanner::Plan(
         translate_origin_, end_pose_, obstacles_num_, obstacles_edges_num_,
         obstacles_A_, obstacles_b_,
         open_space_roi_generator_->openspace_warmstart_obstacles());
+
     // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
-      trajectory_to_end_.Clear();
-      open_space_debug_.Clear();
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
-      publishable_trajectory_.Clear();
-      publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
-          *(trajectory_to_end_.mutable_trajectory_point()));
-      frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
-      frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
+      LoadTrajectoryToFrame(frame);
       return status;
     } else {
       return status;
     }
   }
-}
-
-bool OpenSpacePlanner::CheckDestination(
-    const common::TrajectoryPoint& planning_init_point,
-    const std::vector<double>& end_pose) {
-  CHECK_EQ(end_pose.size(), 4);
-  constexpr double kepsilon = 1e-4;
-  const apollo::common::PathPoint path_point = planning_init_point.path_point();
-  double distance =
-      (path_point.x() - end_pose[0]) * (path_point.x() - end_pose[0]) +
-      (path_point.y() - end_pose[1]) * (path_point.y() - end_pose[1]);
-  if (distance < kepsilon) {
-    return true;
-  }
-  return false;
-}
-
-void OpenSpacePlanner::GenerateDestinationStop(
-    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
-  constexpr int stop_trajectory_length = 10;
-  constexpr double relative_stop_time = 0.1;
-  apollo::common::Trajectory trajectory_to_stop;
-  double stop_x = planning_init_point.path_point().x();
-  double stop_y = planning_init_point.path_point().y();
-  double stop_theta = planning_init_point.path_point().theta();
-  double relative_time = 0;
-  for (int i = 0; i < stop_trajectory_length; i++) {
-    apollo::common::TrajectoryPoint* point =
-        trajectory_to_stop.add_trajectory_point();
-    point->mutable_path_point()->set_x(stop_x);
-    point->mutable_path_point()->set_x(stop_y);
-    point->mutable_path_point()->set_x(stop_theta);
-    point->mutable_path_point()->set_s(0.0);
-    point->mutable_path_point()->set_kappa(0.0);
-    point->set_relative_time(relative_time);
-    point->set_v(0.0);
-    point->set_a(0.0);
-    relative_time += relative_stop_time;
-  }
-  trajectory_to_end_.Clear();
-  publishable_trajectory_.Clear();
-  publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
-      *(trajectory_to_end_.mutable_trajectory_point()));
-  frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
 }
 
 void OpenSpacePlanner::GenerateTrajectoryThread() {
@@ -229,6 +186,56 @@ void OpenSpacePlanner::Stop() {
   if (FLAGS_enable_open_space_planner_thread) {
     task_future_.get();
   }
+}
+
+bool OpenSpacePlanner::CheckDestination(
+    const common::TrajectoryPoint& planning_init_point,
+    const std::vector<double>& end_pose) {
+  CHECK_EQ(end_pose.size(), 4);
+  constexpr double kepsilon = 1e-4;
+  const apollo::common::PathPoint path_point = planning_init_point.path_point();
+  double distance =
+      (path_point.x() - end_pose[0]) * (path_point.x() - end_pose[0]) +
+      (path_point.y() - end_pose[1]) * (path_point.y() - end_pose[1]);
+  if (distance < kepsilon) {
+    return true;
+  }
+  return false;
+}
+
+void OpenSpacePlanner::GenerateStopTrajectory(
+    const common::TrajectoryPoint& planning_init_point,
+    common::Trajectory* trajectory_to_end) {
+  constexpr int stop_trajectory_length = 10;
+  constexpr double relative_stop_time = 0.1;
+  apollo::common::Trajectory trajectory_to_stop;
+  double stop_x = planning_init_point.path_point().x();
+  double stop_y = planning_init_point.path_point().y();
+  double stop_theta = planning_init_point.path_point().theta();
+  double relative_time = 0;
+  for (int i = 0; i < stop_trajectory_length; i++) {
+    apollo::common::TrajectoryPoint* point =
+        trajectory_to_stop.add_trajectory_point();
+    point->mutable_path_point()->set_x(stop_x);
+    point->mutable_path_point()->set_x(stop_y);
+    point->mutable_path_point()->set_x(stop_theta);
+    point->mutable_path_point()->set_s(0.0);
+    point->mutable_path_point()->set_kappa(0.0);
+    point->set_relative_time(relative_time);
+    point->set_v(0.0);
+    point->set_a(0.0);
+    relative_time += relative_stop_time;
+  }
+  trajectory_to_end->mutable_trajectory_point()->CopyFrom(
+      *(trajectory_to_stop.mutable_trajectory_point()));
+}
+
+void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
+  publishable_trajectory_.Clear();
+  publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
+      *(trajectory_to_end_.mutable_trajectory_point()));
+  frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
+  frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
 }
 
 }  // namespace planning
