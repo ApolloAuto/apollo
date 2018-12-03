@@ -32,6 +32,7 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::base::AtomicRWLock;
 using croutine::CRoutine;
 
 class ChoreographyContext : public ProcessorContext {
@@ -47,7 +48,7 @@ class ChoreographyContext : public ProcessorContext {
   std::mutex mtx_wq_;
   std::condition_variable cv_wq_;
 
-  std::mutex mtx_cr_queue_;
+  AtomicRWLock rq_lk_;
   std::multimap<uint32_t, std::shared_ptr<CRoutine>, std::greater<uint32_t>>
       cr_queue_;
 };

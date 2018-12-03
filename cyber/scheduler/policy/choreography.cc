@@ -28,6 +28,9 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::WriteLockGuard;
+
 using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
@@ -37,16 +40,11 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
     return nullptr;
   }
 
-  std::lock_guard<std::mutex> lock(mtx_cr_queue_);
+  ReadLockGuard<AtomicRWLock> lock(rq_lk_);
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
     // FIXME: Remove Acquire() and Release() if there is no race condtion.
     if (!cr->Acquire()) {
-      continue;
-    }
-
-    if (cr->state() == RoutineState::FINISHED) {
-      it = cr_queue_.erase(it);
       continue;
     }
 
@@ -67,7 +65,7 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
 bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
                                             cr->processor_id());
-  std::lock_guard<std::mutex> lk(mtx_cr_queue_);
+  WriteLockGuard<AtomicRWLock> lock(rq_lk_);
   cr_queue_.emplace(cr->priority(), cr);
   return true;
 }
@@ -85,7 +83,7 @@ void ChoreographyContext::Wait() {
 }
 
 void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
-  std::lock_guard<std::mutex> lock(mtx_cr_queue_);
+  WriteLockGuard<AtomicRWLock> lock(rq_lk_);
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
     if (cr->id() == crid) {
