@@ -16,7 +16,7 @@
 
 #include "cyber/tools/cyber_recorder/player/player.h"
 
-#include <iostream>
+#include <termios.h>
 
 #include "cyber/init.h"
 
@@ -31,9 +31,7 @@ Player::Player(const PlayParam& play_param)
       is_stopped_(true),
       consumer_(nullptr),
       producer_(nullptr),
-      term_ctrl_(nullptr),
       task_buffer_(nullptr) {
-  term_ctrl_.reset(new TerminalController());
   task_buffer_ = std::make_shared<PlayTaskBuffer>();
   consumer_.reset(new PlayTaskConsumer(task_buffer_, play_param.play_rate));
   producer_.reset(new PlayTaskProducer(task_buffer_, play_param));
@@ -55,6 +53,39 @@ bool Player::Init() {
   return false;
 }
 
+static char Getch() {
+  char buf = 0;
+  struct termios old = {0};
+  fflush(stdout);
+  if (tcgetattr(0, &old) < 0) perror("tcsetattr()");
+  old.c_lflag &= ~ICANON;
+  old.c_lflag &= ~ECHO;
+  old.c_cc[VMIN] = 1;
+  old.c_cc[VTIME] = 0;
+  if (tcsetattr(0, TCSANOW, &old) < 0) perror("tcsetattr ICANON");
+  if (read(0, &buf, 1) < 0) perror("read()");
+  old.c_lflag |= ICANON;
+  old.c_lflag |= ECHO;
+  if (tcsetattr(0, TCSADRAIN, &old) < 0) perror("tcsetattr ~ICANON");
+  return buf;
+}
+
+void Player::ThreadFunc_Term() {
+  while (!is_stopped_.load()) {
+    char ch = Getch();
+    switch (ch) {
+      case 's':
+        is_playonce_ = true;
+        break;
+      case ' ':
+        is_paused_ = !is_paused_;
+        break;
+      default:
+        break;
+    }
+  }
+}
+
 bool Player::Start() {
   if (!is_initialized_.load()) {
     AERROR << "please call Init firstly.";
@@ -66,9 +97,8 @@ bool Player::Start() {
     return false;
   }
 
-  term_ctrl_->SetUp();
   std::cout << "\nPlease wait for loading...\n"
-            << "Hit Ctrl+C to stop, or Space to pause.\n"
+            << "Hit Ctrl+C to stop, Space to pause, or 's' to step.\n"
             << std::endl;
   producer_->Start();
 
@@ -81,24 +111,18 @@ bool Player::Start() {
 
   std::ios::fmtflags before(std::cout.flags());
   std::cout << std::fixed;
-  bool is_paused = false;
   const double total_progress_time_s =
       static_cast<double>(play_param.end_time_ns - play_param.begin_time_ns) /
           1e9 +
       static_cast<double>(play_param.start_time_s);
 
+  term_thread_.reset(new std::thread(&Player::ThreadFunc_Term, this));
   while (!is_stopped_.load() && apollo::cyber::OK()) {
-    auto character = term_ctrl_->ReadChar();
-    switch (character) {
-      case ' ':
-        is_paused = !is_paused;
-        break;
-
-      default:
-        break;
+    if (is_playonce_) {
+      consumer_->PlayOnce();
+      is_playonce_ = false;
     }
-
-    if (is_paused) {
+    if (is_paused_) {
       consumer_->Pause();
       std::cout << "\r[PAUSED ] Record Time: ";
     } else {
@@ -142,11 +166,12 @@ bool Player::Stop() {
   if (is_stopped_.exchange(true)) {
     return false;
   }
-
-  term_ctrl_->TearDown();
   producer_->Stop();
   consumer_->Stop();
-
+  if (term_thread_ != nullptr && term_thread_->joinable()) {
+    term_thread_->join();
+    term_thread_ = nullptr;
+  }
   return true;
 }
 

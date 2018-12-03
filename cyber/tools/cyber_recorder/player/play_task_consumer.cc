@@ -33,6 +33,7 @@ PlayTaskConsumer::PlayTaskConsumer(const TaskBufferPtr& task_buffer,
       task_buffer_(task_buffer),
       is_stopped_(true),
       is_paused_(false),
+      is_playonce_(false),
       base_msg_play_time_ns_(0),
       base_msg_real_time_ns_(0),
       last_played_msg_real_time_ns_(0) {
@@ -103,9 +104,13 @@ void PlayTaskConsumer::ThreadFunc() {
     }
 
     task->Play();
-    last_played_msg_real_time_ns_ = task->msg_real_time_ns();
+    is_playonce_.exchange(false);
 
+    last_played_msg_real_time_ns_ = task->msg_real_time_ns();
     while (is_paused_.load() && !is_stopped_.load()) {
+      if (is_playonce_.load()) {
+        break;
+      }
       std::this_thread::sleep_for(std::chrono::nanoseconds(kPauseSleepNanoSec));
       accumulated_pause_time_ns += kPauseSleepNanoSec;
     }

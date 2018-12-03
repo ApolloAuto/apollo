@@ -25,7 +25,6 @@
 #include "cyber/tools/cyber_recorder/player/play_task_buffer.h"
 #include "cyber/tools/cyber_recorder/player/play_task_consumer.h"
 #include "cyber/tools/cyber_recorder/player/play_task_producer.h"
-#include "cyber/tools/cyber_recorder/player/terminal_controller.h"
 
 namespace apollo {
 namespace cyber {
@@ -35,7 +34,6 @@ class Player {
  public:
   using ConsumerPtr = std::unique_ptr<PlayTaskConsumer>;
   using ProducerPtr = std::unique_ptr<PlayTaskProducer>;
-  using TermCtrlPtr = std::unique_ptr<TerminalController>;
   using TaskBufferPtr = std::shared_ptr<PlayTaskBuffer>;
 
   explicit Player(const PlayParam& play_param);
@@ -44,14 +42,17 @@ class Player {
   bool Init();
   bool Start();
   bool Stop();
-
  private:
-  std::atomic<bool> is_initialized_;
-  std::atomic<bool> is_stopped_;
+  void ThreadFunc_Term();
+ private:
+  std::atomic<bool> is_initialized_ = {false};
+  std::atomic<bool> is_stopped_ = {false};
+  std::atomic<bool> is_paused_ = {false};
+  std::atomic<bool> is_playonce_ = {false};
   ConsumerPtr consumer_;
   ProducerPtr producer_;
-  TermCtrlPtr term_ctrl_;
   TaskBufferPtr task_buffer_;
+  std::shared_ptr<std::thread> term_thread_ = nullptr;
   static const uint64_t kSleepIntervalMiliSec;
 };
 
