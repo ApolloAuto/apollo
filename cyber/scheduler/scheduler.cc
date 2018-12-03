@@ -41,7 +41,7 @@ bool Scheduler::CreateTask(const RoutineFactory& factory,
 bool Scheduler::CreateTask(std::function<void()>&& func,
                            const std::string& name,
                            std::shared_ptr<DataVisitorBase> visitor) {
-  if (stop_) {
+  if (unlikely(stop_.load())) {
     ADEBUG << "scheduler is stoped, cannot create task!";
     return false;
   }
@@ -58,7 +58,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
 
   if (visitor != nullptr) {
     visitor->RegisterNotifyCallback([this, task_id, name]() {
-      if (stop_) {
+      if (unlikely(stop_.load())) {
         return;
       }
       this->NotifyProcessor(task_id);
@@ -68,7 +68,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
 }
 
 bool Scheduler::NotifyTask(uint64_t crid) {
-  if (stop_) {
+  if (unlikely(stop_.load())) {
     return true;
   }
   return NotifyProcessor(crid);
@@ -107,7 +107,7 @@ void Scheduler::ParseCpuset(const std::string& str, std::vector<int>* cpuset) {
 }
 
 void Scheduler::Shutdown() {
-  if (stop_.exchange(true)) {
+  if (unlikely(stop_.exchange(true))) {
     return;
   }
 
