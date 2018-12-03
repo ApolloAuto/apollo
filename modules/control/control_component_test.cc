@@ -55,7 +55,7 @@ class ControlComponentTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     FLAGS_control_conf_file =
-        "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
+        "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
     FLAGS_is_control_test_mode = true;
 
     SetupCyber();

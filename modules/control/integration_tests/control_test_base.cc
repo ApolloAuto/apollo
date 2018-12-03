@@ -186,7 +186,7 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
 
 void ControlTestBase::SetUpTestCase() {
   FLAGS_control_conf_file =
-      "/apollo/modules/control/testdata/conf/lincoln.pb.txt";
+      "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
   FLAGS_is_control_test_mode = true;
 }
 

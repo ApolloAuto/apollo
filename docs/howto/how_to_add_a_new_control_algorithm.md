@@ -73,7 +73,7 @@ To add the new controller configuration complete the following steps:
       };
     ```
 
-5. When the `protobuf` definition is complete, update the control configuration file accordingly at `modules/control/conf/lincoln.pb.txt`
+5. When the `protobuf` definition is complete, update the control configuration file accordingly at `modules/control/conf/control_conf.pb.txt`
 
 ```
 Note: The above `control/conf` file is the default for Apollo.  Your project may use a different control configuration file.

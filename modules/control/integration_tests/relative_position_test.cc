@@ -39,7 +39,7 @@ class RelativePositionTest : public ControlTestBase {
     FLAGS_test_data_dir =
         "/apollo/modules/control/testdata/relative_position_test/";
     FLAGS_control_conf_file =
-        "/apollo/modules/control/testdata/conf/lincoln_lite.pb.txt";
+        "/apollo/modules/control/testdata/conf/control_conf_lite.pb.txt";
     FLAGS_use_navigation_mode = true;
   }
 };
