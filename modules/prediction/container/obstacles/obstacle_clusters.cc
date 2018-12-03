@@ -43,6 +43,10 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
     const double start_s, const double length,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   std::string lane_id = lane_info_ptr->id().id();
+
+  // If this lane_segment has been used for constructing LaneGraph,
+  // fetch the previously saved LaneGraph, modify its start_s,
+  // then return this (save the time to construct the entire LaneGraph).
   if (lane_graphs_.find(lane_id) != lane_graphs_.end()) {
     LaneGraph* lane_graph = &lane_graphs_[lane_id];
     for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
@@ -58,6 +62,9 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
     }
     return lane_graphs_[lane_id];
   }
+
+  // If this lane_segment has not been used for constructing LaneGraph,
+  // construct the LaneGraph and return.
   RoadGraph road_graph(start_s, length, lane_info_ptr);
   LaneGraph lane_graph;
   road_graph.BuildLaneGraph(&lane_graph);

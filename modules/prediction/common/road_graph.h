@@ -56,15 +56,32 @@ class RoadGraph {
                      const LaneGraph& lane_graph);
 
  private:
+  /**
+    * @brief
+    * @param The accumulated s starting from the obstacle's position.
+    * @param The starting s of the lane_segment to compute lane_sequence,
+    *        this should be start_s_ for the first time, and zero for
+    *        subsequent recursions.
+    * @param The LaneInfo the current lane segment we are looking at.
+    * @param The max. number of recursive calls (so that it won't recurse
+    *        for too many times when given unreasonable speed info. etc.)
+    * @param The vector of lane_segments visited (DFS).
+    * @param The LaneGraph that we need to write in.
+  */
   void ComputeLaneSequence(const double accumulated_s, const double start_s,
                            std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+                           const int graph_search_horizon,
                            std::vector<LaneSegment>* const lane_segments,
-                           LaneGraph* const lane_graph_ptr,
-                           const int graph_search_horizon) const;
+                           LaneGraph* const lane_graph_ptr) const;
 
  private:
+  // The s of the obstacle on its own lane_segment.
   double start_s_ = 0;
+
+  // The total length to search for lane_graph.
   double length_ = -1.0;
+
+  // The lane_info of the lane_segment where the obstacle is on.
   std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr_ = nullptr;
 };
 

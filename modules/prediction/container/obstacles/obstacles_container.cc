@@ -40,6 +40,7 @@ void ObstaclesContainer::Insert(const Message& message) {
   perception_obstacles.CopyFrom(
       dynamic_cast<const PerceptionObstacles&>(message));
 
+  // Update the timestamp_ of the ObstaclesContainer
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
@@ -53,17 +54,19 @@ void ObstaclesContainer::Insert(const Message& message) {
            << timestamp_ << "].";
     return;
   }
-
   if (FLAGS_prediction_offline_mode) {
     if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
         FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
       FeatureOutput::Write();
     }
   }
-
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
+
+  // Set up the ObstacleClusters:
+  // 1. Initialize ObstacleClusters
   ObstacleClusters::Init();
+  // 2. Insert the Obstacles one by one
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
@@ -72,7 +75,9 @@ void ObstaclesContainer::Insert(const Message& message) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
            << "was inserted";
   }
+  // 3. Sort the Obstacles
   ObstacleClusters::SortObstacles();
+  // 4. Deduct the NearbyObstacles info. from the sorted Obstacles
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     if (IsPredictable(perception_obstacle)) {
@@ -102,6 +107,7 @@ void ObstaclesContainer::Clear() {
 
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
+  // Sanity checks.
   const int id = perception_obstacle.id();
   if (id < -1) {
     AERROR << "Invalid ID [" << id << "]";
@@ -111,11 +117,13 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     ADEBUG << "Perception obstacle [" << id << "] is not predictable.";
     return;
   }
+
+  // Insert the obstacle and also update the LRUCache.
   curr_frame_predictable_obstacle_ids_.push_back(id);
   Obstacle* obstacle_ptr = obstacles_.Get(id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->Insert(perception_obstacle, timestamp);
-    ADEBUG << "Insert obstacle [" << id << "]";
+    ADEBUG << "Refresh obstacle [" << id << "]";
   } else {
     Obstacle obstacle;
     obstacle.Insert(perception_obstacle, timestamp);

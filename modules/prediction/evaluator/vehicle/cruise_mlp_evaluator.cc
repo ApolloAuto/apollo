@@ -132,6 +132,8 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  ADEBUG << "There are " << lane_graph_ptr->lane_sequence_size()
+         << " lane sequences with probabilities:";
   // For every possible lane sequence, extract needed features.
   // Then compute the likelihood of the obstacle moving onto that laneseq.
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
@@ -160,6 +162,7 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     }
     double probability = model_output(0, 0);
     double finish_time = model_output(0, 1);
+    ADEBUG << probability;
     lane_sequence_ptr->set_probability(probability);
     lane_sequence_ptr->set_time_to_lane_center(finish_time);
   }
@@ -189,6 +192,7 @@ void CruiseMLPEvaluator::ExtractFeatureValues
            << obstacle_feature_values.size() << ".";
     return;
   }
+  ADEBUG << "Obstacle feature size = " << obstacle_feature_values.size();
   feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
 
@@ -202,6 +206,7 @@ void CruiseMLPEvaluator::ExtractFeatureValues
            << interaction_feature_values.size() << ".";
     return;
   }
+  ADEBUG << "Interaction feature size = " << interaction_feature_values.size();
   feature_values->insert(feature_values->end(),
                          interaction_feature_values.begin(),
                          interaction_feature_values.end());
@@ -215,6 +220,7 @@ void CruiseMLPEvaluator::ExtractFeatureValues
            << ".";
     return;
   }
+  ADEBUG << "Lane feature size = " << lane_feature_values.size();
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
 
@@ -264,6 +270,8 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
       obstacle_ptr->timestamp() - FLAGS_prediction_duration;
   int count = 0;
   // Starting from the most recent timestamp and going backward.
+  ADEBUG << "Obstacle has " << obstacle_ptr->history_size()
+         << " history timestamps.";
   for (std::size_t i = 0; i < obstacle_ptr->history_size(); ++i) {
     const Feature& feature = obstacle_ptr->feature(i);
     if (!feature.IsInitialized()) {
@@ -271,6 +279,9 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
     }
     if (feature.timestamp() < obs_feature_history_start_time) {
       break;
+    }
+    if (!feature.has_lane()) {
+      ADEBUG << "Feature has no lane. Quit.";
     }
     if (feature.has_lane() && feature.lane().has_lane_feature()) {
       thetas.push_back(feature.lane().lane_feature().angle_diff());
@@ -282,6 +293,9 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
       timestamps.push_back(feature.timestamp());
       speeds.push_back(feature.speed());
       ++count;
+    } else {
+      ADEBUG << "Feature has no lane_feature!!!";
+      ADEBUG << feature.lane().current_lane_feature_size();
     }
     if (feature.has_position() &&
         i < FLAGS_cruise_historical_frame_length) {
@@ -304,6 +318,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
     }
   }
   if (count <= 0) {
+    ADEBUG << "There is no feature with lane info. Quit.";
     return;
   }
 
