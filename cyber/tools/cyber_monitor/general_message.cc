@@ -42,20 +42,26 @@ void GeneralMessage::Render(const Screen* s, int key) {
       p = p->parent();
     }
 
-    GeneralChannelMessage* parentPtr =
+    GeneralChannelMessage* channelMsgPtr =
         static_cast<GeneralChannelMessage*>(p->parent());
     s->AddStr(0, lineNo++, "ChannelName: ");
-    s->AddStr(parentPtr->GetChannelName().c_str());
+    s->AddStr(channelMsgPtr->GetChannelName().c_str());
 
     s->AddStr(0, lineNo++, "MessageType: ");
-    s->AddStr(parentPtr->message_type().c_str());
+    s->AddStr(channelMsgPtr->message_type().c_str());
 
     std::ostringstream outStr;
-    outStr << std::fixed << std::setprecision(FrameRatio_Precision) << parentPtr->frame_ratio();
+    outStr << std::fixed << std::setprecision(FrameRatio_Precision) << channelMsgPtr->frame_ratio();
     s->AddStr(0, lineNo++, "FrameRatio: ");
     s->AddStr(outStr.str().c_str());
 
     clear();
+
+    auto channelMsg = channelMsgPtr->CopyMsgPtr();
+    if (!channelMsgPtr->raw_msg_class_->ParseFromString(channelMsg->message)) {
+      s->AddStr(0, lineNo++, "Cannot Parse the message for Real-Time Updating");
+      return;
+    }
 
     if (message_ptr_ && reflection_ptr_) {
       int size = 0;
@@ -66,6 +72,13 @@ void GeneralMessage::Render(const Screen* s, int key) {
             field_->containing_type()->options().map_entry()) {
           size = 1;
         }
+      }
+
+      if (size <= itemIndex_) {
+        outStr.str("");
+        outStr << "The item [" << itemIndex_ << "] has been empty !!!";
+        s->AddStr(0, lineNo++, outStr.str().c_str());
+        return;
       }
 
       switch (key) {

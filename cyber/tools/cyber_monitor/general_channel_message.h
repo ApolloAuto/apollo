@@ -23,6 +23,7 @@
 #include "general_message_base.h"
 
 class CyberTopologyMessage;
+class GeneralMessage;
 
 class GeneralChannelMessage : public GeneralMessageBase {
  public:
@@ -182,8 +183,8 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   google::protobuf::Message* raw_msg_class_;
 
-  friend class GeneralMessageBase;
   friend class CyberTopologyMessage;
+  friend class GeneralMessage;
 };  // GeneralChannelMessage
 
 #endif  // TOOLS_CVT_MONITOR_GENERAL_CHANNEL_MESSAGE_H_
