@@ -57,11 +57,13 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
         return cr;
       }
 
-      if (cr->state() == RoutineState::SLEEP &&
-          (!need_sleep_ || wake_time_ > cr->wake_time())) {
-        need_sleep_ = true;
-        wake_time_ = cr->wake_time();
+      if (unlikely(cr->state() == RoutineState::SLEEP)) {
+        if (!need_sleep_ || wake_time_ > cr->wake_time()) {
+          need_sleep_ = true;
+          wake_time_ = cr->wake_time();
+        }
       }
+
       cr->Release();
     }
   }
@@ -75,7 +77,7 @@ void ClassicContext::Wait() {
     return;
   }
 
-  if (need_sleep_) {
+  if (unlikely(need_sleep_)) {
     auto duration = wake_time_ - std::chrono::steady_clock::now();
     cv_wq_.wait_for(lk, duration);
     need_sleep_ = false;

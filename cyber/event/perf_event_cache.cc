@@ -20,6 +20,7 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 #include "cyber/state.h"
 #include "cyber/time/time.h"
 
@@ -88,12 +89,12 @@ void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
 void PerfEventCache::AddTransportEvent(const TransPerf event_id,
                                        const uint64_t channel_id,
                                        const uint64_t msg_seq) {
-  if (!enable_) {
+  if (likely(!enable_)) {
     return;
   }
 
-  if (perf_conf_.type() != PerfType::TRANSPORT &&
-      perf_conf_.type() != PerfType::ALL) {
+  if (unlikely(perf_conf_.type() != PerfType::TRANSPORT &&
+      perf_conf_.type() != PerfType::ALL)) {
     return;
   }
 
