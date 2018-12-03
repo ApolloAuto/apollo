@@ -62,7 +62,7 @@ class OpenSpaceROI {
 
   const common::math::Vec2d &origin_point() { return origin_point_; }
 
-  const ThreadSafeIndexedObstacles &openspace_warmstart_obstacles() {
+  const IndexedObstacles &openspace_warmstart_obstacles() {
     return openspace_warmstart_obstacles_;
   }
 
@@ -142,7 +142,7 @@ class OpenSpaceROI {
   //                            |------|
   //                                ^
   //                          down_boundary
-  ThreadSafeIndexedObstacles openspace_warmstart_obstacles_;
+  IndexedObstacles openspace_warmstart_obstacles_;
 
   // @brief in the order of [x_min, x_max, y_min, y_max];
   std::vector<double> ROI_xy_boundary_;

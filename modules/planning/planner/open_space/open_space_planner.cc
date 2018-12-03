@@ -70,11 +70,11 @@ apollo::common::Status OpenSpacePlanner::Plan(
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
     }
-    vehicle_state_ = frame->vehicle_state();
 
     {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       thread_data_.planning_init_point = planning_init_point;
+      thread_data_.vehicle_state = frame->vehicle_state();
       thread_data_.rotate_angle = open_space_roi_generator_->origin_heading();
       thread_data_.translate_origin = open_space_roi_generator_->origin_point();
       thread_data_.end_pose = open_space_roi_generator_->open_space_end_pose();
@@ -84,6 +84,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
       thread_data_.obstacles_A = open_space_roi_generator_->obstacles_A();
       thread_data_.obstacles_b = open_space_roi_generator_->obstacles_b();
       thread_data_.XYbounds = open_space_roi_generator_->ROI_xy_boundary();
+      thread_data_.warmstart_obstacles =
+          open_space_roi_generator_->openspace_warmstart_obstacles();
     }
 
     // Check destination
@@ -126,6 +128,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     obstacles_A_ = open_space_roi_generator_->obstacles_A();
     obstacles_b_ = open_space_roi_generator_->obstacles_b();
     XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
+    warmstart_obstacles_ =
+        open_space_roi_generator_->openspace_warmstart_obstacles();
 
     // Check destination
     if (CheckDestination(planning_init_point_, end_pose_)) {
@@ -140,8 +144,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     Status status = open_space_trajectory_generator_->Plan(
         planning_init_point_, vehicle_state_, XYbounds_, rotate_angle_,
         translate_origin_, end_pose_, obstacles_num_, obstacles_edges_num_,
-        obstacles_A_, obstacles_b_,
-        open_space_roi_generator_->openspace_warmstart_obstacles());
+        obstacles_A_, obstacles_b_, warmstart_obstacles_);
 
     // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
@@ -170,8 +173,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
               thread_data_.translate_origin, thread_data_.end_pose,
               thread_data_.obstacles_num, thread_data_.obstacles_edges_num,
               thread_data_.obstacles_A, thread_data_.obstacles_b,
-              open_space_roi_generator_->openspace_warmstart_obstacles()) ==
-          Status::OK()) {
+              thread_data_.warmstart_obstacles) == Status::OK()) {
         {
           std::lock_guard<std::mutex> lock(open_space_mutex_);
           trajectory_updated_ = true;

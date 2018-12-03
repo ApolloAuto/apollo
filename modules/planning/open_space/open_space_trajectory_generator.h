@@ -84,7 +84,7 @@ class OpenSpaceTrajectoryGenerator {
       const std::vector<double>& end_pose, std::size_t obstacles_num,
       const Eigen::MatrixXi& obstacles_edges_num,
       const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      const ThreadSafeIndexedObstacles& obstalce_list);
+      const IndexedObstacles& obstalce_list);
 
   bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
 
@@ -109,7 +109,7 @@ class OpenSpaceTrajectoryGenerator {
                        const Eigen::MatrixXd& state_result_ds,
                        const Eigen::MatrixXd& control_result_ds,
                        const std::vector<double>& XYbounds,
-                       const ThreadSafeIndexedObstacles& obstalce_list);
+                       const IndexedObstacles& obstalce_list);
 
  private:
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
