@@ -212,9 +212,9 @@ Chassis TransitController::chassis() {
   }
 
   if (motion21.has_llc_fbk_steeringangle()) {
-    chassis_.set_steering_percentage(motion21.llc_fbk_steeringangle() * M_PI /
-                                     180 / vehicle_params_.max_steer_angle() *
-                                     100);
+    chassis_.set_steering_percentage(-1.0 * motion21.llc_fbk_steeringangle() *
+                                     M_PI / 180 /
+                                     vehicle_params_.max_steer_angle() * 100);
   }
 
   auto& aux = transit.llc_auxiliaryfeedback_120();
@@ -422,10 +422,10 @@ void TransitController::Steer(double angle) {
     return;
   }
   // TODO(All): remove -1.0 once Udelv has a complete fix.
-  const double real_angle = button_pressed_
-                                ? -1.0 * vehicle_params_.max_steer_angle() *
-                                      angle / 100.0 * 180 / M_PI / 2
-                                : 0;
+  const double real_angle =
+      button_pressed_
+          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI / 2
+          : 0;
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
 }
 
@@ -440,10 +440,10 @@ void TransitController::Steer(double angle, double angle_spd) {
   }
 
   // TODO(All): remove -1.0 once Udelv has a complete fix.
-  const double real_angle = button_pressed_
-                                ? -1.0 * vehicle_params_.max_steer_angle() *
-                                      angle / 100.0 * 180 / M_PI
-                                : 0;
+  const double real_angle =
+      button_pressed_
+          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI
+          : 0;
 
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
   // TODO(QiL) : re-enable the angle_spd ajustment
