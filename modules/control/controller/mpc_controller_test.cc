@@ -45,7 +45,8 @@ class MPCControllerTest : public ::testing::Test, MPCController {
   virtual void SetupTestCase() {
     FLAGS_v = 4;
     FLAGS_control_conf_file =
-        "/apollo/modules//control/testdata/mpc_controller_test/lincoln.pb.txt ";
+        "/apollo/modules//control/testdata/mpc_controller_test/"
+        "control_conf.pb.txt ";
     ControlConf control_conf;
     CHECK(apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
                                                  &control_conf));

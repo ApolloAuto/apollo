@@ -73,7 +73,7 @@ class NewController : public Controller {
       };
     ```
 
-5. `protobuf`定义完成后，在`modules/control/conf/lincoln.pb.txt`中相应更新控制配置文件。
+5. `protobuf`定义完成后，在`modules/control/conf/control_conf.pb.txt`中相应更新控制配置文件。
 
 ```
 注意：上面的"control/conf"文件是Apollo的默认文件。您的项目可能使用不同的控制配置文件.

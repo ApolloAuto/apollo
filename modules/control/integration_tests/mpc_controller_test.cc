@@ -39,7 +39,8 @@ class MPCControllerTest : public ControlTestBase {
     FLAGS_test_data_dir =
         "/apollo/modules/control/testdata/mpc_controller_test/";
     FLAGS_control_conf_file =
-        "/apollo/modules/control/testdata/mpc_controller_test/lincoln.pb.txt";
+        "/apollo/modules/control/testdata/mpc_controller_test/"
+        "control_conf.pb.txt";
     FLAGS_use_navigation_mode = false;
   }
 };

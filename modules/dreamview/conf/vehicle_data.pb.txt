@@ -4,7 +4,7 @@ data_files {
 }
 data_files {
   source_path: "calibration_table.pb.txt"
-  dest_path: "/apollo/modules/control/conf/lincoln.pb.txt"
+  dest_path: "/apollo/modules/control/conf/control_conf.pb.txt"
 }
 data_files {
   source_path: "cancard_params/canbus_conf.pb.txt"
