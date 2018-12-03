@@ -40,6 +40,7 @@ Processor::Processor() {
 }
 
 Processor::~Processor() {
+  Stop();
   if (thread_.joinable()) {
     thread_.join();
   }
