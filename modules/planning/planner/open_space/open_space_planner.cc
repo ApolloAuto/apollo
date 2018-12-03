@@ -125,8 +125,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // Check destination
     if (CheckDestination(planning_init_point, end_pose_)) {
       GenerateDestinationStop(planning_init_point, frame);
-      ADEBUG << "Init point reach destination, stop trajectory is "
-                "sent";
+      AINFO << "Init point reach destination, stop trajectory is "
+               "sent";
       return Status::OK();
     }
 
