@@ -187,7 +187,7 @@ TEST(Obstacle, CreateStaticVirtualObstacle) {
       Obstacle::CreateStaticVirtualObstacles("abc", box);
   EXPECT_EQ("abc", obstacle->Id());
   EXPECT_EQ(-314721735, obstacle->PerceptionId());
-  EXPECT_TRUE(Obstacle::IsVirtualObstacle(obstacle->Perception()));
+  EXPECT_TRUE(obstacle->IsVirtual());
   auto& perception_box = obstacle->PerceptionBoundingBox();
   EXPECT_DOUBLE_EQ(0.0, perception_box.center().x());
   EXPECT_DOUBLE_EQ(0.0, perception_box.center().y());

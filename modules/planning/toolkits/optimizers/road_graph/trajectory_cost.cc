@@ -83,7 +83,7 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
          ptr_obstacle->Perception().type() ==
              perception::PerceptionObstacle::PEDESTRIAN);
 
-    if (Obstacle::IsVirtualObstacle(ptr_obstacle->Perception())) {
+    if (ptr_obstacle->IsVirtual()) {
       // Virtual obstacle
       continue;
     } else if (ptr_obstacle->IsStatic() || is_bycycle_or_pedestrian) {
