@@ -74,6 +74,7 @@ message ScenarioSidePassConfig {
   optional double block_obstacle_min_speed = 4 [default = 0.1]; // m/s
   // set to false to work around large vehicle splitting issue in perception
   optional bool enable_obstacle_blocked_check = 5 [default = true];
+  optional uint32 max_backup_stage_cycle_num = 6 [default = 30];
 }
 
 message ScenarioStopSignUnprotectedConfig {
