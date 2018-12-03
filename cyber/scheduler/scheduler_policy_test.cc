@@ -61,11 +61,11 @@ TEST(SchedulerPolicyTest, classic) {
   // test multiple routine
   FOR_EACH(i, 0, 20) {
     res.emplace_back(Async([i]() {
-      FOR_EACH(time, 0, 50) { cyber::SleepFor(std::chrono::milliseconds(i)); }
+      FOR_EACH(time, 0, 30) { cyber::SleepFor(std::chrono::milliseconds(i)); }
     }));
   };
   for (auto& future : res) {
-    future.get();
+    future.wait_for(std::chrono::milliseconds(1000));
   }
   res.clear();
 
