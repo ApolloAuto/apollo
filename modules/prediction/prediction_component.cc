@@ -215,6 +215,8 @@ void PredictionComponent::OnPerception(
   ADEBUG << "Time for scenario_manager: "
          << diff.count() * 1000 << " msec.";
 
+  // If in junction, BuildJunctionFeature();
+  // If not, BuildLaneGraph().
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
   if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
       FLAGS_enable_junction_feature) {
@@ -225,27 +227,23 @@ void PredictionComponent::OnPerception(
   diff = end_time4 - end_time3;
   ADEBUG << "Time to build junction features: "
          << diff.count() * 1000 << " msec.";
-
   // TODO(kechxu) refactor logic of build lane graph and build junction feature
-  // Set up obstacle cluster
   ptr_obstacles_container->BuildLaneGraph();
   auto end_time5 = std::chrono::system_clock::now();
   diff = end_time5 - end_time4;
   ADEBUG << "Time to build cruise features: "
          << diff.count() * 1000 << " msec.";
-
   ADEBUG << "Received a perception message ["
          << perception_msg.ShortDebugString() << "].";
 
+  // Insert ADC into the obstacle_container as well.
   auto ptr_ego_pose_container = ContainerManager::Instance()->GetContainer<
       PoseContainer>(AdapterConfig::LOCALIZATION);
   auto ptr_ego_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
-
   CHECK(ptr_ego_pose_container != nullptr &&
       ptr_ego_trajectory_container != nullptr);
-
   const PerceptionObstacle* ptr_ego_vehicle =
       ptr_ego_pose_container->ToPerceptionObstacle();
   if (ptr_ego_vehicle != nullptr) {
@@ -266,12 +264,10 @@ void PredictionComponent::OnPerception(
   ADEBUG << "Time to evaluate: "
         << diff.count() * 1000 << " msec.";
 
-  // No prediction trajectories for offline mode
+  // Make predictions
   if (FLAGS_prediction_offline_mode) {
     return;
   }
-
-  // Make predictions
   PredictorManager::Instance()->Run(perception_msg);
   auto end_time8 = std::chrono::system_clock::now();
   diff = end_time8 - end_time7;
@@ -329,6 +325,8 @@ bool PredictionComponent::Proc(
   frame_start_time_ = Clock::NowInSeconds();
   auto end_time1 = std::chrono::system_clock::now();
 
+  // Read localization info. and call OnLocalization to update
+  // the PoseContainer.
   localization_reader_->Observe();
   auto ptr_localization_msg = localization_reader_->GetLatestObserved();
   if (ptr_localization_msg == nullptr) {
@@ -342,6 +340,8 @@ bool PredictionComponent::Proc(
   ADEBUG << "Time for updating PoseContainer: "
         << diff.count() * 1000 << " msec.";
 
+  // Read planning info. of last frame and call OnPlanning to update
+  // the ADCTrajectoryContainer
   planning_reader_->Observe();
   auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
   if (ptr_trajectory_msg != nullptr) {
@@ -353,6 +353,8 @@ bool PredictionComponent::Proc(
   ADEBUG << "Time for updating ADCTrajectoryContainer: "
         << diff.count() * 1000 << " msec.";
 
+  // Get all perception_obstacles of this frame and call OnPerception to
+  // process them all.
   auto perception_msg = *perception_obstacles;
   OnPerception(perception_msg);
   auto end_time4 = std::chrono::system_clock::now();

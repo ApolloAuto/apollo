@@ -161,6 +161,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
     return;
   }
 
+  // Set ID and Type of the feature.
   Feature feature;
   if (SetId(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
@@ -171,7 +172,6 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 
   // Set obstacle observation for KF tracking
   SetStatus(perception_obstacle, timestamp, &feature);
-
   if (!FLAGS_use_navigation_mode) {
     // Update KF
     if (!kf_motion_tracker_.IsInitialized()) {
@@ -184,15 +184,14 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
       }
       UpdateKFPedestrianTracker(feature);
     }
-
     // Update obstacle status based on KF if enabled
     if (FLAGS_enable_kf_tracking) {
       UpdateStatus(&feature);
     }
   }
 
+  // Set obstacle lane features
   if (type_ != PerceptionObstacle::PEDESTRIAN) {
-    // Set obstacle lane features
     SetCurrentLanes(&feature);
     SetNearbyLanes(&feature);
   }
@@ -1011,28 +1010,32 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 }
 
 void Obstacle::BuildLaneGraph() {
+  // Sanity checks.
   if (history_size() == 0) {
     AERROR << "No feature found.";
     return;
   }
+
   Feature* feature = mutable_latest_feature();
+  // No need to BuildLaneGraph for those non-moving obstacles.
   if (feature->is_still()) {
     ADEBUG << "Not build lane graph for still obstacle";
     return;
   }
   double speed = feature->speed();
-  double road_graph_distance = std::max(
+  double road_graph_search_distance = std::max(
       speed * FLAGS_prediction_duration +
       0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
       FLAGS_prediction_duration, FLAGS_min_prediction_length);
 
+  // BuildLaneGraph for current lanes.
   int seq_id = 0;
   int curr_lane_count = 0;
   for (auto& lane : feature->lane().current_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
     const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
-        lane.lane_s(), road_graph_distance, lane_info);
+        lane.lane_s(), road_graph_search_distance, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++curr_lane_count;
     }
@@ -1053,12 +1056,13 @@ void Obstacle::BuildLaneGraph() {
     }
   }
 
+  // BuildLaneGraph for neighbor lanes.
   int nearby_lane_count = 0;
   for (auto& lane : feature->lane().nearby_lane_feature()) {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
     const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
-        lane.lane_s(), road_graph_distance, lane_info);
+        lane.lane_s(), road_graph_search_distance, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++nearby_lane_count;
     }
@@ -1083,7 +1087,6 @@ void Obstacle::BuildLaneGraph() {
     SetLanePoints(feature);
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph());
   }
-
   ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
 }
 
