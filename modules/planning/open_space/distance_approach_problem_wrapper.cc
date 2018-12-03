@@ -153,14 +153,14 @@ class ObstacleContainer {
     }
   }
 
-  const ThreadSafeIndexedObstacles& GetObstacleList() { return obstacles_list; }
+  const IndexedObstacles& GetObstacleList() { return obstacles_list; }
   Eigen::MatrixXd GetAMatrix() { return obstacles_A_; }
   Eigen::MatrixXd GetbMatrix() { return obstacles_b_; }
   std::size_t GetObstaclesNum() { return obstacles_num_; }
   Eigen::MatrixXi GetObstaclesEdgesNum() { return obstacles_edges_num_; }
 
  private:
-  ThreadSafeIndexedObstacles obstacles_list;
+  IndexedObstacles obstacles_list;
   std::size_t obstacles_num_ = 0;
   Eigen::MatrixXi obstacles_edges_num_;
   std::vector<std::vector<Vec2d>> obstacles_vertices_vec_;

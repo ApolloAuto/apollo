@@ -45,9 +45,8 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   delta_t_ = planner_open_space_config_.delta_t();
 }
 
-bool HybridAStar::AnalyticExpansion(
-    std::shared_ptr<Node3d> current_node,
-    const ThreadSafeIndexedObstacles& obstacles) {
+bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
+                                    const IndexedObstacles& obstacles) {
   std::shared_ptr<ReedSheppPath> reeds_shepp_to_check =
       ReedSheppPath_cache_[current_node->GetIndex()];
   if (!RSPCheck(reeds_shepp_to_check, obstacles)) {
@@ -74,7 +73,7 @@ bool HybridAStar::ReedSheppHeuristic(
 
 bool HybridAStar::RSPCheck(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
-    const ThreadSafeIndexedObstacles& obstacles) {
+    const IndexedObstacles& obstacles) {
   for (size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
     std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
         reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
@@ -87,7 +86,7 @@ bool HybridAStar::RSPCheck(
 }
 
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node,
-                                const ThreadSafeIndexedObstacles& obstacles) {
+                                const IndexedObstacles& obstacles) {
   if (obstacles.Items().empty()) {
     return true;
   }
@@ -314,8 +313,7 @@ bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
 
 bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
                        double ephi, const std::vector<double>& XYbounds,
-                       const ThreadSafeIndexedObstacles& obstacles,
-                       Result* result) {
+                       const IndexedObstacles& obstacles, Result* result) {
   // clear containers
   open_set_.clear();
   close_set_.clear();

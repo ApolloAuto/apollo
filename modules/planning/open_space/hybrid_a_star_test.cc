@@ -61,7 +61,7 @@ TEST_F(HybridATest, test1) {
   double ex = 15.0;
   double ey = 0.0;
   double ephi = 0.0;
-  ThreadSafeIndexedObstacles obstacles_list;
+  IndexedObstacles obstacles_list;
   Result result;
   Vec2d obstacle_center(0.0, 0.0);
   Box2d obstacle_box(obstacle_center, 0.0, 2.0, 2.0);

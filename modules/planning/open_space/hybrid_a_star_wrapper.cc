@@ -36,10 +36,10 @@ class HybridAObstacleContainer {
         std::to_string(id), obstacle_box);
     obstacles_list.Add(obstacle->Id(), *obstacle);
   }
-  const ThreadSafeIndexedObstacles& GetObstacleList() { return obstacles_list; }
+  const IndexedObstacles& GetObstacleList() { return obstacles_list; }
 
  private:
-  ThreadSafeIndexedObstacles obstacles_list;
+  IndexedObstacles obstacles_list;
 };
 
 class HybridAResultContainer {

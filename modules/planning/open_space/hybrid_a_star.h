@@ -71,19 +71,19 @@ class HybridAStar {
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
             double ephi, const std::vector<double>& XYbounds,
-            const ThreadSafeIndexedObstacles& obstacles, Result* result);
+            const IndexedObstacles& obstacles, Result* result);
 
  private:
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
-                         const ThreadSafeIndexedObstacles& obstacles);
+                         const IndexedObstacles& obstacles);
   bool ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
                           std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
   // check collision and validity
   bool ValidityCheck(std::shared_ptr<Node3d> node,
-                     const ThreadSafeIndexedObstacles& obstacles);
+                     const IndexedObstacles& obstacles);
   // check Reeds Shepp path collision and validity
   bool RSPCheck(const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
-                const ThreadSafeIndexedObstacles& obstacles);
+                const IndexedObstacles& obstacles);
   // load the whole RSP as nodes and add to the close set
   std::shared_ptr<Node3d> LoadRSPinCS(
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,

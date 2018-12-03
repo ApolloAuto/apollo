@@ -84,6 +84,7 @@ class OpenSpacePlanner : public Planner {
     Eigen::MatrixXd obstacles_A;
     Eigen::MatrixXd obstacles_b;
     std::vector<double> XYbounds;
+    IndexedObstacles warmstart_obstacles;
   };
 
   std::string Name() override { return "OPEN_SPACE"; }
@@ -128,6 +129,7 @@ class OpenSpacePlanner : public Planner {
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
   std::vector<double> XYbounds_;
+  IndexedObstacles warmstart_obstacles_;
 
   planning_internal::OpenSpaceDebug open_space_debug_;
   apollo::common::Trajectory trajectory_to_end_;
