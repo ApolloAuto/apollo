@@ -11,6 +11,9 @@ message DeciderCreepConfig {
   optional double max_valid_stop_distance = 3 [default = 0.3];  // meter
   // min boundary t to ignore obstacles while creeping
   optional double min_boundary_t = 4 [default = 6.0];  // second
+  // max tolerance t to ignore obstacles which are moving on same direction 
+  // of ADC while creeping
+  optional double max_tolerance_t = 5 [default = 0.5];  // second
 }
 
 message RuleCrosswalkConfig {
