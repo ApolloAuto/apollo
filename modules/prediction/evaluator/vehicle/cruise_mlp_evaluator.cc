@@ -162,7 +162,8 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       if (lane_sequence_ptr->vehicle_on_lane()) {
         go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
       } else {
-        cutin_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
+        cutin_model_ptr_->Run(
+            {lane_feature_mat, obs_feature_mat}, &model_output);
       }
       double probability = model_output(0, 0);
       double finish_time = model_output(0, 1);
@@ -226,13 +227,10 @@ void CruiseMLPEvaluator::ExtractFeatureValues
            << ".";
     return;
   }
-<<<<<<< f21750a16c089e4ea73213ca7f280eef518e48b9
+
   ADEBUG << "Lane feature size = " << lane_feature_values.size();
-  feature_values->insert(feature_values->end(), lane_feature_values.begin(),
-=======
   feature_values->insert(feature_values->end(),
                          lane_feature_values.begin(),
->>>>>>> Prediction: input feature refactor.
                          lane_feature_values.end());
 
   // For offline training, write the extracted features into proto.
@@ -280,7 +278,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   double obs_feature_history_start_time =
       obstacle_ptr->timestamp() - FLAGS_prediction_trajectory_time_length;
   int count = 0;
-  //int num_available_history_frames = 0;
+  // int num_available_history_frames = 0;
   double prev_timestamp = obs_curr_feature.timestamp();
 
   // Starting from the most recent timestamp and going backward.
@@ -355,7 +353,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
         i < FLAGS_cruise_historical_frame_length) {
       vel_heading_history[i] = WorldAngleToObjAngle
           (feature.velocity_heading(), obs_curr_heading);
-      if(i != 0) {
+      if (i != 0) {
         vel_heading_changing_rate_history[i] =
             (vel_heading_history[i-1] - vel_heading_history[i]) /
             (FLAGS_double_precision + feature.timestamp() - prev_timestamp);
@@ -597,7 +595,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
   }
 
   double heading = feature.velocity_heading();
-  double speed = feature.speed();
+  // double speed = feature.speed();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
     if (feature_values->size() >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       break;
@@ -637,7 +635,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
     double relative_s_new = 2 * feature_values->operator[](size - 4) -
                                 feature_values->operator[](size - 9);
     double relative_ang_new = feature_values->operator[](size - 3);
-    double centri_acc_new = 0.0;
+    // double centri_acc_new = 0.0;
 
     feature_values->push_back(relative_l_new);
     feature_values->push_back(relative_s_new);
