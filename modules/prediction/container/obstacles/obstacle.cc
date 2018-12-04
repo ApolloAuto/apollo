@@ -479,7 +479,7 @@ void Obstacle::SetPolygonPoints(const PerceptionObstacle& perception_obstacle,
     ADEBUG << "Obstacle [" << id_ << "] has new corner point [" << std::fixed
            << std::setprecision(6) << x << ", " << std::fixed
            << std::setprecision(6) << y << ", " << std::fixed
-           << std::setprecision(6) << z << "].";    
+           << std::setprecision(6) << z << "].";
   }
 }
 
