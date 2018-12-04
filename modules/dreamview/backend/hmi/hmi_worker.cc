@@ -45,6 +45,9 @@ DEFINE_double(status_publish_interval, 5, "HMI Status publish interval.");
 DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
               "Key to store hmi_status.current_mode in KV DB.");
 
+DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
+              "Default HMI Mode when there is no cache.");
+
 DEFINE_string(container_meta_ini, "/apollo/meta.ini",
               "Container meta info file.");
 
@@ -238,13 +241,20 @@ void HMIWorker::InitStatus() {
     status_.add_vehicles(vehicle.first);
   }
 
+  // Initial HMIMode by priority:
+  //   1. NavigationMode if --use_navigation_mode is specified explicitly.
+  //   2. CachedMode if it's stored in KV database.
+  //   3. default_hmi_mode if it is available.
+  //   4. Pick the first available mode.
+  const std::string cached_mode = KVDB::Get(FLAGS_current_mode_db_key);
   if (FLAGS_use_navigation_mode && ContainsKey(modes, kNavigationModeName)) {
     ChangeMode(kNavigationModeName);
+  } else if (ContainsKey(modes, cached_mode)) {
+    ChangeMode(cached_mode);
+  } else if (ContainsKey(modes, FLAGS_default_hmi_mode)) {
+    ChangeMode(FLAGS_default_hmi_mode);
   } else {
-    // Change to the last active mode, or else the first one in options.
-    const std::string cached_mode = KVDB::Get(FLAGS_current_mode_db_key);
-    ChangeMode(
-        ContainsKey(modes, cached_mode) ? cached_mode : modes.begin()->first);
+    ChangeMode(modes.begin()->first);
   }
 }
 
