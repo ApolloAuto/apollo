@@ -248,7 +248,6 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
   *nearest_obstacle = nullptr;
   double s_of_nearest_obs = 0.0;
   for (const auto* obstacle : indexed_obstacle_list.Items()) {
-    ADEBUG << "=============================";
     ADEBUG << "Looking at Obstacle: " << obstacle->Id();
 
     if (obstacle->IsVirtual()) {
