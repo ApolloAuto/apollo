@@ -325,13 +325,14 @@ function release() {
   cd -
 
   # setup cyber binaries and convert from //path:target to path/target
-  CYBERBIN=$(bazel query "kind(cc_binary, //cyber/...)" | sed 's/^\/\///' | sed 's/:/\//' | sed '/.*.so$/d')
+  CYBERBIN=$(bazel query "kind(cc_binary, //...)" | sed 's/^\/\///' | sed 's/:/\//' | sed '/.*.so$/d')
   for BIN in ${CYBERBIN}; do
     cp -P --parent "bazel-bin/${BIN}" ${APOLLO_RELEASE_DIR}
   done
   cp --parent "cyber/setup.bash" "${APOLLO_RELEASE_DIR}"
   cp --parent -a "cyber/tools/cyber_launch" "${APOLLO_RELEASE_DIR}"
   cp --parent -a "cyber/tools/cyber_tools_auto_complete.bash" "${APOLLO_RELEASE_DIR}"
+  cp --parent -a "cyber/python" "${APOLLO_RELEASE_DIR}"
 
 
   # setup tools
@@ -345,17 +346,18 @@ function release() {
   done
 
   # modules data, conf and dag
-  CONFS=$(find modules/ -name "conf")
-  DATAS=$(find modules/ -name "data")
+  CONFS=$(find modules/ cyber/ -name "conf")
+  DATAS=$(find modules/ -name "data" | grep -v "testdata")
   DAGS=$(find modules/ -name "dag")
   LAUNCHS=$(find modules/ -name "launch")
+  PARAMS=$(find modules/ -name "params" | grep -v "testdata")
 
   rm -rf test/*
   for CONF in $CONFS; do
     cp -P --parent -a "${CONF}" "${APOLLO_RELEASE_DIR}"
   done
   for DATA in $DATAS; do
-    if [[ $DATA != *"map"* && $DATA != *"testdata"* ]]; then
+    if [[ $DATA != *"map"* ]]; then
         cp -P --parent -a "${DATA}" "${APOLLO_RELEASE_DIR}"
     fi
   done
@@ -364,6 +366,9 @@ function release() {
   done
   for LAUNCH in $LAUNCHS; do
     cp -P --parent -a "${LAUNCH}" "${APOLLO_RELEASE_DIR}"
+  done
+  for PARAM in $PARAMS; do
+    cp -P --parent -a "${PARAM}" "${APOLLO_RELEASE_DIR}"
   done
   # perception model 
   MODEL="modules/perception/model"
@@ -387,7 +392,7 @@ function release() {
   if $USE_ESD_CAN; then
     warn_proprietary_sw
   fi
-  THIRDLIBS=$(find third_party/* -name "*.so" -type f)
+  THIRDLIBS=$(find third_party/* -name "*.so*")
   for LIB in ${THIRDLIBS}; do
     cp -a "${LIB}" $LIB_DIR
   done
