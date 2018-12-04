@@ -256,14 +256,15 @@ bool PullOver::OnOverlap(const double start_s, const double end_s) {
   }
 
   // junction
-  const std::vector<PathOverlap>& junction_overlaps =
-      reference_line.map_path().junction_overlaps();
-  for (const auto& junction_overlap : junction_overlaps) {
-    if (start_s <= junction_overlap.end_s &&
-        end_s >= junction_overlap.start_s) {
-      ADEBUG << "s[" << start_s << ", " << end_s << "] on junction_overlap["
-             << junction_overlap.object_id << "] s[" << junction_overlap.start_s
-             << ", " << junction_overlap.end_s << "]";
+  const std::vector<PathOverlap>& pnc_junction_overlaps =
+      reference_line.map_path().pnc_junction_overlaps();
+  for (const auto& pnc_junction_overlap : pnc_junction_overlaps) {
+    if (start_s <= pnc_junction_overlap.end_s &&
+        end_s >= pnc_junction_overlap.start_s) {
+      ADEBUG << "s[" << start_s << ", " << end_s << "] on pnc_junction_overlap["
+             << pnc_junction_overlap.object_id << "] s["
+             << pnc_junction_overlap.start_s
+             << ", " << pnc_junction_overlap.end_s << "]";
       return true;
     }
   }
