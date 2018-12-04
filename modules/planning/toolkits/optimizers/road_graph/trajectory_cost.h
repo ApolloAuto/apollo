@@ -73,6 +73,8 @@ class TrajectoryCost {
   common::math::Box2d GetBoxFromSLPoint(const common::SLPoint &sl,
                                         const double dl) const;
 
+  bool IsOffRoad(const double ref_s, const double l, const double dl);
+
   const DpPolyPathConfig config_;
   const ReferenceLine *reference_line_ = nullptr;
   bool is_change_lane_path_ = false;

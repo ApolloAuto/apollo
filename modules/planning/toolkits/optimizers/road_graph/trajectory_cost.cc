@@ -118,27 +118,17 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     return (b + std::exp(-k * (x - l0))) / (1.0 + std::exp(-k * (x - l0)));
   };
 
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  const double width = vehicle_config.vehicle_param().width();
-
   for (double curve_s = 0.0; curve_s < (end_s - start_s);
        curve_s += config_.path_resolution()) {
     const double l = curve.Evaluate(0, curve_s);
 
     path_cost += l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
 
-    double left_width = 0.0;
-    double right_width = 0.0;
-    reference_line_->GetLaneWidth(curve_s + start_s, &left_width, &right_width);
-
-    constexpr double kBuff = 0.2;
-    if (!is_change_lane_path_ && (l + width / 2.0 + kBuff > left_width ||
-                                  l - width / 2.0 - kBuff < -right_width)) {
+    const double dl = std::fabs(curve.Evaluate(1, curve_s));
+    if (!is_change_lane_path_ && IsOffRoad(curve_s + start_s, l, dl)) {
       cost.cost_items[ComparableCost::OUT_OF_BOUNDARY] = true;
     }
 
-    const double dl = std::fabs(curve.Evaluate(1, curve_s));
     path_cost += dl * dl * config_.path_dl_cost();
 
     const double ddl = std::fabs(curve.Evaluate(2, curve_s));
@@ -153,6 +143,33 @@ ComparableCost TrajectoryCost::CalculatePathCost(
   }
   cost.smoothness_cost = path_cost;
   return cost;
+}
+
+bool TrajectoryCost::IsOffRoad(const double ref_s, const double l,
+                               const double dl) {
+  Vec2d position(ref_s, l);
+
+  const auto &param = common::VehicleConfigHelper::GetConfig().vehicle_param();
+  Vec2d vec_to_center(
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
+
+  Vec2d center(position + vec_to_center.rotate(std::atan(dl)));
+
+  const double buffer = 0.1;  // in meters
+  const auto ego_box = Box2d(center, std::atan(dl), param.length() + buffer,
+                             param.width() + buffer);
+
+  double left_width = 0.0;
+  double right_width = 0.0;
+  reference_line_->GetLaneWidth(ref_s, &left_width, &right_width);
+
+  for (const auto &corner : ego_box.GetAllCorners()) {
+    if (corner.y() > left_width || corner.y() < -right_width) {
+      return true;
+    }
+  }
+  return false;
 }
 
 ComparableCost TrajectoryCost::CalculateStaticObstacleCost(
