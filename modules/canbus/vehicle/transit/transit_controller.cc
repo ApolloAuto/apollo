@@ -424,7 +424,7 @@ void TransitController::Steer(double angle) {
   // TODO(All): remove -1.0 once Udelv has a complete fix.
   const double real_angle =
       button_pressed_
-          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI / 2
+          ? vehicle_params_.max_steer_angle() * angle / 100.0 * 180 / M_PI
           : 0;
   adc_motioncontrol1_10_->set_adc_cmd_steerwheelangle(real_angle);
 }
