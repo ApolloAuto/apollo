@@ -22,41 +22,39 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-Block::Block()
-    : is_writing_(false),
-      reading_reference_counts_(0),
-      msg_size_(0),
-      msg_info_size_(0) {}
+const int32_t Block::kRWLockFree = 0;
+const int32_t Block::kWriteExclusive = -1;
+
+Block::Block() : msg_size_(0), msg_info_size_(0) {}
 
 Block::~Block() {}
 
 bool Block::TryLockForWrite() {
-  WriteLockGuard<AtomicRWLock> lock(read_write_mutex_);
-  if (is_writing_.load()) {
-    ADEBUG << "block is writing.";
-    return false;
-  } else if (reading_reference_counts_.load() != 0) {
-    ADEBUG << "block is reading.";
+  int32_t rw_lock_free = kRWLockFree;
+  if (!lock_num_.compare_exchange_weak(rw_lock_free, kWriteExclusive,
+                                       std::memory_order_acq_rel,
+                                       std::memory_order_relaxed)) {
+    ADEBUG << "lock num: " << lock_num_.load();
     return false;
   }
-  is_writing_.store(true);
   return true;
 }
 
 bool Block::TryLockForRead() {
-  ReadLockGuard<AtomicRWLock> lock(read_write_mutex_);
-  if (is_writing_.load()) {
-    ADEBUG << "block is writing.";
+  int32_t lock_num = lock_num_.load();
+  if (lock_num < kRWLockFree ||
+      !lock_num_.compare_exchange_weak(lock_num, lock_num + 1,
+                                       std::memory_order_acq_rel,
+                                       std::memory_order_relaxed)) {
     return false;
   }
-
-  reading_reference_counts_.fetch_add(1);
   return true;
 }
 
-void Block::ReleaseWriteLock() { is_writing_.store(false); }
+void Block::ReleaseWriteLock() { lock_num_.fetch_add(1); }
 
-void Block::ReleaseReadLock() { reading_reference_counts_.fetch_sub(1); }
+void Block::ReleaseReadLock() { lock_num_.fetch_sub(1); }
+
 }  // namespace transport
 }  // namespace cyber
 }  // namespace apollo
