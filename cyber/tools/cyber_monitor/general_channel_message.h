@@ -106,6 +106,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
         message_type_(),
         frame_counter_(0),
         last_time_(apollo::cyber::Time::Now()),
+        msg_time_(last_time_.ToNanosecond() + 1),
         channel_node_(nullptr),
         node_name_(nodeName),
         readers_(), writers_(),
@@ -139,6 +140,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   void updateRawMessage(
       const std::shared_ptr<apollo::cyber::message::RawMessage>& rawMsg) {
     set_has_message_come(true);
+    msg_time_ = apollo::cyber::Time::MonoTime();
     ++frame_counter_;
     std::lock_guard<std::mutex> _g(inner_lock_);
     channel_message_.reset();
@@ -168,6 +170,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   std::string message_type_;
   std::atomic<int> frame_counter_;
   apollo::cyber::Time last_time_;
+  apollo::cyber::Time msg_time_;
 
   std::unique_ptr<apollo::cyber::Node> channel_node_;
 

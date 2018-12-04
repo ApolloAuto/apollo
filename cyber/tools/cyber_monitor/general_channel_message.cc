@@ -80,14 +80,16 @@ bool GeneralChannelMessage::isErrorCode(void* ptr) {
 
 double GeneralChannelMessage::frame_ratio(void) {
   if (!is_enabled() || !has_message_come()) return 0.0;
-  apollo::cyber::Time curTime = apollo::cyber::Time::Now();
-  auto deltaTime = curTime - last_time_;
-
+  auto curMsgTime = msg_time_;
+  auto deltaTime = curMsgTime - last_time_;
   if (deltaTime.ToNanosecond() > 1000000000) {
-    last_time_ = curTime;
     int old = frame_counter_;
-    while(!frame_counter_.compare_exchange_strong(old, 0)) {}
+    while (!frame_counter_.compare_exchange_strong(old, 0)) {
+    }
+    curMsgTime = msg_time_;
+    deltaTime = curMsgTime - last_time_;
     frame_ratio_ = old / deltaTime.ToSecond();
+    last_time_ = curMsgTime;
   }
 
   return (frame_ratio_);
