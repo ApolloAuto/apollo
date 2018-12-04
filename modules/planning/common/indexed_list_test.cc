@@ -67,5 +67,19 @@ TEST(IndexedList, Find) {
   ASSERT_EQ(nullptr, object.Find(2));
 }
 
+TEST(IndexedList, Copy) {
+  StringIndexedList b_object;
+  b_object.Add(1, "one");
+  b_object.Add(2, "two");
+  StringIndexedList a_object;
+  a_object.Add(3, "three");
+  a_object.Add(4, "four");
+  a_object = b_object;
+  ASSERT_NE(nullptr, a_object.Find(1));
+  ASSERT_NE(nullptr, a_object.Find(2));
+  ASSERT_EQ(nullptr, a_object.Find(3));
+  ASSERT_EQ(nullptr, a_object.Find(4));
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -85,6 +85,24 @@ class IndexedList {
    */
   const std::vector<const T*>& Items() const { return object_list_; }
 
+  /**
+   * @brief List all the items in the container.
+   * @return the unordered_map of ids and objects in the container.
+   */
+  const std::unordered_map<I, T>& Dict() const { return object_dict_; }
+
+  /**
+   * @brief Copy the container with objects.
+   */
+  IndexedList& operator=(const IndexedList& other) {
+    this->object_list_.clear();
+    this->object_dict_.clear();
+    for (const auto& item : other.Dict()) {
+      Add(item.first, item.second);
+    }
+    return *this;
+  }
+
  private:
   std::vector<const T*> object_list_;
   std::unordered_map<I, T> object_dict_;
