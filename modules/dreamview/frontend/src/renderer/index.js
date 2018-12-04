@@ -279,6 +279,7 @@ class Renderer {
 
     sendRoutingRequest() {
         return this.routingEditor.sendRoutingRequest(this.adc.mesh.position,
+                                                     this.adc.mesh.rotation.y,
                                                      this.coordinates);
     }
 

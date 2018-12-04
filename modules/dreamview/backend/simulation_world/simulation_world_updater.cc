@@ -257,11 +257,21 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     AERROR << "Failed to prepare a routing request: invalid start point.";
     return false;
   }
-  if (!map_service_->ConstructLaneWayPoint(start["x"], start["y"],
-                                           routing_request->add_waypoint())) {
-    AERROR << "Failed to prepare a routing request:"
-           << " cannot locate start point on map.";
-    return false;
+  if (ContainsKey(start, "heading")) {
+    if (!map_service_->ConstructLaneWayPointWithHeading(
+            start["x"], start["y"], start["heading"],
+            routing_request->add_waypoint())) {
+      AERROR << "Failed to prepare a routing request with heading: "
+             << start["heading"] << " cannot locate start point on map.";
+      return false;
+    }
+  } else {
+    if (!map_service_->ConstructLaneWayPoint(start["x"], start["y"],
+                                             routing_request->add_waypoint())) {
+      AERROR << "Failed to prepare a routing request:"
+             << " cannot locate start point on map.";
+      return false;
+    }
   }
 
   // set way point(s) if any

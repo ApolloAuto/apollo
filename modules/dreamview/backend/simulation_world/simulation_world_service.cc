@@ -1163,5 +1163,11 @@ void SimulationWorldService::PublishRoutingRequest(
   routing_request_writer_->Write(routing_request);
 }
 
+void SimulationWorldService::PublishMonitorMessage(
+  apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+  const std::string &msg) {
+    monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
+    monitor_logger_buffer_.Publish();
+}
 }  // namespace dreamview
 }  // namespace apollo

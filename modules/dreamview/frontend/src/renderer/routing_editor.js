@@ -73,7 +73,7 @@ export default class RoutingEditor {
         this.routePoints = [];
     }
 
-    sendRoutingRequest(carOffsetPosition, coordinates) {
+    sendRoutingRequest(carOffsetPosition, carHeading, coordinates) {
         if (this.routePoints.length === 0) {
             alert("Please provide at least an end point.");
             return false;
@@ -86,9 +86,10 @@ export default class RoutingEditor {
 
         const start    = (points.length > 1) ? points[0]
                          : coordinates.applyOffset(carOffsetPosition, true);
+        const start_heading  = (points.length > 1) ? null : carHeading;
         const end      = points[points.length-1];
         const waypoint = (points.length > 1) ? points.slice(1,-1) : [];
-        WS.requestRoute(start, waypoint, end, this.parkingSpaceId);
+        WS.requestRoute(start, start_heading, waypoint, end, this.parkingSpaceId);
 
         return true;
     }
