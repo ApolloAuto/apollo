@@ -34,9 +34,6 @@ class TimerComponent : public ComponentBase {
   bool Initialize(const TimerComponentConfig& config) override;
   bool Process();
 
- protected:
-  std::shared_ptr<Node> node_ = nullptr;
-
  private:
   virtual bool Proc() = 0;
   virtual bool Init() = 0;
