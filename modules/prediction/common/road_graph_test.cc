@@ -127,11 +127,11 @@ TEST_F(RoadGraphTest, MultipleLaneSequence) {
   EXPECT_EQ(3, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ(3, lane_graph.lane_sequence(1).lane_segment_size());
   EXPECT_EQ("l20", lane_graph.lane_sequence(0).lane_segment(0).lane_id());
-  EXPECT_EQ("l31", lane_graph.lane_sequence(0).lane_segment(1).lane_id());
-  EXPECT_EQ("l29", lane_graph.lane_sequence(0).lane_segment(2).lane_id());
+  EXPECT_EQ("l98", lane_graph.lane_sequence(0).lane_segment(1).lane_id());
+  EXPECT_EQ("l95", lane_graph.lane_sequence(0).lane_segment(2).lane_id());
   EXPECT_EQ("l20", lane_graph.lane_sequence(1).lane_segment(0).lane_id());
-  EXPECT_EQ("l98", lane_graph.lane_sequence(1).lane_segment(1).lane_id());
-  EXPECT_EQ("l95", lane_graph.lane_sequence(1).lane_segment(2).lane_id());
+  EXPECT_EQ("l31", lane_graph.lane_sequence(1).lane_segment(1).lane_id());
+  EXPECT_EQ("l29", lane_graph.lane_sequence(1).lane_segment(2).lane_id());
 }
 
 }  // namespace prediction
