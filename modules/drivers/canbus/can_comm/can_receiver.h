@@ -27,6 +27,8 @@
 #include <sstream>
 #include <thread>
 #include <vector>
+#include <future>
+#include <atomic>
 
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"
@@ -98,12 +100,13 @@ class CanReceiver {
   int32_t Start(bool is_blocked);
 
  private:
-  bool is_running_ = false;
+  std::atomic<bool> is_running_ = {false};
   // CanClient, MessageManager pointer life is managed by outer program
   CanClient *can_client_ = nullptr;
   MessageManager<SensorType> *pt_manager_ = nullptr;
   bool enable_log_ = false;
   bool is_init_ = false;
+  std::future<void> async_result_;
 
   DISALLOW_COPY_AND_ASSIGN(CanReceiver);
 };
@@ -182,7 +185,7 @@ void CanReceiver<SensorType>::RecvThreadFunc() {
 
 template <typename SensorType>
 bool CanReceiver<SensorType>::IsRunning() const {
-  return is_running_;
+  return is_running_.load();
 }
 
 template <typename SensorType>
@@ -190,9 +193,9 @@ template <typename SensorType>
   if (is_init_ == false) {
     return ::apollo::common::ErrorCode::CANBUS_ERROR;
   }
-  is_running_ = true;
+  is_running_.exchange(true);
 
-  cyber::Async(&CanReceiver<SensorType>::RecvThreadFunc, this);
+  async_result_ = cyber::Async(&CanReceiver<SensorType>::RecvThreadFunc, this);
   return ::apollo::common::ErrorCode::OK;
 }
 
@@ -200,7 +203,8 @@ template <typename SensorType>
 void CanReceiver<SensorType>::Stop() {
   if (IsRunning()) {
     AINFO << "Stopping can client receiver ...";
-    is_running_ = false;
+    is_running_.exchange(false);
+    async_result_.wait();
   } else {
     AINFO << "Can client receiver is not running.";
   }
