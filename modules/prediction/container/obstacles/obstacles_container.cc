@@ -46,7 +46,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       dynamic_cast<const PerceptionObstacles&>(message));
 
   // Get the new timestamp and update it in the class
-  // - If it's more than 10sec later than the most recent one, clear the 
+  // - If it's more than 10sec later than the most recent one, clear the
   //   obstacle history.
   // - If it's not a valid time (earlier than history), continue.
   // - Also consider the offline_mode case.
