@@ -275,7 +275,6 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
     // Refresh the s of the nearest obstacle if needed.
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer <=
         kLBufferThreshold) {
-    // if (obs_start_l < lane_left_width && -obs_end_l < lane_right_width) {
       ADEBUG << "Obstacle is not completely outside the current lane.";
       if (!exist_nearest_obs) {
         ADEBUG << "Updating the nearest obstacle to: obstacle_"
