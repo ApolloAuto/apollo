@@ -161,7 +161,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
     return;
   }
 
-  // Set ID and Type of the feature.
+  // Set ID, Type, and Status of the feature.
   Feature feature;
   if (SetId(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
@@ -169,9 +169,9 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   if (SetType(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
   }
+  SetStatus(perception_obstacle, timestamp, &feature);
 
   // Set obstacle observation for KF tracking
-  SetStatus(perception_obstacle, timestamp, &feature);
   if (!FLAGS_use_navigation_mode) {
     // Update KF
     if (!kf_motion_tracker_.IsInitialized()) {
@@ -325,6 +325,7 @@ void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
     return;
   }
   SetTimestamp(perception_obstacle, timestamp, feature);
+  SetPolygonPoints(perception_obstacle, feature);
   SetPosition(perception_obstacle, feature);
   SetVelocity(perception_obstacle, feature);
   SetAcceleration(feature);
@@ -452,6 +453,34 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
 
   ADEBUG << "Obstacle [" << id_ << "] has timestamp [" << std::fixed
          << std::setprecision(6) << ts << "].";
+}
+
+void Obstacle::SetPolygonPoints(const PerceptionObstacle& perception_obstacle,
+                                Feature* feature) {
+  for (int i = 0; i < perception_obstacle.polygon_point_size(); i ++) {
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
+    if (perception_obstacle.polygon_point(i).has_x()) {
+      x = perception_obstacle.polygon_point(i).x();
+    }
+    if (perception_obstacle.polygon_point(i).has_y()) {
+      y = perception_obstacle.polygon_point(i).y();
+    }
+    if (perception_obstacle.polygon_point(i).has_x()) {
+      z = perception_obstacle.polygon_point(i).z();
+    }
+
+    auto* ptr_polygon_point = feature->add_polygon_point();
+    ptr_polygon_point->set_x(x);
+    ptr_polygon_point->set_y(y);
+    ptr_polygon_point->set_z(z);
+
+    ADEBUG << "Obstacle [" << id_ << "] has new corner point [" << std::fixed
+           << std::setprecision(6) << x << ", " << std::fixed
+           << std::setprecision(6) << y << ", " << std::fixed
+           << std::setprecision(6) << z << "].";    
+  }
 }
 
 void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
@@ -1028,7 +1057,9 @@ void Obstacle::BuildLaneGraph() {
       0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
       FLAGS_prediction_duration, FLAGS_min_prediction_length);
 
-  // BuildLaneGraph for current lanes.
+  // BuildLaneGraph for current lanes:
+  // Go through all the LaneSegments in current_lane,
+  // construct up to max_num_current_lane of them.
   int seq_id = 0;
   int curr_lane_count = 0;
   for (auto& lane : feature->lane().current_lane_feature()) {

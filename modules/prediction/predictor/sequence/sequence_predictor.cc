@@ -94,12 +94,33 @@ void SequencePredictor::FilterLaneSequences(
     ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6)
            << distance;
     if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
-      (*enable_lane_sequence)[i] = false;
-      ADEBUG << "Filter trajectory [" << ToString(sequence)
-             << "] due to small distance " << distance << ".";
+      bool obs_within_its_own_lane = true;
+      for (int j = 0; j < feature.polygon_point_size(); j ++) {
+        Eigen::Vector2d position
+            (feature.polygon_point(j).x(), feature.polygon_point(j).y());
+        std::shared_ptr<const LaneInfo> lane_info =
+            PredictionMap::LaneById(lane_id);
+        double lane_s = 0.0;
+        double lane_l = 0.0;
+        PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l);
+
+        double left = 0.0;
+        double right = 0.0;
+        lane_info->GetWidth(lane_s, &left, &right);
+
+        if (lane_l > left || lane_l < -right) {
+          obs_within_its_own_lane = false;
+          break;
+        }
+      }
+
+      if (obs_within_its_own_lane) {
+        (*enable_lane_sequence)[i] = false;
+        ADEBUG << "Filter trajectory [" << ToString(sequence)
+               << "] due to small distance " << distance << ".";
+      }
     }
   }
-
 
   /**
     * Pick the most probable lane-sequence and lane-change

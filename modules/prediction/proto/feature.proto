@@ -61,12 +61,13 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
-// next id = 30
+// next id = 31
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
 
   // Obstacle features
+  repeated apollo.common.Point3D polygon_point = 30;
   optional apollo.common.Point3D position = 2;
   optional apollo.common.Point3D front_position = 27;
   optional apollo.common.Point3D velocity = 3;
