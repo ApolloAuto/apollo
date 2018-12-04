@@ -253,6 +253,7 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
     if (obstacle->IsVirtual()) {
       continue;
     }
+
     // Check the s-direction. Rule out those obstacles that are behind ADC.
     double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
     double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
@@ -260,28 +261,9 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
       ADEBUG << "Obstacle behind ADC. Rule out.";
       continue;
     }
+
     // Check the l-direction. Rule out those obstacles that are not
     // blocking our drive-way.
-
-    /*
-    // TODO(all): this part should be deleted if the new if-statement
-    //            below works well.
-    double lane_left_width_at_start_s = 0.0;
-    double lane_left_width_at_end_s = 0.0;
-    double lane_right_width_at_start_s = 0.0;
-    double lane_right_width_at_end_s = 0.0;
-    reference_line.GetLaneWidth(obs_start_s, &lane_left_width_at_start_s,
-                                &lane_right_width_at_start_s);
-    reference_line.GetLaneWidth(obs_end_s, &lane_left_width_at_end_s,
-                                &lane_right_width_at_end_s);
-    double lane_left_width = std::min(std::abs(lane_left_width_at_start_s),
-                                      std::abs(lane_left_width_at_end_s));
-    double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
-                                       std::abs(lane_right_width_at_end_s));
-    double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
-    double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
-    */
-
     // TODO(all): should make this a GFLAG because this is also used by
     // side_pass_scenario.cc. They should be consistent.
     constexpr double kLBufferThreshold = 0.3;  // unit: m
