@@ -106,9 +106,11 @@ apollo::common::Status OpenSpacePlanner::Plan(
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
       LoadTrajectoryToFrame(frame);
+      return Status::OK();
     }
 
-    return Status::OK();
+    return Status(ErrorCode::PLANNING_ERROR,
+                    "Waiting for planning thread in OpenSpacePlanner");
 
   } else {
     // Single thread logic
