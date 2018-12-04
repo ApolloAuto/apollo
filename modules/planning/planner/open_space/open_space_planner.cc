@@ -55,7 +55,6 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
     task_future_ =
         cyber::Async(&OpenSpacePlanner::GenerateTrajectoryThread, this);
   }
-
   return Status::OK();
 }
 
@@ -94,23 +93,23 @@ apollo::common::Status OpenSpacePlanner::Plan(
       GenerateStopTrajectory(thread_data_.planning_init_point,
                              &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
-      AINFO << "Init point reach destination, stop trajectory is "
-               "sent";
+      ADEBUG << "Init point reach destination, stop trajectory is "
+                "sent";
       return Status::OK();
     }
 
     // Check if trajectory updated
     if (trajectory_updated_) {
-      AINFO << "Trajectories have been updated!";
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
       open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
       LoadTrajectoryToFrame(frame);
+      trajectory_updated_.store(false);
       return Status::OK();
     }
 
     return Status(ErrorCode::PLANNING_ERROR,
-                    "Waiting for planning thread in OpenSpacePlanner");
+                  "Waiting for planning thread in OpenSpacePlanner");
 
   } else {
     // Single thread logic
@@ -137,8 +136,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     if (CheckDestination(planning_init_point_, end_pose_)) {
       GenerateStopTrajectory(planning_init_point, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
-      AINFO << "Init point reach destination, stop trajectory is "
-               "sent";
+      ADEBUG << "Init point reach destination, stop trajectory is "
+                "sent";
       return Status::OK();
     }
 
@@ -165,10 +164,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
     {
       ADEBUG << "Open space plan in multi-threads mode : start to generate new "
                 "trajectories";
-      {
-        std::lock_guard<std::mutex> lock(open_space_mutex_);
-        trajectory_updated_ = false;
-      }
+      std::lock_guard<std::mutex> lock(open_space_mutex_);
       if (open_space_trajectory_generator_->Plan(
               thread_data_.planning_init_point, thread_data_.vehicle_state,
               thread_data_.XYbounds, thread_data_.rotate_angle,
@@ -176,10 +172,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
               thread_data_.obstacles_num, thread_data_.obstacles_edges_num,
               thread_data_.obstacles_A, thread_data_.obstacles_b,
               thread_data_.warmstart_obstacles) == Status::OK()) {
-        {
-          std::lock_guard<std::mutex> lock(open_space_mutex_);
-          trajectory_updated_ = true;
-        }
+        trajectory_updated_.store(true);
       }
     }
   }
