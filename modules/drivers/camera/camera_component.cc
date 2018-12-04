@@ -77,11 +77,12 @@ bool CameraComponent::Init() {
   }
 
   writer_ = node_->CreateWriter<Image>(camera_config_->channel_name());
-  cyber::Async(&CameraComponent::run, this);
+  async_result_ = cyber::Async(&CameraComponent::run, this);
   return true;
 }
 
 void CameraComponent::run() {
+  running_.exchange(true);
   while (!cyber::IsShutdown()) {
     if (!camera_device_->wait_for_device()) {
       // sleep for next check
@@ -106,6 +107,13 @@ void CameraComponent::run() {
     writer_->Write(pb_image);
 
     cyber::SleepFor(std::chrono::microseconds(spin_rate_));
+  }
+}
+
+CameraComponent::~CameraComponent() {
+  if (running_.load()) {
+    running_.exchange(false);
+    async_result_.wait();
   }
 }
 

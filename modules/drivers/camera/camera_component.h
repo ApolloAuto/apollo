@@ -18,6 +18,8 @@
 
 #include <memory>
 #include <vector>
+#include <future>
+#include <atomic>
 
 #include "cyber/cyber.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
@@ -38,6 +40,7 @@ using apollo::drivers::camera::config::Config;
 class CameraComponent : public Component<> {
  public:
   bool Init() override;
+  ~CameraComponent();
 
  private:
   void run();
@@ -52,6 +55,8 @@ class CameraComponent : public Component<> {
   int index_ = 0;
   int buffer_size_ = 16;
   const int32_t MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+  std::future<void> async_result_;
+  std::atomic<bool> running_ = {false};
 };
 
 CYBER_REGISTER_COMPONENT(CameraComponent)
