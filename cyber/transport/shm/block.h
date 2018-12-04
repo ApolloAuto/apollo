@@ -19,19 +19,10 @@
 
 #include <atomic>
 #include <cstdint>
-#include <cstring>
-#include <mutex>
-#include <string>
-
-#include "cyber/base/atomic_rw_lock.h"
 
 namespace apollo {
 namespace cyber {
 namespace transport {
-
-using apollo::cyber::base::AtomicRWLock;
-using apollo::cyber::base::ReadLockGuard;
-using apollo::cyber::base::WriteLockGuard;
 
 class Block {
   friend class Segment;
@@ -48,15 +39,16 @@ class Block {
     msg_info_size_ = msg_info_size;
   }
 
- private:
-  void ReleaseReadLock();
-  void ReleaseWriteLock();
-  bool TryLockForRead();
-  bool TryLockForWrite();
+  static const int32_t kRWLockFree;
+  static const int32_t kWriteExclusive;
 
-  std::atomic<bool> is_writing_;
-  std::atomic<uint32_t> reading_reference_counts_;
-  base::AtomicRWLock read_write_mutex_;
+ private:
+  bool TryLockForWrite();
+  bool TryLockForRead();
+  void ReleaseWriteLock();
+  void ReleaseReadLock();
+
+  volatile std::atomic<int32_t> lock_num_ = {0};
 
   uint64_t msg_size_;
   uint64_t msg_info_size_;
