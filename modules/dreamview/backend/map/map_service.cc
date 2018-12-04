@@ -336,6 +336,26 @@ bool MapService::GetNearestLane(const double x, const double y,
   return true;
 }
 
+bool MapService::GetNearestLaneWithHeading(const double x, const double y,
+                                LaneInfoConstPtr *nearest_lane,
+                                double *nearest_s, double *nearest_l,
+                                const double heading) const {
+  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+
+  PointENU point;
+  point.set_x(x);
+  point.set_y(y);
+  static constexpr double kSearchRadius = 1.0;
+  static constexpr double kMaxHeadingDiff = 1.0;
+  if (!MapReady() || HDMap()->GetNearestLaneWithHeading(
+                         point, kSearchRadius, heading, kMaxHeadingDiff,
+                         nearest_lane, nearest_s, nearest_l) < 0) {
+    AERROR << "Failed to get nearest lane with heading.";
+    return false;
+  }
+  return true;
+}
+
 bool MapService::GetPathsFromRouting(const RoutingResponse &routing,
                                      std::vector<Path> *paths) const {
   if (!CreatePathsFromRouting(routing, paths)) {
@@ -365,11 +385,7 @@ bool MapService::ConstructLaneWayPoint(
     return false;
   }
 
-  if (lane->lane().type() != Lane::CITY_DRIVING) {
-    AERROR
-        << "Failed to construct LaneWayPoint for RoutingRequest: Expected lane "
-        << lane->id().id() << " to be CITY_DRIVING, but was "
-        << apollo::hdmap::Lane::LaneType_Name(lane->lane().type());
+  if (!CheckRoutingPointLaneType(lane)) {
     return false;
   }
 
@@ -379,6 +395,39 @@ bool MapService::ConstructLaneWayPoint(
   pose->set_x(x);
   pose->set_y(y);
 
+  return true;
+}
+
+bool MapService::ConstructLaneWayPointWithHeading(
+    const double x, const double y, const double heading,
+    routing::LaneWaypoint *laneWayPoint) const {
+  double s, l;
+  LaneInfoConstPtr lane;
+  if (!GetNearestLaneWithHeading(x, y, &lane, &s, &l, heading)) {
+    return false;
+  }
+
+  if (!CheckRoutingPointLaneType(lane)) {
+    return false;
+  }
+
+  laneWayPoint->set_id(lane->id().id());
+  laneWayPoint->set_s(s);
+  auto *pose = laneWayPoint->mutable_pose();
+  pose->set_x(x);
+  pose->set_y(y);
+
+  return true;
+}
+
+bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
+  if (lane->lane().type() != Lane::CITY_DRIVING) {
+    AERROR
+        << "Failed to construct LaneWayPoint for RoutingRequest: Expected lane "
+        << lane->id().id() << " to be CITY_DRIVING, but was "
+        << apollo::hdmap::Lane::LaneType_Name(lane->lane().type());
+    return false;
+  }
   return true;
 }
 

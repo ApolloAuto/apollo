@@ -76,6 +76,12 @@ class MapService {
   bool ConstructLaneWayPoint(const double x, const double y,
                              routing::LaneWaypoint *laneWayPoint) const;
 
+  bool ConstructLaneWayPointWithHeading(
+      const double x, const double y, const double heading,
+      routing::LaneWaypoint *laneWayPoint) const;
+
+  bool CheckRoutingPointLaneType(apollo::hdmap::LaneInfoConstPtr lane) const;
+
   // Reload map from current FLAGS_map_dir.
   bool ReloadMap(bool force_reload);
 
@@ -86,6 +92,11 @@ class MapService {
   bool GetNearestLane(const double x, const double y,
                       apollo::hdmap::LaneInfoConstPtr *nearest_lane,
                       double *nearest_s, double *nearest_l) const;
+
+  bool GetNearestLaneWithHeading(const double x, const double y,
+                      apollo::hdmap::LaneInfoConstPtr *nearest_lane,
+                      double *nearest_s, double *nearest_l,
+                      const double heading) const;
 
   bool CreatePathsFromRouting(const routing::RoutingResponse &routing,
                               std::vector<apollo::hdmap::Path> *paths) const;

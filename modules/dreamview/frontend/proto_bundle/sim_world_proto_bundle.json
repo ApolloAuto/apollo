@@ -2583,6 +2583,13 @@
                   "options": {
                     "default": 6
                   }
+                },
+                "maxToleranceT": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 0.5
+                  }
                 }
               }
             },

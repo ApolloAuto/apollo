@@ -137,9 +137,7 @@ class SimulationWorldService {
    */
   void PublishMonitorMessage(
       apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
-      const std::string &msg) {
-    monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
-  }
+      const std::string &msg);
 
   void PublishNavigationInfo(
       const std::shared_ptr<apollo::relative_map::NavigationInfo> &);
