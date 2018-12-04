@@ -40,6 +40,9 @@ message LatencyStats {
   optional double init_frame_time_ms = 3;
 }
 
+message RSSInfo {
+}
+
 // next id: 21
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
@@ -98,4 +101,7 @@ message ADCTrajectory {
     SPEED_FALLBACK = 3;
   }
   optional TrajectoryType trajectory_type = 21 [default = UNKNOWN];
+  
+  // output related to RSS
+  optional RSSInfo rss_info = 100;
 }
