@@ -39,8 +39,8 @@ class Screen;
 
 class RenderableMessage {
  public:
-  static constexpr int FrameRatio_Precision = 4;
-  
+  static constexpr int FrameRatio_Precision = 2;
+
   explicit RenderableMessage(RenderableMessage* parent = nullptr,
                              int lineNo = 0)
       : line_no_(lineNo),
