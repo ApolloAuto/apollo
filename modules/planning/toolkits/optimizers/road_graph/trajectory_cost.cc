@@ -46,13 +46,15 @@ TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
                                const std::vector<const Obstacle *> &obstacles,
                                const common::VehicleParam &vehicle_param,
                                const SpeedData &heuristic_speed_data,
-                               const common::SLPoint &init_sl_point)
+                               const common::SLPoint &init_sl_point,
+                               const SLBoundary &adc_sl_boundary)
     : config_(config),
       reference_line_(&reference_line),
       is_change_lane_path_(is_change_lane_path),
       vehicle_param_(vehicle_param),
       heuristic_speed_data_(heuristic_speed_data),
-      init_sl_point_(init_sl_point) {
+      init_sl_point_(init_sl_point),
+      adc_sl_boundary_(adc_sl_boundary) {
   const double total_time =
       std::min(heuristic_speed_data_.TotalTime(), FLAGS_prediction_total_time);
 
@@ -125,7 +127,7 @@ ComparableCost TrajectoryCost::CalculatePathCost(
     path_cost += l * l * config_.path_l_cost() * quasi_softmax(std::fabs(l));
 
     const double dl = std::fabs(curve.Evaluate(1, curve_s));
-    if (!is_change_lane_path_ && IsOffRoad(curve_s + start_s, l, dl)) {
+    if (IsOffRoad(curve_s + start_s, l, dl, is_change_lane_path_)) {
       cost.cost_items[ComparableCost::OUT_OF_BOUNDARY] = true;
     }
 
@@ -146,8 +148,13 @@ ComparableCost TrajectoryCost::CalculatePathCost(
 }
 
 bool TrajectoryCost::IsOffRoad(const double ref_s, const double l,
-                               const double dl) {
-  Vec2d position(ref_s, l);
+                               const double dl,
+                               const bool is_change_lane_path) {
+  constexpr double kIgnoreDistance = 5.0;
+  if (ref_s - init_sl_point_.s() < kIgnoreDistance) {
+    return false;
+  }
+  Vec2d position(0.0, l);
 
   const auto &param = common::VehicleConfigHelper::GetConfig().vehicle_param();
   Vec2d vec_to_center(
@@ -165,7 +172,10 @@ bool TrajectoryCost::IsOffRoad(const double ref_s, const double l,
   reference_line_->GetLaneWidth(ref_s, &left_width, &right_width);
 
   for (const auto &corner : ego_box.GetAllCorners()) {
-    if (corner.y() > left_width || corner.y() < -right_width) {
+    double left_bound = std::max(adc_sl_boundary_.end_l() + buffer, left_width);
+    double right_bound =
+        std::min(adc_sl_boundary_.start_l() - buffer, -right_width);
+    if (corner.y() > left_bound || corner.y() < right_bound) {
       return true;
     }
   }

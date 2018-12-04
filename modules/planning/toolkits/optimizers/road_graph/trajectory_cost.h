@@ -45,7 +45,8 @@ class TrajectoryCost {
                           const std::vector<const Obstacle *> &obstacles,
                           const common::VehicleParam &vehicle_param,
                           const SpeedData &heuristic_speed_data,
-                          const common::SLPoint &init_sl_point);
+                          const common::SLPoint &init_sl_point,
+                          const SLBoundary &adc_sl_boundary);
   ComparableCost Calculate(const QuinticPolynomialCurve1d &curve,
                            const double start_s, const double end_s,
                            const uint32_t curr_level,
@@ -73,7 +74,8 @@ class TrajectoryCost {
   common::math::Box2d GetBoxFromSLPoint(const common::SLPoint &sl,
                                         const double dl) const;
 
-  bool IsOffRoad(const double ref_s, const double l, const double dl);
+  bool IsOffRoad(const double ref_s, const double l, const double dl,
+                 const bool is_change_lane_path);
 
   const DpPolyPathConfig config_;
   const ReferenceLine *reference_line_ = nullptr;
@@ -81,6 +83,7 @@ class TrajectoryCost {
   const common::VehicleParam vehicle_param_;
   SpeedData heuristic_speed_data_;
   const common::SLPoint init_sl_point_;
+  const SLBoundary adc_sl_boundary_;
   uint32_t num_of_time_stamps_ = 0;
   std::vector<std::vector<common::math::Box2d>> dynamic_obstacle_boxes_;
   std::vector<double> obstacle_probabilities_;
