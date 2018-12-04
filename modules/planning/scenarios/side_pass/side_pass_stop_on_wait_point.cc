@@ -27,6 +27,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/speed_profile_generator.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -36,6 +37,7 @@ namespace side_pass {
 using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
 using apollo::common::math::Vec2d;
+using apollo::common::VehicleConfigHelper;
 
 constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
@@ -85,6 +87,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   if (nearest_obstacle) {
     if (nearest_obstacle->speed() >
         GetContext()->scenario_config_.block_obstacle_min_speed()) {
+      ADEBUG << "The nearest obstacle to side-pass is moving.";
       next_stage_ = ScenarioConfig::NO_STAGE;
       return Stage::FINISHED;
     }
@@ -245,6 +248,9 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
   *nearest_obstacle = nullptr;
   double s_of_nearest_obs = 0.0;
   for (const auto* obstacle : indexed_obstacle_list.Items()) {
+    ADEBUG << "=============================";
+    ADEBUG << "Looking at Obstacle: " << obstacle->Id();
+
     if (obstacle->IsVirtual()) {
       continue;
     }
@@ -252,10 +258,15 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
     double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
     double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
     if (obs_end_s <= first_sl_point.s()) {
+      ADEBUG << "Obstacle behind ADC. Rule out.";
       continue;
     }
-    // Check the l-direction. Rule out those obstacles that are completely
-    // outside the current lane of ADC.
+    // Check the l-direction. Rule out those obstacles that are not
+    // blocking our drive-way.
+
+    /*
+    // TODO(all): this part should be deleted if the new if-statement
+    //            below works well.
     double lane_left_width_at_start_s = 0.0;
     double lane_left_width_at_end_s = 0.0;
     double lane_right_width_at_start_s = 0.0;
@@ -270,14 +281,31 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
                                        std::abs(lane_right_width_at_end_s));
     double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
     double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
+    */
+
+    // TODO(all): should make this a GFLAG because this is also used by
+    // side_pass_scenario.cc. They should be consistent.
+    constexpr double kLBufferThreshold = 0.3;  // unit: m
+    const double driving_width =
+        reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
+    const double adc_width =
+        VehicleConfigHelper::GetConfig().vehicle_param().width();
+
     // Refresh the s of the nearest obstacle if needed.
-    if (obs_start_l < lane_left_width && -obs_end_l < lane_right_width) {
+    if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer <=
+        kLBufferThreshold) {
+    // if (obs_start_l < lane_left_width && -obs_end_l < lane_right_width) {
+      ADEBUG << "Obstacle is not completely outside the current lane.";
       if (!exist_nearest_obs) {
+        ADEBUG << "Updating the nearest obstacle to: obstacle_"
+               << obstacle->Id();
         exist_nearest_obs = true;
         *nearest_obstacle = obstacle;
         s_of_nearest_obs = obs_start_s;
       } else {
         if (obs_start_s < s_of_nearest_obs) {
+          ADEBUG << "Updating the nearest obstacle to: obstacle_"
+                 << obstacle->Id();
           *nearest_obstacle = obstacle;
           s_of_nearest_obs = obs_start_s;
         }
