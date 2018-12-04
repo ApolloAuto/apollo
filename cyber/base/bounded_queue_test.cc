@@ -48,11 +48,11 @@ TEST(BoundedQueueTest, Dequeue) {
 
 TEST(BoundedQueueTest, concurrency) {
   BoundedQueue<int> queue;
-  queue.Init(100000);
+  queue.Init(10);
   std::atomic_int count = {0};
   std::thread threads[48];
   for (int i = 0; i < 48; ++i) {
-    if (i % 2 == 0) {
+    if (i % 4 < 2) {
       threads[i] = std::thread([&]() {
         for (int j = 0; j < 10000; ++j) {
           if (queue.Enqueue(j)) {
@@ -60,7 +60,7 @@ TEST(BoundedQueueTest, concurrency) {
           }
         }
       });
-    } else {
+    } else if (i % 4 == 2) {
       threads[i] = std::thread([&]() {
         for (int j = 0; j < 10000; ++j) {
           int value = 0;
@@ -69,8 +69,19 @@ TEST(BoundedQueueTest, concurrency) {
           }
         }
       });
+    } else {
+      threads[i] = std::thread([&]() {
+        for (int j = 0; j < 10000; ++j) {
+          int value = 0;
+          if (queue.WaitDequeue(&value)) {
+            count--;
+          }
+        }
+      });
     }
   }
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  queue.BreakAllWait();
   for (int i = 0; i < 48; ++i) {
     threads[i].join();
   }
