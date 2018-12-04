@@ -184,6 +184,13 @@ class TrafficLightsPerceptionComponent :
 
   std::shared_ptr<apollo::cyber::Writer<
         apollo::perception::TrafficLightDetection>> writer_;
+
+  // traffic lights
+  apollo::perception::base::TLColor detected_trafficlight_color_;
+  int cnt_r_;
+  int cnt_g_;
+  int cnt_y_;
+  int cnt_u_;
 };
 
 CYBER_REGISTER_COMPONENT(TrafficLightsPerceptionComponent);
