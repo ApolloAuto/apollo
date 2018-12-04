@@ -37,8 +37,7 @@ TaskManager::TaskManager()
   auto func = [task_queue = this->task_queue_]() {
     while (!cyber::IsShutdown()) {
       std::function<void()> task;
-      task_queue->Dequeue(&task);
-      if (task == nullptr) {
+      if (!task_queue->Dequeue(&task)) {
         auto routine = croutine::CRoutine::GetCurrentRoutine();
         routine->HangUp();
         continue;
