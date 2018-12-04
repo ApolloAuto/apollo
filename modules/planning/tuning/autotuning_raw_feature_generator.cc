@@ -44,7 +44,7 @@ AutotuningRawFeatureGenerator::AutotuningRawFeatureGenerator(
       side_pass_boundaries_(num_points, std::vector<std::array<double, 3>>()) {
   CHECK_GT(num_points, 0);
   CHECK_GT(time_range, kMinTimeRange);
-  double res = time_range / num_points;
+  double res = time_range / static_cast<double>(num_points);
   for (double t = 0; t < res + time_range; t += res) {
     eval_time_.push_back(t);
   }

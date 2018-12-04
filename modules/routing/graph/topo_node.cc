@@ -55,7 +55,7 @@ void ConvertOutRange(const RepeatedPtrField<CurveRange>& range_vec,
   double max_diff = 0.0;
   for (size_t i = 0; i < out_range->size(); ++i) {
     if (out_range->at(i).Length() > max_diff) {
-      max_index = i;
+      max_index = static_cast<int>(i);
       max_diff = out_range->at(i).Length();
     }
   }

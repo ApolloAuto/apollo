@@ -48,7 +48,7 @@ void CubicPolynomialCurve1d::DerivedFromQuarticCurve(
   CHECK_EQ(other.Order(), 4);
   param_ = other.ParamLength();
   for (std::size_t i = 1; i < 5; ++i) {
-    coef_[i - 1] = other.Coef(i) * i;
+    coef_[i - 1] = other.Coef(i) * static_cast<double>(i);
   }
 }
 

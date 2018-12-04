@@ -261,7 +261,7 @@ Status QuinticSpiralCurve::GetPathVecWithS(
     return Status::OK();
   }
 
-  const std::uint32_t n = vec_s.size();
+  const std::size_t n = vec_s.size();
 
   common::PathPoint ref_point = start_point();
 

@@ -241,7 +241,7 @@ void ResultGenerator::ExtendForward(const TopoRangeManager& range_manager,
 
 void ResultGenerator::ExtendPassages(const TopoRangeManager& range_manager,
                                      std::vector<PassageInfo>* const passages) {
-  int passage_num = passages->size();
+  int passage_num = static_cast<int>(passages->size());
   for (int i = 0; i < passage_num; ++i) {
     if (i < passage_num - 1) {
       ExtendForward(range_manager, passages->at(i + 1), &(passages->at(i)));
