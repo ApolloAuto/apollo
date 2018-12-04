@@ -783,7 +783,7 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   if (max_light_id > 0)
     std::swap(lights[0], lights[max_light_id]);
 
-  if (max_light_id > 0) {
+  if (max_light_id >= 0) {
     apollo::perception::TrafficLight *light_result =
           (*out_msg)->add_traffic_light();
     light_result->set_id(lights.at(0)->id);
@@ -968,7 +968,7 @@ void TrafficLightsPerceptionComponent::Visualize(
   }
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
-  cv::imshow("Traffic Lihgt", output_image);
+  cv::imshow("Traffic Light", output_image);
   // cv::imwrite("/apollo/debug_vis/" +
   // std::to_string(frame.timestamp) + ".jpg", output_image);
   cvWaitKey(30);
