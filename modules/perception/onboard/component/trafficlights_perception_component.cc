@@ -725,43 +725,48 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   }
   (*out_msg)->set_camera_id(CAMERA_ID_TO_TLCAMERA_ID.at(camera_name));
 
-  // add traffic light result based on voting
-  int cnt_r = 0;
+  // Do voting from multiple traffic light detections
+  cnt_r_ = 0;
   int max_r_id = -1;
   double max_r_conf = 0;
 
-  int cnt_g = 0;
+  cnt_g_ = 0;
   int max_g_id = -1;
   double max_g_conf = 0;
 
-  int cnt_y = 0;
+  cnt_y_ = 0;
   int max_y_id = -1;
   double max_y_conf = 0;
 
+  cnt_u_ = 0;
+
   int max_n_id = -1;
 
-  for (size_t i = 0; i < lights.size(); i++) {
+  for (int i = 0; i < static_cast<int>(lights.size()); i++) {
     switch (lights.at(i)->status.color) {
       case base::TLColor::TL_RED:
-        cnt_r++;
+        cnt_r_++;
         if (lights.at(i)->status.confidence >= max_r_conf) {
           max_r_id = i;
           max_r_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_GREEN:
-        cnt_g++;
+        cnt_g_++;
         if (lights.at(i)->status.confidence >= max_g_conf) {
           max_g_id = i;
           max_g_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_YELLOW:
-        cnt_y++;
+        cnt_y_++;
         if (lights.at(i)->status.confidence >= max_y_conf) {
           max_y_id = i;
           max_y_conf = lights.at(i)->status.confidence;
         }
+        break;
+      case base::TLColor::TL_UNKNOWN_COLOR:
+        cnt_u_++;
         break;
       default:
         max_n_id = i;
@@ -770,18 +775,20 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   }
 
   int max_light_id = -1;
-  if (cnt_r >= cnt_g && cnt_r >= cnt_y && cnt_r > 0)
+  if (cnt_r_ >= cnt_g_ && cnt_r_ >= cnt_y_ && cnt_r_ > 0) {
     max_light_id = max_r_id;
-  else if (cnt_y > cnt_r && cnt_y >= cnt_g)
+  } else if (cnt_y_ > cnt_r_ && cnt_y_ >= cnt_g_) {
     max_light_id = max_y_id;
-  else if (cnt_g > cnt_r && cnt_g > cnt_y)
+  } else if (cnt_g_ > cnt_r_ && cnt_g_ > cnt_y_) {
     max_light_id = max_g_id;
-  else if (cnt_r == 0 && cnt_g == 0 && cnt_y == 0)
+  } else if (cnt_r_ == 0 && cnt_g_ == 0 && cnt_y_ == 0) {
     max_light_id = max_n_id;
+  }
 
   // swap the final output light to the first place
-  if (max_light_id > 0)
+  if (max_light_id > 0) {
     std::swap(lights[0], lights[max_light_id]);
+  }
 
   if (max_light_id >= 0) {
     apollo::perception::TrafficLight *light_result =
@@ -793,6 +800,7 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
     light_result->set_blink(lights.at(0)->status.blink);
     // set contain_lights
     (*out_msg)->set_contain_lights(lights.size() > 0);
+    detected_trafficlight_color_ = lights.at(0)->status.color;
   }
   // add traffic light debug info
   if (!TransformDebugMessage(frame, out_msg)) {
@@ -861,7 +869,7 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
   TrafficLightDebug* light_debug = (*out_msg)->mutable_traffic_light_debug();
 
   // signal number
-  light_debug->set_signal_num(lights.size());
+  light_debug->set_signal_num(static_cast<int>(lights.size()));
 
   if (!lights.empty() && !lights[0]->region.debug_roi.empty()) {
     const auto& debug_roi = lights[0]->region.debug_roi;
@@ -966,6 +974,70 @@ void TrafficLightsPerceptionComponent::Visualize(
         break;
     }
   }
+
+  // Show text of voting results
+  cv::string tl_string;
+  cv::Scalar tl_color;
+  switch (detected_trafficlight_color_) {
+    case base::TLColor::TL_RED:
+      tl_string = "RED traffic light";
+      tl_color = cv::Scalar(0, 0, 255);
+      break;
+    case base::TLColor::TL_GREEN:
+      tl_string = "GREEN traffic light";
+      tl_color = cv::Scalar(0, 255, 0);
+      break;
+    case base::TLColor::TL_YELLOW:
+      tl_string = "YELLOW traffic light";
+      tl_color = cv::Scalar(0, 255, 255);
+      break;
+    default:
+      tl_string = "UNKNOWN traffic light";
+      tl_color = cv::Scalar(255, 255, 255);
+      break;
+  }
+  cv::putText(output_image,
+          tl_string,
+          cv::Point(10, 50),
+          cv::FONT_HERSHEY_COMPLEX_SMALL,
+          3.0,
+          tl_color,
+          3);
+
+  char str[100];
+
+  snprintf(str, sizeof(str), "Red lights:%d", cnt_r_);
+  cv::putText(output_image,
+          str,
+          cv::Point(10, 100),
+          cv::FONT_HERSHEY_COMPLEX_SMALL,
+          2.0,
+          cv::Scalar(0, 0, 255),
+          3);
+  snprintf(str, sizeof(str), "Green lights:%d", cnt_g_);
+  cv::putText(output_image,
+          str,
+          cv::Point(10, 150),
+          cv::FONT_HERSHEY_COMPLEX_SMALL,
+          2.0,
+          cv::Scalar(0, 255, 0),
+          3);
+  snprintf(str, sizeof(str), "Yellow lights:%d", cnt_y_);
+  cv::putText(output_image,
+          str,
+          cv::Point(10, 200),
+          cv::FONT_HERSHEY_COMPLEX_SMALL,
+          2.0,
+          cv::Scalar(0, 255, 255),
+          3);
+  snprintf(str, sizeof(str), "Unknown lights:%d", cnt_u_);
+  cv::putText(output_image,
+          str,
+          cv::Point(10, 250),
+          cv::FONT_HERSHEY_COMPLEX_SMALL,
+          2.0,
+          cv::Scalar(255, 255, 255),
+          3);
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
   cv::imshow("Traffic Light", output_image);
