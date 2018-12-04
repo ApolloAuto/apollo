@@ -166,10 +166,10 @@ void Fem1dQpProblem::SetOutputResolution(const double resolution) {
   std::vector<double> new_ddx;
   std::vector<double> new_dddx;
 
-  const double total_s = delta_s_ * (x_.size() - 1);
+  const double total_s = delta_s_ * (static_cast<double>(x_.size()) - 1.0);
   for (double s = resolution; s < total_s; s += resolution) {
-    const size_t idx = std::floor(s / delta_s_);
-    const double ds = s - delta_s_ * idx;
+    const size_t idx = static_cast<size_t>(std::floor(s / delta_s_));
+    const double ds = s - delta_s_ * static_cast<double>(idx);
 
     double x = 0.0;
     double dx = 0.0;
