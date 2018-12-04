@@ -49,7 +49,7 @@ config: {
   enabled: true
   keep_clear {
     enable_keep_clear_zone: true
-    enable_junction: true
+    enable_junction: false
     min_pass_s_distance: 2.0
   }
 }
