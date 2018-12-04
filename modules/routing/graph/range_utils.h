@@ -27,7 +27,7 @@ int BinarySearchForSLarger(const std::vector<T>& sorted_vec, double value_s) {
     return -1;
   }
   int start_index = 0;
-  int end_index = sorted_vec.size() - 1;
+  int end_index = static_cast<int>(sorted_vec.size()) - 1;
   double internal_s = 0.0;
   int middle_index = 0;
   while (end_index - start_index > 1) {
@@ -52,7 +52,7 @@ int BinarySearchForSSmaller(const std::vector<T>& sorted_vec, double value_s) {
     return -1;
   }
   int start_index = 0;
-  int end_index = sorted_vec.size() - 1;
+  int end_index = static_cast<int>(sorted_vec.size()) - 1;
   double internal_s = 0.0;
   int middle_index = 0;
   while (end_index - start_index > 1) {
