@@ -100,6 +100,11 @@ void SequencePredictor::FilterLaneSequences(
             (feature.polygon_point(j).x(), feature.polygon_point(j).y());
         std::shared_ptr<const LaneInfo> lane_info =
             PredictionMap::LaneById(lane_id);
+        if (lane_info == nullptr) {
+          obs_within_its_own_lane = false;
+          break;
+        }
+
         double lane_s = 0.0;
         double lane_l = 0.0;
         PredictionMap::GetProjection(position, lane_info, &lane_s, &lane_l);
