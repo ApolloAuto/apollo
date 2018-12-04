@@ -467,7 +467,7 @@ void Obstacle::SetPolygonPoints(const PerceptionObstacle& perception_obstacle,
     if (perception_obstacle.polygon_point(i).has_y()) {
       y = perception_obstacle.polygon_point(i).y();
     }
-    if (perception_obstacle.polygon_point(i).has_x()) {
+    if (perception_obstacle.polygon_point(i).has_z()) {
       z = perception_obstacle.polygon_point(i).z();
     }
 
