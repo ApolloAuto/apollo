@@ -255,7 +255,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> speeds;
   std::vector<double> timestamps;
 
-  std::vector<int> has_history
+  std::vector<double> has_history
       (FLAGS_cruise_historical_frame_length, 1.0);
   std::vector<std::pair<double, double>> pos_history
       (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
