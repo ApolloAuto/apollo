@@ -66,10 +66,10 @@ Stage::StageStatus SidePassBackup::Process(
         adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
       continue;
     }
-    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
     if (obstacle->PerceptionSLBoundary().start_s() >
         adc_sl_boundary.end_s() +
-            kAdcDistanceThreshold) {  // vehicles are far away
+            GetContext()->scenario_config_.max_front_obstacle_distance()) {
+      // vehicles are far away
       continue;
     }
 
@@ -134,10 +134,10 @@ Stage::StageStatus SidePassApproachObstacle::Process(
         adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
       continue;
     }
-    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
     if (obstacle->PerceptionSLBoundary().start_s() >
         adc_sl_boundary.end_s() +
-            kAdcDistanceThreshold) {  // vehicles are far away
+            GetContext()->scenario_config_.max_front_obstacle_distance()) {
+      // vehicles are far away
       continue;
     }
 
