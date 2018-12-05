@@ -32,6 +32,7 @@ namespace cyber {
 namespace scheduler {
 
 void func() {}
+
 TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   auto ctx = std::make_shared<ChoreographyContext>();
@@ -55,6 +56,7 @@ TEST(SchedulerPolicyTest, classic) {
   // test single routine
   auto future = Async([]() {
     FOR_EACH(i, 0, 20) { cyber::SleepFor(std::chrono::milliseconds(i)); }
+    AINFO << "Finish task: single";
   });
   future.get();
 
@@ -63,6 +65,7 @@ TEST(SchedulerPolicyTest, classic) {
     res.emplace_back(Async([i]() {
       FOR_EACH(time, 0, 30) { cyber::SleepFor(std::chrono::milliseconds(i)); }
     }));
+    AINFO << "Finish task: " << i;
   };
   for (auto& future : res) {
     future.wait_for(std::chrono::milliseconds(1000));
@@ -83,6 +86,13 @@ TEST(SchedulerPolicyTest, sched_classic) {
   EXPECT_FALSE(sched1->DispatchTask(cr));
   EXPECT_TRUE(sched1->RemoveTask("ABC"));
   sched1->Shutdown();
+}
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::Init(argv[0]);
+  auto res = RUN_ALL_TESTS();
+  return res;
 }
 
 }  // namespace scheduler

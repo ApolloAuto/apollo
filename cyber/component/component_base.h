@@ -26,8 +26,8 @@
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/node/node.h"
-#include "cyber/scheduler/scheduler.h"
 #include "cyber/proto/component_conf.pb.h"
+#include "cyber/scheduler/scheduler.h"
 #include "gflags/gflags.h"
 
 namespace apollo {

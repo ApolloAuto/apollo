@@ -36,15 +36,9 @@ using apollo::cyber::common::GlobalData;
 Processor::Processor() {
   running_.exchange(true);
   routine_context_.reset(new RoutineContext());
-  thread_ = std::thread(&Processor::Run, this);
 }
 
-Processor::~Processor() {
-  Stop();
-  if (thread_.joinable()) {
-    thread_.join();
-  }
-}
+Processor::~Processor() { Stop(); }
 
 void Processor::SetAffinity(const std::vector<int> &cpus,
                             const std::string &affinity, int p) {
@@ -101,7 +95,7 @@ void Processor::Run() {
       }
     } else {
       std::unique_lock<std::mutex> lk(mtx_ctx_);
-      cv_ctx_.wait(lk, [this] { return this->context_ != nullptr; });
+      cv_ctx_.wait_for(lk, std::chrono::milliseconds(10));
     }
   }
 }
