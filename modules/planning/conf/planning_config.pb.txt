@@ -57,7 +57,7 @@ default_task_config: {
     obstacle_collision_cost: 1e8
     path_l_cost: 6.5
     path_dl_cost: 8e3
-    path_ddl_cost: 5e1
+    path_ddl_cost: 1.0
     path_l_cost_param_l0: 1.50
     path_l_cost_param_b: 0.40
     path_l_cost_param_k: 1.5

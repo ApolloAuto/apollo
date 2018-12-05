@@ -68,12 +68,10 @@ bool WaypointSampler::SamplePathWaypoints(
                                 : config_.sample_points_num_each_level();
 
   constexpr double kSamplePointLookForwardTime = 4.0;
-  const double step_length =
+  const double level_distance =
       common::math::Clamp(init_point.v() * kSamplePointLookForwardTime,
                           config_.step_length_min(), config_.step_length_max());
 
-  const double level_distance =
-      (init_point.v() > FLAGS_max_stop_speed) ? step_length : step_length / 2.0;
   double accumulated_s = init_sl_point_.s();
   double prev_s = accumulated_s;
 
@@ -102,7 +100,8 @@ bool WaypointSampler::SamplePathWaypoints(
     }
   }
 
-  for (std::size_t i = 0; accumulated_s < total_length; ++i) {
+  constexpr size_t kNumLevel = 3;
+  for (size_t i = 0; i < kNumLevel && accumulated_s < total_length; ++i) {
     accumulated_s += level_distance;
     if (accumulated_s + level_distance / 2.0 > total_length) {
       accumulated_s = total_length;

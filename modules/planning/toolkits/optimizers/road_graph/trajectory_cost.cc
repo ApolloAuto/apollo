@@ -154,31 +154,38 @@ bool TrajectoryCost::IsOffRoad(const double ref_s, const double l,
   if (ref_s - init_sl_point_.s() < kIgnoreDistance) {
     return false;
   }
-  Vec2d position(0.0, l);
+  Vec2d rear_center(0.0, l);
 
   const auto &param = common::VehicleConfigHelper::GetConfig().vehicle_param();
   Vec2d vec_to_center(
       (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
 
-  Vec2d center(position + vec_to_center.rotate(std::atan(dl)));
+  Vec2d rear_center_to_center = vec_to_center.rotate(std::atan(dl));
+  Vec2d center = rear_center + rear_center_to_center;
+  Vec2d front_center = center + rear_center_to_center;
 
   const double buffer = 0.1;  // in meters
-  const auto ego_box = Box2d(center, std::atan(dl), param.length() + buffer,
-                             param.width() + buffer);
+  const double r_w =
+      (param.left_edge_to_center() + param.right_edge_to_center()) / 2.0;
+  const double r_l = param.back_edge_to_center();
+  const double r = std::sqrt(r_w * r_w + r_l * r_l);
 
   double left_width = 0.0;
   double right_width = 0.0;
   reference_line_->GetLaneWidth(ref_s, &left_width, &right_width);
 
-  for (const auto &corner : ego_box.GetAllCorners()) {
-    double left_bound = std::max(adc_sl_boundary_.end_l() + buffer, left_width);
-    double right_bound =
-        std::min(adc_sl_boundary_.start_l() - buffer, -right_width);
-    if (corner.y() > left_bound || corner.y() < right_bound) {
-      return true;
-    }
+  double left_bound = std::max(init_sl_point_.l() + r + buffer, left_width);
+  double right_bound = std::min(init_sl_point_.l() - r - buffer, -right_width);
+  if (rear_center.y() + r + buffer / 2.0 > left_bound ||
+      rear_center.y() - r - buffer / 2.0 < right_bound) {
+    return true;
   }
+  if (front_center.y() + r + buffer / 2.0 > left_bound ||
+      front_center.y() - r - buffer / 2.0 < right_bound) {
+    return true;
+  }
+
   return false;
 }
 
