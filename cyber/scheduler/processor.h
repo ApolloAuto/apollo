@@ -41,38 +41,25 @@ using croutine::RoutineContext;
 class Processor {
  public:
   Processor();
-  ~Processor();
+  virtual ~Processor();
 
   void Run();
+  void Stop();
+  void BindContext(const std::shared_ptr<ProcessorContext>& context);
   void SetAffinity(const std::vector<int>&, const std::string&, int);
   void SetSchedPolicy(std::string spolicy, int sched_priority);
-  void Stop() {
-    if (!running_.exchange(false)) {
-      return;
-    }
-    cv_ctx_.notify_one();
-    if (thread_.joinable()) {
-      thread_.join();
-    }
-  }
-
-  void BindContext(const std::shared_ptr<ProcessorContext>& context) {
-    context_ = context;
-    std::call_once(thread_flag_,
-                   [this]() { thread_ = std::thread(&Processor::Run, this); });
-  }
 
  private:
   std::shared_ptr<ProcessorContext> context_;
   std::shared_ptr<RoutineContext> routine_context_;
 
-  std::once_flag thread_flag_;
   std::condition_variable cv_ctx_;
+  std::once_flag thread_flag_;
   std::mutex mtx_ctx_;
   std::thread thread_;
 
-  std::atomic<bool> running_{false};
   std::atomic<pid_t> tid_{-1};
+  std::atomic<bool> running_{false};
 };
 
 }  // namespace scheduler

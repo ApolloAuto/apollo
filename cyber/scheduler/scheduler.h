@@ -44,6 +44,7 @@ using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
 
+class Processor;
 class ProcessorContext;
 
 class Scheduler {
@@ -76,6 +77,7 @@ class Scheduler {
 
   std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> id_cr_;
   std::vector<std::shared_ptr<ProcessorContext>> pctxs_;
+  std::vector<std::shared_ptr<Processor>> processors_;
 
   uint32_t proc_num_ = 0;
   uint32_t task_pool_size_ = 0;

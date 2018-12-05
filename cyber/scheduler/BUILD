@@ -6,10 +6,22 @@ cc_library(
     name = "processor",
     srcs = [
         "processor.cc",
-        "processor_context.cc",
     ],
     hdrs = [
         "processor.h",
+    ],
+    deps = [
+         "//cyber/scheduler:processor_context",
+        "//cyber/data:data",
+    ],
+)
+
+cc_library(
+    name = "processor_context",
+    srcs = [
+        "processor_context.cc",
+    ],
+    hdrs = [
         "processor_context.h",
     ],
     deps = [

@@ -100,6 +100,27 @@ void Processor::Run() {
   }
 }
 
+void Processor::Stop() {
+  if (!running_.exchange(false)) {
+    return;
+  }
+
+  if (context_) {
+    context_->Shutdown();
+  }
+
+  cv_ctx_.notify_one();
+  if (thread_.joinable()) {
+    thread_.join();
+  }
+}
+
+void Processor::BindContext(const std::shared_ptr<ProcessorContext> &context) {
+  context_ = context;
+  std::call_once(thread_flag_,
+                 [this]() { thread_ = std::thread(&Processor::Run, this); });
+}
+
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

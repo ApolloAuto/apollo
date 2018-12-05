@@ -105,7 +105,6 @@ void SchedulerChoreography::CreateProcessor() {
     proc->SetAffinity(choreography_cpuset_, choreography_affinity_, i);
     proc->SetSchedPolicy(choreography_processor_policy_,
                          choreography_processor_prio_);
-    ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
   }
 
@@ -117,7 +116,6 @@ void SchedulerChoreography::CreateProcessor() {
     proc->BindContext(ctx);
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
     proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
-    ctx->BindProc(proc);
     pctxs_.emplace_back(ctx);
   }
 }

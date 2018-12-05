@@ -16,7 +16,9 @@
 
 #include "cyber/scheduler/policy/scheduler_classic.h"
 
+#include <algorithm>
 #include <memory>
+#include <utility>
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
@@ -77,14 +79,14 @@ SchedulerClassic::SchedulerClassic() {
 
 void SchedulerClassic::CreateProcessor() {
   for (uint32_t i = 0; i < proc_num_; i++) {
-    auto proc = std::make_shared<Processor>();
     auto ctx = std::make_shared<ClassicContext>();
+    pctxs_.emplace_back(ctx);
 
+    auto proc = std::make_shared<Processor>();
     proc->BindContext(ctx);
     proc->SetAffinity(cpuset_, affinity_, i);
     proc->SetSchedPolicy(processor_policy_, processor_prio_);
-    ctx->BindProc(proc);
-    pctxs_.emplace_back(ctx);
+    processors_.push_back(std::move(proc));
   }
 }
 
