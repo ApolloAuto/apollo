@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include "modules/planning/toolkits/task.h"
 #include "rss/core/RssCheck.hpp"
 #include "rss/test_support/TestSupport.hpp"
