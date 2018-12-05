@@ -12,6 +12,7 @@ export default class RoutingEditor {
         this.routePoints = [];
         this.parkingSpaceId = null;
         this.inEditingMode = false;
+        this.pointId = 0;
     }
 
     isInEditingMode() {
@@ -34,43 +35,59 @@ export default class RoutingEditor {
         this.inEditingMode = false;
         this.removeAllRoutePoints(scene);
         this.parkingSpaceId = null;
+        this.pointId = 0;
     }
 
     addRoutingPoint(point, coordinates, scene) {
         const offsetPoint = coordinates.applyOffset({x:point.x, y:point.y});
         const pointMesh = drawImage(routingPointPin, 3.5, 3.5, offsetPoint.x, offsetPoint.y, 0.3);
+        pointMesh.pointId = this.pointId;
+        point.id = this.pointId;
+        this.pointId += 1;
         this.routePoints.push(pointMesh);
         scene.add(pointMesh);
+        WS.checkRoutingPoint(point);
     }
 
     setParkingSpaceId(id) {
         this.parkingSpaceId = id;
     }
 
+    removeInvalidRoutingPoint(pointId, msg, scene) {
+        alert(msg);
+        if (pointId) {
+            this.routePoints = this.routePoints.filter((point) => {
+                if (point.pointId === pointId) {
+                    this.removeRoutingPoint(scene, point);
+                    return false;
+                }
+                return true;
+            });
+        }
+    }
+
     removeLastRoutingPoint(scene) {
         const lastPoint = this.routePoints.pop();
         if (lastPoint) {
-            scene.remove(lastPoint);
-            if (lastPoint.geometry) {
-                lastPoint.geometry.dispose();
-            }
-            if (lastPoint.material) {
-                lastPoint.material.dispose();
-            }
+            this.removeRoutingPoint(scene, lastPoint);
         }
     }
 
     removeAllRoutePoints(scene) {
         this.routePoints.forEach((object) => {
-            scene.remove(object);
-            if (object.geometry) {
-                object.geometry.dispose();
-            }
-            if (object.material) {
-                object.material.dispose();
-            }
+            this.removeRoutingPoint(scene, object);
         });
         this.routePoints = [];
+    }
+
+    removeRoutingPoint(scene, object) {
+        scene.remove(object);
+        if (object.geometry) {
+            object.geometry.dispose();
+        }
+        if (object.material) {
+            object.material.dispose();
+        }
     }
 
     sendRoutingRequest(carOffsetPosition, carHeading, coordinates) {
@@ -83,7 +100,6 @@ export default class RoutingEditor {
             object.position.z = 0;
             return coordinates.applyOffset(object.position, true);
         });
-
         const start    = (points.length > 1) ? points[0]
                          : coordinates.applyOffset(carOffsetPosition, true);
         const start_heading  = (points.length > 1) ? null : carHeading;

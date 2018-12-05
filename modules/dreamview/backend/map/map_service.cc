@@ -420,6 +420,18 @@ bool MapService::ConstructLaneWayPointWithHeading(
   return true;
 }
 
+bool MapService::CheckRoutingPoint(const double x, const double y) const {
+  double s, l;
+  LaneInfoConstPtr lane;
+  if (!GetNearestLane(x, y, &lane, &s, &l)) {
+    return false;
+  }
+  if (!CheckRoutingPointLaneType(lane)) {
+    return false;
+  }
+  return true;
+}
+
 bool MapService::CheckRoutingPointLaneType(LaneInfoConstPtr lane) const {
   if (lane->lane().type() != Lane::CITY_DRIVING) {
     AERROR

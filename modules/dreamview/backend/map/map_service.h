@@ -80,6 +80,8 @@ class MapService {
       const double x, const double y, const double heading,
       routing::LaneWaypoint *laneWayPoint) const;
 
+  bool CheckRoutingPoint(const double x, const double y) const;
+
   bool CheckRoutingPointLaneType(apollo::hdmap::LaneInfoConstPtr lane) const;
 
   // Reload map from current FLAGS_map_dir.

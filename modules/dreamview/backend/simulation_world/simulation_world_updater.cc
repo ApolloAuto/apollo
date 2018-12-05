@@ -132,6 +132,14 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       });
 
   websocket_->RegisterMessageHandler(
+      "CheckRoutingPoint",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        Json response = CheckRoutingPoint(json);
+        response["type"] = "RoutingPointCheckResult";
+        websocket_->SendData(conn, response.dump());
+      });
+
+  websocket_->RegisterMessageHandler(
       "SendRoutingRequest",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         auto routing_request = std::make_shared<RoutingRequest>();
@@ -241,6 +249,27 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           }
         }
       });
+}
+
+Json SimulationWorldUpdater::CheckRoutingPoint(const Json &json) {
+  Json result;
+  if (!ContainsKey(json, "point")) {
+    result["error"] = "Failed to check routing point: point not found.";
+    AERROR << result["error"];
+    return result;
+  }
+  auto point = json["point"];
+  if (!ValidateCoordinate(point) || !ContainsKey(point, "id")) {
+    result["error"] = "Failed to check routing point: invalid point.";
+    AERROR << result["error"];
+    return result;
+  }
+  if (!map_service_->CheckRoutingPoint(point["x"], point["y"])) {
+    result["pointId"] = point["id"];
+    result["error"] = "Selected point cannot be a routing point.";
+    AWARN << result["error"];
+  }
+  return result;
 }
 
 bool SimulationWorldUpdater::ConstructRoutingRequest(

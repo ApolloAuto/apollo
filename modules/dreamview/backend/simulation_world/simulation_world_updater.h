@@ -93,6 +93,13 @@ class SimulationWorldUpdater {
   bool ValidateCoordinate(const nlohmann::json &json);
 
   /**
+   * @brief Check if routing point is located on a lane that is CITY_DRIVING
+   * @param json that contains point's coordinate x and y
+   * @return True if the lane is CITY_DRIVING
+   */
+  nlohmann::json CheckRoutingPoint(const nlohmann::json &json);
+
+  /**
    * @brief Tries to load the points of interest from the file if it has
    * not been.
    * @return False if failed to load from file,
