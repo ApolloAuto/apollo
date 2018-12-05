@@ -31,7 +31,7 @@ class ServiceBase {
 
   virtual void destroy() = 0;
 
-  std::string service_name();
+  const std::string& service_name() const { return service_name_; }
 
  protected:
   std::string service_name_;

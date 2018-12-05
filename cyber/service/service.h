@@ -37,7 +37,6 @@ class Service : public ServiceBase {
           const ServiceCallback& service_callback)
       : ServiceBase(service_name),
         node_name_(node_name),
-        init_(false),
         service_callback_(service_callback),
         request_channel_(service_name + SRV_CHANNEL_REQ_SUFFIX),
         response_channel_(service_name + SRV_CHANNEL_RES_SUFFIX) {}
@@ -46,13 +45,12 @@ class Service : public ServiceBase {
           ServiceCallback&& service_callback)
       : ServiceBase(service_name),
         node_name_(node_name),
-        init_(false),
         service_callback_(service_callback),
         request_channel_(service_name + SRV_CHANNEL_REQ_SUFFIX),
         response_channel_(service_name + SRV_CHANNEL_RES_SUFFIX) {}
 
   Service() = delete;
-  ~Service() { init_ = false; }
+  ~Service() {}
   bool Init();
   void destroy();
 
@@ -62,8 +60,9 @@ class Service : public ServiceBase {
 
   void SendResponse(const transport::MessageInfo& message_info,
                     const std::shared_ptr<Response>& response);
+  bool IsInit(void) const { return request_receiver_ != nullptr; }
+
   std::string node_name_;
-  bool init_;
   ServiceCallback service_callback_;
 
   std::function<void(const std::shared_ptr<Request>&,
@@ -81,7 +80,7 @@ void Service<Request, Response>::destroy() {}
 
 template <typename Request, typename Response>
 bool Service<Request, Response>::Init() {
-  if (init_) {
+  if (IsInit()) {
     return true;
   }
   proto::RoleAttributes role;
@@ -120,9 +119,9 @@ bool Service<Request, Response>::Init() {
       proto::OptionalMode::RTPS);
   if (request_receiver_ == nullptr) {
     AERROR << " Create request sub failed." << request_channel_;
+    response_transmitter_.reset();
     return false;
   }
-  init_ = true;
   return true;
 }
 
@@ -130,7 +129,7 @@ template <typename Request, typename Response>
 void Service<Request, Response>::HandleRequest(
     const std::shared_ptr<Request>& request,
     const transport::MessageInfo& message_info) {
-  if (!init_) {
+  if (!IsInit()) {
     // LOG_DEBUG << "not inited error.";
     return;
   }
@@ -147,7 +146,7 @@ template <typename Request, typename Response>
 void Service<Request, Response>::SendResponse(
     const transport::MessageInfo& message_info,
     const std::shared_ptr<Response>& response) {
-  if (!init_) {
+  if (!IsInit()) {
     // LOG_DEBUG << "not inited error.";
     return;
   }

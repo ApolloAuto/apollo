@@ -82,6 +82,7 @@ class Client : public ClientBase {
  private:
   void HandleResponse(const std::shared_ptr<Response>& response,
                       const transport::MessageInfo& request_info);
+  bool IsInit(void) const { return response_receiver_ != nullptr; }
 
   std::string node_name_;
 
@@ -143,9 +144,9 @@ bool Client<Request, Response>::Init() {
       proto::OptionalMode::RTPS);
   if (response_receiver_ == nullptr) {
     AERROR << "Create response sub failed.";
+    request_transmitter_.reset();
     return false;
   }
-
   return true;
 }
 
@@ -153,6 +154,7 @@ template <typename Request, typename Response>
 typename Client<Request, Response>::SharedResponse
 Client<Request, Response>::SendRequest(SharedRequest request,
                                        const std::chrono::seconds& timeout_s) {
+  if (!IsInit()) { return nullptr; }
   auto future = AsyncSendRequest(request);
   if (!future.valid()) {
     return nullptr;
@@ -169,6 +171,7 @@ template <typename Request, typename Response>
 typename Client<Request, Response>::SharedResponse
 Client<Request, Response>::SendRequest(const Request& request,
                                        const std::chrono::seconds& timeout_s) {
+  if (!IsInit()) { return nullptr; }
   auto request_ptr = std::make_shared<const Request>(request);
   return SendRequest(request_ptr, timeout_s);
 }
@@ -190,15 +193,19 @@ template <typename Request, typename Response>
 typename Client<Request, Response>::SharedFuture
 Client<Request, Response>::AsyncSendRequest(SharedRequest request,
                                             CallbackType&& cb) {
-  std::lock_guard<std::mutex> lock(pending_requests_mutex_);
-  sequence_number_++;
-  transport::MessageInfo info(writer_id_, sequence_number_, writer_id_);
-  request_transmitter_->Transmit(request, info);
-  SharedPromise call_promise = std::make_shared<Promise>();
-  SharedFuture f(call_promise->get_future());
-  pending_requests_[info.seq_num()] =
-      std::make_tuple(call_promise, std::forward<CallbackType>(cb), f);
-  return f;
+  if (IsInit()) {
+    std::lock_guard<std::mutex> lock(pending_requests_mutex_);
+    sequence_number_++;
+    transport::MessageInfo info(writer_id_, sequence_number_, writer_id_);
+    request_transmitter_->Transmit(request, info);
+    SharedPromise call_promise = std::make_shared<Promise>();
+    SharedFuture f(call_promise->get_future());
+    pending_requests_[info.seq_num()] =
+        std::make_tuple(call_promise, std::forward<CallbackType>(cb), f);
+    return f;
+  } else {
+    return std::shared_future<std::shared_ptr<Response>>();
+  }
 }
 
 template <typename Request, typename Response>

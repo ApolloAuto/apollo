@@ -80,11 +80,14 @@ uint64_t TimingWheel::StartTimer(uint64_t interval, CallHandler handler,
         handler();
       },
       oneshot);
-  if (!add_queue_.Enqueue(task)) {
+  if (add_queue_.Enqueue(task)) {
+    ADEBUG << "start timer id: " << id_counter_;
+    return id_counter_;
+  } else {
+    --id_counter_;
     AERROR << "add queue is full, Enqueue failed!";
+    return -1;
   }
-  ADEBUG << "start timer id: " << id_counter_;
-  return id_counter_;
 }
 
 void TimingWheel::Step() {

@@ -20,6 +20,7 @@
 #include <atomic>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "cyber/proto/role_attributes.pb.h"
 
@@ -29,7 +30,7 @@ namespace cyber {
 class WriterBase {
  public:
   explicit WriterBase(const proto::RoleAttributes& role_attr)
-      : role_attr_(role_attr), init_(false) {}
+      : role_attr_(role_attr), lock_(), init_(false) {}
   virtual ~WriterBase() {}
 
   virtual bool Init() = 0;
@@ -42,11 +43,12 @@ class WriterBase {
     return role_attr_.channel_name();
   }
 
-  bool inited() const { return init_.load(); }
+  bool inited() const { std::lock_guard<std::mutex> g_(lock_); return init_; }
 
  protected:
   proto::RoleAttributes role_attr_;
-  std::atomic<bool> init_;
+  mutable std::mutex lock_;
+  bool init_;
 };
 
 }  // namespace cyber
