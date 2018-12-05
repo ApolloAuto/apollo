@@ -50,16 +50,23 @@ class Processor {
     if (!running_.exchange(false)) {
       return;
     }
+    cv_ctx_.notify_one();
+    if (thread_.joinable()) {
+      thread_.join();
+    }
   }
 
   void BindContext(const std::shared_ptr<ProcessorContext>& context) {
     context_ = context;
+    std::call_once(thread_flag_,
+                   [this]() { thread_ = std::thread(&Processor::Run, this); });
   }
 
  private:
   std::shared_ptr<ProcessorContext> context_;
-  std::shared_ptr<RoutineContext> routine_context_ = nullptr;
+  std::shared_ptr<RoutineContext> routine_context_;
 
+  std::once_flag thread_flag_;
   std::condition_variable cv_ctx_;
   std::mutex mtx_ctx_;
   std::thread thread_;

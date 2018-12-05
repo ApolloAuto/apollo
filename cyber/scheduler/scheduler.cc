@@ -118,8 +118,7 @@ void Scheduler::Shutdown() {
   std::vector<uint64_t> cr_list;
   {
     ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    for (auto it = id_cr_.begin();
-         it != id_cr_.end(); ++it) {
+    for (auto it = id_cr_.begin(); it != id_cr_.end(); ++it) {
       auto cr = it->second;
       auto id = cr->id();
       cr_list.emplace_back(id);
