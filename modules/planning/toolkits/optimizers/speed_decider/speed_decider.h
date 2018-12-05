@@ -49,7 +49,7 @@ class SpeedDecider : public Task {
 
   bool CheckKeepClearCrossable(const PathDecision* const path_decision,
                                const SpeedData& speed_profile,
-                               const StBoundary& st_boundary) const;
+                               const StBoundary& kee_clear_st_boundary) const;
   /**
    * @brief check if the ADC should follow an obstacle by examing the
    *StBoundary of the obstacle.
