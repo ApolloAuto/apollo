@@ -52,6 +52,12 @@ class FeatureOutput {
   static void Insert(const Feature& feature);
 
   /**
+    * @brief Insert a data_for_learning
+    * @param A feature in proto
+    */
+  static void InsertIntoLearningData(const Feature& feature);
+
+  /**
    * @brief Write features to a file
    */
   static void Write();
@@ -64,7 +70,7 @@ class FeatureOutput {
 
  private:
   static Features features_;
-
+  static DataForLearning data_for_learning_;
   static std::size_t index_;
 };
 
