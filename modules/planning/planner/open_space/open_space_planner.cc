@@ -61,7 +61,7 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
 apollo::common::Status OpenSpacePlanner::Plan(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   if (FLAGS_enable_open_space_planner_thread) {
-    ADEBUG << "Open space plan in multi-threads mode";
+    AINFO << "Open space plan in multi-threads mode";
 
     // Update Vehicle information and obstacles information from frame.
     open_space_roi_generator_.reset(new OpenSpaceROI());
@@ -164,14 +164,18 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
     {
       ADEBUG << "Open space plan in multi-threads mode : start to generate new "
                 "trajectories";
-      std::lock_guard<std::mutex> lock(open_space_mutex_);
+      OpenSpaceThreadData thread_data;
+      {
+        std::lock_guard<std::mutex> lock(open_space_mutex_);
+        thread_data = thread_data_;
+      }
       if (open_space_trajectory_generator_->Plan(
-              thread_data_.planning_init_point, thread_data_.vehicle_state,
-              thread_data_.XYbounds, thread_data_.rotate_angle,
-              thread_data_.translate_origin, thread_data_.end_pose,
-              thread_data_.obstacles_num, thread_data_.obstacles_edges_num,
-              thread_data_.obstacles_A, thread_data_.obstacles_b,
-              thread_data_.warmstart_obstacles) == Status::OK()) {
+              thread_data.planning_init_point, thread_data.vehicle_state,
+              thread_data.XYbounds, thread_data.rotate_angle,
+              thread_data.translate_origin, thread_data.end_pose,
+              thread_data.obstacles_num, thread_data.obstacles_edges_num,
+              thread_data.obstacles_A, thread_data.obstacles_b,
+              thread_data.warmstart_obstacles) == Status::OK()) {
         trajectory_updated_.store(true);
       }
     }

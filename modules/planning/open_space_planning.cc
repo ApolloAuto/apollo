@@ -145,7 +145,7 @@ Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
     return status;
   }
 
-  AINFO << "Open Space Planner Init Frame Done";
+  ADEBUG << "Open Space Planner Init Frame Done";
 
   return Status::OK();
 }
@@ -210,7 +210,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
       Clock::NowInSeconds() - start_timestamp);
 
   if (!status.ok()) {
-    AERROR << status.ToString();
+    AINFO << status.ToString();
     if (FLAGS_publish_estop) {
       // Because the function "Control::ProduceControlCommand()" checks the
       // "estop" signal with the following line (Line 170 in control.cc):
@@ -286,59 +286,100 @@ Status OpenSpacePlanning::Plan(
 
   auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
 
-  if (status != Status::OK()) {
+  Status trajectory_partition_status;
+
+  if (status == Status::OK()) {
+    ADCTrajectory* trajectory_after_stitching_point =
+        frame_->mutable_trajectory();
+
+    trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
+        current_time_stamp);
+
+    // adjust the relative time and relative s
+    int size_of_trajectory_after_stitching_point =
+        trajectory_after_stitching_point->trajectory_point_size();
+    double last_stitching_trajectory_relative_time =
+        stitching_trajectory.back().relative_time();
+    double last_stitching_trajectory_relative_s =
+        stitching_trajectory.back().path_point().s();
+    for (int i = 0; i < size_of_trajectory_after_stitching_point; i++) {
+      trajectory_after_stitching_point->mutable_trajectory_point(i)
+          ->set_relative_time(
+              trajectory_after_stitching_point->mutable_trajectory_point(i)
+                  ->relative_time() +
+              last_stitching_trajectory_relative_time);
+      trajectory_after_stitching_point->mutable_trajectory_point(i)
+          ->mutable_path_point()
+          ->set_s(trajectory_after_stitching_point->mutable_trajectory_point(i)
+                      ->path_point()
+                      .s() +
+                  last_stitching_trajectory_relative_s);
+    }
+
+    last_publishable_trajectory_.reset(
+        new PublishableTrajectory(*trajectory_after_stitching_point));
+
+    ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+
+    if (FLAGS_enable_stitch_last_trajectory) {
+      last_publishable_trajectory_->PrependTrajectoryPoints(
+          stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+    }
+
+    // save the publishable trajectory for use when no planning is generated
+    last_trajectory_ = std::make_unique<PublishableTrajectory>(
+        current_time_stamp, *last_publishable_trajectory_);
+    last_open_space_debug_.CopyFrom(frame_->open_space_debug());
+    last_trajectory_succeeded_ = true;
+
+    if (FLAGS_enable_record_debug) {
+      ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
+          stitching_trajectory.back());
+      ADEBUG << "Open space init point added!";
+      ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
+          frame_->open_space_debug());
+      ADEBUG << "Open space debug information added!";
+    }
+
+    if (FLAGS_enable_record_debug && FLAGS_export_chart) {
+      ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
+      ADEBUG << "Open Space Planning debug from frame is : "
+             << frame_->open_space_debug().ShortDebugString();
+      ADEBUG << "Open Space Planning export chart with : "
+             << trajectory_pb->ShortDebugString();
+
+      // trajectory partition and choose the current trajectory to follow
+      trajectory_partition_status =
+          TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
+    }
+  } else if (status ==
+             Status(ErrorCode::PLANNING_ERROR,
+                    "Waiting for planning thread in OpenSpacePlanner")) {
+    if (last_trajectory_succeeded_) {
+      if (FLAGS_enable_record_debug) {
+        ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
+            stitching_trajectory.back());
+        ADEBUG << "Open space init point added!";
+        ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
+            last_open_space_debug_);
+        ADEBUG << "Open space debug information added!";
+      }
+      if (FLAGS_enable_record_debug && FLAGS_export_chart) {
+        ExportOpenSpaceChart(last_open_space_debug_, ptr_debug);
+        ADEBUG << "Open Space Planning debug from frame is : "
+               << last_open_space_debug_.ShortDebugString();
+        ADEBUG << "Open Space Planning export chart with : "
+               << trajectory_pb->ShortDebugString();
+        // trajectory partition and choose the current trajectory to follow
+        trajectory_partition_status =
+            TrajectoryPartition(last_trajectory_, trajectory_pb);
+      }
+    } else {
+      return status;
+    }
+  } else {
     return status;
   }
-
-  if (FLAGS_enable_record_debug) {
-    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
-        stitching_trajectory.back());
-    ADEBUG << "Open space init point added!";
-    ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
-        frame_->open_space_debug());
-    ADEBUG << "Open space debug information added!";
-  }
-
-  if (FLAGS_enable_record_debug && FLAGS_export_chart) {
-    ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
-    ADEBUG << "Open Space Planning debug from frame is : "
-           << frame_->open_space_debug().ShortDebugString();
-    ADEBUG << "Open Space Planning export chart with : "
-           << trajectory_pb->ShortDebugString();
-  }
-
-  ADCTrajectory* trajectory_after_stitching_point =
-      frame_->mutable_trajectory();
-
-  trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
-      current_time_stamp);
-
-  // adjust the relative time
-  int size_of_trajectory_after_stitching_point =
-      trajectory_after_stitching_point->trajectory_point_size();
-  double last_stitching_trajectory_relative_time =
-      stitching_trajectory.back().relative_time();
-  for (int i = 0; i < size_of_trajectory_after_stitching_point; i++) {
-    trajectory_after_stitching_point->mutable_trajectory_point(i)
-        ->set_relative_time(
-            trajectory_after_stitching_point->mutable_trajectory_point(i)
-                ->relative_time() +
-            last_stitching_trajectory_relative_time);
-  }
-
-  last_publishable_trajectory_.reset(
-      new PublishableTrajectory(*trajectory_after_stitching_point));
-
-  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
-
-  if (FLAGS_enable_stitch_last_trajectory) {
-    last_publishable_trajectory_->PrependTrajectoryPoints(
-        stitching_trajectory.begin(), stitching_trajectory.end() - 1);
-  }
-
-  // trajectory partition and choose the current trajectory to follow
-  auto trajectory_partition_status =
-      TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
 
   if (trajectory_partition_status != Status::OK()) {
     return trajectory_partition_status;
@@ -521,14 +562,25 @@ Status OpenSpacePlanning::TrajectoryPartition(
   double time_shift =
       trajectory_pb->trajectory_point(closest_trajectory_point_index)
           .relative_time();
+  double s_shift =
+      trajectory_pb->trajectory_point(closest_trajectory_point_index)
+          .path_point()
+          .s();
   int trajectory_size = trajectory_pb->trajectory_point_size();
   for (int i = 0; i < trajectory_size; i++) {
     apollo::common::TrajectoryPoint* trajectory_point =
         trajectory_pb->mutable_trajectory_point(i);
     trajectory_point->set_relative_time(trajectory_point->relative_time() -
                                         time_shift);
+    trajectory_point->mutable_path_point()->set_s(
+        trajectory_point->path_point().s() - s_shift);
   }
   trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
+
+  const double dt = 1.0;;
+  for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
+    p.set_relative_time(p.relative_time() + dt);
+  }
 
   return Status::OK();
 }
