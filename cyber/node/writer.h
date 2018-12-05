@@ -71,12 +71,14 @@ Writer<MessageT>::~Writer() {
 
 template <typename MessageT>
 bool Writer<MessageT>::Init() {
-  if (init_.exchange(true)) {
-    return true;
-  }
-  transmitter_ =
+  {
+    std::lock_guard<std::mutex> g_(lock_);
+    if (init_) { return true; }
+    transmitter_ =
       transport::Transport::Instance()->CreateTransmitter<MessageT>(role_attr_);
-  RETURN_VAL_IF_NULL(transmitter_, false);
+    RETURN_VAL_IF_NULL(transmitter_, false);
+    init_ = true;
+  }
   this->role_attr_.set_id(transmitter_->id().HashValue());
   channel_manager_ =
       service_discovery::TopologyManager::Instance()->channel_manager();
@@ -86,8 +88,12 @@ bool Writer<MessageT>::Init() {
 
 template <typename MessageT>
 void Writer<MessageT>::Shutdown() {
-  if (!init_.exchange(false)) {
-    return;
+  {
+    std::lock_guard<std::mutex> g_(lock_);
+    if (!init_) {
+      return;
+    }
+    init_ = false;
   }
 
   LeaveTheTopology();
@@ -104,7 +110,7 @@ bool Writer<MessageT>::Write(const MessageT& msg) {
 
 template <typename MessageT>
 bool Writer<MessageT>::Write(const std::shared_ptr<MessageT>& msg_ptr) {
-  RETURN_VAL_IF(!init_.load(), false);
+  RETURN_VAL_IF(!WriterBase::inited(), false);
   return transmitter_->Transmit(msg_ptr);
 }
 
@@ -153,10 +159,7 @@ void Writer<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
 
 template <typename MessageT>
 bool Writer<MessageT>::HasReader() {
-  if (!init_.load()) {
-    return false;
-  }
-
+  RETURN_VAL_IF(!WriterBase::inited(), false);
   return channel_manager_->HasReader(role_attr_.channel_name());
 }
 
@@ -166,7 +169,7 @@ void Writer<MessageT>::GetReaders(std::vector<proto::RoleAttributes>* readers) {
     return;
   }
 
-  if (!init_.load()) {
+  if (!WriterBase::inited()) {
     return;
   }
 

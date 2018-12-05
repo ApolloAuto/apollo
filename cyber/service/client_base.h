@@ -35,7 +35,7 @@ class ClientBase {
 
   const std::string& ServiceName() const { return service_name_; }
 
-  bool ServiceIsReady() const;
+  virtual bool ServiceIsReady() const = 0;
 
  protected:
   std::string service_name_;

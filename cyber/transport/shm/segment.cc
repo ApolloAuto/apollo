@@ -197,11 +197,6 @@ bool Segment::OpenOrCreate() {
         new (static_cast<char*>(managed_shm_) + sizeof(State) +
              conf_.block_num() * sizeof(Block) + i * conf_.block_buf_size())
             uint8_t[conf_.block_buf_size()];
-
-    if (addr == nullptr) {
-      break;
-    }
-
     std::lock_guard<std::mutex> _g(block_buf_lock_);
     block_buf_addrs_[i] = addr;
   }
