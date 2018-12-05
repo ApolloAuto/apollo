@@ -79,8 +79,6 @@ class PredictionComponent
 
   void ProcessOfflineData(const std::string &filename);
 
-  void Stop();
-
  private:
   double component_start_time_ = 0.0;
 
