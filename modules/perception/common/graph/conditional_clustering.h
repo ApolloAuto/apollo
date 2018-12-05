@@ -99,7 +99,7 @@ void ConditionClustering<PointT>::Segment(IndicesClusters* xy_clusters) {
     std::vector<int> current_cluster;
     current_cluster.reserve(200);
     std::size_t cii = 0;
-    current_cluster.push_back(iii);
+    current_cluster.push_back(static_cast<int>(iii));
     processed[iii] = true;
     // Process the current cluster
     // (it can be growing in size as it is being processed)

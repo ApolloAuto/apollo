@@ -152,9 +152,9 @@ inline void IPlaneFitTotalLeastSquare(T *X, T *pi, int n) {
     ym += X[j++];
     zm += X[j++];
   }
-  xm /= n;
-  ym /= n;
-  zm /= n;
+  xm /= static_cast<T>(n);
+  ym /= static_cast<T>(n);
+  zm /= static_cast<T>(n);
   for (i = 0, j = 0; i < n; i++) {
     X[j++] -= xm;
     X[j++] -= ym;

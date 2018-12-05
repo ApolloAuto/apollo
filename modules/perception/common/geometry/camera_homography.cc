@@ -53,7 +53,9 @@ bool IsCamerasFieldOverlap(const base::PinholeCameraModel& from_camera,
   size_t to_height = to_camera.get_height();
   Eigen::Matrix3d f2t_rotation = extrinsic.topLeftCorner(3, 3);
   Eigen::Matrix<double, 4, 2> points;
-  points << 0.0, 0.0, f_width, 0.0, f_width, f_height, 0.0, f_height;
+  points << 0.0, 0.0, static_cast<double>(f_width), 0.0,
+            static_cast<double>(f_width), static_cast<double>(f_height),
+            0.0, static_cast<double>(f_height);
   Eigen::Vector2d pt_min(std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
   Eigen::Vector2d pt_max(-std::numeric_limits<double>::max(),

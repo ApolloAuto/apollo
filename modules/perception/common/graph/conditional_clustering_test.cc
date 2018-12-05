@@ -31,7 +31,7 @@ namespace {
 int EasyCandidate(const base::PointF& p, void* vg,
                   std::vector<int>* nn_indices) {
   nn_indices->push_back(1);
-  return nn_indices->size();
+  return static_cast<int>(nn_indices->size());
 }
 
 int EasyCandidateAll(const base::PointF& p, void* vg,
@@ -39,7 +39,7 @@ int EasyCandidateAll(const base::PointF& p, void* vg,
   for (int i = 0; i < 300; ++i) {
     nn_indices->push_back(i);
   }
-  return nn_indices->size();
+  return static_cast<int>(nn_indices->size());
 }
 
 int EasyCandidateError(const base::PointF& p, void* vg,
@@ -76,16 +76,16 @@ TEST(ConditionalClusteringTest, conditional_clustering_test) {
   size_t i, j;
   for (i = 0; i < 8; ++i) {
     for (j = 0; j < 8; ++j) {
-      tmp_pt.x = 0.5f * i;
-      tmp_pt.y = 0.5f * j;
+      tmp_pt.x = 0.5f * static_cast<float>(i);
+      tmp_pt.y = 0.5f * static_cast<float>(j);
       tmp_pt.z = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }
   }
   for (i = 0; i < 16; ++i) {
     for (j = 0; j < 16; ++j) {
-      tmp_pt.x = 0.5f * i + 100;
-      tmp_pt.y = 0.5f * j + 100;
+      tmp_pt.x = 0.5f * static_cast<float>(i) + 100;
+      tmp_pt.y = 0.5f * static_cast<float>(j) + 100;
       tmp_pt.z = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }
@@ -137,16 +137,16 @@ TEST(ConditionalClusteringTest, conditional_clustering_test1) {
   size_t i, j;
   for (i = 0; i < 8; ++i) {
     for (j = 0; j < 8; ++j) {
-      tmp_pt.x = 0.5f * i;
-      tmp_pt.y = 0.5f * j;
+      tmp_pt.x = 0.5f * static_cast<float>(i);
+      tmp_pt.y = 0.5f * static_cast<float>(j);
       tmp_pt.z = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }
   }
   for (i = 0; i < 16; ++i) {
     for (j = 0; j < 16; ++j) {
-      tmp_pt.x = 0.5f * i + 100;
-      tmp_pt.y = 0.5f * j + 100;
+      tmp_pt.x = 0.5f * static_cast<float>(i) + 100;
+      tmp_pt.y = 0.5f * static_cast<float>(j) + 100;
       tmp_pt.z = 0;
       *(polygon_in_ptr->at(i, j)) = tmp_pt;
     }

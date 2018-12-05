@@ -40,10 +40,10 @@ TEST(ConvexHull2DTest, convex_hull_2d) {
   PointF pt;
   for (size_t i = 0; i < 10; i++) {
     for (size_t j = 0; j < 10; j++) {
-      pt.x = i;
-      pt.y = j;
+      pt.x = static_cast<float>(i);
+      pt.y = static_cast<float>(j);
       pt.z = 0.0;
-      pointcloud_in.push_back(pt, 0.0, i * 1.0f);
+      pointcloud_in.push_back(pt, 0.0, static_cast<float>(i) * 1.0f);
     }
   }
   flag = convex_hull_2d.GetConvexHull(pointcloud_in, &pointcloud_out);
@@ -105,9 +105,9 @@ TEST(ConvexHull2DTest1, convex_hull_2d1) {
   float height = 0.0f;
   for (size_t i = 0; i < 128; i++) {
     for (size_t j = 0; j < 128; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
-      tmp_pt.z = 1.f * i;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
+      tmp_pt.z = static_cast<float>(i);
       *(pointcloud_in_ptr->at(i, j)) = tmp_pt;
       pointcloud_in_ptr->SetPointHeight(i, j, height);
     }

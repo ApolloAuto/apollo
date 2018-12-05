@@ -41,9 +41,12 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
   img_w_ = img_w;
   img_h_ = img_h;
   d_r_ = d_r;
-  d_theta_ = M_PI * d_theta / 180.0;
-  r_size_ = 2 * sqrtf(img_w_ * img_w_ + img_h_ * img_h_) / d_r_;
-  theta_size_ = M_PI / d_theta_;
+  d_theta_ = static_cast<float>(M_PI) * d_theta / 180.0f;
+  r_size_ = static_cast<int>(2 *
+                             sqrtf(static_cast<float>(img_w_ * img_w_ +
+                                                      img_h_ * img_h_))
+                            / d_r_);
+  theta_size_ = static_cast<int>(M_PI / d_theta_);
 
   ClearWithShrink();
   // init vote map
@@ -55,11 +58,12 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
   }
 
   for (int theta_idx = 0; theta_idx < theta_size_; ++theta_idx) {
-    float cur_theta = d_theta_ * theta_idx;
+    float cur_theta = d_theta_ * static_cast<float>(theta_idx);
     for (int img_pos = 0; img_pos < img_w_ * img_h_; ++img_pos) {
       int w = img_pos % img_w_;
       int h = img_pos / img_w_;
-      int r = (cos(cur_theta) * w + sin(cur_theta) * h) / d_r_ + r_size_ / 2;
+      int r = static_cast<int>((cos(cur_theta) * w + sin(cur_theta) * h)
+                               / d_r_) + r_size_ / 2;
       if (0 <= r && r < r_size_) {
         query_map_[img_pos][theta_idx] = r * theta_size_ + theta_idx;
       }
@@ -93,8 +97,8 @@ bool HoughTransfer::ImageVote(const std::vector<int>& image,
   ResetMaps(with_distribute);
   for (size_t i = 0; i < image.size(); ++i) {
     if (image[i] > 0) {
-      int x = i % img_w_;
-      int y = i / img_w_;
+      int x = static_cast<int>(i) % img_w_;
+      int y = static_cast<int>(i) / img_w_;
       PointVote(x, y, with_distribute);
     }
   }
@@ -155,12 +159,17 @@ bool HoughTransfer::GetLines(int min_pt_num, int r_neibor, int theta_neibor,
 unsigned int HoughTransfer::MemoryConsume() const {
   unsigned int size = 0;
   if (is_prepared()) {
-    size += vote_map_.capacity() * sizeof(vote_map_[0]);
-    size += query_map_.capacity() * sizeof(query_map_[0]);
-    size += theta_size_ * query_map_.size() * sizeof(query_map_[0][0]);
-    size += distribute_map_.capacity() * sizeof(distribute_map_[0]);
+    size += static_cast<unsigned int>(vote_map_.capacity() *
+                                      sizeof(vote_map_[0]));
+    size += static_cast<unsigned int>(query_map_.capacity() *
+                                      sizeof(query_map_[0]));
+    size += static_cast<unsigned int>(theta_size_ * query_map_.size() *
+                                      sizeof(query_map_[0][0]));
+    size += static_cast<unsigned int>(distribute_map_.capacity() *
+                                      sizeof(distribute_map_[0]));
     for (const auto& distribute : distribute_map_) {
-      size += distribute.capacity() * sizeof(distribute[0]);
+      size += static_cast<unsigned int>(distribute.capacity() *
+                                        sizeof(distribute[0]));
     }
   }
   return size;
@@ -239,8 +248,8 @@ bool HoughTransfer::VotePosToHoughLine(int vote_pos, bool with_distribute,
   if (!out_line) {
     return false;
   }
-  out_line->r = (vote_pos / theta_size_ - r_size_ / 2) * d_r_;
-  out_line->theta = (vote_pos % theta_size_) * d_theta_;
+  out_line->r = static_cast<float>(vote_pos / theta_size_ - r_size_ / 2) * d_r_;
+  out_line->theta = static_cast<float>(vote_pos % theta_size_) * d_theta_;
   out_line->vote_num = vote_map_[vote_pos];
   if (with_distribute) {
     if (out_line->vote_num !=
@@ -254,8 +263,10 @@ bool HoughTransfer::VotePosToHoughLine(int vote_pos, bool with_distribute,
     const int start_y = start_pos / img_w_;
     const int end_x = end_pos % img_w_;
     const int end_y = end_pos / img_w_;
-    out_line->length = sqrtf((start_x - end_x) * (start_x - end_x) +
-                             (start_y - end_y) * (start_y - end_y));
+    out_line->length = sqrtf(static_cast<float>((start_x - end_x) *
+                                                (start_x - end_x) +
+                                                (start_y - end_y) *
+                                                (start_y - end_y)));
   }
   return true;
 }

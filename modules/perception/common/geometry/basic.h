@@ -60,7 +60,7 @@ inline typename PointT::Type CalculateEuclidenDist(const PointT &pt1,
   typename PointT::Type dist = (pt1.x - pt2.x) * (pt1.x - pt2.x);
   dist += (pt1.y - pt2.y) * (pt1.y - pt2.y);
   dist += (pt1.z - pt2.z) * (pt1.z - pt2.z);
-  return sqrt(dist);
+  return static_cast<typename PointT::Type>(sqrt(dist));
 }
 
 // @brief calculate the Euclidean distance between two points in X-Y plane
@@ -70,7 +70,7 @@ inline typename PointT::Type CalculateEuclidenDist2DXY(const PointT &pt1,
                                                        const PointT &pt2) {
   typename PointT::Type dist = (pt1.x - pt2.x) * (pt1.x - pt2.x);
   dist += (pt1.y - pt2.y) * (pt1.y - pt2.y);
-  return sqrt(dist);
+  return static_cast<typename PointT::Type>(sqrt(dist));
 }
 
 // @brief calculate cos value of the rotation angle
@@ -170,12 +170,12 @@ void ConvertCartesiantoPolarCoordinate(const PointT &xyz,
   const T y = xyz.y;
   const T z = xyz.z;
 
-  (*dist) = sqrt(x * x + y * y + z * z);
-  T dist_xy = sqrt(x * x + y * y);
+  (*dist) = static_cast<T>(sqrt(x * x + y * y + z * z));
+  T dist_xy = static_cast<T>(sqrt(x * x + y * y));
 
   (*h_angle_in_degree) = std::acos(x / dist_xy) * radian_to_degree;
   if (y < 0.0) {
-    (*h_angle_in_degree) = 360.0 - (*h_angle_in_degree);
+    (*h_angle_in_degree) = static_cast<T>(360.0) - (*h_angle_in_degree);
   }
 
   (*v_angle_in_degree) = std::acos(dist_xy / (*dist)) * radian_to_degree;
