@@ -36,9 +36,9 @@ void TransformPoint(const PointT &point_in, const Eigen::Affine3d &pose,
                     PointT *point_out) {
   Eigen::Vector3d point3d(point_in.x, point_in.y, point_in.z);
   point3d = pose * point3d;
-  point_out->x = point3d.x();
-  point_out->y = point3d.y();
-  point_out->z = point3d.z();
+  point_out->x = static_cast<typename PointT::Type>(point3d.x());
+  point_out->y = static_cast<typename PointT::Type>(point3d.y());
+  point_out->z = static_cast<typename PointT::Type>(point3d.z());
 }
 
 // @brief transform a point cloud
@@ -140,9 +140,9 @@ Eigen::Matrix<T, 3, 1> CalculateCentroid(
     centroid[2] += pt.z;
   }
   if (point_num > 0) {
-    centroid[0] /= point_num;
-    centroid[1] /= point_num;
-    centroid[2] /= point_num;
+    centroid[0] /= static_cast<T>(point_num);
+    centroid[1] /= static_cast<T>(point_num);
+    centroid[2] /= static_cast<T>(point_num);
   }
   return centroid;
 }

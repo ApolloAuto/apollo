@@ -73,8 +73,8 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_circular_test2) {
       std::shared_ptr<PointCloud<PointF>>(new base::PointCloud<PointF>);
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 0.f;
       *(pc_in->at(i, j)) = tmp_pt;
     }
@@ -98,8 +98,8 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_circular_test3) {
       std::shared_ptr<PointCloud<PointF>>(new base::PointCloud<PointF>);
   for (size_t i = 0; i < 4; i++) {
     for (size_t j = 0; j < 4; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 0.f;
       *(pc_in->at(i, j)) = tmp_pt;
     }
@@ -119,9 +119,9 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_circular_org_all1) {
   center_pt.y = 0.f;
   center_pt.z = 0.f;
   for (float i = 1.f; i <= 128; i++) {
-    tmp_pt.x = 1.f * i;
-    tmp_pt.y = 1.f * i;
-    tmp_pt.z = 1.f * i;
+    tmp_pt.x = i;
+    tmp_pt.y = i;
+    tmp_pt.z = i;
     pc_in->push_back(tmp_pt);
   }
   int smp_ratio = 1;
@@ -169,8 +169,8 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_circular_org_partial1) {
   center_pt.z = 0.f;
   for (size_t i = 0; i < 64; i++) {
     for (size_t j = 0; j < 64; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 1.f;
       *(pc_in->at(i, j)) = tmp_pt;
       all_org_idx.push_back(std::make_pair(i, j));
@@ -202,8 +202,8 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_circular_org_partial2) {
   center_pt.z = 0.f;
   for (size_t i = 0; i < 64; i++) {
     for (size_t j = 0; j < 64; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 1.f;
       *(pc_in->at(i, j)) = tmp_pt;
       all_org_idx.push_back(std::make_pair(i, j));
@@ -237,8 +237,8 @@ TEST(PointCloudProcessingDownsamplingTest,
   center_pt.z = 0.f;
   for (size_t i = 0; i < 126; i++) {
     for (size_t j = 0; j < 126; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 1.f;
       *(pc_in->at(i, j)) = tmp_pt;
       all_org_idx.push_back(std::make_pair(i, j));
@@ -272,8 +272,8 @@ TEST(PointCloudProcessingDownsamplingTest,
   center_pt.z = 0.f;
   for (size_t i = 0; i < 128; i++) {
     for (size_t j = 0; j < 128; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 1.f;
       *(pc_in->at(i, j)) = tmp_pt;
       all_org_idx.push_back(std::make_pair(i, j));
@@ -300,8 +300,8 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_rectangle_neighbour1) {
       std::shared_ptr<PointCloud<PointF>>(new PointCloud<PointF>);
   for (size_t i = 0; i < 64; i++) {
     for (size_t j = 0; j < 64; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 1.f;
       *(pc_in->at(i, j)) = tmp_pt;
     }
@@ -325,8 +325,8 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_rectangle_neighbour2) {
       std::shared_ptr<PointCloud<PointF>>(new PointCloud<PointF>);
   for (size_t i = 0; i < 64; i++) {
     for (size_t j = 0; j < 64; j++) {
-      tmp_pt.x = 1.f * i;
-      tmp_pt.y = 1.f * j;
+      tmp_pt.x = static_cast<float>(i);
+      tmp_pt.y = static_cast<float>(j);
       tmp_pt.z = 1.f;
       *(pc_in->at(i, j)) = tmp_pt;
     }

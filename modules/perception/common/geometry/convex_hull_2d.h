@@ -217,9 +217,9 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
   }
   out_polygon->clear();
   out_polygon->resize(polygon_indices_.size());
-  float min_z = in_cloud_->at(0).z;
+  float min_z = static_cast<float>(in_cloud_->at(0).z);
   for (std::size_t id = 0; id < in_cloud_->size(); ++id) {
-    min_z = std::min<float>(in_cloud_->at(id).z, min_z);
+    min_z = std::min<float>(static_cast<float>(in_cloud_->at(id).z), min_z);
   }
   for (std::size_t i = 0; i < polygon_indices_.size(); ++i) {
     out_polygon->at(i).x = points_[polygon_indices_[i]](0);

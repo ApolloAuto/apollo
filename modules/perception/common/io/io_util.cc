@@ -93,7 +93,9 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
       params(9 + i) = node["D"][i].as<float>();
     }
 
-    model->set_params(camera_width, camera_height, params);
+    model->set_params(static_cast<size_t>(camera_width),
+                      static_cast<size_t>(camera_height),
+                      params);
   } catch (YAML::Exception &e) {
     AERROR << "load camera intrisic file " << yaml_file
               << " with error, YAML exception: " << e.what();
@@ -148,13 +150,13 @@ bool LoadOmnidirectionalCameraIntrinsics(
     params.push_back(node["principalpoint"]["x"].as<float>());
     params.push_back(node["principalpoint"]["y"].as<float>());
 
-    params.push_back(node["cam2world"].size());
+    params.push_back(static_cast<float>(node["cam2world"].size()));
 
     for (size_t i = 0; i < node["cam2world"].size(); ++i) {
       params.push_back(node["cam2world"][i].as<float>());
     }
 
-    params.push_back(node["world2cam"].size());
+    params.push_back(static_cast<float>(node["world2cam"].size()));
 
     for (size_t i = 0; i < node["world2cam"].size(); ++i) {
       params.push_back(node["world2cam"][i].as<float>());

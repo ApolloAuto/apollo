@@ -106,7 +106,7 @@ void DownsamplingCircularOrgPartial(
     const typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
     typename std::shared_ptr<base::PointCloud<PointT>> down_cloud,
     std::vector<std::pair<int, int>>* all_org_idx_ptr) {
-  int smp_height = cloud->height() / smp_ratio;
+  int smp_height = static_cast<int>(cloud->height()) / smp_ratio;
   int smp_width = org_num;
   CHECK(smp_width >= 1 && smp_width < velodyne_model) << "org_num error!";
   size_t ii = 0;
@@ -114,7 +114,7 @@ void DownsamplingCircularOrgPartial(
   all_org_idx_ptr->resize(smp_height * smp_width);
   for (size_t hh = 0; hh < smp_height; ++hh) {
     for (size_t ww = 0; ww < smp_width; ++ww) {
-      int ori_hh = hh * smp_ratio;
+      int ori_hh = static_cast<int>(hh) * smp_ratio;
       const PointT* p_ptr = cloud->at(ww, ori_hh);
       if (p_ptr == nullptr) {
         continue;
@@ -128,8 +128,8 @@ void DownsamplingCircularOrgPartial(
         continue;
       } else {
         down_cloud->at(ii) = p;
-        all_org_idx_ptr->at(ii).first = hh;
-        all_org_idx_ptr->at(ii).second = ww;
+        all_org_idx_ptr->at(ii).first = static_cast<int>(hh);
+        all_org_idx_ptr->at(ii).second = static_cast<int>(ww);
         ++ii;
       }
     }
@@ -147,7 +147,7 @@ void DownsamplingRectangleOrgPartial(
     typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
     typename std::shared_ptr<base::PointCloud<PointT>> down_cloud,
     std::vector<std::pair<int, int>>* all_org_idx_ptr) {
-  int smp_height = cloud->height() / smp_ratio;
+  int smp_height = static_cast<int>(cloud->height()) / smp_ratio;
   int smp_width = org_num;
   CHECK(smp_width >= 1 && smp_width < velodyne_model) << "org_num error!";
   size_t ii = 0;
@@ -155,7 +155,7 @@ void DownsamplingRectangleOrgPartial(
   all_org_idx_ptr->resize(smp_height * smp_width);
   for (size_t hh = 0; hh < smp_height; ++hh) {
     for (size_t ww = 0; ww < smp_width; ++ww) {
-      int ori_hh = hh * smp_ratio;
+      int ori_hh = static_cast<int>(hh) * smp_ratio;
       const PointT* p_ptr = cloud->at(ww, ori_hh);
       if (p_ptr == nullptr) {
         continue;
@@ -168,8 +168,8 @@ void DownsamplingRectangleOrgPartial(
         continue;
       } else {
         down_cloud->at(ii) = p;
-        all_org_idx_ptr->at(ii).first = hh;
-        all_org_idx_ptr->at(ii).second = ww;
+        all_org_idx_ptr->at(ii).first = static_cast<int>(hh);
+        all_org_idx_ptr->at(ii).second = static_cast<int>(ww);
         ++ii;
       }
     }
