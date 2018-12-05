@@ -41,8 +41,9 @@ class KeepClear : public TrafficRule {
  private:
   bool BuildKeepClearObstacle(Frame* const frame,
                               ReferenceLineInfo* const reference_line_info,
-                              hdmap::PathOverlap* const keep_clear_overlap,
-                              const std::string& virtual_obstacle_id);
+                              const std::string& virtual_obstacle_id,
+                              const double keep_clear_start_s,
+                              const double keep_clear_end_s);
  private:
   static constexpr char const* const KEEP_CLEAR_VO_ID_PREFIX = "KC_";
   static constexpr char const* const KEEP_CLEAR_JUNCTION_VO_ID_PREFIX =

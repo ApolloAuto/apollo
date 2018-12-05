@@ -48,30 +48,85 @@ Status KeepClear::ApplyRule(Frame* const frame,
           KEEP_CLEAR_VO_ID_PREFIX + keep_clear_overlap.object_id;
 
       if (BuildKeepClearObstacle(frame, reference_line_info,
-                                 const_cast<PathOverlap*>(&keep_clear_overlap),
-                                 obstacle_id)) {
+                                 obstacle_id,
+                                 keep_clear_overlap.start_s,
+                                 keep_clear_overlap.end_s)) {
         ADEBUG << "KEEP_CLAER for keep_clear_zone["
                << keep_clear_overlap.object_id << "] s["
-               << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
-               << "] BUILD";
+               << keep_clear_overlap.start_s
+               << ", " << keep_clear_overlap.end_s << "] BUILD";
       }
     }
   }
 
   // junction
   if (config_.keep_clear().enable_junction()) {
-    const std::vector<PathOverlap>& junction_overlaps =
-        reference_line_info->reference_line().map_path().junction_overlaps();
-    for (const auto& junction_overlap : junction_overlaps) {
+    hdmap::PathOverlap *crosswalk_overlap = nullptr;
+    hdmap::PathOverlap *stop_sign_overlap = nullptr;
+    hdmap::PathOverlap *traffic_light_overlap = nullptr;
+    hdmap::PathOverlap *pnc_junction_overlap = nullptr;
+
+    const auto& first_encountered_overlaps =
+        reference_line_info->FirstEncounteredOverlaps();
+    for (const auto& overlap : first_encountered_overlaps) {
+      ADEBUG << overlap.first << ", " << overlap.second.DebugString();
+      switch (overlap.first) {
+        case ReferenceLineInfo::CROSSWALK:
+          crosswalk_overlap = const_cast<PathOverlap*>(&overlap.second);
+          break;
+        case ReferenceLineInfo::STOP_SIGN:
+          stop_sign_overlap = const_cast<PathOverlap*>(&overlap.second);
+          break;
+        case ReferenceLineInfo::SIGNAL:
+          traffic_light_overlap = const_cast<PathOverlap*>(&overlap.second);
+          break;
+        case ReferenceLineInfo::PNC_JUNCTION:
+          pnc_junction_overlap = const_cast<PathOverlap*>(&overlap.second);
+          break;
+        default:
+          break;
+      }
+    }
+
+    if (pnc_junction_overlap != nullptr) {
+      // adjust pnc_junction start_s to align with
+      // the start_s of other "stop type"overlaps
+      double pnc_junction_start_s = pnc_junction_overlap->start_s;
+
+      const double kPncJunctionStartSDiffBuffer = 3.0;
+      // traffic_light, stop_sign, and then crosswalk if neither
+      if (traffic_light_overlap != nullptr &&
+          std::abs(pnc_junction_start_s -
+                   traffic_light_overlap->start_s) <=
+              kPncJunctionStartSDiffBuffer) {
+        ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
+            << "] to traffic_light_start_s"
+            << traffic_light_overlap->start_s << "]";
+          pnc_junction_start_s = traffic_light_overlap->start_s;
+      } else if (stop_sign_overlap != nullptr &&
+          std::abs(pnc_junction_start_s - stop_sign_overlap->start_s) <=
+              kPncJunctionStartSDiffBuffer) {
+        ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
+            << "] to stop_sign_start_s" << stop_sign_overlap->start_s << "]";
+        pnc_junction_start_s = stop_sign_overlap->start_s;
+      } else if (crosswalk_overlap != nullptr &&
+          std::abs(pnc_junction_start_s - crosswalk_overlap->start_s) <=
+              kPncJunctionStartSDiffBuffer) {
+        ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
+            << "] to cross_walk_start_s" << crosswalk_overlap->start_s << "]";
+        pnc_junction_start_s = crosswalk_overlap->start_s;
+      }
+
       const auto obstacle_id =
-          KEEP_CLEAR_JUNCTION_VO_ID_PREFIX + junction_overlap.object_id;
+          KEEP_CLEAR_JUNCTION_VO_ID_PREFIX + pnc_junction_overlap->object_id;
 
       if (BuildKeepClearObstacle(frame, reference_line_info,
-                                 const_cast<PathOverlap*>(&junction_overlap),
-                                 obstacle_id)) {
-        ADEBUG << "KEEP_CLAER for junction[" << junction_overlap.object_id
-               << "] s[" << junction_overlap.start_s << ", "
-               << junction_overlap.end_s << "] BUILD";
+                                 obstacle_id,
+                                 pnc_junction_start_s,
+                                 pnc_junction_overlap->end_s)) {
+        ADEBUG << "KEEP_CLAER for junction[" << pnc_junction_overlap->object_id
+               << "] s[" << pnc_junction_start_s << ", "
+               << pnc_junction_overlap->end_s << "] BUILD";
       }
     }
   }
@@ -81,27 +136,29 @@ Status KeepClear::ApplyRule(Frame* const frame,
 
 bool KeepClear::BuildKeepClearObstacle(
     Frame* const frame, ReferenceLineInfo* const reference_line_info,
-    PathOverlap* const keep_clear_overlap,
-    const std::string& virtual_obstacle_id) {
+    const std::string& virtual_obstacle_id,
+    const double keep_clear_start_s,
+    const double keep_clear_end_s) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-  CHECK_NOTNULL(keep_clear_overlap);
 
   // check
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  if (adc_front_edge_s - keep_clear_overlap->start_s >
+  if (adc_front_edge_s - keep_clear_start_s >
       config_.keep_clear().min_pass_s_distance()) {
-    ADEBUG << "adc inside keep_clear zone[" << keep_clear_overlap->object_id
-           << "] s[" << keep_clear_overlap->start_s << ", "
-           << keep_clear_overlap->end_s << "] adc_front_edge_s["
+    ADEBUG << "adc inside keep_clear zone[" << virtual_obstacle_id
+           << "] s[" << keep_clear_start_s << ", "
+           << keep_clear_end_s << "] adc_front_edge_s["
            << adc_front_edge_s << "]. skip this keep clear zone";
     return false;
   }
 
+  AERROR << "keep clear obstacle: " << keep_clear_start_s;
   // create virtual static obstacle
   auto* obstacle = frame->CreateStaticObstacle(
-      reference_line_info, virtual_obstacle_id, keep_clear_overlap->start_s,
-      keep_clear_overlap->end_s);
+      reference_line_info, virtual_obstacle_id,
+      keep_clear_start_s,
+      keep_clear_end_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
