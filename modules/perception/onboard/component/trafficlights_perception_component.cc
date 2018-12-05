@@ -99,6 +99,12 @@ bool TrafficLightsPerceptionComponent::Init() {
     return false;
   }
 
+  if (FLAGS_start_visualizer) {
+    AINFO << "TrafficLight Visualizer is ON";
+  } else {
+    AINFO << "TrafficLight Visualizer is OFF";
+  }
+
   AINFO << "TrafficLight Preproc Init Success";
   return true;
 }
@@ -714,6 +720,9 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   header->set_timestamp_sec(publish_time);  // message publishing time
   AINFO << "set header time sec:" << std::to_string(frame->timestamp);
 
+  // Set traffic light color to unknown before the process
+  detected_trafficlight_color_ = base::TLColor::TL_UNKNOWN_COLOR;
+
   // sec -> nano-sec
   uint64_t ts_int64 = static_cast<uint64_t>(frame->timestamp * 1e9);
   header->set_camera_timestamp(ts_int64);
@@ -927,6 +936,10 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
 void TrafficLightsPerceptionComponent::Visualize(
     const camera::CameraFrame& frame,
     const std::vector<base::TrafficLightPtr>& lights) const {
+  char str[100];
+  cv::string tl_string;
+  cv::Scalar tl_color;
+
   if (lights.empty()) {
     return;
   }
@@ -953,31 +966,47 @@ void TrafficLightsPerceptionComponent::Visualize(
     const auto& projection_roi = light->region.projection_roi;
     const cv::Rect projection_rect(projection_roi.x, projection_roi.y,
                                    projection_roi.width, projection_roi.height);
-    cv::rectangle(output_image, projection_rect, cv::Scalar(255, 0, 0));
+    cv::rectangle(output_image, projection_rect, cv::Scalar(255, 0, 0), 3);
 
     // Detect lights
     const auto& rectified_roi = light->region.detection_roi;
     const cv::Rect rectified_rect(rectified_roi.x, rectified_roi.y,
                                   rectified_roi.width, rectified_roi.height);
+    cv::Scalar tl_color;
     switch (light->status.color) {
       case base::TLColor::TL_RED:
-        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 0, 255), 2);
+        tl_color = cv::Scalar(0, 0, 255);
+        tl_string = "RED";
         break;
       case base::TLColor::TL_GREEN:
-        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 255, 0), 2);
+        tl_color = cv::Scalar(0, 255, 0);
+        tl_string = "GREEN";
         break;
       case base::TLColor::TL_YELLOW:
-        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 255, 255), 2);
+        tl_color = cv::Scalar(0, 255, 255);
+        tl_string = "YELLOW";
         break;
       default:
-        cv::rectangle(output_image, rectified_rect, cv::Scalar(0, 0, 0), 2);
+        tl_color = cv::Scalar(255, 255, 255);
+        tl_string = "UNKNOWN";
         break;
     }
+    snprintf(str, sizeof(str), "ID:%s, %s, Conf:%.3lf",
+             light->id.c_str(),
+             tl_string.c_str(),
+             light->status.confidence);
+    cv::rectangle(output_image, rectified_rect, tl_color, 2);
+    cv::putText(output_image,
+            str,
+            cv::Point(rectified_roi.x + 20,
+                      rectified_roi.y + rectified_roi.height + 20),
+            cv::FONT_HERSHEY_COMPLEX_SMALL,
+            1.5,
+            tl_color,
+            2);
   }
 
   // Show text of voting results
-  cv::string tl_string;
-  cv::Scalar tl_color;
   switch (detected_trafficlight_color_) {
     case base::TLColor::TL_RED:
       tl_string = "RED traffic light";
@@ -1003,8 +1032,6 @@ void TrafficLightsPerceptionComponent::Visualize(
           3.0,
           tl_color,
           3);
-
-  char str[100];
 
   snprintf(str, sizeof(str), "Red lights:%d", cnt_r_);
   cv::putText(output_image,
