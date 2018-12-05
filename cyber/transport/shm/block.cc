@@ -42,12 +42,18 @@ bool Block::TryLockForWrite() {
 
 bool Block::TryLockForRead() {
   int32_t lock_num = lock_num_.load();
-  if (lock_num < kRWLockFree ||
-      !lock_num_.compare_exchange_weak(lock_num, lock_num + 1,
-                                       std::memory_order_acq_rel,
-                                       std::memory_order_relaxed)) {
+  if (lock_num < kRWLockFree) {
+    AINFO << "block is being written.";
     return false;
   }
+
+  if (!lock_num_.compare_exchange_weak(lock_num, lock_num + 1,
+                                       std::memory_order_acq_rel,
+                                       std::memory_order_relaxed)) {
+    AINFO << "fail to add read lock num, curr num: " << lock_num;
+    return false;
+  }
+
   return true;
 }
 

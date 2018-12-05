@@ -63,8 +63,9 @@ void ShmDispatcher::ReadMessage(uint64_t channel_id, uint32_t block_index) {
   auto rb = std::make_shared<ReadableBlock>();
   rb->index = block_index;
   if (!segments_[channel_id]->AcquireBlockToRead(rb.get())) {
-    AERROR << "acquire block failed, channel: "
-           << GlobalData::GetChannelById(channel_id);
+    AWARN << "fail to acquire block, channel: "
+          << GlobalData::GetChannelById(channel_id)
+          << " index: " << block_index;
     return;
   }
 
