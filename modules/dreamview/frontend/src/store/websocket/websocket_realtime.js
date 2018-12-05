@@ -94,6 +94,11 @@ export default class RealtimeWebSocketEndpoint {
                 case "RoutePath":
                     RENDERER.updateRouting(message.routingTime, message.routePath);
                     break;
+                case "RoutingPointCheckResult":
+                    if (message.error) {
+                        RENDERER.removeInvalidRoutingPoint(message.pointId, message.error);
+                    }
+                    break;
             }
         };
         this.websocket.onclose = event => {
@@ -157,6 +162,14 @@ export default class RealtimeWebSocketEndpoint {
         this.secondLastSeqNum = this.lastSeqNum;
         this.lastSeqNum = world.sequenceNum;
         this.simWorldLastUpdateTimestamp = now;
+    }
+
+    checkRoutingPoint(point) {
+        const request = {
+            type: "CheckRoutingPoint",
+            point: point
+        };
+        this.websocket.send(JSON.stringify(request));
     }
 
     requestMapElementIdsByRadius(radius) {

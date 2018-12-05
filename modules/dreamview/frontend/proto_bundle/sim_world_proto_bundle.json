@@ -4239,6 +4239,9 @@
                 }
               }
             },
+            "RSSInfo": {
+              "fields": {}
+            },
             "ADCTrajectory": {
               "fields": {
                 "header": {
@@ -4317,6 +4320,10 @@
                   "options": {
                     "default": "UNKNOWN"
                   }
+                },
+                "rssInfo": {
+                  "type": "RSSInfo",
+                  "id": 100
                 }
               },
               "nested": {
@@ -4481,6 +4488,20 @@
                   "id": 4,
                   "options": {
                     "default": 0.1
+                  }
+                },
+                "enableObstacleBlockedCheck": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "maxBackupStageCycleNum": {
+                  "type": "uint32",
+                  "id": 6,
+                  "options": {
+                    "default": 30
                   }
                 }
               }

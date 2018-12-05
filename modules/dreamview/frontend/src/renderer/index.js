@@ -265,6 +265,10 @@ class Renderer {
         }
     }
 
+    removeInvalidRoutingPoint(pointId, error) {
+        this.routingEditor.removeInvalidRoutingPoint(pointId, error, this.scene);
+    }
+
     setParkingSpaceId(id) {
         this.routingEditor.setParkingSpaceId(id);
     }
