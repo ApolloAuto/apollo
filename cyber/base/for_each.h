@@ -19,31 +19,25 @@
 
 #include <type_traits>
 
+#include "cyber/base/macros.h"
+
 namespace apollo {
 namespace cyber {
 namespace base {
 
-template <typename Lhs, typename Rhs>
-class HasLess {
-  template <typename, typename>
-  static int test(...);
-
-  template <typename A, typename B>
-  static char test(decltype(A() < B())*);
-
- public:
-  static constexpr bool value = sizeof(test<Lhs, Rhs>(nullptr)) == 1;
-};
+DEFINE_TYPE_TRAIT(HasLess, operator<)  // NOLINT
 
 template <class Value, class End>
-typename std::enable_if<HasLess<Value, End>::value, bool>::type LessThan(
-    const Value& val, const End& end) {
+typename std::enable_if<HasLess<Value>::value && HasLess<End>::value,
+                        bool>::type
+LessThan(const Value& val, const End& end) {
   return val < end;
 }
 
 template <class Value, class End>
-typename std::enable_if<!HasLess<Value, End>::value, bool>::type LessThan(
-    const Value& val, const End& end) {
+typename std::enable_if<!HasLess<Value>::value || !HasLess<End>::value,
+                        bool>::type
+LessThan(const Value& val, const End& end) {
   return val != end;
 }
 
