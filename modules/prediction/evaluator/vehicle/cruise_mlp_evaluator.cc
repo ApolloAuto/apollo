@@ -227,7 +227,6 @@ void CruiseMLPEvaluator::ExtractFeatureValues
            << ".";
     return;
   }
-
   ADEBUG << "Lane feature size = " << lane_feature_values.size();
   feature_values->insert(feature_values->end(),
                          lane_feature_values.begin(),
@@ -257,7 +256,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> timestamps;
 
   std::vector<int> has_history
-      (FLAGS_cruise_historical_frame_length, 1);
+      (FLAGS_cruise_historical_frame_length, 1.0);
   std::vector<std::pair<double, double>> pos_history
       (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
   std::vector<std::pair<double, double>> vel_history
@@ -312,20 +311,21 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
     }
 
     // These are for the new features based on the relative coord. system.
-    if (i != 0 && has_history[i-1] == 0) {
-      has_history[i] = 0;
+    if (i >= FLAGS_cruise_historical_frame_length) {
       continue;
     }
-    if (feature.has_position() &&
-        i < FLAGS_cruise_historical_frame_length) {
+    if (i != 0 && has_history[i-1] == 0.0) {
+      has_history[i] = 0.0;
+      continue;
+    }
+    if (feature.has_position()) {
       pos_history[i] = WorldCoordToObjCoord
           (std::make_pair(feature.position().x(), feature.position().y()),
            obs_curr_pos, obs_curr_heading);
     } else {
-      has_history[i] = 0;
+      has_history[i] = 0.0;
     }
-    if (feature.has_velocity() &&
-        i < FLAGS_cruise_historical_frame_length) {
+    if (feature.has_velocity()) {
       auto vel_end = WorldCoordToObjCoord
           (std::make_pair(feature.velocity().x(), feature.velocity().y()),
            obs_curr_pos, obs_curr_heading);
@@ -334,10 +334,9 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
       vel_history[i] = std::make_pair(vel_end.first - vel_begin.first,
                                       vel_end.second - vel_begin.second);
     } else {
-      has_history[i] = 0;
+      has_history[i] = 0.0;
     }
-    if (feature.has_acceleration() &&
-        i < FLAGS_cruise_historical_frame_length) {
+    if (feature.has_acceleration()) {
       auto acc_end = WorldCoordToObjCoord
           (std::make_pair(feature.acceleration().x(),
                           feature.acceleration().y()),
@@ -347,10 +346,9 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
       acc_history[i] = std::make_pair(acc_end.first - acc_begin.first,
                                       acc_end.second - acc_begin.second);
     } else {
-      has_history[i] = 0;
+      has_history[i] = 0.0;
     }
-    if (feature.has_velocity_heading() &&
-        i < FLAGS_cruise_historical_frame_length) {
+    if (feature.has_velocity_heading()) {
       vel_heading_history[i] = WorldAngleToObjAngle
           (feature.velocity_heading(), obs_curr_heading);
       if (i != 0) {
@@ -360,7 +358,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
         prev_timestamp = feature.timestamp();
       }
     } else {
-      has_history[i] = 0;
+      has_history[i] = 0.0;
     }
   }
   if (count <= 0) {
