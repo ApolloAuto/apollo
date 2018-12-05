@@ -24,9 +24,8 @@ void ProcessorContext::Shutdown() {
   if (!stop_) {
     stop_ = true;
   }
-
-  processor_->Stop();
 }
+
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

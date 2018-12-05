@@ -37,7 +37,6 @@ TEST(SchedulerPolicyTest, choreo) {
   auto processor = std::make_shared<Processor>();
   auto ctx = std::make_shared<ChoreographyContext>();
   processor->BindContext(ctx);
-  ctx->BindProc(processor);
 
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("choreo");
@@ -50,7 +49,6 @@ TEST(SchedulerPolicyTest, classic) {
   auto processor = std::make_shared<Processor>();
   auto ctx = std::make_shared<ClassicContext>();
   processor->BindContext(ctx);
-  ctx->BindProc(processor);
   std::vector<std::future<void>> res;
 
   // test single routine
@@ -71,28 +69,19 @@ TEST(SchedulerPolicyTest, classic) {
     future.wait_for(std::chrono::milliseconds(1000));
   }
   res.clear();
-
   ctx->Shutdown();
 }
 
 TEST(SchedulerPolicyTest, sched_classic) {
   GlobalData::Instance()->SetProcessGroup("example_classic_sched");
-  auto sched1 = std::make_shared<SchedulerClassic>();
+  auto sched = std::make_shared<SchedulerClassic>();
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("ABC");
   cr->set_id(task_id);
-  EXPECT_TRUE(sched1->DispatchTask(cr));
+  EXPECT_TRUE(sched->DispatchTask(cr));
   // dispatch the same task
-  EXPECT_FALSE(sched1->DispatchTask(cr));
-  EXPECT_TRUE(sched1->RemoveTask("ABC"));
-  sched1->Shutdown();
-}
-
-int main(int argc, char** argv) {
-  testing::InitGoogleTest(&argc, argv);
-  apollo::cyber::Init(argv[0]);
-  auto res = RUN_ALL_TESTS();
-  return res;
+  EXPECT_FALSE(sched->DispatchTask(cr));
+  EXPECT_TRUE(sched->RemoveTask("ABC"));
 }
 
 }  // namespace scheduler

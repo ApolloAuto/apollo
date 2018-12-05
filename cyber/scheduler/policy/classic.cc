@@ -94,7 +94,6 @@ void ClassicContext::Shutdown() {
     }
   }
   cv_wq_.notify_all();
-  processor_->Stop();
 }
 
 void ClassicContext::Notify() { cv_wq_.notify_one(); }

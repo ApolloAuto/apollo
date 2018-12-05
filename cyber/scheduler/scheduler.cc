@@ -118,10 +118,8 @@ void Scheduler::Shutdown() {
   std::vector<uint64_t> cr_list;
   {
     ReadLockGuard<AtomicRWLock> lk(id_cr_lock_);
-    for (auto it = id_cr_.begin(); it != id_cr_.end(); ++it) {
-      auto cr = it->second;
-      auto id = cr->id();
-      cr_list.emplace_back(id);
+    for (auto& cr : id_cr_) {
+      cr_list.emplace_back(cr.second->id());
     }
   }
 
@@ -129,6 +127,11 @@ void Scheduler::Shutdown() {
     RemoveCRoutine(id);
   }
 
+  for (auto& processor : processors_) {
+    processor->Stop();
+  }
+
+  processors_.clear();
   pctxs_.clear();
 }
 }  // namespace scheduler

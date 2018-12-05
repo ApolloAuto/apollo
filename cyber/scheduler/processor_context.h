@@ -23,7 +23,6 @@
 
 #include "cyber/base/macros.h"
 #include "cyber/croutine/croutine.h"
-#include "cyber/scheduler/processor.h"
 
 namespace apollo {
 namespace cyber {
@@ -36,18 +35,11 @@ class Processor;
 class ProcessorContext {
  public:
   virtual void Shutdown();
-
-  void BindProc(const std::shared_ptr<Processor>& processor) {
-    processor_ = processor;
-  }
-
   virtual std::shared_ptr<CRoutine> NextRoutine() = 0;
   virtual void Wait() = 0;
 
  protected:
   bool stop_ = false;
-
-  alignas(CACHELINE_SIZE) std::shared_ptr<Processor> processor_ = nullptr;
   alignas(CACHELINE_SIZE) std::atomic_flag notified_ = ATOMIC_FLAG_INIT;
 };
 
