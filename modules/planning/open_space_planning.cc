@@ -29,6 +29,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/routing/proto/routing.pb.h"
 
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -37,8 +38,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
-#include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/planning/traffic_rules/traffic_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -400,11 +399,11 @@ Status OpenSpacePlanning::Plan(
     return trajectory_partition_status;
   }
 
-  BuildPredictedEnvironment(frame_.get()->obstacles());
+  // BuildPredictedEnvironment(frame_.get()->obstacles());
 
-  if (!IsCollisionFreeTrajectory(*trajectory_pb)) {
-    return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
-  }
+  // if (!IsCollisionFreeTrajectory(*trajectory_pb)) {
+  //   return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+  // }
 
   return Status::OK();
 }
@@ -412,11 +411,36 @@ Status OpenSpacePlanning::Plan(
 Status OpenSpacePlanning::TrajectoryPartition(
     const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
     ADCTrajectory* const trajectory_pb) {
-  std::vector<common::TrajectoryPoint> stitched_trajectory_to_end =
-      last_publishable_trajectory->trajectory_points();
+  std::vector<common::TrajectoryPoint>
+      uninterpolated_stitched_trajectory_to_end =
+          last_publishable_trajectory->trajectory_points();
+
+  // interpolate the stitched trajectory
+  std::vector<common::TrajectoryPoint> stitched_trajectory_to_end;
+  size_t interpolated_pieces_num = 50;
+  for (size_t i = 0; i < uninterpolated_stitched_trajectory_to_end.size() - 1;
+       i++) {
+    double relative_time_interval =
+        (uninterpolated_stitched_trajectory_to_end[i + 1].relative_time() -
+         uninterpolated_stitched_trajectory_to_end[i].relative_time()) /
+        interpolated_pieces_num;
+    stitched_trajectory_to_end.push_back(
+        uninterpolated_stitched_trajectory_to_end[i]);
+    for (size_t j = 0; j < interpolated_pieces_num - 1; j++) {
+      double relative_time =
+          uninterpolated_stitched_trajectory_to_end[i].relative_time() +
+          (j + 1) * relative_time_interval;
+      stitched_trajectory_to_end.emplace_back(
+          common::math::InterpolateUsingLinearApproximation(
+              uninterpolated_stitched_trajectory_to_end[i],
+              uninterpolated_stitched_trajectory_to_end[i + 1], relative_time));
+    }
+  }
+  stitched_trajectory_to_end.push_back(
+      uninterpolated_stitched_trajectory_to_end
+          [uninterpolated_stitched_trajectory_to_end.size() - 1]);
 
   double distance_s = 0.0;
-
   apollo::planning_internal::Trajectories trajectory_partition;
   std::vector<apollo::canbus::Chassis::GearPosition> gear_positions;
 
@@ -597,12 +621,12 @@ Status OpenSpacePlanning::TrajectoryPartition(
   trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
 
   // temporary workaround. need trajectory interpolation
-  const double dt = trajectory_pb->trajectory_point(1).relative_time() -
-                    trajectory_pb->trajectory_point(0).relative_time();
+  // const double dt = trajectory_pb->trajectory_point(1).relative_time() -
+  //                   trajectory_pb->trajectory_point(0).relative_time();
 
-  for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
-    p.set_relative_time(p.relative_time() - dt);
-  }
+  // for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
+  //   p.set_relative_time(p.relative_time() - dt);
+  // }
 
   return Status::OK();
 }
@@ -714,9 +738,19 @@ bool OpenSpacePlanning::IsCollisionFreeTrajectory(
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().width();
   int point_size = trajectory_pb.trajectory_point().size();
+  AINFO << "point_size " << point_size;
+  AINFO << "predicted_bounding_rectangles_.size() "
+        << predicted_bounding_rectangles_.size();
   for (int i = 0; i < point_size; ++i) {
     const auto& trajectory_point = trajectory_pb.trajectory_point(i);
     double ego_theta = trajectory_point.path_point().theta();
+    AINFO << "trajectory_point.path_point().x()"
+          << trajectory_point.path_point().x();
+    AINFO << "trajectory_point.path_point().y()"
+          << trajectory_point.path_point().y();
+    AINFO << "trajectory_point.path_point().theta()"
+          << trajectory_point.path_point().theta();
+    AINFO << "i " << i;
     Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
         ego_theta, ego_length, ego_width);
