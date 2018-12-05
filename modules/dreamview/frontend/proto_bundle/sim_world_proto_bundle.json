@@ -4515,6 +4515,13 @@
                   "options": {
                     "default": 0.5
                   }
+                },
+                "minFrontObstacleDistance": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 0.5
+                  }
                 }
               }
             },
