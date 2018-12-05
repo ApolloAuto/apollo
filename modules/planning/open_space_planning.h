@@ -95,6 +95,7 @@ class OpenSpacePlanning : public PlanningBase {
   std::unique_ptr<Frame> frame_;
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
   std::unique_ptr<PublishableTrajectory> last_trajectory_;
+  std::vector<common::TrajectoryPoint> last_stitching_trajectory_; 
   planning_internal::OpenSpaceDebug last_open_space_debug_;
   bool last_trajectory_succeeded_ = false;
 };

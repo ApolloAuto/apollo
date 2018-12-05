@@ -67,7 +67,7 @@ Status OpenSpaceTrajectoryGenerator::Init(
 }
 
 apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
-    const common::TrajectoryPoint& planning_init_point,
+    const std::vector<common::TrajectoryPoint>& stitching_trajectory,
     const VehicleState& vehicle_state, const std::vector<double>& XYbounds,
     const double rotate_angle, const Vec2d& translate_origin,
     const std::vector<double>& end_pose, size_t obstacles_num,
@@ -81,11 +81,13 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   }
 
   // initial state
-  init_state_ = planning_init_point.path_point();
+  stitching_trajectory_ = stitching_trajectory;
+  planning_init_point_ = stitching_trajectory_.back();
+  init_state_ = planning_init_point_.path_point();
   init_x_ = init_state_.x();
   init_y_ = init_state_.y();
   init_phi_ = init_state_.theta();
-  init_v_ = planning_init_point.v();
+  init_v_ = planning_init_point_.v();
   // rotate and scale the state according to the origin point defined in
   // frame
   init_x_ -= translate_origin.x();
@@ -97,8 +99,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   init_phi_ = common::math::NormalizeAngle(init_phi_ - rotate_angle);
 
   // initial control input
-  init_steer_ = planning_init_point.steer();
-  init_a_ = planning_init_point.a();
+  init_steer_ = planning_init_point_.steer();
+  init_a_ = planning_init_point_.a();
 
   Eigen::MatrixXd x0(4, 1);
   x0 << init_x_, init_y_, init_phi_, init_v_;
@@ -237,6 +239,12 @@ void OpenSpaceTrajectoryGenerator::UpdateDebugInfo(
     planning_internal::OpenSpaceDebug* open_space_debug) {
   open_space_debug->Clear();
   open_space_debug->CopyFrom(open_space_debug_);
+}
+
+void OpenSpaceTrajectoryGenerator::GetStitchingTrajectory(
+    std::vector<common::TrajectoryPoint>* stitching_trajectory) {
+  stitching_trajectory->clear();
+  *stitching_trajectory = stitching_trajectory_;
 }
 
 void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
