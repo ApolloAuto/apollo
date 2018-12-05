@@ -77,7 +77,7 @@ void Participant::CreateFastRtpsParticipant(
   }
 
   auto part_attr_conf = std::make_shared<proto::RtpsParticipantAttr>();
-  auto global_conf = common::GlobalData::Instance()->Config();
+  auto& global_conf = common::GlobalData::Instance()->Config();
   if (global_conf.has_transport_conf() &&
       global_conf.transport_conf().has_participant_attr()) {
     part_attr_conf->CopyFrom(global_conf.transport_conf().participant_attr());

@@ -44,6 +44,7 @@ class ChannelManager : public Manager {
   using WriterWarehouse = MultiValueWarehouse;
   using ReaderWarehouse = MultiValueWarehouse;
   using IntraChannels = std::unordered_set<std::string>;
+  using ExemptedMessageTypes = std::unordered_set<std::string>;
 
   ChannelManager();
   virtual ~ChannelManager();
@@ -71,6 +72,8 @@ class ChannelManager : public Manager {
   FlowDirection GetFlowDirection(const std::string& lhs_node_name,
                                  const std::string& rhs_node_name);
 
+  bool IsMessageTypeMatching(const std::string& lhs, const std::string& rhs);
+
  private:
   bool Check(const RoleAttributes& attr) override;
   void Dispose(const ChangeMsg& msg) override;
@@ -81,6 +84,7 @@ class ChannelManager : public Manager {
   void DisposeLeave(const ChangeMsg& msg);
 
   IntraChannels intra_channels_;
+  ExemptedMessageTypes exempted_msg_types_;
 
   Graph node_graph_;
   // key: node_id

@@ -49,18 +49,16 @@ using apollo::cyber::proto::RoleAttributes;
 template <typename M>
 class HybridTransmitter : public Transmitter<M> {
  public:
-  using CommunicationModePtr = std::shared_ptr<proto::CommunicationMode>;
   using MessagePtr = std::shared_ptr<M>;
   using HistoryPtr = std::shared_ptr<History<M>>;
-
   using TransmitterPtr = std::shared_ptr<Transmitter<M>>;
   using TransmitterMap =
       std::unordered_map<OptionalMode, TransmitterPtr, std::hash<int>>;
-
-  using MappingTable =
-      std::unordered_map<Relation, OptionalMode, std::hash<int>>;
   using ReceiverMap =
       std::unordered_map<OptionalMode, std::set<uint64_t>, std::hash<int>>;
+  using CommunicationModePtr = std::shared_ptr<proto::CommunicationMode>;
+  using MappingTable =
+      std::unordered_map<Relation, OptionalMode, std::hash<int>>;
 
   HybridTransmitter(const RoleAttributes& attr,
                     const ParticipantPtr& participant);
@@ -68,7 +66,6 @@ class HybridTransmitter : public Transmitter<M> {
 
   void Enable() override;
   void Disable() override;
-
   void Enable(const RoleAttributes& opposite_attr) override;
   void Disable(const RoleAttributes& opposite_attr) override;
 
@@ -76,25 +73,20 @@ class HybridTransmitter : public Transmitter<M> {
 
  private:
   void InitMode();
-  void InitHistory();
   void ObtainConfig();
-
-  void ClearTransmitters();
+  void InitHistory();
   void InitTransmitters();
-
-  void ClearReceivers();
+  void ClearTransmitters();
   void InitReceivers();
-
-  Relation GetRelation(const RoleAttributes& opposite_attr);
-
+  void ClearReceivers();
   void TransmitHistoryMsg(const RoleAttributes& opposite_attr);
   void ThreadFunc(const RoleAttributes& opposite_attr,
                   const std::vector<typename History<M>::CachedMessage>& msgs);
+  Relation GetRelation(const RoleAttributes& opposite_attr);
 
   HistoryPtr history_;
-  ReceiverMap receivers_;
   TransmitterMap transmitters_;
-
+  ReceiverMap receivers_;
   std::mutex mutex_;
 
   CommunicationModePtr mode_;
@@ -189,7 +181,7 @@ void HybridTransmitter<M>::InitMode() {
 
 template <typename M>
 void HybridTransmitter<M>::ObtainConfig() {
-  auto global_conf = common::GlobalData::Instance()->Config();
+  auto& global_conf = common::GlobalData::Instance()->Config();
   RETURN_IF(!global_conf.has_transport_conf());
   RETURN_IF(!global_conf.transport_conf().has_communication_mode());
 

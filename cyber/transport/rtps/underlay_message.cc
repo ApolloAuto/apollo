@@ -43,21 +43,21 @@ UnderlayMessage::UnderlayMessage() {
 
 UnderlayMessage::~UnderlayMessage() {}
 
-UnderlayMessage::UnderlayMessage(const UnderlayMessage &x) {
+UnderlayMessage::UnderlayMessage(const UnderlayMessage& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = x.m_data;
   m_datatype = x.m_datatype;
 }
 
-UnderlayMessage::UnderlayMessage(UnderlayMessage &&x) {
+UnderlayMessage::UnderlayMessage(UnderlayMessage&& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = std::move(x.m_data);
   m_datatype = std::move(x.m_datatype);
 }
 
-UnderlayMessage &UnderlayMessage::operator=(const UnderlayMessage &x) {
+UnderlayMessage& UnderlayMessage::operator=(const UnderlayMessage& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = x.m_data;
@@ -66,7 +66,7 @@ UnderlayMessage &UnderlayMessage::operator=(const UnderlayMessage &x) {
   return *this;
 }
 
-UnderlayMessage &UnderlayMessage::operator=(UnderlayMessage &&x) {
+UnderlayMessage& UnderlayMessage::operator=(UnderlayMessage&& x) {
   m_timestamp = x.m_timestamp;
   m_seq = x.m_seq;
   m_data = std::move(x.m_data);
@@ -93,7 +93,7 @@ size_t UnderlayMessage::getMaxCdrSerializedSize(size_t current_alignment) {
   return current_alignment - initial_alignment;
 }
 
-size_t UnderlayMessage::getCdrSerializedSize(const UnderlayMessage &data,
+size_t UnderlayMessage::getCdrSerializedSize(const UnderlayMessage& data,
                                              size_t current_alignment) {
   size_t initial_alignment = current_alignment;
 
@@ -114,7 +114,7 @@ size_t UnderlayMessage::getCdrSerializedSize(const UnderlayMessage &data,
   return current_alignment - initial_alignment;
 }
 
-void UnderlayMessage::serialize(eprosima::fastcdr::Cdr &scdr) const {
+void UnderlayMessage::serialize(eprosima::fastcdr::Cdr& scdr) const {
   scdr << m_timestamp;
 
   scdr << m_seq;
@@ -123,7 +123,7 @@ void UnderlayMessage::serialize(eprosima::fastcdr::Cdr &scdr) const {
   scdr << m_datatype;
 }
 
-void UnderlayMessage::deserialize(eprosima::fastcdr::Cdr &dcdr) {
+void UnderlayMessage::deserialize(eprosima::fastcdr::Cdr& dcdr) {
   dcdr >> m_timestamp;
   dcdr >> m_seq;
   dcdr >> m_data;
@@ -137,7 +137,7 @@ size_t UnderlayMessage::getKeyMaxCdrSerializedSize(size_t current_alignment) {
 
 bool UnderlayMessage::isKeyDefined() { return false; }
 
-void UnderlayMessage::serializeKey(eprosima::fastcdr::Cdr &scdr) const {
+void UnderlayMessage::serializeKey(eprosima::fastcdr::Cdr& scdr) const {
   (void)scdr;
 }
 

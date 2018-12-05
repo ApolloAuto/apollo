@@ -24,6 +24,7 @@
 
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/base/signal.h"
+#include "cyber/common/log.h"
 #include "cyber/message/raw_message.h"
 #include "cyber/transport/message/message_info.h"
 
@@ -115,8 +116,7 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
 
   auto connection = signals_[oppo_id]->Connect(listener);
   if (!connection.IsConnected()) {
-    AWARN << oppo_id << " "
-          << self_id << "connect failed!";
+    AWARN << oppo_id << " " << self_id << "connect failed!";
     return;
   }
 

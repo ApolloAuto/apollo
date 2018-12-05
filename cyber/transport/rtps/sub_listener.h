@@ -54,7 +54,6 @@ class SubListener : public eprosima::fastrtps::SubscriberListener {
  private:
   NewMsgCallback callback_;
   MessageInfo msg_info_;
-
   std::mutex mutex_;
 };
 

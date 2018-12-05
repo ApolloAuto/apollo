@@ -25,7 +25,7 @@ Dispatcher::Dispatcher() : is_shutdown_(false) {}
 Dispatcher::~Dispatcher() { Shutdown(); }
 
 void Dispatcher::Shutdown() {
-  is_shutdown_.exchange(true);
+  is_shutdown_.store(true);
   ADEBUG << "Shutdown";
 }
 

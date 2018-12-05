@@ -43,8 +43,8 @@ class RtpsTransmitter : public Transmitter<M> {
                   const ParticipantPtr& participant);
   virtual ~RtpsTransmitter();
 
-  void Disable() override;
   void Enable() override;
+  void Disable() override;
 
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
@@ -52,7 +52,6 @@ class RtpsTransmitter : public Transmitter<M> {
   bool Transmit(const M& msg, const MessageInfo& msg_info);
 
   ParticipantPtr participant_;
-
   eprosima::fastrtps::Publisher* publisher_;
 };
 
