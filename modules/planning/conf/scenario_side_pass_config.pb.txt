@@ -14,6 +14,7 @@ side_pass_config: {
   max_backup_stage_cycle_num: 30
   min_l_nudge_buffer: 0.5
   min_front_obstacle_distance: 0.5
+  max_front_obstacle_distance: 15.0
 }
 stage_config: {
   stage_type: SIDE_PASS_APPROACH_OBSTACLE
