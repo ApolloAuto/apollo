@@ -20,10 +20,10 @@ message ShmConf {
 };
 
 message RtpsParticipantAttr {
-    optional int32 lease_duration = 1;
-    optional int32 announcement_period = 2;
-    optional uint32 domain_id_gain = 3;
-    optional uint32 port_base = 4;
+    optional int32 lease_duration = 1 [default = 12];
+    optional int32 announcement_period = 2 [default = 3];
+    optional uint32 domain_id_gain = 3 [default = 200];
+    optional uint32 port_base = 4 [default = 10000];
 };
 
 message CommunicationMode {
@@ -33,7 +33,7 @@ message CommunicationMode {
 };
 
 message ResourceLimit {
-    optional uint32 max_history_depth = 1;
+    optional uint32 max_history_depth = 1 [default = 1000];
 };
 
 message TransportConf {

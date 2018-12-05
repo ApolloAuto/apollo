@@ -81,9 +81,6 @@ void Participant::CreateFastRtpsParticipant(
   if (global_conf.has_transport_conf() &&
       global_conf.transport_conf().has_participant_attr()) {
     part_attr_conf->CopyFrom(global_conf.transport_conf().participant_attr());
-  } else {
-    AERROR << "No rtps participant attr conf.";
-    return;
   }
 
   eprosima::fastrtps::ParticipantAttributes attr;

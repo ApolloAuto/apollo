@@ -51,26 +51,24 @@ class History {
 
   void Add(const MessagePtr& msg, const MessageInfo& msg_info);
   void Clear();
-  void GetCachedMessage(std::vector<CachedMessage>* msgs);
-  size_t GetSize();
+  void GetCachedMessage(std::vector<CachedMessage>* msgs) const;
+  size_t GetSize() const;
 
   uint32_t depth() const { return depth_; }
   uint32_t max_depth() const { return max_depth_; }
-  bool is_full() const { return is_full_; }
 
  private:
   bool enabled_;
   uint32_t depth_;
   uint32_t max_depth_;
-  bool is_full_;
   std::list<CachedMessage> msgs_;
-  std::mutex msgs_mutex_;
+  mutable std::mutex msgs_mutex_;
 };
 
 template <typename MessageT>
 History<MessageT>::History(const HistoryAttributes& attr)
-    : enabled_(false), max_depth_(1000), is_full_(false) {
-  auto global_conf = common::GlobalData::Instance()->Config();
+    : enabled_(false), max_depth_(1000) {
+  auto& global_conf = common::GlobalData::Instance()->Config();
   if (global_conf.has_transport_conf() &&
       global_conf.transport_conf().has_resource_limit()) {
     max_depth_ =
@@ -99,16 +97,9 @@ void History<MessageT>::Add(const MessagePtr& msg,
     return;
   }
   std::lock_guard<std::mutex> lock(msgs_mutex_);
-  if (is_full_) {
-    msgs_.pop_front();
-  }
-
   msgs_.emplace_back(msg, msg_info);
-
-  if (!is_full_) {
-    if (msgs_.size() == depth_) {
-      is_full_ = true;
-    }
+  while (msgs_.size() > depth_) {
+    msgs_.pop_front();
   }
 }
 
@@ -119,22 +110,19 @@ void History<MessageT>::Clear() {
 }
 
 template <typename MessageT>
-void History<MessageT>::GetCachedMessage(std::vector<CachedMessage>* msgs) {
+void History<MessageT>::GetCachedMessage(
+    std::vector<CachedMessage>* msgs) const {
   if (msgs == nullptr) {
     return;
   }
 
-  {
-    std::lock_guard<std::mutex> lock(msgs_mutex_);
-    msgs->reserve(msgs_.size());
-    for (auto& item : msgs_) {
-      msgs->emplace_back(item);
-    }
-  }
+  std::lock_guard<std::mutex> lock(msgs_mutex_);
+  msgs->reserve(msgs_.size());
+  msgs->insert(msgs->begin(), msgs_.begin(), msgs_.end());
 }
 
 template <typename MessageT>
-size_t History<MessageT>::GetSize() {
+size_t History<MessageT>::GetSize() const {
   std::lock_guard<std::mutex> lock(msgs_mutex_);
   return msgs_.size();
 }

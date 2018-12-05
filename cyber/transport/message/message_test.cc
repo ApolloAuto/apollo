@@ -94,7 +94,6 @@ TEST(HistoryTest, history_test) {
   history.Add(message, message_info);
   EXPECT_EQ(1, history.GetSize());
   message_info.set_seq_num(1);
-  EXPECT_FALSE(history.is_full());
 
   int depth = 10;
   HistoryAttributes attr2(proto::QosHistoryPolicy::HISTORY_KEEP_LAST, depth);
@@ -106,7 +105,6 @@ TEST(HistoryTest, history_test) {
     message_info.set_seq_num(i);
     history2.Add(message, message_info);
   }
-  EXPECT_TRUE(history2.is_full());
   std::vector<History<RawMessage>::CachedMessage> messages;
   history2.GetCachedMessage(nullptr);
   history2.GetCachedMessage(&messages);
