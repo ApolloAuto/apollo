@@ -23,7 +23,6 @@
 #include "cyber/common/global_data.h"
 #include "cyber/transport/common/endpoint.h"
 #include "cyber/transport/common/identity.h"
-#include "cyber/transport/common/syscall_wrapper.h"
 
 namespace apollo {
 namespace cyber {
@@ -67,24 +66,6 @@ TEST(EndpointTest, endpoint_test) {
   EXPECT_EQ(1024, endpoint2.attributes().process_id());
   EXPECT_EQ(123, endpoint2.attributes().id());
   EXPECT_NE(std::string("endpoint"), std::string(endpoint2.id().data()));
-}
-
-TEST(SyscallWrapperTest, syscall_wrapper_test) {
-  CloseAndReset(nullptr);
-
-  int pipe_fd[2] = {-1, -1};
-  CloseAndReset(&pipe_fd[0]);
-  EXPECT_FALSE(SetNonBlocking(pipe_fd[0]));
-
-  pipe(pipe_fd);
-  EXPECT_NE(pipe_fd[0], -1);
-  EXPECT_NE(pipe_fd[1], -1);
-  EXPECT_TRUE(SetNonBlocking(pipe_fd[0]));
-  EXPECT_TRUE(SetNonBlocking(pipe_fd[1]));
-  CloseAndReset(&pipe_fd[0]);
-  CloseAndReset(&pipe_fd[1]);
-  EXPECT_EQ(pipe_fd[0], -1);
-  EXPECT_EQ(pipe_fd[1], -1);
 }
 
 }  // namespace transport
