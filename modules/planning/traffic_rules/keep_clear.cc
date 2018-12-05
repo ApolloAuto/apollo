@@ -153,7 +153,7 @@ bool KeepClear::BuildKeepClearObstacle(
     return false;
   }
 
-  AERROR << "keep clear obstacle: " << keep_clear_start_s;
+  ADEBUG << "keep clear obstacle: " << keep_clear_start_s;
   // create virtual static obstacle
   auto* obstacle = frame->CreateStaticObstacle(
       reference_line_info, virtual_obstacle_id,
