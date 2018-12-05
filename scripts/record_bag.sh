@@ -43,6 +43,7 @@ function start() {
         /apollo/sensor/gnss/raw_data \
         /apollo/sensor/gnss/rtk_eph \
         /apollo/sensor/gnss/rtk_obs \
+        /apollo/sensor/gnss/heading \
         /apollo/sensor/mobileye \
         /apollo/canbus/chassis \
         /apollo/canbus/chassis_detail \
