@@ -200,14 +200,13 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     }
 
     // check driving_width
-    constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line = reference_line_info.reference_line();
     const double driving_width =
         reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
-        kLBufferThreshold) {
+        side_pass_context_.scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
 

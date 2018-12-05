@@ -74,7 +74,6 @@ Stage::StageStatus SidePassBackup::Process(
     }
 
     // check driving_width
-    constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line =
         frame->reference_line_info().front().reference_line();
     const double driving_width =
@@ -82,7 +81,7 @@ Stage::StageStatus SidePassBackup::Process(
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
-        kLBufferThreshold) {
+        GetContext()->scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
 
@@ -143,7 +142,6 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     }
 
     // check driving_width
-    constexpr double kLBufferThreshold = 0.3;  // unit: m
     const auto& reference_line =
         frame->reference_line_info().front().reference_line();
     const double driving_width =
@@ -151,7 +149,7 @@ Stage::StageStatus SidePassApproachObstacle::Process(
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
-        kLBufferThreshold) {
+        GetContext()->scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
 
