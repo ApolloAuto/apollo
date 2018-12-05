@@ -67,8 +67,10 @@ class OpenSpacePlanning : public PlanningBase {
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* const trajectory) override;
 
-  void ExportOpenSpaceChart(const planning_internal::OpenSpaceDebug& debug_info,
-                            planning_internal::Debug* debug_chart);
+  void AddOpenSpaceTrajectory(planning_internal::Debug* debug);
+
+  void ExportOpenSpaceChart(planning_internal::Debug* debug);
+
   void FillPlanningPb(const double timestamp,
                       ADCTrajectory* const trajectory_pb) override;
 
