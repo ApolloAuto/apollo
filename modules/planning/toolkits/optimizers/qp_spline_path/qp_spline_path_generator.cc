@@ -224,8 +224,8 @@ bool QpSplinePathGenerator::InitSpline(const double start_s,
   spline_solver_->Reset(knots_, qp_spline_path_config_.spline_order());
 
   // set evaluated_s_
-  uint32_t constraint_num =
-      (end_s - start_s) / qp_spline_path_config_.max_constraint_interval() + 1;
+  uint32_t constraint_num = static_cast<uint32_t>(
+      (end_s - start_s) / qp_spline_path_config_.max_constraint_interval() + 1);
   common::util::uniform_slice(start_s, end_s, constraint_num - 1,
                               &evaluated_s_);
   return (knots_.size() > 1) && !evaluated_s_.empty();
@@ -236,8 +236,8 @@ bool QpSplinePathGenerator::AddConstraint(const QpFrenetFrame& qp_frenet_frame,
   Spline1dConstraint* spline_constraint =
       spline_solver_->mutable_spline_constraint();
 
-  const int dim =
-      (knots_.size() - 1) * (qp_spline_path_config_.spline_order() + 1);
+  const int dim = static_cast<int>((knots_.size() - 1) *
+                                   (qp_spline_path_config_.spline_order() + 1));
   constexpr double param_range = 1e-4;
   for (int i = qp_spline_path_config_.spline_order(); i < dim;
        i += qp_spline_path_config_.spline_order() + 1) {
