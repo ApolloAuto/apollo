@@ -170,8 +170,12 @@ void HybridReceiver<M>::InitMode() {
 template <typename M>
 void HybridReceiver<M>::ObtainConfig() {
   auto& global_conf = common::GlobalData::Instance()->Config();
-  RETURN_IF(!global_conf.has_transport_conf());
-  RETURN_IF(!global_conf.transport_conf().has_communication_mode());
+  if (!global_conf.has_transport_conf()) {
+    return;
+  }
+  if (!global_conf.transport_conf().has_communication_mode()) {
+    return;
+  }
   mode_->CopyFrom(global_conf.transport_conf().communication_mode());
 
   mapping_table_[SAME_PROC] = mode_->same_proc();
