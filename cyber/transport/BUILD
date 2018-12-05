@@ -66,17 +66,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "syscall_wrapper",
-    srcs = [ "common/syscall_wrapper.cc", ],
-    hdrs = [ "common/syscall_wrapper.h", ],
-    deps = [
-        "history",
-        "//cyber:binary",
-        "//cyber/common:log",
-    ],
-)
-
 cc_test(
     name = "common_test",
     size = "small",
@@ -171,7 +160,6 @@ cc_library(
     deps = [
         "dispatcher",
         "notifier_factory",
-        "syscall_wrapper",
         "segment",
         "readable_info",
         "//cyber/scheduler:scheduler_factory",
