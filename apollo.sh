@@ -370,7 +370,7 @@ function release() {
   for PARAM in $PARAMS; do
     cp -P --parent -a "${PARAM}" "${APOLLO_RELEASE_DIR}"
   done
-  # perception model 
+  # perception model
   MODEL="modules/perception/model"
   cp -P --parent -a "${MODEL}" "${APOLLO_RELEASE_DIR}"
 
@@ -382,6 +382,10 @@ function release() {
 
   # scripts
   cp -r scripts ${APOLLO_RELEASE_DIR}
+
+  # manual traffic light tool
+  mkdir -p ${APOLLO_RELEASE_DIR}/modules/tools
+  cp -r modules/tools/manual_traffic_light ${APOLLO_RELEASE_DIR}/modules/tools
 
   # remove mounted models
   rm -rf ${APOLLO_RELEASE_DIR}/modules/perception/model/yolo_camera_detector/
