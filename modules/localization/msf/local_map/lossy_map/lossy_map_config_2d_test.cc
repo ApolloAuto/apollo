@@ -21,20 +21,11 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-class LossyMapConfig2DTestSuite : public ::testing::Test {
- protected:
-  LossyMapConfig2DTestSuite() {}
-  virtual ~LossyMapConfig2DTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
 /**@brief Test load and set methods in LossyMapConfig2D. */
-TEST_F(LossyMapConfig2DTestSuite, LoadSetTest) {
+TEST(LossyMapConfig2DTestSuite, LoadSetTest) {
   BaseMapConfig config("lossy_map");
-  ASSERT_EQ(config.Load("/apollo/modules/localization/msf/local_map/test_data/"
-                        "lossy_single_map/config.xml"),
-            true);
+  ASSERT_TRUE(config.Load("/apollo/modules/localization/msf/local_map/"
+                          "test_data/lossy_single_map/config.xml"));
   config.SetMultiResolutions();
   ASSERT_EQ(config.map_resolutions_.size(), 10);
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.03125);
@@ -50,20 +41,16 @@ TEST_F(LossyMapConfig2DTestSuite, LoadSetTest) {
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.125);
 
   BaseMapConfig config2;
-  EXPECT_EQ(config2.Load("/apollo/modules/localization/msf/local_map/test_data/"
-                         "lossy_single_map/config.xml"),
-            false);
+  EXPECT_FALSE(config2.Load("/apollo/modules/localization/msf/local_map/"
+                            "test_data/lossy_single_map/config.xml"));
 }
 
 /**@brief Test save method. */
-TEST_F(LossyMapConfig2DTestSuite, SaveTest) {
+TEST(LossyMapConfig2DTestSuite, SaveTest) {
   BaseMapConfig config("lossy_map");
-  ASSERT_EQ(config.Load("/apollo/modules/localization/msf/local_map/test_data/"
-                        "lossy_single_map/config.xml"),
-            true);
-  EXPECT_EQ(config.Save("/apollo/modules/localization/msf/local_map/test_data/"
-                        "temp_output_file.xml"),
-            true);
+  ASSERT_TRUE(config.Load("/apollo/modules/localization/msf/local_map/"
+                          "test_data/lossy_single_map/config.xml"));
+  EXPECT_TRUE(config.Save("/tmp/temp_output_file.xml"));
 }
 
 }  // namespace msf
