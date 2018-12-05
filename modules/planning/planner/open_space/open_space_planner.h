@@ -105,12 +105,15 @@ class OpenSpacePlanner : public Planner {
   void Stop() override;
 
  private:
-  bool CheckDestination(const common::TrajectoryPoint& planning_init_point,
-                        const std::vector<double>& end_pose);
-
-  void GenerateStopTrajectory(
+  apollo::common::Status CheckDestination(
       const common::TrajectoryPoint& planning_init_point,
-      common::Trajectory* trajectory_to_end);
+      const apollo::common::VehicleState& vehicle_state,
+      const std::vector<double>& end_pose);
+
+  void GenerateStopTrajectory(const double& stop_x, const double& stop_y,
+                              const double& stop_theta,
+                              common::Trajectory* trajectory_to_end);
+
   void LoadTrajectoryToFrame(Frame* frame);
 
  private:

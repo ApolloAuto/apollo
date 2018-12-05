@@ -377,6 +377,21 @@ Status OpenSpacePlanning::Plan(
     } else {
       return status;
     }
+  } else if (status ==
+             Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose")) {
+    ADCTrajectory* trajectory_after_stitching_point =
+        frame_->mutable_trajectory();
+
+    trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
+        current_time_stamp);
+    last_publishable_trajectory_.reset(
+        new PublishableTrajectory(*trajectory_after_stitching_point));
+
+    ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+    // trajectory partition and choose the current trajectory to follow
+    trajectory_partition_status =
+        TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
+
   } else {
     return status;
   }
@@ -533,9 +548,13 @@ Status OpenSpacePlanning::TrajectoryPartition(
         (path_end_point.y() - vehicle_state.y()) *
             (path_end_point.y() - vehicle_state.y());
     if (distance_to_trajs_end <= kepsilon_to_destination) {
-      current_trajectory_index =
-          (i + 1) >= trajectories_size ? trajectories_size - 1 : i + 1;
-      closest_trajectory_point_index = 0;
+      if (i + 1 >= trajectories_size) {
+        current_trajectory_index = trajectories_size - 1;
+        closest_trajectory_point_index = trajectory_size - 1;
+      } else {
+        current_trajectory_index = i + 1;
+        closest_trajectory_point_index = 0;
+      }
       break;
     }
 
@@ -577,10 +596,12 @@ Status OpenSpacePlanning::TrajectoryPartition(
   }
   trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
 
-  const double dt = 1.0;
+  // temporary workaround. need trajectory interpolation
+  const double dt = trajectory_pb->trajectory_point(1).relative_time() -
+                    trajectory_pb->trajectory_point(0).relative_time();
 
   for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
-    p.set_relative_time(p.relative_time() + dt);
+    p.set_relative_time(p.relative_time() - dt);
   }
 
   return Status::OK();
