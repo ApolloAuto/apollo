@@ -27,6 +27,7 @@ namespace apollo {
 namespace prediction {
 
 Features FeatureOutput::features_;
+DataForLearning FeatureOutput::data_for_learning_;
 std::size_t FeatureOutput::index_ = 0;
 
 void FeatureOutput::Close() {
@@ -38,6 +39,7 @@ void FeatureOutput::Close() {
 void FeatureOutput::Clear() {
   index_ = 0;
   features_.Clear();
+  data_for_learning_.Clear();
 }
 
 bool FeatureOutput::Ready() {
@@ -49,16 +51,47 @@ void FeatureOutput::Insert(const Feature& feature) {
   features_.add_feature()->CopyFrom(feature);
 }
 
+void FeatureOutput::InsertIntoLearningData(const Feature& feature) {
+  data_for_learning_.set_id(feature.id());
+  data_for_learning_.set_timestamp(feature.timestamp());
+
+  for (int i = 0; i < feature.lane().lane_graph().lane_sequence_size();
+       i ++) {
+    DataForLearning::LaneSequenceData lane_sequence_data;
+    auto curr_lane_sequence = feature.lane().lane_graph().lane_sequence(i);
+
+    lane_sequence_data.set_lane_sequence_id(
+        curr_lane_sequence.lane_sequence_id());
+    for (int j = 0; j < curr_lane_sequence.features().mlp_features_size();
+         j ++) {
+      lane_sequence_data.add_features_lane_learning(
+          curr_lane_sequence.features().mlp_features(j));
+    }
+    data_for_learning_.add_lane_sequence_data()->CopyFrom(lane_sequence_data);
+  }
+}
+
 void FeatureOutput::Write() {
   if (features_.feature_size() <= 0) {
     ADEBUG << "Skip writing empty feature.";
-    return;
+  } else {
+    const std::string file_name =
+        FLAGS_prediction_data_dir + "/feature." +
+        std::to_string(index_) + ".bin";
+    common::util::SetProtoToBinaryFile(features_, file_name);
+    features_.Clear();
+    ++index_;
   }
-  const std::string file_name =
-      FLAGS_prediction_data_dir + "/feature." + std::to_string(index_) + ".bin";
-  common::util::SetProtoToBinaryFile(features_, file_name);
-  features_.Clear();
-  ++index_;
+
+  if (!data_for_learning_.has_id()) {
+    ADEBUG << "Skip writing empty data_for_learning.";
+  } else {
+    const std::string file_name =
+        FLAGS_prediction_data_dir + "/datalearn." +
+        std::to_string(index_) + ".bin";
+    common::util::SetProtoToBinaryFile(data_for_learning_, file_name);
+    data_for_learning_.Clear();
+  }
 }
 
 int FeatureOutput::Size() { return features_.feature_size(); }
