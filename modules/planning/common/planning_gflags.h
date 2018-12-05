@@ -231,4 +231,3 @@ DECLARE_bool(enable_record_debug);
 DECLARE_double(default_front_clear_distance);
 
 DECLARE_double(max_trajectory_len);
-DECLARE_double(side_pass_min_front_obstacle_distance);
