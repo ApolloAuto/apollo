@@ -342,7 +342,7 @@ Status OpenSpacePlanning::Plan(
     }
 
     if (FLAGS_enable_record_debug && FLAGS_export_chart) {
-      ExportOpenSpaceChart(frame_->open_space_debug(), ptr_debug);
+      ExportOpenSpaceChart(ptr_debug);
       ADEBUG << "Open Space Planning debug from frame is : "
              << frame_->open_space_debug().ShortDebugString();
       ADEBUG << "Open Space Planning export chart with : "
@@ -365,7 +365,7 @@ Status OpenSpacePlanning::Plan(
         ADEBUG << "Open space debug information added!";
       }
       if (FLAGS_enable_record_debug && FLAGS_export_chart) {
-        ExportOpenSpaceChart(last_open_space_debug_, ptr_debug);
+        ExportOpenSpaceChart(ptr_debug);
         ADEBUG << "Open Space Planning debug from frame is : "
                << last_open_space_debug_.ShortDebugString();
         ADEBUG << "Open Space Planning export chart with : "
@@ -577,7 +577,8 @@ Status OpenSpacePlanning::TrajectoryPartition(
   }
   trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
 
-  const double dt = 1.0;;
+  const double dt = 1.0;
+
   for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
@@ -585,8 +586,10 @@ Status OpenSpacePlanning::TrajectoryPartition(
   return Status::OK();
 }
 
-void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
-                            Chart* chart) {
+void OpenSpacePlanning::AddOpenSpaceTrajectory(
+    planning_internal::Debug* debug) {
+  auto chart = debug->mutable_planning_data()->add_chart();
+  auto open_space_debug = debug->planning_data().open_space();
   chart->set_title("Open Space Trajectory Visualization");
   auto* options = chart->mutable_options();
   CHECK_EQ(open_space_debug.xy_boundary_size(), 4);
@@ -647,13 +650,10 @@ void AddOpenSpaceTrajectory(const OpenSpaceDebug& open_space_debug,
   (*warm_start_properties)["showLine"] = "true";
 }
 
-void OpenSpacePlanning::ExportOpenSpaceChart(
-    const planning_internal::OpenSpaceDebug& debug_info,
-    planning_internal::Debug* debug_chart) {
+void OpenSpacePlanning::ExportOpenSpaceChart(planning_internal::Debug* debug) {
   // Export Trajectory Visualization Chart.
   if (FLAGS_enable_record_debug) {
-    AddOpenSpaceTrajectory(debug_info,
-                           debug_chart->mutable_planning_data()->add_chart());
+    AddOpenSpaceTrajectory(debug);
   }
 }
 
