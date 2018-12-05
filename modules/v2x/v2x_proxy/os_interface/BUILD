@@ -1,0 +1,36 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "os_interface",
+    srcs = [
+        "os_interface.cc",
+    ],
+    hdrs = [
+        "os_interface.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/v2x/common:v2x_proxy_gflags",
+        "//modules/v2x/proto:v2x_traffic_light_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/perception/proto:perception_proto",
+        "//modules/common/time:time",
+    ],
+)
+
+cc_test(
+    name = "os_interface_test",
+    size = "small",
+    srcs = [
+        "os_interface_test.cc",
+    ],
+    deps = [
+        ":os_interface",
+        "@gtest//:main",
+    ],
+)
+
+cpplint()
