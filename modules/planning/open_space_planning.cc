@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/planning/open_space_planning.h"
+#include "modules/planning/planner/open_space/open_space_planner.h"
 
 #include <algorithm>
 #include <limits>
@@ -278,19 +279,15 @@ Status OpenSpacePlanning::Plan(
     ADCTrajectory* const trajectory_pb) {
   auto* ptr_debug = trajectory_pb->mutable_debug();
 
-  if (FLAGS_enable_record_debug) {
-    ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
-        stitching_trajectory.back());
-  }
-
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+  auto status = dynamic_cast<OpenSpacePlanner&>(*planner_).Plan(
+      stitching_trajectory, frame_.get());
 
   Status trajectory_partition_status;
 
   if (status == Status::OK()) {
     ADCTrajectory* trajectory_after_stitching_point =
         frame_->mutable_trajectory();
-
+    last_stitching_trajectory_ = frame_->last_stitching_trajectory();
     trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
         current_time_stamp);
 
@@ -298,9 +295,9 @@ Status OpenSpacePlanning::Plan(
     int size_of_trajectory_after_stitching_point =
         trajectory_after_stitching_point->trajectory_point_size();
     double last_stitching_trajectory_relative_time =
-        stitching_trajectory.back().relative_time();
+        last_stitching_trajectory_.back().relative_time();
     double last_stitching_trajectory_relative_s =
-        stitching_trajectory.back().path_point().s();
+        last_stitching_trajectory_.back().path_point().s();
     for (int i = 0; i < size_of_trajectory_after_stitching_point; i++) {
       trajectory_after_stitching_point->mutable_trajectory_point(i)
           ->set_relative_time(
@@ -322,7 +319,8 @@ Status OpenSpacePlanning::Plan(
 
     if (FLAGS_enable_stitch_last_trajectory) {
       last_publishable_trajectory_->PrependTrajectoryPoints(
-          stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+          last_stitching_trajectory_.begin(),
+          last_stitching_trajectory_.end() - 1);
     }
 
     // save the publishable trajectory for use when no planning is generated
@@ -333,7 +331,7 @@ Status OpenSpacePlanning::Plan(
 
     if (FLAGS_enable_record_debug) {
       ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
-          stitching_trajectory.back());
+          last_stitching_trajectory_.back());
       ADEBUG << "Open space init point added!";
       ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
           frame_->open_space_debug());
@@ -342,22 +340,19 @@ Status OpenSpacePlanning::Plan(
 
     if (FLAGS_enable_record_debug && FLAGS_export_chart) {
       ExportOpenSpaceChart(ptr_debug);
-      ADEBUG << "Open Space Planning debug from frame is : "
-             << frame_->open_space_debug().ShortDebugString();
-      ADEBUG << "Open Space Planning export chart with : "
-             << trajectory_pb->ShortDebugString();
-
-      // trajectory partition and choose the current trajectory to follow
-      trajectory_partition_status =
-          TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
     }
+
+    // trajectory partition and choose the current trajectory to follow
+    trajectory_partition_status =
+        TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
+
   } else if (status ==
              Status(ErrorCode::PLANNING_ERROR,
                     "Waiting for planning thread in OpenSpacePlanner")) {
     if (last_trajectory_succeeded_) {
       if (FLAGS_enable_record_debug) {
         ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
-            stitching_trajectory.back());
+            last_stitching_trajectory_.back());
         ADEBUG << "Open space init point added!";
         ptr_debug->mutable_planning_data()->mutable_open_space()->CopyFrom(
             last_open_space_debug_);
@@ -365,14 +360,10 @@ Status OpenSpacePlanning::Plan(
       }
       if (FLAGS_enable_record_debug && FLAGS_export_chart) {
         ExportOpenSpaceChart(ptr_debug);
-        ADEBUG << "Open Space Planning debug from frame is : "
-               << last_open_space_debug_.ShortDebugString();
-        ADEBUG << "Open Space Planning export chart with : "
-               << trajectory_pb->ShortDebugString();
-        // trajectory partition and choose the current trajectory to follow
-        trajectory_partition_status =
-            TrajectoryPartition(last_trajectory_, trajectory_pb);
       }
+      // trajectory partition and choose the current trajectory to follow
+      trajectory_partition_status =
+          TrajectoryPartition(last_trajectory_, trajectory_pb);
     } else {
       return status;
     }

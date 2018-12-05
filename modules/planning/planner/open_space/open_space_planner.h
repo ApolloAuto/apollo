@@ -56,7 +56,7 @@ namespace planning {
 using apollo::common::Status;
 
 struct OpenSpaceThreadData {
-  apollo::common::TrajectoryPoint planning_init_point;
+  std::vector<common::TrajectoryPoint> stitching_trajectory;
   apollo::common::VehicleState vehicle_state;
   double rotate_angle;
   apollo::common::math::Vec2d translate_origin;
@@ -98,7 +98,13 @@ class OpenSpacePlanner : public Planner {
    */
   apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+      Frame* frame) override {
+          return Status::OK();
+      }
+
+  apollo::common::Status Plan(
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
+      Frame* frame);
 
   void GenerateTrajectoryThread();
 
@@ -125,6 +131,7 @@ class OpenSpacePlanner : public Planner {
 
   common::VehicleState init_state_;
   common::TrajectoryPoint planning_init_point_;
+  std::vector<common::TrajectoryPoint> stitching_trajectory_;
   apollo::common::VehicleState vehicle_state_;
   double rotate_angle_;
   apollo::common::math::Vec2d translate_origin_;

@@ -77,7 +77,7 @@ class OpenSpaceTrajectoryGenerator {
    * @brief plan for open space trajectory generators.
    */
   apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
+      const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       const apollo::common::VehicleState& vehicle_state,
       const std::vector<double>& XYbounds, const double rotate_angle,
       const apollo::common::math::Vec2d& translate_origin,
@@ -94,6 +94,9 @@ class OpenSpaceTrajectoryGenerator {
 
   void UpdateDebugInfo(
       ::apollo::planning_internal::OpenSpaceDebug* open_space_debug);
+
+  void GetStitchingTrajectory(
+      std::vector<common::TrajectoryPoint>* stitching_trajectory);
 
   void LoadTrajectory(const Eigen::MatrixXd& state_result_ds,
                       const Eigen::MatrixXd& control_result_ds,
@@ -121,6 +124,8 @@ class OpenSpaceTrajectoryGenerator {
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  common::TrajectoryPoint planning_init_point_;
+  std::vector<common::TrajectoryPoint> stitching_trajectory_;
   double init_x_ = 0.0;
   double init_y_ = 0.0;
   double init_phi_ = 0.0;
@@ -128,7 +133,7 @@ class OpenSpaceTrajectoryGenerator {
   double init_steer_ = 0.0;
   double init_a_ = 0.0;
   size_t horizon_ = 0;
-  double ts_ = 0;
+  double ts_ = 0.0;
   Eigen::MatrixXd ego_;
   std::vector<double> XYbounds_;
   apollo::common::Trajectory trajectory_to_end_;

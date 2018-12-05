@@ -141,6 +141,14 @@ class Frame {
     return open_space_debug_;
   }
 
+  std::vector<common::TrajectoryPoint> *mutable_last_stitching_trajectory() {
+    return &stitching_trajectory_;
+  }
+
+  const std::vector<common::TrajectoryPoint> &last_stitching_trajectory() {
+    return stitching_trajectory_;
+  }
+
   const bool is_near_destination() const { return is_near_destination_; }
 
   /**
@@ -196,8 +204,11 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory trajectory_;  // last published trajectory
+
   // debug info for open space planner
   planning_internal::OpenSpaceDebug open_space_debug_;
+  // stitching trajectory for open space planner
+  std::vector<common::TrajectoryPoint> stitching_trajectory_;
 
   // TODO(all): change to use shared_ptr.
   // output trajectory pb
