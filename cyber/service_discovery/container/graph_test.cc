@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "cyber/service_discovery/container/graph.h"
+
 #include <string>
 
-#include "cyber/service_discovery/container/graph.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

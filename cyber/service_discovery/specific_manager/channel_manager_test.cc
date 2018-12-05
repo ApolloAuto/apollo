@@ -410,6 +410,25 @@ TEST_F(ChannelManagerTest, get_upstream_downstream) {
   EXPECT_EQ(channel_manager_.GetFlowDirection("E", "A"), UNREACHABLE);
 }
 
+TEST_F(ChannelManagerTest, is_message_type_matching) {
+  const std::string raw_msg_type_1 =
+      message::MessageType<message::RawMessage>();
+  const std::string py_msg_type =
+      message::MessageType<message::PyMessageWrap>();
+  const std::string chatter_msg_type = message::MessageType<proto::Chatter>();
+  const std::string change_msg_type = message::MessageType<proto::ChangeMsg>();
+  EXPECT_TRUE(channel_manager_.IsMessageTypeMatching(chatter_msg_type,
+                                                     chatter_msg_type));
+  EXPECT_FALSE(channel_manager_.IsMessageTypeMatching(chatter_msg_type,
+                                                      change_msg_type));
+  EXPECT_TRUE(
+      channel_manager_.IsMessageTypeMatching(chatter_msg_type, raw_msg_type_1));
+  EXPECT_TRUE(
+      channel_manager_.IsMessageTypeMatching(chatter_msg_type, py_msg_type));
+  EXPECT_TRUE(
+      channel_manager_.IsMessageTypeMatching(raw_msg_type_1, py_msg_type));
+}
+
 }  // namespace service_discovery
 }  // namespace cyber
 }  // namespace apollo

@@ -47,6 +47,9 @@ ChannelManager::ChannelManager() {
       intra_channels_.emplace(channel);
     }
   }
+
+  exempted_msg_types_.emplace(message::MessageType<message::RawMessage>());
+  exempted_msg_types_.emplace(message::MessageType<message::PyMessageWrap>());
 }
 
 ChannelManager::~ChannelManager() {}
@@ -200,6 +203,20 @@ FlowDirection ChannelManager::GetFlowDirection(
   return node_graph_.GetDirectionOf(lhs, rhs);
 }
 
+bool ChannelManager::IsMessageTypeMatching(const std::string& lhs,
+                                           const std::string& rhs) {
+  if (lhs == rhs) {
+    return true;
+  }
+  if (exempted_msg_types_.count(lhs) > 0) {
+    return true;
+  }
+  if (exempted_msg_types_.count(rhs) > 0) {
+    return true;
+  }
+  return false;
+}
+
 bool ChannelManager::Check(const RoleAttributes& attr) {
   RETURN_VAL_IF(!attr.has_channel_name(), false);
   RETURN_VAL_IF(!attr.has_channel_id(), false);
@@ -264,16 +281,7 @@ void ChannelManager::DisposeJoin(const ChangeMsg& msg) {
     } else {
       auto& exist_msg_type = existing_delegate->attributes().message_type();
       auto& join_msg_type = role->attributes().message_type();
-      const std::string RAW_MESSAGE_TYPE =
-          message::MessageType<message::RawMessage>();
-      const std::string PY_MESSAGE_TYPE =
-          message::MessageType<message::PyMessageWrap>();
-      if ((exist_msg_type != RAW_MESSAGE_TYPE &&
-           join_msg_type != RAW_MESSAGE_TYPE &&
-           exist_msg_type != join_msg_type) &&
-          (exist_msg_type != join_msg_type &&
-           exist_msg_type != PY_MESSAGE_TYPE &&
-           join_msg_type != PY_MESSAGE_TYPE)) {
+      if (!IsMessageTypeMatching(exist_msg_type, join_msg_type)) {
         auto newer = role;
         auto older = existing_delegate;
         if (!older->IsEarlierThan(*newer)) {

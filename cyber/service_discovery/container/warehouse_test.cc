@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include "cyber/service_discovery/container/multi_value_warehouse.h"
 #include "cyber/service_discovery/container/single_value_warehouse.h"
+
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

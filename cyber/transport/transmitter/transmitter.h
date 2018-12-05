@@ -40,11 +40,11 @@ class Transmitter : public Endpoint {
   explicit Transmitter(const RoleAttributes& attr);
   virtual ~Transmitter();
 
-  virtual void Disable() = 0;
   virtual void Enable() = 0;
+  virtual void Disable() = 0;
 
-  virtual void Disable(const RoleAttributes& opposite_attr);
   virtual void Enable(const RoleAttributes& opposite_attr);
+  virtual void Disable(const RoleAttributes& opposite_attr);
 
   virtual bool Transmit(const MessagePtr& msg);
   virtual bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) = 0;
@@ -55,7 +55,6 @@ class Transmitter : public Endpoint {
 
  protected:
   uint64_t seq_num_;
-
   MessageInfo msg_info_;
 };
 

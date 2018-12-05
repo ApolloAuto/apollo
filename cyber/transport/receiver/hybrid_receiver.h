@@ -73,15 +73,12 @@ class HybridReceiver : public Receiver<M> {
 
  private:
   void InitMode();
-  void InitHistory();
   void ObtainConfig();
-
-  void ClearReceivers();
+  void InitHistory();
   void InitReceivers();
-
-  void ClearTransmitters();
+  void ClearReceivers();
   void InitTransmitters();
-
+  void ClearTransmitters();
   void ReceiveHistoryMsg(const RoleAttributes& opposite_attr);
   void ThreadFunc(const RoleAttributes& opposite_attr);
   Relation GetRelation(const RoleAttributes& opposite_attr);
@@ -89,7 +86,6 @@ class HybridReceiver : public Receiver<M> {
   HistoryPtr history_;
   ReceiverContainer receivers_;
   TransmitterContainer transmitters_;
-
   std::mutex mutex_;
 
   CommunicationModePtr mode_;
@@ -173,7 +169,7 @@ void HybridReceiver<M>::InitMode() {
 
 template <typename M>
 void HybridReceiver<M>::ObtainConfig() {
-  auto global_conf = common::GlobalData::Instance()->Config();
+  auto& global_conf = common::GlobalData::Instance()->Config();
   RETURN_IF(!global_conf.has_transport_conf());
   RETURN_IF(!global_conf.transport_conf().has_communication_mode());
   mode_->CopyFrom(global_conf.transport_conf().communication_mode());
@@ -196,14 +192,12 @@ void HybridReceiver<M>::InitHistory() {
 
 template <typename M>
 void HybridReceiver<M>::InitReceivers() {
-  auto listener = std::bind(&HybridReceiver<M>::OnNewMessage, this,
-                            std::placeholders::_1, std::placeholders::_2);
-
   std::set<OptionalMode> modes;
   modes.insert(mode_->same_proc());
   modes.insert(mode_->diff_proc());
   modes.insert(mode_->diff_host());
-
+  auto listener = std::bind(&HybridReceiver<M>::OnNewMessage, this,
+                            std::placeholders::_1, std::placeholders::_2);
   for (auto& mode : modes) {
     switch (mode) {
       case OptionalMode::INTRA:

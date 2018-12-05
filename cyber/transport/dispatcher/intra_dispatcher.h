@@ -67,6 +67,12 @@ void IntraDispatcher::OnMessage(uint64_t channel_id,
     } else {
       auto handler =
           std::dynamic_pointer_cast<ListenerHandler<MessageT>>(*handler_base);
+      if (handler == nullptr) {
+        AERROR << "please ensure that readers with the same channel["
+               << common::GlobalData::GetChannelById(channel_id)
+               << "] in the same process have the same message type";
+        return;
+      }
       handler->Run(message, message_info);
     }
   }

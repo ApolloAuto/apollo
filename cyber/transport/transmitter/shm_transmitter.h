@@ -43,8 +43,8 @@ class ShmTransmitter : public Transmitter<M> {
   explicit ShmTransmitter(const RoleAttributes& attr);
   virtual ~ShmTransmitter();
 
-  void Disable() override;
   void Enable() override;
+  void Disable() override;
 
   bool Transmit(const MessagePtr& msg, const MessageInfo& msg_info) override;
 
