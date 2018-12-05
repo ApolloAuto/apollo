@@ -84,10 +84,10 @@ export default class Map {
         switch (laneType) {
             case "DOTTED_YELLOW":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.YELLOW, 4, 3, 3, 1, false);
+                    points, colorMapping.YELLOW, 4, 3, 3, 1, 1, false);
             case "DOTTED_WHITE":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.WHITE, 4, 3, 3, 1, false);
+                    points, colorMapping.WHITE, 2, 0.5, 0.25, 1, 0.4, false);
             case "SOLID_YELLOW":
                 return drawSegmentsFromPoints(
                     points, colorMapping.YELLOW, 3, 1, false);

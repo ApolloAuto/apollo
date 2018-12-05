@@ -28,8 +28,8 @@ export function drawImage(img, width, height, x = 0, y = 0, z = 0) {
 }
 
 export function drawDashedLineFromPoints(
-    points, color = 0xff0000, linewidth = 1, dashSize = 4,
-    gapSize = 2, zOffset = 0, matrixAutoUpdate = true) {
+    points, color = 0xff0000, linewidth = 1, dashSize = 4, gapSize = 2,
+    zOffset = 0, opacity = 1, matrixAutoUpdate = true) {
 
     const path = new THREE.Path();
     const geometry = path.createGeometry(points);
@@ -38,7 +38,9 @@ export function drawDashedLineFromPoints(
         color: color,
         dashSize: dashSize,
         linewidth: linewidth,
-        gapSize: gapSize
+        gapSize: gapSize,
+        transparent: true,
+        opacity: opacity,
     });
     const mesh = new THREE.Line(geometry, material);
     addOffsetZ(mesh, zOffset);
