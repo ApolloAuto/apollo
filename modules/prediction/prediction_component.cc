@@ -62,7 +62,7 @@ using apollo::planning::ADCTrajectory;
 using cyber::record::RecordMessage;
 using cyber::record::RecordReader;
 
-PredictionComponent::~PredictionComponent() { Stop(); }
+PredictionComponent::~PredictionComponent() {}
 
 std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
@@ -157,17 +157,10 @@ bool PredictionComponent::Init() {
         ProcessOfflineData(offline_bags[i]);
       }
     }
-    Stop();
+    FeatureOutput::Close();
+    return false;
   }
   return true;
-}
-
-void PredictionComponent::Stop() {
-  if (FLAGS_prediction_offline_mode) {
-    AINFO << "write when stop";
-    FeatureOutput::Close();
-  }
-  cyber::Shutdown();
 }
 
 void PredictionComponent::OnLocalization(
