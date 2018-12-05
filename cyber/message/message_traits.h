@@ -32,21 +32,17 @@ namespace message {
 DEFINE_TYPE_TRAIT(HasByteSize, ByteSize)
 DEFINE_TYPE_TRAIT(HasType, TypeName)
 DEFINE_TYPE_TRAIT(HasDescriptor, GetDescriptorString)
+DEFINE_TYPE_TRAIT(HasSerializeToString, SerializeToString)
+DEFINE_TYPE_TRAIT(HasParseFromString, ParseFromString)
+DEFINE_TYPE_TRAIT(HasSerializeToArray, SerializeToArray)
+DEFINE_TYPE_TRAIT(HasParseFromArray, ParseFromArray)
 
 template <typename T>
 class HasSerializer {
- private:
-  template <typename Class>
-  static char Test(decltype(&Class::SerializeToString)*,
-                   decltype(&Class::ParseFromString)*,
-                   decltype(&Class::SerializeToArray)*,
-                   decltype(&Class::ParseFromArray)*);
-  template <typename>
-  static int Test(...);
-
  public:
   static constexpr bool value =
-      sizeof(Test<T>(nullptr, nullptr, nullptr, nullptr)) == 1;
+      HasSerializeToString<T>::value && HasParseFromString<T>::value &&
+      HasSerializeToArray<T>::value && HasParseFromArray<T>::value;
 };
 
 // avoid potential ODR violation
@@ -67,50 +63,50 @@ typename std::enable_if<!HasByteSize<T>::value, int>::type ByteSize(
 }
 
 template <typename T>
-typename std::enable_if<HasSerializer<T>::value, bool>::type ParseFromArray(
+typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromArray(
     const void* data, int size, T* message) {
   return message->ParseFromArray(data, size);
 }
 
 template <typename T>
-typename std::enable_if<!HasSerializer<T>::value, bool>::type ParseFromArray(
-    const void* data, int size, T* message) {
+typename std::enable_if<!HasParseFromArray<T>::value, bool>::type
+ParseFromArray(const void* data, int size, T* message) {
   return false;
 }
 
 template <typename T>
-typename std::enable_if<HasSerializer<T>::value, bool>::type ParseFromString(
-    const std::string& str, T* message) {
+typename std::enable_if<HasParseFromString<T>::value, bool>::type
+ParseFromString(const std::string& str, T* message) {
   return message->ParseFromString(str);
 }
 
 template <typename T>
-typename std::enable_if<!HasSerializer<T>::value, bool>::type ParseFromString(
-    const std::string& str, T* message) {
+typename std::enable_if<!HasParseFromString<T>::value, bool>::type
+ParseFromString(const std::string& str, T* message) {
   return false;
 }
 
 template <typename T>
-typename std::enable_if<HasSerializer<T>::value, bool>::type SerializeToArray(
-    const T& message, void* data, int size) {
+typename std::enable_if<HasSerializeToArray<T>::value, bool>::type
+SerializeToArray(const T& message, void* data, int size) {
   return message.SerializeToArray(data, size);
 }
 
 template <typename T>
-typename std::enable_if<!HasSerializer<T>::value, bool>::type SerializeToArray(
-    const T& message, void* data, int size) {
+typename std::enable_if<!HasSerializeToArray<T>::value, bool>::type
+SerializeToArray(const T& message, void* data, int size) {
   return false;
 }
 
 template <typename T>
-typename std::enable_if<HasSerializer<T>::value, bool>::type SerializeToString(
-    const T& message, std::string* str) {
+typename std::enable_if<HasSerializeToString<T>::value, bool>::type
+SerializeToString(const T& message, std::string* str) {
   return message.SerializeToString(str);
 }
 
 template <typename T>
-typename std::enable_if<!HasSerializer<T>::value, bool>::type SerializeToString(
-    const T& message, std::string* str) {
+typename std::enable_if<!HasSerializeToString<T>::value, bool>::type
+SerializeToString(const T& message, std::string* str) {
   return false;
 }
 

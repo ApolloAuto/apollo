@@ -111,6 +111,9 @@ cc_library(
     hdrs = [
         "for_each.h",
     ],
+    deps = [
+        "//cyber/base:macros",
+    ],
 )
 
 cc_test(
