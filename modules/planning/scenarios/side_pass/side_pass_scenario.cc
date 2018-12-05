@@ -193,7 +193,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
       continue;
     }
 
-    if (adc_sl_boundary.end_s() + FLAGS_side_pass_min_front_obstacle_distance >
+    if (adc_sl_boundary.end_s() +
+            side_pass_context_.scenario_config_.min_front_obstacle_distance() >
         obstacle->PerceptionSLBoundary().start_s()) {
       // front obstacle is too close to side pass
       continue;
