@@ -54,6 +54,21 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+
+struct OpenSpaceThreadData {
+  apollo::common::TrajectoryPoint planning_init_point;
+  apollo::common::VehicleState vehicle_state;
+  double rotate_angle;
+  apollo::common::math::Vec2d translate_origin;
+  std::vector<double> end_pose;
+  std::size_t obstacles_num;
+  Eigen::MatrixXi obstacles_edges_num;
+  Eigen::MatrixXd obstacles_A;
+  Eigen::MatrixXd obstacles_b;
+  std::vector<double> XYbounds;
+  IndexedObstacles warmstart_obstacles;
+};
+
 /**
  * @class OpenSpacePlanner
  * @brief OpenSpacePlanner is a derived class of Planner.
@@ -61,6 +76,7 @@ using apollo::common::Status;
  *        outputs proper segment of the trajectory according to vehicle
  * position.
  */
+
 class OpenSpacePlanner : public Planner {
  public:
   /**
@@ -72,20 +88,6 @@ class OpenSpacePlanner : public Planner {
    * @brief Destructor
    */
   virtual ~OpenSpacePlanner() = default;
-
-  struct ThreadData {
-    apollo::common::TrajectoryPoint planning_init_point;
-    apollo::common::VehicleState vehicle_state;
-    double rotate_angle;
-    apollo::common::math::Vec2d translate_origin;
-    std::vector<double> end_pose;
-    std::size_t obstacles_num;
-    Eigen::MatrixXi obstacles_edges_num;
-    Eigen::MatrixXd obstacles_A;
-    Eigen::MatrixXd obstacles_b;
-    std::vector<double> XYbounds;
-    IndexedObstacles warmstart_obstacles;
-  };
 
   std::string Name() override { return "OPEN_SPACE"; }
 
@@ -135,7 +137,7 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Trajectory trajectory_to_end_;
   apollo::planning::ADCTrajectory publishable_trajectory_;
 
-  ThreadData thread_data_;
+  OpenSpaceThreadData thread_data_;
   std::future<void> task_future_;
   std::atomic<bool> is_stop_{false};
   std::atomic<bool> trajectory_updated_{false};
