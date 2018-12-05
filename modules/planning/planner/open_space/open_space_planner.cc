@@ -88,14 +88,29 @@ apollo::common::Status OpenSpacePlanner::Plan(
     }
 
     // Check destination
-    if (CheckDestination(thread_data_.planning_init_point,
-                         thread_data_.end_pose)) {
-      GenerateStopTrajectory(thread_data_.planning_init_point,
-                             &trajectory_to_end_);
+    apollo::common::Status destination_status =
+        CheckDestination(thread_data_.planning_init_point,
+                         thread_data_.vehicle_state, thread_data_.end_pose);
+    if (destination_status ==
+        Status(ErrorCode::PLANNING_ERROR, "init_point reach end_pose")) {
+      double x = thread_data_.planning_init_point.path_point().x();
+      double y = thread_data_.planning_init_point.path_point().y();
+      double theta = thread_data_.planning_init_point.path_point().theta();
+      GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
-      ADEBUG << "Init point reach destination, stop trajectory is "
-                "sent";
+      AINFO << "Init point reach destination, stop trajectory is "
+               "sent";
       return Status::OK();
+    } else if (destination_status ==
+               Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose")) {
+      double x = thread_data_.vehicle_state.x();
+      double y = thread_data_.vehicle_state.y();
+      double theta = thread_data_.vehicle_state.heading();
+      GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
+      LoadTrajectoryToFrame(frame);
+      AINFO << "vehicle reach destination, stop trajectory is "
+               "sent";
+      return destination_status;
     }
 
     // Check if trajectory updated
@@ -133,12 +148,29 @@ apollo::common::Status OpenSpacePlanner::Plan(
         open_space_roi_generator_->openspace_warmstart_obstacles();
 
     // Check destination
-    if (CheckDestination(planning_init_point_, end_pose_)) {
-      GenerateStopTrajectory(planning_init_point, &trajectory_to_end_);
+    apollo::common::Status destination_status =
+        CheckDestination(thread_data_.planning_init_point,
+                         thread_data_.vehicle_state, thread_data_.end_pose);
+    if (destination_status ==
+        Status(ErrorCode::PLANNING_ERROR, "init_point reach end_pose")) {
+      double x = thread_data_.planning_init_point.path_point().x();
+      double y = thread_data_.planning_init_point.path_point().y();
+      double theta = thread_data_.planning_init_point.path_point().theta();
+      GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
       ADEBUG << "Init point reach destination, stop trajectory is "
                 "sent";
       return Status::OK();
+    } else if (destination_status ==
+               Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose")) {
+      double x = thread_data_.vehicle_state.x();
+      double y = thread_data_.vehicle_state.y();
+      double theta = thread_data_.vehicle_state.heading();
+      GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
+      LoadTrajectoryToFrame(frame);
+      ADEBUG << "Init point reach destination, stop trajectory is "
+                "sent";
+      return destination_status;
     }
 
     // Generate Trajectory;
@@ -189,30 +221,35 @@ void OpenSpacePlanner::Stop() {
   }
 }
 
-bool OpenSpacePlanner::CheckDestination(
+apollo::common::Status OpenSpacePlanner::CheckDestination(
     const common::TrajectoryPoint& planning_init_point,
+    const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose) {
   CHECK_EQ(end_pose.size(), 4);
-  constexpr double kepsilon = 1e-4;
+  constexpr double kepsilon = 1e-1;
   const apollo::common::PathPoint path_point = planning_init_point.path_point();
-  double distance =
+  double distance_to_init_point =
       (path_point.x() - end_pose[0]) * (path_point.x() - end_pose[0]) +
       (path_point.y() - end_pose[1]) * (path_point.y() - end_pose[1]);
-  if (distance < kepsilon) {
-    return true;
+  double distance_to_vehicle =
+      (vehicle_state.x() - end_pose[0]) * (vehicle_state.x() - end_pose[0]) +
+      (vehicle_state.y() - end_pose[1]) * (vehicle_state.y() - end_pose[1]);
+  if (distance_to_init_point < kepsilon) {
+    return Status(ErrorCode::PLANNING_ERROR, "init_point reach end_pose");
   }
-  return false;
+
+  if (distance_to_vehicle < kepsilon) {
+    return Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose");
+  }
+  return Status::OK();
 }
 
 void OpenSpacePlanner::GenerateStopTrajectory(
-    const common::TrajectoryPoint& planning_init_point,
+    const double& stop_x, const double& stop_y, const double& stop_theta,
     common::Trajectory* trajectory_to_end) {
   constexpr int stop_trajectory_length = 10;
   constexpr double relative_stop_time = 0.1;
   apollo::common::Trajectory trajectory_to_stop;
-  double stop_x = planning_init_point.path_point().x();
-  double stop_y = planning_init_point.path_point().y();
-  double stop_theta = planning_init_point.path_point().theta();
   double relative_time = 0;
   for (int i = 0; i < stop_trajectory_length; i++) {
     apollo::common::TrajectoryPoint* point =
