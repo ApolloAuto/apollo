@@ -43,8 +43,13 @@ class SpeedDecider : public Task {
     CROSS = 3,
   };
 
-  StPosition GetStPosition(const SpeedData& speed_profile,
+  StPosition GetStPosition(const PathDecision* const path_decision,
+                           const SpeedData& speed_profile,
                            const StBoundary& st_boundary) const;
+
+  bool CheckKeepClearCrossable(const PathDecision* const path_decision,
+                               const SpeedData& speed_profile,
+                               const StBoundary& st_boundary) const;
   /**
    * @brief check if the ADC should follow an obstacle by examing the
    *StBoundary of the obstacle.

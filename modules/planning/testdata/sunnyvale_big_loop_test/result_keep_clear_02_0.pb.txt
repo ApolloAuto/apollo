@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_CLEAR_ZONE
       reason: "stop by KC_1254"
       stop_point {
-        x: 586424.15538602322
-        y: 4140676.1709425012
+        x: 586425.59276840894
+        y: 4140681.7021027128
       }
-      stop_heading: 1.3030688337003014
+      stop_heading: 1.3269924035145066
       change_lane_type: FORWARD
     }
   }
@@ -38,13 +38,13 @@ decision {
       object_decision {
         stop {
           reason_code: STOP_REASON_CLEAR_ZONE
-          distance_s: -1
+          distance_s: 0
           stop_point {
-            x: 586424.15538602322
-            y: 4140676.1709425012
+            x: 586425.59276840894
+            y: 4140681.7021027128
             z: 0
           }
-          stop_heading: 1.3030688337003014
+          stop_heading: 1.3269924035145066
         }
       }
     }

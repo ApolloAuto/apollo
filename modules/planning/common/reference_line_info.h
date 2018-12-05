@@ -174,7 +174,9 @@ class ReferenceLineInfo {
     CROSSWALK = 1,
     STOP_SIGN = 2,
     SIGNAL = 3,
-    OBSTACLE = 4,
+    CLEAR_AREA = 4,
+    PNC_JUNCTION = 5,
+    OBSTACLE = 6,
   };
 
   const std::vector<std::pair<OverlapType, hdmap::PathOverlap>>&
