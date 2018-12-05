@@ -38,6 +38,7 @@ using apollo::hdmap::Lane;
 using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::Map;
 using apollo::hdmap::MapPathPoint;
+using apollo::hdmap::PNCJunctionInfoConstPtr;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 using apollo::hdmap::PncMap;
@@ -191,6 +192,12 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   }
   ExtractIds(junctions, ids->mutable_junction());
 
+  std::vector<PNCJunctionInfoConstPtr> pnc_junctions;
+  if (SimMap()->GetPNCJunctions(point, radius, &pnc_junctions) != 0) {
+    AERROR << "Fail to get pnc junctions from sim_map.";
+  }
+  ExtractIds(pnc_junctions, ids->mutable_pnc_junction());
+
   std::vector<ParkingSpaceInfoConstPtr> parking_spaces;
   if (SimMap()->GetParkingSpaces(point, radius, &parking_spaces) != 0) {
     AERROR << "Fail to get parking space from sim_map.";
@@ -317,6 +324,14 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
     }
   }
 
+  for (const auto &id : ids.pnc_junction()) {
+    map_id.set_id(id);
+    auto element = SimMap()->GetPNCJunctionById(map_id);
+    if (element) {
+      *result.add_pnc_junction() = element->pnc_junction();
+    }
+  }
+
   return result;
 }
 
@@ -337,9 +352,9 @@ bool MapService::GetNearestLane(const double x, const double y,
 }
 
 bool MapService::GetNearestLaneWithHeading(const double x, const double y,
-                                LaneInfoConstPtr *nearest_lane,
-                                double *nearest_s, double *nearest_l,
-                                const double heading) const {
+                                           LaneInfoConstPtr *nearest_lane,
+                                           double *nearest_s, double *nearest_l,
+                                           const double heading) const {
   boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
 
   PointENU point;

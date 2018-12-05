@@ -429,6 +429,11 @@
                   "rule": "repeated",
                   "type": "string",
                   "id": 11
+                },
+                "pncJunction": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 12
                 }
               }
             },
@@ -4502,6 +4507,13 @@
                   "id": 6,
                   "options": {
                     "default": 30
+                  }
+                },
+                "minLNudgeBuffer": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0.5
                   }
                 }
               }

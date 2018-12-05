@@ -126,27 +126,23 @@ export default class Map {
         });
 
         const rightLaneType = lane.rightBoundary.boundaryType[0].types[0];
-        if (!lane.rightBoundary.virtual || rightLaneType !== "DOTTED_WHITE") {
-            // TODO: this is a temp. fix for repeated boundary types.
-            lane.rightBoundary.curve.segment.forEach((segment, index) => {
-                const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const boundary = this.addLaneMesh(rightLaneType, points);
-                boundary.name = "RightBoundary-" + lane.id.id;
-                scene.add(boundary);
-                drewObjects.push(boundary);
-            });
-        }
+        // TODO: this is a temp. fix for repeated boundary types.
+        lane.rightBoundary.curve.segment.forEach((segment, index) => {
+            const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
+            const boundary = this.addLaneMesh(rightLaneType, points);
+            boundary.name = "RightBoundary-" + lane.id.id;
+            scene.add(boundary);
+            drewObjects.push(boundary);
+        });
 
         const leftLaneType = lane.leftBoundary.boundaryType[0].types[0];
-        if (!lane.leftBoundary.virtual || leftLaneType !== "DOTTED_WHITE") {
-            lane.leftBoundary.curve.segment.forEach((segment, index) => {
-                const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const boundary = this.addLaneMesh(leftLaneType, points);
-                boundary.name = "LeftBoundary-" + lane.id.id;
-                scene.add(boundary);
-                drewObjects.push(boundary);
-            });
-        }
+        lane.leftBoundary.curve.segment.forEach((segment, index) => {
+            const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
+            const boundary = this.addLaneMesh(leftLaneType, points);
+            boundary.name = "LeftBoundary-" + lane.id.id;
+            scene.add(boundary);
+            drewObjects.push(boundary);
+        });
 
         return drewObjects;
     }
@@ -445,6 +441,12 @@ export default class Map {
                     case "junction":
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addBorder(
+                                newData[kind][i], colorMapping.BLUE, coordinates, scene)
+                        }));
+                        break;
+                    case "pncJunction":
+                        this.data[kind].push(Object.assign(newData[kind][i], {
+                            drewObjects: this.addZone(
                                 newData[kind][i], colorMapping.BLUE, coordinates, scene)
                         }));
                         break;
