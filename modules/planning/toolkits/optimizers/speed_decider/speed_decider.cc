@@ -117,7 +117,7 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
 bool SpeedDecider::CheckKeepClearCrossable(
     const PathDecision* const path_decision,
     const SpeedData& speed_profile,
-    const StBoundary& kee_clear_st_boundary) const {
+    const StBoundary& keep_clear_st_boundary) const {
   bool keep_clear_crossable = true;
 
   const auto& last_speed_point = speed_profile.speed_vector().back();
@@ -129,10 +129,10 @@ bool SpeedDecider::CheckKeepClearCrossable(
 
     ADEBUG << "CheckKeepClearCrossable id[" << mutable_obstacle->Id()
         << "] boundary.min_s[" << boundary.min_s()
-        << "] kee_clear_st_boundary.max_s[" << kee_clear_st_boundary.max_s()
-        << "] diff[" << boundary.min_s() - kee_clear_st_boundary.max_s()
+        << "] keep_clear_st_boundary.max_s[" << keep_clear_st_boundary.max_s()
+        << "] diff[" << boundary.min_s() - keep_clear_st_boundary.max_s()
         << "]";
-    if (obstacle->Id() == kee_clear_st_boundary.id()) {
+    if (obstacle->Id() == keep_clear_st_boundary.id()) {
       continue;
     }
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
@@ -143,8 +143,9 @@ bool SpeedDecider::CheckKeepClearCrossable(
     const double adc_length =
         VehicleConfigHelper::GetConfig().vehicle_param().length();
     if (mutable_obstacle->IsBlockingObstacle() &&
-        boundary.min_s() - kee_clear_st_boundary.max_s() < adc_length) {
-      keep_clear_crossable = false;
+        boundary.min_s() - keep_clear_st_boundary.max_s() < (adc_length / 2)) {
+      // TODO(all): temporarily disable this check.
+      // keep_clear_crossable = false;
       break;
     }
   }
@@ -166,9 +167,9 @@ bool SpeedDecider::CheckKeepClearCrossable(
     }
     constexpr double kKeepClearSlowSpeed = 3.0;  // m/s
     ADEBUG << "last_speed_point_s[" << last_speed_point.s()
-        << "] st_boundary.max_s[" << kee_clear_st_boundary.max_s()
+        << "] st_boundary.max_s[" << keep_clear_st_boundary.max_s()
         << "] last_speed_point_v[" << last_speed_point_v << "]";
-    if (last_speed_point.s() <= kee_clear_st_boundary.max_s() &&
+    if (last_speed_point.s() <= keep_clear_st_boundary.max_s() &&
         last_speed_point_v < kKeepClearSlowSpeed) {
       keep_clear_crossable = false;
     }
