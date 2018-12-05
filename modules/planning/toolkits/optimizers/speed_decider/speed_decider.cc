@@ -132,6 +132,9 @@ bool SpeedDecider::CheckKeepClearCrossable(
         << "] kee_clear_st_boundary.max_s[" << kee_clear_st_boundary.max_s()
         << "] diff[" << boundary.min_s() - kee_clear_st_boundary.max_s()
         << "]";
+    if (obstacle->Id() == kee_clear_st_boundary.id()) {
+      continue;
+    }
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
         boundary.max_t() < 0.0 ||
         boundary.min_t() >= speed_profile.speed_vector().back().t()) {
@@ -161,7 +164,7 @@ bool SpeedDecider::CheckKeepClearCrossable(
             (last_speed_point.t() - last_2nd_speed_point.t());
       }
     }
-    constexpr double kKeepClearSlowSpeed = 5.0;  // m/s
+    constexpr double kKeepClearSlowSpeed = 3.0;  // m/s
     ADEBUG << "last_speed_point_s[" << last_speed_point.s()
         << "] st_boundary.max_s[" << kee_clear_st_boundary.max_s()
         << "] last_speed_point_v[" << last_speed_point_v << "]";
