@@ -75,6 +75,10 @@ ParkingSpaceInfoConstPtr HDMap::GetParkingSpaceById(const Id& id) const {
   return impl_.GetParkingSpaceById(id);
 }
 
+PNCJunctionInfoConstPtr HDMap::GetPNCJunctionById(const Id& id) const {
+  return impl_.GetPNCJunctionById(id);
+}
+
 int HDMap::GetLanes(const apollo::common::PointENU& point, double distance,
                     std::vector<LaneInfoConstPtr>* lanes) const {
   return impl_.GetLanes(point, distance, lanes);
@@ -129,9 +133,9 @@ int HDMap::GetParkingSpaces(
   return impl_.GetParkingSpaces(point, distance, parking_spaces);
 }
 
-int HDMap::GetPNCJunctions(const apollo::common::PointENU& point,
-              double distance,
-              std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
+int HDMap::GetPNCJunctions(
+    const apollo::common::PointENU& point, double distance,
+    std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
   return impl_.GetPNCJunctions(point, distance, pnc_junctions);
 }
 
@@ -199,8 +203,8 @@ int HDMap::GetStopSignAssociatedLanes(
 }
 
 int HDMap::GetLocalMap(const apollo::common::PointENU& point,
-                const std::pair<double, double>& range,
-                Map* local_map) const {
+                       const std::pair<double, double>& range,
+                       Map* local_map) const {
   return impl_.GetLocalMap(point, range, local_map);
 }
 

@@ -84,6 +84,7 @@ export default [
             mapCrosswalk: 'Crosswalk',
             mapClearArea: 'Clear Area',
             mapJunction: 'Junction',
+            mapPncJunction: 'PNC Junction',
             mapLane: 'Lane',
             mapRoad: 'Road',
             mapSignal: 'Signal',

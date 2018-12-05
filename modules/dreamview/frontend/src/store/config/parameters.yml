@@ -169,6 +169,9 @@ options:
   showMapJunction:
     default: false
     menuId: mapJunction
+  showMapPncJunction:
+    default: false
+    menuId: mapPncJunction
   showMapLane:
     default: true
     menuId: mapLane
