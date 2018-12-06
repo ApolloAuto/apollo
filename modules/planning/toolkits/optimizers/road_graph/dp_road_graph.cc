@@ -240,7 +240,7 @@ void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
   }
 
   // try to connect the current point with the first point directly
-  if (msg->level >= 2) {
+  if (reference_line_info_.IsChangeLanePath() && msg->level >= 2) {
     const double init_dl = init_frenet_frame_point_.dl();
     const double init_ddl = init_frenet_frame_point_.ddl();
     QuinticPolynomialCurve1d curve(
