@@ -754,28 +754,28 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   for (int i = 0; i < static_cast<int>(lights.size()); i++) {
     switch (lights.at(i)->status.color) {
       case base::TLColor::TL_RED:
-        cnt_r_++;
+        cnt_r_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_r_conf) {
           max_r_id = i;
           max_r_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_GREEN:
-        cnt_g_++;
+        cnt_g_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_g_conf) {
           max_g_id = i;
           max_g_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_YELLOW:
-        cnt_y_++;
+        cnt_y_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_y_conf) {
           max_y_id = i;
           max_y_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_UNKNOWN_COLOR:
-        cnt_u_++;
+        cnt_u_ += lights.at(i)->status.confidence;;
         break;
       default:
         max_n_id = i;
@@ -991,17 +991,17 @@ void TrafficLightsPerceptionComponent::Visualize(
         tl_string = "UNKNOWN";
         break;
     }
-    snprintf(str, sizeof(str), "ID:%s, %s, Conf:%.3lf",
+    snprintf(str, sizeof(str), "ID:%s C:%.3lf",
              light->id.c_str(),
              tl_string.c_str(),
              light->status.confidence);
     cv::rectangle(output_image, rectified_rect, tl_color, 2);
     cv::putText(output_image,
             str,
-            cv::Point(rectified_roi.x + 20,
-                      rectified_roi.y + rectified_roi.height + 20),
-            cv::FONT_HERSHEY_COMPLEX_SMALL,
-            1.5,
+            cv::Point(rectified_roi.x + 30,
+                      rectified_roi.y + rectified_roi.height + 30),
+            cv::FONT_HERSHEY_DUPLEX,
+            1.0,
             tl_color,
             2);
   }
@@ -1025,51 +1025,55 @@ void TrafficLightsPerceptionComponent::Visualize(
       tl_color = cv::Scalar(255, 255, 255);
       break;
   }
+  double all = cnt_r_ + cnt_g_ + cnt_y_ + cnt_u_;
+  if (all < 0.0001) {
+    all = 1.0;
+  }
   cv::putText(output_image,
           tl_string,
-          cv::Point(10, 50),
-          cv::FONT_HERSHEY_COMPLEX_SMALL,
-          3.0,
+          cv::Point(10, 90),
+          cv::FONT_HERSHEY_DUPLEX,
+          2.0,
           tl_color,
           3);
 
-  snprintf(str, sizeof(str), "Red lights:%d", cnt_r_);
-  cv::putText(output_image,
-          str,
-          cv::Point(10, 100),
-          cv::FONT_HERSHEY_COMPLEX_SMALL,
-          2.0,
-          cv::Scalar(0, 0, 255),
-          3);
-  snprintf(str, sizeof(str), "Green lights:%d", cnt_g_);
+  snprintf(str, sizeof(str), "Red lights:%.2f", cnt_r_/all);
   cv::putText(output_image,
           str,
           cv::Point(10, 150),
-          cv::FONT_HERSHEY_COMPLEX_SMALL,
-          2.0,
-          cv::Scalar(0, 255, 0),
+          cv::FONT_HERSHEY_DUPLEX,
+          1.5,
+          cv::Scalar(0, 0, 255),
           3);
-  snprintf(str, sizeof(str), "Yellow lights:%d", cnt_y_);
+  snprintf(str, sizeof(str), "Green lights:%.2f", cnt_g_/all);
   cv::putText(output_image,
           str,
           cv::Point(10, 200),
-          cv::FONT_HERSHEY_COMPLEX_SMALL,
-          2.0,
-          cv::Scalar(0, 255, 255),
+          cv::FONT_HERSHEY_DUPLEX,
+          1.5,
+          cv::Scalar(0, 255, 0),
           3);
-  snprintf(str, sizeof(str), "Unknown lights:%d", cnt_u_);
+  snprintf(str, sizeof(str), "Yellow lights:%.2f", cnt_y_/all);
   cv::putText(output_image,
           str,
           cv::Point(10, 250),
-          cv::FONT_HERSHEY_COMPLEX_SMALL,
-          2.0,
+          cv::FONT_HERSHEY_DUPLEX,
+          1.5,
+          cv::Scalar(0, 255, 255),
+          3);
+  snprintf(str, sizeof(str), "Unknown lights:%.2f", cnt_u_/all);
+  cv::putText(output_image,
+          str,
+          cv::Point(10, 300),
+          cv::FONT_HERSHEY_DUPLEX,
+          1.5,
           cv::Scalar(255, 255, 255),
           3);
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
   cv::imshow("Traffic Light", output_image);
-  // cv::imwrite("/apollo/debug_vis/" +
-  // std::to_string(frame.timestamp) + ".jpg", output_image);
+  cv::imwrite("/apollo/debug_vis/" +
+              std::to_string(frame.timestamp) + ".jpg", output_image);
   cvWaitKey(30);
 }
 

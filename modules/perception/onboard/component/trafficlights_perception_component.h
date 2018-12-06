@@ -187,10 +187,10 @@ class TrafficLightsPerceptionComponent :
 
   // traffic lights
   apollo::perception::base::TLColor detected_trafficlight_color_;
-  int cnt_r_;
-  int cnt_g_;
-  int cnt_y_;
-  int cnt_u_;
+  double cnt_r_;
+  double cnt_g_;
+  double cnt_y_;
+  double cnt_u_;
 };
 
 CYBER_REGISTER_COMPONENT(TrafficLightsPerceptionComponent);
