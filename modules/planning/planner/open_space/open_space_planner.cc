@@ -112,7 +112,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       LoadTrajectoryToFrame(frame);
       AINFO << "vehicle reach destination, stop trajectory is "
                "sent";
-      return destination_status;
+      return Status::OK();
     }
 
     // Check if trajectory updated
