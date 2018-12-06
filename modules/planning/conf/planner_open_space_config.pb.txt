@@ -19,12 +19,12 @@ dual_variable_warm_start_config : {
 }
 
 distance_approach_config : {
-  weight_u : 0.05
-  weight_u : 0.1
+  weight_u : 0.0
+  weight_u : 0.0
   weight_u_rate : 0.1
   weight_u_rate : 0.1
-  weight_state : 0.01
-  weight_state : 0.01
+  weight_state : 0.05
+  weight_state : 0.05
   weight_state : 0.2
   weight_state : 0.00001
   weight_stitching : 0.1
@@ -38,7 +38,7 @@ distance_approach_config : {
   max_speed_reverse : 1.0
   max_acceleration_forward : 2.0
   max_acceleration_reverse : 1.0
-  min_time_sample_scaling : 0.1
-  max_time_sample_scaling : 2.0
+  min_time_sample_scaling : 0.8
+  max_time_sample_scaling : 1.2
   use_fix_time : false
 }

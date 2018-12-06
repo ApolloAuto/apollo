@@ -57,20 +57,17 @@ bool DualVariableWarmStartProblem::Solve(
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  // app->Options()->SetStringValue("hessian_approximation", "limited-memory");
-  // TODO(QiL) : Change IPOPT settings to flag or configs
-  // app->Options()->SetStringValue("derivative_test", "second-order");
-  // app->Options()->SetNumericValue("derivative_test_tol", 1.0e-3);
   app->Options()->SetIntegerValue("print_level", 0);
-  // app->Options()->SetIntegerValue("mumps_mem_percent", 2000);
-  app->Options()->SetNumericValue("mumps_pivtol", 1e-5);
-  app->Options()->SetIntegerValue("max_iter", 750);
+  app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
+  app->Options()->SetNumericValue("mumps_pivtol", 1e-6);
+  app->Options()->SetIntegerValue("max_iter", 100);
   app->Options()->SetNumericValue("tol", 1e-5);
-  // app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
-  // app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
+  app->Options()->SetNumericValue("acceptable_constr_viol_tol", 1e-1);
+  app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
+  app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
   app->Options()->SetStringValue("print_timing_statistics", "yes");
-  // app->Options()->SetStringValue("alpha_for_y", "min");
-  // app->Options()->SetStringValue("recalc_y", "yes");
+  app->Options()->SetStringValue("alpha_for_y", "min");
+  app->Options()->SetStringValue("recalc_y", "yes");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
