@@ -23,6 +23,6 @@ export FLAGS_colorlogtostderr=1
 export FLAGS_minloglevel=0
 # for DEBUG log
 #export FLAGS_minloglevel=-1
-#export FLAGS_v = 4;
+#export FLAGS_v=4;
 
 source ${CYBER_PATH}/tools/cyber_tools_auto_complete.bash
