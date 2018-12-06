@@ -31,7 +31,7 @@ parameters = {
         'dim_output': 1
     },
     'cruise_mlp': {
-        'dim_input': 23 + 5 * 8 + 8 + 20 * 5,
+        'dim_input': 23 + 5 * 9 + 8 + 20 * 4,
         'dim_hidden_1': 50,
         'dim_hidden_2': 18,
         'dim_output': 3
