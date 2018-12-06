@@ -175,12 +175,9 @@ double DstExistanceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
                                             double timestamp) {
   double distance = (std::numeric_limits<float>::max)();
   double dist_decay = 1.0;
-  SensorDataManager *sensor_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
-  CHECK_NOTNULL(sensor_manager);
   Eigen::Affine3d sensor2world_pose;
-  bool status =
-      sensor_manager->GetPose(sensor_id, timestamp, &sensor2world_pose);
+  bool status = SensorDataManager::Instance()->GetPose(sensor_id, timestamp,
+                                                       &sensor2world_pose);
   if (status == false) {
     AERROR << "Failed to get pose";
     return dist_decay;
@@ -253,8 +250,7 @@ void DstExistanceFusion::UpdateToicWithoutCameraMeasurement(
   double dist_score = min_match_dist;
   double in_view_ratio = 0.0;
   // 1.get camera intrinsic and pose
-  SensorDataManager *sensor_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
+  SensorDataManager *sensor_manager = SensorDataManager::Instance();
   CHECK(sensor_manager != nullptr) << "Failed to get sensor manager";
 
   base::BaseCameraModelPtr camera_model =
@@ -301,9 +297,7 @@ void DstExistanceFusion::UpdateToicWithCameraMeasurement(
   double timestamp = camera_obj->GetTimestamp();
   double in_view_ratio = 0.0;
   // 1.get camera intrinsic and pose
-  SensorDataManager *sensor_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
-  CHECK(sensor_manager != nullptr) << "Failed to get sensor manager";
+  SensorDataManager *sensor_manager = SensorDataManager::Instance();
 
   base::BaseCameraModelPtr camera_model =
       sensor_manager->GetCameraIntrinsic(sensor_id);

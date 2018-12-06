@@ -23,11 +23,11 @@
 
 #include "gtest/gtest_prod.h"
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
-#include "modules/perception/lib/singleton/singleton.h"
 
 namespace apollo {
 namespace perception {
@@ -35,9 +35,6 @@ namespace fusion {
 
 class SensorDataManager {
  public:
-  SensorDataManager(const SensorDataManager&) = delete;
-  SensorDataManager operator=(const SensorDataManager&) = delete;
-
   bool Init();
 
   void Reset();
@@ -62,18 +59,13 @@ class SensorDataManager {
       const std::string& sensor_id) const;
 
  private:
-  FRIEND_TEST(SensorDataManagerTest, test);
-
-  SensorDataManager();
-  ~SensorDataManager() = default;
-
-  friend class lib::Singleton<SensorDataManager>;
-
- private:
   bool inited_ = false;
   std::unordered_map<std::string, SensorPtr> sensors_;
 
   const common::SensorManager* sensor_manager_ = nullptr;
+
+  FRIEND_TEST(SensorDataManagerTest, test);
+  DECLARE_SINGLETON(SensorDataManager);
 };
 
 }  // namespace fusion

@@ -33,8 +33,7 @@ TEST(ProbabliticFusionTest, test_init) {
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
-  SensorDataManager* sensor_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
+  SensorDataManager* sensor_manager = SensorDataManager::Instance();
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
@@ -101,8 +100,7 @@ TEST(ProbabliticFusionTest, test_update) {
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
-  SensorDataManager* sensor_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
+  SensorDataManager* sensor_manager = SensorDataManager::Instance();;
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
@@ -252,8 +250,7 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
-  SensorDataManager* sensor_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
+  SensorDataManager* sensor_manager = SensorDataManager::Instance();
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;

@@ -142,18 +142,15 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     // add the evidence of OTHERS_UNMOVABLE
     double in_view_ratio = 0.0;
     // 1.get camera intrinsic and pose
-    SensorDataManager *sensor_manager =
-        lib::Singleton<SensorDataManager>::get_instance();
-    CHECK(sensor_manager != nullptr) << "Failed to get sensor manager";
-
+    SensorDataManager *sensor_data_manager = SensorDataManager::Instance();
     base::BaseCameraModelPtr camera_model =
-        sensor_manager->GetCameraIntrinsic(sensor_id);
+        sensor_data_manager->GetCameraIntrinsic(sensor_id);
     CHECK(camera_model != nullptr)
         << "Failed to get camera intrinsic for " << sensor_id;
 
     Eigen::Affine3d sensor2world_pose;
-    bool status = sensor_manager->GetPose(sensor_id, measurement_timestamp,
-                                          &sensor2world_pose);
+    bool status = sensor_data_manager->GetPose(sensor_id, measurement_timestamp,
+                                               &sensor2world_pose);
     auto max_dist_it = options_.camera_max_valid_dist_.find(sensor_id);
     if (max_dist_it == options_.camera_max_valid_dist_.end()) {
       AWARN << boost::format(
