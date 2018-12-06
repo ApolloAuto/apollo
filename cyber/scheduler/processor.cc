@@ -24,7 +24,6 @@
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/croutine/croutine.h"
-#include "cyber/croutine/routine_context.h"
 #include "cyber/scheduler/processor_context.h"
 
 namespace apollo {
@@ -33,10 +32,7 @@ namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
 
-Processor::Processor() {
-  running_.exchange(true);
-  routine_context_.reset(new RoutineContext());
-}
+Processor::Processor() { running_.exchange(true); }
 
 Processor::~Processor() { Stop(); }
 
@@ -82,7 +78,6 @@ void Processor::SetSchedPolicy(std::string spolicy, int sched_priority) {
 
 void Processor::Run() {
   tid_.store(static_cast<int>(syscall(SYS_gettid)));
-  CRoutine::SetMainContext(routine_context_);
 
   while (likely(running_)) {
     if (likely(context_ != nullptr)) {

@@ -26,7 +26,7 @@
 #include <string>
 
 #include "cyber/common/log.h"
-#include "cyber/croutine/routine_context.h"
+#include "cyber/croutine/detail/routine_context.h"
 
 namespace apollo {
 namespace cyber {
@@ -47,19 +47,22 @@ class CRoutine {
   static void Yield(const RoutineState &state);
   static void SetMainContext(const std::shared_ptr<RoutineContext> &context);
   static CRoutine *GetCurrentRoutine();
-  static RoutineContext *GetMainContext();
+  static char **GetMainStack();
 
   // public interfaces
   bool Acquire();
   void Release();
+
   // It is caller's responsibility to check if state_ is valid before calling
   // SetUpdateFlag().
   void SetUpdateFlag();
+
   // acquire && release should be called before Resume
   // when work-steal like mechanism used
   RoutineState Resume();
   RoutineState UpdateState();
   RoutineContext *GetContext();
+  char **GetStack();
 
   void Run();
   void Stop();
@@ -108,31 +111,26 @@ class CRoutine {
   uint64_t id_ = 0;
 
   static thread_local CRoutine *current_routine_;
-  static thread_local std::shared_ptr<RoutineContext> main_context_;
+  static thread_local char *main_stack_;
 };
 
 inline void CRoutine::Yield(const RoutineState &state) {
   auto routine = GetCurrentRoutine();
   routine->set_state(state);
-  SwapContext(GetCurrentRoutine()->GetContext(), GetMainContext());
+  SwapContext(GetCurrentRoutine()->GetStack(), GetMainStack());
 }
 
 inline void CRoutine::Yield() {
-  SwapContext(GetCurrentRoutine()->GetContext(), GetMainContext());
+  SwapContext(GetCurrentRoutine()->GetStack(), GetMainStack());
 }
 
 inline CRoutine *CRoutine::GetCurrentRoutine() { return current_routine_; }
 
-inline RoutineContext *CRoutine::GetMainContext() {
-  return main_context_.get();
-}
-
-inline void CRoutine::SetMainContext(
-    const std::shared_ptr<RoutineContext> &context) {
-  main_context_ = context;
-}
+inline char **CRoutine::GetMainStack() { return &main_stack_; }
 
 inline RoutineContext *CRoutine::GetContext() { return context_.get(); }
+
+inline char **CRoutine::GetStack() { return &(context_->sp); }
 
 inline void CRoutine::Run() { func_(); }
 
