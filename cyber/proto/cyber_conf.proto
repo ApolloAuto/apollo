@@ -4,14 +4,12 @@ package apollo.cyber.proto;
 
 import "cyber/proto/scheduler_conf.proto";
 import "cyber/proto/transport_conf.proto";
-import "cyber/proto/log_conf.proto";
 import "cyber/proto/perf_conf.proto";
 import "cyber/proto/run_mode_conf.proto";
 import "cyber/proto/record_conf.proto";
 import "cyber/proto/topology_conf.proto";
 
 message CyberConfig {
-    optional LogConf log_conf = 1;
     optional SchedulerConf scheduler_conf = 3;
     optional TransportConf transport_conf = 4;
     optional PerfConf perf_conf = 5;
