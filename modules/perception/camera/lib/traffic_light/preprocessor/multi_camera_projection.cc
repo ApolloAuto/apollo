@@ -39,8 +39,7 @@ bool MultiCamerasProjection::Init(const MultiCamerasInitOption& options) {
     AERROR << "no cameras to be projected";
     return false;
   }
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager* sensor_manager = common::SensorManager::Instance();
   if (!sensor_manager->Init()) {
     AERROR << "sensor_manager init failed";
   }

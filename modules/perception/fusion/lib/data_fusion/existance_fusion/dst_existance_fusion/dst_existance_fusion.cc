@@ -126,11 +126,8 @@ void DstExistanceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
                                                   double measurement_timestamp,
                                                   double target_timestamp,
                                                   double min_match_dist) {
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-  CHECK_NOTNULL(sensor_manager);
   SensorObjectConstPtr camera_object = nullptr;
-  if (sensor_manager->IsCamera(sensor_id)) {
+  if (common::SensorManager::Instance()->IsCamera(sensor_id)) {
     camera_object = track_ref_->GetSensorObject(sensor_id);
     UpdateToicWithoutCameraMeasurement(sensor_id, measurement_timestamp,
                                        min_match_dist);
@@ -227,8 +224,7 @@ double DstExistanceFusion::GetExistReliability(
       (measurement->GetBaseObject()->type == base::ObjectType::UNKNOWN ||
        measurement->GetBaseObject()->type == base::ObjectType::UNKNOWN_MOVABLE);
   double unknown_ratio = unknown ? 0.6 : 1.0;
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager *sensor_manager = common::SensorManager::Instance();
   CHECK_NOTNULL(sensor_manager);
   if (sensor_manager->IsCamera(measurement->GetSensorId())) {
     return 0.8 * unknown_ratio;
@@ -240,8 +236,7 @@ double DstExistanceFusion::GetExistReliability(
 }
 
 double DstExistanceFusion::GetUnexistReliability(const std::string &sensor_id) {
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager *sensor_manager = common::SensorManager::Instance();
   CHECK_NOTNULL(sensor_manager);
   if (sensor_manager->IsCamera(sensor_id)) {
     return 0.8;

@@ -258,8 +258,7 @@ bool TransformWrapper::GetExtrinsicsBySensorId(
     return false;
   }
 
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager* sensor_manager = common::SensorManager::Instance();
   std::string frame_id = sensor_manager->GetFrameId(to_sensor_id);
   std::string child_frame_id = sensor_manager->GetFrameId(from_sensor_id);
 

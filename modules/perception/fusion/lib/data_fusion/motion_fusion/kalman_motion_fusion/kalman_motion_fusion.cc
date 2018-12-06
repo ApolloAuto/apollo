@@ -348,9 +348,7 @@ Eigen::VectorXd KalmanMotionFusion::ComputeAccelerationMeasurement(
     const base::SensorType& sensor_type, const Eigen::Vector3d& velocity,
     const double& timestamp) {
   Eigen::Vector3d acceleration_measurement = Eigen::Vector3d::Zero();
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-  if (sensor_manager->IsCamera(sensor_type)) {
+  if (common::SensorManager::Instance()->IsCamera(sensor_type)) {
     acceleration_measurement(0) = kalman_filter_.GetStates()(4);
     acceleration_measurement(1) = kalman_filter_.GetStates()(5);
     return acceleration_measurement;
@@ -370,8 +368,7 @@ Eigen::VectorXd KalmanMotionFusion::ComputeAccelerationMeasurement(
 void KalmanMotionFusion::RewardRMatrix(const base::SensorType& sensor_type,
                                        const bool& converged,
                                        Eigen::MatrixXd* r_matrix) {
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager* sensor_manager = common::SensorManager::Instance();
   const float converged_scale = 0.01f;
   const float unconverged_scale = 1000.0f;
   if (sensor_manager->IsLidar(sensor_type)) {
@@ -405,8 +402,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoMeasurement(
    * what is a pseudo-radar estimation? if given radar estimation is good,
    * project it on its last good lidar estimation within a short window.
    * otherwise, use current belief. */
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager* sensor_manager = common::SensorManager::Instance();
   if (sensor_manager->IsLidar(sensor_type)) {
     return ComputePseudoLidarMeasurement(measurement);
   }
@@ -438,14 +434,12 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
   if (lidar_velocity.norm() < DBL_EPSILON) {
     return pseudo_measurement;
   }
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
   /* trace back radar velocity history, try to find good radar measurement
    * which could help lidar velocity get a more accurate pseudo measurement */
   for (size_t count = 1; count < history_sensor_type_.size(); ++count) {
     size_t history_index = history_sensor_type_.size() - count;
     base::SensorType& history_type = history_sensor_type_[history_index];
-    if (sensor_manager->IsRadar(history_type)) {
+    if (common::SensorManager::Instance()->IsRadar(history_type)) {
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
       /* abandon radar history, if its velocity angle change is too large */
@@ -508,14 +502,12 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
   if (camera_velocity.norm() < DBL_EPSILON) {
     return pseudo_measurement;
   }
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
   /* trace back radar velocity history, try to find good radar measurement
    * which could help camera velocity get a more accurate pseudo measurement */
   for (size_t count = 1; count < history_sensor_type_.size(); ++count) {
     size_t history_index = history_sensor_type_.size() - count;
     base::SensorType& history_type = history_sensor_type_[history_index];
-    if (sensor_manager->IsRadar(history_type)) {
+    if (common::SensorManager::Instance()->IsRadar(history_type)) {
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
       /* abandon radar history, if its velocity angle change is too large */
@@ -581,8 +573,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoRadarMeasurement(
   Eigen::Vector3d fused_acceleration = Eigen::Vector3d::Zero();
   fused_acceleration(0) = kalman_filter_.GetStates()(4);
   fused_acceleration(1) = kalman_filter_.GetStates()(5);
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager* sensor_manager = common::SensorManager::Instance();
   /* trace back lidar and camera history, try to find good lidar/camera
    * measurement which could help radar velocity get a more robust pseudo
    * measurement. */

@@ -65,8 +65,8 @@ bool ObstacleCameraPerception::Init(
     detector_init_options.conf_file = plugin_param.config_file();
     detector_init_options.gpu_id = perception_param_.gpu_id();
 
-    auto manager = lib::Singleton<common::SensorManager>::get_instance();
-    model = manager->GetUndistortCameraModel(detector_param.camera_name());
+    model = common::SensorManager::Instance()->GetUndistortCameraModel(
+        detector_param.camera_name());
     auto pinhole = static_cast<base::PinholeCameraModel *> (model.get());
     name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
         detector_param.camera_name(), pinhole->get_intrinsic_params()));

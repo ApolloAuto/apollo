@@ -30,8 +30,7 @@ TEST(SensorManagerTest, test) {
   FLAGS_obs_sensor_meta_path = "data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "modules/perception/testdata/common/sensor_manager/params";
-  SensorManager* sensor_manager = lib::Singleton<SensorManager>::get_instance();
-  EXPECT_TRUE(sensor_manager != nullptr);
+  SensorManager* sensor_manager = SensorManager::Instance();
 
   EXPECT_TRUE(sensor_manager->Init());
   EXPECT_EQ(sensor_manager->sensor_info_map_.size(), 5);
@@ -108,9 +107,7 @@ TEST(SensorManagerTest, test) {
 
 /* TODO(all): test not working. to be added back
 TEST(SensorManagerTest, test_init_error) {
-  SensorManager* sensor_manager = lib::Singleton<SensorManager>::get_instance();
-  EXPECT_TRUE(sensor_manager != nullptr);
-
+  SensorManager* sensor_manager = SensorManager::Instance();
   sensor_manager->inited_ = false;
   FLAGS_work_root = "/apollo/modules/perception/testdata/"
       "common/sensor_manager/";

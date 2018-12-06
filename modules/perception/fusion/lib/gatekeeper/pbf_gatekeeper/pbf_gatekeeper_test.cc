@@ -45,8 +45,7 @@ TEST(PbfGatekeeperTest, test) {
   // case 2. radar publish
   // case 3. camera publish
   // case 4. invisible in all sensors, unable
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager* sensor_manager = common::SensorManager::Instance();
   base::SensorInfo lidar_info;
   base::SensorInfo camera_obstacle_info;
   base::SensorInfo camera_narrow_info;

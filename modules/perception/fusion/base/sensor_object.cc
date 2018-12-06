@@ -85,23 +85,17 @@ FusedObject::FusedObject() {
 
 bool IsLidar(const SensorObjectConstPtr& obj) {
   base::SensorType type = obj->GetSensorType();
-  common::SensorManager* sensor_manager =
-    lib::Singleton<common::SensorManager>::get_instance();
-  return sensor_manager->IsLidar(type);
+  return common::SensorManager::Instance()->IsLidar(type);
 }
 
 bool IsRadar(const SensorObjectConstPtr& obj) {
   base::SensorType type = obj->GetSensorType();
-  common::SensorManager* sensor_manager =
-    lib::Singleton<common::SensorManager>::get_instance();
-  return sensor_manager->IsRadar(type);
+  return common::SensorManager::Instance()->IsRadar(type);
 }
 
 bool IsCamera(const SensorObjectConstPtr& obj) {
   base::SensorType type = obj->GetSensorType();
-  common::SensorManager* sensor_manager =
-    lib::Singleton<common::SensorManager>::get_instance();
-  return sensor_manager->IsCamera(type);
+  return common::SensorManager::Instance()->IsCamera(type);
 }
 
 }  // namespace fusion

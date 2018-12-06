@@ -29,7 +29,7 @@ bool SensorDataManager::Init() {
   if (inited_) {
     return true;
   }
-  sensor_manager_ = lib::Singleton<common::SensorManager>::get_instance();
+  sensor_manager_ = common::SensorManager::Instance();
   inited_ = true;
   return true;
 }

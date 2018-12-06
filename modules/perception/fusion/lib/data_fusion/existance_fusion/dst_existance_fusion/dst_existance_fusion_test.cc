@@ -38,11 +38,7 @@ TEST(DstExistFusionTest, test_update_with_measurement) {
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/dst_existance_fusion/params";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-  EXPECT_TRUE(sensor_manager != nullptr);
-
-  EXPECT_TRUE(sensor_manager->Init());
+  EXPECT_TRUE(common::SensorManager::Instance()->Init());
 
   std::cout << "start init dst app\n";
   bool flag = DstExistanceFusion::Init();
@@ -132,11 +128,7 @@ TEST(DstExistFusionTest, test_update_without_measurement) {
   FLAGS_work_root = "./";
   FLAGS_obs_sensor_intrinsic_path = "./params";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-  EXPECT_TRUE(sensor_manager != nullptr);
-
-  EXPECT_TRUE(sensor_manager->Init());
+  EXPECT_TRUE(common::SensorManager::Instance()->Init());
 
   std::cout << "start init dst app\n";
   bool flag = DstExistanceFusion::Init();

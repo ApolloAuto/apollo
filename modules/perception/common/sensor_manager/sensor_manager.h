@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/common/macros.h"
 #include "modules/perception/base/camera.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/sensor_meta.h"
@@ -36,9 +37,6 @@ using apollo::perception::base::BaseCameraModel;
 
 class SensorManager {
  public:
-  SensorManager(const SensorManager&) = delete;
-  SensorManager operator=(const SensorManager&) = delete;
-
   bool Init();
 
   bool IsSensorExist(const std::string& name) const;
@@ -71,11 +69,6 @@ class SensorManager {
   std::string GetFrameId(const std::string& name) const;
 
  private:
-  SensorManager();
-  ~SensorManager() = default;
-
-  friend class apollo::perception::lib::Singleton<SensorManager>;
-
   inline std::string IntrinsicPath(const std::string& frame_id) {
     std::string intrinsics =
         FLAGS_obs_sensor_intrinsic_path + "/" + frame_id + "_intrinsics.yaml";
@@ -92,6 +85,8 @@ class SensorManager {
       distort_model_map_;
   std::unordered_map<std::string, std::shared_ptr<BaseCameraModel>>
       undistort_model_map_;
+
+  DECLARE_SINGLETON(SensorManager);
 };
 
 }  // namespace common
