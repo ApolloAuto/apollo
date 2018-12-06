@@ -611,14 +611,6 @@ Status OpenSpacePlanning::TrajectoryPartition(
   }
   trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
 
-  // temporary workaround. need trajectory interpolation
-  // const double dt = trajectory_pb->trajectory_point(1).relative_time() -
-  //                   trajectory_pb->trajectory_point(0).relative_time();
-
-  // for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
-  //   p.set_relative_time(p.relative_time() - dt);
-  // }
-
   return Status::OK();
 }
 

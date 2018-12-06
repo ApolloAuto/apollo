@@ -129,8 +129,6 @@ class OpenSpacePlanner : public Planner {
       open_space_trajectory_generator_;
   std::unique_ptr<OpenSpaceROI> open_space_roi_generator_;
 
-  common::VehicleState init_state_;
-  common::TrajectoryPoint planning_init_point_;
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
   apollo::common::VehicleState vehicle_state_;
   double rotate_angle_;
@@ -145,7 +143,7 @@ class OpenSpacePlanner : public Planner {
 
   planning_internal::OpenSpaceDebug open_space_debug_;
   apollo::common::Trajectory trajectory_to_end_;
-  apollo::planning::ADCTrajectory publishable_trajectory_;
+  apollo::planning::ADCTrajectory trajectory_to_end_pb_;
 
   OpenSpaceThreadData thread_data_;
   std::future<void> task_future_;
