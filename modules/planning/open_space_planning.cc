@@ -38,7 +38,6 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
-#include "modules/planning/planner/rtk/rtk_replay_planner.h"
 
 namespace apollo {
 namespace planning {
@@ -134,8 +133,6 @@ Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
-
-  std::list<hdmap::RouteSegments> segments;
 
   auto status = frame_->InitForOpenSpace();
 
