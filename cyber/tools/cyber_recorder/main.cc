@@ -192,37 +192,31 @@ int main(int argc, char** argv) {
     }
     switch (opt) {
       case 'f':
-        optind--;
-        while (optind < argc) {
-          if (*argv[optind] != '-') {
-            opt_file_vec.emplace_back(argv[optind]);
-            optind++;
+        opt_file_vec.emplace_back(std::string(optarg));
+        for (int i = optind; i < argc; i++) {
+          if (*argv[i] != '-') {
+            opt_file_vec.emplace_back(std::string(argv[i]));
           } else {
-            optind--;
             break;
           }
         }
         break;
       case 'c':
-        optind--;
-        while (optind < argc) {
-          if (*argv[optind] != '-') {
-            opt_white_channels.emplace_back(argv[optind]);
-            optind++;
+        opt_white_channels.emplace_back(std::string(optarg));
+        for (int i = optind; i < argc; i++) {
+          if (*argv[i] != '-') {
+            opt_white_channels.emplace_back(std::string(argv[i]));
           } else {
-            optind--;
             break;
           }
         }
         break;
       case 'k':
-        optind--;
-        while (optind < argc) {
-          if (*argv[optind] != '-') {
-            opt_black_channels.emplace_back(argv[optind]);
-            optind++;
+        opt_black_channels.emplace_back(std::string(optarg));
+        for (int i = optind; i < argc; i++) {
+          if (*argv[i] != '-') {
+            opt_black_channels.emplace_back(std::string(argv[i]));
           } else {
-            optind--;
             break;
           }
         }
