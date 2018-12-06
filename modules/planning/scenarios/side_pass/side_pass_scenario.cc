@@ -212,7 +212,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     }
 
     bool is_blocked_by_others = false;
-    if (side_pass_context_.scenario_config_.enable_obstacle_blocked_check()) {
+    if (side_pass_context_.scenario_config_.enable_obstacle_blocked_check() &&
+        !IsParked(reference_line, obstacle)) {
       for (const auto* other_obstacle : path_decision.obstacles().Items()) {
         if (other_obstacle->Id() == obstacle->Id()) {
           continue;
@@ -237,7 +238,6 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         }
       }
     }
-
     if (!is_blocked_by_others) {
       // static obstacle id doesn't contain prediction trajectory suffix.
       front_blocking_obstacle_id_ = obstacle->Id() + "_0";
@@ -246,6 +246,23 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     }
   }
   return false;
+}
+
+bool SidePassScenario::IsParked(const ReferenceLine& reference_line,
+                                const Obstacle* obstacle) {
+  double road_left_width = 0.0;
+  double road_right_width = 0.0;
+  double max_road_right_width = 0.0;
+  reference_line.GetRoadWidth(obstacle->PerceptionSLBoundary().start_s(),
+                              &road_left_width, &road_right_width);
+  max_road_right_width = road_right_width;
+  reference_line.GetRoadWidth(obstacle->PerceptionSLBoundary().end_s(),
+                              &road_left_width, &road_right_width);
+  max_road_right_width = std::max(max_road_right_width, road_right_width);
+  bool is_parked = std::abs(obstacle->PerceptionSLBoundary().start_l()) >
+      max_road_right_width - 0.1;
+
+  return (is_parked && obstacle->IsStatic());
 }
 
 }  // namespace side_pass
