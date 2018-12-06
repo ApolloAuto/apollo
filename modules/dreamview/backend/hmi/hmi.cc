@@ -41,9 +41,9 @@ HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
   }
 }
 
-void HMI::Start() {
-  hmi_worker_->Start();
-}
+void HMI::Start() { hmi_worker_->Start(); }
+
+void HMI::Stop() { hmi_worker_->Stop(); }
 
 void HMI::RegisterMessageHandlers() {
   // Broadcast HMIStatus to clients when status changed.
@@ -66,8 +66,8 @@ void HMI::RegisterMessageHandlers() {
   // Send current status and vehicle param to newly joined client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection* conn) {
-        const auto status_json = JsonUtil::ProtoToTypedJson(
-            "HMIStatus", hmi_worker_->GetStatus());
+        const auto status_json =
+            JsonUtil::ProtoToTypedJson("HMIStatus", hmi_worker_->GetStatus());
         websocket_->SendData(conn, status_json.dump());
         SendVehicleParam(conn);
       });

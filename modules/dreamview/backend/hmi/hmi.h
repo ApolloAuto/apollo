@@ -34,6 +34,7 @@ class HMI {
  public:
   HMI(WebSocketHandler *websocket, MapService *map_service);
   void Start();
+  void Stop();
 
  private:
   // Send VehicleParam to the given conn, or broadcast if conn is null.

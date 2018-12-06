@@ -44,9 +44,9 @@ Status Dreamview::Init() {
 
   if (FLAGS_dreamview_profiling_mode &&
       FLAGS_dreamview_profiling_duration > 0.0) {
-    exit_timer_.reset(new cyber::Timer(
-        FLAGS_dreamview_profiling_duration,
-        [this]() { this->TerminateProfilingMode(); }, false));
+    exit_timer_.reset(
+        new cyber::Timer(FLAGS_dreamview_profiling_duration,
+                         [this]() { this->TerminateProfilingMode(); }, false));
 
     exit_timer_->Start();
     AWARN << "============================================================";
@@ -103,6 +103,7 @@ void Dreamview::Stop() {
   server_->close();
   sim_control_->Stop();
   point_cloud_updater_->Stop();
+  hmi_->Stop();
 }
 
 }  // namespace dreamview
