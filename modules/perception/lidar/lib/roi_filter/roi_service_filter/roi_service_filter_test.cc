@@ -51,8 +51,7 @@ class LidarLibROIServiceFilterTest : public testing::Test {
     FLAGS_config_manager_path = "./conf";
     lib::ConfigManager::Instance()->Reset();
 
-    map::HDMapInput* hdmap_input =
-        lib::Singleton<map::HDMapInput>::get_instance();
+    map::HDMapInput* hdmap_input = map::HDMapInput::Instance();
     hdmap_input->Reset();
   }
 
@@ -78,14 +77,13 @@ void MockData(LidarFrame* frame) {
       common::ReadPoseFile(pose, &frame->lidar2world_pose, &idt, &timestamp));
 
   // c.update hdmap struct;
-  map::HDMapInput* hdmap_input =
-      lib::Singleton<map::HDMapInput>::get_instance();
   base::PointD point;
   point.x = frame->lidar2world_pose.translation()(0);
   point.y = frame->lidar2world_pose.translation()(1);
   point.z = frame->lidar2world_pose.translation()(2);
   frame->hdmap_struct.reset(new base::HdmapStruct);
-  CHECK(hdmap_input->GetRoiHDMapStruct(point, 120.0, frame->hdmap_struct));
+  CHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(
+      point, 120.0, frame->hdmap_struct));
 
   // d. trans points
   frame->world_cloud = base::PointDCloudPool::Instance().Get();

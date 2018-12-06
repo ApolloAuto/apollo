@@ -88,8 +88,7 @@ bool FusionComponent::InitAlgorithmPlugin() {
   CHECK(fusion_->Init(param)) << "Failed to init ObstacleMultiSensorFusion";
 
   if (FLAGS_obs_enable_hdmap_input && object_in_roi_check_) {
-    hdmap_input_ = lib::Singleton<map::HDMapInput>::get_instance();
-    CHECK_NOTNULL(hdmap_input_);
+    hdmap_input_ = map::HDMapInput::Instance();
     CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   AINFO << "Init algorithm successfully, onboard fusion: "

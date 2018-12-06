@@ -42,11 +42,7 @@ bool MapManager::Init(const MapManagerInitOptions& options) {
   CHECK(common::util::GetProtoFromFile(config_file, &config));
   update_pose_ = config.update_pose();
   roi_search_distance_ = config.roi_search_distance();
-  hdmap_input_ = lib::Singleton<map::HDMapInput>::get_instance();
-  if (hdmap_input_ == nullptr) {
-    AINFO << "Failed to load hdmap input.";
-    return false;
-  }
+  hdmap_input_ = map::HDMapInput::Instance();
   if (!hdmap_input_->Init()) {
     AINFO << "Failed to init hdmap input.";
     return false;
