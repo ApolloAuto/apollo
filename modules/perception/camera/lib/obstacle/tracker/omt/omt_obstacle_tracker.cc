@@ -77,9 +77,7 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   }
 
   // Init object template
-  object_template_manager_ =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager_ != nullptr);
+  object_template_manager_ = ObjectTemplateManager::Instance();
   return true;
 }
 

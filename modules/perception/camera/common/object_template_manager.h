@@ -26,6 +26,7 @@
 
 #include "gflags/gflags.h"
 #include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/proto/object_template_meta_schema.pb.h"
 #include "modules/perception/lib/singleton/singleton.h"
@@ -53,9 +54,6 @@ struct ObjectTemplateManagerInitOptions {
 
 class ObjectTemplateManager {
  public:
-  ObjectTemplateManager(const ObjectTemplateManager &) = delete;
-  ObjectTemplateManager operator=(const ObjectTemplateManager &) = delete;
-
   bool Init(const ObjectTemplateManagerInitOptions &options);
   // for general visual obj typed as vehicle
   float VehObjHwlBySearchTemplates(float *hwl, int *index = nullptr,
@@ -106,11 +104,6 @@ class ObjectTemplateManager {
   }
 
  private:
-  ObjectTemplateManager();
-  ~ObjectTemplateManager() = default;
-
-  friend class lib::Singleton<ObjectTemplateManager>;
-
   void LoadVehTemplates(const ObjectTemplate &tmplt);
   void LoadVehMinMidMaxTemplates(const base::ObjectSubType &type,
                                  const ObjectTemplate &tmplt);
@@ -140,6 +133,8 @@ class ObjectTemplateManager {
   TemplateMap mid_template_hwl_;
   TemplateMap max_template_hwl_;
   std::vector<TemplateMap> template_hwl_;
+
+  DECLARE_SINGLETON(ObjectTemplateManager);
 };
 
 }  // namespace camera

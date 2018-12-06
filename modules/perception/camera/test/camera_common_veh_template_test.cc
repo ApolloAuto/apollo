@@ -26,9 +26,7 @@ TEST(VehtemplateTest, GetVisualObjHwlBySearchTemplatesTest) {
   options.root_dir = "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/common/object_template/";
   options.conf_file = "object_template.pt";
-  ObjectTemplateManager* manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  EXPECT_TRUE(manager != nullptr);
+  ObjectTemplateManager* manager = ObjectTemplateManager::Instance();
   EXPECT_TRUE(manager->Init(options));
 
   {
