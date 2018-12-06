@@ -34,10 +34,10 @@ TaskManager::TaskManager()
     AERROR << "Task queue init failed";
     throw std::runtime_error("Task queue init failed");
   }
-  auto func = [task_queue = this->task_queue_]() {
-    while (!cyber::IsShutdown()) {
+  auto func = [this]() {
+    while (!stop_) {
       std::function<void()> task;
-      if (!task_queue->Dequeue(&task)) {
+      if (!task_queue_->Dequeue(&task)) {
         auto routine = croutine::CRoutine::GetCurrentRoutine();
         routine->HangUp();
         continue;
@@ -59,9 +59,10 @@ TaskManager::TaskManager()
 TaskManager::~TaskManager() { Shutdown(); }
 
 void TaskManager::Shutdown() {
-  if (is_shutdown_.exchange(true)) {
+  if (stop_.exchange(true)) {
     return;
   }
+
   for (uint32_t i = 0; i < num_threads_; i++) {
     scheduler::Instance()->RemoveTask(task_prefix + std::to_string(i));
   }
