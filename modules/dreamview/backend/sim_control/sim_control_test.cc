@@ -76,6 +76,7 @@ void SetTrajectory(const std::vector<double> &xs, const std::vector<double> &ys,
     point->mutable_path_point()->set_kappa(ks[i]);
     point->set_relative_time(ts[i]);
   }
+  adc_trajectory->set_gear(Chassis::GEAR_DRIVE);
 }
 
 TEST_F(SimControlTest, Test) {
