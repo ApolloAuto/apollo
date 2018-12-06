@@ -130,15 +130,9 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
           PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
   // check timeout
-  /* TODO(all): need revisit
-   if (wait_time > scenario_config_.wait_timeout() &&
-      watch_vehicle_ids.size() <= 1) {
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
-    PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-        GetContext()->stop_sign_id;
-    return Stage::FINISHED;
+  if (wait_time > scenario_config_.wait_timeout()) {
+    return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
   }
-  */
 
   const PathDecision& path_decision = reference_line_info.path_decision();
   for (const auto* obstacle : path_decision.obstacles().Items()) {
