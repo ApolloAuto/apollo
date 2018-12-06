@@ -22,8 +22,8 @@
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
-#include "cyber/scheduler/policy/choreography.h"
-#include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/policy/choreography_context.h"
+#include "cyber/scheduler/policy/classic_context.h"
 #include "cyber/scheduler/processor.h"
 
 namespace apollo {

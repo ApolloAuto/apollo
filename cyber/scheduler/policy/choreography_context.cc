@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/scheduler/policy/choreography.h"
+#include "cyber/scheduler/policy/choreography_context.h"
 
 #include <unordered_map>
 #include <utility>
