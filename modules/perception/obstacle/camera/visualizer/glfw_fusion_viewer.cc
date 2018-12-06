@@ -1672,12 +1672,10 @@ void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
               offset_y, image_width, image_height);
 
   // Draw grid plane
-  // std::vector<cv::Point3f> ocv_points;
   for (double y = -6.0; y <= 6.0; y += 1.5) {
     Eigen::Vector2d prev_pt2d;
     for (double x = 0.0; x < 100.0; x += 5.0) {
       Eigen::Vector3d pt3d(x, y, 0.0);
-      // ocv_points.push_back(pt3d);
       Eigen::Vector2d pt2d;
       get_project_point(v2c, pt3d, &pt2d);
 
@@ -1688,12 +1686,6 @@ void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
       prev_pt2d = pt2d;
     }
   }
-
-  // draw opencv grid plane
-  cv::Mat3d rot;
-  cv::Vec3d rotv;
-  cv::eigen2cv(v2c.inverse().block<3, 3>(0, 0), rot);
-  // cv::Rodrigues(rot, rotv);
 }
 
 bool GLFWFusionViewer::project_point_undistort(Eigen::Matrix4d v2c,
