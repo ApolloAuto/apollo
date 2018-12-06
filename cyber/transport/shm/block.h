@@ -41,6 +41,7 @@ class Block {
 
   static const int32_t kRWLockFree;
   static const int32_t kWriteExclusive;
+  static const int32_t kMaxTryLockTimes;
 
  private:
   bool TryLockForWrite();

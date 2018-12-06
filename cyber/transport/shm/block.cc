@@ -24,6 +24,7 @@ namespace transport {
 
 const int32_t Block::kRWLockFree = 0;
 const int32_t Block::kWriteExclusive = -1;
+const int32_t Block::kMaxTryLockTimes = 5;
 
 Block::Block() : msg_size_(0), msg_info_size_(0) {}
 
@@ -47,11 +48,21 @@ bool Block::TryLockForRead() {
     return false;
   }
 
-  if (!lock_num_.compare_exchange_weak(lock_num, lock_num + 1,
-                                       std::memory_order_acq_rel,
-                                       std::memory_order_relaxed)) {
-    AINFO << "fail to add read lock num, curr num: " << lock_num;
-    return false;
+  int32_t try_times = 0;
+  while (!lock_num_.compare_exchange_weak(lock_num, lock_num + 1,
+                                          std::memory_order_acq_rel,
+                                          std::memory_order_relaxed)) {
+    ++try_times;
+    if (try_times == kMaxTryLockTimes) {
+      AINFO << "fail to add read lock num, curr num: " << lock_num;
+      return false;
+    }
+
+    lock_num = lock_num_.load();
+    if (lock_num < kRWLockFree) {
+      AINFO << "block is being written.";
+      return false;
+    }
   }
 
   return true;
