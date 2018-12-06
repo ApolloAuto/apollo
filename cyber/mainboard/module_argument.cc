@@ -92,13 +92,11 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
     }
     switch (opt) {
       case 'd':
-        optind--;
-        while (optind < argc) {
-          if (*argv[optind] != '-') {
-            dag_conf_list_.emplace_back(argv[optind]);
-            optind++;
+        dag_conf_list_.emplace_back(std::string(optarg));
+        for (int i = optind; i < argc; i++) {
+          if (*argv[i] != '-') {
+            dag_conf_list_.emplace_back(std::string(argv[i]));
           } else {
-            optind--;
             break;
           }
         }
