@@ -276,10 +276,10 @@ void OpenSpacePlanner::GenerateStopTrajectory(
 }
 
 void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
-  publishable_trajectory_.Clear();
-  publishable_trajectory_.mutable_trajectory_point()->CopyFrom(
+  trajectory_to_end_pb_.Clear();
+  trajectory_to_end_pb_.mutable_trajectory_point()->CopyFrom(
       *(trajectory_to_end_.mutable_trajectory_point()));
-  frame->mutable_trajectory()->CopyFrom(publishable_trajectory_);
+  frame->mutable_trajectory()->CopyFrom(trajectory_to_end_pb_);
   frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
   *(frame->mutable_last_stitching_trajectory()) = stitching_trajectory_;
 }
