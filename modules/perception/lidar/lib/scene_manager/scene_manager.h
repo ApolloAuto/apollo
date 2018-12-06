@@ -51,7 +51,7 @@ class SceneManager {
       const SceneManagerInitOptions& options = SceneManagerInitOptions());
 
   int GetServiceNum() const {
-    return services_.size();
+    return static_cast<int>(services_.size());
   }
 
  protected:

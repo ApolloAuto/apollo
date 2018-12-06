@@ -75,7 +75,7 @@ class FeatureGenerator {
     if (count < static_cast<int>(log_table_.size())) {
       return log_table_[count];
     }
-    return log(static_cast<float>(1 + count));
+    return logf(static_cast<float>(1 + count));
   }
 
   // log table for CPU, with std::vector type

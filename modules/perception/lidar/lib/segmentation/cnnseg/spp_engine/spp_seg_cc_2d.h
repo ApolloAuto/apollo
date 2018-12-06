@@ -91,10 +91,14 @@ class SppCCDetector {
       status &= 63488;
       status |= node_rank;
     }
-    inline uint16_t get_traversed() { return (status & 14336) >> 11; }
+    inline uint16_t get_traversed() {
+      uint16_t pattern = 14336;
+      return static_cast<uint16_t>((status & pattern) >> 11);
+    }
     inline void set_traversed(uint16_t traversed) {
       status &= 51199;
-      status |= (traversed & 7) << 11;
+      uint16_t pattern = 7;
+      status |= static_cast<uint16_t>((traversed & pattern) << 11);
     }
     inline bool is_center() { return static_cast<bool>(status & 32768); }
     inline void set_is_center(bool is_center) {

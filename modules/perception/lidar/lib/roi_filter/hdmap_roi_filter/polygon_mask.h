@@ -95,7 +95,8 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
   std::vector<std::vector<IntervalOut>> scans_intervals;
   if (no_edge_table) {
     size_t scans_size =
-        (valid_range.second - valid_range.first) / cell_size[major_dir];
+        static_cast<size_t>((valid_range.second - valid_range.first) /
+                            cell_size[major_dir]);
     scans_intervals.resize(scans_size);
     for (size_t i = 0; i < scans_size; ++i) {
       double scan_loc = valid_range.first + i * cell_size[major_dir];
