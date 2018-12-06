@@ -350,7 +350,7 @@ class GLFWFusionViewer {
       object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
 
-private:
+ private:
   bool change_rot = false;
   bool change_translation = false;
 
@@ -368,7 +368,7 @@ private:
 
     return m;
   }
-  
+
   inline Eigen::Matrix3d rotY(double angle) {
     Eigen::Matrix3d m;
     m << cos(angle), 0, sin(angle),
@@ -385,7 +385,7 @@ private:
          0, 0, 1;
 
     return m;
-  } 
+  }
 
   void save_extrinsics();
   double to_deg(double angle);

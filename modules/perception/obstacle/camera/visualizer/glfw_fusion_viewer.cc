@@ -108,10 +108,10 @@ GLFWFusionViewer::GLFWFusionViewer()
       show_help_text(0),
       capture_screen_(false),
       capture_video_(FLAGS_capture_screen),
-      scene_width_(1280),
-      scene_height_(720),
-      image_width_(1280),
-      image_height_(720),
+      scene_width_(1920),
+      scene_height_(1080),
+      image_width_(1920),
+      image_height_(1080),
       lane_map_threshold_(0.5),
       frame_count_(0) {
   mode_mat_ = Eigen::Matrix4d::Identity();
@@ -302,7 +302,7 @@ void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
 }
 
 void glfw_error_callback(int error, const char *desc) {
-	AERROR << "Error: " << desc;
+  AERROR << "Error: " << desc;
 }
 
 bool GLFWFusionViewer::window_init() {
@@ -875,7 +875,7 @@ void GLFWFusionViewer::mouse_move(double xpos, double ypos) {
 }
 void GLFWFusionViewer::mouse_wheel(double delta) { mode_mat_(2, 3) -= delta; }
 
-void GLFWFusionViewer::reset() { 
+void GLFWFusionViewer::reset() {
   mode_mat_ = Eigen::Matrix4d::Identity();
 
   ax = ay = az = 0.0;
@@ -924,130 +924,130 @@ void GLFWFusionViewer::keyboard(int key) {
       change_rot = false;
       change_translation = true;
     } else {
-        switch(key) {
-          case GLFW_KEY_A: // rotate left (around OZ)
-            ay += step;
-            break;
-          case GLFW_KEY_D: // rotate right
-            ay -= step;
-            break;
-          case GLFW_KEY_Q: // rotate left (around OX)
-            az += step;
-            break;
-          case GLFW_KEY_E: // rotate right
-            az -= step;
-            break;
-          case GLFW_KEY_S: // rotate down (around OY)
-            ax += step;
-            break;
-          case GLFW_KEY_W: // rotate up
-            ax -= step;
-            break;
-          default:
-            break;
-        }
+      switch (key) {
+        case GLFW_KEY_A:  // rotate left (around OZ)
+          ay += step;
+          break;
+        case GLFW_KEY_D:  // rotate right
+          ay -= step;
+          break;
+        case GLFW_KEY_Q:  // rotate left (around OX)
+          az += step;
+          break;
+        case GLFW_KEY_E:  // rotate right
+          az -= step;
+          break;
+        case GLFW_KEY_S:  // rotate down (around OY)
+          ax += step;
+          break;
+        case GLFW_KEY_W:  // rotate up
+          ax -= step;
+          break;
+        default:
+          break;
       }
+    }
   } else if (change_translation) {
-      if (key == GLFW_KEY_M) {
-        change_translation = false;
-        change_rot = true;
-      } else if (key == GLFW_KEY_N) {
-        change_translation = false;
-      } else {
-          switch(key) {
-            case GLFW_KEY_W: // move forward
-              pos[0] += step;
-              break;
-            case GLFW_KEY_S: // move backward
-              pos[0] -= step;
-              break;
-            case GLFW_KEY_A: // left
-              pos[1] -= step;
-              break;
-            case GLFW_KEY_D: // right
-              pos[1] += step;
-              break;
-            case GLFW_KEY_E: // up
-              pos[2] -= step;
-              break;
-            case GLFW_KEY_Q: // down
-              pos[2] += step;
-              break;
-            default:
-              break;
-          }
-        }
-  } else {
-  switch (key) {
-    case GLFW_KEY_R:  // 'R'
-      reset();
-      break;
-    case GLFW_KEY_B:  // 'B'
-      show_box = (show_box + 1) % 2;
-      break;
-    case GLFW_KEY_V:  // 'V'
-      show_velocity = (show_velocity + 1) % 2;
-      break;
-    case GLFW_KEY_C:  // 'C'
-      use_class_color_ = !use_class_color_;
-      break;
-    case GLFW_KEY_P:  // 'P'
-      capture_screen_ = true;
-      break;
-    case GLFW_KEY_A:  // 'A'
-      show_fusion_association_ = !show_fusion_association_;
-      break;
-    // for camera visualization
-    case GLFW_KEY_I:
-      show_type_id_label_ = !show_type_id_label_;
-      break;
-    case GLFW_KEY_Q:  // Q
-      show_lane_ = !show_lane_;
-      break;
-    case GLFW_KEY_E:  // E
-      draw_lane_objects_ = !draw_lane_objects_;
-      break;
-    case GLFW_KEY_F:  // F
-      show_fusion_ = !show_fusion_;
-      break;
-    case GLFW_KEY_D:  // D
-      show_radar_pc_ = !show_radar_pc_;
-      break;
-    case GLFW_KEY_O:
-      show_camera_bdv_ = !show_camera_bdv_;
-      break;
-    case GLFW_KEY_T:
-      show_trajectory_ = !show_trajectory_;
-      break;
-    case GLFW_KEY_2:  // 2
-      show_camera_box2d_ = !show_camera_box2d_;
-      break;
-    case GLFW_KEY_3:  // 3
-      show_camera_box3d_ = !show_camera_box3d_;
-      break;
-    case GLFW_KEY_0:  // 3
-      show_associate_color_ = !show_associate_color_;
-      break;
-    case GLFW_KEY_H:  // H
-      show_help_text = !show_help_text;
-      break;
-    case GLFW_KEY_G:  // G
-      show_vp_grid_ = !show_vp_grid_;
-      break;
-    case GLFW_KEY_L:  // L
-      show_lidar_bdv_ = !show_lidar_bdv_;
-      break;
-    case GLFW_KEY_M:
+    if (key == GLFW_KEY_M) {
       change_translation = false;
       change_rot = true;
-      break;
-    case GLFW_KEY_N:
-      change_rot = false;
-      change_translation = true;
-      break;
-    default:
-      break;
-  }
+    } else if (key == GLFW_KEY_N) {
+      change_translation = false;
+    } else {
+      switch (key) {
+        case GLFW_KEY_W:  // move forward
+          pos[0] += step;
+          break;
+        case GLFW_KEY_S:  // move backward
+          pos[0] -= step;
+          break;
+        case GLFW_KEY_A:  // left
+          pos[1] -= step;
+          break;
+        case GLFW_KEY_D:  // right
+          pos[1] += step;
+          break;
+        case GLFW_KEY_E:  // up
+          pos[2] -= step;
+          break;
+        case GLFW_KEY_Q:  // down
+          pos[2] += step;
+          break;
+        default:
+          break;
+      }
+    }
+  } else {
+    switch (key) {
+      case GLFW_KEY_R:  // 'R'
+        reset();
+        break;
+      case GLFW_KEY_B:  // 'B'
+        show_box = (show_box + 1) % 2;
+        break;
+      case GLFW_KEY_V:  // 'V'
+        show_velocity = (show_velocity + 1) % 2;
+        break;
+      case GLFW_KEY_C:  // 'C'
+        use_class_color_ = !use_class_color_;
+        break;
+      case GLFW_KEY_P:  // 'P'
+        capture_screen_ = true;
+        break;
+      case GLFW_KEY_A:  // 'A'
+        show_fusion_association_ = !show_fusion_association_;
+        break;
+      // for camera visualization
+      case GLFW_KEY_I:
+        show_type_id_label_ = !show_type_id_label_;
+        break;
+      case GLFW_KEY_Q:  // Q
+        show_lane_ = !show_lane_;
+        break;
+      case GLFW_KEY_E:  // E
+        draw_lane_objects_ = !draw_lane_objects_;
+        break;
+      case GLFW_KEY_F:  // F
+        show_fusion_ = !show_fusion_;
+        break;
+      case GLFW_KEY_D:  // D
+        show_radar_pc_ = !show_radar_pc_;
+        break;
+      case GLFW_KEY_O:
+        show_camera_bdv_ = !show_camera_bdv_;
+        break;
+      case GLFW_KEY_T:
+        show_trajectory_ = !show_trajectory_;
+        break;
+      case GLFW_KEY_2:  // 2
+        show_camera_box2d_ = !show_camera_box2d_;
+        break;
+      case GLFW_KEY_3:  // 3
+        show_camera_box3d_ = !show_camera_box3d_;
+        break;
+      case GLFW_KEY_0:  // 3
+        show_associate_color_ = !show_associate_color_;
+        break;
+      case GLFW_KEY_H:  // H
+        show_help_text = !show_help_text;
+        break;
+      case GLFW_KEY_G:  // G
+        show_vp_grid_ = !show_vp_grid_;
+        break;
+      case GLFW_KEY_L:  // L
+        show_lidar_bdv_ = !show_lidar_bdv_;
+        break;
+      case GLFW_KEY_M:
+        change_translation = false;
+        change_rot = true;
+        break;
+      case GLFW_KEY_N:
+        change_rot = false;
+        change_translation = true;
+        break;
+      default:
+        break;
+    }
   }
 
   if (key == GLFW_KEY_UP) {
@@ -1057,7 +1057,7 @@ void GLFWFusionViewer::keyboard(int key) {
   }
 
   if (change_rot) {
-    Eigen::Vector3d eulers = v2c_copy.block<3,3>(0, 0).eulerAngles(0, 1, 2);
+    Eigen::Vector3d eulers = v2c_copy.block<3, 3>(0, 0).eulerAngles(0, 1, 2);
     help_str += "Rotation: \nX: " + std::to_string(eulers[0])
                 + "\nY: " + std::to_string(eulers[1])
                 + "\nZ: " + std::to_string(eulers[2]) + "\n";
@@ -1087,7 +1087,8 @@ void GLFWFusionViewer::keyboard(int key) {
     help_str += "\nUP, DOWN: Change step size";
   } else if (show_help_text) {
     help_str += " (ON)";
-    help_str += "\nM: Change rotation matrix\nN: Change translation\nZ: Save extrinsic parameters";
+    help_str += "\nM: Change rotation matrix\nN: Change translation";
+    help_str += "\nZ: Save extrinsic parameters";
     help_str += "\nR: reset matrxi\nB: show box";
     if (show_box) help_str += "(ON)";
     help_str += "\nV: show velocity";
@@ -1260,7 +1261,10 @@ void GLFWFusionViewer::draw_camera_frame(FrameContent* content,
   v2c_copy << v2c;
   v2c << v2c.inverse();
 
-  Eigen::Matrix4d v2c_static = camera_to_world_pose_static.inverse();
+  // Eigen::Matrix4d v2c_static = camera_to_world_pose_static.inverse();
+  Eigen::Matrix4d v2c_static;
+  v2c_static << v2c;
+
   int offset_x = 0;  // scene_width_;
   int offset_y = 0;
 
@@ -1478,14 +1482,14 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
       if (x >= 0 && x < lane_map.cols && y >= 0 && y < lane_map.rows &&
           lane_map.at<float>(y, x) >= lane_map_threshold_) {
         // cv::Scalar lane_map_color =
-            // lane_map_colors[static_cast<int>(round(lane_map.at<float>(y, x)))];
+          // lane_map_colors[static_cast<int>(round(lane_map.at<float>(y, x)))];
             cv::Scalar lane_map_color = cv::Scalar(255, 0, 0);
         // AINFO << lane_map_color;
         for (uint16_t c = 0; c < 3; c++) {
-          image_mat->at<cv::Vec3b>(h, w)[c] = static_cast<unsigned char>(lane_map_color[c]
+          image_mat->at<cv::Vec3b>(h, w)[c] =
+            static_cast<unsigned char>(lane_map_color[c]);
               // image_mat->at<cv::Vec3b>(h, w)[c] * alpha_blending +
               // lane_map_color[c] * one_minus_alpha
-              );
         }
       }
     }
@@ -1668,10 +1672,12 @@ void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
               offset_y, image_width, image_height);
 
   // Draw grid plane
+  // std::vector<cv::Point3f> ocv_points;
   for (double y = -6.0; y <= 6.0; y += 1.5) {
     Eigen::Vector2d prev_pt2d;
     for (double x = 0.0; x < 100.0; x += 5.0) {
       Eigen::Vector3d pt3d(x, y, 0.0);
+      // ocv_points.push_back(pt3d);
       Eigen::Vector2d pt2d;
       get_project_point(v2c, pt3d, &pt2d);
 
@@ -1682,6 +1688,12 @@ void GLFWFusionViewer::draw_vp_ground(const Eigen::Matrix4d& v2c, bool stat,
       prev_pt2d = pt2d;
     }
   }
+
+  // draw opencv grid plane
+  cv::Mat3d rot;
+  cv::Vec3d rotv;
+  cv::eigen2cv(v2c.inverse().block<3, 3>(0, 0), rot);
+  // cv::Rodrigues(rot, rotv);
 }
 
 bool GLFWFusionViewer::project_point_undistort(Eigen::Matrix4d v2c,
