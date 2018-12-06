@@ -426,7 +426,6 @@ Status OpenSpacePlanning::TrajectoryPartition(
   stitched_trajectory_to_end.push_back(
       uninterpolated_stitched_trajectory_to_end
           [uninterpolated_stitched_trajectory_to_end.size() - 1]);
-
   double distance_s = 0.0;
   apollo::planning_internal::Trajectories trajectory_partition;
   std::vector<apollo::canbus::Chassis::GearPosition> gear_positions;
@@ -482,6 +481,16 @@ Status OpenSpacePlanning::TrajectoryPartition(
       gear_positions.push_back(canbus::Chassis::GEAR_DRIVE);
     }
   }
+  // start point of gears plot
+  plot_gear_shift_.clear();
+  plot_gear_shift_time_.clear();
+  if (gear_positions.back() == canbus::Chassis::GEAR_DRIVE) {
+    plot_gear_shift_.push_back(1.0);
+  } else {
+    plot_gear_shift_.push_back(-1.0);
+  }
+  plot_gear_shift_time_.push_back(0.0);
+
   // partition trajectory points into each trajectory
   for (size_t i = 0; i < horizon; i++) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
@@ -490,6 +499,9 @@ Status OpenSpacePlanning::TrajectoryPartition(
         gear_positions.back() == canbus::Chassis::GEAR_DRIVE) {
       current_trajectory = trajectory_partition.add_trajectory();
       gear_positions.push_back(canbus::Chassis::GEAR_REVERSE);
+      plot_gear_shift_.push_back(-1.0);
+      plot_gear_shift_time_.push_back(
+          stitched_trajectory_to_end[i].relative_time());
       distance_s = 0.0;
     }
     // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
@@ -498,6 +510,9 @@ Status OpenSpacePlanning::TrajectoryPartition(
         gear_positions.back() == canbus::Chassis::GEAR_REVERSE) {
       current_trajectory = trajectory_partition.add_trajectory();
       gear_positions.push_back(canbus::Chassis::GEAR_DRIVE);
+      plot_gear_shift_.push_back(1.0);
+      plot_gear_shift_time_.push_back(
+          stitched_trajectory_to_end[i].relative_time());
       distance_s = 0.0;
     }
 
@@ -655,6 +670,7 @@ void OpenSpacePlanning::AddOpenSpaceTrajectory(
   auto* smoothed_properties = smoothed_line->mutable_properties();
   (*smoothed_properties)["borderWidth"] = "2";
   (*smoothed_properties)["pointRadius"] = "0";
+  (*smoothed_properties)["lineTension"] = "0";
   (*smoothed_properties)["fill"] = "false";
   (*smoothed_properties)["showLine"] = "true";
 
@@ -670,14 +686,85 @@ void OpenSpacePlanning::AddOpenSpaceTrajectory(
   auto* warm_start_properties = warm_start_line->mutable_properties();
   (*warm_start_properties)["borderWidth"] = "2";
   (*warm_start_properties)["pointRadius"] = "0";
+  (*warm_start_properties)["lineTension"] = "0";
   (*warm_start_properties)["fill"] = "false";
   (*warm_start_properties)["showLine"] = "true";
+}
+
+void OpenSpacePlanning::AddOpenSpaceSpeedProfile(
+    planning_internal::Debug* debug) {
+  auto chart = debug->mutable_planning_data()->add_chart();
+  auto open_space_debug = debug->planning_data().open_space();
+  chart->set_title("Open Space Speed Plan Visualization");
+  auto* options = chart->mutable_options();
+  options->mutable_x()->set_min(0);
+  options->mutable_x()->set_max(100);
+  options->mutable_x()->set_label_string("time (s)");
+  options->mutable_y()->set_min(2.1);
+  options->mutable_y()->set_max(-1.1);
+  options->mutable_y()->set_label_string("speed (m/s)");
+
+  auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+  auto* smoothed_line = chart->add_line();
+  smoothed_line->set_label("Speed Profile");
+  for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
+    auto* point_debug = smoothed_line->add_point();
+    point_debug->set_x(point.trajectory_point().relative_time());
+    point_debug->set_y(point.trajectory_point().v());
+  }
+  // Set chartJS's dataset properties
+  auto* smoothed_properties = smoothed_line->mutable_properties();
+  (*smoothed_properties)["borderWidth"] = "2";
+  (*smoothed_properties)["pointRadius"] = "0";
+  (*smoothed_properties)["lineTension"] = "0";
+  (*smoothed_properties)["fill"] = "false";
+  (*smoothed_properties)["showLine"] = "true";
+
+  auto* aux_line = chart->add_line();
+  aux_line->set_label("Zero");
+  auto* aux_point_start = aux_line->add_point();
+  aux_point_start->set_x(0);
+  aux_point_start->set_y(0);
+  auto* aux_point_end = aux_line->add_point();
+  aux_point_end->set_x(100);
+  aux_point_end->set_y(0);
+
+  // Set chartJS's dataset properties
+  auto* aux_properties = aux_line->mutable_properties();
+  (*aux_properties)["borderWidth"] = "2";
+  (*aux_properties)["pointRadius"] = "0";
+  (*aux_properties)["lineTension"] = "0";
+  (*aux_properties)["fill"] = "false";
+  (*aux_properties)["showLine"] = "true";
+
+  auto* gear_shift_line = chart->add_line();
+  gear_shift_line->set_label("Gear");
+  size_t gear_shift_num =
+      std::min(plot_gear_shift_time_.size(), plot_gear_shift_.size());
+  for (unsigned int gear_index = 0; gear_index < gear_shift_num; gear_index++) {
+    if (gear_index > 0) {
+      auto* point_debug = gear_shift_line->add_point();
+      point_debug->set_x(plot_gear_shift_time_[gear_index]);
+      point_debug->set_y(plot_gear_shift_[gear_index - 1]);
+    }
+    auto* point_debug = gear_shift_line->add_point();
+    point_debug->set_x(plot_gear_shift_time_[gear_index]);
+    point_debug->set_y(plot_gear_shift_[gear_index]);
+  }
+  // Set chartJS's dataset properties
+  auto* gear_line_properties = gear_shift_line->mutable_properties();
+  (*gear_line_properties)["borderWidth"] = "2";
+  (*gear_line_properties)["pointRadius"] = "0";
+  (*gear_line_properties)["lineTension"] = "0";
+  (*gear_line_properties)["fill"] = "false";
+  (*gear_line_properties)["showLine"] = "true";
 }
 
 void OpenSpacePlanning::ExportOpenSpaceChart(planning_internal::Debug* debug) {
   // Export Trajectory Visualization Chart.
   if (FLAGS_enable_record_debug) {
     AddOpenSpaceTrajectory(debug);
+    AddOpenSpaceSpeedProfile(debug);
   }
 }
 

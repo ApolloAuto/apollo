@@ -69,6 +69,8 @@ class OpenSpacePlanning : public PlanningBase {
 
   void AddOpenSpaceTrajectory(planning_internal::Debug* debug);
 
+  void AddOpenSpaceSpeedProfile(planning_internal::Debug* debug);
+
   void ExportOpenSpaceChart(planning_internal::Debug* debug);
 
   void FillPlanningPb(const double timestamp,
@@ -98,6 +100,8 @@ class OpenSpacePlanning : public PlanningBase {
   std::vector<common::TrajectoryPoint> last_stitching_trajectory_;
   planning_internal::OpenSpaceDebug last_open_space_debug_;
   bool last_trajectory_succeeded_ = false;
+  std::vector<double> plot_gear_shift_time_;
+  std::vector<double> plot_gear_shift_;
 };
 
 }  // namespace planning

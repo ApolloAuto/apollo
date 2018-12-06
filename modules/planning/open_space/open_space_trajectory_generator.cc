@@ -208,7 +208,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     open_space_debug_.Clear();
     RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
                     dual_n_result_ds, state_result_ds, control_result_ds,
-                    XYbounds_, obstalce_list);
+                    time_result_ds, XYbounds_, obstalce_list);
   }
   // rescale the states to the world frame
   for (size_t i = 0; i < horizon_ + 1; i++) {
@@ -254,7 +254,7 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const Eigen::MatrixXd& dual_n_result_ds,
     const Eigen::MatrixXd& state_result_ds,
     const Eigen::MatrixXd& control_result_ds,
-    const std::vector<double>& XYbounds,
+    const Eigen::MatrixXd& time_result_ds, const std::vector<double>& XYbounds,
     const IndexedObstacles& obstalce_list) {
   // load warm start trajectory
   auto* warm_start_trajectory =
@@ -309,6 +309,8 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     }
   }
 
+  double relative_time = 0;
+
   // load smoothed trajectory
   auto* smoothed_trajectory = open_space_debug_.mutable_smoothed_trajectory();
   for (size_t i = 0; i < horizon_; i++) {
@@ -322,6 +324,9 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     smoothed_point->mutable_trajectory_point()->set_v(state_result_ds(3, i));
     smoothed_point->set_steer(control_result_ds(0, i));
     smoothed_point->mutable_trajectory_point()->set_a(control_result_ds(1, i));
+    relative_time += time_result_ds(0, i);
+    smoothed_point->mutable_trajectory_point()->set_relative_time(
+        relative_time);
   }
   auto* smoothed_point = smoothed_trajectory->add_vehicle_motion_point();
   smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_x(
@@ -332,7 +337,8 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
       state_result_ds(2, horizon_));
   smoothed_point->mutable_trajectory_point()->set_v(
       state_result_ds(3, horizon_));
-
+  relative_time += time_result_ds(0, horizon_);
+  smoothed_point->mutable_trajectory_point()->set_relative_time(relative_time);
   // load xy boundary (xmin, xmax, ymin, ymax)
   open_space_debug_.add_xy_boundary(XYbounds[0]);
   open_space_debug_.add_xy_boundary(XYbounds[1]);

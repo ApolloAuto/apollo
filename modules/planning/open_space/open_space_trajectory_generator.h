@@ -111,6 +111,7 @@ class OpenSpaceTrajectoryGenerator {
                        const Eigen::MatrixXd& dual_n_result_ds,
                        const Eigen::MatrixXd& state_result_ds,
                        const Eigen::MatrixXd& control_result_ds,
+                       const Eigen::MatrixXd& time_result_ds,
                        const std::vector<double>& XYbounds,
                        const IndexedObstacles& obstalce_list);
 
