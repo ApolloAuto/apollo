@@ -101,11 +101,13 @@ void DeciderRuleBasedStop::CheckStopSign(
   ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
 
-  BuildStopDecision(frame, reference_line_info,
-                    stop_wall_id,
-                    stop_line_s,
-                    stop_distance,
-                    StopReasonCode::STOP_REASON_STOP_SIGN);
+  BuildStopDecision(
+      frame, reference_line_info,
+      stop_wall_id,
+      stop_line_s,
+      stop_distance,
+      StopReasonCode::STOP_REASON_STOP_SIGN,
+      PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
 }
 
 void DeciderRuleBasedStop::CheckTrafficLight(
@@ -147,11 +149,13 @@ void DeciderRuleBasedStop::CheckTrafficLight(
 
   ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
       << "] stop_line_s[" << stop_line_s << "]";
+  std::vector<std::string> wait_for_obstacles;
   BuildStopDecision(frame, reference_line_info,
                     stop_wall_id,
                     stop_line_s,
                     stop_distance,
-                    StopReasonCode::STOP_REASON_SIGNAL);
+                    StopReasonCode::STOP_REASON_SIGNAL,
+                    wait_for_obstacles);
 }
 
 TrafficLight DeciderRuleBasedStop::ReadTrafficLight(
@@ -190,7 +194,8 @@ bool DeciderRuleBasedStop::BuildStopDecision(
     const std::string& stop_wall_id,
     const double stop_line_s,
     const double stop_distance,
-    const StopReasonCode& stop_reason_code) {
+    const StopReasonCode& stop_reason_code,
+    const std::vector<std::string>& wait_for_obstacles) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -227,6 +232,10 @@ bool DeciderRuleBasedStop::BuildStopDecision(
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());
   stop_decision->mutable_stop_point()->set_z(0.0);
+
+  for (size_t i = 0; i < wait_for_obstacles.size(); ++i) {
+    stop_decision->add_wait_for_obstacle(wait_for_obstacles[i]);
+  }
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(

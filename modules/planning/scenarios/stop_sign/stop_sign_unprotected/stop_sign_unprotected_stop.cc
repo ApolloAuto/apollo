@@ -76,8 +76,7 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
         return overlap.object_id == stop_sign_overlap_id;
       });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+    return FinishStage(ScenarioConfig::NO_STAGE);
   }
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -86,10 +85,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
           ->FindCreepDistance(*frame, reference_line_info);
   const double creep_fence_s = stop_sign_overlap_it->end_s + creep_distance;
   if (adc_front_edge_s > creep_fence_s) {
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
-    PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-        GetContext()->stop_sign_id;
-    return Stage::FINISHED;
+    return FinishStage(
+        ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE);
   }
 
   // STOP
@@ -100,10 +97,7 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   auto& watch_vehicles = GetContext()->watch_vehicles;
   if (wait_time >= scenario_config_.stop_duration() &&
       watch_vehicles.empty()) {
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
-    PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-        GetContext()->stop_sign_id;
-    return Stage::FINISHED;
+    return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
   }
 
   // get all vehicles currently watched
@@ -111,7 +105,6 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
     std::copy(it->second.begin(), it->second.end(),
               std::back_inserter(watch_vehicle_ids));
-
     // for debug
     std::string associated_lane_id = it->first;
     std::string s;
@@ -124,11 +117,17 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   }
 
   if (watch_vehicle_ids.size() == 0) {
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
-    PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-        GetContext()->stop_sign_id;
-    return Stage::FINISHED;
+    return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
   }
+
+  // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
+  // for visualization
+  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+  std::copy(
+      watch_vehicle_ids.begin(),
+      watch_vehicle_ids.end(),
+      std::back_inserter(
+          PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
   // check timeout
   /* TODO(all): need revisit
@@ -242,6 +241,16 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
   }
 
   return 0;
+}
+
+Stage::StageStatus StopSignUnprotectedStop::FinishStage(
+    const ScenarioConfig::StageType& next_stage) {
+  next_stage_ = next_stage;
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
+      GetContext()->stop_sign_id;
+  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+
+  return Stage::FINISHED;
 }
 
 }  // namespace stop_sign

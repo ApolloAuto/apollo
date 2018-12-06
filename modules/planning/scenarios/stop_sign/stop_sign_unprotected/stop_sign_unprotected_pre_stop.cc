@@ -118,17 +118,30 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
   const PathDecision& path_decision = reference_line_info.path_decision();
   auto& watch_vehicles = GetContext()->watch_vehicles;
 
-  // for debug
+  std::vector<std::string> watch_vehicle_ids;
   for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
+    std::copy(it->second.begin(), it->second.end(),
+              std::back_inserter(watch_vehicle_ids));
+
+    // for debug string
     std::string associated_lane_id = it->first;
     std::string s;
     for (size_t i = 0; i < it->second.size(); ++i) {
-      std::string vehicle = (it->second)[i];
-      s = s.empty() ? vehicle : s + "," + vehicle;
+      std::string vehicle_id = (it->second)[i];
+      s = s.empty() ? vehicle_id : s + "," + vehicle_id;
     }
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
+
+  // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
+  // for visualization
+  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+  std::copy(
+      watch_vehicle_ids.begin(),
+      watch_vehicle_ids.end(),
+      std::back_inserter(
+          PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     // add to watch_vehicles if adc is still proceeding to stop sign

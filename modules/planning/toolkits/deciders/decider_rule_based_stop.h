@@ -21,6 +21,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "modules/planning/proto/decider_config.pb.h"
 
@@ -58,7 +59,8 @@ class DeciderRuleBasedStop : public Decider {
                          const std::string& stop_wall_id,
                          const double stop_line_s,
                          const double stop_distance,
-                         const StopReasonCode& stop_reason_code);
+                         const StopReasonCode& stop_reason_code,
+                         const std::vector<std::string>& wait_for_obstacles);
 
  private:
   static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";

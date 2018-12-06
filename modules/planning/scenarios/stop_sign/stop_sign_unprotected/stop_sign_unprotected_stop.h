@@ -52,6 +52,8 @@ class StopSignUnprotectedStop : public Stage {
       const std::vector<std::string>& watch_vehicle_ids,
       std::unordered_map<std::string, std::vector<std::string>>*
           watch_vehicles);
+ private:
+  Stage::StageStatus FinishStage(const ScenarioConfig::StageType& next_stage);
 
  private:
   ScenarioStopSignUnprotectedConfig scenario_config_;
