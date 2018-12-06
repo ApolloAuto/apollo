@@ -202,7 +202,7 @@ void GroundFittingCostFunc(const T *p,
   const T *refp = d;
   for (int i = 0; i < n; ++i) {
     T d_proj = refx[0] * p[0] + p[1];
-    T proj_err = fabs(d_proj - refp[0]);
+    T proj_err = static_cast<T>(fabs(d_proj - refp[0]));
     if (proj_err < error_tol) {
       inliers[(*nr_inlier)++] = i;
       *cost += proj_err;

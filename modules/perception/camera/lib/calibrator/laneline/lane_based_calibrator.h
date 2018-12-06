@@ -115,7 +115,7 @@ class LaneBasedCalibrator {
   }
 
   bool IsTravelingStraight(const float &vehicle_yaw_changed) const {
-    float abs_yaw = fabs(vehicle_yaw_changed);
+    float abs_yaw = static_cast<float>(fabs(vehicle_yaw_changed));
     return abs_yaw < params_.max_allowed_yaw_angle_in_radian;
   }
 
