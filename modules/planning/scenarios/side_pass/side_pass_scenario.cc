@@ -226,7 +226,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         }
 
         double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-            obstacle->PerceptionSLBoundary().end_s();
+                         obstacle->PerceptionSLBoundary().end_s();
         if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
           continue;
         } else {

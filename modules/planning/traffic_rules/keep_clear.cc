@@ -47,14 +47,13 @@ Status KeepClear::ApplyRule(Frame* const frame,
       const auto obstacle_id =
           KEEP_CLEAR_VO_ID_PREFIX + keep_clear_overlap.object_id;
 
-      if (BuildKeepClearObstacle(frame, reference_line_info,
-                                 obstacle_id,
+      if (BuildKeepClearObstacle(frame, reference_line_info, obstacle_id,
                                  keep_clear_overlap.start_s,
                                  keep_clear_overlap.end_s)) {
         ADEBUG << "KEEP_CLAER for keep_clear_zone["
                << keep_clear_overlap.object_id << "] s["
-               << keep_clear_overlap.start_s
-               << ", " << keep_clear_overlap.end_s << "] BUILD";
+               << keep_clear_overlap.start_s << ", " << keep_clear_overlap.end_s
+               << "] BUILD";
       }
     }
   }
@@ -91,8 +90,7 @@ Status KeepClear::ApplyRule(Frame* const frame,
 
 bool KeepClear::BuildKeepClearObstacle(
     Frame* const frame, ReferenceLineInfo* const reference_line_info,
-    const std::string& virtual_obstacle_id,
-    const double keep_clear_start_s,
+    const std::string& virtual_obstacle_id, const double keep_clear_start_s,
     const double keep_clear_end_s) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -101,20 +99,19 @@ bool KeepClear::BuildKeepClearObstacle(
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   if (adc_front_edge_s - keep_clear_start_s >
       config_.keep_clear().min_pass_s_distance()) {
-    ADEBUG << "adc inside keep_clear zone[" << virtual_obstacle_id
-           << "] s[" << keep_clear_start_s << ", "
-           << keep_clear_end_s << "] adc_front_edge_s["
-           << adc_front_edge_s << "]. skip this keep clear zone";
+    ADEBUG << "adc inside keep_clear zone[" << virtual_obstacle_id << "] s["
+           << keep_clear_start_s << ", " << keep_clear_end_s
+           << "] adc_front_edge_s[" << adc_front_edge_s
+           << "]. skip this keep clear zone";
     return false;
   }
 
   ADEBUG << "keep clear obstacle: [" << keep_clear_start_s
       << ", " << keep_clear_end_s << "]";
   // create virtual static obstacle
-  auto* obstacle = frame->CreateStaticObstacle(
-      reference_line_info, virtual_obstacle_id,
-      keep_clear_start_s,
-      keep_clear_end_s);
+  auto* obstacle =
+      frame->CreateStaticObstacle(reference_line_info, virtual_obstacle_id,
+                                  keep_clear_start_s, keep_clear_end_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << virtual_obstacle_id << "]";
     return false;
