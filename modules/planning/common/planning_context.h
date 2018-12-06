@@ -22,6 +22,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "cyber/common/macros.h"
 
@@ -54,6 +55,8 @@ class PlanningContext {
     // => no stop fence from decider_rule_based_stop task
     std::string stop_done_overlap_id;
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
+    std::vector<std::string> stop_sign_wait_for_obstacles;
+    std::vector<std::string> crosswalk_wait_for_obstacles;
   };
 
   static void Clear();
