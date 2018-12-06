@@ -56,25 +56,18 @@ IntraWriter<MessageT>::~IntraWriter() {
 
 template <typename MessageT>
 bool IntraWriter<MessageT>::Init() {
-  {
-    std::lock_guard<std::mutex> g_(this->lock_);
-    if (this->init_) { return true; }
-
-    blocker_manager_ = BlockerManager::Instance();
-    blocker_manager_->GetOrCreateBlocker<MessageT>(
-        BlockerAttr(this->role_attr_.channel_name()));
-    this->init_ = true;
+  if (this->init_.exchange(true)) {
+    return true;
   }
+  blocker_manager_ = BlockerManager::Instance();
+  blocker_manager_->GetOrCreateBlocker<MessageT>(
+      BlockerAttr(this->role_attr_.channel_name()));
   return true;
 }
 
 template <typename MessageT>
 void IntraWriter<MessageT>::Shutdown() {
-  {
-    std::lock_guard<std::mutex> g_(this->lock_);
-    if (!this->init_) { return; }
-    this->init_ = false;
-  }
+  if (!this->init_.exchange(false)) { return; }
   blocker_manager_ = nullptr;
 }
 
