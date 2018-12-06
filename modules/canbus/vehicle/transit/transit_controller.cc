@@ -598,7 +598,7 @@ bool TransitController::CheckSafetyError(
 void TransitController::SetLimits() {
   adc_motioncontrollimits1_12_->set_adc_cmd_throttlecommandlimit(100);
   adc_motioncontrollimits1_12_->set_adc_cmd_steerwheelanglelimit(1275);
-  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(3200);
+  adc_motioncontrollimits1_12_->set_adc_cmd_steeringrate(500);
 }
 
 }  // namespace transit
