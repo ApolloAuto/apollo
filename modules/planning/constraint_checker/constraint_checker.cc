@@ -70,8 +70,8 @@ ConstraintChecker::Result ConstraintChecker::ValidTrajectory(
   }
 
   for (std::size_t i = 1; i < trajectory.NumOfPoints(); ++i) {
-    const auto& p0 = trajectory.TrajectoryPointAt(i - 1);
-    const auto& p1 = trajectory.TrajectoryPointAt(i);
+    const auto& p0 = trajectory.TrajectoryPointAt(static_cast<uint32_t>(i - 1));
+    const auto& p1 = trajectory.TrajectoryPointAt(static_cast<uint32_t>(i));
 
     if (p1.relative_time() > kMaxCheckRelativeTime) {
       break;
