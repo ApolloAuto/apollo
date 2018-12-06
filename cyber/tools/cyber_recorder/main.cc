@@ -364,7 +364,7 @@ int main(int argc, char** argv) {
                                                opt_white_channels);
     record_result = record_result && recorder->Start() ? true : false;
     if (record_result) {
-      while (::apollo::cyber::OK()) {
+      while (!::apollo::cyber::IsShutdown()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
       record_result = record_result && recorder->Stop() ? true : false;
