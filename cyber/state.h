@@ -47,7 +47,7 @@ inline bool IsShutdown() {
 }
 
 inline void WaitForShutdown() {
-  while (OK()) {
+  while (!IsShutdown()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 }

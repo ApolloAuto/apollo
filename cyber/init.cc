@@ -48,10 +48,11 @@ using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::scheduler::Scheduler;
 using apollo::cyber::service_discovery::TopologyManager;
 
-static bool g_atexit_registered = false;
-static std::recursive_mutex g_mutex;
-
-static ::apollo::cyber::logger::AsyncLogger* async_logger;
+namespace {
+bool g_atexit_registered = false;
+std::mutex g_mutex;
+logger::AsyncLogger* async_logger = nullptr;
+}
 
 namespace {
 
@@ -101,15 +102,6 @@ void InitLogger(const char* binary_name) {
   ADEBUG << "glog FLAGS_colorlogtostderr=" << FLAGS_colorlogtostderr;
 }
 
-void CheckSingleton() {
-  // Initialize internal static objects
-  CHECK_NOTNULL(transport::Transport::Instance());
-  CHECK_NOTNULL(service_discovery::TopologyManager::Instance());
-  CHECK_NOTNULL(scheduler::Instance());
-  CHECK_NOTNULL(TaskManager::Instance());
-  CHECK_NOTNULL(PerfEventCache::Instance());
-}
-
 void StopLogger() {
   if (async_logger != nullptr) {
     async_logger->Stop();
@@ -127,14 +119,12 @@ void OnShutdown(int sig) {
 void ExitHandle() { Clear(); }
 
 bool Init(const char* binary_name) {
-  std::lock_guard<std::recursive_mutex> lg(g_mutex);
-  // avoid reinit
+  std::lock_guard<std::mutex> lg(g_mutex);
   if (GetState() != STATE_UNINITIALIZED) {
     return false;
   }
 
   InitLogger(binary_name);
-  CheckSingleton();
   std::signal(SIGINT, OnShutdown);
   // Register exit handlers
   if (!g_atexit_registered) {
@@ -150,7 +140,7 @@ bool Init(const char* binary_name) {
 }
 
 void Clear() {
-  std::lock_guard<std::recursive_mutex> lg(g_mutex);
+  std::lock_guard<std::mutex> lg(g_mutex);
   if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
     return;
   }
