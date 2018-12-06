@@ -41,6 +41,15 @@ message LatencyStats {
 }
 
 message RSSInfo {
+  optional bool is_rss_safe = 1;
+  optional double cur_dist_lon = 2;
+  optional double rss_safe_dist_lon = 3;
+  optional double acc_lon_range_minimum = 4;
+  optional double acc_lon_range_maximum = 5;
+  optional double acc_lat_left_range_minimum = 6;
+  optional double acc_lat_left_range_maximum = 7;
+  optional double acc_lat_right_range_minimum = 8;
+  optional double acc_lat_right_range_maximum = 9;
 }
 
 // next id: 21
