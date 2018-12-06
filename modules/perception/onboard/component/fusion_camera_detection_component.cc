@@ -373,8 +373,7 @@ int FusionCameraDetectionComponent::InitSensorInfo() {
     return cyber::FAIL;
   }
 
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  auto* sensor_manager = common::SensorManager::Instance();
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     if (!sensor_manager->IsSensorExist(camera_names_[i])) {
       AERROR << ("sensor_name: " + camera_names_[i] + " not exists.");
@@ -464,8 +463,8 @@ int FusionCameraDetectionComponent::InitCameraFrames() {
   //  init extrinsic/intrinsic
   for (const auto &camera_name : camera_names_) {
     base::BaseCameraModelPtr model;
-    auto manager = lib::Singleton<common::SensorManager>::get_instance();
-    model = manager->GetUndistortCameraModel(camera_name);
+    model = common::SensorManager::Instance()->GetUndistortCameraModel(
+        camera_name);
     auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
     Eigen::Matrix3f intrinsic = pinhole->get_intrinsic_params();
     intrinsic_map_[camera_name] = intrinsic;

@@ -89,13 +89,8 @@ class OfflineLidarObstaclePerception {
       return false;
     }
 
-    common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-    if (sensor_manager == nullptr) {
-      AERROR << "Failed to get sensor manager instance";
-      return false;
-    }
-    bool ret = sensor_manager->GetSensorInfo(FLAGS_sensor_name, &sensor_info_);
+    bool ret = common::SensorManager::Instance()->GetSensorInfo(
+        FLAGS_sensor_name, &sensor_info_);
     if (!ret) {
       AERROR << "Failed to get sensor info, sensor name: "
         << FLAGS_sensor_name;

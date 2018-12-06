@@ -39,9 +39,7 @@ class TLPreprocessorTest : public ::testing::Test {
     FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/preprocessor/data/multi_projection";
     preprocessor_ = new TLPreprocessor;
-    sensor_manager_ =
-        lib::Singleton<common::SensorManager>::get_instance();
-    sensor_manager_->Init();
+    common::SensorManager::Instance()->Init();
     camera_names_.push_back("onsemi_traffic");
     camera_names_.push_back("onsemi_narrow");
     camera_names_.push_back("onsemi_obstacle");
@@ -154,7 +152,6 @@ class TLPreprocessorTest : public ::testing::Test {
 
  protected:
   TLPreprocessor *preprocessor_;
-  common::SensorManager* sensor_manager_;
   std::vector<std::string> camera_names_;
 };
 

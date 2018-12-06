@@ -52,8 +52,7 @@ bool UndistortionHandler::Init(const std::string &sensor_name, int device) {
     std::vector<double> D;
     std::vector<double> K;
 
-    common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+    common::SensorManager* sensor_manager = common::SensorManager::Instance();
     if (!sensor_manager->IsSensorExist(sensor_name)) {
       AERROR << "Sensor '" << sensor_name << "' not exists!";
       return false;

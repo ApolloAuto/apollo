@@ -69,10 +69,8 @@ bool SegmentationComponent::Proc(
 }
 
 bool SegmentationComponent::InitAlgorithmPlugin() {
-  apollo::perception::common::SensorManager* sensor_manager =
-      lib::Singleton<apollo::perception::common::SensorManager>::get_instance();
-  CHECK_NOTNULL(sensor_manager);
-  CHECK(sensor_manager->GetSensorInfo(sensor_name_, &sensor_info_));
+  CHECK(common::SensorManager::Instance()->GetSensorInfo(sensor_name_,
+                                                         &sensor_info_));
 
   segmentor_.reset(new lidar::LidarObstacleSegmentation);
   if (segmentor_ == nullptr) {

@@ -137,8 +137,7 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
                                              double measurement_timestamp,
                                              double target_timestamp,
                                              double min_match_dist) {
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
+  common::SensorManager *sensor_manager = common::SensorManager::Instance();
   if (sensor_manager->IsCamera(sensor_id)) {
     // add the evidence of OTHERS_UNMOVABLE
     double in_view_ratio = 0.0;
@@ -283,9 +282,8 @@ double DstTypeFusion::GetReliabilityForUnKnown(
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 17);
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-  double prob = (sensor_manager->IsCamera(sensor_id) && is_night) ? 0.1 : 1.0;
+  double prob = (common::SensorManager::Instance()->IsCamera(sensor_id) &&
+                 is_night) ? 0.1 : 1.0;
   return find_res->second * prob;
 }
 

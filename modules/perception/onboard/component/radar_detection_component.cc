@@ -36,15 +36,8 @@ bool RadarDetectionComponent::Init() {
   pipeline_name_ = comp_config.radar_pipeline_name();
   odometry_channel_name_ = comp_config.odometry_channel_name();
 
-  common::SensorManager* sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-  if (sensor_manager == nullptr) {
-    AERROR << "Failed to get sensor manager instance";
-    return false;
-  }
-
-  bool ret = sensor_manager->GetSensorInfo(
-               comp_config.radar_name(), &radar_info_);
+  bool ret = common::SensorManager::Instance()->GetSensorInfo(
+      comp_config.radar_name(), &radar_info_);
   if (!ret) {
     AERROR << "Failed to get sensor info, sensor name: "
            << comp_config.radar_name();

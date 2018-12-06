@@ -185,7 +185,7 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
     AERROR << "invalid camera_names config";
     return cyber::FAIL;
   }
-  SensorManager* sensor_manager = lib::Singleton<SensorManager>::get_instance();
+  SensorManager* sensor_manager = SensorManager::Instance();
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     if (!sensor_manager->IsSensorExist(camera_names_[i])) {
       AERROR << ("sensor_name: " + camera_names_[i] + " not exists.");

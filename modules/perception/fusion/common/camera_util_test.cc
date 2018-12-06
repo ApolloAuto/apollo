@@ -63,12 +63,9 @@ TEST(CameraUtilTest, test_object_in_camera_view_and_is_behind_camera) {
       new SensorObject(base_lidar_object, lidar_sensor_frame));
 
   Eigen::Affine3d pose(Eigen::Affine3d::Identity());
-  common::SensorManager *sensor_manager =
-      lib::Singleton<common::SensorManager>::get_instance();
-  EXPECT_TRUE(sensor_manager != nullptr);
   std::string sensor_id = "camera_smartereye";
   base::BaseCameraModelPtr camera_model =
-      sensor_manager->GetUndistortCameraModel(sensor_id);
+      common::SensorManager::Instance()->GetUndistortCameraModel(sensor_id);
   EXPECT_TRUE(camera_model != nullptr);
 
   bool flag1 = IsObjectEightVerticesAllBehindCamera(

@@ -110,7 +110,7 @@ int work() {
 
   // Init intrinsic
   std::map<std::string, Eigen::Matrix3f> intrinsic_map;
-  auto manager = lib::Singleton<common::SensorManager>::get_instance();
+  auto manager = common::SensorManager::Instance();
   for (const auto &camera_name : camera_names) {
     base::BaseCameraModelPtr model;
     model = manager->GetUndistortCameraModel(camera_name);
