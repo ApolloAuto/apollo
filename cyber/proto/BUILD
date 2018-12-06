@@ -18,7 +18,6 @@ proto_library(
         ":choreography_conf_proto",
         ":scheduler_conf_proto",
         ":transport_conf_proto",
-        ":log_conf_proto",
         ":perf_conf_proto",
         ":run_mode_conf_proto",
         ":record_conf_proto",
@@ -83,20 +82,6 @@ proto_library(
     name = "transport_conf_proto",
     srcs = [
         "transport_conf.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "log_conf_cc_proto",
-    deps = [
-        ":log_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "log_conf_proto",
-    srcs = [
-        "log_conf.proto",
     ],
 )
 

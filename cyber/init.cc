@@ -65,42 +65,18 @@ void InitLogger(const char* binary_name) {
     ::apollo::cyber::Binary::SetName(binary_name);
   }
   CHECK_NOTNULL(common::GlobalData::Instance());
-  // Get log conf object
-  auto& log_conf = common::GlobalData::Instance()->Config().log_conf();
 
-  // Ensure log dir
-  auto& log_dir = log_conf.log_dir();
-  std::string abs_log_dir(log_dir);
-  if (log_dir[0] != '/') {
-    abs_log_dir = GetAbsolutePath(WorkRoot(), log_dir);
-  }
-  EnsureDirectory(abs_log_dir);
-
-  // Set flags
-  FLAGS_log_dir = abs_log_dir;
-  if (log_conf.min_log_level() >= google::INFO) {
-    FLAGS_minloglevel = log_conf.min_log_level();
-  } else {
-    FLAGS_minloglevel = google::INFO;
-    FLAGS_v = 4;
-  }
-  FLAGS_alsologtostderr = log_conf.log_to_stderr();
-  FLAGS_colorlogtostderr = log_conf.color_log_to_stderr();
+  // Init glog
   google::InitGoogleLogging(binary_name);
   google::SetLogDestination(google::ERROR, "");
   google::SetLogDestination(google::WARNING, "");
   google::SetLogDestination(google::FATAL, "");
 
+  // Init async logger
   async_logger = new ::apollo::cyber::logger::AsyncLogger(
       google::base::GetLogger(FLAGS_minloglevel), 2 * 1024 * 1024);
   google::base::SetLogger(FLAGS_minloglevel, async_logger);
   async_logger->Start();
-
-  ADEBUG << "glog inited";
-  ADEBUG << "glog FLAGS_log_dir=" << FLAGS_log_dir;
-  ADEBUG << "glog FLAGS_minloglevel=" << FLAGS_minloglevel;
-  ADEBUG << "glog FLAGS_alsologtostderr=" << FLAGS_alsologtostderr;
-  ADEBUG << "glog FLAGS_colorlogtostderr=" << FLAGS_colorlogtostderr;
 }
 
 void StopLogger() {

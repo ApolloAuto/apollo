@@ -16,5 +16,12 @@ export PYTHONPATH=${PYTHON_LD_PATH}:${CYBER_PATH}/python:$PYTHONPATH
 
 export CYBER_DOMAIN_ID=80
 export CYBER_IP=127.0.0.1
+export FLAGS_log_dir=/apollo/data/log
+export FLAGS_alsologtostderr=1
+export FLAGS_colorlogtostderr=1
+export FLAGS_minloglevel=0
+# for DEBUG log
+#export FLAGS_minloglevel=-1
+#export FLAGS_v = 4;
 
 source ${CYBER_PATH}/tools/cyber_tools_auto_complete.bash
