@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/init.h"
 #include "cyber/common/global_data.h"
+#include "cyber/init.h"
 #include "modules/dreamview/backend/dreamview.h"
 
 int main(int argc, char *argv[]) {
@@ -31,5 +31,6 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   apollo::cyber::WaitForShutdown();
+  dreamview.Stop();
   return 0;
 }
