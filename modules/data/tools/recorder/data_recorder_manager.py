@@ -92,14 +92,14 @@ class DataRecorderManager(object):
         if not os.path.exists(backup_path):
             try:
                 os.mkdir(backup_path)
-            except Exception as e:
+            except OSError as e:
                 logging.error("Create %s failed, %s", backup_path, str(e))
                 return -1
         backup_path = backup_path + "/" + self.get_system_uptime()
         if not os.path.exists(backup_path):
             try:
                 os.mkdir(backup_path)
-            except Exception as e:
+            except OSError as e:
                 logging.error("Create backup id failed, %s", str(e))
                 return -1
         self.backup_directory = backup_path
@@ -121,7 +121,7 @@ class DataRecorderManager(object):
         for data_dir in self.conf_reader.data_type:
             try:
                 os.mkdir(self.output_directory + "/" + data_dir)
-            except Exception as e:
+            except OSError as e:
                 logging.error("Make sub directory in task failed, %s", str(e))
                 return -1
         recorder_meta = {
@@ -309,11 +309,11 @@ class DataRecorderManager(object):
         try:
             os.remove(output_link_path)
             logging.info("Remove link file succeed")
-        except Exception as e:
+        except OSError as e:
             logging.error("Remove link file failed" + str(e))
         try:
             os.symlink(os.path.abspath(self.output_directory), output_link_path)
-        except Exception as e:
+        except OSError as e:
             logging.error("Update link file failed " + str(e))
 
     def get_system_uptime(self):
@@ -434,7 +434,7 @@ class DataRecorderManager(object):
 
 def print_version(ver):
     """Print the version of program."""
-    print("Program:data_recorder\nversion: %s") % (ver)
+    print("Program:data_recorder\nversion: %s" % ver)
     return 0
 
 
@@ -481,7 +481,7 @@ def main():
             parser.error(
                 "The config file you given does not exists, please check!")
         else:
-            cp =config_parser.ConfigParser()
+            cp = config_parser.ConfigParser()
             global_conf = cp.load_config(
                 "modules/data/conf/recorder.global.yaml")
             task_conf = cp.load_config(options.conf_file)

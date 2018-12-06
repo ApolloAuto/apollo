@@ -89,7 +89,6 @@ bool MultiCamerasProjection::Project(const CarPose &pose,
                                      Light *light) const {
   const Eigen::Matrix4d mpose = pose.pose();
   const apollo::hdmap::Signal &tl_info = light->info;
-  bool ret = true;
 
   auto camera_id = static_cast<int>(option.camera_id);
   if (camera_id < 0 || camera_id >= kCountCameraId) {
@@ -98,15 +97,13 @@ bool MultiCamerasProjection::Project(const CarPose &pose,
     return false;
   }
   AINFO << "Begin project camera: " << option.camera_id;
-  ret =
+  bool ret =
       projection_->Project(camera_coeffient_[camera_id], mpose, tl_info, light);
-
   if (!ret) {
     AWARN << "Projection failed projection the traffic light. "
           << "camera_id: " << camera_id;
-    return false;
   }
-  return true;
+  return ret;
 }
 }  // namespace traffic_light
 }  // namespace perception

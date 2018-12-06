@@ -4,7 +4,7 @@
 
 Please follow the
 [official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
-we also provide a bash script to install docker-ce
+We also provide a bash script to install docker-ce
 
 ```bash
 bash docker/setup_host/install_docker.sh
