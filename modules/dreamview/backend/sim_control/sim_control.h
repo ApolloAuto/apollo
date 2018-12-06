@@ -99,9 +99,12 @@ class SimControl : SimControlInterface {
   /**
    * @brief Predict the next trajectory point using perfect control model
    */
-  bool PerfectControlModel(apollo::common::TrajectoryPoint *point);
+  bool PerfectControlModel(
+      apollo::common::TrajectoryPoint *point,
+      apollo::canbus::Chassis::GearPosition *gear_position);
 
-  void PublishChassis(double cur_speed);
+  void PublishChassis(double cur_speed,
+                      apollo::canbus::Chassis::GearPosition gear_position);
 
   void PublishLocalization(const apollo::common::TrajectoryPoint &point);
 

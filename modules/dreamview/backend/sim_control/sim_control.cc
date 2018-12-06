@@ -308,20 +308,23 @@ void SimControl::RunOnce() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   TrajectoryPoint trajectory_point;
-  if (!PerfectControlModel(&trajectory_point)) {
+  Chassis::GearPosition gear_position;
+  if (!PerfectControlModel(&trajectory_point, &gear_position)) {
     AERROR << "Failed to calculate next point with perfect control model";
     return;
   }
 
-  PublishChassis(trajectory_point.v());
+  PublishChassis(trajectory_point.v(), gear_position);
   PublishLocalization(trajectory_point);
 }
 
-bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
+bool SimControl::PerfectControlModel(TrajectoryPoint* point,
+                                     Chassis::GearPosition* gear_position) {
   // Result of the interpolation.
   auto relative_time =
       Clock::NowInSeconds() - current_trajectory_->header().timestamp_sec();
   const auto& trajectory = current_trajectory_->trajectory_point();
+  *gear_position = current_trajectory_->gear();
 
   if (!received_planning_) {
     prev_point_ = next_point_;
@@ -365,13 +368,14 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point) {
   return true;
 }
 
-void SimControl::PublishChassis(double cur_speed) {
+void SimControl::PublishChassis(double cur_speed,
+                                Chassis::GearPosition gear_position) {
   auto chassis = std::make_shared<Chassis>();
   FillHeader("SimControl", chassis.get());
 
   chassis->set_engine_started(true);
   chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-  chassis->set_gear_location(Chassis::GEAR_DRIVE);
+  chassis->set_gear_location(gear_position);
 
   chassis->set_speed_mps(cur_speed);
   chassis->set_throttle_percentage(0.0);
