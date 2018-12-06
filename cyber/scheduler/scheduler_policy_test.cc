@@ -74,7 +74,7 @@ TEST(SchedulerPolicyTest, classic) {
 
 TEST(SchedulerPolicyTest, sched_classic) {
   GlobalData::Instance()->SetProcessGroup("example_classic_sched");
-  auto sched = std::make_shared<SchedulerClassic>();
+  auto sched = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("ABC");
   cr->set_id(task_id);

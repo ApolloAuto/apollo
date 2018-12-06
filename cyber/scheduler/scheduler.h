@@ -49,7 +49,6 @@ class ProcessorContext;
 
 class Scheduler {
  public:
-  Scheduler() : stop_(false) {}
   virtual ~Scheduler() {}
   static Scheduler* Instance();
 
@@ -65,11 +64,12 @@ class Scheduler {
   virtual void SetInnerThreadAttr(const std::thread* thr,
                                   const std::string& name) {}
 
- protected:
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>&) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
   virtual bool RemoveCRoutine(uint64_t crid) = 0;
 
+ protected:
+  Scheduler() : stop_(false) {}
   void ParseCpuset(const std::string&, std::vector<int>*);
 
   AtomicRWLock id_cr_lock_;
