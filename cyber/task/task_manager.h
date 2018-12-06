@@ -52,9 +52,9 @@ class TaskManager {
   }
 
  private:
-  std::atomic<bool> is_shutdown_ = {false};
   uint32_t num_threads_ = 0;
   uint32_t task_queue_size_ = 1000;
+  std::atomic<bool> stop_ = {false};
   std::vector<uint64_t> tasks_;
   std::shared_ptr<base::BoundedQueue<std::function<void()>>> task_queue_;
   DECLARE_SINGLETON(TaskManager);
