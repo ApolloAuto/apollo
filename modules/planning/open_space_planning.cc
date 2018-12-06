@@ -361,7 +361,8 @@ Status OpenSpacePlanning::Plan(
       trajectory_partition_status =
           TrajectoryPartition(last_trajectory_, ptr_trajectory_pb);
     } else {
-      return status;
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "use last planning result from OpenSpacePlanner");
     }
   } else if (status ==
              Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose")) {
@@ -550,38 +551,95 @@ Status OpenSpacePlanning::TrajectoryPartition(
   }
 
   // Choose the one to follow based on the closest partitioned trajectory
-  int trajectories_size = trajectory_partition.trajectory_size();
+  size_t trajectories_size = trajectory_partition.trajectory_size();
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
-  constexpr double kepsilon_to_destination = 1e-4;
+  constexpr double kepsilon_to_destination = 1e-6;
+  constexpr double heading_searching_range = 0.5;
   // Could have a big error in vehicle state in single thread mode!!! As the
   // vehicle state is only updated at the every beginning at RunOnce()
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
-  double min_distance = std::numeric_limits<double>::max();
-  for (int i = 0; i < trajectories_size; i++) {
+
+  // double min_distance = std::numeric_limits<double>::max();
+  // for (size_t i = 0; i < trajectories_size; i++) {
+  //   const apollo::common::Trajectory trajectory =
+  //       trajectory_partition.trajectory(i);
+  //   int trajectory_size = trajectory.trajectory_point_size();
+
+  //   const apollo::common::TrajectoryPoint trajectory_end_point =
+  //       trajectory.trajectory_point(trajectory_size - 1);
+  //   const apollo::common::PathPoint path_end_point =
+  //       trajectory_end_point.path_point();
+  //   double distance_to_trajs_end =
+  //       (path_end_point.x() - vehicle_state.x()) *
+  //           (path_end_point.x() - vehicle_state.x()) +
+  //       (path_end_point.y() - vehicle_state.y()) *
+  //           (path_end_point.y() - vehicle_state.y());
+  //   if (distance_to_trajs_end <= kepsilon_to_destination) {
+  //     if (i + 1 >= trajectories_size) {
+  //       current_trajectory_index = trajectories_size - 1;
+  //       closest_trajectory_point_index = trajectory_size - 1;
+  //     } else {
+  //       current_trajectory_index = i + 1;
+  //       closest_trajectory_point_index = 0;
+  //     }
+  //     break;
+  //   }
+
+  //   for (int j = 0; j < trajectory_size; j++) {
+  //     const apollo::common::TrajectoryPoint trajectory_point =
+  //         trajectory.trajectory_point(j);
+  //     const apollo::common::PathPoint path_point =
+  //         trajectory_point.path_point();
+  //     double distance = (path_point.x() - vehicle_state.x()) *
+  //                           (path_point.x() - vehicle_state.x()) +
+  //                       (path_point.y() - vehicle_state.y()) *
+  //                           (path_point.y() - vehicle_state.y());
+  //     if (distance < min_distance) {
+  //       min_distance = distance;
+  //       current_trajectory_index = i;
+  //       closest_trajectory_point_index = j;
+  //     }
+  //   }
+  // }
+
+  auto comp = [](const std::pair<std::pair<size_t, int>, double>& left,
+                 const std::pair<std::pair<size_t, int>, double>& right) {
+    return left.second >= right.second;
+  };
+  std::priority_queue<std::pair<std::pair<size_t, int>, double>,
+                      std::vector<std::pair<std::pair<size_t, int>, double>>,
+                      decltype(comp)>
+      closest_points(comp);
+
+  for (size_t i = 0; i < trajectories_size; i++) {
+    double min_distance = std::numeric_limits<double>::max();
     const apollo::common::Trajectory trajectory =
         trajectory_partition.trajectory(i);
     int trajectory_size = trajectory.trajectory_point_size();
 
-    const apollo::common::TrajectoryPoint trajectory_end_point =
-        trajectory.trajectory_point(trajectory_size - 1);
-    const apollo::common::PathPoint path_end_point =
-        trajectory_end_point.path_point();
-    double distance_to_trajs_end =
-        (path_end_point.x() - vehicle_state.x()) *
-            (path_end_point.x() - vehicle_state.x()) +
-        (path_end_point.y() - vehicle_state.y()) *
-            (path_end_point.y() - vehicle_state.y());
-    if (distance_to_trajs_end <= kepsilon_to_destination) {
-      if (i + 1 >= trajectories_size) {
-        current_trajectory_index = trajectories_size - 1;
-        closest_trajectory_point_index = trajectory_size - 1;
-      } else {
-        current_trajectory_index = i + 1;
-        closest_trajectory_point_index = 0;
+    if (!flag_change_to_next_) {
+      const apollo::common::TrajectoryPoint trajectory_end_point =
+          trajectory.trajectory_point(trajectory_size - 1);
+      const apollo::common::PathPoint path_end_point =
+          trajectory_end_point.path_point();
+      double distance_to_trajs_end =
+          (path_end_point.x() - vehicle_state.x()) *
+              (path_end_point.x() - vehicle_state.x()) +
+          (path_end_point.y() - vehicle_state.y()) *
+              (path_end_point.y() - vehicle_state.y());
+      if (distance_to_trajs_end <= kepsilon_to_destination) {
+        if (i + 1 >= trajectories_size) {
+          current_trajectory_index = trajectories_size - 1;
+          closest_trajectory_point_index = trajectory_size - 1;
+        } else {
+          current_trajectory_index = i + 1;
+          closest_trajectory_point_index = 0;
+        }
+        flag_change_to_next_ = true;
+        break;
       }
-      break;
     }
 
     for (int j = 0; j < trajectory_size; j++) {
@@ -595,12 +653,55 @@ Status OpenSpacePlanning::TrajectoryPartition(
                             (path_point.y() - vehicle_state.y());
       if (distance < min_distance) {
         min_distance = distance;
-        current_trajectory_index = i;
         closest_trajectory_point_index = j;
+      }
+    }
+    closest_points.push(std::make_pair(
+        std::make_pair(i, closest_trajectory_point_index), min_distance));
+  }
+
+  if (!flag_change_to_next_) {
+    while (!closest_points.empty()) {
+      auto closest_point = closest_points.top();
+      closest_points.pop();
+      double traj_point_moving_direction =
+          trajectory_partition.trajectory(closest_point.first.first)
+              .trajectory_point(closest_point.first.second)
+              .path_point()
+              .theta();
+      if (gear_positions[closest_point.first.first] ==
+          canbus::Chassis::GEAR_REVERSE) {
+        traj_point_moving_direction =
+            common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
+      }
+      double vehicle_moving_direction = vehicle_state.heading();
+      if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
+        vehicle_moving_direction =
+            common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
+        AINFO << "gear reverse";
+      } else {
+        AINFO << "gear drive";
+      }
+      if (std::abs(traj_point_moving_direction - vehicle_moving_direction) <
+          heading_searching_range) {
+        current_trajectory_index = closest_point.first.first;
+        closest_trajectory_point_index = closest_point.first.second;
+        break;
       }
     }
   }
 
+  AINFO << "flag_change_to_next_ " << flag_change_to_next_;
+  AINFO << "current_trajectory_index " << current_trajectory_index;
+  AINFO <<"closest_trajectory_point_index "<< closest_trajectory_point_index;
+
+  // TODO(Jinyun) Trajectory length not sure
+  if (closest_trajectory_point_index > 50) {
+    flag_change_to_next_ = false;
+  }
+
+  // reassign relative time and relative s to have the closest point as origin
+  // point
   ptr_trajectory_pb->mutable_trajectory_point()->CopyFrom(
       *(trajectory_partition.mutable_trajectory(current_trajectory_index)
             ->mutable_trajectory_point()));

@@ -62,7 +62,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     const std::vector<common::TrajectoryPoint>& stitching_trajectory,
     Frame* frame) {
   if (FLAGS_enable_open_space_planner_thread) {
-    AINFO << "Open space plan in multi-threads mode";
+    ADEBUG << "Open space plan in multi-threads mode";
 
     // Update Vehicle information and obstacles information from frame.
     open_space_roi_generator_.reset(new OpenSpaceROI());
