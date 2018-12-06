@@ -54,7 +54,9 @@ class SLICEPlugin : public nvinfer1::IPlugin {
   ~SLICEPlugin() {}
   virtual int initialize() { return 0; }
   virtual void terminate() {}
-  int getNbOutputs() const override { return slice_point_.size() + 1; }
+  int getNbOutputs() const override {
+    return static_cast<int>(slice_point_.size()) + 1;
+  }
   nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
                                      int nbInputDims) override {
     nvinfer1::Dims out_dims = inputs[0];
