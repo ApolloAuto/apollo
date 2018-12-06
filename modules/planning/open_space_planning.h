@@ -60,7 +60,7 @@ class OpenSpacePlanning : public PlanningBase {
    * timer.
    */
   void RunOnce(const LocalView& local_view,
-               ADCTrajectory* const trajectory_pb) override;
+               ADCTrajectory* const ptr_trajectory_pb) override;
 
   apollo::common::Status Plan(
       const double current_time_stamp,
@@ -72,11 +72,11 @@ class OpenSpacePlanning : public PlanningBase {
   void ExportOpenSpaceChart(planning_internal::Debug* debug);
 
   void FillPlanningPb(const double timestamp,
-                      ADCTrajectory* const trajectory_pb) override;
+                      ADCTrajectory* const ptr_trajectory_pb) override;
 
   apollo::common::Status TrajectoryPartition(
       const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
-      ADCTrajectory* const trajectory_pb);
+      ADCTrajectory* const ptr_trajectory_pb);
 
  private:
   apollo::common::Status InitFrame(

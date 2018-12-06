@@ -96,13 +96,12 @@ OpenSpacePlanning::~OpenSpacePlanning() {
 std::string OpenSpacePlanning::Name() const { return "open_space_planning"; }
 
 Status OpenSpacePlanning::Init(const PlanningConfig& config) {
-  config_ = config;
-  if (!CheckPlanningConfig(config_)) {
+  if (!CheckPlanningConfig(config)) {
     return Status(ErrorCode::PLANNING_ERROR,
-                  "planning config error: " + config_.DebugString());
+                  "planning config error: " + config.DebugString());
   }
 
-  PlanningBase::Init(config_);
+  PlanningBase::Init(config);
 
   planner_dispatcher_->Init();
 
@@ -115,14 +114,14 @@ Status OpenSpacePlanning::Init(const PlanningConfig& config) {
   if (!planner_) {
     return Status(
         ErrorCode::PLANNING_ERROR,
-        "planning is not initialized with config : " + config_.DebugString());
+        "planning is not initialized with config : " + config.DebugString());
   }
 
   start_time_ = Clock::NowInSeconds();
 
   AINFO << "Open Space Planner Init Done";
 
-  return planner_->Init(config_);
+  return planner_->Init(config);
 }
 
 Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
@@ -151,7 +150,7 @@ Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
 }
 
 void OpenSpacePlanning::RunOnce(const LocalView& local_view,
-                                ADCTrajectory* const trajectory_pb) {
+                                ADCTrajectory* const ptr_trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
 
@@ -185,8 +184,8 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
   if (!IsVehicleStateValid(vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed");
     AERROR << msg;
-    status.Save(trajectory_pb->mutable_header()->mutable_status());
-    FillPlanningPb(start_timestamp, trajectory_pb);
+    status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
+    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     return;
   }
 
@@ -204,9 +203,9 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
 
   const uint32_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state, trajectory_pb);
+                     vehicle_state, ptr_trajectory_pb);
 
-  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
+  ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
 
   if (!status.ok()) {
@@ -222,34 +221,34 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
       FillPlanningPb(start_timestamp, &estop_trajectory);
-      trajectory_pb->CopyFrom(estop_trajectory);
+      ptr_trajectory_pb->CopyFrom(estop_trajectory);
     } else {
-      trajectory_pb->mutable_decision()
+      ptr_trajectory_pb->mutable_decision()
           ->mutable_main_decision()
           ->mutable_not_ready()
           ->set_reason(status.ToString());
-      status.Save(trajectory_pb->mutable_header()->mutable_status());
-      FillPlanningPb(start_timestamp, trajectory_pb);
+      status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
+      FillPlanningPb(start_timestamp, ptr_trajectory_pb);
     }
 
-    FillPlanningPb(start_timestamp, trajectory_pb);
-    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+    frame_->mutable_trajectory()->CopyFrom(*ptr_trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
   }
 
-  status = Plan(start_timestamp, stitching_trajectory, trajectory_pb);
+  status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
 
   const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
-  trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  ptr_trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: "
-         << trajectory_pb->latency_stats().DebugString();
+         << ptr_trajectory_pb->latency_stats().DebugString();
 
   if (!status.ok()) {
-    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
     AERROR << "Planning failed:" << status.ToString();
     if (FLAGS_publish_estop) {
       AERROR << "Planning failed and set estop";
@@ -257,17 +256,17 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
       // "estop" signal with the following line (Line 170 in control.cc):
       // estop_ = estop_ || trajectory_.estop().is_estop();
       // we should add more information to ensure the estop being triggered.
-      EStop* estop = trajectory_pb->mutable_estop();
+      EStop* estop = ptr_trajectory_pb->mutable_estop();
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
     }
   }
 
-  trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-  FillPlanningPb(start_timestamp, trajectory_pb);
-  ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
+  ptr_trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
+  FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+  ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
 
-  frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+  frame_->mutable_trajectory()->CopyFrom(*ptr_trajectory_pb);
 
   const uint32_t n = frame_->SequenceNum();
   FrameHistory::Instance()->Add(n, std::move(frame_));
@@ -276,8 +275,8 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
 Status OpenSpacePlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
-    ADCTrajectory* const trajectory_pb) {
-  auto* ptr_debug = trajectory_pb->mutable_debug();
+    ADCTrajectory* const ptr_trajectory_pb) {
+  auto* ptr_debug = ptr_trajectory_pb->mutable_debug();
 
   auto status = dynamic_cast<OpenSpacePlanner&>(*planner_).Plan(
       stitching_trajectory, frame_.get());
@@ -344,7 +343,7 @@ Status OpenSpacePlanning::Plan(
 
     // trajectory partition and choose the current trajectory to follow
     trajectory_partition_status =
-        TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
+        TrajectoryPartition(last_publishable_trajectory_, ptr_trajectory_pb);
 
   } else if (status ==
              Status(ErrorCode::PLANNING_ERROR,
@@ -363,7 +362,7 @@ Status OpenSpacePlanning::Plan(
       }
       // trajectory partition and choose the current trajectory to follow
       trajectory_partition_status =
-          TrajectoryPartition(last_trajectory_, trajectory_pb);
+          TrajectoryPartition(last_trajectory_, ptr_trajectory_pb);
     } else {
       return status;
     }
@@ -380,7 +379,7 @@ Status OpenSpacePlanning::Plan(
     ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
     // trajectory partition and choose the current trajectory to follow
     trajectory_partition_status =
-        TrajectoryPartition(last_publishable_trajectory_, trajectory_pb);
+        TrajectoryPartition(last_publishable_trajectory_, ptr_trajectory_pb);
 
   } else {
     return status;
@@ -392,7 +391,7 @@ Status OpenSpacePlanning::Plan(
 
   // BuildPredictedEnvironment(frame_.get()->obstacles());
 
-  // if (!IsCollisionFreeTrajectory(*trajectory_pb)) {
+  // if (!IsCollisionFreeTrajectory(*ptr_trajectory_pb)) {
   //   return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
   // }
 
@@ -401,7 +400,7 @@ Status OpenSpacePlanning::Plan(
 
 Status OpenSpacePlanning::TrajectoryPartition(
     const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
-    ADCTrajectory* const trajectory_pb) {
+    ADCTrajectory* const ptr_trajectory_pb) {
   std::vector<common::TrajectoryPoint>
       uninterpolated_stitched_trajectory_to_end =
           last_publishable_trajectory->trajectory_points();
@@ -590,26 +589,26 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
   }
 
-  trajectory_pb->mutable_trajectory_point()->CopyFrom(
+  ptr_trajectory_pb->mutable_trajectory_point()->CopyFrom(
       *(trajectory_partition.mutable_trajectory(current_trajectory_index)
             ->mutable_trajectory_point()));
   double time_shift =
-      trajectory_pb->trajectory_point(closest_trajectory_point_index)
+      ptr_trajectory_pb->trajectory_point(closest_trajectory_point_index)
           .relative_time();
   double s_shift =
-      trajectory_pb->trajectory_point(closest_trajectory_point_index)
+      ptr_trajectory_pb->trajectory_point(closest_trajectory_point_index)
           .path_point()
           .s();
-  int trajectory_size = trajectory_pb->trajectory_point_size();
+  int trajectory_size = ptr_trajectory_pb->trajectory_point_size();
   for (int i = 0; i < trajectory_size; i++) {
     apollo::common::TrajectoryPoint* trajectory_point =
-        trajectory_pb->mutable_trajectory_point(i);
+        ptr_trajectory_pb->mutable_trajectory_point(i);
     trajectory_point->set_relative_time(trajectory_point->relative_time() -
                                         time_shift);
     trajectory_point->mutable_path_point()->set_s(
         trajectory_point->path_point().s() - s_shift);
   }
-  trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
+  ptr_trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
 
   return Status::OK();
 }
@@ -691,25 +690,25 @@ bool OpenSpacePlanning::CheckPlanningConfig(const PlanningConfig& config) {
 }
 
 void OpenSpacePlanning::FillPlanningPb(const double timestamp,
-                                       ADCTrajectory* const trajectory_pb) {
-  trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
+                                       ADCTrajectory* const ptr_trajectory_pb) {
+  ptr_trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
   if (!local_view_.prediction_obstacles->has_header()) {
-    trajectory_pb->mutable_header()->set_lidar_timestamp(
+    ptr_trajectory_pb->mutable_header()->set_lidar_timestamp(
         local_view_.prediction_obstacles->header().lidar_timestamp());
-    trajectory_pb->mutable_header()->set_camera_timestamp(
+    ptr_trajectory_pb->mutable_header()->set_camera_timestamp(
         local_view_.prediction_obstacles->header().camera_timestamp());
-    trajectory_pb->mutable_header()->set_radar_timestamp(
+    ptr_trajectory_pb->mutable_header()->set_radar_timestamp(
         local_view_.prediction_obstacles->header().radar_timestamp());
   }
-  trajectory_pb->mutable_routing_header()->CopyFrom(
+  ptr_trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.routing->header());
 
   if (FLAGS_use_planning_fallback &&
-      trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackTrajectory(trajectory_pb);
+      ptr_trajectory_pb->trajectory_point_size() == 0) {
+    SetFallbackTrajectory(ptr_trajectory_pb);
   }
   const double dt = timestamp - Clock::NowInSeconds();
-  for (auto& p : *trajectory_pb->mutable_trajectory_point()) {
+  for (auto& p : *ptr_trajectory_pb->mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() - dt);
   }
 }
