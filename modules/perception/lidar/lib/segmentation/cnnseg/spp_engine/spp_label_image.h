@@ -113,7 +113,7 @@ class SppLabelImage {
   // @param [in]: pixel x
   // @param [in]: pixel y
   void AddPixelSample(size_t id, uint16_t x, uint16_t y) {
-    return AddPixelSample(id, y * width_ + x);
+    return AddPixelSample(id, y * static_cast<uint32_t>(width_) + x);
   }
   // @brief: add a pixel to labeled cluster
   // @param [in]: label id

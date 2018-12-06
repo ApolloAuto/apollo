@@ -216,7 +216,7 @@ void PolygonScanCvter<T>::ScansCvt(
 
   bottom_x_ = scans_interval.first;
   double top_x = scans_interval.second;
-  scans_size_ = (top_x - bottom_x_) / step_;
+  scans_size_ = static_cast<size_t>((top_x - bottom_x_) / step_);
 
   top_segments_.clear();
   top_segments_.reserve(2);
@@ -270,7 +270,7 @@ void PolygonScanCvter<T>::DisturbPolygon(const DirectionMajor dir_major) {
   for (auto& pt : polygon_disturbed_) {
     double& x = pt[dir_major];
     double d_x = (x - bottom_x_) / step_;
-    int int_d_x = std::round(d_x);
+    int int_d_x = static_cast<int>(std::round(d_x));
     double delta_x = d_x - int_d_x;
     if (std::abs(delta_x) < s_epsilon_) {
       if (delta_x > 0) {
@@ -455,7 +455,7 @@ bool PolygonScanCvter<T>::ConvertSegment(const size_t seg_id,
   const Point& min_vertex = segment.first;
   double min_x = min_vertex[dir_major_] - bottom_x_;
   double min_y = min_vertex[op_dir_major_];
-  x_id = std::ceil(min_x / step_);
+  x_id = static_cast<int>(std::ceil(min_x / step_));
   double min_x_ceil = x_id * step_;
 
   edge.x = min_x_ceil;

@@ -39,20 +39,20 @@ inline int F2I(float val, float ori, float scale) {
 // for axis rotated case
 inline void GroupPc2Pixel(float pc_x, float pc_y, float scale, float range,
                           int* x, int* y) {
-  float fx = (range - (0.707107 * (pc_x + pc_y))) * scale;
-  float fy = (range - (0.707107 * (pc_x - pc_y))) * scale;
-  *x = fx < 0 ? -1.f : static_cast<int>(fx);
-  *y = fy < 0 ? -1.f : static_cast<int>(fy);
+  float fx = (range - (0.707107f * (pc_x + pc_y))) * scale;
+  float fy = (range - (0.707107f * (pc_x - pc_y))) * scale;
+  *x = fx < 0 ? -1 : static_cast<int>(fx);
+  *y = fy < 0 ? -1 : static_cast<int>(fy);
 }
 
 // for axis aligned case
 inline int Pc2Pixel(float in_pc, float in_range, float out_size) {
-  float inv_res = 0.5 * out_size / in_range;
+  float inv_res = 0.5f * out_size / in_range;
   return static_cast<int>(std::floor((in_range - in_pc) * inv_res));
 }
 
 inline float Pixel2Pc(int in_pixel, float in_size, float out_range) {
-  float res = 2.0 * out_range / in_size;
+  float res = 2.0f * out_range / in_size;
   return out_range - (static_cast<float>(in_pixel) + 0.5f) * res;
 }
 

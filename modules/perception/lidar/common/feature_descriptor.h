@@ -40,25 +40,28 @@ class FeatureDescriptor {
     int zstep = bin_size;
     int stat_len = xstep + ystep + zstep;
     std::vector<int> stat_feat(stat_len, 0);
-    float xsize = (max_pt_.x - min_pt_.x) / xstep + 0.000001;
-    float ysize = (max_pt_.y - min_pt_.y) / ystep + 0.000001;
-    float zsize = (max_pt_.z - min_pt_.z) / zstep + 0.000001;
+    float xsize = (max_pt_.x - min_pt_.x) /
+                  static_cast<float>(xstep) + 0.000001f;
+    float ysize = (max_pt_.y - min_pt_.y) /
+                  static_cast<float>(ystep) + 0.000001f;
+    float zsize = (max_pt_.z - min_pt_.z) /
+                  static_cast<float>(zstep) + 0.000001f;
 
-    int pt_num = cloud_->size();
+    int pt_num = static_cast<int>(cloud_->size());
     for (int i = 0; i < pt_num; ++i) {
       base::PointF& pt = cloud_->at(i);
       ++stat_feat[static_cast<int>((pt.x - min_pt_.x) / xsize)];
-      ++stat_feat[static_cast<int>(xstep + (pt.y - min_pt_.y) / ysize)];
-      ++stat_feat[static_cast<int>(xstep + ystep + (pt.z - min_pt_.z) / zsize)];
+      ++stat_feat[xstep + static_cast<int>((pt.y - min_pt_.y) / ysize)];
+      ++stat_feat[xstep + ystep + static_cast<int>((pt.z - min_pt_.z) / zsize)];
     }
 
-    feature[0] = center_pt_.x / 10.0;
-    feature[1] = center_pt_.y / 10.0;
+    feature[0] = center_pt_.x / 10.0f;
+    feature[1] = center_pt_.y / 10.0f;
     feature[2] = center_pt_.z;
     feature[3] = xsize;
     feature[4] = ysize;
     feature[5] = zsize;
-    feature[6] = pt_num;
+    feature[6] = static_cast<float>(pt_num);
     for (size_t i = 0; i < stat_feat.size(); ++i) {
       feature[i + 7] =
           static_cast<float>(stat_feat[i]) / static_cast<float>(pt_num);
@@ -73,8 +76,8 @@ class FeatureDescriptor {
     min_pt_.x = min_pt_.y = min_pt_.z = FLT_MAX;
     max_pt_.x = max_pt_.y = max_pt_.z = -FLT_MAX;
 
-    int pt_num = cloud_->size();
-    for (int i = 0; i < pt_num; ++i) {
+    float pt_num = static_cast<float>(cloud_->size());
+    for (int i = 0; i < static_cast<int>(pt_num); ++i) {
       base::PointF& pt = cloud_->at(i);
       xsum += pt.x;
       ysum += pt.y;
