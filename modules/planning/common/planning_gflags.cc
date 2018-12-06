@@ -446,3 +446,4 @@ DEFINE_double(
 
 DEFINE_double(max_trajectory_len, 1000.0,
               "(unit: meter) max possible trajectory length.");
+DEFINE_bool(enable_rss_fallback, false, "trigger rss fallback");

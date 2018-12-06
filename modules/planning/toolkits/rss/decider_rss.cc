@@ -20,6 +20,7 @@
 
 #include "modules/planning/toolkits/rss/decider_rss.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -238,7 +239,9 @@ Status RssDecider::Process(
     ADEBUG << "Task " << Name() << " Distance is RSS-Safe";
   } else {
     ADEBUG << "Task " << Name() << " Distance is not RSS-Safe";
-    reference_line_info->mutable_speed_data()->Clear();
+    if (FLAGS_enable_rss_fallback) {
+      reference_line_info->mutable_speed_data()->Clear();
+    }
   }
 
   return Status::OK();
