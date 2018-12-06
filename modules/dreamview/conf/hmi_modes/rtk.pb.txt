@@ -51,16 +51,6 @@ modules {
   }
 }
 monitored_components {
-  key: "GPS"
-  value: {
-    process {
-      command_keywords: "mainboard"
-      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
-    }
-    # We also have a special GPSMonitor to check message status.
-  }
-}
-monitored_components {
   key: "Localization"
   value: {
     # Special LocalizationMonitor.
