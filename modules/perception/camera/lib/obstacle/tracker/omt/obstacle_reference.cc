@@ -51,9 +51,7 @@ void ObstacleReference::Init(const omt::ReferenceParam &ref_param, float width,
       }
     }
   }
-  object_template_manager_ =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager_ != nullptr);
+  object_template_manager_ = ObjectTemplateManager::Instance();
 }
 
 void ObstacleReference::UpdateReference(const CameraFrame *frame,

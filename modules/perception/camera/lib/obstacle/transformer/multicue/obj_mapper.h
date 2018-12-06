@@ -84,8 +84,7 @@ class ObjMapper {
     memcpy(k_mat_, k_mat, sizeof(float) * 9);
     width_ = width;
     height_ = height;
-    object_template_manager_ =
-        lib::Singleton<ObjectTemplateManager>::get_instance();
+    object_template_manager_ = ObjectTemplateManager::Instance();
   }
 
   void resize_ry_score(int size) { ry_score_.resize(size); }

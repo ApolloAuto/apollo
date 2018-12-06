@@ -28,10 +28,7 @@ TEST(PatchIndicatorTest, PatchIndicator_test) {
     "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  ObjectTemplateManager *object_template_manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager != nullptr);
-  CHECK(object_template_manager->Init(object_template_init_options));
+  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   PatchIndicator p1;
   EXPECT_EQ(p1.frame_id, -1);
@@ -54,10 +51,7 @@ TEST(SimilarMapTest, SimilarMap_test) {
     "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  ObjectTemplateManager *object_template_manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager != nullptr);
-  CHECK(object_template_manager->Init(object_template_init_options));
+  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   SimilarMap similar_map;
   ASSERT_FALSE(similar_map.Init(0));
@@ -100,10 +94,7 @@ TEST(FrameListTest, FrameList_test) {
     "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  ObjectTemplateManager *object_template_manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager != nullptr);
-  CHECK(object_template_manager->Init(object_template_init_options));
+  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   FrameList frame_list;
   ASSERT_EQ(frame_list.Size(), 0);

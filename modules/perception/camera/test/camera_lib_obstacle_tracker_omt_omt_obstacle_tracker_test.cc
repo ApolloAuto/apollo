@@ -57,11 +57,8 @@ DEFINE_string(image_color, "bgr", "color space of image");
 
 int read_detections(const std::string &path, const int &feature_dim,
                     const std::string &camera_name, CameraFrame *frame) {
-  ObjectTemplateManager *object_template_manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager != nullptr);
   const TemplateMap &kMinTemplateHWL =
-      object_template_manager->MinTemplateHWL();
+      ObjectTemplateManager::Instance()->MinTemplateHWL();
 
   std::ifstream fin(path);
   if (!fin.is_open()) {
@@ -248,10 +245,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  ObjectTemplateManager *object_template_manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager != nullptr);
-  CHECK(object_template_manager->Init(object_template_init_options));
+  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   // Init camera list
   std::vector<std::string> camera_names;

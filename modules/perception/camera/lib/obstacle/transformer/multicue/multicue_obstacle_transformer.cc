@@ -39,9 +39,7 @@ bool MultiCueObstacleTransformer::Init(
            << " \ndo template search: " << multicue_param_.check_dimension();
 
   // Init object template
-  object_template_manager_ =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager_ != nullptr);
+  object_template_manager_ = ObjectTemplateManager::Instance();
 
   return true;
 }

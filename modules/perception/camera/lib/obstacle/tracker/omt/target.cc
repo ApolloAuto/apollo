@@ -106,9 +106,7 @@ void Target::Init(const omt::TargetParam &param) {
   world_center_const.covariance_ *=
       target_param_.world_center().init_variance();
   // Init object template
-  object_template_manager_ =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager_ != nullptr);
+  object_template_manager_ = ObjectTemplateManager::Instance();
 }
 Target::Target(const omt::TargetParam &param) {
   Init(param);

@@ -33,10 +33,7 @@ TEST(TargetTest, target_test) {
     "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  ObjectTemplateManager* object_template_manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager != nullptr);
-  CHECK(object_template_manager->Init(object_template_init_options));
+  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
   std::string omt_config = apollo::common::util::GetAbsolutePath(
@@ -209,10 +206,7 @@ TEST(TargetTest, clapping_velocity_test) {
     "/apollo/modules/perception/testdata/"
     "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  ObjectTemplateManager* object_template_manager =
-      lib::Singleton<ObjectTemplateManager>::get_instance();
-  CHECK(object_template_manager != nullptr);
-  CHECK(object_template_manager->Init(object_template_init_options));
+  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
   std::string omt_config = apollo::common::util::GetAbsolutePath(

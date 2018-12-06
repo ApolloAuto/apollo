@@ -179,10 +179,7 @@ bool ObstacleCameraPerception::Init(
         perception_param_.object_template_param().plugin_param();
     init_options.root_dir = GetAbsolutePath(work_root, plugin_param.root_dir());
     init_options.conf_file = plugin_param.config_file();
-    object_template_manager_ =
-        lib::Singleton<ObjectTemplateManager>::get_instance();
-    CHECK(object_template_manager_ != nullptr);
-    CHECK(object_template_manager_->Init(init_options));
+    CHECK(ObjectTemplateManager::Instance()->Init(init_options));
   }
   return true;
 }
