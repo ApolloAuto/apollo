@@ -147,7 +147,7 @@ void Clear() {
   }
   TaskManager::CleanUp();
   TimerManager::CleanUp();
-  scheduler::Instance()->Shutdown();
+  scheduler::CleanUp();
   service_discovery::TopologyManager::CleanUp();
   transport::Transport::CleanUp();
   StopLogger();
