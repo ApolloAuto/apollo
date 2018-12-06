@@ -66,7 +66,7 @@ class Map:
                             py.append(float(p.y))
                         ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
 
-    def draw_lanes(self, ax, is_show_lane_ids, laneids):
+    def draw_lanes(self, ax, is_show_lane_ids, laneids, is_show_lane_details):
         cnt = 1
         for lane in self.map_pb.lane:
             color_val = self.colors[cnt % len(self.colors)]
@@ -79,6 +79,8 @@ class Map:
                     self._draw_lane_central(lane, ax, color_val)
             if is_show_lane_ids:
                 self._draw_lane_id(lane, ax, color_val)
+            elif is_show_lane_details:
+                self._draw_lane_details(lane, ax, color_val)
             elif lane.id.id in laneids:
                 print str(lane)
                 self._draw_lane_id(lane, ax, color_val)
@@ -99,6 +101,46 @@ class Map:
         x, y = self._find_lane_central_point(lane)
         plt.annotate(
             lane.id.id,
+            xy=(x, y), xytext=lxy,
+            textcoords='offset points', ha=has[idx], va=vas[idx],
+            bbox=dict(boxstyle='round,pad=0.5', fc=color_val, alpha=0.5),
+            arrowprops=dict(arrowstyle='-|>', connectionstyle='arc3,rad=-0.2',
+                            fc=color_val, ec=color_val, alpha=0.5))
+
+    def _draw_lane_details(self, lane, ax, color_val):
+        """draw lane id"""
+        labelxys = []
+        labelxys.append((40, -40))
+        labelxys.append((-40, -40))
+        labelxys.append((40, 40))
+        labelxys.append((-40, 40))
+        has = ['right', 'left', 'right', 'left']
+        vas = ['bottom', 'bottom', 'top', 'top']
+
+        idx = random.randint(0, 3)
+        lxy = labelxys[idx]
+        x, y = self._find_lane_central_point(lane)
+        details = str(lane.id.id)
+        for predecessor_id in lane.predecessor_id:
+            details += '\npre:' + str(predecessor_id.id)
+
+        for successor_id in lane.successor_id:
+            details += '\nsuc:' + str(successor_id.id)
+
+        for left_neighbor_forward_lane_id in lane.left_neighbor_forward_lane_id:
+            details += '\nlnf:' + str(left_neighbor_forward_lane_id.id)
+
+        for right_neighbor_forward_lane_id in lane.right_neighbor_forward_lane_id:
+            details += '\nrnf:' + str(right_neighbor_forward_lane_id.id)
+
+        for left_neighbor_reverse_lane_id in lane.left_neighbor_reverse_lane_id:
+            details += '\nlnr:' + str(left_neighbor_reverse_lane_id.id)
+
+        for right_neighbor_reverse_lane_id in lane.right_neighbor_reverse_lane_id:
+            details += '\nrnr:' + str(right_neighbor_reverse_lane_id.id)
+
+        plt.annotate(
+            details,
             xy=(x, y), xytext=lxy,
             textcoords='offset points', ha=has[idx], va=vas[idx],
             bbox=dict(boxstyle='round,pad=0.5', fc=color_val, alpha=0.5),

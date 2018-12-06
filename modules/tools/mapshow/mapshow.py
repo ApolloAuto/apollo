@@ -34,6 +34,9 @@ if __name__ == "__main__":
         "-sl", "--showlaneids", action="store_const", const=True,
         help="Show all lane ids in map")
     parser.add_argument(
+        "-sld", "--showlanedetails", action="store_const", const=True,
+        help="Show all lane ids in map")
+    parser.add_argument(
         "-ss", "--showsignals", action="store_const", const=True,
         help="Show all signal light stop lines with ids in map")
     parser.add_argument(
@@ -50,7 +53,7 @@ if __name__ == "__main__":
     lane_ids = args.laneid
     if lane_ids is None:
         lane_ids = []
-    map.draw_lanes(plt, args.showlaneids, lane_ids)
+    map.draw_lanes(plt, args.showlaneids, lane_ids, args.showlanedetails)
     if args.showsignals:
         map.draw_signal_lights(plt)
 
