@@ -166,10 +166,12 @@ class ObjMapper {
                  float *x /*init outside*/) const;
 
   void FillRyScoreSingleBin(const float &ry) {
-    int nr_bins_ry = ry_score_.size();
+    int nr_bins_ry = static_cast<int>(ry_score_.size());
     memset(ry_score_.data(), 0, sizeof(float) * nr_bins_ry);
     const float PI = common::Constant<float>::PI();
-    int index = std::floor((ry + PI) * nr_bins_ry / (2 * PI));
+    int index = static_cast<int>(std::floor((ry + PI) *
+                                            static_cast<float>(nr_bins_ry) /
+                                            (2.0f * PI)));
     ry_score_[index % nr_bins_ry] = 1.0f;
   }
 

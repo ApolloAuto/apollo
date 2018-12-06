@@ -69,9 +69,9 @@ class SemanticReviser : public BaseTrafficLightTracker {
 
  private:
   traffic_light::tracker::SemanticReviseParam semantic_param_;
-  float revise_time_s_ = 1.5;
-  float blink_threshold_s_ = 0.4;
-  float non_blink_threshold_s_ = 0.8;
+  float revise_time_s_ = 1.5f;
+  float blink_threshold_s_ = 0.4f;
+  float non_blink_threshold_s_ = 0.8f;
   int hysteretic_threshold_ = 1;
   std::vector<SemanticTable> history_semantic_;
 };

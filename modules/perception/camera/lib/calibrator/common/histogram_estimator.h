@@ -57,9 +57,9 @@ struct HistogramEstimatorParams {
     data_ep = params.data_ep;
     assert(nr_bins_in_histogram > 0 && data_ep > data_sp);
 
-    step_bin = (data_ep - data_sp) / nr_bins_in_histogram;
+    step_bin = (data_ep - data_sp) / static_cast<float>(nr_bins_in_histogram);
 
-    int w = params.smooth_kernel.size();
+    int w = static_cast<int>(params.smooth_kernel.size());
     assert(w >= 1);
     smooth_kernel_width = w;
     smooth_kernel.resize(smooth_kernel_width);
@@ -149,7 +149,8 @@ class HistogramEstimator {
   }
 
   float GetValFromIndex(int index) const {
-    return (params_.data_sp + (index + 0.5f) * params_.step_bin);
+    return (params_.data_sp +
+            (static_cast<float>(index) + 0.5f) * params_.step_bin);
   }
 
   void Smooth(const uint32_t *hist_input, int nr_bins,
@@ -163,7 +164,7 @@ class HistogramEstimator {
   void Decay(uint32_t *hist, int nr_bins) {
     float df = params_.decay_factor;
     for (int i = 0; i < nr_bins; ++i) {
-      hist[i] = static_cast<uint32_t>(hist[i] * df);
+      hist[i] = static_cast<uint32_t>(static_cast<float>(hist[i]) * df);
     }
   }
 
