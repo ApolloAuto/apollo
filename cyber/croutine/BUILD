@@ -30,10 +30,10 @@ cc_library(
 cc_library(
     name = "routine_context",
     srcs = [
-        "routine_context.cc",
+        "detail/routine_context.cc",
     ],
     hdrs = [
-        "routine_context.h",
+        "detail/routine_context.h",
     ],
     deps = [
           "//cyber/common:common",
@@ -54,7 +54,7 @@ cc_library(
 cc_library(
     name = "swap",
     srcs = [
-        "swap.S",
+        "detail/swap.S",
     ],
 )
 

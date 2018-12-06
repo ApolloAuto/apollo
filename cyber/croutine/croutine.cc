@@ -21,7 +21,7 @@
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
-#include "cyber/croutine/routine_context.h"
+#include "cyber/croutine/detail/routine_context.h"
 #include "cyber/event/perf_event_cache.h"
 
 namespace apollo {
@@ -31,8 +31,8 @@ namespace croutine {
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-thread_local CRoutine *CRoutine::current_routine_;
-thread_local std::shared_ptr<RoutineContext> CRoutine::main_context_;
+thread_local CRoutine *CRoutine::current_routine_ = nullptr;
+thread_local char *CRoutine::main_stack_ = nullptr;
 
 namespace {
 std::shared_ptr<base::CCObjectPool<RoutineContext>> context_pool = nullptr;
@@ -84,7 +84,7 @@ RoutineState CRoutine::Resume() {
   current_routine_ = this;
   PerfEventCache::Instance()->AddSchedEvent(
       SchedPerf::SWAP_IN, id_, processor_id_, static_cast<int>(state_));
-  SwapContext(GetMainContext(), this->GetContext());
+  SwapContext(GetMainStack(), GetStack());
   PerfEventCache::Instance()->AddSchedEvent(
       SchedPerf::SWAP_OUT, id_, processor_id_, static_cast<int>(state_));
   current_routine_ = nullptr;

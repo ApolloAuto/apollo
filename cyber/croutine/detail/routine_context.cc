@@ -14,40 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_CROUTINE_ROUTINE_CONTEXT_H_
-#define CYBER_CROUTINE_ROUTINE_CONTEXT_H_
-
-#include <cstdlib>
-#include <cstring>
-
-#include "cyber/common/log.h"
-
-extern "C" {
-extern void ctx_swap(void**, void**) asm("ctx_swap");
-};
+#include "cyber/croutine/detail/routine_context.h"
 
 namespace apollo {
 namespace cyber {
 namespace croutine {
 
-constexpr size_t STACK_SIZE = 8 * 1024 * 1024;
-constexpr size_t REGISTERS_SIZE = 56;
-
-typedef void (*func)(void*);
-struct RoutineContext {
-  char stack[STACK_SIZE];
-  char* sp = nullptr;
-};
-
-void MakeContext(const func& f1, const void* arg, RoutineContext* ctx);
-
-inline void SwapContext(RoutineContext* src_ctx, RoutineContext* dst_ctx) {
-  ctx_swap(reinterpret_cast<void**>(&src_ctx->sp),
-           reinterpret_cast<void**>(&dst_ctx->sp));
+void MakeContext(const func &f1, const void *arg, RoutineContext *ctx) {
+  ctx->sp = ctx->stack + STACK_SIZE - 2 * sizeof(void *) - REGISTERS_SIZE;
+  std::memset(ctx->sp, 0, REGISTERS_SIZE);
+  char *sp = ctx->stack + STACK_SIZE - 2 * sizeof(void *);
+  *reinterpret_cast<void **>(sp) = reinterpret_cast<void *>(f1);
+  sp -= sizeof(void *);
+  *reinterpret_cast<void **>(sp) = const_cast<void *>(arg);
 }
 
 }  // namespace croutine
 }  // namespace cyber
 }  // namespace apollo
-
-#endif  // CYBER_CROUTINE_ROUTINE_CONTEXT_H_

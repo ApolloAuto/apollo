@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "cyber/croutine/croutine.h"
-#include "cyber/croutine/routine_context.h"
 #include "cyber/proto/scheduler_conf.pb.h"
 
 namespace apollo {
@@ -36,7 +35,6 @@ namespace scheduler {
 class ProcessorContext;
 
 using croutine::CRoutine;
-using croutine::RoutineContext;
 
 class Processor {
  public:
@@ -51,7 +49,6 @@ class Processor {
 
  private:
   std::shared_ptr<ProcessorContext> context_;
-  std::shared_ptr<RoutineContext> routine_context_;
 
   std::condition_variable cv_ctx_;
   std::once_flag thread_flag_;

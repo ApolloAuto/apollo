@@ -17,7 +17,6 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/croutine/croutine.h"
-#include "cyber/croutine/routine_context.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 
@@ -29,8 +28,6 @@ void function() { CRoutine::Yield(RoutineState::IO_WAIT); }
 
 TEST(Croutine, croutinetest) {
   apollo::cyber::Init("croutine_test");
-  auto context = std::make_shared<apollo::cyber::croutine::RoutineContext>();
-  apollo::cyber::croutine::CRoutine::SetMainContext(context);
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(function);
   auto id = GlobalData::RegisterTaskName("croutine");
   cr->set_id(id);
@@ -43,8 +40,9 @@ TEST(Croutine, croutinetest) {
   EXPECT_EQ(cr->state(), RoutineState::READY);
   cr->UpdateState();
   EXPECT_EQ(cr->state(), RoutineState::READY);
-  EXPECT_NE(cr->GetMainContext(), nullptr);
+  EXPECT_EQ(*(cr->GetMainStack()), nullptr);
   cr->Resume();
+  EXPECT_NE(*(cr->GetMainStack()), nullptr);
   EXPECT_EQ(cr->state(), RoutineState::IO_WAIT);
   cr->Stop();
   EXPECT_EQ(cr->Resume(), RoutineState::FINISHED);
