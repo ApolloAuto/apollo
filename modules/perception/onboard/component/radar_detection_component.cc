@@ -74,8 +74,7 @@ bool RadarDetectionComponent::Proc(
 int RadarDetectionComponent::InitAlgorithmPlugin() {
   AINFO << "onboard radar_preprocessor: " << preprocessor_method_;
   if (FLAGS_obs_enable_hdmap_input) {
-    hdmap_input_ = lib::Singleton<map::HDMapInput>::get_instance();
-    CHECK_NOTNULL(hdmap_input_);
+    hdmap_input_ = map::HDMapInput::Instance();
     CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   radar::BasePreprocessor* preprocessor =

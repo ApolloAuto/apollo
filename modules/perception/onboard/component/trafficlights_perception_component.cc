@@ -207,7 +207,7 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
   }
 
   // init hdmaps
-  hd_map_ = lib::Singleton<map::HDMapInput>::get_instance();
+  hd_map_ = map::HDMapInput::Instance();
   if (hd_map_ == nullptr) {
     AERROR << "PreprocessComponent get hdmap failed.";
     return cyber::FAIL;

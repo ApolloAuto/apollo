@@ -34,9 +34,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_empty_test) {
   FLAGS_config_manager_path = "./empty_conf";
   lib::ConfigManager::Instance()->Reset();
 
-  map::HDMapInput* hdmap_input =
-      lib::Singleton<map::HDMapInput>::get_instance();
-  hdmap_input->Reset();
+  map::HDMapInput::Instance()->Reset();
 
   MapManager map_manager;
   EXPECT_TRUE(map_manager.Init());
@@ -52,9 +50,7 @@ TEST(LidarLibMapManagerTest, lidar_map_manager_test) {
   FLAGS_config_manager_path = "./conf";
   lib::ConfigManager::Instance()->Reset();
 
-  map::HDMapInput* hdmap_input =
-      lib::Singleton<map::HDMapInput>::get_instance();
-  hdmap_input->Reset();
+  map::HDMapInput::Instance()->Reset();
 
   MapManager map_manager;
   EXPECT_EQ(map_manager.Name(), "MapManager");

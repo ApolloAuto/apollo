@@ -49,6 +49,8 @@ using base::PointDCloud;
 using base::PointDCloudPtr;
 // HDMapInput
 
+HDMapInput::HDMapInput() {}
+
 bool HDMapInput::Init() {
   lib::MutexLock lock(&mutex_);
   return InitInternal();
