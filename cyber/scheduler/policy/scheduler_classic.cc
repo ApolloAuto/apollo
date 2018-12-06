@@ -23,7 +23,7 @@
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/event/perf_event_cache.h"
-#include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/policy/classic_context.h"
 #include "cyber/scheduler/processor.h"
 
 namespace apollo {

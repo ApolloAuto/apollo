@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/scheduler/policy/classic.h"
+#include "cyber/scheduler/policy/classic_context.h"
 
 #include "cyber/event/perf_event_cache.h"
 

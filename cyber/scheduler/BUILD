@@ -69,8 +69,8 @@ cc_library(
     ],
     deps = [
         "//cyber/scheduler",
-        "//cyber/scheduler:choreography",
-        "//cyber/scheduler:classic",
+        "//cyber/scheduler:choreography_context",
+        "//cyber/scheduler:classic_context",
     ],
 )
 
@@ -84,17 +84,17 @@ cc_library(
     ],
     deps = [
         "//cyber/scheduler",
-        "//cyber/scheduler:classic",
+        "//cyber/scheduler:classic_context",
     ],
 )
 
 cc_library(
-    name = "choreography",
+    name = "choreography_context",
     srcs = [
-        "policy/choreography.cc",
+        "policy/choreography_context.cc",
     ],
     hdrs = [
-        "policy/choreography.h",
+        "policy/choreography_context.h",
     ],
     deps = [
         "//cyber/croutine:croutine",
@@ -104,12 +104,12 @@ cc_library(
 )
 
 cc_library(
-    name = "classic",
+    name = "classic_context",
     srcs = [
-        "policy/classic.cc",
+        "policy/classic_context.cc",
     ],
     hdrs = [
-        "policy/classic.h",
+        "policy/classic_context.h",
     ],
     deps = [
         "//cyber/croutine:croutine",
