@@ -16,6 +16,7 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planning_proto",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/toolkits:task",
     ],
