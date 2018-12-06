@@ -48,6 +48,7 @@ DECLARE_double(junction_search_radius);
 DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_prioritize_obstacles);
 DECLARE_bool(enable_junction_feature);
+DECLARE_bool(enable_all_junction);
 
 // Obstacle features
 DECLARE_double(scan_length);

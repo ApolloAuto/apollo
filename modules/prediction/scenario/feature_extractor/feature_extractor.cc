@@ -21,6 +21,7 @@
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
@@ -189,7 +190,7 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
     return;
   }
   // Only consider junction have overlap with signal or stop_sign
-  bool need_consider = false;
+  bool need_consider = FLAGS_enable_all_junction;
   for (const auto &overlap_id : junction->junction().overlap_id()) {
     if (PredictionMap::OverlapById(overlap_id.id()) != nullptr) {
       for (const auto &object :

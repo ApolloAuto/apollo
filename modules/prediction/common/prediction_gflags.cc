@@ -69,6 +69,8 @@ DEFINE_bool(enable_prioritize_obstacles, true,
             "If to enable the functionality to prioritize obstacles");
 DEFINE_bool(enable_junction_feature, true,
             "If to enable building junction feature for obstacles");
+DEFINE_bool(enable_all_junction, false,
+           "If consider all junction with junction_mlp_model.");
 
 // Obstacle features
 DEFINE_double(scan_length, 80.0, "The length of the obstacles scan area");
