@@ -175,8 +175,6 @@ class TrackObjectDistance {
   bool LidarCameraCenterDistanceExceedDynamicThreshold(
       const SensorObjectConstPtr& lidar, const SensorObjectConstPtr& camera);
 
-  // SensorDataManager* sensor_data_manager_ =
-  //     lib::Singleton<SensorDataManager>::get_instance();
   ProjectionCache projection_cache_;
   float distance_thresh_ = 4.0f;
   const float vc_similarity2distance_penalize_thresh_ = 0.07f;

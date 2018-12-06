@@ -191,9 +191,7 @@ TEST(DstTypeFusionTest, test_update_without_measurement) {
 
   SensorPtr camera_sensor_ptr(new Sensor(camera_frame_ptr->sensor_info));
   camera_sensor_ptr->AddFrame(camera_frame_ptr);
-  SensorDataManager *sensor_date_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
-  sensor_date_manager->AddSensorMeasurements(camera_frame_ptr);
+  SensorDataManager::Instance()->AddSensorMeasurements(camera_frame_ptr);
 
   // update without measurment
   std::string sensor_id = "camera_smartereye";

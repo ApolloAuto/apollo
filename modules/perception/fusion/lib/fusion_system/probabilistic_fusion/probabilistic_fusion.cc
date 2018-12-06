@@ -80,8 +80,6 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   Sensor::SetMaxCachedFrameNum(
     static_cast<int>(params.max_cached_frame_num()));
 
-  sensor_data_manager_ = lib::Singleton<SensorDataManager>::get_instance();
-
   scenes_.reset(new Scene());
   if (params_.data_association_method == "HMAssociation") {
     matcher_.reset(new HMTrackersObjectsAssociation());
@@ -117,17 +115,18 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
                                std::vector<base::ObjectPtr>* fused_objects) {
   CHECK(fused_objects != nullptr) << "fusion error: fused_objects is nullptr";
 
+  auto* sensor_data_manager = SensorDataManager::Instance();
   // 1. save frame data
   data_mutex_.lock();
-  if (sensor_data_manager_->IsLidar(sensor_frame) && !params_.use_lidar) {
+  if (sensor_data_manager->IsLidar(sensor_frame) && !params_.use_lidar) {
     data_mutex_.unlock();
     return true;
   }
-  if (sensor_data_manager_->IsRadar(sensor_frame) && !params_.use_radar) {
+  if (sensor_data_manager->IsRadar(sensor_frame) && !params_.use_radar) {
     data_mutex_.unlock();
     return true;
   }
-  if (sensor_data_manager_->IsCamera(sensor_frame) && !params_.use_camera) {
+  if (sensor_data_manager->IsCamera(sensor_frame) && !params_.use_camera) {
     data_mutex_.unlock();
     return true;
   }
@@ -141,7 +140,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
     AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
              << ", obj_cnt : " << sensor_frame->objects.size() << ", "
              << GLOG_TIMESTAMP(sensor_frame->timestamp);
-    sensor_data_manager_->AddSensorMeasurements(sensor_frame);
+    sensor_data_manager->AddSensorMeasurements(sensor_frame);
   }
 
   data_mutex_.unlock();
@@ -153,7 +152,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
   fuse_mutex_.lock();
   double fusion_time = sensor_frame->timestamp;
   std::vector<SensorFramePtr> frames;
-  sensor_data_manager_->GetLatestFrames(fusion_time, &frames);
+  sensor_data_manager->GetLatestFrames(fusion_time, &frames);
   AINFO << "Get " << frames.size() << " related frames for fusion";
 
   // 3. peform fusion on related frames

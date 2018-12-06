@@ -98,8 +98,6 @@ class ProbabilisticFusion : public BaseFusionSystem {
   std::unique_ptr<BaseDataAssociation> matcher_;
   std::unique_ptr<BaseGatekeeper> gate_keeper_;
 
-  SensorDataManager* sensor_data_manager_ = nullptr;
-
   FusionParams params_;
 };
 

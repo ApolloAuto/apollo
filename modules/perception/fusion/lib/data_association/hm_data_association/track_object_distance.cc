@@ -70,25 +70,14 @@ void TrackObjectDistance::GetModified2DRadarBoxVertices(
 
 base::BaseCameraModelPtr TrackObjectDistance::QueryCameraModel(
     const SensorObjectConstPtr& camera) {
-  SensorDataManager* sensor_data_manager_ =
-      lib::Singleton<SensorDataManager>::get_instance();
-  if (sensor_data_manager_ == nullptr) {
-    AERROR << "Failed to get sensor data manager";
-    return nullptr;
-  }
-  return (sensor_data_manager_->GetCameraIntrinsic(camera->GetSensorId()));
+  return SensorDataManager::Instance()->GetCameraIntrinsic(
+      camera->GetSensorId());
 }
 
 bool TrackObjectDistance::QueryWorld2CameraPose(
     const SensorObjectConstPtr& camera, Eigen::Matrix4d* pose) {
   Eigen::Affine3d camera2world_pose;
-  SensorDataManager* sensor_data_manager_ =
-      lib::Singleton<SensorDataManager>::get_instance();
-  if (sensor_data_manager_ == nullptr) {
-    AERROR << "Failed to get sensor data manager";
-    return nullptr;
-  }
-  bool status = sensor_data_manager_->GetPose(
+  bool status = SensorDataManager::Instance()->GetPose(
       camera->GetSensorId(), camera->GetTimestamp(), &camera2world_pose);
   if (status == false) {
     return false;

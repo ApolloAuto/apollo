@@ -76,9 +76,7 @@ TEST(DstExistFusionTest, test_update_with_measurement) {
 
   SensorPtr camera_sensor_ptr(new Sensor(camera_frame_ptr->sensor_info));
   camera_sensor_ptr->AddFrame(camera_frame_ptr);
-  SensorDataManager *sensor_date_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
-  sensor_date_manager->AddSensorMeasurements(camera_frame_ptr);
+  SensorDataManager::Instance()->AddSensorMeasurements(camera_frame_ptr);
 
   SensorFramePtr camera_sensor_frame_ptr(new SensorFrame());
   camera_sensor_frame_ptr->Initialize(camera_frame_ptr, camera_sensor_ptr);
@@ -166,9 +164,7 @@ TEST(DstExistFusionTest, test_update_without_measurement) {
 
   SensorPtr camera_sensor_ptr(new Sensor(camera_frame_ptr->sensor_info));
   camera_sensor_ptr->AddFrame(camera_frame_ptr);
-  SensorDataManager *sensor_date_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
-  sensor_date_manager->AddSensorMeasurements(camera_frame_ptr);
+  SensorDataManager::Instance()->AddSensorMeasurements(camera_frame_ptr);
 
   SensorFramePtr camera_sensor_frame_ptr(new SensorFrame());
   camera_sensor_frame_ptr->Initialize(camera_frame_ptr, camera_sensor_ptr);

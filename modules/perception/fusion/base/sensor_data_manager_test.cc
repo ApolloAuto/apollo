@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/fusion/base/sensor_data_manager.h"
+
 #include <gtest/gtest.h>
 
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/fusion/base/sensor_data_manager.h"
 
 namespace apollo {
 namespace perception {
@@ -27,13 +28,8 @@ TEST(SensorDataManagerTest, test) {
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
       "fusion/base/params";
-  SensorDataManager* sensor_data_manager =
-      lib::Singleton<SensorDataManager>::get_instance();
-  EXPECT_TRUE(sensor_data_manager != nullptr);
-  sensor_data_manager = nullptr;
-  sensor_data_manager = lib::Singleton<SensorDataManager>::get_instance();
-  EXPECT_TRUE(sensor_data_manager != nullptr);
 
+  SensorDataManager* sensor_data_manager = SensorDataManager::Instance();
   base::SensorInfo sensor_info_1;
   sensor_info_1.name = "velodyne64";
   sensor_info_1.type = base::SensorType::VELODYNE_64;

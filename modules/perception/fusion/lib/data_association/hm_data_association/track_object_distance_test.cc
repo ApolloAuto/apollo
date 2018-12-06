@@ -177,8 +177,7 @@ TEST_F(TrackObjectDistanceTest, test_query_world2camera_pose) {
         camera_sensor_ptr);
     SensorObjectPtr camera_sensor_object_ptr(
         new SensorObject(sensor_object_const_ptr, sensor_frame_ptr));
-    SensorDataManager* sensor_data_manager_ =
-        lib::Singleton<SensorDataManager>::get_instance();
+    SensorDataManager* sensor_data_manager_ = SensorDataManager::Instance();
     sensor_data_manager_->AddSensorMeasurements(frame_ptr);
     Eigen::Matrix4d pose;
 
@@ -207,8 +206,7 @@ TEST_F(TrackObjectDistanceTest, test_query_world2camera_pose) {
         camera_sensor_ptr_2);
     SensorObjectPtr camera_sensor_object_ptr_2(
         new SensorObject(sensor_object_const_ptr_2, sensor_frame_ptr_2));
-    SensorDataManager* sensor_data_manager_ =
-        lib::Singleton<SensorDataManager>::get_instance();
+    SensorDataManager* sensor_data_manager_ = SensorDataManager::Instance();
     Eigen::Matrix4d pose;
     EXPECT_FALSE(track_object_distance.QueryWorld2CameraPose(
        camera_sensor_object_ptr_2, &pose));
@@ -236,8 +234,7 @@ TEST_F(TrackObjectDistanceTest, test_query_world2camera_pose_2) {
       camera_sensor_ptr);
   SensorObjectPtr camera_sensor_object_ptr(
       new SensorObject(sensor_object_const_ptr, sensor_frame_ptr));
-  SensorDataManager* sensor_data_manager_ =
-      lib::Singleton<SensorDataManager>::get_instance();
+  SensorDataManager* sensor_data_manager_ = SensorDataManager::Instance();
   sensor_data_manager_->AddSensorMeasurements(frame_ptr);
   Eigen::Matrix4d pose;
   EXPECT_TRUE(track_object_distance.QueryWorld2CameraPose(
