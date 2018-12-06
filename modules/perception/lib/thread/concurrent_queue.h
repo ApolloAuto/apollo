@@ -64,7 +64,7 @@ class ConcurrentQueue {
 
   int Size() {
     MutexLock lock(&mutex_);
-    return queue_.size();
+    return static_cast<int>(queue_.size());
   }
 
   void Clear() {

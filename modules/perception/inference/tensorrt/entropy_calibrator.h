@@ -51,7 +51,8 @@ class ICaffePoolOutputDimensionsFormula : public IOutputDimensionsFormula {
 
     std::string str_name(layerName);
     if (str_name.find("as_conv") == std::string::npos) {
-      return DimsHW(ceil(h_temp) + 1, ceil(w_temp) + 1);
+      return DimsHW(static_cast<int>(ceil(h_temp)) + 1,
+                    static_cast<int>(ceil(w_temp)) + 1);
     } else {
       return DimsHW(static_cast<int>(h_temp) + 1, static_cast<int>(w_temp) + 1);
     }
