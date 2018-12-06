@@ -239,6 +239,13 @@ bool ReferenceLineInfo::CheckChangeLane() const {
         sl_boundary.end_l() > kLateralShift) {
       continue;
     }
+    constexpr double kChangeLaneIgnoreDistance = 50.0;
+    if (obstacle->IsStatic() &&
+        sl_boundary.start_s() < sl_boundary_info_.adc_sl_boundary_.end_s() +
+                                    kChangeLaneIgnoreDistance &&
+        sl_boundary.start_s() > sl_boundary_info_.adc_sl_boundary_.end_s()) {
+      return false;
+    }
 
     constexpr float kSafeTime = 3.0;
     constexpr float kForwardMinSafeDistance = 6.0;
