@@ -44,6 +44,7 @@ class HMIWorker {
   HMIWorker() : HMIWorker(cyber::CreateNode("HMI")) {}
   explicit HMIWorker(const std::shared_ptr<apollo::cyber::Node>& node);
   void Start();
+  void Stop();
 
   // HMI action trigger.
   bool Trigger(const HMIAction action);
@@ -52,8 +53,8 @@ class HMIWorker {
   // Register handler which will be called on HMIStatus update.
   // It will be called ASAP if there are changes, or else periodically
   // controlled by FLAGS_hmi_status_update_interval.
-  using StatusUpdateHandler = std::function<void(
-      const bool status_changed, HMIStatus* status)>;
+  using StatusUpdateHandler =
+      std::function<void(const bool status_changed, HMIStatus* status)>;
   inline void RegisterStatusUpdateHandler(StatusUpdateHandler handler) {
     status_update_handlers_.push_back(handler);
   }
@@ -97,7 +98,9 @@ class HMIWorker {
   HMIStatus status_;
   HMIMode current_mode_;
   bool status_changed_ = false;
+  bool stop_ = false;
   mutable boost::shared_mutex status_mutex_;
+  std::future<void> thread_future_;
   std::vector<StatusUpdateHandler> status_update_handlers_;
 
   // Cyber members.

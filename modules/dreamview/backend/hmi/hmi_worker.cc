@@ -92,7 +92,7 @@ std::string TitleCase(const std::string& origin) {
 Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
   Map<std::string, std::string> result;
   const auto subdirs = apollo::common::util::ListSubPaths(dir);
-  for (const auto &subdir : subdirs) {
+  for (const auto& subdir : subdirs) {
     const auto subdir_title = TitleCase(subdir);
     const auto subdir_path = StrCat(dir, "/", subdir);
     result.insert({subdir_title, subdir_path});
@@ -108,16 +108,16 @@ Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
   for (const std::string& file_path : apollo::common::util::Glob(pattern)) {
     // Remove the extention and convert to title case as the file title.
     const std::string filename = apollo::common::util::GetFileName(file_path);
-    const std::string file_title = TitleCase(
-        filename.substr(0, filename.length() - extension.length()));
+    const std::string file_title =
+        TitleCase(filename.substr(0, filename.length() - extension.length()));
     result.insert({file_title, file_path});
   }
   return result;
 }
 
 template <class FlagType, class ValueType>
-void SetGlobalFlag(const std::string &flag_name, const ValueType &value,
-                   FlagType *flag) {
+void SetGlobalFlag(const std::string& flag_name, const ValueType& value,
+                   FlagType* flag) {
   static constexpr char kGlobalFlagfile[] =
       "/apollo/modules/common/data/global_flagfile.txt";
   if (*flag != value) {
@@ -146,29 +146,35 @@ std::string GetDockerImage() {
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
-    : config_(LoadConfig())
-    , node_(node) {
+    : config_(LoadConfig()), node_(node) {
   InitStatus();
 }
 
 void HMIWorker::Start() {
   InitReadersAndWriters();
-  RegisterStatusUpdateHandler([this](const bool status_changed,
-                                     HMIStatus* status) {
-    apollo::common::util::FillHeader("HMI", status);
-    status_writer_->Write(*status);
-    status->clear_header();
-  });
-  cyber::Async(&HMIWorker::StatusUpdateThreadLoop, this);
+  RegisterStatusUpdateHandler(
+      [this](const bool status_changed, HMIStatus* status) {
+        apollo::common::util::FillHeader("HMI", status);
+        status_writer_->Write(*status);
+        status->clear_header();
+      });
+  thread_future_ = cyber::Async(&HMIWorker::StatusUpdateThreadLoop, this);
+}
+
+void HMIWorker::Stop() {
+  stop_ = true;
+  if (thread_future_.valid()) {
+    thread_future_.get();
+  }
 }
 
 HMIConfig HMIWorker::LoadConfig() {
   HMIConfig config;
   // Get available modes, maps and vehicles by listing data directory.
-  *config.mutable_modes() = ListFilesAsDict(FLAGS_hmi_modes_config_path,
-                                            ".pb.txt");
-  CHECK(!config.modes().empty())
-      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
+  *config.mutable_modes() =
+      ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
+  CHECK(!config.modes().empty()) << "No modes config loaded from "
+                                 << FLAGS_hmi_modes_config_path;
 
   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
   *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
@@ -185,9 +191,9 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     const std::string& module_name = iter.first;
     const CyberModule& cyber_module = iter.second;
     // Each cyber module should have at least one dag file.
-    CHECK(!cyber_module.dag_files().empty())
-        << "None dag file is provided for " << module_name << " module in "
-        << mode_config_path;
+    CHECK(!cyber_module.dag_files().empty()) << "None dag file is provided for "
+                                             << module_name << " module in "
+                                             << mode_config_path;
 
     Module& module = LookupOrInsert(mode.mutable_modules(), module_name, {});
     module.set_required_for_safety(cyber_module.required_for_safety());
@@ -261,26 +267,28 @@ void HMIWorker::InitStatus() {
 void HMIWorker::InitReadersAndWriters() {
   status_writer_ = node_->CreateWriter<HMIStatus>(FLAGS_hmi_status_topic);
   pad_writer_ = node_->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
-  drive_event_writer_ = node_->CreateWriter<DriveEvent>(
-      FLAGS_drive_event_topic);
-  audio_capture_writer_ = node_->CreateWriter<AudioCapture>(
-      FLAGS_audio_capture_topic);
+  drive_event_writer_ =
+      node_->CreateWriter<DriveEvent>(FLAGS_drive_event_topic);
+  audio_capture_writer_ =
+      node_->CreateWriter<AudioCapture>(FLAGS_audio_capture_topic);
 
   node_->CreateReader<SystemStatus>(
       FLAGS_system_status_topic,
       [this](const std::shared_ptr<SystemStatus>& system_status) {
         WLock wlock(status_mutex_);
 
-        const bool is_realtime_msg = FLAGS_use_sim_time ?
-            system_status->is_realtime_in_simulation() :
-            Clock::NowInSeconds() - system_status->header().timestamp_sec() <
-                FLAGS_system_status_lifetime_seconds;
+        const bool is_realtime_msg =
+            FLAGS_use_sim_time
+                ? system_status->is_realtime_in_simulation()
+                : Clock::NowInSeconds() -
+                          system_status->header().timestamp_sec() <
+                      FLAGS_system_status_lifetime_seconds;
         // Update modules running status from realtime SystemStatus.
         if (is_realtime_msg) {
           for (auto& iter : *status_.mutable_modules()) {
             auto* status = FindOrNull(system_status->hmi_modules(), iter.first);
-            iter.second = status != nullptr &&
-                          status->status() == ComponentStatus::OK;
+            iter.second =
+                status != nullptr && status->status() == ComponentStatus::OK;
           }
         }
         // Update other components status.
@@ -341,8 +349,8 @@ bool HMIWorker::Trigger(const HMIAction action) {
 }
 
 bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
-  AINFO << "HMIAction " << HMIAction_Name(action)
-        << "(" << value << ") was triggered!";
+  AINFO << "HMIAction " << HMIAction_Name(action) << "(" << value
+        << ") was triggered!";
   switch (action) {
     case HMIAction::CHANGE_MODE:
       ChangeMode(value);
@@ -375,7 +383,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
   apollo::common::util::FillHeader("HMI", drive_event.get());
   drive_event->set_event(event_msg);
-  for (const auto &type_name : event_types) {
+  for (const auto& type_name : event_types) {
     DriveEvent::Type type;
     if (DriveEvent::Type_Parse(type_name, &type)) {
       drive_event->add_type(type);
@@ -549,7 +557,7 @@ void HMIWorker::RecordAudio(const std::string& data) {
 
 void HMIWorker::StatusUpdateThreadLoop() {
   const size_t kLoopIntervalMs = 200;
-  while (true) {
+  while (!stop_) {
     std::this_thread::sleep_for(std::chrono::milliseconds(kLoopIntervalMs));
     bool status_changed = false;
     {

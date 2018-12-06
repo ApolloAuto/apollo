@@ -32,5 +32,6 @@ int main(int argc, char *argv[]) {
   }
   apollo::cyber::WaitForShutdown();
   dreamview.Stop();
+  apollo::cyber::Clear();
   return 0;
 }
