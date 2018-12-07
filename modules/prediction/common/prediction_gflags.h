@@ -105,6 +105,11 @@ DECLARE_uint32(max_num_lane_point);
 // Validation checker
 DECLARE_double(centripetal_acc_coeff);
 
+// Junction Scenario
+DECLARE_double(junction_exit_lane_threshold);
+DECLARE_double(distance_beyond_junction);
+DECLARE_double(defualt_junction_range);
+
 // Obstacle trajectory
 DECLARE_bool(enable_cruise_regression);
 DECLARE_double(lane_sequence_threshold_cruise);
@@ -113,7 +118,6 @@ DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
 DECLARE_bool(enable_trajectory_validation_check);
-DECLARE_double(distance_beyond_junction);
 DECLARE_double(adc_trajectory_search_length);
 DECLARE_double(virtual_lane_radius);
 DECLARE_double(default_lateral_approach_speed);
