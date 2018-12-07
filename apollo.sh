@@ -256,15 +256,10 @@ function build_py_proto() {
   fi
   mkdir py_proto
   PROTOC='./bazel-out/host/bin/external/com_google_protobuf/protoc'
-  find modules/ -name "*.proto" \
+  find modules/ cyber/ -name "*.proto" \
       | grep -v node_modules \
       | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
-
-  # We need to put cyber/proto along with other cyber/ modules to avoid
-  # namespace conflict.
-  find cyber/proto/ -name "*.proto" | xargs ${PROTOC} --python_out=cyber/python
-  find cyber/python/cyber/proto -type d -exec touch "{}/__init__.py" \;
 }
 
 function check() {
