@@ -40,9 +40,9 @@ Node3d::Node3d(double x, double y, double phi,
   phi_grid_ = static_cast<std::size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = static_cast<std::size_t>
-      (static_cast<double>(phi_grid_) * (XYbounds[1] - XYbounds[0]) *
-      (XYbounds[3] - XYbounds[2]) +
+  index_ = static_cast<std::size_t>(
+      static_cast<double>(phi_grid_) * (XYbounds[1] - XYbounds[0]) *
+          (XYbounds[3] - XYbounds[2]) +
       static_cast<double>(y_grid_) * (XYbounds[1] - XYbounds[0]) +
       static_cast<double>(x_grid_));
 }
@@ -63,6 +63,10 @@ Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
   x_ = x;
   y_ = y;
   phi_ = phi;
+  CHECK_GE(x_, XYbounds[0])
+      << "x_ is smaller than xmin when constructing node3d, but";
+  CHECK_GE(y_, XYbounds[2])
+      << "y_ is smaller than ymin when constructing node3d, but";
   // XYbounds in xmin, xmax, ymin, ymax
   x_grid_ = static_cast<std::size_t>(
       (x_ - XYbounds[0]) /
@@ -73,9 +77,9 @@ Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
   phi_grid_ = static_cast<std::size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = static_cast<std::size_t>
-      (static_cast<double>(phi_grid_) * (XYbounds[1] - XYbounds[0]) *
-      (XYbounds[3] - XYbounds[2]) +
+  index_ = static_cast<std::size_t>(
+      static_cast<double>(phi_grid_) * (XYbounds[1] - XYbounds[0]) *
+          (XYbounds[3] - XYbounds[2]) +
       static_cast<double>(y_grid_) * (XYbounds[1] - XYbounds[0]) +
       static_cast<double>(x_grid_));
   traversed_x_ = traversed_x;
