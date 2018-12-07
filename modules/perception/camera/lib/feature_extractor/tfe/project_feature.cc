@@ -53,8 +53,7 @@ bool ProjectFeature::Init(const FeatureExtractorInitOptions &options) {
                                                     input_names,
                                                     options.root_dir));
   CHECK(nullptr != inference_) << "Failed to init CNNAdapter";
-  GlobalConfig *config = lib::Singleton<GlobalConfig>::get_instance();
-  gpu_id_ = config->track_feature_gpu_id;
+  gpu_id_ = GlobalConfig::Instance()->track_feature_gpu_id;
   inference_->set_gpu_id(gpu_id_);
   inference_->set_max_batch_size(100);
   std::vector<int> shape = {5, 64, 3, 3};

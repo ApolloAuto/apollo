@@ -15,6 +15,8 @@
 *****************************************************************************/
 #pragma once
 
+#include "cyber/common/macros.h"
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -22,7 +24,12 @@ namespace camera {
 struct GlobalConfig {
  public:
   int track_feature_gpu_id;
+
+ private:
+  DECLARE_SINGLETON(GlobalConfig);
 };
+
+inline GlobalConfig::GlobalConfig() {}
 
 }  // namespace camera
 }  // namespace perception
