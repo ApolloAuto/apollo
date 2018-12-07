@@ -25,7 +25,7 @@
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
-#include "modules/planning/math/curve1d/quintic_spiral_path.h"
+#include "modules/planning/math/curve1d/quintic_spiral_path_with_derivation.h"
 
 namespace apollo {
 namespace planning {
@@ -51,8 +51,6 @@ class SpiralProblemInterface : public Ipopt::TNLP {
   void set_element_weight_kappa(const double weight_kappa);
 
   void set_element_weight_dkappa(const double weight_dkappa);
-
-  void set_element_weight_d2kappa(const double weight_d2kappa);
 
   void get_optimization_results(std::vector<double>* ptr_theta,
                                 std::vector<double>* ptr_kappa,
@@ -130,10 +128,6 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   int num_of_constraints_ = 0;
 
-  int nnz_jac_g_ = 0;
-
-  int nnz_h_lag_ = 0;
-
   int num_of_points_ = 0;
 
   double default_max_point_deviation_ = 0.0;
@@ -142,7 +136,9 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   std::vector<double> relative_theta_;
 
-  std::vector<QuinticSpiralPath> piecewise_paths_;
+  constexpr static std::size_t N = 10;
+
+  std::vector<QuinticSpiralPathWithDerivation<N>> piecewise_paths_;
 
   bool has_fixed_start_point_ = false;
 
@@ -175,8 +171,6 @@ class SpiralProblemInterface : public Ipopt::TNLP {
   double weight_kappa_ = 1.0;
 
   double weight_dkappa_ = 1.0;
-
-  double weight_d2kappa_ = 1.0;
 };
 
 }  // namespace planning

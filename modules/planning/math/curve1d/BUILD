@@ -101,6 +101,7 @@ cc_library(
     ],
     hdrs = [
         "quintic_spiral_path.h",
+        "quintic_spiral_path_with_derivation.h",
     ],
     deps = [
         ":quintic_polynomial_curve1d",
