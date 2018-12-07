@@ -29,7 +29,6 @@
 #include "cyber/common/macros.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/proto/object_template_meta_schema.pb.h"
-#include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lib/thread/mutex.h"
 
 namespace apollo {

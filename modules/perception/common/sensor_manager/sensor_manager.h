@@ -26,7 +26,6 @@
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/common/perception_gflags.h"
-#include "modules/perception/lib/singleton/singleton.h"
 
 namespace apollo {
 namespace perception {

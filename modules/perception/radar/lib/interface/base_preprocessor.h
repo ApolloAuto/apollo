@@ -62,7 +62,6 @@
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/base/frame.h"
 #include "modules/perception/radar/common/types.h"
 

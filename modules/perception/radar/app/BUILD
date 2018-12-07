@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//modules/perception/base:base",
-        "//modules/perception/lib/singleton:singleton",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/registerer:registerer",
         "//modules/perception/lib/utils:utils",

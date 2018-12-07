@@ -14,7 +14,6 @@ cc_library(
         "//cyber",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
-        "//modules/perception/lib/singleton",
         "//modules/perception/lib/thread",
         "//modules/perception/proto:perception_config_schema_proto",
         "@eigen",

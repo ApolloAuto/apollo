@@ -23,7 +23,6 @@
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/gemm.h"
-#include "modules/perception/lib/singleton/singleton.h"
 
 namespace apollo {
 namespace perception {

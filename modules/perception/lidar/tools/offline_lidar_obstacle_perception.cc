@@ -32,7 +32,6 @@
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/singleton/singleton.h"
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 #include "modules/perception/lidar/common/lidar_frame.h"

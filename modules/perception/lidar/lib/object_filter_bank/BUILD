@@ -16,7 +16,6 @@ cc_library(
         "//modules/common/util",
         "//modules/perception/base",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/singleton",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/object_filter_bank/proto:filter_bank_config_proto",
         "//modules/perception/proto:perception_config_schema_proto",

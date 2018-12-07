@@ -20,7 +20,6 @@ cc_library(
        "//modules/perception/fusion/common:kalman_filter",
        "//modules/perception/fusion/lib/interface:interface",
        "//modules/perception/lib/registerer:registerer",
-       "//modules/perception/lib/singleton:singleton",
     ],
 )
 

@@ -78,7 +78,6 @@ cc_library(
         "//modules/perception/base:object",
         "//modules/perception/base:object_pool_types",
         "//modules/perception/common/sensor_manager",
-        "//modules/perception/lib/singleton",
         "@eigen",
     ],
 )
@@ -131,7 +130,6 @@ cc_library(
         ":sensor",
         "//modules/perception/base:frame",
         "//modules/perception/common/sensor_manager",
-        "//modules/perception/lib/singleton",
         "//modules/perception/lib/thread",
     ],
 )
