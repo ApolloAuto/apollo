@@ -107,7 +107,7 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   template <class T>
   bool eval_obj(int n, const T* x, T* obj_value);
 
-  /** Template to compute contraints */
+  /** Template to compute constraints */
   template <class T>
   bool eval_constraints(int n, const T* x, int m, T* g);
 

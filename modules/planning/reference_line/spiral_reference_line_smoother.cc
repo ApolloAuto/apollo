@@ -40,9 +40,7 @@ using apollo::common::time::Clock;
 
 SpiralReferenceLineSmoother::SpiralReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
-    : ReferenceLineSmoother(config) {
-  default_max_point_deviation_ = config.spiral().max_deviation();
-}
+    : ReferenceLineSmoother(config) {}
 
 bool SpiralReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
@@ -188,7 +186,7 @@ bool SpiralReferenceLineSmoother::Smooth(
   return true;
 }
 
-bool SpiralReferenceLineSmoother::SmoothStandAlone(
+int SpiralReferenceLineSmoother::SmoothStandAlone(
     std::vector<Eigen::Vector2d> point2d, std::vector<double>* ptr_theta,
     std::vector<double>* ptr_kappa, std::vector<double>* ptr_dkappa,
     std::vector<double>* ptr_s, std::vector<double>* ptr_x,
@@ -197,12 +195,10 @@ bool SpiralReferenceLineSmoother::SmoothStandAlone(
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
 
-  ptop->set_default_max_point_deviation(default_max_point_deviation_);
-  ptop->set_element_weight_curve_length(
-      config_.spiral().opt_weight_curve_length());
-  ptop->set_element_weight_kappa(config_.spiral().opt_weight_kappa());
-  ptop->set_element_weight_dkappa(config_.spiral().opt_weight_dkappa());
-  ptop->set_element_weight_d2kappa(config_.spiral().opt_weight_d2kappa());
+  ptop->set_default_max_point_deviation(config_.spiral().max_deviation());
+  ptop->set_element_weight_curve_length(config_.spiral().weight_curve_length());
+  ptop->set_element_weight_kappa(config_.spiral().weight_kappa());
+  ptop->set_element_weight_dkappa(config_.spiral().weight_dkappa());
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 
@@ -211,8 +207,6 @@ bool SpiralReferenceLineSmoother::SmoothStandAlone(
 
   app->Options()->SetStringValue("hessian_approximation", "limited-memory");
   app->Options()->SetIntegerValue("max_iter", config_.spiral().max_iteration());
-  app->Options()->SetIntegerValue("acceptable_iter",
-                                  config_.spiral().opt_acceptable_iteration());
   app->Options()->SetNumericValue("tol", config_.spiral().opt_tol());
   app->Options()->SetNumericValue("acceptable_tol",
                                   config_.spiral().opt_acceptable_tol());
@@ -220,7 +214,7 @@ bool SpiralReferenceLineSmoother::SmoothStandAlone(
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
     ADEBUG << "*** Error during initialization!";
-    return false;
+    return -1;
   }
 
   status = app->OptimizeTNLP(problem);
@@ -241,8 +235,11 @@ bool SpiralReferenceLineSmoother::SmoothStandAlone(
   ptop->get_optimization_results(ptr_theta, ptr_kappa, ptr_dkappa, ptr_s, ptr_x,
                                  ptr_y);
 
-  return status == Ipopt::Solve_Succeeded ||
-         status == Ipopt::Solved_To_Acceptable_Level;
+  if (!(status == Ipopt::Solve_Succeeded) &&
+      !(status == Ipopt::Solved_To_Acceptable_Level)) {
+    return -1;
+  }
+  return app->Statistics()->IterationCount();
 }
 
 bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
@@ -256,18 +253,16 @@ bool SpiralReferenceLineSmoother::Smooth(std::vector<Eigen::Vector2d> point2d,
 
   SpiralProblemInterface* ptop = new SpiralProblemInterface(point2d);
 
-  ptop->set_default_max_point_deviation(default_max_point_deviation_);
+  ptop->set_default_max_point_deviation(config_.spiral().max_deviation());
   if (fixed_start_point_) {
     ptop->set_start_point(fixed_start_x_, fixed_start_y_, fixed_start_theta_,
                           fixed_start_kappa_, fixed_start_dkappa_);
   }
 
   ptop->set_end_point_position(fixed_end_x_, fixed_end_y_);
-  ptop->set_element_weight_curve_length(
-      config_.spiral().opt_weight_curve_length());
-  ptop->set_element_weight_kappa(config_.spiral().opt_weight_kappa());
-  ptop->set_element_weight_dkappa(config_.spiral().opt_weight_dkappa());
-  ptop->set_element_weight_d2kappa(config_.spiral().opt_weight_d2kappa());
+  ptop->set_element_weight_curve_length(config_.spiral().weight_curve_length());
+  ptop->set_element_weight_kappa(config_.spiral().weight_kappa());
+  ptop->set_element_weight_dkappa(config_.spiral().weight_dkappa());
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
 

@@ -83,6 +83,21 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "spiral_reference_line_smoother_test",
+    size = "small",
+    srcs = [
+        "spiral_reference_line_smoother_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":spiral_reference_line_smoother",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "cos_theta_reference_line_smoother",
     srcs = [

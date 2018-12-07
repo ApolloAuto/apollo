@@ -18,7 +18,7 @@ message SpiralSmootherConfig {
   optional double piecewise_length = 2 [default = 10.0];
 
   // The iteration num of spiral reference line smoother.");
-  optional int32 max_iteration = 3 [default = 1000];
+  optional uint32 max_iteration = 3 [default = 1000];
 
   // The desired convergence tol for spiral opt;
   optional double opt_tol = 4 [default = 1.0e-8];
@@ -27,19 +27,16 @@ message SpiralSmootherConfig {
   optional double opt_acceptable_tol = 5 [default = 1e-6];
 
   // The number of acceptable iters before termination for spiral opt;
-  optional int32 opt_acceptable_iteration = 6 [default = 15];
+  optional uint32 opt_acceptable_iteration = 6 [default = 15];
 
   // The weight of curve length term in objective function
-  optional double opt_weight_curve_length = 7 [default = 0.0];
+  optional double weight_curve_length = 7 [default = 1.0];
 
   // The weight of kappa term in objective function
-  optional double opt_weight_kappa = 8 [default = 1.5];
+  optional double weight_kappa = 8 [default = 1.0];
 
   // The weight of dkappa term in objective function
-  optional double opt_weight_dkappa = 9 [default = 1.0];
-
-  // The weight of d2kappa term in objective function
-  optional double opt_weight_d2kappa = 10 [default = 0.0];
+  optional double weight_dkappa = 9 [default = 100.0];
 }
 
 message CosThetaSmootherConfig {
