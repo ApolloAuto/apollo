@@ -30,7 +30,7 @@ import gflags
 import glog
 import utm
 
-from cyber_py import record
+import cyber_py
 from cyber.proto.record_pb2 import Header
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.data.proto.record_pb2 import Record
@@ -75,7 +75,7 @@ class RecordParser(object):
         """Init input reader and output record."""
         self.record = Record(path=record_file)
 
-        self._reader = cyber.record.RecordReader(record_file)
+        self._reader = cyber_py.record.RecordReader(record_file)
         # State during processing messages.
         self._current_driving_mode = None
         self._last_position = None
