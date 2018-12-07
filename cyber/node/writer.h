@@ -62,11 +62,8 @@ class Writer : public WriterBase {
 
 template <typename MessageT>
 Writer<MessageT>::Writer(const proto::RoleAttributes& role_attr)
-    : WriterBase(role_attr), transmitter_(
-      transport::Transport::Instance()->
-        CreateTransmitter<MessageT>(role_attr_)),
-      channel_manager_(service_discovery::TopologyManager::Instance()->
-        channel_manager()) {}
+    : WriterBase(role_attr), transmitter_(nullptr),
+      channel_manager_(nullptr) {}
 
 template <typename MessageT>
 Writer<MessageT>::~Writer() {
@@ -75,16 +72,28 @@ Writer<MessageT>::~Writer() {
 
 template <typename MessageT>
 bool Writer<MessageT>::Init() {
-  if (transmitter_ == nullptr) { return false; }
-  if (init_.exchange(true)) { return true; }
+  {
+    std::lock_guard<std::mutex> g(lock_);
+    if (init_) { return true; }
+    transmitter_ = transport::Transport::Instance()->
+      CreateTransmitter<MessageT>(role_attr_);
+    if (transmitter_ == nullptr) { return false; }
+    init_ = true;
+  }
   this->role_attr_.set_id(transmitter_->id().HashValue());
+  channel_manager_ = service_discovery::TopologyManager::Instance()->
+    channel_manager();
   JoinTheTopology();
   return true;
 }
 
 template <typename MessageT>
 void Writer<MessageT>::Shutdown() {
-  if (!init_.exchange(false)) { return; }
+  {
+    std::lock_guard<std::mutex> g(lock_);
+    if (!init_) { return; }
+    init_ = false;
+  }
   LeaveTheTopology();
   transmitter_ = nullptr;
   channel_manager_ = nullptr;
@@ -92,14 +101,14 @@ void Writer<MessageT>::Shutdown() {
 
 template <typename MessageT>
 bool Writer<MessageT>::Write(const MessageT& msg) {
-  // need copy constructor && extra consumption
+  RETURN_VAL_IF(!WriterBase::IsInit(), false);
   auto msg_ptr = std::make_shared<MessageT>(msg);
   return Write(msg_ptr);
 }
 
 template <typename MessageT>
 bool Writer<MessageT>::Write(const std::shared_ptr<MessageT>& msg_ptr) {
-  RETURN_VAL_IF(!WriterBase::inited(), false);
+  RETURN_VAL_IF(!WriterBase::IsInit(), false);
   return transmitter_->Transmit(msg_ptr);
 }
 
@@ -148,7 +157,7 @@ void Writer<MessageT>::OnChannelChange(const proto::ChangeMsg& change_msg) {
 
 template <typename MessageT>
 bool Writer<MessageT>::HasReader() {
-  RETURN_VAL_IF(!WriterBase::inited(), false);
+  RETURN_VAL_IF(!WriterBase::IsInit(), false);
   return channel_manager_->HasReader(role_attr_.channel_name());
 }
 
@@ -158,7 +167,7 @@ void Writer<MessageT>::GetReaders(std::vector<proto::RoleAttributes>* readers) {
     return;
   }
 
-  if (!WriterBase::inited()) {
+  if (!WriterBase::IsInit()) {
     return;
   }
 
