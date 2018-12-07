@@ -31,33 +31,30 @@
 namespace apollo {
 namespace planning {
 
-SpeedData::SpeedData(std::vector<common::SpeedPoint> speed_points)
-    : speed_vector_(std::move(speed_points)) {}
+using apollo::common::SpeedPoint;
+
+SpeedData::SpeedData(std::vector<SpeedPoint> speed_points)
+    : std::vector<SpeedPoint>(speed_points) {
+  std::sort(begin(), end(), [](const SpeedPoint& p1, const SpeedPoint& p2) {
+    return p1.s() < p2.s();
+  });
+}
 
 void SpeedData::AppendSpeedPoint(const double s, const double time,
                                  const double v, const double a,
                                  const double da) {
-  if (!speed_vector_.empty()) {
-    CHECK(speed_vector_.back().t() < time);
+  if (!empty()) {
+    CHECK(back().t() < time);
   }
-  speed_vector_.push_back(common::util::MakeSpeedPoint(s, time, v, a, da));
-}
-
-const std::vector<common::SpeedPoint>& SpeedData::speed_vector() const {
-  return speed_vector_;
-}
-
-void SpeedData::set_speed_vector(std::vector<common::SpeedPoint> speed_points) {
-  speed_vector_ = std::move(speed_points);
+  push_back(common::util::MakeSpeedPoint(s, time, v, a, da));
 }
 
 bool SpeedData::EvaluateByTime(const double t,
                                common::SpeedPoint* const speed_point) const {
-  if (speed_vector_.size() < 2) {
+  if (size() < 2) {
     return false;
   }
-  if (!(speed_vector_.front().t() < t + 1.0e-6 &&
-        t - 1.0e-6 < speed_vector_.back().t())) {
+  if (!(front().t() < t + 1.0e-6 && t - 1.0e-6 < back().t())) {
     return false;
   }
 
@@ -65,12 +62,11 @@ bool SpeedData::EvaluateByTime(const double t,
     return sp.t() < t;
   };
 
-  auto it_lower =
-      std::lower_bound(speed_vector_.begin(), speed_vector_.end(), t, comp);
-  if (it_lower == speed_vector_.end()) {
-    *speed_point = speed_vector_.back();
-  } else if (it_lower == speed_vector_.begin()) {
-    *speed_point = speed_vector_.front();
+  auto it_lower = std::lower_bound(begin(), end(), t, comp);
+  if (it_lower == end()) {
+    *speed_point = back();
+  } else if (it_lower == begin()) {
+    *speed_point = front();
   } else {
     const auto& p0 = *(it_lower - 1);
     const auto& p1 = *it_lower;
@@ -104,21 +100,20 @@ bool SpeedData::EvaluateByTime(const double t,
 }
 
 double SpeedData::TotalTime() const {
-  if (speed_vector_.empty()) {
+  if (empty()) {
     return 0.0;
   }
-  return speed_vector_.back().t() - speed_vector_.front().t();
+  return back().t() - front().t();
 }
 
-void SpeedData::Clear() { speed_vector_.clear(); }
+void SpeedData::Clear() { clear(); }
 
 std::string SpeedData::DebugString() const {
-  const auto limit =
-      std::min(speed_vector_.size(),
-               static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
+  const auto limit = std::min(
+      size(), static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
   return apollo::common::util::StrCat(
-      "[\n", apollo::common::util::PrintDebugStringIter(
-                 speed_vector_.begin(), speed_vector_.begin() + limit, ",\n"),
+      "[\n", apollo::common::util::PrintDebugStringIter(begin(),
+                                                        begin() + limit, ",\n"),
       "]\n");
 }
 

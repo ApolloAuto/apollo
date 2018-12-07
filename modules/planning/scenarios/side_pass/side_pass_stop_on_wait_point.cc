@@ -26,8 +26,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/speed_profile_generator.h"
 
 namespace apollo {
 namespace planning {
@@ -146,7 +146,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
       SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
           move_forward_distance, kSidePassCreepSpeed);
 
-  for (const auto& sd : rfl_info.mutable_speed_data()->speed_vector()) {
+  for (const auto& sd : *rfl_info.mutable_speed_data()) {
     ADEBUG << sd.ShortDebugString();
   }
 

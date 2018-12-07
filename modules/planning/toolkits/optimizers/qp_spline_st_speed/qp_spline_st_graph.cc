@@ -104,7 +104,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
   }
 
   cruise_.clear();
-  reference_dp_speed_points_ = speed_data->speed_vector();
+  reference_dp_speed_points_ = *speed_data;
 
   init_point_ = st_graph_data.init_point();
   ADEBUG << "init point:" << init_point_.DebugString();
@@ -363,9 +363,8 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
 
   if (t_evaluated_.size() > 0) {
     spline_kernel->AddReferenceLineKernelMatrix(
-        t_evaluated_, cruise_,
-        weight * qp_st_speed_config_.total_time() /
-            static_cast<double>(t_evaluated_.size()));
+        t_evaluated_, cruise_, weight * qp_st_speed_config_.total_time() /
+                                   static_cast<double>(t_evaluated_.size()));
   }
 
   return Status::OK();
@@ -480,9 +479,8 @@ bool QpSplineStGraph::AddDpStReferenceKernel(const double weight) const {
   auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   if (!t_pos.empty()) {
     spline_kernel->AddReferenceLineKernelMatrix(
-        t_pos, s_pos,
-        weight * qp_st_speed_config_.total_time() /
-            static_cast<double>(t_pos.size()));
+        t_pos, s_pos, weight * qp_st_speed_config_.total_time() /
+                          static_cast<double>(t_pos.size()));
   }
   return true;
 }
@@ -555,8 +553,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     while (i < t_evaluated_.size() &&
            j + 1 < speed_limit.speed_limit_points().size()) {
       double distance = v * t_evaluated_[i];
-      if (!last_speed_data.Empty() &&
-          distance < last_speed_data.speed_vector().back().s()) {
+      if (!last_speed_data.Empty() && distance < last_speed_data.back().s()) {
         SpeedPoint p;
         last_speed_data.EvaluateByTime(t_evaluated_[i], &p);
         distance = p.s();
@@ -589,8 +586,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     const auto& speed_limit_points = speed_limit.speed_limit_points();
     for (const double t : t_evaluated_) {
       double s = v * t;
-      if (!last_speed_data.Empty() &&
-          s < last_speed_data.speed_vector().back().s()) {
+      if (!last_speed_data.Empty() && s < last_speed_data.back().s()) {
         SpeedPoint p;
         last_speed_data.EvaluateByTime(t, &p);
         s = p.s();

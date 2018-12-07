@@ -93,14 +93,13 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
       &path_decision_, &speed_data2);
   EXPECT_EQ(process_status, common::Status::OK());
 
-  std::vector<common::SpeedPoint> speed_points = speed_data2.speed_vector();
-  int num_speed_points = static_cast<int>(speed_points.size());
+  int num_speed_points = static_cast<int>(speed_data2.size());
   EXPECT_GT(num_speed_points, 0);
   AERROR << "Number of speed points: " << num_speed_points;
 
   // Check if the output speed are the same for all points
   for (int i = 0; i < num_speed_points; i++) {
-    double actual_speed = speed_points[i].v();
+    double actual_speed = speed_data2[i].v();
     EXPECT_DOUBLE_EQ(actual_speed, 2.23);
   }
 }
@@ -149,14 +148,13 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedDistance) {
       &path_decision_, &speed_data2);
   EXPECT_EQ(process_status, common::Status::OK());
 
-  std::vector<common::SpeedPoint> speed_points = speed_data2.speed_vector();
-  int num_speed_points = static_cast<int>(speed_points.size());
+  int num_speed_points = static_cast<int>(speed_data2.size());
   EXPECT_GT(num_speed_points, 0);
   AERROR << "Number of speed points: " << num_speed_points;
 
   // Check if the output speed are the same for all points
   for (int i = 0; i < num_speed_points; i++) {
-    double actual_speed = speed_points[i].v();
+    double actual_speed = speed_data2[i].v();
     EXPECT_DOUBLE_EQ(actual_speed, 2.23);
   }
 }

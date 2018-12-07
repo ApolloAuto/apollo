@@ -123,7 +123,7 @@ class QpSplineStGraph {
   std::vector<double> cruise_;
 
   // reference st points from dp optimizer
-  std::vector<common::SpeedPoint> reference_dp_speed_points_;
+  SpeedData reference_dp_speed_points_;
 
   planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
 };

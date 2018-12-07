@@ -101,7 +101,7 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
         speed_point.set_a(0.0);
         speed_profile.emplace_back(speed_point);
       }
-      speed_data->set_speed_vector(speed_profile);
+      *speed_data = SpeedData(speed_profile);
       return Status::OK();
     }
   }
@@ -122,7 +122,7 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
       speed_point.set_a(0.0);
       speed_profile.emplace_back(std::move(speed_point));
     }
-    speed_data->set_speed_vector(std::move(speed_profile));
+    *speed_data = SpeedData(std::move(speed_profile));
     return Status::OK();
   }
 
@@ -176,7 +176,8 @@ Status DpStGraph::CalculateTotalCost() {
     size_t highest_row = 0;
     auto lowest_row = cost_table_.back().size() - 1;
 
-    int count = next_highest_row - next_lowest_row + 1;
+    int count = static_cast<int>(next_highest_row) -
+                static_cast<int>(next_lowest_row) + 1;
     if (count > 0) {
       std::vector<std::future<void>> results;
       for (size_t r = next_lowest_row; r <= next_highest_row; ++r) {
@@ -406,7 +407,7 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
     speed_profile[i].set_v(v);
   }
 
-  speed_data->set_speed_vector(speed_profile);
+  *speed_data = SpeedData(speed_profile);
   return Status::OK();
 }
 

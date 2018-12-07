@@ -52,7 +52,7 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
   auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
   ptr_speed_plan->set_name(Name());
   ptr_speed_plan->mutable_speed_point()->CopyFrom(
-      {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
+      {speed_data.begin(), speed_data.end()});
 }
 
 void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
@@ -106,7 +106,7 @@ void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
 
   const auto& speed_data = reference_line_info_->speed_data();
   st_graph_debug->mutable_speed_profile()->CopyFrom(
-      {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
+      {speed_data.begin(), speed_data.end()});
 }
 
 }  // namespace planning
