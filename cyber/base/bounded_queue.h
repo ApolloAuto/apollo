@@ -45,6 +45,7 @@ class BoundedQueue {
   bool Init(uint64_t size);
   bool Init(uint64_t size, WaitStrategy* strategy);
   bool Enqueue(const T& element);
+  bool Enqueue(T&& element);
   bool Dequeue(T* element);
   bool WaitDequeue(T* element);
   uint64_t Size();
@@ -125,6 +126,29 @@ bool BoundedQueue<T>::Enqueue(const T& element) {
 }
 
 template <typename T>
+bool BoundedQueue<T>::Enqueue(T&& element) {
+  uint64_t new_tail = 0;
+  uint64_t old_commit = 0;
+  uint64_t old_tail = tail_.load(std::memory_order_acquire);
+  do {
+    new_tail = old_tail + 1;
+    if (GetIndex(new_tail) == GetIndex(head_.load(std::memory_order_acquire))) {
+      return false;
+    }
+  } while (!tail_.compare_exchange_weak(old_tail, new_tail,
+                                        std::memory_order_acq_rel,
+                                        std::memory_order_relaxed));
+  pool_[GetIndex(old_tail)] = element;
+  do {
+    old_commit = old_tail;
+  } while (unlikely(!commit_.compare_exchange_weak(old_commit, new_tail,
+                                                   std::memory_order_acq_rel,
+                                                   std::memory_order_relaxed)));
+  wait_strategy_->NotifyOne();
+  return true;
+}
+
+template <typename T>
 bool BoundedQueue<T>::Dequeue(T* element) {
   uint64_t new_head = 0;
   uint64_t old_head = head_.load(std::memory_order_acquire);
@@ -143,27 +167,15 @@ bool BoundedQueue<T>::Dequeue(T* element) {
 template <typename T>
 bool BoundedQueue<T>::WaitDequeue(T* element) {
   while (!break_all_wait_) {
-    bool wait = false;
-    uint64_t new_head = 0;
-    uint64_t old_head = head_.load(std::memory_order_acquire);
-    do {
-      new_head = old_head + 1;
-      if (new_head == commit_.load(std::memory_order_acquire)) {
-        wait = true;
-        break;
+    if (Dequeue(element)) {
+      return true;
+    } else {
+      if (wait_strategy_->EmptyWait()) {
+        continue;
       }
-      *element = pool_[GetIndex(new_head)];
-    } while (!head_.compare_exchange_weak(old_head, new_head,
-                                          std::memory_order_acq_rel,
-                                          std::memory_order_relaxed));
-    if (wait) {
-      if (!wait_strategy_->EmptyWait()) {
-        // wait timeout
-        return false;
-      }
-      continue;
+      // wait timeout
+      return false;
     }
-    return true;
   }
   return false;
 }
