@@ -43,11 +43,10 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
     const double start_s, const double length,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   std::string lane_id = lane_info_ptr->id().id();
-
-  // If this lane_segment has been used for constructing LaneGraph,
-  // fetch the previously saved LaneGraph, modify its start_s,
-  // then return this (save the time to construct the entire LaneGraph).
   if (lane_graphs_.find(lane_id) != lane_graphs_.end()) {
+    // If this lane_segment has been used for constructing LaneGraph,
+    // fetch the previously saved LaneGraph, modify its start_s,
+    // then return this (save the time to construct the entire LaneGraph).
     LaneGraph* lane_graph = &lane_graphs_[lane_id];
     for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
       LaneSequence* lane_seq_ptr = lane_graph->mutable_lane_sequence(i);
@@ -60,16 +59,24 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
       }
       first_lane_seg_ptr->set_start_s(start_s);
     }
-    return lane_graphs_[lane_id];
+  } else {
+    // If this lane_segment has not been used for constructing LaneGraph,
+    // construct the LaneGraph and return.
+    RoadGraph road_graph(start_s, length, lane_info_ptr);
+    LaneGraph lane_graph;
+    road_graph.BuildLaneGraph(&lane_graph);
+    lane_graphs_[lane_id] = std::move(lane_graph);
   }
+  return lane_graphs_[lane_id];
+}
 
-  // If this lane_segment has not been used for constructing LaneGraph,
-  // construct the LaneGraph and return.
+const LaneGraph& ObstacleClusters::GetLaneGraphWithoutMemorizing(
+    const double start_s, const double length,
+    std::shared_ptr<const LaneInfo> lane_info_ptr) {
   RoadGraph road_graph(start_s, length, lane_info_ptr);
   LaneGraph lane_graph;
   road_graph.BuildLaneGraph(&lane_graph);
-  lane_graphs_[lane_id] = std::move(lane_graph);
-  return lane_graphs_[lane_id];
+  return lane_graph;
 }
 
 void ObstacleClusters::AddObstacle(

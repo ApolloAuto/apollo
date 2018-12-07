@@ -190,6 +190,12 @@ class Obstacle {
   void BuildLaneGraph();
 
   /**
+   * @brief Build obstacle's lane graph with lanes being ordered.
+   *        This would be useful for lane-scanning algorithms.
+   */
+  void BuildLaneGraphFromLeftToRight();
+
+  /**
    * @brief Set RNN state
    * @param RNN state matrix
    */
