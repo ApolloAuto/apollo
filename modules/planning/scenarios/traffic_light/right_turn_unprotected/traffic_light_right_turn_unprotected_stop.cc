@@ -78,6 +78,7 @@ Stage::StageStatus TrafficLightRightTurnUnprotectedStop::Process(
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP;
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       GetContext()->traffic_light_id;
+  GetContext()->creep_start_time = Clock::NowInSeconds();
   return Stage::FINISHED;
 }
 

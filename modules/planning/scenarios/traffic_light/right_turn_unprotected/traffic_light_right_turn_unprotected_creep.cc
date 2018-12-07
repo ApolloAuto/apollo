@@ -38,12 +38,15 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
+using common::time::Clock;
 using common::TrajectoryPoint;
 
 Stage::StageStatus TrafficLightRightTurnUnprotectedCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
+
+  scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   if (!config_.enabled()) {
     next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP;
@@ -53,9 +56,14 @@ Stage::StageStatus TrafficLightRightTurnUnprotectedCreep::Process(
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
   const double traffic_light_overlap_end_s =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s;
+
+  const double wait_time = Clock::NowInSeconds() -
+      GetContext()->creep_start_time;
+  const double timeout = scenario_config_.creep_timeout();
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
-                           traffic_light_overlap_end_s)) {
+                           traffic_light_overlap_end_s,
+                           wait_time, timeout)) {
     next_stage_ = ScenarioConfig::
         TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE;
     return Stage::FINISHED;

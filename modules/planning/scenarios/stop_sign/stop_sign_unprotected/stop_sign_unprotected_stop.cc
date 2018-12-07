@@ -130,7 +130,7 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
           PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
   // check timeout
-  if (wait_time > scenario_config_.wait_timeout()) {
+  if (wait_time > scenario_config_.stop_timeout()) {
     return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
   }
 
@@ -243,6 +243,9 @@ Stage::StageStatus StopSignUnprotectedStop::FinishStage(
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       GetContext()->stop_sign_id;
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+  if (next_stage == ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP) {
+    GetContext()->creep_start_time = Clock::NowInSeconds();
+  }
 
   return Stage::FINISHED;
 }

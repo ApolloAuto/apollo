@@ -39,6 +39,7 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
+using common::time::Clock;
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
@@ -46,6 +47,8 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
+
+  scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   if (!config_.enabled()) {
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
@@ -69,9 +72,13 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
     return Stage::FINISHED;
   }
 
+  const double wait_time = Clock::NowInSeconds() -
+      GetContext()->creep_start_time;
+  const double timeout = scenario_config_.creep_timeout();
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
-                           stop_sign_overlap_it->end_s)) {
+                           stop_sign_overlap_it->end_s,
+                           wait_time, timeout)) {
     bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
     if (!plan_ok) {
       AERROR << "StopSignUnprotectedCreep planning error";

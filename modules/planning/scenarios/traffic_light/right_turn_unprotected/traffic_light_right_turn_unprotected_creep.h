@@ -48,6 +48,9 @@ class TrafficLightRightTurnUnprotectedCreep : public Stage {
   TrafficLightRightTurnUnprotectedContext* GetContext() {
     return Stage::GetContextAs<TrafficLightRightTurnUnprotectedContext>();
   }
+
+ private:
+  ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config_;
 };
 
 }  // namespace traffic_light
