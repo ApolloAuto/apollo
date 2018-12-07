@@ -20,7 +20,6 @@ proto_library(
         ":transport_conf_proto",
         ":perf_conf_proto",
         ":run_mode_conf_proto",
-        ":record_conf_proto",
         ":topology_conf_proto",
     ],
 )
@@ -110,20 +109,6 @@ proto_library(
     name = "run_mode_conf_proto",
     srcs = [
         "run_mode_conf.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "record_conf_cc_proto",
-    deps = [
-        ":record_conf_proto",
-    ],
-)
-
-proto_library(
-    name = "record_conf_proto",
-    srcs = [
-        "record_conf.proto",
     ],
 )
 

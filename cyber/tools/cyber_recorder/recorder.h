@@ -25,14 +25,12 @@
 #include "cyber/base/signal.h"
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
-#include "cyber/proto/record_conf.pb.h"
 #include "cyber/proto/topology_change.pb.h"
 #include "cyber/record/record_writer.h"
 
 using apollo::cyber::service_discovery::TopologyManager;
 using apollo::cyber::service_discovery::ChannelManager;
 using apollo::cyber::proto::ChangeMsg;
-using apollo::cyber::proto::RecordConf;
 using apollo::cyber::proto::RoleType;
 using apollo::cyber::proto::RoleAttributes;
 using apollo::cyber::message::RawMessage;
@@ -64,7 +62,6 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   std::vector<std::string> channel_vec_;
   std::unordered_map<std::string, std::shared_ptr<ReaderBase>>
       channel_reader_map_;
-  RecordConf record_conf_;
   uint64_t message_count_;
   uint64_t message_time_;
 
