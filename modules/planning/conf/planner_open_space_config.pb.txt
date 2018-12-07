@@ -21,14 +21,14 @@ dual_variable_warm_start_config : {
 distance_approach_config : {
   weight_u : 0.0
   weight_u : 0.0
-  weight_u_rate : 0.1
-  weight_u_rate : 0.1
+  weight_u_rate : 0.05
+  weight_u_rate : 0.05
   weight_state : 0.05
   weight_state : 0.05
   weight_state : 0.2
   weight_state : 0.00001
-  weight_stitching : 0.1
-  weight_stitching : 0.1
+  weight_stitching : 0.05
+  weight_stitching : 0.05
   weight_time : 0.5
   weight_time : 1
   min_safety_distance : 0.0

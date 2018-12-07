@@ -100,7 +100,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
           thread_data_.stitching_trajectory.back().path_point().theta();
       GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
-      AINFO << "Init point reach destination, stop trajectory is "
+      ADEBUG << "Init point reach destination, stop trajectory is "
                "sent";
       return Status::OK();
     } else if (destination_status ==
@@ -110,7 +110,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       double theta = thread_data_.vehicle_state.heading();
       GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
-      AINFO << "vehicle reach destination, stop trajectory is "
+      ADEBUG << "vehicle reach destination, stop trajectory is "
                "sent";
       return Status::OK();
     }
@@ -161,7 +161,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       double theta = stitching_trajectory_.back().path_point().theta();
       GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
-      ADEBUG << "Init point reach destination, stop trajectory is "
+      ADEBUG << "Init point reaches destination, stop trajectory is "
                 "sent";
       return Status::OK();
     } else if (destination_status ==
@@ -171,7 +171,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       double theta = vehicle_state_.heading();
       GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
-      ADEBUG << "Init point reach destination, stop trajectory is "
+      ADEBUG << "vehicle reaches destination, stop trajectory is "
                 "sent";
       return destination_status;
     }
