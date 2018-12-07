@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <utility>
 
+#include "modules/map/hdmap/hdmap_common.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -30,10 +32,20 @@ namespace prediction {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::hdmap::Id;
+using apollo::hdmap::Lane;
 using apollo::hdmap::LaneInfo;
 using apollo::common::math::NormalizeAngle;
 
+
 // Custom helper functions for sorting purpose.
+bool HeadingIsAtLeft(std::vector<double> heading1,
+                     std::vector<double> heading2,
+                     size_t idx);
+bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
+              std::shared_ptr<const LaneInfo> lane2);
+int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane);
+
+
 bool HeadingIsAtLeft(std::vector<double> heading1,
                      std::vector<double> heading2,
                      size_t idx) {
@@ -53,9 +65,33 @@ bool HeadingIsAtLeft(std::vector<double> heading1,
 }
 bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
               std::shared_ptr<const LaneInfo> lane2) {
-  auto heading1 = lane1->headings();
-  auto heading2 = lane2->headings();
-  return HeadingIsAtLeft(heading1, heading2, 0);
+  if (lane1->lane().has_turn() && lane2->lane().has_turn() &&
+      lane1->lane().turn() != lane2->lane().turn()) {
+    int degree_to_left_1 = ConvertTurnTypeToDegree(lane1);
+    int degree_to_left_2 = ConvertTurnTypeToDegree(lane2);
+    return (degree_to_left_1 > degree_to_left_2);
+  } else {
+    auto heading1 = lane1->headings();
+    auto heading2 = lane2->headings();
+    return HeadingIsAtLeft(heading1, heading2, 0);
+  }
+}
+int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
+  // Sanity checks.
+  if (!lane->lane().has_turn()) {
+    return 0;
+  }
+
+  // Assign a number to measure how much it is bent to the left.
+  if (lane->lane().turn() == Lane::NO_TURN) {
+    return 0;
+  } else if (lane->lane().turn() == Lane::LEFT_TURN) {
+    return 1;
+  } else if (lane->lane().turn() == Lane::U_TURN) {
+    return 2;
+  } else {
+    return -1;
+  }
 }
 
 RoadGraph::RoadGraph(const double start_s, const double length,

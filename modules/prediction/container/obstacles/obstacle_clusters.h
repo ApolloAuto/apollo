@@ -51,6 +51,18 @@ class ObstacleClusters {
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
   /**
+   * @brief Obtain a lane graph given a lane info and s, but don't
+   *        memorize it.
+   * @param lane start s
+   * @param lane total length
+   * @param lane info
+   * @return a corresponding lane graph
+   */
+  static const LaneGraph& GetLaneGraphWithoutMemorizing(
+      const double start_s, const double length,
+      std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
+
+  /**
    * @brief Get the nearest obstacle on lane sequence at s
    * @param Lane sequence
    * @param s offset in the first lane of the lane sequence

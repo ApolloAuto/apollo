@@ -1121,6 +1121,83 @@ void Obstacle::BuildLaneGraph() {
   ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
 }
 
+
+void Obstacle::BuildLaneGraphFromLeftToRight() {
+  // Sanity checks.
+  if (history_size() == 0) {
+    AERROR << "No feature found.";
+    return;
+  }
+
+  // No need to BuildLaneGraph for those non-moving obstacles.
+  Feature* feature = mutable_latest_feature();
+  if (feature->is_still()) {
+    ADEBUG << "Not build lane graph for still obstacle";
+    return;
+  }
+  double speed = feature->speed();
+  double road_graph_search_distance = std::max(
+      speed * FLAGS_prediction_duration +
+      0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
+      FLAGS_prediction_duration, FLAGS_min_prediction_length);
+
+  // Treat the most probable lane_segment as the center, put its left
+  // and right neighbors into a vector following the left-to-right order.
+  std::shared_ptr<const LaneInfo> center_lane_info =
+      PredictionMap::LaneById(feature->lane().lane_feature().lane_id());
+  std::vector<std::string> lane_ids_ordered;
+  for (int i = center_lane_info->lane().left_neighbor_forward_lane_id().size()
+       - 1; i >= 0; i --) {
+    if (center_lane_info->lane().left_neighbor_forward_lane_id(i).has_id()) {
+      lane_ids_ordered.push_back(
+          center_lane_info->lane().left_neighbor_forward_lane_id(i).id());
+    }
+  }
+  lane_ids_ordered.push_back(center_lane_info->lane().id().id());
+  for (int i = 0;
+       i < center_lane_info->lane().right_neighbor_forward_lane_id().size();
+       i ++) {
+    if (center_lane_info->lane().right_neighbor_forward_lane_id(i).has_id()) {
+      lane_ids_ordered.push_back(
+          center_lane_info->lane().right_neighbor_forward_lane_id(i).id());
+    }
+  }
+
+  // Build lane_graph for every lane_segment and update it into proto.
+  int seq_id = 0;
+  for (size_t i = 0; i < lane_ids_ordered.size(); i ++) {
+    // Construct the local lane_graph based on the current lane_segment.
+    bool vehicle_is_on_lane = (lane_ids_ordered[i] ==
+                               center_lane_info->lane().id().id());
+    std::shared_ptr<const LaneInfo> curr_lane_info =
+        PredictionMap::LaneById(lane_ids_ordered[i]);
+    const LaneGraph& local_lane_graph =
+        ObstacleClusters::GetLaneGraphWithoutMemorizing(
+            feature->lane().lane_feature().lane_s(),
+            road_graph_search_distance, curr_lane_info);
+    // Update it into the Feature proto
+    for (const auto& lane_seq : local_lane_graph.lane_sequence()) {
+      LaneSequence* lane_seq_ptr = feature->mutable_lane()
+          ->mutable_lane_graph_ordered()->add_lane_sequence();
+      lane_seq_ptr->CopyFrom(lane_seq);
+      lane_seq_ptr->set_lane_sequence_id(seq_id++);
+      lane_seq_ptr->set_lane_s(feature->lane().lane_feature().lane_s());
+      lane_seq_ptr->set_lane_l(feature->lane().lane_feature().lane_l());
+      lane_seq_ptr->set_vehicle_on_lane(vehicle_is_on_lane);
+      ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
+             << lane_seq.ShortDebugString() << "].";
+    }
+  }
+
+  // Build lane_points.
+  // TODO(jiacheng): make the points denser.
+  if (feature->has_lane() && feature->lane().has_lane_graph()) {
+    // SetLanePoints(feature);
+    // SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph());
+  }
+  ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
+}
+
 void Obstacle::SetLanePoints(Feature* feature) {
   if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";
