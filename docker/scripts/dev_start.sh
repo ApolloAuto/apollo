@@ -114,7 +114,6 @@ VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
   sunnyvale_big_loop
   sunnyvale_loop
-  san_mateo
 )
 MAP_VOLUME_CONF=""
 
