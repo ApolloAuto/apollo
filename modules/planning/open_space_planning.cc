@@ -21,6 +21,7 @@
 #include <limits>
 #include <list>
 #include <memory>
+#include <queue>
 #include <utility>
 #include <vector>
 
@@ -237,6 +238,8 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
 
   status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
 
+  ADEBUG << "Planning status:" << status.ToString();
+
   const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
@@ -343,7 +346,7 @@ Status OpenSpacePlanning::Plan(
         TrajectoryPartition(last_publishable_trajectory_, ptr_trajectory_pb);
 
   } else if (status ==
-             Status(ErrorCode::PLANNING_ERROR,
+             Status(ErrorCode::OK,
                     "Waiting for planning thread in OpenSpacePlanner")) {
     if (last_trajectory_succeeded_) {
       if (FLAGS_enable_record_debug) {
@@ -360,12 +363,12 @@ Status OpenSpacePlanning::Plan(
       // trajectory partition and choose the current trajectory to follow
       trajectory_partition_status =
           TrajectoryPartition(last_trajectory_, ptr_trajectory_pb);
+      status = Status(ErrorCode::OK,
+                      "use last planning result from OpenSpacePlanner");
     } else {
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "use last planning result from OpenSpacePlanner");
+      return status;
     }
-  } else if (status ==
-             Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose")) {
+  } else if (status == Status(ErrorCode::OK, "vehicle reach end_pose")) {
     ADCTrajectory* trajectory_after_stitching_point =
         frame_->mutable_trajectory();
 
@@ -393,7 +396,7 @@ Status OpenSpacePlanning::Plan(
   //   return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
   // }
 
-  return Status::OK();
+  return status;
 }
 
 Status OpenSpacePlanning::TrajectoryPartition(
@@ -437,7 +440,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
   const size_t initial_gear_check_horizon = 3;
-  const double kepsilon = 1e-2;
+  const double kepsilon = 1e-6;
   size_t horizon = stitched_trajectory_to_end.size();
   size_t initial_horizon = std::min(horizon, initial_gear_check_horizon);
   int direction_flag = 0;
@@ -555,54 +558,12 @@ Status OpenSpacePlanning::TrajectoryPartition(
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
   constexpr double kepsilon_to_destination = 1e-6;
-  constexpr double heading_searching_range = 0.5;
+  constexpr double heading_searching_range = 0.3;
+  bool flag_change_to_next = false;
   // Could have a big error in vehicle state in single thread mode!!! As the
   // vehicle state is only updated at the every beginning at RunOnce()
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
-
-  // double min_distance = std::numeric_limits<double>::max();
-  // for (size_t i = 0; i < trajectories_size; i++) {
-  //   const apollo::common::Trajectory trajectory =
-  //       trajectory_partition.trajectory(i);
-  //   int trajectory_size = trajectory.trajectory_point_size();
-
-  //   const apollo::common::TrajectoryPoint trajectory_end_point =
-  //       trajectory.trajectory_point(trajectory_size - 1);
-  //   const apollo::common::PathPoint path_end_point =
-  //       trajectory_end_point.path_point();
-  //   double distance_to_trajs_end =
-  //       (path_end_point.x() - vehicle_state.x()) *
-  //           (path_end_point.x() - vehicle_state.x()) +
-  //       (path_end_point.y() - vehicle_state.y()) *
-  //           (path_end_point.y() - vehicle_state.y());
-  //   if (distance_to_trajs_end <= kepsilon_to_destination) {
-  //     if (i + 1 >= trajectories_size) {
-  //       current_trajectory_index = trajectories_size - 1;
-  //       closest_trajectory_point_index = trajectory_size - 1;
-  //     } else {
-  //       current_trajectory_index = i + 1;
-  //       closest_trajectory_point_index = 0;
-  //     }
-  //     break;
-  //   }
-
-  //   for (int j = 0; j < trajectory_size; j++) {
-  //     const apollo::common::TrajectoryPoint trajectory_point =
-  //         trajectory.trajectory_point(j);
-  //     const apollo::common::PathPoint path_point =
-  //         trajectory_point.path_point();
-  //     double distance = (path_point.x() - vehicle_state.x()) *
-  //                           (path_point.x() - vehicle_state.x()) +
-  //                       (path_point.y() - vehicle_state.y()) *
-  //                           (path_point.y() - vehicle_state.y());
-  //     if (distance < min_distance) {
-  //       min_distance = distance;
-  //       current_trajectory_index = i;
-  //       closest_trajectory_point_index = j;
-  //     }
-  //   }
-  // }
 
   auto comp = [](const std::pair<std::pair<size_t, int>, double>& left,
                  const std::pair<std::pair<size_t, int>, double>& right) {
@@ -619,27 +580,25 @@ Status OpenSpacePlanning::TrajectoryPartition(
         trajectory_partition.trajectory(i);
     int trajectory_size = trajectory.trajectory_point_size();
 
-    if (!flag_change_to_next_) {
-      const apollo::common::TrajectoryPoint trajectory_end_point =
-          trajectory.trajectory_point(trajectory_size - 1);
-      const apollo::common::PathPoint path_end_point =
-          trajectory_end_point.path_point();
-      double distance_to_trajs_end =
-          (path_end_point.x() - vehicle_state.x()) *
-              (path_end_point.x() - vehicle_state.x()) +
-          (path_end_point.y() - vehicle_state.y()) *
-              (path_end_point.y() - vehicle_state.y());
-      if (distance_to_trajs_end <= kepsilon_to_destination) {
-        if (i + 1 >= trajectories_size) {
-          current_trajectory_index = trajectories_size - 1;
-          closest_trajectory_point_index = trajectory_size - 1;
-        } else {
-          current_trajectory_index = i + 1;
-          closest_trajectory_point_index = 0;
-        }
-        flag_change_to_next_ = true;
-        break;
+    const apollo::common::TrajectoryPoint trajectory_end_point =
+        trajectory.trajectory_point(trajectory_size - 1);
+    const apollo::common::PathPoint path_end_point =
+        trajectory_end_point.path_point();
+    double distance_to_trajs_end =
+        (path_end_point.x() - vehicle_state.x()) *
+            (path_end_point.x() - vehicle_state.x()) +
+        (path_end_point.y() - vehicle_state.y()) *
+            (path_end_point.y() - vehicle_state.y());
+    if (distance_to_trajs_end <= kepsilon_to_destination) {
+      if (i + 1 >= trajectories_size) {
+        current_trajectory_index = trajectories_size - 1;
+        closest_trajectory_point_index = trajectory_size - 1;
+      } else {
+        current_trajectory_index = i + 1;
+        closest_trajectory_point_index = 0;
       }
+      flag_change_to_next = true;
+      break;
     }
 
     for (int j = 0; j < trajectory_size; j++) {
@@ -660,7 +619,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
         std::make_pair(i, closest_trajectory_point_index), min_distance));
   }
 
-  if (!flag_change_to_next_) {
+  if (!flag_change_to_next) {
     while (!closest_points.empty()) {
       auto closest_point = closest_points.top();
       closest_points.pop();
@@ -678,9 +637,6 @@ Status OpenSpacePlanning::TrajectoryPartition(
       if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
         vehicle_moving_direction =
             common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
-        AINFO << "gear reverse";
-      } else {
-        AINFO << "gear drive";
       }
       if (std::abs(traj_point_moving_direction - vehicle_moving_direction) <
           heading_searching_range) {
@@ -689,15 +645,6 @@ Status OpenSpacePlanning::TrajectoryPartition(
         break;
       }
     }
-  }
-
-  AINFO << "flag_change_to_next_ " << flag_change_to_next_;
-  AINFO << "current_trajectory_index " << current_trajectory_index;
-  AINFO <<"closest_trajectory_point_index "<< closest_trajectory_point_index;
-
-  // TODO(Jinyun) Trajectory length not sure
-  if (closest_trajectory_point_index > 50) {
-    flag_change_to_next_ = false;
   }
 
   // reassign relative time and relative s to have the closest point as origin
@@ -722,7 +669,12 @@ Status OpenSpacePlanning::TrajectoryPartition(
         trajectory_point->path_point().s() - s_shift);
   }
   ptr_trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
-
+  if (gear_positions[current_trajectory_index] ==
+      canbus::Chassis::GEAR_REVERSE) {
+    AINFO << "set to gear reverse";
+  } else {
+    AINFO << "set to gear drive";
+  }
   return Status::OK();
 }
 
