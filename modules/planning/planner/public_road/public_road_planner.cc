@@ -56,6 +56,7 @@ Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
                                 ->mutable_scenario();
       scenario_debug->set_scenario_type(scenario_->scenario_type());
       scenario_debug->set_stage_type(scenario_->GetStage());
+      scenario_debug->set_msg(scenario_->GetMsg());
     }
   }
 

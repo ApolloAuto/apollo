@@ -118,12 +118,17 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
                "scenario.";
       return false;
     }
+    msg_ = "side pass obstacle: " + front_blocking_obstacle_id_;
     return (current_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     return false;
   } else {
-    return IsSidePassScenario(frame);
+    auto is_side_pass = IsSidePassScenario(frame);
+    if (is_side_pass) {
+      msg_ = "side pass obstacle: " + front_blocking_obstacle_id_;
+    }
+    return is_side_pass;
   }
 }
 
