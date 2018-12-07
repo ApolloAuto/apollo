@@ -64,7 +64,6 @@ cc_library(
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/lib/utils:utils",
-        "//modules/perception/lib/singleton:singleton",
     ],
 )
 

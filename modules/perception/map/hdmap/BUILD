@@ -15,7 +15,6 @@ cc_library(
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/geometry:common",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/singleton",
         "//modules/perception/proto:perception_config_schema_proto",
         "//modules/map/proto:map_proto",
         "//modules/map/hdmap:hdmap",
@@ -46,7 +45,6 @@ cc_library(
 #        "//modules/perception/base:point_cloud",
 #        "//modules/perception/common/geometry:common",
 #        "//modules/perception/lib/config_manager",
-#        "//modules/perception/lib/singleton",
 #        "//modules/perception/proto:perception_config_schema_proto",
 #    ],
 #)

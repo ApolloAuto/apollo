@@ -47,7 +47,6 @@ cc_library(
         "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/lib/singleton:singleton",
     ],
 )
 

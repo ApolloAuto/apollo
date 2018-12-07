@@ -16,7 +16,6 @@ cc_library(
         "//modules/common/util",
         "//modules/perception/base:base_type",
         "//modules/perception/lib/config_manager",
-        "//modules/perception/lib/singleton",
         "//modules/perception/lib/thread",
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/lidar/common:lidar_point_label",
