@@ -102,6 +102,8 @@ class ReferenceLineInfo {
   const SpeedData& speed_data() const;
   PathData* mutable_path_data();
   SpeedData* mutable_speed_data();
+  const RSSInfo& rss_info() const;
+  RSSInfo* mutable_rss_info();
   // aggregate final result together by some configuration
   bool CombinePathAndSpeedProfile(
       const double relative_time, const double start_s,
@@ -226,6 +228,8 @@ class ReferenceLineInfo {
   SpeedData speed_data_;
 
   DiscretizedTrajectory discretized_trajectory_;
+
+  RSSInfo rss_info_;
 
   struct {
     /**

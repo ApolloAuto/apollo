@@ -229,52 +229,58 @@ Status RssDecider::Process(
   rssCheck.calculateAccelerationRestriction(
       worldModel, accelerationRestriction);
 
-  RSSInfo rss_info;
-
   if (front_obstacle_distance > dMin_lon) {
     ADEBUG << "Task " << Name() << " Distance is RSS-Safe";
-    rss_info.set_is_rss_safe(true);
+    reference_line_info->mutable_rss_info()->set_is_rss_safe(true);
   } else {
     ADEBUG << "Task " << Name() << " Distance is not RSS-Safe";
-    rss_info.set_is_rss_safe(false);
+    reference_line_info->mutable_rss_info()->set_is_rss_safe(false);
     if (FLAGS_enable_rss_fallback) {
       reference_line_info->mutable_speed_data()->Clear();
     }
   }
 
-  rss_info.set_cur_dist_lon(front_obstacle_distance);
-  rss_info.set_rss_safe_dist_lon(dMin_lon);
-  rss_info.set_acc_lon_range_minimum(
+  reference_line_info->mutable_rss_info()->
+      set_cur_dist_lon(front_obstacle_distance);
+  reference_line_info->mutable_rss_info()->
+      set_rss_safe_dist_lon(dMin_lon);
+  reference_line_info->mutable_rss_info()->
+      set_acc_lon_range_minimum(
       accelerationRestriction.longitudinalRange.minimum);
-  rss_info.set_acc_lon_range_maximum(
+  reference_line_info->mutable_rss_info()->
+      set_acc_lon_range_maximum(
       accelerationRestriction.longitudinalRange.maximum);
-  rss_info.set_acc_lat_left_range_minimum(
+  reference_line_info->mutable_rss_info()->
+      set_acc_lat_left_range_minimum(
       accelerationRestriction.lateralLeftRange.minimum);
-  rss_info.set_acc_lat_left_range_maximum(
+  reference_line_info->mutable_rss_info()->
+      set_acc_lat_left_range_maximum(
       accelerationRestriction.lateralLeftRange.maximum);
-  rss_info.set_acc_lat_right_range_minimum(
+  reference_line_info->mutable_rss_info()->
+      set_acc_lat_right_range_minimum(
       accelerationRestriction.lateralRightRange.minimum);
-  rss_info.set_acc_lat_right_range_maximum(
+  reference_line_info->mutable_rss_info()->
+      set_acc_lat_right_range_maximum(
       accelerationRestriction.lateralRightRange.maximum);
 
   ADEBUG << " is_rss_safe : "
-         << rss_info.is_rss_safe();
+         << reference_line_info->rss_info().is_rss_safe();
   ADEBUG << " cur_dist_lon: "
-         << rss_info.cur_dist_lon();
+         << reference_line_info->rss_info().cur_dist_lon();
   ADEBUG << " rss_safe_dist_lon: "
-         << rss_info.rss_safe_dist_lon();
+         << reference_line_info->rss_info().rss_safe_dist_lon();
   ADEBUG << " acc_longitudianlRange_minimum: "
-         << rss_info.acc_lon_range_minimum();
+         << reference_line_info->rss_info().acc_lon_range_minimum();
   ADEBUG << " acc_longitudinalRange_maximum: "
-         << rss_info.acc_lon_range_maximum();
+         << reference_line_info->rss_info().acc_lon_range_maximum();
   ADEBUG << " acc_lateralLeftRange_minimum: "
-         << rss_info.acc_lat_left_range_minimum();
+         << reference_line_info->rss_info().acc_lat_left_range_minimum();
   ADEBUG << " acc_lateralLeftRange_maximum: "
-         << rss_info.acc_lat_left_range_maximum();
+         << reference_line_info->rss_info().acc_lat_left_range_maximum();
   ADEBUG << " acc_lateralRightRange: "
-         << rss_info.acc_lat_right_range_minimum();
+         << reference_line_info->rss_info().acc_lat_right_range_minimum();
   ADEBUG << " acc_lateralRightRange_maximum: "
-         << rss_info.acc_lat_right_range_maximum();
+         << reference_line_info->rss_info().acc_lat_right_range_maximum();
 
   return Status::OK();
 }
