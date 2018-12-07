@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
