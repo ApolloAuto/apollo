@@ -10,7 +10,7 @@ This camera can be connected to the Apollo Sensor Unit via the FAKRA connector f
 
 ## Product specifications
 
-![specs_image](images/Argus_specs1.png)
+![specs_image](images/Argus_specs2.png)
 
 ## Disclaimer
 
