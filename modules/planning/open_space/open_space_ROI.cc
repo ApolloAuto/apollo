@@ -412,15 +412,8 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   // get xy boundary of the ROI
   double x_min = start_left.x();
   double x_max = end_left.x();
-  double y_min = 0.0;
-  double y_max = 0.0;
-  if (left_down.y() > start_left.y()) {
-    y_max = left_down.y();
-    y_min = start_right.y();
-  } else {
-    y_max = start_left.y();
-    y_min = left_down.y();
-  }
+  double y_min = std::min({left_down.y(), start_right.y(), start_left.y()});
+  double y_max = std::max({left_down.y(), start_right.y(), start_left.y()});
   ROI_xy_boundary_.emplace_back(x_min);
   ROI_xy_boundary_.emplace_back(x_max);
   ROI_xy_boundary_.emplace_back(y_min);
