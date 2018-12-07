@@ -93,7 +93,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
         CheckDestination(thread_data_.stitching_trajectory.back(),
                          thread_data_.vehicle_state, thread_data_.end_pose);
     if (destination_status ==
-        Status(ErrorCode::PLANNING_ERROR, "init_point reach end_pose")) {
+        Status(ErrorCode::OK, "init_point reach end_pose")) {
       double x = thread_data_.stitching_trajectory.back().path_point().x();
       double y = thread_data_.stitching_trajectory.back().path_point().y();
       double theta =
@@ -104,7 +104,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
                "sent";
       return Status::OK();
     } else if (destination_status ==
-               Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose")) {
+               Status(ErrorCode::OK, "vehicle reach end_pose")) {
       double x = thread_data_.vehicle_state.x();
       double y = thread_data_.vehicle_state.y();
       double theta = thread_data_.vehicle_state.heading();
@@ -127,7 +127,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       return Status::OK();
     }
 
-    return Status(ErrorCode::PLANNING_ERROR,
+    return Status(ErrorCode::OK,
                   "Waiting for planning thread in OpenSpacePlanner");
 
   } else {
@@ -155,7 +155,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
     apollo::common::Status destination_status = CheckDestination(
         stitching_trajectory_.back(), vehicle_state_, end_pose_);
     if (destination_status ==
-        Status(ErrorCode::PLANNING_ERROR, "init_point reach end_pose")) {
+        Status(ErrorCode::OK, "init_point reach end_pose")) {
       double x = stitching_trajectory_.back().path_point().x();
       double y = stitching_trajectory_.back().path_point().y();
       double theta = stitching_trajectory_.back().path_point().theta();
@@ -165,7 +165,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
                 "sent";
       return Status::OK();
     } else if (destination_status ==
-               Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose")) {
+               Status(ErrorCode::OK, "vehicle reach end_pose")) {
       double x = vehicle_state_.x();
       double y = vehicle_state_.y();
       double theta = vehicle_state_.heading();
@@ -242,11 +242,11 @@ apollo::common::Status OpenSpacePlanner::CheckDestination(
       (vehicle_state.x() - end_pose[0]) * (vehicle_state.x() - end_pose[0]) +
       (vehicle_state.y() - end_pose[1]) * (vehicle_state.y() - end_pose[1]);
   if (distance_to_init_point < kepsilon) {
-    return Status(ErrorCode::PLANNING_ERROR, "init_point reach end_pose");
+    return Status(ErrorCode::OK, "init_point reach end_pose");
   }
 
   if (distance_to_vehicle < kepsilon) {
-    return Status(ErrorCode::PLANNING_ERROR, "vehicle reach end_pose");
+    return Status(ErrorCode::OK, "vehicle reach end_pose");
   }
   return Status::OK();
 }
