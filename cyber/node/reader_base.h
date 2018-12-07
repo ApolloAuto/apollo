@@ -63,7 +63,7 @@ class ReaderBase {
     return role_attr_.qos_profile();
   }
 
-  bool inited() const { return init_.load(); }
+  bool IsInit() const { return init_.load(); }
 
  protected:
   proto::RoleAttributes role_attr_;

@@ -42,11 +42,12 @@ class WriterBase {
     return role_attr_.channel_name();
   }
 
-  bool inited() const { return init_.load(); }
+  bool IsInit() const { std::lock_guard<std::mutex> g(lock_); return init_; }
 
  protected:
   proto::RoleAttributes role_attr_;
-  std::atomic<bool> init_;
+  mutable std::mutex lock_;
+  bool init_;
 };
 
 }  // namespace cyber
