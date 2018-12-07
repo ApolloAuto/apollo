@@ -68,7 +68,7 @@ void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
 void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
   opterr = 0;  // extern int opterr
   int long_index = 0;
-  const std::string short_opts = "h::d:p:s:";
+  const std::string short_opts = "hd:p:s:";
   static const struct option long_opts[] = {
       {"help", no_argument, nullptr, 'h'},
       {"dag_conf", required_argument, nullptr, 'd'},
