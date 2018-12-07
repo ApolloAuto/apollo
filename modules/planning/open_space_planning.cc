@@ -584,12 +584,27 @@ Status OpenSpacePlanning::TrajectoryPartition(
         trajectory.trajectory_point(trajectory_size - 1);
     const apollo::common::PathPoint path_end_point =
         trajectory_end_point.path_point();
+
     double distance_to_trajs_end =
         (path_end_point.x() - vehicle_state.x()) *
             (path_end_point.x() - vehicle_state.x()) +
         (path_end_point.y() - vehicle_state.y()) *
             (path_end_point.y() - vehicle_state.y());
-    if (distance_to_trajs_end <= kepsilon_to_destination) {
+
+    double traj_point_moving_direction = path_end_point.theta();
+    if (gear_positions[i] == canbus::Chassis::GEAR_REVERSE) {
+      traj_point_moving_direction =
+          common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
+    }
+    double vehicle_moving_direction = vehicle_state.heading();
+    if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
+      vehicle_moving_direction =
+          common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
+    }
+
+    if (distance_to_trajs_end <= kepsilon_to_destination &&
+        std::abs(traj_point_moving_direction - vehicle_moving_direction) <
+            heading_searching_range) {
       if (i + 1 >= trajectories_size) {
         current_trajectory_index = trajectories_size - 1;
         closest_trajectory_point_index = trajectory_size - 1;
@@ -669,12 +684,6 @@ Status OpenSpacePlanning::TrajectoryPartition(
         trajectory_point->path_point().s() - s_shift);
   }
   ptr_trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
-  if (gear_positions[current_trajectory_index] ==
-      canbus::Chassis::GEAR_REVERSE) {
-    AINFO << "set to gear reverse";
-  } else {
-    AINFO << "set to gear drive";
-  }
   return Status::OK();
 }
 
