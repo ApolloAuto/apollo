@@ -339,11 +339,12 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     mutable_obstacle->BuildReferenceLineStBoundary(
         reference_line_, sl_boundary_info_.adc_sl_boundary_.start_s());
 
-    ADEBUG << "reference line st boundary: "
-           << obstacle->reference_line_st_boundary().min_t() << ", "
-           << obstacle->reference_line_st_boundary().max_t()
-           << ", s_max: " << obstacle->reference_line_st_boundary().max_s()
-           << ", s_min: " << obstacle->reference_line_st_boundary().min_s();
+    ADEBUG << "reference line st boundary: t["
+           << mutable_obstacle->reference_line_st_boundary().min_t() << ", "
+           << mutable_obstacle->reference_line_st_boundary().max_t()
+           << "] s[" << mutable_obstacle->reference_line_st_boundary().min_s()
+           << ", " << mutable_obstacle->reference_line_st_boundary().max_s()
+           << "]";
   }
   return mutable_obstacle;
 }

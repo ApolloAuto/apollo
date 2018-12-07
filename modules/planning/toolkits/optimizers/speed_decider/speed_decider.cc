@@ -121,61 +121,54 @@ bool SpeedDecider::CheckKeepClearCrossable(
   bool keep_clear_crossable = true;
 
   const auto& last_speed_point = speed_profile.speed_vector().back();
-
-  // check if overlap with other stop wall
-  for (const auto* obstacle : path_decision->obstacles().Items()) {
-    auto* mutable_obstacle = path_decision->Find(obstacle->Id());
-    const auto& boundary = mutable_obstacle->st_boundary();
-
-    ADEBUG << "CheckKeepClearCrossable id[" << mutable_obstacle->Id()
-        << "] boundary.min_s[" << boundary.min_s()
-        << "] keep_clear_st_boundary.max_s[" << keep_clear_st_boundary.max_s()
-        << "] diff[" << boundary.min_s() - keep_clear_st_boundary.max_s()
-        << "]";
-    if (obstacle->Id() == keep_clear_st_boundary.id()) {
-      continue;
-    }
-    if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
-        boundary.max_t() < 0.0 ||
-        boundary.min_t() >= speed_profile.speed_vector().back().t()) {
-      continue;
-    }
-    const double adc_length =
-        VehicleConfigHelper::GetConfig().vehicle_param().length();
-    if (mutable_obstacle->IsBlockingObstacle() &&
-        boundary.min_s() - keep_clear_st_boundary.max_s() < (adc_length / 2)) {
-      // TODO(all): temporarily disable this check.
-      // keep_clear_crossable = false;
-      break;
+  double last_speed_point_v = 0.0;
+  if (last_speed_point.has_v()) {
+    last_speed_point_v = last_speed_point.v();
+  } else {
+    const size_t len = speed_profile.speed_vector().size();
+    if (len > 1) {
+      const auto& last_2nd_speed_point =
+          speed_profile.speed_vector()[len - 2];
+      last_speed_point_v =
+          (last_speed_point.s() - last_2nd_speed_point.s()) /
+          (last_speed_point.t() - last_2nd_speed_point.t());
     }
   }
-
-  // check if crossable
-  if (keep_clear_crossable) {
-    double last_speed_point_v = 0.0;
-    if (last_speed_point.has_v()) {
-      last_speed_point_v = last_speed_point.v();
-    } else {
-      const size_t len = speed_profile.speed_vector().size();
-      if (len > 1) {
-        const auto& last_2nd_speed_point =
-            speed_profile.speed_vector()[len - 2];
-        last_speed_point_v =
-            (last_speed_point.s() - last_2nd_speed_point.s()) /
-            (last_speed_point.t() - last_2nd_speed_point.t());
-      }
-    }
-    constexpr double kKeepClearSlowSpeed = 3.0;  // m/s
-    ADEBUG << "last_speed_point_s[" << last_speed_point.s()
-        << "] st_boundary.max_s[" << keep_clear_st_boundary.max_s()
-        << "] last_speed_point_v[" << last_speed_point_v << "]";
-    if (last_speed_point.s() <= keep_clear_st_boundary.max_s() &&
-        last_speed_point_v < kKeepClearSlowSpeed) {
-      keep_clear_crossable = false;
-    }
+  constexpr double kKeepClearSlowSpeed = 3.0;  // m/s
+  ADEBUG << "last_speed_point_s[" << last_speed_point.s()
+      << "] st_boundary.max_s[" << keep_clear_st_boundary.max_s()
+      << "] last_speed_point_v[" << last_speed_point_v << "]";
+  if (last_speed_point.s() <= keep_clear_st_boundary.max_s() &&
+      last_speed_point_v < kKeepClearSlowSpeed) {
+    keep_clear_crossable = false;
   }
 
   return keep_clear_crossable;
+}
+
+bool SpeedDecider::CheckKeepClearBlocked(
+    const PathDecision* const path_decision,
+    const Obstacle& keep_clear_obstacle) const {
+  bool keep_clear_blocked = false;
+
+  // check if overlap with other stop wall
+  for (const auto* obstacle : path_decision->obstacles().Items()) {
+    if (obstacle->Id() == keep_clear_obstacle.Id()) {
+      continue;
+    }
+    const double obstacle_start_s =
+        obstacle->PerceptionSLBoundary().start_s();
+    const double adc_length =
+        VehicleConfigHelper::GetConfig().vehicle_param().length();
+    const double distance = obstacle_start_s -
+        keep_clear_obstacle.PerceptionSLBoundary().end_s();
+
+    if (obstacle->IsBlockingObstacle() && distance < (adc_length / 2)) {
+      keep_clear_blocked = true;
+      break;
+    }
+  }
+  return keep_clear_blocked;
 }
 
 bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
@@ -221,6 +214,12 @@ Status SpeedDecider::MakeObjectDecision(
     }
 
     auto position = GetStPosition(path_decision, speed_profile, boundary);
+    if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      if (CheckKeepClearBlocked(path_decision, *obstacle)) {
+        position = BELOW;
+      }
+    }
+
     switch (position) {
       case BELOW:
         if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
