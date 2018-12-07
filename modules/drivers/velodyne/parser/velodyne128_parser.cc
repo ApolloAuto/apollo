@@ -130,7 +130,7 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
       }
 
       // if (pointInRange(distance)) {
-      float intensity = static_cast<float>(raw->blocks[block].data[k + 2]);
+      int intensity = static_cast<int>(raw->blocks[block].data[k + 2]);
 
       /** correct for the laser rotation as a function of timing during the
        * firings **/

@@ -132,7 +132,11 @@ void DataParser::ParseRawData(const std::string &msg) {
 }
 
 void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
-  if (ins_status_record_ != static_cast<uint32_t>(ins->type())) {
+  static double last_notify = cyber::Time().Now().ToSecond();
+  double now = cyber::Time().Now().ToSecond();
+  if (ins_status_record_ != static_cast<uint32_t>(ins->type()) ||
+      (now - last_notify) > 1.0) {
+    last_notify = now;
     ins_status_record_ = static_cast<uint32_t>(ins->type());
     switch (ins->type()) {
       case apollo::drivers::gnss::Ins::GOOD:

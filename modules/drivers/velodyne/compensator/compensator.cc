@@ -187,9 +187,9 @@ void Compensator::MotionCompensation(
       auto* point_new = msg_compensated->add_point();
       point_new->set_intensity(point.intensity());
       point_new->set_timestamp(point.timestamp());
-      point_new->set_x(p.x());
-      point_new->set_y(p.y());
-      point_new->set_z(p.z());
+      point_new->set_x(static_cast<float>(p.x()));
+      point_new->set_y(static_cast<float>(p.y()));
+      point_new->set_z(static_cast<float>(p.z()));
     }
     return;
   }
@@ -213,9 +213,9 @@ void Compensator::MotionCompensation(
     auto* point_new = msg_compensated->add_point();
     point_new->set_intensity(point.intensity());
     point_new->set_timestamp(point.timestamp());
-    point_new->set_x(p.x());
-    point_new->set_y(p.y());
-    point_new->set_z(p.z());
+    point_new->set_x(static_cast<float>(p.x()));
+    point_new->set_y(static_cast<float>(p.y()));
+    point_new->set_z(static_cast<float>(p.z()));
   }
 }
 
