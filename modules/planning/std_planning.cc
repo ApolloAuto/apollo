@@ -38,6 +38,7 @@
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
 
+
 namespace apollo {
 namespace planning {
 
@@ -424,6 +425,10 @@ Status StdPlanning::Plan(
   }
 
   trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
+
+  if (FLAGS_enable_rss_info) {
+    trajectory_pb->mutable_rss_info()->CopyFrom(best_ref_info->rss_info());
+  }
 
   best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
 

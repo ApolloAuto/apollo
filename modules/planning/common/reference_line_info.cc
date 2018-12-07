@@ -430,6 +430,10 @@ PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
 
 SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
 
+const RSSInfo& ReferenceLineInfo::rss_info() const { return rss_info_; }
+
+RSSInfo* ReferenceLineInfo::mutable_rss_info() { return &rss_info_; }
+
 bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     const double relative_time, const double start_s,
     DiscretizedTrajectory* ptr_discretized_trajectory) {
