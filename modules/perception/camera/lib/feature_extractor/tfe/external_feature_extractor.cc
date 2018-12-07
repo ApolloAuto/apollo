@@ -55,8 +55,7 @@ bool ExternalFeatureExtractor::Init(const FeatureExtractorInitOptions
                                                     input_names,
                                                     options.root_dir));
   CHECK(nullptr != inference_) << "Failed to init CNNAdapter";
-  GlobalConfig *config = lib::Singleton<GlobalConfig>::get_instance();
-  gpu_id_ = config->track_feature_gpu_id;
+  gpu_id_ = GlobalConfig::Instance()->track_feature_gpu_id;
   inference_->set_gpu_id(gpu_id_);
   std::vector<int> shape = {1, height_, width_, 3};
   std::map<std::string, std::vector<int>>
