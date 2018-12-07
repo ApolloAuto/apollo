@@ -157,7 +157,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
         SpeedProfileGenerator::GenerateSpeedHotStart(planning_start_point);
     ADEBUG << "Using dummy hot start for speed vector";
   }
-  heuristic_speed_data->set_speed_vector(speed_profile);
+  *heuristic_speed_data = SpeedData(speed_profile);
 
   auto ret = Status::OK();
 

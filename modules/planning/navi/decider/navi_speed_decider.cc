@@ -349,9 +349,8 @@ Status NaviSpeedDecider::MakeSpeedDecision(
                                  ts_point.a, ts_point.da);
   }
 
-  const auto& speed_vector = speed_data->speed_vector();
-  if (speed_vector.size() == 1) {
-    const auto& prev = speed_vector.back();
+  if (speed_data->size() == 1) {
+    const auto& prev = speed_data->back();
     speed_data->AppendSpeedPoint(prev.s(), prev.t() + 1.0, 0.0, 0.0, 0.0);
   }
 
@@ -516,7 +515,7 @@ void NaviSpeedDecider::RecordDebugInfo(const SpeedData& speed_data) {
   auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
   ptr_speed_plan->set_name(Name());
   ptr_speed_plan->mutable_speed_point()->CopyFrom(
-      {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
+      {speed_data.begin(), speed_data.end()});
 }
 
 }  // namespace planning

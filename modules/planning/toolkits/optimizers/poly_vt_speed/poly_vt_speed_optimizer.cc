@@ -159,11 +159,9 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
   }
 
   // step 5 : write back
-  speed_data->Clear();
   constexpr double delta_t = 0.1;
   optimal_profile.GeneratePointsByTime(delta_t);
-  std::vector<common::SpeedPoint> result = optimal_profile.eval_points();
-  speed_data->set_speed_vector(result);
+  *speed_data = SpeedData(optimal_profile.eval_points());
 
   return Status::OK();
 }
@@ -176,7 +174,7 @@ void PolyVTSpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
   auto ptr_speed_plan = debug->mutable_planning_data()->add_speed_plan();
   ptr_speed_plan->set_name(Name());
   ptr_speed_plan->mutable_speed_point()->CopyFrom(
-      {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
+      {speed_data.begin(), speed_data.end()});
 }
 
 void PolyVTSpeedOptimizer::RecordSTGraphDebug(
@@ -233,7 +231,7 @@ void PolyVTSpeedOptimizer::RecordSTGraphDebug(
   }
   const auto& speed_data = reference_line_info_->speed_data();
   st_graph_debug->mutable_speed_profile()->CopyFrom(
-      {speed_data.speed_vector().begin(), speed_data.speed_vector().end()});
+      {speed_data.begin(), speed_data.end()});
 }
 }  // namespace planning
 }  // namespace apollo

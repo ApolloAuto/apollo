@@ -54,10 +54,9 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateInitSpeedProfile(
     ADEBUG << "Current reference line is not started previous drived line";
     return speed_profile;
   }
-  const auto& last_speed_vector =
-      last_reference_line_info->speed_data().speed_vector();
+  const auto& last_speed_data = last_reference_line_info->speed_data();
 
-  if (!last_speed_vector.empty()) {
+  if (!last_speed_data.empty()) {
     const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
     Vec2d last_xy_point(last_init_point.x(), last_init_point.y());
     SLPoint last_sl_point;
@@ -78,7 +77,7 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateInitSpeedProfile(
     double start_time = 0.0;
     double start_s = 0.0;
     bool is_updated_start = false;
-    for (const auto& speed_point : last_speed_vector) {
+    for (const auto& speed_point : last_speed_data) {
       if (speed_point.s() < s_diff) {
         continue;
       }

@@ -63,8 +63,7 @@ common::Status SpeedDecider::Execute(Frame* frame,
 }
 
 SpeedDecider::StPosition SpeedDecider::GetStPosition(
-    const PathDecision* const path_decision,
-    const SpeedData& speed_profile,
+    const PathDecision* const path_decision, const SpeedData& speed_profile,
     const StBoundary& st_boundary) const {
   StPosition st_position = BELOW;
   if (st_boundary.IsEmpty()) {
@@ -74,11 +73,9 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
   bool st_position_set = false;
   const double start_t = st_boundary.min_t();
   const double end_t = st_boundary.max_t();
-  for (size_t i = 0; i + 1 < speed_profile.speed_vector().size(); ++i) {
-    const STPoint curr_st(speed_profile.speed_vector()[i].s(),
-                          speed_profile.speed_vector()[i].t());
-    const STPoint next_st(speed_profile.speed_vector()[i + 1].s(),
-                          speed_profile.speed_vector()[i + 1].t());
+  for (size_t i = 0; i + 1 < speed_profile.size(); ++i) {
+    const STPoint curr_st(speed_profile[i].s(), speed_profile[i].t());
+    const STPoint next_st(speed_profile[i + 1].s(), speed_profile[i + 1].t());
     if (curr_st.t() < start_t && next_st.t() < start_t) {
       continue;
     }
@@ -92,8 +89,8 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       st_position = CROSS;
 
       if (st_boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
-        if (!CheckKeepClearCrossable(path_decision,
-                                     speed_profile, st_boundary)) {
+        if (!CheckKeepClearCrossable(path_decision, speed_profile,
+                                     st_boundary)) {
           st_position = BELOW;
         }
       }
@@ -115,29 +112,26 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
 }
 
 bool SpeedDecider::CheckKeepClearCrossable(
-    const PathDecision* const path_decision,
-    const SpeedData& speed_profile,
+    const PathDecision* const path_decision, const SpeedData& speed_profile,
     const StBoundary& keep_clear_st_boundary) const {
   bool keep_clear_crossable = true;
 
-  const auto& last_speed_point = speed_profile.speed_vector().back();
+  const auto& last_speed_point = speed_profile.back();
   double last_speed_point_v = 0.0;
   if (last_speed_point.has_v()) {
     last_speed_point_v = last_speed_point.v();
   } else {
-    const size_t len = speed_profile.speed_vector().size();
+    const size_t len = speed_profile.size();
     if (len > 1) {
-      const auto& last_2nd_speed_point =
-          speed_profile.speed_vector()[len - 2];
-      last_speed_point_v =
-          (last_speed_point.s() - last_2nd_speed_point.s()) /
-          (last_speed_point.t() - last_2nd_speed_point.t());
+      const auto& last_2nd_speed_point = speed_profile[len - 2];
+      last_speed_point_v = (last_speed_point.s() - last_2nd_speed_point.s()) /
+                           (last_speed_point.t() - last_2nd_speed_point.t());
     }
   }
   constexpr double kKeepClearSlowSpeed = 3.0;  // m/s
   ADEBUG << "last_speed_point_s[" << last_speed_point.s()
-      << "] st_boundary.max_s[" << keep_clear_st_boundary.max_s()
-      << "] last_speed_point_v[" << last_speed_point_v << "]";
+         << "] st_boundary.max_s[" << keep_clear_st_boundary.max_s()
+         << "] last_speed_point_v[" << last_speed_point_v << "]";
   if (last_speed_point.s() <= keep_clear_st_boundary.max_s() &&
       last_speed_point_v < kKeepClearSlowSpeed) {
     keep_clear_crossable = false;
@@ -156,12 +150,11 @@ bool SpeedDecider::CheckKeepClearBlocked(
     if (obstacle->Id() == keep_clear_obstacle.Id()) {
       continue;
     }
-    const double obstacle_start_s =
-        obstacle->PerceptionSLBoundary().start_s();
+    const double obstacle_start_s = obstacle->PerceptionSLBoundary().start_s();
     const double adc_length =
         VehicleConfigHelper::GetConfig().vehicle_param().length();
-    const double distance = obstacle_start_s -
-        keep_clear_obstacle.PerceptionSLBoundary().end_s();
+    const double distance =
+        obstacle_start_s - keep_clear_obstacle.PerceptionSLBoundary().end_s();
 
     if (obstacle->IsBlockingObstacle() && distance < (adc_length / 2)) {
       keep_clear_blocked = true;
@@ -192,7 +185,7 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
 
 Status SpeedDecider::MakeObjectDecision(
     const SpeedData& speed_profile, PathDecision* const path_decision) const {
-  if (speed_profile.speed_vector().size() < 2) {
+  if (speed_profile.size() < 2) {
     const std::string msg = "dp_st_graph failed to get speed profile.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -204,7 +197,7 @@ Status SpeedDecider::MakeObjectDecision(
 
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
         boundary.max_t() < 0.0 ||
-        boundary.min_t() >= speed_profile.speed_vector().back().t()) {
+        boundary.min_t() >= speed_profile.back().t()) {
       AppendIgnoreDecision(mutable_obstacle);
       continue;
     }
@@ -310,8 +303,7 @@ bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
   DCHECK_NOTNULL(stop_decision);
 
   const auto& boundary = obstacle.st_boundary();
-  double fence_s =
-      adc_sl_boundary_.end_s() + boundary.min_s() + stop_distance;
+  double fence_s = adc_sl_boundary_.end_s() + boundary.min_s() + stop_distance;
   if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
     fence_s = obstacle.PerceptionSLBoundary().start_s();
   }
