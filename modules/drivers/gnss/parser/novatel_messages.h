@@ -23,6 +23,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <limits>
 #include "modules/drivers/gnss/proto/config.pb.h"
 
 namespace apollo {
@@ -138,6 +139,7 @@ enum class SolutionStatus : uint32_t {
   UNAUTHORIZED = 20,  // position type is unauthorized
   INVALID_RATE =
       22,  // selected logging rate is not supported for this solution type
+  NONE = std::numeric_limits<uint32_t>::max(),
 };
 
 enum class SolutionType : uint32_t {
@@ -395,6 +397,7 @@ enum class InsStatus : uint32_t {
   ALIGNMENT_COMPLETE,
   DETERMINING_ORIENTATION,
   WAITING_INITIAL_POS,
+  NONE = std::numeric_limits<uint32_t>::max(),
 };
 
 struct InsPva {
