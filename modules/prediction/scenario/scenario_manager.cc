@@ -108,7 +108,9 @@ void ScenarioManager::PrioritizeObstacles(
     bool is_on_lane = obstacle_ptr->IsOnLane();
     bool is_pedestrian_in_front = s > FLAGS_back_dist_ignore_ped &&
         (latest_feature_ptr->type() == PerceptionObstacle::PEDESTRIAN ||
-         latest_feature_ptr->type() == PerceptionObstacle::BICYCLE);
+         latest_feature_ptr->type() == PerceptionObstacle::BICYCLE ||
+         latest_feature_ptr->type() == PerceptionObstacle::UNKNOWN ||
+         latest_feature_ptr->type() == PerceptionObstacle::UNKNOWN_MOVABLE);
 
     bool need_consider = is_in_scan_area || is_on_lane ||
                          is_pedestrian_in_front;
