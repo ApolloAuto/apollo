@@ -98,15 +98,19 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const VehicleState& vehicle_state, const double current_timestamp,
     const double planning_cycle_time,
-    const PublishableTrajectory* prev_trajectory) {
+    const PublishableTrajectory* prev_trajectory,
+    std::string* replan_reason) {
   if (!FLAGS_enable_trajectory_stitcher) {
+    *replan_reason = "stitch is disabled by gflag.";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
   if (!prev_trajectory) {
+    *replan_reason = "replan for no previous trajectory.";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
   if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+    *replan_reason = "replan for manual mode.";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
@@ -116,6 +120,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     ADEBUG << "Projected trajectory at time [" << prev_trajectory->header_time()
            << "] size is zero! Previous planning not exist or failed. Use "
               "origin car status instead.";
+    *replan_reason = "replan for empty previous trajectory.";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
@@ -128,10 +133,15 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   if (time_matched_index == 0 &&
       veh_rel_time < prev_trajectory->StartPoint().relative_time()) {
     AWARN << "current time smaller than the previous trajectory's first time";
+    *replan_reason =
+        "replan for current time smaller than the previous trajectory's first "
+        "time.";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
   if (time_matched_index + 1 >= prev_trajectory_size) {
     AWARN << "current time beyond the previous trajectory's last time";
+    *replan_reason =
+        "replan for current time beyond the previous trajectory's last time";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
@@ -139,6 +149,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
       static_cast<uint32_t>(time_matched_index));
 
   if (!time_matched_point.has_path_point()) {
+    *replan_reason = "replan for previous trajectory missed path point";
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
@@ -157,11 +168,23 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   ADEBUG << "Control lateral diff: " << lat_diff
          << ", longitudinal diff: " << lon_diff;
 
-  if (std::fabs(lat_diff) > FLAGS_replan_lateral_distance_threshold ||
-      std::fabs(lon_diff) > FLAGS_replan_longitudinal_distance_threshold) {
-    AERROR << "the distance between matched point and actual position is too "
-              "large. Replan is triggered. lat_diff = "
-           << lat_diff << ", lon_diff = " << lon_diff;
+  if (std::fabs(lat_diff) > FLAGS_replan_lateral_distance_threshold) {
+    std::string msg(
+        "the distance between matched point and actual position is too "
+        "large. Replan is triggered. lat_diff = " +
+        std::to_string(lat_diff));
+    AERROR << msg;
+    *replan_reason = msg;
+    return ComputeReinitStitchingTrajectory(vehicle_state);
+  }
+
+  if (std::fabs(lon_diff) > FLAGS_replan_longitudinal_distance_threshold) {
+    std::string msg(
+        "the distance between matched point and actual position is too "
+        "large. Replan is triggered. lon_diff = " +
+        std::to_string(lon_diff));
+    AERROR << msg;
+    *replan_reason = msg;
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
@@ -189,6 +212,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   const double zero_s = stitching_trajectory.back().path_point().s();
   for (auto& tp : stitching_trajectory) {
     if (!tp.has_path_point()) {
+      *replan_reason = "replan for previous trajectory missed path point";
       return ComputeReinitStitchingTrajectory(vehicle_state);
     }
     tp.set_relative_time(tp.relative_time() + prev_trajectory->header_time() -

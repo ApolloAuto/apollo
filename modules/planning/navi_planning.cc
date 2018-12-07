@@ -203,9 +203,10 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   std::vector<TrajectoryPoint> stitching_trajectory;
+  std::string replan_reason;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state, start_timestamp, planning_cycle_time,
-      last_publishable_trajectory_.get());
+      last_publishable_trajectory_.get(), &replan_reason);
 
   const uint32_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,

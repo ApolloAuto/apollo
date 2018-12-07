@@ -52,7 +52,7 @@ message RSSInfo {
   optional double acc_lat_right_range_maximum = 9;
 }
 
-// next id: 21
+// next id: 23
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -69,6 +69,7 @@ message ADCTrajectory {
 
   // is_replan == true mean replan triggered
   optional bool is_replan = 9 [default = false];
+  optional string replan_reason = 22;
 
   // Specify trajectory gear
   optional apollo.canbus.Chassis.GearPosition gear = 10;
@@ -110,7 +111,7 @@ message ADCTrajectory {
     SPEED_FALLBACK = 3;
   }
   optional TrajectoryType trajectory_type = 21 [default = UNKNOWN];
-  
+
   // output related to RSS
   optional RSSInfo rss_info = 100;
 }
