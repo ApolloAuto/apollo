@@ -133,7 +133,38 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 }
 
 bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  return (IsFarFromIntersection(frame) && HasBlockingObstacle(frame));
+  return (IsFarFromIntersection(frame) && HasBlockingObstacle(frame) &&
+          IsFarFromDestination(frame));
+}
+
+bool SidePassScenario::IsFarFromDestination(const Frame& frame) {
+  if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
+  const auto& reference_line_info = frame.reference_line_info().front();
+
+  double dest_stop_s = -1.0;
+  for (const auto* obstacle :
+       reference_line_info.path_decision().obstacles().Items()) {
+    if (obstacle->LongitudinalDecision().has_stop() &&
+        obstacle->LongitudinalDecision().stop().reason_code() ==
+            STOP_REASON_DESTINATION) {
+      common::SLPoint dest_sl;
+      const ObjectStop& stop_decision = obstacle->LongitudinalDecision().stop();
+      reference_line_info.reference_line().XYToSL(
+          {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
+          &dest_sl);
+      dest_stop_s = dest_sl.s();
+      break;
+    }
+  }
+  const double kClearDistance = 15.0;
+  const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
+  if (dest_stop_s - adc_sl_boundary.end_s() < kClearDistance) {
+    ADEBUG << "too close to destination";
+    return false;
+  }
+  return true;
 }
 
 bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
