@@ -48,6 +48,9 @@ class StopSignUnprotectedCreep : public Stage {
   StopSignUnprotectedContext* GetContext() {
     return Stage::GetContextAs<StopSignUnprotectedContext>();
   }
+
+ private:
+  ScenarioStopSignUnprotectedConfig scenario_config_;
 };
 
 }  // namespace stop_sign

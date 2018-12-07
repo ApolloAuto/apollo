@@ -41,6 +41,7 @@ namespace traffic_light {
 struct TrafficLightRightTurnUnprotectedContext {
   ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config;
   std::string traffic_light_id;
+  double creep_start_time;
 };
 
 class TrafficLightRightTurnUnprotectedScenario : public Scenario {

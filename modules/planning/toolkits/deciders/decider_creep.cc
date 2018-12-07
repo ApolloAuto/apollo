@@ -102,7 +102,9 @@ bool DeciderCreep::BuildStopDecision(const double stop_sign_overlap_end_s,
 
 bool DeciderCreep::CheckCreepDone(const Frame& frame,
                                   const ReferenceLineInfo& reference_line_info,
-                                  const double stop_sign_overlap_end_s) {
+                                  const double stop_sign_overlap_end_s,
+                                  const double wait_time,
+                                  const double timeout) {
   const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
   double creep_stop_s =
@@ -134,7 +136,11 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
       }
     }
     creep_done = all_far_away;
+  } else {
+    // check timeout
+    creep_done = (wait_time >= timeout);
   }
+
   return creep_done;
 }
 

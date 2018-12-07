@@ -87,7 +87,8 @@ message ScenarioStopSignUnprotectedConfig {
   optional double max_adc_stop_speed = 4 [default = 0.3];  // m/s
   optional float stop_duration = 5 [default = 1.0];
   optional double min_pass_s_distance = 6 [default = 3.0];  // meter
-  optional float wait_timeout = 7 [default = 8.0];  // secoond
+  optional float stop_timeout = 7 [default = 8.0];  // secoond
+  optional float creep_timeout = 8 [default = 10.0];  // secoond
 }
 
 message ScenarioTrafficLightRightTurnUnprotectedConfig {
@@ -95,6 +96,7 @@ message ScenarioTrafficLightRightTurnUnprotectedConfig {
   optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
   optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
   optional double min_pass_s_distance = 4 [default = 3.0];  // meter
+  optional float creep_timeout = 5 [default = 10.0];  // secoond  
 }
 
 // scenario configs
