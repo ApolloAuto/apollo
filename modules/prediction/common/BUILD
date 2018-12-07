@@ -187,4 +187,21 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "junction_analyzer_test",
+    size = "small",
+    srcs = ["junction_analyzer_test.cc"],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        ":kml_map_based_test",
+        ":prediction_gflags",
+        ":prediction_map",
+        ":junction_analyzer",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
