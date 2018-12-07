@@ -163,7 +163,7 @@ DEFINE_double(centripetal_acc_coeff, 0.5,
 
 // Junction Scenario
 DEFINE_double(junction_exit_lane_threshold, 0.1,
-              "If a lane has longer extend out of the junction,"
+              "If a lane extends out of the junction by this value,"
               "consider it as a exit_lane.");
 DEFINE_double(distance_beyond_junction, 0.5,
               "If the obstacle is in junction more than this threshold,"
