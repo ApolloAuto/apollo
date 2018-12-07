@@ -161,6 +161,16 @@ DEFINE_uint32(max_num_lane_point, 20,
 DEFINE_double(centripetal_acc_coeff, 0.5,
               "Coefficient of centripetal acceleration probability");
 
+// Junction Scenario
+DEFINE_double(junction_exit_lane_threshold, 0.1,
+              "If a lane has longer extend out of the junction,"
+              "consider it as a exit_lane.");
+DEFINE_double(distance_beyond_junction, 0.5,
+              "If the obstacle is in junction more than this threshold,"
+              "consider it in junction.");
+DEFINE_double(defualt_junction_range, 10.0,
+              "Default value for the range of a junction.");
+
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,
             "If enable using regression in cruise model");
@@ -176,9 +186,6 @@ DEFINE_bool(enable_trim_prediction_trajectory, false,
             "protected adc planning trajectory.");
 DEFINE_bool(enable_trajectory_validation_check, false,
             "If check the validity of prediction trajectory.");
-DEFINE_double(distance_beyond_junction, 0.5,
-              "If the obstacle is in junction more than this threshold,"
-              "consider it in junction.");
 DEFINE_double(adc_trajectory_search_length, 10.0,
               "How far to search junction along adc planning trajectory");
 DEFINE_double(virtual_lane_radius, 0.5, "Radius to search virtual lanes");

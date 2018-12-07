@@ -22,6 +22,7 @@
 #include <unordered_set>
 
 #include "modules/prediction/common/junction_analyzer.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -62,19 +63,14 @@ void JunctionAnalyzer::SetAllJunctionExits() {
     if (overlap_info_ptr == nullptr) {
       continue;
     }
-    // TODO(all) consider to delete
-    if (overlap_info_ptr->overlap().object_size() != 2) {
-      continue;
-    }
     for (const auto &object : overlap_info_ptr->overlap().object()) {
       if (object.has_lane_overlap_info()) {
         const std::string& lane_id = object.id().id();
         auto lane_info_ptr = PredictionMap::LaneById(lane_id);
-        // TODO(all) move 0.1 to gflags
-        if (object.lane_overlap_info().end_s() + 0.1 <
+        double s = object.lane_overlap_info().end_s();
+        if (s + FLAGS_junction_exit_lane_threshold <
             lane_info_ptr->total_length()) {
           JunctionExit junction_exit;
-          double s = object.lane_overlap_info().end_s();
           apollo::common::PointENU position = lane_info_ptr->GetSmoothPoint(s);
           junction_exit.set_exit_lane_id(lane_id);
           junction_exit.mutable_exit_position()->set_x(position.x());
@@ -181,8 +177,7 @@ double JunctionAnalyzer::ComputeJunctionRange() {
       junction_info_ptr_->junction().polygon().point_size() < 3) {
     AERROR << "Junction [" << GetJunctionId()
            << "] has not enough polygon points to compute range";
-    // TODO(kechxu) move the default range value to gflags
-    return 10.0;
+    return FLAGS_defualt_junction_range;
   }
   double x_min = std::numeric_limits<double>::infinity();
   double x_max = -std::numeric_limits<double>::infinity();
