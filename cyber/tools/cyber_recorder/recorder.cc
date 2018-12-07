@@ -160,7 +160,7 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
     ReaderConfig config;
     config.channel_name = channel_name;
     config.pending_queue_size =
-        gflags::Int32FromEnv("READ_PENDING_QUEUE_SIZE", 50);
+        gflags::Int32FromEnv("CYBER_PENDING_QUEUE_SIZE", 50);
     reader = node_->CreateReader<RawMessage>(config, callback);
     if (reader == nullptr) {
       AERROR << "Create reader failed.";
