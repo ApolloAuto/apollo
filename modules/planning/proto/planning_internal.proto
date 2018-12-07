@@ -123,6 +123,7 @@ message DpPolyGraphDebug {
 message ScenarioDebug {
   optional apollo.planning.ScenarioConfig.ScenarioType scenario_type = 1;
   optional apollo.planning.ScenarioConfig.StageType stage_type = 2;
+  optional string msg = 3;
 }
 
 

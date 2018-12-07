@@ -87,6 +87,9 @@ class Scenario {
   virtual void Init();
 
   const std::string& Name() const;
+  const std::string& GetMsg() const {
+    return msg_;
+  }
 
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
@@ -97,6 +100,7 @@ class Scenario {
       stage_config_map_;
   const ScenarioContext* scenario_context_ = nullptr;
   std::string name_;
+  std::string msg_;  // debug msg
 };
 
 }  // namespace scenario
