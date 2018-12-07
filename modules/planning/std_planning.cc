@@ -267,9 +267,10 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
 
   std::vector<TrajectoryPoint> stitching_trajectory;
+  std::string replan_reason;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state, start_timestamp, planning_cycle_time,
-      last_publishable_trajectory_.get());
+      last_publishable_trajectory_.get(), &replan_reason);
 
   const uint32_t frame_num = seq_num_++;
   bool update_ego_info =
@@ -362,6 +363,10 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   }
 
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
+  if (trajectory_pb->is_replan()) {
+    trajectory_pb->set_replan_reason(replan_reason);
+  }
+
   FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
