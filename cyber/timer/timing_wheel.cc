@@ -17,6 +17,7 @@
 #include "cyber/timer/timing_wheel.h"
 
 #include <algorithm>
+#include "cyber/base/for_each.h"
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "cyber/time/time.h"
@@ -119,7 +120,6 @@ void TimingWheel::StopTimer(uint64_t timer_id) {
     std::lock_guard<std::mutex> lg(cancelled_mutex_);
     cancelled_list_.push_back(timer_id);
   }
-  ADEBUG << "stop timer id: " << timer_id;
 }
 
 void TimingWheel::RemoveCancelledTasks(uint64_t slot_index) {
@@ -129,9 +129,11 @@ void TimingWheel::RemoveCancelledTasks(uint64_t slot_index) {
   {
     std::lock_guard<std::mutex> lg(cancelled_mutex_);
     for (auto id : cancelled_list_) {
-      time_slots_[slot_index].RemoveTask(id);
-      ADEBUG << "remove task " << id << "from slots " << slot_index;
+      FOR_EACH(i, 0, TIMING_WHEEL_SIZE) {
+        time_slots_[i].RemoveTask(id);
+      }
     }
+    cancelled_list_.clear();
   }
 }
 

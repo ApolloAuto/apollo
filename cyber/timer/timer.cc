@@ -41,18 +41,18 @@ void Timer::Start() {
     return;
   }
 
-  if (timer_id_ == 0) {
+  if (!started_.exchange(true)) {
     timer_id_ =
         tm_->Add(timer_opt_.period, timer_opt_.callback, timer_opt_.oneshot);
   }
 }
 
 void Timer::Stop() {
-  if (timer_id_ == 0) {
-    return;
+  if (started_.exchange(false)) {
+    ADEBUG << "stop timer " << timer_id_;
+    tm_->Remove(timer_id_);
+    timer_id_ = 0;
   }
-  ADEBUG << "stop timer " << timer_id_;
-  tm_->Remove(timer_id_);
 }
 
 Timer::~Timer() {

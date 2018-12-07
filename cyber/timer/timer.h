@@ -17,6 +17,7 @@
 #ifndef CYBER_TIMER_TIMER_H_
 #define CYBER_TIMER_TIMER_H_
 
+#include <atomic>
 #include <memory>
 
 #include "cyber/timer/timer_manager.h"
@@ -76,6 +77,7 @@ class Timer {
   TimerOption timer_opt_;
   TimerManager* tm_ = nullptr;
   uint64_t timer_id_ = 0;
+  std::atomic<bool> started_ = {false};
 };
 
 }  // namespace cyber
