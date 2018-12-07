@@ -155,6 +155,27 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "junction_mlp_evaluator_test",
+    size = "small",
+    srcs = [
+        "junction_mlp_evaluator_test.cc",
+    ],
+    data = [
+        "//modules/prediction:prediction_data",
+        "//modules/prediction:prediction_testdata",
+    ],
+    deps = [
+        "//modules/common/util",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/obstacles:obstacles_container",
+        "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "cruise_mlp_evaluator",
     srcs = [
