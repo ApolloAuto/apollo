@@ -26,6 +26,7 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
@@ -36,15 +37,18 @@ class JunctionMLPEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
     std::string file =
-        "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
+        "modules/prediction/testdata/"
+        "single_perception_vehicle_injunction.pb.txt";
     CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
+    FLAGS_enable_all_junction = true;
+    JunctionAnalyzer::Init("j2");
   }
 
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;
 };
 
-TEST_F(JunctionMLPEvaluatorTest, OnLaneCase) {
+TEST_F(JunctionMLPEvaluatorTest, InJunctionCase) {
   EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
                    1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
@@ -52,7 +56,20 @@ TEST_F(JunctionMLPEvaluatorTest, OnLaneCase) {
   EXPECT_EQ(perception_obstacle.id(), 1);
   JunctionMLPEvaluator junction_mlp_evaluator;
   ObstaclesContainer container;
-  // TODO(all) implement
+  container.Insert(perception_obstacles_);
+  container.BuildJunctionFeature();
+  Obstacle* obstacle_ptr = container.GetObstacle(1);
+  EXPECT_TRUE(obstacle_ptr != nullptr);
+  junction_mlp_evaluator.Evaluate(obstacle_ptr);
+  const JunctionFeature& junction_feature =
+      obstacle_ptr->latest_feature().junction_feature();
+  EXPECT_EQ(junction_feature.junction_id(), "j2");
+  EXPECT_GT(junction_feature.junction_exit_size(), 0);
+  for (const auto& junction_exit : junction_feature.junction_exit()) {
+    EXPECT_TRUE(junction_exit.has_exit_lane_id());
+  }
+  EXPECT_EQ(junction_feature.junction_mlp_probability_size(), 12);
+  EXPECT_GT(junction_feature.junction_mlp_probability(0), 0.9);
   junction_mlp_evaluator.Clear();
 }
 
