@@ -33,7 +33,7 @@ class Llcmotionfeedback221 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   // config detail: {'name': 'LLC_FBK_VehicleSpeed', 'offset': 0.0, 'precision':
-  // 0.01, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|655.35]',
+  // 0.028, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|183.498]',
   // 'bit': 32, 'type': 'double', 'order': 'intel', 'physical_unit': 'm/s'}
   double llc_fbk_vehiclespeed(const std::uint8_t* bytes,
                               const int32_t length) const;

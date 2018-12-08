@@ -138,7 +138,7 @@ message Llc_motionfeedback1_20 {
 
 message Llc_motionfeedback2_21 {
 // Report Message
-  // [m/s] [0|655.35]
+  // [m/s] [0|183.498]
   optional double llc_fbk_vehiclespeed = 1;
   // Motion feedback 2 heartbeat counter [] [0|3]
   optional int32 llc_motionfeedback2_counter = 2;
