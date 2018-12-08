@@ -10,12 +10,10 @@ import "modules/dreamview/proto/hmi_status.proto";
 // Rich metadata for a Cyber record, which contains useful information for
 // warehousing needs.
 message Record {
-  // Unique ID to identify record. Generally it's useful to be sortable. So
-  // we'll use <start time>_<file_size>.
-  optional string id = 1;
-
   // The input record to generate this proto.
-  optional string path = 2;
+  optional string path = 1;
+  // Generally the records in the same dir are recorded continuously.
+  optional string dir = 2;
 
   // Get from RecordReader.get_headerstring(). Some useful fields are:
   //   header.begin_time
