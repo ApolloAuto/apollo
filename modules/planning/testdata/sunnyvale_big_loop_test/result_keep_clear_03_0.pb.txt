@@ -73,3 +73,4 @@ engage_advice {
   advice: READY_TO_ENGAGE
 }
 trajectory_type: NORMAL
+replan_reason: "replan for no previous trajectory."
