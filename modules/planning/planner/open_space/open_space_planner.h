@@ -148,6 +148,7 @@ class OpenSpacePlanner : public Planner {
   OpenSpaceThreadData thread_data_;
   std::future<void> task_future_;
   std::atomic<bool> is_stop_{false};
+  std::atomic<bool> is_destination_{false};
   std::atomic<bool> trajectory_updated_{false};
   std::mutex open_space_mutex_;
 };

@@ -101,7 +101,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
       ADEBUG << "Init point reach destination, stop trajectory is "
-               "sent";
+                "sent";
       return Status::OK();
     } else if (destination_status ==
                Status(ErrorCode::OK, "vehicle reach end_pose")) {
@@ -111,7 +111,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
       GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
       LoadTrajectoryToFrame(frame);
       ADEBUG << "vehicle reach destination, stop trajectory is "
-               "sent";
+                "sent";
       return Status::OK();
     }
 
@@ -198,7 +198,7 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
 void OpenSpacePlanner::GenerateTrajectoryThread() {
   while (!is_stop_) {
-    {
+    if (!is_destination_) {
       ADEBUG << "Open space plan in multi-threads mode : start to generate new "
                 "trajectories";
       OpenSpaceThreadData thread_data;
@@ -217,6 +217,8 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
           trajectory_updated_.store(true);
         }
       }
+    } else {
+      ADEBUG << "Vehicle reach end thread not doing planning";
     }
   }
 }
@@ -233,19 +235,34 @@ apollo::common::Status OpenSpacePlanner::CheckDestination(
     const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose) {
   CHECK_EQ(end_pose.size(), 4);
-  constexpr double kepsilon = 1e-1;
-  const apollo::common::PathPoint path_point = planning_init_point.path_point();
-  double distance_to_init_point =
-      (path_point.x() - end_pose[0]) * (path_point.x() - end_pose[0]) +
-      (path_point.y() - end_pose[1]) * (path_point.y() - end_pose[1]);
-  double distance_to_vehicle =
-      (vehicle_state.x() - end_pose[0]) * (vehicle_state.x() - end_pose[0]) +
-      (vehicle_state.y() - end_pose[1]) * (vehicle_state.y() - end_pose[1]);
-  if (distance_to_init_point < kepsilon) {
-    return Status(ErrorCode::OK, "init_point reach end_pose");
+  Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
+  if (FLAGS_enable_open_space_planner_thread) {
+    end_pose_to_world_frame.SelfRotate(thread_data_.rotate_angle);
+    end_pose_to_world_frame += thread_data_.translate_origin;
+  } else {
+    end_pose_to_world_frame.SelfRotate(rotate_angle_);
+    end_pose_to_world_frame += translate_origin_;
   }
+  constexpr double kepsilon = 1e-3;
+  // const apollo::common::PathPoint path_point =
+  // planning_init_point.path_point(); double distance_to_init_point =
+  //     (path_point.x() - end_pose_to_world_frame.x()) *
+  //         (path_point.x() - end_pose_to_world_frame.x()) +
+  //     (path_point.y() - end_pose_to_world_frame.y()) *
+  //         (path_point.y() - end_pose_to_world_frame.y());
+  double distance_to_vehicle =
+      (vehicle_state.x() - end_pose_to_world_frame.x()) *
+          (vehicle_state.x() - end_pose_to_world_frame.x()) +
+      (vehicle_state.y() - end_pose_to_world_frame.y()) *
+          (vehicle_state.y() - end_pose_to_world_frame.y());
+  // if (distance_to_init_point < kepsilon) {
+  //   AINFO<<"init_point reach end_pose";
+  //   return Status(ErrorCode::OK, "init_point reach end_pose");
+  // }
 
   if (distance_to_vehicle < kepsilon) {
+    ADEBUG << "vehicle reach end_pose";
+    is_destination_.store(true);
     return Status(ErrorCode::OK, "vehicle reach end_pose");
   }
   return Status::OK();
@@ -262,8 +279,8 @@ void OpenSpacePlanner::GenerateStopTrajectory(
     apollo::common::TrajectoryPoint* point =
         trajectory_to_stop.add_trajectory_point();
     point->mutable_path_point()->set_x(stop_x);
-    point->mutable_path_point()->set_x(stop_y);
-    point->mutable_path_point()->set_x(stop_theta);
+    point->mutable_path_point()->set_y(stop_y);
+    point->mutable_path_point()->set_theta(stop_theta);
     point->mutable_path_point()->set_s(0.0);
     point->mutable_path_point()->set_kappa(0.0);
     point->set_relative_time(relative_time);
