@@ -26,7 +26,7 @@ struct GlobalConfig {
   int track_feature_gpu_id;
 
  private:
-  DECLARE_SINGLETON(GlobalConfig);
+  DECLARE_SINGLETON(GlobalConfig)
 };
 
 inline GlobalConfig::GlobalConfig() {}

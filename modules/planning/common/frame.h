@@ -226,7 +226,7 @@ class Frame {
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
  private:
-  DECLARE_SINGLETON(FrameHistory);
+  DECLARE_SINGLETON(FrameHistory)
 };
 
 }  // namespace planning

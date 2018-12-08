@@ -80,7 +80,7 @@ class HDMapInput {
   int hdmap_sample_step_ = 5;
   std::string hdmap_file_;
 
-  DECLARE_SINGLETON(HDMapInput);
+  DECLARE_SINGLETON(HDMapInput)
 };
 
 }  // namespace map

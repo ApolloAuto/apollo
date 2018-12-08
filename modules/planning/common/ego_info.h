@@ -85,7 +85,7 @@ class EgoInfo {
 
   common::math::Box2d ego_box_;
 
-  DECLARE_SINGLETON(EgoInfo);
+  DECLARE_SINGLETON(EgoInfo)
 };
 
 }  // namespace planning

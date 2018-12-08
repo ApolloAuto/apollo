@@ -36,7 +36,7 @@ class VehicleManager {
  private:
   VehicleData vehicle_data_;
 
-  DECLARE_SINGLETON(VehicleManager);
+  DECLARE_SINGLETON(VehicleManager)
 };
 
 }  // namespace dreamview

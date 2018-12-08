@@ -158,7 +158,7 @@ class ConfigManager {
   bool inited_ = false;
   std::string work_root_;  // ConfigManager work root dir.
 
-  DECLARE_SINGLETON(ConfigManager);
+  DECLARE_SINGLETON(ConfigManager)
 };
 
 class ModelConfig {

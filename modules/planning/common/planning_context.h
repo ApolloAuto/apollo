@@ -74,7 +74,7 @@ class PlanningContext {
   static ScenarioInfo scenario_info_;
 
   // this is a singleton class
-  DECLARE_SINGLETON(PlanningContext);
+  DECLARE_SINGLETON(PlanningContext)
 };
 
 }  // namespace planning

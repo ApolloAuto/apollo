@@ -66,7 +66,7 @@ class SplineSegKernel {
   Eigen::MatrixXd kernel_second_order_derivative_;
   Eigen::MatrixXd kernel_third_order_derivative_;
 
-  DECLARE_SINGLETON(SplineSegKernel);
+  DECLARE_SINGLETON(SplineSegKernel)
 };
 
 }  // namespace planning

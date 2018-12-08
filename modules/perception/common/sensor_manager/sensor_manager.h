@@ -85,7 +85,7 @@ class SensorManager {
   std::unordered_map<std::string, std::shared_ptr<BaseCameraModel>>
       undistort_model_map_;
 
-  DECLARE_SINGLETON(SensorManager);
+  DECLARE_SINGLETON(SensorManager)
 };
 
 }  // namespace common

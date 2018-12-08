@@ -65,7 +65,7 @@ class SensorDataManager {
   const common::SensorManager* sensor_manager_ = nullptr;
 
   FRIEND_TEST(SensorDataManagerTest, test);
-  DECLARE_SINGLETON(SensorDataManager);
+  DECLARE_SINGLETON(SensorDataManager)
 };
 
 }  // namespace fusion

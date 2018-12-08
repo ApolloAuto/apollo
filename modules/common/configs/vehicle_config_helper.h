@@ -120,7 +120,7 @@ class VehicleConfigHelper {
  private:
   static VehicleConfig vehicle_config_;
   static bool is_init_;
-  DECLARE_SINGLETON(VehicleConfigHelper);
+  DECLARE_SINGLETON(VehicleConfigHelper)
 };
 
 }  // namespace common
