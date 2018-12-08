@@ -70,7 +70,7 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
   return lane_graphs_[lane_id];
 }
 
-const LaneGraph& ObstacleClusters::GetLaneGraphWithoutMemorizing(
+LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
     const double start_s, const double length,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   RoadGraph road_graph(start_s, length, lane_info_ptr);

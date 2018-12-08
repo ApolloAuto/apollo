@@ -51,15 +51,15 @@ using ::apollo::perception::PerceptionObstacle;
 namespace {
 
 double Damp(const double x, const double sigma) {
-  return 1 / (1 + exp(1 / (std::fabs(x) + sigma)));
+  return 1.0 / (1.0 + std::exp(1.0 / (std::fabs(x) + sigma)));
 }
 
 bool IsClosed(const double x0, const double y0, const double theta0,
               const double x1, const double y1, const double theta1) {
-  // TODO(all) move constants to gflags
   double angle_diff = std::abs(common::math::AngleDiff(theta0, theta1));
   double distance = std::hypot(x0 - x1, y0 - y1);
-  return distance < 1.0 && angle_diff < M_PI * 0.25;
+  return distance < FLAGS_distance_threshold_to_junction_exit &&
+         angle_diff < FLAGS_angle_threshold_to_junction_exit;
 }
 
 }  // namespace
@@ -217,7 +217,6 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 
 bool Obstacle::IsInJunction(const std::string& junction_id) {
   // TODO(all) Consider if need to use vehicle front rather than position
-  // TODO(all) refactor according to virtual lane if needed
   if (feature_history_.size() == 0) {
     AERROR << "Obstacle [" << id_ << "] has no history";
     return false;
@@ -250,10 +249,7 @@ void Obstacle::BuildJunctionFeature() {
     CHECK(prev_feature.junction_feature().enter_lane().has_lane_id());
     std::string enter_lane_id =
         prev_feature.junction_feature().enter_lane().lane_id();
-    // TODO(kechxu) deal with consecutive junctions
-    //              fix enter lane bugs
-    // SetJunctionFeatureWithEnterLane(
-    //     enter_lane_id, latest_feature_ptr);
+    // TODO(all) use enter lane when tracking is better
     SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
   } else {
     SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
@@ -296,7 +292,6 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
     AERROR << "Obstacle [" << id_ << "] has no lane.";
     return;
   }
-  // TODO(kechxu) enlarge searching range for lanes in junction
   std::vector<std::string> start_lane_ids;
   if (feature_ptr->lane().current_lane_feature_size() > 0) {
     for (const auto& lane_feature :

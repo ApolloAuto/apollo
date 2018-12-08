@@ -27,7 +27,6 @@ using apollo::prediction::CruiseModelParameter;
 
 void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
                       Eigen::MatrixXf* output) const {
-  // TODO(kechxu) implement
   // inputs = {lane_feature, obs_feature}
   CHECK_EQ(inputs.size(), 2);
   output->resize(1, 2);
@@ -103,8 +102,7 @@ void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
   // Step 7: Get regression result
   if (probability < FLAGS_lane_sequence_threshold_cruise ||
       !FLAGS_enable_cruise_regression) {
-    // TODO(kechxu) move to gflags
-    (*output)(0, 1) = 10.0;
+    (*output)(0, 1) = static_cast<float>(FLAGS_time_to_center_if_not_reach);
     return;
   }
 
