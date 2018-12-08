@@ -88,34 +88,6 @@ apollo::common::Status OpenSpacePlanner::Plan(
           open_space_roi_generator_->openspace_warmstart_obstacles();
     }
 
-    /*
-        // Check destination
-        apollo::common::Status destination_status =
-            CheckDestination(thread_data_.stitching_trajectory.back(),
-                             thread_data_.vehicle_state, thread_data_.end_pose);
-        if (destination_status ==
-            Status(ErrorCode::OK, "init_point reach end_pose")) {
-          double x = thread_data_.stitching_trajectory.back().path_point().x();
-          double y = thread_data_.stitching_trajectory.back().path_point().y();
-          double theta =
-              thread_data_.stitching_trajectory.back().path_point().theta();
-          GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
-          LoadTrajectoryToFrame(frame);
-          ADEBUG << "Init point reach destination, stop trajectory is "
-                    "sent";
-          return Status::OK();
-        } else if (destination_status ==
-                   Status(ErrorCode::OK, "vehicle reach end_pose")) {
-          double x = thread_data_.vehicle_state.x();
-          double y = thread_data_.vehicle_state.y();
-          double theta = thread_data_.vehicle_state.heading();
-          GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
-          LoadTrajectoryToFrame(frame);
-          ADEBUG << "vehicle reach destination, stop trajectory is "
-                    "sent";
-          return Status::OK();
-        }
-    */
     // Check if trajectory updated
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
@@ -152,34 +124,6 @@ apollo::common::Status OpenSpacePlanner::Plan(
     warmstart_obstacles_ =
         open_space_roi_generator_->openspace_warmstart_obstacles();
 
-    /*
-        // Check destination
-        apollo::common::Status destination_status = CheckDestination(
-            stitching_trajectory_.back(), vehicle_state_, end_pose_);
-        if (destination_status ==
-            Status(ErrorCode::OK, "init_point reach end_pose")) {
-          double x = stitching_trajectory_.back().path_point().x();
-          double y = stitching_trajectory_.back().path_point().y();
-          double theta = stitching_trajectory_.back().path_point().theta();
-          GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
-          LoadTrajectoryToFrame(frame);
-          ADEBUG << "Init point reaches destination, stop trajectory is "
-                    "sent";
-          return Status::OK();
-        } else if (destination_status ==
-                   Status(ErrorCode::OK, "vehicle reach end_pose")) {
-          double x = vehicle_state_.x();
-          double y = vehicle_state_.y();
-          double theta = vehicle_state_.heading();
-          GenerateStopTrajectory(x, y, theta, &trajectory_to_end_);
-          LoadTrajectoryToFrame(frame);
-          ADEBUG << "vehicle reaches destination, stop trajectory is "
-                    "sent";
-          return destination_status;
-        }
-
-    */
-
     // Generate Trajectory;
     Status status = open_space_trajectory_generator_->Plan(
         stitching_trajectory_, vehicle_state_, XYbounds_, rotate_angle_,
@@ -202,27 +146,23 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
 void OpenSpacePlanner::GenerateTrajectoryThread() {
   while (!is_stop_) {
-    if (!is_destination_) {
-      ADEBUG << "Open space plan in multi-threads mode : start to generate new "
-                "trajectories";
-      OpenSpaceThreadData thread_data;
-      {
-        std::lock_guard<std::mutex> lock(open_space_mutex_);
-        thread_data = thread_data_;
+    OpenSpaceThreadData thread_data;
+    {
+      std::lock_guard<std::mutex> lock(open_space_mutex_);
+      thread_data = thread_data_;
+    }
+    if (!trajectory_updated_) {
+      if (open_space_trajectory_generator_->Plan(
+              thread_data.stitching_trajectory, thread_data.vehicle_state,
+              thread_data.XYbounds, thread_data.rotate_angle,
+              thread_data.translate_origin, thread_data.end_pose,
+              thread_data.obstacles_num, thread_data.obstacles_edges_num,
+              thread_data.obstacles_A, thread_data.obstacles_b,
+              thread_data.warmstart_obstacles) == Status::OK()) {
+        trajectory_updated_.store(true);
+      } else {
+        AERROR << "Multi-thread trajectory generator failed";
       }
-      if (!trajectory_updated_) {
-        if (open_space_trajectory_generator_->Plan(
-                thread_data.stitching_trajectory, thread_data.vehicle_state,
-                thread_data.XYbounds, thread_data.rotate_angle,
-                thread_data.translate_origin, thread_data.end_pose,
-                thread_data.obstacles_num, thread_data.obstacles_edges_num,
-                thread_data.obstacles_A, thread_data.obstacles_b,
-                thread_data.warmstart_obstacles) == Status::OK()) {
-          trajectory_updated_.store(true);
-        }
-      }
-    } else {
-      ADEBUG << "Vehicle reach end thread not doing planning";
     }
   }
 }
@@ -232,30 +172,6 @@ void OpenSpacePlanner::Stop() {
   if (FLAGS_enable_open_space_planner_thread) {
     task_future_.get();
   }
-}
-
-void OpenSpacePlanner::GenerateStopTrajectory(
-    const double& stop_x, const double& stop_y, const double& stop_theta,
-    common::Trajectory* trajectory_to_end) {
-  constexpr int stop_trajectory_length = 10;
-  constexpr double relative_stop_time = 0.1;
-  apollo::common::Trajectory trajectory_to_stop;
-  double relative_time = 0;
-  for (int i = 0; i < stop_trajectory_length; i++) {
-    apollo::common::TrajectoryPoint* point =
-        trajectory_to_stop.add_trajectory_point();
-    point->mutable_path_point()->set_x(stop_x);
-    point->mutable_path_point()->set_y(stop_y);
-    point->mutable_path_point()->set_theta(stop_theta);
-    point->mutable_path_point()->set_s(0.0);
-    point->mutable_path_point()->set_kappa(0.0);
-    point->set_relative_time(relative_time);
-    point->set_v(0.0);
-    point->set_a(0.0);
-    relative_time += relative_stop_time;
-  }
-  trajectory_to_end->mutable_trajectory_point()->CopyFrom(
-      *(trajectory_to_stop.mutable_trajectory_point()));
 }
 
 void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
