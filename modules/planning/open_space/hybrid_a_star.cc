@@ -75,6 +75,12 @@ bool HybridAStar::RSPCheck(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
     const IndexedObstacles& obstacles) {
   for (size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
+    if (reeds_shepp_to_end->x[i] > XYbounds_[1] ||
+        reeds_shepp_to_end->x[i] < XYbounds_[0] ||
+        reeds_shepp_to_end->y[i] > XYbounds_[3] ||
+        reeds_shepp_to_end->y[i] < XYbounds_[2]) {
+      return false;
+    }
     std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
         reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
         reeds_shepp_to_end->phi[i], XYbounds_, planner_open_space_config_));
