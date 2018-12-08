@@ -79,7 +79,7 @@ class OpenSpaceTrajectoryGenerator {
   apollo::common::Status Plan(
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       const apollo::common::VehicleState& vehicle_state,
-      const std::vector<double>& XYbounds, const double rotate_angle,
+      const std::vector<double>& XYbounds, const double& rotate_angle,
       const apollo::common::math::Vec2d& translate_origin,
       const std::vector<double>& end_pose, std::size_t obstacles_num,
       const Eigen::MatrixXi& obstacles_edges_num,
@@ -116,6 +116,13 @@ class OpenSpaceTrajectoryGenerator {
                        const IndexedObstacles& obstalce_list);
 
  private:
+  bool IsNearDestination(const common::TrajectoryPoint& planning_init_point,
+                         const apollo::common::VehicleState& vehicle_state,
+                         const std::vector<double>& end_pose,
+                         const double& rotate_angle,
+                         const Vec2d& translate_origin,
+                         const double& is_near_desitination_threshold);
+
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;

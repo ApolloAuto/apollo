@@ -99,8 +99,8 @@ class OpenSpacePlanner : public Planner {
   apollo::common::Status Plan(
       const common::TrajectoryPoint& planning_init_point,
       Frame* frame) override {
-          return Status::OK();
-      }
+    return Status::OK();
+  }
 
   apollo::common::Status Plan(
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
@@ -111,11 +111,6 @@ class OpenSpacePlanner : public Planner {
   void Stop() override;
 
  private:
-  apollo::common::Status CheckDestination(
-      const common::TrajectoryPoint& planning_init_point,
-      const apollo::common::VehicleState& vehicle_state,
-      const std::vector<double>& end_pose);
-
   void GenerateStopTrajectory(const double& stop_x, const double& stop_y,
                               const double& stop_theta,
                               common::Trajectory* trajectory_to_end);
