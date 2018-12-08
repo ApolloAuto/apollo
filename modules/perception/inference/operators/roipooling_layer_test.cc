@@ -94,7 +94,7 @@ TEST(ROIPoolRoundTest, test) {
   int pooled_w = 7;
   bool use_floor = false;
   int feat_channel = 1;
-  float spatial_scale = 16.0;
+  float spatial_scale = 16.0f;
   auto roi_layer = new apollo::perception::inference::ROIPoolingLayer<float>(
       pooled_h, pooled_w, use_floor, spatial_scale, feat_channel);
   std::vector<int> feat_shape{2, feat_channel, 30, 30};

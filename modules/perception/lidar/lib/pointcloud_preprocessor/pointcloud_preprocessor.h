@@ -67,12 +67,12 @@ class PointCloudPreprocessor {
   // params
   bool filter_naninf_points_ = true;
   bool filter_nearby_box_points_ = true;
-  float box_forward_x_ = 0.0;
-  float box_backward_x_ = 0.0;
-  float box_forward_y_ = 0.0;
-  float box_backward_y_ = 0.0;
+  float box_forward_x_ = 0.0f;
+  float box_backward_x_ = 0.0f;
+  float box_forward_y_ = 0.0f;
+  float box_backward_y_ = 0.0f;
   bool filter_high_z_points_ = true;
-  float z_threshold_ = 5.0;
+  float z_threshold_ = 5.0f;
   static const float kPointInfThreshold;
 };  // class PointCloudPreprocessor
 

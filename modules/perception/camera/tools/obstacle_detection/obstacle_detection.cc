@@ -101,13 +101,13 @@ bool LoadFromKitti(const std::string &kitti_path, CameraFrame *frame) {
   while (!feof(fp)) {
     base::ObjectPtr obj = nullptr;
     obj.reset(new base::Object);
-    float trash = 0.0;
-    float score = 0.0;
+    float trash = 0.0f;
+    float score = 0.0f;
     char type[255];
-    float x1 = 0.0;
-    float y1 = 0.0;
-    float x2 = 0.0;
-    float y2 = 0.0;
+    float x1 = 0.0f;
+    float y1 = 0.0f;
+    float x2 = 0.0f;
+    float y2 = 0.0f;
     memset(type, 0, sizeof(type));
 
     int ret = 0;

@@ -87,9 +87,9 @@ class FeatureGenerator {
   // feature param
   int width_ = 0;
   int height_ = 0;
-  float range_ = 0.0;
-  float min_height_ = 0.0;
-  float max_height_ = 0.0;
+  float range_ = 0.0f;
+  float min_height_ = 0.0f;
+  float max_height_ = 0.0f;
   bool use_intensity_feature_ = false;
   bool use_constant_feature_ = false;
 

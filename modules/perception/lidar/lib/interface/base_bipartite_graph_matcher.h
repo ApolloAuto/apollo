@@ -32,8 +32,8 @@ namespace lidar {
 struct BipartiteGraphMatcherInitOptions {};
 
 struct BipartiteGraphMatcherOptions {
-  float cost_thresh = 4.0;
-  float bound_value = 100.0;
+  float cost_thresh = 4.0f;
+  float bound_value = 100.0f;
 };
 
 class BaseBipartiteGraphMatcher {

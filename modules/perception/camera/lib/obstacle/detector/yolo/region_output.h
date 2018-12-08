@@ -98,10 +98,10 @@ struct YoloBlobs {
   std::shared_ptr<base::Blob<float>> expand_blob;
 };
 struct MinDims {
-  float min_2d_height = 0;
-  float min_3d_height = 0;
-  float min_3d_length = 0;
-  float min_3d_width = 0;
+  float min_2d_height = 0.0f;
+  float min_3d_height = 0.0f;
+  float min_3d_length = 0.0f;
+  float min_3d_width = 0.0f;
 };
 
 __host__ __device__

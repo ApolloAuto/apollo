@@ -56,7 +56,7 @@ void MlfMotionMeasurement::MeasurementSelection(
     const TrackedObjectConstPtr& latest_object, TrackedObjectPtr new_object) {
   // Select measured velocity among candidates according motion consistency
   int corner_index = 0;
-  float corner_velocity_gain = 0;
+  float corner_velocity_gain = 0.0f;
   std::vector<float> corner_velocity_gain_norms(4);
   for (int i = 0; i < 4; ++i) {
     corner_velocity_gain_norms[i] = (new_object->measured_corners_velocity[i] -

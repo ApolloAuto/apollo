@@ -148,8 +148,8 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
 
     if (Contain(object_template_manager_->TypeRefinedByTemplate(),
                 obj->sub_type)) {
-      float min_template_volume = 0;
-      float max_template_volume = 0;
+      float min_template_volume = 0.0f;
+      float max_template_volume = 0.0f;
       auto min_tmplt = kMinTemplateHWL.at(obj->sub_type);
       auto max_tmplt = kMaxTemplateHWL.at(obj->sub_type);
       min_template_volume = min_tmplt[0] * min_tmplt[1] * min_tmplt[2];

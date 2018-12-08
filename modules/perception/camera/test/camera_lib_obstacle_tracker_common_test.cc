@@ -92,7 +92,7 @@ TEST(EKFTest, ekf_test) {
 //  Eigen::Vector3d x;
 //  Eigen::Vector3d z;  // observation: x, y, theta
 //  float speed = 3.0f;
-//  float theta = 0.5;
+//  float theta = 0.5f;
 //  ekf.Init();
 //  ekf.measure_noise_ *= 5;
 //  ekf.Predict(1.f);

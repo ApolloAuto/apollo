@@ -24,7 +24,7 @@ void init_sin_cos_rot_table(float* sin_rot_table, float* cos_rot_table,
                             uint16_t rotation, float rotation_resolution) {
   for (uint16_t i = 0; i < rotation; ++i) {
     // float rotation = angles::from_degrees(rotation_resolution * i);
-    float rotation = rotation_resolution * i * M_PI / 180.0;
+    float rotation = rotation_resolution * i * M_PI / 180.0f;
     cos_rot_table[i] = cosf(rotation);
     sin_rot_table[i] = sinf(rotation);
   }

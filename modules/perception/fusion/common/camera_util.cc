@@ -86,7 +86,7 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
                          const Eigen::Affine3d& camera_sensor2world_pose,
                          double camera_ts, double camera_max_dist,
                          bool motion_compensation, bool all_in) {
-  float in_view_ratio = 0.0;
+  float in_view_ratio = 0.0f;
   Eigen::Matrix4d world2sensor_pose =
       camera_sensor2world_pose.matrix().inverse();
   if (!world2sensor_pose.allFinite()) {

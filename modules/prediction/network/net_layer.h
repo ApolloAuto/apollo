@@ -311,8 +311,8 @@ class BatchNormalization : public Layer {
   Eigen::VectorXf sigma_;
   Eigen::VectorXf gamma_;
   Eigen::VectorXf beta_;
-  float epsilon_ = 0.0;
-  float momentum_ = 0.0;
+  float epsilon_ = 0.0f;
+  float momentum_ = 0.0f;
   int axis_ = 0;
   bool center_ = false;
   bool scale_ = false;

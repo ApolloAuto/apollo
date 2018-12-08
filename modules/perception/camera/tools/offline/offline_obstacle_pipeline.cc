@@ -146,7 +146,7 @@ int work() {
     AINFO << camera_names[i] << " height: " << camera_ground_height;
     name_camera_ground_height_map[camera_names[i]] = camera_ground_height;
     Eigen::Matrix3d project_matrix;
-    float pitch_diff = 0.0;
+    float pitch_diff = 0.0f;
     if (FLAGS_base_camera_name == camera_names[i]) {
       project_matrix = Eigen::Matrix3d::Identity();
       pitch_diff = 0;

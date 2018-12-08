@@ -42,7 +42,7 @@ double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
   double x_std_dev = 0.4;
   double y_std_dev = 0.5;
   size_t check_augmented_iou_minimum_pts_num = 20;
-  float augmented_buffer = 25;
+  float augmented_buffer = 25.0f;
   if (object->Empty()) {
     ADEBUG << "cache object is empty!";
     return min_p;
@@ -280,9 +280,9 @@ double ComputeRadarCameraVelocitySimilarity(
     float diff_velocity = (radar_velocity - camera_velocity).norm() / 2;
     float diff_velocity_ratio =
         diff_velocity / std::max(scalar_camera_velocity, scalar_radar_velocity);
-    const float velocity_std = 0.15;
-    const float max_velocity_p = 0.9;
-    const float th_velocity_p = 0.5;
+    const float velocity_std = 0.15f;
+    const float max_velocity_p = 0.9f;
+    const float th_velocity_p = 0.5f;
     float velocity_score =
         1 - ChiSquaredCdf1TableFun(diff_velocity_ratio * diff_velocity_ratio /
                                    velocity_std / velocity_std);

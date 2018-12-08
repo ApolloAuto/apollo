@@ -87,7 +87,7 @@ struct alignas(16) Object {
   // @brief if the velocity estimation is converged, true by default
   bool velocity_converged = true;
   // @brief velocity confidence, required
-  float velocity_confidence = 1.0;
+  float velocity_confidence = 1.0f;
   // @brief acceleration of the object, required
   Eigen::Vector3f acceleration = Eigen::Vector3f(0, 0, 0);
   // @brief covariance matrix of the acceleration uncertainty, required

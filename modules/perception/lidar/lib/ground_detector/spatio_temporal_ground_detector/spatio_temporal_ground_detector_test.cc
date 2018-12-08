@@ -125,8 +125,8 @@ TEST(SpatioTemporalGroundDetectorTest, test_spatio_temporal_ground_detector) {
   //     std::dynamic_pointer_cast<GroundService>(ground_service);
 
   // Eigen::Vector3d world_point(0.0, 0.0, 0.0);
-  // float out_query = 0.0;
-  // float out_detected = 0.0;
+  // float out_query = 0.0f;
+  // float out_detected = 0.0f;
   // for (size_t i = 0; i < 10; ++i) {
   //   const auto& index = frame_data->non_ground_indices.indices[i];
   //   const auto& pt = frame_data->world_cloud->at(index);

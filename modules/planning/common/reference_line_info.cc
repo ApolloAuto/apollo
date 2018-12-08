@@ -234,7 +234,7 @@ bool ReferenceLineInfo::CheckChangeLane() const {
   for (const auto* obstacle : path_decision_.obstacles().Items()) {
     const auto& sl_boundary = obstacle->PerceptionSLBoundary();
 
-    constexpr float kLateralShift = 2.5;
+    constexpr float kLateralShift = 2.5f;
     if (sl_boundary.start_l() < -kLateralShift ||
         sl_boundary.end_l() > kLateralShift) {
       continue;
@@ -247,9 +247,9 @@ bool ReferenceLineInfo::CheckChangeLane() const {
       return false;
     }
 
-    constexpr float kSafeTime = 3.0;
-    constexpr float kForwardMinSafeDistance = 6.0;
-    constexpr float kBackwardMinSafeDistance = 8.0;
+    constexpr float kSafeTime = 3.0f;
+    constexpr float kForwardMinSafeDistance = 6.0f;
+    constexpr float kBackwardMinSafeDistance = 8.0f;
 
     const float kForwardSafeDistance = std::max(
         kForwardMinSafeDistance,

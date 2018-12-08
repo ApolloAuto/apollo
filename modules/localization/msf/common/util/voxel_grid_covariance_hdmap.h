@@ -340,7 +340,7 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
         // Get the distance value
         const uint8_t* pt_data =
             reinterpret_cast<const uint8_t*>(&input_->points[cp]);
-        float distance_value = 0;
+        float distance_value = 0.0f;
         memcpy(&distance_value, pt_data + fields[distance_idx].offset,
                sizeof(float));
 

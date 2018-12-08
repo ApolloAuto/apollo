@@ -70,9 +70,9 @@ class FeatureDescriptor {
 
  private:
   void GetMinMaxCenter() {
-    float xsum = 0.0;
-    float ysum = 0.0;
-    float zsum = 0.0;
+    float xsum = 0.0f;
+    float ysum = 0.0f;
+    float zsum = 0.0f;
     min_pt_.x = min_pt_.y = min_pt_.z = FLT_MAX;
     max_pt_.x = max_pt_.y = max_pt_.z = -FLT_MAX;
 

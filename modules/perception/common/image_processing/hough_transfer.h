@@ -27,9 +27,9 @@ namespace perception {
 namespace common {
 
 struct HoughLine {
-  float r = 0.0;
-  float theta = 0.0;
-  float length = 0.0;
+  float r = 0.0f;
+  float theta = 0.0f;
+  float length = 0.0f;
   int vote_num = 0;
   std::vector<int> pts;
 };

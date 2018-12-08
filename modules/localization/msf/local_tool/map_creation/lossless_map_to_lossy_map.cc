@@ -174,11 +174,11 @@ int main(int argc, char** argv) {
   for (; itr != buf.end(); ++itr, ++index) {
     // int single_alt = 0;
     // int double_alt = 0;
-    // float delta_alt_max = 0.0;
-    // float delta_alt_min = 100.0;
+    // float delta_alt_max = 0.0f;
+    // float delta_alt_min = 100.0f;
     // int delta_alt_minus_num = 0;
-    // float alt_max = 0.0;
-    // float alt_min = 100.0;
+    // float alt_max = 0.0f;
+    // float alt_min = 100.0f;
 
     LosslessMapNode* lossless_node =
         static_cast<LosslessMapNode*>(lossless_map.GetMapNodeSafe(*itr));
@@ -203,8 +203,8 @@ int main(int argc, char** argv) {
         unsigned int count = lossless_node->GetCount(row, col);
 
         // Read altitude
-        float altitude_ground = 0.0;
-        float altitude_avg = 0.0;
+        float altitude_ground = 0.0f;
+        float altitude_avg = 0.0f;
         bool is_ground_useful = false;
         std::vector<float> layer_alts;
         std::vector<unsigned int> layer_counts;

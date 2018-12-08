@@ -51,7 +51,7 @@ struct SppData {
   size_t data_width = 0;
   size_t data_height = 0;
   size_t data_size = 0;
-  float data_range = 0;
+  float data_range = 0.0f;
 
   void MakeReference(size_t width, size_t height, float range);
 

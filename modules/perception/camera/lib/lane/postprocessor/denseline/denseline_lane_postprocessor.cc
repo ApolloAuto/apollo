@@ -182,7 +182,7 @@ void DenselineLanePostprocessor::CalLaneMap(
       score_channel[2] = output_data[channel2_pos + x];
       score_channel[3] = output_data[channel3_pos + x];
       //  utilize softmax to get the probability
-      float sum_score = 0;
+      float sum_score = 0.0f;
       for (int i = 0; i < 4; i++) {
         score_channel[i] = static_cast<float>(exp(score_channel[i]));
         sum_score += score_channel[i];
@@ -717,13 +717,13 @@ void DenselineLanePostprocessor::AddImageLaneline(
     return;
   }
   //  check the validity of laneline
-  float sum_dist = 0;
-  float avg_dist = 0;
+  float sum_dist = 0.0f;
+  float avg_dist = 0.0f;
   int count = 0;
   for (int i = 0; i < image_point_set_size; i++) {
     float x_pos = img_pos_vec[i](0, 0);
     float y_pos = img_pos_vec[i](1, 0);
-    float x_poly = 0;
+    float x_poly = 0.0f;
     PolyEval(y_pos, max_poly_order, img_coeff, &x_poly);
     float dist = static_cast<float>(fabs(x_poly - x_pos));
     sum_dist += dist;
@@ -762,7 +762,7 @@ void DenselineLanePostprocessor::PolyFitCameraLaneline(
     // z: longitudinal direction
     // x: latitudinal direction
     float x_start = camera_point_set[0].z;
-    float x_end = 0;
+    float x_end = 0.0f;
     Eigen::Matrix<float, max_poly_order + 1, 1> camera_coeff;
     std::vector<Eigen::Matrix<float, 2, 1> > camera_pos_vec;
     for (int i = 0; i < static_cast<int>(camera_point_set.size()); i++) {

@@ -116,9 +116,9 @@ class LossyMapMatrix2D : public BaseMapMatrix {
   const int var_range_ = 1023;  // 65535;
   const int var_ratio_ = 4;     // 256;
   // const unsigned int _alt_range = 1023;//65535;
-  const float alt_ground_interval_ = 0.04;
+  const float alt_ground_interval_ = 0.04f;
   const uint16_t ground_void_flag_ = 0xffff;
-  const float alt_avg_interval_ = 0.04;
+  const float alt_avg_interval_ = 0.04f;
   const int count_range_ = 2;  // 30;
   mutable float alt_avg_min_;
   mutable float alt_avg_max_;

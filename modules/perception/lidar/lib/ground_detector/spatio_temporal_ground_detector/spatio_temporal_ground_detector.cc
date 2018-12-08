@@ -98,7 +98,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
   size_t num_points_all = 0;
   int index = 0;
   unsigned int nr_points_element = 3;
-  float z_distance = 0.0;
+  float z_distance = 0.0f;
 
   cloud_center_(0) = frame->lidar2world_pose(0, 3);
   cloud_center_(1) = frame->lidar2world_pose(1, 3);

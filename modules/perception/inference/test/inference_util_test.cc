@@ -97,7 +97,7 @@ TEST(UtilTest, NormTest) {
     norm.L2Norm(&data);
     const float *result = data.cpu_data();
     for (int i = 0; i < num; ++i) {
-      float sum = 0;
+      float sum = 0.0f;
       for (int j = 0; j < dim; ++j) {
         sum += (*result) * (*result);
         ++result;

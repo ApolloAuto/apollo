@@ -39,7 +39,7 @@ class CropBox : public IGetBox {
              const base::TrafficLightPtr &light, base::RectI *crop_box);
 
  private:
-  float crop_scale_ = 2.5;
+  float crop_scale_ = 2.5f;
   int min_crop_size_ = 270;
 };
 

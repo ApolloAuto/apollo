@@ -27,7 +27,7 @@ namespace common {
 
 // @brief: graph edge definition
 struct Edge {
-  float w = 0.0;
+  float w = 0.0f;
   int a = 0;
   int b = 0;
   // @brief: edge comparison

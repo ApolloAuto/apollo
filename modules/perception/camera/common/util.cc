@@ -118,7 +118,7 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
       const int y2_read = std::min(y2, height - 1);
       int src_reg = 0;
       for (int c = 0; c < channel; c++) {
-        float out = 0;
+        float out = 0.0f;
 
         int idx11 = (y1_read * stepwidth + x1_read) * channel;
         src_reg = src[idx11 + c];

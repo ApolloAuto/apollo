@@ -144,7 +144,7 @@ void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   output->resize(output_num_row, output_num_col);
   for (int i = 0; i < output_num_row; ++i) {
     for (int j = 0; j < output_num_col; ++j) {
-      float output_i_j_unbiased = 0.0;
+      float output_i_j_unbiased = 0.0f;
       for (int p = 0; p < inputs[0].rows(); ++p) {
         for (int q = j * stride_; q < j * stride_ + kernel_size; ++q) {
           output_i_j_unbiased +=
@@ -233,7 +233,7 @@ void AvgPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   for (int j = 0; j < output_num_col; ++j) {
     CHECK_LE(input_index + kernel_size_, inputs[0].cols());
     for (int i = 0; i < output_num_row; ++i) {
-      float output_i_j_sum = 0.0;
+      float output_i_j_sum = 0.0f;
       for (int k = input_index; k < input_index + kernel_size_; ++k) {
         output_i_j_sum += inputs[0](i, k);
       }
