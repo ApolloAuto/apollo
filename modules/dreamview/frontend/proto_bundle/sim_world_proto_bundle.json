@@ -613,6 +613,14 @@
                     "labelString": {
                       "type": "string",
                       "id": 3
+                    },
+                    "windowSize": {
+                      "type": "double",
+                      "id": 4
+                    },
+                    "stepSize": {
+                      "type": "double",
+                      "id": 5
                     }
                   }
                 }
@@ -794,6 +802,7 @@
                 "PERCEPTION_ERROR_UNKNOWN": 4005,
                 "PREDICTION_ERROR": 5000,
                 "PLANNING_ERROR": 6000,
+                "PLANNING_ERROR_NOT_READY": 6001,
                 "HDMAP_DATA_ERROR": 7000,
                 "ROUTING_ERROR": 8000,
                 "ROUTING_ERROR_REQUEST": 8001,
@@ -5886,7 +5895,7 @@
                   }
                 },
                 "maxIteration": {
-                  "type": "int32",
+                  "type": "uint32",
                   "id": 3,
                   "options": {
                     "default": 1000
@@ -5907,38 +5916,31 @@
                   }
                 },
                 "optAcceptableIteration": {
-                  "type": "int32",
+                  "type": "uint32",
                   "id": 6,
                   "options": {
                     "default": 15
                   }
                 },
-                "optWeightCurveLength": {
+                "weightCurveLength": {
                   "type": "double",
                   "id": 7,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "optWeightKappa": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 1.5
-                  }
-                },
-                "optWeightDkappa": {
-                  "type": "double",
-                  "id": 9,
                   "options": {
                     "default": 1
                   }
                 },
-                "optWeightD2kappa": {
+                "weightKappa": {
                   "type": "double",
-                  "id": 10,
+                  "id": 8,
                   "options": {
-                    "default": 0
+                    "default": 1
+                  }
+                },
+                "weightDkappa": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 100
                   }
                 }
               }

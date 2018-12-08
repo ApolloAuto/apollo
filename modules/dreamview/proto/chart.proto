@@ -9,6 +9,8 @@ message Options {
         optional double min = 1;
         optional double max = 2;
         optional string label_string = 3;
+        optional double window_size = 4;
+        optional double step_size = 5;
     }
 
     optional bool legend_display = 1 [default = true];

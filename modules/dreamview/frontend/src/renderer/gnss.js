@@ -42,7 +42,7 @@ export default class GNSS {
     const position = coordinates.applyOffset({
       x: world.gps.positionX,
       y: world.gps.positionY,
-      z: 0,
+      z: 0.01,
     });
 
     this.circle.position.set(position.x, position.y, position.z);
