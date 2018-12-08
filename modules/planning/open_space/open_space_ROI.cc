@@ -418,6 +418,17 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   ROI_xy_boundary_.emplace_back(x_max);
   ROI_xy_boundary_.emplace_back(y_min);
   ROI_xy_boundary_.emplace_back(y_max);
+
+  // check if vehicle in range of xy_boundary
+  Vec2d vehicle_xy = Vec2d(vehicle_state_.x(), vehicle_state_.y());
+  vehicle_xy -= origin_point_;
+  vehicle_xy.SelfRotate(-1.0 * origin_heading_);
+  if (vehicle_xy.x() > x_max || vehicle_xy.x() < x_min ||
+      vehicle_xy.y() > y_max || vehicle_xy.y() < y_min) {
+    std::string msg("vehicle pose outside of xy boundary of parking ROI");
+    AERROR << msg;
+    return false;
+  }
   // If smaller than zero, the parking spot is on the right of the lane
   // Left, right, down or up of the boundary is decided when viewing the
   // parking spot upward
@@ -522,26 +533,14 @@ bool OpenSpaceROI::GetMapInfo(ParkingSpaceInfoConstPtr *target_parking_spot,
       segments_vector.emplace_back(next_lanesegment);
       (*nearby_path).reset(new Path(segments_vector));
       SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot);
-      if (*target_parking_spot == nullptr) {
-        std::string msg("No target parking spot found on path");
-        ADEBUG << msg << nearest_lane->id().id() << " + "
-               << next_lane->id().id();
-        segments_vector.clear();
-      } else {
-        return true;
+      if (*target_parking_spot != nullptr) {
+        break;
       }
     }
   } else {
     segments_vector.push_back(nearest_lanesegment);
     (*nearby_path).reset(new Path(segments_vector));
     SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot);
-    if (*target_parking_spot == nullptr) {
-      std::string msg(
-          "No target parking spot found on the path which has no next lane");
-      ADEBUG << msg << nearest_lane->id().id();
-    } else {
-      return true;
-    }
   }
 
   if (*target_parking_spot == nullptr) {

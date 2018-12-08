@@ -23,6 +23,12 @@
 namespace apollo {
 namespace planning {
 
+Node3d::Node3d(double x, double y, double phi) {
+  x_ = x;
+  y_ = y;
+  phi_ = phi;
+}
+
 Node3d::Node3d(double x, double y, double phi,
                const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
@@ -31,6 +37,10 @@ Node3d::Node3d(double x, double y, double phi,
   x_ = x;
   y_ = y;
   phi_ = phi;
+  CHECK_GE(x_, XYbounds[0])
+      << "x_ is smaller than xmin when constructing node3d";
+  CHECK_GE(y_, XYbounds[2])
+      << "y_ is smaller than ymin when constructing node3d";
   x_grid_ = static_cast<std::size_t>(
       (x_ - XYbounds[0]) /
       open_space_conf.warm_start_config().xy_grid_resolution());
@@ -47,26 +57,20 @@ Node3d::Node3d(double x, double y, double phi,
       static_cast<double>(x_grid_));
 }
 
-Node3d::Node3d(double x, double y, double phi) {
-  x_ = x;
-  y_ = y;
-  phi_ = phi;
-}
-
-Node3d::Node3d(double x, double y, double phi, std::vector<double> traversed_x,
+Node3d::Node3d(std::vector<double> traversed_x,
                std::vector<double> traversed_y,
                std::vector<double> traversed_phi,
                const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
   CHECK(XYbounds.size() == 4)
       << "XYbounds size is not 4, but" << XYbounds.size();
-  x_ = x;
-  y_ = y;
-  phi_ = phi;
+  x_ = traversed_x.back();
+  y_ = traversed_y.back();
+  phi_ = traversed_phi.back();
   CHECK_GE(x_, XYbounds[0])
-      << "x_ is smaller than xmin when constructing node3d, but";
+      << "x_ is smaller than xmin when constructing node3d";
   CHECK_GE(y_, XYbounds[2])
-      << "y_ is smaller than ymin when constructing node3d, but";
+      << "y_ is smaller than ymin when constructing node3d";
   // XYbounds in xmin, xmax, ymin, ymax
   x_grid_ = static_cast<std::size_t>(
       (x_ - XYbounds[0]) /

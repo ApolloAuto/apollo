@@ -37,12 +37,11 @@ using apollo::common::math::Vec2d;
 
 class Node3d {
  public:
+  explicit Node3d(double x, double y, double phi);
   explicit Node3d(double x, double y, double phi,
                   const std::vector<double>& XYbounds,
                   const PlannerOpenSpaceConfig& open_space_conf);
-  explicit Node3d(double x, double y, double phi);
-  explicit Node3d(double x, double y, double phi,
-                  std::vector<double> traversed_x_,
+  explicit Node3d(std::vector<double> traversed_x_,
                   std::vector<double> traversed_y_,
                   std::vector<double> traversed_phi_,
                   const std::vector<double>& XYbounds,

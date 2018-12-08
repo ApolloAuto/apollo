@@ -102,11 +102,9 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node,
 std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
     std::shared_ptr<Node3d> current_node) {
-  std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(
-      new Node3d(reeds_shepp_to_end->x.back(), reeds_shepp_to_end->y.back(),
-                 reeds_shepp_to_end->phi.back(), reeds_shepp_to_end->x,
-                 reeds_shepp_to_end->y, reeds_shepp_to_end->phi, XYbounds_,
-                 planner_open_space_config_));
+  std::shared_ptr<Node3d> end_node = std::shared_ptr<Node3d>(new Node3d(
+      reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
+      XYbounds_, planner_open_space_config_));
   end_node->SetPre(current_node);
   end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
@@ -155,9 +153,16 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
     last_y = next_y;
     last_phi = next_phi;
   }
+  // check if the vehicle runs outside of XY boundary
+  if (intermediate_x.back() > XYbounds_[1] ||
+      intermediate_x.back() < XYbounds_[0] ||
+      intermediate_y.back() > XYbounds_[3] ||
+      intermediate_y.back() < XYbounds_[2]) {
+    return nullptr;
+  }
   std::shared_ptr<Node3d> next_node = std::shared_ptr<Node3d>(
-      new Node3d(last_x, last_y, last_phi, intermediate_x, intermediate_y,
-                 intermediate_phi, XYbounds_, planner_open_space_config_));
+      new Node3d(intermediate_x, intermediate_y, intermediate_phi, XYbounds_,
+                 planner_open_space_config_));
   next_node->SetPre(current_node);
   next_node->SetDirec(traveled_distance > 0);
   next_node->SetSteer(steering);
@@ -323,16 +328,10 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
   // load XYbounds
   XYbounds_ = XYbounds;
   // load nodes and obstacles
-  std::vector<double> sx_vec{sx};
-  std::vector<double> sy_vec{sy};
-  std::vector<double> sphi_vec{sphi};
-  std::vector<double> ex_vec{ex};
-  std::vector<double> ey_vec{ey};
-  std::vector<double> ephi_vec{ephi};
-  start_node_.reset(new Node3d(sx, sy, sphi, sx_vec, sy_vec, sphi_vec,
-                               XYbounds_, planner_open_space_config_));
-  end_node_.reset(new Node3d(ex, ey, ephi, ex_vec, ey_vec, ephi_vec, XYbounds_,
-                             planner_open_space_config_));
+  start_node_.reset(
+      new Node3d({sx}, {sy}, {sphi}, XYbounds_, planner_open_space_config_));
+  end_node_.reset(
+      new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
   if (!ValidityCheck(start_node_, obstacles)) {
     AERROR << "start_node in collision with obstacles";
     return false;
@@ -376,7 +375,11 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     reeds_shepp_time += (end_timestamp - start_timestamp);
     for (size_t i = 0; i < next_node_num_; i++) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
-      // boundary and validity check
+      // boundary check failure handle
+      if (next_node == nullptr) {
+        continue;
+      }
+      // collision check
       if (!ValidityCheck(next_node, obstacles)) {
         continue;
       }
