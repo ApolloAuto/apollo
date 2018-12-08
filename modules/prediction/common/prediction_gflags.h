@@ -101,6 +101,8 @@ DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_bool(adjust_vehicle_heading_by_lane);
 DECLARE_double(heading_filter_param);
 DECLARE_uint32(max_num_lane_point);
+DECLARE_double(distance_threshold_to_junction_exit);
+DECLARE_double(angle_threshold_to_junction_exit);
 
 // Validation checker
 DECLARE_double(centripetal_acc_coeff);
@@ -109,6 +111,9 @@ DECLARE_double(centripetal_acc_coeff);
 DECLARE_double(junction_exit_lane_threshold);
 DECLARE_double(distance_beyond_junction);
 DECLARE_double(defualt_junction_range);
+
+// Evaluator
+DECLARE_double(time_to_center_if_not_reach);
 
 // Obstacle trajectory
 DECLARE_bool(enable_cruise_regression);

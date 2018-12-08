@@ -58,7 +58,7 @@ class ObstacleClusters {
    * @param lane info
    * @return a corresponding lane graph
    */
-  static const LaneGraph& GetLaneGraphWithoutMemorizing(
+  static LaneGraph GetLaneGraphWithoutMemorizing(
       const double start_s, const double length,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 

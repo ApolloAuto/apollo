@@ -156,6 +156,10 @@ DEFINE_bool(adjust_vehicle_heading_by_lane, true,
 DEFINE_double(heading_filter_param, 0.98, "heading filter parameter");
 DEFINE_uint32(max_num_lane_point, 20,
               "The maximal number of lane points to store");
+DEFINE_double(distance_threshold_to_junction_exit, 1.0,
+              "Threshold of distance to junction exit");
+DEFINE_double(angle_threshold_to_junction_exit, M_PI * 0.25,
+              "Threshold of angle to junction exit");
 
 // Validation checker
 DEFINE_double(centripetal_acc_coeff, 0.5,
@@ -170,6 +174,10 @@ DEFINE_double(distance_beyond_junction, 0.5,
               "consider it in junction.");
 DEFINE_double(defualt_junction_range, 10.0,
               "Default value for the range of a junction.");
+
+// Evaluator
+DEFINE_double(time_to_center_if_not_reach, 10.0,
+              "Default value of time to lane center of not reach.");
 
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,
