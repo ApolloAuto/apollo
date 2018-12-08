@@ -404,7 +404,7 @@ DEFINE_double(open_space_planning_period, 4.0,
               "estimated time for open space planner planning period");
 
 DEFINE_double(
-    parking_longitudinal_range, 15.0,
+    parking_longitudinal_range, 20.0,
     "the distance serving as the parking range when solving the problem");
 
 DEFINE_double(parking_start_range, 10.0,
