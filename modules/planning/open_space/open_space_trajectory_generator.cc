@@ -74,30 +74,36 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const IndexedObstacles& obstalce_list) {
+  // Return if planning data not ready
   if (!vehicle_state.has_x() || XYbounds.size() == 0 || end_pose.size() == 0 ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
     return Status(ErrorCode::PLANNING_ERROR, "Generator input data not ready");
   }
 
+  // Generate Stop trajectory if vehicle close to destination
   if (IsVehicleNearDestination(
           stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
           translate_origin,
           planner_open_space_config_.is_near_desitination_threshold())) {
-    return Status(
-        ErrorCode::PLANNING_ERROR,
-        "Vehicle is close to destination, skip new trajectory generation.");
+    AINFO << "Vehicle is close to destination, skip new "
+             "trajectory generation.";
+
+    GenerateStopTrajectory(end_pose);
+    return Status::OK();
   }
 
   /*
-    if (IsInitPointNearDestination(
-            stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
-            translate_origin,
-            planner_open_space_config_.is_near_desitination_threshold())) {
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "Planning init point is close to destination, skip new "
-                    "trajectory generation.");
-    }
+  if (IsInitPointNearDestination(
+          stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
+          translate_origin,
+          planner_open_space_config_.is_near_desitination_threshold())) {
+    AINFO << "Planning init point is close to destination, skip new "
+             "trajectory generation.";
+
+    GenerateStopTrajectory(end_pose);
+    return status::OK();
+  }
   */
 
   // initial state
@@ -448,6 +454,26 @@ bool OpenSpaceTrajectoryGenerator::IsInitPointNearDestination(
   }
 
   return false;
+}
+
+void OpenSpaceTrajectoryGenerator::GenerateStopTrajectory(
+    const std::vector<double>& end_pose) {
+  trajectory_to_end_.Clear();
+  double relative_time = 0.0;
+  constexpr int stop_trajectory_length = 10;
+  constexpr double relative_stop_time = 0.1;
+  for (size_t i = 0; i < stop_trajectory_length; i++) {
+    auto* point = trajectory_to_end_.add_trajectory_point();
+    point->mutable_path_point()->set_x(end_pose[0]);
+    point->mutable_path_point()->set_y(end_pose[1]);
+    point->mutable_path_point()->set_theta(end_pose[2]);
+    point->mutable_path_point()->set_s(0.0);
+    point->mutable_path_point()->set_kappa(0.0);
+    point->set_relative_time(relative_time);
+    point->set_v(0.0);
+    point->set_a(0.0);
+    relative_time += relative_stop_time;
+  }
 }
 
 }  // namespace planning

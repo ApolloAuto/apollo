@@ -130,6 +130,8 @@ class OpenSpaceTrajectoryGenerator {
       const Vec2d& translate_origin,
       const double& is_near_desitination_threshold);
 
+  void GenerateStopTrajectory(const std::vector<double>& end_pose);
+
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
       distance_approach_;
