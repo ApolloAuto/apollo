@@ -253,21 +253,13 @@ bool ReferenceLineProvider::GetReferenceLines(
 void ReferenceLineProvider::PrioritzeChangeLane(
     std::list<hdmap::RouteSegments> *route_segments) {
   CHECK_NOTNULL(route_segments);
-  if (route_segments->size() > 1) {
-    if (route_segments->front().IsOnSegment()) {
-      route_segments->pop_front();
-    } else {
-      route_segments->pop_back();
+  auto iter = route_segments->begin();
+  while (iter != route_segments->end()) {
+    if (!iter->IsOnSegment()) {
+      route_segments->splice(route_segments->begin(), *route_segments, iter);
+      break;
     }
-  } else {
-    auto iter = route_segments->begin();
-    while (iter != route_segments->end()) {
-      if (!iter->IsOnSegment()) {
-        route_segments->splice(route_segments->begin(), *route_segments, iter);
-        break;
-      }
-      ++iter;
-    }
+    ++iter;
   }
 }
 

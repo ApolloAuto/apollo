@@ -67,6 +67,7 @@ class ReferenceLineInfo {
   const PathDecision& path_decision() const;
   const ReferenceLine& reference_line() const;
 
+  double SDistanceToDestination() const;
   bool ReachedDestination() const;
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory);

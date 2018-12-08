@@ -159,7 +159,7 @@ bool WaypointSampler::SamplePathWaypoints(
     std::vector<double> sample_l;
     if (reference_line_info_->IsChangeLanePath() &&
         !reference_line_info_->IsSafeToChangeLane()) {
-      sample_l.push_back(init_sl_point_.l());
+      sample_l.push_back(reference_line_info_->OffsetToOtherReferenceLine());
     } else {
       common::util::uniform_slice(
           sample_right_boundary, sample_left_boundary,
