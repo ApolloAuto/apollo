@@ -32,23 +32,12 @@ from mongo_util import Mongo
 from parse_record import RecordParser
 
 
-gflags.DEFINE_string('collection', 'records', 'MongoDB collection name.')
-
-gflags.DEFINE_string('import_mode', 'insert',
-                     'Strategy when importing record to MongoDB:'
-                     'insert: Insert new records only; '
-                     'update: Update existing records only; '
-                     'replace: Insert new or replace existing records.')
+gflags.DEFINE_string('mongo_collection_name', 'records',
+                     'MongoDB collection name.')
 
 
 class RecordImporter(object):
-    """
-    Import Apollo record files.
-
-    See https://api.mongodb.com/python/current/api/pymongo/collection.html for
-    MongoDB collection document.
-    As we used some advanced features, pymongo >= 3.0 is required.
-    """
+    """Import Apollo record files."""
 
     @staticmethod
     def Import(record_file):
@@ -57,28 +46,13 @@ class RecordImporter(object):
         if not parser.ParseMeta():
             glog.error('Fail to parse record {}'.format(record_file))
             return
-        record_id = parser.record.id
-        query = {'id': record_id}
 
-        # Check if the record has been imported.
-        collection = Mongo.collection(gflags.FLAGS.collection)
-        mode = gflags.FLAGS.import_mode
-        if mode == 'insert' and collection.find_one(query, {'_id': 1}):
-            glog.info('Skip duplicate record with id {}'.format(record_id))
-            return
-
-        # Continue parsing.
         parser.ParseMessages()
         doc = Mongo.pb_to_doc(parser.record)
 
-        # Operate MongoDB.
-        if mode == 'insert':
-            collection.insert_one(doc)
-        elif mode == 'update':
-            collection.update_one(query, {'$set': doc})
-        elif mode == 'replace':
-            collection.replace_one(query, doc, upsert=True)
-        glog.info('Imported record {}'.format(record_id))
+        collection = Mongo.collection(gflags.FLAGS.mongo_collection_name)
+        collection.replace_one({'path': parser.record.path}, doc, upsert=True)
+        glog.info('Imported record {}'.format(record_file))
 
 
 if __name__ == '__main__':

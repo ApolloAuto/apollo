@@ -73,7 +73,8 @@ class RecordParser(object):
 
     def __init__(self, record_file):
         """Init input reader and output record."""
-        self.record = Record(path=record_file)
+        record_file = os.path.abspath(record_file)
+        self.record = Record(path=record_file, dir=os.path.dirname(record_file))
 
         self._reader = RecordReader(record_file)
         # State during processing messages.
@@ -89,8 +90,6 @@ class RecordParser(object):
         Currently we parse the record ID, header and channel list here.
         """
         self.record.header.ParseFromString(self._reader.get_headerstring())
-        self.record.id = '{}_{}'.format(self.record.header.begin_time,
-                                        self.record.header.size)
         for chan in self._reader.get_channellist():
             self.record.channels[chan] = self._reader.get_messagenumber(chan)
         if len(self.record.channels) == 0:
