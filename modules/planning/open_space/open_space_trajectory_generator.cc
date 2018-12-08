@@ -80,7 +80,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     return Status(ErrorCode::PLANNING_ERROR, "Generator input data not ready");
   }
 
-  if (IsNearDestination(
+  if (IsVehicleNearDestination(
           stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
           translate_origin,
           planner_open_space_config_.is_near_desitination_threshold())) {
@@ -88,6 +88,17 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
         ErrorCode::PLANNING_ERROR,
         "Vehicle is close to destination, skip new trajectory generation.");
   }
+
+  /*
+    if (IsInitPointNearDestination(
+            stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
+            translate_origin,
+            planner_open_space_config_.is_near_desitination_threshold())) {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Planning init point is close to destination, skip new "
+                    "trajectory generation.");
+    }
+  */
 
   // initial state
   stitching_trajectory_ = stitching_trajectory;
@@ -386,7 +397,7 @@ void OpenSpaceTrajectoryGenerator::LoadTrajectory(
   }
 }
 
-bool OpenSpaceTrajectoryGenerator::IsNearDestination(
+bool OpenSpaceTrajectoryGenerator::IsVehicleNearDestination(
     const common::TrajectoryPoint& planning_init_point,
     const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose, const double& rotate_angle,
@@ -409,17 +420,32 @@ bool OpenSpaceTrajectoryGenerator::IsNearDestination(
     return true;
   }
 
-  // const apollo::common::PathPoint path_point =
-  // planning_init_point.path_point(); double distance_to_init_point =
-  //     (path_point.x() - end_pose_to_world_frame.x()) *
-  //         (path_point.x() - end_pose_to_world_frame.x()) +
-  //     (path_point.y() - end_pose_to_world_frame.y()) *
-  //         (path_point.y() - end_pose_to_world_frame.y());
+  return false;
+}
 
-  // if (distance_to_init_point < kepsilon) {
-  //   AINFO<<"init_point reach end_pose";
-  //   return Status(ErrorCode::OK, "init_point reach end_pose");
-  // }
+bool OpenSpaceTrajectoryGenerator::IsInitPointNearDestination(
+    const common::TrajectoryPoint& planning_init_point,
+    const common::VehicleState& vehicle_state,
+    const std::vector<double>& end_pose, const double& rotate_angle,
+    const Vec2d& translate_origin,
+    const double& is_near_desitination_threshold) {
+  CHECK_EQ(end_pose.size(), 4);
+  Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
+
+  end_pose_to_world_frame.SelfRotate(rotate_angle);
+  end_pose_to_world_frame += translate_origin;
+
+  const apollo::common::PathPoint path_point = planning_init_point.path_point();
+  double distance_to_init_point =
+      (path_point.x() - end_pose_to_world_frame.x()) *
+          (path_point.x() - end_pose_to_world_frame.x()) +
+      (path_point.y() - end_pose_to_world_frame.y()) *
+          (path_point.y() - end_pose_to_world_frame.y());
+
+  if (distance_to_init_point < is_near_desitination_threshold) {
+    AINFO << "init_point reach end_pose";
+    return true;
+  }
 
   return false;
 }
