@@ -1,8 +1,8 @@
 vehicle_param {
-  front_edge_to_center: 3.91
-  back_edge_to_center: 1.09
-  left_edge_to_center: 0.95
-  right_edge_to_center: 0.95
+  front_edge_to_center: 2.87
+  back_edge_to_center: 1.96
+  left_edge_to_center: 1.1
+  right_edge_to_center: 1.1
 
   length: 4.82
   width: 1.84
