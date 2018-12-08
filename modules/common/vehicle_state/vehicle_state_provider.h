@@ -179,7 +179,7 @@ class VehicleStateProvider {
   common::VehicleState vehicle_state_;
   localization::LocalizationEstimate original_localization_;
 
-  DECLARE_SINGLETON(VehicleStateProvider);
+  DECLARE_SINGLETON(VehicleStateProvider)
 };
 
 }  // namespace common

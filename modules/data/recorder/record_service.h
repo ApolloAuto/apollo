@@ -41,7 +41,7 @@ class RecordService {
  private:
   std::shared_ptr<apollo::cyber::Service<RecordRequest, RecordResponse>>
       server_;
-  DECLARE_SINGLETON(RecordService);
+  DECLARE_SINGLETON(RecordService)
 };
 
 }  // namespace data

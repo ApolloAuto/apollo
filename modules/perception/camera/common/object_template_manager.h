@@ -133,7 +133,7 @@ class ObjectTemplateManager {
   TemplateMap max_template_hwl_;
   std::vector<TemplateMap> template_hwl_;
 
-  DECLARE_SINGLETON(ObjectTemplateManager);
+  DECLARE_SINGLETON(ObjectTemplateManager)
 };
 
 }  // namespace camera

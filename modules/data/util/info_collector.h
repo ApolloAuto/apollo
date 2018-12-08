@@ -50,7 +50,7 @@ class InfoCollector {
   std::shared_ptr<cyber::Reader<apollo::routing::RoutingRequest>>
       routing_request_reader_;
 
-  DECLARE_SINGLETON(InfoCollector);
+  DECLARE_SINGLETON(InfoCollector)
 };
 
 }  // namespace data

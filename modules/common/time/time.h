@@ -246,7 +246,7 @@ class Clock {
   Timestamp mock_now_;
 
   /// Explicitly disable default and move/copy constructors.
-  DECLARE_SINGLETON(Clock);
+  DECLARE_SINGLETON(Clock)
 };
 
 inline Clock::Clock()

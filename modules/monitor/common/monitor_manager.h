@@ -77,7 +77,7 @@ class MonitorManager {
   std::shared_ptr<apollo::cyber::Node> node_;
   std::unordered_map<std::string, std::shared_ptr<cyber::ReaderBase>> readers_;
 
-  DECLARE_SINGLETON(MonitorManager);
+  DECLARE_SINGLETON(MonitorManager)
 };
 
 }  // namespace monitor

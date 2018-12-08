@@ -61,7 +61,7 @@ class CanClientFactory
   std::unique_ptr<CanClient> CreateCANClient(const CANCardParameter &parameter);
 
  private:
-  DECLARE_SINGLETON(CanClientFactory);
+  DECLARE_SINGLETON(CanClientFactory)
 };
 
 }  // namespace canbus
