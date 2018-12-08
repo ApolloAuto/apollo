@@ -20,7 +20,7 @@ namespace perception {
 namespace fusion {
 
 bool PbfShapeFusion::s_use_camera_3d_ = true;
-float PbfShapeFusion::s_camera_radar_time_diff_th_ = 0.3;
+float PbfShapeFusion::s_camera_radar_time_diff_th_ = 0.3f;
 
 bool PbfShapeFusion::Init() { return true; }
 

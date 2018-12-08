@@ -64,8 +64,8 @@ TEST(OnlineCalibrationServiceTest, online_calibration_service_test) {
   OnlineCalibrationService *online_calib_service
       = dynamic_cast<OnlineCalibrationService *>(calibration_service);
   if (online_calib_service != nullptr) {
-    float camera_ground_height_query = 0.0;
-    float camera_pitch_angle_query = 0.0;
+    float camera_ground_height_query = 0.0f;
+    float camera_pitch_angle_query = 0.0f;
     EXPECT_FALSE(online_calib_service->BuildIndex());
     EXPECT_FALSE(online_calib_service->QueryCameraToGroundHeightAndPitchAngle(
         &camera_ground_height_query,

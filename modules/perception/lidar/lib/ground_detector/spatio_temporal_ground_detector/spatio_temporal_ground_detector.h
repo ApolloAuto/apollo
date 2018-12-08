@@ -58,7 +58,7 @@ class SpatioTemporalGroundDetector : public BaseGroundDetector {
 
   bool use_roi_ = true;
   bool use_ground_service_ = false;
-  float ground_thres_ = 0.25;
+  float ground_thres_ = 0.25f;
   size_t default_point_size_ = 320000;
   Eigen::Vector3d cloud_center_ = Eigen::Vector3d(0.0, 0.0, 0.0);
   GroundServiceContent ground_service_content_;

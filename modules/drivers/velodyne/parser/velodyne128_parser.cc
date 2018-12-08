@@ -73,7 +73,7 @@ void Velodyne128Parser::Order(std::shared_ptr<PointCloud> cloud) {
 void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
                                std::shared_ptr<PointCloud> pc) {
   float azimuth_diff, azimuth_corrected_f;
-  float last_azimuth_diff = 0;
+  float last_azimuth_diff = 0.0f;
   uint16_t azimuth, azimuth_next, azimuth_corrected;
   // float x_coord, y_coord, z_coord;
   // const raw_packet_t *raw = (const raw_packet_t *)&pkt.data[0];

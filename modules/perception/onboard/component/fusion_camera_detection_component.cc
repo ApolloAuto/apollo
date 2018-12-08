@@ -65,7 +65,7 @@ bool SetCameraHeight(const std::string &sensor_name,
                      const std::string &params_dir, float default_camera_height,
                      float *camera_height) {
   float base_h = default_camera_height;
-  float camera_offset = 0;
+  float camera_offset = 0.0f;
   try {
     YAML::Node lidar_height =
         YAML::LoadFile(params_dir + "/" + "velodyne64_height.yaml");
@@ -478,7 +478,7 @@ int FusionCameraDetectionComponent::InitCameraFrames() {
 
   // Init camera height
   for (const auto &camera_name : camera_names_) {
-    float height = 0.0;
+    float height = 0.0f;
     SetCameraHeight(camera_name, FLAGS_obs_sensor_intrinsic_path,
                     default_camera_height_, &height);
     camera_height_map_[camera_name] = height;

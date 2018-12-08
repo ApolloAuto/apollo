@@ -80,8 +80,8 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
     return false;
   }
 
-  float camera_width = 0;
-  float camera_height = 0;
+  float camera_width = 0.0f;
+  float camera_height = 0.0f;
   Eigen::VectorXf params(9 + 5);
   try {
     camera_width = node["width"].as<float>();

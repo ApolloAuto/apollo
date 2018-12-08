@@ -46,7 +46,7 @@ class BufferInterface {
    */
   virtual apollo::transform::TransformStamped lookupTransform(
       const std::string& target_frame, const std::string& source_frame,
-      const cyber::Time& time, const float timeout_second = 0.01) const = 0;
+      const cyber::Time& time, const float timeout_second = 0.01f) const = 0;
 
   /** \brief Get the transform between two frames by frame ID assuming fixed
    *frame.
@@ -68,7 +68,7 @@ class BufferInterface {
       const std::string& target_frame, const cyber::Time& target_time,
       const std::string& source_frame, const cyber::Time& source_time,
       const std::string& fixed_frame,
-      const float timeout_second = 0.01) const = 0;
+      const float timeout_second = 0.01f) const = 0;
 
   /** \brief Test if a transform is possible
    * \param target_frame The frame into which to transform

@@ -70,7 +70,7 @@ TEST(CommonFunctions, poly_eval_test) {
     Eigen::Matrix<float, max_poly_order + 1, 1> coeff;
     int order = max_poly_order + 2;
     float x = 1.0f;
-    float y = 0;
+    float y = 0.0f;
     coeff(3, 0) = 1.0f;
     coeff(2, 0) = 1.0f;
     coeff(1, 0) = 1.0f;
@@ -81,7 +81,7 @@ TEST(CommonFunctions, poly_eval_test) {
     Eigen::Matrix<float, max_poly_order + 1, 1> coeff;
     int order = max_poly_order;
     float x = 1.0f;
-    float y = 0;
+    float y = 0.0f;
     coeff(3, 0) = 1.0f;
     coeff(2, 0) = 1.0f;
     coeff(1, 0) = 1.0f;

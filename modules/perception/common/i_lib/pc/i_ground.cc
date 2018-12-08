@@ -298,8 +298,8 @@ int PlaneFitGroundDetector::CompareZ(const float *point_cloud,
   unsigned int nr_z_comp_fail_threshold =
       IMin(param_.nr_z_comp_fail_threshold, (unsigned int)(nr_compares >> 1));
   const float *ptr = nullptr;
-  float z = 0;
-  float delta_z = 0;
+  float z = 0.0f;
+  float delta_z = 0.0f;
   std::vector<int>::const_iterator iter = indices.cbegin();
   while (iter < indices.cend()) {
     nr_contradi = 0;
@@ -340,13 +340,13 @@ int PlaneFitGroundDetector::CompareZ(const float *point_cloud,
 void PlaneFitGroundDetector::ComputeAdaptiveThreshold() {
   unsigned int r = 0;
   unsigned int c = 0;
-  float dr = 0;
-  float dc = 0;
-  float k = 0;
-  float b = 0;
-  float min_dist = 0;
-  float max_dist = 0;
-  float thre = 0;
+  float dr = 0.0f;
+  float dc = 0.0f;
+  float k = 0.0f;
+  float b = 0.0f;
+  float min_dist = 0.0f;
+  float max_dist = 0.0f;
+  float thre = 0.0f;
   float grid_rad = static_cast<float>(param_.nr_grids_coarse - 1) / 2;
   assert(pf_thresholds_ != nullptr);
   for (r = 0; r < param_.nr_grids_coarse; ++r) {
@@ -423,7 +423,7 @@ void PlaneFitGroundDetector::ComputeSignedGroundHeightLine(
   const float *cptr = nullptr;
   float dist[] = {0, 0, 0, 0, 0};
   const float *plane[] = {nullptr, nullptr, nullptr, nullptr, nullptr};
-  float min_abs_dist = 0;
+  float min_abs_dist = 0.0f;
   unsigned int nm1 = param_.nr_grids_coarse - 1;
   assert(param_.nr_grids_coarse >= 2);
   plane[0] = cn[0].IsValid() ? cn[0].params : nullptr;
@@ -627,8 +627,8 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
     return (0);
   }
   GroundPlaneLiDAR plane;
-  float ptp_dist = 0;
-  float fit_cost = 0;
+  float ptp_dist = 0.0f;
+  float fit_cost = 0.0f;
   float fit_cost_best = dist_thre;
   int nr_inliers = 0;
   int nr_inliers_best = -1;
@@ -833,7 +833,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   int kNr_iter = param_.nr_ransac_iter_threshold +
                  static_cast<int>(neighbors.size());
   GroundPlaneLiDAR hypothesis[kNr_iter];
-  float ptp_dist = 0;
+  float ptp_dist = 0.0f;
   int best = -1;
   int nr_inliers = 0;
   int nr_inliers_best = -1;
@@ -990,7 +990,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
 float PlaneFitGroundDetector::CalculateAngleDist(
     const GroundPlaneLiDAR &plane,
     const std::vector<std::pair<int, int> > &neighbors) {
-  float angle_dist = 0;
+  float angle_dist = 0.0f;
   int count = 0;
   unsigned int j = 0;
   int r_n = 0;

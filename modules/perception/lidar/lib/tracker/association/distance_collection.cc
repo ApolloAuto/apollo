@@ -109,7 +109,7 @@ float BboxSizeDistance(
   Eigen::Vector3f old_bbox_size = last_object->output_size.cast<float>();
   Eigen::Vector3f new_bbox_size = new_object->size.cast<float>();
 
-  float size_dist = 0.0;
+  float size_dist = 0.0f;
   double dot_val_00 = fabs(old_bbox_dir(0) * new_bbox_dir(0) +
       old_bbox_dir(1) * new_bbox_dir(1));
   double dot_val_01 = fabs(old_bbox_dir(0) * new_bbox_dir(1) -
@@ -177,7 +177,7 @@ float HistogramDistance(
     return 100;
   }
 
-  float histogram_dist = 0.0;
+  float histogram_dist = 0.0f;
   for (size_t i = 0; i < old_object_shape_features.size(); ++i) {
     histogram_dist += std::fabs(old_object_shape_features[i] -
         new_object_shape_features[i]);

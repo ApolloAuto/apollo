@@ -253,7 +253,7 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
     pre_vehicle_ground_height_ = lidar_pose.translation()(2) - height_diff;
   }
 
-  float vehicle_ground_alt = 0.0;
+  float vehicle_ground_alt = 0.0f;
   unsigned int x = 0;
   unsigned int y = 0;
   if (node->GetCoordinate(lidar_trans, &x, &y)) {

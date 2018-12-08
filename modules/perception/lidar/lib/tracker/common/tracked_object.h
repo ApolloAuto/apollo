@@ -111,7 +111,7 @@ struct TrackedObject {
   int boostup_need_history_size = 0;
   bool valid = false;
   bool converged = true;
-  float convergence_confidence = 0.0;
+  float convergence_confidence = 0.0f;
   double update_quality = 0.0;
   Eigen::Vector3d selected_measured_velocity;
   Eigen::Vector3d selected_measured_acceleration;

@@ -43,8 +43,8 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize_badcase1) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float bound_value = 10;
-  float cost_thresh = 2.5;
+  float bound_value = 10.0f;
+  float cost_thresh = 2.5f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
   std::vector<std::pair<size_t, size_t>> assignments;
@@ -112,8 +112,8 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize_badcase_2) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float bound_value = 10;
-  float cost_thresh = 2.5;
+  float bound_value = 10.0f;
+  float cost_thresh = 2.5f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
   std::vector<std::pair<size_t, size_t>> assignments;
@@ -163,8 +163,8 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Minimize) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float cost_thresh = 1.0;
-  float bound_value = 2.0;
+  float cost_thresh = 1.0f;
+  float bound_value = 2.0f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
   std::vector<std::pair<size_t, size_t>> assignments;
@@ -414,8 +414,8 @@ TEST_F(GatedHungarianMatcherTest, test_Match_Maximize) {
   SecureMat<float>* global_costs = optimizer_->mutable_global_costs();
   global_costs->Reserve(1000, 1000);
 
-  float cost_thresh = 1.0;
-  float bound_value = 2.0;
+  float cost_thresh = 1.0f;
+  float bound_value = 2.0f;
   GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
       GatedHungarianMatcher<float>::OptimizeFlag::OPTMAX;
   std::vector<std::pair<size_t, size_t>> assignments;

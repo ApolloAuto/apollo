@@ -130,7 +130,7 @@ TEST(YoloCameraDetectorTest, box_test) {
   ASSERT_EQ(box3.xmin, 1);
   ASSERT_EQ(box3.xmax, 10);
 
-  float size = 0;
+  float size = 0.0f;
   init_box(&box1);
   box1.xmax = 0;
   size = get_bbox_size(box1);

@@ -73,12 +73,12 @@ int read_detections(const std::string &path, const int &feature_dim,
   frame->frame_id = frame_num;
   frame->track_feature_blob.reset(new base::Blob<float>);
   (frame->track_feature_blob)->Reshape({det_count, feature_size});
-  float x = 0;
-  float y = 0;
-  float width = 0;
-  float height = 0;
-  float feature = 0.0;
-  float score = 0.0;
+  float x = 0.0f;
+  float y = 0.0f;
+  float width = 0.0f;
+  float height = 0.0f;
+  float feature = 0.0f;
+  float score = 0.0f;
   frame->detected_objects.clear();
   for (int i = 0; i < det_count; ++i) {
     fin >> x >> y >> width >> height >> score;
@@ -307,10 +307,10 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   while (fin_gt >> image_name >> det_count) {
     std::vector<base::CameraObjectSupplement> bboxs;
     base::CameraObjectSupplement bbox;
-    float x = 0;
-    float y = 0;
-    float width = 0;
-    float height = 0;
+    float x = 0.0f;
+    float y = 0.0f;
+    float width = 0.0f;
+    float height = 0.0f;
     int id = 0;
     for (int i = 0; i < det_count; ++i) {
       fin_gt >> x >> y >> width >> height >> id;
@@ -386,7 +386,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
              << frame.tracked_objects.size();
     for (auto &bbox_gt : det_gts[frame_num]) {
       int id = -1;
-      float max_iou = 0;
+      float max_iou = 0.0f;
       Eigen::Matrix<double, 3, 1> center0, size0;
       center0[0] = bbox_gt.box.Center().x;
       size0[0] = bbox_gt.box.xmax - bbox_gt.box.xmin;

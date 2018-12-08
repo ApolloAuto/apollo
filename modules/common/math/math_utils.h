@@ -186,7 +186,7 @@ inline void L2Norm(int feat_dim, float *feat_data) {
     return;
   }
   // feature normalization
-  float l2norm = 0.0;
+  float l2norm = 0.0f;
   for (int i = 0; i < feat_dim; ++i) {
     l2norm += feat_data[i] * feat_data[i];
   }

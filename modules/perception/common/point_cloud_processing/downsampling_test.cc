@@ -118,7 +118,7 @@ TEST(PointCloudProcessingDownsamplingTest, downsampling_circular_org_all1) {
   center_pt.x = 0.f;
   center_pt.y = 0.f;
   center_pt.z = 0.f;
-  for (float i = 1.f; i <= 128; i++) {
+  for (float i = 1.f; i <= 128.0f; i++) {
     tmp_pt.x = i;
     tmp_pt.y = i;
     tmp_pt.z = i;

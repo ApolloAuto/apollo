@@ -51,7 +51,7 @@ class SegmentationComponent : public cyber::Component<drivers::PointCloud> {
   static uint32_t s_seq_num_;
   std::string sensor_name_;
   bool enable_hdmap_ = true;
-  float lidar_query_tf_offset_ = 20.0;
+  float lidar_query_tf_offset_ = 20.0f;
   std::string lidar2novatel_tf2_child_frame_id_;
   std::string output_channel_name_;
   base::SensorInfo sensor_info_;

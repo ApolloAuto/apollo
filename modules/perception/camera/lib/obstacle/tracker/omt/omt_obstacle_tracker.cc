@@ -97,7 +97,7 @@ bool OMTObstacleTracker::CombineDuplicateTargets() {
         continue;
       }
       int count = 0;
-      float score = 0;
+      float score = 0.0f;
       int index1 = 0;
       int index2 = 0;
       while (index1 < targets_[i].Size() && index2 < targets_[j].Size()) {
@@ -262,7 +262,7 @@ float OMTObstacleTracker::ScoreShape(const Target &target,
 
 float OMTObstacleTracker::ScoreAppearance(const Target &target,
                                           TrackObjectPtr track_obj) {
-  float energy = 0;
+  float energy = 0.0f;
   int count = 0;
   auto sensor_name = track_obj->indicator.sensor_name;
   for (int i = target.Size() - 1; i >= 0; --i) {

@@ -137,7 +137,7 @@ void FeatureGenerator::GenerateCPU(const base::PointFCloudPtr& pc_ptr,
     }
     const auto& pt = pc_ptr->at(i);
     float pz = pt.z;
-    float pi = pt.intensity / 255.0;
+    float pi = pt.intensity / 255.0f;
     if (max_height_data_[idx] < pz) {
       max_height_data_[idx] = pz;
       if (use_intensity_feature_) {

@@ -50,7 +50,7 @@ class ContiArsPreprocessor : public BasePreprocessor {
   void CorrectTime(drivers::ContiRadar* corrected_obstacles);
   int GetNextId();
 
-  float delay_time_ = 0.0;
+  float delay_time_ = 0.0f;
   static int current_idx_;
   static int local2global_[ORIGIN_CONTI_MAX_ID_NUM];
 

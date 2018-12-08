@@ -31,9 +31,9 @@ namespace perception {
 namespace camera {
 
 struct Reference {
-  float area = 0;
-  float k = 0;
-  float ymax = 0;
+  float area = 0.0f;
+  float k = 0.0f;
+  float ymax = 0.0f;
 };
 
 class ObstacleReference {

@@ -168,12 +168,12 @@ int RNNEvaluator::SetupObstacleFeature(
   feature_values->clear();
   feature_values->reserve(DIM_OBSTACLE_FEATURE);
 
-  float heading = 0.0;
-  float speed = 0.0;
-  float lane_l = 0.0;
-  float theta = 0.0;
-  float dist_lb = 1.0;
-  float dist_rb = 1.0;
+  float heading = 0.0f;
+  float speed = 0.0f;
+  float lane_l = 0.0f;
+  float theta = 0.0f;
+  float dist_lb = 1.0f;
+  float dist_rb = 1.0f;
   if (obstacle->history_size() < 1) {
     AWARN << "Size of feature less than 1!";
     return -1;
