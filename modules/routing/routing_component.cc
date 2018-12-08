@@ -16,6 +16,8 @@
 
 #include "modules/routing/routing_component.h"
 
+#include <utility>
+
 #include "cyber/cyber.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
@@ -38,6 +40,30 @@ bool RoutingComponent::Init() {
                           DURABILITY_TRANSIENT_LOCAL);
   response_writer_ = node_->CreateWriter<RoutingResponse>(attr);
 
+  apollo::cyber::proto::RoleAttributes attr_history;
+  attr_history.set_channel_name(FLAGS_routing_response_topic + "_history");
+  auto qos_history = attr_history.mutable_qos_profile();
+  qos_history->set_history(
+      apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+  qos_history->set_reliability(
+      apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
+  qos_history->set_durability(apollo::cyber::proto::QosDurabilityPolicy::
+                          DURABILITY_TRANSIENT_LOCAL);
+
+  response_history_writer_ = node_->CreateWriter<RoutingResponse>(attr_history);
+  std::weak_ptr<RoutingComponent> self =
+     std::dynamic_pointer_cast<RoutingComponent>(shared_from_this());
+  timer_.reset(new ::apollo::cyber::Timer(100, [self, this]() {
+    auto ptr = self.lock();
+    if (ptr) {
+      std::lock_guard<std::mutex> guard(this->mutex_);
+      if (this->response_.get() != nullptr) {
+        this->response_writer_->Write(response_);
+      }
+    }
+  }, false));
+  timer_->Start();
+
   return routing_.Init().ok() && routing_.Start().ok();
 }
 
@@ -47,8 +73,11 @@ bool RoutingComponent::Proc(const std::shared_ptr<RoutingRequest>& request) {
     return false;
   }
   common::util::FillHeader(node_->Name(), response.get());
-
   response_writer_->Write(response);
+  {
+    std::lock_guard<std::mutex> guard(mutex_);
+    response_ = std::move(response);
+  }
   return true;
 }
 

@@ -37,7 +37,12 @@ class RoutingComponent final
  private:
   std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>>
       response_writer_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>>
+      response_history_writer_ = nullptr;
   Routing routing_;
+  std::shared_ptr<RoutingResponse> response_ = nullptr;
+  std::unique_ptr<::apollo::cyber::Timer> timer_;
+  std::mutex mutex_;
 };
 
 CYBER_REGISTER_COMPONENT(RoutingComponent)
