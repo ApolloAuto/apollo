@@ -95,11 +95,12 @@ const std::vector<Spline1dSeg>& Spline1d::splines() const { return splines_; }
 
 uint32_t Spline1d::FindIndex(const double x) const {
   auto upper_bound = std::upper_bound(x_knots_.begin() + 1, x_knots_.end(), x);
-  const uint32_t dis = std::distance(x_knots_.begin(), upper_bound);
+  const uint32_t dis =
+      static_cast<uint32_t>(std::distance(x_knots_.begin(), upper_bound));
   if (dis < x_knots_.size()) {
     return dis - 1;
   } else {
-    return x_knots_.size() - 2;
+    return static_cast<uint32_t>(x_knots_.size()) - 2;
   }
 }
 
