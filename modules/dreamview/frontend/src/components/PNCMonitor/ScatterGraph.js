@@ -49,7 +49,7 @@ Chart.plugins.register({
                 chart.ctx.restore();
             }
         });
-    }
+    },
 });
 
 Chart.defaults.global.defaultFontColor = '#FFFFFF';
@@ -64,6 +64,13 @@ const defaultPolygonProperties = {
     cubicInterpolationMode: 'monotone',
     lineTension: 0,
 };
+
+function updateTickWindow(scale, windowSize) {
+    const mid = Math.floor((scale.max + scale.min) / 2);
+    scale.max = mid + windowSize / 2;
+    scale.min = mid - windowSize / 2;
+}
+
 export default class ScatterGraph extends React.Component {
     initializeCanvas(title, options) {
         this.name2idx = {};
@@ -100,6 +107,7 @@ export default class ScatterGraph extends React.Component {
                         max: setting.max,
                         minRotation: 0,
                         maxRotation: 0,
+                        stepSize: setting.stepSize,
                     },
                     gridLines: {
                         color: 'rgba(153, 153, 153, 0.5)',
@@ -108,6 +116,11 @@ export default class ScatterGraph extends React.Component {
                 };
                 if (!chartOptions.scales[name]) {
                     chartOptions.scales[name] = [];
+                }
+                if (setting.windowSize) {
+                    axisOptions.afterDataLimits = (chart) => {
+                        updateTickWindow(chart, setting.windowSize);
+                    };
                 }
                 chartOptions.scales[name].push(axisOptions);
             }

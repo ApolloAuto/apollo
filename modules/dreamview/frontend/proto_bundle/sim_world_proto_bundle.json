@@ -1138,6 +1138,10 @@
                 "da": {
                   "type": "double",
                   "id": 5
+                },
+                "steer": {
+                  "type": "double",
+                  "id": 6
                 }
               }
             },
@@ -4245,7 +4249,44 @@
               }
             },
             "RSSInfo": {
-              "fields": {}
+              "fields": {
+                "isRssSafe": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "curDistLon": {
+                  "type": "double",
+                  "id": 2
+                },
+                "rssSafeDistLon": {
+                  "type": "double",
+                  "id": 3
+                },
+                "accLonRangeMinimum": {
+                  "type": "double",
+                  "id": 4
+                },
+                "accLonRangeMaximum": {
+                  "type": "double",
+                  "id": 5
+                },
+                "accLatLeftRangeMinimum": {
+                  "type": "double",
+                  "id": 6
+                },
+                "accLatLeftRangeMaximum": {
+                  "type": "double",
+                  "id": 7
+                },
+                "accLatRightRangeMinimum": {
+                  "type": "double",
+                  "id": 8
+                },
+                "accLatRightRangeMaximum": {
+                  "type": "double",
+                  "id": 9
+                }
+              }
             },
             "ADCTrajectory": {
               "fields": {
@@ -4522,6 +4563,13 @@
                   "options": {
                     "default": 0.5
                   }
+                },
+                "maxFrontObstacleDistance": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 15
+                  }
                 }
               }
             },
@@ -4569,11 +4617,18 @@
                     "default": 3
                   }
                 },
-                "waitTimeout": {
+                "stopTimeout": {
                   "type": "float",
                   "id": 7,
                   "options": {
                     "default": 8
+                  }
+                },
+                "creepTimeout": {
+                  "type": "float",
+                  "id": 8,
+                  "options": {
+                    "default": 10
                   }
                 }
               }
@@ -4606,6 +4661,13 @@
                   "id": 4,
                   "options": {
                     "default": 3
+                  }
+                },
+                "creepTimeout": {
+                  "type": "float",
+                  "id": 5,
+                  "options": {
+                    "default": 10
                   }
                 }
               }
@@ -7157,6 +7219,10 @@
                 "stageType": {
                   "type": "apollo.planning.ScenarioConfig.StageType",
                   "id": 2
+                },
+                "msg": {
+                  "type": "string",
+                  "id": 3
                 }
               }
             },
