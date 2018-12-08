@@ -240,7 +240,7 @@ bool ReferenceLineInfo::CheckChangeLane() const {
       continue;
     }
     constexpr double kChangeLaneIgnoreDistance = 50.0;
-    if (obstacle->IsStatic() &&
+    if ((obstacle->IsVirtual() || obstacle->IsStatic()) &&
         sl_boundary.start_s() < sl_boundary_info_.adc_sl_boundary_.end_s() +
                                     kChangeLaneIgnoreDistance &&
         sl_boundary.start_s() > sl_boundary_info_.adc_sl_boundary_.end_s()) {
@@ -341,10 +341,9 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
 
     ADEBUG << "reference line st boundary: t["
            << mutable_obstacle->reference_line_st_boundary().min_t() << ", "
-           << mutable_obstacle->reference_line_st_boundary().max_t()
-           << "] s[" << mutable_obstacle->reference_line_st_boundary().min_s()
-           << ", " << mutable_obstacle->reference_line_st_boundary().max_s()
-           << "]";
+           << mutable_obstacle->reference_line_st_boundary().max_t() << "] s["
+           << mutable_obstacle->reference_line_st_boundary().min_s() << ", "
+           << mutable_obstacle->reference_line_st_boundary().max_s() << "]";
   }
   return mutable_obstacle;
 }
@@ -567,20 +566,24 @@ bool ReferenceLineInfo::IsRightTurnPath(const double forward_buffer) const {
 
 bool ReferenceLineInfo::ReachedDestination() const {
   constexpr double kDestinationDeltaS = 0.05;
+  return SDistanceToDestination() <= kDestinationDeltaS;
+}
+
+double ReferenceLineInfo::SDistanceToDestination() const {
+  double res = std::numeric_limits<double>::max();
   const auto* dest_ptr = path_decision_.Find(FLAGS_destination_obstacle_id);
   if (!dest_ptr) {
-    return false;
+    return res;
   }
   if (!dest_ptr->LongitudinalDecision().has_stop()) {
-    return false;
+    return res;
   }
   if (!reference_line_.IsOnLane(dest_ptr->PerceptionBoundingBox().center())) {
-    return false;
+    return res;
   }
   const double stop_s = dest_ptr->PerceptionSLBoundary().start_s() +
                         dest_ptr->LongitudinalDecision().stop().distance_s();
-  return sl_boundary_info_.adc_sl_boundary_.end_s() + kDestinationDeltaS >
-         stop_s;
+  return stop_s - sl_boundary_info_.adc_sl_boundary_.end_s();
 }
 
 void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
