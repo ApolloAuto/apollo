@@ -30,8 +30,8 @@ import gflags
 import glog
 import utm
 
-import cyber_py
 from cyber.proto.record_pb2 import Header
+from cyber_py.record import RecordReader
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.data.proto.record_pb2 import Record
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -75,7 +75,7 @@ class RecordParser(object):
         """Init input reader and output record."""
         self.record = Record(path=record_file)
 
-        self._reader = cyber_py.record.RecordReader(record_file)
+        self._reader = RecordReader(record_file)
         # State during processing messages.
         self._current_driving_mode = None
         self._last_position = None
@@ -118,7 +118,7 @@ class RecordParser(object):
 
     def ProcessDriveEvent(self, msg):
         """Save DriveEvents."""
-        self._record.drive_events.add().ParseFromString(message)
+        self.record.drive_events.add().ParseFromString(message)
 
     def ProcessChassis(self, msg):
         """Process Chassis, save disengagements."""
