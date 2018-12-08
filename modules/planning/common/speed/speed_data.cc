@@ -34,9 +34,9 @@ namespace planning {
 using apollo::common::SpeedPoint;
 
 SpeedData::SpeedData(std::vector<SpeedPoint> speed_points)
-    : std::vector<SpeedPoint>(speed_points) {
+    : std::vector<SpeedPoint>(std::move(speed_points)) {
   std::sort(begin(), end(), [](const SpeedPoint& p1, const SpeedPoint& p2) {
-    return p1.s() < p2.s();
+    return p1.t() < p2.t();
   });
 }
 
