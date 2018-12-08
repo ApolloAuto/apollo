@@ -391,11 +391,11 @@ Status OpenSpacePlanning::Plan(
     return trajectory_partition_status;
   }
 
-  // BuildPredictedEnvironment(frame_.get()->obstacles());
+  BuildPredictedEnvironment(frame_.get()->obstacles());
 
-  // if (!IsCollisionFreeTrajectory(*ptr_trajectory_pb)) {
-  //   return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
-  // }
+  if (!IsCollisionFreeTrajectory(*ptr_trajectory_pb)) {
+    return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
+  }
 
   return status;
 }
@@ -487,6 +487,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
   }
   // start point of gears plot
+  // TODO(Jiaxuan): move it out of TrajectoryPartition() and add a flag on it
   plot_gear_shift_.clear();
   plot_gear_shift_time_.clear();
   if (gear_positions.back() == canbus::Chassis::GEAR_DRIVE) {
@@ -546,7 +547,8 @@ Status OpenSpacePlanning::TrajectoryPartition(
     if (gear_positions.back() == canbus::Chassis::GEAR_REVERSE) gear_drive = -1;
 
     point->set_v(stitched_trajectory_to_end[i].v() * gear_drive);
-    // TODO(Jiaxuan): Verify this steering to kappa equation
+    // TODO(Jiaxuan): Verify this steering to kappa equation and use parameter
+    // from config
     point->mutable_path_point()->set_kappa(
         std::tanh(stitched_trajectory_to_end[i].steer() * 470 * M_PI / 180.0 /
                   16) /
@@ -867,19 +869,9 @@ bool OpenSpacePlanning::IsCollisionFreeTrajectory(
   double ego_length = vehicle_config.vehicle_param().length();
   double ego_width = vehicle_config.vehicle_param().width();
   int point_size = trajectory_pb.trajectory_point().size();
-  AINFO << "point_size " << point_size;
-  AINFO << "predicted_bounding_rectangles_.size() "
-        << predicted_bounding_rectangles_.size();
   for (int i = 0; i < point_size; ++i) {
     const auto& trajectory_point = trajectory_pb.trajectory_point(i);
     double ego_theta = trajectory_point.path_point().theta();
-    AINFO << "trajectory_point.path_point().x()"
-          << trajectory_point.path_point().x();
-    AINFO << "trajectory_point.path_point().y()"
-          << trajectory_point.path_point().y();
-    AINFO << "trajectory_point.path_point().theta()"
-          << trajectory_point.path_point().theta();
-    AINFO << "i " << i;
     Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
         ego_theta, ego_length, ego_width);
@@ -888,8 +880,9 @@ bool OpenSpacePlanning::IsCollisionFreeTrajectory(
     Vec2d shift_vec{shift_distance * std::cos(ego_theta),
                     shift_distance * std::sin(ego_theta)};
     ego_box.Shift(shift_vec);
-    if (predicted_bounding_rectangles_.size() != 0) {
-      for (const auto& obstacle_box : predicted_bounding_rectangles_[i]) {
+    size_t predicted_time_horizon = predicted_bounding_rectangles_.size();
+    for (size_t j = 0; j < predicted_time_horizon; j++) {
+      for (const auto& obstacle_box : predicted_bounding_rectangles_[j]) {
         if (ego_box.HasOverlap(obstacle_box)) {
           return false;
         }
@@ -903,7 +896,7 @@ void OpenSpacePlanning::BuildPredictedEnvironment(
     const std::vector<const Obstacle*>& obstacles) {
   predicted_bounding_rectangles_.clear();
   double relative_time = 0.0;
-  while (relative_time < FLAGS_trajectory_time_length) {
+  while (relative_time < FLAGS_open_space_prediction_time_horizon) {
     std::vector<Box2d> predicted_env;
     for (const Obstacle* obstacle : obstacles) {
       TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);

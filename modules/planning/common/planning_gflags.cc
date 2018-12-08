@@ -410,6 +410,10 @@ DEFINE_double(
 DEFINE_double(parking_start_range, 10.0,
               "the distance used for checking whether doing parking");
 
+DEFINE_double(open_space_prediction_time_horizon, 2.0,
+              "the time in second we use from the trajectory of obstacles "
+              "given by prediction");
+
 DEFINE_bool(enable_perception_obstacles, true,
             "enable the open space planner to take percetion obstacles into "
             "consideration");
