@@ -41,7 +41,7 @@ message Record {
   repeated apollo.common.DriveEvent drive_events = 7;
 
   message Stat {
-    // Mileage stat by driving mode: {canbus.Chassis.DrivingMode : miles}.
+    // Mileage stat by driving mode: {canbus.Chassis.DrivingMode : meters}.
     map<string, float> mileages = 1;
 
     // A downsampled position point list which forms a driving path.

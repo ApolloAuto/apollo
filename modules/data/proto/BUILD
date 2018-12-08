@@ -17,12 +17,6 @@ proto_library(
 )
 
 proto_library(
-    name = "task_proto_lib",
-    srcs = ["task.proto"],
-    deps = [":static_info_proto_lib"],
-)
-
-proto_library(
     name = "record_proto_lib",
     srcs = ["record.proto"],
     deps = [
@@ -31,12 +25,6 @@ proto_library(
         "//modules/common/proto:geometry_proto_lib",
         "//modules/dreamview/proto:hmi_status_proto_lib",
     ],
-)
-
-proto_library(
-    name = "warehouse_query_proto_lib",
-    srcs = ["warehouse_query.proto"],
-    deps = [":task_proto_lib"],
 )
 
 cc_proto_library(

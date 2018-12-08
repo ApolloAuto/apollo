@@ -43,7 +43,7 @@ gflags.DEFINE_string('utm_zone_letter', 'S', 'UTM zone letter.')
 
 kChassisChannel = '/apollo/canbus/chassis'
 kDriveEventChannel = '/apollo/drive_event'
-kHMIStatusChannel = '/apollo/hmi/hmi_status'
+kHMIStatusChannel = '/apollo/hmi/status'
 kLocalizationChannel = '/apollo/localization/pose'
 
 
@@ -52,11 +52,6 @@ def utm_distance_meters(pos0, pos1):
     return math.sqrt((pos0.x - pos1.x) ** 2 +
                      (pos0.y - pos1.y) ** 2 +
                      (pos0.z - pos1.z) ** 2)
-
-
-def utm_distance_miles(pos0, pos1):
-    """Return distance of pos0 and pos1 in miles."""
-    return 0.000621371 * utm_distance_meters(pos0, pos1)
 
 
 class RecordParser(object):
@@ -153,11 +148,11 @@ class RecordParser(object):
         if (self._last_position is not None and
             self._current_driving_mode is not None):
             driving_mode = Chassis.DrivingMode.Name(self._current_driving_mode)
-            miles = utm_distance_miles(self._last_position, cur_pos)
+            meters = utm_distance_meters(self._last_position, cur_pos)
             if driving_mode in self.record.stat.mileages:
-                self.record.stat.mileages[driving_mode] += miles
+                self.record.stat.mileages[driving_mode] += meters
             else:
-                self.record.stat.mileages[driving_mode] = miles
+                self.record.stat.mileages[driving_mode] = meters
 
         # Sample driving path.
         G = gflags.FLAGS
