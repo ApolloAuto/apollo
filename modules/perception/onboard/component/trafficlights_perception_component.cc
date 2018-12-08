@@ -799,13 +799,16 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   }
 
   if (max_light_id >= 0) {
-    apollo::perception::TrafficLight *light_result =
-          (*out_msg)->add_traffic_light();
-    light_result->set_id(lights.at(0)->id);
-    light_result->set_confidence(lights.at(0)->status.confidence);
-    light_result->set_color(static_cast<apollo::perception::TrafficLight_Color>
-                            (lights.at(0)->status.color));
-    light_result->set_blink(lights.at(0)->status.blink);
+    for (size_t i = 0; i < lights.size(); i++) {
+      apollo::perception::TrafficLight *light_result =
+            (*out_msg)->add_traffic_light();
+      light_result->set_id(lights.at(i)->id);
+      light_result->set_confidence(lights.at(0)->status.confidence);
+      light_result->set_color(static_cast<apollo::perception::TrafficLight_Color>
+                              (lights.at(0)->status.color));
+      light_result->set_blink(lights.at(0)->status.blink);
+    }
+      // set contain_lights
     // set contain_lights
     (*out_msg)->set_contain_lights(lights.size() > 0);
     detected_trafficlight_color_ = lights.at(0)->status.color;
