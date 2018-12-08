@@ -80,8 +80,23 @@ class SpiralSmootherUtil {
       return false;
     }
 
-    Eigen::Vector2d start_point = raw_points.front();
-    std::for_each(raw_points.begin(), raw_points.end(),
+    std::vector<Eigen::Vector2d> processed_points;
+    processed_points.push_back(raw_points.front());
+
+    for (const Eigen::Vector2d& p : raw_points) {
+      Eigen::Vector2d d = p - processed_points.back();
+      if (d.norm() < FLAGS_minimum_point_spacing) {
+        continue;
+      }
+      processed_points.push_back(p);
+    }
+
+    if (processed_points.size() < 2) {
+      processed_points.push_back(raw_points.back());
+    }
+
+    Eigen::Vector2d start_point = processed_points.front();
+    std::for_each(processed_points.begin(), processed_points.end(),
         [&start_point](Eigen::Vector2d& p) {
           p = p - start_point;});
 
@@ -97,7 +112,7 @@ class SpiralSmootherUtil {
     std::vector<double> opt_y;
 
     SpiralReferenceLineSmoother spiral_smoother(config);
-    auto res = spiral_smoother.SmoothStandAlone(raw_points,
+    auto res = spiral_smoother.SmoothStandAlone(processed_points,
         &opt_theta, &opt_kappa, &opt_dkappa, &opt_s, &opt_x, &opt_y);
 
     if (!res) {
