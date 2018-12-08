@@ -52,7 +52,7 @@ void Llcmotionfeedback221::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 // config detail: {'name': 'llc_fbk_vehiclespeed', 'offset': 0.0, 'precision':
-// 0.028, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|183.498]',
+// 0.01, 'len': 16, 'is_signed_var': False, 'physical_range': '[0|655.35]',
 // 'bit': 32, 'type': 'double', 'order': 'intel', 'physical_unit': 'm/s'}
 double Llcmotionfeedback221::llc_fbk_vehiclespeed(const std::uint8_t* bytes,
                                                   int32_t length) const {
@@ -64,7 +64,7 @@ double Llcmotionfeedback221::llc_fbk_vehiclespeed(const std::uint8_t* bytes,
   x <<= 8;
   x |= t;
 
-  double ret = x * 0.028000;
+  double ret = x * 0.010000;
   return ret;
 }
 
