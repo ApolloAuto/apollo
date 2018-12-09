@@ -50,8 +50,6 @@ DECLARE_double(lock_steer_speed);
 DECLARE_bool(enable_navigation_mode_error_filter);
 DECLARE_bool(enable_navigation_mode_position_update);
 
-DECLARE_bool(enable_persistent_estop);
-
 DECLARE_int32(chassis_pending_queue_size);
 DECLARE_int32(planning_pending_queue_size);
 DECLARE_int32(localization_pending_queue_size);
