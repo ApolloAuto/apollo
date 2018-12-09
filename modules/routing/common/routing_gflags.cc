@@ -29,3 +29,7 @@ DEFINE_double(min_length_for_lane_change, 1.0,
 
 DEFINE_bool(enable_change_lane_in_result, true,
             "contain change lane operator in result");
+
+DECLARE_double(routing_response_history_interval_ms);
+DEFINE_double(routing_response_history_interval_ms, 3000.0,
+              "ms, emit routing resposne for this time interval");

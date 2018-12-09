@@ -53,15 +53,18 @@ bool RoutingComponent::Init() {
   response_history_writer_ = node_->CreateWriter<RoutingResponse>(attr_history);
   std::weak_ptr<RoutingComponent> self =
      std::dynamic_pointer_cast<RoutingComponent>(shared_from_this());
-  timer_.reset(new ::apollo::cyber::Timer(100, [self, this]() {
-    auto ptr = self.lock();
-    if (ptr) {
-      std::lock_guard<std::mutex> guard(this->mutex_);
-      if (this->response_.get() != nullptr) {
-        this->response_history_writer_->Write(response_);
-      }
-    }
-  }, false));
+  timer_.reset(new ::apollo::cyber::Timer(
+      FLAGS_routing_response_history_interval_ms,
+      [self, this]() {
+        auto ptr = self.lock();
+        if (ptr) {
+          std::lock_guard<std::mutex> guard(this->mutex_);
+          if (this->response_.get() != nullptr) {
+            this->response_history_writer_->Write(response_);
+          }
+        }
+      },
+      false));
   timer_->Start();
 
   return routing_.Init().ok() && routing_.Start().ok();
