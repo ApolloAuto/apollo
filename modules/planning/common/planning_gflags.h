@@ -215,8 +215,6 @@ DECLARE_bool(enable_planning_pad_msg);
 // open space planner
 DECLARE_string(planner_open_space_config_filename);
 DECLARE_double(open_space_planning_period);
-DECLARE_double(parking_longitudinal_range);
-DECLARE_double(parking_start_range);
 DECLARE_double(open_space_prediction_time_horizon);
 DECLARE_bool(enable_perception_obstacles);
 DECLARE_bool(parking_inwards);

@@ -284,6 +284,7 @@ cc_binary(
     ],
     deps = [
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/map/pnc_map",
         "//modules/common/math",
         "//cyber/common:log",
