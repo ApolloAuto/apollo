@@ -126,7 +126,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
   const double init_a = EgoInfo::Instance()->start_point().a();
   if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
     auto speed_data = GenerateStopProfileFromPolynomial(init_v, init_a);
-    if (!speed_data.Empty()) {
+    if (!speed_data.empty()) {
       return speed_data;
     }
   }

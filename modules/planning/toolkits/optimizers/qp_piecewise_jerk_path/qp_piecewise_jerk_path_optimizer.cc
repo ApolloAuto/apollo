@@ -123,7 +123,7 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
       index = 0;
     }
     if (index > static_cast<int>(lateral_bounds.size())) {
-      index = lateral_bounds.size();
+      index = static_cast<int>(lateral_bounds.size());
     }
     return lateral_bounds.begin() + index;
   };

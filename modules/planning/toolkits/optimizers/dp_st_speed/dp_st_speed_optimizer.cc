@@ -104,7 +104,7 @@ Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   adc_sl_boundary_ = adc_sl_boundary;
   reference_line_ = &reference_line;
 
-  if (path_data.discretized_path().NumOfPoints() == 0) {
+  if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

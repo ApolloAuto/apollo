@@ -83,7 +83,7 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
   ReferenceLine reference_line_;
   path_data_.SetReferenceLine(&reference_line_);
   path_data_.SetDiscretizedPath(path);
-  int num_of_points = path_data_.discretized_path().NumOfPoints();
+  size_t num_of_points = path_data_.discretized_path().size();
   EXPECT_EQ(num_of_points, 2);
 
   SpeedData speed_data1;
@@ -138,7 +138,7 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedDistance) {
   ReferenceLine reference_line_;
   path_data_.SetReferenceLine(&reference_line_);
   path_data_.SetDiscretizedPath(path);
-  int num_of_points = path_data_.discretized_path().NumOfPoints();
+  size_t num_of_points = path_data_.discretized_path().size();
   EXPECT_EQ(num_of_points, 2);
 
   SpeedData speed_data1;

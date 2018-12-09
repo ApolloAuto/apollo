@@ -43,7 +43,7 @@ using apollo::hdmap::PathOverlap;
 using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
-constexpr double kRoadBuffer = 0.05;   // 5cm
+constexpr double kRoadBuffer = 0.05;  // 5cm
 constexpr double kObstacleLBuffer = 0.1;
 constexpr double kObstacleSBuffer = 1.0;
 constexpr double kSidePassPathLength = 50.0;
@@ -512,8 +512,7 @@ const Obstacle *SidePassPathDecider::GetNearestObstacle(
 
 void SidePassPathDecider::RecordDebugInfo(
     ReferenceLineInfo *const reference_line_info) {
-  const auto &path_points =
-      reference_line_info->path_data().discretized_path().path_points();
+  const auto &path_points = reference_line_info->path_data().discretized_path();
   auto *ptr_optimized_path =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
   ptr_optimized_path->set_name(Name());

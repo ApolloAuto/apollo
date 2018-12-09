@@ -200,7 +200,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
       vehicle_state, start_timestamp, planning_cycle_time,
       last_publishable_trajectory_.get(), &replan_reason);
 
-  const uint32_t frame_num = seq_num_++;
+  const size_t frame_num = seq_num_++;
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
                      vehicle_state, ptr_trajectory_pb);
 

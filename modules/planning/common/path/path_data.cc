@@ -49,7 +49,7 @@ bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
     AERROR << "Fail to transfer discretized path to frenet path.";
     return false;
   }
-  DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
   path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
   return true;
 }
@@ -65,7 +65,7 @@ bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
     AERROR << "Fail to transfer frenet path to discretized path.";
     return false;
   }
-  DCHECK_EQ(discretized_path_.NumOfPoints(), frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
   path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
   return true;
 }
@@ -75,8 +75,7 @@ const DiscretizedPath &PathData::discretized_path() const {
 }
 
 bool PathData::Empty() const {
-  return discretized_path_.NumOfPoints() == 0 &&
-         frenet_path_.NumOfPoints() == 0;
+  return discretized_path_.empty() && frenet_path_.empty();
 }
 
 std::list<std::pair<DiscretizedPath, FrenetFramePath>>
@@ -103,59 +102,55 @@ bool PathData::GetPathPointWithRefS(const double ref_s,
                                     common::PathPoint *const path_point) const {
   DCHECK_NOTNULL(reference_line_);
   DCHECK_NOTNULL(path_point);
-  DCHECK_EQ(discretized_path_.path_points().size(),
-            frenet_path_.points().size());
+  DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
   if (ref_s < 0) {
     AERROR << "ref_s[" << ref_s << "] should be > 0";
     return false;
   }
-  if (ref_s > frenet_path_.points().back().s()) {
+  if (ref_s > frenet_path_.back().s()) {
     AERROR << "ref_s is larger than the length of frenet_path_ length ["
-           << frenet_path_.points().back().s() << "].";
+           << frenet_path_.back().s() << "].";
     return false;
   }
 
   uint32_t index = 0;
   const double kDistanceEpsilon = 1e-3;
-  for (uint32_t i = 0; i + 1 < frenet_path_.points().size(); ++i) {
-    if (fabs(ref_s - frenet_path_.points().at(i).s()) < kDistanceEpsilon) {
-      path_point->CopyFrom(discretized_path_.path_points().at(i));
+  for (uint32_t i = 0; i + 1 < frenet_path_.size(); ++i) {
+    if (fabs(ref_s - frenet_path_.at(i).s()) < kDistanceEpsilon) {
+      path_point->CopyFrom(discretized_path_.at(i));
       return true;
     }
-    if (frenet_path_.points().at(i).s() < ref_s &&
-        ref_s <= frenet_path_.points().at(i + 1).s()) {
+    if (frenet_path_.at(i).s() < ref_s && ref_s <= frenet_path_.at(i + 1).s()) {
       index = i;
       break;
     }
   }
-  double r = (ref_s - frenet_path_.points().at(index).s()) /
-             (frenet_path_.points().at(index + 1).s() -
-              frenet_path_.points().at(index).s());
+  double r = (ref_s - frenet_path_.at(index).s()) /
+             (frenet_path_.at(index + 1).s() - frenet_path_.at(index).s());
 
-  const double discretized_path_s =
-      discretized_path_.path_points().at(index).s() +
-      r * (discretized_path_.path_points().at(index + 1).s() -
-           discretized_path_.path_points().at(index).s());
+  const double discretized_path_s = discretized_path_.at(index).s() +
+                                    r * (discretized_path_.at(index + 1).s() -
+                                         discretized_path_.at(index).s());
   path_point->CopyFrom(discretized_path_.Evaluate(discretized_path_s));
 
   return true;
 }
 
 void PathData::Clear() {
-  discretized_path_.Clear();
-  frenet_path_.Clear();
+  discretized_path_.clear();
+  frenet_path_.clear();
   reference_line_ = nullptr;
 }
 
 std::string PathData::DebugString() const {
-  const auto &path_points = discretized_path_.path_points();
   const auto limit =
-      std::min(path_points.size(),
+      std::min(discretized_path_.size(),
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
   return apollo::common::util::StrCat(
-      "[\n", apollo::common::util::PrintDebugStringIter(
-                 path_points.begin(), path_points.begin() + limit, ",\n"),
+      "[\n",
+      apollo::common::util::PrintDebugStringIter(
+          discretized_path_.begin(), discretized_path_.begin() + limit, ",\n"),
       "]\n");
 }
 
@@ -163,7 +158,7 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
                       DiscretizedPath *const discretized_path) {
   DCHECK_NOTNULL(discretized_path);
   std::vector<common::PathPoint> path_points;
-  for (const common::FrenetFramePoint &frenet_point : frenet_path.points()) {
+  for (const common::FrenetFramePoint &frenet_point : frenet_path) {
     common::SLPoint sl_point;
     common::math::Vec2d cartesian_point;
     sl_point.set_s(frenet_point.s());
@@ -209,7 +204,7 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
   CHECK_NOTNULL(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   const double max_len = reference_line_->Length();
-  for (const auto &path_point : discretized_path.path_points()) {
+  for (const auto &path_point : discretized_path) {
     common::FrenetFramePoint frenet_point =
         reference_line_->GetFrenetPoint(path_point);
     if (!frenet_point.has_s()) {
@@ -238,7 +233,7 @@ bool PathData::LeftTrimWithRefS(const common::FrenetFramePoint &frenet_point) {
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   frenet_frame_points.emplace_back(frenet_point);
 
-  for (const common::FrenetFramePoint fp : frenet_path_.points()) {
+  for (const common::FrenetFramePoint fp : frenet_path_) {
     if (std::fabs(fp.s() - frenet_point.s()) < 1e-6) {
       continue;
     }

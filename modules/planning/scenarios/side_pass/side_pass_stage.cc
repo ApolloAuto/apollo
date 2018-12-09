@@ -267,8 +267,7 @@ Stage::StageStatus SidePassDetectSafety::Process(
   auto& rfl_info = frame->mutable_reference_line_info()->front();
   *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
 
-  const auto& path_points =
-      rfl_info.path_data().discretized_path().path_points();
+  const auto& path_points = rfl_info.path_data().discretized_path();
   auto* debug_path =
       rfl_info.mutable_debug()->mutable_planning_data()->add_path();
 
@@ -329,8 +328,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
   auto& rfl_info = frame->mutable_reference_line_info()->front();
   *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
 
-  const auto& path_points =
-      rfl_info.path_data().discretized_path().path_points();
+  const auto& path_points = rfl_info.path_data().discretized_path();
   auto* debug_path =
       rfl_info.mutable_debug()->mutable_planning_data()->add_path();
 
@@ -349,7 +347,7 @@ Stage::StageStatus SidePassPassObstacle::Process(
 
   const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   const auto& end_point =
-      reference_line_info.path_data().discretized_path().EndPoint();
+      reference_line_info.path_data().discretized_path().back();
   Vec2d last_xy_point(end_point.x(), end_point.y());
   // get s of last point on path
   common::SLPoint sl_point;

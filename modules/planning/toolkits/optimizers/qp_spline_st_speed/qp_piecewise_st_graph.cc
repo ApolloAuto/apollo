@@ -99,7 +99,7 @@ Status QpPiecewiseStGraph::Search(
   }
 
   // extract output
-  speed_data->Clear();
+  speed_data->clear();
   const auto& res = generator_->params();
   speed_data->AppendSpeedPoint(0.0, 0.0, init_point_.v(), init_point_.a(), 0.0);
 
@@ -279,9 +279,8 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
 
   if (t_evaluated_.size() > 0) {
     ref_kernel->AddReferenceLineKernelMatrix(
-        index_list, cruise_,
-        weight * static_cast<double>(t_evaluated_.size()) /
-            qp_st_speed_config_.total_time());
+        index_list, cruise_, weight * static_cast<double>(t_evaluated_.size()) /
+                                 qp_st_speed_config_.total_time());
   }
 
   return Status::OK();
@@ -328,9 +327,8 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
 
   if (!ref_s.empty()) {
     follow_kernel->AddReferenceLineKernelMatrix(
-        index_list, ref_s,
-        weight * static_cast<double>(t_evaluated_.size()) /
-            qp_st_speed_config_.total_time());
+        index_list, ref_s, weight * static_cast<double>(t_evaluated_.size()) /
+                               qp_st_speed_config_.total_time());
   }
 
   for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {

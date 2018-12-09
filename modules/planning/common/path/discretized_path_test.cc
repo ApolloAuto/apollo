@@ -42,7 +42,7 @@ TEST(DiscretizedPathTest, basic_test) {
   std::vector<PathPoint> path_points{p1, p2, p3, p4};
 
   DiscretizedPath discretized_path(path_points);
-  EXPECT_EQ(discretized_path.NumOfPoints(), 4);
+  EXPECT_EQ(discretized_path.size(), 4);
 
   EXPECT_DOUBLE_EQ(discretized_path.Length(), std::sqrt(1.0 + 1.0) * 3.0);
 
@@ -66,14 +66,8 @@ TEST(DiscretizedPathTest, basic_test) {
   EXPECT_DOUBLE_EQ(eval_p4.x(), (2.0 + 0.5) / std::sqrt(2));
   EXPECT_DOUBLE_EQ(eval_p4.y(), (2.0 + 0.5) / std::sqrt(2));
 
-  auto points = discretized_path.path_points();
-  EXPECT_EQ(points.size(), path_points.size());
-
-  EXPECT_DOUBLE_EQ(discretized_path.StartPoint().s(), path_points.front().s());
-  EXPECT_DOUBLE_EQ(discretized_path.EndPoint().s(), path_points.back().s());
-
-  discretized_path.Clear();
-  EXPECT_EQ(discretized_path.NumOfPoints(), 0);
+  discretized_path.clear();
+  EXPECT_EQ(discretized_path.size(), 0);
 }
 
 }  // namespace planning

@@ -189,7 +189,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
     reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
   }
 
-  if (!ret.ok() || reference_line_info->speed_data().Empty()) {
+  if (!ret.ok() || reference_line_info->speed_data().empty()) {
     ADEBUG << "Speed fallback.";
 
     *reference_line_info->mutable_speed_data() =

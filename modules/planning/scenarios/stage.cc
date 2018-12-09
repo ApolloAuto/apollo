@@ -84,7 +84,7 @@ bool Stage::ExecuteTaskOnReferenceLine(
       }
     }
 
-    if (reference_line_info.speed_data().Empty()) {
+    if (reference_line_info.speed_data().empty()) {
       *reference_line_info.mutable_speed_data() =
           SpeedProfileGenerator::GenerateFallbackSpeedProfile();
       reference_line_info.AddCost(kSpeedOptimizationFallbackCost);

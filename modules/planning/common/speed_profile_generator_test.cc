@@ -30,7 +30,7 @@ namespace planning {
 
 TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
   auto speed_data = SpeedProfileGenerator::GenerateFallbackSpeedProfile();
-  EXPECT_FALSE(speed_data.Empty());
+  EXPECT_FALSE(speed_data.empty());
 
   common::TrajectoryPoint adc_planning_point;
   adc_planning_point.set_v(FLAGS_polynomial_speed_fallback_velocity + 0.1);
@@ -39,7 +39,7 @@ TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
 
   EgoInfo::Instance()->Update(adc_planning_point, vs);
   auto speed_data2 = SpeedProfileGenerator::GenerateFallbackSpeedProfile();
-  EXPECT_FALSE(speed_data2.Empty());
+  EXPECT_FALSE(speed_data2.empty());
 }
 
 }  // namespace planning

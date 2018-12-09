@@ -82,10 +82,10 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (path_data_.discretized_path().NumOfPoints() < 2) {
+  if (path_data_.discretized_path().size() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
-           << path_data_.discretized_path().NumOfPoints() << ".";
+           << path_data_.discretized_path().size() << ".";
     return Status(ErrorCode::PLANNING_ERROR,
                   "Fail to get params because of too few path points");
   }
@@ -174,10 +174,10 @@ Status StBoundaryMapper::CreateStBoundaryWithHistory(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (path_data_.discretized_path().NumOfPoints() < 2) {
+  if (path_data_.discretized_path().size() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
-           << path_data_.discretized_path().NumOfPoints() << ".";
+           << path_data_.discretized_path().size() << ".";
     return Status(ErrorCode::PLANNING_ERROR,
                   "Fail to get params because of too few path points");
   }
@@ -277,10 +277,9 @@ bool StBoundaryMapper::MapStopDecision(
                             stop_decision.stop().distance_s() -
                             vehicle_param_.front_edge_to_center();
 
-  if (stop_ref_s > path_data_.frenet_frame_path().points().back().s()) {
-    st_stop_s =
-        path_data_.discretized_path().EndPoint().s() +
-        (stop_ref_s - path_data_.frenet_frame_path().points().back().s());
+  if (stop_ref_s > path_data_.frenet_frame_path().back().s()) {
+    st_stop_s = path_data_.discretized_path().back().s() +
+                (stop_ref_s - path_data_.frenet_frame_path().back().s());
   } else {
     PathPoint stop_point;
     if (!path_data_.GetPathPointWithRefS(stop_ref_s, &stop_point)) {
@@ -316,8 +315,8 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                                *obstacle, &upper_points, &lower_points)) {
+  if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
+                                &upper_points, &lower_points)) {
     return Status::OK();
   }
 
@@ -393,9 +392,9 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
           sampled_path_points.push_back(path_points[i]);
         }
       }
-      discretized_path.set_path_points(sampled_path_points);
+      discretized_path = DiscretizedPath(sampled_path_points);
     } else {
-      discretized_path.set_path_points(path_points);
+      discretized_path = DiscretizedPath(path_points);
     }
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
@@ -411,8 +410,8 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       auto path_len =
           std::min(FLAGS_max_trajectory_len, discretized_path.Length());
       for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
-        const auto curr_adc_path_point = discretized_path.Evaluate(
-            path_s + discretized_path.StartPoint().s());
+        const auto curr_adc_path_point =
+            discretized_path.Evaluate(path_s + discretized_path.front().s());
         if (CheckOverlap(curr_adc_path_point, obs_box,
                          st_boundary_config_.boundary_buffer())) {
           // found overlap, start searching with higher resolution
@@ -436,7 +435,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
             }
             if (!find_low) {
               const auto& point_low = discretized_path.Evaluate(
-                  low_s + discretized_path.StartPoint().s());
+                  low_s + discretized_path.front().s());
               if (!CheckOverlap(point_low, obs_box,
                                 st_boundary_config_.boundary_buffer())) {
                 low_s += fine_tuning_step_length;
@@ -446,7 +445,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
             }
             if (!find_high) {
               const auto& point_high = discretized_path.Evaluate(
-                  high_s + discretized_path.StartPoint().s());
+                  high_s + discretized_path.front().s());
               if (!CheckOverlap(point_high, obs_box,
                                 st_boundary_config_.boundary_buffer())) {
                 high_s -= fine_tuning_step_length;
@@ -482,8 +481,8 @@ Status StBoundaryMapper::MapWithDecision(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  if (!GetOverlapBoundaryPoints(path_data_.discretized_path().path_points(),
-                                *obstacle, &upper_points, &lower_points)) {
+  if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
+                                &upper_points, &lower_points)) {
     return Status::OK();
   }
 
