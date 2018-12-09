@@ -697,25 +697,25 @@ void OpenSpacePlanning::AddOpenSpaceTrajectory(
   chart->set_title("Open Space Trajectory Visualization");
   auto* options = chart->mutable_options();
   CHECK_EQ(open_space_debug.xy_boundary_size(), 4);
-  options->mutable_x()->set_min(-20);
-  options->mutable_x()->set_max(20);
+  options->mutable_x()->set_min(open_space_debug.xy_boundary(0) - 1.0);
+  options->mutable_x()->set_max(open_space_debug.xy_boundary(1) + 1.0);
   options->mutable_x()->set_label_string("x (meter)");
-  options->mutable_y()->set_min(-10);
-  options->mutable_y()->set_max(10);
+  options->mutable_y()->set_min(open_space_debug.xy_boundary(2) - 1.0);
+  options->mutable_y()->set_max(open_space_debug.xy_boundary(3) + 1.0);
   options->mutable_y()->set_label_string("y (meter)");
   int obstacle_index = 1;
   for (const auto& obstacle : open_space_debug.obstacles()) {
-    auto* polygon = chart->add_polygon();
-    polygon->set_label("boundary_" + std::to_string(obstacle_index));
+    auto* obstacle_outline = chart->add_line();
+    obstacle_outline->set_label("boundary_" + std::to_string(obstacle_index));
     obstacle_index += 1;
     for (int vertice_index = 0;
          vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
-      auto* point_debug = polygon->add_point();
+      auto* point_debug = obstacle_outline->add_point();
       point_debug->set_x(obstacle.vertices_x_coords(vertice_index));
       point_debug->set_y(obstacle.vertices_y_coords(vertice_index));
     }
     // Set chartJS's dataset properties
-    auto* obstacle_properties = polygon->mutable_properties();
+    auto* obstacle_properties = obstacle_outline->mutable_properties();
     (*obstacle_properties)["borderWidth"] = "2";
     (*obstacle_properties)["pointRadius"] = "0";
     (*obstacle_properties)["lineTension"] = "0";
