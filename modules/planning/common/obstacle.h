@@ -207,6 +207,12 @@ class Obstacle {
   void SetBlockingObstacle(bool blocking) { is_blocking_obstacle_ = blocking; }
   bool IsBlockingObstacle() const { return is_blocking_obstacle_; }
 
+  /*
+   * @brief IsLaneBlocking is only meaningful when IsStatic() == true.
+   */
+  bool IsLaneBlocking() const { return is_lane_blocking_; }
+  void CheckLaneBlocking(const ReferenceLine& reference_line);
+
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
   static ObjectDecisionType MergeLongitudinalDecision(
@@ -233,11 +239,9 @@ class Obstacle {
   common::math::Box2d perception_bounding_box_;
   common::math::Polygon2d perception_polygon_;
 
-  // const Obstacle* obstacle_ = nullptr;
-
   std::vector<ObjectDecisionType> decisions_;
   std::vector<std::string> decider_tags_;
-  SLBoundary perception_sl_boundary_;
+  SLBoundary sl_boundary_;
 
   StBoundary reference_line_st_boundary_;
   StBoundary st_boundary_;
@@ -245,7 +249,10 @@ class Obstacle {
   ObjectDecisionType lateral_decision_;
   ObjectDecisionType longitudinal_decision_;
 
+  // for keep_clear usage only
   bool is_blocking_obstacle_ = false;
+
+  bool is_lane_blocking_ = false;
 
   double min_radius_stop_distance_ = -1.0;
 

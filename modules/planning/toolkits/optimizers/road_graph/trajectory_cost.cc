@@ -278,10 +278,11 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
     return obstacle_cost;
   }
 
-  const double delta_l = std::fabs(
-      adc_l - (obs_sl_boundary.start_l() + obs_sl_boundary.end_l()) / 2.0);
+  const double delta_l = std::fmax(adc_right_l - obs_sl_boundary.end_l(),
+                                   obs_sl_boundary.start_l() - adc_left_l);
+  ADEBUG << "delta_l = " << delta_l;
 
-  const double kSafeDistance = 1.0;
+  constexpr double kSafeDistance = 1.0;
   if (delta_l < kSafeDistance) {
     obstacle_cost.safety_cost +=
         config_.obstacle_collision_cost() *

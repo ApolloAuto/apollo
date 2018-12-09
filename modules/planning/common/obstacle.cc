@@ -287,7 +287,7 @@ bool Obstacle::IsValidTrajectoryPoint(const common::TrajectoryPoint& point) {
 }
 
 void Obstacle::SetPerceptionSlBoundary(const SLBoundary& sl_boundary) {
-  perception_sl_boundary_ = sl_boundary;
+  sl_boundary_ = sl_boundary;
 }
 
 double Obstacle::MinRadiusStopDistance(
@@ -297,9 +297,9 @@ double Obstacle::MinRadiusStopDistance(
   }
   constexpr double stop_distance_buffer = 0.5;
   const double min_turn_radius = VehicleConfigHelper::MinSafeTurnRadius();
-  double lateral_diff = vehicle_param.width() / 2.0 +
-                        std::max(std::fabs(perception_sl_boundary_.start_l()),
-                                 std::fabs(perception_sl_boundary_.end_l()));
+  double lateral_diff =
+      vehicle_param.width() / 2.0 + std::max(std::fabs(sl_boundary_.start_l()),
+                                             std::fabs(sl_boundary_.end_l()));
   const double kEpison = 1e-5;
   lateral_diff = std::min(lateral_diff, min_turn_radius - kEpison);
   double stop_distance =
@@ -320,8 +320,8 @@ void Obstacle::BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
   const double adc_width = adc_param.width();
   if (is_static_ || trajectory_.trajectory_point().empty()) {
     std::vector<std::pair<STPoint, STPoint>> point_pairs;
-    double start_s = perception_sl_boundary_.start_s();
-    double end_s = perception_sl_boundary_.end_s();
+    double start_s = sl_boundary_.start_s();
+    double end_s = sl_boundary_.end_s();
     if (end_s - start_s < kStBoundaryDeltaS) {
       end_s = start_s + kStBoundaryDeltaS;
     }
@@ -685,7 +685,7 @@ const std::string Obstacle::DebugString() const {
 }
 
 const SLBoundary& Obstacle::PerceptionSLBoundary() const {
-  return perception_sl_boundary_;
+  return sl_boundary_;
 }
 
 void Obstacle::SetStBoundary(const StBoundary& boundary) {
@@ -720,6 +720,32 @@ bool Obstacle::IsValidObstacle(
   return !std::isnan(object_width) && !std::isnan(object_length) &&
          object_width > kMinObjectDimension &&
          object_length > kMinObjectDimension;
+}
+
+void Obstacle::CheckLaneBlocking(const ReferenceLine& reference_line) {
+  if (!IsStatic()) {
+    is_lane_blocking_ = false;
+    return;
+  }
+  DCHECK(sl_boundary_.has_start_s());
+  DCHECK(sl_boundary_.has_end_s());
+  DCHECK(sl_boundary_.has_start_l());
+  DCHECK(sl_boundary_.has_end_l());
+
+  if (sl_boundary_.start_l() * sl_boundary_.end_l() < 0.0) {
+    is_lane_blocking_ = true;
+    return;
+  }
+
+  const double driving_width = reference_line.GetDrivingWidth(sl_boundary_);
+  auto vehicle_param = common::VehicleConfigHelper::GetConfig().vehicle_param();
+  if (driving_width <
+      FLAGS_static_decision_nudge_l_buffer + vehicle_param.width()) {
+    is_lane_blocking_ = true;
+    return;
+  }
+
+  is_lane_blocking_ = false;
 }
 
 }  // namespace planning
