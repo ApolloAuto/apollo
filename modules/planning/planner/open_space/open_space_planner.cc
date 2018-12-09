@@ -91,13 +91,29 @@ apollo::common::Status OpenSpacePlanner::Plan(
     // Check if trajectory updated
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
-      open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
-      open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
-      open_space_trajectory_generator_->GetStitchingTrajectory(
-          &stitching_trajectory_);
-      LoadTrajectoryToFrame(frame);
-      trajectory_updated_.store(false);
-      return Status::OK();
+      if (open_space_trajectory_generator_->end_pose() ==
+          thread_data_.end_pose) {
+        open_space_trajectory_generator_->UpdateTrajectory(&trajectory_to_end_);
+        open_space_trajectory_generator_->UpdateDebugInfo(&open_space_debug_);
+        open_space_trajectory_generator_->GetStitchingTrajectory(
+            &stitching_trajectory_);
+        LoadTrajectoryToFrame(frame);
+        trajectory_updated_.store(false);
+        return Status(ErrorCode::OK, "Planning trajectory updated");
+      } else {
+        AINFO << "End pose not same between threads, old pose : "
+              << open_space_trajectory_generator_->end_pose()[0] << ", "
+              << open_space_trajectory_generator_->end_pose()[1] << ", "
+              << open_space_trajectory_generator_->end_pose()[2] << ", "
+              << open_space_trajectory_generator_->end_pose()[3]
+              << ", new pose : " << thread_data_.end_pose[0] << ", "
+              << thread_data_.end_pose[1] << ", " << thread_data_.end_pose[2]
+              << ", " << thread_data_.end_pose[3]
+              << ", disgard this trajectory generation.";
+        trajectory_updated_.store(false);
+        return Status(ErrorCode::OK,
+                      "Disgard this frame due to end_pose not match");
+      }
     }
 
     return Status(ErrorCode::OK,

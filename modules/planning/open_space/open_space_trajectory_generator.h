@@ -117,6 +117,8 @@ class OpenSpaceTrajectoryGenerator {
                        const std::vector<std::vector<common::math::Vec2d>>&
                            obstacles_vertices_vec);
 
+  const std::vector<double>& end_pose() const { return end_pose_; }
+
  private:
   bool IsVehicleNearDestination(
       const common::TrajectoryPoint& planning_init_point,
@@ -157,6 +159,7 @@ class OpenSpaceTrajectoryGenerator {
   std::vector<double> XYbounds_;
   apollo::common::Trajectory trajectory_to_end_;
   apollo::planning_internal::OpenSpaceDebug open_space_debug_;
+  std::vector<double> end_pose_;
 };
 
 }  // namespace planning
