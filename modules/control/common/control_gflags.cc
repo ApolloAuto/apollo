@@ -60,10 +60,6 @@ DEFINE_bool(enable_navigation_mode_error_filter, false,
 DEFINE_bool(enable_navigation_mode_position_update, true,
             "Enable position update for navigation mode");
 
-DEFINE_bool(enable_persistent_estop, false,
-            "True to persistent keep estop status, "
-            "pad reset can reset the estop status.");
-
 DEFINE_int32(chassis_pending_queue_size, 10, "Max chassis pending queue size");
 DEFINE_int32(planning_pending_queue_size, 10,
              "Max planning pending queue size");
