@@ -167,9 +167,19 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;
     }
-    if (overlap.second.start_s - adc_sl_boundary.end_s() < kClearDistance) {
-      ADEBUG << "too close to overlap_type[" << overlap.first << "]";
-      return false;
+    auto distance = overlap.second.start_s - adc_sl_boundary.end_s();
+    if (overlap.first == ReferenceLineInfo::SIGNAL) {
+      if (distance < FLAGS_side_pass_min_signal_intersection_distance) {
+        ADEBUG << "skip side pass scenario for it is too close to signal "
+                  "intersection: "
+               << distance;
+        return false;
+      }
+    } else {
+      if (distance < kClearDistance) {
+        ADEBUG << "too close to overlap_type[" << overlap.first << "]";
+        return false;
+      }
     }
   }
   return true;
