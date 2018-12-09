@@ -45,8 +45,12 @@ DEFINE_string(scenario_traffic_light_right_turn_unprotected_config_file,
               "scenario_traffic_light_right_turn_unprotected_config.pb.txt",
               "scenario_traffic_light_right_turn_unprotected config file");
 
-DEFINE_bool(enable_scenario_side_pass, false,
+DEFINE_bool(enable_scenario_side_pass, true,
             "enable side pass scenario in planning");
+DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
+              "meter, for intersection has signal, ADC will enter side pass "
+              "scenario only when it is farther than this threshoold");
+
 DEFINE_bool(enable_scenario_stop_sign_unprotected, true,
             "enable stop_sign_unprotected scenario in planning");
 DEFINE_bool(enable_scenario_traffic_light_right_turn_unprotected, false,
