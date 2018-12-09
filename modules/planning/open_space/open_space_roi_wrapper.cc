@@ -27,6 +27,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -64,8 +65,12 @@ class OpenSpaceROITest {
     }
     // start or end, left or right is decided by the vehicle's heading
     double center_line_s = (left_top_s + right_top_s) / 2;
-    double start_s = center_line_s - FLAGS_parking_longitudinal_range;
-    double end_s = center_line_s + FLAGS_parking_longitudinal_range;
+    double start_s =
+        center_line_s -
+        planner_open_space_config_.roi_config().roi_longitudinal_range();
+    double end_s =
+        center_line_s +
+        planner_open_space_config_.roi_config().roi_longitudinal_range();
     hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
     hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
     double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);
@@ -235,8 +240,12 @@ class OpenSpaceROITest {
     }
     // start or end, left or right is decided by the vehicle's heading
     double center_line_s = (left_top_s + right_top_s) / 2;
-    double start_s = center_line_s - FLAGS_parking_longitudinal_range;
-    double end_s = center_line_s + FLAGS_parking_longitudinal_range;
+    double start_s =
+        center_line_s -
+        planner_open_space_config_.roi_config().roi_longitudinal_range();
+    double end_s =
+        center_line_s +
+        planner_open_space_config_.roi_config().roi_longitudinal_range();
     hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
     hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
     double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);
@@ -347,6 +356,12 @@ class OpenSpaceROITest {
       AINFO << "fail at loading map";
       return false;
     }
+
+    CHECK(common::util::GetProtoFromFile(
+        FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+        << "Failed to load open space config file "
+        << FLAGS_planner_open_space_config_filename;
+
     // load info from pnc map
     if (!OpenSpaceROI()) {
       AINFO << "fail at ROI()";
@@ -431,6 +446,7 @@ class OpenSpaceROITest {
   Polygon2d GetParkingSpotBox() { return parking_spot_box_; }
 
  private:
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
   ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
   Polygon2d parking_spot_box_;
   std::unique_ptr<Path> nearby_path_ = nullptr;

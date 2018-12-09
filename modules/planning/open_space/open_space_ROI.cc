@@ -32,9 +32,11 @@ using apollo::hdmap::PathOverlap;
 
 constexpr double kMathEpsilon = 1e-8;
 
-OpenSpaceROI::OpenSpaceROI() {
+OpenSpaceROI::OpenSpaceROI(
+    const PlannerOpenSpaceConfig &planner_open_space_config) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
+  planner_open_space_config_.CopyFrom(planner_open_space_config);
 }
 
 bool OpenSpaceROI::GenerateRegionOfInterest(Frame *frame) {
@@ -239,8 +241,12 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   }
   // start or end, left or right is decided by the vehicle's heading
   double center_line_s = (left_top_s + right_top_s) / 2;
-  double start_s = center_line_s - FLAGS_parking_longitudinal_range;
-  double end_s = center_line_s + FLAGS_parking_longitudinal_range;
+  double start_s =
+      center_line_s -
+      planner_open_space_config_.roi_config().roi_longitudinal_range();
+  double end_s =
+      center_line_s +
+      planner_open_space_config_.roi_config().roi_longitudinal_range();
   hdmap::MapPathPoint end_point = nearby_path->GetSmoothPoint(end_s);
   hdmap::MapPathPoint start_point = nearby_path->GetSmoothPoint(start_s);
   double start_left_width = nearby_path->GetRoadLeftWidth(start_s);
@@ -491,7 +497,8 @@ bool OpenSpaceROI::CheckDistanceToParkingSpot(
   (*nearby_path)
       ->GetNearestPoint(vehicle_vec, &vehicle_point_s, &vehicle_point_l);
   if (std::abs((left_bottom_point_s + right_bottom_point_s) / 2 -
-               vehicle_point_s) < FLAGS_parking_start_range) {
+               vehicle_point_s) <
+      planner_open_space_config_.roi_config().parking_start_range()) {
     return true;
   } else {
     return false;

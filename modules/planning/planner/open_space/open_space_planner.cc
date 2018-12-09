@@ -65,7 +65,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
     ADEBUG << "Open space plan in multi-threads mode";
 
     // Update Vehicle information and obstacles information from frame.
-    open_space_roi_generator_.reset(new OpenSpaceROI());
+    open_space_roi_generator_.reset(
+        new OpenSpaceROI(planner_open_space_config_));
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
@@ -104,7 +105,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
 
   } else {
     // Single thread logic
-    open_space_roi_generator_.reset(new OpenSpaceROI());
+    open_space_roi_generator_.reset(
+        new OpenSpaceROI(planner_open_space_config_));
     if (!open_space_roi_generator_->GenerateRegionOfInterest(frame)) {
       return Status(ErrorCode::PLANNING_ERROR,
                     "Generate Open Space ROI failed");
@@ -150,16 +152,18 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
       thread_data = thread_data_;
     }
     if (!trajectory_updated_) {
-      if (open_space_trajectory_generator_->Plan(
-              thread_data.stitching_trajectory, thread_data.vehicle_state,
-              thread_data.XYbounds, thread_data.rotate_angle,
-              thread_data.translate_origin, thread_data.end_pose,
-              thread_data.obstacles_edges_num, thread_data.obstacles_A,
-              thread_data.obstacles_b,
-              thread_data_.obstacles_vertices_vec) == Status::OK()) {
+      Status status = open_space_trajectory_generator_->Plan(
+          thread_data.stitching_trajectory, thread_data.vehicle_state,
+          thread_data.XYbounds, thread_data.rotate_angle,
+          thread_data.translate_origin, thread_data.end_pose,
+          thread_data.obstacles_edges_num, thread_data.obstacles_A,
+          thread_data.obstacles_b, thread_data_.obstacles_vertices_vec);
+      if (status == Status::OK()) {
         trajectory_updated_.store(true);
       } else {
-        AERROR << "Multi-thread trajectory generator failed";
+        AERROR
+            << "Multi-thread trajectory generator failed with return satus : "
+            << status.ToString();
       }
     }
   }

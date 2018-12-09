@@ -20,10 +20,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
@@ -40,9 +40,11 @@
 
 namespace apollo {
 namespace planning {
+
 class OpenSpaceROI {
  public:
-  OpenSpaceROI();
+  explicit OpenSpaceROI(
+      const PlannerOpenSpaceConfig &planner_open_space_config);
 
   bool GenerateRegionOfInterest(Frame *frame);
 
@@ -168,6 +170,8 @@ class OpenSpaceROI {
 
   // @brief parking_spot_id from routing
   std::string target_parking_spot_id_ = "";
+
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 }  // namespace planning

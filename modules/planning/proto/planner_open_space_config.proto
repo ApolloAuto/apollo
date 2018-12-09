@@ -3,16 +3,25 @@ syntax = "proto2";
 package apollo.planning;
 
 message PlannerOpenSpaceConfig {
+  // Open Space ROIConfig
+  optional ROIConfig roi_config = 1;
   // Hybrid A Star Warm Start
-  optional WarmStartConfig warm_start_config = 1;
+  optional WarmStartConfig warm_start_config = 2;
   // Dual Variable Warm Start
-  optional DualVariableWarmStartConfig dual_variable_warm_start_config = 2;
-  // Distance Approach COnfigs
-  optional DistanceApproachConfig distance_approach_config = 3;
-  optional float delta_t = 4 [default = 1.0];
-  optional double max_position_error_to_end_point = 5 [default = 0.5];
-  optional double max_theta_error_to_end_point = 6 [default = 0.2];
-  optional double is_near_desitination_threshold = 7 [default = 0.01];
+  optional DualVariableWarmStartConfig dual_variable_warm_start_config = 3;
+  // Distance Approach Configs
+  optional DistanceApproachConfig distance_approach_config = 4;
+  optional float delta_t = 5 [default = 1.0];
+  optional double max_position_error_to_end_point = 6 [default = 0.5];
+  optional double max_theta_error_to_end_point = 7 [default = 0.2];
+  optional double is_near_desitination_threshold = 8 [default = 0.001];
+}
+
+message ROIConfig {
+  // Hybrid A Star Warm Start
+  optional double roi_longitudinal_range = 1 [default = 10.0];
+  // Dual Variable Warm Start
+  optional double parking_start_range = 2 [default = 7.0];
 }
 
 message WarmStartConfig {
