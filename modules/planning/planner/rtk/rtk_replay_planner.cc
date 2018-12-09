@@ -86,10 +86,12 @@ Status RTKReplayPlanner::PlanOnReferenceLine(
   std::uint32_t matched_index =
       QueryPositionMatchedPoint(planning_init_point, complete_rtk_trajectory_);
 
-  std::uint32_t forward_buffer = FLAGS_rtk_trajectory_forward;
+  std::uint32_t forward_buffer =
+      static_cast<std::uint32_t>(FLAGS_rtk_trajectory_forward);
   // end_index is excluded.
   std::uint32_t end_index = std::min<std::uint32_t>(
-      complete_rtk_trajectory_.size(), matched_index + forward_buffer);
+      static_cast<std::uint32_t>(complete_rtk_trajectory_.size()),
+      matched_index + forward_buffer);
 
   //  auto* trajectory_points = trajectory_pb->mutable_trajectory_point();
   std::vector<TrajectoryPoint> trajectory_points(
