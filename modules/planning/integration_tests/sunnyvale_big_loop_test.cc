@@ -600,8 +600,8 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   auto* crosswalk_status =
       PlanningContext::MutablePlanningStatus()->mutable_crosswalk();
   EXPECT_EQ("2832", crosswalk_status->crosswalk_id());
-  EXPECT_EQ(1, crosswalk_status->stop_timers_size());
-  EXPECT_EQ("11652", crosswalk_status->stop_timers(0).obstacle_id());
+  EXPECT_EQ(1, crosswalk_status->stop_time_size());
+  EXPECT_EQ("11652", crosswalk_status->stop_time(0).obstacle_id());
 
   // step 2:
   // timeout on static pesestrian
@@ -611,10 +611,10 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
       PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::CROSSWALK);
   double stop_timeout = crosswalk_config->crosswalk().stop_timeout();
   double wait_time = stop_timeout + 0.5;
-  for (int i = 0; i < crosswalk_status->stop_timers_size(); ++i) {
-    auto stop_timer = crosswalk_status->mutable_stop_timers(i);
-    if (stop_timer->obstacle_id() == "11652") {
-      stop_timer->set_stop_time(Clock::NowInSeconds() - wait_time);
+  for (int i = 0; i < crosswalk_status->stop_time_size(); ++i) {
+    auto stop_time = crosswalk_status->mutable_stop_time(i);
+    if (stop_time->obstacle_id() == "11652") {
+      stop_time->set_obstacle_stop_timestamp(Clock::NowInSeconds() - wait_time);
     }
   }
 
