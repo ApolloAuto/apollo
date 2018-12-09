@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <string>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -114,9 +115,36 @@ Stage::StageStatus SidePassBackup::Process(
  */
 Stage::StageStatus SidePassApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  // check the status of side pass scenario
+  std::string blocking_obstacle_id = GetContext()->front_blocking_obstacle_id_;
+  const auto front_blocking_obstacle =
+        frame->Find(blocking_obstacle_id);
+  double obstacle_start_s =
+      front_blocking_obstacle->PerceptionSLBoundary().start_s();
   const SLBoundary& adc_sl_boundary =
       frame->reference_line_info().front().AdcSlBoundary();
+
+  if ((adc_sl_boundary.end_s() - obstacle_start_s) <
+      GetContext()->scenario_config_.min_front_obstacle_distance()) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+
+  double kBlockingObstacleDistance = 2.0;
+  std::string virtual_obstacle_id = blocking_obstacle_id + "_virtual_stop";
+  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
+    auto* obstacle = frame->CreateStopObstacle(
+        &reference_line_info, virtual_obstacle_id,
+        obstacle_start_s - kBlockingObstacleDistance);
+    if (!obstacle) {
+      AERROR << "Failed to create virtual stop obstacle[" << virtual_obstacle_id
+             << "]";
+      next_stage_ = ScenarioConfig::NO_STAGE;
+      return Stage::FINISHED;
+    }
+    break;
+  }
+
+  // check the status of side pass scenario
   const PathDecision& path_decision =
       frame->reference_line_info().front().path_decision();
 
