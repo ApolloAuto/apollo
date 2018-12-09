@@ -116,38 +116,73 @@ Stage::StageStatus SidePassBackup::Process(
 Stage::StageStatus SidePassApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   std::string blocking_obstacle_id = GetContext()->front_blocking_obstacle_id_;
-  const auto front_blocking_obstacle =
-        frame->Find(blocking_obstacle_id);
-  double obstacle_start_s =
-      front_blocking_obstacle->PerceptionSLBoundary().start_s();
   const SLBoundary& adc_sl_boundary =
       frame->reference_line_info().front().AdcSlBoundary();
+  const PathDecision& path_decision =
+      frame->reference_line_info().front().path_decision();
 
-  if ((adc_sl_boundary.end_s() - obstacle_start_s) <
+  double obstacle_start_s = -1.0;
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (obstacle->Id() == blocking_obstacle_id) {
+      obstacle_start_s = obstacle->PerceptionSLBoundary().start_s();
+      break;
+    }
+  }
+  if (obstacle_start_s < 0.0) {
+    AWARN << "front blocking obstacle: " << blocking_obstacle_id
+          << " is not found";
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+
+  if ((obstacle_start_s - adc_sl_boundary.end_s()) <
       GetContext()->scenario_config_.min_front_obstacle_distance()) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
 
-  double kBlockingObstacleDistance = 2.0;
+  double kBlockingObstacleDistance = 5.0;
+  double stop_fence_s = obstacle_start_s - kBlockingObstacleDistance;
+  stop_fence_s = std::max(stop_fence_s, adc_sl_boundary.end_s() + 0.2);
   std::string virtual_obstacle_id = blocking_obstacle_id + "_virtual_stop";
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     auto* obstacle = frame->CreateStopObstacle(
-        &reference_line_info, virtual_obstacle_id,
-        obstacle_start_s - kBlockingObstacleDistance);
+        &reference_line_info, virtual_obstacle_id, stop_fence_s);
     if (!obstacle) {
-      AERROR << "Failed to create virtual stop obstacle[" << virtual_obstacle_id
-             << "]";
+      AERROR << "Failed to create virtual stop obstacle["
+             << blocking_obstacle_id << "]";
       next_stage_ = ScenarioConfig::NO_STAGE;
       return Stage::FINISHED;
     }
+    Obstacle* stop_wall = reference_line_info.AddObstacle(obstacle);
+    if (!stop_wall) {
+      AERROR << "Failed to create stop obstacle for: " << blocking_obstacle_id;
+      next_stage_ = ScenarioConfig::NO_STAGE;
+      return Stage::FINISHED;
+    }
+
+    const double stop_distance = 0.2;
+    const double stop_s = stop_fence_s - stop_distance;
+    const auto& reference_line = reference_line_info.reference_line();
+    auto stop_point = reference_line.GetReferencePoint(stop_s);
+    double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
+
+    ObjectDecisionType stop;
+    auto stop_decision = stop.mutable_stop();
+    stop_decision->set_reason_code(StopReasonCode::STOP_REASON_OBSTACLE);
+    stop_decision->set_distance_s(-stop_distance);
+    stop_decision->set_stop_heading(stop_heading);
+    stop_decision->mutable_stop_point()->set_x(stop_point.x());
+    stop_decision->mutable_stop_point()->set_y(stop_point.y());
+    stop_decision->mutable_stop_point()->set_z(0.0);
+
+    auto* path_decision = reference_line_info.path_decision();
+    path_decision->AddLongitudinalDecision("SidePass", stop_wall->Id(), stop);
+
     break;
   }
 
   // check the status of side pass scenario
-  const PathDecision& path_decision =
-      frame->reference_line_info().front().path_decision();
-
   bool has_blocking_obstacle = false;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     if (obstacle->IsVirtual() || !obstacle->IsStatic()) {

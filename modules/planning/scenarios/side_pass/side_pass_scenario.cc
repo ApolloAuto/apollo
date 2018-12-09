@@ -271,8 +271,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
       // static obstacle id doesn't contain prediction trajectory suffix.
       front_blocking_obstacle_id_ = obstacle->Id() + "_0";
       ADEBUG << "Obstacle: " << obstacle->Id() << " is blocking.";
-      side_pass_context_.front_blocking_obstacle_id_ =
-          front_blocking_obstacle_id_;
+      side_pass_context_.front_blocking_obstacle_id_ = obstacle->Id();
       return true;
     }
   }
