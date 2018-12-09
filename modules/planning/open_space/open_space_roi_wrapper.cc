@@ -147,17 +147,10 @@ class OpenSpaceROITest {
     open_space_end_pose_.emplace_back(0.0);
 
     // get xy boundary of the ROI
-    double x_min = start_left.x();
-    double x_max = end_left.x();
-    double y_min = 0.0;
-    double y_max = 0.0;
-    if (left_down.y() > start_left.y()) {
-      y_max = left_down.y();
-      y_min = start_right.y();
-    } else {
-      y_max = start_left.y();
-      y_min = left_down.y();
-    }
+    double x_min = std::min({start_left.x(), start_right.x()});
+    double x_max = std::max({end_left.x(), end_right.x()});
+    double y_min = std::min({left_down.y(), start_right.y(), start_left.y()});
+    double y_max = std::max({left_down.y(), start_right.y(), start_left.y()});
     ROI_xy_boundary_.emplace_back(x_min);
     ROI_xy_boundary_.emplace_back(x_max);
     ROI_xy_boundary_.emplace_back(y_min);
@@ -288,17 +281,10 @@ class OpenSpaceROITest {
     open_space_end_pose_.emplace_back(0.0);
 
     // get xy boundary of the ROI
-    double x_min = start_left.x();
-    double x_max = end_left.x();
-    double y_min = 0.0;
-    double y_max = 0.0;
-    if (left_down.y() > start_left.y()) {
-      y_max = left_down.y();
-      y_min = start_right.y();
-    } else {
-      y_max = start_left.y();
-      y_min = left_down.y();
-    }
+    double x_min = std::min({start_left.x(), start_right.x()});
+    double x_max = std::max({end_left.x(), end_right.x()});
+    double y_min = std::min({left_down.y(), start_right.y(), start_left.y()});
+    double y_max = std::max({left_down.y(), start_right.y(), start_left.y()});
     ROI_xy_boundary_.emplace_back(x_min);
     ROI_xy_boundary_.emplace_back(x_max);
     ROI_xy_boundary_.emplace_back(y_min);
@@ -386,69 +372,9 @@ class OpenSpaceROITest {
     obstacles_edges_num_.resize(parking_boundaries_obstacles_edges_num.rows(),
                                 1);
     obstacles_edges_num_ << parking_boundaries_obstacles_edges_num;
-
-    // load boundary obstacle for warm start
-    Vec2d left_boundary_center(
-        (ROI_parking_boundary_[0][0].x() + ROI_parking_boundary_[0][1].x()) / 2,
-        (ROI_parking_boundary_[0][1].y() + ROI_parking_boundary_[0][2].y()) /
-            2);
-    double left_boundary_heading = std::atan2(
-        ROI_parking_boundary_[0][1].y() - ROI_parking_boundary_[0][0].y(),
-        ROI_parking_boundary_[0][1].x() - ROI_parking_boundary_[0][0].x());
-    double left_boundary_length = std::abs(-ROI_parking_boundary_[0][0].x() +
-                                           ROI_parking_boundary_[0][1].x());
-    double left_boundary_width = std::abs(ROI_parking_boundary_[0][1].y() -
-                                          ROI_parking_boundary_[0][2].y());
-    Box2d left_boundary_box(left_boundary_center, left_boundary_heading,
-                            left_boundary_length, left_boundary_width);
-    // check the heading of the parking spot is facing up or down
-    Vec2d down_boundary_center(
-        (ROI_parking_boundary_[1][0].x() + ROI_parking_boundary_[1][1].x()) / 2,
-        ROI_parking_boundary_[1][1].y() +
-            (parking_spot_heading_ > kMathEpsilon ? 0.5 : -0.5));
-    double down_boundary_heading = std::atan2(
-        ROI_parking_boundary_[1][1].y() - ROI_parking_boundary_[1][0].y(),
-        ROI_parking_boundary_[1][1].x() - ROI_parking_boundary_[1][0].x());
-    double down_boundary_length = std::abs(-ROI_parking_boundary_[1][0].x() +
-                                           ROI_parking_boundary_[1][1].x());
-    double down_boundary_width = 1.0;
-    Box2d down_boundary_box(down_boundary_center, down_boundary_heading,
-                            down_boundary_length, down_boundary_width);
-
-    Vec2d right_boundary_center(
-        (ROI_parking_boundary_[2][1].x() + ROI_parking_boundary_[2][2].x()) / 2,
-        (ROI_parking_boundary_[2][0].y() + ROI_parking_boundary_[2][1].y()) /
-            2);
-    double right_boundary_heading = std::atan2(
-        ROI_parking_boundary_[2][2].y() - ROI_parking_boundary_[2][1].y(),
-        ROI_parking_boundary_[2][2].x() - ROI_parking_boundary_[2][1].x());
-    double right_boundary_length = std::abs(-ROI_parking_boundary_[2][1].x() +
-                                            ROI_parking_boundary_[2][2].x());
-    double right_boundary_width = std::abs(ROI_parking_boundary_[2][1].y() -
-                                           ROI_parking_boundary_[2][0].y());
-    Box2d right_boundary_box(right_boundary_center, right_boundary_heading,
-                             right_boundary_length, right_boundary_width);
-
-    Vec2d up_boundary_center(
-        (ROI_parking_boundary_[3][0].x() + ROI_parking_boundary_[3][1].x()) / 2,
-        ROI_parking_boundary_[3][0].y() +
-            (parking_spot_heading_ > kMathEpsilon ? -0.5 : 0.5));
-    double up_boundary_heading = std::atan2(
-        ROI_parking_boundary_[3][1].y() - ROI_parking_boundary_[3][0].y(),
-        ROI_parking_boundary_[3][1].x() - ROI_parking_boundary_[3][0].x());
-    double up_boundary_length = std::abs(-ROI_parking_boundary_[3][0].x() +
-                                         ROI_parking_boundary_[3][1].x());
-    double up_boundary_width = 1.0;
-    Box2d up_boundary_box(up_boundary_center, up_boundary_heading,
-                          up_boundary_length, up_boundary_width);
-    ROI_parking_box_.push_back(left_boundary_box);
-    ROI_parking_box_.push_back(down_boundary_box);
-    ROI_parking_box_.push_back(right_boundary_box);
-    ROI_parking_box_.push_back(up_boundary_box);
     return true;
   }
 
-  // TODO(Jinyun) plot path boundary in visualizer
   bool LoadPathBoundary() { return true; }
 
   bool LoadMap(const std::string& lane_id, const std::string& parking_id) {
@@ -499,7 +425,6 @@ class OpenSpaceROITest {
   std::vector<std::vector<Vec2d>>* GetNoRotateROIParkingBoundary() {
     return &No_rotate_ROI_parking_boundary_;
   }
-  std::vector<Box2d>* GetROIParkingBox() { return &ROI_parking_box_; }
   std::vector<double>* GetEndPose() { return &open_space_end_pose_; }
   double GetOriginHeading() { return origin_heading_; }
   Vec2d GetOriginPose() { return origin_point_; }
@@ -513,7 +438,6 @@ class OpenSpaceROITest {
   Eigen::MatrixXd obstacles_edges_num_;
   std::vector<double> ROI_xy_boundary_;
   std::vector<std::vector<Vec2d>> ROI_parking_boundary_;
-  std::vector<Box2d> ROI_parking_box_;
   std::vector<std::vector<Vec2d>> No_rotate_ROI_parking_boundary_;
   std::vector<double> open_space_end_pose_;
   double origin_heading_;
@@ -526,10 +450,9 @@ OpenSpaceROITest* CreateROITestPtr() { return new OpenSpaceROITest(); }
 // all data in form of array
 bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
              double* unrotated_roi_boundary_x, double* unrotated_roi_boundary_y,
-             double* roi_boundary_x, double* roi_boundary_y, double* roi_box_x,
-             double* roi_box_y, double* roi_box_info, double* parking_spot_x,
-             double* parking_spot_y, double* end_pose, double* xy_boundary,
-             double* origin_pose) {
+             double* roi_boundary_x, double* roi_boundary_y,
+             double* parking_spot_x, double* parking_spot_y, double* end_pose,
+             double* xy_boundary, double* origin_pose) {
   std::string lane_id_str(lane_id);
   std::string parking_id_str(parking_id);
   if (!test_ptr->VPresentationObstacle(lane_id_str, parking_id_str)) {
@@ -540,7 +463,6 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
       test_ptr->GetNoRotateROIParkingBoundary();
   std::vector<std::vector<Vec2d>>* roi_boundary_ =
       test_ptr->GetROIParkingBoundary();
-  std::vector<Box2d>* roi_box_ = test_ptr->GetROIParkingBox();
   Polygon2d parking_spot_ = test_ptr->GetParkingSpotBox();
   std::vector<double>* end_pose_ = test_ptr->GetEndPose();
   std::vector<double>* xy_boundary_ = test_ptr->GetROIXYBoundary();
@@ -568,22 +490,6 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
     }
   }
 
-  index = 0;
-  std::size_t box_index = 0;
-  for (std::size_t i = 0; i < roi_box_->size(); i++) {
-    std::vector<Vec2d> points;
-    roi_box_->at(i).GetAllCorners(&points);
-    roi_box_info[4 * box_index] = roi_box_->at(i).center_x();
-    roi_box_info[4 * box_index + 1] = roi_box_->at(i).center_y();
-    roi_box_info[4 * box_index + 2] = roi_box_->at(i).length();
-    roi_box_info[4 * box_index + 3] = roi_box_->at(i).width();
-    box_index++;
-    for (std::size_t j = 0; j < points.size(); j++) {
-      roi_box_x[index] = points[j].x();
-      roi_box_y[index] = points[j].y();
-      index++;
-    }
-  }
   index = 0;
   std::vector<Vec2d> parking_spot_vec_ = parking_spot_.points();
   for (std::size_t i = 0; i < parking_spot_vec_.size(); i++) {

@@ -27,19 +27,22 @@ namespace planning {
 class HybridAObstacleContainer {
  public:
   HybridAObstacleContainer() = default;
-  void AddVirtualObstacle(const double x, const double y, const double heading,
-                          const double length, const double width,
-                          const int id) {
-    Vec2d obstacle_center(x, y);
-    Box2d obstacle_box(obstacle_center, heading, length, width);
-    std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles(
-        std::to_string(id), obstacle_box);
-    obstacles_list.Add(obstacle->Id(), *obstacle);
+  void AddVirtualObstacle(double* obstacle_x, double* obstacle_y,
+                          int vertice_num) {
+    std::vector<common::math::Vec2d> obstacle_vertices;
+    for (int i = 0; i < vertice_num; i++) {
+      common::math::Vec2d vertice(obstacle_x[i], obstacle_y[i]);
+      obstacle_vertices.emplace_back(vertice);
+    }
+    obstacles_list.emplace_back(obstacle_vertices);
   }
-  const IndexedObstacles& GetObstacleList() { return obstacles_list; }
+  const std::vector<std::vector<common::math::Vec2d>>&
+  GetObstaclesVerticesVec() {
+    return obstacles_list;
+  }
 
  private:
-  IndexedObstacles obstacles_list;
+  std::vector<std::vector<common::math::Vec2d>> obstacles_list;
 };
 
 class HybridAResultContainer {
@@ -59,10 +62,10 @@ class HybridAResultContainer {
   std::vector<double>* GetV() { return &v_; }
   std::vector<double>* GetA() { return &a_; }
   std::vector<double>* GetSteer() { return &steer_; }
-  Result* PrepareResult() { return &result_; }
+  HybridAStartResult* PrepareResult() { return &result_; }
 
  private:
-  Result result_;
+  HybridAStartResult result_;
   std::vector<double> x_;
   std::vector<double> y_;
   std::vector<double> phi_;
@@ -87,17 +90,17 @@ HybridAObstacleContainer* CreateObstaclesPtr() {
 HybridAResultContainer* CreateResultPtr() {
   return new HybridAResultContainer();
 }
-void AddVirtualObstacle(HybridAObstacleContainer* obstacles_ptr, const double x,
-                        const double y, const double heading,
-                        const double length, const double width, const int id) {
-  obstacles_ptr->AddVirtualObstacle(x, y, heading, length, width, id);
+void AddVirtualObstacle(HybridAObstacleContainer* obstacles_ptr,
+                        double* obstacle_x, double* obstacle_y,
+                        int vertice_num) {
+  obstacles_ptr->AddVirtualObstacle(obstacle_x, obstacle_y, vertice_num);
 }
 bool Plan(HybridAStar* planner_ptr, HybridAObstacleContainer* obstacles_ptr,
           HybridAResultContainer* result_ptr, double sx, double sy, double sphi,
           double ex, double ey, double ephi, double* XYbounds) {
   std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
   return planner_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
-                           obstacles_ptr->GetObstacleList(),
+                           obstacles_ptr->GetObstaclesVerticesVec(),
                            result_ptr->PrepareResult());
 }
 void GetResult(HybridAResultContainer* result_ptr, double* x, double* y,

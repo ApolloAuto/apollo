@@ -63,10 +63,6 @@ class OpenSpaceROI {
 
   const common::math::Vec2d &origin_point() { return origin_point_; }
 
-  const IndexedObstacles &openspace_warmstart_obstacles() {
-    return openspace_warmstart_obstacles_;
-  }
-
   const std::vector<double> &ROI_xy_boundary() { return ROI_xy_boundary_; }
 
   const std::vector<double> &open_space_end_pose() {
@@ -128,22 +124,6 @@ class OpenSpaceROI {
   // @brief the dimension needed for A and b matrix dimension in H
   // representation
   Eigen::MatrixXi obstacles_edges_num_;
-
-  // @brief obstacle list for open space warm start as warm start needs all
-  // obstacles in shape of box while distance approach only requires lines for
-  // parking boundary
-  // the viewing angle and the boundaries names
-  //
-  //                     ------------------------   <-  up_boundary
-  //
-  //  left_boundary  |-> --------      ----------   <-|  right_boundary
-  //                 |->        |      |            <-|
-  //                            |      |
-  //                            |      |
-  //                            |------|
-  //                                ^
-  //                          down_boundary
-  IndexedObstacles openspace_warmstart_obstacles_;
 
   // @brief in the order of [x_min, x_max, y_min, y_max];
   std::vector<double> ROI_xy_boundary_;

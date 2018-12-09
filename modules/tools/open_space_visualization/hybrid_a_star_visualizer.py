@@ -39,29 +39,26 @@ scenario = "backward"
 
 if scenario == "backward":
     # for parking space 11543 in sunnyvale_with_two_offices
-    #obstacles(x, y, heading, length, width, id)
-    HybridAStar.AddVirtualObstacle(-6.82035273881, -
-                                   2.57629095812, 0.0, 13.6407054776, 5.15258191624, 1)
+    left_boundary_x = (c_double * 3)(*[-13.6407054776, 0.0, 0.0515703622475])
+    left_boundary_y = (c_double * 3)(*[0.0140634663703, 0.0, -5.15258191624])
+    down_boundary_x = (c_double * 2)(*[0.0515703622475, 2.8237895441])
+    down_boundary_y = (c_double * 2)(*[-5.15258191624, -5.15306980547])
+    right_boundary_x = (c_double * 3)(*[2.8237895441, 2.7184833539, 16.3592013995])
+    right_boundary_y = (c_double * 3)(*[-5.15306980547, -0.0398078878812, -0.011889513383])
+    up_boundary_x = (c_double * 2)(*[16.3591910364, -13.6406951857])
+    up_boundary_y = (c_double * 2)(*[5.60414234644, 5.61797800844])
+    #obstacles(x, y, size)
+    HybridAStar.AddVirtualObstacle(left_boundary_x, left_boundary_y, 3)
     HybridAStar.AddVirtualObstacle(
-        1.43767995317, -5.65306980547, 0.0, 2.77221918185, 1.0, 2)
+        down_boundary_x, down_boundary_y, 2)
     HybridAStar.AddVirtualObstacle(
-        9.53884237668, -2.59643884667, 0.0, 13.6407180455, 5.11326191759, 3)
+        right_boundary_x, right_boundary_y, 3)
     HybridAStar.AddVirtualObstacle(
-        1.35924792537, 6.10414234644, 0.0, 29.9998862221, 1.0, 4)
+        up_boundary_x, up_boundary_y, 2)
     ex = 1.359
     ey = -3.86443643718
     ephi = 1.581
     XYbounds = [-13.6406951857, 16.3591910364, -5.15258191624, 5.61797800844]
-elif scenario == "parallel":
-    #obstacles(x, y, heading, length, width, id)
-    HybridAStar.AddVirtualObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
-    HybridAStar.AddVirtualObstacle(-12, 0.0, 0.0, 16.0, 10.0, 2)
-    HybridAStar.AddVirtualObstacle(12, 0.0, 0.0, 16.0, 10.0, 3)
-    HybridAStar.AddVirtualObstacle(0.0, -1.25, 0.0, 40.0, 7.5, 4)
-    ex = -1.0
-    ey = 0.0
-    ephi = 0.0
-    XYbounds = [-20, 20, -20, 20]
 
 
 x = (c_double * num_output_buffer)()
@@ -116,28 +113,19 @@ for i in range(0, size[0]):
 ax.plot(sx, sy, "s")
 ax.plot(ex, ey, "s")
 if scenario == "backward":
-    rect1 = patches.Rectangle((-6.82035273881 - 0.5 * 13.6407054776, -
-                               2.57629095812 - 0.5 * 5.15258191624), 13.6407054776, 5.15258191624, 0.0)
-    rect2 = patches.Rectangle(
-        (1.43767995317 - 0.5 * 2.77221918185, -5.65306980547 - 0.5 * 1.0),  2.77221918185, 1.0, 0.0)
-    rect3 = patches.Rectangle((9.53884237668 - 0.5 * 13.6407180455, -
-                               2.59643884667 - 0.5 * 5.11326191759), 13.6407180455, 5.11326191759, 0.0)
-    rect4 = patches.Rectangle((1.35924792537 - 0.5 * 29.9998862221,
-                               6.10414234644 - 0.5 * 1.0), 29.9998862221, 1.0, 0.0)
+    left_boundary_x = [-13.6407054776, 0.0, 0.0515703622475]
+    left_boundary_y = [0.0140634663703, 0.0, -5.15258191624]
+    down_boundary_x = [0.0515703622475, 2.8237895441]
+    down_boundary_y = [-5.15258191624, -5.15306980547]
+    right_boundary_x = [2.8237895441, 2.7184833539, 16.3592013995]
+    right_boundary_y = [-5.15306980547, -0.0398078878812, -0.011889513383]
+    up_boundary_x = [16.3591910364, -13.6406951857]
+    up_boundary_y = [5.60414234644, 5.61797800844]
+    ax.plot(left_boundary_x, left_boundary_y, "k")
+    ax.plot(down_boundary_x, down_boundary_y, "k")
+    ax.plot(right_boundary_x, right_boundary_y, "k")
+    ax.plot(up_boundary_x, up_boundary_y, "k")
 
-    ax.add_patch(rect1)
-    ax.add_patch(rect2)
-    ax.add_patch(rect3)
-    ax.add_patch(rect4)
-elif scenario == "parallel":
-    rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
-    rect2 = patches.Rectangle((-20.0, -5.0), 16.0, 10.0, 0.0)
-    rect3 = patches.Rectangle((4.0, -5.0), 16.0, 10.0, 0.0)
-    rect4 = patches.Rectangle((-20.0, -5.0), 40.0, 7.5, 0.0)
-    ax.add_patch(rect1)
-    ax.add_patch(rect2)
-    ax.add_patch(rect3)
-    ax.add_patch(rect4)
 plt.axis('equal')
 
 fig2 = plt.figure(2)

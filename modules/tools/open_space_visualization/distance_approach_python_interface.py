@@ -32,12 +32,8 @@ class DistancePlanner(object):
         self.obstacles = lib.DistanceCreateObstaclesPtr()
         self.result = lib.DistanceCreateResultPtr()
 
-    def AddWarmStartObstacle(self, x, y, heading, length, width, identity):
-        lib.AddWarmStartObstacle(self.obstacles, c_double(x),
-                                 c_double(y), c_double(heading), c_double(length), c_double(width), c_int(identity))
-
-    def AddDistanceApproachObstacle(self, ROI_distance_approach_parking_boundary):
-        lib.AddDistanceApproachObstacle(self.obstacles, POINTER(
+    def AddObstacle(self, ROI_distance_approach_parking_boundary):
+        lib.AddObstacle(self.obstacles, POINTER(
             c_double)(ROI_distance_approach_parking_boundary))
 
     def DistancePlan(self, sx, sy, sphi, ex, ey, ephi, XYbounds):

@@ -78,14 +78,13 @@ apollo::common::Status OpenSpacePlanner::Plan(
       thread_data_.rotate_angle = open_space_roi_generator_->origin_heading();
       thread_data_.translate_origin = open_space_roi_generator_->origin_point();
       thread_data_.end_pose = open_space_roi_generator_->open_space_end_pose();
-      thread_data_.obstacles_num = open_space_roi_generator_->obstacles_num();
       thread_data_.obstacles_edges_num =
           open_space_roi_generator_->obstacles_edges_num();
       thread_data_.obstacles_A = open_space_roi_generator_->obstacles_A();
       thread_data_.obstacles_b = open_space_roi_generator_->obstacles_b();
+      thread_data_.obstacles_vertices_vec =
+          open_space_roi_generator_->obstacles_vertices_vec();
       thread_data_.XYbounds = open_space_roi_generator_->ROI_xy_boundary();
-      thread_data_.warmstart_obstacles =
-          open_space_roi_generator_->openspace_warmstart_obstacles();
     }
 
     // Check if trajectory updated
@@ -116,19 +115,18 @@ apollo::common::Status OpenSpacePlanner::Plan(
     rotate_angle_ = open_space_roi_generator_->origin_heading();
     translate_origin_ = open_space_roi_generator_->origin_point();
     end_pose_ = open_space_roi_generator_->open_space_end_pose();
-    obstacles_num_ = open_space_roi_generator_->obstacles_num();
     obstacles_edges_num_ = open_space_roi_generator_->obstacles_edges_num();
     obstacles_A_ = open_space_roi_generator_->obstacles_A();
     obstacles_b_ = open_space_roi_generator_->obstacles_b();
+    obstacles_vertices_vec_ =
+        open_space_roi_generator_->obstacles_vertices_vec();
     XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
-    warmstart_obstacles_ =
-        open_space_roi_generator_->openspace_warmstart_obstacles();
 
     // Generate Trajectory;
     Status status = open_space_trajectory_generator_->Plan(
         stitching_trajectory_, vehicle_state_, XYbounds_, rotate_angle_,
-        translate_origin_, end_pose_, obstacles_num_, obstacles_edges_num_,
-        obstacles_A_, obstacles_b_, warmstart_obstacles_);
+        translate_origin_, end_pose_, obstacles_edges_num_, obstacles_A_,
+        obstacles_b_, obstacles_vertices_vec_);
 
     // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
@@ -156,9 +154,9 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
               thread_data.stitching_trajectory, thread_data.vehicle_state,
               thread_data.XYbounds, thread_data.rotate_angle,
               thread_data.translate_origin, thread_data.end_pose,
-              thread_data.obstacles_num, thread_data.obstacles_edges_num,
-              thread_data.obstacles_A, thread_data.obstacles_b,
-              thread_data.warmstart_obstacles) == Status::OK()) {
+              thread_data.obstacles_edges_num, thread_data.obstacles_A,
+              thread_data.obstacles_b,
+              thread_data_.obstacles_vertices_vec) == Status::OK()) {
         trajectory_updated_.store(true);
       } else {
         AERROR << "Multi-thread trajectory generator failed";

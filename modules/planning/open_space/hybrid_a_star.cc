@@ -45,11 +45,13 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   delta_t_ = planner_open_space_config_.delta_t();
 }
 
-bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node,
-                                    const IndexedObstacles& obstacles) {
+bool HybridAStar::AnalyticExpansion(
+    std::shared_ptr<Node3d> current_node,
+    const std::vector<std::vector<common::math::Vec2d>>&
+        obstacles_vertices_vec) {
   std::shared_ptr<ReedSheppPath> reeds_shepp_to_check =
       ReedSheppPath_cache_[current_node->GetIndex()];
-  if (!RSPCheck(reeds_shepp_to_check, obstacles)) {
+  if (!RSPCheck(reeds_shepp_to_check, obstacles_vertices_vec)) {
     return false;
   }
   AINFO << "Reach the end configuration with Reed Sharp";
@@ -73,7 +75,8 @@ bool HybridAStar::ReedSheppHeuristic(
 
 bool HybridAStar::RSPCheck(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
-    const IndexedObstacles& obstacles) {
+    const std::vector<std::vector<common::math::Vec2d>>&
+        obstacles_vertices_vec) {
   for (size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
     if (reeds_shepp_to_end->x[i] > XYbounds_[1] ||
         reeds_shepp_to_end->x[i] < XYbounds_[0] ||
@@ -84,22 +87,29 @@ bool HybridAStar::RSPCheck(
     std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
         reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
         reeds_shepp_to_end->phi[i], XYbounds_, planner_open_space_config_));
-    if (!ValidityCheck(node, obstacles)) {
+    if (!ValidityCheck(node, obstacles_vertices_vec)) {
       return false;
     }
   }
   return true;
 }
 
-bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node,
-                                const IndexedObstacles& obstacles) {
-  if (obstacles.Items().empty()) {
+bool HybridAStar::ValidityCheck(
+    std::shared_ptr<Node3d> node,
+    const std::vector<std::vector<common::math::Vec2d>>&
+        obstacles_vertices_vec) {
+  if (obstacles_vertices_vec.size() == 0) {
     return true;
   }
-  for (const auto& obstacle_box : obstacles.Items()) {
-    if (node->GetBoundingBox(vehicle_param_)
-            .HasOverlap(obstacle_box->PerceptionBoundingBox())) {
-      return false;
+  for (const auto& obstacle_vertices : obstacles_vertices_vec) {
+    size_t vertices_num = obstacle_vertices.size();
+    for (size_t i = 0; i < vertices_num - 1; i++) {
+      common::math::LineSegment2d line_segment = common::math::LineSegment2d(
+          obstacle_vertices[i], obstacle_vertices[i + 1]);
+      if (node->GetBoundingBox(vehicle_param_)
+              .HasOverlap(line_segment)) {
+        return false;
+      }
     }
   }
   return true;
@@ -237,7 +247,7 @@ double HybridAStar::CalculateRSPCost(
   }
   return RSP_cost;
 }
-bool HybridAStar::GetResult(Result* result) {
+bool HybridAStar::GetResult(HybridAStartResult* result) {
   std::shared_ptr<Node3d> current_node = final_node_;
   std::vector<double> hybrid_a_x;
   std::vector<double> hybrid_a_y;
@@ -288,7 +298,7 @@ bool HybridAStar::GetResult(Result* result) {
   return true;
 }
 
-bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
+bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
   if (result->x.size() < 2 || result->y.size() < 2 || result->phi.size() < 2) {
     AERROR << "result size check when generating speed and acceleration fail";
     return false;
@@ -322,9 +332,11 @@ bool HybridAStar::GenerateSpeedAcceleration(Result* result) {
   return true;
 }
 
-bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
-                       double ephi, const std::vector<double>& XYbounds,
-                       const IndexedObstacles& obstacles, Result* result) {
+bool HybridAStar::Plan(
+    double sx, double sy, double sphi, double ex, double ey, double ephi,
+    const std::vector<double>& XYbounds,
+    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    HybridAStartResult* result) {
   // clear containers
   open_set_.clear();
   close_set_.clear();
@@ -338,11 +350,11 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
       new Node3d({sx}, {sy}, {sphi}, XYbounds_, planner_open_space_config_));
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
-  if (!ValidityCheck(start_node_, obstacles)) {
+  if (!ValidityCheck(start_node_, obstacles_vertices_vec)) {
     AERROR << "start_node in collision with obstacles";
     return false;
   }
-  if (!ValidityCheck(end_node_, obstacles)) {
+  if (!ValidityCheck(end_node_, obstacles_vertices_vec)) {
     AERROR << "end_node in collision with obstacles";
     return false;
   }
@@ -373,7 +385,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
     // check if a analystic curve could be connected from current configuration
     // to the end configuration without collision. if so, search ends.
     start_timestamp = Clock::NowInSeconds();
-    if (AnalyticExpansion(current_node, obstacles)) {
+    if (AnalyticExpansion(current_node, obstacles_vertices_vec)) {
       break;
     }
     close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
@@ -386,7 +398,7 @@ bool HybridAStar::Plan(double sx, double sy, double sphi, double ex, double ey,
         continue;
       }
       // collision check
-      if (!ValidityCheck(next_node, obstacles)) {
+      if (!ValidityCheck(next_node, obstacles_vertices_vec)) {
         continue;
       }
       // check if the node is already in the close set

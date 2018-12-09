@@ -81,10 +81,11 @@ class OpenSpaceTrajectoryGenerator {
       const apollo::common::VehicleState& vehicle_state,
       const std::vector<double>& XYbounds, const double& rotate_angle,
       const apollo::common::math::Vec2d& translate_origin,
-      const std::vector<double>& end_pose, std::size_t obstacles_num,
+      const std::vector<double>& end_pose,
       const Eigen::MatrixXi& obstacles_edges_num,
       const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-      const IndexedObstacles& obstalce_list);
+      const std::vector<std::vector<common::math::Vec2d>>&
+          obstacles_vertices_vec);
 
   bool IsCollisionFreeTrajectory(const ADCTrajectory& adc_trajectory);
 
@@ -113,7 +114,8 @@ class OpenSpaceTrajectoryGenerator {
                        const Eigen::MatrixXd& control_result_ds,
                        const Eigen::MatrixXd& time_result_ds,
                        const std::vector<double>& XYbounds,
-                       const IndexedObstacles& obstalce_list);
+                       const std::vector<std::vector<common::math::Vec2d>>&
+                           obstacles_vertices_vec);
 
  private:
   bool IsVehicleNearDestination(

@@ -56,7 +56,7 @@ namespace planning {
 
 using apollo::common::Status;
 
-struct Result {
+struct HybridAStartResult {
   std::vector<double> x;
   std::vector<double> y;
   std::vector<double> phi;
@@ -71,19 +71,24 @@ class HybridAStar {
   virtual ~HybridAStar() = default;
   bool Plan(double sx, double sy, double sphi, double ex, double ey,
             double ephi, const std::vector<double>& XYbounds,
-            const IndexedObstacles& obstacles, Result* result);
+            const std::vector<std::vector<common::math::Vec2d>>&
+                obstacles_vertices_vec,
+            HybridAStartResult* result);
 
  private:
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
-                         const IndexedObstacles& obstacles);
+                         const std::vector<std::vector<common::math::Vec2d>>&
+                obstacles_vertices_vec);
   bool ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
                           std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
   // check collision and validity
   bool ValidityCheck(std::shared_ptr<Node3d> node,
-                     const IndexedObstacles& obstacles);
+                     const std::vector<std::vector<common::math::Vec2d>>&
+                obstacles_vertices_vec);
   // check Reeds Shepp path collision and validity
   bool RSPCheck(const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
-                const IndexedObstacles& obstacles);
+                const std::vector<std::vector<common::math::Vec2d>>&
+                obstacles_vertices_vec);
   // load the whole RSP as nodes and add to the close set
   std::shared_ptr<Node3d> LoadRSPinCS(
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
@@ -99,8 +104,8 @@ class HybridAStar {
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
   double CalculateRSPCost(
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
-  bool GetResult(Result* result);
-  bool GenerateSpeedAcceleration(Result* result);
+  bool GetResult(HybridAStartResult* result);
+  bool GenerateSpeedAcceleration(HybridAStartResult* result);
 
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;

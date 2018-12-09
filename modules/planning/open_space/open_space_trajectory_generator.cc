@@ -70,11 +70,11 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const std::vector<common::TrajectoryPoint>& stitching_trajectory,
     const VehicleState& vehicle_state, const std::vector<double>& XYbounds,
     const double& rotate_angle, const Vec2d& translate_origin,
-    const std::vector<double>& end_pose, size_t obstacles_num,
+    const std::vector<double>& end_pose,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const IndexedObstacles& obstalce_list) {
-  // Return if planning data not ready
+    const std::vector<std::vector<common::math::Vec2d>>&
+        obstacles_vertices_vec) {
   if (!vehicle_state.has_x() || XYbounds.size() == 0 || end_pose.size() == 0 ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
@@ -141,14 +141,17 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // planning bound
   XYbounds_ = XYbounds;
 
+  // obstacle num
+  size_t obstacles_num = obstacles_vertices_vec.size();
+
   ADEBUG << "Start forming state warm start problem with configs setting : "
          << planner_open_space_config_.warm_start_config().ShortDebugString();
 
   // Warm Start (initial velocity is assumed to be 0 for now)
-  Result result;
+  HybridAStartResult result;
 
   if (warm_start_->Plan(x0(0, 0), x0(1, 0), x0(2, 0), xF(0, 0), xF(1, 0),
-                        xF(2, 0), XYbounds_, obstalce_list, &result)) {
+                        xF(2, 0), XYbounds_, obstacles_vertices_vec, &result)) {
     ADEBUG << "State warm start problem solved successfully!";
   } else {
     return Status(ErrorCode::PLANNING_ERROR,
@@ -234,7 +237,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     open_space_debug_.Clear();
     RecordDebugInfo(xWS, uWS, l_warm_up, n_warm_up, dual_l_result_ds,
                     dual_n_result_ds, state_result_ds, control_result_ds,
-                    time_result_ds, XYbounds_, obstalce_list);
+                    time_result_ds, XYbounds_, obstacles_vertices_vec);
   }
   // rescale the states to the world frame
   for (size_t i = 0; i < horizon_ + 1; i++) {
@@ -281,7 +284,8 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const Eigen::MatrixXd& state_result_ds,
     const Eigen::MatrixXd& control_result_ds,
     const Eigen::MatrixXd& time_result_ds, const std::vector<double>& XYbounds,
-    const IndexedObstacles& obstalce_list) {
+    const std::vector<std::vector<common::math::Vec2d>>&
+        obstacles_vertices_vec) {
   // load warm start trajectory
   auto* warm_start_trajectory =
       open_space_debug_.mutable_warm_start_trajectory();
@@ -372,14 +376,12 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
   open_space_debug_.add_xy_boundary(XYbounds[3]);
 
   // load obstacles
-  for (const auto& obstacle_box : obstalce_list.Items()) {
+  for (const auto& obstacle_vertices : obstacles_vertices_vec) {
     auto* obstacle_ptr = open_space_debug_.add_obstacles();
-    std::vector<Vec2d> vertices =
-        obstacle_box->PerceptionBoundingBox().GetAllCorners();
-    size_t vertices_size = vertices.size();
+    size_t vertices_size = obstacle_vertices.size();
     for (size_t i = 0; i < vertices_size; i++) {
-      obstacle_ptr->add_vertices_x_coords(vertices[i].x());
-      obstacle_ptr->add_vertices_y_coords(vertices[i].y());
+      obstacle_ptr->add_vertices_x_coords(obstacle_vertices[i].x());
+      obstacle_ptr->add_vertices_y_coords(obstacle_vertices[i].y());
     }
   }
 }
