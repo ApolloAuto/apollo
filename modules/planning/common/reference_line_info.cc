@@ -210,15 +210,6 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
       auto is_protected = (*junction_right_of_way)[overlap.object_id];
       if (is_protected) {
         return ADCTrajectory::PROTECTED;
-      } else {
-        const auto lane_segments =
-            reference_line_.GetLaneSegments(overlap.start_s, overlap.end_s);
-        for (const auto& segment : lane_segments) {
-          if (segment.lane->lane().turn() != hdmap::Lane::NO_TURN) {
-            return ADCTrajectory::UNPROTECTED;
-          }
-        }
-        return ADCTrajectory::PROTECTED;
       }
     }
   }
