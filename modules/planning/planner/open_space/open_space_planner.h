@@ -61,12 +61,11 @@ struct OpenSpaceThreadData {
   double rotate_angle;
   apollo::common::math::Vec2d translate_origin;
   std::vector<double> end_pose;
-  std::size_t obstacles_num;
   Eigen::MatrixXi obstacles_edges_num;
   Eigen::MatrixXd obstacles_A;
   Eigen::MatrixXd obstacles_b;
   std::vector<double> XYbounds;
-  IndexedObstacles warmstart_obstacles;
+  std::vector<std::vector<common::math::Vec2d>> obstacles_vertices_vec;
 };
 
 /**
@@ -129,8 +128,8 @@ class OpenSpacePlanner : public Planner {
   Eigen::MatrixXi obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;
+  std::vector<std::vector<common::math::Vec2d>> obstacles_vertices_vec_;
   std::vector<double> XYbounds_;
-  IndexedObstacles warmstart_obstacles_;
 
   planning_internal::OpenSpaceDebug open_space_debug_;
   apollo::common::Trajectory trajectory_to_end_;

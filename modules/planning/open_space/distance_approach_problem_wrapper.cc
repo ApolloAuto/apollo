@@ -134,18 +134,7 @@ class ObstacleContainer {
     return true;
   }
 
-  void AddWarmStartObstacle(const double x, const double y,
-                            const double heading, const double length,
-                            const double width, const int id) {
-    Vec2d obstacle_center(x, y);
-    Box2d obstacle_box(obstacle_center, heading, length, width);
-    std::unique_ptr<Obstacle> obstacle = Obstacle::CreateStaticVirtualObstacles(
-        std::to_string(id), obstacle_box);
-    obstacles_list.Add(obstacle->Id(), *obstacle);
-  }
-
-  void AddDistanceApproachObstacle(
-      const double* ROI_distance_approach_parking_boundary) {
+  void AddObstacle(const double* ROI_distance_approach_parking_boundary) {
     // the obstacles are hard coded into vertice sets of 3, 2, 3, 2
     if (!(VPresentationObstacle(ROI_distance_approach_parking_boundary) &&
           HPresentationObstacle())) {
@@ -153,14 +142,15 @@ class ObstacleContainer {
     }
   }
 
-  const IndexedObstacles& GetObstacleList() { return obstacles_list; }
+  const std::vector<std::vector<Vec2d>>& GetObstacleVec() {
+    return obstacles_vertices_vec_;
+  }
   Eigen::MatrixXd GetAMatrix() { return obstacles_A_; }
   Eigen::MatrixXd GetbMatrix() { return obstacles_b_; }
   std::size_t GetObstaclesNum() { return obstacles_num_; }
   Eigen::MatrixXi GetObstaclesEdgesNum() { return obstacles_edges_num_; }
 
  private:
-  IndexedObstacles obstacles_list;
   std::size_t obstacles_num_ = 0;
   Eigen::MatrixXi obstacles_edges_num_;
   std::vector<std::vector<Vec2d>> obstacles_vertices_vec_;
@@ -185,7 +175,7 @@ class ResultContainer {
   std::vector<double>* GetV() { return &v_; }
   std::vector<double>* GetA() { return &a_; }
   std::vector<double>* GetSteer() { return &steer_; }
-  Result* PrepareHybridAResult() { return &result_; }
+  HybridAStartResult* PrepareHybridAResult() { return &result_; }
   Eigen::MatrixXd* PrepareStateResult() { return &state_result_ds_; }
   Eigen::MatrixXd* PrepareControlResult() { return &control_result_ds_; }
   Eigen::MatrixXd* PrepareTimeResult() { return &time_result_ds_; }
@@ -193,7 +183,7 @@ class ResultContainer {
   Eigen::MatrixXd* PrepareNResult() { return &dual_n_result_ds_; }
 
  private:
-  Result result_;
+  HybridAStartResult result_;
   std::vector<double> x_;
   std::vector<double> y_;
   std::vector<double> phi_;
@@ -220,17 +210,10 @@ ObstacleContainer* DistanceCreateObstaclesPtr() {
   return new ObstacleContainer();
 }
 ResultContainer* DistanceCreateResultPtr() { return new ResultContainer(); }
-void AddWarmStartObstacle(ObstacleContainer* obstacles_ptr, const double x,
-                          const double y, const double heading,
-                          const double length, const double width,
-                          const int id) {
-  obstacles_ptr->AddWarmStartObstacle(x, y, heading, length, width, id);
-}
-void AddDistanceApproachObstacle(
-    ObstacleContainer* obstacles_ptr,
-    const double* ROI_distance_approach_parking_boundary) {
-  obstacles_ptr->AddDistanceApproachObstacle(
-      ROI_distance_approach_parking_boundary);
+
+void AddObstacle(ObstacleContainer* obstacles_ptr,
+                 const double* ROI_distance_approach_parking_boundary) {
+  obstacles_ptr->AddObstacle(ROI_distance_approach_parking_boundary);
 }
 bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
                   ResultContainer* result_ptr, double sx, double sy,
@@ -243,7 +226,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       << FLAGS_planner_open_space_config_filename;
   std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
   if (!hybridA_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
-                         obstacles_ptr->GetObstacleList(),
+                         obstacles_ptr->GetObstacleVec(),
                          result_ptr->PrepareHybridAResult())) {
     AINFO << "Hybrid A fail";
     return false;
@@ -293,19 +276,6 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   double left_to_center = vehicle_param_.left_edge_to_center();
   double right_to_center = vehicle_param_.right_edge_to_center();
   ego_ << front_to_center, right_to_center, back_to_center, left_to_center;
-
-  // TODO(QiL) : add dual variable warm up here.
-
-  /*
-    const std::size_t obstacles_edges_num =
-        obstacles_ptr->GetObstaclesEdgesNum().sum();
-    Eigen::MatrixXd l_warm_up =
-        Eigen::MatrixXd::Ones(obstacles_edges_num, horizon_ + 1);
-
-    const std::size_t obstacles_num = obstacles_ptr->GetObstaclesNum();
-    Eigen::MatrixXd n_warm_up =
-        Eigen::MatrixXd::Ones(4 * obstacles_num, horizon_ + 1);
-  */
 
   // result for distance approach problem
   Eigen::MatrixXd l_warm_up;

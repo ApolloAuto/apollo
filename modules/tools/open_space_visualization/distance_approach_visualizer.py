@@ -38,15 +38,6 @@ scenario = "backward"
 # scenario = "parallel"
 
 if scenario == "backward":
-    # obstacles for warm start(x, y, heading, length, width, id)
-    OpenSpacePlanner.AddWarmStartObstacle(-6.82035273881, -
-                                          2.57629095812, 0.0, 13.6407054776, 5.15258191624, 1)
-    OpenSpacePlanner.AddWarmStartObstacle(
-        1.43767995317, -5.65306980547, 0.0, 2.77221918185, 1.0, 2)
-    OpenSpacePlanner.AddWarmStartObstacle(
-        9.53884237668, -2.59643884667, 0.0, 13.6407180455, 5.11326191759, 3)
-    OpenSpacePlanner.AddWarmStartObstacle(
-        1.35924792537, 6.10414234644, 0.0, 29.9998862221, 1.0, 4)
     # obstacles for distance approach(vertices coords in clock wise order)
     ROI_distance_approach_parking_boundary = (
         c_double * 20)(*[-13.6407054776,
@@ -70,22 +61,12 @@ if scenario == "backward":
                          -13.6406951857,
                          5.61797800844,
                          ])
-    OpenSpacePlanner.AddDistanceApproachObstacle(
+    OpenSpacePlanner.AddObstacle(
         ROI_distance_approach_parking_boundary)
     ex = 1.359
     ey = -3.86443643718
     ephi = 1.581
     XYbounds = [-13.6406951857, 16.3591910364, -5.15258191624, 5.61797800844]
-# elif scenario == "parallel":
-#     #obstacles(x, y, heading, length, width, id)
-#     OpenSpacePlanner.AddWarmStartObstacle(0.0, 13.0, 0.0, 40.0, 4.0, 1)
-#     OpenSpacePlanner.AddWarmStartObstacle(-12, 0.0, 0.0, 16.0, 10.0, 2)
-#     OpenSpacePlanner.AddWarmStartObstacle(12, 0.0, 0.0, 16.0, 10.0, 3)
-#     OpenSpacePlanner.AddWarmStartObstacle(0.0, -1.25, 0.0, 40.0, 7.5, 4)
-#     ex = -1.75
-#     ey = 4.0
-#     ephi = 0
-    # XYbounds = [-20, 20, -20, 20]
 
 
 x = (c_double * num_output_buffer)()
@@ -116,7 +97,7 @@ print("planning time is " + str(end - start))
 
 # load result
 OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
-                                   opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, 
+                                   opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
                                    opt_dual_l, opt_dual_n, size)
 x_out = []
 y_out = []
@@ -186,28 +167,19 @@ for i in range(0, size[0]):
 ax.plot(sx, sy, "s")
 ax.plot(ex, ey, "s")
 if scenario == "backward":
-    rect1 = patches.Rectangle((-6.82035273881 - 0.5 * 13.6407054776, -
-                               2.57629095812 - 0.5 * 5.15258191624), 13.6407054776, 5.15258191624, 0.0)
-    rect2 = patches.Rectangle(
-        (1.43767995317 - 0.5 * 2.77221918185, -5.65306980547 - 0.5 * 1.0),  2.77221918185, 1.0, 0.0)
-    rect3 = patches.Rectangle((9.53884237668 - 0.5 * 13.6407180455, -
-                               2.59643884667 - 0.5 * 5.11326191759), 13.6407180455, 5.11326191759, 0.0)
-    rect4 = patches.Rectangle((1.35924792537 - 0.5 * 29.9998862221,
-                               6.10414234644 - 0.5 * 1.0), 29.9998862221, 1.0, 0.0)
-
-    ax.add_patch(rect1)
-    ax.add_patch(rect2)
-    ax.add_patch(rect3)
-    ax.add_patch(rect4)
-# elif scenario == "parallel":
-#     rect1 = patches.Rectangle((-20.0, 11.0), 40.0, 4.0, 0.0)
-#     rect2 = patches.Rectangle((-20.0, -5.0), 16.0, 10.0, 0.0)
-#     rect3 = patches.Rectangle((4.0, -5.0), 16.0, 10.0, 0.0)
-#     rect4 = patches.Rectangle((-20.0, -5.0), 40.0, 7.5, 0.0)
-#     ax.add_patch(rect1)
-#     ax.add_patch(rect2)
-#     ax.add_patch(rect3)
-#     ax.add_patch(rect4)
+    left_boundary_x = [-13.6407054776, 0.0, 0.0515703622475]
+    left_boundary_y = [0.0140634663703, 0.0, -5.15258191624]
+    down_boundary_x = [0.0515703622475, 2.8237895441]
+    down_boundary_y = [-5.15258191624, -5.15306980547]
+    right_boundary_x = [2.8237895441, 2.7184833539, 16.3592013995]
+    right_boundary_y = [-5.15306980547, -0.0398078878812, -0.011889513383]
+    up_boundary_x = [16.3591910364, -13.6406951857]
+    up_boundary_y = [5.60414234644, 5.61797800844]
+    ax.plot(left_boundary_x, left_boundary_y, "k")
+    ax.plot(down_boundary_x, down_boundary_y, "k")
+    ax.plot(right_boundary_x, right_boundary_y, "k")
+    ax.plot(up_boundary_x, up_boundary_y, "k")
+    
 plt.axis('equal')
 
 # input plot

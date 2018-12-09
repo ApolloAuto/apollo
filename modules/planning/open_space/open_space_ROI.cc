@@ -74,17 +74,6 @@ bool OpenSpaceROI::VPresentationObstacle() {
     if (perception_obstacles_num == 0) {
       AERROR << "no obstacle given by percption";
     }
-    // load percption obstacle list for warm start
-    for (size_t i = 0; i < perception_obstacles_num; i++) {
-      Box2d original_box =
-          obstacles_by_frame_->Items().at(i)->PerceptionBoundingBox();
-      original_box.Shift(-1.0 * origin_point_);
-      original_box.RotateFromCenter(-1.0 * origin_heading_);
-      std::shared_ptr<Obstacle> obstacle =
-          Obstacle::CreateStaticVirtualObstacles(
-              obstacles_by_frame_->Items().at(i)->Id(), original_box);
-      openspace_warmstart_obstacles_.Add(obstacle->Id(), *obstacle);
-    }
     // load vertice vector for distance approach
     Eigen::MatrixXi perception_obstacles_edges_num_ =
         4 * Eigen::MatrixXi::Ones(perception_obstacles_num, 1);
@@ -125,86 +114,6 @@ bool OpenSpaceROI::VPresentationObstacle() {
                                 1);
     obstacles_edges_num_ << parking_boundaries_obstacles_edges_num;
   }
-
-  // load boundary obstacle for warm start
-  Vec2d left_boundary_center(
-      (ROI_parking_boundary_[0][0].x() + ROI_parking_boundary_[0][1].x()) / 2,
-      (ROI_parking_boundary_[0][1].y() + ROI_parking_boundary_[0][2].y()) / 2);
-  double left_boundary_heading = std::atan2(
-      ROI_parking_boundary_[0][1].y() - ROI_parking_boundary_[0][0].y(),
-      ROI_parking_boundary_[0][1].x() - ROI_parking_boundary_[0][0].x());
-  double left_boundary_length = std::abs(-ROI_parking_boundary_[0][0].x() +
-                                         ROI_parking_boundary_[0][1].x());
-  double left_boundary_width = std::abs(ROI_parking_boundary_[0][1].y() -
-                                        ROI_parking_boundary_[0][2].y());
-  Box2d left_boundary_box(left_boundary_center, left_boundary_heading,
-                          left_boundary_length, left_boundary_width);
-  // check the heading of the parking spot is facing up or down
-  Vec2d down_boundary_center(
-      (ROI_parking_boundary_[1][0].x() + ROI_parking_boundary_[1][1].x()) / 2,
-      ROI_parking_boundary_[1][1].y() +
-          (parking_spot_heading_ > kMathEpsilon ? 0.5 : -0.5));
-  double down_boundary_heading = std::atan2(
-      ROI_parking_boundary_[1][1].y() - ROI_parking_boundary_[1][0].y(),
-      ROI_parking_boundary_[1][1].x() - ROI_parking_boundary_[1][0].x());
-  double down_boundary_length = std::abs(-ROI_parking_boundary_[1][0].x() +
-                                         ROI_parking_boundary_[1][1].x());
-  double down_boundary_width = 1.0;
-  Box2d down_boundary_box(down_boundary_center, down_boundary_heading,
-                          down_boundary_length, down_boundary_width);
-
-  Vec2d right_boundary_center(
-      (ROI_parking_boundary_[2][1].x() + ROI_parking_boundary_[2][2].x()) / 2,
-      (ROI_parking_boundary_[2][0].y() + ROI_parking_boundary_[2][1].y()) / 2);
-  double right_boundary_heading = std::atan2(
-      ROI_parking_boundary_[2][2].y() - ROI_parking_boundary_[2][1].y(),
-      ROI_parking_boundary_[2][2].x() - ROI_parking_boundary_[2][1].x());
-  double right_boundary_length = std::abs(-ROI_parking_boundary_[2][1].x() +
-                                          ROI_parking_boundary_[2][2].x());
-  double right_boundary_width = std::abs(ROI_parking_boundary_[2][1].y() -
-                                         ROI_parking_boundary_[2][0].y());
-  Box2d right_boundary_box(right_boundary_center, right_boundary_heading,
-                           right_boundary_length, right_boundary_width);
-
-  Vec2d up_boundary_center(
-      (ROI_parking_boundary_[3][0].x() + ROI_parking_boundary_[3][1].x()) / 2,
-      ROI_parking_boundary_[3][0].y() +
-          (parking_spot_heading_ > kMathEpsilon ? -0.5 : 0.5));
-  double up_boundary_heading = std::atan2(
-      ROI_parking_boundary_[3][1].y() - ROI_parking_boundary_[3][0].y(),
-      ROI_parking_boundary_[3][1].x() - ROI_parking_boundary_[3][0].x());
-  double up_boundary_length = std::abs(-ROI_parking_boundary_[3][0].x() +
-                                       ROI_parking_boundary_[3][1].x());
-  double up_boundary_width = 1.0;
-  Box2d up_boundary_box(up_boundary_center, up_boundary_heading,
-                        up_boundary_length, up_boundary_width);
-
-  std::shared_ptr<Obstacle> left_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("left_boundary",
-                                             left_boundary_box);
-
-  openspace_warmstart_obstacles_.Add(left_boundary_obstacle->Id(),
-                                     *left_boundary_obstacle);
-
-  std::shared_ptr<Obstacle> down_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("down_boundary",
-                                             down_boundary_box);
-
-  openspace_warmstart_obstacles_.Add(down_boundary_obstacle->Id(),
-                                     *down_boundary_obstacle);
-
-  std::shared_ptr<Obstacle> right_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("right_boundary",
-                                             right_boundary_box);
-
-  openspace_warmstart_obstacles_.Add(right_boundary_obstacle->Id(),
-                                     *right_boundary_obstacle);
-
-  std::shared_ptr<Obstacle> up_boundary_obstacle =
-      Obstacle::CreateStaticVirtualObstacles("up_boundary", up_boundary_box);
-
-  openspace_warmstart_obstacles_.Add(up_boundary_obstacle->Id(),
-                                     *up_boundary_obstacle);
 
   // load vertices for parking boundary (not need to repeat the first vertice to
   // get close hull)
@@ -410,8 +319,8 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   open_space_end_pose_.emplace_back(0.0);
 
   // get xy boundary of the ROI
-  double x_min = start_left.x();
-  double x_max = end_left.x();
+  double x_min = std::min({start_left.x(), start_right.x()});
+  double x_max = std::max({end_left.x(), end_right.x()});
   double y_min = std::min({left_down.y(), start_right.y(), start_left.y()});
   double y_max = std::max({left_down.y(), start_right.y(), start_left.y()});
   ROI_xy_boundary_.emplace_back(x_min);

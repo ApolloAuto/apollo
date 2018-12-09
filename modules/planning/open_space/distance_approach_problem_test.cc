@@ -51,7 +51,6 @@ class DistanceApproachProblemTest : public ::testing::Test {
   Eigen::MatrixXi obstacles_edges_num_ = Eigen::MatrixXi::Ones(12, 4);
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Zero(2, horizon_);
-  std::size_t obstacles_num = 10;
   Eigen::MatrixXi obstacles_edges_num = Eigen::MatrixXi::Zero(1, horizon_ + 1);
   Eigen::MatrixXd obstacles_A = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd obstacles_b = Eigen::MatrixXd::Ones(4, 1);

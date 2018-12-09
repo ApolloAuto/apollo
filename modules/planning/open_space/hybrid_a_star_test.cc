@@ -61,10 +61,11 @@ TEST_F(HybridATest, test1) {
   double ex = 15.0;
   double ey = 0.0;
   double ephi = 0.0;
-  IndexedObstacles obstacles_list;
-  Result result;
-  Vec2d obstacle_center(0.0, 0.0);
-  Box2d obstacle_box(obstacle_center, 0.0, 2.0, 2.0);
+  std::vector<std::vector<common::math::Vec2d>> obstacles_list;
+  HybridAStartResult result;
+  Vec2d obstacle_vertice_a(1.0, 0.0);
+  Vec2d obstacle_vertice_b(-1.0, 0.0);
+  std::vector<Vec2d> obstacle = {obstacle_vertice_a, obstacle_vertice_b};
   // load xy boundary into the Plan() from configuration(Independent from frame)
   std::vector<double> XYbounds_;
   XYbounds_.push_back(-50.0);
@@ -72,9 +73,7 @@ TEST_F(HybridATest, test1) {
   XYbounds_.push_back(-50.0);
   XYbounds_.push_back(50.0);
 
-  std::unique_ptr<Obstacle> obstacle =
-      Obstacle::CreateStaticVirtualObstacles("a box in center", obstacle_box);
-  obstacles_list.Add(obstacle->Id(), *obstacle);
+  obstacles_list.emplace_back(obstacle);
   ASSERT_TRUE(hybrid_test->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
                                 obstacles_list, &result));
 }
