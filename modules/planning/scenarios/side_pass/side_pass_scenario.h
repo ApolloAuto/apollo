@@ -36,7 +36,8 @@ struct SidePassContext {
   PathData path_data_;
   ScenarioSidePassConfig scenario_config_;
   int pass_obstacle_stuck_cycle_num_;
-  uint32_t backup_stage_cycle_num;
+  uint32_t backup_stage_cycle_num_;
+  std::string front_blocking_obstacle_id_;
 };
 
 class SidePassScenario : public Scenario {

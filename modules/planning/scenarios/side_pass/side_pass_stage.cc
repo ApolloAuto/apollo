@@ -89,11 +89,11 @@ Stage::StageStatus SidePassBackup::Process(
     break;
   }
 
-  GetContext()->backup_stage_cycle_num += 1;
+  GetContext()->backup_stage_cycle_num_ += 1;
   if (!has_blocking_obstacle ||
-      GetContext()->backup_stage_cycle_num >
+      GetContext()->backup_stage_cycle_num_ >
           GetContext()->scenario_config_.max_backup_stage_cycle_num()) {
-    GetContext()->backup_stage_cycle_num = 0;
+    GetContext()->backup_stage_cycle_num_ = 0;
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
@@ -225,7 +225,7 @@ Stage::StageStatus SidePassGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   if (!ExecuteTaskOnReferenceLine(planning_start_point, frame)) {
     AERROR << "Fail to plan on reference_line.";
-    GetContext()->backup_stage_cycle_num = 0;
+    GetContext()->backup_stage_cycle_num_ = 0;
     next_stage_ = ScenarioConfig::SIDE_PASS_BACKUP;
     return Stage::FINISHED;
   }
