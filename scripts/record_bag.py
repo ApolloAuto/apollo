@@ -66,6 +66,7 @@ SMALL_TOPICS = [
     '/apollo/relative_map',
     '/apollo/routing_request',
     '/apollo/routing_response',
+    '/apollo/routing_response_history',
     '/apollo/sensor/conti_radar',
     '/apollo/sensor/delphi_esr',
     '/apollo/sensor/gnss/best_pose',
