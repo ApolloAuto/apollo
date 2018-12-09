@@ -81,6 +81,9 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     return Status(ErrorCode::PLANNING_ERROR, "Generator input data not ready");
   }
 
+  // Update end pose for target consistency check.
+  end_pose_ = end_pose;
+
   // Generate Stop trajectory if vehicle close to destination
   if (IsVehicleNearDestination(
           stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
