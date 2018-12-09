@@ -40,6 +40,10 @@ class Crosswalk : public TrafficRule {
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
+  bool CheckStopForObstacle(
+      ReferenceLineInfo* const reference_line_info,
+      const hdmap::CrosswalkInfoConstPtr crosswalk_ptr,
+      const Obstacle& obstacle);
   int BuildStopDecision(Frame* frame,
                         ReferenceLineInfo* const reference_line_info,
                         hdmap::PathOverlap* const crosswalk_overlap,

@@ -26,16 +26,17 @@ message ChangeLaneStatus {
   optional double timestamp = 3;
 }
 
-message StopTimer {
+message StopTime {
   optional string obstacle_id = 1;
   // the timestamp when start stopping for the crosswalk
-  optional double stop_time = 2;
+  optional double obstacle_stop_timestamp = 2;
 }
 
 message CrosswalkStatus {
   optional string crosswalk_id = 1;
   // the timestamp when start stopping for the crosswalk
-  repeated StopTimer stop_timers = 2;
+  repeated StopTime stop_time = 2;
+  repeated string finished_crosswalk = 3;
 }
 
 message PullOverStatus {
