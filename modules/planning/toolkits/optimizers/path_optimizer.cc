@@ -45,7 +45,7 @@ apollo::common::Status PathOptimizer::Execute(
 }
 
 void PathOptimizer::RecordDebugInfo(const PathData& path_data) {
-  const auto& path_points = path_data.discretized_path().path_points();
+  const auto& path_points = path_data.discretized_path();
   auto* ptr_optimized_path = reference_line_info_->mutable_debug()
                                  ->mutable_planning_data()
                                  ->add_path();

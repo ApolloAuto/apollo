@@ -33,8 +33,6 @@ class SpeedData : public std::vector<common::SpeedPoint> {
 
   explicit SpeedData(std::vector<common::SpeedPoint> speed_points);
 
-  virtual ~SpeedData() = default;
-
   void AppendSpeedPoint(const double s, const double time, const double v,
                         const double a, const double da);
 
@@ -42,10 +40,6 @@ class SpeedData : public std::vector<common::SpeedPoint> {
                       common::SpeedPoint* const speed_point) const;
 
   double TotalTime() const;
-
-  bool Empty() const { return empty(); }
-
-  void Clear();
 
   virtual std::string DebugString() const;
 };

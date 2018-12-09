@@ -79,7 +79,7 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     return Status(ErrorCode::PLANNING_ERROR, "No Frame info");
   }
 
-  if (path_data.discretized_path().NumOfPoints() == 0) {
+  if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

@@ -48,8 +48,7 @@ using CostComponentsPair = std::pair<std::vector<double>, double>;
 using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
-    const std::array<double, 3>& init_s,
-    const PlanningTarget& planning_target,
+    const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
     const std::vector<PtrTrajectory1d>& lon_trajectories,
     const std::vector<PtrTrajectory1d>& lat_trajectories,
     std::shared_ptr<PathTimeGraph> path_time_graph,
@@ -100,7 +99,7 @@ bool TrajectoryEvaluator::has_more_trajectory_pairs() const {
   return !cost_queue_.empty();
 }
 
-std::size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
+size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
   return cost_queue_.size();
 }
 
@@ -229,8 +228,8 @@ double TrajectoryEvaluator::LonObjectiveCost(
 
   double speed_cost_sqr_sum = 0.0;
   double speed_cost_weight_sum = 0.0;
-  for (std::size_t i = 0; i < ref_s_dots.size(); ++i) {
-    double t = i * FLAGS_trajectory_time_resolution;
+  for (size_t i = 0; i < ref_s_dots.size(); ++i) {
+    double t = static_cast<double>(i) * FLAGS_trajectory_time_resolution;
     double cost = ref_s_dots[i] - lon_trajectory->Evaluate(1, t);
     speed_cost_sqr_sum += t * t * std::fabs(cost);
     speed_cost_weight_sum += t * t;
@@ -249,12 +248,12 @@ double TrajectoryEvaluator::LonCollisionCost(
     const PtrTrajectory1d& lon_trajectory) const {
   double cost_sqr_sum = 0.0;
   double cost_abs_sum = 0.0;
-  for (std::size_t i = 0; i < path_time_intervals_.size(); ++i) {
+  for (size_t i = 0; i < path_time_intervals_.size(); ++i) {
     const auto& pt_interval = path_time_intervals_[i];
     if (pt_interval.empty()) {
       continue;
     }
-    double t = i * FLAGS_trajectory_time_resolution;
+    double t = static_cast<double>(i) * FLAGS_trajectory_time_resolution;
     double traj_s = lon_trajectory->Evaluate(0, t);
     double sigma = FLAGS_lon_collision_cost_std;
     for (const auto& m : pt_interval) {
@@ -275,7 +274,6 @@ double TrajectoryEvaluator::LonCollisionCost(
 
 double TrajectoryEvaluator::CentripetalAccelerationCost(
     const PtrTrajectory1d& lon_trajectory) const {
-
   // Assumes the vehicle is not obviously deviate from the reference line.
   double centripetal_acc_sum = 0.0;
   double centripetal_acc_sqr_sum = 0.0;
@@ -302,8 +300,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
 
   if (!planning_target.has_stop_point()) {
     PiecewiseAccelerationTrajectory1d lon_traj(init_s_[0], cruise_v);
-    lon_traj.AppendSegment(0.0,
-        FLAGS_trajectory_time_length + + FLAGS_lattice_epsilon);
+    lon_traj.AppendSegment(
+        0.0, FLAGS_trajectory_time_length + +FLAGS_lattice_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;
          t += FLAGS_trajectory_time_resolution) {
@@ -313,8 +311,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     double dist_s = planning_target.stop_point().s() - init_s_[0];
     if (dist_s < FLAGS_lattice_epsilon) {
       PiecewiseAccelerationTrajectory1d lon_traj(init_s_[0], 0.0);
-      lon_traj.AppendSegment(0.0,
-          FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
+      lon_traj.AppendSegment(
+          0.0, FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
 
       for (double t = 0.0; t < FLAGS_trajectory_time_length;
            t += FLAGS_trajectory_time_resolution) {
@@ -331,8 +329,7 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     std::shared_ptr<Trajectory1d> lon_ref_trajectory =
         PiecewiseBrakingTrajectoryGenerator::Generate(
             planning_target.stop_point().s(), init_s_[0],
-            planning_target.cruise_speed(),
-            init_s_[1], a_comfort, d_comfort,
+            planning_target.cruise_speed(), init_s_[1], a_comfort, d_comfort,
             FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;

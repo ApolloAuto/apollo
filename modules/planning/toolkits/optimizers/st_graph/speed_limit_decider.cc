@@ -88,13 +88,12 @@ Status SpeedLimitDecider::GetSpeedLimits(
   CHECK_NOTNULL(speed_limit_data);
 
   std::vector<double> avg_kappa;
-  GetAvgKappa(path_data_.discretized_path().path_points(), &avg_kappa);
-  const auto& discretized_path_points =
-      path_data_.discretized_path().path_points();
-  const auto& frenet_path_points = path_data_.frenet_frame_path().points();
-  for (uint32_t i = 0; i < discretized_path_points.size(); ++i) {
-    const double path_s = discretized_path_points.at(i).s();
-    const double frenet_point_s = frenet_path_points.at(i).s();
+  GetAvgKappa(path_data_.discretized_path(), &avg_kappa);
+  const auto& discretized_path = path_data_.discretized_path();
+  const auto& frenet_path = path_data_.frenet_frame_path();
+  for (uint32_t i = 0; i < discretized_path.size(); ++i) {
+    const double path_s = discretized_path.at(i).s();
+    const double frenet_point_s = frenet_path.at(i).s();
     if (frenet_point_s > reference_line_.Length()) {
       AWARN << "path length [" << frenet_point_s
             << "] is LARGER than reference_line_ length ["
@@ -115,9 +114,9 @@ Status SpeedLimitDecider::GetSpeedLimits(
 
     // -- 2.2: limit by centripetal jerk
     double centri_jerk_speed_limit = std::numeric_limits<double>::max();
-    if (i + 1 < discretized_path_points.size()) {
-      const double ds = discretized_path_points.at(i + 1).s() -
-                        discretized_path_points.at(i).s();
+    if (i + 1 < discretized_path.size()) {
+      const double ds =
+          discretized_path.at(i + 1).s() - discretized_path.at(i).s();
       DCHECK_GE(ds, 0.0);
       const double kEpsilon = 1e-9;
       const double centri_jerk =
@@ -152,7 +151,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
       const auto& nudge = const_obstacle->LateralDecision().nudge();
 
       // Please notice the differences between adc_l and frenet_point_l
-      const double frenet_point_l = frenet_path_points.at(i).l();
+      const double frenet_point_l = frenet_path.at(i).l();
 
       // obstacle is on the right of ego vehicle (at path point i)
       bool is_close_on_left =

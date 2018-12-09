@@ -92,7 +92,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
-      speed_data->Clear();
+      speed_data->clear();
       const double t_output_resolution = FLAGS_trajectory_time_min_interval;
       double time = 0.0;
       while (time < qp_st_speed_config_.total_time() + t_output_resolution) {
@@ -139,7 +139,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
          << " ms.";
 
   // extract output
-  speed_data->Clear();
+  speed_data->clear();
   const Spline1d& spline = spline_solver_->spline();
 
   const double t_output_resolution = FLAGS_trajectory_time_min_interval;
@@ -553,7 +553,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     while (i < t_evaluated_.size() &&
            j + 1 < speed_limit.speed_limit_points().size()) {
       double distance = v * t_evaluated_[i];
-      if (!last_speed_data.Empty() && distance < last_speed_data.back().s()) {
+      if (!last_speed_data.empty() && distance < last_speed_data.back().s()) {
         SpeedPoint p;
         last_speed_data.EvaluateByTime(t_evaluated_[i], &p);
         distance = p.s();
@@ -586,7 +586,7 @@ Status QpSplineStGraph::EstimateSpeedUpperBound(
     const auto& speed_limit_points = speed_limit.speed_limit_points();
     for (const double t : t_evaluated_) {
       double s = v * t;
-      if (!last_speed_data.Empty() && s < last_speed_data.back().s()) {
+      if (!last_speed_data.empty() && s < last_speed_data.back().s()) {
         SpeedPoint p;
         last_speed_data.EvaluateByTime(t, &p);
         s = p.s();

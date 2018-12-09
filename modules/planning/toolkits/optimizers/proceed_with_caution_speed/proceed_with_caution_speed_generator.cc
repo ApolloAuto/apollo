@@ -20,6 +20,7 @@
 
 #include "modules/planning/toolkits/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
 
+#include <algorithm>
 #include <string>
 
 #include "modules/planning/common/planning_context.h"
@@ -44,22 +45,23 @@ Status ProceedWithCautionSpeedGenerator::Process(
     const TrajectoryPoint& init_point, const ReferenceLine& reference_line,
     const SpeedData& reference_speed_data, PathDecision* const path_decision,
     SpeedData* const speed_data) {
-  if (path_data.discretized_path().NumOfPoints() == 0) {
+  if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  speed_data->Clear();
+  speed_data->clear();
 
   auto proceed_param =
       PlanningContext::GetScenarioInfo()->proceed_with_caution_speed;
   const bool is_fixed_distance = proceed_param.is_fixed_distance;
-  double proceed_distance = is_fixed_distance ?
-      proceed_param.distance : path_data.discretized_path().Length();
-  proceed_distance = std::min(
-      proceed_distance,
-      config_.proceed_with_caution_speed_config().max_distance());
+  double proceed_distance = is_fixed_distance
+                                ? proceed_param.distance
+                                : path_data.discretized_path().Length();
+  proceed_distance =
+      std::min(proceed_distance,
+               config_.proceed_with_caution_speed_config().max_distance());
 
   *speed_data = SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
       proceed_distance, proceeding_speed_);

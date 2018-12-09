@@ -400,9 +400,8 @@ void QpSplinePathGenerator::AddHistoryPathKernel() {
   std::vector<double> history_s;
   std::vector<double> histroy_l;
 
-  for (uint32_t i = 0; i < last_path_data.frenet_frame_path().NumOfPoints();
-       ++i) {
-    const auto p = last_path_data.frenet_frame_path().PointAt(i);
+  for (size_t i = 0; i < last_path_data.frenet_frame_path().size(); ++i) {
+    const auto p = last_path_data.frenet_frame_path().at(i);
     history_s.push_back(p.s());
     histroy_l.push_back(p.l() - ref_l_);
   }

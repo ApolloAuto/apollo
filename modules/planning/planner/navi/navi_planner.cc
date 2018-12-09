@@ -189,7 +189,7 @@ Status NaviPlanner::PlanOnReferenceLine(
     reference_line_info->AddCost(kPathOptimizationFallbackClost);
   }
 
-  if (!ret.ok() || reference_line_info->speed_data().Empty()) {
+  if (!ret.ok() || reference_line_info->speed_data().empty()) {
     ADEBUG << "Speed fallback.";
     GenerateFallbackSpeedProfile(reference_line_info->mutable_speed_data());
     reference_line_info->AddCost(kSpeedOptimizationFallbackClost);
@@ -398,7 +398,7 @@ void NaviPlanner::GenerateFallbackSpeedProfile(SpeedData* speed_data) {
   const auto& start_point = EgoInfo::Instance()->start_point();
   *speed_data =
       GenerateStopProfileFromPolynomial(start_point.v(), start_point.a());
-  if (speed_data->Empty()) {
+  if (speed_data->empty()) {
     *speed_data = GenerateStopProfile(start_point.v(), start_point.a());
   }
 }

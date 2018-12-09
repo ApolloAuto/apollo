@@ -30,63 +30,37 @@
 namespace apollo {
 namespace planning {
 
-DiscretizedPath::DiscretizedPath(
-    const std::vector<common::PathPoint> &path_points) {
-  path_points_ = path_points;
-}
+using apollo::common::PathPoint;
 
-void DiscretizedPath::set_path_points(
-    const std::vector<common::PathPoint> &path_points) {
-  path_points_ = path_points;
-}
+DiscretizedPath::DiscretizedPath(const std::vector<PathPoint> &path_points)
+    : std::vector<PathPoint>(path_points) {}
 
 double DiscretizedPath::Length() const {
-  if (path_points_.empty()) {
+  if (empty()) {
     return 0.0;
   }
-  return path_points_.back().s() - path_points_.front().s();
+  return back().s() - front().s();
 }
 
-common::PathPoint DiscretizedPath::Evaluate(const double path_s) const {
-  CHECK(!path_points_.empty());
+PathPoint DiscretizedPath::Evaluate(const double path_s) const {
+  CHECK(!empty());
   auto it_lower = QueryLowerBound(path_s);
-  if (it_lower == path_points_.begin()) {
-    return path_points_.front();
+  if (it_lower == begin()) {
+    return front();
   }
-  if (it_lower == path_points_.end()) {
-    return path_points_.back();
+  if (it_lower == end()) {
+    return back();
   }
   return common::math::InterpolateUsingLinearApproximation(*(it_lower - 1),
                                                            *it_lower, path_s);
 }
 
-const std::vector<common::PathPoint> &DiscretizedPath::path_points() const {
-  return path_points_;
-}
-
-std::uint32_t DiscretizedPath::NumOfPoints() const {
-  return path_points_.size();
-}
-
-const common::PathPoint &DiscretizedPath::StartPoint() const {
-  CHECK(!path_points_.empty());
-  return path_points_.front();
-}
-
-const common::PathPoint &DiscretizedPath::EndPoint() const {
-  CHECK(!path_points_.empty());
-  return path_points_.back();
-}
-
-void DiscretizedPath::Clear() { path_points_.clear(); }
-
-std::vector<common::PathPoint>::const_iterator DiscretizedPath::QueryLowerBound(
+std::vector<PathPoint>::const_iterator DiscretizedPath::QueryLowerBound(
     const double path_s) const {
-  auto func = [](const common::PathPoint &tp, const double path_s) {
+  auto func = [](const PathPoint &tp, const double path_s) {
     return tp.s() < path_s;
   };
-  return std::lower_bound(path_points_.begin(), path_points_.end(), path_s,
-                          func);
+  return std::lower_bound(begin(), end(), path_s, func);
 }
 
 }  // namespace planning

@@ -68,7 +68,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status::OK();
   }
 
-  if (path_data.discretized_path().NumOfPoints() == 0) {
+  if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

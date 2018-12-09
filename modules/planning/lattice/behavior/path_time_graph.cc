@@ -313,11 +313,11 @@ std::vector<PathTimePoint> PathTimeGraph::GetObstacleSurroundingPoints(
   CHECK(time_gap > -FLAGS_lattice_epsilon);
   time_gap = std::fabs(time_gap);
 
-  std::size_t num_sections = std::size_t(time_gap / t_min_density) + 1;
-  double t_interval = time_gap / num_sections;
+  size_t num_sections = static_cast<size_t>(time_gap / t_min_density + 1);
+  double t_interval = time_gap / static_cast<double>(num_sections);
 
-  for (std::size_t i = 0; i <= num_sections; ++i) {
-    double t = t_interval * i + t0;
+  for (size_t i = 0; i <= num_sections; ++i) {
+    double t = t_interval * static_cast<double>(i) + t0;
     double s = lerp(s0, t0, s1, t1, t) + s_dist;
 
     PathTimePoint ptt;
@@ -343,14 +343,14 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
   std::vector<double> discretized_path;
   double s_range = s_end - s_start;
   double s_curr = s_start;
-  std::size_t num_bound = static_cast<std::size_t>(s_range / s_resolution);
+  size_t num_bound = static_cast<size_t>(s_range / s_resolution);
 
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_width = vehicle_config.vehicle_param().width();
 
   // Initialize bounds by reference line width
-  for (std::size_t i = 0; i < num_bound; ++i) {
+  for (size_t i = 0; i < num_bound; ++i) {
     double left_width = FLAGS_default_reference_line_width / 2.0;
     double right_width = FLAGS_default_reference_line_width / 2.0;
     ptr_reference_line_info_->reference_line().GetLaneWidth(s_curr, &left_width,
@@ -369,7 +369,7 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetLateralBounds(
                                   s_end, &bounds);
   }
 
-  for (std::size_t i = 0; i < bounds.size(); ++i) {
+  for (size_t i = 0; i < bounds.size(); ++i) {
     bounds[i].first += ego_width / 2.0;
     bounds[i].second -= ego_width / 2.0;
     if (bounds[i].first >= bounds[i].second) {
@@ -391,19 +391,19 @@ void PathTimeGraph::UpdateLateralBoundsByObstacle(
       discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
   auto end_iter = std::upper_bound(
       discretized_path.begin(), discretized_path.end(), sl_boundary.start_s());
-  std::size_t start_index = start_iter - discretized_path.begin();
-  std::size_t end_index = end_iter - discretized_path.begin();
+  size_t start_index = start_iter - discretized_path.begin();
+  size_t end_index = end_iter - discretized_path.begin();
   if (sl_boundary.end_l() > -FLAGS_lattice_epsilon &&
       sl_boundary.start_l() < FLAGS_lattice_epsilon) {
-    for (std::size_t i = start_index; i < end_index; ++i) {
+    for (size_t i = start_index; i < end_index; ++i) {
       bounds->operator[](i).first = -FLAGS_lattice_epsilon;
       bounds->operator[](i).second = FLAGS_lattice_epsilon;
     }
     return;
   }
   if (sl_boundary.end_l() < FLAGS_lattice_epsilon) {
-    for (std::size_t i = start_index;
-         i < std::min(end_index + 1, bounds->size()); ++i) {
+    for (size_t i = start_index; i < std::min(end_index + 1, bounds->size());
+         ++i) {
       bounds->operator[](i).first =
           std::max(bounds->operator[](i).first,
                    sl_boundary.end_l() + FLAGS_nudge_buffer);
@@ -411,8 +411,8 @@ void PathTimeGraph::UpdateLateralBoundsByObstacle(
     return;
   }
   if (sl_boundary.start_l() > -FLAGS_lattice_epsilon) {
-    for (std::size_t i = start_index;
-         i < std::min(end_index + 1, bounds->size()); ++i) {
+    for (size_t i = start_index; i < std::min(end_index + 1, bounds->size());
+         ++i) {
       bounds->operator[](i).second =
           std::min(bounds->operator[](i).second,
                    sl_boundary.start_l() - FLAGS_nudge_buffer);

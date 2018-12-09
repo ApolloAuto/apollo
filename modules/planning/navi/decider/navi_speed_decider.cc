@@ -231,10 +231,9 @@ Status NaviSpeedDecider::Execute(Frame* frame,
 
   // get the path
   auto& discretized_path = reference_line_info_->path_data().discretized_path();
-  const auto& path_points = discretized_path.path_points();
 
   auto ret = MakeSpeedDecision(
-      start_v, start_a, start_da, path_points, frame_->obstacles(),
+      start_v, start_a, start_da, discretized_path, frame_->obstacles(),
       [&](const std::string& id) { return frame_->Find(id); },
       reference_line_info_->mutable_speed_data());
   RecordDebugInfo(reference_line_info->speed_data());
@@ -308,13 +307,13 @@ Status NaviSpeedDecider::MakeSpeedDecision(
   std::vector<NaviSpeedTsPoint> ts_points;
   if (ts_graph_.Solve(&ts_points) != Status::OK()) {
     AERROR << "Solve speed points failed";
-    speed_data->Clear();
+    speed_data->clear();
     speed_data->AppendSpeedPoint(0.0 + start_s, 0.0, 0.0, -max_decel_, 0.0);
     speed_data->AppendSpeedPoint(0.0 + start_s, 1.0, 0.0, -max_decel_, 0.0);
     return Status::OK();
   }
 
-  speed_data->Clear();
+  speed_data->clear();
   for (auto& ts_point : ts_points) {
     if (ts_point.s > kSpeedPointSLimit || ts_point.t > kSpeedPointTimeLimit)
       break;

@@ -49,7 +49,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const PathDecision& path_decision = reference_line_info.path_decision();
 
-  if (GetContext()->path_data_.discretized_path().path_points().empty()) {
+  if (GetContext()->path_data_.discretized_path().empty()) {
     AERROR << "path data is empty.";
     return Stage::ERROR;
   }
@@ -64,13 +64,12 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   if (!GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_)) {
     return Stage::ERROR;
   }
-  if (GetContext()->path_data_.discretized_path().path_points().empty()) {
+  if (GetContext()->path_data_.discretized_path().empty()) {
     AERROR << "path data is empty after trim.";
     return Stage::ERROR;
   }
 
-  for (const auto& p :
-       GetContext()->path_data_.discretized_path().path_points()) {
+  for (const auto& p : GetContext()->path_data_.discretized_path()) {
     ADEBUG << p.ShortDebugString();
   }
 
@@ -96,7 +95,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   ADEBUG << "Got the nearest obstacle if there is one.";
   // Get the "wait point".
   PathPoint first_path_point =
-      GetContext()->path_data_.discretized_path().path_points().front();
+      GetContext()->path_data_.discretized_path().front();
   PathPoint last_path_point;
   bool should_not_move_at_all = false;
   if (!GetMoveForwardLastPathPoint(reference_line, nearest_obstacle,
@@ -234,7 +233,7 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
   // Get the first path point. This can be used later to
   // filter out other obstaces that are behind ADC.
   PathPoint first_path_point =
-      GetContext()->path_data_.discretized_path().path_points().front();
+      GetContext()->path_data_.discretized_path().front();
   common::SLPoint first_sl_point;
   if (!reference_line.XYToSL(Vec2d(first_path_point.x(), first_path_point.y()),
                              &first_sl_point)) {
@@ -309,8 +308,7 @@ bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
     s_max = nearest_obstacle->PerceptionSLBoundary().start_s();
   }
 
-  for (const auto& path_point :
-       GetContext()->path_data_.discretized_path().path_points()) {
+  for (const auto& path_point : GetContext()->path_data_.discretized_path()) {
     // Get the four corner points ABCD of ADC at every path point,
     // and keep checking until it gets out of the current lane or
     // reaches the nearest obstacle (in the same lane) ahead.
