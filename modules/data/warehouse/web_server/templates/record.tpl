@@ -1,5 +1,5 @@
 {#
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 {% block head %}
 
-<title>Apollo Data - Task {{ task.id }}</title>
+<title>Apollo Data - Record - {{ record.path }}</title>
 
 <style>
 .green {color: green;}
@@ -34,35 +34,37 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Vehicle</th>
-          <th>Time</th>
-          <th>Duration</th>
+          <th>Mode</th>
           <th>Map</th>
-          <th>Type</th>
+          <th>Vehicle</th>
+          <th>Begin Time</th>
+          <th>Duration</th>
+          <th>Size</th>
           <th>Mileage (Auto/Total)</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>{{ task.info.vehicle.name }}</td>
-          <td>{{ task.start_time | timestamp_to_time }}</td>
-          <td>{{ (task.end_time - task.start_time) | round(1) }} s</td>
-          <td>{{ task.info.environment.map_name }}</td>
-          <td>{{ task.loop_type | loop_type }}</td>
-          <td>{{ task.mileage['COMPLETE_AUTO_DRIVE'] | int }} / {{ task.mileage.values() | sum | int }} m</td>
+          <td>{{ record.hmi_status.current_mode }}</td>
+          <td>{{ record.hmi_status.current_map }}</td>
+          <td>{{ record.hmi_status.current_vehicle }}</td>
+          <td>{{ record.header.begin_time | timestamp_ns_to_time }}</td>
+          <td>{{ ((record.header.end_time - record.header.begin_time) / 1000000000.0) | round(1) }} s</td>
+          <td>{{ record.header.size | readable_data_size }}</td>
+          <td>{{ record.stat.mileages['COMPLETE_AUTO_DRIVE'] | int }} / {{ record.stat.mileages.values() | sum | int }} m</td>
         </tr>
       </tbody>
     </table>
 
     {# Draw map path. #}
-    {% if task.map_path %}
+    {% if record.stat.driving_path %}
       <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&key=AIzaSyC2THXHPs0lkchGfcUOHTm-aVujoBHh2Sc"></script>
       <script type="text/javascript" src="{{ url_for('static', filename='js/gmap_util.js') }}"></script>
       <div style="width:100%; height:350px;">
         <div id="gmap_canvas" style="width: 100%; height: 100%;"></div>
         <script>
-          {{ task.map_path | draw_path_on_gmap('gmap_canvas') }}
-          {{ task | draw_disengagements_on_gmap }}
+          {{ record.stat.driving_path | draw_path_on_gmap('gmap_canvas') }}
+          {{ record | draw_disengagements_on_gmap }}
         </script>
       </div>
 
@@ -79,31 +81,35 @@
   </div>
 </div>
 
+{% if sub_records %}
 <div class="panel panel-default">
-  <div class="panel-heading">Rosbags</div>
+  <div class="panel-heading">Records</div>
   <div class="panel-body">
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Start Time</th>
+          <th>Begin Time</th>
           <th>Duration</th>
           <th>Size</th>
-          <th>Path (On NFS or HDFS)</th>
+          <th>Path</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        {% for bag in task.bags %}
+        {% for record in sub_records %}
           <tr>
-            <td>{{ (bag.start_time - task.start_time) | round(1) }}</td>
-            <td>{{ (bag.end_time - bag.start_time) | round(1) }} s</td>
-            <td>{{ bag.size | readable_data_size }}</td>
-            <td>{{ task.id | task_id_to_path }}/{{ bag.name }}</td>
+            <td>{{ record.header.begin_time | timestamp_ns_to_time }}</td>
+            <td>{{ ((record.header.end_time - record.header.begin_time) / 1000000000.0) | round(1) }} s</td>
+            <td>{{ record.header.size | readable_data_size }}</td>
+            <td>{{ record.path }}</td>
+            <td><a href="{{ url_for('record_hdl', record_path=record.path[1:]) }}">View</a></td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+{% endif %}
 
 <div class="panel panel-default">
   <div class="panel-heading">Disengagements</div>
@@ -113,17 +119,15 @@
         <tr>
           <th>Time</th>
           <th>Description</th>
-          <th>Bag</th>
           <th>Offset</th>
         </tr>
       </thead>
       <tbody>
-        {% for dis in task.disengagements %}
+        {% for dis in record.disengagements %}
           <tr>
-            <td>{{ (dis.time - task.start_time) | round(1) }}</td>
+            <td>{{ dis.time | timestamp_to_time }}</td>
             <td>{{ dis.desc }}</td>
-            <td>{{ task.id | task_id_to_path }}/{{ task.bags | find_bag_by_time(dis.time) }}</td>
-            <td>{{ task.bags | find_bag_offset_by_time(dis.time) | round(1) }} s</td>
+            <td>{{ (dis.time - record.header.start_time) | round(1) }}</td>
           </tr>
         {% endfor %}
       </tbody>
@@ -132,13 +136,24 @@
 </div>
 
 <div class="panel panel-default">
-  <div class="panel-heading">Topics</div>
+  <div class="panel-heading">Channels</div>
   <div class="panel-body">
-    <ul class="list-group">
-      {% for topic in task.topics %}
-        <li class="list-group-item">{{ topic }}</li>
-      {% endfor %}
-    </ul>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Messages</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for channel, msg_count in record.channels.iteritems() %}
+          <tr>
+            <td>{{ channel }}</td>
+            <td>{{ msg_count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 

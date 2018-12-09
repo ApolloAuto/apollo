@@ -18,9 +18,4 @@
 import os
 import sys
 
-apollo_root = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '../../../..'))
-py_proto_path = os.path.join(apollo_root, 'py_proto')
-common_path = os.path.join(apollo_root, 'modules/data/warehouse/common')
-
-sys.path.extend([py_proto_path, common_path])
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
