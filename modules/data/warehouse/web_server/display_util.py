@@ -78,13 +78,14 @@ def draw_path_on_gmap(driving_path, canvas_id):
     return result
 
 
-def draw_disengagements_on_gmap(task):
+def draw_disengagements_on_gmap(record):
     """Draw disengagements on Google map."""
     result = ''
-    for dis in task.disengagements:
-        info = 'disengage at %.1fs' % (dis.time - task.start_time)
+    for dis in record.disengagements:
+        info = 'disengage at %.1fs' % (
+            dis.time - record.header.begin_time / 1e9)
         result += 'DrawInfoWindow(gmap, {}, {}, "{}");\n'.format(
-            dis.location.latitude, dis.location.longitude, info)
+            dis.location.lat, dis.location.lon, info)
     return result
 
 

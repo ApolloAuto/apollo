@@ -35,7 +35,7 @@ from mongo_util import Mongo
 
 
 gflags.DEFINE_string('host', '0.0.0.0', 'Web host IP.')
-gflags.DEFINE_integer('port', 8887, 'Web host port.')
+gflags.DEFINE_integer('port', 8000, 'Web host port.')
 gflags.DEFINE_integer('workers', 5, 'Web host workers.')
 gflags.DEFINE_boolean('debug', False, 'Enable debug mode.')
 gflags.DEFINE_integer('page_size', 20, 'Search results per page.')
