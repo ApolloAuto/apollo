@@ -85,9 +85,6 @@ bool PathDecider::MakeStaticObstacleDecision(
 
   const double lateral_radius = half_width + FLAGS_lateral_ignore_buffer;
 
-  const double lateral_stop_radius =
-      half_width + FLAGS_static_decision_nudge_l_buffer;
-
   for (const auto *obstacle : path_decision->obstacles().Items()) {
     bool is_bycycle_or_pedestrain =
         (obstacle->Perception().type() ==
@@ -137,8 +134,7 @@ bool PathDecider::MakeStaticObstacleDecision(
       // ignore
       path_decision->AddLateralDecision("PathDecider/not-in-l", obstacle->Id(),
                                         object_decision);
-    } else if (curr_l - lateral_stop_radius < sl_boundary.end_l() &&
-               curr_l + lateral_stop_radius > sl_boundary.start_l()) {
+    } else if (obstacle->IsLaneBlocking()) {
       // stop
       *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
 
@@ -156,14 +152,14 @@ bool PathDecider::MakeStaticObstacleDecision(
       }
     } else if (FLAGS_enable_nudge_decision) {
       // nudge
-      if (curr_l - lateral_stop_radius > sl_boundary.end_l()) {
+      if (curr_l > sl_boundary.end_l()) {
         // LEFT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
         object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
         path_decision->AddLateralDecision("PathDecider/left-nudge",
                                           obstacle->Id(), object_decision);
-      } else {
+      } else if (curr_l < sl_boundary.start_l()) {
         // RIGHT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);

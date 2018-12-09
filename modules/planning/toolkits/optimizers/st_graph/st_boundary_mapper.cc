@@ -96,6 +96,21 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
 
   for (const auto* const_obstacle : obstacles.Items()) {
     auto* obstacle = path_decision->Find(const_obstacle->Id());
+
+    bool is_bycycle_or_pedestrain =
+        (obstacle->Perception().type() ==
+             perception::PerceptionObstacle::BICYCLE ||
+         obstacle->Perception().type() ==
+             perception::PerceptionObstacle::PEDESTRIAN);
+
+    const auto& lat_decision = obstacle->LateralDecision();
+    if (!is_bycycle_or_pedestrain && obstacle->IsStatic() &&
+        lat_decision.has_nudge()) {
+      ADEBUG << "Do not map S-T Boundary for nudge decision: "
+             << lat_decision.DebugString();
+      continue;
+    }
+
     if (!obstacle->HasLongitudinalDecision()) {
       if (!MapWithoutDecision(obstacle).ok()) {
         std::string msg = StrCat("Fail to map obstacle ", obstacle->Id(),
@@ -105,6 +120,7 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
       }
       continue;
     }
+
     const auto& decision = obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
       const double stop_s = obstacle->PerceptionSLBoundary().start_s() +

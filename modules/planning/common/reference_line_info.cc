@@ -325,6 +325,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     return mutable_obstacle;
   }
   mutable_obstacle->SetPerceptionSlBoundary(perception_sl);
+  mutable_obstacle->CheckLaneBlocking(reference_line_);
 
   if (IsUnrelaventObstacle(mutable_obstacle)) {
     ObjectDecisionType ignore;
