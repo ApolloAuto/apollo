@@ -29,6 +29,10 @@
   <nav class="navbar navbar-default">
     <div class="container-fluid">
       <div class="navbar-header"><a class="navbar-brand" href="/">Apollo Data</a></div>
+      <ul class="nav navbar-nav">
+        <li><a href="{{ url_for('tasks_hdl') }}">Tasks</a></li>
+        <li><a href="{{ url_for('records_hdl') }}">Records</a></li>
+      </ul>
     </div>
   </nav>
 
