@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_PULL_OVER
       reason: "stop by PO_DESTINATION"
       stop_point {
-        x: 587171.47276862385
-        y: 4141195.7076147585
+        x: 587171.47122647916
+        y: 4141195.7053173776
       }
-      stop_heading: 2.8937449930020716
+      stop_heading: 2.8941276874894215
       change_lane_type: FORWARD
     }
   }
@@ -25,11 +25,11 @@ decision {
           reason_code: STOP_REASON_PULL_OVER
           distance_s: -0.5
           stop_point {
-            x: 587171.47276862385
-            y: 4141195.7076147585
+            x: 587171.47122647916
+            y: 4141195.7053173776
             z: 0
           }
-          stop_heading: 2.8937449930020716
+          stop_heading: 2.8941276874894215
         }
       }
     }
@@ -58,6 +58,9 @@ lane_id {
 }
 lane_id {
   id: "2688_1_-1"
+}
+lane_id {
+  id: "2687_1_-1"
 }
 engage_advice {
   advice: KEEP_ENGAGED

@@ -9,10 +9,10 @@ decision {
       reason_code: STOP_REASON_CLEAR_ZONE
       reason: "stop by KC_1254"
       stop_point {
-        x: 586425.59276840894
-        y: 4140681.7021027128
+        x: 586425.59079784492
+        y: 4140681.6991510969
       }
-      stop_heading: 1.3269924035145066
+      stop_heading: 1.3275275923622227
       change_lane_type: FORWARD
     }
   }
@@ -24,11 +24,11 @@ decision {
         follow {
           distance_s: -5.4097223281860352
           fence_point {
-            x: 586426.49739531986
-            y: 4140685.4601982441
+            x: 586426.49820628366
+            y: 4140685.4595480911
             z: 0
           }
-          fence_heading: 1.3398228192102641
+          fence_heading: 1.3387142186783652
         }
       }
     }
@@ -40,11 +40,11 @@ decision {
           reason_code: STOP_REASON_CLEAR_ZONE
           distance_s: 0
           stop_point {
-            x: 586425.59276840894
-            y: 4140681.7021027128
+            x: 586425.59079784492
+            y: 4140681.6991510969
             z: 0
           }
-          stop_heading: 1.3269924035145066
+          stop_heading: 1.3275275923622227
         }
       }
     }

@@ -17,11 +17,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.31443244056
-            y: 4141284.1266878112
+            x: 586260.20580383553
+            y: 4141284.312753018
             z: 0
           }
-          fence_heading: -1.3299784970826325
+          fence_heading: -1.3350939032979112
         }
       }
     }
@@ -32,11 +32,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.21964232251
-            y: 4141284.5152856694
+            x: 586260.17567152879
+            y: 4141284.4340668428
             z: 0
           }
-          fence_heading: -1.3430782827827037
+          fence_heading: -1.3350939032979112
         }
       }
     }
@@ -81,6 +81,9 @@ lane_id {
 }
 lane_id {
   id: "2811_1_-1"
+}
+lane_id {
+  id: "2813_1_-1"
 }
 engage_advice {
   advice: READY_TO_ENGAGE
