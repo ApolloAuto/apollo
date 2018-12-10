@@ -37,6 +37,11 @@ using apollo::perception::TrafficLightDetection;
 Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool Rerouting::ChangeLaneFailRerouting() {
+  for (const auto& ref_line_info : frame_->reference_line_info()) {
+    if (ref_line_info.ReachedDestination()) {
+      return true;
+    }
+  }
   const auto& segments = reference_line_info_->Lanes();
   // 1. If current reference line is drive forward, no rerouting.
   if (segments.NextAction() == routing::FORWARD) {
