@@ -49,6 +49,7 @@ TEST(SchedulerPolicyTest, classic) {
   auto processor = std::make_shared<Processor>();
   auto ctx = std::make_shared<ClassicContext>();
   processor->BindContext(ctx);
+  ctx->SetGroupName(DEFAULT_GROUP_NAME);
   std::vector<std::future<void>> res;
 
   // test single routine
@@ -74,14 +75,37 @@ TEST(SchedulerPolicyTest, classic) {
 
 TEST(SchedulerPolicyTest, sched_classic) {
   GlobalData::Instance()->SetProcessGroup("example_classic_sched");
-  auto sched = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
+  auto sched1 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("ABC");
   cr->set_id(task_id);
-  EXPECT_TRUE(sched->DispatchTask(cr));
+  cr->set_name("ABC");
+  EXPECT_TRUE(sched1->DispatchTask(cr));
   // dispatch the same task
-  EXPECT_FALSE(sched->DispatchTask(cr));
-  EXPECT_TRUE(sched->RemoveTask("ABC"));
+  EXPECT_FALSE(sched1->DispatchTask(cr));
+  EXPECT_TRUE(sched1->RemoveTask("ABC"));
+
+  std::shared_ptr<CRoutine> cr1 = std::make_shared<CRoutine>(func);
+  cr1->set_id(GlobalData::RegisterTaskName("xxxxxx"));
+  cr1->set_name("xxxxxx");
+  EXPECT_TRUE(sched1->DispatchTask(cr1));
+  sched1->Shutdown();
+
+  GlobalData::Instance()->SetProcessGroup("not_exist_sched");
+  auto sched2 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
+  std::shared_ptr<CRoutine> cr2 = std::make_shared<CRoutine>(func);
+  cr2->set_id(GlobalData::RegisterTaskName("sched2"));
+  cr2->set_name("sched2");
+  EXPECT_TRUE(sched2->DispatchTask(cr2));
+  sched2->Shutdown();
+
+  GlobalData::Instance()->SetProcessGroup("dreamview_sched");
+  auto sched3 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
+  std::shared_ptr<CRoutine> cr3 = std::make_shared<CRoutine>(func);
+  cr3->set_id(GlobalData::RegisterTaskName("sched3"));
+  cr3->set_name("sched3");
+  EXPECT_TRUE(sched3->DispatchTask(cr3));
+  sched3->Shutdown();
 }
 
 }  // namespace scheduler
