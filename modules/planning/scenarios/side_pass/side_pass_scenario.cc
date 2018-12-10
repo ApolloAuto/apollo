@@ -33,6 +33,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stage.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stop_on_wait_point.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace planning {
@@ -40,6 +41,7 @@ namespace scenario {
 namespace side_pass {
 
 using apollo::common::VehicleConfigHelper;
+using apollo::hdmap::HDMapUtil;
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
@@ -200,17 +202,21 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   // a blocking obstacle is an obstacle blocks the road when it is not blocked
   // (by other obstacles or traffic rules)
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
+    ADEBUG << "Evaluating Obstacle: " << obstacle->Id();
+    if (obstacle->IsVirtual()) {
+      ADEBUG << " - It is virtual.";
       continue;
     }
 
-    if (obstacle->speed() >
+    if (!obstacle->IsStatic() || obstacle->speed() >
         side_pass_context_.scenario_config_.block_obstacle_min_speed()) {
+      ADEBUG << " - It is non-static.";
       continue;
     }
 
     if (obstacle->PerceptionSLBoundary().start_s() <=
         adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
+      ADEBUG << " - It is behind ADC.";
       continue;
     }
 
@@ -219,6 +225,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     if (obstacle->PerceptionSLBoundary().start_s() >
         adc_sl_boundary.end_s() + kAdcDistanceThreshold) {
       // vehicles are far away
+      ADEBUG << " - It is too far ahead.";
       continue;
     }
 
@@ -226,6 +233,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
             side_pass_context_.scenario_config_.min_front_obstacle_distance() >
         obstacle->PerceptionSLBoundary().start_s()) {
       // front obstacle is too close to side pass
+      ADEBUG << " - It is too close to side-pass.";
       continue;
     }
 
@@ -237,6 +245,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         VehicleConfigHelper::GetConfig().vehicle_param().width();
     if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
         side_pass_context_.scenario_config_.min_l_nudge_buffer()) {
+      ADEBUG << " - It is not blocking our way."
+             << " (driving width = " << driving_width
+             << ", adc_width = " << adc_width << ")";
       continue;
     }
 
@@ -270,9 +281,11 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     if (!is_blocked_by_others) {
       // static obstacle id doesn't contain prediction trajectory suffix.
       front_blocking_obstacle_id_ = obstacle->Id() + "_0";
-      ADEBUG << "Obstacle: " << obstacle->Id() << " is blocking.";
+      ADEBUG << "IT IS BLOCKING!";
       side_pass_context_.front_blocking_obstacle_id_ = obstacle->Id();
       return true;
+    } else {
+      ADEBUG << " - It is blocked by others.";
     }
   }
   side_pass_context_.front_blocking_obstacle_id_ = "";
@@ -281,6 +294,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
 
 bool SidePassScenario::IsParked(const ReferenceLine& reference_line,
                                 const Obstacle* obstacle) {
+  if (!FLAGS_enable_scenario_side_pass_multiple_parked_obstacles) {
+    return false;
+  }
   double road_left_width = 0.0;
   double road_right_width = 0.0;
   double max_road_right_width = 0.0;
@@ -290,9 +306,22 @@ bool SidePassScenario::IsParked(const ReferenceLine& reference_line,
   reference_line.GetRoadWidth(obstacle->PerceptionSLBoundary().end_s(),
                               &road_left_width, &road_right_width);
   max_road_right_width = std::max(max_road_right_width, road_right_width);
-  bool is_parked = std::abs(obstacle->PerceptionSLBoundary().start_l()) >
-                   max_road_right_width - 0.1;
+  bool is_at_road_edge = std::abs(obstacle->PerceptionSLBoundary().start_l()) >
+      max_road_right_width - 0.1;
 
+  std::vector<std::shared_ptr<const hdmap::LaneInfo>> lanes;
+  auto obstacle_box = obstacle->PerceptionBoundingBox();
+  HDMapUtil::BaseMapPtr()->GetLanes(
+      common::util::MakePointENU(
+          obstacle_box.center().x(), obstacle_box.center().y(), 0.0),
+      std::min(obstacle_box.width(), obstacle_box.length()), &lanes);
+  bool is_on_parking_lane = false;
+  if (lanes.size() == 1 &&
+      lanes.front()->lane().type() == apollo::hdmap::Lane::PARKING) {
+    is_on_parking_lane = true;
+  }
+
+  bool is_parked = is_on_parking_lane || is_at_road_edge;
   return (is_parked && obstacle->IsStatic());
 }
 
