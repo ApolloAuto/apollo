@@ -156,7 +156,8 @@ bool SpeedDecider::CheckKeepClearBlocked(
     const double distance =
         obstacle_start_s - keep_clear_obstacle.PerceptionSLBoundary().end_s();
 
-    if (obstacle->IsBlockingObstacle() && distance < (adc_length / 2)) {
+    if (obstacle->IsBlockingObstacle()
+        && distance > 0 && distance < (adc_length / 2)) {
       keep_clear_blocked = true;
       break;
     }
