@@ -232,8 +232,9 @@ void DownsampleCurve(Curve *curve) {
   line_segment->clear_point();
 
   // Downsample points by angle then by distance.
-  std::vector<int> sampled_indices = DownsampleByAngle(points, kAngleThreshold);
-  for (int index : sampled_indices) {
+  std::vector<size_t> sampled_indices =
+      DownsampleByAngle(points, kAngleThreshold);
+  for (const size_t index: sampled_indices) {
     auto *point = line_segment->add_point();
     point->set_x(points[index].x());
     point->set_y(points[index].y());
@@ -813,10 +814,8 @@ void SimulationWorldService::DownsamplePath(const common::Path &path,
   auto sampled_indices = DownsampleByAngle(path.path_point(), kAngleThreshold);
 
   downsampled_path->set_name(path.name());
-  for (int index : sampled_indices) {
-    const auto &path_point = path.path_point()[index];
-    auto *point = downsampled_path->add_path_point();
-    point->CopyFrom(path_point);
+  for (const size_t index : sampled_indices) {
+    *downsampled_path->add_path_point() = path.path_point(index);
   }
 }
 
@@ -984,7 +983,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
     route_paths_.emplace_back();
     RoutePath *route_path = &route_paths_.back();
-    for (int index : sampled_indices) {
+    for (const size_t index : sampled_indices) {
       const auto &path_point = path.path_points()[index];
       PolygonPoint *route_point = route_path->add_point();
       route_point->set_x(path_point.x() + map_service_->GetXOffset());
