@@ -65,7 +65,6 @@ uint64_t Velodyne128Parser::GetTimestamp(double base_time, float time_offset,
   return timestamp;
 }
 
-// TODO(dengchengliang): No manual about order for lidar128 by now.
 void Velodyne128Parser::Order(std::shared_ptr<PointCloud> cloud) {
   (void)cloud;
 }
@@ -75,8 +74,6 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
   float azimuth_diff, azimuth_corrected_f;
   float last_azimuth_diff = 0.0f;
   uint16_t azimuth, azimuth_next, azimuth_corrected;
-  // float x_coord, y_coord, z_coord;
-  // const raw_packet_t *raw = (const raw_packet_t *)&pkt.data[0];
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   double basetime = raw->gps_timestamp;
 

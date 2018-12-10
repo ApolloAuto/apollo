@@ -392,7 +392,6 @@ bool UsbCam::init_device(void) {
       break;
   }
 
-  // TODO(dengchengliang): clearly return value, now exit when error
   return true;
 }
 
