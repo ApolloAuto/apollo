@@ -52,9 +52,9 @@ struct SidePassContext;
  *    back of car
  *
  */
-class SidePassStopOnWaitPoint : public Stage {
+class StageStopOnWaitPoint : public Stage {
  public:
-  explicit SidePassStopOnWaitPoint(const ScenarioConfig::StageConfig& config)
+  explicit StageStopOnWaitPoint(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
@@ -70,11 +70,10 @@ class SidePassStopOnWaitPoint : public Stage {
       const ReferenceLine& reference_line,
       const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
       const Obstacle** nearest_obstacle);
-  bool GetMoveForwardLastPathPoint(
-      const ReferenceLine& reference_line,
-      const Obstacle* nearest_obstacle,
-      common::PathPoint* const last_path_point,
-      bool* should_not_move_at_all);
+  bool GetMoveForwardLastPathPoint(const ReferenceLine& reference_line,
+                                   const Obstacle* nearest_obstacle,
+                                   common::PathPoint* const last_path_point,
+                                   bool* should_not_move_at_all);
 };
 
 }  // namespace side_pass

@@ -30,9 +30,7 @@ namespace side_pass {
 
 struct SidePassContext;
 
-DECLARE_STAGE(SidePassGeneratePath, SidePassContext);
-DECLARE_STAGE(SidePassDetectSafety, SidePassContext);
-DECLARE_STAGE(SidePassPassObstacle, SidePassContext);
+DECLARE_STAGE(StageApproachObstacle, SidePassContext);
 
 }  // namespace side_pass
 }  // namespace scenario
