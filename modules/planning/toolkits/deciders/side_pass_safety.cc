@@ -38,7 +38,6 @@ Status SidePassSafety::Process(Frame *frame,
                                ReferenceLineInfo *reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-
   if (!IsSafeSidePass(frame, reference_line_info)) {
     AINFO << "Side Pass Safety: False";
     BuildSidePathDecision(frame, reference_line_info);
@@ -49,19 +48,49 @@ Status SidePassSafety::Process(Frame *frame,
 }
 
 apollo::common::Status SidePassSafety::BuildSidePathDecision(
-    Frame *frame, ReferenceLineInfo *const reference_line_info) {
+    Frame *frame, ReferenceLineInfo *reference_line_info) {
   std::string virtual_obstacle_id = SIDEPASS_VIRTUAL_OBSTACLE_ID;
 
+  double stop_fence_s = reference_line_info->AdcSlBoundary().end_s() + 0.2;
   auto *obstacle =
       frame->CreateStopObstacle(reference_line_info, virtual_obstacle_id,
-                                reference_line_info->AdcSlBoundary().end_s());
+                                stop_fence_s);
   if (!obstacle) {
     AERROR << "Failed to create side pass safety obstacle["
            << virtual_obstacle_id << "]";
     auto status = Status(ErrorCode::PLANNING_ERROR,
-                         "Failed to create side pass safety obstacle");
+                         "Failed to create side pass safety obstacle.");
     return status;
   }
+
+  Obstacle *stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create obstacle for: " << virtual_obstacle_id;
+    auto status = Status(ErrorCode::PLANNING_ERROR,
+                         "Failed to create side pass safety stop wall.");
+    return status;
+  }
+
+  // build stop decision
+  const double stop_distance = 2.0;
+  const double stop_s = stop_fence_s - stop_distance;
+  const auto& reference_line = reference_line_info->reference_line();
+  auto stop_point = reference_line.GetReferencePoint(stop_s);
+  double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
+
+  ObjectDecisionType stop;
+  auto stop_decision = stop.mutable_stop();
+  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CREEPER);
+  stop_decision->set_distance_s(-stop_distance);
+  stop_decision->set_stop_heading(stop_heading);
+  stop_decision->mutable_stop_point()->set_x(stop_point.x());
+  stop_decision->mutable_stop_point()->set_y(stop_point.y());
+  stop_decision->mutable_stop_point()->set_z(0.0);
+
+  auto *path_decision = reference_line_info->path_decision();
+  path_decision->AddLongitudinalDecision("SidePassSafety", stop_wall->Id(),
+                                         stop);
+
   return Status().OK();
 }
 

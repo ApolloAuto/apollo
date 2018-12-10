@@ -41,7 +41,7 @@ class SidePassSafety : public Decider {
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
   apollo::common::Status BuildSidePathDecision(
-      Frame* frame, ReferenceLineInfo* const reference_line_info);
+      Frame* frame, ReferenceLineInfo* reference_line_info);
 
   bool IsSafeSidePass(Frame* frame,
                       ReferenceLineInfo* const reference_line_info);
