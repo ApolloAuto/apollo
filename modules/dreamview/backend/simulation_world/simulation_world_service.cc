@@ -234,7 +234,7 @@ void DownsampleCurve(Curve *curve) {
   // Downsample points by angle then by distance.
   std::vector<size_t> sampled_indices =
       DownsampleByAngle(points, kAngleThreshold);
-  for (const size_t index: sampled_indices) {
+  for (const size_t index : sampled_indices) {
     auto *point = line_segment->add_point();
     point->set_x(points[index].x());
     point->set_y(points[index].y());
