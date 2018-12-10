@@ -81,6 +81,31 @@ class OnlineRawDataToDataTrain(object):
         self.label_dict = dict()
 
 
+    def LoadFeaturePBAndSaveLabelFiles(self, input_filepath, output_filepath):
+        '''
+        This function will be used to replace all the functionalities in
+        generate_cruise_label.py
+        '''
+        feature_sequences = self.LoadPBFeatures(input_filepath)
+        self.OrganizeFeatures(feature_sequences)
+        del feature_sequences # Try to free up some memory
+        self.Label(output_filepath)
+
+
+    def LoadFeatureLearnPBAndLabel(self):
+        '''
+        This loads the feature_for_learning, label them according to the
+        pre-saved dictionary, and pack into h5 format for training.
+        '''
+        # TODO(jiacheng): implement this.
+
+
+
+    '''
+    =======================================================================
+    Below are non-public-API functions
+    =======================================================================
+    '''
     @staticmethod
     def LoadPBFeatures(filepath):
         '''
@@ -107,17 +132,6 @@ class OnlineRawDataToDataTrain(object):
                     delimiter = encoder._VarintBytes(len(serializedMessage))
                     file.write(delimiter + serializedMessage)
         file.close()
-
-
-    def LoadFeaturePBAndSaveLabelFiles(self, input_filepath, output_filepath):
-        '''
-        This function will be used to replace all the functionalities in
-        generate_cruise_label.py
-        '''
-        feature_sequences = self.LoadPBFeatures(input_filepath)
-        self.OrganizeFeatures(feature_sequences)
-        del feature_sequences # Try to free up some memory
-        self.Label(output_filepath)
 
 
     def OrganizeFeatures(self, features):
