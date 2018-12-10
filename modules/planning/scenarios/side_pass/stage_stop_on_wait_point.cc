@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/side_pass/side_pass_stop_on_wait_point.h"
+#include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 #include <algorithm>
 #include <vector>
@@ -41,9 +41,9 @@ using apollo::common::VehicleConfigHelper;
 
 constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
-Stage::StageStatus SidePassStopOnWaitPoint::Process(
+Stage::StageStatus StageStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  ADEBUG << "Processing SidePassStopOnWaitPoint";
+  ADEBUG << "Processing StageStopOnWaitPoint";
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
   const ReferenceLine& reference_line = reference_line_info.reference_line();
@@ -170,7 +170,7 @@ Stage::StageStatus SidePassStopOnWaitPoint::Process(
   return Stage::FINISHED;
 }
 
-bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
+bool StageStopOnWaitPoint::IsFarAwayFromObstacles(
     const ReferenceLine& reference_line,
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
     const PathPoint& first_path_point, const PathPoint& last_path_point) {
@@ -226,7 +226,7 @@ bool SidePassStopOnWaitPoint::IsFarAwayFromObstacles(
   return true;
 }
 
-bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
+bool StageStopOnWaitPoint::GetTheNearestObstacle(
     const ReferenceLine& reference_line,
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
     const Obstacle** nearest_obstacle) {
@@ -295,7 +295,7 @@ bool SidePassStopOnWaitPoint::GetTheNearestObstacle(
   return true;
 }
 
-bool SidePassStopOnWaitPoint::GetMoveForwardLastPathPoint(
+bool StageStopOnWaitPoint::GetMoveForwardLastPathPoint(
     const ReferenceLine& reference_line, const Obstacle* nearest_obstacle,
     PathPoint* const last_path_point, bool* should_not_move_at_all) {
   *should_not_move_at_all = false;

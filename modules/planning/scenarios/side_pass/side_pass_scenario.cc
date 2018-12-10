@@ -33,7 +33,9 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stage.h"
-#include "modules/planning/scenarios/side_pass/side_pass_stop_on_wait_point.h"
+#include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
+#include "modules/planning/scenarios/side_pass/stage_backup.h"
+#include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 namespace apollo {
 namespace planning {
@@ -53,7 +55,7 @@ void SidePassScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_APPROACH_OBSTACLE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new SidePassApproachObstacle(config);
+        return new StageApproachObstacle(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_DETECT_SAFETY,
@@ -68,7 +70,7 @@ void SidePassScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new SidePassStopOnWaitPoint(config);
+        return new StageStopOnWaitPoint(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_PASS_OBSTACLE,
@@ -78,7 +80,7 @@ void SidePassScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_BACKUP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new SidePassBackup(config);
+        return new StageBackup(config);
       });
 }
 
