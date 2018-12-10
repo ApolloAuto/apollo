@@ -29,11 +29,11 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stage.h"
 #include "modules/planning/scenarios/side_pass/side_pass_stop_on_wait_point.h"
-#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace planning {
@@ -208,8 +208,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
       continue;
     }
 
-    if (!obstacle->IsStatic() || obstacle->speed() >
-        side_pass_context_.scenario_config_.block_obstacle_min_speed()) {
+    if (!obstacle->IsStatic() ||
+        obstacle->speed() >
+            side_pass_context_.scenario_config_.block_obstacle_min_speed()) {
       ADEBUG << " - It is non-static.";
       continue;
     }
@@ -243,8 +244,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
     const double adc_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width();
-    if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
-        side_pass_context_.scenario_config_.min_l_nudge_buffer()) {
+    if (driving_width >
+        adc_width + FLAGS_static_decision_nudge_l_buffer +
+            side_pass_context_.scenario_config_.min_l_nudge_buffer()) {
       ADEBUG << " - It is not blocking our way."
              << " (driving width = " << driving_width
              << ", adc_width = " << adc_width << ")";
@@ -307,13 +309,13 @@ bool SidePassScenario::IsParked(const ReferenceLine& reference_line,
                               &road_left_width, &road_right_width);
   max_road_right_width = std::max(max_road_right_width, road_right_width);
   bool is_at_road_edge = std::abs(obstacle->PerceptionSLBoundary().start_l()) >
-      max_road_right_width - 0.1;
+                         max_road_right_width - 0.1;
 
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> lanes;
   auto obstacle_box = obstacle->PerceptionBoundingBox();
   HDMapUtil::BaseMapPtr()->GetLanes(
-      common::util::MakePointENU(
-          obstacle_box.center().x(), obstacle_box.center().y(), 0.0),
+      common::util::MakePointENU(obstacle_box.center().x(),
+                                 obstacle_box.center().y(), 0.0),
       std::min(obstacle_box.width(), obstacle_box.length()), &lanes);
   bool is_on_parking_lane = false;
   if (lanes.size() == 1 &&

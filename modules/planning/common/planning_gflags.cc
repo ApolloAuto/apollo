@@ -54,7 +54,6 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
 
-
 DEFINE_bool(enable_scenario_stop_sign_unprotected, true,
             "enable stop_sign_unprotected scenario in planning");
 DEFINE_bool(enable_scenario_traffic_light_right_turn_unprotected, false,
@@ -199,7 +198,7 @@ DEFINE_bool(enable_nudge_slowdown, true,
 
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
-DEFINE_double(static_decision_nudge_l_buffer, 0.2, "l buffer for nudge");
+DEFINE_double(static_decision_nudge_l_buffer, 0.4, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");

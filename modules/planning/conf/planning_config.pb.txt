@@ -97,7 +97,7 @@ default_task_config: {
     max_deceleration: -4.0
 
     st_boundary_config {
-      boundary_buffer: 0.1
+      boundary_buffer: 0.25
       high_speed_centric_acceleration_limit: 0.8
       low_speed_centric_acceleration_limit: 1.2
       high_speed_threshold: 12.58

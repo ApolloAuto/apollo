@@ -246,7 +246,7 @@ std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
   // create a "virtual" perception_obstacle
   perception::PerceptionObstacle perception_obstacle;
   // simulator needs a valid integer
-  int32_t negative_id = std::hash<std::string>{}(id);
+  size_t negative_id = std::hash<std::string>{}(id);
   // set the first bit to 1 so negative_id became negative number
   negative_id |= (0x1 << 31);
   perception_obstacle.set_id(negative_id);
@@ -739,8 +739,9 @@ void Obstacle::CheckLaneBlocking(const ReferenceLine& reference_line) {
 
   const double driving_width = reference_line.GetDrivingWidth(sl_boundary_);
   auto vehicle_param = common::VehicleConfigHelper::GetConfig().vehicle_param();
+
   if (driving_width <
-      FLAGS_static_decision_nudge_l_buffer + vehicle_param.width()) {
+      vehicle_param.width() + FLAGS_static_decision_nudge_l_buffer) {
     is_lane_blocking_ = true;
     return;
   }

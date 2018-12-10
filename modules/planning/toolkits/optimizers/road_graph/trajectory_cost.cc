@@ -264,10 +264,8 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
 
   bool no_overlap = ((adc_front_s < obs_sl_boundary.start_s() ||
                       adc_end_s > obs_sl_boundary.end_s()) ||  // longitudinal
-                     (adc_left_l + FLAGS_static_decision_nudge_l_buffer <
-                          obs_sl_boundary.start_l() ||
-                      adc_right_l - FLAGS_static_decision_nudge_l_buffer >
-                          obs_sl_boundary.end_l()));  // lateral
+                     (adc_left_l + 0.1 < obs_sl_boundary.start_l() ||
+                      adc_right_l - 0.1 > obs_sl_boundary.end_l()));  // lateral
 
   if (!no_overlap) {
     obstacle_cost.cost_items[ComparableCost::HAS_COLLISION] = true;
@@ -280,7 +278,11 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
 
   const double delta_l = std::fmax(adc_right_l - obs_sl_boundary.end_l(),
                                    obs_sl_boundary.start_l() - adc_left_l);
-  ADEBUG << "delta_l = " << delta_l;
+  /*
+  AWARN << "adc_s: " << adc_s << "; adc_left_l: " << adc_left_l
+        << "; adc_right_l: " << adc_right_l << "; delta_l = " << delta_l;
+  AWARN << obs_sl_boundary.ShortDebugString();
+  */
 
   constexpr double kSafeDistance = 1.0;
   if (delta_l < kSafeDistance) {
