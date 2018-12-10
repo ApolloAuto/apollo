@@ -148,9 +148,13 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       std::string obstacle_type_name =
           PerceptionObstacle_Type_Name(obstacle_type);
 
+      // update stop timestamp on static pedestrian for watch timer
       const bool is_on_lane =
           reference_line.IsOnLane(obstacle->PerceptionSLBoundary());
-      if (stop && !is_on_lane) {
+      const double kStartWatchTimerDistance = 40.0;
+      if (stop && !is_on_lane &&
+          crosswalk_overlap->start_s - adc_front_edge_s
+              <= kStartWatchTimerDistance) {
         // check on stop timer for static pedestrians/bicycles
         // if NOT on_lane ahead of adc
         const double kMaxStopSpeed = 0.3;
