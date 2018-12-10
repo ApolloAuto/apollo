@@ -50,6 +50,10 @@ DEFINE_bool(enable_scenario_side_pass, true,
 DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
               "meter, for intersection has signal, ADC will enter side pass "
               "scenario only when it is farther than this threshoold");
+DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
+            "enable ADC to side-pass multiple parked obstacles without"
+            "worrying if the obstacles are blocked by others.");
+
 
 DEFINE_bool(enable_scenario_stop_sign_unprotected, true,
             "enable stop_sign_unprotected scenario in planning");

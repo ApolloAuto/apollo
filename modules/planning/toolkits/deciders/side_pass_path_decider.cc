@@ -43,9 +43,9 @@ using apollo::hdmap::PathOverlap;
 using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
-constexpr double kRoadBuffer = 0.05;  // 5cm
-constexpr double kObstacleLBuffer = 0.1;
-constexpr double kObstacleSBuffer = 1.0;
+constexpr double kRoadBuffer = 0.05;      // 5cm
+constexpr double kObstacleLBuffer = 0.1;  // 10cm
+constexpr double kObstacleSBuffer = 2.0;  // 2m
 constexpr double kSidePassPathLength = 50.0;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
