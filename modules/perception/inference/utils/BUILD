@@ -24,8 +24,10 @@ cc_library(
     ],
     hdrs = ["cuda_util.h"],
     linkstatic = 1,
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
-    deps = [],
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    deps = [
+        "@caffe",
+    ],
 )
 
 cuda_library(
@@ -51,12 +53,13 @@ cc_library(
     ],
     hdrs = ["util.h"],
     linkstatic = 1,
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
     deps = [
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
         "//modules/perception/base:box",
         "//modules/perception/base:point_cloud",
+        "@caffe",
     ],
 )
 
@@ -85,8 +88,10 @@ cc_library(
     ],
     hdrs = ["resize.h"],
     linkstatic = 1,
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
-    deps = [],
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    deps = [
+        "@caffe",
+    ],
 )
 
 
@@ -115,8 +120,10 @@ cc_library(
     ],
     hdrs = ["gemm.h"],
     linkstatic = 1,
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
-    deps = [],
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    deps = [
+        "@caffe",
+    ],
 )
 
 
@@ -139,9 +146,10 @@ cc_library(
         "binary_data.cc",
     ],
     hdrs = ["binary_data.h"],
-    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin -lcaffe"],
+    linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
     deps = [
         "//modules/perception/base:blob",
+        "@caffe",
     ],
 )
 
