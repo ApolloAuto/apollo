@@ -133,6 +133,19 @@ bool Obstacle::IsOnLane() const {
   return false;
 }
 
+bool Obstacle::IsNearLane() const {
+  if (feature_history_.size() > 0) {
+    if (feature_history_.front().has_lane() &&
+        (feature_history_.front().lane().current_lane_feature_size() > 0 ||
+         feature_history_.front().lane().nearby_lane_feature_size() > 0)) {
+      ADEBUG << "Obstacle [" << id_ << "] is on lane.";
+      return true;
+    }
+  }
+  ADEBUG << "Obstacle [" << id_ << "] is not on lane.";
+  return false;
+}
+
 bool Obstacle::ToIgnore() {
   if (history_size() == 0) {
     return true;

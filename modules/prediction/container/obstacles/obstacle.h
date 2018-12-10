@@ -149,6 +149,12 @@ class Obstacle {
   bool IsOnLane() const;
 
   /**
+   * @brief Check if the obstacle is near or on any lane.
+   * @return If the obstacle is near or on any lane.
+   */
+  bool IsNearLane() const;
+
+  /**
    * @brief Check if the obstacle can be ignored.
    * @return If the obstacle can be ignored.
    */

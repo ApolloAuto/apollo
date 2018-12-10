@@ -110,6 +110,16 @@ class PredictionMap {
       double* s, double* l);
 
   /**
+   * @brief If there is a lane in the range with radius
+   * @param x x-axis coordinate
+   * @param y y-axis coordinate
+   * @param radius range radius
+   * @return If there is a lane in the range with radius
+   */
+  static bool HasNearbyLane(const double x, const double y,
+                            const double radius);
+
+  /**
    * @brief Get the nearest path point to a longitudinal coordinate on a lane.
    * @param lane_info The lane on which to get the projected point.
    * @param s The longitudinal coordinate.

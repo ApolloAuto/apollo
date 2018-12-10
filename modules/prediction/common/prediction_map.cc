@@ -98,6 +98,16 @@ bool PredictionMap::GetProjection(
   return lane_info->GetProjection({pos.x(), pos.y()}, s, l);
 }
 
+bool PredictionMap::HasNearbyLane(const double x, const double y,
+                                  const double radius) {
+  common::PointENU point_enu;
+  point_enu.set_x(x);
+  point_enu.set_y(y);
+  std::vector<std::shared_ptr<const LaneInfo>> lanes;
+  HDMapUtil::BaseMap().GetLanes(point_enu, radius, &lanes);
+  return (!lanes.empty());
+}
+
 bool PredictionMap::ProjectionFromLane(
     std::shared_ptr<const LaneInfo> lane_info, const double s,
     MapPathPoint* path_point) {

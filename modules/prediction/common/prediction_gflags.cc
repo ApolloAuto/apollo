@@ -61,6 +61,8 @@ DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
 DEFINE_double(lane_search_radius_in_junction, 15.0,
               "Search radius for a candidate lane");
 DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
+DEFINE_double(pedestrian_nearby_lane_search_radius, 3.0,
+              "Radius to determine if pedestrian-like obstacle is near lane.");
 
 // Scenario
 DEFINE_double(junction_distance_threshold, 10.0, "Distance threshold "
