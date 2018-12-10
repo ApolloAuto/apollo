@@ -1061,10 +1061,10 @@ decision {
       reason_code: STOP_REASON_HEAD_VEHICLE
       reason: "stop by 2352_0"
       stop_point {
-        x: 586353.30796196789
-        y: 4140733.3347376487
+        x: 586353.28168712929
+        y: 4140733.2382512097
       }
-      stop_heading: 1.3049273362882
+      stop_heading: 1.3049301592711204
       change_lane_type: FORWARD
     }
   }
@@ -1076,11 +1076,11 @@ decision {
         stop {
           distance_s: -6
           stop_point {
-            x: 586353.30796196789
-            y: 4140733.3347376487
+            x: 586353.28168712929
+            y: 4140733.2382512097
             z: 0
           }
-          stop_heading: 1.3049273362882
+          stop_heading: 1.3049301592711204
         }
       }
     }
