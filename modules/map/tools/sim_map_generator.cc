@@ -60,7 +60,7 @@ static void DownsampleCurve(Curve* curve) {
   // Downsample points by angle then by distance.
   auto sampled_indices = DownsampleByAngle(points, FLAGS_angle_threshold);
   std::vector<PointENU> downsampled_points;
-  for (int index : sampled_indices) {
+  for (const size_t index : sampled_indices) {
     downsampled_points.push_back(points[index]);
   }
 
@@ -68,10 +68,10 @@ static void DownsampleCurve(Curve* curve) {
       DownsampleByDistance(downsampled_points, FLAGS_downsample_distance,
                            FLAGS_steep_turn_downsample_distance);
 
-  for (int index : sampled_indices) {
+  for (const size_t index : sampled_indices) {
     *line_segment->add_point() = downsampled_points[index];
   }
-  int new_size = line_segment->point_size();
+  size_t new_size = line_segment->point_size();
   CHECK_GT(new_size, 1);
 
   AINFO << "Lane curve downsampled from " << points.size() << " points to "

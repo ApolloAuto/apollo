@@ -293,7 +293,7 @@ class SimulationWorldService {
       return;
     }
 
-    for (int i = 0; i < points.size() - 1; i += downsampleInterval) {
+    for (size_t i = 0; i + 1 < points.size(); i += downsampleInterval) {
       auto *point = downsampled_points->Add();
       point->set_s(points[i].s());
       point->set_t(points[i].t());

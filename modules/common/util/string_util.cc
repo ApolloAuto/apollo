@@ -32,7 +32,7 @@ std::vector<int> Base64CodeTable() {
   std::vector<int> table(256, -1);
   const size_t base64_array_length = strlen(kBase64Array);
   for (size_t i = 0; i < base64_array_length; ++i) {
-    table[kBase64Array[i]] = i;
+    table[kBase64Array[i]] = static_cast<int>(i);
   }
   return table;
 }
@@ -75,7 +75,7 @@ std::string DecodeBase64(const std::string& base64_str) {
     sum = (sum << 6) + kBase64CodeTable[c];
     sum_bits += 6;
     if (sum_bits >= 8) {
-      bytes.push_back((sum >> (sum_bits - 8)) & 0xFF);
+      bytes.push_back(static_cast<char>((sum >> (sum_bits - 8)) & 0xFF));
       sum_bits -= 8;
     }
   }
@@ -88,11 +88,11 @@ std::string EncodeBase64(const std::string& in) {
     return out;
   }
 
-  int in_size = in.size();
+  const size_t in_size = in.size();
 
   out.reserve(((in_size - 1) / 3 + 1) * 4);
 
-  int i = 2;
+  size_t i = 2;
   for (; i < in_size; i += 3) {
     out.append(tripletBase64((in[i - 2] << 16) | (in[i - 1] << 8) | in[i]), 4);
   }

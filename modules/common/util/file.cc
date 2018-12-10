@@ -359,11 +359,11 @@ void GetFileNamesInFolderById(const std::string &folder, const std::string &ext,
     ++it;
   }
   // sort
-  int ret_size = ret->size();
-  for (int i = 0; i < ret_size; ++i) {
-    for (int j = i; j < ret_size; ++j) {
+  const size_t ret_size = ret->size();
+  for (size_t i = 0; i < ret_size; ++i) {
+    for (size_t j = i; j < ret_size; ++j) {
       if (ret_id[i] > ret_id[j]) {
-        double temp_id = ret_id[i];
+        const double temp_id = ret_id[i];
         ret_id[i] = ret_id[j];
         ret_id[j] = temp_id;
         std::string temp_path = (*ret)[i];
