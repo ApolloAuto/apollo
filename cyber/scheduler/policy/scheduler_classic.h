@@ -32,6 +32,7 @@ namespace scheduler {
 
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::proto::ClassicTask;
+using apollo::cyber::proto::ClassicConf;
 
 class SchedulerClassic : public Scheduler {
  public:
@@ -47,11 +48,8 @@ class SchedulerClassic : public Scheduler {
   bool NotifyProcessor(uint64_t crid) override;
 
   std::unordered_map<std::string, ClassicTask> cr_confs_;
-
-  std::string affinity_;
-  std::vector<int> cpuset_;
-  int32_t processor_prio_ = 0;
-  std::string processor_policy_;
+  ClassicConf classic_conf_;
+  bool conf_exist_ = false;
 };
 
 }  // namespace scheduler

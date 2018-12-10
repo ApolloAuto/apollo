@@ -112,6 +112,10 @@ void SchedulerChoreography::CreateProcessor() {
   for (uint32_t i = 0; i < task_pool_size_; i++) {
     auto proc = std::make_shared<Processor>();
     auto ctx = std::make_shared<ClassicContext>();
+    ctx->SetGroupName(DEFAULT_GROUP_NAME);
+
+    MULTI_PRIO_QUEUE q;
+    ClassicContext::cr_group_[DEFAULT_GROUP_NAME] = q;
 
     proc->BindContext(ctx);
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
@@ -157,12 +161,14 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
       AWARN << cr->name() << " prio great than MAX_PRIO.";
       cr->set_priority(MAX_PRIO - 1);
     }
+    cr->set_group_name(DEFAULT_GROUP_NAME);
 
     // Enqueue task to pool runqueue.
     {
       WriteLockGuard<AtomicRWLock> lk(
-          ClassicContext::rq_locks_[cr->priority()]);
-      ClassicContext::rq_[cr->priority()].emplace_back(cr);
+          ClassicContext::rq_locks_[DEFAULT_GROUP_NAME].at(cr->priority()));
+      ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority())
+          .emplace_back(cr);
     }
   }
   return true;
@@ -185,6 +191,7 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // get cr prio if cr found
   int prio;
   int pid;
+  std::string group_name;
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
     auto p = id_cr_.find(crid);
@@ -192,6 +199,7 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
       auto cr = p->second;
       prio = cr->priority();
       pid = cr->processor_id();
+      group_name = cr->group_name();
       id_cr_[crid]->Stop();
       id_cr_.erase(crid);
     } else {
@@ -201,14 +209,15 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
 
   // rm cr from pool if rt not in choreo context
   if (pid == -1) {
-    WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[prio]);
-    for (auto it = ClassicContext::rq_[prio].begin();
-         it != ClassicContext::rq_[prio].end(); ++it) {
+    WriteLockGuard<AtomicRWLock> lk(
+            ClassicContext::rq_locks_[group_name].at(prio));
+    for (auto it = ClassicContext::cr_group_[group_name].at(prio).begin();
+         it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
       if ((*it)->id() == crid) {
         auto cr = *it;
 
         cr->Stop();
-        ClassicContext::rq_[prio].erase(it);
+        it = ClassicContext::cr_group_[group_name].at(prio).erase(it);
         cr->Release();
         return true;
       }
@@ -252,7 +261,7 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
     static_cast<ChoreographyContext*>(pctxs_[pid].get())->Notify();
   } else {
     // Notify processor in pool.
-    ClassicContext::Notify();
+    ClassicContext::Notify(cr->group_name());
   }
 
   return true;
