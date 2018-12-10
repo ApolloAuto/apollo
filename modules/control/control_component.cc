@@ -206,6 +206,12 @@ Status ControlComponent::ProduceControlCommand(
     estop_reason_ = "estop from planning";
   }
 
+  if (local_view_.trajectory.trajectory_point_size() == 0) {
+    AWARN_EVERY(100) << "planning has no trajectory point. ";
+    estop_ = true;
+    estop_reason_ = "estop for empty planning trajectory";
+  }
+
   // if planning set estop, then no control process triggered
   if (!estop_) {
     if (local_view_.chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
