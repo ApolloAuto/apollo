@@ -43,6 +43,7 @@ DECLARE_int32(max_num_dump_feature);
 DECLARE_double(lane_search_radius);
 DECLARE_double(lane_search_radius_in_junction);
 DECLARE_double(junction_search_radius);
+DECLARE_double(pedestrian_nearby_lane_search_radius);
 
 // Scenario
 DECLARE_double(junction_distance_threshold);

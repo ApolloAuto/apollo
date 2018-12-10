@@ -103,17 +103,24 @@ void ScenarioManager::PrioritizeObstacles(
     Vec2d ego_vec = Vec2d::CreateUnitVec2d(pose_theta);
     double s = ego_to_obstacle_vec.InnerProd(ego_vec);
 
+    double pedestrian_like_nearby_lane_radius =
+        FLAGS_pedestrian_nearby_lane_search_radius;
+    bool is_near_lane = PredictionMap::HasNearbyLane(obstacle_x, obstacle_y,
+        pedestrian_like_nearby_lane_radius);
+
     // Decide if we need consider this obstacle
     bool is_in_scan_area = scan_box.IsPointIn({obstacle_x, obstacle_y});
     bool is_on_lane = obstacle_ptr->IsOnLane();
-    bool is_pedestrian_in_front = s > FLAGS_back_dist_ignore_ped &&
+    bool is_pedestrian_like_in_front_near_lanes =
+        s > FLAGS_back_dist_ignore_ped &&
         (latest_feature_ptr->type() == PerceptionObstacle::PEDESTRIAN ||
          latest_feature_ptr->type() == PerceptionObstacle::BICYCLE ||
          latest_feature_ptr->type() == PerceptionObstacle::UNKNOWN ||
-         latest_feature_ptr->type() == PerceptionObstacle::UNKNOWN_MOVABLE);
+         latest_feature_ptr->type() == PerceptionObstacle::UNKNOWN_MOVABLE) &&
+        is_near_lane;
 
     bool need_consider = is_in_scan_area || is_on_lane ||
-                         is_pedestrian_in_front;
+                         is_pedestrian_like_in_front_near_lanes;
 
     // For junction scenario, need_consider if obstacle is in junction_polygon
     if (scenario_type == Scenario::JUNCTION ||
