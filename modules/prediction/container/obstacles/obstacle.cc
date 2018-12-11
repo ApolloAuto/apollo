@@ -311,7 +311,8 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
          feature_ptr->lane().current_lane_feature()) {
       start_lane_ids.push_back(lane_feature.lane_id());
     }
-  } else if (feature_ptr->lane().nearby_lane_feature_size() > 0) {
+  }
+  if (feature_ptr->lane().nearby_lane_feature_size() > 0) {
     for (const auto& lane_feature :
          feature_ptr->lane().nearby_lane_feature()) {
       start_lane_ids.push_back(lane_feature.lane_id());
