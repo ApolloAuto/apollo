@@ -204,7 +204,8 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   last_timestamp_ = current_timestamp;
   ADEBUG << "Control_sequence_number:"
          << control_command.header().sequence_num() << ", Time_of_delay:"
-         << current_timestamp - control_command.header().timestamp_sec();
+         << current_timestamp -
+                static_cast<int64_t>(control_command.header().timestamp_sec());
 
   if (vehicle_controller_->Update(control_command) != ErrorCode::OK) {
     AERROR << "Failed to process callback function OnControlCommand because "

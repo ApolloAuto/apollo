@@ -102,7 +102,7 @@ double DigitalFilter::Compute(const std::deque<double> &values,
     return 0.0;
   }
   double sum = 0.0;
-  int i = coeff_start;
+  int i = static_cast<int>(coeff_start);
   for (auto &value : values) {
     sum += value * coefficients[i];
     ++i;
