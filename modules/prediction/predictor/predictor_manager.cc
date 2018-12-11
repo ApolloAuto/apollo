@@ -226,7 +226,8 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       prediction_obstacle.set_is_static(true);
     }
 
-    prediction_obstacle.set_predicted_period(FLAGS_prediction_duration);
+    prediction_obstacle.set_predicted_period(
+        FLAGS_prediction_trajectory_time_length);
     prediction_obstacle.mutable_perception_obstacle()->CopyFrom(
         perception_obstacle);
 

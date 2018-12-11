@@ -19,20 +19,7 @@
 #include <cmath>
 #include <limits>
 
-DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
-DEFINE_double(
-    prediction_test_duration, std::numeric_limits<double>::infinity(),
-    "The runtime duration in test mode (in seconds). Negative value will not "
-    "restrict the runtime duration.");
-
-DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
-DEFINE_string(
-    prediction_offline_bags, "",
-    "a list of bag files or directories for offline mode. The items need to be "
-    "separated by colon ':'.  If this value is not set, the prediction module "
-    "will use the listen to published ros topic mode.");
-
-DEFINE_double(prediction_duration, 8.0, "Prediction duration (in seconds)");
+DEFINE_double(prediction_trajectory_time_length, 8.0, "Prediction duration (in seconds)");
 DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_length, 20.0,

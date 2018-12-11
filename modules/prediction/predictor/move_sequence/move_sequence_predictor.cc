@@ -93,7 +93,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
 
     auto end_time1 = std::chrono::system_clock::now();
     DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection
-        (*obstacle, sequence, FLAGS_prediction_duration,
+        (*obstacle, sequence, FLAGS_prediction_trajectory_time_length,
          FLAGS_prediction_period, &points);
     auto end_time2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = end_time2 - end_time1;
@@ -519,7 +519,7 @@ std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
   // then predict that the obstacle will keep current speed.
   double v_init = init_s[1];
   if (max_kappa < FLAGS_turning_curvature_lower_bound) {
-    return {v_init, FLAGS_prediction_duration};
+    return {v_init, FLAGS_prediction_trajectory_time_length};
   }
   // (Calculate the speed at the max. curvature point)
   double v_end = apollo::prediction::predictor_util::AdjustSpeedByCurvature(
@@ -528,14 +528,14 @@ std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
   // than initial speed, don't accelerate, just predict that
   // the obstacle will maintain current speed.
   if (v_end + FLAGS_double_precision > v_init) {
-    return {v_init, FLAGS_prediction_duration};
+    return {v_init, FLAGS_prediction_trajectory_time_length};
   }
   // If the obstacle is already at the max. curvature point,
   // then predict that it will maintain the current speed.
   double s_offset = s_at_max_kappa - init_s[0];
   double t = 2.0 * s_offset / (v_init + v_end);
   if (t < FLAGS_double_precision) {
-    return {v_init, FLAGS_prediction_duration};
+    return {v_init, FLAGS_prediction_trajectory_time_length};
   }
   // If the deceleration is too much,
   // then predict the obstacle follows a reasonable deceleration.

@@ -37,16 +37,16 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::ErrorCode;
-using ::apollo::common::Point3D;
-using ::apollo::common::math::KalmanFilter;
-using ::apollo::common::math::Vec2d;
-using ::apollo::common::util::FindOrDie;
-using ::apollo::common::util::FindOrNull;
-using ::apollo::common::PathPoint;
-using ::apollo::hdmap::LaneInfo;
-using ::apollo::hdmap::JunctionInfo;
-using ::apollo::perception::PerceptionObstacle;
+using common::ErrorCode;
+using common::Point3D;
+using common::math::KalmanFilter;
+using common::math::Vec2d;
+using common::util::FindOrDie;
+using common::util::FindOrNull;
+using common::PathPoint;
+using hdmap::LaneInfo;
+using hdmap::JunctionInfo;
+using perception::PerceptionObstacle;
 
 namespace {
 
@@ -1062,9 +1062,9 @@ void Obstacle::BuildLaneGraph() {
   }
   double speed = feature->speed();
   double road_graph_search_distance = std::max(
-      speed * FLAGS_prediction_duration +
-      0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
-      FLAGS_prediction_duration, FLAGS_min_prediction_length);
+      speed * FLAGS_prediction_trajectory_time_length +
+      0.5 * FLAGS_max_acc * FLAGS_prediction_trajectory_time_length *
+      FLAGS_prediction_trajectory_time_length, FLAGS_min_prediction_length);
 
   // BuildLaneGraph for current lanes:
   // Go through all the LaneSegments in current_lane,
@@ -1146,9 +1146,9 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   }
   double speed = feature->speed();
   double road_graph_search_distance = std::max(
-      speed * FLAGS_prediction_duration +
-      0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
-      FLAGS_prediction_duration, FLAGS_min_prediction_length);
+      speed * FLAGS_prediction_trajectory_time_length +
+      0.5 * FLAGS_max_acc * FLAGS_prediction_trajectory_time_length *
+      FLAGS_prediction_trajectory_time_length, FLAGS_min_prediction_length);
 
   // Treat the most probable lane_segment as the center, put its left
   // and right neighbors into a vector following the left-to-right order.

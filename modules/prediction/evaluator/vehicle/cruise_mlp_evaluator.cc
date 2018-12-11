@@ -26,6 +26,7 @@
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/validation_checker.h"
 #include "modules/prediction/container/container_manager.h"
@@ -268,7 +269,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
                      obs_curr_feature.acceleration().y());
 
   double obs_feature_history_start_time =
-      obstacle_ptr->timestamp() - FLAGS_prediction_duration;
+      obstacle_ptr->timestamp() - FLAGS_prediction_trajectory_time_length;
   int count = 0;
   // Starting from the most recent timestamp and going backward.
   ADEBUG << "Obstacle has " << obstacle_ptr->history_size()
@@ -574,13 +575,13 @@ void CruiseMLPEvaluator::LoadModels(const std::string& go_model_file,
   CHECK(GetProtoFromFile(go_model_file, &go_model_param))
       << "Unable to load go model file: " << go_model_file << ".";
   CHECK(GetProtoFromFile(cutin_model_file, &cutin_model_param))
-      << "Unable to load cutin model file: " << cutin_model_file << ".";
+      << "Unable to load cut-in model file: " << cutin_model_file << ".";
 
   go_model_ptr_->LoadModel(go_model_param);
   cutin_model_ptr_->LoadModel(cutin_model_param);
 
   AINFO << "Succeeded in loading go model: " << go_model_file << ".";
-  AINFO << "Succeeded in loading cutin model: " << cutin_model_file << ".";
+  AINFO << "Succeeded in loading cut-in model: " << cutin_model_file << ".";
 }
 
 // TODO(all): implement this once the model is trained and ready.

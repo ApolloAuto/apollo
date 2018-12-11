@@ -22,6 +22,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/prediction_map.h"
 

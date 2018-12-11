@@ -45,7 +45,8 @@ void JunctionPredictor::Predict(Obstacle* obstacle) {
   for (const auto& junction_exit : junction_exits) {
     std::vector<TrajectoryPoint> trajectory_points;
     DrawJunctionTrajectoryPoints(latest_feature, junction_exit,
-      FLAGS_prediction_duration, FLAGS_prediction_period, &trajectory_points);
+        FLAGS_prediction_trajectory_time_length,
+        FLAGS_prediction_period, &trajectory_points);
     Trajectory trajectory = GenerateTrajectory(trajectory_points);
     trajectories_.push_back(std::move(trajectory));
   }
@@ -209,7 +210,7 @@ std::vector<double> JunctionPredictor::GenerateCandidateTimes() {
   std::vector<double> candidate_times;
   double t = 1.0;
   double time_gap = 0.5;
-  while (t <= FLAGS_prediction_duration) {
+  while (t <= FLAGS_prediction_trajectory_time_length) {
     candidate_times.push_back(t);
     t += time_gap;
   }
