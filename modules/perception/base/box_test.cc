@@ -66,13 +66,13 @@ TEST(ImageCoreTest, operator_test) {
     EXPECT_EQ(rect1, rect2);
   }
   {
-    Rect<float> rect1(100.0001, 200.11111, 1000.0, 500.0);
-    Rect<float> rect2(100.0001, 200.11111, 1000.0, 500.0);
+    Rect<float> rect1(100.0001f, 200.11111f, 1000.0f, 500.0f);
+    Rect<float> rect2(100.0001f, 200.11111f, 1000.0f, 500.0f);
     EXPECT_EQ(rect1, rect2);
   }
   {
-    Rect<float> rect1(100.002, 200.11111, 1000.0, 500.0);
-    Rect<float> rect2(100.0001, 200.11111, 1000.0, 500.0);
+    Rect<float> rect1(100.002f, 200.11111f, 1000.0f, 500.0f);
+    Rect<float> rect2(100.0001f, 200.11111f, 1000.0f, 500.0f);
     EXPECT_NE(rect1, rect2);
   }
   {

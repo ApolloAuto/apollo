@@ -235,12 +235,12 @@ TEST(SimilarTest, GPU_test) {
   ASSERT_TRUE(frame2.track_feature_blob->shape(0) == 3);  // NOLINT
   ASSERT_TRUE(frame2.track_feature_blob->shape(1) == 2);  // NOLINT
   float *feature2 = frame2.track_feature_blob->mutable_cpu_data();
-  feature2[0] = 0.707;
-  feature2[1] = 0.707;
+  feature2[0] = 0.707f;
+  feature2[1] = 0.707f;
   feature2[2] = 1.0f;
   feature2[3] = 0.0f;
-  feature2[4] = -0.707;
-  feature2[5] = 0.707;
+  feature2[4] = -0.707f;
+  feature2[5] = 0.707f;
   std::shared_ptr<base::Blob<float>> sim2(new base::Blob<float>);
   similar.Calc(&frame1, &frame2, sim2.get());
   ASSERT_TRUE(sim2->shape(0) == 1);  // NOLINT
@@ -278,7 +278,7 @@ TEST(KalmanConstTest, const_filter_test) {
     EXPECT_TRUE(filter.Init(param));
     filter.measure_noise_ << 10;
     filter.process_noise_ << 0.1;
-    std::srand(std::time(NULL));
+    std::srand(static_cast<unsigned int>(std::time(NULL)));
     std::vector<double> measurements = {
         1.27201411, -0.27051547, -2.50816196,  0.05856895, -3.14114835,
         1.3873894 ,  0.90496925, -0.00598577,  0.48878823,  0.75704055,

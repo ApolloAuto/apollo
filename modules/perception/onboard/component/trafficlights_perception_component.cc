@@ -145,7 +145,7 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   image_sys_ts_diff_threshold_ =
     traffic_light_param.image_sys_ts_diff_threshold();
   preprocessor_init_options_.sync_interval_seconds =
-    traffic_light_param.sync_interval_seconds();
+    static_cast<float>(traffic_light_param.sync_interval_seconds());
   camera_perception_init_options_.root_dir =
     traffic_light_param.camera_traffic_light_perception_conf_dir();
   camera_perception_init_options_.conf_file =
@@ -670,8 +670,9 @@ bool TrafficLightsPerceptionComponent::GetPoseFromTF(
   PERCEPTION_PERF_FUNCTION();
   apollo::cyber::Time query_time(timestamp);
   std::string err_string;
-  if (!tf2_buffer_->canTransform(frame_id, child_frame_id,
-                                query_time, tf2_timeout_second_, &err_string)) {
+  if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
+                                 static_cast<float>(tf2_timeout_second_),
+                                 &err_string)) {
     AERROR << "Can not find transform. " << std::to_string(timestamp)
               << " frame_id: " << frame_id
               << " child_frame_id: " << child_frame_id
@@ -995,7 +996,6 @@ void TrafficLightsPerceptionComponent::Visualize(
     }
     snprintf(str, sizeof(str), "ID:%s C:%.3lf",
              light->id.c_str(),
-             tl_string.c_str(),
              light->status.confidence);
     cv::rectangle(output_image, rectified_rect, tl_color, 2);
     cv::putText(output_image,

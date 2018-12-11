@@ -51,7 +51,7 @@ bool ROIServiceFilter::Filter(const ROIFilterOptions& options,
     auto& pt = frame->world_cloud->at(i);
     Eigen::Vector3d world_point(pt.x, pt.y, pt.z);
     if (roi_service_->QueryIsPointInROI(world_point, roi_service_content_)) {
-      frame->roi_indices.indices.push_back(i);
+      frame->roi_indices.indices.push_back(static_cast<int>(i));
       frame->cloud->mutable_points_label()->at(i) =
           static_cast<uint8_t>(LidarPointLabel::ROI);
     }

@@ -108,7 +108,8 @@ TEST(LidarDummyAlgorithmTest, lidar_dummy_algorithm_test) {
     base::ObjectPool::Instance().BatchGet(4, &frame.segmented_objects);
     for (std::size_t i = 0; i < 4; ++i) {
       frame.segmented_objects[i]->lidar_supplement.cloud.resize(1);
-      frame.segmented_objects[i]->lidar_supplement.cloud[0].x = i;
+      frame.segmented_objects[i]->lidar_supplement.cloud[0].x =
+                                               static_cast<float>(i);
       frame.segmented_objects[i]->lidar_supplement.cloud[0].y = 0.f;
       frame.segmented_objects[i]->lidar_supplement.cloud[0].z = 0.5f;
     }

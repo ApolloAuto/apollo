@@ -53,8 +53,8 @@ void MultiCueObstacleTransformer::SetObjMapperOptions(
   // input insanity check
   bbox2d[0] = std::max(0.0f, bbox2d[0]);
   bbox2d[1] = std::max(0.0f, bbox2d[1]);
-  bbox2d[2] = std::min(width_image - 1.0f, bbox2d[2]);
-  bbox2d[3] = std::min(height_image - 1.0f, bbox2d[3]);
+  bbox2d[2] = std::min(static_cast<float>(width_image) - 1.0f, bbox2d[2]);
+  bbox2d[3] = std::min(static_cast<float>(height_image) - 1.0f, bbox2d[3]);
   bbox2d[2] = std::max(bbox2d[0] + 1.0f, bbox2d[2]);
   bbox2d[3] = std::max(bbox2d[1] + 1.0f, bbox2d[3]);
 
@@ -66,8 +66,10 @@ void MultiCueObstacleTransformer::SetObjMapperOptions(
   Eigen::Vector3f image_point_low_center(box_cent_x, bbox2d[3], 1);
   Eigen::Vector3f point_in_camera =
       camera_k_matrix.inverse() * image_point_low_center;
-  *theta_ray = atan2(point_in_camera.x(), point_in_camera.z());
-  float rotation_y = *theta_ray + obj->camera_supplement.alpha;
+  *theta_ray = static_cast<float>(atan2(point_in_camera.x(),
+                                  point_in_camera.z()));
+  float rotation_y = *theta_ray +
+                     static_cast<float>(obj->camera_supplement.alpha);
   base::ObjectSubType sub_type = obj->sub_type;
 
   // enforce rotation_y to be in the range [-pi, pi)
@@ -123,9 +125,9 @@ int MultiCueObstacleTransformer::MatchTemplates(base::ObjectSubType sub_type,
       const float *min_tmplt_cur_type = kMinTemplateHWL.at(sub_type).data();
       const float *mid_tmplt_cur_type = kMidTemplateHWL.at(sub_type).data();
       const float *max_tmplt_cur_type = kMaxTemplateHWL.at(sub_type).data();
-      float dh_min = fabs(dimension_hwl[0] - min_tmplt_cur_type[0]);
-      float dh_mid = fabs(dimension_hwl[0] - mid_tmplt_cur_type[0]);
-      float dh_max = fabs(dimension_hwl[0] - max_tmplt_cur_type[0]);
+      float dh_min = fabsf(dimension_hwl[0] - min_tmplt_cur_type[0]);
+      float dh_mid = fabsf(dimension_hwl[0] - mid_tmplt_cur_type[0]);
+      float dh_max = fabsf(dimension_hwl[0] - max_tmplt_cur_type[0]);
       std::vector<std::pair<float, float>> diff_hs;
       diff_hs.push_back(std::make_pair(dh_min, min_tmplt_cur_type[0]));
       diff_hs.push_back(std::make_pair(dh_mid, mid_tmplt_cur_type[0]));

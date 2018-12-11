@@ -103,8 +103,8 @@ void ExtendedKalmanFilter::Init(Eigen::VectorXd x) {
 
 void ExtendedKalmanFilter::Predict(float delta_t) {
   if (inited_) {
-    float sin_theta = std::sin(state_(3));
-    float cos_theta = std::cos(state_(3));
+    float sin_theta = static_cast<float>(std::sin(state_(3)));
+    float cos_theta = static_cast<float>(std::cos(state_(3)));
     state_transition_matrix_(0, 2) = delta_t * cos_theta;
     state_transition_matrix_(0, 3) = -delta_t * state_(2) * sin_theta;
     state_transition_matrix_(1, 2) = delta_t * sin_theta;
@@ -152,7 +152,7 @@ void MeanFilter::AddMeasure(const Eigen::VectorXd &z) {
     measures_[index_] = z;
   }
   index_ = (index_ + 1) % window_;
-  int n = measures_.size();
+  int n = static_cast<int>(measures_.size());
 
   state_.resizeLike(z);
   state_.setConstant(0);
@@ -222,7 +222,7 @@ Eigen::VectorXd MaxNMeanFilter::get_state() const {
   for (size_t i = 1; i < measures_.size(); ++i) {
     x += measures_[i];
   }
-  x = x / measures_.size();
+  x = x / static_cast<double>(measures_.size());
   return x;
 }
 void MaxNMeanFilter::Clear() {

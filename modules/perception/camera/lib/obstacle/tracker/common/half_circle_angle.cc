@@ -26,9 +26,9 @@ void HalfCircleAngle::SetDirection(float theta) {
   }
   if (std::abs(theta_ - theta) > M_PI_2) {
     if (theta_ > 0) {
-      theta_ -= M_PI;
+      theta_ -= static_cast<float>(M_PI);
     } else {
-      theta_ += M_PI;
+      theta_ += static_cast<float>(M_PI);
     }
   }
 }

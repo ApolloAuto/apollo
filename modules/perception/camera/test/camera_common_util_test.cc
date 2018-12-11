@@ -29,16 +29,16 @@ TEST(UtilTest, CoverTest) {
   base::RectF rect1(1, 1, 10, 10);
   base::RectF rect2(1, 1, 6, 6);
   base::RectF rect3(100, 100, 10, 10);
-  ASSERT_TRUE(IsCovered(rect1, rect2, 0.3));
-  ASSERT_FALSE(IsCovered(rect1, rect2, 0.9));
-  ASSERT_FALSE(IsCoveredVertical(rect1, rect3, 0.1));
-  ASSERT_FALSE(IsCoveredHorizon(rect1, rect3, 0.1));
-  ASSERT_FALSE(IsCoveredVertical(rect1, rect3, 0.9));
-  ASSERT_FALSE(IsCoveredHorizon(rect1, rect3, 0.9));
-  ASSERT_FALSE(IsCoveredVertical(rect1, rect2, 0.9));
-  ASSERT_FALSE(IsCoveredHorizon(rect1, rect2, 0.9));
-  ASSERT_TRUE(IsCoveredVertical(rect1, rect2, 0.5));
-  ASSERT_TRUE(IsCoveredHorizon(rect1, rect2, 0.5));
+  ASSERT_TRUE(IsCovered(rect1, rect2, 0.3f));
+  ASSERT_FALSE(IsCovered(rect1, rect2, 0.9f));
+  ASSERT_FALSE(IsCoveredVertical(rect1, rect3, 0.1f));
+  ASSERT_FALSE(IsCoveredHorizon(rect1, rect3, 0.1f));
+  ASSERT_FALSE(IsCoveredVertical(rect1, rect3, 0.9f));
+  ASSERT_FALSE(IsCoveredHorizon(rect1, rect3, 0.9f));
+  ASSERT_FALSE(IsCoveredVertical(rect1, rect2, 0.9f));
+  ASSERT_FALSE(IsCoveredHorizon(rect1, rect2, 0.9f));
+  ASSERT_TRUE(IsCoveredVertical(rect1, rect2, 0.5f));
+  ASSERT_TRUE(IsCoveredHorizon(rect1, rect2, 0.5f));
 }
 TEST(UtilTest, ContainTest) {
   {
@@ -357,9 +357,9 @@ TEST(UtilTest, FillObjectPolygonFromBBox3DTest) {
   object->size(0) = 10;
   object->size(1) = 10;
   object->size(2) = 10;
-  object->direction(0) = 0.707;
-  object->direction(1) = 0.707;
-  object->direction(2) = 0.0;
+  object->direction(0) = 0.707f;
+  object->direction(1) = 0.707f;
+  object->direction(2) = 0.0f;
   object->center(0) = 0;
   object->center(1) = 0;
   object->center(2) = 0;

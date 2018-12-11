@@ -135,8 +135,8 @@ bool TrafficLightDetection::Init(
   float *param_data = param_blob_->mutable_cpu_data();
   for (int i = 0; i < max_batch_size_; ++i) {
     auto offset = i * param_blob_length_;
-    param_data[offset + 0] = resize_width;
-    param_data[offset + 1] = resize_height;
+    param_data[offset + 0] = static_cast<float>(resize_width);
+    param_data[offset + 1] = static_cast<float>(resize_height);
     param_data[offset + 2] = 1;
     param_data[offset + 3] = 1;
     param_data[offset + 4] = 0;
@@ -177,14 +177,18 @@ TrafficLightDetection::Inference(std::vector<base::TrafficLightPtr> *lights,
   auto input_img_blob = rt_net_->get_blob(net_inputs_[0]);
   auto input_param = rt_net_->get_blob(net_inputs_[1]);
 
-  input_img_blob->Reshape(batch_num, detection_param_.min_crop_size(),
-                      detection_param_.min_crop_size(), 3);
-  param_blob_->Reshape(batch_num, 6, 1, 1);
+  input_img_blob->Reshape(static_cast<int>(batch_num),
+                          static_cast<int>(detection_param_.min_crop_size()),
+                          static_cast<int>(detection_param_.min_crop_size()),
+                          3);
+  param_blob_->Reshape(static_cast<int>(batch_num), 6, 1, 1);
   float *param_data = param_blob_->mutable_cpu_data();
   for (size_t i = 0; i < batch_num; ++i) {
     auto offset = i * param_blob_length_;
-    param_data[offset + 0] = detection_param_.min_crop_size();
-    param_data[offset + 1] = detection_param_.min_crop_size();
+    param_data[offset + 0] = static_cast<float>(
+                                 detection_param_.min_crop_size());
+    param_data[offset + 1] = static_cast<float>(
+                                 detection_param_.min_crop_size());
     param_data[offset + 2] = 1;
     param_data[offset + 3] = 1;
     param_data[offset + 4] = 0;
@@ -213,8 +217,8 @@ TrafficLightDetection::Inference(std::vector<base::TrafficLightPtr> *lights,
       AINFO << "get image data success ";
 
       float resize_scale =
-          static_cast<float>(detection_param_.min_crop_size()) /
-          std::min(cbox.width, cbox.height);
+          static_cast<float>(detection_param_.min_crop_size() /
+                             std::min(cbox.width, cbox.height));
       resize_scale_list_.push_back(resize_scale);
 
       inference::ResizeGPU(*image_, input_img_blob,
@@ -391,7 +395,7 @@ void TrafficLightDetection::ApplyNMS(
   std::vector<std::pair<float, int> > score_index_vec(lights->size());
   for (size_t i = 0; i < lights->size(); ++i) {
     score_index_vec[i].first = lights->at(i)->region.detect_score;
-    score_index_vec[i].second = i;
+    score_index_vec[i].second = static_cast<int>(i);
   }
   std::stable_sort(score_index_vec.begin(), score_index_vec.end(),
       [](const std::pair<float, int>& pr1, const std::pair<float, int>& pr2) {
@@ -406,8 +410,8 @@ void TrafficLightDetection::ApplyNMS(
       const int kept_idx = kept_indices[k];
       const auto &rect1 = lights->at(idx)->region.detection_roi;
       const auto &rect2 = lights->at(kept_idx)->region.detection_roi;
-      float overlap = static_cast<float>((rect1 & rect2).Area()) /
-          (rect1 | rect2).Area();
+      float overlap = static_cast<float>((rect1 & rect2).Area() /
+                                         (rect1 | rect2).Area());
       // if current bbox has large overlap(>=iou_thresh) with any
       // kept bbox, drop it
       keep = std::fabs(overlap) < iou_thresh;

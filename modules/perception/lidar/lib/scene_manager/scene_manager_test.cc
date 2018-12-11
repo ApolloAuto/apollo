@@ -276,7 +276,7 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_roi_service_test) {
     auto& pt = frame.world_cloud->at(i);
     Eigen::Vector3d world_pt(pt.x, pt.y, pt.z);
     if (roi_service->QueryIsPointInROI(world_pt)) {
-      filter_indices.indices.push_back(i);
+      filter_indices.indices.push_back(static_cast<int>(i));
     }
   }
 

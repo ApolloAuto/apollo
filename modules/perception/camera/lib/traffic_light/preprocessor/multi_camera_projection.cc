@@ -124,7 +124,7 @@ int MultiCamerasProjection::getImageWidth(
     AERROR << "getImageWidth failed, camera_name: " << camera_name;
     return -1;
   }
-  return camera_models_.at(camera_name)->get_width();
+  return static_cast<int>(camera_models_.at(camera_name)->get_width());
 }
 
 int MultiCamerasProjection::getImageHeight(
@@ -133,7 +133,7 @@ int MultiCamerasProjection::getImageHeight(
     AERROR << "getImageHeight failed, camera_name: " << camera_name;
     return -1;
   }
-  return camera_models_.at(camera_name)->get_height();
+  return static_cast<int>(camera_models_.at(camera_name)->get_height());
 }
 
 bool MultiCamerasProjection::BoundaryBasedProject(
@@ -142,9 +142,9 @@ bool MultiCamerasProjection::BoundaryBasedProject(
     const std::vector<base::PointXYZID> &points,
     base::TrafficLight *light) const {
   CHECK_NOTNULL(camera_model.get());
-  int width = camera_model->get_width();
-  int height = camera_model->get_height();
-  int bound_size = points.size();
+  int width = static_cast<int>(camera_model->get_width());
+  int height = static_cast<int>(camera_model->get_height());
+  int bound_size = static_cast<int>(points.size());
   AINFO << "bound size " << bound_size;
   if (bound_size < 4) {
     AERROR << "invalid bound_size";

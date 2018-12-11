@@ -309,7 +309,7 @@ void HDMapInput::DownsamplePoints(
     acos_theta += angle;
     if ((acos_theta - 1.0) > DBL_EPSILON) {
       polygon_ptr->push_back(point_1);
-      spt = idx - 1;
+      spt = static_cast<unsigned int>(idx - 1);
       acos_theta = 0.0;
     }
   }
@@ -338,8 +338,8 @@ void HDMapInput::SplitBoundary(
   base::PolygonDType temp_line;
   for (size_t i = 1; i < boundary_flag.size(); ++i) {
     if (!boundary_flag[i - 1] || !boundary_flag[i]) {
-      line_index.push_back(i - 1);
-      line_index.push_back(i);
+      line_index.push_back(static_cast<int>(i - 1));
+      line_index.push_back(static_cast<int>(i));
     } else if (line_index.size() > 1) {
       std::vector<int>::iterator pos;
       pos = std::unique(line_index.begin(), line_index.end());

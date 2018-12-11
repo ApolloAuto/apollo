@@ -26,7 +26,9 @@ namespace perception {
 namespace common {
 
 namespace {
-float GetThreshold(const size_t sz, const float c) { return c / sz; }
+float GetThreshold(const size_t sz, const float c) {
+  return c / static_cast<float>(sz);
+}
 }
 
 void GraphSegmentor::Init(const float initial_threshold) {

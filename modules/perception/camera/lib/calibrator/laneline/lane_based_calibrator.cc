@@ -72,7 +72,7 @@ void CalibratorParams::Init() {
   hist_estimator_params.step_bin = (hist_estimator_params.data_ep
       - hist_estimator_params.data_sp);
   hist_estimator_params.step_bin /=
-      hist_estimator_params.nr_bins_in_histogram;
+      static_cast<float>(hist_estimator_params.nr_bins_in_histogram);
 
   hist_estimator_params.smooth_kernel.clear();
   hist_estimator_params.smooth_kernel.push_back(1);
@@ -187,7 +187,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
     pitch_estimation_ = pitch_histogram_.get_val_estimation();
     const float cy = k_mat_[5];
     const float fy = k_mat_[4];
-    vanishing_row_ = tan(pitch_estimation_) * fy + cy;
+    vanishing_row_ = tanf(pitch_estimation_) * fy + cy;
     accumulated_straight_driving_in_meter_ = 0.0f;
     return true;
   }
@@ -229,11 +229,11 @@ bool LaneBasedCalibrator::GetPitchFromVanishingPoint(
   const float cy = k_mat_[5];
   const float fx = k_mat_[0];
   const float fy = k_mat_[4];
-  float yaw_check = atan2(vp.pixel_pos[0] - cx, fx);
+  float yaw_check = static_cast<float>(atan2(vp.pixel_pos[0] - cx, fx));
   if (fabs(yaw_check) > params_.max_allowed_yaw_angle_in_radian) {
     return false;
   }
-  *pitch = atan2(vp.pixel_pos[1] - cy, fy);
+  *pitch = static_cast<float>(atan2(vp.pixel_pos[1] - cy, fy));
   return true;
 }
 
@@ -276,14 +276,16 @@ int LaneBasedCalibrator::GetCenterIndex(
     center_x += points[i](0);
     center_y += points[i](1);
   }
-  center_x /= nr_pts;
-  center_y /= nr_pts;
+  center_x /= static_cast<float>(nr_pts);
+  center_y /= static_cast<float>(nr_pts);
   float dist = 0.0f;
   float dist_min
-      = fabs(points[0](0) - center_x) + fabs(points[0](1) - center_y);
+      = static_cast<float>(fabs(points[0](0) - center_x) +
+                           fabs(points[0](1) - center_y));
   int center_index = 0;
   for (int i = 1; i < nr_pts; ++i) {
-    dist = fabs(points[i](0) - center_x) + fabs(points[i](1) - center_y);
+    dist = static_cast<float>(fabs(points[i](0) - center_x) +
+                              fabs(points[i](1) - center_y));
     if (dist < dist_min) {
       dist_min = dist;
       center_index = i;
@@ -299,7 +301,7 @@ bool LaneBasedCalibrator::SelectTwoPointsFromLineForVanishingPoint(
     return false;
   }
 
-  int nr_samples = nr_pts * params_.sampling_lane_point_rate;
+  int nr_samples = nr_pts * static_cast<int>(params_.sampling_lane_point_rate);
   int offset_end = nr_pts - nr_samples - 1;
   int sampled_start
       = GetCenterIndex(line.lane_point.data(), nr_samples);

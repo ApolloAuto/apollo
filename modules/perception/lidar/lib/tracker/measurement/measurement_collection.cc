@@ -45,7 +45,7 @@ void MeasureBboxCenterVelocity(
   Eigen::Vector3d old_center = old_object->output_center;
   Eigen::Vector3f new_size_tmp;
   Eigen::Vector3d new_center;
-  double minimum_edge_length = 0.01;
+  float minimum_edge_length = 0.01f;
   base::PointDCloud &cloud = (
       new_object->object_ptr->lidar_supplement).cloud_world;
   common::CalculateBBoxSizeCenter2DXY(cloud, old_dir_tmp, &new_size_tmp,
@@ -76,7 +76,7 @@ void MeasureBboxCornerVelocity(
   Eigen::Vector3d old_center = old_object->output_center;
   Eigen::Vector3f new_size_tmp;
   Eigen::Vector3d new_center;
-  double minimum_edge_length = 0.01;
+  float minimum_edge_length = 0.01f;
   base::PointDCloud &cloud = (
       new_object->object_ptr->lidar_supplement).cloud_world;
   common::CalculateBBoxSizeCenter2DXY(cloud, old_dir_tmp, &new_size_tmp,

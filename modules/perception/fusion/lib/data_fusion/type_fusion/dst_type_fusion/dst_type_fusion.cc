@@ -275,7 +275,7 @@ double DstTypeFusion::GetReliabilityForUnKnown(
            << " is not supported by class fusion";
     return 0.0;
   }
-  time_t rawtime = measurement_timestamp;
+  time_t rawtime = static_cast<time_t>(measurement_timestamp);
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 17);

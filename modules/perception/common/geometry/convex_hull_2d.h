@@ -150,21 +150,21 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::MockConvexHull(
     }
   }
 
-  out_polygon->at(0).x = minv(0);
-  out_polygon->at(0).y = minv(1);
-  out_polygon->at(0).z = minv(2);
+  out_polygon->at(0).x = static_cast<float>(minv(0));
+  out_polygon->at(0).y = static_cast<float>(minv(1));
+  out_polygon->at(0).z = static_cast<float>(minv(2));
 
-  out_polygon->at(1).x = maxv(0);
-  out_polygon->at(1).y = minv(1);
-  out_polygon->at(1).z = minv(2);
+  out_polygon->at(1).x = static_cast<float>(maxv(0));
+  out_polygon->at(1).y = static_cast<float>(minv(1));
+  out_polygon->at(1).z = static_cast<float>(minv(2));
 
-  out_polygon->at(2).x = maxv(0);
-  out_polygon->at(2).y = maxv(1);
-  out_polygon->at(2).z = minv(2);
+  out_polygon->at(2).x = static_cast<float>(maxv(0));
+  out_polygon->at(2).y = static_cast<float>(maxv(1));
+  out_polygon->at(2).z = static_cast<float>(minv(2));
 
-  out_polygon->at(3).x = minv(0);
-  out_polygon->at(3).y = maxv(1);
-  out_polygon->at(3).z = minv(2);
+  out_polygon->at(3).x = static_cast<float>(minv(0));
+  out_polygon->at(3).y = static_cast<float>(maxv(1));
+  out_polygon->at(3).z = static_cast<float>(minv(2));
   return true;
 }
 
@@ -222,8 +222,8 @@ bool ConvexHull2D<CLOUD_IN_TYPE, CLOUD_OUT_TYPE>::GetConvexHullMonotoneChain(
     min_z = std::min<float>(static_cast<float>(in_cloud_->at(id).z), min_z);
   }
   for (std::size_t i = 0; i < polygon_indices_.size(); ++i) {
-    out_polygon->at(i).x = points_[polygon_indices_[i]](0);
-    out_polygon->at(i).y = points_[polygon_indices_[i]](1);
+    out_polygon->at(i).x = static_cast<float>(points_[polygon_indices_[i]](0));
+    out_polygon->at(i).y = static_cast<float>(points_[polygon_indices_[i]](1));
     out_polygon->at(i).z = min_z;
   }
   return true;

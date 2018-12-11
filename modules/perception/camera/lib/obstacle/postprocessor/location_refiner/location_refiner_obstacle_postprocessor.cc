@@ -122,8 +122,10 @@ bool LocationRefinerObstaclePostprocessor::Process(
     Eigen::Vector3f image_point_low_center(box_cent_x, bbox2d[3], 1);
     Eigen::Vector3f point_in_camera
         = camera_k_matrix.inverse() * image_point_low_center;
-    float theta_ray = atan2(point_in_camera.x(), point_in_camera.z());
-    float rotation_y = theta_ray + obj->camera_supplement.alpha;
+    float theta_ray =
+          static_cast<float>(atan2(point_in_camera.x(), point_in_camera.z()));
+    float rotation_y =
+          theta_ray + static_cast<float>(obj->camera_supplement.alpha);
 
     // enforce the ry to be in the range [-pi, pi)
     const float PI = common::Constant<float>::PI();

@@ -54,11 +54,11 @@ bool PointCloudPreprocessor::Init(
   box_backward_y_ = config.box_backward_y();
   /*const auto &vehicle_param =
     common::VehicleConfigHelper::GetConfig().vehicle_param();
-  box_forward_x_ = vehicle_param.right_edge_to_center();
-  box_backward_x_ = -vehicle_param.left_edge_to_center();
-  box_forward_y_ = vehicle_param.front_edge_to_center();
-  box_backward_y_ = -vehicle_param.back_edge_to_center();*/
-  filter_high_z_points_ = config.filter_high_z_points();
+  box_forward_x_ = static_cast<float>(vehicle_param.right_edge_to_center());
+  box_backward_x_ = static_cast<float>(-vehicle_param.left_edge_to_center());
+  box_forward_y_ = static_cast<float>(vehicle_param.front_edge_to_center());
+  box_backward_y_ = static_cast<float>(-vehicle_param.back_edge_to_center());*/
+  filter_high_z_points_ = static_cast<float>(config.filter_high_z_points());
   z_threshold_ = config.z_threshold();
   return true;
 }
@@ -107,7 +107,7 @@ bool PointCloudPreprocessor::Preprocess(
       point.x = pt.x();
       point.y = pt.y();
       point.z = pt.z();
-      point.intensity = pt.intensity();
+      point.intensity = static_cast<float>(pt.intensity());
       frame->cloud->push_back(point, static_cast<double>(pt.timestamp()) * 1e-9,
                               FLT_MAX, i, 0);
     }

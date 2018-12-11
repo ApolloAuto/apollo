@@ -40,7 +40,8 @@ bool SegmentationComponent::Init() {
   sensor_name_ = comp_config.sensor_name();
   lidar2novatel_tf2_child_frame_id_ =
       comp_config.lidar2novatel_tf2_child_frame_id();
-  lidar_query_tf_offset_ = comp_config.lidar_query_tf_offset();
+  lidar_query_tf_offset_ = static_cast<float>(
+                             comp_config.lidar_query_tf_offset());
   enable_hdmap_ = comp_config.enable_hdmap();
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 

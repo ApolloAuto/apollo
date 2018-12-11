@@ -230,7 +230,7 @@ int WriteLanelines(const bool enable,
     AERROR << "fail to open lane_save_path!" << save_path;
     return -1;
   }
-  int lane_line_size = lane_objects.size();
+  int lane_line_size = static_cast<int>(lane_objects.size());
   AINFO << "lane line num: " << lane_line_size;
   fprintf(file_save, "[\n");
   for (int j = 0; j < lane_line_size; j++) {

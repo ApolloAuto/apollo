@@ -142,7 +142,7 @@ int work() {
                << " to ground";
       return -1;
     }
-    float camera_ground_height = c2g.translation()[2];
+    float camera_ground_height = static_cast<float>(c2g.translation()[2]);
     AINFO << camera_names[i] << " height: " << camera_ground_height;
     name_camera_ground_height_map[camera_names[i]] = camera_ground_height;
     Eigen::Matrix3d project_matrix;
@@ -159,7 +159,7 @@ int work() {
         return -1;
       }
       Eigen::Vector3d euler = trans.linear().eulerAngles(0, 1, 2);
-      pitch_diff = euler(0);
+      pitch_diff = static_cast<float>(euler(0));
       if (pitch_diff > 10.0 * M_PI / 180.0) {
         pitch_diff = 0;
       }

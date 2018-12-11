@@ -72,12 +72,12 @@ bool GroundServiceDetector::Detect(const GroundDetectorOptions& options,
   for (size_t i = 0; i < cloud->size(); ++i) {
     auto& pt = cloud->at(i);
     Eigen::Vector3d world_point(pt.x, pt.y, pt.z);
-    double dist = ground_service_->QueryPointToGroundDistance(
+    float dist = ground_service_->QueryPointToGroundDistance(
         world_point, ground_service_content_);
     frame->cloud->mutable_points_height()->at(i) = dist;
     frame->world_cloud->mutable_points_height()->at(i) = dist;
     if (dist > ground_threshold_) {
-      non_ground_indices.indices.push_back(i);
+      non_ground_indices.indices.push_back(static_cast<int>(i));
     } else {
       frame->cloud->mutable_points_label()->at(i) =
           static_cast<uint8_t>(LidarPointLabel::GROUND);

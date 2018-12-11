@@ -44,9 +44,10 @@ CropBox::getCropBox(const int width, const int height,
   // scale
   int center_x = (xr + xl) / 2;
   int center_y = (yb + yt) / 2;
-  int resize = static_cast<int>(crop_scale_ * std::max(
-      light->region.projection_roi.width,
-      light->region.projection_roi.height));
+  int resize = static_cast<int>(crop_scale_ *
+                                static_cast<float>(std::max(
+                                    light->region.projection_roi.width,
+                                    light->region.projection_roi.height)));
 
   resize = std::max(resize, min_crop_size_);
   resize = std::min(resize, width);

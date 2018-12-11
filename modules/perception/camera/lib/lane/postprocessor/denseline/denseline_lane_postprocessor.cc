@@ -612,7 +612,7 @@ bool DenselineLanePostprocessor::LocateNeighborLaneLine(
   int line_index, bool left_flag, int *locate_index) {
   // left_flag = true: find the line which is at left side of the line
   // left_flag = false: find the line which is at right side of the line
-  int set_size = latitude_intersection.size();
+  int set_size = static_cast<int>(latitude_intersection.size());
   if (line_index < 0 || line_index >= set_size) {
     return false;
   }

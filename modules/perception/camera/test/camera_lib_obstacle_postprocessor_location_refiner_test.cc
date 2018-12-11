@@ -190,7 +190,8 @@ TEST(LocationRefinedObstaclePostProcessorTestOnlineCalibration,
     Eigen::Vector3f image_point_low_center(box_cent_x, obj.bbox[3], 1);
     Eigen::Vector3f point_in_camera
         = frame.camera_k_matrix.inverse() * image_point_low_center;
-    float theta_ray = atan2(point_in_camera.x(), point_in_camera.z());
+    float theta_ray = static_cast<float>(atan2(point_in_camera.x(),
+                                         point_in_camera.z()));
     detected_obj->camera_supplement.alpha = theta_ray - obj.rotation_y;
     frame.detected_objects.push_back(detected_obj);
   }

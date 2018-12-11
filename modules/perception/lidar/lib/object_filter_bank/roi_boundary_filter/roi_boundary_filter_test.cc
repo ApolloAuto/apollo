@@ -208,13 +208,13 @@ TEST_F(ROIBoundaryFilterTest, roi_boundary_filter_test) {
   for (auto& obj : frame.segmented_objects) {
     obj->lidar_supplement.is_background = false;
   }
-  frame.segmented_objects[0]->confidence = 0.8;
-  frame.segmented_objects[1]->confidence = 0.4;
+  frame.segmented_objects[0]->confidence = 0.8f;
+  frame.segmented_objects[1]->confidence = 0.4f;
   filter_.distance_to_boundary_threshold_ = -1.f;
   EXPECT_TRUE(filter_.Filter(filter_option, &frame));
   EXPECT_EQ(frame.segmented_objects.size(), 2);
 
-  frame.segmented_objects[0]->confidence = 0.4;
+  frame.segmented_objects[0]->confidence = 0.4f;
   EXPECT_TRUE(filter_.Filter(filter_option, &frame));
   EXPECT_EQ(frame.segmented_objects.size(), 1);
 
@@ -224,8 +224,8 @@ TEST_F(ROIBoundaryFilterTest, roi_boundary_filter_test) {
   frame.segmented_objects[0]->lidar_supplement.is_background = false;
   frame.segmented_objects[1]->lidar_supplement.is_background = false;
   frame.segmented_objects[2]->lidar_supplement.is_background = false;
-  frame.segmented_objects[0]->confidence = 0.8;
-  frame.segmented_objects[1]->confidence = 0.4;
+  frame.segmented_objects[0]->confidence = 0.8f;
+  frame.segmented_objects[1]->confidence = 0.4f;
   filter_.distance_to_boundary_threshold_ = -1.f;
   EXPECT_TRUE(filter_.Filter(filter_option, &frame));
   EXPECT_EQ(frame.segmented_objects.size(), 4);

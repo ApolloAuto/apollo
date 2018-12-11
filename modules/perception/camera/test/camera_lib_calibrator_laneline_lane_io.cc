@@ -22,7 +22,7 @@ namespace camera {
 
 bool ParseOneLaneLine(const std::string &s, LaneLine *lane_line) {
   assert(lane_line != nullptr);
-  int len = s.size();
+  int len = static_cast<int>(s.size());
   if (len == 0) {
     return false;
   }

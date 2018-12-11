@@ -113,16 +113,16 @@ bool ObjectTemplateManager::Init(
   look_up_table_min_volume_index_.clear();
   veh_hwl_.resize(0);
   look_up_table_min_volume_index_[TemplateIndex::CAR_MIN_VOLUME_INDEX] =
-      veh_hwl_.size();
+      static_cast<int>(veh_hwl_.size());
   LoadVehTemplates(proto.car());
   look_up_table_min_volume_index_[TemplateIndex::VAN_MIN_VOLUME_INDEX] =
-      veh_hwl_.size();
+      static_cast<int>(veh_hwl_.size());
   LoadVehTemplates(proto.van());
   look_up_table_min_volume_index_[TemplateIndex::TRUCK_MIN_VOLUME_INDEX] =
-      veh_hwl_.size();
+      static_cast<int>(veh_hwl_.size());
   LoadVehTemplates(proto.truck());
   look_up_table_min_volume_index_[TemplateIndex::BUS_MIN_VOLUME_INDEX] =
-      veh_hwl_.size();
+      static_cast<int>(veh_hwl_.size());
   LoadVehTemplates(proto.bus());
 
   min_template_hwl_.clear();
@@ -205,7 +205,7 @@ void ObjectTemplateManager::LoadVehMinMidMaxTemplates(
   std::sort(list_tpl.begin(), list_tpl.end());
 
   int ind_min = 0;
-  int ind_max = list_tpl.size() - 1;
+  int ind_max = static_cast<int>(list_tpl.size()) - 1;
   int ind_mid = (ind_min + ind_max) / 2;
   std::vector<float> tmplt_min = {std::get<0>(list_tpl[ind_min]),
                                   std::get<1>(list_tpl[ind_min]),
@@ -275,11 +275,11 @@ float ObjectTemplateManager::VehObjHwlBySearchTemplates(float *hwl, int *index,
     std::swap(hwl_tmplt_matched[1], hwl_tmplt_matched[2]);
   }
 
-  float dh = fabs(hwl[0] - hwl_tmplt_matched[0]);
+  float dh = fabsf(hwl[0] - hwl_tmplt_matched[0]);
   float dh_ratio = dh / hwl_tmplt_matched[0];
-  float dw = fabs(hwl[1] - hwl_tmplt_matched[1]);
+  float dw = fabsf(hwl[1] - hwl_tmplt_matched[1]);
   float dw_ratio = dw / hwl_tmplt_matched[1];
-  float dl = fabs(hwl[2] - hwl_tmplt_matched[2]);
+  float dl = fabsf(hwl[2] - hwl_tmplt_matched[2]);
   float dl_ratio = dl / hwl_tmplt_matched[2];
   float dh_dw_dl_ratio_mean = (dh_ratio + dw_ratio + dl_ratio) / 3;
   float dh_ratio_check = std::min(dh_ratio, dh_dw_dl_ratio_mean);

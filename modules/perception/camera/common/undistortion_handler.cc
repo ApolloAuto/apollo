@@ -66,8 +66,8 @@ bool UndistortionHandler::Init(const std::string &sensor_name, int device) {
       std::dynamic_pointer_cast<base::BrownCameraDistortionModel>(
           sensor_manager->GetDistortCameraModel(sensor_name));
 
-    height_ = distort_model->get_height();
-    width_ = distort_model->get_width();
+    height_ = static_cast<int>(distort_model->get_height());
+    width_ = static_cast<int>(distort_model->get_width());
     d_mapx_.Reshape({height_, width_});
     d_mapy_.Reshape({height_, width_});
 
@@ -103,7 +103,7 @@ bool UndistortionHandler::Handle(const base::Image8U &src_img,
     NppiRect remap_roi = {0, 0, width_, height_};
 
     NppStatus status;
-    int d_map_step = d_mapx_.shape(1) * sizeof(float);
+    int d_map_step = static_cast<int>(d_mapx_.shape(1) * sizeof(float));
     switch (src_img.channels()) {
       case 1:
         status = nppiRemap_8u_C1R(src_img.gpu_data(), image_size,
@@ -169,7 +169,9 @@ void UndistortionHandler::InitUndistortRectifyMap(
     float *y_ptr = d_mapy->mutable_cpu_data() + d_mapy->offset(v);
     for (int u = 0; u < width_; ++u) {
       Eigen::Matrix<float, 3, 1> xy1;
-      xy1 << (u - ncx) / nfx, (v - ncy) / nfy, 1;
+      xy1 << (static_cast<float>(u) - ncx) / nfx,
+             (static_cast<float>(v) - ncy) / nfy,
+             1;
       auto XYW = Rinv * xy1;
       double nx = XYW(0, 0) / XYW(2, 0);
       double ny = XYW(1, 0) / XYW(2, 0);
@@ -179,8 +181,8 @@ void UndistortionHandler::InitUndistortRectifyMap(
                    2 * p1 * nx * ny + p2 * (r_square + 2 * nx * nx);
       double nny = ny * scale + \
                    p1 * (r_square + 2 * ny * ny) + 2 * p2 * nx * ny;
-      x_ptr[u] = nnx * fx + cx;
-      y_ptr[u] = nny * fy + cy;
+      x_ptr[u] = static_cast<float>(nnx * fx + cx);
+      y_ptr[u] = static_cast<float>(nny * fy + cy);
     }
   }
 }

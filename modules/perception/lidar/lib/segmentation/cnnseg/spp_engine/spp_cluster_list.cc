@@ -50,7 +50,7 @@ void SppClusterList::AddPointSample(size_t cluster_id,
 void SppClusterList::Merge(SppClusterList* rhs) {
   clusters_.reserve(clusters_.size() + rhs->clusters_.size());
   for (size_t i = 0; i < rhs->size(); ++i) {
-    clusters_.push_back((*rhs)[i]);
+    clusters_.push_back((*rhs)[static_cast<int>(i)]);
   }
 }
 

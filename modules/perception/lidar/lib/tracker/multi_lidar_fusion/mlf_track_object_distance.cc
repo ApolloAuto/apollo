@@ -109,7 +109,7 @@ float MlfTrackObjectDistance::ComputeDistance(
   }
   CHECK(weights != nullptr && weights->size() >= 7);
   float distance = 0.f;
-  float delta = 1e-10;
+  float delta = 1e-10f;
 
   double current_time = object->object_ptr->latest_tracked_time;
   track->PredictState(current_time);

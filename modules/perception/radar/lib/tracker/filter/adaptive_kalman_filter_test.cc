@@ -27,8 +27,8 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   EXPECT_EQ(filter->Name(), "AdaptiveKalmanFilter");
   const double time_diff = 0.074;
   base::Object object;
-  object.velocity << 3.0, 4.0, 0;
-  object.center << 0.0, 0.0, 0.0;
+  object.velocity << 3.0f, 4.0f, 0.0f;
+  object.center << 0.0f, 0.0f, 0.0f;
   object.anchor_point = object.center;
   Eigen::Matrix3d temp_matrix;
   temp_matrix.setIdentity();
@@ -51,8 +51,8 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   EXPECT_TRUE(std::fabs(predict_state(3) - result(3)) < 1e-5);
   // update (predict & correct)
   base::Object object2;
-  object2.velocity << 3.01, 3.99, 0;
-  object2.center << 0.0, 0.0, 0.0;
+  object2.velocity << 3.01f, 3.99f, 0.0f;
+  object2.center << 0.0f, 0.0f, 0.0f;
   object2.anchor_point = object.center;
   object2.center_uncertainty = temp_matrix.cast<float>();
   object2.velocity_uncertainty = temp_matrix.cast<float>();

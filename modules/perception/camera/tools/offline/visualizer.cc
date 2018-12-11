@@ -78,11 +78,14 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
   Eigen::Affine3d world2lidar = lidar2world.inverse();
   for (const auto &object : frame.tracked_objects) {
     base::RectF rect(object->camera_supplement.box);
-    cv::Rect r(rect.x, rect.y, rect.width, rect.height);
+    cv::Rect r(static_cast<int>(rect.x),
+               static_cast<int>(rect.y),
+               static_cast<int>(rect.width),
+               static_cast<int>(rect.height));
     cv::rectangle(image, r, colorlist[object->track_id % colorlist.size()], 2);
     cv::putText(image,
                 std::to_string(object->track_id),
-                cv::Point(rect.x, rect.y),
+                cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
                 cv::FONT_HERSHEY_DUPLEX,
                 1,
                 cv::Scalar(0, 0, 255),
@@ -90,7 +93,7 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     Eigen::Vector3d theta;
     theta << cos(object->theta), sin(object->theta), 0;
     theta = world2lidar.linear() * theta;
-    float yaw = atan2(theta[1], theta[0]);
+    float yaw = static_cast<float>(atan2(theta[1], theta[0]));
     Eigen::Matrix2d rotate;
     rotate << cos(yaw), -sin(yaw),
       sin(yaw), cos(yaw);
@@ -214,8 +217,8 @@ void Visualizer::draw_range_circle() {
 
 cv::Point Visualizer::world_point_to_bigimg(const Eigen::Vector2d &p) {
   cv::Point point;
-  point.x = -p[1] * m2pixel_ + wide_pixel_ / 2;
-  point.y = world_h_ - p[0] * m2pixel_;
+  point.x = static_cast<int>(-p[1] * m2pixel_ + wide_pixel_ / 2);
+  point.y = static_cast<int>(world_h_ - p[0] * m2pixel_);
   return point;
 }
 }  // namespace camera

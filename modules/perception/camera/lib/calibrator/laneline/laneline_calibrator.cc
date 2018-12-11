@@ -67,7 +67,7 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
 
   timestamp_cur_ = *options.timestamp;
   if (!is_first_frame_) {
-    time_diff_ = fabs(static_cast<float>(timestamp_cur_ - timestamp_pre_));
+    time_diff_ = fabsf(static_cast<float>(timestamp_cur_ - timestamp_pre_));
     ADEBUG << timestamp_cur_ << " " << timestamp_pre_ << std::endl;
     camera::GetYawVelocityInfo(
         time_diff_, cam_coord_cur_, cam_coord_pre_, cam_coord_pre_pre_,
@@ -107,7 +107,8 @@ bool LaneLineCalibrator::LoadEgoLaneline(
   for (size_t i = 0; i < lane_objects.size(); ++i) {
     if (lane_objects[i].pos_type ==
         base::LaneLinePositionType::EGO_LEFT) {
-      int num_points = lane_objects[i].curve_image_point_set.size();
+      int num_points =
+          static_cast<int>(lane_objects[i].curve_image_point_set.size());
       ego_lane->left_line.lane_point.resize(num_points);
       const auto &curve = lane_objects[i].curve_image_coord;
       float y_curve = 0.0f;
@@ -125,7 +126,8 @@ bool LaneLineCalibrator::LoadEgoLaneline(
     }
     if (lane_objects[i].pos_type ==
         base::LaneLinePositionType::EGO_RIGHT) {
-      int num_points = lane_objects[i].curve_image_point_set.size();
+      int num_points =
+          static_cast<int>(lane_objects[i].curve_image_point_set.size());
       ego_lane->right_line.lane_point.resize(num_points);
       const auto &curve = lane_objects[i].curve_image_coord;
       float y_curve = 0.0f;

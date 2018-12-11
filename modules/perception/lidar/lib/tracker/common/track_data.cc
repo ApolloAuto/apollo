@@ -33,7 +33,7 @@ std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
   int max_idx = std::abs(idx) >= static_cast<int>(history_objects_.size())
-                    ? history_objects_.size() - 1
+                    ? static_cast<int>(history_objects_.size()) - 1
                     : abs(idx);
   // from oldest
   if (idx > 0) {
@@ -61,7 +61,7 @@ TrackData::GetHistoryObject(int idx) const {
   }
   int max_idx =
       static_cast<size_t>(abs(idx)) >= history_objects_.size() ?
-      history_objects_.size() - 1 : abs(idx);
+      static_cast<int>(history_objects_.size()) - 1 : abs(idx);
   // from oldest
   if (idx > 0) {
     std::map<double, TrackedObjectPtr>::const_iterator cur_obj =

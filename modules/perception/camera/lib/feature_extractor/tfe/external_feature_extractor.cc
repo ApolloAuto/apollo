@@ -89,7 +89,8 @@ bool ExternalFeatureExtractor::Extract(const FeatureExtractorOptions &options,
   auto input_blob = inference_->get_blob(param_.input_blob());
   DataProvider::ImageOptions image_options;
   image_options.target_color = base::Color::BGR;
-  auto offset_y_ = static_cast<int>(param_.offset_ratio() * raw_height + .5);
+  auto offset_y_ = static_cast<int>(param_.offset_ratio() *
+                                    static_cast<float>(raw_height) + 0.5f);
   image_options.crop_roi = base::RectI(0, offset_y_,
                                        raw_width, raw_height - offset_y_);
   image_options.do_crop = true;

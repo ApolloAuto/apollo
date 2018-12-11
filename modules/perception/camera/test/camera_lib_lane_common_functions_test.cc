@@ -45,7 +45,7 @@ TEST(CommonFunctions, poly_fit_error_test) {
     int order = max_poly_order;
     for (int i = 0; i < order; i++) {
       Eigen::Matrix<float, 2, 1> pos;
-      pos << static_cast<float>(i), static_cast<float>(i + 1.0f);
+      pos << static_cast<float>(i), static_cast<float>(i) + 1.0f;
       pos_vec.push_back(pos);
     }
     EXPECT_FALSE(PolyFit(pos_vec, order, &coeff));
@@ -173,7 +173,7 @@ TEST(CommonFunctions, QuickSortTest) {
   unsigned int seed = 0;
   for (int i = 0; i < nsize; i++) {
     int rand_value = rand_r(&seed) % 100;
-    float value = 1.0f * rand_value / 100 + rand_value;
+    float value = 1.0f * static_cast<float>(rand_value / 100 + rand_value);
     value_vec.push_back(value);
     snprintf(tmp, sizeof(tmp), "[%d %f] ", i, value);
     msg += tmp;
@@ -196,7 +196,8 @@ TEST(CommonFunctions, FindKSmallValueTest) {
   unsigned int seed = 0;
   for (int i = 0; i < nsize; i++) {
     int rand_value = rand_r(&seed) % 10;
-    float value = 0.32f * rand_value + rand_value;
+    float value = 0.32f * static_cast<float>(rand_value) +
+                  static_cast<float>(rand_value);
     value_vec.push_back(value);
     snprintf(tmp, sizeof(tmp), "[%d %f] ", i, value);
     msg += tmp;
@@ -272,7 +273,8 @@ TEST(CommonFunctions, FindKLargeValueTest) {
   unsigned int seed = 5;
   for (int i = 0; i < nsize; i++) {
     int rand_value = rand_r(&seed) % 10;
-    float value = 0.2f * rand_value + rand_value;
+    float value = 0.2f * static_cast<float>(rand_value) +
+                  static_cast<float>(rand_value);
     value_vec.push_back(value);
     snprintf(tmp, sizeof(tmp), "[%d %f] ", i, value);
     msg += tmp;

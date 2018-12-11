@@ -81,12 +81,12 @@ TEST(ContiArsDetector, detect) {
 
   Eigen::Matrix3f dist_uncertain;
   Eigen::Matrix3f vel_uncertain;
-  dist_uncertain << 0.01, 0, 0,
-                    0, 0.04, 0,
-                    0, 0, 0;
-  vel_uncertain << 0.01, 0, 0,
-                    0, 0.04, 0,
-                    0, 0, 0;
+  dist_uncertain << 0.01f, 0.0f,  0.0f,
+                    0.0f,  0.04f, 0.0f,
+                    0.0f,  0.0f,  0.0f;
+  vel_uncertain << 0.01f, 0.0f,  0.0f,
+                   0.0f,  0.04f, 0.0f,
+                   0.0f,  0.0f,  0.0f;
   float dist_diff = (dist_uncertain - radar_object->center_uncertainty).norm();
   float vel_diff = (vel_uncertain - radar_object->velocity_uncertainty).norm();
   EXPECT_LT(dist_diff, 1.0e-6);

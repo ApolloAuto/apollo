@@ -135,7 +135,7 @@ void ROIBoundaryFilter::FillObjectRoiFlag(const ObjectFilterOptions& options,
     bool cross = (obj->lidar_supplement.num_points_in_roi !=
                   obj->lidar_supplement.cloud.size());
     float ratio = static_cast<float>(obj->lidar_supplement.num_points_in_roi) /
-                  obj->lidar_supplement.cloud.size();
+                  static_cast<float>(obj->lidar_supplement.cloud.size());
     if (ratio < cross_roi_threshold_  // a hacked minimum support value
         || (cross && obj->confidence <= .11f)) {
       objects_cross_roi_[i] = true;

@@ -50,7 +50,8 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions& options) {
   revise_time_s_ = semantic_param_.revise_time_second();
   blink_threshold_s_ = semantic_param_.blink_threshold_second();
   hysteretic_threshold_ = semantic_param_.hysteretic_threshold_count();
-  non_blink_threshold_s_ = blink_threshold_s_ * non_blink_coef;
+  non_blink_threshold_s_ = blink_threshold_s_ *
+                           static_cast<float>(non_blink_coef);
 
   AINFO << "revise_time_s_: " << revise_time_s_;
   AINFO << "blink_threshold_s_: " << blink_threshold_s_;
@@ -271,7 +272,7 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions& options,
     }
 
     tmp.semantic = ss.str();
-    tmp.light_ids.push_back(i);
+    tmp.light_ids.push_back(static_cast<int>(i));
     tmp.color = light->status.color;
     tmp.time_stamp = time_stamp;
     tmp.blink = false;
@@ -280,7 +281,7 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions& options,
                              boost::bind(compare, _1, tmp));
 
     if (iter != semantic_table.end()) {
-      iter->light_ids.push_back(i);
+      iter->light_ids.push_back(static_cast<int>(i));
     } else {
       semantic_table.push_back(tmp);
     }
