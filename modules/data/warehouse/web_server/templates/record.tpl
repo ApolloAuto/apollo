@@ -127,7 +127,7 @@
           <tr>
             <td>{{ dis.time | timestamp_to_time }}</td>
             <td>{{ dis.desc }}</td>
-            <td>{{ (dis.time - record.header.begin_time) | round(1) }}</td>
+            <td>{{ (dis.time - record.header.begin_time / 1000000000.0) | round(1) }} s</td>
           </tr>
         {% endfor %}
       </tbody>
