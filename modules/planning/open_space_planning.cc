@@ -178,7 +178,6 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     vehicle_state.set_y(future_xy.y());
     vehicle_state.set_timestamp(start_timestamp);
   }
-
   if (!IsVehicleStateValid(vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed");
     AERROR << msg;

@@ -5,17 +5,17 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "autotuning_raw_feature_generator",
     srcs = [
-        "autotuning_raw_feature_generator.cc"
+        "autotuning_raw_feature_generator.cc",
     ],
     hdrs = [
-        "autotuning_raw_feature_generator.h"
+        "autotuning_raw_feature_generator.h",
     ],
     deps = [
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/planning/common:frame",
-        "//modules/planning/common:speed_limit",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/common:speed_limit",
         "//modules/planning/proto:auto_tuning_raw_feature_proto",
     ],
 )
@@ -32,9 +32,10 @@ cc_test(
     ],
 )
 
-cc_library(name = "autotuning_feature_builder",
+cc_library(
+    name = "autotuning_feature_builder",
     hdrs = [
-        "autotuning_feature_builder.h"
+        "autotuning_feature_builder.h",
     ],
     deps = [
         "//modules/common/status",
@@ -46,17 +47,18 @@ cc_library(name = "autotuning_feature_builder",
 cc_library(
     name = "autotuning_mlp_net_model",
     srcs = [
-        "autotuning_mlp_net_model.cc"
+        "autotuning_mlp_net_model.cc",
     ],
     hdrs = [
-        "autotuning_mlp_net_model.h"
+        "autotuning_mlp_net_model.h",
     ],
     deps = [
         "//modules/prediction/network:net_model",
     ],
 )
 
-cc_test(name = "autotuning_mlp_net_model_test",
+cc_test(
+    name = "autotuning_mlp_net_model_test",
     size = "small",
     srcs = [
         "autotuning_mlp_net_model_test.cc",
@@ -70,13 +72,14 @@ cc_test(name = "autotuning_mlp_net_model_test",
 cc_library(
     name = "autotuning_base_model",
     hdrs = [
-        "autotuning_base_model.h"
+        "autotuning_base_model.h",
     ],
     deps = [
+        ":autotuning_feature_builder",
+        ":autotuning_mlp_net_model",
         "//modules/common/status",
         "//modules/planning/proto:auto_tuning_model_input_proto",
-        ":autotuning_mlp_net_model",
-        ":autotuning_feature_builder",
     ],
 )
+
 cpplint()
