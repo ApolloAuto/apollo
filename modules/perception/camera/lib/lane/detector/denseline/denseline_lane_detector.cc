@@ -52,8 +52,8 @@ bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
     input_height_ = 1080;
     input_width_ = 1920;
   } else {
-    input_height_ = base_camera_model_->get_height();
-    input_width_ = base_camera_model_->get_width();
+    input_height_ = static_cast<uint16_t>(base_camera_model_->get_height());
+    input_width_ = static_cast<uint16_t>(base_camera_model_->get_width());
   }
   CHECK(input_width_ > 0) << "input width should be more than 0";
   CHECK(input_height_ > 0) << "input height should be more than 0";
@@ -62,10 +62,10 @@ bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
   AINFO << "input_width: " << input_width_;
 
   image_scale_ = model_param.resize_scale();
-  input_offset_y_ = model_param.input_offset_y();
-  input_offset_x_ = model_param.input_offset_x();
-  crop_height_ = model_param.crop_height();
-  crop_width_ = model_param.crop_width();
+  input_offset_y_ = static_cast<uint16_t>(model_param.input_offset_y());
+  input_offset_x_ = static_cast<uint16_t>(model_param.input_offset_x());
+  crop_height_ = static_cast<uint16_t>(model_param.crop_height());
+  crop_width_ = static_cast<uint16_t>(model_param.crop_width());
 
   CHECK_LE(crop_height_, input_height_)
     << "crop height larger than input height";
@@ -119,8 +119,8 @@ bool DenselineLaneDetector::Init(const LaneDetectorInitOptions &options) {
   CHECK(rt_net_ != nullptr);
   rt_net_->set_gpu_id(options.gpu_id);
 
-  resize_height_ = crop_height_ * image_scale_;
-  resize_width_ = crop_width_ * image_scale_;
+  resize_height_ = static_cast<uint16_t>(crop_height_ * image_scale_);
+  resize_width_ = static_cast<uint16_t>(crop_width_ * image_scale_);
   CHECK(resize_width_ > 0) << "resize width should be more than 0";
   CHECK(resize_height_ > 0) << "resize height should be more than 0";
 
@@ -190,9 +190,9 @@ bool DenselineLaneDetector::Detect(
             input_blob,
             static_cast<int>(crop_width_),
             0,
-            image_mean_[0],
-            image_mean_[1],
-            image_mean_[2],
+            static_cast<float>(image_mean_[0]),
+            static_cast<float>(image_mean_[1]),
+            static_cast<float>(image_mean_[2]),
             false,
             static_cast<float>(1.0));
   AINFO << "resize gpu finish.";

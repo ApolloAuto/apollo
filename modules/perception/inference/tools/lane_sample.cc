@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
     const int count = 1 * width * height;
     std::vector<float> input(count);
     for (int i = 0; i < count; i++) {
-      input[i] = (img.data[i] - 128.0f) * 0.0078125f;
+      input[i] = static_cast<float>(img.data[i] - 128) * 0.0078125f;
     }
     cudaMemcpy(input_blob->mutable_gpu_data(), &input[0], count * sizeof(float),
                cudaMemcpyHostToDevice);

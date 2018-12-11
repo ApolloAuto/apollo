@@ -26,9 +26,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-static const float kEpsilon = 1e-6;
-static const float kEpsilonForSize = 1e-2;
-static const float kEpsilonForLine = 1e-3;
+static const float kEpsilon = 1e-6f;
+static const float kEpsilonForSize = 1e-2f;
+static const float kEpsilonForLine = 1e-3f;
 using apollo::perception::base::PointF;
 using apollo::perception::base::PointD;
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
@@ -48,7 +48,7 @@ bool ObjectBuilder::Build(const ObjectBuilderOptions& options,
   std::vector<ObjectPtr>* objects = &(frame->segmented_objects);
   for (size_t i = 0; i < objects->size(); ++i) {
     if (objects->at(i)) {
-      objects->at(i)->id = i;
+      objects->at(i)->id = static_cast<int>(i);
       ComputePolygon2D(objects->at(i));
     }
   }
@@ -81,7 +81,7 @@ void ObjectBuilder::ComputeOtherObjectInformation(ObjectPtr object) {
     timestamp += object->lidar_supplement.cloud.points_timestamp(i);
   }
   if (num_point > 0) {
-    timestamp /= num_point;
+    timestamp /= static_cast<double>(num_point);
   }
   object->latest_tracked_time = timestamp;
 }
@@ -109,7 +109,8 @@ void ObjectBuilder::ComputePolygonSizeCenter(ObjectPtr object) {
       object->size[i] = kEpsilonForSize;
     }
   }
-  object->theta = atan2(object->direction[1], object->direction[0]);
+  object->theta = static_cast<float>(atan2(object->direction[1],
+                                           object->direction[0]));
 }
 
 void ObjectBuilder::SetDefaultValue(const Eigen::Vector3f& min_pt_in,

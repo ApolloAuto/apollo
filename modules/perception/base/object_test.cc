@@ -55,7 +55,7 @@ TEST(ObjectTest, object_reset_test) {
   object.id = 1;
   object.polygon.resize(2);
   object.direction = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
-  object.theta = M_PI / 2;
+  object.theta = static_cast<float>(M_PI / 2);
   object.theta_variance = 0.0f;
   object.center = Eigen::Vector3d(100, 0.0, 0.0);
   object.center_uncertainty << 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f,

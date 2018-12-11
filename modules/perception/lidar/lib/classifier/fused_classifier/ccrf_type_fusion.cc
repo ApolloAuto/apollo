@@ -209,7 +209,7 @@ bool CCRFSequenceTypeFusion::FuseWithConditionalProbabilityInference(
         }
       }
       fused_sequence_probs_[i](right) = max_prob;
-      state_back_trace_[i](right) = id;
+      state_back_trace_[i](right) = static_cast<int>(id);
     }
   }
   ObjectPtr object = tracked_objects->rbegin()->second;

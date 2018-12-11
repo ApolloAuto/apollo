@@ -47,11 +47,11 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
   base::ObjectPtr base_lidar_object_ptr(new base::Object());
   base_lidar_object_ptr->type = base::ObjectType::VEHICLE;
   base_lidar_object_ptr->type_probs.resize(
-      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.0);
+      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.0f);
   base_lidar_object_ptr->type_probs = std::vector<float>(
-      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.1);
+      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.1f);
   base_lidar_object_ptr
-      ->type_probs[static_cast<size_t>(base::ObjectType::VEHICLE)] = 0.6;
+      ->type_probs[static_cast<size_t>(base::ObjectType::VEHICLE)] = 0.6f;
 
   base::FramePtr lidar_frame_ptr(new base::Frame());
   lidar_frame_ptr->sensor_info.name = "velodyne_64";
@@ -79,9 +79,9 @@ TEST(DstTypeFusionTest, test_update_with_measurement) {
   base_camera_object_ptr->type_probs.resize(
       static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE));
   base_camera_object_ptr->type_probs = std::vector<float>(
-      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.1);
+      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.1f);
   base_camera_object_ptr
-      ->type_probs[static_cast<size_t>(base::ObjectType::PEDESTRIAN)] = 0.4;
+      ->type_probs[static_cast<size_t>(base::ObjectType::PEDESTRIAN)] = 0.4f;
 
   base::FramePtr camera_frame_ptr(new base::Frame());
   camera_frame_ptr->sensor_info.type = base::SensorType::MONOCULAR_CAMERA;
@@ -156,11 +156,11 @@ TEST(DstTypeFusionTest, test_update_without_measurement) {
   base::ObjectPtr base_lidar_object_ptr(new base::Object());
   base_lidar_object_ptr->type = base::ObjectType::VEHICLE;
   base_lidar_object_ptr->type_probs.resize(
-      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.0);
+      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.0f);
   base_lidar_object_ptr->type_probs = std::vector<float>(
-      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.1);
+      static_cast<size_t>(base::ObjectType::MAX_OBJECT_TYPE), 0.1f);
   base_lidar_object_ptr
-      ->type_probs[static_cast<size_t>(base::ObjectType::VEHICLE)] = 0.6;
+      ->type_probs[static_cast<size_t>(base::ObjectType::VEHICLE)] = 0.6f;
   base_lidar_object_ptr->center = Eigen::Vector3d(0, 0, 10);
 
   base::FramePtr lidar_frame_ptr(new base::Frame());

@@ -31,9 +31,9 @@ void DummyDetector::ContiObs2Frame(
     radar_object->center(2) = 0.0;
     radar_object->anchor_point = radar_object->center;
 
-    radar_object->velocity(0) = radar_obs.longitude_vel();
-    radar_object->velocity(1) = radar_obs.lateral_vel();
-    radar_object->velocity(2) = 0.0;
+    radar_object->velocity(0) = static_cast<float>(radar_obs.longitude_vel());
+    radar_object->velocity(1) = static_cast<float>(radar_obs.lateral_vel());
+    radar_object->velocity(2) = 0.0f;
 
     Eigen::Matrix3d dist_rms;
     dist_rms.setZero();
@@ -51,11 +51,13 @@ void DummyDetector::ContiObs2Frame(
     double local_obj_theta = radar_obs.oritation_angle() / 180.0 * PI;
     Eigen::Vector3d direction(cos(local_obj_theta), sin(local_obj_theta), 0);
     radar_object->direction = direction.cast<float>();
-    radar_object->theta = std::atan2(direction(1), direction(0));
-    radar_object->theta_variance = radar_obs.oritation_angle_rms() / 180.0 * PI;
-    radar_object->size(0) = radar_obs.length();
-    radar_object->size(1) = radar_obs.width();
-    radar_object->confidence = radar_obs.probexist();
+    radar_object->theta =
+        static_cast<float>(std::atan2(direction(1), direction(0)));
+    radar_object->theta_variance =
+        static_cast<float>(radar_obs.oritation_angle_rms() / 180.0 * PI);
+    radar_object->size(0) = static_cast<float>(radar_obs.length());
+    radar_object->size(1) = static_cast<float>(radar_obs.width());
+    radar_object->confidence = static_cast<float>(radar_obs.probexist());
 
     int cls = radar_obs.obstacle_class();
     if (cls == CONTI_CAR || cls == CONTI_TRUCK) {

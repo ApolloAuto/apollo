@@ -41,7 +41,7 @@ void CloudMask::GetValidCloud(const AttributePointCloud<PointF>& source_cloud,
   indices_.reserve(mask_.size());
   for (size_t i = 0; i < mask_.size(); ++i) {
     if (mask_[i] > 0) {
-      indices_.push_back(i);
+      indices_.push_back(static_cast<int>(i));
     }
   }
   target_cloud->CopyPointCloud(source_cloud, indices_);

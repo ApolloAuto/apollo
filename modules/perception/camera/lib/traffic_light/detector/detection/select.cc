@@ -36,8 +36,10 @@ bool Select::Init(int rows, int cols) {
 
 double Select::Calc2dGaussianScore(base::Point2DI p1, base::Point2DI p2,
                                    float sigma1, float sigma2) {
-  return std::exp(-0.5 * (((p1.x - p2.x) * (p1.x - p2.x)) / (sigma1 * sigma1) +
-      ((p1.y - p2.y) * (p1.y - p2.y)) / (sigma2 * sigma2)));
+  return std::exp(-0.5 * (static_cast<float>((p1.x - p2.x) * (p1.x - p2.x)) /
+                          (sigma1 * sigma1) +
+                         (static_cast<float>((p1.y - p2.y) * (p1.y - p2.y)) /
+                          (sigma2 * sigma2))));
 }
 
 void Select::SelectTrafficLights(

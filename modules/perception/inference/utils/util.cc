@@ -27,7 +27,7 @@ std::shared_ptr<float> load_binary_data(const std::string &filename) {
   std::ifstream ifs(filename, std::ifstream::binary);
   if (ifs) {
     ifs.seekg(0, ifs.end);
-    int length = ifs.tellg() / sizeof(float);
+    int length = static_cast<int>(ifs.tellg() / sizeof(float));
     ifs.seekg(0, ifs.beg);
     std::shared_ptr<float> outputs;
     outputs.reset(new float[length]);

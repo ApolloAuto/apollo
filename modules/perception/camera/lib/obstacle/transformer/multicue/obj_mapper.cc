@@ -28,14 +28,14 @@ void ObjMapperParams::set_default() {
   small_bbox_height = 50.0f;
   factor_small = 0.6f;
   learning_r = 0.7f;
-  reproj_err = 4 * sqrt(2.0f);
+  reproj_err = 4 * sqrtf(2.0f);
   rz_ratio = 0.1f;
   abnormal_h_veh = 0.8f;
   stable_w = 0.5f;
   occ_ratio = 0.9f;
   depth_min = 0.1f;
   dist_far = 100.0f;
-  eps_mapper = 1e-5;
+  eps_mapper = 1e-5f;
 
   iou_suc = 0.5f;
   iou_high = 0.7f;
@@ -60,14 +60,14 @@ bool ObjMapper::SolveCenterFromNearestVerticalEdge(const float *bbox,
 
   // compensate from the nearest vertical edge to center
   const float PI = common::Constant<float>::PI();
-  float theta_bbox = atan(hwl[1] * common::IRec(hwl[2]));
+  float theta_bbox = static_cast<float>(atan(hwl[1] * common::IRec(hwl[2])));
   float radius_bbox =
       common::ISqrt(common::ISqr(hwl[2] / 2) + common::ISqr(hwl[1] / 2));
 
-  float abs_ry = fabs(ry);
+  float abs_ry = fabsf(ry);
   float theta_z = std::min(abs_ry, PI - abs_ry) + theta_bbox;
   theta_z = std::min(theta_z, PI - theta_z);
-  depth += fabs(radius_bbox * sin(theta_z));
+  depth += static_cast<float>(fabs(radius_bbox * sin(theta_z)));
 
   // back-project to solve center
   center_2d[0] = (bbox[0] + bbox[2]) / 2;
@@ -91,13 +91,13 @@ bool ObjMapper::Solve3dBboxGivenOneFullBboxDimensionOrientation(
   float center_2d[2] = {0};
   bool success =
       SolveCenterFromNearestVerticalEdge(bbox, hwl, *ry, center, center_2d);
-  float min_x = params_.boundary_len;
-  float min_y = params_.boundary_len;
+  float min_x = static_cast<float>(params_.boundary_len);
+  float min_y = static_cast<float>(params_.boundary_len);
   float max_x = static_cast<float>(width_ - params_.boundary_len);
   float max_y = static_cast<float>(height_ - params_.boundary_len);
   bool truncated = bbox[0] <= min_x || bbox[2] >= max_x || bbox[1] <= min_y ||
                    bbox[3] >= max_y;
-  float dist_rough = sqrt(common::ISqr(center[0]) + common::ISqr(center[2]));
+  float dist_rough = sqrtf(common::ISqr(center[0]) + common::ISqr(center[2]));
   bool ry_pred_is_not_reliable = dist_rough > params_.dist_far &&
                                  bbox[3] - bbox[1] < params_.small_bbox_height;
   if (ry_pred_is_not_reliable || std::abs(*ry - PI_HALF) < small_angle_diff ||
@@ -138,7 +138,7 @@ bool ObjMapper::Solve3dBbox(const ObjMapperOptions &options, float center[3],
     const float *tmplt_with_min_vol = &kVehHwl[type_min_vol_index];
     float min_tmplt_vol =
         tmplt_with_min_vol[0] * tmplt_with_min_vol[1] * tmplt_with_min_vol[2];
-    float shrink_ratio_vol = common::ISqr(sqrt(params_.iou_high));
+    float shrink_ratio_vol = common::ISqr(sqrtf(params_.iou_high));
     shrink_ratio_vol *= shrink_ratio_vol;
     // float shrink_ratio_vol = sqrt(params_.iou_high);
     if (hwl[0] < params_.abnormal_h_veh ||
@@ -184,8 +184,8 @@ bool ObjMapper::Solve3dBbox(const ObjMapperOptions &options, float center[3],
 
   float z = center[2];
   float rz = z * params_.rz_ratio;
-  float nr_bins_z = params_.nr_bins_z;
-  std::vector<float> buffer(2 * nr_bins_z, 0);
+  float nr_bins_z = static_cast<float>(params_.nr_bins_z);
+  std::vector<float> buffer(static_cast<size_t>(2 * nr_bins_z), 0);
   float *score_z = buffer.data();
   float dz = 2 * rz / nr_bins_z;
   float z_start = std::max(z - rz, params_.depth_min);
@@ -206,7 +206,7 @@ bool ObjMapper::Solve3dBbox(const ObjMapperOptions &options, float center[3],
   orientation_variance_(0) = var_yaw;
   float bbox_cx = (bbox[0] + bbox[2]) / 2;
   float focal = (k_mat_[0] + k_mat_[4]) / 2;
-  float sf_z_to_x = fabs(bbox_cx - k_mat_[2]) * common::IRec(focal);
+  float sf_z_to_x = fabsf(bbox_cx - k_mat_[2]) * common::IRec(focal);
   float var_x = var_z * common::ISqr(sf_z_to_x);
   float var_xz = sf_z_to_x * var_z;
   position_uncertainty_(0, 0) = var_x;
@@ -220,7 +220,7 @@ void ObjMapper::PostRefineOrientation(const float *bbox, const float *hwl,
   const int kNrBinsRy = static_cast<int>(ry_score_.size());
   const float PI = common::Constant<float>::PI();
   const float PI_HALF = PI * 0.5f;
-  const float D_RY = 2 * PI / kNrBinsRy;
+  const float D_RY = 2 * PI / static_cast<float>(kNrBinsRy);
 
   float ry_test = -PI;
   float ry_best = -PI;
@@ -272,7 +272,7 @@ void ObjMapper::GetCenter(const float *bbox, const float &z_ref,
   const float LR = params_.learning_r;
   const int MAX_ITERATION = params_.max_nr_iter;
 
-  float cost_pre = 2.0f * width_;
+  float cost_pre = 2.0f * static_cast<float>(width_);
   float cost_delta = 0.0f;
   float center_test[3] = {0};
   float rot[9] = {0};

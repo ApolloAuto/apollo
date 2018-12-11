@@ -31,13 +31,13 @@ TEST(LidarCloudMaskTest, lidar_cloud_mask_test) {
   EXPECT_EQ(mask.mask().size(), 10);
   const CloudMask& const_mask = mask;
   for (size_t i = 0; i < 10; ++i) {
-    EXPECT_EQ(mask[i], 0);
-    EXPECT_EQ(const_mask[i], 0);
+    EXPECT_EQ(mask[static_cast<int>(i)], 0);
+    EXPECT_EQ(const_mask[static_cast<int>(i)], 0);
   }
   mask.Fill(1);
   for (size_t i = 0; i < 10; ++i) {
-    EXPECT_EQ(mask[i], 1);
-    EXPECT_EQ(const_mask[i], 1);
+    EXPECT_EQ(mask[static_cast<int>(i)], 1);
+    EXPECT_EQ(const_mask[static_cast<int>(i)], 1);
   }
   EXPECT_EQ(mask.ValidIndicesCount(), 10);
   mask[0] = 0;

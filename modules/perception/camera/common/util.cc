@@ -127,8 +127,8 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
         int idx12 = (y1_read * stepwidth + x2_read) * channel;
         src_reg = src[idx12 + c];
         out = out + static_cast<float>(src_reg) *
-              (static_cast<float>(src_x) - x1) *
-              (y2 - static_cast<float>(src_y));
+              (src_x - static_cast<float>(x1)) *
+              (static_cast<float>(y2) - src_y);
 
         int idx21 = (y2_read * stepwidth + x1_read) * channel;
         src_reg = src[idx21 + c];

@@ -28,7 +28,7 @@ bool InformationFilter::Init(const Eigen::VectorXd &global_states,
     return false;
   }
 
-  states_num_ = global_uncertainty.rows();
+  states_num_ = static_cast<int>(global_uncertainty.rows());
 
   if (states_num_ <= 0) {
     return false;

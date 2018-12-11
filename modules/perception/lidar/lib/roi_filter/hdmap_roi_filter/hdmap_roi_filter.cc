@@ -211,8 +211,8 @@ void HdmapROIFilter::TransformFrame(
     const auto& pt = cloud->at(i);
     auto& local_pt = (*cloud_local)->at(i);
     Eigen::Vector3d e_pt(pt.x, pt.y, pt.z);
-    local_pt.x = x_axis.dot(e_pt);
-    local_pt.y = y_axis.dot(e_pt);
+    local_pt.x = static_cast<float>(x_axis.dot(e_pt));
+    local_pt.y = static_cast<float>(y_axis.dot(e_pt));
   }
 }
 
@@ -232,7 +232,7 @@ bool HdmapROIFilter::Bitmap2dFilter(const base::PointFCloudPtr& in_cloud,
       continue;
     }
     if (bitmap.Check(e_pt)) {
-      roi_indices->indices.push_back(i);
+      roi_indices->indices.push_back(static_cast<int>(i));
     }
   }
   return true;

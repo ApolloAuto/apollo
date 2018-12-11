@@ -112,7 +112,7 @@ bool TransformServer::LoadFromFile(const std::string &tf_input,
   Transform tf;
   int64_t ts;
   while (fin >> ts) {
-    tf.timestamp = ts * 1e-9;
+    tf.timestamp = static_cast<double>(ts) * 1e-9;
     fin >> tf.tx;
     fin >> tf.ty;
     fin >> tf.tz;

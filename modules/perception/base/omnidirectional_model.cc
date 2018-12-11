@@ -107,11 +107,12 @@ bool OmnidirectionalCameraDistortionModel::set_params(
   intrinsic_params_(1, 2) = params(7);
 
   for (size_t i = 0; i < cam2world_order; ++i) {
-    cam2world_[i] = static_cast<size_t>(params(9 + i));
+    cam2world_[static_cast<uint32_t>(i)] = static_cast<double>(params(9 + i));
   }
 
   for (size_t i = 0; i < world2cam_order; ++i) {
-    world2cam_[i] = static_cast<size_t>(params(10 + cam2world_order + i));
+    world2cam_[static_cast<uint32_t>(i)] =
+        static_cast<double>(params(10 + cam2world_order + i));
   }
 
   return true;

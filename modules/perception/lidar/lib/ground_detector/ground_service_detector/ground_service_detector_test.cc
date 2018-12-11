@@ -130,9 +130,12 @@ TEST_F(LidarLibGroundServiceDetectorTest,
   for (size_t i = 0; i < world_pts.size(); ++i) {
     base::PointD world_pt;
     base::PointF local_pt;
-    local_pt.x = world_pt.x = world_pts[i][0];
-    local_pt.y = world_pt.y = world_pts[i][1];
-    local_pt.z = world_pt.z = world_pts[i][2];
+    world_pt.x = world_pts[i][0];
+    world_pt.y = world_pts[i][1];
+    world_pt.z = world_pts[i][2];
+    local_pt.x = static_cast<float>(world_pts[i][0]);
+    local_pt.y = static_cast<float>(world_pts[i][1]);
+    local_pt.z = static_cast<float>(world_pts[i][2]);
     frame.world_cloud->push_back(world_pt);
     frame.cloud->push_back(local_pt);
   }

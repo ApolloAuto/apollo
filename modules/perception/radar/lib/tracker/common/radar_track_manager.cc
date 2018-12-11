@@ -31,10 +31,10 @@ int RadarTrackManager::RemoveLostTracks() {
       ++track_count;
     }
   }
-  int removed_count = static_cast<int>(tracks_.size()) - track_count;
+  int removed_count = static_cast<int>(tracks_.size() - track_count);
   ADEBUG << "Remove " << removed_count << " tracks";
   tracks_.resize(track_count);
-  return track_count;
+  return static_cast<int>(track_count);
 }
 
 void RadarTrackManager::ClearTracks() { tracks_.clear(); }

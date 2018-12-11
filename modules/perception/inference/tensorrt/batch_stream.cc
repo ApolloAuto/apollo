@@ -31,7 +31,7 @@ BatchStream::BatchStream(int batchSize, int maxBatches, std::string dataPath)
   FILE *file = fopen((mPath + "Batch0").c_str(), "rb");
   if (file != nullptr) {
     int d[4];
-    int fs = fread(d, sizeof(int), 4, file);
+    int fs = static_cast<int>(fread(d, sizeof(int), 4, file));
     CHECK_EQ(fs, 4);
     mDims = nvinfer1::DimsNCHW{d[0], d[1], d[2], d[3]};
     fclose(file);
@@ -99,7 +99,7 @@ bool BatchStream::update() {
   }
 
   int d[4];
-  int fs = fread(d, sizeof(int), 4, file);
+  int fs = static_cast<int>(fread(d, sizeof(int), 4, file));
   CHECK_EQ(fs, 4);
   CHECK(mDims.n() == d[0] && mDims.c() == d[1] && mDims.h() == d[2] &&
         mDims.w() == d[3]);

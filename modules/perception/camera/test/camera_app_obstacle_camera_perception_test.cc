@@ -110,7 +110,7 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
   std::string image_name;
   std::map<std::string, float> name_camera_ground_height_map;
   std::map<std::string, float> name_camera_pitch_angle_diff_map;
-  name_camera_ground_height_map["onsemi_obstacle"] = 1.6;
+  name_camera_ground_height_map["onsemi_obstacle"] = 1.6f;
   name_camera_pitch_angle_diff_map["onsemi_obstacle"] = 0.0;
   float pitch_angle = 0.f;
   perception.SetCameraHeightAndPitch(name_camera_ground_height_map,

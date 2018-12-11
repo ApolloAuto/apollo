@@ -131,9 +131,9 @@ int evaluate_image_list() {
       int idxx = 0;
       for (int idx = 0; idx < count / FLAGS_image_channel_num; idx++) {
         idxx = idx * FLAGS_image_channel_num;
-        cpu_data[idxx] = img.data[idxx] - image_c0;
-        cpu_data[idxx + 1] = img.data[idxx + 1] - image_c1;
-        cpu_data[idxx + 2] = img.data[idxx + 2] - image_c2;
+        cpu_data[idxx] = static_cast<float>(img.data[idxx] - image_c0);
+        cpu_data[idxx + 1] = static_cast<float>(img.data[idxx + 1] - image_c1);
+        cpu_data[idxx + 2] = static_cast<float>(img.data[idxx + 2] - image_c2);
       }
     } else {
       for (int ri = 0; ri < height; ++ri) {
@@ -142,9 +142,12 @@ int evaluate_image_list() {
         int row_idx2 = (2 * height + ri) * width;
         auto img_ptr = img.ptr<cv::Vec3b>(ri);
         for (int cj = 0; cj < width; ++cj) {
-          cpu_data[row_idx0 + cj] = img_ptr[cj][0] - image_c0;
-          cpu_data[row_idx1 + cj] = img_ptr[cj][1] - image_c1;
-          cpu_data[row_idx2 + cj] = img_ptr[cj][2] - image_c2;
+          cpu_data[row_idx0 + cj] =
+              static_cast<float>(img_ptr[cj][0] - image_c0);
+          cpu_data[row_idx1 + cj] =
+              static_cast<float>(img_ptr[cj][1] - image_c1);
+          cpu_data[row_idx2 + cj] =
+              static_cast<float>(img_ptr[cj][2] - image_c2);
         }
       }
     }

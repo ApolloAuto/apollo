@@ -108,7 +108,8 @@ void MlfMotionFilter::UpdateWithoutObject(const MlfFilterOptions& options,
 }
 
 void MlfMotionFilter::InitializeTrackState(TrackedObjectPtr new_object) {
-  new_object->boostup_need_history_size = boostup_history_size_minimum_;
+  new_object->boostup_need_history_size =
+      static_cast<int>(boostup_history_size_minimum_);
   new_object->convergence_confidence = use_convergence_boostup_ ? 0.0 : 1.0;
   new_object->converged = use_convergence_boostup_ ? false : true;
   new_object->update_quality = 1.0;
@@ -299,7 +300,8 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
     object->belief_velocity_online_covariance.block<2, 2>(0, 0) =
         velocity_resisual.head<2>() * velocity_resisual.head<2>().transpose();
   }
-  object->belief_velocity_online_covariance /= evaluate_window;
+  object->belief_velocity_online_covariance /= static_cast<double>(
+                                                   evaluate_window);
   object->belief_velocity_online_covariance += Eigen::Matrix3d::Identity() *
       noise_maximum_ * noise_maximum_;
   object->output_velocity_uncertainty =
@@ -382,7 +384,8 @@ void MlfMotionFilter::ComputeConvergenceConfidence(
         min_convergence_confidence_score = convergence_score_list[i];
       }
     }
-    new_object->convergence_confidence = min_convergence_confidence_score;
+    new_object->convergence_confidence =
+        static_cast<float>(min_convergence_confidence_score);
   } else {
     double mean_convergence_confidence_score = 0;  // mean
     for (size_t i = 0; i < static_cast<size_t>(boostup_need_history_size);
@@ -390,7 +393,8 @@ void MlfMotionFilter::ComputeConvergenceConfidence(
       mean_convergence_confidence_score += convergence_score_list[i];
     }
     mean_convergence_confidence_score /= boostup_need_history_size;
-    new_object->convergence_confidence = mean_convergence_confidence_score;
+    new_object->convergence_confidence =
+        static_cast<float>(mean_convergence_confidence_score);
   }
 }
 
@@ -410,7 +414,7 @@ void MlfMotionFilter::BoostupState(const MlfTrackDataConstPtr& track_data,
   int actual_boostup_history_size =
       static_cast<size_t>(boostup_need_history_size) >
               track_data->history_objects_.size()
-          ? track_data->history_objects_.size()
+          ? static_cast<int>(track_data->history_objects_.size())
           : boostup_need_history_size;
   int boostup_used_history_size = 0;
   auto& history_objects = track_data->history_objects_;

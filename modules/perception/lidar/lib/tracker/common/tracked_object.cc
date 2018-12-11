@@ -240,7 +240,8 @@ void TrackedObject::ComputeShapeFeatures() {
   // 2. compute object's shape feature
   shape_features_full.resize(histogram_bin_size * 7);
   FeatureDescriptor fd(&(object_ptr->lidar_supplement.cloud));
-  fd.ComputeHistogram(histogram_bin_size, shape_features_full.data());
+  fd.ComputeHistogram(static_cast<int>(histogram_bin_size),
+                      shape_features_full.data());
 
   size_t feature_len = histogram_bin_size * 3;
   shape_features.clear();

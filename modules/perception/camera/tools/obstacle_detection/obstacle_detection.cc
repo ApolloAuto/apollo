@@ -120,14 +120,16 @@ bool LoadFromKitti(const std::string &kitti_path, CameraFrame *frame) {
         &obj->theta, &score);
     AINFO << "fscanf return: " << ret;
     if (FLAGS_dist_type == "H-from-h")  {
-      obj->size[0] = obj->center[2];
+      obj->size[0] = static_cast<float>(obj->center[2]);
     } else if (FLAGS_dist_type == "H-on-h")  {
-      obj->size[0] = obj->center[2] * (y2 - y1);
+      obj->size[0] = static_cast<float>(obj->center[2]) * (y2 - y1);
     }
     obj->camera_supplement.box.xmin = std::max<float>(x1, 0);
     obj->camera_supplement.box.ymin = std::max<float>(y1, 0);
-    obj->camera_supplement.box.xmax = std::min<float>(x2, FLAGS_width);
-    obj->camera_supplement.box.ymax = std::min<float>(y2, FLAGS_height);
+    obj->camera_supplement.box.xmax =
+             std::min<float>(x2, static_cast<float>(FLAGS_width));
+    obj->camera_supplement.box.ymax =
+             std::min<float>(y2, static_cast<float>(FLAGS_height));
     obj->camera_supplement.area_id = 5;
 
     obj->sub_type = GetObjectSubType(type);
@@ -278,15 +280,19 @@ int main() {
               supp.cut_off_ratios[3]);
       if (FLAGS_vis_dir != "") {
         cv::rectangle(cv_img,
-                      cv::Point(box.xmin, box.ymin),
-                      cv::Point(box.xmax, box.ymax),
+                      cv::Point(static_cast<int>(box.xmin),
+                                static_cast<int>(box.ymin)),
+                      cv::Point(static_cast<int>(box.xmax),
+                                static_cast<int>(box.ymax)),
                       cv::Scalar(0, 0, 0), 8);
         float xmid = (box.xmin + box.xmax) / 2;
         CHECK(area_id > 0 && area_id < 9);
         if (area_id % 2 == 1) {
           cv::rectangle(cv_img,
-                        cv::Point(box.xmin, box.ymin),
-                        cv::Point(box.xmax, box.ymax),
+                        cv::Point(static_cast<int>(box.xmin),
+                                  static_cast<int>(box.ymin)),
+                        cv::Point(static_cast<int>(box.xmax),
+                                  static_cast<int>(box.ymax)),
                         kFaceColorMap[area_id / 2], 2);
         } else {
           auto &tl = supp.cut_off_ratios[2];
@@ -305,12 +311,16 @@ int main() {
             xmid = x + w * left_ratio;
           }
           cv::rectangle(cv_img,
-                        cv::Point(box.xmin, box.ymin),
-                        cv::Point(xmid, box.ymax),
+                        cv::Point(static_cast<int>(box.xmin),
+                                  static_cast<int>(box.ymin)),
+                        cv::Point(static_cast<int>(xmid),
+                                  static_cast<int>(box.ymax)),
                         kFaceColorMap[(area_id / 2) % 4], 3);
           cv::rectangle(cv_img,
-                        cv::Point(xmid, box.ymin),
-                        cv::Point(box.xmax, box.ymax),
+                        cv::Point(static_cast<int>(xmid),
+                                  static_cast<int>(box.ymin)),
+                        cv::Point(static_cast<int>(box.xmax),
+                                  static_cast<int>(box.ymax)),
                         kFaceColorMap[area_id / 2 - 1], 2);
         }
         fprintf(stderr, "obj-%02d: %.3f %.3f %.3f %.3f -- %.3f %.3f %.3f %.3f "
@@ -324,8 +334,11 @@ int main() {
         std::stringstream text;
         auto &name = base::kSubType2NameMap.at(obj->sub_type);
         text << name[0] << name[1] << name[2] << " - " << obj_id++;
-        cv::putText(cv_img, text.str(), cv::Point(box.xmin, box.ymin),
-            cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(255, 0, 0), 2);
+        cv::putText(cv_img,
+                    text.str(),
+                    cv::Point(static_cast<int>(box.xmin),
+                              static_cast<int>(box.ymin)),
+                    cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(255, 0, 0), 2);
       }
     }
     if (FLAGS_vis_dir != "") {

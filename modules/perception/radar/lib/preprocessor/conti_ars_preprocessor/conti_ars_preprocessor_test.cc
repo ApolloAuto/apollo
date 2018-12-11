@@ -34,13 +34,13 @@ class ContiArsPreprocessorTest : public testing::Test {
 };
 
 TEST_F(ContiArsPreprocessorTest, init) {
-  float delay_time = preprocessor.GetDelayTime();
+  float delay_time = static_cast<float>(preprocessor.GetDelayTime());
   EXPECT_FLOAT_EQ(delay_time, 0.0);
   FLAGS_work_root = "/apollo/modules/perception/testdata/"
       "radar/preprocessor";
   bool init_result = preprocessor.Init();
   EXPECT_TRUE(init_result);
-  delay_time = preprocessor.GetDelayTime();
+  delay_time = static_cast<float>(preprocessor.GetDelayTime());
   EXPECT_FLOAT_EQ(delay_time, 0.07);
   EXPECT_EQ(preprocessor.Name(), "ContiArsPreprocessor");
 }

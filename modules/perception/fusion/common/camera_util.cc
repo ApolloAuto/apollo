@@ -59,7 +59,9 @@ bool Pt3dToCamera2d(const Eigen::Vector3d& pt3d,
       world2camera_pose * Eigen::Vector4d(pt3d(0), pt3d(1), pt3d(2), 1);
   if (local_pt[2] > 0) {
     *pt2d = (camera_model->Project(
-                 Eigen::Vector3f(local_pt[0], local_pt[1], local_pt[2])))
+                 Eigen::Vector3f(static_cast<float>(local_pt[0]),
+                                 static_cast<float>(local_pt[1]),
+                                 static_cast<float>(local_pt[2]))))
                 .cast<double>();
     return true;
   }
@@ -92,12 +94,13 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
   if (!world2sensor_pose.allFinite()) {
     return in_view_ratio;
   }
-  double width = camera_model->get_width();
-  double height = camera_model->get_height();
+  double width = static_cast<double>(camera_model->get_width());
+  double height = static_cast<double>(camera_model->get_height());
 
   double time_diff =
       camera_ts - sensor_object->GetBaseObject()->latest_tracked_time;
-  Eigen::Vector3f offset = sensor_object->GetBaseObject()->velocity * time_diff;
+  Eigen::Vector3f offset = sensor_object->GetBaseObject()->velocity *
+                           static_cast<float>(time_diff);
   if (!motion_compensation) {
     offset.setZero();
   }
@@ -114,7 +117,7 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
   double obj_height = sensor_object->GetBaseObject()->size(2);
   if (cloud.size() > 0) {
     // use point cloud
-    int point_num = cloud.size();
+    int point_num = static_cast<int>(cloud.size());
     int in_view_point_num = 0;
     for (int i = 0; i < point_num; ++i) {
       const auto& pt = cloud.at(i);
@@ -126,7 +129,7 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
         ++in_view_point_num;
       }
     }
-    in_view_ratio = static_cast<double>(in_view_point_num) / point_num;
+    in_view_ratio = static_cast<float>(in_view_point_num / point_num);
     if (all_in) {
       in_view_ratio = (in_view_point_num == point_num) ? 1.0 : 0.0;
     }
@@ -161,7 +164,8 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
         bottom_right.cwiseMin(Eigen::Vector2d(width, height));
     Eigen::Vector2d bound_box_size = bound_bottom_right - bound_top_left;
     if ((bound_box_size.array() > 0.0).all()) {
-      in_view_ratio = bound_box_size.prod() / box_size.prod();
+      in_view_ratio = static_cast<float>(bound_box_size.prod() /
+                                         box_size.prod());
     } else {
       in_view_ratio = 0.0;
     }
@@ -191,7 +195,8 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
   };
   Eigen::Vector4d center3d_local = world2sensor_pose * center.homogeneous();
   double dist_to_camera = center3d_local.z();
-  return in_view_ratio * sigmoid_like_fun(dist_to_camera);
+  return static_cast<float>(in_view_ratio *
+                            sigmoid_like_fun(dist_to_camera));
 }
 
 }  // namespace fusion

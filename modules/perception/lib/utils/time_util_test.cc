@@ -46,7 +46,7 @@ TEST(TimeUtilTest, TestGetCurrentTime) {
   for (int i = 0; i < 20; i++) {
     const double unix_time = TimeUtil::GetCurrentTime();
     uint64_t current_time = ::time(NULL);
-    if (std::fabs(unix_time - current_time) < 1) {
+    if (std::fabs(unix_time - static_cast<double>(current_time)) < 1) {
       return;
     }
     usleep(50000);  // 50ms

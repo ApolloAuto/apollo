@@ -52,13 +52,17 @@ bool OnlineCalibrationService::Init(
   calibrator_init_options.image_width = options.image_width;
   calibrator_init_options.image_height = options.image_height;
   calibrator_init_options.focal_x =
-                    name_camera_status_map_[master_sensor_name_].k_matrix[0];
+                 static_cast<float>(
+                     name_camera_status_map_[master_sensor_name_].k_matrix[0]);
   calibrator_init_options.focal_y =
-                    name_camera_status_map_[master_sensor_name_].k_matrix[4];
+                 static_cast<float>(
+                     name_camera_status_map_[master_sensor_name_].k_matrix[4]);
   calibrator_init_options.cx =
-                    name_camera_status_map_[master_sensor_name_].k_matrix[2];
+                 static_cast<float>(
+                     name_camera_status_map_[master_sensor_name_].k_matrix[2]);
   calibrator_init_options.cy =
-                    name_camera_status_map_[master_sensor_name_].k_matrix[5];
+                 static_cast<float>(
+                     name_camera_status_map_[master_sensor_name_].k_matrix[5]);
   calibrator_.reset(BaseCalibratorRegisterer::
                     GetInstanceByName(options.calibrator_method));
   CHECK(calibrator_ != nullptr);

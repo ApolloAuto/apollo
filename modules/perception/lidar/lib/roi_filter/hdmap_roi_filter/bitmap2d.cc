@@ -108,7 +108,7 @@ inline Bitmap2D::Vec3ui Bitmap2D::RealToBitmap(const Eigen::Vector2d& p) const {
 
 // calc index by bitmap index;
 inline int Bitmap2D::Index(const Bitmap2D::Vec3ui& p) const {
-  return p.x() * map_size_[1] + p.y();
+  return static_cast<int>(p.x() * map_size_[1] + p.y());
 }
 
 // range check

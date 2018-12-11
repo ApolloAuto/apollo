@@ -26,7 +26,8 @@ namespace lidar {
 void SppEngine::Init(size_t width, size_t height, float range,
                      const SppParams& param, const std::string& sensor_name) {
   // initialize connect component detector
-  detector_2d_cc_.Init(height, width);
+  detector_2d_cc_.Init(static_cast<int>(height),
+                       static_cast<int>(width));
   detector_2d_cc_.SetData(data_.obs_prob_data_ref, data_.offset_data,
                           static_cast<float>(height) / (2.f * range),
                           data_.objectness_threshold);
@@ -89,7 +90,7 @@ size_t SppEngine::ProcessConnectedComponentCluster(
   // and they shared the same cluster pointer
   clusters_ = labels_2d_;
   for (size_t i = 0; i < point_cloud->size(); ++i) {
-    if (mask.size() && mask[i] == 0) {
+    if (mask.size() && mask[static_cast<int>(i)] == 0) {
       continue;
     }
     // out of range
@@ -105,7 +106,7 @@ size_t SppEngine::ProcessConnectedComponentCluster(
     if (point.z <=
         labels_2d_.GetCluster(label - 1)->top_z + data_.top_z_threshold) {
       clusters_.AddPointSample(label - 1, point, point_cloud->points_height(i),
-                               i);
+                               static_cast<uint32_t>(i));
     }
   }
   double mapping_time = timer.toc(true);
@@ -139,7 +140,7 @@ size_t SppEngine::RemoveGroundPointsInForegroundCluster(
   mask_.Flip();
   // at this time, all ground points has mask value 0
   for (size_t i = 0; i < clusters_.size(); ++i) {
-    clusters_[i]->RemovePoints(mask_);
+    clusters_[static_cast<int>(i)]->RemovePoints(mask_);
   }
   clusters_.RemoveEmptyClusters();
   return clusters_.size();

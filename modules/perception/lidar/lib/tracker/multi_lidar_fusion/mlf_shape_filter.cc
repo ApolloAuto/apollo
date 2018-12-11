@@ -55,8 +55,10 @@ void MlfShapeFilter::UpdateWithObject(const MlfFilterOptions& options,
     hull_.GetConvexHull(obj->lidar_supplement.cloud_world, &obj->polygon);
   } else {
     hull_.GetConvexHullWithoutGroundAndHead(
-        obj->lidar_supplement.cloud_world, bottom_points_ignore_threshold_,
-        top_points_ignore_threshold_, &obj->polygon);
+        obj->lidar_supplement.cloud_world,
+        static_cast<float>(bottom_points_ignore_threshold_),
+        static_cast<float>(top_points_ignore_threshold_),
+        &obj->polygon);
   }
   // simple moving average orientation filtering
   if (track_data->age_ > 0) {

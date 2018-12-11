@@ -81,8 +81,8 @@ TEST(OnlineCalibrationServiceTest, online_calibration_service_test) {
     EXPECT_TRUE(online_calib_service->BuildIndex());
     EXPECT_TRUE(online_calib_service->QueryGroundPlaneInCameraFrame(&plane));
 
-    int x = principal_x;
-    int y = principal_y + 200;
+    int x = static_cast<int>(principal_x);
+    int y = static_cast<int>(principal_y) + 200;
 
     Eigen::Vector3d point3d;
     EXPECT_TRUE(online_calib_service->QueryPoint3dOnGroundPlane(x,

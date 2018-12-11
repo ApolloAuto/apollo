@@ -153,7 +153,9 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
                                               vt(2) + offset(2), 1.0);
       if (project_vt(2) <= 0) continue;
       Eigen::Vector2f project_vt2f = camera_model->Project(
-          Eigen::Vector3f(project_vt(0), project_vt(1), project_vt(2)));
+          Eigen::Vector3f(static_cast<float>(project_vt(0)),
+                          static_cast<float>(project_vt(1)),
+                          static_cast<float>(project_vt(2))));
       if (!IsPtInFrustum(project_vt2f, width, height)) continue;
       is_all_lidar_3d_vertices_outside_frustum = false;
       break;
@@ -177,7 +179,9 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
                                               pt.z + offset(2), 1.0);
       if (project_pt(2) <= 0) continue;
       Eigen::Vector2f project_pt2f = camera_model->Project(
-          Eigen::Vector3f(project_pt(0), project_pt(1), project_pt(2)));
+          Eigen::Vector3f(static_cast<float>(project_pt(0)),
+                          static_cast<float>(project_pt(1)),
+                          static_cast<float>(project_pt(2))));
       if (!IsPtInFrustum(project_pt2f, width, height)) continue;
       if (project_pt2f.x() < xmin) xmin = project_pt2f.x();
       if (project_pt2f.y() < ymin) ymin = project_pt2f.y();
@@ -473,7 +477,9 @@ float TrackObjectDistance::ComputeLidarCamera(
                                  &projected_velo_ct);
     if (projected_velo_ct[2] > 0) {
       Eigen::Vector2f project_pt2f = camera_model->Project(Eigen::Vector3f(
-          projected_velo_ct[0], projected_velo_ct[1], projected_velo_ct[2]));
+          static_cast<float>(projected_velo_ct[0]),
+          static_cast<float>(projected_velo_ct[1]),
+          static_cast<float>(projected_velo_ct[2])));
       Eigen::Vector2d project_pt2d = project_pt2f.cast<double>();
       Eigen::Vector2d ct_diff = project_pt2d - box2d_ct;
       distance = static_cast<float>(ct_diff.norm()) *
@@ -532,7 +538,9 @@ float TrackObjectDistance::ComputeRadarCamera(
   if (local_pt[2] > 0) {
     Eigen::Vector3f pt3f;
     pt3f << camera_model->Project(
-        Eigen::Vector3f(local_pt[0], local_pt[1], local_pt[2])),
+        Eigen::Vector3f(static_cast<float>(local_pt[0]),
+                        static_cast<float>(local_pt[1]),
+                        static_cast<float>(local_pt[2]))),
         static_cast<float>(local_pt[2]);
     Eigen::Vector3d pt3d = pt3f.cast<double>();
     if (IsPtInFrustum(pt3d, width, height)) {

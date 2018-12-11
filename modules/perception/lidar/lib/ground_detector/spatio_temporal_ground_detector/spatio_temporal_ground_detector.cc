@@ -139,7 +139,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
   } else {
     for (i = 0; i < num_points; ++i) {
       const auto& pt = frame->world_cloud->at(i);
-      point_indices_temp_[valid_point_num++] = i;
+      point_indices_temp_[valid_point_num++] = static_cast<int>(i);
       data_[data_id++] = static_cast<float>(pt.x - cloud_center_(0));
       data_[data_id++] = static_cast<float>(pt.y - cloud_center_(1));
       data_[data_id++] = static_cast<float>(pt.z - cloud_center_(2));

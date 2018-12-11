@@ -73,7 +73,7 @@ bool ObjPostProcessor::AdjustCenterWithGround(
     return false;
   }
   const float MIN_COST = hwl[2] * params_.sampling_ratio_low;
-  const float EPS_COST_DELTA = 1e-1;
+  const float EPS_COST_DELTA = 1e-1f;
   const float WEIGHT_IOU = params_.weight_iou;
   const int MAX_ITERATION = params_.max_nr_iter;
 
@@ -141,7 +141,7 @@ bool ObjPostProcessor::PostRefineCenterWithGroundBoundary(
   }
 
   float iou_before = GetProjectionScore(ry, bbox, hwl, center);
-  int nr_line_segs = line_seg_limits.size();
+  int nr_line_segs = static_cast<int>(line_seg_limits.size());
   float depth_pts[4] = {0};
   float pts_c[12] = {0};
   int x_pts[4] = {0};

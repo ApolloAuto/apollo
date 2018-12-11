@@ -160,8 +160,8 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   const int width_image = frame.data_provider->src_width();
   const int height_image = frame.data_provider->src_height();
   ObjMapperParams params;
-  float min_x = params.boundary_len;
-  float min_y = params.boundary_len;
+  float min_x = static_cast<float>(params.boundary_len);
+  float min_y = static_cast<float>(params.boundary_len);
   float max_x = static_cast<float>(width_image - params.boundary_len);
   float max_y = static_cast<float>(height_image - params.boundary_len);
   obj->size(2) = 1.6182f;

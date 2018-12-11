@@ -76,7 +76,7 @@ bool TransformCache::QueryTransform(double timestamp,
     return false;
   }
 
-  int size = transforms_.size();
+  int size = static_cast<int>(transforms_.size());
   if (size == 1) {
     (*transform) = transforms_.back();
     transform->timestamp = timestamp;
@@ -221,7 +221,8 @@ bool TransformWrapper::QueryTrans(double timestamp, StampedTransform* trans,
   cyber::Time query_time(timestamp);
   std::string err_string;
   if (!tf2_buffer_->canTransform(frame_id, child_frame_id, query_time,
-                                 FLAGS_obs_tf2_buff_size, &err_string)) {
+                                 static_cast<float>(FLAGS_obs_tf2_buff_size),
+                                 &err_string)) {
     AERROR << "Can not find transform. " << std::to_string(timestamp)
            << " frame_id: " << frame_id << " child_frame_id: " << child_frame_id
            << " Error info: " << err_string;

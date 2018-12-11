@@ -225,7 +225,7 @@ bool CNNSegmentation::InitClusterAndBackgroundSegmentation() {
 
 void CNNSegmentation::MapPointToGrid(
     const std::shared_ptr<AttributePointCloud<PointF>>& pc_ptr) {
-  float inv_res_x = 0.5 * static_cast<float>(width_) / range_;
+  float inv_res_x = 0.5f * static_cast<float>(width_) / range_;
   // float inv_res_y = 0.5 * static_cast<float>(height_) / range_;
   point2grid_.assign(pc_ptr->size(), -1);
   int pos_x = -1;
@@ -352,7 +352,7 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   objects->clear();
   base::ObjectPool::Instance().BatchGet(clusters.size(), objects);
   size_t valid = 0;
-  for (size_t i = 0; i < clusters.size(); ++i) {
+  for (int i = 0; i < static_cast<int>(clusters.size()); ++i) {
     if (clusters[i]->points.size() <= cnnseg_param_.min_pts_num() &&
         clusters[i]->pixels.size() < cnnseg_param_.min_pts_num()) {
       continue;
@@ -407,10 +407,10 @@ void CNNSegmentation::GetObjectsFromSppEngine(
       // object->direction[1] = sin(cluster->yaw);
       // 2018.6.21, switch to axis rotated projection
       // should be reverted after retrain model.
-      static const float quater_pi = M_PI * 0.25f;
+      static const float quater_pi = static_cast<float>(M_PI) * 0.25f;
       object->theta = cluster->yaw - quater_pi;
-      object->direction[0] = cos(cluster->yaw - quater_pi);
-      object->direction[1] = sin(cluster->yaw - quater_pi);
+      object->direction[0] = cosf(cluster->yaw - quater_pi);
+      object->direction[1] = sinf(cluster->yaw - quater_pi);
       object->direction[2] = 0;
       object->lidar_supplement.is_orientation_ready = true;
     }

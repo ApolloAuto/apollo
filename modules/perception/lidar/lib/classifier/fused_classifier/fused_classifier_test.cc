@@ -135,8 +135,8 @@ void FusedClassifierTest::BuildObjectsBadTimestamp() {
       ls.raw_probs.resize(
           2, std::vector<float>(
                  static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
-      GenerateSmoothProb(&ls.raw_probs[0], j, 0.9);
-      GenerateSmoothProb(&ls.raw_probs[1], j, 0.7);
+      GenerateSmoothProb(&ls.raw_probs[0], j, 0.9f);
+      GenerateSmoothProb(&ls.raw_probs[1], j, 0.7f);
     }
     timestamps_[i] = static_cast<double>(i) * 0.1;
   }
@@ -157,8 +157,8 @@ void FusedClassifierTest::BuildObjects() {
       ls.raw_probs.resize(
           2, std::vector<float>(
                  static_cast<int>(base::ObjectType::MAX_OBJECT_TYPE), 0.f));
-      GenerateSmoothProb(&ls.raw_probs[0], j, 0.9);
-      GenerateSmoothProb(&ls.raw_probs[1], j, 0.7);
+      GenerateSmoothProb(&ls.raw_probs[0], j, 0.9f);
+      GenerateSmoothProb(&ls.raw_probs[1], j, 0.7f);
     }
     timestamps_[i] = static_cast<double>(i) * 0.1;
   }

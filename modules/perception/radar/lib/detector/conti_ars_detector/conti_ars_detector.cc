@@ -98,12 +98,16 @@ void ContiArsDetector::RawObs2Frame(
                                      * vel_rms.transpose()
                                      * radar2world_rotate_t).cast<float>();
     double local_obj_theta = radar_obs.oritation_angle() / 180.0 * PI;
-    Eigen::Vector3f direction(cos(local_obj_theta), sin(local_obj_theta), 0);
+    Eigen::Vector3f direction(static_cast<float>(cos(local_obj_theta)),
+                              static_cast<float>(sin(local_obj_theta)),
+                              0.0f);
     direction =  radar2world_rotate.cast<float>() * direction;
     radar_object->direction = direction;
     radar_object->theta = std::atan2(direction(1), direction(0));
-    radar_object->theta_variance = radar_obs.oritation_angle_rms() / 180.0 * PI;
-    radar_object->confidence = radar_obs.probexist();
+    radar_object->theta_variance = static_cast<float>(
+                                     radar_obs.oritation_angle_rms() /
+                                     180.0 * PI);
+    radar_object->confidence = static_cast<float>(radar_obs.probexist());
 
     int motion_state = radar_obs.dynprop();
     if (motion_state == CONTI_MOVING
@@ -128,21 +132,21 @@ void ContiArsDetector::RawObs2Frame(
        radar_object->type = base::ObjectType::UNKNOWN;
     }
 
-    radar_object->size(0) = radar_obs.length();
-    radar_object->size(1) = radar_obs.width();
-    radar_object->size(2) = 2.0;    // vehicle template (pnc required)
+    radar_object->size(0) = static_cast<float>(radar_obs.length());
+    radar_object->size(1) = static_cast<float>(radar_obs.width());
+    radar_object->size(2) = 2.0f;    // vehicle template (pnc required)
     if (cls == CONTI_POINT) {
-      radar_object->size(0) = 1.0;
-      radar_object->size(1) = 1.0;
+      radar_object->size(0) = 1.0f;
+      radar_object->size(1) = 1.0f;
     }
     // extreme case protection
     if (radar_object->size(0) * radar_object->size(1) < 1.0e-4) {
       if (cls == CONTI_CAR || cls == CONTI_TRUCK) {
-        radar_object->size(0) = 4.0;
-        radar_object->size(1) = 1.6;   // vehicle template
+        radar_object->size(0) = 4.0f;
+        radar_object->size(1) = 1.6f;   // vehicle template
       } else {
-        radar_object->size(0) = 1.0;
-        radar_object->size(1) = 1.0;
+        radar_object->size(0) = 1.0f;
+        radar_object->size(1) = 1.0f;
       }
     }
     MockRadarPolygon(radar_object);

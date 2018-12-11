@@ -100,7 +100,7 @@ SensorObjectConstPtr Track::GetLatestSensorObject(
 }
 
 size_t Track::GenerateNewTrackId() {
-  int ret_track_id = s_track_idx_;
+  int ret_track_id = static_cast<int>(s_track_idx_);
   if (s_track_idx_ == UINT_MAX) {
     s_track_idx_ = 1;
   } else {

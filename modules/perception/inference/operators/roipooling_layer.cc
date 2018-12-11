@@ -88,26 +88,26 @@ void ROIPoolingLayer<Dtype>::ForwardCPU(
   int batch_size = feat_bottom->num();
   int top_count = top[0]->count();
   Dtype *top_data = top[0]->mutable_cpu_data();
-  memset(top_data, -1, FLT_MAX * sizeof(Dtype));
+  memset(top_data, -1, static_cast<size_t>(FLT_MAX * sizeof(Dtype)));
   int *argmax_data = max_idx_.mutable_cpu_data();
   memset(argmax_data, -1, top_count * sizeof(int));
   // For each ROI R = [batch_index x1 y1 x2 y2]: max pool over R
   for (int n = 0; n < num_rois; ++n) {
-    int roi_batch_ind = bottom_rois[0];
+    int roi_batch_ind = static_cast<int>(bottom_rois[0]);
     int roi_start_w = 0;
     int roi_start_h = 0;
     int roi_end_w = 0;
     int roi_end_h = 0;
     if (use_floor_) {
-      roi_start_w = floor(bottom_rois[1] * spatial_scale_);
-      roi_start_h = floor(bottom_rois[2] * spatial_scale_);
-      roi_end_w = floor(bottom_rois[3] * spatial_scale_);
-      roi_end_h = floor(bottom_rois[4] * spatial_scale_);
+      roi_start_w = static_cast<int>(floor(bottom_rois[1] * spatial_scale_));
+      roi_start_h = static_cast<int>(floor(bottom_rois[2] * spatial_scale_));
+      roi_end_w = static_cast<int>(floor(bottom_rois[3] * spatial_scale_));
+      roi_end_h = static_cast<int>(floor(bottom_rois[4] * spatial_scale_));
     } else {
-      roi_start_w = round(bottom_rois[1] * spatial_scale_);
-      roi_start_h = round(bottom_rois[2] * spatial_scale_);
-      roi_end_w = round(bottom_rois[3] * spatial_scale_);
-      roi_end_h = round(bottom_rois[4] * spatial_scale_);
+      roi_start_w = static_cast<int>(round(bottom_rois[1] * spatial_scale_));
+      roi_start_h = static_cast<int>(round(bottom_rois[2] * spatial_scale_));
+      roi_end_w = static_cast<int>(round(bottom_rois[3] * spatial_scale_));
+      roi_end_h = static_cast<int>(round(bottom_rois[4] * spatial_scale_));
     }
     CHECK_GE(roi_batch_ind, 0);
     CHECK_LT(roi_batch_ind, batch_size);

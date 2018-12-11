@@ -277,9 +277,10 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   base_track_lidar->track_id = 0;
   base_track_lidar->polygon.resize(4);
   for (size_t i = 0; i < 4; i++) {
-    base_track_lidar->polygon[i].x = 8 + 4 * (i % 2);
-    base_track_lidar->polygon[i].y = -1 + 2 * ((i + 1) % 2);
-    base_track_lidar->polygon[i].z = 0;
+    base_track_lidar->polygon[i].x = static_cast<double>(8 + 4 * (i % 2));
+    base_track_lidar->polygon[i].y = static_cast<double>(
+                                         -1 + 2 * ((i + 1) % 2));
+    base_track_lidar->polygon[i].z = 0.0;
   }
   base_track_lidar->anchor_point = Eigen::Vector3d(10, 0, 0);
   base_track_lidar->type = base::ObjectType::VEHICLE;
@@ -308,9 +309,10 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   base_track_radar->track_id = 0;
   base_track_radar->polygon.resize(4);
   for (size_t i = 0; i < 4; i++) {
-    base_track_radar->polygon[i].x = 8 + 4 * (i % 2);
-    base_track_radar->polygon[i].y = -1 + 2 * ((i + 1) % 2);
-    base_track_radar->polygon[i].z = 0;
+    base_track_radar->polygon[i].x = static_cast<double>(8 + 4 * (i % 2));
+    base_track_radar->polygon[i].y = static_cast<double>(
+                                         -1 + 2 * ((i + 1) % 2));
+    base_track_radar->polygon[i].z = 0.0;
   }
   base_track_radar->anchor_point = Eigen::Vector3d(10, 0, 0);
   base_track_radar->type = base::ObjectType::VEHICLE;
@@ -330,9 +332,10 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   base_track_camera->track_id = 0;
   base_track_camera->polygon.resize(4);
   for (size_t i = 0; i < 4; i++) {
-    base_track_radar->polygon[i].x = 58 + 4 * (i % 2);
-    base_track_radar->polygon[i].y = -1 + 2 * ((i + 1) % 2);
-    base_track_radar->polygon[i].z = 0;
+    base_track_radar->polygon[i].x = static_cast<double>(58 + 4 * (i % 2));
+    base_track_radar->polygon[i].y = static_cast<double>(
+                                         -1 + 2 * ((i + 1) % 2));
+    base_track_radar->polygon[i].z = 0.0;
   }
   base_track_camera->anchor_point = Eigen::Vector3d(10, 0, 0);
   base_track_camera->type = base::ObjectType::VEHICLE;

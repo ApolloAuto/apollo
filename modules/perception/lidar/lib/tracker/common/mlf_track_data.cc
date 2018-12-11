@@ -146,12 +146,15 @@ void MlfTrackData::PredictState(double timestamp) const {
     latest_object->output_velocity;
 
   predict_.state.resize(6);
-  predict_.state(0) = latest_anchor_point(0) + latest_velocity(0) * time_diff;
-  predict_.state(1) = latest_anchor_point(1) + latest_velocity(1) * time_diff;
-  predict_.state(2) = latest_anchor_point(2) + latest_velocity(2) * time_diff;
-  predict_.state(3) = latest_velocity(0);
-  predict_.state(4) = latest_velocity(1);
-  predict_.state(5) = latest_velocity(2);
+  predict_.state(0) = static_cast<float>(latest_anchor_point(0) +
+                                         latest_velocity(0) * time_diff);
+  predict_.state(1) = static_cast<float>(latest_anchor_point(1) +
+                                         latest_velocity(1) * time_diff);
+  predict_.state(2) = static_cast<float>(latest_anchor_point(2) +
+                                         latest_velocity(2) * time_diff);
+  predict_.state(3) = static_cast<float>(latest_velocity(0));
+  predict_.state(4) = static_cast<float>(latest_velocity(1));
+  predict_.state(5) = static_cast<float>(latest_velocity(2));
 
   predict_.timestamp = timestamp;
   // TODO(.): predict cloud and polygon if needed in future.

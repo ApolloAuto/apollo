@@ -57,7 +57,9 @@ void ObstacleReference::Init(const omt::ReferenceParam &ref_param, float width,
 void ObstacleReference::UpdateReference(const CameraFrame *frame,
                                         const std::vector<Target> &targets) {
   std::string sensor = frame->data_provider->sensor_name();
-  SyncGroundEstimator(sensor, frame->camera_k_matrix, img_width_, img_height_);
+  SyncGroundEstimator(sensor, frame->camera_k_matrix,
+                      static_cast<int>(img_width_),
+                      static_cast<int>(img_height_));
   auto &ground_estimator = ground_estimator_mapper_[sensor];
 
   auto &refs = reference_[sensor];
@@ -94,8 +96,10 @@ void ObstacleReference::UpdateReference(const CameraFrame *frame,
 
     AINFO << "Target: " << target.id << " can be Ref. Type: "
              << base::kSubType2NameMap.at(obj->sub_type);
-    int y_discrete = static_cast<int>(y / ref_param_.down_sampling());
-    int x_discrete = static_cast<int>(x / ref_param_.down_sampling());
+    int y_discrete =
+        static_cast<int>(y / static_cast<float>(ref_param_.down_sampling()));
+    int x_discrete =
+        static_cast<int>(x / static_cast<float>(ref_param_.down_sampling()));
     if (ref_map[y_discrete][x_discrete] == 0) {
       Reference r;
       r.area = box.Area();
@@ -176,8 +180,9 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
                      (supplement.box.ymax - supplement.box.ymin);
 
       // h from ground detection
-      SyncGroundEstimator(sensor, frame->camera_k_matrix, img_width_,
-                          img_height_);
+      SyncGroundEstimator(sensor, frame->camera_k_matrix,
+                          static_cast<int>(img_width_),
+                          static_cast<int>(img_height_));
       auto &ground_estimator = ground_estimator_mapper_[sensor];
       float l[3] = {0};
       if (ground_estimator.GetGroundModel(l)) {
@@ -185,7 +190,7 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
             (-l[0] * supplement.box.ymax - l[2]) * common::IRec(l[1]);
         double z_ground = common::IRec(z_ground_reversed);
         z_ground = std::max(z_ground, z_obj);
-        float k2 = z_ground / frame->camera_k_matrix(1, 1);
+        float k2 = static_cast<float>(z_ground / frame->camera_k_matrix(1, 1));
         float h = k2 * (supplement.box.ymax - supplement.box.ymin);
         h = std::max(std::min(h, kMaxTemplateHWL.at(obj->sub_type).at(0)),
                      kMinTemplateHWL.at(obj->sub_type).at(0));
@@ -200,7 +205,8 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
             static_cast<int>(supplement.box.ymax), &z_calib);
         if (success) {
           z_calib = std::max(z_calib, z_obj);
-          float k2 = z_calib / frame->camera_k_matrix(1, 1);
+          float k2 = static_cast<float>(
+                         z_calib / frame->camera_k_matrix(1, 1));
           float h = k2 * (supplement.box.ymax - supplement.box.ymin);
           h = std::max(std::min(h, kMaxTemplateHWL.at(obj->sub_type).at(0)),
                        kMinTemplateHWL.at(obj->sub_type).at(0));
@@ -220,8 +226,10 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
           // pick out the refs close enough in y directions
           float dy = std::abs(reference.ymax - supplement.box.ymax);
           float scale_y = (supplement.box.ymax - cy) / (img_height_ - cy);
-          float thres_dy = std::max(ref_param_.down_sampling() * scale_y,
-                                    ref_param_.margin() * 2.0f);
+          float thres_dy = std::max(
+                             static_cast<float>(ref_param_.down_sampling()) *
+                             scale_y,
+                             static_cast<float>(ref_param_.margin()) * 2.0f);
           if (dy < thres_dy) {
             float k2 = reference.k;
             k2 *= (reference.ymax - cy) / (supplement.box.ymax - cy);
@@ -237,7 +245,7 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
 
       CHECK_GT(height.size(), 0);
       std::sort(height.begin(), height.end());
-      int nr_hs = height.size();
+      int nr_hs = static_cast<int>(height.size());
       float h_updated = height[nr_hs / 2];
       AINFO << "Estimate " << h_updated << " with " << height.size();
       obj->size[2] =

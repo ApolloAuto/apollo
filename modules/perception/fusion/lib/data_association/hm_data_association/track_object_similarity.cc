@@ -79,7 +79,7 @@ double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
     diff.y() = std::max(diff.y(), velo_pt2d->y() - camera_bbox.ymax);
     mean_pixel_dist += diff;
   }
-  mean_pixel_dist /= object->Size();
+  mean_pixel_dist /= static_cast<double>(object->Size());
   ADEBUG << "mean_pixel_dist is: " << mean_pixel_dist;
   // normalize according to box size
   Eigen::Vector2d box_size = Eigen::Vector2d(
@@ -284,10 +284,14 @@ double ComputeRadarCameraVelocitySimilarity(
     const float max_velocity_p = 0.9f;
     const float th_velocity_p = 0.5f;
     float velocity_score =
-        1 - ChiSquaredCdf1TableFun(diff_velocity_ratio * diff_velocity_ratio /
-                                   velocity_std / velocity_std);
-    velocity_score =
-        ScalePositiveProbability(velocity_score, max_velocity_p, th_velocity_p);
+        static_cast<float>(1 - ChiSquaredCdf1TableFun(diff_velocity_ratio *
+                                                      diff_velocity_ratio /
+                                                      velocity_std /
+                                                      velocity_std));
+    velocity_score = static_cast<float>(
+                         ScalePositiveProbability(velocity_score,
+                                                  max_velocity_p,
+                                                  th_velocity_p));
     return velocity_score;
   } else {
     return 0.5;

@@ -55,12 +55,13 @@ void MlfMotionMeasurement::MeasurementSelection(
     const MlfTrackDataConstPtr& track_data,
     const TrackedObjectConstPtr& latest_object, TrackedObjectPtr new_object) {
   // Select measured velocity among candidates according motion consistency
-  int corner_index = 0;
+  int64_t corner_index = 0;
   float corner_velocity_gain = 0.0f;
   std::vector<float> corner_velocity_gain_norms(4);
   for (int i = 0; i < 4; ++i) {
-    corner_velocity_gain_norms[i] = (new_object->measured_corners_velocity[i] -
-                                     latest_object->belief_velocity).norm();
+    corner_velocity_gain_norms[i] = static_cast<float>(
+                                    (new_object->measured_corners_velocity[i] -
+                                     latest_object->belief_velocity).norm());
   }
   std::vector<float>::iterator corener_min_gain =
       std::min_element(std::begin(corner_velocity_gain_norms),
@@ -70,13 +71,15 @@ void MlfMotionMeasurement::MeasurementSelection(
 
   std::vector<float> velocity_gain_norms(3);
   velocity_gain_norms[0] = corner_velocity_gain;
-  velocity_gain_norms[1] = (new_object->measured_barycenter_velocity -
-                            latest_object->belief_velocity).norm();
-  velocity_gain_norms[2] = (new_object->measured_center_velocity -
-                            latest_object->belief_velocity).norm();
+  velocity_gain_norms[1] = static_cast<float>(
+                            (new_object->measured_barycenter_velocity -
+                             latest_object->belief_velocity).norm());
+  velocity_gain_norms[2] = static_cast<float>(
+                            (new_object->measured_center_velocity -
+                            latest_object->belief_velocity).norm());
   std::vector<float>::iterator min_gain = std::min_element(
       std::begin(velocity_gain_norms), std::end(velocity_gain_norms));
-  int min_gain_pos = min_gain - velocity_gain_norms.begin();
+  int64_t min_gain_pos = min_gain - velocity_gain_norms.begin();
   if (min_gain_pos == 0) {
     new_object->selected_measured_velocity =
         new_object->measured_corners_velocity[corner_index];

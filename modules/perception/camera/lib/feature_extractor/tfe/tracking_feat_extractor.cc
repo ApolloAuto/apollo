@@ -106,10 +106,14 @@ bool TrackingFeatureExtractor::Extract(const FeatureExtractorOptions &options,
         feature_extractor_layer_ptr->rois_blob->mutable_cpu_data();
     for (const auto &obj : frame->detected_objects) {
       rois_data[0] = 0;
-      rois_data[1] = obj->camera_supplement.box.xmin * feat_width_;
-      rois_data[2] = obj->camera_supplement.box.ymin * feat_height_;
-      rois_data[3] = obj->camera_supplement.box.xmax * feat_width_;
-      rois_data[4] = obj->camera_supplement.box.ymax * feat_height_;
+      rois_data[1] = obj->camera_supplement.box.xmin *
+                     static_cast<float>(feat_width_);
+      rois_data[2] = obj->camera_supplement.box.ymin *
+                     static_cast<float>(feat_height_);
+      rois_data[3] = obj->camera_supplement.box.xmax *
+                     static_cast<float>(feat_width_);
+      rois_data[4] = obj->camera_supplement.box.ymax *
+                     static_cast<float>(feat_height_);
       ADEBUG << rois_data[0]
                 << " " << rois_data[1] << " " << rois_data[2]
                 << " " << rois_data[3] << " " << rois_data[4];
