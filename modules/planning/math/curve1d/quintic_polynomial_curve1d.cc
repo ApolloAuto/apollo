@@ -100,7 +100,7 @@ void QuinticPolynomialCurve1d::IntegratedFromQuarticCurve(
   param_ = other.ParamLength();
   coef_[0] = init_value;
   for (std::size_t i = 0; i < 5; ++i) {
-    coef_[i + 1] = other.Coef(i) / (i + 1);
+    coef_[i + 1] = other.Coef(i) / (static_cast<double>(i) + 1);
   }
 }
 
