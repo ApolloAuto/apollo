@@ -48,7 +48,7 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
  protected:
   std::size_t horizon_ = 5;
   std::size_t obstacles_num_ = 10;
-  float ts_ = 0.01f;
+  double ts_ = 0.01f;
   Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
   Eigen::MatrixXi obstacles_edges_num_;

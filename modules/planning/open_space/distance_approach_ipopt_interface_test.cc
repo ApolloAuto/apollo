@@ -52,7 +52,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
  protected:
   std::size_t horizon_ = 5;
   std::size_t obstacles_num_ = 10;
-  float ts_ = 0.01f;
+  double ts_ = 0.01f;
   Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xf_ = 10 * Eigen::MatrixXd::Ones(4, 1);

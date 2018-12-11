@@ -42,7 +42,7 @@ class DistanceApproachProblemTest : public ::testing::Test {
   int num_of_variables_ = 160;
   int num_of_constraints_ = 200;
   std::size_t horizon_ = 20;
-  float ts_ = 0.01f;
+  double ts_ = 0.01f;
   Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xf_ = Eigen::MatrixXd::Ones(4, 1);

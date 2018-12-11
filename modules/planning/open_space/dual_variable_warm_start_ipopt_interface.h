@@ -44,7 +44,7 @@ namespace planning {
 class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
  public:
   explicit DualVariableWarmStartIPOPTInterface(
-      std::size_t horizon, float ts, const Eigen::MatrixXd& ego,
+      std::size_t horizon, double ts, const Eigen::MatrixXd& ego,
       const Eigen::MatrixXi& obstacles_edges_num,
       const std::size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
       const Eigen::MatrixXd& obstacles_b, const Eigen::MatrixXd& xWS,
@@ -119,7 +119,7 @@ class DualVariableWarmStartIPOPTInterface : public Ipopt::TNLP {
   int num_of_variables_;
   int num_of_constraints_;
   int horizon_;
-  float ts_;
+  double ts_;
   Eigen::MatrixXd ego_;
   int lambda_horizon_ = 0;
   int miu_horizon_ = 0;
