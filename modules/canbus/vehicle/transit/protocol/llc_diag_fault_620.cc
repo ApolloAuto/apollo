@@ -143,7 +143,7 @@ int Llcdiagfault620::llc_fbk_version_year(const std::uint8_t* bytes,
   Byte t0(bytes + 5);
   int32_t x = t0.get_byte(0, 7);
 
-  int ret = x + 2017.000000;
+  int ret = static_cast<int>(x + 2017.000000);
   return ret;
 }
 

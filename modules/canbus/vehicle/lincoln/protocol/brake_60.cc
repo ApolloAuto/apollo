@@ -84,15 +84,15 @@ void Brake60::set_pedal_p(uint8_t *data, double pedal) {
   // and a rough mapping
   pedal /= 100.;
   pedal = ProtocolData::BoundedValue(0.0, 1.0, pedal);
-  int32_t x = pedal / 1.52590218966964e-05;
+  int32_t x = static_cast<int32_t>(pedal / 1.52590218966964e-05);
   std::uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte frame_low(data + 0);
   frame_low.set_value(t, 0, 8);
 
   x >>= 8;
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte frame_high(data + 1);
   frame_high.set_value(t, 0, 8);
 }
@@ -127,7 +127,7 @@ void Brake60::set_clear_driver_override_flag_p(uint8_t *bytes, bool clear) {
 void Brake60::set_watchdog_counter_p(uint8_t *data, int32_t count) {
   count = ProtocolData::BoundedValue(0, 255, count);
   Byte frame(data + 7);
-  frame.set_value(count, 0, 8);
+  frame.set_value(static_cast<uint8_t>(count), 0, 8);
 }
 
 }  // namespace lincoln

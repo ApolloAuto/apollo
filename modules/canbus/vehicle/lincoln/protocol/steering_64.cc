@@ -78,7 +78,7 @@ Steering64 *Steering64::set_steering_angle_speed(double angle_speed) {
 // positive for left, negative for right
 void Steering64::set_steering_angle_p(uint8_t *data, double angle) {
   angle = ProtocolData::BoundedValue(-470.0, 470.0, angle);
-  int32_t x = angle / 0.100000;
+  int32_t x = static_cast<int32_t>(angle / 0.100000);
 
   // add offset
   if (x < 0) {
@@ -86,12 +86,12 @@ void Steering64::set_steering_angle_p(uint8_t *data, double angle) {
   }
 
   std::uint8_t t = 0;
-  t = x & 0xFF;  // low
+  t = static_cast<uint8_t>(x & 0xFF);  // low
   Byte frame_low(data + 0);
   frame_low.set_value(t, 0, 8);
 
   x >>= 8;  // high
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte frame_high(data + 1);
   frame_high.set_value(t, 0, 8);
 }
@@ -125,16 +125,16 @@ void Steering64::set_ignore_driver_override_p(uint8_t *bytes, bool ignore) {
 
 void Steering64::set_steering_angle_speed_p(uint8_t *data, double angle_speed) {
   angle_speed = ProtocolData::BoundedValue(0.0, 500.0, angle_speed);
-  int32_t x = angle_speed / 2.000000;
+  int32_t x = static_cast<int32_t>(angle_speed / 2.000000);
 
   Byte frame(data + 3);
-  frame.set_value(x, 0, 8);
+  frame.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 void Steering64::set_watchdog_counter_p(uint8_t *data, int32_t count) {
   count = ProtocolData::BoundedValue(0, 255, count);
   Byte frame(data + 7);
-  frame.set_value(count, 0, 8);
+  frame.set_value(static_cast<uint8_t>(count), 0, 8);
 }
 
 void Steering64::set_disable_audible_warning_p(uint8_t *data, bool disable) {
