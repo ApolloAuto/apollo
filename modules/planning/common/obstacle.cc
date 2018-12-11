@@ -249,7 +249,7 @@ std::unique_ptr<Obstacle> Obstacle::CreateStaticVirtualObstacles(
   size_t negative_id = std::hash<std::string>{}(id);
   // set the first bit to 1 so negative_id became negative number
   negative_id |= (0x1 << 31);
-  perception_obstacle.set_id(static_cast<int32>(negative_id));
+  perception_obstacle.set_id(static_cast<int32_t>(negative_id));
   perception_obstacle.mutable_position()->set_x(obstacle_box.center().x());
   perception_obstacle.mutable_position()->set_y(obstacle_box.center().y());
   perception_obstacle.set_theta(obstacle_box.heading());
