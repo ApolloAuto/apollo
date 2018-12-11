@@ -32,9 +32,11 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/scenarios/side_pass/side_pass_stage.h"
 #include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
 #include "modules/planning/scenarios/side_pass/stage_backup.h"
+#include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
+#include "modules/planning/scenarios/side_pass/stage_generate_path.h"
+#include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
 #include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 namespace apollo {
@@ -60,12 +62,12 @@ void SidePassScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_DETECT_SAFETY,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new SidePassDetectSafety(config);
+        return new StageDetectSafety(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_GENERATE_PATH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new SidePassGeneratePath(config);
+        return new StageGeneratePath(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT,
@@ -75,7 +77,7 @@ void SidePassScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_PASS_OBSTACLE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new SidePassPassObstacle(config);
+        return new StagePassObstacle(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_BACKUP,

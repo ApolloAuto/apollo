@@ -18,14 +18,15 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/side_pass/side_pass_stage.h"
+#include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
 
 #include <algorithm>
 #include <string>
 #include <vector>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
+
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
@@ -37,36 +38,12 @@ namespace side_pass {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
-using apollo::common::VehicleConfigHelper;
-
-constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
 
 /*
  * @brief:
- * STAGE: SidePassGeneratePath
+ * STAGE: StagePassObstacle
  */
-Stage::StageStatus SidePassGeneratePath::Process(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
-  if (!ExecuteTaskOnReferenceLine(planning_start_point, frame)) {
-    AERROR << "Fail to plan on reference_line.";
-    GetContext()->backup_stage_cycle_num_ = 0;
-    next_stage_ = ScenarioConfig::SIDE_PASS_BACKUP;
-    return Stage::FINISHED;
-  }
-  GetContext()->path_data_ = frame->reference_line_info().front().path_data();
-  if (frame->reference_line_info().front().trajectory().NumOfPoints() > 0) {
-    next_stage_ = ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT;
-    return Stage::FINISHED;
-  }
-  return Stage::RUNNING;
-}
-
-/*
- * @brief:
- * STAGE: SidePassDetectSafety
- */
-
-Stage::StageStatus SidePassDetectSafety::Process(
+Stage::StageStatus StagePassObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   const auto& reference_line_info = frame->reference_line_info().front();
   bool update_success = GetContext()->path_data_.UpdateFrenetFramePath(
@@ -75,68 +52,7 @@ Stage::StageStatus SidePassDetectSafety::Process(
     AERROR << "Fail to update path_data.";
     return Stage::ERROR;
   }
-
-  const auto adc_frenet_frame_point_ =
-      reference_line_info.reference_line().GetFrenetPoint(
-          frame->PlanningStartPoint().path_point());
-
-  bool trim_success =
-      GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_);
-  if (!trim_success) {
-    AERROR << "Fail to trim path_data. adc_frenet_frame_point: "
-           << adc_frenet_frame_point_.ShortDebugString();
-    return Stage::ERROR;
-  }
-
-  auto& rfl_info = frame->mutable_reference_line_info()->front();
-  *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
-
-  const auto& path_points = rfl_info.path_data().discretized_path();
-  auto* debug_path =
-      rfl_info.mutable_debug()->mutable_planning_data()->add_path();
-
-  debug_path->set_name("DpPolyPathOptimizer");
-  debug_path->mutable_path_point()->CopyFrom(
-      {path_points.begin(), path_points.end()});
-
-  if (!ExecuteTaskOnReferenceLine(planning_start_point, frame)) {
-    return Stage::ERROR;
-  }
-  bool is_safe = true;
-  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-
-  const PathDecision& path_decision =
-      frame->reference_line_info().front().path_decision();
-  for (const auto* obstacle : path_decision.obstacles().Items()) {
-    // TODO(All): check according to neighbor lane.
-    if (obstacle->IsVirtual() && obstacle->Id().substr(0, 3) == "SP_" &&
-        obstacle->PerceptionSLBoundary().start_s() >= adc_front_edge_s) {
-      is_safe = false;
-      break;
-    }
-  }
-  if (is_safe) {
-    GetContext()->pass_obstacle_stuck_cycle_num_ = 0;
-    next_stage_ = ScenarioConfig::SIDE_PASS_PASS_OBSTACLE;
-    return Stage::FINISHED;
-  }
-  return Stage::RUNNING;
-}
-
-/*
- * @brief:
- * STAGE: SidePassPassObstacle
- */
-Stage::StageStatus SidePassPassObstacle::Process(
-    const TrajectoryPoint& planning_start_point, Frame* frame) {
-  const auto& reference_line_info = frame->reference_line_info().front();
-  bool update_success = GetContext()->path_data_.UpdateFrenetFramePath(
-      &reference_line_info.reference_line());
-  if (!update_success) {
-    AERROR << "Fail to update path_data.";
-    return Stage::ERROR;
-  }
-  ADEBUG << "Processing SidePassPassObstacle.";
+  ADEBUG << "Processing StagePassObstacle.";
   const auto adc_frenet_frame_point_ =
       reference_line_info.reference_line().GetFrenetPoint(
           frame->PlanningStartPoint().path_point());
