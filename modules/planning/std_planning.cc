@@ -272,7 +272,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
       vehicle_state, start_timestamp, planning_cycle_time,
       last_publishable_trajectory_.get(), &replan_reason);
 
-  const uint32_t frame_num = seq_num_++;
+  const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   bool update_ego_info =
       EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
   status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,

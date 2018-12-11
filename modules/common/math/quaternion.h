@@ -104,15 +104,16 @@ inline Eigen::Vector3d QuaternionRotate(const Quaternion &orientation,
                                         const Eigen::Vector3d &original) {
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                        orientation.qy(), orientation.qz());
-  return static_cast<Eigen::Vector3d>(quaternion.toRotationMatrix() * original);
+  auto rotation = quaternion.toRotationMatrix() * original;
+  return Eigen::Vector3d(rotation(0), rotation(1), rotation(2));
 }
 
 inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion &orientation,
                                                const Eigen::Vector3d &rotated) {
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                        orientation.qy(), orientation.qz());
-  return static_cast<Eigen::Vector3d>(quaternion.toRotationMatrix().inverse() *
-                                      rotated);
+  auto rotation = quaternion.toRotationMatrix().inverse() * rotated;
+  return Eigen::Vector3d(rotation(0), rotation(1), rotation(2));
 }
 
 }  // namespace math
