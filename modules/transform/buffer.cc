@@ -23,6 +23,8 @@
 namespace apollo {
 namespace transform {
 
+static constexpr float kSecondToNanoFactor = 1e9f;
+
 Buffer::Buffer() : BufferCore() { Init(); }
 
 int Buffer::Init() {
@@ -83,32 +85,26 @@ void Buffer::SubscriptionCallbackImpl(
       geometry_msgs::TransformStamped trans_stamped;
 
       // header
-      trans_stamped.header.stamp =
-          msg_evt->transforms(i).header().timestamp_sec() * 1e9;
-      trans_stamped.header.frame_id =
-          msg_evt->transforms(i).header().frame_id();
-      trans_stamped.header.seq = msg_evt->transforms(i).header().sequence_num();
+      const auto& header = msg_evt->transforms(i).header();
+      trans_stamped.header.stamp = static_cast<uint64_t>(
+          header.timestamp_sec() * kSecondToNanoFactor);
+      trans_stamped.header.frame_id = header.frame_id();
+      trans_stamped.header.seq = header.sequence_num();
 
       // child_frame_id
       trans_stamped.child_frame_id = msg_evt->transforms(i).child_frame_id();
 
       // translation
-      trans_stamped.transform.translation.x =
-          msg_evt->transforms(i).transform().translation().x();
-      trans_stamped.transform.translation.y =
-          msg_evt->transforms(i).transform().translation().y();
-      trans_stamped.transform.translation.z =
-          msg_evt->transforms(i).transform().translation().z();
+      const auto& transform = msg_evt->transforms(i).transform();
+      trans_stamped.transform.translation.x = transform.translation().x();
+      trans_stamped.transform.translation.y = transform.translation().y();
+      trans_stamped.transform.translation.z = transform.translation().z();
 
       // rotation
-      trans_stamped.transform.rotation.x =
-          msg_evt->transforms(i).transform().rotation().qx();
-      trans_stamped.transform.rotation.y =
-          msg_evt->transforms(i).transform().rotation().qy();
-      trans_stamped.transform.rotation.z =
-          msg_evt->transforms(i).transform().rotation().qz();
-      trans_stamped.transform.rotation.w =
-          msg_evt->transforms(i).transform().rotation().qw();
+      trans_stamped.transform.rotation.x = transform.rotation().qx();
+      trans_stamped.transform.rotation.y = transform.rotation().qy();
+      trans_stamped.transform.rotation.z = transform.rotation().qz();
+      trans_stamped.transform.rotation.w = transform.rotation().qw();
 
       if (is_static) {
         static_msgs_.push_back(trans_stamped);
@@ -157,7 +153,6 @@ void Buffer::TF2MsgToCyber(
 apollo::transform::TransformStamped Buffer::lookupTransform(
     const std::string& target_frame, const std::string& source_frame,
     const cyber::Time& time, const float timeout_second) const {
-  (void)timeout_second;
   tf2::Time tf2_time(time.ToNanosecond());
   geometry_msgs::TransformStamped tf2_trans_stamped =
       lookupTransform(target_frame, source_frame, tf2_time);
@@ -170,7 +165,6 @@ apollo::transform::TransformStamped Buffer::lookupTransform(
     const std::string& target_frame, const cyber::Time& target_time,
     const std::string& source_frame, const cyber::Time& source_time,
     const std::string& fixed_frame, const float timeout_second) const {
-  (void)timeout_second;
   geometry_msgs::TransformStamped tf2_trans_stamped =
       lookupTransform(target_frame, target_time.ToNanosecond(), source_frame,
                       source_time.ToNanosecond(), fixed_frame);
@@ -184,7 +178,8 @@ bool Buffer::canTransform(const std::string& target_frame,
                           const cyber::Time& time,
                           const float timeout_second,
                           std::string* errstr) const {
-  uint64_t timeout_ns = timeout_second * 1000000000;
+  uint64_t timeout_ns = static_cast<uint64_t>(
+      timeout_second * kSecondToNanoFactor);
   uint64_t start_time = cyber::Time::Now().ToNanosecond();
   while (
       cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
@@ -206,7 +201,8 @@ bool Buffer::canTransform(const std::string& target_frame,
                           const float timeout_second,
                           std::string* errstr) const {
   // poll for transform if timeout is set
-  uint64_t timeout_ns = timeout_second * 1000000000;
+  uint64_t timeout_ns = static_cast<uint64_t>(
+      timeout_second * kSecondToNanoFactor);
   uint64_t start_time = cyber::Time::Now().ToNanosecond();
   while (cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
          !canTransform(target_frame, target_time.ToNanosecond(), source_frame,

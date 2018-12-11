@@ -71,7 +71,13 @@ build --copt="-Werror=switch"
 
 build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Wconversion
 # Strict check on cleared modules.
-build --per_file_copt=^modules/common/util/.*\.cc,^modules/data/.*\.cc,^modules/monitor/.*\.cc,^modules/dreamview/backend/hmi/.*\.cc@-Werror=conversion
+build --per_file_copt=\
+^modules/common/util/.*\.cc,\
+^modules/data/.*\.cc,\
+^modules/dreamview/backend/hmi/.*\.cc,\
+^modules/monitor/.*\.cc,\
+^modules/transform/.*\.cc,\
+@-Werror=conversion
 
 # Enable C++14
 build --cxxopt="-std=c++1y"
