@@ -140,10 +140,10 @@ void MPCController::InitializeFilters(const ControlConf *control_conf) {
   common::LpfCoefficients(
       ts_, control_conf->mpc_controller_conf().cutoff_freq(), &den, &num);
   digital_filter_.set_coefficients(den, num);
-  lateral_error_filter_ = common::MeanFilter(
-      control_conf->mpc_controller_conf().mean_filter_window_size());
-  heading_error_filter_ = common::MeanFilter(
-      control_conf->mpc_controller_conf().mean_filter_window_size());
+  lateral_error_filter_ = common::MeanFilter(static_cast<std::uint_fast8_t>(
+      control_conf->mpc_controller_conf().mean_filter_window_size()));
+  heading_error_filter_ = common::MeanFilter(static_cast<std::uint_fast8_t>(
+      control_conf->mpc_controller_conf().mean_filter_window_size()));
 }
 
 Status MPCController::Init(const ControlConf *control_conf) {
