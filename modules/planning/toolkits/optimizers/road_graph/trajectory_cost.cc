@@ -284,7 +284,7 @@ ComparableCost TrajectoryCost::GetCostFromObsSL(
   AWARN << obs_sl_boundary.ShortDebugString();
   */
 
-  constexpr double kSafeDistance = 1.0;
+  constexpr double kSafeDistance = 0.6;
   if (delta_l < kSafeDistance) {
     obstacle_cost.safety_cost +=
         config_.obstacle_collision_cost() *
