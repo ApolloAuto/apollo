@@ -46,7 +46,7 @@ using apollo::hdmap::HDMapUtil;
 constexpr double kRoadBuffer = 0.05;      // 5cm
 constexpr double kObstacleLBuffer = 0.1;  // 10cm
 constexpr double kObstacleSBuffer = 2.0;  // 2m
-constexpr double kSidePassPathLength = 50.0;
+constexpr double kExtraRoadBufferDuringTurning = 0.1;
 constexpr double kVehicleBuffer = 0.6;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
@@ -55,9 +55,7 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
 void SidePassPathDecider::InitSolver() {
   const TaskConfig &config = Decider::config_;
   fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
-  delta_s_ = config.side_pass_path_decider_config().path_resolution();
-  const int n = static_cast<int>(
-      config.side_pass_path_decider_config().total_path_length() / delta_s_);
+  const int n = static_cast<int>(total_path_length_ / delta_s_);
   std::array<double, 3> l_init = {adc_frenet_frame_point_.l(),
                                   adc_frenet_frame_point_.dl(),
                                   adc_frenet_frame_point_.ddl()};
@@ -79,6 +77,10 @@ Status SidePassPathDecider::Process(
   adc_frenet_frame_point_ =
       reference_line_info->reference_line().GetFrenetPoint(
           frame->PlanningStartPoint().path_point());
+  delta_s_ = Decider::config_.side_pass_path_decider_config().path_resolution();
+  CHECK_GT(std::fabs(delta_s_), 0.000001);
+  total_path_length_ =
+      Decider::config_.side_pass_path_decider_config().total_path_length();
   InitSolver();
 
   nearest_obstacle_ =
@@ -255,7 +257,7 @@ SidePassPathDecider::GetPathBoundaries(
   constexpr double kLargeBoundary = 10.0;
   std::unordered_map<std::string, SidePassDirection> obs_id_to_side_pass_dir;
   for (double curr_s = adc_frenet_frame_point_.s();
-       curr_s < std::min(adc_frenet_frame_point_.s() + kSidePassPathLength,
+       curr_s < std::min(adc_frenet_frame_point_.s() + total_path_length_,
                          reference_line.Length());
        curr_s +=
        Decider::config_.side_pass_path_decider_config().path_resolution()) {
@@ -416,9 +418,11 @@ SidePassPathDecider::GetPathBoundaries(
                                    obs_sl.end_l() + adc_half_width +
                                    kObstacleLBuffer;
         ADEBUG << "Should pass from left. Lower bound = " << lower_bound;
-        if (std::get<2>(lateral_bound) >= lower_bound) {
-          ADEBUG << "Reseting the right boundary for left-side-pass.";
+        if (std::get<2>(lateral_bound) - kExtraRoadBufferDuringTurning >=
+            lower_bound) {
+          ADEBUG << "Reseting the boundaries for left-side-pass.";
           std::get<1>(lateral_bound) = lower_bound;
+          std::get<2>(lateral_bound) -= kExtraRoadBufferDuringTurning;
         } else {
           *fail_to_find_boundary = true;
           break;
@@ -428,9 +432,11 @@ SidePassPathDecider::GetPathBoundaries(
                                    obs_sl.start_l() - adc_half_width -
                                    kObstacleLBuffer;
         ADEBUG << "Should pass from right. Upper bound = " << upper_bound;
-        if (upper_bound >= std::get<1>(lateral_bound)) {
-          ADEBUG << "Reseting the left boundary for right-side-pass.";
+        if (std::get<1>(lateral_bound) + kExtraRoadBufferDuringTurning <=
+            upper_bound) {
+          ADEBUG << "Reseting the boundaries for right-side-pass.";
           std::get<2>(lateral_bound) = upper_bound;
+          std::get<1>(lateral_bound) += kExtraRoadBufferDuringTurning;
         } else {
           *fail_to_find_boundary = true;
           break;
