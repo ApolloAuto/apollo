@@ -32,6 +32,7 @@ using ::apollo::common::math::LineSegment2d;
 using ::apollo::common::math::Polygon2d;
 using ::apollo::common::math::Vec2d;
 using ::apollo::hdmap::JunctionInfo;
+using ::apollo::hdmap::PNCJunctionInfo;
 using ::apollo::planning::ADCTrajectory;
 
 ADCTrajectoryContainer::ADCTrajectoryContainer()
@@ -54,6 +55,9 @@ void ADCTrajectoryContainer::Insert(
   SetJunctionPolygon();
   ADEBUG << "Generate a polygon [" << adc_junction_polygon_.DebugString()
          << "].";
+  SetPNCJunctionPolygon();
+  ADEBUG << "Generate a polygon [" << adc_pnc_junction_polygon_.DebugString()
+         << "].";
 
   // Find ADC lane sequence
   SetLaneSequence();
@@ -61,7 +65,16 @@ void ADCTrajectoryContainer::Insert(
          << "].";
 }
 
-bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
+bool ADCTrajectoryContainer::IsPointInJunction(
+    const PathPoint& point) const {
+  if (adc_pnc_junction_info_ptr_ != nullptr) {
+    return IsPointInPNCJunction(point);
+  }
+  return IsPointInRegularJunction(point);
+}
+
+bool ADCTrajectoryContainer::IsPointInRegularJunction(
+    const PathPoint& point) const {
   if (adc_junction_polygon_.points().size() < 3) {
     return false;
   }
@@ -76,6 +89,14 @@ bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
                                                    FLAGS_virtual_lane_radius);
   }
   return in_polygon && on_virtual_lane;
+}
+
+bool ADCTrajectoryContainer::IsPointInPNCJunction(
+    const PathPoint& point) const {
+  if (adc_pnc_junction_polygon_.points().size() < 3) {
+    return false;
+  }
+  return adc_pnc_junction_polygon_.IsPointIn({point.x(), point.y()});
 }
 
 bool ADCTrajectoryContainer::IsProtected() const {
@@ -121,6 +142,48 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
       adc_junction_info_ptr_ = junction_info;
       s_dist_to_junction_ = s_at_junction - s_start;
       adc_junction_polygon_ = Polygon2d{vertices};
+    }
+  }
+}
+
+void ADCTrajectoryContainer::SetPNCJunctionPolygon() {
+  std::shared_ptr<const PNCJunctionInfo> junction_info(nullptr);
+
+  double s_start = 0.0;
+  double s_at_junction = 0.0;
+  if (adc_trajectory_.trajectory_point_size() > 0) {
+    s_start = adc_trajectory_.trajectory_point(0).path_point().s();
+  }
+  for (int i = 0; i < adc_trajectory_.trajectory_point_size(); ++i) {
+    double s = adc_trajectory_.trajectory_point(i).path_point().s();
+
+    if (s > FLAGS_adc_trajectory_search_length) {
+      break;
+    }
+
+    if (junction_info != nullptr) {
+      s_at_junction = s;
+      break;
+    }
+
+    double x = adc_trajectory_.trajectory_point(i).path_point().x();
+    double y = adc_trajectory_.trajectory_point(i).path_point().y();
+    std::vector<std::shared_ptr<const PNCJunctionInfo>> junctions =
+        PredictionMap::GetPNCJunctions({x, y}, FLAGS_junction_search_radius);
+    if (!junctions.empty() && junctions.front() != nullptr) {
+      junction_info = junctions.front();
+    }
+  }
+
+  if (junction_info != nullptr && junction_info->pnc_junction().has_polygon()) {
+    std::vector<Vec2d> vertices;
+    for (const auto& point : junction_info->pnc_junction().polygon().point()) {
+      vertices.emplace_back(point.x(), point.y());
+    }
+    if (vertices.size() >= 3) {
+      adc_pnc_junction_info_ptr_ = junction_info;
+      s_dist_to_junction_ = s_at_junction - s_start;
+      adc_pnc_junction_polygon_ = Polygon2d{vertices};
     }
   }
 }

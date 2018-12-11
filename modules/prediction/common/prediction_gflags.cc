@@ -183,7 +183,7 @@ DEFINE_double(lane_sequence_threshold_junction, 0.5,
 DEFINE_double(lane_change_dist, 10.0, "Lane change distance with ADC");
 DEFINE_bool(enable_lane_sequence_acc, false,
             "If use acceleration in lane sequence.");
-DEFINE_bool(enable_trim_prediction_trajectory, false,
+DEFINE_bool(enable_trim_prediction_trajectory, true,
             "If trim the prediction trajectory to avoid crossing"
             "protected adc planning trajectory.");
 DEFINE_bool(enable_trajectory_validation_check, false,
