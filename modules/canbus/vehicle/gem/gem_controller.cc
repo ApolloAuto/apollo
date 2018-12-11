@@ -18,9 +18,9 @@ limitations under the License.
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
+#include "cyber/common/log.h"
 #include "modules/canbus/vehicle/gem/gem_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -168,8 +168,8 @@ Chassis GemController::chassis() {
   // 5
   if (chassis_detail.gem().has_vehicle_speed_rpt_6f() &&
       chassis_detail.gem().vehicle_speed_rpt_6f().has_vehicle_speed()) {
-    chassis_.set_speed_mps(
-        chassis_detail.gem().vehicle_speed_rpt_6f().vehicle_speed());
+    chassis_.set_speed_mps(static_cast<float>(
+        chassis_detail.gem().vehicle_speed_rpt_6f().vehicle_speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -180,7 +180,7 @@ Chassis GemController::chassis() {
   if (chassis_detail.gem().has_accel_rpt_68() &&
       chassis_detail.gem().accel_rpt_68().has_output_value()) {
     chassis_.set_throttle_percentage(
-        chassis_detail.gem().accel_rpt_68().output_value());
+        static_cast<float>(chassis_detail.gem().accel_rpt_68().output_value()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -188,7 +188,7 @@ Chassis GemController::chassis() {
   if (chassis_detail.gem().has_brake_rpt_6c() &&
       chassis_detail.gem().brake_rpt_6c().has_output_value()) {
     chassis_.set_brake_percentage(
-        chassis_detail.gem().brake_rpt_6c().output_value());
+        static_cast<float>(chassis_detail.gem().brake_rpt_6c().output_value()));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -220,9 +220,9 @@ Chassis GemController::chassis() {
   // TODO(QiL) : verify the unit here.
   if (chassis_detail.gem().has_steering_rpt_1_6e() &&
       chassis_detail.gem().steering_rpt_1_6e().has_output_value()) {
-    chassis_.set_steering_percentage(
+    chassis_.set_steering_percentage(static_cast<float>(
         chassis_detail.gem().steering_rpt_1_6e().output_value() * 100.0 /
-        vehicle_params_.max_steer_angle());
+        vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -472,9 +472,7 @@ void GemController::SetTurningSignal(const ControlCommand& command) {
   }
 }
 
-void GemController::ResetProtocol() {
-  message_manager_->ResetSendMessages();
-}
+void GemController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool GemController::CheckChassisError() {
   // TODO(QiL) : implement it here

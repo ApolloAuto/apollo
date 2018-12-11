@@ -163,14 +163,16 @@ Chassis LincolnController::chassis() {
   chassis_.set_engine_started(true);
   // 4
   if (chassis_detail.has_ems() && chassis_detail.ems().has_engine_rpm()) {
-    chassis_.set_engine_rpm(chassis_detail.ems().engine_rpm());
+    chassis_.set_engine_rpm(
+        static_cast<float>(chassis_detail.ems().engine_rpm()));
   } else {
     chassis_.set_engine_rpm(0);
   }
   // 5
   if (chassis_detail.has_vehicle_spd() &&
-      chassis_detail.vehicle_spd().has_vehicle_spd()) {
-    chassis_.set_speed_mps(chassis_detail.vehicle_spd().vehicle_spd());
+      static_cast<float>(chassis_detail.vehicle_spd().has_vehicle_spd())) {
+    chassis_.set_speed_mps(
+        static_cast<float>(chassis_detail.vehicle_spd().vehicle_spd()));
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
         chassis_detail.vehicle_spd().is_wheel_spd_rr_valid());
     chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
@@ -205,7 +207,8 @@ Chassis LincolnController::chassis() {
   // 6
   if (chassis_detail.has_basic() && chassis_detail.basic().has_odo_meter()) {
     // odo_meter is in km
-    chassis_.set_odometer_m(chassis_detail.basic().odo_meter() * 1000);
+    chassis_.set_odometer_m(
+        static_cast<float>(chassis_detail.basic().odo_meter() * 1000.0));
   } else {
     chassis_.set_odometer_m(0);
   }
@@ -216,13 +219,15 @@ Chassis LincolnController::chassis() {
   chassis_.set_fuel_range_m(0);
   // 8
   if (chassis_detail.has_gas() && chassis_detail.gas().has_throttle_output()) {
-    chassis_.set_throttle_percentage(chassis_detail.gas().throttle_output());
+    chassis_.set_throttle_percentage(
+        static_cast<float>(chassis_detail.gas().throttle_output()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9
   if (chassis_detail.has_brake() && chassis_detail.brake().has_brake_output()) {
-    chassis_.set_brake_percentage(chassis_detail.brake().brake_output());
+    chassis_.set_brake_percentage(
+        static_cast<float>(chassis_detail.brake().brake_output()));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -234,15 +239,16 @@ Chassis LincolnController::chassis() {
   }
   // 11
   if (chassis_detail.has_eps() && chassis_detail.eps().has_steering_angle()) {
-    chassis_.set_steering_percentage(chassis_detail.eps().steering_angle() *
-                                     100.0 / vehicle_params_.max_steer_angle() *
-                                     M_PI / 180);
+    chassis_.set_steering_percentage(
+        static_cast<float>(chassis_detail.eps().steering_angle() * 100.0 /
+                           vehicle_params_.max_steer_angle() * M_PI / 180.0));
   } else {
     chassis_.set_steering_percentage(0);
   }
   // 12
   if (chassis_detail.has_eps() && chassis_detail.eps().has_epas_torque()) {
-    chassis_.set_steering_torque_nm(chassis_detail.eps().epas_torque());
+    chassis_.set_steering_torque_nm(
+        static_cast<float>(chassis_detail.eps().epas_torque()));
   } else {
     chassis_.set_steering_torque_nm(0);
   }

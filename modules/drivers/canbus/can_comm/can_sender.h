@@ -225,7 +225,7 @@ SenderMessage<SensorType>::SenderMessage(
   int32_t len = protocol_data_->GetLength();
 
   can_frame_to_update_.id = message_id_;
-  can_frame_to_update_.len = len;
+  can_frame_to_update_.len = static_cast<uint8_t>(len);
 
   period_ = protocol_data_->GetPeriod();
   curr_period_ = period_;

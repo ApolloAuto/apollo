@@ -124,10 +124,10 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
   }
 
   // Update matrix_m1, matrix_m2, convert MPC problem to QP problem done
-  const auto matrix_m1 =
-      matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr;
-  const auto matrix_m2 =
-      matrix_k.transpose() * matrix_qq * (matrix_m + matrix_cc - matrix_t);
+  const Matrix matrix_m1 = static_cast<Matrix>(
+      matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr);
+  const Matrix matrix_m2 = static_cast<Matrix>(
+      matrix_k.transpose() * matrix_qq * (matrix_m + matrix_cc - matrix_t));
 
   // Format in qp_solver
   /**
