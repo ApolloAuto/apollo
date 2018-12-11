@@ -47,6 +47,7 @@ constexpr double kRoadBuffer = 0.05;      // 5cm
 constexpr double kObstacleLBuffer = 0.1;  // 10cm
 constexpr double kObstacleSBuffer = 2.0;  // 2m
 constexpr double kSidePassPathLength = 50.0;
+constexpr double kVehicleBuffer = 0.6;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {}
@@ -326,6 +327,7 @@ SidePassPathDecider::GetPathBoundaries(
       ADEBUG << "Upper limit expanded by " << adjacent_lane_width;
       // Update the lateral_bound accordingly.
       std::get<2>(lateral_bound) += adjacent_lane_width;
+      std::get<2>(lateral_bound) -= kVehicleBuffer;
     } else if (decided_direction_ == SidePassDirection::RIGHT &&
                (curr_lane_.right_neighbor_forward_lane_id_size() > 0 ||
                 curr_lane_.right_neighbor_reverse_lane_id_size() > 0)) {
@@ -362,6 +364,7 @@ SidePassPathDecider::GetPathBoundaries(
       }
       ADEBUG << "Lower limit expanded by " << adjacent_lane_width;
       std::get<1>(lateral_bound) -= adjacent_lane_width;
+      std::get<1>(lateral_bound) += kVehicleBuffer;
     }
     ADEBUG << "lateral_bound updated based on direction: "
            << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound)
