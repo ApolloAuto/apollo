@@ -100,7 +100,7 @@ void ControlComponentTest::SetupCyber() {
 
   component_config_.set_name("control_test");
 
-  component_config_.set_interval(0.01);
+  component_config_.set_interval(10);
 
   std::shared_ptr<apollo::cyber::Node> node(
       apollo::cyber::CreateNode("control_test"));
