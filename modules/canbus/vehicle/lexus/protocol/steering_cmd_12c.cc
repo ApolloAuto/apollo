@@ -67,7 +67,7 @@ void Steeringcmd12c::set_p_ignore_overrides(uint8_t* data,
   int x = ignore_overrides;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 1, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
 Steeringcmd12c* Steeringcmd12c::set_enable(bool enable) {
@@ -82,7 +82,7 @@ void Steeringcmd12c::set_p_enable(uint8_t* data, bool enable) {
   int x = enable;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 1);
 }
 
 Steeringcmd12c* Steeringcmd12c::set_clear_override(bool clear_override) {
@@ -97,7 +97,7 @@ void Steeringcmd12c::set_p_clear_override(uint8_t* data, bool clear_override) {
   int x = clear_override;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 2, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
 Steeringcmd12c* Steeringcmd12c::set_clear_faults(bool clear_faults) {
@@ -112,7 +112,7 @@ void Steeringcmd12c::set_p_clear_faults(uint8_t* data, bool clear_faults) {
   int x = clear_faults;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 3, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
 Steeringcmd12c* Steeringcmd12c::set_position(double position) {
@@ -125,15 +125,15 @@ Steeringcmd12c* Steeringcmd12c::set_position(double position) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad'}
 void Steeringcmd12c::set_p_position(uint8_t* data, double position) {
   position = ProtocolData::BoundedValue(-32.768, 32.767, position);
-  int x = position / 0.001000;
+  int x = static_cast<int>(position / 0.001000);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 2);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 1);
   to_set1.set_value(t, 0, 8);
 }
@@ -148,15 +148,15 @@ Steeringcmd12c* Steeringcmd12c::set_rotation_rate(double rotation_rate) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
 void Steeringcmd12c::set_p_rotation_rate(uint8_t* data, double rotation_rate) {
   rotation_rate = ProtocolData::BoundedValue(0.0, 65.535, rotation_rate);
-  int x = rotation_rate / 0.001000;
+  int x = static_cast<int>(rotation_rate / 0.001000);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 4);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 3);
   to_set1.set_value(t, 0, 8);
 }

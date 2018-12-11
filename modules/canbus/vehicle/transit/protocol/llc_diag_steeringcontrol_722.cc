@@ -64,15 +64,15 @@ void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringsensorposition(
     uint8_t* data, double llc_dbg_steeringsensorposition) {
   llc_dbg_steeringsensorposition = ProtocolData::BoundedValue(
       -6.5536, 6.5534, llc_dbg_steeringsensorposition);
-  int x = llc_dbg_steeringsensorposition / 0.000200;
+  int x = static_cast<int>(llc_dbg_steeringsensorposition / 0.000200);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 5);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 6);
   to_set1.set_value(t, 0, 8);
 }
@@ -96,12 +96,12 @@ void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringrackinputtorque(
   int x = llc_dbg_steeringrackinputtorque;
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 3);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 4);
   to_set1.set_value(t, 0, 8);
 }
@@ -122,20 +122,20 @@ void Llcdiagsteeringcontrol722::set_p_llc_dbg_steeringmotorposition(
     uint8_t* data, double llc_dbg_steeringmotorposition) {
   llc_dbg_steeringmotorposition = ProtocolData::BoundedValue(
       -83.88608, 83.88607, llc_dbg_steeringmotorposition);
-  int x = llc_dbg_steeringmotorposition / 0.000010;
+  int x = static_cast<int>(llc_dbg_steeringmotorposition / 0.000010);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 0);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 1);
   to_set1.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set2(data + 2);
   to_set2.set_value(t, 0, 8);
 }

@@ -58,25 +58,25 @@ Steeringcmd6d* Steeringcmd6d::set_position_value(double position_value) {
 void Steeringcmd6d::set_p_position_value(uint8_t* data, double position_value) {
   position_value =
       ProtocolData::BoundedValue(-2147483.648, 2147483.647, position_value);
-  int x = position_value / 0.001000;
+  int x = static_cast<int>(position_value / 0.001000);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 3);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 2);
   to_set1.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set2(data + 1);
   to_set2.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set3(data + 0);
   to_set3.set_value(t, 0, 8);
 }
@@ -91,25 +91,25 @@ Steeringcmd6d* Steeringcmd6d::set_speed_limit(double speed_limit) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'rad/s'}
 void Steeringcmd6d::set_p_speed_limit(uint8_t* data, double speed_limit) {
   speed_limit = ProtocolData::BoundedValue(0.0, 65.535, speed_limit);
-  int x = speed_limit / 0.001000;
+  int x = static_cast<int>(speed_limit / 0.001000);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 7);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 6);
   to_set1.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set2(data + 5);
   to_set2.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set3(data + 4);
   to_set3.set_value(t, 0, 8);
 }

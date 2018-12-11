@@ -81,7 +81,7 @@ void Dashcontrolsrightrpt210::set_p_output_value(
   int x = output_value;
 
   Byte to_set(data + 3);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_commanded_value(
@@ -103,7 +103,7 @@ void Dashcontrolsrightrpt210::set_p_commanded_value(
   int x = commanded_value;
 
   Byte to_set(data + 2);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_vehicle_fault(
@@ -120,7 +120,7 @@ void Dashcontrolsrightrpt210::set_p_vehicle_fault(uint8_t* data,
   int x = vehicle_fault;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 6, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 6, 1);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_pacmod_fault(
@@ -137,7 +137,7 @@ void Dashcontrolsrightrpt210::set_p_pacmod_fault(uint8_t* data,
   int x = pacmod_fault;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 5, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 5, 1);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_override_active(
@@ -154,7 +154,7 @@ void Dashcontrolsrightrpt210::set_p_override_active(uint8_t* data,
   int x = override_active;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 1, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_output_reported_fault(
@@ -171,7 +171,7 @@ void Dashcontrolsrightrpt210::set_p_output_reported_fault(
   int x = output_reported_fault;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 4, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 4, 1);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_input_output_fault(
@@ -188,7 +188,7 @@ void Dashcontrolsrightrpt210::set_p_input_output_fault(
   int x = input_output_fault;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 3, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_enabled(bool enabled) {
@@ -203,7 +203,7 @@ void Dashcontrolsrightrpt210::set_p_enabled(uint8_t* data, bool enabled) {
   int x = enabled;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 1);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_command_output_fault(
@@ -220,7 +220,7 @@ void Dashcontrolsrightrpt210::set_p_command_output_fault(
   int x = command_output_fault;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 2, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
 Dashcontrolsrightrpt210* Dashcontrolsrightrpt210::set_manual_input(
@@ -241,7 +241,7 @@ void Dashcontrolsrightrpt210::set_p_manual_input(
   int x = manual_input;
 
   Byte to_set(data + 1);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 }  // namespace lexus

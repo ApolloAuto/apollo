@@ -80,20 +80,20 @@ void Adcmotioncontrol110::set_p_adc_cmd_steerwheelangle(
     uint8_t* data, double adc_cmd_steerwheelangle) {
   adc_cmd_steerwheelangle =
       ProtocolData::BoundedValue(-1638.4, 1638.35, adc_cmd_steerwheelangle);
-  int x = adc_cmd_steerwheelangle / -0.050000;
+  int x = static_cast<int>(adc_cmd_steerwheelangle / -0.050000);
   uint8_t t = 0;
 
-  t = x & 0x1F;
+  t = static_cast<uint8_t>(x & 0x1F);
   Byte to_set0(data + 3);
   to_set0.set_value(t, 3, 5);
   x >>= 5;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 4);
   to_set1.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0x7;
+  t = static_cast<uint8_t>(x & 0x7);
   Byte to_set2(data + 5);
   to_set2.set_value(t, 0, 3);
 }
@@ -118,7 +118,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_steeringcontrolmode(
   int x = adc_cmd_steeringcontrolmode;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 4, 2);
+  to_set.set_value(static_cast<uint8_t>(x), 4, 2);
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_parkingbrake(
@@ -136,7 +136,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_parkingbrake(
   int x = adc_cmd_parkingbrake;
 
   Byte to_set(data + 6);
-  to_set.set_value(x, 5, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 5, 1);
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_gear(
@@ -156,7 +156,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_gear(
   int x = adc_cmd_gear;
 
   Byte to_set(data + 6);
-  to_set.set_value(x, 2, 3);
+  to_set.set_value(static_cast<uint8_t>(x), 2, 3);
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_motioncontrol1_checksum(
@@ -176,7 +176,7 @@ void Adcmotioncontrol110::set_p_adc_motioncontrol1_checksum(
   int x = adc_motioncontrol1_checksum;
 
   Byte to_set(data + 7);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_brakepercentage(
@@ -194,20 +194,20 @@ void Adcmotioncontrol110::set_p_adc_cmd_brakepercentage(
     uint8_t* data, double adc_cmd_brakepercentage) {
   adc_cmd_brakepercentage =
       ProtocolData::BoundedValue(0.0, 113.8132, adc_cmd_brakepercentage);
-  int x = adc_cmd_brakepercentage / 0.055600;
+  int x = static_cast<int>(adc_cmd_brakepercentage / 0.055600);
   uint8_t t = 0;
 
-  t = x & 0x3;
+  t = static_cast<uint8_t>(x & 0x3);
   Byte to_set0(data + 0);
   to_set0.set_value(t, 6, 2);
   x >>= 2;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 1);
   to_set1.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0x1;
+  t = static_cast<uint8_t>(x & 0x1);
   Byte to_set2(data + 2);
   to_set2.set_value(t, 0, 1);
 }
@@ -227,15 +227,15 @@ void Adcmotioncontrol110::set_p_adc_cmd_throttleposition(
     uint8_t* data, double adc_cmd_throttleposition) {
   adc_cmd_throttleposition =
       ProtocolData::BoundedValue(0.0, 100.0, adc_cmd_throttleposition);
-  int x = adc_cmd_throttleposition / 0.100000;
+  int x = static_cast<int>(adc_cmd_throttleposition / 0.100000);
   uint8_t t = 0;
 
-  t = x & 0x7F;
+  t = static_cast<uint8_t>(x & 0x7F);
   Byte to_set0(data + 2);
   to_set0.set_value(t, 1, 7);
   x >>= 7;
 
-  t = x & 0x7;
+  t = static_cast<uint8_t>(x & 0x7);
   Byte to_set1(data + 3);
   to_set1.set_value(t, 0, 3);
 }
@@ -257,7 +257,7 @@ void Adcmotioncontrol110::set_p_adc_motioncontrol1_counter(
   int x = adc_motioncontrol1_counter;
 
   Byte to_set(data + 6);
-  to_set.set_value(x, 6, 2);
+  to_set.set_value(static_cast<uint8_t>(x), 6, 2);
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_autonomyrequest(
@@ -280,7 +280,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_autonomyrequest(
   int x = adc_cmd_autonomyrequest;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 2);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 2);
 }
 
 Adcmotioncontrol110* Adcmotioncontrol110::set_adc_cmd_longitudinalcontrolmode(
@@ -304,7 +304,7 @@ void Adcmotioncontrol110::set_p_adc_cmd_longitudinalcontrolmode(
   int x = adc_cmd_longitudinalcontrolmode;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 2, 2);
+  to_set.set_value(static_cast<uint8_t>(x), 2, 2);
 }
 
 }  // namespace transit

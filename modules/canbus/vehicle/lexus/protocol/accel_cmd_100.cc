@@ -64,7 +64,7 @@ void Accelcmd100::set_p_ignore_overrides(uint8_t* data, bool ignore_overrides) {
   int x = ignore_overrides;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 1, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
 Accelcmd100* Accelcmd100::set_enable(bool enable) {
@@ -79,7 +79,7 @@ void Accelcmd100::set_p_enable(uint8_t* data, bool enable) {
   int x = enable;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 1);
 }
 
 Accelcmd100* Accelcmd100::set_clear_override(bool clear_override) {
@@ -94,7 +94,7 @@ void Accelcmd100::set_p_clear_override(uint8_t* data, bool clear_override) {
   int x = clear_override;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 2, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
 Accelcmd100* Accelcmd100::set_clear_faults(bool clear_faults) {
@@ -109,7 +109,7 @@ void Accelcmd100::set_p_clear_faults(uint8_t* data, bool clear_faults) {
   int x = clear_faults;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 3, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
 Accelcmd100* Accelcmd100::set_accel_cmd(double accel_cmd) {
@@ -122,15 +122,15 @@ Accelcmd100* Accelcmd100::set_accel_cmd(double accel_cmd) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
 void Accelcmd100::set_p_accel_cmd(uint8_t* data, double accel_cmd) {
   accel_cmd = ProtocolData::BoundedValue(0.0, 1.0, accel_cmd);
-  int x = accel_cmd / 0.001000;
+  int x = static_cast<int>(accel_cmd / 0.001000);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 2);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 1);
   to_set1.set_value(t, 0, 8);
 }

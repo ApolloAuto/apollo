@@ -59,7 +59,7 @@ Turnsignal68 *Turnsignal68::set_turn_right() {
 void Turnsignal68::set_turn_cmd_p(uint8_t *data, int32_t turn_cmd) {
   turn_cmd = ProtocolData::BoundedValue(0, 3, turn_cmd);
   Byte frame(data + 0);
-  frame.set_value(turn_cmd, 0, 2);
+  frame.set_value(static_cast<uint8_t>(turn_cmd), 0, 2);
 }
 
 }  // namespace lincoln
