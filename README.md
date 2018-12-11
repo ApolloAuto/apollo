@@ -32,8 +32,11 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-**The Apollo Team now proudly presents to you the latest [version 3.0](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md).**
+**Please refer to the
+[migration guide](docs/howto/how_to_migrate_to_apollo_3_5_from_old_versions.md)
+for information about migrating to the brand new Apollo 3.5 from an old version.
 
+**The Apollo Team now proudly presents to you the latest [version 3.0](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md).**
 
  Apollo 3.0 is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
 
