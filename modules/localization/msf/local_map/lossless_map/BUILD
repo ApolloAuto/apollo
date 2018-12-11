@@ -33,7 +33,7 @@ filegroup(
 cc_test(
     name = "localization_msf_local_map_pool_test",
     size = "medium",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["map_pool_test.cc"],
     copts = [
       "-Dprivate=public",
@@ -51,7 +51,7 @@ cc_test(
 cc_test(
     name = "localization_msf_lossless_map_config_test",
     size = "medium",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["lossless_map_config_test.cc"],
     data = [":localization_msf_local_map_test_data"],
     deps = [
