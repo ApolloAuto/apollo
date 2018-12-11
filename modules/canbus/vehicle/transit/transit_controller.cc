@@ -259,7 +259,20 @@ ErrorCode TransitController::EnableAutoMode() {
           ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
 
   can_sender_->Update();
-  set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  if (!CheckResponse()) {
+    AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
+    Emergency();
+    return ErrorCode::CANBUS_ERROR;
+  } else {
+    if (button_pressed_) {
+      set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+      AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+    } else {
+      set_driving_mode(Chassis::COMPLETE_MANUAL);
+      AINFO << "Physical button not pressed yet.";
+    }
+    return ErrorCode::OK;
+  }
   return ErrorCode::OK;
 }
 
@@ -311,14 +324,19 @@ ErrorCode TransitController::EnableSpeedOnlyMode() {
       Adc_motioncontrol1_10::
           ADC_CMD_LONGITUDINALCONTROLMODE_DIRECT_THROTTLE_BRAKE);
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
+  if (!CheckResponse()) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
   } else {
-    set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
+    if (button_pressed_) {
+      set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+      AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+    } else {
+      set_driving_mode(Chassis::COMPLETE_MANUAL);
+      AINFO << "Physical button not pressed yet.";
+    }
     return ErrorCode::OK;
   }
 }
@@ -525,7 +543,7 @@ void TransitController::SecurityDogThreadFunc() {
     // 1. horizontal control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_STEER_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
+        !CheckResponse()) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -538,7 +556,7 @@ void TransitController::SecurityDogThreadFunc() {
     // 2. vertical control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse()) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -565,8 +583,24 @@ void TransitController::SecurityDogThreadFunc() {
   }
 }
 
-bool TransitController::CheckResponse(const int32_t flags, bool need_wait) {
-  return true;
+bool TransitController::CheckResponse() {
+  // TODO(Udelv): Add seperate indicators
+  ChassisDetail chassis_detail;
+  if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
+    AERROR_EVERY(100) << "get chassis detail failed.";
+    return false;
+  }
+
+  auto& motion1_20 = chassis_detail.transit().llc_motionfeedback1_20();
+
+  return (motion1_20.llc_fbk_state() ==
+              Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED ||
+          motion1_20.llc_fbk_state() ==
+              Llc_motionfeedback1_20::LLC_FBK_STATE_DISENGAGE_REQUESTED ||
+          motion1_20.llc_fbk_state() ==
+              Llc_motionfeedback1_20::LLC_FBK_STATE_DISENGAGED ||
+          motion1_20.llc_fbk_state() ==
+              Llc_motionfeedback1_20::LLC_FBK_STATE_FAULT);
 }
 
 void TransitController::set_chassis_error_mask(const int32_t mask) {
