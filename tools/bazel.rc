@@ -88,6 +88,7 @@ build --per_file_copt=\
 ^modules/perception/map/.*\.cc,\
 ^modules/perception/onboard/.*\.cc,\
 ^modules/planning/.*\.cc,\
+^modules/routing/.*\.cc,\
 ^modules/third_party_perception/.*\.cc,\
 ^modules/tools/.*\.cc,\
 ^modules/transform/.*\.cc,\

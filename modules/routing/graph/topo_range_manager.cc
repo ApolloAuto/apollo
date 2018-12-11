@@ -34,8 +34,8 @@ void merge_block_range(const TopoNode* topo_node,
                        std::vector<NodeSRange>* block_range) {
   std::vector<NodeSRange> sorted_origin_range(origin_range);
   std::sort(sorted_origin_range.begin(), sorted_origin_range.end());
-  int cur_index = 0;
-  int total_size = sorted_origin_range.size();
+  size_t cur_index = 0;
+  auto total_size = sorted_origin_range.size();
   while (cur_index < total_size) {
     NodeSRange range(sorted_origin_range[cur_index]);
     ++cur_index;
