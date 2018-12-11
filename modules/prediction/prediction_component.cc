@@ -34,6 +34,7 @@
 #include "modules/common/util/message_util.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/validation_checker.h"
 #include "modules/prediction/common/junction_analyzer.h"

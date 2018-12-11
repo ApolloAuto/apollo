@@ -14,23 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#include "modules/prediction/common/prediction_system_gflags.h"
 
-#include <memory>
-
-#include "modules/prediction/common/environment_features.h"
-#include "modules/prediction/scenario/scenario_features/scenario_features.h"
-
-namespace apollo {
-namespace prediction {
-
-class ScenarioAnalyzer {
- public:
-  ScenarioAnalyzer() = delete;
-
-  static std::shared_ptr<ScenarioFeatures>
-  Analyze(const EnvironmentFeatures& environment_features);
-};
-
-}  // namespace prediction
-}  // namespace apollo
+// System gflags
+DEFINE_string(prediction_module_name, "prediction",
+              "Default prediction module name");
+DEFINE_string(prediction_conf_file,
+              "/apollo/modules/prediction/conf/prediction_conf.pb.txt",
+              "Default conf file for prediction");
+DEFINE_string(prediction_adapter_config_filename,
+              "/apollo/modules/prediction/conf/adapter.conf",
+              "Default conf file for prediction");
+DEFINE_string(prediction_data_dir,
+              "/apollo/modules/prediction/data/prediction/",
+              "Prefix of files to store feature data");
