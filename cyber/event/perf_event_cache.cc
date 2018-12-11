@@ -18,7 +18,8 @@
 
 #include <string>
 
-#include "cyber/common/global_data.h"
+#include "cyber/base/macros.h"
+#include "cyber/common/environment.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/state.h"
@@ -28,18 +29,22 @@ namespace apollo {
 namespace cyber {
 namespace event {
 
-using common::GlobalData;
-using proto::PerfConf;
-using proto::PerfType;
+using common::GetEnv;
 
 PerfEventCache::PerfEventCache() {
-  auto& global_conf = GlobalData::Instance()->Config();
-  if (global_conf.has_perf_conf()) {
-    perf_conf_.CopyFrom(global_conf.perf_conf());
-    enable_ = perf_conf_.enable();
+  auto trans_perf = GetEnv("cyber_trans_perf");
+  if (trans_perf != "" &&
+      std::stoi(trans_perf)) {
+    enable_trans_perf_ = true;
+  }
+  auto sched_perf = GetEnv("cyber_sched_perf");
+  if (sched_perf != "" &&
+      std::stoi(sched_perf)) {
+    enable_sched_perf_ = true;
   }
 
-  if (enable_) {
+  if (enable_sched_perf_ ||
+      enable_trans_perf_) {
     if (!event_queue_.Init(kEventQueueSize)) {
       AERROR << "Event queue init failed.";
       throw std::runtime_error("Event queue init failed.");
@@ -49,11 +54,15 @@ PerfEventCache::PerfEventCache() {
 }
 
 PerfEventCache::~PerfEventCache() {
-  if (!enable_) {
+  if (!enable_sched_perf_ &&
+      !enable_trans_perf_) {
     return;
   }
 
-  shutdown_ = true;
+  if (shutdown_.exchange(true)) {
+    return;
+  }
+
   event_queue_.BreakAllWait();
   if (io_thread_.joinable()) {
     io_thread_.join();
@@ -67,12 +76,7 @@ PerfEventCache::~PerfEventCache() {
 void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
                                    const uint64_t cr_id, const int proc_id,
                                    const int cr_state) {
-  if (!enable_) {
-    return;
-  }
-
-  if (perf_conf_.type() != PerfType::SCHED &&
-      perf_conf_.type() != PerfType::ALL) {
+  if (likely(!enable_sched_perf_)) {
     return;
   }
 
@@ -89,12 +93,7 @@ void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
 void PerfEventCache::AddTransportEvent(const TransPerf event_id,
                                        const uint64_t channel_id,
                                        const uint64_t msg_seq) {
-  if (likely(!enable_)) {
-    return;
-  }
-
-  if (unlikely(perf_conf_.type() != PerfType::TRANSPORT &&
-      perf_conf_.type() != PerfType::ALL)) {
+  if (likely(!enable_trans_perf_)) {
     return;
   }
 

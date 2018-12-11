@@ -17,7 +17,6 @@ cc_library(
         "//cyber/common:global_data",
         "//cyber/common:log",
         "//cyber/common:macros",
-        "//cyber/proto:perf_conf_cc_proto",
         "//cyber/time:time",
     ]
 )
