@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "cyber/samples/commontestcomponent/commontest_component.h"
+#include <memory>
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
+#include "cyber/component/timer_component.h"
+#include "cyber/samples/proto/samples.pb.h"
 
-bool Commontestcomponent::Init() {
-  AINFO << "Commontest component init";
-  return true;
-}
+using apollo::cyber::samples::proto::Driver;
+using apollo::cyber::Component;
+using apollo::cyber::ComponentBase;
+using apollo::cyber::TimerComponent;
+using apollo::cyber::Writer;
 
-bool Commontestcomponent::Proc(const std::shared_ptr<Driver>& msg0,
-                               const std::shared_ptr<Driver>& msg1) {
-  AINFO << "Start commontest component Proc [" << msg0->msg_id() << "] ["
-        << msg1->msg_id() << "]";
-  return true;
-}
+class TimerComponentSample : public TimerComponent {
+ public:
+  bool Init() override;
+  bool Proc() override;
+
+ private:
+  std::shared_ptr<Writer<Driver>> driver_writer_ = nullptr;
+};
+CYBER_REGISTER_COMPONENT(TimerComponentSample)

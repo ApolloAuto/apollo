@@ -3,19 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "libtimertest_component.so",
-    deps = [":timertest_component_lib"],
+    name = "libtimer_component_sample.so",
+    deps = [":timer_component_sample_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
 )
 
 cc_library(
-    name = "timertest_component_lib",
+    name = "timer_component_sample_lib",
     srcs = [
-        "timertest_component.cc",
+        "timer_component_sample.cc",
     ],
     hdrs = [
-        "timertest_component.h",
+        "timer_component_sample.h",
     ],
     deps = [
         "//cyber",

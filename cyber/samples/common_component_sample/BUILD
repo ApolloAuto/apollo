@@ -3,19 +3,19 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "libcommontest_component.so",
-    deps = [":commontest_component_lib"],
+    name = "libcommon_component_sample.so",
+    deps = [":common_component_sample_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
 )
 
 cc_library(
-    name = "commontest_component_lib",
+    name = "common_component_sample_lib",
     srcs = [
-        "commontest_component.cc",
+        "common_component_sample.cc",
     ],
     hdrs = [
-        "commontest_component.h",
+        "common_component_sample.h",
     ],
     deps = [
         "//cyber",
