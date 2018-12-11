@@ -1,10 +1,10 @@
 # Define all coms in DAG streaming.
     module_config {
-    module_library : "/apollo/bazel-bin/cyber/samples/commontestcomponent/libcommontest_component.so"
+    module_library : "/apollo/bazel-bin/cyber/samples/common_component_sample/libcommon_component_sample.so"
     components {
-        class_name : "Commontestcomponent"
+        class_name : "CommonComponentSample"
         config {
-            name : "commontest"
+            name : "common"
             readers {
                 channel: "/apollo/prediction"
             }

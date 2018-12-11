@@ -1,0 +1,12 @@
+# Define all coms in DAG streaming.
+    module_config {
+    module_library : "/apollo/bazel-bin/cyber/samples/timer_component_sample/libtimer_component_sample.so"
+    timer_components {
+        class_name : "TimerComponentSample"
+        config {
+            name : "timer"
+            interval : 10
+        }
+    }    
+
+    }
