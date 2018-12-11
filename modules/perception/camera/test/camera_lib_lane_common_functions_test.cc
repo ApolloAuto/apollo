@@ -173,7 +173,7 @@ TEST(CommonFunctions, QuickSortTest) {
   unsigned int seed = 0;
   for (int i = 0; i < nsize; i++) {
     int rand_value = rand_r(&seed) % 100;
-    float value = 1.0f * static_cast<float>(rand_value / 100 + rand_value);
+    float value = static_cast<float>(rand_value / 100 + rand_value);
     value_vec.push_back(value);
     snprintf(tmp, sizeof(tmp), "[%d %f] ", i, value);
     msg += tmp;
