@@ -19,18 +19,6 @@
 #include <cmath>
 #include <limits>
 
-// System gflags
-DEFINE_string(prediction_module_name, "prediction",
-              "Default prediction module name");
-DEFINE_string(prediction_conf_file,
-              "/apollo/modules/prediction/conf/prediction_conf.pb.txt",
-              "Default conf file for prediction");
-DEFINE_string(prediction_adapter_config_filename,
-              "/apollo/modules/prediction/conf/adapter.conf",
-              "Default conf file for prediction");
-DEFINE_string(prediction_data_dir,
-              "/apollo/modules/prediction/data/prediction/",
-              "Prefix of files to store feature data");
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
     prediction_test_duration, std::numeric_limits<double>::infinity(),
@@ -111,13 +99,13 @@ DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
 DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff, M_PI / 3.0,
-              "Max angle difference for a candiate lane");
+              "Max angle difference for a candidate lane");
 DEFINE_int32(max_num_current_lane_in_junction, 1,
              "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane_in_junction, 1,
              "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff_in_junction, M_PI / 6.0,
-              "Max angle difference for a candiate lane");
+              "Max angle difference for a candidate lane");
 DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
 DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
@@ -136,7 +124,7 @@ DEFINE_string(evaluator_cruise_vehicle_go_model_file,
               "Vehicle cruise go model file");
 DEFINE_string(evaluator_cruise_vehicle_cutin_model_file,
               "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.bin",
-              "Vehicle cruise cutin model file");
+              "Vehicle cruise cut-in model file");
 DEFINE_string(evaluator_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.bin",
               "Vehicle junction MLP model file");
@@ -242,7 +230,7 @@ DEFINE_bool(use_bell_curve_for_cost_function, false,
             "Whether to use bell curve for the cost function or not.");
 
 DEFINE_int32(road_graph_max_search_horizon, 20,
-             "Maximal search depth for buiding road graph");
+             "Maximal search depth for building road graph");
 
 DEFINE_double(lane_distance_threshold, 3.0,
               "The threshold for distance to ego/neighbor lane "

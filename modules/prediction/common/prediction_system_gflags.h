@@ -16,21 +16,10 @@
 
 #pragma once
 
-#include <memory>
+#include "gflags/gflags.h"
 
-#include "modules/prediction/common/environment_features.h"
-#include "modules/prediction/scenario/scenario_features/scenario_features.h"
-
-namespace apollo {
-namespace prediction {
-
-class ScenarioAnalyzer {
- public:
-  ScenarioAnalyzer() = delete;
-
-  static std::shared_ptr<ScenarioFeatures>
-  Analyze(const EnvironmentFeatures& environment_features);
-};
-
-}  // namespace prediction
-}  // namespace apollo
+// System gflags
+DECLARE_string(prediction_module_name);
+DECLARE_string(prediction_conf_file);
+DECLARE_string(prediction_adapter_config_filename);
+DECLARE_string(prediction_data_dir);
