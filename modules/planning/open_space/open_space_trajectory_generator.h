@@ -117,7 +117,7 @@ class OpenSpaceTrajectoryGenerator {
                        const std::vector<std::vector<common::math::Vec2d>>&
                            obstacles_vertices_vec);
 
-  const std::vector<double>& end_pose() const { return end_pose_; }
+//   const std::vector<double>& end_pose() const { return end_pose_; }
 
  private:
   bool IsVehicleNearDestination(
@@ -134,7 +134,9 @@ class OpenSpaceTrajectoryGenerator {
       const Vec2d& translate_origin,
       const double& is_near_desitination_threshold);
 
-  void GenerateStopTrajectory(const std::vector<double>& end_pose);
+  void GenerateStopTrajectory(const std::vector<double>& end_pose,
+                              const double& rotate_angle,
+                              const Vec2d& translate_origin);
 
   std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
   std::unique_ptr<::apollo::planning::DistanceApproachProblem>
@@ -159,7 +161,7 @@ class OpenSpaceTrajectoryGenerator {
   std::vector<double> XYbounds_;
   apollo::common::Trajectory trajectory_to_end_;
   apollo::planning_internal::OpenSpaceDebug open_space_debug_;
-  std::vector<double> end_pose_;
+//   std::vector<double> end_pose_;
 };
 
 }  // namespace planning
