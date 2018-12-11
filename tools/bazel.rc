@@ -76,6 +76,7 @@ build --per_file_copt=\
 ^modules/common/math/.*\.cc,\
 ^modules/common/util/.*\.cc,\
 ^modules/contrib/.*\.cc,\
+^modules/control/.*\.cc,\
 ^modules/data/.*\.cc,\
 ^modules/dreamview/backend/hmi/.*\.cc,\
 ^modules/guardian/.*\.cc,\
