@@ -18,6 +18,7 @@
 
 #include "modules/common/proto/vehicle_signal.pb.h"
 
+#include "cyber/common/log.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/canbus/vehicle/lincoln/protocol/brake_60.h"
 #include "modules/canbus/vehicle/lincoln/protocol/gear_66.h"
@@ -26,7 +27,6 @@
 #include "modules/canbus/vehicle/lincoln/protocol/turnsignal_68.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/kv_db/kv_db.h"
-#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -617,11 +617,6 @@ bool LincolnController::CheckChassisError() {
 
   int32_t error_cnt = 0;
   int32_t chassis_error_mask = 0;
-  if (!chassis_detail.has_eps()) {
-    AERROR_EVERY(100) << "ChassisDetail has NO eps."
-                      << chassis_detail.DebugString();
-    return false;
-  }
   bool steer_fault = chassis_detail.eps().watchdog_fault() |
                      chassis_detail.eps().channel_1_fault() |
                      chassis_detail.eps().channel_2_fault() |
