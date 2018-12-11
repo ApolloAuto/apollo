@@ -82,7 +82,7 @@ class BufferInterface {
   virtual bool canTransform(const std::string& target_frame,
                             const std::string& source_frame,
                             const cyber::Time& time,
-                            const float timeout_second = 0.01,
+                            const float timeout_second = 0.01f,
                             std::string* errstr = nullptr) const = 0;
 
   /** \brief Test if a transform is possible
@@ -102,13 +102,13 @@ class BufferInterface {
                             const std::string& source_frame,
                             const cyber::Time& source_time,
                             const std::string& fixed_frame,
-                            const float timeout_second = 0.01,
+                            const float timeout_second = 0.01f,
                             std::string* errstr = nullptr) const = 0;
 
   // Transform, simple api, with pre-allocation
   template <typename T>
   T& transform(const T& in, T& out, const std::string& target_frame,  // NOLINT
-               float timeout = 0.0) const {
+               float timeout = 0.0f) const {
     // do the transform
     tf2::doTransform(in, out,
                      lookupTransform(target_frame, tf2::getFrameId(in),
@@ -119,7 +119,7 @@ class BufferInterface {
   // transform, simple api, no pre-allocation
   template <typename T>
   T transform(const T& in, const std::string& target_frame,
-              float timeout = 0.0) const {
+              float timeout = 0.0f) const {
     T out;
     return transform(in, out, target_frame, timeout);
   }
@@ -127,7 +127,7 @@ class BufferInterface {
   // transform, simple api, different types, pre-allocation
   template <typename A, typename B>
   B& transform(const A& in, B& out, const std::string& target_frame,  // NOLINT
-               float timeout = 0.0) const {
+               float timeout = 0.0f) const {
     A copy = transform(in, target_frame, timeout);
     tf2::convert(copy, out);
     return out;
@@ -137,7 +137,7 @@ class BufferInterface {
   template <typename T>
   T& transform(const T& in, T& out, const std::string& target_frame,  // NOLINT
                const cyber::Time& target_time,
-               const std::string& fixed_frame, float timeout = 0.0) const {
+               const std::string& fixed_frame, float timeout = 0.0f) const {
     // do the transform
     tf2::doTransform(
         in, out,
@@ -150,7 +150,7 @@ class BufferInterface {
   template <typename T>
   T transform(const T& in, const std::string& target_frame,
               const cyber::Time& target_time,
-              const std::string& fixed_frame, float timeout = 0.0) const {
+              const std::string& fixed_frame, float timeout = 0.0f) const {
     T out;
     return transform(in, out, target_frame, target_time, fixed_frame, timeout);
   }
@@ -159,7 +159,7 @@ class BufferInterface {
   template <typename A, typename B>
   B& transform(const A& in, B& out, const std::string& target_frame,  // NOLINT
                const cyber::Time& target_time,
-               const std::string& fixed_frame, float timeout = 0.0) const {
+               const std::string& fixed_frame, float timeout = 0.0f) const {
     // do the transform
     A copy = transform(in, target_frame, target_time, fixed_frame, timeout);
     tf2::convert(copy, out);
