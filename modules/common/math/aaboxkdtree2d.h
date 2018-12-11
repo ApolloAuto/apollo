@@ -131,7 +131,7 @@ class AABoxKDTree2dNode {
 
  private:
   void InitObjects(const std::vector<ObjectPtr> &objects) {
-    num_objects_ = objects.size();
+    num_objects_ = static_cast<int>(objects.size());
     objects_sorted_by_min_ = objects;
     objects_sorted_by_max_ = objects;
     std::sort(objects_sorted_by_min_.begin(), objects_sorted_by_min_.end(),

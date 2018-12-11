@@ -71,7 +71,7 @@ inline double QuaternionToHeading(const double qw, const double qx,
  */
 template <typename T>
 inline T QuaternionToHeading(const Eigen::Quaternion<T> &q) {
-  return QuaternionToHeading(q.w(), q.x(), q.y(), q.z());
+  return static_cast<T>(QuaternionToHeading(q.w(), q.x(), q.y(), q.z()));
 }
 
 /*
@@ -104,14 +104,15 @@ inline Eigen::Vector3d QuaternionRotate(const Quaternion &orientation,
                                         const Eigen::Vector3d &original) {
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                        orientation.qy(), orientation.qz());
-  return quaternion.toRotationMatrix() * original;
+  return static_cast<Eigen::Vector3d>(quaternion.toRotationMatrix() * original);
 }
 
 inline Eigen::Vector3d InverseQuaternionRotate(const Quaternion &orientation,
                                                const Eigen::Vector3d &rotated) {
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                        orientation.qy(), orientation.qz());
-  return quaternion.toRotationMatrix().inverse() * rotated;
+  return static_cast<Eigen::Vector3d>(quaternion.toRotationMatrix().inverse() *
+                                      rotated);
 }
 
 }  // namespace math

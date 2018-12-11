@@ -75,6 +75,7 @@ build --per_file_copt=\
 ^modules/calibration/.*\.cc,\
 ^modules/common/util/.*\.cc,\
 ^modules/contrib/.*\.cc,\
+^modules/common/math/.*,\
 ^modules/data/.*\.cc,\
 ^modules/dreamview/backend/hmi/.*\.cc,\
 ^modules/guardian/.*\.cc,\

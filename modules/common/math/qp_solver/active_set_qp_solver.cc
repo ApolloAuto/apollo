@@ -39,9 +39,9 @@ ActiveSetQpSolver::ActiveSetQpSolver(
     : QpSolver(kernel_matrix, offset, affine_inequality_matrix,
                affine_inequality_boundary, affine_equality_matrix,
                affine_equality_boundary),
-      num_constraint_(affine_equality_matrix_.rows() +
-                      affine_inequality_matrix_.rows()),
-      num_param_(kernel_matrix.rows()),
+      num_constraint_(static_cast<int>(affine_equality_matrix_.rows() +
+                                       affine_inequality_matrix_.rows())),
+      num_param_(static_cast<int>(kernel_matrix.rows())),
       qp_eps_num_(FLAGS_default_active_set_eps_num),
       qp_eps_den_(FLAGS_default_active_set_eps_den),
       qp_eps_iter_ref_(FLAGS_default_active_set_eps_iter_ref),
