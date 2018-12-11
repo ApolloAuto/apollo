@@ -234,6 +234,15 @@ class PredictionMap {
   GetJunctions(const Eigen::Vector2d& point, const double radius);
 
   /**
+   * @brief Get a list of junctions given a point and a search radius
+   * @param Point
+   * @param Search radius
+   * @return A list of junctions
+   */
+  static std::vector<std::shared_ptr<const apollo::hdmap::PNCJunctionInfo>>
+  GetPNCJunctions(const Eigen::Vector2d& point, const double radius);
+
+  /**
    * @brief Get the lane heading on a point.
    * @param lane_info The target lane.
    * @param point The point to get the heading.

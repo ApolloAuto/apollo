@@ -43,6 +43,7 @@ using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::Id;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::PNCJunctionInfo;
 using apollo::hdmap::OverlapInfo;
 using apollo::hdmap::MapPathPoint;
 
@@ -300,6 +301,17 @@ std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
   hdmap_point.set_y(point.y());
   std::vector<std::shared_ptr<const JunctionInfo>> junctions;
   HDMapUtil::BaseMap().GetJunctions(hdmap_point, radius, &junctions);
+  return junctions;
+}
+
+std::vector<std::shared_ptr<const PNCJunctionInfo>>
+PredictionMap::GetPNCJunctions(
+    const Eigen::Vector2d& point, const double radius) {
+  common::PointENU hdmap_point;
+  hdmap_point.set_x(point.x());
+  hdmap_point.set_y(point.y());
+  std::vector<std::shared_ptr<const PNCJunctionInfo>> junctions;
+  HDMapUtil::BaseMap().GetPNCJunctions(hdmap_point, radius, &junctions);
   return junctions;
 }
 

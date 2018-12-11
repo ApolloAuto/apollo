@@ -103,6 +103,22 @@ class ADCTrajectoryContainer : public Container {
  private:
   void SetJunctionPolygon();
 
+  void SetPNCJunctionPolygon();
+
+  /**
+   * @brief Check if a point is in the first junction of the adc trajectory
+   * @param Point
+   * @return True if the point is in the first junction of the adc trajectory
+   */
+  bool IsPointInRegularJunction(const common::PathPoint& point) const;
+
+  /**
+   * @brief Check if a point is in the first PNC junction of the adc trajectory
+   * @param Point
+   * @return True if the point is in the first PNC junction of the adc trajectory
+   */
+  bool IsPointInPNCJunction(const common::PathPoint& point) const;
+
   void SetLaneSequence();
 
   std::string ToString(const std::unordered_set<std::string>& lane_ids);
@@ -112,7 +128,9 @@ class ADCTrajectoryContainer : public Container {
  private:
   planning::ADCTrajectory adc_trajectory_;
   common::math::Polygon2d adc_junction_polygon_;
+  common::math::Polygon2d adc_pnc_junction_polygon_;
   std::shared_ptr<const hdmap::JunctionInfo> adc_junction_info_ptr_;
+  std::shared_ptr<const hdmap::PNCJunctionInfo> adc_pnc_junction_info_ptr_;
   double s_dist_to_junction_;
   std::unordered_set<std::string> adc_lane_ids_;
   std::vector<std::string> adc_lane_seq_;

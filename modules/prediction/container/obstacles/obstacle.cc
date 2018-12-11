@@ -302,7 +302,7 @@ void Obstacle::SetJunctionFeatureWithEnterLane(
 void Obstacle::SetJunctionFeatureWithoutEnterLane(
     Feature* const feature_ptr) {
   if (!feature_ptr->has_lane()) {
-    AERROR << "Obstacle [" << id_ << "] has no lane.";
+    ADEBUG << "Obstacle [" << id_ << "] has no lane.";
     return;
   }
   std::vector<std::string> start_lane_ids;
