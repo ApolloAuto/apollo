@@ -214,7 +214,7 @@ default_task_config: {
 default_task_config: {
   task_type: SIDE_PASS_PATH_DECIDER
   side_pass_path_decider_config {
-    total_path_length: 50.0
+    total_path_length: 60.0
     path_resolution: 0.5
     max_dddl: 2.0
     l_weight: 1.0

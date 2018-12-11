@@ -77,6 +77,7 @@ class SidePassPathDecider : public Decider {
   std::unique_ptr<Fem1dQpProblem> fem_qp_;
   SidePassDirection decided_direction_ = SidePassDirection::LEFT;
   double delta_s_ = 0.0;
+  double total_path_length_ = 0.0;
 
   hdmap::Lane curr_lane_;
   const Obstacle* nearest_obstacle_ = nullptr;
