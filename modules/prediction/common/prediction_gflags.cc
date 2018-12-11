@@ -241,3 +241,11 @@ DEFINE_bool(use_bell_curve_for_cost_function, false,
 
 DEFINE_int32(road_graph_max_search_horizon, 20,
              "Maximal search depth for buiding road graph");
+
+DEFINE_double(lane_distance_threshold, 3.0,
+              "The threshold for distance to ego/neighbor lane "
+              "in feature extraction");
+
+DEFINE_double(lane_angle_difference_threshold, M_PI * 0.25,
+              "The threshold for distance to ego/neighbor lane "
+              "in feature extraction");
