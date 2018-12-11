@@ -369,20 +369,6 @@ Status OpenSpacePlanning::Plan(
     } else {
       return status;
     }
-  } else if (status == Status(ErrorCode::OK, "vehicle reach end_pose")) {
-    ADCTrajectory* trajectory_after_stitching_point =
-        frame_->mutable_trajectory();
-
-    trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
-        current_time_stamp);
-    last_publishable_trajectory_.reset(
-        new PublishableTrajectory(*trajectory_after_stitching_point));
-
-    ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
-    // trajectory partition and choose the current trajectory to follow
-    trajectory_partition_status =
-        TrajectoryPartition(last_publishable_trajectory_, ptr_trajectory_pb);
-
   } else {
     return status;
   }

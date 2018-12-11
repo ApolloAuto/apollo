@@ -78,25 +78,26 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   if (!vehicle_state.has_x() || XYbounds.size() == 0 || end_pose.size() == 0 ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
-    return Status(ErrorCode::PLANNING_ERROR, "Generator input data not ready");
+    return Status(ErrorCode::PLANNING_ERROR,
+                           "Generator input data not ready");
   }
 
   // Update end pose for target consistency check.
-  end_pose_ = end_pose;
+//   end_pose_ = end_pose;
 
   // Generate Stop trajectory if vehicle close to destination
-  if (IsVehicleNearDestination(
-          stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
-          translate_origin,
-          planner_open_space_config_.is_near_desitination_threshold())) {
-    AINFO << "Vehicle is close to destination, skip new "
-             "trajectory generation.";
+  //   if (IsVehicleNearDestination(
+  //           stitching_trajectory.back(), vehicle_state, end_pose,
+  //           rotate_angle, translate_origin,
+  //           planner_open_space_config_.is_near_desitination_threshold())) {
+  //     AINFO << "Vehicle is close to destination, skip new "
+  //              "trajectory generation.";
 
-    GenerateStopTrajectory(end_pose);
-    return Status::OK();
-  }
+  //     GenerateStopTrajectory(end_pose, rotate_angle, translate_origin);
+  //     return Status::OK();
+  //   }
 
-  /*
+  // Generate Stop trajectory if init point close to destination
   if (IsInitPointNearDestination(
           stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
           translate_origin,
@@ -104,10 +105,9 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     AINFO << "Planning init point is close to destination, skip new "
              "trajectory generation.";
 
-    GenerateStopTrajectory(end_pose);
-    return status::OK();
+    GenerateStopTrajectory(end_pose, rotate_angle, translate_origin);
+    return Status::OK();
   }
-  */
 
   // initial state
   stitching_trajectory_ = stitching_trajectory;
@@ -462,16 +462,21 @@ bool OpenSpaceTrajectoryGenerator::IsInitPointNearDestination(
 }
 
 void OpenSpaceTrajectoryGenerator::GenerateStopTrajectory(
-    const std::vector<double>& end_pose) {
+    const std::vector<double>& end_pose, const double& rotate_angle,
+    const Vec2d& translate_origin) {
   trajectory_to_end_.Clear();
+  CHECK_EQ(end_pose.size(), 4);
+  Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
+  end_pose_to_world_frame.SelfRotate(rotate_angle);
+  end_pose_to_world_frame += translate_origin;
   double relative_time = 0.0;
   constexpr int stop_trajectory_length = 10;
   constexpr double relative_stop_time = 0.1;
   for (size_t i = 0; i < stop_trajectory_length; i++) {
     auto* point = trajectory_to_end_.add_trajectory_point();
-    point->mutable_path_point()->set_x(end_pose[0]);
-    point->mutable_path_point()->set_y(end_pose[1]);
-    point->mutable_path_point()->set_theta(end_pose[2]);
+    point->mutable_path_point()->set_x(end_pose_to_world_frame.x());
+    point->mutable_path_point()->set_y(end_pose_to_world_frame.y());
+    point->mutable_path_point()->set_theta(end_pose[2] + rotate_angle);
     point->mutable_path_point()->set_s(0.0);
     point->mutable_path_point()->set_kappa(0.0);
     point->set_relative_time(relative_time);
