@@ -114,6 +114,8 @@ DECLARE_double(defualt_junction_range);
 
 // Evaluator
 DECLARE_double(time_to_center_if_not_reach);
+DECLARE_double(default_s_if_no_obstacle_in_lane_sequence);
+DECLARE_double(default_l_if_no_obstacle_in_lane_sequence);
 
 // Obstacle trajectory
 DECLARE_bool(enable_cruise_regression);
