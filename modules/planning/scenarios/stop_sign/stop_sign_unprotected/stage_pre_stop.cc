@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_pre_stop.h"
 
 #include <algorithm>
 #include <limits>
@@ -51,7 +51,7 @@ using perception::PerceptionObstacle;
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
-Stage::StageStatus StopSignUnprotectedPreStop::Process(
+Stage::StageStatus StagePreStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: PreStop";
   CHECK_NOTNULL(frame);
@@ -60,7 +60,7 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StopSignUnprotectedPreStop planning error";
+    AERROR << "StagePreStop planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -69,12 +69,11 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
   std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it = std::find_if(
-      stop_sign_overlaps.begin(),
-      stop_sign_overlaps.end(),
-      [&stop_sign_overlap_id](const PathOverlap &overlap) {
-        return overlap.object_id == stop_sign_overlap_id;
-      });
+  auto stop_sign_overlap_it =
+      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
+                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
+                     return overlap.object_id == stop_sign_overlap_id;
+                   });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
@@ -138,8 +137,7 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
   // for visualization
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   std::copy(
-      watch_vehicle_ids.begin(),
-      watch_vehicle_ids.end(),
+      watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
       std::back_inserter(
           PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
@@ -154,8 +152,8 @@ Stage::StageStatus StopSignUnprotectedPreStop::Process(
 /**
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
-int StopSignUnprotectedPreStop::AddWatchVehicle(
-    const Obstacle& obstacle, StopSignLaneVehicles* watch_vehicles) {
+int StagePreStop::AddWatchVehicle(const Obstacle& obstacle,
+                                  StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle = obstacle.Perception();
@@ -250,8 +248,7 @@ int StopSignUnprotectedPreStop::AddWatchVehicle(
 /**
  * @brief: check valid stop_sign stop
  */
-bool StopSignUnprotectedPreStop::CheckADCStop(
-    const ReferenceLineInfo& reference_line_info) {
+bool StagePreStop::CheckADCStop(const ReferenceLineInfo& reference_line_info) {
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > scenario_config_.max_adc_stop_speed()) {

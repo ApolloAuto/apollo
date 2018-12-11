@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_stop.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_stop.h"
 
 #include <algorithm>
 #include <limits>
@@ -51,7 +51,7 @@ using perception::PerceptionObstacle;
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
-Stage::StageStatus StopSignUnprotectedStop::Process(
+Stage::StageStatus StageStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
@@ -69,12 +69,11 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it = std::find_if(
-      stop_sign_overlaps.begin(),
-      stop_sign_overlaps.end(),
-      [&stop_sign_overlap_id](const PathOverlap &overlap) {
-        return overlap.object_id == stop_sign_overlap_id;
-      });
+  auto stop_sign_overlap_it =
+      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
+                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
+                     return overlap.object_id == stop_sign_overlap_id;
+                   });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
     return FinishStage(ScenarioConfig::NO_STAGE);
   }
@@ -92,11 +91,10 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   // STOP
   auto start_time = GetContext()->stop_start_time;
   const double wait_time = Clock::NowInSeconds() - start_time;
-  ADEBUG << "stop_start_time[" << start_time
-      << "] wait_time[" << wait_time << "]";
+  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
+         << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
-  if (wait_time >= scenario_config_.stop_duration() &&
-      watch_vehicles.empty()) {
+  if (wait_time >= scenario_config_.stop_duration() && watch_vehicles.empty()) {
     return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
   }
 
@@ -112,8 +110,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
       std::string vehicle = watch_vehicle_ids[i];
       s = s.empty() ? vehicle : s + "," + vehicle;
     }
-    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id
-         << "] vehicle[" << s << "]";
+    ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
+           << s << "]";
   }
 
   if (watch_vehicle_ids.size() == 0) {
@@ -124,8 +122,7 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
   // for visualization
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   std::copy(
-      watch_vehicle_ids.begin(),
-      watch_vehicle_ids.end(),
+      watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
       std::back_inserter(
           PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
@@ -146,9 +143,8 @@ Stage::StageStatus StopSignUnprotectedStop::Process(
 /**
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
-int StopSignUnprotectedStop::RemoveWatchVehicle(
-    const Obstacle& obstacle,
-    const std::vector<std::string>& watch_vehicle_ids,
+int StageStop::RemoveWatchVehicle(
+    const Obstacle& obstacle, const std::vector<std::string>& watch_vehicle_ids,
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
@@ -176,8 +172,8 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
   }
 
   for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
-    if (std::find(it->second.begin(), it->second.end(),
-                  obstacle_id) == it->second.end()) {
+    if (std::find(it->second.begin(), it->second.end(), obstacle_id) ==
+        it->second.end()) {
       continue;
     }
 
@@ -198,27 +194,24 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
             hdmap::MakeMapId(associated_lane_id));
     if (stop_sign_over_lap_info == nullptr) {
       AERROR << "can't find stop_sign_over_lap_info for id: "
-          << associated_lane_id;
+             << associated_lane_id;
       continue;
     }
     const double stop_line_end_s =
         stop_sign_over_lap_info->lane_overlap_info().end_s();
 
-    const auto lane = HDMapUtil::BaseMap().GetLaneById(
-        hdmap::MakeMapId(associated_lane_id));
+    const auto lane =
+        HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(associated_lane_id));
     if (lane == nullptr) {
       continue;
     }
     auto stop_sign_point = lane.get()->GetSmoothPoint(stop_line_end_s);
     auto obstacle_point = common::util::MakePointENU(
-        perception_obstacle.position().x(),
-        perception_obstacle.position().y(),
+        perception_obstacle.position().x(), perception_obstacle.position().y(),
         perception_obstacle.position().z());
 
-    double distance = common::util::DistanceXY(
-        stop_sign_point, obstacle_point);
-    ADEBUG << "obstacle_id[" << obstacle_id
-        << "] distance[" << distance << "]";
+    double distance = common::util::DistanceXY(stop_sign_point, obstacle_point);
+    ADEBUG << "obstacle_id[" << obstacle_id << "] distance[" << distance << "]";
 
     // TODO(all): move 10.0 to conf
     if (distance > 10.0) {
@@ -226,9 +219,9 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
       for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
            it != watch_vehicles->end(); ++it) {
         std::vector<std::string>& vehicles = it->second;
-        vehicles.erase(std::remove(vehicles.begin(), vehicles.end(),
-                                   obstacle_id),
-                                   vehicles.end());
+        vehicles.erase(
+            std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
+            vehicles.end());
       }
       return 0;
     }
@@ -237,7 +230,7 @@ int StopSignUnprotectedStop::RemoveWatchVehicle(
   return 0;
 }
 
-Stage::StageStatus StopSignUnprotectedStop::FinishStage(
+Stage::StageStatus StageStop::FinishStage(
     const ScenarioConfig::StageType& next_stage) {
   next_stage_ = next_stage;
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =

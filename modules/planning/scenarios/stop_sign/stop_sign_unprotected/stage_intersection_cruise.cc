@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_intersection_cruise.h"
 
 #include <algorithm>
 #include <limits>
@@ -41,14 +41,14 @@ namespace stop_sign {
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
-Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
+Stage::StageStatus StageIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StopSignUnprotectedIntersectionCruise plan error";
+    AERROR << "StageIntersectionCruise plan error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -57,12 +57,11 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
   std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it = std::find_if(
-      stop_sign_overlaps.begin(),
-      stop_sign_overlaps.end(),
-      [&stop_sign_overlap_id](const PathOverlap &overlap) {
-        return overlap.object_id == stop_sign_overlap_id;
-      });
+  auto stop_sign_overlap_it =
+      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
+                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
+                     return overlap.object_id == stop_sign_overlap_id;
+                   });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
@@ -72,8 +71,7 @@ Stage::StageStatus StopSignUnprotectedIntersectionCruise::Process(
   // TODO(all): update when pnc-junction is ready
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  if (adc_back_edge_s - stop_sign_overlap_it->end_s >
-      kIntersectionLength) {
+  if (adc_back_edge_s - stop_sign_overlap_it->end_s > kIntersectionLength) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }

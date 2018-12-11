@@ -36,9 +36,9 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-class StopSignUnprotectedCreep : public Stage {
+class StageIntersectionCruise : public Stage {
  public:
-  explicit StopSignUnprotectedCreep(const ScenarioConfig::StageConfig& config)
+  explicit StageIntersectionCruise(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:
@@ -46,7 +46,7 @@ class StopSignUnprotectedCreep : public Stage {
                              Frame* frame) override;
 
   StopSignUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<StopSignUnprotectedContext>();
+    return GetContextAs<StopSignUnprotectedContext>();
   }
 
  private:

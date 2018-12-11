@@ -18,10 +18,10 @@
  * @file
  **/
 
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
+
 #include <algorithm>
 #include <limits>
-
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -32,10 +32,10 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_creep.h"
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_intersection_cruise.h"
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_pre_stop.h"
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_stop.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_creep.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_intersection_cruise.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_pre_stop.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_stop.h"
 
 namespace apollo {
 namespace planning {
@@ -95,22 +95,22 @@ void StopSignUnprotectedScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedPreStop(config);
+        return new StagePreStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedStop(config);
+        return new StageStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedCreep(config);
+        return new StageCreep(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StopSignUnprotectedIntersectionCruise(config);
+        return new StageIntersectionCruise(config);
       });
 }
 

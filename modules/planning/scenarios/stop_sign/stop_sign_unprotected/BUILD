@@ -5,23 +5,23 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "stop_sign_unprotected_scenario",
     srcs = [
+        "stage_creep.cc",
+        "stage_intersection_cruise.cc",
+        "stage_pre_stop.cc",
+        "stage_stop.cc",
         "stop_sign_unprotected_scenario.cc",
-        "stop_sign_unprotected_pre_stop.cc",
-        "stop_sign_unprotected_stop.cc",
-        "stop_sign_unprotected_creep.cc",
-        "stop_sign_unprotected_intersection_cruise.cc",
     ],
     hdrs = [
+        "stage_creep.h",
+        "stage_intersection_cruise.h",
+        "stage_pre_stop.h",
+        "stage_stop.h",
         "stop_sign_unprotected_scenario.h",
-        "stop_sign_unprotected_pre_stop.h",
-        "stop_sign_unprotected_stop.h",
-        "stop_sign_unprotected_creep.h",
-        "stop_sign_unprotected_intersection_cruise.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//external:gflags",
         "//cyber/common:log",
+        "//external:gflags",
         "//modules/common",
         "//modules/common/util",
         "//modules/common/util:factory",
@@ -35,8 +35,8 @@ cc_library(
 cc_test(
     name = "stop_sign_unprotected_scenario_test",
     size = "small",
-    srcs = ["stop_sign_unprotected_scenario_test.cc",],
-    data = ["//modules/planning:planning_conf",],
+    srcs = ["stop_sign_unprotected_scenario_test.cc"],
+    data = ["//modules/planning:planning_conf"],
     deps = [
         ":stop_sign_unprotected_scenario",
         "@gtest//:main",
