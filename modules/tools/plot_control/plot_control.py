@@ -17,15 +17,13 @@
 ###############################################################################
 
 import sys
-
 import gflags
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-import rospy
-from std_msgs.msg import String
+#import rospy
+from cyber_py import cyber
 
 from modules.control.proto import control_cmd_pb2
-
 BRAKE_LINE_DATA = []
 TROTTLE_LINE_DATA = []
 STEERING_LINE_DATA = []
@@ -54,9 +52,15 @@ def callback(data):
 
 
 def listener():
-    rospy.init_node('control_listener', anonymous=True)
-    rospy.Subscriber('/apollo/control', control_cmd_pb2.ControlCommand,
-                     callback)
+    #cyber.init()
+    test_node = cyber.Node("control_listener")
+    test_node.create_reader("/apollo/control",
+            control_cmd_pb2.ControlCommand, callback)
+    test_node.spin()
+    #cyber.shutdown()
+    #rospy.init_node('control_listener', anonymous=True)
+    #rospy.Subscriber('/apollo/control', control_cmd_pb2.ControlCommand,
+    #                 callback)
 
     # rospy.spin()
 

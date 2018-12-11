@@ -16,8 +16,19 @@
 # limitations under the License.
 ###############################################################################
 
+"""
+Extract localization message from data record file,
+and save them into specified  file
+
+Usage:
+    extract_path.py save_fileName  bag1 bag2
+
+See the gflags for more optional args.
+"""
+
 import sys
-import rosbag
+from cyber_py import cyber
+from cyber_py.record import RecordReader
 from modules.localization.proto import localization_pb2
 
 if len(sys.argv) < 3:
@@ -29,10 +40,12 @@ fbags = sys.argv[2:]
 
 with open(filename, 'w') as f:
     for fbag in fbags:
-        bag = rosbag.Bag(fbag)
-        for topic, localization_pb, t in bag.read_messages(
-                topics=['/apollo/localization/pose']):
-            x = localization_pb.pose.position.x
-            y = localization_pb.pose.position.y
-            f.write(str(x) + "," + str(y) + "\n")
+        reader = RecordReader(fbag)
+        for msg in reader.read_messages():
+            if msg.topic == "/apollo/localization/pose":
+                localization = localization_pb2.LocalizationEstimate()
+                localization.ParseFromString(msg.message)
+                x = localization.pose.position.x
+                y = localization.pose.position.y
+                f.write(str(x) + "," + str(y) + "\n")
 print("File written to: %s" % filename)

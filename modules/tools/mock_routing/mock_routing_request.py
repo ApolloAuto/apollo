@@ -16,30 +16,29 @@
 # limitations under the License.
 ###############################################################################
 """
-Generate Planning Path
+Insert routing request
+Usage:
+    mock_routing_request.py
 """
-
 import argparse
-import atexit
 import os
 import sys
 import time
 
-import rospy
-import scipy.signal as signal
-from numpy import genfromtxt
-
+from cyber_py import cyber
 from modules.routing.proto import routing_pb2
 
 def main():
     """
     Main rosnode
     """
-    rospy.init_node('mock_routing_requester', anonymous=True)
+    cyber.init()
+    node = cyber.Node("mock_routing_requester")
     sequence_num = 0
 
     routing_request = routing_pb2.RoutingRequest()
-    routing_request.header.timestamp_sec = rospy.get_time()
+
+    routing_request.header.timestamp_sec = time.time()
     routing_request.header.module_name = 'routing_request'
     routing_request.header.sequence_num = sequence_num
     sequence_num = sequence_num + 1
@@ -56,10 +55,11 @@ def main():
     waypoint.id = '1-1'
     waypoint.s = 80
 
-    request_publisher = rospy.Publisher(
-            '/apollo/routing_request', routing_pb2.RoutingRequest, queue_size=1)
+    writer = node.create_writer('/apollo/routing_request',
+                                           routing_pb2.RoutingRequest)
     time.sleep(2.0)
-    request_publisher.publish(routing_request)
+    print("routing_request", routing_request)
+    writer.write(routing_request)
 
 
 if __name__ == '__main__':
