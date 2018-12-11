@@ -896,5 +896,39 @@ void OpenSpacePlanning::BuildPredictedEnvironment(
   }
 }
 
+apollo::common::Status OpenSpacePlanning::GenerateGearShiftTrajectory(
+    const std::vector<double>& end_pose,
+    const apollo::canbus::Chassis::GearPosition& gear_position,
+    ADCTrajectory* trajectory_pb) {
+  if (end_pose.size() != 4) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "End pose not valid in GenerateGearShiftTrajectory!");
+  }
+
+  trajectory_pb->clear_trajectory_point();
+
+  trajectory_pb->set_gear(gear_position);
+
+  // TODO(QiL): move this to config after finalize the logic
+  const double max_t = 3.0;
+  const double unit_t = 0.02;
+
+  TrajectoryPoint tp;
+  auto path_point = tp.mutable_path_point();
+  path_point->set_x(end_pose[0]);
+  path_point->set_y(end_pose[1]);
+  path_point->set_theta(end_pose[2]);
+  path_point->set_s(0.0);
+  tp.set_v(0.0);
+  tp.set_a(0.0);
+  for (double t = 0.0; t < max_t; t += unit_t) {
+    tp.set_relative_time(t);
+    auto next_point = trajectory_pb->add_trajectory_point();
+    next_point->CopyFrom(tp);
+  }
+
+  return Status::OK();
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -92,6 +92,11 @@ class OpenSpacePlanning : public PlanningBase {
 
   void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
+  apollo::common::Status GenerateGearShiftTrajectory(
+      const std::vector<double>& end_pose,
+      const apollo::canbus::Chassis::GearPosition& gear_position,
+      ADCTrajectory* trajectory_pb);
+
  private:
   routing::RoutingResponse last_routing_;
   std::unique_ptr<Frame> frame_;
