@@ -25,7 +25,6 @@
 #include "cyber/base/bounded_queue.h"
 #include "cyber/common/macros.h"
 #include "cyber/event/perf_event.h"
-#include "cyber/proto/perf_conf.pb.h"
 
 namespace apollo {
 namespace cyber {
@@ -48,10 +47,10 @@ class PerfEventCache {
   std::thread io_thread_;
   std::ofstream of_;
 
-  bool enable_ = false;
-  bool shutdown_ = false;
+  bool enable_trans_perf_ = false;
+  bool enable_sched_perf_ = false;
+  std::atomic<bool> shutdown_ = {false};
 
-  proto::PerfConf perf_conf_;
   base::BoundedQueue<EventBasePtr> event_queue_;
 
   const int kFlushSize = 512;
