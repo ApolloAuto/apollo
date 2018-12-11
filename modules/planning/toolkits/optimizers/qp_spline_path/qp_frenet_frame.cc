@@ -429,7 +429,8 @@ bool QpFrenetFrame::CalculateObstacleBound(
 uint32_t QpFrenetFrame::FindIndex(const double s) const {
   auto upper_bound =
       std::upper_bound(evaluated_s_.begin(), evaluated_s_.end(), s);
-  return std::distance(evaluated_s_.begin(), upper_bound);
+  return static_cast<uint32_t>(
+      std::distance(evaluated_s_.begin(), upper_bound));
 }
 
 }  // namespace planning
