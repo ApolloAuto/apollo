@@ -457,15 +457,15 @@ int HDMapImpl::GetParkingSpaces(
   return 0;
 }
 
-int HDMapImpl::GetPNCJunctions(const apollo::common::PointENU& point,
-                  double distance,
-                  std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
+int HDMapImpl::GetPNCJunctions(
+    const apollo::common::PointENU& point, double distance,
+    std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
   return GetPNCJunctions({point.x(), point.y()}, distance, pnc_junctions);
 }
 
-int HDMapImpl::GetPNCJunctions(const apollo::common::math::Vec2d& point,
-                  double distance,
-                  std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
+int HDMapImpl::GetPNCJunctions(
+    const apollo::common::math::Vec2d& point, double distance,
+    std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const {
   if (pnc_junctions == nullptr || pnc_junction_polygon_kdtree_ == nullptr) {
     return -1;
   }
@@ -561,7 +561,8 @@ int HDMapImpl::GetNearestLaneWithHeading(
   }
 
   *nearest_s = s;
-  int segment_index = std::min(s_index, (*nearest_lane)->segments().size() - 1);
+  int segment_index = static_cast<int>(
+      std::min(s_index, (*nearest_lane)->segments().size() - 1));
   const auto& segment_2d = (*nearest_lane)->segments()[segment_index];
   *nearest_l =
       segment_2d.unit_direction().CrossProd(point - segment_2d.start());
@@ -1034,8 +1035,8 @@ int HDMapImpl::GetStopSignAssociatedLanes(
 }
 
 int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
-                const std::pair<double, double>& range,
-                Map* local_map) const {
+                           const std::pair<double, double>& range,
+                           Map* local_map) const {
   CHECK_NOTNULL(local_map);
 
   double distance = std::max(range.first, range.second);
@@ -1077,47 +1078,47 @@ int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
   for (auto& lane_ptr : lanes) {
     map_element_ids.insert(lane_ptr->id().id());
     std::copy(lane_ptr->lane().overlap_id().begin(),
-      lane_ptr->lane().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              lane_ptr->lane().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_lane() = lane_ptr->lane();
   }
 
   for (auto& crosswalk_ptr : crosswalks) {
     map_element_ids.insert(crosswalk_ptr->id().id());
     std::copy(crosswalk_ptr->crosswalk().overlap_id().begin(),
-      crosswalk_ptr->crosswalk().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              crosswalk_ptr->crosswalk().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_crosswalk() = crosswalk_ptr->crosswalk();
   }
 
   for (auto& junction_ptr : junctions) {
     map_element_ids.insert(junction_ptr->id().id());
     std::copy(junction_ptr->junction().overlap_id().begin(),
-      junction_ptr->junction().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              junction_ptr->junction().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_junction() = junction_ptr->junction();
   }
 
   for (auto& signal_ptr : signals) {
     map_element_ids.insert(signal_ptr->id().id());
     std::copy(signal_ptr->signal().overlap_id().begin(),
-      signal_ptr->signal().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              signal_ptr->signal().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_signal() = signal_ptr->signal();
   }
 
   for (auto& stop_sign_ptr : stop_signs) {
     map_element_ids.insert(stop_sign_ptr->id().id());
     std::copy(stop_sign_ptr->stop_sign().overlap_id().begin(),
-      stop_sign_ptr->stop_sign().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              stop_sign_ptr->stop_sign().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_stop_sign() = stop_sign_ptr->stop_sign();
   }
 
   for (auto& yield_sign_ptr : yield_signs) {
     std::copy(yield_sign_ptr->yield_sign().overlap_id().begin(),
-      yield_sign_ptr->yield_sign().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              yield_sign_ptr->yield_sign().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     map_element_ids.insert(yield_sign_ptr->id().id());
     *local_map->add_yield() = yield_sign_ptr->yield_sign();
   }
@@ -1125,16 +1126,16 @@ int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
   for (auto& clear_area_ptr : clear_areas) {
     map_element_ids.insert(clear_area_ptr->id().id());
     std::copy(clear_area_ptr->clear_area().overlap_id().begin(),
-      clear_area_ptr->clear_area().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              clear_area_ptr->clear_area().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_clear_area() = clear_area_ptr->clear_area();
   }
 
   for (auto& speed_bump_ptr : speed_bumps) {
     map_element_ids.insert(speed_bump_ptr->id().id());
     std::copy(speed_bump_ptr->speed_bump().overlap_id().begin(),
-      speed_bump_ptr->speed_bump().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              speed_bump_ptr->speed_bump().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_speed_bump() = speed_bump_ptr->speed_bump();
   }
 
@@ -1146,8 +1147,8 @@ int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
   for (auto& parking_space_ptr : parking_spaces) {
     map_element_ids.insert(parking_space_ptr->id().id());
     std::copy(parking_space_ptr->parking_space().overlap_id().begin(),
-      parking_space_ptr->parking_space().overlap_id().end(),
-      std::back_inserter(overlap_ids));
+              parking_space_ptr->parking_space().overlap_id().end(),
+              std::back_inserter(overlap_ids));
     *local_map->add_parking_space() = parking_space_ptr->parking_space();
   }
 
@@ -1279,9 +1280,8 @@ void HDMapImpl::BuildPNCJunctionPolygonKDTree() {
   AABoxKDTreeParams params;
   params.max_leaf_dimension = 5.0;  // meters.
   params.max_leaf_size = 1;
-  BuildPolygonKDTree(pnc_junction_table_, params,
-                    &pnc_junction_polygon_boxes_,
-                    &pnc_junction_polygon_kdtree_);
+  BuildPolygonKDTree(pnc_junction_table_, params, &pnc_junction_polygon_boxes_,
+                     &pnc_junction_polygon_kdtree_);
 }
 
 template <class KDTree>

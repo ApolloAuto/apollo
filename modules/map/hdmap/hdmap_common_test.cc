@@ -325,7 +325,7 @@ TEST_F(HDMapCommonTestSuite, TestLaneInfo) {
   EXPECT_EQ(lane.id().id(), lane_info.id().id());
   EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
             lane_info.points().size());
-  for (std::size_t i = 0; i < lane_info.points().size(); ++i) {
+  for (int i = 0; i < static_cast<int>(lane_info.points().size()); ++i) {
     EXPECT_NEAR(lane.central_curve().segment(0).line_segment().point(i).x(),
                 lane_info.points()[i].x(), 1E-5);
     EXPECT_NEAR(lane.central_curve().segment(0).line_segment().point(i).y(),
@@ -338,18 +338,19 @@ TEST_F(HDMapCommonTestSuite, TestLaneInfo) {
   }
   EXPECT_EQ(lane_info.unit_directions().size(),
             lane_info.segments().size() + 1);
-  for (std::size_t i = 0; i < lane_info.segments().size(); ++i) {
+  for (size_t i = 0; i < lane_info.segments().size(); ++i) {
     EXPECT_EQ(lane_info.segments()[i].unit_direction(),
               lane_info.unit_directions()[i]);
   }
   EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
             lane_info.accumulate_s().size());
-  for (std::size_t i = 0; i < lane_info.accumulate_s().size(); ++i) {
-    EXPECT_NEAR(i * 1.0, lane_info.accumulate_s()[i], 1E-4);
+  for (size_t i = 0; i < lane_info.accumulate_s().size(); ++i) {
+    EXPECT_NEAR(static_cast<double>(i) * 1.0,
+                lane_info.accumulate_s()[static_cast<int>(i)], 1E-4);
   }
   EXPECT_EQ(lane.central_curve().segment(0).line_segment().point_size(),
             lane_info.headings().size());
-  for (std::size_t i = 0; i < lane_info.headings().size(); ++i) {
+  for (size_t i = 0; i < lane_info.headings().size(); ++i) {
     EXPECT_NEAR(lane_info.unit_directions()[i].Angle(), lane_info.headings()[i],
                 1E-3);
   }
@@ -435,15 +436,15 @@ TEST_F(HDMapCommonTestSuite, DistanceToWithMoreInfo) {
   apollo::common::math::Vec2d foot_point;
   double s_offset = 0.0;
   int s_offset_index = 0;
-  double distance = lane_info.DistanceTo(
-      {170002.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
+  double distance = lane_info.DistanceTo({170002.5, 3.0}, &foot_point,
+                                         &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.0, 1E-3);
   EXPECT_NEAR(foot_point.x(), 170002.5, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
   EXPECT_NEAR(s_offset, 1.5, 1E-3);
 
-  distance = lane_info.DistanceTo(
-      {170000.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
+  distance = lane_info.DistanceTo({170000.5, 3.0}, &foot_point, &s_offset,
+                                  &s_offset_index);
   EXPECT_NEAR(distance, 2.06155, 1E-3);
   EXPECT_NEAR(foot_point.x(), 170001.0, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
@@ -476,8 +477,8 @@ TEST_F(HDMapCommonTestSuite, GetProjection) {
 
   double accumulate_s = 0.0;
   double lateral = 0.0;
-  bool success = lane_info.GetProjection({170002.4, 3.0}, &accumulate_s,
-                                        &lateral);
+  bool success =
+      lane_info.GetProjection({170002.4, 3.0}, &accumulate_s, &lateral);
   EXPECT_TRUE(success);
   EXPECT_NEAR(accumulate_s, 1.4, 1E-3);
   EXPECT_NEAR(lateral, 2.0, 1E-3);
@@ -499,9 +500,9 @@ TEST_F(HDMapCommonTestSuite, TestJunctionInfo) {
   JunctionInfo junction_info(junction);
   EXPECT_EQ(junction.id().id(), junction_info.id().id());
   EXPECT_EQ(7, junction_info.polygon().points().size());
-  for (std::size_t i = 0; i < 5; ++i) {
-    EXPECT_NEAR((i + 170001) * 1.0, junction_info.polygon().points()[i].x(),
-                1E-3);
+  for (size_t i = 0; i < 5; ++i) {
+    EXPECT_NEAR(static_cast<double>(i + 170001) * 1.0,
+                junction_info.polygon().points()[i].x(), 1E-3);
   }
   EXPECT_NEAR(170005.0, junction_info.polygon().points()[5].x(), 1E-3);
   EXPECT_NEAR(170002.0, junction_info.polygon().points()[5].y(), 1E-3);

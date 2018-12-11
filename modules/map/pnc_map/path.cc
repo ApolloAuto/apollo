@@ -668,7 +668,8 @@ InterpolatedIndex Path::GetLaneIndexFromS(double s) const {
     return {static_cast<int>(lane_segments_.size() - 1),
             lane_segments_.back().Length()};
   }
-  int index = std::distance(lane_accumulated_s_.begin(), iter);
+  int index =
+      static_cast<int>(std::distance(lane_accumulated_s_.begin(), iter));
   if (index == 0) {
     return {index, s};
   } else {
@@ -688,7 +689,7 @@ std::vector<hdmap::LaneSegment> Path::GetLaneSegments(
     start_index.id += 1;
     start_index.offset = 0;
   }
-  const int num_lanes = lane_segments_.size();
+  const int num_lanes = static_cast<int>(lane_segments_.size());
   if (start_index.id >= num_lanes) {
     return lanes;
   }
@@ -748,8 +749,8 @@ bool Path::GetProjectionWithHueristicParams(const Vec2d& point,
   *min_distance = std::numeric_limits<double>::infinity();
 
   int start_interpolation_index = GetIndexFromS(hueristic_start_s).id;
-  int end_interpolation_index =
-      std::fmin(num_segments_, GetIndexFromS(hueristic_end_s).id + 1);
+  int end_interpolation_index = static_cast<int>(
+      std::fmin(num_segments_, GetIndexFromS(hueristic_end_s).id + 1));
   int min_index = start_interpolation_index;
   for (int i = start_interpolation_index; i < end_interpolation_index; ++i) {
     const double distance = segments_[i].DistanceSquareTo(point);
@@ -1029,7 +1030,7 @@ void PathApproximation::InitProjections(const Path& path) {
     projections_.push_back(s);
   }
   const auto& original_points = path.path_points();
-  const int num_original_points = original_points.size();
+  const int num_original_points = static_cast<int>(original_points.size());
   original_projections_.clear();
   original_projections_.reserve(num_original_points);
   for (size_t i = 0; i < projections_.size(); ++i) {

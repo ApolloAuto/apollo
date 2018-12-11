@@ -80,6 +80,7 @@ build --per_file_copt=\
 ^modules/dreamview/backend/hmi/.*\.cc,\
 ^modules/guardian/.*\.cc,\
 ^modules/monitor/.*\.cc,\
+^modules/map/.*\.cc,\
 ^modules/third_party_perception/.*\.cc,\
 ^modules/tools/.*\.cc,\
 ^modules/transform/.*\.cc,\

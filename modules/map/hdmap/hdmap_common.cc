@@ -81,8 +81,8 @@ void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
   for (const auto &curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
       for (const auto &point : curve.line_segment().point()) {
-        CHECK(IsPointValid(point))
-            << "invalid map point: " << point.DebugString();
+        CHECK(IsPointValid(point)) << "invalid map point: "
+                                   << point.DebugString();
         points->emplace_back(point.x(), point.y());
       }
     } else {
@@ -100,8 +100,9 @@ apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
     points.emplace_back(point.x(), point.y());
   }
   RemoveDuplicates(&points);
-  while (points.size() >= 2 && points[0].DistanceTo(points.back()) <=
-                                   apollo::common::math::kMathEpsilon) {
+  while (points.size() >= 2 &&
+         points[0].DistanceTo(points.back()) <=
+             apollo::common::math::kMathEpsilon) {
     points.pop_back();
   }
   return apollo::common::math::Polygon2d(points);
@@ -229,7 +230,7 @@ double LaneInfo::Heading(const double s) const {
   }
 
   auto iter = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(), s);
-  int index = std::distance(accumulated_s_.begin(), iter);
+  int index = static_cast<int>(std::distance(accumulated_s_.begin(), iter));
   if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
     return headings_[index];
   } else {
@@ -258,7 +259,7 @@ double LaneInfo::Curvature(const double s) const {
     ADEBUG << "Reach the end of lane.";
     return 0.0;
   }
-  int index = std::distance(accumulated_s_.begin(), iter);
+  int index = static_cast<int>(std::distance(accumulated_s_.begin(), iter));
   if (index == 0) {
     ADEBUG << "Reach the beginning of lane";
     return 0.0;
@@ -427,7 +428,7 @@ bool LaneInfo::GetProjection(const Vec2d &point, double *accumulate_s,
     return false;
   }
   double min_dist = std::numeric_limits<double>::infinity();
-  int seg_num = segments_.size();
+  int seg_num = static_cast<int>(segments_.size());
   int min_index = 0;
   for (int i = 0; i < seg_num; ++i) {
     const double distance = segments_[i].DistanceSquareTo(point);
@@ -703,7 +704,7 @@ void ParkingSpaceInfo::Init() {
 }
 
 PNCJunctionInfo::PNCJunctionInfo(const PNCJunction &pnc_junction)
-  : junction_(pnc_junction) {
+    : junction_(pnc_junction) {
   Init();
 }
 

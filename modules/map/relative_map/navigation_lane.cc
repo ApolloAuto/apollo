@@ -366,34 +366,33 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
     }
   };
 
-  auto gen_navi_path_loop_func =
-      [this, &navigation_path, &enu_to_flu_func](
-          const int start, const int end, const double ref_s_base,
-          const double max_length, common::Path *path) {
-        CHECK_NOTNULL(path);
-        const double ref_s = navigation_path.path_point(start).s();
-        for (int i = start; i < end; ++i) {
-          auto *point = path->add_path_point();
-          point->CopyFrom(navigation_path.path_point(i));
+  auto gen_navi_path_loop_func = [this, &navigation_path, &enu_to_flu_func](
+      const int start, const int end, const double ref_s_base,
+      const double max_length, common::Path *path) {
+    CHECK_NOTNULL(path);
+    const double ref_s = navigation_path.path_point(start).s();
+    for (int i = start; i < end; ++i) {
+      auto *point = path->add_path_point();
+      point->CopyFrom(navigation_path.path_point(i));
 
-          double flu_x = 0.0;
-          double flu_y = 0.0;
-          double flu_theta = 0.0;
-          enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x,
-                          &flu_y, &flu_theta);
+      double flu_x = 0.0;
+      double flu_y = 0.0;
+      double flu_theta = 0.0;
+      enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x, &flu_y,
+                      &flu_theta);
 
-          point->set_x(flu_x);
-          point->set_y(flu_y);
-          point->set_theta(flu_theta);
-          const double accumulated_s =
-              navigation_path.path_point(i).s() - ref_s + ref_s_base;
-          point->set_s(accumulated_s);
+      point->set_x(flu_x);
+      point->set_y(flu_y);
+      point->set_theta(flu_theta);
+      const double accumulated_s =
+          navigation_path.path_point(i).s() - ref_s + ref_s_base;
+      point->set_s(accumulated_s);
 
-          if (accumulated_s > max_length) {
-            break;
-          }
-        }
-      };
+      if (accumulated_s > max_length) {
+        break;
+      }
+    }
+  };
 
   double dist = navigation_path.path_point().rbegin()->s() -
                 navigation_path.path_point(current_project_index).s();
@@ -674,16 +673,18 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
         left_sample->set_s(path_point.s());
         left_sample->set_width(lane_left_width);
         left_segment->add_point()->CopyFrom(
-            *point + lane_left_width *
-                         Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+            *point +
+            lane_left_width *
+                Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
       }
 
       auto *right_sample = lane->add_right_sample();
       right_sample->set_s(path_point.s());
       right_sample->set_width(lane_right_width);
       right_segment->add_point()->CopyFrom(
-          *point + lane_right_width *
-                       Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+          *point +
+          lane_right_width *
+              Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
     }
     return true;
   };
@@ -706,7 +707,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   FLAGS_relative_map_generate_left_boundray = true;
   for (auto iter = navigation_path_list_.cbegin();
        iter != navigation_path_list_.cend(); ++iter) {
-    std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
+    size_t index = std::distance(navigation_path_list_.cbegin(), iter);
     if (!create_map_func(*iter)) {
       AWARN << "Failed to generate lane: " << index;
       ++fail_num;
@@ -717,7 +718,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
 
     // The left border of the middle lane uses the right border of the left
     // lane.
-    int lane_index = index - fail_num;
+    int lane_index = static_cast<int>(index) - fail_num;
     if (lane_index > 0) {
       auto *left_boundary =
           hdmap->mutable_lane(lane_index)->mutable_left_boundary();
