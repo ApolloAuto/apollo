@@ -33,8 +33,8 @@ bool LateralOSQPOptimizer::optimize(
   std::vector<c_int> P_indptr;
   CalculateKernel(d_bounds, &P_data, &P_indices, &P_indptr);
   delta_s_ = delta_s;
-  const int num_var = d_bounds.size();
-  const int kNumParam = 3 * d_bounds.size();
+  const int num_var = static_cast<int>(d_bounds.size());
+  const int kNumParam = 3 * static_cast<int>(d_bounds.size());
   const int kNumConstraint = kNumParam + 3 * (num_var - 1) + 3;
   c_float lower_bounds[kNumConstraint];
   c_float upper_bounds[kNumConstraint];
@@ -197,7 +197,7 @@ void LateralOSQPOptimizer::CalculateKernel(
     const std::vector<std::pair<double, double>>& d_bounds,
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {
-  const int kNumParam = 3 * d_bounds.size();
+  const int kNumParam = 3 * static_cast<int>(d_bounds.size());
   P_data->resize(kNumParam);
   P_indices->resize(kNumParam);
   P_indptr->resize(kNumParam + 1);
