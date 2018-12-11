@@ -129,7 +129,7 @@ class ObstacleContainer {
 
       A_all->block(counter, 0, A_i.rows(), 2) = A_i;
       b_all->block(counter, 0, b_i.rows(), 1) = b_i;
-      counter += current_vertice_num;
+      counter += static_cast<int>(current_vertice_num);
     }
     return true;
   }

@@ -24,7 +24,7 @@ namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
-    size_t horizon, float ts, Eigen::MatrixXd ego, const Eigen::MatrixXd& xWS,
+    size_t horizon, double ts, Eigen::MatrixXd ego, const Eigen::MatrixXd& xWS,
     const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
     const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& x0,
     const Eigen::MatrixXd& xf, const Eigen::MatrixXd& last_time_u,
