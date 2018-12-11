@@ -21,5 +21,5 @@ message TimerComponentConfig {
     optional string name = 1;
     optional string config_file_path = 2;
     optional string flag_file_path = 3;
-    optional uint32 interval = 4;
+    optional uint32 interval = 4;  // In milliseconds.
 }
