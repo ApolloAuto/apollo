@@ -152,7 +152,7 @@ bool GraphCreator::Create() {
            << dump_topo_file_path_;
     return false;
   }
-  int type_pos = dump_topo_file_path_.find_last_of(".") + 1;
+  auto type_pos = dump_topo_file_path_.find_last_of(".") + 1;
   std::string bin_file = dump_topo_file_path_.replace(type_pos, 3, "bin");
   std::string txt_file = dump_topo_file_path_.replace(type_pos, 3, "txt");
   if (!common::util::SetProtoToASCIIFile(graph_, txt_file)) {

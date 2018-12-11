@@ -36,7 +36,7 @@ bool TopoGraph::LoadNodes(const Graph& graph) {
     return false;
   }
   for (const auto& node : graph.node()) {
-    node_index_map_[node.lane_id()] = topo_nodes_.size();
+    node_index_map_[node.lane_id()] = static_cast<int>(topo_nodes_.size());
     std::shared_ptr<TopoNode> topo_node;
     topo_node.reset(new TopoNode(node));
     road_node_map_[node.road_id()].insert(topo_node.get());
