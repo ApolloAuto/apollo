@@ -201,8 +201,9 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
       last_publishable_trajectory_.get(), &replan_reason);
 
   const size_t frame_num = seq_num_++;
-  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state, ptr_trajectory_pb);
+  status =
+      InitFrame(static_cast<uint32_t>(frame_num), stitching_trajectory.back(),
+                start_timestamp, vehicle_state, ptr_trajectory_pb);
 
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
@@ -415,13 +416,13 @@ Status OpenSpacePlanning::TrajectoryPartition(
     double relative_time_interval =
         (uninterpolated_stitched_trajectory_to_end[i + 1].relative_time() -
          uninterpolated_stitched_trajectory_to_end[i].relative_time()) /
-        interpolated_pieces_num;
+        static_cast<double>(interpolated_pieces_num);
     stitched_trajectory_to_end.push_back(
         uninterpolated_stitched_trajectory_to_end[i]);
     for (size_t j = 0; j < interpolated_pieces_num - 1; j++) {
       double relative_time =
           uninterpolated_stitched_trajectory_to_end[i].relative_time() +
-          (j + 1) * relative_time_interval;
+          (static_cast<double>(j) + 1) * relative_time_interval;
       stitched_trajectory_to_end.emplace_back(
           common::math::InterpolateUsingLinearApproximation(
               uninterpolated_stitched_trajectory_to_end[i],
@@ -580,7 +581,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
   for (size_t i = 0; i < trajectories_size; i++) {
     double min_distance = std::numeric_limits<double>::max();
     const apollo::common::Trajectory trajectory =
-        trajectory_partition.trajectory(i);
+        trajectory_partition.trajectory(static_cast<int>(i));
     int trajectory_size = trajectory.trajectory_point_size();
 
     const apollo::common::TrajectoryPoint trajectory_end_point =
@@ -642,7 +643,8 @@ Status OpenSpacePlanning::TrajectoryPartition(
       auto closest_point = closest_points.top();
       closest_points.pop();
       double traj_point_moving_direction =
-          trajectory_partition.trajectory(closest_point.first.first)
+          trajectory_partition
+              .trajectory(static_cast<int>(closest_point.first.first))
               .trajectory_point(closest_point.first.second)
               .path_point()
               .theta();
@@ -668,7 +670,8 @@ Status OpenSpacePlanning::TrajectoryPartition(
   // reassign relative time and relative s to have the closest point as origin
   // point
   ptr_trajectory_pb->mutable_trajectory_point()->CopyFrom(
-      *(trajectory_partition.mutable_trajectory(current_trajectory_index)
+      *(trajectory_partition
+            .mutable_trajectory(static_cast<int>(current_trajectory_index))
             ->mutable_trajectory_point()));
   double time_shift =
       ptr_trajectory_pb->trajectory_point(closest_trajectory_point_index)
