@@ -42,11 +42,6 @@ class FeatureExtractor {
   FeatureExtractor() = delete;
 
   /**
-   * @brief Destructor
-   */
-  virtual ~FeatureExtractor() = delete;
-
-  /**
    * @brief Extract features for scenario analysis
    * @return Scenario features
    */
@@ -55,9 +50,6 @@ class FeatureExtractor {
   FRIEND_TEST(FeatureExtractorTest, junction);
 
  private:
-  static void ExtractEgoVehicleFeatures(
-      EnvironmentFeatures* ptr_environment_features);
-
   static void ExtractEgoLaneFeatures(
       EnvironmentFeatures* ptr_environment_features,
       const std::shared_ptr<const hdmap::LaneInfo>& ptr_ego_lane,
@@ -69,9 +61,6 @@ class FeatureExtractor {
       const common::math::Vec2d& ego_position);
 
   static void ExtractFrontJunctionFeatures(
-      EnvironmentFeatures* ptr_environment_features);
-
-  static void ExtractObstacleFeatures(
       EnvironmentFeatures* ptr_environment_features);
 
   static std::shared_ptr<const hdmap::LaneInfo> GetEgoLane(

@@ -23,56 +23,66 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
-using apollo::planning::ADCTrajectory;
-using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::LaneInfo;
-using apollo::hdmap::JunctionInfo;
-using apollo::hdmap::OverlapInfo;
-using apollo::perception::PerceptionObstacle;
-using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
-using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
-
 namespace apollo {
 namespace prediction {
+
+using common::adapter::AdapterConfig;
+using common::math::Vec2d;
+using planning::ADCTrajectory;
+using hdmap::HDMapUtil;
+using hdmap::LaneInfo;
+using hdmap::JunctionInfo;
+using hdmap::OverlapInfo;
+using perception::PerceptionObstacle;
+using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
+using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
 
 EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
   EnvironmentFeatures environment_features;
 
-  auto pose_container =
+  auto ego_state_container =
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
 
-  if (pose_container == nullptr) {
-    AERROR << "Null pose container found.";
-    return environment_features;
-  }
-  ExtractEgoVehicleFeatures(&environment_features);
-
-  const PerceptionObstacle* ptr_ego_pose =
-      pose_container->ToPerceptionObstacle();
-  if (ptr_ego_pose == nullptr) {
-    AERROR << "Null pose pointer, skip extracting environment features.";
+  if (ego_state_container == nullptr ||
+      ego_state_container->ToPerceptionObstacle() == nullptr) {
+    AERROR << "Null ego state container found or "
+        "the container pointer is nullptr";
     return environment_features;
   }
 
-  if (!ptr_ego_pose->position().has_x() ||
-      !ptr_ego_pose->position().has_y()) {
-    AERROR << "Fail to get ego vehicle position";
+  auto ptr_ego_state = ego_state_container->ToPerceptionObstacle();
+  if (!ptr_ego_state->has_position() ||
+      !ptr_ego_state->position().has_x() ||
+      !ptr_ego_state->position().has_y() ||
+      !ptr_ego_state->has_theta() ||
+      !ptr_ego_state->has_velocity() ||
+      !ptr_ego_state->velocity().has_x() ||
+      !ptr_ego_state->velocity().has_y()) {
+    AERROR << "Incomplete ego pose information.";
     return environment_features;
   }
 
-  // TODO(all): check the coordinate frame.
-  if (!ptr_ego_pose->has_theta()) {
-    AERROR << "Fail to get ego vehicle heading";
+  if (std::isnan(ptr_ego_state->position().x()) ||
+      std::isnan(ptr_ego_state->position().y()) ||
+      std::isnan(ptr_ego_state->theta()) ||
+      std::isnan(ptr_ego_state->velocity().x()) ||
+      std::isnan(ptr_ego_state->velocity().y())) {
+    AERROR << "nan found in ego state";
     return environment_features;
   }
-  auto ptr_ego_lane = GetEgoLane(ptr_ego_pose->position(),
-      ptr_ego_pose->theta());
 
-  Vec2d ego_position(ptr_ego_pose->position().x(),
-      ptr_ego_pose->position().y());
+  Vec2d ego_position(ptr_ego_state->position().x(),
+      ptr_ego_state->position().y());
+
+  Vec2d ego_velocity(ptr_ego_state->velocity().x(),
+      ptr_ego_state->velocity().y());
+
+  environment_features.set_ego_speed(ego_velocity.Length());
+  environment_features.set_ego_heading(ptr_ego_state->theta());
+
+  auto ptr_ego_lane = GetEgoLane(ptr_ego_state->position(),
+      ptr_ego_state->theta());
 
   ExtractEgoLaneFeatures(&environment_features,
       ptr_ego_lane, ego_position);
@@ -82,29 +92,7 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
 
   ExtractFrontJunctionFeatures(&environment_features);
 
-  ExtractObstacleFeatures(&environment_features);
-
-  // TODO(all): add other features
-
   return environment_features;
-}
-
-void FeatureExtractor::ExtractEgoVehicleFeatures(
-    EnvironmentFeatures* ptr_environment_features) {
-  auto pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  const PerceptionObstacle* pose_ptr = pose_container->ToPerceptionObstacle();
-  if (pose_ptr == nullptr) {
-    AERROR << "Null pose pointer";
-    return;
-  }
-  // TODO(all): change this to ego_speed and ego_heading
-  double pose_speed = std::hypot(pose_ptr->velocity().x(),
-                                 pose_ptr->velocity().y());
-  ptr_environment_features->set_ego_speed(pose_speed);
-  ptr_environment_features->set_ego_heading(pose_ptr->theta());
-  // TODO(all): add acceleration if needed
 }
 
 void FeatureExtractor::ExtractEgoLaneFeatures(
@@ -150,11 +138,9 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
     return;
   }
 
-  // TODO(all): make this a gflag
-  double threshold = 3.0;
-
   auto ptr_left_neighbor_lane = PredictionMap::GetLeftNeighborLane(
-      ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
+      ptr_ego_lane, {ego_position.x(), ego_position.y()},
+      FLAGS_lane_distance_threshold);
 
   if (ptr_left_neighbor_lane != nullptr) {
     double left_neighbor_lane_s = 0.0;
@@ -166,7 +152,9 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
   }
 
   auto ptr_right_neighbor_lane = PredictionMap::GetRightNeighborLane(
-      ptr_ego_lane, {ego_position.x(), ego_position.y()}, threshold);
+      ptr_ego_lane, {ego_position.x(), ego_position.y()},
+      FLAGS_lane_distance_threshold);
+
   if (ptr_right_neighbor_lane != nullptr) {
     double right_neighbor_lane_s = 0.0;
     double right_neighbor_lane_l = 0.0;
@@ -208,22 +196,16 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
   }
 }
 
-void FeatureExtractor::ExtractObstacleFeatures(
-    EnvironmentFeatures* ptr_environment_features) {
-}
-
 LaneInfoPtr FeatureExtractor::GetEgoLane(const common::Point3D& position,
     const double heading) {
-  // TODO(all): move to gflags
-  apollo::common::PointENU position_enu;
+  common::PointENU position_enu;
   position_enu.set_x(position.x());
   position_enu.set_y(position.y());
   position_enu.set_z(position.z());
 
-  double angle_diff_threshold = M_PI * 0.25;
-  double radius = 3.0;
-  return PredictionMap::GetMostLikelyCurrentLane(position_enu, radius,
-      heading, angle_diff_threshold);
+  return PredictionMap::GetMostLikelyCurrentLane(position_enu,
+      FLAGS_lane_distance_threshold, heading,
+      FLAGS_lane_angle_difference_threshold);
 }
 
 }  // namespace prediction
