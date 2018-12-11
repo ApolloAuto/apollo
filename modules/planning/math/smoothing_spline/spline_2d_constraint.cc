@@ -37,7 +37,8 @@ Spline2dConstraint::Spline2dConstraint(const std::vector<double>& t_knots,
     : t_knots_(t_knots), spline_order_(order) {
   inequality_constraint_.SetIsEquality(false);
   equality_constraint_.SetIsEquality(true);
-  total_param_ = 2 * (spline_order_ + 1) * (t_knots.size() - 1);
+  total_param_ =
+      2 * (spline_order_ + 1) * (static_cast<uint32_t>(t_knots.size()) - 1);
 }
 
 // direct method
