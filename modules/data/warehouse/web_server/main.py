@@ -71,6 +71,8 @@ def tasks_hdl(page_idx=1):
         'hmi_status.current_mode': 1,
         'hmi_status.current_map': 1,
         'hmi_status.current_vehicle': 1,
+        'disengagements': 1,
+        'drive_events': 1,
         'stat.mileages': 1,
     }
     task_records = collections.defaultdict(list)
@@ -105,6 +107,8 @@ def records_hdl(page_idx=1):
         'hmi_status.current_mode': 1,
         'hmi_status.current_map': 1,
         'hmi_status.current_vehicle': 1,
+        'disengagements': 1,
+        'drive_events': 1,
         'stat.mileages': 1,
     }
     kSort = [('header.begin_time', pymongo.DESCENDING)]
