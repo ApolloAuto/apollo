@@ -23,7 +23,8 @@ cc_library(
 
 cc_test(
     name = "os_interface_test",
-    size = "small",
+    size = "medium",
+    timeout = "moderate",
     srcs = [
         "os_interface_test.cc",
     ],
