@@ -50,9 +50,9 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   void ProblemSetup();
 
  protected:
-  std::size_t horizon_ = 5;
-  std::size_t obstacles_num_ = 10;
-  double ts_ = 0.01f;
+  size_t horizon_ = 5;
+  size_t obstacles_num_ = 10;
+  double ts_ = 0.01;
   Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xf_ = 10 * Eigen::MatrixXd::Ones(4, 1);
@@ -61,7 +61,7 @@ class DistanceApproachIPOPTInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Ones(4, 6);
   Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Ones(2, 5);
   Eigen::MatrixXi obstacles_edges_num_;
-  std::size_t obstacles_edges_sum_;
+  size_t obstacles_edges_sum_;
   Eigen::MatrixXd obstacles_A_ = Eigen::MatrixXd::Ones(10, 2);
   Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(10, 1);
   bool use_fix_time_ = false;
@@ -115,11 +115,11 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, get_starting_point) {
 
 TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
   int n = 520;
-  double obj_value;
+  double obj_value = 0.0;
   double x[520];
   std::fill_n(x, n, 1.2);
   bool res = ptop_->eval_f(n, x, true, obj_value);
-  EXPECT_DOUBLE_EQ(obj_value, 2013.3729758069705);
+  EXPECT_DOUBLE_EQ(obj_value, 2013.3728863999997);
   EXPECT_TRUE(res);
 }
 

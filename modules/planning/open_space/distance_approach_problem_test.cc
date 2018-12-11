@@ -41,8 +41,8 @@ class DistanceApproachProblemTest : public ::testing::Test {
   std::unique_ptr<DistanceApproachProblem> distance_approach_ = nullptr;
   int num_of_variables_ = 160;
   int num_of_constraints_ = 200;
-  std::size_t horizon_ = 20;
-  double ts_ = 0.01f;
+  size_t horizon_ = 20;
+  double ts_ = 0.01;
   Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd xf_ = Eigen::MatrixXd::Ones(4, 1);

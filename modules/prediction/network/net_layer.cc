@@ -88,7 +88,7 @@ bool Dense::Load(const DenseParameter& dense_pb) {
 void Dense::Run(const std::vector<Eigen::MatrixXf>& inputs,
                 Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1);
-  Eigen::MatrixXf prod = inputs[0] * weights_;
+  Eigen::MatrixXf prod = static_cast<Eigen::MatrixXf>(inputs[0] * weights_);
   if (use_bias_) {
     Eigen::MatrixXf sum = prod.rowwise() + bias_.transpose();
     prod = sum;
@@ -107,8 +107,7 @@ bool Conv1d::Load(const LayerParameter& layer_pb) {
 }
 
 bool Conv1d::Load(const Conv1dParameter& conv1d_pb) {
-  if (!conv1d_pb.has_kernel() ||
-      !LoadTensor(conv1d_pb.kernel(), &kernel_)) {
+  if (!conv1d_pb.has_kernel() || !LoadTensor(conv1d_pb.kernel(), &kernel_)) {
     AERROR << "Fail to Load kernel!";
     return false;
   }
@@ -138,8 +137,9 @@ void Conv1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
   CHECK_EQ(inputs.size(), 1);
   CHECK_GT(kernel_.size(), 0);
   CHECK_EQ(kernel_[0].rows(), inputs[0].rows());
-  int kernel_size = kernel_[0].cols();
-  int output_num_col = (inputs[0].cols() - kernel_size) / stride_ + 1;
+  int kernel_size = static_cast<int>(kernel_[0].cols());
+  int output_num_col =
+      static_cast<int>((inputs[0].cols() - kernel_size) / stride_) + 1;
   int output_num_row = static_cast<int>(kernel_.size());
   output->resize(output_num_row, output_num_col);
   for (int i = 0; i < output_num_row; ++i) {
@@ -181,10 +181,11 @@ bool MaxPool1d::Load(const MaxPool1dParameter& maxpool1d_pb) {
 }
 
 void MaxPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                         Eigen::MatrixXf* output) {
+                    Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1);
-  int output_num_col = (inputs[0].cols() - kernel_size_) / stride_ + 1;
-  int output_num_row = inputs[0].rows();
+  int output_num_col =
+      static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
+  int output_num_row = static_cast<int>(inputs[0].rows());
   output->resize(output_num_row, output_num_col);
   int input_index = 0;
   for (int j = 0; j < output_num_col; ++j) {
@@ -224,10 +225,11 @@ bool AvgPool1d::Load(const AvgPool1dParameter& avgpool1d_pb) {
 }
 
 void AvgPool1d::Run(const std::vector<Eigen::MatrixXf>& inputs,
-                         Eigen::MatrixXf* output) {
+                    Eigen::MatrixXf* output) {
   CHECK_EQ(inputs.size(), 1);
-  int output_num_col = (inputs[0].cols() - kernel_size_) / stride_ + 1;
-  int output_num_row = inputs[0].rows();
+  int output_num_col =
+      static_cast<int>((inputs[0].cols() - kernel_size_) / stride_) + 1;
+  int output_num_row = static_cast<int>(inputs[0].rows());
   output->resize(output_num_row, output_num_col);
   int input_index = 0;
   for (int j = 0; j < output_num_col; ++j) {
@@ -278,8 +280,8 @@ bool BatchNormalization::Load(const LayerParameter& layer_pb) {
     return false;
   }
 
-  BatchNormalizationParameter bn_pb = layer_pb.batch_normalization();
-  epsilon_ = bn_pb.epsilon();
+  auto bn_pb = layer_pb.batch_normalization();
+  epsilon_ = static_cast<float>(bn_pb.epsilon());
   axis_ = bn_pb.axis();
   center_ = bn_pb.center();
   scale_ = bn_pb.scale();
