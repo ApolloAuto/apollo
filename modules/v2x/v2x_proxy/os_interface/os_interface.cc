@@ -30,18 +30,9 @@ using apollo::v2x::IntersectionTrafficLightData;
 
 OsInterFace::OsInterFace()
     : node_(cyber::CreateNode("v2x_os_interface")), init_flag_(false) {
-  if (node_ == nullptr) {
-    AFATAL << "ERROR: Create v2x os interface node failed.";
-    exit(1);
-  }
-  if (!InitReaders()) {
-    AFATAL << "ERROR: Initial readers failed.";
-    exit(1);
-  }
-  if (!InitWriters()) {
-    AFATAL << "ERROR: Initial writers failed.";
-    exit(1);
-  }
+  CHECK(node_) << "ERROR: Create v2x os interface node failed.";
+  CHECK(InitReaders()) << "ERROR: Initial readers failed.";
+  CHECK(InitWriters()) << "ERROR: Initial writers failed.";
   PrintModuleDetails();
   AINFO << "v2x os interface initial success";
 
