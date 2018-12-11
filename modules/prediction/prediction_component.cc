@@ -220,7 +220,6 @@ void PredictionComponent::OnPerception(
   diff = end_time4 - end_time3;
   ADEBUG << "Time to build junction features: "
          << diff.count() * 1000 << " msec.";
-  // TODO(kechxu) refactor logic of build lane graph and build junction feature
   ptr_obstacles_container->BuildLaneGraph();
   auto end_time5 = std::chrono::system_clock::now();
   diff = end_time5 - end_time4;

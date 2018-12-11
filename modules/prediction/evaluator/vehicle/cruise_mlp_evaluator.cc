@@ -143,17 +143,17 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     if (feature_values.size() != OBSTACLE_FEATURE_SIZE +
                                  INTERACTION_FEATURE_SIZE +
-                                 LANE_FEATURE_SIZE) {
+                                 SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       lane_sequence_ptr->set_probability(0.0);
       ADEBUG << "Skip lane sequence due to incorrect feature size";
       continue;
     }
     Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
         OBSTACLE_FEATURE_SIZE);
-    // TODO(kechxu) move 5 and 30 to gflags
     Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(feature_values,
         OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
-        static_cast<int>(feature_values.size()), 5, 30);
+        static_cast<int>(feature_values.size()), SINGLE_LANE_FEATURE_SIZE,
+                         LANE_POINTS_SIZE);
     Eigen::MatrixXf model_output;
     if (lane_sequence_ptr->vehicle_on_lane()) {
       go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
@@ -214,7 +214,8 @@ void CruiseMLPEvaluator::ExtractFeatureValues
   // Extract lane related features.
   std::vector<double> lane_feature_values;
   SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
-  if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
+  if (lane_feature_values.size() !=
+      SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
     ADEBUG << "Obstacle [" << id << "] has fewer than "
            << "expected lane feature_values" << lane_feature_values.size()
            << ".";
@@ -439,10 +440,10 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
   // Initialize forward and backward obstacles
   NearbyObstacle forward_obstacle;
   NearbyObstacle backward_obstacle;
-  forward_obstacle.set_s(1000.0);  // TODO(kechxu) move to gflags
-  forward_obstacle.set_l(10.0);  // TODO(kechxu) move to gflags
-  backward_obstacle.set_s(-1000.0);  // TODO(kechxu) move to gflags
-  backward_obstacle.set_l(10.0);  // TODO(kechxu) move to gflags
+  forward_obstacle.set_s(FLAGS_default_s_if_no_obstacle_in_lane_sequence);
+  forward_obstacle.set_l(FLAGS_default_l_if_no_obstacle_in_lane_sequence);
+  backward_obstacle.set_s(-FLAGS_default_s_if_no_obstacle_in_lane_sequence);
+  backward_obstacle.set_l(FLAGS_default_l_if_no_obstacle_in_lane_sequence);
 
   for (const auto& nearby_obstacle : lane_sequence_ptr->nearby_obstacle()) {
     if (nearby_obstacle.s() < 0.0) {
@@ -496,7 +497,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
      std::vector<double>* feature_values) {
   // Sanity checks.
   feature_values->clear();
-  feature_values->reserve(LANE_FEATURE_SIZE);
+  feature_values->reserve(SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE);
   const Feature& feature = obstacle_ptr->latest_feature();
   if (!feature.IsInitialized()) {
     ADEBUG << "Obstacle [" << obstacle_ptr->id() << "] has no latest feature.";
@@ -509,12 +510,13 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
   double heading = feature.velocity_heading();
   double speed = feature.speed();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
-    if (feature_values->size() >= LANE_FEATURE_SIZE) {
+    if (feature_values->size() >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       break;
     }
     const LaneSegment& lane_segment = lane_sequence_ptr->lane_segment(i);
     for (int j = 0; j < lane_segment.lane_point_size(); ++j) {
-      if (feature_values->size() >= LANE_FEATURE_SIZE) {
+      if (feature_values->size() >=
+          SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
         break;
       }
       const LanePoint& lane_point = lane_segment.lane_point(j);
@@ -535,30 +537,12 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       feature_values->push_back(relative_ang);
       feature_values->push_back(speed * speed * lane_point.kappa());
       feature_values->push_back(lane_point.kappa());
-      /*
-      double diff_x = lane_point.position().x() - feature.position().x();
-      double diff_y = lane_point.position().y() - feature.position().y();
-      double angle = std::atan2(diff_y, diff_x);
-      double deviation_angle = angle - heading;
-      double relative_l = std::sqrt(diff_x * diff_x + diff_y * diff_y)
-                          * std::sin(deviation_angle);
-
-      // The lateral deviation of the lane-point from vehicle facing:
-      feature_values->push_back(relative_l);
-      // The extrapolated normal acceleration:
-      feature_values->push_back(speed * speed * lane_point.kappa());
-      // The lane-point's heading w.r.t. vehicle's facing direction:
-      feature_values->push_back(common::math::AngleDiff
-                                    (heading, lane_point.heading()));
-      feature_values->push_back(diff_x);
-      feature_values->push_back(diff_y);
-      */
     }
   }
 
   // If the lane points are not sufficient, apply a linear extrapolation.
   std::size_t size = feature_values->size();
-  while (size >= 10 && size < LANE_FEATURE_SIZE) {
+  while (size >= 10 && size < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
     double relative_l_new = 2 * feature_values->operator[](size - 5) -
                                 feature_values->operator[](size - 10);
     double relative_s_new = 2 * feature_values->operator[](size - 4) -
@@ -573,30 +557,9 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
     feature_values->push_back(0.0);
 
     size = feature_values->size();
-    /*
-    double diff_x_new = 2 * feature_values->operator[](size - 2) -
-                            feature_values->operator[](size - 7);
-    double diff_y_new = 2 * feature_values->operator[](size - 1) -
-                            feature_values->operator[](size - 6);
-    double angle_new = std::atan2(diff_y_new, diff_x_new);
-    double deviation_angle_new = angle_new - heading;
-    double relative_l_new = std::sqrt(diff_x_new * diff_x_new +
-                                      diff_y_new * diff_y_new)
-                          * std::sin(deviation_angle_new);
-    double centri_acc_new = 0.0;
-    double angle_diff_new = feature_values->operator[](size - 3);
-
-    feature_values->push_back(relative_l_new);
-    feature_values->push_back(centri_acc_new);
-    feature_values->push_back(angle_diff_new);
-    feature_values->push_back(diff_x_new);
-    feature_values->push_back(diff_y_new);
-    size = feature_values->size();
-    */
   }
 }
 
-// TODO(all): uncomment this once the model is trained and ready.
 void CruiseMLPEvaluator::LoadModels(const std::string& go_model_file,
     const std::string& cutin_model_file) {
   go_model_ptr_.reset(new network::CruiseModel());

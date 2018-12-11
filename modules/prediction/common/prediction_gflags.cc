@@ -178,6 +178,10 @@ DEFINE_double(defualt_junction_range, 10.0,
 // Evaluator
 DEFINE_double(time_to_center_if_not_reach, 10.0,
               "Default value of time to lane center of not reach.");
+DEFINE_double(default_s_if_no_obstacle_in_lane_sequence, 1000.0,
+              "The default s value if no obstacle in the lane sequence.");
+DEFINE_double(default_l_if_no_obstacle_in_lane_sequence, 10.0,
+              "The default l value if no obstacle in the lane sequence.");
 
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,
