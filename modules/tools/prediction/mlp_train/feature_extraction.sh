@@ -32,6 +32,7 @@ echo "--prediction_offline_mode" >> ${FLAGFILE}
 echo "--prediction_offline_bags=${SRC_DIR}" >> ${FLAGFILE}
 echo "--prediction_data_dir=${TARGET_DIR}" >> ${FLAGFILE}
 echo "--junction_distance_threshold=30.0" >> ${FLAGFILE}
+echo "--noenable_prioritize_obstacles" >> ${FLAGFILE}
 
 sudo mkdir -p ${TARGET_DIR}
 # sudo chown apollo:apollo ${TARGET_DIR}
