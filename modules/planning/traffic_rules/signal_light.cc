@@ -98,17 +98,28 @@ void SignalLight::MakeDecisions(Frame* const frame,
       reference_line_info->mutable_debug()
           ->mutable_planning_data()
           ->mutable_signal_light();
-  signal_light_debug->set_adc_front_s(
-      reference_line_info->AdcSlBoundary().end_s());
+  const double adc_front_edge_s =
+      reference_line_info->AdcSlBoundary().end_s();
+  signal_light_debug->set_adc_front_s(adc_front_edge_s);
   signal_light_debug->set_adc_speed(
       common::VehicleStateProvider::Instance()->linear_velocity());
 
   bool has_stop = false;
   for (auto& signal_light : signal_lights_from_path_) {
     const TrafficLight signal = GetSignal(signal_light.object_id);
+
     double stop_deceleration = util::GetADCStopDeceleration(
         reference_line_info, signal_light.start_s,
         config_.signal_light().min_pass_s_distance());
+
+    // work around incorrect s-projection along round routing
+    const double monitor_forward_distance = std::max(
+        150.0, config_.signal_light().max_monitor_forward_distance());
+    if (signal_light.start_s - adc_front_edge_s > monitor_forward_distance) {
+      ADEBUG << "SKIP traffic_light[" << signal_light.object_id
+          << "] start_s[" << signal_light.start_s << "]. too far away";
+      continue;
+    }
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
         signal_light_debug->add_signal();
@@ -117,6 +128,9 @@ void SignalLight::MakeDecisions(Frame* const frame,
     signal_debug->set_light_id(signal_light.object_id);
     signal_debug->set_light_stop_s(signal_light.start_s);
 
+    ADEBUG << "traffic_light[" << signal_light.object_id
+        << "] start_s[" << signal_light.start_s
+        << "] color[" << signal.color() << "]";
     if ((signal.color() == TrafficLight::RED &&
          stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::UNKNOWN &&

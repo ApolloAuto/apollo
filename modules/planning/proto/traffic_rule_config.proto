@@ -118,8 +118,10 @@ message SignalLightConfig {
   // is less than this threshold; otherwise treated as green light
   optional double max_stop_deacceleration_yellow_light = 4 [default = 3.0];
   optional double signal_expire_time_sec = 5 [default = 5.0];  // second
-  optional CreepConfig righ_turn_creep = 6;
+  optional double max_monitor_forward_distance = 6; // meter
+  optional CreepConfig righ_turn_creep = 7;
   // consider the signal msg is expired if its timestamp over this threshold(s)
+
 }
 
 message StopSignConfig {
