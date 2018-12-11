@@ -472,6 +472,10 @@ bool MapService::GetStartPoint(apollo::common::PointENU *start_point) const {
 
 bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
                                         std::vector<Path> *paths) const {
+  if (routing.road_size() == 0) {
+    return false;
+  }
+
   for (const auto &road : routing.road()) {
     for (const auto &passage_region : road.passage()) {
       // Each passage region in a road forms a path
