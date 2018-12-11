@@ -292,8 +292,9 @@ bool AStarStrategy::Search(const TopoGraph* graph,
         tentative_g_score -=
             (edge->FromNode()->Cost() + edge->ToNode()->Cost()) / 2;
       }
+      double f = tentative_g_score + HeuristicCost(to_node, dest_node);
       if (open_set_.count(to_node) != 0 &&
-          tentative_g_score >= g_score_[to_node]) {
+          f >= g_score_[to_node]) {
         continue;
       }
       // if to_node is reached by forward, reset enter_s to start_s
@@ -313,9 +314,9 @@ bool AStarStrategy::Search(const TopoGraph* graph,
         enter_s_[to_node] = to_node_enter_s;
       }
 
-      g_score_[to_node] = tentative_g_score;
+      g_score_[to_node] = f;
       SearchNode next_node(to_node);
-      next_node.f = tentative_g_score + HeuristicCost(to_node, dest_node);
+      next_node.f = f;
       open_set_detail.push(next_node);
       came_from_[to_node] = from_node;
       if (open_set_.count(to_node) == 0) {
