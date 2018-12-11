@@ -125,14 +125,14 @@ class OpenSpaceTrajectoryGenerator {
       const apollo::common::VehicleState& vehicle_state,
       const std::vector<double>& end_pose, const double& rotate_angle,
       const Vec2d& translate_origin,
-      const double& is_near_desitination_threshold);
+      const double& is_near_destination_threshold);
 
   bool IsInitPointNearDestination(
       const common::TrajectoryPoint& planning_init_point,
       const apollo::common::VehicleState& vehicle_state,
       const std::vector<double>& end_pose, const double& rotate_angle,
       const Vec2d& translate_origin,
-      const double& is_near_desitination_threshold);
+      const double& is_near_destination_threshold);
 
   void GenerateStopTrajectory(const std::vector<double>& end_pose,
                               const double& rotate_angle,

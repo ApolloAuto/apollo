@@ -1,7 +1,7 @@
 delta_t : 0.5
 max_position_error_to_end_point : 0.05
 max_theta_error_to_end_point : 0.05
-is_near_desitination_threshold : 0.001
+is_near_destination_threshold : 0.001
 
 roi_config : {
   roi_longitudinal_range : 10.0

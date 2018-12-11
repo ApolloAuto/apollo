@@ -78,18 +78,17 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   if (!vehicle_state.has_x() || XYbounds.size() == 0 || end_pose.size() == 0 ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                           "Generator input data not ready");
+    return Status(ErrorCode::PLANNING_ERROR, "Generator input data not ready");
   }
 
   // Update end pose for target consistency check.
-//   end_pose_ = end_pose;
+  //   end_pose_ = end_pose;
 
   // Generate Stop trajectory if vehicle close to destination
   //   if (IsVehicleNearDestination(
   //           stitching_trajectory.back(), vehicle_state, end_pose,
   //           rotate_angle, translate_origin,
-  //           planner_open_space_config_.is_near_desitination_threshold())) {
+  //           planner_open_space_config_.is_near_destination_threshold())) {
   //     AINFO << "Vehicle is close to destination, skip new "
   //              "trajectory generation.";
 
@@ -101,7 +100,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   if (IsInitPointNearDestination(
           stitching_trajectory.back(), vehicle_state, end_pose, rotate_angle,
           translate_origin,
-          planner_open_space_config_.is_near_desitination_threshold())) {
+          planner_open_space_config_.is_near_destination_threshold())) {
     AINFO << "Planning init point is close to destination, skip new "
              "trajectory generation.";
 
@@ -413,7 +412,7 @@ bool OpenSpaceTrajectoryGenerator::IsVehicleNearDestination(
     const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose, const double& rotate_angle,
     const Vec2d& translate_origin,
-    const double& is_near_desitination_threshold) {
+    const double& is_near_destination_threshold) {
   CHECK_EQ(end_pose.size(), 4);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
 
@@ -426,7 +425,7 @@ bool OpenSpaceTrajectoryGenerator::IsVehicleNearDestination(
       (vehicle_state.y() - end_pose_to_world_frame.y()) *
           (vehicle_state.y() - end_pose_to_world_frame.y());
 
-  if (distance_to_vehicle < is_near_desitination_threshold) {
+  if (distance_to_vehicle < is_near_destination_threshold) {
     ADEBUG << "vehicle reach end_pose";
     return true;
   }
@@ -439,7 +438,7 @@ bool OpenSpaceTrajectoryGenerator::IsInitPointNearDestination(
     const common::VehicleState& vehicle_state,
     const std::vector<double>& end_pose, const double& rotate_angle,
     const Vec2d& translate_origin,
-    const double& is_near_desitination_threshold) {
+    const double& is_near_destination_threshold) {
   CHECK_EQ(end_pose.size(), 4);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
 
@@ -453,7 +452,7 @@ bool OpenSpaceTrajectoryGenerator::IsInitPointNearDestination(
       (path_point.y() - end_pose_to_world_frame.y()) *
           (path_point.y() - end_pose_to_world_frame.y());
 
-  if (distance_to_init_point < is_near_desitination_threshold) {
+  if (distance_to_init_point < is_near_destination_threshold) {
     AINFO << "init_point reach end_pose";
     return true;
   }
