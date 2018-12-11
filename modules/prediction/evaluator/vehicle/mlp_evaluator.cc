@@ -25,6 +25,7 @@
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/validation_checker.h"
 
@@ -159,7 +160,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> speeds;
   std::vector<double> timestamps;
 
-  double duration = obstacle_ptr->timestamp() - FLAGS_prediction_duration;
+  double duration = obstacle_ptr->timestamp() -
+      FLAGS_prediction_trajectory_time_length;
   int count = 0;
   for (std::size_t i = 0; i < obstacle_ptr->history_size(); ++i) {
     const Feature& feature = obstacle_ptr->feature(i);

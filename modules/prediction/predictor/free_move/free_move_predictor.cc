@@ -56,7 +56,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   double theta = feature.velocity_heading();
 
   std::vector<TrajectoryPoint> points(0);
-  double prediction_total_time = FLAGS_prediction_duration;
+  double prediction_total_time = FLAGS_prediction_trajectory_time_length;
   if (obstacle->type() == PerceptionObstacle::PEDESTRIAN) {
     prediction_total_time = FLAGS_prediction_pedestrian_total_time;
   }

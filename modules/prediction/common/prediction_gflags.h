@@ -18,13 +18,7 @@
 
 #include "gflags/gflags.h"
 
-DECLARE_bool(prediction_test_mode);
-DECLARE_double(prediction_test_duration);
-
-DECLARE_bool(prediction_offline_mode);
-DECLARE_string(prediction_offline_bags);
-
-DECLARE_double(prediction_duration);
+DECLARE_double(prediction_trajectory_time_length);
 DECLARE_double(prediction_period);
 DECLARE_double(double_precision);
 DECLARE_double(min_prediction_length);

@@ -29,10 +29,10 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::PathPoint;
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::KalmanFilter;
-using apollo::hdmap::LaneInfo;
+using common::PathPoint;
+using common::TrajectoryPoint;
+using common::math::KalmanFilter;
+using hdmap::LaneInfo;
 
 void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -75,8 +75,8 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
 
     std::vector<TrajectoryPoint> points;
     DrawLaneSequenceTrajectoryPoints(*obstacle, sequence,
-                                     FLAGS_prediction_duration,
-                                     FLAGS_prediction_period, &points);
+        FLAGS_prediction_trajectory_time_length,
+        FLAGS_prediction_period, &points);
 
     if (points.empty()) {
       continue;

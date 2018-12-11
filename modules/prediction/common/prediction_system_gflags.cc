@@ -16,6 +16,8 @@
 
 #include "modules/prediction/common/prediction_system_gflags.h"
 
+#include <limits>
+
 // System gflags
 DEFINE_string(prediction_module_name, "prediction",
               "Default prediction module name");
@@ -28,3 +30,16 @@ DEFINE_string(prediction_adapter_config_filename,
 DEFINE_string(prediction_data_dir,
               "/apollo/modules/prediction/data/prediction/",
               "Prefix of files to store feature data");
+
+DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
+DEFINE_double(
+    prediction_test_duration, std::numeric_limits<double>::infinity(),
+    "The runtime duration in test mode (in seconds). Negative value will not "
+    "restrict the runtime duration.");
+
+DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
+DEFINE_string(
+    prediction_offline_bags, "",
+    "a list of bag files or directories for offline mode. The items need to be "
+    "separated by colon ':'.  If this value is not set, the prediction module "
+    "will use the listen to published ros topic mode.");
