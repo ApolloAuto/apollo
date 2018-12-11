@@ -109,7 +109,7 @@ class TransitController final : public VehicleController {
 
  private:
   void SecurityDogThreadFunc();
-  virtual bool CheckResponse(const int32_t flags, bool need_wait);
+  virtual bool CheckResponse();
   void set_chassis_error_mask(const int32_t mask);
   int32_t chassis_error_mask();
   Chassis::ErrorCode chassis_error_code();
