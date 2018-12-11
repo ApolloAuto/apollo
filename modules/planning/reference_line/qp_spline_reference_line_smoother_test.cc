@@ -74,7 +74,7 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
 
 TEST_F(QpSplineReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
-  EXPECT_FLOAT_EQ(153.87421, reference_line_->Length());
+  EXPECT_DOUBLE_EQ(153.87421245682503, reference_line_->Length());
   std::vector<AnchorPoint> anchor_points;
   const double interval = 10.0;
   int num_of_anchors =
