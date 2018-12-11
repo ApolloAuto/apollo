@@ -96,11 +96,13 @@ class EulerAnglesZXY {
    * @param qz Quaternion z-coordinate
    */
   EulerAnglesZXY(T qw, T qx, T qy, T qz)
-      : roll_(std::atan2(2.0 * (qw * qy - qx * qz),
-                         2.0 * (Square<T>(qw) + Square<T>(qz)) - 1.0)),
-        pitch_(std::asin(2.0 * (qw * qx + qy * qz))),
-        yaw_(std::atan2(2.0 * (qw * qz - qx * qy),
-                        2.0 * (Square<T>(qw) + Square<T>(qy)) - 1.0)) {}
+      : roll_(std::atan2(static_cast<T>(2.0) * (qw * qy - qx * qz),
+                         static_cast<T>(2.0) * (Square<T>(qw) + Square<T>(qz)) -
+                             static_cast<T>(1.0))),
+        pitch_(std::asin(static_cast<T>(2.0) * (qw * qx + qy * qz))),
+        yaw_(std::atan2(static_cast<T>(2.0) * (qw * qz - qx * qy),
+                        static_cast<T>(2.0) * (Square<T>(qw) + Square<T>(qy)) -
+                            static_cast<T>(1.0))) {}
 
   /**
    * @brief Constructs a rotation from quaternion.
@@ -150,9 +152,10 @@ class EulerAnglesZXY {
    * @return Quaternion encoding this rotation.
    */
   Eigen::Quaternion<T> ToQuaternion() const {
-    T r = roll_ * 0.5;
-    T p = pitch_ * 0.5;
-    T y = yaw_ * 0.5;
+    T coeff = static_cast<T>(0.5);
+    T r = roll_ * coeff;
+    T p = pitch_ * coeff;
+    T y = yaw_ * coeff;
 
     T sr = std::sin(r);
     T sp = std::sin(p);

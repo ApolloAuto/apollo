@@ -193,7 +193,7 @@ int Polygon2d::Next(int at) const { return at >= num_points_ - 1 ? 0 : at + 1; }
 int Polygon2d::Prev(int at) const { return at == 0 ? num_points_ - 1 : at - 1; }
 
 void Polygon2d::BuildFromPoints() {
-  num_points_ = points_.size();
+  num_points_ = static_cast<int>(points_.size());
   CHECK_GE(num_points_, 3);
 
   // Make sure the points are in ccw order.
@@ -240,7 +240,7 @@ void Polygon2d::BuildFromPoints() {
 bool Polygon2d::ComputeConvexHull(const std::vector<Vec2d> &points,
                                   Polygon2d *const polygon) {
   CHECK_NOTNULL(polygon);
-  const int n = points.size();
+  const int n = static_cast<int>(points.size());
   if (n < 3) {
     return false;
   }
@@ -405,9 +405,7 @@ void Polygon2d::GetAllVertices(std::vector<Vec2d> *const vertices) const {
   *vertices = points_;
 }
 
-std::vector<Vec2d> Polygon2d::GetAllVertices() const {
-  return points_;
-}
+std::vector<Vec2d> Polygon2d::GetAllVertices() const { return points_; }
 
 std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
     const LineSegment2d &line_segment) const {
