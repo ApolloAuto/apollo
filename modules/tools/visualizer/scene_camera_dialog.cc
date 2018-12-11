@@ -59,7 +59,8 @@ void SceneCameraDialog::updateCameraPos(const QVector3D& pos) {
 }
 
 void SceneCameraDialog::OnStepSlideChanged(int v) {
-  float step = static_cast<float>(v) / ui->stepSlider->maximum();
+  const float step = static_cast<float>(v) /
+                     static_cast<float>(ui->stepSlider->maximum());
 
   emit sensitivityChanged(step);
 
