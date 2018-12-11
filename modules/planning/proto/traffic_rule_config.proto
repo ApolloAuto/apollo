@@ -124,31 +124,6 @@ message SignalLightConfig {
 
 }
 
-message StopSignConfig {
-  // stop distance from stop line of stop sign
-  optional double stop_distance = 1 [default = 1.0];  // meter
-  // min s_distance for adc to be considered have passed stop_sign
-  // (stop_line_end_s)
-  optional double min_pass_s_distance = 2 [default = 1.0];  // meter
-  // max speed(m/s) to be considered as a valid stop
-  optional double max_stop_speed = 3 [default = 0.3];  // m/s
-  // max distance(m) to the stop line to be considered as a valid stop
-  optional double max_valid_stop_distance = 4 [default = 3.0];  // meter
-  // min time(seconds) to be considered as a full stop at stop sign
-  optional double stop_duration = 5 [default = 1.0];  // seconds
-  // max speed(m/s) for watch vehicles to be considered as
-  // a valid stop.(this check is looser than adc)
-  optional double watch_vehicle_max_valid_stop_speed = 6
-      [default = 0.5];  // m/s
-  // max stop distance for watch vehicles to be considered as
-  // a valid stop.(this check is looser than adc)
-  optional double watch_vehicle_max_valid_stop_distance = 7
-      [default = 5.0];  // meter
-  // timeout threshold while monitoring/waiting for other obstacles
-  optional double wait_timeout = 8 [default = 8.0];  // sec
-  optional CreepConfig creep = 9;
-}
-
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -175,7 +150,6 @@ message TrafficRuleConfig {
     ReferenceLineEndConfig reference_line_end = 9;
     ReroutingConfig rerouting = 10;
     SignalLightConfig signal_light = 11;
-    StopSignConfig stop_sign = 12;
   }
 }
 
