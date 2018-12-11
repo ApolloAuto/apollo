@@ -15,24 +15,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
+"""
+extract localization message from  bag files
+Usage:
+    python path_extract.py file1 file2 ...
+"""
 import sys
 import datetime
-import rosbag
+from cyber_py.record import RecordReader
+from modules.localization.proto import localization_pb2
+
+kLocalizationTopic = '/apollo/localization/pose'
 
 if __name__ == '__main__':
-    fbags = sys.argv[1:]
+    bag_files = sys.argv[1:]
 
-    fbag = fbags[0]
+    bag_file = bag_files[0]
     now = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
-    f = open("path_" + fbag.split('/')[-1] + ".txt", 'w')
+    f = open("path_" + bag_file.split('/')[-1] + ".txt", 'w')
 
-    for fbag in fbags:
-        bag = rosbag.Bag(fbag)
-        for topic, localization_pb, t in bag.read_messages(
-                topics=['/apollo/localization/pose']):
-            x = localization_pb.pose.position.x
-            y = localization_pb.pose.position.y
-            f.write(str(x) + "," + str(y) + "\n")
-        bag.close()
+    for bag_file in bag_files:
+        print("begin to extract path from file :", bag_file)
+        reader = RecordReader(bag_file)
+        localization = localization_pb2.LocalizationEstimate()
+        for msg in reader.read_messages():
+            if msg.topic == kLocalizationTopic:
+                localization.ParseFromString(msg.message)
+                x = localization.pose.position.x
+                y = localization.pose.position.y
+                f.write(str(x) + "," + str(y) + "\n")
+        print("Finished extracting path from file :", bag_file)
     f.close()

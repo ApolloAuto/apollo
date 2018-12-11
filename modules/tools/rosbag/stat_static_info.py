@@ -25,14 +25,13 @@ Usage:
 import os
 import sys
 
-from modules.data.proto.static_info_pb2 import StaticInfo
-from rosbag.bag import Bag
 
-kStaticInfoTopic = '/apollo/monitor/static_info'
-kTopics = [
-    kStaticInfoTopic,
-]
-
+from modules.canbus.proto import chassis_pb2
+from modules.dreamview.proto import hmi_status_pb2
+from cyber_py import cyber
+from cyber_py.record import RecordReader
+kChassisInfoTopic = '/apollo/canbus/chassis'
+kHMIInfoTopic = '/apollo/hmi/status'
 
 class StaticInfoCalculator(object):
     """Stat static info."""
@@ -43,18 +42,27 @@ class StaticInfoCalculator(object):
 
     def process_file(self, bag_file):
         """
-        Extract information from bag file.
+        Extract information from bag file. 
         Return True if we are done collecting all information.
         """
         try:
-            with Bag(bag_file, 'r') as bag:
-                for _, msg, _ in bag.read_messages(topics=kTopics):
-                    if msg.vehicle.name:
-                        self.vehicle_name = msg.vehicle.name.lower()
-                    if msg.vehicle.license.vin:
-                        self.vehicle_vin = msg.vehicle.license.vin
-                    if self.done():
-                        return True
+            reader = RecordReader(bag_file)
+            print "begin"
+            for msg in reader.read_messages():
+                if msg.topic == kChassisInfoTopic and self.vehicle_vin == None:
+                    chassis = chassis_pb2.Chassis()
+                    chassis.ParseFromString(msg.message)
+                    if chassis.license.vin:
+                        self.vehicle_vin = chassis.license.vin
+                elif msg.topic == kHMIInfoTopic and self.vehicle_name == None:
+                    hmistatus = hmi_status_pb2.HMIStatus()
+                    hmistatus.ParseFromString(msg.message)
+                    print hmistatus.MessageType
+                    if hmistatus.current_vehicle:
+                        self.vehicle_name = hmistatus.current_vehicle
+                        print self.vehicle_name
+                if self.done():
+                    return True
         except:
             return False
         return self.done()

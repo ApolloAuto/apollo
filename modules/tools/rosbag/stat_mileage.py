@@ -48,7 +48,7 @@ class MileageCalculator(object):
     def calculate(self, bag_file):
         """Calculate mileage."""
         last_pos = None
-        cur_mode = 'Unknown'
+        last_mode = 'Unknown'
         mileage = collections.defaultdict(lambda: 0.0)
         chassis = chassis_pb2.Chassis()
         localization = localization_pb2.LocalizationEstimate()
@@ -57,11 +57,11 @@ class MileageCalculator(object):
             if msg.topic == kChassisTopic:
                 chassis.ParseFromString(msg.message)
                 # Mode changed
-                if cur_mode != chassis.driving_mode:
-                    if (cur_mode == Chassis.COMPLETE_AUTO_DRIVE and
+                if last_mode != chassis.driving_mode:
+                    if (last_mode == Chassis.COMPLETE_AUTO_DRIVE and
                             chassis.driving_mode == Chassis.EMERGENCY_MODE):
                         self.disengagements += 1
-                    cur_mode = chassis.driving_mode
+                    last_mode = chassis.driving_mode
                     # Reset start position.
                     last_pos = None
             elif msg.topic == kLocalizationTopic:
@@ -69,7 +69,7 @@ class MileageCalculator(object):
                 cur_pos = localization.pose.position
                 if last_pos:
                     # Accumulate mileage, from xyz-distance to miles.
-                    mileage[cur_mode] += 0.000621371 * math.sqrt(
+                    mileage[last_mode] += 0.000621371 * math.sqrt(
                         (cur_pos.x - last_pos.x) ** 2 +
                         (cur_pos.y - last_pos.y) ** 2 +
                         (cur_pos.z - last_pos.z) ** 2)

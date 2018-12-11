@@ -22,10 +22,8 @@ This program can dump a rosbag into separate text files that contains the pb mes
 import argparse
 import os
 import shutil
-
-import rosbag
-import std_msgs
-from std_msgs.msg import String
+from cyber_py.record import RecordReader
+from datetime import datetime
 
 g_args = None
 
@@ -40,7 +38,7 @@ def write_to_file(file_path, topic_pb):
 
 def dump_bag(in_bag, out_dir):
     """out_bag = in_bag + routing_bag"""
-    bag = rosbag.Bag(in_bag, 'r')
+    reader = RecordReader(in_bag)
     seq = 0
     global g_args
     topic_name_map = {
@@ -55,21 +53,26 @@ def dump_bag(in_bag, out_dir):
     }
     first_time = None
     record_num = 0
-    for topic, msg, t in bag.read_messages():
+    for channel, message, _type, _timestamp in reader.read_messages():
+        t = _timestamp
+        msg = message
         record_num += 1
         if record_num % 1000 == 0:
             print "Processing record_num:", record_num
         if first_time is None:
             first_time = t
-        if topic not in topic_name_map:
+        if channel not in topic_name_map:
             continue
-        relative_time = (t - first_time).secs - g_args.start_time
+        dt1 = datetime.utcfromtimestamp(t/1000000000)
+        dt2 = datetime.utcfromtimestamp(first_time/1000000000)
+        relative_time = (dt1 - dt2).seconds - g_args.start_time
+        print "relative_time", relative_time
         if ((g_args.time_duration > 0) and
             (relative_time < 0 or relative_time > g_args.time_duration)):
             continue
-        if topic == "/apollo/planning":
+        if channel == "/apollo/planning":
             seq += 1
-            topic_name_map[topic][1] = msg
+            topic_name_map[channel][1] = msg
             print "Generating seq:", seq
             for t, name_pb in topic_name_map.iteritems():
                 if name_pb[1] is None:
@@ -77,13 +80,13 @@ def dump_bag(in_bag, out_dir):
                 file_path = os.path.join(out_dir,
                                         str(seq) + "_" + name_pb[0] + ".pb.txt")
                 write_to_file(file_path, name_pb[1])
-        topic_name_map[topic][1] = msg
-
+        topic_name_map[channel][1] = msg
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=
-        "A tool to dump the protobuf messages according to the planning message ")
+        "A tool to dump the protobuf messages according to the planning message"
+        "Usage: python dump_planning.py bag_file save_directory")
     parser.add_argument(
         "in_rosbag", action="store", type=str, help="the input ros bag")
     parser.add_argument(

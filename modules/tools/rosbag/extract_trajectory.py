@@ -41,6 +41,7 @@ def write_to_file(file_path, topic_pb):
 
 def extract_record(in_record, output):
     freader = record.RecordReader(in_record)
+    print "begin to extract from record {}".format(in_record)
     time.sleep(1)
     seq = 0
     localization_topic = "/apollo/localization/pose"
@@ -58,11 +59,13 @@ def extract_record(in_record, output):
                       pose.position.z, pose.orientation.qx,
                       pose.orientation.qy, pose.orientation.qz,
                       pose.orientation.qw))
+    print "finished extracting from record {}".format(in_record)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="A tool to dump the localization messages for map team")
+        description="A tool to dump the localization messages for map team"
+                    "Usage: python extract_trajectory.py bag1 bag2 --output output.txt")
     parser.add_argument(
         "in_record",
         action="store",
