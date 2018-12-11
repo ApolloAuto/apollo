@@ -36,9 +36,9 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-class StopSignUnprotectedPreStop : public Stage {
+class StageCreep : public Stage {
  public:
-  explicit StopSignUnprotectedPreStop(const ScenarioConfig::StageConfig& config)
+  explicit StageCreep(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:
@@ -46,13 +46,8 @@ class StopSignUnprotectedPreStop : public Stage {
                              Frame* frame) override;
 
   StopSignUnprotectedContext* GetContext() {
-    return GetContextAs<StopSignUnprotectedContext>();
+    return Stage::GetContextAs<StopSignUnprotectedContext>();
   }
-
-  int AddWatchVehicle(const Obstacle& obstacle,
-                      std::unordered_map<std::string, std::vector<std::string>>*
-                          watch_vehicles);
-  bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
 
  private:
   ScenarioStopSignUnprotectedConfig scenario_config_;

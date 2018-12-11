@@ -36,9 +36,9 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-class StopSignUnprotectedStop : public Stage {
+class StageStop : public Stage {
  public:
-  explicit StopSignUnprotectedStop(const ScenarioConfig::StageConfig& config)
+  explicit StageStop(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:
@@ -52,6 +52,7 @@ class StopSignUnprotectedStop : public Stage {
       const std::vector<std::string>& watch_vehicle_ids,
       std::unordered_map<std::string, std::vector<std::string>>*
           watch_vehicles);
+
  private:
   Stage::StageStatus FinishStage(const ScenarioConfig::StageType& next_stage);
 

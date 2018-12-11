@@ -36,10 +36,10 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-class StopSignUnprotectedIntersectionCruise : public Stage {
+class StagePreStop : public Stage {
  public:
-  explicit StopSignUnprotectedIntersectionCruise(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+  explicit StagePreStop(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
@@ -48,6 +48,11 @@ class StopSignUnprotectedIntersectionCruise : public Stage {
   StopSignUnprotectedContext* GetContext() {
     return GetContextAs<StopSignUnprotectedContext>();
   }
+
+  int AddWatchVehicle(const Obstacle& obstacle,
+                      std::unordered_map<std::string, std::vector<std::string>>*
+                          watch_vehicles);
+  bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
 
  private:
   ScenarioStopSignUnprotectedConfig scenario_config_;

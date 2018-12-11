@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_creep.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_creep.h"
 
 #include <algorithm>
 #include <limits>
@@ -43,7 +43,7 @@ using common::time::Clock;
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
-Stage::StageStatus StopSignUnprotectedCreep::Process(
+Stage::StageStatus StageCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
@@ -61,27 +61,25 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
   std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it = std::find_if(
-      stop_sign_overlaps.begin(),
-      stop_sign_overlaps.end(),
-      [&stop_sign_overlap_id](const PathOverlap &overlap) {
-        return overlap.object_id == stop_sign_overlap_id;
-      });
+  auto stop_sign_overlap_it =
+      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
+                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
+                     return overlap.object_id == stop_sign_overlap_id;
+                   });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
     next_stage_ = ScenarioConfig::NO_STAGE;
     return Stage::FINISHED;
   }
 
-  const double wait_time = Clock::NowInSeconds() -
-      GetContext()->creep_start_time;
+  const double wait_time =
+      Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
-                           stop_sign_overlap_it->end_s,
-                           wait_time, timeout)) {
+                           stop_sign_overlap_it->end_s, wait_time, timeout)) {
     bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
     if (!plan_ok) {
-      AERROR << "StopSignUnprotectedCreep planning error";
+      AERROR << "StageCreep planning error";
     }
 
     next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
@@ -95,7 +93,7 @@ Stage::StageStatus StopSignUnprotectedCreep::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StopSignUnprotectedCreep planning error";
+    AERROR << "StageCreep planning error";
   }
   return Stage::RUNNING;
 }
