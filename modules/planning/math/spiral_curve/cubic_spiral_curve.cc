@@ -248,7 +248,7 @@ Status CubicSpiralCurve::GetPathVecWithS(
                   "CubicSpiralCurve::get_path_vec_with_s");
   }
 
-  const std::uint32_t n = vec_s.size();
+  const std::uint32_t n = static_cast<std::uint32_t>(vec_s.size());
   std::vector<PathPoint>& result = *path_points;
   result.resize(n);
 

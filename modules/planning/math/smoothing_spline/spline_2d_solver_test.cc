@@ -33,7 +33,7 @@ using Eigen::MatrixXd;
 
 TEST(constraint_test, test_suit_one) {
   std::vector<double> t_knots{0, 1, 2, 3, 4, 5};
-  std::size_t order = 5;
+  uint32_t order = 5;
   ActiveSetSpline2dSolver spline_solver(t_knots, order);
 
   Spline2dConstraint* constraint = spline_solver.mutable_constraint();
