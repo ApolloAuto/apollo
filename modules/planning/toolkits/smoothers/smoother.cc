@@ -20,6 +20,8 @@
 
 #include "modules/planning/toolkits/smoothers/smoother.h"
 
+#include <string>
+
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
 
