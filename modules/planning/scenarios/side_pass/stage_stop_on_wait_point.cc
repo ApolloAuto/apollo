@@ -39,7 +39,8 @@ using apollo::common::PathPoint;
 using apollo::common::math::Vec2d;
 using apollo::common::VehicleConfigHelper;
 
-constexpr double kExtraMarginforStopOnWaitPointStage = 3.0;
+constexpr double kSExtraMarginforStopOnWaitPointStage = 3.0;
+constexpr double kLExtraMarginforStopOnWaitPointStage = 0.4;
 
 Stage::StageStatus StageStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
@@ -201,7 +202,7 @@ bool StageStopOnWaitPoint::IsFarAwayFromObstacles(
     double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
     double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
     if (obs_end_s < first_sl_point.s() ||
-        obs_start_s > last_sl_point.s() + kExtraMarginforStopOnWaitPointStage) {
+        obs_start_s > last_sl_point.s() + kSExtraMarginforStopOnWaitPointStage) {
       continue;
     }
     // Check the l-direction.
@@ -330,8 +331,10 @@ bool StageStopOnWaitPoint::GetMoveForwardLastPathPoint(
       reference_line.GetLaneWidth(curr_point_sl.s(), &curr_point_left_width,
                                   &curr_point_right_width);
       // Check if this corner point is within the lane:
-      if (curr_point_sl.l() > std::abs(curr_point_left_width) ||
-          curr_point_sl.l() < -std::abs(curr_point_right_width)) {
+      if (curr_point_sl.l() > std::abs(curr_point_left_width) -
+          kLExtraMarginforStopOnWaitPointStage ||
+          curr_point_sl.l() < -std::abs(curr_point_right_width) +
+          kLExtraMarginforStopOnWaitPointStage) {
         is_out_of_curr_lane = true;
         break;
       }

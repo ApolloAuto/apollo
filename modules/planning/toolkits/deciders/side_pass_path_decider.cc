@@ -43,11 +43,13 @@ using apollo::hdmap::PathOverlap;
 using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
-constexpr double kRoadBuffer = 0.05;      // 5cm
-constexpr double kObstacleLBuffer = 0.1;  // 10cm
-constexpr double kObstacleSBuffer = 2.0;  // 2m
-constexpr double kExtraRoadBufferDuringTurning = 0.1;
-constexpr double kVehicleBuffer = 0.6;
+constexpr double kRoadBuffer = 0.05;                    // 5cm
+constexpr double kObstacleLBuffer = 0.1;                // 10cm
+constexpr double kObstacleSBuffer = 2.0;                // 2m
+constexpr double kExtraRoadBufferDuringTurning = 0.1;   // 10cm
+constexpr double kVehicleBuffer = 0.6;                  // 60cm
+constexpr double kOffRoadCenterThreshold = 0.4;         // 40cm
+constexpr double kTrimWatchWindow = 12.0;               // 12m
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {}
@@ -100,7 +102,8 @@ Status SidePassPathDecider::Process(
 }
 
 bool SidePassPathDecider::DecideSidePassDirection(
-    const std::vector<bool>& can_side_pass) {
+    const std::vector<bool>& can_side_pass,
+    size_t left_length, size_t right_length) {
   if (can_side_pass[0] == false && can_side_pass[1] == false) {
     return false;
   } else if (can_side_pass[0] == true && can_side_pass[1] == false) {
@@ -119,7 +122,11 @@ bool SidePassPathDecider::DecideSidePassDirection(
     } else if (curr_lane_.right_neighbor_reverse_lane_id_size() > 0) {
       decided_direction_ = SidePassDirection::RIGHT;
     } else {
-      decided_direction_ = SidePassDirection::LEFT;
+      if (left_length <= right_length) {
+        decided_direction_ = SidePassDirection::LEFT;
+      } else {
+        decided_direction_ = SidePassDirection::RIGHT;
+      }
     }
     return true;
   }
@@ -209,11 +216,13 @@ bool SidePassPathDecider::GeneratePath(
       frenet_frame_paths[i].push_back(std::move(frenet_frame_point));
       accumulated_s += delta_s_;
     }
+    TrimGeneratedPath(&frenet_frame_paths[i]);
   }
 
   ADEBUG << "\n";
   // Decide a direction to side-pass.
-  if (!DecideSidePassDirection(can_side_pass)) {
+  if (!DecideSidePassDirection(can_side_pass, frenet_frame_paths[0].size(),
+                               frenet_frame_paths[1].size())) {
     ADEBUG << "Unable to generate path in either direction.";
     return false;
   }
@@ -446,6 +455,47 @@ SidePassPathDecider::GetPathBoundaries(
     lateral_bounds.push_back(lateral_bound);
   }
   return lateral_bounds;
+}
+
+bool SidePassPathDecider::TrimGeneratedPath(
+    std::vector<common::FrenetFramePoint>* ptr_frenet_frame_path) {
+  // Sanity checks.
+  if (ptr_frenet_frame_path->empty()) {
+    return false;
+  }
+  if (std::fabs(ptr_frenet_frame_path->back().l()) >
+      kOffRoadCenterThreshold) {
+    return false;
+  }
+
+  // Sliding window algorithm.
+  int i = static_cast<int32_t>(ptr_frenet_frame_path->size()) - 1;
+  int j = static_cast<int32_t>(ptr_frenet_frame_path->size()) - 1;
+  // 1. Move j so that it is kTrimWatchWindow ahead of i.
+  while (j >= 0) {
+    if ((*ptr_frenet_frame_path)[i].s() - (*ptr_frenet_frame_path)[j].s() >
+        kTrimWatchWindow) {
+      break;
+    }
+    if (std::fabs((*ptr_frenet_frame_path)[j].l()) > kOffRoadCenterThreshold) {
+      return false;
+    }
+    j --;
+  }
+  if (j < 0) {
+    return false;
+  }
+  // 2. Slide the j-i window backward until the point where side-pass finishes.
+  //    Trim the tailing path points.
+  while (j >= 0) {
+    if (std::fabs((*ptr_frenet_frame_path)[j].l()) > kOffRoadCenterThreshold) {
+      break;
+    }
+    i --;
+    j --;
+    ptr_frenet_frame_path->pop_back();
+  }
+  return true;
 }
 
 const Obstacle *SidePassPathDecider::GetNearestObstacle(
