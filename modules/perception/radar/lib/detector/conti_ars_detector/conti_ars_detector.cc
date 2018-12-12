@@ -66,7 +66,9 @@ void ContiArsDetector::RawObs2Frame(
                               radar_obs.lateral_dist(),
                               0,
                               1);
-    Eigen::Vector4d world_loc = radar2world * local_loc;
+    Eigen::Vector4d world_loc =
+      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
+      (radar2world * local_loc);
     radar_object->center = world_loc.block<3, 1>(0, 0);
     radar_object->anchor_point = radar_object->center;
 
@@ -76,8 +78,9 @@ void ContiArsDetector::RawObs2Frame(
 
     Eigen::Vector3d angular_trans_speed = rotation_radar
       * local_loc.topLeftCorner(3, 1);
-    Eigen::Vector3d world_vel = radar2world_rotate
-      * (local_vel + angular_trans_speed);
+    Eigen::Vector3d world_vel =
+      static_cast<Eigen::Matrix<double, 3, 1, 0, 3, 1>>
+      (radar2world_rotate * (local_vel + angular_trans_speed));
     Eigen::Vector3d vel_temp = world_vel
                 + options.car_linear_speed.cast<double>();
     radar_object->velocity = vel_temp.cast<float>();

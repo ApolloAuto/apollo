@@ -31,7 +31,8 @@ bool PointCamera1ToCamera2(const Eigen::Vector2d& point,
                            Eigen::Vector2d* point_out) {
   Eigen::Vector3d pt = point.homogeneous();
   Eigen::Vector3d camera2_3d =
-      trans_camera1_to_camera2 * camera1_intrinsic_inverse * pt;
+      static_cast<Eigen::Matrix<double, 3, 1, 0, 3, 1>>
+      (trans_camera1_to_camera2 * camera1_intrinsic_inverse * pt);
 
   double z = camera2_3d(2);
   if (fabs(z) > 1e-6) {

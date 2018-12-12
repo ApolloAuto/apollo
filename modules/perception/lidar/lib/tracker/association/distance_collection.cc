@@ -250,9 +250,11 @@ float BboxIouDistance(
   trans_mat(1, 0) = -(old_dir.cast<double>())(1);
   trans_mat(1, 1) = (old_dir.cast<double>())(0);
   Eigen::Vector2d old_center_transformed_2d =
-    trans_mat * old_center.head(2);
+    static_cast<Eigen::Matrix<double, 2, 1, 0, 2, 1>>
+    (trans_mat * old_center.head(2));
   Eigen::Vector2d new_center_transformed_2d =
-    trans_mat * new_center.head(2);
+    static_cast<Eigen::Matrix<double, 2, 1, 0, 2, 1>>
+    (trans_mat * new_center.head(2));
   old_center(0) = old_center_transformed_2d(0);
   old_center(1) = old_center_transformed_2d(1);
   new_center(0) = new_center_transformed_2d(0);

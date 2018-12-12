@@ -56,7 +56,8 @@ bool Pt3dToCamera2d(const Eigen::Vector3d& pt3d,
                     base::BaseCameraModelPtr camera_model,
                     Eigen::Vector2d* pt2d) {
   Eigen::Vector4d local_pt =
-      world2camera_pose * Eigen::Vector4d(pt3d(0), pt3d(1), pt3d(2), 1);
+    static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
+    (world2camera_pose * Eigen::Vector4d(pt3d(0), pt3d(1), pt3d(2), 1));
   if (local_pt[2] > 0) {
     *pt2d = (camera_model->Project(
                  Eigen::Vector3f(static_cast<float>(local_pt[0]),
