@@ -86,7 +86,6 @@ void ScenarioManager::PrioritizeObstacles(
                   pose_y + FLAGS_scan_length / 2.0 * std::sin(pose_theta)},
                   pose_theta, FLAGS_scan_length, FLAGS_scan_width);
 
-  const auto& scenario_type = ptr_scenario_features->scenario().type();
   const auto& obstacle_ids =
       obstacles_container->GetCurrentFramePredictableObstacleIds();
 
@@ -118,23 +117,10 @@ void ScenarioManager::PrioritizeObstacles(
          latest_feature_ptr->type() == PerceptionObstacle::UNKNOWN ||
          latest_feature_ptr->type() == PerceptionObstacle::UNKNOWN_MOVABLE) &&
         is_near_lane;
+    bool is_near_junction = obstacle_ptr->IsNearJunction();
 
-    bool need_consider = is_in_scan_area || is_on_lane ||
+    bool need_consider = is_in_scan_area || is_on_lane || is_near_junction ||
                          is_pedestrian_like_in_front_near_lanes;
-
-    // For junction scenario, need_consider if obstacle is in junction_polygon
-    if (scenario_type == Scenario::JUNCTION ||
-        scenario_type == Scenario::JUNCTION_TRAFFIC_LIGHT ||
-        scenario_type == Scenario::JUNCTION_STOP_SIGN) {
-      std::string junction_id =
-          ptr_scenario_features->scenario().junction_id();
-      std::shared_ptr<const apollo::hdmap::JunctionInfo> junction_info_ptr =
-          PredictionMap::JunctionById(junction_id);
-      CHECK_NOTNULL(junction_info_ptr);
-      bool is_in_junction =
-          junction_info_ptr->polygon().IsPointIn({obstacle_x, obstacle_y});
-      need_consider = need_consider || is_in_junction;
-    }
 
     if (!need_consider) {
       latest_feature_ptr->mutable_priority()->set_priority(
