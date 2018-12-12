@@ -126,7 +126,6 @@ message ScenarioDebug {
   optional string msg = 3;
 }
 
-
 message Trajectories {
   repeated apollo.common.Trajectory trajectory = 1;
 }
@@ -143,7 +142,18 @@ message OpenSpaceDebug {
   repeated apollo.planning_internal.ObstacleDebug obstacles = 9;
 }
 
-// next ID: 27
+message SmootherDebug {
+  enum SmootherType {
+    SMOOTHER_NONE = 1;
+    SMOOTHER_CLOSE_STOP = 2;
+  }
+  optional bool is_smoothed = 1;
+
+  optional SmootherType type = 2 [default = SMOOTHER_NONE];
+  optional string reason = 3;
+}
+
+// next ID: 29
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -170,6 +180,7 @@ message PlanningData {
   repeated apollo.dreamview.Chart chart = 25;
   optional ScenarioDebug scenario = 26;
   optional OpenSpaceDebug open_space = 27;
+  optional SmootherDebug smoother = 28;
 }
 
 message LatticeStPixel {

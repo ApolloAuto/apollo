@@ -97,7 +97,12 @@ apollo::common::Status Smoother::Smooth(
   auto header = current_trajectory_pb->header();
   *current_trajectory_pb = previous_planning;
   current_trajectory_pb->mutable_header()->CopyFrom(header);
-
+  auto smoother_debug = current_trajectory_pb->mutable_debug()
+                            ->mutable_planning_data()
+                            ->mutable_smoother();
+  smoother_debug->set_is_smoothed(true);
+  smoother_debug->set_type(
+      planning_internal::SmootherDebug::SMOOTHER_CLOSE_STOP);
   return Status::OK();
 }
 
