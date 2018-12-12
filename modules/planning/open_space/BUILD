@@ -303,6 +303,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",

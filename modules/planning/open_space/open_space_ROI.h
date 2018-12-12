@@ -27,6 +27,8 @@
 
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -172,6 +174,8 @@ class OpenSpaceROI {
   std::string target_parking_spot_id_ = "";
 
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+
+  apollo::common::VehicleParam vehicle_params_;
 };
 
 }  // namespace planning
