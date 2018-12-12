@@ -247,18 +247,18 @@ Preprocess the data.
 def data_preprocessing(data):
     # Various input features separation
     X_obs_old_features = data[:, 0:23]
-    X_surround_obs = data[:, 83:91]
-    X_obs_now = data[:, 23:29]
-    X_obs_hist_5 = data[:, 29:53]
-    X_lane = data[:, 91:-dim_output]
+    X_surround_obs = data[:, 68:76]
+    X_obs_now = data[:, 23:32]
+    X_obs_hist_5 = data[:, 23:68]
+    X_lane = data[:, 76:-dim_output]
 
     # mask out those that don't have any history
-    mask5 = (data[:,53] != 100)
+    # mask5 = (data[:,53] != 100)
 
-    X = np.concatenate((X_obs_old_features, X_surround_obs, X_obs_hist_5, X_lane), axis=1)
-    X = X[mask5, :]
+    X = np.concatenate((X_obs_old_features, X_obs_hist_5, X_lane), axis=1)
+    # X = X[mask5, :]
     y = data[:, -dim_output:]
-    y = y[mask5, :]
+    # y = y[mask5, :]
 
     # Binary classification
     y[:, 0] = (y[:, 0] > 0).astype(float)

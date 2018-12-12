@@ -101,24 +101,24 @@ class FCNN_CNN1D(torch.nn.Module):
     def __init__(self):
         super(FCNN_CNN1D, self).__init__()
         self.lane_feature_conv = torch.nn.Sequential(\
-                            nn.Conv1d(5, 10, 3, stride=1),\
+                            nn.Conv1d(4, 10, 3, stride=1),\
                             #nn.BatchNorm1d(10),\
                             nn.ReLU(),\
-                            nn.Conv1d(10, 16, 3, stride=2),\
+                            #nn.Conv1d(10, 16, 3, stride=2),\
                             #nn.BatchNorm1d(16),\
-                            nn.ReLU(),\
-                            nn.Conv1d(16, 25, 3, stride=2),\
+                            #nn.ReLU(),\
+                            nn.Conv1d(10, 25, 3, stride=2),\
                             #nn.BatchNorm1d(25)
                             )
-        self.lane_feature_maxpool = nn.MaxPool1d(3)
-        self.lane_feature_avgpool = nn.AvgPool1d(3)
+        self.lane_feature_maxpool = nn.MaxPool1d(4)
+        self.lane_feature_avgpool = nn.AvgPool1d(4)
         self.lane_feature_dropout = nn.Dropout(0.0)
 
         self.obs_feature_fc = torch.nn.Sequential(\
-                            nn.Linear(47, 32),\
+                            nn.Linear(68, 40),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
-                            nn.Linear(32, 24),\
+                            nn.Linear(40, 24),\
                             nn.Sigmoid(),\
                             nn.Dropout(0.0),\
                             )
@@ -156,10 +156,10 @@ class FCNN_CNN1D(torch.nn.Module):
                             nn.ReLU()
                                             )
     def forward(self, x):
-        lane_fea = x[:,-150:]
-        lane_fea = lane_fea.view(lane_fea.size(0), 5, 30)
+        lane_fea = x[:,-80:]
+        lane_fea = lane_fea.view(lane_fea.size(0), 4, 20)
 
-        obs_fea = x[:,:-150]
+        obs_fea = x[:,:-80]
 
         lane_fea = self.lane_feature_conv(lane_fea)
 
