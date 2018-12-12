@@ -53,7 +53,8 @@ class SidePassPathDecider : public Decider {
   common::Status Process(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) override;
 
-  bool DecideSidePassDirection(const std::vector<bool>& can_side_pass);
+  bool DecideSidePassDirection(const std::vector<bool>& can_side_pass,
+                               size_t left_length, size_t right_length);
 
   bool GeneratePath(Frame* const frame,
                     ReferenceLineInfo* const reference_line_info);
@@ -63,6 +64,9 @@ class SidePassPathDecider : public Decider {
       const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,
       const IndexedList<std::string, Obstacle>& indexed_obstacles,
       bool* fail_to_find_boundary);
+
+  bool TrimGeneratedPath(
+      std::vector<common::FrenetFramePoint>* ptr_frenet_frame_path);
 
   const Obstacle* GetNearestObstacle(
       const SLBoundary& adc_sl_boundary, const ReferenceLine& reference_line,
