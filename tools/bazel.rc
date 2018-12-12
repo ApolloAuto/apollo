@@ -82,6 +82,7 @@ build --per_file_copt=\
 ^modules/map/.*\.cc,\
 ^modules/monitor/.*\.cc,\
 ^modules/perception/.*\.cc,\
+^modules/prediction/.*\.cc,\
 ^modules/planning/.*\.cc,\
 ^modules/routing/.*\.cc,\
 ^modules/third_party_perception/.*\.cc,\
