@@ -19,8 +19,6 @@
 #include <algorithm>
 #include <bitset>
 
-#include "modules/common/util/string_util.h"
-
 namespace apollo {
 namespace drivers {
 namespace canbus {
@@ -43,7 +41,7 @@ std::string Byte::byte_to_hex(const uint8_t value) {
   static const char HEX[] = "0123456789ABCDEF";
   uint8_t high = static_cast<uint8_t>(value >> 4);
   uint8_t low = static_cast<uint8_t>(value & 0x0F);
-  return apollo::common::util::StringPrintf("%c%c", HEX[high], HEX[low]);
+  return {HEX[high], HEX[low]};
 }
 
 std::string Byte::byte_to_hex(const uint32_t value) {
