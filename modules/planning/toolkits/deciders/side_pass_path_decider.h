@@ -53,8 +53,7 @@ class SidePassPathDecider : public Decider {
   common::Status Process(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) override;
 
-  bool BuildSidePathDecision(Frame* const frame,
-                             ReferenceLineInfo* const reference_line_info);
+  bool DecideSidePassDirection(const std::vector<bool>& can_side_pass);
 
   bool GeneratePath(Frame* const frame,
                     ReferenceLineInfo* const reference_line_info);
