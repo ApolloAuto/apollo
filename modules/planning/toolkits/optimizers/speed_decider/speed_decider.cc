@@ -128,7 +128,7 @@ bool SpeedDecider::CheckKeepClearCrossable(
                            (last_speed_point.t() - last_2nd_speed_point.t());
     }
   }
-  constexpr double kKeepClearSlowSpeed = 3.0;  // m/s
+  constexpr double kKeepClearSlowSpeed = 2.5;  // m/s
   ADEBUG << "last_speed_point_s[" << last_speed_point.s()
          << "] st_boundary.max_s[" << keep_clear_st_boundary.max_s()
          << "] last_speed_point_v[" << last_speed_point_v << "]";
@@ -136,7 +136,6 @@ bool SpeedDecider::CheckKeepClearCrossable(
       last_speed_point_v < kKeepClearSlowSpeed) {
     keep_clear_crossable = false;
   }
-
   return keep_clear_crossable;
 }
 
