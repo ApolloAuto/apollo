@@ -98,7 +98,6 @@ DEFINE_int32(max_num_nearby_lane_in_junction, 1,
              "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff_in_junction, M_PI / 6.0,
               "Max angle difference for a candidate lane");
-DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
 DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
 DEFINE_double(pedestrian_max_acc, 2.0, "maximum pedestrian acceleration");

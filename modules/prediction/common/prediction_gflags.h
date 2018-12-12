@@ -68,7 +68,6 @@ DECLARE_double(max_lane_angle_diff);
 DECLARE_int32(max_num_current_lane_in_junction);
 DECLARE_int32(max_num_nearby_lane_in_junction);
 DECLARE_double(max_lane_angle_diff_in_junction);
-DECLARE_bool(enable_pedestrian_acc);
 DECLARE_double(coeff_mul_sigma);
 DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_max_acc);

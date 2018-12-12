@@ -131,9 +131,6 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
   Eigen::Vector2d acc(0.0, 0.0);
-  if (FLAGS_enable_pedestrian_acc) {
-    acc = {feature.acceleration().x(), feature.acceleration().y()};
-  }
 
   const double total_time = FLAGS_prediction_trajectory_time_length;
   std::vector<TrajectoryPoint> left_points;
@@ -239,10 +236,6 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
   u.setZero();
   u(0, 0) = velocity.x();
   u(1, 0) = velocity.y();
-  if (FLAGS_enable_pedestrian_acc) {
-    u(2, 0) = acceleration.x();
-    u(3, 0) = acceleration.y();
-  }
 
   kf.SetControlMatrix(B);
 
