@@ -107,6 +107,19 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "protobuf_factory_test",
+    size = "small",
+    srcs = [
+        "protobuf_factory_test.cc"
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/proto:unit_test_cc_proto",
+        "@gtest//:main"
+    ],
+)
+
 cc_library(
     name = "raw_message_traits",
     hdrs = [

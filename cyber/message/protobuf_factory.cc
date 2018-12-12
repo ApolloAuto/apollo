@@ -211,7 +211,7 @@ void ErrorCollector::AddError(const std::string& filename,
                               const google::protobuf::Message* descriptor,
                               ErrorLocation location,
                               const std::string& message) {
-  AERROR << "[" << filename << "] " << message;
+  AWARN << "[" << filename << "] " << message;
 }
 
 void ErrorCollector::AddWarning(const std::string& filename,
@@ -219,7 +219,7 @@ void ErrorCollector::AddWarning(const std::string& filename,
                                 const google::protobuf::Message* descriptor,
                                 ErrorLocation location,
                                 const std::string& message) {
-  AERROR << "[" << filename << "] " << message;
+  AWARN << "[" << filename << "] " << message;
 }
 
 }  // namespace message
