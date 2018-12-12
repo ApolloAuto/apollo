@@ -37,6 +37,8 @@ OpenSpaceROI::OpenSpaceROI(
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   planner_open_space_config_.CopyFrom(planner_open_space_config);
+  vehicle_params_ =
+      apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
 }
 
 bool OpenSpaceROI::GenerateRegionOfInterest(Frame *frame) {
@@ -303,15 +305,19 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   double end_y = 0.0;
   if (parking_spot_heading_ > kMathEpsilon) {
     if (FLAGS_parking_inwards) {
-      end_y = left_top.y() + (left_down.y() - left_top.y()) / 4;
+      end_y = left_down.y() - std::max(3 * (left_down.y() - left_top.y()) / 4,
+                                       vehicle_params_.front_edge_to_center());
     } else {
-      end_y = left_top.y() + 3 * (left_down.y() - left_top.y()) / 4;
+      end_y = left_down.y() - std::max((left_down.y() - left_top.y()) / 4,
+                                       vehicle_params_.back_edge_to_center());
     }
   } else {
     if (FLAGS_parking_inwards) {
-      end_y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
+      end_y = left_down.y() + std::max(3 * (left_top.y() - left_down.y()) / 4,
+                                       vehicle_params_.front_edge_to_center());
     } else {
-      end_y = left_down.y() + (left_top.y() - left_down.y()) / 4;
+      end_y = left_down.y() + std::max((left_top.y() - left_down.y()) / 4,
+                                       vehicle_params_.back_edge_to_center());
     }
   }
   open_space_end_pose_.emplace_back(end_x);
