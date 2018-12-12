@@ -81,7 +81,7 @@ TEST_F(FreeMovePredictorTest, Pedestrian) {
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
   EXPECT_EQ(trajectories.size(), 1);
-  EXPECT_EQ(trajectories[0].trajectory_point_size(), 100);
+  EXPECT_EQ(trajectories[0].trajectory_point_size(), 80);
 }
 
 }  // namespace prediction

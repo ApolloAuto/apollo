@@ -46,7 +46,7 @@ DECLARE_bool(enable_all_junction);
 DECLARE_double(scan_length);
 DECLARE_double(scan_width);
 DECLARE_double(back_dist_ignore_ped);
-DECLARE_uint32(cruise_historical_frame_length);
+DECLARE_uint64(cruise_historical_frame_length);
 DECLARE_bool(enable_kf_tracking);
 DECLARE_double(max_angle_diff_to_adjust_velocity);
 DECLARE_double(q_var);
@@ -88,7 +88,7 @@ DECLARE_bool(adjust_velocity_by_obstacle_heading);
 DECLARE_bool(adjust_velocity_by_position_shift);
 DECLARE_bool(adjust_vehicle_heading_by_lane);
 DECLARE_double(heading_filter_param);
-DECLARE_uint32(max_num_lane_point);
+DECLARE_uint64(max_num_lane_point);
 DECLARE_double(distance_threshold_to_junction_exit);
 DECLARE_double(angle_threshold_to_junction_exit);
 

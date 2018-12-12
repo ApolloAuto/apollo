@@ -23,8 +23,8 @@
 #include <unordered_set>
 #include <utility>
 
-#include "modules/common/configs/config_gflags.h"
 #include "cyber/common/log.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/map_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -41,8 +41,6 @@ using common::ErrorCode;
 using common::Point3D;
 using common::math::KalmanFilter;
 using common::math::Vec2d;
-using common::util::FindOrDie;
-using common::util::FindOrNull;
 using common::PathPoint;
 using hdmap::LaneInfo;
 using hdmap::JunctionInfo;
@@ -56,7 +54,7 @@ double Damp(const double x, const double sigma) {
 
 bool IsClosed(const double x0, const double y0, const double theta0,
               const double x1, const double y1, const double theta1) {
-  double angle_diff = std::abs(common::math::AngleDiff(theta0, theta1));
+  double angle_diff = std::fabs(common::math::AngleDiff(theta0, theta1));
   double distance = std::hypot(x0 - x1, y0 - y1);
   return distance < FLAGS_distance_threshold_to_junction_exit &&
          angle_diff < FLAGS_angle_threshold_to_junction_exit;

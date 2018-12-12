@@ -61,7 +61,7 @@ DEFINE_double(scan_length, 80.0, "The length of the obstacles scan area");
 DEFINE_double(scan_width, 12.0, "The width of the obstacles scan area");
 DEFINE_double(back_dist_ignore_ped, -2.0,
               "Backward distance to ignore pedestrians.");
-DEFINE_uint32(cruise_historical_frame_length, 5,
+DEFINE_uint64(cruise_historical_frame_length, 5,
               "The number of historical frames of the obstacle"
               "that the cruise model will look at.");
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
@@ -134,7 +134,7 @@ DEFINE_bool(adjust_velocity_by_position_shift, false,
 DEFINE_bool(adjust_vehicle_heading_by_lane, true,
             "adjust vehicle heading by lane");
 DEFINE_double(heading_filter_param, 0.98, "heading filter parameter");
-DEFINE_uint32(max_num_lane_point, 20,
+DEFINE_uint64(max_num_lane_point, 20,
               "The maximal number of lane points to store");
 DEFINE_double(distance_threshold_to_junction_exit, 1.0,
               "Threshold of distance to junction exit");
