@@ -34,9 +34,11 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 **The Apollo Team now proudly presents to you the latest [version 3.5](docs/quickstart/apollo_3_5_quick_start.md).**
 
-**The Apollo Team now proudly presents to you the latest [version 3.0](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md).**
-
  Apollo 3.5 is packed with the latest sensor suite (VLS-128, AXU, FPD-Link Cameras), software architecture and a brand new runtime framework. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
+ 
+**Please refer to the
+[migration guide](docs/howto/how_to_migrate_to_apollo_3_5_from_old_versions.md)
+for information about migrating to the brand new Apollo 3.5 from an old version.
 
 [Want to contribute to our code?](CONTRIBUTING.md) follow this guide.
 
@@ -217,7 +219,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 
 * **Hardware Connection Overview**
 
-![image alt text](docs/demo_guide/images/Hardware_connection1_3_5.png)
+![image alt text](docs/demo_guide/images/Hardware_connection_3_5.png)
 
 * **Software Overview - Navigation Mode**
 
