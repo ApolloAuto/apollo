@@ -92,11 +92,11 @@ DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff, M_PI / 3.0,
               "Max angle difference for a candidate lane");
-DEFINE_int32(max_num_current_lane_in_junction, 1,
+DEFINE_int32(max_num_current_lane_in_junction, 3,
              "Max number to search current lanes");
-DEFINE_int32(max_num_nearby_lane_in_junction, 1,
+DEFINE_int32(max_num_nearby_lane_in_junction, 2,
              "Max number to search nearby lanes");
-DEFINE_double(max_lane_angle_diff_in_junction, M_PI / 6.0,
+DEFINE_double(max_lane_angle_diff_in_junction, M_PI / 4.0,
               "Max angle difference for a candidate lane");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
 DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");

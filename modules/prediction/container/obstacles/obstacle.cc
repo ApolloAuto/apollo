@@ -985,13 +985,15 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
 void Obstacle::SetNearbyLanes(Feature* feature) {
   Eigen::Vector2d point(feature->position().x(), feature->position().y());
   int max_num_lane = FLAGS_max_num_nearby_lane;
+  double lane_search_radius = FLAGS_lane_search_radius;
   if (PredictionMap::InJunction(point, FLAGS_junction_search_radius)) {
     max_num_lane = FLAGS_max_num_nearby_lane_in_junction;
+    lane_search_radius = FLAGS_lane_search_radius_in_junction;
   }
   double theta = feature->velocity_heading();
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
   PredictionMap::NearbyLanesByCurrentLanes(
-      point, theta, FLAGS_lane_search_radius, current_lanes_,
+      point, theta, lane_search_radius, current_lanes_,
       max_num_lane, &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
