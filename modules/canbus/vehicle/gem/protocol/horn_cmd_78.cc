@@ -53,7 +53,7 @@ Horncmd78* Horncmd78::set_horn_cmd(Horn_cmd_78::Horn_cmdType horn_cmd) {
 // 'motorola', 'physical_unit': ''}
 void Horncmd78::set_p_horn_cmd(uint8_t* data,
                                Horn_cmd_78::Horn_cmdType horn_cmd) {
-  int x = horn_cmd;
+  uint8_t x = horn_cmd;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 8);

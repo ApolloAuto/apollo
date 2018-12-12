@@ -57,12 +57,12 @@ void Accelcmd67::set_p_accel_cmd(uint8_t* data, double accel_cmd) {
   int x = static_cast<int>(accel_cmd / 0.001000);
   uint8_t t = 0;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set0(data + 1);
   to_set0.set_value(t, 0, 8);
   x >>= 8;
 
-  t = x & 0xFF;
+  t = static_cast<uint8_t>(x & 0xFF);
   Byte to_set1(data + 0);
   to_set1.set_value(t, 0, 8);
 }

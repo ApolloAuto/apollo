@@ -54,7 +54,7 @@ int Datetimerpt40f::time_second(const std::uint8_t* bytes,
   Byte t0(bytes + 5);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  int ret = static_cast<int>(x);
   return ret;
 }
 
@@ -66,7 +66,7 @@ int Datetimerpt40f::time_minute(const std::uint8_t* bytes,
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x;
+  int ret = static_cast<int>(x);
   return ret;
 }
 
@@ -88,7 +88,7 @@ int Datetimerpt40f::date_day(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x + 1.000000;
+  int ret = static_cast<int>(x + 1.000000);
   return ret;
 }
 
