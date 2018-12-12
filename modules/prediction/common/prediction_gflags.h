@@ -19,13 +19,9 @@
 #include "gflags/gflags.h"
 
 DECLARE_double(prediction_trajectory_time_length);
-DECLARE_double(prediction_period);
+DECLARE_double(prediction_trajectory_time_resolution);
 DECLARE_double(double_precision);
-DECLARE_double(min_prediction_length);
-
-// Bag replay timestamp gap
-DECLARE_double(replay_timestamp_gap);
-DECLARE_int32(max_num_dump_feature);
+DECLARE_double(min_prediction_trajectory_spatial_length);
 
 // Map
 DECLARE_double(lane_search_radius);

@@ -29,3 +29,7 @@ DECLARE_double(prediction_test_duration);
 
 DECLARE_bool(prediction_offline_mode);
 DECLARE_string(prediction_offline_bags);
+
+// Bag replay timestamp gap
+DECLARE_double(replay_timestamp_gap);
+DECLARE_int32(max_num_dump_feature);

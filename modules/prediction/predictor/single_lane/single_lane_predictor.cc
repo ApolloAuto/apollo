@@ -66,7 +66,7 @@ void SingleLanePredictor::Predict(Obstacle* obstacle) {
     std::vector<TrajectoryPoint> points;
     GenerateTrajectoryPoints(*obstacle, sequence,
         FLAGS_prediction_trajectory_time_length,
-        FLAGS_prediction_period, &points);
+        FLAGS_prediction_trajectory_time_resolution, &points);
 
     if (points.empty()) {
       continue;
@@ -80,7 +80,7 @@ void SingleLanePredictor::Predict(Obstacle* obstacle) {
 
 void SingleLanePredictor::GenerateTrajectoryPoints(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double period,
+    const double time_length, const double time_resolution,
     std::vector<TrajectoryPoint>* points) {
   const Feature& feature = obstacle.latest_feature();
   if (!feature.has_position() || !feature.has_velocity() ||
@@ -109,9 +109,9 @@ void SingleLanePredictor::GenerateTrajectoryPoints(
     AERROR << "Failed in getting lane s and lane l";
     return;
   }
-  size_t total_num = static_cast<size_t>(total_time / period);
-  for (size_t i = 0; i < total_num; ++i) {
-    double relative_time = static_cast<double>(i) * period;
+  size_t num_of_points = static_cast<size_t>(time_length / time_resolution);
+  for (size_t i = 0; i < num_of_points; ++i) {
+    double relative_time = static_cast<double>(i) * time_resolution;
     Eigen::Vector2d point;
     double theta = M_PI;
     if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
@@ -133,7 +133,7 @@ void SingleLanePredictor::GenerateTrajectoryPoints(
     trajectory_point.set_relative_time(relative_time);
     points->emplace_back(std::move(trajectory_point));
 
-    lane_s += speed * period;
+    lane_s += speed * time_resolution;
 
     while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
            lane_segment_index + 1 < lane_sequence.lane_segment_size()) {

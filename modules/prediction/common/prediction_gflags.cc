@@ -19,17 +19,13 @@
 #include <cmath>
 #include <limits>
 
-DEFINE_double(prediction_trajectory_time_length, 8.0, "Prediction duration (in seconds)");
-DEFINE_double(prediction_period, 0.1, "Prediction period (in seconds");
+DEFINE_double(prediction_trajectory_time_length, 8.0,
+              "Time length of predicted trajectory (in seconds)");
+DEFINE_double(prediction_trajectory_time_resolution, 0.1,
+              "Time resolution of predicted trajectory (in seconds");
 DEFINE_double(double_precision, 1e-6, "precision of double");
-DEFINE_double(min_prediction_length, 20.0,
-              "Minimal length of prediction trajectory");
-
-// Bag replay timestamp gap
-DEFINE_double(replay_timestamp_gap, 10.0,
-              "Max timestamp gap for rosbag replay");
-DEFINE_int32(max_num_dump_feature, 50000,
-             "Max number of features to dump");
+DEFINE_double(min_prediction_trajectory_spatial_length, 20.0,
+              "Minimal spatial length of predicted trajectory");
 
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");

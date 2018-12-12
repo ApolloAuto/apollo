@@ -46,7 +46,7 @@ void JunctionPredictor::Predict(Obstacle* obstacle) {
     std::vector<TrajectoryPoint> trajectory_points;
     DrawJunctionTrajectoryPoints(latest_feature, junction_exit,
         FLAGS_prediction_trajectory_time_length,
-        FLAGS_prediction_period, &trajectory_points);
+        FLAGS_prediction_trajectory_time_resolution, &trajectory_points);
     Trajectory trajectory = GenerateTrajectory(trajectory_points);
     trajectories_.push_back(std::move(trajectory));
   }
@@ -201,7 +201,7 @@ double JunctionPredictor::CostFunction(const std::array<double, 4>& x_coeffs,
     // cost = curvature * v^2 + time_to_exit
     cost = std::max(cost, std::abs(x_1 * y_2 - y_1 * x_2) /
                           std::hypot(x_1, y_1) + time_to_exit);
-    t += FLAGS_prediction_period;
+    t += FLAGS_prediction_trajectory_time_resolution;
   }
   return cost;
 }
