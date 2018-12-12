@@ -34,12 +34,7 @@ using apollo::cyber::common::GlobalData;
 
 Processor::Processor() { running_.exchange(true); }
 
-Processor::~Processor() {
-  Stop();
-  if (thread_.joinable()) {
-    thread_.join();
-  }
-}
+Processor::~Processor() { Stop(); }
 
 void Processor::SetAffinity(const std::vector<int> &cpus,
                             const std::string &affinity, int p) {
@@ -105,8 +100,13 @@ void Processor::Stop() {
     return;
   }
 
-  if (!context_) {
-    cv_ctx_.notify_one();
+  if (context_) {
+    context_->Shutdown();
+  }
+
+  cv_ctx_.notify_one();
+  if (thread_.joinable()) {
+    thread_.join();
   }
 }
 
