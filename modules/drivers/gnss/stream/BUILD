@@ -19,12 +19,12 @@ cc_library(
     hdrs = ["tcp_stream.h"],
     deps = [
         ":stream",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:string_util",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/common/util:util",
-        "//modules/common/math:math",
         "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/math:math",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/util:string_util",
+        "//modules/common/util:util",
     ],
 )
 
@@ -36,13 +36,13 @@ cc_library(
         ":ntrip_stream",
         ":serial_stream",
         ":stream",
+        "//cyber",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/util:message_util",
         "//modules/drivers/gnss/parser:gnss_parser",
         "//modules/drivers/gnss/proto:gnss_proto",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/gnss/util:gnss_util",
-        "//modules/common/util:message_util",
-        "//cyber",
     ],
 )
 
@@ -51,8 +51,8 @@ cc_library(
     srcs = ["serial_stream.cc"],
     deps = [
         ":stream",
-        "//modules/drivers/gnss/util:gnss_util",
         "//cyber",
+        "//modules/drivers/gnss/util:gnss_util",
     ],
 )
 
@@ -71,8 +71,8 @@ cc_library(
     srcs = ["udp_stream.cc"],
     deps = [
         ":stream",
-        "//modules/drivers/gnss/util:gnss_util",
         "//cyber",
+        "//modules/drivers/gnss/util:gnss_util",
     ],
 )
 
@@ -80,8 +80,8 @@ cc_library(
     name = "stream",
     hdrs = ["stream.h"],
     deps = [
-        "//modules/drivers/gnss/util:gnss_util",
         "//cyber",
+        "//modules/drivers/gnss/util:gnss_util",
     ],
 )
 

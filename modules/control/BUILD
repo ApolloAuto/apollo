@@ -7,6 +7,8 @@ cc_library(
     srcs = [
     ],
     deps = [
+        "//cyber",
+        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
@@ -20,8 +22,6 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
-        "//cyber",
-        "//external:gflags",
     ],
     copts = ['-DMODULE_NAME=\\"control\\"'],
 )

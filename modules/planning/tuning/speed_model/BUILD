@@ -7,9 +7,9 @@ cc_library(
     srcs = ["autotuning_speed_feature_builder.cc"],
     hdrs = ["autotuning_speed_feature_builder.h"],
     deps = [
-        "//modules/planning/tuning:autotuning_feature_builder",
-        "//modules/common/proto:error_code_proto",
         "//cyber/common:log",
+        "//modules/common/proto:error_code_proto",
+        "//modules/planning/tuning:autotuning_feature_builder",
     ],
 )
 

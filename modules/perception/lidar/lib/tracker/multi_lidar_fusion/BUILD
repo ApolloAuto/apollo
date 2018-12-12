@@ -8,9 +8,9 @@ cc_library(
         "mlf_base_filter.h",
     ],
     deps = [
-        "//modules/perception/lidar/lib/tracker/common:tracked_object",
-        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/perception/lidar/lib/tracker/common:tracked_object",
     ],
 )
 
@@ -23,13 +23,13 @@ cc_library(
         "mlf_engine.cc",
     ],
     deps = [
-        "//modules/perception/lidar/lib/interface:base_multi_target_tracker",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
-        "//modules/perception/lib/config_manager:config_manager",
         "//modules/common/util:file_util",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lidar/lib/interface:base_multi_target_tracker",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
     ],
 )
 
@@ -42,13 +42,13 @@ cc_library(
         "mlf_motion_filter.h",
     ],
     deps = [
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_refiner",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_measurement",
+        "//modules/common/util:file_util",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager:config_manager",
-        "//modules/common/util:file_util",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_measurement",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_refiner",
     ],
 )
 
@@ -77,10 +77,10 @@ cc_library(
         "mlf_motion_refiner.h",
     ],
     deps = [
-        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/common/util:file_util",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager:config_manager",
-        "//modules/common/util:file_util",
+        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
 )
@@ -94,12 +94,12 @@ cc_library(
         "mlf_shape_filter.h",
     ],
     deps = [
-        "//modules/perception/common/geometry:convex_hull_2d",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
-        "//modules/perception/lib/config_manager:config_manager",
         "//modules/common/util:file_util",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/common/geometry:convex_hull_2d",
+        "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lidar/common:lidar_object_util",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
 
     ],
 )
@@ -114,12 +114,12 @@ cc_library(
         "mlf_track_object_distance.h",
     ],
     deps = [
-        "//modules/perception/lidar/lib/tracker/common:tracked_object",
-        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
-        "//modules/perception/lib/config_manager:config_manager",
         "//modules/common/util:file_util",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lidar/lib/tracker/association:distance_collection",
+        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/perception/lidar/lib/tracker/common:tracked_object",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
 )
 
@@ -132,15 +132,15 @@ cc_library(
         "mlf_track_object_matcher.h",
     ],
     deps = [
+        "//modules/common/util:file_util",
         "//modules/perception/common/graph:secure_matrix",
+        "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
+        "//modules/perception/lidar/lib/tracker/association:distance_collection",
         "//modules/perception/lidar/lib/tracker/association:gnn_bipartite_graph_matcher",
         "//modules/perception/lidar/lib/tracker/association:multi_hm_bipartite_graph_matcher",
-        "//modules/perception/lidar/lib/tracker/association:distance_collection",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_distance",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/common/util:file_util",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_distance",
     ],
 )
 
@@ -153,16 +153,16 @@ cc_library(
         "mlf_tracker.h",
     ],
     deps = [
-        "//modules/perception/lidar/lib/tracker/common:tracked_object",
-        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_measurement",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_shape_filter",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_filter",
-        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_refiner",
-        "//modules/perception/lib/config_manager:config_manager",
         "//modules/common/util:file_util",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
+        "//modules/perception/lidar/lib/tracker/common:tracked_object",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_filter",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_measurement",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_refiner",
+        "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_shape_filter",
     ],
 )
 

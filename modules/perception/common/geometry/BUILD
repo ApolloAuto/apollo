@@ -45,8 +45,8 @@ cc_library(
     deps = [
         ":common",
         "//modules/perception/base:base_type",
-        "//modules/perception/base:point_cloud",
         "//modules/perception/base:object",
+        "//modules/perception/base:point_cloud",
         "@eigen",
     ],
 )

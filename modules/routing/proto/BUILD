@@ -16,8 +16,8 @@ proto_library(
         "topo_graph.proto",
     ],
     deps = [
-        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/map/proto:map_proto_lib",
     ],

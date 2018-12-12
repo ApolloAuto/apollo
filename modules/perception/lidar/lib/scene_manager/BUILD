@@ -38,8 +38,6 @@ cc_test(
     ],
     deps = [
         ":scene_manager",
-        "@gtest//:main",
-        "@pcl",
         "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
         "//modules/perception/base",
@@ -48,9 +46,11 @@ cc_test(
         "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
-        "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/lidar/lib/scene_manager/ground_service",
+        "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/map/hdmap:hdmap_input",
+        "@gtest//:main",
+        "@pcl",
     ],
 )
 

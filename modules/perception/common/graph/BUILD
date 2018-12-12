@@ -5,13 +5,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "graph",
     deps = [
-        ":disjoint_set",
-        ":graph_segmentor",
-        ":secure_matrix",
-        ":hungarian_optimizer",
-        ":connected_component_analysis",
         ":conditional_clustering",
+        ":connected_component_analysis",
+        ":disjoint_set",
         ":gated_hungarian_bigraph_matcher",
+        ":graph_segmentor",
+        ":hungarian_optimizer",
+        ":secure_matrix",
     ],
 )
 
@@ -81,8 +81,8 @@ cc_test(
     ],
     deps = [
         ":secure_matrix",
-        "@gtest//:main",
         "@eigen",
+        "@gtest//:main",
     ],
 )
 

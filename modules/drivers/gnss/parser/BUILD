@@ -20,16 +20,16 @@ cc_library(
     ],
     deps = [
         ":novatel_parser",
-        "//modules/common/util:message_util",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/util:message_util",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/util:gnss_util",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/transform:transform_broadcaster_lib",
-        "@proj4",
-        "//cyber",
         "@eigen",
+        "@proj4",
     ],
 )
 
@@ -42,11 +42,11 @@ cc_library(
         "rtcm_decode.h",
     ],
     deps = [
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "//cyber",
     ],
 )
 
@@ -63,11 +63,11 @@ cc_library(
         "rtcm_parser.h",
     ],
     deps = [
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "//cyber",
     ],
 )
 

@@ -12,22 +12,22 @@ cc_library(
     ],
     copts = ["-msse4.1"],
     deps = [
-        "@eigen",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/lib/registerer",
+        "@eigen",
         #"//modules/perception/lib/io:protobuf_util",
         "//modules/perception/common/i_lib",
-        "//modules/perception/common/point_cloud_processing",
         "//modules/perception/common/i_lib/pc:i_ground",
         "//modules/perception/common/i_lib/pc:i_struct_s",
         "//modules/perception/common/i_lib/pc:i_util",
-        "//modules/perception/proto:perception_config_schema_proto",
+        "//modules/perception/common/point_cloud_processing",
+        "//modules/perception/lidar/common",
         "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/proto:spatio_temporal_ground_detector_config_proto",
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/scene_manager",
         "//modules/perception/lidar/lib/scene_manager/ground_service",
-        "//modules/perception/lidar/common",
+        "//modules/perception/proto:perception_config_schema_proto",
     ],
 )
 
@@ -40,8 +40,8 @@ cc_test(
     copts = ["-msse4.1"],
     deps = [
         ":spatio_temporal_ground_detector",
-        "@pcl",
         "@gtest//:main",
+        "@pcl",
     ]
 )
 

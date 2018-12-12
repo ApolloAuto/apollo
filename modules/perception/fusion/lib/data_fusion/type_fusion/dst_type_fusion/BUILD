@@ -12,15 +12,15 @@ cc_library(
     ],
     deps = [
         "//modules/common/util:file_util",
-        "//modules/perception/proto:dst_type_fusion_config_proto",
-        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/fusion/base:base_init_options",
+        "//modules/perception/fusion/base:scene",
+        "//modules/perception/fusion/base:sensor_data_manager",
+        "//modules/perception/fusion/base:track",
+        "//modules/perception/fusion/common:camera_util",
         "//modules/perception/fusion/common:dst_evidence",
         "//modules/perception/fusion/lib/interface:interface",
-        "//modules/perception/fusion/base:scene",
-        "//modules/perception/fusion/base:track",
-        "//modules/perception/fusion/base:base_init_options",
-        "//modules/perception/fusion/base:sensor_data_manager",
-        "//modules/perception/fusion/common:camera_util",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/proto:dst_type_fusion_config_proto",
     ],
 )
 

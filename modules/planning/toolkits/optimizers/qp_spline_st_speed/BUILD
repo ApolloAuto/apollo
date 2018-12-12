@@ -63,14 +63,14 @@ cc_library(
         ":qp_piecewise_st_graph",
         ":qp_spline_st_graph",
         "//cyber/common:log",
-        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/proto:pnc_point_proto",
         "//modules/localization/proto:pose_proto",
         "//modules/map/hdmap",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/toolkits/optimizers:speed_optimizer",
         "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",
+        "//modules/planning/toolkits/optimizers:speed_optimizer",
     ],
 )
 

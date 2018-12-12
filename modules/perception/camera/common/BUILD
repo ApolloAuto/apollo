@@ -73,8 +73,8 @@ cc_library(
         "object_template_manager.h",
     ],
     deps = [
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
@@ -99,9 +99,9 @@ cc_library(
         "twod_threed_util.h",
     ],
     deps = [
-        "@eigen",
         "//modules/perception/common/i_lib/core:core",
         "//modules/perception/common/i_lib/geometry:i_plane",
+        "@eigen",
     ],
 )
 

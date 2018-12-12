@@ -18,11 +18,11 @@ cc_library(
         "//cyber/base:macros",
         "//cyber/base:wait_strategy",
         "//cyber/common:common",
-        "//cyber/event:perf_event_cache",
-        "//cyber/time:time",
         "//cyber/croutine:routine_context",
         "//cyber/croutine:routine_factory",
         "//cyber/croutine:swap",
+        "//cyber/event:perf_event_cache",
+        "//cyber/time:time",
     ],
     linkopts = ["-latomic"],
 )

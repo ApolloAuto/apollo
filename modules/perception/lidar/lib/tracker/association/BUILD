@@ -11,10 +11,10 @@ cc_library(
         "multi_hm_bipartite_graph_matcher.h",
     ],
     deps = [
+        "//cyber",
         "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
-        "//cyber",
         "@eigen",
 
     ],
@@ -29,10 +29,10 @@ cc_library(
         "gnn_bipartite_graph_matcher.h",
     ],
     deps = [
+        "//cyber",
         "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
-        "//cyber",
     ],
 )
 
@@ -45,11 +45,11 @@ cc_library(
         "distance_collection.h",
     ],
     deps = [
+        "//modules/perception/common/geometry:basic",
+        "//modules/perception/common/geometry:common",
+        "//modules/perception/lidar/common:lidar_log",
         "//modules/perception/lidar/lib/tracker/common:track_data",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
-        "//modules/perception/lidar/common:lidar_log",
-        "//modules/perception/common/geometry:common",
-        "//modules/perception/common/geometry:basic",
 
     ],
 )

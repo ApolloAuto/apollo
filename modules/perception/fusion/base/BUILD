@@ -6,8 +6,8 @@ cc_library(
     name = "base",
     deps = [
         ":base_forward_declaration",
-        ":fusion_log",
         ":base_init_options",
+        ":fusion_log",
         ":scene",
         ":sensor",
         ":sensor_data_manager",

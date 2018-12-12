@@ -57,9 +57,9 @@ cc_test(
     deps = [
         ":digital_filter",
         ":digital_filter_coefficients",
+        "//cyber",
         "//modules/common",
         "@gtest//:main",
-        "//cyber",
     ],
 )
 

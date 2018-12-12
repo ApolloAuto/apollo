@@ -53,9 +53,9 @@ cc_library(
         "scheduler_factory.h",
     ],
     deps = [
+        "//cyber/proto:component_conf_cc_proto",
         "//cyber/scheduler:scheduler_choreography",
         "//cyber/scheduler:scheduler_classic",
-        "//cyber/proto:component_conf_cc_proto",
     ],
 )
 
@@ -98,8 +98,8 @@ cc_library(
     ],
     deps = [
         "//cyber/croutine:croutine",
-        "//cyber/scheduler:processor",
         "//cyber/proto:choreography_conf_cc_proto",
+        "//cyber/scheduler:processor",
     ],
 )
 
@@ -113,8 +113,8 @@ cc_library(
     ],
     deps = [
         "//cyber/croutine:croutine",
-        "//cyber/scheduler:processor",
         "//cyber/proto:classic_conf_cc_proto",
+        "//cyber/scheduler:processor",
     ],
 )
 

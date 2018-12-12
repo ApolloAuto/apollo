@@ -56,8 +56,8 @@ cc_library(
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
     deps = [
         "//modules/perception/base:blob",
-        "//modules/perception/base:image",
         "//modules/perception/base:box",
+        "//modules/perception/base:image",
         "//modules/perception/base:point_cloud",
         "@caffe",
     ],
@@ -73,8 +73,8 @@ cuda_library(
     ],
     deps = [
         "//cyber",
-        ":inference_util_lib",
         ":inference_cuda_util_lib",
+        ":inference_util_lib",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
         "@cuda",
@@ -105,8 +105,8 @@ cuda_library(
     ],
     deps = [
         "//cyber",
-        ":inference_util_lib",
         ":inference_cuda_util_lib",
+        ":inference_util_lib",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
         "@cuda",

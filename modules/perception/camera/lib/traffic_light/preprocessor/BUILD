@@ -69,15 +69,15 @@ cc_library(
     deps = [
         "@eigen",
         ":multi_camera_projection",
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
+        "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
-        "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/lib/utils:utils",
-        "//modules/common/util:file_util",
-        "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/camera/lib/interface:base_init_options",
+        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/utils:utils",
     ],
 )
 

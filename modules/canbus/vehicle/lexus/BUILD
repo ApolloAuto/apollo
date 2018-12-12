@@ -27,10 +27,10 @@ cc_library(
         "lexus_message_manager.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/lexus/protocol:canbus_lexus_protocol",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
@@ -45,12 +45,12 @@ cc_library(
     ],
     deps = [
         ":lexus_message_manager",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/lexus/protocol:canbus_lexus_protocol",
+        "//modules/canbus/vehicle:vehicle_controller_base",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )

@@ -134,10 +134,10 @@ cc_library(
     srcs = ["validation_checker.cc"],
     hdrs = ["validation_checker.h"],
     deps = [
+        "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:lane_graph_proto",
-        "//modules/common/math",
     ],
 )
 
@@ -160,8 +160,8 @@ cc_library(
     srcs = ["environment_features.cc"],
     hdrs = ["environment_features.h"],
     deps = [
-        "//modules/common/proto:geometry_proto",
         "//cyber",
+        "//modules/common/proto:geometry_proto",
     ],
 )
 
@@ -171,8 +171,8 @@ cc_test(
     srcs = ["environment_features_test.cc"],
     deps = [
         ":environment_features",
-        "//modules/common/proto:geometry_proto",
         "//cyber",
+        "//modules/common/proto:geometry_proto",
         "@gtest//:main",
     ],
 )
@@ -198,10 +198,10 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        ":junction_analyzer",
         ":kml_map_based_test",
         ":prediction_gflags",
         ":prediction_map",
-        ":junction_analyzer",
         "@gtest//:main",
     ],
 )

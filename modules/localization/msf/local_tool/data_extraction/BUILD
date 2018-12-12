@@ -22,11 +22,11 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/math",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
         "@eigen//:eigen",
         "@pcl//:pcl",
     ],

@@ -27,8 +27,8 @@ cc_library(
         "location_refiner_obstacle_postprocessor.h",
     ],
     deps = [
-        ":obj_postprocessor",
         ":location_refiner_proto",
+        ":obj_postprocessor",
         "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",

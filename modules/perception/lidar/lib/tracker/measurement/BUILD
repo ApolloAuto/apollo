@@ -11,9 +11,9 @@ cc_library(
         "measurement_collection.h",
     ],
     deps = [
-        "//modules/perception/lidar/lib/tracker/common:tracked_object",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/common/geometry:common",
+        "//modules/perception/lidar/lib/tracker/common:tracked_object",
     ],
 )
 

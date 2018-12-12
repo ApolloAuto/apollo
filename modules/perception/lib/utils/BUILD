@@ -6,8 +6,8 @@ cc_library(
     name = "utils",
     deps = [
         ":perception_perf",
-        ":perception_timer",
         ":perception_time_util",
+        ":perception_timer",
     ],
 )
 

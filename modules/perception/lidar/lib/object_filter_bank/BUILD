@@ -11,7 +11,6 @@ cc_library(
         "object_filter_bank.h",
     ],
     deps = [
-        "@eigen",
         "//cyber",
         "//modules/common/util",
         "//modules/perception/base",
@@ -19,6 +18,7 @@ cc_library(
         "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/object_filter_bank/proto:filter_bank_config_proto",
         "//modules/perception/proto:perception_config_schema_proto",
+        "@eigen",
     ],
 )
 

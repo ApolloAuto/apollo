@@ -95,10 +95,10 @@ cc_library(
     srcs = [ "role/role.cc", ],
     hdrs = [ "role/role.h", ],
     deps = [
-        "//cyber:binary",
         "//cyber/common:log",
         "//cyber/common:types",
         "//cyber/proto:role_attributes_cc_proto",
+        "//cyber:binary",
     ],
 )
 
@@ -118,7 +118,6 @@ cc_library(
     hdrs = [ "specific_manager/manager.h", ],
     deps = [
         "subscriber_listener",
-        "//cyber:state",
         "//cyber/base:signal",
         "//cyber/message:message_traits",
         "//cyber/message:protobuf_factory",
@@ -127,8 +126,9 @@ cc_library(
         "//cyber/proto:topology_change_cc_proto",
         "//cyber/time:time",
         "//cyber/transport:attributes_filler",
-        "//cyber/transport:underlay_message_type",
         "//cyber/transport:qos_profile_conf",
+        "//cyber/transport:underlay_message_type",
+        "//cyber:state",
     ],
 )
 

@@ -12,9 +12,9 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:environment_features",
-        "//modules/prediction/container:container_manager",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/pose:pose_container",
+        "//modules/prediction/container:container_manager",
         "@gtest//:main",
     ],
 )

@@ -29,8 +29,8 @@ cc_binary(
     ],
     deps = [
         ":lane_common",
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",

@@ -21,8 +21,8 @@ cc_binary(
     name = "pad_terminal",
     srcs = ["pad_terminal.cc"],
     deps = [
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",

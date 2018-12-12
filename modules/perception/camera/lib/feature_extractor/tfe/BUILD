@@ -31,10 +31,10 @@ cc_library(
         "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/inference:inference_factory_lib",
-        "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference:inference_lib",
     ],
 )
 
@@ -52,9 +52,9 @@ cc_library(
         "//modules/common/util:file_util",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/inference:inference_factory_lib",
-        "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/inference/utils:inference_gemm_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference:inference_factory_lib",
     ],
 )
 
@@ -68,14 +68,14 @@ cc_library(
     ],
     deps = [
         ":tracking_feature_proto",
+        "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/inference:inference_factory_lib",
-        "//modules/perception/inference/utils:inference_util_lib",
-        "//modules/perception/inference/utils:inference_gemm_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
-        "//modules/common/util:file_util",
+        "//modules/perception/inference/utils:inference_gemm_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference:inference_factory_lib",
     ],
 )
 

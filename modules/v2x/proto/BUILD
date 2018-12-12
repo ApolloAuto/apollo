@@ -34,8 +34,8 @@ proto_library(
         "v2x_carstatus.proto",
     ],
     deps = [
-        "//modules/localization/proto:localization_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/localization/proto:localization_proto_lib",
     ],
 )
 

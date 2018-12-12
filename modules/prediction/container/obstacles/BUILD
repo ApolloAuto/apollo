@@ -9,14 +9,14 @@ cc_library(
     deps = [
         "//modules/common/math:geometry",
         "//modules/common/util:lru_cache",
+        "//modules/prediction/common:environment_features",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:environment_features",
-        "//modules/prediction/proto:scenario_proto",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/container/pose:pose_container",
+        "//modules/prediction/proto:scenario_proto",
     ],
 )
 
@@ -34,10 +34,10 @@ cc_library(
         "//modules/common/util:map_util",
         "//modules/map/hdmap",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:road_graph",
-        "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
         "//modules/prediction/proto:feature_proto",
@@ -95,8 +95,8 @@ cc_library(
     ],
     deps = [
         "//modules/map/hdmap:hdmap_util",
-        "//modules/prediction/common:road_graph",
         "//modules/prediction/common:prediction_map",
+        "//modules/prediction/common:road_graph",
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:lane_graph_proto",
     ],

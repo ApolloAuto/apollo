@@ -64,9 +64,9 @@ cc_library(
         "timer_task",
         "timing_slot",
         "//cyber/base:bounded_queue",
+        "//cyber/task:task",
         "//cyber/time:duration",
         "//cyber/time:time",
-        "//cyber/task:task",
     ],
 )
 

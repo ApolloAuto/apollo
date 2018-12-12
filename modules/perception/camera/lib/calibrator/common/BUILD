@@ -12,9 +12,9 @@ cc_library(
         "histogram_estimator.h",
     ],
     deps = [
-        "@eigen",
         "//cyber",
         "//modules/perception/common/i_lib/core:core",
+        "@eigen",
     ],
 )
 

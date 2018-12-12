@@ -11,12 +11,12 @@ cc_library(
         "obstacle_multi_sensor_fusion.h",
     ],
     deps = [
-         "@eigen",
          "//cyber",
          "//modules/perception/base",
          "//modules/perception/fusion/base",
          "//modules/perception/fusion/lib/interface",
          "//modules/perception/lib/registerer",
+         "@eigen",
     ],
 )
 

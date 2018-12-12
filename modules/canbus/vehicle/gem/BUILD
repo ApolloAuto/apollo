@@ -37,10 +37,10 @@ cc_library(
         "gem_message_manager.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
@@ -67,12 +67,12 @@ cc_library(
     ],
     deps = [
         ":gem_message_manager",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
+        "//modules/canbus/vehicle:vehicle_controller_base",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )

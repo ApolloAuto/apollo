@@ -14,11 +14,11 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/status",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/common/trajectory:discretized_trajectory",
-        "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
     ],

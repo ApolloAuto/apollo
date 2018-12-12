@@ -15,8 +15,8 @@ cc_library(
     hdrs = ["pri_sec_fusion_component.h"],
     deps = [
         "//cyber",
-        "//modules/drivers/velodyne/proto:velodyne_proto",
         "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/velodyne/proto:velodyne_proto",
         "//modules/transform:tf2_buffer_lib",
         "@eigen",
     ],
