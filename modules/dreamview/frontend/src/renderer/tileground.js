@@ -13,7 +13,8 @@ function diffTiles(newTiles, currentTiles) {
 }
 
 export default class TileGround {
-    constructor() {
+    constructor(renderer) {
+        this.renderer = renderer;
         // This a dummy variable. Without it,
         // renderer will not proceed the render process.
         this.mesh = true;
@@ -78,6 +79,7 @@ export default class TileGround {
         });
 
         loadTexture(mapUrl, texture => {
+            texture.anisotropy = this.renderer.getMaxAnisotropy();
             const mesh = new THREE.Mesh(
                 new THREE.PlaneGeometry(1, 1),
                 new THREE.MeshBasicMaterial({map: texture}));

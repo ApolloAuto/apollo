@@ -2751,7 +2751,8 @@
                 "STOP_REASON_CREEPER": 105,
                 "STOP_REASON_REFERENCE_END": 106,
                 "STOP_REASON_YELLOW_SIGNAL": 107,
-                "STOP_REASON_PULL_OVER": 108
+                "STOP_REASON_PULL_OVER": 108,
+                "STOP_REASON_SIDEPASS_SAFETY": 109
               }
             },
             "ObjectStop": {
@@ -3965,37 +3966,66 @@
             },
             "PlannerOpenSpaceConfig": {
               "fields": {
+                "roiConfig": {
+                  "type": "ROIConfig",
+                  "id": 1
+                },
                 "warmStartConfig": {
                   "type": "WarmStartConfig",
-                  "id": 1
+                  "id": 2
                 },
                 "dualVariableWarmStartConfig": {
                   "type": "DualVariableWarmStartConfig",
-                  "id": 2
+                  "id": 3
                 },
                 "distanceApproachConfig": {
                   "type": "DistanceApproachConfig",
-                  "id": 3
+                  "id": 4
                 },
                 "deltaT": {
                   "type": "float",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": 1
                   }
                 },
                 "maxPositionErrorToEndPoint": {
                   "type": "double",
-                  "id": 5,
+                  "id": 6,
                   "options": {
                     "default": 0.5
                   }
                 },
                 "maxThetaErrorToEndPoint": {
                   "type": "double",
-                  "id": 6,
+                  "id": 7,
                   "options": {
                     "default": 0.2
+                  }
+                },
+                "isNearDesitinationThreshold": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 0.001
+                  }
+                }
+              }
+            },
+            "ROIConfig": {
+              "fields": {
+                "roiLongitudinalRange": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "parkingStartRange": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 7
                   }
                 }
               }
@@ -4331,6 +4361,10 @@
                   "options": {
                     "default": false
                   }
+                },
+                "replanReason": {
+                  "type": "string",
+                  "id": 22
                 },
                 "gear": {
                   "type": "apollo.canbus.Chassis.GearPosition",
@@ -5008,13 +5042,13 @@
                 }
               }
             },
-            "StopTimer": {
+            "StopTime": {
               "fields": {
                 "obstacleId": {
                   "type": "string",
                   "id": 1
                 },
-                "stopTime": {
+                "obstacleStopTimestamp": {
                   "type": "double",
                   "id": 2
                 }
@@ -5026,10 +5060,15 @@
                   "type": "string",
                   "id": 1
                 },
-                "stopTimers": {
+                "stopTime": {
                   "rule": "repeated",
-                  "type": "StopTimer",
+                  "type": "StopTime",
                   "id": 2
+                },
+                "finishedCrosswalk": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 3
                 }
               }
             },
@@ -6611,73 +6650,13 @@
                     "default": 5
                   }
                 },
+                "maxMonitorForwardDistance": {
+                  "type": "double",
+                  "id": 6
+                },
                 "righTurnCreep": {
                   "type": "CreepConfig",
-                  "id": 6
-                }
-              }
-            },
-            "StopSignConfig": {
-              "fields": {
-                "stopDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "minPassSDistance": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "maxStopSpeed": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.3
-                  }
-                },
-                "maxValidStopDistance": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 3
-                  }
-                },
-                "stopDuration": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "watchVehicleMaxValidStopSpeed": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "watchVehicleMaxValidStopDistance": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "waitTimeout": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 8
-                  }
-                },
-                "creep": {
-                  "type": "CreepConfig",
-                  "id": 9
+                  "id": 7
                 }
               }
             },
@@ -6693,8 +6672,7 @@
                     "pullOver",
                     "referenceLineEnd",
                     "rerouting",
-                    "signalLight",
-                    "stopSign"
+                    "signalLight"
                   ]
                 }
               },
@@ -6742,10 +6720,6 @@
                 "signalLight": {
                   "type": "SignalLightConfig",
                   "id": 11
-                },
-                "stopSign": {
-                  "type": "StopSignConfig",
-                  "id": 12
                 }
               },
               "nested": {
