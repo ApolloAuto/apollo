@@ -130,7 +130,8 @@ void SignalLight::MakeDecisions(Frame* const frame,
 
     ADEBUG << "traffic_light[" << signal_light.object_id
         << "] start_s[" << signal_light.start_s
-        << "] color[" << signal.color() << "]";
+        << "] color[" << signal.color()
+        << "] stop_deceleration[" << stop_deceleration << "]";
     if ((signal.color() == TrafficLight::RED &&
          stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::UNKNOWN &&
@@ -148,13 +149,22 @@ void SignalLight::MakeDecisions(Frame* const frame,
         signal_debug->set_is_stop_wall_created(true);
       }
     }
+
+    // set right_of_way_status
+    bool is_protected = true;
     if (has_stop) {
-      reference_line_info->SetJunctionRightOfWay(signal_light.start_s,
-                                                 false);  // not protected
+      is_protected = false;
+      // protected for YELLOW light with STOP decision
+      // at beginning and then passing junction
+      if (adc_front_edge_s - signal_light.start_s < 5.0 &&
+          signal.color() == TrafficLight::YELLOW) {
+        is_protected = true;
+      }
     } else {
-      reference_line_info->SetJunctionRightOfWay(signal_light.start_s, true);
-      // is protected
+      is_protected = true;
     }
+    reference_line_info->SetJunctionRightOfWay(signal_light.start_s,
+                                               is_protected);
   }
 }
 
