@@ -321,8 +321,7 @@ void SimControl::RunOnce() {
 bool SimControl::PerfectControlModel(TrajectoryPoint* point,
                                      Chassis::GearPosition* gear_position) {
   // Result of the interpolation.
-  auto relative_time =
-      Clock::NowInSeconds() - current_trajectory_->header().timestamp_sec();
+  auto current_time = Clock::NowInSeconds();
   const auto& trajectory = current_trajectory_->trajectory_point();
   *gear_position = current_trajectory_->gear();
 
@@ -337,8 +336,8 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point,
     } else {
       // Determine the status of the car based on received planning message.
       while (next_point_index_ < trajectory.size() &&
-             relative_time >
-                 trajectory.Get(next_point_index_).relative_time()) {
+             current_time > trajectory.Get(next_point_index_).relative_time() +
+                                current_trajectory_->header().timestamp_sec()) {
         ++next_point_index_;
       }
 
@@ -358,12 +357,14 @@ bool SimControl::PerfectControlModel(TrajectoryPoint* point,
     }
   }
 
-  if (relative_time > next_point_.relative_time()) {
+  if (current_time > next_point_.relative_time() +
+                         current_trajectory_->header().timestamp_sec()) {
     // Don't try to extrapolate if relative_time passes last point
     *point = next_point_;
   } else {
-    *point = InterpolateUsingLinearApproximation(prev_point_, next_point_,
-                                                 relative_time);
+    *point = InterpolateUsingLinearApproximation(
+        prev_point_, next_point_,
+        current_time - current_trajectory_->header().timestamp_sec());
   }
   return true;
 }
@@ -377,7 +378,7 @@ void SimControl::PublishChassis(double cur_speed,
   chassis->set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
   chassis->set_gear_location(gear_position);
 
-  chassis->set_speed_mps(cur_speed);
+  chassis->set_speed_mps(static_cast<float>(cur_speed));
   chassis->set_throttle_percentage(0.0);
   chassis->set_brake_percentage(0.0);
 
