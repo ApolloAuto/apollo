@@ -32,7 +32,7 @@ using common::Hash;
 
 ConditionNotifier::ConditionNotifier() {
   key_ = static_cast<key_t>(Hash("/apollo/cyber/transport/shm/notifier"));
-  AINFO << "condition notifier key: " << key_;
+  ADEBUG << "condition notifier key: " << key_;
   shm_size_ = sizeof(Indicator);
 
   if (!Init()) {

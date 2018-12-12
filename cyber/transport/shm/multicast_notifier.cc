@@ -119,8 +119,8 @@ bool MulticastNotifier::Init() {
     mcast_port = static_cast<uint16_t>(locator.port());
   }
 
-  AINFO << "multicast notifier ip: " << mcast_ip;
-  AINFO << "multicast notifier port: " << mcast_port;
+  ADEBUG << "multicast notifier ip: " << mcast_ip;
+  ADEBUG << "multicast notifier port: " << mcast_port;
 
   notify_fd_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (notify_fd_ == -1) {
