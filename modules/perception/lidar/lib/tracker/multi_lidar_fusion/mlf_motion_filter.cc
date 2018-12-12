@@ -208,12 +208,14 @@ void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
   observation_transform.block<2, 2>(0, 0).setIdentity();
   observation_transform.block<2, 2>(0, 2).setZero();
   Eigen::Matrix<double, 4, 2> kalman_gain_matrix =
-      state_covariance * observation_transform.transpose() *
-      (observation_transform * state_covariance *
-           observation_transform.transpose() + measurement_covariance)
-          .inverse();
+      static_cast<Eigen::Matrix<double, 4, 2, 0, 4, 2>>
+      (state_covariance * observation_transform.transpose() *
+       (observation_transform * state_covariance *
+            observation_transform.transpose() + measurement_covariance)
+           .inverse());
   Eigen::Vector4d state_gain =
-      kalman_gain_matrix * (measurement - observation_transform * state);
+      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
+      (kalman_gain_matrix * (measurement - observation_transform * state));
 
   // 3. gain adjustment and esitmate posterior
   StateGainAdjustment(track_data, latest_object, new_object, &state_gain);

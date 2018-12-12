@@ -120,8 +120,9 @@ bool LocationRefinerObstaclePostprocessor::Process(
                               obj->size(0)};
     float box_cent_x = (bbox2d[0] + bbox2d[2]) / 2;
     Eigen::Vector3f image_point_low_center(box_cent_x, bbox2d[3], 1);
-    Eigen::Vector3f point_in_camera
-        = camera_k_matrix.inverse() * image_point_low_center;
+    Eigen::Vector3f point_in_camera =
+      static_cast<Eigen::Matrix<float, 3, 1, 0, 3, 1>>
+      (camera_k_matrix.inverse() * image_point_low_center);
     float theta_ray =
           static_cast<float>(atan2(point_in_camera.x(), point_in_camera.z()));
     float rotation_y =
