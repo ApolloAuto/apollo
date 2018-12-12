@@ -111,7 +111,8 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
       stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
   const double distance =
       creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
-  if (distance < creep_config.max_valid_stop_distance()) {
+  if (distance < creep_config.max_valid_stop_distance() ||
+      wait_time >= timeout) {
     bool all_far_away = true;
     for (auto* obstacle :
          reference_line_info.path_decision().obstacles().Items()) {
@@ -136,9 +137,6 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
       }
     }
     creep_done = all_far_away;
-  } else {
-    // check timeout
-    creep_done = (wait_time >= timeout);
   }
 
   return creep_done;
