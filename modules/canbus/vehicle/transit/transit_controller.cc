@@ -176,7 +176,8 @@ Chassis TransitController::chassis() {
 
   auto& motion20 = transit.llc_motionfeedback1_20();
   if (motion20.has_llc_fbk_throttleposition()) {
-    chassis_.set_throttle_percentage(motion20.llc_fbk_throttleposition());
+    chassis_.set_throttle_percentage(
+        static_cast<float>(motion20.llc_fbk_throttleposition()));
   }
 
   button_pressed_ = (transit.llc_motionfeedback1_20().llc_fbk_state() ==
@@ -184,7 +185,8 @@ Chassis TransitController::chassis() {
 
   if (motion20.has_llc_fbk_brakepercentrear()) {
     // TODO(Udelv): fix scaling
-    chassis_.set_brake_percentage(motion20.llc_fbk_brakepercentrear());
+    chassis_.set_brake_percentage(
+        static_cast<float>(motion20.llc_fbk_brakepercentrear()));
   }
 
   if (motion20.has_llc_fbk_gear()) {
@@ -208,13 +210,13 @@ Chassis TransitController::chassis() {
 
   auto& motion21 = transit.llc_motionfeedback2_21();
   if (motion21.has_llc_fbk_vehiclespeed()) {
-    chassis_.set_speed_mps(motion21.llc_fbk_vehiclespeed());
+    chassis_.set_speed_mps(static_cast<float>(motion21.llc_fbk_vehiclespeed()));
   }
 
   if (motion21.has_llc_fbk_steeringangle()) {
-    chassis_.set_steering_percentage(-1.0 * motion21.llc_fbk_steeringangle() *
-                                     M_PI / 180 /
-                                     vehicle_params_.max_steer_angle() * 100);
+    chassis_.set_steering_percentage(
+        static_cast<float>(-1.0 * motion21.llc_fbk_steeringangle() * M_PI /
+                           180 / vehicle_params_.max_steer_angle() * 100));
   }
 
   auto& aux = transit.llc_auxiliaryfeedback_120();
