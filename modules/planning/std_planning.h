@@ -23,6 +23,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/planner/std_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
+#include "modules/planning/toolkits/smoothers/smoother.h"
 
 /**
  * @namespace apollo::planning
@@ -81,6 +82,7 @@ class StdPlanning : public PlanningBase {
   routing::RoutingResponse last_routing_;
   std::unique_ptr<Frame> frame_;
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
+  Smoother planning_smoother_;
 };
 
 }  // namespace planning
