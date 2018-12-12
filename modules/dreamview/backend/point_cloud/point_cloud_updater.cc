@@ -165,9 +165,10 @@ void PointCloudUpdater::UpdatePointCloud(
     }
 
     for (size_t i = 0; i < pcl_ptr->points.size(); ++i) {
-      pcl_ptr->points[i].x = point_cloud->point(i).x();
-      pcl_ptr->points[i].y = point_cloud->point(i).y();
-      pcl_ptr->points[i].z = point_cloud->point(i).z();
+      const auto& point = point_cloud->point(static_cast<int>(i));
+      pcl_ptr->points[i].x = point.x();
+      pcl_ptr->points[i].y = point.y();
+      pcl_ptr->points[i].z = point.z();
     }
     std::future<void> f =
         cyber::Async(&PointCloudUpdater::FilterPointCloud,
@@ -180,8 +181,10 @@ void PointCloudUpdater::FilterPointCloud(
     pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr) {
   pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
   voxel_grid.setInputCloud(pcl_ptr);
-  voxel_grid.setLeafSize(FLAGS_voxel_filter_size, FLAGS_voxel_filter_size,
-                         FLAGS_voxel_filter_height);
+  voxel_grid.setLeafSize(
+      static_cast<float>(FLAGS_voxel_filter_size),
+      static_cast<float>(FLAGS_voxel_filter_size),
+      static_cast<float>(FLAGS_voxel_filter_height));
   pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_filtered_ptr(
     new pcl::PointCloud<pcl::PointXYZ>);
   voxel_grid.filter(*pcl_filtered_ptr);

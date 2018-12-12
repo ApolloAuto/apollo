@@ -58,7 +58,7 @@ namespace {
 template <typename MapElementInfoConstPtr>
 void ExtractIds(const std::vector<MapElementInfoConstPtr> &items,
                 RepeatedPtrField<std::string> *ids) {
-  ids->Reserve(items.size());
+  ids->Reserve(static_cast<unsigned int>(items.size()));
   for (const auto &item : items) {
     ids->Add()->assign(item->id().id());
   }
@@ -70,8 +70,8 @@ void ExtractIds(const std::vector<MapElementInfoConstPtr> &items,
 void ExtractRoadAndLaneIds(const std::vector<LaneInfoConstPtr> &lanes,
                            RepeatedPtrField<std::string> *lane_ids,
                            RepeatedPtrField<std::string> *road_ids) {
-  lane_ids->Reserve(lanes.size());
-  road_ids->Reserve(lanes.size());
+  lane_ids->Reserve(static_cast<unsigned int>(lanes.size()));
+  road_ids->Reserve(static_cast<unsigned int>(lanes.size()));
 
   for (const auto &lane : lanes) {
     lane_ids->Add()->assign(lane->id().id());
