@@ -8,8 +8,8 @@ cc_binary(
         "fake_prediction.cc",
     ],
     deps = [
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
         "//modules/prediction/proto:prediction_proto",

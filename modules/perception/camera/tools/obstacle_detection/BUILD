@@ -13,10 +13,10 @@ cc_binary(
         "-lopencv_highgui",
     ],
     deps = [
-        "@gtest",
         "//modules/perception/base:base",
         "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/common/io:io_util",
+        "@gtest",
     ]
 )
 

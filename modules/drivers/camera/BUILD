@@ -24,8 +24,8 @@ cc_library(
     hdrs = ["camera_component.h"],
     deps = [
         ":camera",
-        "//modules/drivers/proto:sensor_proto",
         "//cyber",
+        "//modules/drivers/proto:sensor_proto",
     ],
     copts = ['-DMODULE_NAME=\\"camera\\"']
 )
@@ -35,9 +35,9 @@ cc_library(
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
     deps = [
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/drivers/camera/proto:camera_proto",
         "//cyber",
+        "//modules/drivers/camera/proto:camera_proto",
+        "//modules/drivers/proto:sensor_proto",
         "@opencv2//:core",
         "@opencv2//:highgui"
     ],
@@ -56,8 +56,8 @@ cc_library(
     ],
     
     deps = [
-        "//modules/drivers/camera/proto:camera_proto",
         "//cyber",
+        "//modules/drivers/camera/proto:camera_proto",
         "@adv_plat//:adv_plat",
     ],
     copts = ['-mavx2']

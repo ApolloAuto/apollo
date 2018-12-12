@@ -12,10 +12,10 @@ cuda_library(
         "similar.h",
     ],
     deps = [
-        "@cuda",
         "//cyber",
         "//modules/perception/camera/common:camera_frame",
         "//modules/perception/inference/utils:inference_gemm_lib",
+        "@cuda",
     ],
 )
 
@@ -29,9 +29,9 @@ cc_library(
         "similar.h",
     ],
     deps = [
-        "@eigen",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
+        "@eigen",
     ],
 )
 
@@ -57,8 +57,8 @@ cc_library(
         "kalman_filter.h",
     ],
     deps = [
-        "@eigen",
         "//cyber",
+        "@eigen",
     ],
 )
 

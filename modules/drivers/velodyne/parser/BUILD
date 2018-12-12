@@ -14,8 +14,8 @@ cc_library(
     srcs = ["velodyne_convert_component.cc"],
     hdrs = ["velodyne_convert_component.h"],
     deps = [
-        "//modules/drivers/velodyne/parser:convert",
         "//cyber",
+        "//modules/drivers/velodyne/parser:convert",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
@@ -42,9 +42,9 @@ cc_library(
         "velodyne_parser.h",
     ],
     deps = [
-        "//modules/drivers/velodyne/proto:velodyne_proto",
-        "//modules/drivers/proto:sensor_proto",
         "//cyber",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/velodyne/proto:velodyne_proto",
         "@eigen",
         "@yaml_cpp//:yaml",
     ],

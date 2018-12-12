@@ -8,8 +8,8 @@ cc_library(
     srcs = ["scenario_features.cc"],
     hdrs = ["scenario_features.h"],
     deps = [
-        "//modules/prediction/proto:scenario_proto",
         "//cyber",
+        "//modules/prediction/proto:scenario_proto",
     ],
 )
 
@@ -19,10 +19,10 @@ cc_library(
     hdrs = ["cruise_scenario_features.h"],
     deps = [
         ":scenario_features",
+        "//cyber",
+        "//modules/prediction/common:environment_features",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
-        "//modules/prediction/common:environment_features",
-        "//cyber",
     ],
 )
 

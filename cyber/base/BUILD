@@ -153,8 +153,8 @@ cc_test(
         "object_pool_test.cc",
     ],
     deps = [
-        "//cyber/base:object_pool",
         "//cyber/base:concurrent_object_pool",
+        "//cyber/base:object_pool",
         "@gtest//:main",
     ],
     linkopts = [

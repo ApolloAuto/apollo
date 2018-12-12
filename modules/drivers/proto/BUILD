@@ -22,8 +22,8 @@ proto_library(
         "ultrasonic_radar.proto",
     ],
     deps = [
-        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/drivers/radar/conti_radar/proto:conti_radar_proto_lib",
         "//modules/drivers/radar/racobit_radar/proto:racobit_radar_proto_lib",

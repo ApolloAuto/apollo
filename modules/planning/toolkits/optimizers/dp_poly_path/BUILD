@@ -12,8 +12,8 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/toolkits/optimizers:path_optimizer",
         "//modules/planning/toolkits/optimizers/road_graph",
+        "//modules/planning/toolkits/optimizers:path_optimizer",
     ],
 )
 

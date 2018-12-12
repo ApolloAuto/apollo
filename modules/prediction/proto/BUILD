@@ -31,13 +31,13 @@ proto_library(
         "prediction_obstacle.proto",
     ],
     deps = [
-        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
-        "//modules/prediction/proto:scenario_proto_lib",
         "//modules/prediction/proto:feature_proto_lib",
+        "//modules/prediction/proto:scenario_proto_lib",
     ],
 )
 

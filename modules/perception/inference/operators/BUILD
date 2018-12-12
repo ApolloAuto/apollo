@@ -30,8 +30,8 @@ cc_library(
         "roipooling_layer.h",
     ],
     deps = [
-        "//modules/perception/inference:layer_lib",
         "//modules/perception/base:blob",
+        "//modules/perception/inference:layer_lib",
     ]
 )
 

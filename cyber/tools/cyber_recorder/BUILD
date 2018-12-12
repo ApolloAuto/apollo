@@ -11,9 +11,9 @@ cc_binary(
         "recorder",
         "recoverer",
         "spliter",
-        "//cyber:init",
         "//cyber/common:file",
         "//cyber/common:time_conversion",
+        "//cyber:init",
     ],
     linkopts = [
         "-pthread",
@@ -51,8 +51,8 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//cyber/proto:record_cc_proto",
-        "//cyber:cyber",
         "//cyber/record:record_reader",
+        "//cyber:cyber",
     ]
 )
 

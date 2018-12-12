@@ -10,13 +10,13 @@ cc_library(
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/proto:error_code_proto",
         "//modules/control/proto:control_proto",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "//modules/common/configs:vehicle_config_helper",
     ],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
@@ -47,9 +47,9 @@ cc_library(
         "vehicle_factory.h",
     ],
     deps = [
-        "//modules/canbus/vehicle/lincoln:lincoln_vehicle_factory",
         "//modules/canbus/vehicle/gem:gem_vehicle_factory",
         "//modules/canbus/vehicle/lexus:lexus_vehicle_factory",
+        "//modules/canbus/vehicle/lincoln:lincoln_vehicle_factory",
         "//modules/canbus/vehicle/transit:transit_vehicle_factory",
         "//modules/common/util:factory",
     ],

@@ -12,8 +12,8 @@ cc_library(
         "buffer.h",
     ],
     deps = [
-        "//modules/transform/proto:transform_proto",
         "//cyber",
+        "//modules/transform/proto:transform_proto",
         "//third_party/tf2:tf2"
     ],
 )
@@ -26,8 +26,8 @@ cc_library(
         "transform_broadcaster.h",
     ],
     deps = [
-        "//modules/transform/proto:transform_proto",
         "//cyber",
+        "//modules/transform/proto:transform_proto",
         "//third_party/tf2:tf2"
     ],
 )
@@ -41,10 +41,10 @@ cc_library(
         "static_transform_component.h",
     ],
     deps = [
+        "//cyber",
+        "//modules/common/util:file_util",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
-        "//modules/common/util:file_util",
-        "//cyber",
         "//third_party/tf2:tf2",
         "@yaml_cpp//:yaml"
     ],

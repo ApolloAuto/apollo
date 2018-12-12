@@ -29,10 +29,10 @@ cc_library(
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/inference:inference_factory_lib",
-        "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference:inference_lib",
     ],
 )
 
@@ -47,9 +47,9 @@ cc_library(
     deps = [
         ":classify",
         ":trafficlight_detector_recognition_proto",
-        "//modules/perception/inference:inference_lib",
-        "//modules/perception/camera/lib/interface:interface",
         "//modules/common/util:file_util",
+        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/inference:inference_lib",
     ],
 )
 

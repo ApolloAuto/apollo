@@ -23,13 +23,13 @@ cc_library(
         "conti_ars_preprocessor.h",
     ],
     deps = [
+        "//modules/drivers/proto:sensor_proto",
         "//modules/perception/base:base",
-        "//modules/perception/lib/utils:utils",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/lib/utils:utils",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/interface:base_preprocessor",
-        "//modules/drivers/proto:sensor_proto",
         "@eigen",
     ],
 )

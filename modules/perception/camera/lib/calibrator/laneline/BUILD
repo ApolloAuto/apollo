@@ -14,8 +14,8 @@ cc_library(
     ],
     deps = [
         ":lane_struct_for_calib",
-        "//modules/perception/common/i_lib/core:core",
         "//modules/perception/camera/lib/calibrator/common:histogram_estimator",
+        "//modules/perception/common/i_lib/core:core",
     ],
 )
 
@@ -41,8 +41,8 @@ cc_library(
     ],
     deps = [
         ":lane_based_calibrator",
-        "//modules/perception/common/i_lib/core:core",
         "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/common/i_lib/core:core",
     ],
 )
 

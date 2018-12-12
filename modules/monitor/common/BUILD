@@ -27,10 +27,9 @@ cc_library(
     hdrs = ["monitor_manager.h"],
     deps = [
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common/proto:drive_event_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/localization/proto:pose_proto",
         "//modules/common/monitor_log",
+        "//modules/common/proto:drive_event_proto",
         "//modules/common/util",
         "//modules/common/util:map_util",
         "//modules/control/proto:control_proto",
@@ -39,6 +38,7 @@ cc_library(
         "//modules/dreamview/proto:hmi_config_proto",
         "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/dreamview/proto:hmi_status_proto",
+        "//modules/localization/proto:pose_proto",
         "//modules/monitor/proto:system_status_proto",
     ],
 )

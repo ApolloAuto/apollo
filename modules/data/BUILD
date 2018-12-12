@@ -5,12 +5,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "data_lib",
     deps = [
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
-        "//modules/data/proto:data_proto",
         "//modules/data/common:data_gflags",
         "//modules/data/proto:data_conf_proto",
-        "//cyber",
+        "//modules/data/proto:data_proto",
         "//modules/data/recorder:record_service",
     ]
 )

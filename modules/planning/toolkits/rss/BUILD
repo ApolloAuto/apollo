@@ -12,13 +12,13 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//third_party/rss:rss",
         "//modules/common/status",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_proto",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/proto:planning_proto",
         "//modules/planning/toolkits:task",
+        "//third_party/rss:rss",
     ],
 )
 

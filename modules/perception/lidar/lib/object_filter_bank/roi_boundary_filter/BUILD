@@ -11,13 +11,13 @@ cc_library(
         "roi_boundary_filter.h",
     ],
     deps = [
+        "//cyber",
         "//modules/common/util:file_util",
-        "//modules/perception/proto:roi_boundary_filter_config_proto",
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/geometry:common",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lidar/lib/interface:base_object_filter",
-        "//cyber",
+        "//modules/perception/proto:roi_boundary_filter_config_proto",
         "@eigen",
     ],
 )
@@ -30,8 +30,8 @@ cc_test(
     ],
     deps = [
         ":roi_boundary_filter",
-        "@gtest//:main",
         "//modules/perception/common:perception_gflags",
+        "@gtest//:main",
     ],
 )
 

@@ -14,10 +14,10 @@ cuda_library(
     ],
     deps = [
         ":object_maintainer",
-        "@cuda",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
+        "@cuda",
     ],
 )
 
@@ -59,10 +59,10 @@ cc_library(
         "//modules/perception/camera/lib/feature_extractor/tfe:tracking_feat_extractor",
         "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/camera/lib/obstacle/detector/yolo/proto:yolo_proto",
-        "//modules/perception/inference:inference_factory_lib",
-        "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference:inference_lib",
         "//modules/perception/lib/utils:utils",
     ],
 )

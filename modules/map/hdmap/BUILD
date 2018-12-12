@@ -16,7 +16,6 @@ cc_library(
         "hdmap_util.h",
     ],
     deps = [
-        "@glog//:glog",
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
         "//modules/common/math:linear_interpolation",
@@ -24,6 +23,7 @@ cc_library(
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",
         "//modules/map/relative_map/proto:navigation_proto",
+        "@glog//:glog",
     ],
 )
 
@@ -58,8 +58,8 @@ cc_test(
     ],
     data = [
         ":testdata",
-        "//modules/map:map_data",
         "//modules/common/util",
+        "//modules/map:map_data",
     ],
     deps = [
         ":hdmap",

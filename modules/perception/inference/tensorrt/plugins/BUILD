@@ -8,8 +8,8 @@ licenses(["notice"])
 cc_library(
     name = "perception_inference_tensorrt_plugins",
     srcs = [
-        ":perception_inference_tensorrt_plugins_slice_cuda",
         ":perception_inference_tensorrt_plugins_argmax_cuda",
+        ":perception_inference_tensorrt_plugins_slice_cuda",
         ":perception_inference_tensorrt_plugins_softmax_cuda",
     ],
     hdrs = glob([

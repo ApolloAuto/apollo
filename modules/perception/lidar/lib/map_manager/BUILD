@@ -12,15 +12,15 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/common/math:math",
         "//modules/common/util:file_util",
+        "//modules/map/hdmap:hdmap",
+        "//modules/map/proto:map_proto",
         "//modules/perception/base:base_type",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_frame",
         "//modules/perception/map/hdmap:hdmap_input",
         "//modules/perception/proto:map_manager_config_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/map/hdmap:hdmap",
-        "//modules/common/math:math",
     ],
 )
 

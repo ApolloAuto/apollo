@@ -13,11 +13,11 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/v2x/common:v2x_proxy_gflags",
-        "//modules/v2x/proto:v2x_traffic_light_proto",
+        "//modules/common/time:time",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
-        "//modules/common/time:time",
+        "//modules/v2x/common:v2x_proxy_gflags",
+        "//modules/v2x/proto:v2x_traffic_light_proto",
     ],
 )
 

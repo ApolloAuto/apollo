@@ -6,9 +6,9 @@ cc_binary(
     name = "parser_cli",
     srcs = ["parser_cli.cc"],
     deps = [
-        "//modules/drivers/gnss/stream:gnss_stream",
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
+        "//modules/drivers/gnss/stream:gnss_stream",
         "@ros//:ros_common",
     ],
 )

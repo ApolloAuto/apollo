@@ -74,8 +74,8 @@ cc_library(
     name = "reader_base",
     hdrs = [ "reader_base.h", ],
     deps = [
-        "//cyber/transport:transport",
         "//cyber/event:perf_event_cache",
+        "//cyber/transport:transport",
     ],
 )
 

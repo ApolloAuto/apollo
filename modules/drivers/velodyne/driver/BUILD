@@ -14,9 +14,9 @@ cc_library(
     srcs = ["velodyne_driver_component.cc"],
     hdrs = ["velodyne_driver_component.h"],
     deps = [
-        "//modules/drivers/velodyne/driver:driver",
-        "//modules/common/util:message_util",
         "//cyber",
+        "//modules/common/util:message_util",
+        "//modules/drivers/velodyne/driver:driver",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
@@ -38,9 +38,9 @@ cc_library(
         "-lpcap",
     ],
     deps = [
+        "//cyber",
         "//modules/common/util",
         "//modules/drivers/velodyne/proto:velodyne_proto",
-        "//cyber",
         "@pcl",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']

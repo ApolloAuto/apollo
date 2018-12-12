@@ -31,11 +31,11 @@ cc_library(
         "transform_server.h",
     ],
     deps = [
-        "@eigen",
-        "@yaml_cpp//:yaml",
         "//cyber",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
+        "@eigen",
+        "@yaml_cpp//:yaml",
     ]
 )
 
@@ -51,8 +51,8 @@ cc_binary(
         "-lboost_system",
     ],
     deps = [
-        ":visualizer",
         ":transform_server",
+        ":visualizer",
         "//modules/perception/base:base",
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/camera/common:common",

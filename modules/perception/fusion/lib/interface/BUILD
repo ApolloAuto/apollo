@@ -15,9 +15,9 @@ cc_library(
         "base_type_fusion.h",
     ],
     deps = [
-        "//modules/perception/lib/registerer",
-        "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:base_forward_declaration",
+        "//modules/perception/fusion/base:sensor",
+        "//modules/perception/lib/registerer",
     ],
 )
 

@@ -14,9 +14,9 @@ cc_library(
         "//cyber",
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",
-        "//modules/third_party_perception:third_party_perception_lib",
         "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/proto:third_party_perception_proto",
+        "//modules/third_party_perception:third_party_perception_lib",
         "@gtest//:main",
     ],
 )

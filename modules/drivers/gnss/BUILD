@@ -14,9 +14,9 @@ cc_library(
     srcs = ["gnss_component.cc"],
     hdrs = ["gnss_component.h"],
     deps = [
-        "//modules/drivers/gnss/stream:gnss_stream",
-        "//modules/common/monitor_log",
         "//cyber",
+        "//modules/common/monitor_log",
+        "//modules/drivers/gnss/stream:gnss_stream",
     ],
     copts = ['-DMODULE_NAME=\\"gnss\\"']
 )

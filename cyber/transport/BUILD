@@ -29,8 +29,8 @@ cc_library(
         "underlay_message_type",
         "participant",
         "qos_profile_conf",
-        "//cyber/timer:timer_manager",
         "//cyber/service_discovery:role",
+        "//cyber/timer:timer_manager",
         "@fastrtps//:fastrtps",
     ],
 )
@@ -40,8 +40,8 @@ cc_test(
     size = "small",
     srcs = [ "transport_test.cc", ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest",
     ],
 )
@@ -96,8 +96,8 @@ cc_test(
         "dispatcher/dispatcher_test.cc",
     ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest//:main",
     ],
 )
@@ -120,8 +120,8 @@ cc_test(
         "dispatcher/intra_dispatcher_test.cc",
     ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest//:main",
     ],
 )
@@ -131,8 +131,8 @@ cc_library(
     srcs = [ "dispatcher/rtps_dispatcher.cc", ],
     hdrs = [ "dispatcher/rtps_dispatcher.h", ],
     deps = [
-        "//cyber/proto:role_attributes_cc_proto",
         "//cyber/message:message_traits",
+        "//cyber/proto:role_attributes_cc_proto",
         "dispatcher",
         "attributes_filler",
         "sub_listener",
@@ -147,8 +147,8 @@ cc_test(
         "dispatcher/rtps_dispatcher_test.cc",
     ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest",
     ],
 )
@@ -162,9 +162,9 @@ cc_library(
         "notifier_factory",
         "segment",
         "readable_info",
-        "//cyber/scheduler:scheduler_factory",
-        "//cyber/proto:proto_desc_cc_proto",
         "//cyber/message:message_traits",
+        "//cyber/proto:proto_desc_cc_proto",
+        "//cyber/scheduler:scheduler_factory",
     ],
 )
 
@@ -175,8 +175,8 @@ cc_test(
         "dispatcher/shm_dispatcher_test.cc",
     ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest//:main",
     ],
 )
@@ -479,8 +479,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/hybrid_transceiver_test.cc", ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest",
     ],
 )
@@ -490,8 +490,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/intra_transceiver_test.cc", ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest//:main",
     ],
 )
@@ -501,8 +501,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/rtps_transceiver_test.cc", ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest",
     ],
 )
@@ -512,8 +512,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/shm_transceiver_test.cc", ],
     deps = [
-        "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "//cyber:cyber_core",
         "@gtest//:main",
     ],
 )

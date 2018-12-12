@@ -11,12 +11,12 @@ cc_library(
         "msg_serializer.h",
     ],
     deps = [
-        "@eigen",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/lib/utils",
         "//modules/perception/onboard/common_flags",
         "//modules/perception/proto:perception_proto",
+        "@eigen",
     ],
 )
 

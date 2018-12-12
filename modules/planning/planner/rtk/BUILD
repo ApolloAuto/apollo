@@ -12,8 +12,8 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//external:gflags",
         "//cyber/common:log",
+        "//external:gflags",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
         "//modules/common/util:factory",

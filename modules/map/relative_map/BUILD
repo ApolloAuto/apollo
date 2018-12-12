@@ -62,8 +62,8 @@ cc_library(
     ],
     deps = [
         ":relative_map_lib",
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
         "//modules/common/adapters:adapter_gflags",
     ],
 )

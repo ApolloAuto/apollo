@@ -14,6 +14,7 @@ cc_library(
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
+        "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/handlers:image_handler",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/hmi",
@@ -22,7 +23,6 @@ cc_library(
         "//modules/dreamview/backend/sim_control",
         "//modules/dreamview/backend/simulation_world:simulation_world_updater",
         "//modules/dreamview/proto:simulation_world_proto",
-        "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "@civetweb//:civetweb++",

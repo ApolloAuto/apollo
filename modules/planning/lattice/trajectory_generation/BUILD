@@ -80,8 +80,8 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/constraint_checker:collision_checker",
         "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:trajectory1d_generator",
@@ -102,8 +102,8 @@ cc_library(
         "//modules/common",
         "//modules/common/math:cartesian_frenet_conversion",
         "//modules/common/math:path_matcher",
-        "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/math/curve1d",
     ],
 )

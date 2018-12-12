@@ -11,9 +11,9 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
         "//modules/data/common:data_gflags",
-        "//modules/data/proto:static_info_proto",
         "//modules/data/proto:record_request_proto",
         "//modules/data/proto:record_response_proto",
+        "//modules/data/proto:static_info_proto",
     ],
 )
 

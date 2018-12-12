@@ -11,8 +11,8 @@ cc_library(
         "radar_util.h",
     ],
     deps = [
-        "@eigen",
         "//modules/perception/base:base",
+        "@eigen",
     ],
 )
 

@@ -8,8 +8,8 @@ cc_library(
     hdrs = ["canbus_component.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//external:gflags",
         "//cyber",
+        "//external:gflags",
         "//modules/canbus/common:canbus_common",
         "//modules/canbus/vehicle:vehicle_factory",
         "//modules/common",

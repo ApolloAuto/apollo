@@ -27,9 +27,9 @@ cc_library(
         "common_functions.h",
     ],
     deps = [
-        "@eigen",
         "//cyber",
         "//modules/perception/base:base",
+        "@eigen",
     ],
 )
 

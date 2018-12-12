@@ -11,10 +11,10 @@ cc_library(
         "image_decompress.h",
     ],
     deps = [
-        "//modules/tools/image_decompress/proto:decompress_proto",
+        "//cyber",
         "//modules/drivers/camera/proto:camera_proto",
         "//modules/drivers/proto:sensor_proto",
-        "//cyber",
+        "//modules/tools/image_decompress/proto:decompress_proto",
         "@opencv2//:core",
         "@opencv2//:highgui"
     ],

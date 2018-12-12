@@ -14,8 +14,8 @@ cc_library(
     srcs = ["compensator_component.cc"],
     hdrs = ["compensator_component.h"],
     deps = [
-        "//modules/drivers/velodyne/compensator:compensator_lib",
         "//cyber",
+        "//modules/drivers/velodyne/compensator:compensator_lib",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
@@ -29,10 +29,10 @@ cc_library(
         "compensator.h",
     ],
     deps = [
-        "//modules/drivers/velodyne/proto:velodyne_proto",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/transform:tf2_buffer_lib",
         "//cyber",
+        "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/velodyne/proto:velodyne_proto",
+        "//modules/transform:tf2_buffer_lib",
         "@eigen",
     ],
     copts = ['-DMODULE_NAME=\\"velodyne\\"']

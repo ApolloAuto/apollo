@@ -49,10 +49,10 @@ cc_library(
     deps = [
         ":reference_line",
         ":reference_line_smoother",
-        "//modules/planning/math:curve_math",
-        "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/smoothing_spline:active_set_spline_2d_solver",
         "//modules/planning/math/smoothing_spline:osqp_spline_2d_solver",
+        "//modules/planning/math:curve_math",
+        "//modules/planning/math:polynomial_xd",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:reference_line_smoother_config_proto",
         "@eigen",

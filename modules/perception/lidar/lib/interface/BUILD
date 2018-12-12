@@ -6,12 +6,12 @@ cc_library(
     name = "interface",
     deps = [
         ":base_bipartite_graph_matcher",
-        ":base_segmentation",
         ":base_classifier",
         ":base_ground_detector",
         ":base_multi_target_tracker",
         ":base_object_filter",
         ":base_roi_filter",
+        ":base_segmentation",
     ],
 )
 
@@ -22,8 +22,8 @@ cc_library(
         "base_bipartite_graph_matcher.h",
     ],
     deps = [
-        "//modules/perception/lib/registerer",
         "//modules/perception/common/graph:secure_matrix",
+        "//modules/perception/lib/registerer",
         "@eigen",
     ],
 )

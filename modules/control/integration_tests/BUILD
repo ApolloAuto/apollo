@@ -14,9 +14,9 @@ cc_library(
         "//cyber",
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",
-        "//modules/control:control_component_lib",
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_proto",
+        "//modules/control:control_component_lib",
         "@gtest//:main",
     ],
 )
