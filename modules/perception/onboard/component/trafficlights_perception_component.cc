@@ -30,6 +30,7 @@
 #include <string>
 #include <tuple>
 #include <utility>
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
@@ -754,6 +755,13 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
   for (int i = 0; i < static_cast<int>(lights.size()); i++) {
     switch (lights.at(i)->status.color) {
       case base::TLColor::TL_RED:
+        // quick fix for 0 confidence color decision
+        if (std::abs(lights.at(i)->status.confidence) <
+            std::numeric_limits<double>::min()) {
+          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+          max_n_id = i;
+          break;
+        }
         cnt_r_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_r_conf) {
           max_r_id = i;
@@ -761,6 +769,13 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
         }
         break;
       case base::TLColor::TL_GREEN:
+        // quick fix for 0 confidence color decision
+        if (std::abs(lights.at(i)->status.confidence) <
+            std::numeric_limits<double>::min()) {
+          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+          max_n_id = i;
+          break;
+        }
         cnt_g_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_g_conf) {
           max_g_id = i;
@@ -768,6 +783,13 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
         }
         break;
       case base::TLColor::TL_YELLOW:
+        // quick fix for 0 confidence color decision
+        if (std::abs(lights.at(i)->status.confidence) <
+            std::numeric_limits<double>::min()) {
+          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+          max_n_id = i;
+          break;
+        }
         cnt_y_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_y_conf) {
           max_y_id = i;
@@ -775,7 +797,8 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
         }
         break;
       case base::TLColor::TL_UNKNOWN_COLOR:
-        cnt_u_ += lights.at(i)->status.confidence;;
+        cnt_u_ += lights.at(i)->status.confidence;
+        max_n_id = i;
         break;
       default:
         max_n_id = i;
