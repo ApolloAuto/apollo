@@ -37,6 +37,7 @@ using ::apollo::planning::ADCTrajectory;
 
 ADCTrajectoryContainer::ADCTrajectoryContainer()
     :adc_junction_info_ptr_(nullptr),
+     adc_pnc_junction_info_ptr_(nullptr),
      s_dist_to_junction_(0.0) {
 }
 
