@@ -69,9 +69,16 @@ class OpenSpacePlanning : public PlanningBase {
 
   void AddOpenSpaceTrajectory(planning_internal::Debug* debug);
 
-  void AddOpenSpaceSpeedProfile(planning_internal::Debug* debug);
+  void AddStitchSpeedProfile(planning_internal::Debug* debug);
 
-  void ExportOpenSpaceChart(planning_internal::Debug* debug);
+  void AddPublishedSpeed(planning_internal::Debug* debug,
+                         ADCTrajectory* const ptr_trajectory_pb);
+
+  void AddPublishedAcceleration(planning_internal::Debug* debug,
+                                ADCTrajectory* const ptr_trajectory_pb);
+
+  void ExportOpenSpaceChart(planning_internal::Debug* debug,
+                            ADCTrajectory* const ptr_trajectory_pb);
 
   void FillPlanningPb(const double timestamp,
                       ADCTrajectory* const ptr_trajectory_pb) override;
