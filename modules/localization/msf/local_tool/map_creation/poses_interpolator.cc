@@ -16,6 +16,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+
 #include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 int main(int argc, char **argv) {

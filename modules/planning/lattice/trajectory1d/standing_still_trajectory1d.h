@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <string>
+
 #include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {

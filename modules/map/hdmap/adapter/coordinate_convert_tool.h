@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <proj_api.h>
 #include <string>
+
 #include "modules/map/hdmap/adapter/xml_parser/status.h"
 
 namespace apollo {

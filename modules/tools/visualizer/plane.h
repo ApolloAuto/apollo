@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+
 #include "modules/tools/visualizer/renderable_object.h"
 #include "modules/tools/visualizer/texture.h"
 

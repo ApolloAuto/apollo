@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <string>
+
 #include "cyber/common/log.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT

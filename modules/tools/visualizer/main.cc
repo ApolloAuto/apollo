@@ -21,6 +21,7 @@
 #include <QOpenGLFunctions>
 #include <QSurfaceFormat>
 #include <sstream>
+
 #include "cyber/init.h"
 #include "modules/tools/visualizer/main_window.h"
 

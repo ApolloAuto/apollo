@@ -14,10 +14,12 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/tools/lane_detection/lane_common.h"
+
 #include <algorithm>
 #include <cmath>
 #include <string>
 #include <vector>
+
 #include "cyber/common/log.h"
 
 DEFINE_string(list, "test.list", "test file title");

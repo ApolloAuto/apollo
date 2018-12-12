@@ -16,6 +16,7 @@
 #pragma once
 
 #include <vector>
+
 #include "modules/perception/fusion/common/base_filter.h"
 
 namespace apollo {

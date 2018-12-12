@@ -22,6 +22,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/camera_frame.h"

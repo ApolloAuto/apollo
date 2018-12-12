@@ -17,6 +17,7 @@
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 
 #include <vector>
+
 #include "cyber/task/task.h"
 #include "cyber/common/log.h"
 #include "modules/localization/msf/common/util/system_utility.h"

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <string>
+
 #include "Eigen/Dense"
 #include "gtest/gtest.h"
 

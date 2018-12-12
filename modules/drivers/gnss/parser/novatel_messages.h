@@ -24,6 +24,7 @@
 
 #include <stdint.h>
 #include <limits>
+
 #include "modules/drivers/gnss/proto/config.pb.h"
 
 namespace apollo {

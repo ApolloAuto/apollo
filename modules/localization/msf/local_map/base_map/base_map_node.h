@@ -19,6 +19,7 @@
 #include <Eigen/Core>
 #include <string>
 #include <vector>
+
 #include "modules/localization/msf/common/util/compression.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"

@@ -17,6 +17,7 @@
 
 #include <utility>
 #include <string>
+
 #include "Eigen/Dense"
 
 #include "modules/perception/lib/thread/thread_worker.h"

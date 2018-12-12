@@ -17,6 +17,7 @@
 #include "modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion/pbf_shape_fusion.h"
 
 #include <memory>
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/perception_gflags.h"

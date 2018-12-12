@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
+
 #include "modules/perception/lidar/lib/object_filter_bank/object_filter_bank.h"
 
 DECLARE_string(work_root);

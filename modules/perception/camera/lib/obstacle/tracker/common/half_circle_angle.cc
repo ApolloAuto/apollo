@@ -14,7 +14,9 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/common/half_circle_angle.h"
+
 #include <cmath>
+
 #include "modules/perception/camera/common/util.h"
 
 namespace apollo {

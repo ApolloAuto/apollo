@@ -15,12 +15,14 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/scene_viewer.h"
+
 #include <QMessageBox>
 #include <QTimer>
 #include <QWheelEvent>
 #include <iomanip>
 #include <iostream>
 #include <utility>
+
 #include "modules/tools/visualizer/scene_camera_dialog.h"
 
 struct SceneViewer::TempRenderableObjGroup {

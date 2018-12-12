@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
+
 #include <string>
 #include <vector>
+
 #include "modules/common/util/file.h"
 #include "modules/perception/proto/fused_classifier_config.pb.h"
 

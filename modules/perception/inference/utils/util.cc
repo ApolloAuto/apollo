@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <memory>
+
 #include "cyber/common/log.h"
 #include "modules/perception/inference/utils/util.h"
 

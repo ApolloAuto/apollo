@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/util/frame_transform.h"
+
 #include <gtest/gtest.h>
 
 namespace apollo {

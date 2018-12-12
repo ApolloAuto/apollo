@@ -14,7 +14,9 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/radar/lib/tracker/common/radar_track.h"
+
 #include <gtest/gtest.h>
+
 #include "cyber/common/log.h"
 #include "modules/perception/radar/lib/tracker/filter/adaptive_kalman_filter.h"
 

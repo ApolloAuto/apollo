@@ -21,6 +21,7 @@
 #pragma once
 
 #include <string>
+
 #include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {

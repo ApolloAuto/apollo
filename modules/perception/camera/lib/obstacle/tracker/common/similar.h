@@ -16,6 +16,7 @@
 #pragma once
 
 #include <cblas.h>
+
 #include "modules/perception/camera/common/camera_frame.h"
 
 namespace apollo {

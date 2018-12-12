@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include <gtest/gtest.h>
+
 #include "modules/perception/radar/lib/dummy/dummy_algorithms.h"
 
 namespace apollo {

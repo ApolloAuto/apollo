@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
+
 #include <vector>
 
 namespace apollo {

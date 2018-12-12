@@ -19,6 +19,7 @@
 
 #include <limits>
 #include <string>
+
 #include "cyber/time/duration.h"
 
 namespace apollo {

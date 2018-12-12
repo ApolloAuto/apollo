@@ -19,6 +19,7 @@
 #include <QTimer>
 #include <QWidget>
 #include <memory>
+
 #include "modules/tools/visualizer/video_image_viewer.h"
 
 class FixedAspectRatioWidget : public QWidget {

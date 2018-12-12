@@ -17,6 +17,7 @@
 #include "modules/prediction/container/pose/pose_container.h"
 
 #include <array>
+
 #include "gtest/gtest.h"
 
 #include "modules/localization/proto/localization.pb.h"

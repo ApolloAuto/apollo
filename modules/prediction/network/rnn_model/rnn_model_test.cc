@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <string>
+
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"

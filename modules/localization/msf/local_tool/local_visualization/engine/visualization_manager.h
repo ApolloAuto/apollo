@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 #include <atomic>
+
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {

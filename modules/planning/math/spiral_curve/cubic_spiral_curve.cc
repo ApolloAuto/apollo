@@ -20,6 +20,7 @@
 #include "modules/planning/math/spiral_curve/cubic_spiral_curve.h"
 
 #include <algorithm>
+
 #include "Eigen/Core"
 #include "Eigen/LU"
 

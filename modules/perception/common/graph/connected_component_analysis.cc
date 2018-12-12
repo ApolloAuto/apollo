@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/common/graph/connected_component_analysis.h"
+
 #include <iostream>
 #include <queue>
 

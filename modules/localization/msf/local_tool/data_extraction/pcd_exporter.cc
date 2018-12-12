@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_tool/data_extraction/pcd_exporter.h"
+
 #include <string>
+
 #include "pcl/io/pcd_io.h"
 #include "pcl/point_types.h"
 #include "cyber/cyber.h"

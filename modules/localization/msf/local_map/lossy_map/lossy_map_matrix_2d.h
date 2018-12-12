@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vector>
+
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 

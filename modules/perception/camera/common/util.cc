@@ -14,7 +14,9 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/common/util.h"
+
 #include <cstdlib>
+
 #include "cyber/common/log.h"
 
 namespace apollo {

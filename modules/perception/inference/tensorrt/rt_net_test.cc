@@ -18,6 +18,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <string>
+
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
 

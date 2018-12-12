@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+
 #include "cyber/cyber.h"
 
 #include "modules/drivers/gnss/util/macros.h"

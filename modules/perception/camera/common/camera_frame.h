@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/base/lane_struct.h"
 #include "modules/perception/base/object_pool_types.h"

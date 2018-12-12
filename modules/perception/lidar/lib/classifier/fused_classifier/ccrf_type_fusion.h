@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+
 #include "modules/perception/lidar/lib/classifier/fused_classifier/type_fusion_interface.h"
 #include "modules/perception/lidar/lib/classifier/fused_classifier/util.h"
 

@@ -16,6 +16,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
 
 int main(int argc, char **argv) {

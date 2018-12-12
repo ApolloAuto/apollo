@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <limits>
 #include <vector>
+
 #include "modules/perception/base/polynomial.h"
 
 namespace apollo {

@@ -14,7 +14,9 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/calibrator/common/histogram_estimator.h"
+
 #include <fstream>
+
 #include "modules/perception/common/i_lib/core/i_basic.h"
 
 namespace apollo {

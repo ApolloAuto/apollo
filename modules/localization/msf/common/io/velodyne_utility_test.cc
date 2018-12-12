@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/common/io/velodyne_utility.h"
+
 #include <gtest/gtest.h>
 
 namespace apollo {

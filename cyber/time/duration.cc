@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "cyber/time/duration.h"
+
 #include <chrono>
 #include <iomanip>
 #include <iostream>

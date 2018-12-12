@@ -14,6 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "modules/canbus/vehicle/gem/gem_controller.h"
+
 #include <cmath>
 
 #include "modules/common/proto/vehicle_signal.pb.h"

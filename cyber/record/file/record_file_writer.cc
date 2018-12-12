@@ -17,6 +17,7 @@
 #include "cyber/record/file/record_file_writer.h"
 
 #include <fcntl.h>
+
 #include "cyber/common/file.h"
 #include "cyber/time/time.h"
 

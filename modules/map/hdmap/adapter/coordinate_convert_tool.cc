@@ -13,7 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"
+
 #include <math.h>
+
 #include "glog/logging.h"
 
 namespace apollo {

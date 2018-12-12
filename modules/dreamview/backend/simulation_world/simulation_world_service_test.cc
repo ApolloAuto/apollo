@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
 #include <iostream>
+
 #include "gtest/gtest.h"
 
 #include "modules/common/adapters/adapter_gflags.h"

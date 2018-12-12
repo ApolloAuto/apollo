@@ -61,6 +61,7 @@ license and copyright terms herein.
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/base/syncedmem.h"
+
 #include <string.h>
 
 namespace apollo {

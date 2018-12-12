@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_struct.h"
+
 #include <algorithm>
 
 namespace apollo {

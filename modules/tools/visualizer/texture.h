@@ -19,6 +19,7 @@
 #include <QImage>
 #include <QOpenGLBuffer>
 #include <memory>
+
 #include "modules/drivers/proto/sensor_image.pb.h"
 
 class Texture {

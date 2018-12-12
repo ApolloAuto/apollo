@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/common/math/search.h"
+
 #include <cmath>
 
 namespace apollo {

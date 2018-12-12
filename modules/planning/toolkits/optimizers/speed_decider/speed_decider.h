@@ -26,6 +26,7 @@
 #include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/toolkits/task.h"
+
 namespace apollo {
 namespace planning {
 

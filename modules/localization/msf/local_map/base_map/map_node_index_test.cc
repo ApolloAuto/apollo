@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <gtest/gtest.h>
+
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 
 namespace apollo {

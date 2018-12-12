@@ -14,7 +14,9 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/app/debug_info.h"
+
 #include <iomanip>
+
 #include "cyber/common/log.h"
 
 namespace apollo {

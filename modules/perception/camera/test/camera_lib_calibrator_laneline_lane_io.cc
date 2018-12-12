@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_io.h"
+
 #include <iostream>
 
 namespace apollo {

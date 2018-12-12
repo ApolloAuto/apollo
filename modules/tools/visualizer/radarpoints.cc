@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "radarpoints.h"
+
 #include <iostream>
 
 RadarPoints::RadarPoints(std::shared_ptr<QOpenGLShaderProgram> shaderProgram)

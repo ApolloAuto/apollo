@@ -16,6 +16,7 @@
 #pragma once
 
 #include <map>
+
 #include "modules/perception/base/object.h"
 
 namespace apollo {

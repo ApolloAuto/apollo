@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "cyber/common/log.h"
 
 #include "modules/perception/camera/test/camera_lib_calibrator_laneline_app_util.h"

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vector>
+
 #include "modules/localization/msf/local_map/base_map/base_map.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 

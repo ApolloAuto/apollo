@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <set>
+
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_timer.h"

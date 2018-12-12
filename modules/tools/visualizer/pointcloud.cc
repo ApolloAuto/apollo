@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/pointcloud.h"
+
 #include <cassert>
 #include <fstream>
 #include <iostream>

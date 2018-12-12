@@ -15,6 +15,7 @@
 *****************************************************************************/
 #include <opencv2/opencv.hpp>
 #include <gtest/gtest.h>
+
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 
 namespace apollo {

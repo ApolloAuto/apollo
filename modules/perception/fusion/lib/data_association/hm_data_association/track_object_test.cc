@@ -24,6 +24,7 @@
 #include "modules/perception/fusion/base/sensor_frame.h"
 #include "modules/perception/fusion/base/sensor_object.h"
 #include "modules/perception/fusion/base/track.h"
+
 #define private public
 
 namespace apollo {
