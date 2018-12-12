@@ -12,7 +12,7 @@ side_pass_config: {
   block_obstacle_min_speed: 0.1
   enable_obstacle_blocked_check: true
   max_backup_stage_cycle_num: 30
-  min_l_nudge_buffer: 0.25
+  min_l_nudge_buffer: 0.3
   min_front_obstacle_distance: 1.0
   max_front_obstacle_distance: 15.0
 }
