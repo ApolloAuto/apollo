@@ -98,7 +98,7 @@ void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
   }
   const Feature& feature = obstacle->latest_feature();
   if (!feature.has_position() || !feature.position().has_x() ||
-      !feature.position().has_y() || !feature.has_velocity()) {
+      !feature.position().has_y() || !feature.has_velocity_heading()) {
     AERROR << "Missing position or velocity.";
     return;
   }
@@ -123,7 +123,8 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
   }
   const Feature& feature = obstacle->latest_feature();
   if (!feature.has_position() || !feature.position().has_x() ||
-      !feature.position().has_y() || !feature.has_velocity()) {
+      !feature.position().has_y() || !feature.has_velocity() ||
+      !feature.velocity().has_x() || !feature.velocity().has_y()) {
     AERROR << "Missing position or velocity.";
     return;
   }
@@ -172,7 +173,7 @@ void RegionalPredictor::DrawStillTrajectory(
 void RegionalPredictor::DrawMovingTrajectory(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
     const Eigen::Vector2d& acceleration,
-    const apollo::common::math::KalmanFilter<double, 2, 2, 4>& kf,
+    const common::math::KalmanFilter<double, 2, 2, 4>& kf,
     const double total_time, std::vector<TrajectoryPoint>* left_points,
     std::vector<TrajectoryPoint>* right_points) {
   double delta_ts = FLAGS_prediction_trajectory_time_resolution;
@@ -180,7 +181,6 @@ void RegionalPredictor::DrawMovingTrajectory(
   CompressVector2d(FLAGS_pedestrian_max_speed, &vel);
   Eigen::Vector2d acc = acceleration;
   CompressVector2d(FLAGS_pedestrian_max_acc, &acc);
-  double speed = std::hypot(vel[0], vel[1]);
 
   // candidate point sequences
   std::vector<TrajectoryPoint> middle_points;
@@ -189,7 +189,7 @@ void RegionalPredictor::DrawMovingTrajectory(
   TrajectoryPoint starting_point;
   starting_point.mutable_path_point()->set_x(0.0);
   starting_point.mutable_path_point()->set_y(0.0);
-  starting_point.set_v(speed);
+  starting_point.set_v(vel.norm());
 
   Eigen::Vector2d translated_vec(0.0, 0.0);
   GetTrajectoryCandidatePoints(translated_vec, vel, acc, kf, total_time,
@@ -203,12 +203,12 @@ void RegionalPredictor::DrawMovingTrajectory(
   UpdateTrajectoryPoints(starting_point, vel, delta_ts, middle_points,
                          boundary_points, left_points, right_points);
   for (size_t i = 0; i < left_points->size(); ++i) {
-    apollo::prediction::predictor_util::TranslatePoint(
-        position[0], position[1], &(left_points->operator[](i)));
+    predictor_util::TranslatePoint(
+        position[0], position[1], &((*left_points)[i]));
   }
   for (size_t i = 0; i < right_points->size(); ++i) {
-    apollo::prediction::predictor_util::TranslatePoint(
-        position[0], position[1], &(right_points->operator[](i)));
+    predictor_util::TranslatePoint(
+        position[0], position[1], &((*right_points)[i]));
   }
 }
 
