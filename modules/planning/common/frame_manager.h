@@ -20,6 +20,7 @@
 #include <list>
 #include <memory>
 #include <unordered_map>
+
 #include "modules/planning/common/frame.h"
 
 namespace apollo {

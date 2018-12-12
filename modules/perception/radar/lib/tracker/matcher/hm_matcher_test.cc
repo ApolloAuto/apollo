@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include <gtest/gtest.h>
+
 #include "cyber/common/log.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track.h"

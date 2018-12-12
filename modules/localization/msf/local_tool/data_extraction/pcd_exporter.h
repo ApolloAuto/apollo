@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+
 #include "modules/drivers/proto/pointcloud.pb.h"
 
 namespace apollo {

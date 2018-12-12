@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
+
 #include "modules/perception/base/impending_collision_edge.h"
 
 namespace apollo {

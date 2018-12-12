@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "cyber/base/atomic_hash_map.h"
+
 #include <string>
 #include <thread>
+
 #include "gtest/gtest.h"
 
 namespace apollo {

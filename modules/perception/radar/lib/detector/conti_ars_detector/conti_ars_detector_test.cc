@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include <gtest/gtest.h>
+
 #include "modules/perception/radar/lib/detector/conti_ars_detector/conti_ars_detector.h"
 
 namespace apollo {

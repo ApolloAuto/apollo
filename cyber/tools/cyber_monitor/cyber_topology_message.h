@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+
 #include "./renderable_message.h"
 
 namespace apollo {

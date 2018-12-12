@@ -15,6 +15,7 @@
 *****************************************************************************/
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 
 DEFINE_int32(height, 1080, "image height");

@@ -16,6 +16,7 @@
 #include "modules/common/kv_db/kv_db.h"
 
 #include <sqlite3.h>
+
 #include "gflags/gflags.h"
 
 #include "cyber/common/log.h"

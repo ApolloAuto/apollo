@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
+
 #include <stdlib.h>
 #include <algorithm>
 #include <fstream>
+
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/geometry/convex_hull_2d.h"
 #include "modules/perception/lib/config_manager/config_manager.h"

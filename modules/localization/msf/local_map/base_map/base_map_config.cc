@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
+
 #include <boost/foreach.hpp>
 
 namespace apollo {

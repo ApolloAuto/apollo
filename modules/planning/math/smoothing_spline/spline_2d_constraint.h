@@ -21,6 +21,7 @@
 #pragma once
 
 #include <vector>
+
 #include "Eigen/Core"
 
 #include "modules/common/math/vec2d.h"

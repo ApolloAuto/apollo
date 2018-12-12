@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/fixedaspectratiowidget.h"
+
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QMouseEvent>
@@ -24,6 +25,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <iostream>
+
 #include "modules/tools/visualizer/texture.h"
 
 FixedAspectRatioWidget::FixedAspectRatioWidget(QWidget* parent, int index)

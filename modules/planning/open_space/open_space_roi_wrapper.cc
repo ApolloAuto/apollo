@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <vector>
+
 #include "Eigen/Dense"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"

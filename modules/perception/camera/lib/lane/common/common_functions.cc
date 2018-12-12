@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
+
 #include <algorithm>
 
 namespace apollo {

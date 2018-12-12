@@ -19,9 +19,11 @@
  * @brief define v2x proxy module and onboard unit interface grpc impl class
  */
 #include "modules/v2x/v2x_proxy/obu_interface/obu_interface_grpc_impl.h"
+
 #include <memory>
 #include <string>
 #include <utility>
+
 #include "modules/v2x/common/v2x_proxy_gflags.h"
 
 namespace apollo {

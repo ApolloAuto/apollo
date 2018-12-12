@@ -22,6 +22,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+
 #include "modules/perception/base/image.h"
 #include "modules/perception/base/blob.h"
 

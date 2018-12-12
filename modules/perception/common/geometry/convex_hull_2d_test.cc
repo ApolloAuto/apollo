@@ -18,6 +18,7 @@
 #include <cfloat>
 #include <limits>
 #include <memory>
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/point.h"

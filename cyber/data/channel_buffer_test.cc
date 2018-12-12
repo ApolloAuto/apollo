@@ -16,6 +16,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "gtest/gtest.h"
 
 #include "cyber/common/util.h"

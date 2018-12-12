@@ -16,6 +16,7 @@
 #pragma once
 
 #include <memory>
+
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image.h"
 #include "modules/perception/base/impending_collision_edge.h"

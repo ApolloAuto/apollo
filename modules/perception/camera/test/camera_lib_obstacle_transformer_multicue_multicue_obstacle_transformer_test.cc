@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <string>
+
 #include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"  // NOLINT

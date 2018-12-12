@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 #include <iostream>
+
 #include "cyber/common/log.h"
 #include "modules/perception/fusion/common/information_filter.h"
 

@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+
 #include "modules/perception/lidar/lib/tracker/common/mlf_track_data.h"
 
 namespace apollo {

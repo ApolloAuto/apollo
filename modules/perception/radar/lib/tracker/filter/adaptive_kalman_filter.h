@@ -16,6 +16,7 @@
 #pragma once
 
 #include <vector>
+
 #include "modules/perception/radar/lib/interface/base_filter.h"
 
 namespace apollo {

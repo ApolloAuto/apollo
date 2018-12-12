@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
+
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
 DECLARE_string(work_root);

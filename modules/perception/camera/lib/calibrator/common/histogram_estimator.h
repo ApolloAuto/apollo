@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <string>
 #include <cstring>
+
 #include "cyber/common/log.h"
 
 namespace apollo {

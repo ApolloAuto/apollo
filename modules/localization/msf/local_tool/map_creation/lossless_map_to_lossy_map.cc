@@ -16,6 +16,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
+
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"

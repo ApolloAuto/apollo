@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 #include <sstream>
+
 #include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/common/io/io_util.h"

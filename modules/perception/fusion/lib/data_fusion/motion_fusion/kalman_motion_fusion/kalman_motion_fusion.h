@@ -18,6 +18,7 @@
 #include <deque>
 #include <string>
 #include <vector>
+
 #include "modules/perception/fusion/common/kalman_filter.h"
 #include "modules/perception/fusion/lib/interface/base_motion_fusion.h"
 

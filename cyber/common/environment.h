@@ -19,6 +19,7 @@
 
 #include <assert.h>
 #include <string>
+
 #include "cyber/common/log.h"
 
 namespace apollo {

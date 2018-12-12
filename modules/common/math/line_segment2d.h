@@ -22,6 +22,7 @@
 #pragma once
 
 #include <string>
+
 #include "modules/common/math/vec2d.h"
 
 /**

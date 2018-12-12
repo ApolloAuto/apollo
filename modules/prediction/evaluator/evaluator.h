@@ -26,6 +26,7 @@
 
 #include "google/protobuf/message.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
+
 /**
  * @namespace apollo::prediction
  * @brief apollo::prediction

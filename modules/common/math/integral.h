@@ -25,6 +25,7 @@
 #include <functional>
 #include <utility>
 #include <vector>
+
 /**
  * @namespace apollo::common::math
  * @brief apollo::common::math

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cublas_v2.h>
+
 namespace apollo {
 namespace perception {
 namespace inference {

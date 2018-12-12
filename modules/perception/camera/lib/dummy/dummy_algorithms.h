@@ -18,6 +18,7 @@
 #include <string>
 #include <utility>
 #include <map>
+
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 #include "modules/perception/camera/lib/interface/base_calibrator.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
@@ -65,13 +66,11 @@ class DummyLaneDetector : public BaseLaneDetector {
 
   virtual ~DummyLaneDetector() {}
 
-  bool Init(const LaneDetectorInitOptions &options
-  = LaneDetectorInitOptions()) override {
+  bool Init(const LaneDetectorInitOptions &options = {}) override {
     return true;
   }
 
-  bool Detect(const LaneDetectorOptions &options,
-              CameraFrame *frame) override {
+  bool Detect(const LaneDetectorOptions &options, CameraFrame *frame) override {
     return true;
   }
 

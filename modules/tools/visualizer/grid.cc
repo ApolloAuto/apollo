@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/grid.h"
+
 #include <iostream>
 
 Grid::Grid(int cellCountBySide)

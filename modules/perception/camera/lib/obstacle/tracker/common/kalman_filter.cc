@@ -14,7 +14,9 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/common/kalman_filter.h"
+
 #include <algorithm>
+
 #include "Eigen/LU"
 #include "cyber/common/log.h"
 

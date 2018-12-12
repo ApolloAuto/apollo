@@ -14,7 +14,9 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/detector/detection/cropbox.h"
+
 #include <algorithm>
+
 #include "modules/perception/camera/common/util.h"
 
 namespace apollo {

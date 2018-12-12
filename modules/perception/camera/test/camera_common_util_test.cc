@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/test/camera_common_io_util.h"

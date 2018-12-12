@@ -23,6 +23,7 @@
 #pragma once
 
 #include <vector>
+
 #include "Eigen/Core"
 
 #include "modules/planning/math/smoothing_spline/spline_1d.h"

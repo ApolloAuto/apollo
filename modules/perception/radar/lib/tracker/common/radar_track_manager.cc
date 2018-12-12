@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
+
 #include <memory>
 #include <utility>
 

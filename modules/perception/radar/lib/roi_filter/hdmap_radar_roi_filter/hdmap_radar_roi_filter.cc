@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include <vector>
+
 #include "modules/perception/radar/lib/roi_filter/hdmap_radar_roi_filter/hdmap_radar_roi_filter.h"
 
 namespace apollo {

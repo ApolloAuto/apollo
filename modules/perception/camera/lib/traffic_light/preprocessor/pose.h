@@ -18,6 +18,7 @@
 #include <eigen3/Eigen/Core>
 #include <map>
 #include <string>
+
 #include "modules/perception/base/image_8u.h"
 
 namespace apollo {

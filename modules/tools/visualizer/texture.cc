@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/tools/visualizer/texture.h"
+
 #include <iostream>
 
 Texture::Texture()

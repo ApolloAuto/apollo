@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/common/util/lru_cache.h"
+
 #include <vector>
+
 #include "gtest/gtest.h"
 
 namespace apollo {

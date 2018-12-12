@@ -18,8 +18,10 @@
 #define CYBER_PARAMETER_PARAMETER_H_
 
 #include <string>
+
 #include "cyber/common/log.h"
 #include "cyber/proto/parameter.pb.h"
+
 /**
  * @namespace cyber.parameter
  */
