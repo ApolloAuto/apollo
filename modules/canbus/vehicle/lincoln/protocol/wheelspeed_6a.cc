@@ -59,7 +59,8 @@ void Wheelspeed6a::Parse(const std::uint8_t *bytes, int32_t length,
                          const struct timeval &timestamp,
                          ChassisDetail *chassis_detail) const {
   chassis_detail->mutable_vehicle_spd()->set_timestamp_sec(
-      timestamp.tv_sec + timestamp.tv_usec / 1000000.0);
+      static_cast<double>(timestamp.tv_sec) +
+      static_cast<double>(timestamp.tv_usec) / 1000000.0);
   Parse(bytes, length, chassis_detail);
 }
 

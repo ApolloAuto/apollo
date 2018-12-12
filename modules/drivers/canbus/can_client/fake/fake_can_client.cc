@@ -61,9 +61,9 @@ ErrorCode FakeCanClient::Receive(std::vector<CanFrame> *const frames,
   const int MOCK_LEN = 8;
   for (size_t i = 0; i < frames->size(); ++i) {
     for (int j = 0; j < MOCK_LEN; ++j) {
-      (*frames)[i].data[j] = j;
+      (*frames)[i].data[j] = static_cast<uint8_t>(j);
     }
-    (*frames)[i].id = i;
+    (*frames)[i].id = static_cast<uint32_t>(i);
     (*frames)[i].len = MOCK_LEN;
     ADEBUG << (*frames)[i].CanFrameString() << "frame_num[" << i << "]";
   }
