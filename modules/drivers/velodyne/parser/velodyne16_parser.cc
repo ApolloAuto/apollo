@@ -70,7 +70,7 @@ void Velodyne16Parser::Unpack(const VelodynePacket& pkt,
   float azimuth_diff = 0.0f;
   float last_azimuth_diff = 0.0f;
   float azimuth_corrected_f = 0.0f;
-  int azimuth_corrected = 0.0;
+  int azimuth_corrected = 0;
 
   // const RawPacket* raw = (const RawPacket*)&pkt.data[0];
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();

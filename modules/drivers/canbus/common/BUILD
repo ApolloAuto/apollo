@@ -12,6 +12,7 @@ cc_library(
         "canbus_consts.h",
     ],
     deps = [
+        "//modules/common/util:string_util",
     ],
 )
 
