@@ -33,10 +33,11 @@ namespace {
 static constexpr auto MIN_SLEEP_INTERVAL = std::chrono::milliseconds(1);
 }
 
-GRP_WQ_MUTEX ClassicContext::mtx_wq_;
-GRP_WQ_CV ClassicContext::cv_wq_;
-RQ_LOCK_GROUP ClassicContext::rq_locks_;
-CR_GROUP ClassicContext::cr_group_;
+std::mutex ClassicContext::mtx_wq_;
+std::condition_variable ClassicContext::cv_wq_;
+std::array<AtomicRWLock, MAX_PRIO> ClassicContext::rq_locks_;
+std::array<std::vector<std::shared_ptr<CRoutine>>, MAX_PRIO>
+    ClassicContext::rq_;
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   if (unlikely(stop_)) {
@@ -44,8 +45,8 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
   }
 
   for (int i = MAX_PRIO - 1; i >= 0; --i) {
-    ReadLockGuard<AtomicRWLock> lk(rq_locks_[group_name_].at(i));
-    for (auto& cr : cr_group_[group_name_].at(i)) {
+    ReadLockGuard<AtomicRWLock> lk(rq_locks_[i]);
+    for (auto& cr : rq_[i]) {
       if (!cr->Acquire()) {
         continue;
       }
@@ -71,33 +72,31 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 }
 
 void ClassicContext::Wait() {
-  std::unique_lock<std::mutex> lk(mtx_wq_[group_name_]);
+  std::unique_lock<std::mutex> lk(mtx_wq_);
   if (stop_) {
     return;
   }
 
   if (unlikely(need_sleep_)) {
     auto duration = wake_time_ - std::chrono::steady_clock::now();
-    cv_wq_[group_name_].wait_for(lk, duration);
+    cv_wq_.wait_for(lk, duration);
     need_sleep_ = false;
   } else {
-    cv_wq_[group_name_].wait(lk);
+    cv_wq_.wait(lk);
   }
 }
 
 void ClassicContext::Shutdown() {
   {
-    std::lock_guard<std::mutex> lg(mtx_wq_[group_name_]);
+    std::lock_guard<std::mutex> lg(mtx_wq_);
     if (!stop_) {
       stop_ = true;
     }
   }
-  cv_wq_[group_name_].notify_all();
+  cv_wq_.notify_all();
 }
 
-void ClassicContext::Notify(const std::string& group_name) {
-  cv_wq_[group_name].notify_one();
-}
+void ClassicContext::Notify() { cv_wq_.notify_one(); }
 
 }  // namespace scheduler
 }  // namespace cyber

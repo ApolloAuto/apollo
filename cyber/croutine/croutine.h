@@ -88,14 +88,6 @@ class CRoutine {
 
   std::chrono::steady_clock::time_point wake_time() const;
 
-  void set_group_name(const std::string& group_name) {
-    group_name_ = group_name;
-  }
-
-  const std::string& group_name() {
-    return group_name_;
-  }
-
  private:
   CRoutine(CRoutine &) = delete;
   CRoutine &operator=(CRoutine &) = delete;
@@ -117,8 +109,6 @@ class CRoutine {
   int processor_id_ = -1;
   uint32_t priority_ = 0;
   uint64_t id_ = 0;
-
-  std::string group_name_;
 
   static thread_local CRoutine *current_routine_;
   static thread_local char *main_stack_;

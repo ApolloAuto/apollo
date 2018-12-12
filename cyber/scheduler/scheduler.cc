@@ -111,10 +111,6 @@ void Scheduler::Shutdown() {
     return;
   }
 
-  for (auto& processor : processors_) {
-    processor->Stop();
-  }
-
   for (auto& ctx : pctxs_) {
     ctx->Shutdown();
   }
@@ -129,6 +125,10 @@ void Scheduler::Shutdown() {
 
   for (auto& id : cr_list) {
     RemoveCRoutine(id);
+  }
+
+  for (auto& processor : processors_) {
+    processor->Stop();
   }
 
   processors_.clear();
