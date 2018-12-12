@@ -7,8 +7,8 @@ layer {
     shape {
       dim: 1
       dim: 4
-      dim: 576
-      dim: 576
+      dim: 864
+      dim: 864
     }
   }
 }
