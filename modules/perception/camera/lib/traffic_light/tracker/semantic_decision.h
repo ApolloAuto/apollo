@@ -15,8 +15,8 @@
 *****************************************************************************/
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic.pb.h"

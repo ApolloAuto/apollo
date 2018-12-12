@@ -21,8 +21,8 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 
-#include "modules/localization/common/localization_gflags.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
 namespace localization {

@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 
 #include "modules/perception/base/distortion_model.h"
-#include "modules/perception/common/io/io_util.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+#include "modules/perception/common/io/io_util.h"
 
 namespace apollo {
 namespace perception {

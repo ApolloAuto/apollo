@@ -32,12 +32,12 @@ limitations under the License.
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
 #include "modules/map/proto/map_parking_space.pb.h"
+#include "modules/map/proto/map_pnc_junction.pb.h"
 #include "modules/map/proto/map_road.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_pnc_junction.pb.h"
 
 /**
  * @namespace apollo::hdmap

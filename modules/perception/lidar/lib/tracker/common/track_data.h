@@ -15,10 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <map>
-#include <utility>
-#include <memory>
 #include <deque>
+#include <map>
+#include <memory>
+#include <utility>
 
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 

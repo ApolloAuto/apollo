@@ -16,8 +16,8 @@
 
 #include "modules/prediction/network/cruise_model/cruise_model.h"
 #include "cyber/common/log.h"
-#include "modules/prediction/network/net_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/network/net_util.h"
 
 namespace apollo {
 namespace prediction {

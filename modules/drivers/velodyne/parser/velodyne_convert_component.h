@@ -21,8 +21,8 @@
 #include <string>
 #include <thread>
 
-#include "cyber/cyber.h"
 #include "cyber/base/concurrent_object_pool.h"
+#include "cyber/cyber.h"
 
 #include "modules/drivers/velodyne/parser/convert.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"

@@ -15,15 +15,15 @@
 *****************************************************************************/
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <string>
 #include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "cyber/common/log.h"
-#include "modules/perception/inference/utils/util.h"
-#include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/camera/common/camera_frame.h"
+#include "modules/perception/inference/utils/cuda_util.h"
+#include "modules/perception/inference/utils/util.h"
 
 namespace apollo {
 namespace perception {

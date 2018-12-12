@@ -17,12 +17,12 @@
 
 #include <gflags/gflags.h>
 
+#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/lidar/common/lidar_log.h"
-#include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 
 namespace apollo {

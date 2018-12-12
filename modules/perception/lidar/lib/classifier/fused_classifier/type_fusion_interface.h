@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/lib/registerer/registerer.h"

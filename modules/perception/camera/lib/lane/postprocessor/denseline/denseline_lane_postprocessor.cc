@@ -15,8 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
 
-#include <fstream>
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 
 #include "cyber/common/log.h"

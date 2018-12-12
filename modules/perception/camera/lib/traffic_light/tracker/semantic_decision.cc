@@ -15,10 +15,10 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
 
-#include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <sstream>
+#include <boost/function.hpp>
 #include <map>
+#include <sstream>
 
 #include "modules/common/util/file.h"
 

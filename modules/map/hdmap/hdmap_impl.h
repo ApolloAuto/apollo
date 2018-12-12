@@ -18,8 +18,8 @@ limitations under the License.
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/common/math/aabox2d.h"
 #include "modules/common/math/aaboxkdtree2d.h"
@@ -35,11 +35,11 @@ limitations under the License.
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
 #include "modules/map/proto/map_parking_space.pb.h"
+#include "modules/map/proto/map_pnc_junction.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_pnc_junction.pb.h"
 
 /**
  * @namespace apollo::hdmap

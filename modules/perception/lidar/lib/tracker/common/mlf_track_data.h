@@ -17,10 +17,10 @@
 
 #include <Eigen/Dense>
 #include <map>
+#include <memory>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
-#include <memory>
 
 #include "modules/perception/lidar/lib/tracker/common/track_data.h"
 

@@ -19,8 +19,8 @@
 #include <string>
 
 #include "cyber/common/log.h"
-#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lidar/common/feature_descriptor.h"
 

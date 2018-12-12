@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
 #include <algorithm>
 #include <string>
+#include <vector>
 
 #include "modules/perception/lidar/lib/tracker/measurement/measurement_collection.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_motion_measurement.h"

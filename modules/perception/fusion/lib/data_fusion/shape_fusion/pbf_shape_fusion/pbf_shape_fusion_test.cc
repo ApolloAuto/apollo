@@ -20,9 +20,9 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/perception/base/sensor_meta.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/fusion/base/sensor_frame.h"
-#include "modules/perception/base/sensor_meta.h"
 
 namespace apollo {
 namespace perception {

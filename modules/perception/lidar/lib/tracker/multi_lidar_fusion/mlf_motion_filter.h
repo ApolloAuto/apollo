@@ -15,12 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_base_filter.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_motion_refiner.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_motion_measurement.h"
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_motion_refiner.h"
 
 namespace apollo {
 namespace perception {

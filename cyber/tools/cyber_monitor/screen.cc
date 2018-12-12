@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "screen.h"
-#include "general_channel_message.h"
 #include "cyber_topology_message.h"
+#include "general_channel_message.h"
 #include "renderable_message.h"
 
 #include <ncurses.h>

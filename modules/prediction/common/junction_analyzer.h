@@ -16,14 +16,14 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/proto/feature.pb.h"
 
 namespace apollo {
 namespace prediction {

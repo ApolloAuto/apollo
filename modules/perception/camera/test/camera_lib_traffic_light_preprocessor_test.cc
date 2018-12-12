@@ -15,10 +15,10 @@
 *****************************************************************************/
 #include <gflags/gflags.h>
 
-#include "gtest/gtest.h"
-#include "modules/perception/camera/lib/traffic_light/preprocessor/tl_preprocessor.h"
-#include "modules/perception/base/point.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
+#include "modules/perception/base/point.h"
+#include "modules/perception/camera/lib/traffic_light/preprocessor/tl_preprocessor.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {

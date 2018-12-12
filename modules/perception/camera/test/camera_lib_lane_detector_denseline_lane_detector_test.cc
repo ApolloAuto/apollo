@@ -20,8 +20,8 @@
 #include <iostream>
 
 #include "cyber/common/log.h"
-#include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
 #include "modules/perception/base/distortion_model.h"
+#include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
 #include "modules/perception/common/io/io_util.h"
 
 namespace apollo {

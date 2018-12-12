@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "cyber/class_loader/utility/class_factory.h"
+
 #include "cyber/class_loader/class_loader.h"
 
 namespace apollo {

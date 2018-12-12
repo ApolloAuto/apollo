@@ -15,14 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <utility>
-#include <string>
 #include <deque>
 #include <list>
+#include <map>
 #include <memory>
 #include <queue>
+#include <string>
+#include <utility>
 #include <vector>
-#include <map>
 
 #include "modules/perception/base/concurrent_object_pool.h"
 #include "modules/perception/base/sensor_meta.h"

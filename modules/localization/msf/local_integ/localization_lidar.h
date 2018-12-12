@@ -20,14 +20,14 @@
 #include <vector>
 
 #include "cyber/common/log.h"
+#include "include/lidar_locator.h"
+#include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_node_2d.h"
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_pool_2d.h"
-#include "modules/localization/msf/local_integ/localization_params.h"
-#include "include/lidar_locator.h"
 
 namespace apollo {
 namespace localization {

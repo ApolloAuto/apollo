@@ -56,13 +56,13 @@
 
 #include "Eigen/Core"
 
-#include "cyber/common/macros.h"
 #include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 
 #include "modules/drivers/proto/conti_radar.pb.h"
-#include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/base/frame.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/radar/common/types.h"
 
 namespace apollo {

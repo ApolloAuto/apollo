@@ -17,13 +17,13 @@
 
 #include <math.h>
 #include <Eigen/Dense>
-#include <string>
-#include <memory>
 #include <map>
+#include <memory>
+#include <string>
 #include <vector>
 
-#include "modules/perception/camera/lib/interface/base_calibrator.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
+#include "modules/perception/camera/lib/interface/base_calibrator.h"
 
 namespace apollo {
 namespace perception {

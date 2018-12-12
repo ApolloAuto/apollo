@@ -19,8 +19,8 @@
 #include "./screen.h"
 
 #include "cyber/message/message_traits.h"
-#include "cyber/proto/topology_change.pb.h"
 #include "cyber/proto/role_attributes.pb.h"
+#include "cyber/proto/topology_change.pb.h"
 
 #include <ncurses.h>
 #include <iomanip>

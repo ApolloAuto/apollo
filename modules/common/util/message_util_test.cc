@@ -18,8 +18,8 @@
 
 #include <vector>
 
-#include "modules/common/util/testdata/simple.pb.h"
 #include "gtest/gtest.h"
+#include "modules/common/util/testdata/simple.pb.h"
 
 namespace apollo {
 namespace common {

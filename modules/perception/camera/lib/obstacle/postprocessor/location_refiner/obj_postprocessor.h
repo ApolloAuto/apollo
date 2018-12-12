@@ -19,8 +19,8 @@
 
 #ifdef LOCAL_REPO
 // local repo header path
-#include "modules/perception/lib/common/twod_threed_util.h"
 #include "modules/perception/common/noncopyable.h"
+#include "modules/perception/lib/common/twod_threed_util.h"
 #else
 // perception-camera header path
 #include "modules/perception/camera/common/twod_threed_util.h"

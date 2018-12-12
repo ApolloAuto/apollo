@@ -18,11 +18,11 @@
 #include <fstream>
 #include <string>
 
-#include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/base/distortion_model.h"
-#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"  // NOLINT
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"  // NOLINT
 #include "modules/perception/common/io/io_util.h"
+#include "modules/perception/inference/utils/cuda_util.h"
 
 namespace apollo {
 namespace perception {

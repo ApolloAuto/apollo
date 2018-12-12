@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {

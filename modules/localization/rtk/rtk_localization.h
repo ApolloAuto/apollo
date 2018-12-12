@@ -17,10 +17,10 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "gtest/gtest_prod.h"
 

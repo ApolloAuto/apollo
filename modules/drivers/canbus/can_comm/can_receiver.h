@@ -21,14 +21,14 @@
 
 #pragma once
 
+#include <atomic>
 #include <cmath>
+#include <future>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <thread>
 #include <vector>
-#include <future>
-#include <atomic>
 
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"

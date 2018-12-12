@@ -22,8 +22,8 @@
 
 #include "cyber/common/types.h"
 #include "cyber/node/node_channel_impl.h"
-#include "cyber/service/service_base.h"
 #include "cyber/scheduler/scheduler.h"
+#include "cyber/service/service_base.h"
 
 namespace apollo {
 namespace cyber {

@@ -18,9 +18,9 @@
 
 #include <string>
 
+#include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"
-#include "modules/localization/proto/gps.pb.h"
 
 #include "cyber/common/log.h"
 

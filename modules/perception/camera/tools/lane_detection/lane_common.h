@@ -18,9 +18,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/camera/lib/lane/common/common_functions.h"
-#include "modules/perception/base/point.h"
 #include "modules/perception/base/lane_struct.h"
+#include "modules/perception/base/point.h"
+#include "modules/perception/camera/lib/lane/common/common_functions.h"
 
 DECLARE_string(list);
 DECLARE_string(file_title);

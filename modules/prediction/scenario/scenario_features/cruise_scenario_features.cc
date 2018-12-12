@@ -16,8 +16,8 @@
 
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 
-#include <queue>
 #include <memory>
+#include <queue>
 #include <utility>
 
 #include "modules/prediction/common/prediction_gflags.h"

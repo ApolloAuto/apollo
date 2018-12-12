@@ -15,13 +15,13 @@
  *****************************************************************************/
 #include "modules/perception/common/io/io_util.h"
 
+#include <Eigen/Geometry>
 #include <boost/filesystem.hpp>
 #include <fcntl.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/io/gzip_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
-#include <Eigen/Geometry>
 
 #include <algorithm>
 #include <fstream>

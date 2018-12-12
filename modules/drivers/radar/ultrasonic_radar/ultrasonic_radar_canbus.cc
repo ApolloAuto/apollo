@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/common/util/util.h"
+#include "modules/drivers/proto/ultrasonic_radar.pb.h"
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus.h"
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
-#include "modules/drivers/proto/ultrasonic_radar.pb.h"
-#include "modules/common/util/util.h"
 
 /**
  * @namespace apollo::drivers::ultrasonic_radar

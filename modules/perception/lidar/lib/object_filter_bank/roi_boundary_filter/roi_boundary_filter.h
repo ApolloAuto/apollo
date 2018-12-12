@@ -21,8 +21,8 @@
 #include "Eigen/Dense"
 #include "gtest/gtest_prod.h"
 
-#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
 
 namespace apollo {

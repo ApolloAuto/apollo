@@ -16,12 +16,12 @@
 
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 
-#include <queue>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <queue>
 
-#include "modules/prediction/common/road_graph.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/common/road_graph.h"
 
 namespace apollo {
 namespace prediction {

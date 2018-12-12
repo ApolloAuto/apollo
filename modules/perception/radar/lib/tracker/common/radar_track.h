@@ -15,14 +15,14 @@
 *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "Eigen/Core"
 
-#include "cyber/common/macros.h"
 #include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/object_pool_types.h"

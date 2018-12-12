@@ -20,9 +20,9 @@
 #include "gflags/gflags.h"
 #include "ros/ros.h"
 
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "cyber/common/log.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 
 DEFINE_string(navigation_dummy_file,

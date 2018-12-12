@@ -20,11 +20,11 @@
 #include <fstream>
 #include <sstream>
 
-#include "modules/perception/base/object_types.h"
 #include "modules/perception/base/distortion_model.h"
-#include "modules/perception/common/io/io_util.h"
+#include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_transformer.h"
+#include "modules/perception/common/io/io_util.h"
 
 DEFINE_string(test_list, "full_test_list.txt", "test image list");
 DEFINE_string(image_root, "", "root dir of images");

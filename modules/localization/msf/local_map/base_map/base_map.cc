@@ -18,8 +18,8 @@
 
 #include <vector>
 
-#include "cyber/task/task.h"
 #include "cyber/common/log.h"
+#include "cyber/task/task.h"
 #include "modules/localization/msf/common/util/system_utility.h"
 
 namespace apollo {

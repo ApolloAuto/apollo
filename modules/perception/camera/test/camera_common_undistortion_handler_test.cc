@@ -17,16 +17,16 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/opencv.hpp>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include "modules/perception/lib/utils/timer.h"
 #include "modules/perception/camera/common/undistortion_handler.h"
-#include "modules/perception/camera/test/camera_common_undistortion.h"
 #include "modules/perception/camera/test/camera_common_io_util.h"
+#include "modules/perception/camera/test/camera_common_undistortion.h"
+#include "modules/perception/lib/utils/timer.h"
 
 namespace apollo {
 namespace perception {

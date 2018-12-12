@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include <utility>
-#include <limits>
-#include <vector>
 #include <array>
+#include <limits>
+#include <utility>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"

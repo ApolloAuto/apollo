@@ -20,10 +20,10 @@
 #include "boost/format.hpp"
 
 #include "modules/common/util/file.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/proto/dst_existance_fusion_config.pb.h"
 
 namespace apollo {

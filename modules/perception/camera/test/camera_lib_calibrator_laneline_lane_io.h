@@ -17,14 +17,14 @@
 
 #include <assert.h>
 #include <Eigen/Eigen>
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
-#include "modules/perception/camera/test/camera_lib_calibrator_laneline_app_util.h"
 #include "modules/perception/camera/lib/calibrator/laneline/lane_based_calibrator.h"
+#include "modules/perception/camera/test/camera_lib_calibrator_laneline_app_util.h"
 
 namespace apollo {
 namespace perception {

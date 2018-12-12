@@ -15,12 +15,12 @@
 *****************************************************************************/
 #pragma once
 
-#include <vector>
 #include <memory>
 #include <utility>
+#include <vector>
 
-#include "modules/perception/base/traffic_light.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/base/traffic_light.h"
 #include "modules/perception/common/graph/hungarian_optimizer.h"
 
 namespace apollo {

@@ -15,20 +15,20 @@
 *****************************************************************************/
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <memory>
-#include <algorithm>
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
-#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/common/math_functions.h"
+#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/proto/yolo.pb.h"
 
 namespace apollo {

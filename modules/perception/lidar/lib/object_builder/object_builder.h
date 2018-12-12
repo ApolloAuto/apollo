@@ -16,9 +16,9 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/point.h"
