@@ -37,7 +37,7 @@ import sys
 
 import psutil
 
-MAP_COLLECTION_DAT_TOPICS = [
+MAP_COLLECTION_DATA_TOPICS = [
     '/apollo/monitor/system_status',
     '/apollo/sensor/gnss/best_pose',
     '/apollo/sensor/gnss/gnss_status',
