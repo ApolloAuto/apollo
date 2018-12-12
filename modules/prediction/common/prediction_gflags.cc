@@ -26,6 +26,8 @@ DEFINE_double(prediction_trajectory_time_resolution, 0.1,
 DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_trajectory_spatial_length, 20.0,
               "Minimal spatial length of predicted trajectory");
+DEFINE_bool(enable_trajectory_validation_check, false,
+            "If check the validity of prediction trajectory.");
 
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
@@ -169,8 +171,6 @@ DEFINE_bool(enable_lane_sequence_acc, false,
 DEFINE_bool(enable_trim_prediction_trajectory, true,
             "If trim the prediction trajectory to avoid crossing"
             "protected adc planning trajectory.");
-DEFINE_bool(enable_trajectory_validation_check, false,
-            "If check the validity of prediction trajectory.");
 DEFINE_double(adc_trajectory_search_length, 10.0,
               "How far to search junction along adc planning trajectory");
 DEFINE_double(virtual_lane_radius, 0.5, "Radius to search virtual lanes");

@@ -25,8 +25,8 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::PathPoint;
-using apollo::common::TrajectoryPoint;
+using common::PathPoint;
+using common::TrajectoryPoint;
 
 double ValidationChecker::ProbabilityByCentripetalAcceleration(
     const LaneSequence& lane_sequence, const double speed) {
@@ -47,22 +47,24 @@ double ValidationChecker::ProbabilityByCentripetalAcceleration(
 
 bool ValidationChecker::ValidCentripetalAcceleration(
     const std::vector<TrajectoryPoint>& trajectory_points) {
-  double max_centripetal_acc = 0.0;
   for (size_t i = 0; i + 1 < trajectory_points.size(); ++i) {
-    const auto& first_point = trajectory_points[i];
-    const auto& second_point = trajectory_points[i + 1];
-    double theta_diff = std::abs(common::math::NormalizeAngle(
-        second_point.path_point().theta() - first_point.path_point().theta()));
+    const auto& p0 = trajectory_points[i];
+    const auto& p1 = trajectory_points[i + 1];
     double time_diff =
-        std::abs(second_point.relative_time() - first_point.relative_time());
+        std::abs(p1.relative_time() - p0.relative_time());
     if (time_diff < FLAGS_double_precision) {
       continue;
     }
-    double v = (first_point.v() + second_point.v()) * 0.5;
-    double centripedal_acc = v * theta_diff / time_diff;
-    max_centripetal_acc = std::max(max_centripetal_acc, centripedal_acc);
+
+    double theta_diff = std::abs(common::math::NormalizeAngle(
+        p1.path_point().theta() - p0.path_point().theta()));
+    double v = (p0.v() + p1.v()) * 0.5;
+    double angular_a = v * theta_diff / time_diff;
+    if (angular_a > FLAGS_centripedal_acc_threshold) {
+      return false;
+    }
   }
-  return max_centripetal_acc < FLAGS_centripedal_acc_threshold;
+  return true;
 }
 
 bool ValidationChecker::ValidTrajectoryPoint(

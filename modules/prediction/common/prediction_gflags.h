@@ -22,6 +22,8 @@ DECLARE_double(prediction_trajectory_time_length);
 DECLARE_double(prediction_trajectory_time_resolution);
 DECLARE_double(double_precision);
 DECLARE_double(min_prediction_trajectory_spatial_length);
+DECLARE_bool(enable_trajectory_validation_check);
+
 
 // Map
 DECLARE_double(lane_search_radius);
@@ -109,7 +111,6 @@ DECLARE_double(lane_sequence_threshold_junction);
 DECLARE_double(lane_change_dist);
 DECLARE_bool(enable_lane_sequence_acc);
 DECLARE_bool(enable_trim_prediction_trajectory);
-DECLARE_bool(enable_trajectory_validation_check);
 DECLARE_double(adc_trajectory_search_length);
 DECLARE_double(virtual_lane_radius);
 DECLARE_double(default_lateral_approach_speed);
