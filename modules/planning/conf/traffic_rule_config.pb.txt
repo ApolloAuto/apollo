@@ -98,7 +98,7 @@ config: {
     min_pass_s_distance: 4.0
     max_stop_deacceleration_yellow_light: 3.0
     signal_expire_time_sec: 5.0
-    max_monitor_forward_distance: 150.0
+    max_monitor_forward_distance: 135.0
     righ_turn_creep {
       enabled: false
       min_boundary_t: 6.0
