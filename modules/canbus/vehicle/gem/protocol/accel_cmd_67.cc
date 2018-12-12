@@ -54,7 +54,7 @@ Accelcmd67* Accelcmd67::set_accel_cmd(double accel_cmd) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
 void Accelcmd67::set_p_accel_cmd(uint8_t* data, double accel_cmd) {
   accel_cmd = ProtocolData::BoundedValue(0.0, 1.0, accel_cmd);
-  int x = accel_cmd / 0.001000;
+  int x = static_cast<int>(accel_cmd / 0.001000);
   uint8_t t = 0;
 
   t = x & 0xFF;

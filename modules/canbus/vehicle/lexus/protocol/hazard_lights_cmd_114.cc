@@ -63,7 +63,7 @@ Hazardlightscmd114* Hazardlightscmd114::set_hazard_lights_cmd(
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
 void Hazardlightscmd114::set_p_hazard_lights_cmd(uint8_t* data,
                                                  bool hazard_lights_cmd) {
-  int x = hazard_lights_cmd;
+  uint8_t x = hazard_lights_cmd;
 
   Byte to_set(data + 1);
   to_set.set_value(x, 0, 1);
@@ -80,7 +80,7 @@ Hazardlightscmd114* Hazardlightscmd114::set_ignore_overrides(
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
 void Hazardlightscmd114::set_p_ignore_overrides(uint8_t* data,
                                                 bool ignore_overrides) {
-  int x = ignore_overrides;
+  uint8_t x = ignore_overrides;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 1, 1);
@@ -97,7 +97,7 @@ Hazardlightscmd114* Hazardlightscmd114::set_clear_override(
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
 void Hazardlightscmd114::set_p_clear_override(uint8_t* data,
                                               bool clear_override) {
-  int x = clear_override;
+  uint8_t x = clear_override;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 2, 1);
@@ -112,7 +112,7 @@ Hazardlightscmd114* Hazardlightscmd114::set_enable(bool enable) {
 // 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 0, 'type': 'bool',
 // 'order': 'motorola', 'physical_unit': ''}
 void Hazardlightscmd114::set_p_enable(uint8_t* data, bool enable) {
-  int x = enable;
+  uint8_t x = enable;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 1);
@@ -127,7 +127,7 @@ Hazardlightscmd114* Hazardlightscmd114::set_clear_faults(bool clear_faults) {
 // 'len': 1, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 3,
 // 'type': 'bool', 'order': 'motorola', 'physical_unit': ''}
 void Hazardlightscmd114::set_p_clear_faults(uint8_t* data, bool clear_faults) {
-  int x = clear_faults;
+  uint8_t x = clear_faults;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 3, 1);
