@@ -621,6 +621,10 @@
                     "stepSize": {
                       "type": "double",
                       "id": 5
+                    },
+                    "midValue": {
+                      "type": "double",
+                      "id": 6
                     }
                   }
                 }
@@ -4003,7 +4007,7 @@
                     "default": 0.2
                   }
                 },
-                "isNearDesitinationThreshold": {
+                "isNearDestinationThreshold": {
                   "type": "double",
                   "id": 8,
                   "options": {
