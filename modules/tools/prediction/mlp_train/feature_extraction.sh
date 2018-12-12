@@ -39,7 +39,7 @@ sudo mkdir -p ${TARGET_DIR}
 cyber_launch start /apollo/modules/prediction/launch/prediction.launch
 
 for b in $(find ${TARGET_DIR} -iname "*.bin"); do
-  if [-e "$b.junction.label"]; then
+  if [ -e "$b.junction.label" ]; then
      echo "skip existing $b.junction.label"
   else
      echo "Generating junction labels for $b"
@@ -57,7 +57,7 @@ for b in $(find ${TARGET_DIR} -iname "*.bin"); do
 done
 
 for b in $(find ${TARGET_DIR} -iname "*.bin"); do
-  if [-e "$b.cruise.label"]; then
+  if [ -e "$b.cruise.label" ]; then
     echo "skip existing $b.cruise.label"
   else
     echo "Generating cruise labels for $b"
