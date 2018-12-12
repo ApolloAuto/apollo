@@ -54,12 +54,10 @@ SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
 
 void SidePassPathDecider::InitSolver() {
   const TaskConfig &config = Decider::config_;
-  fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
   const int n = static_cast<int>(total_path_length_ / delta_s_);
   std::array<double, 3> l_init = {adc_frenet_frame_point_.l(),
                                   adc_frenet_frame_point_.dl(),
                                   adc_frenet_frame_point_.ddl()};
-
   std::array<double, 5> w = {
       config.side_pass_path_decider_config().l_weight(),
       config.side_pass_path_decider_config().dl_weight(),
@@ -67,6 +65,7 @@ void SidePassPathDecider::InitSolver() {
       config.side_pass_path_decider_config().dddl_weight(),
       config.side_pass_path_decider_config().guiding_line_weight(),
   };
+  fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
   CHECK(fem_qp_->Init(n, l_init, delta_s_, w,
                       config.side_pass_path_decider_config().max_dddl()));
 }
@@ -81,7 +80,6 @@ Status SidePassPathDecider::Process(
   CHECK_GT(std::fabs(delta_s_), 0.000001);
   total_path_length_ =
       Decider::config_.side_pass_path_decider_config().total_path_length();
-  InitSolver();
 
   nearest_obstacle_ =
       GetNearestObstacle(reference_line_info->AdcSlBoundary(),
@@ -101,8 +99,39 @@ Status SidePassPathDecider::Process(
   return Status::OK();
 }
 
-bool SidePassPathDecider::BuildSidePathDecision(
+bool SidePassPathDecider::DecideSidePassDirection(
+    const std::vector<bool>& can_side_pass) {
+  if (can_side_pass[0] == false && can_side_pass[1] == false) {
+    return false;
+  } else if (can_side_pass[0] == true && can_side_pass[1] == false) {
+    decided_direction_ = SidePassDirection::LEFT;
+    return true;
+  } else if (can_side_pass[0] == false && can_side_pass[1] == true) {
+    decided_direction_ = SidePassDirection::RIGHT;
+    return true;
+  } else {
+    if (curr_lane_.left_neighbor_forward_lane_id_size() > 0) {
+      decided_direction_ = SidePassDirection::LEFT;
+    } else if (curr_lane_.right_neighbor_forward_lane_id_size() > 0) {
+      decided_direction_ = SidePassDirection::RIGHT;
+    } else if (curr_lane_.left_neighbor_reverse_lane_id_size() > 0) {
+      decided_direction_ = SidePassDirection::LEFT;
+    } else if (curr_lane_.right_neighbor_reverse_lane_id_size() > 0) {
+      decided_direction_ = SidePassDirection::RIGHT;
+    } else {
+      decided_direction_ = SidePassDirection::LEFT;
+    }
+    return true;
+  }
+}
+
+bool SidePassPathDecider::GeneratePath(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
+  // Sanity checks.
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  // Get the current LaneInfo of the ADC.
   hdmap::LaneInfoConstPtr lane;
   double s = 0.0;
   double l = 0.0;
@@ -118,130 +147,91 @@ bool SidePassPathDecider::BuildSidePathDecision(
            << ", heading:" << adc_planning_start_point_.path_point().theta();
     return false;
   }
-
   curr_lane_ = lane->lane();
   ADEBUG << curr_lane_.ShortDebugString();
 
-  if (curr_lane_.left_neighbor_forward_lane_id_size() > 0) {
-    decided_direction_ = SidePassDirection::LEFT;
-  } else if (curr_lane_.right_neighbor_forward_lane_id_size() > 0) {
-    decided_direction_ = SidePassDirection::RIGHT;
-  } else if (curr_lane_.left_neighbor_reverse_lane_id_size() > 0) {
-    decided_direction_ = SidePassDirection::LEFT;
-  } else if (curr_lane_.right_neighbor_reverse_lane_id_size() > 0) {
-    decided_direction_ = SidePassDirection::RIGHT;
-  } else {
-    const double obs_start_s =
-        nearest_obstacle_->PerceptionSLBoundary().start_s();
-    const double obs_end_s = nearest_obstacle_->PerceptionSLBoundary().end_s();
-
-    // Filter out those out-of-lane obstacles.
-    double lane_left_width_at_start_s = 0.0;
-    double lane_right_width_at_start_s = 0.0;
-    reference_line_info->reference_line().GetLaneWidth(
-        obs_start_s, &lane_left_width_at_start_s, &lane_right_width_at_start_s);
-
-    double lane_left_width_at_end_s = 0.0;
-    double lane_right_width_at_end_s = 0.0;
-    reference_line_info->reference_line().GetLaneWidth(
-        obs_end_s, &lane_left_width_at_end_s, &lane_right_width_at_end_s);
-
-    double lane_left_width = std::min(std::abs(lane_left_width_at_start_s),
-                                      std::abs(lane_left_width_at_end_s));
-    double lane_right_width = std::min(std::abs(lane_right_width_at_start_s),
-                                       std::abs(lane_right_width_at_end_s));
-
-    const double obs_start_l =
-        nearest_obstacle_->PerceptionSLBoundary().start_l();
-    const double obs_end_l = nearest_obstacle_->PerceptionSLBoundary().end_l();
-
-    const double left_space = lane_left_width - obs_end_l;
-    const double right_space = lane_right_width + obs_start_l;
-
-    const double adc_half_width =
-        VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
-
-    if (left_space > adc_half_width + kRoadBuffer) {
-      decided_direction_ = SidePassDirection::LEFT;
-    } else if (right_space > adc_half_width + kRoadBuffer) {
-      decided_direction_ = SidePassDirection::RIGHT;
+  // Try generating paths for both directions.
+  std::vector<SidePassDirection> side_pass_directions =
+      {SidePassDirection::LEFT, SidePassDirection::RIGHT};
+  std::vector<bool> can_side_pass(2, true);
+  std::vector<std::vector<common::FrenetFramePoint>> frenet_frame_paths(
+      2, std::vector<common::FrenetFramePoint>(0));
+  for (size_t i = 0; i < side_pass_directions.size(); i++) {
+    // Pick a direction and try generating a path.
+    decided_direction_ = side_pass_directions[i];
+    if (decided_direction_ == SidePassDirection::LEFT) {
+      ADEBUG << "\n";
+      ADEBUG << "Trying to side-pass from left:";
     } else {
-      AERROR << "Fail to find side pass direction.";
-      return false;
+      ADEBUG << "\n";
+      ADEBUG << "Trying to side-pass from right:";
+    }
+    // 1. Generate boundary
+    bool fail_to_find_boundary = false;
+    auto lateral_bounds = GetPathBoundaries(
+        frame->PlanningStartPoint(), reference_line_info->AdcSlBoundary(),
+        reference_line_info->reference_line(),
+        reference_line_info->path_decision()->obstacles(),
+        &fail_to_find_boundary);
+    if (fail_to_find_boundary) {
+      can_side_pass[i] = false;
+      ADEBUG << "  - Failed to find a boundary.";
+      continue;
+    }
+    ADEBUG << "  - The boundary is:";
+    for (const auto &bd : lateral_bounds) {
+      ADEBUG << std::get<0>(bd) << ": " << std::get<1>(bd) << ", "
+             << std::get<2>(bd);
+    }
+    // 2. Call optimizer to generate smooth path.
+    InitSolver();
+    fem_qp_->SetVariableBounds(lateral_bounds);
+    if (!fem_qp_->Optimize()) {
+      can_side_pass[i] = false;
+      ADEBUG << "  - Failed to optimize in SidePassPathDecider.";
+      continue;
+    }
+    // 3. Update the path.
+    double accumulated_s = adc_frenet_frame_point_.s();
+    for (size_t j = 0; j < fem_qp_->x().size(); ++j) {
+      common::FrenetFramePoint frenet_frame_point;
+      ADEBUG << "FrenetFramePath: s = " << accumulated_s
+             << ", l = " << fem_qp_->x()[j]
+             << ", dl = " << fem_qp_->x_derivative()[j]
+             << ", ddl = " << fem_qp_->x_second_order_derivative()[j];
+      if (accumulated_s >= reference_line_info->reference_line().Length()) {
+        break;
+      }
+      frenet_frame_point.set_s(accumulated_s);
+      frenet_frame_point.set_l(fem_qp_->x()[j]);
+      frenet_frame_point.set_dl(fem_qp_->x_derivative()[j]);
+      frenet_frame_point.set_ddl(fem_qp_->x_second_order_derivative()[j]);
+      frenet_frame_paths[i].push_back(std::move(frenet_frame_point));
+      accumulated_s += delta_s_;
     }
   }
 
+  ADEBUG << "\n";
+  // Decide a direction to side-pass.
+  if (!DecideSidePassDirection(can_side_pass)) {
+    ADEBUG << "Unable to generate path in either direction.";
+    return false;
+  }
   if (decided_direction_ == SidePassDirection::LEFT) {
     ADEBUG << "Decided to side-pass from LEFT.\n";
   } else {
     ADEBUG << "Decided to side-pass from RIGHT.\n";
   }
-
-  return true;
-}
-
-bool SidePassPathDecider::GeneratePath(
-    Frame *const frame, ReferenceLineInfo *const reference_line_info) {
-  // Sanity checks.
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  // Decide whether to side-pass from left or right.
-  if (!BuildSidePathDecision(frame, reference_line_info)) {
-    AERROR << "Failed to decide on a side-pass direction.";
-    return false;
-  }
-
-  bool fail_to_find_boundary = false;
-  auto lateral_bounds = GetPathBoundaries(
-      frame->PlanningStartPoint(), reference_line_info->AdcSlBoundary(),
-      reference_line_info->reference_line(),
-      reference_line_info->path_decision()->obstacles(),
-      &fail_to_find_boundary);
-  if (fail_to_find_boundary) {
-    return false;
-  }
-
-  for (const auto &bd : lateral_bounds) {
-    ADEBUG << std::get<0>(bd) << ": " << std::get<1>(bd) << ", "
-           << std::get<2>(bd);
-  }
-
-  // Call optimizer to generate smooth path.
-  fem_qp_->SetVariableBounds(lateral_bounds);
-  if (!fem_qp_->Optimize()) {
-    AERROR << "Fail to optimize in SidePassPathDecider.";
-    return false;
-  }
-
-  // TODO(All): put optimized results into ReferenceLineInfo.
-  // Update Reference_Line_Info with this newly generated path.
-  std::vector<common::FrenetFramePoint> frenet_frame_path;
-  double accumulated_s = adc_frenet_frame_point_.s();
-  for (size_t i = 0; i < fem_qp_->x().size(); ++i) {
-    common::FrenetFramePoint frenet_frame_point;
-    ADEBUG << "FrenetFramePath: s = " << accumulated_s
-           << ", l = " << fem_qp_->x()[i]
-           << ", dl = " << fem_qp_->x_derivative()[i]
-           << ", ddl = " << fem_qp_->x_second_order_derivative()[i];
-    if (accumulated_s >= reference_line_info->reference_line().Length()) {
-      break;
-    }
-    frenet_frame_point.set_s(accumulated_s);
-    frenet_frame_point.set_l(fem_qp_->x()[i]);
-    frenet_frame_point.set_dl(fem_qp_->x_derivative()[i]);
-    frenet_frame_point.set_ddl(fem_qp_->x_second_order_derivative()[i]);
-    frenet_frame_path.push_back(std::move(frenet_frame_point));
-    accumulated_s += delta_s_;
-  }
-
   auto path_data = reference_line_info->mutable_path_data();
   if (path_data == nullptr) {
     return false;
   }
   path_data->SetReferenceLine(&reference_line_info->reference_line());
-  path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-
+  if (decided_direction_ == SidePassDirection::LEFT) {
+    path_data->SetFrenetPath(FrenetFramePath(frenet_frame_paths[0]));
+  } else {
+    path_data->SetFrenetPath(FrenetFramePath(frenet_frame_paths[1]));
+  }
   RecordDebugInfo(reference_line_info);
   return true;
 }
