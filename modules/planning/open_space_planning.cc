@@ -751,46 +751,28 @@ void OpenSpacePlanning::AddOpenSpaceSpeedProfile(
   auto open_space_debug = debug->planning_data().open_space();
   chart->set_title("Open Space Speed Plan Visualization");
   auto* options = chart->mutable_options();
-  options->mutable_x()->set_min(0);
-  options->mutable_x()->set_max(100);
+  options->mutable_x()->set_window_size(20.0);
   options->mutable_x()->set_label_string("time (s)");
   options->mutable_y()->set_min(2.1);
   options->mutable_y()->set_max(-1.1);
   options->mutable_y()->set_label_string("speed (m/s)");
 
-  auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
-  auto* smoothed_line = chart->add_line();
-  smoothed_line->set_label("Speed Profile");
-  for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
-    auto* point_debug = smoothed_line->add_point();
-    point_debug->set_x(point.trajectory_point().relative_time());
-    point_debug->set_y(point.trajectory_point().v());
+  // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+  auto* speed_profile = chart->add_line();
+  speed_profile->set_label("Speed Profile");
+  for (const auto& point : last_trajectory_->trajectory_points()) {
+    auto* point_debug = speed_profile->add_point();
+    point_debug->set_x(point.relative_time() + last_trajectory_->header_time());
+    point_debug->set_y(point.v());
   }
   // Set chartJS's dataset properties
-  auto* smoothed_properties = smoothed_line->mutable_properties();
-  (*smoothed_properties)["borderWidth"] = "2";
-  (*smoothed_properties)["pointRadius"] = "0";
-  (*smoothed_properties)["lineTension"] = "0";
-  (*smoothed_properties)["fill"] = "false";
-  (*smoothed_properties)["showLine"] = "true";
-
-  auto* aux_line = chart->add_line();
-  aux_line->set_label("Zero");
-  auto* aux_point_start = aux_line->add_point();
-  aux_point_start->set_x(0);
-  aux_point_start->set_y(0);
-  auto* aux_point_end = aux_line->add_point();
-  aux_point_end->set_x(100);
-  aux_point_end->set_y(0);
-
-  // Set chartJS's dataset properties
-  auto* aux_properties = aux_line->mutable_properties();
-  (*aux_properties)["borderWidth"] = "2";
-  (*aux_properties)["pointRadius"] = "0";
-  (*aux_properties)["lineTension"] = "0";
-  (*aux_properties)["fill"] = "false";
-  (*aux_properties)["showLine"] = "true";
-
+  auto* speed_profile_properties = speed_profile->mutable_properties();
+  (*speed_profile_properties)["borderWidth"] = "2";
+  (*speed_profile_properties)["pointRadius"] = "0";
+  (*speed_profile_properties)["lineTension"] = "0";
+  (*speed_profile_properties)["fill"] = "false";
+  (*speed_profile_properties)["showLine"] = "true";
+  /*
   auto* gear_shift_line = chart->add_line();
   gear_shift_line->set_label("Gear");
   size_t gear_shift_num =
@@ -812,6 +794,7 @@ void OpenSpacePlanning::AddOpenSpaceSpeedProfile(
   (*gear_line_properties)["lineTension"] = "0";
   (*gear_line_properties)["fill"] = "false";
   (*gear_line_properties)["showLine"] = "true";
+  */
 }
 
 void OpenSpacePlanning::ExportOpenSpaceChart(planning_internal::Debug* debug) {
