@@ -38,19 +38,15 @@ void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
   lane_activation_1_->Run({lane_conv1d_0_output}, &lane_activation_1_output);
   Eigen::MatrixXf lane_conv1d_2_output;
   lane_conv1d_2_->Run({lane_activation_1_output}, &lane_conv1d_2_output);
-  Eigen::MatrixXf lane_activation_3_output;
-  lane_activation_3_->Run({lane_conv1d_2_output}, &lane_activation_3_output);
-  Eigen::MatrixXf lane_conv1d_4_output;
-  lane_conv1d_4_->Run({lane_activation_3_output}, &lane_conv1d_4_output);
 
   // Step 2: Run lane feature max pool 1d
   Eigen::MatrixXf lane_maxpool1d_output;
-  lane_maxpool1d_->Run({lane_conv1d_4_output}, &lane_maxpool1d_output);
+  lane_maxpool1d_->Run({lane_conv1d_2_output}, &lane_maxpool1d_output);
   Eigen::MatrixXf lane_maxpool1d_flat = FlattenMatrix(lane_maxpool1d_output);
 
   // Step 3: Run lane feature avg pool 1d
   Eigen::MatrixXf lane_avgpool1d_output;
-  lane_avgpool1d_->Run({lane_conv1d_4_output}, &lane_avgpool1d_output);
+  lane_avgpool1d_->Run({lane_conv1d_2_output}, &lane_avgpool1d_output);
   Eigen::MatrixXf lane_avgpool1d_flat = FlattenMatrix(lane_avgpool1d_output);
 
   Eigen::MatrixXf lane_feature;
@@ -154,8 +150,6 @@ bool CruiseModel::LoadModel(
   lane_conv1d_0_->Load(lane_conv1d_param.conv1d_0());
   lane_activation_1_->Load(lane_conv1d_param.activation_1());
   lane_conv1d_2_->Load(lane_conv1d_param.conv1d_2());
-  lane_activation_3_->Load(lane_conv1d_param.activation_3());
-  lane_conv1d_4_->Load(lane_conv1d_param.conv1d_4());
 
   // Load MaxPool1dParameter
   const auto& lane_maxpool1d_param =

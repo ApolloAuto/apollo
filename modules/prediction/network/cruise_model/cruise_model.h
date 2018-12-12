@@ -57,10 +57,6 @@ class CruiseModel : public NetModel {
       std::unique_ptr<Activation>(new Activation());
   std::unique_ptr<Conv1d> lane_conv1d_2_ =
       std::unique_ptr<Conv1d>(new Conv1d());
-  std::unique_ptr<Activation> lane_activation_3_ =
-      std::unique_ptr<Activation>(new Activation());
-  std::unique_ptr<Conv1d> lane_conv1d_4_ =
-      std::unique_ptr<Conv1d>(new Conv1d());
 
   // MaxPool1dParameter
   std::unique_ptr<MaxPool1d> lane_maxpool1d_ =

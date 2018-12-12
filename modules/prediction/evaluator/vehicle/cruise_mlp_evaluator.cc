@@ -466,45 +466,7 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(lane_types.front() == 1 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 2 ? 1.0 : 0.0);
   feature_values->push_back(lane_types.front() == 3 ? 1.0 : 0.0);
-  ///////////////////////////////////////////////////////////////
 
-  /*
-  for (std::size_t i = 0; i < FLAGS_cruise_historical_frame_length; i++) {
-    // If not enough history, extrapolate in the following way:
-    // assume constant velocity, zero acceleration, no heading change.
-    // Set up position (extrapolate if not enough history):
-    if (i != 0 && pos_history[i].first == 100.0) {
-      feature_values->push_back(
-          pos_history[i-1].first -
-          vel_history[i-1].first * FLAGS_prediction_period);
-      feature_values->push_back(
-          pos_history[i-1].second -
-          vel_history[i-1].second * FLAGS_prediction_period);
-    } else {
-      feature_values->push_back(pos_history[i].first);
-      feature_values->push_back(pos_history[i].second);
-    }
-    // Set up velocity (append the same velocity if not enough history):
-    if (i != 0 && vel_history[i].first == 100.0) {
-      feature_values->push_back(vel_history[i-1].first);
-      feature_values->push_back(vel_history[i-1].second);
-    } else {
-      feature_values->push_back(vel_history[i].first);
-      feature_values->push_back(vel_history[i].second);
-    }
-    // Set up acceleration (set to zero if not enough history):
-    feature_values->push_back(acc_history[i].first);
-    feature_values->push_back(acc_history[i].second);
-    // Set up vel heading (append the same heading if not enough history):
-    if (i != 0 && vel_heading_history[i] == 100.0) {
-      feature_values->push_back(vel_heading_history[i-1]);
-    } else {
-      feature_values->push_back(vel_heading_history[i]);
-    }
-    // Set up vel heading changeing rate (append zero if not enough hist.):
-    feature_values->push_back(vel_heading_changing_rate_history[i]);
-  }
-  */
   for (std::size_t i = 0; i < FLAGS_cruise_historical_frame_length; i++) {
     feature_values->push_back(has_history[i]);
     feature_values->push_back(pos_history[i].first);
@@ -593,7 +555,6 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
   }
 
   double heading = feature.velocity_heading();
-  // double speed = feature.speed();
   for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
     if (feature_values->size() >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       break;
@@ -620,7 +581,6 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
       feature_values->push_back(relative_s_l.second);
       feature_values->push_back(relative_s_l.first);
       feature_values->push_back(relative_ang);
-      // feature_values->push_back(speed * speed * lane_point.kappa());
       feature_values->push_back(lane_point.kappa());
     }
   }
@@ -633,12 +593,10 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
     double relative_s_new = 2 * feature_values->operator[](size - 4) -
                                 feature_values->operator[](size - 9);
     double relative_ang_new = feature_values->operator[](size - 3);
-    // double centri_acc_new = 0.0;
 
     feature_values->push_back(relative_l_new);
     feature_values->push_back(relative_s_new);
     feature_values->push_back(relative_ang_new);
-    // feature_values->push_back(centri_acc_new);
     feature_values->push_back(0.0);
 
     size = feature_values->size();
