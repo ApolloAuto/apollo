@@ -81,11 +81,7 @@ build --per_file_copt=\
 ^modules/guardian/.*\.cc,\
 ^modules/map/.*\.cc,\
 ^modules/monitor/.*\.cc,\
-^modules/perception/base/.*\.cc,\
-^modules/perception/inference/.*\.cc,\
-^modules/perception/lib/.*\.cc,\
-^modules/perception/map/.*\.cc,\
-^modules/perception/onboard/.*\.cc,\
+^modules/perception/.*\.cc,\
 ^modules/planning/.*\.cc,\
 ^modules/routing/.*\.cc,\
 ^modules/third_party_perception/.*\.cc,\
