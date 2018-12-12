@@ -59,7 +59,7 @@ int Brakemotorrpt2402::encoder_temperature(const std::uint8_t* bytes,
   x <<= 16;
   x >>= 16;
 
-  int ret = x + -40.000000;
+  int ret = static_cast<int>(x + -40.000000);
   return ret;
 }
 
@@ -80,7 +80,7 @@ int Brakemotorrpt2402::motor_temperature(const std::uint8_t* bytes,
   x <<= 16;
   x >>= 16;
 
-  int ret = x + -40.000000;
+  int ret = static_cast<int>(x + -40.000000);
   return ret;
 }
 
