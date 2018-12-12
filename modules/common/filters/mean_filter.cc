@@ -57,15 +57,16 @@ double MF::Update(const double measurement) {
   CHECK_LE(min_candidates_.size(), window_size_);
   CHECK_LE(max_candidates_.size(), window_size_);
   ++time_;
-  time_ %= 2 * window_size_;
+  time_ %= static_cast<std::uint_fast8_t>(2 * window_size_);
   if (values_.size() == window_size_) {
     RemoveEarliest();
   }
   Insert(measurement);
   if (values_.size() > 2) {
-    return (sum_ - GetMin() - GetMax()) / (values_.size() - 2);
+    return (sum_ - GetMin() - GetMax()) /
+           static_cast<double>(values_.size() - 2);
   } else {
-    return sum_ / values_.size();
+    return sum_ / static_cast<double>(values_.size());
   }
 }
 
