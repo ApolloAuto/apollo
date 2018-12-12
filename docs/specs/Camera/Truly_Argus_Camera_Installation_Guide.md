@@ -1,8 +1,8 @@
 # Guide for Argus Camera
 
-Argus camera is a joint development venture product of Truly Seminconductors Itd. and Baidu. The Argus camera features high dynamic range (HDR 120dB), internal/external trigger and OTA firmware update. It is well supported by the Apollo Sensor Unit. This line of product is based on AR230 1080P sensor and AP0202 ISP from ON Semiconductor. 
+Argus camera is a joint development venture product of Truly Seminconductors Ltd. and Baidu. The Argus camera features high dynamic range (HDR 120dB), internal/external trigger and OTA firmware update. It is well supported by the Apollo Sensor Unit. This line of product is based on ON Semiconductor MARS. 
 
-We recommend using ```three cameras```, two with **6 mm** lens and one with **25 mm** lens to achieve the required performance for the traffic light detection application. 
+We recommend using ```three cameras```, one with **6 mm** lens, one with **12 mm** lens and the last one with **2.33 mm** to achieve the required performance for the traffic light detection application. 
 
 ![camera_image](images/Argus_pic.png)
 

@@ -2,7 +2,7 @@
 
 Apollo 3.5 uses the latest 128 line LiDAR system **VLS-128** from Velodyne LiDAR, Inc.
 
-![](images/vls_128.png)
+![](images/VLS_128.png)
 
 ## Key Features:
 
