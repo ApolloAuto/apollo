@@ -18,8 +18,8 @@ cc_test(
     deps = [
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/common:perception_gflags",
-        "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
@@ -86,16 +86,16 @@ cc_test(
         "-lopencv_highgui",
     ],
     deps = [
+        ":camera_common_io_util",
         "//modules/perception/camera/common:data_provider",
         "//modules/perception/common:perception_gflags",
-        "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-        ":camera_common_io_util",
     ]
 )
 cc_test(
@@ -113,8 +113,8 @@ cc_test(
     deps = [
         "//modules/perception/camera/common:twod_threed_util",
         "//modules/perception/common/i_lib/algorithm:i_sort",
-        "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
@@ -179,18 +179,18 @@ cc_test(
         "-lopencv_highgui",
     ],
     deps = [
+        ":camera_common_io_util",
         "//modules/perception/camera/common:data_provider",
         "//modules/perception/camera/common:util",
+        "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "//modules/perception/inference:inference_factory_lib",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-        ":camera_common_io_util",
     ]
 )
 cc_test(
@@ -207,8 +207,8 @@ cc_test(
     ],
     deps = [
         "//modules/perception/camera/common:object_template_manager",
-        "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
@@ -295,10 +295,10 @@ cc_library(
         "camera_lib_calibrator_laneline_lane_io.h",
     ],
     deps = [
-        "@eigen",
         ":camera_lib_calibrator_laneline_app_util",
         "//modules/perception/camera/lib/calibrator/laneline:lane_based_calibrator",
         "//modules/perception/common/i_lib/core:core",
+        "@eigen",
     ]
 )
 
@@ -677,8 +677,8 @@ cc_test(
     ],
     deps = [
         "//modules/perception/camera/lib/traffic_light/detector/detection:select",
-        "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
@@ -730,8 +730,8 @@ cc_test(
         "//modules/perception/base:distortion_model",
         "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
         "//modules/perception/common/io:io_util",
-        "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference:inference_factory_lib",
+        "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",

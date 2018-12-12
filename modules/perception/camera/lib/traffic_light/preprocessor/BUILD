@@ -67,7 +67,6 @@ cc_library(
         "-lboost_system",
     ],
     deps = [
-        "@eigen",
         ":multi_camera_projection",
         "//cyber",
         "//external:gflags",
@@ -78,6 +77,7 @@ cc_library(
         "//modules/perception/camera/lib/interface:interface",
         "//modules/perception/lib/config_manager:config_manager",
         "//modules/perception/lib/utils:utils",
+        "@eigen",
     ],
 )
 

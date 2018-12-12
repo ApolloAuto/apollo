@@ -72,9 +72,9 @@ cuda_library(
         "resize.h",
     ],
     deps = [
-        "//cyber",
         ":inference_cuda_util_lib",
         ":inference_util_lib",
+        "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
         "@cuda",
@@ -104,9 +104,9 @@ cuda_library(
         "gemm.h",
     ],
     deps = [
-        "//cyber",
         ":inference_cuda_util_lib",
         ":inference_util_lib",
+        "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
         "@cuda",

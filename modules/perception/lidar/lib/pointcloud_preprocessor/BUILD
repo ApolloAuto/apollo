@@ -12,8 +12,8 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:header_proto",
         "//modules/common/util",

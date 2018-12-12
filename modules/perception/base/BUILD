@@ -45,9 +45,9 @@ cc_library(
         "blob.h",
     ],
     deps = [
-        "//cyber",
         ":common",
         ":syncedmem",
+        "//cyber",
     ],
 )
 

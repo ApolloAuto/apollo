@@ -12,8 +12,8 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/common/speed:st_point",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/speed:st_point",
     ],
 )
 
@@ -29,9 +29,9 @@ cc_library(
     deps = [
         ":st_graph_point",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common/speed:st_boundary",
         "//modules/planning/common:frame",
         "//modules/planning/common:obstacle",
+        "//modules/planning/common/speed:st_boundary",
         "//modules/planning/proto:dp_st_speed_config_proto",
     ],
 )
@@ -49,14 +49,14 @@ cc_library(
         ":dp_st_cost",
         ":st_graph_point",
         "//cyber/common:log",
-        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
-        "//modules/planning/common/speed:speed_data",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
+        "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/toolkits/optimizers/st_graph:st_graph_data",
@@ -80,9 +80,9 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:dp_st_speed_config_proto",
         "//modules/planning/proto:planning_proto",
+        "//modules/planning/toolkits/optimizers:speed_optimizer",
         "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",
         "//modules/planning/toolkits/optimizers/st_graph:st_graph_data",
-        "//modules/planning/toolkits/optimizers:speed_optimizer",
     ],
 )
 

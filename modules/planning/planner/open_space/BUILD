@@ -38,8 +38,8 @@ cc_test(
         "open_space_planner_test.cc",
     ],
     deps = [
-        "@gtest//:main",
         ":open_space_planner",
+        "@gtest//:main",
     ],
 )
 

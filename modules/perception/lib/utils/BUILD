@@ -21,8 +21,8 @@ cc_library(
     srcs = ["timer.cc"],
     hdrs = ["timer.h"],
     deps = [
-        "//cyber",
         ":perception_perf",
+        "//cyber",
     ],
 )
 

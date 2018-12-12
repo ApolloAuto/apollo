@@ -28,8 +28,8 @@ cc_library(
     ],
 
     deps = [
-        "//cyber",
         ":denseline_postprocessor_proto",
+        "//cyber",
         "//modules/common/util:file_util",
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",

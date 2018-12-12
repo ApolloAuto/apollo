@@ -36,8 +36,8 @@ cc_test(
     size = "small",
     srcs = ["data_component_test.cc"],
     deps = [
-        "@gtest//:main",
         ":data_component_lib",
+        "@gtest//:main",
     ],
 )
 

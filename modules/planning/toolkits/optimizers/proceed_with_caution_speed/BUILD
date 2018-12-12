@@ -16,8 +16,8 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common:speed_profile_generator",
         "//modules/planning/proto:planning_config_proto",
-        "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",
         "//modules/planning/toolkits/optimizers:speed_optimizer",
+        "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",
     ],
 )
 

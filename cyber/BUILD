@@ -58,9 +58,9 @@ cc_library(
       "init.h",
     ],
     deps = [
+      "//cyber:state",
       "//cyber/logger:async_logger",
       "//cyber/node",
-      "//cyber:state",
     ],
 )
 
@@ -79,6 +79,9 @@ cc_library(
       "cyber.h",
     ],
     deps = [
+        "//cyber:binary",
+        "//cyber:init",
+        "//cyber:state",
         "//cyber/base",
         "//cyber/blocker:blocker_manager",
         "//cyber/class_loader",
@@ -114,9 +117,6 @@ cc_library(
         "//cyber/transport",
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
-        "//cyber:binary",
-        "//cyber:init",
-        "//cyber:state",
         "//third_party/tf2",
         "@fastrtps",
     ],

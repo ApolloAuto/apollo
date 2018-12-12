@@ -383,8 +383,8 @@ cc_library(
     deps = [
         ":obstacle",
         "//cyber/common:log",
-        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/math:geometry",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/reference_line",

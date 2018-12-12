@@ -34,10 +34,10 @@ cc_library(
         "//modules/perception/base:base",
         "//modules/perception/camera/common:common",
         "//modules/perception/camera/lib/interface:interface",
-        "//modules/perception/inference/utils:inference_resize_lib",
-        "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference:inference_lib",
+        "//modules/perception/inference/utils:inference_resize_lib",
+        "//modules/perception/inference/utils:inference_util_lib",
     ],
 )
 

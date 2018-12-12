@@ -17,8 +17,8 @@ cc_binary(
         "cyber_topology_message",
         "general_channel_message",
         "screen",
-        "//cyber/service_discovery:topology_manager",
         "//cyber:init",
+        "//cyber/service_discovery:topology_manager",
     ],
     linkopts = [
         "-pthread",
@@ -50,8 +50,8 @@ cc_library(
     hdrs = [ "general_message.h", ],
     deps = [
         "general_message_base",
-        "//cyber/message:raw_message",
         "//cyber:cyber",
+        "//cyber/message:raw_message",
     ],
 )
 
