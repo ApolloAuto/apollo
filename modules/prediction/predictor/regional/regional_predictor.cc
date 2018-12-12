@@ -154,7 +154,7 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
 void RegionalPredictor::DrawStillTrajectory(
     const Eigen::Vector2d& position, const double heading, const double speed,
     const double total_time, std::vector<TrajectoryPoint>* points) {
-  double delta_ts = FLAGS_prediction_period;
+  double delta_ts = FLAGS_prediction_trajectory_time_resolution;
   double x = position[0];
   double y = position[1];
   double direction_x = std::cos(heading);
@@ -178,7 +178,7 @@ void RegionalPredictor::DrawMovingTrajectory(
     const apollo::common::math::KalmanFilter<double, 2, 2, 4>& kf,
     const double total_time, std::vector<TrajectoryPoint>* left_points,
     std::vector<TrajectoryPoint>* right_points) {
-  double delta_ts = FLAGS_prediction_period;
+  double delta_ts = FLAGS_prediction_trajectory_time_resolution;
   Eigen::Vector2d vel = velocity;
   CompressVector2d(FLAGS_pedestrian_max_speed, &vel);
   Eigen::Vector2d acc = acceleration;
@@ -221,7 +221,7 @@ void RegionalPredictor::GetTrajectoryCandidatePoints(
     const KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker,
     const double total_time, std::vector<TrajectoryPoint>* middle_points,
     std::vector<TrajectoryPoint>* boundary_points) {
-  double delta_ts = FLAGS_prediction_period;
+  double delta_ts = FLAGS_prediction_trajectory_time_resolution;
   KalmanFilter<double, 2, 2, 4> kf = kf_pedestrian_tracker;
   // set the control matrix and control vector
   Eigen::Matrix<double, 2, 2> P = kf.GetStateCovariance();

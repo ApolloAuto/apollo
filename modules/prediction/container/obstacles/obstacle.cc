@@ -1064,7 +1064,8 @@ void Obstacle::BuildLaneGraph() {
   double road_graph_search_distance = std::max(
       speed * FLAGS_prediction_trajectory_time_length +
       0.5 * FLAGS_max_acc * FLAGS_prediction_trajectory_time_length *
-      FLAGS_prediction_trajectory_time_length, FLAGS_min_prediction_length);
+      FLAGS_prediction_trajectory_time_length,
+      FLAGS_min_prediction_trajectory_spatial_length);
 
   // BuildLaneGraph for current lanes:
   // Go through all the LaneSegments in current_lane,
@@ -1145,10 +1146,11 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     return;
   }
   double speed = feature->speed();
-  double road_graph_search_distance = std::max(
+  double road_graph_search_distance = std::fmax(
       speed * FLAGS_prediction_trajectory_time_length +
       0.5 * FLAGS_max_acc * FLAGS_prediction_trajectory_time_length *
-      FLAGS_prediction_trajectory_time_length, FLAGS_min_prediction_length);
+      FLAGS_prediction_trajectory_time_length,
+      FLAGS_min_prediction_trajectory_spatial_length);
 
   // Treat the most probable lane_segment as the center, put its left
   // and right neighbors into a vector following the left-to-right order.

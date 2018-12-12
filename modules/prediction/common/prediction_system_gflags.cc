@@ -43,3 +43,9 @@ DEFINE_string(
     "a list of bag files or directories for offline mode. The items need to be "
     "separated by colon ':'.  If this value is not set, the prediction module "
     "will use the listen to published ros topic mode.");
+
+// Bag replay timestamp gap
+DEFINE_double(replay_timestamp_gap, 10.0,
+              "Max timestamp gap for rosbag replay");
+DEFINE_int32(max_num_dump_feature, 50000,
+             "Max number of features to dump");

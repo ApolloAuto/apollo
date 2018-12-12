@@ -61,7 +61,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
     prediction_total_time = FLAGS_prediction_pedestrian_total_time;
   }
   DrawFreeMoveTrajectoryPoints(position, velocity, acc, theta,
-                               prediction_total_time, FLAGS_prediction_period,
+                               prediction_total_time, FLAGS_prediction_trajectory_time_resolution,
                                &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
