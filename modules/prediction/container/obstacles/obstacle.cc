@@ -894,10 +894,8 @@ void Obstacle::UpdateKFPedestrianTracker(const Feature& feature) {
     Eigen::Matrix<double, 4, 1> u;
     u(0, 0) = feature.velocity().x();
     u(1, 0) = feature.velocity().y();
-    if (FLAGS_enable_pedestrian_acc) {
-      u(2, 0) = feature.acceleration().x();
-      u(3, 0) = feature.acceleration().y();
-    }
+    u(2, 0) = 0.0;
+    u(3, 0) = 0.0;
 
     kf_pedestrian_tracker_.Predict(u);
 
