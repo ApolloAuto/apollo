@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/perception/common/i_lib/core/i_blas.h"
 #include "modules/perception/common/i_lib/core/i_rand.h"

@@ -23,8 +23,8 @@
 #include <string>
 #include <unordered_set>
 
-#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 #include "modules/prediction/common/environment_features.h"
+#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 
 namespace apollo {
 namespace prediction {

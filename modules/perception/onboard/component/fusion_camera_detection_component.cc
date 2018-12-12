@@ -15,11 +15,11 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_camera_detection_component.h"
 
+#include <Eigen/Core>
+#include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <yaml-cpp/yaml.h>
-#include <Eigen/Core>
-#include <Eigen/Dense>
 
 #include <algorithm>
 #include <iomanip>

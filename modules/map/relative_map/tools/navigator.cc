@@ -22,9 +22,9 @@
 #include "ros/ros.h"
 #include "third_party/json/json.hpp"
 
+#include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "cyber/common/log.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 

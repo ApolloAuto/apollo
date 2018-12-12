@@ -26,9 +26,9 @@
 
 #include "cyber/common/macros.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/prediction/predictor/predictor.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
-#include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
 namespace prediction {

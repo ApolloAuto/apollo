@@ -21,12 +21,12 @@
 
 #include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
+#include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
-#include "modules/perception/inference/inference_factory.h"
 
 namespace apollo {
 namespace perception {

@@ -18,11 +18,11 @@
 #include <nppi.h>
 
 #include <map>
-#include <vector>
 #include <memory>
-#include <string>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/box.h"

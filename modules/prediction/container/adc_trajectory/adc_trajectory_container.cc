@@ -17,8 +17,8 @@
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"

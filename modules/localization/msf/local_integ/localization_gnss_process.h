@@ -27,10 +27,10 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
+#include "include/gnss_solver.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "include/gnss_solver.h"
 
 /**
  * @namespace apollo::localization::msf

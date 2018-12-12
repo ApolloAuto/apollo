@@ -23,8 +23,8 @@
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"
-#include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
 #include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
+#include "modules/perception/camera/lib/interface/base_traffic_light_tracker.h"
 
 namespace apollo {
 namespace perception {

@@ -27,10 +27,10 @@
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/map_util.h"
+#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
-#include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 

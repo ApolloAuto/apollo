@@ -15,13 +15,13 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
 
-#include <map>
 #include <algorithm>
+#include <map>
 
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/inference_factory.h"
+#include "modules/perception/inference/utils/resize.h"
 
 namespace apollo {
 namespace perception {

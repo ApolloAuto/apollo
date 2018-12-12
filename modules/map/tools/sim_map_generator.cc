@@ -19,8 +19,8 @@
 
 #include "gflags/gflags.h"
 
-#include "modules/common/configs/config_gflags.h"
 #include "cyber/common/log.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"

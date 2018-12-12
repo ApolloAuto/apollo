@@ -15,18 +15,18 @@
 *****************************************************************************/
 #pragma once
 
+#include <map>
 #include <string>
 #include <utility>
-#include <map>
 
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 #include "modules/perception/camera/lib/interface/base_calibrator.h"
 #include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/camera/lib/interface/base_inference_engine.h"
 #include "modules/perception/camera/lib/interface/base_landmark_detector.h"
+#include "modules/perception/camera/lib/interface/base_lane_detector.h"
 #include "modules/perception/camera/lib/interface/base_lane_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_lane_tracker.h"
-#include "modules/perception/camera/lib/interface/base_lane_detector.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_postprocessor.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"

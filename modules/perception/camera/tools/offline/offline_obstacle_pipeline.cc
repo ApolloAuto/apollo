@@ -18,8 +18,8 @@
 #include <opencv2/opencv.hpp>
 #include <yaml-cpp/yaml.h>
 
-#include <map>
 #include <iomanip>
+#include <map>
 
 #include "modules/common/util/file.h"
 #include "modules/perception/base/distortion_model.h"

@@ -19,8 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 #include "modules/perception/lidar/lib/tracker/common/mlf_track_data.h"
+#include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 
 namespace apollo {
 namespace perception {

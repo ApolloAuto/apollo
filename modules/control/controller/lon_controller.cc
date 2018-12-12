@@ -18,8 +18,8 @@
 #include <cstdio>
 #include <utility>
 
-#include "modules/common/configs/vehicle_config_helper.h"
 #include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_util.h"

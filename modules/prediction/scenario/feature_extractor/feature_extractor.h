@@ -27,8 +27,8 @@
 
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/common/environment_features.h"
-#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {

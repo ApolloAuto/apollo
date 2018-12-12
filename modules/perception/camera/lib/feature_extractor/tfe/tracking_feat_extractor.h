@@ -16,19 +16,19 @@
 #pragma once
 
 #include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/gzip_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/text_format.h>
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feature.pb.h"
+#include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/inference/operators/roipooling_layer.h"
 #include "modules/perception/inference/utils/gemm.h"
 

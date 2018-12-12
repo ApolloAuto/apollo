@@ -13,13 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <opencv2/opencv.hpp>
 #include <gtest/gtest.h>
+#include <opencv2/opencv.hpp>
 
-#include "modules/perception/common/io/io_util.h"
 #include "modules/perception/camera/app/traffic_light_camera_perception.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
+#include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
 namespace apollo {

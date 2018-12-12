@@ -16,15 +16,15 @@
 
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "Eigen/Dense"
 
 #include "cyber/common/macros.h"
-#include "modules/prediction/proto/cruise_model.pb.h"
-#include "modules/prediction/network/net_model.h"
 #include "modules/prediction/network/net_layer.h"
+#include "modules/prediction/network/net_model.h"
+#include "modules/prediction/proto/cruise_model.pb.h"
 
 namespace apollo {
 namespace prediction {

@@ -17,18 +17,18 @@
 
 #include <boost/circular_buffer.hpp>
 #include <Eigen/Dense>
-#include <utility>
-#include <memory>
-#include <vector>
 #include <map>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
-#include "modules/perception/camera/lib/traffic_light/preprocessor/multi_camera_projection.h"
-#include "modules/perception/camera/lib/interface/base_init_options.h"
-#include "modules/perception/camera/common/camera_frame.h"
-#include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/base/image_8u.h"
 #include "modules/perception/base/traffic_light.h"
+#include "modules/perception/camera/common/camera_frame.h"
+#include "modules/perception/camera/lib/interface/base_init_options.h"
+#include "modules/perception/camera/lib/traffic_light/preprocessor/multi_camera_projection.h"
+#include "modules/perception/lib/utils/perf.h"
 
 namespace apollo {
 namespace perception {

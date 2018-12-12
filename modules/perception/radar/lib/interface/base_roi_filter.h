@@ -55,13 +55,13 @@
 
 #include "Eigen/Core"
 
-#include "cyber/common/macros.h"
 #include "cyber/common/log.h"
+#include "cyber/common/macros.h"
 
 #include "modules/perception/base/frame.h"
+#include "modules/perception/common/geometry/roi_filter.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
-#include "modules/perception/common/geometry/roi_filter.h"
 
 namespace apollo {
 namespace perception {

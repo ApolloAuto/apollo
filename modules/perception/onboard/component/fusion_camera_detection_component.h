@@ -33,11 +33,11 @@
 #include "modules/perception/camera/app/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
+#include "modules/perception/onboard/component/camera_perception_viz_message.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/onboard/component/camera_perception_viz_message.h"
 
 namespace apollo {
 namespace perception {

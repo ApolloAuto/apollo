@@ -19,10 +19,9 @@
 
 #include "Eigen/Dense"
 
-#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -31,6 +30,7 @@
 #include "modules/prediction/common/validation_checker.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
 namespace apollo {
 namespace prediction {

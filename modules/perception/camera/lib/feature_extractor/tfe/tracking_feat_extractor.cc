@@ -13,8 +13,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"

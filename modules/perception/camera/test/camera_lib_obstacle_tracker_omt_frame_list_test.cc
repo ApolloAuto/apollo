@@ -13,9 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
+#include "gtest/gtest.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {

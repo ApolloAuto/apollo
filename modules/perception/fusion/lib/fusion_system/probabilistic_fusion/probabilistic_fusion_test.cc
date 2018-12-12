@@ -17,8 +17,8 @@
 
 #define private public
 #define protected public
-#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 #include "modules/perception/base/sensor_meta.h"
+#include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 #include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 
 namespace apollo {

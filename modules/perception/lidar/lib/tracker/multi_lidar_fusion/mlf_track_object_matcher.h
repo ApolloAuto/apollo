@@ -15,10 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <utility>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "cyber/common/macros.h"
 #include "modules/perception/common/graph/secure_matrix.h"

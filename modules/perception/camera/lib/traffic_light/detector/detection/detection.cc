@@ -16,17 +16,17 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 
 #include <algorithm>
-#include <map>
-#include <utility>
 #include <limits>
+#include <map>
 #include <numeric>
+#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/inference/utils/util.h"
-#include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/inference_factory.h"
+#include "modules/perception/inference/utils/resize.h"
+#include "modules/perception/inference/utils/util.h"
 
 namespace apollo {
 namespace perception {

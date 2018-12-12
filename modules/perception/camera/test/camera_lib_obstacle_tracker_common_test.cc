@@ -17,13 +17,13 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/half_circle_angle.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/kalman_filter.h"
-#include "modules/perception/inference/utils/cuda_util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/common/similar.h"
-#include "cyber/common/log.h"
-#include "gtest/gtest.h"
+#include "modules/perception/inference/utils/cuda_util.h"
 
 namespace apollo {
 namespace perception {

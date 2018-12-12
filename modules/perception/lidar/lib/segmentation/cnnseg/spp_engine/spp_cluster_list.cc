@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster_list.h"
+
 #include <algorithm>
 
-#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster_list.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_pool_types.h"
 

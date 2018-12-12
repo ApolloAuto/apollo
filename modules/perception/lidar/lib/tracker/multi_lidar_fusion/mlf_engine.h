@@ -15,14 +15,14 @@
  *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_matcher.h"
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_tracker.h"
 
 namespace apollo {
 namespace perception {

@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/lidar/lib/tracker/association/gnn_bipartite_graph_matcher.h"
+
 #include <algorithm>
-#include <vector>
 #include <iostream>
 #include <utility>
+#include <vector>
 
-#include "modules/perception/lidar/lib/tracker/association/gnn_bipartite_graph_matcher.h"
 #include "cyber/common/log.h"
 
 

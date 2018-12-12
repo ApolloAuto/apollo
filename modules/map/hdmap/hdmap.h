@@ -18,8 +18,8 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "cyber/common/macros.h"
 

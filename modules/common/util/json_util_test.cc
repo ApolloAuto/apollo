@@ -16,8 +16,8 @@
 
 #include "modules/common/util/json_util.h"
 
-#include "google/protobuf/util/json_util.h"
 #include "gmock/gmock.h"
+#include "google/protobuf/util/json_util.h"
 #include "gtest/gtest.h"
 #include "modules/common/proto/error_code.pb.h"
 

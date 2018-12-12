@@ -15,12 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/common/i_lib/core/i_struct.h"
+#include "modules/perception/common/i_lib/algorithm/i_sort.h"
 #include "modules/perception/common/i_lib/core/i_alloc.h"
+#include "modules/perception/common/i_lib/core/i_struct.h"
+#include "modules/perception/common/i_lib/da/i_ransac.h"
 #include "modules/perception/common/i_lib/geometry/i_line.h"
 #include "modules/perception/common/i_lib/geometry/i_util.h"
-#include "modules/perception/common/i_lib/da/i_ransac.h"
-#include "modules/perception/common/i_lib/algorithm/i_sort.h"
 
 namespace apollo {
 namespace perception {

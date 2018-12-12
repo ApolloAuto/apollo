@@ -16,11 +16,11 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-#include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/camera.h"
+#include "modules/perception/base/distortion_model.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
-#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
 
 namespace apollo {
 namespace perception {

@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <queue>
-#include <memory>
-#include <utility>
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <memory>
+#include <queue>
 #include <unordered_set>
+#include <utility>
 
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"

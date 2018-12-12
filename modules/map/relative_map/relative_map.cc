@@ -17,9 +17,9 @@
 #include "modules/map/relative_map/relative_map.h"
 
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/common/util/file.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {

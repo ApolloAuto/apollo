@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include <QVector3D>
 #include <QColor>
 #include <QRgb>
+#include <QVector3D>
 
-#include "modules/tools/visualizer/renderable_object.h"
 #include "modules/drivers/proto/radar.pb.h"
+#include "modules/tools/visualizer/renderable_object.h"
 
 class QOpenGLShaderProgram;
 

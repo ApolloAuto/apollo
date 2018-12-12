@@ -19,12 +19,12 @@
 #include "cyber/common/log.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/scenario/scenario_manager.h"
-#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
-#include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
-#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 
 namespace apollo {
 namespace prediction {

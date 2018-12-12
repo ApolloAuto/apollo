@@ -15,12 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/perception/common/i_lib/core/i_struct.h"
-#include "modules/perception/common/i_lib/core/i_rand.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
+#include "modules/perception/common/i_lib/core/i_rand.h"
+#include "modules/perception/common/i_lib/core/i_struct.h"
 
-#include <limits>
 #include <algorithm>
+#include <limits>
 
 namespace apollo {
 namespace perception {

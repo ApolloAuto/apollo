@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 #include "modules/perception/lidar/lib/tracker/common/mlf_track_data.h"
+#include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_base_filter.h"
 
 namespace apollo {

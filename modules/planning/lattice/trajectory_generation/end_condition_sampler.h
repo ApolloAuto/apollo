@@ -21,10 +21,10 @@
 #pragma once
 
 #include <array>
-#include <utility>
-#include <vector>
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/lattice/behavior/feasible_region.h"

@@ -15,14 +15,14 @@
 *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "modules/perception/camera/common/util.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feature.pb.h"
+#include "modules/perception/camera/lib/interface/base_feature_extractor.h"
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/utils/gemm.h"
-#include "modules/perception/camera/lib/interface/base_feature_extractor.h"
-#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feature.pb.h"
 
 namespace apollo {
 namespace perception {

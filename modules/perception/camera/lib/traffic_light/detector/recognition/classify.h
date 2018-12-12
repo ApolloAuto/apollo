@@ -15,16 +15,16 @@
 *****************************************************************************/
 #pragma once
 
-#include <vector>
 #include <memory>
 #include <string>
+#include <vector>
 
-#include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.pb.h"
-#include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
-#include "modules/perception/inference/inference.h"
-#include "modules/perception/base/traffic_light.h"
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image_8u.h"
+#include "modules/perception/base/traffic_light.h"
+#include "modules/perception/camera/lib/interface/base_traffic_light_detector.h"
+#include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.pb.h"
+#include "modules/perception/inference/inference.h"
 
 namespace apollo {
 namespace perception {

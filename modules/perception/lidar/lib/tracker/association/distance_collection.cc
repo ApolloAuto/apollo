@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include "cyber/common/log.h"
-#include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/geometry/basic.h"
+#include "modules/perception/common/geometry/common.h"
 
 #include "modules/perception/lidar/lib/tracker/association/distance_collection.h"
 

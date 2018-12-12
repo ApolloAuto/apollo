@@ -15,13 +15,13 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/classify.h"
 
-#include <string>
 #include <map>
+#include <string>
 
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
-#include "modules/perception/inference/utils/resize.h"
 #include "modules/perception/inference/inference_factory.h"
+#include "modules/perception/inference/utils/resize.h"
 
 namespace apollo {
 namespace perception {

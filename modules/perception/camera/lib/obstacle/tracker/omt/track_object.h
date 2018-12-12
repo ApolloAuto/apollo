@@ -15,11 +15,11 @@
 *****************************************************************************/
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
-#include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 #include "modules/perception/base/blob.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 
 namespace apollo {
 namespace perception {

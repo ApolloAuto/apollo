@@ -20,11 +20,11 @@
 #include <iostream>
 #include <map>
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "modules/perception/base/image.h"
 #include "modules/perception/base/blob.h"
+#include "modules/perception/base/image.h"
 
 namespace apollo {
 namespace perception {

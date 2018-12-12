@@ -19,10 +19,10 @@
 #include <atomic>
 #include <condition_variable>
 #include <list>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
-#include <memory>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"

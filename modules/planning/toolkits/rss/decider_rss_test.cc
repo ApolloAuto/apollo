@@ -19,8 +19,8 @@
  **/
 
 
-#include "rss/test_support/TestSupport.hpp"
 #include "rss/core/RssCheck.hpp"
+#include "rss/test_support/TestSupport.hpp"
 
 namespace rss {
 namespace core {

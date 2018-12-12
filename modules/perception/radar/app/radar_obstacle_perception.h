@@ -15,9 +15,9 @@
 *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "modules/perception/radar/lib/interface/base_radar_obstacle_perception.h"
 

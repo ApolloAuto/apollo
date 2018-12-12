@@ -15,9 +15,9 @@
 *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"

@@ -28,9 +28,9 @@
 #include "cyber/cyber.h"
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/status/status.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
-#include "modules/common/status/status.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"

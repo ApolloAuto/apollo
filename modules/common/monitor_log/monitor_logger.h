@@ -27,8 +27,8 @@
 #include <vector>
 
 #include "cyber/cyber.h"
-#include "modules/common/util/message_util.h"
 #include "modules/common/monitor_log/proto/monitor_log.pb.h"
+#include "modules/common/util/message_util.h"
 
 /**
  * @namespace apollo::common::monitor

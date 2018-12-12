@@ -16,8 +16,8 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <Eigen/QR>
 #include <Eigen/LU>
+#include <Eigen/QR>
 #include <vector>
 
 #include "cyber/common/log.h"

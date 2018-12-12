@@ -21,13 +21,13 @@
 #pragma once
 
 #include <Eigen/Geometry>
+#include <atomic>
 #include <list>
 #include <map>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <atomic>
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
