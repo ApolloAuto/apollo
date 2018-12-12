@@ -58,7 +58,7 @@ Wipercmd90* Wipercmd90::set_wiper_cmd(Wiper_cmd_90::Wiper_cmdType wiper_cmd) {
 // 'physical_unit': ''}
 void Wipercmd90::set_p_wiper_cmd(uint8_t* data,
                                  Wiper_cmd_90::Wiper_cmdType wiper_cmd) {
-  int x = wiper_cmd;
+  uint8_t x = wiper_cmd;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 8);

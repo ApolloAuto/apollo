@@ -57,7 +57,7 @@ Shiftcmd65* Shiftcmd65::set_shift_cmd(Shift_cmd_65::Shift_cmdType shift_cmd) {
 // '[0|4]', 'bit': 7, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 void Shiftcmd65::set_p_shift_cmd(uint8_t* data,
                                  Shift_cmd_65::Shift_cmdType shift_cmd) {
-  int x = shift_cmd;
+  uint8_t x = shift_cmd;
 
   Byte to_set(data + 0);
   to_set.set_value(x, 0, 8);
