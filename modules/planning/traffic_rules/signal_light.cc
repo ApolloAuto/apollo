@@ -113,12 +113,33 @@ void SignalLight::MakeDecisions(Frame* const frame,
         config_.signal_light().min_pass_s_distance());
 
     // work around incorrect s-projection along round routing
+    const double kTrafficLightLookForwardDistanceConfGuard = 135.0;
+    const double kTrafficLightDistance = 50.0;
     const double monitor_forward_distance = std::max(
-        150.0, config_.signal_light().max_monitor_forward_distance());
+        kTrafficLightLookForwardDistanceConfGuard,
+        config_.signal_light().max_monitor_forward_distance());
     if (signal_light.start_s - adc_front_edge_s > monitor_forward_distance) {
-      ADEBUG << "SKIP traffic_light[" << signal_light.object_id
-          << "] start_s[" << signal_light.start_s << "]. too far away";
-      continue;
+      const auto& reference_line = reference_line_info->reference_line();
+      common::SLPoint signal_light_sl;
+      signal_light_sl.set_s(signal_light.start_s);
+      signal_light_sl.set_l(0);
+      common::math::Vec2d signal_light_point;
+      reference_line.SLToXY(signal_light_sl, &signal_light_point);
+
+      common::math::Vec2d adc_position = {
+          common::VehicleStateProvider::Instance()->x(),
+          common::VehicleStateProvider::Instance()->y()};
+
+      const double distance = common::util::DistanceXY(
+          signal_light_point, adc_position);
+      ADEBUG << "traffic_light[" << signal_light.object_id
+          << "] start_s[" << signal_light.start_s
+          << "] actual_distance[" << distance << "]";
+      if (distance < kTrafficLightDistance) {
+        ADEBUG << "SKIP traffic_light[" << signal_light.object_id
+            << "]. too far away along reference line";
+        continue;
+      }
     }
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
