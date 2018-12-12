@@ -294,17 +294,11 @@ class SimulationWorldService {
     }
 
     for (size_t i = 0; i + 1 < points.size(); i += downsampleInterval) {
-      auto *point = downsampled_points->Add();
-      point->set_s(points[i].s());
-      point->set_t(points[i].t());
-      point->set_v(points[i].v());
+      *downsampled_points->Add() = points[static_cast<int>(i)];
     }
 
     // add the last point
-    auto *point = downsampled_points->Add();
-    point->set_s(points[points.size() - 1].s());
-    point->set_t(points[points.size() - 1].t());
-    point->set_v(points[points.size() - 1].v());
+    *downsampled_points->Add() = *points.rbegin();
   }
 
   std::unique_ptr<cyber::Node> node_;

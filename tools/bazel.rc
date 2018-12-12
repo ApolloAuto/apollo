@@ -69,16 +69,19 @@ build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
+# TODO(all): Final target is:
+# build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Werror=conversion
 build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Wconversion
 # Strict check on cleared modules.
 build --per_file_copt=\
 ^modules/calibration/.*\.cc,\
+^modules/common/file/.*\.cc,\
 ^modules/common/math/.*\.cc,\
 ^modules/common/util/.*\.cc,\
 ^modules/contrib/.*\.cc,\
 ^modules/control/.*\.cc,\
 ^modules/data/.*\.cc,\
-^modules/dreamview/backend/hmi/.*\.cc,\
+^modules/dreamview/.*\.cc,\
 ^modules/guardian/.*\.cc,\
 ^modules/map/.*\.cc,\
 ^modules/monitor/.*\.cc,\

@@ -38,10 +38,11 @@ void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
   cv::Mat mat(image->height(), image->width(), CV_8UC3,
               const_cast<char *>(image->data().data()), image->step());
   cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
-  cv::resize(mat, mat,
-             cv::Size(image->width() * ImageHandler::kImageScale,
-                      image->height() * ImageHandler::kImageScale),
-             0, 0, CV_INTER_LINEAR);
+  cv::resize(
+    mat, mat,
+    cv::Size(static_cast<int>(image->width() * ImageHandler::kImageScale),
+             static_cast<int>(image->height() * ImageHandler::kImageScale)),
+    0, 0, CV_INTER_LINEAR);
 
   std::unique_lock<std::mutex> lock(mutex_);
   cv::imencode(".jpg", mat, send_buffer_, std::vector<int>() /* params */);

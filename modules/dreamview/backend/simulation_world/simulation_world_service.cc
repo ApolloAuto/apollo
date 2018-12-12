@@ -374,7 +374,8 @@ void SimulationWorldService::Update() {
   UpdateLatencies();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
-  world_.set_timestamp(apollo::common::time::AsInt64<millis>(Clock::Now()));
+  world_.set_timestamp(static_cast<double>(
+       apollo::common::time::AsInt64<millis>(Clock::Now())));
 }
 
 void SimulationWorldService::UpdateDelays() {
@@ -813,7 +814,8 @@ void SimulationWorldService::DownsamplePath(const common::Path &path,
 
   downsampled_path->set_name(path.name());
   for (const size_t index : sampled_indices) {
-    *downsampled_path->add_path_point() = path.path_point(index);
+    *downsampled_path->add_path_point() =
+        path.path_point(static_cast<int>(index));
   }
 }
 

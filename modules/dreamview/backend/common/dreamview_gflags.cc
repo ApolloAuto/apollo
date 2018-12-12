@@ -20,8 +20,8 @@ DEFINE_string(dreamview_module_name, "dreamview", "dreamview module name");
 
 DEFINE_bool(dreamview_profiling_mode, false, "Run dreamview in profiling mode");
 
-DEFINE_double(
-    dreamview_profiling_duration, -1.0,
+DEFINE_int32(
+    dreamview_profiling_duration, -1,
     "Dreamview profiling duration in ms. Negative value will not restrict the "
     "profiling time");
 

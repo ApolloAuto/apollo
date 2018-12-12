@@ -22,7 +22,7 @@ DECLARE_string(dreamview_module_name);
 
 DECLARE_bool(dreamview_profiling_mode);
 
-DECLARE_double(dreamview_profiling_duration);
+DECLARE_int32(dreamview_profiling_duration);
 
 DECLARE_string(static_file_dir);
 
