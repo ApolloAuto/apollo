@@ -65,8 +65,8 @@ const defaultPolygonProperties = {
     lineTension: 0,
 };
 
-function updateTickWindow(scale, windowSize) {
-    const mid = Math.floor((scale.max + scale.min) / 2);
+function updateTickWindow(scale, windowSize, midValue) {
+    const mid = midValue || Math.floor((scale.max + scale.min) / 2);
     scale.max = mid + windowSize / 2;
     scale.min = mid - windowSize / 2;
 }
@@ -119,7 +119,7 @@ export default class ScatterGraph extends React.Component {
                 }
                 if (setting.windowSize) {
                     axisOptions.afterDataLimits = (chart) => {
-                        updateTickWindow(chart, setting.windowSize);
+                        updateTickWindow(chart, setting.windowSize, setting.midValue);
                     };
                 }
                 chartOptions.scales[name].push(axisOptions);
