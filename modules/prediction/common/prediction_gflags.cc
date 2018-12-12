@@ -19,15 +19,24 @@
 #include <cmath>
 #include <limits>
 
+DEFINE_double(double_precision, 1e-6, "precision of double");
+
+// prediction trajectory and dynamic model
 DEFINE_double(prediction_trajectory_time_length, 8.0,
               "Time length of predicted trajectory (in seconds)");
 DEFINE_double(prediction_trajectory_time_resolution, 0.1,
               "Time resolution of predicted trajectory (in seconds");
-DEFINE_double(double_precision, 1e-6, "precision of double");
 DEFINE_double(min_prediction_trajectory_spatial_length, 20.0,
               "Minimal spatial length of predicted trajectory");
 DEFINE_bool(enable_trajectory_validation_check, false,
             "If check the validity of prediction trajectory.");
+
+DEFINE_double(vehicle_max_linear_acc, 4.0,
+              "Upper bound of vehicle linear acceleration");
+DEFINE_double(vehicle_min_linear_acc, -4.0,
+              "Lower bound of vehicle linear deceleration");
+DEFINE_double(vehicle_max_speed, 35.0,
+              "Max speed of vehicle");
 
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
@@ -56,9 +65,7 @@ DEFINE_uint32(cruise_historical_frame_length, 5,
               "The number of historical frames of the obstacle"
               "that the cruise model will look at.");
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");
-DEFINE_double(max_acc, 4.0, "Upper bound of acceleration");
-DEFINE_double(min_acc, -4.0, "Lower bound of deceleration");
-DEFINE_double(max_speed, 35.0, "Max speed");
+
 DEFINE_double(max_angle_diff_to_adjust_velocity, M_PI / 6.0,
               "The maximal angle diff to adjust velocity heading.");
 DEFINE_double(q_var, 0.01, "Processing noise covariance");
@@ -95,8 +102,6 @@ DEFINE_bool(enable_pedestrian_acc, false, "Enable calculating speed by acc");
 DEFINE_double(coeff_mul_sigma, 2.0, "coefficient multiply standard deviation");
 DEFINE_double(pedestrian_max_speed, 10.0, "speed upper bound for pedestrian");
 DEFINE_double(pedestrian_max_acc, 2.0, "maximum pedestrian acceleration");
-DEFINE_double(prediction_pedestrian_total_time, 10.0,
-              "Total prediction time for pedestrians");
 DEFINE_double(still_speed, 0.01, "speed considered to be still");
 DEFINE_string(evaluator_vehicle_mlp_file,
               "/apollo/modules/prediction/data/mlp_vehicle_model.bin",

@@ -16,6 +16,7 @@
 
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <utility>
@@ -58,7 +59,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
   std::vector<TrajectoryPoint> points(0);
   double prediction_total_time = FLAGS_prediction_trajectory_time_length;
   if (obstacle->type() == PerceptionObstacle::PEDESTRIAN) {
-    prediction_total_time = FLAGS_prediction_pedestrian_total_time;
+    prediction_total_time = FLAGS_prediction_trajectory_time_length;
   }
   DrawFreeMoveTrajectoryPoints(position, velocity, acc, theta,
                                prediction_total_time,
@@ -82,8 +83,10 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
   state(1, 0) = 0.0;
   state(2, 0) = velocity(0);
   state(3, 0) = velocity(1);
-  state(4, 0) = common::math::Clamp(acc(0), FLAGS_min_acc, FLAGS_max_acc);
-  state(5, 0) = common::math::Clamp(acc(1), FLAGS_min_acc, FLAGS_max_acc);
+  state(4, 0) = common::math::Clamp(acc(0),
+      FLAGS_vehicle_min_linear_acc, FLAGS_vehicle_max_linear_acc);
+  state(5, 0) = common::math::Clamp(acc(1),
+      FLAGS_vehicle_min_linear_acc, FLAGS_vehicle_max_linear_acc);
 
   Eigen::Matrix<double, 6, 6> transition;
   transition.setIdentity();

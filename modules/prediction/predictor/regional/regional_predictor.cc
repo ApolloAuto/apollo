@@ -105,7 +105,7 @@ void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
 
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   double heading = feature.velocity_heading();
-  const double total_time = FLAGS_prediction_pedestrian_total_time;
+  const double total_time = FLAGS_prediction_trajectory_time_length;
   size_t start_index = NumOfTrajectories();
 
   std::vector<TrajectoryPoint> points;
@@ -135,7 +135,7 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
     acc = {feature.acceleration().x(), feature.acceleration().y()};
   }
 
-  const double total_time = FLAGS_prediction_pedestrian_total_time;
+  const double total_time = FLAGS_prediction_trajectory_time_length;
   std::vector<TrajectoryPoint> left_points;
   std::vector<TrajectoryPoint> right_points;
 
