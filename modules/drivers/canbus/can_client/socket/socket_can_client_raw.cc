@@ -180,7 +180,7 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
 
   for (int32_t i = 0; i < *frame_num && i < MAX_CAN_RECV_FRAME_LEN; ++i) {
     CanFrame cf;
-    int ret = read(dev_handler_, &recv_frames_[i], sizeof(recv_frames_[i]));
+    auto ret = read(dev_handler_, &recv_frames_[i], sizeof(recv_frames_[i]));
 
     if (ret < 0) {
       AERROR << "receive message failed, error code: " << ret;
