@@ -54,8 +54,8 @@ cc_library(
     srcs = [ "cyber_record_wrap.cc", ],
     hdrs = [ "py_record.h", ],
     deps = [
-        "//cyber/record",
         "//cyber:cyber_core",
+        "//cyber/record",
         "@python27",
     ],
 )

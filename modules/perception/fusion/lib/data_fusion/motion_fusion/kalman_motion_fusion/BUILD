@@ -12,9 +12,9 @@ cc_library(
     ],
     deps = [
        "//modules/perception/base:base",
+       "//modules/perception/common:perception_gflags",
        "//modules/perception/common/geometry:basic",
        "//modules/perception/common/sensor_manager:sensor_manager",
-       "//modules/perception/common:perception_gflags",
        "//modules/perception/fusion/base:base",
        "//modules/perception/fusion/common:base_filter",
        "//modules/perception/fusion/common:kalman_filter",

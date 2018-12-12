@@ -8,8 +8,8 @@ cc_binary(
     deps = [
         "//cyber",
         "//external:gflags",
-        "//modules/canbus/common:canbus_common",
         "//modules/canbus:canbus_lib",
+        "//modules/canbus/common:canbus_common",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
     ],

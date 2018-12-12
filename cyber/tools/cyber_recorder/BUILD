@@ -11,9 +11,9 @@ cc_binary(
         "recorder",
         "recoverer",
         "spliter",
+        "//cyber:init",
         "//cyber/common:file",
         "//cyber/common:time_conversion",
-        "//cyber:init",
     ],
     linkopts = [
         "-pthread",
@@ -49,10 +49,10 @@ cc_library(
         "player/play_task_producer.h",
     ],
     deps = [
+        "//cyber:cyber",
         "//cyber/common:log",
         "//cyber/proto:record_cc_proto",
         "//cyber/record:record_reader",
-        "//cyber:cyber",
     ]
 )
 
@@ -61,9 +61,9 @@ cc_library(
     srcs = [ "recorder.cc", ],
     hdrs = [ "recorder.h", ],
     deps = [
+        "//cyber:cyber",
         "//cyber/common:log",
         "//cyber/proto:record_cc_proto",
-        "//cyber:cyber",
         "@fastrtps//:fastrtps",
     ],
 )

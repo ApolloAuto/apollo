@@ -46,8 +46,8 @@ cc_library(
         "graph_segmentor.h",
     ],
     deps = [
-        "//cyber",
         ":disjoint_set",
+        "//cyber",
     ],
 )
 
@@ -162,10 +162,10 @@ cc_library(
         "gated_hungarian_bigraph_matcher.h",
     ],
     deps = [
-        "//cyber",
         ":connected_component_analysis",
         ":hungarian_optimizer",
         ":secure_matrix",
+        "//cyber",
     ],
 )
 

@@ -9,8 +9,8 @@ cc_test(
         "hm_matcher_test.cc",
     ],
     deps = [
-        "//modules/perception/radar/lib/tracker/common:radar_track_manager",
         ":hm_matcher",
+        "//modules/perception/radar/lib/tracker/common:radar_track_manager",
         "@gtest//:main",
     ],
 )

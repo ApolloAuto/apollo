@@ -54,9 +54,9 @@ cc_library(
         "log_file_object.h",
     ],
     deps = [
+        "//cyber:binary",
         "//cyber/common:log",
         "//cyber/logger:logger_util",
-        "//cyber:binary",
     ]
 )
 

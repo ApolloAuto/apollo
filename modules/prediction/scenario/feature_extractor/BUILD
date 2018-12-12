@@ -12,9 +12,9 @@ cc_library(
         "//modules/common/math:geometry",
         "//modules/map/hdmap:hdmap_util",
         "//modules/prediction/common:environment_features",
+        "//modules/prediction/container:container_manager",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/pose:pose_container",
-        "//modules/prediction/container:container_manager",
         "@gtest//:main",
     ],
 )
@@ -28,10 +28,10 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        ":feature_extractor",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container:container_manager",
-        ":feature_extractor",
         "@gtest//:main",
     ],
 )

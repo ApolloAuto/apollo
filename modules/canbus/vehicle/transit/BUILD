@@ -46,8 +46,8 @@ cc_library(
     deps = [
         ":transit_message_manager",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "//modules/canbus/vehicle:vehicle_controller_base",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "//modules/common/kv_db",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",

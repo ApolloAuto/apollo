@@ -42,11 +42,11 @@ cc_test(
     ],
     data = ["//modules/planning:planning_testdata"],
     deps = [
-        "@gtest//:main",
         ":navi_planner",
         "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
+        "@gtest//:main",
     ],
 )
 

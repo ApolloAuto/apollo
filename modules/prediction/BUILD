@@ -14,8 +14,8 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common",
-        "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/math:geometry",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",

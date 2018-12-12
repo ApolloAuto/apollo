@@ -45,12 +45,12 @@ cc_grpc_library(
         "v2x_service_car_to_obu.proto",
     ],
     deps = [
-        "//modules/perception/proto:perception_proto_lib",
         ":v2x_carstatus_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
     ],
     deps_cc = [
-        "//modules/perception/proto:perception_proto",
         ":v2x_carstatus_proto",
+        "//modules/perception/proto:perception_proto",
     ],
 )
 
@@ -60,12 +60,12 @@ cc_grpc_library(
         "v2x_service_obu_to_car.proto",
     ],
     deps = [
-        "//modules/perception/proto:perception_proto_lib",
         ":v2x_traffic_light_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
     ],
     deps_cc = [
-        "//modules/perception/proto:perception_proto",
         ":v2x_traffic_light_proto",
+        "//modules/perception/proto:perception_proto",
     ],
 )
 

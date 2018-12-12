@@ -40,8 +40,8 @@ cc_test(
     size = "small",
     srcs = [ "transport_test.cc", ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest",
     ],
 )
@@ -96,8 +96,8 @@ cc_test(
         "dispatcher/dispatcher_test.cc",
     ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )
@@ -120,8 +120,8 @@ cc_test(
         "dispatcher/intra_dispatcher_test.cc",
     ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )
@@ -147,8 +147,8 @@ cc_test(
         "dispatcher/rtps_dispatcher_test.cc",
     ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest",
     ],
 )
@@ -175,8 +175,8 @@ cc_test(
         "dispatcher/shm_dispatcher_test.cc",
     ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )
@@ -479,8 +479,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/hybrid_transceiver_test.cc", ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest",
     ],
 )
@@ -490,8 +490,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/intra_transceiver_test.cc", ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )
@@ -501,8 +501,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/rtps_transceiver_test.cc", ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest",
     ],
 )
@@ -512,8 +512,8 @@ cc_test(
     size = "small",
     srcs = [ "transceiver/shm_transceiver_test.cc", ],
     deps = [
-        "//cyber/proto:unit_test_cc_proto",
         "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
 )

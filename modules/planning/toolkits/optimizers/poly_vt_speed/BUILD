@@ -43,8 +43,8 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/common/proto:pnc_point_proto",
         ":piecewise_poly_speed_curve",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 
@@ -99,27 +99,27 @@ cc_library(
         "poly_vt_speed_optimizer.h",
     ],
     deps = [
+        ":piecewise_poly_vt_speed_sampler",
         "//cyber/common:log",
-        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/localization/proto:pose_proto",
-        "//modules/planning/common/path:path_data",
-        "//modules/planning/common/speed:speed_data",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common:speed_limit",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:poly_vt_speed_config_proto",
+        "//modules/planning/toolkits:task",
         "//modules/planning/toolkits/optimizers/st_graph:st_boundary_mapper",
         "//modules/planning/toolkits/optimizers/st_graph:st_graph_data",
-        "//modules/planning/toolkits:task",
+        "//modules/planning/tuning:autotuning_raw_feature_generator",
         "//modules/planning/tuning/speed_model:autotuning_speed_feature_builder",
         "//modules/planning/tuning/speed_model:autotuning_speed_mlp_model",
-        "//modules/planning/tuning:autotuning_raw_feature_generator",
-        ":piecewise_poly_vt_speed_sampler",
     ],
 )
 cpplint()

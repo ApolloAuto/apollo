@@ -19,8 +19,8 @@ cc_library(
         "hm_tracks_objects_match.h",
     ],
     deps = [
-        "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
         ":track_object_distance",
+        "//modules/perception/common/graph:gated_hungarian_bigraph_matcher",
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/fusion/base:scene",
         "//modules/perception/fusion/lib/interface:interface",
@@ -53,20 +53,20 @@ cc_library(
         "track_object_distance.h",
     ],
     deps = [
+        ":chi_squared_cdf",
+        ":probabilities",
+        ":projection_cache",
+        ":track_object_similarity",
+        "//modules/perception/base:base_type",
+        "//modules/perception/base:camera",
         "//modules/perception/base:point_cloud",
+        "//modules/perception/common/geometry:camera_homography",
         "//modules/perception/common/sensor_manager:sensor_manager",
         "//modules/perception/fusion/base:fusion_log",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:sensor_data_manager",
         "//modules/perception/fusion/base:track",
         "//modules/perception/fusion/common:camera_util",
-        ":probabilities",
-        ":projection_cache",
-        ":track_object_similarity",
-        "//modules/perception/base:base_type",
-        "//modules/perception/base:camera",
-        "//modules/perception/common/geometry:camera_homography",
-        ":chi_squared_cdf",
     ],
 )
 
@@ -80,11 +80,11 @@ cc_library(
     ],
     deps = [
         ":chi_squared_cdf",
+        ":probabilities",
+        ":projection_cache",
         "//modules/perception/fusion/base:fusion_log",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/common:camera_util",
-        ":probabilities",
-        ":projection_cache",
     ],
 )
 
@@ -95,15 +95,15 @@ cc_test(
         "hm_data_association_test.cc",
     ],
     deps = [
+        ":probabilities",
+        ":projection_cache",
+        ":track_object_distance",
+        ":track_object_similarity",
         "//modules/perception/base:frame",
         "//modules/perception/common/sensor_manager:sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
         "@gtest//:main",
-        ":probabilities",
-        ":projection_cache",
-        ":track_object_distance",
-        ":track_object_similarity",
     ],
 )
 
@@ -114,15 +114,15 @@ cc_test(
         "track_object_distance_test.cc",
     ],
     deps = [
+        ":projection_cache",
+        ":track_object_distance",
+        ":track_object_similarity",
         "//modules/perception/base:frame",
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/sensor_manager:sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
         "@gtest//:main",
-        ":projection_cache",
-        ":track_object_distance",
-        ":track_object_similarity",
     ],
 )
 
@@ -133,13 +133,13 @@ cc_test(
         "track_object_test.cc",
     ],
     deps = [
+        ":hm_tracks_objects_match",
         "//modules/perception/base:frame",
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/sensor_manager:sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
         "@gtest//:main",
-        ":hm_tracks_objects_match",
     ],
 )
 

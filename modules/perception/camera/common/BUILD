@@ -41,8 +41,8 @@ cc_library(
         "data_provider.h",
     ],
     deps = [
-        "//modules/perception/base:base",
         ":undistortion_handler",
+        "//modules/perception/base:base",
     ],
 )
 

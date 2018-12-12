@@ -182,10 +182,10 @@ cc_library(
     srcs = ["junction_analyzer.cc"],
     hdrs = ["junction_analyzer.h"],
     deps = [
-        "//modules/map/hdmap:hdmap",
-        "//modules/prediction/proto:feature_proto",
         ":prediction_map",
         "//cyber",
+        "//modules/map/hdmap:hdmap",
+        "//modules/prediction/proto:feature_proto",
     ],
 )
 

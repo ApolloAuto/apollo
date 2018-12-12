@@ -21,9 +21,9 @@ cc_library(
         "//modules/perception/lidar/lib/ground_detector/ground_service_detector/proto:ground_service_detector_config_proto",
         "//modules/perception/lidar/lib/interface:base_ground_detector",
         "//modules/perception/lidar/lib/scene_manager",
+        "//modules/perception/lidar/lib/scene_manager:scene_service",
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/lidar/lib/scene_manager/ground_service:ground_struct",
-        "//modules/perception/lidar/lib/scene_manager:scene_service",
         "//modules/perception/proto:perception_config_schema_proto",
         "@eigen",
     ],
@@ -37,8 +37,8 @@ cc_test(
     ],
     deps = [
         ":ground_service_detector",
-        "//modules/perception/common/io:io_util",
         "//modules/perception/common:perception_gflags",
+        "//modules/perception/common/io:io_util",
         "@gtest//:main",
     ],
 )
