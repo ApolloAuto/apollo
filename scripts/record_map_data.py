@@ -37,29 +37,22 @@ import sys
 
 import psutil
 
-
-MAP_MKZ_STD_TOPICS = [
-    '/apollo/sensor/gnss/raw_data',
-    '/apollo/sensor/gnss/odometry',
+MAP_COLLECTION_DAT_TOPICS = [
+    '/apollo/monitor/system_status',
+    '/apollo/sensor/gnss/best_pose',
+    '/apollo/sensor/gnss/gnss_status',
+    '/apollo/sensor/gnss/imu',
     '/apollo/sensor/gnss/ins_stat',
-    '/apollo/sensor/velodyne64/VelodyneScan',
-    '/apollo/sensor/velodyne64/compensator/PointCloud2',
-    '/apollo/sensor/velodyne16/VelodyneScan',
-    '/apollo/sensor/camera/traffic/image_short/compressed',
-    '/apollo/sensor/camera/traffic/image_long/compressed',
-]
-
-MAP_UDEV_STD_TOPICS = [
-    '/apollo/sensor/gnss/raw_data',
     '/apollo/sensor/gnss/odometry',
-    '/apollo/sensor/gnss/ins_stat',
-    '/apollo/sensor/velodyne128/VelodyneScan',
-    '/apollo/sensor/velodyne128/compensator/PointCloud2',
-    '/apollo/sensor/velodyne16/up/center/VelodyneScan',
-    '/apollo/sensor/camera/front_6mm/image/compressed',
+    '/apollo/sensor/gnss/raw_data',
+    '/tf',
+    '/tf_static',
     '/apollo/sensor/camera/front_12mm/image/compressed',
+    '/apollo/sensor/camera/front_6mm/image/compressed',
+    '/apollo/sensor/lidar16/front/center/PointCloud2',
+    '/apollo/sensor/lidar128/PointCloud2',
+    '/apollo/sensor/lidar128/compensator/PointCloud2',
 ]
-
 
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
@@ -86,15 +79,9 @@ class ArgManager(object):
                                  'that case, the False value is ignored.')
         self.parser.add_argument('--stop', default=False, action="store_true",
                                  help='Stop recorder.')
-        self.parser.add_argument('--additional_topics', action='append',
-                                 help='Record additional topics.')
         self.parser.add_argument('--split_duration', default="1m",
                                  help='Duration to split bags, will be applied '
                                  'as parameter to "rosbag record --duration".')
-        self.parser.add_argument('--map_type', default="mkz_std",
-                                 help='Select the type of car '
-                                 'used to collect data. '
-                                 'Valid type: mkz_std, udev_std.')
         self._args = None
 
     def args(self):
@@ -116,7 +103,7 @@ class DiskManager(object):
             disks.append({
                 'mountpoint': disk.mountpoint,
                 'available_size': DiskManager.disk_avail_size(disk.mountpoint),
-                'is_nvme': disk.device.startswith('/dev/nvme'),
+                'is_nvme': disk.mountpoint.startswith('/media/apollo/internal_nvme'),
             })
         # Prefer NVME disks and then larger disks.
         self.disks = sorted(
@@ -147,19 +134,12 @@ class Recorder(object):
         # Use the best disk, or fallback '/apollo' if none available.
         disk_to_use = disks[0]['mountpoint'] if len(disks) > 0 else '/apollo'
 
-        topics = []
-        if self.args.map_type == 'mkz_std':
-            topics.extend(MAP_MKZ_STD_TOPICS)
-        elif self.args.map_type == 'udev_std':
-            topics.extend(MAP_UDEV_STD_TOPICS)
-
-        if self.args.additional_topics:
-            topics.extend(self.args.additional_topics)
+        topics = list(MAP_COLLECTION_DATA_TOPICS)
         self.record_task(disk_to_use, topics)
 
     def stop(self):
         """Stop recording."""
-        shell_cmd('kill -TERM $(pgrep -f "cyber_recorder record" | grep -v pgrep)')
+        shell_cmd('pkill -f "cyber_recorder record"')
 
     def record_task(self, disk, topics):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
