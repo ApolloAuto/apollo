@@ -49,7 +49,7 @@ void Velodyne128Parser::GeneratePointcloud(
     AERROR << "All points is NAN!Please check velodyne:" << config_.model();
     return;
   } else {
-    uint64_t timestamp = out_msg->point(size - 1).timestamp();
+    const auto timestamp = out_msg->point(size - 1).timestamp();
     out_msg->set_measurement_time(timestamp / 1e9);
     out_msg->mutable_header()->set_lidar_timestamp(timestamp);
   }
