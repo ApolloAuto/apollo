@@ -88,6 +88,13 @@ apollo::common::Status OpenSpacePlanner::Plan(
       thread_data_.XYbounds = open_space_roi_generator_->ROI_xy_boundary();
     }
 
+    // check vehicle state
+    if (IsVehicleNearDestination(
+            thread_data_.vehicle_state, thread_data_.end_pose,
+            thread_data_.rotate_angle, thread_data_.translate_origin)) {
+      return Status(ErrorCode::OK, "Vehicle is near to destination");
+    }
+
     // Check if trajectory updated
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
@@ -100,21 +107,6 @@ apollo::common::Status OpenSpacePlanner::Plan(
       LoadTrajectoryToFrame(frame);
       trajectory_updated_.store(false);
       return Status::OK();
-      // return Status(ErrorCode::OK, "Planning trajectory updated");
-      // } else {
-      //   AINFO << "End pose not same between threads, old pose : "
-      //         << open_space_trajectory_generator_->end_pose()[0] << ", "
-      //         << open_space_trajectory_generator_->end_pose()[1] << ", "
-      //         << open_space_trajectory_generator_->end_pose()[2] << ", "
-      //         << open_space_trajectory_generator_->end_pose()[3]
-      //         << ", new pose : " << thread_data_.end_pose[0] << ", "
-      //         << thread_data_.end_pose[1] << ", " << thread_data_.end_pose[2]
-      //         << ", " << thread_data_.end_pose[3]
-      //         << ", disgard this trajectory generation.";
-      //   trajectory_updated_.store(false);
-      //   return Status(ErrorCode::OK,
-      //                 "Disgard this frame due to end_pose not match");
-      // }
     }
 
     return Status(ErrorCode::OK,
@@ -140,6 +132,12 @@ apollo::common::Status OpenSpacePlanner::Plan(
     obstacles_vertices_vec_ =
         open_space_roi_generator_->obstacles_vertices_vec();
     XYbounds_ = open_space_roi_generator_->ROI_xy_boundary();
+
+    // check vehicle state
+    if (IsVehicleNearDestination(vehicle_state_, end_pose_, rotate_angle_,
+                                 translate_origin_)) {
+      return Status(ErrorCode::OK, "Vehicle is near to destination");
+    }
 
     // Generate Trajectory;
     Status status = open_space_trajectory_generator_->Plan(
@@ -179,7 +177,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
         trajectory_updated_.store(true);
       } else {
         AERROR_EVERY(200)
-            << "Multi-thread trajectory generator failed with return satus : "
+            << "Multi-thread trajectory generator not OK with return satus : "
             << status.ToString();
       }
     }
@@ -200,6 +198,30 @@ void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
   frame->mutable_trajectory()->CopyFrom(trajectory_to_end_pb_);
   frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
   *(frame->mutable_last_stitching_trajectory()) = stitching_trajectory_;
+}
+
+bool OpenSpacePlanner::IsVehicleNearDestination(
+    const common::VehicleState& vehicle_state,
+    const std::vector<double>& end_pose, const double& rotate_angle,
+    const Vec2d& translate_origin) {
+  CHECK_EQ(end_pose.size(), 4);
+  Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);
+
+  end_pose_to_world_frame.SelfRotate(rotate_angle);
+  end_pose_to_world_frame += translate_origin;
+
+  double distance_to_vehicle =
+      (vehicle_state.x() - end_pose_to_world_frame.x()) *
+          (vehicle_state.x() - end_pose_to_world_frame.x()) +
+      (vehicle_state.y() - end_pose_to_world_frame.y()) *
+          (vehicle_state.y() - end_pose_to_world_frame.y());
+
+  if (distance_to_vehicle <
+      planner_open_space_config_.is_near_destination_threshold()) {
+    ADEBUG << "vehicle reach end_pose";
+    return true;
+  }
+  return false;
 }
 
 }  // namespace planning
