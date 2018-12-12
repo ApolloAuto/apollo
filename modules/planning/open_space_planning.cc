@@ -369,6 +369,9 @@ Status OpenSpacePlanning::Plan(
     } else {
       return status;
     }
+  } else if (status ==
+             Status(ErrorCode::OK, "Vehicle is near to destination")) {
+    GenerateStopTrajectory(ptr_trajectory_pb);
   } else {
     return status;
   }
@@ -382,7 +385,6 @@ Status OpenSpacePlanning::Plan(
   if (!IsCollisionFreeTrajectory(*ptr_trajectory_pb)) {
     return Status(ErrorCode::PLANNING_ERROR, "Collision Check failed");
   }
-
   return status;
 }
 
@@ -551,8 +553,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
   bool flag_change_to_next = false;
   // Could have a big error in vehicle state in single thread mode!!! As the
   // vehicle state is only updated at the every beginning at RunOnce()
-  VehicleState vehicle_state =
-      VehicleStateProvider::Instance()->vehicle_state();
+  VehicleState vehicle_state = frame_->vehicle_state();
 
   auto comp = [](const std::pair<std::pair<size_t, int>, double>& left,
                  const std::pair<std::pair<size_t, int>, double>& right) {
@@ -928,6 +929,25 @@ apollo::common::Status OpenSpacePlanning::GenerateGearShiftTrajectory(
   }
 
   return Status::OK();
+}
+
+void OpenSpacePlanning::GenerateStopTrajectory(
+    ADCTrajectory* const ptr_trajectory_pb) {
+  double relative_time = 0.0;
+  constexpr int stop_trajectory_length = 10;
+  constexpr double relative_stop_time = 0.1;
+  for (size_t i = 0; i < stop_trajectory_length; i++) {
+    auto* point = ptr_trajectory_pb->add_trajectory_point();
+    point->mutable_path_point()->set_x(frame_->vehicle_state().x());
+    point->mutable_path_point()->set_y(frame_->vehicle_state().x());
+    point->mutable_path_point()->set_theta(frame_->vehicle_state().heading());
+    point->mutable_path_point()->set_s(0.0);
+    point->mutable_path_point()->set_kappa(0.0);
+    point->set_relative_time(relative_time);
+    point->set_v(0.0);
+    point->set_a(0.0);
+    relative_time += relative_stop_time;
+  }
 }
 
 }  // namespace planning

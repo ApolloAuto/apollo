@@ -97,6 +97,8 @@ class OpenSpacePlanning : public PlanningBase {
       const apollo::canbus::Chassis::GearPosition& gear_position,
       ADCTrajectory* trajectory_pb);
 
+  void GenerateStopTrajectory(ADCTrajectory* const ptr_trajectory_pb);
+
  private:
   routing::RoutingResponse last_routing_;
   std::unique_ptr<Frame> frame_;

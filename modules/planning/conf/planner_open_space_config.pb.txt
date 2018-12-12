@@ -4,8 +4,8 @@ max_theta_error_to_end_point : 0.05
 is_near_destination_threshold : 0.001
 
 roi_config : {
-  roi_longitudinal_range : 10.0
-  parking_start_range : 7.0
+  roi_longitudinal_range : 15.0
+  parking_start_range : 12.0
 }
 
 warm_start_config : {

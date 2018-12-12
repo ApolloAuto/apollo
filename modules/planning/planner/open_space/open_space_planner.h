@@ -111,6 +111,10 @@ class OpenSpacePlanner : public Planner {
 
  private:
   void LoadTrajectoryToFrame(Frame* frame);
+  bool IsVehicleNearDestination(const common::VehicleState& vehicle_state,
+                                const std::vector<double>& end_pose,
+                                const double& rotate_angle,
+                                const Vec2d& translate_origin);
 
  private:
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
