@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,14 +46,14 @@ class EventDumper(object):
             print("can't open bag")
         else:
             f = file('/apollo/test.txt', 'a')
-	    for msg in reader.read_messages():
+            for msg in reader.read_messages():
                 if msg.topic == kEventTopic:
                     drive_event.ParseFromString(msg.message)
-		    msg_time = time.localtime(msg.timestamp/long(1e9))
-		    f.write(time.strftime("%Y-%m-%d %H:%M:%S", msg_time))
-		    f.write(str(drive_event.type)+":")
+                    msg_time = time.localtime(msg.timestamp/long(1e9))
+                    f.write(time.strftime("%Y-%m-%d %H:%M:%S", msg_time))
+                    f.write(str(drive_event.type)+":")
                     f.write(drive_event.event.encode('utf-8')+'\n')
-	    f.close()
+            f.close()
 
 def main():
     """Main function."""
