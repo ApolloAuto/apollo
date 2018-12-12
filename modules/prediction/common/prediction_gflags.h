@@ -18,12 +18,17 @@
 
 #include "gflags/gflags.h"
 
+DECLARE_double(double_precision);
+
+// prediction trajectory and dynamic model
 DECLARE_double(prediction_trajectory_time_length);
 DECLARE_double(prediction_trajectory_time_resolution);
-DECLARE_double(double_precision);
 DECLARE_double(min_prediction_trajectory_spatial_length);
 DECLARE_bool(enable_trajectory_validation_check);
 
+DECLARE_double(vehicle_max_linear_acc);
+DECLARE_double(vehicle_min_linear_acc);
+DECLARE_double(vehicle_max_speed);
 
 // Map
 DECLARE_double(lane_search_radius);
@@ -43,9 +48,6 @@ DECLARE_double(scan_width);
 DECLARE_double(back_dist_ignore_ped);
 DECLARE_uint32(cruise_historical_frame_length);
 DECLARE_bool(enable_kf_tracking);
-DECLARE_double(max_acc);
-DECLARE_double(min_acc);
-DECLARE_double(max_speed);
 DECLARE_double(max_angle_diff_to_adjust_velocity);
 DECLARE_double(q_var);
 DECLARE_double(r_var);
@@ -70,7 +72,6 @@ DECLARE_bool(enable_pedestrian_acc);
 DECLARE_double(coeff_mul_sigma);
 DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_max_acc);
-DECLARE_double(prediction_pedestrian_total_time);
 DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(evaluator_cruise_vehicle_go_model_file);

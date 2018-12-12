@@ -369,8 +369,10 @@ void Obstacle::UpdateStatus(Feature* feature) {
   feature->set_speed(speed);
   feature->set_velocity_heading(std::atan2(state(3, 0), state(2, 0)));
 
-  double acc_x = common::math::Clamp(state(4, 0), FLAGS_min_acc, FLAGS_max_acc);
-  double acc_y = common::math::Clamp(state(5, 0), FLAGS_min_acc, FLAGS_max_acc);
+  double acc_x = common::math::Clamp(state(4, 0),
+      FLAGS_vehicle_min_linear_acc, FLAGS_vehicle_max_linear_acc);
+  double acc_y = common::math::Clamp(state(5, 0),
+      FLAGS_vehicle_min_linear_acc, FLAGS_vehicle_max_linear_acc);
   double acc =
       acc_x * std::cos(velocity_heading) + acc_y * std::sin(velocity_heading);
   feature->mutable_acceleration()->set_x(acc_x);
@@ -678,12 +680,12 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_y *= damping_y;
       acc_z *= damping_z;
 
-      acc_x =
-          common::math::Clamp(acc_x * damping_x, FLAGS_min_acc, FLAGS_max_acc);
-      acc_y =
-          common::math::Clamp(acc_y * damping_y, FLAGS_min_acc, FLAGS_max_acc);
-      acc_z =
-          common::math::Clamp(acc_z * damping_z, FLAGS_min_acc, FLAGS_max_acc);
+      acc_x = common::math::Clamp(acc_x * damping_x,
+          FLAGS_vehicle_min_linear_acc, FLAGS_vehicle_max_linear_acc);
+      acc_y = common::math::Clamp(acc_y * damping_y,
+          FLAGS_vehicle_min_linear_acc, FLAGS_vehicle_max_linear_acc);
+      acc_z = common::math::Clamp(acc_z * damping_z,
+          FLAGS_vehicle_min_linear_acc, FLAGS_vehicle_max_linear_acc);
 
       double heading = feature->velocity_heading();
       acc = acc_x * std::cos(heading) + acc_y * std::sin(heading);
@@ -1061,10 +1063,13 @@ void Obstacle::BuildLaneGraph() {
     return;
   }
   double speed = feature->speed();
-  double road_graph_search_distance = std::max(
-      speed * FLAGS_prediction_trajectory_time_length +
-      0.5 * FLAGS_max_acc * FLAGS_prediction_trajectory_time_length *
-      FLAGS_prediction_trajectory_time_length,
+  double t_max = FLAGS_prediction_trajectory_time_length;
+  double a_max = FLAGS_vehicle_max_linear_acc;
+  auto estimated_move_distance = speed * t_max +
+      0.5 * a_max * t_max * t_max;
+
+  double road_graph_search_distance = std::fmax(
+      estimated_move_distance,
       FLAGS_min_prediction_trajectory_spatial_length);
 
   // BuildLaneGraph for current lanes:
@@ -1131,7 +1136,6 @@ void Obstacle::BuildLaneGraph() {
   ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
 }
 
-
 void Obstacle::BuildLaneGraphFromLeftToRight() {
   // Sanity checks.
   if (history_size() == 0) {
@@ -1148,7 +1152,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   double speed = feature->speed();
   double road_graph_search_distance = std::fmax(
       speed * FLAGS_prediction_trajectory_time_length +
-      0.5 * FLAGS_max_acc * FLAGS_prediction_trajectory_time_length *
+      0.5 * FLAGS_vehicle_max_linear_acc *
+      FLAGS_prediction_trajectory_time_length *
       FLAGS_prediction_trajectory_time_length,
       FLAGS_min_prediction_trajectory_spatial_length);
 

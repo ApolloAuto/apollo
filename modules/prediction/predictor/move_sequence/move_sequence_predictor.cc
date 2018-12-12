@@ -540,8 +540,8 @@ std::pair<double, double> MoveSequencePredictor::ComputeLonEndState(
   // If the deceleration is too much,
   // then predict the obstacle follows a reasonable deceleration.
   double acc = (v_end - v_init) / t;
-  if (acc < FLAGS_min_acc) {
-    t = v_init / (-FLAGS_min_acc);
+  if (acc < FLAGS_vehicle_min_linear_acc) {
+    t = v_init / (-FLAGS_vehicle_min_linear_acc);
     return {FLAGS_still_obstacle_speed_threshold, t};
   }
   // Otherwise, predict that it takes t for the obstacle to arrive at the

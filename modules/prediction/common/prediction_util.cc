@@ -246,8 +246,8 @@ void GenerateFreeMoveTrajectoryPoints(
       acc_x = 0.0;
       acc_y = 0.0;
       acc = 0.0;
-    } else if (speed > FLAGS_max_speed) {
-      speed = FLAGS_max_speed;
+    } else {
+      speed = std::fmin(speed, FLAGS_vehicle_max_speed);
     }
 
     // update theta and acc
