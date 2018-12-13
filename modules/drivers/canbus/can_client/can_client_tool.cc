@@ -19,8 +19,8 @@
 #include <memory>
 #include <thread>
 
-#include "gflags/gflags.h"
 #include "cyber/common/log.h"
+#include "gflags/gflags.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/factory.h"
@@ -134,8 +134,8 @@ class CanAgent {
         send_id = id;
         frames[i].id = id;
         frames[i].len = 8;
-        frames[i].data[7] = count % 256;
-        for (int32_t j = 0; j < 7; ++j) {
+        frames[i].data[7] = static_cast<uint8_t>(count % 256);
+        for (uint8_t j = 0; j < 7; ++j) {
           frames[i].data[j] = j;
         }
         ++count;
@@ -159,7 +159,7 @@ class CanAgent {
       }
     }
     int64_t end = AsInt64<micros>(Clock::Now());
-    param->send_time = end - start;
+    param->send_time = static_cast<int32_t>(end - start);
     // In case for finish too quick to receiver miss some msg
     sleep(2);
     AINFO << "Send thread stopping..." << param->conf.ShortDebugString();
@@ -215,7 +215,7 @@ class CanAgent {
       }
     }
     int64_t end = AsInt64<micros>(Clock::Now());
-    param->recv_time = end - start;
+    param->recv_time = static_cast<int32_t>(end - start);
     AINFO << "Recv thread stopping..., conf:" << param->conf.ShortDebugString();
     return;
   }

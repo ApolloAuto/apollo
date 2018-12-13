@@ -70,8 +70,7 @@ build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
 # Strict check on type conversion.
-# TODO(all): Clear drivers module and remove it from exception.
-build --per_file_copt=^modules/.*\.cc,-^modules/drivers/.*\.cc@-Werror=conversion
+build --per_file_copt=^modules/.*\.cc@-Werror=conversion
 
 # TODO(all): Clear cyber warnings and add it to the strict check.
 build --per_file_copt=^cyber/.*\.cc@-Wconversion
