@@ -60,7 +60,7 @@ int Steeringmotorrpt2405::encoder_temperature(const std::uint8_t* bytes,
   x <<= 16;
   x >>= 16;
 
-  int ret = x + -40.000000;
+  int ret = x + -40;
   return ret;
 }
 
@@ -81,7 +81,7 @@ int Steeringmotorrpt2405::motor_temperature(const std::uint8_t* bytes,
   x <<= 16;
   x >>= 16;
 
-  int ret = x + -40.000000;
+  int ret = x + -40;
   return ret;
 }
 
