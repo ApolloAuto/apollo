@@ -64,7 +64,7 @@ void Globalcmd69::set_p_pacmod_enable(
   uint8_t x = pacmod_enable;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 1);
 }
 
 Globalcmd69* Globalcmd69::set_clear_override(
@@ -83,7 +83,7 @@ void Globalcmd69::set_p_clear_override(
   uint8_t x = clear_override;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 1, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
 Globalcmd69* Globalcmd69::set_ignore_override(
@@ -102,7 +102,7 @@ void Globalcmd69::set_p_ignore_override(
   uint8_t x = ignore_override;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 2, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
 }  // namespace gem

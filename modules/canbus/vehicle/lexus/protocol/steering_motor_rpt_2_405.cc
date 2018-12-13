@@ -112,7 +112,7 @@ double Steeringmotorrpt2405::angular_speed(const std::uint8_t* bytes,
   x <<= 0;
   x >>= 0;
 
-  double ret = x * 0.001000;
+  double ret = static_cast<double>(x * 0.001000);
   return ret;
 }
 }  // namespace lexus
