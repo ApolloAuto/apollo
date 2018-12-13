@@ -42,12 +42,11 @@ bool PriSecFusionComponent::Init() {
 
 bool PriSecFusionComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
-
   auto target = point_cloud;
   auto fusion_readers = readers_;
   auto start_time = Time::Now().ToSecond();
-  while ((Time::Now().ToSecond() - start_time) < conf_.wait_time_s()
-      && fusion_readers.size() > 0) {
+  while ((Time::Now().ToSecond() - start_time) < conf_.wait_time_s() &&
+         fusion_readers.size() > 0) {
     for (auto itr = fusion_readers.begin(); itr != fusion_readers.end();) {
       (*itr)->Observe();
       if (!(*itr)->Empty()) {
@@ -81,7 +80,7 @@ bool PriSecFusionComponent::QueryPoseAffine(const std::string& target_frame_id,
                                             Eigen::Affine3d* pose) {
   std::string err_string;
   if (!buffer_ptr_->canTransform(target_frame_id, source_frame_id,
-                                 cyber::Time(0), 0.02, &err_string)) {
+                                 cyber::Time(0), 0.02f, &err_string)) {
     AERROR << "Can not find transform. "
            << "target_id:" << target_frame_id << " frame_id:" << source_frame_id
            << " Error info: " << err_string;
@@ -152,9 +151,8 @@ void PriSecFusionComponent::AppendPointCloud(
 bool PriSecFusionComponent::Fusion(std::shared_ptr<PointCloud> target,
                                    std::shared_ptr<PointCloud> source) {
   Eigen::Affine3d pose;
-  if (QueryPoseAffine(target->header().frame_id(),
-      source->header().frame_id(),
-      &pose)) {
+  if (QueryPoseAffine(target->header().frame_id(), source->header().frame_id(),
+                      &pose)) {
     AppendPointCloud(target, source, pose);
     return true;
   }

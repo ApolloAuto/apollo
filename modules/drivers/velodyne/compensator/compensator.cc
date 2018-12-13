@@ -145,7 +145,7 @@ void Compensator::MotionCompensation(
 
   double d = q0.dot(q1);
   double abs_d = abs(d);
-  double f = 1.0 / (timestamp_max - timestamp_min);
+  double f = 1.0 / static_cast<double>(timestamp_max - timestamp_min);
 
   // Threshold for a "significant" rotation from min_time to max_time:
   // The LiDAR range accuracy is ~2 cm. Over 70 meters range, it means an angle
@@ -173,7 +173,7 @@ void Compensator::MotionCompensation(
       Eigen::Vector3d p(x_scalar, y_scalar, z_scalar);
 
       uint64_t tp = point.timestamp();
-      double t = (timestamp_max - tp) * f;
+      double t = static_cast<double>(timestamp_max - tp) * f;
 
       Eigen::Translation3d ti(t * translation);
 
@@ -205,7 +205,7 @@ void Compensator::MotionCompensation(
     Eigen::Vector3d p(x_scalar, y_scalar, z_scalar);
 
     uint64_t tp = point.timestamp();
-    double t = (timestamp_max - tp) * f;
+    double t = static_cast<double>(timestamp_max - tp) * f;
     Eigen::Translation3d ti(t * translation);
 
     p = ti * p;

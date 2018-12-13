@@ -43,8 +43,8 @@ void Velodyne64Driver::Init() {
  */
 bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
-  int poll_result = config_.use_sensor_sync() ? PollStandardSync(scan)
-                                              : PollStandard(scan);
+  int poll_result =
+      config_.use_sensor_sync() ? PollStandardSync(scan) : PollStandard(scan);
 
   if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
     return false;  // poll again
@@ -72,8 +72,8 @@ bool Velodyne64Driver::CheckAngle(const VelodynePacket& packet) {
   // check the lidar model
   const unsigned char* raw_ptr = (const unsigned char*)packet.data().c_str();
   for (int i = 0; i < BLOCKS_PER_PACKET; ++i) {
-    uint16_t angle =
-        raw_ptr[i * BLOCK_SIZE + 3] * 256 + raw_ptr[i * BLOCK_SIZE + 2];
+    uint16_t angle = static_cast<uint16_t>(raw_ptr[i * BLOCK_SIZE + 3] * 256 +
+                                           raw_ptr[i * BLOCK_SIZE + 2]);
     // for the velodyne64 angle resolution is 0.17~0.2 , so take the angle diff
     // at 0.3 degree should be a good choice
     // prefix_angle default = 18000

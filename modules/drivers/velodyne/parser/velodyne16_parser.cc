@@ -38,7 +38,7 @@ void Velodyne16Parser::GeneratePointcloud(
 
   size_t packets_size = scan_msg->firing_pkts_size();
   for (size_t i = 0; i < packets_size; ++i) {
-    Unpack(scan_msg->firing_pkts(i), out_msg);
+    Unpack(scan_msg->firing_pkts(static_cast<int>(i)), out_msg);
     last_time_stamp_ = out_msg->measurement_time();
     ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
   }
@@ -53,10 +53,10 @@ void Velodyne16Parser::GeneratePointcloud(
 }
 
 uint64_t Velodyne16Parser::GetTimestamp(double base_time, float time_offset,
-                                         uint16_t block_id) {
+                                        uint16_t block_id) {
   double t = base_time - time_offset;
-  uint64_t timestamp = Velodyne16Parser::GetGpsStamp(
-      t, &previous_packet_stamp_, &gps_base_usec_);
+  uint64_t timestamp = Velodyne16Parser::GetGpsStamp(t, &previous_packet_stamp_,
+                                                     &gps_base_usec_);
   return timestamp;
 }
 
@@ -101,8 +101,9 @@ void Velodyne16Parser::Unpack(const VelodynePacket& pkt,
         /** correct for the laser rotation as a function of timing during the
          * firings **/
         azimuth_corrected_f =
-            azimuth + (azimuth_diff * ((dsr * VLP16_DSR_TOFFSET) +
-                                       (firing * VLP16_FIRING_TOFFSET)) /
+            azimuth + (azimuth_diff *
+                       ((static_cast<float>(dsr) * VLP16_DSR_TOFFSET) +
+                        (static_cast<float>(firing) * VLP16_FIRING_TOFFSET)) /
                        VLP16_BLOCK_TDURATION);
         azimuth_corrected =
             static_cast<int>(round(fmod(azimuth_corrected_f, 36000.0)));
@@ -118,7 +119,7 @@ void Velodyne16Parser::Unpack(const VelodynePacket& pkt,
             firing == VLP16_FIRINGS_PER_BLOCK - 1 &&
             dsr == VLP16_SCANS_PER_FIRING - 1) {
           // set header stamp before organize the point cloud
-          pc->set_measurement_time(static_cast<double>(timestamp / 1e9));
+          pc->set_measurement_time(static_cast<double>(timestamp) / 1e9);
         }
 
         float real_distance = raw_distance.raw_distance * DISTANCE_RESOLUTION;
@@ -141,7 +142,8 @@ void Velodyne16Parser::Unpack(const VelodynePacket& pkt,
         PointXYZIT* point = pc->add_point();
         point->set_timestamp(timestamp);
         // append this point to the cloud
-        ComputeCoords(real_distance, corrections, azimuth_corrected, point);
+        ComputeCoords(real_distance, corrections,
+                      static_cast<uint16_t>(azimuth_corrected), point);
         point->set_intensity(raw->blocks[block].data[k + 2]);
         // append this point to the cloud
 

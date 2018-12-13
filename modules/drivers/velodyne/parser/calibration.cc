@@ -105,7 +105,8 @@ void operator>>(const YAML::Node& node,
   correction.second.sin_vert_correction =
       sinf(correction.second.vert_correction);
   correction.second.focal_offset =
-      256 * pow(1 - correction.second.focal_distance / 13100, 2);
+      256.0f * static_cast<float>(std::pow(
+                   1 - correction.second.focal_distance / 13100.0f, 2));
   correction.second.laser_ring = 0;  // clear initially (set later)
 }
 
