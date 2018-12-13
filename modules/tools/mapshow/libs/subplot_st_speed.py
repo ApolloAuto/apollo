@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+
 class StSpeedSubplot:
     def __init__(self, ax, st_name):
         self.speed_limit_line = ax.plot([0], [0], "r-",
@@ -55,8 +56,10 @@ class StSpeedSubplot:
         self.speed_line.set_ydata(planned_speed_v)
         self.speed_line.set_visible(True)
 
-        self.speed_limit_line.set_xdata(planning.st_speed_limit_s[self.st_name])
-        self.speed_limit_line.set_ydata(planning.st_speed_limit_v[self.st_name])
+        self.speed_limit_line.set_xdata(
+            planning.st_speed_limit_s[self.st_name])
+        self.speed_limit_line.set_ydata(
+            planning.st_speed_limit_v[self.st_name])
         self.speed_limit_line.set_visible(True)
 
         self.speed_upper_bound_line.set_xdata(
