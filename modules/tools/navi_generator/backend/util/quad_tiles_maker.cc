@@ -27,7 +27,12 @@ namespace apollo {
 namespace navi_generator {
 namespace util {
 
-QuadTilesMaker::QuadTilesMaker() { ; }
+namespace {
+constexpr double kMaxNorthLat = 90.0;
+constexpr double kMinSouthLat = -90.0;
+constexpr double kMaxEastLon = 180.0;
+constexpr double kMinWestLon = -180.0;
+}  // namespace
 
 bool QuadTilesMaker::MakeQuadTile(const double lat, const double lon,
                                   const double altitude,
@@ -48,12 +53,12 @@ bool QuadTilesMaker::MakeQuadTile(const double lat, const double lon,
     return false;
   }
 
-  std::uint64_t id;
-  double center_lat;
-  double center_lon;
+  std::uint64_t id = 0;
+  double center_lat = 0.0;
+  double center_lon = 0.0;
   std::size_t current_level = 0;
-  double lat_adjustment = 45.0;
-  double lon_adjustment = 90.0;
+  double lat_adjustment = 45.0;  // one quarter of the earth's latitude
+  double lon_adjustment = 90.0;  // one quarter of the earth's longitude
   std::uint64_t bit = 0x8000000000000000;
 
   while (current_level < level) {
@@ -111,8 +116,8 @@ bool QuadTilesMaker::IdAsString(const std::size_t level,
   *id_string = "";
 
   for (std::size_t i = 0; i < level; i++) {
-    id_string->append(1, static_cast<char>(97 + (id >> 62)));
-    id = id << 2;
+    id_string->append(1, static_cast<char>('a' + (id >> 62)));
+    id <<= 2;
   }
 
   return true;
@@ -141,10 +146,11 @@ bool QuadTilesMaker::IdAsUint32(const std::size_t level,
   return true;
 }
 
-bool QuadTilesMaker::MakePosition(double lat, double lon, double altitude,
-                                  Position* const pos) {
+bool QuadTilesMaker::MakePosition(const double lat, const double lon,
+                                  const double altitude, Position* const pos) {
   CHECK_NOTNULL(pos);
-  if (lat < -90.0 || lat > 90.0 || lon <= -180.0 || lon > 180.0) {
+  if (lat < kMinSouthLat || lat > kMaxNorthLat || lon <= kMinWestLon ||
+      lon > kMaxEastLon) {
     AERROR << "The latitude: " << lat << ", longitude: " << lon
            << ", altitude: " << altitude << " is out of range.";
     return false;
