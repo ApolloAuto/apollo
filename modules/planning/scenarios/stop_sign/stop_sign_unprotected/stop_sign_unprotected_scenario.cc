@@ -27,6 +27,7 @@
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "cyber/common/log.h"
+
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
@@ -43,13 +44,17 @@ namespace scenario {
 namespace stop_sign {
 
 using common::TrajectoryPoint;
-using common::time::Clock;
 using hdmap::HDMapUtil;
 using hdmap::StopSignInfo;
 using hdmap::StopSignInfoConstPtr;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
+
+apollo::common::util::Factory<
+    ScenarioConfig::StageType, Stage,
+    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+    StopSignUnprotectedScenario::s_stage_factory_;
 
 void StopSignUnprotectedScenario::Init() {
   if (init_) {
@@ -82,11 +87,6 @@ void StopSignUnprotectedScenario::Init() {
 
   init_ = true;
 }
-
-apollo::common::util::Factory<
-    ScenarioConfig::StageType, Stage,
-    Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-    StopSignUnprotectedScenario::s_stage_factory_;
 
 void StopSignUnprotectedScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
@@ -128,14 +128,8 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 }
 
 bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario, const common::TrajectoryPoint& ego_point,
+    const Scenario& current_scenario, const TrajectoryPoint& ego_point,
     const Frame& frame) {
-  // const std::string stop_sign_overlap_id =
-  //     PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  // if (stop_sign_overlap_id.empty()) {
-  //   return false;
-  // }
-
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double stop_sign_overlap_start_s =
@@ -147,9 +141,12 @@ bool StopSignUnprotectedScenario::IsTransferable(
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
+      break;
     case ScenarioConfig::CHANGE_LANE:
+      break;
     case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
+      break;
+    case ScenarioConfig::APPROACH: {
       if (PlanningContext::GetScenarioInfo()
               ->next_stop_sign_overlap.object_id.empty()) {
         return false;
@@ -158,16 +155,22 @@ bool StopSignUnprotectedScenario::IsTransferable(
               adc_distance_to_stop_sign <=
                   config_.stop_sign_unprotected_config()
                       .start_stop_sign_scenario_distance());
+    }
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       return (current_scenario.GetStatus() !=
               Scenario::ScenarioStatus::STATUS_DONE);
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
+      break;
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
+      break;
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
+      break;
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
+      break;
     case ScenarioConfig::TRAFFIC_LIGHT_GO_THROUGH:
+      break;
     default:
       break;
   }
