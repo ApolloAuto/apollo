@@ -70,10 +70,7 @@ build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
 # Strict check on type conversion.
-build --per_file_copt=^modules/.*\.cc@-Werror=conversion
-
-# TODO(all): Clear cyber warnings and add it to the strict check.
-build --per_file_copt=^cyber/.*\.cc@-Wconversion
+build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Werror=conversion
 
 
 # Enable C++14
