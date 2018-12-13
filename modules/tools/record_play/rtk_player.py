@@ -222,8 +222,8 @@ class RtkPlayer(object):
 
             if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
                 adc_point.a = -adc_point.a
-                adc_point.kappa = -adc_point.kappa
-                adc_point.dkappa = -adc_point.dkappa
+                adc_point.path_point.kappa = -adc_point.path_point.kappa
+                adc_point.path_point.dkappa = -adc_point.path_point.dkappa
 
             time_diff = self.data['time'][i] - \
                 self.data['time'][self.closestpoint]
