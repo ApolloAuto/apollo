@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+
 class ADVehicle:
     def __init__(self):
         self._chassis_pb = None

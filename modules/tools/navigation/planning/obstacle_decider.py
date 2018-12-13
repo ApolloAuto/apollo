@@ -79,18 +79,18 @@ class ObstacleDecider:
         routing_y = fpath.init_y()
         if routing_y <= 0:
             left_nudgable = self.default_lane_width / 2.0 \
-                            - abs(routing_y) \
-                            - self.left_edge_to_center
+                - abs(routing_y) \
+                - self.left_edge_to_center
             right_nudgable = self.default_lane_width / 2.0 \
-                             + abs(routing_y) \
-                             - self.right_edge_to_center
+                + abs(routing_y) \
+                - self.right_edge_to_center
         else:
             left_nudgable = self.default_lane_width / 2.0 \
-                            + abs(routing_y) \
-                            - self.left_edge_to_center
+                + abs(routing_y) \
+                - self.left_edge_to_center
             right_nudgable = self.default_lane_width / 2.0 \
-                             - abs(routing_y) \
-                             - self.right_edge_to_center
+                - abs(routing_y) \
+                - self.right_edge_to_center
 
         return left_nudgable, -1 * right_nudgable
 
@@ -100,8 +100,8 @@ class ObstacleDecider:
         for obs_id, lat_dist in self.obstacle_lat_dist.items():
             if lat_dist >= 0:
                 actual_dist = abs(lat_dist) \
-                              - self.mobileye.obstacles[obs_id].width / 2.0 \
-                              - self.left_edge_to_center
+                    - self.mobileye.obstacles[obs_id].width / 2.0 \
+                    - self.left_edge_to_center
                 if self.LAT_DIST > actual_dist > 0.2:
                     if right_nudge is None:
                         right_nudge = -1 * (self.LAT_DIST - actual_dist)
@@ -109,8 +109,8 @@ class ObstacleDecider:
                         right_nudge = -1 * (self.LAT_DIST - actual_dist)
             else:
                 actual_dist = abs(lat_dist) \
-                              - self.mobileye.obstacles[obs_id].width / 2.0 \
-                              - self.left_edge_to_center
+                    - self.mobileye.obstacles[obs_id].width / 2.0 \
+                    - self.left_edge_to_center
                 if self.LAT_DIST > actual_dist > 0.2:
                     if left_nudge is None:
                         left_nudge = self.LAT_DIST - actual_dist
@@ -145,18 +145,14 @@ if __name__ == "__main__":
     from provider_mobileye import MobileyeProvider
     from path_decider import PathDecider
 
-
     def localization_callback(localization_pb):
         ad_vehicle.update_localization(localization_pb)
-
 
     def routing_callback(routing_str):
         routing.update(routing_str)
 
-
     def chassis_callback(chassis_pb):
         ad_vehicle.update_chassis(chassis_pb)
-
 
     def mobileye_callback(mobileye_pb):
         global fpath
@@ -167,7 +163,6 @@ if __name__ == "__main__":
         obs_decider.update(mobileye)
         obs_decider.process_path_obstacle(fpath)
         print "nudge distance = ", obs_decider.get_nudge_distance()
-
 
     def update(frame):
         if not ad_vehicle.is_ready():
@@ -184,7 +179,6 @@ if __name__ == "__main__":
             px, py = fpath.get_xy()
             path_line.set_xdata(px)
             path_line.set_ydata(py)
-
 
     fpath = None
     ad_vehicle = ADVehicle()

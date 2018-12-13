@@ -150,23 +150,18 @@ if __name__ == "__main__":
     from provider_routing import RoutingProvider
     from provider_mobileye import MobileyeProvider
 
-
     def localization_callback(localization_pb):
         ad_vehicle.update_localization(localization_pb)
-
 
     def routing_callback(routing_str):
         routing.update(routing_str)
 
-
     def chassis_callback(chassis_pb):
         ad_vehicle.update_chassis(chassis_pb)
-
 
     def mobileye_callback(mobileye_pb):
         mobileye.update(mobileye_pb)
         mobileye.process_lane_markers()
-
 
     def update(frame):
         if not ad_vehicle.is_ready():
@@ -192,7 +187,6 @@ if __name__ == "__main__":
         final_path.set_ydata(fpath_y)
         # ax.autoscale_view()
         # ax.relim()
-
 
     ad_vehicle = ADVehicle()
     routing = RoutingProvider()

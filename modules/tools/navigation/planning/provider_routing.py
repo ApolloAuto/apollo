@@ -52,7 +52,8 @@ def optimized_spline(x, y, k=3, s=0, w=None):
     constraint['type'] = 'eq'
     constraint['fun'] = lambda c: splev(x0, (t, c, k), der=1)
     constraints = [constraint]
-    res = minimize(error_function, c0, (x, y, t, k, w), constraints=constraints)
+    res = minimize(error_function, c0, (x, y, t, k, w),
+                   constraints=constraints)
     return UnivariateSpline._from_tck((t, res.x, k))
 
 
@@ -181,7 +182,8 @@ class RoutingProvider:
         return ref_x, ref_y
 
     def get_local_segment_spline(self, utm_x, utm_y, heading):
-        local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        local_seg_x, local_seg_y = self.get_local_segment(
+            utm_x, utm_y, heading)
         if len(local_seg_x) <= 10:
             return [], []
         if self.human:
@@ -200,7 +202,8 @@ class RoutingProvider:
 
     def get_local_segment_spline_debug(self, utm_x, utm_y, heading, k=3,
                                        std=0.5):
-        local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        local_seg_x, local_seg_y = self.get_local_segment(
+            utm_x, utm_y, heading)
         mono_seg_x, mono_seg_y = self.to_monotonic_segment(
             local_seg_x, local_seg_y)
 
@@ -216,7 +219,8 @@ class RoutingProvider:
         utm_x = adv.x
         utm_y = adv.y
         heading = adv.heading
-        local_seg_x, local_seg_y = self.get_local_segment(utm_x, utm_y, heading)
+        local_seg_x, local_seg_y = self.get_local_segment(
+            utm_x, utm_y, heading)
         if len(local_seg_x) <= 10:
             return LocalPath([])
         if self.human:
@@ -254,18 +258,14 @@ if __name__ == "__main__":
     from ad_vehicle import ADVehicle
     import matplotlib.animation as animation
 
-
     def localization_callback(localization_pb):
         ad_vehicle.update_localization(localization_pb)
-
 
     def routing_callback(routing_str):
         routing.update(routing_str)
 
-
     def chassis_callback(chassis_pb):
         ad_vehicle.update_chassis(chassis_pb)
-
 
     def update(frame):
         routing_line_x = []
@@ -290,7 +290,6 @@ if __name__ == "__main__":
         ax.relim()
         # ax2.autoscale_view()
         # ax2.relim()
-
 
     ad_vehicle = ADVehicle()
     routing = RoutingProvider()

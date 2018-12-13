@@ -240,23 +240,18 @@ if __name__ == "__main__":
     from modules.drivers.proto import mobileye_pb2
     from provider_routing import RoutingProvider
 
-
     def localization_callback(localization_pb):
         ad_vehicle.update_localization(localization_pb)
-
 
     def routing_callback(routing_str):
         routing.update(routing_str)
 
-
     def chassis_callback(chassis_pb):
         ad_vehicle.update_chassis(chassis_pb)
 
-
     def mobileye_callback(mobileye_pb):
         mobileye.update(mobileye_pb)
-        mobileye.process_lane_markers();
-
+        mobileye.process_lane_markers()
 
     def update(frame):
         left_path = mobileye.get_left_lane_marker_path()
@@ -275,7 +270,6 @@ if __name__ == "__main__":
         middle_lm.set_ydata(middle_y)
         # ax.autoscale_view()
         # ax.relim()
-
 
     ad_vehicle = ADVehicle()
     routing = RoutingProvider()

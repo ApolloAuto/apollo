@@ -17,6 +17,7 @@
 ###############################################################################
 import math
 
+
 class SubplotSSpeed:
     def __init__(self, ax):
         self.s_speed_line, = ax.plot([0], [0], 'r-', lw=3, alpha=0.4)
@@ -25,11 +26,8 @@ class SubplotSSpeed:
         ax.set_xlabel("s (m)")
         ax.set_ylabel("speed (m/s)")
 
-
     def show(self, planning_data):
         planning_data.path_param_lock.acquire()
         self.s_speed_line.set_xdata(planning_data.s)
         self.s_speed_line.set_ydata(planning_data.speed)
         planning_data.path_param_lock.release()
-
-

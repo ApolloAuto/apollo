@@ -18,6 +18,7 @@
 
 import threading
 
+
 class PlanningData:
     def __init__(self, planning_pb=None):
         self.path_lock = threading.Lock()
@@ -31,7 +32,6 @@ class PlanningData:
         self.speed = []
         self.s = []
         self.theta = []
-
 
     def update(self, planning_pb):
         self.planning_pb = planning_pb
@@ -67,4 +67,3 @@ class PlanningData:
         self.s = s
         self.theta = theta
         self.path_param_lock.release()
-

@@ -26,4 +26,3 @@ class LaneMarkerCorrector:
 
     def correct(self, position, heading, routing_segment):
         return self.left_marker, self.right_marker
-
