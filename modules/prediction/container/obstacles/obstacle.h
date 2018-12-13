@@ -279,6 +279,8 @@ class Obstacle {
 
   void SetNearbyLanes(Feature* feature);
 
+  void SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr);
+
   void SetLanePoints(Feature* feature);
 
   void SetLaneSequencePath(LaneGraph* const lane_graph);

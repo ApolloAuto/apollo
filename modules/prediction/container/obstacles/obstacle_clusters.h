@@ -119,6 +119,13 @@ class ObstacleClusters {
     const double obstacle_l,
     NearbyObstacle* const nearby_obstacle_ptr);
 
+  /**
+   * @brief Query stop sign by lane ID
+   * @param lane ID
+   * @return the stop sign
+   */
+  static StopSign QueryStopSignByLaneId(const std::string& lane_id);
+
  private:
   ObstacleClusters() = delete;
 
@@ -128,6 +135,7 @@ class ObstacleClusters {
   static std::unordered_map<std::string, LaneGraph> lane_graphs_;
   static std::unordered_map<std::string,
                             std::vector<LaneObstacle>> lane_obstacles_;
+  static std::unordered_map<std::string, StopSign> lane_id_stop_sign_map_;
 };
 
 }  // namespace prediction
