@@ -179,6 +179,21 @@ int SQLiteDataReader::GetIntValue(int col_index) {
   return sqlite3_column_int(stmt_, col_index);
 }
 
+std::uint8_t SQLiteDataReader::GetUint8Value(int col_index) {
+  return static_cast<std::uint8_t>(sqlite3_column_int(stmt_, col_index));
+}
+
+std::int64_t SQLiteDataReader::GetInt64Value(int col_index) {
+  return static_cast<std::int64_t>(sqlite3_column_int64(stmt_, col_index));
+}
+
+std::uint64_t SQLiteDataReader::GetUint64Value(int col_index) {
+  std::string value;
+  GetStringValue(col_index, &value);
+  std::size_t idx = 0;
+  return std::stoull(value, &idx, 0);
+}
+
 double SQLiteDataReader::GetFloatValue(int col_index) {
   return sqlite3_column_double(stmt_, col_index);
 }
@@ -187,6 +202,15 @@ int SQLiteDataReader::GetBlobValue(int col_index,
                                    const unsigned char** blob_value) {
   *blob_value = (const unsigned char*)sqlite3_column_blob(stmt_, col_index);
   return sqlite3_column_bytes(stmt_, col_index);
+}
+
+int SQLiteDataReader::GetBlobValue(
+    int col_index, std::vector<unsigned char>* const blob_value) {
+  CHECK_NOTNULL(blob_value);
+  const unsigned char* data = nullptr;
+  int len = GetBlobValue(col_index, &data);
+  blob_value->assign(data, data + len);
+  return len;
 }
 
 SQLiteCommand::SQLiteCommand(SQLite* sqlite)
@@ -222,11 +246,20 @@ bool SQLiteCommand::BindParam(int index, const int value) {
   return true;
 }
 
+bool SQLiteCommand::BindParam(int index, const std::uint8_t value) {
+  return BindParam(index, static_cast<int>(value));
+}
+
 bool SQLiteCommand::BindParam(int index, const double value) {
   if (sqlite3_bind_double(stmt_, index, value) != SQLITE_OK) {
     return false;
   }
   return true;
+}
+
+bool SQLiteCommand::BindParam(int index, const std::uint64_t value) {
+  std::string str = std::to_string(value);
+  return BindParam(index, str);
 }
 
 bool SQLiteCommand::BindParam(int index, const unsigned char* value, int len) {
@@ -235,6 +268,12 @@ bool SQLiteCommand::BindParam(int index, const unsigned char* value, int len) {
     return false;
   }
   return true;
+}
+
+bool SQLiteCommand::BindParam(int index,
+                              const std::vector<unsigned char>* const value) {
+  CHECK_NOTNULL(value);
+  return BindParam(index, value->data(), value->size());
 }
 
 bool SQLiteCommand::BindParam(int index) {
