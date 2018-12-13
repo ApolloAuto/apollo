@@ -480,7 +480,7 @@ bool SidePassPathDecider::TrimGeneratedPath(
     if (std::fabs((*ptr_frenet_frame_path)[j].l()) > kOffRoadCenterThreshold) {
       return false;
     }
-    j --;
+    j--;
   }
   if (j < 0) {
     return false;
@@ -491,8 +491,8 @@ bool SidePassPathDecider::TrimGeneratedPath(
     if (std::fabs((*ptr_frenet_frame_path)[j].l()) > kOffRoadCenterThreshold) {
       break;
     }
-    i --;
-    j --;
+    i--;
+    j--;
     ptr_frenet_frame_path->pop_back();
   }
   return true;
