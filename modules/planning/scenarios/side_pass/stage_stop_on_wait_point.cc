@@ -202,7 +202,8 @@ bool StageStopOnWaitPoint::IsFarAwayFromObstacles(
     double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
     double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
     if (obs_end_s < first_sl_point.s() ||
-        obs_start_s > last_sl_point.s() + kSExtraMarginforStopOnWaitPointStage) {
+        obs_start_s > last_sl_point.s() +
+            kSExtraMarginforStopOnWaitPointStage) {
       continue;
     }
     // Check the l-direction.
