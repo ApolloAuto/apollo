@@ -1,9 +1,26 @@
 #!/usr/bin/python
 
-import sys 
+###############################################################################
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
+import sys
 import numpy
 import math
 import os
+
 
 def get_stat2_from_data(data):
     """find the max number of continuous frames when position error is lager than 30cm, 20cm and 10cm
@@ -29,19 +46,19 @@ def get_stat2_from_data(data):
                     tem_con_frame_num_30 += 1
                 else:
                     if tem_con_frame_num_30 > max_con_frame_num_30:
-                        max_con_frame_num_30 = tem_con_frame_num_30  
+                        max_con_frame_num_30 = tem_con_frame_num_30
                         tem_con_frame_num_30 = 0
             else:
                 if tem_con_frame_num_20 > max_con_frame_num_20:
-                    max_con_frame_num_20 = tem_con_frame_num_20  
+                    max_con_frame_num_20 = tem_con_frame_num_20
                     tem_con_frame_num_20 = 0
-        else: 
+        else:
             if tem_con_frame_num_10 > max_con_frame_num_10:
-                max_con_frame_num_10 = tem_con_frame_num_10  
+                max_con_frame_num_10 = tem_con_frame_num_10
                 tem_con_frame_num_10 = 0
 
     stat = [max_con_frame_num_10, max_con_frame_num_20, max_con_frame_num_30]
-    return stat        
+    return stat
 
 
 def get_angle_stat2_from_data(data):
@@ -68,15 +85,15 @@ def get_angle_stat2_from_data(data):
                     tem_con_frame_num_1_0 += 1
                 else:
                     if tem_con_frame_num_1_0 > max_con_frame_num_1_0:
-                        max_con_frame_num_1_0 = tem_con_frame_num_1_0  
+                        max_con_frame_num_1_0 = tem_con_frame_num_1_0
                         tem_con_frame_num_1_0 = 0
             else:
                 if tem_con_frame_num_0_6 > max_con_frame_num_0_6:
-                    max_con_frame_num_0_6 = tem_con_frame_num_0_6  
+                    max_con_frame_num_0_6 = tem_con_frame_num_0_6
                     tem_con_frame_num_0_6 = 0
         else:
             if tem_con_frame_num_0_3 > max_con_frame_num_0_3:
-                max_con_frame_num_0_3 = tem_con_frame_num_0_3  
+                max_con_frame_num_0_3 = tem_con_frame_num_0_3
                 tem_con_frame_num_0_3 = 0
 
     stat = [max_con_frame_num_1_0, max_con_frame_num_0_6, max_con_frame_num_0_3]
@@ -103,7 +120,8 @@ def get_stat_from_data(data):
     count_less_than_30 /= float(len(data))
     count_less_than_20 /= float(len(data))
     count_less_than_10 /= float(len(data))
-    stat = [mean, std, mx, count_less_than_30, count_less_than_20, count_less_than_10]
+    stat = [mean, std, mx, count_less_than_30,
+            count_less_than_20, count_less_than_10]
     return stat
 
 
@@ -127,7 +145,8 @@ def get_angle_stat_from_data(data):
     count_less_than_1 /= float(len(data))
     count_less_than_06 /= float(len(data))
     count_less_than_03 /= float(len(data))
-    stat = [mean, std, mx, count_less_than_1, count_less_than_06, count_less_than_03]
+    stat = [mean, std, mx, count_less_than_1,
+            count_less_than_06, count_less_than_03]
     return stat
 
 
@@ -152,7 +171,7 @@ def parse_file(filename, type):
             error_roll.append(float(s[5]))
             error_pitch.append(float(s[6]))
             error_yaw.append(float(s[7]))
-            
+
             x = float(s[2])
             y = float(s[3])
             error.append(math.sqrt(x * x + y * y))
@@ -168,41 +187,50 @@ def parse_file(filename, type):
     else:
         print_distance_error(error, error_lon, error_lat, error_alt)
         print_angle_error(error_roll, error_pitch, error_yaw)
-    
+
+
 def print_distance_error(error, error_lon, error_lat, error_alt):
     print "criteria : mean     std      max      < 30cm   < 20cm   < 10cm  con_frames(>30cm)"
     result = get_stat_from_data(error)
     res = get_stat2_from_data(error)
     print "error    : %06f %06f %06f %06f %06f %06f %06d" % \
-    (result[0], result[1], result[2], result[3], result[4], result[5], res[2]) 
+        (result[0], result[1], result[2],
+         result[3], result[4], result[5], res[2])
     result = get_stat_from_data(error_lon)
     res = get_stat2_from_data(error_lon)
     print "error lon: %06f %06f %06f %06f %06f %06f %06d" % \
-    (result[0], result[1], result[2], result[3], result[4], result[5], res[2]) 
+        (result[0], result[1], result[2],
+         result[3], result[4], result[5], res[2])
     result = get_stat_from_data(error_lat)
     res = get_stat2_from_data(error_lat)
     print "error lat: %06f %06f %06f %06f %06f %06f %06d" % \
-    (result[0], result[1], result[2], result[3], result[4], result[5], res[2]) 
+        (result[0], result[1], result[2],
+         result[3], result[4], result[5], res[2])
     result = get_stat_from_data(error_alt)
     res = get_stat2_from_data(error_alt)
     print "error alt: %06f %06f %06f %06f %06f %06f %06d" % \
-    (result[0], result[1], result[2], result[3], result[4], result[5], res[2]) 
+        (result[0], result[1], result[2],
+         result[3], result[4], result[5], res[2])
+
 
 def print_angle_error(error_roll, error_pitch, error_yaw):
     print "criteria : mean     std      max      < 1.0d   < 0.6d   < 0.3d  con_frames(>1.0d)"
     result = get_angle_stat_from_data(error_roll)
     res = get_angle_stat2_from_data(error_roll)
     print "error rol: %06f %06f %06f %06f %06f %06f %06d" % \
-    (result[0], result[1], result[2], result[3], result[4], result[5], res[0]) 
+        (result[0], result[1], result[2],
+         result[3], result[4], result[5], res[0])
     result = get_angle_stat_from_data(error_pitch)
     res = get_angle_stat2_from_data(error_pitch)
     print "error pit: %06f %06f %06f %06f %06f %06f %06d" % \
-    (result[0], result[1], result[2], result[3], result[4], result[5], res[0]) 
+        (result[0], result[1], result[2],
+         result[3], result[4], result[5], res[0])
     result = get_angle_stat_from_data(error_yaw)
     res = get_angle_stat2_from_data(error_yaw)
     print "error yaw: %06f %06f %06f %06f %06f %06f %06d" % \
-    (result[0], result[1], result[2], result[3], result[4], result[5], res[0]) 
-    
+        (result[0], result[1], result[2],
+         result[3], result[4], result[5], res[0])
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

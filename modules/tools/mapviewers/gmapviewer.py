@@ -55,11 +55,11 @@ def generate(api_key, left_boundaries, right_boundaries, center_lat,
                 doc.asis('function initMap() {\n')
                 doc.asis("map = new google.maps.Map(\
                 document.getElementById('map'), {\n")
-                doc.asis('center: {lat: ' + str(center_lat) + \
+                doc.asis('center: {lat: ' + str(center_lat) +
                          ', lng: ' + str(center_lon) + '},\n')
                 doc.asis('zoom: 16\n')
                 doc.asis('});\n')
-                doc.asis('var left_boundaries = ' + \
+                doc.asis('var left_boundaries = ' +
                          json.dumps(left_boundaries) + ';\n')
                 doc.asis("""
                     for (var i = 0; i < left_boundaries.length; i++) {
@@ -73,7 +73,7 @@ def generate(api_key, left_boundaries, right_boundaries, center_lat,
                         boundary.setMap(map);
                     }
                 """)
-                doc.asis('var right_boundaries = ' + \
+                doc.asis('var right_boundaries = ' +
                          json.dumps(right_boundaries) + ';\n')
                 doc.asis("""
                     for (var i = 0; i < right_boundaries.length; i++) {

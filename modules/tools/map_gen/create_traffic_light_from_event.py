@@ -129,8 +129,7 @@ def parse_drive_event_file(drive_event_filename, signal_filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description=
-        "A tool to create traffic light protobuf message from localization.")
+        description="A tool to create traffic light protobuf message from localization.")
     parser.add_argument(
         "drive_event_filename",
         action="store",

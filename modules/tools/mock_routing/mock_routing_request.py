@@ -28,6 +28,7 @@ import time
 from cyber_py import cyber
 from modules.routing.proto import routing_pb2
 
+
 def main():
     """
     Main rosnode
@@ -56,7 +57,7 @@ def main():
     waypoint.s = 80
 
     writer = node.create_writer('/apollo/routing_request',
-                                           routing_pb2.RoutingRequest)
+                                routing_pb2.RoutingRequest)
     time.sleep(2.0)
     print("routing_request", routing_request)
     writer.write(routing_request)
@@ -64,4 +65,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

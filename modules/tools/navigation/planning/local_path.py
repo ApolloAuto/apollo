@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+
 class LocalPath:
     def __init__(self, points):
         self.points = points

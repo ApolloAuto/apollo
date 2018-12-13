@@ -18,6 +18,7 @@
 
 import threading
 
+
 class MobileyeData:
     def __init__(self, mobileye_pb=None):
         self.mobileye_pb = mobileye_pb
@@ -35,7 +36,6 @@ class MobileyeData:
 
         self.next_lanes_x = []
         self.next_lanes_y = []
-
 
     def update(self, mobileye_pb):
         self.mobileye_pb = mobileye_pb
@@ -67,7 +67,6 @@ class MobileyeData:
             self.next_lanes_x.append(lane_x)
             self.next_lanes_y.append(lane_y)
         self.next_lane_data_lock.release()
-
 
     def compute_lanes(self):
         if self.mobileye_pb is None:
@@ -107,7 +106,7 @@ class MobileyeData:
         c1 = (rc1 + lc1) / 2
         c2 = (rc2 + lc2) / 2
         c3 = (rc3 + lc3) / 2
-        rangex = (lrangex + rrangex) /2
+        rangex = (lrangex + rrangex) / 2
         self.lane_data_lock.acquire()
         for y in range(int(rangex)):
             self.ref_lane_y.append(y)

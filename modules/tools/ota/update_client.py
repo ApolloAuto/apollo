@@ -24,6 +24,7 @@ from ConfigParser import ConfigParser
 from modules.data.proto.static_info_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
 
+
 def update():
     # setup server url
     config = ConfigParser()
@@ -32,10 +33,11 @@ def update():
     ip = config.get('Host', 'ip')
     port = config.get('Host', 'port')
     url = 'https://' + ip + ':' + port + '/update'
-    
+
     # setup car info
     vehicle_info = VehicleInfo()
-    VEHICLE_INFO_FILE = os.path.join(os.path.dirname(__file__), 'vehicle_info.pb.txt')
+    VEHICLE_INFO_FILE = os.path.join(
+        os.path.dirname(__file__), 'vehicle_info.pb.txt')
     try:
         proto_utils.get_pb_from_text_file(VEHICLE_INFO_FILE, vehicle_info)
     except IOError:
@@ -46,9 +48,9 @@ def update():
     model = VehicleInfo.Model.Name(vehicle_info.model)
     vin = vehicle_info.license.vin
     car_info = {
-        "car_type" : brand + "." + model,
-        "tag" : sys.argv[1],
-        "vin" : vin,
+        "car_type": brand + "." + model,
+        "tag": sys.argv[1],
+        "vin": vin,
     }
 
     urllib3.disable_warnings()
@@ -62,6 +64,7 @@ def update():
     else:
         print "Cannot connect to server."
     sys.exit(1)
+
 
 if __name__ == "__main__":
     update()

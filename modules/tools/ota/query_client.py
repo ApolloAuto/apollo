@@ -1,3 +1,4 @@
+import secure_upgrade_export as sec_api
 """OTA query client"""
 
 ###############################################################################
@@ -25,7 +26,6 @@ from modules.data.proto.static_info_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
 
 sys.path.append('/home/caros/secure_upgrade/python')
-import secure_upgrade_export as sec_api
 
 root_config_path = "/home/caros/secure_upgrade/config/secure_config.json"
 returnCode = sec_api.init_secure_upgrade(root_config_path)
@@ -33,15 +33,17 @@ if returnCode == False:
     print 'Security environment init fail!'
     sys.exit(1)
 
+
 def query():
     vehicle_info = VehicleInfo()
-    VEHICLE_INFO_FILE = os.path.join(os.path.dirname(__file__), 'vehicle_info.pb.txt')
+    VEHICLE_INFO_FILE = os.path.join(
+        os.path.dirname(__file__), 'vehicle_info.pb.txt')
     try:
         proto_utils.get_pb_from_text_file(VEHICLE_INFO_FILE, vehicle_info)
     except IOError:
         print "vehicle_info.pb.txt cannot be open file."
         sys.exit(1)
-    
+
     # setup server url
     config = ConfigParser()
     CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.ini')
@@ -64,10 +66,10 @@ def query():
     META_FILE = '/apollo/meta.ini'
     config.read(META_FILE)
     car_info = {
-        "car_type" : brand + "." + model,
-        "tag" : config.get('Release', 'tag'),
-        "vin" : vin,
-        "token" : dev_token
+        "car_type": brand + "." + model,
+        "tag": config.get('Release', 'tag'),
+        "vin": vin,
+        "token": dev_token
     }
 
     urllib3.disable_warnings()
@@ -79,7 +81,8 @@ def query():
             print "Cannot get authorize token!"
             sys.exit(1)
         else:
-            token_file_name = os.environ['HOME'] + '/.cache/apollo_update/auth_token'
+            token_file_name = os.environ['HOME'] + \
+                '/.cache/apollo_update/auth_token'
             apollo_update = os.path.dirname(token_file_name)
             if not os.path.exists(apollo_update):
                 os.makedirs(apollo_update)
@@ -95,6 +98,7 @@ def query():
     else:
         print "Cannot connect to server."
     sys.exit(1)
+
 
 if __name__ == "__main__":
     query()

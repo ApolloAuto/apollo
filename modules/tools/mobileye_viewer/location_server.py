@@ -50,6 +50,7 @@ projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
 urllib3.contrib.pyopenssl.inject_into_urllib3()
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
+
 def mobileye_callback(p_mobileye_pb):
     global mobileye_pb
     mobileye_pb = p_mobileye_pb

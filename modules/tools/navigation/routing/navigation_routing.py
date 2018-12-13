@@ -58,6 +58,7 @@ projector = pyproj.Proj(proj='utm', zone=10, ellps='WGS84')
 urllib3.contrib.pyopenssl.inject_into_urllib3()
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
+
 def add_listener():
     global routing_pub
     rospy.init_node("navigation_map_routing", anonymous=True)
@@ -77,9 +78,9 @@ def navigation():
     if "end_lon" not in request_json:
         return jsonify([])
     start_latlon = str(request_json["start_lat"]) + "," + \
-                   str(request_json["start_lon"])
+        str(request_json["start_lon"])
     end_latlon = str(request_json["end_lat"]) + "," + \
-                 str(request_json["end_lon"])
+        str(request_json["end_lon"])
     url = "http://navi-env.axty8vi3ic.us-west-2." \
           "elasticbeanstalk.com/dreamview/navigation?origin=" + \
           start_latlon + "&destination=" + end_latlon + "&heading=0"
@@ -113,9 +114,9 @@ def request_routing(request_json):
         return None
 
     start_latlon = str(request_json["start_lat"]) + "," + \
-                   str(request_json["start_lon"])
+        str(request_json["start_lon"])
     end_latlon = str(request_json["end_lat"]) + "," + \
-                 str(request_json["end_lon"])
+        str(request_json["end_lon"])
 
     url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + \
           start_latlon + "&destination=" + end_latlon + "&key=" + API_KEY
@@ -319,7 +320,7 @@ def run_flask():
 
 if __name__ == "__main__":
     key_file_name = os.path.dirname(os.path.abspath(__file__)) + \
-                    "/map_api_key/api_key"
+        "/map_api_key/api_key"
     try:
         f = open(key_file_name, 'r')
         with f:

@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
+import secure_upgrade_export as sec_api
 """OTA verify client"""
 
 import requests
@@ -24,7 +26,6 @@ from ConfigParser import ConfigParser
 from modules.data.proto.static_info_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
 sys.path.append('/home/caros/secure_upgrade/python')
-import secure_upgrade_export as sec_api
 
 root_config_path = "/home/caros/secure_upgrade/config/secure_config.json"
 returnCode = sec_api.init_secure_upgrade(root_config_path)
@@ -33,6 +34,7 @@ if returnCode == True:
 else:
     print 'Security environment init fail!'
     sys.exit(1)
+
 
 def verify():
     # generate orig update package
@@ -50,6 +52,7 @@ def verify():
     else:
         print 'verify package failed!!!'
         sys.exit(1)
+
 
 if __name__ == "__main__":
     verify()
