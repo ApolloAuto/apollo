@@ -95,12 +95,33 @@ class SQLiteDataReader {
    * @brief Get the value of column corresponding to the column index which
    * starting from 1.
    */
+  std::uint8_t GetUint8Value(int col_index);
+  /**
+   * @brief Get the value of column corresponding to the column index which
+   * starting from 1.
+   */
+  std::int64_t GetInt64Value(int col_index);
+  /**
+   * @brief Get the value of column corresponding to the column index which
+   * starting from 1. Stored uint64 as a blob in sqlite because it does not
+   * support uint64 storage.
+   */
+  std::uint64_t GetUint64Value(int col_index);
+  /**
+   * @brief Get the value of column corresponding to the column index which
+   * starting from 1.
+   */
   double GetFloatValue(int col_index);
   /**
    * @brief Get the value of column corresponding to the column index which
    * starting from 1.
    */
   int GetBlobValue(int col_index, const unsigned char** blob_value);
+  /**
+   * @brief Get the value of column corresponding to the column index which
+   * starting from 1.
+   */
+  int GetBlobValue(int col_index, std::vector<unsigned char>* const blob_value);
 
  private:
   sqlite3_stmt* stmt_;
@@ -128,15 +149,31 @@ class SQLiteCommand {
    */
   bool BindParam(int index, const int value);
   /**
+   * @brief Bind the int value of the param to the param index which starting
+   * from 1.
+   */
+  bool BindParam(int index, const std::uint8_t value);
+  /**
    * @brief Bind the double value of the param to the param index which starting
    * from 1.
    */
   bool BindParam(int index, const double value);
   /**
+   * @brief Bind the uint64_t value of the param to the param index which
+   * starting from 1. Stores uint64 as a blob in sqlite because it does not
+   * support uint64 storage.
+   */
+  bool BindParam(int index, const std::uint64_t value);
+  /**
    * @brief Bind the blob value of the param to the param index which starting
    * from 1.
    */
   bool BindParam(int index, const unsigned char* value, int len);
+  /**
+   * @brief Bind the blob value of the param to the param index which starting
+   * from 1.
+   */
+  bool BindParam(int index, const std::vector<unsigned char>* const value);
   /**
    * @brief Bind the null value of the param to the param index which starting
    * from 1.
