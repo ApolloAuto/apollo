@@ -73,8 +73,7 @@ def update(frame_number):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
-        description=
-        """A visualization tool that can plot a manual driving trace produced by the rtk_player tool,
+        description="""A visualization tool that can plot a manual driving trace produced by the rtk_player tool,
         and plot the autonomous driving trace in real time.
         The manual driving trace is the blue lines, and the autonomous driving trace is the red lines.
         It is visualization a way to verify the precision of the autonomous driving trace.

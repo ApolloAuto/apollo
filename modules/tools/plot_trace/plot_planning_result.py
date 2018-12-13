@@ -93,8 +93,7 @@ def press_key(event):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
-        description=
-        """A visualization tool that can plot one or multiple planning "
+        description="""A visualization tool that can plot one or multiple planning "
         results, so that we can compare the differences.
         Example: plot_planning_result.py result_file1.pb.txt result_file2.pb.txt"""
     )
