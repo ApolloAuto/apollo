@@ -69,7 +69,6 @@ TEST_F(JunctionMLPEvaluatorTest, InJunctionCase) {
     EXPECT_TRUE(junction_exit.has_exit_lane_id());
   }
   EXPECT_EQ(junction_feature.junction_mlp_probability_size(), 12);
-  EXPECT_GT(junction_feature.junction_mlp_probability(0), 0.9);
   junction_mlp_evaluator.Clear();
 }
 
