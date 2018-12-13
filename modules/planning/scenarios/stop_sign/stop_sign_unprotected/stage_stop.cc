@@ -42,7 +42,6 @@ namespace stop_sign {
 using common::TrajectoryPoint;
 using common::time::Clock;
 using hdmap::HDMapUtil;
-using hdmap::LaneInfo;
 using hdmap::LaneInfoConstPtr;
 using hdmap::PathOverlap;
 using hdmap::OverlapInfoConstPtr;

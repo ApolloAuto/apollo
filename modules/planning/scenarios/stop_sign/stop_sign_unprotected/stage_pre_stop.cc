@@ -42,7 +42,6 @@ namespace stop_sign {
 using common::TrajectoryPoint;
 using common::time::Clock;
 using hdmap::HDMapUtil;
-using hdmap::LaneInfo;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
 using hdmap::PathOverlap;
@@ -95,6 +94,7 @@ Stage::StageStatus StagePreStop::Process(
       return Stage::FINISHED;
     }
   } else {
+    // TODO(all): handle this by stage creep
     // adc has passed stop sign
     const double creep_distance =
         dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
@@ -176,7 +176,7 @@ int StagePreStop::AddWatchVehicle(const Obstacle& obstacle,
                                           perception_obstacle.position().z());
   double obstacle_s = 0.0;
   double obstacle_l = 0.0;
-  hdmap::LaneInfoConstPtr obstacle_lane;
+  LaneInfoConstPtr obstacle_lane;
   if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
           point, 5.0, perception_obstacle.theta(), M_PI / 3.0, &obstacle_lane,
           &obstacle_s, &obstacle_l) != 0) {
@@ -202,16 +202,6 @@ int StagePreStop::AddWatchVehicle(const Obstacle& obstacle,
            << "] not associated with current stop_sign. skip";
     return -1;
   }
-
-  /* skip the speed check to make it less strick
-  auto speed = std::hypot(perception_obstacle.velocity().x(),
-                          perception_obstacle.velocity().y());
-  if (speed > config_.stop_sign().watch_vehicle_max_valid_stop_speed()) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "] velocity[" << speed << "] not stopped. skip";
-    return -1;
-  }
-  */
 
   // check a valid stop for stop line of the stop_sign
   auto over_lap_info = assoc_lane_it->second.get()->GetObjectOverlapInfo(
