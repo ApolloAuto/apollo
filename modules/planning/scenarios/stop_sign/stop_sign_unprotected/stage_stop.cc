@@ -113,7 +113,7 @@ Stage::StageStatus StageStop::Process(
            << s << "]";
   }
 
-  if (watch_vehicle_ids.size() == 0) {
+  if (watch_vehicle_ids.empty()) {
     return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
   }
 

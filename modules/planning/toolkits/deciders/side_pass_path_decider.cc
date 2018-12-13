@@ -43,13 +43,13 @@ using apollo::hdmap::PathOverlap;
 using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
-constexpr double kRoadBuffer = 0.05;                    // 5cm
-constexpr double kObstacleLBuffer = 0.1;                // 10cm
-constexpr double kObstacleSBuffer = 2.0;                // 2m
-constexpr double kExtraRoadBufferDuringTurning = 0.1;   // 10cm
-constexpr double kVehicleBuffer = 0.6;                  // 60cm
-constexpr double kOffRoadCenterThreshold = 0.4;         // 40cm
-constexpr double kTrimWatchWindow = 12.0;               // 12m
+constexpr double kRoadBuffer = 0.05;                   // 5cm
+constexpr double kObstacleLBuffer = 0.1;               // 10cm
+constexpr double kObstacleSBuffer = 2.0;               // 2m
+constexpr double kExtraRoadBufferDuringTurning = 0.1;  // 10cm
+constexpr double kVehicleBuffer = 0.6;                 // 60cm
+constexpr double kOffRoadCenterThreshold = 0.4;        // 40cm
+constexpr double kTrimWatchWindow = 12.0;              // 12m
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {}
@@ -79,7 +79,11 @@ Status SidePassPathDecider::Process(
       reference_line_info->reference_line().GetFrenetPoint(
           frame->PlanningStartPoint().path_point());
   delta_s_ = Decider::config_.side_pass_path_decider_config().path_resolution();
-  CHECK_GT(std::fabs(delta_s_), 0.000001);
+  if (std::fabs(delta_s_) < 1e-6) {
+    const std::string msg = "delta_s_ is too small.";
+    AERROR << msg << ", delta_s_ = " << delta_s_;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
   total_path_length_ =
       Decider::config_.side_pass_path_decider_config().total_path_length();
 
@@ -102,8 +106,8 @@ Status SidePassPathDecider::Process(
 }
 
 bool SidePassPathDecider::DecideSidePassDirection(
-    const std::vector<bool>& can_side_pass,
-    size_t left_length, size_t right_length) {
+    const std::vector<bool> &can_side_pass, size_t left_length,
+    size_t right_length) {
   if (can_side_pass[0] == false && can_side_pass[1] == false) {
     return false;
   } else if (can_side_pass[0] == true && can_side_pass[1] == false) {
@@ -158,8 +162,8 @@ bool SidePassPathDecider::GeneratePath(
   ADEBUG << curr_lane_.ShortDebugString();
 
   // Try generating paths for both directions.
-  std::vector<SidePassDirection> side_pass_directions =
-      {SidePassDirection::LEFT, SidePassDirection::RIGHT};
+  std::vector<SidePassDirection> side_pass_directions = {
+      SidePassDirection::LEFT, SidePassDirection::RIGHT};
   std::vector<bool> can_side_pass(2, true);
   std::vector<std::vector<common::FrenetFramePoint>> frenet_frame_paths(
       2, std::vector<common::FrenetFramePoint>(0));
@@ -458,13 +462,12 @@ SidePassPathDecider::GetPathBoundaries(
 }
 
 bool SidePassPathDecider::TrimGeneratedPath(
-    std::vector<common::FrenetFramePoint>* ptr_frenet_frame_path) {
+    std::vector<common::FrenetFramePoint> *ptr_frenet_frame_path) {
   // Sanity checks.
   if (ptr_frenet_frame_path->empty()) {
     return false;
   }
-  if (std::fabs(ptr_frenet_frame_path->back().l()) >
-      kOffRoadCenterThreshold) {
+  if (std::fabs(ptr_frenet_frame_path->back().l()) > kOffRoadCenterThreshold) {
     return false;
   }
 

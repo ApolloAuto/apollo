@@ -130,7 +130,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     return false;
   } else {
-    auto is_side_pass = IsSidePassScenario(frame);
+    bool is_side_pass = IsSidePassScenario(frame);
     if (is_side_pass) {
       msg_ = "side pass obstacle: " + front_blocking_obstacle_id_;
     }

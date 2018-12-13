@@ -42,7 +42,7 @@ using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
 Stage::StageStatus StageIntersectionCruise::Process(
-    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+    const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
