@@ -160,8 +160,8 @@ Chassis LexusController::chassis() {
   // 5
   if (chassis_detail.lexus().has_vehicle_speed_rpt_400() &&
       chassis_detail.lexus().vehicle_speed_rpt_400().has_vehicle_speed()) {
-    chassis_.set_speed_mps(
-        chassis_detail.lexus().vehicle_speed_rpt_400().vehicle_speed());
+    chassis_.set_speed_mps(static_cast<float>(
+        chassis_detail.lexus().vehicle_speed_rpt_400().vehicle_speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -204,8 +204,8 @@ Chassis LexusController::chassis() {
   if (chassis_detail.lexus().has_accel_rpt_200() &&
       chassis_detail.lexus().accel_rpt_200().has_output_value()) {
     // TODO(snehagn): Temp fix until AS to fix the scaling
-    chassis_.set_throttle_percentage(
-        chassis_detail.lexus().accel_rpt_200().output_value() * 100);
+    chassis_.set_throttle_percentage(static_cast<float>(
+        chassis_detail.lexus().accel_rpt_200().output_value() * 100));
   } else {
     chassis_.set_throttle_percentage(0);
   }
@@ -213,8 +213,8 @@ Chassis LexusController::chassis() {
   if (chassis_detail.lexus().has_brake_rpt_204() &&
       chassis_detail.lexus().brake_rpt_204().has_output_value()) {
     // TODO(snehagn): Temp fix until AS to fix the scaling
-    chassis_.set_brake_percentage(
-        chassis_detail.lexus().brake_rpt_204().output_value() * 100);
+    chassis_.set_brake_percentage(static_cast<float>(
+        chassis_detail.lexus().brake_rpt_204().output_value() * 100));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -247,9 +247,9 @@ Chassis LexusController::chassis() {
   // TODO(QiL) : verify the unit here.
   if (chassis_detail.lexus().has_steering_rpt_22c() &&
       chassis_detail.lexus().steering_rpt_22c().has_output_value()) {
-    chassis_.set_steering_percentage(
+    chassis_.set_steering_percentage(static_cast<float>(
         chassis_detail.lexus().steering_rpt_22c().output_value() * 100.0 /
-        vehicle_params_.max_steer_angle());
+        vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
