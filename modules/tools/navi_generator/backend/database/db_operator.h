@@ -143,6 +143,8 @@ class DBOperator : public DBOperatorBase {
   bool DeleteWay(const std::uint64_t way_id);
   bool CreateNewWayId(std::uint64_t* const way_id);
   bool GetNaviTableId(std::uint64_t* const navi_table_id);
+  bool QueryNaviWithPos(const std::string& node_value,
+                        std::vector<NaviInfoWithPos>* const navi_info);
 
  private:
   bool OpenDatabase();
@@ -151,6 +153,8 @@ class DBOperator : public DBOperatorBase {
   bool DeleteWayNodes(const std::uint64_t way_id);
   bool DeleteWayData(const std::uint64_t way_id);
   bool DeleteNaviData(const std::uint64_t way_id);
+  bool FindNaviWithPos(const std::string& node_value,
+                       std::vector<NaviInfoWithPos>* const navi_info);
 };
 
 }  // namespace util
