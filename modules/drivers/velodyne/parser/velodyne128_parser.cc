@@ -31,8 +31,7 @@ void Velodyne128Parser::GeneratePointcloud(
     std::shared_ptr<PointCloud> out_msg) {
   // allocate a point cloud with same time and frame ID as raw data
   out_msg->mutable_header()->set_frame_id(scan_msg->header().frame_id());
-  out_msg->mutable_header()->set_timestamp_sec(
-      cyber::Time().Now().ToSecond());
+  out_msg->mutable_header()->set_timestamp_sec(cyber::Time().Now().ToSecond());
   out_msg->set_height(1);
 
   // us
@@ -49,19 +48,19 @@ void Velodyne128Parser::GeneratePointcloud(
     AERROR << "All points is NAN!Please check velodyne:" << config_.model();
     return;
   } else {
-    const auto timestamp = out_msg->point(size - 1).timestamp();
-    out_msg->set_measurement_time(timestamp / 1e9);
+    const auto timestamp =
+        out_msg->point(static_cast<int>(size) - 1).timestamp();
+    out_msg->set_measurement_time(static_cast<double>(timestamp) / 1e9);
     out_msg->mutable_header()->set_lidar_timestamp(timestamp);
   }
   out_msg->set_width(out_msg->point_size());
 }
 
 uint64_t Velodyne128Parser::GetTimestamp(double base_time, float time_offset,
-                                          uint16_t block_id) {
+                                         uint16_t block_id) {
   (void)block_id;
   double t = base_time + time_offset;
-  uint64_t timestamp =
-      GetGpsStamp(t, &previous_packet_stamp_, &gps_base_usec_);
+  uint64_t timestamp = GetGpsStamp(t, &previous_packet_stamp_, &gps_base_usec_);
   return timestamp;
 }
 
@@ -96,8 +95,8 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
     /*condition added to avoid calculating points which are not
       in the interesting defined area (min_angle < area < max_angle)*/
     for (int j = 0, k = 0; j < SCANS_PER_BLOCK; j++, k += RAW_SCAN_SIZE) {
-      uint8_t group = block % 4;
-      uint8_t chan_id = j + group * 32;
+      uint8_t group = static_cast<uint8_t>(block % 4);
+      uint8_t chan_id = static_cast<uint8_t>(j + group * 32);
       uint8_t firing_order = chan_id / 8;
       firing_order = 0;
       LaserCorrection& corrections = calibration_.laser_corrections_[chan_id];
@@ -111,8 +110,8 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
           raw_distance.raw_distance * VSL128_DISTANCE_RESOLUTION;
       float distance = real_distance + corrections.dist_correction;
 
-      uint64_t timestamp =
-          GetTimestamp(basetime, (*inner_time_)[block][j], block);
+      uint64_t timestamp = static_cast<uint64_t>(GetTimestamp(
+          basetime, (*inner_time_)[block][j], static_cast<uint16_t>(block)));
       if (!is_scan_valid(azimuth, distance)) {
         // todo orgnized
         if (config_.organized()) {
@@ -145,7 +144,7 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
       ComputeCoords(real_distance, corrections, azimuth_corrected, point_new);
 
       intensity = IntensityCompensate(corrections, raw_distance.raw_distance,
-                                       intensity);
+                                      intensity);
       point_new->set_intensity(intensity);
     }
     // }
@@ -153,16 +152,18 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
 }
 
 int Velodyne128Parser::IntensityCompensate(const LaserCorrection& corrections,
-                                            const uint16_t raw_distance,
-                                            int intensity) {
+                                           const uint16_t raw_distance,
+                                           int intensity) {
   float focal_offset = 256 * (1 - corrections.focal_distance / 13100) *
                        (1 - corrections.focal_distance / 13100);
   float focal_slope = corrections.focal_slope;
 
-  intensity +=
+  intensity += static_cast<int>(
       focal_slope *
-      (abs(focal_offset - 256 * (1 - static_cast<float>(raw_distance) / 65535) *
-                              (1 - static_cast<float>(raw_distance) / 65535)));
+      static_cast<float>(std::abs(
+          focal_offset -
+          256.0f * (1.0f - static_cast<float>(raw_distance) / 65535.0f) *
+              (1.0f - static_cast<float>(raw_distance) / 65535.0f))));
 
   if (intensity < corrections.min_intensity) {
     intensity = corrections.min_intensity;

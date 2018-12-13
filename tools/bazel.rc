@@ -81,6 +81,7 @@ build --per_file_copt=\
 ^modules/control/.*\.cc,\
 ^modules/data/.*\.cc,\
 ^modules/dreamview/.*\.cc,\
+^modules/drivers/velodyne/.*\.cc,\
 ^modules/guardian/.*\.cc,\
 ^modules/localization/.*\.cc,\
 ^modules/map/.*\.cc,\

@@ -38,7 +38,7 @@ void Velodyne32Parser::GeneratePointcloud(
 
   size_t packets_size = scan_msg->firing_pkts_size();
   for (size_t i = 0; i < packets_size; ++i) {
-    Unpack(scan_msg->firing_pkts(i), out_msg);
+    Unpack(scan_msg->firing_pkts(static_cast<int>(i)), out_msg);
     last_time_stamp_ = out_msg->measurement_time();
     ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
   }
@@ -52,10 +52,9 @@ void Velodyne32Parser::GeneratePointcloud(
 }
 
 uint64_t Velodyne32Parser::GetTimestamp(double base_time, float time_offset,
-                                         uint16_t block_id) {
+                                        uint16_t block_id) {
   double t = base_time - time_offset;
-  uint64_t timestamp =
-      GetGpsStamp(t, &previous_packet_stamp_, &gps_base_usec_);
+  uint64_t timestamp = GetGpsStamp(t, &previous_packet_stamp_, &gps_base_usec_);
   return timestamp;
 }
 
@@ -75,12 +74,12 @@ void Velodyne32Parser::Unpack(const VelodynePacket& pkt,
       raw_distance.bytes[1] = raw->blocks[i].data[k + 1];
 
       // compute time
-      uint64_t timestamp =
-          GetTimestamp(basetime, (*inner_time_)[i][laser_id], i);
+      uint64_t timestamp = static_cast<uint64_t>(GetTimestamp(
+          basetime, (*inner_time_)[i][laser_id], static_cast<uint16_t>(i)));
 
       if (laser_id == SCANS_PER_BLOCK - 1) {
         // set header stamp before organize the point cloud
-        pc->set_measurement_time(static_cast<double>(timestamp / 1e9));
+        pc->set_measurement_time(static_cast<double>(timestamp) / 1e9);
       }
 
       int rotation = static_cast<int>(raw->blocks[i].rotation);
@@ -104,7 +103,8 @@ void Velodyne32Parser::Unpack(const VelodynePacket& pkt,
       apollo::drivers::PointXYZIT* point = pc->add_point();
       point->set_timestamp(timestamp);
       // Position Calculation, append this point to the cloud
-      ComputeCoords(real_distance, corrections, rotation, point);
+      ComputeCoords(real_distance, corrections, static_cast<uint16_t>(rotation),
+                    point);
       point->set_intensity(raw->blocks[i].data[k + 2]);
       // append this point to the cloud
     }

@@ -170,12 +170,12 @@ void Velodyne64Parser::GeneratePointcloud(
   for (size_t i = 0; i < packets_size; ++i) {
     if (gps_base_usec_[0] == 0) {
       // only set one time type when call this function, so cannot break
-      SetBaseTimeFromPackets(scan_msg->firing_pkts(i));
+      SetBaseTimeFromPackets(scan_msg->firing_pkts(static_cast<int>(i)));
       // If base time not ready then set empty_unpack true
       skip = true;
     } else {
-      CheckGpsStatus(scan_msg->firing_pkts(i));
-      Unpack(scan_msg->firing_pkts(i), pointcloud);
+      CheckGpsStatus(scan_msg->firing_pkts(static_cast<int>(i)));
+      Unpack(scan_msg->firing_pkts(static_cast<int>(i)), pointcloud);
       last_time_stamp_ = pointcloud->measurement_time();
       ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
     }
@@ -190,7 +190,7 @@ void Velodyne64Parser::GeneratePointcloud(
       AERROR << "All points is NAN! Please check velodyne:" << config_.model();
     } else {
       uint64_t timestamp = pointcloud->point(size - 1).timestamp();
-      pointcloud->set_measurement_time(timestamp / 1e9);
+      pointcloud->set_measurement_time(static_cast<double>(timestamp) / 1e9);
       pointcloud->mutable_header()->set_lidar_timestamp(timestamp);
     }
     pointcloud->set_width(pointcloud->point_size());
@@ -198,31 +198,34 @@ void Velodyne64Parser::GeneratePointcloud(
 }
 
 uint64_t Velodyne64Parser::GetTimestamp(double base_time, float time_offset,
-                                         uint16_t block_id) {
+                                        uint16_t block_id) {
   double t = base_time - time_offset;
-  double timestamp = 0;
+  double timestamp = 0.0;
   int index = 0;
 
   if (is_s2_) {
     index = block_id & 1;  // % 2
     double& previous_packet_stamp = previous_packet_stamp_[index];
     uint64_t& gps_base_usec = gps_base_usec_[index];
-    timestamp = GetGpsStamp(t, &previous_packet_stamp, &gps_base_usec);
+    timestamp = static_cast<double>(
+        GetGpsStamp(t, &previous_packet_stamp, &gps_base_usec));
   } else {                 // 64E_S3
     index = block_id & 3;  // % 4
     double& previous_packet_stamp = previous_packet_stamp_[index];
     uint64_t& gps_base_usec = gps_base_usec_[index];
-    timestamp = GetGpsStamp(t, &previous_packet_stamp, &gps_base_usec);
+    timestamp = static_cast<double>(
+        GetGpsStamp(t, &previous_packet_stamp, &gps_base_usec));
   }
-  return timestamp;
+  return static_cast<uint64_t>(timestamp);
 }
 
 int Velodyne64Parser::IntensityCompensate(const LaserCorrection& corrections,
-                                           const uint16_t raw_distance,
-                                           int intensity) {
-  float tmp = 1 - static_cast<float>(raw_distance) / 65535;
-  intensity += corrections.focal_slope *
-               (fabs(corrections.focal_offset - 256 * tmp * tmp));
+                                          const uint16_t raw_distance,
+                                          int intensity) {
+  float tmp = 1.0f - static_cast<float>(raw_distance) / 65535.0f;
+  intensity +=
+      static_cast<int>(corrections.focal_slope *
+                       (fabs(corrections.focal_offset - 256 * tmp * tmp)));
 
   if (intensity < corrections.min_intensity) {
     intensity = corrections.min_intensity;
@@ -255,7 +258,8 @@ void Velodyne64Parser::Unpack(const VelodynePacket& pkt,
     for (int j = 0, k = 0; j < SCANS_PER_BLOCK;
          ++j, k += RAW_SCAN_SIZE) {  // 32, 3
       // One point
-      uint8_t laser_number = j + bank_origin;  // hardware laser number
+      uint8_t laser_number =
+          static_cast<uint8_t>(j + bank_origin);  // hardware laser number
       LaserCorrection& corrections =
           calibration_.laser_corrections_[laser_number];
 
@@ -264,11 +268,12 @@ void Velodyne64Parser::Unpack(const VelodynePacket& pkt,
       raw_distance.bytes[1] = raw->blocks[i].data[k + 1];
 
       // compute time
-      uint64_t timestamp = GetTimestamp(basetime, (*inner_time_)[i][j], i);
+      uint64_t timestamp = GetTimestamp(basetime, (*inner_time_)[i][j],
+                                        static_cast<uint16_t>(i));
 
       if (j == SCANS_PER_BLOCK - 1) {
         // set header stamp before organize the point cloud
-        pc->set_measurement_time(static_cast<double>(timestamp / 1e9));
+        pc->set_measurement_time(static_cast<double>(timestamp) / 1e9);
       }
 
       float real_distance = raw_distance.raw_distance * DISTANCE_RESOLUTION;
@@ -291,8 +296,7 @@ void Velodyne64Parser::Unpack(const VelodynePacket& pkt,
       apollo::drivers::PointXYZIT* point = pc->add_point();
       point->set_timestamp(timestamp);
       // Position Calculation, append this point to the cloud
-      ComputeCoords(real_distance, corrections, raw->blocks[i].rotation,
-                     point);
+      ComputeCoords(real_distance, corrections, raw->blocks[i].rotation, point);
       point->set_intensity(IntensityCompensate(
           corrections, raw_distance.raw_distance, raw->blocks[i].data[k + 2]));
       // append this point to the cloud

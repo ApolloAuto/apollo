@@ -44,7 +44,7 @@ int OnlineCalibration::decode(const std::shared_ptr<VelodyneScan>& scan_msgs) {
     return -1;
   }
   get_unit_index();
-  int unit_size = unit_indexs_.size();
+  int unit_size = static_cast<int>(unit_indexs_.size());
   if (unit_size < 2) {
     // can not find two unit# index, may be lost packet
     AINFO << "unit count less than 2, maybe lost packets";
@@ -69,33 +69,34 @@ int OnlineCalibration::decode(const std::shared_ptr<VelodyneScan>& scan_msgs) {
     laser_correction.laser_ring = status_values_[index_16];
 
     laser_correction.vert_correction =
-        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 1]) / 100.0 *
-        DEGRESS_TO_RADIANS;
+        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 1]) / 100.0f *
+        static_cast<float>(DEGRESS_TO_RADIANS);
     laser_correction.rot_correction =
-        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 3]) / 100.0 *
-        DEGRESS_TO_RADIANS;
+        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 3]) / 100.0f *
+        static_cast<float>(DEGRESS_TO_RADIANS);
     laser_correction.dist_correction =
-        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 5]) / 10.0 /
-        100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_16 + 5]) / 10.0f /
+        100.0f;  // to meter
     laser_correction.dist_correction_x =
-        *reinterpret_cast<int16_t*>(&status_values_[index_32]) / 10.0 /
-        100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_32]) / 10.0f /
+        100.0f;  // to meter
     laser_correction.dist_correction_y =
-        *reinterpret_cast<int16_t*>(&status_values_[index_32 + 2]) / 10.0 /
-        100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_32 + 2]) / 10.0f /
+        100.0f;  // to meter
     laser_correction.vert_offset_correction =
-        *reinterpret_cast<int16_t*>(&status_values_[index_32 + 4]) / 10.0 /
-        100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_32 + 4]) / 10.0f /
+        100.0f;  // to meter
     laser_correction.horiz_offset_correction =
-        (int16_t)((int16_t)status_values_[index_48] << 8 |
-                  status_values_[index_32 + 6]) /
-        10.0 / 100.0;  // to meter
+        static_cast<int16_t>(static_cast<int16_t>(status_values_[index_48])
+                                 << 8 |
+                             status_values_[index_32 + 6]) /
+        10.0f / 100.0f;  // to meter
     laser_correction.focal_distance =
-        *reinterpret_cast<int16_t*>(&status_values_[index_48 + 1]) / 10.0 /
-        100.0;  // to meter
+        *reinterpret_cast<int16_t*>(&status_values_[index_48 + 1]) / 10.0f /
+        100.0f;  // to meter
     laser_correction.focal_slope =
         *reinterpret_cast<int16_t*>(&status_values_[index_48 + 3]) /
-        10.0;  // to meter
+        10.0f;  // to meter
     laser_correction.max_intensity = status_values_[index_48 + 6];
     laser_correction.min_intensity = status_values_[index_48 + 5];
 
@@ -106,7 +107,8 @@ int OnlineCalibration::decode(const std::shared_ptr<VelodyneScan>& scan_msgs) {
     laser_correction.sin_vert_correction =
         sinf(laser_correction.vert_correction);
     laser_correction.focal_offset =
-        256 * pow(1 - laser_correction.focal_distance / 13100, 2);
+        256.0f * static_cast<float>(
+                     std::pow(1 - laser_correction.focal_distance / 13100, 2));
 
     calibration_.laser_corrections_[laser_correction.laser_ring] =
         laser_correction;
@@ -118,7 +120,7 @@ int OnlineCalibration::decode(const std::shared_ptr<VelodyneScan>& scan_msgs) {
 }
 
 void OnlineCalibration::get_unit_index() {
-  int size = status_values_.size();
+  int size = static_cast<int>(status_values_.size());
   // simple check only for value, maybe need more check fro status type
   int start_index = 0;
   if (unit_indexs_.size() > 0) {

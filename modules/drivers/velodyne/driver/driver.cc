@@ -67,13 +67,14 @@ void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,
   time.tm_sec = 0;
 
   // set last gps time using gps socket packet
-  last_gps_time_ = (nmea_time->min * 60 + nmea_time->sec) * 1e6;
+  last_gps_time_ =
+      static_cast<uint32_t>((nmea_time->min * 60 + nmea_time->sec) * 1e6);
 
   AINFO << "Set base unix time : " << time.tm_year << "-" << time.tm_mon << "-"
         << time.tm_mday << " " << time.tm_hour << ":" << time.tm_min << ":"
         << time.tm_sec;
   uint64_t unix_base = static_cast<uint64_t>(timegm(&time));
-  *basetime = unix_base * 1e6;
+  *basetime = unix_base * static_cast<uint64_t>(1e6);
 }
 
 bool VelodyneDriver::SetBaseTime() {
@@ -136,12 +137,12 @@ bool VelodyneDriver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
 int VelodyneDriver::PollStandard(std::shared_ptr<VelodyneScan> scan) {
   // Since the velodyne delivers data at a very high rate, keep reading and
   // publishing scans as fast as possible.
-  while ((config_.use_poll_sync()
-          && ((config_.is_main_frame() &&
-             scan->firing_pkts_size() < config_.npackets())
-          || (!config_.is_main_frame() && sync_counter == last_count_)))
-      || (!config_.use_poll_sync()
-          && scan->firing_pkts_size() < config_.npackets())) {
+  while ((config_.use_poll_sync() &&
+          ((config_.is_main_frame() &&
+            scan->firing_pkts_size() < config_.npackets()) ||
+           (!config_.is_main_frame() && sync_counter == last_count_))) ||
+         (!config_.use_poll_sync() &&
+          scan->firing_pkts_size() < config_.npackets())) {
     while (true) {
       // keep reading until full packet received
       VelodynePacket* packet = scan->add_firing_pkts();
@@ -172,12 +173,12 @@ void VelodyneDriver::PollPositioningPacket(void) {
       time_t t = time(NULL);
       struct tm current_time;
       localtime_r(&t, &current_time);
-      nmea_time->year = current_time.tm_year - 100;
-      nmea_time->mon = current_time.tm_mon + 1;
-      nmea_time->day = current_time.tm_mday;
-      nmea_time->hour = current_time.tm_hour;
-      nmea_time->min = current_time.tm_min;
-      nmea_time->sec = current_time.tm_sec;
+      nmea_time->year = static_cast<uint16_t>(current_time.tm_year - 100);
+      nmea_time->mon = static_cast<uint16_t>(current_time.tm_mon + 1);
+      nmea_time->day = static_cast<uint16_t>(current_time.tm_mday);
+      nmea_time->hour = static_cast<uint16_t>(current_time.tm_hour);
+      nmea_time->min = static_cast<uint16_t>(current_time.tm_min);
+      nmea_time->sec = static_cast<uint16_t>(current_time.tm_sec);
       AINFO << "Get NMEA Time from local time :"
             << "year:" << nmea_time->year << "mon:" << nmea_time->mon
             << "day:" << nmea_time->day << "hour:" << nmea_time->hour
@@ -209,7 +210,7 @@ void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
   }
   if (last_gps_time_ > current_time) {
     if (std::abs(last_gps_time_ - current_time) > 3599000000) {
-      basetime_ += 3600 * 1e6;
+      basetime_ += static_cast<uint64_t>(3600 * 1e6);
       AINFO << "Base time plus 3600s. Model: " << config_.model() << std::fixed
             << ". current:" << current_time << ", last time:" << last_gps_time_;
     } else {
