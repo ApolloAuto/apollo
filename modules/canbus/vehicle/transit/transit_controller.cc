@@ -598,11 +598,11 @@ bool TransitController::CheckResponse() {
   return (motion1_20.llc_fbk_state() ==
               Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_NOT_ALLOWED ||
           motion1_20.llc_fbk_state() ==
-              Llc_motionfeedback1_20::LLC_FBK_STATE_DISENGAGE_REQUESTED ||
+              Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_ALLOWED ||
           motion1_20.llc_fbk_state() ==
-              Llc_motionfeedback1_20::LLC_FBK_STATE_DISENGAGED ||
+              Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY_REQUESTED ||
           motion1_20.llc_fbk_state() ==
-              Llc_motionfeedback1_20::LLC_FBK_STATE_FAULT);
+              Llc_motionfeedback1_20::LLC_FBK_STATE_AUTONOMY);
 }
 
 void TransitController::set_chassis_error_mask(const int32_t mask) {
