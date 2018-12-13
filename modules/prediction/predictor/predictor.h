@@ -105,6 +105,30 @@ class Predictor {
                       const ADCTrajectoryContainer* adc_trajectory_container,
                       Trajectory* trajectory);
 
+  /**
+   * @brief Draw constant acceleration trajectory points
+   * @param Obstacle
+   * @param Lane sequence
+   * @param Total prediction time
+   * @param Prediction period
+   * @param acceleration
+   * @param A vector of generated trajectory points
+   */
+  void DrawConstantAccelerationTrajectory(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const double total_time, const double period,
+    const double acceleration,
+    std::vector<apollo::common::TrajectoryPoint>* points);
+
+  /**
+   * @brief Determine if an obstacle is supposed to stop within a distance
+   * @param The specific obstacle
+   * @param The distance to stop
+   * @return If the obstacle is supposed to stop within a distance
+   */
+  bool SupposedToStop(const Obstacle& obstacle,
+    const double stop_distance);
+
  protected:
   std::vector<Trajectory> trajectories_;
 };

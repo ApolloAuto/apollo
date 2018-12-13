@@ -128,5 +128,19 @@ bool Predictor::TrimTrajectory(
   return true;
 }
 
+void Predictor::DrawConstantAccelerationTrajectory(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const double total_time, const double period,
+    const double acceleration,
+    std::vector<TrajectoryPoint>* points) {
+  // TODO(kechxu) implement
+}
+
+bool Predictor::SupposedToStop(const Obstacle& obstacle,
+    const double stop_distance) {
+  // TODO(kechxu) implement
+  return false;
+}
+
 }  // namespace prediction
 }  // namespace apollo

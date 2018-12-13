@@ -92,9 +92,9 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
     std::vector<TrajectoryPoint> points;
 
     auto end_time1 = std::chrono::system_clock::now();
-    DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection
-        (*obstacle, sequence, FLAGS_prediction_trajectory_time_length,
-         FLAGS_prediction_trajectory_time_resolution, &points);
+    DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection(
+        *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
+        FLAGS_prediction_trajectory_time_resolution, &points);
     auto end_time2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = end_time2 - end_time1;
     ADEBUG << " Time to draw trajectory: "
