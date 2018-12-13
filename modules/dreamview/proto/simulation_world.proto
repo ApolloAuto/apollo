@@ -264,4 +264,7 @@ message SimulationWorld {
 
   // Relative Map
   repeated apollo.common.Path navigation_path = 24;
+
+  // RSS info
+  optional bool is_rss_safe = 25 [default = true];
 }

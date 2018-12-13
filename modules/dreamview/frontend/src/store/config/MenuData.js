@@ -65,6 +65,7 @@ export default [
         data: {
             planningCar: 'Planning Car',
             planningTrajectory: 'Planning Trajectory',
+            rssInfo: 'RSS Info'
         },
         supportInOfflineView: true,
     }, {

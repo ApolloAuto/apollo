@@ -578,6 +578,13 @@
                   "rule": "repeated",
                   "type": "apollo.common.Path",
                   "id": 24
+                },
+                "isRssSafe": {
+                  "type": "bool",
+                  "id": 25,
+                  "options": {
+                    "default": true
+                  }
                 }
               }
             },
@@ -6656,7 +6663,10 @@
                 },
                 "maxMonitorForwardDistance": {
                   "type": "double",
-                  "id": 6
+                  "id": 6,
+                  "options": {
+                    "default": 135
+                  }
                 },
                 "righTurnCreep": {
                   "type": "CreepConfig",
@@ -7276,6 +7286,33 @@
                 }
               }
             },
+            "SmootherDebug": {
+              "fields": {
+                "isSmoothed": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "type": {
+                  "type": "SmootherType",
+                  "id": 2,
+                  "options": {
+                    "default": "SMOOTHER_NONE"
+                  }
+                },
+                "reason": {
+                  "type": "string",
+                  "id": 3
+                }
+              },
+              "nested": {
+                "SmootherType": {
+                  "values": {
+                    "SMOOTHER_NONE": 1,
+                    "SMOOTHER_CLOSE_STOP": 2
+                  }
+                }
+              }
+            },
             "PlanningData": {
               "fields": {
                 "adcPosition": {
@@ -7364,6 +7401,10 @@
                 "openSpace": {
                   "type": "OpenSpaceDebug",
                   "id": 27
+                },
+                "smoother": {
+                  "type": "SmootherDebug",
+                  "id": 28
                 }
               }
             },

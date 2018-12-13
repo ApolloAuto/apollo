@@ -6,16 +6,21 @@ import Notification from "components/StatusBar/Notification";
 import TrafficLightIndicator from "components/StatusBar/TrafficLightIndicator";
 import DrivingMode from "components/StatusBar/DrivingMode";
 import Wheel from "components/StatusBar/Wheel";
+import Rss from "components/StatusBar/Rss";
 
 
 @observer
 export default class StatusBar extends React.Component {
     render() {
-        const { meters, trafficSignal, showNotification, monitor } = this.props;
+        const { meters, trafficSignal, showNotification,
+                showPlanningRSSInfo, monitor } = this.props;
 
         return (
             <div className="status-bar">
-                {showNotification && <Notification monitor={monitor} />}
+                {showNotification &&
+                    <Notification monitor={monitor}
+                        showPlanningRSSInfo={showPlanningRSSInfo} />}
+                {showPlanningRSSInfo && <Rss monitor={monitor} />}
                 <AutoMeter throttlePercent={meters.throttlePercent}
                     brakePercent={meters.brakePercent}
                     speed={meters.speed} />

@@ -7,7 +7,7 @@ import errorIcon from "assets/images/icons/error.png";
 import { timestampMsToTimeString } from "utils/misc";
 
 @observer
-class MonitorItem extends React.Component {
+export class MonitorItem extends React.Component {
     render() {
         const { level, text, time } = this.props;
 
@@ -37,7 +37,9 @@ export default class Console extends React.Component {
                 <div className="card-header"><span>Console</span></div>
                 <div className="card-content-column">
                     <ul className="console">
-                        {monitor.items.map((item, index) => (
+                        {monitor.items.filter(item => {
+                            return !item.msg.startsWith('RSS');
+                        }).map((item, index) => (
                             <MonitorItem key={index} text={item.msg}
                                          level={item.logLevel}
                                          time={timestampMsToTimeString(item.timestampMs)} />
