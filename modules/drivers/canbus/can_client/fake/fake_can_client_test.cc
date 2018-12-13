@@ -78,7 +78,7 @@ TEST_F(FakeCanClientTest, SendMessage) {
     frames[i].id = 1 & 0x3FF;
     frames[i].len = 8;
     frames[i].data[7] = 1 % 256;
-    for (int32_t j = 0; j < 7; ++j) {
+    for (uint8_t j = 0; j < 7; ++j) {
       frames[i].data[j] = j;
     }
   }

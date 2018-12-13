@@ -121,7 +121,7 @@ T ProtocolData<SensorType>::BoundedValue(T lower, T upper, T val) {
 template <typename SensorType>
 uint8_t ProtocolData<SensorType>::CalculateCheckSum(const uint8_t *input,
                                                     const uint32_t length) {
-  return std::accumulate(input, input + length, 0) ^ 0xFF;
+  return static_cast<uint8_t>(std::accumulate(input, input + length, 0) ^ 0xFF);
 }
 
 template <typename SensorType>

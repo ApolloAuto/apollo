@@ -277,7 +277,7 @@ std::string EsdCanClient::GetErrorString(const NTCAN_RESULT ntstatus) {
     char sz_error_text[60];
 
     res = canFormatError(ntstatus, NTCAN_ERROR_FORMAT_LONG, sz_error_text,
-                         sizeof(sz_error_text) - 1);
+                         static_cast<uint32_t>(sizeof(sz_error_text) - 1));
     if (NTCAN_SUCCESS == res) {
       snprintf(reinterpret_cast<char *>(str_buf), ERROR_BUF_SIZE, "%s - %s",
                es->str, sz_error_text);
