@@ -90,9 +90,9 @@ bool UsbCam::init(const std::shared_ptr<Config>& cameraconfig) {
   }
 
   // Warning when diff with last > 1.5* interval
-  frame_warning_interval_ = 1.5 / config_->frame_rate();
+  frame_warning_interval_ = static_cast<float>(1.5 / config_->frame_rate());
   // now max fps 30, we use a appox time 0.9 to drop image.
-  frame_drop_interval_ = 0.9 / config_->frame_rate();
+  frame_drop_interval_ = static_cast<float>(0.9 / config_->frame_rate());
 
   return true;
 }
@@ -399,9 +399,10 @@ bool UsbCam::set_adv_trigger() {
   AINFO << "Trigger enable, dev:" << config_->camera_dev()
         << ", fps:" << config_->trigger_fps()
         << ", internal:" << config_->trigger_internal();
-  int ret =
-      adv_trigger_enable(config_->camera_dev().c_str(), config_->trigger_fps(),
-                         config_->trigger_internal());
+  int ret = adv_trigger_enable(
+      config_->camera_dev().c_str(),
+      static_cast<unsigned char>(config_->trigger_fps()),
+      static_cast<unsigned char>(config_->trigger_internal()));
   if (ret != 0) {
     AERROR << "trigger failed:" << ret;
     return false;
@@ -410,7 +411,7 @@ bool UsbCam::set_adv_trigger() {
 }
 
 int UsbCam::xioctl(int fd, int request, void* arg) {
-  int r;
+  int r = 0;
   do {
     r = ioctl(fd, request, arg);
   } while (-1 == r && EINTR == errno);
@@ -503,9 +504,8 @@ bool UsbCam::init_userp(unsigned int buffer_size) {
 
   if (-1 == xioctl(fd_, VIDIOC_REQBUFS, &req)) {
     if (EINVAL == errno) {
-      AERROR << config_->camera_dev()
-             << " does not support "
-                "user pointer i/o";
+      AERROR << config_->camera_dev() << " does not support "
+                                         "user pointer i/o";
       return false;
     }
     AERROR << "VIDIOC_REQBUFS";
@@ -579,7 +579,7 @@ bool UsbCam::start_capturing(void) {
         buf.memory = V4L2_MEMORY_USERPTR;
         buf.index = i;
         buf.m.userptr = reinterpret_cast<uint64_t>(buffers_[i].start);
-        buf.length = buffers_[i].length;
+        buf.length = static_cast<unsigned int>(buffers_[i].length);
 
         if (-1 == xioctl(fd_, VIDIOC_QBUF, &buf)) {
           AERROR << "VIDIOC_QBUF";
@@ -737,7 +737,7 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
   switch (config_->io_method()) {
     case IO_METHOD_READ:
-      len = read(fd_, buffers_[0].start, buffers_[0].length);
+      len = static_cast<int>(read(fd_, buffers_[0].start, buffers_[0].length));
 
       if (len == -1) {
         switch (errno) {
@@ -747,9 +747,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
           case EIO:
 
-            /* Could ignore EIO, see spec. */
+          /* Could ignore EIO, see spec. */
 
-            /* fall through */
+          /* fall through */
 
           default:
             AERROR << "read";
@@ -774,9 +774,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
           case EIO:
 
-            /* Could ignore EIO, see spec. */
+          /* Could ignore EIO, see spec. */
 
-            /* fall through */
+          /* fall through */
 
           default:
             AERROR << "VIDIOC_DQBUF";
@@ -787,17 +787,17 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
       assert(buf.index < n_buffers_);
       len = buf.bytesused;
-      raw_image->tv_sec = buf.timestamp.tv_sec;
-      raw_image->tv_usec = buf.timestamp.tv_usec;
+      raw_image->tv_sec = static_cast<int>(buf.timestamp.tv_sec);
+      raw_image->tv_usec = static_cast<int>(buf.timestamp.tv_usec);
 
       {
-        cyber::Time image_time(raw_image->tv_sec,
-                                   1000 * raw_image->tv_usec);
+        cyber::Time image_time(raw_image->tv_sec, 1000 * raw_image->tv_usec);
         uint64_t camera_timestamp = image_time.ToNanosecond();
         if (last_nsec_ == 0) {
           last_nsec_ = camera_timestamp;
         } else {
-          double diff = (camera_timestamp - last_nsec_) / 1e9;
+          double diff =
+              static_cast<double>(camera_timestamp - last_nsec_) / 1e9;
           // drop image by frame_rate
           if (diff < frame_drop_interval_) {
             AINFO << "drop image:" << camera_timestamp;
@@ -813,8 +813,8 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
           last_nsec_ = camera_timestamp;
         }
 
-        double now_s = cyber::Time::Now().ToSecond();
-        double image_s = camera_timestamp / 1e9;
+        double now_s = static_cast<double>(cyber::Time::Now().ToSecond());
+        double image_s = static_cast<double>(camera_timestamp) / 1e9;
         double diff = now_s - image_s;
         if (diff > 0.5 || diff < 0) {
           std::stringstream warning_stream;
@@ -852,9 +852,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
           case EIO:
 
-            /* Could ignore EIO, see spec. */
+          /* Could ignore EIO, see spec. */
 
-            /* fall through */
+          /* fall through */
 
           default:
             AERROR << "VIDIOC_DQBUF";
@@ -899,10 +899,8 @@ bool UsbCam::process_image(const void* src, int len, CameraImagePtr dest) {
     if (config_->output_type() == YUYV) {
       memcpy(dest->image, src, dest->width * dest->height * 2);
     } else if (config_->output_type() == RGB) {
-      yuyv2rgb_avx(
-          (unsigned char*)src,
-          (unsigned char*)dest->image,
-          dest->width * dest->height);
+      yuyv2rgb_avx((unsigned char*)src, (unsigned char*)dest->image,
+                   dest->width * dest->height);
     } else {
       AERROR << "unsupported output format:" << config_->output_type();
       return false;
