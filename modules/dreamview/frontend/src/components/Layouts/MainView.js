@@ -33,6 +33,7 @@ class SceneView extends React.Component {
                     : <StatusBar meters={meters}
                                  trafficSignal={trafficSignal}
                                  showNotification={!options.showTasks}
+                                 showPlanningRSSInfo={options.showPlanningRSSInfo}
                                  monitor={monitor} />}
                 {OFFLINE_PLAYBACK && <PlaybackControls />}
                 {hmi.inNavigationMode &&

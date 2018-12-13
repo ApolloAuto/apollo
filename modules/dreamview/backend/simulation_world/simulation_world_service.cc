@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "google/protobuf/util/json_util.h"
+#include "boost/format.hpp"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -603,6 +604,10 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
 }
 
+std::string formatDoubleToString(const double data) {
+  return (boost::format("%.2f") % data).str();
+}
+
 void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
@@ -633,6 +638,38 @@ void SimulationWorldService::UpdatePlanningTrajectory(
   if (trajectory.has_engage_advice()) {
     world_.set_engage_advice(
         EngageAdvice_Advice_Name(trajectory.engage_advice().advice()));
+  }
+
+  // Update RSS info
+  if (trajectory.has_rss_info()) {
+    if (trajectory.rss_info().is_rss_safe()) {
+      if (!is_rss_safe_) {
+        this->PublishMonitorMessage(MonitorMessageItem::INFO, "RSS safe.");
+        is_rss_safe_ = true;
+        world_.set_is_rss_safe(true);
+      }
+    } else {
+      const double next_real_dist = trajectory.rss_info().cur_dist_lon();
+      const double next_rss_safe_dist =
+          trajectory.rss_info().rss_safe_dist_lon();
+      // Not update RSS message if data keeps same.
+      if (std::fabs(current_real_dist_ - next_real_dist) <
+              common::math::kMathEpsilon &&
+          std::fabs(current_rss_safe_dist_ - next_rss_safe_dist) <
+              common::math::kMathEpsilon) {
+        return;
+      }
+      this->PublishMonitorMessage(
+          MonitorMessageItem::ERROR,
+          "RSS unsafe: \ncurrent distance: " +
+              formatDoubleToString(trajectory.rss_info().cur_dist_lon()) +
+              "\nsafe distance: " +
+              formatDoubleToString(trajectory.rss_info().rss_safe_dist_lon()));
+      is_rss_safe_ = false;
+      world_.set_is_rss_safe(false);
+      current_real_dist_ = next_real_dist;
+      current_rss_safe_dist_ = next_rss_safe_dist;
+    }
   }
 }
 

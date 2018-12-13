@@ -100,6 +100,9 @@ options:
   showPlanningCar:
     default: false
     menuId: planningCar
+  showPlanningRSSInfo:
+    default: false
+    menuId: rssInfo
   showRouting:
     default: true
     menuId: routing

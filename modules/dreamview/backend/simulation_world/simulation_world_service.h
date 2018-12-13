@@ -333,6 +333,11 @@ class SimulationWorldService {
   // Whether the sim_world is ready to push to frontend
   std::atomic<bool> ready_to_push_;
 
+  // Latest rss info
+  bool is_rss_safe_ = false;
+  double current_real_dist_ = 0.0;
+  double current_rss_safe_dist_ = 0.0;
+
   // Readers.
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
   std::shared_ptr<cyber::Reader<apollo::localization::Gps>> gps_reader_;

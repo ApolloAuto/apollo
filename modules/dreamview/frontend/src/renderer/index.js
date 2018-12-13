@@ -343,7 +343,7 @@ class Renderer {
     }
 
     updateWorld(world) {
-        this.adc.update(this.coordinates, world.autoDrivingCar);
+        this.adc.update(this.coordinates, world.autoDrivingCar, world.isRssSafe);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);
         this.perceptionObstacles.update(world, this.coordinates, this.scene);
@@ -354,7 +354,7 @@ class Renderer {
 
         if (this.planningAdc &&
             world.planningTrajectory && world.planningTrajectory.length) {
-            this.planningAdc.update(this.coordinates, world.planningTrajectory[0]);
+            this.planningAdc.update(this.coordinates, world.planningTrajectory[0], world.isRssSafe);
         }
     }
 
