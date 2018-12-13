@@ -42,23 +42,28 @@ class DeciderCreep : public Decider {
   bool CheckCreepDone(const Frame& frame,
                       const ReferenceLineInfo& reference_line_info,
                       const double stop_sign_overlap_end_s,
-                      const double wait_time,
-                      const double timeout);
+                      const double wait_time, const double timeout);
 
   void SetProceedWithCautionSpeedParam(
-      const Frame& frame,
-      const ReferenceLineInfo& reference_line_info,
+      const Frame& frame, const ReferenceLineInfo& reference_line_info,
       const double stop_sign_overlap_end_s);
 
   double FindCreepDistance(const Frame& frame,
                            const ReferenceLineInfo& reference_line_info);
 
  private:
-  bool BuildStopDecision(const double stop_sign_overlap_end_s,
-                         Frame* frame, ReferenceLineInfo* reference_line_info);
+  bool BuildStopDecision(const double stop_sign_overlap_end_s, Frame* frame,
+                         ReferenceLineInfo* reference_line_info);
+
+  double GetDistanceToFirstOverlapLane(
+      const ReferenceLineInfo& reference_line_info);
+
+  double GetOverlapPointS(const PathData& path_data);
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
+  common::TrajectoryPoint adc_planning_start_point_;
+  hdmap::Lane curr_lane_;
 };
 
 }  // namespace planning
