@@ -87,7 +87,8 @@ Stream *create_stream(const config::Stream &sd) {
         AERROR << "tcp def has no port field.";
         return nullptr;
       }
-      return Stream::create_tcp(sd.tcp().address().c_str(), sd.tcp().port());
+      return Stream::create_tcp(sd.tcp().address().c_str(),
+                                static_cast<uint16_t>(sd.tcp().port()));
 
     case config::Stream::kUdp:
       if (!sd.udp().has_address()) {
@@ -98,7 +99,8 @@ Stream *create_stream(const config::Stream &sd) {
         AERROR << "tcp def has no port field.";
         return nullptr;
       }
-      return Stream::create_udp(sd.udp().address().c_str(), sd.udp().port());
+      return Stream::create_udp(sd.udp().address().c_str(),
+                                static_cast<uint16_t>(sd.udp().port()));
 
     case config::Stream::kNtrip:
       if (!sd.ntrip().has_address()) {
@@ -122,8 +124,9 @@ Stream *create_stream(const config::Stream &sd) {
         return nullptr;
       }
       return Stream::create_ntrip(
-          sd.ntrip().address(), sd.ntrip().port(), sd.ntrip().mount_point(),
-          sd.ntrip().user(), sd.ntrip().password(), sd.ntrip().timeout_s());
+          sd.ntrip().address(), static_cast<uint16_t>(sd.ntrip().port()),
+          sd.ntrip().mount_point(), sd.ntrip().user(), sd.ntrip().password(),
+          sd.ntrip().timeout_s());
     default:
       return nullptr;
   }
@@ -276,15 +279,14 @@ bool RawStream::Init() {
   const std::string gpsbin_file = getLocalTimeFileStr(config_.gpsbin_folder());
   gpsbin_stream_.reset(new std::ofstream(
       gpsbin_file, std::ios::app | std::ios::out | std::ios::binary));
-  stream_writer_ =
-      node_->CreateWriter<StreamStatus>(FLAGS_stream_status_topic);
+  stream_writer_ = node_->CreateWriter<StreamStatus>(FLAGS_stream_status_topic);
   raw_writer_ = node_->CreateWriter<RawData>(FLAGS_gnss_raw_data_topic);
   rtcm_writer_ = node_->CreateWriter<RawData>(FLAGS_rtcm_data_topic);
   cyber::ReaderConfig reader_config;
   reader_config.channel_name = FLAGS_gnss_raw_data_topic;
   reader_config.pending_queue_size = 100;
-  gpsbin_reader_ = node_->CreateReader<RawData>(reader_config,
-      [&](const std::shared_ptr<RawData> &raw_data) {
+  gpsbin_reader_ = node_->CreateReader<RawData>(
+      reader_config, [&](const std::shared_ptr<RawData> &raw_data) {
         GpsbinCallback(raw_data);
       });
   chassis_reader_ = node_->CreateReader<Chassis>(
@@ -309,8 +311,8 @@ void RawStream::OnWheelVelocityTimer() {
     AINFO << "No chassis message received";
     return;
   }
-  auto latency_sec = cyber::Time::Now().ToSecond() -
-                     chassis_ptr_->header().timestamp_sec();
+  auto latency_sec =
+      cyber::Time::Now().ToSecond() - chassis_ptr_->header().timestamp_sec();
   auto latency_ms = std::to_string(std::lround(latency_sec * 1000));
   auto speed_cmps =
       std::to_string(std::lround(chassis_ptr_->speed_mps() * 100));

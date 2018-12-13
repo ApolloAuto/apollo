@@ -214,7 +214,7 @@ bool SerialStream::configure_port(int fd) {
   ::tcsetattr(fd, TCSANOW, &options);
 
   // Update byte_time_ based on the new settings.
-  uint32_t bit_time_us = 1e6 / 115200;
+  uint32_t bit_time_us = static_cast<uint32_t>(1e6 / 115200);
   byte_time_us_ = bit_time_us * (1 + bytesize_ + parity_ + stopbits_);
   return true;
 }
