@@ -740,8 +740,9 @@ void Obstacle::CheckLaneBlocking(const ReferenceLine& reference_line) {
   const double driving_width = reference_line.GetDrivingWidth(sl_boundary_);
   auto vehicle_param = common::VehicleConfigHelper::GetConfig().vehicle_param();
 
-  if (driving_width <
-      vehicle_param.width() + FLAGS_static_decision_nudge_l_buffer) {
+  if (reference_line.IsOnLane(sl_boundary_) &&
+      driving_width <
+          vehicle_param.width() + FLAGS_static_decision_nudge_l_buffer) {
     is_lane_blocking_ = true;
     return;
   }
