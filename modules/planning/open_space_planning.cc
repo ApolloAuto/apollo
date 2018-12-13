@@ -515,14 +515,20 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
 
     auto* point = current_trajectory->add_trajectory_point();
-
+    int gear_drive = 1;
+    if (gear_positions.back() == canbus::Chassis::GEAR_REVERSE) gear_drive = -1;
     point->set_relative_time(stitched_trajectory_to_end[i].relative_time());
     point->mutable_path_point()->set_x(
         stitched_trajectory_to_end[i].path_point().x());
     point->mutable_path_point()->set_y(
         stitched_trajectory_to_end[i].path_point().y());
-    point->mutable_path_point()->set_theta(
-        stitched_trajectory_to_end[i].path_point().theta());
+    if (gear_drive == 1) {
+      point->mutable_path_point()->set_theta(
+          stitched_trajectory_to_end[i].path_point().theta());
+    } else {
+      point->mutable_path_point()->set_theta(common::math::NormalizeAngle(
+          stitched_trajectory_to_end[i].path_point().theta() + M_PI));
+    }
     if (i > 0) {
       distance_s +=
           std::sqrt((stitched_trajectory_to_end[i].path_point().x() -
@@ -535,16 +541,15 @@ Status OpenSpacePlanning::TrajectoryPartition(
                          stitched_trajectory_to_end[i - 1].path_point().y()));
     }
     point->mutable_path_point()->set_s(distance_s);
-    int gear_drive = 1;
-    if (gear_positions.back() == canbus::Chassis::GEAR_REVERSE) gear_drive = -1;
 
     point->set_v(stitched_trajectory_to_end[i].v() * gear_drive);
     // TODO(Jiaxuan): Verify this steering to kappa equation and use parameter
     // from config
+    const auto& vehicle_config =
+        common::VehicleConfigHelper::Instance()->GetConfig();
     point->mutable_path_point()->set_kappa(
-        std::tanh(stitched_trajectory_to_end[i].steer() * 470 * M_PI / 180.0 /
-                  16) /
-        2.85 * gear_drive);
+        std::tan(stitched_trajectory_to_end[i].steer()) /
+        vehicle_config.vehicle_param().wheel_base() * gear_drive);
     point->set_a(stitched_trajectory_to_end[i].a() * gear_drive);
   }
 
