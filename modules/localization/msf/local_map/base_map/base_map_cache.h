@@ -66,7 +66,7 @@ class LRUCache {
     return true;
   }
   /**@brief return cache's in use. */
-  int Size() { return list_.size(); }
+  int Size() { return static_cast<int>(list_.size()); }
   /**@brief return cache's max capacity. */
   int Capacity() { return capacity_; }
 

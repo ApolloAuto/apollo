@@ -55,7 +55,9 @@ class FeatureXYPlane {
 
   void SetPlaneInlierDistance(double d) { plane_inlier_distance_ = d; }
 
-  void SetMinPlanepointsNumber(double d) { min_planepoints_number_ = d; }
+  void SetMinPlanepointsNumber(double d) {
+    min_planepoints_number_ = static_cast<int>(d);
+  }
 
   void SetPlaneTypeDegree(double d) { plane_type_degree_ = d; }
 
@@ -64,7 +66,7 @@ class FeatureXYPlane {
   float CalculateDegree(const Eigen::Vector3f& tmp0,
                         const Eigen::Vector3f& tmp1) {
     float cos_theta = tmp0.dot(tmp1) / (tmp0.norm() * tmp1.norm());
-    return std::acos(cos_theta) * 180.0 / M_PI;
+    return static_cast<float>(std::acos(cos_theta) * 180.0 / M_PI);
   }
 
   PointCloudPtrT& GetXYPlaneCloud() { return xy_plane_cloud_; }
@@ -75,7 +77,7 @@ class FeatureXYPlane {
     xy_plane_cloud_.reset(new PointCloudT);
     PointCloudPtrT pointcloud_ptr(new PointCloudT);
     pcl::copyPointCloud<PointT>(*cloud, *pointcloud_ptr);
-    int iter_num = log2(max_grid_size_ / min_grid_size_);
+    int iter_num = static_cast<int>(log2(max_grid_size_ / min_grid_size_));
     if (iter_num == 0) {
       iter_num = 1;
     }
@@ -85,7 +87,7 @@ class FeatureXYPlane {
     double power2 = 0.5;  // 2^-1
     for (int iter = 0; iter <= iter_num; ++iter) {
       power2 *= 2;
-      double grid_size = max_grid_size_ / power2;
+      float grid_size = static_cast<float>(max_grid_size_ / power2);
       VoxelGridCovariance<PointT> vgc;
       vgc.setInputCloud(pointcloud_ptr);
       vgc.SetMinPointPerVoxel(min_planepoints_number_);

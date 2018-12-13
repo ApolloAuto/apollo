@@ -47,19 +47,18 @@ LosslessMapSingleCell& LosslessMapSingleCell::operator=(
 void LosslessMapSingleCell::AddSample(const float new_altitude,
                                       const float new_intensity) {
   ++count;
+  float fcount = static_cast<float>(count);
   float v1 = new_intensity - intensity;
-  float value = v1 / count;
+  float value = v1 / fcount;
   intensity += value;
   float v2 = new_intensity - intensity;
-  intensity_var =
-      (static_cast<float>(count - 1) * intensity_var + v1 * v2) / count;
+  intensity_var = (fcount - 1.0f) * intensity_var + v1 * v2 / fcount;
 
   v1 = new_altitude - altitude;
-  value = v1 / count;
+  value = v1 / fcount;
   altitude += value;
   v2 = new_altitude - altitude;
-  altitude_var =
-      (static_cast<float>(count - 1) * altitude_var + v1 * v2) / count;
+  altitude_var = ((fcount - 1) * altitude_var + v1 * v2) / fcount;
 }
 
 unsigned int LosslessMapSingleCell::LoadBinary(unsigned char* buf) {
@@ -72,8 +71,8 @@ unsigned int LosslessMapSingleCell::LoadBinary(unsigned char* buf) {
   ++p;
   altitude_var = *p;
   ++p;
-  unsigned int* pp = reinterpret_cast<unsigned int*>(
-          reinterpret_cast<void*>(p));
+  unsigned int* pp =
+      reinterpret_cast<unsigned int*>(reinterpret_cast<void*>(p));
   count = *pp;
   return GetBinarySize();
 }
@@ -91,15 +90,15 @@ unsigned int LosslessMapSingleCell::CreateBinary(unsigned char* buf,
     ++p;
     *p = altitude_var;
     ++p;
-    unsigned int* pp = reinterpret_cast<unsigned int*>(
-            reinterpret_cast<void*>(p));
+    unsigned int* pp =
+        reinterpret_cast<unsigned int*>(reinterpret_cast<void*>(p));
     *pp = count;
   }
   return target_size;
 }
 
 unsigned int LosslessMapSingleCell::GetBinarySize() const {
-  return sizeof(float) * 4 + sizeof(unsigned int);
+  return static_cast<unsigned int>(sizeof(float) * 4 + sizeof(unsigned int));
 }
 
 // ======================LosslessMapCell===========================
@@ -181,7 +180,7 @@ unsigned int LosslessMapCell::CreateBinary(unsigned char* buf,
     unsigned int* p = reinterpret_cast<unsigned int*>(buf);
     *p = layer_num;
     ++p;
-    buf_size -= sizeof(unsigned int);
+    buf_size -= static_cast<unsigned int>(sizeof(unsigned int));
     unsigned char* pp = reinterpret_cast<unsigned char*>(p);
     for (size_t i = 0; i < layer_num; ++i) {
       const LosslessMapSingleCell& cell = map_cells[i];
@@ -343,7 +342,7 @@ unsigned int LosslessMapMatrix::CreateBinary(unsigned char* buf,
     ++p;
     *p = cols_;
     ++p;
-    buf_size -= (sizeof(unsigned int) * 2);
+    buf_size -= static_cast<unsigned int>(sizeof(unsigned int) * 2);
     unsigned char* pp = reinterpret_cast<unsigned char*>(p);
     for (unsigned int y = 0; y < rows_; ++y) {
       for (unsigned int x = 0; x < cols_; ++x) {
@@ -360,7 +359,8 @@ unsigned int LosslessMapMatrix::CreateBinary(unsigned char* buf,
 
 unsigned int LosslessMapMatrix::GetBinarySize() const {
   // default binary size
-  unsigned int target_size = sizeof(unsigned int) * 2;  // rows and cols
+  unsigned int target_size =
+      static_cast<unsigned int>(sizeof(unsigned int) * 2);  // rows and cols
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
       const LosslessMapCell& cell = GetMapCell(y, x);

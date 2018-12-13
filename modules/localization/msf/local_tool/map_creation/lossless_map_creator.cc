@@ -158,17 +158,17 @@ int main(int argc, char** argv) {
               << "4.0, 8.0 or 16.0." << std::endl;
   }
 
-  const unsigned int num_trials = pcd_folder_pathes.size();
+  const size_t num_trials = pcd_folder_pathes.size();
 
   // load all poses
   std::cerr << "Pcd folders are as follows:" << std::endl;
-  for (std::size_t i = 0; i < num_trials; ++i) {
+  for (size_t i = 0; i < num_trials; ++i) {
     std::cerr << pcd_folder_pathes[i] << std::endl;
   }
   std::vector<std::vector<Eigen::Affine3d>> ieout_poses(num_trials);
   std::vector<std::vector<double>> time_stamps(num_trials);
   std::vector<std::vector<unsigned int>> pcd_indices(num_trials);
-  for (std::size_t i = 0; i < pose_files.size(); ++i) {
+  for (size_t i = 0; i < pose_files.size(); ++i) {
     apollo::localization::msf::velodyne::LoadPcdPoses(
         pose_files[i], &ieout_poses[i], &time_stamps[i], &pcd_indices[i]);
   }
@@ -234,8 +234,10 @@ int main(int argc, char** argv) {
     fprintf(file, "Map row x col: \n");
     for (size_t i = 0; i < loss_less_config.map_resolutions_.size(); ++i) {
       fprintf(file, "%u x %u, ",
-              MapNodeIndex::GetMapIndexRangeNorth(loss_less_config, i),
-              MapNodeIndex::GetMapIndexRangeEast(loss_less_config, i));
+              MapNodeIndex::GetMapIndexRangeNorth(loss_less_config,
+                                                  static_cast<unsigned int>(i)),
+              MapNodeIndex::GetMapIndexRangeEast(loss_less_config,
+                                                 static_cast<unsigned int>(i)));
     }
     fprintf(file, "Map image max intensity: %lf\n",
             loss_less_config.max_intensity_value_);
@@ -285,9 +287,9 @@ int main(int argc, char** argv) {
         pcl_pc->resize(velodyne_frame.pt3ds.size());
         for (size_t i = 0; i < velodyne_frame.pt3ds.size(); ++i) {
           PclPointT& pt = pcl_pc->at(i);
-          pt.x = velodyne_frame.pt3ds[i][0];
-          pt.y = velodyne_frame.pt3ds[i][1];
-          pt.z = velodyne_frame.pt3ds[i][2];
+          pt.x = static_cast<float>(velodyne_frame.pt3ds[i][0]);
+          pt.y = static_cast<float>(velodyne_frame.pt3ds[i][1]);
+          pt.z = static_cast<float>(velodyne_frame.pt3ds[i][2]);
           pt.intensity = static_cast<float>(velodyne_frame.intensities[i]);
         }
 
@@ -352,7 +354,8 @@ int main(int argc, char** argv) {
     }
   }
 
-  map.GetConfig().map_ground_height_offset_ = mean_height_diff;
+  map.GetConfig().map_ground_height_offset_ =
+      static_cast<float>(mean_height_diff);
   std::string config_path = map.GetConfig().map_folder_path_ + "/config.xml";
   map.GetConfig().Save(config_path);
   ADEBUG << "Mean: " << mean_height_diff << ", Var: " << var_height_diff << ".";

@@ -40,7 +40,7 @@ void LosslessMapNode::SetValue(const Eigen::Vector3d& coordinate,
       static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
   map_cell.SetValue(coordinate[2], intensity);
   if (min_altitude_ > coordinate[2]) {
-    min_altitude_ = coordinate[2];
+    min_altitude_ = static_cast<float>(coordinate[2]);
   }
   is_changed_ = true;
 }
@@ -56,7 +56,7 @@ bool LosslessMapNode::SetValueIfInBound(const Eigen::Vector3d& coordinate,
         static_cast<LosslessMapMatrix*>(map_matrix_)->GetMapCell(y, x);
     map_cell.SetValue(coordinate[2], intensity);
     if (min_altitude_ > coordinate[2]) {
-      min_altitude_ = coordinate[2];
+      min_altitude_ = static_cast<float>(coordinate[2]);
     }
     is_changed_ = true;
     return true;

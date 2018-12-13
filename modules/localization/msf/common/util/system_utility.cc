@@ -44,7 +44,7 @@ bool system::GetFileSize(const std::string& path, unsigned int* size) {
   boost::filesystem::path p(path);
   if (boost::filesystem::exists(p)) {
     if (boost::filesystem::is_regular_file(p)) {
-      *size = boost::filesystem::file_size(p);
+      *size = static_cast<unsigned int>(boost::filesystem::file_size(p));
       return true;
     } else {
       return false;
