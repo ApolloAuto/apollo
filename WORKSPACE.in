@@ -218,3 +218,11 @@ new_http_archive(
     strip_prefix = "libprotobuf-mutator-1.0",
     url = "https://github.com/BaiduXLab/libprotobuf-mutator/archive/v1.0.tar.gz",
 )
+
+# sqlite3
+new_http_archive(
+    name = "sqlite3",
+    build_file = "third_party/sqlite3.BUILD",
+    strip_prefix = "sqlite-amalgamation-3250300",
+    url = "https://www.sqlite.org/2018/sqlite-amalgamation-3250300.zip",
+)
