@@ -23,6 +23,7 @@ import argparse
 from modules.map.proto.map_pb2 import Map
 from google.protobuf import text_format
 
+
 def main():
     parser = argparse.ArgumentParser(
         description='Convert a base map from txt to bin format')
@@ -42,7 +43,7 @@ def main():
 
     input_file_name = args['input_file']
     output_file_name = args['output_file']
-    
+
     with open(input_file_name, 'r') as f:
         mp = Map()
         text_format.Merge(f.read(), mp)
@@ -50,6 +51,7 @@ def main():
     # Output map
     with open(output_file_name, "wb") as f:
         f.write(mp.SerializeToString())
+
 
 if __name__ == '__main__':
     main()

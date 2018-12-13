@@ -43,9 +43,10 @@ gflags.DEFINE_string('input_file', None, 'Input record file path.')
 gflags.DEFINE_string('output_dir', './', 'Output directory path.')
 
 # Stable flags which rarely change.
-gflags.DEFINE_string('gps_raw_data_channel', 
+gflags.DEFINE_string('gps_raw_data_channel',
                      '/apollo/sensor/gnss/raw_data',
                      'gps raw data channel.')
+
 
 def process_record_file(args):
     """Read record file and extract the message with specified channels"""
@@ -60,11 +61,13 @@ def process_record_file(args):
                 raw_data.ParseFromString(message)
                 outfile.write(raw_data.data)
 
+
 def main():
     """Entry point."""
     gflags.FLAGS(sys.argv)
     process_record_file(gflags.FLAGS)
     return
+
 
 if __name__ == '__main__':
     main()

@@ -53,7 +53,7 @@ class Configurator(object):
                 module_name, proto_file, proto_class, conf_file = line.strip(
                 ).split(' ')
                 if module_name == 'MODULE' or proto_file == '#' or\
-                    proto_class == "#" or conf_file == '#':
+                        proto_class == "#" or conf_file == '#':
                     pass
                 else:
                     moduleconf = ModuleConf(module_name, proto_file,
