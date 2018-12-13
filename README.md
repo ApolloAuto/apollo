@@ -215,7 +215,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 
 * **Hardware/ Vehicle Overview**
 
-![image alt text](docs/demo_guide/images/Hardware_overview.png)
+![image alt text](docs/demo_guide/images/Hardware_overview_3_5.png)
 
 * **Hardware Connection Overview**
 
