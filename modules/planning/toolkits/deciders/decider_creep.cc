@@ -20,8 +20,12 @@
 
 #include "modules/planning/toolkits/deciders/decider_creep.h"
 
+#include <algorithm>
 #include <string>
+#include <vector>
 
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {
@@ -30,6 +34,8 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::hdmap::PathOverlap;
+using apollo::hdmap::HDMapUtil;
+using apollo::common::math::Vec2d;
 
 DeciderCreep::DeciderCreep(const TaskConfig& config) : Decider(config) {
   CHECK(config_.has_decider_creep_config());
@@ -109,6 +115,7 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
   bool creep_done = false;
   double creep_stop_s =
       stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
+
   const double distance =
       creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
   if (distance < creep_config.max_valid_stop_distance() ||
@@ -147,6 +154,7 @@ void DeciderCreep::SetProceedWithCautionSpeedParam(
     const double stop_sign_overlap_end_s) {
   double creep_stop_s =
       stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
+
   const double adc_front_end_s = reference_line_info.AdcSlBoundary().end_s();
   const double creep_distance = creep_stop_s - adc_front_end_s;
 
@@ -156,6 +164,66 @@ void DeciderCreep::SetProceedWithCautionSpeedParam(
       creep_distance;
   ADEBUG << "creep_stop_s[" << creep_stop_s << "] adc_front_end_s["
          << adc_front_end_s << "] creep distance[" << creep_distance << "]";
+}
+
+double DeciderCreep::GetDistanceToFirstOverlapLane(
+    const ReferenceLineInfo& reference_line_info) {
+  hdmap::LaneInfoConstPtr lane;
+  double s = 0.0;
+  double l = 0.0;
+  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
+          common::util::MakePointENU(
+              adc_planning_start_point_.path_point().x(),
+              adc_planning_start_point_.path_point().y(),
+              adc_planning_start_point_.path_point().z()),
+          1.0, adc_planning_start_point_.path_point().theta(), M_PI / 3.0,
+          &lane, &s, &l) != 0) {
+    AERROR << "Failed to find nearest lane from map at position: "
+           << adc_planning_start_point_.DebugString()
+           << ", heading:" << adc_planning_start_point_.path_point().theta();
+    return 0.0;
+  }
+  curr_lane_ = lane->lane();
+  AERROR << curr_lane_.DebugString();
+
+  return GetOverlapPointS(reference_line_info.path_data());
+}
+
+double DeciderCreep::GetOverlapPointS(const PathData& path_data) {
+  double dist = 0.0;
+  if (curr_lane_.successor_id_size() == 0) {
+    return dist;
+  }
+  const auto& next_lane_info =
+      HDMapUtil::BaseMapPtr()->GetLaneById(curr_lane_.successor_id(0));
+
+  for (const auto& path_point : path_data.discretized_path()) {
+    const auto& vehicle_box =
+        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
+    const std::vector<Vec2d>& corners = vehicle_box.GetAllCorners();
+
+    bool is_overlap = false;
+    for (const auto id : next_lane_info->lane().predecessor_id()) {
+      if (is_overlap) {
+        break;
+      }
+      if (id.id() == curr_lane_.id().id()) {
+        continue;
+      }
+      const auto& lane_info =
+          HDMapUtil::BaseMapPtr()->GetLaneById(curr_lane_.successor_id(0));
+      for (const auto& corner : corners) {
+        if (lane_info->IsOnLane(corner)) {
+          is_overlap = true;
+          break;
+        }
+      }
+    }
+    if (!is_overlap) {
+      dist = std::max(dist, path_point.s());
+    }
+  }
+  return dist;
 }
 
 }  // namespace planning
