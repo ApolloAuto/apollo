@@ -765,6 +765,90 @@ bool DBOperator::FindNaviWithPos(
   return res;
 }
 
+bool DBOperator::QueryRouteWithStartEndWay(const std::uint64_t start_way_id,
+                                           const std::uint64_t end_way_id,
+                                           std::vector<Way>* const route) {
+  CHECK_NOTNULL(route);
+  if (FindRoute(start_way_id, end_way_id, Orientation::kOrientationForward,
+                route)) {
+    return true;
+  }
+  route->clear();
+  return FindRoute(start_way_id, end_way_id, Orientation::kOrientationBackward,
+                   route);
+}
+
+bool DBOperator::FindRoute(const std::uint64_t start_way_id,
+                           const std::uint64_t end_way_id,
+                           const Orientation orientation,
+                           std::vector<Way>* const route) {
+  CHECK_NOTNULL(route);
+  bool ret = false;
+  Way way;
+  switch (orientation) {
+    case Orientation::kOrientationForward: {
+      if (!QueryWayWithWayId(start_way_id, &way)) {
+        ret = false;
+        break;
+      }
+      if (start_way_id == end_way_id) {
+        route->emplace_back(way);
+        ret = true;
+        break;
+      }
+      if (way.next_way_id == 0) {
+        ret = false;
+        break;
+      }
+      if (way.next_way_id == end_way_id) {
+        route->emplace_back(way);
+        Way end_way;
+        if (!QueryWayWithWayId(end_way_id, &end_way)) {
+          ret = false;
+          break;
+        }
+        route->emplace_back(end_way);
+        ret = true;
+        break;
+      }
+      route->emplace_back(way);
+      ret = FindRoute(way.next_way_id, end_way_id, orientation, route);
+    } break;
+    case Orientation::kOrientationBackward: {
+      if (!QueryWayWithWayId(start_way_id, &way)) {
+        ret = false;
+        break;
+      }
+      if (start_way_id == end_way_id) {
+        route->emplace_back(way);
+        ret = true;
+        break;
+      }
+      if (way.pre_way_id == 0) {
+        ret = false;
+        break;
+      }
+      if (way.pre_way_id == end_way_id) {
+        route->emplace_back(way);
+        Way end_way;
+        if (!QueryWayWithWayId(end_way_id, &end_way)) {
+          ret = false;
+          break;
+        }
+        route->emplace_back(end_way);
+        ret = true;
+        break;
+      }
+      route->emplace_back(way);
+      ret = FindRoute(way.pre_way_id, end_way_id, orientation, route);
+    } break;
+    default:
+      break;
+  }
+
+  return ret;
+}
+
 }  // namespace util
 }  // namespace navi_generator
 }  // namespace apollo

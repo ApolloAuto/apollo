@@ -94,6 +94,11 @@ enum TableNames {
   kMaxNumberOfTables,
 };
 
+enum Orientation {
+  kOrientationForward = 0,
+  kOrientationBackward,
+};
+
 class DBOperatorBase {
  public:
   DBOperatorBase() = default;
@@ -145,6 +150,9 @@ class DBOperator : public DBOperatorBase {
   bool GetNaviTableId(std::uint64_t* const navi_table_id);
   bool QueryNaviWithPos(const std::string& node_value,
                         std::vector<NaviInfoWithPos>* const navi_info);
+  bool QueryRouteWithStartEndWay(const std::uint64_t start_way_id,
+                                 const std::uint64_t end_way_id,
+                                 std::vector<Way>* const route);
 
  private:
   bool OpenDatabase();
@@ -155,6 +163,9 @@ class DBOperator : public DBOperatorBase {
   bool DeleteNaviData(const std::uint64_t way_id);
   bool FindNaviWithPos(const std::string& node_value,
                        std::vector<NaviInfoWithPos>* const navi_info);
+  bool FindRoute(const std::uint64_t start_way_id,
+                 const std::uint64_t end_way_id, const Orientation orientation,
+                 std::vector<Way>* const route);
 };
 
 }  // namespace util
