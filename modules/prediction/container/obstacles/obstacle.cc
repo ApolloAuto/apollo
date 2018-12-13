@@ -1119,6 +1119,7 @@ void Obstacle::BuildLaneGraph() {
       lane_seq_ptr->set_lane_s(lane.lane_s());
       lane_seq_ptr->set_lane_l(lane.lane_l());
       lane_seq_ptr->set_vehicle_on_lane(false);
+      SetLaneSequenceStopSign(lane_seq_ptr);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
@@ -1132,6 +1133,11 @@ void Obstacle::BuildLaneGraph() {
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph());
   }
   ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
+}
+
+void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
+  // TODO(Hongyi) implement
+  // Set the nearest stop sign along the lane sequence
 }
 
 void Obstacle::BuildLaneGraphFromLeftToRight() {

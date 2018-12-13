@@ -45,8 +45,10 @@ message NearbyObstacle {
 }
 
 message StopSign {
-  optional string id = 1;
-  optional double stop_s = 2;
+  optional string stop_sign_id = 1;
+  optional string lane_id =2;
+  optional double lane_s = 3;  // the s value within the lane
+  optional double lane_sequence_s = 4;  // the s value along lane sequence
 }
 
 // next id = 21

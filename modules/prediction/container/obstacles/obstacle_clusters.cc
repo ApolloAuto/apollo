@@ -31,10 +31,13 @@ using ::apollo::hdmap::LaneInfo;
 std::unordered_map<std::string, LaneGraph> ObstacleClusters::lane_graphs_;
 std::unordered_map<std::string, std::vector<LaneObstacle>>
     ObstacleClusters::lane_obstacles_;
+std::unordered_map<std::string, StopSign>
+    ObstacleClusters::lane_id_stop_sign_map_;
 
 void ObstacleClusters::Clear() {
   lane_graphs_.clear();
   lane_obstacles_.clear();
+  lane_id_stop_sign_map_.clear();
 }
 
 void ObstacleClusters::Init() { Clear(); }
@@ -195,6 +198,13 @@ bool ObstacleClusters::BackwardNearbyObstacle(
   }
 
   return found_one_behind;
+}
+
+StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
+  StopSign stop_sign;
+  // TODO(hongyi) implement using lane_id_stop_sign_map_
+  // fill stop_sign_id, lane_id, and lane_s
+  return stop_sign;
 }
 
 }  // namespace prediction
