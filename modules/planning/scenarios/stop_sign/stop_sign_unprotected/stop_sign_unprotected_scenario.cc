@@ -141,12 +141,9 @@ bool StopSignUnprotectedScenario::IsTransferable(
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
-      break;
     case ScenarioConfig::CHANGE_LANE:
-      break;
     case ScenarioConfig::SIDE_PASS:
-      break;
-    case ScenarioConfig::APPROACH: {
+    case ScenarioConfig::APPROACH:
       if (PlanningContext::GetScenarioInfo()
               ->next_stop_sign_overlap.object_id.empty()) {
         return false;
@@ -155,26 +152,19 @@ bool StopSignUnprotectedScenario::IsTransferable(
               adc_distance_to_stop_sign <=
                   config_.stop_sign_unprotected_config()
                       .start_stop_sign_scenario_distance());
-    }
     case ScenarioConfig::STOP_SIGN_PROTECTED:
       return false;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       return (current_scenario.GetStatus() !=
               Scenario::ScenarioStatus::STATUS_DONE);
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
-      break;
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
-      break;
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
-      break;
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
-      break;
     case ScenarioConfig::TRAFFIC_LIGHT_GO_THROUGH:
-      break;
     default:
       break;
   }
-
   return false;
 }
 
