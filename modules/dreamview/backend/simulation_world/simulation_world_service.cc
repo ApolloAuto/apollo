@@ -604,10 +604,6 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
 }
 
-std::string formatDoubleToString(const double data) {
-  return (boost::format("%.2f") % data).str();
-}
-
 void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
   const double cutoff_time = world_.auto_driving_car().timestamp_sec();
@@ -639,13 +635,19 @@ void SimulationWorldService::UpdatePlanningTrajectory(
     world_.set_engage_advice(
         EngageAdvice_Advice_Name(trajectory.engage_advice().advice()));
   }
+}
 
-  // Update RSS info
+std::string formatDoubleToString(const double data) {
+  std::stringstream ss;
+  ss << std::fixed << std::setprecision(2) << data;
+  return ss.str();
+}
+
+void SimulationWorldService::UpdateRSSInfo(const ADCTrajectory &trajectory) {
   if (trajectory.has_rss_info()) {
     if (trajectory.rss_info().is_rss_safe()) {
-      if (!is_rss_safe_) {
+      if (!world_.is_rss_safe()) {
         this->PublishMonitorMessage(MonitorMessageItem::INFO, "RSS safe.");
-        is_rss_safe_ = true;
         world_.set_is_rss_safe(true);
       }
     } else {
@@ -665,7 +667,6 @@ void SimulationWorldService::UpdatePlanningTrajectory(
               formatDoubleToString(trajectory.rss_info().cur_dist_lon()) +
               "\nsafe distance: " +
               formatDoubleToString(trajectory.rss_info().rss_safe_dist_lon()));
-      is_rss_safe_ = false;
       world_.set_is_rss_safe(false);
       current_real_dist_ = next_real_dist;
       current_rss_safe_dist_ = next_rss_safe_dist;
@@ -944,6 +945,8 @@ void SimulationWorldService::UpdateSimulationWorld(
   const double header_time = trajectory.header().timestamp_sec();
 
   UpdatePlanningTrajectory(trajectory);
+
+  UpdateRSSInfo(trajectory);
 
   UpdateDecision(trajectory.decision(), header_time);
 

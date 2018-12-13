@@ -174,6 +174,7 @@ class SimulationWorldService {
       Object *world_object);
   void UpdatePlanningTrajectory(
       const apollo::planning::ADCTrajectory &trajectory);
+  void UpdateRSSInfo(const apollo::planning::ADCTrajectory &trajectory);
   bool LocateMarker(const apollo::planning::ObjectDecisionType &decision,
                     Decision *world_decision);
   void FindNudgeRegion(const apollo::planning::ObjectDecisionType &decision,
@@ -334,7 +335,6 @@ class SimulationWorldService {
   std::atomic<bool> ready_to_push_;
 
   // Latest rss info
-  bool is_rss_safe_ = false;
   double current_real_dist_ = 0.0;
   double current_rss_safe_dist_ = 0.0;
 
