@@ -179,7 +179,7 @@ if scenario == "backward":
     ax.plot(down_boundary_x, down_boundary_y, "k")
     ax.plot(right_boundary_x, right_boundary_y, "k")
     ax.plot(up_boundary_x, up_boundary_y, "k")
-    
+
 plt.axis('equal')
 
 # input plot

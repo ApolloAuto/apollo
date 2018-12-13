@@ -73,7 +73,7 @@ def find_closest_traj_point(planning_pb, current_t):
 
 def plot_traj_point(planning_pb, traj_point, ax):
     matched_t = planning_pb.header.timestamp_sec \
-                + traj_point.relative_time
+        + traj_point.relative_time
     ax.plot([traj_point.x], [traj_point.y], "bs")
     content = "t = " + str(matched_t) + "\n"
     content += "speed = " + str(traj_point.speed) + "\n"
@@ -103,8 +103,10 @@ def plot_vehicle(localization_pb, ax):
 
     mkz_polygon.plot(position, localization_pb.pose.heading, ax)
     content = "t = " + str(current_t) + "\n"
-    content += "speed @y = " + str(localization_pb.pose.linear_velocity.y) + "\n"
-    content += "acc @y = " + str(localization_pb.pose.linear_acceleration_vrf.y)
+    content += "speed @y = " + \
+        str(localization_pb.pose.linear_velocity.y) + "\n"
+    content += "acc @y = " + \
+        str(localization_pb.pose.linear_acceleration_vrf.y)
     lxy = [-80, 80]
     ax.annotate(
         content,
@@ -116,6 +118,7 @@ def plot_vehicle(localization_pb, ax):
         bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.3),
         arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=0'),
         alpha=0.8)
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

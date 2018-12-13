@@ -55,7 +55,7 @@ def listener():
     #cyber.init()
     test_node = cyber.Node("control_listener")
     test_node.create_reader("/apollo/control",
-            control_cmd_pb2.ControlCommand, callback)
+                            control_cmd_pb2.ControlCommand, callback)
     test_node.spin()
     #cyber.shutdown()
     #rospy.init_node('control_listener', anonymous=True)
