@@ -73,7 +73,10 @@ build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Wconversion
 # Strict check on cleared modules.
 build --per_file_copt=\
 ^modules/calibration/.*\.cc,\
+^modules/canbus/.*\.cc,\
 ^modules/common/.*\.cc,\
+^modules/common/math/.*\.cc,\
+^modules/common/util/.*\.cc,\
 ^modules/contrib/.*\.cc,\
 ^modules/control/.*\.cc,\
 ^modules/data/.*\.cc,\

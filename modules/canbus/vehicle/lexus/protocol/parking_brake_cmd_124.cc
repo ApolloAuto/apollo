@@ -66,7 +66,7 @@ void Parkingbrakecmd124::set_p_ignore_overrides(uint8_t* data,
   uint8_t x = ignore_overrides;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 1, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
 Parkingbrakecmd124* Parkingbrakecmd124::set_enable(bool enable) {
@@ -81,7 +81,7 @@ void Parkingbrakecmd124::set_p_enable(uint8_t* data, bool enable) {
   uint8_t x = enable;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 1);
 }
 
 Parkingbrakecmd124* Parkingbrakecmd124::set_clear_override(
@@ -98,7 +98,7 @@ void Parkingbrakecmd124::set_p_clear_override(uint8_t* data,
   uint8_t x = clear_override;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 2, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 2, 1);
 }
 
 Parkingbrakecmd124* Parkingbrakecmd124::set_parking_brake_cmd(
@@ -115,7 +115,7 @@ void Parkingbrakecmd124::set_p_parking_brake_cmd(uint8_t* data,
   uint8_t x = parking_brake_cmd;
 
   Byte to_set(data + 1);
-  to_set.set_value(x, 0, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 1);
 }
 
 Parkingbrakecmd124* Parkingbrakecmd124::set_clear_faults(bool clear_faults) {
@@ -130,7 +130,7 @@ void Parkingbrakecmd124::set_p_clear_faults(uint8_t* data, bool clear_faults) {
   uint8_t x = clear_faults;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 3, 1);
+  to_set.set_value(static_cast<uint8_t>(x), 3, 1);
 }
 
 }  // namespace lexus

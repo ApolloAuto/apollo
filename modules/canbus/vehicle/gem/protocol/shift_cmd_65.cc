@@ -60,7 +60,7 @@ void Shiftcmd65::set_p_shift_cmd(uint8_t* data,
   uint8_t x = shift_cmd;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 }  // namespace gem
