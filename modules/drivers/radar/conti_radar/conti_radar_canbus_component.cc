@@ -143,8 +143,9 @@ void ContiRadarCanbusComponent::PoseCallback(
   Eigen::Vector3d speed_v(pose_msg->pose().linear_velocity().x(),
                           pose_msg->pose().linear_velocity().y(),
                           pose_msg->pose().linear_velocity().z());
-  float speed = (rotation_matrix * speed_v).y();
-  float yaw_rate = pose_msg->pose().angular_velocity().z() * 180 / M_PI;
+  float speed = static_cast<float>((rotation_matrix * speed_v).y());
+  float yaw_rate = static_cast<float>(pose_msg->pose().angular_velocity().z() *
+                                      180.0f / M_PI);
 
   AINFO << "radar speed:" << speed << ";yaw rate:" << yaw_rate;
   MotionInputSpeed300 input_speed;
