@@ -77,6 +77,24 @@ bool FileOperator::Import(
   return true;
 }
 
+bool FileOperator::Import(const std::string& filename,
+                          std::vector<unsigned char>* const data) {
+  CHECK_NOTNULL(data);
+  std::ifstream ifs(filename.c_str(), std::ifstream::in);
+  if (!ifs.is_open()) {
+    AERROR << "Can't open the smoothed file: " << filename;
+    return false;
+  }
+  // TODO(zhanghua): Maybe these read char operation shuold be optimized.
+  unsigned char c;
+  while (!ifs.eof()) {
+    c = ifs.get();
+    data->emplace_back(c);
+  }
+  ifs.close();
+  return true;
+}
+
 bool FileOperator::Export(
     const std::string& filename,
     const std::vector<apollo::planning::ReferencePoint>& lanepoints) {
@@ -103,6 +121,22 @@ bool FileOperator::Export(
       ofs << '\n';
     }
     s += DistanceXY(point, lanepoints[i + 1]);
+  }
+  ofs.flush();
+  ofs.close();
+  AINFO << "The smoothed result is saved to the file: " << filename;
+  return true;
+}
+
+bool FileOperator::Export(const std::string& filename,
+                          const std::vector<unsigned char>& data) {
+  std::ofstream ofs(filename.c_str());
+  if (!ofs.is_open()) {
+    AERROR << "Failed to open the output file: " << filename;
+    return false;
+  }
+  for (auto& c : data) {
+    ofs.put(c);
   }
   ofs.flush();
   ofs.close();
