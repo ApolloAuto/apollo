@@ -689,6 +689,82 @@ bool DBOperator::GetNaviTableId(std::uint64_t* const navi_table_id) {
   return res;
 }
 
+bool DBOperator::QueryNaviWithPos(
+    const std::string& node_value,
+    std::vector<NaviInfoWithPos>* const navi_info) {
+  CHECK_NOTNULL(navi_info);
+  bool res = false;
+  std::size_t find_times = 5;
+  std::size_t cur_time = 0;
+  std::string node_value_to_found = node_value;
+  while (cur_time < find_times) {
+    navi_info->clear();
+    if (FindNaviWithPos(node_value_to_found, navi_info)) {
+      res = true;
+      break;
+    } else {
+      node_value_to_found =
+          node_value_to_found.substr(0, node_value_to_found.size() - 1);
+    }
+  }
+
+  return res;
+}
+
+bool DBOperator::FindNaviWithPos(
+    const std::string& node_value,
+    std::vector<NaviInfoWithPos>* const navi_info) {
+  CHECK_NOTNULL(navi_info);
+  bool res = false;
+  std::string sql =
+      "SELECT way_nodes.way_id, node_index, data_line_number,node_value, "
+      "navi_index, data FROM way_nodes INNER JOIN navi_data ON "
+      "way_nodes.way_id = navi_data.way_id WHERE node_value LIKE '" +
+      node_value + "%' ORDER BY way_nodes.way_id,navi_index;";
+  SQLiteDataReader* reader = nullptr;
+  if (!sqlite_.ExcuteQuery(sql, &reader)) {
+    std::string err_msg;
+    sqlite_.GetLastErrorMsg(&err_msg);
+    AERROR << err_msg;
+    return false;
+  }
+  bool unique_way_id_has_been_read = false;
+  std::uint64_t last_way_id = 0;
+  NaviInfoWithPos navi_info_for_one_way;
+  while (reader->Read()) {
+    if (last_way_id == 0) {
+      last_way_id = reader->GetUint64Value(0);
+    }
+    if (last_way_id != reader->GetUint64Value(0)) {
+      // A new way
+      navi_info->emplace_back(navi_info_for_one_way);
+      navi_info_for_one_way.navi_data.clear();
+      last_way_id = reader->GetUint64Value(0);
+      unique_way_id_has_been_read = false;
+    }
+    if (!unique_way_id_has_been_read) {
+      navi_info_for_one_way.way_id = reader->GetUint64Value(0);
+      navi_info_for_one_way.node.node_index = reader->GetUint64Value(1);
+      navi_info_for_one_way.node.data_line_number = reader->GetUint64Value(2);
+      reader->GetStringValue(3, &(navi_info_for_one_way.node.node_value));
+      unique_way_id_has_been_read = true;
+    }
+    NaviData navi_data;
+    navi_data.navi_index = reader->GetUint8Value(4);
+    reader->GetBlobValue(5, &(navi_data.data));
+    navi_info_for_one_way.navi_data.emplace_back(navi_data);
+    res = true;
+  }
+  // push back the last navi_info_for_one_way since it has not been pushed in
+  // the while
+  if (navi_info_for_one_way.navi_data.size() > 0) {
+    navi_info->emplace_back(navi_info_for_one_way);
+  }
+
+  DeleteSQLiteDataReader(reader);
+  return res;
+}
+
 }  // namespace util
 }  // namespace navi_generator
 }  // namespace apollo
