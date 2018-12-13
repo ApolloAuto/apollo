@@ -153,7 +153,8 @@ ErrorCode SocketCanClientRaw::Send(const std::vector<CanFrame> &frames,
     std::memcpy(send_frames_[i].data, frames[i].data, frames[i].len);
 
     // Synchronous transmission of CAN messages
-    int ret = write(dev_handler_, &send_frames_[i], sizeof(send_frames_[i]));
+    int ret = static_cast<int>(
+        write(dev_handler_, &send_frames_[i], sizeof(send_frames_[i])));
     if (ret <= 0) {
       AERROR << "send message failed, error code: " << ret;
       return ErrorCode::CAN_CLIENT_ERROR_BASE;

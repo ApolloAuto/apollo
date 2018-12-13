@@ -51,15 +51,15 @@ void RadarConfig200::UpdateData(uint8_t* data) {
   set_ctrl_relay_valid_p(data, radar_conf_.ctrl_relay_valid());
   set_rcs_threshold_valid_p(data, radar_conf_.rcs_threshold_valid());
 
-  set_max_distance_p(data, radar_conf_.max_distance());
-  set_sensor_id_p(data, radar_conf_.sensor_id());
+  set_max_distance_p(data, static_cast<uint16_t>(radar_conf_.max_distance()));
+  set_sensor_id_p(data, static_cast<uint8_t>(radar_conf_.sensor_id()));
   set_output_type_p(data, radar_conf_.output_type());
-  set_radar_power_p(data, radar_conf_.radar_power());
-  set_ctrl_relay_p(data, radar_conf_.ctrl_relay());
+  set_radar_power_p(data, static_cast<uint8_t>(radar_conf_.radar_power()));
+  set_ctrl_relay_p(data, static_cast<uint8_t>(radar_conf_.ctrl_relay()));
   set_send_ext_info_p(data, radar_conf_.send_ext_info());
   set_send_quality_p(data, radar_conf_.send_quality());
-  set_sort_index_p(data, radar_conf_.sort_index());
-  set_store_in_nvm_p(data, radar_conf_.store_in_nvm());
+  set_sort_index_p(data, static_cast<uint8_t>(radar_conf_.sort_index()));
+  set_store_in_nvm_p(data, static_cast<uint8_t>(radar_conf_.store_in_nvm()));
   set_rcs_threshold_p(data, radar_conf_.rcs_threshold());
 }
 
@@ -90,9 +90,7 @@ void RadarConfig200::Reset() {
   radar_conf_.set_rcs_threshold(RCS_THRESHOLD_STANDARD);
 }
 
-RadarConf RadarConfig200::radar_conf() {
-  return radar_conf_;
-}
+RadarConf RadarConfig200::radar_conf() { return radar_conf_; }
 
 RadarConfig200* RadarConfig200::set_radar_conf(RadarConf radar_conf) {
   radar_conf_.CopyFrom(radar_conf);
@@ -291,11 +289,11 @@ void RadarConfig200::set_rcs_threshold_valid_p(uint8_t* data, bool valid) {
 
 void RadarConfig200::set_max_distance_p(uint8_t* data, uint16_t value) {
   value /= 2;
-  uint8_t low = value >> 2;
+  uint8_t low = static_cast<uint8_t>(value >> 2);
   Byte frame_low(data + 1);
   frame_low.set_value(low, 0, 8);
 
-  uint8_t high = value << 6;
+  uint8_t high = static_cast<uint8_t>(value << 6);
   high &= 0xc0;
   Byte frame_high(data + 2);
   frame_high.set_value(high, 0, 8);

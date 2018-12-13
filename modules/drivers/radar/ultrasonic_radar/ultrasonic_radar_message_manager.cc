@@ -39,7 +39,7 @@ void UltrasonicRadarMessageManager::set_can_client(
 }
 
 void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
-                                     const uint8_t *data, int32_t length) {
+                                          const uint8_t *data, int32_t length) {
   if (message_id == 0x301) {
     sensor_data_.set_ranges(0, data[1]);
     sensor_data_.set_ranges(1, data[2]);
@@ -68,7 +68,8 @@ void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;
-    if (it->second.real_period > (it->second.period * period_multiplier)) {
+    if (it->second.real_period >
+        (static_cast<double>(it->second.period) * period_multiplier)) {
       it->second.error_count += 1;
     } else {
       it->second.error_count = 0;
