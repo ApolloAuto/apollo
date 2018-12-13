@@ -44,7 +44,7 @@ using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
 Stage::StageStatus StageCreep::Process(
-    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+    const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
 

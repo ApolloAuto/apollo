@@ -49,22 +49,21 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
   switch (scenario_type) {
     case ScenarioConfig::LANE_FOLLOW:
-      ptr.reset(new lane_follow::LaneFollowScenario(
-          config_map_[scenario_type], &scenario_context_));
+      ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
+                                                    &scenario_context_));
       break;
     case ScenarioConfig::SIDE_PASS:
       ptr.reset(new scenario::side_pass::SidePassScenario(
           config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      ptr.reset(
-          new scenario::stop_sign::StopSignUnprotectedScenario(
-              config_map_[scenario_type], &scenario_context_));
+      ptr.reset(new scenario::stop_sign::StopSignUnprotectedScenario(
+          config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
-      ptr.reset(new scenario::traffic_light::
-                TrafficLightRightTurnUnprotectedScenario(
-                    config_map_[scenario_type], &scenario_context_));
+      ptr.reset(
+          new scenario::traffic_light::TrafficLightRightTurnUnprotectedScenario(
+              config_map_[scenario_type], &scenario_context_));
       break;
     default:
       return nullptr;
@@ -147,7 +146,8 @@ void ScenarioManager::Observe(const Frame& frame) {
           stop_sign_overlap;
     }
   }
-  ADEBUG << "Stop Sign: "
+  ADEBUG
+      << "Stop Sign: "
       << PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
 
   // find next traffic_light_overlap
@@ -164,8 +164,8 @@ void ScenarioManager::Observe(const Frame& frame) {
     }
   }
   ADEBUG << "Traffic Light: "
-      << PlanningContext::GetScenarioInfo()->
-          next_traffic_light_overlap.object_id;
+         << PlanningContext::GetScenarioInfo()
+                ->next_traffic_light_overlap.object_id;
 
   // find next crosswalk_overlap
   const std::vector<hdmap::PathOverlap>& crosswalk_overlaps =
@@ -180,7 +180,8 @@ void ScenarioManager::Observe(const Frame& frame) {
           crosswalk_overlap;
     }
   }
-  ADEBUG << "Crosswalk: "
+  ADEBUG
+      << "Crosswalk: "
       << PlanningContext::GetScenarioInfo()->next_crosswalk_overlap.object_id;
 }
 
