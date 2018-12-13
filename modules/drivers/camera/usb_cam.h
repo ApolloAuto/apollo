@@ -159,10 +159,10 @@ class UsbCam {
   int avframe_rgb_size_;
   struct SwsContext* video_sws_;
 
-  float frame_warning_interval_;
-  float device_wait_sec_;
-  uint64_t last_nsec_;
-  float frame_drop_interval_;
+  float frame_warning_interval_ = 0.0;
+  float device_wait_sec_ = 0.0;
+  uint64_t last_nsec_ = 0;
+  float frame_drop_interval_ = 0.0;
 };
 }  // namespace camera
 }  // namespace drivers

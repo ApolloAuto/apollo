@@ -23,7 +23,7 @@ namespace camera {
 bool CameraComponent::Init() {
   camera_config_ = std::make_shared<Config>();
   if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                                   camera_config_.get())) {
+                                               camera_config_.get())) {
     return false;
   }
   AINFO << "UsbCam config: " << camera_config_->DebugString();
@@ -37,7 +37,7 @@ bool CameraComponent::Init() {
   raw_image_->bytes_per_pixel = camera_config_->bytes_per_pixel();
 
   device_wait_ = camera_config_->device_wait_ms();
-  spin_rate_ = (1.0 / camera_config_->spin_rate()) * 1e6;
+  spin_rate_ = static_cast<uint32_t>((1.0 / camera_config_->spin_rate()) * 1e6);
 
   if (camera_config_->output_type() == YUYV) {
     raw_image_->image_size = raw_image_->width * raw_image_->height * 2;

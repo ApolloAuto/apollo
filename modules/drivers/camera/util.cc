@@ -30,7 +30,7 @@ void print_m256(__m256i a) {
     Store<true>(reinterpret_cast<__m256i*>(snoop), a);
   else
     Store<false>(reinterpret_cast<__m256i*>(snoop), a);
-  for (int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; ++i) {
     printf("DEBUG8 %d %u \n", i, snoop[i]);
   }
 }
@@ -41,7 +41,7 @@ void print_m256_i32(const __m256i a) {
     Store<true>(reinterpret_cast<__m256i*>(snoop), a);
   else
     Store<false>(reinterpret_cast<__m256i*>(snoop), a);
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 8; ++i) {
     printf("DEBUG32 %d %u \n", i, snoop[i]);
   }
 }
@@ -53,7 +53,7 @@ void print_m256_i16(const __m256i a) {
     Store<true>(reinterpret_cast<__m256i*>(snoop), a);
   else
     Store<false>(reinterpret_cast<__m256i*>(snoop), a);
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < 16; ++i) {
     printf("DEBUG16 %d %u \n", i, snoop[i]);
   }
 }
@@ -136,15 +136,17 @@ void yuyv2rgb_avx(unsigned char* YUV, unsigned char* RGB, int NumPixels) {
   uint8_t* yuv_offset = YUV;
   uint8_t* rgb_offset = RGB;
   if (align) {
-    for (int i = 0; i < NumPixels; i = i + (2 * sizeof(__m256i)),
-             yuv_offset += 4 * sizeof(__m256i),
-             rgb_offset += 6 * sizeof(__m256i)) {
+    for (int i = 0; i < NumPixels;
+         i = i + static_cast<int>(2 * sizeof(__m256i)),
+             yuv_offset += 4 * static_cast<int>(sizeof(__m256i)),
+             rgb_offset += 6 * static_cast<int>(sizeof(__m256i))) {
       yuv2rgb_avx2<true>(yuv_offset, rgb_offset);
     }
   } else {
-    for (int i = 0; i < NumPixels; i = i + (2 * sizeof(__m256i)),
-             yuv_offset += 4 * sizeof(__m256i),
-             rgb_offset += 6 * sizeof(__m256i)) {
+    for (int i = 0; i < NumPixels;
+         i = i + static_cast<int>(2 * sizeof(__m256i)),
+             yuv_offset += 4 * static_cast<int>(sizeof(__m256i)),
+             rgb_offset += 6 * static_cast<int>(sizeof(__m256i))) {
       yuv2rgb_avx2<false>(yuv_offset, rgb_offset);
     }
   }
