@@ -41,6 +41,50 @@ struct SpeedLimit {
   std::uint8_t speed;
 };
 
+struct Way {
+  std::uint64_t way_id;       // starting from 1
+  std::uint64_t pre_way_id;   // starting from 1
+  std::uint64_t next_way_id;  // starting from 1
+  std::uint8_t speed_min;
+  std::uint8_t speed_max;
+};
+
+struct Node {
+  std::uint64_t node_index;  // starting from 0
+  std::uint64_t
+      data_line_number;  // starting from 1. the line number of the binary file
+                         // which corresponding to node_index.
+  std::string node_value;
+};
+
+struct WayNodes {
+  std::uint64_t way_id;  // starting from 1
+  std::vector<Node> nodes;
+};
+
+struct WayData {
+  std::uint64_t way_id;                 // starting from 1
+  std::vector<unsigned char> raw_data;  // the data of the raw bag file
+  std::uint8_t navi_number;
+  std::uint64_t navi_table_id;
+};
+
+struct NaviData {
+  std::uint8_t navi_index;  // starting from 0
+  std::vector<unsigned char> data;
+};
+
+struct NaviInfo {
+  std::uint64_t way_id;  // starting from 1
+  std::vector<NaviData> navi_data;
+};
+
+struct NaviInfoWithPos {
+  std::uint64_t way_id;  // starting from 1
+  Node node;
+  std::vector<NaviData> navi_data;
+};
+
 enum TableNames {
   kTableSpeedLimit = 0,
   kTableWay,
@@ -75,11 +119,36 @@ class DBOperator : public DBOperatorBase {
    * @return  Return true for success.
    */
   bool InitDatabase();
+  bool SaveWay(const Way& way);
+  bool SaveWayNodes(const WayNodes& way_nodes);
+  bool SaveWayData(const WayData& way_data);
+  bool SaveNaviData(const NaviInfo& navi_info);
+  bool QueryWayWithWayId(const std::uint64_t way_id, Way* const way);
+  bool QueryWayDataWithWayId(const std::uint64_t way_id,
+                             WayData* const way_data);
+  bool QueryNaviDataWithWayId(const std::uint64_t way_id,
+                              std::vector<NaviData>* const navi_data);
+  bool QueryNaviDataWithWayId(const std::uint64_t way_id,
+                              const std::uint8_t navi_index,
+                              NaviData* const navi_data);
+  bool QueryWayNodesWithWayId(const std::uint64_t way_id,
+                              WayNodes* const way_nodes);
+  bool UpdateWay(const std::uint64_t way_id, const Way& way);
+  bool UpdateWaySpeedLimit(const std::uint64_t way_id,
+                           const std::uint8_t speed_min,
+                           const std::uint8_t speed_max);
+  bool UpdateWayNodes(const std::uint64_t way_id, const WayNodes& way_nodes);
+  bool UpdateWayData(const std::uint64_t way_id, const WayData& way_data);
+  bool UpdateNaviData(const std::uint64_t way_id, const NaviInfo& navi_info);
+  bool DeleteWay(const std::uint64_t way_id);
 
  private:
   bool OpenDatabase();
   void CloseDatabase();
   bool FillTableSpeedLimit();
+  bool DeleteWayNodes(const std::uint64_t way_id);
+  bool DeleteWayData(const std::uint64_t way_id);
+  bool DeleteNaviData(const std::uint64_t way_id);
 };
 
 }  // namespace util
