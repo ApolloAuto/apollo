@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.image_decompress.config;
+package apollo.image_decompress;
 
 message Config {
   optional string channel_name = 1;

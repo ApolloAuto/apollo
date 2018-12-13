@@ -25,24 +25,15 @@
 namespace apollo {
 namespace image_decompress {
 
-using apollo::cyber::Component;
-using apollo::cyber::Reader;
-using apollo::cyber::Writer;
-using apollo::drivers::Image;
-using apollo::drivers::CompressedImage;
-using apollo::image_decompress::config::Config;
-
-class ImageDecompressComponent final : public Component<CompressedImage> {
- public:
-  ImageDecompressComponent() = default;
-  ~ImageDecompressComponent() = default;
-
+class ImageDecompressComponent final :
+    public cyber::Component<apollo::drivers::CompressedImage> {
  public:
   bool Init() override;
-  bool Proc(const std::shared_ptr<CompressedImage>& image) override;
+  bool Proc(
+      const std::shared_ptr<apollo::drivers::CompressedImage>& image) override;
 
  private:
-  std::shared_ptr<Writer<Image>> writer_;
+  std::shared_ptr<cyber::Writer<apollo::drivers::Image>> writer_;
   Config config_;
 };
 
