@@ -32,6 +32,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "file_operator",
+    srcs = [
+        "file_operator.cc",
+    ],
+    hdrs = [
+        "file_operator.h",
+    ],
+    deps = [
+       "//modules/common:log",
+       "//modules/planning/reference_line:reference_line",
+       "//third_party/json",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
