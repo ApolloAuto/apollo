@@ -19,8 +19,8 @@
  * @brief This file provides the declaration of the class "DBOperator"
  */
 
-#ifndef MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_DB_OPERATOR_H_
-#define MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_DB_OPERATOR_H_
+#ifndef MODULES_TOOLS_NAVI_GENERATOR_BACKEND_DATABASE_DB_OPERATOR_H_
+#define MODULES_TOOLS_NAVI_GENERATOR_BACKEND_DATABASE_DB_OPERATOR_H_
 
 #include <cstdio>
 #include <string>
@@ -161,4 +161,4 @@ class DBOperator : public DBOperatorBase {
 }  // namespace navi_generator
 }  // namespace apollo
 
-#endif  // MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_DB_OPERATOR_H_
+#endif  // MODULES_TOOLS_NAVI_GENERATOR_BACKEND_DATABASE_DB_OPERATOR_H_
