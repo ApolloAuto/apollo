@@ -69,32 +69,12 @@ build --copt="-Werror=unused-variable"
 build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
-build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Wconversion
-# Strict check on cleared modules.
-build --per_file_copt=\
-^modules/calibration/.*\.cc,\
-^modules/canbus/.*\.cc,\
-^modules/common/.*\.cc,\
-^modules/common/math/.*\.cc,\
-^modules/common/util/.*\.cc,\
-^modules/contrib/.*\.cc,\
-^modules/control/.*\.cc,\
-^modules/data/.*\.cc,\
-^modules/dreamview/.*\.cc,\
-^modules/drivers/velodyne/.*\.cc,\
-^modules/guardian/.*\.cc,\
-^modules/localization/.*\.cc,\
-^modules/map/.*\.cc,\
-^modules/monitor/.*\.cc,\
-^modules/perception/.*\.cc,\
-^modules/prediction/.*\.cc,\
-^modules/planning/.*\.cc,\
-^modules/routing/.*\.cc,\
-^modules/third_party_perception/.*\.cc,\
-^modules/tools/.*\.cc,\
-^modules/transform/.*\.cc,\
-^modules/v2x/.*\.cc,\
-@-Werror=conversion
+# Strict check on type conversion.
+# TODO(all): Clear drivers module and remove it from exception.
+build --per_file_copt=^modules/.*\.cc,-^modules/drivers/.*\.cc@-Werror=conversion
+
+# TODO(all): Clear cyber warnings and add it to the strict check.
+build --per_file_copt=^cyber/.*\.cc@-Wconversion
 
 
 # Enable C++14
