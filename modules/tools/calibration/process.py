@@ -27,7 +27,7 @@ import scipy.signal as signal
 warnings.simplefilter('ignore', np.RankWarning)
 
 SPEED_INTERVAL = 0.2
-SPEED_DELAY = 130  #Speed report delay relative to IMU information
+SPEED_DELAY = 130  # Speed report delay relative to IMU information
 
 
 def preprocess(filename):
@@ -53,7 +53,7 @@ def get_start_index(data):
     ind = start_ind
     while ind < len(data):
         if data['brake_percentage'][
-                ind] == 40:  #or data['vehicle_speed'][ind] == 0.0:
+                ind] == 40:  # or data['vehicle_speed'][ind] == 0.0:
             ind = ind + 1
         else:
             break

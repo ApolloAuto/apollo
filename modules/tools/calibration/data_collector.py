@@ -41,7 +41,7 @@ class DataCollector(object):
     def __init__(self, node):
         self.sequence_num = 0
         self.control_pub = node.create_writer('/apollo/control',
-                            control_cmd_pb2.ControlCommand)
+                                              control_cmd_pb2.ControlCommand)
         time.sleep(0.3)
         self.controlcmd = control_cmd_pb2.ControlCommand()
 
@@ -194,10 +194,10 @@ def main():
     data_collector = DataCollector(node)
     plotter = Plotter()
     node.create_reader('/apollo/localization/pose',
-                                       localization_pb2.LocalizationEstimate,
-                                       data_collector.callback_localization)
+                       localization_pb2.LocalizationEstimate,
+                       data_collector.callback_localization)
     node.create_reader('/apollo/canbus/chassis', chassis_pb2.Chassis,
-                                 data_collector.callback_canbus)
+                       data_collector.callback_canbus)
 
     print "Enter q to quit"
     print "Enter p to plot result from last run"

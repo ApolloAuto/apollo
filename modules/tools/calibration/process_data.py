@@ -56,6 +56,7 @@ class Plotter(object):
 
     def save_data(self):
         """
+        save_data
         """
         for i in range(len(self.tablecmd)):
             for j in range(len(self.tablespeed[i])):

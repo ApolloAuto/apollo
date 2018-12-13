@@ -24,6 +24,7 @@ import common.proto_utils as proto_utils
 from modules.control.proto import calibration_table_pb2
 from modules.control.proto.control_conf_pb2 import ControlConf
 
+
 def load_calibration_raw_data(fn):
     speed_table = {}
     with open(fn, 'r') as f:
@@ -42,7 +43,7 @@ def load_calibration_raw_data(fn):
                 cmd_table = {}
                 cmd_table[cmd] = [acc]
                 speed_table[speed] = cmd_table
-                
+
     for speed in speed_table:
         cmd_table = speed_table[speed]
         for cmd in cmd_table:
@@ -53,7 +54,7 @@ def load_calibration_raw_data(fn):
     for speed in speed_table:
         cmd_table = speed_table[speed]
         acc_table = {}
-        for cmd in cmd_table: 
+        for cmd in cmd_table:
             acc = cmd_table[cmd]
             if acc in acc_table:
                 acc_table[acc].append(cmd)
@@ -62,6 +63,7 @@ def load_calibration_raw_data(fn):
         speed_table2[speed] = acc_table
 
     return speed_table2
+
 
 def load_calibration_raw_data_old(fn):
     speed_table = {}
@@ -83,6 +85,7 @@ def load_calibration_raw_data_old(fn):
                 speed_table[speed] = acc_table
     return speed_table
 
+
 def get_calibration_table_pb(speed_table):
     calibration_table_pb = calibration_table_pb2.ControlCalibrationTable()
     speeds = speed_table.keys()
@@ -99,6 +102,7 @@ def get_calibration_table_pb(speed_table):
             item.acceleration = acc
             item.command = cmd
     return calibration_table_pb
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
