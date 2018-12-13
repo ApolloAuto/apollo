@@ -44,7 +44,12 @@ message NearbyObstacle {
   optional double l = 3;  // relative to focus obstacle
 }
 
-// next id = 20
+message StopSign {
+  optional string id = 1;
+  optional double stop_s = 2;
+}
+
+// next id = 21
 message LaneSequence {
   optional int32 lane_sequence_id = 1;
   repeated LaneSegment lane_segment = 2;
@@ -52,6 +57,7 @@ message LaneSequence {
   repeated NearbyObstacle nearby_obstacle = 3;
   optional double lane_s = 17;
   optional double lane_l = 18;
+  optional StopSign stop_sign = 20;
 
   message Features {
     repeated double mlp_features = 1;
