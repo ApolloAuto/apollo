@@ -360,7 +360,8 @@ class Planning:
         sl_static_obstacle_upper_boundary.set_ydata(new_static_upper)
         sl_path.set_xdata(self.sl_path_s)
         sl_path.set_ydata(self.sl_path_l)
-        sl_aggregated_boundary_low_line.set_xdata(self.sl_aggregated_boundary_s)
+        sl_aggregated_boundary_low_line.set_xdata(
+            self.sl_aggregated_boundary_s)
         sl_aggregated_boundary_low_line.set_ydata(
             self.sl_aggregated_boundary_low_l)
         sl_aggregated_boundary_high_line.set_xdata(

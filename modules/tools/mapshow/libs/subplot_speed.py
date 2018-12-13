@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+
 class SpeedSubplot:
     def __init__(self, ax):
         self.ax = ax

@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+
 class StMainSubplot:
     def __init__(self, ax, st_name):
         self.st_curve_line, = ax.plot([0], [0], "k.", lw=3, alpha=0.5)
