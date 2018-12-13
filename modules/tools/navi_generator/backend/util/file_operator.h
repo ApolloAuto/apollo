@@ -50,11 +50,23 @@ class FileOperator {
   bool Import(const std::string& filename,
               std::vector<apollo::planning::ReferencePoint>* const lanepoints);
   /**
+   * @brief Import smoothed file.
+   * @return  Return true for success.
+   */
+  bool Import(const std::string& filename,
+              std::vector<unsigned char>* const data);
+  /**
    * @brief Export smoothed file.
    * @return  Return true for success.
    */
   bool Export(const std::string& filename,
               const std::vector<apollo::planning::ReferencePoint>& lanepoints);
+  /**
+   * @brief Export smoothed file.
+   * @return  Return true for success.
+   */
+  bool Export(const std::string& filename,
+              const std::vector<unsigned char>& data);
 };
 
 }  // namespace util
