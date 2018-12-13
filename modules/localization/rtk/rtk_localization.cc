@@ -159,7 +159,7 @@ void RTKLocalization::FillLocalizationMsgHeader(
   double timestamp = apollo::common::time::Clock::NowInSeconds();
   header->set_module_name(module_name_);
   header->set_timestamp_sec(timestamp);
-  header->set_sequence_num(++localization_seq_num_);
+  header->set_sequence_num(static_cast<unsigned int>(++localization_seq_num_));
 
   return;
 }

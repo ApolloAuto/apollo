@@ -59,7 +59,7 @@ unsigned int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
       stream_data.avail_in = zlib_chunk;
       flush = Z_NO_FLUSH;
     } else {
-      stream_data.avail_in = src->size() - src_idx;
+      stream_data.avail_in = static_cast<unsigned int>(src->size()) - src_idx;
       flush = Z_FINISH;
     }
     stream_data.next_in = in;
@@ -116,7 +116,7 @@ unsigned int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
     if (src->size() - src_idx > zlib_chunk) {
       stream_data.avail_in = zlib_chunk;
     } else {
-      stream_data.avail_in = src->size() - src_idx;
+      stream_data.avail_in = static_cast<unsigned int>(src->size()) - src_idx;
     }
     stream_data.next_in = in;
     src_idx += stream_data.avail_in;

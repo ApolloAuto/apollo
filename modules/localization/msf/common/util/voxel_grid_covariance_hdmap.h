@@ -531,10 +531,10 @@ class VoxelGridCovariance : public pcl::VoxelGrid<PointT> {
           if (rgba_index >= 0) {
             pcl::RGB& rgb = *reinterpret_cast<pcl::RGB*>(
                 reinterpret_cast<char*>(&output->points.back()) + rgba_index);
-            rgb.a = leaf.centroid[centroid_size - 4];
-            rgb.r = leaf.centroid[centroid_size - 3];
-            rgb.g = leaf.centroid[centroid_size - 2];
-            rgb.b = leaf.centroid[centroid_size - 1];
+            rgb.a = static_cast<uint8_t>(leaf.centroid[centroid_size - 4]);
+            rgb.r = static_cast<uint8_t>(leaf.centroid[centroid_size - 3]);
+            rgb.g = static_cast<uint8_t>(leaf.centroid[centroid_size - 2]);
+            rgb.b = static_cast<uint8_t>(leaf.centroid[centroid_size - 1]);
           }
         }
 

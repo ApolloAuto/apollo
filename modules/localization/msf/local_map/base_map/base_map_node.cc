@@ -227,7 +227,7 @@ unsigned int BaseMapNode::CreateBinary(FILE* file) const {
   // Create body
   CHECK_GE(buf_size, body_buffer.size());
   memcpy(&buffer[buffer_bias], &body_buffer[0], body_buffer.size());
-  binary_size += body_buffer.size();
+  binary_size += static_cast<unsigned int>(body_buffer.size());
   fwrite(&buffer[0], 1, binary_size, file);
   return binary_size;
 }
@@ -277,11 +277,11 @@ unsigned int BaseMapNode::CreateHeaderBinary(unsigned char* buf,
 }
 
 unsigned int BaseMapNode::GetHeaderBinarySize() const {
-  return sizeof(unsigned int)     // index_.resolution_id_
-         + sizeof(int)            // index_.zone_id_
-         + sizeof(unsigned int)   // index_.m_
-         + sizeof(unsigned int)   // index_.n_
-         + sizeof(unsigned int);  // the body size in file.
+  return static_cast<int>(sizeof(unsigned int)      // index_.resolution_id_
+                          + sizeof(int)             // index_.zone_id_
+                          + sizeof(unsigned int)    // index_.m_
+                          + sizeof(unsigned int)    // index_.n_
+                          + sizeof(unsigned int));  // the body size in file.
 }
 
 // unsigned int BaseMapNode::CreateBodyBinary(
@@ -303,7 +303,8 @@ unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
   std::vector<unsigned char> buf_uncompressed;
   compression_strategy_->Decode(buf, &buf_uncompressed);
   AERROR << "map node compress ratio: "
-         << static_cast<float>(buf->size()) / buf_uncompressed.size();
+         << static_cast<float>(buf->size()) /
+                static_cast<float>(buf_uncompressed.size());
   return map_matrix_->LoadBinary(&buf_uncompressed[0]);
 }
 
@@ -313,8 +314,8 @@ unsigned int BaseMapNode::CreateBodyBinary(
     unsigned int body_size = GetBodyBinarySize();
     buf->resize(body_size);
     map_matrix_->CreateBinary(&((*buf)[0]), body_size);
-    file_body_binary_size_ = buf->size();
-    return buf->size();
+    file_body_binary_size_ = static_cast<unsigned int>(buf->size());
+    return static_cast<unsigned int>(buf->size());
   }
   std::vector<unsigned char> buf_uncompressed;
   // Compute the uncompression binary body size
@@ -322,8 +323,8 @@ unsigned int BaseMapNode::CreateBodyBinary(
   buf_uncompressed.resize(body_size);
   map_matrix_->CreateBinary(&buf_uncompressed[0], body_size);
   compression_strategy_->Encode(&buf_uncompressed, buf);
-  file_body_binary_size_ = buf->size();
-  return buf->size();
+  file_body_binary_size_ = static_cast<unsigned int>(buf->size());
+  return static_cast<unsigned int>(buf->size());
 }
 
 unsigned int BaseMapNode::GetBodyBinarySize() const {
@@ -394,8 +395,9 @@ bool BaseMapNode::GetCoordinate(const Eigen::Vector3d& coordinate,
 Eigen::Vector2d BaseMapNode::GetCoordinate(unsigned int x,
                                            unsigned int y) const {
   const Eigen::Vector2d& left_top_corner = GetLeftTopCorner();
-  Eigen::Vector2d coord(left_top_corner[0] + x * GetMapResolution(),
-                        left_top_corner[1] + y * GetMapResolution());
+  Eigen::Vector2d coord(
+      left_top_corner[0] + static_cast<float>(x) * GetMapResolution(),
+      left_top_corner[1] + static_cast<float>(y) * GetMapResolution());
   return coord;
 }
 
@@ -415,11 +417,13 @@ Eigen::Vector2d BaseMapNode::GetLeftTopCorner(const BaseMapConfig& config,
                                               const MapNodeIndex& index) {
   Eigen::Vector2d coord;
   coord[0] = config.map_range_.GetMinX() +
-             config.map_node_size_x_ *
-                 config.map_resolutions_[index.resolution_id_] * index.n_;
+             static_cast<float>(config.map_node_size_x_) *
+                 config.map_resolutions_[index.resolution_id_] *
+                 static_cast<float>(index.n_);
   coord[1] = config.map_range_.GetMinY() +
-             config.map_node_size_y_ *
-                 config.map_resolutions_[index.resolution_id_] * index.m_;
+             static_cast<float>(config.map_node_size_y_) *
+                 config.map_resolutions_[index.resolution_id_] *
+                 static_cast<float>(index.m_);
   DCHECK_LT(coord[0], config.map_range_.GetMaxX());
   DCHECK_LT(coord[1], config.map_range_.GetMaxY());
   return coord;

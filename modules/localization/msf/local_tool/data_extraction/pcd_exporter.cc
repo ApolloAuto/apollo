@@ -18,10 +18,10 @@
 
 #include <string>
 
-#include "pcl/io/pcd_io.h"
-#include "pcl/point_types.h"
 #include "cyber/cyber.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
+#include "pcl/io/pcd_io.h"
+#include "pcl/point_types.h"
 
 namespace apollo {
 namespace localization {
@@ -74,11 +74,13 @@ void PCDExporter::WritePcdFile(const std::string &filename,
     cloud.points.resize(msg.point_size());
   }
 
-  for (size_t i = 0; i < cloud.points.size(); ++i) {
+  for (unsigned int i = 0; i < static_cast<unsigned int>(cloud.points.size());
+       ++i) {
     cloud.points[i].x = msg.point(i).x();
     cloud.points[i].y = msg.point(i).y();
     cloud.points[i].z = msg.point(i).z();
-    cloud.points[i].intensity = msg.point(i).intensity();
+    cloud.points[i].intensity =
+        static_cast<unsigned char>(msg.point(i).intensity());
   }
 
   pcl::io::savePCDFileBinaryCompressed(filename, cloud);

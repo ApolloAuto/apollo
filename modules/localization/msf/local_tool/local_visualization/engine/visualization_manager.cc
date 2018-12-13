@@ -163,7 +163,7 @@ template <class MessageType>
 unsigned int MessageBuffer<MessageType>::BufferSize() {
   unsigned int size = 0;
   pthread_mutex_lock(&buffer_mutex_);
-  size = msg_list_.size();
+  size = static_cast<unsigned int>(msg_list_.size());
   pthread_mutex_unlock(&buffer_mutex_);
 
   return size;

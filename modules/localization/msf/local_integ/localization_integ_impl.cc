@@ -190,7 +190,7 @@ void LocalizationIntegImpl::PcdThreadLoop() {
       std::unique_lock<std::mutex> lock(lidar_data_queue_mutex_);
       lidar_frame = lidar_data_queue_.front();
       lidar_data_queue_.pop();
-      waiting_num = lidar_data_queue_.size();
+      waiting_num = static_cast<int>(lidar_data_queue_.size());
     }
 
     if (waiting_num > 2) {
@@ -264,7 +264,7 @@ void LocalizationIntegImpl::ImuThreadLoop() {
       std::unique_lock<std::mutex> lock(imu_data_queue_mutex_);
       imu_data = imu_data_queue_.front();
       imu_data_queue_.pop();
-      waiting_num = imu_data_queue_.size();
+      waiting_num = static_cast<int>(imu_data_queue_.size());
     }
 
     if (waiting_num > 10) {
@@ -314,8 +314,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
       integ_localization.pose().orientation();
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                        orientation.qy(), orientation.qz());
-  Eigen::Vector3d vec_acceleration =
-      quaternion.toRotationMatrix() * orig_acceleration;
+  Eigen::Vector3d vec_acceleration = static_cast<Eigen::Vector3d>(
+      quaternion.toRotationMatrix() * orig_acceleration);
 
   apollo::common::Point3D* linear_acceleration =
       posepb_loc->mutable_linear_acceleration();
@@ -332,8 +332,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   // set angular velocity
   Eigen::Vector3d orig_angular_velocity(imu_data.wibb[0], imu_data.wibb[1],
                                         imu_data.wibb[2]);
-  Eigen::Vector3d vec_angular_velocity =
-      quaternion.toRotationMatrix() * orig_angular_velocity;
+  Eigen::Vector3d vec_angular_velocity = static_cast<Eigen::Vector3d>(
+      quaternion.toRotationMatrix() * orig_angular_velocity);
   apollo::common::Point3D* angular_velocity =
       posepb_loc->mutable_angular_velocity();
   angular_velocity->set_x(vec_angular_velocity(0));
@@ -458,7 +458,7 @@ void LocalizationIntegImpl::GnssThreadLoop() {
       std::unique_lock<std::mutex> lock(gnss_function_queue_mutex_);
       gnss_func = gnss_function_queue_.front();
       gnss_function_queue_.pop();
-      waiting_num = gnss_function_queue_.size();
+      waiting_num = static_cast<int>(gnss_function_queue_.size());
     }
 
     if (waiting_num > 2) {
@@ -544,7 +544,7 @@ void LocalizationIntegImpl::GnssHeadingThreadLoop() {
   while (keep_gnss_heading_running_.load()) {
     {
       std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
-      int size = gnss_heading_function_queue_.size();
+      int size = static_cast<int>(gnss_heading_function_queue_.size());
       while (size > gnss_heading_queue_max_size_) {
         gnss_heading_function_queue_.pop();
         --size;
@@ -561,7 +561,7 @@ void LocalizationIntegImpl::GnssHeadingThreadLoop() {
       std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
       gnss_heading_func = gnss_heading_function_queue_.front();
       gnss_heading_function_queue_.pop();
-      waiting_num = gnss_heading_function_queue_.size();
+      waiting_num = static_cast<int>(gnss_heading_function_queue_.size());
     }
 
     if (waiting_num > 2) {

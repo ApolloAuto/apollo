@@ -31,8 +31,8 @@ LosslessMap::~LosslessMap() {}
 void LosslessMap::SetValue(const Eigen::Vector3d& coordinate, int zone_id,
                            unsigned char intensity) {
   for (size_t i = 0; i < map_config_->map_resolutions_.size(); ++i) {
-    MapNodeIndex index =
-        MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate, i, zone_id);
+    MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(
+        *map_config_, coordinate, static_cast<unsigned int>(i), zone_id);
     LosslessMapNode* node =
         static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
     node->SetValue(coordinate, intensity);
@@ -42,8 +42,8 @@ void LosslessMap::SetValue(const Eigen::Vector3d& coordinate, int zone_id,
 void LosslessMap::SetValueLayer(const Eigen::Vector3d& coordinate, int zone_id,
                                 unsigned char intensity) {
   for (size_t i = 0; i < map_config_->map_resolutions_.size(); ++i) {
-    MapNodeIndex index =
-        MapNodeIndex::GetMapNodeIndex(*map_config_, coordinate, i, zone_id);
+    MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(
+        *map_config_, coordinate, static_cast<unsigned int>(i), zone_id);
     LosslessMapNode* node =
         static_cast<LosslessMapNode*>(GetMapNodeSafe(index));
     node->SetValueLayer(coordinate, intensity);

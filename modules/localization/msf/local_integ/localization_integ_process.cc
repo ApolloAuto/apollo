@@ -267,7 +267,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
   while (keep_running_.load()) {
     {
       std::unique_lock<std::mutex> lock(measure_data_queue_mutex_);
-      int size = measure_data_queue_.size();
+      int size = static_cast<int>(measure_data_queue_.size());
       while (size > measure_data_queue_size_) {
         measure_data_queue_.pop();
         --size;
@@ -285,7 +285,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
       std::unique_lock<std::mutex> lock(measure_data_queue_mutex_);
       measure = measure_data_queue_.front();
       measure_data_queue_.pop();
-      waiting_num = measure_data_queue_.size();
+      waiting_num = static_cast<int>(measure_data_queue_.size());
     }
 
     if (waiting_num > measure_data_queue_size_ / 4) {

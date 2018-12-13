@@ -134,7 +134,7 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
   locator_->SetVelodyneExtrinsic(lidar_extrinsic_);
   locator_->SetLocalizationMode(localization_mode_);
   locator_->SetImageAlignMode(yaw_align_mode_);
-  locator_->SetValidThreshold(map_coverage_theshold_);
+  locator_->SetValidThreshold(static_cast<float>(map_coverage_theshold_));
   locator_->SetVehicleHeight(lidar_height_.height);
   locator_->SetDeltaPitchRollLimit(compensate_pitch_roll_limit_);
 
@@ -257,7 +257,7 @@ int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
   orientation_std_dev->set_y(0.0);
   orientation_std_dev->set_z(yaw_covariance);
 
-  MsfStatus *msf_status = lidar_local_msg->mutable_msf_status();
+  MsfStatus* msf_status = lidar_local_msg->mutable_msf_status();
   msf_status->set_local_lidar_status(local_lidar_status_);
   msf_status->set_local_lidar_quality(local_lidar_quality_);
 
@@ -352,16 +352,13 @@ void LocalizationLidarProcess::UpdateState(const int ret, const double time) {
     double local_uncertainty_x = std::sqrt(location_covariance_(0, 0));
     double local_uncertainty_y = std::sqrt(location_covariance_(1, 1));
 
-    local_uncertainty_x =
-      local_uncertainty_x > 0.1 ? local_uncertainty_x : 0.1;
-    local_uncertainty_y =
-      local_uncertainty_y > 0.1 ? local_uncertainty_y : 0.1;
+    local_uncertainty_x = local_uncertainty_x > 0.1 ? local_uncertainty_x : 0.1;
+    local_uncertainty_y = local_uncertainty_y > 0.1 ? local_uncertainty_y : 0.1;
     // check covariance
     double cur_location_std_area =
-      std::sqrt(local_uncertainty_x * local_uncertainty_x +
-                local_uncertainty_y * local_uncertainty_y);
-    if (cur_location_std_area > unstable_threshold_ ||
-        location_score < 0.8) {
+        std::sqrt(local_uncertainty_x * local_uncertainty_x +
+                  local_uncertainty_y * local_uncertainty_y);
+    if (cur_location_std_area > unstable_threshold_ || location_score < 0.8) {
       local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
     } else if (cur_location_std_area <= unstable_threshold_ &&
                location_score < 0.85) {

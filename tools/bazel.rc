@@ -82,6 +82,7 @@ build --per_file_copt=\
 ^modules/data/.*\.cc,\
 ^modules/dreamview/.*\.cc,\
 ^modules/guardian/.*\.cc,\
+^modules/localization/.*\.cc,\
 ^modules/map/.*\.cc,\
 ^modules/monitor/.*\.cc,\
 ^modules/perception/.*\.cc,\
@@ -93,6 +94,7 @@ build --per_file_copt=\
 ^modules/transform/.*\.cc,\
 ^modules/v2x/.*\.cc,\
 @-Werror=conversion
+
 
 # Enable C++14
 build --cxxopt="-std=c++1y"

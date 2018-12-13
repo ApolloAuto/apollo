@@ -88,7 +88,7 @@ static void PoseAndStdInterpolationByTime(
         re_transd.x() = pre_transd.x() * t + cur_transd.x() * (1 - t);
         re_transd.y() = pre_transd.y() * t + cur_transd.y() * (1 - t);
         re_transd.z() = pre_transd.z() * t + cur_transd.z() * (1 - t);
-        (*out_poses)[i] = re_transd * res_quatd;
+        (*out_poses)[static_cast<unsigned int>(i)] = re_transd * res_quatd;
 
         Eigen::Vector3d pre_std = in_stds[index - 1];
         Eigen::Vector3d cur_std = in_stds[index];
@@ -96,7 +96,7 @@ static void PoseAndStdInterpolationByTime(
         std[0] = pre_std[0] * t + cur_std[0] * (1 - t);
         std[1] = pre_std[1] * t + cur_std[1] * (1 - t);
         std[2] = pre_std[2] * t + cur_std[2] * (1 - t);
-        (*out_stds)[i] = std;
+        (*out_stds)[static_cast<unsigned int>(i)] = std;
       }
     } else {
       AERROR << "[ERROR] No more poses. Exit now.";

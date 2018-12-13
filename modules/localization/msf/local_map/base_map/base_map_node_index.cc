@@ -86,12 +86,12 @@ MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
   MapNodeIndex index;
   index.resolution_id_ = resolution_id;
   index.zone_id_ = zone_id;
-  int n = static_cast<int>(
-      (coordinate[0] - option.map_range_.GetMinX()) /
-      (option.map_node_size_x_ * option.map_resolutions_[resolution_id]));
-  int m = static_cast<int>(
-      (coordinate[1] - option.map_range_.GetMinY()) /
-      (option.map_node_size_y_ * option.map_resolutions_[resolution_id]));
+  int n = static_cast<int>((coordinate[0] - option.map_range_.GetMinX()) /
+                           (static_cast<float>(option.map_node_size_x_) *
+                            option.map_resolutions_[resolution_id]));
+  int m = static_cast<int>((coordinate[1] - option.map_range_.GetMinY()) /
+                           (static_cast<float>(option.map_node_size_y_) *
+                            option.map_resolutions_[resolution_id]));
   if (n >= 0 && m >= 0 &&
       n < static_cast<int>(GetMapIndexRangeEast(option, resolution_id)) &&
       m < static_cast<int>(GetMapIndexRangeNorth(option, resolution_id))) {
@@ -107,14 +107,16 @@ unsigned int MapNodeIndex::GetMapIndexRangeEast(const BaseMapConfig& option,
                                                 unsigned int resolution_id) {
   return static_cast<unsigned int>(
       (option.map_range_.GetMaxX() - option.map_range_.GetMinX()) /
-      (option.map_node_size_x_ * option.map_resolutions_[resolution_id]));
+      (static_cast<float>(option.map_node_size_x_) *
+       option.map_resolutions_[resolution_id]));
 }
 
 unsigned int MapNodeIndex::GetMapIndexRangeNorth(const BaseMapConfig& option,
                                                  unsigned int resolution_id) {
   return static_cast<unsigned int>(
       (option.map_range_.GetMaxY() - option.map_range_.GetMinY()) /
-      (option.map_node_size_y_ * option.map_resolutions_[resolution_id]));
+      (static_cast<float>(option.map_node_size_y_) *
+       option.map_resolutions_[resolution_id]));
 }
 
 std::ostream& operator<<(std::ostream& cerr, const MapNodeIndex& index) {
