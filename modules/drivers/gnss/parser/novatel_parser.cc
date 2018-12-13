@@ -656,10 +656,13 @@ bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
 
 bool NovatelParser::HandleInsCov(const novatel::InsCov* cov) {
   for (int i = 0; i < 9; ++i) {
-    ins_.set_position_covariance(i, cov->position_covariance[i]);
+    ins_.set_position_covariance(
+        i, static_cast<float>(cov->position_covariance[i]));
     ins_.set_euler_angles_covariance(
-        INDEX[i], (DEG_TO_RAD * DEG_TO_RAD) * cov->attitude_covariance[i]);
-    ins_.set_linear_velocity_covariance(i, cov->velocity_covariance[i]);
+        INDEX[i], static_cast<float>((DEG_TO_RAD * DEG_TO_RAD) *
+                                     cov->attitude_covariance[i]));
+    ins_.set_linear_velocity_covariance(
+        i, static_cast<float>(cov->velocity_covariance[i]));
   }
   return false;
 }
@@ -733,8 +736,8 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
     }
     gyro_scale_ = param.gyro_scale * param.sampling_rate_hz;
     accel_scale_ = param.accel_scale * param.sampling_rate_hz;
-    imu_measurement_hz_ = param.sampling_rate_hz;
-    imu_measurement_span_ = 1.0 / param.sampling_rate_hz;
+    imu_measurement_hz_ = static_cast<float>(param.sampling_rate_hz);
+    imu_measurement_span_ = static_cast<float>(1.0 / param.sampling_rate_hz);
     imu_.set_measurement_span(imu_measurement_span_);
   }
 
@@ -789,7 +792,7 @@ bool NovatelParser::HandleRawImu(const novatel::RawImu* imu) {
     }
     gyro_scale = param.gyro_scale * param.sampling_rate_hz;
     accel_scale = param.accel_scale * param.sampling_rate_hz;
-    imu_measurement_span = 1.0 / param.sampling_rate_hz;
+    imu_measurement_span = static_cast<float>(1.0 / param.sampling_rate_hz);
     imu_.set_measurement_span(imu_measurement_span);
   } else {
     gyro_scale = gyro_scale_;
@@ -868,7 +871,7 @@ bool NovatelParser::HandleGpsEph(const novatel::GPS_Ephemeris* gps_emph) {
   keppler_orbit->set_i0(gps_emph->I_0);
   keppler_orbit->set_omegadot(gps_emph->dot_omega);
   keppler_orbit->set_idot(gps_emph->dot_I);
-  keppler_orbit->set_accuracy(sqrt(gps_emph->ura));
+  keppler_orbit->set_accuracy(static_cast<unsigned int>(sqrt(gps_emph->ura)));
   keppler_orbit->set_health(gps_emph->health);
   keppler_orbit->set_tgd(gps_emph->tgd);
   keppler_orbit->set_iodc(gps_emph->iodc);
@@ -907,7 +910,7 @@ bool NovatelParser::HandleBdsEph(const novatel::BDS_Ephemeris* bds_emph) {
   keppler_orbit->set_i0(bds_emph->inc_angle);
   keppler_orbit->set_omegadot(bds_emph->rra);
   keppler_orbit->set_idot(bds_emph->idot);
-  keppler_orbit->set_accuracy(bds_emph->ura);
+  keppler_orbit->set_accuracy(static_cast<unsigned int>(bds_emph->ura));
   keppler_orbit->set_health(bds_emph->health1);
   keppler_orbit->set_tgd(bds_emph->tdg1);
   keppler_orbit->set_iodc(bds_emph->aodc);
