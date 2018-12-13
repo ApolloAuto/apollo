@@ -154,6 +154,46 @@ TEST_F(DBOperatorTest, InitDB) {
     EXPECT_EQ(way.pre_way_id, way_comp.pre_way_id);
     EXPECT_EQ(way.next_way_id, way_comp.next_way_id);
   }
+
+  std::uint64_t id = start_way_id;
+  std::vector<apollo::navi_generator::util::Way> route;
+  EXPECT_TRUE(db_operator_->QueryRouteWithStartEndWay(start_way_id,
+                                                      start_way_id, &route));
+  for (auto& way : route) {
+    EXPECT_EQ(way.way_id, id);
+    ++id;
+  }
+
+  id = start_way_id;
+  route.clear();
+  EXPECT_TRUE(db_operator_->QueryRouteWithStartEndWay(
+      start_way_id, start_way_id + way_counts - 1, &route));
+  for (auto& way : route) {
+    EXPECT_EQ(way.way_id, id);
+    ++id;
+  }
+
+  id = start_way_id + way_counts - 1;
+  route.clear();
+  EXPECT_TRUE(db_operator_->QueryRouteWithStartEndWay(
+      start_way_id + way_counts - 1, start_way_id, &route));
+  for (auto& way : route) {
+    EXPECT_EQ(way.way_id, id);
+    --id;
+  }
+
+  route.clear();
+  EXPECT_FALSE(db_operator_->QueryRouteWithStartEndWay(
+      start_way_id, start_way_id + way_counts, &route));
+
+  route.clear();
+  EXPECT_FALSE(db_operator_->QueryRouteWithStartEndWay(
+      start_way_id - 1, start_way_id + way_counts - 1, &route));
+
+  for (std::uint64_t i = start_way_id; i < start_way_id + way_counts; ++i) {
+    EXPECT_TRUE(db_operator_->DeleteWay(i));
+    EXPECT_FALSE(db_operator_->QueryWayWithWayId(i, &way));
+  }
 }
 
 }  // namespace util
