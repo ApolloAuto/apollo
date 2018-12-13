@@ -617,6 +617,78 @@ bool DBOperator::DeleteNaviData(const std::uint64_t way_id) {
   return res;
 }
 
+bool DBOperator::CreateNewWayId(std::uint64_t* const way_id) {
+  CHECK_NOTNULL(way_id);
+  bool res = false;
+  std::string sql = "SELECT max(way_id) from way;";
+  SQLiteDataReader* reader = nullptr;
+  if (!sqlite_.ExcuteQuery(sql, &reader)) {
+    std::string err_msg;
+    sqlite_.GetLastErrorMsg(&err_msg);
+    AERROR << err_msg;
+    return false;
+  }
+  apollo::navi_generator::database::SqliteDataType data_type;
+  while (reader->Read()) {
+    data_type = reader->GetDataType(0);
+    *way_id =
+        (data_type ==
+         apollo::navi_generator::database::SqliteDataType::kSqliteDataTypeNull)
+            ? 1
+            : reader->GetUint64Value(0) + 1;
+    res = true;
+  }
+  DeleteSQLiteDataReader(reader);
+  return res;
+}
+
+bool DBOperator::GetNaviTableId(std::uint64_t* const navi_table_id) {
+  CHECK_NOTNULL(navi_table_id);
+  bool res = false;
+  std::uint64_t cur_max_table_id = 0;
+  std::string sql = "SELECT max(navi_table_id) from way_data;";
+  SQLiteDataReader* reader = nullptr;
+  if (!sqlite_.ExcuteQuery(sql, &reader)) {
+    std::string err_msg;
+    sqlite_.GetLastErrorMsg(&err_msg);
+    AERROR << err_msg;
+    return false;
+  }
+  apollo::navi_generator::database::SqliteDataType data_type;
+  while (reader->Read()) {
+    data_type = reader->GetDataType(0);
+    cur_max_table_id =
+        (data_type ==
+         apollo::navi_generator::database::SqliteDataType::kSqliteDataTypeNull)
+            ? 0
+            : reader->GetUint64Value(0);
+    res = true;
+  }
+
+  std::uint64_t table_line_counts = 0;
+  sql = "SELECT count(*) from navi_data_" + std::to_string(cur_max_table_id) +
+        ";";
+  if (!sqlite_.ExcuteQuery(sql, &reader)) {
+    std::string err_msg;
+    sqlite_.GetLastErrorMsg(&err_msg);
+    AERROR << err_msg;
+    DeleteSQLiteDataReader(reader);
+    return false;
+  }
+  while (reader->Read()) {
+    table_line_counts = reader->GetUint64Value(0);
+    res = true;
+  }
+
+  DeleteSQLiteDataReader(reader);
+
+  *navi_table_id = (table_line_counts < kMaxRowNumberOfDBTable)
+                       ? cur_max_table_id
+                       : cur_max_table_id + 1;
+
+  return res;
+}
+
 }  // namespace util
 }  // namespace navi_generator
 }  // namespace apollo

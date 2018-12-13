@@ -141,6 +141,8 @@ class DBOperator : public DBOperatorBase {
   bool UpdateWayData(const std::uint64_t way_id, const WayData& way_data);
   bool UpdateNaviData(const std::uint64_t way_id, const NaviInfo& navi_info);
   bool DeleteWay(const std::uint64_t way_id);
+  bool CreateNewWayId(std::uint64_t* const way_id);
+  bool GetNaviTableId(std::uint64_t* const navi_table_id);
 
  private:
   bool OpenDatabase();
