@@ -93,7 +93,7 @@ class Field(object):
     def setup(self):
         self.elelist = []
         if self.descriptor.containing_type is not None and \
-            self.descriptor.label == self.descriptor.LABEL_REPEATED:
+                self.descriptor.label == self.descriptor.LABEL_REPEATED:
             printstring = self.descriptor.name + " [Index: " + str(
                 self.index) + "]"
             self.win.addstr(1, 2, printstring, curses.A_BOLD)
@@ -106,7 +106,7 @@ class Field(object):
                           [])
 
     def prefetch(self, entity, descriptor, row, col, descript_path):
-        if descriptor.containing_type is None  or \
+        if descriptor.containing_type is None or \
            descriptor.type == descriptor.TYPE_MESSAGE:
             for descript, item in entity.ListFields():
                 if row >= self.winy - 1:
@@ -308,7 +308,7 @@ class element(object):
             if len(s) == 0:
                 pass
             elif self.descriptor.type == self.descriptor.TYPE_FLOAT or \
-                 self.descriptor.type == self.descriptor.TYPE_DOUBLE:
+                    self.descriptor.type == self.descriptor.TYPE_DOUBLE:
                 try:
                     value = float(s)
                     self.modified = True

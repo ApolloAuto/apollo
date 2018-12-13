@@ -34,6 +34,7 @@ from modules.map.proto.map_road_pb2 import BoundaryEdge, Road
 from modules.routing.proto.routing_pb2 import LaneWaypoint
 from modules.routing.proto.poi_pb2 import POI, Landmark
 
+
 class DataPoint:
     """
     class of data sample (localization and mobileye lane detection)
@@ -45,13 +46,16 @@ class DataPoint:
         self.pos_z = 0.0
         self.theta = 0.0  # heading
         self.dist_left = 0.0  # distance to left lane marking
-        self.conf_left = 0  # confidence of left lane marking (0/1: low confidence, -1/-2: high confidence)
+        # confidence of left lane marking (0/1: low confidence, -1/-2: high confidence)
+        self.conf_left = 0
         self.dist_right = 0.0  # distance to right lane marking
-        self.conf_right = 0  # confidence of right lane marking (0/1: low confidence, -1/-2: high confidence)
+        # confidence of right lane marking (0/1: low confidence, -1/-2: high confidence)
+        self.conf_right = 0
         self.width = 0.0  # lane width
         self.ratio = 0.0  # relative position within a lane (dist_left / width)
         self.center_x = 0.0  # point on the center line of current lane
         self.center_y = 0.0
+
 
 def distance(x1, y1, x2, y2):
     """
@@ -60,12 +64,13 @@ def distance(x1, y1, x2, y2):
 
     return math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
 
+
 def interpolate_width(data, default_width):
     """
     fill 'width' field of all data samples by interpolation
     """
 
-    # Collect a set of consecutive entries with low confidence on left OR right lane detection 
+    # Collect a set of consecutive entries with low confidence on left OR right lane detection
     intervals = []
     interval_begin = -1
     interval_end = -1
@@ -94,8 +99,10 @@ def interpolate_width(data, default_width):
                 elif interval[1] == len(data) - 1:
                     data[index].width = data[interval[0] - 1].width
                 else:
-                    alpha = float(index - interval[0] + 1) / (interval[1] - interval[0] + 2)
-                    data[index].width = (1.0 - alpha) * data[interval[0] - 1].width + alpha * data[interval[1] + 1].width
+                    alpha = float(
+                        index - interval[0] + 1) / (interval[1] - interval[0] + 2)
+                    data[index].width = (
+                        1.0 - alpha) * data[interval[0] - 1].width + alpha * data[interval[1] + 1].width
 
     # Fill in dist_left/right and conf_left/right using interpolated width
     for (index, entry) in enumerate(data):
@@ -106,12 +113,13 @@ def interpolate_width(data, default_width):
             entry.dist_right = entry.width - entry.dist_left
             entry.conf_right = -1
 
+
 def interpolate_ratio(data, default_ratio):
     """
     fill 'ratio' field of all data samples by interpolation
     """
 
-    # Collect a set of consecutive entries with low confidence on left AND right lane detection 
+    # Collect a set of consecutive entries with low confidence on left AND right lane detection
     intervals = []
     interval_begin = -1
     interval_end = -1
@@ -140,8 +148,10 @@ def interpolate_ratio(data, default_ratio):
                 elif interval[1] == len(data) - 1:
                     data[index].ratio = data[interval[0] - 1].ratio
                 else:
-                    alpha = float(index - interval[0] + 1) / (interval[1] - interval[0] + 2)
-                    data[index].ratio = (1.0 - alpha) * data[interval[0] - 1].ratio + alpha * data[interval[1] + 1].ratio
+                    alpha = float(
+                        index - interval[0] + 1) / (interval[1] - interval[0] + 2)
+                    data[index].ratio = (
+                        1.0 - alpha) * data[interval[0] - 1].ratio + alpha * data[interval[1] + 1].ratio
 
     # Fill in dist_left/right and conf_left/right using interpolated ratio
     for (index, entry) in enumerate(data):
@@ -150,6 +160,7 @@ def interpolate_ratio(data, default_ratio):
             entry.dist_right = entry.width - entry.dist_left
             entry.conf_left = -1
             entry.conf_right = -1
+
 
 def compute_center(data):
     """
@@ -175,6 +186,7 @@ def compute_center(data):
         entry.center_x = (pos_l_x + pos_r_x) / 2.0
         entry.center_y = (pos_l_y + pos_r_y) / 2.0
 
+
 def sample_data(data, sample_distance):
     """
     sample 'data' at the interval of 'sample_distance'
@@ -195,6 +207,7 @@ def sample_data(data, sample_distance):
 
     return result
 
+
 def extract_data(data, dim):
     """
     extract dimension 'dim' (center_x, center_y or width) of 'data' into a list
@@ -210,6 +223,7 @@ def extract_data(data, dim):
             result.append(entry.width)
     return result
 
+
 def laplacian_operator(data):
     """
     apply laplacian operator on data
@@ -222,7 +236,8 @@ def laplacian_operator(data):
     lap.append(0.0)
     return lap
 
-def laplacian_smooth(data, alpha = 0.5, iterations = 3):
+
+def laplacian_smooth(data, alpha=0.5, iterations=3):
     """
     apply laplacian smoothing on data
     """
@@ -231,6 +246,7 @@ def laplacian_smooth(data, alpha = 0.5, iterations = 3):
         lap = laplacian_operator(data)
         for index in range(len(data)):
             data[index] += alpha * lap[index]
+
 
 def update_data(data, dim, new_data):
     """
@@ -245,6 +261,7 @@ def update_data(data, dim, new_data):
         elif dim == 'width':
             entry.width = new_entry
 
+
 def smooth_dimension(data, dim):
     """
     smooth dimension 'dim' of 'data'
@@ -257,6 +274,7 @@ def smooth_dimension(data, dim):
         laplacian_smooth(extracted_data, 1.0, 1000)
     update_data(data, dim, extracted_data)
 
+
 def smooth_center_width(data):
     """
     smooth centers and widths of data
@@ -265,6 +283,7 @@ def smooth_center_width(data):
     smooth_dimension(data, 'center_x')
     smooth_dimension(data, 'center_y')
     smooth_dimension(data, 'width')
+
 
 def split_data(data, max_lane_length):
     """
@@ -300,6 +319,7 @@ def split_data(data, max_lane_length):
             result.append(current)
 
     return result
+
 
 def create_lane(data, offset, lane_count, left_lanes, right_lanes):
     """
@@ -382,7 +402,7 @@ def create_lane(data, offset, lane_count, left_lanes, right_lanes):
         point.x = pos_l_x
         point.y = pos_l_y
 
-        point = lane_right_boundary_curve_seg.line_segment.point.add()    
+        point = lane_right_boundary_curve_seg.line_segment.point.add()
         point.x = pos_r_x
         point.y = pos_r_y
 
@@ -432,6 +452,7 @@ def create_lane(data, offset, lane_count, left_lanes, right_lanes):
 
     return lane
 
+
 def create_road(data, left_lanes, right_lanes):
     """
     create a road using 'data'
@@ -472,11 +493,15 @@ def create_road(data, left_lanes, right_lanes):
         theta_left = theta + np.pi / 2.0
         theta_right = theta - np.pi / 2.0
 
-        pos_l_x = entry.center_x + entry.width * (0.5 + left_lanes) * np.cos(theta_left)
-        pos_l_y = entry.center_y + entry.width * (0.5 + left_lanes) * np.sin(theta_left)
+        pos_l_x = entry.center_x + entry.width * \
+            (0.5 + left_lanes) * np.cos(theta_left)
+        pos_l_y = entry.center_y + entry.width * \
+            (0.5 + left_lanes) * np.sin(theta_left)
 
-        pos_r_x = entry.center_x + entry.width * (0.5 + right_lanes) * np.cos(theta_right)
-        pos_r_y = entry.center_y + entry.width * (0.5 + right_lanes) * np.sin(theta_right)
+        pos_r_x = entry.center_x + entry.width * \
+            (0.5 + right_lanes) * np.cos(theta_right)
+        pos_r_y = entry.center_y + entry.width * \
+            (0.5 + right_lanes) * np.sin(theta_right)
 
         if index == 0:
             left_edge_curve_seg.start_position.x = pos_l_x
@@ -496,7 +521,7 @@ def create_road(data, left_lanes, right_lanes):
         point.x = pos_l_x
         point.y = pos_l_y
 
-        point = right_edge_curve_seg.line_segment.point.add()    
+        point = right_edge_curve_seg.line_segment.point.add()
         point.x = pos_r_x
         point.y = pos_r_y
 
@@ -510,6 +535,7 @@ def create_road(data, left_lanes, right_lanes):
     right_edge_curve_seg.length = total_right_length
 
     return road
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -630,7 +656,8 @@ def main():
     for (lane_count, lane_data) in enumerate(list_data):
         lane_set = []
         for offset in range(-left_lanes, right_lanes + 1):
-            lane_set.append(create_lane(lane_data, offset, lane_count, left_lanes, right_lanes))
+            lane_set.append(create_lane(lane_data, offset,
+                                        lane_count, left_lanes, right_lanes))
         lane_sets.append(lane_set)
 
     # Create road
@@ -646,13 +673,17 @@ def main():
     for lane_count in range(len(lane_sets)):
         for lane_offset in range(len(lane_sets[lane_count])):
             if lane_count != 0:
-                lane_sets[lane_count][lane_offset].predecessor_id.add().id = lane_sets[lane_count - 1][lane_offset].id.id
+                lane_sets[lane_count][lane_offset].predecessor_id.add(
+                ).id = lane_sets[lane_count - 1][lane_offset].id.id
             if lane_count != len(lane_sets) - 1:
-                lane_sets[lane_count][lane_offset].successor_id.add().id = lane_sets[lane_count + 1][lane_offset].id.id
+                lane_sets[lane_count][lane_offset].successor_id.add(
+                ).id = lane_sets[lane_count + 1][lane_offset].id.id
             if lane_offset != 0:
-                lane_sets[lane_count][lane_offset].left_neighbor_forward_lane_id.add().id = lane_sets[lane_count][lane_offset - 1].id.id
+                lane_sets[lane_count][lane_offset].left_neighbor_forward_lane_id.add(
+                ).id = lane_sets[lane_count][lane_offset - 1].id.id
             if lane_offset != len(lane_sets[lane_count]) - 1:
-                lane_sets[lane_count][lane_offset].right_neighbor_forward_lane_id.add().id = lane_sets[lane_count][lane_offset + 1].id.id
+                lane_sets[lane_count][lane_offset].right_neighbor_forward_lane_id.add(
+                ).id = lane_sets[lane_count][lane_offset + 1].id.id
 
     # Add road/lanes to map and let road contain lanes
     mp.road.extend([road])
@@ -665,7 +696,7 @@ def main():
     with open(map_file_name, "w") as f:
         f.write(mp.__str__())
 
-    # Create default end_way_point using the farthest point of last central lane 
+    # Create default end_way_point using the farthest point of last central lane
     last_central_lane = lane_sets[-1][left_lanes]
 
     poi = POI()
@@ -680,6 +711,7 @@ def main():
     # Output default end_way_point
     with open(waypoint_file_name, "w") as f:
         f.write(poi.__str__())
+
 
 if __name__ == '__main__':
     main()

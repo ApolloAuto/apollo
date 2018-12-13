@@ -49,7 +49,8 @@ def write_single_protocol_vars(pb_fp, p):
         pb_fp.write("  // ")
         if "description" in var:
             pb_fp.write("%s " % var["description"])
-        pb_fp.write("[%s] %s\n" % (var["physical_unit"], var["physical_range"]))
+        pb_fp.write("[%s] %s\n" %
+                    (var["physical_unit"], var["physical_range"]))
         if t == "enum":
             pb_fp.write(fmt % (var["name"].capitalize() + "Type",
                                var["name"].lower(), var_seq))
@@ -120,8 +121,8 @@ def gen_proto_file(config_file, work_dir):
             pb_var_seq = 1
             for p_name in protocols:
                 p = protocols[p_name]
-                pb_fp.write("  optional %s %s = %d;" %\
-                    (p["name"].capitalize(), p["name"], pb_var_seq))
+                pb_fp.write("  optional %s %s = %d;" %
+                            (p["name"].capitalize(), p["name"], pb_var_seq))
                 if protocols[p_name]["protocol_type"] == "control":
                     pb_fp.write(" // control message")
                 if protocols[p_name]["protocol_type"] == "report":

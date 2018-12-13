@@ -146,9 +146,11 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
             fp_write.write(yaml.dump(config))
 
         control_protocol_num =\
-            len([key for key in protocols.keys() if protocols[key]["protocol_type"] == "control"])
+            len([key for key in protocols.keys()
+                 if protocols[key]["protocol_type"] == "control"])
         report_protocol_num =\
-            len([key for key in protocols.keys() if protocols[key]["protocol_type"] == "report"])
+            len([key for key in protocols.keys()
+                 if protocols[key]["protocol_type"] == "report"])
         print "Extract car_type:%s's protocol meta info to file: %s" % (
             car_type.upper(), out_file)
         print "Total parsed protocols: %d" % len(protocols)

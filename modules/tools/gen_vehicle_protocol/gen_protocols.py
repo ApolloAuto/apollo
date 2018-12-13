@@ -141,13 +141,13 @@ def gen_parse_value_impl(var, byte_info):
         impl = impl + fmt % (i, info["byte"])
         if i == 0:
             impl = impl + "  int32_t x = t%d.get_byte(%d, %d);\n" %\
-                      (i, info["start_bit"], info["len"])
+                (i, info["start_bit"], info["len"])
         elif i == 1:
             impl = impl + "  int32_t t = t%d.get_byte(%d, %d);\n  x <<= %d;\n  x |= t;\n" %\
-                      (i, info["start_bit"], info["len"], info["len"])
+                (i, info["start_bit"], info["len"], info["len"])
         else:
             impl = impl + "  t = t%d.get_byte(%d, %d);\n  x <<= %d;\n  x |= t;\n" %\
-                      (i, info["start_bit"], info["len"], info["len"])
+                (i, info["start_bit"], info["len"], info["len"])
         shift_bit = shift_bit + info["len"]
     return impl
 
@@ -253,7 +253,8 @@ def gen_control_decode_offset_precision(var):
 
     if var["type"] != "enum" and var["type"] != "bool":
         impl = impl + "  %s = ProtocolData::BoundedValue(%s, %s, %s);\n" %\
-           (var["name"].lower(), range_info["low"], range_info["high"], var["name"].lower())
+            (var["name"].lower(), range_info["low"],
+             range_info["high"], var["name"].lower())
     impl = impl + "  int x ="
     if var["offset"] != 0.0:
         impl = impl + " (%s - %f)" % (var["name"].lower(), var["offset"])
@@ -318,7 +319,8 @@ def gen_control_value_func_impl(classname, var, p):
     impl = ""
     if var["len"] > 32:
         print "This generator not support big than four bytes var." + \
-              "protocol classname: %s, var_name:%s " % (class_name, var["name"])
+              "protocol classname: %s, var_name:%s " % (
+                  class_name, var["name"])
         return impl
 
     fmt = """
