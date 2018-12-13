@@ -54,7 +54,7 @@ Brakecmd6b* Brakecmd6b::set_brake_cmd(double brake_cmd) {
 // 'type': 'double', 'order': 'motorola', 'physical_unit': '%'}
 void Brakecmd6b::set_p_brake_cmd(uint8_t* data, double brake_cmd) {
   brake_cmd = ProtocolData::BoundedValue(0.0, 1.0, brake_cmd);
-  int x = brake_cmd / 0.001000;
+  int x = static_cast<int>(brake_cmd / 0.001000);
   uint8_t t = 0;
 
   t = static_cast<uint8_t>(x & 0xFF);

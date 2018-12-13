@@ -88,7 +88,7 @@ int Datetimerpt40f::date_day(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 2);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = static_cast<int>(x + 1.000000);
+  int ret = x + 1;
   return ret;
 }
 
@@ -100,7 +100,7 @@ int Datetimerpt40f::date_month(const std::uint8_t* bytes,
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x + 1.000000;
+  int ret = x + 1;
   return ret;
 }
 
@@ -111,7 +111,7 @@ int Datetimerpt40f::date_year(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  int ret = x + 2000.000000;
+  int ret = x + 2000;
   return ret;
 }
 }  // namespace lexus
