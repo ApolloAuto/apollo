@@ -49,7 +49,7 @@ struct QuadTile {
 
 class QuadTilesMaker {
  public:
-  QuadTilesMaker();
+  QuadTilesMaker() = default;
   ~QuadTilesMaker() = default;
 
  public:
@@ -84,7 +84,7 @@ class QuadTilesMaker {
                   std::uint32_t* const id_uint32);
 
  private:
-  bool MakePosition(double lat, double lon, double altitude,
+  bool MakePosition(const double lat, const double lon, const double altitude,
                     Position* const pos);
 };
 

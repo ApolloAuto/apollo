@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+package apollo.navi_generator;
+
+// Trajectory Collector Message.
+message TrajectoryCollectorMsg {
+  // Timestamp in seconds
+  optional double timestamp_sec = 1;
+  // Max speed limit
+  optional double max_speed_limit = 2;
+  // Min speed limit
+  optional double min_speed_limit = 3;
+}

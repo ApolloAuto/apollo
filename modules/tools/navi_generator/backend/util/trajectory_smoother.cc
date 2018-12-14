@@ -33,6 +33,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
+#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
 
 namespace apollo {
@@ -46,7 +47,16 @@ using apollo::hdmap::MapPathPoint;
 using apollo::planning::AnchorPoint;
 using apollo::planning::QpSplineReferenceLineSmoother;
 using apollo::planning::ReferenceLine;
+using apollo::planning::ReferenceLineSmoother;
 using apollo::planning::ReferencePoint;
+using apollo::planning::SpiralReferenceLineSmoother;
+
+namespace {
+constexpr double kMinDist = 1.0;
+constexpr double kMaximumPointKappa = 0.2;
+constexpr std::size_t kMinSmoothLength = 150;
+constexpr std::size_t kStepLength = 10;
+}  // namespace
 
 TrajectorySmoother::TrajectorySmoother() {
   TrajectoryUtilConfig util_config;
@@ -82,15 +92,25 @@ bool TrajectorySmoother::Import(const std::string& filename) {
     }
     auto x_str = point_str.substr(0, idx);
     auto y_str = point_str.substr(idx + 1);
-    raw_points_.emplace_back(std::stod(x_str), std::stod(y_str));
+    auto filter_point_func = [this](double x, double y) {
+      if (raw_points_.size() > 0) {
+        auto dx = x - raw_points_.back().x();
+        auto dy = y - raw_points_.back().y();
+        if (dx * dx + dy * dy > std::pow(kMinDist, 2)) {
+          raw_points_.emplace_back(x, y);
+        }
+      } else {
+        raw_points_.emplace_back(x, y);
+      }
+    };
+    filter_point_func(std::stod(x_str), std::stod(y_str));
   }
-
   return true;
 }
 
-bool TrajectorySmoother::Smooth() {
+bool TrajectorySmoother::StepSmooth(const std::size_t smooth_length) {
   if (raw_points_.size() <= 2) {
-    AERROR << "the original point size is " << raw_points_.size();
+    AERROR << "The original point size is " << raw_points_.size();
     return false;
   }
   std::size_t i = 1;
@@ -104,23 +124,9 @@ bool TrajectorySmoother::Smooth() {
                               0.0, 0.0);
       s += segment.length();
     }
-    ReferenceLine init_ref(ref_points);
-    auto smoother_ptr =
-        std::make_unique<QpSplineReferenceLineSmoother>(smoother_config_);
-    std::vector<AnchorPoint> anchors;
-    if (!CreateAnchorPoints(init_ref.reference_points().front(), init_ref,
-                            &anchors)) {
-      AERROR << "Can't create anchor points.";
+    if (!SmoothPoints(ref_points, &ref_points_)) {
       return false;
     }
-
-    smoother_ptr->SetAnchorPoints(anchors);
-    ReferenceLine smoothed_init_ref;
-    if (!smoother_ptr->Smooth(init_ref, &smoothed_init_ref)) {
-      AERROR << "smooth initial reference line failed";
-      return false;
-    }
-    ref_points_ = smoothed_init_ref.reference_points();
   }
   for (; i < raw_points_.size(); ++i) {
     double s = 0.0;
@@ -149,26 +155,25 @@ bool TrajectorySmoother::Smooth() {
       ++j;
     }
     i = j;
-    ReferenceLine local_ref(ref_points);
-    std::vector<AnchorPoint> anchors;
-    if (!CreateAnchorPoints(ref_points.front(), local_ref, &anchors)) {
-      AERROR << "Can't create anchor points.";
+    if (!SmoothPoints(ref_points, &ref_points_)) {
       return false;
     }
-
-    auto smoother_ptr =
-        std::make_unique<QpSplineReferenceLineSmoother>(smoother_config_);
-    smoother_ptr->SetAnchorPoints(anchors);
-    ReferenceLine smoothed_local_ref;
-    if (!smoother_ptr->Smooth(local_ref, &smoothed_local_ref)) {
-      AERROR << "Failed to smooth reference line";
-      return false;
-    }
-    ref_points_.insert(ref_points_.end(),
-                       smoothed_local_ref.reference_points().begin(),
-                       smoothed_local_ref.reference_points().end());
   }
   return true;
+}
+
+bool TrajectorySmoother::Smooth() {
+  std::size_t smooth_length = traj_smoother_config_.smooth_length();
+  while (smooth_length > kMinSmoothLength) {
+    if (!StepSmooth(smooth_length)) {
+      AWARN << "Smooth failed with smooth length : " << smooth_length;
+      smooth_length -= kStepLength;
+    } else {
+      return true;
+    }
+  }
+  AERROR << "Smooth failed.";
+  return false;
 }
 
 bool TrajectorySmoother::Export(const std::string& filename) {
@@ -197,6 +202,50 @@ bool TrajectorySmoother::Export(const std::string& filename) {
   AINFO << "The smoothed result is saved to the file: " << filename;
 
   return true;
+}
+
+bool TrajectorySmoother::SmoothPoints(
+    const std::vector<apollo::planning::ReferencePoint>& raw_points,
+    std::vector<apollo::planning::ReferencePoint>* const smoothed_points) {
+  CHECK_NOTNULL(smoothed_points);
+  ReferenceLine init_ref(raw_points);
+  std::unique_ptr<ReferenceLineSmoother> ptr_smoother =
+      std::make_unique<QpSplineReferenceLineSmoother>(smoother_config_);
+  if (IsSpiral(raw_points)) {
+    ptr_smoother.reset();
+    ptr_smoother =
+        std::make_unique<SpiralReferenceLineSmoother>(smoother_config_);
+    AINFO << "Default is QpSpline , but now we choose Spiral.";
+  }
+  // Prefer "std::make_unique" to direct use of "new".
+  // Reference "https://herbsutter.com/gotw/_102/" for details.
+  std::vector<AnchorPoint> anchors;
+  if (!CreateAnchorPoints(init_ref.reference_points().front(), init_ref,
+                          &anchors)) {
+    AERROR << "Can't create anchor points.";
+    return false;
+  }
+  ptr_smoother->SetAnchorPoints(anchors);
+  ReferenceLine smoothed_init_ref;
+  if (!ptr_smoother->Smooth(init_ref, &smoothed_init_ref)) {
+    AERROR << "Smooth initial reference line failed";
+    return false;
+  }
+  smoothed_points->insert(smoothed_points->end(),
+                          smoothed_init_ref.reference_points().begin(),
+                          smoothed_init_ref.reference_points().end());
+  return true;
+}
+
+bool TrajectorySmoother::IsSpiral(
+    const std::vector<apollo::planning::ReferencePoint>& points) {
+  const auto& itr = std::minmax_element(
+      points.begin(), points.end(),
+      [](const ReferencePoint& item1, const ReferencePoint& item2) {
+        return item1.heading() < item2.heading();
+      });
+  double delta_theta = itr.second->heading() - itr.first->heading();
+  return delta_theta > kMaximumPointKappa ? true : false;
 }
 
 bool TrajectorySmoother::CreateAnchorPoints(
