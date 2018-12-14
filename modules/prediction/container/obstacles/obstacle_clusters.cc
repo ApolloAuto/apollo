@@ -202,8 +202,33 @@ bool ObstacleClusters::BackwardNearbyObstacle(
 
 StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
   StopSign stop_sign;
-  // TODO(hongyi) implement using lane_id_stop_sign_map_
-  // fill stop_sign_id, lane_id, and lane_s
+  if (lane_id_stop_sign_map_.find(lane_id) != lane_id_stop_sign_map_.end()) {
+    return lane_id_stop_sign_map_[lane_id];
+  }
+  std::shared_ptr<const LaneInfo> lane_info_ptr =
+      PredictionMap::LaneById(lane_id);
+  CHECK_NOTNULL(lane_info_ptr);
+  for (const auto &overlap_id : lane_info_ptr->lane().overlap_id()) {
+    auto overlap_info_ptr = PredictionMap::OverlapById(overlap_id.id());
+    if (overlap_info_ptr == nullptr) {
+      continue;
+    }
+    for (const auto &object : overlap_info_ptr->overlap().object()) {
+      if (object.has_stop_sign_overlap_info()) {
+        for (const auto &obj : overlap_info_ptr->overlap().object()) {
+          if (obj.has_lane_overlap_info()) {
+            if (!stop_sign.has_lane_s() ||
+                stop_sign.lane_s() > obj.lane_overlap_info().start_s()) {
+              stop_sign.set_stop_sign_id(object.id().id());
+              stop_sign.set_lane_id(lane_id);
+              stop_sign.set_lane_s(obj.lane_overlap_info().start_s());
+              lane_id_stop_sign_map_[lane_id] = stop_sign;
+            }
+          }
+        }
+      }
+    }
+  }
   return stop_sign;
 }
 

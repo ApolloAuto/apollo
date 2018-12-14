@@ -1136,8 +1136,26 @@ void Obstacle::BuildLaneGraph() {
 }
 
 void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
-  // TODO(Hongyi) implement
   // Set the nearest stop sign along the lane sequence
+  if (lane_sequence_ptr->lane_segment_size() <= 0) {
+    return;
+  }
+  double accumulate_s = 0.0;
+  for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
+    const LaneSegment& lane_segment = lane_sequence_ptr->lane_segment(i);
+    const StopSign& stop_sign =
+        ObstacleClusters::QueryStopSignByLaneId(lane_segment.lane_id());
+    if (stop_sign.has_stop_sign_id() &&
+        stop_sign.lane_s() + accumulate_s > lane_sequence_ptr->lane_s()) {
+      lane_sequence_ptr->mutable_stop_sign()->CopyFrom(stop_sign);
+      lane_sequence_ptr->mutable_stop_sign()
+          ->set_lane_sequence_s(stop_sign.lane_s() + accumulate_s);
+      ADEBUG << "Set StopSign for LaneSequence ["
+             << lane_sequence_ptr->lane_sequence_id() << "].";
+      break;
+    }
+    accumulate_s += lane_segment.total_length();
+  }
 }
 
 void Obstacle::BuildLaneGraphFromLeftToRight() {
