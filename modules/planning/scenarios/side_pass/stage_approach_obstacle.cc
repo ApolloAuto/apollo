@@ -28,8 +28,11 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
+
+#define ADEBUG AINFO
 
 namespace apollo {
 namespace planning {
@@ -44,6 +47,7 @@ using apollo::common::VehicleConfigHelper;
  */
 Stage::StageStatus StageApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  ADEBUG << "SIDEPASS: Approaching obstacle.";
   std::string blocking_obstacle_id = GetContext()->front_blocking_obstacle_id_;
   const SLBoundary& adc_sl_boundary =
       frame->reference_line_info().front().AdcSlBoundary();
@@ -111,9 +115,12 @@ Stage::StageStatus StageApproachObstacle::Process(
     break;
   }
 
+  AWARN << "============================";
+
   // check the status of side pass scenario
   bool has_blocking_obstacle = false;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
+    /*
     if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       continue;
     }
@@ -144,13 +151,16 @@ Stage::StageStatus StageApproachObstacle::Process(
         GetContext()->scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
-
-    has_blocking_obstacle = true;
-    break;
+    */
+    if (IsBlockingObstacleToSidePass(*frame, obstacle, 0.1, 1.0, true)) {
+      has_blocking_obstacle = true;
+      break;
+    }
   }
 
   if (!has_blocking_obstacle) {
     next_stage_ = ScenarioConfig::NO_STAGE;
+    ADEBUG << "There is no blocking obstacle.";
     return Stage::FINISHED;
   }
   // do path planning
@@ -168,6 +178,7 @@ Stage::StageStatus StageApproachObstacle::Process(
 
   double front_obstacle_distance = 1000;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
+    /*
     if (obstacle->IsVirtual()) {
       continue;
     }
@@ -182,7 +193,12 @@ Stage::StageStatus StageApproachObstacle::Process(
     if (obstacle_sl.end_s() <= reference_line_info.AdcSlBoundary().start_s()) {
       continue;
     }
+    */
+    if (!IsBlockingObstacleToSidePass(*frame, obstacle, 0.1, 1.0, true)) {
+      continue;
+    }
 
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     double distance = obstacle_sl.start_s() - adc_front_edge_s;
     if (distance < front_obstacle_distance) {
       front_obstacle_distance = distance;
@@ -200,6 +216,8 @@ Stage::StageStatus StageApproachObstacle::Process(
   double min_stop_obstacle_distance =
       GetContext()->scenario_config_.approach_obstacle_min_stop_distance();
 
+  ADEBUG << "front_obstacle_distance = " << front_obstacle_distance;
+  ADEBUG << "adc_velocity = " << adc_velocity;
   if (adc_velocity < max_stop_velocity &&
       front_obstacle_distance > min_stop_obstacle_distance) {
     next_stage_ = ScenarioConfig::SIDE_PASS_GENERATE_PATH;
