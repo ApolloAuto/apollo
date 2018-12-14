@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "modules/common/log.h"
+#include "modules/tools/navi_generator/backend/util/navigation_editor.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_collector.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_processor.h"
 #include "modules/tools/navi_generator/backend/webserver/navi_generator_websocket.h"
@@ -83,12 +84,16 @@ class TopicsService {
 
   nlohmann::json GetRoutePathAsJson(const nlohmann::json &map_data);
 
+  bool CorrectRoadDeviation();
+  bool SaveRoadCorrection();
+
  private:
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;
 
   std::unique_ptr<util::TrajectoryProcessor> trajectory_processor_;
   std::unique_ptr<util::TrajectoryCollector> trajectory_collector_;
+  std::unique_ptr<util::NavigationEditor> navigation_editor_;
 };
 
 }  // namespace navi_generator

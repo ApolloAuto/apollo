@@ -24,6 +24,7 @@ cc_library(
         "//modules/tools/navi_generator/backend/util:trajectory_processor",
         "//modules/tools/navi_generator/backend/util:trajectory_collector",
         "//modules/tools/navi_generator/backend/util:navigation_provider",
+        "//modules/tools/navi_generator/backend/util:navigation_editor",
         "//modules/tools/navi_generator/backend/webserver:navi_generator_websocket",
         "//third_party/json",
         "@com_google_protobuf//:protobuf",
