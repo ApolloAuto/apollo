@@ -181,13 +181,13 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestCorrectRoadDeviation",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): correct road deviation with bag files.
+        topicsService_.CorrectRoadDeviation();
       });
 
   websocket_->RegisterMessageHandler(
       "requestSaveRoadCorrection",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): save the correction of road deviation with bag files.
+        topicsService_.SaveRoadCorrection();
       });
 }
 

@@ -163,5 +163,24 @@ Json TopicsService::GetRoutePathAsJson(const Json &map_data) {
   return response;
 }
 
+bool TopicsService::CorrectRoadDeviation() {
+  const std::map<std::uint16_t, apollo::navi_generator::util::FileInfo>
+      *processed_file_info = nullptr;
+  trajectory_processor_->GetProcessedFilesInfo(&processed_file_info);
+  if (processed_file_info == nullptr) {
+    return false;
+  }
+  if (navigation_editor_->CorrectDeviation(*processed_file_info)) {
+    return false;
+  }
+  return true;
+}
+bool TopicsService::SaveRoadCorrection() {
+  if (!navigation_editor_->SaveRoadCorrection(trajectory_processor_.get())) {
+    return false;
+  }
+  return true;
+}
+
 }  // namespace navi_generator
 }  // namespace apollo

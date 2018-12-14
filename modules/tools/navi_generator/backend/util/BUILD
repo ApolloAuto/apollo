@@ -166,6 +166,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "navigation_editor",
+    srcs = [
+        "navigation_editor.cc",
+    ],
+    hdrs = [
+        "navigation_editor.h",
+    ],
+    deps = [
+       "//modules/tools/navi_generator/backend/database:db_operator",
+       ":navigation_matcher",
+       ":trajectory_processor",
+       "//modules/common:log",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
