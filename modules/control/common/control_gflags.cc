@@ -24,14 +24,8 @@ DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
 DEFINE_string(control_node_name, "control", "The control node name in proto");
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
-DEFINE_double(control_test_duration, -1.0,
-              "Control testing duration in seconds. This number is will not "
-              "take effect if negative");
 DEFINE_bool(use_preview_speed_for_table, false,
             "True to use preview speed for table lookup");
-
-DEFINE_bool(enable_input_timestamp_check, true,
-            "True to enable input timestamp delay check");
 
 DEFINE_int32(max_localization_miss_num, 20,
              "Max missing number of localization before entering estop mode");
