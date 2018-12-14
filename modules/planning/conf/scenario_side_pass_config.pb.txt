@@ -7,7 +7,7 @@ stage_type: SIDE_PASS_PASS_OBSTACLE
 stage_type: SIDE_PASS_BACKUP
 side_pass_config: {
   side_pass_exit_distance: 5.0
-  approach_obstacle_max_stop_speed: 1.0e-5
+  approach_obstacle_max_stop_speed: 1.0e-2
   approach_obstacle_min_stop_distance: 4.0
   block_obstacle_min_speed: 0.1
   enable_obstacle_blocked_check: true

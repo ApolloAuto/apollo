@@ -220,7 +220,7 @@ bool SidePassPathDecider::GeneratePath(
       frenet_frame_paths[i].push_back(std::move(frenet_frame_point));
       accumulated_s += delta_s_;
     }
-    TrimGeneratedPath(&frenet_frame_paths[i]);
+    !TrimGeneratedPath(&frenet_frame_paths[i]);
   }
 
   ADEBUG << "\n";
@@ -539,8 +539,6 @@ const Obstacle *SidePassPathDecider::GetNearestObstacle(
                                        std::abs(lane_right_width_at_end_s));
     double obs_start_l = obstacle->PerceptionSLBoundary().start_l();
     double obs_end_l = obstacle->PerceptionSLBoundary().end_l();
-
-    // filter out-of-lane obstacles
     if (obs_start_l > lane_left_width || obs_end_l < -lane_right_width) {
       continue;
     }
