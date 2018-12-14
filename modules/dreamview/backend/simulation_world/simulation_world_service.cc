@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "google/protobuf/util/json_util.h"
-#include "boost/format.hpp"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"

@@ -12,12 +12,10 @@ export default class Rss extends React.Component {
                 <div className="rss-header"><div>RSS Info</div></div>
                 <div className="rss-content-column">
                     <ul className="rss-console">
-                        {monitor.items.filter(item => {
-                            return item.msg.startsWith('RSS');
-                        }).map((item, index) => (
+                        {monitor.rssInfo.map((item, index) => (
                             <MonitorItem key={index} text={item.msg}
-                                         level={item.logLevel}
-                                         time={timestampMsToTimeString(item.timestampMs)} />
+                                level={item.logLevel}
+                                time={timestampMsToTimeString(item.timestampMs)} />
                          ))}
                     </ul>
                 </div>
