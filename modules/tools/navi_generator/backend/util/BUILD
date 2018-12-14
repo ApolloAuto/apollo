@@ -131,6 +131,25 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "navigation_matcher",
+    srcs = [
+        "navigation_matcher.cc",
+    ],
+    hdrs = [
+        "navigation_matcher.h",
+    ],
+    deps = [
+       "//modules/common:log",
+       "//modules/tools/navi_generator/backend/database:db_operator",
+       "//modules/localization/msf/common/util:localization_msf_common_util",
+       "//modules/tools/navi_generator/backend/common:navi_generator_gflags",
+       ":file_operator",
+       ":quad_tiles_maker",
+       ":navi_gen_json_converter",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
