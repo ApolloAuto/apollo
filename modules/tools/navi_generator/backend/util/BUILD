@@ -92,6 +92,7 @@ cc_library(
         ":trajectory_converter", 
         ":navigation_expander",
         ":file_operator",
+        ":quad_tiles_maker",
         "//modules/common/util:util",
     ],
 )

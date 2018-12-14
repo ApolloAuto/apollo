@@ -83,6 +83,15 @@ class TrajectoryProcessor {
   bool SaveFilesToDatabase();
   bool Reset();
 
+  bool SaveWay(DBOperator* const db_operator, const Way& last_way,
+               const FileInfo& file_info, Way* const way);
+  bool SaveWayNodes(DBOperator* const db_operator, const std::uint64_t way_id,
+                    const FileInfo& file_info);
+  bool SaveWayData(DBOperator* const db_operator, const std::uint64_t way_id,
+                   const FileInfo& file_info);
+  bool SaveNaviData(DBOperator* const db_operator, const std::uint64_t way_id,
+                    const FileInfo& file_info);
+
  private:
   void FileSegmentThread();
   bool ExportSegmentsToFile(const std::string& file_name);
@@ -95,6 +104,12 @@ class TrajectoryProcessor {
       std::vector<apollo::localization::msf::WGS84Corr>* const waypoints);
   bool ExpandNaviFiles(const std::string& src_smoothed_file_name,
                        std::vector<NaviFile>* const navi_files);
+  bool FindWayNodes(
+      const std::uint64_t way_id,
+      const std::vector<apollo::localization::msf::WGS84Corr>* const waypoints,
+      WayNodes* const way_nodes);
+  bool GetRightmostNaviFile(const FileInfo& file_info,
+                            NaviFile* const navi_file);
 
  private:
   CommonBagFileInfo common_file_info_;
