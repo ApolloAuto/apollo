@@ -474,7 +474,7 @@ bool SidePassPathDecider::TrimGeneratedPath(
   // If haven't departed at all, don't trim.
   // TODO(all): make trimming dependent on the obstacle location.
   bool ever_departed_reference_line = false;
-  for (size_t k = 0; k < ptr_frenet_frame_path->size(); k++) {
+  for (size_t k = 0; k < ptr_frenet_frame_path->size(); ++k) {
     if (std::fabs((*ptr_frenet_frame_path)[k].l()) > kOffRoadCenterThreshold) {
       ever_departed_reference_line = true;
       break;

@@ -27,11 +27,11 @@ bool IsBlockingObstacleToSidePass(
     bool enable_obstacle_blocked_check);
 
 // Check if the obstacle is blocking ADC's driving path (reference_line).
-bool ObstacleIsBlockingDrivingPath(
-  const ReferenceLine& reference_line, const Obstacle* obstacle);
+bool IsBlockingDrivingPathObstacle(
+    const ReferenceLine& reference_line, const Obstacle* obstacle);
 
-bool IsParked(const ReferenceLine& reference_line,
-              const Obstacle* obstacle);
+bool IsParkedVehicle(const ReferenceLine& reference_line,
+                     const Obstacle* obstacle);
 
 }  // namespace planning
 }  // namespace apollo
