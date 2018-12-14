@@ -88,6 +88,13 @@ class TrajectoryProcessor {
   bool ExportSegmentsToFile(const std::string& file_name);
   void ProcessFiles();
   bool ProcessFile(const BagFileInfo& bag_file_info);
+  bool ProcessBagFile(
+      const std::string& first_bag_filename,
+      const std::string& second_bag_filename,
+      std::string* const smoothed_file_name,
+      std::vector<apollo::localization::msf::WGS84Corr>* const waypoints);
+  bool ExpandNaviFiles(const std::string& src_smoothed_file_name,
+                       std::vector<NaviFile>* const navi_files);
 
  private:
   CommonBagFileInfo common_file_info_;
@@ -95,6 +102,9 @@ class TrajectoryProcessor {
   std::map<std::uint16_t, FileSegment> cur_file_segment_s_;
   // first: file_index, second: BagFileInfo
   std::map<std::uint16_t, BagFileInfo> bag_files_to_process_;
+  // first: file_index, second: FileInfo
+  std::map<std::uint16_t, FileInfo> processed_file_info_s_;
+  std::vector<apollo::localization::msf::WGS84Corr> wgs84_points_;
 
   // A thread and its related variables that receive and process the bag files.
   std::unique_ptr<std::thread> file_seg_thread_;

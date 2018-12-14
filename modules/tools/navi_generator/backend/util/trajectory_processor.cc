@@ -36,6 +36,11 @@ namespace apollo {
 namespace navi_generator {
 namespace util {
 
+namespace {
+constexpr double kOverlapLenFromSecondBag = 250.0;
+constexpr double kDefaultLaneWidth = 3.75;
+}  // namespace
+
 TrajectoryProcessor::TrajectoryProcessor()
     : file_seg_thread_(std::make_unique<std::thread>(
           &TrajectoryProcessor::FileSegmentThread, this)) {}
@@ -97,6 +102,7 @@ bool TrajectoryProcessor::SaveFilesToDatabase() {
 
 bool TrajectoryProcessor::Reset() {
   cur_file_segment_s_.clear();
+  processed_file_info_s_.clear();
   return true;
 }
 
@@ -155,7 +161,74 @@ void TrajectoryProcessor::ProcessFiles() {
 }
 
 bool TrajectoryProcessor::ProcessFile(const BagFileInfo& bag_file_info) {
-  // TODO(*): Process the bag file.
+  wgs84_points_.clear();
+  std::string smoothed_file_name;
+  if (!ProcessBagFile(bag_file_info.raw_file_name,
+                      bag_file_info.next_raw_file_name, &smoothed_file_name,
+                      &wgs84_points_)) {
+    return false;
+  }
+  // expand the lane
+  std::vector<NaviFile> navi_files;
+  if (!ExpandNaviFiles(smoothed_file_name, &navi_files)) {
+    return false;
+  }
+  FileInfo file_info;
+  file_info.bag_file_info = bag_file_info;
+  file_info.navi_files = navi_files;
+  // TODO(*): set the speed limits
+  processed_file_info_s_.insert(
+      std::make_pair(file_info.bag_file_info.file_index, file_info));
+  return true;
+}
+
+bool TrajectoryProcessor::ProcessBagFile(
+    const std::string& first_bag_filename,
+    const std::string& second_bag_filename,
+    std::string* const smoothed_file_name,
+    std::vector<apollo::localization::msf::WGS84Corr>* const waypoints) {
+  CHECK_NOTNULL(waypoints);
+  TrajectoryConverter trajectory_converter;
+  if (!trajectory_converter.ExtractTrajectoryPointsFromTwoBags(
+          first_bag_filename, second_bag_filename, kOverlapLenFromSecondBag)) {
+    return false;
+  }
+
+  if (!trajectory_converter.SmoothTrajectoryPoints()) {
+    return false;
+  }
+
+  if (!trajectory_converter.SaveSmoothedTrajectoryPoints()) {
+    return false;
+  }
+  *smoothed_file_name = trajectory_converter.GetSmoothedFileName();
+
+  if (!trajectory_converter.GetSmoothedTrajectoryWGS84Points(waypoints)) {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+bool TrajectoryProcessor::ExpandNaviFiles(
+    const std::string& src_smoothed_file_name,
+    std::vector<NaviFile>* const navi_files) {
+  std::list<ExpandedFileInfo> expanded_files;
+  NavigationExpander navigation_expander;
+  if (!navigation_expander.ExpandLane(src_smoothed_file_name,
+                                      common_file_info_.left_lane_num,
+                                      common_file_info_.right_lane_num,
+                                      kDefaultLaneWidth, &expanded_files)) {
+    return false;
+  }
+  for (auto& item : expanded_files) {
+    NaviFile navi_file;
+    navi_file.navi_index = item.index;
+    navi_file.navi_file_name = item.file_name;
+    navi_files->emplace_back(navi_file);
+  }
   return true;
 }
 
