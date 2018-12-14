@@ -192,9 +192,10 @@ TEST_F(PCMapTest, PrepareLaneMarkers) {
   lane_markers.mutable_left_lane_marker()->CopyFrom(left_lane_marker);
   lane_markers.mutable_right_lane_marker()->CopyFrom(right_lane_marker);
   double heading = -1.19396;
-  auto source_lanes =
-      map.PrepareLaneMarkers(lane_markers, position, heading,
-                             kInsertMapLaneLength, kPointsNumInsertToMap);
+  std::vector<OdometryLaneMarker> source_lanes;
+  EXPECT_TRUE(map.PrepareLaneMarkers(lane_markers, position, heading,
+                                     kInsertMapLaneLength,
+                                     kPointsNumInsertToMap, &source_lanes));
   EXPECT_EQ(2, source_lanes.size());
   for (auto& lane : source_lanes) {
     EXPECT_EQ(kPointsNumInsertToMap, lane.points_size());
