@@ -16,6 +16,7 @@
 
 #include "modules/localization/lmd/predictor/output/predictor_output.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include "modules/common/proto/geometry.pb.h"
@@ -88,8 +89,9 @@ void FillPoseFromImu(const Pose& imu_pose, Pose* pose) {
   }
 
   // euler angle
-  if (imu_pose.has_euler_angles())
+  if (imu_pose.has_euler_angles()) {
     pose->mutable_euler_angles()->CopyFrom(imu_pose.euler_angles());
+  }
 }
 }  // namespace
 
@@ -100,6 +102,7 @@ PredictorOutput::PredictorOutput(
   name_ = kPredictorOutputName;
   dep_predicteds_.emplace(kPredictorGpsName, PoseList(memory_cycle_sec));
   dep_predicteds_.emplace(kPredictorImuName, PoseList(memory_cycle_sec));
+  dep_predicteds_.emplace(kPredictorPerceptionName, PoseList(memory_cycle_sec));
   on_adapter_thread_ = true;
 }
 
@@ -146,8 +149,28 @@ Status PredictorOutput::Update() {
     auto timestamp_sec = imu.Latest()->first;
 
     // base pose for prediction
-    auto base_timestamp_sec = predicted_.Latest()->first;
-    auto base_pose = predicted_.Latest()->second;
+    double base_timestamp_sec;
+    Pose base_pose;
+    const auto& perception = dep_predicteds_[kPredictorPerceptionName];
+    auto perception_pose_it = perception.RangeOf(timestamp_sec).first;
+    if (perception_pose_it != perception.end()) {
+      base_timestamp_sec = perception_pose_it->first;
+      if (!predicted_.Older(base_timestamp_sec)) {
+        predicted_.FindNearestPose(base_timestamp_sec, &base_pose);
+        // assign position and heading from perception
+        const auto& perception_pose = perception_pose_it->second;
+        base_pose.mutable_position()->CopyFrom(perception_pose.position());
+        base_pose.mutable_orientation()->CopyFrom(
+            perception_pose.orientation());
+        base_pose.set_heading(perception_pose.heading());
+      } else {
+        base_timestamp_sec = predicted_.Latest()->first;
+        base_pose = predicted_.Latest()->second;
+      }
+    } else {
+      base_timestamp_sec = predicted_.Latest()->first;
+      base_pose = predicted_.Latest()->second;
+    }
 
     // predict
     Pose pose;
@@ -173,15 +196,12 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
   const auto& imu = dep_predicteds_[kPredictorImuName];
   auto p = imu.RangeOf(old_timestamp_sec);
   auto it = p.first;
-  if (it == imu.end()) {
-    if (p.second != imu.end()) {
-      it = p.second;
-    } else {
-      AERROR << std::setprecision(15)
-             << "Cannot get the lower of range from imu with timestamp["
-             << old_timestamp_sec << "]";
-      return false;
-    }
+  auto it_1 = p.second;
+  if (it == imu.end() && it_1 == imu.end()) {
+    AERROR << std::setprecision(15)
+           << "Cannot get the lower of range from imu with timestamp["
+           << old_timestamp_sec << "]";
+    return false;
   }
 
   auto timestamp_sec = old_timestamp_sec;
@@ -191,17 +211,19 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
     Pose imu_pose;
     double timestamp_sec_1;
     Pose imu_pose_1;
-    auto it_1 = it;
-    it_1++;
-    if (it_1 != imu.end() && new_timestamp_sec >= it_1->first) {
+
+    if (it == imu.end()) {
+      imu_pose = imu_pose_1 = it_1->second;
+      timestamp_sec_1 = std::min(it_1->first, new_timestamp_sec);
+    } else if (it_1 == imu.end()) {
+      imu_pose = imu_pose_1 = it->second;
+      timestamp_sec_1 = new_timestamp_sec;
+    } else {
       PoseList::InterpolatePose(it->first, it->second, it_1->first,
                                 it_1->second, timestamp_sec, &imu_pose);
-      timestamp_sec_1 = it_1->first;
-      imu_pose_1 = it_1->second;
-    } else {
-      timestamp_sec_1 = new_timestamp_sec;
-      imu_pose = it->second;
-      imu_pose_1 = imu_pose;
+      timestamp_sec_1 = std::min(it_1->first, new_timestamp_sec);
+      PoseList::InterpolatePose(it->first, it->second, it_1->first,
+                                it_1->second, timestamp_sec_1, &imu_pose_1);
     }
 
     if (new_timestamp_sec <= timestamp_sec_1) {
@@ -210,7 +232,7 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
 
     if (!finished && timestamp_sec_1 <= timestamp_sec) {
       it = it_1;
-      imu_pose = imu_pose_1;
+      it_1++;
       continue;
     }
 
@@ -318,7 +340,7 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
     if (!finished) {
       timestamp_sec = timestamp_sec_1;
       it = it_1;
-      imu_pose = imu_pose_1;
+      it_1++;
     }
   }
 
