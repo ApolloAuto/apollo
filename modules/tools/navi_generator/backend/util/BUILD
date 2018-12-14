@@ -79,6 +79,23 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_processor",
+    srcs = [
+        "trajectory_processor.cc",
+    ],
+    hdrs = [
+        "trajectory_processor.h",
+    ],
+    deps = [
+        "//modules/tools/navi_generator/backend/database:db_operator", 
+        ":trajectory_converter", 
+        ":navigation_expander",
+        ":file_operator",
+        "//modules/common/util:util",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
