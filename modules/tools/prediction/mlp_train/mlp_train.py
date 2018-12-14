@@ -264,8 +264,7 @@ def save_model(model, param_norm, filename):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
-        description=
-        'train neural network based on feature files and save parameters')
+        description='train neural network based on feature files and save parameters')
     parser.add_argument('filename', type=str, help='h5 file of data.')
 
     args = parser.parse_args()
@@ -315,8 +314,8 @@ if __name__ == "__main__":
         performance = evaluate_model(Y_test, Y_test_hat > thres)
     performance['accuracy'] = [score[1]]
 
-    print ("\nFor more detailed evaluation results, please refer to", \
-          evaluation_log_path + ".log")
+    print ("\nFor more detailed evaluation results, please refer to",
+           evaluation_log_path + ".log")
 
     model_path = os.path.join(os.getcwd(), "mlp_model.bin")
     save_model(model, param_norm, model_path)

@@ -34,14 +34,14 @@ def getListOfFiles(dirName):
     '''
     listOfFiles = os.listdir(dirName)
     allFiles = list()
-    
+
     for entry in listOfFiles:
         fullPath = os.path.join(dirName, entry)
         if os.path.isdir(fullPath):
             allFiles = allFiles + getListOfFiles(fullPath)
         else:
             allFiles.append(fullPath)
-    
+
     return allFiles
 
 
@@ -75,7 +75,7 @@ def data_splitting(feature):
 
     go_idx = np.logical_and(go_idx, idx_normal)
     cutin_idx = np.logical_and(cutin_idx, idx_normal)
-    
+
     feature = np.asarray(feature)
 
     return feature[go_idx], feature[cutin_idx]
@@ -104,15 +104,14 @@ def down_sample(feature, label, drop_rate):
     return data_downsampled
 
 
-
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'Data preprocessing.')
-    parser.add_argument('directory', type=str,\
-        help='directory contains feature files in .h5')
-    parser.add_argument('-m', '--merge_files', action='store_true', \
-        help='Merge output files into one.')
-    parser.add_argument('-s', '--split_category', action='store_true', \
-        help='Split the output into Go and Cutin.')
+    parser = argparse.ArgumentParser(description='Data preprocessing.')
+    parser.add_argument('directory', type=str,
+                        help='directory contains feature files in .h5')
+    parser.add_argument('-m', '--merge_files', action='store_true',
+                        help='Merge output files into one.')
+    parser.add_argument('-s', '--split_category', action='store_true',
+                        help='Split the output into Go and Cutin.')
 
     args = parser.parse_args()
 
@@ -141,12 +140,14 @@ if __name__ == '__main__':
                     #fea_go = down_sample(fea_go, [0, 1, 4], [0.0, 0.95, 0.83])
                     #fea_cutin = down_sample(fea_cutin, [-1, 2, 3], [0.985 ,0.0, 0.0])
 
-                    go_path = path + 'go/' + file.split('/')[-2] + '-' + file.split('/')[-1]
+                    go_path = path + 'go/' + \
+                        file.split('/')[-2] + '-' + file.split('/')[-1]
                     h5_file = h5py.File(go_path, 'w')
                     h5_file.create_dataset('data', data=fea_go)
                     h5_file.close()
 
-                    cutin_path = path + 'cutin/' + file.split('/')[-2] + '-' + file.split('/')[-1]
+                    cutin_path = path + 'cutin/' + \
+                        file.split('/')[-2] + '-' + file.split('/')[-1]
                     h5_file = h5py.File(cutin_path, 'w')
                     h5_file.create_dataset('data', data=fea_cutin)
                     h5_file.close()
@@ -185,13 +186,12 @@ if __name__ == '__main__':
                     #fea_cutin = down_sample(fea_cutin, [-1, 2, 3], [0.985 ,0.0, 0.0])
 
                     features_go = np.concatenate((features_go, fea_go), axis=0) if features_go is not None \
-                            else fea_go
+                        else fea_go
                     features_cutin = np.concatenate((features_cutin, fea_cutin), axis=0) if features_cutin is not None \
-                            else fea_cutin
+                        else fea_cutin
         else:
             print ("Fail to find", path)
             os._exit(-1)
-
 
         if args.split_category:
             date = datetime.datetime.now().strftime('%Y-%m-%d')
