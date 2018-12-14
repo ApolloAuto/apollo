@@ -94,6 +94,9 @@ class TrajectoryProcessor {
   bool SaveNaviData(DBOperator* const db_operator, const std::uint64_t way_id,
                     const FileInfo& file_info);
 
+  void GetProcessedFilesInfo(
+      const std::map<std::uint16_t, FileInfo>** processed_files_info);
+
  private:
   void FileSegmentThread();
   bool ExportSegmentsToFile(const std::string& file_name);

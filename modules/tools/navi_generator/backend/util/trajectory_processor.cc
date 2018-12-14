@@ -423,6 +423,11 @@ bool TrajectoryProcessor::GetRightmostNaviFile(const FileInfo& file_info,
   return true;
 }
 
+void TrajectoryProcessor::GetProcessedFilesInfo(
+    const std::map<std::uint16_t, FileInfo>** processed_files_info) {
+  *processed_files_info = &processed_file_info_s_;
+}
+
 }  // namespace util
 }  // namespace navi_generator
 }  // namespace apollo
