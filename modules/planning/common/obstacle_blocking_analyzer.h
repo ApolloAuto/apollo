@@ -21,17 +21,17 @@
 namespace apollo {
 namespace planning {
 
-bool IsBlockingObstacleToSidePass (
+bool IsBlockingObstacleToSidePass(
     const Frame& frame, const Obstacle* obstacle,
     double block_obstacle_min_speed, double min_front_sidepass_distance,
     bool enable_obstacle_blocked_check);
 
 // Check if the obstacle is blocking ADC's driving path (reference_line).
-bool ObstacleIsBlockingDrivingPath (
+bool ObstacleIsBlockingDrivingPath(
   const ReferenceLine& reference_line, const Obstacle* obstacle);
 
 bool IsParked(const ReferenceLine& reference_line,
               const Obstacle* obstacle);
 
-}
-}
+}  // namespace planning
+}  // namespace apollo

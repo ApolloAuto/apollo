@@ -220,7 +220,7 @@ bool SidePassPathDecider::GeneratePath(
       frenet_frame_paths[i].push_back(std::move(frenet_frame_point));
       accumulated_s += delta_s_;
     }
-    !TrimGeneratedPath(&frenet_frame_paths[i]);
+    TrimGeneratedPath(&frenet_frame_paths[i]);
   }
 
   ADEBUG << "\n";
@@ -468,6 +468,19 @@ bool SidePassPathDecider::TrimGeneratedPath(
     return false;
   }
   if (std::fabs(ptr_frenet_frame_path->back().l()) > kOffRoadCenterThreshold) {
+    return false;
+  }
+
+  // If haven't departed at all, don't trim.
+  // TODO(all): make trimming dependent on the obstacle location.
+  bool ever_departed_reference_line = false;
+  for (size_t k = 0; k < ptr_frenet_frame_path->size(); k++) {
+    if (std::fabs((*ptr_frenet_frame_path)[k].l()) > kOffRoadCenterThreshold) {
+      ever_departed_reference_line = true;
+      break;
+    }
+  }
+  if (!ever_departed_reference_line) {
     return false;
   }
 
