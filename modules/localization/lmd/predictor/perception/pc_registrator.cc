@@ -33,16 +33,16 @@ using apollo::common::math::RotateAxis;
 using apollo::common::math::Vec2d;
 
 namespace {
-constexpr double kHeadingOptRange = M_PI * 0.6;
-constexpr double kXOptRange = 4.0;
-constexpr double kYOptRange = 4.0;
-constexpr int kHeadingOptRatio = 5;
-constexpr int kXOptRatio = 5;
-constexpr int kYOptRatio = 5;
-constexpr int kOptIterNum = 4;
+constexpr double kHeadingOptRange = 1.0;
+constexpr double kXOptRange = 3.0;
+constexpr double kYOptRange = 3.0;
+constexpr int kHeadingOptRatio = 12;
+constexpr int kXOptRatio = 12;
+constexpr int kYOptRatio = 12;
+constexpr int kOptIterNum = 3;
 constexpr double kNotFoundError = 1000.0;
 constexpr double kMovingXCostRatio = 2.0;
-constexpr double kMovingYCostRatio = 0.2;
+constexpr double kMovingYCostRatio = kMovingXCostRatio;
 }  // namespace
 
 PCRegistrator::PCRegistrator(PCMap* map) {
@@ -123,6 +123,13 @@ void PCRegistrator::Register(const std::vector<PCSourcePoint>& source_points,
     heading_range = heading_step * 2.0;
     x_range = x_step * 2.0;
     y_range = y_step * 2.0;
+
+    heading_step_ratio -= 2;
+    heading_step_ratio = std::max(2, heading_step_ratio);
+    x_step_ratio /= 2;
+    x_step_ratio = std::max(2, x_step_ratio);
+    y_step_ratio /= 2;
+    y_step_ratio = std::max(2, y_step_ratio);
   }
 
   ADEBUG << "On registrating, min error [" << current_error << "]";
