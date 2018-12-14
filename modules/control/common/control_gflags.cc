@@ -27,13 +27,6 @@ DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,
             "True to use preview speed for table lookup");
 
-DEFINE_int32(max_localization_miss_num, 20,
-             "Max missing number of localization before entering estop mode");
-DEFINE_int32(max_chassis_miss_num, 20,
-             "Max missing number of chassis before entering estop mode");
-DEFINE_int32(max_planning_miss_num, 20,
-             "Max missing number of planning before entering estop mode");
-
 DEFINE_double(max_acceleration_when_stopped, 0.01,
               "max acceleration can be observed when vehicle is stopped");
 

@@ -42,8 +42,9 @@
 #include "modules/planning/proto/planning_internal.pb.h"
 
 /*
-Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
-Zhanga , Alexander Linigerb and Francesco Borrellia
+Initially inspired by "Optimization-Based Collision Avoidance"
+(arXiv:1711.03449) from Xiaojing Zhang , Alexander Liniger and Francesco
+Borrelli
 */
 
 /**
