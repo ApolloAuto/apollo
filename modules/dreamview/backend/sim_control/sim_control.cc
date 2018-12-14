@@ -315,7 +315,7 @@ void SimControl::RunOnce() {
   }
 
   PublishChassis(trajectory_point.v(), gear_position);
-  PublishLocalization(trajectory_point);
+  PublishLocalization(trajectory_point, gear_position);
 }
 
 bool SimControl::PerfectControlModel(TrajectoryPoint* point,
@@ -385,7 +385,8 @@ void SimControl::PublishChassis(double cur_speed,
   chassis_writer_->Write(chassis);
 }
 
-void SimControl::PublishLocalization(const TrajectoryPoint& point) {
+void SimControl::PublishLocalization(const TrajectoryPoint& point,
+                                     Chassis::GearPosition gear_position) {
   auto localization = std::make_shared<LocalizationEstimate>();
   FillHeader("SimControl", localization.get());
 
@@ -393,16 +394,23 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   auto prev = prev_point_.path_point();
   auto next = next_point_.path_point();
 
+  // revert theta direction when in reverse gear as the trajectory point theta
+  // is the direction of vehicle motion rather than vehicle heading
+  TrajectoryPoint point_to_publish = point;
+  if (gear_position == Chassis::GEAR_REVERSE) {
+    point_to_publish.mutable_path_point()->set_theta(
+        NormalizeAngle(point_to_publish.path_point().theta() + M_PI));
+  }
   // Set position
-  pose->mutable_position()->set_x(point.path_point().x());
-  pose->mutable_position()->set_y(point.path_point().y());
-  pose->mutable_position()->set_z(point.path_point().z());
+  pose->mutable_position()->set_x(point_to_publish.path_point().x());
+  pose->mutable_position()->set_y(point_to_publish.path_point().y());
+  pose->mutable_position()->set_z(point_to_publish.path_point().z());
   // Set orientation and heading
-  double cur_theta = point.path_point().theta();
+  double cur_theta = point_to_publish.path_point().theta();
 
   if (FLAGS_use_navigation_mode) {
-    double flu_x = point.path_point().x();
-    double flu_y = point.path_point().y();
+    double flu_x = point_to_publish.path_point().x();
+    double flu_y = point_to_publish.path_point().y();
     double enu_x = 0.0;
     double enu_y = 0.0;
     common::math::RotateAxis(-cur_theta, flu_x, flu_y, &enu_x, &enu_y);
@@ -421,16 +429,18 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   pose->set_heading(cur_theta);
 
   // Set linear_velocity
-  pose->mutable_linear_velocity()->set_x(std::cos(cur_theta) * point.v());
-  pose->mutable_linear_velocity()->set_y(std::sin(cur_theta) * point.v());
+  pose->mutable_linear_velocity()->set_x(std::cos(cur_theta) *
+                                         point_to_publish.v());
+  pose->mutable_linear_velocity()->set_y(std::sin(cur_theta) *
+                                         point_to_publish.v());
   pose->mutable_linear_velocity()->set_z(0);
 
   // Set angular_velocity in both map reference frame and vehicle reference
   // frame
   pose->mutable_angular_velocity()->set_x(0);
   pose->mutable_angular_velocity()->set_y(0);
-  pose->mutable_angular_velocity()->set_z(point.v() *
-                                          point.path_point().kappa());
+  pose->mutable_angular_velocity()->set_z(
+      point_to_publish.v() * point_to_publish.path_point().kappa());
 
   TransformToVRF(pose->angular_velocity(), pose->orientation(),
                  pose->mutable_angular_velocity_vrf());
@@ -438,8 +448,8 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point) {
   // Set linear_acceleration in both map reference frame and vehicle reference
   // frame
   auto* linear_acceleration = pose->mutable_linear_acceleration();
-  linear_acceleration->set_x(std::cos(cur_theta) * point.a());
-  linear_acceleration->set_y(std::sin(cur_theta) * point.a());
+  linear_acceleration->set_x(std::cos(cur_theta) * point_to_publish.a());
+  linear_acceleration->set_y(std::sin(cur_theta) * point_to_publish.a());
   linear_acceleration->set_z(0);
 
   TransformToVRF(pose->linear_acceleration(), pose->orientation(),
