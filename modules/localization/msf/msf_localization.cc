@@ -140,7 +140,7 @@ void MSFLocalization::InitParams() {
     double uncertainty_x = 0.0;
     double uncertainty_y = 0.0;
     double uncertainty_z = 0.0;
-    AERROR << "Ant imu lever arm file: " << FLAGS_ant_imu_leverarm_file;
+    AINFO << "Ant imu lever arm file: " << FLAGS_ant_imu_leverarm_file;
     CHECK(LoadGnssAntennaExtrinsic(FLAGS_ant_imu_leverarm_file,
                                    &offset_x, &offset_y, &offset_z,
                                    &uncertainty_x, &uncertainty_y,
