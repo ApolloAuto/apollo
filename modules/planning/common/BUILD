@@ -455,4 +455,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "distance_estimator",
+    srcs = [
+        "distance_estimator.cc",
+    ],
+    hdrs = [
+        "distance_estimator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/map/pnc_map:route_segments",
+        "//modules/planning/common/path:path_data",
+    ],
+)
+
 cpplint()
