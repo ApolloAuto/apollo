@@ -47,6 +47,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "navigation_expander",
+    srcs = [
+        "navigation_expander.cc",
+    ],
+    hdrs = [
+        "navigation_expander.h",
+    ],
+    deps = [
+        ":file_operator",
+        "//modules/planning/reference_line:reference_line",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
@@ -77,6 +91,21 @@ cc_test(
     ],
     deps = [
         ":quad_tiles_maker",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "navigation_expander_test",
+    size = "small",
+    srcs = [
+        "navigation_expander_test.cc",
+    ], 
+    data = [        
+        ":testdata",
+    ],   
+    deps = [
+        ":navigation_expander",
         "@gtest//:main",
     ],
 )
