@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "modules/common/log.h"
+#include "modules/tools/navi_generator/backend/util/trajectory_processor.h"
 #include "modules/tools/navi_generator/backend/webserver/navi_generator_websocket.h"
 
 namespace apollo {
@@ -61,9 +62,17 @@ class TopicsService {
   // A callback function which updates the GUI.
   static void UpdateGUI(const std::string &msg, void *service);
 
+  bool SetCommonBagFileInfo(
+      const apollo::navi_generator::util::CommonBagFileInfo &common_file_info);
+  bool ProcessBagFileSegment(
+      const apollo::navi_generator::util::FileSegment &file_segment);
+  bool SaveFilesToDatabase();
+
  private:
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;
+
+  std::unique_ptr<util::TrajectoryProcessor> trajectory_processor_;
 };
 
 }  // namespace navi_generator

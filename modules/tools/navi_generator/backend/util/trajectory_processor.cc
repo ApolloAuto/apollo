@@ -42,9 +42,13 @@ constexpr double kOverlapLenFromSecondBag = 250.0;
 constexpr double kDefaultLaneWidth = 3.75;
 }  // namespace
 
-TrajectoryProcessor::TrajectoryProcessor()
+using std::placeholders::_1;  // for _1, _2, _3...
+
+TrajectoryProcessor::TrajectoryProcessor(UPDATE_GUI_FUNC task,
+                                         void* gui_service)
     : file_seg_thread_(std::make_unique<std::thread>(
-          &TrajectoryProcessor::FileSegmentThread, this)) {}
+          &TrajectoryProcessor::FileSegmentThread, this)),
+      update_gui_task_(std::bind(task, _1, gui_service)) {}
 
 TrajectoryProcessor::~TrajectoryProcessor() {
   file_seg_finished_ = true;
@@ -64,6 +68,8 @@ void TrajectoryProcessor::FileSegmentThread() {
       if (!ExportSegmentsToFile(cur_file_segment_s_[0].cur_file_name)) {
         cur_file_segment_s_.clear();
         // TODO(*): Inform the frontend an error message.
+        std::string msg;
+        update_gui_task_(msg);
         return;
       }
       BagFileInfo bag_file_info;
@@ -126,7 +132,14 @@ bool TrajectoryProcessor::SaveFilesToDatabase() {
     last_way = way;
     item = processed_file_info_s_.erase(item);
   }
-  // TODO(*): Inform the frontend the result.
+
+  std::string msg;
+  if (res) {
+    // TODO(*): Inform the frontend the result.
+  } else {
+    // TODO(*): Inform the frontend an error message.
+  }
+  update_gui_task_(msg);
   return res;
 }
 
@@ -262,8 +275,12 @@ void TrajectoryProcessor::ProcessFiles() {
       // the last file to process
       if (!ProcessFile(bag_file_info)) {
         // TODO(*): Inform the frontend an error message.
+        std::string msg;
+        update_gui_task_(msg);
       } else {
         // TODO(*): Inform the frontend the result.
+        std::string msg;
+        update_gui_task_(msg);
       }
       bag_files_to_process_.erase(bag_file_info.file_index);
       break;
@@ -276,10 +293,14 @@ void TrajectoryProcessor::ProcessFiles() {
     if (++item != bag_files_to_process_.end()) {
       if (!ProcessFile(bag_file_info)) {
         // TODO(*): Inform the frontend an error message.
+        std::string msg;
+        update_gui_task_(msg);
         bag_files_to_process_.erase(bag_file_info.file_index);
         break;
       } else {
         // TODO(*): Inform the frontend the result.
+        std::string msg;
+        update_gui_task_(msg);
         bag_files_to_process_.erase(bag_file_info.file_index);
       }
     }

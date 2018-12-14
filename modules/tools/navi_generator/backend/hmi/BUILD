@@ -21,6 +21,7 @@ cc_library(
         "//modules/common/util",
         "//modules/localization/proto:localization_proto",
         "//modules/tools/navi_generator/backend/common:navi_generator_gflags",
+        "//modules/tools/navi_generator/backend/util:trajectory_processor",
         "//modules/tools/navi_generator/backend/webserver:navi_generator_websocket",
         "//third_party/json",
         "@com_google_protobuf//:protobuf",

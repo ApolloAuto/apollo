@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <map>
 #include <unordered_set>
 #include <vector>
 
@@ -49,10 +50,29 @@ void TopicsService::UpdateGUI(const std::string &msg, void *service) {
 }
 
 TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
-    : websocket_(websocket) {}
+    : websocket_(websocket) {
+  trajectory_processor_.reset(
+      new util::TrajectoryProcessor(TopicsService::UpdateGUI, this));
+}
 
 void TopicsService::Update() {
   // TODO(*): Update status
 }
+
+bool TopicsService::SetCommonBagFileInfo(
+    const apollo::navi_generator::util::CommonBagFileInfo &common_file_info) {
+  trajectory_processor_->Reset();
+  return trajectory_processor_->SetCommonBagFileInfo(common_file_info);
+}
+
+bool TopicsService::ProcessBagFileSegment(
+    const apollo::navi_generator::util::FileSegment &file_segment) {
+  return trajectory_processor_->ProcessBagFileSegment(file_segment);
+}
+
+bool TopicsService::SaveFilesToDatabase() {
+  return trajectory_processor_->SaveFilesToDatabase();
+}
+
 }  // namespace navi_generator
 }  // namespace apollo
