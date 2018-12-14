@@ -1097,8 +1097,6 @@ void TrafficLightsPerceptionComponent::Visualize(
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
   cv::imshow("Traffic Light", output_image);
-  cv::imwrite("/apollo/debug_vis/" +
-              std::to_string(frame.timestamp) + ".jpg", output_image);
   cvWaitKey(30);
 }
 
