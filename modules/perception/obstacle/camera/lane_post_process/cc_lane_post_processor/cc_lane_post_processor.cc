@@ -579,7 +579,10 @@ bool CCLanePostProcessor::ProcessWithoutCC(
           Eigen::Matrix<double, 3, 1> xy_p = trans_mat_ * img_point;
           Eigen::Matrix<double, 2, 1> xy_point;
           Eigen::Matrix<double, 2, 1> uv_point;
-          if (std::abs(xy_p(2)) < 1e-6) continue;
+          if (std::abs(xy_p(2)) < 1e-6) {
+            ++x;
+            continue;
+          }
           xy_point << xy_p(0) / xy_p(2), xy_p(1) / xy_p(2);
           if (xy_point(0) < 0 || xy_point(0) > 300 || abs(xy_point(1)) > 30) {
             ++x;

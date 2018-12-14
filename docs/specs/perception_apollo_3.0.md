@@ -11,7 +11,7 @@ Apollo 3.0 introduced a production level solution for the low-cost, closed venue
   * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
   * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
   * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
-  * **Visual localization**: Camera's are currently being tested to aide and enhance localization
+  * **Visual localization**: Camera's are currently being tested to aid and enhance localization
   * **16 beam LiDAR support**
 
 ***Safety alert***

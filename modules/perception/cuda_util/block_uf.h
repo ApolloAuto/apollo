@@ -51,7 +51,11 @@ namespace perception {
 namespace block_uf {
 
 #ifndef UF_BLOCK_WIDTH
+#ifdef __x86_64__
 #define UF_BLOCK_WIDTH 32
+#else
+#define UF_BLOCK_WIDTH 16
+#endif
 #endif
 
 #ifndef UF_BLOCK_HEIGHT
