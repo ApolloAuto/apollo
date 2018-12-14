@@ -6,9 +6,11 @@ cc_library(
     name = "localization_lmd_predictor_perception",
     srcs = [
         "lm_provider.cc",
+        "pc_map.cc",
     ],
     hdrs = [
         "lm_provider.h",
+        "pc_map.h",
     ],
     deps = [
         "//modules/common:log",
@@ -30,6 +32,7 @@ cc_test(
     size = "small",
     srcs = [
         "lm_provider_test.cc",
+        "pc_map_test.cc",
     ],
     data = ["//modules/localization:localization_testdata"],
     deps = [
