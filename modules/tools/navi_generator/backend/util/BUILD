@@ -117,6 +117,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "navi_gen_json_converter",
+    srcs = [
+        "navi_gen_json_converter.cc",
+    ],
+    hdrs = [
+        "navi_gen_json_converter.h",
+    ],
+    deps = [
+       "//third_party/json",
+       "//modules/localization/msf/common/util:localization_msf_common_util",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
