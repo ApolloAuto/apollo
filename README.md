@@ -32,7 +32,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-**The Apollo Team now proudly presents to you the latest [version 3.5](docs/quickstart/apollo_3_5_quick_start.md).**
+**The Apollo Team now proudly presents to you the latest [version 3.5 pre-release candidate](docs/quickstart/apollo_3_5_quick_start.md).**
 
  Apollo 3.5 is packed with the latest sensor suite (VLS-128, AXU, FPD-Link Cameras), software architecture and a brand new runtime framework. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
  
