@@ -16,6 +16,7 @@
 
 #include "modules/prediction/common/prediction_util.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
@@ -45,7 +46,7 @@ std::vector<double> Softmax(const std::vector<double>& value) {
   std::vector<double> result;
   double sum = 0.0;
   for (std::size_t i = 0; i < value.size(); ++i) {
-    double exp_value = std::exp(value[i]);
+    double exp_value = std::max(0.001, value[i]);
     sum += exp_value;
     result.push_back(exp_value);
   }
