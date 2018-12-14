@@ -78,6 +78,7 @@ bool TrajectoryConverter::ExtractTrajectoryPoints(
   for (rosbag::MessageInstance const m :
        rosbag::View(bag, rosbag::TopicQuery(topics))) {
     auto localization_pb = m.instantiate<LocalizationEstimate>();
+    auto bestpose_pb = m.instantiate<GnssBestPose>();
     if (localization_pb != nullptr) {
       double x = localization_pb->pose().position().x();
       double y = localization_pb->pose().position().y();
@@ -90,6 +91,9 @@ bool TrajectoryConverter::ExtractTrajectoryPoints(
       prev_x = x;
       prev_y = y;
       raw_points_.emplace_back(x, y);
+    }
+    if (bestpose_pb != nullptr) {
+      local_utm_zone_id_ = GetUTMZone(bestpose_pb->longitude());
     }
   }
   bag.close();

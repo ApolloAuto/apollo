@@ -93,8 +93,16 @@ class TrajectoryConverter {
    */
   bool SaveSmoothedTrajectoryPoints();
 
+  /**
+   * @brief Get UTM zone.
+   */
+  inline std::size_t GetUTMZone(double lon) {
+    return static_cast<int>(((lon + 180.0) / 6) + 1);
+  }
+
  private:
   TrajectorySmoother trajectory_smoother_;
+  std::size_t local_utm_zone_id_ = 49;
   std::string extracted_filename_;
   std::string smoothed_filename_;
   std::vector<common::math::Vec2d> raw_points_;
