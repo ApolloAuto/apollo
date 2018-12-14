@@ -27,6 +27,8 @@ DECLARE_double(navi_generator_profiling_duration);
 
 DECLARE_string(navi_generator_adapter_config_filename);
 
+DECLARE_string(hmi_config_filename);
+
 DECLARE_string(static_file_dir);
 
 DECLARE_string(server_ports);

@@ -31,6 +31,9 @@ DEFINE_string(navi_generator_adapter_config_filename,
               "modules/tools/navi_generator/conf/adapter.conf",
               "The adapter config file");
 
+DEFINE_string(hmi_config_filename, "modules/tools/navi_generator/conf/hmi.conf",
+              "The HMI config file");
+
 DEFINE_string(static_file_dir, "modules/tools/navi_generator/frontend/html",
               "The path to the dreamview distribution directory. The default "
               "value points to built-in version from the Apollo project.");

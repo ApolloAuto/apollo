@@ -62,11 +62,20 @@ class TopicsUpdater {
   void RegisterMessageHandlers();
   bool ValidateCoordinate(const nlohmann::json &json);
 
+  // Broadcast SystemStatus to all clients.
+  void StartBroadcastHMIStatusThread();
+  void DeferredBroadcastHMIStatus();
+
  private:
   NaviGeneratorWebSocket *websocket_ = nullptr;
 
   ros::Timer timer_;
   TopicsService topicsService_;
+
+  // For HMIStatus broadcasting.
+  std::unique_ptr<std::thread> broadcast_hmi_status_thread_;
+  bool need_broadcast_ = false;
+  std::mutex need_broadcast_mutex_;
 };
 
 }  // namespace navi_generator

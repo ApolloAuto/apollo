@@ -61,6 +61,31 @@ class TopicsService {
    */
   void Update();
 
+  /**
+   * @brief Update simulation world with incoming data, e.g., chassis,
+   * localization, planning, perception, etc.
+   */
+  template <typename DataType>
+  void UpdateObserved(const DataType &data);
+
+  /**
+   * @brief Get the latest observed data from the adapter manager to update the
+   * SimulationWorld object when triggered by refresh timer.
+   */
+  template <typename AdapterType>
+  void UpdateWithLatestObserved(const std::string &adapter_name,
+                                AdapterType *adapter, bool logging = true) {
+    if (adapter->Empty()) {
+      if (logging) {
+        AINFO_EVERY(100) << adapter_name
+                         << " adapter has not received any data yet.";
+      }
+      return;
+    }
+
+    UpdateObserved(adapter->GetLatestObserved());
+  }
+
   // A callback function which updates the GUI.
   static void UpdateGUI(const std::string &msg, void *service);
 
@@ -96,6 +121,10 @@ class TopicsService {
  private:
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;
+
+  // Whether to clear the SimulationWorld in the next timer cycle, set by
+  // frontend request.
+  bool to_clear_ = false;
 
   std::unique_ptr<util::TrajectoryProcessor> trajectory_processor_;
   std::unique_ptr<util::TrajectoryCollector> trajectory_collector_;
