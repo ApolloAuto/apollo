@@ -27,12 +27,13 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::PointENU;
 using apollo::hdmap::LaneInfo;
-using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::OverlapInfo;
+using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
-std::shared_ptr<const apollo::hdmap::JunctionInfo>
+std::shared_ptr<const JunctionInfo>
     JunctionAnalyzer::junction_info_ptr_;
 std::unordered_map<std::string, JunctionExit>
     JunctionAnalyzer::junction_exits_;
@@ -71,7 +72,7 @@ void JunctionAnalyzer::SetAllJunctionExits() {
         if (s + FLAGS_junction_exit_lane_threshold <
             lane_info_ptr->total_length()) {
           JunctionExit junction_exit;
-          apollo::common::PointENU position = lane_info_ptr->GetSmoothPoint(s);
+          PointENU position = lane_info_ptr->GetSmoothPoint(s);
           junction_exit.set_exit_lane_id(lane_id);
           junction_exit.mutable_exit_position()->set_x(position.x());
           junction_exit.mutable_exit_position()->set_y(position.y());
@@ -87,7 +88,9 @@ void JunctionAnalyzer::SetAllJunctionExits() {
 
 std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     const std::string& start_lane_id) {
+  // TODO(hongyi) make this a gflag
   int max_search_level = 5;
+
   std::vector<JunctionExit> junction_exits;
   std::queue<std::pair<ConstLaneInfoPtr, int>> lane_info_queue;
   lane_info_queue.emplace(PredictionMap::LaneById(start_lane_id), 0);
