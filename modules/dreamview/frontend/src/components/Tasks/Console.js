@@ -37,13 +37,11 @@ export default class Console extends React.Component {
                 <div className="card-header"><span>Console</span></div>
                 <div className="card-content-column">
                     <ul className="console">
-                        {monitor.items.filter(item => {
-                            return !item.msg.startsWith('RSS');
-                        }).map((item, index) => (
+                        {monitor.items.map((item, index) => (
                             <MonitorItem key={index} text={item.msg}
-                                         level={item.logLevel}
-                                         time={timestampMsToTimeString(item.timestampMs)} />
-                         ))}
+                                level={item.logLevel}
+                                time={timestampMsToTimeString(item.timestampMs)} />
+                        ))}
                     </ul>
                 </div>
             </div>

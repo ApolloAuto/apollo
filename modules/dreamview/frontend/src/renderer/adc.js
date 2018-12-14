@@ -27,8 +27,8 @@ export default class AutoDrivingCar {
         this.rssUnsafeMarker = new THREE.Object3D();
         this.rssUnsafeMarker.add(rssUnsafeMesh);
         this.rssUnsafeMarker.mesh = rssUnsafeMesh;
-        this.rssUnsafeMarkerAddedToScene = false;
-        this.scene = scene;
+        this.rssUnsafeMarker.visible = false;
+        scene.add(this.rssUnsafeMarker);
 
         const properties = CAR_PROPERTIES[name];
         if (!properties) {
@@ -61,18 +61,11 @@ export default class AutoDrivingCar {
 
         this.mesh.position.set(position.x, position.y, 0);
         this.mesh.rotation.y = pose.heading;
-
         this.rssUnsafeMarker.visible = false;
-        this.rssUnsafeMarker.mesh.visible = false;
-        if (!isRssSafe && STORE.options.showPlanningRSSInfo) {
-            if (!this.rssUnsafeMarkerAddedToScene) {
-                this.scene.add(this.rssUnsafeMarker);
-                this.rssUnsafeMarkerAddedToScene = true;
-            }
+        if (isRssSafe !== undefined && !isRssSafe && STORE.options.showPlanningRSSInfo) {
             this.rssUnsafeMarker.position.set(position.x, position.y, 0.2);
             this.rssUnsafeMarker.rotation.set(Math.PI / 2, pose.heading - Math.PI / 2, 0);
             this.rssUnsafeMarker.visible = true;
-            this.rssUnsafeMarker.mesh.visible = true;
         }
     }
 
