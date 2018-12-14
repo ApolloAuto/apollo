@@ -80,13 +80,14 @@ bool IsBlockingObstacleToSidePass(
   }
 
   // Obstacle is not blocking our path.
-  if (!ObstacleIsBlockingDrivingPath(reference_line, obstacle)) {
+  if (!IsBlockingDrivingPathObstacle(reference_line, obstacle)) {
     ADEBUG << " - It is not blocking our way.";
     return false;
   }
 
   // Obstacle is blocked by others too.
-  if (enable_obstacle_blocked_check && !IsParked(reference_line, obstacle)) {
+  if (enable_obstacle_blocked_check &&
+      !IsParkedVehicle(reference_line, obstacle)) {
     for (const auto* other_obstacle : path_decision.obstacles().Items()) {
       if (other_obstacle->Id() == obstacle->Id()) {
         continue;
@@ -118,8 +119,7 @@ bool IsBlockingObstacleToSidePass(
   return true;
 }
 
-
-bool ObstacleIsBlockingDrivingPath(
+bool IsBlockingDrivingPathObstacle(
     const ReferenceLine& reference_line, const Obstacle* obstacle) {
   const double driving_width =
       reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
@@ -140,9 +140,8 @@ bool ObstacleIsBlockingDrivingPath(
   return false;
 }
 
-
-bool IsParked(const ReferenceLine& reference_line,
-              const Obstacle* obstacle) {
+bool IsParkedVehicle(const ReferenceLine& reference_line,
+                     const Obstacle* obstacle) {
   if (!FLAGS_enable_scenario_side_pass_multiple_parked_obstacles) {
     return false;
   }

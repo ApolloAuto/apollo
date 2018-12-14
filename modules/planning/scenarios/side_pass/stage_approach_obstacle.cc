@@ -146,13 +146,6 @@ Stage::StageStatus StageApproachObstacle::Process(
         GetContext()->scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
-
-    /*
-    if (IsBlockingObstacleToSidePass(*frame, obstacle, 0.1, 1.0, true)) {
-      has_blocking_obstacle = true;
-      break;
-    }
-    */
   }
 
   if (!has_blocking_obstacle) {
@@ -189,13 +182,6 @@ Stage::StageStatus StageApproachObstacle::Process(
     if (obstacle_sl.end_s() <= reference_line_info.AdcSlBoundary().start_s()) {
       continue;
     }
-
-    /*
-    if (!IsBlockingObstacleToSidePass(*frame, obstacle, 0.1, 1.0, true)) {
-      continue;
-    }
-    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
-    */
 
     double distance = obstacle_sl.start_s() - adc_front_edge_s;
     if (distance < front_obstacle_distance) {
