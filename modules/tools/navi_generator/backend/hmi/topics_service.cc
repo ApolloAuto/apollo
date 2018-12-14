@@ -74,5 +74,86 @@ bool TopicsService::SaveFilesToDatabase() {
   return trajectory_processor_->SaveFilesToDatabase();
 }
 
+bool TopicsService::StartCollector(const std::string &collection_type,
+                                   const std::size_t min_speed_limit,
+                                   const std::size_t max_speed_limit) {
+  util::CollectorOptions options;
+  if (!GetCollectorOptions(collection_type, min_speed_limit, max_speed_limit,
+                           &options)) {
+    return false;
+  }
+  if (!trajectory_collector_->Init(options)) {
+    return false;
+  }
+  if (!trajectory_collector_->Start()) {
+    return false;
+  }
+  return true;
+}
+
+bool TopicsService::StopCollector() {
+  if (!trajectory_collector_->Stop()) {
+    return false;
+  }
+  return true;
+}
+
+bool TopicsService::UpdateCollector(const std::string &collection_type,
+                                    const std::size_t min_speed_limit,
+                                    const std::size_t max_speed_limit) {
+  util::CollectorOptions options;
+  if (!GetCollectorOptions(collection_type, min_speed_limit, max_speed_limit,
+                           &options)) {
+    return false;
+  }
+  if (!trajectory_collector_->UpdateOptions(options)) {
+    return false;
+  }
+  return true;
+}
+
+bool TopicsService::GetCollectorOptions(const std::string &collection_type,
+                                        const std::size_t min_speed_limit,
+                                        const std::size_t max_speed_limit,
+                                        util::CollectorOptions *const options) {
+  CHECK_NOTNULL(options);
+  std::string unit;
+  double duration = 5.0;
+  double multiplier = 60.0;
+  bool is_duration = true;
+  std::istringstream iss(collection_type);
+  if ((iss >> duration).fail()) {
+    AWARN << "Collection type must be start number.";
+    return false;
+  }
+  if ((!iss.eof() && ((iss >> unit).fail()))) {
+    AWARN << "Collection type unit must be min or km.";
+    return false;
+  }
+  if (unit == std::string("")) {
+    multiplier = 60.0;
+  } else if (unit == std::string("min")) {
+    is_duration = true;
+  } else if (unit == std::string("km")) {
+    is_duration = false;
+  } else {
+    AWARN << "Collection type error.";
+    return false;
+  }
+  std::vector<std::string> topics = {"/apollo/sensor/gnss/best_pose",
+                                     "/apollo/localization/pose",
+                                     "/apollo/navi_generator/collector"};
+  options->topics = topics;
+  if (is_duration) {
+    options->max_duration = ros::Duration(multiplier * duration);
+  } else {
+    options->max_mileage = duration;
+  }
+  options->max_speed_limit = static_cast<double>(max_speed_limit);
+  options->min_speed_limit = static_cast<double>(min_speed_limit);
+
+  return true;
+}
+
 }  // namespace navi_generator
 }  // namespace apollo
