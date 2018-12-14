@@ -58,6 +58,42 @@ TEST_F(TrajectorySmootherTest, GoodData) {
   EXPECT_GT(smoother_->smoothed_points().size(), 0);
 }
 
+TEST_F(TrajectorySmootherTest, GoodData_1st) {
+  EXPECT_TRUE(
+      smoother_->Import("modules/tools/navi_generator/backend/util/testdata/"
+                        "trajectory_smoother/path_1st.bag.txt"));
+  EXPECT_TRUE(smoother_->Smooth());
+  EXPECT_TRUE(smoother_->Export(smoothed_filename_));
+  EXPECT_GT(smoother_->smoothed_points().size(), 0);
+}
+
+TEST_F(TrajectorySmootherTest, GoodData_2nd) {
+  EXPECT_TRUE(
+      smoother_->Import("modules/tools/navi_generator/backend/util/testdata/"
+                        "trajectory_smoother/path_2nd.bag.txt"));
+  EXPECT_TRUE(smoother_->Smooth());
+  EXPECT_TRUE(smoother_->Export(smoothed_filename_));
+  EXPECT_GT(smoother_->smoothed_points().size(), 0);
+}
+
+TEST_F(TrajectorySmootherTest, GoodData_3rd) {
+  EXPECT_TRUE(
+      smoother_->Import("modules/tools/navi_generator/backend/util/testdata/"
+                        "trajectory_smoother/path_3rd.bag.txt"));
+  EXPECT_TRUE(smoother_->Smooth());
+  EXPECT_TRUE(smoother_->Export(smoothed_filename_));
+  EXPECT_GT(smoother_->smoothed_points().size(), 0);
+}
+
+TEST_F(TrajectorySmootherTest, GoodData_4th) {
+  EXPECT_TRUE(
+      smoother_->Import("modules/tools/navi_generator/backend/util/testdata/"
+                        "trajectory_smoother/path_4th.bag.txt"));
+  EXPECT_TRUE(smoother_->Smooth());
+  EXPECT_TRUE(smoother_->Export(smoothed_filename_));
+  EXPECT_GT(smoother_->smoothed_points().size(), 0);
+}
+
 TEST_F(TrajectorySmootherTest, EmptyData) {
   EXPECT_FALSE(smoother_->Import("foo.txt"));
   EXPECT_FALSE(smoother_->Smooth());
