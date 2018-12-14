@@ -605,22 +605,10 @@ void SimulationWorldService::UpdateSimulationWorld(
 
 void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
-  const double cutoff_time = world_.auto_driving_car().timestamp_sec();
-  const double header_time = trajectory.header().timestamp_sec();
-
   // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
-
-  bool collecting_started = false;
   for (const TrajectoryPoint &point : trajectory.trajectory_point()) {
-    // Trajectory points with a timestamp older than the cutoff time
-    // (which is effectively the timestamp of the most up-to-date
-    // localization/chassis message) will be dropped.
-    if (collecting_started ||
-        point.relative_time() + header_time >= cutoff_time) {
-      collecting_started = true;
-      collector.Collect(point, header_time);
-    }
+    collector.Collect(point, trajectory.header().timestamp_sec());
   }
   for (int i = 0; i < world_.planning_trajectory_size(); ++i) {
     auto traj_pt = world_.mutable_planning_trajectory(i);
