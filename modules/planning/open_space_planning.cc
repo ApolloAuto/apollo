@@ -557,8 +557,10 @@ Status OpenSpacePlanning::TrajectoryPartition(
   size_t trajectories_size = trajectory_partition.trajectory_size();
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
+  // TODO(Jinyun) move these to configs
   constexpr double kepsilon_to_destination = 1e-6;
   constexpr double heading_searching_range = 0.3;
+  constexpr double gear_shift_period_duration_ = 10.0;
   bool flag_change_to_next = false;
   // Could have a big error in vehicle state in single thread mode!!! As the
   // vehicle state is only updated at the every beginning at RunOnce()
@@ -591,10 +593,6 @@ Status OpenSpacePlanning::TrajectoryPartition(
             (path_end_point.y() - vehicle_state.y());
 
     double traj_point_moving_direction = path_end_point.theta();
-    if (gear_positions[i] == canbus::Chassis::GEAR_REVERSE) {
-      traj_point_moving_direction =
-          common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
-    }
     double vehicle_moving_direction = vehicle_state.heading();
     if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
       vehicle_moving_direction =
@@ -643,11 +641,6 @@ Status OpenSpacePlanning::TrajectoryPartition(
               .trajectory_point(closest_point.first.second)
               .path_point()
               .theta();
-      if (gear_positions[closest_point.first.first] ==
-          canbus::Chassis::GEAR_REVERSE) {
-        traj_point_moving_direction =
-            common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
-      }
       double vehicle_moving_direction = vehicle_state.heading();
       if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
         vehicle_moving_direction =
@@ -659,6 +652,23 @@ Status OpenSpacePlanning::TrajectoryPartition(
         closest_trajectory_point_index = closest_point.first.second;
         break;
       }
+    }
+  }
+
+  if (flag_change_to_next || !gear_shift_period_finished_) {
+    gear_shift_period_finished_ = false;
+    if (gear_shift_period_started_) {
+      gear_shift_start_time_ = Clock::NowInSeconds();
+      gear_shift_position_ = gear_positions[current_trajectory_index];
+      gear_shift_period_started_ = false;
+    }
+    if (gear_shift_period_time_ > gear_shift_period_duration_) {
+      gear_shift_period_finished_ = true;
+      gear_shift_period_started_ = true;
+    } else {
+      GenerateGearShiftTrajectory(gear_shift_position_, ptr_trajectory_pb);
+      gear_shift_period_time_ = Clock::NowInSeconds() - gear_shift_start_time_;
+      return Status::OK();
     }
   }
 
@@ -995,28 +1005,24 @@ void OpenSpacePlanning::BuildPredictedEnvironment(
   }
 }
 
-apollo::common::Status OpenSpacePlanning::GenerateGearShiftTrajectory(
-    const std::vector<double>& end_pose,
+void OpenSpacePlanning::GenerateGearShiftTrajectory(
     const apollo::canbus::Chassis::GearPosition& gear_position,
     ADCTrajectory* trajectory_pb) {
-  if (end_pose.size() != 4) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "End pose not valid in GenerateGearShiftTrajectory!");
-  }
-
   trajectory_pb->clear_trajectory_point();
 
-  trajectory_pb->set_gear(gear_position);
-
   // TODO(QiL): move this to config after finalize the logic
-  const double max_t = 3.0;
-  const double unit_t = 0.02;
+  constexpr double max_t = 3.0;
+  constexpr double unit_t = 0.02;
 
   TrajectoryPoint tp;
   auto path_point = tp.mutable_path_point();
-  path_point->set_x(end_pose[0]);
-  path_point->set_y(end_pose[1]);
-  path_point->set_theta(end_pose[2]);
+  path_point->set_x(frame_->vehicle_state().x());
+  path_point->set_y(frame_->vehicle_state().y());
+  if (gear_position == canbus::Chassis::GEAR_REVERSE) {
+    path_point->set_theta(
+        common::math::NormalizeAngle(frame_->vehicle_state().heading() + M_PI));
+  }
+  path_point->set_kappa(-1.0 * frame_->vehicle_state().kappa());
   path_point->set_s(0.0);
   tp.set_v(0.0);
   tp.set_a(0.0);
@@ -1025,8 +1031,7 @@ apollo::common::Status OpenSpacePlanning::GenerateGearShiftTrajectory(
     auto next_point = trajectory_pb->add_trajectory_point();
     next_point->CopyFrom(tp);
   }
-
-  return Status::OK();
+  trajectory_pb->set_gear(gear_position);
 }
 
 void OpenSpacePlanning::GenerateStopTrajectory(
@@ -1046,6 +1051,7 @@ void OpenSpacePlanning::GenerateStopTrajectory(
     point->set_a(0.0);
     relative_time += relative_stop_time;
   }
+  ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
 }
 
 }  // namespace planning
