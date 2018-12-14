@@ -23,9 +23,11 @@
 #include <vector>
 
 #include "google/protobuf/util/json_util.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
 #include "modules/tools/navi_generator/backend/util/navigation_provider.h"
 
@@ -37,6 +39,8 @@ using apollo::common::time::millis;
 using apollo::common::time::ToSecond;
 using apollo::common::util::GetProtoFromFile;
 using Json = nlohmann::json;
+using apollo::common::adapter::AdapterManager;
+using apollo::localization::LocalizationEstimate;
 using google::protobuf::util::MessageToJsonString;
 
 // A callback function which updates the GUI.
@@ -57,7 +61,16 @@ TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
 }
 
 void TopicsService::Update() {
-  // TODO(*): Update status
+  if (to_clear_) {
+    // Clears received data.
+    AdapterManager::GetLocalization()->ClearData();
+    to_clear_ = false;
+  }
+}
+
+template <>
+void TopicsService::UpdateObserved(const LocalizationEstimate &localization) {
+  // TODO(***): Update status
 }
 
 bool TopicsService::SetCommonBagFileInfo(

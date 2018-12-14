@@ -20,7 +20,9 @@
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/util.h"
+#include "modules/monitor/proto/system_status.pb.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
+#include "modules/tools/navi_generator/backend/hmi/hmi_worker.h"
 #include "third_party/json/json.hpp"
 
 namespace apollo {
@@ -33,6 +35,8 @@ using apollo::common::util::JsonUtil;
 using Json = nlohmann::json;
 using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
+using RLock = boost::shared_lock<boost::shared_mutex>;
+using apollo::common::time::Clock;
 
 namespace {
 // Time interval, in milliseconds, between pushing SimulationWorld to
@@ -42,7 +46,10 @@ constexpr double kSimWorldTimeIntervalMs = 100;
 
 TopicsUpdater::TopicsUpdater(NaviGeneratorWebSocket *websocket)
     : websocket_(websocket), topicsService_(websocket) {
-  RegisterMessageHandlers();
+  if (websocket_) {
+    RegisterMessageHandlers();
+    StartBroadcastHMIStatusThread();
+  }
 }
 
 void TopicsUpdater::RegisterMessageHandlers() {
@@ -214,6 +221,16 @@ void TopicsUpdater::RegisterMessageHandlers() {
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
         topicsService_.SaveRoadCorrection();
       });
+
+  // Received new system status, broadcast to clients.
+  AdapterManager::AddSystemStatusCallback(
+      [this](const monitor::SystemStatus &system_status) {
+        if (Clock::NowInSeconds() - system_status.header().timestamp_sec() <
+            FLAGS_system_status_lifetime_seconds) {
+          HMIWorker::instance()->UpdateSystemStatus(system_status);
+          DeferredBroadcastHMIStatus();
+        }
+      });
 }
 
 bool TopicsUpdater::ValidateCoordinate(const nlohmann::json &json) {
@@ -237,6 +254,35 @@ void TopicsUpdater::Start() {
 
 void TopicsUpdater::OnTimer(const ros::TimerEvent &event) {
   topicsService_.Update();
+}
+
+void TopicsUpdater::StartBroadcastHMIStatusThread() {
+  constexpr int kMinBroadcastIntervalMs = 200;
+  broadcast_hmi_status_thread_.reset(new std::thread([this]() {
+    while (true) {
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(kMinBroadcastIntervalMs));
+
+      {
+        std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
+        if (!need_broadcast_) {
+          continue;
+        }
+        // Reset to false.
+        need_broadcast_ = false;
+      }
+
+      RLock rlock(HMIWorker::instance()->GetStatusMutex());
+      const auto &status = HMIWorker::instance()->GetStatus();
+      websocket_->BroadcastData(
+          JsonUtil::ProtoToTypedJson("HMIStatus", status).dump());
+    }
+  }));
+}
+
+void TopicsUpdater::DeferredBroadcastHMIStatus() {
+  std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
+  need_broadcast_ = true;
 }
 
 }  // namespace navi_generator
