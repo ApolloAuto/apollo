@@ -182,5 +182,23 @@ bool TopicsService::SaveRoadCorrection() {
   return true;
 }
 
+bool TopicsService::ModifySpeedLimit(
+    const apollo::localization::msf::WGS84Corr &start_point,
+    const apollo::localization::msf::WGS84Corr &end_point,
+    const std::uint8_t new_speed_min, const std::uint8_t new_speed_max) {
+  if (!navigation_editor_->ModifySpeedLimit(start_point, end_point,
+                                            new_speed_min, new_speed_max)) {
+    return false;
+  }
+  return true;
+}
+
+bool TopicsService::SaveSpeedLimit() {
+  if (!navigation_editor_->SaveSpeedLimit()) {
+    return false;
+  }
+  return true;
+}
+
 }  // namespace navi_generator
 }  // namespace apollo

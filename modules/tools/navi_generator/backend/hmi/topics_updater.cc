@@ -168,14 +168,39 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestModifySpeedLimit",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): modify speed limit between starting and end point.
+        apollo::localization::msf::WGS84Corr start_point;
+        apollo::localization::msf::WGS84Corr end_point;
+        std::uint8_t new_speed_min;
+        std::uint8_t new_speed_max;
+
+        if (!ContainsKey(json, "start") || !ContainsKey(json, "end")) {
+          AERROR << "Failed to find start or end point.";
+          return;
+        }
+        if (!ValidateCoordinate(json["start"])) {
+          return;
+        }
+        if (!ValidateCoordinate(json["end"])) {
+          return;
+        }
+        start_point.log = json["start"]["Lng"];
+        start_point.lat = json["start"]["Lat"];
+        end_point.log = json["start"]["Lng"];
+        end_point.lat = json["start"]["Lat"];
+        if (!JsonUtil::GetNumberFromJson(json, "speed_min", &new_speed_min)) {
+          return;
+        }
+        if (!JsonUtil::GetNumberFromJson(json, "speed_max", &new_speed_max)) {
+          return;
+        }
+        topicsService_.ModifySpeedLimit(start_point, end_point, new_speed_min,
+                                        new_speed_max);
       });
 
   websocket_->RegisterMessageHandler(
       "requestSaveSpeedLimitCorrection",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): save the correction of speed limit between starting
-        // and end point.
+        topicsService_.SaveSpeedLimit();
       });
 
   websocket_->RegisterMessageHandler(

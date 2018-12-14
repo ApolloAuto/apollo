@@ -54,8 +54,17 @@ class NavigationEditor {
 
   bool CorrectDeviation(const apollo::localization::msf::WGS84Corr& start_point,
                         const apollo::localization::msf::WGS84Corr& end_point);
+  /**
+   * @brief Correct speed limit.
+   */
+  bool ModifySpeedLimit(const apollo::localization::msf::WGS84Corr& start_point,
+                        const apollo::localization::msf::WGS84Corr& end_point,
+                        const std::uint8_t new_speed_min,
+                        const std::uint8_t new_speed_max);
 
   bool SaveRoadCorrection(TrajectoryProcessor* const trajectory_processor);
+
+  bool SaveSpeedLimit();
 
   bool ResponseToFrontEnd();
 

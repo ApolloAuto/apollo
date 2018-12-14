@@ -38,6 +38,8 @@ namespace util {
 namespace {
 const char kWebSocketTypeCorrectDeviation[] = "requestCorrectRoadDeviation";
 const char kWebSocketTypeSaveCorrection[] = "requestSaveRoadCorrection";
+const char kWebSocketTypeModifySpeedLmit[] = "requestModifySpeedLimit";
+const char kWebSocketTypeSaveSpeedLimit[] = "requestSaveSpeedLimitCorrection";
 }  // namespace
 
 using std::placeholders::_1;  // for _1, _2, _3...
@@ -119,6 +121,42 @@ bool NavigationEditor::CorrectDeviation(
   return true;
 }
 
+bool NavigationEditor::ModifySpeedLimit(
+    const apollo::localization::msf::WGS84Corr& start_point,
+    const apollo::localization::msf::WGS84Corr& end_point,
+    const std::uint8_t new_speed_min, const std::uint8_t new_speed_max) {
+  DBOperator db_operator;
+  std::vector<Way> route;
+  std::uint64_t start_line_number = 1, end_line_number = 1;
+  std::uint64_t start_way_id = 0, end_way_id = 0;
+  // Find route with start and end position
+  if (!FindRouteWithPos(&db_operator, start_point, end_point,
+                        &start_line_number, &end_line_number, &route)) {
+    AWARN << "Not found route with start and end position.";
+    return false;
+  }
+  if (route.empty()) {
+    AWARN << "Founded route is empty.";
+    return false;
+  }
+  // Backup route
+  db_route_.clear();
+  db_route_ = route;
+
+  start_way_id = route.front().way_id;
+  end_way_id = route.back().way_id;
+  // Update start and end way
+  if (!SplitStartEndWay(&db_operator, start_way_id, end_way_id,
+                        start_line_number, end_line_number)) {
+    AWARN << "Update start and end way failed.";
+    return false;
+  }
+  new_speed_min_ = new_speed_min;
+  new_speed_max_ = new_speed_max;
+
+  return true;
+}
+
 bool NavigationEditor::SaveRoadCorrection(
     TrajectoryProcessor* const trajectory_processor) {
   if (processed_file_info_s_.empty()) {
@@ -174,6 +212,27 @@ bool NavigationEditor::SaveRoadCorrection(
     return false;
   }
   AINFO << "Save road correction success.";
+  return true;
+}
+
+bool NavigationEditor::SaveSpeedLimit() {
+  // Update way speed limit
+  DBOperator db_operator;
+  for (auto& route_way : db_route_) {
+    if ((route_way.way_id == start_way_navi_info_.way_id) ||
+        (route_way.way_id == end_way_navi_info_.way_id)) {
+      continue;
+    }
+    if (!db_operator.UpdateWaySpeedLimit(route_way.way_id, new_speed_min_,
+                                         new_speed_max_)) {
+      AWARN << "Update way speed limit failed.";
+      return false;
+    }
+  }
+  // Update start and end way
+  if (!UpdateStartEndWay(&db_operator, false)) {
+    return false;
+  }
   return true;
 }
 
