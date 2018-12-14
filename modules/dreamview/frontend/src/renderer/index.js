@@ -84,7 +84,7 @@ class Renderer {
         }
 
         // Geolocation of the mouse
-        this.geolocation = {x: 0, y:0};
+        this.geolocation = { x: 0, y: 0 };
     }
 
     initialize(canvasId, width, height, options) {
@@ -173,7 +173,7 @@ class Renderer {
         this.camera.near = PARAMETERS.camera[pov].near;
         this.camera.far = PARAMETERS.camera[pov].far;
 
-        switch(pov) {
+        switch (pov) {
         case "Default":
             let deltaX = (this.viewDistance * Math.cos(target.rotation.y)
                 * Math.cos(this.viewAngle));
@@ -353,9 +353,14 @@ class Renderer {
         this.updateRouting(world.routingTime, world.routePath);
         this.gnss.update(world, this.coordinates, this.scene);
 
-        if (this.planningAdc &&
-            world.planningTrajectory && world.planningTrajectory.length) {
-            this.planningAdc.update(this.coordinates, world.planningTrajectory[0]);
+        const planningAdcPose = _.get(world, 'planningData.initPoint.pathPoint');
+        if (this.planningAdc && planningAdcPose) {
+            const pose = {
+                positionX: planningAdcPose.x,
+                positionY: planningAdcPose.y,
+                heading: planningAdcPose.theta,
+            };
+            this.planningAdc.update(this.coordinates, pose);
         }
     }
 
@@ -432,8 +437,8 @@ class Renderer {
             0);
 
         const raycaster = new THREE.Raycaster();
-        raycaster.setFromCamera( mouse, this.camera );
-        const objects = this.map.data['lane'].reduce((result,current) => {
+        raycaster.setFromCamera(mouse, this.camera);
+        const objects = this.map.data['lane'].reduce((result, current) => {
             return result.concat(current.drewObjects);
         }, []);
         const intersects = raycaster.intersectObjects(objects);
