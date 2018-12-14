@@ -41,6 +41,7 @@ constexpr char kPredictorPrintErrorName[] = "print_error";
 constexpr char kPredictorOutputName[] = "output";
 constexpr char kPredictorImuName[] = "imu";
 constexpr char kPredictorGpsName[] = "gps";
+constexpr char kPredictorFilteredImuName[] = "filtered_imu";
 constexpr char kPredictorPerceptionName[] = "perception";
 
 /**
