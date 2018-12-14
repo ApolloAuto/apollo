@@ -128,4 +128,19 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "trajectory_converter_test",
+    size = "small",
+    srcs = [
+        "trajectory_converter_test.cc",
+    ],
+    data = [
+        ":testdata",
+    ],
+    deps = [
+        ":trajectory_converter",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
