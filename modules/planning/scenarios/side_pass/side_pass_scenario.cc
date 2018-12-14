@@ -245,7 +245,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     }
 
     // check driving_width
-    if (!ObstacleIsBlockingDrivingPath(reference_line, obstacle)) {
+    if (!IsBlockingDrivingPathObstacle(reference_line, obstacle)) {
       ADEBUG << " - It is not blocking our way.";
       continue;
     }
