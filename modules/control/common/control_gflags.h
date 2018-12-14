@@ -32,8 +32,6 @@ DECLARE_string(control_node_name);
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
 
-DECLARE_bool(enable_input_timestamp_check);
-
 DECLARE_int32(max_localization_miss_num);
 DECLARE_int32(max_chassis_miss_num);
 DECLARE_int32(max_planning_miss_num);
