@@ -81,6 +81,8 @@ class TopicsService {
                            const std::size_t max_speed_limit,
                            util::CollectorOptions *const options);
 
+  nlohmann::json GetRoutePathAsJson(const nlohmann::json &map_data);
+
  private:
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;

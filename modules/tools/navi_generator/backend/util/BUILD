@@ -150,6 +150,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "navigation_provider",
+    srcs = [
+        "navigation_provider.cc",
+    ],
+    hdrs = [
+        "navigation_provider.h",
+    ],
+    deps = [
+        "//modules/tools/navi_generator/backend/database:db_operator",
+        "//third_party/json",
+        ":navigation_matcher",
+        "//modules/localization/msf/common/util:localization_msf_common_util",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([

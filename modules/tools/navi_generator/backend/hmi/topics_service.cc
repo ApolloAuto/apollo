@@ -27,6 +27,7 @@
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
+#include "modules/tools/navi_generator/backend/util/navigation_provider.h"
 
 namespace apollo {
 namespace navi_generator {
@@ -153,6 +154,13 @@ bool TopicsService::GetCollectorOptions(const std::string &collection_type,
   options->min_speed_limit = static_cast<double>(min_speed_limit);
 
   return true;
+}
+
+Json TopicsService::GetRoutePathAsJson(const Json &map_data) {
+  Json response;
+  std::unique_ptr<util::NavigationProvider> provider;
+  provider->GetRoutePathAsJson(map_data, &response);
+  return response;
 }
 
 }  // namespace navi_generator
