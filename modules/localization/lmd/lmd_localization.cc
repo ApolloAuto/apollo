@@ -22,6 +22,7 @@
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/lmd/predictor/output/predictor_output.h"
 #include "modules/localization/lmd/predictor/output/predictor_print_error.h"
+#include "modules/localization/lmd/predictor/perception/predictor_perception.h"
 #include "modules/localization/lmd/predictor/raw/predictor_gps.h"
 #include "modules/localization/lmd/predictor/raw/predictor_imu.h"
 
@@ -40,7 +41,7 @@ using apollo::common::util::ThreadPool;
 using apollo::perception::PerceptionObstacles;
 
 namespace {
-constexpr double kDefaultMemoryCycle = 2.0;
+constexpr double kDefaultMemoryCycle = 1.0;
 constexpr int kDefaultThreadPoolSize = 2;
 }  // namespace
 
@@ -78,6 +79,9 @@ Status LMDLocalization::Start() {
   predictor = new PredictorImu(kDefaultMemoryCycle);
   predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
   imu_ = &predictors_[predictor->Name()];
+  predictor = new PredictorPerception(kDefaultMemoryCycle);
+  predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
+  perception_ = &predictors_[predictor->Name()];
   predictor = new PredictorOutput(kDefaultMemoryCycle, publish_func);
   predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
   output_ = &predictors_[predictor->Name()];
@@ -162,7 +166,35 @@ void LMDLocalization::OnGps(const Gps &gps) {
 void LMDLocalization::OnChassis(const Chassis &chassis) {}
 
 void LMDLocalization::OnPerceptionObstacles(
-    const PerceptionObstacles &obstacles) {}
+    const PerceptionObstacles &obstacles) {
+  if (!perception_->Busy()) {
+    // update messages
+    auto *predictor =
+        static_cast<PredictorPerception *>(perception_->predictor.get());
+    for (const auto &obstacles : obstacles_list_) {
+      if (!obstacles.has_header() || !obstacles.header().has_timestamp_sec() ||
+          !obstacles.has_lane_marker()) {
+        AERROR << "Message has not some feilds";
+        continue;
+      }
+      predictor->UpdateLaneMarkers(obstacles.header().timestamp_sec(),
+                                   obstacles.lane_marker());
+    }
+    obstacles_list_.clear();
+    if (!obstacles.has_header() || !obstacles.header().has_timestamp_sec() ||
+        !obstacles.has_lane_marker()) {
+      AERROR << "Message has not some feilds";
+    } else {
+      predictor->UpdateLaneMarkers(obstacles.header().timestamp_sec(),
+                                   obstacles.lane_marker());
+    }
+
+    // predicting
+    Predicting();
+  } else {
+    obstacles_list_.emplace_back(obstacles);
+  }
+}
 
 void LMDLocalization::OnTimer(const ros::TimerEvent &event) {
   // take a snapshot of the current received messages
