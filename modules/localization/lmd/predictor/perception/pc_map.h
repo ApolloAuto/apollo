@@ -236,12 +236,14 @@ class PCMap {
    * @param heading The heading value after pc registration.
    * @param lane_length The length to sample points.
    * @param point_number The total sample point number.
-   * @return The vector contains the generated odometry lane markers.
+   * @param The vector contains the generated odometry lane markers.
+   * @return true if succeed false otherwise
    */
-  std::vector<OdometryLaneMarker> PrepareLaneMarkers(
-      const apollo::perception::LaneMarkers& source,
-      const apollo::common::PointENU position, const double heading,
-      const double lane_length, const int point_number);
+  bool PrepareLaneMarkers(const apollo::perception::LaneMarkers& source,
+                          const apollo::common::PointENU position,
+                          const double heading, const double lane_length,
+                          const int point_number,
+                          std::vector<OdometryLaneMarker>* generated_vector);
 
   /**
    * @brief  Generate odometry lane marker according to the source perception
@@ -251,12 +253,14 @@ class PCMap {
    * @param heading The heading value after pc registration.
    * @param lane_length The length to sample points.
    * @param point_number The total sample point number.
-   * @return The generated odometry lane marker.
+   * @param the ptr to the generated lane marker
+   * @return true if succeed false otherwise.
    */
-  const OdometryLaneMarker GenerateOdometryLaneMarker(
+  bool GenerateOdometryLaneMarker(
       const apollo::perception::LaneMarker& lanemarker,
       const apollo::common::PointENU position, const double heading,
-      const double lane_length, const int point_number) const;
+      const double lane_length, const int point_number,
+      OdometryLaneMarker* generated_odo) const;
 
   /**
    * @brief  Calculate curve value by given curve params.

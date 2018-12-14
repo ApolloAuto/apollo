@@ -151,12 +151,12 @@ void PCMap::LoadLaneMarker(const OdometryLaneMarker& lane_marker) {
   }
 }
 
-const OdometryLaneMarker PCMap::GenerateOdometryLaneMarker(
+bool PCMap::GenerateOdometryLaneMarker(
     const LaneMarker& lanemarker, const PointENU position, const double heading,
-    const double lane_length, const int point_number) const {
-  OdometryLaneMarker odo_lane;
+    const double lane_length, const int point_number,
+    OdometryLaneMarker* generated_odo) const {
   for (int i = 0; i < point_number; ++i) {
-    auto point = odo_lane.add_points();
+    auto point = generated_odo->add_points();
     auto relative_x = lane_length / point_number * i;
     auto relative_y = GetCurveVal(
         relative_x, lanemarker.c0_position(), lanemarker.c1_heading_angle(),
@@ -176,40 +176,45 @@ const OdometryLaneMarker PCMap::GenerateOdometryLaneMarker(
     point->mutable_direct()->set_y(enu_y_direct);
     point->mutable_direct()->set_z(0.0);
   }
-  return odo_lane;
+  return true;
 }
 
-std::vector<OdometryLaneMarker> PCMap::PrepareLaneMarkers(
-    const LaneMarkers& source, const PointENU position, const double heading,
-    const double lane_length, const int point_number) {
-  std::vector<OdometryLaneMarker> result;
+bool PCMap::PrepareLaneMarkers(
+    const apollo::perception::LaneMarkers& source,
+    const apollo::common::PointENU position, const double heading,
+    const double lane_length, const int point_number,
+    std::vector<OdometryLaneMarker>* generated_vector) {
   if (source.has_left_lane_marker()) {
     const auto& lanemarker = source.left_lane_marker();
-    const auto& odo_lane_marker = GenerateOdometryLaneMarker(
-        lanemarker, position, heading, lane_length, point_number);
-    result.emplace_back(odo_lane_marker);
+    OdometryLaneMarker odo_lane_marker;
+    GenerateOdometryLaneMarker(lanemarker, position, heading, lane_length,
+                               point_number, &odo_lane_marker);
+    generated_vector->emplace_back(odo_lane_marker);
   }
   if (source.has_right_lane_marker()) {
     const auto& lanemarker = source.right_lane_marker();
-    const auto& odo_lane_marker = GenerateOdometryLaneMarker(
-        lanemarker, position, heading, lane_length, point_number);
-    result.emplace_back(odo_lane_marker);
+    OdometryLaneMarker odo_lane_marker;
+    GenerateOdometryLaneMarker(lanemarker, position, heading, lane_length,
+                               point_number, &odo_lane_marker);
+    generated_vector->emplace_back(odo_lane_marker);
   }
 
   for (int i = 0; i < source.next_left_lane_marker_size(); ++i) {
     const auto& lanemarker = source.next_left_lane_marker(i);
-    const auto& odo_lane_marker = GenerateOdometryLaneMarker(
-        lanemarker, position, heading, lane_length, point_number);
-    result.emplace_back(odo_lane_marker);
+    OdometryLaneMarker odo_lane_marker;
+    GenerateOdometryLaneMarker(lanemarker, position, heading, lane_length,
+                               point_number, &odo_lane_marker);
+    generated_vector->emplace_back(odo_lane_marker);
   }
 
   for (int i = 0; i < source.next_right_lane_marker_size(); ++i) {
     const auto& lanemarker = source.next_right_lane_marker(i);
-    const auto& odo_lane_marker = GenerateOdometryLaneMarker(
-        lanemarker, position, heading, lane_length, point_number);
-    result.emplace_back(odo_lane_marker);
+    OdometryLaneMarker odo_lane_marker;
+    GenerateOdometryLaneMarker(lanemarker, position, heading, lane_length,
+                               point_number, &odo_lane_marker);
+    generated_vector->emplace_back(odo_lane_marker);
   }
-  return result;
+  return true;
 }
 
 double PCMap::GetCurveVal(const double x_value, const double c0,
