@@ -28,7 +28,6 @@
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
-#include "modules/planning/reference_line/reference_point.h"
 #include "modules/tools/navi_generator/proto/trajectory_util_config.pb.h"
 
 /**
@@ -86,6 +85,23 @@ class TrajectorySmoother {
       const apollo::planning::ReferencePoint& init_point,
       const apollo::planning::ReferenceLine& ref_line,
       std::vector<apollo::planning::AnchorPoint>* anchor_points);
+
+  /**
+   * @brief Smooth the input points and output.
+   * @param raw_points The input points.
+   * @param smoothed_points The output points.
+   * @return  Return true for success.
+   */
+  bool SmoothPoints(
+      const std::vector<apollo::planning::ReferencePoint>& raw_points,
+      std::vector<apollo::planning::ReferencePoint>* const smoothed_points);
+
+  /**
+   * @brief Determine whether to use Spiral to smooth.
+   * @param points The input points.
+   * @return  Return true for use Spiral.
+   */
+  bool IsSpiral(const std::vector<apollo::planning::ReferencePoint>& points);
 
  private:
   std::string filename_;
