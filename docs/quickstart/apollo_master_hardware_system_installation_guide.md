@@ -1,4 +1,4 @@
-# Apollo 3.5 Hardware and System Installation Guide
+# Apollo master Hardware and System Installation Guide
 
 * [About This Guide](#about-this-guide)
     * [Document Conventions](#document-conventions)
@@ -17,7 +17,7 @@
 
 ## About This Guide
 
-The *Apollo 3.5 Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project**. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
+The *Apollo master Hardware and System Installation Guide* provides the instructions to install all of the hardware components and system software for the **Apollo Project**. The system installation information included pertains to the procedures to download and install the Apollo Linux Kernel.
 
 ### Document Conventions
 
@@ -76,7 +76,7 @@ The key hardware components to install include:
   - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
   - NovAtel SPAN® PwrPak7™ 
   - Navtech NV-GI120
-- Light Detection and Ranging System (LiDAR) ─  You can select one of the following options, please note Apollo 3.5 uses VLS-128 LiDAR:
+- Light Detection and Ranging System (LiDAR) ─  You can select one of the following options, please note Apollo master uses VLS-128 LiDAR:
     - [Velodyne VLS-128](https://github.com/ApolloAuto/apollo2/blob/master/docs/specs/Lidar/VLS_128_Installation_Guide.md)
     - Velodyne HDL-64E S3
     - Velodyne Puck series
@@ -177,5 +177,5 @@ In order to, sync the computer time to the NTP server on the internet, you could
 
 ## Next Steps
 
-After you complete the hardware installation in the vehicle, see the [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_5_quick_start.md) for the steps to complete the software installation.
+After you complete the hardware installation in the vehicle, see the [Apollo Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_master_quick_start.md) for the steps to complete the software installation.
 
