@@ -202,6 +202,7 @@ bool ObstacleClusters::BackwardNearbyObstacle(
 
 StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
   StopSign stop_sign;
+  // Find the stop_sign by lane_id in the hashtable
   if (lane_id_stop_sign_map_.find(lane_id) != lane_id_stop_sign_map_.end()) {
     return lane_id_stop_sign_map_[lane_id];
   }
@@ -214,8 +215,10 @@ StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
       continue;
     }
     for (const auto &object : overlap_info_ptr->overlap().object()) {
+      // find the overlap with stop_sign
       if (object.has_stop_sign_overlap_info()) {
         for (const auto &obj : overlap_info_ptr->overlap().object()) {
+          // find the obj of in the overlap
           if (obj.has_lane_overlap_info()) {
             if (!stop_sign.has_lane_s() ||
                 stop_sign.lane_s() > obj.lane_overlap_info().start_s()) {
@@ -229,7 +232,7 @@ StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
       }
     }
   }
-  return stop_sign;
+  return lane_id_stop_sign_map_[lane_id];
 }
 
 }  // namespace prediction
