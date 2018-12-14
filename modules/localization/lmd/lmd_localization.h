@@ -107,6 +107,7 @@ class LMDLocalization : public LocalizationBase {
   std::map<std::string, PredictorHandler> predictors_;
   PredictorHandler *gps_;
   PredictorHandler *imu_;
+  PredictorHandler *perception_;
   PredictorHandler *output_;
   std::list<CorrectedImu> imu_list_;
   std::list<Gps> gps_list_;

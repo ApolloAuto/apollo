@@ -23,6 +23,7 @@ cc_library(
         "//modules/localization/common:localization_common",
         "//modules/localization/lmd/predictor:localization_lmd_predictor",
         "//modules/localization/lmd/predictor/output:localization_lmd_predictor_output",
+        "//modules/localization/lmd/predictor/perception:localization_lmd_predictor_perception",
         "//modules/localization/lmd/predictor/raw:localization_lmd_predictor_raw_gps",
         "//modules/localization/lmd/predictor/raw:localization_lmd_predictor_raw_imu",
         "//modules/localization/proto:localization_config_proto",
