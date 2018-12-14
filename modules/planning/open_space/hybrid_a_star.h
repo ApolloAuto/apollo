@@ -25,8 +25,8 @@
  * Semi-Structured Environments.” The International Journal of Robotics
  * Research, vol. 29, no. 5, 2010, pp. 485–501., doi:10.1177/0278364909359210.
  *
- * Xiaojing, et al. "Optimization-Based Collision Avoidance" and its
- * implementation.
+ * Xiaojing, et al. "Optimization-Based Collision Avoidance" (arXiv:1711.03449)
+ * and its implementation (https://github.com/XiaojingGeorgeZhang/H-OBCA).
  */
 
 #pragma once
@@ -78,17 +78,17 @@ class HybridAStar {
  private:
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node,
                          const std::vector<std::vector<common::math::Vec2d>>&
-                obstacles_vertices_vec);
+                             obstacles_vertices_vec);
   bool ReedSheppHeuristic(std::shared_ptr<Node3d> current_node,
                           std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
   // check collision and validity
   bool ValidityCheck(std::shared_ptr<Node3d> node,
                      const std::vector<std::vector<common::math::Vec2d>>&
-                obstacles_vertices_vec);
+                         obstacles_vertices_vec);
   // check Reeds Shepp path collision and validity
   bool RSPCheck(const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
                 const std::vector<std::vector<common::math::Vec2d>>&
-                obstacles_vertices_vec);
+                    obstacles_vertices_vec);
   // load the whole RSP as nodes and add to the close set
   std::shared_ptr<Node3d> LoadRSPinCS(
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
