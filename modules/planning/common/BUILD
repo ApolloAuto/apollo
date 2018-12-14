@@ -103,6 +103,24 @@ cc_test(
 )
 
 cc_library(
+    name = "obstacle_blocking_analyzer",
+    srcs = [
+        "obstacle_blocking_analyzer.cc",
+    ],
+    hdrs = [
+        "obstacle_blocking_analyzer.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        ":frame",
+        "//modules/planning/reference_line",
+        "//modules/common/configs:vehicle_config_helper",
+    ],
+)
+
+cc_library(
     name = "planning_context",
     srcs = [
         "planning_context.cc",

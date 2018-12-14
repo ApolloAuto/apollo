@@ -32,6 +32,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
 #include "modules/planning/scenarios/side_pass/stage_backup.h"
 #include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
@@ -200,6 +201,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   }
 
   const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& reference_line = reference_line_info.reference_line();
   const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   const PathDecision& path_decision = reference_line_info.path_decision();
 
@@ -243,17 +245,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     }
 
     // check driving_width
-    const auto& reference_line = reference_line_info.reference_line();
-    const double driving_width =
-        reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
-    const double adc_width =
-        VehicleConfigHelper::GetConfig().vehicle_param().width();
-    if (driving_width >
-        adc_width + FLAGS_static_decision_nudge_l_buffer +
-            side_pass_context_.scenario_config_.min_l_nudge_buffer()) {
-      ADEBUG << " - It is not blocking our way."
-             << " (driving width = " << driving_width
-             << ", adc_width = " << adc_width << ")";
+    if (!ObstacleIsBlockingDrivingPath(reference_line, obstacle)) {
+      ADEBUG << " - It is not blocking our way.";
       continue;
     }
 
@@ -262,6 +255,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         !IsParked(reference_line, obstacle)) {
       for (const auto* other_obstacle : path_decision.obstacles().Items()) {
         if (other_obstacle->Id() == obstacle->Id()) {
+          continue;
+        }
+        if (other_obstacle->IsVirtual()) {
           continue;
         }
         if (other_obstacle->PerceptionSLBoundary().start_l() >
