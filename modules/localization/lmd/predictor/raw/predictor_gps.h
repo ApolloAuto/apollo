@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file predictor.h
+ * @file predictor_gps.h
  * @brief The class of PredictorGps.
  */
 
