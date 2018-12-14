@@ -32,6 +32,7 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Vec2d;
+using apollo::hdmap::LaneInfo;
 using apollo::planning::ADCTrajectory;
 
 const std::vector<Trajectory>& Predictor::trajectories() {
@@ -128,18 +129,21 @@ bool Predictor::TrimTrajectory(
   return true;
 }
 
-void Predictor::DrawConstantAccelerationTrajectory(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double period,
-    const double acceleration,
-    std::vector<TrajectoryPoint>* points) {
-  // TODO(kechxu) implement
-}
-
-bool Predictor::SupposedToStop(const Obstacle& obstacle,
-    const double stop_distance) {
-  // TODO(kechxu) implement
-  return false;
+bool Predictor::SupposedToStop(const Feature& feature,
+                               const double stop_distance,
+                               double* acceleration) {
+  if (stop_distance < std::max(feature.length() * 0.5, 1.0)) {
+    return false;
+  }
+  if (stop_distance > FLAGS_distance_to_slow_down_at_stop_sign) {
+    return false;
+  }
+  double speed = feature.speed();
+  *acceleration = -speed * speed / (2.0 * stop_distance);
+  if (*acceleration > -FLAGS_double_precision) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace prediction
