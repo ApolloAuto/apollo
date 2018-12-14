@@ -1228,25 +1228,36 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   }
 
   // Build lane_points.
-  // TODO(jiacheng): make the points denser.
   if (feature->has_lane() && feature->lane().has_lane_graph()) {
-    // SetLanePoints(feature);
-    // SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph());
+    SetLanePoints(feature, FLAGS_dense_lane_gap,
+                  feature->mutable_lane()->mutable_lane_graph_ordered());
+    SetLaneSequencePath(
+        feature->mutable_lane()->mutable_lane_graph_ordered());
   }
   ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
 }
 
+// The default SetLanePoints applies to lane_graph with
+// FLAGS_target_lane_gap.
 void Obstacle::SetLanePoints(Feature* feature) {
+  LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
+  SetLanePoints(feature, FLAGS_target_lane_gap, lane_graph);
+}
+
+// The generic SetLanePoints
+void Obstacle::SetLanePoints(Feature* feature, double lane_point_spacing,
+                             LaneGraph* const lane_graph) {
+  // Sanity checks.
   if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";
     return;
   }
-
-  LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
   double heading = feature->velocity_heading();
   double x = feature->position().x();
   double y = feature->position().y();
   Eigen::Vector2d position(x, y);
+
+  // Go through every lane_sequence.
   for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence = lane_graph->mutable_lane_sequence(i);
     if (lane_sequence->lane_segment_size() <= 0) {
@@ -1258,9 +1269,12 @@ void Obstacle::SetLanePoints(Feature* feature) {
     double total_s = 0.0;
     double lane_seg_s = start_s;
     std::size_t count_point = 0;
+    // Go through lane_segment one by one sequentially.
     while (lane_index < lane_sequence->lane_segment_size() &&
            count_point < FLAGS_max_num_lane_point) {
       if (lane_seg_s > lane_segment->end_s()) {
+        // If already exceeds the current lane_segment, then go to the
+        // next following one.
         start_s = lane_seg_s - lane_segment->end_s();
         lane_seg_s = start_s;
         ++lane_index;
@@ -1270,13 +1284,15 @@ void Obstacle::SetLanePoints(Feature* feature) {
           lane_segment = nullptr;
         }
       } else {
+        // Otherwise, update lane_graph:
+        // 1. Sanity checks.
         std::string lane_id = lane_segment->lane_id();
         std::shared_ptr<const LaneInfo> lane_info =
             PredictionMap::LaneById(lane_id);
         if (lane_info == nullptr) {
           break;
         }
-        LanePoint lane_point;
+        // 2. Get the closeset lane_point
         Eigen::Vector2d lane_point_pos =
             PredictionMap::PositionOnLane(lane_info, lane_seg_s);
         double lane_point_heading =
@@ -1285,6 +1301,9 @@ void Obstacle::SetLanePoints(Feature* feature) {
             PredictionMap::LaneTotalWidth(lane_info, lane_seg_s);
         double lane_point_angle_diff =
             common::math::AngleDiff(lane_point_heading, heading);
+
+        // 3. Update it into the lane_graph
+        LanePoint lane_point;
         lane_point.mutable_position()->set_x(lane_point_pos[0]);
         lane_point.mutable_position()->set_y(lane_point_pos[1]);
         lane_point.set_heading(lane_point_heading);
@@ -1296,8 +1315,8 @@ void Obstacle::SetLanePoints(Feature* feature) {
         lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
         lane_segment->add_lane_point()->CopyFrom(lane_point);
         ++count_point;
-        total_s += FLAGS_target_lane_gap;
-        lane_seg_s += FLAGS_target_lane_gap;
+        total_s += lane_point_spacing;
+        lane_seg_s += lane_point_spacing;
       }
     }
   }
@@ -1305,11 +1324,14 @@ void Obstacle::SetLanePoints(Feature* feature) {
 }
 
 void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
+  // Go through every lane_sequence.
   for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence = lane_graph->mutable_lane_sequence(i);
     double lane_segment_s = 0.0;
+    // Go through every lane_segment.
     for (int j = 0; j < lane_sequence->lane_segment_size(); ++j) {
       LaneSegment* lane_segment = lane_sequence->mutable_lane_segment(j);
+      // Go through every lane_point and set the corresponding path_point.
       for (int k = 0; k < lane_segment->lane_point_size(); ++k) {
         LanePoint* lane_point = lane_segment->mutable_lane_point(k);
         PathPoint path_point;
@@ -1319,10 +1341,12 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
       }
       lane_segment_s += lane_segment->total_length();
     }
+    // Sanity checks.
     int num_path_point = lane_sequence->path_point_size();
     if (num_path_point <= 0) {
       continue;
     }
+    // Go through every path_point, calculate kappa, and update it.
     int segment_index = 0;
     int point_index = 0;
     for (int j = 0; j + 1 < num_path_point; ++j) {
