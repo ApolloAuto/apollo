@@ -199,7 +199,8 @@ def main():
         argv[2]:filename of generated lane marker msgs
     """
     if(len(sys.argv) != 3):
-        print("Please provide --argv[1]:raw rosbag input to generate lanemarker msgs --argv[2]:filename of generated lane marker msgs")
+        print(
+            "Please provide --argv[1]:raw rosbag input to generate lanemarker msgs --argv[2]:filename of generated lane marker msgs")
         sys.exit()
     resource = read_bag(sys.argv[1])
     write_info(resource, sys.argv[2])
