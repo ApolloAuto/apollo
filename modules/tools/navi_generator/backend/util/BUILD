@@ -97,6 +97,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_collector",
+    srcs = [
+        "trajectory_collector.cc",
+    ],
+    hdrs = [
+        "trajectory_collector.h",
+    ],
+    linkopts = [
+        "-pthread",
+        "-lconsole_bridge",
+    ],
+    deps = [
+       "//modules/common:log",
+       "//modules/common/adapters:adapter_manager",
+       "//modules/tools/navi_generator/proto:trajectory_collector_proto",
+        "@ros//:ros_common",
+    ],
+)
+
 filegroup(
     name = "testdata",
     srcs = glob([
@@ -157,6 +177,18 @@ cc_test(
     ],
     deps = [
         ":trajectory_converter",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "trajectory_collector_test",
+    size = "small",
+    srcs = [
+        "trajectory_collector_test.cc",
+    ],
+    deps = [
+        ":trajectory_collector",
         "@gtest//:main",
     ],
 )

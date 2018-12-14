@@ -15,3 +15,20 @@ proto_library(
     deps = [        
     ],
 )
+
+cc_proto_library(
+    name = "trajectory_collector_proto",
+    deps = [
+        ":trajectory_collector_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "trajectory_collector_proto_lib",
+    srcs = [
+        "trajectory_collector.proto",
+    ],
+     deps = [
+    ],
+)
+
