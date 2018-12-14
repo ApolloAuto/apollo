@@ -5,9 +5,10 @@ In Apollo 3.5, the Perception module has been upgraded completely to handle comp
 ## Introduction
 Apollo 3.5 has following new features:
 
- * **Support for VLS-128 Line LiDAR**: 
- * **Support for 5 FPD-Link Cameras**: The previous versions of Perception incorporated fusion of only 5 Leopard cameras, but Apollo 3.5 has included 5 FPD-Link Cameras which perception handles seamlessly
- * **Upgraded Perception Algorithm**
+ * **Support for VLS-128 Line LiDAR**
+ * **Obstacle detection though multiple cameras**
+ * **Advanced traffic light detection**
+ * **Configurable sensor fusion**
 
 The perception module incorporates the capability of using 5 cameras (2 front, 2 on either side and 1 rear) and 2 radars (front and rear) along with 3 16-line LiDARs (2 rear and 1 front) and 1 128-line LiDAR to recognize obstacles and fuse their individual tracks to obtain a final track list. The obstacle sub-module detects, classifies and tracks obstacles. This sub-module also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
 
@@ -16,18 +17,20 @@ The perception module incorporates the capability of using 5 cameras (2 front, 2
 
 The perception module inputs are:
 
-- Radar data (ROS topic _/apollo/sensor/conti_radar_)
-- Image data (ROS topic _/apollo/sensor/camera/obstacle/front_6mm_)
+- 128 channel LiDAR data (cyber channel /apollo/sensor/velodyne128)
+- 16 channel LiDAR data (cyber channel /apollo/sensor/lidar_front, lidar_rear_left, lidar_rear_right)
+- Radar data (cyber channel /apollo/sensor/radar_front, radar_rear)
+- Image data (cyber channel /apollo/sensor/camera/front_6mm, front_12mm)
 - Extrinsic parameters of radar sensor calibration (from YAML files)
 - Extrinsic and Intrinsic parameters of front camera calibration (from YAML files)
-- Velocity and Angular Velocity of host vehicle (ROS topic /apollo/localization/pose)
+- Velocity and Angular Velocity of host vehicle (cyber channel /apollo/localization/pose)
 
 ## Output
 
 The perception module outputs are:
 
-* The 3D obstacle tracks with the heading, velocity and classification information (ROS topic _/apollo/perception/obstacles_)
-* The lane marker information with fitted curve parameter, spatial information(L0, R0, etc.) as well as semantic information (lane type) (ROS topic _/apollo/perception/obstacles_)
+* The 3D obstacle tracks with the heading, velocity and classification information (ROS topic /apollo/perception/obstacles_)
+* The lane marker information with fitted curve parameter, spatial information(L0, R0, etc.) as well as semantic information (lane type) (cyber channel /apollo/perception/obstacles_)
 
 ## Setup Instructions
 
