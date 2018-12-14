@@ -771,13 +771,13 @@ body {
     width: 100%;
 
     .rss {
+        flex: 1 1 auto;
         position: absolute;
         width: 240px;
         height: 270px;
         top: 10px;
         right: 250px;
         background: rgba(0, 0, 0, 0.8);
-        flex: 1 1 auto;
 
         .rss-header {
             width: 100%;
