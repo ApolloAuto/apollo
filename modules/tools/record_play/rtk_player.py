@@ -25,6 +25,7 @@ import logging
 import os
 import sys
 import time
+import math
 
 from cyber_py import cyber
 import scipy.signal as signal
@@ -219,19 +220,23 @@ class RtkPlayer(object):
             adc_point.a = self.data['acceleration'][i] * self.speedmultiplier
             adc_point.path_point.kappa = self.data['curvature'][i]
             adc_point.path_point.dkappa = self.data['curvature_change_rate'][i]
+            adc_point.path_point.theta = self.data['theta'][i]
 
             if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
                 adc_point.a = -adc_point.a
                 adc_point.path_point.kappa = -adc_point.path_point.kappa
                 adc_point.path_point.dkappa = -adc_point.path_point.dkappa
-
+                adc_point.path_point.theta = math.fmod(self.data['theta'][i] + 2.0 * math.pi, 2.0 * math.pi)
+                if adc_point.path_point.theta < 0.0:
+                    adc_point.path_point.theta = adc_point.path_point.theta + 2.0 * math.pi
+                adc_point.path_point.theta = adc_point.path_point.theta - math.pi
+                
             time_diff = self.data['time'][i] - \
                 self.data['time'][self.closestpoint]
 
             adc_point.relative_time = time_diff / self.speedmultiplier - (
                 now - self.starttime)
 
-            adc_point.path_point.theta = self.data['theta'][i]
             adc_point.path_point.s = self.data['s'][i]
 
             planningdata.trajectory_point.extend([adc_point])
