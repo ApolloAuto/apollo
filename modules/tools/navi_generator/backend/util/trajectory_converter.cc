@@ -48,6 +48,8 @@ using apollo::localization::LocalizationEstimate;
 
 namespace {
 constexpr double kDistanceTolerance = 5.0;
+// kSinsRadToDeg = 180 / pi
+constexpr double kSinsRadToDeg = 57.295779513;
 }  // namespace
 
 bool TrajectoryConverter::ExtractTrajectoryPoints(
@@ -177,6 +179,35 @@ bool TrajectoryConverter::SmoothTrajectoryPoints() {
   }
 
   smoothed_points_ = trajectory_smoother_.smoothed_points();
+  return true;
+}
+
+bool TrajectoryConverter::GetSmoothedTrajectoryWGS84Points(
+    std::vector<apollo::localization::msf::WGS84Corr>* const waypoints) {
+  for (auto smoothed_point : smoothed_points_) {
+    apollo::localization::msf::WGS84Corr wgs84;
+    apollo::localization::msf::UtmXYToLatlon(smoothed_point.x(),
+                                             smoothed_point.y(),
+                                             local_utm_zone_id_, false, &wgs84);
+    wgs84.lat *= kSinsRadToDeg;
+    wgs84.log *= kSinsRadToDeg;
+    waypoints->emplace_back(wgs84);
+  }
+  return true;
+}
+
+bool TrajectoryConverter::ConvertSmoothedTrajectoryPointsToWGS84(
+    const std::vector<planning::ReferencePoint>* const smoothed_points,
+    std::vector<apollo::localization::msf::WGS84Corr>* const waypoints) {
+  for (auto smoothed_point : *smoothed_points) {
+    apollo::localization::msf::WGS84Corr wgs84;
+    apollo::localization::msf::UtmXYToLatlon(smoothed_point.x(),
+                                             smoothed_point.y(),
+                                             local_utm_zone_id_, false, &wgs84);
+    wgs84.lat *= kSinsRadToDeg;
+    wgs84.log *= kSinsRadToDeg;
+    waypoints->emplace_back(wgs84);
+  }
   return true;
 }
 

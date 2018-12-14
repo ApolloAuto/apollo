@@ -100,6 +100,15 @@ class TrajectoryConverter {
     return static_cast<int>(((lon + 180.0) / 6) + 1);
   }
 
+  const std::string& GetSmoothedFileName() const { return smoothed_filename_; }
+
+  bool GetSmoothedTrajectoryWGS84Points(
+      std::vector<apollo::localization::msf::WGS84Corr>* const waypoints);
+
+  bool ConvertSmoothedTrajectoryPointsToWGS84(
+      const std::vector<planning::ReferencePoint>* const smoothed_points,
+      std::vector<apollo::localization::msf::WGS84Corr>* const waypoints);
+
  private:
   TrajectorySmoother trajectory_smoother_;
   std::size_t local_utm_zone_id_ = 49;
