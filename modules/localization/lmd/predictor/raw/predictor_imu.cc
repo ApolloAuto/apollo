@@ -16,6 +16,8 @@
 
 #include <iomanip>
 
+#include "modules/common/time/time_util.h"
+#include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/lmd/predictor/raw/predictor_imu.h"
 
 #include "modules/common/log.h"
@@ -25,6 +27,8 @@ namespace localization {
 
 using apollo::common::Point3D;
 using apollo::common::Status;
+using apollo::common::time::TimeUtil;
+using apollo::drivers::gnss::Imu;
 
 namespace {
 constexpr double kSamplingInterval = 0.01;
@@ -34,6 +38,8 @@ PredictorImu::PredictorImu(double memory_cycle_sec)
     : Predictor(memory_cycle_sec), raw_imu_(memory_cycle_sec) {
   name_ = kPredictorImuName;
   on_adapter_thread_ = true;
+  constexpr double kCutoffFreq = 20.0;
+  InitLPFilter(kCutoffFreq);
 }
 
 PredictorImu::~PredictorImu() {}
@@ -46,8 +52,48 @@ bool PredictorImu::UpdateImu(const CorrectedImu& imu) {
     return false;
   }
 
+  auto pose = imu.imu();
+  pose.mutable_linear_acceleration()->CopyFrom(pose.linear_acceleration());
+
   auto timestamp_sec = imu.header().timestamp_sec();
-  if (!raw_imu_.Push(timestamp_sec, imu.imu())) {
+  if (!raw_imu_.Push(timestamp_sec, pose)) {
+    AWARN << std::setprecision(15)
+          << "Failed push pose to list, with timestamp[" << timestamp_sec
+          << "]";
+    return false;
+  }
+
+  return true;
+}
+
+bool PredictorImu::UpdateRawImu(const Imu& imu) {
+  // TODO(all): skipped
+  if (true) {
+    return true;
+  }
+
+  if (!imu.has_measurement_time() || !imu.has_linear_acceleration() ||
+      !imu.has_angular_velocity()) {
+    AERROR << "Message has not some feilds";
+    return false;
+  }
+
+  auto timestamp_sec = TimeUtil::Gps2unix(imu.measurement_time());
+  Pose pose;
+  pose.mutable_linear_acceleration()->set_x(imu.linear_acceleration().x() *
+                                            FLAGS_imu_rate);
+  pose.mutable_linear_acceleration()->set_y(imu.linear_acceleration().y() *
+                                            FLAGS_imu_rate);
+  pose.mutable_linear_acceleration()->set_z(imu.linear_acceleration().z() *
+                                            FLAGS_imu_rate);
+  pose.mutable_linear_acceleration()->set_z(0.0);
+  pose.mutable_angular_velocity()->set_x(imu.angular_velocity().x() *
+                                         FLAGS_imu_rate);
+  pose.mutable_angular_velocity()->set_y(imu.angular_velocity().y() *
+                                         FLAGS_imu_rate);
+  pose.mutable_angular_velocity()->set_z(imu.angular_velocity().z() *
+                                         FLAGS_imu_rate);
+  if (!raw_imu_.Push(timestamp_sec, pose)) {
     AWARN << std::setprecision(15)
           << "Failed push pose to list, with timestamp[" << timestamp_sec
           << "]";
@@ -67,6 +113,7 @@ bool PredictorImu::Updateable() const {
 
 Status PredictorImu::Update() {
   ResamplingFilter();
+  // LPFilter();
   return Status::OK();
 }
 
@@ -80,6 +127,19 @@ void PredictorImu::ResamplingFilter() {
     raw_imu_.FindNearestPose(timestamp_sec, &pose);
     predicted_.Push(timestamp_sec, pose);
   }
+}
+
+void PredictorImu::InitLPFilter(double cutoff_freq) {
+  auto omega = 2.0 * M_PI * cutoff_freq * kSamplingInterval;
+  auto sin_o = std::sin(omega);
+  auto cos_o = std::cos(omega);
+  auto alpha = sin_o / (2.0 / std::sqrt(2));
+  iir_filter_bz_[0] = (1.0 - cos_o) / 2.0;
+  iir_filter_bz_[1] = 1.0 - cos_o;
+  iir_filter_bz_[2] = (1.0 - cos_o) / 2.0;
+  iir_filter_az_[0] = 1.0 + alpha;
+  iir_filter_az_[1] = -2.0 * cos_o;
+  iir_filter_az_[2] = 1.0 - alpha;
 }
 
 void PredictorImu::LPFilter() {
@@ -116,13 +176,13 @@ void PredictorImu::LPFilter() {
   }
 
   //  two-order Butterworth filter
-  auto but_filter = [](double x_0, double x_1, double x_2, double y_1,
-                       double y_2) {
-    constexpr double kBZ[3] = {0.024472, 0.048943, 0.024472};
-    constexpr double kAZ[3] = {1.2185, -1.9021, 0.78149};
-    return (kBZ[0] * x_0 + kBZ[1] * x_1 + kBZ[2] * x_2 - kAZ[1] * y_1 -
-            kAZ[2] * y_2) /
-           kAZ[0];
+  auto but_filter = [&](double x_0, double x_1, double x_2, double y_1,
+                        double y_2) {
+    const auto& bz = iir_filter_bz_;
+    const auto& az = iir_filter_az_;
+    return (bz[0] * x_0 + bz[1] * x_1 + bz[2] * x_2 - az[1] * y_1 -
+            az[2] * y_2) /
+           az[0];
   };
 
   y_0.set_x(but_filter(x_0.x(), x_1.x(), x_2.x(), y_1.x(), y_2.x()));
