@@ -155,7 +155,8 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestRoute",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): return the route result
+        Json response = topicsService_.GetRoutePathAsJson(json);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
