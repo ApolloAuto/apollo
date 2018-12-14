@@ -43,6 +43,8 @@ class DistanceEstimator {
  private:
   bool UpdateCurrentLane();
 
+  double GetOverlapPointS(const DiscretizedPath& path);
+
  private:
   common::TrajectoryPoint ego_point_;
   hdmap::RouteSegments route_segments_;
