@@ -73,6 +73,8 @@ DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
 DEFINE_double(go_approach_rate, 0.995,
               "The rate to approach to the reference line of going straight");
+DEFINE_double(cutin_approach_rate, 0.95,
+              "The rate to approach to the reference line of cutin");
 
 DEFINE_int32(min_still_obstacle_history_length, 4,
              "Min # historical frames for still obstacles");
@@ -155,6 +157,8 @@ DEFINE_double(distance_beyond_junction, 0.5,
               "consider it in junction.");
 DEFINE_double(defualt_junction_range, 10.0,
               "Default value for the range of a junction.");
+DEFINE_double(distance_to_slow_down_at_stop_sign, 40.0,
+              "The distance to slow down at stop sign");
 
 // Evaluator
 DEFINE_double(time_to_center_if_not_reach, 10.0,
