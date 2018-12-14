@@ -20,6 +20,7 @@
 #include "modules/common/log.h"
 #include "modules/common/util/thread_pool.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/localization/lmd/predictor/filter/predictor_filtered_imu.h"
 #include "modules/localization/lmd/predictor/output/predictor_output.h"
 #include "modules/localization/lmd/predictor/output/predictor_print_error.h"
 #include "modules/localization/lmd/predictor/perception/predictor_perception.h"
@@ -38,6 +39,7 @@ using apollo::common::adapter::GpsAdapter;
 using apollo::common::adapter::ImuAdapter;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::util::ThreadPool;
+using apollo::drivers::gnss::Imu;
 using apollo::perception::PerceptionObstacles;
 
 namespace {
@@ -73,20 +75,51 @@ Status LMDLocalization::Start() {
   };
 
   // initialize predictors
-  Predictor *predictor = new PredictorGps(kDefaultMemoryCycle);
-  predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
-  gps_ = &predictors_[predictor->Name()];
-  predictor = new PredictorImu(kDefaultMemoryCycle);
-  predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
-  imu_ = &predictors_[predictor->Name()];
-  predictor = new PredictorPerception(kDefaultMemoryCycle);
-  predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
-  perception_ = &predictors_[predictor->Name()];
-  predictor = new PredictorOutput(kDefaultMemoryCycle, publish_func);
-  predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
-  output_ = &predictors_[predictor->Name()];
-  predictor = new PredictorPrintError(kDefaultMemoryCycle);
-  predictors_.emplace(predictor->Name(), PredictorHandler(predictor));
+  auto add_predictor = [&](Predictor *predictor) -> PredictorHandler * {
+    return &predictors_.emplace(predictor->Name(), PredictorHandler(predictor))
+                .first->second;
+  };
+
+  // gps
+  auto *predictor_gps = new PredictorGps(kDefaultMemoryCycle);
+  gps_reciever_.Set(*add_predictor(predictor_gps),
+                    [=](const Gps &msg) { predictor_gps->UpdateGps(msg); });
+
+  // imu
+  auto *predictor_imu = new PredictorImu(kDefaultMemoryCycle);
+  auto &ph_imu = *add_predictor(predictor_imu);
+  imu_reciever_.Set(
+      ph_imu, [=](const CorrectedImu &msg) { predictor_imu->UpdateImu(msg); });
+  imu_reciever1_.Set(ph_imu,
+                     [=](const Imu &msg) { predictor_imu->UpdateRawImu(msg); });
+
+  // filtered_imu
+  auto *predictor_filtered_imu = new PredictorFilteredImu(kDefaultMemoryCycle);
+  filtered_imu_reciever_.Set(
+      *add_predictor(predictor_filtered_imu),
+      [=](const Chassis &msg) { predictor_filtered_imu->UpdateChassis(msg); });
+
+  // perception
+  auto *predictor_perception = new PredictorPerception(kDefaultMemoryCycle);
+  perception_reciever_.Set(
+      *add_predictor(predictor_perception),
+      [=](const PerceptionObstacles &msg) {
+        if (!msg.has_header() || !msg.header().has_timestamp_sec() ||
+            !msg.has_lane_marker()) {
+          return;
+        }
+        predictor_perception->UpdateLaneMarkers(msg.header().timestamp_sec(),
+                                                msg.lane_marker());
+      });
+
+  // output
+  auto *predictor_output =
+      new PredictorOutput(kDefaultMemoryCycle, publish_func);
+  add_predictor(predictor_output);
+
+  // print_error
+  auto *predictor_print_error = new PredictorPrintError(kDefaultMemoryCycle);
+  add_predictor(predictor_print_error);
 
   // check predictors' dep
   for (const auto &p : predictors_) {
@@ -106,12 +139,13 @@ Status LMDLocalization::Start() {
   ThreadPool::Init(kDefaultThreadPoolSize);
 
   // initialize adapter manager
-  AdapterManager::Init(FLAGS_lmd_adapter_config_file);
   AdapterManager::AddImuCallback(&LMDLocalization::OnImu, this);
+  AdapterManager::AddRawImuCallback(&LMDLocalization::OnRawImu, this);
   AdapterManager::AddGpsCallback(&LMDLocalization::OnGps, this);
   AdapterManager::AddChassisCallback(&LMDLocalization::OnChassis, this);
   AdapterManager::AddPerceptionObstaclesCallback(
       &LMDLocalization::OnPerceptionObstacles, this);
+  AdapterManager::Init(FLAGS_lmd_adapter_config_file);
 
   // start ROS timer, one-shot = false, auto-start = true
   const double duration = 1.0 / FLAGS_localization_publish_freq;
@@ -130,79 +164,39 @@ Status LMDLocalization::Stop() {
 }
 
 void LMDLocalization::OnImu(const CorrectedImu &imu) {
-  if (!imu_->Busy()) {
-    // update messages
-    auto *predictor = static_cast<PredictorImu *>(imu_->predictor.get());
-    for (const auto &imu : imu_list_) {
-      predictor->UpdateImu(imu);
-    }
-    imu_list_.clear();
-    predictor->UpdateImu(imu);
+  imu_reciever_.OnMessage(imu);
+  // predicting
+  Predicting();
+}
 
-    // predicting
-    Predicting();
-  } else {
-    imu_list_.emplace_back(imu);
-  }
+void LMDLocalization::OnRawImu(const Imu &imu) {
+  imu_reciever1_.OnMessage(imu);
+  // predicting
+  Predicting();
 }
 
 void LMDLocalization::OnGps(const Gps &gps) {
-  if (!gps_->Busy()) {
-    // update messages
-    auto *predictor = static_cast<PredictorGps *>(gps_->predictor.get());
-    for (const auto &gps : gps_list_) {
-      predictor->UpdateGps(gps);
-    }
-    gps_list_.clear();
-    predictor->UpdateGps(gps);
-
-    // predicting
-    Predicting();
-  } else {
-    gps_list_.emplace_back(gps);
-  }
+  gps_reciever_.OnMessage(gps);
+  // predicting
+  Predicting();
 }
 
-void LMDLocalization::OnChassis(const Chassis &chassis) {}
+void LMDLocalization::OnChassis(const Chassis &chassis) {
+  filtered_imu_reciever_.OnMessage(chassis);
+  // predicting
+  Predicting();
+}
 
 void LMDLocalization::OnPerceptionObstacles(
     const PerceptionObstacles &obstacles) {
-  if (!perception_->Busy()) {
-    // update messages
-    auto *predictor =
-        static_cast<PredictorPerception *>(perception_->predictor.get());
-    for (const auto &obstacles : obstacles_list_) {
-      if (!obstacles.has_header() || !obstacles.header().has_timestamp_sec() ||
-          !obstacles.has_lane_marker()) {
-        AERROR << "Message has not some feilds";
-        continue;
-      }
-      predictor->UpdateLaneMarkers(obstacles.header().timestamp_sec(),
-                                   obstacles.lane_marker());
-    }
-    obstacles_list_.clear();
-    if (!obstacles.has_header() || !obstacles.header().has_timestamp_sec() ||
-        !obstacles.has_lane_marker()) {
-      AERROR << "Message has not some feilds";
-    } else {
-      predictor->UpdateLaneMarkers(obstacles.header().timestamp_sec(),
-                                   obstacles.lane_marker());
-    }
-
-    // predicting
-    Predicting();
-  } else {
-    obstacles_list_.emplace_back(obstacles);
-  }
+  perception_reciever_.OnMessage(obstacles);
+  // predicting
+  Predicting();
 }
 
 void LMDLocalization::OnTimer(const ros::TimerEvent &event) {
-  // take a snapshot of the current received messages
-  AdapterManager::Observe();
-
   // predicting
   Predicting();
-
   // watch dog
   RunWatchDog();
 }

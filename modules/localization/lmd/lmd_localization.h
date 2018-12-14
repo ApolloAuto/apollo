@@ -23,24 +23,28 @@
 #define MODULES_LOCALIZATION_LMD_LMD_LOCALIZATION_H_
 
 #include <chrono>
+#include <functional>
 #include <future>
 #include <list>
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ros/include/ros/ros.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/common/status/status.h"
-#include "modules/localization/lmd/predictor/predictor.h"
-#include "modules/localization/localization_base.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/status/status.h"
+#include "modules/localization/lmd/predictor/predictor.h"
+#include "modules/localization/localization_base.h"
 
 /**
  * @namespace apollo::localization
@@ -72,6 +76,33 @@ class LMDLocalization : public LocalizationBase {
     }
   };
 
+  template <class Message>
+  struct MessageReciever {
+    std::list<Message> msg_list;
+    const PredictorHandler *ph = nullptr;
+    std::function<void(const Message &)> on_msg_recieved;
+
+    void Set(const PredictorHandler &ph,
+             std::function<void(const Message &)> &&on_msg_recieved) {
+      this->ph = &ph;
+      this->on_msg_recieved = std::move(on_msg_recieved);
+    }
+
+    void OnMessage(const Message &msg) {
+      if (ph != nullptr) {
+        if (!ph->Busy()) {
+          for (const auto &msg : msg_list) {
+            on_msg_recieved(msg);
+          }
+          msg_list.clear();
+          on_msg_recieved(msg);
+        } else {
+          msg_list.emplace_back(msg);
+        }
+      }
+    }
+  };
+
  public:
   LMDLocalization();
   virtual ~LMDLocalization();
@@ -90,6 +121,7 @@ class LMDLocalization : public LocalizationBase {
 
  private:
   void OnImu(const CorrectedImu &imu);
+  void OnRawImu(const apollo::drivers::gnss::Imu &imu);
   void OnGps(const Gps &gps);
   void OnChassis(const apollo::canbus::Chassis &chassis);
   void OnPerceptionObstacles(
@@ -103,16 +135,13 @@ class LMDLocalization : public LocalizationBase {
   ros::Timer timer_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
   const std::vector<double> map_offset_;
-
   std::map<std::string, PredictorHandler> predictors_;
-  PredictorHandler *gps_;
-  PredictorHandler *imu_;
-  PredictorHandler *perception_;
-  PredictorHandler *output_;
-  std::list<CorrectedImu> imu_list_;
-  std::list<Gps> gps_list_;
-  std::list<apollo::perception::PerceptionObstacles> obstacles_list_;
-};
+  MessageReciever<CorrectedImu> imu_reciever_;
+  MessageReciever<apollo::drivers::gnss::Imu> imu_reciever1_;
+  MessageReciever<Gps> gps_reciever_;
+  MessageReciever<apollo::canbus::Chassis> filtered_imu_reciever_;
+  MessageReciever<apollo::perception::PerceptionObstacles> perception_reciever_;
+};  // namespace localization
 
 }  // namespace localization
 }  // namespace apollo
