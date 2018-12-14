@@ -1,0 +1,562 @@
+	html, body, ul, li, ol, dl, dd, dt, p, h1, h2, h3, h4, h5, h6, form, fieldset, legend, img {
+		    margin: 0;
+		    padding: 0;
+		}
+		fieldset, img, input, button {
+		    border: none; 
+		    padding: 0;
+		    margin: 0;
+		    outline-style: none; 
+		}
+		ul, ol {
+		    list-style: none; 
+		}
+		input {
+		    padding-top: 0;
+		    padding-bottom: 0;
+		    -moz-appearance:textfield;
+		}
+		input::-webkit-outer-spin-button,
+		input::-webkit-inner-spin-button {
+		    -webkit-appearance: none;
+		    appearance: none; 
+		    margin: 0; 
+		}
+		select, input {
+		    vertical-align: middle; 
+		}
+		select, input, textarea {
+		    font-size: 14px;
+		    margin: 0;
+		}
+		textarea {
+		    resize: none; 
+		}
+		img {
+		    border: 0;
+		    vertical-align: middle; 
+		}
+		table {
+		    border-collapse: collapse; 
+		}
+		body {
+		    font-family:  Microsoft YaHei, Arial, "\5b8b\4f53";
+		}
+		.clearfix:before, .clearfix:after {
+		    content: "";
+		    display: table;
+		}
+		.clearfix:after {
+		    clear: both;
+		}
+		.clearfix {
+		    *zoom: 1; 
+		}
+		h1, h2, h3, h4, h5, h6 {
+		    text-decoration: none; 
+		    font-weight: normal; 
+		    font-size: 100%;
+		}
+		a{
+		    text-decoration: none;
+		}
+		s, i, em {		   
+		    font-style: normal;
+		    text-decoration: none; 
+		}
+		.left{
+		    float: left;
+		}
+		.right{
+		    float: right;
+		}
+		.anchorBL{display:none;}
+	
+	/*content style*/
+		#map-container{
+		    max-width:100%;
+		    height: 100%;
+		    position: absolute;
+		    top: 0;
+		    bottom: 0;
+		    left: 0;
+		    right: 0;
+		    margin: auto;
+		    background-color: #fff;
+		    box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.12), 1px 1px 1px 1px rgba(0, 0, 0, 0.24);
+		    display: -webkit-box;
+		    display: -webkit-flex;
+		    display: -ms-flexbox;
+		    display: flex;
+		    -webkit-box-align: center;
+		    -webkit-align-items: center;
+		    -ms-flex-align: center;
+		    align-items: center;
+		    -webkit-box-pack: left;
+		    -webkit-justify-content: left;
+		    -ms-flex-pack: left;
+		    justify-content: left;
+		    overflow: hidden;
+		}
+		#left-side {
+		    height: 100%;
+		    width: 5%;
+		    display: -webkit-box;
+		    display: -webkit-flex;
+		    display: -ms-flexbox;
+		    display: flex;
+		    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.7);
+		}
+		#left-side ul{
+			width: 100%;
+			margin-top: 30px;
+		}
+		#left-side ul li {
+		    width: 100%;
+		    text-align: center;
+		    padding-top: 10px;
+		    padding-bottom: 10px;
+		    border-top: 1px solid #ddd;
+		    border-bottom: 1px solid #ddd;
+    		margin: -1px;
+		    display: -ms-flexbox;
+		    line-height: 34px;
+		    color: #9a9a9a;
+		    font-weight: 500;
+		    cursor: pointer;
+		    -webkit-transition: all .2s ease-out;
+		    transition: all .2s ease-out;
+		}
+		#left-side ul li.active {
+		    color: #ffffff;
+		}
+		.icon {
+		    position: relative;
+		    width: 32px;
+		    height: 32px;
+		    display: block;
+		    margin: auto;
+		    fill: rgba(51, 51, 51, 0.5);
+		    -webkit-transition: all .2s ease-out;
+		    transition: all .2s ease-out;
+		}
+		#left-side ul li:hover {
+		    color: #fff;
+		    -webkit-transition: all .2s ease-out;
+		    transition: all .2s ease-out; 
+		}
+		#right-side {
+		    height: 100%;
+		    width: 95%;
+		    overflow: hidden;
+		}
+		#right-side #first, #right-side #second{
+		    height: 100%;
+		    width: 100%;
+		    -webkit-transition: all .6s ease-in-out;
+		    transition: all .6s ease-in-out;
+		}
+		#collect.layui-col-space1 {
+		    height: 22%;
+		    margin: 0;
+		}
+		#editor.layui-col-space1 {
+		    height: 22%;
+		    margin: 0;
+		}
+		.tools {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: stretch;
+			flex: 1 1 auto;
+			overflow: hidden;
+		}
+		.tools .card {
+			height: 100%;
+		    flex: 1 1 auto;
+		     color: #fff;
+		   border-left: 1px solid #fff;
+		    padding: 10px 10px 25px 20px;
+		    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.7);
+		}
+		.tools .card .card-header {
+		    width: 100%;
+		    padding-bottom: 15px;
+		    overflow: hidden;
+		}
+		.tools .card .card-header h2 {
+			float: left;
+		    border-bottom: 1px solid #999;
+		    padding: 10px 10px 10px 0;
+		    color: #fff;
+		    font-size: 18px;
+		}
+		.tools .card .card-content-column {
+		    display: flex;
+		    flex-flow: column nowrap;
+		    overflow-x: hidden;
+		    overflow-y: auto;
+		    height: 89%;
+		}
+		.card-content-column .status-display {
+		    min-width: 250px;
+		    padding: 5px 20px 5px 5px;
+		}
+		.card-content-column .status-display .name {
+		    display: inline-block;
+		    padding: 10px;
+		    min-width: 70px;
+		}
+		.card-content-column .status-display .status {
+		    display: inline-block;
+		    position: relative;
+		    width: 110px;
+		    padding: 10px;
+		    background: #000;
+		    white-space: nowrap;
+		}
+		.card-content-column .status-display .status .status-icon {
+		    position: absolute;
+		    right: 10px;
+		    width: 15px;
+		    height: 15px;
+		    background-color: #b43131;
+		}
+		#allform {
+		    float: right;
+		    margin-top: 15px;
+		}
+		.layui-form .layui-form-label{text-align: left;}
+		.layui-form .layui-input-block{margin-left: 90px;}
+		.layui-form .layui-form-switch{
+			    min-width: 50px;
+			    border-radius:0;
+		}
+		.layui-form .layui-form-switch i{
+			border-radius:0;
+		}
+		#first .layui-form-label{
+			background-color: #00000038;
+			border-color: #adadadad;
+		}
+		#first .layui-input, .layui-select, .layui-textarea{
+			border-color: #adadadad;
+		}
+		#allform .layui-form-checkbox[lay-skin=primary] span{
+			color: #fff;
+		}
+		.tools .layui-form-radio{
+			line-height: 36px;
+			margin: 6px 15px 0 0;
+		}
+		.input-radio .layui-form-radio{
+			float: left;
+			margin: 6px 5px 0 0;
+			padding-right: 0;
+		}
+		.input-radio .layui-input{
+			display: inline-block;
+		    width: 36px;
+		    height: 20px;
+		    padding-left: 0;
+		    margin: 15px 5px 0 0;
+		}
+	    .input-radio .layui-word-aux{
+			color: #fff !important;
+		}
+		.input-radio .layui-form-mid{
+			padding: 15px 0 0 0!important;
+		}
+		.speed .input-radio{
+			width: 95px;
+			float: right;
+		}
+		.speed .input-radio .layui-input{
+			width: 40px;
+		}
+		#speedSubmit {
+			margin-left: 30px;
+		}
+		.first-bapl{
+			border-bottom: 1px solid #616060;
+		}
+		.bapl{
+			border-left: 1px solid #616060;
+			border-bottom: 1px solid #616060;
+			padding-left: 20px;
+		}
+		.collection{
+			margin-bottom: 15px;
+		}
+		.button-box {
+		    margin-bottom: 25px;
+		}
+		.collection .layui-btn{
+			height: 27px;
+		    line-height: 27px;
+		    width: 120px;
+		}
+		.files{
+			width: 100%;
+    		height: 100%;
+		}
+		#allmap{
+			width: 100%;
+			height: 78%;
+			margin: 2px;
+    		box-shadow: 1px 1px 1px 2px #888686;
+		}
+		.layui-upload-list {
+		    overflow-y: auto;
+		    height: 75%;
+		}
+		#editor .layui-form-item .layui-input-inline{
+			width: 120px;
+		}
+		#editor .layui-btn{
+			width: 172px;
+		}
+		#generate .layui-btn{
+			width: 106px;
+		}
+		#modification .layui-btn{
+			width: 106px;
+		}
+		#generate .file-frame{
+			height: 100%;
+			padding-right: 20px;
+		}
+		#modification .file-frame{
+			height: 100%;
+			padding-right: 20px;
+		}
+		#roadform .layui-btn{
+			width: 120px;
+			padding: 0;
+		}
+		.closeFileWin {
+		    position: absolute;
+		    top: 5px;
+		    right: 5px;
+		    z-index: 111;
+		    background: #6b6b6b;
+		    cursor: pointer;
+		}
+		#editor .button-right{
+			margin-left: 0px;
+		}
+		#modifySpeed{
+			display:none;
+		}
+		.layui-modifySpeed{
+			margin: 15px 0 0 30px;
+		}
+		#modifySpeedform .layui-modifySpeed{
+			margin: 0 0 0 30px;
+		}
+		#switchForm .layui-form-item{
+			    margin-bottom: 5px;
+		}
+		.file {
+		    position: relative;
+		    display: inline-block;
+		    border-radius: 4px;
+		    padding: 9px 0;
+		    overflow: hidden;
+		    color: #fff;
+		    text-decoration: none;
+		    text-indent: 0;
+		    line-height: 20px;
+		}
+		.file input {
+		    position: absolute;
+		    font-size: 100px;
+		    left: -20px;
+		    top: 0;
+		    opacity: 0;
+		    cursor: pointer;
+		    padding: 0px 20px;
+		}
+		.file:hover {
+		    border-color: #78C3F3;
+		    color: #fff;
+		    text-decoration: none;
+		}
+
+		.searchbox-content{
+			position: absolute;
+		    right: 2%;
+    		top: 4%;
+			width: 368px;
+		    border-radius: 2px 0 0 2px;
+		    background: #fff;
+		        float: left;
+		    box-sizing: border-box;
+		    box-shadow: 1px 2px 1px rgba(0,0,0,.15);
+		}
+		.route-header {
+		    overflow: hidden;
+		}
+		.searchbox-content-common {
+		    box-sizing: border-box;
+		    float: left;
+		    width: 329px;
+		    height: 38px;
+		}
+		.route-tabs {
+		    position: relative;
+		    border-bottom: 1px solid #A3C7FF;
+		    color: #888;
+		    text-decoration: none;
+		    font-size: 24px;
+		    line-height: 38px;
+		    padding-left: 20px;
+		    font-weight: bold;
+		}
+		.searchbox-content-button {
+		    box-sizing: border-box;
+		    float: left;
+		    height: 38px;
+		    width: 39px;
+		    cursor: pointer;
+		    position: relative;
+		    text-align: center;
+		}
+		.searchbox-content-button:before {
+		    content: '';
+		    position: absolute;
+		    width: 38px;
+		    left: 0;
+		    top: 6px;
+		    height: 26px;
+		    border-left: 1px solid #d0d0d0;
+		}
+		.routebox {
+		    -webkit-transition: max-height 1s ease-in;
+		    transition: max-height 1s ease-in;
+		    overflow: hidden;
+		}
+		.routebox .routebox-content {
+		    height: auto!important;
+		    position: relative;
+		}
+		.searchbox-content .searchbox-content-common {
+		    box-sizing: border-box;
+		    float: left;
+		    width: 329px;
+		    height: 38px;
+		}
+		.routebox .routebox-content .routebox-inputs {
+		    margin-left: 18px;
+		}
+		.routebox .routebox-content .routebox-input {
+		    height: 40px;
+		    width: 289px;
+		    border-bottom: 1px solid #eaebed;
+		    position: relative;
+		}
+		.routebox .routebox-content .routebox-input .route-input-icon {
+		    width: 11px;
+		    height: 10px;
+		    background: #13e453;
+		    border-radius: 50%;
+		    position: absolute;
+		    top: 15px;
+		    left: 3px;
+		}
+		.routebox .routebox-content .routebox-input.route-end .route-input-icon {
+		    background: #fd0000;
+		}
+		.routebox .routebox-content .routebox-input input {
+		    box-sizing: border-box;
+		    border: 0;
+		    height: 100%;
+		    width: 100%;
+		    padding: 10px 0;
+		    font-size: 14px;
+		    border-left: 20px solid transparent;
+		    border-right: 27px solid transparent;
+		    line-height: 20px;
+		}
+		.input-clear {
+		    cursor: pointer;
+		    position: absolute;
+		    width: 27px;
+		    height: 38px;
+		    top: 1px;
+		    right: 22px;
+		    text-align: center;
+		    line-height: 38px;
+		    color: #909090;
+		}
+		#closeMarker i{
+			font-size: 30px;
+		    line-height: 38px;
+		}
+		
+
+		/*分辨率兼容*/
+
+		@media screen and (max-width: 1850px) {
+		    #roadform .layui-input-inline {
+		            width: 100px;
+		    }
+		    #roadform .layui-btn{
+		    	width: 100px;
+		    }
+		    .tools .card .card-header h2{
+				font-size: 16px;
+			}
+		}
+		@media screen and (max-width: 1670px) {
+		    #roadform .layui-input-inline {
+		            width: 80px;
+		    }
+		    #roadform .layui-btn{
+		    	width: 80px;
+		    }
+		    .file{
+		    	padding:9px 0px;
+		    }
+		    #editor .layui-btn {
+			    width: 152px;
+			}
+			#modification .layui-btn {
+			    width: 96px;
+			}
+			#generate .layui-btn {
+			    width: 96px;
+			}
+			.tools .card .card-header h2{
+				font-size: 14px;
+			}
+		}
+
+		@media screen and (max-width: 1480px) {
+		    #roadform .layui-input-inline {
+		            width: 60px;
+		    }
+		    #roadform .layui-btn{
+		    	width: 60px;
+		    }
+		    #editor .layui-btn {
+			    width: 122px;
+			}
+			#modification .layui-btn {
+			    width: 86px;
+			}
+			#generate .layui-btn {
+			    width: 86px;
+			}
+			#modification .layui-form-pane .layui-form-label{
+				width: 80px;
+			}
+			#generate .layui-form-pane .layui-form-label{
+				width: 80px;
+			}
+			.tools .card .card-header h2{
+				font-size: 14px;
+			}
+		}
+		
+		
