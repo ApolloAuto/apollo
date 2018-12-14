@@ -17,6 +17,7 @@
 #include "modules/localization/lmd/predictor/perception/predictor_perception.h"
 
 #include <algorithm>
+#include <string>
 
 #include "modules/common/log.h"
 #include "modules/common/math/quaternion.h"
@@ -33,6 +34,11 @@ using apollo::perception::LaneMarkers;
 
 namespace {
 constexpr double kPCMapSearchRadius = 10.0;
+
+const std::string& PredictorOutputName() {
+  static const std::string name(kPredictorOutputName);
+  return name;
+}
 }  // namespace
 
 PredictorPerception::PredictorPerception(double memory_cycle_sec)
@@ -41,7 +47,7 @@ PredictorPerception::PredictorPerception(double memory_cycle_sec)
       pc_registrator_(&pc_map_),
       lane_markers_samples_(memory_cycle_sec) {
   name_ = kPredictorPerceptionName;
-  dep_predicteds_.emplace(kPredictorOutputName, PoseList(memory_cycle_sec));
+  dep_predicteds_.emplace(PredictorOutputName(), PoseList(memory_cycle_sec));
 }
 
 PredictorPerception::~PredictorPerception() {}
@@ -60,7 +66,7 @@ bool PredictorPerception::UpdateLaneMarkers(double timestamp_sec,
 }
 
 bool PredictorPerception::Updateable() const {
-  const auto& output = dep_predicteds_.find(kPredictorOutputName)->second;
+  const auto& output = dep_predicteds_.find(PredictorOutputName())->second;
   return lane_markers_samples_.Older(output) &&
          (predicted_.Older(lane_markers_samples_) || predicted_.empty()) &&
          DepsTimestamp() > deps_timestamp_sec_;
@@ -74,7 +80,7 @@ Status PredictorPerception::Update() {
   const auto& latest_sample = latest_sample_it->second;
 
   // get estimated pose for timestamp_sec
-  const auto& output = dep_predicteds_[kPredictorOutputName];
+  const auto& output = dep_predicteds_[PredictorOutputName()];
   Pose pose_estimated;
   output.FindNearestPose(timestamp_sec, &pose_estimated);
   if (!pose_estimated.has_position() || !pose_estimated.position().has_x() ||
@@ -123,7 +129,7 @@ double PredictorPerception::DepsTimestamp() const {
   if (sample_it != lane_markers_samples_.end()) {
     timestamp_sec = std::max(sample_it->first, timestamp_sec);
   }
-  const auto& output = dep_predicteds_.find(kPredictorOutputName)->second;
+  const auto& output = dep_predicteds_.find(PredictorOutputName())->second;
   auto o_it = output.Latest();
   if (o_it != output.end()) {
     timestamp_sec = std::max(o_it->first, timestamp_sec);
