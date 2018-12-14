@@ -62,6 +62,7 @@ DECLARE_double(still_obstacle_position_std);
 DECLARE_double(still_pedestrian_position_std);
 DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
+DECLARE_double(dense_lane_gap);
 DECLARE_int32(max_num_current_lane);
 DECLARE_int32(max_num_nearby_lane);
 DECLARE_double(max_lane_angle_diff);
