@@ -14,6 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <algorithm>
+#include <memory>
+#include <vector>
+
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -29,7 +33,7 @@ using apollo::hdmap::HDMapUtil;
 
 // This is the side-pass condition for every obstacle.
 // TODO(all): if possible, transform as many function parameters into GFLAGS.
-bool IsBlockingObstacleToSidePass (
+bool IsBlockingObstacleToSidePass(
     const Frame& frame, const Obstacle* obstacle,
     double block_obstacle_min_speed, double min_front_sidepass_distance,
     bool enable_obstacle_blocked_check) {
@@ -55,7 +59,7 @@ bool IsBlockingObstacleToSidePass (
 
   // Obstacle is behind ADC.
   if (obstacle->PerceptionSLBoundary().start_s() <=
-      adc_sl_boundary.end_s()) {  
+      adc_sl_boundary.end_s()) {
     ADEBUG << " - It is behind ADC.";
     return false;
   }
@@ -115,7 +119,7 @@ bool IsBlockingObstacleToSidePass (
 }
 
 
-bool ObstacleIsBlockingDrivingPath (
+bool ObstacleIsBlockingDrivingPath(
     const ReferenceLine& reference_line, const Obstacle* obstacle) {
   const double driving_width =
       reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
@@ -170,5 +174,5 @@ bool IsParked(const ReferenceLine& reference_line,
   return (is_parked && obstacle->IsStatic());
 }
 
-}
-}
+}  // namespace planning
+}  // namespace apollo

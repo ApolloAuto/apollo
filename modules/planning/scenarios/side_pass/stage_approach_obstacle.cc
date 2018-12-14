@@ -32,8 +32,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 
-#define ADEBUG AINFO
-
 namespace apollo {
 namespace planning {
 namespace scenario {
@@ -115,12 +113,9 @@ Stage::StageStatus StageApproachObstacle::Process(
     break;
   }
 
-  AWARN << "============================";
-
   // check the status of side pass scenario
   bool has_blocking_obstacle = false;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    /*
     if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
       continue;
     }
@@ -151,11 +146,13 @@ Stage::StageStatus StageApproachObstacle::Process(
         GetContext()->scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
-    */
+
+    /*
     if (IsBlockingObstacleToSidePass(*frame, obstacle, 0.1, 1.0, true)) {
       has_blocking_obstacle = true;
       break;
     }
+    */
   }
 
   if (!has_blocking_obstacle) {
@@ -178,7 +175,6 @@ Stage::StageStatus StageApproachObstacle::Process(
 
   double front_obstacle_distance = 1000;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    /*
     if (obstacle->IsVirtual()) {
       continue;
     }
@@ -193,12 +189,14 @@ Stage::StageStatus StageApproachObstacle::Process(
     if (obstacle_sl.end_s() <= reference_line_info.AdcSlBoundary().start_s()) {
       continue;
     }
-    */
+
+    /*
     if (!IsBlockingObstacleToSidePass(*frame, obstacle, 0.1, 1.0, true)) {
       continue;
     }
-
     const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
+    */
+
     double distance = obstacle_sl.start_s() - adc_front_edge_s;
     if (distance < front_obstacle_distance) {
       front_obstacle_distance = distance;
