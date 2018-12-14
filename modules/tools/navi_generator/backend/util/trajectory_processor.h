@@ -72,9 +72,11 @@ struct FileInfo {
   std::uint8_t speed_max = 0;
 };
 
+typedef void (*UPDATE_GUI_FUNC)(const std::string&, void*);
+
 class TrajectoryProcessor {
  public:
-  TrajectoryProcessor();
+  TrajectoryProcessor(UPDATE_GUI_FUNC task, void* gui_service);
   ~TrajectoryProcessor();
 
  public:
@@ -126,6 +128,8 @@ class TrajectoryProcessor {
   std::condition_variable file_seg_cv_;
   mutable std::mutex file_seg_mut_;
   bool file_seg_finished_ = false;
+  // A task for asynchronously updating GUI information.
+  std::packaged_task<void(const std::string&)> update_gui_task_;
 };
 
 }  // namespace util

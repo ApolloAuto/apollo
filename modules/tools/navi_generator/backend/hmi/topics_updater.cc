@@ -41,8 +41,7 @@ constexpr double kSimWorldTimeIntervalMs = 100;
 }  // namespace
 
 TopicsUpdater::TopicsUpdater(NaviGeneratorWebSocket *websocket)
-    : websocket_(websocket),
-      topicsService_(websocket) {
+    : websocket_(websocket), topicsService_(websocket) {
   RegisterMessageHandlers();
 }
 
@@ -68,12 +67,57 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestProcessBagFiles",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): process bag files
+        if (ContainsKey(json, "totalFileNum")) {
+          std::size_t num;
+          apollo::navi_generator::util::CommonBagFileInfo common_file_info;
+          if (!JsonUtil::GetNumberFromJson(json, "totalFileNum", &num)) {
+            return;
+          }
+          common_file_info.total_file_num = num;
+          if (!JsonUtil::GetNumberFromJson(json, "leftLaneNum", &num)) {
+            return;
+          }
+          common_file_info.left_lane_num = num;
+          if (!JsonUtil::GetNumberFromJson(json, "rightLaneNum", &num)) {
+            return;
+          }
+          common_file_info.right_lane_num = num;
+          topicsService_.SetCommonBagFileInfo(common_file_info);
+        } else if (ContainsKey(json, "curIndex")) {
+          std::string str;
+          std::size_t num;
+          apollo::navi_generator::util::FileSegment file_segment;
+          if (!JsonUtil::GetNumberFromJson(json, "curIndex", &num)) {
+            return;
+          }
+          file_segment.cur_file_index = num;
+          if (!JsonUtil::GetNumberFromJson(json, "curSegCount", &num)) {
+            return;
+          }
+          file_segment.cur_file_seg_count = num;
+          if (!JsonUtil::GetNumberFromJson(json, "curSegIdx", &num)) {
+            return;
+          }
+          file_segment.cur_file_seg_index = num;
+          if (!JsonUtil::GetStringFromJson(json, "curName", &str)) {
+            return;
+          }
+          file_segment.cur_file_name = str;
+          if (!JsonUtil::GetStringFromJson(json, "nextName", &str)) {
+            return;
+          }
+          file_segment.next_file_name = str;
+          if (!JsonUtil::GetStringFromJson(json, "data", &str)) {
+            return;
+          }
+          file_segment.cur_file_seg_data = str;
+          topicsService_.ProcessBagFileSegment(file_segment);
+        }
       });
   websocket_->RegisterMessageHandler(
       "requestSaveBagFiles",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): save bag files
+        topicsService_.SaveFilesToDatabase();
       });
 
   websocket_->RegisterMessageHandler(
