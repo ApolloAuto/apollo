@@ -37,6 +37,17 @@ using apollo::common::util::GetProtoFromFile;
 using Json = nlohmann::json;
 using google::protobuf::util::MessageToJsonString;
 
+// A callback function which updates the GUI.
+void TopicsService::UpdateGUI(const std::string &msg, void *service) {
+  CHECK_NOTNULL(service);
+  // Update the frontend through a WebSocket broadcast message.
+  TopicsService *topics_service = reinterpret_cast<TopicsService *>(service);
+  NaviGeneratorWebSocket *websocket = topics_service->websocket_;
+  if (websocket) {
+    websocket->BroadcastData(msg);
+  }
+}
+
 TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
     : websocket_(websocket) {}
 

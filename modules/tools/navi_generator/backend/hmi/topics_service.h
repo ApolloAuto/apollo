@@ -58,6 +58,9 @@ class TopicsService {
    */
   void Update();
 
+  // A callback function which updates the GUI.
+  static void UpdateGUI(const std::string &msg, void *service);
+
  private:
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;
