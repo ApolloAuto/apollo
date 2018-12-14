@@ -54,10 +54,18 @@ TEST(BoundedQueueTest, concurrency) {
   std::atomic_int count = {0};
   std::thread threads[48];
   for (int i = 0; i < 48; ++i) {
-    if (i % 4 < 2) {
+    if (i % 4 == 0) {
       threads[i] = std::thread([&]() {
         for (int j = 0; j < 10000; ++j) {
           if (queue.Enqueue(j)) {
+            count++;
+          }
+        }
+      });
+    } else if (i % 4 == 1) {
+      threads[i] = std::thread([&]() {
+        for (int j = 0; j < 10000; ++j) {
+          if (queue.WaitEnqueue(j)) {
             count++;
           }
         }
