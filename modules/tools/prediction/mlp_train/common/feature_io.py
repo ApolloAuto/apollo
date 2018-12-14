@@ -31,7 +31,7 @@ def readVarint32(stream):
     """
     read block size from file stream
     """
-    mask = 0x80  #(1 << 7)
+    mask = 0x80  # (1 << 7)
     raw_varint32 = []
     while 1:
         b = stream.read(1)

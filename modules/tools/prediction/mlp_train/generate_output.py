@@ -75,7 +75,8 @@ def generate_output(filename, output_file):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Generate .bin files for tensorflow')
+    parser = argparse.ArgumentParser(
+        description='Generate .bin files for tensorflow')
     parser.add_argument('input', type=str, help='input file')
     parser.add_argument('output', type=str, help='output file')
     args = parser.parse_args()
