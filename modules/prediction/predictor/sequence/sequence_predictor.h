@@ -92,6 +92,21 @@ class SequencePredictor : public Predictor {
   double GetLaneChangeDistanceWithADC(const LaneSequence& lane_sequence);
 
   /**
+   * @brief Draw constant acceleration trajectory points
+   * @param Obstacle
+   * @param Lane sequence
+   * @param Total prediction time
+   * @param Prediction period
+   * @param acceleration
+   * @param A vector of generated trajectory points
+   */
+  void DrawConstantAccelerationTrajectory(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const double total_time, const double period,
+    const double acceleration,
+    std::vector<apollo::common::TrajectoryPoint>* points);
+
+  /**
    * @brief Clear private members
    */
   void Clear();
