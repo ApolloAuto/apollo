@@ -467,6 +467,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/proto:pnc_point_proto",
         "//modules/map/pnc_map:route_segments",
         "//modules/planning/common/path:path_data",

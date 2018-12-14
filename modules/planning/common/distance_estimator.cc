@@ -20,6 +20,10 @@
 
 #include "modules/planning/common/distance_estimator.h"
 
+#include <algorithm>
+#include <vector>
+
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
@@ -61,6 +65,44 @@ bool DistanceEstimator::UpdateCurrentLane() {
   ADEBUG << curr_lane_.DebugString();
 
   return true;
+}
+
+double DistanceEstimator::GetOverlapPointS(const DiscretizedPath& path) {
+  double dist = 0.0;
+  if (curr_lane_.successor_id_size() == 0) {
+    return dist;
+  }
+  const auto& next_lane_info =
+      HDMapUtil::BaseMapPtr()->GetLaneById(curr_lane_.successor_id(0));
+
+  for (const auto& path_point : path) {
+    const auto& vehicle_box =
+        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
+    const std::vector<Vec2d>& corners = vehicle_box.GetAllCorners();
+
+    bool is_overlap = false;
+    for (const auto id : next_lane_info->lane().predecessor_id()) {
+      if (is_overlap) {
+        break;
+      }
+      if (id.id() == curr_lane_.id().id()) {
+        continue;
+      }
+      const auto& lane_info = HDMapUtil::BaseMapPtr()->GetLaneById(id);
+      for (const auto& corner : corners) {
+        if (lane_info->IsOnLane(corner)) {
+          is_overlap = true;
+          break;
+        }
+      }
+    }
+    if (!is_overlap) {
+      dist = std::max(dist, path_point.s());
+    } else {
+      break;
+    }
+  }
+  return dist;
 }
 
 }  // namespace planning
