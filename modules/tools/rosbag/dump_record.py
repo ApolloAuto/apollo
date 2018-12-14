@@ -79,8 +79,7 @@ def dump_record(in_record, out_dir, start_time, duration, filter_topic):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description=
-        "A tool to dump the protobuf messages in a cyber record into text files"
+        description="A tool to dump the protobuf messages in a cyber record into text files"
     )
     parser.add_argument(
         "in_record",

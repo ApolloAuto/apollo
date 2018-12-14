@@ -185,9 +185,9 @@ def loss_fn(c_pred, r_pred, target, balance):
                ((target[:, 2] <= 0.0) + (target[:, 2] > 3.0)).float().view(
                    target.shape[0], 1) * target[:, 2].view(target.shape[0], 1),
                target[:, 2].view(target.shape[0], 1))
-    #loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
-    #        (target[:,1] >= 10.0).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
-    #        target[:,1].view(target.shape[0],1))
+        #loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
+        #        (target[:,1] >= 10.0).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
+        #        target[:,1].view(target.shape[0],1))
     return loss
 
 

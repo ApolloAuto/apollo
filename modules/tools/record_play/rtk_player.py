@@ -140,7 +140,7 @@ class RtkPlayer(object):
         start = self.start
         for i in range(search_start, search_end):
             dist_sqr = (self.carx - self.data['x'][i]) ** 2 + \
-                   (self.cary - self.data['y'][i]) ** 2
+                (self.cary - self.data['y'][i]) ** 2
             if dist_sqr <= shortest_dist_sqr:
                 start = i
                 shortest_dist_sqr = dist_sqr
@@ -150,7 +150,7 @@ class RtkPlayer(object):
         time_elapsed = time.time() - self.starttime
         closest_time = self.start
         time_diff = self.data['time'][closest_time] - \
-           self.data['time'][self.closestpoint]
+            self.data['time'][self.closestpoint]
 
         while time_diff < time_elapsed and closest_time < (len(self.data) - 1):
             closest_time = closest_time + 1
@@ -226,11 +226,12 @@ class RtkPlayer(object):
                 adc_point.a = -adc_point.a
                 adc_point.path_point.kappa = -adc_point.path_point.kappa
                 adc_point.path_point.dkappa = -adc_point.path_point.dkappa
-                adc_point.path_point.theta = math.fmod(self.data['theta'][i] + 2.0 * math.pi, 2.0 * math.pi)
+                adc_point.path_point.theta = math.fmod(
+                    self.data['theta'][i] + 2.0 * math.pi, 2.0 * math.pi)
                 if adc_point.path_point.theta < 0.0:
                     adc_point.path_point.theta = adc_point.path_point.theta + 2.0 * math.pi
                 adc_point.path_point.theta = adc_point.path_point.theta - math.pi
-                
+
             time_diff = self.data['time'][i] - \
                 self.data['time'][self.closestpoint]
 
