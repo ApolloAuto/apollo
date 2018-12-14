@@ -44,6 +44,11 @@ struct LanePointsInfo {
   LanePoints points;
 };
 
+struct ExpandedFileInfo {
+  int index;
+  std::string file_name;
+};
+
 class NavigationExpander {
  public:
   NavigationExpander() = default;
@@ -62,6 +67,19 @@ class NavigationExpander {
   bool ExpandLane(const LanePoints& src_lane, const int left_lane_number,
                   const int right_lane_number, const double lane_width,
                   std::list<LanePointsInfo>* const dst_lane_list);
+  /**
+   * @brief Expand multiple lanes.
+   * @param src_smoothed_file_name The input smoothed file name.
+   * @param left_lane_number The left lane number.
+   * @param right_lane number The right lane number.
+   * @param lane_width The lane width.
+   * @param expanded_files The list of expanded file list.
+   * @return  Return true for success.
+   */
+  bool ExpandLane(const std::string& src_smoothed_file_name,
+                  const int left_lane_number, const int right_lane_number,
+                  const double lane_width,
+                  std::list<ExpandedFileInfo>* const expanded_files);
 
  private:
   /**

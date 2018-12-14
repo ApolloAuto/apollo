@@ -37,6 +37,54 @@ namespace util {
 using apollo::planning::ReferencePoint;
 
 bool NavigationExpander::ExpandLane(
+    const std::string& src_smoothed_file_name, const int left_lane_number,
+    const int right_lane_number, const double lane_width,
+    std::list<ExpandedFileInfo>* const expanded_files) {
+  CHECK_NOTNULL(expanded_files);
+  std::vector<apollo::planning::ReferencePoint> lane_points;
+  std::list<LanePointsInfo> expanded_lane_list;
+  FileOperator file_operator;
+  // Import smoothed file.
+  if (!file_operator.Import(src_smoothed_file_name, &lane_points)) {
+    AERROR << "Import file failed";
+    return false;
+  }
+  // Expand lane
+  if (!ExpandLane(lane_points, left_lane_number, right_lane_number, lane_width,
+                  &expanded_lane_list)) {
+    AERROR << "Expand Lane failed";
+    return false;
+  }
+  // Export expanded lane data to files
+  if (expanded_lane_list.empty()) {
+    AERROR << "Expanded Lane list is empty";
+    return false;
+  }
+  std::string::size_type n = src_smoothed_file_name.rfind('.');
+  std::string prefix = src_smoothed_file_name.substr(0, n);
+  for (const auto& lane_points_info : expanded_lane_list) {
+    int index = lane_points_info.index;
+    std::string file_name =
+        prefix + "_" + std::to_string(lane_points_info.index) + ".smoothed";
+    ExpandedFileInfo expanded_file_info;
+    expanded_file_info.index = index;
+    expanded_file_info.file_name = file_name;
+    // Skip export source smoothed file
+    if (lane_points_info.index == right_lane_number) {
+      expanded_file_info.file_name = src_smoothed_file_name;
+      expanded_files->emplace_back(expanded_file_info);
+      continue;
+    }
+    if (!file_operator.Export(file_name, lane_points_info.points)) {
+      AERROR << "Expanded Lane list is empty";
+      return false;
+    }
+    expanded_files->emplace_back(expanded_file_info);
+  }
+  return true;
+}
+
+bool NavigationExpander::ExpandLane(
     const LanePoints& src_lane, const int left_lane_number,
     const int right_lane_number, const double lane_width,
     std::list<LanePointsInfo>* const dst_lane_list) {
