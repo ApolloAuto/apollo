@@ -65,10 +65,10 @@ class PredictorImu : public Predictor {
   apollo::common::Status Update() override;
 
  private:
-  bool WindowFilter(double timestamp_sec);
+  void ResamplingFilter();
+  void LPFilter();
 
  private:
-  double latest_timestamp_sec_;
   PoseList raw_imu_;
 };
 

@@ -23,7 +23,12 @@
 namespace apollo {
 namespace localization {
 
+using apollo::common::Point3D;
 using apollo::common::Status;
+
+namespace {
+constexpr double kSamplingInterval = 0.01;
+}  // namespace
 
 PredictorImu::PredictorImu(double memory_cycle_sec)
     : Predictor(memory_cycle_sec), raw_imu_(memory_cycle_sec) {
@@ -35,7 +40,8 @@ PredictorImu::~PredictorImu() {}
 
 bool PredictorImu::UpdateImu(const CorrectedImu& imu) {
   if (!imu.has_header() || !imu.header().has_timestamp_sec() ||
-      !imu.has_imu()) {
+      !imu.has_imu() || !imu.imu().has_linear_acceleration() ||
+      !imu.imu().has_angular_velocity()) {
     AERROR << "Message has not some feilds";
     return false;
   }
@@ -48,71 +54,82 @@ bool PredictorImu::UpdateImu(const CorrectedImu& imu) {
     return false;
   }
 
-  return WindowFilter(timestamp_sec);
+  return true;
 }
 
 bool PredictorImu::Updateable() const {
-  return !predicted_.empty() && predicted_.Newer(latest_timestamp_sec_);
+  if (predicted_.empty()) {
+    return !raw_imu_.empty();
+  } else {
+    return !predicted_.Newer(raw_imu_.Latest()->first - kSamplingInterval);
+  }
 }
 
 Status PredictorImu::Update() {
-  if (!predicted_.empty()) {
-    auto latest = predicted_.Latest();
-    latest_timestamp_sec_ = latest->first;
-  }
+  ResamplingFilter();
   return Status::OK();
 }
 
-bool PredictorImu::WindowFilter(double timestamp_sec) {
+void PredictorImu::ResamplingFilter() {
+  auto latest_it = predicted_.Latest();
+  if (latest_it == predicted_.end()) {
+    predicted_.Push(raw_imu_.begin()->first, raw_imu_.begin()->second);
+  } else {
+    auto timestamp_sec = latest_it->first + kSamplingInterval;
+    Pose pose;
+    raw_imu_.FindNearestPose(timestamp_sec, &pose);
+    predicted_.Push(timestamp_sec, pose);
+  }
+}
+
+void PredictorImu::LPFilter() {
+  double timestamp_sec;
+  Point3D x_0, x_1, x_2;
+  Point3D y_0, y_1, y_2;
   Pose pose;
-  pose.mutable_linear_acceleration()->set_x(0.0);
-  pose.mutable_linear_acceleration()->set_y(0.0);
-  pose.mutable_linear_acceleration()->set_z(0.0);
-  pose.mutable_angular_velocity()->set_x(0.0);
-  pose.mutable_angular_velocity()->set_y(0.0);
-  pose.mutable_angular_velocity()->set_z(0.0);
 
-  constexpr double kWindowSize = 0.20;
-  constexpr double kSamplingInterval = 0.01;
-  std::size_t count = 0;
-  for (auto t = timestamp_sec; t >= timestamp_sec - kWindowSize;
-       t -= kSamplingInterval) {
-    Pose sample;
-    raw_imu_.FindNearestPose(t, &sample);
-    pose.mutable_linear_acceleration()->set_x(pose.linear_acceleration().x() +
-                                              sample.linear_acceleration().x());
-    pose.mutable_linear_acceleration()->set_y(pose.linear_acceleration().y() +
-                                              sample.linear_acceleration().y());
-    pose.mutable_linear_acceleration()->set_z(pose.linear_acceleration().z() +
-                                              sample.linear_acceleration().z());
-    pose.mutable_angular_velocity()->set_x(pose.angular_velocity().x() +
-                                           sample.angular_velocity().x());
-    pose.mutable_angular_velocity()->set_y(pose.angular_velocity().y() +
-                                           sample.angular_velocity().y());
-    pose.mutable_angular_velocity()->set_z(pose.angular_velocity().z() +
-                                           sample.angular_velocity().z());
+  auto latest_it = predicted_.Latest();
+  if (latest_it == predicted_.end()) {
+    timestamp_sec = raw_imu_.begin()->first;
 
-    count++;
+    x_0 = x_1 = x_2 = raw_imu_.begin()->second.linear_acceleration();
+    y_1 = y_2 = x_2;
+    pose = raw_imu_.begin()->second;
+  } else {
+    timestamp_sec = latest_it->first + kSamplingInterval;
+
+    raw_imu_.FindNearestPose(timestamp_sec - 2.0 * kSamplingInterval, &pose);
+    x_2 = pose.linear_acceleration();
+    raw_imu_.FindNearestPose(timestamp_sec - kSamplingInterval, &pose);
+    x_1 = pose.linear_acceleration();
+    raw_imu_.FindNearestPose(timestamp_sec, &pose);
+    x_0 = pose.linear_acceleration();
+
+    if (predicted_.size() == 1) {
+      y_2 = x_2;
+    } else {
+      auto it_2 = latest_it;
+      it_2--;
+      y_2 = it_2->second.linear_acceleration();
+    }
+    y_1 = latest_it->second.linear_acceleration();
   }
 
-  pose.mutable_linear_acceleration()->set_x(pose.linear_acceleration().x() /
-                                            count);
-  pose.mutable_linear_acceleration()->set_y(pose.linear_acceleration().y() /
-                                            count);
-  pose.mutable_linear_acceleration()->set_z(pose.linear_acceleration().z() /
-                                            count);
-  pose.mutable_angular_velocity()->set_x(pose.angular_velocity().x() / count);
-  pose.mutable_angular_velocity()->set_y(pose.angular_velocity().y() / count);
-  pose.mutable_angular_velocity()->set_z(pose.angular_velocity().z() / count);
+  //  two-order Butterworth filter
+  auto but_filter = [](double x_0, double x_1, double x_2, double y_1,
+                       double y_2) {
+    constexpr double kBZ[3] = {0.024472, 0.048943, 0.024472};
+    constexpr double kAZ[3] = {1.2185, -1.9021, 0.78149};
+    return (kBZ[0] * x_0 + kBZ[1] * x_1 + kBZ[2] * x_2 - kAZ[1] * y_1 -
+            kAZ[2] * y_2) /
+           kAZ[0];
+  };
 
-  if (!predicted_.Push(timestamp_sec, pose)) {
-    AWARN << std::setprecision(15)
-          << "Failed push pose to list, with timestamp[" << timestamp_sec
-          << "]";
-    return false;
-  }
-
-  return true;
+  y_0.set_x(but_filter(x_0.x(), x_1.x(), x_2.x(), y_1.x(), y_2.x()));
+  y_0.set_y(but_filter(x_0.y(), x_1.y(), x_2.y(), y_1.y(), y_2.y()));
+  y_0.set_z(but_filter(x_0.z(), x_1.z(), x_2.z(), y_1.z(), y_2.z()));
+  pose.mutable_linear_acceleration()->CopyFrom(y_0);
+  predicted_.Push(timestamp_sec, pose);
 }
 
 }  // namespace localization
