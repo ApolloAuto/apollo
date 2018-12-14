@@ -33,6 +33,7 @@ from cyber_py.record import RecordReader
 kChassisInfoTopic = '/apollo/canbus/chassis'
 kHMIInfoTopic = '/apollo/hmi/status'
 
+
 class StaticInfoCalculator(object):
     """Stat static info."""
 
@@ -105,6 +106,7 @@ def main(path):
     # Output result, which might be None
     print 'vehicle_name:', calc.vehicle_name
     print 'vehicle_vin:', calc.vehicle_vin
+
 
 if __name__ == '__main__':
     main(sys.argv[1])

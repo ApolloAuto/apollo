@@ -35,8 +35,8 @@ from stitem import Stitem
 from xyitem import Xyitem
 
 VehicleLength = 2.85
-HistLine2display = 2  #The number of lines to display
-MaxSteerAngle = 470  #Maximum Steering Angle
+HistLine2display = 2  # The number of lines to display
+MaxSteerAngle = 470  # Maximum Steering Angle
 SteerRatio = 16
 WindowSize = 80
 
@@ -132,7 +132,8 @@ class Plotter(object):
             self.ax[0].new_carstatus(cartime, carx, cary, carheading,
                                      self.steer_angle, self.autodrive)
             self.ax[1].new_carstatus(cartime, self.carspeed, self.autodrive)
-            self.ax[2].new_carstatus(cartime, self.carcurvature, self.autodrive)
+            self.ax[2].new_carstatus(
+                cartime, self.carcurvature, self.autodrive)
 
             if self.ax[3].title == "Heading":
                 self.ax[3].new_carstatus(cartime, carheading, self.autodrive)

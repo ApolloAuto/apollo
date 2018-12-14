@@ -86,6 +86,7 @@ def GetDisks():
         sys.exit(1)
     return copy_from, copy_to
 
+
 def CollectEvents(bags):
     """Collect interested event timestamps."""
 
@@ -99,7 +100,7 @@ def CollectEvents(bags):
                 # For disengagement, take the message time as event time.
                 if topic == K_CHASSIS_TOPIC:
                     if (cur_driving_mode == Chassis.COMPLETE_AUTO_DRIVE and
-                        msg.driving_mode == Chassis.EMERGENCY_MODE):
+                            msg.driving_mode == Chassis.EMERGENCY_MODE):
                         events.append(t.to_sec())
                     cur_driving_mode = msg.driving_mode
                 # For DriveEvent, take the header time as event time.
@@ -107,6 +108,7 @@ def CollectEvents(bags):
                     events.append(msg.header.timestamp_sec)
     print('Collected {} events.'.format(len(events)))
     return events
+
 
 def SmartCopyBags(from_dir, to_dir):
     """Copy a task but filter useless sensor data."""
@@ -136,7 +138,7 @@ def SmartCopyBags(from_dir, to_dir):
                     next_event += 1
                 # For large size topics, only copy when it's near an event.
                 if (next_event < len(events) and events[next_event] - msg_sec <
-                    K_COPY_LARGE_SIZE_TOPICS_SECONDS_BEFORE_EVENT):
+                        K_COPY_LARGE_SIZE_TOPICS_SECONDS_BEFORE_EVENT):
                     bag_out.write(topic, msg, t)
 
 
@@ -192,7 +194,8 @@ def main():
     for src, dst in other_data_dirs.iteritems():
         if os.path.exists(src):
             print('Copying ', src)
-            shutil.copytree(src, os.path.join(copy_to, dst)
+            shutil.copytree(src, os.path.join(copy_to, dst))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
