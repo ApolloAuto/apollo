@@ -97,6 +97,13 @@ class TrajectorySmoother {
       std::vector<apollo::planning::ReferencePoint>* const smoothed_points);
 
   /**
+   * @brief Smooth the input points and output.
+   * @param smooth_length the smooth length.
+   * @return  Return true for success.
+   */
+  bool StepSmooth(const std::size_t smooth_length);
+
+  /**
    * @brief Determine whether to use Spiral to smooth.
    * @param points The input points.
    * @return  Return true for use Spiral.

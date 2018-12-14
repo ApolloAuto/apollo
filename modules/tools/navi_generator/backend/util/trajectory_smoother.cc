@@ -54,6 +54,8 @@ using apollo::planning::SpiralReferenceLineSmoother;
 namespace {
 constexpr double kMinDist = 1.0;
 constexpr double kMaximumPointKappa = 0.2;
+constexpr std::size_t kMinSmoothLength = 150;
+constexpr std::size_t kStepLength = 10;
 }  // namespace
 
 TrajectorySmoother::TrajectorySmoother() {
@@ -106,7 +108,7 @@ bool TrajectorySmoother::Import(const std::string& filename) {
   return true;
 }
 
-bool TrajectorySmoother::Smooth() {
+bool TrajectorySmoother::StepSmooth(const std::size_t smooth_length) {
   if (raw_points_.size() <= 2) {
     AERROR << "The original point size is " << raw_points_.size();
     return false;
@@ -158,6 +160,20 @@ bool TrajectorySmoother::Smooth() {
     }
   }
   return true;
+}
+
+bool TrajectorySmoother::Smooth() {
+  std::size_t smooth_length = traj_smoother_config_.smooth_length();
+  while (smooth_length > kMinSmoothLength) {
+    if (!StepSmooth(smooth_length)) {
+      AWARN << "Smooth failed with smooth length : " << smooth_length;
+      smooth_length -= kStepLength;
+    } else {
+      return true;
+    }
+  }
+  AERROR << "Smooth failed.";
+  return false;
 }
 
 bool TrajectorySmoother::Export(const std::string& filename) {
