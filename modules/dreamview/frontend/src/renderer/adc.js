@@ -18,16 +18,18 @@ const CAR_PROPERTIES = {
     },
 };
 
-const rssUnsafeMesh = drawImage(iconRssUnsafe, 1.5, 1.5, -1.25, 2.7, 0);
+const RSS_UNSAFE_MESH = drawImage(iconRssUnsafe, 1.5, 1.5);
+const RSS_UNSAFE_MARKER_OFFSET = {
+    x: 1,
+    y: 1,
+    z: 2.6
+};
 
 export default class AutoDrivingCar {
     constructor(name, scene) {
         this.mesh = null;
         this.name = name;
-        this.rssUnsafeMarker = new THREE.Object3D();
-        this.rssUnsafeMarker.add(rssUnsafeMesh);
-        this.rssUnsafeMarker.mesh = rssUnsafeMesh;
-        this.rssUnsafeMarker.visible = false;
+        this.rssUnsafeMarker = RSS_UNSAFE_MESH;
         scene.add(this.rssUnsafeMarker);
 
         const properties = CAR_PROPERTIES[name];
@@ -47,7 +49,7 @@ export default class AutoDrivingCar {
             });
     }
 
-    update(coordinates, pose, isRssSafe) {
+    update(coordinates, pose) {
         if (!this.mesh || !pose || !_.isNumber(pose.positionX) || !_.isNumber(pose.positionY)) {
             return;
         }
@@ -61,10 +63,15 @@ export default class AutoDrivingCar {
 
         this.mesh.position.set(position.x, position.y, 0);
         this.mesh.rotation.y = pose.heading;
+    }
+
+    updateRssMarker(isRssSafe) {
         this.rssUnsafeMarker.visible = false;
-        if (isRssSafe !== undefined && !isRssSafe && STORE.options.showPlanningRSSInfo) {
-            this.rssUnsafeMarker.position.set(position.x, position.y, 0.2);
-            this.rssUnsafeMarker.rotation.set(Math.PI / 2, pose.heading - Math.PI / 2, 0);
+        if (isRssSafe === false && STORE.options.showPlanningRSSInfo) {
+            this.rssUnsafeMarker.position.set(this.mesh.position.x + RSS_UNSAFE_MARKER_OFFSET.x,
+                                              this.mesh.position.y + RSS_UNSAFE_MARKER_OFFSET.y,
+                                              this.mesh.position.z + RSS_UNSAFE_MARKER_OFFSET.z);
+            this.rssUnsafeMarker.rotation.set(Math.PI / 2, this.mesh.rotation.y - Math.PI / 2, 0);
             this.rssUnsafeMarker.visible = true;
         }
     }
