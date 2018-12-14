@@ -87,6 +87,12 @@ class TopicsService {
   bool CorrectRoadDeviation();
   bool SaveRoadCorrection();
 
+  bool ModifySpeedLimit(const apollo::localization::msf::WGS84Corr &start_point,
+                        const apollo::localization::msf::WGS84Corr &end_point,
+                        const std::uint8_t new_speed_min,
+                        const std::uint8_t new_speed_max);
+  bool SaveSpeedLimit();
+
  private:
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;
