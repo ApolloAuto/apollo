@@ -156,6 +156,8 @@ void PoseList::InterpolatePose(double timestamp_sec1, const Pose &pose1,
           InterpolateXYZ(pose1.euler_angles(), pose2.euler_angles(), frac1);
       pose->mutable_euler_angles()->CopyFrom(val);
     }
+  } else {
+    pose->CopyFrom(pose1);
   }
 }
 
