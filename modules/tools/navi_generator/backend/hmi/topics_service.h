@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "modules/common/log.h"
+#include "modules/tools/navi_generator/backend/util/trajectory_collector.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_processor.h"
 #include "modules/tools/navi_generator/backend/webserver/navi_generator_websocket.h"
 
@@ -68,11 +69,24 @@ class TopicsService {
       const apollo::navi_generator::util::FileSegment &file_segment);
   bool SaveFilesToDatabase();
 
+  bool StartCollector(const std::string &collection_type,
+                      const std::size_t min_speed_limit,
+                      const std::size_t max_speed_limit);
+  bool StopCollector();
+  bool UpdateCollector(const std::string &collection_type,
+                       const std::size_t min_speed_limit,
+                       const std::size_t max_speed_limit);
+  bool GetCollectorOptions(const std::string &collection_type,
+                           const std::size_t min_speed_limit,
+                           const std::size_t max_speed_limit,
+                           util::CollectorOptions *const options);
+
  private:
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;
 
   std::unique_ptr<util::TrajectoryProcessor> trajectory_processor_;
+  std::unique_ptr<util::TrajectoryCollector> trajectory_collector_;
 };
 
 }  // namespace navi_generator

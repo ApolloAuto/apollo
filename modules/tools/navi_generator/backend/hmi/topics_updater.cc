@@ -49,19 +49,51 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestStartCollection",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): start collectting trajectories online
+        std::string collection_type;
+        std::size_t min_speed_limit;
+        std::size_t max_speed_limit;
+        if (!JsonUtil::GetStringFromJson(json, "collectionType",
+                                         &collection_type)) {
+          return;
+        }
+        if (!JsonUtil::GetNumberFromJson(json, "lowSpeedLimit",
+                                         &min_speed_limit)) {
+          return;
+        }
+        if (!JsonUtil::GetNumberFromJson(json, "highSpeedLimit",
+                                         &max_speed_limit)) {
+          return;
+        }
+        topicsService_.StartCollector(collection_type, min_speed_limit,
+                                      max_speed_limit);
       });
 
   websocket_->RegisterMessageHandler(
       "requestUpdateCollectionCondition",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): update collectting trajectories condition
+        std::string collection_type;
+        std::size_t min_speed_limit;
+        std::size_t max_speed_limit;
+        if (!JsonUtil::GetStringFromJson(json, "collectionType",
+                                         &collection_type)) {
+          return;
+        }
+        if (!JsonUtil::GetNumberFromJson(json, "lowSpeedLimit",
+                                         &min_speed_limit)) {
+          return;
+        }
+        if (!JsonUtil::GetNumberFromJson(json, "highSpeedLimit",
+                                         &max_speed_limit)) {
+          return;
+        }
+        topicsService_.UpdateCollector(collection_type, min_speed_limit,
+                                       max_speed_limit);
       });
 
   websocket_->RegisterMessageHandler(
       "requestFinishCollection",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): stop collectting trajectories
+        topicsService_.StopCollector();
       });
 
   websocket_->RegisterMessageHandler(
