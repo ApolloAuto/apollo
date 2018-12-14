@@ -139,5 +139,6 @@ def main():
     with rosbag.Bag(gflags.FLAGS.input_bag) as bag:
         process_bag(bag, gflags.FLAGS)
 
+
 if __name__ == '__main__':
     main()

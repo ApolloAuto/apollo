@@ -55,12 +55,14 @@ class EventDumper(object):
                     f.write(drive_event.event.encode('utf-8')+'\n')
             f.close()
 
+
 def main():
     """Main function."""
-    
+
     ed = EventDumper()
     for bag_file in sys.argv[1:]:
         ed.calculate(bag_file)
+
 
 if __name__ == '__main__':
     main()

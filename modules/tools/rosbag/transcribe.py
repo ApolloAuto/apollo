@@ -45,16 +45,14 @@ def transcribe(proto_msg):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description=
-        "A tool to transcribe received protobuf messages into text files")
+        description="A tool to transcribe received protobuf messages into text files")
     parser.add_argument(
         "topic", action="store", help="the topic that you want to transcribe.")
     parser.add_argument(
         "--out_dir",
         action="store",
         default='.',
-        help=
-        "the output directory for the dumped file, the default value is current directory"
+        help="the output directory for the dumped file, the default value is current directory"
     )
     g_args = parser.parse_args()
     if not os.path.exists(g_args.out_dir):
