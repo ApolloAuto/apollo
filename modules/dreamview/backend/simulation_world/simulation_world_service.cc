@@ -374,8 +374,8 @@ void SimulationWorldService::Update() {
   UpdateLatencies();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
-  world_.set_timestamp(static_cast<double>(
-       apollo::common::time::AsInt64<millis>(Clock::Now())));
+  world_.set_timestamp(
+      static_cast<double>(apollo::common::time::AsInt64<millis>(Clock::Now())));
 }
 
 void SimulationWorldService::UpdateDelays() {
@@ -854,6 +854,18 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
     planning_data->mutable_scenario()->CopyFrom(data.scenario());
   }
 
+  // Update init point
+  if (data.has_init_point()) {
+    auto &planning_path_point = data.init_point().path_point();
+    auto *world_obj_path_point =
+        planning_data->mutable_init_point()->mutable_path_point();
+    world_obj_path_point->set_x(planning_path_point.x() +
+                                map_service_->GetXOffset());
+    world_obj_path_point->set_y(planning_path_point.y() +
+                                map_service_->GetYOffset());
+    world_obj_path_point->set_theta(planning_path_point.theta());
+  }
+
   // Update Chart
   planning_data->mutable_chart()->CopyFrom(data.chart());
 
@@ -1190,10 +1202,10 @@ void SimulationWorldService::PublishRoutingRequest(
 }
 
 void SimulationWorldService::PublishMonitorMessage(
-  apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
-  const std::string &msg) {
-    monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
-    monitor_logger_buffer_.Publish();
+    apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+    const std::string &msg) {
+  monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
+  monitor_logger_buffer_.Publish();
 }
 }  // namespace dreamview
 }  // namespace apollo
