@@ -112,7 +112,7 @@ class RecordParser(object):
 
     def ProcessDriveEvent(self, msg):
         """Save DriveEvents."""
-        self.record.drive_events.add().ParseFromString(message)
+        self.record.drive_events.add().ParseFromString(msg)
 
     def ProcessChassis(self, msg):
         """Process Chassis, save disengagements."""
