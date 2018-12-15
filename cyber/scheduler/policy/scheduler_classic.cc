@@ -92,6 +92,14 @@ void SchedulerClassic::CreateProcessor() {
 bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
+  if (likely(id_cr_wl_.find(cr->id()) == id_cr_wl_.end())) {
+    {
+      std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
+      if (id_cr_wl_.find(cr->id()) == id_cr_wl_.end()) {
+        id_cr_wl_[cr->id()];
+      }
+    }
+  }
   std::lock_guard<std::mutex> lg(id_cr_wl_[cr->id()]);
 
   {
@@ -157,6 +165,14 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
 bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
+  if (unlikely(id_cr_wl_.find(crid) == id_cr_wl_.end())) {
+    {
+      std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
+      if (id_cr_wl_.find(crid) == id_cr_wl_.end()) {
+        id_cr_wl_[crid];
+      }
+    }
+  }
   std::lock_guard<std::mutex> lg(id_cr_wl_[crid]);
 
   std::shared_ptr<CRoutine> cr = nullptr;
