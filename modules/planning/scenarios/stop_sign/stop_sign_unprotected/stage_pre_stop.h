@@ -55,6 +55,9 @@ class StagePreStop : public Stage {
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
 
  private:
+  Stage::StageStatus FinishStage();
+
+ private:
   ScenarioStopSignUnprotectedConfig scenario_config_;
 };
 

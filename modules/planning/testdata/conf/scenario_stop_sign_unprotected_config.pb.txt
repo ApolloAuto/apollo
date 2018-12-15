@@ -92,7 +92,8 @@ stage_config: {
       speed_limit: 1.0
       max_valid_stop_distance: 0.4
       min_boundary_t: 6.0
-      max_tolerance_t: 0.5
+      ignore_max_min_t: 0.1
+      ignore_min_min_s: 15.0
     }
   }
   task_config: {
