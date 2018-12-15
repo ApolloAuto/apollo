@@ -237,6 +237,7 @@ Stage::StageStatus StageStop::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
+  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
   return Stage::FINISHED;
 }
 

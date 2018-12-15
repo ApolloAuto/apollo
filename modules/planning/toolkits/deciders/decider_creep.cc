@@ -37,6 +37,8 @@ using apollo::hdmap::PathOverlap;
 using apollo::hdmap::HDMapUtil;
 using apollo::common::math::Vec2d;
 
+uint32_t DeciderCreep::creep_clear_counter_ = 0;
+
 DeciderCreep::DeciderCreep(const TaskConfig& config) : Decider(config) {
   CHECK(config_.has_decider_creep_config());
   SetName("DeciderCreep");
@@ -128,24 +130,37 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
       }
       if (obstacle->reference_line_st_boundary().min_t() <
           creep_config.min_boundary_t()) {
+        const double kepsilon = 1e-6;
         double obstacle_traveled_s =
             obstacle->reference_line_st_boundary().BottomLeftPoint().s() -
             obstacle->reference_line_st_boundary().BottomRightPoint().s();
-        const double kepsilon = 1e-6;
+        ADEBUG << "obstacle[" << obstacle->Id()
+            << "] obstacle_st_min_t["
+            << obstacle->reference_line_st_boundary().min_t()
+            << "] obstacle_st_min_s["
+            << obstacle->reference_line_st_boundary().min_s()
+            << "] obstacle_traveled_s[" << obstacle_traveled_s << "]";
+
         // ignore the obstacle which is already on reference line and moving
         // along the direction of ADC
         if (obstacle_traveled_s < kepsilon &&
             obstacle->reference_line_st_boundary().min_t() <
-                creep_config.max_tolerance_t()) {
+                creep_config.ignore_max_min_t() &&
+            obstacle->reference_line_st_boundary().min_s() >
+                creep_config.ignore_min_min_s()) {
           continue;
         }
         all_far_away = false;
         break;
       }
     }
-    creep_done = all_far_away;
-  }
 
+    creep_clear_counter_ = all_far_away ? creep_clear_counter_ + 1 : 0;
+    if (creep_clear_counter_ >= 5) {
+      creep_clear_counter_ = 0;  // reset
+      creep_done = true;
+    }
+  }
   return creep_done;
 }
 
