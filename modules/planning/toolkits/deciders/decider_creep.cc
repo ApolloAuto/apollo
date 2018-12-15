@@ -145,9 +145,9 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
         // along the direction of ADC
         if (obstacle_traveled_s < kepsilon &&
             obstacle->reference_line_st_boundary().min_t() <
-                creep_config.ignore_max_min_t() &&
+                creep_config.ignore_max_st_min_t() &&
             obstacle->reference_line_st_boundary().min_s() >
-                creep_config.ignore_min_min_s()) {
+                creep_config.ignore_min_st_min_s()) {
           continue;
         }
         all_far_away = false;

@@ -13,8 +13,8 @@ message DeciderCreepConfig {
   optional double min_boundary_t = 4 [default = 6.0];  // second
   // tolerance min_t & min_s to ignore obstacles which are moving
   // on same direction of ADC while creeping
-  optional double ignore_max_min_t = 5 [default = 0.1];  // second
-  optional double ignore_min_min_s = 6 [default = 15.0];  // meter
+  optional double ignore_max_st_min_t = 5 [default = 0.1];  // second
+  optional double ignore_min_st_min_s = 6 [default = 15.0];  // meter
 }
 
 message RuleCrosswalkConfig {
