@@ -1,14 +1,14 @@
-# Migrate to Apollo 3.5 from old versions
+# Migrate to Apollo master from old versions
 
 ## Introduced Git-LFS
 
-In Apollo 3.5, we enabled [Git-LFS](https://git-lfs.github.com) as the storage
+In Apollo master, we enabled [Git-LFS](https://git-lfs.github.com) as the storage
 for large files, such as records, images, models, etc.
 
 *To make the most out of Git-LFS, we also revised the whole history of Apollo to
 move data files into the large-file-storage.*
 
-This makes the Apollo 3.5 more like a brand new repo, while NOT growing on top
+This makes the Apollo master more like a brand new repo, while NOT growing on top
 of Apollo 3.0, as they have different commit ID on almost each history commits.
 
 ### Why we are doing this
@@ -66,10 +66,10 @@ time in the long run.
    - Cherry-pick your work:
      `git cherry-pick <base_commit_of_your_work>...<HEAD_of_your_work>`
 
-1. Migrate your work to the same base commit in Apollo 3.5.
+1. Migrate your work to the same base commit in Apollo master.
 
    As we have revised the history, the ID of the base commit of your work
-   actually changed. Please find the equivalent commit in Apollo 3.5:
+   actually changed. Please find the equivalent commit in Apollo master:
 
    ```bash
    git log --pretty=oneline | grep "<commit meassge>"
