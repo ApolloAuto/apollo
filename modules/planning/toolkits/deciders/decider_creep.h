@@ -57,6 +57,7 @@ class DeciderCreep : public Decider {
 
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
+  static uint32_t creep_clear_counter_;
   common::TrajectoryPoint adc_planning_start_point_;
   hdmap::Lane curr_lane_;
 };
