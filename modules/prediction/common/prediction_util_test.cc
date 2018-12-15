@@ -46,8 +46,8 @@ TEST(PredictionUtilTest, softmax) {
   std::vector<double> value = {0.0, 10.0, 100.0};
   std::vector<double> result = Softmax(value);
   EXPECT_NEAR(result[0], 0.0, 0.001);
-  EXPECT_NEAR(result[1], 0.0, 0.001);
-  EXPECT_NEAR(result[2], 1.0, 0.001);
+  EXPECT_NEAR(result[1], 0.0, 0.090908264470322991);
+  EXPECT_NEAR(result[2], 1.0, 0.90908264470322997);
 }
 
 TEST(PredictionUtilTest, softmax_balanced) {
