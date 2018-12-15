@@ -146,6 +146,8 @@ Stage::StageStatus StageApproachObstacle::Process(
         GetContext()->scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
+    has_blocking_obstacle = true;
+    break;
   }
 
   if (!has_blocking_obstacle) {
