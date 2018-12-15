@@ -1092,6 +1092,7 @@ void Obstacle::BuildLaneGraph() {
       lane_seq_ptr->set_lane_s(lane.lane_s());
       lane_seq_ptr->set_lane_l(lane.lane_l());
       lane_seq_ptr->set_vehicle_on_lane(true);
+      SetLaneSequenceStopSign(lane_seq_ptr);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
     }
