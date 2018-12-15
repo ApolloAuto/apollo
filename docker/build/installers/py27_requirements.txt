@@ -13,13 +13,9 @@ python-gflags
 # Web utils.
 flask
 flask-cors
+gunicorn
 requests >= 2.18
 simplejson
-
-# ROS env.
-PyYAML
-catkin_pkg
-rospkg
 
 # Python tools
 plyvel == 0.9
@@ -28,5 +24,7 @@ pyproj
 shapely
 
 # Data format
+PyYAML
 h5py
+pytz
 utm
