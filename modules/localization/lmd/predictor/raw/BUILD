@@ -20,6 +20,9 @@ cc_library(
     deps = [
         ":localization_lmd_predictor_raw_base",
         "//modules/common:log",
+        "//modules/common/time",
+        "//modules/drivers/gnss/proto:imu_proto",
+        "//modules/localization/common:localization_common",
         "//modules/localization/proto:imu_proto",
     ],
 )

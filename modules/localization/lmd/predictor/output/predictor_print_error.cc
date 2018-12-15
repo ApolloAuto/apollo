@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <string>
 
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
@@ -31,21 +32,31 @@ using apollo::common::math::RotateAxis;
 
 namespace {
 constexpr double kPrintErrorInterval = 0.01;
+
+const std::string& PredictorGpsName() {
+  static const std::string name(kPredictorGpsName);
+  return name;
+}
+
+const std::string& PredictorOutputName() {
+  static const std::string name(kPredictorOutputName);
+  return name;
+}
 }  // namespace
 
 PredictorPrintError::PredictorPrintError(double memory_cycle_sec)
     : Predictor(memory_cycle_sec) {
   name_ = kPredictorPrintErrorName;
-  dep_predicteds_.emplace(kPredictorGpsName, PoseList(memory_cycle_sec));
-  dep_predicteds_.emplace(kPredictorOutputName, PoseList(memory_cycle_sec));
+  dep_predicteds_.emplace(PredictorGpsName(), PoseList(memory_cycle_sec));
+  dep_predicteds_.emplace(PredictorOutputName(), PoseList(memory_cycle_sec));
   on_adapter_thread_ = true;
 }
 
 PredictorPrintError::~PredictorPrintError() {}
 
 bool PredictorPrintError::Updateable() const {
-  const auto& gps = dep_predicteds_.find(kPredictorGpsName)->second;
-  const auto& output = dep_predicteds_.find(kPredictorOutputName)->second;
+  const auto& gps = dep_predicteds_.find(PredictorGpsName())->second;
+  const auto& output = dep_predicteds_.find(PredictorOutputName())->second;
   return !gps.empty() && !output.empty() &&
          (!has_latest_timestamp_sec_ ||
           latest_timestamp_sec_ + kPrintErrorInterval < DepsTimestamp());
@@ -62,10 +73,11 @@ Status PredictorPrintError::Update() {
   for (auto timestamp_sec = latest_timestamp_sec_;
        timestamp_sec + kPrintErrorInterval < deps_timestamp_sec;
        timestamp_sec += kPrintErrorInterval) {
-    const auto& output = dep_predicteds_[kPredictorOutputName];
+    const auto& output = dep_predicteds_[PredictorOutputName()];
     Pose pose;
-    output.FindMatchingPose(timestamp_sec, &pose);
-    PrintPoseError(timestamp_sec, pose);
+    if (output.FindMatchingPose(timestamp_sec, &pose)) {
+      PrintPoseError(timestamp_sec, pose);
+    }
   }
 
   latest_timestamp_sec_ = deps_timestamp_sec;
@@ -73,14 +85,14 @@ Status PredictorPrintError::Update() {
 }
 
 double PredictorPrintError::DepsTimestamp() const {
-  auto g_it = dep_predicteds_.find(kPredictorGpsName)->second.Latest();
-  auto o_it = dep_predicteds_.find(kPredictorOutputName)->second.Latest();
+  auto g_it = dep_predicteds_.find(PredictorGpsName())->second.Latest();
+  auto o_it = dep_predicteds_.find(PredictorOutputName())->second.Latest();
   return std::min(o_it->first, g_it->first);
 }
 
 void PredictorPrintError::PrintPoseError(double timestamp_sec,
                                          const Pose& pose) {
-  const auto& gps = dep_predicteds_[kPredictorGpsName];
+  const auto& gps = dep_predicteds_[PredictorGpsName()];
   Pose gps_pose;
   if (!gps.FindMatchingPose(timestamp_sec, &gps_pose)) {
     return;

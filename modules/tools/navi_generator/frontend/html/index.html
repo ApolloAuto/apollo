@@ -1,0 +1,440 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Navigation Line Generator</title>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'/>
+<link rel="stylesheet" type="text/css" href="css/index.css">
+<link rel="stylesheet" href="layui/css/layui.css"  media="all">
+<link rel="icon" href="icon.ico">
+<link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+<script type="text/javascript" src="http://api.map.baidu.com/getscript?v=3.0&ak=826e806b86676d155282de3d37188137&services=&t=20170220193356"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+</head>
+<body>
+ <div id="map-container">
+    <div id="left-side">
+        <ul>
+            <li class="pay active">
+                <div class="icon">
+                    <i class="layui-icon" style="font-size: 30px;">&#xe715;</i>
+                </div>
+                Editor
+            </li>
+            <li class="choose">
+                <div class="icon active">
+                    <i class="layui-icon" style="font-size: 30px;">&#xe653;</i>
+                </div>
+                Collector
+            </li>
+        </ul>
+    </div>
+    <div id="right-side">
+        <div id="first">
+          <div id="allmap"></div>
+          <div id="editor" class="layui-row layui-col-space1 tools">
+                <div class="layui-col-md2 card">
+                   <div class="card-header">
+                      <h2>Navigation Generation</h2>
+                   </div>
+                   <div class="status-display">
+                      <div class="button-box">
+                        <button id="mapFile" class="layui-btn" lay-submit="">
+                          Generate
+                        </button>
+                      </div>
+                      <div class="button-box">
+                        <button type="button" id="preserve" class="layui-btn layui-btn-disabled">
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                </div>
+
+                <!-- generate Files Select -->
+                <div id="generate" class="layui-col-md6 card" style="display: none">
+                  <i class="layui-icon closeFileWin" title="close">&#x1006;</i>
+                  <div class="layui-col-md5">
+                    <div class="layui-col-md12">
+                        <div class="card-header">
+                          <h2>Number of Adjacent Lanes</h2>
+                        </div>
+                        <form name="roadform" id="roadform" class="layui-form layui-form-pane" method="post" action="">
+                          <div class="layui-form-item" style="margin-bottom: 25px">
+                            <div>
+                              <label class="layui-form-label">Left</label>
+                              <div class="layui-input-inline">
+                                <input id="LeftRoad" name="LeftRoad" type="number" class="layui-input" autocomplete="off" lay-key="1" value="0">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="layui-form-item">
+                            <div>
+                              <label class="layui-form-label">Right</label>
+                              <div class="layui-input-inline">
+                                <input id="RightRoad" name="RightRoad" type="number" class="layui-input" autocomplete="off" lay-key="1" value="0">
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                    </div>
+                  </div>
+
+                  <div class="layui-col-md7 file-frame">
+                    <div class="layui-upload-list">
+                      <table class="layui-table">
+                        <thead>
+                          <tr><th>NO.</th>
+                          <th>File Name</th>
+                          <th>Status</th>
+                        </tr></thead>
+                        <tbody id="demoList"></tbody>
+                      </table>
+                    </div>
+                    <button type="button" class="layui-btn" id="testList">
+                      <a href="javascript:;" class="file">Select File
+                          <input type="file"  id="files" class="files" name="fileField" accept=".bag" multiple="multiple" title=" ">
+                      </a>
+                    </button>
+                    <button type="button" id="generateSubmit" class="layui-btn">
+                      Submit
+                    </button>
+                    <button id="generateCancel" type="button" class="layui-btn layui-btn-disabled">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+                <!-- Navigation Modification  -->
+                <div class="layui-col-md2 card">
+                   <div class="card-header">
+                      <h2>Navigation Modification</h2>
+                   </div>
+                   <div class="status-display">
+                      <div class="button-box">
+                        <button id="deviation" class="layui-btn button-right " lay-submit="">
+                          Modify
+                        </button>
+                      </div>
+                      <div class="button-box">
+                        <button id="deviationSave" class="layui-btn layui-btn-disabled " lay-submit="">
+                            Save
+                        </button>
+                      </div>
+                    </div>
+                </div>
+
+                <!-- modification  File Select -->
+                <div id="modification" class="layui-col-md6 card"  style="display: none">
+                  <i class="layui-icon closeFileWin" title="close">&#x1006;</i>
+                  <div class="layui-col-md5">
+                    <div class="layui-col-md12">
+                        <div class="card-header">
+                          <h2>Number of Adjacent Lanes</h2>
+                        </div>
+                        <form name="roadform" id="modificationform" class="layui-form layui-form-pane" method="post" action="">
+                          <div class="layui-form-item" style="margin-bottom: 25px">
+                            <div>
+                              <label class="layui-form-label">Left</label>
+                              <div class="layui-input-inline">
+                                <input id="modificationLeftRoad" name="modificationLeftRoad" type="number" class="layui-input" autocomplete="off" lay-key="1" value="0">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="layui-form-item">
+                            <div>
+                              <label class="layui-form-label">Right</label>
+                              <div class="layui-input-inline">
+                                <input id="modificationRightRoad" name="modificationRightRoad" type="number" class="layui-input" autocomplete="off" lay-key="1" value="0">
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                    </div>
+                  </div>
+
+                  <div class="layui-col-md7 file-frame">
+                    <div class="layui-upload-list">
+                      <table class="layui-table">
+                        <thead>
+                          <tr><th>NO.</th>
+                          <th>File Name</th>
+                          <th>Status</th>
+                        </tr></thead>
+                        <tbody id="modificationList"></tbody>
+                      </table>
+                    </div>
+                    <button type="button" class="layui-btn" id="testList">
+                      <a href="javascript:;" class="file">Select File
+                          <input type="file" class="files" id="modificationFiles" name="modificationFiles" accept=".bag" multiple="multiple" title=" ">
+                      </a>
+                    </button>
+                    <button type="button" id="modificationSubmit" class="layui-btn">
+                      Submit
+                    </button>
+                    <button type="button" id="modificationCancel" class="layui-btn layui-btn-disabled">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Speed Modification -->
+                <div class="layui-col-md2 card">
+                   <div class="card-header">
+                      <h2>Speed Modification</h2>
+                   </div>
+                   <div class="status-display">
+                      <div class="button-box">
+                        <button id="speed" class="layui-btn" lay-submit="">
+                            Modify
+                        </button>
+                      </div>
+                      <div class="button-box">
+                        <button id="speedSave" class="layui-btn layui-btn-disabled " lay-submit="">
+                            Save
+                        </button>
+                      </div>
+                    </div>
+                </div>
+                <!-- speed  Modification window-->
+                <div id="speedModification" class="layui-col-md4 card" style="display: none">
+                  <i class="layui-icon closeFileWin" title="close">&#x1006;</i>
+                  <div class="layui-col-md12">
+                    <div class="layui-col-md12">
+                        <div class="card-header">
+                          <h2>Modify Speed (km/h)</h2>
+                        </div>
+                        <form name="modifySpeedform" id="modifySpeedform" class="layui-form layui-form-pane button-box" method="post" action="">
+                          <input type="hidden" id="startPoint">
+                          <input type="hidden" id="endPoint">
+                          <div class="layui-form-item" style="margin-bottom: 0">
+                            <div class="layui-inline layui-modifySpeed">
+                              <label class="layui-form-label">Minimum</label>
+                              <div class="layui-input-inline">
+                                <input id="modify-minSpeed" name="modify-minSpeed" type="number" class="layui-input" autocomplete="off" lay-key="1" >
+                              </div>
+                            </div>
+                            <div class="layui-inline layui-modifySpeed">
+                              <label class="layui-form-label">Maximum</label>
+                              <div class="layui-input-inline">
+                                <input id="modify-maxSpeed" name="modify-maxSpeed" type="number" class="layui-input" autocomplete="off" lay-key="2" >
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                        <button type="button" id="speedSubmit" class="layui-btn">
+                          Submit
+                        </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="layui-col-md2 card">
+                   <div class="card-header">
+                      <h2>Navigation Display</h2>
+                   </div>
+                   <div class="status-display">
+                      <div class="button-box">
+                        <button id="route" class="layui-btn" lay-submit="">
+                            Route
+                        </button>
+                      </div>
+                      <div class="button-box">
+                        <button id="navigate" class="layui-btn button-right" lay-submit="">
+                          Navigate
+                        </button>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            <div id="collect" class="layui-row layui-col-space1 tools">
+                <div class="layui-col-md2 card">
+                  <div class="card-header">
+                    <h2>Hardware</h2>
+                  </div>
+                  <div class="card-content-column">
+                      <div class="status-display">
+                          <div class="name">GPS</div>
+                          <div class="status">
+                              <span>ERROR</span>
+                              <span class="status-icon"></span>
+                          </div>
+                      </div>
+                      <div class="status-display">
+                          <div class="name">CAN</div>
+                          <div class="status">
+                              <span>UNKNOWN</span>
+                              <span class="status-icon"></span>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+                <div class="layui-col-md2 card">
+                    <form  id="switchForm" class="layui-form" action="">
+                      <div class="card-header">
+                        <h2>Module</h2>
+                            <div id="allform"><input  type="checkbox" name="all" title="ALL" lay-skin="primary" lay-filter="allChoose"></div>
+                      </div>
+                      <div class="layui-form-item">
+                        <label class="layui-form-label">GPS</label>
+                        <div class="layui-input-block">
+                          <input type="checkbox" name="gps" lay-skin="switch" lay-text="ON|OFF" lay-filter="gps">
+                        </div>
+                      </div>
+                      <div class="layui-form-item">
+                        <label class="layui-form-label">CAN BUS</label>
+                        <div class="layui-input-block">
+                          <input type="checkbox" name="can" lay-skin="switch" lay-text="ON|OFF" lay-filter="can">
+                        </div>
+                      </div>
+                      <div class="layui-form-item">
+                        <label class="layui-form-label">Location</label>
+                        <div class="layui-input-block">
+                          <input type="checkbox" name="lacation" lay-skin="switch" lay-text="ON|OFF" lay-filter="lacation">
+                        </div>
+                      </div>
+                    </form>
+                </div>
+                <div class="layui-col-md8 card">
+                    <form id="radioForm" class="layui-form" action="">
+                        <div class="layui-col-md4 first-bapl">
+                            <div class="card-header">
+                                <h2>Collect Type</h2>
+                            </div>
+                            <div class="layui-inline">
+                                <div class="layui-input-inline input-min" style="width: 175px;">
+                                  <input type="radio" data-type="min" name="sex" lay-filter="first-input"  value="5" title="Every 5 min" checked>
+                                  <input type="radio" data-type="min" name="sex" lay-filter="first-input"  value="10" title="Every 10 min" >
+                                  <div class="input-radio">
+                                      <input type="radio" data-type="min" name="sex" lay-filter="collect" value="" title="Every" class="inputMinsex">
+                                      <input type="number" name="inputMin"  autocomplete="off"  value="" disabled="disabled"  class="layui-disabled inputMin layui-input left">
+                                      <div class="layui-form-mid layui-word-aux">min</div>
+                                  </div>
+
+                                </div>
+                                <div class="layui-input-inline input-km" style="width: 175px;">
+                                  <input type="radio" data-type="km" name="sex" lay-filter="first-input"  value="5" title="Every 5 km" >
+                                  <input type="radio" data-type="km" name="sex" lay-filter="first-input"  value="10" title="Every 10 km" >
+                                  <div class="input-radio">
+                                      <input type="radio" data-type="km" name="sex" lay-filter="collect" value="" title="Every" class="inputKmsex">
+                                      <input type="number" name="inputKm"  autocomplete="off" disabled="disabled" class="layui-disabled inputKm layui-input left">
+                                      <div class="layui-form-mid layui-word-aux">km</div>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md3 bapl speed minSpeed">
+                          <div class="card-header">
+                            <h2>Minimum Speed (km/h)</h2>
+                          </div>
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="30" title="30" checked>
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="40" title="40">
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="50" title="50">
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="60" title="60">
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="70" title="70">
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="80" title="80">
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="90" title="90">
+                          <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="minSpeed" value="100" title="100">
+                          <div class="input-radio">
+                              <input type="radio" name="minSpeed" data-type="minSpeed" lay-filter="collect" value="" class="inputMinSpeed">
+                              <input type="number" name="inputMinimum"  autocomplete="off" disabled="disabled" class="layui-disabled inputMinimum layui-input left">
+                          </div>
+                        </div>
+                        <div class="layui-col-md3 bapl speed maxSpeed">
+                          <div class="card-header">
+                            <h2>Maximum Speed (km/h)</h2>
+                          </div>
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="40" title="40" checked>
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="50" title="50">
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="60" title="60">
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="70" title="70">
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="80" title="80">
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="90" title="90">
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="100" title="100">
+                          <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="maxSpeed" value="110" title="110">
+                          <div class="input-radio">
+                              <input type="radio" name="maxSpeed" data-type="maxSpeed" lay-filter="collect" value="" class="inputMaxSpeed">
+                              <input type="number" name="inputMaximum"  autocomplete="off" disabled="disabled" class="layui-disabled inputMaximum layui-input left">
+                          </div>
+                        </div>
+                        <div class="layui-col-md2 bapl">
+                          <div class="card-header">
+                            <h2>Record Bag</h2>
+                          </div>
+                          <div class="layui-form-item">
+                            <div class="collection">
+                                <button class="layui-btn" lay-submit lay-filter="formStart">
+                                    <i class="layui-icon">&#xe652;</i> Start
+                                </button>
+                            </div>
+                            <div class="collection">
+                                <button class="layui-btn layui-btn-warm" lay-submit lay-filter="formChange">
+                                    <i class="layui-icon">&#xe669;</i> Change
+                                </button>
+                            </div>
+                            <div class="collection">
+                               <button type="reset" class="layui-btn layui-btn-primary" lay-submit lay-filter="formEnd">
+                               <i class="layui-icon">&#xe651;</i> End
+                               </button>
+                            </div>
+                          </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- position window -->
+  <div id="positionInfo" class="searchbox-content">
+    <div class="route-header">
+      <div class="searchbox-content-common route-tabs">Starting & End Points</div>
+      <div id="closeMarker" class="searchbox-content-button" title="关闭路线" data-tooltip="1"><i  class="layui-icon">&#x1006;</i></div>
+    </div>
+    <div class="routebox">
+      <div class="searchbox-content-common routebox-content">
+        <div class="routebox-inputs">
+          <div class="routebox-input route-start">
+            <div class="route-input-icon"></div>
+            <input autocomplete="off" maxlength="256" placeholder="Select a starting point on the map" class="route-start-input" type="text" value="">
+            <!-- <div class="input-clear" title="清空" style="display: block;"><i class="layui-icon">&#x1007;</i></div> -->
+          </div>
+          <div class="routebox-input route-end">
+            <div class="route-input-icon"></div>
+            <input autocomplete="off" maxlength="256" placeholder="Select a end point on the map" class="route-start-input" type="text" value="">
+            <!-- <div class="input-clear" title="清空" style="display: block;"><i class="layui-icon">&#x1007;</i></div> -->
+          </div>
+          </div>
+        </div>
+    </div>
+  </div>
+ </div>
+
+ <!-- Modify window -->
+ <div id="modifySpeed">
+   <form name="modifySpeedform" id="modifySpeedform" class="layui-form layui-form-pane" method="post" action="">
+   <input type="hidden" id="startPoint">
+   <input type="hidden" id="endPoint">
+    <div class="layui-form-item" style="margin-bottom: 0">
+      <div class="layui-inline layui-modifySpeed">
+        <label class="layui-form-label">Minimum</label>
+        <div class="layui-input-inline">
+          <input id="modify-minSpeed" name="modify-minSpeed" type="number" class="layui-input" autocomplete="off" lay-key="1" >
+        </div>
+      </div>
+      <div class="layui-inline layui-modifySpeed">
+        <label class="layui-form-label">Maximum</label>
+        <div class="layui-input-inline">
+          <input id="modify-maxSpeed" name="modify-maxSpeed" type="number" class="layui-input" autocomplete="off" lay-key="2" >
+        </div>
+      </div>
+    </div>
+  </form>
+ </div>
+</body>
+<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/config.js"></script>
+<script type="text/javascript" src="js/resolver.js"></script>
+
+
+</html>

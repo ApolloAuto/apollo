@@ -15,16 +15,16 @@
  *****************************************************************************/
 
 /**
- * @file predictor.h
+ * @file predictor_imu.h
  * @brief The class of PredictorImu.
  */
 
 #ifndef MODULES_LOCALIZATION_LMD_PREDICTOR_RAW_PREDICTOR_IMU_H_
 #define MODULES_LOCALIZATION_LMD_PREDICTOR_RAW_PREDICTOR_IMU_H_
 
-#include "modules/localization/proto/imu.pb.h"
-
+#include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/lmd/predictor/predictor.h"
+#include "modules/localization/proto/imu.pb.h"
 
 /**
  * @namespace apollo::localization
@@ -51,8 +51,15 @@ class PredictorImu : public Predictor {
   bool UpdateImu(const CorrectedImu& imu);
 
   /**
-   * @brief Overrided implementation of the virtual function "Updateable" in the
-   * base class "Predictor".
+   * @brief Update poses from raw imu.
+   * @param imu The message from raw imu.
+   * @return True if success; false if not needed.
+   */
+  bool UpdateRawImu(const apollo::drivers::gnss::Imu& imu);
+
+  /**
+   * @brief Overrided implementation of the virtual function "Updateable" in
+   * the base class "Predictor".
    * @return True if yes; no otherwise.
    */
   bool Updateable() const override;
@@ -65,11 +72,14 @@ class PredictorImu : public Predictor {
   apollo::common::Status Update() override;
 
  private:
-  bool WindowFilter(double timestamp_sec);
+  void ResamplingFilter();
+  void InitLPFilter(double cutoff_freq);
+  void LPFilter();
 
  private:
-  double latest_timestamp_sec_;
   PoseList raw_imu_;
+  double iir_filter_bz_[3];
+  double iir_filter_az_[3];
 };
 
 }  // namespace localization
