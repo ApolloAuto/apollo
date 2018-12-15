@@ -286,7 +286,7 @@ std::vector<double> JunctionMLPEvaluator::ComputeProbability(
       layer_output.push_back(neuron_output);
     }
     if (layer.layer_activation_func() == Layer::SOFTMAX) {
-      layer_output = apollo::prediction::math_util::Softmax(layer_output);
+      layer_output = apollo::prediction::math_util::Softmax(layer_output, false);
     }
   }
   return layer_output;

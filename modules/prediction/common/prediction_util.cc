@@ -42,11 +42,14 @@ double Sigmoid(const double value) {
 
 double Relu(const double value) { return (value > 0.0) ? value : 0.0; }
 
-std::vector<double> Softmax(const std::vector<double>& value) {
+std::vector<double> Softmax(const std::vector<double>& value, bool use_exp) {
   std::vector<double> result;
   double sum = 0.0;
   for (std::size_t i = 0; i < value.size(); ++i) {
     double exp_value = std::max(0.001, value[i]);
+    if (use_exp) {
+      exp_value = std::exp(value[i]);
+    }
     sum += exp_value;
     result.push_back(exp_value);
   }
