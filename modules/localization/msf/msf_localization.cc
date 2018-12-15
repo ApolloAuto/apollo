@@ -105,11 +105,8 @@ void MSFLocalization::InitParams() {
     double qz = 0.0;
     double qw = 0.0;
 
-    std::string vehicle_imu_file =
-        common::util::TranslatePath(FLAGS_vehicle_imu_file);
-    AINFO << "Vehile imu file: " << vehicle_imu_file;
-
-    if (LoadImuVehicleExtrinsic(vehicle_imu_file, &qx, &qy, &qz, &qw)) {
+    AINFO << "Vehile imu file: " << FLAGS_vehicle_imu_file;
+    if (LoadImuVehicleExtrinsic(FLAGS_vehicle_imu_file, &qx, &qy, &qz, &qw)) {
       imu_vehicle_quat_.x() = qx;
       imu_vehicle_quat_.y() = qy;
       imu_vehicle_quat_.z() = qz;
@@ -143,13 +140,12 @@ void MSFLocalization::InitParams() {
     double uncertainty_x = 0.0;
     double uncertainty_y = 0.0;
     double uncertainty_z = 0.0;
-    std::string ant_imu_leverarm_file =
-        common::util::TranslatePath(FLAGS_ant_imu_leverarm_file);
-    AERROR << "Ant imu lever arm file: " << ant_imu_leverarm_file;
-    CHECK(LoadGnssAntennaExtrinsic(ant_imu_leverarm_file, &offset_x, &offset_y,
-                                   &offset_z, &uncertainty_x, &uncertainty_y,
+    AINFO << "Ant imu lever arm file: " << FLAGS_ant_imu_leverarm_file;
+    CHECK(LoadGnssAntennaExtrinsic(FLAGS_ant_imu_leverarm_file,
+                                   &offset_x, &offset_y, &offset_z,
+                                   &uncertainty_x, &uncertainty_y,
                                    &uncertainty_z));
-    localization_param_.ant_imu_leverarm_file = ant_imu_leverarm_file;
+    localization_param_.ant_imu_leverarm_file = FLAGS_ant_imu_leverarm_file;
 
     localization_param_.imu_to_ant_offset.offset_x = offset_x;
     localization_param_.imu_to_ant_offset.offset_y = offset_y;
