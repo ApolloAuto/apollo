@@ -18,7 +18,6 @@
 // It is supposed to be
 // used for verifying if the parser works properly.
 
-#include <ros/ros.h>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -30,10 +29,6 @@
 #include "modules/drivers/gnss/parser/data_parser.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/drivers/gnss/stream/stream.h"
-
-#include "ros/include/rosbag/bag.h"
-#include "ros/include/rosbag/view.h"
-#include "ros/include/std_msgs/String.h"
 
 namespace apollo {
 namespace drivers {
@@ -49,21 +44,6 @@ void ParseBin(const char* filename, DataParser* parser) {
     f.read(b, BUFFER_SIZE);
     std::string msg(reinterpret_cast<const char*>(b), f.gcount());
     parser->ParseRawData(msg);
-  }
-}
-
-void ParseBag(const char* filename, DataParser* parser) {
-  rosbag::Bag bag;
-  bag.open(filename, rosbag::bagmode::Read);
-
-  std::vector<std::string> topics = {"/apollo/sensor/gnss/raw_data"};
-  rosbag::View view(bag, rosbag::TopicQuery(topics));
-  for (auto const m : view) {
-    std_msgs::String::ConstPtr msg = m.instantiate<std_msgs::String>();
-    if (msg != nullptr) {
-      parser->ParseRawData(msg->data);
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(2));
   }
 }
 
@@ -91,9 +71,7 @@ void Parse(const char* filename, const char* file_type,
   }
   DataParser* parser = new DataParser(config, node);
   parser->Init();
-  if (type == "bag") {
-    ParseBag(filename, parser);
-  } else if (type == "bin") {
+  if (type == "bin") {
     ParseBin(filename, parser);
   } else if (type == "record") {
     ParseRecord(filename, parser);

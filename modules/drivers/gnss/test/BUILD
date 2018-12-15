@@ -9,7 +9,6 @@ cc_binary(
         "//cyber",
         "//external:gflags",
         "//modules/drivers/gnss/stream:gnss_stream",
-        "@ros//:ros_common",
     ],
 )
 
