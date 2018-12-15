@@ -19,13 +19,12 @@
 
 import datetime
 import math
-import os
 import pytz
 import sys
 
 import gflags
 
-from modules.canbus.proto.chassis_pb2 import Chassis
+from modules.common.proto.drive_event_pb2 import DriveEvent
 
 gflags.DEFINE_string('timezone', 'America/Los_Angeles', 'Timezone.')
 
@@ -98,6 +97,11 @@ def readable_data_size(num):
     return "%.2f %s" % (num, 'YB')
 
 
+def drive_event_type_name(event_type):
+    """Convert DriveEvent type to name."""
+    return DriveEvent.Type.Name(event_type)
+
+
 # To be registered into jinja2 templates.
 utils = {
     'draw_disengagements_on_gmap': draw_disengagements_on_gmap,
@@ -105,4 +109,5 @@ utils = {
     'readable_data_size': readable_data_size,
     'timestamp_to_time': timestamp_to_time,
     'timestamp_ns_to_time': timestamp_ns_to_time,
+    'drive_event_type_name': drive_event_type_name,
 }

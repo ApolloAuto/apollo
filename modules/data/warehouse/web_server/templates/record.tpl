@@ -111,6 +111,7 @@
 </div>
 {% endif %}
 
+{% if record.disengagements %}
 <div class="panel panel-default">
   <div class="panel-heading">Disengagements</div>
   <div class="panel-body">
@@ -134,6 +135,35 @@
     </table>
   </div>
 </div>
+{% endif %}
+
+{% if record.drive_events %}
+<div class="panel panel-default">
+  <div class="panel-heading">Drive Events</div>
+  <div class="panel-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Offset</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in record.drive_events %}
+          <tr>
+            <td>{{ event.header.timestamp_sec | timestamp_to_time }}</td>
+            <td>{% for type in event.type %} {{ type | drive_event_type_name }} {% endfor %}</td>
+            <td>{{ event.event }}</td>
+            <td>{{ (event.header.timestamp_sec - record.header.begin_time / 1000000000.0) | round(1) }} s</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
 
 <div class="panel panel-default">
   <div class="panel-heading">Channels</div>
