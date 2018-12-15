@@ -107,17 +107,17 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   std::vector<double> opt_y_;
 
-  std::size_t num_of_variables_ = 0;
+  size_t num_of_variables_ = 0;
 
-  std::size_t num_of_constraints_ = 0;
+  size_t num_of_constraints_ = 0;
 
-  std::size_t nnz_jac_g_ = 0;
+  size_t nnz_jac_g_ = 0;
 
-  std::size_t nnz_h_lag_ = 0;
+  size_t nnz_h_lag_ = 0;
 
-  std::size_t num_of_points_ = 0;
+  size_t num_of_points_ = 0;
 
-  std::map<std::pair<std::size_t, std::size_t>, std::size_t> idx_map_;
+  std::map<std::pair<size_t, size_t>, size_t> idx_map_;
 
   void hessian_strcuture();
 

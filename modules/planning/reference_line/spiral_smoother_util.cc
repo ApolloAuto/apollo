@@ -48,7 +48,7 @@ class SpiralSmootherUtil {
         FLAGS_minimum_point_spacing;
 
     while (std::getline(ifs, point_str)) {
-      std::size_t idx = point_str.find(',');
+      size_t idx = point_str.find(',');
       if (idx == std::string::npos) {
         continue;
       }
@@ -142,7 +142,7 @@ class SpiralSmootherUtil {
     }
     ofs.precision(12);
     // skip the first point and the last point
-    for (std::size_t i = 1; i + 1 < smoothed_points.size(); ++i) {
+    for (size_t i = 1; i + 1 < smoothed_points.size(); ++i) {
       const auto& point = smoothed_points[i];
       ofs << std::fixed << "{\"kappa\": " << point.kappa()
           << ", \"s\": " << point.s()

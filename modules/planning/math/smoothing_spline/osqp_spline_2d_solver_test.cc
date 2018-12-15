@@ -56,7 +56,7 @@ TEST(OSQPSolverTest, solver_test_01) {
   std::vector<double> angle;
   std::vector<Vec2d> ref_point;
 
-  for (std::size_t i = 0; i < 11; ++i) {
+  for (size_t i = 0; i < 11; ++i) {
     angle.push_back(constraint_data[i][0]);
     Vec2d prev_point(constraint_data[i][1], constraint_data[i][2]);
 

@@ -28,7 +28,7 @@ PiecewisePolySpeedProfile::PiecewisePolySpeedProfile(
     : curve_(curve) {}
 
 PiecewisePolySpeedProfile::PiecewisePolySpeedProfile(
-    const PiecewisePolySpeedCurve& curve, const std::size_t num_eval_points)
+    const PiecewisePolySpeedCurve& curve, const size_t num_eval_points)
     : curve_(curve) {
   curve_.SampleSpeedPoints(num_eval_points, &eval_points_);
 }
@@ -45,7 +45,7 @@ void PiecewisePolySpeedProfile::set_collision(const bool collision) {
 }
 
 void PiecewisePolySpeedProfile::GeneratePoints(
-    const std::size_t num_eval_points) {
+    const size_t num_eval_points) {
   curve_.SampleSpeedPoints(num_eval_points, &eval_points_);
 }
 

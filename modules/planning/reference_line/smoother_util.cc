@@ -50,7 +50,7 @@ class SmootherUtil {
     std::ifstream ifs(filename.c_str(), std::ifstream::in);
     std::string point_str;
     while (std::getline(ifs, point_str)) {
-      std::size_t idx = point_str.find(',');
+      size_t idx = point_str.find(',');
       if (idx == std::string::npos) {
         continue;
       }
@@ -69,7 +69,7 @@ class SmootherUtil {
       AERROR << "the original point size is " << raw_points_.size();
       return false;
     }
-    std::size_t i = 1;
+    size_t i = 1;
     {
       std::vector<ReferencePoint> ref_points;
       double s = 0.0;
@@ -96,7 +96,7 @@ class SmootherUtil {
     }
     for (; i < raw_points_.size(); ++i) {
       double s = 0.0;
-      std::size_t j = ref_points_.size() - 1;
+      size_t j = ref_points_.size() - 1;
       while (j > 0 && s < FLAGS_smooth_length / 2.0) {
         s += DistanceXY(ref_points_[j - 1], ref_points_[j]);
         --j;
@@ -148,7 +148,7 @@ class SmootherUtil {
     ofs.precision(6);
     double s = 0.0;
     // skip the first point and the last point
-    for (std::size_t i = 1; i + 1 < ref_points_.size(); ++i) {
+    for (size_t i = 1; i + 1 < ref_points_.size(); ++i) {
       const auto& point = ref_points_[i];
       ofs << std::fixed << "{\"kappa\": " << point.kappa() << ", \"s\": " << s
           << ", \"theta\": " << point.heading() << ", \"x\":" << point.x()

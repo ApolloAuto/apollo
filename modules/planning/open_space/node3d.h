@@ -50,14 +50,14 @@ class Node3d {
   Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
   double GetCost() { return traj_cost_ + heuristic_cost_; }
   double GetTrajCost() { return traj_cost_; }
-  std::size_t GetGridX() { return x_grid_; }
-  std::size_t GetGridY() { return y_grid_; }
-  std::size_t GetGridPhi() { return phi_grid_; }
+  size_t GetGridX() { return x_grid_; }
+  size_t GetGridY() { return y_grid_; }
+  size_t GetGridPhi() { return phi_grid_; }
   double GetX() { return x_; }
   double GetY() { return y_; }
   double GetPhi() { return phi_; }
   bool operator==(const std::shared_ptr<Node3d> right) const;
-  std::size_t GetIndex() { return index_; }
+  size_t GetIndex() { return index_; }
   bool GetDirec() { return direction_; }
   double GetSteer() { return steering_; }
   std::shared_ptr<Node3d> GetPreNode() { return pre_node_; }
@@ -77,10 +77,10 @@ class Node3d {
   std::vector<double> traversed_x_;
   std::vector<double> traversed_y_;
   std::vector<double> traversed_phi_;
-  std::size_t x_grid_ = 0;
-  std::size_t y_grid_ = 0;
-  std::size_t phi_grid_ = 0;
-  std::size_t index_ = 0;
+  size_t x_grid_ = 0;
+  size_t y_grid_ = 0;
+  size_t phi_grid_ = 0;
+  size_t index_ = 0;
   double traj_cost_ = 0.0;
   double heuristic_cost_ = 0.0;
   double cost_ = 0.0;

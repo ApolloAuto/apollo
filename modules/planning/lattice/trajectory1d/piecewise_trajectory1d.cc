@@ -33,8 +33,8 @@ double PiecewiseTrajectory1d::Evaluate(const std::uint32_t order,
                                    accumulated_param_lengths_.end(), param);
   CHECK(it_lower != accumulated_param_lengths_.end());
 
-  std::size_t index =
-      (std::size_t)(it_lower - accumulated_param_lengths_.begin());
+  size_t index =
+      (size_t)(it_lower - accumulated_param_lengths_.begin());
 
   double param_overhead = 0.0;
   if (index != 0) {
@@ -102,7 +102,7 @@ void PiecewiseTrajectory1d::PopSegment() {
   accumulated_param_lengths_.pop_back();
 }
 
-std::size_t PiecewiseTrajectory1d::NumOfSegments() const {
+size_t PiecewiseTrajectory1d::NumOfSegments() const {
   return trajectory_segments_.size();
 }
 

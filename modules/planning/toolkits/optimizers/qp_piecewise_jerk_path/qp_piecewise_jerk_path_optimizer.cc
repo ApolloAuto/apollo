@@ -90,7 +90,7 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
 
   // expand by road'sl or lane's l
   double accumulated_s = start_s;
-  for (std::size_t i = 0; i < lateral_bounds.size();
+  for (size_t i = 0; i < lateral_bounds.size();
        ++i, accumulated_s += qp_delta_s) {
     double left = 0.0;
     double right = 0.0;

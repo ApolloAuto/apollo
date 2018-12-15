@@ -60,7 +60,7 @@ class TrajectoryEvaluator {
 
   bool has_more_trajectory_pairs() const;
 
-  std::size_t num_of_trajectory_pairs() const;
+  size_t num_of_trajectory_pairs() const;
 
   std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>
   next_top_trajectory_pair();

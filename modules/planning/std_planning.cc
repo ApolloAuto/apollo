@@ -38,7 +38,6 @@
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
 
-
 namespace apollo {
 namespace planning {
 
@@ -187,8 +186,7 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
 void StdPlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
 
-  const auto& vehicle_state =
-      VehicleStateProvider::Instance()->vehicle_state();
+  const auto& vehicle_state = VehicleStateProvider::Instance()->vehicle_state();
   const double max_t = FLAGS_fallback_total_time;
   const double unit_t = FLAGS_fallback_time_unit;
 
@@ -372,8 +370,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
 
   frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
   if (FLAGS_enable_planning_smoother) {
-    planning_smoother_.Smooth(FrameHistory::Instance(),
-                              frame_.get(),
+    planning_smoother_.Smooth(FrameHistory::Instance(), frame_.get(),
                               trajectory_pb);
   }
 
@@ -481,7 +478,8 @@ Status StdPlanning::Plan(
 
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(
-        stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+        std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
+                                     stitching_trajectory.end() - 1));
   }
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
