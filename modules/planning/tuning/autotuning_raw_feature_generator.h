@@ -33,7 +33,7 @@ class AutotuningRawFeatureGenerator {
  public:
   // @brief class constructor
   AutotuningRawFeatureGenerator(const double time_range,
-                                const std::size_t num_points,
+                                const size_t num_points,
                                 const ReferenceLineInfo& reference_line_info,
                                 const Frame& frame,
                                 const SpeedLimit& speed_limit);
@@ -80,7 +80,7 @@ class AutotuningRawFeatureGenerator {
                                       const double speed);
 
   common::Status EvaluateSpeedPoint(const common::SpeedPoint& speed_point,
-                                    const std::size_t index,
+                                    const size_t index,
                                     autotuning::TrajectoryPointRawFeature* const
                                         trajectory_point_feature) const;
 

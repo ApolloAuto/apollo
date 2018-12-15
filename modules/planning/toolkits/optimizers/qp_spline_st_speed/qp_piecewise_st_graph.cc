@@ -272,7 +272,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
       kernel_cruise_ref->mutable_cruise_line_s()->Add(cruise_[i]);
     }
   }
-  for (std::size_t i = 0; i < t_evaluated_.size(); ++i) {
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
     ADEBUG << "Cruise Ref S: " << cruise_[i]
            << " Relative time: " << t_evaluated_[i] << std::endl;
   }
@@ -331,7 +331,7 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
                                qp_st_speed_config_.total_time());
   }
 
-  for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
+  for (size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
     ADEBUG << "Follow Ref S: " << ref_s[i]
            << " Relative time: " << filtered_evaluate_t[i] << std::endl;
   }

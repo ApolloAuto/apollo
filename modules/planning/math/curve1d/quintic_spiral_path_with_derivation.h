@@ -32,7 +32,7 @@
 namespace apollo {
 namespace planning {
 
-template <std::size_t N>
+template <size_t N>
 class QuinticSpiralPathWithDerivation : public QuinticPolynomialCurve1d {
  public:
   QuinticSpiralPathWithDerivation() = default;
@@ -48,31 +48,31 @@ class QuinticSpiralPathWithDerivation : public QuinticPolynomialCurve1d {
 
   virtual ~QuinticSpiralPathWithDerivation() = default;
 
-  double evaluate(const std::size_t order,
-      const std::size_t i, const std::size_t n);
+  double evaluate(const size_t order,
+      const size_t i, const size_t n);
 
   double ComputeCartesianDeviationX() const { return dx_; }
 
   double ComputeCartesianDeviationY() const { return dy_; }
 
   std::pair<double, double> DeriveCartesianDeviation(
-      const std::size_t param_index);
+      const size_t param_index);
 
-  double DeriveKappaDerivative(const std::size_t param_index,
+  double DeriveKappaDerivative(const size_t param_index,
       const int i, const int n);
 
-  double DeriveDKappaDerivative(const std::size_t param_index,
+  double DeriveDKappaDerivative(const size_t param_index,
       const int i, const int n);
 
-  static const std::size_t THETA0 = 0;
-  static const std::size_t KAPPA0 = 1;
-  static const std::size_t DKAPPA0 = 2;
-  static const std::size_t THETA1 = 3;
-  static const std::size_t KAPPA1 = 4;
-  static const std::size_t DKAPPA1 = 5;
-  static const std::size_t DELTA_S = 6;
+  static const size_t THETA0 = 0;
+  static const size_t KAPPA0 = 1;
+  static const size_t DKAPPA0 = 2;
+  static const size_t THETA1 = 3;
+  static const size_t KAPPA1 = 4;
+  static const size_t DKAPPA1 = 5;
+  static const size_t DELTA_S = 6;
 
-  static const std::size_t INDEX_MAX = 7;
+  static const size_t INDEX_MAX = 7;
 
   double ComputeCartesianDeviationX(const double s) const {
     auto cos_theta = [this](const double s) {
@@ -92,27 +92,27 @@ class QuinticSpiralPathWithDerivation : public QuinticPolynomialCurve1d {
 
  private:
   double DeriveCosTheta(
-      const std::size_t param_index,
+      const size_t param_index,
       const double r) const;
 
   double DeriveSinTheta(
-      const std::size_t param_index,
+      const size_t param_index,
       const double r) const;
 
   double DeriveThetaDerivative(
-      const std::size_t param_index,
+      const size_t param_index,
       const double r) const;
 
   std::array<std::array<double, 7>, 6> coef_deriv_;
 
-  std::unordered_map<std::size_t, double> cache_evaluate_;
+  std::unordered_map<size_t, double> cache_evaluate_;
 
-  std::unordered_map<std::size_t, std::pair<double, double>>
+  std::unordered_map<size_t, std::pair<double, double>>
   cache_cartesian_deriv_;
 
-  std::unordered_map<std::size_t, double> cache_kappa_deriv_;
+  std::unordered_map<size_t, double> cache_kappa_deriv_;
 
-  std::unordered_map<std::size_t, double> cache_dkappa_deriv_;
+  std::unordered_map<size_t, double> cache_dkappa_deriv_;
 
   double dx_ = 0.0;
 
@@ -123,7 +123,7 @@ class QuinticSpiralPathWithDerivation : public QuinticPolynomialCurve1d {
   std::array<double, N> gauss_point_weights_;
 };
 
-template<std::size_t N>
+template<size_t N>
 QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
     const double x0, const double dx0, const double ddx0, const double x1,
     const double dx1, const double ddx1, const double s) :
@@ -144,8 +144,8 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
   double s5 = s2 * s3;
   double s6 = s3 * s3;
 
-  for (std::size_t i = 0; i < 6; ++i) {
-    for (std::size_t j = 0; j < 7; ++j) {
+  for (size_t i = 0; i < 6; ++i) {
+    for (size_t j = 0; j < 7; ++j) {
       coef_deriv_[i][j] = 0.0;
     }
   }
@@ -198,7 +198,7 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
   coef_deriv_[0][0] = 1.0;
 }
 
-template<std::size_t N>
+template<size_t N>
 QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
     const std::array<double, 3>& start, const std::array<double, 3>& end,
     const double delta_s) :
@@ -206,9 +206,9 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
         end[1], end[2], delta_s) {
 }
 
-template<std::size_t N>
+template<size_t N>
 double QuinticSpiralPathWithDerivation<N>::evaluate(
-    const std::size_t order, const std::size_t i, const std::size_t n) {
+    const size_t order, const size_t i, const size_t n) {
   auto key = order * 100 + n * 10 + i;
   if (cache_evaluate_.find(key) != cache_evaluate_.end()) {
     return cache_evaluate_[key];
@@ -219,10 +219,10 @@ double QuinticSpiralPathWithDerivation<N>::evaluate(
   return res;
 }
 
-template<std::size_t N>
+template<size_t N>
 std::pair<double, double>
 QuinticSpiralPathWithDerivation<N>::DeriveCartesianDeviation(
-    const std::size_t param_index) {
+    const size_t param_index) {
 
   if (cache_cartesian_deriv_.find(param_index)
       != cache_cartesian_deriv_.end()) {
@@ -234,7 +234,7 @@ QuinticSpiralPathWithDerivation<N>::DeriveCartesianDeviation(
 
   std::pair<double, double> cartesian_deviation = {0.0, 0.0};
   if (param_index != DELTA_S) {
-    for (std::size_t i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       double r = 0.5 * g[i] + 0.5;
       cartesian_deviation.first += w[i] * DeriveCosTheta(param_index, r);
       cartesian_deviation.second += w[i] * DeriveSinTheta(param_index, r);
@@ -243,7 +243,7 @@ QuinticSpiralPathWithDerivation<N>::DeriveCartesianDeviation(
     cartesian_deviation.first *= param_ * 0.5;
     cartesian_deviation.second *= param_ * 0.5;
   } else {
-    for (std::size_t i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       double r = 0.5 * g[i] + 0.5;
       cartesian_deviation.first += w[i] * DeriveCosTheta(param_index, r);
       cartesian_deviation.second += w[i] * DeriveSinTheta(param_index, r);
@@ -252,7 +252,7 @@ QuinticSpiralPathWithDerivation<N>::DeriveCartesianDeviation(
     cartesian_deviation.first *= param_ * 0.5;
     cartesian_deviation.second *= param_ * 0.5;
 
-    for (std::size_t i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       double r = 0.5 * g[i] + 0.5;
       auto theta = Evaluate(0, r * param_);
 
@@ -264,9 +264,9 @@ QuinticSpiralPathWithDerivation<N>::DeriveCartesianDeviation(
   return cartesian_deviation;
 }
 
-template <std::size_t N>
+template <size_t N>
 double QuinticSpiralPathWithDerivation<N>::DeriveKappaDerivative(
-    const std::size_t param_index, const int i, const int n) {
+    const size_t param_index, const int i, const int n) {
   auto key = param_index * INDEX_MAX + i;
   if (cache_kappa_deriv_.find(key) != cache_kappa_deriv_.end()) {
     return cache_kappa_deriv_[key];
@@ -297,9 +297,9 @@ double QuinticSpiralPathWithDerivation<N>::DeriveKappaDerivative(
   return derivative;
 }
 
-template <std::size_t N>
+template <size_t N>
 double QuinticSpiralPathWithDerivation<N>::DeriveDKappaDerivative(
-    const std::size_t param_index, const int i, const int n) {
+    const size_t param_index, const int i, const int n) {
 
   auto key = param_index * INDEX_MAX + i;
   if (cache_dkappa_deriv_.find(key) != cache_dkappa_deriv_.end()) {
@@ -328,9 +328,9 @@ double QuinticSpiralPathWithDerivation<N>::DeriveDKappaDerivative(
   return derivative;
 }
 
-template <std::size_t N>
+template <size_t N>
 double QuinticSpiralPathWithDerivation<N>::DeriveThetaDerivative(
-    const std::size_t param_index, const double r) const {
+    const size_t param_index, const double r) const {
   double s = param_ * r;
   double s2 = s * s;
   double s3 = s2 * s;
@@ -356,9 +356,9 @@ double QuinticSpiralPathWithDerivation<N>::DeriveThetaDerivative(
   return derivative;
 }
 
-template <std::size_t N>
+template <size_t N>
 double QuinticSpiralPathWithDerivation<N>::DeriveCosTheta(
-    const std::size_t param_index, const double r) const {
+    const size_t param_index, const double r) const {
   double g = param_ * r;
   double theta = Evaluate(0, g);
 
@@ -366,9 +366,9 @@ double QuinticSpiralPathWithDerivation<N>::DeriveCosTheta(
   return derivative;
 }
 
-template <std::size_t N>
+template <size_t N>
 double QuinticSpiralPathWithDerivation<N>::DeriveSinTheta(
-    const std::size_t param_index, const double r) const {
+    const size_t param_index, const double r) const {
   double g = param_ * r;
   double theta = Evaluate(0, g);
 

@@ -136,7 +136,7 @@ class SpiralProblemInterface : public Ipopt::TNLP {
 
   std::vector<double> relative_theta_;
 
-  constexpr static std::size_t N = 10;
+  constexpr static size_t N = 10;
 
   std::vector<QuinticSpiralPathWithDerivation<N>> piecewise_paths_;
 

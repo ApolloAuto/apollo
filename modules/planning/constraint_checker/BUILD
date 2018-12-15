@@ -15,7 +15,6 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/trajectory",
         "//modules/planning/common/trajectory:discretized_trajectory",
     ],
 )

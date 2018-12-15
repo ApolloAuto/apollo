@@ -51,7 +51,7 @@ class PiecewiseQuinticSpiralPath : public Curve1d {
   }
 
  private:
-  std::size_t LocatePiece(const double param) const;
+  size_t LocatePiece(const double param) const;
 
   std::vector<QuinticSpiralPath> pieces_;
 

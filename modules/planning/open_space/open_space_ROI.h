@@ -108,7 +108,7 @@ class OpenSpaceROI {
   bool HPresentationObstacle();
 
   // @brief Helper function for HPresentationObstacle()
-  bool ObsHRep(const std::size_t &obstacles_num,
+  bool ObsHRep(const size_t &obstacles_num,
                const Eigen::MatrixXi &obstacles_edges_num,
                const std::vector<std::vector<common::math::Vec2d>>
                    &obstacles_vertices_vec,

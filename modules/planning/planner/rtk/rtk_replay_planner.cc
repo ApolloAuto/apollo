@@ -109,7 +109,7 @@ Status RTKReplayPlanner::PlanOnReferenceLine(
   // if not, append the last points multiple times and
   // adjust their corresponding time stamps.
   while (trajectory_points.size() <
-         static_cast<std::size_t>(FLAGS_rtk_trajectory_forward)) {
+         static_cast<size_t>(FLAGS_rtk_trajectory_forward)) {
     const auto& last_point = trajectory_points.rbegin();
     auto new_point = last_point;
     new_point->set_relative_time(new_point->relative_time() +

@@ -142,7 +142,7 @@ TEST(OsqpSpline1dSolver, three) {
   std::vector<double> t_knots(21, 0.0);
   std::vector<double> ft_knots(21, 0.0);
 
-  for (std::size_t i = 0; i < t_knots.size(); ++i) {
+  for (size_t i = 0; i < t_knots.size(); ++i) {
     t_knots[i] = static_cast<double>(i) * 0.1;
     ft_knots[i] = t_knots[i] * slope + intercept;
   }

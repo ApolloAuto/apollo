@@ -373,7 +373,7 @@ class OpenSpaceROITest {
       return false;
     }
 
-    std::size_t parking_boundaries_num = ROI_parking_boundary_.size();
+    size_t parking_boundaries_num = ROI_parking_boundary_.size();
 
     if (parking_boundaries_num != 4) {
       AERROR << "parking boundary obstacles size not right";
@@ -451,7 +451,7 @@ class OpenSpaceROITest {
   ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
   Polygon2d parking_spot_box_;
   std::unique_ptr<Path> nearby_path_ = nullptr;
-  std::size_t obstacles_num_ = 0;
+  size_t obstacles_num_ = 0;
   Eigen::MatrixXd obstacles_edges_num_;
   std::vector<double> ROI_xy_boundary_;
   std::vector<std::vector<Vec2d>> ROI_parking_boundary_;
@@ -487,10 +487,10 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
   Vec2d origin_point_ = test_ptr->GetOriginPose();
 
   // load all into array
-  std::size_t index = 0;
-  for (std::size_t i = 0; i < unrotated_roi_boundary_->size(); i++) {
+  size_t index = 0;
+  for (size_t i = 0; i < unrotated_roi_boundary_->size(); i++) {
     std::vector<Vec2d> boundary = unrotated_roi_boundary_->at(i);
-    for (std::size_t j = 0; j < boundary.size(); j++) {
+    for (size_t j = 0; j < boundary.size(); j++) {
       unrotated_roi_boundary_x[index] = boundary[j].x();
       unrotated_roi_boundary_y[index] = boundary[j].y();
       index++;
@@ -498,9 +498,9 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
   }
 
   index = 0;
-  for (std::size_t i = 0; i < roi_boundary_->size(); i++) {
+  for (size_t i = 0; i < roi_boundary_->size(); i++) {
     std::vector<Vec2d> boundary = roi_boundary_->at(i);
-    for (std::size_t j = 0; j < boundary.size(); j++) {
+    for (size_t j = 0; j < boundary.size(); j++) {
       roi_boundary_x[index] = boundary[j].x();
       roi_boundary_y[index] = boundary[j].y();
       index++;
@@ -509,17 +509,17 @@ bool ROITest(OpenSpaceROITest* test_ptr, char* lane_id, char* parking_id,
 
   index = 0;
   std::vector<Vec2d> parking_spot_vec_ = parking_spot_.points();
-  for (std::size_t i = 0; i < parking_spot_vec_.size(); i++) {
+  for (size_t i = 0; i < parking_spot_vec_.size(); i++) {
     parking_spot_x[index] = parking_spot_vec_[i].x();
     parking_spot_y[index] = parking_spot_vec_[i].y();
     index++;
   }
 
-  for (std::size_t i = 0; i < end_pose_->size(); i++) {
+  for (size_t i = 0; i < end_pose_->size(); i++) {
     end_pose[i] = end_pose_->at(i);
   }
 
-  for (std::size_t i = 0; i < xy_boundary_->size(); i++) {
+  for (size_t i = 0; i < xy_boundary_->size(); i++) {
     xy_boundary[i] = xy_boundary_->at(i);
   }
 

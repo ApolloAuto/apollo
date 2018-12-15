@@ -62,15 +62,14 @@ TEST(RTKReplayPlannerTest, ComputeTrajectory) {
 
   const auto& trajectory = info.trajectory();
   EXPECT_TRUE(status.ok());
-  EXPECT_TRUE(!trajectory.trajectory_points().empty());
-  EXPECT_EQ(trajectory.trajectory_points().size(),
-            FLAGS_rtk_trajectory_forward);
+  EXPECT_TRUE(!trajectory.empty());
+  EXPECT_EQ(trajectory.size(), FLAGS_rtk_trajectory_forward);
 
-  auto first_point = trajectory.trajectory_points().begin();
+  auto first_point = trajectory.begin();
   EXPECT_DOUBLE_EQ(first_point->path_point().x(), 586385.782841);
   EXPECT_DOUBLE_EQ(first_point->path_point().y(), 4140674.76065);
 
-  auto last_point = trajectory.trajectory_points().rbegin();
+  auto last_point = trajectory.rbegin();
   EXPECT_DOUBLE_EQ(last_point->path_point().x(), 586355.063786);
   EXPECT_DOUBLE_EQ(last_point->path_point().y(), 4140681.98605);
 }
