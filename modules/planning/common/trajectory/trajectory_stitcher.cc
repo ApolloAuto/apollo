@@ -72,8 +72,7 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
   auto tx = -(cos_theta * x_diff - sin_theta * y_diff);
   auto ty = -(sin_theta * x_diff + cos_theta * y_diff);
 
-  std::for_each(prev_trajectory->trajectory_points().begin(),
-                prev_trajectory->trajectory_points().end(),
+  std::for_each(prev_trajectory->begin(), prev_trajectory->end(),
                 [&cos_theta, &sin_theta, &tx, &ty,
                  &theta_diff](common::TrajectoryPoint& p) {
                   auto x = p.path_point().x();
@@ -98,8 +97,7 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const VehicleState& vehicle_state, const double current_timestamp,
     const double planning_cycle_time,
-    const PublishableTrajectory* prev_trajectory,
-    std::string* replan_reason) {
+    const PublishableTrajectory* prev_trajectory, std::string* replan_reason) {
   if (!FLAGS_enable_trajectory_stitcher) {
     *replan_reason = "stitch is disabled by gflag.";
     return ComputeReinitStitchingTrajectory(vehicle_state);
@@ -114,7 +112,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  std::size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
+  size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
 
   if (prev_trajectory_size == 0) {
     ADEBUG << "Projected trajectory at time [" << prev_trajectory->header_time()
@@ -127,7 +125,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   const double veh_rel_time =
       current_timestamp - prev_trajectory->header_time();
 
-  std::size_t time_matched_index =
+  size_t time_matched_index =
       prev_trajectory->QueryLowerBoundPoint(veh_rel_time);
 
   if (time_matched_index == 0 &&
@@ -153,9 +151,8 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(vehicle_state);
   }
 
-  std::size_t position_matched_index =
-      prev_trajectory->QueryNearestPointWithBuffer(
-          {vehicle_state.x(), vehicle_state.y()}, 1.0e-6);
+  size_t position_matched_index = prev_trajectory->QueryNearestPointWithBuffer(
+      {vehicle_state.x(), vehicle_state.y()}, 1.0e-6);
 
   auto frenet_sd = ComputePositionProjection(
       vehicle_state.x(), vehicle_state.y(),
@@ -194,7 +191,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
           .relative_time() +
       planning_cycle_time;
 
-  std::size_t forward_time_index =
+  size_t forward_time_index =
       prev_trajectory->QueryLowerBoundPoint(forward_rel_time);
 
   ADEBUG << "Position matched index:\t" << position_matched_index;
@@ -204,9 +201,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   constexpr size_t kNumPreCyclePoint = 20;
   std::vector<TrajectoryPoint> stitching_trajectory(
-      prev_trajectory->trajectory_points().begin() +
+      prev_trajectory->begin() +
           std::max(0, static_cast<int>(matched_index - kNumPreCyclePoint)),
-      prev_trajectory->trajectory_points().begin() + forward_time_index + 1);
+      prev_trajectory->begin() + forward_time_index + 1);
   ADEBUG << "stitching_trajectory size: " << stitching_trajectory.size();
 
   const double zero_s = stitching_trajectory.back().path_point().s();

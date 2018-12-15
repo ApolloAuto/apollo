@@ -553,7 +553,8 @@ Status NaviPlanning::Plan(
   // flashing or bouncing
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(
-        stitching_trajectory.begin(), stitching_trajectory.end() - 1);
+        std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
+                                     stitching_trajectory.end() - 1));
   }
 
   for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {

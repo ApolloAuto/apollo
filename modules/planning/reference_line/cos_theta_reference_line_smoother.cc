@@ -180,7 +180,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
     AINFO << "Return by IPOPT is wrong. Size smaller than 2 ";
     return false;
   }
-  for (std::size_t i = 0; i < x.size(); ++i) {
+  for (size_t i = 0; i < x.size(); ++i) {
     // reverse back to the unscaled points
     double start_x = x[i] + zero_x_;
     double start_y = y[i] + zero_y_;
@@ -210,7 +210,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
   double Fy = ptr_smoothed_point2d->front().y();
   double Nx = 0.0;
   double Ny = 0.0;
-  for (std::size_t i = 1; i < ptr_smoothed_point2d->size(); i++) {
+  for (size_t i = 1; i < ptr_smoothed_point2d->size(); i++) {
     Nx = ptr_smoothed_point2d->at(i).x();
     Ny = ptr_smoothed_point2d->at(i).y();
     double end_segment_s =

@@ -99,7 +99,7 @@ void QuinticPolynomialCurve1d::IntegratedFromQuarticCurve(
   CHECK_EQ(other.Order(), 4);
   param_ = other.ParamLength();
   coef_[0] = init_value;
-  for (std::size_t i = 0; i < 5; ++i) {
+  for (size_t i = 0; i < 5; ++i) {
     coef_[i + 1] = other.Coef(i) / (static_cast<double>(i) + 1);
   }
 }
@@ -132,7 +132,7 @@ std::string QuinticPolynomialCurve1d::ToString() const {
       apollo::common::util::PrintIter(coef_, "\t"), param_, "\n");
 }
 
-double QuinticPolynomialCurve1d::Coef(const std::size_t order) const {
+double QuinticPolynomialCurve1d::Coef(const size_t order) const {
   CHECK_GT(6, order);
   return coef_[order];
 }

@@ -52,9 +52,9 @@ class CubicPolynomialCurve1d : public PolynomialCurve1d {
   double ParamLength() const override { return param_; }
   std::string ToString() const override;
 
-  double Coef(const std::size_t order) const override;
+  double Coef(const size_t order) const override;
 
-  std::size_t Order() const override { return 3; }
+  size_t Order() const override { return 3; }
 
  private:
   void ComputeCoefficients(const double x0, const double dx0, const double ddx0,

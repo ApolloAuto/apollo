@@ -55,7 +55,7 @@ class reeds_shepp : public ::testing::Test {
     ASSERT_LT(end_node->GetY() - ((*optimal_path).y).back(), 0.01);
     ASSERT_LT(end_node->GetPhi() - ((*optimal_path).phi).back(), 0.01);
     ASSERT_GT((*optimal_path).x.size(), 1);
-    for (std::size_t i = 1; i < (*optimal_path).x.size(); i++) {
+    for (size_t i = 1; i < (*optimal_path).x.size(); i++) {
       double gold_interval = std::sqrt(
           planner_open_space_config_.warm_start_config().step_size() *
               planner_open_space_config_.warm_start_config().step_size() +

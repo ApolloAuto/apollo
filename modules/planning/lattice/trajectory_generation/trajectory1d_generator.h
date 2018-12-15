@@ -71,7 +71,7 @@ class Trajectory1dGenerator {
       const PlanningTarget& planning_target,
       std::vector<std::shared_ptr<Curve1d>>* ptr_lon_trajectory_bundle) const;
 
-  template <std::size_t N>
+  template <size_t N>
   void GenerateTrajectory1DBundle(
       const std::array<double, 3>& init_state,
       const std::vector<std::pair<std::array<double, 3>, double>>&

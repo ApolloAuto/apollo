@@ -34,8 +34,8 @@ class ObstacleContainer {
     obstacles_num_ = 4;
     obstacles_edges_num_.resize(4, 1);
     obstacles_edges_num_ << 2, 1, 2, 1;
-    std::size_t index = 0;
-    for (std::size_t i = 0; i < obstacles_num_; i++) {
+    size_t index = 0;
+    for (size_t i = 0; i < obstacles_num_; i++) {
       std::vector<Vec2d> vertices_cw;
       for (int j = 0; j < obstacles_edges_num_(i, 0) + 1; j++) {
         Vec2d vertice =
@@ -61,7 +61,7 @@ class ObstacleContainer {
     return true;
   }
 
-  bool ObsHRep(const std::size_t& obstacles_num,
+  bool ObsHRep(const size_t& obstacles_num,
                const Eigen::MatrixXi& obstacles_edges_num,
                const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
                Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {
@@ -76,13 +76,13 @@ class ObstacleContainer {
     int counter = 0;
     double kEpsilon = 1.0e-5;
     // start building H representation
-    for (std::size_t i = 0; i < obstacles_num; ++i) {
-      std::size_t current_vertice_num = obstacles_edges_num(i, 0);
+    for (size_t i = 0; i < obstacles_num; ++i) {
+      size_t current_vertice_num = obstacles_edges_num(i, 0);
       Eigen::MatrixXd A_i(current_vertice_num, 2);
       Eigen::MatrixXd b_i(current_vertice_num, 1);
 
       // take two subsequent vertices, and computer hyperplane
-      for (std::size_t j = 0; j < current_vertice_num; ++j) {
+      for (size_t j = 0; j < current_vertice_num; ++j) {
         Vec2d v1 = obstacles_vertices_vec[i][j];
         Vec2d v2 = obstacles_vertices_vec[i][j + 1];
 
@@ -147,11 +147,11 @@ class ObstacleContainer {
   }
   Eigen::MatrixXd GetAMatrix() { return obstacles_A_; }
   Eigen::MatrixXd GetbMatrix() { return obstacles_b_; }
-  std::size_t GetObstaclesNum() { return obstacles_num_; }
+  size_t GetObstaclesNum() { return obstacles_num_; }
   Eigen::MatrixXi GetObstaclesEdgesNum() { return obstacles_edges_num_; }
 
  private:
-  std::size_t obstacles_num_ = 0;
+  size_t obstacles_num_ = 0;
   Eigen::MatrixXi obstacles_edges_num_;
   std::vector<std::vector<Vec2d>> obstacles_vertices_vec_;
   Eigen::MatrixXd obstacles_A_;
@@ -232,7 +232,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     return false;
   }
   // load Warm Start result(horizon is the "N", not the size of step points)
-  std::size_t horizon_ = result_ptr->PrepareHybridAResult()->x.size() - 1;
+  size_t horizon_ = result_ptr->PrepareHybridAResult()->x.size() - 1;
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon_);
   Eigen::VectorXd x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
@@ -326,45 +326,45 @@ void DistanceGetResult(ResultContainer* result_ptr,
                        double* opt_x, double* opt_y, double* opt_phi,
                        double* opt_v, double* opt_a, double* opt_steer,
                        double* opt_time, double* opt_dual_l, double* opt_dual_n,
-                       std::size_t* output_size) {
+                       size_t* output_size) {
   result_ptr->LoadHybridAResult();
-  std::size_t size = result_ptr->GetX()->size();
-  std::size_t size_by_distance = result_ptr->PrepareStateResult()->cols();
+  size_t size = result_ptr->GetX()->size();
+  size_t size_by_distance = result_ptr->PrepareStateResult()->cols();
   if (size != size_by_distance) {
     AINFO << "sizes by hybrid A and distance approach not consistent";
   }
   std::cout << "return size is " << size << std::endl;
-  for (std::size_t i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     x[i] = result_ptr->GetX()->at(i);
     y[i] = result_ptr->GetY()->at(i);
     phi[i] = result_ptr->GetPhi()->at(i);
     v[i] = result_ptr->GetV()->at(i);
   }
-  for (std::size_t i = 0; i < size - 1; i++) {
+  for (size_t i = 0; i < size - 1; i++) {
     a[i] = result_ptr->GetA()->at(i);
     steer[i] = result_ptr->GetSteer()->at(i);
   }
   output_size[0] = size;
 
-  std::size_t obstacles_edges_sum = obstacles_ptr->GetObstaclesEdgesNum().sum();
-  std::size_t obstacles_num_to_car = 4 * obstacles_ptr->GetObstaclesNum();
-  for (std::size_t i = 0; i < size_by_distance; i++) {
+  size_t obstacles_edges_sum = obstacles_ptr->GetObstaclesEdgesNum().sum();
+  size_t obstacles_num_to_car = 4 * obstacles_ptr->GetObstaclesNum();
+  for (size_t i = 0; i < size_by_distance; i++) {
     opt_x[i] = (*(result_ptr->PrepareStateResult()))(0, i);
     opt_y[i] = (*(result_ptr->PrepareStateResult()))(1, i);
     opt_phi[i] = (*(result_ptr->PrepareStateResult()))(2, i);
     opt_v[i] = (*(result_ptr->PrepareStateResult()))(3, i);
     opt_time[i] = (*(result_ptr->PrepareTimeResult()))(0, i);
-    for (std::size_t j = 0; j < obstacles_edges_sum; j++) {
+    for (size_t j = 0; j < obstacles_edges_sum; j++) {
       opt_dual_l[i * obstacles_edges_sum + j] =
           (*(result_ptr->PrepareLResult()))(j, i);
     }
-    for (std::size_t k = 0; k < obstacles_num_to_car; k++) {
+    for (size_t k = 0; k < obstacles_num_to_car; k++) {
       opt_dual_n[i * obstacles_num_to_car + k] =
           (*(result_ptr->PrepareNResult()))(k, i);
     }
   }
 
-  for (std::size_t i = 0; i < size_by_distance - 1; i++) {
+  for (size_t i = 0; i < size_by_distance - 1; i++) {
     opt_a[i] = (*(result_ptr->PrepareControlResult()))(0, i);
     opt_steer[i] = (*(result_ptr->PrepareControlResult()))(1, i);
   }

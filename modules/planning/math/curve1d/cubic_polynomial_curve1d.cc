@@ -47,7 +47,7 @@ void CubicPolynomialCurve1d::DerivedFromQuarticCurve(
     const PolynomialCurve1d& other) {
   CHECK_EQ(other.Order(), 4);
   param_ = other.ParamLength();
-  for (std::size_t i = 1; i < 5; ++i) {
+  for (size_t i = 1; i < 5; ++i) {
     coef_[i - 1] = other.Coef(i) * static_cast<double>(i);
   }
 }
@@ -91,7 +91,7 @@ void CubicPolynomialCurve1d::ComputeCoefficients(const double x0,
   coef_[3] = (x1 - x0 - dx0 * param - coef_[2] * p2) / p3;
 }
 
-double CubicPolynomialCurve1d::Coef(const std::size_t order) const {
+double CubicPolynomialCurve1d::Coef(const size_t order) const {
   CHECK_GT(4, order);
   return coef_[order];
 }

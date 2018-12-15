@@ -34,7 +34,7 @@ template <typename I, typename T>
 class IndexedQueue {
  public:
   // Get infinite capacity with 0.
-  explicit IndexedQueue(std::size_t capacity) : capacity_(capacity) {}
+  explicit IndexedQueue(size_t capacity) : capacity_(capacity) {}
 
   const T *Find(const I id) const {
     auto *result = apollo::common::util::FindOrNull(map_, id);
@@ -70,7 +70,7 @@ class IndexedQueue {
   }
 
  public:
-  std::size_t capacity_ = 0;
+  size_t capacity_ = 0;
   std::queue<std::pair<I, const T *>> queue_;
   std::unordered_map<I, std::unique_ptr<T>> map_;
 };

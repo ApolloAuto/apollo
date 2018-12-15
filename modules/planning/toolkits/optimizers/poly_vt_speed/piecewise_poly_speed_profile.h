@@ -31,7 +31,7 @@ class PiecewisePolySpeedProfile {
   PiecewisePolySpeedProfile() = default;
   explicit PiecewisePolySpeedProfile(const PiecewisePolySpeedCurve& curve);
   PiecewisePolySpeedProfile(const PiecewisePolySpeedCurve& curve,
-                            const std::size_t num_eval_points);
+                            const size_t num_eval_points);
 
   void set_curve(const PiecewisePolySpeedCurve& curve);
 
@@ -41,7 +41,7 @@ class PiecewisePolySpeedProfile {
   /**
    * @brief: Generate discretized speed points
    */
-  void GeneratePoints(const std::size_t num_eval_points);
+  void GeneratePoints(const size_t num_eval_points);
 
   void GeneratePointsByTime(const double t_resolution);
 

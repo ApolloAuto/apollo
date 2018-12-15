@@ -319,8 +319,8 @@ Status OpenSpacePlanning::Plan(
 
     if (FLAGS_enable_stitch_last_trajectory) {
       last_publishable_trajectory_->PrependTrajectoryPoints(
-          last_stitching_trajectory_.begin(),
-          last_stitching_trajectory_.end() - 1);
+          std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
+                                       last_stitching_trajectory_.end() - 1));
     }
 
     // save the publishable trajectory for use when no planning is generated
@@ -395,34 +395,26 @@ Status OpenSpacePlanning::Plan(
 Status OpenSpacePlanning::TrajectoryPartition(
     const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
     ADCTrajectory* const ptr_trajectory_pb) {
-  std::vector<common::TrajectoryPoint>
-      uninterpolated_stitched_trajectory_to_end =
-          last_publishable_trajectory->trajectory_points();
-
   // interpolate the stitched trajectory
   std::vector<common::TrajectoryPoint> stitched_trajectory_to_end;
   size_t interpolated_pieces_num = 50;
-  for (size_t i = 0; i < uninterpolated_stitched_trajectory_to_end.size() - 1;
-       i++) {
+  for (size_t i = 0; i < last_publishable_trajectory->size() - 1; i++) {
     double relative_time_interval =
-        (uninterpolated_stitched_trajectory_to_end[i + 1].relative_time() -
-         uninterpolated_stitched_trajectory_to_end[i].relative_time()) /
+        (last_publishable_trajectory->at(i + 1).relative_time() -
+         last_publishable_trajectory->at(i).relative_time()) /
         static_cast<double>(interpolated_pieces_num);
-    stitched_trajectory_to_end.push_back(
-        uninterpolated_stitched_trajectory_to_end[i]);
+    stitched_trajectory_to_end.push_back(last_publishable_trajectory->at(i));
     for (size_t j = 0; j < interpolated_pieces_num - 1; j++) {
       double relative_time =
-          uninterpolated_stitched_trajectory_to_end[i].relative_time() +
+          last_publishable_trajectory->at(i).relative_time() +
           (static_cast<double>(j) + 1) * relative_time_interval;
       stitched_trajectory_to_end.emplace_back(
           common::math::InterpolateUsingLinearApproximation(
-              uninterpolated_stitched_trajectory_to_end[i],
-              uninterpolated_stitched_trajectory_to_end[i + 1], relative_time));
+              last_publishable_trajectory->at(i),
+              last_publishable_trajectory->at(i + 1), relative_time));
     }
   }
-  stitched_trajectory_to_end.push_back(
-      uninterpolated_stitched_trajectory_to_end
-          [uninterpolated_stitched_trajectory_to_end.size() - 1]);
+  stitched_trajectory_to_end.push_back(last_publishable_trajectory->back());
   double distance_s = 0.0;
   apollo::planning_internal::Trajectories trajectory_partition;
   std::vector<apollo::canbus::Chassis::GearPosition> gear_positions;
@@ -779,7 +771,7 @@ void OpenSpacePlanning::AddStitchSpeedProfile(planning_internal::Debug* debug) {
   // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* speed_profile = chart->add_line();
   speed_profile->set_label("Speed Profile");
-  for (const auto& point : last_trajectory_->trajectory_points()) {
+  for (const auto& point : *last_trajectory_) {
     auto* point_debug = speed_profile->add_point();
     point_debug->set_x(point.relative_time() + last_trajectory_->header_time());
     point_debug->set_y(point.v());

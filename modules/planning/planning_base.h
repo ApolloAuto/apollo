@@ -84,7 +84,7 @@ class PlanningBase {
   const std::shared_ptr<ADCTrajectory> last_planning_;
 
   double start_time_ = 0.0;
-  std::size_t seq_num_ = 0;
+  size_t seq_num_ = 0;
 
   PlanningConfig config_;
   TrafficRuleConfigs traffic_rule_configs_;

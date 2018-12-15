@@ -668,7 +668,7 @@ void Obstacle::AddLateralDecision(const std::string& decider_tag,
 const std::string Obstacle::DebugString() const {
   std::stringstream ss;
   ss << "Obstacle id: " << id_;
-  for (std::size_t i = 0; i < decisions_.size(); ++i) {
+  for (size_t i = 0; i < decisions_.size(); ++i) {
     ss << " decision: " << decisions_[i].DebugString() << ", made by "
        << decider_tags_[i];
   }

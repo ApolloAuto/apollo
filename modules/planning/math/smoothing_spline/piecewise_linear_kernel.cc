@@ -51,7 +51,7 @@ void PiecewiseLinearKernel::AddSecondOrderDerivativeMatrix(
     const double init_derivative, const double weight) {
   Eigen::MatrixXd second_derivative_matrix =
       Eigen::MatrixXd::Zero(dimension_, dimension_);
-  for (std::size_t i = 0; i < dimension_; ++i) {
+  for (size_t i = 0; i < dimension_; ++i) {
     if (i == 0) {
       second_derivative_matrix(0, 0) += 1.0;
     } else if (i == 1) {
@@ -82,7 +82,7 @@ void PiecewiseLinearKernel::AddThirdOrderDerivativeMatrix(
     const double init_derivative, const double init_second_derivative,
     const double weight) {
   Eigen::MatrixXd jerk_matrix = Eigen::MatrixXd::Zero(dimension_, dimension_);
-  for (std::size_t i = 0; i < dimension_; ++i) {
+  for (size_t i = 0; i < dimension_; ++i) {
     if (i == 0) {
       jerk_matrix(0, 0) += 1.0;
     } else if (i == 1) {

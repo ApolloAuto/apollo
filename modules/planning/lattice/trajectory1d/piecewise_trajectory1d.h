@@ -45,7 +45,7 @@ class PiecewiseTrajectory1d : public Curve1d {
 
   void PopSegment();
 
-  std::size_t NumOfSegments() const;
+  size_t NumOfSegments() const;
 
  private:
   std::vector<std::shared_ptr<Curve1d>> trajectory_segments_;

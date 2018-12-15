@@ -61,7 +61,7 @@ double PiecewiseQuinticSpiralPath::ParamLength() const {
   return accumulated_s_.back();
 }
 
-std::size_t PiecewiseQuinticSpiralPath::LocatePiece(const double s) const {
+size_t PiecewiseQuinticSpiralPath::LocatePiece(const double s) const {
   CHECK(s >= accumulated_s_.front() && s <= accumulated_s_.back());
 
   auto it_lower = std::lower_bound(accumulated_s_.begin(), accumulated_s_.end(),
