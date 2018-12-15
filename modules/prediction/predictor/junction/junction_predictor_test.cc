@@ -50,8 +50,6 @@ class JunctionPredictorTest : public KMLMapBasedTest {
 };
 
 TEST_F(JunctionPredictorTest, InJunctionCase) {
-  // TODO(all) double check and fix the test if necessary
-  /**
   EXPECT_DOUBLE_EQ(perception_obstacles_.header().timestamp_sec(),
                    1501183430.161906);
   apollo::perception::PerceptionObstacle perception_obstacle =
@@ -66,8 +64,7 @@ TEST_F(JunctionPredictorTest, InJunctionCase) {
   junction_mlp_evaluator.Evaluate(obstacle_ptr);
   JunctionPredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 2);
-  **/
+  // EXPECT_EQ(predictor.NumOfTrajectories(), 2);
 }
 
 }  // namespace prediction
