@@ -56,7 +56,8 @@ double Relu(const double value);
  * @param vector The input.
  * @return The output of Softmax function.
  */
-std::vector<double> Softmax(const std::vector<double>& value, bool use_exp = true);
+std::vector<double> Softmax(const std::vector<double>& value,
+                            bool use_exp = true);
 
 /**
  * @brief Solve quadratic equation.
