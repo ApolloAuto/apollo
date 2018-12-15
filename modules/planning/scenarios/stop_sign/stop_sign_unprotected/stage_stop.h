@@ -54,7 +54,7 @@ class StageStop : public Stage {
           watch_vehicles);
 
  private:
-  Stage::StageStatus FinishStage(const ScenarioConfig::StageType& next_stage);
+  Stage::StageStatus FinishStage();
 
  private:
   ScenarioStopSignUnprotectedConfig scenario_config_;

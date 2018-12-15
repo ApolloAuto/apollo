@@ -63,8 +63,7 @@ Stage::StageStatus StageIntersectionCruise::Process(
                      return overlap.object_id == stop_sign_overlap_id;
                    });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+    return FinishStage();
   }
 
   // check pass intersection
@@ -72,11 +71,15 @@ Stage::StageStatus StageIntersectionCruise::Process(
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
   if (adc_back_edge_s - stop_sign_overlap_it->end_s > kIntersectionLength) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+    return FinishStage();
   }
 
   return Stage::RUNNING;
+}
+
+Stage::StageStatus StageIntersectionCruise::FinishStage() {
+  next_stage_ = ScenarioConfig::NO_STAGE;
+  return Stage::FINISHED;
 }
 
 }  // namespace stop_sign
