@@ -206,8 +206,12 @@ Status LonController::ComputeControlCommand(
                           speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-  if (VehicleStateProvider::Instance()->linear_velocity() <=
-      lon_controller_conf.switch_speed()) {
+  if (trajectory_message_->gear() == canbus::Chassis::GEAR_REVERSE) {
+    speed_pid_controller_.SetPID(lon_controller_conf.reverse_speed_pid_conf());
+    acceleration_cmd_closeloop =
+        speed_pid_controller_.Control(speed_controller_input_limited, ts);
+  } else if (VehicleStateProvider::Instance()->linear_velocity() <=
+             lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
     acceleration_cmd_closeloop =
         speed_pid_controller_.Control(speed_controller_input_limited, ts);
@@ -221,7 +225,7 @@ Status LonController::ComputeControlCommand(
       GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
 
   if (isnan(slope_offset_compenstaion)) {
-      slope_offset_compenstaion = 0;
+    slope_offset_compenstaion = 0;
   }
 
   debug->set_slope_offset_compensation(slope_offset_compenstaion);
@@ -233,12 +237,12 @@ Status LonController::ComputeControlCommand(
   GetPathRemain(debug);
 
   if ((trajectory_message_->trajectory_type() ==
-   apollo::planning::ADCTrajectory::NORMAL) &&
+       apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
-           FLAGS_max_acceleration_when_stopped &&
-       std::fabs(debug->preview_speed_reference()) <=
-           vehicle_param_.max_abs_speed_when_stopped()) ||
-      (debug->path_remain() < 0.3))) {
+            FLAGS_max_acceleration_when_stopped &&
+        std::fabs(debug->preview_speed_reference()) <=
+            vehicle_param_.max_abs_speed_when_stopped()) ||
+       (debug->path_remain() < 0.3))) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
