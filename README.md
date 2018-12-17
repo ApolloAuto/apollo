@@ -182,6 +182,32 @@ Apollo 3.0's main focus is to provide a platform for developers to build upon in
     * Monitor
     * Additional drivers to support Hardware
 
+[**Apollo Master Upgrade:**]()
+
+The latest Apollo Master Upgrade is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios including unprotected turns and narrow streets often found in residential areas and roads with stop signs. 
+
+![image alt text](docs/demo_guide/images/Apollo_updated_architecture.png)
+
+**For Setup:**
+
+* Hardware:
+
+    * Velodyne VLS - 128
+    * Apollo Extension Unit (AXU)
+    * ARGUS FPD-Link Cameras (3)
+    * NovAtel PwrPak7
+    * Additional IPC
+
+* Software: 
+
+    * Perception
+    * Planning
+    * V2X
+    * Additional drivers to support Hardware
+
+* Runtime Framework
+    * Cyber RT
+
 ## Architecture
 
 * **Hardware/ Vehicle Overview**
