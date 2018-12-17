@@ -25,12 +25,12 @@ cc_library(
         "similar.cc",
         ":similar_cuda",
     ],
-    hdrs = [ 
+    hdrs = [
         "similar.h",
     ],
     deps = [
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
         "@eigen",
     ],
 )
@@ -40,11 +40,11 @@ cc_library(
     srcs = [
         "half_circle_angle.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "half_circle_angle.h",
     ],
     deps = [
-        "//modules/perception/camera/common:common",
+        "//modules/perception/camera/common",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_library(
     srcs = [
         "kalman_filter.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "kalman_filter.h",
     ],
     deps = [
@@ -61,7 +61,6 @@ cc_library(
         "@eigen",
     ],
 )
-
 
 cc_library(
     name = "common",

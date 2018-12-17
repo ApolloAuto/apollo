@@ -39,6 +39,7 @@ cc_library(
     hdrs = [
         "racobit_radar_canbus_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"racobit_radar_canbus\\"'],
     deps = [
         ":racobit_radar_message_manager",
         "//cyber",
@@ -52,14 +53,13 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/drivers/radar/racobit_radar/protocol:drivers_racobit_radar_protocol",
     ],
-    copts = ['-DMODULE_NAME=\\"racobit_radar_canbus\\"'],
 )
 
 cc_binary(
     name = "libracobit_radar_canbus_component.so",
-    deps = [":racobit_radar_canbus_lib"],
     linkshared = True,
     linkstatic = False,
+    deps = [":racobit_radar_canbus_lib"],
 )
 
 cpplint()

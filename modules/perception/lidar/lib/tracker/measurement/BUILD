@@ -17,5 +17,4 @@ cc_library(
     ],
 )
 
-
 cpplint()

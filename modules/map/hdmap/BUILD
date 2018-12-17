@@ -23,7 +23,7 @@ cc_library(
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",
         "//modules/map/relative_map/proto:navigation_proto",
-        "@glog//:glog",
+        "@glog",
     ],
 )
 
@@ -50,8 +50,8 @@ filegroup(
 
 cc_test(
     name = "hdmap_map_test",
-    timeout = "short",
     size = "small",
+    timeout = "short",
     srcs = [
         "hdmap_common_test.cc",
         "hdmap_impl_test.cc",
@@ -63,15 +63,15 @@ cc_test(
     ],
     deps = [
         ":hdmap",
-        "@glog//:glog",
+        "@glog",
         "@gtest//:main",
     ],
 )
 
 cc_test(
     name = "hdmap_util_test",
-    timeout = "short",
     size = "small",
+    timeout = "short",
     srcs = [
         "hdmap_util_test.cc",
     ],
@@ -81,8 +81,9 @@ cc_test(
     ],
     deps = [
         ":hdmap_util",
-        "@glog//:glog",
+        "@glog",
         "@gtest//:main",
     ],
 )
+
 cpplint()

@@ -33,16 +33,16 @@ cc_library(
 
 cc_test(
     name = "spatio_temporal_ground_detector_test",
+    size = "small",
     srcs = [
         "spatio_temporal_ground_detector_test.cc",
     ],
-    size = "small",
     copts = ["-msse4.1"],
     deps = [
         ":spatio_temporal_ground_detector",
         "@gtest//:main",
         "@pcl",
-    ]
+    ],
 )
 
 cpplint()

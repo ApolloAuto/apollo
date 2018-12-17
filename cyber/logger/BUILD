@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//cyber/base:macros",
-        "//cyber/common:common",
+        "//cyber/common",
         "//cyber/logger:log_file_object",
     ],
 )
@@ -39,10 +39,10 @@ cc_library(
     ],
     deps = [
         "//cyber/base:macros",
-        "//cyber/common:common",
+        "//cyber/common",
         "//cyber/logger:log_file_object",
         "//cyber/scheduler:scheduler_factory",
-    ]
+    ],
 )
 
 cc_library(
@@ -57,20 +57,20 @@ cc_library(
         "//cyber:binary",
         "//cyber/common:log",
         "//cyber/logger:logger_util",
-    ]
+    ],
 )
 
 cc_library(
     name = "logger_util",
     srcs = [
-        "logger_util.cc"
+        "logger_util.cc",
     ],
     hdrs = [
         "logger_util.h",
     ],
     deps = [
         "//cyber/common:global_data",
-    ]
+    ],
 )
 
 cpplint()

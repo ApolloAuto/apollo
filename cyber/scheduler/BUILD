@@ -11,8 +11,8 @@ cc_library(
         "processor.h",
     ],
     deps = [
-         "//cyber/scheduler:processor_context",
-        "//cyber/data:data",
+        "//cyber/data",
+        "//cyber/scheduler:processor_context",
     ],
 )
 
@@ -25,8 +25,8 @@ cc_library(
         "processor_context.h",
     ],
     deps = [
-        "//cyber/croutine:croutine",
-        "//cyber/data:data",
+        "//cyber/croutine",
+        "//cyber/data",
     ],
 )
 
@@ -39,7 +39,7 @@ cc_library(
         "scheduler.h",
     ],
     deps = [
-        "//cyber/croutine:croutine",
+        "//cyber/croutine",
         "//cyber/scheduler:processor",
     ],
 )
@@ -97,7 +97,7 @@ cc_library(
         "policy/choreography_context.h",
     ],
     deps = [
-        "//cyber/croutine:croutine",
+        "//cyber/croutine",
         "//cyber/proto:choreography_conf_cc_proto",
         "//cyber/scheduler:processor",
     ],
@@ -112,12 +112,11 @@ cc_library(
         "policy/classic_context.h",
     ],
     deps = [
-        "//cyber/croutine:croutine",
+        "//cyber/croutine",
         "//cyber/proto:classic_conf_cc_proto",
         "//cyber/scheduler:processor",
     ],
 )
-
 
 cc_test(
     name = "scheduler_test",

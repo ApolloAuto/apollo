@@ -4,9 +4,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "libcommon_component_sample.so",
-    deps = [":common_component_sample_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
+    deps = [":common_component_sample_lib"],
 )
 
 cc_library(
@@ -22,4 +22,5 @@ cc_library(
         "//cyber/samples/proto:samples_cc_proto",
     ],
 )
+
 cpplint()

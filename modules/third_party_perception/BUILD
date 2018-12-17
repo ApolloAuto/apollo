@@ -80,18 +80,18 @@ cc_library(
     hdrs = [
         "third_party_perception_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"third_party_perception\\"'],
     deps = [
         ":third_party_perception_lib",
         "//cyber",
     ],
-    copts = ['-DMODULE_NAME=\\"third_party_perception\\"']
 )
 
 cc_binary(
     name = "libthird_party_perception_component.so",
-    deps = [":third_party_perception_component_lib"],
     linkshared = True,
     linkstatic = False,
+    deps = [":third_party_perception_component_lib"],
 )
 
 cpplint()

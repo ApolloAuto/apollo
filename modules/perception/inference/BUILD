@@ -54,8 +54,8 @@ cc_library(
 
 cc_test(
     name = "inference_factory_test",
-    srcs = ["inference_factory_test.cc"],
     size = "small",
+    srcs = ["inference_factory_test.cc"],
     deps = [
         ":inference_factory_lib",
         "@gtest//:main",

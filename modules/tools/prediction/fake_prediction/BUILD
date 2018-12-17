@@ -7,6 +7,8 @@ cc_binary(
     srcs = [
         "fake_prediction.cc",
     ],
+    linkshared = True,
+    linkstatic = False,
     deps = [
         "//cyber",
         "//external:gflags",
@@ -14,8 +16,6 @@ cc_binary(
         "//modules/common/util",
         "//modules/prediction/proto:prediction_proto",
     ],
-    linkshared = True,
-    linkstatic = False,
 )
 
 cpplint()

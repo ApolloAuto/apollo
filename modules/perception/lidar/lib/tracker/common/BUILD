@@ -15,12 +15,10 @@ cc_library(
         "//modules/perception/base:object",
         "//modules/perception/base:object_pool_types",
         "//modules/perception/base:point_cloud",
-        "//modules/perception/common/point_cloud_processing:point_cloud_processing",
+        "//modules/perception/common/point_cloud_processing",
         "//modules/perception/lidar/common:feature_descriptor",
     ],
 )
-
-
 
 cc_library(
     name = "track_data",
@@ -40,12 +38,12 @@ cc_library(
 cc_library(
     name = "mlf_track_data_with_track_pool_types",
     srcs = [
-        "track_pool_types.cc",        
         "mlf_track_data.cc",
+        "track_pool_types.cc",
     ],
     hdrs = [
-        "track_pool_types.h",
         "mlf_track_data.h",
+        "track_pool_types.h",
     ],
     deps = [
         ":track_data",

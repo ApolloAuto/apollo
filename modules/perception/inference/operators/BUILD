@@ -18,8 +18,9 @@ cuda_library(
         "//modules/perception/inference:layer_lib",
         "@cuda",
         "@eigen",
-    ]
+    ],
 )
+
 cc_library(
     name = "perception_inference_operators",
     srcs = [
@@ -32,7 +33,7 @@ cc_library(
     deps = [
         "//modules/perception/base:blob",
         "//modules/perception/inference:layer_lib",
-    ]
+    ],
 )
 
 cc_test(

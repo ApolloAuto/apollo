@@ -171,5 +171,5 @@ proto_library(
     ],
     deps = [
         ":network_model_proto_lib",
-    ]
+    ],
 )

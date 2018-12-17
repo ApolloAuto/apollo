@@ -22,9 +22,9 @@ cc_library(
 
 cc_binary(
     name = "libmanual_traffic_light_component.so",
-    deps = [":manual_traffic_light"],
     linkshared = True,
     linkstatic = False,
+    deps = [":manual_traffic_light"],
 )
 
 cpplint()

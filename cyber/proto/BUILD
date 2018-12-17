@@ -64,9 +64,9 @@ proto_library(
         "scheduler_conf.proto",
     ],
     deps = [
-      ":choreography_conf_proto",
-      ":classic_conf_proto",
-    ]
+        ":choreography_conf_proto",
+        ":classic_conf_proto",
+    ],
 )
 
 cc_proto_library(

@@ -15,7 +15,7 @@ cc_library(
         "//modules/prediction/network:net_layer",
         "//modules/prediction/network:net_model",
         "//modules/prediction/proto:network_model_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

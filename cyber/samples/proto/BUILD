@@ -13,4 +13,3 @@ proto_library(
         "samples.proto",
     ],
 )
-

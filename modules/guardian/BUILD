@@ -8,6 +8,9 @@ cc_binary(
         "guardian_component.cc",
         "guardian_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"guardian\\"'],
+    linkshared = True,
+    linkstatic = False,
     deps = [
         "//cyber",
         "//modules/canbus/proto:canbus_proto",
@@ -18,9 +21,6 @@ cc_binary(
         "//modules/guardian/proto:guardian_proto",
         "//modules/monitor/proto:system_status_proto",
     ],
-    copts = ['-DMODULE_NAME=\\"guardian\\"'],
-    linkshared = True,
-    linkstatic = False,
 )
 
 cpplint()

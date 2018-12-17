@@ -10,12 +10,12 @@ cc_library(
     hdrs = [
         "lexus_vehicle_factory.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":lexus_controller",
         ":lexus_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -26,13 +26,13 @@ cc_library(
     hdrs = [
         "lexus_message_manager.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle/lexus/protocol:canbus_lexus_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -43,6 +43,7 @@ cc_library(
     hdrs = [
         "lexus_controller.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":lexus_message_manager",
         "//modules/canbus/proto:canbus_proto",
@@ -52,7 +53,6 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cpplint()

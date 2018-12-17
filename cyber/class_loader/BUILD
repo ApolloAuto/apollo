@@ -1,6 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//visibility:public"],)
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "class_loader",
@@ -15,15 +15,15 @@ cc_library(
         "utility/class_factory.h",
         "utility/class_loader_utility.h",
     ],
+    linkopts = [
+        "-lPocoFoundation",
+    ],
     deps = [
         "//cyber:init",
         "//cyber/common:log",
     ],
-    linkopts = [
-        "-lPocoFoundation",
-    ],
 )
-        
+
 cc_library(
     name = "class_loader_manager",
     srcs = [
