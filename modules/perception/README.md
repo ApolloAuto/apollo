@@ -12,6 +12,13 @@ Apollo Perception has following new features:
 
 The perception module incorporates the capability of using 5 cameras (2 front, 2 on either side and 1 rear) and 2 radars (front and rear) along with 3 16-line LiDARs (2 rear and 1 front) and 1 128-line LiDAR to recognize obstacles and fuse their individual tracks to obtain a final track list. The obstacle sub-module detects, classifies and tracks obstacles. This sub-module also predicts obstacle motion and position information (e.g., heading and velocity). For lane line, we construct lane instances by postprocessing lane parsing pixels and calculate the lane relative location to the ego-vehicle (L0, L1, R0, R1, etc.).
 
+## Architecture
+
+The general architecture of the perception module is shown:
+![](docs/specs/images/Apollo3.5_perception_sensor_based.png)
+
+The detailed perception modules are displayed below.
+![](docs/specs/images/Apollo3.5_perception_detail.png)
 
 ## Input
 
@@ -29,8 +36,8 @@ The perception module inputs are:
 
 The perception module outputs are:
 
-* The 3D obstacle tracks with the heading, velocity and classification information (ROS topic /apollo/perception/obstacles_)
-* The lane marker information with fitted curve parameter, spatial information(L0, R0, etc.) as well as semantic information (lane type) (cyber channel /apollo/perception/obstacles_)
+* The 3D obstacle tracks with the heading, velocity and classification information (cyber channel /apollo/perception/obstacles)
+* The output of traffic light detection and recognition (cyber channel /apollo/perception/traffic_light)
 
 ## Setup Instructions
 
