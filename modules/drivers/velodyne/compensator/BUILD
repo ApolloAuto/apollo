@@ -4,20 +4,20 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "libvelodyne_compensator_component.so",
-    deps = [":compensator_component_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
+    deps = [":compensator_component_lib"],
 )
 
 cc_library(
     name = "compensator_component_lib",
     srcs = ["compensator_component.cc"],
     hdrs = ["compensator_component.h"],
+    copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
         "//modules/drivers/velodyne/compensator:compensator_lib",
     ],
-    copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
 
 cc_library(
@@ -28,6 +28,7 @@ cc_library(
     hdrs = [
         "compensator.h",
     ],
+    copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
         "//modules/drivers/proto:sensor_proto",
@@ -35,7 +36,6 @@ cc_library(
         "//modules/transform:tf2_buffer_lib",
         "@eigen",
     ],
-    copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
 
 cpplint()

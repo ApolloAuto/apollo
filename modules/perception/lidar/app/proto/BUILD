@@ -17,5 +17,4 @@ proto_library(
     ],
 )
 
-
 cpplint()

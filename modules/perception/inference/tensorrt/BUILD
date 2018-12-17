@@ -59,8 +59,8 @@ cc_library(
         "rt_net.cc",
     ],
     hdrs = [
-        "rt_net.h",
         "entropy_calibrator.h",
+        "rt_net.h",
     ],
     linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
     deps = [
@@ -69,7 +69,7 @@ cc_library(
         ":rt_common",
         ":rt_utils",
         "//cyber",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/tensorrt/plugins:perception_inference_tensorrt_plugins",
         "//modules/perception/proto:rt_proto",

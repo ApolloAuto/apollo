@@ -14,8 +14,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
-        "//modules/prediction/scenario/feature_extractor:feature_extractor",
-        "//modules/prediction/scenario/scenario_features:scenario_features",
+        "//modules/prediction/scenario/feature_extractor",
+        "//modules/prediction/scenario/scenario_features",
     ],
 )
 

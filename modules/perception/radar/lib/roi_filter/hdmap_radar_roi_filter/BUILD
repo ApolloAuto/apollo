@@ -23,10 +23,10 @@ cc_library(
         "hdmap_radar_roi_filter.h",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/common/geometry:roi_filter",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lib/registerer",
         "//modules/perception/proto:perception_config_schema_proto",
         "//modules/perception/radar/lib/interface:base_roi_filter",
         "@eigen",

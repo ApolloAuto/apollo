@@ -49,7 +49,6 @@ cc_test(
     ],
 )
 
-
 cc_library(
     name = "atomic_rw_lock",
     hdrs = [
@@ -57,7 +56,7 @@ cc_library(
     ],
     deps = [
         "//cyber/base:rw_lock_guard",
-    ]
+    ],
 )
 
 cc_test(
@@ -125,7 +124,7 @@ cc_test(
     deps = [
         "//cyber/base:for_each",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_library(
@@ -152,14 +151,14 @@ cc_test(
     srcs = [
         "object_pool_test.cc",
     ],
+    linkopts = [
+        "-latomic",
+    ],
     deps = [
         "//cyber/base:concurrent_object_pool",
         "//cyber/base:object_pool",
         "@gtest//:main",
     ],
-    linkopts = [
-        "-latomic",
-    ]
 )
 
 cc_library(

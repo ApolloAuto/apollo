@@ -49,7 +49,7 @@ cc_library(
         "radar_track.h",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/interface:base_filter",
         "//modules/perception/radar/lib/tracker/filter:adaptive_kalman_filter",

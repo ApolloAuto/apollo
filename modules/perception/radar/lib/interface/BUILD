@@ -24,9 +24,9 @@ cc_library(
         "base_matcher.h",
     ],
     deps = [
-        "//modules/perception/base:base",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/base",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lib/registerer",
         "//modules/perception/proto:perception_config_schema_proto",
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/tracker/common:radar_track",

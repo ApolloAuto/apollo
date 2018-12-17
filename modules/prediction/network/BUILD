@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/prediction/proto:network_model_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -29,7 +29,7 @@ cc_library(
         "//cyber",
         "//modules/prediction/network:net_util",
         "//modules/prediction/proto:network_model_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -46,7 +46,7 @@ cc_library(
         "//modules/common/util",
         "//modules/prediction/network:net_layer",
         "//modules/prediction/proto:network_model_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
     deps = [
         "//modules/prediction/network:net_util",
         "//modules/prediction/proto:network_model_proto",
-        "@eigen//:eigen",
+        "@eigen",
         "@gtest//:main",
     ],
 )
@@ -74,7 +74,7 @@ cc_test(
         "//modules/prediction/network:net_layer",
         "//modules/prediction/network:net_util",
         "//modules/prediction/proto:network_model_proto",
-        "@eigen//:eigen",
+        "@eigen",
         "@gtest//:main",
     ],
 )

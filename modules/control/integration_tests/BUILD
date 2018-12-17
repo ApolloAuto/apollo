@@ -30,7 +30,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 
@@ -56,7 +56,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 

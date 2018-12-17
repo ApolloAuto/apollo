@@ -18,7 +18,7 @@ cc_library(
         "//modules/dreamview/backend/map:map_service",
         "//modules/map/relative_map/proto:navigation_proto",
         "//modules/planning/proto:planning_proto",
-        "@gtest//:gtest",
+        "@gtest",
     ],
 )
 

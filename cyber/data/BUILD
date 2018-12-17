@@ -5,15 +5,15 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "data",
     deps = [
+        "all_latest",
         "cache_buffer",
         "channel_buffer",
         "data_dispatcher",
+        "data_fusion",
         "data_notifier",
         "data_visitor",
         "data_visitor_base",
-        "all_latest",
-        "data_fusion",
-    ]
+    ],
 )
 
 cc_library(
@@ -43,7 +43,7 @@ cc_library(
     deps = [
         "data_notifier",
         "//cyber/proto:component_conf_cc_proto",
-    ],        
+    ],
 )
 
 cc_library(
@@ -52,8 +52,8 @@ cc_library(
         "data_dispatcher.h",
     ],
     deps = [
-        "channel_buffer"
-    ]
+        "channel_buffer",
+    ],
 )
 
 cc_library(
@@ -82,7 +82,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "data_notifier",
     hdrs = [
@@ -90,7 +89,7 @@ cc_library(
     ],
     deps = [
         "cache_buffer",
-    ]
+    ],
 )
 
 cc_test(
@@ -123,7 +122,7 @@ cc_library(
         "fusion/data_fusion.h",
     ],
     deps = [
-    ]
+    ],
 )
 
 cc_library(
@@ -132,9 +131,9 @@ cc_library(
         "fusion/all_latest.h",
     ],
     deps = [
+        "channel_buffer",
         "data_fusion",
-        "channel_buffer"
-    ]
+    ],
 )
-   
+
 cpplint()

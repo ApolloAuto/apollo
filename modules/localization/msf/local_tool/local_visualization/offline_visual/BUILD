@@ -21,7 +21,7 @@ cc_library(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "//modules/localization/msf/local_tool/local_visualization/engine",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -41,7 +41,7 @@ cc_binary(
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

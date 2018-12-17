@@ -23,7 +23,7 @@ cc_library(
         "//modules/planning/planner",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

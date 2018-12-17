@@ -39,10 +39,10 @@ cc_library(
     deps = [
         "parameter",
         "parameter_service_names",
-        "//cyber/node:node",
+        "//cyber/node",
         "//cyber/service:client",
         "@fastrtps",
-    ]
+    ],
 )
 
 cc_test(
@@ -68,10 +68,10 @@ cc_library(
     deps = [
         "parameter",
         "parameter_service_names",
-        "//cyber/node:node",
-        "//cyber/service:service",
+        "//cyber/node",
+        "//cyber/service",
         "@fastrtps",
-    ]
+    ],
 )
 
 cc_test(

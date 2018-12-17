@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_proto_library(
     name = "denseline_postprocessor_proto",
     deps = [
@@ -17,27 +16,25 @@ proto_library(
     ],
 )
 
-
 cc_library(
     name = "denseline_lane_postprocessor",
     srcs = [
         "denseline_lane_postprocessor.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "denseline_lane_postprocessor.h",
     ],
-
     deps = [
         ":denseline_postprocessor_proto",
         "//cyber",
         "//modules/common/util:file_util",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/lane/common:common_functions",
         "//modules/perception/camera/lib/lane/common:denseline_proto",
-        "//modules/perception/lib/registerer:registerer",
-        "//modules/perception/lib/utils:utils",
+        "//modules/perception/lib/registerer",
+        "//modules/perception/lib/utils",
     ],
 )
 

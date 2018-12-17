@@ -4,10 +4,12 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "localization_msf_lossy_map",
-    srcs = ["lossy_map_2d.cc",
-            "lossy_map_config_2d.cc",
-            "lossy_map_matrix_2d.cc",
-            "lossy_map_pool_2d.cc",],
+    srcs = [
+        "lossy_map_2d.cc",
+        "lossy_map_config_2d.cc",
+        "lossy_map_matrix_2d.cc",
+        "lossy_map_pool_2d.cc",
+    ],
     hdrs = glob(["*.h"]),
     linkopts = [
         "-lopencv_core",

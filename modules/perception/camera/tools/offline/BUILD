@@ -2,24 +2,23 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_library(
     name = "visualizer",
     srcs = [
         "visualizer.cc",
+    ],
+    hdrs = [
+        "visualizer.h",
     ],
     linkopts = [
         "-lopencv_core",
         "-lopencv_imgproc",
         "-lopencv_highgui",
     ],
-    hdrs = [
-        "visualizer.h",
-    ],
     deps = [
         ":transform_server",
-        "//modules/perception/camera/common:common",
-    ]
+        "//modules/perception/camera/common",
+    ],
 )
 
 cc_library(
@@ -32,11 +31,11 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
         "@eigen",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
 
 cc_binary(
@@ -53,11 +52,11 @@ cc_binary(
     deps = [
         ":transform_server",
         ":visualizer",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/app:obstacle_camera_perception",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/utils:utils",
-    ]
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/utils",
+    ],
 )
 
 cpplint()

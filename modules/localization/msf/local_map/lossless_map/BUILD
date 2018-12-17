@@ -4,11 +4,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "localization_msf_lossless_map",
-    srcs = ["lossless_map_config.cc",
-            "lossless_map_matrix.cc",
-            "lossless_map_node.cc",
-            "lossless_map_pool.cc",
-            "lossless_map.cc"],
+    srcs = [
+        "lossless_map.cc",
+        "lossless_map_config.cc",
+        "lossless_map_matrix.cc",
+        "lossless_map_node.cc",
+        "lossless_map_pool.cc",
+    ],
     hdrs = glob(["*.h"]),
     linkopts = [
         "-lopencv_core",
@@ -36,7 +38,7 @@ cc_test(
     timeout = "moderate",
     srcs = ["map_pool_test.cc"],
     copts = [
-      "-Dprivate=public",
+        "-Dprivate=public",
     ],
     deps = [
         "//cyber",

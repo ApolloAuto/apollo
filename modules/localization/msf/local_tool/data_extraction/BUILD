@@ -5,14 +5,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "data_extraction",
     srcs = [
+        "cyber_record_reader.cc",
         "location_exporter.cc",
         "pcd_exporter.cc",
-        "cyber_record_reader.cc",
     ],
     hdrs = [
+        "cyber_record_reader.h",
         "location_exporter.h",
         "pcd_exporter.h",
-        "cyber_record_reader.h"
     ],
     linkopts = [
         "-lboost_filesystem",
@@ -27,8 +27,8 @@ cc_library(
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "@eigen",
+        "@pcl",
     ],
 )
 
@@ -46,8 +46,8 @@ cc_binary(
     deps = [
         ":data_extraction",
         "//cyber",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "@eigen",
+        "@pcl",
     ],
 )
 
@@ -65,7 +65,7 @@ cc_binary(
     deps = [
         ":data_extraction",
         "//cyber",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

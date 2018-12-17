@@ -258,8 +258,8 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "distance_approach_problem",
-        "hybrid_a_star",
         "dual_variable_warm_start_problem",
+        "hybrid_a_star",
         "//cyber/common:log",
         "//external:gflags",
         "//modules/common/proto:pnc_point_proto",
@@ -271,24 +271,24 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_common",
         "//modules/planning/proto:planning_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
 cc_binary(
     name = "open_space_roi_wrapper_lib.so",
-    linkshared = True,
-    linkstatic = False,
     srcs = [
         "open_space_roi_wrapper.cc",
     ],
+    linkshared = True,
+    linkstatic = False,
     deps = [
         "//cyber/common:log",
         "//modules/common/math",
         "//modules/map/pnc_map",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

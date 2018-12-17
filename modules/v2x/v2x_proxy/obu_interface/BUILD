@@ -8,8 +8,11 @@ cc_library(
         "obu_interface_grpc_impl.cc",
     ],
     hdrs = [
-        "obu_interface_grpc_impl.h",
         "obu_interface_abstract_class.h",
+        "obu_interface_grpc_impl.h",
+    ],
+    linkopts = [
+        "-lgrpc++",
     ],
     deps = [
         "//cyber",
@@ -21,9 +24,6 @@ cc_library(
         "//modules/v2x/proto:v2x_traffic_light_proto",
         "//modules/v2x/v2x_proxy/obu_interface/grpc_interface:grpc_client",
         "//modules/v2x/v2x_proxy/obu_interface/grpc_interface:grpc_server",
-    ],
-    linkopts = [
-        "-lgrpc++",
     ],
 )
 

@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/time:time",
+        "//modules/common/time",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/v2x/common:v2x_proxy_gflags",

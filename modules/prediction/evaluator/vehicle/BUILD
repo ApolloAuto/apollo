@@ -196,7 +196,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
-        "//modules/prediction/network/cruise_model:cruise_model",
+        "//modules/prediction/network/cruise_model",
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
         "//modules/prediction/proto:lane_graph_proto",

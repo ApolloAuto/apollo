@@ -13,7 +13,7 @@ cc_binary(
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
         "//modules/perception/common/point_cloud_processing",
-        "//modules/perception/common/sensor_manager:sensor_manager",
+        "//modules/perception/common/sensor_manager",
         "//modules/perception/lidar/app",
         "//modules/perception/lidar/lib/object_builder",
         "//modules/perception/proto:perception_config_schema_proto",

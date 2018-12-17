@@ -38,7 +38,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -77,10 +77,10 @@ cc_library(
     srcs = [
         "pid_BC_controller.cc",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
     hdrs = [
         "pid_BC_controller.h",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":pid_controller",
         "//cyber",
@@ -127,6 +127,7 @@ cc_library(
 
 cc_library(
     name = "common",
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":control_gflags",
         ":hysteresis_filter",
@@ -135,7 +136,6 @@ cc_library(
         ":pid_controller",
         ":trajectory_analyzer",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'], 
 )
 
 cc_test(

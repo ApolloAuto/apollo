@@ -70,7 +70,7 @@ proto_library(
     srcs = ["hmi_mode.proto"],
     deps = [
         "//cyber/proto:scheduler_conf_proto",
-    ]
+    ],
 )
 
 cc_proto_library(
