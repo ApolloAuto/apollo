@@ -1,6 +1,6 @@
 ![image alt text](docs/demo_guide/images/Apollo_logo.png)
 
-[![Build Status](https://travis-ci.org/ApolloAuto/apollo.svg?branch=master)](https://travis-ci.org/ApolloAuto/apollo) [![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/dailybuild)
+[![Build Status](https://travis-ci.com/ApolloAuto/apollo.svg?branch=master)](https://travis-ci.com/ApolloAuto/apollo) [![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/dailybuild)
 
 ```
 
@@ -32,7 +32,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-We just released many upgraded features to the Apollo master. This upgrade is loaded with new modules and features, but needs to be callibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
+We just released many upgraded features to the Apollo master. This upgrade is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
 
 **To learn more, please refer to the
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
