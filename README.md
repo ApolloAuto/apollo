@@ -54,7 +54,7 @@ for information about migrating to the updated Apollo master from an old version
 
 
  - Please note, it is recommended that you install the versions of Apollo in the following order: 
- **1.0 > 1.5 > 2.0 > 2.5 > 3.0**.
+ **1.0 > whichever version you would like to test out**.
  The reason behind this recommendation is that you need to confirm whether individual hardware components 
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher more capable version for your safety and the safety of those around you.
@@ -186,11 +186,11 @@ Apollo 3.0's main focus is to provide a platform for developers to build upon in
 
 * **Hardware/ Vehicle Overview**
 
-![image alt text](docs/demo_guide/images/Hardware_overview.png)
+![image alt text](docs/demo_guide/images/Hardware_overview_3_5.png)
 
 * **Hardware Connection Overview**
 
-![image alt text](docs/demo_guide/images/Hardware_connection.png)
+![image alt text](docs/demo_guide/images/Hardware_connection_3_5.png)
 
 * **Software Overview - Navigation Mode**
 
@@ -217,6 +217,9 @@ If at this point, you do not have a Hardware setup, please go to [Without Hardwa
 * [Apollo 2.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_quick_start.md)
 
 * [Apollo 3.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md)
+
+* [Apollo Upgraded QuickStart Guide](docs/quickstart/apollo_updated_quick_start.md)
+
 
 ### Without Hardware:
 
