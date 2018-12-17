@@ -17,8 +17,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/highgui/highgui_c.h>
@@ -27,10 +27,10 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <limits>
 #include <string>
 #include <tuple>
 #include <utility>
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
@@ -756,44 +756,44 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
     switch (lights.at(i)->status.color) {
       case base::TLColor::TL_RED:
         // quick fix for 0 confidence color decision
-        if (std::abs(lights.at(i)->status.confidence) <
-            std::numeric_limits<double>::min()) {
-          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
-          max_n_id = i;
-          break;
-        }
-        cnt_r_ += lights.at(i)->status.confidence;
+        // if (std::abs(lights.at(i)->status.confidence) <
+        //     std::numeric_limits<double>::min()) {
+        //   lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+        //   max_n_id = i;
+        //   break;
+        // }
+        cnt_r_ += (lights.at(i)->status.confidence + 0.01);
         if (lights.at(i)->status.confidence >= max_r_conf) {
           max_r_id = i;
-          max_r_conf = lights.at(i)->status.confidence;
+          max_r_conf = (lights.at(i)->status.confidence + 0.01);
         }
         break;
       case base::TLColor::TL_GREEN:
         // quick fix for 0 confidence color decision
-        if (std::abs(lights.at(i)->status.confidence) <
-            std::numeric_limits<double>::min()) {
-          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
-          max_n_id = i;
-          break;
-        }
-        cnt_g_ += lights.at(i)->status.confidence;
+        // if (std::abs(lights.at(i)->status.confidence) <
+        //     std::numeric_limits<double>::min()) {
+        //   lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+        //   max_n_id = i;
+        //   break;
+        // }
+        cnt_g_ += (lights.at(i)->status.confidence + 0.01);
         if (lights.at(i)->status.confidence >= max_g_conf) {
           max_g_id = i;
-          max_g_conf = lights.at(i)->status.confidence;
+          max_g_conf = (lights.at(i)->status.confidence + 0.01);
         }
         break;
       case base::TLColor::TL_YELLOW:
         // quick fix for 0 confidence color decision
-        if (std::abs(lights.at(i)->status.confidence) <
-            std::numeric_limits<double>::min()) {
-          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
-          max_n_id = i;
-          break;
-        }
-        cnt_y_ += lights.at(i)->status.confidence;
+        // if (std::abs(lights.at(i)->status.confidence) <
+        //     std::numeric_limits<double>::min()) {
+        //   lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+        //   max_n_id = i;
+        //   break;
+        // }
+        cnt_y_ += (lights.at(i)->status.confidence + 0.01);
         if (lights.at(i)->status.confidence >= max_y_conf) {
           max_y_id = i;
-          max_y_conf = lights.at(i)->status.confidence;
+          max_y_conf = (lights.at(i)->status.confidence + 0.01);
         }
         break;
       case base::TLColor::TL_UNKNOWN_COLOR:
