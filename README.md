@@ -38,7 +38,7 @@ We just released many upgraded features to the Apollo master. This upgrade is lo
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
 for information about migrating to the updated Apollo master from an old version.
 
-[Want to contribute to our code?](https://github.com/ApolloAuto/apollo/blob/master/CONTRIBUTING.md) follow this guide.
+[Want to contribute to our code?](CONTRIBUTING.md) follow this guide.
 
 ## Prerequisites
 
@@ -66,9 +66,9 @@ for information about migrating to the updated Apollo master from an old version
 
 The following diagram highlights the scope and features of each Apollo release:
 
-![](https://github.com/ApolloAuto/apollo/blob/master/docs/demo_guide/images/apollo_versions_3.png)
+![](docs/demo_guide/images/apollo_versions_3.png)
 
-[**Apollo 1.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
+[**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
 
 Apollo 1.0 also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
 
@@ -96,7 +96,7 @@ Apollo 1.0 also referred to as the Automatic GPS Waypoint Following, works in an
 
     * Apollo Linux Kernel (based on Linux Kernel 4.4.32)
 
-[**Apollo 1.5:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_hardware_system_installation_guide.md) 
+[**Apollo 1.5:**](docs/quickstart/apollo_1_5_hardware_system_installation_guide.md) 
 
 Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicles with this version now have better perception of its surroundings and can better map its current position and plan its trajectory for safer maneuvering on its lane. Please note, the modules highlighted in Yellow are additions or upgrades for version 1.5.
 
@@ -116,7 +116,7 @@ Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicle
 
     * Nvidia GPU Driver
 
-[**Apollo 2.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md#key-hardware-components)
+[**Apollo 2.0:**](docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md#key-hardware-components)
 
 Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicles are able to cruise on roads safely, avoid collisions with obstacles, stop at traffic lights and change lanes if needed to reach their destination.  Please note, the modules highlighted in Red are additions or upgrades for version 2.0.
 
@@ -138,7 +138,7 @@ Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicle
 
     * Same as 1.5
 
-[**Apollo 2.5:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
+[**Apollo 2.5:**](docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
 Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
 
@@ -162,7 +162,7 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
     * Same as 2.0
 
-[**Apollo 3.0:**](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md)
+[**Apollo 3.0:**](docs/quickstart/apollo_3_0_quick_start.md)
 
 Apollo 3.0's main focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
 
@@ -226,23 +226,23 @@ The latest Apollo Master Upgrade is capable of navigating through complex drivin
 
 * [Fork and then Clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo) 
 
-* [Build and Release using Docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) - This step is required
+* [Build and Release using Docker](docs/howto/how_to_build_and_release.md) - This step is required
 
-* [Launch and Run Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md)
+* [Launch and Run Apollo](docs/howto/how_to_launch_Apollo.md)
 
 If at this point, you do not have a Hardware setup, please go to [Without Hardware](#without-hardware). 
 
 ### With Hardware:
 
-* [Apollo 1.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md)
+* [Apollo 1.0 QuickStart Guide](docs/quickstart/apollo_1_0_quick_start.md)
 
-* [Apollo 1.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_5_quick_start.md)
+* [Apollo 1.5 QuickStart Guide](docs/quickstart/apollo_1_5_quick_start.md)
 
-* [Apollo 2.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_quick_start.md)
+* [Apollo 2.0 QuickStart Guide](docs/quickstart/apollo_2_0_quick_start.md)
 
-* [Apollo 2.5 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_5_quick_start.md)
+* [Apollo 2.5 QuickStart Guide](docs/quickstart/apollo_2_5_quick_start.md)
 
-* [Apollo 3.0 QuickStart Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_0_quick_start.md)
+* [Apollo 3.0 QuickStart Guide](docs/quickstart/apollo_3_0_quick_start.md)
 
 * [Apollo Upgraded QuickStart Guide](docs/quickstart/apollo_updated_quick_start.md)
 
