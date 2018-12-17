@@ -25,7 +25,7 @@ namespace apollo {
 namespace common {
 namespace math {
 
-template <int N>
+template <long int N>
 struct Factorial {
   enum { value = N * Factorial<N - 1>::value };
 };
