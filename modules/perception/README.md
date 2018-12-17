@@ -1,9 +1,9 @@
-# Perception 3.5
+# Perception
 
-In Apollo 3.5, the Perception module has been upgraded completely to handle comprehensive sensor fusion of our brand-new sensor suite and also keep up with the brand new scenario-based planning.
+The Perception module has been upgraded completely to handle comprehensive sensor fusion of our brand-new sensor suite and also keep up with the brand new scenario-based planning.
 
 ## Introduction
-Apollo 3.5 has following new features:
+Apollo Perception has following new features:
 
  * **Support for VLS-128 Line LiDAR**
  * **Obstacle detection though multiple cameras**
