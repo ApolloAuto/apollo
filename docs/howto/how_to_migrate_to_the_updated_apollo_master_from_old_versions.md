@@ -11,6 +11,11 @@ move data files into the large-file-storage.*
 This makes the Apollo master more like a brand new repo, while NOT growing on top
 of Apollo 3.0, as they have different commit ID on almost each history commits.
 
+```
+Note:
+Please re-fork and re-clone your repository to sync with the latest changes. 
+```
+
 ### Why we are doing this
 
 Besides code, Apollo also has a lot of data files which are generally very big.
