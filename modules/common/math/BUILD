@@ -44,6 +44,7 @@ cc_library(
         "//cyber",
         "//modules/common/util:string_util",
         "@osqp",
+        "@eigen",
     ],
 )
 

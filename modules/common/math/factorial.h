@@ -21,11 +21,13 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace apollo {
 namespace common {
 namespace math {
 
-template <long int N>
+template <uint64_t N>
 struct Factorial {
   enum { value = N * Factorial<N - 1>::value };
 };

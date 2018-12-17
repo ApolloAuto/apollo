@@ -411,13 +411,14 @@ void SimControl::PublishLocalization(const TrajectoryPoint& point,
   if (FLAGS_use_navigation_mode) {
     double flu_x = point_to_publish.path_point().x();
     double flu_y = point_to_publish.path_point().y();
-    double enu_x = 0.0;
-    double enu_y = 0.0;
-    common::math::RotateAxis(-cur_theta, flu_x, flu_y, &enu_x, &enu_y);
-    enu_x += adc_position_.x();
-    enu_y += adc_position_.y();
-    pose->mutable_position()->set_x(enu_x);
-    pose->mutable_position()->set_y(enu_y);
+
+    Eigen::Vector2d enu_coordinate = common::math::RotateVector2d(
+        {flu_x, flu_y}, cur_theta);
+
+    enu_coordinate.x() += adc_position_.x();
+    enu_coordinate.y() += adc_position_.y();
+    pose->mutable_position()->set_x(enu_coordinate.x());
+    pose->mutable_position()->set_y(enu_coordinate.y());
   }
 
   Eigen::Quaternion<double> cur_orientation =
