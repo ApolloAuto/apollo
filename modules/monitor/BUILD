@@ -8,6 +8,9 @@ cc_binary(
         "monitor.cc",
         "monitor.h",
     ],
+    copts = ['-DMODULE_NAME=\\"monitor\\"'],
+    linkshared = True,
+    linkstatic = False,
     deps = [
         "//cyber",
         "//modules/common/util:message_util",
@@ -22,9 +25,6 @@ cc_binary(
         "//modules/monitor/software:process_monitor",
         "//modules/monitor/software:summary_monitor",
     ],
-    copts = ['-DMODULE_NAME=\\"monitor\\"'],
-    linkshared = True,
-    linkstatic = False,
 )
 
 cpplint()

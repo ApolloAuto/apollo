@@ -13,6 +13,10 @@ cc_binary(
         "renderable_message.cc",
         "screen.cc",
     ],
+    linkopts = [
+        "-pthread",
+        "-lncurses",
+    ],
     deps = [
         "cyber_topology_message",
         "general_channel_message",
@@ -20,15 +24,11 @@ cc_binary(
         "//cyber:init",
         "//cyber/service_discovery:topology_manager",
     ],
-    linkopts = [
-        "-pthread",
-        "-lncurses"
-    ],
 )
 
 cc_library(
     name = "cyber_topology_message",
-    hdrs = [ "cyber_topology_message.h", ],
+    hdrs = ["cyber_topology_message.h"],
     deps = [
         "renderable_message",
     ],
@@ -36,28 +36,28 @@ cc_library(
 
 cc_library(
     name = "general_channel_message",
-    hdrs = [ "general_channel_message.h", ],
+    hdrs = ["general_channel_message.h"],
     deps = [
-        "general_message_base",
         "general_message",
+        "general_message_base",
         "screen",
-        "//cyber/message:raw_message"
+        "//cyber/message:raw_message",
     ],
 )
 
 cc_library(
     name = "general_message",
-    hdrs = [ "general_message.h", ],
+    hdrs = ["general_message.h"],
     deps = [
         "general_message_base",
-        "//cyber:cyber",
+        "//cyber",
         "//cyber/message:raw_message",
     ],
 )
 
 cc_library(
     name = "general_message_base",
-    hdrs = [ "general_message_base.h", ],
+    hdrs = ["general_message_base.h"],
     deps = [
         "renderable_message",
     ],
@@ -65,7 +65,7 @@ cc_library(
 
 cc_library(
     name = "renderable_message",
-    hdrs = [ "renderable_message.h", ],
+    hdrs = ["renderable_message.h"],
     deps = [
         "screen",
     ],
@@ -73,7 +73,7 @@ cc_library(
 
 cc_library(
     name = "screen",
-    hdrs = [ "screen.h", ],
+    hdrs = ["screen.h"],
 )
 
 #cpplint()

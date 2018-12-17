@@ -1,5 +1,4 @@
 load("//tools:cpplint.bzl", "cpplint")
-
 load("//tools:grpc_library.bzl", "cc_grpc_library")
 
 package(default_visibility = ["//visibility:public"])
@@ -44,13 +43,13 @@ cc_grpc_library(
     srcs = [
         "v2x_service_car_to_obu.proto",
     ],
-    deps = [
-        ":v2x_carstatus_proto_lib",
-        "//modules/perception/proto:perception_proto_lib",
-    ],
     deps_cc = [
         ":v2x_carstatus_proto",
         "//modules/perception/proto:perception_proto",
+    ],
+    deps = [
+        ":v2x_carstatus_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
     ],
 )
 
@@ -59,13 +58,13 @@ cc_grpc_library(
     srcs = [
         "v2x_service_obu_to_car.proto",
     ],
-    deps = [
-        ":v2x_traffic_light_proto_lib",
-        "//modules/perception/proto:perception_proto_lib",
-    ],
     deps_cc = [
         ":v2x_traffic_light_proto",
         "//modules/perception/proto:perception_proto",
+    ],
+    deps = [
+        ":v2x_traffic_light_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
     ],
 )
 

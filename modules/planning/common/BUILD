@@ -115,8 +115,8 @@ cc_library(
     ],
     deps = [
         ":frame",
-        "//modules/planning/reference_line",
         "//modules/common/configs:vehicle_config_helper",
+        "//modules/planning/reference_line",
     ],
 )
 

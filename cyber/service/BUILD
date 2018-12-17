@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         "service_base",
-        "//cyber/scheduler:scheduler",
+        "//cyber/scheduler",
     ],
 )
 
@@ -36,6 +36,5 @@ cc_library(
         "service_base.h",
     ],
 )
-
 
 cpplint()

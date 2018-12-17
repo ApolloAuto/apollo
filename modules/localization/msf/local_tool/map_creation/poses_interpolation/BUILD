@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

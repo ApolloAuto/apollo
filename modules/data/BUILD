@@ -12,7 +12,7 @@ cc_library(
         "//modules/data/proto:data_conf_proto",
         "//modules/data/proto:data_proto",
         "//modules/data/recorder:record_service",
-    ]
+    ],
 )
 
 cc_library(
@@ -27,8 +27,8 @@ cc_library(
 
 cc_binary(
     name = "libdata_component.so",
-    deps = [":data_component_lib"],
     linkshared = True,
+    deps = [":data_component_lib"],
 )
 
 cc_test(
@@ -40,6 +40,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
 
 cpplint()

@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_test(
     name = "camera_app_obstacle_camera_perception_test",
     size = "medium",
@@ -25,8 +24,9 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
+
 #cc_test(
 #    name = "camera_app_traffic_light_camera_perception_test",
 #    srcs = [
@@ -56,22 +56,20 @@ cc_test(
         "camera_common_camera_ground_plane_test.cc",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/common:camera_ground_plane",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
-
 
 cc_library(
-     name = "camera_common_io_util",
-     hdrs = [
-         ":camera_common_io_util.h"
-     ],
+    name = "camera_common_io_util",
+    hdrs = [
+        ":camera_common_io_util.h",
+    ],
 )
-
 
 cc_test(
     name = "camera_common_data_provider_test",
@@ -96,8 +94,9 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
+
 cc_test(
     name = "camera_common_twod_threed_util_test",
     size = "small",
@@ -120,8 +119,9 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
+
 cc_library(
     name = "camera_common_undistortion",
     srcs = [
@@ -137,10 +137,11 @@ cc_library(
         "-lopencv_highgui",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
+
 #cc_test(
 #    name = "camera_common_undistortion_handler_test",
 #    srcs = [
@@ -191,8 +192,9 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
+
 cc_test(
     name = "camera_common_veh_template_test",
     size = "small",
@@ -214,9 +216,8 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
-
 
 cc_test(
     name = "camera_lib_calibration_service_online_calibration_service_test",
@@ -226,13 +227,13 @@ cc_test(
     ],
     deps = [
         "//cyber",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
+        "//modules/perception/base",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
 
 cc_test(
@@ -244,7 +245,7 @@ cc_test(
     deps = [
         "//modules/perception/camera/lib/calibrator/common:histogram_estimator",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_library(
@@ -260,9 +261,9 @@ cc_library(
         "-lopencv_highgui",
     ],
     deps = [
-        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
-    ]
+    ],
 )
 
 cc_library(
@@ -279,12 +280,11 @@ cc_library(
         "-lopencv_highgui",
     ],
     deps = [
-        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
         "@eigen",
-    ]
+    ],
 )
-
 
 cc_library(
     name = "camera_lib_calibrator_laneline_lane_io",
@@ -297,11 +297,10 @@ cc_library(
     deps = [
         ":camera_lib_calibrator_laneline_app_util",
         "//modules/perception/camera/lib/calibrator/laneline:lane_based_calibrator",
-        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/core",
         "@eigen",
-    ]
+    ],
 )
-
 
 # cc_test(
 #     name = "camera_lib_calibrator_laneline_laneline_calibrator_test",
@@ -331,7 +330,7 @@ cc_test(
     deps = [
         "//modules/perception/camera/lib/dummy:dummy_algorithms",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -341,14 +340,14 @@ cc_test(
         "camera_lib_feature_extractor_tfe_tracking_feat_extractor_test.cc",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/lib/feature_extractor/tfe:tracking_feat_extractor",
         "//modules/perception/common/io:io_util",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -358,9 +357,9 @@ cc_test(
         "camera_lib_interface_test.cc",
     ],
     deps = [
-        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/camera/lib/interface",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -376,12 +375,12 @@ cc_test(
     ],
     deps = [
         "//cyber",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/lib/lane/common:common_functions",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
 
 cc_test(
@@ -397,11 +396,11 @@ cc_test(
     ],
     deps = [
         "//cyber",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -417,15 +416,15 @@ cc_test(
     ],
     deps = [
         "//cyber",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -435,13 +434,13 @@ cc_test(
         "camera_lib_obstacle_detector_yolo_region_output_test.cc",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
         "//modules/perception/common/io:io_util",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -462,7 +461,7 @@ cc_test(
         "//modules/perception/inference/utils:inference_util_lib",
         "@gtest//:main",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
 
 cc_test(
@@ -473,12 +472,12 @@ cc_test(
     ],
     deps = [
         "//cyber",
-        "//modules/perception/camera/lib/calibration_service/online_calibration_service:online_calibration_service",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
         "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -489,15 +488,15 @@ cc_test(
     ],
     deps = [
         "//cyber",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/camera/lib/obstacle/tracker/common:common",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/obstacle/tracker/common",
         "//modules/perception/inference/operators:perception_inference_operators",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@eigen",
         "@gtest//:main",
-    ]
+    ],
 )
 
 cc_test(
@@ -507,12 +506,11 @@ cc_test(
         "camera_lib_obstacle_tracker_omt_frame_list_test.cc",
     ],
     deps = [
-        "//modules/perception/camera/common:common",
+        "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
         "@gtest//:main",
-    ]
+    ],
 )
-
 
 # TODO(private)
 # cc_test(
@@ -562,15 +560,16 @@ cc_test(
     ],
     deps = [
         "//modules/common/util:file_util",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
         "//modules/perception/camera/lib/obstacle/tracker/omt:frame_list",
         "//modules/perception/camera/lib/obstacle/tracker/omt:omt_proto",
         "//modules/perception/camera/lib/obstacle/tracker/omt:target",
         "//modules/perception/inference/utils:inference_gemm_lib",
         "@gtest//:main",
-    ]
+    ],
 )
+
 cc_test(
     name = "camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test",
     size = "small",
@@ -583,7 +582,7 @@ cc_test(
         "-lopencv_highgui",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
         "//modules/perception/camera/lib/obstacle/transformer/multicue:multicue_obstacle_transformer",
         "//modules/perception/common/io:io_util",
@@ -591,10 +590,8 @@ cc_test(
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@gtest//:main",
-    ]
+    ],
 )
-
-
 
 cc_test(
     name = "camera_lib_traffic_light_detector_crop_test",
@@ -615,7 +612,7 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
 
 # cc_test(
@@ -684,9 +681,8 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
-
 
 # TODO(private)
 #cc_test(
@@ -737,7 +733,7 @@ cc_test(
         "@gtest//:main",
         "@tensorrt",
         "@yaml_cpp//:yaml",
-    ]
+    ],
 )
 
 cpplint()

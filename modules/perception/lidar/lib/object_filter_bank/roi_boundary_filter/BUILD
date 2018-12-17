@@ -15,7 +15,7 @@ cc_library(
         "//modules/common/util:file_util",
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/geometry:common",
-        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface:base_object_filter",
         "//modules/perception/proto:roi_boundary_filter_config_proto",
         "@eigen",

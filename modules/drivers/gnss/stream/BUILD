@@ -21,10 +21,10 @@ cc_library(
         ":stream",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/math:math",
+        "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/util",
         "//modules/common/util:string_util",
-        "//modules/common/util:util",
     ],
 )
 

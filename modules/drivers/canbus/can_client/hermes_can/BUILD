@@ -8,9 +8,9 @@ cc_library(
         "hermes_can_client.cc",
     ],
     hdrs = [
-        "hermes_can_client.h",
         "bcan.h",
         "bcan_defs.h",
+        "hermes_can_client.h",
     ],
     deps = [
         "//modules/drivers/canbus/can_client",

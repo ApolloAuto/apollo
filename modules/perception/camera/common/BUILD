@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_library(
     name = "camera_frame",
     hdrs = [
@@ -10,10 +9,9 @@ cc_library(
     ],
     deps = [
         ":data_provider",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
     ],
 )
-
 
 cc_library(
     name = "camera_ground_plane",
@@ -25,12 +23,11 @@ cc_library(
     ],
     deps = [
         "//modules/perception/common/i_lib/algorithm:i_sort",
-        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/da:i_ransac",
         "//modules/perception/common/i_lib/geometry:i_plane",
     ],
 )
-
 
 cc_library(
     name = "data_provider",
@@ -42,10 +39,9 @@ cc_library(
     ],
     deps = [
         ":undistortion_handler",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
     ],
 )
-
 
 cc_library(
     name = "global_config",
@@ -54,15 +50,13 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "math_functions",
     hdrs = [
-        "//modules/perception/base:base",
         "math_functions.h",
+        "//modules/perception/base:base",
     ],
 )
-
 
 cc_library(
     name = "object_template_manager",
@@ -76,14 +70,13 @@ cc_library(
         "//cyber",
         "//external:gflags",
         "//modules/common/util:file_util",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/camera/common/proto:object_template_meta_schema_proto",
         "//modules/perception/common/io:io_util",
-        "//modules/perception/lib/config_manager:config_manager",
-        "//modules/perception/lib/thread:thread",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lib/thread",
     ],
 )
-
 
 cc_library(
     name = "timer",
@@ -92,19 +85,17 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "twod_threed_util",
     hdrs = [
         "twod_threed_util.h",
     ],
     deps = [
-        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
         "@eigen",
     ],
 )
-
 
 cc_library(
     name = "undistortion_handler",
@@ -115,9 +106,9 @@ cc_library(
         "undistortion_handler.h",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/base:blob",
-        "//modules/perception/common/sensor_manager:sensor_manager",
+        "//modules/perception/common/sensor_manager",
     ],
 )
 
@@ -130,10 +121,9 @@ cc_library(
         "util.h",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
     ],
 )
-
 
 cc_library(
     name = "common",

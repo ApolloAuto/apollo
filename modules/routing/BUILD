@@ -32,17 +32,17 @@ cc_library(
     hdrs = [
         "routing_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_lib",
     ],
-    copts = ['-DMODULE_NAME=\\"routing\\"']
 )
 
 cc_binary(
     name = "librouting_component.so",
-    deps = [":routing_component_lib"],
     linkshared = True,
     linkstatic = False,
+    deps = [":routing_component_lib"],
 )
 
 filegroup(

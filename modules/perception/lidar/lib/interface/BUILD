@@ -15,7 +15,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "base_bipartite_graph_matcher",
     hdrs = [

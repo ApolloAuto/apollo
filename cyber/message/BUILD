@@ -1,6 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
 
-package(default_visibility = ["//visibility:public"],)
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "intra_message",
@@ -51,7 +51,7 @@ cc_library(
         "//cyber/common:log",
         "//cyber/common:macros",
         "//cyber/proto:proto_desc_cc_proto",
-    ]
+    ],
 )
 
 cc_library(
@@ -60,7 +60,7 @@ cc_library(
         "protobuf_traits.h",
     ],
     deps = [
-        "protobuf_factory"
+        "protobuf_factory",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_library(
         "py_message.h",
     ],
     deps = [
-        "protobuf_factory"
+        "protobuf_factory",
     ],
 )
 
@@ -80,8 +80,8 @@ cc_library(
         "py_message_traits.h",
     ],
     deps = [
-        "py_message",
         "protobuf_factory",
+        "py_message",
     ],
 )
 
@@ -91,7 +91,7 @@ cc_library(
         "raw_message.h",
     ],
     deps = [
-        "protobuf_factory"
+        "protobuf_factory",
     ],
 )
 
@@ -111,12 +111,12 @@ cc_test(
     name = "protobuf_factory_test",
     size = "small",
     srcs = [
-        "protobuf_factory_test.cc"
+        "protobuf_factory_test.cc",
     ],
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest//:main"
+        "@gtest//:main",
     ],
 )
 
@@ -126,8 +126,8 @@ cc_library(
         "raw_message_traits.h",
     ],
     deps = [
-        "raw_message",
         "protobuf_factory",
+        "raw_message",
     ],
 )
 

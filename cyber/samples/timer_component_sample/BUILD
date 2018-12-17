@@ -4,9 +4,9 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "libtimer_component_sample.so",
-    deps = [":timer_component_sample_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
+    deps = [":timer_component_sample_lib"],
 )
 
 cc_library(
@@ -22,4 +22,5 @@ cc_library(
         "//cyber/samples/proto:samples_cc_proto",
     ],
 )
+
 cpplint()

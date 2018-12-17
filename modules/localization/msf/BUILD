@@ -12,14 +12,14 @@ cc_library(
         "msf_localization.h",
         "msf_localization_component.h",
     ],
-    linkopts = [
-        "-lboost_system",
-    ],
     copts = [
         "-O2",
         "-DMODULE_NAME=\\\"localization\\\"",
         "-DENABLE_DEBUG_LIB",
         "-DENABLE_OPENCV",
+    ],
+    linkopts = [
+        "-lboost_system",
     ],
     deps = [
         "//cyber",
@@ -59,18 +59,17 @@ cc_binary(
     deps = [":msf_localization_component_lib"],
 )
 
-
 cc_test(
     name = "msf_localization_test",
-    timeout = "short",
     size = "small",
+    timeout = "short",
     srcs = [
         "msf_localization_test.cc",
     ],
-    data = ["//modules/localization:localization_testdata"],
     copts = [
         "-Dprivate=public",
     ],
+    data = ["//modules/localization:localization_testdata"],
     deps = [
         "//cyber",
         "//modules/common/time",

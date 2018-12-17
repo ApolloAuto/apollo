@@ -23,8 +23,8 @@ cc_library(
         ":inference_cuda_util_cuda_lib",
     ],
     hdrs = ["cuda_util.h"],
-    linkstatic = 1,
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkstatic = 1,
     deps = [
         "@caffe",
     ],
@@ -52,8 +52,8 @@ cc_library(
         ":inference_util_cuda_lib",
     ],
     hdrs = ["util.h"],
-    linkstatic = 1,
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkstatic = 1,
     deps = [
         "//modules/perception/base:blob",
         "//modules/perception/base:box",
@@ -87,13 +87,12 @@ cc_library(
         ":inference_resize_cuda_lib",
     ],
     hdrs = ["resize.h"],
-    linkstatic = 1,
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkstatic = 1,
     deps = [
         "@caffe",
     ],
 )
-
 
 cuda_library(
     name = "inference_gemm_cuda_lib",
@@ -119,13 +118,12 @@ cc_library(
         ":inference_gemm_cuda_lib",
     ],
     hdrs = ["gemm.h"],
-    linkstatic = 1,
     linkopts = ["-lopencv_core -lopencv_imgproc -lopencv_highgui -lnvinfer_plugin"],
+    linkstatic = 1,
     deps = [
         "@caffe",
     ],
 )
-
 
 cc_test(
     name = "inference_util_test",

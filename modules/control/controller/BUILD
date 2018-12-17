@@ -19,6 +19,7 @@ cc_library(
     hdrs = [
         "lat_controller.h",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
         "//cyber",
@@ -38,7 +39,6 @@ cc_library(
         "//modules/control/proto:control_proto",
         "@eigen",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -49,6 +49,7 @@ cc_library(
     hdrs = [
         "lon_controller.h",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
         "//cyber",
@@ -64,7 +65,6 @@ cc_library(
         "//modules/control/common:trajectory_analyzer",
         "//modules/localization/common:localization_common",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -75,6 +75,7 @@ cc_library(
     hdrs = [
         "mpc_controller.h",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
         "//cyber",
@@ -95,11 +96,11 @@ cc_library(
         "//modules/control/proto:control_proto",
         "@eigen",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
     name = "controller",
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_agent",
         ":controller_interface",
@@ -108,7 +109,6 @@ cc_library(
         ":mpc_controller",
         "@eigen",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -119,6 +119,7 @@ cc_library(
     hdrs = [
         "controller_agent.h",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
         ":lat_controller",
@@ -131,7 +132,6 @@ cc_library(
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'], 
 )
 
 cc_test(

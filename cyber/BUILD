@@ -6,43 +6,43 @@ cc_library(
     name = "cyber",
     linkstatic = False,
     deps = [
-      "//cyber:cyber_core",
+        "//cyber:cyber_core",
     ],
 )
 
 cc_binary(
     name = "mainboard",
     srcs = [
-      "mainboard/mainboard.cc",
-      "mainboard/module_controller.cc",
-      "mainboard/module_controller.h",
-      "mainboard/module_argument.cc",
-      "mainboard/module_argument.h",
+        "mainboard/mainboard.cc",
+        "mainboard/module_argument.cc",
+        "mainboard/module_argument.h",
+        "mainboard/module_controller.cc",
+        "mainboard/module_controller.h",
     ],
     copts = [
-      "-pthread",
+        "-pthread",
     ],
     linkstatic = False,
     deps = [
-      ":cyber_core",
-      "//cyber/proto:dag_conf_cc_proto",
+        ":cyber_core",
+        "//cyber/proto:dag_conf_cc_proto",
     ],
 )
 
 cc_library(
     name = "binary",
     hdrs = [
-      "binary.h",
+        "binary.h",
     ],
 )
 
 cc_library(
     name = "state",
     srcs = [
-      "state.cc",
+        "state.cc",
     ],
     hdrs = [
-      "state.h",
+        "state.h",
     ],
     deps = [
         "//cyber/common",
@@ -55,28 +55,28 @@ cc_library(
         "init.cc",
     ],
     hdrs = [
-      "init.h",
+        "init.h",
     ],
     deps = [
-      "//cyber:state",
-      "//cyber/logger:async_logger",
-      "//cyber/node",
+        "//cyber:state",
+        "//cyber/logger:async_logger",
+        "//cyber/node",
     ],
 )
 
 cc_library(
     name = "cyber_core",
+    srcs = [
+        "cyber.cc",
+    ],
+    hdrs = [
+        "cyber.h",
+    ],
     linkopts = [
         "-lglog",
         "-lgflags",
         "-lprotobuf",
         "-luuid",
-    ],
-    srcs = [
-        "cyber.cc",
-    ],
-    hdrs = [
-      "cyber.h",
     ],
     deps = [
         "//cyber:binary",

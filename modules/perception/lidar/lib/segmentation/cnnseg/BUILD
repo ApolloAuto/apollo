@@ -30,7 +30,7 @@ cc_library(
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:spp_engine_config_proto",
         "//modules/perception/lidar/lib/segmentation/cnnseg/spp_engine",
-        "//modules/perception/proto:perception_config_schema_proto"
+        "//modules/perception/proto:perception_config_schema_proto",
     ],
 )
 
@@ -44,8 +44,8 @@ cc_library(
 cc_library(
     name = "feature_generator",
     srcs = [
-        ":feature_generator_cuda",
         "feature_generator.cc",
+        ":feature_generator_cuda",
     ],
     hdrs = [
         "feature_generator.h",

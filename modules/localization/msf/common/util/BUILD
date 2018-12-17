@@ -45,10 +45,10 @@ cc_library(
     name = "localization_msf_common_util",
     hdrs = [
         "extract_ground_plane.h",
-        "rect2d.h",
         "math_util.h",
-        "voxel_grid_covariance_hdmap.h",
+        "rect2d.h",
         "time_conversion.h",
+        "voxel_grid_covariance_hdmap.h",
     ],
     linkopts = [
         "-lboost_filesystem",
@@ -62,24 +62,24 @@ cc_library(
 
 cc_test(
     name = "localization_msf_common_util_compression_test",
-    srcs = ["compression_test.cc"],
-    timeout = "short",
     size = "small",
+    timeout = "short",
+    srcs = ["compression_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
-        "@gtest//:main"
-    ]
+        "@gtest//:main",
+    ],
 )
 
 cc_test(
     name = "localization_msf_common_util_rect2d_test",
-    srcs = ["rect2d_test.cc"],
-    timeout = "short",
     size = "small",
+    timeout = "short",
+    srcs = ["rect2d_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "@gtest//:main"
-    ]
+        "@gtest//:main",
+    ],
 )
 
 filegroup(
@@ -89,25 +89,25 @@ filegroup(
 
 cc_test(
     name = "localization_msf_common_system_utility_test",
-    timeout = "short",
     size = "medium",
+    timeout = "short",
     srcs = ["system_utility_test.cc"],
     data = ["localization_msf_common_test_data"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
-        "@gtest//:main"
-    ]
+        "@gtest//:main",
+    ],
 )
 
 cc_test(
     name = "localization_msf_common_frame_transform_test",
-    timeout = "short",
     size = "medium",
+    timeout = "short",
     srcs = ["frame_transform_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_frame_transform",
-        "@gtest//:main"
-    ]
+        "@gtest//:main",
+    ],
 )
 
 cpplint()

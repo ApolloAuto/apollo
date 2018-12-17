@@ -10,10 +10,10 @@ cc_library(
     hdrs = [
         "canbus_gflags.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//external:gflags",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cpplint()

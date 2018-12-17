@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_library(
     name = "piecewise_poly_speed_curve",
     srcs = [
@@ -19,7 +18,6 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
     ],
 )
-
 
 cc_test(
     name = "piecewise_poly_speed_curve_test",
@@ -75,7 +73,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/proto:poly_vt_speed_config_proto",
-    ]
+    ],
 )
 
 cc_test(
@@ -122,4 +120,5 @@ cc_library(
         "//modules/planning/tuning/speed_model:autotuning_speed_mlp_model",
     ],
 )
+
 cpplint()

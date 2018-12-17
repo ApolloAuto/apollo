@@ -18,7 +18,7 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:rnn_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/scenario:scenario_manager",
-        "@glog//:glog",
+        "@glog",
     ],
 )
 

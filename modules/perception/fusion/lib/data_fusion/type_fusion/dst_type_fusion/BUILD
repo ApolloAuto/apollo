@@ -18,8 +18,8 @@ cc_library(
         "//modules/perception/fusion/base:track",
         "//modules/perception/fusion/common:camera_util",
         "//modules/perception/fusion/common:dst_evidence",
-        "//modules/perception/fusion/lib/interface:interface",
-        "//modules/perception/lib/config_manager:config_manager",
+        "//modules/perception/fusion/lib/interface",
+        "//modules/perception/lib/config_manager",
         "//modules/perception/proto:dst_type_fusion_config_proto",
     ],
 )

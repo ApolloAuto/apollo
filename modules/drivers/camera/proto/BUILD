@@ -9,7 +9,6 @@ cc_library(
     ],
 )
 
-
 cc_proto_library(
     name = "sensor_camera_proto",
     deps = [

@@ -2,206 +2,204 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_library(
     name = "base_lane_postprocessor",
-    hdrs = [ 
+    hdrs = [
         "base_lane_postprocessor.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_calibrator",
-    hdrs = [ 
+    hdrs = [
         "base_calibrator.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_lane_detector",
-    hdrs = [ 
+    hdrs = [
         "base_lane_detector.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_landmark_detector",
-    hdrs = [ 
+    hdrs = [
         "base_landmark_detector.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_calibration_service",
-    hdrs = [ 
+    hdrs = [
         "base_calibration_service.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_obstacle_postprocessor",
-    hdrs = [ 
+    hdrs = [
         "base_obstacle_postprocessor.h",
     ],
 )
 
 cc_library(
     name = "base_obstacle_tracker",
-    hdrs = [ 
+    hdrs = [
         "base_obstacle_tracker.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_obstacle_transformer",
-    hdrs = [ 
+    hdrs = [
         "base_obstacle_transformer.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_scene_parser",
-    hdrs = [ 
+    hdrs = [
         "base_scene_parser.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_lane_tracker",
-    hdrs = [ 
+    hdrs = [
         "base_lane_tracker.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_traffic_light_detector",
-    hdrs = [ 
+    hdrs = [
         "base_traffic_light_detector.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_init_options",
-    hdrs = [ 
+    hdrs = [
         "base_init_options.h",
     ],
 )
 
 cc_library(
     name = "base_obstacle_detector",
-    hdrs = [ 
+    hdrs = [
         "base_obstacle_detector.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_traffic_light_tracker",
-    hdrs = [ 
+    hdrs = [
         "base_traffic_light_tracker.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_feature_extractor",
-    hdrs = [ 
+    hdrs = [
         "base_feature_extractor.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_inference_engine",
-    hdrs = [ 
+    hdrs = [
         "base_inference_engine.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
 
 cc_library(
     name = "base_camera_perception",
-    hdrs = [ 
+    hdrs = [
         "base_camera_perception.h",
     ],
     deps = [
         ":base_init_options",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/lib/registerer:registerer",
+        "//modules/perception/camera/common",
+        "//modules/perception/lib/registerer",
     ],
 )
-
 
 cc_library(
     name = "interface",

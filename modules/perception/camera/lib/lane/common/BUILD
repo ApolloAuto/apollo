@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_proto_library(
     name = "denseline_proto",
     deps = [
@@ -17,18 +16,17 @@ proto_library(
     ],
 )
 
-
 cc_library(
     name = "common_functions",
     srcs = [
         "common_functions.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "common_functions.h",
     ],
     deps = [
         "//cyber",
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "@eigen",
     ],
 )
