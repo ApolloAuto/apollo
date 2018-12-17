@@ -356,8 +356,11 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
                                         const double enu_theta, double *flu_x,
                                         double *flu_y, double *flu_theta) {
     if (flu_x != nullptr && flu_y != nullptr) {
-      common::math::RotateAxis(original_pose_.heading(), enu_x + dx, enu_y + dy,
-                               flu_x, flu_y);
+      Eigen::Vector2d flu_coordinate = common::math::RotateVector2d(
+          {enu_x + dx, enu_y + dy}, -original_pose_.heading());
+
+      *flu_x = flu_coordinate.x();
+      *flu_y = flu_coordinate.y();
     }
 
     if (flu_theta != nullptr) {

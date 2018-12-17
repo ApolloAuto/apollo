@@ -91,26 +91,28 @@ TEST(MathUtilsTest, Clamp) {
   EXPECT_EQ(6, Clamp(6, 0, 6));  // test upper bound as input
 }
 
-TEST(MathUtilsTest, RotateAxis) {
-  double x, y;
-  double expected_x, expected_y;
-  expected_x = sqrt(2);
-  expected_y = 0;
-  RotateAxis(M_PI / 4, 1.0, 1.0, &x, &y);
-  EXPECT_DOUBLE_EQ(expected_x, x);
-  EXPECT_NEAR(expected_y, y, 1e-5);
+TEST(MathUtilsTest, RotateVector2d) {
+  double expected_x = 0.0;
+  double expected_y = std::sqrt(2.0);
 
-  expected_x = 1;
-  expected_y = 0;
-  RotateAxis(M_PI / 2, 0.0, 1.0, &x, &y);
-  EXPECT_DOUBLE_EQ(expected_x, x);
-  EXPECT_NEAR(expected_y, y, 1e-5);
+  Eigen::Vector2d result =
+      RotateVector2d({1.0, 1.0}, M_PI / 4);
 
-  expected_x = -1;
-  expected_y = 0;
-  RotateAxis(M_PI, 1.0, 0.0, &x, &y);
-  EXPECT_DOUBLE_EQ(expected_x, x);
-  EXPECT_NEAR(expected_y, y, 1e-5);
+  auto tol = 1.0e-10;
+  EXPECT_NEAR(expected_x, result.x(), tol);
+  EXPECT_NEAR(expected_y, result.y(), tol);
+
+  expected_x = -1.0;
+  expected_y = 0.0;
+  result = RotateVector2d({0.0, 1.0}, M_PI / 2);
+  EXPECT_NEAR(expected_x, result.x(), tol);
+  EXPECT_NEAR(expected_y, result.y(), tol);
+
+  expected_x = -1.0;
+  expected_y = 0.0;
+  result = RotateVector2d({1.0, 0.0}, M_PI);
+  EXPECT_NEAR(expected_x, result.x(), tol);
+  EXPECT_NEAR(expected_y, result.y(), tol);
 }
 
 TEST(MathUtilsTest, QPSTTest) {

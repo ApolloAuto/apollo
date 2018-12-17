@@ -24,6 +24,8 @@
 #include <limits>
 #include <utility>
 
+#include "Eigen/Dense"
+
 #include "modules/common/math/vec2d.h"
 
 /**
@@ -167,11 +169,9 @@ double Gaussian(const double u, const double std, const double x);
 // Sigmoid
 double Sigmoid(const double x);
 
-// Rotate Axis (2D):
-// convert a point (x0, y0) in axis1 to a point (x1, y1) in axis2 where the
-// angle from axis1 to axis2 is theta (counter clockwise)
-void RotateAxis(const double theta, const double x0, const double y0,
-                double *x1, double *y1);
+// Rotate a 2d vector counter-clockwise by theta
+Eigen::Vector2d RotateVector2d(
+    const Eigen::Vector2d& v_in, const double theta);
 
 inline std::pair<double, double> RFUToFLU(const double x, const double y) {
   return std::make_pair(y, -x);
@@ -203,7 +203,7 @@ inline void L2Norm(int feat_dim, float *feat_data) {
   }
 }
 
-// Cartesian coordinates to Polar coordianates
+// Cartesian coordinates to Polar coordinates
 std::pair<double, double> Cartesian2Polar(double x, double y);
 
 }  // namespace math
