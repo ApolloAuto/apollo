@@ -60,6 +60,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "log_file_object_test",
+    size = "small",
+    srcs = [
+        "log_file_object_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "logger_util",
     srcs = [
