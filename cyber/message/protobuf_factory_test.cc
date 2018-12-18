@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/message/protobuf_factory.h"
+
 #include <gtest/gtest.h>
 #include <string>
 
-#include "cyber/message/protobuf_factory.h"
 #include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {

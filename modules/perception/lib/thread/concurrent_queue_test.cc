@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
-
-#include "cyber/common/log.h"
 
 #include "modules/perception/lib/thread/concurrent_queue.h"
+
+#include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/perception/lib/thread/thread.h"
 
 namespace apollo {

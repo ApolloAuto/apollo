@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/transport/transmitter/rtps_transmitter.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -23,7 +25,6 @@
 #include "cyber/common/util.h"
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/receiver/rtps_receiver.h"
-#include "cyber/transport/transmitter/rtps_transmitter.h"
 #include "cyber/transport/transport.h"
 
 namespace apollo {

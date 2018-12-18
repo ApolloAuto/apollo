@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
+#include "cyber/node/node.h"
 
 #include "cyber/init.h"
-#include "cyber/node/node.h"
 #include "cyber/proto/unit_test.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {}  // namespace cyber

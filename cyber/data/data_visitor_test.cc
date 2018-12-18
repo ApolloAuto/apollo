@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/data/data_visitor.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -21,7 +23,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "cyber/data/data_visitor.h"
 #include "cyber/message/raw_message.h"
 
 namespace apollo {
