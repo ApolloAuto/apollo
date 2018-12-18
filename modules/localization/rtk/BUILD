@@ -20,6 +20,7 @@ cc_library(
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",
         "//modules/common/util:message_util",
+        "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:localization_proto",
