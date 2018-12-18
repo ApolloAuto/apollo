@@ -43,14 +43,6 @@ using apollo::hdmap::PathOverlap;
 using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
-constexpr double kRoadBuffer = 0.05;                   // 5cm
-constexpr double kObstacleLBuffer = 0.1;               // 10cm
-constexpr double kObstacleSBuffer = 2.0;               // 2m
-constexpr double kExtraRoadBufferDuringTurning = 0.1;  // 10cm
-constexpr double kVehicleBuffer = 0.6;                 // 60cm
-constexpr double kOffRoadCenterThreshold = 0.4;        // 40cm
-constexpr double kTrimWatchWindow = 12.0;              // 12m
-
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)
     : Decider(config) {}
 
@@ -280,8 +272,9 @@ SidePassPathDecider::GetPathBoundaries(
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
     std::get<1>(lateral_bound) =
-        -lane_right_width + adc_half_width + kRoadBuffer;
-    std::get<2>(lateral_bound) = lane_left_width - adc_half_width - kRoadBuffer;
+        -lane_right_width + adc_half_width + FLAGS_side_pass_road_buffer;
+    std::get<2>(lateral_bound) =
+        lane_left_width - adc_half_width - FLAGS_side_pass_road_buffer;
     ADEBUG << "lateral_bound initialized: " << std::get<1>(lateral_bound)
            << ", " << std::get<2>(lateral_bound) << ".";
 
@@ -332,7 +325,7 @@ SidePassPathDecider::GetPathBoundaries(
       ADEBUG << "Upper limit expanded by " << adjacent_lane_width;
       // Update the lateral_bound accordingly.
       std::get<2>(lateral_bound) += adjacent_lane_width;
-      std::get<2>(lateral_bound) -= kVehicleBuffer;
+      std::get<2>(lateral_bound) -= FLAGS_side_pass_vehicle_buffer;
     } else if (decided_direction_ == SidePassDirection::RIGHT &&
                (curr_lane_.right_neighbor_forward_lane_id_size() > 0 ||
                 curr_lane_.right_neighbor_reverse_lane_id_size() > 0)) {
@@ -369,7 +362,7 @@ SidePassPathDecider::GetPathBoundaries(
       }
       ADEBUG << "Lower limit expanded by " << adjacent_lane_width;
       std::get<1>(lateral_bound) -= adjacent_lane_width;
-      std::get<1>(lateral_bound) += kVehicleBuffer;
+      std::get<1>(lateral_bound) += FLAGS_side_pass_vehicle_buffer;
     }
     ADEBUG << "lateral_bound updated based on direction: "
            << std::get<1>(lateral_bound) << ", " << std::get<2>(lateral_bound)
@@ -384,15 +377,17 @@ SidePassPathDecider::GetPathBoundaries(
       // ADEBUG << obs_sl.ShortDebugString();
       // ADEBUG << "Offset = " << adc_frenet_frame_point_.s();
       // not overlap with obstacle
-      if (curr_s < obs_sl.start_s() - kObstacleSBuffer ||
-          curr_s > obs_sl.end_s() + kObstacleSBuffer) {
+      if (curr_s < obs_sl.start_s() - FLAGS_side_pass_obstacle_s_buffer ||
+          curr_s > obs_sl.end_s() + FLAGS_side_pass_obstacle_s_buffer) {
         continue;
       }
       // not within lateral range
-      if (obs_sl.start_l() >
-              std::get<2>(lateral_bound) + kObstacleLBuffer + adc_half_width ||
-          obs_sl.end_l() <
-              std::get<1>(lateral_bound) - kObstacleLBuffer - adc_half_width) {
+      if (obs_sl.start_l() > std::get<2>(lateral_bound) +
+                                 FLAGS_side_pass_obstacle_l_buffer +
+                                 adc_half_width ||
+          obs_sl.end_l() < std::get<1>(lateral_bound) -
+                               FLAGS_side_pass_obstacle_l_buffer -
+                               adc_half_width) {
         ADEBUG << "Obstacle not considered.";
         continue;
       }
@@ -419,13 +414,15 @@ SidePassPathDecider::GetPathBoundaries(
       if (side_pass_direction == SidePassDirection::LEFT) {
         const double lower_bound = FLAGS_static_decision_nudge_l_buffer +
                                    obs_sl.end_l() + adc_half_width +
-                                   kObstacleLBuffer;
+                                   FLAGS_side_pass_obstacle_l_buffer;
         ADEBUG << "Should pass from left. Lower bound = " << lower_bound;
-        if (std::get<2>(lateral_bound) - kExtraRoadBufferDuringTurning >=
+        if (std::get<2>(lateral_bound) -
+                FLAGS_side_pass_extra_road_buffer_during_turning >=
             lower_bound) {
           ADEBUG << "Reseting the boundaries for left-side-pass.";
           std::get<1>(lateral_bound) = lower_bound;
-          std::get<2>(lateral_bound) -= kExtraRoadBufferDuringTurning;
+          std::get<2>(lateral_bound) -=
+              FLAGS_side_pass_extra_road_buffer_during_turning;
         } else {
           *fail_to_find_boundary = true;
           break;
@@ -433,13 +430,14 @@ SidePassPathDecider::GetPathBoundaries(
       } else {
         const double upper_bound = -FLAGS_static_decision_nudge_l_buffer +
                                    obs_sl.start_l() - adc_half_width -
-                                   kObstacleLBuffer;
+                                   FLAGS_side_pass_obstacle_l_buffer;
         ADEBUG << "Should pass from right. Upper bound = " << upper_bound;
-        if (std::get<1>(lateral_bound) + kExtraRoadBufferDuringTurning <=
+        if (std::get<1>(lateral_bound) + FLAGS_side_pass_extra_road_buffer_during_turning <=
             upper_bound) {
           ADEBUG << "Reseting the boundaries for right-side-pass.";
           std::get<2>(lateral_bound) = upper_bound;
-          std::get<1>(lateral_bound) += kExtraRoadBufferDuringTurning;
+          std::get<1>(lateral_bound) +=
+              FLAGS_side_pass_extra_road_buffer_during_turning;
         } else {
           *fail_to_find_boundary = true;
           break;
@@ -467,7 +465,8 @@ bool SidePassPathDecider::TrimGeneratedPath(
   if (ptr_frenet_frame_path->empty()) {
     return false;
   }
-  if (std::fabs(ptr_frenet_frame_path->back().l()) > kOffRoadCenterThreshold) {
+  if (std::fabs(ptr_frenet_frame_path->back().l()) >
+      FLAGS_side_pass_off_road_center_threshold) {
     return false;
   }
 
@@ -475,7 +474,8 @@ bool SidePassPathDecider::TrimGeneratedPath(
   // TODO(all): make trimming dependent on the obstacle location.
   bool ever_departed_reference_line = false;
   for (size_t k = 0; k < ptr_frenet_frame_path->size(); ++k) {
-    if (std::fabs((*ptr_frenet_frame_path)[k].l()) > kOffRoadCenterThreshold) {
+    if (std::fabs((*ptr_frenet_frame_path)[k].l()) >
+        FLAGS_side_pass_off_road_center_threshold) {
       ever_departed_reference_line = true;
       break;
     }
@@ -487,13 +487,14 @@ bool SidePassPathDecider::TrimGeneratedPath(
   // Sliding window algorithm.
   int i = static_cast<int32_t>(ptr_frenet_frame_path->size()) - 1;
   int j = static_cast<int32_t>(ptr_frenet_frame_path->size()) - 1;
-  // 1. Move j so that it is kTrimWatchWindow ahead of i.
+  // 1. Move j so that it is FLAGS_side_pass_trim_watch_window ahead of i.
   while (j >= 0) {
     if ((*ptr_frenet_frame_path)[i].s() - (*ptr_frenet_frame_path)[j].s() >
-        kTrimWatchWindow) {
+        FLAGS_side_pass_trim_watch_window) {
       break;
     }
-    if (std::fabs((*ptr_frenet_frame_path)[j].l()) > kOffRoadCenterThreshold) {
+    if (std::fabs((*ptr_frenet_frame_path)[j].l()) >
+        FLAGS_side_pass_off_road_center_threshold) {
       return false;
     }
     j--;
@@ -504,7 +505,8 @@ bool SidePassPathDecider::TrimGeneratedPath(
   // 2. Slide the j-i window backward until the point where side-pass finishes.
   //    Trim the tailing path points.
   while (j >= 0) {
-    if (std::fabs((*ptr_frenet_frame_path)[j].l()) > kOffRoadCenterThreshold) {
+    if (std::fabs((*ptr_frenet_frame_path)[j].l()) >
+        FLAGS_side_pass_off_road_center_threshold) {
       break;
     }
     i--;
