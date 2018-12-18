@@ -22,6 +22,7 @@
 #include <map>
 
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
