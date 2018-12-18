@@ -70,7 +70,8 @@ const char Screen::InteractiveCmdStr[] =
     "\n"
     "Commands for Channel Repeated Datum:\n"
     "   n | N -- next repeated data item\n"
-    "   m | M -- previous repeated data item\n";
+    "   m | M -- previous repeated data item\n"
+    "   , -- enable|disable to show all repeated items\n";
 
 Screen::Screen()
     : current_color_pair_(INVALID),
