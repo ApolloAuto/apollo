@@ -85,3 +85,6 @@ DEFINE_string(lidar_height_yaml,
               "/apollo/modules/localization/msf/params/velodyne_params/"
               "velodyne64_height.yaml",
               "The yaml file for reading height of lidar w.r.t. ground.");
+
+DEFINE_int32(monitor_msg_pending_queue_size, 10,
+             "Max monitor message pending queue size");
