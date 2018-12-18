@@ -53,6 +53,10 @@ apollo::common::util::Factory<
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
     SidePassScenario::s_stage_factory_;
 
+// The clearance distance from intersection/destination.
+// If ADC is too close, then do not enter SIDE_PASS.
+constexpr double kClearDistance = 15.0;
+
 void SidePassScenario::RegisterStages() {
   s_stage_factory_.Clear();
   s_stage_factory_.Register(
@@ -112,25 +116,32 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
 bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
                                       const common::TrajectoryPoint& ego_point,
                                       const Frame& frame) {
+  // Sanity checks.
   if (frame.reference_line_info().size() > 1) {
     return false;
   }
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
+    // Check if the blocking obstacle is still static.
+    // If not, then switch to LANE_FOLLOW.
     const auto front_blocking_obstacle =
         const_cast<Frame&>(frame).Find(front_blocking_obstacle_id_);
     if (front_blocking_obstacle != nullptr &&
         !front_blocking_obstacle->IsStatic()) {
-      AWARN << "obstacle: " << front_blocking_obstacle_id_
-            << " starts to move and scenario changes SIDE_PASS back to default "
-               "scenario.";
+      AWARN << "Obstacle " << front_blocking_obstacle_id_
+            << " starts to move. Change scenario from SIDE_PASS"
+               " back to default scenario.";
       return false;
     }
     msg_ = "side pass obstacle: " + front_blocking_obstacle_id_;
     return (current_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
+    // If in some other special scenario, then don't try to switch
+    // to SIDE_PASS scenario.
     return false;
   } else {
+    // If originally in LANE_FOLLOW, then decide whether we shoudl
+    // switch to SIDE_PASS scenario.
     bool is_side_pass = IsSidePassScenario(frame);
     if (is_side_pass) {
       msg_ = "side pass obstacle: " + front_blocking_obstacle_id_;
@@ -140,8 +151,9 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 }
 
 bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  return (IsFarFromIntersection(frame) && HasBlockingObstacle(frame) &&
-          IsFarFromDestination(frame));
+  return (IsFarFromDestination(frame) &&
+          IsFarFromIntersection(frame) &&
+          HasBlockingObstacle(frame));
 }
 
 bool SidePassScenario::IsFarFromDestination(const Frame& frame) {
@@ -149,9 +161,8 @@ bool SidePassScenario::IsFarFromDestination(const Frame& frame) {
     return false;
   }
   const auto& reference_line_info = frame.reference_line_info().front();
-  const double kClearDistance = 15.0;
   if (reference_line_info.SDistanceToDestination() < kClearDistance) {
-    ADEBUG << "too close to destination";
+    ADEBUG << "Too close to destination; don't SIDE_PASS";
     return false;
   }
   return true;
@@ -165,7 +176,6 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
       frame.reference_line_info().front().AdcSlBoundary();
   const auto& first_encountered_overlaps =
       frame.reference_line_info().front().FirstEncounteredOverlaps();
-  const double kClearDistance = 15.0;  // in meters
   for (const auto& overlap : first_encountered_overlaps) {
     ADEBUG << "AdcSL: " << adc_sl_boundary.ShortDebugString();
     ADEBUG << overlap.first << ", " << overlap.second.DebugString();
@@ -177,14 +187,14 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
     auto distance = overlap.second.start_s - adc_sl_boundary.end_s();
     if (overlap.first == ReferenceLineInfo::SIGNAL) {
       if (distance < FLAGS_side_pass_min_signal_intersection_distance) {
-        ADEBUG << "skip side pass scenario for it is too close to signal "
-                  "intersection: "
-               << distance;
+        ADEBUG << "Too close to signal intersection ("
+               << distance << "m); don't SIDE_PASS.";
         return false;
       }
     } else {
       if (distance < kClearDistance) {
-        ADEBUG << "too close to overlap_type[" << overlap.first << "]";
+        ADEBUG << "Too close to overlap_type[" << overlap.first
+               << "] (" << distance << "m); don't SIDE_PASS";
         return false;
       }
     }
@@ -193,138 +203,46 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
 }
 
 bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
-  // possible state change: default scenario => side_pass scenario
+  // Sanity checks.
   front_blocking_obstacle_id_ = "";
-
   if (frame.reference_line_info().size() > 1) {
     return false;
   }
 
   const auto& reference_line_info = frame.reference_line_info().front();
-  const auto& reference_line = reference_line_info.reference_line();
-  const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   const PathDecision& path_decision = reference_line_info.path_decision();
-
-  // a blocking obstacle is an obstacle blocks the road when it is not blocked
-  // (by other obstacles or traffic rules)
+  double distance_to_closest_blocking_obstacle = -100.0;
+  bool exists_a_blocking_obstacle = false;
+  // A blocking obstacle is an obstacle blocks the road when it is not blocked
+  // by other obstacles or traffic rules.
+  // Loop through every obstacle to locate the closest blocking one, if there
+  // exists such an obstacle.
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    ADEBUG << "Evaluating Obstacle: " << obstacle->Id();
-    if (obstacle->IsVirtual()) {
-      ADEBUG << " - It is virtual.";
-      continue;
-    }
-
-    if (!obstacle->IsStatic() ||
-        obstacle->speed() >
-            side_pass_context_.scenario_config_.block_obstacle_min_speed()) {
-      ADEBUG << " - It is non-static.";
-      continue;
-    }
-
-    if (obstacle->PerceptionSLBoundary().start_s() <=
-        adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
-      ADEBUG << " - It is behind ADC.";
-      continue;
-    }
-
-    // check s distance
-    constexpr double kAdcDistanceThreshold = 15.0;  // unit: m
-    if (obstacle->PerceptionSLBoundary().start_s() >
-        adc_sl_boundary.end_s() + kAdcDistanceThreshold) {
-      // vehicles are far away
-      ADEBUG << " - It is too far ahead.";
-      continue;
-    }
-
-    if (adc_sl_boundary.end_s() +
-            side_pass_context_.scenario_config_.min_front_obstacle_distance() >
-        obstacle->PerceptionSLBoundary().start_s()) {
-      // front obstacle is too close to side pass
-      ADEBUG << " - It is too close to side-pass.";
-      continue;
-    }
-
-    // check driving_width
-    if (!IsBlockingDrivingPathObstacle(reference_line, obstacle)) {
-      ADEBUG << " - It is not blocking our way.";
-      continue;
-    }
-
-    bool is_blocked_by_others = false;
-    if (side_pass_context_.scenario_config_.enable_obstacle_blocked_check() &&
-        !IsParked(reference_line, obstacle)) {
-      for (const auto* other_obstacle : path_decision.obstacles().Items()) {
-        if (other_obstacle->Id() == obstacle->Id()) {
-          continue;
-        }
-        if (other_obstacle->IsVirtual()) {
-          continue;
-        }
-        if (other_obstacle->PerceptionSLBoundary().start_l() >
-                obstacle->PerceptionSLBoundary().end_l() ||
-            other_obstacle->PerceptionSLBoundary().end_l() <
-                obstacle->PerceptionSLBoundary().start_l()) {
-          // not blocking the backside vehicle
-          continue;
-        }
-
-        double delta_s = other_obstacle->PerceptionSLBoundary().start_s() -
-                         obstacle->PerceptionSLBoundary().end_s();
-        if (delta_s < 0.0 || delta_s > kAdcDistanceThreshold) {
-          continue;
-        } else {
-          // TODO(All): fixed the segmentation bug for large vehicles, otherwise
-          // the follow line will be problematic.
-          is_blocked_by_others = true;
-          break;
-        }
+    double distance_between_adc_and_obstacle = 0.0;
+    if (IsBlockingObstacleToSidePass(
+            frame, obstacle,
+            side_pass_context_.scenario_config_.block_obstacle_min_speed(),
+            side_pass_context_.scenario_config_.min_front_obstacle_distance(),
+            side_pass_context_.scenario_config_.enable_obstacle_blocked_check(),
+            &distance_between_adc_and_obstacle)) {
+      exists_a_blocking_obstacle = true;
+      if (distance_to_closest_blocking_obstacle < 0 ||
+          distance_between_adc_and_obstacle <
+              distance_to_closest_blocking_obstacle) {
+        // Only record the closest front blocking obstacle.
+        distance_to_closest_blocking_obstacle =
+            distance_between_adc_and_obstacle;
+        front_blocking_obstacle_id_ = obstacle->Id() + "_0";
+        side_pass_context_.front_blocking_obstacle_id_ = obstacle->Id();
       }
     }
-    if (!is_blocked_by_others) {
-      // static obstacle id doesn't contain prediction trajectory suffix.
-      front_blocking_obstacle_id_ = obstacle->Id() + "_0";
-      ADEBUG << "IT IS BLOCKING!";
-      side_pass_context_.front_blocking_obstacle_id_ = obstacle->Id();
-      return true;
-    } else {
-      ADEBUG << " - It is blocked by others.";
-    }
   }
-  side_pass_context_.front_blocking_obstacle_id_ = "";
-  return false;
-}
-
-bool SidePassScenario::IsParked(const ReferenceLine& reference_line,
-                                const Obstacle* obstacle) {
-  if (!FLAGS_enable_scenario_side_pass_multiple_parked_obstacles) {
+  if (exists_a_blocking_obstacle) {
+    return true;
+  } else {
+    side_pass_context_.front_blocking_obstacle_id_ = "";
     return false;
   }
-  double road_left_width = 0.0;
-  double road_right_width = 0.0;
-  double max_road_right_width = 0.0;
-  reference_line.GetRoadWidth(obstacle->PerceptionSLBoundary().start_s(),
-                              &road_left_width, &road_right_width);
-  max_road_right_width = road_right_width;
-  reference_line.GetRoadWidth(obstacle->PerceptionSLBoundary().end_s(),
-                              &road_left_width, &road_right_width);
-  max_road_right_width = std::max(max_road_right_width, road_right_width);
-  bool is_at_road_edge = std::abs(obstacle->PerceptionSLBoundary().start_l()) >
-                         max_road_right_width - 0.1;
-
-  std::vector<std::shared_ptr<const hdmap::LaneInfo>> lanes;
-  auto obstacle_box = obstacle->PerceptionBoundingBox();
-  HDMapUtil::BaseMapPtr()->GetLanes(
-      common::util::MakePointENU(obstacle_box.center().x(),
-                                 obstacle_box.center().y(), 0.0),
-      std::min(obstacle_box.width(), obstacle_box.length()), &lanes);
-  bool is_on_parking_lane = false;
-  if (lanes.size() == 1 &&
-      lanes.front()->lane().type() == apollo::hdmap::Lane::PARKING) {
-    is_on_parking_lane = true;
-  }
-
-  bool is_parked = is_on_parking_lane || is_at_road_edge;
-  return (is_parked && obstacle->IsStatic());
 }
 
 }  // namespace side_pass
