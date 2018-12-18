@@ -239,3 +239,11 @@ DECLARE_bool(enable_rss_info);
 
 DECLARE_bool(enable_planning_smoother);
 DECLARE_double(smoother_stop_distance);
+
+DECLARE_double(side_pass_road_buffer);
+DECLARE_double(side_pass_obstacle_l_buffer);
+DECLARE_double(side_pass_obstacle_s_buffer);
+DECLARE_double(side_pass_extra_road_buffer_during_turning);
+DECLARE_double(side_pass_vehicle_buffer);
+DECLARE_double(side_pass_off_road_center_threshold);
+DECLARE_double(side_pass_trim_watch_window);
