@@ -40,6 +40,8 @@ export default class Monitor {
                 return Object.assign(notification.item, {
                     timestampMs: notification.timestampSec * 1000,
                 });
+            }).sort((notification1, notification2) => {
+                return notification2.timestampMs - notification1.timestampMs;
             });
         } else if (world.monitor) {
             // deprecated: no timestamp for each item
@@ -80,7 +82,9 @@ export default class Monitor {
     }
 
     updateMonitorMessages(newItems, newTimestamp) {
+        this.hasActiveNotification = true;
         this.lastUpdateTimestamp = newTimestamp;
+
         this.items = [];
         this.rssInfo = [];
         newItems.forEach(item => {

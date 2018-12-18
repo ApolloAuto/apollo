@@ -2613,11 +2613,18 @@
                     "default": 6
                   }
                 },
-                "maxToleranceT": {
+                "ignoreMaxStMinT": {
                   "type": "double",
                   "id": 5,
                   "options": {
-                    "default": 0.5
+                    "default": 0.1
+                  }
+                },
+                "ignoreMinStMinS": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 15
                   }
                 }
               }
@@ -4623,6 +4630,13 @@
                   "id": 9,
                   "options": {
                     "default": 15
+                  }
+                },
+                "stopFenceDistanceToBlockingObstacle": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 6
                   }
                 }
               }
