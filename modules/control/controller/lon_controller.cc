@@ -259,14 +259,19 @@ Status LonController::ComputeControlCommand(
         std::make_pair(chassis_->speed_mps(), acceleration_cmd));
   }
 
-  if (calibration_value >= 0) {
-    throttle_cmd = calibration_value > throttle_deadzone ? calibration_value
-                                                         : throttle_deadzone;
+  if ((calibration_value >= 0 &&
+       chassis->gear_location() == canbus::Chassis::GEAR_DRIVE) ||
+      (calibration_value < 0 &&
+       chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)) {
+    throttle_cmd = std::abs(calibration_value) > throttle_deadzone
+                       ? std::abs(calibration_value)
+                       : throttle_deadzone;
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = -calibration_value > brake_deadzone ? -calibration_value
-                                                    : brake_deadzone;
+    brake_cmd = std::abs(calibration_value) > brake_deadzone
+                    ? std::abs(calibration_value)
+                    : brake_deadzone;
   }
 
   debug->set_station_error_limited(station_error_limited);
