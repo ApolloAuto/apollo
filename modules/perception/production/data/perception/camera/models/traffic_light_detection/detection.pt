@@ -1,4 +1,4 @@
-min_crop_size: 400
+min_crop_size: 270
 crop_method: 0
 mean_r: 122.7717
 mean_g: 115.9465
