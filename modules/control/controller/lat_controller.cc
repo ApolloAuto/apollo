@@ -271,7 +271,9 @@ Status LatController::ComputeControlCommand(
     const canbus::Chassis *chassis,
     const planning::ADCTrajectory *planning_published_trajectory,
     ControlCommand *cmd) {
-  VehicleStateProvider::Instance()->set_linear_velocity(chassis->speed_mps());
+  auto vehicle_state = VehicleStateProvider::Instance();
+
+  vehicle_state->set_linear_velocity(chassis->speed_mps());
 
   auto target_tracking_trajectory = *planning_published_trajectory;
 
@@ -361,12 +363,10 @@ Status LatController::ComputeControlCommand(
   if (FLAGS_enable_gain_scheduler) {
     matrix_q_updated_(0, 0) =
         matrix_q_(0, 0) *
-        lat_err_interpolation_->Interpolate(
-            VehicleStateProvider::Instance()->linear_velocity());
+        lat_err_interpolation_->Interpolate(vehicle_state->linear_velocity());
     matrix_q_updated_(2, 2) =
-        matrix_q_(2, 2) *
-        heading_err_interpolation_->Interpolate(
-            VehicleStateProvider::Instance()->linear_velocity());
+        matrix_q_(2, 2) * heading_err_interpolation_->Interpolate(
+                              vehicle_state->linear_velocity());
     common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_updated_,
                                   matrix_r_, lqr_eps_, lqr_max_iteration_,
                                   &matrix_k_);
@@ -390,11 +390,11 @@ Status LatController::ComputeControlCommand(
       steer_angle_feedback + steer_angle_feedforward, -100.0, 100.0);
 
   if (FLAGS_set_steer_limit) {
-    const double steer_limit =
-        std::atan(max_lat_acc_ * min_turn_radius_ /
-                  (VehicleStateProvider::Instance()->linear_velocity() *
-                   VehicleStateProvider::Instance()->linear_velocity())) *
-        steer_ratio_ * 180 / M_PI / steer_single_direction_max_degree_ * 100;
+    const double steer_limit = std::atan(max_lat_acc_ * min_turn_radius_ /
+                                         (vehicle_state->linear_velocity() *
+                                          vehicle_state->linear_velocity())) *
+                               steer_ratio_ * 180 / M_PI /
+                               steer_single_direction_max_degree_ * 100;
 
     // Clamp the steer angle
     double steer_angle_limited =
@@ -406,12 +406,9 @@ Status LatController::ComputeControlCommand(
     steer_angle = digital_filter_.Filter(steer_angle);
   }
 
-  if (VehicleStateProvider::Instance()->linear_velocity() <
-          FLAGS_lock_steer_speed &&
-      (VehicleStateProvider::Instance()->gear() ==
-           canbus::Chassis::GEAR_DRIVE ||
-       VehicleStateProvider::Instance()->gear() ==
-           canbus::Chassis::GEAR_REVERSE) &&
+  if (vehicle_state->linear_velocity() < FLAGS_lock_steer_speed &&
+      (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
+       vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     steer_angle = pre_steer_angle_;
   }
@@ -447,7 +444,7 @@ Status LatController::ComputeControlCommand(
       steer_angle_heading_rate_contribution);
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
-  debug->set_ref_speed(VehicleStateProvider::Instance()->linear_velocity());
+  debug->set_ref_speed(vehicle_state->linear_velocity());
 
   ProcessLogs(debug, chassis);
   return Status::OK();
@@ -456,16 +453,16 @@ Status LatController::ComputeControlCommand(
 Status LatController::Reset() { return Status::OK(); }
 
 void LatController::UpdateState(SimpleLateralDebug *debug) {
+  auto vehicle_state = VehicleStateProvider::Instance();
   if (FLAGS_use_navigation_mode) {
-    ComputeLateralErrors(0.0, 0.0, driving_orientation_,
-                         VehicleStateProvider::Instance()->linear_velocity(),
-                         VehicleStateProvider::Instance()->angular_velocity(),
-                         trajectory_analyzer_, debug);
+    ComputeLateralErrors(
+        0.0, 0.0, driving_orientation_, vehicle_state->linear_velocity(),
+        vehicle_state->angular_velocity(), trajectory_analyzer_, debug);
   } else {
-    const auto &com = VehicleStateProvider::Instance()->ComputeCOMPosition(lr_);
+    const auto &com = vehicle_state->ComputeCOMPosition(lr_);
     ComputeLateralErrors(com.x(), com.y(), driving_orientation_,
-                         VehicleStateProvider::Instance()->linear_velocity(),
-                         VehicleStateProvider::Instance()->angular_velocity(),
+                         vehicle_state->linear_velocity(),
+                         vehicle_state->angular_velocity(),
                          trajectory_analyzer_, debug);
   }
 
@@ -589,12 +586,12 @@ void LatController::ComputeLateralErrors(
 }
 
 void LatController::UpdateDrivingOrientation() {
-  driving_orientation_ = VehicleStateProvider::Instance()->heading();
+  auto vehicle_state = VehicleStateProvider::Instance();
+  driving_orientation_ = vehicle_state->heading();
   matrix_bd_ = matrix_b_ * ts_;
   // Reverse the driving direction if the vehicle is in reverse mode
   if (FLAGS_reverse_heading_control) {
-    if (VehicleStateProvider::Instance()->gear() ==
-        canbus::Chassis::GEAR_REVERSE) {
+    if (vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
       driving_orientation_ =
           common::math::NormalizeAngle(driving_orientation_ + M_PI);
       // Update Matrix_b for reverse mode
