@@ -225,8 +225,8 @@ class RtkPlayer(object):
             if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
                 adc_point.v = -adc_point.v
                 # adc_point.a = -adc_point.a
-                adc_point.path_point.kappa = -adc_point.path_point.kappa
-                adc_point.path_point.dkappa = -adc_point.path_point.dkappa
+                # adc_point.path_point.kappa = -adc_point.path_point.kappa
+                # adc_point.path_point.dkappa = -adc_point.path_point.dkappa
                 # adc_point.path_point.theta = math.fmod(
                 #     self.data['theta'][i] + 2.0 * math.pi, 2.0 * math.pi)
                 # if adc_point.path_point.theta < 0.0:
