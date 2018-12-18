@@ -1,5 +1,5 @@
 ## conti_radar
-该驱动基于ROS开发，支持continental ARS。
+该驱动基于Apollo cyber开发，支持continental ARS。
 
 ### 配置
 radar的默认配置: [conf/conti_radar_conf.pb.txt](https://github.com/ApolloAuto/apollo/blob/master/modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt)
