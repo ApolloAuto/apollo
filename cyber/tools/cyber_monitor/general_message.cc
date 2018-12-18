@@ -27,6 +27,7 @@ GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
                                const google::protobuf::FieldDescriptor* field)
     : GeneralMessageBase(parent),
       itemIndex_(0),
+      is_folded_(true),
       field_(field),
       message_ptr_(msg),
       reflection_ptr_(reflection) {}
@@ -81,34 +82,42 @@ void GeneralMessage::Render(const Screen* s, int key) {
         return;
       }
 
-      switch (key) {
-        case 'n':
-        case 'N':
-          ++itemIndex_;
-          if (itemIndex_ >= size) itemIndex_ = 0;
-          break;
+      if (key == ',') {
+        is_folded_ = !is_folded_;
+      } else if (is_folded_) {
+        switch (key) {
+          case 'n':
+          case 'N':
+            ++itemIndex_;
+            if (itemIndex_ >= size) itemIndex_ = 0;
+            break;
 
-        case 'm':
-        case 'M':
-          --itemIndex_;
-          if (itemIndex_ < 0) itemIndex_ = size - 1;
-          break;
+          case 'm':
+          case 'M':
+            --itemIndex_;
+            if (itemIndex_ < 0) itemIndex_ = size - 1;
+            break;
 
-        default: {}
+          default: {}
+        }
       }
 
-      int lcount =
-          lineCountOfField(*message_ptr_, s->Width(), field_, reflection_ptr_);
-      page_item_count_ = s->Height() - lineNo;
+      int lcount = lineCountOfField(*message_ptr_, s->Width(), 
+              field_, reflection_ptr_, is_folded_);
+      page_item_count_ = s->Height() - lineNo - 8;
+      if (page_item_count_ < 1) page_item_count_ = 1;
       pages_ = lcount / page_item_count_ + 1;
       SplitPages(key);
-
       int jumpLines = page_index_ * page_item_count_;
-
-      jumpLines <<= 2;
-      jumpLines /= 5;
-      GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s, lineNo,
-                                     0, reflection_ptr_, field_, itemIndex_);
+      if (is_folded_) {
+        GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, 
+                          s, lineNo, 0, reflection_ptr_, field_, itemIndex_);
+      } else {
+        for (int i = 0; i < size; ++i) {
+          GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, 
+                            s, lineNo, 0, reflection_ptr_, field_, i);
+        }
+      }
     }
   }
 

@@ -76,10 +76,36 @@ int GeneralMessageBase::lineCount(const google::protobuf::Message& msg,
 int GeneralMessageBase::lineCountOfField(
     const google::protobuf::Message& msg, int screenWidth,
     const google::protobuf::FieldDescriptor* field,
-    const google::protobuf::Reflection* reflection) {
-  int ret = 1;
-  if (!field->is_repeated()) {
-    switch (field->cpp_type()) {
+    const google::protobuf::Reflection* reflection,
+    bool is_folded) {
+  int ret = 0;
+  if (!is_folded && field->is_repeated()) {
+    int size = reflection->FieldSize(msg, field);
+    for (int i = 0; i < size; ++i) {
+      switch (field->cpp_type()) {
+      case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
+        std::string scratch;
+        const std::string& value =
+            reflection->GetRepeatedStringReference(msg, field, i, &scratch);
+        ret += calculateStringLines(value, screenWidth);
+        break;
+      }
+
+      case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE: {
+        const google::protobuf::Message& childMsg =
+            reflection->GetRepeatedMessage(msg, field, i);
+        ret += lineCount(childMsg, screenWidth);
+        break;
+      }
+
+      default: 
+        ret += 1;
+      }  // end switch
+    }
+  } else {
+    ret = 1;
+    if (!field->is_repeated()) {
+      switch (field->cpp_type()) {
       case google::protobuf::FieldDescriptor::CPPTYPE_STRING: {
         std::string scratch;
         const std::string& value =
@@ -95,10 +121,10 @@ int GeneralMessageBase::lineCountOfField(
         break;
       }
 
-      default:;
-    }  // end switch
+      default: {}
+      }  // end switch
+    }
   }
-
   return ret;
 }
 
@@ -127,7 +153,7 @@ void GeneralMessageBase::PrintMessage(GeneralMessageBase* baseMsg,
         std::ostringstream outStr;
         const std::string& fieldName = field->name();
         outStr << fieldName << ": ";
-        outStr << "+[" << reflection->FieldSize(msg, field) << " items ]";
+        outStr << "+[" << reflection->FieldSize(msg, field) << " items]";
         GeneralMessage* item =
             new GeneralMessage(baseMsg, &msg, reflection, field);
         if (item) {
