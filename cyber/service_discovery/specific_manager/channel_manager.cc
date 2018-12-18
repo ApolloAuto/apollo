@@ -37,17 +37,6 @@ ChannelManager::ChannelManager() {
   allowed_role_ |= 1 << RoleType::ROLE_READER;
   change_type_ = ChangeType::CHANGE_CHANNEL;
   channel_name_ = "channel_change_broadcast";
-
-  auto& global_conf = common::GlobalData::Instance()->Config();
-  if (global_conf.has_topology_conf() &&
-      global_conf.topology_conf().has_channel_conf()) {
-    auto& channel_conf = global_conf.topology_conf().channel_conf();
-    for (auto& channel : channel_conf.intra_channels()) {
-      ADEBUG << "intra channel: " << channel;
-      intra_channels_.emplace(channel);
-    }
-  }
-
   exempted_msg_types_.emplace(message::MessageType<message::RawMessage>());
   exempted_msg_types_.emplace(message::MessageType<message::PyMessageWrap>());
 }
@@ -231,14 +220,6 @@ void ChannelManager::Dispose(const ChangeMsg& msg) {
     DisposeLeave(msg);
   }
   Notify(msg);
-}
-
-bool ChannelManager::NeedPublish(const ChangeMsg& msg) const {
-  auto& channel = msg.role_attr().channel_name();
-  if (intra_channels_.count(channel) > 0) {
-    return false;
-  }
-  return true;
 }
 
 void ChannelManager::OnTopoModuleLeave(const std::string& host_name,
