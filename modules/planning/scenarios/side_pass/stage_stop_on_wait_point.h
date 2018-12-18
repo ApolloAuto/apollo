@@ -67,7 +67,7 @@ class StageStopOnWaitPoint : public Stage {
       const common::PathPoint& first_path_point,
       const common::PathPoint& last_path_point);
   bool GetTheNearestObstacle(
-      const ReferenceLine& reference_line,
+      const Frame& frame,
       const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
       const Obstacle** nearest_obstacle);
   bool GetMoveForwardLastPathPoint(const ReferenceLine& reference_line,
