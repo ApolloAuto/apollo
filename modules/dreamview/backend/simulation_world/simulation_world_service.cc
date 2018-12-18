@@ -495,7 +495,11 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
-  auto_driving_car->set_speed(chassis.speed_mps());
+  double speed = chassis.speed_mps();
+  if (chassis.gear_location() == Chassis::GEAR_REVERSE) {
+    speed = -speed;
+  }
+  auto_driving_car->set_speed(speed);
   auto_driving_car->set_throttle_percentage(chassis.throttle_percentage());
   auto_driving_car->set_brake_percentage(chassis.brake_percentage());
 
