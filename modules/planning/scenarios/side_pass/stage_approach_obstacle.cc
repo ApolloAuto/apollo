@@ -72,9 +72,9 @@ Stage::StageStatus StageApproachObstacle::Process(
     return Stage::FINISHED;
   }
 
-  double kBlockingObstacleDistance = 5.0;
-  double stop_fence_s = obstacle_start_s - kBlockingObstacleDistance;
-  stop_fence_s = std::max(stop_fence_s, adc_sl_boundary.end_s() + 0.2);
+  double stop_fence_s =
+      obstacle_start_s -
+      GetContext()->scenario_config_.stop_fence_distance_to_blocking_obstacle();
   std::string virtual_obstacle_id = blocking_obstacle_id + "_virtual_stop";
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     auto* obstacle = frame->CreateStopObstacle(
