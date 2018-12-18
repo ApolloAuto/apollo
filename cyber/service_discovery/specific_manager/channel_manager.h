@@ -43,7 +43,6 @@ class ChannelManager : public Manager {
   using ChannelDelegateWarehouse = SingleValueWarehouse;
   using WriterWarehouse = MultiValueWarehouse;
   using ReaderWarehouse = MultiValueWarehouse;
-  using IntraChannels = std::unordered_set<std::string>;
   using ExemptedMessageTypes = std::unordered_set<std::string>;
 
   ChannelManager();
@@ -77,13 +76,11 @@ class ChannelManager : public Manager {
  private:
   bool Check(const RoleAttributes& attr) override;
   void Dispose(const ChangeMsg& msg) override;
-  bool NeedPublish(const ChangeMsg& msg) const override;
   void OnTopoModuleLeave(const std::string& host_name, int process_id) override;
 
   void DisposeJoin(const ChangeMsg& msg);
   void DisposeLeave(const ChangeMsg& msg);
 
-  IntraChannels intra_channels_;
   ExemptedMessageTypes exempted_msg_types_;
 
   Graph node_graph_;
