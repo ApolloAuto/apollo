@@ -409,9 +409,9 @@ Status LatController::ComputeControlCommand(
   if (VehicleStateProvider::Instance()->linear_velocity() <
           FLAGS_lock_steer_speed &&
       (VehicleStateProvider::Instance()->gear() ==
-       canbus::Chassis::GEAR_DRIVE ||
+           canbus::Chassis::GEAR_DRIVE ||
        VehicleStateProvider::Instance()->gear() ==
-       canbus::Chassis::GEAR_REVERSE) &&
+           canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     steer_angle = pre_steer_angle_;
   }
@@ -546,7 +546,7 @@ void LatController::ComputeLateralErrors(
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) {
   TrajectoryPoint target_point;
-  if (FLAGS_use_navigation_mode  &&
+  if (FLAGS_use_navigation_mode &&
       !FLAGS_enable_navigation_mode_position_update) {
     target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
         Clock::NowInSeconds() + query_relative_time_);
@@ -592,13 +592,15 @@ void LatController::UpdateDrivingOrientation() {
   driving_orientation_ = VehicleStateProvider::Instance()->heading();
   matrix_bd_ = matrix_b_ * ts_;
   // Reverse the driving direction if the vehicle is in reverse mode
-  if (VehicleStateProvider::Instance()->gear() ==
-      canbus::Chassis::GEAR_REVERSE) {
-    driving_orientation_ = common::math::NormalizeAngle(
-      driving_orientation_ + M_PI);
-  // Update Matrix_b for reverse mode
-  matrix_bd_ = - matrix_b_ * ts_;
-  ADEBUG << "Matrix_b changed due to gear direction";
+  if (reverse_heading_control) {
+    if (VehicleStateProvider::Instance()->gear() ==
+        canbus::Chassis::GEAR_REVERSE) {
+      driving_orientation_ =
+          common::math::NormalizeAngle(driving_orientation_ + M_PI);
+      // Update Matrix_b for reverse mode
+      matrix_bd_ = -matrix_b_ * ts_;
+      ADEBUG << "Matrix_b changed due to gear direction";
+    }
   }
 }
 }  // namespace control
