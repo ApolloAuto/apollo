@@ -18,6 +18,8 @@
  * @file
  */
 
+#include "modules/planning/open_space/reeds_shepp_path.h"
+
 #include <memory>
 
 #include "gtest/gtest.h"
@@ -26,7 +28,6 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/node3d.h"
-#include "modules/planning/open_space/reeds_shepp_path.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {

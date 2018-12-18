@@ -18,6 +18,7 @@
  * @file
  **/
 #include "modules/planning/open_space/distance_approach_problem.h"
+
 #include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 

@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/message/raw_message.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
 #include <string>
 
-#include "cyber/message/raw_message.h"
 
 namespace apollo {
 namespace cyber {

@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/common/file.h"
+
 #include <gtest/gtest.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
 
-#include "cyber/common/file.h"
 #include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {

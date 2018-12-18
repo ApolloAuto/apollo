@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/service_discovery/specific_manager/channel_manager.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -23,7 +25,6 @@
 #include "cyber/message/message_traits.h"
 #include "cyber/message/protobuf_factory.h"
 #include "cyber/proto/unit_test.pb.h"
-#include "cyber/service_discovery/specific_manager/channel_manager.h"
 #include "cyber/transport/common/identity.h"
 
 namespace apollo {

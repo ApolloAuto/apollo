@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/base/signal.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "cyber/base/signal.h"
 
 namespace apollo {
 namespace cyber {

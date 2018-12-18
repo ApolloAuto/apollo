@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/base/object_pool.h"
+
 #include <thread>
 
 #include "cyber/base/concurrent_object_pool.h"
-#include "cyber/base/object_pool.h"
 #include "gtest/gtest.h"
 
 namespace apollo {

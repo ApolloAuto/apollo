@@ -13,10 +13,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <gtest/gtest.h>
+
+#include "modules/perception/radar/lib/interface/base_matcher.h"
 
 #include "cyber/common/log.h"
-#include "modules/perception/radar/lib/interface/base_matcher.h"
+#include "gtest/gtest.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track.h"
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
 

@@ -19,9 +19,9 @@
  **/
 
 #include "modules/planning/math/curve1d/cubic_polynomial_curve1d.h"
-#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 #include "gtest/gtest.h"
+#include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 namespace apollo {
 namespace planning {

@@ -29,6 +29,7 @@
 #define private public
 #define protected public
 #include "modules/planning/math/finite_element_qp/fem_1d_expanded_jerk_qp_problem.h"
+
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 namespace apollo {

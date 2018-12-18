@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/data/data_dispatcher.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
 
 #include "cyber/common/util.h"
-#include "cyber/data/data_dispatcher.h"
 
 namespace apollo {
 namespace cyber {

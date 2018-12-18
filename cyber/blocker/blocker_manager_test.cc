@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include "cyber/blocker/blocker_manager.h"
+
 #include "cyber/proto/unit_test.pb.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
