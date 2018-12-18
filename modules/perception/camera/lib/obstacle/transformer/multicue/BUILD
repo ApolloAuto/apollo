@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_proto_library(
     name = "multicue_proto",
     deps = [
@@ -17,18 +16,17 @@ proto_library(
     ],
 )
 
-
 cc_library(
     name = "obj_mapper",
     srcs = [
         "obj_mapper.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "obj_mapper.h",
     ],
     deps = [
         "//cyber",
-        "//modules/perception/camera/common:common",
+        "//modules/perception/camera/common",
     ],
 )
 
@@ -37,7 +35,7 @@ cc_library(
     srcs = [
         "multicue_obstacle_transformer.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "multicue_obstacle_transformer.h",
     ],
     deps = [
@@ -45,8 +43,8 @@ cc_library(
         ":obj_mapper",
         "//cyber",
         "//modules/common/util:file_util",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/interface",
     ],
 )
 

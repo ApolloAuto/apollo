@@ -74,17 +74,18 @@ Stage::StageStatus StageStop::Process(
                      return overlap.object_id == stop_sign_overlap_id;
                    });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    return FinishStage(ScenarioConfig::NO_STAGE);
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
   }
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double creep_distance =
-      dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-          ->FindCreepDistance(*frame, reference_line_info);
-  const double creep_fence_s = stop_sign_overlap_it->end_s + creep_distance;
-  if (adc_front_edge_s > creep_fence_s) {
-    return FinishStage(
-        ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE);
+  const double distance_adc_pass_stop_sign =
+      adc_front_edge_s - stop_sign_overlap_it->start_s;
+  constexpr double kPassStopLineBuffer = 1.0;  // unit: m
+
+  // passed stop line too far
+  if (distance_adc_pass_stop_sign > kPassStopLineBuffer) {
+    return FinishStage();
   }
 
   // STOP
@@ -94,7 +95,7 @@ Stage::StageStatus StageStop::Process(
          << "]";
   auto& watch_vehicles = GetContext()->watch_vehicles;
   if (wait_time >= scenario_config_.stop_duration() && watch_vehicles.empty()) {
-    return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
+    return FinishStage();
   }
 
   // get all vehicles currently watched
@@ -114,7 +115,7 @@ Stage::StageStatus StageStop::Process(
   }
 
   if (watch_vehicle_ids.empty()) {
-    return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
+    return FinishStage();
   }
 
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
@@ -125,9 +126,10 @@ Stage::StageStatus StageStop::Process(
       std::back_inserter(
           PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
-  // check timeout
-  if (wait_time > scenario_config_.stop_timeout()) {
-    return FinishStage(ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP);
+  // check timeout while waiting for only one vehicle
+  if (wait_time > scenario_config_.stop_timeout() &&
+      watch_vehicle_ids.size() <= 1) {
+    return FinishStage();
   }
 
   const PathDecision& path_decision = reference_line_info.path_decision();
@@ -229,16 +231,13 @@ int StageStop::RemoveWatchVehicle(
   return 0;
 }
 
-Stage::StageStatus StageStop::FinishStage(
-    const ScenarioConfig::StageType& next_stage) {
-  next_stage_ = next_stage;
+Stage::StageStatus StageStop::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       GetContext()->stop_sign_id;
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
-  if (next_stage == ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP) {
-    GetContext()->creep_start_time = Clock::NowInSeconds();
-  }
+  GetContext()->creep_start_time = Clock::NowInSeconds();
 
+  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;
   return Stage::FINISHED;
 }
 

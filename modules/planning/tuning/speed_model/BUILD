@@ -30,7 +30,7 @@ cc_library(
     deps = [
         ":autotuning_speed_feature_builder",
         "//modules/planning/tuning:autotuning_base_model",
-    ],    
+    ],
 )
 
 cc_test(
@@ -42,4 +42,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
 cpplint()

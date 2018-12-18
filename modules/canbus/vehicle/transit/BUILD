@@ -10,12 +10,12 @@ cc_library(
     hdrs = [
         "transit_vehicle_factory.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":transit_controller",
         ":transit_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -26,13 +26,13 @@ cc_library(
     hdrs = [
         "transit_message_manager.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_library(
@@ -43,6 +43,7 @@ cc_library(
     hdrs = [
         "transit_controller.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":transit_message_manager",
         "//modules/canbus/proto:canbus_proto",
@@ -53,7 +54,6 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
@@ -69,13 +69,13 @@ cc_test(
 cc_test(
     name = "transit_controller_test",
     size = "small",
-    data = ["//modules/canbus:canbus_testdata"],
     srcs = [
         "transit_controller_test.cc",
     ],
+    data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":transit_controller",
-        "//modules/common/util:util",
+        "//modules/common/util",
         "@gtest//:main",
     ],
 )

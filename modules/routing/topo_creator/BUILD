@@ -40,10 +40,10 @@ cc_library(
 
 cc_test(
     name = "graph_creator_test",
+    size = "small",
     srcs = [
         "graph_creator_test.cc",
     ],
-    size = "small",
     deps = [
         ":graph_creator",
         "@gtest//:main",

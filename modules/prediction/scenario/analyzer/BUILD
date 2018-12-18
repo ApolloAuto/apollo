@@ -11,9 +11,9 @@ cc_library(
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:scenario_proto",
+        "//modules/prediction/scenario/scenario_features",
         "//modules/prediction/scenario/scenario_features:cruise_scenario_features",
         "//modules/prediction/scenario/scenario_features:junction_scenario_features",
-        "//modules/prediction/scenario/scenario_features:scenario_features",
     ],
 )
 
@@ -29,9 +29,9 @@ cc_test(
         ":scenario_analyzer",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/scenario/scenario_features",
         "//modules/prediction/scenario/scenario_features:cruise_scenario_features",
         "//modules/prediction/scenario/scenario_features:junction_scenario_features",
-        "//modules/prediction/scenario/scenario_features:scenario_features",
         "@gtest//:main",
     ],
 )

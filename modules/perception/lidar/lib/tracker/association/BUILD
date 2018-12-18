@@ -16,7 +16,6 @@ cc_library(
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
         "@eigen",
-
     ],
 )
 
@@ -50,7 +49,7 @@ cc_library(
         "//modules/perception/lidar/common:lidar_log",
         "//modules/perception/lidar/lib/tracker/common:track_data",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
-
     ],
 )
+
 cpplint()

@@ -12,7 +12,7 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor",
-        "@glog//:glog",
+        "@glog",
     ],
 )
 

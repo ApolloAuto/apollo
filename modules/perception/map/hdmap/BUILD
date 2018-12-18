@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//modules/common/math:geometry",
         "//modules/common/proto:geometry_proto",
-        "//modules/map/hdmap:hdmap",
+        "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
         "//modules/perception/base:base_type",
         "//modules/perception/base:blob",

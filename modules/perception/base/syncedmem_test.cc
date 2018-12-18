@@ -60,11 +60,13 @@ license and copyright terms herein.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/perception/base/syncedmem.h"
+
 #include <gtest/gtest.h>
 #include <limits>
 #include <vector>
 
-#include "modules/perception/base/syncedmem.h"
 #include "modules/perception/base/test/test_helper.h"
 
 namespace apollo {

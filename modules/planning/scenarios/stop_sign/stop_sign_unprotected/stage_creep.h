@@ -50,6 +50,9 @@ class StageCreep : public Stage {
   }
 
  private:
+  Stage::StageStatus FinishStage();
+
+ private:
   ScenarioStopSignUnprotectedConfig scenario_config_;
 };
 

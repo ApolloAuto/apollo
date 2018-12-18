@@ -245,7 +245,7 @@ bool Spline2dConstraint::AddPointConstraint(const double t, const double x,
 bool Spline2dConstraint::AddPointSecondDerivativeConstraint(const double t,
                                                             const double ddx,
                                                             const double ddy) {
-  const std::size_t index = FindIndex(t);
+  const size_t index = FindIndex(t);
   const double rel_t = t - t_knots_[index];
   std::vector<double> coef = SecondDerivativeCoef(rel_t);
   return AddPointKthOrderDerivativeConstraint(t, ddx, ddy, coef);
@@ -254,7 +254,7 @@ bool Spline2dConstraint::AddPointSecondDerivativeConstraint(const double t,
 bool Spline2dConstraint::AddPointThirdDerivativeConstraint(const double t,
                                                            const double dddx,
                                                            const double dddy) {
-  const std::size_t index = FindIndex(t);
+  const size_t index = FindIndex(t);
   const double rel_t = t - t_knots_[index];
   std::vector<double> coef = ThirdDerivativeCoef(rel_t);
   return AddPointKthOrderDerivativeConstraint(t, dddx, dddy, coef);
@@ -267,9 +267,9 @@ bool Spline2dConstraint::AddPointKthOrderDerivativeConstraint(
   Eigen::MatrixXd affine_equality = Eigen::MatrixXd::Zero(2, total_param_);
   Eigen::MatrixXd affine_boundary = Eigen::MatrixXd::Zero(2, 1);
   affine_boundary << x_kth_derivative, y_kth_derivative;
-  const std::size_t index = FindIndex(t);
-  const std::size_t index_offset = index * 2 * num_params;
-  for (std::size_t i = 0; i < num_params; ++i) {
+  const size_t index = FindIndex(t);
+  const size_t index_offset = index * 2 * num_params;
+  for (size_t i = 0; i < num_params; ++i) {
     affine_equality(0, i + index_offset) = coef[i];
     affine_equality(1, i + num_params + index_offset) = coef[i];
   }

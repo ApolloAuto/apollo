@@ -15,9 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/inference/tensorrt/plugins/slice_plugin.h"
-#include "modules/perception/proto/rt.pb.h"
 
 #include "gtest/gtest.h"
+#include "modules/perception/proto/rt.pb.h"
 
 TEST(SlicePluginsTest, test) {
   apollo::perception::inference::SliceParameter slice_param;

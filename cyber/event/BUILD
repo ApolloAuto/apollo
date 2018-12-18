@@ -17,13 +17,13 @@ cc_library(
         "//cyber/common:global_data",
         "//cyber/common:log",
         "//cyber/common:macros",
-        "//cyber/time:time",
-    ]
+        "//cyber/time",
+    ],
 )
 
 cc_library(
     name = "perf_event",
-    hdrs = [ "perf_event.h", ],
+    hdrs = ["perf_event.h"],
     deps = [
         "//cyber/common:global_data",
     ],

@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     topo_graph_file = sys.argv[1]
     graph = proto_utils.get_pb_from_bin_file(topo_graph_file, Graph())
-    g_central_curve_dict = {nd.lane_id : nd.central_curve for nd in graph.node}
+    g_central_curve_dict = {nd.lane_id: nd.central_curve for nd in graph.node}
 
     plt.ion()
     while 1:

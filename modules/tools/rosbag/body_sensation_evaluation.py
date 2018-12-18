@@ -42,8 +42,10 @@ SPEED_DOWN_THRESHOLD_4 = -4
 kChassisTopic = '/apollo/canbus/chassis'
 kLocalizationTopic = '/apollo/localization/pose'
 
+
 class BodySensationCalculator(object):
     """The class to dispose body sensation from rosbag"""
+
     def __init__(self):
         self.driving_mode = []
         self._timestamp = 0.0
@@ -154,7 +156,7 @@ class BodySensationCalculator(object):
                 acc_x = localization.pose.linear_acceleration.x
                 acc_y = localization.pose.linear_acceleration.y
                 acc_z = localization.pose.linear_acceleration.z
-                
+
                 if abs(acc_z) >= SPEED_UP_THRESHOLD_2 and diff_bump_time >= BUMP_TIME_THRESHOLD:
                     self._bumps_rollback(t)
                     self._last_bump_time = t
@@ -171,7 +173,7 @@ class BodySensationCalculator(object):
                         if acc_y <= SPEED_DOWN_THRESHOLD_2:
                             continue
                         if self._speed_down_4_flag == 1 \
-                        and t - self._last_speed_down_4_time >= ACCELERATE_TIME_THRESHOLD:
+                                and t - self._last_speed_down_4_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_down_4_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_down_4"] += 1
@@ -195,7 +197,7 @@ class BodySensationCalculator(object):
                         if acc_y >= SPEED_UP_THRESHOLD_2:
                             continue
                         if self._speed_up_4_flag == 1 \
-                        and t - self._last_speed_up_4_time >= ACCELERATE_TIME_THRESHOLD:
+                                and t - self._last_speed_up_4_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_up_4_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_up_4"] += 1
@@ -228,8 +230,7 @@ class BodySensationCalculator(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description=
-        "A tool to evaluate the body sensation. \
+        description="A tool to evaluate the body sensation. \
         It should be used like 'python body_sensation_evalution.py bag1 bag2 ...' ")
     parser.add_argument(
         "in_rosbag", action="store", nargs='+', type=str, help="the input rosbag")
@@ -243,4 +244,3 @@ if __name__ == '__main__':
     counts["auto"] = sorted(bsc.auto_counts.items())
     counts["manual"] = sorted(bsc.manual_counts.items())
     print(counts)
-

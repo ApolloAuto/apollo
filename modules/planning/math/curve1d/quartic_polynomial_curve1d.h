@@ -86,9 +86,9 @@ class QuarticPolynomialCurve1d : public PolynomialCurve1d {
 
   std::string ToString() const override;
 
-  double Coef(const std::size_t order) const override;
+  double Coef(const size_t order) const override;
 
-  std::size_t Order() const { return 4; }
+  size_t Order() const { return 4; }
 
  private:
   void ComputeCoefficients(const double x0, const double dx0, const double ddx0,

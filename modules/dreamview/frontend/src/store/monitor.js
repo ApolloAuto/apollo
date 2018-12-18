@@ -3,6 +3,7 @@ import { observable, computed, action } from "mobx";
 export default class Monitor {
     @observable hasActiveNotification = false;
     @observable items = [];
+    @observable rssInfo = [];
 
     lastUpdateTimestamp = 0;
     refreshTimer = null;
@@ -46,10 +47,7 @@ export default class Monitor {
         }
 
         if (this.hasNewNotification(this.items, newItems)) {
-            this.hasActiveNotification = true;
-            this.lastUpdateTimestamp = Date.now();
-            this.items.replace(newItems);
-            this.startRefresh();
+            this.updateMonitorMessages(newItems, Date.now());
         }
     }
 
@@ -78,9 +76,19 @@ export default class Monitor {
             }
         }
 
-        this.hasActiveNotification = true;
-        this.lastUpdateTimestamp = timestamp;
-        this.items.replace(newItems);
-        this.startRefresh();
+        this.updateMonitorMessages(newItems, timestamp);
+    }
+
+    updateMonitorMessages(newItems, newTimestamp) {
+        this.lastUpdateTimestamp = newTimestamp;
+        this.items = [];
+        this.rssInfo = [];
+        newItems.forEach(item => {
+            if (item && item.msg && item.msg.startsWith('RSS')) {
+                this.rssInfo.push(item);
+            } else {
+                this.items.push(item);
+            }
+        });
     }
 }

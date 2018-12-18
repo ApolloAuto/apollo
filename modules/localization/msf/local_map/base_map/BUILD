@@ -4,12 +4,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "localization_msf_base_map",
-    srcs = ["base_map_config.cc",
-            "base_map_matrix.cc",
-            "base_map_node_index.cc",
-            "base_map_node.cc",
-            "base_map_pool.cc",
-            "base_map.cc"],
+    srcs = [
+        "base_map.cc",
+        "base_map_config.cc",
+        "base_map_matrix.cc",
+        "base_map_node.cc",
+        "base_map_node_index.cc",
+        "base_map_pool.cc",
+    ],
     hdrs = glob(["*.h"]),
     linkopts = [
         "-lz",

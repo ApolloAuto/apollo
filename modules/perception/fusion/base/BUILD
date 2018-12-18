@@ -13,7 +13,7 @@ cc_library(
         ":sensor_data_manager",
         ":track",
         ":track_pool_types",
-    ]
+    ],
 )
 
 cc_library(

@@ -105,17 +105,17 @@ bool Plan(HybridAStar* planner_ptr, HybridAObstacleContainer* obstacles_ptr,
 }
 void GetResult(HybridAResultContainer* result_ptr, double* x, double* y,
                double* phi, double* v, double* a, double* steer,
-               std::size_t* output_size) {
+               size_t* output_size) {
   result_ptr->LoadResult();
-  std::size_t size = result_ptr->GetX()->size();
+  size_t size = result_ptr->GetX()->size();
   std::cout << "return size is " << size << std::endl;
-  for (std::size_t i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; i++) {
     x[i] = result_ptr->GetX()->at(i);
     y[i] = result_ptr->GetY()->at(i);
     phi[i] = result_ptr->GetPhi()->at(i);
     v[i] = result_ptr->GetV()->at(i);
   }
-  for (std::size_t i = 0; i < size - 1; i++) {
+  for (size_t i = 0; i < size - 1; i++) {
     a[i] = result_ptr->GetA()->at(i);
     steer[i] = result_ptr->GetSteer()->at(i);
   }

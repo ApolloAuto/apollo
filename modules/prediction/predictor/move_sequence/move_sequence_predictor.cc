@@ -90,16 +90,29 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
            << "] with probability [" << sequence.probability() << "].";
 
     std::vector<TrajectoryPoint> points;
-
     auto end_time1 = std::chrono::system_clock::now();
-    DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection(
-        *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
-        FLAGS_prediction_trajectory_time_resolution, &points);
+
+    bool is_about_to_stop = false;
+    double acceleration = 0.0;
+    if (sequence.has_stop_sign()) {
+      double stop_distance = sequence.stop_sign().lane_sequence_s() -
+                             sequence.lane_s();
+      is_about_to_stop = SupposedToStop(feature, stop_distance, &acceleration);
+    }
+
+    if (is_about_to_stop) {
+      DrawConstantAccelerationTrajectory(
+          *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
+          FLAGS_prediction_trajectory_time_resolution, acceleration, &points);
+    } else {
+      DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection(
+          *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
+          FLAGS_prediction_trajectory_time_resolution, &points);
+    }
     auto end_time2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = end_time2 - end_time1;
     ADEBUG << " Time to draw trajectory: "
            << diff.count() * 1000 << " msec.";
-
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());

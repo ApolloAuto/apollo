@@ -4,25 +4,24 @@ package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
     name = "trafficlight_detector_detection_proto",
-    deps = [ 
+    deps = [
         ":trafficlight_detector_detection_lib",
-    ],  
+    ],
 )
 
 proto_library(
     name = "trafficlight_detector_detection_lib",
-    srcs = [ 
+    srcs = [
         "detection.proto",
-    ],  
+    ],
 )
-
 
 cc_library(
     name = "detection",
     srcs = [
         "detection.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "detection.h",
     ],
     deps = [
@@ -31,9 +30,9 @@ cc_library(
         ":trafficlight_detector_detection_proto",
         "//cyber",
         "//modules/common/util:file_util",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/utils:inference_resize_lib",
@@ -46,15 +45,15 @@ cc_library(
     srcs = [
         "select.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "select.h",
     ],
     deps = [
         "//cyber",
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
         "//modules/perception/common/graph:hungarian_optimizer",
-        "//modules/perception/common/graph:secure_matrix"
+        "//modules/perception/common/graph:secure_matrix",
     ],
 )
 
@@ -63,12 +62,12 @@ cc_library(
     srcs = [
         "cropbox.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "cropbox.h",
     ],
     deps = [
-        "//modules/perception/base:base",
-        "//modules/perception/camera/common:common",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
     ],
 )
 

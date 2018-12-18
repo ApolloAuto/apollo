@@ -35,6 +35,7 @@ from modules.drivers.gnss.proto import gnss_pb2
 g_args = None
 kRawDataTopic = '/apollo/sensor/gnss/raw_data'
 
+
 def dump_bag(in_dir, out_file):
     """out_bag = in_bag"""
     print "begin"

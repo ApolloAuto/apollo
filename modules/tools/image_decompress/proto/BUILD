@@ -9,7 +9,6 @@ cc_library(
     ],
 )
 
-
 cc_proto_library(
     name = "image_decompress_proto",
     deps = [

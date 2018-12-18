@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file trajectory.h
- **/
+#include "cyber/logger/log_file_object.h"
 
-#pragma once
+#include <glog/logging.h>
+#include <gtest/gtest.h>
+#include <string>
 
-#include "modules/common/proto/pnc_point.pb.h"
+#include "cyber/cyber.h"
+#include "cyber/time/time.h"
 
 namespace apollo {
-namespace planning {
+namespace cyber {
+namespace logger {
 
-class Trajectory {
- public:
-  Trajectory() = default;
+TEST(LogFileObjectTest, init_and_write) {
+  std::string basename = "logfile";
+  LogFileObject logfileobject(google::INFO, basename.c_str());
+  logfileobject.SetBasename("base");
+  time_t timep;
+  time(&timep);
+  std::string message = "cyber logger test";
+  logfileobject.Write(false, timep, message.c_str(), 20);
+  logfileobject.SetExtension("unittest");
+  logfileobject.Flush();
+}
 
-  virtual ~Trajectory() = default;
-
-  virtual common::TrajectoryPoint Evaluate(
-      const double relative_time) const = 0;
-
-  virtual common::TrajectoryPoint StartPoint() const = 0;
-
-  virtual double GetTemporalLength() const = 0;
-
-  virtual double GetSpatialLength() const = 0;
-};
-
-}  // namespace planning
+}  // namespace logger
+}  // namespace cyber
 }  // namespace apollo

@@ -74,9 +74,23 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
            << "] with probability [" << sequence.probability() << "].";
 
     std::vector<TrajectoryPoint> points;
-    DrawLaneSequenceTrajectoryPoints(*obstacle, sequence,
-        FLAGS_prediction_trajectory_time_length,
-        FLAGS_prediction_trajectory_time_resolution, &points);
+    bool is_about_to_stop = false;
+    double acceleration = 0.0;
+    if (sequence.has_stop_sign()) {
+      double stop_distance = sequence.stop_sign().lane_sequence_s() -
+                             sequence.lane_s();
+      is_about_to_stop = SupposedToStop(feature, stop_distance, &acceleration);
+    }
+
+    if (is_about_to_stop) {
+      DrawConstantAccelerationTrajectory(
+          *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
+          FLAGS_prediction_trajectory_time_resolution, acceleration, &points);
+    } else {
+      DrawLaneSequenceTrajectoryPoints(*obstacle, sequence,
+          FLAGS_prediction_trajectory_time_length,
+          FLAGS_prediction_trajectory_time_resolution, &points);
+    }
 
     if (points.empty()) {
       continue;
@@ -121,6 +135,10 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
     AERROR << "Failed in getting lane s and lane l";
     return;
   }
+  double approach_rate = FLAGS_go_approach_rate;
+  if (!lane_sequence.vehicle_on_lane()) {
+    approach_rate = FLAGS_cutin_approach_rate;
+  }
   size_t total_num = static_cast<size_t>(total_time / period);
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * period;
@@ -154,7 +172,7 @@ void LaneSequencePredictor::DrawLaneSequenceTrajectoryPoints(
       lane_id = lane_sequence.lane_segment(lane_segment_index).lane_id();
     }
 
-    lane_l *= FLAGS_go_approach_rate;
+    lane_l *= approach_rate;
   }
 }
 

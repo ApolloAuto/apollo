@@ -76,8 +76,8 @@ void DpStCost::SortAndMergeRange(
     return;
   }
   std::sort(keep_clear_range->begin(), keep_clear_range->end());
-  std::size_t i = 0;
-  std::size_t j = i + 1;
+  size_t i = 0;
+  size_t j = i + 1;
   while (j < keep_clear_range->size()) {
     if (keep_clear_range->at(i).second < keep_clear_range->at(j).first) {
       ++i;

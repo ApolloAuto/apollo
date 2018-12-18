@@ -14,30 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <glog/logging.h>
-#include <gtest/gtest.h>
-#include <string>
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/planning/common/frame.h"
 
-#include "cyber/cyber.h"
-#include "cyber/logger/log_file_object.h"
-#include "cyber/time/time.h"
 
 namespace apollo {
-namespace cyber {
-namespace logger {
+namespace planning {
 
-TEST(LogFileObjectTest, init_and_write) {
-  std::string basename = "logfile";
-  LogFileObject logfileobject(google::INFO, basename.c_str());
-  logfileobject.SetBasename("base");
-  time_t timep;
-  time(&timep);
-  std::string message = "cyber logger test";
-  logfileobject.Write(false, timep, message.c_str(), 20);
-  logfileobject.SetExtension("unittest");
-  logfileobject.Flush();
-}
+bool IsBlockingObstacleToSidePass(
+    const Frame& frame, const Obstacle* obstacle,
+    double block_obstacle_min_speed, double min_front_sidepass_distance,
+    bool enable_obstacle_blocked_check);
 
-}  // namespace logger
-}  // namespace cyber
+// Check if the obstacle is blocking ADC's driving path (reference_line).
+bool IsBlockingDrivingPathObstacle(
+    const ReferenceLine& reference_line, const Obstacle* obstacle);
+
+bool IsParkedVehicle(const ReferenceLine& reference_line,
+                     const Obstacle* obstacle);
+
+}  // namespace planning
 }  // namespace apollo

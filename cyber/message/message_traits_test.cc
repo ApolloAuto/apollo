@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/message/message_traits.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
 #include <string>
 
 #include "cyber/message/intra_message.h"
-#include "cyber/message/message_traits.h"
 #include "cyber/proto/unit_test.pb.h"
 
 namespace apollo {

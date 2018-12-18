@@ -123,23 +123,6 @@ bool GetContent(const std::string &file_name, std::string *content) {
   return true;
 }
 
-std::string TranslatePath(const std::string &src_path) {
-  // TODO(xiaoxq): ROS paths are fading out. Retire this when config files are
-  //               moved to new places.
-  static const std::string kRosHomePlaceHolder = "<ros>";
-  static const std::string kRosHome = "/home/tmp/ros";
-
-  std::string result(src_path);
-
-  // Replace ROS home place holder.
-  const auto pos = src_path.find(kRosHomePlaceHolder);
-  if (pos != std::string::npos) {
-    result.replace(pos, kRosHomePlaceHolder.length(), kRosHome);
-  }
-
-  return result;
-}
-
 std::string GetAbsolutePath(const std::string &prefix,
                             const std::string &relative_path) {
   if (relative_path.empty()) {

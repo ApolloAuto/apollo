@@ -390,11 +390,10 @@ const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
 }
 
 double ReferenceLineInfo::TrajectoryLength() const {
-  const auto& tps = discretized_trajectory_.trajectory_points();
-  if (tps.empty()) {
+  if (discretized_trajectory_.empty()) {
     return 0.0;
   }
-  return tps.back().path_point().s();
+  return discretized_trajectory_.back().path_point().s();
 }
 
 void ReferenceLineInfo::SetStopPoint(const StopPoint& stop_point) {

@@ -13,8 +13,8 @@ proto_library(
         "simple.proto",
     ],
     deps = [
-        "//modules/common/proto:header_proto_lib"
-    ]
+        "//modules/common/proto:header_proto_lib",
+    ],
 )
 
 filegroup(
@@ -23,4 +23,3 @@ filegroup(
         "hm_tracker_test/**/*",
     ]),
 )
-

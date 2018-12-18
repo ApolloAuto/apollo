@@ -5,16 +5,16 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "thread",
     srcs = [
+        "thread.cc",
         "thread_pool.cc",
         "thread_worker.cc",
-        "thread.cc",
     ],
     hdrs = [
         "concurrent_queue.h",
         "mutex.h",
+        "thread.h",
         "thread_pool.h",
         "thread_worker.h",
-        "thread.h",
     ],
     deps = [
         "//cyber",

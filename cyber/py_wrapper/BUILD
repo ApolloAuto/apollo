@@ -4,17 +4,17 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "_cyber_init.so",
+    linkshared = True,
+    linkstatic = False,
     deps = [
         ":py_init",
     ],
-    linkshared = True,
-    linkstatic = False,
 )
 
 cc_library(
     name = "py_init",
-    srcs = [ "cyber_init_wrap.cc", ],
-    hdrs = [ "py_init.h", ],
+    srcs = ["cyber_init_wrap.cc"],
+    hdrs = ["py_init.h"],
     deps = [
         "//cyber:cyber_core",
         "@python27",
@@ -23,17 +23,17 @@ cc_library(
 
 cc_binary(
     name = "_cyber_node.so",
+    linkshared = True,
+    linkstatic = False,
     deps = [
         ":py_node",
     ],
-    linkshared = True,
-    linkstatic = False,
 )
 
 cc_library(
     name = "py_node",
-    srcs = [ "cyber_node_wrap.cc", ],
-    hdrs = [ "py_node.h", ],
+    srcs = ["cyber_node_wrap.cc"],
+    hdrs = ["py_node.h"],
     deps = [
         "//cyber:cyber_core",
         "@python27",
@@ -42,17 +42,17 @@ cc_library(
 
 cc_binary(
     name = "_cyber_record.so",
+    linkshared = True,
+    linkstatic = False,
     deps = [
         ":py_record",
     ],
-    linkshared = True,
-    linkstatic = False,
 )
 
 cc_library(
     name = "py_record",
-    srcs = [ "cyber_record_wrap.cc", ],
-    hdrs = [ "py_record.h", ],
+    srcs = ["cyber_record_wrap.cc"],
+    hdrs = ["py_record.h"],
     deps = [
         "//cyber:cyber_core",
         "//cyber/record",

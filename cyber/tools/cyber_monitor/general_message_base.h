@@ -42,7 +42,8 @@ class GeneralMessageBase : public RenderableMessage {
   static int lineCountOfField(const google::protobuf::Message& msg,
                               int screenWidth,
                               const google::protobuf::FieldDescriptor* field,
-                              const google::protobuf::Reflection* reflection);
+                              const google::protobuf::Reflection* reflection,
+                              bool is_folded = true);
 
   void insertRepeatedMessage(int lineNo, GeneralMessageBase* item) {
     children_map_.insert(std::make_pair(lineNo, item));

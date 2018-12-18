@@ -1,9 +1,9 @@
-# Apollo 3.5 Quick Start Guide
+# Apollo master Quick Start Guide
 
-The following guide serves as a user manual for launching the Apollo 3.5
+The following guide serves as a user manual for launching the Apollo master
 software and hardware stack on vehicle.
 
-The Apollo 3.5 Quick Start Guide focuses on Apollo 3.5's new features. For general Apollo concepts, please refer to
+The Apollo master Quick Start Guide focuses on Apollo master's new features. For general Apollo concepts, please refer to
 [Apollo 1.0 Quick Start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_quick_start.md).
 
 ## Contents
@@ -23,7 +23,7 @@ before you proceed.
 ## Hardware and Software Installation
 
 Please refer to
-[Apollo 3.5 Hardware and System Installation Guide](apollo_3_5_hardware_system_installation_guide.md)
+[Apollo master Hardware and System Installation Guide](apollo_master_hardware_system_installation_guide.md)
 for the steps to install the hardware components and the system software, as well as
 [Apollo Software Installation Guide](apollo_software_installation_guide.md).
 

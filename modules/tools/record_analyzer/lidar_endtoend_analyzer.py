@@ -64,19 +64,19 @@ class LidarEndToEndAnalyzer:
         """print_endtoend_latency"""
         print "\n\n"
         print PrintColors.HEADER + "* End to End (Control) Latency (ms)" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.control_endtoend_latency)
 
         print PrintColors.FAIL + "  - MISS # OF LIDAR: " + \
-              str(len(self.control_unprocessed_lidar_timestamps)) + \
-              PrintColors.ENDC
+            str(len(self.control_unprocessed_lidar_timestamps)) + \
+            PrintColors.ENDC
 
         print PrintColors.HEADER + "* End to End (Planning) Latency (ms)" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.planning_endtoend_latency)
 
         print PrintColors.FAIL + "  - MISS # OF LIDAR: " + \
-              str(len(self.planning_unprocessed_lidar_timestamps)) + \
-              PrintColors.ENDC
+            str(len(self.planning_unprocessed_lidar_timestamps)) + \
+            PrintColors.ENDC

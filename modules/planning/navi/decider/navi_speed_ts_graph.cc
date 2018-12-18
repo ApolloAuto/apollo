@@ -85,7 +85,7 @@ void NaviSpeedTsGraph::Reset(double s_step, double s_max, double start_v,
   start_a_ = start_a;
   start_da_ = start_da;
 
-  auto point_num = (std::size_t)((s_max + s_step_) / s_step_);
+  auto point_num = (size_t)((s_max + s_step_) / s_step_);
   constraints_.clear();
   constraints_.resize(point_num);
 }
@@ -103,8 +103,8 @@ void NaviSpeedTsGraph::UpdateRangeConstraints(
   CHECK_GE(end_s, start_s);
   CheckConstraints(constraints);
 
-  auto start_idx = (std::size_t)(std::floor(start_s / s_step_));
-  auto end_idx = (std::size_t)(std::ceil(end_s / s_step_));
+  auto start_idx = (size_t)(std::floor(start_s / s_step_));
+  auto end_idx = (size_t)(std::ceil(end_s / s_step_));
   if (start_idx == end_idx) {
     CombineConstraints(constraints, &constraints_[start_idx]);
   } else {

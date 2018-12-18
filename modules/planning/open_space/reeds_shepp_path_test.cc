@@ -18,6 +18,8 @@
  * @file
  */
 
+#include "modules/planning/open_space/reeds_shepp_path.h"
+
 #include <memory>
 
 #include "gtest/gtest.h"
@@ -26,7 +28,6 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/node3d.h"
-#include "modules/planning/open_space/reeds_shepp_path.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 namespace apollo {
@@ -55,7 +56,7 @@ class reeds_shepp : public ::testing::Test {
     ASSERT_LT(end_node->GetY() - ((*optimal_path).y).back(), 0.01);
     ASSERT_LT(end_node->GetPhi() - ((*optimal_path).phi).back(), 0.01);
     ASSERT_GT((*optimal_path).x.size(), 1);
-    for (std::size_t i = 1; i < (*optimal_path).x.size(); i++) {
+    for (size_t i = 1; i < (*optimal_path).x.size(); i++) {
       double gold_interval = std::sqrt(
           planner_open_space_config_.warm_start_config().step_size() *
               planner_open_space_config_.warm_start_config().step_size() +

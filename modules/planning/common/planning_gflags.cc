@@ -459,3 +459,18 @@ DEFINE_bool(
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
               "within this threshold, current planning will be smoothered.");
+
+DEFINE_double(side_pass_road_buffer, 0.05,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_obstacle_l_buffer, 0.1,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_obstacle_s_buffer, 2.0,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_extra_road_buffer_during_turning, 0.1,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_vehicle_buffer, 0.6,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_off_road_center_threshold, 0.4,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_trim_watch_window, 12.0,
+              "(unit: meter) for side pass scenario ");

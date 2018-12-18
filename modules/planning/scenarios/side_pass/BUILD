@@ -27,6 +27,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/common",
         "//modules/common/util:factory",
+        "//modules/planning/common:obstacle_blocking_analyzer",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:speed_profile_generator",
         "//modules/planning/proto:planning_proto",

@@ -27,7 +27,7 @@ cc_library(
         "//modules/planning/open_space:open_space_trajectory_generator",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

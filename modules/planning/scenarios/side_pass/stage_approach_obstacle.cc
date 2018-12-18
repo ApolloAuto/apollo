@@ -28,6 +28,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 
@@ -44,6 +45,7 @@ using apollo::common::VehicleConfigHelper;
  */
 Stage::StageStatus StageApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  ADEBUG << "SIDEPASS: Approaching obstacle.";
   std::string blocking_obstacle_id = GetContext()->front_blocking_obstacle_id_;
   const SLBoundary& adc_sl_boundary =
       frame->reference_line_info().front().AdcSlBoundary();
@@ -70,9 +72,9 @@ Stage::StageStatus StageApproachObstacle::Process(
     return Stage::FINISHED;
   }
 
-  double kBlockingObstacleDistance = 5.0;
-  double stop_fence_s = obstacle_start_s - kBlockingObstacleDistance;
-  stop_fence_s = std::max(stop_fence_s, adc_sl_boundary.end_s() + 0.2);
+  double stop_fence_s =
+      obstacle_start_s -
+      GetContext()->scenario_config_.stop_fence_distance_to_blocking_obstacle();
   std::string virtual_obstacle_id = blocking_obstacle_id + "_virtual_stop";
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     auto* obstacle = frame->CreateStopObstacle(
@@ -144,13 +146,13 @@ Stage::StageStatus StageApproachObstacle::Process(
         GetContext()->scenario_config_.min_l_nudge_buffer()) {
       continue;
     }
-
     has_blocking_obstacle = true;
     break;
   }
 
   if (!has_blocking_obstacle) {
     next_stage_ = ScenarioConfig::NO_STAGE;
+    ADEBUG << "There is no blocking obstacle.";
     return Stage::FINISHED;
   }
   // do path planning
@@ -200,6 +202,8 @@ Stage::StageStatus StageApproachObstacle::Process(
   double min_stop_obstacle_distance =
       GetContext()->scenario_config_.approach_obstacle_min_stop_distance();
 
+  ADEBUG << "front_obstacle_distance = " << front_obstacle_distance;
+  ADEBUG << "adc_velocity = " << adc_velocity;
   if (adc_velocity < max_stop_velocity &&
       front_obstacle_distance > min_stop_obstacle_distance) {
     next_stage_ = ScenarioConfig::SIDE_PASS_GENERATE_PATH;

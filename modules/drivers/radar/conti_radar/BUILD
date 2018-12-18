@@ -27,6 +27,7 @@ cc_library(
     hdrs = [
         "conti_radar_canbus_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"conti_radar\\"'],
     deps = [
         ":conti_radar_message_manager",
         "//cyber",
@@ -39,16 +40,15 @@ cc_library(
         "//modules/drivers/radar/conti_radar/protocol:drivers_conti_radar_protocol",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:pose_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
-    copts = ['-DMODULE_NAME=\\"conti_radar\\"']
 )
 
 cc_binary(
     name = "libconti_radar.so",
-    deps = [":conti_radar_canbus_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
+    deps = [":conti_radar_canbus_lib"],
 )
 
 cpplint()

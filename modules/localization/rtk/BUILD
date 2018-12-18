@@ -5,12 +5,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "rtk_localization_component_lib",
     srcs = [
-        "rtk_localization_component.cc",
         "rtk_localization.cc",
+        "rtk_localization_component.cc",
     ],
     hdrs = [
-        "rtk_localization_component.h",
         "rtk_localization.h",
+        "rtk_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"localization\\\""],
     deps = [

@@ -42,7 +42,8 @@ cc_library(
         "//modules/monitor/software:summary_monitor",
     ] + select({
         "//tools/platforms:use_esd_can": [
-            "//third_party/can_card_library/esd_can"],
+            "//third_party/can_card_library/esd_can",
+        ],
         "//conditions:default": [],
     }),
 )

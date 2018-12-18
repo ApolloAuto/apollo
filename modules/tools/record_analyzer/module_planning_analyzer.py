@@ -56,7 +56,7 @@ class PlannigAnalyzer:
         """print_latency_statistics"""
         print "\n\n"
         print PrintColors.HEADER + "--- Planning Latency (ms) ---" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         StatisticalAnalyzer().print_statistical_results(self.module_latency)
 
         print PrintColors.HEADER + "--- Planning Trajectroy Type Distribution" \
@@ -70,8 +70,8 @@ class PlannigAnalyzer:
             self.estop_reason_dist)
 
         print PrintColors.HEADER + "--- Planning Error Code Distribution---" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         self.error_code_analyzer.print_results()
         print PrintColors.HEADER + "--- Planning Error Msg Distribution ---" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         self.error_msg_analyzer.print_results()

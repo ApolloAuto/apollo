@@ -38,7 +38,7 @@ class FrenetFramePathTest : public ::testing::Test {
     std::vector<double> dl{1, 0, -1, 0, -1, 0, 1, 1, 1, 0};
     std::vector<double> ddl{0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     std::vector<FrenetFramePoint> sl_points;
-    for (std::size_t i = 0; i < s.size(); ++i) {
+    for (size_t i = 0; i < s.size(); ++i) {
       sl_points.emplace_back();
       FrenetFramePoint& point = sl_points.back();
       point.set_s(s[i]);

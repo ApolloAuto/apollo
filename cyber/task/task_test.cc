@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/task/task.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
@@ -21,7 +23,6 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
-#include "cyber/task/task.h"
 
 namespace apollo {
 namespace cyber {

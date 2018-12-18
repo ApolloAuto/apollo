@@ -6,6 +6,7 @@ cc_library(
     name = "control_lib",
     srcs = [
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
         "//external:gflags",
@@ -23,7 +24,6 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
@@ -34,17 +34,17 @@ cc_library(
     hdrs = [
         "control_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":control_lib",
     ],
-    copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_binary(
     name = "libcontrol_component.so",
-    deps = [":control_component_lib"],
     linkshared = True,
     linkstatic = False,
+    deps = [":control_component_lib"],
 )
 
 cc_test(

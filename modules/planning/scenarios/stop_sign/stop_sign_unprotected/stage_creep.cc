@@ -51,8 +51,7 @@ Stage::StageStatus StageCreep::Process(
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   if (!config_.enabled()) {
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
-    return Stage::FINISHED;
+    return FinishStage();
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -82,8 +81,7 @@ Stage::StageStatus StageCreep::Process(
       AERROR << "StageCreep planning error";
     }
 
-    next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
-    return Stage::FINISHED;
+    return FinishStage();
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
@@ -96,6 +94,11 @@ Stage::StageStatus StageCreep::Process(
     AERROR << "StageCreep planning error";
   }
   return Stage::RUNNING;
+}
+
+Stage::StageStatus StageCreep::FinishStage() {
+  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
+  return Stage::FINISHED;
 }
 
 }  // namespace stop_sign

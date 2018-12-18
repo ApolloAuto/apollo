@@ -3,19 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "trajectory",
-    hdrs = [
-        "trajectory.h",
-    ],
-    deps = [
-        "//external:gflags",
-        "//modules/common/math",
-        "//modules/common/monitor_log/proto:monitor_log_proto",
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
-cc_library(
     name = "discretized_trajectory",
     srcs = [
         "discretized_trajectory.cc",
@@ -24,12 +11,11 @@ cc_library(
         "discretized_trajectory.h",
     ],
     deps = [
-        ":trajectory",
         "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/planning/common:planning_context",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

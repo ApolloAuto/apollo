@@ -18,6 +18,7 @@
  * @file
  */
 #include "modules/planning/open_space/node3d.h"
+
 #include "gtest/gtest.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"

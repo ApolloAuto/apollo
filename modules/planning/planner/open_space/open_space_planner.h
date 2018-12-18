@@ -42,8 +42,9 @@
 #include "modules/planning/proto/planning_internal.pb.h"
 
 /*
-Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
-Zhanga , Alexander Linigerb and Francesco Borrellia
+Initially inspired by "Optimization-Based Collision Avoidance"
+(arXiv:1711.03449) from Xiaojing Zhang , Alexander Liniger and Francesco
+Borrelli
 */
 
 /**
@@ -128,7 +129,7 @@ class OpenSpacePlanner : public Planner {
   double rotate_angle_;
   apollo::common::math::Vec2d translate_origin_;
   std::vector<double> end_pose_;
-  std::size_t obstacles_num_;
+  size_t obstacles_num_;
   Eigen::MatrixXi obstacles_edges_num_;
   Eigen::MatrixXd obstacles_A_;
   Eigen::MatrixXd obstacles_b_;

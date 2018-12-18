@@ -32,7 +32,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 
 AutotuningRawFeatureGenerator::AutotuningRawFeatureGenerator(
-    const double time_range, const std::size_t num_points,
+    const double time_range, const size_t num_points,
     const ReferenceLineInfo& reference_line_info, const Frame& frame,
     const SpeedLimit& speed_limit)
     : reference_line_info_(reference_line_info),
@@ -64,7 +64,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateTrajectoryPoint(
 }
 
 common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
-    const common::SpeedPoint& speed_point, const std::size_t index,
+    const common::SpeedPoint& speed_point, const size_t index,
     autotuning::TrajectoryPointRawFeature* const trajectory_point_feature)
     const {
   auto* speed_feature = trajectory_point_feature->mutable_speed_feature();
@@ -132,7 +132,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedProfile(
     return Status(ErrorCode::PLANNING_ERROR,
                   "mismatched evaluated time and speed profile size");
   }
-  for (std::size_t i = 0; i < eval_time_.size(); ++i) {
+  for (size_t i = 0; i < eval_time_.size(); ++i) {
     auto* trajectory_point_feature = trajectory_feature->add_point_feature();
     auto status =
         EvaluateSpeedPoint(speed_profile[i], i, trajectory_point_feature);
@@ -159,7 +159,7 @@ void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
 
 void AutotuningRawFeatureGenerator::ConvertToDiscretizedBoundaries(
     const StBoundary& boundary, const double speed) {
-  for (std::size_t i = 0; i < eval_time_.size(); ++i) {
+  for (size_t i = 0; i < eval_time_.size(); ++i) {
     double upper = 0.0;
     double lower = 0.0;
     bool suc = boundary.GetBoundarySRange(eval_time_[i], &upper, &lower);

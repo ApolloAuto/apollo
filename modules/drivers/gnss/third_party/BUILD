@@ -9,7 +9,7 @@ cc_library(
         "rcvraw.c",
         "rtcm.c",
         "rtcm3.c",
-        "rtkcmn.c"
-        ],
+        "rtkcmn.c",
+    ],
     hdrs = ["rtklib.h"],
 )

@@ -99,8 +99,7 @@ class OpenSpacePlanning : public PlanningBase {
 
   void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
-  apollo::common::Status GenerateGearShiftTrajectory(
-      const std::vector<double>& end_pose,
+  void GenerateGearShiftTrajectory(
       const apollo::canbus::Chassis::GearPosition& gear_position,
       ADCTrajectory* trajectory_pb);
 
@@ -114,6 +113,12 @@ class OpenSpacePlanning : public PlanningBase {
   std::vector<common::TrajectoryPoint> last_stitching_trajectory_;
   planning_internal::OpenSpaceDebug last_open_space_debug_;
   bool last_trajectory_succeeded_ = false;
+  bool gear_shift_period_finished_ = true;
+  bool gear_shift_period_started_ = true;
+  double gear_shift_period_time_ = 0.0;
+  double gear_shift_start_time_ = 0.0;
+  apollo::canbus::Chassis::GearPosition gear_shift_position_ =
+      canbus::Chassis::GEAR_DRIVE;
   std::vector<double> plot_gear_shift_time_;
   std::vector<double> plot_gear_shift_;
 };

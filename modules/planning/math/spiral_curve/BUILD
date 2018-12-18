@@ -44,7 +44,7 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:pnc_point_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 
@@ -62,7 +62,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

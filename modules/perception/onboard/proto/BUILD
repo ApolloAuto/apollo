@@ -12,7 +12,7 @@ cc_proto_library(
 proto_library(
     name = "radar_component_config_proto_lib",
     srcs = [
-        "radar_component_config.proto"
+        "radar_component_config.proto",
     ],
 )
 
@@ -26,37 +26,38 @@ cc_proto_library(
 proto_library(
     name = "fusion_component_config_proto_lib",
     srcs = [
-        "fusion_component_config.proto"
+        "fusion_component_config.proto",
     ],
 )
 
 cc_proto_library(
-	name = "fusion_camera_detection_proto",
-	deps = [
-		":fusion_camera_detection_proto_lib",
-	],
+    name = "fusion_camera_detection_proto",
+    deps = [
+        ":fusion_camera_detection_proto_lib",
+    ],
 )
 
 proto_library(
-	name = "fusion_camera_detection_proto_lib",
-	srcs = [
-		"fusion_camera_detection_component.proto",
-	],
+    name = "fusion_camera_detection_proto_lib",
+    srcs = [
+        "fusion_camera_detection_component.proto",
+    ],
 )
 
 cc_proto_library(
-	name = "trafficlights_perception_component_proto",
-	deps = [
-		":trafficlights_perception_component_proto_lib",
-	],
+    name = "trafficlights_perception_component_proto",
+    deps = [
+        ":trafficlights_perception_component_proto_lib",
+    ],
 )
 
 proto_library(
-	name = "trafficlights_perception_component_proto_lib",
-	srcs = [
-		"trafficlights_perception_component.proto",
-	],
+    name = "trafficlights_perception_component_proto_lib",
+    srcs = [
+        "trafficlights_perception_component.proto",
+    ],
 )
+
 cc_proto_library(
     name = "lidar_component_config_proto",
     deps = [
@@ -67,7 +68,7 @@ cc_proto_library(
 proto_library(
     name = "lidar_component_config_proto_lib",
     srcs = [
-        "lidar_component_config.proto"
+        "lidar_component_config.proto",
     ],
 )
 
