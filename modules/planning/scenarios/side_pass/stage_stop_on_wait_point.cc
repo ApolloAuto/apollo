@@ -26,6 +26,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 
@@ -44,24 +45,22 @@ constexpr double kLExtraMarginforStopOnWaitPointStage = 0.4;
 
 Stage::StageStatus StageStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  ADEBUG << "Processing StageStopOnWaitPoint";
+  ADEBUG << "SIDEPASS: Stopping on wait point.";
+
+  // Sanity checks.
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const PathDecision& path_decision = reference_line_info.path_decision();
-
   if (GetContext()->path_data_.discretized_path().empty()) {
     AERROR << "path data is empty.";
     return Stage::ERROR;
   }
-
   if (!GetContext()->path_data_.UpdateFrenetFramePath(&reference_line)) {
     return Stage::ERROR;
   }
-
   const auto adc_frenet_frame_point_ =
       reference_line.GetFrenetPoint(frame->PlanningStartPoint().path_point());
-
   if (!GetContext()->path_data_.LeftTrimWithRefS(adc_frenet_frame_point_)) {
     return Stage::ERROR;
   }
@@ -69,21 +68,19 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
     AERROR << "path data is empty after trim.";
     return Stage::ERROR;
   }
-
   for (const auto& p : GetContext()->path_data_.discretized_path()) {
     ADEBUG << p.ShortDebugString();
   }
 
-  // Get the nearest obstacle
+  // Get the nearest obstacle.
+  // If the nearest obstacle, provided it exists, is moving,
+  // then quit the side_pass stage.
   const Obstacle* nearest_obstacle = nullptr;
-  if (!GetTheNearestObstacle(reference_line, path_decision.obstacles(),
+  if (!GetTheNearestObstacle(*frame, path_decision.obstacles(),
                              &nearest_obstacle)) {
     AERROR << "Failed while running the function to get nearest obstacle.";
     return Stage::ERROR;
   }
-
-  // If the nearest obstacle, provided it exists, is moving,
-  // then quit the side_pass stage.
   if (nearest_obstacle) {
     if (nearest_obstacle->speed() >
         GetContext()->scenario_config_.block_obstacle_min_speed()) {
@@ -92,8 +89,8 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
       return Stage::FINISHED;
     }
   }
-
   ADEBUG << "Got the nearest obstacle if there is one.";
+
   // Get the "wait point".
   PathPoint first_path_point =
       GetContext()->path_data_.discretized_path().front();
@@ -109,7 +106,6 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
     next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
     return Stage::FINISHED;  // return FINISHED if it's already at "wait point".
   }
-
   ADEBUG << "first_path_point: " << first_path_point.ShortDebugString();
   ADEBUG << "last_path_point : " << last_path_point.ShortDebugString();
   double move_forward_distance = last_path_point.s() - first_path_point.s();
@@ -118,7 +114,7 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
   // Wait until everything is clear.
   if (!IsFarAwayFromObstacles(reference_line, path_decision.obstacles(),
                               first_path_point, last_path_point)) {
-    // wait here, do nothing this cycle.
+    // Wait here, do nothing this cycle.
     auto& rfl_info = frame->mutable_reference_line_info()->front();
     *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
     *(rfl_info.mutable_speed_data()) =
@@ -135,11 +131,12 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
     rfl_info.SetTrajectory(trajectory);
     rfl_info.SetDrivable(true);
 
-    ADEBUG << "waiting until obstacles are far away.";
+    ADEBUG << "Waiting until obstacles are far away.";
     return Stage::RUNNING;
   }
 
-  // (1) call proceed with cautious
+  // Proceed to the proper wait point, and stop there.
+  //  1. call proceed with cautious
   constexpr double kSidePassCreepSpeed = 2.33;  // m/s
   auto& rfl_info = frame->mutable_reference_line_info()->front();
   *(rfl_info.mutable_speed_data()) =
@@ -149,10 +146,8 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
   for (const auto& sd : *rfl_info.mutable_speed_data()) {
     ADEBUG << sd.ShortDebugString();
   }
-
-  // (2) combine path and speed.
+  //  2. Combine path and speed.
   *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
-
   rfl_info.set_trajectory_type(ADCTrajectory::NORMAL);
   DiscretizedTrajectory trajectory;
   if (!rfl_info.CombinePathAndSpeedProfile(
@@ -164,6 +159,7 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
   rfl_info.SetTrajectory(trajectory);
   rfl_info.SetDrivable(true);
 
+  // If it arrives at the wait point, switch to SIDE_PASS_DETECT_SAFETY.
   constexpr double kBuffer = 0.3;
   if (move_forward_distance < kBuffer) {
     next_stage_ = ScenarioConfig::SIDE_PASS_DETECT_SAFETY;
@@ -192,8 +188,8 @@ bool StageStopOnWaitPoint::IsFarAwayFromObstacles(
     return false;
   }
 
-  // Go through every obstacle, check if there is any in the no_obs_zone,
-  // which will be used by the proceed_with_caution movement.
+  // Go through every obstacle, check if there is any in the no_obs_zone;
+  // the no_obs_zone must be clear for successful proceed_with_caution.
   for (const auto* obstacle : indexed_obstacle_list.Items()) {
     if (obstacle->IsVirtual()) {
       continue;
@@ -229,9 +225,40 @@ bool StageStopOnWaitPoint::IsFarAwayFromObstacles(
 }
 
 bool StageStopOnWaitPoint::GetTheNearestObstacle(
-    const ReferenceLine& reference_line,
+    const Frame& frame,
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
     const Obstacle** nearest_obstacle) {
+
+  // Sanity checks.
+  if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
+  *nearest_obstacle = nullptr;
+
+  // Get the closest front blocking obstacle.
+  double distance_to_closest_blocking_obstacle = -100.0;
+  bool exists_a_blocking_obstacle = false;
+  for (const auto* obstacle : indexed_obstacle_list.Items()) {
+    double distance_between_adc_and_obstacle = 0.0;
+    if (IsBlockingObstacleToSidePass(
+            frame, obstacle,
+            GetContext()->scenario_config_.block_obstacle_min_speed(),
+            GetContext()->scenario_config_.min_front_obstacle_distance(),
+            GetContext()->scenario_config_.enable_obstacle_blocked_check(),
+            &distance_between_adc_and_obstacle)) {
+      exists_a_blocking_obstacle = true;
+      if (distance_to_closest_blocking_obstacle < 0 ||
+          distance_between_adc_and_obstacle <
+              distance_to_closest_blocking_obstacle) {
+        distance_to_closest_blocking_obstacle =
+            distance_between_adc_and_obstacle;
+        *nearest_obstacle = obstacle;
+      }
+    }
+  }
+  return exists_a_blocking_obstacle;
+
+  /*
   // Get the first path point. This can be used later to
   // filter out other obstaces that are behind ADC.
   PathPoint first_path_point =
@@ -295,6 +322,7 @@ bool StageStopOnWaitPoint::GetTheNearestObstacle(
   }
 
   return true;
+  */
 }
 
 bool StageStopOnWaitPoint::GetMoveForwardLastPathPoint(
