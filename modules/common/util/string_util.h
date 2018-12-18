@@ -42,7 +42,6 @@ namespace util {
 using google::protobuf::Join;
 using google::protobuf::StrAppend;
 using google::protobuf::StrCat;
-using google::protobuf::StringPiece;
 using google::protobuf::StringPrintf;
 
 /**
@@ -52,10 +51,10 @@ using google::protobuf::StringPrintf;
  * @return Whether the original string ends with the specified pattern.
  */
 inline bool EndWith(const std::string& ori, const std::string& pat) {
-  return StringPiece(ori).ends_with(pat);
+  return std::equal(pat.rbegin(), pat.rend(), ori.rbegin());
 }
 inline bool StartWith(const std::string& ori, const std::string& pat) {
-  return StringPiece(ori).starts_with(pat);
+  return std::equal(pat.begin(), pat.end(), ori.begin());
 }
 
 /**
