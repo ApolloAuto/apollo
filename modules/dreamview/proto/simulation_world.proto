@@ -87,7 +87,7 @@ message Object {
 
   // Motion Info
   // For objects with motion info such as ADC.
-  optional double speed = 11;               // in m/s
+  optional double speed = 11;               // in m/s, can be negative
   optional double speed_acceleration = 12;  // in m/s^2
   optional double speed_jerk = 13;
   optional double spin = 14;
