@@ -432,7 +432,8 @@ SidePassPathDecider::GetPathBoundaries(
                                    obs_sl.start_l() - adc_half_width -
                                    FLAGS_side_pass_obstacle_l_buffer;
         ADEBUG << "Should pass from right. Upper bound = " << upper_bound;
-        if (std::get<1>(lateral_bound) + FLAGS_side_pass_extra_road_buffer_during_turning <=
+        if (std::get<1>(lateral_bound) +
+                FLAGS_side_pass_extra_road_buffer_during_turning <=
             upper_bound) {
           ADEBUG << "Reseting the boundaries for right-side-pass.";
           std::get<2>(lateral_bound) = upper_bound;
