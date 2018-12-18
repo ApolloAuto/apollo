@@ -31,6 +31,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 - [Dreamview usage table](dreamview_usage_table.md)
 
 ## Algorithms
+- [Open Space Planner](Open_Space_Planner.md)
 - [3d obstacle perception](3d_obstacle_perception.md)
 - [3d obstacle perception cn](3d_obstacle_perception_cn.md)
 - [QP spline path optimizer](qp_spline_path_optimizer.md)
