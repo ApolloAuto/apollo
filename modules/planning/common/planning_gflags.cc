@@ -210,17 +210,17 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
+DEFINE_double(follow_min_obs_lateral_distance, 2.5,
+              "obstacle min lateral distance to follow");
 DEFINE_double(yield_distance, 3.0,
               "min yield distance for vehicles/moving objects "
               "other than pedestrians/bicycles");
 DEFINE_double(yield_distance_pedestrian_bycicle, 5.0,
               "min yield distance for pedestrians/bicycles");
-DEFINE_double(
-    follow_time_buffer, 2.5,
-    "follow time buffer (in second) to calculate the following distance.");
-DEFINE_double(
-    follow_min_time_sec, 0.1,
-    "min following time in st region before considering a valid follow");
+DEFINE_double(follow_time_buffer, 2.5,
+              "time buffer in second to calculate the following distance.");
+DEFINE_double(follow_min_time_sec, 0.1,
+              "min follow time in st region before considering a valid follow");
 DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
 DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
