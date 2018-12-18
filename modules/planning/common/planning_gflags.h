@@ -112,6 +112,7 @@ DECLARE_double(min_stop_distance_obstacle);
 DECLARE_double(max_stop_distance_obstacle);
 DECLARE_double(nudge_distance_obstacle);
 DECLARE_double(follow_min_distance);
+DECLARE_double(follow_min_obs_lateral_distance);
 DECLARE_double(yield_distance);
 DECLARE_double(yield_distance_pedestrian_bycicle);
 DECLARE_double(follow_time_buffer);
