@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/record/record_viewer.h"
+
 #include <gtest/gtest.h>
 #include <unistd.h>
 #include <algorithm>
@@ -23,7 +25,6 @@
 
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
-#include "cyber/record/record_viewer.h"
 #include "cyber/record/record_writer.h"
 
 namespace apollo {

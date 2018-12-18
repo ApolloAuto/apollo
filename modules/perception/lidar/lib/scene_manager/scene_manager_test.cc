@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+
+#include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
+
 #include <fstream>
 #include <sstream>
 
+#include "gtest/gtest.h"
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -26,7 +29,6 @@
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
-#include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 #include "modules/perception/map/hdmap/hdmap_input.h"
 
 namespace apollo {

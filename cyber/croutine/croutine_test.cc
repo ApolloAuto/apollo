@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "gtest/gtest.h"
+#include "cyber/croutine/croutine.h"
 
 #include "cyber/common/global_data.h"
-#include "cyber/croutine/croutine.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

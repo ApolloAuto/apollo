@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/perception/inference/tensorrt/rt_net.h"
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/highgui/highgui_c.h>
@@ -23,7 +26,6 @@
 #include "gtest/gtest_prod.h"
 
 #include "modules/perception/inference/inference_factory.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
 #include "modules/perception/inference/utils/util.h"
 
 namespace apollo {

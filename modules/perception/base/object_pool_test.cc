@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/base/object_pool.h"
+
 #include "modules/perception/base/light_object_pool.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_pool_types.h"

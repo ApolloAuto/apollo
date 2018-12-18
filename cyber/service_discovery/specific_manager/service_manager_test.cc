@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/service_discovery/specific_manager/service_manager.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "cyber/common/global_data.h"
-#include "cyber/service_discovery/specific_manager/service_manager.h"
 
 namespace apollo {
 namespace cyber {

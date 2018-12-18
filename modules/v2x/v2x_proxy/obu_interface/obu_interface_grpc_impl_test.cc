@@ -20,6 +20,7 @@
  */
 
 #include "modules/v2x/v2x_proxy/obu_interface/obu_interface_grpc_impl.h"
+
 #include "gtest/gtest.h"
 
 namespace apollo {
