@@ -592,7 +592,7 @@ void LatController::UpdateDrivingOrientation() {
   driving_orientation_ = VehicleStateProvider::Instance()->heading();
   matrix_bd_ = matrix_b_ * ts_;
   // Reverse the driving direction if the vehicle is in reverse mode
-  if (reverse_heading_control) {
+  if (FLAGS_reverse_heading_control) {
     if (VehicleStateProvider::Instance()->gear() ==
         canbus::Chassis::GEAR_REVERSE) {
       driving_orientation_ =
