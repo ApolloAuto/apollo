@@ -574,6 +574,13 @@ void LatController::ComputeLateralErrors(
   debug->set_heading_error(heading_error);
 
   auto lateral_error_dot = linear_v * std::sin(heading_error);
+
+  if (FLAGS_reverse_heading_control) {
+    if (VehicleStateProvider::Instance()->gear() ==
+        canbus::Chassis::GEAR_REVERSE) {
+      lateral_error_dot = -lateral_error_dot;
+    }
+  }
   debug->set_lateral_error_rate(lateral_error_dot);
 
   auto heading_error_rate =
