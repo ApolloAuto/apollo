@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###############################################################################
-# Copyright 2017 The Apollo Authors. All Rights Reserved.
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import argparse
 import matplotlib.pyplot as plt
 from libs.map import Map
 from libs.localization import Localization
+from libs.path import Path
 
 if __name__ == "__main__":
 
@@ -45,6 +46,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--loc", action="store", type=str, required=False,
         help="Specify the localization pb file in txt format")
+    # driving path data files are text files with data format of
+    # t,x,y,heading,speed
+    parser.add_argument(
+        "-dp", "--drivingpath", nargs='+',
+        help="Show driving paths in map")
 
     args = parser.parse_args()
 
@@ -56,6 +62,10 @@ if __name__ == "__main__":
     map.draw_lanes(plt, args.showlaneids, lane_ids, args.showlanedetails)
     if args.showsignals:
         map.draw_signal_lights(plt)
+
+    if args.drivingpath is not None:
+        path = Path(args.drivingpath)
+        path.draw(plt)
 
     if args.loc is not None:
         localization = Localization()
