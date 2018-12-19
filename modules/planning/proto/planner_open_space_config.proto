@@ -60,4 +60,16 @@ message DistanceApproachConfig {
   optional double min_time_sample_scaling = 13 [default = 0.1];
   optional double max_time_sample_scaling = 14 [default = 10.0];
   optional bool use_fix_time = 18 [default = false];
+  // ipopt configs
+  optional int32 ipopt_print_level = 19 [default = 0];
+  optional int32 mumps_mem_percent = 20 [default = 6000];
+  optional double mumps_pivtol = 21 [default = 1e-6];
+  optional int32 ipopt_max_iter = 22 [default = 1000];
+  optional double ipopt_tol = 23 [default = 1e-4];
+  optional double ipopt_acceptable_constr_viol_tol = 24 [default = 1e-1];
+  optional double ipopt_min_hessian_perturbation = 25 [default = 1e-12];
+  optional double ipopt_jacobian_regularization_value = 26 [default = 1e-7];
+  optional string ipopt_print_timing_statistics = 27 [default = "yes"];
+  optional string ipopt_alpha_for_y = 28 [default = "min"];
+  optional string ipopt_recalc_y = 29 [default = "yes"];
 }
