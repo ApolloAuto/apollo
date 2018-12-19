@@ -28,6 +28,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 
@@ -45,51 +46,27 @@ using apollo::common::VehicleConfigHelper;
  */
 Stage::StageStatus StageBackup::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  // check the status of side pass scenario
-  const SLBoundary& adc_sl_boundary =
-      frame->reference_line_info().front().AdcSlBoundary();
-  const PathDecision& path_decision =
-      frame->reference_line_info().front().path_decision();
-
-  bool has_blocking_obstacle = false;
+  // Check for front blocking obstacles.
+  const auto& reference_line_info = frame->reference_line_info().front();
+  const PathDecision& path_decision = reference_line_info.path_decision();
+  bool exists_a_blocking_obstacle = false;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    if (obstacle->IsVirtual() || !obstacle->IsStatic()) {
-      continue;
+    double distance_between_adc_and_obstacle = 0.0;
+    if (IsBlockingObstacleToSidePass(
+            *frame, obstacle,
+            GetContext()->scenario_config_.block_obstacle_min_speed(),
+            GetContext()->scenario_config_.min_front_obstacle_distance(),
+            GetContext()->scenario_config_.enable_obstacle_blocked_check(),
+            &distance_between_adc_and_obstacle)) {
+      exists_a_blocking_obstacle = true;
+      break;
     }
-    CHECK(obstacle->IsStatic());
-    if (obstacle->speed() >
-        GetContext()->scenario_config_.block_obstacle_min_speed()) {
-      continue;
-    }
-    if (obstacle->PerceptionSLBoundary().start_s() <=
-        adc_sl_boundary.end_s()) {  // such vehicles are behind the ego car.
-      continue;
-    }
-    if (obstacle->PerceptionSLBoundary().start_s() >
-        adc_sl_boundary.end_s() +
-            GetContext()->scenario_config_.max_front_obstacle_distance()) {
-      // vehicles are far away
-      continue;
-    }
-
-    // check driving_width
-    const auto& reference_line =
-        frame->reference_line_info().front().reference_line();
-    const double driving_width =
-        reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
-    const double adc_width =
-        VehicleConfigHelper::GetConfig().vehicle_param().width();
-    if (driving_width - adc_width - FLAGS_static_decision_nudge_l_buffer >
-        GetContext()->scenario_config_.min_l_nudge_buffer()) {
-      continue;
-    }
-
-    has_blocking_obstacle = true;
-    break;
   }
 
+  // If there is no more blocking obstacle or if we are in this stage
+  // for too long, then exit stage.
   GetContext()->backup_stage_cycle_num_ += 1;
-  if (!has_blocking_obstacle ||
+  if (!exists_a_blocking_obstacle ||
       GetContext()->backup_stage_cycle_num_ >
           GetContext()->scenario_config_.max_backup_stage_cycle_num()) {
     GetContext()->backup_stage_cycle_num_ = 0;
@@ -97,7 +74,7 @@ Stage::StageStatus StageBackup::Process(
     return Stage::FINISHED;
   }
 
-  // do path planning
+  // Otherwise, do path planning.
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_start_point, frame);
   if (!plan_ok) {
     AERROR << "Stage " << Name() << " error: "
