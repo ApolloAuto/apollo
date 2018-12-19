@@ -22,7 +22,6 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/localization/common/localization_gflags.h"
-#include "modules/localization/msf/common/util/math_util.h"
 
 namespace apollo {
 namespace localization {
@@ -41,9 +40,8 @@ void NDTLocalization::Init() {
   std::string lidar_height_file = FLAGS_lidar_height_file;
   std::string lidar_extrinsics_file = FLAGS_lidar_extrinsics_file;
 
-  std::string map_path_ = FLAGS_map_dir + "/" +
-                          FLAGS_ndt_map_dir + "/" +
-                          FLAGS_local_map_name;
+  std::string map_path_ =
+      FLAGS_map_dir + "/" + FLAGS_ndt_map_dir + "/" + FLAGS_local_map_name;
   AINFO << "map folder: " << map_path_;
   velodyne_extrinsic_ = Eigen::Affine3d::Identity();
   bool sucess = LoadLidarExtrinsic(lidar_extrinsics_file, &velodyne_extrinsic_);
@@ -244,12 +242,10 @@ void NDTLocalization::ComposeLocalizationEstimate(
       common::math::QuaternionToHeading(quat.w(), quat.x(), quat.y(), quat.z());
   mutable_pose->set_heading(heading);
 
-  double euler[3] = {};
-  double qbn[4] = {quat.w(), quat.x(), quat.y(), quat.z()};
-  msf::math::QuaternionToEuler(qbn, euler);
-  mutable_pose->mutable_euler_angles()->set_x(euler[0]);
-  mutable_pose->mutable_euler_angles()->set_y(euler[1]);
-  mutable_pose->mutable_euler_angles()->set_z(euler[2]);
+  common::math::EulerAnglesZXYd euler(quat.w(), quat.x(), quat.y(), quat.z());
+  mutable_pose->mutable_euler_angles()->set_x(euler.pitch());
+  mutable_pose->mutable_euler_angles()->set_y(euler.roll());
+  mutable_pose->mutable_euler_angles()->set_z(euler.yaw());
 
   const auto& odometry_pose = odometry_msg->localization();
   if (odometry_pose.has_linear_velocity()) {
@@ -340,24 +336,20 @@ bool NDTLocalization::QueryPoseFromBuffer(double time, Eigen::Affine3d* pose) {
       pre_pose.pose.translation() * v1 + next_pose.pose.translation() * v2;
 
   Eigen::Quaterniond pre_quat(pre_pose.pose.linear());
-  const double pre_qbn[4] = {pre_quat.w(), pre_quat.x(), pre_quat.y(),
-                             pre_quat.z()};
-  double pre_euler[3];
-  msf::math::QuaternionToEuler(pre_qbn, pre_euler);
+
+  common::math::EulerAnglesZXYd pre_euler(pre_quat.w(), pre_quat.x(),
+                                          pre_quat.y(), pre_quat.z());
 
   Eigen::Quaterniond next_quat(next_pose.pose.linear());
-  const double next_qbn[4] = {next_quat.w(), next_quat.x(), next_quat.y(),
-                              next_quat.z()};
-  double next_euler[3];
-  msf::math::QuaternionToEuler(next_qbn, next_euler);
+  common::math::EulerAnglesZXYd next_euler(next_quat.w(), next_quat.x(),
+                                           next_quat.y(), next_quat.z());
 
-  double euler[3] = {};
-  euler[0] = pre_euler[0] * v1 + next_euler[0] * v2;
-  euler[1] = pre_euler[1] * v1 + next_euler[1] * v2;
-  euler[2] = pre_euler[2] * v1 + next_euler[2] * v2;
-  double qbn[4] = {};
-  msf::math::EulerToQuaternion(euler[0], euler[1], euler[2], qbn);
-  Eigen::Quaterniond quat(qbn[0], qbn[1], qbn[2], qbn[3]);
+  double tmp_euler[3] = {};
+  tmp_euler[0] = pre_euler.pitch() * v1 + next_euler.pitch() * v2;
+  tmp_euler[1] = pre_euler.roll() * v1 + next_euler.roll() * v2;
+  tmp_euler[2] = pre_euler.yaw() * v1 + next_euler.yaw() * v2;
+  common::math::EulerAnglesZXYd euler(tmp_euler[1], tmp_euler[0], tmp_euler[2]);
+  Eigen::Quaterniond quat = euler.ToQuaternion();
   quat.normalize();
   pose->linear() = quat.toRotationMatrix();
   return true;

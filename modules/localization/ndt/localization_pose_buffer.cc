@@ -18,7 +18,7 @@
 #include <Eigen/Dense>
 #include <iomanip>
 #include "cyber/common/log.h"
-#include "modules/localization/msf/common/util/math_util.h"
+#include "modules/common/math/euler_angles_zxy.h"
 
 namespace apollo {
 namespace localization {
@@ -74,14 +74,8 @@ Eigen::Affine3d LocalizationPoseBuffer::UpdateOdometryPose(
 
     Eigen::Quaterniond novatel_quat(novatel_pose.linear());
     novatel_quat.normalize();
-    double quat[4] = {novatel_quat.w(), novatel_quat.x(), novatel_quat.y(),
-                      novatel_quat.z()};
-    AINFO << "quat: " << quat[0] << ", " << quat[1] << ", " << quat[2] << ", "
-          << quat[3];
-    double novatel_ev[3] = {};
-    apollo::localization::msf::math::QuaternionToEuler(quat, novatel_ev);
-    AINFO << "novatel_ev: " << novatel_ev[0] << ", " << novatel_ev[1] << ", "
-          << novatel_ev[2];
+    common::math::EulerAnglesZXYd novatel_ev(
+        novatel_quat.w(), novatel_quat.x(), novatel_quat.y(), novatel_quat.z());
     Eigen::Vector3d pose_ev;
     pose_ev[0] = 0;
     pose_ev[1] = 0;
@@ -103,26 +97,26 @@ Eigen::Affine3d LocalizationPoseBuffer::UpdateOdometryPose(
       Eigen::Quaterniond predict_pose_quat =
           pair_locator_quat * pair_novatel_quat.inverse() * novatel_quat;
       predict_pose_quat.normalized();
-      double pose_quat[4] = {predict_pose_quat.w(), predict_pose_quat.x(),
-                             predict_pose_quat.y(), predict_pose_quat.z()};
-      double predict_pose_ev[3] = {};
-      msf::math::QuaternionToEuler(pose_quat, predict_pose_ev);
-      double predict_yaw = predict_pose_ev[2];
-      if (novatel_ev[2] > 0) {
-        if (novatel_ev[2] - predict_pose_ev[2] > M_PI) {
-          predict_yaw = predict_pose_ev[2] + M_PI * 2.0;
+
+      common::math::EulerAnglesZXYd predict_pose_ev(
+          predict_pose_quat.w(), predict_pose_quat.x(), predict_pose_quat.y(),
+          predict_pose_quat.z());
+      double predict_yaw = predict_pose_ev.yaw();
+      if (novatel_ev.yaw() > 0) {
+        if (novatel_ev.yaw() - predict_pose_ev.yaw() > M_PI) {
+          predict_yaw = predict_pose_ev.yaw() + M_PI * 2.0;
         }
       } else {
-        if (predict_pose_ev[2] - novatel_ev[2] > M_PI) {
-          predict_yaw = predict_pose_ev[2] - M_PI * 2.0;
+        if (predict_pose_ev.yaw() - novatel_ev.yaw() > M_PI) {
+          predict_yaw = predict_pose_ev.yaw() - M_PI * 2.0;
         }
       }
       pose_ev[2] += predict_yaw;
       weight += 1;
     }
     pose.translation() *= (1.0 / weight);
-    pose_ev[0] = novatel_ev[0];
-    pose_ev[1] = novatel_ev[1];
+    pose_ev[0] = novatel_ev.pitch();
+    pose_ev[1] = novatel_ev.roll();
     pose_ev[2] *= (1.0 / weight);
     if (std::abs(pose_ev[2]) > M_PI) {
       if (pose_ev[2] > 0) {
@@ -131,12 +125,9 @@ Eigen::Affine3d LocalizationPoseBuffer::UpdateOdometryPose(
         pose_ev[2] += 2.0 * M_PI;
       }
     }
-    double tmp_quat[4] = {};
-    msf::math::EulerToQuaternion(pose_ev[0], pose_ev[1], pose_ev[2], tmp_quat);
-    AINFO << "tmp_quat: " << tmp_quat[0] << ", " << tmp_quat[1] << ", "
-          << tmp_quat[2] << ", " << tmp_quat[3];
-    Eigen::Quaterniond tmp_qbn(tmp_quat[0], tmp_quat[1], tmp_quat[2],
-                               tmp_quat[3]);
+    common::math::EulerAnglesZXYd pose_euler(pose_ev[1], pose_ev[0],
+                                             pose_ev[2]);
+    Eigen::Quaterniond tmp_qbn = pose_euler.ToQuaternion();
     tmp_qbn.normalize();
     pose.linear() = tmp_qbn.toRotationMatrix();
   }

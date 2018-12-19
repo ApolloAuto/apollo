@@ -16,10 +16,9 @@
 
 #include "modules/localization/ndt/ndt_localization_component.h"
 
-#include "modules/common/time/time.h"
-#include "modules/common/math/quaternion.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/localization/msf/common/util/math_util.h"
+#include "modules/common/math/quaternion.h"
+#include "modules/common/time/time.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -118,12 +117,10 @@ void NDTLocalizationComponent::LidarCallback(
                                                        quat.y(), quat.z());
     mutable_pose->set_heading(heading);
 
-    double euler[3] = {};
-    double qbn[4] = {quat.w(), quat.x(), quat.y(), quat.z()};
-    msf::math::QuaternionToEuler(qbn, euler);
-    mutable_pose->mutable_euler_angles()->set_x(euler[0]);
-    mutable_pose->mutable_euler_angles()->set_y(euler[1]);
-    mutable_pose->mutable_euler_angles()->set_z(euler[2]);
+    common::math::EulerAnglesZXYd euler(quat.w(), quat.x(), quat.y(), quat.z());
+    mutable_pose->mutable_euler_angles()->set_x(euler.pitch());
+    mutable_pose->mutable_euler_angles()->set_y(euler.roll());
+    mutable_pose->mutable_euler_angles()->set_z(euler.yaw());
     // publish localization messages
     PublishLidarPoseBroadcastTopic(localization);
   }
