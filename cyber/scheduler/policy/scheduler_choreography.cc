@@ -19,6 +19,7 @@
 #include <sched.h>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
@@ -106,6 +107,7 @@ void SchedulerChoreography::CreateProcessor() {
     proc->SetSchedPolicy(choreography_processor_policy_,
                          choreography_processor_prio_);
     pctxs_.emplace_back(ctx);
+    processors_.push_back(std::move(proc));
   }
 
   // Put tasks w/o processor assigned into a classic pool.
@@ -117,6 +119,7 @@ void SchedulerChoreography::CreateProcessor() {
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
     proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
     pctxs_.emplace_back(ctx);
+    processors_.push_back(std::move(proc));
   }
 }
 
