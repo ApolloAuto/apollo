@@ -125,6 +125,7 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
         localization.pose().linear_acceleration().y());
   }
 
+  // TODO(all) kappa is wrong as it uses unupdated linear velocity.
   constexpr double kEpsilon = 1e-6;
   if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
     vehicle_state_.set_kappa(0.0);
