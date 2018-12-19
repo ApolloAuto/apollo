@@ -468,12 +468,12 @@ DEFINE_double(side_pass_obstacle_s_buffer, 2.0,
               "(unit: meter) for side pass scenario ");
 DEFINE_double(side_pass_extra_road_buffer_during_turning, 0.1,
               "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_vehicle_buffer, 0.6,
+DEFINE_double(side_pass_vehicle_buffer, 0.1,
               "(unit: meter) for side pass scenario ");
 DEFINE_double(side_pass_off_road_center_threshold, 0.4,
               "(unit: meter) for side pass scenario ");
 DEFINE_double(side_pass_trim_watch_window, 12.0,
               "(unit: meter) for side pass scenario ");
-DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, true,
+DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
             "Whether to use the actual laneinfo for side-pass path generation,"
             " or to use the planning starting-point's laneinfo all the time.");
