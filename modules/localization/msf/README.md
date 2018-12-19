@@ -16,7 +16,7 @@
 ## Output
   * Localization result defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`. (ROS topic `/apollo/localization/pose`)
   * Localization status defined by Protobuf message `LocalizationStatus`, which can be found in file `localization/proto/localization.proto`. (ROS topic `/apollo/localization/msf_status`)
-  * We also provide intermediate results: Gnss localization result, LiDAR localization result. (ROS topic `/apollo/localization/msf_gnss`, `/apollo/localization/msf_lidar`)
+  * We also provide intermediate results: Gnss localization result, LiDAR localization result. (ROS topic `/apollo/localization/gnss_pose`, `/apollo/localization/lidar_pose`)
 
 ## Modes
 

@@ -56,8 +56,8 @@ function start() {
         /apollo/routing_request \
         /apollo/routing_response \
         /apollo/localization/pose \
-        /apollo/localization/msf_gnss \
-        /apollo/localization/msf_lidar \
+        /apollo/localization/gnss_pose \
+        /apollo/localization/lidar_pose \
         /apollo/localization/msf_status \
         /apollo/navigation \
         /apollo/relative_map \
