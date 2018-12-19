@@ -137,7 +137,7 @@ Status LMDLocalization::Start() {
 
   // initialize thread pool
   ThreadPool::Init(kDefaultThreadPoolSize);
-
+  AdapterManager::Init(FLAGS_lmd_adapter_config_file);
   // initialize adapter manager
   AdapterManager::AddImuCallback(&LMDLocalization::OnImu, this);
   AdapterManager::AddRawImuCallback(&LMDLocalization::OnRawImu, this);
@@ -145,7 +145,6 @@ Status LMDLocalization::Start() {
   AdapterManager::AddChassisCallback(&LMDLocalization::OnChassis, this);
   AdapterManager::AddPerceptionObstaclesCallback(
       &LMDLocalization::OnPerceptionObstacles, this);
-  AdapterManager::Init(FLAGS_lmd_adapter_config_file);
 
   // start ROS timer, one-shot = false, auto-start = true
   const double duration = 1.0 / FLAGS_localization_publish_freq;
