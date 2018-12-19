@@ -58,3 +58,6 @@ DEFINE_double(look_forward_time_sec, 8.0,
               "when creating reference line from routing");
 
 DEFINE_bool(use_sim_time, false, "Use bag time in mock time mode.");
+
+DEFINE_bool(reverse_heading_vehicle_state, false,
+            "test flag for reverse driving.");

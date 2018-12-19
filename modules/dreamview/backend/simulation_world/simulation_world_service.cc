@@ -295,8 +295,12 @@ void SimulationWorldService::InitReaders() {
         this->PublishMonitorMessage(MonitorMessageItem::WARN,
                                     drive_event->event());
       });
+  cyber::ReaderConfig monitor_message_reader_config;
+  monitor_message_reader_config.channel_name = FLAGS_monitor_topic;
+  monitor_message_reader_config.pending_queue_size =
+      FLAGS_monitor_msg_pending_queue_size;
   monitor_reader_ = node_->CreateReader<MonitorMessage>(
-      FLAGS_monitor_topic,
+      monitor_message_reader_config,
       [this](const std::shared_ptr<MonitorMessage> &monitor_message) {
         std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
         monitor_msgs_.push_back(monitor_message);
@@ -491,7 +495,11 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
-  auto_driving_car->set_speed(chassis.speed_mps());
+  double speed = chassis.speed_mps();
+  if (chassis.gear_location() == Chassis::GEAR_REVERSE) {
+    speed = -speed;
+  }
+  auto_driving_car->set_speed(speed);
   auto_driving_car->set_throttle_percentage(chassis.throttle_percentage());
   auto_driving_car->set_brake_percentage(chassis.brake_percentage());
 
@@ -1168,6 +1176,7 @@ void SimulationWorldService::UpdateMonitorMessages() {
   {
     std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
     monitor_msgs = monitor_msgs_;
+    monitor_msgs_.clear();
   }
 
   for (const auto &monitor_msg : monitor_msgs) {

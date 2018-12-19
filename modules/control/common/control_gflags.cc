@@ -54,3 +54,5 @@ DEFINE_int32(localization_pending_queue_size, 10,
              "Max localization pending queue size");
 DEFINE_int32(pad_msg_pending_queue_size, 10,
              "Max pad message pending queue size");
+
+DEFINE_bool(reverse_heading_control, false, "test vehicle reverse control");

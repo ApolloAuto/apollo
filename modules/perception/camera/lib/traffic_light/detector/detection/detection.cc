@@ -217,8 +217,8 @@ TrafficLightDetection::Inference(std::vector<base::TrafficLightPtr> *lights,
       AINFO << "get image data success ";
 
       float resize_scale =
-          static_cast<float>(detection_param_.min_crop_size() /
-                             std::min(cbox.width, cbox.height));
+          static_cast<float>(detection_param_.min_crop_size()) /
+          static_cast<float>(std::min(cbox.width, cbox.height));
       resize_scale_list_.push_back(resize_scale);
 
       inference::ResizeGPU(*image_, input_img_blob,
