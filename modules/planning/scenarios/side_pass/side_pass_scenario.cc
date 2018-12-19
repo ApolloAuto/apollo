@@ -226,7 +226,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
             side_pass_context_.scenario_config_.enable_obstacle_blocked_check(),
             &distance_between_adc_and_obstacle)) {
       exists_a_blocking_obstacle = true;
-      if (distance_to_closest_blocking_obstacle < 0 ||
+      if (distance_to_closest_blocking_obstacle < 0.0 ||
           distance_between_adc_and_obstacle <
               distance_to_closest_blocking_obstacle) {
         // Only record the closest front blocking obstacle.
