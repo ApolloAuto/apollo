@@ -16,6 +16,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:file_util",
+        "//modules/common/util:string_util",
         "//modules/perception/base:camera",
         "//modules/perception/base:distortion_model",
         "//modules/perception/base:omnidirectional_model",

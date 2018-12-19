@@ -45,6 +45,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:file_util",
+        "//modules/common/util:string_util",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
         "//third_party/tf2",

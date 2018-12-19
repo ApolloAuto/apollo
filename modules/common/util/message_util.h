@@ -27,6 +27,7 @@
 #include "google/protobuf/message.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 
 /**
  * @namespace apollo::common::util
