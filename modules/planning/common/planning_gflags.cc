@@ -474,3 +474,6 @@ DEFINE_double(side_pass_off_road_center_threshold, 0.4,
               "(unit: meter) for side pass scenario ");
 DEFINE_double(side_pass_trim_watch_window, 12.0,
               "(unit: meter) for side pass scenario ");
+DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, true,
+            "Whether to use the actual laneinfo for side-pass path generation,"
+            " or to use the planning starting-point's laneinfo all the time.");
