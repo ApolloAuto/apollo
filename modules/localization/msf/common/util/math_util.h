@@ -38,35 +38,6 @@ struct math {
     return;
   }
 
-  static void DcmToEuler(const double dcm[3][3], double att[3]) {
-    att[0] = asin(dcm[2][1]);               // the angle rotate respect to X
-    att[1] = atan2(-dcm[2][0], dcm[2][2]);  // the angle rotate respect to Y
-    att[2] = atan2(dcm[0][1], dcm[1][1]);   // the angle rotate respect to Z
-    return;
-  }
-
-  // only this one
-  static void QuaternionToEuler(const double quaternion[4], double att[3]) {
-    double dcm21 =
-        2 * (quaternion[2] * quaternion[3] + quaternion[0] * quaternion[1]);
-    double dcm20 =
-        2 * (quaternion[1] * quaternion[3] - quaternion[0] * quaternion[2]);
-    double dcm22 =
-        quaternion[0] * quaternion[0] - quaternion[1] * quaternion[1] -
-        quaternion[2] * quaternion[2] + quaternion[3] * quaternion[3];
-    double dcm01 =
-        2 * (quaternion[1] * quaternion[2] - quaternion[0] * quaternion[3]);
-    double dcm11 =
-        quaternion[0] * quaternion[0] - quaternion[1] * quaternion[1] +
-        quaternion[2] * quaternion[2] - quaternion[3] * quaternion[3];
-
-    att[0] = asin(dcm21);           // the angle rotate respect to X
-    att[1] = atan2(-dcm20, dcm22);  // the angle rotate respect to Y
-    att[2] = atan2(dcm01, dcm11);   // the angle rotate respect to Z
-
-    return;
-  }
-
   static void QuaternionToDcm(const double *quaternion, double dcm[3][3]) {
     dcm[0][0] = quaternion[0] * quaternion[0] + quaternion[1] * quaternion[1] -
                 quaternion[2] * quaternion[2] - quaternion[3] * quaternion[3];

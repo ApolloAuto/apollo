@@ -23,6 +23,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/topo_creator/edge_creator.h"

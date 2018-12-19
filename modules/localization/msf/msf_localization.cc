@@ -201,17 +201,14 @@ void MSFLocalization::OnPointCloud(
 
   localization_integ_.PcdProcess(*message);
 
-  std::list<msf::LocalizationResult> lidar_localization_list;
-  localization_integ_.GetLidarLocalizationList(&lidar_localization_list);
+  const auto &result = localization_integ_.GetLastestLidarLocalization();
 
-  for (auto itr = lidar_localization_list.begin();
-       itr != lidar_localization_list.end(); ++itr) {
-    if (itr->state() == msf::LocalizationMeasureState::OK ||
-        itr->state() == msf::LocalizationMeasureState::VALID) {
-      // publish lidar message to debug
-      publisher_->PublishLocalizationMsfLidar(itr->localization());
-    }
+  if (result.state() == msf::LocalizationMeasureState::OK ||
+      result.state() == msf::LocalizationMeasureState::VALID) {
+    // publish lidar message to debug
+    publisher_->PublishLocalizationMsfLidar(result.localization());
   }
+
   return;
 }
 
@@ -223,59 +220,33 @@ void MSFLocalization::OnRawImu(
     localization_integ_.RawImuProcessFlu(*imu_msg);
   }
 
-  std::list<msf::LocalizationResult> integ_localization_list;
-  localization_integ_.GetIntegLocalizationList(&integ_localization_list);
+  const auto &result = localization_integ_.GetLastestIntegLocalization();
 
-  for (auto itr = integ_localization_list.begin();
-       itr != integ_localization_list.end(); ++itr) {
-    // compose localization status
-    LocalizationStatus status;
-    apollo::common::Header *status_headerpb = status.mutable_header();
-    status_headerpb->set_timestamp_sec(
-        itr->localization().header().timestamp_sec());
-    status.set_fusion_status(
-        static_cast<MeasureState>(itr->integ_status().integ_state));
-    status.set_state_message(itr->integ_status().state_message);
-    status.set_measurement_time(itr->localization().measurement_time());
-    publisher_->PublishLocalizationStatus(status);
+  // compose localization status
+  LocalizationStatus status;
+  apollo::common::Header *status_headerpb = status.mutable_header();
+  status_headerpb->set_timestamp_sec(
+      result.localization().header().timestamp_sec());
+  status.set_fusion_status(
+      static_cast<MeasureState>(result.integ_status().integ_state));
+  status.set_state_message(result.integ_status().state_message);
+  status.set_measurement_time(result.localization().measurement_time());
+  publisher_->PublishLocalizationStatus(status);
 
-    if (itr->state() == msf::LocalizationMeasureState::OK ||
-        itr->state() == msf::LocalizationMeasureState::VALID) {
-      // caculate orientation_vehicle_world
-      LocalizationEstimate local_result = itr->localization();
-      apollo::localization::Pose *posepb_loc = local_result.mutable_pose();
-      const apollo::common::Quaternion &orientation = posepb_loc->orientation();
-      const Eigen::Quaternion<double> quaternion(
-          orientation.qw(), orientation.qx(), orientation.qy(),
-          orientation.qz());
-      Eigen::Quaternion<double> quat_vehicle_world =
-          quaternion * imu_vehicle_quat_;
+  if (result.state() == msf::LocalizationMeasureState::OK ||
+      result.state() == msf::LocalizationMeasureState::VALID) {
+    // caculate orientation_vehicle_world
+    LocalizationEstimate local_result = result.localization();
+    CompensateImuVehicleExtrinsic(&local_result);
 
-      // set heading according to rotation of vehicle
-      posepb_loc->set_heading(common::math::QuaternionToHeading(
-          quat_vehicle_world.w(), quat_vehicle_world.x(),
-          quat_vehicle_world.y(), quat_vehicle_world.z()));
-
-      // set euler angles according to rotation of vehicle
-      apollo::common::Point3D *eulerangles = posepb_loc->mutable_euler_angles();
-      common::math::EulerAnglesZXYd euler_angle(
-          quat_vehicle_world.w(), quat_vehicle_world.x(),
-          quat_vehicle_world.y(), quat_vehicle_world.z());
-      eulerangles->set_x(euler_angle.pitch());
-      eulerangles->set_y(euler_angle.roll());
-      eulerangles->set_z(euler_angle.yaw());
-
-      publisher_->PublishPoseBroadcastTF(local_result);
-      publisher_->PublishPoseBroadcastTopic(local_result);
-    }
+    publisher_->PublishPoseBroadcastTF(local_result);
+    publisher_->PublishPoseBroadcastTopic(local_result);
   }
 
-  if (!integ_localization_list.empty()) {
-    localization_state_ = integ_localization_list.back().state();
-  }
+  localization_state_ = result.state();
 
   return;
-}  // namespace localization
+}
 
 void MSFLocalization::OnGnssBestPose(
     const std::shared_ptr<drivers::gnss::GnssBestPose> &bestgnsspos_msg) {
@@ -287,15 +258,11 @@ void MSFLocalization::OnGnssBestPose(
 
   localization_integ_.GnssBestPoseProcess(*bestgnsspos_msg);
 
-  std::list<msf::LocalizationResult> gnss_localization_list;
-  localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
+  const auto &result = localization_integ_.GetLastestGnssLocalization();
 
-  for (auto itr = gnss_localization_list.begin();
-       itr != gnss_localization_list.end(); ++itr) {
-    if (itr->state() == msf::LocalizationMeasureState::OK ||
-        itr->state() == msf::LocalizationMeasureState::VALID) {
-      publisher_->PublishLocalizationMsfGnss(itr->localization());
-    }
+  if (result.state() == msf::LocalizationMeasureState::OK ||
+      result.state() == msf::LocalizationMeasureState::VALID) {
+    publisher_->PublishLocalizationMsfGnss(result.localization());
   }
 
   return;
@@ -311,15 +278,11 @@ void MSFLocalization::OnGnssRtkObs(
 
   localization_integ_.RawObservationProcess(*raw_obs_msg);
 
-  std::list<msf::LocalizationResult> gnss_localization_list;
-  localization_integ_.GetGnssLocalizationList(&gnss_localization_list);
+  const auto &result = localization_integ_.GetLastestGnssLocalization();
 
-  for (auto itr = gnss_localization_list.begin();
-       itr != gnss_localization_list.end(); ++itr) {
-    if (itr->state() == msf::LocalizationMeasureState::OK ||
-        itr->state() == msf::LocalizationMeasureState::VALID) {
-      publisher_->PublishLocalizationMsfGnss(itr->localization());
-    }
+  if (result.state() == msf::LocalizationMeasureState::OK ||
+      result.state() == msf::LocalizationMeasureState::VALID) {
+    publisher_->PublishLocalizationMsfGnss(result.localization());
   }
 
   return;
@@ -351,6 +314,32 @@ void MSFLocalization::OnGnssHeading(
 void MSFLocalization::SetPublisher(
     const std::shared_ptr<LocalizationMsgPublisher> &publisher) {
   publisher_ = publisher;
+}
+
+void MSFLocalization::CompensateImuVehicleExtrinsic(
+    LocalizationEstimate *local_result) {
+  CHECK_NOTNULL(local_result);
+  // caculate orientation_vehicle_world
+  apollo::localization::Pose *posepb_loc = local_result->mutable_pose();
+  const apollo::common::Quaternion &orientation = posepb_loc->orientation();
+  const Eigen::Quaternion<double> quaternion(
+      orientation.qw(), orientation.qx(), orientation.qy(), orientation.qz());
+  Eigen::Quaternion<double> quat_vehicle_world =
+      quaternion * imu_vehicle_quat_;
+
+  // set heading according to rotation of vehicle
+  posepb_loc->set_heading(common::math::QuaternionToHeading(
+  quat_vehicle_world.w(), quat_vehicle_world.x(),
+  quat_vehicle_world.y(), quat_vehicle_world.z()));
+
+  // set euler angles according to rotation of vehicle
+  apollo::common::Point3D *eulerangles = posepb_loc->mutable_euler_angles();
+  common::math::EulerAnglesZXYd euler_angle(
+      quat_vehicle_world.w(), quat_vehicle_world.x(),
+      quat_vehicle_world.y(), quat_vehicle_world.z());
+  eulerangles->set_x(euler_angle.pitch());
+  eulerangles->set_y(euler_angle.roll());
+  eulerangles->set_z(euler_angle.yaw());
 }
 
 bool MSFLocalization::LoadGnssAntennaExtrinsic(
