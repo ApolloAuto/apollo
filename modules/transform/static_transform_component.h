@@ -27,7 +27,7 @@
 namespace apollo {
 namespace transform {
 
-class StaticTransformComponent final : public ::apollo::cyber::Component<> {
+class StaticTransformComponent final : public apollo::cyber::Component<> {
  public:
   StaticTransformComponent() = default;
   ~StaticTransformComponent() = default;
@@ -42,7 +42,7 @@ class StaticTransformComponent final : public ::apollo::cyber::Component<> {
   bool ParseFromYaml(const std::string& file_path,
                      apollo::transform::TransformStamped* transform);
 
-  ::apollo::static_transform::Conf conf_;
+  apollo::static_transform::Conf conf_;
   std::shared_ptr<cyber::Writer<apollo::transform::TransformStampeds>>
       writer_;
   apollo::transform::TransformStampeds transform_stampeds_;

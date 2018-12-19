@@ -24,22 +24,19 @@ TransformBroadcaster::TransformBroadcaster(
     : node_(node) {
   cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
-  writer_ = node_->CreateWriter<::apollo::transform::TransformStampeds>(attr);
+  writer_ = node_->CreateWriter<TransformStampeds>(attr);
 }
 
-void TransformBroadcaster::SendTransform(
-    const ::apollo::transform::TransformStamped& transform) {
-  std::vector<::apollo::transform::TransformStamped> transforms;
+void TransformBroadcaster::SendTransform(const TransformStamped& transform) {
+  std::vector<TransformStamped> transforms;
   transforms.emplace_back(transform);
   SendTransform(transforms);
 }
 
 void TransformBroadcaster::SendTransform(
-    const std::vector<::apollo::transform::TransformStamped>& transforms) {
-  auto message = std::make_shared<::apollo::transform::TransformStampeds>();
-  for (const auto& transform : transforms) {
-    *(message->add_transforms()) = transform;
-  }
+    const std::vector<TransformStamped>& transforms) {
+  auto message = std::make_shared<TransformStampeds>();
+  *message->mutable_transforms() = {transforms.begin(), transforms.end()};
   writer_->Write(message);
 }
 
