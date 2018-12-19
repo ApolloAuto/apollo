@@ -273,8 +273,6 @@ Status LatController::ComputeControlCommand(
     ControlCommand *cmd) {
   auto vehicle_state = VehicleStateProvider::Instance();
 
-  vehicle_state->set_linear_velocity(chassis->speed_mps());
-
   auto target_tracking_trajectory = *planning_published_trajectory;
 
   if (FLAGS_use_navigation_mode &&
