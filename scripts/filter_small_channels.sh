@@ -36,8 +36,8 @@ cyber_recorder split -f "${INPUT_RECORD}" -o "${OUTPUT_RECORD}" \
     -c "/apollo/drive_event" \
     -c "/apollo/guardian" \
     -c "/apollo/localization/pose" \
-    -c "/apollo/localization/gnss_pose" \
-    -c "/apollo/localization/lidar_pose" \
+    -c "/apollo/localization/msf_gnss" \
+    -c "/apollo/localization/msf_lidar" \
     -c "/apollo/localization/msf_status" \
     -c "/apollo/hmi/status" \
     -c "/apollo/monitor" \
