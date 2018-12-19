@@ -56,7 +56,7 @@ class NDTLocalization {
   /**@brief output localization result */
   void GetLocalization(LocalizationEstimate* localization) const;
   /**@brief get ndt localization result */
-  Eigen::Affine3d GetLidarPose() const { return lidar_pose_; }
+  void GetLidarLocalization(LocalizationEstimate* lidar_localization) const;
   /**@brief get zone id */
   inline int GetZoneId() const { return zone_id_; }
   /**@brief get online resolution for ndt localizaiton*/
@@ -87,6 +87,8 @@ class NDTLocalization {
       const Eigen::Affine3d& pose,
       const std::shared_ptr<localization::Gps>& odometry_msg,
       LocalizationEstimate* localization);
+  void ComposeLidarResult(double time_stamp, const Eigen::Affine3d& pose,
+                          LocalizationEstimate* localization);
 
  private:
   std::string module_name_ = "ndt_localization";
@@ -106,6 +108,7 @@ class NDTLocalization {
   LidarHeight lidar_height_;
   Eigen::Affine3d lidar_pose_;
   Eigen::Affine3d velodyne_extrinsic_;
+  LocalizationEstimate lidar_localization_result_;
   bool is_service_started_ = false;
 
   std::list<TimeStampPose> odometry_buffer_;

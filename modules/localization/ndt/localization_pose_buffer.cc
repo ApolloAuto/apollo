@@ -65,7 +65,6 @@ Eigen::Affine3d LocalizationPoseBuffer::UpdateOdometryPose(
     double timestamp, const Eigen::Affine3d& novatel_pose) {
   Eigen::Affine3d pose = novatel_pose;
   if (used_buffer_size_ > 0) {
-    AINFO << "has lidar pose!!!!!!!";
     pose.translation()[0] = 0;
     pose.translation()[1] = 0;
     pose.translation()[2] = 0;

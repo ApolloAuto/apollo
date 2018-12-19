@@ -32,7 +32,7 @@ class NdtMapConfig : public BaseMapConfig {
   ~NdtMapConfig() {}
 
   /**@brief Set single resolutions. */
-  void SetSingleResolutionZ(float resolution = 0.125);
+  void SetSingleResolutionZ(float resolution = 1.0f);
   /**@brief Set multi resolutions. */
   void SetMultiResolutionsZ();
 

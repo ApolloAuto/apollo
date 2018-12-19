@@ -101,26 +101,7 @@ void NDTLocalizationComponent::LidarCallback(
   // for test to output lidar pose
   if (localization_->IsServiceStarted()) {
     LocalizationEstimate localization;
-    localization_->GetLocalization(&localization);
-    Eigen::Affine3d lidar_pose = localization_->GetLidarPose();
-    auto mutable_pose = localization.mutable_pose();
-    mutable_pose->mutable_position()->set_x(lidar_pose.translation().x());
-    mutable_pose->mutable_position()->set_y(lidar_pose.translation().y());
-    mutable_pose->mutable_position()->set_z(lidar_pose.translation().z());
-
-    Eigen::Quaterniond quat(lidar_pose.linear());
-    mutable_pose->mutable_orientation()->set_qw(quat.w());
-    mutable_pose->mutable_orientation()->set_qx(quat.x());
-    mutable_pose->mutable_orientation()->set_qy(quat.y());
-    mutable_pose->mutable_orientation()->set_qz(quat.z());
-    double heading = common::math::QuaternionToHeading(quat.w(), quat.x(),
-                                                       quat.y(), quat.z());
-    mutable_pose->set_heading(heading);
-
-    common::math::EulerAnglesZXYd euler(quat.w(), quat.x(), quat.y(), quat.z());
-    mutable_pose->mutable_euler_angles()->set_x(euler.pitch());
-    mutable_pose->mutable_euler_angles()->set_y(euler.roll());
-    mutable_pose->mutable_euler_angles()->set_z(euler.yaw());
+    localization_->GetLidarLocalization(&localization);
     // publish localization messages
     PublishLidarPoseBroadcastTopic(localization);
   }

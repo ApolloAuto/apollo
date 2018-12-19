@@ -25,7 +25,7 @@ namespace msf {
 NdtMapConfig::NdtMapConfig(std::string map_version)
     : BaseMapConfig(map_version) {
   map_is_compression_ = true;
-  map_resolutions_z_.push_back(0.125);
+  map_resolutions_z_.push_back(1.0f);
 }
 
 void NdtMapConfig::SetSingleResolutionZ(float resolution) {

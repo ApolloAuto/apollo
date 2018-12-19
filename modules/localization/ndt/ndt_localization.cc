@@ -176,6 +176,7 @@ void NDTLocalization::LidarCallback(
   lidar_locator_.Update(frame_idx++, odometry_pose, lidar_frame);
   lidar_pose_ = lidar_locator_.GetPose();
   pose_buffer_.UpdateLidarPose(time_stamp, lidar_pose_, odometry_pose);
+  ComposeLidarResult(time_stamp, lidar_pose_, &lidar_localization_result_);
   if (ndt_debug_log_flag_) {
     Eigen::Quaterniond tmp_quat(lidar_pose_.linear());
     AINFO << "NDTLocalization Debug Log: lidar pose: " << std::setprecision(15)
@@ -204,6 +205,11 @@ void NDTLocalization::LidarCallback(
 void NDTLocalization::GetLocalization(
     LocalizationEstimate* localization) const {
   *localization = localization_result_;
+}
+
+void NDTLocalization::GetLidarLocalization(
+    LocalizationEstimate* localization) const {
+  *localization = lidar_localization_result_;
 }
 
 bool NDTLocalization::IsServiceStarted() { return is_service_started_; }
@@ -268,6 +274,33 @@ void NDTLocalization::ComposeLocalizationEstimate(
     mutable_pose->mutable_angular_velocity_vrf()->CopyFrom(
         odometry_pose.angular_velocity_vrf());
   }
+}
+
+void NDTLocalization::ComposeLidarResult(double time_stamp,
+                                         const Eigen::Affine3d& pose,
+                                         LocalizationEstimate* localization) {
+  localization->Clear();
+  FillLocalizationMsgHeader(localization);
+
+  localization->set_measurement_time(time_stamp);
+  auto mutable_pose = localization->mutable_pose();
+  mutable_pose->mutable_position()->set_x(pose.translation().x());
+  mutable_pose->mutable_position()->set_y(pose.translation().y());
+  mutable_pose->mutable_position()->set_z(pose.translation().z());
+
+  Eigen::Quaterniond quat(pose.linear());
+  mutable_pose->mutable_orientation()->set_qw(quat.w());
+  mutable_pose->mutable_orientation()->set_qx(quat.x());
+  mutable_pose->mutable_orientation()->set_qy(quat.y());
+  mutable_pose->mutable_orientation()->set_qz(quat.z());
+  double heading =
+      common::math::QuaternionToHeading(quat.w(), quat.x(), quat.y(), quat.z());
+  mutable_pose->set_heading(heading);
+
+  common::math::EulerAnglesZXYd euler(quat.w(), quat.x(), quat.y(), quat.z());
+  mutable_pose->mutable_euler_angles()->set_x(euler.pitch());
+  mutable_pose->mutable_euler_angles()->set_y(euler.roll());
+  mutable_pose->mutable_euler_angles()->set_z(euler.yaw());
 }
 
 bool NDTLocalization::QueryPoseFromTF(double time, Eigen::Affine3d* pose) {
