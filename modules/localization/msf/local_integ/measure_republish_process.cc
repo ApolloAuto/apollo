@@ -22,7 +22,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
-#include "modules/common/math/quaternion.h"
 #include "modules/common/time/time_util.h"
 #include "modules/localization/msf/common/util/math_util.h"
 #include "modules/localization/msf/common/util/time_conversion.h"
@@ -684,8 +683,11 @@ bool MeasureRepublishProcess::LoadImuGnssAntennaExtrinsic(
                                extrinsic->transform_1.translation()[0],
                            extrinsic->transform_2.translation()[1] -
                                extrinsic->transform_1.translation()[1]);
+        double quat[4] = {0.0};
+        math::EulerToQuaternion(0.0, 0.0, yaw, quat);
         extrinsic->transform_1.linear() =
-            common::math::HeadingToQuaternion(yaw).toRotationMatrix();
+            Eigen::Quaterniond(quat[0], quat[1], quat[2], quat[3])
+                .toRotationMatrix();
       }
       return true;
     } else {
