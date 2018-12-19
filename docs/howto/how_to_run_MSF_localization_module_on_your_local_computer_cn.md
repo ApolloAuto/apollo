@@ -76,8 +76,8 @@ rosbag play *.bag
 然后接收以下topic并进行可视化绘制。
 
  - /apollo/sensor/velodyne64/compensator/PointCloud2
- - /apollo/localization/lidar_pose
- - /apollo/localization/gnss_pose
+ - /apollo/localization/msf_lidar
+ - /apollo/localization/msf_gnss
  - /apollo/localization/pose
 
 可视化效果如下

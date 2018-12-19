@@ -113,9 +113,9 @@ DEFINE_string(gnss_rtk_eph_topic, "/apollo/sensor/gnss/rtk_eph",
               "Gnss rtk ephemeris topic name");
 DEFINE_string(gnss_best_pose_topic, "/apollo/sensor/gnss/best_pose",
               "Gnss rtk best gnss pose");
-DEFINE_string(localization_gnss_topic, "/apollo/localization/gnss_pose",
+DEFINE_string(localization_gnss_topic, "/apollo/localization/msf_gnss",
               "Gnss localization measurement topic name");
-DEFINE_string(localization_lidar_topic, "/apollo/localization/lidar_pose",
+DEFINE_string(localization_lidar_topic, "/apollo/localization/msf_lidar",
               "Lidar localization measurement topic name");
 DEFINE_string(localization_ndt_topic, "/apollo/localization/ndt_lidar",
               "NDT localization lidar measurement topic name");

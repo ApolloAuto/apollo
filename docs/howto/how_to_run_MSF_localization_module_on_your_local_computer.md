@@ -63,8 +63,8 @@ First, the visualization tool will generate a series of cache files from the loc
 
 Then it will receive the topics blew and draw them on screen.
  - /apollo/sensor/velodyne64/compensator/PointCloud2
- - /apollo/localization/lidar_pose
- - /apollo/localization/gnss_pose
+ - /apollo/localization/msf_lidar
+ - /apollo/localization/msf_gnss
  - /apollo/localization/pose
 
 If everything is fine, you should see this on screen.
