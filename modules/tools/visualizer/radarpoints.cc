@@ -33,11 +33,11 @@ bool RadarPoints::FillData(
   if (buffer_) {
     GLfloat* ptr = buffer_;
     const ::google::protobuf::Map<::google::protobuf::int32,
-                                  ::apollo::drivers::RadarObstacle>&
+                                  apollo::drivers::RadarObstacle>&
         radarObstacles = rawData->radar_obstacle();
     for (::google::protobuf::Map<
              ::google::protobuf::int32,
-             ::apollo::drivers::RadarObstacle>::const_iterator iter =
+             apollo::drivers::RadarObstacle>::const_iterator iter =
              radarObstacles.cbegin();
          iter != radarObstacles.cend(); ++iter, ptr += vertex_element_count()) {
       const apollo::common::Point2D& position =

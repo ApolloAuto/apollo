@@ -39,18 +39,16 @@ class TransformBroadcaster {
   /** \brief Send a TransformStamped message
    * The stamped data structure includes frame_id, and time, and parent_id
    * already.  */
-  void SendTransform(const apollo::transform::TransformStamped& transform);
+  void SendTransform(const TransformStamped& transform);
 
   /** \brief Send a vector of TransformStamped messages
    * The stamped data structure includes frame_id, and time, and parent_id
    * already.  */
-  void SendTransform(
-      const std::vector<apollo::transform::TransformStamped>& transforms);
+  void SendTransform(const std::vector<TransformStamped>& transforms);
 
  private:
   std::shared_ptr<cyber::Node> node_;
-  std::shared_ptr<cyber::Writer<apollo::transform::TransformStampeds>>
-      writer_;
+  std::shared_ptr<cyber::Writer<TransformStampeds>> writer_;
 };
 }  // namespace transform
 }  // namespace apollo

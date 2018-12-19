@@ -52,18 +52,18 @@ class ThirdPartyPerception {
   void Stop();
 
   // Upon receiving mobileye data
-  void OnMobileye(const ::apollo::drivers::Mobileye& message);
+  void OnMobileye(const apollo::drivers::Mobileye& message);
   // Upon receiving esr radar data
-  void OnDelphiESR(const ::apollo::drivers::DelphiESR& message);
+  void OnDelphiESR(const apollo::drivers::DelphiESR& message);
   // Upon receiving conti radar data
-  void OnContiRadar(const ::apollo::drivers::ContiRadar& message);
+  void OnContiRadar(const apollo::drivers::ContiRadar& message);
   // Upon receiving localization data
   void OnLocalization(
-      const ::apollo::localization::LocalizationEstimate& message);
+      const apollo::localization::LocalizationEstimate& message);
   // Upont receiving chassis data
   void OnChassis(const apollo::canbus::Chassis& message);
   // publish perception obstacles when timer is triggered
-  bool Process(::apollo::perception::PerceptionObstacles* const response);
+  bool Process(apollo::perception::PerceptionObstacles* const response);
 
  private:
   std::mutex third_party_perception_mutex_;
