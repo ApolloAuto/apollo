@@ -153,7 +153,7 @@ Stage::StageStatus StageApproachObstacle::Process(
     ADEBUG << "There is no blocking obstacle.";
     return Stage::FINISHED;
   }
-  if ((distance_to_closest_blocking_obstacle) < 0) {
+  if (distance_to_closest_blocking_obstacle < 0.0) {
     AERROR << "Stage " << Name() << " error: "
            << "front obstacle has wrong position.";
     return Stage::ERROR;
