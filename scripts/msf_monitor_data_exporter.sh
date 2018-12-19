@@ -9,8 +9,8 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-GNSS_LOC_TOPIC="/apollo/localization/msf_gnss"
-LIDAR_LOC_TOPIC="/apollo/localization/msf_lidar" 
+GNSS_LOC_TOPIC="/apollo/localization/gnss_pose"
+LIDAR_LOC_TOPIC="/apollo/localization/lidar_pose" 
 FUSION_LOC_TOPIC="/apollo/localization/pose"
 ODOMETRY_LOC_TOPIC="/apollo/sensor/gnss/odometry"
 CLOUD_TOPIC="/apollo/sensor/velodyne64/compensator/PointCloud2"

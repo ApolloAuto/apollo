@@ -41,8 +41,8 @@ function start() {
         /apollo/sensor/gnss/rtk_obs \
         /apollo/sensor/velodyne64/compensator/PointCloud2 \
         /apollo/localization/pose \
-        /apollo/localization/msf_gnss \
-        /apollo/localization/msf_lidar \
+        /apollo/localization/gnss_pose \
+        /apollo/localization/lidar_pose \
         /apollo/localization/msf_status \
         /apollo/drive_event \
         /tf \
