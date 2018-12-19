@@ -55,3 +55,5 @@ DECLARE_double(voxel_filter_height);
 DECLARE_double(system_status_lifetime_seconds);
 
 DECLARE_string(lidar_height_yaml);
+
+DECLARE_int32(monitor_msg_pending_queue_size);

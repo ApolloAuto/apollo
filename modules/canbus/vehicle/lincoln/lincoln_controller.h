@@ -154,6 +154,8 @@ class LincolnController final : public VehicleController {
   int32_t chassis_error_mask_ = 0;
 
   bool received_vin_ = false;
+
+  canbus::Chassis::GearPosition gear_tmp_;
 };
 
 }  // namespace lincoln

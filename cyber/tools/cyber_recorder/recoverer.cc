@@ -116,7 +116,7 @@ bool Recoverer::Proc() {
       default: {
         AERROR << "this section should not be here, section type: "
                << section.type;
-        break;
+        return false;
       }
     }  // end for switch
   }    // end for while

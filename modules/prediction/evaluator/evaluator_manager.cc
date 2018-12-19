@@ -24,6 +24,7 @@
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
+#include "modules/prediction/evaluator/cyclist/cyclist_keep_lane_evaluator.h"
 #include "modules/prediction/scenario/scenario_manager.h"
 
 namespace apollo {
@@ -41,6 +42,7 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::COST_EVALUATOR);
   RegisterEvaluator(ObstacleConf::CRUISE_MLP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MLP_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR);
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
@@ -191,6 +193,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::COST_EVALUATOR: {
       evaluator_ptr.reset(new CostEvaluator());
+      break;
+    }
+    case ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR: {
+      evaluator_ptr.reset(new CyclistKeepLaneEvaluator());
       break;
     }
     default: { break; }

@@ -91,7 +91,7 @@ class EvaluatorManager {
       ObstacleConf::JUNCTION_MLP_EVALUATOR;
 
   ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
-      ObstacleConf::MLP_EVALUATOR;
+      ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;
 
   ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;
