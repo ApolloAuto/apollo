@@ -247,3 +247,4 @@ DECLARE_double(side_pass_extra_road_buffer_during_turning);
 DECLARE_double(side_pass_vehicle_buffer);
 DECLARE_double(side_pass_off_road_center_threshold);
 DECLARE_double(side_pass_trim_watch_window);
+DECLARE_bool(side_pass_use_actual_laneinfo_for_path_generation);
