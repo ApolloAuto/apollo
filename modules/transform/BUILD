@@ -44,7 +44,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"static_transform\\"'],
     deps = [
         "//cyber",
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/common/util:string_util",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",

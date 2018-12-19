@@ -28,7 +28,7 @@ namespace apollo {
 namespace third_party_perception {
 
 class ThirdPartyPerceptionComponent final
-    : public ::apollo::cyber::TimerComponent {
+    : public apollo::cyber::TimerComponent {
  public:
   ThirdPartyPerceptionComponent() = default;
   ~ThirdPartyPerceptionComponent() = default;
@@ -38,19 +38,19 @@ class ThirdPartyPerceptionComponent final
   bool Proc() override;
 
  private:
-  std::shared_ptr<::apollo::cyber::Reader<::apollo::drivers::Mobileye>>
+  std::shared_ptr<apollo::cyber::Reader<apollo::drivers::Mobileye>>
       mobileye_reader_ = nullptr;
-  std::shared_ptr<::apollo::cyber::Reader<::apollo::drivers::DelphiESR>>
+  std::shared_ptr<apollo::cyber::Reader<apollo::drivers::DelphiESR>>
       delphi_esr_reader_ = nullptr;
-  std::shared_ptr<::apollo::cyber::Reader<::apollo::drivers::ContiRadar>>
+  std::shared_ptr<apollo::cyber::Reader<apollo::drivers::ContiRadar>>
       conti_radar_reader_ = nullptr;
   std::shared_ptr<
-      ::apollo::cyber::Reader<::apollo::localization::LocalizationEstimate>>
+      apollo::cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_ = nullptr;
-  std::shared_ptr<::apollo::cyber::Reader<::apollo::canbus::Chassis>>
+  std::shared_ptr<apollo::cyber::Reader<apollo::canbus::Chassis>>
       chassis_reader_ = nullptr;
   std::shared_ptr<
-      ::apollo::cyber::Writer<::apollo::perception::PerceptionObstacles>>
+      apollo::cyber::Writer<apollo::perception::PerceptionObstacles>>
       writer_ = nullptr;
   ThirdPartyPerception perception_;
 };
