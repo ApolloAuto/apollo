@@ -128,6 +128,25 @@ bool SidePassPathDecider::DecideSidePassDirection(
   }
 }
 
+bool SidePassPathDecider::GetLaneInfoFromPoint(
+    double point_x, double point_y, double point_z, double point_theta,
+    hdmap::LaneInfoConstPtr* const lane) {
+  constexpr double kLaneSearchRadius = 1.0;
+  constexpr double kLaneSearchMaxThetaDiff = M_PI / 3.0;
+  double s = 0.0;
+  double l = 0.0;
+  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
+          common::util::MakePointENU(point_x, point_y, point_z),
+          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff,
+          lane, &s, &l) != 0) {
+    AERROR << "Failed to find nearest lane from map at position: "
+           << "(x, y, z) = (" << point_x << ", " << point_y << ", "
+           << point_z << ")" << ", heading = " << point_theta;
+    return false;
+  }
+  return true;
+}
+
 bool SidePassPathDecider::GeneratePath(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // Sanity checks.
@@ -136,18 +155,12 @@ bool SidePassPathDecider::GeneratePath(
 
   // Get the current LaneInfo of the ADC.
   hdmap::LaneInfoConstPtr lane;
-  double s = 0.0;
-  double l = 0.0;
-  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
-          common::util::MakePointENU(
-              adc_planning_start_point_.path_point().x(),
-              adc_planning_start_point_.path_point().y(),
-              adc_planning_start_point_.path_point().z()),
-          1.0, adc_planning_start_point_.path_point().theta(), M_PI / 3.0,
-          &lane, &s, &l) != 0) {
-    AERROR << "Failed to find nearest lane from map at position: "
-           << adc_planning_start_point_.DebugString()
-           << ", heading:" << adc_planning_start_point_.path_point().theta();
+  if (!GetLaneInfoFromPoint(
+          adc_planning_start_point_.path_point().x(),
+          adc_planning_start_point_.path_point().y(),
+          adc_planning_start_point_.path_point().z(),
+          adc_planning_start_point_.path_point().theta(),
+          &lane)) {
     return false;
   }
   curr_lane_ = lane->lane();
@@ -269,6 +282,7 @@ SidePassPathDecider::GetPathBoundaries(
       lateral_bounds.push_back(lateral_bound);
       continue;
     }
+    const double curr_lane_width = lane_left_width + lane_right_width;
     const double adc_half_width =
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
     std::get<1>(lateral_bound) =
@@ -279,28 +293,42 @@ SidePassPathDecider::GetPathBoundaries(
            << ", " << std::get<2>(lateral_bound) << ".";
 
     // Update the lateral bound based on the road info and side-pass direction.
-    const double curr_lane_width = lane_left_width + lane_right_width;
-    ADEBUG << "Current lane's ID: " << curr_lane_.id().id();
+    hdmap::Lane curr_lane;
+    hdmap::LaneInfoConstPtr lane_info_ptr;
+    if (!FLAGS_side_pass_use_actual_laneinfo_for_path_generation ||
+        !GetLaneInfoFromPoint(
+            reference_line.GetReferencePoint(curr_s).x(),
+            reference_line.GetReferencePoint(curr_s).y(),
+            0.0,
+            reference_line.GetReferencePoint(curr_s).heading(),
+            &lane_info_ptr)) {
+      ADEBUG << "Cannot find the true current lane; therefore, use the "
+                "planning starting point's current lane as a substitute.";
+      curr_lane = curr_lane_;
+    } else {
+      curr_lane = lane_info_ptr->lane();
+    }
+    ADEBUG << "Current lane's ID: " << curr_lane.id().id();
     ADEBUG << "Current lane's width = " << curr_lane_width;
     ADEBUG << "Number of left lanes: "
-           << curr_lane_.left_neighbor_forward_lane_id_size() +
-                  curr_lane_.left_neighbor_reverse_lane_id_size()
+           << curr_lane.left_neighbor_forward_lane_id_size() +
+                  curr_lane.left_neighbor_reverse_lane_id_size()
            << ". Number of right lanes: "
-           << curr_lane_.right_neighbor_forward_lane_id_size() +
-                  curr_lane_.right_neighbor_reverse_lane_id_size();
+           << curr_lane.right_neighbor_forward_lane_id_size() +
+                  curr_lane.right_neighbor_reverse_lane_id_size();
     if (decided_direction_ == SidePassDirection::LEFT &&
-        (curr_lane_.left_neighbor_forward_lane_id_size() > 0 ||
-         curr_lane_.left_neighbor_reverse_lane_id_size() > 0)) {
+        (curr_lane.left_neighbor_forward_lane_id_size() > 0 ||
+         curr_lane.left_neighbor_reverse_lane_id_size() > 0)) {
       ADEBUG << "Expanding the upper limit (left).";
       double adjacent_lane_width = 0.0;
       hdmap::LaneInfoConstPtr adjacent_lane;
       // Get the LaneInfo of the left lane.
-      if (curr_lane_.left_neighbor_forward_lane_id_size() > 0) {
+      if (curr_lane.left_neighbor_forward_lane_id_size() > 0) {
         adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-            curr_lane_.left_neighbor_forward_lane_id(0));
-      } else if (curr_lane_.left_neighbor_reverse_lane_id_size() > 0) {
+            curr_lane.left_neighbor_forward_lane_id(0));
+      } else if (curr_lane.left_neighbor_reverse_lane_id_size() > 0) {
         adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-            curr_lane_.left_neighbor_reverse_lane_id(0));
+            curr_lane.left_neighbor_reverse_lane_id(0));
       }
       // Get the XY point of the curr_s.
       common::math::Vec2d xy_curr_s;
@@ -327,18 +355,18 @@ SidePassPathDecider::GetPathBoundaries(
       std::get<2>(lateral_bound) += adjacent_lane_width;
       std::get<2>(lateral_bound) -= FLAGS_side_pass_vehicle_buffer;
     } else if (decided_direction_ == SidePassDirection::RIGHT &&
-               (curr_lane_.right_neighbor_forward_lane_id_size() > 0 ||
-                curr_lane_.right_neighbor_reverse_lane_id_size() > 0)) {
+               (curr_lane.right_neighbor_forward_lane_id_size() > 0 ||
+                curr_lane.right_neighbor_reverse_lane_id_size() > 0)) {
       ADEBUG << "Expanding the lower limit (right).";
       double adjacent_lane_width = 0.0;
       hdmap::LaneInfoConstPtr adjacent_lane;
       // Get the LaneInfo of the right lane.
-      if (curr_lane_.right_neighbor_forward_lane_id_size() > 0) {
+      if (curr_lane.right_neighbor_forward_lane_id_size() > 0) {
         adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-            curr_lane_.right_neighbor_forward_lane_id(0));
-      } else if (curr_lane_.right_neighbor_reverse_lane_id_size() > 0) {
+            curr_lane.right_neighbor_forward_lane_id(0));
+      } else if (curr_lane.right_neighbor_reverse_lane_id_size() > 0) {
         adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-            curr_lane_.right_neighbor_reverse_lane_id(0));
+            curr_lane.right_neighbor_reverse_lane_id(0));
       }
       // Get the XY point of the curr_s.
       common::math::Vec2d xy_curr_s;
