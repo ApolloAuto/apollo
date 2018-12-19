@@ -17,6 +17,7 @@
 #include "modules/transform/static_transform_component.h"
 
 #include "modules/common/util/file.h"
+#include "modules/common/util/string_util.h"
 #include "yaml-cpp/yaml.h"
 
 namespace apollo {

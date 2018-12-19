@@ -16,6 +16,7 @@
 
 #include "cyber/common/file.h"
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <stdlib.h>
 #include <string>
@@ -63,15 +64,6 @@ TEST(FileTest, file_utils_test) {
   GetContent("not_exists_dir/message.proto", &content);
   EXPECT_EQ("", content);
 
-  EXPECT_EQ("/home/caros", GetAbsolutePath("/home/caros", ""));
-  EXPECT_EQ("file.txt", GetAbsolutePath("", "file.txt"));
-  EXPECT_EQ("/home/caros/README", GetAbsolutePath("", "/home/caros/README"));
-  EXPECT_EQ("/home/caros/file.txt",
-            GetAbsolutePath("/home/caros/", "file.txt"));
-  EXPECT_EQ("/home/caros/file.txt", GetAbsolutePath("/home/caros", "file.txt"));
-  EXPECT_EQ("/home/caros/../file.txt",
-            GetAbsolutePath("/home/caros/", "../file.txt"));
-
   EXPECT_TRUE(PathExists("./"));
   EXPECT_FALSE(PathExists("not_exits_file"));
 
@@ -93,14 +85,6 @@ TEST(FileTest, file_utils_test) {
   EXPECT_TRUE(CopyFile("message.binary", current_path + "/2/message.binary"));
   EXPECT_TRUE(DirectoryExists(current_path + "/1/2/3"));
 
-  EXPECT_EQ("README", GetFileName("README"));
-  EXPECT_EQ("README", GetFileName("/home/caros/README"));
-  EXPECT_EQ("README", GetFileName("../../README"));
-
-  std::vector<std::string> dirs = ListSubDirectories("/not_exists_directory");
-  EXPECT_TRUE(dirs.empty());
-  dirs = ListSubDirectories(current_path + "/1");
-
   EXPECT_FALSE(RemoveAllFiles("/not_exists_dir"));
   EXPECT_FALSE(RemoveAllFiles(current_path + "/1"));
   EXPECT_TRUE(RemoveAllFiles(current_path + "/2"));
@@ -111,6 +95,56 @@ TEST(FileTest, file_utils_test) {
   rmdir((current_path + "/1/2").c_str());
   rmdir((current_path + "/1").c_str());
   rmdir((current_path + "/2").c_str());
+}
+
+TEST(FileTest, ListSubPaths) {
+  const auto root_subdirs = ListSubPaths("/");
+
+  // Some common root subdirs should exist.
+  EXPECT_NE(root_subdirs.end(),
+            std::find(root_subdirs.begin(), root_subdirs.end(), "home"));
+  EXPECT_NE(root_subdirs.end(),
+            std::find(root_subdirs.begin(), root_subdirs.end(), "root"));
+  // Something shouldn't exist.
+  EXPECT_EQ(root_subdirs.end(),
+            std::find(root_subdirs.begin(), root_subdirs.end(), "impossible"));
+}
+
+TEST(FileTest, Glob) {
+  // Match none.
+  EXPECT_TRUE(Glob("/path/impossible/*").empty());
+  // Match one.
+  EXPECT_THAT(Glob("/apollo"), testing::ElementsAre(std::string("/apollo")));
+  EXPECT_THAT(Glob("/apol?o"), testing::ElementsAre(std::string("/apollo")));
+  // Match multiple.
+  EXPECT_THAT(
+      Glob("/apol?o/modules/p*"),
+      testing::AllOf(
+          testing::Contains(std::string("/apollo/modules/perception")),
+          testing::Contains(std::string("/apollo/modules/planning")),
+          testing::Contains(std::string("/apollo/modules/prediction"))));
+}
+
+TEST(FileTest, GetAbsolutePath) {
+  EXPECT_EQ("./xx.txt", GetAbsolutePath("", "./xx.txt"));
+  EXPECT_EQ("/abc", GetAbsolutePath("/abc", ""));
+  EXPECT_EQ("/home/work/xx.txt", GetAbsolutePath("/home/work", "xx.txt"));
+  EXPECT_EQ("/home/work/xx.txt", GetAbsolutePath("/home/work/", "xx.txt"));
+  EXPECT_EQ("/xx.txt", GetAbsolutePath("/home/work", "/xx.txt"));
+  EXPECT_EQ("/home/work/./xx.txt", GetAbsolutePath("/home/work", "./xx.txt"));
+}
+
+TEST(FileTest, GetFileName) {
+  EXPECT_EQ("xx.txt", GetFileName("xx.txt"));
+  EXPECT_EQ("xx", GetFileName("./xx.txt", true));
+  EXPECT_EQ("xx.txt", GetFileName("./xx.txt"));
+  EXPECT_EQ("xx", GetFileName("./xx.txt", true));
+  EXPECT_EQ(".txt", GetFileName("./.txt"));
+  EXPECT_EQ("", GetFileName("./.txt", true));
+  EXPECT_EQ("txt", GetFileName("/path/.to/txt"));
+  EXPECT_EQ("txt", GetFileName("/path/.to/txt", true));
+  EXPECT_EQ("", GetFileName("/path/to/"));
+  EXPECT_EQ("", GetFileName("/path/to/", true));
 }
 
 }  // namespace common
