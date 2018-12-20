@@ -242,7 +242,7 @@ Status LonController::ComputeControlCommand(
             FLAGS_max_acceleration_when_stopped &&
         std::fabs(debug->preview_speed_reference()) <=
             vehicle_param_.max_abs_speed_when_stopped()) ||
-       (debug->path_remain() < 0.3))) {
+       (std::abs(debug->path_remain() < 0.3)))) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
@@ -251,18 +251,19 @@ Status LonController::ComputeControlCommand(
   double throttle_deadzone = lon_controller_conf.throttle_deadzone();
   double brake_deadzone = lon_controller_conf.brake_deadzone();
   double calibration_value = 0.0;
+  double acceleration_lookup =
+      (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
+          ? -acceleration_cmd
+          : acceleration_cmd;
   if (FLAGS_use_preview_speed_for_table) {
     calibration_value = control_interpolation_->Interpolate(
-        std::make_pair(debug->preview_speed_reference(), acceleration_cmd));
+        std::make_pair(debug->preview_speed_reference(), acceleration_lookup));
   } else {
     calibration_value = control_interpolation_->Interpolate(
-        std::make_pair(chassis_->speed_mps(), acceleration_cmd));
+        std::make_pair(chassis_->speed_mps(), acceleration_lookup));
   }
 
-  if ((calibration_value >= 0 &&
-       chassis->gear_location() == canbus::Chassis::GEAR_DRIVE) ||
-      (calibration_value < 0 &&
-       chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)) {
+  if (calibration_value >= 0) {
     throttle_cmd = std::abs(calibration_value) > throttle_deadzone
                        ? std::abs(calibration_value)
                        : throttle_deadzone;
@@ -279,7 +280,7 @@ Status LonController::ComputeControlCommand(
   debug->set_acceleration_cmd(acceleration_cmd);
   debug->set_throttle_cmd(throttle_cmd);
   debug->set_brake_cmd(brake_cmd);
-  debug->set_acceleration_lookup(acceleration_cmd);
+  debug->set_acceleration_lookup(acceleration_lookup);
   debug->set_speed_lookup(chassis_->speed_mps());
   debug->set_calibration_value(calibration_value);
   debug->set_acceleration_cmd_closeloop(acceleration_cmd_closeloop);
