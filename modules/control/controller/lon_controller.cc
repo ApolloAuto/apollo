@@ -189,6 +189,18 @@ Status LonController::ComputeControlCommand(
     station_error_limited = common::math::Clamp(
         debug->station_error(), -station_error_limit, station_error_limit);
   }
+
+  if (trajectory_message_->gear() == canbus::Chassis::GEAR_REVERSE) {
+    station_pid_controller_.SetPID(
+        lon_controller_conf.reverse_station_pid_conf());
+    speed_pid_controller_.SetPID(lon_controller_conf.reverse_speed_pid_conf());
+  } else if (VehicleStateProvider::Instance()->linear_velocity() <=
+             lon_controller_conf.switch_speed()) {
+    speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
+  } else {
+    speed_pid_controller_.SetPID(lon_controller_conf.high_speed_pid_conf());
+  }
+
   double speed_offset =
       station_pid_controller_.Control(station_error_limited, ts);
 
@@ -206,20 +218,9 @@ Status LonController::ComputeControlCommand(
                           speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-  if (trajectory_message_->gear() == canbus::Chassis::GEAR_REVERSE) {
-    speed_pid_controller_.SetPID(lon_controller_conf.reverse_speed_pid_conf());
-    acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
-  } else if (VehicleStateProvider::Instance()->linear_velocity() <=
-             lon_controller_conf.switch_speed()) {
-    speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
-    acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
-  } else {
-    speed_pid_controller_.SetPID(lon_controller_conf.high_speed_pid_conf());
-    acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
-  }
+
+  acceleration_cmd_closeloop =
+      speed_pid_controller_.Control(speed_controller_input_limited, ts);
 
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
