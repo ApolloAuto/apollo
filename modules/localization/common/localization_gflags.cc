@@ -184,7 +184,7 @@ DEFINE_double(localization_std_y_threshold_2, 0.3,
 DEFINE_string(ndt_map_dir, "ndt_map", "subdirectory for ndt map");
 DEFINE_bool(ndt_debug_log_flag, false, "NDT Localization log switch");
 DEFINE_double(online_resolution, 2.0, "NDT online pointcloud resolution");
-DEFINE_int32(ndt_max_iterations, 10, "maximum iterations for NDT matching");
+DEFINE_int32(ndt_max_iterations, 20, "maximum iterations for NDT matching");
 DEFINE_double(ndt_target_resolution, 1.0,
               "target resolution for ndt localization");
 DEFINE_double(ndt_line_search_step_size, 0.1,
