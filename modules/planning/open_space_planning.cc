@@ -545,7 +545,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
   // TODO(Jinyun) move these to configs
   constexpr double kepsilon_to_destination = 1e-6;
   constexpr double heading_searching_range = 0.3;
-  constexpr double gear_shift_period_duration_ = 10.0;
+  constexpr double gear_shift_period_duration_ = 2.0;
   bool flag_change_to_next = false;
   // Could have a big error in vehicle state in single thread mode!!! As the
   // vehicle state is only updated at the every beginning at RunOnce()
