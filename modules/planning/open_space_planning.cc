@@ -507,22 +507,17 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
 
     auto* point = current_trajectory->add_trajectory_point();
-    int gear_drive = 1;
-    if (gear_positions.back() == canbus::Chassis::GEAR_REVERSE) gear_drive = -1;
     point->set_relative_time(stitched_trajectory_to_end[i].relative_time());
     point->mutable_path_point()->set_x(
         stitched_trajectory_to_end[i].path_point().x());
     point->mutable_path_point()->set_y(
         stitched_trajectory_to_end[i].path_point().y());
-    if (gear_drive == 1) {
-      point->mutable_path_point()->set_theta(
-          stitched_trajectory_to_end[i].path_point().theta());
-    } else {
-      point->mutable_path_point()->set_theta(common::math::NormalizeAngle(
-          stitched_trajectory_to_end[i].path_point().theta() + M_PI));
-    }
+    point->mutable_path_point()->set_theta(
+        stitched_trajectory_to_end[i].path_point().theta());
     if (i > 0) {
       distance_s +=
+          (gear_positions.back() == canbus::Chassis::GEAR_REVERSE ? -1.0
+                                                                  : 1.0) *
           std::sqrt((stitched_trajectory_to_end[i].path_point().x() -
                      stitched_trajectory_to_end[i - 1].path_point().x()) *
                         (stitched_trajectory_to_end[i].path_point().x() -
@@ -534,15 +529,13 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
     point->mutable_path_point()->set_s(distance_s);
 
-    point->set_v(stitched_trajectory_to_end[i].v() * gear_drive);
-    // TODO(Jiaxuan): Verify this steering to kappa equation and use parameter
-    // from config
+    point->set_v(stitched_trajectory_to_end[i].v());
     const auto& vehicle_config =
         common::VehicleConfigHelper::Instance()->GetConfig();
     point->mutable_path_point()->set_kappa(
         std::tan(stitched_trajectory_to_end[i].steer()) /
-        vehicle_config.vehicle_param().wheel_base() * gear_drive);
-    point->set_a(stitched_trajectory_to_end[i].a() * gear_drive);
+        vehicle_config.vehicle_param().wheel_base());
+    point->set_a(stitched_trajectory_to_end[i].a());
   }
 
   // Choose the one to follow based on the closest partitioned trajectory
@@ -585,6 +578,11 @@ Status OpenSpacePlanning::TrajectoryPartition(
             (path_end_point.y() - vehicle_state.y());
 
     double traj_point_moving_direction = path_end_point.theta();
+    // TODO(Jinyun) simplify the calculation
+    if (gear_positions[i] == canbus::Chassis::GEAR_REVERSE) {
+      traj_point_moving_direction =
+          common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
+    }
     double vehicle_moving_direction = vehicle_state.heading();
     if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
       vehicle_moving_direction =
@@ -633,6 +631,11 @@ Status OpenSpacePlanning::TrajectoryPartition(
               .trajectory_point(closest_point.first.second)
               .path_point()
               .theta();
+      if (gear_positions[closest_point.first.first] ==
+          canbus::Chassis::GEAR_REVERSE) {
+        traj_point_moving_direction =
+            common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
+      }
       double vehicle_moving_direction = vehicle_state.heading();
       if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
         vehicle_moving_direction =
@@ -1010,11 +1013,8 @@ void OpenSpacePlanning::GenerateGearShiftTrajectory(
   auto path_point = tp.mutable_path_point();
   path_point->set_x(frame_->vehicle_state().x());
   path_point->set_y(frame_->vehicle_state().y());
-  if (gear_position == canbus::Chassis::GEAR_REVERSE) {
-    path_point->set_theta(
-        common::math::NormalizeAngle(frame_->vehicle_state().heading() + M_PI));
-  }
-  path_point->set_kappa(-1.0 * frame_->vehicle_state().kappa());
+  path_point->set_theta(frame_->vehicle_state().heading());
+  path_point->set_kappa(frame_->vehicle_state().kappa());
   path_point->set_s(0.0);
   tp.set_v(0.0);
   tp.set_a(0.0);
