@@ -220,6 +220,7 @@ Status LatController::Init(const ControlConf *control_conf) {
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
+
   for (int i = 0; i < q_param_size; ++i) {
     matrix_q_(i, i) = control_conf->lat_controller_conf().matrix_q(i);
   }
@@ -356,6 +357,18 @@ Status LatController::ComputeControlCommand(
 
   // Compound discrete matrix with road preview model
   UpdateMatrixCompound();
+
+  // Adjust matrix_q_updated when in reverse gear
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    for (int i = 0; i < q_param_size; ++i) {
+      matrix_q_(i, i) = control_conf->lat_controller_conf().reverse_matrix_q(i);
+    }
+  } else {
+    for (int i = 0; i < q_param_size; ++i) {
+      matrix_q_(i, i) = control_conf->lat_controller_conf().matrix_q(i);
+    }
+  }
 
   // Add gain scheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
