@@ -1,6 +1,6 @@
 # Define all coms in DAG streaming.
     module_config {
-    module_library : "/apollo/bazel-bin/cyber/samples/common_component_sample/libcommon_component_sample.so"
+    module_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
     components {
         class_name : "CommonComponentSample"
         config {
