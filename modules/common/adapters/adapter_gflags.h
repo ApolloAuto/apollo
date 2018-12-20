@@ -31,6 +31,7 @@ DECLARE_string(monitor_topic);
 DECLARE_string(pad_topic);
 DECLARE_string(control_command_topic);
 DECLARE_string(pointcloud_topic);
+DECLARE_string(pointcloud_64_topic);
 DECLARE_string(pointcloud_128_topic);
 DECLARE_string(pointcloud_raw_topic);
 DECLARE_string(velodyne_raw_topic);
