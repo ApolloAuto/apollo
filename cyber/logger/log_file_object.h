@@ -64,7 +64,7 @@ class LogFileObject : public google::base::Logger {
   uint32_t dropped_mem_length_;
   uint32_t file_length_;
   unsigned int rollover_attempt_;
-  int64_t next_flush_time_;  // cycle count at which to flush log
+  int64_t next_flush_time_;  // cycle count of which to flush log
 };
 
 }  // namespace logger

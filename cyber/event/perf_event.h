@@ -91,7 +91,7 @@ class SchedEvent : public EventBase {
   uint64_t cr_id_;
 };
 
-// event_id = 1 transport
+// event_id
 // 1 transport time
 // 2 write_data_cache & notify listener
 class TransportEvent : public EventBase {
