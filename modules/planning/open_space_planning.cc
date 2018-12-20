@@ -650,20 +650,23 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
   }
 
-  if (flag_change_to_next || !gear_shift_period_finished_) {
-    gear_shift_period_finished_ = false;
-    if (gear_shift_period_started_) {
-      gear_shift_start_time_ = Clock::NowInSeconds();
-      gear_shift_position_ = gear_positions[current_trajectory_index];
-      gear_shift_period_started_ = false;
-    }
-    if (gear_shift_period_time_ > gear_shift_period_duration_) {
-      gear_shift_period_finished_ = true;
-      gear_shift_period_started_ = true;
-    } else {
-      GenerateGearShiftTrajectory(gear_shift_position_, ptr_trajectory_pb);
-      gear_shift_period_time_ = Clock::NowInSeconds() - gear_shift_start_time_;
-      return Status::OK();
+  if (FLAGS_use_gear_shift_trajectory) {
+    if (flag_change_to_next || !gear_shift_period_finished_) {
+      gear_shift_period_finished_ = false;
+      if (gear_shift_period_started_) {
+        gear_shift_start_time_ = Clock::NowInSeconds();
+        gear_shift_position_ = gear_positions[current_trajectory_index];
+        gear_shift_period_started_ = false;
+      }
+      if (gear_shift_period_time_ > gear_shift_period_duration_) {
+        gear_shift_period_finished_ = true;
+        gear_shift_period_started_ = true;
+      } else {
+        GenerateGearShiftTrajectory(gear_shift_position_, ptr_trajectory_pb);
+        gear_shift_period_time_ =
+            Clock::NowInSeconds() - gear_shift_start_time_;
+        return Status::OK();
+      }
     }
   }
 
