@@ -82,7 +82,7 @@ class AsyncLogger : public google::base::Logger {
   // Write a message to the log.
   //
   // 'force_flush' is set by the GLog library based on the configured
-  // '--logbuflevel' flag.
+  // '--logbuflevel' flag. 
   // Any messages logged at the configured level or higher result in
   // 'force_flush'
   // being set to true, indicating that the message should be immediately
