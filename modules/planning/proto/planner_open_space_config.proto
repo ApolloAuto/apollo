@@ -15,6 +15,7 @@ message PlannerOpenSpaceConfig {
   optional double max_position_error_to_end_point = 6 [default = 0.5];
   optional double max_theta_error_to_end_point = 7 [default = 0.2];
   optional double is_near_destination_threshold = 8 [default = 0.001];
+  // optional IpoptConfig ipopt_config = 9;
 }
 
 message ROIConfig {
@@ -36,7 +37,6 @@ message WarmStartConfig {
   optional double steer_penalty = 12 [default = 100.0];
   optional double steer_change_penalty = 13 [default = 10.0];
 }
-
 
 message DualVariableWarmStartConfig {
   // Dual variable Warm Start
@@ -60,4 +60,20 @@ message DistanceApproachConfig {
   optional double min_time_sample_scaling = 13 [default = 0.1];
   optional double max_time_sample_scaling = 14 [default = 10.0];
   optional bool use_fix_time = 18 [default = false];
+  optional IpoptConfig ipopt_config = 19;
+}
+
+message IpoptConfig {
+  // ipopt configs
+  optional int32 ipopt_print_level = 1;
+  optional int32 mumps_mem_percent = 2;
+  optional double mumps_pivtol = 3;
+  optional int32 ipopt_max_iter = 4;
+  optional double ipopt_tol = 5;
+  optional double ipopt_acceptable_constr_viol_tol = 6;
+  optional double ipopt_min_hessian_perturbation = 7;
+  optional double ipopt_jacobian_regularization_value = 8;
+  optional string ipopt_print_timing_statistics = 9;
+  optional string ipopt_alpha_for_y = 10;
+  optional string ipopt_recalc_y = 11;
 }
