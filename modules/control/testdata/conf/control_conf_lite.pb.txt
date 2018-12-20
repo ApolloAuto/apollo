@@ -120,6 +120,13 @@ lon_controller_conf {
     kd: 0.0
   }
   switch_speed: 2.0
+  reverse_station_pid_conf {
+    integrator_enable: false
+    integrator_saturation_level: 0.3
+    kp: 0.2
+    ki: 0.0
+    kd: 0.0
+  }
   reverse_speed_pid_conf {
     integrator_enable: true
     integrator_saturation_level: 0.1
