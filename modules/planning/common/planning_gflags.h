@@ -225,6 +225,7 @@ DECLARE_bool(parking_inwards);
 DECLARE_bool(enable_open_space_planner_thread);
 DECLARE_bool(open_space_planner_switchable);
 DECLARE_bool(use_dual_variable_warm_start);
+DECLARE_bool(use_gear_shift_trajectory);
 
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
