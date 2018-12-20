@@ -33,14 +33,14 @@ namespace planning {
   *        itself is blocked by others as well. In other words, if the
   *        front blocking obstacle is blocked by others, then don't try
   *        to side-pass it. (Parked obstacles are never blocked by others)
-  * @param The distance between ADC and the nearest front obstacle will
-  *        be updated.
   */
 bool IsBlockingObstacleToSidePass(
     const Frame& frame, const Obstacle* obstacle,
     double block_obstacle_min_speed, double min_front_sidepass_distance,
-    bool enable_obstacle_blocked_check,
-    double* const distance_between_adc_and_obstacle);
+    bool enable_obstacle_blocked_check);
+
+double GetDistanceBetweenADCAndObstacle(
+    const Frame& frame, const Obstacle* obstacle);
 
 // Check if the obstacle is blocking ADC's driving path (reference_line).
 bool IsBlockingDrivingPathObstacle(

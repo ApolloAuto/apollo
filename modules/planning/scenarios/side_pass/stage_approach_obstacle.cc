@@ -132,15 +132,15 @@ Stage::StageStatus StageApproachObstacle::Process(
   double distance_to_closest_blocking_obstacle = -100.0;
   bool exists_a_blocking_obstacle = false;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    double distance_between_adc_and_obstacle = 0.0;
     if (IsBlockingObstacleToSidePass(
             *frame, obstacle,
             GetContext()->scenario_config_.block_obstacle_min_speed(),
             GetContext()->scenario_config_.min_front_obstacle_distance(),
-            GetContext()->scenario_config_.enable_obstacle_blocked_check(),
-            &distance_between_adc_and_obstacle)) {
+            GetContext()->scenario_config_.enable_obstacle_blocked_check())) {
       exists_a_blocking_obstacle = true;
-      if (distance_to_closest_blocking_obstacle < 0 ||
+      double distance_between_adc_and_obstacle =
+          GetDistanceBetweenADCAndObstacle(*frame, obstacle);
+      if (distance_to_closest_blocking_obstacle < 0.0 ||
           distance_between_adc_and_obstacle <
               distance_to_closest_blocking_obstacle) {
         distance_to_closest_blocking_obstacle =

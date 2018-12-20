@@ -51,13 +51,11 @@ Stage::StageStatus StageBackup::Process(
   const PathDecision& path_decision = reference_line_info.path_decision();
   bool exists_a_blocking_obstacle = false;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
-    double distance_between_adc_and_obstacle = 0.0;
     if (IsBlockingObstacleToSidePass(
             *frame, obstacle,
             GetContext()->scenario_config_.block_obstacle_min_speed(),
             GetContext()->scenario_config_.min_front_obstacle_distance(),
-            GetContext()->scenario_config_.enable_obstacle_blocked_check(),
-            &distance_between_adc_and_obstacle)) {
+            GetContext()->scenario_config_.enable_obstacle_blocked_check())) {
       exists_a_blocking_obstacle = true;
       break;
     }
