@@ -177,7 +177,8 @@ void LatController::InitializeFilters(const ControlConf *control_conf) {
 }
 
 Status LatController::Init(const ControlConf *control_conf) {
-  if (!LoadControlConf(control_conf)) {
+  control_conf_ = control_conf;
+  if (!LoadControlConf(control_conf_)) {
     AERROR << "failed to load control conf";
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR,
                   "failed to load control_conf");
@@ -212,21 +213,26 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_r_ = Matrix::Identity(1, 1);
   matrix_q_ = Matrix::Zero(matrix_size, matrix_size);
 
-  int q_param_size = control_conf->lat_controller_conf().matrix_q_size();
-  if (matrix_size != q_param_size) {
+  int q_param_size = control_conf_->lat_controller_conf().matrix_q_size();
+  int reverse_q_param_size =
+      control_conf_->lat_controller_conf().reverse_matrix_q_size();
+  if (matrix_size != q_param_size || matrix_size != reverse_q_param_size) {
     const auto error_msg =
         StrCat("lateral controller error: matrix_q size: ", q_param_size,
+               "lateral controller error: reverse_maxtrix_q size: ",
+               reverse_q_param_size,
                " in parameter file not equal to matrix_size: ", matrix_size);
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
+
   for (int i = 0; i < q_param_size; ++i) {
-    matrix_q_(i, i) = control_conf->lat_controller_conf().matrix_q(i);
+    matrix_q_(i, i) = control_conf_->lat_controller_conf().matrix_q(i);
   }
 
   matrix_q_updated_ = matrix_q_;
-  InitializeFilters(control_conf);
-  auto &lat_controller_conf = control_conf->lat_controller_conf();
+  InitializeFilters(control_conf_);
+  auto &lat_controller_conf = control_conf_->lat_controller_conf();
   LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
   return Status::OK();
@@ -356,6 +362,22 @@ Status LatController::ComputeControlCommand(
 
   // Compound discrete matrix with road preview model
   UpdateMatrixCompound();
+
+  // Adjust matrix_q_updated when in reverse gear
+  int q_param_size = control_conf_->lat_controller_conf().matrix_q_size();
+  int reverse_q_param_size =
+      control_conf_->lat_controller_conf().reverse_matrix_q_size();
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    for (int i = 0; i < reverse_q_param_size; ++i) {
+      matrix_q_(i, i) =
+          control_conf_->lat_controller_conf().reverse_matrix_q(i);
+    }
+  } else {
+    for (int i = 0; i < q_param_size; ++i) {
+      matrix_q_(i, i) = control_conf_->lat_controller_conf().matrix_q(i);
+    }
+  }
 
   // Add gain scheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
