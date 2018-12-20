@@ -25,8 +25,9 @@ message LonControllerConf {
   optional PidConf low_speed_pid_conf = 9;
   optional PidConf high_speed_pid_conf = 10;
   optional double switch_speed = 11;  // low/high speed controller switch speed
-  optional PidConf reverse_speed_pid_conf = 12;
-  optional FilterConf pitch_angle_filter_conf = 13;
+  optional PidConf reverse_station_pid_conf = 12;
+  optional PidConf reverse_speed_pid_conf = 13;
+  optional FilterConf pitch_angle_filter_conf = 14;
 
-  optional calibrationtable.ControlCalibrationTable calibration_table = 14;
+  optional calibrationtable.ControlCalibrationTable calibration_table = 15;
 }
