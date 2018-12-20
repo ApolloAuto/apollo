@@ -16,13 +16,7 @@
 
 #include "cyber/common/file.h"
 
-#include <dirent.h>
-#include <errno.h>
 #include <glob.h>
-#include <stddef.h>
-#include <unistd.h>
-#include <fstream>
-#include <string>
 
 namespace apollo {
 namespace cyber {

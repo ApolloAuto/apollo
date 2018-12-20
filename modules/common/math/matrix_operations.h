@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <cmath>
-#include <utility>
 #include <vector>
 
-#include "Eigen/Dense"
 #include "Eigen/SVD"
 
 #include "cyber/common/log.h"

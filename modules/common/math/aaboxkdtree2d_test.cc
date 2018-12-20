@@ -21,7 +21,6 @@
 #include "gtest/gtest.h"
 
 #include "modules/common/math/line_segment2d.h"
-#include "modules/common/math/math_utils.h"
 
 namespace apollo {
 namespace common {

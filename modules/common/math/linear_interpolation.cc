@@ -16,9 +16,6 @@
 
 #include "modules/common/math/linear_interpolation.h"
 
-#include <cmath>
-
-#include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 
 namespace apollo {

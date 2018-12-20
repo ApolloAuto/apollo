@@ -23,10 +23,6 @@
 
 // TODO(all): should use Angle class internally.
 
-#include <cmath>
-
-#include "Eigen/Geometry"
-
 #include "modules/common/math/math_utils.h"
 
 /**

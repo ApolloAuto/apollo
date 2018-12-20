@@ -17,7 +17,6 @@
 #include "modules/common/math/box2d.h"
 
 #include <algorithm>
-#include <cmath>
 #include <utility>
 
 #include "cyber/common/log.h"

@@ -17,10 +17,6 @@
 #include "cyber/common/file.h"
 
 #include <gmock/gmock.h>
-#include <gtest/gtest.h>
-#include <stdlib.h>
-#include <string>
-#include <vector>
 
 #include "cyber/proto/unit_test.pb.h"
 
