@@ -69,7 +69,7 @@ void ScenarioManager::PrioritizeObstacles(
 
   const PerceptionObstacle* pose_obstacle_ptr =
       pose_container->ToPerceptionObstacle();
-  if (pose_container == nullptr) {
+  if (pose_obstacle_ptr == nullptr) {
     AERROR << "Pose obstacle pointer is a null pointer.";
     return;
   }
