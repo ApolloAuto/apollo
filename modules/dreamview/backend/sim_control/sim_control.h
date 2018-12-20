@@ -106,8 +106,7 @@ class SimControl : SimControlInterface {
   void PublishChassis(double cur_speed,
                       apollo::canbus::Chassis::GearPosition gear_position);
 
-  void PublishLocalization(const apollo::common::TrajectoryPoint &point,
-                           apollo::canbus::Chassis::GearPosition gear_position);
+  void PublishLocalization(const apollo::common::TrajectoryPoint &point);
 
   void PublishDummyPrediction();
 
