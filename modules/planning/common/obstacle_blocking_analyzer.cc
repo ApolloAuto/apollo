@@ -138,7 +138,8 @@ bool IsBlockingDrivingPathObstacle(
   ADEBUG << " (driving width = " << driving_width
          << ", adc_width = " << adc_width << ")";
   if (driving_width >
-      adc_width + FLAGS_static_decision_nudge_l_buffer + 0.4) {
+      adc_width + FLAGS_static_decision_nudge_l_buffer +
+      FLAGS_side_pass_driving_width_l_buffer) {
     // TODO(jiacheng): make this a GFLAG:
     // side_pass_context_.scenario_config_.min_l_nudge_buffer()
     ADEBUG << "It is NOT blocking our path.";

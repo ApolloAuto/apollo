@@ -198,7 +198,7 @@ DEFINE_bool(enable_nudge_slowdown, true,
 
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
-DEFINE_double(static_decision_nudge_l_buffer, 0.4, "l buffer for nudge");
+DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -477,3 +477,5 @@ DEFINE_double(side_pass_trim_watch_window, 12.0,
 DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
             "Whether to use the actual laneinfo for side-pass path generation,"
             " or to use the planning starting-point's laneinfo all the time.");
+DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
+              "(unit: meter) for side pass driving width l buffer");
