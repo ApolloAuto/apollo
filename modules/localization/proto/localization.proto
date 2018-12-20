@@ -50,7 +50,7 @@ message LocalizationEstimate {
   optional apollo.localization.Pose pose = 2;
   optional Uncertainty uncertainty = 3;
 
-  // The time of pose measurement, seconds since the GPS epoch (Jan 6, 1980).
+  // The time of pose measurement, seconds since 1970-1-1 (UNIX time).
   optional double measurement_time = 4;  // In seconds.
 
   // Future trajectory acturally driven by the drivers
@@ -75,7 +75,7 @@ message LocalizationStatus {
   optional MeasureState fusion_status = 2;
   optional MeasureState gnss_status = 3 [deprecated = true];
   optional MeasureState lidar_status = 4 [deprecated = true];
-  // The time of pose measurement, seconds since the GPS epoch (Jan 6, 1980).
+  // The time of pose measurement, seconds since 1970-1-1 (UNIX time).
   optional double measurement_time = 5;  // In seconds.
   optional string state_message = 6;
 }
