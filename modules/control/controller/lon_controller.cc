@@ -380,15 +380,29 @@ void LonController::SetDigitalFilter(double ts, double cutoff_freq,
   digital_filter->set_coefficients(denominators, numerators);
 }
 
+// TODO(all): Refactor and simplify
 void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   int stop_index = 0;
-  while (stop_index < trajectory_message_->trajectory_point_size()) {
-    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-        trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
-        trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
-      break;
-    } else {
-      ++stop_index;
+
+  if (trajectory_message_->gear() == canbus::Chassis::GEAR_DRIVE) {
+    while (stop_index < trajectory_message_->trajectory_point_size()) {
+      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
+          trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
+          trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
+        break;
+      } else {
+        ++stop_index;
+      }
+    }
+  } else {
+    while (stop_index < trajectory_message_->trajectory_point_size()) {
+      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
+          trajectory_message_->trajectory_point(stop_index).a() < 0.1 &&
+          trajectory_message_->trajectory_point(stop_index).a() > 0.0) {
+        break;
+      } else {
+        ++stop_index;
+      }
     }
   }
   if (stop_index == trajectory_message_->trajectory_point_size()) {
