@@ -37,6 +37,9 @@ DEFINE_string(pad_topic, "/apollo/control/pad",
 DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
 DEFINE_string(pointcloud_topic,
+              "/apollo/sensor/lidar128/compensator/PointCloud2",
+              "pointcloud topic name");
+DEFINE_string(pointcloud_64_topic,
               "/apollo/sensor/velodyne64/compensator/PointCloud2",
               "pointcloud topic name");
 DEFINE_string(pointcloud_128_topic,
@@ -93,7 +96,8 @@ DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
 DEFINE_string(image_front_topic, "/apollo/sensor/camera/front_6mm/image",
               "front camera image topic name for obstacles from camera");
-DEFINE_string(image_short_topic, "/apollo/sensor/camera/traffic/image_short",
+DEFINE_string(image_short_topic,
+              "/apollo/sensor/camera/front_6mm/image/compressed",
               "short camera image topic name");
 DEFINE_string(image_long_topic, "/apollo/sensor/camera/traffic/image_long",
               "long camera image topic name");
