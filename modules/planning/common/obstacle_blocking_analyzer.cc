@@ -35,7 +35,8 @@ using apollo::hdmap::HDMapUtil;
 // TODO(all): if possible, transform as many function parameters into GFLAGS.
 bool IsBlockingObstacleToSidePass(
     const Frame& frame, const Obstacle* obstacle,
-    double block_obstacle_min_speed, double min_front_sidepass_distance,
+    double block_obstacle_min_speed,
+    double min_front_sidepass_distance,
     bool enable_obstacle_blocked_check) {
   // Get the necessary info.
   const auto& reference_line_info = frame.reference_line_info().front();
@@ -117,6 +118,15 @@ bool IsBlockingObstacleToSidePass(
 
   ADEBUG << "IT IS BLOCKING!";
   return true;
+}
+
+double GetDistanceBetweenADCAndObstacle(
+    const Frame& frame, const Obstacle* obstacle) {
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
+  double distance_between_adc_and_obstacle =
+      obstacle->PerceptionSLBoundary().start_s() - adc_sl_boundary.end_s();
+  return distance_between_adc_and_obstacle;
 }
 
 bool IsBlockingDrivingPathObstacle(

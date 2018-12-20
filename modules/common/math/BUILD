@@ -18,6 +18,7 @@ cc_library(
         ":quaternion",
         ":search",
         ":sin_table",
+        ":curve_fitting",
     ],
 )
 
@@ -91,6 +92,17 @@ cc_library(
         ":euler_angles_zxy",
         ":geometry",
         "//modules/common/proto:geometry_proto",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "curve_fitting",
+    hdrs = [
+        "curve_fitting.h",
+    ],
+    deps = [
+        ":matrix_operations",
         "@eigen",
     ],
 )

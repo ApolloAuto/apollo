@@ -28,45 +28,44 @@ bool ThirdPartyPerceptionComponent::Init() {
     return false;
   }
 
-  writer_ = node_->CreateWriter<::apollo::perception::PerceptionObstacles>(
+  writer_ = node_->CreateWriter<apollo::perception::PerceptionObstacles>(
       FLAGS_perception_obstacle_topic);
 
-  std::shared_ptr<Reader<::apollo::drivers::Mobileye>> mobileye_reader_ =
+  std::shared_ptr<Reader<apollo::drivers::Mobileye>> mobileye_reader_ = nullptr;
+  std::shared_ptr<Reader<apollo::drivers::DelphiESR>> delphi_esr_reader_ =
       nullptr;
-  std::shared_ptr<Reader<::apollo::drivers::DelphiESR>> delphi_esr_reader_ =
-      nullptr;
-  std::shared_ptr<Reader<::apollo::drivers::ContiRadar>> conti_radar_reader_ =
+  std::shared_ptr<Reader<apollo::drivers::ContiRadar>> conti_radar_reader_ =
       nullptr;
 
-  mobileye_reader_ = node_->CreateReader<::apollo::drivers::Mobileye>(
+  mobileye_reader_ = node_->CreateReader<apollo::drivers::Mobileye>(
       FLAGS_mobileye_topic,
-      [this](const std::shared_ptr<::apollo::drivers::Mobileye> &message) {
+      [this](const std::shared_ptr<apollo::drivers::Mobileye> &message) {
         perception_.OnMobileye(*message.get());
       });
 
-  delphi_esr_reader_ = node_->CreateReader<::apollo::drivers::DelphiESR>(
+  delphi_esr_reader_ = node_->CreateReader<apollo::drivers::DelphiESR>(
       FLAGS_delphi_esr_topic,
-      [this](const std::shared_ptr<::apollo::drivers::DelphiESR> &message) {
+      [this](const std::shared_ptr<apollo::drivers::DelphiESR> &message) {
         perception_.OnDelphiESR(*message.get());
       });
 
-  conti_radar_reader_ = node_->CreateReader<::apollo::drivers::ContiRadar>(
+  conti_radar_reader_ = node_->CreateReader<apollo::drivers::ContiRadar>(
       FLAGS_conti_radar_topic,
-      [this](const std::shared_ptr<::apollo::drivers::ContiRadar> &message) {
+      [this](const std::shared_ptr<apollo::drivers::ContiRadar> &message) {
         perception_.OnContiRadar(*message.get());
       });
 
   localization_reader_ =
-      node_->CreateReader<::apollo::localization::LocalizationEstimate>(
+      node_->CreateReader<apollo::localization::LocalizationEstimate>(
           FLAGS_localization_topic,
           [this](const std::shared_ptr<
-                 ::apollo::localization::LocalizationEstimate> &localization) {
+                 apollo::localization::LocalizationEstimate> &localization) {
             perception_.OnLocalization(*localization.get());
           });
 
-  chassis_reader_ = node_->CreateReader<::apollo::canbus::Chassis>(
+  chassis_reader_ = node_->CreateReader<apollo::canbus::Chassis>(
       FLAGS_chassis_topic,
-      [this](const std::shared_ptr<::apollo::canbus::Chassis> &chassis) {
+      [this](const std::shared_ptr<apollo::canbus::Chassis> &chassis) {
         perception_.OnChassis(*chassis.get());
       });
 
@@ -74,7 +73,7 @@ bool ThirdPartyPerceptionComponent::Init() {
 }
 
 bool ThirdPartyPerceptionComponent::Proc() {
-  auto response = std::make_shared<::apollo::perception::PerceptionObstacles>();
+  auto response = std::make_shared<apollo::perception::PerceptionObstacles>();
   if (!perception_.Process(response.get())) {
     return false;
   }

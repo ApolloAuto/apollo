@@ -45,6 +45,9 @@ void ProcessMonitor::RunOnce(const double current_time) {
     std::string cmd_string;
     if (apollo::common::util::GetContent(cmd_file, &cmd_string) &&
         !cmd_string.empty()) {
+      // In /proc/<PID>/cmdline, the parts are seperated with \0, which will be
+      // converted back to whitespaces here.
+      std::replace(cmd_string.begin(), cmd_string.end(), '\0', ' ');
       running_processes.push_back(cmd_string);
     }
   }

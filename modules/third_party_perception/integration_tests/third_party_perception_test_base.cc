@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/third_party_perception/integration_tests/third_party_perception_test_base.h"
+
 #include <unistd.h>
 #include <climits>
 #include <fstream>
 #include <sstream>
 
+#include "cyber/common/file.h"
 #include "google/protobuf/text_format.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
-#include "modules/third_party_perception/integration_tests/third_party_perception_test_base.h"
 
 DEFINE_string(test_data_dir, "", "the test data folder");
 DEFINE_string(test_localization_file, "", "localization input file");

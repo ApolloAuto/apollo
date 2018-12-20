@@ -54,17 +54,39 @@ bool DistanceApproachProblem::Solve(
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  app->Options()->SetIntegerValue("print_level", 0);
-  app->Options()->SetIntegerValue("mumps_mem_percent", 6000);
-  app->Options()->SetNumericValue("mumps_pivtol", 1e-6);
-  app->Options()->SetIntegerValue("max_iter", 1000);
-  app->Options()->SetNumericValue("tol", 1e-4);
-  app->Options()->SetNumericValue("acceptable_constr_viol_tol", 1e-1);
-  app->Options()->SetNumericValue("min_hessian_perturbation", 1e-12);
-  app->Options()->SetNumericValue("jacobian_regularization_value", 1e-7);
-  app->Options()->SetStringValue("print_timing_statistics", "yes");
-  app->Options()->SetStringValue("alpha_for_y", "min");
-  app->Options()->SetStringValue("recalc_y", "yes");
+  app->Options()->SetIntegerValue("print_level",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_print_level());
+  app->Options()->SetIntegerValue("mumps_mem_percent",
+      planner_open_space_config_.distance_approach_config().
+        ipopt_config().mumps_mem_percent());
+  app->Options()->SetNumericValue("mumps_pivtol",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().mumps_pivtol());
+  app->Options()->SetIntegerValue("max_iter",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_max_iter());
+  app->Options()->SetNumericValue("tol",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_tol());
+  app->Options()->SetNumericValue("acceptable_constr_viol_tol",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_acceptable_constr_viol_tol());
+  app->Options()->SetNumericValue("min_hessian_perturbation",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_min_hessian_perturbation());
+  app->Options()->SetNumericValue("jacobian_regularization_value",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_jacobian_regularization_value());
+  app->Options()->SetStringValue("print_timing_statistics",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_print_timing_statistics());
+  app->Options()->SetStringValue("alpha_for_y",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_alpha_for_y());
+  app->Options()->SetStringValue("recalc_y",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_recalc_y());
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
