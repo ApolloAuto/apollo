@@ -19,4 +19,7 @@ message TrafficLight {
     optional int32 default_image_border_size = 14 [default = 100];
     optional string traffic_light_output_channel_name = 15 [default = "/apollo/perception/traffic_light"];
     optional string simulation_channel_name = 16 [default = "/apollo/perception/traffic_light_simulation"];
+    optional string v2x_trafficlights_input_channel_name = 17 [default = "/apollo/v2x/traffic_light"];
+    optional double v2x_sync_interval_seconds = 18 [default = 0.1];
+    optional int32 max_v2x_msg_buff_size = 19 [default = 50];
 }
