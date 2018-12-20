@@ -7,7 +7,7 @@ cc_binary(
     srcs = ["talker.cc"],
     deps = [
         "//cyber",
-        "//cyber/samples/proto:samples_cc_proto",
+        "//cyber/examples/proto:examples_cc_proto",
     ],
 )
 
@@ -16,7 +16,7 @@ cc_binary(
     srcs = ["listener.cc"],
     deps = [
         "//cyber",
-        "//cyber/samples/proto:samples_cc_proto",
+        "//cyber/examples/proto:examples_cc_proto",
     ],
 )
 
@@ -34,7 +34,7 @@ cc_binary(
     srcs = ["service.cc"],
     deps = [
         "//cyber",
-        "//cyber/samples/proto:samples_cc_proto",
+        "//cyber/examples/proto:examples_cc_proto",
     ],
 )
 

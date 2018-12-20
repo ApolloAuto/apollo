@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <memory>
+#include "cyber/examples/common_component_example/common_component_example.h"
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
-#include "cyber/samples/proto/samples.pb.h"
 
-using apollo::cyber::samples::proto::Driver;
-using apollo::cyber::Component;
-using apollo::cyber::ComponentBase;
+bool CommonComponentSample::Init() {
+  AINFO << "Commontest component init";
+  return true;
+}
 
-class CommonComponentSample : public Component<Driver, Driver> {
- public:
-  bool Init() override;
-  bool Proc(const std::shared_ptr<Driver>& msg0,
-            const std::shared_ptr<Driver>& msg1) override;
-};
-CYBER_REGISTER_COMPONENT(CommonComponentSample)
+bool CommonComponentSample::Proc(const std::shared_ptr<Driver>& msg0,
+                               const std::shared_ptr<Driver>& msg1) {
+  AINFO << "Start common component Proc [" << msg0->msg_id() << "] ["
+        << msg1->msg_id() << "]";
+  return true;
+}
