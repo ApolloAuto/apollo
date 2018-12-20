@@ -125,6 +125,9 @@ class LatController : public Controller {
 
   void CloseLogFile();
 
+  // vehicle
+  const ControlConf *control_conf_ = nullptr;
+
   // vehicle parameter
   common::VehicleParam vehicle_param_;
 
