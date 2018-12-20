@@ -17,8 +17,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/highgui/highgui_c.h>
@@ -27,10 +27,10 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <tuple>
 #include <utility>
-#include <limits>
 
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
@@ -99,6 +99,11 @@ bool TrafficLightsPerceptionComponent::Init() {
     return false;
   }
 
+  if (InitV2XListener() != cyber::SUCC) {
+    AERROR << "TrafficLightsPerceptionComponent InitV2XListener failed.";
+    return false;
+  }
+
   if (FLAGS_start_visualizer) {
     AINFO << "TrafficLight Visualizer is ON";
   } else {
@@ -158,6 +163,14 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   traffic_light_output_channel_name_ =
     traffic_light_param.traffic_light_output_channel_name();
 
+  // v2x params
+  v2x_trafficlights_input_channel_name_ =
+    traffic_light_param.v2x_trafficlights_input_channel_name();
+  v2x_sync_interval_seconds_ =
+    traffic_light_param.v2x_sync_interval_seconds();
+  max_v2x_msg_buff_size_ =
+    traffic_light_param.max_v2x_msg_buff_size();
+  v2x_msg_buffer_.set_capacity(max_v2x_msg_buff_size_);
   return cyber::SUCC;
 }
 
@@ -245,6 +258,17 @@ int TrafficLightsPerceptionComponent::InitCameraListeners() {
     last_sub_camera_image_ts_[camera_name] = 0.0;
   }
 
+  return cyber::SUCC;
+}
+
+int TrafficLightsPerceptionComponent::InitV2XListener() {
+  typedef const std::shared_ptr<
+      apollo::v2x::IntersectionTrafficLightData> V2XTrafficLightsMsgType;
+  std::function<void(const V2XTrafficLightsMsgType&)> sub_v2x_tl_callback =
+      std::bind(&TrafficLightsPerceptionComponent::OnReceiveV2XMsg,
+          this, std::placeholders::_1);
+  auto sub_v2x_reader = node_->CreateReader(
+      v2x_trafficlights_input_channel_name_, sub_v2x_tl_callback);
   return cyber::SUCC;
 }
 
@@ -402,6 +426,8 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
              << " color " << static_cast<int>(light->status.color);
   }
 
+  SyncV2XTrafficLights(&frame_);
+
   std::shared_ptr<apollo::perception::TrafficLightDetection> out_msg =
       std::make_shared<apollo::perception::TrafficLightDetection>();
   if (!TransformOutputMessage(&frame_, camera_name, &out_msg)) {
@@ -445,6 +471,12 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
       << GLOG_TIMESTAMP(end_timestamp) << "]:cur_latency[" << end_latency
       << "]";
   }
+}
+
+void TrafficLightsPerceptionComponent::OnReceiveV2XMsg(
+    const std::shared_ptr<apollo::v2x::IntersectionTrafficLightData> v2x_msg) {
+  std::lock_guard<std::mutex> lck(mutex_);
+  v2x_msg_buffer_.push_back(*v2x_msg);
 }
 
 void TrafficLightsPerceptionComponent::GenerateTrafficLights(
@@ -756,44 +788,44 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
     switch (lights.at(i)->status.color) {
       case base::TLColor::TL_RED:
         // quick fix for 0 confidence color decision
-        // if (std::abs(lights.at(i)->status.confidence) <
-        //     std::numeric_limits<double>::min()) {
-        //   lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
-        //   max_n_id = i;
-        //   break;
-        // }
-        cnt_r_ += (lights.at(i)->status.confidence + 0.01);
+        if (std::abs(lights.at(i)->status.confidence) <
+            std::numeric_limits<double>::min()) {
+          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+          max_n_id = i;
+          break;
+        }
+        cnt_r_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_r_conf) {
           max_r_id = i;
-          max_r_conf = (lights.at(i)->status.confidence + 0.01);
+          max_r_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_GREEN:
         // quick fix for 0 confidence color decision
-        // if (std::abs(lights.at(i)->status.confidence) <
-        //     std::numeric_limits<double>::min()) {
-        //   lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
-        //   max_n_id = i;
-        //   break;
-        // }
-        cnt_g_ += (lights.at(i)->status.confidence + 0.01);
+        if (std::abs(lights.at(i)->status.confidence) <
+            std::numeric_limits<double>::min()) {
+          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+          max_n_id = i;
+          break;
+        }
+        cnt_g_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_g_conf) {
           max_g_id = i;
-          max_g_conf = (lights.at(i)->status.confidence + 0.01);
+          max_g_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_YELLOW:
         // quick fix for 0 confidence color decision
-        // if (std::abs(lights.at(i)->status.confidence) <
-        //     std::numeric_limits<double>::min()) {
-        //   lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
-        //   max_n_id = i;
-        //   break;
-        // }
-        cnt_y_ += (lights.at(i)->status.confidence + 0.01);
+        if (std::abs(lights.at(i)->status.confidence) <
+            std::numeric_limits<double>::min()) {
+          lights.at(i)->status.color = base::TLColor::TL_UNKNOWN_COLOR;
+          max_n_id = i;
+          break;
+        }
+        cnt_y_ += lights.at(i)->status.confidence;
         if (lights.at(i)->status.confidence >= max_y_conf) {
           max_y_id = i;
-          max_y_conf = (lights.at(i)->status.confidence + 0.01);
+          max_y_conf = lights.at(i)->status.confidence;
         }
         break;
       case base::TLColor::TL_UNKNOWN_COLOR:
@@ -1097,7 +1129,69 @@ void TrafficLightsPerceptionComponent::Visualize(
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
   cv::imshow("Traffic Light", output_image);
+  cv::imwrite("/apollo/debug_vis/" +
+              std::to_string(frame.timestamp) + ".jpg", output_image);
   cvWaitKey(30);
+}
+
+void TrafficLightsPerceptionComponent::SyncV2XTrafficLights(
+    camera::CameraFrame *frame) {
+  const double camera_frame_timestamp = frame->timestamp;
+  auto sync_single_light = [&](base::TrafficLightPtr light) {
+    for (auto itr = v2x_msg_buffer_.rbegin(); itr != v2x_msg_buffer_.rend();
+        ++itr) {
+      double v2x_timestamp = (*itr).header().timestamp_sec();
+      // find close enough v2x msg
+      if (std::fabs(camera_frame_timestamp - v2x_timestamp) <
+          v2x_sync_interval_seconds_) {
+        const int v2x_lights_num =
+            (*itr).current_lane_trafficlight().single_traffic_light_size();
+        const auto &v2x_lights = (*itr).current_lane_trafficlight();
+        for (int i = 0; i < v2x_lights_num; ++i) {
+          const auto &v2x_light = v2x_lights.single_traffic_light(i);
+          // check signal id
+          if (light->id != v2x_light.id()) {
+            continue;
+          }
+          base::TLColor v2x_color = base::TLColor::TL_UNKNOWN_COLOR;
+          bool blink = false;
+          switch (v2x_light.color()) {
+            default:
+            case apollo::v2x::SingleTrafficLight::UNKNOWN:
+              v2x_color = base::TLColor::TL_UNKNOWN_COLOR;
+              break;
+            case apollo::v2x::SingleTrafficLight::RED:
+              v2x_color = base::TLColor::TL_RED;
+              break;
+            case apollo::v2x::SingleTrafficLight::YELLOW:
+              v2x_color = base::TLColor::TL_YELLOW;
+              break;
+            case apollo::v2x::SingleTrafficLight::GREEN:
+              v2x_color = base::TLColor::TL_GREEN;
+              break;
+            case apollo::v2x::SingleTrafficLight::BLACK:
+              v2x_color = base::TLColor::TL_BLACK;
+              break;
+            case apollo::v2x::SingleTrafficLight::FLASH_GREEN:
+              v2x_color = base::TLColor::TL_GREEN;
+              blink = true;
+              break;
+          }
+          // use v2x result directly
+          AINFO << "Sync V2X success. update color from "
+              << static_cast<int>(light->status.color) << " to "
+              << static_cast<int>(v2x_color) << "; signal id: "
+              << light->id;
+          light->status.color = v2x_color;
+          light->status.blink = blink;
+        }
+        break;
+      }
+    }
+  };
+  for (auto &light : frame->traffic_lights) {
+    sync_single_light(light);
+  }
 }
 
 void TrafficLightsPerceptionComponent::SendSimulationMsg() {
