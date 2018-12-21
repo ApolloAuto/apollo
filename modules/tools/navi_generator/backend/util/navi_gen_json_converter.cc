@@ -36,16 +36,16 @@ bool NaviGenJsonConverter::NaviGenResponseToJson(
   (*js)["type"] = navi_gen_response.type;
   (*js)["result"]["success"] = navi_gen_response.result.success;
   (*js)["result"]["msg"] = navi_gen_response.result.msg;
-  (*js)["res_data"]["start"]["Lat"] = navi_gen_response.res_data.start.lat;
-  (*js)["res_data"]["start"]["Lng"] = navi_gen_response.res_data.start.log;
-  (*js)["res_data"]["end"]["Lat"] = navi_gen_response.res_data.end.lat;
-  (*js)["res_data"]["end"]["Lng"] = navi_gen_response.res_data.end.log;
-  (*js)["res_data"]["numPlans"] = navi_gen_response.res_data.num_plans;
+  (*js)["resData"]["start"]["Lat"] = navi_gen_response.res_data.start.lat;
+  (*js)["resData"]["start"]["Lng"] = navi_gen_response.res_data.start.log;
+  (*js)["resData"]["end"]["Lat"] = navi_gen_response.res_data.end.lat;
+  (*js)["resData"]["end"]["Lng"] = navi_gen_response.res_data.end.log;
+  (*js)["resData"]["numPlans"] = navi_gen_response.res_data.num_plans;
 
   for (std::size_t i = 0; i < navi_gen_response.res_data.route_plans.size();
        ++i) {
     if (!NaviGenRoutePlansToJson(navi_gen_response.res_data.route_plans[i],
-                                 &((*js)["res_data"]["routePlans"][i]))) {
+                                 &((*js)["resData"]["routePlans"][i]))) {
       AERROR << "NaviGenResponseToJson failed";
     }
   }
@@ -87,8 +87,8 @@ bool NaviGenJsonConverter::NaviGenNavisToJson(const NaviGenNavis& navis,
   CHECK_NOTNULL(js);
   (*js)["naviIndex"] = navis.navi_index;
   for (std::size_t i = 0; i < navis.path.size(); ++i) {
-    (*js)["navis"]["path"][i]["Lng"] = navis.path[i].log;
-    (*js)["navis"]["path"][i]["Lat"] = navis.path[i].lat;
+    (*js)["navi"]["path"][i]["Lng"] = navis.path[i].log;
+    (*js)["navi"]["path"][i]["Lat"] = navis.path[i].lat;
   }
   return true;
 }
@@ -149,14 +149,14 @@ bool NaviGenJsonConverter::JsonToMapData(const Json& js,
   map_data->end.log = js["end"]["Lng"];
   map_data->end.lat = js["end"]["Lat"];
 
-  for (std::size_t i = 0; i < js["waypoint"].size(); ++i) {
-    apollo::localization::msf::WGS84Corr waypoint;
-    if (!JsonToMapWayPoint(js["waypoint"][i], &waypoint)) {
-      AERROR << "JsonToMapWayPoint failed.";
-      return false;
-    }
-    map_data->waypoint.emplace_back(waypoint);
-  }
+  // for (std::size_t i = 0; i < js["waypoint"].size(); ++i) {
+  //   apollo::localization::msf::WGS84Corr waypoint;
+  //   if (!JsonToMapWayPoint(js["waypoint"][i], &waypoint)) {
+  //     AERROR << "JsonToMapWayPoint failed.";
+  //     return false;
+  //   }
+  //   map_data->waypoint.emplace_back(waypoint);
+  // }
   map_data->num_plans = js["numPlans"];
   for (std::size_t i = 0; i < js["routePlans"].size(); ++i) {
     MapRoutePlans route_plans;

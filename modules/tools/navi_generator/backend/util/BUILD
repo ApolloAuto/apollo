@@ -15,7 +15,7 @@ cc_library(
         "//modules/planning/reference_line:spiral_reference_line_smoother",
         "//modules/tools/navi_generator/backend/common:navi_generator_gflags",
         "//modules/tools/navi_generator/proto:trajectory_util_config_proto",
-
+        ":file_operator",
     ],
 )
 
