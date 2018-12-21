@@ -21,17 +21,12 @@
 
 #pragma once
 
-#include <chrono>
 #include <memory>
-#include <string>
 
-#include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/time/time.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/v2x/common/v2x_proxy_gflags.h"
 #include "modules/v2x/proto/v2x_traffic_light.pb.h"
 
