@@ -179,13 +179,17 @@ class DreamviewStore {
     }
 
     handleDrivingModeChange(wasAutoMode, isAutoMode) {
-        this.newDisengagementReminder =
-            this.hmi.isCoDriver && wasAutoMode && !isAutoMode;
+        const hasDisengagement = wasAutoMode && !isAutoMode;
+        const hasAuto = !wasAutoMode && isAutoMode;
+
+        this.newDisengagementReminder = this.hmi.isCoDriver && hasDisengagement;
         if (this.newDisengagementReminder && !this.options.showDataRecorder) {
             this.handleOptionToggle('showDataRecorder');
         }
 
-        if (!wasAutoMode && isAutoMode && !this.options.lockTaskPanel) {
+        if (hasAuto && !this.options.lockTaskPanel) {
+            this.handleOptionToggle('lockTaskPanel');
+        } else if (hasDisengagement && this.options.lockTaskPanel) {
             this.handleOptionToggle('lockTaskPanel');
         }
     }
