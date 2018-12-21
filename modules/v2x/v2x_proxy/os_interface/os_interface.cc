@@ -26,7 +26,6 @@ namespace v2x {
 
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacles;
-using apollo::v2x::IntersectionTrafficLightData;
 
 OsInterFace::OsInterFace()
     : node_(cyber::CreateNode("v2x_os_interface")), init_flag_(false) {

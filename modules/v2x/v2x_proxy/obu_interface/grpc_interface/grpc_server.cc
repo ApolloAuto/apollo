@@ -20,8 +20,6 @@
  */
 
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_server.h"
-#include "cyber/common/log.h"
-#include "cyber/cyber.h"
 
 namespace apollo {
 namespace v2x {
