@@ -40,48 +40,97 @@ namespace util {
 namespace {
 constexpr double kOverlapLenFromSecondBag = 250.0;
 constexpr double kDefaultLaneWidth = 3.75;
+const char kWebSocketTypeProcessFile[] = "requestProcessBagFiles";
+const char kWebSocketTypeSaveFile[] = "requestSaveBagFiles";
 }  // namespace
 
 using std::placeholders::_1;  // for _1, _2, _3...
+using Json = nlohmann::json;
 
-TrajectoryProcessor::TrajectoryProcessor(UPDATE_GUI_FUNC task,
+TrajectoryProcessor::TrajectoryProcessor(UPDATE_FRONTEND_FUNC update_task,
                                          void* gui_service)
     : file_seg_thread_(std::make_unique<std::thread>(
           &TrajectoryProcessor::FileSegmentThread, this)),
-      update_gui_task_(std::bind(task, _1, gui_service)) {}
+      file_seg_finished_(false),
+      update_frontend_thread_(std::make_unique<std::thread>(
+          &TrajectoryProcessor::UpdateFrontendThread, this)),
+      update_frontend_func_(std::bind(update_task, _1, gui_service)),
+      update_frontend_finished_(false) {}
 
 TrajectoryProcessor::~TrajectoryProcessor() {
   file_seg_finished_ = true;
   if (file_seg_thread_ && file_seg_thread_->joinable()) {
     file_seg_thread_->join();
   }
+
+  update_frontend_finished_ = true;
+  if (update_frontend_thread_ && update_frontend_thread_->joinable()) {
+    update_frontend_thread_->join();
+  }
 }
 
 void TrajectoryProcessor::FileSegmentThread() {
   while (!file_seg_finished_) {
-    std::unique_lock<std::mutex> lock(file_seg_mut_);
-    file_seg_cv_.wait(lock, [this]() {
+    std::unique_lock<std::mutex> file_seg_lock(file_seg_mut_);
+    file_seg_cv_.wait(file_seg_lock, [this]() {
       return !cur_file_segment_s_.empty() || file_seg_finished_;
     });
+    if (!cur_file_segment_s_.empty() &&
+        cur_file_segment_s_[0].cur_file_name.empty()) {
+      cur_file_segment_s_.clear();
+      continue;
+    }
+    if (!cur_file_segment_s_.empty() &&
+        cur_file_segment_s_.size() <
+            cur_file_segment_s_[0].cur_file_seg_count) {
+      continue;
+    }
     // All segments of a file have been received.
     if (!cur_file_segment_s_.empty()) {
-      if (!ExportSegmentsToFile(cur_file_segment_s_[0].cur_file_name)) {
+      std::uint16_t file_index = cur_file_segment_s_[0].cur_file_index;
+      std::string cur_file_name = cur_file_segment_s_[0].cur_file_name;
+      std::string next_file_name = cur_file_segment_s_[0].next_file_name;
+      if (!cur_file_name.empty() && !ExportSegmentsToFile(cur_file_name)) {
         cur_file_segment_s_.clear();
-        // TODO(*): Inform the frontend an error message.
-        std::string msg;
-        update_gui_task_(msg);
-        return;
+        file_seg_lock.unlock();
+
+        // Inform the frontend an error message.
+        NaviGenResponse response;
+        response.type = kWebSocketTypeProcessFile;
+        response.result.success = 1;
+        response.result.msg = "Failed to store received file " + cur_file_name;
+        ResponseToFrontend(response);
+        continue;
       }
-      BagFileInfo bag_file_info;
-      bag_file_info.file_index = cur_file_segment_s_[0].cur_file_index;
-      bag_file_info.raw_file_name = cur_file_segment_s_[0].cur_file_name;
-      bag_file_info.next_raw_file_name = cur_file_segment_s_[0].next_file_name;
-      bag_files_to_process_[bag_file_info.file_index] = bag_file_info;
       cur_file_segment_s_.clear();
+      file_seg_lock.unlock();
+
+      BagFileInfo bag_file_info;
+      bag_file_info.file_index = file_index;
+      bag_file_info.raw_file_name = cur_file_name;
+      bag_file_info.next_raw_file_name = next_file_name;
+      bag_files_to_process_[bag_file_info.file_index] = bag_file_info;
     }
 
-    lock.unlock();
     ProcessFiles();
+  }
+}
+
+void TrajectoryProcessor::UpdateFrontendThread() {
+  while (!update_frontend_finished_) {
+    std::unique_lock<std::mutex> lock(update_frontend_mut_);
+    update_frontend_cv_.wait(lock, [this]() {
+      return !update_frontend_tasks_.empty() || update_frontend_finished_;
+    });
+    if (update_frontend_tasks_.empty()) {
+      continue;
+    }
+    auto task = std::move(update_frontend_tasks_.front());
+    update_frontend_tasks_.pop_front();
+
+    lock.unlock();
+    // Update the frontend display.
+    task();
   }
 }
 
@@ -93,12 +142,14 @@ bool TrajectoryProcessor::SetCommonBagFileInfo(
 
 bool TrajectoryProcessor::ProcessBagFileSegment(
     const FileSegment& file_segment) {
-  std::lock_guard<std::mutex> lk(file_seg_mut_);
-  cur_file_segment_s_[file_segment.cur_file_seg_index] = file_segment;
-  if (cur_file_segment_s_.size() < file_segment.cur_file_seg_count) {
-    return true;
+  {
+    std::lock_guard<std::mutex> lk(file_seg_mut_);
+    cur_file_segment_s_[file_segment.cur_file_seg_index] = file_segment;
+    if (cur_file_segment_s_.size() < file_segment.cur_file_seg_count) {
+      return true;
+    }
   }
-  file_seg_cv_.notify_all();
+  file_seg_cv_.notify_one();
   return true;
 }
 
@@ -133,13 +184,19 @@ bool TrajectoryProcessor::SaveFilesToDatabase() {
     item = processed_file_info_s_.erase(item);
   }
 
-  std::string msg;
+  NaviGenResponse response;
   if (res) {
-    // TODO(*): Inform the frontend the result.
+    // Inform the frontend the result.
+    response.type = kWebSocketTypeSaveFile;
+    response.result.success = 0;
+    response.result.msg = "The bags has been saved successfully";
   } else {
-    // TODO(*): Inform the frontend an error message.
+    // Inform the frontend an error message.
+    response.type = kWebSocketTypeSaveFile;
+    response.result.success = 1;
+    response.result.msg = "Failed to save bags files to database";
   }
-  update_gui_task_(msg);
+  ResponseToFrontend(response);
   return res;
 }
 
@@ -274,35 +331,34 @@ void TrajectoryProcessor::ProcessFiles() {
     if (bag_file_info.file_index + 1 == common_file_info_.total_file_num) {
       // the last file to process
       if (!ProcessFile(bag_file_info)) {
-        // TODO(*): Inform the frontend an error message.
-        std::string msg;
-        update_gui_task_(msg);
-      } else {
-        // TODO(*): Inform the frontend the result.
-        std::string msg;
-        update_gui_task_(msg);
+        // Inform the frontend an error message.
+        NaviGenResponse response;
+        response.type = kWebSocketTypeProcessFile;
+        response.result.success = 1;
+        response.result.msg =
+            "Failed to process file" + bag_file_info.raw_file_name;
+        ResponseToFrontend(response);
       }
       bag_files_to_process_.erase(bag_file_info.file_index);
       break;
     }
-    if (bag_file_info.file_index == 0) {
-      // the first but not last file
-      continue;
-    }
-    // the 2nd~ (total_file_num-1)th file to process
+    // the 1st~ (total_file_num-1)th file to process
     if (++item != bag_files_to_process_.end()) {
       if (!ProcessFile(bag_file_info)) {
-        // TODO(*): Inform the frontend an error message.
-        std::string msg;
-        update_gui_task_(msg);
+        // Inform the frontend an error message.
+        NaviGenResponse response;
+        response.type = kWebSocketTypeProcessFile;
+        response.result.success = 1;
+        response.result.msg =
+            "Failed to process file" + bag_file_info.raw_file_name;
+        ResponseToFrontend(response);
         bag_files_to_process_.erase(bag_file_info.file_index);
         break;
       } else {
-        // TODO(*): Inform the frontend the result.
-        std::string msg;
-        update_gui_task_(msg);
         bag_files_to_process_.erase(bag_file_info.file_index);
       }
+    } else {
+      break;
     }
   }
 }
@@ -324,6 +380,64 @@ bool TrajectoryProcessor::ProcessFile(const BagFileInfo& bag_file_info) {
   file_info.bag_file_info = bag_file_info;
   file_info.navi_files = navi_files;
   // TODO(*): set the speed limits
+
+  // Inform the frontend the result.
+  {
+    apollo::localization::msf::WGS84Corr start;
+    apollo::localization::msf::WGS84Corr end;
+
+    std::vector<NaviGenNavis> navis;
+    for (auto& navi_file : file_info.navi_files) {
+      NaviGenNavis navi;
+      navi.navi_index = navi_file.navi_index;
+
+      std::vector<planning::ReferencePoint> smoothed_points;
+      FileOperator file_operator;
+      if (!file_operator.Import(navi_file.navi_file_name, &smoothed_points)) {
+        break;
+      }
+      std::vector<apollo::localization::msf::WGS84Corr> waypoints;
+      TrajectoryConverter trajecotry_converter;
+      trajecotry_converter.ConvertSmoothedTrajectoryPointsToWGS84(
+          &smoothed_points, &waypoints);
+      navi.path = waypoints;
+
+      navis.emplace_back(navi);
+
+      if (navi.navi_index == 0) {
+        start = waypoints.front();
+        end = waypoints.back();
+      }
+    }
+    NaviGenRoutes route;
+    route.navis = navis;
+    route.num_navis = route.navis.size();
+    route.speed_min = file_info.speed_min;
+    route.speed_max = file_info.speed_max;
+    route.route_index = 0;
+    std::vector<NaviGenRoutes> routes;
+    routes.emplace_back(route);
+    NaviGenRoutePlan route_plan;
+    route_plan.num_routes = routes.size();
+    route_plan.routes = routes;
+    NaviGenRoutePlans route_plans;
+    route_plans.route_plan_index = 0;
+    route_plans.route_plan = route_plan;
+    std::vector<NaviGenRoutePlans> route_plan_s;
+    route_plan_s.emplace_back(route_plans);
+    NaviGenResponse response;
+    response.res_data.route_plans = route_plan_s;
+    response.res_data.num_plans = response.res_data.route_plans.size();
+    response.res_data.start = start;
+    response.res_data.end = end;
+    response.type = kWebSocketTypeProcessFile;
+    response.result.success = 0;
+    response.result.msg =
+        "Processed file " + bag_file_info.raw_file_name + " successfully";
+
+    ResponseToFrontend(response);
+  }
+
   processed_file_info_s_.insert(
       std::make_pair(file_info.bag_file_info.file_index, file_info));
   return true;
@@ -426,6 +540,23 @@ bool TrajectoryProcessor::GetRightmostNaviFile(const FileInfo& file_info,
 void TrajectoryProcessor::GetProcessedFilesInfo(
     const std::map<std::uint16_t, FileInfo>** processed_files_info) {
   *processed_files_info = &processed_file_info_s_;
+}
+
+bool TrajectoryProcessor::ResponseToFrontend(
+    const NaviGenResponse& navi_gen_response) {
+  Json response;
+  NaviGenJsonConverter converter;
+  if (!converter.NaviGenResponseToJson(navi_gen_response, &response)) {
+    return false;
+  }
+
+  {
+    std::lock_guard<std::mutex> update_frontend_lock(update_frontend_mut_);
+    update_frontend_tasks_.emplace_back(
+        std::bind(update_frontend_func_, response.dump()));
+  }
+  update_frontend_cv_.notify_one();
+  return true;
 }
 
 }  // namespace util
