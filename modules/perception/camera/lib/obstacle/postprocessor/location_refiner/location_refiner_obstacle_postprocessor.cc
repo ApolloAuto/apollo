@@ -76,7 +76,7 @@ bool LocationRefinerObstaclePostprocessor::Process(
       k_mat[i3 + j] = camera_k_matrix(i, j);
     }
   }
-  ADEBUG << "Camera k matrix input to obstacle postprocessor: \n"
+  AINFO << "Camera k matrix input to obstacle postprocessor: \n"
             << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
             << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
             << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8] << "\n";
