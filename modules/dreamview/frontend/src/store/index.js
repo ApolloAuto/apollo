@@ -163,19 +163,9 @@ class DreamviewStore {
                 ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
     }
 
-    update(world) {
-        this.updateTimestamp(world.timestamp);
-        this.updateModuleDelay(world);
-
-        const wasAutoMode = this.meters.isAutoMode;
-        this.meters.update(world);
-        this.newDisengagementReminder =
-            this.hmi.isCoDriver && wasAutoMode && !this.meters.isAutoMode;
-        if (this.newDisengagementReminder && !this.options.showDataRecorder) {
-            this.handleOptionToggle("showDataRecorder");
-        }
-        // If there is any other planning path when pnc monitor is on
+    updateCustomizedToggles(world) {
         if (world.planningData && world.planningData.path) {
+            // Add customized toggles for planning paths
             world.planningData.path.forEach((path) => {
                 const pathName = path.name;
                 if (!this.options.customizedToggles.has(pathName)) {
@@ -186,11 +176,33 @@ class DreamviewStore {
             // Clean the planning paths
             this.options.customizedToggles.clear();
         }
+    }
+
+    handleDrivingModeChange(wasAutoMode, isAutoMode) {
+        this.newDisengagementReminder =
+            this.hmi.isCoDriver && wasAutoMode && !isAutoMode;
+        if (this.newDisengagementReminder && !this.options.showDataRecorder) {
+            this.handleOptionToggle('showDataRecorder');
+        }
+
+        if (!wasAutoMode && isAutoMode && !this.options.lockTaskPanel) {
+            this.handleOptionToggle('lockTaskPanel');
+        }
+    }
+
+    update(world) {
+        this.updateTimestamp(world.timestamp);
+        this.updateModuleDelay(world);
+
+        const wasAutoMode = this.meters.isAutoMode;
+        this.meters.update(world);
+        this.handleDrivingModeChange(wasAutoMode, this.meters.isAutoMode);
 
         this.monitor.update(world);
         this.trafficSignal.update(world);
         this.hmi.update(world);
 
+        this.updateCustomizedToggles(world);
         if (this.options.showPNCMonitor) {
             this.planningData.update(world);
             this.controlData.update(world, this.hmi.vehicleParam);
