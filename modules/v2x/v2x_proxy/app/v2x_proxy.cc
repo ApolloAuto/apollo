@@ -24,9 +24,7 @@
 namespace apollo {
 namespace v2x {
 
-using apollo::canbus::ChassisDetail;
 using apollo::localization::LocalizationEstimate;
-using apollo::v2x::IntersectionTrafficLightData;
 
 V2xProxy::V2xProxy()
     : node_(cyber::CreateNode("v2x_proxy")), init_flag_(false) {

@@ -21,8 +21,6 @@
 
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_client.h"
 
-#include <chrono>
-
 #include "cyber/common/log.h"
 
 namespace apollo {
