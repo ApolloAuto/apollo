@@ -17,9 +17,7 @@
 #include "modules/routing/routing.h"
 
 #include "modules/common/util/util.h"
-#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/common/routing_gflags.h"
-#include "modules/routing/core/navigator.h"
 
 namespace apollo {
 namespace routing {

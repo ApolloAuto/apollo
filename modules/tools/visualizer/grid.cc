@@ -16,8 +16,6 @@
 
 #include "modules/tools/visualizer/grid.h"
 
-#include <iostream>
-
 Grid::Grid(int cellCountBySide)
     : RenderableObject((cellCountBySide << 2) + 4, 2),
       grid_color_(128, 128, 128) {}

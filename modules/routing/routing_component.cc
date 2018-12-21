@@ -18,8 +18,6 @@
 
 #include <utility>
 
-#include "cyber/cyber.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/routing/common/routing_gflags.h"
 

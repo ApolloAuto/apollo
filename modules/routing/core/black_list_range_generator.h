@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
 #include <unordered_set>
 
 #include "modules/routing/graph/topo_graph.h"

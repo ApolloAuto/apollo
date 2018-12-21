@@ -16,18 +16,10 @@
 #include "modules/routing/core/result_generator.h"
 
 #include <algorithm>
-#include <memory>
-#include <string>
 #include <unordered_set>
-#include <utility>
-#include <vector>
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"
-#include "modules/routing/common/routing_gflags.h"
-#include "modules/routing/graph/node_with_range.h"
-#include "modules/routing/graph/range_utils.h"
 
 namespace apollo {
 namespace routing {

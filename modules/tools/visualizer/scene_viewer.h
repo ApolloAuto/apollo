@@ -16,16 +16,10 @@
 
 #pragma once
 
-#include <QList>
-#include <QOpenGLFunctions>
 #include <QOpenGLWidget>
-#include <map>
-#include <memory>
-#include <string>
 
 #include "modules/tools/visualizer/free_camera.h"
 #include "modules/tools/visualizer/plane.h"
-#include "modules/tools/visualizer/renderable_object.h"
 #include "modules/tools/visualizer/target_camera.h"
 
 class QTimer;

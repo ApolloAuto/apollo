@@ -14,8 +14,6 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include <string>
-
 #include "gtest/gtest.h"
 
 #include "modules/routing/common/routing_gflags.h"

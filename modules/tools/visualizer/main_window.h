@@ -16,14 +16,9 @@
 
 #pragma once
 
-#include <map>
-#include <string>
-
 #include <QMainWindow>
 #include <QMenu>
 #include <QMutex>
-#include <QPixmap>
-#include <memory>
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/proto/radar.pb.h"
