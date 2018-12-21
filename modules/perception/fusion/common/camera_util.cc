@@ -55,22 +55,21 @@ bool Pt3dToCamera2d(const Eigen::Vector3d& pt3d,
                     const Eigen::Matrix4d& world2camera_pose,
                     base::BaseCameraModelPtr camera_model,
                     Eigen::Vector2d* pt2d) {
-  Eigen::Vector4d local_pt =
-    static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
-    (world2camera_pose * Eigen::Vector4d(pt3d(0), pt3d(1), pt3d(2), 1));
+  Eigen::Vector4d local_pt = static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
+      world2camera_pose * Eigen::Vector4d(pt3d(0), pt3d(1), pt3d(2), 1));
   if (local_pt[2] > 0) {
-    *pt2d = (camera_model->Project(
-                 Eigen::Vector3f(static_cast<float>(local_pt[0]),
-                                 static_cast<float>(local_pt[1]),
-                                 static_cast<float>(local_pt[2]))))
-                .cast<double>();
+    *pt2d =
+        (camera_model->Project(Eigen::Vector3f(
+             static_cast<float>(local_pt[0]), static_cast<float>(local_pt[1]),
+             static_cast<float>(local_pt[2]))))
+            .cast<double>();
     return true;
   }
   return false;
 }
 
 bool IsObjectEightVerticesAllBehindCamera(
-    std::shared_ptr<const base::Object> obj,
+    const std::shared_ptr<const base::Object>& obj,
     const Eigen::Matrix4d& world2camera_pose,
     base::BaseCameraModelPtr camera_model) {
   std::vector<Eigen::Vector3d> vertices(8);
@@ -100,8 +99,8 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
 
   double time_diff =
       camera_ts - sensor_object->GetBaseObject()->latest_tracked_time;
-  Eigen::Vector3f offset = sensor_object->GetBaseObject()->velocity *
-                           static_cast<float>(time_diff);
+  Eigen::Vector3f offset =
+      sensor_object->GetBaseObject()->velocity * static_cast<float>(time_diff);
   if (!motion_compensation) {
     offset.setZero();
   }
@@ -165,8 +164,8 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
         bottom_right.cwiseMin(Eigen::Vector2d(width, height));
     Eigen::Vector2d bound_box_size = bound_bottom_right - bound_top_left;
     if ((bound_box_size.array() > 0.0).all()) {
-      in_view_ratio = static_cast<float>(bound_box_size.prod() /
-                                         box_size.prod());
+      in_view_ratio =
+          static_cast<float>(bound_box_size.prod() / box_size.prod());
     } else {
       in_view_ratio = 0.0;
     }
@@ -191,13 +190,13 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
   const double dist_slope = 0.25;
   auto sigmoid_like_fun = [max_dist, dist_slope](double obj_dist) {
     double x = obj_dist - max_dist;
-    return 0.5 - 0.5 * x * dist_slope /
-                     std::sqrt(1 + x * x * dist_slope * dist_slope);
+    return 0.5 -
+           0.5 * x * dist_slope /
+               std::sqrt(1 + x * x * dist_slope * dist_slope);
   };
   Eigen::Vector4d center3d_local = world2sensor_pose * center.homogeneous();
   double dist_to_camera = center3d_local.z();
-  return static_cast<float>(in_view_ratio *
-                            sigmoid_like_fun(dist_to_camera));
+  return static_cast<float>(in_view_ratio * sigmoid_like_fun(dist_to_camera));
 }
 
 }  // namespace fusion

@@ -44,12 +44,13 @@ Status PublicRoadPlanner::Init(const PlanningConfig& config) {
 
 Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
                                Frame* frame) {
+  DCHECK_NOTNULL(frame);
   scenario_manager_.Update(planning_start_point, *frame);
   scenario_ = scenario_manager_.mutable_scenario();
   auto result = scenario_->Process(planning_start_point, frame);
 
   if (FLAGS_enable_record_debug) {
-    if (frame && frame->output_trajectory()) {
+    if (frame->output_trajectory()) {
       auto scenario_debug = frame->output_trajectory()
                                 ->mutable_debug()
                                 ->mutable_planning_data()

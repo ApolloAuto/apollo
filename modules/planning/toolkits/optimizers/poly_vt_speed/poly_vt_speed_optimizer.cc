@@ -55,6 +55,16 @@ PolyVTSpeedOptimizer::PolyVTSpeedOptimizer(const TaskConfig& config)
 
 apollo::common::Status PolyVTSpeedOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
+  if (frame == nullptr) {
+    AERROR << "Frame info is empty!";
+    return Status(ErrorCode::PLANNING_ERROR, "No Frame info");
+  }
+
+  if (reference_line_info == nullptr) {
+    AERROR << "Reference line info is empty!";
+    return Status(ErrorCode::PLANNING_ERROR, "No reference line info!");
+  }
+
   const auto& poly_vt_config = config_.poly_vt_speed_config();
   // extract infos
   const SLBoundary& adc_sl_boundary = reference_line_info->AdcSlBoundary();
@@ -64,19 +74,9 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
   PathDecision* path_decision = reference_line_info->path_decision();
   SpeedData* speed_data = reference_line_info->mutable_speed_data();
 
-  if (reference_line_info == nullptr) {
-    AERROR << "Reference line info is empty!";
-    return Status(ErrorCode::PLANNING_ERROR, "No reference line info!");
-  }
-
   reference_line_info_ = reference_line_info;
   if (reference_line_info->ReachedDestination()) {
     return Status::OK();
-  }
-
-  if (frame == nullptr) {
-    AERROR << "Frame info is empty!";
-    return Status(ErrorCode::PLANNING_ERROR, "No Frame info");
   }
 
   if (path_data.discretized_path().empty()) {

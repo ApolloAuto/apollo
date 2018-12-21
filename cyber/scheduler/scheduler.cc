@@ -85,7 +85,7 @@ void Scheduler::ParseCpuset(const std::string& str, std::vector<int>* cpuset) {
 
   for (std::vector<std::string>::const_iterator it = lines.begin(),
                                                 e = lines.end();
-       it != e; it++) {
+       it != e; ++it) {
     std::stringstream ss(*it);
     std::vector<std::string> range;
 
