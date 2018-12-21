@@ -62,7 +62,7 @@ class LocalizationIntegImpl {
 
   // Lidar pcd process.
   void PcdProcess(const LidarFrame& lidar_frame);
-  // Raw Imu process.
+  // Imu process.
   void RawImuProcessRfu(const ImuData& imu_data);
 
   // Gnss Info process.
@@ -76,32 +76,17 @@ class LocalizationIntegImpl {
   // gnss heading process
   void GnssHeadingProcess(const drivers::gnss::Heading& gnssheading_msg);
 
-  void GetLastestLidarLocalization(LocalizationMeasureState* state,
-                                   LocalizationEstimate* lidar_localization);
+  const LocalizationResult& GetLastestLidarLocalization() const;
 
-  void GetLastestIntegLocalization(LocalizationMeasureState* state,
-                                   LocalizationEstimate* integ_localization);
+  const LocalizationResult& GetLastestIntegLocalization() const;
 
-  void GetLastestGnssLocalization(LocalizationMeasureState* state,
-                                  LocalizationEstimate* gnss_localization);
-
-  void GetLidarLocalizationList(std::list<LocalizationResult>* results);
-
-  void GetIntegLocalizationList(std::list<LocalizationResult>* results);
-
-  void GetGnssLocalizationList(std::list<LocalizationResult>* results);
+  const LocalizationResult& GetLastestGnssLocalization() const;
 
  protected:
-  void StartThreadLoop();
-  void StopThreadLoop();
-
-  void PcdThreadLoop();
   void PcdProcessImpl(const LidarFrame& pcd_data);
 
-  void ImuThreadLoop();
   void ImuProcessImpl(const ImuData& imu_data);
 
-  void GnssThreadLoop();
   void RawObservationProcessImpl(
       const drivers::gnss::EpochObservation& raw_obs_msg);
   void RawEphemerisProcessImpl(
@@ -109,7 +94,6 @@ class LocalizationIntegImpl {
   void GnssBestPoseProcessImpl(
       const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
-  void GnssHeadingThreadLoop();
   void GnssHeadingProcessImpl(const drivers::gnss::Heading& gnssheading_msg);
 
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
@@ -121,55 +105,14 @@ class LocalizationIntegImpl {
   LocalizationGnssProcess* gnss_process_;
   LocalizationLidarProcess* lidar_process_;
 
-  // lidar localizaiton result list
-  std::list<LocalizationResult> lidar_localization_list_;
-  size_t lidar_localization_list_max_size_ = 10;
-  std::mutex lidar_localization_mutex_;
+  LocalizationResult lastest_lidar_localization_;
+  LocalizationResult lastest_integ_localization_;
+  LocalizationResult lastest_gnss_localization_;
 
-  // integration localization result list
-  std::list<LocalizationResult> integ_localization_list_;
-  size_t integ_localization_list_max_size_ = 50;
-  std::mutex integ_localization_mutex_;
-
-  // gnss localization result list
-  std::list<LocalizationResult> gnss_localization_list_;
-  size_t gnss_localization_list_max_size_ = 10;
-  std::mutex gnss_localization_mutex_;
   bool is_use_gnss_bestpose_ = true;
 
-  // lidar process thread
-  std::atomic<bool> keep_lidar_running_;
-  std::thread lidar_data_thread_;
-  std::condition_variable lidar_data_signal_;
-  std::queue<LidarFrame> lidar_data_queue_;
-  size_t lidar_queue_max_size_ = 5;
-  std::mutex lidar_data_queue_mutex_;
   double imu_altitude_from_lidar_localization_ = 0.0;
   bool imu_altitude_from_lidar_localization_available_ = false;
-
-  // imu process thread
-  std::atomic<bool> keep_imu_running_;
-  std::thread imu_data_thread_;
-  std::condition_variable imu_data_signal_;
-  std::queue<ImuData> imu_data_queue_;
-  size_t imu_queue_max_size_ = 200;
-  std::mutex imu_data_queue_mutex_;
-
-  // gnss process thread
-  std::atomic<bool> keep_gnss_running_;
-  std::thread gnss_function_thread_;
-  std::condition_variable gnss_function_signal_;
-  std::queue<std::function<void()>> gnss_function_queue_;
-  size_t gnss_queue_max_size_ = 100;
-  std::mutex gnss_function_queue_mutex_;
-
-  // gnss heading process thread
-  std::atomic<bool> keep_gnss_heading_running_;
-  std::thread gnss_heading_function_thread_;
-  std::condition_variable gnss_heading_function_signal_;
-  std::queue<std::function<void()>> gnss_heading_function_queue_;
-  int gnss_heading_queue_max_size_;
-  std::mutex gnss_heading_function_queue_mutex_;
 
   bool enable_lidar_localization_ = true;
   Eigen::Affine3d gnss_antenna_extrinsic_;

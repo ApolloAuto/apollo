@@ -89,43 +89,19 @@ void LocalizationInteg::GnssHeadingProcess(
   return;
 }
 
-void LocalizationInteg::GetLastestLidarLocalization(
-    LocalizationMeasureState *state, LocalizationEstimate *lidar_localization) {
-  localization_integ_impl_->GetLastestLidarLocalization(state,
-                                                        lidar_localization);
-  return;
+const LocalizationResult& LocalizationInteg::
+    GetLastestLidarLocalization() const {
+  return localization_integ_impl_->GetLastestLidarLocalization();
 }
 
-void LocalizationInteg::GetLastestIntegLocalization(
-    LocalizationMeasureState *state, LocalizationEstimate *integ_localization) {
-  localization_integ_impl_->GetLastestIntegLocalization(state,
-                                                        integ_localization);
-  return;
+const LocalizationResult& LocalizationInteg::
+    GetLastestIntegLocalization() const {
+  return localization_integ_impl_->GetLastestIntegLocalization();
 }
 
-void LocalizationInteg::GetLastestGnssLocalization(
-    LocalizationMeasureState *state, LocalizationEstimate *gnss_localization) {
-  localization_integ_impl_->GetLastestGnssLocalization(state,
-                                                       gnss_localization);
-  return;
-}
-
-void LocalizationInteg::GetLidarLocalizationList(
-    std::list<LocalizationResult> *results) {
-  localization_integ_impl_->GetLidarLocalizationList(results);
-  return;
-}
-
-void LocalizationInteg::GetIntegLocalizationList(
-    std::list<LocalizationResult> *results) {
-  localization_integ_impl_->GetIntegLocalizationList(results);
-  return;
-}
-
-void LocalizationInteg::GetGnssLocalizationList(
-    std::list<LocalizationResult> *results) {
-  localization_integ_impl_->GetGnssLocalizationList(results);
-  return;
+const LocalizationResult& LocalizationInteg::
+    GetLastestGnssLocalization() const {
+  return localization_integ_impl_->GetLastestGnssLocalization();
 }
 
 void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
