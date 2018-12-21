@@ -59,7 +59,7 @@ class CosThetaReferenceLineSmootherTest : public ::testing::Test {
   }
 
   const std::string map_file =
-      "modules/planning/testdata/garage_map/base_map.txt";
+      "/apollo/modules/planning/testdata/garage_map/base_map.txt";
 
   hdmap::HDMap hdmap_;
   common::math::Vec2d vehicle_position_;

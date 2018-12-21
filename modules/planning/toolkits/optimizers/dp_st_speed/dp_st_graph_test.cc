@@ -32,20 +32,21 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::util::GetProtoFromFile;
+
 class DpStGraphTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     FLAGS_enable_multi_thread_in_dp_st_graph = false;
     FLAGS_scenario_lane_follow_config_file =
-        "modules/planning/conf/scenario_lane_follow_config.pb.txt";
+        "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt";
     ScenarioConfig config;
-    CHECK(apollo::common::util::GetProtoFromFile(
-        FLAGS_scenario_lane_follow_config_file, &config));
+    CHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
 
-    FLAGS_planning_config_file = "modules/planning/conf/planning_config.pb.txt";
+    FLAGS_planning_config_file =
+        "/apollo/modules/planning/conf/planning_config.pb.txt";
     PlanningConfig planning_config;
-    CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                                 &planning_config))
+    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
         << "failed to load planning config file " << FLAGS_planning_config_file;
 
     DpStSpeedConfig default_dp_config;
