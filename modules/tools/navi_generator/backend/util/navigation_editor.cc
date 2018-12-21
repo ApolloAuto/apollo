@@ -44,7 +44,7 @@ const char kWebSocketTypeSaveSpeedLimit[] = "requestSaveSpeedLimitCorrection";
 
 using std::placeholders::_1;  // for _1, _2, _3...
 
-NavigationEditor::NavigationEditor(UPDATE_GUI_FUNC task, void* gui_service)
+NavigationEditor::NavigationEditor(UPDATE_FRONTEND_FUNC task, void* gui_service)
     : update_gui_task_(std::bind(task, _1, gui_service)) {}
 
 bool NavigationEditor::CorrectDeviation(

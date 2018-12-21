@@ -23,9 +23,9 @@
 #ifndef MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_NAVIGATION_EDITOR_H_
 #define MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_NAVIGATION_EDITOR_H_
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/tools/navi_generator/backend/database/db_operator.h"
@@ -42,7 +42,7 @@ namespace util {
 class NavigationEditor {
  public:
   // NavigationEditor() = default;
-  NavigationEditor(UPDATE_GUI_FUNC task, void* gui_service);
+  NavigationEditor(UPDATE_FRONTEND_FUNC task, void* gui_service);
   ~NavigationEditor() = default;
 
  public:
