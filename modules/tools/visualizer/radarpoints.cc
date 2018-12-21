@@ -18,7 +18,8 @@
 
 #include <iostream>
 
-RadarPoints::RadarPoints(std::shared_ptr<QOpenGLShaderProgram> shaderProgram)
+RadarPoints::RadarPoints(
+    const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram)
     : RenderableObject(1, 3, shaderProgram),
       color_(1.0f, 0.0f, 0.0f),
       buffer_(nullptr) {}
@@ -35,10 +36,9 @@ bool RadarPoints::FillData(
     const ::google::protobuf::Map<::google::protobuf::int32,
                                   apollo::drivers::RadarObstacle>&
         radarObstacles = rawData->radar_obstacle();
-    for (::google::protobuf::Map<
-             ::google::protobuf::int32,
-             apollo::drivers::RadarObstacle>::const_iterator iter =
-             radarObstacles.cbegin();
+    for (::google::protobuf::Map<::google::protobuf::int32,
+                                 apollo::drivers::RadarObstacle>::const_iterator
+             iter = radarObstacles.cbegin();
          iter != radarObstacles.cend(); ++iter, ptr += vertex_element_count()) {
       const apollo::common::Point2D& position =
           iter->second.absolute_position();
