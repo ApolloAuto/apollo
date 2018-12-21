@@ -66,15 +66,17 @@ Based on the ROI LUT, the affiliation of each input point is queried using a two
 - Collects all the points that belong to the ROI and outputs their indices with respect to the input point cloud.
 
 
-Set the user-defined parameters in the configuration file: `modules/perception/model/hdmap_roi_filter.config`.
+Set the user-defined parameters in the configuration file: `modules/perception/production/data/perception/lidar/models/roi_filter/hdmap_roi_filter/hdmap_roi_filter.conf`.
 
 The table below describes the usage of parameters for HDMap ROI Filter.
 
 | Parameter Name | Usage                                    | Default     |
 | -------------- | ---------------------------------------- | ----------- |
-| range          | The range of ROI LUT (the 2D grid) with respect to the origin (LiDAR sensor). | 70.0 meters |
+| range          | The range of ROI LUT (the 2D grid) with respect to the origin (LiDAR sensor). | 120.0 meters |
 | cell_size      | The size of cells for quantizing the 2D grid. | 0.25 meter  |
 | extend_dist    | The distance that the ROI extends from the polygon boundary. | 0.0 meter   |
+| no_edge_table  | use edge_table for polygon mask generation. | false   |
+| set_roi_service| enable roi_service to perception lidar modules. | true   |
 
 Convolutional Neural Networks (CNN) Segmentation
 ------------------------------------------------
@@ -178,22 +180,29 @@ The class probabilities are summed up over the nodes (cells) within the object c
 
 After clustering, Apollo obtains a set of candidate object clusters each of which includes several cells. In the post-processing step, Apollo first computes the detection confidence score and object height for each candidate cluster by averaging the positiveness and object height values of its involved cells respectively. Then, Apollo removes the points that are too high with respect to the predicted object height and collects the points of valid cells for each candidate cluster. Finally, Apollo removes the candidate clusters that have either a very low confidence score or a small number of points, to output the final obstacle clusters/segments.
 
-Set the user-defined parameters in the configuration file `modules/perception/model/cnn\_segmentation/cnnseg.conf`.
+Set the user-defined parameters in the configuration file `modules/perception/production/data/perception/lidar/models/cnnseg/velodyne128/cnnseg_param.conf`.
 
 The table below explains the parameter usage and default values for CNN Segmentation.
 
 | Parameter Name               | Usage                                    | Default    |
 | ---------------------------- | ---------------------------------------- | ---------- |
 | objectness_thresh            | The threshold of objectness for filtering out non-object cells in the obstacle clustering step. | 0.5        |
-| use_all_grids_for_clustering | The option of specifying whether or not to use all cells to construct the graph in the obstacle clustering step. If not selected, only the occupied cells are considered. | true       |
+| model_type		       | Network type, e.g., RTNet means tensorRT accelerated network | RTNet       |
 | confidence_thresh            | The detection confidence score threshold for filtering out the candidate clusters in the post-processing step. | 0.1        |
+| confidence_range            | The confident range with respect to the origin (the LiDAR sensor)for good quality detection.| 85.0 meters        |
 | height_thresh                | If it is non-negative, the points that are higher than the predicted object height by height_thresh are filtered out in the post-processing step. | 0.5 meters |
 | min_pts_num                  | In the post-processing step, the candidate clusters with less than min_pts_num points are removed. | 3          |
-| use_full_cloud               | If it is set by true, all the points of the original point cloud are used for extracting channel features. Otherwise only the points of the input point cloud (i.e., the points after HDMap ROI filter) are used. | true       |
+| ground_detector              | Ground surface detector type. | SpatioTemporalGroundDetector       |
 | gpu_id                       | The ID of the GPU device used in the CNN-based obstacle prediction step. | 0          |
-| feature_param {width}        | The number of cells in X (column) axis of the 2D grid. | 512        |
-| feature_param {height}       | The number of cells in Y (row) axis of the 2D grid. | 512        |
-| feature_param {range}        | The range of the 2D grid with respect to the origin (the LiDAR sensor). | 60 meters  |
+| roi_filter                   | The ROI filter type, with help of the HDmap. | HdmapROIFilter       |
+| network_param {instance_pt_blob, etc}        | The types of different caffe input and outputlayer blob. | layer predefined |
+| feature_param {width}        | The number of cells in X (column) axis of the 2D grid. | 864        |
+| feature_param {height}       | The number of cells in Y (row) axis of the 2D grid. | 864        |
+| feature_param {min_height}   | The minimum height with respect to the origin (the LiDAR sensor). | -5.0 meters  |
+| feature_param {max_height}   | The maximum height with respect to the origin (the LiDAR sensor). | 5.0 meters |
+| feature_param {use_intensity_feature}        | Enable input channel internsity feature. | false |
+| feature_param {use_constant_feature}        | Enable input channel constant feature. | false |
+| feature_param {point_cloud_range}        | The range of the 2D grid with respect to the origin (the LiDAR sensor). | 90 meters  |
 
 **Note: the provided model is a sample for experiment purpose only.**
 
