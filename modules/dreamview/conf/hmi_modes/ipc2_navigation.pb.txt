@@ -1,0 +1,25 @@
+cyber_modules {
+  key: "Relative Map"
+  value: {
+    dag_files: "/apollo/modules/map/relative_map/dag/relative_map.dag"
+  }
+}
+cyber_modules {
+  key: "Planning"
+  value: {
+    dag_files: "/apollo/modules/planning/dag/planning_navi.dag"
+  }
+}
+cyber_modules {
+  key: "Prediction"
+  value: {
+    dag_files: "/apollo/modules/prediction/dag/prediction_navi.dag"
+  }
+}
+# Should specify control module after dag is ready
+cyber_modules {
+  key: "Control"
+  value: {
+    dag_files: "/apollo/modules/control/dag/control.dag"
+  }
+}
