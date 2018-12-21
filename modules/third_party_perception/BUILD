@@ -10,14 +10,7 @@ cc_library(
         ":third_party_perception_conversion",
         ":third_party_perception_filter",
         ":third_party_perception_fusion",
-        "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:message_util",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/third_party_perception/common:third_party_perception_gflags",
-        "//modules/third_party_perception/common:third_party_perception_util",
     ],
 )
 
@@ -31,11 +24,7 @@ cc_library(
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common/configs:config_gflags",
         "//modules/drivers/proto:sensor_proto",
-        "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",
         "//modules/third_party_perception/proto:third_party_perception_proto",
     ],
@@ -52,8 +41,6 @@ cc_library(
     deps = [
         "//modules/common/math:geometry",
         "//modules/perception/proto:perception_proto",
-        "//modules/third_party_perception/common:third_party_perception_gflags",
-        "//modules/third_party_perception/common:third_party_perception_util",
     ],
 )
 
@@ -66,7 +53,6 @@ cc_library(
         "filter.h",
     ],
     deps = [
-        "//modules/third_party_perception/common:third_party_perception_gflags",
         "//modules/third_party_perception/common:third_party_perception_util",
         "//modules/third_party_perception/proto:third_party_perception_proto",
     ],
@@ -83,7 +69,6 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"third_party_perception\\"'],
     deps = [
         ":third_party_perception_lib",
-        "//cyber",
     ],
 )
 

@@ -15,16 +15,12 @@
   *****************************************************************************/
 
 #include <algorithm>
-#include <cmath>
-#include <fstream>
 #include <limits>
 #include <queue>
 
-#include "cyber/common/log.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/topo_node.h"
 #include "modules/routing/strategy/a_star_strategy.h"
 
 namespace apollo {

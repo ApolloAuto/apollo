@@ -20,12 +20,8 @@
 
 #pragma once
 
-#include <map>
 #include <mutex>
-#include <queue>
 #include <string>
-
-#include "cyber/common/macros.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"

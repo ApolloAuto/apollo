@@ -15,13 +15,8 @@
  *****************************************************************************/
 #include "modules/third_party_perception/third_party_perception.h"
 
-#include <cmath>
-
-#include "cyber/common/log.h"
-#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
-#include "modules/third_party_perception/common/third_party_perception_util.h"
 #include "modules/third_party_perception/conversion.h"
 #include "modules/third_party_perception/filter.h"
 #include "modules/third_party_perception/fusion.h"
@@ -30,16 +25,12 @@ namespace apollo {
 namespace third_party_perception {
 
 using apollo::canbus::Chassis;
-using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
-using apollo::drivers::Esr_track01_500;
 using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using Point = apollo::common::Point3D;
 
 std::string ThirdPartyPerception::Name() const {
   return FLAGS_third_party_perception_node_name;

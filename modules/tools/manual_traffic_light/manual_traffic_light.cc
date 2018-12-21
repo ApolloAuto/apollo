@@ -15,35 +15,20 @@
  *****************************************************************************/
 
 #include <poll.h>
-#include <unistd.h>
-#include <cstdio>
-#include <fstream>
-#include <iostream>
 
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
-#include "gflags/gflags.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/color.h"
 #include "modules/common/util/message_util.h"
-#include "modules/common/util/string_util.h"
-#include "modules/localization/proto/localization.pb.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
-using apollo::common::PointENU;
 using apollo::common::color::ANSI_GREEN;
 using apollo::common::color::ANSI_RED;
 using apollo::common::color::ANSI_RESET;
 using apollo::common::util::PrintIter;
-using apollo::hdmap::HDMap;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::SignalInfoConstPtr;
 using apollo::localization::LocalizationEstimate;

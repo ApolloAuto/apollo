@@ -18,10 +18,6 @@
 
 #include "cyber/cyber.h"
 
-#include <functional>
-#include <memory>
-#include <string>
-
 class MainWindow;
 
 template <typename T>

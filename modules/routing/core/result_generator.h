@@ -23,7 +23,6 @@
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/routing/graph/node_with_range.h"
-#include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_range_manager.h"
 
 namespace apollo {

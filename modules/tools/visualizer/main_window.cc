@@ -14,29 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <QAction>
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
-#include <QContextMenuEvent>
-#include <QDebug>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QKeyEvent>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QTreeWidgetItem>
 
-#include <iostream>
-
-#include "cyber/init.h"
 #include "modules/tools/visualizer/fixedaspectratiowidget.h"
 #include "modules/tools/visualizer/grid.h"
 #include "modules/tools/visualizer/main_window.h"
 #include "modules/tools/visualizer/pointcloud.h"
 #include "modules/tools/visualizer/radarpoints.h"
-#include "modules/tools/visualizer/texture.h"
 #include "modules/tools/visualizer/ui_main_window.h"
 #include "modules/tools/visualizer/video_images_dialog.h"
 
