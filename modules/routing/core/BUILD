@@ -20,12 +20,7 @@ cc_library(
     deps = [
         ":routing_black_list_range_generator",
         ":routing_result_generator",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/time",
         "//modules/common/util",
-        "//modules/routing/common:routing_gflags",
-        "//modules/routing/graph",
-        "//modules/routing/proto:routing_proto",
         "//modules/routing/strategy",
     ],
 )
@@ -52,10 +47,7 @@ cc_library(
         "result_generator.h",
     ],
     deps = [
-        "//modules/common/time",
-        "//modules/common/util:map_util",
         "//modules/routing/graph",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 

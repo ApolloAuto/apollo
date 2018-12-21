@@ -15,14 +15,9 @@
  *****************************************************************************/
 
 #include <QApplication>
-#include <QFile>
 #include <QOffscreenSurface>
-#include <QOpenGLContext>
 #include <QOpenGLFunctions>
-#include <QSurfaceFormat>
-#include <sstream>
 
-#include "cyber/init.h"
 #include "modules/tools/visualizer/main_window.h"
 
 int main(int argc, char* argv[]) {

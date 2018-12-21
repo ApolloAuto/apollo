@@ -16,17 +16,9 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "gtest/gtest.h"
 
-#include "cyber/common/macros.h"
-
-#include "modules/third_party_perception/proto/radar_obstacle.pb.h"
-
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
-#include "modules/third_party_perception/third_party_perception.h"
 
 #define RUN_GOLDEN_TEST                                          \
   {                                                              \

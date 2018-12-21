@@ -18,15 +18,8 @@
 
 #include <QContextMenuEvent>
 #include <QMenu>
-#include <QMouseEvent>
-#include <QPaintEvent>
 #include <QPainter>
-#include <QResizeEvent>
-#include <QStyle>
 #include <QStyleOption>
-#include <iostream>
-
-#include "modules/tools/visualizer/texture.h"
 
 FixedAspectRatioWidget::FixedAspectRatioWidget(QWidget* parent, int index)
     : QWidget(parent), index_(index), refresh_timer_(this), viewer_() {

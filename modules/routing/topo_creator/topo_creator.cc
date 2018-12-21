@@ -14,12 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/log.h"
-
-#include "modules/routing/proto/routing_config.pb.h"
-
-#include "modules/common/configs/config_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/topo_creator/graph_creator.h"

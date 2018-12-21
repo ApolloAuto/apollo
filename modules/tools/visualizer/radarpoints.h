@@ -17,8 +17,6 @@
 #pragma once
 
 #include <QColor>
-#include <QRgb>
-#include <QVector3D>
 
 #include "modules/drivers/proto/radar.pb.h"
 #include "modules/tools/visualizer/renderable_object.h"
