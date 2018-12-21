@@ -29,7 +29,7 @@ using base::PointF;
 using base::PointD;
 using base::PointCloud;
 
-void GetBoundingBox2d(const std::shared_ptr<Object> object,
+void GetBoundingBox2d(const std::shared_ptr<Object>& object,
                       PointCloud<PointD>* box, double expand) {
   box->clear();
   box->resize(4);

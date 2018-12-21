@@ -402,11 +402,11 @@ class OpenSpaceROITest {
     hdmap::Id target_lane_id;
     target_lane_id.set_id(parking_id);
     auto nearby_lane = map_ptr->GetLaneById(nearby_lane_id);
-    std::cout << "the lane found is " << nearby_lane->id().id() << std::endl;
     if (nearby_lane == nullptr) {
       std::cout << "No such lane found " << lane_id << std::endl;
       return false;
     }
+    std::cout << "the lane found is " << nearby_lane->id().id() << std::endl;
     LaneSegment nearby_lanesegment =
         LaneSegment(nearby_lane, nearby_lane->accumulate_s().front(),
                     nearby_lane->accumulate_s().back());

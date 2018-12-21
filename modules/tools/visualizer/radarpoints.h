@@ -25,54 +25,51 @@
 
 class QOpenGLShaderProgram;
 
-class RadarPoints : public RenderableObject
-{
-    /* struct Point{
-     *    GLfloat x, // raw data from radar
-     *    GLfloat y,
-     *    GLfloat r
-     * };
-     */
+class RadarPoints : public RenderableObject {
+  /* struct Point{
+   *    GLfloat x, // raw data from radar
+   *    GLfloat y,
+   *    GLfloat r
+   * };
+   */
 
-public:
-    explicit RadarPoints(std::shared_ptr<QOpenGLShaderProgram> shaderProgram = nullptr);
-    ~RadarPoints(void){
-        if(buffer_){
-            delete [] buffer_;
-            buffer_ = nullptr;
-        }
+ public:
+  explicit RadarPoints(
+      const std::shared_ptr<QOpenGLShaderProgram>& shaderProgram = nullptr);
+  ~RadarPoints(void) {
+    if (buffer_) {
+      delete[] buffer_;
+      buffer_ = nullptr;
     }
+  }
 
-    virtual GLenum GetPrimitiveType(void) const { return GL_POINTS; }
+  virtual GLenum GetPrimitiveType(void) const { return GL_POINTS; }
 
-    void SetupExtraUniforms(void) {
-      shader_program_->setUniformValue("color", color_);
-    }
+  void SetupExtraUniforms(void) {
+    shader_program_->setUniformValue("color", color_);
+  }
 
-    GLfloat red(void) const { return color_.x(); }
-    GLfloat green(void) const { return color_.y(); }
-    GLfloat blue(void) const { return color_.z(); }
+  GLfloat red(void) const { return color_.x(); }
+  GLfloat green(void) const { return color_.y(); }
+  GLfloat blue(void) const { return color_.z(); }
 
-    const QVector3D& color(void) const { return color_; }
+  const QVector3D& color(void) const { return color_; }
 
-    void set_color(const QRgb& rgb){
-        set_color(QColor(rgb));
-    }
+  void set_color(const QRgb& rgb) { set_color(QColor(rgb)); }
 
-    void set_color(const QColor& color) {
-        color_.setX(static_cast<float>(color.redF()));
-        color_.setY(static_cast<float>(color.greenF()));
-        color_.setZ(static_cast<float>(color.blueF()));
-    }
+  void set_color(const QColor& color) {
+    color_.setX(static_cast<float>(color.redF()));
+    color_.setY(static_cast<float>(color.greenF()));
+    color_.setZ(static_cast<float>(color.blueF()));
+  }
 
-    bool FillData(
-        const std::shared_ptr<const apollo::drivers::RadarObstacles>& pData);
+  bool FillData(
+      const std::shared_ptr<const apollo::drivers::RadarObstacles>& pData);
 
-protected:
-    bool FillVertexBuffer(GLfloat* pBuffer) override;
+ protected:
+  bool FillVertexBuffer(GLfloat* pBuffer) override;
 
-private:
-
-    QVector3D color_; // r, g, b
-    GLfloat* buffer_;
+ private:
+  QVector3D color_;  // r, g, b
+  GLfloat* buffer_;
 };
