@@ -26,10 +26,12 @@ limitations under the License.
 namespace apollo {
 namespace dreamview {
 
+using apollo::drivers::CompressedImage;
 using apollo::drivers::Image;
 
 constexpr double ImageHandler::kImageScale;
 
+template <>
 void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
   if (requests_ == 0) {
     return;
@@ -39,13 +41,27 @@ void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
               const_cast<char *>(image->data().data()), image->step());
   cv::cvtColor(mat, mat, cv::COLOR_RGB2BGR);
   cv::resize(
-    mat, mat,
-    cv::Size(static_cast<int>(image->width() * ImageHandler::kImageScale),
-             static_cast<int>(image->height() * ImageHandler::kImageScale)),
-    0, 0, CV_INTER_LINEAR);
+      mat, mat,
+      cv::Size(static_cast<int>(image->width() * ImageHandler::kImageScale),
+               static_cast<int>(image->height() * ImageHandler::kImageScale)),
+      0, 0, CV_INTER_LINEAR);
 
   std::unique_lock<std::mutex> lock(mutex_);
   cv::imencode(".jpg", mat, send_buffer_, std::vector<int>() /* params */);
+  cvar_.notify_all();
+}
+
+template <>
+void ImageHandler::OnImage(
+    const std::shared_ptr<CompressedImage> &compressed_image) {
+  std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
+                                           compressed_image->data().end());
+  cv::Mat mat_image = cv::imdecode(compressed_raw_data, CV_LOAD_IMAGE_COLOR);
+  cv::cvtColor(mat_image, mat_image, cv::COLOR_RGB2BGR);
+
+  std::unique_lock<std::mutex> lock(mutex_);
+  cv::imencode(".jpg", mat_image, send_buffer_,
+               std::vector<int>() /* params */);
   cvar_.notify_all();
 }
 
@@ -55,7 +71,7 @@ void ImageHandler::OnImageFront(const std::shared_ptr<Image> &image) {
   }
 }
 
-void ImageHandler::OnImageShort(const std::shared_ptr<Image> &image) {
+void ImageHandler::OnImageShort(const std::shared_ptr<CompressedImage> &image) {
   if (!FLAGS_use_navigation_mode) {
     OnImage(image);
   }
@@ -69,9 +85,9 @@ ImageHandler::ImageHandler()
         OnImageFront(image);
       });
 
-  node_->CreateReader<Image>(
+  node_->CreateReader<CompressedImage>(
       FLAGS_image_short_topic,
-      [this](const std::shared_ptr<Image> &image) {
+      [this](const std::shared_ptr<CompressedImage> &image) {
         OnImageShort(image);
       });
 }
