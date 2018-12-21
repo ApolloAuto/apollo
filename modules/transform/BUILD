@@ -44,6 +44,7 @@ cc_library(
         "//cyber",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
+        "@yaml_cpp//:yaml",
     ],
 )
 
