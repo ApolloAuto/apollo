@@ -18,7 +18,6 @@
  * @file
  */
 
-#include <cmath>
 #include <map>
 #include <vector>
 
@@ -38,7 +37,6 @@ namespace third_party_perception {
 namespace conversion {
 
 using apollo::canbus::Chassis;
-using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;

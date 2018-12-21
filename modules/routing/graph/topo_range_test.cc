@@ -14,15 +14,11 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include <algorithm>
-#include <string>
-
 #include "gtest/gtest.h"
 
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/node_with_range.h"
 #include "modules/routing/graph/range_utils.h"
-#include "modules/routing/graph/topo_test_utils.h"
 
 namespace apollo {
 namespace routing {

@@ -16,13 +16,7 @@
 
 #include "modules/tools/visualizer/video_image_viewer.h"
 
-#include <QContextMenuEvent>
-#include <QMenu>
-#include <QMouseEvent>
-#include <QTimer>
 #include <iostream>
-
-#include "modules/tools/visualizer/texture.h"
 
 VideoImgViewer::VideoImgViewer(QWidget* parent)
     : QOpenGLWidget(parent),

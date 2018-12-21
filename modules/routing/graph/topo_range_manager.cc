@@ -20,14 +20,10 @@
 #include <utility>
 
 #include "cyber/common/log.h"
-#include "modules/common/util/map_util.h"
 
 namespace apollo {
 namespace routing {
 namespace {
-
-using apollo::common::util::ContainsKey;
-using apollo::common::util::FindOrDieNoPrint;
 
 void merge_block_range(const TopoNode* topo_node,
                        const std::vector<NodeSRange>& origin_range,

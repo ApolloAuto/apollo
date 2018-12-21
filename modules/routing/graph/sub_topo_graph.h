@@ -17,13 +17,11 @@
 #pragma once
 
 #include <memory>
-#include <queue>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #include "modules/routing/graph/node_with_range.h"
-#include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
 namespace routing {

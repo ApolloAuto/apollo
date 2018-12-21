@@ -11,7 +11,6 @@ cc_library(
         "routing_gflags.h",
     ],
     deps = [
-        "//external:gflags",
     ],
 )
 

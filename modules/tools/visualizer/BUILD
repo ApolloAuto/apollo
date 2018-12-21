@@ -18,11 +18,6 @@ cc_binary(
     ],
     deps = [
         ":visualizer_lib",
-        "//cyber",
-        "@qt//:qt_core",
-        "@qt//:qt_gui",
-        "@qt//:qt_opengl",
-        "@qt//:qt_widgets",
     ],
 )
 
@@ -51,10 +46,7 @@ qt_cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/proto:sensor_proto",
-        "@qt//:qt_core",
         "@qt//:qt_gui",
-        "@qt//:qt_opengl",
-        "@qt//:qt_widgets",
     ],
 )
 

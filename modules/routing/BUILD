@@ -11,16 +11,10 @@ cc_library(
         "routing.h",
     ],
     deps = [
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
-        "//modules/common/status",
-        "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/routing/common:routing_gflags",
         "//modules/routing/core",
-        "//modules/routing/graph",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 

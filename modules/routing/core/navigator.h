@@ -18,15 +18,10 @@
 
 #include <memory>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 #include "modules/routing/core/black_list_range_generator.h"
 #include "modules/routing/core/result_generator.h"
-#include "modules/routing/graph/node_with_range.h"
-#include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/topo_range_manager.h"
-#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace routing {

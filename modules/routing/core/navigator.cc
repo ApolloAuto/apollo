@@ -16,12 +16,6 @@
 
 #include "modules/routing/core/navigator.h"
 
-#include <algorithm>
-#include <fstream>
-
-#include "modules/common/proto/error_code.pb.h"
-
-#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"

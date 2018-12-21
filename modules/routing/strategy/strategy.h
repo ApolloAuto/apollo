@@ -16,12 +16,7 @@
 
 #pragma once
 
-#include <unordered_set>
 #include <vector>
-
-#include "modules/routing/graph/sub_topo_graph.h"
-#include "modules/routing/graph/topo_graph.h"
-#include "modules/routing/graph/topo_node.h"
 
 namespace apollo {
 namespace routing {

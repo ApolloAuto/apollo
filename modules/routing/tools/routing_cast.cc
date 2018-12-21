@@ -14,13 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "cyber/init.h"
 #include "cyber/time/rate.h"
-#include "cyber/time/time.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/message_util.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -29,7 +25,6 @@ DEFINE_string(routing_dump_file,
               "file name to dump routing response.");
 
 using apollo::cyber::Rate;
-using apollo::cyber::Time;
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);

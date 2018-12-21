@@ -23,9 +23,6 @@
 #include <vector>
 
 #include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/third_party_perception/common/third_party_perception_gflags.h"
-#include "modules/third_party_perception/common/third_party_perception_util.h"
 
 /**
  * @namespace apollo::third_party_perception::fusion
