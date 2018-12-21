@@ -139,7 +139,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
 
   // check for driving straight
   if (!IsTravelingStraight(vehicle_yaw_changed)) {
-    AERROR << "Do not calibate if not moving straight: "
+    AINFO << "Do not calibate if not moving straight: "
               << "yaw angle changed " << vehicle_yaw_changed;
     vp_buffer_.clear();
     return false;
@@ -150,7 +150,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
 
   // get the current estimation on vanishing point from lane
   if (!GetVanishingPoint(lane, &vp_cur)) {
-    AERROR << "Lane is not valid for calibration.";
+    AINFO << "Lane is not valid for calibration.";
     return false;
   }
   vp_cur.distance_traveled = distance_traveled_in_meter;
@@ -159,14 +159,14 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
   // push vanishing point into buffer
   PushVanishingPoint(vp_cur);
   if (!PopVanishingPoint(&vp_work)) {
-    AERROR << "Driving distance is not long enough";
+    AINFO << "Driving distance is not long enough";
     return false;
   }
 
   // get current estimation on pitch
   pitch_cur_ = 0.0f;
   if (!GetPitchFromVanishingPoint(vp_work, &pitch_cur_)) {
-    AERROR << "Fail to estimate pitch from vanishing point.";
+    AINFO << "Fail to estimate pitch from vanishing point.";
     return false;
   }
 //  std::cout << "#current pitch: " << pitch_cur_ << std::endl;
@@ -174,7 +174,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
 
   // get the filtered output using histogram
   if (!AddPitchToHistogram(pitch_cur_)) {
-    AERROR << "Calculated pitch is out-of-range.";
+    AINFO << "Calculated pitch is out-of-range.";
     return false;
   }
 
@@ -247,14 +247,14 @@ bool LaneBasedCalibrator::GetVanishingPoint(const EgoLane &lane,
   bool get_line_seg_left
       = SelectTwoPointsFromLineForVanishingPoint(lane.left_line, line_seg_l);
   if (!get_line_seg_left) {
-    AERROR << "left lane is too short.";
+    AINFO << "left lane is too short.";
     return false;
   }
 
   bool get_line_seg_right
       = SelectTwoPointsFromLineForVanishingPoint(lane.right_line, line_seg_r);
   if (!get_line_seg_right) {
-    AERROR << "right lane is too short.";
+    AINFO << "right lane is too short.";
     return false;
   }
 
