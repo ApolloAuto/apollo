@@ -35,6 +35,7 @@
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
+#include "modules/tools/navi_generator/backend/util/file_operator.h"
 
 namespace apollo {
 namespace navi_generator {
@@ -177,31 +178,8 @@ bool TrajectorySmoother::Smooth() {
 }
 
 bool TrajectorySmoother::Export(const std::string& filename) {
-  if (ref_points_.empty()) {
-    AERROR << "There aren't any smoothed points to output.";
-    return false;
-  }
-
-  std::ofstream ofs(filename.c_str());
-  if (!ofs.is_open()) {
-    AERROR << "Failed to open the output file: " << filename;
-    return false;
-  }
-  ofs.precision(6);
-  double s = 0.0;
-  // skip the first point and the last point
-  for (std::size_t i = 1; i + 1 < ref_points_.size(); ++i) {
-    const auto& point = ref_points_[i];
-    ofs << std::fixed << "{\"kappa\": " << point.kappa() << ", \"s\": " << s
-        << ", \"theta\": " << point.heading() << ", \"x\":" << point.x()
-        << ", \"y\":" << point.y() << ", \"dkappa\":" << point.dkappa() << "}"
-        << std::endl;
-    s += DistanceXY(point, ref_points_[i + 1]);
-  }
-  ofs.close();
-  AINFO << "The smoothed result is saved to the file: " << filename;
-
-  return true;
+  FileOperator file_operator;
+  return file_operator.Export(filename, ref_points_);
 }
 
 bool TrajectorySmoother::SmoothPoints(
