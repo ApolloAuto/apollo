@@ -88,7 +88,7 @@ export default class Dreamview extends React.Component {
                         <div className="right-pane">
                             {options.showPNCMonitor && options.showVideo &&
                                 <div>
-                                    <Tab><span>Camera Sensor</span></Tab>
+                                    <Tab><span>Camera View</span></Tab>
                                     <CameraVideo />
                                 </div>
                             }
