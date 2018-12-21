@@ -28,8 +28,8 @@ bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
   int time_field_index = 0;
   int validity_field_index = 0;
   int date_field_index = 0;
-  while (bytes[++gprmc_index] != '*' &&
-         gprmc_index < POSITIONING_DATA_PACKET_SIZE) {
+  while (++gprmc_index < POSITIONING_DATA_PACKET_SIZE - 6 &&
+         bytes[gprmc_index] != '*') {
     if (bytes[gprmc_index] == ',') {
       ++field_count;
       if (field_count == 1 && time_field_index == 0) {
@@ -45,6 +45,10 @@ bool Input::exract_nmea_time_from_packet(NMEATimePtr nmea_time,
         break;
       }
     }
+  }
+
+  if (gprmc_index == POSITIONING_DATA_PACKET_SIZE - 6) {
+    return false;
   }
 
   nmea_time->year =
