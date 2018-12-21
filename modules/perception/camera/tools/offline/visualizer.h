@@ -29,9 +29,22 @@ class Visualizer {
  public:
   bool Init(const std::vector<std::string> &camera_names,
             TransformServer *tf_server);
+  bool Init_all_info_single_camera(const std::string &camera_name,
+            std::map<std::string, Eigen::Matrix3f> intrinsic_map,
+            std::map<std::string, Eigen::Matrix4d> extrinsic_map,
+            Eigen::Matrix4d ex_lidar2imu, double pitch_adj);
   void SetDirectory(const std::string &path);
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
+  void ShowResult_all_info_single_camera(const cv::Mat &img,
+                                      const CameraFrame &frame);
+  void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
+                                      const CameraFrame &frame,
+                                      Eigen::Matrix3d intrinsic,
+                                      Eigen::Matrix4d extrinsic);
+  cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
+  Eigen::Vector2d image2ground(cv::Point p_img);
+
  private:
   std::map<std::string, cv::Mat> camera_image_;
   cv::Mat world_image_;
@@ -44,7 +57,13 @@ class Visualizer {
   int world_h_ = 0;
   int m2pixel_ = 0;
   void draw_range_circle();
-  cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
+
+  // map for store params
+  std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
+  std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
+
+  // homograph between image and lider ground plane
+  Eigen::Matrix3d homography_;
 };
 
 }  // namespace camera

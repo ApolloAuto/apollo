@@ -15,8 +15,12 @@
 *****************************************************************************/
 #pragma once
 
+#include <Eigen/Core>
+#include <Eigen/Dense>
+
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -25,32 +29,38 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
-#include "modules/perception/camera/app/obstacle_camera_perception.h"
+#include "modules/perception/camera/app/lane_camera_perception.h"
 #include "modules/perception/camera/app/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
+#include "modules/perception/camera/lib/motion_service/motion_service.h"
 #include "modules/perception/onboard/component/camera_perception_viz_message.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
-#include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
+#include "modules/perception/onboard/proto/lane_perception_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/perception_camera.pb.h"
+#include "modules/perception/proto/perception_lane.pb.h"
+#include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
+
+typedef std::shared_ptr<apollo::perception::Motion_Service>
+                                         MotionServiceMsgType;
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
-class FusionCameraDetectionComponent :
+typedef Eigen::Matrix4d MotionType;
+
+class LaneDetectionComponent :
     public apollo::cyber::Component<> {
  public:
-  FusionCameraDetectionComponent() : seq_num_(0) {}
-  ~FusionCameraDetectionComponent();
+  LaneDetectionComponent() : seq_num_(0) {}
+  ~LaneDetectionComponent();
 
-  FusionCameraDetectionComponent(
-      const FusionCameraDetectionComponent&) = delete;
-  FusionCameraDetectionComponent& operator=(
-      const FusionCameraDetectionComponent&) = delete;
+  LaneDetectionComponent(
+      const LaneDetectionComponent&) = delete;
+  LaneDetectionComponent& operator=(
+      const LaneDetectionComponent&) = delete;
 
   bool Init() override;
 
@@ -58,39 +68,30 @@ class FusionCameraDetectionComponent :
   void OnReceiveImage(
       const std::shared_ptr<apollo::drivers::Image>& in_message,
       const std::string &camera_name);
+  void OnMotionService(
+      const MotionServiceMsgType& in_message);
   int InitConfig();
   int InitSensorInfo();
   int InitAlgorithmPlugin();
   int InitCameraFrames();
   int InitProjectMatrix();
+  int InitMotionService();
   int InitCameraListeners();
   void SetCameraHeightAndPitch();
-
 
   int InternalProc(
       const std::shared_ptr<apollo::drivers::Image const>& in_message,
       const std::string &camera_name,
       apollo::common::ErrorCode *error_code,
       SensorFrameMessage* prefused_message,
-      apollo::perception::PerceptionObstacles* out_message);
-
-  int MakeProtobufMsg(double msg_timestamp,
-      int seq_num, const std::vector<base::ObjectPtr>& objects,
-      const apollo::common::ErrorCode error_code,
-      apollo::perception::PerceptionObstacles* obstacles);
-
-  int ConvertObjectToPb(const base::ObjectPtr& object_ptr,
-      apollo::perception::PerceptionObstacle* pb_msg);
-
-  int ConvertObjectToCameraObstacle(const base::ObjectPtr& object_ptr,
-      apollo::perception::camera::CameraObstacle* camera_obstacle);
+      apollo::perception::PerceptionLanes* out_message);
 
   int ConvertLaneToCameraLaneline(const base::LaneLine& lane_line,
       apollo::perception::camera::CameraLaneLine* camera_laneline);
 
-  int MakeCameraDebugMsg(double msg_timestamp, const std::string& camera_name,
+  int MakeProtobufMsg(double msg_timestamp, const std::string& camera_name,
       const camera::CameraFrame& camera_frame,
-      apollo::perception::camera::CameraDebug* camera_debug_msg);
+      apollo::perception::PerceptionLanes* lanes_msg);
 
  private:
   std::mutex mutex_;
@@ -108,7 +109,6 @@ class FusionCameraDetectionComponent :
   std::map<std::string, float> camera_height_map_;
 
   // camera_pitch_angle_diff
-  // the pitch_diff = pitch_narrow - pitch_obstacle
   std::map<std::string, float> name_camera_pitch_angle_diff_map_;
 
   // TF stuff
@@ -124,10 +124,10 @@ class FusionCameraDetectionComponent :
   std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
   std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
 
-  // camera obstacle pipeline
+  // camera lane pipeline
   camera::CameraPerceptionInitOptions camera_perception_init_options_;
   camera::CameraPerceptionOptions camera_perception_options_;
-  std::unique_ptr<camera::ObstacleCameraPerception> camera_obstacle_pipeline_;
+  std::unique_ptr<camera::LaneCameraPerception> camera_lane_pipeline_;
 
   // fixed size camera frames
   int frame_capacity_ = 20;
@@ -149,16 +149,9 @@ class FusionCameraDetectionComponent :
 
   double timestamp_offset_ = 0.0;
 
-  std::string prefused_channel_name_;
-
   bool enable_visualization_ = false;
-  std::string camera_perception_viz_message_channel_name_;
 
-  bool output_final_obstacles_ = false;
-  std::string output_obstacles_channel_name_;
-
-  bool output_camera_debug_msg_ = false;
-  std::string camera_debug_channel_name_;
+  std::string output_lanes_channel_name_;
 
   Eigen::Matrix3d project_matrix_;
   double pitch_diff_ = 0.0;
@@ -167,22 +160,16 @@ class FusionCameraDetectionComponent :
   double ts_diff_ = 1.0;
 
   std::shared_ptr<apollo::cyber::Writer<
-        apollo::perception::PerceptionObstacles>> writer_;
+        apollo::perception::PerceptionLanes>> writer_;
 
-  std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>>
-        sensorframe_writer_;
-
-  std::shared_ptr<apollo::cyber::Writer<
-        CameraPerceptionVizMessage>> camera_viz_writer_;
-
-  std::shared_ptr<apollo::cyber::Writer<
-        apollo::perception::camera::CameraDebug>> camera_debug_writer_;
+  base::MotionBufferPtr mot_buffer_;
+  const int motion_buffer_size_ = 100;
 
   camera::Visualizer visualize_;
   std::string visual_camera_ = "front_6mm";
 };
 
-CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);
+CYBER_REGISTER_COMPONENT(LaneDetectionComponent);
 
 }  // namespace onboard
 }  // namespace perception

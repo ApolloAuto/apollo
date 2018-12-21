@@ -29,31 +29,31 @@ bool TransformServer::Init(const std::vector<std::string> &camera_names,
   // 1. init lidar height
   try {
     YAML::Node lidar_height =
-      YAML::LoadFile(params_dir + "/" + "velodyne64_height.yaml");
+      YAML::LoadFile(params_dir + "/" + "velodyne128_height.yaml");
     Eigen::Affine3d trans;
     trans.linear() = Eigen::Matrix3d::Identity();
     AINFO << trans.translation() << " "
              << lidar_height["vehicle"]["parameters"]["height"];
     trans.translation() << 0.0, 0.0,
       lidar_height["vehicle"]["parameters"]["height"].as<double>();
-    AddTransform("velodyne64", "ground", trans);
+    AddTransform("velodyne128", "ground", trans);
   } catch (YAML::InvalidNode &in) {
-    AERROR << "load velodyne64 extrisic file error"
+    AERROR << "load velodyne128 extrisic file error"
               << " YAML::InvalidNode exception";
     return false;
   } catch (YAML::TypedBadConversion<float> &bc) {
-    AERROR << "load velodyne64 extrisic file error, "
+    AERROR << "load velodyne128 extrisic file error, "
               << "YAML::TypedBadConversion exception";
     return false;
   } catch (YAML::Exception &e) {
-    AERROR << "load velodyne64 extrisic file "
+    AERROR << "load velodyne128 extrisic file "
               << " error, YAML exception:" << e.what();
     return false;
   }
   // 2. init lidar and camera extrinsic
   std::vector<std::string> extrinsic_filelist;
   extrinsic_filelist.push_back(
-    params_dir + "/velodyne64_novatel_extrinsics.yaml");
+    params_dir + "/velodyne128_novatel_extrinsics.yaml");
   for (const auto &camera_name : camera_names) {
     extrinsic_filelist.push_back(
       params_dir + "/" + camera_name + "_extrinsics.yaml");
