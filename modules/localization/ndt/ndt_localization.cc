@@ -51,6 +51,12 @@ void NDTLocalization::Init() {
            << lidar_extrinsics_file;
     return;
   }
+  Eigen::Quaterniond ext_quat(velodyne_extrinsic_.linear());
+  AINFO << "lidar extrinsics: " << velodyne_extrinsic_.translation().x()
+        << ", " << velodyne_extrinsic_.translation().y()
+        << ", " << velodyne_extrinsic_.translation().z()
+        << ", " << ext_quat.x() << ", " << ext_quat.y()
+        << ", " << ext_quat.z() << ", " << ext_quat.w();
 
   sucess = LoadLidarHeight(lidar_height_file, &lidar_height_);
   if (!sucess) {
@@ -160,14 +166,14 @@ void NDTLocalization::LidarCallback(
 
   double time_stamp = lidar_frame.measurement_time;
   Eigen::Affine3d odometry_pose = Eigen::Affine3d::Identity();
-  if (!QueryPoseFromTF(time_stamp, &odometry_pose)) {
-    if (!QueryPoseFromBuffer(time_stamp, &odometry_pose)) {
+  if (!QueryPoseFromBuffer(time_stamp, &odometry_pose)) {
+    if (!QueryPoseFromTF(time_stamp, &odometry_pose)) {
       AERROR << "Can not query forcast pose";
       return;
     }
-    AINFO << "Query pose from buffer";
-  } else {
     AINFO << "Query pose from TF";
+  } else {
+    AINFO << "Query pose from buffer";
   }
   if (!lidar_locator_.IsInitialized()) {
     lidar_locator_.Init(odometry_pose, resolution_id_, zone_id_);

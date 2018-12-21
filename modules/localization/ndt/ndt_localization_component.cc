@@ -49,7 +49,7 @@ bool NDTLocalizationComponent::Init() {
 bool NDTLocalizationComponent::InitConfig() {
   localization_topic_ = FLAGS_localization_topic;
   lidar_topic_ = FLAGS_lidar_topic;
-  lidar_pose_topic_ = FLAGS_localization_lidar_topic;
+  lidar_pose_topic_ = FLAGS_localization_ndt_topic;
   broadcast_tf_frame_id_ = FLAGS_broadcast_tf_frame_id;
   broadcast_tf_child_frame_id_ = FLAGS_broadcast_tf_child_frame_id;
 
