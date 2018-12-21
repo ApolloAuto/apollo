@@ -62,7 +62,6 @@ bool LocationRefinerObstaclePostprocessor::Process(
       && !frame->calibration_service->QueryGroundPlaneInCameraFrame(&plane)
       ) {
     AINFO << "No valid ground plane in the service.";
-    return false;
   }
   float query_plane[4] = {static_cast<float>(plane(0)),
                           static_cast<float>(plane(1)),
