@@ -75,7 +75,7 @@ bool Pt3dToCamera2d(const Eigen::Vector3d& pt3d,
 // @param [in]: world2camera_pose
 // @param [in]: camera_model
 bool IsObjectEightVerticesAllBehindCamera(
-    std::shared_ptr<const base::Object> obj,
+    const std::shared_ptr<const base::Object>& obj,
     const Eigen::Matrix4d& world2camera_pose,
     base::BaseCameraModelPtr camera_model);
 

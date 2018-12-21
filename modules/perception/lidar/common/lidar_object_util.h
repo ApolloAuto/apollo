@@ -27,7 +27,7 @@ namespace lidar {
 // @param [in]: object
 // @param [in]: expand valud, in meter
 // @param [out]: bounding box vertices(4 in xy plane)
-void GetBoundingBox2d(const std::shared_ptr<base::Object> object,
+void GetBoundingBox2d(const std::shared_ptr<base::Object>& object,
                       base::PointCloud<base::PointD>* box, double expand = 0.0);
 
 // @brief: compute object shape(center, size) from given direction and polygon
