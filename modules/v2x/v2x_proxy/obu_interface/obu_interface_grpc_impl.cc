@@ -20,19 +20,14 @@
  */
 #include "modules/v2x/v2x_proxy/obu_interface/obu_interface_grpc_impl.h"
 
-#include <memory>
 #include <string>
 #include <utility>
-
-#include "modules/v2x/common/v2x_proxy_gflags.h"
 
 namespace apollo {
 namespace v2x {
 
 using apollo::perception::PerceptionObstacles;
-using grpc::Server;
 using grpc::ServerBuilder;
-using grpc::ServerContext;
 
 ObuInterFaceGrpcImpl::ObuInterFaceGrpcImpl() {
   AINFO << "ObuInterFaceGrpcImpl Start Construct.";

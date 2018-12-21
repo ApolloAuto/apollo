@@ -21,14 +21,7 @@
 
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_server.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
-#include "modules/v2x/common/v2x_proxy_gflags.h"
-
-using grpc::Server;
-using grpc::ServerBuilder;
-using grpc::ServerContext;
 
 namespace apollo {
 namespace v2x {

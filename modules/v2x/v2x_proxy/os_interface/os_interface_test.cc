@@ -21,11 +21,7 @@
 
 #include "modules/v2x/v2x_proxy/os_interface/os_interface.h"
 
-#include <iostream>
-
-#include "cyber/init.h"
 #include "gtest/gtest.h"
-#include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {
 namespace v2x {

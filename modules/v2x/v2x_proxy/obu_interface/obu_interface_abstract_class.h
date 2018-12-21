@@ -21,16 +21,7 @@
 
 #pragma once
 
-#include <chrono>
 #include <memory>
-
-#include "cyber/common/log.h"
-#include "cyber/cyber.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/v2x/proto/v2x_carstatus.pb.h"
-#include "modules/v2x/proto/v2x_traffic_light.pb.h"
 
 namespace apollo {
 namespace v2x {

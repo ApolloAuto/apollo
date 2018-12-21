@@ -26,11 +26,7 @@
 #include <string>
 
 #include "modules/common/configs/config_gflags.h"
-#include "cyber/common/log.h"
-#include "cyber/cyber.h"
 #include "modules/map/hdmap/hdmap.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/v2x/common/v2x_proxy_gflags.h"
 #include "modules/v2x/v2x_proxy/obu_interface/obu_interface_grpc_impl.h"
 #include "modules/v2x/v2x_proxy/os_interface/os_interface.h"
 
