@@ -44,8 +44,7 @@ class LaneFollowScenarioTest : public ::testing::Test {
 
 TEST_F(LaneFollowScenarioTest, VerifyConf) {
   FLAGS_scenario_lane_follow_config_file =
-      "//apollo/modules/planning/conf/"
-      "scenario_lane_follow_config.pb.txt";
+      "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
@@ -54,7 +53,7 @@ TEST_F(LaneFollowScenarioTest, VerifyConf) {
 
 TEST_F(LaneFollowScenarioTest, Init) {
   FLAGS_scenario_lane_follow_config_file =
-      "//apollo/modules/planning/testdata/conf/"
+      "/apollo/modules/planning/testdata/conf/"
       "scenario_lane_follow_config.pb.txt";
 
   ScenarioConfig config;
