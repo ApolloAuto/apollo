@@ -41,6 +41,7 @@ message WarmStartConfig {
 message DualVariableWarmStartConfig {
   // Dual variable Warm Start
   optional double weight_d = 1 [default = 1.0];
+  optional IpoptConfig ipopt_config = 2;
 }
 
 message DistanceApproachConfig {
