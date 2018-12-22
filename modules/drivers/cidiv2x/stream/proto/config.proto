@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+package apollo.drivers.cidiv2x.config;
+
+message Stream {
+  message Serial {
+    optional bytes device = 1;  // Something like "/dev/ttyXXX".
+    optional int32 baud_rate = 2 [default = 9600];
+    // In general, we assumes no parity, 8 data bits, 1 stop bit, no
+    // handshaking, break detection enabled. If not, add more fields here.
+  }
+
+  message Tcp {
+    optional bytes address = 1;  // Something like "192.168.10.6".
+    optional int32 port = 2 [default = 3001];
+  }
+
+  message Udp {
+    optional bytes address = 1;  // Something like "192.168.10.6".
+    optional int32 port = 2 [default = 3001];
+    optional int32 broadcast_port = 3;
+  }
+
+  oneof type {
+    Serial serial = 1;
+    Tcp tcp = 2;
+    Udp udp = 3;
+  }
+}
+
+message Config {
+  // The driver reads data from this port. This port should always be provided.
+  optional Stream data = 1;
+
+  // If given, the driver sends commands to this port. If not given, the driver
+  // sends commands to the data port.
+  optional Stream command = 2;
+
+  repeated bytes login_commands = 3;
+
+  repeated bytes logout_commands = 4;
+}
