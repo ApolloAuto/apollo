@@ -17,6 +17,7 @@
 ###############################################################################
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DREAMVIEW_URL="http://localhost:8888"
 
 cd "${DIR}/.."
 
@@ -29,7 +30,12 @@ function start() {
     ./scripts/monitor.sh start
     ./scripts/dreamview.sh start
     if [ $? -eq 0 ]; then
-        echo "Dreamview is running at http://localhost:8888"
+        http_status="$(curl -o -I -L -s -w '%{http_code}' ${DREAMVIEW_URL})"
+        if [ $http_status -eq 200 ]; then
+            echo "Dreamview is running at" $DREAMVIEW_URL
+        else
+            echo "Failed to start Dreamview. Please check /apollo/data/log or /apollo/data/core for more information"
+        fi
     fi
 }
 
