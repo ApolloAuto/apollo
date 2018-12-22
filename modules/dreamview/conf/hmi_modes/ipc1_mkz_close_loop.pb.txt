@@ -1,0 +1,71 @@
+cyber_modules {
+  key: "Computer"
+  value: {
+    dag_files: "/apollo/modules/drivers/camera/dag/camera_no_compress.dag"
+    dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
+    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_msf_localization.dag"
+    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
+    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
+    dag_files: "/apollo/modules/routing/dag/routing.dag"
+    dag_files: "/apollo/modules/transform/dag/static_transform.dag"
+    process_group: "compute_sched"
+  }
+}
+cyber_modules {
+  key: "Controller"
+  value: {
+    dag_files: "/apollo/modules/canbus/dag/canbus.dag"
+    dag_files: "/apollo/modules/guardian/dag/guardian.dag"
+    process_group: "control_sched"
+  }
+}
+modules {
+  key: "Recorder"
+  value: {
+    start_command: "/apollo/scripts/record_bag.py --start"
+    stop_command: "/apollo/scripts/record_bag.py --stop"
+    process_monitor_config {
+      command_keywords: "cyber_recorder record"
+    }
+  }
+}
+monitored_components {
+  key: "Recorder"
+  value: {
+    process {
+      command_keywords: "cyber_recorder record"
+    }
+    resource {
+      disk_spaces {
+        # For logs.
+        path: "/apollo/data"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        # For records.
+        path: "/media/apollo/internal_nvme"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "GPS"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    }
+    # We also have a special GPSMonitor to check message status.
+  }
+}
+monitored_components {
+  key: "Localization"
+  value: {
+    # Special LocalizationMonitor.
+  }
+}
