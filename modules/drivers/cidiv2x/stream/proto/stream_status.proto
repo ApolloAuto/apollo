@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.drivers.cidiv2x.stream_status;
+
+import "modules/common/proto/header.proto";
+
+message StreamStatus {
+  optional apollo.common.Header header = 1;
+  enum Type {
+    DISCONNECTED = 0;
+    CONNECTED = 1;
+  }
+  optional Type stream_type = 2 [default = DISCONNECTED];
+}
+
