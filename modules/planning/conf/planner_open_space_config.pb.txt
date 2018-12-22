@@ -21,7 +21,20 @@ warm_start_config : {
 }
 
 dual_variable_warm_start_config : {
-   weight_d : 1.0
+  weight_d : 1.0
+  ipopt_config : {
+    ipopt_print_level : 0
+    mumps_mem_percent : 6000
+    mumps_pivtol : 1e-6
+    ipopt_max_iter : 100
+    ipopt_tol : 1e-5
+    ipopt_acceptable_constr_viol_tol : 1e-1
+    ipopt_min_hessian_perturbation : 1e-12
+    ipopt_jacobian_regularization_value : 1e-7
+    ipopt_print_timing_statistics : "yes"
+    ipopt_alpha_for_y : "min"
+    ipopt_recalc_y : "yes"
+  }
 }
 
 distance_approach_config : {
