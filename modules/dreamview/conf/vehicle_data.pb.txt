@@ -32,6 +32,7 @@ data_files {
 }
 data_files {
   source_path: "camera_params"
+  dest_path: "/apollo/modules/perception/data/params"
 }
 data_files {
   source_path: "radar_params"
