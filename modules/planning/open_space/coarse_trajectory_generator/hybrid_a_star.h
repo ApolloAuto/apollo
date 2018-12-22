@@ -38,8 +38,8 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/open_space/node3d.h"
-#include "modules/planning/open_space/reeds_shepp_path.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
