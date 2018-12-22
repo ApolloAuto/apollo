@@ -17,7 +17,7 @@
 /*
  * @file
  */
-#include "modules/planning/open_space/node3d.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 
 #include "gtest/gtest.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"

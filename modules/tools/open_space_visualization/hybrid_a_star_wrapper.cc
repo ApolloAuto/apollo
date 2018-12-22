@@ -17,7 +17,7 @@
 /*
  * @file
  */
-#include "modules/planning/open_space/hybrid_a_star.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
 #include <iostream>
 

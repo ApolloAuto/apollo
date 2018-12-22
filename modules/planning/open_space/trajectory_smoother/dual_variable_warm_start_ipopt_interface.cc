@@ -18,7 +18,7 @@
  * @file
  */
 
-#include "modules/planning/open_space/dual_variable_warm_start_ipopt_interface.h"
+#include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.h"
 
 #include <math.h>
 #include <utility>
