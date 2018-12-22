@@ -1,0 +1,18 @@
+cyber_modules {
+  key: "Control"
+  value: {
+    dag_files: "/apollo/modules/control/dag/control.dag"
+  }
+}
+cyber_modules {
+  key: "Planning"
+  value: {
+    dag_files: "/apollo/modules/planning/dag/planning.dag"
+  }
+}
+cyber_modules {
+  key: "Prediction"
+  value: {
+    dag_files: "/apollo/modules/prediction/dag/prediction.dag"
+  }
+}
