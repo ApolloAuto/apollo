@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/open_space/distance_approach_ipopt_interface.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"

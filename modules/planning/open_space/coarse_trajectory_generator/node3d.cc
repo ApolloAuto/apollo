@@ -18,7 +18,7 @@
  * @file
  */
 
-#include "modules/planning/open_space/node3d.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 
 namespace apollo {
 namespace planning {

@@ -10,7 +10,7 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [
-        "//modules/planning/open_space:hybrid_a_star",
+        "//modules/planning/open_space/coarse_trajectory_generator:hybrid_a_star",
     ],
 )
 
@@ -22,9 +22,9 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [
-        "//modules/planning/open_space:distance_approach_problem",
-        "//modules/planning/open_space:dual_variable_warm_start_problem",
-        "//modules/planning/open_space:hybrid_a_star",
+        "//modules/planning/open_space/trajectory_smoother:distance_approach_problem",
+        "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",
+        "//modules/planning/open_space/coarse_trajectory_generator:hybrid_a_star",
     ],
 )
 

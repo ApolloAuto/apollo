@@ -18,7 +18,7 @@
  * @file
  */
 
-#include "modules/planning/open_space/distance_approach_problem.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 
 namespace apollo {
 namespace planning {

@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/open_space/dual_variable_warm_start_problem.h"
+#include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
 
 #include "gtest/gtest.h"
 
