@@ -18,7 +18,7 @@
  * @file
  */
 
-#include "modules/planning/open_space/reeds_shepp_path.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
 
 namespace apollo {
 namespace planning {

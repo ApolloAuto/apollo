@@ -14,18 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
+/*
  * @file
- **/
-#include "modules/planning/open_space/distance_approach_problem.h"
+ */
+
+#include <memory>
 
 #include "gtest/gtest.h"
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
 namespace apollo {
 namespace planning {
 
-class DistanceApproachProblemTest : public ::testing::Test {
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
+
+class HybridATest : public ::testing::Test {
  public:
   virtual void SetUp() {
     FLAGS_planner_open_space_config_filename =
@@ -36,33 +44,38 @@ class DistanceApproachProblemTest : public ::testing::Test {
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;
+
+    hybrid_test = std::unique_ptr<HybridAStar>(
+        new HybridAStar(planner_open_space_config_));
   }
 
  protected:
-  std::unique_ptr<DistanceApproachProblem> distance_approach_ = nullptr;
-  int num_of_variables_ = 160;
-  int num_of_constraints_ = 200;
-  size_t horizon_ = 20;
-  double ts_ = 0.01;
-  Eigen::MatrixXd ego_ = Eigen::MatrixXd::Ones(4, 1);
-  Eigen::MatrixXd x0_ = Eigen::MatrixXd::Ones(4, 1);
-  Eigen::MatrixXd xf_ = Eigen::MatrixXd::Ones(4, 1);
-  std::vector<double> XYbounds_ = {1.0, 1.0, 1.0, 1.0};
-  Eigen::MatrixXd last_time_u_ = Eigen::MatrixXd::Zero(2, 1);
-  Eigen::MatrixXi obstacles_edges_num_ = Eigen::MatrixXi::Ones(12, 4);
-  Eigen::MatrixXd xWS_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
-  Eigen::MatrixXd uWS_ = Eigen::MatrixXd::Zero(2, horizon_);
-  Eigen::MatrixXi obstacles_edges_num = Eigen::MatrixXi::Zero(1, horizon_ + 1);
-  Eigen::MatrixXd obstacles_A = Eigen::MatrixXd::Ones(4, 1);
-  Eigen::MatrixXd obstacles_b = Eigen::MatrixXd::Ones(4, 1);
+  std::unique_ptr<HybridAStar> hybrid_test;
   apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
-TEST_F(DistanceApproachProblemTest, initilization) {
-  distance_approach_.reset(
-      new DistanceApproachProblem(planner_open_space_config_));
-  EXPECT_NE(distance_approach_, nullptr);
-}
+TEST_F(HybridATest, test1) {
+  double sx = -15.0;
+  double sy = 0.0;
+  double sphi = 0.0;
+  double ex = 15.0;
+  double ey = 0.0;
+  double ephi = 0.0;
+  std::vector<std::vector<common::math::Vec2d>> obstacles_list;
+  HybridAStartResult result;
+  Vec2d obstacle_vertice_a(1.0, 0.0);
+  Vec2d obstacle_vertice_b(-1.0, 0.0);
+  std::vector<Vec2d> obstacle = {obstacle_vertice_a, obstacle_vertice_b};
+  // load xy boundary into the Plan() from configuration(Independent from frame)
+  std::vector<double> XYbounds_;
+  XYbounds_.push_back(-50.0);
+  XYbounds_.push_back(50.0);
+  XYbounds_.push_back(-50.0);
+  XYbounds_.push_back(50.0);
 
+  obstacles_list.emplace_back(obstacle);
+  ASSERT_TRUE(hybrid_test->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
+                                obstacles_list, &result));
+}
 }  // namespace planning
 }  // namespace apollo

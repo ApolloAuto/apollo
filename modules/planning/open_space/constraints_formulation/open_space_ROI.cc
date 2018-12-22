@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/open_space/open_space_ROI.h"
+#include "modules/planning/open_space/constraints_formulation/open_space_ROI.h"
 
 namespace apollo {
 namespace planning {
