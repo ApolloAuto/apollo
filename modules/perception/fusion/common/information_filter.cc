@@ -139,23 +139,27 @@ bool InformationFilter::Correct(
   }
   cur_observation_ = cur_observation;
   cur_observation_uncertainty_ = cur_observation_uncertainty;
+  // global_uncertainty now stores information matrix
   global_uncertainty_ = global_uncertainty_.inverse();
+  // tmp_states_ is information vector
   tmp_states_ = global_uncertainty_ * global_states_;
+  // cur_observation_uncertainty_ is now the inverse of covariance matrix
   cur_observation_uncertainty_ = cur_observation_uncertainty_.inverse();
   if (last_observation_init_) {
+    // propate to current time
     last_observation_ = last_to_cur_transform_matrix_ * last_observation_;
     last_observation_uncertainty_ =
         last_to_cur_transform_matrix_ * last_observation_uncertainty_ *
-            last_to_cur_transform_matrix_.transpose() +
+        last_to_cur_transform_matrix_.transpose() +
         last_to_cur_env_uncertainty_;
-    last_observation_uncertainty_ =
+    last_observation_uncertainty_ =  // transform to measurement space
         c_matrix_ * last_observation_uncertainty_ * c_matrix_.transpose();
-    global_uncertainty_ =
-        c_matrix_.transpose() * global_uncertainty_ +
+    global_uncertainty_ =  // update information matrix
+        global_uncertainty_ +
         (c_matrix_.transpose() * cur_observation_uncertainty_ * c_matrix_ -
          c_matrix_.transpose() * last_observation_uncertainty_.inverse() *
              c_matrix_);
-    tmp_states_ +=
+    tmp_states_ +=  // update information vector
         (c_matrix_.transpose() * cur_observation_uncertainty_ *
              cur_observation_ -
          c_matrix_.transpose() * last_observation_uncertainty_.inverse() *
