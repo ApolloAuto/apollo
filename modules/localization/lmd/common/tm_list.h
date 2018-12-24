@@ -76,6 +76,15 @@ class TimeMarkedList : public std::map<double, Data> {
     return true;
   }
 
+  bool Pop() {
+    auto latest = Latest();
+    if (latest == std::map<double, Data>::end()) {
+      return false;
+    }
+    std::map<double, Data>::erase(latest);
+    return true;
+  }
+
   Iterator Latest() const {
     if (!std::map<double, Data>::empty()) {
       auto iter = std::map<double, Data>::end();
