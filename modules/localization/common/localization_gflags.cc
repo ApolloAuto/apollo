@@ -54,6 +54,8 @@ DEFINE_bool(enable_gps_imu_interprolate, true, "enable GPU/IMU interprolate");
 DEFINE_bool(enable_map_reference_unify, true,
             "enable IMU data convert to map reference");
 DEFINE_bool(enable_watchdog, true, "enable watchdog");
+DEFINE_bool(enable_gps_heading, false, "enable gps heading");
+DEFINE_bool(enable_heading_filter, true, "enable heading filter");
 
 DEFINE_double(gps_time_delay_tolerance, 1.0,
               "gps message time delay tolerance (sec)");

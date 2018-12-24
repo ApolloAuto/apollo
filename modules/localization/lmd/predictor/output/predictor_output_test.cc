@@ -63,11 +63,11 @@ TEST_F(PredictorOutputTest, PredictByImu1) {
 
   Pose new_pose;
   EXPECT_TRUE(predictor_.PredictByImu(0.0, old_pose, 1.0, &new_pose));
-  EXPECT_NEAR(0.354, new_pose.position().x(), 1e-3);
-  EXPECT_NEAR(0.354, new_pose.position().y(), 1e-3);
+  EXPECT_NEAR(0.372, new_pose.position().x(), 1e-3);
+  EXPECT_NEAR(0.083, new_pose.position().y(), 1e-3);
   EXPECT_NEAR(0.0, new_pose.position().z(), 1e-3);
-  EXPECT_NEAR(0.625, new_pose.linear_velocity().x(), 1e-3);
-  EXPECT_NEAR(0.625, new_pose.linear_velocity().y(), 1e-3);
+  EXPECT_NEAR(0.682, new_pose.linear_velocity().x(), 1e-3);
+  EXPECT_NEAR(-0.052, new_pose.linear_velocity().y(), 1e-3);
   EXPECT_NEAR(0.0, new_pose.linear_velocity().z(), 1e-3);
 }
 
@@ -101,11 +101,11 @@ TEST_F(PredictorOutputTest, PredictByImu2) {
 
   Pose new_pose;
   EXPECT_TRUE(predictor_.PredictByImu(0.0, old_pose, 1.0, &new_pose));
-  EXPECT_NEAR(0.5, new_pose.position().x(), 1e-3);
-  EXPECT_NEAR(0.5, new_pose.position().y(), 1e-3);
+  EXPECT_NEAR(0.515, new_pose.position().x(), 1e-3);
+  EXPECT_NEAR(0.184, new_pose.position().y(), 1e-3);
   EXPECT_NEAR(0.0, new_pose.position().z(), 1e-3);
-  EXPECT_NEAR(1.0, new_pose.linear_velocity().x(), 1e-3);
-  EXPECT_NEAR(1.0, new_pose.linear_velocity().y(), 1e-3);
+  EXPECT_NEAR(1.047, new_pose.linear_velocity().x(), 1e-3);
+  EXPECT_NEAR(0.052, new_pose.linear_velocity().y(), 1e-3);
   EXPECT_NEAR(0.0, new_pose.linear_velocity().z(), 1e-3);
 }
 

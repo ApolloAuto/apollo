@@ -21,6 +21,8 @@ cc_library(
         ":localization_lmd_predictor_raw_base",
         "//modules/common:log",
         "//modules/common/time",
+        "//modules/common/filters:digital_filter",
+        "//modules/common/filters:digital_filter_coefficients",
         "//modules/drivers/gnss/proto:imu_proto",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:imu_proto",
