@@ -240,6 +240,7 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
   } else {
     return -1;
   }
+  return 0;
 }
 
 Eigen::Affine3d LidarLocatorNdt::GetPose() const { return location_; }

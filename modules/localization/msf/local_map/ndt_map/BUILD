@@ -19,5 +19,39 @@ cc_library(
     ],
 )
 
+filegroup(
+    name = "localization_msf_ndt_map_test_data",
+    srcs = glob([
+        "local_map/test_data/ndt_map/**",
+    ]),
+)
+
+cc_test(
+    name = "localization_msf_ndt_map_test",
+    size = "small",
+    timeout = "short",
+    srcs = ["ndt_map_test.cpp"],
+    data = [":localization_msf_ndt_map_test_data"],
+    deps = [
+        "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "//modules/localization/msf/common/io:localization_msf_common_io",
+        "@eigen",
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "localization_msf_ndt_map_config_test",
+    size = "small",
+    timeout = "short",
+    srcs = ["ndt_map_config_test.cpp"],
+    deps = [
+        "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "@eigen",
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()

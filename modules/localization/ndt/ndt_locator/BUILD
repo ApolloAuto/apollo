@@ -30,4 +30,39 @@ cc_library(
     ],
 )
 
+filegroup(
+    name = "ndt_lidar_locator_test_data",
+    srcs = glob([
+        "ndt/test_data/**",
+    ])
+)
+
+cc_test(
+    name = "ndt_lidar_locator_test",
+    size = "small",
+    timeout = "short",
+    srcs = ["lidar_locator_ndt_test.cc"],
+    data = [":ndt_lidar_locator_test_data"],
+    deps = [
+        "//cyber",
+        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
+        "//modules/localization/msf/common/io:localization_msf_common_io",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "ndt_solver_test",
+    size = "small",
+    timeout = "short",
+    srcs = ["ndt_solver_test.cc"],
+    data = [":ndt_lidar_locator_test_data"],
+    deps = [
+        "//cyber",
+        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
+        "//modules/localization/msf/common/io:localization_msf_common_io",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
