@@ -188,8 +188,8 @@ Status MPCController::Init(const ControlConf *control_conf) {
 
   matrix_q_ = Matrix::Zero(basic_state_size_, basic_state_size_);
 
-  int r_param_size = control_conf->mpc_controller_conf().matrix_r_size();
-  for (int i = 0; i < r_param_size; ++i) {
+  for (int i = 0; i < control_conf->mpc_controller_conf().matrix_r_size();
+       ++i) {
     matrix_r_(i, i) = control_conf->mpc_controller_conf().matrix_r(i);
   }
 
