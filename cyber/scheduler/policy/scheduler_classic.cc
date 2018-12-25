@@ -49,43 +49,63 @@ SchedulerClassic::SchedulerClassic() {
 
   apollo::cyber::proto::CyberConfig cfg;
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
-    auto& groups = cfg.scheduler_conf().classic_conf().groups();
-    proc_num_ = groups[0].processor_num();
-    affinity_ = groups[0].affinity();
-    processor_policy_ = groups[0].processor_policy();
-    processor_prio_ = groups[0].processor_prio();
-    ParseCpuset(groups[0].cpuset(), &cpuset_);
-
-    for (auto& group : groups) {
-      for (auto& task : group.tasks()) {
+    classic_conf_ = cfg.scheduler_conf().classic_conf();
+    for (auto& group : classic_conf_.groups()) {
+      auto& group_name = group.name();
+      for (auto task : group.tasks()) {
+        task.set_group_name(group_name);
         cr_confs_[task.name()] = task;
       }
     }
   } else {
+    // if do not set default_proc_num in scheduler conf
+    // give a default value
+    uint32_t proc_num = 2;
     auto& global_conf = GlobalData::Instance()->Config();
     if (global_conf.has_scheduler_conf() &&
         global_conf.scheduler_conf().has_default_proc_num()) {
-      proc_num_ = global_conf.scheduler_conf().default_proc_num();
-    } else {
-      proc_num_ = 2;
+      proc_num = global_conf.scheduler_conf().default_proc_num();
     }
-  }
+    task_pool_size_ = proc_num;
 
-  task_pool_size_ = proc_num_;
+    sched_group_ = classic_conf_.add_groups();
+    sched_group_->set_name(DEFAULT_GROUP_NAME);
+    sched_group_->set_processor_num(proc_num);
+  }
 
   CreateProcessor();
 }
 
 void SchedulerClassic::CreateProcessor() {
-  for (uint32_t i = 0; i < proc_num_; i++) {
-    auto ctx = std::make_shared<ClassicContext>();
-    pctxs_.emplace_back(ctx);
+  for (auto& group : classic_conf_.groups()) {
+    auto& group_name = group.name();
+    auto proc_num = group.processor_num();
+    if (task_pool_size_ == 0) {
+      task_pool_size_ = proc_num;
+    }
 
-    auto proc = std::make_shared<Processor>();
-    proc->BindContext(ctx);
-    proc->SetAffinity(cpuset_, affinity_, i);
-    proc->SetSchedPolicy(processor_policy_, processor_prio_);
-    processors_.push_back(std::move(proc));
+    auto& affinity = group.affinity();
+    auto& processor_policy = group.processor_policy();
+    auto processor_prio = group.processor_prio();
+    std::vector<int> cpuset;
+    ParseCpuset(group.cpuset(), &cpuset);
+
+    ClassicContext::cr_group_[group_name];
+    ClassicContext::rq_locks_[group_name];
+    ClassicContext::mtx_wq_[group_name];
+    ClassicContext::cv_wq_[group_name];
+
+    for (uint32_t i = 0; i < proc_num; i++) {
+      auto ctx = std::make_shared<ClassicContext>();
+      ctx->SetGroupName(group_name);
+      pctxs_.emplace_back(ctx);
+
+      auto proc = std::make_shared<Processor>();
+      proc->BindContext(ctx);
+      proc->SetAffinity(cpuset, affinity, i);
+      proc->SetSchedPolicy(processor_policy, processor_prio);
+      processors_.push_back(std::move(proc));
+    }
   }
 }
 
@@ -111,7 +131,12 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   }
 
   if (cr_confs_.find(cr->name()) != cr_confs_.end()) {
-    cr->set_priority(cr_confs_[cr->name()].prio());
+    ClassicTask task = cr_confs_[cr->name()];
+    cr->set_priority(task.prio());
+    cr->set_group_name(task.group_name());
+  } else {
+    // croutine that not exist in conf
+    cr->set_group_name(classic_conf_.groups(0).name());
   }
 
   // Check if task prio is reasonable.
@@ -123,13 +148,15 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
 
   // Enqueue task.
   {
-    WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[cr->priority()]);
-    ClassicContext::rq_[cr->priority()].emplace_back(cr);
+    WriteLockGuard<AtomicRWLock> lk(
+        ClassicContext::rq_locks_[cr->group_name()].at(cr->priority()));
+    ClassicContext::cr_group_[cr->group_name()].at(cr->priority())
+        .emplace_back(cr);
   }
 
   PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
                                             cr->processor_id());
-  ClassicContext::Notify();
+  ClassicContext::Notify(cr->group_name());
   return true;
 }
 
@@ -146,7 +173,7 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
         cr->SetUpdateFlag();
       }
 
-      ClassicContext::Notify();
+      ClassicContext::Notify(cr->group_name());
       return true;
     }
   }
@@ -177,11 +204,13 @@ bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
 
   std::shared_ptr<CRoutine> cr = nullptr;
   int prio;
+  std::string group_name;
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(crid) != id_cr_.end()) {
       cr = id_cr_[crid];
       prio = cr->priority();
+      group_name = cr->group_name();
       id_cr_[crid]->Stop();
       id_cr_.erase(crid);
     } else {
@@ -189,14 +218,15 @@ bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
     }
   }
 
-  WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[prio]);
-  for (auto it = ClassicContext::rq_[prio].begin();
-       it != ClassicContext::rq_[prio].end(); ++it) {
+  WriteLockGuard<AtomicRWLock> lk(
+      ClassicContext::rq_locks_[group_name].at(prio));
+  for (auto it = ClassicContext::cr_group_[group_name].at(prio).begin();
+       it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
     if ((*it)->id() == crid) {
       auto cr = *it;
 
       (*it)->Stop();
-      it = ClassicContext::rq_[prio].erase(it);
+      it = ClassicContext::cr_group_[group_name].at(prio).erase(it);
       cr->Release();
       return true;
     }
