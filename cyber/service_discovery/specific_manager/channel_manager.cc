@@ -253,37 +253,7 @@ void ChannelManager::OnTopoModuleLeave(const std::string& host_name,
 }
 
 void ChannelManager::DisposeJoin(const ChangeMsg& msg) {
-  auto role = std::make_shared<RoleBase>(msg.role_attr(), msg.timestamp());
-  uint64_t key = role->attributes().channel_id();
-  if (!channel_delegates_.Add(key, role, false)) {
-    RolePtr existing_delegate;
-    if (!channel_delegates_.Search(key, &existing_delegate)) {
-      channel_delegates_.Add(key, role);
-    } else {
-      auto& exist_msg_type = existing_delegate->attributes().message_type();
-      auto& join_msg_type = role->attributes().message_type();
-      if (!IsMessageTypeMatching(exist_msg_type, join_msg_type)) {
-        auto newer = role;
-        auto older = existing_delegate;
-        if (!older->IsEarlierThan(*newer)) {
-          newer = existing_delegate;
-          older = role;
-          channel_delegates_.Add(key, older);
-        }
-
-        if (newer->attributes().process_id() == process_id_ &&
-            newer->attributes().host_name() == host_name_) {
-          AERROR << "this process will be terminated due to mismatch message "
-                    "type of channel["
-                 << newer->attributes().channel_name() << "], satisfied["
-                 << older->attributes().message_type() << "] given["
-                 << newer->attributes().message_type() << "].";
-          AsyncShutdown();
-          return;
-        }
-      }
-    }
-  }
+  ScanMessageType(msg);
 
   Vertice v(msg.role_attr().node_name());
   Edge e;
@@ -294,11 +264,12 @@ void ChannelManager::DisposeJoin(const ChangeMsg& msg) {
       message::ProtobufFactory::Instance()->RegisterMessage(
           msg.role_attr().proto_desc());
     }
-
+    auto role = std::make_shared<RoleWriter>(msg.role_attr(), msg.timestamp());
     node_writers_.Add(role->attributes().node_id(), role);
     channel_writers_.Add(role->attributes().channel_id(), role);
     e.set_src(v);
   } else {
+    auto role = std::make_shared<RoleReader>(msg.role_attr(), msg.timestamp());
     node_readers_.Add(role->attributes().node_id(), role);
     channel_readers_.Add(role->attributes().channel_id(), role);
     e.set_dst(v);
@@ -322,6 +293,42 @@ void ChannelManager::DisposeLeave(const ChangeMsg& msg) {
     e.set_dst(v);
   }
   node_graph_.Delete(e);
+}
+
+void ChannelManager::ScanMessageType(const ChangeMsg& msg) {
+  uint64_t key = msg.role_attr().channel_id();
+  std::string role_type("reader");
+  if (msg.role_type() == RoleType::ROLE_WRITER) {
+    role_type = "writer";
+  }
+
+  RoleAttrVec existed_writers;
+  channel_writers_.Search(key, &existed_writers);
+  for (auto& w_attr : existed_writers) {
+    if (!IsMessageTypeMatching(msg.role_attr().message_type(),
+                               w_attr.message_type())) {
+      AERROR << "newly added " << role_type << "(belongs to node["
+             << msg.role_attr().node_name() << "])"
+             << "'s message type[" << msg.role_attr().message_type()
+             << "] does not match the exsited writer(belongs to node["
+             << w_attr.node_name() << "])'s message type["
+             << w_attr.message_type() << "].";
+    }
+  }
+
+  RoleAttrVec existed_readers;
+  channel_readers_.Search(key, &existed_readers);
+  for (auto& r_attr : existed_readers) {
+    if (!IsMessageTypeMatching(msg.role_attr().message_type(),
+                               r_attr.message_type())) {
+      AERROR << "newly added " << role_type << "(belongs to node["
+             << msg.role_attr().node_name() << "])"
+             << "'s message type[" << msg.role_attr().message_type()
+             << "] does not match the exsited reader(belongs to node["
+             << r_attr.node_name() << "])'s message type["
+             << r_attr.message_type() << "].";
+    }
+  }
 }
 
 }  // namespace service_discovery
