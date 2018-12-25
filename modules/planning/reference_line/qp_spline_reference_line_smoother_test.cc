@@ -51,7 +51,7 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
     const auto& points = lane_info_ptr->points();
     const auto& headings = lane_info_ptr->headings();
     const auto& accumulate_s = lane_info_ptr->accumulate_s();
-    for (std::size_t i = 0; i < points.size(); ++i) {
+    for (size_t i = 0; i < points.size(); ++i) {
       std::vector<hdmap::LaneWaypoint> waypoint;
       waypoint.emplace_back(lane_info_ptr, accumulate_s[i]);
       hdmap::MapPathPoint map_path_point(points[i], headings[i], waypoint);
@@ -62,7 +62,7 @@ class QpSplineReferenceLineSmootherTest : public ::testing::Test {
   }
 
   const std::string map_file =
-      "modules/planning/testdata/garage_map/base_map.txt";
+      "/apollo/modules/planning/testdata/garage_map/base_map.txt";
 
   hdmap::HDMap hdmap_;
   common::math::Vec2d vehicle_position_;

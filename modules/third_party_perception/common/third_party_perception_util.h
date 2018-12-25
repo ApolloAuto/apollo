@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <cmath>
-
-#include "modules/common/proto/geometry.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 /**

@@ -1,6 +1,8 @@
 localization_topic: "/apollo/localization/pose"
+localization_status_topic: "/apollo/localization/msf_status"
 imu_topic: "/apollo/sensor/gnss/corrected_imu"
 gps_topic: "/apollo/sensor/gnss/odometry"
+gps_status_topic: "/apollo/sensor/gnss/ins_stat"
 broadcast_tf_frame_id: "world"
 broadcast_tf_child_frame_id: "localization"
 imu_list_max_size: 20

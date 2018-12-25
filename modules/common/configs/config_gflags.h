@@ -42,3 +42,5 @@ DECLARE_bool(use_navigation_mode);
 DECLARE_string(navigation_mode_end_way_point_file);
 
 DECLARE_bool(use_sim_time);
+
+DECLARE_bool(reverse_heading_vehicle_state);

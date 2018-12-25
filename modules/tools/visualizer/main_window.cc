@@ -14,29 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <QAction>
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
-#include <QContextMenuEvent>
-#include <QDebug>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QKeyEvent>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QTreeWidgetItem>
 
-#include <iostream>
-
-#include "cyber/init.h"
 #include "modules/tools/visualizer/fixedaspectratiowidget.h"
 #include "modules/tools/visualizer/grid.h"
 #include "modules/tools/visualizer/main_window.h"
 #include "modules/tools/visualizer/pointcloud.h"
 #include "modules/tools/visualizer/radarpoints.h"
-#include "modules/tools/visualizer/texture.h"
 #include "modules/tools/visualizer/ui_main_window.h"
 #include "modules/tools/visualizer/video_images_dialog.h"
 
@@ -1136,12 +1125,10 @@ void MainWindow::SelectCurrentTreeItem(FixedAspectRatioWidget* dock) {
 
 void MainWindow::TopologyChanged(
     const apollo::cyber::proto::ChangeMsg& changeMsg) {
-  if (::apollo::cyber::proto::ChangeType::CHANGE_CHANNEL ==
+  if (apollo::cyber::proto::ChangeType::CHANGE_CHANNEL ==
           changeMsg.change_type() &&
-      ::apollo::cyber::proto::RoleType::ROLE_WRITER ==
-          changeMsg.role_type() &&
-      ::apollo::cyber::proto::OperateType::OPT_JOIN ==
-          changeMsg.operate_type()) {
+      apollo::cyber::proto::RoleType::ROLE_WRITER == changeMsg.role_type() &&
+      apollo::cyber::proto::OperateType::OPT_JOIN == changeMsg.operate_type()) {
     FindNewWriter(changeMsg.role_attr());
   }
 }
@@ -1149,8 +1136,9 @@ void MainWindow::TopologyChanged(
 void MainWindow::FindNewWriter(
     const apollo::cyber::proto::RoleAttributes& role) {
   const std::string& channelName = role.channel_name();
-  if (_channelName2TypeMap.find(channelName) != _channelName2TypeMap.end())
+  if (_channelName2TypeMap.find(channelName) != _channelName2TypeMap.end()) {
     return;
+  }
   const std::string& msgTypeName = role.message_type();
   _channelName2TypeMap[channelName] = msgTypeName;
 

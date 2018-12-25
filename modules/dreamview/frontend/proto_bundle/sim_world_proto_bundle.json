@@ -2613,11 +2613,18 @@
                     "default": 6
                   }
                 },
-                "maxToleranceT": {
+                "ignoreMaxStMinT": {
                   "type": "double",
                   "id": 5,
                   "options": {
-                    "default": 0.5
+                    "default": 0.1
+                  }
+                },
+                "ignoreMinStMinS": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 15
                   }
                 }
               }
@@ -4230,6 +4237,58 @@
                   "options": {
                     "default": false
                   }
+                },
+                "ipoptConfig": {
+                  "type": "IpoptConfig",
+                  "id": 19
+                }
+              }
+            },
+            "IpoptConfig": {
+              "fields": {
+                "ipoptPrintLevel": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "mumpsMemPercent": {
+                  "type": "int32",
+                  "id": 2
+                },
+                "mumpsPivtol": {
+                  "type": "double",
+                  "id": 3
+                },
+                "ipoptMaxIter": {
+                  "type": "int32",
+                  "id": 4
+                },
+                "ipoptTol": {
+                  "type": "double",
+                  "id": 5
+                },
+                "ipoptAcceptableConstrViolTol": {
+                  "type": "double",
+                  "id": 6
+                },
+                "ipoptMinHessianPerturbation": {
+                  "type": "double",
+                  "id": 7
+                },
+                "ipoptJacobianRegularizationValue": {
+                  "type": "double",
+                  "id": 8
+                },
+                "ipoptPrintTimingStatistics": {
+                  "type": "string",
+                  "id": 9
+                },
+                "ipoptAlphaForY": {
+                  "type": "string",
+                  "id": 10
+                },
+                "ipoptRecalcY": {
+                  "type": "string",
+                  "id": 11
                 }
               }
             },
@@ -4623,6 +4682,13 @@
                   "id": 9,
                   "options": {
                     "default": 15
+                  }
+                },
+                "stopFenceDistanceToBlockingObstacle": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 6
                   }
                 }
               }

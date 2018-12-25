@@ -18,11 +18,6 @@ export default class Notification extends React.Component {
             return null;
         }
 
-        if (monitor.items[0].msg &&
-            monitor.items[0].msg.startsWith('RSS')) {
-            return null;
-        }
-
         const item = monitor.items[0];
 
         const levelClass = (item.logLevel === "ERROR" ||

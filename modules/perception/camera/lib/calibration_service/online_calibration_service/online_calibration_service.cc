@@ -188,7 +188,7 @@ void OnlineCalibrationService::Update(CameraFrame* frame) {
            << iter->second.camera_ground_height;
   AINFO << "pitch_angle: "
            << iter->second.pitch_angle;
-  CHECK(BuildIndex());
+  // CHECK(BuildIndex());
 }
 
 void OnlineCalibrationService::SetCameraHeightAndPitch(

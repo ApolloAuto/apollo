@@ -14,14 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <unistd.h>
-#include <climits>
-#include <fstream>
-#include <sstream>
-
-#include "google/protobuf/text_format.h"
-#include "modules/common/util/file.h"
-#include "modules/common/util/util.h"
 #include "modules/third_party_perception/integration_tests/third_party_perception_test_base.h"
 
 DEFINE_string(test_data_dir, "", "the test data folder");

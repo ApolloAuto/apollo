@@ -74,6 +74,7 @@ class Scheduler {
 
   AtomicRWLock id_cr_lock_;
   std::unordered_map<uint64_t, std::mutex> id_cr_wl_;
+  std::mutex cr_wl_mtx_;
 
   std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> id_cr_;
   std::vector<std::shared_ptr<ProcessorContext>> pctxs_;

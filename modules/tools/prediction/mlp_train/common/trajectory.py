@@ -285,7 +285,7 @@ class TrajectoryToSample(object):
                 # Sanity check.
                 if len(lane_sequence.lane_segment) == 0:
                     continue
-                
+
                 if is_jittering:
                     lane_sequence.label = -10
                     lane_sequence.time_to_lane_center = -1.0
@@ -301,7 +301,8 @@ class TrajectoryToSample(object):
                         current_lane_ids = []
                         for k in range(len(lane_sequence.lane_segment)):
                             if lane_sequence.lane_segment[k].HasField('lane_id'):
-                                current_lane_ids.append(lane_sequence.lane_segment[k].lane_id)
+                                current_lane_ids.append(
+                                    lane_sequence.lane_segment[k].lane_id)
 
                         is_following_this_lane = True
                         for l_id in range(1, min(len(current_lane_ids), len(obs_actual_lane_ids))):
@@ -367,7 +368,6 @@ class TrajectoryToSample(object):
 
         return feature_sequence
 
-
     @classmethod
     def label_junction(cls, trajectory):
         '''
@@ -392,16 +392,28 @@ class TrajectoryToSample(object):
             exit_pos_dict = dict()
             for junction_exit in fea.junction_feature.junction_exit:
                 if junction_exit.HasField('exit_lane_id'):
-                    exit_dict[junction_exit.exit_lane_id] = BoundingRectangle(junction_exit.exit_position.x, junction_exit.exit_position.y, junction_exit.exit_heading, 0.01, junction_exit.exit_width)
-                    exit_pos_dict[junction_exit.exit_lane_id] = np.array([junction_exit.exit_position.x, junction_exit.exit_position.y])
+                    exit_dict[junction_exit.exit_lane_id] =
+                    BoundingRectangle(junction_exit.exit_position.x,
+                                      junction_exit.exit_position.y,
+                                      junction_exit.exit_heading,
+                                      0.01,
+                                      junction_exit.exit_width)
+                    exit_pos_dict[junction_exit.exit_lane_id] = np.array(
+                        [junction_exit.exit_position.x, junction_exit.exit_position.y])
             # Searching for up to 100 frames (10 seconds)
             for j in range(i, min(i + 100, traj_len)):
-                car_bounding = BoundingRectangle(trajectory[j].position.x, trajectory[j].position.y, math.atan2(trajectory[j].raw_velocity.y, trajectory[j].raw_velocity.x), trajectory[j].length, trajectory[j].width)
+                car_bounding = BoundingRectangle(trajectory[j].position.x,
+                                                 trajectory[j].position.y,
+                                                 math.atan2(trajectory[j].raw_velocity.y,
+                                                            trajectory[j].raw_velocity.x),
+                                                 trajectory[j].length,
+                                                 trajectory[j].width)
                 for key, value in exit_dict.items():
                     if car_bounding.overlap(value):
                         exit_pos = exit_pos_dict[key]
                         delta_pos = exit_pos - curr_pos
-                        angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
+                        angle = math.atan2(
+                            delta_pos[1], delta_pos[0]) - heading
                         d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
                         label = [0 for idx in range(12)]
                         label[d_idx] = 1

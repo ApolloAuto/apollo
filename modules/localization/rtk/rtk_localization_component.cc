@@ -50,8 +50,10 @@ bool RTKLocalizationComponent::InitConfig() {
   AINFO << "Rtk localization config: " << rtk_config.DebugString();
 
   localization_topic_ = rtk_config.localization_topic();
+  localization_status_topic_ = rtk_config.localization_status_topic();
   imu_topic_ = rtk_config.imu_topic();
   gps_topic_ = rtk_config.gps_topic();
+  gps_status_topic_ = rtk_config.gps_status_topic();
   broadcast_tf_frame_id_ = rtk_config.broadcast_tf_frame_id();
   broadcast_tf_child_frame_id_ = rtk_config.broadcast_tf_child_frame_id();
 
@@ -61,16 +63,29 @@ bool RTKLocalizationComponent::InitConfig() {
 }
 
 bool RTKLocalizationComponent::InitIO() {
-  std::function<void(const std::shared_ptr<localization::CorrectedImu>&)>
-      imu_register_call = std::bind(&RTKLocalizationComponent::ImuCallback,
-                                    this, std::placeholders::_1);
-  corrected_imu_listener_ =
-      this->node_->CreateReader<localization::CorrectedImu>(imu_topic_,
-                                                            imu_register_call);
+  corrected_imu_listener_ = node_->CreateReader<localization::CorrectedImu>(
+      imu_topic_,
+      std::bind(
+          &RTKLocalization::ImuCallback,
+          localization_.get(),
+          std::placeholders::_1));
+  DCHECK_NOTNULL(corrected_imu_listener_);
+
+  gps_status_listener_ = node_->CreateReader<drivers::gnss::InsStat>(
+      gps_status_topic_,
+      std::bind(
+          &RTKLocalization::GpsStatusCallback,
+          localization_.get(),
+          std::placeholders::_1));
+  DCHECK_NOTNULL(gps_status_listener_);
 
   localization_talker_ =
-      this->node_->CreateWriter<LocalizationEstimate>(localization_topic_);
+      node_->CreateWriter<LocalizationEstimate>(localization_topic_);
+  DCHECK_NOTNULL(localization_talker_);
 
+  localization_status_talker_ =
+      node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
+  DCHECK_NOTNULL(localization_status_talker_);
   return true;
 }
 
@@ -81,19 +96,17 @@ bool RTKLocalizationComponent::Proc(
   if (localization_->IsServiceStarted()) {
     LocalizationEstimate localization;
     localization_->GetLocalization(&localization);
+    LocalizationStatus localization_status;
+    localization_->GetLocalizationStatus(&localization_status);
 
     // publish localization messages
     PublishPoseBroadcastTopic(localization);
     PublishPoseBroadcastTF(localization);
+    PublishLocalizationStatus(localization_status);
     ADEBUG << "[OnTimer]: Localization message publish success!";
   }
 
   return true;
-}
-
-void RTKLocalizationComponent::ImuCallback(
-    const std::shared_ptr<localization::CorrectedImu>& imu_msg) {
-  localization_->ImuCallback(imu_msg);
 }
 
 void RTKLocalizationComponent::PublishPoseBroadcastTF(
@@ -124,6 +137,12 @@ void RTKLocalizationComponent::PublishPoseBroadcastTF(
 void RTKLocalizationComponent::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
+  return;
+}
+
+void RTKLocalizationComponent::PublishLocalizationStatus(
+    const LocalizationStatus& localization_status) {
+  localization_status_talker_->Write(localization_status);
   return;
 }
 

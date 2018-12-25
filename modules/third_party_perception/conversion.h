@@ -20,15 +20,11 @@
 
 #pragma once
 
-#include <cstdint>
-#include <queue>
-
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/delphi_esr.pb.h"
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/third_party_perception/proto/radar_obstacle.pb.h"
 
 /**

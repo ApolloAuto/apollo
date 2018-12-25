@@ -73,6 +73,8 @@ DEFINE_double(r_var, 0.25, "Measurement noise covariance");
 DEFINE_double(p_var, 0.1, "Error covariance");
 DEFINE_double(go_approach_rate, 0.995,
               "The rate to approach to the reference line of going straight");
+DEFINE_double(cutin_approach_rate, 0.95,
+              "The rate to approach to the reference line of cutin");
 
 DEFINE_int32(min_still_obstacle_history_length, 4,
              "Min # historical frames for still obstacles");
@@ -87,7 +89,9 @@ DEFINE_double(still_obstacle_position_std, 1.0,
 DEFINE_double(still_pedestrian_position_std, 0.5,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
-DEFINE_double(target_lane_gap, 2.0, "gap between two lane points.");
+DEFINE_double(target_lane_gap, 2.0, "Gap between two lane points.");
+DEFINE_double(dense_lane_gap, 0.2, "Gap between two adjacent lane points"
+              " for constructing dense lane graph.");
 DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
 DEFINE_double(max_lane_angle_diff, M_PI / 3.0,
@@ -153,6 +157,8 @@ DEFINE_double(distance_beyond_junction, 0.5,
               "consider it in junction.");
 DEFINE_double(defualt_junction_range, 10.0,
               "Default value for the range of a junction.");
+DEFINE_double(distance_to_slow_down_at_stop_sign, 40.0,
+              "The distance to slow down at stop sign");
 
 // Evaluator
 DEFINE_double(time_to_center_if_not_reach, 10.0,

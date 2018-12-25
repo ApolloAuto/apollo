@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "google/protobuf/util/json_util.h"
-#include "boost/format.hpp"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -296,8 +295,12 @@ void SimulationWorldService::InitReaders() {
         this->PublishMonitorMessage(MonitorMessageItem::WARN,
                                     drive_event->event());
       });
+  cyber::ReaderConfig monitor_message_reader_config;
+  monitor_message_reader_config.channel_name = FLAGS_monitor_topic;
+  monitor_message_reader_config.pending_queue_size =
+      FLAGS_monitor_msg_pending_queue_size;
   monitor_reader_ = node_->CreateReader<MonitorMessage>(
-      FLAGS_monitor_topic,
+      monitor_message_reader_config,
       [this](const std::shared_ptr<MonitorMessage> &monitor_message) {
         std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
         monitor_msgs_.push_back(monitor_message);
@@ -375,8 +378,8 @@ void SimulationWorldService::Update() {
   UpdateLatencies();
 
   world_.set_sequence_num(world_.sequence_num() + 1);
-  world_.set_timestamp(static_cast<double>(
-       apollo::common::time::AsInt64<millis>(Clock::Now())));
+  world_.set_timestamp(
+      static_cast<double>(apollo::common::time::AsInt64<millis>(Clock::Now())));
 }
 
 void SimulationWorldService::UpdateDelays() {
@@ -492,7 +495,11 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   const auto &vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
-  auto_driving_car->set_speed(chassis.speed_mps());
+  double speed = chassis.speed_mps();
+  if (chassis.gear_location() == Chassis::GEAR_REVERSE) {
+    speed = -speed;
+  }
+  auto_driving_car->set_speed(speed);
   auto_driving_car->set_throttle_percentage(chassis.throttle_percentage());
   auto_driving_car->set_brake_percentage(chassis.brake_percentage());
 
@@ -606,22 +613,10 @@ void SimulationWorldService::UpdateSimulationWorld(
 
 void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
-  const double cutoff_time = world_.auto_driving_car().timestamp_sec();
-  const double header_time = trajectory.header().timestamp_sec();
-
   // Collect trajectory
   util::TrajectoryPointCollector collector(&world_);
-
-  bool collecting_started = false;
   for (const TrajectoryPoint &point : trajectory.trajectory_point()) {
-    // Trajectory points with a timestamp older than the cutoff time
-    // (which is effectively the timestamp of the most up-to-date
-    // localization/chassis message) will be dropped.
-    if (collecting_started ||
-        point.relative_time() + header_time >= cutoff_time) {
-      collecting_started = true;
-      collector.Collect(point, header_time);
-    }
+    collector.Collect(point, trajectory.header().timestamp_sec());
   }
   for (int i = 0; i < world_.planning_trajectory_size(); ++i) {
     auto traj_pt = world_.mutable_planning_trajectory(i);
@@ -865,6 +860,18 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   // Update scenario
   if (data.has_scenario()) {
     planning_data->mutable_scenario()->CopyFrom(data.scenario());
+  }
+
+  // Update init point
+  if (data.has_init_point()) {
+    auto &planning_path_point = data.init_point().path_point();
+    auto *world_obj_path_point =
+        planning_data->mutable_init_point()->mutable_path_point();
+    world_obj_path_point->set_x(planning_path_point.x() +
+                                map_service_->GetXOffset());
+    world_obj_path_point->set_y(planning_path_point.y() +
+                                map_service_->GetYOffset());
+    world_obj_path_point->set_theta(planning_path_point.theta());
   }
 
   // Update Chart
@@ -1169,6 +1176,7 @@ void SimulationWorldService::UpdateMonitorMessages() {
   {
     std::unique_lock<std::mutex> lock(monitor_msgs_mutex_);
     monitor_msgs = monitor_msgs_;
+    monitor_msgs_.clear();
   }
 
   for (const auto &monitor_msg : monitor_msgs) {
@@ -1203,10 +1211,10 @@ void SimulationWorldService::PublishRoutingRequest(
 }
 
 void SimulationWorldService::PublishMonitorMessage(
-  apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
-  const std::string &msg) {
-    monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
-    monitor_logger_buffer_.Publish();
+    apollo::common::monitor::MonitorMessageItem::LogLevel log_level,
+    const std::string &msg) {
+  monitor_logger_buffer_.AddMonitorMsgItem(log_level, msg);
+  monitor_logger_buffer_.Publish();
 }
 }  // namespace dreamview
 }  // namespace apollo

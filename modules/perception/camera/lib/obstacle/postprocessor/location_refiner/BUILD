@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_proto_library(
     name = "location_refiner_proto",
     deps = [
@@ -17,13 +16,12 @@ proto_library(
     ],
 )
 
-
 cc_library(
     name = "location_refiner_obstacle_postprocessor",
     srcs = [
         "location_refiner_obstacle_postprocessor.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "location_refiner_obstacle_postprocessor.h",
     ],
     deps = [
@@ -31,8 +29,8 @@ cc_library(
         ":obj_postprocessor",
         "//cyber",
         "//modules/common/util:file_util",
-        "//modules/perception/camera/common:common",
-        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/interface",
     ],
 )
 
@@ -41,11 +39,11 @@ cc_library(
     srcs = [
         "obj_postprocessor.cc",
     ],
-    hdrs = [ 
+    hdrs = [
         "obj_postprocessor.h",
     ],
     deps = [
-        "//modules/perception/camera/common:common",
+        "//modules/perception/camera/common",
     ],
 )
 

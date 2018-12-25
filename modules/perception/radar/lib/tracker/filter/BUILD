@@ -23,7 +23,7 @@ cc_library(
         "adaptive_kalman_filter.h",
     ],
     deps = [
-        "//modules/perception/base:base",
+        "//modules/perception/base",
         "//modules/perception/radar/lib/interface:base_filter",
         "@eigen",
     ],

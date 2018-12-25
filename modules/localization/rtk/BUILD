@@ -5,12 +5,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "rtk_localization_component_lib",
     srcs = [
-        "rtk_localization_component.cc",
         "rtk_localization.cc",
+        "rtk_localization_component.cc",
     ],
     hdrs = [
-        "rtk_localization_component.h",
         "rtk_localization.h",
+        "rtk_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"localization\\\""],
     deps = [
@@ -20,6 +20,7 @@ cc_library(
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",
         "//modules/common/util:message_util",
+        "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
         "//modules/localization/proto:localization_proto",

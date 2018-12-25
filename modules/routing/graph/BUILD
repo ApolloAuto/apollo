@@ -5,10 +5,8 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "graph",
     deps = [
-        ":routing_node_with_range",
         ":routing_sub_topo_graph",
         ":routing_topo_graph",
-        ":routing_topo_node",
         ":routing_topo_range_manager",
     ],
 )
@@ -36,8 +34,6 @@ cc_library(
     ],
     deps = [
         ":routing_topo_node",
-        ":routing_topo_range",
-        "//modules/common/util:map_util",
     ],
 )
 
@@ -60,7 +56,6 @@ cc_library(
     ],
     deps = [
         ":routing_topo_node",
-        ":routing_topo_range",
     ],
 )
 
@@ -76,9 +71,7 @@ cc_library(
         ":routing_range_utils",
         ":routing_topo_range",
         "//cyber",
-        "//modules/common/proto:geometry_proto",
         "//modules/common/util:map_util",
-        "//modules/map/proto:map_proto",
         "//modules/routing/proto:routing_proto",
     ],
 )
@@ -93,12 +86,6 @@ cc_library(
     ],
     deps = [
         ":routing_topo_node",
-        "//modules/common",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/common:routing_gflags",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 
@@ -112,13 +99,6 @@ cc_library(
     ],
     deps = [
         ":routing_node_with_range",
-        ":routing_topo_node",
-        "//modules/common",
-        "//modules/common/proto:geometry_proto",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/common:routing_gflags",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 
@@ -132,7 +112,6 @@ cc_library(
     ],
     deps = [
         ":routing_topo_graph",
-        ":routing_topo_node",
     ],
 )
 
@@ -156,8 +135,6 @@ cc_test(
     ],
     deps = [
         ":routing_node_with_range",
-        ":routing_range_utils",
-        ":routing_topo_test_utils",
         "@gtest//:main",
     ],
 )
@@ -169,9 +146,6 @@ cc_test(
         "topo_graph_test.cc",
     ],
     deps = [
-        ":routing_node_with_range",
-        ":routing_range_utils",
-        ":routing_topo_graph",
         ":routing_topo_test_utils",
         "@gtest//:main",
     ],
@@ -184,10 +158,7 @@ cc_test(
         "sub_topo_graph_test.cc",
     ],
     deps = [
-        ":routing_node_with_range",
-        ":routing_range_utils",
         ":routing_sub_topo_graph",
-        ":routing_topo_graph",
         ":routing_topo_test_utils",
         "@gtest//:main",
     ],

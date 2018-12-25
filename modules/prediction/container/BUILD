@@ -12,7 +12,7 @@ cc_library(
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
-        "@glog//:glog",
+        "@glog",
         "@gtest//:main",
     ],
 )

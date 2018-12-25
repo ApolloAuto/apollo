@@ -1,6 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
-package(default_visibility = ["//visibility:public"])
 
+package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "obstacle_detection",
@@ -13,11 +13,11 @@ cc_binary(
         "-lopencv_highgui",
     ],
     deps = [
-        "//modules/perception/base:base",
-        "//modules/perception/camera/lib/interface:interface",
+        "//modules/perception/base",
+        "//modules/perception/camera/lib/interface",
         "//modules/perception/common/io:io_util",
         "@gtest",
-    ]
+    ],
 )
 
 cpplint()

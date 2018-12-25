@@ -19,7 +19,7 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//third_party/json",
-        "@glog//:glog",
+        "@glog",
     ],
 )
 

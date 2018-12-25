@@ -51,15 +51,20 @@ Status VehicleStateProvider::Update(
     vehicle_state_.set_timestamp(chassis.header().timestamp_sec());
   }
 
-  if (chassis.has_speed_mps()) {
-    vehicle_state_.set_linear_velocity(chassis.speed_mps());
-  }
-
   if (chassis.has_gear_location()) {
     vehicle_state_.set_gear(chassis.gear_location());
   } else {
     vehicle_state_.set_gear(canbus::Chassis::GEAR_NONE);
   }
+
+  if (chassis.has_speed_mps()) {
+    vehicle_state_.set_linear_velocity(chassis.speed_mps());
+    if (!FLAGS_reverse_heading_vehicle_state &&
+        vehicle_state_.gear() == canbus::Chassis::GEAR_REVERSE) {
+      vehicle_state_.set_linear_velocity(-vehicle_state_.linear_velocity());
+    }
+  }
+
   vehicle_state_.set_driving_mode(chassis.driving_mode());
 
   return Status::OK();
@@ -120,7 +125,9 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
         localization.pose().linear_acceleration().y());
   }
 
-  if (!(vehicle_state_.linear_velocity() > 0.0)) {
+  // TODO(all) kappa is wrong as it uses unupdated linear velocity.
+  constexpr double kEpsilon = 1e-6;
+  if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
     vehicle_state_.set_kappa(0.0);
   } else {
     vehicle_state_.set_kappa(vehicle_state_.angular_velocity() /
@@ -197,9 +204,6 @@ const VehicleState &VehicleStateProvider::vehicle_state() const {
 math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
   Eigen::Vector3d vec_distance(0.0, 0.0, 0.0);
   double v = vehicle_state_.linear_velocity();
-  if (vehicle_state_.gear() == canbus::Chassis::GEAR_REVERSE) {
-    v = -vehicle_state_.linear_velocity();
-  }
   // Predict distance travel vector
   if (std::fabs(vehicle_state_.angular_velocity()) < 0.0001) {
     vec_distance[0] = 0.0;

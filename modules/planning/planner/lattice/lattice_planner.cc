@@ -95,8 +95,8 @@ void ComputeInitFrenetState(const PathPoint& matched_point,
 
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
                             Frame* frame) {
-  std::size_t success_line_count = 0;
-  std::size_t index = 0;
+  size_t success_line_count = 0;
+  size_t index = 0;
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (index != 0) {
       reference_line_info.SetPriorityCost(
@@ -130,8 +130,8 @@ Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
 Status LatticePlanner::PlanOnReferenceLine(
     const TrajectoryPoint& planning_init_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
-  static std::size_t num_planning_cycles = 0;
-  static std::size_t num_planning_succeeded_cycles = 0;
+  static size_t num_planning_cycles = 0;
+  static size_t num_planning_succeeded_cycles = 0;
 
   double start_time = Clock::NowInSeconds();
   double current_time = start_time;
@@ -219,18 +219,18 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 7. always get the best pair of trajectories to combine; return the first
   // collision-free trajectory.
-  std::size_t constraint_failure_count = 0;
-  std::size_t collision_failure_count = 0;
-  std::size_t combined_constraint_failure_count = 0;
+  size_t constraint_failure_count = 0;
+  size_t collision_failure_count = 0;
+  size_t combined_constraint_failure_count = 0;
 
-  std::size_t lon_vel_failure_count = 0;
-  std::size_t lon_acc_failure_count = 0;
-  std::size_t lon_jerk_failure_count = 0;
-  std::size_t curvature_failure_count = 0;
-  std::size_t lat_acc_failure_count = 0;
-  std::size_t lat_jerk_failure_count = 0;
+  size_t lon_vel_failure_count = 0;
+  size_t lon_acc_failure_count = 0;
+  size_t lon_jerk_failure_count = 0;
+  size_t curvature_failure_count = 0;
+  size_t lat_acc_failure_count = 0;
+  size_t lat_jerk_failure_count = 0;
 
-  std::size_t num_lattice_traj = 0;
+  size_t num_lattice_traj = 0;
 
   while (trajectory_evaluator.has_more_trajectory_pairs()) {
     double trajectory_pair_cost =
@@ -282,8 +282,7 @@ Status LatticePlanner::PlanOnReferenceLine(
     }
 
     // put combine trajectory into debug data
-    const auto& combined_trajectory_points =
-        combined_trajectory.trajectory_points();
+    const auto& combined_trajectory_points = combined_trajectory;
     num_lattice_traj += 1;
     reference_line_info->SetTrajectory(combined_trajectory);
     reference_line_info->SetCost(reference_line_info->PriorityCost() +

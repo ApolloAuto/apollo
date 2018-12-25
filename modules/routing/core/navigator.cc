@@ -16,12 +16,6 @@
 
 #include "modules/routing/core/navigator.h"
 
-#include <algorithm>
-#include <fstream>
-
-#include "modules/common/proto/error_code.pb.h"
-
-#include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
@@ -101,7 +95,7 @@ void PrintDebugData(const std::vector<NodeWithRange>& nodes) {
 Navigator::Navigator(const std::string& topo_file_path) {
   Graph graph;
   if (!common::util::GetProtoFromFile(topo_file_path, &graph)) {
-    AERROR << "Failed to read topology graph from " << topo_file_path;
+    AERROR << "Failed to read topology graph from: " << topo_file_path;
     return;
   }
 
@@ -145,7 +139,7 @@ bool Navigator::MergeRoute(
       result_node_vec->push_back(node);
     } else {
       if (result_node_vec->back().EndS() < node.StartS()) {
-        AERROR << "Result route is not coninuous";
+        AERROR << "Result route is not continuous";
         return false;
       } else {
         result_node_vec->back().SetEndS(node.EndS());

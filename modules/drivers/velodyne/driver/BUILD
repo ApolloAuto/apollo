@@ -4,21 +4,21 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "libvelodyne_driver_component.so",
-    deps = [":velodyne_driver_component_lib"],
     linkopts = ["-shared"],
     linkstatic = False,
+    deps = [":velodyne_driver_component_lib"],
 )
 
 cc_library(
     name = "velodyne_driver_component_lib",
     srcs = ["velodyne_driver_component.cc"],
     hdrs = ["velodyne_driver_component.h"],
+    copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
         "//modules/common/util:message_util",
-        "//modules/drivers/velodyne/driver:driver",
+        "//modules/drivers/velodyne/driver",
     ],
-    copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
 
 cc_library(
@@ -34,6 +34,7 @@ cc_library(
         "input.h",
         "socket_input.h",
     ],
+    copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     linkopts = [
         "-lpcap",
     ],
@@ -43,7 +44,6 @@ cc_library(
         "//modules/drivers/velodyne/proto:velodyne_proto",
         "@pcl",
     ],
-    copts = ['-DMODULE_NAME=\\"velodyne\\"']
 )
 
 cpplint()

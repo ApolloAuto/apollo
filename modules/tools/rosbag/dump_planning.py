@@ -29,6 +29,7 @@ g_args = None
 
 g_delta_t = 0.5  # 1 second approximate time match region.
 
+
 def write_to_file(file_path, topic_pb):
     """write pb message to file"""
     f = file(file_path, 'w')
@@ -42,14 +43,14 @@ def dump_bag(in_bag, out_dir):
     seq = 0
     global g_args
     topic_name_map = {
-        "/apollo/localization/pose" : ["localization", None],
-        "/apollo/canbus/chassis" : ["chassis", None],
-        "/apollo/routing_response" : ["routing", None],
-        "/apollo/routing_resquest" : ["routing_request", None],
-        "/apollo/perception/obstacles" : ["perception", None],
-        "/apollo/prediction" : ["prediction", None],
-        "/apollo/planning" : ["planning", None],
-        "/apollo/control" : ["control", None]
+        "/apollo/localization/pose": ["localization", None],
+        "/apollo/canbus/chassis": ["chassis", None],
+        "/apollo/routing_response": ["routing", None],
+        "/apollo/routing_resquest": ["routing_request", None],
+        "/apollo/perception/obstacles": ["perception", None],
+        "/apollo/prediction": ["prediction", None],
+        "/apollo/planning": ["planning", None],
+        "/apollo/control": ["control", None]
     }
     first_time = None
     record_num = 0
@@ -68,7 +69,7 @@ def dump_bag(in_bag, out_dir):
         relative_time = (dt1 - dt2).seconds - g_args.start_time
         print "relative_time", relative_time
         if ((g_args.time_duration > 0) and
-            (relative_time < 0 or relative_time > g_args.time_duration)):
+                (relative_time < 0 or relative_time > g_args.time_duration)):
             continue
         if channel == "/apollo/planning":
             seq += 1
@@ -78,14 +79,14 @@ def dump_bag(in_bag, out_dir):
                 if name_pb[1] is None:
                     continue
                 file_path = os.path.join(out_dir,
-                                        str(seq) + "_" + name_pb[0] + ".pb.txt")
+                                         str(seq) + "_" + name_pb[0] + ".pb.txt")
                 write_to_file(file_path, name_pb[1])
         topic_name_map[channel][1] = msg
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description=
-        "A tool to dump the protobuf messages according to the planning message"
+        description="A tool to dump the protobuf messages according to the planning message"
         "Usage: python dump_planning.py bag_file save_directory")
     parser.add_argument(
         "in_rosbag", action="store", type=str, help="the input ros bag")

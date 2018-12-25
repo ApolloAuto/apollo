@@ -21,11 +21,7 @@
 
 #pragma once
 
-#include <grpc++/grpc++.h>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
-#include <thread>
 
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_client.h"
 #include "modules/v2x/v2x_proxy/obu_interface/grpc_interface/grpc_server.h"

@@ -1,0 +1,10 @@
+module_config {
+    module_library : "/apollo/bazel-bin/cyber/examples/timer_component_example/libtimer_component_example.so"
+    timer_components {
+        class_name : "TimerComponentSample"
+        config {
+            name : "timer"
+            interval : 10
+        }
+    }    
+}

@@ -12,9 +12,9 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/math:math",
+        "//modules/common/math",
         "//modules/common/util:file_util",
-        "//modules/map/hdmap:hdmap",
+        "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
         "//modules/perception/base:base_type",
         "//modules/perception/lib/config_manager",

@@ -90,6 +90,7 @@ cc_library(
     ],
     deps = [
         ":file_util",
+        ":string_util",
         "//modules/common/time",
         "@com_google_protobuf//:protobuf",
     ],
@@ -169,9 +170,6 @@ cc_test(
 
 cc_library(
     name = "file_util",
-    srcs = [
-        "file.cc",
-    ],
     hdrs = [
         "file.h",
     ],
@@ -180,28 +178,7 @@ cc_library(
         "-lboost_system",
     ],
     deps = [
-        ":string_util",
-        "//cyber",
-        "@com_google_protobuf//:protobuf",
-    ],
-)
-
-cc_test(
-    name = "file_test",
-    size = "small",
-    srcs = [
-        "file_test.cc",
-    ],
-    data = [
-        "//modules/common/util/testdata:data",
-    ],
-    tags = [
-        "external",
-    ],
-    deps = [
-        ":util",
-        "//modules/common/util/testdata:simple_proto",
-        "@gtest//:main",
+        "//cyber/common:file",
     ],
 )
 

@@ -10,12 +10,12 @@ cc_library(
     hdrs = [
         "gem_vehicle_factory.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":gem_controller",
         ":gem_message_manager",
         "//modules/canbus/vehicle:abstract_vehicle_factory",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
@@ -36,13 +36,13 @@ cc_library(
     hdrs = [
         "gem_message_manager.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
@@ -65,6 +65,7 @@ cc_library(
     hdrs = [
         "gem_controller.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         ":gem_message_manager",
         "//modules/canbus/proto:canbus_proto",
@@ -74,19 +75,18 @@ cc_library(
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
     ],
-    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
 )
 
 cc_test(
     name = "gem_controller_test",
     size = "small",
-    data = ["//modules/canbus:canbus_testdata"],
     srcs = [
         "gem_controller_test.cc",
     ],
+    data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":gem_controller",
-        "//modules/common/util:util",
+        "//modules/common/util",
         "@gtest//:main",
     ],
 )

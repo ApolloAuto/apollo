@@ -73,7 +73,7 @@ void AsyncLogger::Stop() {
 
 void AsyncLogger::Write(bool force_flush, time_t timestamp, const char* message,
                         int message_len) {
-  // drop message when acitve buffer is full
+  // drop message when acitve buffer full
   if (unlikely(BufferFull(*active_buf_))) {
     return;
   }
@@ -122,7 +122,7 @@ void AsyncLogger::Flush() {
   }
 
   // Wake up the writer thread at least twice.
-  // This ensures that it has completely flushed both buffers.
+  // This ensures both buffers were completely flushed.
   uint64_t orig_flush_count = flush_count_;
   while (flush_count_ < (orig_flush_count + 2) && state_ == RUNNING) {
     active_buf_->flush = true;
@@ -179,7 +179,7 @@ void AsyncLogger::RunThread() {
 }
 
 bool AsyncLogger::BufferFull(const Buffer& buf) const {
-  // We evenly divide our total buffer space between the two buffers.
+  // We evenly divide our total buffer space into two buffers.
   return buf.size > (max_buffer_bytes_ / 2);
 }
 

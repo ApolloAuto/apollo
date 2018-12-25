@@ -93,8 +93,7 @@ def save_model(model, filename):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
-        description=
-        'train neural network based on feature files and save parameters')
+        description='train neural network based on feature files and save parameters')
     parser.add_argument('filename', type=str, help='h5 file of data.')
     args = parser.parse_args()
     file = args.filename

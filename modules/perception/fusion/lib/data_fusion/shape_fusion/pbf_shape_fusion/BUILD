@@ -14,7 +14,7 @@ cc_library(
         "//modules/perception/fusion/base:scene",
         "//modules/perception/fusion/base:sensor_data_manager",
         "//modules/perception/fusion/base:track",
-        "//modules/perception/fusion/lib/interface:interface",
+        "//modules/perception/fusion/lib/interface",
     ],
 )
 

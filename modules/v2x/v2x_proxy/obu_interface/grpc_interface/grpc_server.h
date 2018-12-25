@@ -21,17 +21,10 @@
 
 #pragma once
 
-#include <grpc++/grpc++.h>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
-#include <thread>
 
 #include "cyber/cyber.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/v2x/proto/v2x_service_obu_to_car.grpc.pb.h"
-#include "modules/v2x/proto/v2x_traffic_light.pb.h"
 
 namespace apollo {
 namespace v2x {

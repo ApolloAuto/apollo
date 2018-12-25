@@ -19,7 +19,6 @@
 #include <string>
 
 #include "modules/routing/graph/topo_node.h"
-#include "modules/routing/graph/topo_range.h"
 
 namespace apollo {
 namespace routing {

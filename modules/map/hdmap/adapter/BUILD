@@ -36,8 +36,8 @@ cc_library(
         "//modules/common/status",
         "//modules/common/util",
         "//modules/map/proto:map_proto",
-        "@proj4//:proj4",
-        "@tinyxml2//:tinyxml2",
+        "@proj4",
+        "@tinyxml2",
     ],
 )
 

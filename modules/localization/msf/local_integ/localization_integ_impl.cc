@@ -34,24 +34,13 @@ LocalizationIntegImpl::LocalizationIntegImpl()
       integ_process_(new LocalizationIntegProcess()),
       gnss_process_(new LocalizationGnssProcess()),
       lidar_process_(new LocalizationLidarProcess()),
-      lidar_localization_list_max_size_(10),
-      integ_localization_list_max_size_(50),
-      gnss_localization_list_max_size_(10),
       is_use_gnss_bestpose_(true),
-      keep_lidar_running_(false),
-      lidar_queue_max_size_(5),
       imu_altitude_from_lidar_localization_(0.0),
       imu_altitude_from_lidar_localization_available_(false),
-      keep_imu_running_(false),
-      imu_queue_max_size_(200),
-      keep_gnss_running_(false),
-      gnss_queue_max_size_(100),
       enable_lidar_localization_(true),
       gnss_antenna_extrinsic_(Eigen::Affine3d::Identity()) {}
 
 LocalizationIntegImpl::~LocalizationIntegImpl() {
-  //  StopThreadLoop();
-
   delete republish_process_;
   delete lidar_process_;
   delete gnss_process_;
@@ -104,102 +93,14 @@ Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
 
   expert_.Init(params);
 
-  //  StartThreadLoop();
-
   return Status::OK();
 }
 
-void LocalizationIntegImpl::StartThreadLoop() {
-  // run process thread
-  keep_lidar_running_ = true;
-  lidar_queue_max_size_ = 5;
-  const auto& pcd_loop_func = [this] { PcdThreadLoop(); };
-  lidar_data_thread_ = std::thread(pcd_loop_func);
-
-  keep_imu_running_ = true;
-  imu_queue_max_size_ = 200;
-  const auto& imu_loop_func = [this] { ImuThreadLoop(); };
-  imu_data_thread_ = std::thread(imu_loop_func);
-
-  keep_gnss_running_ = true;
-  gnss_queue_max_size_ = 100;
-  const auto gnss_loop_func = [this] { GnssThreadLoop(); };
-  gnss_function_thread_ = std::thread(gnss_loop_func);
-
-  keep_gnss_heading_running_ = true;
-  gnss_heading_queue_max_size_ = 100;
-  const auto& gnss_heading_loop_func = [this] { GnssHeadingThreadLoop(); };
-  gnss_heading_function_thread_ = std::thread(gnss_heading_loop_func);
-}
-
-void LocalizationIntegImpl::StopThreadLoop() {
-  if (keep_lidar_running_.load()) {
-    keep_lidar_running_ = false;
-    lidar_data_signal_.notify_one();
-    lidar_data_thread_.join();
-  }
-
-  if (keep_imu_running_.load()) {
-    keep_imu_running_ = false;
-    imu_data_signal_.notify_one();
-    imu_data_thread_.join();
-  }
-
-  if (keep_gnss_running_.load()) {
-    keep_gnss_running_ = false;
-    gnss_function_signal_.notify_one();
-    gnss_function_thread_.join();
-  }
-
-  if (keep_gnss_heading_running_.load()) {
-    keep_gnss_heading_running_ = false;
-    gnss_heading_function_signal_.notify_one();
-    gnss_heading_function_thread_.join();
-  }
-}
 
 void LocalizationIntegImpl::PcdProcess(const LidarFrame& lidar_frame) {
   PcdProcessImpl(lidar_frame);
 
-  // lidar_data_queue_mutex_.lock();
-  // lidar_data_queue_.push(lidar_frame);
-  // lidar_data_signal_.notify_one();
-  // lidar_data_queue_mutex_.unlock();
   return;
-}
-
-void LocalizationIntegImpl::PcdThreadLoop() {
-  AINFO << "Started pcd data process thread";
-  while (keep_lidar_running_.load()) {
-    {
-      std::unique_lock<std::mutex> lock(lidar_data_queue_mutex_);
-      size_t size = lidar_data_queue_.size();
-      while (size > lidar_queue_max_size_) {
-        lidar_data_queue_.pop();
-        --size;
-      }
-      if (lidar_data_queue_.size() == 0) {
-        lidar_data_signal_.wait(lock);
-        continue;
-      }
-    }
-
-    LidarFrame lidar_frame;
-    int waiting_num = 0;
-    {
-      std::unique_lock<std::mutex> lock(lidar_data_queue_mutex_);
-      lidar_frame = lidar_data_queue_.front();
-      lidar_data_queue_.pop();
-      waiting_num = static_cast<int>(lidar_data_queue_.size());
-    }
-
-    if (waiting_num > 2) {
-      AWARN << waiting_num << " point cloud msg are waiting to process.";
-    }
-
-    PcdProcessImpl(lidar_frame);
-  }
-  AINFO << "Exited pcd data process thread";
 }
 
 void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
@@ -223,57 +124,12 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
     imu_altitude_from_lidar_localization_available_ = true;
   }
 
-  lidar_localization_mutex_.lock();
-  lidar_localization_list_.push_back(
-      LocalizationResult(LocalizationMeasureState(state), lidar_localization));
-  if (lidar_localization_list_.size() > lidar_localization_list_max_size_) {
-    lidar_localization_list_.pop_front();
-  }
-  lidar_localization_mutex_.unlock();
+  lastest_lidar_localization_ = LocalizationResult(
+      LocalizationMeasureState(state), lidar_localization);
 }
 
 void LocalizationIntegImpl::RawImuProcessRfu(const ImuData& imu_data) {
   ImuProcessImpl(imu_data);
-
-  // // push to imu_data_queue
-  // imu_data_queue_mutex_.lock();
-  // imu_data_queue_.push(imu_data);
-  // imu_data_signal_.notify_one();
-  // imu_data_queue_mutex_.unlock();
-}
-
-void LocalizationIntegImpl::ImuThreadLoop() {
-  AINFO << "Started imu data process thread";
-  while (keep_imu_running_.load()) {
-    {
-      std::unique_lock<std::mutex> lock(imu_data_queue_mutex_);
-      size_t size = imu_data_queue_.size();
-      while (size > imu_queue_max_size_) {
-        imu_data_queue_.pop();
-        --size;
-      }
-      if (imu_data_queue_.size() == 0) {
-        imu_data_signal_.wait(lock);
-        continue;
-      }
-    }
-
-    ImuData imu_data;
-    int waiting_num = 0;
-    {
-      std::unique_lock<std::mutex> lock(imu_data_queue_mutex_);
-      imu_data = imu_data_queue_.front();
-      imu_data_queue_.pop();
-      waiting_num = static_cast<int>(imu_data_queue_.size());
-    }
-
-    if (waiting_num > 10) {
-      AWARN << waiting_num << " imu msg are waiting to process.";
-    }
-
-    ImuProcessImpl(imu_data);
-  }
-  AINFO << "Exited imu data process thread";
 }
 
 void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
@@ -346,14 +202,9 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   angular_velocity_vrf->set_y(imu_data.wibb[1]);
   angular_velocity_vrf->set_z(imu_data.wibb[2]);
 
-  integ_localization_mutex_.lock();
-  integ_localization_list_.emplace_back(
-      LocalizationMeasureState(static_cast<int>(state)), integ_localization,
-      integ_status);
-  if (integ_localization_list_.size() > integ_localization_list_max_size_) {
-    integ_localization_list_.pop_front();
-  }
-  integ_localization_mutex_.unlock();
+  lastest_integ_localization_ = LocalizationResult(
+      LocalizationMeasureState(static_cast<int>(state)),
+      integ_localization, integ_status);
 
   InsPva integ_sins_pva;
   double covariance[9][9];
@@ -384,15 +235,6 @@ void LocalizationIntegImpl::RawObservationProcess(
 
   RawObservationProcessImpl(raw_obs_msg);
 
-  // TODO(zhouyao4321): Use cyber::Task instead.
-  // // push process function to queue
-  // gnss_function_queue_mutex_.lock();
-  // gnss_function_queue_.push(std::function<void()>(std::bind(
-  //     &LocalizationIntegImpl::RawObservationProcessImpl, this,
-  //     raw_obs_msg)));
-  // gnss_function_signal_.notify_one();
-  // gnss_function_queue_mutex_.unlock();
-
   return;
 }
 
@@ -403,15 +245,6 @@ void LocalizationIntegImpl::RawEphemerisProcess(
   }
 
   RawEphemerisProcessImpl(gnss_orbit_msg);
-
-  // TODO(zhouyao4321): Use cyber::Task instead.
-  // // push process function to queue
-  // gnss_function_queue_mutex_.lock();
-  // gnss_function_queue_.push(std::function<void()>(std::bind(
-  //     &LocalizationIntegImpl::RawEphemerisProcessImpl, this,
-  //     gnss_orbit_msg)));
-  // gnss_function_signal_.notify_one();
-  // gnss_function_queue_mutex_.unlock();
 
   return;
 }
@@ -424,50 +257,6 @@ void LocalizationIntegImpl::GnssBestPoseProcess(
 
   GnssBestPoseProcessImpl(bestgnsspos_msg);
 
-  // TODO(zhouyao4321): Use cyber::Task instead.
-  // // push process function to queue
-  // gnss_function_queue_mutex_.lock();
-  // gnss_function_queue_.push(std::function<void()>(std::bind(
-  //     &LocalizationIntegImpl::GnssBestPoseProcessImpl, this,
-  //     bestgnsspos_msg)));
-  // gnss_function_signal_.notify_one();
-  // gnss_function_queue_mutex_.unlock();
-
-  return;
-}
-
-void LocalizationIntegImpl::GnssThreadLoop() {
-  AINFO << "Started gnss process thread";
-  while (keep_gnss_running_.load()) {
-    {
-      std::unique_lock<std::mutex> lock(gnss_function_queue_mutex_);
-      size_t size = gnss_function_queue_.size();
-      while (size > gnss_queue_max_size_) {
-        gnss_function_queue_.pop();
-        --size;
-      }
-      if (gnss_function_queue_.size() == 0) {
-        gnss_function_signal_.wait(lock);
-        continue;
-      }
-    }
-
-    std::function<void()> gnss_func;
-    int waiting_num = 0;
-    {
-      std::unique_lock<std::mutex> lock(gnss_function_queue_mutex_);
-      gnss_func = gnss_function_queue_.front();
-      gnss_function_queue_.pop();
-      waiting_num = static_cast<int>(gnss_function_queue_.size());
-    }
-
-    if (waiting_num > 2) {
-      AWARN << waiting_num << " gnss function are waiting to process.";
-    }
-
-    gnss_func();
-  }
-  AINFO << "Exited gnss process thread";
   return;
 }
 
@@ -488,13 +277,8 @@ void LocalizationIntegImpl::RawObservationProcessImpl(
   LocalizationEstimate gnss_localization;
   TransferGnssMeasureToLocalization(measure, &gnss_localization);
 
-  gnss_localization_mutex_.lock();
-  gnss_localization_list_.push_back(
-      LocalizationResult(state, gnss_localization));
-  if (gnss_localization_list_.size() > gnss_localization_list_max_size_) {
-    gnss_localization_list_.pop_front();
-  }
-  gnss_localization_mutex_.unlock();
+  lastest_gnss_localization_ = LocalizationResult(state, gnss_localization);
+
   return;
 }
 
@@ -516,13 +300,8 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     TransferGnssMeasureToLocalization(measure, &gnss_localization);
     expert_.GetGnssStatus(gnss_localization.mutable_msf_status());
 
-    gnss_localization_mutex_.lock();
-    gnss_localization_list_.push_back(
-        LocalizationResult(LocalizationMeasureState::OK, gnss_localization));
-    if (gnss_localization_list_.size() > gnss_localization_list_max_size_) {
-      gnss_localization_list_.pop_front();
-    }
-    gnss_localization_mutex_.unlock();
+    lastest_gnss_localization_ = LocalizationResult(
+        LocalizationMeasureState::OK, gnss_localization);
   }
   return;
 }
@@ -530,46 +309,6 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
 void LocalizationIntegImpl::GnssHeadingProcess(
     const drivers::gnss::Heading& gnssheading_msg) {
   GnssHeadingProcessImpl(gnssheading_msg);
-  //  gnss_heading_function_queue_mutex_.lock();
-  //  gnss_heading_function_queue_.push(std::function<void()>(std::bind(
-  //                  &LocalizationIntegImpl::GnssHeadingProcessImpl, this,
-  //                  gnssheading_msg)));
-  //  gnss_heading_function_signal_.notify_one();
-  //  gnss_heading_function_queue_mutex_.unlock();
-  return;
-}
-
-void LocalizationIntegImpl::GnssHeadingThreadLoop() {
-  AINFO << "Started gnss process thread";
-  while (keep_gnss_heading_running_.load()) {
-    {
-      std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
-      int size = static_cast<int>(gnss_heading_function_queue_.size());
-      while (size > gnss_heading_queue_max_size_) {
-        gnss_heading_function_queue_.pop();
-        --size;
-      }
-      if (gnss_heading_function_queue_.size() == 0) {
-        gnss_heading_function_signal_.wait(lock);
-        continue;
-      }
-    }
-
-    std::function<void()> gnss_heading_func;
-    int waiting_num = 0;
-    {
-      std::unique_lock<std::mutex> lock(gnss_heading_function_queue_mutex_);
-      gnss_heading_func = gnss_heading_function_queue_.front();
-      gnss_heading_function_queue_.pop();
-      waiting_num = static_cast<int>(gnss_heading_function_queue_.size());
-    }
-
-    if (waiting_num > 2) {
-      AWARN << waiting_num << " gnss_heading function are waiting to process.";
-    }
-    gnss_heading_func();
-  }
-  AINFO << "Exited gnss_heading process thread";
   return;
 }
 
@@ -633,86 +372,19 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   return;
 }
 
-void LocalizationIntegImpl::GetLastestLidarLocalization(
-    LocalizationMeasureState* state, LocalizationEstimate* lidar_localization) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(lidar_localization);
-
-  lidar_localization_mutex_.lock();
-  if (lidar_localization_list_.size()) {
-    *state = lidar_localization_list_.front().state();
-    *lidar_localization = lidar_localization_list_.front().localization();
-    lidar_localization_list_.clear();
-  } else {
-    *state = LocalizationMeasureState::NOT_VALID;
-  }
-  lidar_localization_mutex_.unlock();
-  return;
+const LocalizationResult& LocalizationIntegImpl::
+    GetLastestLidarLocalization() const {
+  return lastest_lidar_localization_;
 }
 
-void LocalizationIntegImpl::GetLastestIntegLocalization(
-    LocalizationMeasureState* state, LocalizationEstimate* integ_localization) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(integ_localization);
-
-  integ_localization_mutex_.lock();
-  if (integ_localization_list_.size()) {
-    *state = integ_localization_list_.front().state();
-    *integ_localization = integ_localization_list_.front().localization();
-    integ_localization_list_.clear();
-  } else {
-    *state = LocalizationMeasureState::NOT_VALID;
-  }
-  integ_localization_mutex_.unlock();
-  return;
+const LocalizationResult& LocalizationIntegImpl::
+    GetLastestIntegLocalization() const {
+  return lastest_integ_localization_;
 }
 
-void LocalizationIntegImpl::GetLastestGnssLocalization(
-    LocalizationMeasureState* state, LocalizationEstimate* gnss_localization) {
-  CHECK_NOTNULL(state);
-  CHECK_NOTNULL(gnss_localization);
-
-  gnss_localization_mutex_.lock();
-  if (gnss_localization_list_.size()) {
-    *state = gnss_localization_list_.front().state();
-    *gnss_localization = gnss_localization_list_.front().localization();
-    gnss_localization_list_.clear();
-  } else {
-    *state = LocalizationMeasureState::NOT_VALID;
-  }
-  gnss_localization_mutex_.unlock();
-  return;
-}
-
-void LocalizationIntegImpl::GetLidarLocalizationList(
-    std::list<LocalizationResult>* results) {
-  CHECK_NOTNULL(results);
-
-  lidar_localization_mutex_.lock();
-  *results = lidar_localization_list_;
-  lidar_localization_list_.clear();
-  lidar_localization_mutex_.unlock();
-}
-
-void LocalizationIntegImpl::GetIntegLocalizationList(
-    std::list<LocalizationResult>* results) {
-  CHECK_NOTNULL(results);
-
-  integ_localization_mutex_.lock();
-  *results = integ_localization_list_;
-  integ_localization_list_.clear();
-  integ_localization_mutex_.unlock();
-}
-
-void LocalizationIntegImpl::GetGnssLocalizationList(
-    std::list<LocalizationResult>* results) {
-  CHECK_NOTNULL(results);
-
-  gnss_localization_mutex_.lock();
-  *results = gnss_localization_list_;
-  gnss_localization_list_.clear();
-  gnss_localization_mutex_.unlock();
-  return;
+const LocalizationResult& LocalizationIntegImpl::
+    GetLastestGnssLocalization() const {
+  return lastest_gnss_localization_;
 }
 
 }  // namespace msf

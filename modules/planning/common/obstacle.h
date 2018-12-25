@@ -259,7 +259,7 @@ class Obstacle {
   struct ObjectTagCaseHash {
     size_t operator()(
         const planning::ObjectDecisionType::ObjectTagCase tag) const {
-      return static_cast<std::size_t>(tag);
+      return static_cast<size_t>(tag);
     }
   };
 

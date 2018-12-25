@@ -356,7 +356,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
   }
   DCHECK_EQ(t_evaluated_.size(), cruise_.size());
 
-  for (std::size_t i = 0; i < t_evaluated_.size(); ++i) {
+  for (size_t i = 0; i < t_evaluated_.size(); ++i) {
     ADEBUG << "Cruise Ref S: " << cruise_[i]
            << " Relative time: " << t_evaluated_[i] << std::endl;
   }
@@ -415,7 +415,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
             static_cast<double>(t_evaluated_.size()));
   }
 
-  for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
+  for (size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
     ADEBUG << "Follow Ref S: " << ref_s[i]
            << " Relative time: " << filtered_evaluate_t[i] << std::endl;
   }
@@ -462,7 +462,7 @@ Status QpSplineStGraph::AddYieldReferenceLineKernel(
             static_cast<double>(t_evaluated_.size()));
   }
 
-  for (std::size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
+  for (size_t i = 0; i < filtered_evaluate_t.size(); ++i) {
     ADEBUG << "Yield Ref S: " << ref_s[i]
            << " Relative time: " << filtered_evaluate_t[i] << std::endl;
   }

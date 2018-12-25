@@ -14,11 +14,9 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include <string>
+#include "modules/routing/graph/sub_topo_graph.h"
 
 #include "gtest/gtest.h"
-
-#include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/graph/topo_graph.h"
 #include "modules/routing/graph/topo_test_utils.h"
 

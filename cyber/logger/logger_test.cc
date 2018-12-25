@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/logger/logger.h"
+
 #include <glog/logging.h>
 #include <gtest/gtest.h>
 #include <string>
 
-#include "cyber/logger/logger.h"
 #include "cyber/time/time.h"
 
 namespace apollo {

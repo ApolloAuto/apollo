@@ -65,8 +65,8 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
     py_lane_marker = []
     for x in range(int(lane_marker.left_lane_marker.view_range)):
         px_lane_marker.append(evaluate_poly(left_c0, left_c1,
-                                             left_c2, left_c3,
-                                             float(x)))
+                                            left_c2, left_c3,
+                                            float(x)))
         py_lane_marker.append(float(x))
     ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
 
@@ -88,8 +88,8 @@ def draw_lane_boundary(lane, ax, color_val, lane_marker):
     py_lane_marker = []
     for x in range(int(lane_marker.right_lane_marker.view_range)):
         px_lane_marker.append(evaluate_poly(right_c0, right_c1,
-                                             right_c2, right_c3,
-                                             float(x)))
+                                            right_c2, right_c3,
+                                            float(x)))
         py_lane_marker.append(float(x))
     ax.plot(px_lane_marker, py_lane_marker, ls='--', c='g', alpha=0.5)
 
@@ -182,6 +182,7 @@ def update(frame_number):
 def map_callback(map_msg_pb):
     global map_msg
     map_msg = map_msg_pb
+
 
 def planning_callback(planning_msg_pb):
     global planning_msg

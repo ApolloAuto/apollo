@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/component/timer_component.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "cyber/component/timer_component.h"
 #include "cyber/init.h"
 
 namespace apollo {

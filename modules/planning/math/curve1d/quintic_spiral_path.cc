@@ -145,7 +145,7 @@ QuinticSpiralPath::QuinticSpiralPath(const std::array<double, 3>& start,
     : QuinticSpiralPath(start[0], start[1], start[2], end[0], end[1], end[2],
                         delta_s) {}
 
-double QuinticSpiralPath::DeriveTheta(const std::size_t param_index,
+double QuinticSpiralPath::DeriveTheta(const size_t param_index,
                                       const double r) const {
   double s = param_ * r;
   double s2 = s * s;
@@ -166,7 +166,7 @@ double QuinticSpiralPath::DeriveTheta(const std::size_t param_index,
   return derivative;
 }
 
-double QuinticSpiralPath::DeriveKappaDerivative(const std::size_t param_index,
+double QuinticSpiralPath::DeriveKappaDerivative(const size_t param_index,
                                                 const double r) const {
   double s = param_ * r;
   double s2 = s * s;
@@ -187,7 +187,7 @@ double QuinticSpiralPath::DeriveKappaDerivative(const std::size_t param_index,
   return derivative;
 }
 
-double QuinticSpiralPath::DeriveDKappaDerivative(const std::size_t param_index,
+double QuinticSpiralPath::DeriveDKappaDerivative(const size_t param_index,
                                                  const double r) const {
   double s = param_ * r;
   double s2 = s * s;
@@ -205,7 +205,7 @@ double QuinticSpiralPath::DeriveDKappaDerivative(const std::size_t param_index,
   return derivative;
 }
 
-double QuinticSpiralPath::DeriveD2KappaDerivative(const std::size_t param_index,
+double QuinticSpiralPath::DeriveD2KappaDerivative(const size_t param_index,
                                                   const double r) const {
   double s = param_ * r;
   double s2 = s * s;

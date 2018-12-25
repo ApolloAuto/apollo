@@ -61,6 +61,8 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform/proto:transform_proto",
+        "//modules/v2x/common:v2x_proxy_gflags",
+        "//modules/v2x/proto:v2x_traffic_light_proto",
         "@eigen",
     ],
 )

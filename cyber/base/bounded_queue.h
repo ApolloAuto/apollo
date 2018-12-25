@@ -46,6 +46,8 @@ class BoundedQueue {
   bool Init(uint64_t size, WaitStrategy* strategy);
   bool Enqueue(const T& element);
   bool Enqueue(T&& element);
+  bool WaitEnqueue(const T& element);
+  bool WaitEnqueue(T&& element);
   bool Dequeue(T* element);
   bool WaitDequeue(T* element);
   uint64_t Size();
@@ -165,6 +167,38 @@ bool BoundedQueue<T>::Dequeue(T* element) {
 }
 
 template <typename T>
+bool BoundedQueue<T>::WaitEnqueue(const T& element) {
+  while (!break_all_wait_) {
+    if (Enqueue(element)) {
+      return true;
+    } else {
+      if (wait_strategy_->EmptyWait()) {
+        continue;
+      }
+      // wait timeout
+      return false;
+    }
+  }
+  return false;
+}
+
+template <typename T>
+bool BoundedQueue<T>::WaitEnqueue(T&& element) {
+  while (!break_all_wait_) {
+    if (Enqueue(element)) {
+      return true;
+    } else {
+      if (wait_strategy_->EmptyWait()) {
+        continue;
+      }
+      // wait timeout
+      return false;
+    }
+  }
+  return false;
+}
+
+template <typename T>
 bool BoundedQueue<T>::WaitDequeue(T* element) {
   while (!break_all_wait_) {
     if (Dequeue(element)) {
@@ -192,7 +226,7 @@ inline bool BoundedQueue<T>::Empty() {
 
 template <typename T>
 inline uint64_t BoundedQueue<T>::GetIndex(uint64_t num) {
-  return num % pool_size_;
+  return num - (num / pool_size_) * pool_size_;  // faster than %
 }
 
 template <typename T>

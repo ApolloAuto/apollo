@@ -35,10 +35,6 @@ VehicleManager::VehicleManager() {
   CHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
       << "Unable to parse VehicleData config file "
       << FLAGS_vehicle_data_config_filename;
-  for (auto &data_file : *vehicle_data_.mutable_data_files()) {
-    data_file.set_dest_path(
-        apollo::common::util::TranslatePath(data_file.dest_path()));
-  }
 }
 
 bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {

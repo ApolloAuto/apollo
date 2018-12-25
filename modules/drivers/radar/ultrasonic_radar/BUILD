@@ -72,18 +72,18 @@ cc_library(
     hdrs = [
         "ultrasonic_radar_canbus_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"ultrasonic_radar_canbus\\"'],
     deps = [
         ":ultrasonic_radar_canbus_lib",
         "//modules/common/adapters:adapter_gflags",
     ],
-    copts = ['-DMODULE_NAME=\\"ultrasonic_radar_canbus\\"']
 )
 
 cc_binary(
     name = "libultrasonic_radar_canbus_component.so",
-    deps = [":ultrasonic_radar_canbus_component_lib"],
     linkshared = True,
     linkstatic = False,
+    deps = [":ultrasonic_radar_canbus_component_lib"],
 )
 
 cpplint()

@@ -4,8 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "node",
-    srcs = [ "node.cc", ],
-    hdrs = [ "node.h", ],
+    srcs = ["node.cc"],
+    hdrs = ["node.h"],
     deps = [
         "node_channel_impl",
         "node_service_impl",
@@ -14,7 +14,7 @@ cc_library(
 
 cc_library(
     name = "node_channel_impl",
-    hdrs = [ "node_channel_impl.h", ],
+    hdrs = ["node_channel_impl.h"],
     deps = [
         "reader",
         "writer",
@@ -28,17 +28,16 @@ cc_library(
 
 cc_library(
     name = "node_service_impl",
-    hdrs = [ "node_service_impl.h", ],
+    hdrs = ["node_service_impl.h"],
     deps = [
         "reader",
         "writer",
         "//cyber/common:global_data",
+        "//cyber/service",
         "//cyber/service:client",
-        "//cyber/service:service",
         "//cyber/service_discovery:topology_manager",
     ],
 )
-    
 
 cc_test(
     name = "node_test",
@@ -55,45 +54,45 @@ cc_test(
 
 cc_library(
     name = "reader",
-    hdrs = [ "reader.h", ],
+    hdrs = ["reader.h"],
     deps = [
         "reader_base",
-        "//cyber/blocker:blocker",
+        "//cyber/blocker",
         "//cyber/common:global_data",
         "//cyber/croutine:routine_factory",
         "//cyber/data:data_visitor",
         "//cyber/proto:topology_change_cc_proto",
-        "//cyber/scheduler:scheduler",
+        "//cyber/scheduler",
         "//cyber/service_discovery:topology_manager",
-        "//cyber/time:time",
-        "//cyber/transport:transport",
-    ]
+        "//cyber/time",
+        "//cyber/transport",
+    ],
 )
 
 cc_library(
     name = "reader_base",
-    hdrs = [ "reader_base.h", ],
+    hdrs = ["reader_base.h"],
     deps = [
         "//cyber/event:perf_event_cache",
-        "//cyber/transport:transport",
+        "//cyber/transport",
     ],
 )
 
 cc_library(
     name = "writer",
-    hdrs = [ "writer.h", ],
+    hdrs = ["writer.h"],
     deps = [
         "writer_base",
         "//cyber/common:log",
         "//cyber/proto:topology_change_cc_proto",
         "//cyber/service_discovery:topology_manager",
-        "//cyber/transport:transport",
+        "//cyber/transport",
     ],
 )
 
 cc_library(
     name = "writer_base",
-    hdrs = [ "writer_base.h", ],
+    hdrs = ["writer_base.h"],
     deps = [
         "//cyber/common:macros",
         "//cyber/common:util",
@@ -104,7 +103,7 @@ cc_library(
 cc_test(
     name = "writer_reader_test",
     size = "small",
-    srcs = [ "writer_reader_test.cc", ],
+    srcs = ["writer_reader_test.cc"],
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",

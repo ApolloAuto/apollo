@@ -16,7 +16,6 @@
 
 #include "modules/transform/static_transform_component.h"
 
-#include "modules/common/util/file.h"
 #include "yaml-cpp/yaml.h"
 
 namespace apollo {
@@ -55,7 +54,7 @@ void StaticTransformComponent::SendTransforms() {
 bool StaticTransformComponent::ParseFromYaml(
     const std::string& file_path,
     apollo::transform::TransformStamped* transform_stamped) {
-  if (!common::util::PathExists(file_path)) {
+  if (!cyber::common::PathExists(file_path)) {
     AERROR << "Extrinsic yaml file is noe exists: " << file_path;
     return false;
   }

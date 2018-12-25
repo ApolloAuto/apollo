@@ -319,8 +319,8 @@ Status OpenSpacePlanning::Plan(
 
     if (FLAGS_enable_stitch_last_trajectory) {
       last_publishable_trajectory_->PrependTrajectoryPoints(
-          last_stitching_trajectory_.begin(),
-          last_stitching_trajectory_.end() - 1);
+          std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
+                                       last_stitching_trajectory_.end() - 1));
     }
 
     // save the publishable trajectory for use when no planning is generated
@@ -395,34 +395,26 @@ Status OpenSpacePlanning::Plan(
 Status OpenSpacePlanning::TrajectoryPartition(
     const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
     ADCTrajectory* const ptr_trajectory_pb) {
-  std::vector<common::TrajectoryPoint>
-      uninterpolated_stitched_trajectory_to_end =
-          last_publishable_trajectory->trajectory_points();
-
   // interpolate the stitched trajectory
   std::vector<common::TrajectoryPoint> stitched_trajectory_to_end;
   size_t interpolated_pieces_num = 50;
-  for (size_t i = 0; i < uninterpolated_stitched_trajectory_to_end.size() - 1;
-       i++) {
+  for (size_t i = 0; i < last_publishable_trajectory->size() - 1; i++) {
     double relative_time_interval =
-        (uninterpolated_stitched_trajectory_to_end[i + 1].relative_time() -
-         uninterpolated_stitched_trajectory_to_end[i].relative_time()) /
+        (last_publishable_trajectory->at(i + 1).relative_time() -
+         last_publishable_trajectory->at(i).relative_time()) /
         static_cast<double>(interpolated_pieces_num);
-    stitched_trajectory_to_end.push_back(
-        uninterpolated_stitched_trajectory_to_end[i]);
+    stitched_trajectory_to_end.push_back(last_publishable_trajectory->at(i));
     for (size_t j = 0; j < interpolated_pieces_num - 1; j++) {
       double relative_time =
-          uninterpolated_stitched_trajectory_to_end[i].relative_time() +
+          last_publishable_trajectory->at(i).relative_time() +
           (static_cast<double>(j) + 1) * relative_time_interval;
       stitched_trajectory_to_end.emplace_back(
           common::math::InterpolateUsingLinearApproximation(
-              uninterpolated_stitched_trajectory_to_end[i],
-              uninterpolated_stitched_trajectory_to_end[i + 1], relative_time));
+              last_publishable_trajectory->at(i),
+              last_publishable_trajectory->at(i + 1), relative_time));
     }
   }
-  stitched_trajectory_to_end.push_back(
-      uninterpolated_stitched_trajectory_to_end
-          [uninterpolated_stitched_trajectory_to_end.size() - 1]);
+  stitched_trajectory_to_end.push_back(last_publishable_trajectory->back());
   double distance_s = 0.0;
   apollo::planning_internal::Trajectories trajectory_partition;
   std::vector<apollo::canbus::Chassis::GearPosition> gear_positions;
@@ -515,22 +507,17 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
 
     auto* point = current_trajectory->add_trajectory_point();
-    int gear_drive = 1;
-    if (gear_positions.back() == canbus::Chassis::GEAR_REVERSE) gear_drive = -1;
     point->set_relative_time(stitched_trajectory_to_end[i].relative_time());
     point->mutable_path_point()->set_x(
         stitched_trajectory_to_end[i].path_point().x());
     point->mutable_path_point()->set_y(
         stitched_trajectory_to_end[i].path_point().y());
-    if (gear_drive == 1) {
-      point->mutable_path_point()->set_theta(
-          stitched_trajectory_to_end[i].path_point().theta());
-    } else {
-      point->mutable_path_point()->set_theta(common::math::NormalizeAngle(
-          stitched_trajectory_to_end[i].path_point().theta() + M_PI));
-    }
+    point->mutable_path_point()->set_theta(
+        stitched_trajectory_to_end[i].path_point().theta());
     if (i > 0) {
       distance_s +=
+          (gear_positions.back() == canbus::Chassis::GEAR_REVERSE ? -1.0
+                                                                  : 1.0) *
           std::sqrt((stitched_trajectory_to_end[i].path_point().x() -
                      stitched_trajectory_to_end[i - 1].path_point().x()) *
                         (stitched_trajectory_to_end[i].path_point().x() -
@@ -542,23 +529,23 @@ Status OpenSpacePlanning::TrajectoryPartition(
     }
     point->mutable_path_point()->set_s(distance_s);
 
-    point->set_v(stitched_trajectory_to_end[i].v() * gear_drive);
-    // TODO(Jiaxuan): Verify this steering to kappa equation and use parameter
-    // from config
+    point->set_v(stitched_trajectory_to_end[i].v());
     const auto& vehicle_config =
         common::VehicleConfigHelper::Instance()->GetConfig();
     point->mutable_path_point()->set_kappa(
         std::tan(stitched_trajectory_to_end[i].steer()) /
-        vehicle_config.vehicle_param().wheel_base() * gear_drive);
-    point->set_a(stitched_trajectory_to_end[i].a() * gear_drive);
+        vehicle_config.vehicle_param().wheel_base());
+    point->set_a(stitched_trajectory_to_end[i].a());
   }
 
   // Choose the one to follow based on the closest partitioned trajectory
   size_t trajectories_size = trajectory_partition.trajectory_size();
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
+  // TODO(Jinyun) move these to configs
   constexpr double kepsilon_to_destination = 1e-6;
   constexpr double heading_searching_range = 0.3;
+  constexpr double gear_shift_period_duration_ = 2.0;
   bool flag_change_to_next = false;
   // Could have a big error in vehicle state in single thread mode!!! As the
   // vehicle state is only updated at the every beginning at RunOnce()
@@ -591,6 +578,7 @@ Status OpenSpacePlanning::TrajectoryPartition(
             (path_end_point.y() - vehicle_state.y());
 
     double traj_point_moving_direction = path_end_point.theta();
+    // TODO(Jinyun) simplify the calculation
     if (gear_positions[i] == canbus::Chassis::GEAR_REVERSE) {
       traj_point_moving_direction =
           common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
@@ -658,6 +646,26 @@ Status OpenSpacePlanning::TrajectoryPartition(
         current_trajectory_index = closest_point.first.first;
         closest_trajectory_point_index = closest_point.first.second;
         break;
+      }
+    }
+  }
+
+  if (FLAGS_use_gear_shift_trajectory) {
+    if (flag_change_to_next || !gear_shift_period_finished_) {
+      gear_shift_period_finished_ = false;
+      if (gear_shift_period_started_) {
+        gear_shift_start_time_ = Clock::NowInSeconds();
+        gear_shift_position_ = gear_positions[current_trajectory_index];
+        gear_shift_period_started_ = false;
+      }
+      if (gear_shift_period_time_ > gear_shift_period_duration_) {
+        gear_shift_period_finished_ = true;
+        gear_shift_period_started_ = true;
+      } else {
+        GenerateGearShiftTrajectory(gear_shift_position_, ptr_trajectory_pb);
+        gear_shift_period_time_ =
+            Clock::NowInSeconds() - gear_shift_start_time_;
+        return Status::OK();
       }
     }
   }
@@ -769,7 +777,7 @@ void OpenSpacePlanning::AddStitchSpeedProfile(planning_internal::Debug* debug) {
   // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* speed_profile = chart->add_line();
   speed_profile->set_label("Speed Profile");
-  for (const auto& point : last_trajectory_->trajectory_points()) {
+  for (const auto& point : *last_trajectory_) {
     auto* point_debug = speed_profile->add_point();
     point_debug->set_x(point.relative_time() + last_trajectory_->header_time());
     point_debug->set_y(point.v());
@@ -995,28 +1003,21 @@ void OpenSpacePlanning::BuildPredictedEnvironment(
   }
 }
 
-apollo::common::Status OpenSpacePlanning::GenerateGearShiftTrajectory(
-    const std::vector<double>& end_pose,
+void OpenSpacePlanning::GenerateGearShiftTrajectory(
     const apollo::canbus::Chassis::GearPosition& gear_position,
     ADCTrajectory* trajectory_pb) {
-  if (end_pose.size() != 4) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "End pose not valid in GenerateGearShiftTrajectory!");
-  }
-
   trajectory_pb->clear_trajectory_point();
 
-  trajectory_pb->set_gear(gear_position);
-
   // TODO(QiL): move this to config after finalize the logic
-  const double max_t = 3.0;
-  const double unit_t = 0.02;
+  constexpr double max_t = 3.0;
+  constexpr double unit_t = 0.02;
 
   TrajectoryPoint tp;
   auto path_point = tp.mutable_path_point();
-  path_point->set_x(end_pose[0]);
-  path_point->set_y(end_pose[1]);
-  path_point->set_theta(end_pose[2]);
+  path_point->set_x(frame_->vehicle_state().x());
+  path_point->set_y(frame_->vehicle_state().y());
+  path_point->set_theta(frame_->vehicle_state().heading());
+  path_point->set_kappa(frame_->vehicle_state().kappa());
   path_point->set_s(0.0);
   tp.set_v(0.0);
   tp.set_a(0.0);
@@ -1025,8 +1026,7 @@ apollo::common::Status OpenSpacePlanning::GenerateGearShiftTrajectory(
     auto next_point = trajectory_pb->add_trajectory_point();
     next_point->CopyFrom(tp);
   }
-
-  return Status::OK();
+  trajectory_pb->set_gear(gear_position);
 }
 
 void OpenSpacePlanning::GenerateStopTrajectory(
@@ -1046,6 +1046,7 @@ void OpenSpacePlanning::GenerateStopTrajectory(
     point->set_a(0.0);
     relative_time += relative_stop_time;
   }
+  ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
 }
 
 }  // namespace planning

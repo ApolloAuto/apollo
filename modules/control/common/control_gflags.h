@@ -32,12 +32,6 @@ DECLARE_string(control_node_name);
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
 
-DECLARE_bool(enable_input_timestamp_check);
-
-DECLARE_int32(max_localization_miss_num);
-DECLARE_int32(max_chassis_miss_num);
-DECLARE_int32(max_planning_miss_num);
-
 DECLARE_double(max_acceleration_when_stopped);
 
 DECLARE_double(steer_angle_rate);
@@ -54,3 +48,5 @@ DECLARE_int32(chassis_pending_queue_size);
 DECLARE_int32(planning_pending_queue_size);
 DECLARE_int32(localization_pending_queue_size);
 DECLARE_int32(pad_msg_pending_queue_size);
+
+DECLARE_bool(reverse_heading_control);

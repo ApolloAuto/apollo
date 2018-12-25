@@ -103,6 +103,24 @@ cc_test(
 )
 
 cc_library(
+    name = "obstacle_blocking_analyzer",
+    srcs = [
+        "obstacle_blocking_analyzer.cc",
+    ],
+    hdrs = [
+        "obstacle_blocking_analyzer.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        ":frame",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/planning/reference_line",
+    ],
+)
+
+cc_library(
     name = "planning_context",
     srcs = [
         "planning_context.cc",
@@ -452,6 +470,25 @@ cc_library(
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
+    ],
+)
+
+cc_library(
+    name = "distance_estimator",
+    srcs = [
+        "distance_estimator.cc",
+    ],
+    hdrs = [
+        "distance_estimator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/map/pnc_map:route_segments",
+        "//modules/planning/common/path:path_data",
     ],
 )
 

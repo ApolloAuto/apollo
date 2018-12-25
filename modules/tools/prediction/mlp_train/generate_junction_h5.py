@@ -34,6 +34,7 @@ from common.trajectory import TrajectoryToSample
 mlp_feature_size = parameters['junction_mlp']['dim_input']
 mlp_label_size = parameters['junction_mlp']['dim_output']
 
+
 def extract_mlp_features(filename):
     features = load_label_feature(filename)
 
@@ -51,10 +52,11 @@ def extract_mlp_features(filename):
             mlp_feature.append(fea.junction_feature.junction_mlp_label[i])
         mlp_feature_np = np.array(mlp_feature)
         if mlp_features is None:
-            mlp_features = mlp_feature_np.reshape(1,mlp_feature_size+mlp_label_size)
+            mlp_features = mlp_feature_np.reshape(
+                1, mlp_feature_size+mlp_label_size)
         else:
             mlp_features = np.concatenate(
-                (mlp_features, mlp_feature_np.reshape(1,mlp_feature_size+mlp_label_size)), axis=0)
+                (mlp_features, mlp_feature_np.reshape(1, mlp_feature_size+mlp_label_size)), axis=0)
     if (mlp_features is None) or (np.size(mlp_features) == 0):
         return
     #mlp_features = mlp_features.reshape(

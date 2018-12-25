@@ -9,7 +9,6 @@ cc_library(
     ],
 )
 
-
 cc_proto_library(
     name = "sensor_velodyne_proto",
     deps = [
@@ -20,8 +19,8 @@ cc_proto_library(
 proto_library(
     name = "velodyne_proto_lib",
     srcs = [
-        "velodyne.proto",
         "config.proto",
+        "velodyne.proto",
     ],
     deps = [
         "//modules/common/proto:header_proto_lib",

@@ -15,7 +15,7 @@ cc_library(
         ":i_struct_s",
         ":i_util",
         "//modules/perception/common/i_lib/algorithm:i_sort",
-        "//modules/perception/common/i_lib/core:core",
+        "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/da:i_ransac",
         "//modules/perception/common/i_lib/geometry:i_plane",
     ],

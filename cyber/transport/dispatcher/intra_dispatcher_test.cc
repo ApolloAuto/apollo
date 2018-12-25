@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/transport/dispatcher/intra_dispatcher.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 
@@ -21,7 +23,6 @@
 #include "cyber/message/raw_message.h"
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/common/identity.h"
-#include "cyber/transport/dispatcher/intra_dispatcher.h"
 
 namespace apollo {
 namespace cyber {

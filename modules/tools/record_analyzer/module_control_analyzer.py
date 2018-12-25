@@ -42,14 +42,14 @@ class ControlAnalyzer:
         """print_latency_statistics"""
         print "\n\n"
         print PrintColors.HEADER + "--- Control Latency (ms) ---" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.module_latency)
 
         print PrintColors.HEADER + "--- Control Error Code Distribution ---" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         self.error_code_analyzer.print_results()
 
         print PrintColors.HEADER + "--- Control Error Msg Distribution ---" + \
-              PrintColors.ENDC
+            PrintColors.ENDC
         self.error_msg_analyzer.print_results()

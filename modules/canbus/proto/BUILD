@@ -13,9 +13,9 @@ proto_library(
         "canbus_conf.proto",
         "chassis.proto",
         "chassis_detail.proto",
-        "vehicle_parameter.proto",
         "lexus.proto",
-        "transit.proto"
+        "transit.proto",
+        "vehicle_parameter.proto",
     ],
     deps = [
         "//modules/common/proto:drive_state_proto_lib",

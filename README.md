@@ -32,13 +32,11 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-**The Apollo Team now proudly presents to you the latest [version 3.5](docs/quickstart/apollo_3_5_quick_start.md).**
+We just released many upgraded features to the Apollo master. This upgrade is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
 
- Apollo 3.5 is packed with the latest sensor suite (VLS-128, AXU, FPD-Link Cameras), software architecture and a brand new runtime framework. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
- 
-**Please refer to the
-[migration guide](docs/howto/how_to_migrate_to_apollo_3_5_from_old_versions.md)
-for information about migrating to the brand new Apollo 3.5 from an old version.
+**To learn more, please refer to the
+[migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
+for information about migrating to the updated Apollo master from an old version.
 
 [Want to contribute to our code?](CONTRIBUTING.md) follow this guide.
 
@@ -56,8 +54,8 @@ for information about migrating to the brand new Apollo 3.5 from an old version.
 
 
  - Please note, it is recommended that you install the versions of Apollo in the following order: 
- **1.0 > the version that suits your requirements**.
- The reason behind this recommendation is that you need to confirm whether individual hardware components
+ **1.0 > whichever version you would like to test out**.
+ The reason behind this recommendation is that you need to confirm whether individual hardware components 
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher more capable version for your safety and the safety of those around you.
 
@@ -184,11 +182,11 @@ Apollo 3.0's main focus is to provide a platform for developers to build upon in
     * Monitor
     * Additional drivers to support Hardware
 
-[**Apollo 3.5:**]()
+[**Apollo Master Upgrade:**]()
 
-Apollo 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios including unprotected turns and narrow streets often found in residential areas and roads with stop signs. 
+The latest Apollo Master Upgrade is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios including unprotected turns and narrow streets often found in residential areas and roads with stop signs. 
 
-![image alt text](docs/demo_guide/images/Apollo_3_5_Architecture.png)
+![image alt text](docs/demo_guide/images/Apollo_updated_architecture.png)
 
 **For Setup:**
 
@@ -210,7 +208,6 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 * Runtime Framework
     * Cyber RT
 
-
 ## Architecture
 
 * **Hardware/ Vehicle Overview**
@@ -224,7 +221,6 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 * **Software Overview - Navigation Mode**
 
 ![image alt text](docs/specs/images/Apollo_3.0_SW.png)
-
 
 ## Installation
 
@@ -248,7 +244,8 @@ If at this point, you do not have a Hardware setup, please go to [Without Hardwa
 
 * [Apollo 3.0 QuickStart Guide](docs/quickstart/apollo_3_0_quick_start.md)
 
-* [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_3_5_quick_start.md)
+* [Apollo Upgraded QuickStart Guide](docs/quickstart/apollo_updated_quick_start.md)
+
 
 ### Without Hardware:
 

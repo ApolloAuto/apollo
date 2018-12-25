@@ -23,17 +23,18 @@ import datetime
 import numpy as np
 import h5py
 
+
 def getListOfFiles(dirName):
     listOfFiles = os.listdir(dirName)
     allFiles = list()
-    
+
     for entry in listOfFiles:
         fullPath = os.path.join(dirName, entry)
         if os.path.isdir(fullPath):
             allFiles = allFiles + getListOfFiles(fullPath)
         else:
             allFiles.append(fullPath)
-    
+
     return allFiles
 
 
@@ -55,10 +56,10 @@ def load_hdf5(filename):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description = 'generate training samples\
+    parser = argparse.ArgumentParser(description='generate training samples\
             from a specified directory')
     parser.add_argument('directory', type=str,
-            help='directory contains feature files in .h5')
+                        help='directory contains feature files in .h5')
     args = parser.parse_args()
     path = args.directory
 
@@ -75,7 +76,7 @@ if __name__ == '__main__':
             if np.any(np.isinf(feature)):
                 print ("inf data found")
             features = np.concatenate((features, feature), axis=0) if features is not None \
-                    else feature
+                else feature
     else:
         print ("Fail to find", path)
         os._exit(-1)

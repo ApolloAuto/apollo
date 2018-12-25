@@ -62,7 +62,7 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double max_point_deviation_ = 0.1;
 
-  std::size_t num_of_iterations_ = 3000;
+  size_t num_of_iterations_ = 3000;
 
   bool has_start_point_constraint_ = false;
 

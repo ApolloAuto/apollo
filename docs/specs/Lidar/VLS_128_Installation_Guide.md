@@ -1,6 +1,6 @@
 # Installation guide of Velodyne VLS-128
 
-Apollo 3.5 uses the latest 128 line LiDAR system **VLS-128** from Velodyne LiDAR, Inc.
+Apollo master uses the latest 128 line LiDAR system **VLS-128** from Velodyne LiDAR, Inc.
 
 ![](images/VLS_128.png)
 

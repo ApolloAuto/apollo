@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/component/component.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "cyber/component/component.h"
 #include "cyber/init.h"
 #include "cyber/message/raw_message.h"
 

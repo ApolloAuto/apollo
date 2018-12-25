@@ -106,7 +106,7 @@ function main() {
         -e DOCKER_GRP=$GRP \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
-        -e PYTHONPATH=/apollo/lib:/apollo/ros/lib/python2.7/dist-packages \
+        -e PYTHONPATH=/apollo/lib \
         ${devices} \
         --add-host in_release_docker:127.0.0.1 \
         --add-host ${LOCAL_HOST}:127.0.0.1 \
@@ -124,11 +124,7 @@ function main() {
                  "/apollo/modules/localization/msf/params/velodyne_params"
                  "/apollo/modules/perception/data/params"
                  "/apollo/modules/tools/ota"
-                 "/apollo/modules/drivers/gnss/conf"
-                 "/apollo/ros/share/velodyne/launch"
-                 "/apollo/ros/share/velodyne_driver/launch"
-                 "/apollo/ros/share/velodyne_pointcloud/launch"
-                 "/apollo/ros/share/velodyne_pointcloud/params")
+                 "/apollo/modules/drivers/gnss/conf")
       for DATA_DIR in "${DATA_DIRS[@]}"; do
         docker exec apollo_release bash -c \
             "mkdir -p '${DATA_DIR}'; chmod a+rw -R '${DATA_DIR}'"

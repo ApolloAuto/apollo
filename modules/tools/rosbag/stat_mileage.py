@@ -75,7 +75,8 @@ class MileageCalculator(object):
                         (cur_pos.z - last_pos.z) ** 2)
                 last_pos = cur_pos
         self.auto_mileage += mileage[Chassis.COMPLETE_AUTO_DRIVE]
-        self.manual_mileage += (mileage[Chassis.COMPLETE_MANUAL] + mileage[Chassis.EMERGENCY_MODE])
+        self.manual_mileage += (mileage[Chassis.COMPLETE_MANUAL] +
+                                mileage[Chassis.EMERGENCY_MODE])
 
 
 def main():
@@ -88,6 +89,7 @@ def main():
         mc.auto_mileage * 1.60934, mc.auto_mileage)
     print 'Manual mileage: %.3f km / %.3f miles' % (
         mc.manual_mileage * 1.60934, mc.manual_mileage)
+
 
 if __name__ == '__main__':
     main()

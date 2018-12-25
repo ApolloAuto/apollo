@@ -117,6 +117,7 @@ ErrorCode LincolnController::Init(
   // need sleep to ensure all messages received
   AINFO << "Controller is initialized.";
 
+  gear_tmp_ = Chassis::GEAR_INVALID;
   is_initialized_ = true;
   return ErrorCode::OK;
 }
@@ -463,19 +464,33 @@ ErrorCode LincolnController::EnableSpeedOnlyMode() {
 }
 
 // NEUTRAL, REVERSE, DRIVE
-void LincolnController::Gear(Chassis::GearPosition gear_position) {
+void LincolnController::Gear(Chassis::GearPosition ref_gear_position) {
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
     AINFO << "this drive mode no need to set gear.";
     return;
   }
-  // enable steering to enable shifting
-  // actually, if we wanna shift from parking
-  // to some other state
-  // we need to apply a brake
-  // which needs to be done by human or
-  // some canbus cmd
-  switch (gear_position) {
+
+  ChassisDetail chassis_detail;
+  message_manager_->GetSensorData(&chassis_detail);
+  const Chassis::GearPosition current_gear_position =
+      chassis_detail.gear().gear_state();
+
+  if (ref_gear_position == current_gear_position) {
+    return;
+  }
+
+  // need to request neutral gear first if current gear location is not neutral
+  // or none
+  if (ref_gear_position != current_gear_position &&
+      current_gear_position != Chassis::GEAR_NEUTRAL &&
+      current_gear_position != Chassis::GEAR_NONE) {
+    gear_tmp_ = Chassis::GEAR_NEUTRAL;
+  } else if (current_gear_position == Chassis::GEAR_NEUTRAL) {
+    gear_tmp_ = ref_gear_position;
+  }
+
+  switch (gear_tmp_) {
     case Chassis::GEAR_NEUTRAL: {
       gear_66_->set_gear_neutral();
       break;

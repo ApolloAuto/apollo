@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/transport/transport.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <typeinfo>
 
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/common/identity.h"
-#include "cyber/transport/transport.h"
 
 namespace apollo {
 namespace cyber {

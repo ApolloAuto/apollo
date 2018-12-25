@@ -92,6 +92,12 @@ class VehicleStateProvider {
    */
   double z() const;
 
+  /**
+   * @brief Get the kappa of vehicle position.
+   *  the poistive or negative sign is decided by the vehicle heading vector
+   *  along the path
+   * @return The kappa of vehicle position.
+   */
   double kappa() const;
 
   /**

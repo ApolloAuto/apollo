@@ -24,7 +24,6 @@
 
 #include "cyber/common/log.h"
 #include "modules/routing/graph/topo_node.h"
-#include "modules/routing/proto/topo_graph.pb.h"
 
 namespace apollo {
 namespace routing {

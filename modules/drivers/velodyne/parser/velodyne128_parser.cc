@@ -72,7 +72,9 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
                                std::shared_ptr<PointCloud> pc) {
   float azimuth_diff, azimuth_corrected_f;
   float last_azimuth_diff = 0.0f;
-  uint16_t azimuth, azimuth_next, azimuth_corrected;
+  uint16_t azimuth = 0;
+  uint16_t azimuth_next = 0;
+  uint16_t azimuth_corrected = 0;
   const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
   double basetime = raw->gps_timestamp;
 

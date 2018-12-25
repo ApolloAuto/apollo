@@ -55,13 +55,9 @@ class DeciderCreep : public Decider {
   bool BuildStopDecision(const double stop_sign_overlap_end_s, Frame* frame,
                          ReferenceLineInfo* reference_line_info);
 
-  double GetDistanceToFirstOverlapLane(
-      const ReferenceLineInfo& reference_line_info);
-
-  double GetOverlapPointS(const PathData& path_data);
-
  private:
   static constexpr const char* CREEP_VO_ID_PREFIX = "CREEP_";
+  static uint32_t creep_clear_counter_;
   common::TrajectoryPoint adc_planning_start_point_;
   hdmap::Lane curr_lane_;
 };

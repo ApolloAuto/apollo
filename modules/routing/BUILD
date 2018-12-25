@@ -11,16 +11,10 @@ cc_library(
         "routing.h",
     ],
     deps = [
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
-        "//modules/common/status",
-        "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/routing/common:routing_gflags",
         "//modules/routing/core",
-        "//modules/routing/graph",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 
@@ -32,17 +26,17 @@ cc_library(
     hdrs = [
         "routing_component.h",
     ],
+    copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_lib",
     ],
-    copts = ['-DMODULE_NAME=\\"routing\\"']
 )
 
 cc_binary(
     name = "librouting_component.so",
-    deps = [":routing_component_lib"],
     linkshared = True,
     linkstatic = False,
+    deps = [":routing_component_lib"],
 )
 
 filegroup(

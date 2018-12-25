@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "duration",
-        "//cyber/common:common",
+        "//cyber/common",
     ],
 )
 
@@ -37,9 +37,9 @@ cc_library(
         "rate.h",
     ],
     deps = [
-        "time",
         "duration",
-        "//cyber/common:common",
+        "time",
+        "//cyber/common",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_library(
         "duration.h",
     ],
     deps = [
-        "//cyber/common:common",
+        "//cyber/common",
     ],
 )
 

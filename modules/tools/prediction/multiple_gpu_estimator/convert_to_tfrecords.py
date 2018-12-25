@@ -62,7 +62,8 @@ def convert_to(bin_data, name):
         for index in range(0, num_examples):
             data_raw = bin_data[index * (feature_dim + 1):index *
                                 (feature_dim + 1) + feature_dim]
-            label_raw = np.array([bin_data[index*(feature_dim +1)+feature_dim]])
+            label_raw = np.array(
+                [bin_data[index*(feature_dim + 1)+feature_dim]])
             example = tf.train.Example(
                 features=tf.train.Features(
                     feature={

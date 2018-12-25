@@ -53,6 +53,7 @@ DECLARE_double(q_var);
 DECLARE_double(r_var);
 DECLARE_double(p_var);
 DECLARE_double(go_approach_rate);
+DECLARE_double(cutin_approach_rate);
 
 DECLARE_int32(min_still_obstacle_history_length);
 DECLARE_int32(max_still_obstacle_history_length);
@@ -62,6 +63,7 @@ DECLARE_double(still_obstacle_position_std);
 DECLARE_double(still_pedestrian_position_std);
 DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
+DECLARE_double(dense_lane_gap);
 DECLARE_int32(max_num_current_lane);
 DECLARE_int32(max_num_nearby_lane);
 DECLARE_double(max_lane_angle_diff);
@@ -98,6 +100,7 @@ DECLARE_double(centripetal_acc_coeff);
 DECLARE_double(junction_exit_lane_threshold);
 DECLARE_double(distance_beyond_junction);
 DECLARE_double(defualt_junction_range);
+DECLARE_double(distance_to_slow_down_at_stop_sign);
 
 // Evaluator
 DECLARE_double(time_to_center_if_not_reach);

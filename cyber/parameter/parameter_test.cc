@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/parameter/parameter.h"
+
 #include <gtest/gtest.h>
 #include <string>
 
 #include "cyber/cyber.h"
 #include "cyber/message/message_traits.h"
-#include "cyber/parameter/parameter.h"
 #include "cyber/proto/parameter.pb.h"
 
 namespace apollo {

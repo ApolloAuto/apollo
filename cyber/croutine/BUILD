@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "croutine.h",
     ],
+    linkopts = ["-latomic"],
     deps = [
         "//cyber/base:atomic_hash_map",
         "//cyber/base:atomic_rw_lock",
@@ -17,14 +18,13 @@ cc_library(
         "//cyber/base:concurrent_object_pool",
         "//cyber/base:macros",
         "//cyber/base:wait_strategy",
-        "//cyber/common:common",
+        "//cyber/common",
         "//cyber/croutine:routine_context",
         "//cyber/croutine:routine_factory",
         "//cyber/croutine:swap",
         "//cyber/event:perf_event_cache",
-        "//cyber/time:time",
+        "//cyber/time",
     ],
-    linkopts = ["-latomic"],
 )
 
 cc_library(
@@ -36,7 +36,7 @@ cc_library(
         "detail/routine_context.h",
     ],
     deps = [
-          "//cyber/common:common",
+        "//cyber/common",
     ],
 )
 
@@ -46,8 +46,8 @@ cc_library(
         "routine_factory.h",
     ],
     deps = [
-          "//cyber/common:common",
-          "//cyber/event:perf_event_cache",
+        "//cyber/common",
+        "//cyber/event:perf_event_cache",
     ],
 )
 

@@ -19,6 +19,7 @@
 #include <sched.h>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
@@ -106,6 +107,7 @@ void SchedulerChoreography::CreateProcessor() {
     proc->SetSchedPolicy(choreography_processor_policy_,
                          choreography_processor_prio_);
     pctxs_.emplace_back(ctx);
+    processors_.push_back(std::move(proc));
   }
 
   // Put tasks w/o processor assigned into a classic pool.
@@ -117,12 +119,21 @@ void SchedulerChoreography::CreateProcessor() {
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
     proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
     pctxs_.emplace_back(ctx);
+    processors_.push_back(std::move(proc));
   }
 }
 
 bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
+  if (likely(id_cr_wl_.find(cr->id()) == id_cr_wl_.end())) {
+    {
+      std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
+      if (id_cr_wl_.find(cr->id()) == id_cr_wl_.end()) {
+        id_cr_wl_[cr->id()];
+      }
+    }
+  }
   std::lock_guard<std::mutex> lg(id_cr_wl_[cr->id()]);
 
   // Assign sched cfg to tasks according to configuration.
@@ -179,6 +190,14 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
 bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
+  if (unlikely(id_cr_wl_.find(crid) == id_cr_wl_.end())) {
+    {
+      std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
+      if (id_cr_wl_.find(crid) == id_cr_wl_.end()) {
+        id_cr_wl_[crid];
+      }
+    }
+  }
   std::lock_guard<std::mutex> lg(id_cr_wl_[crid]);
 
   // Find cr from id_cr &&

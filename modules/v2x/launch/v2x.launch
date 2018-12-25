@@ -1,0 +1,11 @@
+<cyber>
+    <module>
+        <name>v2x</name>
+        <dag_conf></dag_conf>
+        <type>binary</type>
+        <process_name>
+           /apollo/bazel-bin/modules/v2x/v2x --flagfile=/apollo/modules/v2x/conf/v2x.conf
+        </process_name>
+        <version>1.0.0</version>
+    </module>
+</cyber>

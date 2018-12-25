@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/transport/transmitter/intra_transmitter.h"
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -21,7 +23,6 @@
 
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/receiver/intra_receiver.h"
-#include "cyber/transport/transmitter/intra_transmitter.h"
 
 namespace apollo {
 namespace cyber {

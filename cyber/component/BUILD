@@ -9,7 +9,7 @@ cc_library(
     ],
     deps = [
         "component_base",
-        "//cyber/scheduler:scheduler",
+        "//cyber/scheduler",
     ],
 )
 
@@ -36,7 +36,7 @@ cc_library(
     deps = [
         "component_base",
         "//cyber/blocker:blocker_manager",
-        "//cyber/timer:timer",
+        "//cyber/timer",
         "//cyber/transport:history",
         "//cyber/transport:hybrid_transmitter",
         "//cyber/transport:intra_transmitter",
@@ -65,8 +65,8 @@ cc_library(
     deps = [
         "//cyber/base:signal",
         "//cyber/base:thread_pool",
-        "//cyber/class_loader:class_loader",
-        "//cyber/node:node",
+        "//cyber/class_loader",
+        "//cyber/node",
     ],
 )
 

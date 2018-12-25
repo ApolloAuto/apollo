@@ -11,8 +11,6 @@ cc_library(
         "edge_creator.h",
     ],
     deps = [
-        "//modules/common",
-        "//modules/map/proto:map_proto",
         "//modules/routing/common:routing_gflags",
         "//modules/routing/proto:routing_proto",
     ],
@@ -29,21 +27,17 @@ cc_library(
     deps = [
         ":edge_creator",
         ":node_creator",
-        "//modules/common",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 
 cc_test(
     name = "graph_creator_test",
+    size = "small",
     srcs = [
         "graph_creator_test.cc",
     ],
-    size = "small",
     deps = [
         ":graph_creator",
         "@gtest//:main",
@@ -59,9 +53,6 @@ cc_library(
         "node_creator.h",
     ],
     deps = [
-        "//modules/common",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/common:routing_gflags",
         "//modules/routing/proto:routing_proto",
     ],
 )
@@ -71,16 +62,7 @@ cc_binary(
     srcs = ["topo_creator.cc"],
     deps = [
         ":graph_creator",
-        "//cyber/common:log",
-        "//external:gflags",
-        "//modules/common",
-        "//modules/common/configs:config_gflags",
-        "//modules/common/status",
-        "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/common:routing_gflags",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 

@@ -36,11 +36,11 @@ cc_test(
 cc_binary(
     name = "libcanbus.so",
     linkopts = ["-shared"],
+    linkshared = True,
+    linkstatic = False,
     deps = [
         ":canbus_lib",
     ],
-    linkshared = True,
-    linkstatic = False,
 )
 
 filegroup(

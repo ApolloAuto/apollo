@@ -198,7 +198,7 @@ DEFINE_bool(enable_nudge_slowdown, true,
 
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
-DEFINE_double(static_decision_nudge_l_buffer, 0.4, "l buffer for nudge");
+DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -210,17 +210,17 @@ DEFINE_double(nudge_distance_obstacle, 0.3,
               "minimum distance to nudge a obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
+DEFINE_double(follow_min_obs_lateral_distance, 2.5,
+              "obstacle min lateral distance to follow");
 DEFINE_double(yield_distance, 3.0,
               "min yield distance for vehicles/moving objects "
               "other than pedestrians/bicycles");
 DEFINE_double(yield_distance_pedestrian_bycicle, 5.0,
               "min yield distance for pedestrians/bicycles");
-DEFINE_double(
-    follow_time_buffer, 2.5,
-    "follow time buffer (in second) to calculate the following distance.");
-DEFINE_double(
-    follow_min_time_sec, 0.1,
-    "min following time in st region before considering a valid follow");
+DEFINE_double(follow_time_buffer, 2.5,
+              "time buffer in second to calculate the following distance.");
+DEFINE_double(follow_min_time_sec, 0.1,
+              "min follow time in st region before considering a valid follow");
 DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
 DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
@@ -433,6 +433,9 @@ DEFINE_bool(open_space_planner_switchable, false,
 DEFINE_bool(use_dual_variable_warm_start, true,
             "whether or not enable dual variable warm start ");
 
+DEFINE_bool(use_gear_shift_trajectory, true,
+            "allow some time for the vehicle to shift gear");
+
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
@@ -459,3 +462,23 @@ DEFINE_bool(
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
               "within this threshold, current planning will be smoothered.");
+
+DEFINE_double(side_pass_road_buffer, 0.05,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_obstacle_l_buffer, 0.1,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_obstacle_s_buffer, 2.0,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_extra_road_buffer_during_turning, 0.1,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_vehicle_buffer, 0.1,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_off_road_center_threshold, 0.4,
+              "(unit: meter) for side pass scenario ");
+DEFINE_double(side_pass_trim_watch_window, 12.0,
+              "(unit: meter) for side pass scenario ");
+DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
+            "Whether to use the actual laneinfo for side-pass path generation,"
+            " or to use the planning starting-point's laneinfo all the time.");
+DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
+              "(unit: meter) for side pass driving width l buffer");

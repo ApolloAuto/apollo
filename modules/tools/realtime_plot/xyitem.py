@@ -152,7 +152,7 @@ class Xyitem(object):
         xcenter = x + math.cos(heading) * 40
         ycenter = y + math.sin(heading) * 40
         if xcenter >= (self.axx + 20) or xcenter <= (self.axx - 20) or \
-            ycenter >= (self.axy + 20) or ycenter <= (self.axy - 20):
+                ycenter >= (self.axy + 20) or ycenter <= (self.axy - 20):
             scale = self.ax.get_window_extent(
             )._transform._boxout._bbox.get_points()[1]
             original = self.ax.get_position().get_points()

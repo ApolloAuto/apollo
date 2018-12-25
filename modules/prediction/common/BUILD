@@ -4,10 +4,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "prediction_gflags",
-    srcs = ["prediction_gflags.cc", 
-            "prediction_system_gflags.cc",],
-    hdrs = ["prediction_gflags.h", 
-            "prediction_system_gflags.h"],
+    srcs = [
+        "prediction_gflags.cc",
+        "prediction_system_gflags.cc",
+    ],
+    hdrs = [
+        "prediction_gflags.h",
+        "prediction_system_gflags.h",
+    ],
     deps = [
         "//external:gflags",
     ],
@@ -184,7 +188,7 @@ cc_library(
     deps = [
         ":prediction_map",
         "//cyber",
-        "//modules/map/hdmap:hdmap",
+        "//modules/map/hdmap",
         "//modules/prediction/proto:feature_proto",
     ],
 )

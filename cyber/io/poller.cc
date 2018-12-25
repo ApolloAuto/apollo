@@ -278,7 +278,7 @@ void Poller::HandleChanges() {
   }
 }
 
-// we may use min heap to opt
+// min heap can be used to optimize
 int Poller::GetTimeoutMs() {
   int timeout_ms = kPollTimeoutMs;
   ReadLockGuard<AtomicRWLock> lck(poll_data_lock_);

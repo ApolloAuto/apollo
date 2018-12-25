@@ -45,7 +45,7 @@ class TrafficLightRightTurnUnprotectedScenarioTest : public ::testing::Test {
 
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
-      "//apollo/modules/planning/conf/"
+      "/apollo/modules/planning/conf/"
       "scenario_traffic_light_right_turn_unprotected_config.pb.txt";
 
   ScenarioConfig config;
@@ -56,7 +56,7 @@ TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
 
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, Init) {
   FLAGS_scenario_stop_sign_unprotected_config_file =
-      "//apollo/modules/planning/testdata/conf/"
+      "/apollo/modules/planning/testdata/conf/"
       "scenario_traffic_light_right_turn_unprotected_config.pb.txt";
 
   ScenarioConfig config;

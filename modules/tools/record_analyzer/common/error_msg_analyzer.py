@@ -20,6 +20,7 @@ from modules.common.proto import error_code_pb2
 from statistical_analyzer import PrintColors
 from distribution_analyzer import DistributionAnalyzer
 
+
 class ErrorMsgAnalyzer:
     """class"""
 

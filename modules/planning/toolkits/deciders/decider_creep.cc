@@ -37,6 +37,8 @@ using apollo::hdmap::PathOverlap;
 using apollo::hdmap::HDMapUtil;
 using apollo::common::math::Vec2d;
 
+uint32_t DeciderCreep::creep_clear_counter_ = 0;
+
 DeciderCreep::DeciderCreep(const TaskConfig& config) : Decider(config) {
   CHECK(config_.has_decider_creep_config());
   SetName("DeciderCreep");
@@ -128,24 +130,37 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
       }
       if (obstacle->reference_line_st_boundary().min_t() <
           creep_config.min_boundary_t()) {
+        const double kepsilon = 1e-6;
         double obstacle_traveled_s =
             obstacle->reference_line_st_boundary().BottomLeftPoint().s() -
             obstacle->reference_line_st_boundary().BottomRightPoint().s();
-        const double kepsilon = 1e-6;
+        ADEBUG << "obstacle[" << obstacle->Id()
+            << "] obstacle_st_min_t["
+            << obstacle->reference_line_st_boundary().min_t()
+            << "] obstacle_st_min_s["
+            << obstacle->reference_line_st_boundary().min_s()
+            << "] obstacle_traveled_s[" << obstacle_traveled_s << "]";
+
         // ignore the obstacle which is already on reference line and moving
         // along the direction of ADC
         if (obstacle_traveled_s < kepsilon &&
             obstacle->reference_line_st_boundary().min_t() <
-                creep_config.max_tolerance_t()) {
+                creep_config.ignore_max_st_min_t() &&
+            obstacle->reference_line_st_boundary().min_s() >
+                creep_config.ignore_min_st_min_s()) {
           continue;
         }
         all_far_away = false;
         break;
       }
     }
-    creep_done = all_far_away;
-  }
 
+    creep_clear_counter_ = all_far_away ? creep_clear_counter_ + 1 : 0;
+    if (creep_clear_counter_ >= 5) {
+      creep_clear_counter_ = 0;  // reset
+      creep_done = true;
+    }
+  }
   return creep_done;
 }
 
@@ -164,66 +179,6 @@ void DeciderCreep::SetProceedWithCautionSpeedParam(
       creep_distance;
   ADEBUG << "creep_stop_s[" << creep_stop_s << "] adc_front_end_s["
          << adc_front_end_s << "] creep distance[" << creep_distance << "]";
-}
-
-double DeciderCreep::GetDistanceToFirstOverlapLane(
-    const ReferenceLineInfo& reference_line_info) {
-  hdmap::LaneInfoConstPtr lane;
-  double s = 0.0;
-  double l = 0.0;
-  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
-          common::util::MakePointENU(
-              adc_planning_start_point_.path_point().x(),
-              adc_planning_start_point_.path_point().y(),
-              adc_planning_start_point_.path_point().z()),
-          1.0, adc_planning_start_point_.path_point().theta(), M_PI / 3.0,
-          &lane, &s, &l) != 0) {
-    AERROR << "Failed to find nearest lane from map at position: "
-           << adc_planning_start_point_.DebugString()
-           << ", heading:" << adc_planning_start_point_.path_point().theta();
-    return 0.0;
-  }
-  curr_lane_ = lane->lane();
-  AERROR << curr_lane_.DebugString();
-
-  return GetOverlapPointS(reference_line_info.path_data());
-}
-
-double DeciderCreep::GetOverlapPointS(const PathData& path_data) {
-  double dist = 0.0;
-  if (curr_lane_.successor_id_size() == 0) {
-    return dist;
-  }
-  const auto& next_lane_info =
-      HDMapUtil::BaseMapPtr()->GetLaneById(curr_lane_.successor_id(0));
-
-  for (const auto& path_point : path_data.discretized_path()) {
-    const auto& vehicle_box =
-        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
-    const std::vector<Vec2d>& corners = vehicle_box.GetAllCorners();
-
-    bool is_overlap = false;
-    for (const auto id : next_lane_info->lane().predecessor_id()) {
-      if (is_overlap) {
-        break;
-      }
-      if (id.id() == curr_lane_.id().id()) {
-        continue;
-      }
-      const auto& lane_info =
-          HDMapUtil::BaseMapPtr()->GetLaneById(curr_lane_.successor_id(0));
-      for (const auto& corner : corners) {
-        if (lane_info->IsOnLane(corner)) {
-          is_overlap = true;
-          break;
-        }
-      }
-    }
-    if (!is_overlap) {
-      dist = std::max(dist, path_point.s());
-    }
-  }
-  return dist;
 }
 
 }  // namespace planning
