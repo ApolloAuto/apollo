@@ -31,7 +31,7 @@ using apollo::drivers::cidiv2x::config::Config;
 
 CidiV2xDriverComponent::CidiV2xDriverComponent()
     : monitor_logger_buffer_(
-          apollo::common::monitor::MonitorMessageItem::GNSS) {}
+          apollo::common::monitor::MonitorMessageItem::CIDIV2X) {}
 
 bool CidiV2xDriverComponent::Init() {
   Config config;
