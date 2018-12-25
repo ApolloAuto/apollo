@@ -17,45 +17,26 @@
 #include "modules/prediction/prediction_component.h"
 
 #include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <memory>
 #include <vector>
 
-#include "boost/filesystem.hpp"
-#include "boost/range/iterator_range.hpp"
-
-#include "cyber/cyber.h"
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/message_util.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/validation_checker.h"
-#include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/util/data_extraction.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
-using apollo::common::util::DirectoryExists;
-using apollo::common::util::Glob;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;

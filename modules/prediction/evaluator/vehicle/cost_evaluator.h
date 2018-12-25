@@ -16,10 +16,7 @@
 
 #pragma once
 
-#include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/evaluator/evaluator.h"
-#include "modules/prediction/proto/feature.pb.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {

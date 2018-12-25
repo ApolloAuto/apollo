@@ -16,13 +16,9 @@
 
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 
-#include <cmath>
 #include <memory>
-#include <string>
 #include <utility>
-#include <vector>
 
-#include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 

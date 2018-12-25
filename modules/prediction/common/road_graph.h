@@ -21,12 +21,7 @@
 
 #include "modules/prediction/proto/lane_graph.pb.h"
 
-#include "modules/common/math/math_utils.h"
 #include "modules/common/status/status.h"
-#include "modules/common/util/string_util.h"
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/proto/map_lane.pb.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {

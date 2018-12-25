@@ -20,17 +20,13 @@
 #include <string>
 #include <utility>
 
-#include "cyber/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
-using apollo::common::math::KalmanFilter;
 using apollo::hdmap::LaneInfo;
 
 void SingleLanePredictor::Predict(Obstacle* obstacle) {

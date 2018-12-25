@@ -17,23 +17,14 @@
 #include "modules/prediction/predictor/predictor.h"
 
 #include <algorithm>
-#include <cmath>
-#include <string>
-#include <vector>
 
-#include "Eigen/Dense"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
-using apollo::common::math::LineSegment2d;
-using apollo::common::math::Vec2d;
-using apollo::hdmap::LaneInfo;
-using apollo::planning::ADCTrajectory;
 
 const std::vector<Trajectory>& Predictor::trajectories() {
   return trajectories_;

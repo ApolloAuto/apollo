@@ -20,12 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "Eigen/Dense"
-
-#include "cyber/common/macros.h"
-
-#include "modules/map/hdmap/hdmap_common.h"
-#include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/map/pnc_map/path.h"
 
 namespace apollo {

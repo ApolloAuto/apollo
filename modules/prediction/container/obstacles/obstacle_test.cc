@@ -14,19 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/container/obstacles/obstacle.h"
-
-#include <iostream>
-#include <sstream>
-#include <string>
-
-#include "gtest/gtest.h"
-
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "modules/common/util/file.h"
-#include "modules/common/util/string_util.h"
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"

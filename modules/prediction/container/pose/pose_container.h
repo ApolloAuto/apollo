@@ -25,7 +25,6 @@
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "modules/prediction/container/container.h"
 
 namespace apollo {

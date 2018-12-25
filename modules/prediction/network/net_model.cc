@@ -16,7 +16,6 @@
 
 #include "modules/prediction/network/net_model.h"
 
-#include <sstream>
 #include <utility>
 
 #include "cyber/common/log.h"

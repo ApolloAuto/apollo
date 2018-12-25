@@ -12,27 +12,9 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
-        "//cyber",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/math:geometry",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/common/time",
-        "//modules/common/util",
-        "//modules/localization/proto:localization_proto",
-        "//modules/perception/proto:perception_proto",
-        "//modules/planning/proto:planning_proto",
-        "//modules/prediction/common:feature_output",
-        "//modules/prediction/common:junction_analyzer",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_map",
-        "//modules/prediction/common:validation_checker",
-        "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
-        "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/util:data_extraction",
     ],
@@ -49,7 +31,6 @@ cc_test(
     ],
     deps = [
         ":prediction_component_lib",
-        "@gtest//:main",
     ],
 )
 
@@ -59,7 +40,6 @@ cc_binary(
     linkstatic = False,
     deps = [
         ":prediction_component_lib",
-        "//external:gflags",
     ],
 )
 

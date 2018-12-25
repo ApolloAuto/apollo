@@ -17,12 +17,8 @@
 #include "modules/prediction/scenario/scenario_manager.h"
 
 #include <algorithm>
-#include <cmath>
 
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/container/container_manager.h"
 
 namespace apollo {
 namespace prediction {

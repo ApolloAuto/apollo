@@ -22,7 +22,6 @@
 
 #include <vector>
 
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {

@@ -20,12 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "Eigen/Dense"
-
-#include "modules/prediction/proto/network_model.pb.h"
-
 #include "modules/prediction/network/net_layer.h"
-#include "modules/prediction/network/net_util.h"
+#include "modules/prediction/proto/network_model.pb.h"
 
 /**
  * @namespace apollo::prediction::network

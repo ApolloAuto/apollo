@@ -18,7 +18,6 @@
 
 #include <utility>
 
-#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -30,7 +29,6 @@ namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using ::google::protobuf::Message;
 
 
 ObstaclesContainer::ObstaclesContainer()

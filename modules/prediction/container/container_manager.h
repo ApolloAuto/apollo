@@ -22,7 +22,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <unordered_map>
 
 #include "cyber/common/macros.h"
@@ -52,8 +51,7 @@ class ContainerManager {
    * @return Pointer to the container given the name
    */
   template <typename T>
-  T* GetContainer(
-      const common::adapter::AdapterConfig::MessageType &type) {
+  T* GetContainer(const common::adapter::AdapterConfig::MessageType &type) {
     auto key_type = static_cast<int>(type);
     if (containers_.find(key_type) != containers_.end()) {
       return static_cast<T*>(containers_[key_type].get());

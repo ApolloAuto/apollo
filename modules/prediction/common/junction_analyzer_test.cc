@@ -16,15 +16,7 @@
 
 #include "modules/prediction/common/junction_analyzer.h"
 
-#include <string>
-#include <vector>
-
-#include "gtest/gtest.h"
-
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/prediction/common/kml_map_based_test.h"
-#include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {

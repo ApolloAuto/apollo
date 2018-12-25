@@ -22,10 +22,7 @@
 #include <utility>
 #include <vector>
 
-#include "cyber/common/macros.h"
-
 #include "modules/prediction/proto/feature.pb.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 #include "modules/map/hdmap/hdmap_common.h"
 
