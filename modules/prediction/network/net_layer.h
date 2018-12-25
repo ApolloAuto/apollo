@@ -17,10 +17,6 @@
 #include <string>
 #include <vector>
 
-#include "Eigen/Dense"
-
-#include "modules/prediction/proto/network_layers.pb.h"
-
 #include "modules/prediction/network/net_util.h"
 
 #pragma once

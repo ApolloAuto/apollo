@@ -16,18 +16,15 @@
 
 #include "modules/prediction/predictor/regional/regional_predictor.h"
 
-#include <cmath>
 #include <limits>
 #include <utility>
 
-#include "modules/common/math/kalman_filter.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::KalmanFilter;
 

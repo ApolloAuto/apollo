@@ -16,11 +16,6 @@
 
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 
-#include <string>
-
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -28,12 +23,8 @@ namespace prediction {
 
 using common::adapter::AdapterConfig;
 using common::math::Vec2d;
-using planning::ADCTrajectory;
-using hdmap::HDMapUtil;
 using hdmap::LaneInfo;
 using hdmap::JunctionInfo;
-using hdmap::OverlapInfo;
-using perception::PerceptionObstacle;
 using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
 using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
 

@@ -11,12 +11,9 @@ cc_library(
         "cruise_model.h",
     ],
     deps = [
-        "//cyber",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/network:net_layer",
         "//modules/prediction/network:net_model",
         "//modules/prediction/proto:cruise_model_proto",
-        "@eigen",
     ],
 )
 

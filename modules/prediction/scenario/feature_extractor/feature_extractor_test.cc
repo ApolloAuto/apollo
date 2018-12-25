@@ -16,24 +16,13 @@
 
 #include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 
-#include <memory>
-
-#include "gtest/gtest.h"
-
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-
 #include "modules/prediction/common/kml_map_based_test.h"
-#include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/container/container_manager.h"
 
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::localization::LocalizationEstimate;
-using apollo::planning::ADCTrajectory;
 
 class FeatureExtractorTest : public KMLMapBasedTest {};
 

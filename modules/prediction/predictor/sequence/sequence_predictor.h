@@ -22,16 +22,11 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
 #include <vector>
 
-#include "Eigen/Dense"
 #include "gtest/gtest.h"
 
-#include "cyber/common/macros.h"
-
 #include "modules/prediction/predictor/predictor.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {

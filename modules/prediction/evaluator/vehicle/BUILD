@@ -11,17 +11,11 @@ cc_library(
         "mlp_evaluator.h",
     ],
     deps = [
-        "//modules/common/math:geometry",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
         "//modules/prediction/common:feature_output",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/common:validation_checker",
-        "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
-        "//modules/prediction/proto:lane_graph_proto",
     ],
 )
 
@@ -36,10 +30,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
-        "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "@gtest//:main",
@@ -55,14 +46,7 @@ cc_library(
         "rnn_evaluator.h",
     ],
     deps = [
-        "//modules/common/util",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_map",
-        "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
-        "//modules/prediction/network/rnn_model",
-        "//modules/prediction/proto:network_model_proto",
-        "@eigen",
     ],
 )
 
@@ -77,10 +61,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
-        "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:rnn_evaluator",
         "@gtest//:main",
@@ -96,16 +77,8 @@ cc_library(
         "cost_evaluator.h",
     ],
     deps = [
-        "//modules/common/math:geometry",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
-        "//modules/prediction/common:feature_output",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
-        "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
-        "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/proto:lane_graph_proto",
     ],
 )
 
@@ -120,10 +93,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
-        "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "@gtest//:main",
@@ -139,19 +109,10 @@ cc_library(
         "junction_mlp_evaluator.h",
     ],
     deps = [
-        "//modules/common/math:geometry",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
         "//modules/prediction/common:feature_output",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_map",
         "//modules/prediction/common:prediction_util",
-        "//modules/prediction/common:validation_checker",
-        "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
-        "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
-        "//modules/prediction/proto:lane_graph_proto",
     ],
 )
 
@@ -166,10 +127,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
-        "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
         "@gtest//:main",
@@ -185,22 +143,9 @@ cc_library(
         "cruise_mlp_evaluator.h",
     ],
     deps = [
-        "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/math:geometry",
-        "//modules/common/util",
-        "//modules/map/proto:map_proto",
-        "//modules/prediction/common:feature_output",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/common:prediction_util",
-        "//modules/prediction/common:validation_checker",
         "//modules/prediction/container:container_manager",
-        "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/evaluator",
         "//modules/prediction/network/cruise_model",
-        "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/proto:fnn_vehicle_model_proto",
-        "//modules/prediction/proto:lane_graph_proto",
-        "//modules/prediction/proto:scenario_proto",
     ],
 )
 
@@ -215,13 +160,8 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
-        "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
-        "@gtest//:main",
     ],
 )
 

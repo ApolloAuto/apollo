@@ -7,13 +7,9 @@ cc_library(
     srcs = ["adc_trajectory_container.cc"],
     hdrs = ["adc_trajectory_container.h"],
     deps = [
-        "//cyber",
-        "//modules/common/math:geometry",
         "//modules/planning/proto:planning_proto",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/container",
-        "//modules/prediction/proto:lane_graph_proto",
     ],
 )
 

@@ -21,18 +21,10 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 #include <string>
-#include <vector>
 
 #include "cyber/component/component.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/status/status.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**

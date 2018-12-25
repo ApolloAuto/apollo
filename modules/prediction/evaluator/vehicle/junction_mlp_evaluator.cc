@@ -16,17 +16,13 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
-#include <cmath>
 #include <unordered_map>
 
-#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
-
-using apollo::hdmap::LaneInfo;
 
 namespace apollo {
 namespace prediction {
