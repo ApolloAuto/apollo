@@ -16,18 +16,11 @@
 
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
-#include <cmath>
 #include <limits>
 #include <memory>
 #include <utility>
 
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-
-#include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/common/road_graph.h"
-#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
@@ -37,7 +30,6 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
 using apollo::hdmap::LaneInfo;
 
 void SequencePredictor::Predict(Obstacle* obstacle) {

@@ -16,18 +16,9 @@
 
 #include "modules/prediction/predictor/junction/junction_predictor.h"
 
-#include <string>
-#include <vector>
-
-#include "gtest/gtest.h"
-
-#include "modules/common/util/file.h"
-#include "modules/map/hdmap/hdmap.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 

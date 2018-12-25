@@ -16,11 +16,7 @@
 
 #include "modules/prediction/network/net_layer.h"
 
-#include <string>
-
-#include "Eigen/Dense"
 #include "gtest/gtest.h"
-#include "modules/prediction/proto/network_layers.pb.h"
 
 namespace apollo {
 namespace prediction {

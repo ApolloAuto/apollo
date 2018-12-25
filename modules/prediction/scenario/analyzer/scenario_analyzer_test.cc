@@ -16,11 +16,7 @@
 
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
 
-#include "gtest/gtest.h"
-
-#include "modules/prediction/common/environment_features.h"
 #include "modules/prediction/common/kml_map_based_test.h"
-#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {

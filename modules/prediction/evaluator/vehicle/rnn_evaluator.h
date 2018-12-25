@@ -16,17 +16,12 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "Eigen/Dense"
-
-#include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
-#include "modules/prediction/proto/network_model.pb.h"
 
 namespace apollo {
 namespace prediction {

@@ -17,7 +17,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 
 #include <cmath>
-#include <limits>
 
 DEFINE_double(double_precision, 1e-6, "precision of double");
 

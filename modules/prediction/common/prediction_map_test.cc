@@ -16,15 +16,12 @@
 
 #include "modules/prediction/common/prediction_map.h"
 
-#include "gtest/gtest.h"
-
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::hdmap::Id;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::MapPathPoint;
 

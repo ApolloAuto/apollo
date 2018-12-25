@@ -7,14 +7,7 @@ cc_library(
     srcs = ["feature_extractor.cc"],
     hdrs = ["feature_extractor.h"],
     deps = [
-        "//cyber",
-        "//modules/common/math:geometry",
-        "//modules/map/hdmap:hdmap_util",
-        "//modules/prediction/common:environment_features",
         "//modules/prediction/container:container_manager",
-        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
-        "//modules/prediction/container/pose:pose_container",
-        "@gtest//:main",
     ],
 )
 
@@ -29,9 +22,6 @@ cc_test(
     deps = [
         ":feature_extractor",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/container:container_manager",
-        "@gtest//:main",
     ],
 )
 

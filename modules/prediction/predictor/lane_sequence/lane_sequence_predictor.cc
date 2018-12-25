@@ -20,10 +20,7 @@
 #include <string>
 #include <utility>
 
-#include "cyber/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/common/validation_checker.h"
 
 namespace apollo {
@@ -31,7 +28,6 @@ namespace prediction {
 
 using common::PathPoint;
 using common::TrajectoryPoint;
-using common::math::KalmanFilter;
 using hdmap::LaneInfo;
 
 void LaneSequencePredictor::Predict(Obstacle* obstacle) {

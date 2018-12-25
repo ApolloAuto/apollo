@@ -22,7 +22,6 @@
 #include <utility>
 
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {

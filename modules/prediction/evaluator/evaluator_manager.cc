@@ -16,7 +16,6 @@
 
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
-#include "cyber/common/log.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
@@ -25,14 +24,12 @@
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 #include "modules/prediction/evaluator/cyclist/cyclist_keep_lane_evaluator.h"
-#include "modules/prediction/scenario/scenario_manager.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
 

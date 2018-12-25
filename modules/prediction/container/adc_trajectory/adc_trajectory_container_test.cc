@@ -16,8 +16,6 @@
 
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
-#include "gtest/gtest.h"
-
 #include "modules/prediction/common/kml_map_based_test.h"
 
 namespace apollo {
@@ -28,7 +26,6 @@ using ::apollo::common::TrajectoryPoint;
 using ::apollo::common::math::Vec2d;
 using ::apollo::hdmap::Id;
 using ::apollo::planning::ADCTrajectory;
-using ::apollo::prediction::LaneSequence;
 
 class ADCTrajectoryTest : public KMLMapBasedTest {
  public:

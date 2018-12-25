@@ -17,15 +17,9 @@
 #include "modules/prediction/common/prediction_util.h"
 
 #include <algorithm>
-#include <cmath>
-#include <limits>
-#include <string>
-#include <vector>
 
-#include "cyber/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {

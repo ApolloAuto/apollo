@@ -16,8 +16,6 @@
 
 #include "modules/prediction/common/validation_checker.h"
 
-#include <limits>
-
 #include "gtest/gtest.h"
 
 #include "modules/prediction/common/prediction_gflags.h"

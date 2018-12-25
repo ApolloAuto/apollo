@@ -29,12 +29,6 @@ namespace apollo {
 namespace prediction {
 namespace network {
 
-using apollo::prediction::DenseParameter;
-using apollo::prediction::LayerParameter;
-using apollo::prediction::Conv1dParameter;
-using apollo::prediction::MaxPool1dParameter;
-using apollo::prediction::ActivationParameter;
-
 bool Layer::Load(const LayerParameter& layer_pb) {
   if (!layer_pb.has_name()) {
     ADEBUG << "Set name at default";

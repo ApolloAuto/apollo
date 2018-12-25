@@ -18,9 +18,7 @@
 
 #include <algorithm>
 #include <limits>
-#include <queue>
 
-#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/road_graph.h"
 
 namespace apollo {

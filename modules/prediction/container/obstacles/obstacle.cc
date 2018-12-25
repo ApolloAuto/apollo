@@ -17,20 +17,11 @@
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
 #include <limits>
-#include <unordered_set>
-#include <utility>
 
-#include "cyber/common/log.h"
-#include "modules/common/configs/config_gflags.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/util/map_util.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/common/road_graph.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 
@@ -40,7 +31,6 @@ namespace prediction {
 using common::ErrorCode;
 using common::Point3D;
 using common::math::KalmanFilter;
-using common::math::Vec2d;
 using common::PathPoint;
 using hdmap::LaneInfo;
 using hdmap::JunctionInfo;

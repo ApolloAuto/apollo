@@ -21,7 +21,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/proto/feature.pb.h"
 
