@@ -22,6 +22,8 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <string>
+#include <unordered_map>
 
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/croutine/croutine.h"
@@ -33,23 +35,35 @@ namespace scheduler {
 
 static constexpr uint32_t MAX_PRIO = 20;
 
+#define DEFAULT_GROUP_NAME "default_grp"
+
+using CROUTINE_QUEUE = std::vector<std::shared_ptr<CRoutine>>;
+using MULTI_PRIO_QUEUE = std::array<CROUTINE_QUEUE, MAX_PRIO>;
+using CR_GROUP = std::unordered_map<std::string, MULTI_PRIO_QUEUE>;
+using LOCK_QUEUE = std::array<base::AtomicRWLock, MAX_PRIO>;
+using RQ_LOCK_GROUP = std::unordered_map<std::string, LOCK_QUEUE>;
+
+using GRP_WQ_MUTEX = std::unordered_map<std::string, std::mutex>;
+using GRP_WQ_CV = std::unordered_map<std::string, std::condition_variable>;
+
 class ClassicContext : public ProcessorContext {
  public:
   std::shared_ptr<CRoutine> NextRoutine() override;
   void Wait() override;
   void Shutdown() override;
 
-  static void Notify();
+  static void Notify(const std::string& group_name);
 
-  alignas(
-      CACHELINE_SIZE) static std::array<base::AtomicRWLock, MAX_PRIO> rq_locks_;
-  alignas(CACHELINE_SIZE) static std::array<
-      std::vector<std::shared_ptr<croutine::CRoutine>>, MAX_PRIO> rq_;
+  void SetGroupName(const std::string& group_name) { group_name_ = group_name; }
+  std::string group_name_;
+
+  alignas(CACHELINE_SIZE) static RQ_LOCK_GROUP rq_locks_;
+  alignas(CACHELINE_SIZE) static CR_GROUP cr_group_;
+
+  alignas(CACHELINE_SIZE) static GRP_WQ_MUTEX mtx_wq_;
+  alignas(CACHELINE_SIZE) static GRP_WQ_CV cv_wq_;
 
  private:
-  alignas(CACHELINE_SIZE) static std::mutex mtx_wq_;
-  alignas(CACHELINE_SIZE) static std::condition_variable cv_wq_;
-
   std::chrono::steady_clock::time_point wake_time_;
   bool need_sleep_ = false;
 };
