@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <iomanip>
+#include <vector>
 
 #include "modules/common/time/time_util.h"
 #include "modules/localization/common/localization_gflags.h"
@@ -40,6 +41,9 @@ PredictorImu::PredictorImu(double memory_cycle_sec)
   on_adapter_thread_ = true;
   constexpr double kCutoffFreq = 20.0;
   InitLPFilter(kCutoffFreq);
+
+  constexpr double kLCutoffFreq = 0.6;
+  InitializeFilters(kSamplingInterval, kLCutoffFreq);
 }
 
 PredictorImu::~PredictorImu() {}
@@ -114,6 +118,7 @@ bool PredictorImu::Updateable() const {
 Status PredictorImu::Update() {
   ResamplingFilter();
   // LPFilter();
+  DigitalFilter();
   return Status::OK();
 }
 
@@ -190,6 +195,34 @@ void PredictorImu::LPFilter() {
   y_0.set_z(but_filter(x_0.z(), x_1.z(), x_2.z(), y_1.z(), y_2.z()));
   pose.mutable_linear_acceleration()->CopyFrom(y_0);
   predicted_.Push(timestamp_sec, pose);
+}
+
+void PredictorImu::InitializeFilters(const double ts,
+                                     const double cutoff_freq) {
+  // Low pass filter
+  std::vector<double> den(3, 0.0);
+  std::vector<double> num(3, 0.0);
+  common::LpfCoefficients(ts, cutoff_freq, &den, &num);
+  digital_filter_x_.set_coefficients(den, num);
+  digital_filter_y_.set_coefficients(den, num);
+}
+
+void PredictorImu::DigitalFilter() {
+  auto latest_it = predicted_.Latest();
+  if (latest_it != predicted_.end()) {
+    Pose pose;
+    pose.CopyFrom(latest_it->second);
+    auto timestamp_sec = latest_it->first;
+    auto linear_acc = pose.linear_acceleration();
+
+    linear_acc.set_x(digital_filter_x_.Filter(linear_acc.x()));
+    linear_acc.set_y(digital_filter_y_.Filter(linear_acc.y()));
+
+    pose.mutable_linear_acceleration()->CopyFrom(linear_acc);
+
+    predicted_.Pop();
+    predicted_.Push(timestamp_sec, pose);
+  }
 }
 
 }  // namespace localization

@@ -17,6 +17,8 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:common_proto",
         "//modules/common/status",
+        "//modules/common/filters:digital_filter",
+        "//modules/common/filters:digital_filter_coefficients",
         "//modules/localization/common:localization_common",
         "//modules/localization/lmd/common:localization_lmd_common",
         "//modules/localization/lmd/predictor:localization_lmd_predictor",
