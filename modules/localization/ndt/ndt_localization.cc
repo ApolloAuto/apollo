@@ -56,11 +56,10 @@ void NDTLocalization::Init() {
     return;
   }
   Eigen::Quaterniond ext_quat(velodyne_extrinsic_.linear());
-  AINFO << "lidar extrinsics: " << velodyne_extrinsic_.translation().x()
-        << ", " << velodyne_extrinsic_.translation().y()
-        << ", " << velodyne_extrinsic_.translation().z()
-        << ", " << ext_quat.x() << ", " << ext_quat.y()
-        << ", " << ext_quat.z() << ", " << ext_quat.w();
+  AINFO << "lidar extrinsics: " << velodyne_extrinsic_.translation().x() << ", "
+        << velodyne_extrinsic_.translation().y() << ", "
+        << velodyne_extrinsic_.translation().z() << ", " << ext_quat.x() << ", "
+        << ext_quat.y() << ", " << ext_quat.z() << ", " << ext_quat.w();
 
   sucess = LoadLidarHeight(lidar_height_file, &lidar_height_);
   if (!sucess) {
