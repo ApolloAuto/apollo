@@ -191,3 +191,10 @@ DEFINE_double(ndt_line_search_step_size, 0.1,
               "line search step size for ndt matching");
 DEFINE_double(ndt_transformation_epsilon, 0.01,
               "iteration convergence condition on transformation");
+DEFINE_int32(ndt_filter_size_x, 48, "x size for ndt searching area");
+DEFINE_int32(ndt_filter_size_y, 48, "y size for ndt searching area");
+DEFINE_int32(ndt_bad_score_count_threshold, 10,
+             "count for continuous bad ndt fitness score");
+DEFINE_double(ndt_warnning_ndt_score, 1.0,
+              "warnning ndt fitness score threshold");
+DEFINE_double(ndt_error_ndt_score, 2.0, "error ndt fitness score threshold");

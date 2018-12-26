@@ -21,6 +21,7 @@
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -39,6 +40,9 @@ void NDTLocalization::Init() {
   tf_target_frame_id_ = FLAGS_broadcast_tf_child_frame_id;
   std::string lidar_height_file = FLAGS_lidar_height_file;
   std::string lidar_extrinsics_file = FLAGS_lidar_extrinsics_file;
+  bad_score_count_threshold_ = FLAGS_ndt_bad_score_count_threshold;
+  warnning_ndt_score_ = FLAGS_ndt_warnning_ndt_score;
+  error_ndt_score_ = FLAGS_ndt_error_ndt_score;
 
   std::string map_path_ =
       FLAGS_map_dir + "/" + FLAGS_ndt_map_dir + "/" + FLAGS_local_map_name;
@@ -52,11 +56,10 @@ void NDTLocalization::Init() {
     return;
   }
   Eigen::Quaterniond ext_quat(velodyne_extrinsic_.linear());
-  AINFO << "lidar extrinsics: " << velodyne_extrinsic_.translation().x()
-        << ", " << velodyne_extrinsic_.translation().y()
-        << ", " << velodyne_extrinsic_.translation().z()
-        << ", " << ext_quat.x() << ", " << ext_quat.y()
-        << ", " << ext_quat.z() << ", " << ext_quat.w();
+  AINFO << "lidar extrinsics: " << velodyne_extrinsic_.translation().x() << ", "
+        << velodyne_extrinsic_.translation().y() << ", "
+        << velodyne_extrinsic_.translation().z() << ", " << ext_quat.x() << ", "
+        << ext_quat.y() << ", " << ext_quat.z() << ", " << ext_quat.w();
 
   sucess = LoadLidarHeight(lidar_height_file, &lidar_height_);
   if (!sucess) {
@@ -154,6 +157,9 @@ void NDTLocalization::OdometryCallback(
   }
   ComposeLocalizationEstimate(localization_pose, odometry_msg,
                               &localization_result_);
+  drivers::gnss::InsStat odometry_status;
+  FindNearestOdometryStatus(odometry_time, &odometry_status);
+  ComposeLocalizationStatus(odometry_status, &localization_status_);
   is_service_started_ = true;
 }
 
@@ -183,6 +189,12 @@ void NDTLocalization::LidarCallback(
   lidar_pose_ = lidar_locator_.GetPose();
   pose_buffer_.UpdateLidarPose(time_stamp, lidar_pose_, odometry_pose);
   ComposeLidarResult(time_stamp, lidar_pose_, &lidar_localization_result_);
+  ndt_score_ = lidar_locator_.GetFitnessScore();
+  if (ndt_score_ > warnning_ndt_score_) {
+    bad_score_count_++;
+  } else {
+    bad_score_count_ = 0;
+  }
   if (ndt_debug_log_flag_) {
     Eigen::Quaterniond tmp_quat(lidar_pose_.linear());
     AINFO << "NDTLocalization Debug Log: lidar pose: " << std::setprecision(15)
@@ -207,6 +219,17 @@ void NDTLocalization::LidarCallback(
           << "qw: " << qbn.w();
   }
 }
+
+void NDTLocalization::OdometryStatusCallback(
+    const std::shared_ptr<drivers::gnss::InsStat>& status_msg) {
+  std::unique_lock<std::mutex> lock(odometry_status_list_mutex_);
+  if (odometry_status_list_.size() < odometry_status_list_max_size_) {
+    odometry_status_list_.push_back(*status_msg);
+  } else {
+    odometry_status_list_.pop_front();
+    odometry_status_list_.push_back(*status_msg);
+  }
+}
 // output localization result
 void NDTLocalization::GetLocalization(
     LocalizationEstimate* localization) const {
@@ -216,6 +239,11 @@ void NDTLocalization::GetLocalization(
 void NDTLocalization::GetLidarLocalization(
     LocalizationEstimate* localization) const {
   *localization = lidar_localization_result_;
+}
+
+void NDTLocalization::GetLocalizationStatus(
+    LocalizationStatus* localization_status) const {
+  *localization_status = localization_status_;
 }
 
 bool NDTLocalization::IsServiceStarted() { return is_service_started_; }
@@ -336,6 +364,40 @@ bool NDTLocalization::QueryPoseFromTF(double time, Eigen::Affine3d* pose) {
                               query_transform.transform().rotation().qz());
   pose->linear() = tmp_quat.toRotationMatrix();
   return true;
+}
+
+void NDTLocalization::ComposeLocalizationStatus(
+    const drivers::gnss::InsStat& status,
+    LocalizationStatus* localization_status) {
+  apollo::common::Header* header = localization_status->mutable_header();
+  double timestamp = apollo::common::time::Clock::NowInSeconds();
+  header->set_timestamp_sec(timestamp);
+  localization_status->set_measurement_time(status.header().timestamp_sec());
+
+  if (!status.has_pos_type()) {
+    localization_status->set_fusion_status(MeasureState::ERROR);
+    localization_status->set_state_message(
+        "Error: Current Localization Status Is Missing.");
+    return;
+  }
+
+  auto pos_type = static_cast<drivers::gnss::SolutionType>(status.pos_type());
+  if (ndt_score_ < warnning_ndt_score_ &&
+      pos_type == drivers::gnss::SolutionType::INS_RTKFIXED) {
+    localization_status->set_fusion_status(MeasureState::OK);
+    localization_status->set_state_message("");
+  } else if (bad_score_count_ > bad_score_count_threshold_ ||
+             ndt_score_ > error_ndt_score_ ||
+             (pos_type != drivers::gnss::SolutionType::INS_RTKFIXED &&
+              pos_type != drivers::gnss::SolutionType::INS_RTKFLOAT)) {
+    localization_status->set_fusion_status(MeasureState::ERROR);
+    localization_status->set_state_message(
+        "Error: Current Localization Is Very Unstable.");
+  } else {
+    localization_status->set_fusion_status(MeasureState::WARNNING);
+    localization_status->set_state_message(
+        "Warnning: Current Localization Is Unstable.");
+  }
 }
 
 bool NDTLocalization::QueryPoseFromBuffer(double time, Eigen::Affine3d* pose) {
@@ -531,6 +593,37 @@ bool NDTLocalization::LoadZoneIdFromFolder(const std::string& folder_path,
     return true;
   }
   return false;
+}
+
+bool NDTLocalization::FindNearestOdometryStatus(
+    const double odometry_timestamp, drivers::gnss::InsStat* status) {
+  CHECK_NOTNULL(status);
+
+  std::unique_lock<std::mutex> lock(odometry_status_list_mutex_);
+  auto odometry_status_list = odometry_status_list_;
+  lock.unlock();
+
+  double timestamp_diff_sec = 1e8;
+  auto nearest_itr = odometry_status_list.end();
+  for (auto itr = odometry_status_list.begin();
+       itr != odometry_status_list.end(); ++itr) {
+    double diff = std::abs(itr->header().timestamp_sec() - odometry_timestamp);
+    if (diff < timestamp_diff_sec) {
+      timestamp_diff_sec = diff;
+      nearest_itr = itr;
+    }
+  }
+
+  if (nearest_itr == odometry_status_list.end()) {
+    return false;
+  }
+
+  if (timestamp_diff_sec > odometry_status_time_diff_threshold_) {
+    return false;
+  }
+
+  *status = *nearest_itr;
+  return true;
 }
 
 }  // namespace ndt

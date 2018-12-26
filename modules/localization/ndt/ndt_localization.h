@@ -19,6 +19,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/ndt/localization_pose_buffer.h"
 #include "modules/localization/ndt/ndt_locator/lidar_locator_ndt.h"
@@ -51,12 +52,17 @@ class NDTLocalization {
   void OdometryCallback(const std::shared_ptr<localization::Gps>& odometry_msg);
   /**@brief receive lidar pointcloud message */
   void LidarCallback(const std::shared_ptr<drivers::PointCloud>& lidar_msg);
+  /**@brief receive ins status message */
+  void OdometryStatusCallback(
+      const std::shared_ptr<drivers::gnss::InsStat>& status_msg);
   /**@brief service start status */
   bool IsServiceStarted();
   /**@brief output localization result */
   void GetLocalization(LocalizationEstimate* localization) const;
   /**@brief get ndt localization result */
   void GetLidarLocalization(LocalizationEstimate* lidar_localization) const;
+  /**@brief get localization status */
+  void GetLocalizationStatus(LocalizationStatus* localization_status) const;
   /**@brief get zone id */
   inline int GetZoneId() const { return zone_id_; }
   /**@brief get online resolution for ndt localizaiton*/
@@ -89,6 +95,12 @@ class NDTLocalization {
       LocalizationEstimate* localization);
   void ComposeLidarResult(double time_stamp, const Eigen::Affine3d& pose,
                           LocalizationEstimate* localization);
+  /**@brief fill localization status */
+  void ComposeLocalizationStatus(const drivers::gnss::InsStat& status,
+                                 LocalizationStatus* localization_status);
+  /**@brief find nearest odometry status */
+  bool FindNearestOdometryStatus(const double odometry_timestamp,
+                                 drivers::gnss::InsStat* status);
 
  private:
   std::string module_name_ = "ndt_localization";
@@ -109,6 +121,11 @@ class NDTLocalization {
   Eigen::Affine3d lidar_pose_;
   Eigen::Affine3d velodyne_extrinsic_;
   LocalizationEstimate lidar_localization_result_;
+  double ndt_score_ = 0;
+  unsigned int bad_score_count_ = 0;
+  unsigned int bad_score_count_threshold_ = 10;
+  double warnning_ndt_score_ = 1.0;
+  double error_ndt_score_ = 2.0;
   bool is_service_started_ = false;
 
   std::list<TimeStampPose> odometry_buffer_;
@@ -117,6 +134,12 @@ class NDTLocalization {
   const unsigned int max_odometry_buffer_size_ = 100;
 
   LocalizationEstimate localization_result_;
+  LocalizationStatus localization_status_;
+
+  std::list<drivers::gnss::InsStat> odometry_status_list_;
+  size_t odometry_status_list_max_size_ = 10;
+  std::mutex odometry_status_list_mutex_;
+  double odometry_status_time_diff_threshold_ = 1.0;
 
   bool ndt_debug_log_flag_ = false;
 };

@@ -24,6 +24,8 @@ cc_library(
         "//modules/transform:tf2_buffer_lib",
         "//modules/common/proto:geometry_proto",
         "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/gnss/proto:ins_proto",
+        "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/transform:transform_broadcaster_lib",

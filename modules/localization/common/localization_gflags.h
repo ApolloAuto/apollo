@@ -135,3 +135,8 @@ DECLARE_int32(ndt_max_iterations);
 DECLARE_double(ndt_target_resolution);
 DECLARE_double(ndt_line_search_step_size);
 DECLARE_double(ndt_transformation_epsilon);
+DECLARE_int32(ndt_filter_size_x);
+DECLARE_int32(ndt_filter_size_y);
+DECLARE_int32(ndt_bad_score_count_threshold);
+DECLARE_double(ndt_warnning_ndt_score);
+DECLARE_double(ndt_error_ndt_score);

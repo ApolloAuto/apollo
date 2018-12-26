@@ -71,9 +71,11 @@ void LidarLocatorNdt::Init(const Eigen::Affine3d& init_location,
 
   // set filter
   filter_x_ =
-      static_cast<int>(48 / map_.GetConfig().map_resolutions_[resolution_id_]);
+      static_cast<int>(static_cast<float>(FLAGS_ndt_filter_size_x) /
+                       map_.GetConfig().map_resolutions_[resolution_id_]);
   filter_y_ =
-      static_cast<int>(48 / map_.GetConfig().map_resolutions_[resolution_id_]);
+      static_cast<int>(static_cast<float>(FLAGS_ndt_filter_size_y) /
+                       map_.GetConfig().map_resolutions_[resolution_id_]);
   AINFO << "Filter size: " << filter_x_ << ", " << filter_y_;
 
   // set NDT
@@ -214,16 +216,16 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
   reg_.Align(output_cloud, init_matrix.cast<float>());
   ndt_timer.End("Ndt Align End.");
 
-  double fitness_score = reg_.GetFitnessScore();
+  fitness_score_ = reg_.GetFitnessScore();
   bool has_converged = reg_.HasConverged();
   int iteration = reg_.GetFinalNumIteration();
   Eigen::Matrix4d ndt_pose = reg_.GetFinalTransformation().cast<double>();
   AINFO << "Ndt summary:";
-  AINFO << "Fitness Score: " << fitness_score;
+  AINFO << "Fitness Score: " << fitness_score_;
   AINFO << "Has_converged: " << has_converged;
   AINFO << "Iteration: %d: " << iteration;
   AINFO << "Relative Ndt pose: " << ndt_pose(0, 3) << ", " << ndt_pose(1, 3)
-        << ", " << ndt_pose(2, 3);
+         << ", " << ndt_pose(2, 3);
 
   // Twv
   Eigen::Affine3d lidar_location = Eigen::Affine3d::Identity();

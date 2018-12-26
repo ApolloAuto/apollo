@@ -52,6 +52,8 @@ bool NDTLocalizationComponent::InitConfig() {
   lidar_pose_topic_ = FLAGS_localization_ndt_topic;
   broadcast_tf_frame_id_ = FLAGS_broadcast_tf_frame_id;
   broadcast_tf_child_frame_id_ = FLAGS_broadcast_tf_child_frame_id;
+  odometry_status_topic_ = FLAGS_ins_stat_topic;
+  localization_status_topic_ = FLAGS_localization_msf_status;
 
   localization_->Init();
 
@@ -69,11 +71,23 @@ bool NDTLocalizationComponent::InitIO() {
   lidar_listener_ = this->node_->CreateReader<drivers::PointCloud>(
       reader_config, lidar_register_call);
 
+  reader_config.channel_name = odometry_status_topic_;
+  reader_config.pending_queue_size = 1;
+  std::function<void(const std::shared_ptr<drivers::gnss::InsStat>&)>
+      odometry_status_call =
+          std::bind(&NDTLocalizationComponent::OdometryStatusCallback, this,
+                    std::placeholders::_1);
+  odometry_status_listener_ = this->node_->CreateReader<drivers::gnss::InsStat>(
+      reader_config, odometry_status_call);
+
   localization_talker_ =
       this->node_->CreateWriter<LocalizationEstimate>(localization_topic_);
 
   lidar_pose_talker_ =
       this->node_->CreateWriter<LocalizationEstimate>(lidar_pose_topic_);
+
+  localization_status_talker_ =
+      this->node_->CreateWriter<LocalizationStatus>(localization_status_topic_);
 
   return true;
 }
@@ -86,9 +100,13 @@ bool NDTLocalizationComponent::Proc(
     LocalizationEstimate localization;
     localization_->GetLocalization(&localization);
 
+    LocalizationStatus localization_status;
+    localization_->GetLocalizationStatus(&localization_status);
+
     // publish localization messages
     PublishPoseBroadcastTopic(localization);
     PublishPoseBroadcastTF(localization);
+    PublishLocalizationStatusTopic(localization_status);
     ADEBUG << "[OnTimer]: Localization message publish success!";
   }
 
@@ -105,6 +123,11 @@ void NDTLocalizationComponent::LidarCallback(
     // publish localization messages
     PublishLidarPoseBroadcastTopic(localization);
   }
+}
+
+void NDTLocalizationComponent::OdometryStatusCallback(
+    const std::shared_ptr<drivers::gnss::InsStat>& status_msg) {
+  localization_->OdometryStatusCallback(status_msg);
 }
 
 void NDTLocalizationComponent::PublishPoseBroadcastTF(
@@ -129,19 +152,21 @@ void NDTLocalizationComponent::PublishPoseBroadcastTF(
   mutable_rotation->set_qw(localization.pose().orientation().qw());
 
   tf2_broadcaster_->SendTransform(tf2_msg);
-  return;
 }
 
 void NDTLocalizationComponent::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
-  return;
 }
 
 void NDTLocalizationComponent::PublishLidarPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
   lidar_pose_talker_->Write(localization);
-  return;
+}
+
+void NDTLocalizationComponent::PublishLocalizationStatusTopic(
+    const LocalizationStatus& localization_status) {
+  localization_status_talker_->Write(localization_status);
 }
 
 }  // namespace ndt

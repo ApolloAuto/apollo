@@ -120,6 +120,8 @@ class LidarLocatorNdt {
   inline bool IsMaploaded() const { return is_map_loaded_; }
   /**@brief Get the locator map. */
   inline const NdtMap& GetMap() const { return map_; }
+  /**@brief Get ndt matching score */
+  inline double GetFitnessScore() const { return fitness_score_; }
 
  private:
   /**@brief Whether initialized. */
@@ -168,6 +170,9 @@ class LidarLocatorNdt {
   Eigen::Vector3d map_left_top_corner_;
   /**@brief NDT transform class. */
   NormalDistributionsTransform<pcl::PointXYZ, pcl::PointXYZ> reg_;
+
+  /**@brief ndt matching score */
+  double fitness_score_ = 0.0;
 
   /**@brief maximum iterations for ndt matching*/
   int ndt_max_iterations_ = 10;
