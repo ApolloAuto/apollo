@@ -361,7 +361,7 @@ struct BestVel {
 };
 static_assert(sizeof(BestVel) == 44, "Incorrect size of BestVel");
 
-// IMU data corrected for gravity, the earth’s rotation and estimated sensor
+// IMU data corrected for gravity, the earth's rotation and estimated sensor
 // errors.
 struct CorrImuData {
   uint32_t gps_week;

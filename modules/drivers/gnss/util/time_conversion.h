@@ -66,7 +66,7 @@ namespace util {
  | 1993 | +1     | 0      | 2017 | 0      | 0      |
  +------+--------+--------+------+--------+--------+
 
- Current TAI − UTC = 37. (mean that: 2017 - 1970/01/01 = 37 seconds)
+ Current TAI - UTC = 37. (mean that: 2017 - 1970/01/01 = 37 seconds)
 */
 
 // We build a lookup table to describe relationship that between UTC and
