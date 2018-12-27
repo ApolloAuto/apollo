@@ -68,7 +68,7 @@ $$
 
 ### 3.1 The init point constraints
 
-Given the assumption that the the first point is ($t0$, $s0$), and $s0$ is on the planned path $f_i(t)$, $f'i(t)$, and $f_i(t)''$ (position, velocity, acceleration).  Apollo converts those constraint into QP equality constraints:
+Given the assumption that the first point is ($t0$, $s0$), and $s0$ is on the planned path $f_i(t)$, $f'i(t)$, and $f_i(t)''$ (position, velocity, acceleration).  Apollo converts those constraint into QP equality constraints:
 <p>
 $$
 A_{eq}x = b_{eq}

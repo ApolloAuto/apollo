@@ -84,7 +84,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * client.
    *
    * @details In the websocket protocol, data is transmitted using a sequence of
-   * frames, and each frame received invokes this callback method. Since the the
+   * frames, and each frame received invokes this callback method. Since the
    * type of opcode (text, binary, etc) is given in the first frame, this method
    * stores the opcode in a thread_local variable named current_opcode_. And
    * data from each frame is accumulated to data_ until the final fragment is

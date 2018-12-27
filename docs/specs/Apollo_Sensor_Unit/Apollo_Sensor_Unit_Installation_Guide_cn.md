@@ -21,17 +21,12 @@ ASU和IPC的通讯通过PCI Express接口。ASU收集传感器数据并通过PCI
 
 #### 后面板接口
 
-1. Micro USB到UART接口（保留为调试使用）
-2. Micro USB到UART接口（ASU配置端口）
-3. 供内置LTE模块使用的Micro SIM 卡片支架 
-4. 通用UART接口（保留） 
-5. USB 3.0 type A port（2个接口）
-6. 外部PCI Express接口（支持X4或X8）
-7. GPS PPS / GPRMC输出接口（3个接口）
-8. Micro USB 2.0 OTG
-9. 连接Stereo Camera的电源和PPS/GPRMC输出接口
-10. CAN Bus（4个接口）
-11. 主电源输入接口
+1. 通用UART接口（保留）
+2. 外部PCI Express接口（支持X4或X8）连接IPC请使用EXTN
+3. GPS PPS / GPRMC输出接口（3个接口）
+4. 连接Stereo Camera的电源和PPS/GPRMC输出接口
+5. CAN Bus（4个接口）
+6. 主电源输入接口
 
 ### 购买渠道
 
@@ -53,7 +48,7 @@ Apollo传感器单元（ASU）目前只提供给Apollo合作伙伴和特定的�
    | ----- | ---- | ---- | ------------------ |
    | 1     | 12V  | PWR  | 12V (9V~36V, 120W) |
    | 2     | GND  | PWR  | GROUND             |
-   
+
 2. FPD-Link III摄像机
 
    在ASU的前面板上有5个从右至左分别标记为1~5的FAKRA接头连接FPD Link III摄像机。ASU可以支持多达5个摄像机，摄像机的解串行单元(TI, DS90UB914ATRHSTQ1) 将FPD Link III的信号转换为并行的数据信号。
@@ -65,7 +60,7 @@ Apollo传感器单元（ASU）目前只提供给Apollo合作伙伴和特定的�
    | 3        | 0x62        | DS90UB914ATRHSTQ1         |
    | 4        | 0x63        | DS90UB914ATRHSTQ1         |
    | 5       | 0x64        | DS90UB914ATRHSTQ1         |
-   
+
 3. GPS同步输入通道
 
    GPS同步输入通道使用	 接头是TE Connectivity的1565749-1。接头和引脚的信息在下图中展示。
@@ -82,7 +77,7 @@ Apollo传感器单元（ASU）目前只提供给Apollo合作伙伴和特定的�
    | 2     | GPRMC | INPUT | GPS Specific information contains time, date, position, track made good and speed data provided by GPS navigation receiver.  RS-232 Signal level. |
    | 3     | GND   | PWR   | GROUND (the ground for PPS and GPRMC should be shorted on ground) |
    | 4     | PPS   | INPUT | Pulse per Second from GPS transceiver, 3.3V CMOS Signal      |
-   
+
 4. GPS同步输出通道
 
    定制的8 Pin接头为需要同步输出的传感器例如激光雷达、摄像机等提供了3种PPS/GPRMC输出序列。
@@ -103,7 +98,7 @@ Apollo传感器单元（ASU）目前只提供给Apollo合作伙伴和特定的�
    | 6     | GND    | PWR    | GROUND                                                  |
    | 7     | GND    | PWR    | GROUND                                                  |
    | 8     | PPS2   | OUTPUT | Pulse per Second from GPS transceiver, 3.3V CMOS Signal |
-   
+
 5. CAN卡接口
 
    CAN卡提供了4种车辆接口，数据通路（传输路径）为：
@@ -129,7 +124,7 @@ Apollo传感器单元（ASU）目前只提供给Apollo合作伙伴和特定的�
    | 11   | CANL-2 | INOUT | Channel 3, CANL |
    | 12   | GND    | PWR   | Ground          |
 
-   
+
 ## 免责声明
 
 This device is `Apollo Platform Supported`

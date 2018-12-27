@@ -297,7 +297,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     AERROR << "navigation path ids is empty";
     return false;
   }
-  // get curent adc lane info by vehicle state
+  // get current adc lane info by vehicle state
   common::VehicleState vehicle_state =
       common::VehicleStateProvider::instance()->vehicle_state();
   hdmap::LaneWaypoint adc_lane_way_point;

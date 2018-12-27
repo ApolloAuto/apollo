@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+ARCH=$(uname -m)
 
 addgroup --gid "$DOCKER_GRP_ID" "$DOCKER_GRP"
 adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
@@ -23,16 +24,26 @@ adduser --disabled-password --force-badname --gecos '' "$DOCKER_USER" \
 usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
-echo '
-export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda2/bin
 
-if [ -e "/apollo/scripts/apollo_base.sh" ]; then
-  source /apollo/scripts/apollo_base.sh
+if [ "$ARCH" == 'aarch64' ]; then
+  echo "
+export PATH=\$PATH:/usr/lib/java/bin:/apollo/scripts:/usr/local/miniconda2/bin/
+export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib:/usr/lib/aarch64-linux-gnu/tegra:/usr/local/ipopt/lib:/usr/local/cuda/lib64/stubs
+export NVBLAS_CONFIG_FILE=/usr/local/cuda
+if [ -e "/apollo/scripts/apollo_base.sh" ]; then 
+  source /apollo/scripts/apollo_base.sh; 
 fi
-
-ulimit -c unlimited
-' >> "/home/${DOCKER_USER}/.bashrc"
-
+ulimit -c unlimited" >> /home/${DOCKER_USER}/.bashrc
+  source /home/${DOCKER_USER}/.bashrc
+else
+  echo '
+  export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda2/bin
+   if [ -e "/apollo/scripts/apollo_base.sh" ]; then
+    source /apollo/scripts/apollo_base.sh
+  fi
+   ulimit -c unlimited
+  ' >> "/home/${DOCKER_USER}/.bashrc"
+fi
 echo '
 genhtml_branch_coverage = 1
 lcov_branch_coverage = 1
@@ -59,6 +70,16 @@ if [ -e /dev/camera/trafficlights ]; then
   chmod a+rw /dev/camera/trafficlights
 fi
 
+# add authority of GPU devices on TX2
+# check /dev/nv*
+if [ "$ARCH" == 'aarch64' ]; then
+  chmod a+rw /dev/nv*
+
+  if [ -e "/usr/lib/aarch64-linux-gnu/tegra/libGL.so" ]; then
+    rm /usr/lib/aarch64-linux-gnu/libGL.so
+    ln -s /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu/libGL.so
+  fi
+fi
 
 if [ "$RELEASE_DOCKER" != "1" ];then
   # setup map data

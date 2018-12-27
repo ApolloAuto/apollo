@@ -62,6 +62,10 @@ enum ErrorCode {
   // Driver error codes.
   DRIVER_ERROR_GNSS = 12000;
   DRIVER_ERROR_VELODYNE = 13000; 
+
+  // Navi Generator error codes.
+  NAVI_GENERATOR_ERROR_DATABASE = 15000;
+   
 }
 
 message StatusPb {

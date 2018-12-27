@@ -131,4 +131,20 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "odometry_lane_marker_proto",
+    deps = [
+        ":odometry_lane_marker_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "odometry_lane_marker_proto_lib",
+    srcs = ["odometry_lane_marker.proto"],
+    deps = [
+        ":pose_proto_lib",
+        "//modules/common/proto:common_proto_lib",
+    ],
+)
+
 cpplint()

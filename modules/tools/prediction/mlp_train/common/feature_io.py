@@ -33,6 +33,9 @@ def readVarint32(stream):
     """
     mask = 0x80  #(1 << 7)
     raw_varint32 = []
+    # In Python 3.x, the 'True' is becomes a keyword and a real contant.
+    # Hence, we can replace '1' with 'True' in an infinite loop without
+    # performance regression.
     while 1:
         b = stream.read(1)
         if b == "":
@@ -61,7 +64,7 @@ def load_label_feature(filename):
             read_bytes, _ = decoder._DecodeVarint32(size, 0)
             data = f.read(read_bytes)
             if len(data) < read_bytes:
-                print "Fail to load protobuf"
+                print("Failed to load protobuf.")
                 break
             fea = feature_pb2.Feature()
             fea.ParseFromString(data)
@@ -80,9 +83,6 @@ def save_protobuf(filename, feature_trajectories):
                 serializedMessage = fea.SerializeToString()
                 delimiter = encoder._VarintBytes(len(serializedMessage))
                 f.write(delimiter + serializedMessage)
-
-    f.close()
-
 
 def build_trajectory(features):
     """

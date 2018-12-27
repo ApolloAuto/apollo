@@ -349,6 +349,47 @@ class GLFWFusionViewer {
   std::map<int, boost::circular_buffer<std::pair<float, float>>>
       object_trackjectories_;
   std::map<int, std::vector<double>> object_timestamps_;
+
+ private:
+  bool change_rot = false;
+  bool change_translation = false;
+
+  Eigen::Matrix4d v2c_copy;
+  Eigen::Vector3d pos;
+
+  double ax = 0, ay = 0, az = 0;
+  double step = 1.0;
+
+  inline Eigen::Matrix3d rotX(double angle) {
+    Eigen::Matrix3d m;
+    m << 1, 0, 0,
+         0, cos(angle), -sin(angle),
+         0, sin(angle), cos(angle);
+
+    return m;
+  }
+
+  inline Eigen::Matrix3d rotY(double angle) {
+    Eigen::Matrix3d m;
+    m << cos(angle), 0, sin(angle),
+         0, 1, 0,
+         -sin(angle), 0, cos(angle);
+
+    return m;
+  }
+
+  inline Eigen::Matrix3d rotZ(double angle) {
+    Eigen::Matrix3d m;
+    m << cos(angle), -sin(angle), 0,
+         sin(angle), cos(angle), 0,
+         0, 0, 1;
+
+    return m;
+  }
+
+  void save_extrinsics();
+  double to_deg(double angle);
+  double to_rad(double angle);
 };
 
 }  // namespace lowcostvisualizer

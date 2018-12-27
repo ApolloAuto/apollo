@@ -105,7 +105,7 @@ class Teleop {
            KEYCODE_DN1, KEYCODE_SETB1);
     printf("Steer LEFT:         [%c]     |  Steer RIGHT:        [%c]\n",
            KEYCODE_LF1, KEYCODE_RT1);
-    printf("Parkinig Brake:     [%c]     |  Emergency Stop      [%c]\n",
+    printf("Parking Brake:     [%c]     |  Emergency Stop      [%c]\n",
            KEYCODE_PKBK, KEYCODE_ESTOP);
     printf("\n-----------------------------------------------------------\n");
     printf("Exit: Ctrl + C, then press enter to normal terminal\n");
