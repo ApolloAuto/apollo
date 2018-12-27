@@ -14,40 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/vehicle_factory.h"
+#include "modules/canbus/vehicle/ge3/protocol/pc_vcu_205.h"
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/proto/vehicle_parameter.pb.h"
-
 namespace apollo {
 namespace canbus {
+namespace ge3 {
 
-class VehicleFactoryTest : public ::testing::Test {
+class Pcvcu205Test : public ::testing::Test {
  public:
-  VehicleFactoryTest() : factory_() {}
-
-  virtual void SetUp() {
-    factory_.RegisterVehicleFactory();
-  }
-  virtual void TearDown() {}
-
- protected:
-  VehicleFactory factory_;
+  virtual void SetUp() {}
 };
 
-TEST_F(VehicleFactoryTest, CreateVehicle) {
-  VehicleParameter parameter;
-
-  parameter.set_brand(VehicleParameter::GEM);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::GE3);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+TEST_F(Pcvcu205Test, reset) {
+  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53, 0x54};
+  Pcvcu205 pcvcu205;
+  EXPECT_EQ(pcvcu205.GetPeriod(), 20 * 1000);
+  pcvcu205.UpdateData(data);
+  EXPECT_EQ(data[0], 0b00000000);
+  EXPECT_EQ(data[1], 0b00000000);
+  EXPECT_EQ(data[2], 0b00000111);
+  EXPECT_EQ(data[3], 0b11010000);
+  EXPECT_EQ(data[4], 0b01010001);
+  EXPECT_EQ(data[5], 0b01010010);
+  EXPECT_EQ(data[6], 0b01010011);
+  EXPECT_EQ(data[7], 0b01010100);
 }
 
+}  // namespace ge3
 }  // namespace canbus
 }  // namespace apollo

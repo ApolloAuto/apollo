@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/vehicle_factory.h"
+#include "modules/canbus/vehicle/ge3/ge3_vehicle_factory.h"
 
 #include "gtest/gtest.h"
 
@@ -23,30 +23,25 @@
 namespace apollo {
 namespace canbus {
 
-class VehicleFactoryTest : public ::testing::Test {
+class Ge3VehicleFactoryTest : public ::testing::Test {
  public:
-  VehicleFactoryTest() : factory_() {}
-
   virtual void SetUp() {
-    factory_.RegisterVehicleFactory();
+    VehicleParameter parameter;
+    parameter.set_brand(VehicleParameter::GE3);
+    ge3_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}
 
  protected:
-  VehicleFactory factory_;
+  Ge3VehicleFactory ge3_factory_;
 };
 
-TEST_F(VehicleFactoryTest, CreateVehicle) {
-  VehicleParameter parameter;
+TEST_F(Ge3VehicleFactoryTest, InitVehicleController) {
+  EXPECT_TRUE(ge3_factory_.CreateVehicleController() != nullptr);
+}
 
-  parameter.set_brand(VehicleParameter::GEM);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::GE3);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+TEST_F(Ge3VehicleFactoryTest, InitMessageManager) {
+  EXPECT_TRUE(ge3_factory_.CreateMessageManager() != nullptr);
 }
 
 }  // namespace canbus
