@@ -14,40 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/vehicle_factory.h"
+#include "modules/canbus/vehicle/ge3/protocol/scu_vcu_2_313.h"
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/proto/vehicle_parameter.pb.h"
-
 namespace apollo {
 namespace canbus {
+namespace ge3 {
 
-class VehicleFactoryTest : public ::testing::Test {
+class Scuvcu2313Test : public ::testing::Test {
  public:
-  VehicleFactoryTest() : factory_() {}
-
-  virtual void SetUp() {
-    factory_.RegisterVehicleFactory();
-  }
-  virtual void TearDown() {}
-
- protected:
-  VehicleFactory factory_;
+  virtual void SetUp() {}
 };
 
-TEST_F(VehicleFactoryTest, CreateVehicle) {
-  VehicleParameter parameter;
+TEST_F(Scuvcu2313Test, reset) {
+  Scuvcu2313 scuvcu2313;
+  int32_t length = 8;
+  ChassisDetail chassis_detail;
+  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
-  parameter.set_brand(VehicleParameter::GEM);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::GE3);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+  scuvcu2313.Parse(bytes, length, &chassis_detail);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_torqposmax(), 228);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_torqnegmax(),
+                   -2796);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_torqact(), -2928);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_vcu_2_313().vcu_engspd(), 258);
 }
 
+}  // namespace ge3
 }  // namespace canbus
 }  // namespace apollo
