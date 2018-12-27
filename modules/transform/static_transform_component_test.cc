@@ -13,39 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/transform/static_transform_component.h"
 
-#pragma once
-
-#include <memory>
-#include <string>
-#include <vector>
-
-#include "cyber/component/component.h"
-#include "modules/transform/proto/static_transform_conf.pb.h"
-#include "modules/transform/proto/transform.pb.h"
+#include "cyber/init.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace transform {
 
-class StaticTransformComponent final : public apollo::cyber::Component<> {
- public:
-  StaticTransformComponent() = default;
-  ~StaticTransformComponent() = default;
-
- public:
-  bool Init() override;
-
- private:
-  void SendTransforms();
-  void SendTransform(const std::vector<TransformStamped>& msgtf);
-  bool ParseFromYaml(const std::string& file_path, TransformStamped* transform);
-
-  apollo::static_transform::Conf conf_;
-  std::shared_ptr<cyber::Writer<TransformStampeds>> writer_;
-  TransformStampeds transform_stampeds_;
-};
-
-CYBER_REGISTER_COMPONENT(StaticTransformComponent)
+TEST(TransformComponentTest, Init) {
+  cyber::Init("transform_component_test");
+  StaticTransformComponent component;
+}
 
 }  // namespace transform
 }  // namespace apollo
