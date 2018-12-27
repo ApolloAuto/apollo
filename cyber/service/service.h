@@ -17,8 +17,10 @@
 #ifndef CYBER_SERVICE_SERVICE_H_
 #define CYBER_SERVICE_SERVICE_H_
 
+#include <list>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "cyber/common/types.h"
 #include "cyber/node/node_channel_impl.h"
@@ -50,7 +52,13 @@ class Service : public ServiceBase {
         response_channel_(service_name + SRV_CHANNEL_RES_SUFFIX) {}
 
   Service() = delete;
-  ~Service() {}
+  ~Service() {
+    inited_ = false;
+    condition_.notify_all();
+    if (thread_.joinable()) {
+      thread_.join();
+    }
+  }
   bool Init();
   void destroy();
 
@@ -73,10 +81,48 @@ class Service : public ServiceBase {
   std::string request_channel_;
   std::string response_channel_;
   std::mutex service_handle_request_mutex_;
+
+  volatile bool inited_;
+  void Enqueue(std::function<void()>&& task);
+  void Process();
+  std::thread thread_;
+  std::mutex queue_mutex_;
+  std::condition_variable condition_;
+  std::list<std::function<void()>> tasks_;
 };
 
 template <typename Request, typename Response>
-void Service<Request, Response>::destroy() {}
+void Service<Request, Response>::destroy() {
+  inited_ = false;
+  condition_.notify_all();
+  if (thread_.joinable()) {
+    thread_.join();
+  }
+}
+
+template <typename Request, typename Response>
+inline void Service<Request, Response>::Enqueue(std::function<void()>&& task) {
+  std::lock_guard<std::mutex> lg(queue_mutex_);
+  tasks_.emplace_back(std::move(task));
+  condition_.notify_one();
+}
+
+template <typename Request, typename Response>
+void Service<Request, Response>::Process() {
+  while (!cyber::IsShutdown()) {
+    std::unique_lock<std::mutex> ul(queue_mutex_);
+    condition_.wait(ul, [this]() { return !inited_ || !this->tasks_.empty(); });
+    if (!inited_) {
+      break;
+    }
+    if (!tasks_.empty()) {
+      auto task = tasks_.front();
+      tasks_.pop_front();
+      ul.unlock();
+      task();
+    }
+  }
+}
 
 template <typename Request, typename Response>
 bool Service<Request, Response>::Init() {
@@ -111,12 +157,15 @@ bool Service<Request, Response>::Init() {
           const transport::MessageInfo& message_info,
           const proto::RoleAttributes& reader_attr) {
         (void)reader_attr;
-        std::thread _thread =
-            std::thread(request_callback_, request, message_info);
-        scheduler::Instance()->SetInnerThreadAttr(&_thread, "service");
-        _thread.detach();
+        (void)reader_attr;
+        auto task = [this, request, message_info]() {
+          this->HandleRequest(request, message_info);
+        };
+        Enqueue(std::move(task));
       },
       proto::OptionalMode::RTPS);
+  inited_ = true;
+  thread_ = std::thread(&Service<Request, Response>::Process, this);
   if (request_receiver_ == nullptr) {
     AERROR << " Create request sub failed." << request_channel_;
     response_transmitter_.reset();
