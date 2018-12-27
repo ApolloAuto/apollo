@@ -14,40 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/vehicle_factory.h"
+#include "modules/canbus/vehicle/ge3/protocol/scu_epb_310.h"
 
 #include "gtest/gtest.h"
 
-#include "modules/canbus/proto/vehicle_parameter.pb.h"
-
 namespace apollo {
 namespace canbus {
+namespace ge3 {
 
-class VehicleFactoryTest : public ::testing::Test {
+class Scuepb310Test : public ::testing::Test {
  public:
-  VehicleFactoryTest() : factory_() {}
-
-  virtual void SetUp() {
-    factory_.RegisterVehicleFactory();
-  }
-  virtual void TearDown() {}
-
- protected:
-  VehicleFactory factory_;
+  virtual void SetUp() {}
 };
 
-TEST_F(VehicleFactoryTest, CreateVehicle) {
-  VehicleParameter parameter;
+TEST_F(Scuepb310Test, reset) {
+  Scuepb310 scuepb310;
+  int32_t length = 8;
+  ChassisDetail chassis_detail;
+  uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
-  parameter.set_brand(VehicleParameter::GEM);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::GE3);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+  scuepb310.Parse(bytes, length, &chassis_detail);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_epb_310().epb_intidx(), 2);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_epb_310().epb_drvmode(), 0);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_epb_310().epb_sysst(), 1);
+  EXPECT_DOUBLE_EQ(chassis_detail.ge3().scu_epb_310().epb_faultst(), 0);
 }
 
+}  // namespace ge3
 }  // namespace canbus
 }  // namespace apollo
