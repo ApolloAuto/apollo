@@ -48,6 +48,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "static_transform_component_test",
+    size = "small",
+    srcs = ["static_transform_component_test.cc"],
+    deps = [
+        ":static_transform_component_lib",
+        "@gtest//:main",
+    ],
+)
+
 cc_binary(
     name = "libstatic_transform_component.so",
     linkshared = True,
