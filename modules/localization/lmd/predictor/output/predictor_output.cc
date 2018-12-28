@@ -104,7 +104,8 @@ PredictorOutput::PredictorOutput(
     : Predictor(memory_cycle_sec), publish_loc_func_(publish_loc_func) {
   name_ = kPredictorOutputName;
   dep_predicteds_.emplace(kPredictorGpsName, PoseList(memory_cycle_sec));
-  dep_predicteds_.emplace(kPredictorImuName, PoseList(memory_cycle_sec));
+  dep_predicteds_.emplace(kPredictorFilteredImuName,
+                          PoseList(memory_cycle_sec));
   dep_predicteds_.emplace(kPredictorPerceptionName, PoseList(memory_cycle_sec));
   on_adapter_thread_ = true;
 
@@ -116,7 +117,7 @@ PredictorOutput::PredictorOutput(
 PredictorOutput::~PredictorOutput() {}
 
 bool PredictorOutput::Updateable() const {
-  const auto& imu = dep_predicteds_.find(kPredictorImuName)->second;
+  const auto& imu = dep_predicteds_.find(kPredictorFilteredImuName)->second;
   if (predicted_.empty()) {
     const auto& gps = dep_predicteds_.find(kPredictorGpsName)->second;
     return !gps.empty() && !imu.empty();
@@ -138,7 +139,7 @@ Status PredictorOutput::Update() {
           pose.orientation().qy(), pose.orientation().qz()));
     }
 
-    const auto& imu = dep_predicteds_[kPredictorImuName];
+    const auto& imu = dep_predicteds_[kPredictorFilteredImuName];
     Pose imu_pose;
     imu.FindNearestPose(timestamp_sec, &imu_pose);
 
@@ -152,7 +153,7 @@ Status PredictorOutput::Update() {
     return publish_loc_func_(timestamp_sec, pose);
   } else {
     // get timestamp from imu
-    const auto& imu = dep_predicteds_[kPredictorImuName];
+    const auto& imu = dep_predicteds_[kPredictorFilteredImuName];
     auto timestamp_sec = imu.Latest()->first;
 
     // base pose for prediction
@@ -200,7 +201,7 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
     return false;
   }
 
-  const auto& imu = dep_predicteds_[kPredictorImuName];
+  const auto& imu = dep_predicteds_[kPredictorFilteredImuName];
   auto p = imu.RangeOf(old_timestamp_sec);
   auto it = p.first;
   auto it_1 = p.second;
