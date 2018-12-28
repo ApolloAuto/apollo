@@ -60,7 +60,7 @@ class Scenario {
   }
 
   /**
-   * Each scenario should define its own stages object's creation
+   * Each scenario should define it's own stages object's creation
    * scenario will call stage's Stage::Process function following a configured
    * order, The return value of Stage::Process function determines the
    * transition from one stage to another.
@@ -68,7 +68,7 @@ class Scenario {
   virtual std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) = 0;
 
-  // Each scenario should define it's own transfer condition, i.e., when it
+  // Each scenario should define its own transfer condition, i.e., when it
   // should allow to transfer from other scenario ot itself.
   virtual bool IsTransferable(const Scenario& other_scenario,
                               const common::TrajectoryPoint& ego_point,
@@ -87,7 +87,9 @@ class Scenario {
   virtual void Init();
 
   const std::string& Name() const;
-  const std::string& GetMsg() const { return msg_; }
+  const std::string& GetMsg() const {
+    return msg_;
+  }
 
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
