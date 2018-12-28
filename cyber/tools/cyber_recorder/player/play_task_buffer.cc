@@ -50,8 +50,13 @@ PlayTaskBuffer::TaskPtr PlayTaskBuffer::Pop() {
     return nullptr;
   }
   auto res = tasks_.begin()->second;
-  tasks_.erase(tasks_.begin());
   return res;
+}
+
+void PlayTaskBuffer::PopFront() {
+  if (!tasks_.empty()) {
+    tasks_.erase(tasks_.begin());
+  }
 }
 
 }  // namespace record
