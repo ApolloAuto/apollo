@@ -41,7 +41,8 @@ class PlayTaskBuffer {
   bool Empty() const;
 
   void Push(const TaskPtr& task);
-  TaskPtr Pop();
+  TaskPtr Front();
+  void PopFront();
 
  private:
   TaskMap tasks_;

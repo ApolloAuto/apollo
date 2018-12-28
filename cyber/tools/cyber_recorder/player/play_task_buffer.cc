@@ -44,14 +44,20 @@ void PlayTaskBuffer::Push(const TaskPtr& task) {
   tasks_.insert(std::make_pair(task->msg_play_time_ns(), task));
 }
 
-PlayTaskBuffer::TaskPtr PlayTaskBuffer::Pop() {
+PlayTaskBuffer::TaskPtr PlayTaskBuffer::Front() {
   std::lock_guard<std::mutex> lck(mutex_);
   if (tasks_.empty()) {
     return nullptr;
   }
   auto res = tasks_.begin()->second;
-  tasks_.erase(tasks_.begin());
   return res;
+}
+
+void PlayTaskBuffer::PopFront() {
+  std::lock_guard<std::mutex> lck(mutex_);
+  if (!tasks_.empty()) {
+    tasks_.erase(tasks_.begin());
+  }
 }
 
 }  // namespace record
