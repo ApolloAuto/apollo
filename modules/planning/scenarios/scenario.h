@@ -60,7 +60,7 @@ class Scenario {
   }
 
   /**
-   * Each scenario should define it's own stages object's creation
+   * Each scenario should define its own stages object's creation
    * scenario will call stage's Stage::Process function following a configured
    * order, The return value of Stage::Process function determines the
    * transition from one stage to another.
@@ -87,9 +87,7 @@ class Scenario {
   virtual void Init();
 
   const std::string& Name() const;
-  const std::string& GetMsg() const {
-    return msg_;
-  }
+  const std::string& GetMsg() const { return msg_; }
 
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
