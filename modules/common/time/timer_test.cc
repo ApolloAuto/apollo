@@ -30,7 +30,7 @@ TEST(TimeTest, test_timer) {
   timer.Start();
   usleep(100000);
   uint64_t elapsed_time = timer.End("TimerTest");
-  EXPECT_TRUE(elapsed_time >= 99 && elapsed_time <= 101);
+  EXPECT_TRUE(elapsed_time >= 90 && elapsed_time <= 110);
 }
 
 TEST(TimerWrapperTest, test) {
