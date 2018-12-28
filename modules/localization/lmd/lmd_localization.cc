@@ -137,15 +137,43 @@ Status LMDLocalization::Start() {
 
   // initialize thread pool
   ThreadPool::Init(kDefaultThreadPoolSize);
-  AdapterManager::Init(FLAGS_lmd_adapter_config_file);
   // initialize adapter manager
+  AdapterManager::Init(FLAGS_lmd_adapter_config_file);
+  // Imu
+  if (!AdapterManager::GetImu()) {
+    AERROR << "IMU input not initialized. Check your adapter.conf file!";
+    return Status(common::LOCALIZATION_ERROR_MSG, "no IMU adapter");
+  }
   AdapterManager::AddImuCallback(&LMDLocalization::OnImu, this);
+  // Raw Imu
+  if (!AdapterManager::GetRawImu()) {
+    AERROR << "Raw IMU input not initialized. Check your adapter.conf file!";
+    return Status(common::LOCALIZATION_ERROR_MSG, "no Raw IMU adapter");
+  }
   AdapterManager::AddRawImuCallback(&LMDLocalization::OnRawImu, this);
+  // Gps
+  if (!AdapterManager::GetGps()) {
+    AERROR << "Gps input not initialized. Check your adapter.conf file!";
+
+    return Status(common::LOCALIZATION_ERROR_MSG, "no Gps adapter");
+  }
   AdapterManager::AddGpsCallback(&LMDLocalization::OnGps, this);
+  // Chassis
+  if (!AdapterManager::GetChassis()) {
+    AERROR << "Chassis input not initialized. Check your adapter.conf file!";
+    return Status(common::LOCALIZATION_ERROR_MSG, "no Chassis adapter");
+  }
   AdapterManager::AddChassisCallback(&LMDLocalization::OnChassis, this);
+  // Perception
+  if (!AdapterManager::GetPerceptionObstacles()) {
+    AERROR
+        << "PerceptionObstacles input not initialized. Check your adapter.conf "
+           "file!";
+    return Status(common::LOCALIZATION_ERROR_MSG,
+                  "no PerceptionObstacles adapter");
+  }
   AdapterManager::AddPerceptionObstaclesCallback(
       &LMDLocalization::OnPerceptionObstacles, this);
-
   // start ROS timer, one-shot = false, auto-start = true
   const double duration = 1.0 / FLAGS_localization_publish_freq;
   timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
