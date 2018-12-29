@@ -16,7 +16,6 @@
 
 #include "modules/prediction/network/net_util.h"
 
-#include <cmath>
 #include <unordered_map>
 
 #include "cyber/common/log.h"

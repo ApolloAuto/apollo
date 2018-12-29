@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <memory>
 #include <queue>
 #include <unordered_set>
 #include <utility>
@@ -30,7 +29,6 @@ namespace prediction {
 using apollo::common::PointENU;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
-using apollo::hdmap::OverlapInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
 std::shared_ptr<const JunctionInfo>

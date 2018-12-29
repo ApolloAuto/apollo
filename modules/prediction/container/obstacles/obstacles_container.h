@@ -24,14 +24,9 @@
 #include <string>
 #include <vector>
 
-#include "cyber/common/macros.h"
-
 #include "modules/common/util/lru_cache.h"
-#include "modules/prediction/common/environment_features.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
-#include "modules/prediction/container/pose/pose_container.h"
-#include "modules/prediction/proto/scenario.pb.h"
 
 namespace apollo {
 namespace prediction {

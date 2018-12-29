@@ -17,21 +17,10 @@
 #include "modules/prediction/common/prediction_map.h"
 
 #include <algorithm>
-#include <cmath>
-#include <iomanip>
 #include <limits>
-#include <memory>
-#include <string>
 #include <unordered_set>
 #include <utility>
-#include <vector>
 
-#include "modules/map/proto/map_id.pb.h"
-
-#include "modules/common/math/linear_interpolation.h"
-#include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
-#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
@@ -40,7 +29,6 @@ namespace prediction {
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::Id;
 using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::PNCJunctionInfo;

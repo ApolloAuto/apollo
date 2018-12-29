@@ -16,25 +16,15 @@
 
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 
-#include <algorithm>
-#include <cmath>
-#include <limits>
 #include <utility>
-#include <vector>
 
-#include "Eigen/Dense"
-
-#include "cyber/common/log.h"
-#include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
 using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::math::KalmanFilter;
 using ::apollo::perception::PerceptionObstacle;
 
 void FreeMovePredictor::Predict(Obstacle* obstacle) {

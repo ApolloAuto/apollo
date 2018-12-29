@@ -16,13 +16,9 @@
 
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 
-#include <cmath>
 #include <limits>
-#include <numeric>
 
-#include "modules/common/math/math_utils.h"
 #include "modules/common/util/file.h"
-#include "modules/map/proto/map_lane.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -31,8 +27,6 @@
 
 namespace apollo {
 namespace prediction {
-
-using HDMapLane = apollo::hdmap::Lane;
 
 namespace {
 

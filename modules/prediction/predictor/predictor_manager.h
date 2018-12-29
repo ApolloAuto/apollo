@@ -24,12 +24,8 @@
 #include <map>
 #include <memory>
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-
-#include "cyber/common/macros.h"
 #include "modules/prediction/predictor/predictor.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 /**
  * @namespace apollo::prediction

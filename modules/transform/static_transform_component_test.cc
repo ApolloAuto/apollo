@@ -13,41 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/transform/static_transform_component.h"
 
-#pragma once
-
-#include "modules/prediction/evaluator/evaluator.h"
+#include "cyber/init.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
-namespace prediction {
+namespace transform {
 
-class CostEvaluator : public Evaluator {
- public:
-  /**
-   * @brief Constructor
-   */
-  CostEvaluator() = default;
+TEST(TransformComponentTest, Init) {
+  cyber::Init("transform_component_test");
+  StaticTransformComponent component;
+}
 
-  /**
-   * @brief Destructor
-   */
-  virtual ~CostEvaluator() = default;
-
-  /**
-   * @brief Override Evaluate
-   * @param Obstacle pointer
-   */
-  void Evaluate(Obstacle* obstacle_ptr) override;
-
- private:
-  double ComputeProbability(const double obstacle_length,
-                            const double obstacle_width,
-                            const LaneSequence& lane_sequence);
-
-  double FrontLateralDistanceCost(const double obstacle_length,
-                                  const double obstacle_width,
-                                  const LaneSequence& lane_sequence);
-};
-
-}  // namespace prediction
+}  // namespace transform
 }  // namespace apollo

@@ -21,11 +21,7 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
-#include "gtest/gtest.h"
-
-#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/common/environment_features.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"

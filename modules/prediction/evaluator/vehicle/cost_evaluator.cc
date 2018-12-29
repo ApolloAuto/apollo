@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 

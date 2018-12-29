@@ -7,15 +7,8 @@ cc_library(
     srcs = ["scenario_manager.cc"],
     hdrs = ["scenario_manager.h"],
     deps = [
-        "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/math:geometry",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/container:container_manager",
-        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor",
-        "//modules/prediction/scenario/scenario_features",
     ],
 )
 
@@ -29,7 +22,6 @@ cc_test(
     ],
     deps = [
         ":scenario_manager",
-        "@gtest//:main",
     ],
 )
 

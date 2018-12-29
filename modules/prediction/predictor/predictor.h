@@ -23,12 +23,9 @@
 
 #include <vector>
 
-#include "modules/common/math/line_segment2d.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
-
-#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction

@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/offline_features.pb.h"
 
 namespace apollo {

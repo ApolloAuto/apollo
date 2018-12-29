@@ -33,7 +33,7 @@ namespace control {
 
 /**
  * @class PIDICController
- * @brief A proportional–integral–derivative controller for speed and steering
+ * @brief A proportional-integral-derivative controller for speed and steering
 with integral-clamping-anti-windup
  */
 class PIDICController : public PIDController {

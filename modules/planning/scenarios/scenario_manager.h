@@ -42,7 +42,7 @@ class ScenarioManager final {
  private:
   /**
    * This function will wake up each scenario's observe function to cache
-   * neccessary information in planning context, even when the scenario is not
+   * necessary information in planning context, even when the scenario is not
    * scheduled.
    */
   void Observe(const Frame& frame);

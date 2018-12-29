@@ -16,19 +16,14 @@
 
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
-#include <memory>
 #include <utility>
-#include <vector>
 
-#include "cyber/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
 using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::math::LineSegment2d;
 using ::apollo::common::math::Polygon2d;
 using ::apollo::common::math::Vec2d;
 using ::apollo::hdmap::JunctionInfo;

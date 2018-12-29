@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include "google/protobuf/message.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 
 /**

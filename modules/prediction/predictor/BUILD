@@ -7,13 +7,6 @@ cc_library(
     srcs = ["predictor_manager.cc"],
     hdrs = ["predictor_manager.h"],
     deps = [
-        "//modules/perception/proto:perception_proto",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/container",
-        "//modules/prediction/container:container_manager",
-        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
-        "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/prediction/predictor/empty:empty_predictor",
         "//modules/prediction/predictor/free_move:free_move_predictor",
         "//modules/prediction/predictor/junction:junction_predictor",
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",
@@ -21,8 +14,6 @@ cc_library(
         "//modules/prediction/predictor/regional:regional_predictor",
         "//modules/prediction/predictor/single_lane:single_lane_predictor",
         "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/prediction/proto:prediction_proto",
-        "@glog",
     ],
 )
 
@@ -35,16 +26,9 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
-        "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/container:container_manager",
-        "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
-        "//modules/prediction/proto:prediction_conf_proto",
-        "@gtest//:main",
     ],
 )
 
@@ -53,13 +37,8 @@ cc_library(
     srcs = ["predictor.cc"],
     hdrs = ["predictor.h"],
     deps = [
-        "//modules/common/math:geometry",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/prediction/common:prediction_map",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacle",
-        "//modules/prediction/proto:prediction_proto",
-        "@eigen",
     ],
 )
 

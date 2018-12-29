@@ -16,12 +16,6 @@
 
 #include "modules/prediction/scenario/scenario_manager.h"
 
-#include <memory>
-#include <string>
-
-#include "gtest/gtest.h"
-#include "modules/prediction/container/container_manager.h"
-
 namespace apollo {
 namespace prediction {
 

@@ -11,7 +11,6 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common",
     ],
 )
 
