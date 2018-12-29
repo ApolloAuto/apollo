@@ -16,8 +16,6 @@
 
 #include "modules/transform/static_transform_component.h"
 
-#include "modules/common/util/file.h"
-#include "modules/common/util/string_util.h"
 #include "yaml-cpp/yaml.h"
 
 namespace apollo {
@@ -32,19 +30,19 @@ bool StaticTransformComponent::Init() {
   attr.set_channel_name("/tf_static");
   attr.mutable_qos_profile()->CopyFrom(
       cyber::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
-  writer_ = node_->CreateWriter<apollo::transform::TransformStampeds>(attr);
+  writer_ = node_->CreateWriter<TransformStampeds>(attr);
   SendTransforms();
   return true;
 }
 
 void StaticTransformComponent::SendTransforms() {
-  std::vector<apollo::transform::TransformStamped> tranform_stamped_vec;
+  std::vector<TransformStamped> tranform_stamped_vec;
   for (auto& extrinsic_file : conf_.extrinsic_file()) {
     if (extrinsic_file.enable()) {
       AINFO << "Broadcast static transform, frame id ["
             << extrinsic_file.frame_id() << "], child frame id ["
             << extrinsic_file.child_frame_id() << "]";
-      apollo::transform::TransformStamped transform;
+      TransformStamped transform;
       if (ParseFromYaml(extrinsic_file.file_path(), &transform)) {
         tranform_stamped_vec.emplace_back(transform);
       }
@@ -54,9 +52,8 @@ void StaticTransformComponent::SendTransforms() {
 }
 
 bool StaticTransformComponent::ParseFromYaml(
-    const std::string& file_path,
-    apollo::transform::TransformStamped* transform_stamped) {
-  if (!common::util::PathExists(file_path)) {
+    const std::string& file_path, TransformStamped* transform_stamped) {
+  if (!cyber::common::PathExists(file_path)) {
     AERROR << "Extrinsic yaml file is noe exists: " << file_path;
     return false;
   }
@@ -86,7 +83,7 @@ bool StaticTransformComponent::ParseFromYaml(
 }
 
 void StaticTransformComponent::SendTransform(
-    const std::vector<apollo::transform::TransformStamped>& msgtf) {
+    const std::vector<TransformStamped>& msgtf) {
   for (auto it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in) {
     bool match_found = false;
     int size = transform_stampeds_.transforms_size();
@@ -105,8 +102,7 @@ void StaticTransformComponent::SendTransform(
       *ts = *it_in;
     }
   }
-  writer_->Write(std::make_shared<apollo::transform::TransformStampeds>(
-      transform_stampeds_));
+  writer_->Write(std::make_shared<TransformStampeds>(transform_stampeds_));
 }
 
 }  // namespace transform

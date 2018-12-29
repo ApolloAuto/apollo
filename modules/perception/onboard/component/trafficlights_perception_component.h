@@ -18,6 +18,8 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#include <boost/circular_buffer.hpp>
+
 #include <map>
 #include <memory>
 #include <mutex>
@@ -37,6 +39,9 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/transform/buffer.h"
+
+#include "modules/v2x/common/v2x_proxy_gflags.h"
+#include "modules/v2x/proto/v2x_traffic_light.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -61,9 +66,14 @@ class TrafficLightsPerceptionComponent :
   int InitCameraListeners();
   int InitCameraFrame();
 
+  int InitV2XListener();
+
   void OnReceiveImage(
       const std::shared_ptr<apollo::drivers::Image> image,
       const std::string& camera_name);
+
+  void OnReceiveV2XMsg(
+      const std::shared_ptr<apollo::v2x::IntersectionTrafficLightData> v2x_msg);
 
   bool QueryPoseAndSignals(const double ts,
       camera::CarPose* pose,
@@ -107,6 +117,7 @@ class TrafficLightsPerceptionComponent :
  private:
   void Visualize(const camera::CameraFrame& frame,
                  const std::vector<base::TrafficLightPtr>& lights) const;
+  void SyncV2XTrafficLights(camera::CameraFrame *frame);
 
  private:
   std::mutex mutex_;
@@ -191,6 +202,13 @@ class TrafficLightsPerceptionComponent :
   double cnt_g_;
   double cnt_y_;
   double cnt_u_;
+
+  // v2x
+  std::string v2x_trafficlights_input_channel_name_;
+  double v2x_sync_interval_seconds_ = 0.1;
+  int max_v2x_msg_buff_size_ = 50;
+  boost::circular_buffer<apollo::v2x::IntersectionTrafficLightData>
+      v2x_msg_buffer_;
 };
 
 CYBER_REGISTER_COMPONENT(TrafficLightsPerceptionComponent);

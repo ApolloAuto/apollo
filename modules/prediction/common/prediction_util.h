@@ -16,14 +16,12 @@
 
 #pragma once
 
-#include <array>
 #include <limits>
 #include <utility>
 #include <vector>
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {

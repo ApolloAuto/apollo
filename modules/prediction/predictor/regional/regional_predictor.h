@@ -23,10 +23,6 @@
 
 #include <vector>
 
-#include "Eigen/Dense"
-
-#include "modules/common/proto/pnc_point.pb.h"
-
 #include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {

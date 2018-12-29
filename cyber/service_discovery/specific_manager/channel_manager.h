@@ -40,7 +40,6 @@ class ChannelManager : public Manager {
 
  public:
   using RoleAttrVec = std::vector<proto::RoleAttributes>;
-  using ChannelDelegateWarehouse = SingleValueWarehouse;
   using WriterWarehouse = MultiValueWarehouse;
   using ReaderWarehouse = MultiValueWarehouse;
   using ExemptedMessageTypes = std::unordered_set<std::string>;
@@ -81,6 +80,8 @@ class ChannelManager : public Manager {
   void DisposeJoin(const ChangeMsg& msg);
   void DisposeLeave(const ChangeMsg& msg);
 
+  void ScanMessageType(const ChangeMsg& msg);
+
   ExemptedMessageTypes exempted_msg_types_;
 
   Graph node_graph_;
@@ -91,7 +92,6 @@ class ChannelManager : public Manager {
   // key: channel_id
   WriterWarehouse channel_writers_;
   ReaderWarehouse channel_readers_;
-  ChannelDelegateWarehouse channel_delegates_;
 };
 
 }  // namespace service_discovery

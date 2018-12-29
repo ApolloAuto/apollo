@@ -16,16 +16,12 @@
 
 #include "modules/prediction/common/validation_checker.h"
 
-#include <algorithm>
-#include <cmath>
-
 #include "modules/common/math/math_utils.h"
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
-using common::PathPoint;
 using common::TrajectoryPoint;
 
 double ValidationChecker::ProbabilityByCentripetalAcceleration(

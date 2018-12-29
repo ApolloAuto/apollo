@@ -16,10 +16,7 @@
 
 #include "modules/tools/visualizer/pointcloud.h"
 
-#include <cassert>
-#include <fstream>
 #include <iostream>
-#include <sstream>
 
 PointCloud::PointCloud(
     int pointCount, int vertexElementCount,

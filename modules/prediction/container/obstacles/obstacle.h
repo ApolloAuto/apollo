@@ -24,16 +24,11 @@
 #include <deque>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
-
-#include "Eigen/Dense"
 
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
-#include "modules/common/proto/error_code.pb.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/feature.pb.h"
 
 /**

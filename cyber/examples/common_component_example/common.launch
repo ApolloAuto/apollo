@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>common</name>
+        <dag_conf>/apollo/cyber/examples/common_component_example/common.dag</dag_conf>
+        <process_name>common</process_name>
+    </module>
+</cyber>

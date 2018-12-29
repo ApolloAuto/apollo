@@ -52,7 +52,7 @@ class Stage {
   ScenarioConfig::StageType stage_type() const { return config_.stage_type(); }
 
   /**
-   * @brief Each stage does its bussines logic inside Process function.
+   * @brief Each stage does its business logic inside Process function.
    * If the stage want to transite to a different stage after finish,
    * it should set the type of 'next_stage_'.
    */

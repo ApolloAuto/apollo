@@ -63,7 +63,7 @@ Some of the key features include:
 - Apollo FSM: A finite state machine that determines the vehicle state given its location and routing together with HD Map.
 - Planning Dispatcher: Call an appropriate planner given the vehicle's state and some other relevant information
 - Planner: Obtain the required context data and other information, decide a corresponding vehicle intention, execute the required planning tasks for this intention and generate the planning trajectory. It will also update the context for future jobs.
-- Deciders & Optimizers: A set of stateless libraries that implement decision tasks and various optimizations. Optimizers specifically optimize the vehicle's trajectory and speed. Deciders are rule-based descision makers that advise on when to change lane, when to stop, creep or when the creep is complete. 
+- Deciders & Optimizers: A set of stateless libraries that implement decision tasks and various optimizations. Optimizers specifically optimize the vehicle's trajectory and speed. Deciders are rule-based decision makers that advise on when to change lane, when to stop, creep or when the creep is complete.
 - Yellow box: These boxes are included for future scenarios and/or developers to contribute their own scenarios based on real-world driving use cases
 
 ```

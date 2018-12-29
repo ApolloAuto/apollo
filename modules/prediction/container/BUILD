@@ -7,12 +7,10 @@ cc_library(
     srcs = ["container_manager.cc"],
     hdrs = ["container_manager.h"],
     deps = [
-        "//cyber",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/pose:pose_container",
-        "@glog",
         "@gtest//:main",
     ],
 )
@@ -26,9 +24,7 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
         "//modules/prediction/container:container_manager",
-        "@gtest//:main",
     ],
 )
 
@@ -36,7 +32,6 @@ cc_library(
     name = "container",
     hdrs = ["container.h"],
     deps = [
-        "@com_google_protobuf//:protobuf",
     ],
 )
 

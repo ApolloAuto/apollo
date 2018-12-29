@@ -68,7 +68,7 @@ class Scenario {
   virtual std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) = 0;
 
-  // Each scenario should define it's own transfer condition, i.e., when it
+  // Each scenario should define its own transfer condition, i.e., when it
   // should allow to transfer from other scenario ot itself.
   virtual bool IsTransferable(const Scenario& other_scenario,
                               const common::TrajectoryPoint& ego_point,

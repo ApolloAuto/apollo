@@ -17,13 +17,10 @@
 #include "modules/prediction/network/cruise_model/cruise_model.h"
 #include "cyber/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/network/net_util.h"
 
 namespace apollo {
 namespace prediction {
 namespace network {
-
-using apollo::prediction::CruiseModelParameter;
 
 void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
                       Eigen::MatrixXf* output) const {

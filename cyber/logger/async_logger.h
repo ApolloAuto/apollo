@@ -43,7 +43,7 @@ namespace logger {
 // a new buffer and writes any accumulated messages to the wrapped
 // Logger.
 //
-// This double-buffering behavior dramatically improves performance, especially
+// This double-buffering design dramatically improves performance, especially
 // for logging messages which require flushing the underlying file (i.e WARNING
 // and above for default). The flush can take a couple of milliseconds, and in
 // some cases can even block for hundreds of milliseconds or more. With the
@@ -54,7 +54,7 @@ namespace logger {
 // glog semantics. By default, glog will immediately (synchronously) flush
 // WARNING
 // and above to the underlying file, whereas here we are deferring that flush to
-// the separate thread. This means that a crash just after a 'LOG_WARN' would
+// a separate thread. This means that a crash just after a 'LOG_WARN' would
 // may be missing the message in the logs, but the perf benefit is probably
 // worth it. We do take care that a glog FATAL message flushes all buffered log
 // messages before exiting.
@@ -82,14 +82,13 @@ class AsyncLogger : public google::base::Logger {
   // Write a message to the log.
   //
   // 'force_flush' is set by the GLog library based on the configured
-  // '--logbuflevel'
-  // flag. Any messages logged at the configured level or higher result in
+  // '--logbuflevel' flag.
+  // Any messages logged at the configured level or higher result in
   // 'force_flush'
   // being set to true, indicating that the message should be immediately
   // written to the
   // log rather than buffered in memory. See the class-level docs above for more
-  // detail
-  // about the implementation provided here.
+  // details about the implementation provided here.
   //
   // REQUIRES: Start() must have been called.
   void Write(bool force_flush, time_t timestamp, const char* message,
@@ -99,7 +98,7 @@ class AsyncLogger : public google::base::Logger {
   void Flush() override;
 
   // Get the current LOG file size.
-  // The returned value is approximate since some
+  // The return value is an approximate value since some
   // logged data may not have been flushed to disk yet.
   uint32_t LogSize() override;
 
@@ -107,7 +106,7 @@ class AsyncLogger : public google::base::Logger {
   // A buffered message.
   //
   // TODO(todd): using std::string for buffered messages is convenient but not
-  // as efficient as it could be. Better would be to make the buffers just be
+  // as efficient as it could be. It's better to make the buffers just be
   // Arenas and allocate both the message data and Msg struct from them, forming
   // a linked list.
   struct Msg {

@@ -8,15 +8,8 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"manual_traffic_light\\\""],
     data = ["//modules/map:map_data"],
     deps = [
-        "//cyber",
-        "//external:gflags",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/configs:config_gflags",
-        "//modules/common/util",
-        "//modules/common/util:color",
         "//modules/map/hdmap:hdmap_util",
-        "//modules/perception/proto:perception_proto",
     ],
 )
 

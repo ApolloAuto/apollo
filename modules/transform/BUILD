@@ -14,7 +14,6 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/transform/proto:transform_proto",
-        "//third_party/tf2",
     ],
 )
 
@@ -29,7 +28,6 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/transform/proto:transform_proto",
-        "//third_party/tf2",
     ],
 )
 
@@ -44,12 +42,19 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"static_transform\\"'],
     deps = [
         "//cyber",
-        "//modules/common/util:file_util",
-        "//modules/common/util:string_util",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
-        "//third_party/tf2",
         "@yaml_cpp//:yaml",
+    ],
+)
+
+cc_test(
+    name = "static_transform_component_test",
+    size = "small",
+    srcs = ["static_transform_component_test.cc"],
+    deps = [
+        ":static_transform_component_lib",
+        "@gtest//:main",
     ],
 )
 

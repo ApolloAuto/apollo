@@ -16,12 +16,7 @@
 
 #include "modules/prediction/predictor/empty/empty_predictor.h"
 
-#include "gtest/gtest.h"
-
-#include "modules/common/util/file.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
-#include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 

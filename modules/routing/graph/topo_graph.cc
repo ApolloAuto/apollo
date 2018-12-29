@@ -18,9 +18,6 @@
 
 #include <utility>
 
-#include "modules/common/util/file.h"
-#include "modules/routing/graph/topo_node.h"
-
 namespace apollo {
 namespace routing {
 

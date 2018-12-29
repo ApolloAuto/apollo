@@ -432,10 +432,16 @@ bool ObstacleCameraPerception::Perception(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
       frame->data_provider->sensor_name(), "Track");
 
-  WriteCamera2World(out_pose_, frame->frame_id, frame->camera2world_pose);
-  WriteTracking(out_track_,
-                frame->frame_id,
-                frame->tracked_objects);
+  if (perception_param_.has_debug_param()) {
+    if (perception_param_.debug_param().has_camera2world_out_file()) {
+      WriteCamera2World(out_pose_, frame->frame_id, frame->camera2world_pose);
+    }
+    if (perception_param_.debug_param().has_track_out_file()) {
+      WriteTracking(out_track_,
+                    frame->frame_id,
+                    frame->tracked_objects);
+    }
+  }
   // save tracked detections results as kitti format
   WriteDetections(perception_param_.debug_param().
                       has_tracked_detection_out_dir(),

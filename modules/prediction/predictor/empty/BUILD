@@ -7,7 +7,6 @@ cc_library(
     srcs = ["empty_predictor.cc"],
     hdrs = ["empty_predictor.h"],
     deps = [
-        "//cyber",
         "//modules/prediction/predictor",
     ],
 )
@@ -23,13 +22,10 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
-        "//modules/common/util",
         "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/predictor/empty:empty_predictor",
-        "//modules/prediction/proto:prediction_proto",
         "@gtest//:main",
     ],
 )

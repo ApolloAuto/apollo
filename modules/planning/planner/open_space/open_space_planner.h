@@ -34,7 +34,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/open_space/open_space_ROI.h"
+#include "modules/planning/open_space/constraints_formulation/open_space_ROI.h"
 #include "modules/planning/open_space/open_space_trajectory_generator.h"
 #include "modules/planning/planner/planner.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"

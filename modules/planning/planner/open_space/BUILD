@@ -23,7 +23,7 @@ cc_library(
         "//modules/map/hdmap",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_common",
-        "//modules/planning/open_space:open_space_ROI",
+        "//modules/planning/open_space/constraints_formulation:open_space_ROI",
         "//modules/planning/open_space:open_space_trajectory_generator",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",

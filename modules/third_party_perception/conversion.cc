@@ -18,7 +18,6 @@
  * @file
  */
 
-#include <cmath>
 #include <map>
 #include <vector>
 
@@ -38,7 +37,6 @@ namespace third_party_perception {
 namespace conversion {
 
 using apollo::canbus::Chassis;
-using apollo::drivers::ContiRadar;
 using apollo::drivers::DelphiESR;
 using apollo::drivers::Mobileye;
 using apollo::localization::LocalizationEstimate;
@@ -46,7 +44,7 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using Point = apollo::common::Point3D;
 
-std::map<std::int32_t, ::apollo::hdmap::LaneBoundaryType_Type>
+std::map<std::int32_t, apollo::hdmap::LaneBoundaryType_Type>
     lane_conversion_map = {{0, apollo::hdmap::LaneBoundaryType::DOTTED_YELLOW},
                            {1, apollo::hdmap::LaneBoundaryType::SOLID_YELLOW},
                            {2, apollo::hdmap::LaneBoundaryType::UNKNOWN},
@@ -407,7 +405,7 @@ RadarObstacles DelphiToRadarObstacles(
 
     // ignore invalid target
     if (data_500.can_tx_track_status() ==
-        ::apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET) {
+        apollo::drivers::Esr_track01_500::CAN_TX_TRACK_STATUS_NO_TARGET) {
       continue;
     }
 

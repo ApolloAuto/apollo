@@ -15,10 +15,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/perception/proto:perception_proto",
         "//modules/v2x/common:v2x_proxy_gflags",
-        "//modules/v2x/proto:v2x_carstatus_proto",
         "//modules/v2x/proto:v2x_service_car_to_obu_grpc",
     ],
 )
@@ -36,11 +33,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/perception/proto:perception_proto",
-        "//modules/v2x/common:v2x_proxy_gflags",
         "//modules/v2x/proto:v2x_service_obu_to_car_grpc",
-        "//modules/v2x/proto:v2x_traffic_light_proto",
     ],
 )
 

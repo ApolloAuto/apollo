@@ -189,6 +189,18 @@ Status LonController::ComputeControlCommand(
     station_error_limited = common::math::Clamp(
         debug->station_error(), -station_error_limit, station_error_limit);
   }
+
+  if (trajectory_message_->gear() == canbus::Chassis::GEAR_REVERSE) {
+    station_pid_controller_.SetPID(
+        lon_controller_conf.reverse_station_pid_conf());
+    speed_pid_controller_.SetPID(lon_controller_conf.reverse_speed_pid_conf());
+  } else if (VehicleStateProvider::Instance()->linear_velocity() <=
+             lon_controller_conf.switch_speed()) {
+    speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
+  } else {
+    speed_pid_controller_.SetPID(lon_controller_conf.high_speed_pid_conf());
+  }
+
   double speed_offset =
       station_pid_controller_.Control(station_error_limited, ts);
 
@@ -206,20 +218,9 @@ Status LonController::ComputeControlCommand(
                           speed_controller_input_limit);
 
   double acceleration_cmd_closeloop = 0.0;
-  if (trajectory_message_->gear() == canbus::Chassis::GEAR_REVERSE) {
-    speed_pid_controller_.SetPID(lon_controller_conf.reverse_speed_pid_conf());
-    acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
-  } else if (VehicleStateProvider::Instance()->linear_velocity() <=
-             lon_controller_conf.switch_speed()) {
-    speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
-    acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
-  } else {
-    speed_pid_controller_.SetPID(lon_controller_conf.high_speed_pid_conf());
-    acceleration_cmd_closeloop =
-        speed_pid_controller_.Control(speed_controller_input_limited, ts);
-  }
+
+  acceleration_cmd_closeloop =
+      speed_pid_controller_.Control(speed_controller_input_limited, ts);
 
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
@@ -242,7 +243,7 @@ Status LonController::ComputeControlCommand(
             FLAGS_max_acceleration_when_stopped &&
         std::fabs(debug->preview_speed_reference()) <=
             vehicle_param_.max_abs_speed_when_stopped()) ||
-       (debug->path_remain() < 0.3))) {
+       std::abs(debug->path_remain()) < 0.3)) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);
@@ -251,18 +252,19 @@ Status LonController::ComputeControlCommand(
   double throttle_deadzone = lon_controller_conf.throttle_deadzone();
   double brake_deadzone = lon_controller_conf.brake_deadzone();
   double calibration_value = 0.0;
+  double acceleration_lookup =
+      (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
+          ? -acceleration_cmd
+          : acceleration_cmd;
   if (FLAGS_use_preview_speed_for_table) {
     calibration_value = control_interpolation_->Interpolate(
-        std::make_pair(debug->preview_speed_reference(), acceleration_cmd));
+        std::make_pair(debug->preview_speed_reference(), acceleration_lookup));
   } else {
     calibration_value = control_interpolation_->Interpolate(
-        std::make_pair(chassis_->speed_mps(), acceleration_cmd));
+        std::make_pair(chassis_->speed_mps(), acceleration_lookup));
   }
 
-  if ((calibration_value >= 0 &&
-       chassis->gear_location() == canbus::Chassis::GEAR_DRIVE) ||
-      (calibration_value < 0 &&
-       chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)) {
+  if (calibration_value >= 0) {
     throttle_cmd = std::abs(calibration_value) > throttle_deadzone
                        ? std::abs(calibration_value)
                        : throttle_deadzone;
@@ -279,7 +281,7 @@ Status LonController::ComputeControlCommand(
   debug->set_acceleration_cmd(acceleration_cmd);
   debug->set_throttle_cmd(throttle_cmd);
   debug->set_brake_cmd(brake_cmd);
-  debug->set_acceleration_lookup(acceleration_cmd);
+  debug->set_acceleration_lookup(acceleration_lookup);
   debug->set_speed_lookup(chassis_->speed_mps());
   debug->set_calibration_value(calibration_value);
   debug->set_acceleration_cmd_closeloop(acceleration_cmd_closeloop);
@@ -379,15 +381,29 @@ void LonController::SetDigitalFilter(double ts, double cutoff_freq,
   digital_filter->set_coefficients(denominators, numerators);
 }
 
+// TODO(all): Refactor and simplify
 void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   int stop_index = 0;
-  while (stop_index < trajectory_message_->trajectory_point_size()) {
-    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-        trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
-        trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
-      break;
-    } else {
-      ++stop_index;
+
+  if (trajectory_message_->gear() == canbus::Chassis::GEAR_DRIVE) {
+    while (stop_index < trajectory_message_->trajectory_point_size()) {
+      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
+          trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
+          trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
+        break;
+      } else {
+        ++stop_index;
+      }
+    }
+  } else {
+    while (stop_index < trajectory_message_->trajectory_point_size()) {
+      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
+          trajectory_message_->trajectory_point(stop_index).a() < 0.1 &&
+          trajectory_message_->trajectory_point(stop_index).a() > 0.0) {
+        break;
+      } else {
+        ++stop_index;
+      }
     }
   }
   if (stop_index == trajectory_message_->trajectory_point_size()) {

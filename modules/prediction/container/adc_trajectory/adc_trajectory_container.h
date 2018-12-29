@@ -22,16 +22,10 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-#include "Eigen/Dense"
-
-#include "modules/common/math/line_segment2d.h"
-#include "modules/common/math/polygon2d.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container.h"

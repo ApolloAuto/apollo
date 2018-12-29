@@ -13,7 +13,7 @@ of Apollo 3.0, as they have different commit ID on almost each history commits.
 
 ```
 Note:
-- Please re-fork and re-clone your repository to sync with the latest changes. 
+- Please re-fork and re-clone your repository to sync with the latest changes.
 - Rememeber to make a copy of your work (changes) before re-cloning or you will lose all of it.
 ```
 
@@ -92,4 +92,11 @@ time in the long run.
 
 ### Trouble shooting guide
 
-We'll add common trouble shooting guidance here.
+1. Missed file found when run `git push -f origin master`. If you see
+
+
+   ```
+   open /home/apollo/docs/specs/Camera/images/Argus_Specs1.png: no such file or directory        
+   ```
+
+   please run `git lfs fetch --all` before git push to resolve the issue.

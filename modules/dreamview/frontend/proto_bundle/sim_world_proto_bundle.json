@@ -4237,6 +4237,58 @@
                   "options": {
                     "default": false
                   }
+                },
+                "ipoptConfig": {
+                  "type": "IpoptConfig",
+                  "id": 19
+                }
+              }
+            },
+            "IpoptConfig": {
+              "fields": {
+                "ipoptPrintLevel": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "mumpsMemPercent": {
+                  "type": "int32",
+                  "id": 2
+                },
+                "mumpsPivtol": {
+                  "type": "double",
+                  "id": 3
+                },
+                "ipoptMaxIter": {
+                  "type": "int32",
+                  "id": 4
+                },
+                "ipoptTol": {
+                  "type": "double",
+                  "id": 5
+                },
+                "ipoptAcceptableConstrViolTol": {
+                  "type": "double",
+                  "id": 6
+                },
+                "ipoptMinHessianPerturbation": {
+                  "type": "double",
+                  "id": 7
+                },
+                "ipoptJacobianRegularizationValue": {
+                  "type": "double",
+                  "id": 8
+                },
+                "ipoptPrintTimingStatistics": {
+                  "type": "string",
+                  "id": 9
+                },
+                "ipoptAlphaForY": {
+                  "type": "string",
+                  "id": 10
+                },
+                "ipoptRecalcY": {
+                  "type": "string",
+                  "id": 11
                 }
               }
             },

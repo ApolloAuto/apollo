@@ -368,7 +368,7 @@ bool DenselineLanePostprocessor::SelectLanecenterCCs(
   select_lane_ccs->clear();
   int lane_ccs_num = static_cast<int>(lane_ccs.size());
   if (lane_ccs_num == 0) {
-    AERROR << "lane_ccs_num=0";
+    AINFO << "lane_ccs_num=0";
     return false;
   }
   //  select top 3 ccs with largest pixels size
@@ -378,14 +378,14 @@ bool DenselineLanePostprocessor::SelectLanecenterCCs(
   for (int i = 0; i < lane_ccs_num; i++) {
     const std::vector<base::Point2DI>& pixels = lane_ccs[i].GetPixels();
     if (static_cast<int>(pixels.size()) < valid_pixels_num) {
-      AERROR << "pixels_size < valid_pixels_num";
+      AINFO << "pixels_size < valid_pixels_num";
       continue;
     }
     valid_lane_ccs.push_back(lane_ccs[i]);
   }
   int valid_ccs_num = static_cast<int>(valid_lane_ccs.size());
   if (valid_ccs_num == 0) {
-    AERROR << "valid_ccs_num=0";
+    AINFO << "valid_ccs_num=0";
     return false;
   }
   std::sort(valid_lane_ccs.begin(), valid_lane_ccs.end(),

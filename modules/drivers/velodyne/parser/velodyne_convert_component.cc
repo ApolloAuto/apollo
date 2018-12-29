@@ -63,13 +63,7 @@ bool VelodyneConvertComponent::Proc(
     AWARN << "point cloud out is nullptr";
     return false;
   }
-  AINFO << "Clear before bytes:" << point_cloud_out->ByteSize();
   point_cloud_out->Clear();
-  AINFO << "Clear after bytes:" << point_cloud_out->ByteSize();
-  AINFO << "SpaceUsedExcludingSelf: "
-        << point_cloud_out->mutable_point()->SpaceUsedExcludingSelf()
-        << ", ClearedCount:"
-        << point_cloud_out->mutable_point()->ClearedCount();
   conv_->ConvertPacketsToPointcloud(scan_msg, point_cloud_out);
 
   if (point_cloud_out == nullptr || point_cloud_out->point_size() == 0) {

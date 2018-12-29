@@ -16,8 +16,6 @@
 
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
 
-#include <string>
-
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 #include "modules/prediction/scenario/scenario_features/junction_scenario_features.h"

@@ -13,11 +13,8 @@ cc_binary(
     linkstatic = False,
     deps = [
         "//cyber",
-        "//modules/drivers/camera/proto:camera_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/tools/image_decompress/proto:decompress_proto",
-        "@opencv2//:core",
-        "@opencv2//:highgui",
     ],
 )
 

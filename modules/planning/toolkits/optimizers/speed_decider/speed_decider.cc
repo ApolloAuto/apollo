@@ -213,6 +213,11 @@ Status SpeedDecider::MakeObjectDecision(
       }
     }
 
+    auto box = obstacle->PerceptionBoundingBox();
+    common::SLPoint start_sl_point;
+    reference_line_->XYToSL({box.center_x(), box.center_y()}, &start_sl_point);
+    double start_abs_l = std::abs(start_sl_point.l());
+
     switch (position) {
       case BELOW:
         if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
@@ -223,7 +228,8 @@ Status SpeedDecider::MakeObjectDecision(
           }
         } else if (CheckIsFollowByT(boundary) &&
                    (boundary.max_t() - boundary.min_t() >
-                    FLAGS_follow_min_time_sec)) {
+                    FLAGS_follow_min_time_sec) &&
+                   start_abs_l < FLAGS_follow_min_obs_lateral_distance) {
           // stop for low_speed decelerating
           if (IsFollowTooClose(*mutable_obstacle)) {
             ObjectDecisionType stop_decision;

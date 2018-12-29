@@ -19,12 +19,7 @@ cc_library(
         "strategy.h",
     ],
     deps = [
-        "//modules/common",
-        "//modules/common/proto:geometry_proto",
-        "//modules/map/proto:map_proto",
-        "//modules/routing/common:routing_gflags",
         "//modules/routing/graph",
-        "//modules/routing/proto:routing_proto",
     ],
 )
 

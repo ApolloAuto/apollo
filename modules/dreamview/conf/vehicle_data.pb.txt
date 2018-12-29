@@ -27,6 +27,10 @@ data_files {
   dest_path: "/apollo/modules/localization/msf/params/velodyne_params"
 }
 data_files {
+  source_path: "velodyne_params"
+  dest_path: "/apollo/modules/perception/data/params"
+}
+data_files {
   source_path: "camera_params"
   dest_path: "/apollo/modules/perception/data/params"
 }

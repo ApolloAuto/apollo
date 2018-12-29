@@ -16,10 +16,6 @@
 
 #include "modules/prediction/container/container_manager.h"
 
-#include <memory>
-#include <string>
-
-#include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"

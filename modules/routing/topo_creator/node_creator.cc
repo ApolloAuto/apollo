@@ -17,7 +17,6 @@
 #include "modules/routing/topo_creator/node_creator.h"
 
 #include <algorithm>
-#include <cmath>
 
 namespace apollo {
 namespace routing {

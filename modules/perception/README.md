@@ -15,10 +15,10 @@ The perception module incorporates the capability of using 5 cameras (2 front, 2
 ## Architecture
 
 The general architecture of the perception module is shown:
-![](docs/specs/images/Apollo3.5_perception_sensor_based.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo3.5_perception_sensor_based.png)
 
 The detailed perception modules are displayed below.
-![](docs/specs/images/Apollo3.5_perception_detail.png)
+![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/Apollo3.5_perception_detail.png)
 
 ## Input
 

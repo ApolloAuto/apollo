@@ -16,13 +16,9 @@
 
 #include "modules/prediction/predictor/predictor_manager.h"
 
-#include <memory>
-
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/predictor/empty/empty_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/junction/junction_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
@@ -36,7 +32,6 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using apollo::planning::ADCTrajectory;
 
 PredictorManager::PredictorManager() { RegisterPredictors(); }
 

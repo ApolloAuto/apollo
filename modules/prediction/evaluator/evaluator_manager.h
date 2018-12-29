@@ -25,7 +25,6 @@
 #include <memory>
 
 #include "cyber/common/macros.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 

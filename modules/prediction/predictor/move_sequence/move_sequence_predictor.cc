@@ -17,25 +17,10 @@
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 
 #include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <limits>
 #include <memory>
-#include <utility>
 
-#include "Eigen/Dense"
-#include "cyber/common/log.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/math/math_utils.h"
-#include "modules/common/util/file.h"
-#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_util.h"
-#include "modules/prediction/common/road_graph.h"
-#include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -43,8 +28,6 @@ namespace prediction {
 using ::apollo::common::PathPoint;
 using ::apollo::common::Point3D;
 using ::apollo::common::TrajectoryPoint;
-using ::apollo::common::adapter::AdapterConfig;
-using ::apollo::common::math::KalmanFilter;
 using ::apollo::hdmap::LaneInfo;
 using ::apollo::prediction::math_util::EvaluateQuarticPolynomial;
 using ::apollo::prediction::math_util::EvaluateQuinticPolynomial;
