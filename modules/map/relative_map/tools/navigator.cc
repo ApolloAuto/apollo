@@ -19,18 +19,16 @@
 #include <thread>
 #include <vector>
 
-#include "ros/ros.h"
 #include "third_party/json/json.hpp"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "cyber/cyber.h"
+#include "cyber/time/rate.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
+using apollo::cyber::Rate;
 using apollo::relative_map::NavigationInfo;
 using apollo::relative_map::NavigationPath;
 using nlohmann::json;
@@ -41,8 +39,9 @@ bool GetNavigationPathFromFile(const std::string& filename,
                                NavigationPath* navigation_path);
 
 int main(int argc, char** argv) {
-  google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
+  // Init the cyber framework
+  apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
 
   std::vector<std::string> navigation_line_filenames;
@@ -59,17 +58,6 @@ int main(int argc, char** argv) {
 
   ADEBUG << "The flag \"navigator_down_sample\" is: "
          << FLAGS_navigator_down_sample;
-
-  ros::init(argc, argv, "navigator_offline", ros::init_options::AnonymousName);
-
-  AdapterManagerConfig config;
-  config.set_is_ros(true);
-  auto* sub_config = config.add_config();
-  sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-  sub_config->set_type(AdapterConfig::NAVIGATION);
-
-  AdapterManager::Init(config);
-  ADEBUG << "AdapterManager is initialized.";
 
   NavigationInfo navigation_info;
   int i = 0;
@@ -89,23 +77,18 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  if (ros::ok()) {
-    AdapterManager::FillNavigationHeader("relative_map", &navigation_info);
-    AdapterManager::PublishNavigation(navigation_info);
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("navigation_info"));
+  auto writer = node->CreateWriter<apollo::relative_map::NavigationInfo>(
+      "Navigation Info");
+
+  Rate rate(1.0);
+  if (apollo::cyber::OK()) {
+    writer->Write(navigation_info);
     ADEBUG << "Sending navigation info:" << navigation_info.DebugString();
-
-    // Wait for the subscriber's callback function to process this topic.
-    // Otherwise, an error message similar to the following will appear:
-    // [ERROR] [1530582989.030754209]: Failed to parse message: boost: mutex
-    // lock failed in pthread_mutex_lock: Invalid argument
-    ros::spinOnce();
-
-    // Sleep for one second to prevent the publishing node from being destroyed
-    // prematurely.
-    ros::Rate r(1);  // 1 hz
-    r.sleep();
+    rate.Sleep();
   } else {
-    AERROR << "ROS status is wrong.";
+    AERROR << "Cyber status is wrong.";
     return -1;
   }
 
