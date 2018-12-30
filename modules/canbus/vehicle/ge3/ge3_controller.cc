@@ -351,8 +351,7 @@ Chassis Ge3Controller::chassis() {
   }
 
   // give engage_advice based on error_code and canbus feedback
-  if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
-      (chassis_.brake_percentage() == 0.0)) {
+  if (chassis_error_mask_) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason("Chassis error!");
@@ -815,17 +814,7 @@ void Ge3Controller::set_chassis_error_code(
 
 bool Ge3Controller::CheckSafetyError(
     const ::apollo::canbus::ChassisDetail& chassis_detail) {
-  bool safety_error =
-      chassis_detail.safety().is_passenger_door_open() ||
-      chassis_detail.safety().is_rearleft_door_open() ||
-      chassis_detail.safety().is_rearright_door_open() ||
-      chassis_detail.safety().is_hood_open() ||
-      chassis_detail.safety().is_trunk_open() ||
-      (chassis_detail.safety().is_passenger_detected() &&
-       (!chassis_detail.safety().is_passenger_airbag_enabled() ||
-        !chassis_detail.safety().is_passenger_buckled()));
-  ADEBUG << "Vehicle safety error status is : " << safety_error;
-  return safety_error;
+  return false;
 }
 
 }  // namespace ge3
