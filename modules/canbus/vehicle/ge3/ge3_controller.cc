@@ -158,6 +158,7 @@ Chassis Ge3Controller::chassis() {
 
   // check if there is not ge3, no chassis detail can be retrieved and return
   if (!chassis_detail.has_ge3()) {
+    AERROR << "NO GE3 chassis information!";
     return chassis_;
   }
   Ge3 ge3 = chassis_detail.ge3();
@@ -250,6 +251,7 @@ Chassis Ge3Controller::chassis() {
     chassis_.set_gear_location(Chassis::GEAR_INVALID);
   }
 
+  // 11
   if (ge3.has_scu_eps_311() && ge3.scu_eps_311().has_eps_steerangle()) {
     chassis_.set_steering_percentage(
         static_cast<float>(ge3.scu_eps_311().eps_steerangle() /
@@ -296,7 +298,7 @@ Chassis Ge3Controller::chassis() {
     chassis_.mutable_signal()->set_turn_signal(
         common::VehicleSignal::TURN_NONE);
   }
-  // // 18
+  // 18
   if (ge3.has_scu_bcm_304() && ge3.scu_bcm_304().has_bcm_hornst() &&
       Scu_bcm_304::BCM_HORNST_ACTIVE == ge3.scu_bcm_304().bcm_hornst()) {
     chassis_.mutable_signal()->set_horn(true);
@@ -306,7 +308,7 @@ Chassis Ge3Controller::chassis() {
 
   // vin number will be written into KVDB once.
   chassis_.mutable_license()->set_vin("");
-  if (ge3.has_scu_2_302()) {
+  if (ge3.has_scu_1_301() && ge3.has_scu_2_302() && ge3.has_scu_3_303()) {
     Scu_1_301 scu_1_301 = ge3.scu_1_301();
     Scu_2_302 scu_2_302 = ge3.scu_2_302();
     Scu_3_303 scu_3_303 = ge3.scu_3_303();
@@ -348,6 +350,22 @@ Chassis Ge3Controller::chassis() {
     }
   }
 
+  // give engage_advice based on error_code and canbus feedback
+  if (chassis_error_mask_ || (chassis_.throttle_percentage() == 0.0) ||
+      (chassis_.brake_percentage() == 0.0)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason("Chassis error!");
+  } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    chassis_.mutable_engage_advice()->set_reason(
+        "Vehicle is not in a safe state to engage!");
+  } else {
+    chassis_.mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+  }
+
   return chassis_;
 }
 
@@ -356,6 +374,7 @@ void Ge3Controller::Emergency() {
   ResetProtocol();
   // In emergency case, the hazard lamp should be on
   pc_bcm_201_->set_pc_hazardlampreq(Pc_bcm_201::PC_HAZARDLAMPREQ_REQ);
+  set_chassis_error_code(Chassis::CHASSIS_ERROR);
 }
 
 ErrorCode Ge3Controller::EnableAutoMode() {
@@ -792,6 +811,21 @@ void Ge3Controller::set_chassis_error_code(
     const Chassis::ErrorCode& error_code) {
   std::lock_guard<std::mutex> lock(chassis_error_code_mutex_);
   chassis_error_code_ = error_code;
+}
+
+bool Ge3Controller::CheckSafetyError(
+    const ::apollo::canbus::ChassisDetail& chassis_detail) {
+  bool safety_error =
+      chassis_detail.safety().is_passenger_door_open() ||
+      chassis_detail.safety().is_rearleft_door_open() ||
+      chassis_detail.safety().is_rearright_door_open() ||
+      chassis_detail.safety().is_hood_open() ||
+      chassis_detail.safety().is_trunk_open() ||
+      (chassis_detail.safety().is_passenger_detected() &&
+       (!chassis_detail.safety().is_passenger_airbag_enabled() ||
+        !chassis_detail.safety().is_passenger_buckled()));
+  ADEBUG << "Vehicle safety error status is : " << safety_error;
+  return safety_error;
 }
 
 }  // namespace ge3
