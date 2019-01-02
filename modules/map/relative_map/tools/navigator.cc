@@ -25,6 +25,8 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/message_util.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 
@@ -80,16 +82,23 @@ int main(int argc, char** argv) {
   std::shared_ptr<apollo::cyber::Node> node(
       apollo::cyber::CreateNode("navigation_info"));
   auto writer = node->CreateWriter<apollo::relative_map::NavigationInfo>(
-      "Navigation Info");
+      FLAGS_navigation_topic);
 
+  // In theory, the message only needs to be sent once. Considering the problems
+  // such as the network delay, We send it several times to ensure that the data
+  // is sent successfully.
   Rate rate(1.0);
-  if (apollo::cyber::OK()) {
+  constexpr int kTransNum = 3;
+  int trans_num = 0;
+  while (apollo::cyber::OK()) {
+    if (trans_num > kTransNum) {
+      break;
+    }
+    apollo::common::util::FillHeader(node->Name(), &navigation_info);
     writer->Write(navigation_info);
     ADEBUG << "Sending navigation info:" << navigation_info.DebugString();
     rate.Sleep();
-  } else {
-    AERROR << "Cyber status is wrong.";
-    return -1;
+    ++trans_num;
   }
 
   return 0;
