@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_GE3_PROTOCOL_SCU_EPB_310_H_
-#define MODULES_CANBUS_VEHICLE_GE3_PROTOCOL_SCU_EPB_310_H_
+#pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -70,5 +69,3 @@ class Scuepb310 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace ge3
 }  // namespace canbus
 }  // namespace apollo
-
-#endif  // MODULES_CANBUS_VEHICL_GE3_PROTOCOL_SCU_EPB_310_H_
