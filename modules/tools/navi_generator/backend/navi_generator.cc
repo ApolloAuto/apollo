@@ -52,6 +52,9 @@ void NaviGenerator::CheckAdapters() {
   CHECK(AdapterManager::GetGps()) << "GpsAdapter is not initialized.";
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
+  CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
+  CHECK(AdapterManager::GetSystemStatus())
+      << "SystemStatus is not initialized.";
 }
 
 Status NaviGenerator::Init() {
