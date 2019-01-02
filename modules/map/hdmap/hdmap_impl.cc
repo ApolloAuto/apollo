@@ -16,7 +16,6 @@ limitations under the License.
 #include "modules/map/hdmap/hdmap_impl.h"
 
 #include <algorithm>
-#include <iostream>
 #include <limits>
 #include <set>
 #include <unordered_set>

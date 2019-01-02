@@ -19,8 +19,6 @@
  **/
 
 #include <algorithm>
-#include <limits>
-#include <unordered_map>
 #include <utility>
 
 #include "cyber/common/log.h"

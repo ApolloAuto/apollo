@@ -16,9 +16,6 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
-#include <cstdio>
-#include <fstream>
-
 #include "boost/filesystem.hpp"
 
 #include "cyber/common/log.h"

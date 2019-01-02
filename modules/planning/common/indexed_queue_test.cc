@@ -18,10 +18,6 @@
  * @file
  **/
 
-#include <memory>
-#include <unordered_map>
-#include <vector>
-
 #include "gtest/gtest.h"
 
 #include "modules/common/util/util.h"

@@ -16,10 +16,6 @@
 
 #include "modules/control/controller/lat_controller.h"
 
-#include <memory>
-#include <string>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

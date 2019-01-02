@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 
-#include <string>
 #include <utility>
 
 #include "cyber/common/log.h"

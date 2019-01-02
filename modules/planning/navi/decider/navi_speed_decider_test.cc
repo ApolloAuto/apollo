@@ -22,9 +22,6 @@
 
 #include "modules/planning/navi/decider/navi_speed_decider.h"
 
-#include <map>
-#include <string>
-
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 

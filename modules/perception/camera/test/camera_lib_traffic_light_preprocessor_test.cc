@@ -13,7 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <gflags/gflags.h>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"

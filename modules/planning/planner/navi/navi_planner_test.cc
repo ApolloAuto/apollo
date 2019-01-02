@@ -28,8 +28,6 @@
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
-using apollo::common::TrajectoryPoint;
-
 namespace apollo {
 namespace planning {
 // TODO(all): Add your unit test code here according to the Google Unit Testing

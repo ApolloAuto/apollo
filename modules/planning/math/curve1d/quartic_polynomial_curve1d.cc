@@ -20,8 +20,6 @@
 
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
-#include <string>
-
 #include "cyber/common/log.h"
 #include "modules/common/util/string_util.h"
 

@@ -16,8 +16,6 @@
 
 #include "modules/perception/common/graph/conditional_clustering.h"
 
-#include <limits>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/point_cloud.h"

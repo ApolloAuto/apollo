@@ -21,8 +21,6 @@
 
 #include "modules/planning/math/smoothing_spline/piecewise_linear_constraint.h"
 
-#include <limits>
-
 #include "cyber/common/log.h"
 
 namespace apollo {

@@ -14,11 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <unistd.h>
-#include <climits>
-#include <fstream>
 #include <memory>
-#include <sstream>
 
 #include "google/protobuf/text_format.h"
 #include "modules/common/util/file.h"
@@ -39,12 +35,8 @@ namespace control {
 
 using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
-using apollo::common::time::Clock;
-using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::TrafficLightDetection;
 using apollo::planning::ADCTrajectory;
-using apollo::routing::RoutingResponse;
 
 uint32_t ControlTestBase::s_seq_num_ = 0;
 

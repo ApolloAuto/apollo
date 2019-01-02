@@ -22,7 +22,6 @@
 #pragma once
 
 #include <map>
-#include <string>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"

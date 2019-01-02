@@ -19,7 +19,6 @@
  **/
 
 #include <chrono>
-#include <iostream>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"

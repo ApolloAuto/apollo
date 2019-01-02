@@ -16,8 +16,6 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
-#include <iostream>
-
 #include "gtest/gtest.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
@@ -36,7 +34,6 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
-using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 
 namespace apollo {

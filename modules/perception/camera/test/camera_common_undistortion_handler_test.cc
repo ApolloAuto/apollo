@@ -13,15 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <gtest/gtest.h>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/opencv.hpp>
-
-#include <fstream>
-#include <iostream>
 
 #include "modules/perception/camera/common/undistortion_handler.h"
 #include "modules/perception/camera/test/camera_common_io_util.h"

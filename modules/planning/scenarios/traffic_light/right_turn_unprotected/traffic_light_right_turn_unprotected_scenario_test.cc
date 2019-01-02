@@ -22,8 +22,6 @@
 #define private public
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_scenario.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"

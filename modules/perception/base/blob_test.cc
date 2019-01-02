@@ -64,8 +64,6 @@ license and copyright terms herein.
 #include "modules/perception/base/blob.h"
 
 #include <gtest/gtest.h>
-#include <limits>
-#include <vector>
 
 #include "modules/perception/base/test/test_helper.h"
 

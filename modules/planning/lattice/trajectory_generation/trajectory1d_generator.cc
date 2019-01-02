@@ -20,11 +20,6 @@
 
 #include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
 
-#include <algorithm>
-#include <cmath>
-#include <limits>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"

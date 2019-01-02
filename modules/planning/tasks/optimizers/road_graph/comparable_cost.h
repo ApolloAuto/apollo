@@ -20,11 +20,8 @@
 
 #pragma once
 
-#include <cmath>
-#include <cstdlib>
-
 #include <array>
-#include <vector>
+#include <cmath>
 
 namespace apollo {
 namespace planning {

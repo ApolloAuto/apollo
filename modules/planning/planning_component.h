@@ -17,7 +17,6 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"

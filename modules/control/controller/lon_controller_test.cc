@@ -16,10 +16,6 @@
 
 #include "modules/control/controller/lon_controller.h"
 
-#include <memory>
-#include <string>
-#include <utility>
-
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"

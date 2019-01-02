@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <assert.h>
-
 #include "modules/perception/common/i_lib/core/i_basic.h"
 
 namespace apollo {

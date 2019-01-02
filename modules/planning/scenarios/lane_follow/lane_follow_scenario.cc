@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
-#include <fstream>
-#include <limits>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
@@ -50,14 +46,6 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace lane_follow {
-
-using common::ErrorCode;
-using common::SLPoint;
-using common::SpeedPoint;
-using common::Status;
-using common::TrajectoryPoint;
-using common::math::Vec2d;
-using common::time::Clock;
 
 namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;

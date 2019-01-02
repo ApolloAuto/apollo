@@ -17,7 +17,6 @@
 
 #include <boost/circular_buffer.hpp>
 
-#include <string>
 #include <vector>
 
 #include "modules/perception/base/object.h"

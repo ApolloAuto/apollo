@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
 
-#include <string>
 #include <vector>
 
 #include "modules/common/util/file.h"

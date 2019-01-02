@@ -16,9 +16,6 @@
 
 #include "modules/map/pnc_map/pnc_map.h"
 
-#include <algorithm>
-#include <vector>
-
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
 

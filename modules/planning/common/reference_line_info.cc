@@ -20,10 +20,6 @@
 
 #include "modules/planning/common/reference_line_info.h"
 
-#include <algorithm>
-#include <functional>
-#include <utility>
-
 #include "cyber/task/task.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
@@ -40,7 +36,6 @@ namespace planning {
 
 using apollo::canbus::Chassis;
 using apollo::common::EngageAdvice;
-using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;

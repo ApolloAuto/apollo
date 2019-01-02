@@ -20,8 +20,6 @@
 
 #include "modules/planning/planner/std_planner_dispatcher.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "modules/planning/planner/planner_dispatcher.h"

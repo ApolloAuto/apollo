@@ -17,12 +17,8 @@
 
 #include <nppi.h>
 
-#include <map>
 #include <memory>
-#include <sstream>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/box.h"

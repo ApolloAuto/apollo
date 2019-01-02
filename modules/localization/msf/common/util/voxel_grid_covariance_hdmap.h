@@ -16,12 +16,8 @@
 
 #pragma once
 
-#include <pcl/common/common.h>
-#include <pcl/filters/boost.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/kdtree/kdtree_flann.h>
-#include <Eigen/Cholesky>
-#include <Eigen/Dense>
 #include <limits>
 #include <map>
 #include <vector>

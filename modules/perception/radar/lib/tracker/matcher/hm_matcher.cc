@@ -15,7 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/radar/lib/tracker/matcher/hm_matcher.h"
 
-#include <iomanip>
 #include <string>
 #include <utility>
 

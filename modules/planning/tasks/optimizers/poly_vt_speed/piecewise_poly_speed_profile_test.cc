@@ -16,8 +16,6 @@
 
 #include "modules/planning/tasks/optimizers/poly_vt_speed/piecewise_poly_speed_profile.h"
 
-#include <vector>
-
 #include "gtest/gtest.h"
 
 #include "modules/common/proto/pnc_point.pb.h"

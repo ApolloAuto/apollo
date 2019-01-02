@@ -16,10 +16,7 @@
 
 #pragma once
 
-#include <cuda_runtime_api.h>
-#include <map>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "modules/perception/base/blob.h"

@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/side_pass/stage_generate_path.h"
 
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"

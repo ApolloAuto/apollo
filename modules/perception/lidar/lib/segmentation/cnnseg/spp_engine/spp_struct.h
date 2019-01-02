@@ -15,9 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <stddef.h>
-#include <stdint.h>
-
 #include "modules/perception/base/blob.h"
 
 namespace apollo {

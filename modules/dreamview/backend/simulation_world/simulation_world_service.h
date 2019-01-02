@@ -21,7 +21,6 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
 #include <list>
 #include <memory>
 #include <string>

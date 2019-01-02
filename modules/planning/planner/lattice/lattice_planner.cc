@@ -20,7 +20,6 @@
 
 #include "modules/planning/planner/lattice/lattice_planner.h"
 
-#include <algorithm>
 #include <limits>
 #include <memory>
 #include <utility>

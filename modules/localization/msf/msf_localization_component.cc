@@ -16,8 +16,6 @@
 
 #include "modules/localization/msf/msf_localization_component.h"
 
-#include <limits>
-
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
 
@@ -28,7 +26,6 @@ namespace apollo {
 namespace localization {
 
 using apollo::common::time::Clock;
-using apollo::cyber::proto::RoleAttributes;
 
 MSFLocalizationComponent::MSFLocalizationComponent() {}
 

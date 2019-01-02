@@ -19,9 +19,7 @@
  */
 #include "modules/planning/tasks/optimizers/poly_vt_speed/poly_vt_speed_optimizer.h"
 
-#include <algorithm>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"

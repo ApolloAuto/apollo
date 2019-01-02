@@ -13,13 +13,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <boost/algorithm/string.hpp>
-#include <gflags/gflags.h>
-#include <opencv2/opencv.hpp>
-#include <yaml-cpp/yaml.h>
 
 #include <iomanip>
-#include <map>
 
 #include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"

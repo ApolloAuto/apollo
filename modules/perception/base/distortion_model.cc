@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/base/distortion_model.h"
 
-#include <cmath>
-
 #include "cyber/common/log.h"
 
 namespace apollo {

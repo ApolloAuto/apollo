@@ -16,9 +16,7 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
-#include <chrono>
 #include <unordered_set>
-#include <vector>
 
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
@@ -50,7 +48,6 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
-using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::FillHeader;

@@ -19,11 +19,8 @@
 
 #include <algorithm>
 #include <limits>
-#include <list>
-#include <memory>
 #include <queue>
 #include <utility>
-#include <vector>
 
 #include "gtest/gtest_prod.h"
 
@@ -44,16 +41,11 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
-using apollo::dreamview::Chart;
 using apollo::hdmap::HDMapUtil;
-using apollo::planning_internal::OpenSpaceDebug;
 using apollo::routing::RoutingResponse;
 
 namespace {

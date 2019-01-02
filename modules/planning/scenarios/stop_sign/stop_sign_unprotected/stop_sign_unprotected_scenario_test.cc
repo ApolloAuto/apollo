@@ -22,8 +22,6 @@
 #define private public
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"

@@ -20,9 +20,6 @@
 
 #include "modules/planning/planner/open_space/open_space_planner.h"
 
-#include <fstream>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -32,10 +29,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 
 Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
   AINFO << "In OpenSpacePlanner::Init()";

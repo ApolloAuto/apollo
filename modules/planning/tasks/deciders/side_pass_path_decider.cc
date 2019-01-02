@@ -21,7 +21,6 @@
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 
 #include <algorithm>
-#include <string>
 #include <unordered_map>
 #include <utility>
 
@@ -39,8 +38,6 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
-using apollo::hdmap::PathOverlap;
-using apollo::common::util::MakePointENU;
 using apollo::hdmap::HDMapUtil;
 
 SidePassPathDecider::SidePassPathDecider(const TaskConfig &config)

@@ -15,16 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 
-#include <fcntl.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/io/gzip_stream.h>
-#include <google/protobuf/io/zero_copy_stream_impl.h>
-
 #include <algorithm>
 #include <functional>
-#include <map>
-#include <string>
-#include <vector>
 
 #include "modules/common/util/file.h"
 #include "modules/perception/base/point.h"

@@ -21,7 +21,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"

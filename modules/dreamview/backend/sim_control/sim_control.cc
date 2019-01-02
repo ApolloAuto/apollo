@@ -16,8 +16,6 @@
 
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 
-#include <cmath>
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
@@ -38,11 +36,8 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::math::HeadingToQuaternion;
 using apollo::common::math::InterpolateUsingLinearApproximation;
 using apollo::common::math::InverseQuaternionRotate;
-using apollo::common::math::NormalizeAngle;
-using apollo::common::math::QuaternionToHeading;
 using apollo::common::time::Clock;
 using apollo::common::util::FillHeader;
-using apollo::common::util::GetProtoFromFile;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;

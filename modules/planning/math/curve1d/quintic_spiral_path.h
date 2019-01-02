@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <utility>
 
 #include "cyber/common/log.h"

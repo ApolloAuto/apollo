@@ -17,8 +17,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cstdio>
-#include <functional>
 #include <limits>
 #include <utility>
 #include <vector>

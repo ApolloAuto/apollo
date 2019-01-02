@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_intersection_cruise.h"
 
-#include <algorithm>
-#include <limits>
-#include <utility>
-
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "cyber/common/log.h"
@@ -37,8 +33,6 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace traffic_light {
-
-using common::TrajectoryPoint;
 
 Stage::StageStatus TrafficLightRightTurnUnprotectedIntersectionCruise::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {

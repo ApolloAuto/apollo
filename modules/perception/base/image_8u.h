@@ -15,13 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <algorithm>
-#include <atomic>
 #include <map>
 #include <memory>
-#include <sstream>
-#include <string>
-#include <vector>
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/box.h"

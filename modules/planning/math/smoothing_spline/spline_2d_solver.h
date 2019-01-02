@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <qpOASES.hpp>
-
-#include <memory>
 #include <vector>
 
 #include "modules/common/math/qp_solver/qp_solver.h"

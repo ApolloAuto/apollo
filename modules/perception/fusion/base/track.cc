@@ -15,10 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/track.h"
 
-#include <cstdint>
-#include <iostream>
-#include <sstream>
-
 namespace apollo {
 namespace perception {
 namespace fusion {

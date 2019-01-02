@@ -17,7 +17,6 @@
 #include "modules/localization/msf/common/util/compression.h"
 
 #include <zlib.h>
-#include <cstdio>
 
 #include "cyber/common/log.h"
 

@@ -17,7 +17,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"

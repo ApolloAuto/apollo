@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include "modules/perception/base/box.h"

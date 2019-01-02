@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include <cublas_v2.h>
-#include <cuda.h>
 #include <vector>
 
 #include "modules/common/math/line_segment2d.h"

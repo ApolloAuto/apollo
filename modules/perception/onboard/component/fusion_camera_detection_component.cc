@@ -15,17 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_camera_detection_component.h"
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <yaml-cpp/yaml.h>
-
-#include <algorithm>
-#include <iomanip>
-#include <iostream>
-#include <string>
-#include <tuple>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"

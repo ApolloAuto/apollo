@@ -16,9 +16,7 @@
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 
 #include <algorithm>
-#include <limits>
 #include <map>
-#include <numeric>
 #include <utility>
 
 #include "cyber/common/log.h"

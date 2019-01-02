@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <pthread.h>
 #include <string>
 
 namespace apollo {

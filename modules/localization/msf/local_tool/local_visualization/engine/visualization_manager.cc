@@ -17,8 +17,6 @@
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_manager.h"
 
 #include <algorithm>
-#include <string>
-#include <vector>
 
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include "boost/filesystem.hpp"

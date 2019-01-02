@@ -21,8 +21,6 @@
 #define private public
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"

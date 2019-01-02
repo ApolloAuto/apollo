@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 

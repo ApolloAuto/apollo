@@ -15,9 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/radar/app/radar_obstacle_perception.h"
 
-#include <string>
-#include <vector>
-
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/lib/utils/perf.h"

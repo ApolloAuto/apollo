@@ -20,8 +20,6 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
-#include <fstream>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -52,10 +50,8 @@ namespace lane_follow {
 
 using common::ErrorCode;
 using common::SLPoint;
-using common::SpeedPoint;
 using common::Status;
 using common::TrajectoryPoint;
-using common::math::Vec2d;
 using common::time::Clock;
 
 namespace {

@@ -29,7 +29,6 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::time::Clock;
 
 namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(

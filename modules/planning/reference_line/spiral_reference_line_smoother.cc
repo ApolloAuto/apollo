@@ -21,8 +21,6 @@
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 #include <algorithm>
-#include <iomanip>
-#include <limits>
 #include <utility>
 
 #include "IpIpoptApplication.hpp"

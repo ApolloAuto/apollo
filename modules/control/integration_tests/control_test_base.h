@@ -17,7 +17,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "gtest/gtest.h"
 #include "modules/control/common/control_gflags.h"

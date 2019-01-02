@@ -20,10 +20,7 @@
 #include "modules/planning/tasks/optimizers/qp_spline_path/qp_spline_path_generator.h"
 
 #include <algorithm>
-#include <cmath>
-#include <limits>
 #include <utility>
-#include <vector>
 
 #include "cyber/common/macros.h"
 

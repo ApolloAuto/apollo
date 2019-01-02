@@ -16,10 +16,6 @@
 
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/hdmap_roi_filter.h"
 
-#include <fstream>
-#include <string>
-#include <vector>
-
 #include "gtest/gtest.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/lidar_log.h"

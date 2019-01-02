@@ -16,13 +16,8 @@
 
 #include "modules/perception/inference/tensorrt/rt_net.h"
 
-#include <NvInferPlugin.h>
 #include <algorithm>
-#include <iostream>
-#include <map>
-#include <set>
 #include <utility>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
