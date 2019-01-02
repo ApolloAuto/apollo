@@ -16,8 +16,6 @@
 
 #include "modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion/pbf_shape_fusion.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/sensor_meta.h"
@@ -30,8 +28,6 @@ namespace fusion {
 const double SHAPE_FUSION_PI = 3.1415926;
 
 using SensorInfoPtr = std::shared_ptr<perception::base::SensorInfo>;
-using apollo::perception::fusion::SensorFrame;
-using SensorFramePtr = std::shared_ptr<SensorFrame>;
 using FramePtr = std::shared_ptr<perception::base::Frame>;
 
 TEST(PbfShapeFusion, lidar_track) {

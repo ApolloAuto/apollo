@@ -15,7 +15,6 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/xml_parser/junctions_xml_parser.h"
 
 #include <string>
-#include <vector>
 
 #include "tinyxml2/tinyxml2.h"
 

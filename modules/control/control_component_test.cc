@@ -16,9 +16,6 @@
 
 #include "modules/control/control_component.h"
 
-#include <string>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 
@@ -30,18 +27,12 @@
 
 namespace apollo {
 namespace control {
-using apollo::cyber::ComponentConfig;
-using apollo::cyber::Reader;
-using apollo::cyber::Writer;
 
 using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::time::Clock;
-using apollo::control::ControlCommand;
-using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::routing::RoutingResponse;
 
 DEFINE_string(test_chassis_file, "", "chassis input file");
 DEFINE_string(test_data_dir, "", "the test data folder");

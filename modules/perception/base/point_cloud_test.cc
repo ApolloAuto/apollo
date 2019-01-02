@@ -16,8 +16,6 @@
 
 #include "modules/perception/base/point_cloud.h"
 
-#include <limits>
-
 #include "gtest/gtest.h"
 
 namespace apollo {

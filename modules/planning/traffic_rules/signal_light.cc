@@ -20,9 +20,6 @@
 
 #include "modules/planning/traffic_rules/signal_light.h"
 
-#include <limits>
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 

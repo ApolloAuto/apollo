@@ -24,8 +24,6 @@
 //   absolute (x,y,z) is still correct. Then we can find the nearest point on
 //   the new map as the new end point.
 
-#include <string>
-
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"

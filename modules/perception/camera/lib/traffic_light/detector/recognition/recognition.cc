@@ -15,8 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
 
-#include <string>
-
 #include "modules/common/util/file.h"
 
 namespace apollo {

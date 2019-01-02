@@ -13,7 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <boost/iterator/counting_iterator.hpp>
 
 #include "cyber/common/log.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/region_output.h"

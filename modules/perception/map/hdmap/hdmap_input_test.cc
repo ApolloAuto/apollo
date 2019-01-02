@@ -16,9 +16,6 @@
 
 #include "modules/perception/map/hdmap/hdmap_input.h"
 
-#include <gflags/gflags.h>
-#include <gtest/gtest.h>
-
 #include "cyber/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 

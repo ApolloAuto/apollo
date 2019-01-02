@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
-
-#include "gtest/gtest.h"
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -28,7 +24,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::PointENU;
 using apollo::common::time::Clock;
 
 /**

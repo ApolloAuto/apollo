@@ -21,10 +21,6 @@
 
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 
-#include <algorithm>
-#include <limits>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
@@ -44,9 +40,6 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace side_pass {
-
-using apollo::common::VehicleConfigHelper;
-using apollo::hdmap::HDMapUtil;
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,

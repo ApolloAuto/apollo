@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include <sys/time.h>
 
 #include "modules/perception/lib/thread/thread.h"
 

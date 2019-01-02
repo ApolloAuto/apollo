@@ -21,12 +21,6 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "include/gnss_struct.h"
 #include "include/sins_struct.h"
 #include "modules/common/status/status.h"

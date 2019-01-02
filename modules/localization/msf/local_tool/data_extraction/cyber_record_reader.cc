@@ -16,9 +16,6 @@
 
 #include "modules/localization/msf/local_tool/data_extraction/cyber_record_reader.h"
 
-#include <memory>
-#include <utility>
-
 #include "cyber/cyber.h"
 #include "cyber/record/record_reader.h"
 

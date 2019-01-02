@@ -15,8 +15,6 @@
 *****************************************************************************/
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
-#include <fstream>
-#include <iostream>
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/distortion_model.h"

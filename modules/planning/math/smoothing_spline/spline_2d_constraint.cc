@@ -21,7 +21,6 @@
 #include "modules/planning/math/smoothing_spline/spline_2d_constraint.h"
 
 #include <algorithm>
-#include <cmath>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/angle.h"

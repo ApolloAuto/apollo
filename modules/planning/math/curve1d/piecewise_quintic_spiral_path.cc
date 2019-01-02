@@ -20,8 +20,6 @@
 
 #include "modules/planning/math/curve1d/piecewise_quintic_spiral_path.h"
 
-#include <utility>
-
 namespace apollo {
 namespace planning {
 

@@ -15,11 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <deque>
-#include <map>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/lib/interface/base_existance_fusion.h"

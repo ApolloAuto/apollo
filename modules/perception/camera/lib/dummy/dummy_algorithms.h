@@ -17,7 +17,6 @@
 
 #include <map>
 #include <string>
-#include <utility>
 
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 #include "modules/perception/camera/lib/interface/base_calibrator.h"

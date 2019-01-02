@@ -16,7 +16,6 @@
 
 #include "modules/perception/common/graph/graph_segmentor.h"
 
-#include <cfloat>
 #include <limits>
 
 #include "cyber/common/log.h"

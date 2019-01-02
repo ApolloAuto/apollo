@@ -21,8 +21,6 @@
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
 
 #include <algorithm>
-#include <list>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
@@ -37,7 +35,6 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
-using apollo::common::util::DistanceXY;
 
 std::vector<TrajectoryPoint>
 TrajectoryStitcher::ComputeReinitStitchingTrajectory(

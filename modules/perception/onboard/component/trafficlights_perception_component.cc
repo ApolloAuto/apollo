@@ -15,21 +15,10 @@
 *****************************************************************************/
 #include "modules/perception/onboard/component/trafficlights_perception_component.h"
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-#include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/highgui/highgui_c.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <algorithm>
-#include <iomanip>
-#include <iostream>
 #include <limits>
-#include <string>
-#include <tuple>
 #include <utility>
 
 #include "cyber/common/log.h"

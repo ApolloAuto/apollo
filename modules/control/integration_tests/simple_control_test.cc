@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <memory>
-#include <string>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
@@ -27,8 +23,6 @@
 #include "modules/common/util/util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/integration_tests/control_test_base.h"
-
-using apollo::common::time::Clock;
 
 namespace apollo {
 namespace control {

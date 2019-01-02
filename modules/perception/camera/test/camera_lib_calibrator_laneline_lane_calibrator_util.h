@@ -17,11 +17,6 @@
 
 #include <opencv2/opencv.hpp>
 
-#include <assert.h>
-#include <Eigen/Eigen>
-#include <algorithm>
-#include <cstdlib>
-#include <map>
 #include <vector>
 
 #include "modules/perception/common/i_lib/core/i_blas.h"

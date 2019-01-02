@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <cstdlib>
-
 namespace apollo {
 namespace perception {
 namespace fusion {

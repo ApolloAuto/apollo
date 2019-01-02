@@ -16,9 +16,6 @@
 
 #include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
 
-#include <algorithm>
-#include <iomanip>
-#include <iostream>
 #include <utility>
 
 #include "IpIpoptApplication.hpp"

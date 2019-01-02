@@ -16,8 +16,6 @@
 
 #include "modules/perception/lidar/lib/tracker/association/multi_hm_bipartite_graph_matcher.h"
 
-#include <Eigen/Core>
-
 #include "cyber/common/log.h"
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 

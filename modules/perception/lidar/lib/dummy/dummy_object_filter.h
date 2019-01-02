@@ -17,7 +17,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "modules/perception/lidar/lib/interface/base_object_filter.h"
 

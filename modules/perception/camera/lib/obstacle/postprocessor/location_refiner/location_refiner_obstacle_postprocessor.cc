@@ -15,9 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"  // NOLINT
 
-#include <assert.h>
-#include <algorithm>
-
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"

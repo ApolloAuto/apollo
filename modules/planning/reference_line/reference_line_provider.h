@@ -22,15 +22,10 @@
 
 #pragma once
 
-#include <atomic>
-#include <condition_variable>
 #include <list>
 #include <memory>
-#include <mutex>
 #include <queue>
 #include <string>
-#include <thread>
-#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 

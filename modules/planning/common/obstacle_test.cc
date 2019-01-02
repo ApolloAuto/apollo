@@ -20,10 +20,6 @@
 
 #include "modules/planning/common/obstacle.h"
 
-#include <memory>
-#include <unordered_map>
-#include <vector>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"

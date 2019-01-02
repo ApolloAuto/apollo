@@ -20,11 +20,6 @@
 
 #include "modules/planning/math/smoothing_spline/osqp_spline_1d_solver.h"
 
-#include <algorithm>
-
-#include "Eigen/Core"
-#include "Eigen/Eigenvalues"
-
 #include "cyber/common/log.h"
 
 #include "modules/common/math/matrix_operations.h"

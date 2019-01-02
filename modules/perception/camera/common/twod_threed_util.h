@@ -16,11 +16,8 @@
 #pragma once
 
 #include <float.h>
-#include <Eigen/Dense>
 #include <algorithm>
-#include <cstdlib>
 #include <utility>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/perception/common/i_lib/core/i_constant.h"

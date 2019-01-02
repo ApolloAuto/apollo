@@ -16,8 +16,6 @@
 
 #include "modules/perception/common/graph/graph_segmentor.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 namespace apollo {

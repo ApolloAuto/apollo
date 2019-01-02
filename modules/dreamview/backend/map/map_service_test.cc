@@ -22,9 +22,7 @@
 #include "modules/common/configs/config_gflags.h"
 
 using apollo::common::PointENU;
-using apollo::hdmap::Id;
 using apollo::hdmap::Map;
-using ::testing::UnorderedElementsAre;
 
 namespace apollo {
 namespace dreamview {

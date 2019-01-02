@@ -16,7 +16,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"

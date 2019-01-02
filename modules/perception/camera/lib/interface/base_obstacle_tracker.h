@@ -16,7 +16,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"

@@ -16,7 +16,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cfloat>
 #include <vector>
 
 #include "modules/perception/base/point_cloud.h"

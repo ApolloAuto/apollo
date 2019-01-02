@@ -23,7 +23,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -31,7 +30,7 @@
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/toolkits/task.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {

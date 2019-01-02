@@ -15,13 +15,8 @@
 *****************************************************************************/
 #pragma once
 
-#include <google/protobuf/message.h>
-#include <google/protobuf/text_format.h>
-
 #include <map>
-#include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "gflags/gflags.h"

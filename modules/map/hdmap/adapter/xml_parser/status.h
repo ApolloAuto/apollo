@@ -14,13 +14,6 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-#include <cstddef>
-#include <iostream>
-#include <ostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
 #include "modules/common/status/status.h"
 
 namespace apollo {

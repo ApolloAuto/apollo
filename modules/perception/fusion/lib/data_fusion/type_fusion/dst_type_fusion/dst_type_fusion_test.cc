@@ -15,12 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 
-#include <algorithm>
-#include <functional>
-#include <map>
-#include <string>
-#include <vector>
-
 #include "boost/format.hpp"
 #include "gtest/gtest.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"

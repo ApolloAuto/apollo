@@ -22,7 +22,6 @@
 #include "modules/planning/navi/decider/navi_path_decider.h"
 
 #include <algorithm>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"

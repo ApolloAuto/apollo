@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 #include <string>
-#include <vector>
 
 #include "modules/map/hdmap/adapter/xml_parser/lanes_xml_parser.h"
 #include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"

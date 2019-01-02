@@ -15,8 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
 
-#include <assert.h>
-#include <float.h>
 #include <utility>
 
 #include "modules/perception/common/i_lib/core/i_blas.h"

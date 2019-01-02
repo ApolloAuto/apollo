@@ -13,11 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <gflags/gflags.h>
-#include <opencv2/opencv.hpp>
-
-#include <fstream>
-#include <iostream>
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"

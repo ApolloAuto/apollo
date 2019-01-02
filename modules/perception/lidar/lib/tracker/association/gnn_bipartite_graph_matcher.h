@@ -17,7 +17,6 @@
 
 #include <vector>
 #include <string>
-#include <cstdio>
 
 #include "modules/perception/lidar/lib/interface/base_bipartite_graph_matcher.h"
 #include "modules/perception/common/graph/secure_matrix.h"

@@ -16,14 +16,6 @@
 
 #pragma once
 
-#include <list>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-
 #include "modules/common/math/box2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/reference_line/reference_line.h"

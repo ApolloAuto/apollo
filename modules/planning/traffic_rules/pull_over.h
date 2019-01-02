@@ -21,8 +21,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
-#include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"

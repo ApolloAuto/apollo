@@ -20,10 +20,6 @@
 
 #include "modules/planning/open_space/open_space_trajectory_generator.h"
 
-#include <cmath>
-#include <fstream>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -33,12 +29,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleState;
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
-using apollo::planning_internal::Trajectories;
 
 Status OpenSpaceTrajectoryGenerator::Init(
     const PlannerOpenSpaceConfig& planner_open_space_config) {

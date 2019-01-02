@@ -20,12 +20,7 @@
 #include "modules/planning/common/frame.h"
 
 #include <algorithm>
-#include <cmath>
-#include <functional>
 #include <limits>
-#include <list>
-#include <string>
-#include <utility>
 
 #include "modules/routing/proto/routing.pb.h"
 
@@ -46,15 +41,8 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleStateProvider;
 using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 using apollo::common::math::Polygon2d;
-using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::LaneSegment;
-using apollo::hdmap::ParkingSpaceInfoConstPtr;
-using apollo::hdmap::Path;
-using apollo::hdmap::PathOverlap;
 using apollo::prediction::PredictionObstacles;
 
 constexpr double kMathEpsilon = 1e-8;

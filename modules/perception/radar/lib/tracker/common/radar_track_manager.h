@@ -15,7 +15,6 @@
 *****************************************************************************/
 #pragma once
 
-#include <utility>
 #include <vector>
 
 #include "cyber/common/macros.h"

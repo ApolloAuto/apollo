@@ -17,7 +17,6 @@
 #include "modules/map/pnc_map/path.h"
 
 #include <algorithm>
-#include <cstdlib>
 #include <limits>
 #include <unordered_map>
 
@@ -36,7 +35,6 @@ namespace hdmap {
 using common::math::Box2d;
 using common::math::kMathEpsilon;
 using common::math::LineSegment2d;
-using common::math::Polygon2d;
 using common::math::Sqr;
 using common::math::Vec2d;
 using std::placeholders::_1;

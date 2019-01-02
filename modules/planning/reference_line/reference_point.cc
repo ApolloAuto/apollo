@@ -20,17 +20,12 @@
 
 #include "modules/planning/reference_line/reference_point.h"
 
-#include <string>
-#include <utility>
-#include <vector>
-
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::PathPoint;
 using apollo::common::util::StrCat;
 
 namespace {

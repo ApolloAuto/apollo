@@ -16,9 +16,6 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 
-#include <sstream>
-#include <string>
-
 #include "cyber/common/log.h"
 
 namespace apollo {

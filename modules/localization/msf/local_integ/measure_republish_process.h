@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <cmath>
-#include <cstdint>
 #include <list>
 #include <mutex>
 #include <string>

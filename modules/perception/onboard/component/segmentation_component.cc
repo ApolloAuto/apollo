@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/segmentation_component.h"
 
-#include <gflags/gflags.h>
-
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lib/utils/time_util.h"

@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
-
 namespace apollo {
 namespace perception {
 namespace lidar {

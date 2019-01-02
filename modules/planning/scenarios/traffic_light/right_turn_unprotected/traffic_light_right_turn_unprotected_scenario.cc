@@ -18,9 +18,6 @@
  * @file
  **/
 
-#include <algorithm>
-#include <limits>
-
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_scenario.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -40,8 +37,6 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::TrajectoryPoint;
-using common::time::Clock;
 using hdmap::HDMapUtil;
 
 void TrafficLightRightTurnUnprotectedScenario::Init() {

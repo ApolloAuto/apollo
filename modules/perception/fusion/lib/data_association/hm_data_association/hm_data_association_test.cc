@@ -14,9 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
-#include <iostream>
-
 #include "modules/perception/base/frame.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor.h"

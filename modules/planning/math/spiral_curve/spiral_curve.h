@@ -22,7 +22,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cmath>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"

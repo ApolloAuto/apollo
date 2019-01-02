@@ -17,8 +17,6 @@
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
 
 #include <fstream>
-#include <iomanip>
-#include <iostream>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"

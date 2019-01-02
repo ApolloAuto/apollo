@@ -20,9 +20,6 @@
 
 #include "modules/planning/common/speed/st_boundary.h"
 
-#include <algorithm>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 

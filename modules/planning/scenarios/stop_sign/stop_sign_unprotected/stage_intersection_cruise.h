@@ -21,7 +21,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"

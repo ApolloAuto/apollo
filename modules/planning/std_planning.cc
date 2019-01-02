@@ -16,11 +16,8 @@
 
 #include "modules/planning/std_planning.h"
 
-#include <algorithm>
 #include <list>
-#include <memory>
 #include <utility>
-#include <vector>
 
 #include "gtest/gtest_prod.h"
 

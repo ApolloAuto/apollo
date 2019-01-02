@@ -14,9 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <chrono>
-#include <thread>
-
 #include "gflags/gflags.h"
 
 #include "cyber/cyber.h"
