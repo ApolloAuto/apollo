@@ -113,6 +113,7 @@ cc_library(
     deps = [
        "//modules/common:log",
        "//modules/common/adapters:adapter_manager",
+       "//modules/common/util:util",
        "//modules/tools/navi_generator/proto:trajectory_collector_proto",
        "//modules/localization/proto:localization_proto",
         "@ros//:ros_common",

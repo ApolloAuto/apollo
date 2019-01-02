@@ -158,6 +158,7 @@ bool TopicsService::GetCollectorOptions(const std::string &collection_type,
     is_duration = true;
   } else if (unit == std::string("km")) {
     is_duration = false;
+    multiplier = 1000.0;
   } else {
     AWARN << "Collection type error.";
     return false;
@@ -167,9 +168,11 @@ bool TopicsService::GetCollectorOptions(const std::string &collection_type,
                                      "/apollo/navi_generator/collector"};
   options->topics = topics;
   if (is_duration) {
+    options->collector_type = util::CollectorType::TIME;
     options->max_duration = ros::Duration(multiplier * duration);
   } else {
-    options->max_mileage = duration;
+    options->collector_type = util::CollectorType::MILEAGE;
+    options->max_mileage = multiplier * duration;
   }
   options->max_speed_limit = static_cast<double>(max_speed_limit);
   options->min_speed_limit = static_cast<double>(min_speed_limit);
