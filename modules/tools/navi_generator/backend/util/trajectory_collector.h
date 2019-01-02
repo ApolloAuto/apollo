@@ -38,6 +38,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/tools/navi_generator/proto/trajectory_collector.pb.h"
 
 namespace apollo {
@@ -83,6 +84,7 @@ class CollectorMsgQueue {
   ros::Time time_;
 };
 
+enum CollectorType { TIME = 0, MILEAGE = 1 };
 /**
  * @struct CollectorOptions
  * @brief A collector options.
@@ -93,6 +95,8 @@ struct CollectorOptions {
   bool split;
   // Flag of append date for file name.
   bool append_date;
+  // Collector type
+  CollectorType collector_type;
   // Compression type.
   rosbag::compression::CompressionType compression;
   // Buffer size.
@@ -139,6 +143,7 @@ class TrajectoryCollector {
    * @return true is for success
    */
   bool Init(const CollectorOptions& options);
+  bool Init();
   /**
    * @brief Start collector.
    * @return True is for success.
@@ -155,6 +160,17 @@ class TrajectoryCollector {
    * @return True is for success.
    */
   bool UpdateOptions(const CollectorOptions& options);
+
+  /**
+   * @brief Publish collector message.
+   */
+  void PublishCollector();
+  /**
+   * @brief Get localization.
+   */
+  const apollo::localization::LocalizationEstimate& GetLocalization() const {
+    return localization_;
+  }
 
  private:
   /**
@@ -228,14 +244,6 @@ class TrajectoryCollector {
    * @brief Get local time string.
    */
   const std::string GetLocalTimeString();
-  /**
-   * @brief Callback timer.
-   */
-  void OnTimer(const ros::TimerEvent& event);
-  /**
-   * @brief Publish collector message.
-   */
-  void PublishCollector();
 
  private:
   // Collector options.
@@ -257,7 +265,7 @@ class TrajectoryCollector {
   // Mutex for queue.
   std::mutex queue_mutex_;
   // Queue for storing.
-  std::queue<CollectorMessage>* queue_;
+  std::unique_ptr<std::queue<CollectorMessage>> queue_;
   // Queue size.
   uint64_t queue_size_;
   // Max queue size.
@@ -275,9 +283,9 @@ class TrajectoryCollector {
   // Flag for running.
   bool is_running_;
   // Max speed limit.
-  double last_max_speed_limit;
+  double last_max_speed_limit_;
   // Min speed limit.
-  double last_min_speed_limit;
+  double last_min_speed_limit_;
   // Mutex for check disk.
   std::mutex check_disk_mutex_;
   // Time for next time of check disk.
@@ -285,13 +293,17 @@ class TrajectoryCollector {
   // Time for next time of warning.
   ros::WallTime warn_next_;
   // Collector thread.
-  std::thread collect_thread_;
+  std::unique_ptr<std::thread> collect_thread_;
   // Collector message data
   apollo::navi_generator::TrajectoryCollectorMsg collector_data_;
   // Collector publisher
   ros::Publisher collector_publisher_;
-  // Collector timer
-  ros::Timer timer_;
+  // Localization
+  apollo::localization::LocalizationEstimate localization_;
+  // Last position
+  apollo::localization::Pose last_pos_;
+  // Mileage
+  double mileage_;
 };
 
 }  // namespace util

@@ -59,6 +59,7 @@ void TopicsUpdater::RegisterMessageHandlers() {
         std::string collection_type;
         std::size_t min_speed_limit;
         std::size_t max_speed_limit;
+        int ret = 0;
         if (!JsonUtil::GetStringFromJson(json, "collectionType",
                                          &collection_type)) {
           return;
@@ -71,8 +72,17 @@ void TopicsUpdater::RegisterMessageHandlers() {
                                          &max_speed_limit)) {
           return;
         }
-        topicsService_.StartCollector(collection_type, min_speed_limit,
-                                      max_speed_limit);
+        if (!topicsService_.StartCollector(collection_type, min_speed_limit,
+                                           max_speed_limit)) {
+          ret = -1;
+        }
+        std::string module = "collector";
+        std::string command = "start";
+        std::string type = "requestStartCollection";
+
+        Json response =
+            topicsService_.GetCommandResponseAsJson(type, module, command, ret);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
@@ -81,6 +91,7 @@ void TopicsUpdater::RegisterMessageHandlers() {
         std::string collection_type;
         std::size_t min_speed_limit;
         std::size_t max_speed_limit;
+        int ret = 0;
         if (!JsonUtil::GetStringFromJson(json, "collectionType",
                                          &collection_type)) {
           return;
@@ -93,14 +104,32 @@ void TopicsUpdater::RegisterMessageHandlers() {
                                          &max_speed_limit)) {
           return;
         }
-        topicsService_.UpdateCollector(collection_type, min_speed_limit,
-                                       max_speed_limit);
+        if (!topicsService_.UpdateCollector(collection_type, min_speed_limit,
+                                            max_speed_limit)) {
+          ret = -1;
+        }
+        std::string module = "collector";
+        std::string command = "update";
+        std::string type = "requestUpdateCollectionCondition";
+
+        Json response =
+            topicsService_.GetCommandResponseAsJson(type, module, command, ret);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
       "requestFinishCollection",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        topicsService_.StopCollector();
+        int ret = 0;
+        std::string module = "collector";
+        std::string command = "stop";
+        std::string type = "requestFinishCollection";
+        if (!topicsService_.StopCollector()) {
+          ret = -1;
+        }
+        Json response =
+            topicsService_.GetCommandResponseAsJson(type, module, command, ret);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
@@ -246,6 +275,7 @@ bool TopicsUpdater::ValidateCoordinate(const nlohmann::json &json) {
 }
 
 void TopicsUpdater::Start() {
+  topicsService_.InitCollector();
   // start ROS timer, one-shot = false, auto-start = true
   timer_ =
       AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeIntervalMs / 1000),
