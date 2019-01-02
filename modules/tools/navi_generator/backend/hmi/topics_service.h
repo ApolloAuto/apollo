@@ -33,6 +33,7 @@
 #include "modules/tools/navi_generator/backend/util/trajectory_collector.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_processor.h"
 #include "modules/tools/navi_generator/backend/webserver/navi_generator_websocket.h"
+#include "third_party/json/json.hpp"
 
 namespace apollo {
 namespace navi_generator {
@@ -61,6 +62,10 @@ class TopicsService {
    */
   void Update();
 
+  nlohmann::json GetCommandResponseAsJson(const std::string &type,
+                                          const std::string &module,
+                                          const std::string &command,
+                                          const int success) const;
   /**
    * @brief Update simulation world with incoming data, e.g., chassis,
    * localization, planning, perception, etc.
@@ -95,6 +100,7 @@ class TopicsService {
       const apollo::navi_generator::util::FileSegment &file_segment);
   bool SaveFilesToDatabase();
 
+  bool InitCollector();
   bool StartCollector(const std::string &collection_type,
                       const std::size_t min_speed_limit,
                       const std::size_t max_speed_limit);

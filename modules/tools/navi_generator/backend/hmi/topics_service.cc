@@ -58,6 +58,7 @@ TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
     : websocket_(websocket) {
   trajectory_processor_.reset(
       new util::TrajectoryProcessor(TopicsService::UpdateGUI, this));
+  trajectory_collector_.reset(new util::TrajectoryCollector());
 }
 
 void TopicsService::Update() {
@@ -86,6 +87,13 @@ bool TopicsService::ProcessBagFileSegment(
 
 bool TopicsService::SaveFilesToDatabase() {
   return trajectory_processor_->SaveFilesToDatabase();
+}
+
+bool TopicsService::InitCollector() {
+  if (!trajectory_collector_->Init()) {
+    return false;
+  }
+  return true;
 }
 
 bool TopicsService::StartCollector(const std::string &collection_type,
@@ -173,6 +181,24 @@ Json TopicsService::GetRoutePathAsJson(const Json &map_data) {
   Json response;
   std::unique_ptr<util::NavigationProvider> provider;
   provider->GetRoutePathAsJson(map_data, &response);
+  return response;
+}
+
+Json TopicsService::GetCommandResponseAsJson(const std::string &type,
+                                             const std::string &module,
+                                             const std::string &command,
+                                             const int success) const {
+  Json response;
+  response["type"] = type;
+  response["result"]["name"] = module;
+  response["result"]["success"] = std::to_string(success);
+  std::string msg;
+  if (success == 0) {
+    msg = module + " has been " + command + "successfully.";
+  } else {
+    msg = module + " has been " + command + "failed.";
+  }
+  response["result"]["msg"] = msg;
   return response;
 }
 
