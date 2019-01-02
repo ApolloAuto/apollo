@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_CANBUS_VEHICLE_GE3_GE3_PROTOCOL_MANAGER_H_
-#define MODULES_CANBUS_VEHICLE_GE3_GE3_PROTOCOL_MANAGER_H_
+#pragma once
 
 #include <memory>
 #include <thread>
-#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/common/proto/error_code.pb.h"
-#include "modules/control/proto/control_cmd.pb.h"
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcm_201.h"
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcs_202.h"
 #include "modules/canbus/vehicle/ge3/protocol/pc_epb_203.h"
 #include "modules/canbus/vehicle/ge3/protocol/pc_eps_204.h"
 #include "modules/canbus/vehicle/ge3/protocol/pc_vcu_205.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
+#include "modules/common/proto/error_code.pb.h"
+#include "modules/control/proto/control_cmd.pb.h"
 
 namespace apollo {
 namespace canbus {
@@ -43,9 +42,9 @@ class Ge3Controller final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>
-      *const message_manager) override;
+      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      override;
 
   bool Start() override;
 
@@ -101,7 +100,7 @@ class Ge3Controller final : public VehicleController {
 
   void ResetProtocol();
   bool CheckChassisError();
-  bool CheckSafetyError(const canbus::ChassisDetail &chassis);
+  bool CheckSafetyError(const canbus::ChassisDetail& chassis);
 
  private:
   void SecurityDogThreadFunc();
@@ -134,5 +133,3 @@ class Ge3Controller final : public VehicleController {
 }  // namespace ge3
 }  // namespace canbus
 }  // namespace apollo
-
-#endif  // MODULES_CANBUS_VEHICLE_GE3_GE3_PROTOCOL_MANAGER_H_
