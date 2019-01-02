@@ -35,7 +35,7 @@
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/scenarios/scenario.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/toolkits/task.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {

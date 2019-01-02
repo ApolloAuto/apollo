@@ -31,7 +31,7 @@
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/toolkits/task.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {

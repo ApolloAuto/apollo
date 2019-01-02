@@ -23,7 +23,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/planner/std_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
-#include "modules/planning/toolkits/smoothers/smoother.h"
+#include "modules/planning/tasks/smoothers/smoother.h"
 
 /**
  * @namespace apollo::planning
