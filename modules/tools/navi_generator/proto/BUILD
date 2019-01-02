@@ -102,3 +102,20 @@ proto_library(
          ":navigation_coordinate_proto_lib",
     ],
 )
+
+cc_proto_library(
+    name = "navigation_map_data_proto",
+    deps = [
+        ":navigation_map_data_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navigation_map_data_proto_lib",
+    srcs = [
+        "navigation_map_data.proto",
+    ],
+    deps = [
+         ":navigation_coordinate_proto_lib",
+    ],
+)
