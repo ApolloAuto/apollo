@@ -15,11 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/common/object_template_manager.h"
 
-#include <assert.h>
-
 #include <algorithm>
 #include <cfloat>
-#include <string>
 #include <tuple>
 #include <utility>
 

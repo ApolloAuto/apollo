@@ -20,7 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
 
-#include <algorithm>
 #include <utility>
 #include <vector>
 

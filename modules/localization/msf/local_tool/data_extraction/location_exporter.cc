@@ -16,8 +16,6 @@
 
 #include "modules/localization/msf/local_tool/data_extraction/location_exporter.h"
 
-#include <string>
-
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"

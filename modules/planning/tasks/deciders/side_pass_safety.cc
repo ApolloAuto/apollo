@@ -30,7 +30,6 @@ namespace planning {
 
 using ::apollo::common::ErrorCode;
 using ::apollo::common::Status;
-using ::apollo::hdmap::PathOverlap;
 
 SidePassSafety::SidePassSafety(const TaskConfig &config) : Decider(config) {}
 

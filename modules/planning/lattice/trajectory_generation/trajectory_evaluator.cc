@@ -21,10 +21,7 @@
 #include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
 
 #include <algorithm>
-#include <cmath>
-#include <functional>
 #include <limits>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/path_matcher.h"
@@ -38,12 +35,10 @@ namespace planning {
 
 using Trajectory1d = Curve1d;
 using apollo::common::math::PathMatcher;
-using apollo::common::FrenetFramePoint;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
 using Trajectory1dPair =
     std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>;
-using CostComponentsPair = std::pair<std::vector<double>, double>;
 
 using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 

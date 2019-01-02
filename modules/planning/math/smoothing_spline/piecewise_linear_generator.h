@@ -22,9 +22,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
-
-#include "Eigen/Core"
 
 #include "modules/common/math/qp_solver/qp_solver.h"
 #include "modules/planning/math/smoothing_spline/piecewise_linear_constraint.h"

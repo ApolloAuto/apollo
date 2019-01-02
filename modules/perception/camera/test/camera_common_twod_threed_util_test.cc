@@ -14,7 +14,6 @@
 * limitations under the License.
 *****************************************************************************/
 #include <gtest/gtest.h>
-#include <cmath>
 
 #include "modules/perception/camera/common/twod_threed_util.h"
 

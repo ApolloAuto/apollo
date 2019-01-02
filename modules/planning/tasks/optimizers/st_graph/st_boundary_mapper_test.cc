@@ -16,11 +16,7 @@
 
 #include "modules/planning/tasks/optimizers/st_graph/st_boundary_mapper.h"
 
-#include <algorithm>
-#include <cmath>
-
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"

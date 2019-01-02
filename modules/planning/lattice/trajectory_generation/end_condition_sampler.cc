@@ -21,7 +21,6 @@
 #include "modules/planning/lattice/trajectory_generation/end_condition_sampler.h"
 
 #include <algorithm>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"

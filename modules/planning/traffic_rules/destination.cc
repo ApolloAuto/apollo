@@ -18,7 +18,6 @@
  * @file
  **/
 #include <algorithm>
-#include <vector>
 
 #include "modules/planning/traffic_rules/destination.h"
 
@@ -33,7 +32,6 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::LaneSegment;
 
 Destination::Destination(const TrafficRuleConfig& config)
     : TrafficRule(config) {}

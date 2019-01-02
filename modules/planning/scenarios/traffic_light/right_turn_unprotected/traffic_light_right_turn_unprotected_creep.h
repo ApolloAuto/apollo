@@ -20,10 +20,6 @@
 
 #pragma once
 
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/stage.h"

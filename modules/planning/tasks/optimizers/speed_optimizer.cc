@@ -26,7 +26,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 

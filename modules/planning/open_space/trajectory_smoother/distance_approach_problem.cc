@@ -23,8 +23,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
-
 DistanceApproachProblem::DistanceApproachProblem(
     const PlannerOpenSpaceConfig& planner_open_space_config) {
   planner_open_space_config_.CopyFrom(planner_open_space_config);

@@ -13,21 +13,13 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <gflags/gflags.h>
-#include <gtest/gtest.h>
-#include <cstdio>
-// #include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-#include "cyber/common/log.h"
-
-#include "modules/perception/camera/test/camera_lib_calibrator_laneline_app_util.h"
-#include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_calibrator_util.h"  // NOLINT
-#include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_io.h"
 
 #include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
+
+#include "cyber/common/log.h"
+#include "modules/perception/camera/test/camera_lib_calibrator_laneline_app_util.h"
+#include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_calibrator_util.h"
+#include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_io.h"
 
 namespace apollo {
 namespace perception {

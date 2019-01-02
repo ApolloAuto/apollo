@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include <algorithm>
 #include <limits>
-#include <vector>
 
 #include "Eigen/Core"
 

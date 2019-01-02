@@ -16,9 +16,7 @@
 #pragma once
 
 #include <boost/circular_buffer.hpp>
-#include <Eigen/Dense>
 #include <map>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>

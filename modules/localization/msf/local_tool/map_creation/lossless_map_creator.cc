@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
-
 #include "boost/filesystem.hpp"
 #include "boost/program_options.hpp"
 
@@ -30,8 +28,6 @@ const unsigned int CAR_SENSOR_LASER_NUMBER = 64;
 using apollo::localization::msf::FeatureXYPlane;
 using apollo::localization::msf::LosslessMap;
 using apollo::localization::msf::LosslessMapConfig;
-using apollo::localization::msf::LosslessMapMatrix;
-using apollo::localization::msf::LosslessMapNode;
 using apollo::localization::msf::LosslessMapNodePool;
 using apollo::localization::msf::MapNodeIndex;
 typedef apollo::localization::msf::FeatureXYPlane::PointT PclPointT;

@@ -15,9 +15,6 @@
 *****************************************************************************/
 #pragma once
 
-#include <cuda_runtime.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <string>
 
 #include "modules/perception/base/blob.h"

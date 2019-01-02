@@ -13,10 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "gtest/gtest.h"
 #include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_impl.h"

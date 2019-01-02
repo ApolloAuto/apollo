@@ -19,7 +19,6 @@
  **/
 #include "modules/planning/math/spiral_curve/spiral_curve.h"
 
-#include <cmath>
 #include <limits>
 
 namespace apollo {

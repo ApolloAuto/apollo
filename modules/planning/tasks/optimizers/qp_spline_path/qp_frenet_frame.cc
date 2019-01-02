@@ -20,7 +20,6 @@
 #include "modules/planning/tasks/optimizers/qp_spline_path/qp_frenet_frame.h"
 
 #include <algorithm>
-#include <iterator>
 #include <limits>
 
 #include "cyber/common/macros.h"

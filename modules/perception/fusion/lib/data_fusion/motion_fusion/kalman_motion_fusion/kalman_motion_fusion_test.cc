@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gflags/gflags.h>
-#include <gtest/gtest.h>
-#include <iostream>
-#include <vector>
 #define private public
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/fusion/base/sensor.h"

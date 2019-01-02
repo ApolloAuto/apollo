@@ -16,7 +16,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "modules/perception/base/frame.h"

@@ -13,12 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <gtest/gtest.h>
-#include <opencv2/opencv.hpp>
-#include <yaml-cpp/yaml.h>
-
-#include <fstream>
-#include <string>
 
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"

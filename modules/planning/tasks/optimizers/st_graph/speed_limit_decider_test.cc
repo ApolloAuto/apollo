@@ -16,11 +16,7 @@
 
 #include "modules/planning/tasks/optimizers/st_graph/speed_limit_decider.h"
 
-#include <algorithm>
-#include <cmath>
-
 #include "gmock/gmock.h"
-#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "modules/map/hdmap/hdmap_util.h"

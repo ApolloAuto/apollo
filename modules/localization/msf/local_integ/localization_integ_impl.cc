@@ -16,9 +16,6 @@
 
 #include "modules/localization/msf/local_integ/localization_integ_impl.h"
 
-#include <list>
-#include <queue>
-
 #include "cyber/common/log.h"
 #include "modules/common/time/timer.h"
 #include "modules/localization/msf/common/util/frame_transform.h"

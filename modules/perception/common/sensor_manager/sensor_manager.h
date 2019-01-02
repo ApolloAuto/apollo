@@ -16,10 +16,8 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include "cyber/common/macros.h"
 #include "modules/perception/base/camera.h"

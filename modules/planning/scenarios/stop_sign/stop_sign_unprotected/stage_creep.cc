@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_creep.h"
 
-#include <algorithm>
-#include <limits>
-#include <utility>
-
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "cyber/common/log.h"

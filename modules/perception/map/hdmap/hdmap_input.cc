@@ -17,8 +17,6 @@
 #include "modules/perception/map/hdmap/hdmap_input.h"
 
 #include <algorithm>
-#include <string>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
@@ -33,15 +31,10 @@ namespace map {
 
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::hdmap::JunctionInfo;
 using apollo::hdmap::JunctionInfoConstPtr;
-using apollo::hdmap::RoadROIBoundaryPtr;
 using apollo::hdmap::RoadRoiPtr;
-using apollo::hdmap::JunctionBoundaryPtr;
 using apollo::hdmap::LineBoundary;
 using apollo::hdmap::SignalInfoConstPtr;
-using apollo::hdmap::LaneInfoConstPtr;
-using base::PolygonDType;
 
 using base::PointD;
 using base::RoadBoundary;

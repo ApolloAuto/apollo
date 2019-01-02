@@ -20,11 +20,7 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
-#include <mutex>
-#include <queue>
-#include <string>
 
 #include "cyber/common/macros.h"
 #include "cyber/component/timer_component.h"

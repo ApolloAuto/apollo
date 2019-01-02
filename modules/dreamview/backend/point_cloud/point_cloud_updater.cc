@@ -31,8 +31,6 @@
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::time::Clock;
-using apollo::common::util::PathExists;
 using apollo::localization::LocalizationEstimate;
 using Json = nlohmann::json;
 

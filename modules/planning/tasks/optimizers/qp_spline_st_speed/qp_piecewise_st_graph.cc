@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -33,8 +32,6 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleParam;
-using apollo::planning_internal::STGraphDebug;
 
 QpPiecewiseStGraph::QpPiecewiseStGraph(
     const QpStSpeedConfig& qp_st_speed_config)

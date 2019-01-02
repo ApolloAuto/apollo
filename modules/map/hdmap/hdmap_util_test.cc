@@ -20,8 +20,6 @@ limitations under the License.
 
 namespace apollo {
 namespace hdmap {
-using apollo::common::time::Clock;
-using apollo::relative_map::MapMsg;
 
 class HDMapUtilTestSuite : public ::testing::Test {
  protected:

@@ -15,7 +15,6 @@
 *****************************************************************************/
 #pragma once
 
-#include <map>
 #include <string>
 
 #include "cyber/common/macros.h"

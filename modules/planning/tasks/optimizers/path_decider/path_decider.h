@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <limits>
-#include <string>
-
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {

@@ -29,8 +29,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::perception::TrafficLight;
-using apollo::perception::TrafficLightDetection;
 
 ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
     : TrafficRule(config) {}

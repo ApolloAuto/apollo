@@ -17,9 +17,6 @@
 #include "modules/perception/inference/tensorrt/rt_utils.h"
 
 #include <fcntl.h>
-#include <unistd.h>
-#include <cmath>
-#include <iostream>
 
 #include "cyber/common/log.h"
 

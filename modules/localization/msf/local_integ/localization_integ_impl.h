@@ -21,11 +21,6 @@
 
 #pragma once
 
-#include <atomic>
-#include <functional>
-#include <list>
-#include <queue>
-
 #include "modules/common/status/status.h"
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
 #include "modules/localization/msf/local_integ/localization_integ.h"

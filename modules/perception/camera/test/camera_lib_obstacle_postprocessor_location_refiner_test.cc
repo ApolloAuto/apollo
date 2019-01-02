@@ -14,9 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #include <gtest/gtest.h>
-#include <stdlib.h>
 #include <fstream>
-#include <string>
 
 #include "cyber/common/log.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT

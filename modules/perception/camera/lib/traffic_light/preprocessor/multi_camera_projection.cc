@@ -15,14 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/preprocessor/multi_camera_projection.h"
 
-#include <gflags/gflags.h>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
 #include <algorithm>
-#include <cmath>
 #include <limits>
-#include <numeric>
-#include <string>
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"

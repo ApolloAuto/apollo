@@ -15,8 +15,6 @@
 *****************************************************************************/
 #pragma once
 
-#include <math.h>
-#include <Eigen/Dense>
 #include <map>
 #include <memory>
 #include <string>

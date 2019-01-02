@@ -17,9 +17,7 @@
 #include "modules/control/controller/mpc_controller.h"
 
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -37,7 +35,6 @@ namespace apollo {
 namespace control {
 
 using apollo::common::ErrorCode;
-using apollo::common::Point3D;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;

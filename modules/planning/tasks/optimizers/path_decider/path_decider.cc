@@ -20,17 +20,10 @@
 
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
 
-#include <algorithm>
-#include <cmath>
-#include <string>
-#include <utility>
-#include <vector>
-
-#include "modules/planning/proto/decision.pb.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/decision.pb.h"
 
 namespace apollo {
 namespace planning {

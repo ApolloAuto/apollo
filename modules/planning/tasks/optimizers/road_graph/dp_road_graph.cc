@@ -20,7 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/road_graph/dp_road_graph.h"
 
-#include <algorithm>
 #include <utility>
 
 #include "cyber/task/task.h"
@@ -41,12 +40,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::ErrorCode;
-using apollo::common::SLPoint;
-using apollo::common::Status;
-using apollo::common::math::CartesianFrenetConverter;
-using apollo::common::util::MakeSLPoint;
 
 DpRoadGraph::DpRoadGraph(const DpPolyPathConfig &config,
                          const ReferenceLineInfo &reference_line_info,

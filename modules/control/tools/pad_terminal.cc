@@ -14,9 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <iostream>
-#include <thread>
-
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/cyber.h"

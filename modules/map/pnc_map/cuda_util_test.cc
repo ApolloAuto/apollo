@@ -16,8 +16,6 @@
 
 #include "modules/map/pnc_map/cuda_util.h"
 
-#include <vector>
-
 #include "gtest/gtest.h"
 
 namespace apollo {

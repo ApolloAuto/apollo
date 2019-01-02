@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
-
-#include "gtest/gtest.h"
-
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"

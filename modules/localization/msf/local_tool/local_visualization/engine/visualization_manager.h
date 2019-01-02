@@ -20,7 +20,6 @@
  */
 #pragma once
 
-#include <Eigen/Geometry>
 #include <atomic>
 #include <list>
 #include <map>

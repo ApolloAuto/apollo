@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Dense>
 #include <memory>
 #include <string>
 #include <vector>

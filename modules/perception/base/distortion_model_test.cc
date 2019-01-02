@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include <memory>
 
 #include "modules/perception/base/distortion_model.h"
 
