@@ -39,7 +39,7 @@ cc_library(
         "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
     ],
 )
 

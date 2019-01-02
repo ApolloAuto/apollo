@@ -3,7 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "canbus_ge3_protocol",
+    name = "canbus_ge3_protocol_pc_bcm_201",
     srcs = [
       "pc_bcm_201.cc",
       "pc_bcs_202.cc",
@@ -54,7 +54,7 @@ cc_test(
         "pc_bcm_201_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -66,7 +66,7 @@ cc_test(
         "pc_bcs_202_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -78,7 +78,7 @@ cc_test(
         "pc_epb_203_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -90,7 +90,7 @@ cc_test(
         "pc_eps_204_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -102,7 +102,7 @@ cc_test(
         "pc_vcu_205_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -114,7 +114,7 @@ cc_test(
         "scu_1_301_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -126,7 +126,7 @@ cc_test(
         "scu_2_302_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -138,7 +138,7 @@ cc_test(
         "scu_3_303_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -150,7 +150,7 @@ cc_test(
         "scu_bcm_304_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -162,7 +162,7 @@ cc_test(
         "scu_bcs_1_306_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -174,7 +174,7 @@ cc_test(
         "scu_bcs_2_307_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -186,7 +186,7 @@ cc_test(
         "scu_bcs_3_308_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -198,7 +198,7 @@ cc_test(
         "scu_epb_310_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -210,7 +210,7 @@ cc_test(
         "scu_eps_311_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -222,7 +222,7 @@ cc_test(
         "scu_vcu_1_312_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )
@@ -234,7 +234,7 @@ cc_test(
         "scu_vcu_2_313_test.cc",
     ],
     deps = [
-        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol",
+        "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
     ],
 )

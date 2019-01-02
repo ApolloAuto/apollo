@@ -1,4 +1,4 @@
-/* Copyright 2017 The Apollo Authors. All Rights Reserved.
+/* Copyright 2019 The Apollo Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,21 +24,17 @@ limitations under the License.
 namespace apollo {
 namespace canbus {
 namespace ge3 {
-
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
-
 namespace {
-
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
 }  // namespace
 
 ErrorCode Ge3Controller::Init(
-    const VehicleParameter& params,
-    CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+    const VehicleParameter& params, CanSender<ChassisDetail>* const can_sender,
     MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
     AINFO << "Ge3Controller has already been initiated.";
@@ -166,40 +162,50 @@ Chassis Ge3Controller::chassis() {
   if (ge3.has_scu_bcs_3_308()) {
     Scu_bcs_3_308 scu_bcs_3_308 = ge3.scu_bcs_3_308();
     if (scu_bcs_3_308.has_bcs_rrwheelspd()) {
-      chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
-          scu_bcs_3_308.bcs_rrwheelspdvd());
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
-          (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_rrwheeldirection());
-      chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
-          scu_bcs_3_308.bcs_rrwheelspd());
+      if (chassis_.has_wheel_speed()) {
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
+            scu_bcs_3_308.bcs_rrwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_wheel_direction_rr(
+            (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_rrwheeldirection());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_rr(
+            scu_bcs_3_308.bcs_rrwheelspd());
+      }
     }
+
     if (scu_bcs_3_308.has_bcs_rlwheelspd()) {
-      chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
-          scu_bcs_3_308.bcs_rlwheelspdvd());
-      chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
-          (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_rlwheeldirection());
-      chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
-          scu_bcs_3_308.bcs_rlwheelspd());
+      if (chassis_.has_wheel_speed()) {
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_rl_valid(
+            scu_bcs_3_308.bcs_rlwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_wheel_direction_rl(
+            (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_rlwheeldirection());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_rl(
+            scu_bcs_3_308.bcs_rlwheelspd());
+      }
     }
 
     if (scu_bcs_3_308.has_bcs_frwheelspd()) {
-      chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
-          scu_bcs_3_308.bcs_frwheelspdvd());
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
-          (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_frwheeldirection());
-      chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
-          scu_bcs_3_308.bcs_frwheelspd());
+      if (chassis_.has_wheel_speed()) {
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_fr_valid(
+            scu_bcs_3_308.bcs_frwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_wheel_direction_fr(
+            (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_frwheeldirection());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_fr(
+            scu_bcs_3_308.bcs_frwheelspd());
+      }
     }
 
     if (scu_bcs_3_308.has_bcs_flwheelspd()) {
-      chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
-          scu_bcs_3_308.bcs_flwheelspdvd());
-      chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
-          (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_flwheeldirection());
-      chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
-          scu_bcs_3_308.bcs_flwheelspd());
+      if (chassis_.has_wheel_speed()) {
+        chassis_.mutable_wheel_speed()->set_is_wheel_spd_fl_valid(
+            scu_bcs_3_308.bcs_flwheelspdvd());
+        chassis_.mutable_wheel_speed()->set_wheel_direction_fl(
+            (WheelSpeed::WheelSpeedType)scu_bcs_3_308.bcs_flwheeldirection());
+        chassis_.mutable_wheel_speed()->set_wheel_spd_fl(
+            scu_bcs_3_308.bcs_flwheelspd());
+      }
     }
   }
+
   if (ge3.has_scu_bcs_2_307() && ge3.scu_bcs_2_307().has_bcs_vehspd()) {
     chassis_.set_speed_mps(
         static_cast<float>(ge3.scu_bcs_2_307().bcs_vehspd()));
@@ -272,9 +278,13 @@ Chassis Ge3Controller::chassis() {
   if (ge3.has_scu_bcm_304() && ge3.scu_bcm_304().has_bcm_highbeamst() &&
       Scu_bcm_304::BCM_HIGHBEAMST_ACTIVE ==
           ge3.scu_bcm_304().bcm_highbeamst()) {
-    chassis_.mutable_signal()->set_high_beam(true);
+    if (chassis_.has_signal()) {
+      chassis_.mutable_signal()->set_high_beam(true);
+    }
   } else {
-    chassis_.mutable_signal()->set_high_beam(false);
+    if (chassis_.has_signal()) {
+      chassis_.mutable_signal()->set_high_beam(false);
+    }
   }
 
   // 16, 17
@@ -346,23 +356,31 @@ Chassis Ge3Controller::chassis() {
         ch[i] = static_cast<char>(n[i]);
       }
       ch[17] = '\0';
-      chassis_.mutable_license()->set_vin(ch);
+      if (chassis_.has_license()) {
+        chassis_.mutable_license()->set_vin(ch);
+      }
     }
   }
 
   // give engage_advice based on error_code and canbus feedback
   if (chassis_error_mask_) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason("Chassis error!");
+    if (chassis_.has_engage_advice()) {
+      chassis_.mutable_engage_advice()->set_advice(
+          apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+      chassis_.mutable_engage_advice()->set_reason("Chassis error!");
+    }
   } else if (chassis_.parking_brake() || CheckSafetyError(chassis_detail)) {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-    chassis_.mutable_engage_advice()->set_reason(
-        "Vehicle is not in a safe state to engage!");
+    if (chassis_.has_engage_advice()) {
+      chassis_.mutable_engage_advice()->set_advice(
+          apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+      chassis_.mutable_engage_advice()->set_reason(
+          "Vehicle is not in a safe state to engage!");
+    }
   } else {
-    chassis_.mutable_engage_advice()->set_advice(
-        apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    if (chassis_.has_engage_advice()) {
+      chassis_.mutable_engage_advice()->set_advice(
+          apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    }
   }
 
   return chassis_;
@@ -427,7 +445,7 @@ ErrorCode Ge3Controller::EnableSteeringOnlyMode() {
   pc_eps_204_->set_pc_steerenable(Pc_eps_204::PC_STEERENABLE_ENABLE);
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
@@ -455,7 +473,7 @@ ErrorCode Ge3Controller::EnableSpeedOnlyMode() {
   pc_eps_204_->set_pc_steerenable(Pc_eps_204::PC_STEERENABLE_DISABLE);
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
@@ -638,11 +656,9 @@ bool Ge3Controller::CheckChassisError() {
   }
 
   // check vcu error
-  if (ge3.has_scu_vcu_1_312()) {
-    if (Scu_vcu_1_312::VCU_FAULTST_NORMAL !=
-        ge3.scu_vcu_1_312().vcu_faultst()) {
-      return true;
-    }
+  if (ge3.has_scu_vcu_1_312() &&
+      Scu_vcu_1_312::VCU_FAULTST_NORMAL != ge3.scu_vcu_1_312().vcu_faultst()) {
+    return true;
   }
 
   // check braking error
