@@ -22,7 +22,6 @@
 #include "modules/planning/reference_line/reference_line_provider.h"
 
 #include <algorithm>
-#include <chrono>
 #include <limits>
 #include <utility>
 

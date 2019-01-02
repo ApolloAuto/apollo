@@ -23,10 +23,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
-using apollo::planning_internal::StGraphBoundaryDebug;
-using apollo::planning_internal::STGraphDebug;
-
 Decider::Decider(const TaskConfig& config) : Task(config) {}
 
 apollo::common::Status Decider::Execute(

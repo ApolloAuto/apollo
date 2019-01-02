@@ -21,7 +21,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include "cyber/common/macros.h"
 #include "cyber/component/timer_component.h"

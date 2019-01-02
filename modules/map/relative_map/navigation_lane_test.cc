@@ -21,9 +21,6 @@
 
 #include "modules/map/relative_map/navigation_lane.h"
 
-#include <string>
-#include <vector>
-
 #include "gtest/gtest.h"
 #include "third_party/json/json.hpp"
 

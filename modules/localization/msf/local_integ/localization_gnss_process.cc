@@ -16,8 +16,6 @@
 
 #include "modules/localization/msf/local_integ/localization_gnss_process.h"
 
-#include <string>
-
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"

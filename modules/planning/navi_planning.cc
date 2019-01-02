@@ -19,9 +19,6 @@
 #include <algorithm>
 #include <list>
 #include <map>
-#include <memory>
-#include <utility>
-#include <vector>
 
 #include "google/protobuf/repeated_field.h"
 

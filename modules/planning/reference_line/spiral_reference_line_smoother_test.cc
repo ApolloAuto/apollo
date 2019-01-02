@@ -20,8 +20,6 @@
 
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
-#include <chrono>
-
 #include "gtest/gtest.h"
 
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"

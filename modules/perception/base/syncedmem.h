@@ -62,9 +62,6 @@ license and copyright terms herein.
  *****************************************************************************/
 #pragma once
 
-#include <cstdlib>
-#include <iostream>
-
 #include "cyber/common/log.h"
 #include "modules/perception/base/common.h"
 

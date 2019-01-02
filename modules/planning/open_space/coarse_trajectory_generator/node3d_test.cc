@@ -28,9 +28,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
-
 class Node3dTest : public ::testing::Test {
  public:
   virtual void SetUp() {

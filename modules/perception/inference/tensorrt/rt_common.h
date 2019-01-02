@@ -16,21 +16,8 @@
 
 #pragma once
 
-#include <cublas_v2.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include <cudnn.h>
-#include <curand.h>
-#include <driver_types.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <cmath>
-#include <fstream>
-#include <iostream>
 #include <map>
-#include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
 

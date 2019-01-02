@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "modules/canbus/proto/chassis.pb.h"

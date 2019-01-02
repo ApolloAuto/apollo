@@ -18,10 +18,6 @@
  * @file
  **/
 
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
 #include "modules/common/math/vec2d.h"

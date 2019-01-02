@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {

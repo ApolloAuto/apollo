@@ -21,8 +21,6 @@
 #pragma once
 
 #include <memory>
-#include <queue>
-#include <string>
 #include <vector>
 
 #include "Eigen/Eigen"
@@ -50,7 +48,6 @@ Zhanga , Alexander Linigerb and Francesco Borrellia
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
 /**
  * @class OpenSpaceTrajectoryGenerator
  * @brief OpenSpaceTrajectoryGenerator is a derived class of Planner.

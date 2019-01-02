@@ -20,10 +20,7 @@
 
 #include "modules/planning/tasks/optimizers/st_graph/speed_limit_decider.h"
 
-#include <algorithm>
 #include <limits>
-#include <unordered_map>
-#include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -36,7 +33,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::PathPoint;
 using apollo::common::Status;
 
 SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,

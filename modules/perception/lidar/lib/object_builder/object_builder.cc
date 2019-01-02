@@ -15,9 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/object_builder/object_builder.h"
 
-#include <stdlib.h>
 #include <algorithm>
-#include <fstream>
 
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/geometry/convex_hull_2d.h"
@@ -36,7 +34,6 @@ using apollo::perception::base::PointD;
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 using PointFCloud = apollo::perception::base::PointCloud<PointF>;
 using PolygonDType = apollo::perception::base::PointCloud<PointD>;
-using PointFCloudPtr = std::shared_ptr<PointFCloud>;
 
 bool ObjectBuilder::Init(const ObjectBuilderInitOptions& options) {
   return true;

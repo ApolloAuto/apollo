@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <smmintrin.h>
-#include <cassert>
-#include <limits>
 #include <vector>
 
 #include "modules/perception/common/i_lib/core/i_alloc.h"

@@ -18,7 +18,6 @@
  * @file
  **/
 
-#include <limits>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"

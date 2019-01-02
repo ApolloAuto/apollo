@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/control/controller/lon_controller.h"
 
-#include <cstdio>
 #include <utility>
 
 #include "cyber/common/log.h"

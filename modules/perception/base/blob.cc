@@ -60,8 +60,6 @@ license and copyright terms herein.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <climits>
-#include <vector>
 
 #include "modules/perception/base/blob.h"
 

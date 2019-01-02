@@ -20,9 +20,6 @@
 
 #include "modules/planning/tasks/task_factory.h"
 
-#include <memory>
-#include <string>
-
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"

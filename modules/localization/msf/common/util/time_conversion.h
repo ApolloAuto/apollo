@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <stdint.h>
-
 namespace apollo {
 namespace localization {
 namespace msf {

@@ -15,9 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/radar/lib/tracker/common/radar_track_manager.h"
 
-#include <memory>
-#include <utility>
-
 namespace apollo {
 namespace perception {
 namespace radar {

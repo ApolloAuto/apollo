@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 
-#include <string>
-
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "modules/common/time/time.h"
@@ -32,12 +30,9 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::time::Clock;
-using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::util::WithinBound;
-using apollo::hdmap::PathOverlap;
 using apollo::perception::TrafficLight;
-using apollo::perception::TrafficLightDetection;
 
 DeciderRuleBasedStop::DeciderRuleBasedStop(
     const TaskConfig& config) : Decider(config) {

@@ -15,9 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/app/traffic_light_camera_perception.h"
 
-#include <gflags/gflags.h>
-#include <string>
-
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"

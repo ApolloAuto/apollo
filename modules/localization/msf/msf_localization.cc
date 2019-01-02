@@ -17,7 +17,6 @@
 #include "modules/localization/msf/msf_localization.h"
 
 #include <yaml-cpp/yaml.h>
-#include <list>
 
 #include "modules/drivers/gnss/proto/config.pb.h"
 
@@ -34,9 +33,6 @@ namespace apollo {
 namespace localization {
 
 using apollo::common::Status;
-using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::time::Clock;
-using ::Eigen::Vector3d;
 
 MSFLocalization::MSFLocalization()
     : monitor_logger_(

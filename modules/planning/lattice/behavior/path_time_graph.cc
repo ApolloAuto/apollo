@@ -21,10 +21,7 @@
 #include "modules/planning/lattice/behavior/path_time_graph.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
-#include <utility>
-#include <vector>
 
 #include "modules/planning/proto/sl_boundary.pb.h"
 
@@ -42,7 +39,6 @@ using apollo::common::math::Polygon2d;
 using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
-using apollo::perception::PerceptionObstacle;
 
 PathTimeGraph::PathTimeGraph(
     const std::vector<const Obstacle*>& obstacles,

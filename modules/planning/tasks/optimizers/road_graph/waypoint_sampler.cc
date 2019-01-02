@@ -20,7 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/road_graph/waypoint_sampler.h"
 
-#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -37,8 +36,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::SLPoint;
-using apollo::common::Status;
-using apollo::common::util::MakeSLPoint;
 
 void WaypointSampler::Init(
     const ReferenceLineInfo *reference_line_info,

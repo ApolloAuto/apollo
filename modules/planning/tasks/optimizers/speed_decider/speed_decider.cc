@@ -22,8 +22,6 @@
 
 #include <algorithm>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"

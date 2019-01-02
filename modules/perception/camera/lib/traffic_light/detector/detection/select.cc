@@ -15,9 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
 
-#include <cmath>
-#include <vector>
-
 #include "cyber/common/log.h"
 
 namespace apollo {

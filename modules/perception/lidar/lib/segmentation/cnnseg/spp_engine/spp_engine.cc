@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <set>
 
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/common/lidar_log.h"

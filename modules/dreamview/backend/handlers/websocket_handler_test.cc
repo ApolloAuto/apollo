@@ -15,9 +15,6 @@ limitations under the License.
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 
-#include <chrono>
-#include <string>
-
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "cyber/common/log.h"

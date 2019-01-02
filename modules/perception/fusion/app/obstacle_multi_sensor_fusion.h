@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <mutex>
 #include <string>
 #include <vector>
 

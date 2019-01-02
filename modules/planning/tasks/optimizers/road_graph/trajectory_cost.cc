@@ -21,8 +21,6 @@
 #include "modules/planning/tasks/optimizers/road_graph/trajectory_cost.h"
 
 #include <algorithm>
-#include <cmath>
-#include <limits>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"

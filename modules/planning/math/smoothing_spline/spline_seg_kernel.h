@@ -24,7 +24,6 @@
 
 #pragma once
 
-#include <cstddef>
 #include <string>
 
 #include "Eigen/Core"

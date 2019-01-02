@@ -20,15 +20,10 @@
 
 #include "modules/planning/common/path_decision.h"
 
-#include <memory>
-#include <utility>
-
 #include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
-
-using IndexedObstacles = IndexedList<std::string, Obstacle>;
 
 Obstacle *PathDecision::AddObstacle(const Obstacle &obstacle) {
   std::lock_guard<std::mutex> lock(obstacle_mutex_);

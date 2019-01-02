@@ -16,7 +16,6 @@
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/classify.h"
 
 #include <map>
-#include <string>
 
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"

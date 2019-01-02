@@ -14,10 +14,6 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/adapter/xml_parser/lanes_xml_parser.h"
 
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 namespace {

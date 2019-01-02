@@ -28,7 +28,6 @@ namespace dreamview {
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::util::ContainsKey;
 using apollo::common::util::GetProtoFromASCIIFile;
-using apollo::common::util::JsonUtil;
 using apollo::hdmap::EndWayPointFile;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;

@@ -28,7 +28,6 @@ using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
-using apollo::hdmap::PathOverlap;
 
 constexpr double kMathEpsilon = 1e-8;
 

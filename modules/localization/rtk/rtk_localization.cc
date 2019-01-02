@@ -17,7 +17,6 @@
 #include "modules/localization/rtk/rtk_localization.h"
 
 #include <limits>
-#include <sstream>
 
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"

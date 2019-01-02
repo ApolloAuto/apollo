@@ -20,11 +20,7 @@
 
 #pragma once
 
-#include <atomic>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
-#include <queue>
 #include <string>
 #include <vector>
 
@@ -53,8 +49,6 @@ Borrelli
  */
 namespace apollo {
 namespace planning {
-
-using apollo::common::Status;
 
 struct OpenSpaceThreadData {
   std::vector<common::TrajectoryPoint> stitching_trajectory;

@@ -28,7 +28,6 @@ namespace apollo {
 namespace planning {
 using apollo::common::SLPoint;
 using apollo::common::Status;
-using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
 namespace {

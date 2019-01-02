@@ -18,7 +18,6 @@
 
 #include <chrono>
 
-#include "Eigen/Core"
 #include "cyber/common/log.h"
 
 #include "modules/common/math/matrix_operations.h"

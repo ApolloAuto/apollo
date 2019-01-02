@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <cstdio>
-#include <fstream>
-#include <iostream>
-
 #include "gflags/gflags.h"
 
 #include "cyber/common/log.h"
@@ -47,10 +43,6 @@ DEFINE_double(s, 0.0, "s");
 DEFINE_double(l, 0.0, "l");
 
 using apollo::common::PointENU;
-using apollo::common::util::PrintIter;
-using apollo::hdmap::LaneBoundary;
-using apollo::hdmap::LaneBoundaryType;
-using apollo::hdmap::LaneInfoConstPtr;
 
 namespace apollo {
 namespace hdmap {

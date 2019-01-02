@@ -16,9 +16,6 @@
 
 #include "modules/localization/msf/local_integ/localization_integ.h"
 
-#include <list>
-#include <map>
-
 #include "modules/common/time/time_util.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/local_integ/lidar_msg_transfer.h"

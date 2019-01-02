@@ -21,11 +21,7 @@
 #include "modules/map/pnc_map/pnc_map.h"
 
 #include <algorithm>
-#include <fstream>
 #include <limits>
-#include <unordered_set>
-#include <utility>
-#include <vector>
 
 #include "google/protobuf/text_format.h"
 
@@ -55,7 +51,6 @@ namespace hdmap {
 
 using apollo::common::PointENU;
 using apollo::common::VehicleState;
-using apollo::common::math::Vec2d;
 using apollo::routing::RoutingResponse;
 using common::util::MakePointENU;
 

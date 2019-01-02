@@ -20,8 +20,6 @@
 
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 
-#include <string>
-
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"

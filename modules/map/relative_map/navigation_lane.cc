@@ -17,7 +17,6 @@
 #include "modules/map/relative_map/navigation_lane.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
 
 #include "modules/map/proto/map_lane.pb.h"
@@ -32,13 +31,11 @@
 namespace apollo {
 namespace relative_map {
 
-using apollo::common::Path;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Vec2d;
 using apollo::common::util::DistanceXY;
 using apollo::hdmap::Lane;
 using apollo::common::util::operator+;
-using apollo::perception::PerceptionObstacles;
 
 NavigationLane::NavigationLane(const NavigationLaneConfig &config)
     : config_(config) {}

@@ -20,8 +20,6 @@
 
 #include "modules/planning/constraint_checker/collision_checker.h"
 
-#include <array>
-#include <cmath>
 #include <utility>
 
 #include "cyber/common/log.h"

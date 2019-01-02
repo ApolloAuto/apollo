@@ -16,9 +16,6 @@
 
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
-#include <fstream>
-#include <sstream>
-
 #include "gtest/gtest.h"
 #include "modules/perception/base/hdmap_struct.h"
 #include "modules/perception/common/io/io_util.h"

@@ -17,17 +17,9 @@
 #pragma once
 
 #include <cuda_runtime_api.h>
-#include <float.h>
-#include <sys/stat.h>
-#include <time.h>
 #include <algorithm>
-#include <cmath>
 #include <fstream>
-#include <iostream>
-#include <iterator>
-#include <sstream>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "NvCaffeParser.h"

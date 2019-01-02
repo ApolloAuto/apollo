@@ -21,7 +21,6 @@
 #include "modules/planning/common/path/path_data.h"
 
 #include <algorithm>
-#include <limits>
 #include <vector>
 
 #include "cyber/common/log.h"
@@ -36,7 +35,6 @@ namespace planning {
 
 using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
-using apollo::common::math::Vec2d;
 
 bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
   if (reference_line_ == nullptr) {

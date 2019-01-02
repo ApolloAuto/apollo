@@ -15,9 +15,7 @@
 *****************************************************************************/
 #include "modules/perception/camera/common/undistortion_handler.h"
 
-#include <boost/filesystem.hpp>
 #include <npp.h>
-#include <yaml-cpp/yaml.h>
 
 #include <Eigen/Dense>
 #include <vector>

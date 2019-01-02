@@ -39,8 +39,6 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
-using apollo::common::VehicleParam;
-using apollo::common::math::Vec2d;
 
 namespace {
 

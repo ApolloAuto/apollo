@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_struct.h"
 
-#include <algorithm>
-
 namespace apollo {
 namespace perception {
 namespace lidar {

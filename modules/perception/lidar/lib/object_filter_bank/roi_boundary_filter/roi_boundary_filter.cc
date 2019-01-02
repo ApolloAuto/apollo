@@ -26,7 +26,6 @@ namespace perception {
 namespace lidar {
 
 using apollo::common::util::GetAbsolutePath;
-using apollo::perception::base::PointD;
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();

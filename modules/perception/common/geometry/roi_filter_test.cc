@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/common/geometry/roi_filter.h"
 
-#include <limits>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/hdmap_struct.h"

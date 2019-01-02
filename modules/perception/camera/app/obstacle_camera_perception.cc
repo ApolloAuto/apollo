@@ -15,13 +15,7 @@
 *****************************************************************************/
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 
-#include <gflags/gflags.h>
-#include <yaml-cpp/yaml.h>
-#include <algorithm>
-#include <fstream>
-#include <string>
 #include <utility>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"

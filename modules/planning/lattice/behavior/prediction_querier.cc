@@ -20,8 +20,6 @@
 
 #include "modules/planning/lattice/behavior/prediction_querier.h"
 
-#include <string>
-
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/path_matcher.h"
 

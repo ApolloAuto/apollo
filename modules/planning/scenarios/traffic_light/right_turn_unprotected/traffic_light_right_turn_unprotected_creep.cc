@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_creep.h"
 
-#include <algorithm>
-#include <limits>
-#include <utility>
-
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "cyber/common/log.h"
@@ -39,7 +35,6 @@ namespace scenario {
 namespace traffic_light {
 
 using common::time::Clock;
-using common::TrajectoryPoint;
 
 Stage::StageStatus TrafficLightRightTurnUnprotectedCreep::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {

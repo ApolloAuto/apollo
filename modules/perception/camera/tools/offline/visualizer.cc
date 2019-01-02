@@ -15,9 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/tools/offline/visualizer.h"
 
-#include <cstdio>
-#include <cstdlib>
-
 #include "cyber/common/log.h"
 
 namespace apollo {

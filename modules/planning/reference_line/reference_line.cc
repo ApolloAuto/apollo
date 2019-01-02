@@ -22,10 +22,7 @@
 
 #include <algorithm>
 #include <limits>
-#include <string>
 #include <unordered_set>
-#include <utility>
-#include <vector>
 
 #include "boost/math/tools/minima.hpp"
 

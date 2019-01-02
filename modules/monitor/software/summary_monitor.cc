@@ -29,7 +29,6 @@ DEFINE_double(system_status_publish_interval, 10,
 
 namespace apollo {
 namespace monitor {
-using apollo::common::util::StrCat;
 
 void SummaryMonitor::EscalateStatus(const ComponentStatus::Status new_status,
                                     const std::string& message,

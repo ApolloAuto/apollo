@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
@@ -38,7 +37,6 @@ using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
-using apollo::planning_internal::STGraphDebug;
 
 QpSplineStGraph::QpSplineStGraph(Spline1dSolver* spline_solver,
                                  const QpStSpeedConfig& qp_st_speed_config,

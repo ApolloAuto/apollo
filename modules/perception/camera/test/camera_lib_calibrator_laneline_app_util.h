@@ -16,14 +16,9 @@
 #pragma once
 
 #include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/program_options.hpp>
 #include <opencv2/opencv.hpp>
 
-#include <assert.h>
 #include <algorithm>
-#include <cstdlib>
-#include <map>
 #include <string>
 #include <vector>
 

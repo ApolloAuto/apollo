@@ -17,7 +17,6 @@
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 #include <algorithm>
-#include <chrono>
 
 #include "cyber/common/log.h"
 

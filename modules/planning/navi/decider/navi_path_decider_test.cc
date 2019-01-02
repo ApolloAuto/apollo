@@ -28,7 +28,6 @@
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
-using apollo::common::TrajectoryPoint;
 using apollo::common::util::MakePathPoint;
 
 namespace apollo {

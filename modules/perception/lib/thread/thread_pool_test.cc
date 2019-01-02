@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <google/protobuf/stubs/common.h>
 #include <gtest/gtest.h>
 
 #include "cyber/common/log.h"
@@ -28,7 +27,6 @@ namespace lib {
 // Just use the protobuf Closure.
 using google::protobuf::Closure;
 using google::protobuf::NewCallback;
-using google::protobuf::NewPermanentCallback;
 
 using std::vector;
 

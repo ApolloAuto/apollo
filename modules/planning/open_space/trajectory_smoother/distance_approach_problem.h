@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <algorithm>
-#include <iomanip>
-#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"

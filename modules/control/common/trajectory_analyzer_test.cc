@@ -16,9 +16,6 @@
 
 #include "modules/control/common/trajectory_analyzer.h"
 
-#include <iostream>
-#include <vector>
-
 #include "gtest/gtest.h"
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"

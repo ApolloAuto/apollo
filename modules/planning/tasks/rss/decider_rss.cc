@@ -28,11 +28,6 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
-
-using rss::world::Object;
-using rss::world::RoadArea;
-using rss::world::Scene;
 
 RssDecider::RssDecider(const TaskConfig &config) : Task(config) {
   SetName("RssDecider");

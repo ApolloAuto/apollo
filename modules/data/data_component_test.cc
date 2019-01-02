@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <memory>
 
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
@@ -34,8 +33,6 @@ namespace apollo {
 namespace data {
 
 using apollo::common::time::Clock;
-using apollo::cyber::ComponentConfig;
-using apollo::cyber::Reader;
 using apollo::cyber::Writer;
 
 class DataComponentTest : public ::testing::Test {

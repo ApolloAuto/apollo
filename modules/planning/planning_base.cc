@@ -16,10 +16,6 @@
 
 #include "modules/planning/planning_base.h"
 
-#include <algorithm>
-#include <list>
-#include <vector>
-
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
@@ -31,10 +27,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
 using apollo::dreamview::Chart;
-using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;

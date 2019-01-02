@@ -17,8 +17,6 @@
 #include "modules/perception/inference/tensorrt/batch_stream.h"
 
 #include <algorithm>
-#include <cstdio>
-#include <string>
 
 #include "cyber/common/log.h"
 

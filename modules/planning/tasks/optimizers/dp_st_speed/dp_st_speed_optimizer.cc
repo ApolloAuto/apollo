@@ -20,7 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 
-#include <algorithm>
 #include <vector>
 
 #include "modules/planning/proto/planning_internal.pb.h"
@@ -37,8 +36,6 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
-using apollo::localization::LocalizationEstimate;
 using apollo::planning_internal::STGraphDebug;
 
 DpStSpeedOptimizer::DpStSpeedOptimizer(const TaskConfig& config)

@@ -20,9 +20,7 @@
 
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
-#include <algorithm>
 #include <string>
-#include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -31,11 +29,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::hdmap::PathOverlap;
-using apollo::hdmap::HDMapUtil;
-using apollo::common::math::Vec2d;
 
 uint32_t DeciderCreep::creep_clear_counter_ = 0;
 
