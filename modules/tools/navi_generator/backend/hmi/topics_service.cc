@@ -27,6 +27,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
+#include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
 #include "modules/tools/navi_generator/backend/util/navigation_provider.h"
@@ -42,6 +43,13 @@ using Json = nlohmann::json;
 using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
 using google::protobuf::util::MessageToJsonString;
+
+namespace {
+static constexpr double kAngleThreshold = 0.1;
+// kSinsRadToDeg = 180 / pi
+constexpr double kSinsRadToDeg = 57.295779513;
+constexpr std::size_t kLocalUTMZoneID = 49;
+}  // namespace
 
 // A callback function which updates the GUI.
 void TopicsService::UpdateGUI(const std::string &msg, void *service) {
@@ -64,28 +72,59 @@ void TopicsService::NotifyBagFilesProcessed(void *service) {
 }
 
 TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
-    : websocket_(websocket) {
+    : websocket_(websocket), ready_to_push_(false) {
   trajectory_processor_.reset(new util::TrajectoryProcessor(
       TopicsService::UpdateGUI, TopicsService::NotifyBagFilesProcessed, this));
   trajectory_collector_.reset(new util::TrajectoryCollector());
 }
 
 void TopicsService::Update() {
-  if (to_clear_) {
-    // Clears received data.
-    AdapterManager::GetLocalization()->ClearData();
-    to_clear_ = false;
+  const apollo::localization::LocalizationEstimate localization =
+      trajectory_collector_->GetLocalization();
+  if (!localization.has_pose()) {
+    return;
   }
+  if (!ReadyToSend()) {
+    return;
+  }
+  UpdateObserved(localization);
+  world_.set_sequence_num(world_.sequence_num() + 1);
+  world_.set_timestamp(apollo::common::time::AsInt64<millis>(Clock::Now()));
+  trajectory_collector_->PublishCollector();
 }
 
-template <>
-void TopicsService::UpdateObserved(const LocalizationEstimate &localization) {
-  // TODO(***): Update status
+void TopicsService::UpdateObserved(
+    const apollo::localization::LocalizationEstimate &localization) {
+  // Update status
+  Object *auto_driving_car = world_.mutable_auto_driving_car();
+  const auto &pose = localization.pose();
+
+  apollo::localization::msf::WGS84Corr wgs84;
+  apollo::localization::msf::UtmXYToLatlon(
+      pose.position().x(), pose.position().y(), kLocalUTMZoneID, false, &wgs84);
+  wgs84.lat *= kSinsRadToDeg;
+  wgs84.log *= kSinsRadToDeg;
+
+  // Updates position with the input localization message.
+  auto_driving_car->set_position_x(pose.position().x());
+  auto_driving_car->set_position_y(pose.position().y());
+  auto_driving_car->set_heading(pose.heading());
+
+  auto_driving_car->set_latitude(wgs84.lat);
+  auto_driving_car->set_longitude(wgs84.log);
+
+  // Updates the timestamp with the timestamp inside the localization
+  // message header. It is done on both the SimulationWorld object
+  // itself and its auto_driving_car() field.
+  auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
+
+  ready_to_push_.store(true);
 }
 
 bool TopicsService::SetCommonBagFileInfo(
     const apollo::navi_generator::util::CommonBagFileInfo &common_file_info) {
   trajectory_processor_->Reset();
+  SetReadyToSend(false);
   return trajectory_processor_->SetCommonBagFileInfo(common_file_info);
 }
 
@@ -95,6 +134,7 @@ bool TopicsService::ProcessBagFileSegment(
 }
 
 bool TopicsService::SaveFilesToDatabase() {
+  SetReadyToSend(true);
   return trajectory_processor_->SaveFilesToDatabase();
 }
 
@@ -102,6 +142,7 @@ bool TopicsService::InitCollector() {
   if (!trajectory_collector_->Init()) {
     return false;
   }
+  SetReadyToSend(true);
   return true;
 }
 
@@ -196,6 +237,16 @@ Json TopicsService::GetRoutePathAsJson(const Json &map_data) {
   return response;
 }
 
+Json TopicsService::GetUpdateAsJson() const {
+  std::string sim_world_json_string;
+  MessageToJsonString(world_, &sim_world_json_string);
+
+  Json update;
+  update["type"] = "SimWorldUpdate";
+  update["data"] = sim_world_json_string;
+  return update;
+}
+
 Json TopicsService::GetCommandResponseAsJson(const std::string &type,
                                              const std::string &module,
                                              const std::string &command,
@@ -215,18 +266,21 @@ Json TopicsService::GetCommandResponseAsJson(const std::string &type,
 }
 
 bool TopicsService::CorrectRoadDeviation() {
+  SetReadyToSend(false);
   const std::map<std::uint16_t, apollo::navi_generator::util::FileInfo>
       *processed_file_info = nullptr;
   trajectory_processor_->GetProcessedFilesInfo(&processed_file_info);
   if (processed_file_info == nullptr) {
     return false;
   }
-  if (navigation_editor_->CorrectDeviation(*processed_file_info)) {
+  if (!navigation_editor_->CorrectDeviation(*processed_file_info)) {
     return false;
   }
   return true;
 }
+
 bool TopicsService::SaveRoadCorrection() {
+  SetReadyToSend(true);
   if (!navigation_editor_->SaveRoadCorrection(trajectory_processor_.get())) {
     return false;
   }

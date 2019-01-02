@@ -33,6 +33,7 @@
 #include "modules/tools/navi_generator/backend/util/trajectory_collector.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_processor.h"
 #include "modules/tools/navi_generator/backend/webserver/navi_generator_websocket.h"
+#include "modules/tools/navi_generator/proto/simulation_world.pb.h"
 #include "third_party/json/json.hpp"
 
 namespace apollo {
@@ -45,10 +46,6 @@ namespace navi_generator {
  */
 class TopicsService {
  public:
-  // The maximum number of monitor message items to be kept in
-  // SimulationWorld.
-  static constexpr int kMaxMonitorItems = 30;
-
   /**
    * @brief Constructor of TopicsService.
    * @param websocket Pointer of the websocket handler that has been attached to
@@ -62,34 +59,31 @@ class TopicsService {
    */
   void Update();
 
+  nlohmann::json GetUpdateAsJson() const;
+
   nlohmann::json GetCommandResponseAsJson(const std::string &type,
                                           const std::string &module,
                                           const std::string &command,
                                           const int success) const;
-  /**
-   * @brief Update simulation world with incoming data, e.g., chassis,
-   * localization, planning, perception, etc.
-   */
-  template <typename DataType>
-  void UpdateObserved(const DataType &data);
 
+  inline const SimulationWorld &world() const { return world_; }
   /**
-   * @brief Get the latest observed data from the adapter manager to update the
-   * SimulationWorld object when triggered by refresh timer.
+   * @brief Sets the flag to send system status and localization to frontend.
    */
-  template <typename AdapterType>
-  void UpdateWithLatestObserved(const std::string &adapter_name,
-                                AdapterType *adapter, bool logging = true) {
-    if (adapter->Empty()) {
-      if (logging) {
-        AINFO_EVERY(100) << adapter_name
-                         << " adapter has not received any data yet.";
-      }
-      return;
-    }
-
-    UpdateObserved(adapter->GetLatestObserved());
-  }
+  void SetReadyToSend(bool ready_to_send) { ready_to_send_ = ready_to_send; }
+  bool ReadyToSend() const { return ready_to_send_; }
+  /**
+   * @brief Check whether the SimulationWorld object has enough information.
+   * The backend won't push the SimulationWorld to frontend if it is not ready.
+   * @return True if the object is ready to push.
+   */
+  bool ReadyToPush() const { return ready_to_push_.load(); }
+  void SetReadyToPush(bool read_to_push) { ready_to_push_.store(read_to_push); }
+  /**
+   * @brief Update simulation world with incoming data, e.g.localization.
+   */
+  void UpdateObserved(
+      const apollo::localization::LocalizationEstimate &localization);
 
   // A callback function which updates the GUI.
   static void UpdateGUI(const std::string &msg, void *service);
@@ -130,13 +124,18 @@ class TopicsService {
   // The pointer of NaviGeneratorWebSocket, not owned by TopicsService.
   NaviGeneratorWebSocket *websocket_ = nullptr;
 
-  // Whether to clear the SimulationWorld in the next timer cycle, set by
-  // frontend request.
-  bool to_clear_ = false;
-
   std::unique_ptr<util::TrajectoryProcessor> trajectory_processor_;
   std::unique_ptr<util::TrajectoryCollector> trajectory_collector_;
   std::unique_ptr<util::NavigationEditor> navigation_editor_;
+
+  // The underlying SimulationWorld object, owned by the
+  // SimulationWorldService instance.
+  SimulationWorld world_;
+
+  bool ready_to_send_ = false;
+
+  // Whether the sim_world is ready to push to frontend
+  std::atomic<bool> ready_to_push_;
 };
 
 }  // namespace navi_generator

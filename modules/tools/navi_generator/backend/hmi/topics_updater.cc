@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 namespace {
 // Time interval, in milliseconds, between pushing SimulationWorld to
 // frontend.
-constexpr double kSimWorldTimeIntervalMs = 100;
+constexpr double kSimWorldTimeIntervalMs = 1000;
 }  // namespace
 
 TopicsUpdater::TopicsUpdater(NaviGeneratorWebSocket *websocket)
@@ -251,6 +251,31 @@ void TopicsUpdater::RegisterMessageHandlers() {
         topicsService_.SaveRoadCorrection();
       });
 
+  // HMI client asks for executing module command.
+  websocket_->RegisterMessageHandler(
+      "requestExecuteModuleCommand",
+      [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
+        // json should contain {module: "module_name", command: "command_name"}.
+        // If module_name is "all", then run the command on all modules.
+        std::string module;
+        std::string command;
+        std::string type = "requestExecuteModuleCommand";
+        int ret = 0;
+        if (JsonUtil::GetStringFromJson(json, "module", &module) &&
+            JsonUtil::GetStringFromJson(json, "command", &command)) {
+          if (module == "all") {
+            ret = HMIWorker::instance()->RunModeCommand(command);
+          } else {
+            ret = HMIWorker::instance()->RunModuleCommand(module, command);
+          }
+          Json response = topicsService_.GetCommandResponseAsJson(type, module,
+                                                                  command, ret);
+          websocket_->SendData(conn, response.dump());
+        } else {
+          AERROR << "Truncated module command.";
+        }
+      });
+
   // Received new system status, broadcast to clients.
   AdapterManager::AddSystemStatusCallback(
       [this](const monitor::SystemStatus &system_status) {
@@ -284,6 +309,16 @@ void TopicsUpdater::Start() {
 
 void TopicsUpdater::OnTimer(const ros::TimerEvent &event) {
   topicsService_.Update();
+  if (!topicsService_.ReadyToPush()) {
+    return;
+  }
+  if (!topicsService_.ReadyToSend()) {
+    return;
+  }
+  Json json = topicsService_.GetUpdateAsJson();
+  simulation_world_ = json.dump();
+  websocket_->BroadcastData(simulation_world_);
+  topicsService_.SetReadyToPush(false);
 }
 
 void TopicsUpdater::StartBroadcastHMIStatusThread() {
@@ -296,6 +331,9 @@ void TopicsUpdater::StartBroadcastHMIStatusThread() {
       {
         std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
         if (!need_broadcast_) {
+          continue;
+        }
+        if (!topicsService_.ReadyToSend()) {
           continue;
         }
         // Reset to false.

@@ -25,7 +25,8 @@ function start() {
   local MODULE_PATH=$1
   local MODULE=$1
   shift 2
-
+  # Start monitor.
+  supervisorctl start monitor > /dev/null
   LOG="${APOLLO_ROOT_DIR}/data/log/${MODULE}.out"
   is_stopped_customized_path "${MODULE_PATH}" "${MODULE}"
   if [ $? -eq 1 ]; then
@@ -68,6 +69,7 @@ function stop() {
   else
     echo "Module ${MODULE} is not running - skipping."
   fi
+  supervisorctl stop monitor
 }
 
 # run function from apollo_base.sh
