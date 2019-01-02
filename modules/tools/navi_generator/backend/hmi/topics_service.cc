@@ -54,10 +54,19 @@ void TopicsService::UpdateGUI(const std::string &msg, void *service) {
   }
 }
 
+// A callback function which informs the bag files has been processed.
+void TopicsService::NotifyBagFilesProcessed(void *service) {
+  CHECK_NOTNULL(service);
+  TopicsService *topics_service = reinterpret_cast<TopicsService *>(service);
+  if (topics_service) {
+    topics_service->CorrectRoadDeviation();
+  }
+}
+
 TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
     : websocket_(websocket) {
-  trajectory_processor_.reset(
-      new util::TrajectoryProcessor(TopicsService::UpdateGUI, this));
+  trajectory_processor_.reset(new util::TrajectoryProcessor(
+      TopicsService::UpdateGUI, TopicsService::NotifyBagFilesProcessed, this));
   trajectory_collector_.reset(new util::TrajectoryCollector());
 }
 

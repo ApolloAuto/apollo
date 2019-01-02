@@ -93,6 +93,8 @@ class TopicsService {
 
   // A callback function which updates the GUI.
   static void UpdateGUI(const std::string &msg, void *service);
+  // A callback function which informs the bag files has been processed.
+  static void NotifyBagFilesProcessed(void *service);
 
   bool SetCommonBagFileInfo(
       const apollo::navi_generator::util::CommonBagFileInfo &common_file_info);

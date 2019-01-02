@@ -47,15 +47,17 @@ const char kWebSocketTypeSaveFile[] = "requestSaveBagFiles";
 using std::placeholders::_1;  // for _1, _2, _3...
 using Json = nlohmann::json;
 
-TrajectoryProcessor::TrajectoryProcessor(UPDATE_FRONTEND_FUNC update_task,
-                                         void* gui_service)
+TrajectoryProcessor::TrajectoryProcessor(
+    UPDATE_FRONTEND_FUNC update_task,
+    NOTIFY_BAG_FIFES_PROCESSED_FUNC notify_task, void* gui_service)
     : file_seg_thread_(std::make_unique<std::thread>(
           &TrajectoryProcessor::FileSegmentThread, this)),
       file_seg_finished_(false),
       update_frontend_thread_(std::make_unique<std::thread>(
           &TrajectoryProcessor::UpdateFrontendThread, this)),
       update_frontend_func_(std::bind(update_task, _1, gui_service)),
-      update_frontend_finished_(false) {}
+      update_frontend_finished_(false),
+      notify_bag_file_processed_func_(std::bind(notify_task, gui_service)) {}
 
 TrajectoryProcessor::~TrajectoryProcessor() {
   file_seg_finished_ = true;
@@ -338,6 +340,8 @@ void TrajectoryProcessor::ProcessFiles() {
         response.result.msg =
             "Failed to process file" + bag_file_info.raw_file_name;
         ResponseToFrontend(response);
+      } else {
+        notify_bag_file_processed_func_();
       }
       bag_files_to_process_.erase(bag_file_info.file_index);
       break;

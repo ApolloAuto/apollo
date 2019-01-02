@@ -75,10 +75,13 @@ struct FileInfo {
 };
 
 typedef void (*UPDATE_FRONTEND_FUNC)(const std::string&, void*);
+typedef void (*NOTIFY_BAG_FIFES_PROCESSED_FUNC)(void*);
 
 class TrajectoryProcessor {
  public:
-  TrajectoryProcessor(UPDATE_FRONTEND_FUNC update_task, void* gui_service);
+  TrajectoryProcessor(UPDATE_FRONTEND_FUNC update_task,
+                      NOTIFY_BAG_FIFES_PROCESSED_FUNC notify_task,
+                      void* gui_service);
   ~TrajectoryProcessor();
 
  public:
@@ -154,6 +157,9 @@ class TrajectoryProcessor {
   // A binded updating frontend function.
   std::function<void(const std::string&)> update_frontend_func_;
   std::atomic<bool> update_frontend_finished_;
+
+  // A binded notifying bag files has been processed.
+  std::function<void()> notify_bag_file_processed_func_;
 };
 
 }  // namespace util
