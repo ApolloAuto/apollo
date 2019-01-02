@@ -15,7 +15,7 @@ cc_library(
         ":stage",
         "//modules/common",
         "//modules/planning/common:planning_common",
-        "//modules/planning/toolkits:task",
+        "//modules/planning/tasks:task",
     ],
 )
 
@@ -31,8 +31,8 @@ cc_library(
     deps = [
         "//modules/common",
         "//modules/planning/common:planning_common",
-        "//modules/planning/toolkits:task",
-        "//modules/planning/toolkits:task_factory",
+        "//modules/planning/tasks:task",
+        "//modules/planning/tasks:task_factory",
     ],
 )
 

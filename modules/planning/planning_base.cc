@@ -25,7 +25,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/planning/toolkits/task_factory.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
