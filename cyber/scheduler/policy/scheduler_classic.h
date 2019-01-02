@@ -33,7 +33,6 @@ namespace scheduler {
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::proto::ClassicTask;
 using apollo::cyber::proto::ClassicConf;
-using apollo::cyber::proto::SchedGroup;
 
 class SchedulerClassic : public Scheduler {
  public:
@@ -51,7 +50,6 @@ class SchedulerClassic : public Scheduler {
   std::unordered_map<std::string, ClassicTask> cr_confs_;
 
   ClassicConf classic_conf_;
-  SchedGroup* sched_group_;
 };
 
 }  // namespace scheduler
