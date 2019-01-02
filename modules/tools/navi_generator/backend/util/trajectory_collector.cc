@@ -23,10 +23,16 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace navi_generator {
 namespace util {
+
+namespace {
+// Max velocity 240Km/h = 66.666m/s
+constexpr double kMaxDistance = 67.0;
+}  // namespace
 
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::DistanceXY;
@@ -386,7 +392,31 @@ bool TrajectoryCollector::CheckDuration(const ros::Time& t) {
 }
 // Check mileage
 bool TrajectoryCollector::CheckMileage() {
-  // TODO(zhanghua): mileage check should be add in future.
+  // Caculate mileage
+  if (options_.max_mileage > 0) {
+    if (localization_.has_pose()) {
+      if (last_pos_.has_position() && (localization_.pose().has_position())) {
+        double s =
+            DistanceXY(localization_.pose().position(), last_pos_.position());
+        if (s < kMaxDistance) {
+          mileage_ += s;
+        }
+      }
+      last_pos_ = localization_.pose();
+    }
+    // Check mileage
+    if (mileage_ > options_.max_mileage) {
+      if (options_.split) {
+        StopWriting();
+        split_count_++;
+        CheckNumSplits();
+        StartWriting();
+      } else {
+        StopWriting();
+        return true;
+      }
+    }
+  }
   return false;
 }
 // Publish collector message
