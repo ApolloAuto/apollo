@@ -72,3 +72,33 @@ proto_library(
     srcs = ["simulation_world.proto"],
 )
 
+cc_proto_library(
+    name = "navigation_coordinate_proto",
+    deps = [
+        ":navigation_coordinate_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navigation_coordinate_proto_lib",
+    srcs = [
+        "navigation_coordinate.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "navigation_response_proto",
+    deps = [
+        ":navigation_response_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navigation_response_proto_lib",
+    srcs = [
+        "navigation_response.proto",
+    ],
+    deps = [
+         ":navigation_coordinate_proto_lib",
+    ],
+)

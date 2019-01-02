@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+package apollo.navi_generator;
+
+import "modules/tools/navi_generator/proto/navigation_coordinate.proto";
+
+message NaviPath{
+  required uint64 navi_index = 1;
+  repeated NaviWGS84Corr path = 2;
+}
+
+message NaviRoute {
+  required uint64 route_index = 1;
+  required double speed_min = 2;
+  required double speed_max = 3;
+  required uint64 num_navis = 4;
+  repeated NaviPath navis = 5;
+}
+
+message NaviRoutePlan {
+  required uint64 num_routes = 1;
+  required uint64 route_plan_index = 2;
+  repeated NaviRoute routes = 3;
+}
+
+message NaviRoutePlans {
+  required NaviWGS84Corr start = 1;
+  required NaviWGS84Corr end = 2;
+  required uint64 num_plans = 3;
+  repeated NaviRoutePlan route_plans = 4;
+}
+
+message NaviSummary {
+  required uint64 success = 1;
+  required string msg = 2;
+}
+
+message NaviResponse {
+  required string type = 1;
+  required NaviSummary result = 2;
+  optional NaviRoutePlans res_data = 3;
+}
