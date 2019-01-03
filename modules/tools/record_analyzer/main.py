@@ -28,7 +28,7 @@ from module_planning_analyzer import PlannigAnalyzer
 from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
 
 
-def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
+def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer, is_simulation):
     is_auto_drive = False
 
     for msg in reader.read_messages():
@@ -42,7 +42,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
                 is_auto_drive = False
 
         if msg.topic == "/apollo/control":
-            if not is_auto_drive:
+            if not is_auto_drive or is_simulation:
                 continue
             control_cmd = control_cmd_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
@@ -58,7 +58,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
             lidar_endtoend_analyzer.put_planning(adc_trajectory)
 
         if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2":
-            if not is_auto_drive:
+            if not is_auto_drive or is_simulation:
                 continue
             point_cloud = pointcloud_pb2.PointCloud()
             point_cloud.ParseFromString(msg.message)
@@ -75,18 +75,24 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f", "--file", action="store", type=str, required=True,
         help="Specify the record file for analysis.")
-
+    parser.add_argument(
+        "-s", "--simulation", action="store_const", const=True,
+        help="For simulation API call")
     args = parser.parse_args()
 
     record_file = args.file
     reader = RecordReader(record_file)
 
     control_analyzer = ControlAnalyzer()
-    planning_analyzer = PlannigAnalyzer()
+    planning_analyzer = PlannigAnalyzer(args.simulation)
     lidar_endtoend_analyzer = LidarEndToEndAnalyzer()
 
-    process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer)
+    process(control_analyzer, planning_analyzer,
+            lidar_endtoend_analyzer, args.simulation)
 
-    control_analyzer.print_latency_statistics()
-    planning_analyzer.print_latency_statistics()
-    lidar_endtoend_analyzer.print_endtoend_latency()
+    if args.simulation:
+        planning_analyzer.print_simulation_results()
+    else:
+        control_analyzer.print_latency_statistics()
+        planning_analyzer.print_latency_statistics()
+        lidar_endtoend_analyzer.print_endtoend_latency()

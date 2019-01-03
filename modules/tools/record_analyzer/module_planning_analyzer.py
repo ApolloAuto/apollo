@@ -29,7 +29,7 @@ from shapely.geometry import LineString, Point
 class PlannigAnalyzer:
     """planning analyzer"""
 
-    def __init__(self):
+    def __init__(self, is_simulation):
         """init"""
         self.module_latency = []
         self.trajectory_type_dist = {}
@@ -38,23 +38,27 @@ class PlannigAnalyzer:
         self.error_msg_analyzer = ErrorMsgAnalyzer()
         self.last_adc_trajectory = None
         self.frechet_distance_list = []
+        self.is_simulation = is_simulation
 
     def put(self, adc_trajectory):
         """put"""
-        latency = adc_trajectory.latency_stats.total_time_ms
-        self.module_latency.append(latency)
+        if not self.is_simulation:
+            latency = adc_trajectory.latency_stats.total_time_ms
+            self.module_latency.append(latency)
 
-        self.error_code_analyzer.put(adc_trajectory.header.status.error_code)
-        self.error_msg_analyzer.put(adc_trajectory.header.status.msg)
+            self.error_code_analyzer.put(
+                adc_trajectory.header.status.error_code)
+            self.error_msg_analyzer.put(adc_trajectory.header.status.msg)
 
-        traj_type = planning_pb2.ADCTrajectory.TrajectoryType.Name(
-            adc_trajectory.trajectory_type)
-        self.trajectory_type_dist[traj_type] = \
-            self.trajectory_type_dist.get(traj_type, 0) + 1
+            traj_type = planning_pb2.ADCTrajectory.TrajectoryType.Name(
+                adc_trajectory.trajectory_type)
+            self.trajectory_type_dist[traj_type] = \
+                self.trajectory_type_dist.get(traj_type, 0) + 1
 
-        if adc_trajectory.estop.is_estop:
-            self.estop_reason_dist[adc_trajectory.estop.reason] = \
-                self.estop_reason_dist.get(adc_trajectory.estop.reason, 0) + 1
+            if adc_trajectory.estop.is_estop:
+                self.estop_reason_dist[adc_trajectory.estop.reason] = \
+                    self.estop_reason_dist.get(
+                        adc_trajectory.estop.reason, 0) + 1
 
         if self.last_adc_trajectory is not None:
             current_path, last_path = self.find_common_path(adc_trajectory,
@@ -63,8 +67,7 @@ class PlannigAnalyzer:
                 dist = 0
             else:
                 dist = frechet_distance(current_path, last_path)
-            print dist
-            self.frechet_distance_list.append(dist)
+                self.frechet_distance_list.append(dist)
 
         self.last_adc_trajectory = adc_trajectory
 
@@ -140,3 +143,9 @@ class PlannigAnalyzer:
         print PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" + \
             PrintColors.ENDC
         StatisticalAnalyzer().print_statistical_results(self.frechet_distance_list)
+
+    def print_simulation_results(self):
+        results = {}
+        results['frechet_dist'] = sum(self.frechet_distance_list) /\
+            len(self.frechet_distance_list)
+        print str(results)
