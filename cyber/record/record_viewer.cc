@@ -115,6 +115,9 @@ void RecordViewer::UpdateTime() {
   uint64_t max_end_time = 0;
 
   for (auto& reader : readers_) {
+    if (!reader->IsValid()) {
+      continue;
+    }
     const auto& header = reader->header();
     if (min_begin_time > header.begin_time()) {
       min_begin_time = header.begin_time();

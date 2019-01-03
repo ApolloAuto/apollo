@@ -28,11 +28,11 @@ RecordReader::~RecordReader() {}
 
 RecordReader::RecordReader(const std::string& file) {
   file_reader_.reset(new RecordFileReader());
-  reach_end_ = false;
   if (!file_reader_->Open(file)) {
     AERROR << "Open record file failed, file: " << file;
     return;
   }
+  is_valid_ = true;
   header_ = file_reader_->GetHeader();
   if (file_reader_->ReadIndex()) {
     index_ = file_reader_->GetIndex();
@@ -71,6 +71,9 @@ std::set<std::string> RecordReader::GetChannelList() const {
 
 bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
                                uint64_t end_time) {
+  if (!is_valid_) {
+    return false;
+  }
   while (message_index_ < chunk_.messages_size()) {
     const auto& next_message = chunk_.messages(message_index_);
     uint64_t time = next_message.time();
