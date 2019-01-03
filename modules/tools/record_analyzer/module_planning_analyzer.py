@@ -21,7 +21,9 @@ from common.statistical_analyzer import PrintColors
 from common.distribution_analyzer import DistributionAnalyzer
 from common.error_code_analyzer import ErrorCodeAnalyzer
 from common.error_msg_analyzer import ErrorMsgAnalyzer
+from common.frechet_distance import frechet_distance
 from modules.planning.proto import planning_pb2
+from shapely.geometry import LineString, Point
 
 
 class PlannigAnalyzer:
@@ -34,6 +36,8 @@ class PlannigAnalyzer:
         self.estop_reason_dist = {}
         self.error_code_analyzer = ErrorCodeAnalyzer()
         self.error_msg_analyzer = ErrorMsgAnalyzer()
+        self.last_adc_trajectory = None
+        self.frechet_distance_list = []
 
     def put(self, adc_trajectory):
         """put"""
@@ -51,6 +55,63 @@ class PlannigAnalyzer:
         if adc_trajectory.estop.is_estop:
             self.estop_reason_dist[adc_trajectory.estop.reason] = \
                 self.estop_reason_dist.get(adc_trajectory.estop.reason, 0) + 1
+
+        if self.last_adc_trajectory is not None:
+            current_path, last_path = self.find_common_path(adc_trajectory,
+                                                            self.last_adc_trajectory)
+            if len(current_path) == 0 or len(last_path) == 0:
+                dist = 0
+            else:
+                dist = frechet_distance(current_path, last_path)
+            print dist
+            self.frechet_distance_list.append(dist)
+
+        self.last_adc_trajectory = adc_trajectory
+
+    def find_common_path(self, current_adc_trajectory, last_adc_trajectory):
+        current_path_points = current_adc_trajectory.trajectory_point
+        last_path_points = last_adc_trajectory.trajectory_point
+        current_path = []
+        for point in current_path_points:
+            current_path.append([point.path_point.x, point.path_point.y])
+        last_path = []
+        for point in last_path_points:
+            last_path.append([point.path_point.x, point.path_point.y])
+        if len(current_path) == 0 or len(last_path) == 0:
+            return [], []
+
+        current_ls = LineString(current_path)
+        last_ls = LineString(last_path)
+        current_start_point = Point(current_path[0])
+
+        dist = last_ls.project(current_start_point)
+        cut_lines = self.cut(last_ls, dist)
+        if len(cut_lines) == 1:
+            return [], []
+        last_ls = cut_lines[1]
+        dist = current_ls.project(Point(last_path[-1]))
+        if dist <= current_ls.length:
+            current_ls = self.cut(current_ls, dist)[0]
+        else:
+            dist = last_ls.project(Point(current_path[-1]))
+            last_ls = self.cut(last_ls, dist)[0]
+        return current_ls.coords, last_ls.coords
+
+    def cut(self, line, distance):
+        if distance <= 0.0 or distance >= line.length:
+            return [LineString(line)]
+        coords = list(line.coords)
+        for i, p in enumerate(coords):
+            pd = line.project(Point(p))
+            if pd == distance:
+                return [
+                    LineString(coords[:i+1]),
+                    LineString(coords[i:])]
+            if pd > distance:
+                cp = line.interpolate(distance)
+                return [
+                    LineString(coords[:i] + [(cp.x, cp.y)]),
+                    LineString([(cp.x, cp.y)] + coords[i:])]
 
     def print_latency_statistics(self):
         """print_latency_statistics"""
@@ -75,3 +136,7 @@ class PlannigAnalyzer:
         print PrintColors.HEADER + "--- Planning Error Msg Distribution ---" + \
             PrintColors.ENDC
         self.error_msg_analyzer.print_results()
+
+        print PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" + \
+            PrintColors.ENDC
+        StatisticalAnalyzer().print_statistical_results(self.frechet_distance_list)
