@@ -22,6 +22,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/common/util/lru_cache.h"
@@ -103,7 +104,10 @@ class ObstaclesContainer : public Container {
  private:
   double timestamp_ = -1.0;
   common::util::LRUCache<int, Obstacle> obstacles_;
+  // an id_mapping from perception_id to prediction_id
+  common::util::LRUCache<int, int> id_mapping_;
   std::vector<int> curr_frame_predictable_obstacle_ids_;
+  std::unordered_set<int> seen_prediction_ids_;
 };
 
 }  // namespace prediction
