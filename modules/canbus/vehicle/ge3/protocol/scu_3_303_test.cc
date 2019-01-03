@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_3_303.h"
-
 #include "gtest/gtest.h"
 
 namespace apollo {

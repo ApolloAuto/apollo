@@ -15,9 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/scu_3_303.h"
-
 #include "glog/logging.h"
-
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
