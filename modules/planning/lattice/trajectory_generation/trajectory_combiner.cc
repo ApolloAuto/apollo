@@ -58,12 +58,12 @@ DiscretizedTrajectory TrajectoryCombiner::Combine(
       break;
     }
 
-    double s_param = s - s0;
+    double relative_s = s - s0;
     // linear extrapolation is handled internally in LatticeTrajectory1d;
     // no worry about s_param > lat_trajectory.ParamLength() situation
-    double d = lat_trajectory.Evaluate(0, s_param);
-    double d_prime = lat_trajectory.Evaluate(1, s_param);
-    double d_pprime = lat_trajectory.Evaluate(2, s_param);
+    double d = lat_trajectory.Evaluate(0, relative_s);
+    double d_prime = lat_trajectory.Evaluate(1, relative_s);
+    double d_pprime = lat_trajectory.Evaluate(2, relative_s);
 
     PathPoint matched_ref_point = PathMatcher::MatchToPath(reference_line, s);
 

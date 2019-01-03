@@ -127,8 +127,8 @@ void Trajectory1dGenerator::GenerateLateralTrajectoryBundle(
     GenerateTrajectory1DBundle<5>(init_lat_state_, end_conditions,
                                   ptr_lat_trajectory_bundle);
   } else {
-    double s_min = 0.0;
-    double s_max = FLAGS_max_s_lateral_optimization;
+    double s_min = init_lon_state_[0];
+    double s_max = s_min + FLAGS_max_s_lateral_optimization;
 
     double delta_s = FLAGS_default_delta_s_lateral_optimization;
 
