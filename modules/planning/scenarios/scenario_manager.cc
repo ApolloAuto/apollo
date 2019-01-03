@@ -123,7 +123,7 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
-  // inti
+  // init
   PlanningContext::GetScenarioInfo()->next_stop_sign_overlap = PathOverlap();
   PlanningContext::GetScenarioInfo()->next_traffic_light_overlap =
       PathOverlap();
