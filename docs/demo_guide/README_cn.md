@@ -9,13 +9,13 @@ Apollo演示的安装步骤：
 1. 运行如下命令启动docker的release环境:
 
     ```
-    bash docker/scripts/release_start.sh
+    bash docker/scripts/dev_start.sh
     ```
 
 2. 运行如下命令进入docker的release环境:
 
     ```
-    bash docker/scripts/release_into.sh
+    bash docker/scripts/dev_into.sh
     ```
 
 3. 运行如下命令回放位rosbag:
