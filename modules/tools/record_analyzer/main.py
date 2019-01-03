@@ -42,7 +42,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
                 is_auto_drive = False
 
         if msg.topic == "/apollo/control":
-            if is_auto_drive:
+            if not is_auto_drive:
                 continue
             control_cmd = control_cmd_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
@@ -50,7 +50,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
             lidar_endtoend_analyzer.put_control(control_cmd)
 
         if msg.topic == "/apollo/planning":
-            if is_auto_drive:
+            if not is_auto_drive:
                 continue
             adc_trajectory = planning_pb2.ADCTrajectory()
             adc_trajectory.ParseFromString(msg.message)
@@ -58,7 +58,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer):
             lidar_endtoend_analyzer.put_planning(adc_trajectory)
 
         if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2":
-            if is_auto_drive:
+            if not is_auto_drive:
                 continue
             point_cloud = pointcloud_pb2.PointCloud()
             point_cloud.ParseFromString(msg.message)
