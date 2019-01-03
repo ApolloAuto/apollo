@@ -71,6 +71,23 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
 
+  // Prediction tracking adaption
+  // TODO(Hongyi) move this a gflag
+  if (false) {
+    // Set seen pred_id in LRUCache id_mapping_ or obstacles_
+    seen_prediction_ids_.clear();
+    for (const PerceptionObstacle& perception_obstacle :
+         perception_obstacles.perception_obstacle()) {
+      int pred_id = 0, percept_id = perception_obstacle.id();
+      if (!id_mapping_.GetCopy(percept_id, &pred_id)) {
+        pred_id = percept_id;
+        if (GetObstacle(pred_id) != nullptr) {
+          seen_prediction_ids_.insert(pred_id);
+        }
+      }
+    }
+  }
+
   // Set up the ObstacleClusters:
   // 1. Initialize ObstacleClusters
   ObstacleClusters::Init();
@@ -113,6 +130,7 @@ ObstaclesContainer::GetCurrentFramePredictableObstacleIds() const {
 
 void ObstaclesContainer::Clear() {
   obstacles_.Clear();
+  id_mapping_.Clear();
   timestamp_ = -1.0;
 }
 
@@ -120,27 +138,29 @@ void ObstaclesContainer::Clear() {
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
   // Sanity checks.
-  const int id = perception_obstacle.id();
-  if (id < -1) {
-    AERROR << "Invalid ID [" << id << "]";
+  int pred_id = perception_obstacle.id();
+  id_mapping_.GetCopy(pred_id, &pred_id);
+  ADEBUG << "Prediction_id is: " << pred_id;
+  if (pred_id < -1) {
+    AERROR << "Invalid ID [" << pred_id << "]";
     return;
   }
   if (!IsPredictable(perception_obstacle)) {
-    ADEBUG << "Perception obstacle [" << id << "] is not predictable.";
+    ADEBUG << "Perception obstacle [" << pred_id << "] is not predictable.";
     return;
   }
 
   // Insert the obstacle and also update the LRUCache.
-  curr_frame_predictable_obstacle_ids_.push_back(id);
-  Obstacle* obstacle_ptr = obstacles_.Get(id);
+  curr_frame_predictable_obstacle_ids_.push_back(pred_id);
+  Obstacle* obstacle_ptr = obstacles_.Get(pred_id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->Insert(perception_obstacle, timestamp);
-    ADEBUG << "Refresh obstacle [" << id << "]";
+    ADEBUG << "Refresh obstacle [" << pred_id << "]";
   } else {
     Obstacle obstacle;
     obstacle.Insert(perception_obstacle, timestamp);
-    obstacles_.Put(id, std::move(obstacle));
-    ADEBUG << "Insert obstacle [" << id << "]";
+    obstacles_.Put(pred_id, std::move(obstacle));
+    ADEBUG << "Insert obstacle [" << pred_id << "]";
   }
 }
 
