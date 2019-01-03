@@ -7,6 +7,7 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
     var obj = {
         generateFile: function () {
             var file = $('input[name="fileField"]').prop('files');
+            file = obj.fileSort(file);
             if (file.length > 0) {
                 $('#demoList').html("");
                 for (var i = 0; i < file.length; i++) {
@@ -21,6 +22,7 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
         },
         modificationFile: function () {
             var file = $('input[name="modificationFiles"]').prop('files');
+            file = obj.fileSort(file);
             if (file.length > 0) {
                 $('#modificationList').html("");
                 for (var i = 0; i < file.length; i++) {
@@ -57,10 +59,10 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
                 };
 
                 if (!window.WebSocket) window.WebSocket = window.MozWebSocket;
-                if(socket.readyState!=1){
-                    layer.msg("Error in connection establishment . ", {icon: 5});
-                }else{
-                     socket.send(JSON.stringify(resultMap));
+                if (socket.readyState != 1) {
+                    layer.msg("Error in connection establishment . ", { icon: 5 });
+                } else {
+                    socket.send(JSON.stringify(resultMap));
                 }
                 // console.log("send data is "+ JSON.stringify(resultMap));
                 segmentCounter++;
@@ -71,14 +73,12 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
                         obj.readFileSync(files[fileIdx], type);
                     }
                     if (fileIdx == files.length) {
-
                         if (type == "requestCorrectRoadDeviation") {
-                            $("#modificationCancel").addClass("layui-btn-disabled");
-                            $("#deviationSave").removeClass("layui-btn-disabled");
+                            $("#modificationCancel").addClass("layui-btn-disabled").attr('disabled', "true");
                         } else {
-                            $("#generateCancel").addClass("layui-btn-disabled");
-                            $("#preserve").removeClass("layui-btn-disabled");
+                            $("#generateCancel").addClass("layui-btn-disabled").attr('disabled', "true");
                         }
+                        obj.showButton();
                     }
                 }
             };
@@ -153,14 +153,17 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
                 layer.alert('The number of right adjacent lanes must be between 0 and 20');
                 return;
             }
-            obj.resetVariables(type);
+            obj.resetVariables();
 
             if (type == "requestCorrectRoadDeviation") {
+                $("#deviationSave").addClass("layui-btn-disabled").attr('disabled', "true");
                 files = $('input[name="modificationFiles"]').prop('files');
             } else {
+                $("#preserve").addClass("layui-btn-disabled").attr('disabled', "true");
                 files = $('input[name="fileField"]').prop('files');
             }
 
+            files = obj.fileSort(files);
             totalFileNum = files.length;
             if (totalFileNum == 0) {
                 layer.alert('Please select file');
@@ -174,24 +177,31 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
             };
 
             if (!window.WebSocket) window.WebSocket = window.MozWebSocket;
-            if(socket.readyState!=1){
-                layer.msg("Error in connection establishment . ", {icon: 5});
-            }else{
-                 socket.send(JSON.stringify(sendHeadMap));
+            if (socket.readyState != 1) {
+                layer.msg("Error in connection establishment . ", { icon: 5 });
+                return false;
+            } else {
+                socket.send(JSON.stringify(sendHeadMap));
             }
+            obj.changeCss(type);
             obj.readFileSync(files[fileIdx], type);
+
         },
 
         awakeUpload: function () {
         },
 
         cancelUpload: function () {
-            $("#generateCancel").addClass("layui-btn-disabled");
 
             isOnabort = true;
             for (var i = 0; i < readerArray.length; i++) {
                 readerArray[i].abort();
             }
+
+            $("#generateCancel").addClass("layui-btn-disabled").attr('disabled', "true");
+            $("#modificationCancel").addClass("layui-btn-disabled").attr('disabled', "true");
+
+            obj.showButton();
 
             for (var i = fileIdx; i < totalFileNum; i++) {
                 $("#fileIndex" + i).html("Transmission interrupted");
@@ -208,7 +218,62 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
             end = 0;
         },
 
-        resetVariables: function (type) {
+        showButton: function () {
+            $("#testList").removeClass("layui-btn-disabled").removeAttr("disabled");
+            $("#testList a").css("color", "#fff");
+            $("#generateSubmit").removeClass("layui-btn-disabled").removeAttr("disabled");
+
+            $("#modificationtestList").removeClass("layui-btn-disabled").removeAttr("disabled");
+            $("#modificationtestList a").css("color", "#fff");
+            $("#modificationSubmit").removeClass("layui-btn-disabled").removeAttr("disabled");
+
+            $('input[name="fileField"]').val('');
+            $('input[name="modificationFiles"]').val('');
+        },
+        saveButton: function (type) {
+            if (type == "requestCorrectRoadDeviation") {
+                $("#deviationSave").removeClass("layui-btn-disabled").removeAttr("disabled");
+            } else {
+                $("#preserve").removeClass("layui-btn-disabled").removeAttr("disabled");
+            }
+        },
+        changeCss: function (type) {
+            if (type == "requestCorrectRoadDeviation") {
+                $("#modificationtestList").addClass("layui-btn-disabled").attr('disabled', "true");
+                $("#modificationtestList a").css("color", "#c9c9c9");
+                $("#modificationSubmit").addClass("layui-btn-disabled").attr('disabled', "true");
+                $("#modificationCancel").removeClass("layui-btn-disabled").removeAttr("disabled");
+            } else {
+                $("#testList").addClass("layui-btn-disabled").attr('disabled', "true");
+                $("#testList a").css("color", "#c9c9c9");
+                $("#generateSubmit").addClass("layui-btn-disabled").attr('disabled', "true");
+                $("#generateCancel").removeClass("layui-btn-disabled").removeAttr("disabled");
+            }
+        },
+
+        fileSort: function (files) {
+            var fileArray = new Array();
+
+            for (var i = 0; i < files.length; i++) {
+                fileArray.push(files[i]);
+            }
+
+            if (fileArray.length > 0) {
+                for (var i = 0; i < fileArray.length - i - 1; i++) {
+                    for (var j = 0; j < fileArray.length - i - 1; j++) {
+                        if (fileArray[j].name > fileArray[j + 1].name) {
+                            var swap = fileArray[j];
+                            fileArray[j] = fileArray[j + 1];
+                            fileArray[j + 1] = swap;
+                        }
+                    }
+                }
+            }
+            return fileArray;
+
+        },
+
+        resetVariables: function () {
             files = [];
             totalFileNum = 0;
             fileIdx = 0;
@@ -218,11 +283,6 @@ layui.define(['jquery', 'layer', 'base64', 'resolver'], function (exports) {
             start = 0;
             end = 0;
             isOnabort = false;
-            if (type == "requestCorrectRoadDeviation") {
-                $("#modificationCancel").removeClass("layui-btn-disabled");
-            } else {
-                $("#generateCancel").removeClass("layui-btn-disabled");
-            }
             $(".transferStatus").html("Transmitting");
         }
     };

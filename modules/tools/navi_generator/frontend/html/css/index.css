@@ -157,11 +157,11 @@
 		    transition: all .6s ease-in-out;
 		}
 		#collect.layui-col-space1 {
-		    height: 22%;
+		    height: 214px;
 		    margin: 0;
 		}
 		#editor.layui-col-space1 {
-		    height: 22%;
+		    height: 214px;
 		    margin: 0;
 		}
 		.tools {
@@ -220,7 +220,7 @@
 		    right: 10px;
 		    width: 15px;
 		    height: 15px;
-		    background-color: #b43131;
+		    background: #b43131;
 		}
 		#allform {
 		    float: right;
@@ -235,7 +235,7 @@
 		.layui-form .layui-form-switch i{
 			border-radius:0;
 		}
-		#first .layui-form-label{
+		#editor .layui-form-label{
 			background-color: #00000038;
 			border-color: #adadadad;
 		}
@@ -557,6 +557,12 @@
 			.tools .card .card-header h2{
 				font-size: 14px;
 			}
+		}
+
+		@media screen and (max-height: 570px) {
+		    #allmap{
+		    	height: 64%;
+		    }
 		}
 		
 		

@@ -36,10 +36,10 @@ bool NaviGenJsonConverter::NaviGenResponseToJson(
   (*js)["type"] = navi_gen_response.type;
   (*js)["result"]["success"] = navi_gen_response.result.success;
   (*js)["result"]["msg"] = navi_gen_response.result.msg;
-  (*js)["resData"]["start"]["Lat"] = navi_gen_response.res_data.start.lat;
-  (*js)["resData"]["start"]["Lng"] = navi_gen_response.res_data.start.log;
-  (*js)["resData"]["end"]["Lat"] = navi_gen_response.res_data.end.lat;
-  (*js)["resData"]["end"]["Lng"] = navi_gen_response.res_data.end.log;
+  (*js)["resData"]["start"]["lat"] = navi_gen_response.res_data.start.lat;
+  (*js)["resData"]["start"]["lng"] = navi_gen_response.res_data.start.log;
+  (*js)["resData"]["end"]["lat"] = navi_gen_response.res_data.end.lat;
+  (*js)["resData"]["end"]["lng"] = navi_gen_response.res_data.end.log;
   (*js)["resData"]["numPlans"] = navi_gen_response.res_data.num_plans;
 
   for (std::size_t i = 0; i < navi_gen_response.res_data.route_plans.size();
@@ -56,11 +56,11 @@ bool NaviGenJsonConverter::NaviGenRoutePlansToJson(
     const NaviGenRoutePlans& route_plans, Json* const js) {
   CHECK_NOTNULL(js);
   (*js)["routePlanIndex"] = route_plans.route_plan_index;
-  (*js)["routePlan"]["numRoutes"] = route_plans.route_plan.num_routes;
+  (*js)["numRoutes"] = route_plans.route_plan.num_routes;
 
   for (std::size_t i = 0; i < route_plans.route_plan.routes.size(); ++i) {
     if (!NaviGenRoutesToJson(route_plans.route_plan.routes[i],
-                             &((*js)["routePlan"]["routes"][i]))) {
+                             &((*js)["routes"][i]))) {
       AERROR << "NaviGenRoutePlansToJson failed";
     }
   }
@@ -71,8 +71,8 @@ bool NaviGenJsonConverter::NaviGenRoutesToJson(const NaviGenRoutes& routes,
                                                Json* const js) {
   CHECK_NOTNULL(js);
   (*js)["routeIndex"] = routes.route_index;
-  (*js)["speed_min"] = routes.speed_min;
-  (*js)["speed_max"] = routes.speed_max;
+  (*js)["speedMin"] = routes.speed_min;
+  (*js)["speedMax"] = routes.speed_max;
   (*js)["numNavis"] = 1;
   for (std::size_t i = 0; i < routes.navis.size(); ++i) {
     if (!NaviGenNavisToJson(routes.navis[i], &((*js)["navis"][i]))) {
@@ -87,8 +87,8 @@ bool NaviGenJsonConverter::NaviGenNavisToJson(const NaviGenNavis& navis,
   CHECK_NOTNULL(js);
   (*js)["naviIndex"] = navis.navi_index;
   for (std::size_t i = 0; i < navis.path.size(); ++i) {
-    (*js)["navi"]["path"][i]["Lng"] = navis.path[i].log;
-    (*js)["navi"]["path"][i]["Lat"] = navis.path[i].lat;
+    (*js)["path"][i]["lng"] = navis.path[i].log;
+    (*js)["path"][i]["lat"] = navis.path[i].lat;
   }
   return true;
 }
@@ -97,10 +97,10 @@ bool NaviGenJsonConverter::JsonToNaviGenRoutePlans(
     const Json& js, NaviGenRoutePlans* const route_plans) {
   CHECK_NOTNULL(route_plans);
   route_plans->route_plan_index = js["routePlanIndex"];
-  route_plans->route_plan.num_routes = js["routePlan"]["numRoutes"];
-  for (std::size_t i = 0; i < js["routePlan"]["routes"].size(); ++i) {
+  route_plans->route_plan.num_routes = js["numRoutes"];
+  for (std::size_t i = 0; i < js["routes"].size(); ++i) {
     NaviGenRoutes routes;
-    if (!JsonToNaviGenRoutes(js["routePlan"]["routes"][i], &routes)) {
+    if (!JsonToNaviGenRoutes(js["routes"][i], &routes)) {
       AERROR << "JsonToNaviGenRoutePlans failed";
       return false;
     }
@@ -113,8 +113,8 @@ bool NaviGenJsonConverter::JsonToNaviGenRoutes(const Json& js,
                                                NaviGenRoutes* const routes) {
   CHECK_NOTNULL(routes);
   routes->route_index = js["routeIndex"];
-  routes->speed_min = js["speed_min"];
-  routes->speed_max = js["speed_max"];
+  routes->speed_min = js["speedMin"];
+  routes->speed_max = js["speedMax"];
   routes->num_navis = 1;
   for (std::size_t i = 0; i < js["navis"].size(); ++i) {
     NaviGenNavis navis;
@@ -131,10 +131,10 @@ bool NaviGenJsonConverter::JsonToNaviGenNavis(const Json& js,
                                               NaviGenNavis* const navis) {
   CHECK_NOTNULL(navis);
   navis->navi_index = js["naviIndex"];
-  for (std::size_t i = 0; i < js["navi"]["path"].size(); ++i) {
+  for (std::size_t i = 0; i < js["path"].size(); ++i) {
     apollo::localization::msf::WGS84Corr path;
-    path.log = js["navi"]["path"][i]["Lng"];
-    path.lat = js["navi"]["path"][i]["Lat"];
+    path.log = js["path"][i]["lng"];
+    path.lat = js["path"][i]["lat"];
     navis->path.emplace_back(path);
   }
   return true;
@@ -144,10 +144,10 @@ bool NaviGenJsonConverter::JsonToMapData(const Json& js,
                                          MapData* const map_data) {
   CHECK_NOTNULL(map_data);
   map_data->type = js["type"];
-  map_data->start.log = js["start"]["Lng"];
-  map_data->start.lat = js["start"]["Lat"];
-  map_data->end.log = js["end"]["Lng"];
-  map_data->end.lat = js["end"]["Lat"];
+  map_data->start.log = js["start"]["lng"];
+  map_data->start.lat = js["start"]["lat"];
+  map_data->end.log = js["end"]["lng"];
+  map_data->end.lat = js["end"]["lat"];
 
   // for (std::size_t i = 0; i < js["waypoint"].size(); ++i) {
   //   apollo::localization::msf::WGS84Corr waypoint;
@@ -174,8 +174,8 @@ bool NaviGenJsonConverter::JsonToMapWayPoint(
     apollo::localization::msf::WGS84Corr* const waypoint) {
   AINFO << "JsonToMapWayPoint start";
   CHECK_NOTNULL(waypoint);
-  waypoint->log = WayPoint["Lng"];
-  waypoint->lat = WayPoint["Lat"];
+  waypoint->log = WayPoint["lng"];
+  waypoint->lat = WayPoint["lat"];
   return true;
 }
 
@@ -251,8 +251,8 @@ bool NaviGenJsonConverter::JsonToMapRoute(const Json& Route,
 bool NaviGenJsonConverter::JsonToMapPath(
     const Json& Path, apollo::localization::msf::WGS84Corr* const path) {
   CHECK_NOTNULL(path);
-  path->log = Path["Lng"];
-  path->lat = Path["Lat"];
+  path->log = Path["lng"];
+  path->lat = Path["lat"];
   return true;
 }
 
@@ -260,8 +260,8 @@ bool NaviGenJsonConverter::JsonToMapStep(const Json& Step,
                                          MapStep* const step) {
   CHECK_NOTNULL(step);
   step->step_index = Step["stepIndex"];
-  step->step.log = Step["Lng"];
-  step->step.lat = Step["Lat"];
+  step->step.log = Step["lng"];
+  step->step.lat = Step["lat"];
   return true;
 }
 
