@@ -18,11 +18,9 @@
  * @file ge3_vehicle_factory.h
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_GE3_VEHICLE_FACTORY_H_
-#define MODULES_CANBUS_VEHICLE_GE3_VEHICLE_FACTORY_H_
+#pragma once
 
 #include <memory>
-
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/abstract_vehicle_factory.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
@@ -64,5 +62,3 @@ class Ge3VehicleFactory : public AbstractVehicleFactory {
 
 }  // namespace canbus
 }  // namespace apollo
-
-#endif  // MODULES_CANBUS_VEHICLE_GE3_VEHICLE_FACTORY_H_

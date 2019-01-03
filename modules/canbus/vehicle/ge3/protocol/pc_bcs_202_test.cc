@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcs_202.h"
-
 #include "gtest/gtest.h"
 
 namespace apollo {

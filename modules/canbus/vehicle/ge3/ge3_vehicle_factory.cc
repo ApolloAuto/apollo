@@ -15,10 +15,8 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/ge3_vehicle_factory.h"
-
 #include "modules/canbus/vehicle/ge3/ge3_controller.h"
 #include "modules/canbus/vehicle/ge3/ge3_message_manager.h"
-// #include "modules/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {

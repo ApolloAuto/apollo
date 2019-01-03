@@ -15,11 +15,8 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/ge3_controller.h"
-
 #include <string>
-
 #include "gtest/gtest.h"
-
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/vehicle/ge3/ge3_message_manager.h"
