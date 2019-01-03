@@ -457,5 +457,5 @@ cd swig_wrapper
 bash build.sh
 cd /apollo-platform/ros/
 ./build.sh build
-cp -R install/ros_aarch64/ /home/tmp/ros
+cp -R install/ros_aarch64/* /home/tmp/ros
 ```
