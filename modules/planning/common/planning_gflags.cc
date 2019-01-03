@@ -454,7 +454,7 @@ DEFINE_double(
 DEFINE_double(max_trajectory_len, 1000.0,
               "(unit: meter) max possible trajectory length.");
 DEFINE_bool(enable_rss_fallback, false, "trigger rss fallback");
-DEFINE_bool(enable_rss_info, false, "enable rss_info in trajectory_pb");
+DEFINE_bool(enable_rss_info, true, "enable rss_info in trajectory_pb");
 
 DEFINE_bool(
     enable_planning_smoother, true,
