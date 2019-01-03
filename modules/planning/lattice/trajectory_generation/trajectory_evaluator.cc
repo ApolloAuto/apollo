@@ -191,8 +191,10 @@ double TrajectoryEvaluator::LatComfortCost(
     double s = lon_trajectory->Evaluate(0, t);
     double s_dot = lon_trajectory->Evaluate(1, t);
     double s_dotdot = lon_trajectory->Evaluate(2, t);
-    double l_prime = lat_trajectory->Evaluate(1, s);
-    double l_primeprime = lat_trajectory->Evaluate(2, s);
+
+    double relative_s = s - init_s_[0];
+    double l_prime = lat_trajectory->Evaluate(1, relative_s);
+    double l_primeprime = lat_trajectory->Evaluate(2, relative_s);
     double cost = l_primeprime * s_dot * s_dot + l_prime * s_dotdot;
     max_cost = std::max(max_cost, std::fabs(cost));
   }
