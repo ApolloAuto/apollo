@@ -41,9 +41,9 @@ cc_library(
         "file_operator.h",
     ],
     deps = [
-       "//modules/common:log",
-       "//modules/planning/reference_line:reference_line",
-       "//third_party/json",
+        "//modules/common:log",
+        "//modules/planning/reference_line:reference_line",
+        "//third_party/json",
     ],
 )
 
@@ -111,11 +111,11 @@ cc_library(
         "-lconsole_bridge",
     ],
     deps = [
-       "//modules/common:log",
-       "//modules/common/adapters:adapter_manager",
-       "//modules/common/util:util",
-       "//modules/tools/navi_generator/proto:trajectory_collector_proto",
-       "//modules/localization/proto:localization_proto",
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/util:util",
+        "//modules/tools/navi_generator/proto:trajectory_collector_proto",
+        "//modules/localization/proto:localization_proto",
         "@ros//:ros_common",
     ],
 )
@@ -134,6 +134,7 @@ cc_library(
     ],
 )
 
+
 cc_library(
     name = "navigation_matcher",
     srcs = [
@@ -143,13 +144,14 @@ cc_library(
         "navigation_matcher.h",
     ],
     deps = [
-       "//modules/common:log",
-       "//modules/tools/navi_generator/backend/database:db_operator",
-       "//modules/localization/msf/common/util:localization_msf_common_util",
-       "//modules/tools/navi_generator/backend/common:navi_generator_gflags",
-       ":file_operator",
-       ":quad_tiles_maker",
-       ":navi_gen_json_converter",
+        "//modules/common:log",
+        "//modules/tools/navi_generator/backend/database:db_operator",
+        "//modules/localization/msf/common/util:localization_msf_common_util",
+        "//modules/tools/navi_generator/backend/common:navi_generator_gflags",
+        ":file_operator",
+        ":quad_tiles_maker",
+        "//modules/tools/navi_generator/proto:navigation_response_proto",
+        "//modules/tools/navi_generator/proto:navigation_map_data_proto",
     ],
 )
 
@@ -166,6 +168,8 @@ cc_library(
         "//third_party/json",
         ":navigation_matcher",
         "//modules/localization/msf/common/util:localization_msf_common_util",
+        "//modules/tools/navi_generator/proto:navigation_response_proto",
+        "//modules/tools/navi_generator/proto:navigation_map_data_proto",
     ],
 )
 
@@ -178,10 +182,11 @@ cc_library(
         "navigation_editor.h",
     ],
     deps = [
-       "//modules/tools/navi_generator/backend/database:db_operator",
-       ":navigation_matcher",
-       ":trajectory_processor",
-       "//modules/common:log",
+        "//modules/tools/navi_generator/backend/database:db_operator",
+        ":navigation_matcher",
+        ":trajectory_processor",
+        "//modules/common:log",
+        ":navi_gen_json_converter",
     ],
 )
 
