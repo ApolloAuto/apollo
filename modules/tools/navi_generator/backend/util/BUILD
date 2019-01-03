@@ -94,7 +94,7 @@ cc_library(
         ":file_operator",
         ":quad_tiles_maker",
         "//modules/common/util:util",
-        ":navi_gen_json_converter",
+        "//modules/tools/navi_generator/proto:navigation_response_proto",
     ],
 )
 
