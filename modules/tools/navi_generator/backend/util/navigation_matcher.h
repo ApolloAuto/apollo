@@ -29,6 +29,7 @@
 #include "modules/tools/navi_generator/backend/database/db_operator.h"
 #include "modules/tools/navi_generator/backend/util/file_operator.h"
 #include "third_party/json/json.hpp"
+#include "modules/tools/navi_generator/proto/navigation_map_data.pb.h"
 
 /**
  * @namespace apollo::navi_generator::util
@@ -49,7 +50,7 @@ class NavigationMatcher {
                        std::uint64_t* const line_num,
                        apollo::localization::msf::WGS84Corr* const found_pos);
 
-  bool MatchRoute(const nlohmann::json& expected_route,
+  bool MatchRoute(const MapData& map_data,
                   const std::vector<Way>& route);
 
  private:
