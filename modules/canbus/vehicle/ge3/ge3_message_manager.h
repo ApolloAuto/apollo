@@ -13,8 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-#ifndef MODULES_CANBUS_VEHICLE_GE3_GE3_MESSAGE_MANAGER_H_
-#define MODULES_CANBUS_VEHICLE_GE3_GE3_MESSAGE_MANAGER_H_
+#pragma once
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
@@ -35,5 +34,3 @@ class Ge3MessageManager
 }  // namespace ge3
 }  // namespace canbus
 }  // namespace apollo
-
-#endif  // MODULES_CANBUS_VEHICLE_GE3_GE3_MESSAGE_MANAGER_H_

@@ -15,9 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ge3/ge3_message_manager.h"
-
 #include "gtest/gtest.h"
-
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcm_201.h"
 #include "modules/canbus/vehicle/ge3/protocol/pc_bcs_202.h"
 #include "modules/canbus/vehicle/ge3/protocol/pc_epb_203.h"
