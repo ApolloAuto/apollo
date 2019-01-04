@@ -109,7 +109,6 @@ void EvaluatorManager::Run(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(container);
 
-  Evaluator* evaluator = nullptr;
   for (const auto& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     if (!perception_obstacle.has_id()) {
@@ -132,39 +131,44 @@ void EvaluatorManager::Run(
       continue;
     }
 
-    switch (perception_obstacle.type()) {
-      case PerceptionObstacle::VEHICLE: {
-        if (obstacle->HasJunctionFeatureWithExits() &&
-            !obstacle->IsClosedToJunctionExit()) {
-          evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
-          CHECK_NOTNULL(evaluator);
-        } else if (obstacle->IsOnLane()) {
-          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
-          CHECK_NOTNULL(evaluator);
-        }
-        break;
+    EvaluateObstacle(obstacle);
+  }
+}
+
+void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
+  Evaluator* evaluator = nullptr;
+  switch (obstacle->type()) {
+    case PerceptionObstacle::VEHICLE: {
+      if (obstacle->HasJunctionFeatureWithExits() &&
+          !obstacle->IsClosedToJunctionExit()) {
+        evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
+        CHECK_NOTNULL(evaluator);
+      } else if (obstacle->IsOnLane()) {
+        evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+        CHECK_NOTNULL(evaluator);
       }
-      case PerceptionObstacle::BICYCLE: {
-        if (obstacle->IsOnLane()) {
-          evaluator = GetEvaluator(cyclist_on_lane_evaluator_);
-          CHECK_NOTNULL(evaluator);
-        }
-        break;
-      }
-      case PerceptionObstacle::PEDESTRIAN: {
-        break;
-      }
-      default: {
-        if (obstacle->IsOnLane()) {
-          evaluator = GetEvaluator(default_on_lane_evaluator_);
-          CHECK_NOTNULL(evaluator);
-        }
-        break;
-      }
+      break;
     }
-    if (evaluator != nullptr) {
-      evaluator->Evaluate(obstacle);
+    case PerceptionObstacle::BICYCLE: {
+      if (obstacle->IsOnLane()) {
+        evaluator = GetEvaluator(cyclist_on_lane_evaluator_);
+        CHECK_NOTNULL(evaluator);
+      }
+      break;
     }
+    case PerceptionObstacle::PEDESTRIAN: {
+      break;
+    }
+    default: {
+      if (obstacle->IsOnLane()) {
+        evaluator = GetEvaluator(default_on_lane_evaluator_);
+        CHECK_NOTNULL(evaluator);
+      }
+      break;
+    }
+  }
+  if (evaluator != nullptr) {
+    evaluator->Evaluate(obstacle);
   }
 }
 
