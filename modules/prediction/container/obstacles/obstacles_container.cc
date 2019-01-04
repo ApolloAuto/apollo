@@ -129,31 +129,33 @@ void ObstaclesContainer::Clear() {
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
   // Sanity checks.
-  int pred_id = perception_obstacle.id();
-  if (curr_frame_id_mapping_.find(pred_id) != curr_frame_id_mapping_.end()) {
-    pred_id = curr_frame_id_mapping_[pred_id];
-    ADEBUG << "Prediction_id is: " << pred_id;
+  int prediction_id = perception_obstacle.id();
+  if (curr_frame_id_mapping_.find(prediction_id) !=
+      curr_frame_id_mapping_.end()) {
+    prediction_id = curr_frame_id_mapping_[prediction_id];
+    ADEBUG << "Prediction_id is: " << prediction_id;
   }
-  if (pred_id < -1) {
-    AERROR << "Invalid ID [" << pred_id << "]";
+  if (prediction_id < -1) {
+    AERROR << "Invalid ID [" << prediction_id << "]";
     return;
   }
   if (!IsPredictable(perception_obstacle)) {
-    ADEBUG << "Perception obstacle [" << pred_id << "] is not predictable.";
+    ADEBUG << "Perception obstacle [" << prediction_id
+           << "] is not predictable.";
     return;
   }
 
   // Insert the obstacle and also update the LRUCache.
-  curr_frame_predictable_obstacle_ids_.push_back(pred_id);
-  Obstacle* obstacle_ptr = obstacles_.Get(pred_id);
+  curr_frame_predictable_obstacle_ids_.push_back(prediction_id);
+  Obstacle* obstacle_ptr = obstacles_.Get(prediction_id);
   if (obstacle_ptr != nullptr) {
-    obstacle_ptr->Insert(perception_obstacle, timestamp, pred_id);
-    ADEBUG << "Refresh obstacle [" << pred_id << "]";
+    obstacle_ptr->Insert(perception_obstacle, timestamp, prediction_id);
+    ADEBUG << "Refresh obstacle [" << prediction_id << "]";
   } else {
     Obstacle obstacle;
-    obstacle.Insert(perception_obstacle, timestamp, pred_id);
-    obstacles_.Put(pred_id, std::move(obstacle));
-    ADEBUG << "Insert obstacle [" << pred_id << "]";
+    obstacle.Insert(perception_obstacle, timestamp, prediction_id);
+    obstacles_.Put(prediction_id, std::move(obstacle));
+    ADEBUG << "Insert obstacle [" << prediction_id << "]";
   }
 }
 
@@ -179,39 +181,40 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
   // Go through every obstacle in the current frame, after some
   // sanity checks, build current_frame_id_mapping for every obstacle
 
-  std::unordered_set<int> seen_percept_ids_;
+  std::unordered_set<int> seen_perception_ids;
   // Loop all precept_id and find those in obstacles_LRU
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
-    int percept_id = perception_obstacle.id();
-    if (GetObstacle(percept_id) != nullptr) {
-      seen_percept_ids_.insert(percept_id);
+    int perception_id = perception_obstacle.id();
+    if (GetObstacle(perception_id) != nullptr) {
+      seen_perception_ids.insert(perception_id);
     }
   }
 
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
-    int percept_id = perception_obstacle.id();
-    curr_frame_id_mapping_[percept_id] = percept_id;
-    if (seen_percept_ids_.find(percept_id) != seen_percept_ids_.end()) {
-      // find this percept_id in LRUCache, treat it as a tracked obstacle
+    int perception_id = perception_obstacle.id();
+    curr_frame_id_mapping_[perception_id] = perception_id;
+    if (seen_perception_ids.find(perception_id) != seen_perception_ids.end()) {
+      // find this perception_id in LRUCache, treat it as a tracked obstacle
       continue;
     }
-    std::unordered_set<int> seen_pred_ids_;
-    int pred_id = 0;
-    if (id_mapping_.GetCopy(percept_id, &pred_id)) {
-      if (seen_percept_ids_.find(pred_id) != seen_percept_ids_.end()) {
-        // find this percept_id in LRUMapping, map it to an old tracked obstacle
-        curr_frame_id_mapping_[percept_id] = pred_id;
-        seen_pred_ids_.insert(pred_id);
+    std::unordered_set<int> seen_prediction_ids;
+    int prediction_id = 0;
+    if (id_mapping_.GetCopy(perception_id, &prediction_id)) {
+      if (seen_perception_ids.find(prediction_id) !=
+          seen_perception_ids.end()) {
+        // find this perception_id in LRUMapping, map it to a tracked obstacle
+        curr_frame_id_mapping_[perception_id] = prediction_id;
+        seen_prediction_ids.insert(prediction_id);
       }
     } else {  // process adaption
       common::util::Node<int, Obstacle>* curr = obstacles_.First();
       while (curr != nullptr) {
         int obs_id = curr->key;
         curr = curr->next;
-        if (seen_percept_ids_.find(obs_id) != seen_percept_ids_.end() ||
-            seen_pred_ids_.find(obs_id) != seen_pred_ids_.end()) {
+        if (seen_perception_ids.find(obs_id) != seen_perception_ids.end() ||
+            seen_prediction_ids.find(obs_id) != seen_prediction_ids.end()) {
           // this obs_id has already been processed
           continue;
         }
@@ -225,8 +228,8 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
           break;
         }
         if (AdaptTracking(perception_obstacle, obstacle_ptr)) {
-          id_mapping_[percept_id] = obs_id;
-          curr_frame_id_mapping_[percept_id] = obs_id;
+          id_mapping_[perception_id] = obs_id;
+          curr_frame_id_mapping_[perception_id] = obs_id;
           break;
         }
       }
