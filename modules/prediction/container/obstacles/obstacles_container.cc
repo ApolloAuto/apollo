@@ -73,11 +73,10 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
 
-  // Prediction tracking adaption
+  // Prediction tracking adaptation
   // TODO(Hongyi) move this a gflag
-  if (true) {
+  if (false) {
     BuildCurrentFrameIdMapping(perception_obstacles);
-
   }
 
   // Set up the ObstacleClusters:
@@ -130,8 +129,11 @@ void ObstaclesContainer::Clear() {
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
   // Sanity checks.
-  int pred_id = curr_frame_id_mapping_[perception_obstacle.id()];
-  ADEBUG << "Prediction_id is: " << pred_id;
+  int pred_id = perception_obstacle.id();
+  if (curr_frame_id_mapping_.find(pred_id) != curr_frame_id_mapping_.end()) {
+    pred_id = curr_frame_id_mapping_[pred_id];
+    ADEBUG << "Prediction_id is: " << pred_id;
+  }
   if (pred_id < -1) {
     AERROR << "Invalid ID [" << pred_id << "]";
     return;
@@ -265,13 +267,13 @@ bool ObstaclesContainer::AdaptTracking(
       perception_obstacle.type() != obstacle_ptr->type()) {
     // different obstacle type, can't be same obstacle
     return false;
-  } 
+  }
   // TODO(Hongyi) test position with trajectory position
   if (perception_obstacle.has_position()) {
     if (perception_obstacle.position().has_x() &&
         perception_obstacle.position().has_y()) {
-      double dist = std::hypot(perception_obstacle.position().x(),
-                               perception_obstacle.position().y());
+      // double dist = std::hypot(perception_obstacle.position().x(),
+      //                          perception_obstacle.position().y());
     }
   }
   return true;
