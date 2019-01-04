@@ -142,8 +142,9 @@ class NavigationLane {
   // when invalid, right_width_ < 0
   double perceived_right_width_ = -1.0;
 
-  double default_left_width_ = 1.75;
-  double default_right_width_ = 1.75;
+  // The standard lane width of China's expressway is 3.75 meters.
+  double default_left_width_ = 1.875;
+  double default_right_width_ = 1.875;
 
   // key: line index,
   // value: last projection index pair in the "key" line.
