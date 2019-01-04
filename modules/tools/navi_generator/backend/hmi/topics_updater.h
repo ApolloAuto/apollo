@@ -66,6 +66,8 @@ class TopicsUpdater {
   void StartBroadcastHMIStatusThread();
   void DeferredBroadcastHMIStatus();
 
+  bool ParseProcessRequest(const nlohmann::json &json);
+
  private:
   NaviGeneratorWebSocket *websocket_ = nullptr;
 
