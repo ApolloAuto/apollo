@@ -46,6 +46,7 @@ constexpr double kMinDist = 0.5;
 constexpr double kEpsilon = 0.001;
 // kSinsRadToDeg = 180 / pi
 constexpr double kSinsRadToDeg = 57.295779513;
+constexpr int kUtmZoneId = 49;
 }  // namespace
 
 bool NavigationMatcher::MatchWayWithPos(
@@ -187,8 +188,11 @@ bool NavigationMatcher::FindMinDist(
     int index = std::distance(std::begin(min_dist_vector), min_distance);
     *line_num = min_linenum_vector[index];
     *way_id = min_way_id_vector[index];
-    found_pos->log = min_x_vector[index];
-    found_pos->lat = min_y_vector[index];
+    apollo::localization::msf::WGS84Corr wgs84;
+    UtmXYToLatlon(min_x_vector[index], min_y_vector[index], kUtmZoneId, false,
+                  &wgs84);
+    found_pos->lat = wgs84.lat * kSinsRadToDeg;
+    found_pos->log = wgs84.log * kSinsRadToDeg;
   } else {
     AERROR << "There is no min_dist_vector";
     return false;
