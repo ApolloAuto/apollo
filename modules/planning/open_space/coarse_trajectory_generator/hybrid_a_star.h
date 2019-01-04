@@ -111,7 +111,7 @@ class HybridAStar {
   common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   size_t next_node_num_ = 0;
-  double max_steer_ = 0.0;
+  double max_steer_angle_ = 0.0;
   double step_size_ = 0.0;
   double xy_grid_resolution_ = 0.0;
   double delta_t_ = 0.0;

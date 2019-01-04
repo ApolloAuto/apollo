@@ -41,7 +41,6 @@ message WarmStartConfig {
   optional double heu_rs_gear_switch_penalty = 12 [default = 10.0];
   optional double heu_rs_steer_penalty = 13 [default = 100.0];
   optional double heu_rs_steer_change_penalty = 14 [default = 10.0];
-  optional double max_steering = 15 [default = 0.6];
 }
 
 message DualVariableWarmStartConfig {
@@ -58,16 +57,14 @@ message DistanceApproachConfig {
   repeated double weight_stitching = 4;
   repeated double weight_time = 5;
   optional double min_safety_distance = 6 [default = 0.0];
-  optional double max_steer_rate = 7 [default = 0.6];
-  optional double max_speed_forward = 8 [default = 3.0];
-  optional double max_speed_reverse = 9 [default = 2.0];
-  optional double max_acceleration_forward = 10 [default = 2.0];
-  optional double max_acceleration_reverse = 11 [default = 2.0];
-  optional double min_time_sample_scaling = 12 [default = 0.1];
-  optional double max_time_sample_scaling = 13 [default = 10.0];
-  optional bool use_fix_time = 14 [default = false];
-  optional IpoptConfig ipopt_config = 15;
-  optional double max_steer_angle = 16 [default = 0.6];
+  optional double max_speed_forward = 7 [default = 3.0];
+  optional double max_speed_reverse = 8 [default = 2.0];
+  optional double max_acceleration_forward = 9 [default = 2.0];
+  optional double max_acceleration_reverse = 10 [default = 2.0];
+  optional double min_time_sample_scaling = 11 [default = 0.1];
+  optional double max_time_sample_scaling = 12 [default = 10.0];
+  optional bool use_fix_time = 13 [default = false];
+  optional IpoptConfig ipopt_config = 14;
 }
 
 message IpoptConfig {
