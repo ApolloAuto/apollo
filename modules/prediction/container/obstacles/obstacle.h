@@ -60,7 +60,7 @@ class Obstacle {
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
   void Insert(const perception::PerceptionObstacle& perception_obstacle,
-              const double timestamp);
+              const double timestamp, int pred_id);
 
   /**
    * @brief Get the type of perception obstacle's type.
@@ -220,13 +220,13 @@ class Obstacle {
 
  private:
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
-                 double timestamp, Feature* feature);
+                 double timestamp, Feature* feature, int pred_id);
 
   void UpdateStatus(Feature* feature);
 
   common::ErrorCode SetId(
       const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+      Feature* feature, int pred_id = -1);
 
   common::ErrorCode SetType(
       const perception::PerceptionObstacle& perception_obstacle,
