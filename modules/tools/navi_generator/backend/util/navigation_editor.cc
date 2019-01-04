@@ -23,11 +23,12 @@
 
 #include <cmath>
 #include <cstdio>
-#include <memory>
-#include <string>
-#include <vector>
+#include <functional>
+#include <utility>
 
+#include "google/protobuf/util/json_util.h"
 #include "modules/common/log.h"
+#include "modules/common/util/util.h"
 #include "modules/tools/navi_generator/backend/util/file_operator.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_converter.h"
 
@@ -40,17 +41,33 @@ const char kWebSocketTypeCorrectDeviation[] = "requestCorrectRoadDeviation";
 const char kWebSocketTypeSaveCorrection[] = "requestSaveRoadCorrection";
 const char kWebSocketTypeModifySpeedLmit[] = "requestModifySpeedLimit";
 const char kWebSocketTypeSaveSpeedLimit[] = "requestSaveSpeedLimitCorrection";
+const size_t kProcessedSuccessfully = 10000;
+const size_t kProcessedFailed = 10001;
 }  // namespace
 
+using google::protobuf::util::MessageToJsonString;
 using std::placeholders::_1;  // for _1, _2, _3...
 
-NavigationEditor::NavigationEditor(UPDATE_FRONTEND_FUNC task, void* gui_service)
-    : update_gui_task_(std::bind(task, _1, gui_service)) {}
+NavigationEditor::NavigationEditor(UPDATE_FRONTEND_FUNC update_task,
+                                   void* gui_service)
+    : update_frontend_thread_(std::make_unique<std::thread>(
+          &NavigationEditor::UpdateFrontendThread, this)),
+      update_frontend_func_(std::bind(update_task, _1, gui_service)),
+      update_frontend_finished_(false) {}
+
+NavigationEditor::~NavigationEditor() {
+  update_frontend_finished_ = true;
+  if (update_frontend_thread_ && update_frontend_thread_->joinable()) {
+    update_frontend_thread_->join();
+  }
+}
 
 bool NavigationEditor::CorrectDeviation(
     const std::map<std::uint16_t, FileInfo>& processed_file_info) {
+  std::string response_msg = "Failed to correct road deviation.";
   if (processed_file_info.empty()) {
-    AWARN << "Not found any processed file.";
+    ResponseToFrontEnd(kWebSocketTypeCorrectDeviation, response_msg,
+                       kProcessedFailed);
     return false;
   }
   processed_file_info_s_.clear();
@@ -59,11 +76,13 @@ bool NavigationEditor::CorrectDeviation(
   FileInfo file_info_start = item_first->second;
   std::vector<apollo::localization::msf::WGS84Corr> waypoints;
   if (!FindWayPoint(file_info_start, &waypoints)) {
-    AWARN << "Not found way points.";
+    ResponseToFrontEnd(kWebSocketTypeCorrectDeviation, response_msg,
+                       kProcessedFailed);
     return false;
   }
   if (waypoints.empty()) {
-    AWARN << "Way points is empty.";
+    ResponseToFrontEnd(kWebSocketTypeCorrectDeviation, response_msg,
+                       kProcessedFailed);
     return false;
   }
   apollo::localization::msf::WGS84Corr start_point = waypoints.front();
@@ -71,19 +90,26 @@ bool NavigationEditor::CorrectDeviation(
   FileInfo file_info_end = item_last->second;
   waypoints.clear();
   if (!FindWayPoint(file_info_end, &waypoints)) {
-    AWARN << "Not found way points.";
+    ResponseToFrontEnd(kWebSocketTypeCorrectDeviation, response_msg,
+                       kProcessedFailed);
     return false;
   }
   if (waypoints.empty()) {
-    AWARN << "Way points is empty.";
+    ResponseToFrontEnd(kWebSocketTypeCorrectDeviation, response_msg,
+                       kProcessedFailed);
     return false;
   }
   apollo::localization::msf::WGS84Corr end_point = waypoints.back();
+  start_point_ = start_point;
+  end_point_ = end_point;
   if (!CorrectDeviation(start_point, end_point)) {
-    AWARN << "Correct road deviation failed.";
+    ResponseToFrontEnd(kWebSocketTypeCorrectDeviation, response_msg,
+                       kProcessedFailed);
     return false;
   }
-  AINFO << "Correct road deviation success.";
+  response_msg = "Corrected road deviation successfully.";
+  ResponseToFrontEnd(kWebSocketTypeCorrectDeviation, response_msg,
+                     kProcessedSuccessfully);
   return true;
 }
 
@@ -94,11 +120,11 @@ bool NavigationEditor::CorrectDeviation(
   std::vector<Way> route;
   std::uint64_t start_line_number = 1, end_line_number = 1;
   std::uint64_t start_way_id = 0, end_way_id = 0;
-
+  need_split_ = true;
   // Find route with start and end position
   if (!FindRouteWithPos(&db_operator, start_point, end_point,
                         &start_line_number, &end_line_number, &route)) {
-    AWARN << "Not found route with start and end position.";
+    AWARN << "Not find route with start and end position.";
     return false;
   }
   if (route.empty()) {
@@ -111,7 +137,6 @@ bool NavigationEditor::CorrectDeviation(
 
   start_way_id = route.front().way_id;
   end_way_id = route.back().way_id;
-
   // Update start and end way
   if (!SplitStartEndWay(&db_operator, start_way_id, end_way_id,
                         start_line_number, end_line_number)) {
@@ -129,14 +154,17 @@ bool NavigationEditor::ModifySpeedLimit(
   std::vector<Way> route;
   std::uint64_t start_line_number = 1, end_line_number = 1;
   std::uint64_t start_way_id = 0, end_way_id = 0;
+  std::string response_msg = "Failed to modify speed limit.";
   // Find route with start and end position
   if (!FindRouteWithPos(&db_operator, start_point, end_point,
                         &start_line_number, &end_line_number, &route)) {
-    AWARN << "Not found route with start and end position.";
+    ResponseToFrontEnd(kWebSocketTypeModifySpeedLmit, response_msg,
+                       kProcessedFailed);
     return false;
   }
   if (route.empty()) {
-    AWARN << "Founded route is empty.";
+    ResponseToFrontEnd(kWebSocketTypeModifySpeedLmit, response_msg,
+                       kProcessedFailed);
     return false;
   }
   // Backup route
@@ -145,33 +173,42 @@ bool NavigationEditor::ModifySpeedLimit(
 
   start_way_id = route.front().way_id;
   end_way_id = route.back().way_id;
+
+  start_point_ = start_point;
+  end_point_ = end_point;
   // Update start and end way
   if (!SplitStartEndWay(&db_operator, start_way_id, end_way_id,
                         start_line_number, end_line_number)) {
-    AWARN << "Update start and end way failed.";
+    ResponseToFrontEnd(kWebSocketTypeModifySpeedLmit, response_msg,
+                       kProcessedFailed);
     return false;
   }
   new_speed_min_ = new_speed_min;
   new_speed_max_ = new_speed_max;
 
+  response_msg = "Modified speed limit successfully.";
+  ResponseToFrontEnd(kWebSocketTypeModifySpeedLmit, response_msg,
+                     kProcessedSuccessfully);
   return true;
 }
 
 bool NavigationEditor::SaveRoadCorrection(
     TrajectoryProcessor* const trajectory_processor) {
+  std::string response_msg = "Failed to save road deviation.";
   if (processed_file_info_s_.empty()) {
-    AWARN << "Not any processed files data to save.";
+    ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                       kProcessedFailed);
     return false;
   }
   DBOperator db_operator;
   // Delete old route way
   if (!DeleteOldRoute(&db_operator)) {
-    AWARN << "Delete database route failed.";
+    ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                       kProcessedFailed);
     return false;
   }
   // Save new way
   new_route_.clear();
-  AINFO << "Processed files size " << processed_file_info_s_.size();
   Way last_way;
   for (auto item = processed_file_info_s_.begin();
        item != processed_file_info_s_.end();) {
@@ -179,22 +216,26 @@ bool NavigationEditor::SaveRoadCorrection(
 
     if (!trajectory_processor->SaveWay(&db_operator, last_way, item->second,
                                        &way)) {
-      AWARN << "Save way failed,way id is " << way.way_id;
+      ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                         kProcessedFailed);
       return false;
     }
     if (!trajectory_processor->SaveWayNodes(&db_operator, way.way_id,
                                             item->second)) {
-      AWARN << "Save way nodes failed,way id is " << way.way_id;
+      ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                         kProcessedFailed);
       return false;
     }
     if (!trajectory_processor->SaveWayData(&db_operator, way.way_id,
                                            item->second)) {
-      AWARN << "Save way data failed,way id is " << way.way_id;
+      ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                         kProcessedFailed);
       return false;
     }
     if (!trajectory_processor->SaveNaviData(&db_operator, way.way_id,
                                             item->second)) {
-      AWARN << "Save navigation data failed,way id is " << way.way_id;
+      ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                         kProcessedFailed);
       return false;
     }
     last_way = way;
@@ -203,20 +244,25 @@ bool NavigationEditor::SaveRoadCorrection(
   }
   // Update start and end way
   if (!UpdateStartEndWay(&db_operator, true)) {
-    AWARN << "Update start and end way failed.";
+    ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                       kProcessedFailed);
     return false;
   }
   // Update new route
   if (!UpdateNewRoute(&db_operator)) {
-    AWARN << "Update new route failed.";
+    ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                       kProcessedFailed);
     return false;
   }
-  AINFO << "Save road correction success.";
+  response_msg = "Saved road deviation successfully.";
+  ResponseToFrontEnd(kWebSocketTypeSaveCorrection, response_msg,
+                     kProcessedSuccessfully);
   return true;
 }
 
 bool NavigationEditor::SaveSpeedLimit() {
   // Update way speed limit
+  std::string response_msg = "Failed to save correction speed limit.";
   DBOperator db_operator;
   for (auto& route_way : db_route_) {
     if ((route_way.way_id == start_way_navi_info_.way_id) ||
@@ -225,14 +271,20 @@ bool NavigationEditor::SaveSpeedLimit() {
     }
     if (!db_operator.UpdateWaySpeedLimit(route_way.way_id, new_speed_min_,
                                          new_speed_max_)) {
-      AWARN << "Update way speed limit failed.";
+      ResponseToFrontEnd(kWebSocketTypeSaveSpeedLimit, response_msg,
+                         kProcessedSuccessfully);
       return false;
     }
   }
   // Update start and end way
   if (!UpdateStartEndWay(&db_operator, false)) {
+    ResponseToFrontEnd(kWebSocketTypeSaveSpeedLimit, response_msg,
+                       kProcessedSuccessfully);
     return false;
   }
+  response_msg = "Saved correction speed limit successfully.";
+  ResponseToFrontEnd(kWebSocketTypeSaveSpeedLimit, response_msg,
+                     kProcessedSuccessfully);
   return true;
 }
 
@@ -253,7 +305,7 @@ bool NavigationEditor::FindWayPoint(
     return false;
   }
   if (smoothed_points.empty()) {
-    AWARN << "Not found any smoothed points.";
+    AWARN << "Not find any smoothed points.";
     return false;
   }
 
@@ -313,7 +365,9 @@ bool NavigationEditor::SplitNaviData(DBOperator* const db_operator,
       AWARN << "Split navigation data failed.";
       return false;
     }
-    new_navi_info->navi_data.emplace_back(navi_data);
+    if (!navi_data.data.empty()) {
+      new_navi_info->navi_data.emplace_back(navi_data);
+    }
     // Reomve temporary file
     if (remove(file_name.c_str())) {
       AWARN << "Remove navigation data file " << file_name.c_str()
@@ -414,8 +468,28 @@ bool NavigationEditor::FindRouteWithPos(
     AWARN << "No route with start and end way.";
     return false;
   }
+  // Line number index starting from 1.
+  if (*start_line_number < 1) {
+    *start_line_number = 1;
+  }
+  if (*end_line_number < 1) {
+    *end_line_number = 1;
+  }
+  return true;
+}
 
-  AINFO << "Found a route with position success.";
+bool NavigationEditor::FindMinMaxLineNumber(
+    DBOperator* const db_operator, const std::uint64_t way_id,
+    std::uint64_t* const min_line_number,
+    std::uint64_t* const max_line_number) {
+  // Query way node.
+  WayNodes way_node;
+  if (!db_operator->QueryWayNodesWithWayId(way_id, &way_node)) {
+    AWARN << "Query way node failed.";
+    return false;
+  }
+  *min_line_number = way_node.nodes.front().data_line_number;
+  *max_line_number = way_node.nodes.back().data_line_number;
   return true;
 }
 
@@ -424,6 +498,30 @@ bool NavigationEditor::SplitStartEndWay(DBOperator* const db_operator,
                                         const std::uint64_t end_way_id,
                                         const std::uint64_t start_line_number,
                                         const std::uint64_t end_line_number) {
+  // Check wheter need split
+  if (start_way_id == end_way_id) {
+    std::uint64_t min_line_number = 0, max_line_number = 0;
+    if (!FindMinMaxLineNumber(db_operator, start_way_id, &min_line_number,
+                              &max_line_number)) {
+      AWARN << "Find way " << start_way_id << " min line number "
+            << min_line_number << "max line number " << max_line_number
+            << "failed.";
+      return false;
+    }
+    if ((start_line_number == min_line_number) &&
+        (end_line_number == max_line_number)) {
+      need_split_ = false;
+      AINFO << "No need to split way " << start_way_id;
+      Way way;
+      if (!db_operator->QueryWayWithWayId(start_way_id, &way)) {
+        AWARN << "Query start way failed.";
+        return false;
+      }
+      replaced_way_ = way;
+      return true;
+    }
+  }
+
   // Split start/end navigation data.
   start_way_nodes_.way_id = start_way_id;
   start_way_nodes_.nodes.clear();
@@ -431,7 +529,7 @@ bool NavigationEditor::SplitStartEndWay(DBOperator* const db_operator,
   start_way_navi_info_.navi_data.clear();
   if (!SplitWayNodes(db_operator, start_way_id, start_line_number,
                      kOrientationForward, &start_way_nodes_)) {
-    AWARN << "Split start navigation data failed.";
+    AWARN << "Split start way nodes failed.";
     return false;
   }
   if (!SplitNaviData(db_operator, start_way_id, start_line_number,
@@ -460,26 +558,41 @@ bool NavigationEditor::UpdateStartEndWay(DBOperator* const db_operator,
                                          const bool is_update_way) {
   CHECK_NOTNULL(db_operator);
   // Update way nodes
-  if (!db_operator->UpdateWayNodes(start_way_nodes_.way_id, start_way_nodes_)) {
-    AWARN << "Update start way nodes failed.";
-    return false;
-  }
-  if (!db_operator->UpdateWayNodes(end_way_nodes_.way_id, end_way_nodes_)) {
-    AWARN << "Update end way nodes failed.";
-    return false;
-  }
-  // Update start/end way navigation data.
-  if (!db_operator->UpdateNaviData(start_way_navi_info_.way_id,
-                                   start_way_navi_info_)) {
-    AWARN << "Update start way navigation data failed.";
-    return false;
-  }
-  if (!db_operator->UpdateNaviData(end_way_navi_info_.way_id,
-                                   end_way_navi_info_)) {
-    AWARN << "Update end way navigation data failed.";
-    return false;
+  if (!need_split_) {
+    AINFO << "No need to update.";
+    return true;
   }
 
+  if (!start_way_nodes_.nodes.empty()) {
+    if (!db_operator->UpdateWayNodes(start_way_nodes_.way_id,
+                                     start_way_nodes_)) {
+      AWARN << "Update start way nodes failed.";
+      return false;
+    }
+  }
+
+  if (!end_way_nodes_.nodes.empty()) {
+    if (!db_operator->UpdateWayNodes(end_way_nodes_.way_id, end_way_nodes_)) {
+      AWARN << "Update end way nodes failed.";
+      return false;
+    }
+  }
+  // Update start/end way navigation data.
+  if (!start_way_navi_info_.navi_data.empty()) {
+    if (!db_operator->UpdateNaviData(start_way_navi_info_.way_id,
+                                     start_way_navi_info_)) {
+      AWARN << "Update start way navigation data failed.";
+      return false;
+    }
+  }
+
+  if (!end_way_navi_info_.navi_data.empty()) {
+    if (!db_operator->UpdateNaviData(end_way_navi_info_.way_id,
+                                     end_way_navi_info_)) {
+      AWARN << "Update end way navigation data failed.";
+      return false;
+    }
+  }
   // Is needed update way?
   if (is_update_way) {
     // Query start/end way.
@@ -518,8 +631,13 @@ bool NavigationEditor::UpdateNewRoute(DBOperator* const db_operator) {
   Way new_way_head = new_route_.front();
   Way new_way_tail = new_route_.back();
 
-  new_way_head.pre_way_id = start_way_navi_info_.way_id;
-  new_way_tail.next_way_id = end_way_navi_info_.way_id;
+  if (!need_split_) {
+    new_way_head.pre_way_id = replaced_way_.pre_way_id;
+    new_way_tail.next_way_id = replaced_way_.next_way_id;
+  } else {
+    new_way_head.pre_way_id = start_way_navi_info_.way_id;
+    new_way_tail.next_way_id = end_way_navi_info_.way_id;
+  }
 
   if (!db_operator->UpdateWay(new_way_head.way_id, new_way_head)) {
     AWARN << "Update new way head failed.";
@@ -530,21 +648,21 @@ bool NavigationEditor::UpdateNewRoute(DBOperator* const db_operator) {
     return false;
   }
   // Push start and end way to new route
-  Way start_way, end_way;
-  if (!db_operator->QueryWayWithWayId(start_way_navi_info_.way_id,
-                                      &start_way)) {
-    AWARN << "Query start way failed.";
-    return false;
+  if (need_split_) {
+    Way start_way, end_way;
+    if (!db_operator->QueryWayWithWayId(start_way_navi_info_.way_id,
+                                        &start_way)) {
+      AWARN << "Query start way failed.";
+      return false;
+    }
+    if (!db_operator->QueryWayWithWayId(end_way_navi_info_.way_id, &end_way)) {
+      AWARN << "Query end way failed.";
+      return false;
+    }
+    new_route_.insert(new_route_.begin(), start_way);
+    new_route_.emplace_back(end_way);
   }
-  if (!db_operator->QueryWayWithWayId(end_way_navi_info_.way_id, &end_way)) {
-    AWARN << "Query end way failed.";
-    return false;
-  }
-  new_route_.insert(new_route_.begin(), start_way);
-  new_route_.emplace_back(end_way);
-
   AINFO << "Update new route success.";
-
   return true;
 }
 bool NavigationEditor::DeleteOldRoute(DBOperator* const db_operator) {
@@ -554,9 +672,11 @@ bool NavigationEditor::DeleteOldRoute(DBOperator* const db_operator) {
     return true;
   }
   for (auto route_way : db_route_) {
-    if ((route_way.way_id == start_way_navi_info_.way_id) ||
-        (route_way.way_id == end_way_navi_info_.way_id)) {
-      continue;
+    if (need_split_) {
+      if ((route_way.way_id == start_way_navi_info_.way_id) ||
+          (route_way.way_id == end_way_navi_info_.way_id)) {
+        continue;
+      }
     }
     if (!db_operator->DeleteWay(route_way.way_id)) {
       AWARN << "Delete way failed.";
@@ -566,11 +686,177 @@ bool NavigationEditor::DeleteOldRoute(DBOperator* const db_operator) {
   return true;
 }
 
-bool NavigationEditor::ResponseToFrontEnd() {
-  // TODO(*): response to frontend.
-  std::string msg;
-  update_gui_task_(msg);
+bool NavigationEditor::ResponseToFrontEnd(const std::string& type,
+                                          const std::string& msg, int success) {
+  NaviResponse response;
+  response.set_type(type);
+  NaviSummary* result = response.mutable_result();
+  result->set_success(success);
+  result->set_msg(msg);
+  if (success == 10000) {
+    if (type == kWebSocketTypeCorrectDeviation) {
+      // Fill navigation data to response
+      NaviRoutePlans* res_data = response.mutable_res_data();
+      if (!GetResponseDataByFile(res_data)) {
+        AWARN << "Get Response data failed.";
+        return false;
+      }
+    } else if (type == kWebSocketTypeModifySpeedLmit) {
+      // Fill navigation data to response
+      NaviRoutePlans* res_data = response.mutable_res_data();
+      if (!GetResponseDataByDatabase(res_data)) {
+        AWARN << "Get Response data failed.";
+        return false;
+      }
+    } else {
+      // Nothing to do
+    }
+  }
+  // Inform to frontend.
+  std::string response_str;
+  if (!MessageToJsonString(response, &response_str).ok()) {
+    AWARN << "Navigation response message to json string failed.";
+    return false;
+  }
+  {
+    std::lock_guard<std::mutex> update_frontend_lock(update_frontend_mut_);
+    update_frontend_tasks_.emplace_back(
+        std::bind(update_frontend_func_, response_str));
+  }
+  update_frontend_cv_.notify_one();
   return true;
+}
+
+bool NavigationEditor::GetResponseDataByFile(
+    NaviRoutePlans* const response_data) {
+  // Set start point.
+  NaviWGS84Corr* start_point = response_data->mutable_start();
+  start_point->set_lng(start_point_.log);
+  start_point->set_lat(start_point_.lat);
+  // Set end point.
+  NaviWGS84Corr* end_point = response_data->mutable_end();
+  end_point->set_lng(end_point_.log);
+  end_point->set_lat(end_point_.lat);
+  // Set number of plans and plane index.
+  response_data->set_num_plans(1);
+  // Add route plans.
+  NaviRoutePlan* navi_route_plan = response_data->add_route_plans();
+  navi_route_plan->set_route_plan_index(0);
+  navi_route_plan->set_num_routes(processed_file_info_s_.size());
+  std::uint64_t route_index = 0;
+  // Add routes into navigation route plans.
+  for (auto item = processed_file_info_s_.begin();
+       item != processed_file_info_s_.end(); item++) {
+    FileInfo file_info = item->second;
+
+    NaviRoute* navi_route = navi_route_plan->add_routes();
+    navi_route->set_route_index(route_index);
+    navi_route->set_speed_min(file_info.speed_min);
+    navi_route->set_speed_max(file_info.speed_max);
+    navi_route->set_num_navis(file_info.navi_files.size());
+    route_index++;
+    // Add navigation path into route.
+    for (auto& navi_file : file_info.navi_files) {
+      NaviPath* navi_path = navi_route->add_navis();
+      navi_path->set_navi_index(navi_file.navi_index);
+
+      std::vector<planning::ReferencePoint> smoothed_points;
+      FileOperator file_operator;
+      if (!file_operator.Import(navi_file.navi_file_name, &smoothed_points)) {
+        continue;
+      }
+      std::vector<apollo::localization::msf::WGS84Corr> waypoints;
+      TrajectoryConverter trajecotry_converter;
+      trajecotry_converter.ConvertSmoothedTrajectoryPointsToWGS84(
+          &smoothed_points, &waypoints);
+      // Add points into navigation path.
+      for (const auto& point : waypoints) {
+        NaviWGS84Corr* path = navi_path->add_path();
+        path->set_lng(point.log);
+        path->set_lat(point.lat);
+      }
+    }
+  }
+  return true;
+}
+
+bool NavigationEditor::GetResponseDataByDatabase(
+    NaviRoutePlans* const response_data) {
+  // Set start point.
+  NaviWGS84Corr* start_point = response_data->mutable_start();
+  start_point->set_lng(start_point_.log);
+  start_point->set_lat(start_point_.lat);
+  // Set end point.
+  NaviWGS84Corr* end_point = response_data->mutable_end();
+  end_point->set_lng(end_point_.log);
+  end_point->set_lat(end_point_.lat);
+  // Set number of plans and plane index.
+  response_data->set_num_plans(1);
+  // Add route plans.
+  NaviRoutePlan* navi_route_plan = response_data->add_route_plans();
+  navi_route_plan->set_route_plan_index(0);
+  navi_route_plan->set_num_routes(db_route_.size());
+  // Add routes into navigation route plans.
+  DBOperator db_operator;
+  for (std::size_t i = 0; i < db_route_.size(); ++i) {
+    NaviRoute* navi_route = navi_route_plan->add_routes();
+    std::vector<NaviData> navi_data;
+    if (!db_operator.QueryNaviDataWithWayId(db_route_[i].way_id, &navi_data)) {
+      AWARN << "Failed to query navigation data with way id";
+      return false;
+    }
+    navi_route->set_route_index(i);
+    navi_route->set_speed_min(new_speed_min_);
+    navi_route->set_speed_max(new_speed_max_);
+    navi_route->set_num_navis(navi_data.size());
+    // Add navigation path into route.
+    for (std::size_t j = 0; j < navi_data.size(); ++j) {
+      NaviPath* navi_path = navi_route->add_navis();
+      navi_path->set_navi_index(j);
+      FileOperator file_operator;
+      std::string file_name = "navi_" + std::to_string(j) + ".smoothed";
+      if (!file_operator.Export(file_name, navi_data[i].data)) {
+        continue;
+      }
+      std::vector<planning::ReferencePoint> smoothed_points;
+      if (!file_operator.Import(file_name, &smoothed_points)) {
+        continue;
+      }
+      std::vector<apollo::localization::msf::WGS84Corr> waypoints;
+      TrajectoryConverter trajecotry_converter;
+      trajecotry_converter.ConvertSmoothedTrajectoryPointsToWGS84(
+          &smoothed_points, &waypoints);
+      // Add points into navigation path.
+      for (const auto& point : waypoints) {
+        NaviWGS84Corr* path = navi_path->add_path();
+        path->set_lng(point.log);
+        path->set_lat(point.lat);
+      }
+      // Reomve temporary file
+      if (remove(file_name.c_str())) {
+        AWARN << "Remove navigation data file " << file_name.c_str()
+              << " failed.";
+      }
+    }
+  }
+  return true;
+}
+void NavigationEditor::UpdateFrontendThread() {
+  while (!update_frontend_finished_) {
+    std::unique_lock<std::mutex> lock(update_frontend_mut_);
+    update_frontend_cv_.wait(lock, [this]() {
+      return !update_frontend_tasks_.empty() || update_frontend_finished_;
+    });
+    if (update_frontend_tasks_.empty()) {
+      continue;
+    }
+    auto task = std::move(update_frontend_tasks_.front());
+    update_frontend_tasks_.pop_front();
+
+    lock.unlock();
+    // Update the frontend display.
+    task();
+  }
 }
 
 }  // namespace util
