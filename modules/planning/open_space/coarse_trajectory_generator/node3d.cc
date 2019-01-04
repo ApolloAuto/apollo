@@ -80,7 +80,7 @@ Node3d::Node3d(std::vector<double> traversed_x, std::vector<double> traversed_y,
   phi_grid_ = static_cast<size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = static_cast<size_t>( 
+  index_ = static_cast<size_t>(
       static_cast<double>(phi_grid_) * (XYbounds[1] - XYbounds[0]) *
           (XYbounds[3] - XYbounds[2]) +
       static_cast<double>(y_grid_) * (XYbounds[1] - XYbounds[0]) +
