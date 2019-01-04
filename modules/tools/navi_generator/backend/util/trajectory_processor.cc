@@ -380,6 +380,14 @@ bool TrajectoryProcessor::ProcessFiles() {
 }
 
 bool TrajectoryProcessor::ProcessFile(const BagFileInfo& bag_file_info) {
+  double speed_min;
+  double speed_max;
+  TrajectoryConverter trajectory_converter;
+  if (!trajectory_converter.ExtractSpeedLimit(bag_file_info.raw_file_name,
+                                              &speed_min, &speed_max)) {
+    return false;
+  }
+
   wgs84_points_.clear();
   std::string smoothed_file_name;
   if (!ProcessBagFile(bag_file_info.raw_file_name,
@@ -395,7 +403,8 @@ bool TrajectoryProcessor::ProcessFile(const BagFileInfo& bag_file_info) {
   FileInfo file_info;
   file_info.bag_file_info = bag_file_info;
   file_info.navi_files = navi_files;
-  // TODO(*): set the speed limits
+  file_info.speed_min = static_cast<uint8_t>(speed_min);
+  file_info.speed_max = static_cast<uint8_t>(speed_max);
 
   // Inform the frontend the result.
   {

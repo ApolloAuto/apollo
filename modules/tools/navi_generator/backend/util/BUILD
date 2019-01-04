@@ -76,6 +76,7 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/reference_line:reference_line_provider",
         "//modules/tools/navi_generator/backend/common:navi_generator_gflags",
+        "//modules/tools/navi_generator/proto:trajectory_collector_proto",
     ],
 )
 
