@@ -40,6 +40,10 @@ class NavigationProvider {
   bool GetRoutePathAsJson(const nlohmann::json& expected_route,
                           const bool get_all_lane,
                           nlohmann::json* const matched_route);
+
+ private:
+  void GenerateFailuredResponse(const bool get_all_lane,
+                                nlohmann::json* const matched_route);
 };
 
 }  // namespace util

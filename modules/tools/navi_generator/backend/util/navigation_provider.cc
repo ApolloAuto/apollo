@@ -55,6 +55,7 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
   MapData map_data;
   if (!JsonStringToMessage(expected_route.dump(), &map_data).ok()) {
     AERROR << "Failed to convert Json to MapData";
+    GenerateFailuredResponse(get_all_lane, matched_route);
     return false;
   }
   std::uint64_t start_way_id;
@@ -70,6 +71,7 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
   point.lat = map_data.start().lat();
   if (!matcher.MatchWayWithPos(point, &start_way_id, &dump, &corr)) {
     AERROR << "Failed to find the starting point";
+    GenerateFailuredResponse(get_all_lane, matched_route);
     return false;
   }
   NaviWGS84Corr* start_corr = res_data->mutable_start();
@@ -79,6 +81,7 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
   point.lat = map_data.end().lat();
   if (!matcher.MatchWayWithPos(point, &end_way_id, &dump, &corr)) {
     AERROR << "Failed to find the end point";
+    GenerateFailuredResponse(get_all_lane, matched_route);
     return false;
   }
   NaviWGS84Corr* end_corr = res_data->mutable_end();
@@ -90,10 +93,12 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
   if (!dboperator.QueryRouteWithStartEndWay(start_way_id, end_way_id,
                                             &db_route)) {
     AERROR << "Failed to find route from the starting point to the end point";
+    GenerateFailuredResponse(get_all_lane, matched_route);
     return false;
   }
   if (!matcher.MatchRoute(map_data, db_route)) {
     AERROR << "Failed to find the expected route";
+    GenerateFailuredResponse(get_all_lane, matched_route);
     return false;
   }
   res_data->set_num_plans(1);
@@ -104,12 +109,14 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
   for (std::size_t i = 0; i < db_route.size(); ++i) {
     if (!dboperator.QueryWayWithWayId(db_route[i].way_id, &way)) {
       AERROR << "Failed to query way with way id";
+      GenerateFailuredResponse(get_all_lane, matched_route);
       return false;
     }
     std::vector<NaviData> navi_data_vec;
     if (!dboperator.QueryNaviDataWithWayId(db_route[i].way_id,
                                            &navi_data_vec)) {
       AERROR << "Failed to query navi data with way id";
+      GenerateFailuredResponse(get_all_lane, matched_route);
       return false;
     }
     if (!get_all_lane && navi_data_vec.size() > 1) {
@@ -147,10 +154,30 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
   std::string json_str;
   if (!MessageToJsonString(navi_response, &json_str).ok()) {
     AERROR << "Failed to convert from NaviGenResponse to Json";
+    GenerateFailuredResponse(get_all_lane, matched_route);
     return false;
   }
   *matched_route = Json::parse(json_str);
   return true;
+}
+
+void NavigationProvider::GenerateFailuredResponse(
+    const bool get_all_lane, nlohmann::json* const matched_route) {
+  NaviResponse navi_response;
+  navi_response.set_type("requestRoute");
+  NaviSummary* result = navi_response.mutable_result();
+  result->set_success(1);
+  if (get_all_lane) {
+    result->set_msg("No navigation found.");
+  } else {
+    result->set_msg("No route found.");
+  }
+  std::string json_str;
+  if (!MessageToJsonString(navi_response, &json_str).ok()) {
+    AERROR << "Failed to convert from NaviGenResponse to Json";
+  } else {
+    *matched_route = Json::parse(json_str);
+  }
 }
 
 }  // namespace util
