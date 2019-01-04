@@ -149,6 +149,17 @@ bool NavigationLane::GeneratePath() {
                                                     : default_left_width_;
     double right_width = perceived_right_width_ > 0.0 ? perceived_right_width_
                                                       : default_right_width_;
+    if (!IsFloatEqual(left_width, default_left_width_) &&
+        !IsFloatEqual(right_width, default_right_width_)) {
+      left_width = left_width > default_left_width_ ? left_width - min_d
+                                                    : left_width + min_d;
+      right_width = right_width > default_right_width_ ? right_width - min_d
+                                                       : right_width + min_d;
+    }
+
+    ADEBUG << "The left width of current lane is: " << left_width
+           << " and the right width of current lane is: " << right_width;
+
     std::get<1>(current_navi_path_tuple_) = left_width;
     std::get<2>(current_navi_path_tuple_) = right_width;
     auto curr_navi_path_iter = std::find_if(
@@ -375,34 +386,33 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
     }
   };
 
-  auto gen_navi_path_loop_func =
-      [this, &navigation_path, &enu_to_flu_func](
-          const int start, const int end, const double ref_s_base,
-          const double max_length, common::Path *path) {
-        CHECK_NOTNULL(path);
-        const double ref_s = navigation_path.path_point(start).s();
-        for (int i = start; i < end; ++i) {
-          auto *point = path->add_path_point();
-          point->CopyFrom(navigation_path.path_point(i));
+  auto gen_navi_path_loop_func = [this, &navigation_path, &enu_to_flu_func](
+      const int start, const int end, const double ref_s_base,
+      const double max_length, common::Path *path) {
+    CHECK_NOTNULL(path);
+    const double ref_s = navigation_path.path_point(start).s();
+    for (int i = start; i < end; ++i) {
+      auto *point = path->add_path_point();
+      point->CopyFrom(navigation_path.path_point(i));
 
-          double flu_x = 0.0;
-          double flu_y = 0.0;
-          double flu_theta = 0.0;
-          enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x,
-                          &flu_y, &flu_theta);
+      double flu_x = 0.0;
+      double flu_y = 0.0;
+      double flu_theta = 0.0;
+      enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x, &flu_y,
+                      &flu_theta);
 
-          point->set_x(flu_x);
-          point->set_y(flu_y);
-          point->set_theta(flu_theta);
-          const double accumulated_s =
-              navigation_path.path_point(i).s() - ref_s + ref_s_base;
-          point->set_s(accumulated_s);
+      point->set_x(flu_x);
+      point->set_y(flu_y);
+      point->set_theta(flu_theta);
+      const double accumulated_s =
+          navigation_path.path_point(i).s() - ref_s + ref_s_base;
+      point->set_s(accumulated_s);
 
-          if (accumulated_s > max_length) {
-            break;
-          }
-        }
-      };
+      if (accumulated_s > max_length) {
+        break;
+      }
+    }
+  };
 
   double dist = navigation_path.path_point().rbegin()->s() -
                 navigation_path.path_point(current_project_index).s();
@@ -615,13 +625,16 @@ void NavigationLane::ConvertLaneMarkerToPath(
     point->set_dkappa((k2 - k1) / 0.0002);
   }
 
-  perceived_left_width_ = (std::fabs(left_lane.c0_position()) +
-                           std::fabs(right_lane.c0_position())) /
-                          2.0;
-  perceived_left_width_ =
-      common::math::Clamp(perceived_left_width_, config_.min_lane_half_width(),
-                          config_.max_lane_half_width());
-  perceived_right_width_ = perceived_left_width_;
+  perceived_left_width_ = std::fabs(left_lane.c0_position());
+  perceived_right_width_ = std::fabs(right_lane.c0_position());
+  // If the perceived lane width is incorrect, use the default lane width
+  // directly.
+  double perceived_lane_width = perceived_left_width_ + perceived_right_width_;
+  if (perceived_lane_width < 2.0 * config_.min_lane_half_width() ||
+      perceived_lane_width > 2.0 * config_.max_lane_half_width()) {
+    perceived_left_width_ = default_left_width_;
+    perceived_right_width_ = default_right_width_;
+  }
 }
 
 bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
