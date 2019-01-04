@@ -135,52 +135,7 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestProcessBagFiles",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        if (ContainsKey(json, "totalFileNum")) {
-          std::size_t num;
-          apollo::navi_generator::util::CommonBagFileInfo common_file_info;
-          if (!JsonUtil::GetNumberFromJson(json, "totalFileNum", &num)) {
-            return;
-          }
-          common_file_info.total_file_num = num;
-          if (!JsonUtil::GetNumberFromJson(json, "leftLaneNum", &num)) {
-            return;
-          }
-          common_file_info.left_lane_num = num;
-          if (!JsonUtil::GetNumberFromJson(json, "rightLaneNum", &num)) {
-            return;
-          }
-          common_file_info.right_lane_num = num;
-          topicsService_.SetCommonBagFileInfo(common_file_info);
-        } else if (ContainsKey(json, "curIndex")) {
-          std::string str;
-          std::size_t num;
-          apollo::navi_generator::util::FileSegment file_segment;
-          if (!JsonUtil::GetNumberFromJson(json, "curIndex", &num)) {
-            return;
-          }
-          file_segment.cur_file_index = num;
-          if (!JsonUtil::GetNumberFromJson(json, "curSegCount", &num)) {
-            return;
-          }
-          file_segment.cur_file_seg_count = num;
-          if (!JsonUtil::GetNumberFromJson(json, "curSegIdx", &num)) {
-            return;
-          }
-          file_segment.cur_file_seg_index = num;
-          if (!JsonUtil::GetStringFromJson(json, "curName", &str)) {
-            return;
-          }
-          file_segment.cur_file_name = str;
-          if (!JsonUtil::GetStringFromJson(json, "nextName", &str)) {
-            return;
-          }
-          file_segment.next_file_name = str;
-          if (!JsonUtil::GetStringFromJson(json, "data", &str)) {
-            return;
-          }
-          file_segment.cur_file_seg_data = str;
-          topicsService_.ProcessBagFileSegment(file_segment);
-        }
+        ParseProcessRequest(json);
       });
   websocket_->RegisterMessageHandler(
       "requestSaveBagFiles",
@@ -242,7 +197,7 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestCorrectRoadDeviation",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        topicsService_.CorrectRoadDeviation();
+        ParseProcessRequest(json);
       });
 
   websocket_->RegisterMessageHandler(
@@ -351,6 +306,65 @@ void TopicsUpdater::StartBroadcastHMIStatusThread() {
 void TopicsUpdater::DeferredBroadcastHMIStatus() {
   std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
   need_broadcast_ = true;
+}
+
+bool TopicsUpdater::ParseProcessRequest(const Json &json) {
+  if (ContainsKey(json, "totalFileNum")) {
+    std::size_t num;
+    apollo::navi_generator::util::CommonBagFileInfo common_file_info;
+    if (!JsonUtil::GetNumberFromJson(json, "totalFileNum", &num)) {
+      return false;
+    }
+    common_file_info.total_file_num = num;
+    if (!JsonUtil::GetNumberFromJson(json, "leftLaneNum", &num)) {
+      return false;
+    }
+    common_file_info.left_lane_num = num;
+    if (!JsonUtil::GetNumberFromJson(json, "rightLaneNum", &num)) {
+      return false;
+    }
+    common_file_info.right_lane_num = num;
+    std::string type;
+    if (!JsonUtil::GetStringFromJson(json, "type", &type)) {
+      return false;
+    }
+    if (type == "requestCorrectRoadDeviation") {
+      topicsService_.EnableRoadDeviationCorrection(true);
+    } else {
+      topicsService_.EnableRoadDeviationCorrection(false);
+    }
+    return topicsService_.SetCommonBagFileInfo(common_file_info);
+  } else if (ContainsKey(json, "curIndex")) {
+    std::string str;
+    std::size_t num;
+    apollo::navi_generator::util::FileSegment file_segment;
+    if (!JsonUtil::GetNumberFromJson(json, "curIndex", &num)) {
+      return false;
+    }
+    file_segment.cur_file_index = num;
+    if (!JsonUtil::GetNumberFromJson(json, "curSegCount", &num)) {
+      return false;
+    }
+    file_segment.cur_file_seg_count = num;
+    if (!JsonUtil::GetNumberFromJson(json, "curSegIdx", &num)) {
+      return false;
+    }
+    file_segment.cur_file_seg_index = num;
+    if (!JsonUtil::GetStringFromJson(json, "curName", &str)) {
+      return false;
+    }
+    file_segment.cur_file_name = str;
+    if (!JsonUtil::GetStringFromJson(json, "nextName", &str)) {
+      return false;
+    }
+    file_segment.next_file_name = str;
+    if (!JsonUtil::GetStringFromJson(json, "data", &str)) {
+      return false;
+    }
+    file_segment.cur_file_seg_data = str;
+    return topicsService_.ProcessBagFileSegment(file_segment);
+  }
+  return true;
 }
 
 }  // namespace navi_generator

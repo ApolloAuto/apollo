@@ -111,6 +111,10 @@ class TopicsService {
 
   nlohmann::json GetRoutePathAsJson(const nlohmann::json &map_data);
 
+
+  void EnableRoadDeviationCorrection(bool enable_road_deviation_correction) {
+    road_deviation_correction_enabled_ = enable_road_deviation_correction;
+  }
   bool CorrectRoadDeviation();
   bool SaveRoadCorrection();
 
@@ -127,6 +131,8 @@ class TopicsService {
   std::unique_ptr<util::TrajectoryProcessor> trajectory_processor_;
   std::unique_ptr<util::TrajectoryCollector> trajectory_collector_;
   std::unique_ptr<util::NavigationEditor> navigation_editor_;
+
+  bool road_deviation_correction_enabled_ = false;
 
   // The underlying SimulationWorld object, owned by the
   // SimulationWorldService instance.

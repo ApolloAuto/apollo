@@ -75,6 +75,8 @@ TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
     : websocket_(websocket), ready_to_push_(false) {
   trajectory_processor_.reset(new util::TrajectoryProcessor(
       TopicsService::UpdateGUI, TopicsService::NotifyBagFilesProcessed, this));
+  navigation_editor_.reset(
+      new util::NavigationEditor(TopicsService::UpdateGUI, this));
   trajectory_collector_.reset(new util::TrajectoryCollector());
 }
 
@@ -266,7 +268,11 @@ Json TopicsService::GetCommandResponseAsJson(const std::string &type,
 }
 
 bool TopicsService::CorrectRoadDeviation() {
+  if (!road_deviation_correction_enabled_) {
+    return true;
+  }
   SetReadyToSend(false);
+  road_deviation_correction_enabled_ = false;
   const std::map<std::uint16_t, apollo::navi_generator::util::FileInfo>
       *processed_file_info = nullptr;
   trajectory_processor_->GetProcessedFilesInfo(&processed_file_info);
