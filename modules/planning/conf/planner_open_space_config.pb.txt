@@ -1,7 +1,7 @@
 delta_t : 0.5
 max_position_error_to_end_point : 0.05
 max_theta_error_to_end_point : 0.05
-is_near_destination_threshold : 0.001
+is_near_destination_threshold : 0.05
 
 roi_config : {
   roi_longitudinal_range : 15.0
@@ -14,10 +14,17 @@ warm_start_config : {
   max_steering : 0.6
   next_node_num : 20
   step_size : 0.5
-  back_penalty : 0.0
-  gear_switch_penalty : 10.0
-  steer_penalty : 10.0
-  steer_change_penalty : 10.0
+  traj_forward_penalty : 1.0
+  traj_back_penalty : 0.0
+  traj_gear_switch_penalty : 10.0
+  traj_steer_penalty : 10.0
+  traj_steer_change_penalty : 10.0
+  heu_rs_forward_penalty : 1.0
+  heu_rs_back_penalty : 0.0
+  heu_rs_gear_switch_penalty : 10.0
+  heu_rs_steer_penalty : 10.0
+  heu_rs_steer_change_penalty : 10.0
+  
 }
 
 dual_variable_warm_start_config : {
@@ -45,14 +52,14 @@ distance_approach_config : {
   weight_state : 0.05
   weight_state : 0.05
   weight_state : 0.2
-  weight_state : 0.00001
+  weight_state : 0.0
   weight_stitching : 0.05
   weight_stitching : 0.05
   weight_time : 0.5
   weight_time : 1
   min_safety_distance : 0.0
   max_steer_angle : 0.6
-  max_steer_rate : 0.6
+  max_steer_rate : 1.0
   max_speed_forward : 2.0
   max_speed_reverse : 1.0
   max_acceleration_forward : 2.0
