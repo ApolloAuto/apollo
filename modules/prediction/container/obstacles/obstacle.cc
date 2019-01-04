@@ -317,7 +317,8 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
-                         const double timestamp, Feature* feature, int pred_id) {
+                         const double timestamp, Feature* feature,
+                         int pred_id) {
   if (SetId(perception_obstacle, feature, pred_id) ==
       ErrorCode::PREDICTION_ERROR) {
     AERROR << "Obstacle has no ID";
