@@ -39,6 +39,7 @@ class PlannigAnalyzer:
         self.last_adc_trajectory = None
         self.frechet_distance_list = []
         self.is_simulation = is_simulation
+        self.hard_break_list = []
 
     def put(self, adc_trajectory):
         """put"""
@@ -59,6 +60,11 @@ class PlannigAnalyzer:
                 self.estop_reason_dist[adc_trajectory.estop.reason] = \
                     self.estop_reason_dist.get(
                         adc_trajectory.estop.reason, 0) + 1
+
+        if self.is_simulation:
+            for point in adc_trajectory.trajectory_point:
+                if point.a <= -2.0:
+                    self.hard_break_list.append(point.a)
 
         if self.last_adc_trajectory is not None:
             current_path, last_path = self.find_common_path(adc_trajectory,
@@ -148,4 +154,5 @@ class PlannigAnalyzer:
         results = {}
         results['frechet_dist'] = sum(self.frechet_distance_list) /\
             len(self.frechet_distance_list)
+        results['hard_brake_cycle_num'] = len(self.hard_break_list)
         print str(results)
