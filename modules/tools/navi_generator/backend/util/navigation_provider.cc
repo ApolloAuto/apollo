@@ -49,6 +49,7 @@ constexpr int kUtmZoneId = 49;
 }  // namespace
 
 bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
+                                            const bool get_all_lane,
                                             Json* const matched_route) {
   CHECK_NOTNULL(matched_route);
   MapData map_data;
@@ -111,6 +112,9 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
       AERROR << "Failed to query navi data with way id";
       return false;
     }
+    if (!get_all_lane && navi_data_vec.size() > 1) {
+      navi_data_vec.erase(navi_data_vec.begin() + 1, navi_data_vec.end());
+    }
     NaviRoute* routes = route_plans->add_routes();
     routes->set_num_navis(navi_data_vec.size());
     routes->set_route_index(i);
@@ -139,7 +143,7 @@ bool NavigationProvider::GetRoutePathAsJson(const Json& expected_route,
   NaviSummary* result = navi_response.mutable_result();
   result->set_success(0);
   result->set_msg("There are " + std::to_string(res_data->num_plans()) +
-                  " plans.");
+                  " route plans.");
   std::string json_str;
   if (!MessageToJsonString(navi_response, &json_str).ok()) {
     AERROR << "Failed to convert from NaviGenResponse to Json";

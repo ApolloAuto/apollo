@@ -153,7 +153,8 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestNavigation",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): return the navigation result
+        Json response = topicsService_.GetNavigationPathAsJson(json);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
