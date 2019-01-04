@@ -31,7 +31,8 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       new ReedShepp(vehicle_param_, planner_open_space_config_));
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
-  max_steer_angle_ = vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
+  max_steer_angle_ =
+      vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
   step_size_ = planner_open_space_config_.warm_start_config().step_size();
   xy_grid_resolution_ =
       planner_open_space_config_.warm_start_config().xy_grid_resolution();
@@ -145,15 +146,17 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   size_t index = 0;
   double traveled_distance = 0.0;
   if (next_node_index < static_cast<double>(next_node_num_) / 2) {
-    steering = -max_steer_angle_ + (2 * max_steer_angle_ /
-                              (static_cast<double>(next_node_num_) / 2 - 1)) *
-                                 static_cast<double>(next_node_index);
+    steering =
+        -max_steer_angle_ +
+        (2 * max_steer_angle_ / (static_cast<double>(next_node_num_) / 2 - 1)) *
+            static_cast<double>(next_node_index);
     traveled_distance = step_size_;
   } else {
     index = next_node_index - next_node_num_ / 2;
-    steering = -max_steer_angle_ + (2 * max_steer_angle_ /
-                              (static_cast<double>(next_node_num_) / 2 - 1)) *
-                                 static_cast<double>(index);
+    steering =
+        -max_steer_angle_ +
+        (2 * max_steer_angle_ / (static_cast<double>(next_node_num_) / 2 - 1)) *
+            static_cast<double>(index);
     traveled_distance = -step_size_;
   }
   // take above motion primitive to generate a curve driving the car to a
