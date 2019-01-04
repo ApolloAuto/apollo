@@ -163,7 +163,7 @@ export default class PerceptionObstacles {
             lineCount++;
         }
         if (STORE.options.showPredictionPriority) {
-            const priority = obstacle.obstaclePriority;
+            const priority = _.get(obstacle, 'obstaclePriority.priority');
             if (priority && priority !== "NORMAL") {
                 const textPosition = {
                     x: initPosition.x,

@@ -145,28 +145,6 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
   }
 }
 
-void SetObstaclePriority(const PredictionObstacle &obstacle,
-                         Object *world_object) {
-  if (world_object == nullptr || !obstacle.has_priority() ||
-      !obstacle.priority().has_priority()) {
-    return;
-  }
-
-  switch (obstacle.priority().priority()) {
-    case ObstaclePriority::CAUTION:
-      world_object->set_obstacle_priority(Object_ObstaclePriority_CAUTION);
-      break;
-    case ObstaclePriority::NORMAL:
-      world_object->set_obstacle_priority(Object_ObstaclePriority_NORMAL);
-      break;
-    case ObstaclePriority::IGNORE:
-      world_object->set_obstacle_priority(Object_ObstaclePriority_IGNORE);
-      break;
-    default:
-      world_object->set_obstacle_priority(Object_ObstaclePriority_NORMAL);
-  }
-}
-
 void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {
   switch (reason_code) {
     case StopReasonCode::STOP_REASON_HEAD_VEHICLE:
@@ -995,7 +973,11 @@ void SimulationWorldService::UpdateSimulationWorld(
 
     // Add prediction trajectory to the object.
     CreatePredictionTrajectory(obstacle, &world_obj);
-    SetObstaclePriority(obstacle, &world_obj);
+
+    // Add prediction priority
+    if (obstacle.has_priority()) {
+        world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
+    }
 
     world_obj.set_timestamp_sec(
         std::max(obstacle.timestamp(), world_obj.timestamp_sec()));
