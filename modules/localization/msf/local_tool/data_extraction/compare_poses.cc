@@ -16,8 +16,6 @@
 
 #include <fstream>
 #include <iomanip>
-#include <map>
-#include <vector>
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"

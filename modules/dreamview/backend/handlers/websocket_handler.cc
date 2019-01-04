@@ -15,10 +15,6 @@ limitations under the License.
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 
-#include <cerrno>
-#include <utility>
-#include <vector>
-
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"

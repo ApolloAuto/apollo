@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
-#include <memory>
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"

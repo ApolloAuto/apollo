@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <string>
 #include <vector>
 
 #include "modules/planning/traffic_rules/traffic_rule.h"

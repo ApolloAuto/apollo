@@ -16,8 +16,6 @@
 
 #include "modules/dreamview/backend/util/trajectory_point_collector.h"
 
-#include <cmath>
-
 using apollo::common::TrajectoryPoint;
 
 namespace apollo {

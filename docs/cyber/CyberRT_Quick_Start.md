@@ -1,7 +1,7 @@
 
 # How to create and run a new component in Apollo Cyber RT
 
-Apollo Cyber RT framework is built based on the concept of component. As a basic building bolock of Apollo Cyber RT framework, each component contains a specific algorithm module which process a set of data inputs and generate a set of outputs.
+Apollo Cyber RT framework is built based on the concept of component. As a basic building block of Apollo Cyber RT framework, each component contains a specific algorithm module which process a set of data inputs and generate a set of outputs.
 
 In order to successfully create and launch a new compoent, there are four essential steps that need to happen:
 
@@ -31,7 +31,7 @@ To implement `common_component_example.h`:
 
 - Inherit the Component class
 - Define your own `Init` and `Proc` functions. Proc function needs to specify its input data types
-- Register your component classes to be global by using 
+- Register your component classes to be global by using
 `CYBER_REGISTER_COMPONENT`
 
 ```cpp
@@ -117,7 +117,7 @@ To configure the DAG dependency file (common.dag), specify the following items a
  - channel names: for data input and output
  - library path: library built from component class
  - class name: the class name of the component
- 
+
 ```bash
 # Define all coms in DAG streaming.
     component_config {
@@ -162,7 +162,7 @@ Build the component by running the command below:
 ```bash
 bash /apollo/apollo.sh build
 ```
- 
+
 Note: make sure the example component builds fine
 
 Then configure the environment:
@@ -180,7 +180,7 @@ There are two ways to launch the component:
 cyber_launch start /apollo/cyber/examples/common_component_example/common.launch
 ```
 
-- launch with the DAG file 
+- launch with the DAG file
 
 ```bash
 mainboard -d /apollo/cyber/examples/common_component_example/common.dag

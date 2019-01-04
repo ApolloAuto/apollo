@@ -14,9 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include <algorithm>
-#include <cmath>
-#include <cstring>
-#include <iostream>
 
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_timer.h"

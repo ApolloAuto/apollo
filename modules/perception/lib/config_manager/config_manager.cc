@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lib/config_manager/config_manager.h"
 
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/common/io/io_util.h"

@@ -16,8 +16,6 @@
 #include "modules/perception/camera/lib/obstacle/tracker/omt/obstacle_reference.h"
 
 #include <algorithm>
-#include <queue>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"

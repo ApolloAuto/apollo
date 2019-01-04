@@ -20,15 +20,12 @@
 
 #include "modules/planning/common/path/frenet_frame_path.h"
 
-#include <vector>
-
 #include "gtest/gtest.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::FrenetFramePoint;
-using apollo::common::PathPoint;
 
 class FrenetFramePathTest : public ::testing::Test {
  public:

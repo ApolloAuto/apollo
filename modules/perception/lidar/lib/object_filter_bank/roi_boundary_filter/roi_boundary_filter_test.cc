@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include <fstream>
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"

@@ -16,7 +16,6 @@ limitations under the License.
 #include "modules/map/hdmap/hdmap_common.h"
 
 #include <algorithm>
-#include <iostream>
 #include <limits>
 
 #include "cyber/common/log.h"

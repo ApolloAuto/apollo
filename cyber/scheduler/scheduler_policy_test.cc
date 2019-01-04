@@ -71,6 +71,7 @@ TEST(SchedulerPolicyTest, classic) {
   }
   res.clear();
   ctx->Shutdown();
+  processor->Stop();
 }
 
 TEST(SchedulerPolicyTest, sched_classic) {

@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include <iostream>
-#include <vector>
 #define private public
 #include "cyber/common/log.h"
 #include "modules/perception/fusion/common/kalman_filter.h"

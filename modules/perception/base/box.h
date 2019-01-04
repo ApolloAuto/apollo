@@ -16,12 +16,8 @@
 #pragma once
 
 #include <algorithm>
-#include <cfloat>
-#include <cstdint>
-#include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include "modules/perception/base/comparison_traits.h"
 #include "modules/perception/base/point.h"

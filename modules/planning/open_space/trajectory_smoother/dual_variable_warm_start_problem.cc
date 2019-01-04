@@ -20,10 +20,6 @@
 
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
 
-#include <algorithm>
-#include <iomanip>
-#include <utility>
-
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
 
@@ -32,8 +28,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::time::Clock;
 
 DualVariableWarmStartProblem::DualVariableWarmStartProblem(
     const PlannerOpenSpaceConfig& planner_open_space_config) {

@@ -20,8 +20,6 @@
 
 #include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"

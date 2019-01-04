@@ -16,7 +16,6 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/xml_parser/objects_xml_parser.h"
 
 #include <string>
-#include <vector>
 
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 

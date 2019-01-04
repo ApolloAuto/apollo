@@ -21,7 +21,6 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
 
 #include "modules/common/proto/pnc_point.pb.h"
 

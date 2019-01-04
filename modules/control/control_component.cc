@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/control/control_component.h"
 
-#include <iomanip>
-#include <string>
-
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
@@ -33,8 +30,6 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
-using apollo::control::ControlCommand;
-using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 

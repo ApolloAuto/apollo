@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <array>
 #include <vector>
 
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"

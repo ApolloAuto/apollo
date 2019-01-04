@@ -20,9 +20,7 @@
 
 #include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
 
-#include <algorithm>
 #include <string>
-#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 
@@ -38,7 +36,6 @@ namespace scenario {
 namespace side_pass {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
 
 /*
  * @brief: STAGE ApproachObstacle in side_pass scenario

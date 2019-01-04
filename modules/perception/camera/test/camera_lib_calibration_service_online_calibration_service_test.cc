@@ -14,8 +14,6 @@
 * limitations under the License.
 *****************************************************************************/
 #include <gtest/gtest.h>
-#include <fstream>
-#include <string>
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/distortion_model.h"

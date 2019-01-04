@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
-
-#include "gtest/gtest.h"
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -46,6 +42,7 @@ class SunnyvaleLoopTest : public PlanningTestBase {
     FLAGS_enable_scenario_side_pass = false;
     FLAGS_enable_scenario_stop_sign_unprotected = false;
     FLAGS_enable_scenario_traffic_light_right_turn_unprotected = false;
+    FLAGS_enable_rss_info = false;
 
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
     ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);

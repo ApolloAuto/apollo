@@ -20,12 +20,9 @@
 
 #pragma once
 
-#include <array>
-#include <memory>
 #include <utility>
 #include <vector>
 
-#include "Eigen/Core"
 #include "osqp/include/osqp.h"
 
 #include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"

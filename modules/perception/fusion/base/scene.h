@@ -16,10 +16,7 @@
 
 #pragma once
 
-#include <deque>
-#include <map>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "modules/perception/fusion/base/sensor_object.h"

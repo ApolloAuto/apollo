@@ -21,7 +21,6 @@
 #include "modules/planning/traffic_rules/pull_over.h"
 
 #include <algorithm>
-#include <iomanip>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"

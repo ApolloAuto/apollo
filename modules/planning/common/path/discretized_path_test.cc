@@ -16,8 +16,6 @@
 
 #include "modules/planning/common/path/discretized_path.h"
 
-#include <vector>
-
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"

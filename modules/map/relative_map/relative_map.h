@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <memory>
-#include <mutex>
 #include <string>
 
 #include "modules/map/relative_map/proto/navigation.pb.h"

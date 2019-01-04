@@ -18,12 +18,15 @@
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
+BOLD='\033[1m'
 RED='\033[0;31m'
-YELLOW='\e[33m'
+GREEN='\033[32m'
+WHITE='\033[34m'
+YELLOW='\033[33m'
 NO_COLOR='\033[0m'
 
 function info() {
-  (>&2 echo -e "[\e[34m\e[1mINFO\e[0m] $*")
+  (>&2 echo -e "[${WHITE}${BOLD}INFO${NO_COLOR}] $*")
 }
 
 function error() {
@@ -35,7 +38,7 @@ function warning() {
 }
 
 function ok() {
-  (>&2 echo -e "[\e[32m\e[1m OK \e[0m] $*")
+  (>&2 echo -e "[${GREEN}${BOLD} OK ${NO_COLOR}] $*")
 }
 
 function print_delim() {

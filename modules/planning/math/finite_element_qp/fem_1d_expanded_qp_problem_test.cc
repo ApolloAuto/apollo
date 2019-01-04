@@ -21,7 +21,6 @@
 #include "modules/planning/math/finite_element_qp/fem_1d_expanded_qp_problem.h"
 
 #include <chrono>
-#include <iostream>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"

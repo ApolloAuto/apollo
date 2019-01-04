@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <unordered_map>
-#include <unordered_set>
-
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {

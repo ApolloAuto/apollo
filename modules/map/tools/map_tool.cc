@@ -14,8 +14,6 @@
   * limitations under the License.
   *****************************************************************************/
 
-#include <string>
-
 #include "gflags/gflags.h"
 
 #include "cyber/common/log.h"

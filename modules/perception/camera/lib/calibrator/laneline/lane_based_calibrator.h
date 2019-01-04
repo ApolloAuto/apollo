@@ -15,9 +15,6 @@
 *****************************************************************************/
 #pragma once
 
-#include <float.h>
-
-#include <algorithm>
 #include <deque>
 #include <utility>
 

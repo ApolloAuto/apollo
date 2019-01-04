@@ -15,11 +15,8 @@
 *****************************************************************************/
 #pragma once
 
-#include <Eigen/Dense>
 #include <map>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/interface/base_init_options.h"

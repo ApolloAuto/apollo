@@ -16,8 +16,6 @@
 
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
 
-#include <vector>
-
 #include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_node.h"
 

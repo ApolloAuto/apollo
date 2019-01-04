@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "modules/planning/proto/traffic_rule_config.pb.h"
 
 #include "modules/planning/common/frame.h"

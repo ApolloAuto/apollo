@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <cmath>
 #include <string>
 
 #include "modules/control/proto/control_cmd.pb.h"

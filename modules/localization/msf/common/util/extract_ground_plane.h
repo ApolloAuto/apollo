@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include <cmath>
 #include <map>
-#include <unordered_map>
 #include <vector>
 
 #include "pcl/sample_consensus/impl/ransac.hpp"

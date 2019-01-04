@@ -39,6 +39,8 @@ class RecordReader : public RecordBase {
   explicit RecordReader(const std::string& file);
   virtual ~RecordReader();
 
+  bool IsValid() const { return is_valid_; }
+
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
                    uint64_t end_time = UINT64_MAX);
   void Reset();
@@ -59,7 +61,8 @@ class RecordReader : public RecordBase {
  private:
   bool ReadNextChunk(uint64_t begin_time, uint64_t end_time);
 
-  bool reach_end_;
+  bool is_valid_ = false;
+  bool reach_end_ = false;
   proto::ChunkBody chunk_;
   proto::Index index_;
   int message_index_ = 0;

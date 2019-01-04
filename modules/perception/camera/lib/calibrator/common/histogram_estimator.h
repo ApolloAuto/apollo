@@ -15,12 +15,9 @@
 *****************************************************************************/
 #pragma once
 
-#include <float.h>
 #include <assert.h>
 #include <vector>
 #include <algorithm>
-#include <string>
-#include <cstring>
 
 #include "cyber/common/log.h"
 

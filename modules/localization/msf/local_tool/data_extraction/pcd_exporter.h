@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
 #include "modules/drivers/proto/pointcloud.pb.h"

@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/side_pass/stage_backup.h"
 
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -38,7 +34,6 @@ namespace scenario {
 namespace side_pass {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
 
 /*
  * @brief:

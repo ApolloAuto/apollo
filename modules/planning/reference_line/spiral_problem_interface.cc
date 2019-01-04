@@ -20,7 +20,6 @@
 
 #include "modules/planning/reference_line/spiral_problem_interface.h"
 
-#include <math.h>
 #include <utility>
 
 #include "modules/common/math/math_utils.h"

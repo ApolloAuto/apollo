@@ -28,9 +28,6 @@ namespace relative_map {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
-using apollo::common::util::operator+;
-using apollo::common::math::Vec2d;
-using apollo::common::monitor::MonitorLogBuffer;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::perception::PerceptionObstacles;
 using apollo::canbus::Chassis;

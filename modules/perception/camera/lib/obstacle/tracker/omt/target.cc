@@ -16,9 +16,7 @@
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
 #include <algorithm>
-#include <cmath>
 #include <map>
-#include <numeric>
 
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/math_functions.h"

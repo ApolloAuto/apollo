@@ -68,9 +68,9 @@ SchedulerClassic::SchedulerClassic() {
     }
     task_pool_size_ = proc_num;
 
-    sched_group_ = classic_conf_.add_groups();
-    sched_group_->set_name(DEFAULT_GROUP_NAME);
-    sched_group_->set_processor_num(proc_num);
+    auto sched_group = classic_conf_.add_groups();
+    sched_group->set_name(DEFAULT_GROUP_NAME);
+    sched_group->set_processor_num(proc_num);
   }
 
   CreateProcessor();
@@ -104,7 +104,7 @@ void SchedulerClassic::CreateProcessor() {
       proc->BindContext(ctx);
       proc->SetAffinity(cpuset, affinity, i);
       proc->SetSchedPolicy(processor_policy, processor_prio);
-      processors_.push_back(std::move(proc));
+      processors_.emplace_back(proc);
     }
   }
 }

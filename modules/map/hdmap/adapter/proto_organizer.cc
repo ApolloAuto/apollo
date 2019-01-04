@@ -15,12 +15,7 @@ limitations under the License.
 
 #include "modules/map/hdmap/adapter/proto_organizer.h"
 
-#include <functional>
-#include <iostream>
-#include <string>
-#include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/polygon2d.h"

@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <Eigen/Core>
 #include <boost/format.hpp>
 #include <vector>

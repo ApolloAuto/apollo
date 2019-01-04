@@ -21,11 +21,7 @@
 #pragma once
 
 #include <limits>
-#include <list>
-#include <memory>
-#include <mutex>
 #include <string>
-#include <vector>
 
 #include "modules/planning/proto/decision.pb.h"
 

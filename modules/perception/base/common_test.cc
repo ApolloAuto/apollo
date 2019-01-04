@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 #include <gtest/gtest.h>
-#include <limits>
-#include <vector>
 
 #include "modules/perception/base/common.h"
 

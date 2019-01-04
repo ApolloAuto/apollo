@@ -16,7 +16,6 @@
 
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 
-#include <fstream>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -30,7 +29,6 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleStateProvider;
 
 RTKReplayPlanner::RTKReplayPlanner() {
   ReadTrajectoryFile(FLAGS_rtk_trajectory_filename);

@@ -16,7 +16,6 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 #include <string>
 
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_struct.h"

@@ -16,9 +16,6 @@
 
 #include "modules/perception/fusion/lib/data_association/hm_data_association/track_object_distance.h"
 
-#include <gtest/gtest.h>
-#include <iostream>
-
 #include "modules/perception/base/frame.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"

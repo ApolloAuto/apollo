@@ -23,7 +23,6 @@
 #include <limits>
 #include <unordered_map>
 #include <utility>
-#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
@@ -42,7 +41,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
@@ -51,7 +49,6 @@ using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 using apollo::perception::PerceptionObstacle;
-using apollo::planning::CrosswalkStatus;
 using CrosswalkToStop =
     std::vector<std::pair<const hdmap::PathOverlap*, std::vector<std::string>>>;
 using CrosswalkStopTimer =

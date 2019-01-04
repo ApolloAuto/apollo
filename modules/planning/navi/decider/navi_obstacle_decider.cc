@@ -22,13 +22,8 @@
 #include "modules/planning/navi/decider/navi_obstacle_decider.h"
 
 #include <algorithm>
-#include <cfloat>
-#include <cmath>
 #include <limits>
-#include <map>
-#include <string>
 #include <utility>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
@@ -40,8 +35,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
-using apollo::common::math::InterpolateUsingLinearApproximation;
-using apollo::common::math::LineSegment2d;
 using apollo::common::math::PathMatcher;
 using apollo::common::math::Vec2d;
 using apollo::common::util::MakePathPoint;

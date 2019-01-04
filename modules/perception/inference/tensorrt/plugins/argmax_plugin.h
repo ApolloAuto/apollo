@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <thrust/device_vector.h>
-
 #include "modules/perception/inference/tensorrt/rt_common.h"
 #include "modules/perception/proto/rt.pb.h"
 
