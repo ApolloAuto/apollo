@@ -143,22 +143,27 @@ bool GetNavigationPathFromFile(const std::string& filename,
   int down_sampled_points_num = 0;
   constexpr double kStraightSampleInterval = 3.0;
   constexpr double kSmallKappaSampleInterval = 1.0;
-  constexpr double kLargeKappaSampleInterval = 0.4;
-  constexpr double kSmallKappa = 0.005;
-  constexpr double kLargeKappa = 0.03;
+  constexpr double kMiddleKappaSampleInterval = 0.4;
+  constexpr double kLargeKappaSampleInterval = 0.1;
+  constexpr double kSmallKappa = 0.002;
+  constexpr double kMiddleKappa = 0.008;
+  constexpr double kLargeKappa = 0.02;
   while (std::getline(ifs, line_str)) {
     try {
       auto json_obj = json::parse(line_str);
       current_sampled_s = json_obj["s"];
       current_kappa = json_obj["kappa"];
       diff_s = current_sampled_s - last_sampled_s;
-      bool not_down_sampling = FLAGS_navigator_down_sample
-                                   ? diff_s >= kStraightSampleInterval ||
-                                         (diff_s >= kSmallKappaSampleInterval &&
-                                          current_kappa > kSmallKappa) ||
-                                         (diff_s >= kLargeKappaSampleInterval &&
-                                          current_kappa > kLargeKappa)
-                                   : true;
+      bool not_down_sampling =
+          FLAGS_navigator_down_sample
+              ? diff_s >= kStraightSampleInterval ||
+                    (diff_s >= kSmallKappaSampleInterval &&
+                     current_kappa > kSmallKappa) ||
+                    (diff_s >= kMiddleKappaSampleInterval &&
+                     current_kappa > kMiddleKappa) ||
+                    (diff_s >= kLargeKappaSampleInterval &&
+                     current_kappa > kLargeKappa)
+              : true;
       if (not_down_sampling) {
         last_sampled_s = current_sampled_s;
         auto* point = navigation_path->mutable_path()->add_path_point();
