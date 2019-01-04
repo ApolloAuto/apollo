@@ -25,6 +25,7 @@ DECLARE_double(prediction_trajectory_time_length);
 DECLARE_double(prediction_trajectory_time_resolution);
 DECLARE_double(min_prediction_trajectory_spatial_length);
 DECLARE_bool(enable_trajectory_validation_check);
+DECLARE_bool(enable_tracking_adaptation);
 
 DECLARE_double(vehicle_max_linear_acc);
 DECLARE_double(vehicle_min_linear_acc);
