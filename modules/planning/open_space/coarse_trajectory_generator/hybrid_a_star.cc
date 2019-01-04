@@ -203,12 +203,22 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
 void HybridAStar::CalculateNodeCost(
     std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node,
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
+  next_node->SetTrajCost(current_node->GetTrajCost() +
+                         TrajCost(current_node, next_node));
+  // evaluate heuristic cost
+  next_node->SetHeuCost(NonHoloNoObstacleHeuristic(reeds_shepp_to_end));
+}
+
+double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
+                             std::shared_ptr<Node3d> next_node) {
   // evaluate cost on the trajectory and add current cost
   double piecewise_cost = 0.0;
   if (next_node->GetDirec()) {
-    piecewise_cost += xy_grid_resolution_ * traj_forward_penalty_;
+    piecewise_cost += static_cast<double>(next_node->GetSize() - 1) *
+                      step_size_ * traj_forward_penalty_;
   } else {
-    piecewise_cost += xy_grid_resolution_ * traj_back_penalty_;
+    piecewise_cost += static_cast<double>(next_node->GetSize() - 1) *
+                      step_size_ * traj_back_penalty_;
   }
   if (current_node->GetDirec() != next_node->GetDirec()) {
     piecewise_cost += traj_gear_switch_penalty_;
@@ -216,9 +226,7 @@ void HybridAStar::CalculateNodeCost(
   piecewise_cost += traj_steer_penalty_ * std::abs(next_node->GetSteer());
   piecewise_cost += traj_steer_change_penalty_ *
                     std::abs(next_node->GetSteer() - current_node->GetSteer());
-  next_node->SetTrajCost(current_node->GetTrajCost() + piecewise_cost);
-  // evaluate heuristic cost
-  next_node->SetHeuCost(NonHoloNoObstacleHeuristic(reeds_shepp_to_end));
+  return piecewise_cost;
 }
 
 double HybridAStar::NonHoloNoObstacleHeuristic(
@@ -233,7 +241,7 @@ double HybridAStar::CalculateRSPCost(
     if (reeds_shepp_to_end->segs_lengths[i] > 0.0) {
       RSP_cost += reeds_shepp_to_end->segs_lengths[i] * heu_rs_forward_penalty_;
     } else {
-      RSP_cost += reeds_shepp_to_end->segs_lengths[i] * heu_rs_back_penalty_;
+      RSP_cost += -reeds_shepp_to_end->segs_lengths[i] * heu_rs_back_penalty_;
     }
   }
 
@@ -436,8 +444,6 @@ bool HybridAStar::Plan(
         open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
         open_pq_.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
-      } else {
-        // TODO(Jinyun) :reinitial the cost for rewiring
       }
     }
   }
