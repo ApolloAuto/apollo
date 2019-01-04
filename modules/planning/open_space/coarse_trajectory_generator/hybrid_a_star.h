@@ -97,6 +97,8 @@ class HybridAStar {
   void CalculateNodeCost(
       std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node,
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
+  double TrajCost(std::shared_ptr<Node3d> current_node,
+                  std::shared_ptr<Node3d> next_node);
   double HeuristicCost();
   double HoloObstacleHeuristic();
   double NonHoloNoObstacleHeuristic(

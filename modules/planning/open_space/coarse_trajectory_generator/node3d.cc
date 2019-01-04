@@ -57,8 +57,7 @@ Node3d::Node3d(double x, double y, double phi,
       static_cast<double>(x_grid_));
 }
 
-Node3d::Node3d(std::vector<double> traversed_x,
-               std::vector<double> traversed_y,
+Node3d::Node3d(std::vector<double> traversed_x, std::vector<double> traversed_y,
                std::vector<double> traversed_phi,
                const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
@@ -81,7 +80,7 @@ Node3d::Node3d(std::vector<double> traversed_x,
   phi_grid_ = static_cast<size_t>(
       (phi_ - (-M_PI)) /
       open_space_conf.warm_start_config().phi_grid_resolution());
-  index_ = static_cast<size_t>(
+  index_ = static_cast<size_t>( 
       static_cast<double>(phi_grid_) * (XYbounds[1] - XYbounds[0]) *
           (XYbounds[3] - XYbounds[2]) +
       static_cast<double>(y_grid_) * (XYbounds[1] - XYbounds[0]) +
@@ -106,6 +105,12 @@ Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {
 bool Node3d::operator==(const std::shared_ptr<Node3d> right) const {
   return x_grid_ == right->GetGridX() && y_grid_ == right->GetGridY() &&
          phi_grid_ == right->GetGridPhi();
+}
+
+size_t Node3d::GetSize() {
+  DCHECK(traversed_x_.size() == traversed_y_.size() &&
+         traversed_x_.size() == traversed_phi_.size());
+  return traversed_x_.size();
 }
 
 }  // namespace planning
