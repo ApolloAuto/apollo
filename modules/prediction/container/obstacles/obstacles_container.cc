@@ -271,15 +271,21 @@ bool ObstaclesContainer::AdaptTracking(
     // different obstacle type, can't be same obstacle
     return false;
   }
-  // TODO(Hongyi) test position with trajectory position
-  if (perception_obstacle.has_position()) {
-    if (perception_obstacle.position().has_x() &&
-        perception_obstacle.position().has_y()) {
-      // double dist = std::hypot(perception_obstacle.position().x(),
-      //                          perception_obstacle.position().y());
+  // test perception_obstacle position with possible obstacle position
+  if (perception_obstacle.has_position() &&
+      perception_obstacle.position().has_x() &&
+      perception_obstacle.position().has_y()) {
+    double obs_x = obstacle_ptr->latest_feature().position().x() +
+                   obstacle_ptr->latest_feature().raw_velocity().x() * 0.1;
+    double obs_y = obstacle_ptr->latest_feature().position().y() +
+                   obstacle_ptr->latest_feature().raw_velocity().y() * 0.1;
+    double dist = std::hypot(perception_obstacle.position().x() - obs_x,
+                             perception_obstacle.position().y() - obs_y);
+    if (dist < 1.0) {
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 
