@@ -216,6 +216,10 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   Trim();
 }
 
+void Obstacle::InsertFeature(const Feature& feature) {
+  InsertFeatureToHistory(feature);
+}
+
 bool Obstacle::IsInJunction(const std::string& junction_id) {
   // TODO(all) Consider if need to use vehicle front rather than position
   if (feature_history_.size() == 0) {

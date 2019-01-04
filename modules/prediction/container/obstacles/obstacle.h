@@ -63,6 +63,12 @@ class Obstacle {
               const double timestamp);
 
   /**
+   * @brief Insert a feature proto message.
+   * @param feature proto message.
+   */
+  void InsertFeature(const Feature& feature);
+
+  /**
    * @brief Get the type of perception obstacle's type.
    * @return The type pf perception obstacle.
    */

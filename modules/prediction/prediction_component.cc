@@ -19,9 +19,11 @@
 #include <algorithm>
 #include <vector>
 
+#include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
+
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -29,6 +31,7 @@
 #include "modules/prediction/common/validation_checker.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
+#include "modules/prediction/proto/offline_features.pb.h"
 #include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/util/data_extraction.h"
 
@@ -70,6 +73,21 @@ void PredictionComponent::ProcessOfflineData(const std::string& filename) {
         OnPlanning(adc_trajectory);
       }
     }
+  }
+}
+
+void PredictionComponent::OfflineProcessFeatureProtoFile(
+    const std::string& features_proto_file_name) {
+  auto obstacles_container_ptr = ContainerManager::Instance()->GetContainer<
+      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  obstacles_container_ptr->Clear();
+  Features features;
+  apollo::cyber::common::GetProtoFromBinaryFile(
+      features_proto_file_name, &features);
+  for (const Feature& feature : features.feature()) {
+    obstacles_container_ptr->InsertFeatureProto(feature);
+    Obstacle* obstacle_ptr = obstacles_container_ptr->GetObstacle(feature.id());
+    EvaluatorManager::Instance()->EvaluateObstacle(obstacle_ptr);
   }
 }
 
