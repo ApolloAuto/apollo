@@ -23,6 +23,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/planner/std_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
+#include "modules/planning/open_space/trajectory_partition/trajectory_partitioner.h"
 
 /**
  * @namespace apollo::planning
@@ -83,10 +84,6 @@ class OpenSpacePlanning : public PlanningBase {
   void FillPlanningPb(const double timestamp,
                       ADCTrajectory* const ptr_trajectory_pb) override;
 
-  apollo::common::Status TrajectoryPartition(
-      const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
-      ADCTrajectory* const ptr_trajectory_pb);
-
  private:
   apollo::common::Status InitFrame(
       const uint32_t sequence_num,
@@ -99,10 +96,6 @@ class OpenSpacePlanning : public PlanningBase {
 
   void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles);
 
-  void GenerateGearShiftTrajectory(
-      const apollo::canbus::Chassis::GearPosition& gear_position,
-      ADCTrajectory* trajectory_pb);
-
   void GenerateStopTrajectory(ADCTrajectory* const ptr_trajectory_pb);
 
  private:
@@ -113,14 +106,7 @@ class OpenSpacePlanning : public PlanningBase {
   std::vector<common::TrajectoryPoint> last_stitching_trajectory_;
   planning_internal::OpenSpaceDebug last_open_space_debug_;
   bool last_trajectory_succeeded_ = false;
-  bool gear_shift_period_finished_ = true;
-  bool gear_shift_period_started_ = true;
-  double gear_shift_period_time_ = 0.0;
-  double gear_shift_start_time_ = 0.0;
-  apollo::canbus::Chassis::GearPosition gear_shift_position_ =
-      canbus::Chassis::GEAR_DRIVE;
-  std::vector<double> plot_gear_shift_time_;
-  std::vector<double> plot_gear_shift_;
+  std::unique_ptr<TrajectoryPartitioner> trajectory_partitioner_;
 };
 
 }  // namespace planning
