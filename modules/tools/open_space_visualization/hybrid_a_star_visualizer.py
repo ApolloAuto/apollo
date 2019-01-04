@@ -30,8 +30,8 @@ HybridAStar = HybridAStarPlanner()
 
 # parameter(except max, min and car size is defined in proto)
 num_output_buffer = 100000
-sx = -10.0
-sy = 3
+sx = -8
+sy = 4
 sphi = 0.0
 
 scenario = "backward"

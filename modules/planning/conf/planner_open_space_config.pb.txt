@@ -11,7 +11,6 @@ roi_config : {
 warm_start_config : {
   xy_grid_resolution : 0.2
   phi_grid_resolution : 0.05
-  max_steering : 0.6
   next_node_num : 20
   step_size : 0.5
   traj_forward_penalty : 1.0
@@ -24,7 +23,6 @@ warm_start_config : {
   heu_rs_gear_switch_penalty : 10.0
   heu_rs_steer_penalty : 10.0
   heu_rs_steer_change_penalty : 10.0
-  
 }
 
 dual_variable_warm_start_config : {
@@ -58,8 +56,6 @@ distance_approach_config : {
   weight_time : 0.5
   weight_time : 1
   min_safety_distance : 0.0
-  max_steer_angle : 0.6
-  max_steer_rate : 1.0
   max_speed_forward : 2.0
   max_speed_reverse : 1.0
   max_acceleration_forward : 2.0
