@@ -18,6 +18,8 @@
 
 #include <boost/foreach.hpp>
 
+#include "cyber/common/log.h"
+
 namespace apollo {
 namespace localization {
 namespace msf {
@@ -36,8 +38,7 @@ bool BaseMapConfig::Save(const std::string file_path) {
   boost::property_tree::ptree config;
   CreateXml(&config);
   boost::property_tree::write_xml(file_path, config);
-  std::cerr << "Saved the map configuration to: " << file_path << "."
-            << std::endl;
+  AINFO << "Saved the map configuration to: " << file_path;
   return true;
 }
 
@@ -48,12 +49,11 @@ bool BaseMapConfig::Load(const std::string file_path) {
   std::string map_version = config.get<std::string>("map.map_config.version");
   if (map_version_ == map_version) {
     LoadXml(config);
-    std::cerr << "Loaded the map configuration from: " << file_path << "."
-              << std::endl;
+    AINFO << "Loaded the map configuration from: " << file_path;
     return true;
   } else {
-    std::cerr << "[Fatal Error] Expect v" << map_version_ << " map, but found v"
-              << map_version << " map." << std::endl;
+    AERROR << "[Fatal Error] Expect v" << map_version_ << " map, but found v"
+           << map_version << " map.";
     return false;
   }
 }
@@ -96,12 +96,12 @@ void BaseMapConfig::LoadXml(const boost::property_tree::ptree& config) {
                  config.get_child("map.map_config.resolutions")) {
     map_resolutions_.push_back(
         static_cast<float>(atof(v.second.data().c_str())));
-    std::cout << "Resolution: " << v.second.data() << std::endl;
+    AINFO << "Resolution: " << v.second.data();
   }
   BOOST_FOREACH (const boost::property_tree::ptree::value_type& v,  // NOLINT
                  config.get_child("map.map_record.datasets")) {
     map_datasets_.push_back(v.second.data());
-    std::cout << "Dataset: " << v.second.data() << std::endl;
+    AINFO << "Dataset: " << v.second.data();
   }
   return;
 }
