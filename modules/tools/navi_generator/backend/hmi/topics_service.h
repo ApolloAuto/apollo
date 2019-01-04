@@ -30,6 +30,7 @@
 
 #include "modules/common/log.h"
 #include "modules/tools/navi_generator/backend/util/navigation_editor.h"
+#include "modules/tools/navi_generator/backend/util/navigation_provider.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_collector.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_processor.h"
 #include "modules/tools/navi_generator/backend/webserver/navi_generator_websocket.h"
@@ -111,10 +112,12 @@ class TopicsService {
 
   nlohmann::json GetRoutePathAsJson(const nlohmann::json &map_data);
 
+  nlohmann::json GetNavigationPathAsJson(const nlohmann::json &map_data);
 
   void EnableRoadDeviationCorrection(bool enable_road_deviation_correction) {
     road_deviation_correction_enabled_ = enable_road_deviation_correction;
   }
+
   bool CorrectRoadDeviation();
   bool SaveRoadCorrection();
 
@@ -131,6 +134,7 @@ class TopicsService {
   std::unique_ptr<util::TrajectoryProcessor> trajectory_processor_;
   std::unique_ptr<util::TrajectoryCollector> trajectory_collector_;
   std::unique_ptr<util::NavigationEditor> navigation_editor_;
+  std::unique_ptr<util::NavigationProvider> navigation_provider_;
 
   bool road_deviation_correction_enabled_ = false;
 

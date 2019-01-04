@@ -78,6 +78,7 @@ TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
   navigation_editor_.reset(
       new util::NavigationEditor(TopicsService::UpdateGUI, this));
   trajectory_collector_.reset(new util::TrajectoryCollector());
+  navigation_provider_.reset(new util::NavigationProvider());
 }
 
 void TopicsService::Update() {
@@ -234,8 +235,13 @@ bool TopicsService::GetCollectorOptions(const std::string &collection_type,
 
 Json TopicsService::GetRoutePathAsJson(const Json &map_data) {
   Json response;
-  std::unique_ptr<util::NavigationProvider> provider;
-  provider->GetRoutePathAsJson(map_data, &response);
+  navigation_provider_->GetRoutePathAsJson(map_data, false, &response);
+  return response;
+}
+
+Json TopicsService::GetNavigationPathAsJson(const Json &map_data) {
+  Json response;
+  navigation_provider_->GetRoutePathAsJson(map_data, true, &response);
   return response;
 }
 

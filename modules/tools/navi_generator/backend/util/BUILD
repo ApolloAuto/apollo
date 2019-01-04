@@ -121,21 +121,6 @@ cc_library(
 )
 
 cc_library(
-    name = "navi_gen_json_converter",
-    srcs = [
-        "navi_gen_json_converter.cc",
-    ],
-    hdrs = [
-        "navi_gen_json_converter.h",
-    ],
-    deps = [
-       "//third_party/json",
-       "//modules/localization/msf/common/util:localization_msf_common_util",
-    ],
-)
-
-
-cc_library(
     name = "navigation_matcher",
     srcs = [
         "navigation_matcher.cc",
@@ -186,7 +171,6 @@ cc_library(
         ":navigation_matcher",
         ":trajectory_processor",
         "//modules/common:log",
-        ":navi_gen_json_converter",
     ],
 )
 
