@@ -29,6 +29,8 @@ DEFINE_double(min_prediction_trajectory_spatial_length, 20.0,
               "Minimal spatial length of predicted trajectory");
 DEFINE_bool(enable_trajectory_validation_check, false,
             "If check the validity of prediction trajectory.");
+DEFINE_bool(enable_tracking_adaptation, false,
+            "If enable prediction tracking adaptation");
 
 DEFINE_double(vehicle_max_linear_acc, 4.0,
               "Upper bound of vehicle linear acceleration");

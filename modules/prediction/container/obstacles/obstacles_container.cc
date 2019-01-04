@@ -74,8 +74,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
 
   // Prediction tracking adaptation
-  // TODO(Hongyi) move this a gflag
-  if (false) {
+  if (FLAGS_enable_tracking_adaptation) {
     BuildCurrentFrameIdMapping(perception_obstacles);
   }
 
@@ -275,10 +274,12 @@ bool ObstaclesContainer::AdaptTracking(
   if (perception_obstacle.has_position() &&
       perception_obstacle.position().has_x() &&
       perception_obstacle.position().has_y()) {
-    double obs_x = obstacle_ptr->latest_feature().position().x() +
-                   obstacle_ptr->latest_feature().raw_velocity().x() * 0.1;
-    double obs_y = obstacle_ptr->latest_feature().position().y() +
-                   obstacle_ptr->latest_feature().raw_velocity().y() * 0.1;
+    double obs_x = obstacle_ptr->latest_feature().position().x() + (timestamp_ -
+                   obstacle_ptr->latest_feature().timestamp()) *
+                   obstacle_ptr->latest_feature().raw_velocity().x();
+    double obs_y = obstacle_ptr->latest_feature().position().y() + (timestamp_ -
+                   obstacle_ptr->latest_feature().timestamp()) *
+                   obstacle_ptr->latest_feature().raw_velocity().y();
     double dist = std::hypot(perception_obstacle.position().x() - obs_x,
                              perception_obstacle.position().y() - obs_y);
     if (dist < 1.0) {
