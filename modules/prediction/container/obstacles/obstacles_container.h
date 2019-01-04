@@ -22,7 +22,7 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/common/util/lru_cache.h"
@@ -60,6 +60,12 @@ class ObstaclesContainer : public Container {
       const double timestamp);
 
   /**
+   * @brief Build current frame id mapping for all obstacles
+   */
+  void BuildCurrentFrameIdMapping(
+      const perception::PerceptionObstacles& perception_obstacles);
+
+  /**
    * @brief Build lane graph for obstacles
    */
   void BuildLaneGraph();
@@ -89,6 +95,15 @@ class ObstaclesContainer : public Container {
 
  private:
   /**
+   * @brief Check if a perception_obstacle is an old existed obstacle
+   * @param A PerceptionObstacle
+   * @param An obstacle_ptr
+   * @return True if the perception_obstacle is this obstacle; otherwise false;
+   */
+  bool AdaptTracking(const perception::PerceptionObstacle& perception_obstacle,
+                      Obstacle* obstacle_ptr);
+
+  /**
    * @brief Check if an obstacle is predictable
    * @param An obstacle
    * @return True if the obstacle is predictable; otherwise false;
@@ -101,7 +116,7 @@ class ObstaclesContainer : public Container {
   // an id_mapping from perception_id to prediction_id
   common::util::LRUCache<int, int> id_mapping_;
   std::vector<int> curr_frame_predictable_obstacle_ids_;
-  std::unordered_set<int> seen_prediction_ids_;
+  std::unordered_map<int, int> curr_frame_id_mapping_;
 };
 
 }  // namespace prediction
