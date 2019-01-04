@@ -31,18 +31,32 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       new ReedShepp(vehicle_param_, planner_open_space_config_));
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
-  max_steer_ = vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
+  // max_steer_ = vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
+  max_steer_ = planner_open_space_config_.warm_start_config().max_steering();
   step_size_ = planner_open_space_config_.warm_start_config().step_size();
   xy_grid_resolution_ =
       planner_open_space_config_.warm_start_config().xy_grid_resolution();
-  back_penalty_ = planner_open_space_config_.warm_start_config().back_penalty();
-  gear_switch_penalty_ =
-      planner_open_space_config_.warm_start_config().gear_switch_penalty();
-  steer_penalty_ =
-      planner_open_space_config_.warm_start_config().steer_penalty();
-  steer_change_penalty_ =
-      planner_open_space_config_.warm_start_config().steer_change_penalty();
   delta_t_ = planner_open_space_config_.delta_t();
+  traj_forward_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_forward_penalty();
+  traj_back_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_back_penalty();
+  traj_gear_switch_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_gear_switch_penalty();
+  traj_steer_penalty_ =
+      planner_open_space_config_.warm_start_config().traj_steer_penalty();
+  traj_steer_change_penalty_ = planner_open_space_config_.warm_start_config()
+                                   .traj_steer_change_penalty();
+  heu_rs_forward_penalty_ =
+      planner_open_space_config_.warm_start_config().heu_rs_forward_penalty();
+  heu_rs_back_penalty_ =
+      planner_open_space_config_.warm_start_config().heu_rs_back_penalty();
+  heu_rs_gear_switch_penalty_ = planner_open_space_config_.warm_start_config()
+                                    .heu_rs_gear_switch_penalty();
+  heu_rs_steer_penalty_ =
+      planner_open_space_config_.warm_start_config().heu_rs_steer_penalty();
+  heu_rs_steer_change_penalty_ = planner_open_space_config_.warm_start_config()
+                                     .heu_rs_steer_change_penalty();
 }
 
 bool HybridAStar::AnalyticExpansion(
@@ -106,8 +120,7 @@ bool HybridAStar::ValidityCheck(
     for (size_t i = 0; i < vertices_num - 1; i++) {
       common::math::LineSegment2d line_segment = common::math::LineSegment2d(
           obstacle_vertices[i], obstacle_vertices[i + 1]);
-      if (node->GetBoundingBox(vehicle_param_)
-              .HasOverlap(line_segment)) {
+      if (node->GetBoundingBox(vehicle_param_).HasOverlap(line_segment)) {
         return false;
       }
     }
@@ -191,15 +204,15 @@ void HybridAStar::CalculateNodeCost(
   // evaluate cost on the trajectory and add current cost
   double piecewise_cost = 0.0;
   if (next_node->GetDirec()) {
-    piecewise_cost += xy_grid_resolution_;
+    piecewise_cost += xy_grid_resolution_ * traj_forward_penalty_;
   } else {
-    piecewise_cost += xy_grid_resolution_ * back_penalty_;
+    piecewise_cost += xy_grid_resolution_ * traj_back_penalty_;
   }
   if (current_node->GetDirec() != next_node->GetDirec()) {
-    piecewise_cost += gear_switch_penalty_;
+    piecewise_cost += traj_gear_switch_penalty_;
   }
-  piecewise_cost += steer_penalty_ * std::abs(next_node->GetSteer());
-  piecewise_cost += steer_change_penalty_ *
+  piecewise_cost += traj_steer_penalty_ * std::abs(next_node->GetSteer());
+  piecewise_cost += traj_steer_change_penalty_ *
                     std::abs(next_node->GetSteer() - current_node->GetSteer());
   next_node->SetTrajCost(current_node->GetTrajCost() + piecewise_cost);
   // evaluate heuristic cost
@@ -216,9 +229,9 @@ double HybridAStar::CalculateRSPCost(
   double RSP_cost = 0.0;
   for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size(); i++) {
     if (reeds_shepp_to_end->segs_lengths[i] > 0.0) {
-      RSP_cost += reeds_shepp_to_end->segs_lengths[i];
+      RSP_cost += reeds_shepp_to_end->segs_lengths[i] * heu_rs_forward_penalty_;
     } else {
-      RSP_cost += reeds_shepp_to_end->segs_lengths[i] * back_penalty_;
+      RSP_cost += reeds_shepp_to_end->segs_lengths[i] * heu_rs_back_penalty_;
     }
   }
 
@@ -226,7 +239,7 @@ double HybridAStar::CalculateRSPCost(
     if (reeds_shepp_to_end->segs_lengths[i] *
             reeds_shepp_to_end->segs_lengths[i + 1] <
         0.0) {
-      RSP_cost += gear_switch_penalty_;
+      RSP_cost += heu_rs_gear_switch_penalty_;
     }
   }
   // steering cost
@@ -234,14 +247,14 @@ double HybridAStar::CalculateRSPCost(
   char last_turning;
   for (size_t i = 0; i < reeds_shepp_to_end->segs_types.size(); i++) {
     if (reeds_shepp_to_end->segs_types[i] != 'S') {
-      RSP_cost += steer_penalty_ * max_steer_;
+      RSP_cost += heu_rs_steer_penalty_ * max_steer_;
       if (!first_nonS_flag) {
         last_turning = reeds_shepp_to_end->segs_types[i];
         first_nonS_flag = true;
         continue;
       }
       if (reeds_shepp_to_end->segs_types[i] != last_turning) {
-        RSP_cost += 2 * steer_change_penalty_ * max_steer_;
+        RSP_cost += 2 * heu_rs_steer_change_penalty_ * max_steer_;
       }
     }
   }

@@ -83,8 +83,9 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   weight_first_order_time_ = distance_approach_config_.weight_time(0);
   weight_second_order_time_ = distance_approach_config_.weight_time(1);
   min_safety_distance_ = distance_approach_config_.min_safety_distance();
+  // max_steer_angle_ =
+  //     vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
   max_steer_angle_ = distance_approach_config_.max_steer_angle();
-  max_speed_forward_ = distance_approach_config_.max_speed_forward();
   max_speed_reverse_ = distance_approach_config_.max_speed_reverse();
   max_acceleration_forward_ =
       distance_approach_config_.max_acceleration_forward();
