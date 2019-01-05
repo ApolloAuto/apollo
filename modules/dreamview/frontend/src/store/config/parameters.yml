@@ -1,7 +1,7 @@
 camera:
-  viewAngle: 0.65
+  viewAngle: 0.80   # rad
   Default:
-    fov: 60
+    fov: 60 # deg
     near: 1
     far: 300
   Near:
