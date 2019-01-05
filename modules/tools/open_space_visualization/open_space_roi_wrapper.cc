@@ -130,13 +130,13 @@ class OpenSpaceROITest {
     double end_x = (left_top.x() + right_top.x()) / 2;
     double end_y = 0.0;
     if (parking_spot_heading_ > kMathEpsilon) {
-      if (FLAGS_parking_inwards) {
+      if (planner_open_space_config_.roi_config().parking_inwards()) {
         end_y = left_top.y() + (left_down.y() - left_top.y()) / 4;
       } else {
         end_y = left_top.y() + 3 * (left_down.y() - left_top.y()) / 4;
       }
     } else {
-      if (FLAGS_parking_inwards) {
+      if (planner_open_space_config_.roi_config().parking_inwards()) {
         end_y = left_down.y() + 3 * (left_top.y() - left_down.y()) / 4;
       } else {
         end_y = left_down.y() + (left_top.y() - left_down.y()) / 4;
@@ -144,7 +144,7 @@ class OpenSpaceROITest {
     }
     open_space_end_pose_.emplace_back(end_x);
     open_space_end_pose_.emplace_back(end_y);
-    if (FLAGS_parking_inwards) {
+    if (planner_open_space_config_.roi_config().parking_inwards()) {
       open_space_end_pose_.emplace_back(parking_spot_heading_);
     } else {
       open_space_end_pose_.emplace_back(
