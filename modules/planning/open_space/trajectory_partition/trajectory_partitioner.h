@@ -42,7 +42,7 @@ namespace planning {
 
 class TrajectoryPartitioner {
  public:
-  TrajectoryPartitioner() = default;
+  TrajectoryPartitioner();
 
   apollo::common::Status TrajectoryPartition(
       const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
@@ -54,6 +54,7 @@ class TrajectoryPartitioner {
       const Frame* frame, ADCTrajectory* trajectory_pb);
 
  private:
+  PlannerOpenSpaceConfig planner_open_space_config_;
   bool gear_shift_period_finished_ = true;
   bool gear_shift_period_started_ = true;
   double gear_shift_period_time_ = 0.0;

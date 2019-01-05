@@ -28,19 +28,31 @@ using apollo::common::Status;
 using apollo::common::VehicleState;
 using apollo::common::time::Clock;
 
+TrajectoryPartitioner::TrajectoryPartitioner() {
+  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
+                                       &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
+}
+
 Status TrajectoryPartitioner::TrajectoryPartition(
     const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
     const Frame* frame, ADCTrajectory* const ptr_trajectory_pb) {
   // interpolate the stitched trajectory
   std::vector<common::TrajectoryPoint> stitched_trajectory_to_end;
-  size_t interpolated_pieces_num = 50;
   for (size_t i = 0; i < last_publishable_trajectory->size() - 1; i++) {
     double relative_time_interval =
         (last_publishable_trajectory->at(i + 1).relative_time() -
          last_publishable_trajectory->at(i).relative_time()) /
-        static_cast<double>(interpolated_pieces_num);
+        static_cast<double>(
+            planner_open_space_config_.trajectory_partition_config()
+                .interpolated_pieces_num());
     stitched_trajectory_to_end.push_back(last_publishable_trajectory->at(i));
-    for (size_t j = 0; j < interpolated_pieces_num - 1; j++) {
+    for (size_t j = 0;
+         j < planner_open_space_config_.trajectory_partition_config()
+                     .interpolated_pieces_num() -
+                 1;
+         j++) {
       double relative_time =
           last_publishable_trajectory->at(i).relative_time() +
           (static_cast<double>(j) + 1) * relative_time_interval;
@@ -50,6 +62,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
               last_publishable_trajectory->at(i + 1), relative_time));
     }
   }
+
   stitched_trajectory_to_end.push_back(last_publishable_trajectory->back());
   double distance_s = 0.0;
   apollo::planning_internal::Trajectories trajectory_partition;
@@ -60,10 +73,11 @@ Status TrajectoryPartitioner::TrajectoryPartition(
 
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
-  const size_t initial_gear_check_horizon = 3;
   const double kepsilon = 1e-6;
   size_t horizon = stitched_trajectory_to_end.size();
-  size_t initial_horizon = std::min(horizon, initial_gear_check_horizon);
+  size_t initial_horizon =
+      std::min(horizon, planner_open_space_config_.trajectory_partition_config()
+                            .initial_gear_check_horizon());
   int direction_flag = 0;
   size_t i = 0;
   int j = 0;
@@ -162,12 +176,9 @@ Status TrajectoryPartitioner::TrajectoryPartition(
   size_t trajectories_size = trajectory_partition.trajectory_size();
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
-  // TODO(Jinyun) move these to configs
   constexpr double kepsilon_to_destination = 1e-6;
-  constexpr double heading_searching_range = 0.3;
-  constexpr double gear_shift_period_duration_ = 2.0;
   bool flag_change_to_next = false;
-  // Could have a big error in vehicle state in single thread mode!!! As the
+  // Could have a big error in vehicle state in single thread mode As the
   // vehicle state is only updated at the every beginning at RunOnce()
   VehicleState vehicle_state = frame->vehicle_state();
 
@@ -211,7 +222,8 @@ Status TrajectoryPartitioner::TrajectoryPartition(
 
     if (distance_to_trajs_end <= kepsilon_to_destination &&
         std::abs(traj_point_moving_direction - vehicle_moving_direction) <
-            heading_searching_range) {
+            planner_open_space_config_.trajectory_partition_config()
+                .heading_searching_range()) {
       if (i + 1 >= trajectories_size) {
         current_trajectory_index = trajectories_size - 1;
         closest_trajectory_point_index = trajectory_size - 1;
@@ -262,7 +274,8 @@ Status TrajectoryPartitioner::TrajectoryPartition(
             common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
       }
       if (std::abs(traj_point_moving_direction - vehicle_moving_direction) <
-          heading_searching_range) {
+          planner_open_space_config_.trajectory_partition_config()
+              .heading_searching_range()) {
         current_trajectory_index = closest_point.first.first;
         closest_trajectory_point_index = closest_point.first.second;
         break;
@@ -278,7 +291,9 @@ Status TrajectoryPartitioner::TrajectoryPartition(
         gear_shift_position_ = gear_positions[current_trajectory_index];
         gear_shift_period_started_ = false;
       }
-      if (gear_shift_period_time_ > gear_shift_period_duration_) {
+      if (gear_shift_period_time_ >
+          planner_open_space_config_.trajectory_partition_config()
+              .gear_shift_period_duration()) {
         gear_shift_period_finished_ = true;
         gear_shift_period_started_ = true;
       } else {
@@ -323,8 +338,12 @@ void TrajectoryPartitioner::GenerateGearShiftTrajectory(
   trajectory_pb->clear_trajectory_point();
 
   // TODO(QiL): move this to config after finalize the logic
-  constexpr double max_t = 3.0;
-  constexpr double unit_t = 0.02;
+  double gear_shift_max_t =
+      planner_open_space_config_.trajectory_partition_config()
+          .gear_shift_max_t();
+  double gear_shift_unit_t =
+      planner_open_space_config_.trajectory_partition_config()
+          .gear_shift_unit_t();
 
   apollo::common::TrajectoryPoint tp;
   auto path_point = tp.mutable_path_point();
@@ -335,7 +354,7 @@ void TrajectoryPartitioner::GenerateGearShiftTrajectory(
   path_point->set_s(0.0);
   tp.set_v(0.0);
   tp.set_a(0.0);
-  for (double t = 0.0; t < max_t; t += unit_t) {
+  for (double t = 0.0; t < gear_shift_max_t; t += gear_shift_unit_t) {
     tp.set_relative_time(t);
     auto next_point = trajectory_pb->add_trajectory_point();
     next_point->CopyFrom(tp);
