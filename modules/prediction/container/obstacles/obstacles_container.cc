@@ -33,7 +33,8 @@ using apollo::perception::PerceptionObstacles;
 
 
 ObstaclesContainer::ObstaclesContainer()
-    : obstacles_(FLAGS_max_num_obstacles) {}
+    : obstacles_(FLAGS_max_num_obstacles),
+      id_mapping_(FLAGS_max_num_obstacles) {}
 
 // This is called by Perception module at every frame to insert all
 // detected obstacles.
@@ -132,7 +133,11 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   if (curr_frame_id_mapping_.find(prediction_id) !=
       curr_frame_id_mapping_.end()) {
     prediction_id = curr_frame_id_mapping_[prediction_id];
-    ADEBUG << "Prediction_id is: " << prediction_id;
+    if (prediction_id != perception_obstacle.id()) {
+      ADEBUG << "Obstacle have got AdaptTracking, with perception_id: "
+             << perception_obstacle.id()
+             << ", and prediction_id: " << prediction_id;
+    }
   }
   if (prediction_id < -1) {
     AERROR << "Invalid ID [" << prediction_id << "]";
@@ -186,7 +191,7 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
     std::unordered_set<int> seen_prediction_ids;
     int prediction_id = 0;
     if (id_mapping_.GetCopy(perception_id, &prediction_id)) {
-      if (seen_perception_ids.find(prediction_id) !=
+      if (seen_perception_ids.find(prediction_id) ==
           seen_perception_ids.end()) {
         // find this perception_id in LRUMapping, map it to a tracked obstacle
         curr_frame_id_mapping_[perception_id] = prediction_id;
@@ -207,12 +212,12 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
           AERROR << "Obstacle id [" << obs_id << "] with empty obstacle_ptr.";
           break;
         }
-        if (timestamp_ - obstacle_ptr->timestamp() > 0.2) {
+        if (timestamp_ - obstacle_ptr->timestamp() > 0.5) {
           ADEBUG << "Obstacle already reach time threshold.";
           break;
         }
         if (AdaptTracking(perception_obstacle, obstacle_ptr)) {
-          id_mapping_[perception_id] = obs_id;
+          id_mapping_.Put(perception_id, obs_id);
           curr_frame_id_mapping_[perception_id] = obs_id;
           break;
         }
@@ -282,7 +287,7 @@ bool ObstaclesContainer::AdaptTracking(
                    obstacle_ptr->latest_feature().raw_velocity().y();
     double dist = std::hypot(perception_obstacle.position().x() - obs_x,
                              perception_obstacle.position().y() - obs_y);
-    if (dist < 1.0) {
+    if (dist < 3.0) {
       return true;
     }
   }
