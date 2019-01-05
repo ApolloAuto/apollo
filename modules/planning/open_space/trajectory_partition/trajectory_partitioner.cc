@@ -362,5 +362,12 @@ void TrajectoryPartitioner::GenerateGearShiftTrajectory(
   trajectory_pb->set_gear(gear_position);
 }
 
+void TrajectoryPartitioner::Restart() {
+  gear_shift_period_finished_ = true;
+  gear_shift_period_started_ = true;
+  gear_shift_period_time_ = 0.0;
+  gear_shift_start_time_ = 0.0;
+  gear_shift_position_ = canbus::Chassis::GEAR_DRIVE;
+}
 }  // namespace planning
 }  // namespace apollo
