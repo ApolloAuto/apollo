@@ -2,6 +2,7 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
+
 cc_library(
     name = "canbus_transit_protocol",
     deps = [
@@ -33,7 +34,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -49,7 +50,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -67,7 +68,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -85,7 +86,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",      
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -102,12 +103,26 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
 cc_library(
-    name = "llc_diag_fault_620",
+    name = "llc_diag_fault_620",# cc_library(
+#    name = "canbus_transit_protocol",
+#    srcs = glob([
+#        "*.cc",
+#    ]),
+#    hdrs = glob([
+#        "*.h",
+#    ]),
+#    copts = ["-DMODULE_NAME=\\\"canbus\\\""],
+#    deps = [
+#        "//modules/canbus/proto:canbus_proto",
+#        "//modules/drivers/canbus/can_comm:message_manager_base",
+#        "//modules/drivers/canbus/common:canbus_common",
+#    ],
+# )
     srcs = [
         "llc_diag_fault_620.cc",
     ],
@@ -118,7 +133,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -134,7 +149,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -150,7 +165,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -171,6 +186,7 @@ cc_library(
 )
 
 
+
 cc_library(
     name = "llc_motionfeedback2_21",
     srcs = [
@@ -183,7 +199,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -200,7 +216,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -216,7 +232,21 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
+
+cc_test(
+    name = "Motioncommandfeedback1_22_test",
+    size = "small",
+    srcs = [
+        "llc_motioncommandfeedback1_22_test.cc",
+    ],
+    deps = [
+        ":llc_motioncommandfeedback1_22",
+        "//modules/common/util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

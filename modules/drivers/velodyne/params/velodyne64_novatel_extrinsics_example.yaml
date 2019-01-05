@@ -1,20 +1,17 @@
-# proj: +proj=utm +zone=50 +ellps=WGS84
-# scale:1.11177
-# (XXX) Manually adjusted
-header:
-  stamp:
-    secs: 1422601952
-    nsecs: 288805456
-  seq: 0
-  frame_id: novatel
+child_frame_id: velodyne64
 transform:
   translation:
-    x: -0.1941689746184177
-    y: 1.438544324620427
-    z: 0
+    x: -0.0581372003122598
+    y: 1.459274166013735
+    z: 1.24965
   rotation:
-    x: -0.00971305
-    y: 0.00327669
-    z: 0.7157
-    w: 0.698332
-child_frame_id: velodyne64
+    x: 0.02748694630673456
+    y: -0.03223034579615043
+    z: 0.7065742186090662
+    w: 0.706369978261802
+header:
+  seq: 0
+  stamp:
+    secs: 1512689414
+    nsecs: 0
+  frame_id: novatel

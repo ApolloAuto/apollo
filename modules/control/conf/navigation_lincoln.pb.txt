@@ -27,10 +27,6 @@ lat_controller_conf {
   matrix_q: 0.0
   matrix_q: 0.25
   matrix_q: 0.02
-  reverse_matrix_q: 0.5
-  reverse_matrix_q: 0.0
-  reverse_matrix_q: 0.4
-  reverse_matrix_q: 0.0
   cutoff_freq: 10
   mean_filter_window_size: 10
   max_iteration: 150
@@ -60,6 +56,10 @@ lat_controller_conf {
       speed: 24.6
       ratio: 0.049
     }
+    scheduler {
+      speed: 30.0
+      ratio: 0.05
+    }
   }
   heading_err_gain_scheduler {
     scheduler {
@@ -85,6 +85,10 @@ lat_controller_conf {
     scheduler {
       speed: 24.6
       ratio: 0.06
+    }
+    scheduler {
+      speed: 30.0
+      ratio: 0.05
     }
   }
 }
@@ -118,20 +122,6 @@ lon_controller_conf {
     kd: 0.0
   }
   switch_speed: 2.0
-  reverse_station_pid_conf {
-    integrator_enable: false
-    integrator_saturation_level: 0.3
-    kp: 0.2
-    ki: 0.0
-    kd: 0.0
-  }
-  reverse_speed_pid_conf {
-    integrator_enable: true
-    integrator_saturation_level: 0.1
-    kp: 0.05
-    ki: 0.0
-    kd: 0.0
-  }
   pitch_angle_filter_conf {
     cutoff_freq: 5
   }
