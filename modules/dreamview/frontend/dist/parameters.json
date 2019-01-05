@@ -1,6 +1,6 @@
 {
 	"camera": {
-		"viewAngle": 0.65,
+		"viewAngle": 0.8,
 		"Default": {
 			"fov": 60,
 			"near": 1,
