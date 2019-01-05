@@ -20,12 +20,12 @@
 
 #pragma once
 
+#include <algorithm>
+#include <limits>
 #include <memory>
 #include <queue>
-#include <algorithm>
 #include <utility>
 #include <vector>
-#include <limits>
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -43,6 +43,8 @@ namespace planning {
 class TrajectoryPartitioner {
  public:
   TrajectoryPartitioner();
+
+  void Restart();
 
   apollo::common::Status TrajectoryPartition(
       const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
