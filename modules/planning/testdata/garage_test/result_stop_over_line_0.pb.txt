@@ -11,7 +11,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -26,7 +26,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -41,7 +41,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -56,7 +56,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -71,7 +71,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -86,7 +86,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -101,7 +101,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -116,7 +116,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -131,7 +131,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -146,7 +146,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -161,7 +161,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -176,7 +176,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -191,7 +191,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -206,7 +206,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -221,7 +221,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -236,7 +236,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -251,7 +251,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -266,7 +266,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -281,7 +281,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -296,7 +296,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -311,7 +311,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -326,7 +326,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -341,7 +341,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -356,7 +356,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -371,7 +371,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -386,7 +386,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -401,7 +401,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -416,7 +416,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -431,7 +431,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -446,7 +446,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -461,7 +461,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -476,7 +476,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -491,7 +491,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -506,7 +506,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -521,7 +521,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -536,7 +536,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -551,7 +551,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -566,7 +566,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -581,7 +581,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -596,7 +596,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -611,7 +611,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -626,7 +626,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -641,7 +641,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -656,7 +656,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -671,7 +671,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -686,7 +686,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -701,7 +701,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -716,7 +716,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -731,7 +731,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -746,7 +746,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -761,7 +761,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -776,7 +776,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -791,7 +791,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -806,7 +806,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -821,7 +821,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -836,7 +836,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -851,7 +851,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -866,7 +866,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -881,7 +881,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -896,7 +896,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -911,7 +911,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -926,7 +926,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -941,7 +941,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -956,7 +956,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -971,7 +971,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -986,7 +986,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -1001,7 +1001,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -1016,7 +1016,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -1031,7 +1031,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0
@@ -1046,7 +1046,7 @@ trajectory_point {
     y: 4140735.5242147995
     z: 0
     theta: 1.3120887936
-    kappa: 3.7846794424699828e-05
+    kappa: -1.8746706329538833e-21
     s: 0
     dkappa: 0
     ddkappa: 0

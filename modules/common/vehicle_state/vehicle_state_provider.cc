@@ -65,6 +65,14 @@ Status VehicleStateProvider::Update(
     }
   }
 
+  constexpr double kEpsilon = 1e-6;
+  if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
+    vehicle_state_.set_kappa(0.0);
+  } else {
+    vehicle_state_.set_kappa(vehicle_state_.angular_velocity() /
+                             vehicle_state_.linear_velocity());
+  }
+
   vehicle_state_.set_driving_mode(chassis.driving_mode());
 
   return Status::OK();
@@ -123,15 +131,6 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     CHECK(localization.pose().has_linear_acceleration());
     vehicle_state_.set_linear_acceleration(
         localization.pose().linear_acceleration().y());
-  }
-
-  // TODO(all) kappa is wrong as it uses unupdated linear velocity.
-  constexpr double kEpsilon = 1e-6;
-  if (std::abs(vehicle_state_.linear_velocity()) < kEpsilon) {
-    vehicle_state_.set_kappa(0.0);
-  } else {
-    vehicle_state_.set_kappa(vehicle_state_.angular_velocity() /
-                             vehicle_state_.linear_velocity());
   }
 
   if (localization.pose().has_euler_angles()) {
