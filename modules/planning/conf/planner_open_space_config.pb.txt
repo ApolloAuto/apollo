@@ -6,6 +6,7 @@ is_near_destination_threshold : 0.05
 roi_config : {
   roi_longitudinal_range : 15.0
   parking_start_range : 12.0
+  parking_inwards : false
 }
 
 warm_start_config : {

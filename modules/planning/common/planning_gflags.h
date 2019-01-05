@@ -221,7 +221,6 @@ DECLARE_string(planner_open_space_config_filename);
 DECLARE_double(open_space_planning_period);
 DECLARE_double(open_space_prediction_time_horizon);
 DECLARE_bool(enable_perception_obstacles);
-DECLARE_bool(parking_inwards);
 DECLARE_bool(enable_open_space_planner_thread);
 DECLARE_bool(open_space_planner_switchable);
 DECLARE_bool(use_dual_variable_warm_start);
