@@ -10,7 +10,7 @@ Argus摄像头是由Truly Seminconductors Itd和百度联合投资开发的产�
 
 ## 产品规格
 
-![specs_image](images/Argus_specs.png)
+![specs_image](images/Argus_specs2.png)
 
 ## 免责声明
 该设备由`Apollo平台提供支持`
