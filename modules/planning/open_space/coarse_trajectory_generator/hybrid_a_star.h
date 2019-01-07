@@ -31,7 +31,6 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <queue>
 #include <unordered_map>
@@ -98,6 +97,8 @@ class HybridAStar {
   void CalculateNodeCost(
       std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node,
       const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end);
+  double TrajCost(std::shared_ptr<Node3d> current_node,
+                  std::shared_ptr<Node3d> next_node);
   double HeuristicCost();
   double HoloObstacleHeuristic();
   double NonHoloNoObstacleHeuristic(
@@ -112,14 +113,20 @@ class HybridAStar {
   common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   size_t next_node_num_ = 0;
-  double max_steer_ = 0.0;
+  double max_steer_angle_ = 0.0;
   double step_size_ = 0.0;
   double xy_grid_resolution_ = 0.0;
-  double back_penalty_ = 0.0;
-  double gear_switch_penalty_ = 0.0;
-  double steer_penalty_ = 0.0;
-  double steer_change_penalty_ = 0.0;
   double delta_t_ = 0.0;
+  double traj_forward_penalty_ = 0.0;
+  double traj_back_penalty_ = 0.0;
+  double traj_gear_switch_penalty_ = 0.0;
+  double traj_steer_penalty_ = 0.0;
+  double traj_steer_change_penalty_ = 0.0;
+  double heu_rs_forward_penalty_ = 0.0;
+  double heu_rs_back_penalty_ = 0.0;
+  double heu_rs_gear_switch_penalty_ = 0.0;
+  double heu_rs_steer_penalty_ = 0.0;
+  double heu_rs_steer_change_penalty_ = 0.0;
   std::vector<double> XYbounds_;
   std::shared_ptr<Node3d> start_node_;
   std::shared_ptr<Node3d> end_node_;

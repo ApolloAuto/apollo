@@ -421,11 +421,6 @@ DEFINE_bool(enable_perception_obstacles, true,
 DEFINE_bool(enable_open_space_planner_thread, true,
             "Enable thread in open space planner for trajectory publish.");
 
-DEFINE_bool(
-    parking_inwards, false,
-    "true for parking the car inwards in parking spot, false for parking "
-    "the car towards the street");
-
 DEFINE_bool(open_space_planner_switchable, false,
             "true for std planning being able to switch to open space planner "
             "when close enough to target parking spot");
@@ -454,7 +449,7 @@ DEFINE_double(
 DEFINE_double(max_trajectory_len, 1000.0,
               "(unit: meter) max possible trajectory length.");
 DEFINE_bool(enable_rss_fallback, false, "trigger rss fallback");
-DEFINE_bool(enable_rss_info, false, "enable rss_info in trajectory_pb");
+DEFINE_bool(enable_rss_info, true, "enable rss_info in trajectory_pb");
 
 DEFINE_bool(
     enable_planning_smoother, true,

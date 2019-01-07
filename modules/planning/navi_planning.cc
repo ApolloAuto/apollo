@@ -19,9 +19,6 @@
 #include <algorithm>
 #include <list>
 #include <map>
-#include <memory>
-#include <utility>
-#include <vector>
 
 #include "google/protobuf/repeated_field.h"
 
@@ -549,7 +546,7 @@ Status NaviPlanning::Plan(
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
   // Navi Panner doesn't need to stitch the last path planning
-  // trajectory.Otherwise, it will cause the Dremview planning track to display
+  // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(

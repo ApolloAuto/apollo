@@ -25,6 +25,7 @@ namespace record {
 
 const uint64_t PlayTaskConsumer::kPauseSleepNanoSec = 100000000UL;
 const uint64_t PlayTaskConsumer::kWaitProduceSleepNanoSec = 5000000UL;
+const uint64_t PlayTaskConsumer::MIN_SLEEP_DURATION_NS = 200000000UL;
 
 PlayTaskConsumer::PlayTaskConsumer(const TaskBufferPtr& task_buffer,
                                    double play_rate)
@@ -69,7 +70,7 @@ void PlayTaskConsumer::ThreadFunc() {
   uint64_t accumulated_pause_time_ns = 0;
 
   while (!is_stopped_.load()) {
-    auto task = task_buffer_->Pop();
+    auto task = task_buffer_->Front();
     if (task == nullptr) {
       std::this_thread::sleep_for(
           std::chrono::nanoseconds(kWaitProduceSleepNanoSec));
@@ -85,6 +86,16 @@ void PlayTaskConsumer::ThreadFunc() {
         sleep_ns = static_cast<uint64_t>(
             static_cast<double>(base_msg_play_time_ns_ - begin_time_ns_) /
             play_rate_);
+        while (sleep_ns > MIN_SLEEP_DURATION_NS && !is_stopped_.load()) {
+          std::this_thread::sleep_for(
+              std::chrono::nanoseconds(MIN_SLEEP_DURATION_NS));
+          sleep_ns -= MIN_SLEEP_DURATION_NS;
+        }
+
+        if (is_stopped_.load()) {
+          break;
+        }
+
         std::this_thread::sleep_for(std::chrono::nanoseconds(sleep_ns));
       }
       base_real_time_ns = Time::Now().ToNanosecond();
@@ -114,6 +125,7 @@ void PlayTaskConsumer::ThreadFunc() {
       std::this_thread::sleep_for(std::chrono::nanoseconds(kPauseSleepNanoSec));
       accumulated_pause_time_ns += kPauseSleepNanoSec;
     }
+    task_buffer_->PopFront();
   }
 }
 

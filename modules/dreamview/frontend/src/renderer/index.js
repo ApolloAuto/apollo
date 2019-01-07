@@ -186,8 +186,8 @@ class Renderer {
             this.camera.position.z = target.position.z + deltaZ;
             this.camera.up.set(0, 0, 1);
             this.camera.lookAt({
-                x: target.position.x + 2 * deltaX,
-                y: target.position.y + 2 * deltaY,
+                x: target.position.x + deltaX,
+                y: target.position.y + deltaY,
                 z: 0
             });
 
@@ -205,8 +205,8 @@ class Renderer {
             this.camera.position.z = target.position.z + deltaZ;
             this.camera.up.set(0, 0, 1);
             this.camera.lookAt({
-                x: target.position.x + 2 * deltaX,
-                y: target.position.y + 2 * deltaY,
+                x: target.position.x + deltaX,
+                y: target.position.y + deltaY,
                 z: 0
             });
 
@@ -347,7 +347,9 @@ class Renderer {
         this.adc.updateRssMarker(world.isRssSafe);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);
-        this.perceptionObstacles.update(world, this.coordinates, this.scene);
+
+        const isBirdView = ['Overhead', 'Map'].includes(_.get(this, 'options.cameraAngle'));
+        this.perceptionObstacles.update(world, this.coordinates, this.scene, isBirdView);
         this.decision.update(world, this.coordinates, this.scene);
         this.prediction.update(world, this.coordinates, this.scene);
         this.updateRouting(world.routingTime, world.routePath);

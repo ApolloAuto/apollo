@@ -22,7 +22,6 @@
 #include "modules/planning/reference_line/reference_line_provider.h"
 
 #include <algorithm>
-#include <chrono>
 #include <limits>
 #include <utility>
 
@@ -139,7 +138,11 @@ void ReferenceLineProvider::UpdateReferenceLine(
     auto segment_iter = route_segments.begin();
     auto internal_iter = reference_lines_.begin();
     auto internal_segment_iter = route_segments_.begin();
-    for (auto iter = reference_lines.begin(); iter != reference_lines.end();
+    for (auto iter = reference_lines.begin();
+         iter != reference_lines.end() &&
+         segment_iter != route_segments.end() &&
+         internal_iter != reference_lines_.end() &&
+         internal_segment_iter != route_segments_.end();
          ++iter, ++segment_iter, ++internal_iter, ++internal_segment_iter) {
       if (iter->reference_points().empty()) {
         *internal_iter = *iter;

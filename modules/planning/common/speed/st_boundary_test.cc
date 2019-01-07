@@ -16,9 +16,6 @@
 
 #include "modules/planning/common/speed/st_boundary.h"
 
-#include <algorithm>
-#include <cmath>
-
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
@@ -26,9 +23,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 
 TEST(StBoundaryTest, basic_test) {
   std::vector<STPoint> upper_points;

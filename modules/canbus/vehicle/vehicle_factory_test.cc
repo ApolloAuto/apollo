@@ -44,6 +44,9 @@ TEST_F(VehicleFactoryTest, CreateVehicle) {
 
   parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
   EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+
+  parameter.set_brand(VehicleParameter::GE3);
+  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
 }
 
 }  // namespace canbus

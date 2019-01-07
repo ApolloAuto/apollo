@@ -17,9 +17,7 @@
 #include "modules/perception/lidar/lib/tracker/association/gnn_bipartite_graph_matcher.h"
 
 #include <algorithm>
-#include <iostream>
 #include <utility>
-#include <vector>
 
 #include "cyber/common/log.h"
 

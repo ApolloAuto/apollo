@@ -20,9 +20,6 @@
 
 #include "modules/planning/scenarios/scenario.h"
 
-#include <map>
-#include <utility>
-
 namespace apollo {
 namespace planning {
 namespace scenario {

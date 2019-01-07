@@ -21,8 +21,6 @@
 #define private public
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"

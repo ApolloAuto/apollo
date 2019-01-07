@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_intersection_cruise.h"
 
-#include <algorithm>
-#include <limits>
-#include <utility>
-
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "cyber/common/log.h"
@@ -31,7 +27,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/toolkits/deciders/decider_creep.h"
+#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {

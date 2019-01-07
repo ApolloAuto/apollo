@@ -37,7 +37,6 @@
 namespace apollo {
 namespace planning {
 using common::Status;
-using common::VehicleConfigHelper;
 
 apollo::common::util::Factory<TrafficRuleConfig::RuleId, TrafficRule,
                               TrafficRule *(*)(const TrafficRuleConfig &config)>

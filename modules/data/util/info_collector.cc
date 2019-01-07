@@ -34,8 +34,6 @@ namespace {
 
 using apollo::common::KVDB;
 using apollo::common::util::GetProtoFromASCIIFile;
-using apollo::common::util::SetProtoToASCIIFile;
-using apollo::routing::RoutingRequest;
 using google::protobuf::Map;
 using google::protobuf::RepeatedPtrField;
 

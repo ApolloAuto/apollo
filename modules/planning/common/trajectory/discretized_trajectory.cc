@@ -20,9 +20,7 @@
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
-#include <algorithm>
 #include <limits>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/linear_interpolation.h"

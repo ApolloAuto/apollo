@@ -33,12 +33,12 @@ export default class PerceptionObstacles {
         this.icons = [];
     }
 
-    update(world, coordinates, scene) {
-        this.updateObjects(world, coordinates, scene);
+    update(world, coordinates, scene, isBirdView) {
+        this.updateObjects(world, coordinates, scene, isBirdView);
         this.updateLaneMarkers(world, coordinates, scene);
     }
 
-    updateObjects(world, coordinates, scene) {
+    updateObjects(world, coordinates, scene, isBirdView) {
         // Id meshes need to be recreated every time.
         // Each text mesh needs to be removed from the scene,
         // and its char meshes need to be hidden for reuse purpose.
@@ -66,6 +66,8 @@ export default class PerceptionObstacles {
             x: world.autoDrivingCar.positionX,
             y: world.autoDrivingCar.positionY,
         });
+        adc.heading = world.autoDrivingCar.heading;
+
         let arrowIdx = 0;
         let cubeIdx = 0;
         let extrusionFaceIdx = 0;
@@ -97,7 +99,7 @@ export default class PerceptionObstacles {
                 arrowMesh.visible = true;
             }
 
-            this.updateTexts(adc, obstacle, position, scene);
+            this.updateTexts(adc, obstacle, position, scene, isBirdView);
 
             // get the confidence and validate its range
             let confidence = obstacle.confidence;
@@ -140,12 +142,17 @@ export default class PerceptionObstacles {
         return arrowMesh;
     }
 
-    updateTexts(adc, obstacle, obstaclePosition, scene) {
+    updateTexts(adc, obstacle, obstaclePosition, scene, isBirdView) {
         const initPosition = {
             x: obstaclePosition.x,
             y: obstaclePosition.y,
             z: obstacle.height || 3
         };
+
+        const lineSpacing = 0.5;
+        const deltaX = isBirdView ? 0.0 : lineSpacing * Math.cos(adc.heading);
+        const deltaY = isBirdView ? 0.7 : lineSpacing * Math.sin(adc.heading);
+        const deltaZ = isBirdView ? 0.0 : lineSpacing;
         let lineCount = 0;
         if (STORE.options.showObstaclesInfo) {
             const distance = adc.distanceTo(obstaclePosition).toFixed(1);
@@ -155,20 +162,20 @@ export default class PerceptionObstacles {
         }
         if (STORE.options.showObstaclesId) {
             const textPosition = {
-                x: initPosition.x,
-                y: initPosition.y + (lineCount * 0.7),
-                z: initPosition.z + (lineCount * 1),
+                x: initPosition.x + (lineCount * deltaX),
+                y: initPosition.y + (lineCount * deltaY),
+                z: initPosition.z + (lineCount * deltaZ),
             };
             this.drawTexts(obstacle.id, textPosition, scene);
             lineCount++;
         }
         if (STORE.options.showPredictionPriority) {
-            const priority = obstacle.obstaclePriority;
+            const priority = _.get(obstacle, 'obstaclePriority.priority');
             if (priority && priority !== "NORMAL") {
                 const textPosition = {
-                    x: initPosition.x,
-                    y: initPosition.y + (lineCount * 0.7),
-                    z: initPosition.z + (lineCount * 1),
+                    x: initPosition.x + (lineCount * deltaX),
+                    y: initPosition.y + (lineCount * deltaY),
+                    z: initPosition.z + (lineCount * deltaZ),
                 };
                 this.drawTexts(priority, textPosition, scene);
             }

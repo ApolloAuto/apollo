@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
 
-#include <string>
-#include <vector>
-
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"

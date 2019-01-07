@@ -21,8 +21,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
-#include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -35,7 +33,7 @@
 #include "modules/planning/reference_line/reference_point.h"
 #include "modules/planning/scenarios/scenario.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/toolkits/task.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {

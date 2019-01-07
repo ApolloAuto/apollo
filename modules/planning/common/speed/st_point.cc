@@ -20,8 +20,6 @@
 
 #include "modules/planning/common/speed/st_point.h"
 
-#include <iomanip>
-
 #include "modules/common/util/string_util.h"
 
 namespace apollo {

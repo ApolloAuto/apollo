@@ -16,9 +16,7 @@
 #include "modules/perception/fusion/lib/data_association/hm_data_association/track_object_similarity.h"
 
 #include <algorithm>
-#include <iostream>
 #include <limits>
-#include <vector>
 
 #include "modules/perception/fusion/base/fusion_log.h"
 #include "modules/perception/fusion/common/camera_util.h"

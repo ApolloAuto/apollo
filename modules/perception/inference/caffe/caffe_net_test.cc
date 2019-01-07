@@ -16,12 +16,6 @@
 
 #include "modules/perception/inference/caffe/caffe_net.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/highgui/highgui_c.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <string>
-
 #include "caffe/util/math_functions.hpp"
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"

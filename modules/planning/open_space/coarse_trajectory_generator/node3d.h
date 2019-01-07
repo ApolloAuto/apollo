@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <math.h>
 #include <memory>
 #include <vector>
 
@@ -50,6 +49,7 @@ class Node3d {
   Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
   double GetCost() { return traj_cost_ + heuristic_cost_; }
   double GetTrajCost() { return traj_cost_; }
+  double GetHeuCost() { return heuristic_cost_; }
   size_t GetGridX() { return x_grid_; }
   size_t GetGridY() { return y_grid_; }
   size_t GetGridPhi() { return phi_grid_; }
@@ -64,6 +64,7 @@ class Node3d {
   std::vector<double> GetXs() { return traversed_x_; }
   std::vector<double> GetYs() { return traversed_y_; }
   std::vector<double> GetPhis() { return traversed_phi_; }
+  size_t GetSize();
   void SetPre(std::shared_ptr<Node3d> pre_node) { pre_node_ = pre_node; }
   void SetDirec(bool direction) { direction_ = direction; }
   void SetTrajCost(double cost) { traj_cost_ = cost; }

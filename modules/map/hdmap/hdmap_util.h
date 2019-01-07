@@ -16,7 +16,6 @@ limitations under the License.
 #pragma once
 
 #include <memory>
-#include <mutex>
 #include <string>
 
 #include "modules/map/proto/map_id.pb.h"

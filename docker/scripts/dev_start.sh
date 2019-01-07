@@ -56,6 +56,10 @@ function check_host_environment() {
     echo 'Check https://git-lfs.github.com for more information.'
     exit 1
   fi
+
+  # Fetch lfs managed files for current HEAD.
+  git lfs fetch
+
   if ! [ -d ${APOLLO_ROOT_DIR}/.git/lfs/objects ]; then
     echo 'You need to install and run git-lfs when working with apollo.'
     echo 'New versions of git manage it automotically, but old versions may '

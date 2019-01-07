@@ -21,7 +21,6 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "modules/planning/proto/planning.pb.h"

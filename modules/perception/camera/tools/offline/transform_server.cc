@@ -14,8 +14,6 @@
 * limitations under the License.
 *****************************************************************************/
 #include <yaml-cpp/yaml.h>
-#include <fstream>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"

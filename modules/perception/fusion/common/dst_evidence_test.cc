@@ -13,11 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <algorithm>
-#include <functional>
-#include <map>
-#include <string>
-#include <vector>
 
 #include "boost/format.hpp"
 #include "gtest/gtest.h"

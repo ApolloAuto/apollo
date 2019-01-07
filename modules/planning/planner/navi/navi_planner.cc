@@ -21,11 +21,7 @@
 
 #include "modules/planning/planner/navi/navi_planner.h"
 
-#include <algorithm>
-#include <limits>
-#include <memory>
 #include <utility>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"

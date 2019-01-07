@@ -16,11 +16,6 @@
 
 #include "modules/planning/integration_tests/planning_test_base.h"
 
-#include <unistd.h>
-#include <chrono>
-#include <cstdlib>
-#include <thread>
-
 #include "cyber/common/log.h"
 
 #include "modules/canbus/proto/chassis.pb.h"

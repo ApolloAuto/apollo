@@ -18,8 +18,6 @@
  * @file
  */
 
-#include <memory>
-
 #include "gtest/gtest.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
@@ -29,9 +27,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 
 class HybridATest : public ::testing::Test {
  public:

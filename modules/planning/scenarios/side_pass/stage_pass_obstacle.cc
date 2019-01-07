@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
 
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"

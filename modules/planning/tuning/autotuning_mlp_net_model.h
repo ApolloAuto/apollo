@@ -18,8 +18,6 @@
 
 #include <vector>
 
-#include "Eigen/Dense"
-
 #include "cyber/common/macros.h"
 
 #include "modules/prediction/network/net_model.h"

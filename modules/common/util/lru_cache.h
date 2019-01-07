@@ -135,11 +135,11 @@ class LRUCache {
 
   V* Get(const K& key) { return Get(key, false); }
 
-  bool GetCopySilently(const K& key, const V* val) {
+  bool GetCopySilently(const K& key, V* const val) {
     return GetCopy(key, val, true);
   }
 
-  bool GetCopy(const K& key, const V* val) { return GetCopy(key, val, false); }
+  bool GetCopy(const K& key, V* const val) { return GetCopy(key, val, false); }
 
   size_t size() { return size_; }
 
@@ -252,7 +252,7 @@ class LRUCache {
     return nullptr;
   }
 
-  bool GetCopy(const K& key, const V* val, bool silent) {
+  bool GetCopy(const K& key, V* const val, bool silent) {
     if (Contains(key)) {
       auto* node = &map_[key];
       if (!silent) {

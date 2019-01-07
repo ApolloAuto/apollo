@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <string>
 #include <vector>
 
 #include "modules/perception/lidar/common/lidar_log.h"

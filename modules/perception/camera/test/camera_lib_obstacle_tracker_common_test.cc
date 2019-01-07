@@ -13,9 +13,6 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-#include <Eigen/Core>
-#include <cstdio>
-#include <cstdlib>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"

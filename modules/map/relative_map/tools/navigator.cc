@@ -19,18 +19,18 @@
 #include <thread>
 #include <vector>
 
-#include "ros/ros.h"
 #include "third_party/json/json.hpp"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "cyber/cyber.h"
+#include "cyber/time/rate.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/message_util.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
+using apollo::cyber::Rate;
 using apollo::relative_map::NavigationInfo;
 using apollo::relative_map::NavigationPath;
 using nlohmann::json;
@@ -41,8 +41,9 @@ bool GetNavigationPathFromFile(const std::string& filename,
                                NavigationPath* navigation_path);
 
 int main(int argc, char** argv) {
-  google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
+  // Init the cyber framework
+  apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
 
   std::vector<std::string> navigation_line_filenames;
@@ -59,17 +60,6 @@ int main(int argc, char** argv) {
 
   ADEBUG << "The flag \"navigator_down_sample\" is: "
          << FLAGS_navigator_down_sample;
-
-  ros::init(argc, argv, "navigator_offline", ros::init_options::AnonymousName);
-
-  AdapterManagerConfig config;
-  config.set_is_ros(true);
-  auto* sub_config = config.add_config();
-  sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-  sub_config->set_type(AdapterConfig::NAVIGATION);
-
-  AdapterManager::Init(config);
-  ADEBUG << "AdapterManager is initialized.";
 
   NavigationInfo navigation_info;
   int i = 0;
@@ -89,24 +79,26 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  if (ros::ok()) {
-    AdapterManager::FillNavigationHeader("relative_map", &navigation_info);
-    AdapterManager::PublishNavigation(navigation_info);
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("navigation_info"));
+  auto writer = node->CreateWriter<apollo::relative_map::NavigationInfo>(
+      FLAGS_navigation_topic);
+
+  // In theory, the message only needs to be sent once. Considering the problems
+  // such as the network delay, We send it several times to ensure that the data
+  // is sent successfully.
+  Rate rate(1.0);
+  constexpr int kTransNum = 3;
+  int trans_num = 0;
+  while (apollo::cyber::OK()) {
+    if (trans_num > kTransNum) {
+      break;
+    }
+    apollo::common::util::FillHeader(node->Name(), &navigation_info);
+    writer->Write(navigation_info);
     ADEBUG << "Sending navigation info:" << navigation_info.DebugString();
-
-    // Wait for the subscriber's callback function to process this topic.
-    // Otherwise, an error message similar to the following will appear:
-    // [ERROR] [1530582989.030754209]: Failed to parse message: boost: mutex
-    // lock failed in pthread_mutex_lock: Invalid argument
-    ros::spinOnce();
-
-    // Sleep for one second to prevent the publishing node from being destroyed
-    // prematurely.
-    ros::Rate r(1);  // 1 hz
-    r.sleep();
-  } else {
-    AERROR << "ROS status is wrong.";
-    return -1;
+    rate.Sleep();
+    ++trans_num;
   }
 
   return 0;
@@ -151,22 +143,27 @@ bool GetNavigationPathFromFile(const std::string& filename,
   int down_sampled_points_num = 0;
   constexpr double kStraightSampleInterval = 3.0;
   constexpr double kSmallKappaSampleInterval = 1.0;
-  constexpr double kLargeKappaSampleInterval = 0.4;
-  constexpr double kSmallKappa = 0.005;
-  constexpr double kLargeKappa = 0.03;
+  constexpr double kMiddleKappaSampleInterval = 0.4;
+  constexpr double kLargeKappaSampleInterval = 0.1;
+  constexpr double kSmallKappa = 0.002;
+  constexpr double kMiddleKappa = 0.008;
+  constexpr double kLargeKappa = 0.02;
   while (std::getline(ifs, line_str)) {
     try {
       auto json_obj = json::parse(line_str);
       current_sampled_s = json_obj["s"];
       current_kappa = json_obj["kappa"];
       diff_s = current_sampled_s - last_sampled_s;
-      bool not_down_sampling = FLAGS_navigator_down_sample
-                                   ? diff_s >= kStraightSampleInterval ||
-                                         (diff_s >= kSmallKappaSampleInterval &&
-                                          current_kappa > kSmallKappa) ||
-                                         (diff_s >= kLargeKappaSampleInterval &&
-                                          current_kappa > kLargeKappa)
-                                   : true;
+      bool not_down_sampling =
+          FLAGS_navigator_down_sample
+              ? diff_s >= kStraightSampleInterval ||
+                    (diff_s >= kSmallKappaSampleInterval &&
+                     current_kappa > kSmallKappa) ||
+                    (diff_s >= kMiddleKappaSampleInterval &&
+                     current_kappa > kMiddleKappa) ||
+                    (diff_s >= kLargeKappaSampleInterval &&
+                     current_kappa > kLargeKappa)
+              : true;
       if (not_down_sampling) {
         last_sampled_s = current_sampled_s;
         auto* point = navigation_path->mutable_path()->add_path_point();

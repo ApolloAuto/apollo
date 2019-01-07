@@ -20,9 +20,6 @@
 
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.h"
 
-#include <math.h>
-#include <utility>
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"

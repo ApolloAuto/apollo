@@ -14,8 +14,6 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-#include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "tinyxml2/tinyxml2.h"

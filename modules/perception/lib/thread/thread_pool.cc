@@ -21,8 +21,6 @@ namespace lib {
 
 // Just use the protobuf Closure.
 using google::protobuf::Closure;
-using google::protobuf::NewCallback;
-using google::protobuf::NewPermanentCallback;
 
 using std::vector;
 

@@ -60,6 +60,8 @@ class EvaluatorManager {
    */
   void Run(const perception::PerceptionObstacles& perception_obstacles);
 
+  void EvaluateObstacle(Obstacle* obstacle);
+
  private:
   /**
    * @brief Register an evaluator by type

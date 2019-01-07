@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/roi_filter/roi_service_filter/roi_service_filter.h"
 
-#include <fstream>
-#include <sstream>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/hdmap_struct.h"

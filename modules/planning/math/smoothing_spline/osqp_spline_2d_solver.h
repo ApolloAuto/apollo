@@ -20,10 +20,8 @@
 
 #pragma once
 
-#include <memory>
 #include <vector>
 
-#include "Eigen/Core"
 #include "gtest/gtest_prod.h"
 #include "osqp/include/osqp.h"
 

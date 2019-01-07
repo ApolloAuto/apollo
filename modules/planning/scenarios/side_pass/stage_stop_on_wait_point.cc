@@ -38,7 +38,6 @@ namespace side_pass {
 using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
 using apollo::common::math::Vec2d;
-using apollo::common::VehicleConfigHelper;
 
 constexpr double kSExtraMarginforStopOnWaitPointStage = 3.0;
 constexpr double kLExtraMarginforStopOnWaitPointStage = 0.4;

@@ -17,9 +17,7 @@
 #include "modules/control/controller/mpc_controller.h"
 
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -37,7 +35,6 @@ namespace apollo {
 namespace control {
 
 using apollo::common::ErrorCode;
-using apollo::common::Point3D;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
@@ -349,8 +346,6 @@ Status MPCController::ComputeControlCommand(
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
           mpc_eps_, mpc_max_iteration_, &control) != true) {
     AERROR << "MPC solver failed";
-    steer_angle_feedback = 0.0;
-    acc_feedback = 0.0;
   } else {
     ADEBUG << "MPC problem solved! ";
     steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));

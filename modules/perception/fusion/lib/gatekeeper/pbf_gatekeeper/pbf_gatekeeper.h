@@ -16,7 +16,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "modules/perception/fusion/lib/interface/base_gatekeeper.h"
 

@@ -15,8 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/preprocessor/tl_preprocessor.h"
 
-#include <gflags/gflags.h>
-
 #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"

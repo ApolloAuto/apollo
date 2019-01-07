@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/ground_service/ground_service.h"
 
-#include <cfloat>
 #include <limits>
 
 #include "modules/common/util/file.h"

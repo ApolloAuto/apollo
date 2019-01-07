@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 

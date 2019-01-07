@@ -59,6 +59,12 @@ class ObstaclesContainer : public Container {
       const double timestamp);
 
   /**
+   * @brief Insert a feature proto message into the container
+   * @param feature proto message
+   */
+  void InsertFeatureProto(const Feature& feature);
+
+  /**
    * @brief Build lane graph for obstacles
    */
   void BuildLaneGraph();

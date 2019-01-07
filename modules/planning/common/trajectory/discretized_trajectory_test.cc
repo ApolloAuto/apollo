@@ -20,9 +20,6 @@
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
-#include <iostream>
-#include <string>
-
 #include "gtest/gtest.h"
 
 #include "modules/common/util/file.h"

@@ -15,11 +15,6 @@ limitations under the License.
 #include "modules/map/hdmap/adapter/xml_parser/util_xml_parser.h"
 
 #include <algorithm>
-#include <iomanip>
-#include <limits>
-#include <sstream>
-#include <string>
-#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/map/hdmap/adapter/coordinate_convert_tool.h"

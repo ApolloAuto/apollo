@@ -144,6 +144,21 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   }
 }
 
+void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
+  if (!feature.has_id()) {
+    AERROR << "Invalid feature, no ID found.";
+    return;
+  }
+  int id = feature.id();
+  Obstacle* obstacle_ptr = obstacles_.Get(id);
+  if (obstacle_ptr != nullptr) {
+    obstacle_ptr->InsertFeature(feature);
+  } else {
+    Obstacle obstacle;
+    obstacle.InsertFeature(feature);
+    obstacles_.Put(id, std::move(obstacle));
+  }
+}
 
 void ObstaclesContainer::BuildLaneGraph() {
   // Go through every obstacle in the current frame, after some

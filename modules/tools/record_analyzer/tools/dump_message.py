@@ -45,12 +45,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     record_file = args.file
-    bag = rosbag.Bag(record_file, 'r')
-    f = file("perception_obstacle.txt", 'w')
-    for topic, msg, t in bag.read_messages():
-        timestamp = t / float(1e9)
-        if (topic == args.message) and abs(timestamp - args.timestamp) <= 1:
-            if topic == "/apollo/perception/obstacles":
-                f.write(str(msg))
-               print str(perception_obstacles)
-    f.close()
+    reader = RecordReader(record_file)
+    
+    for msg in reader.read_messages():
+        timestamp = msg.timestamp / float(1e9)
+        if msg.topic == args.message and abs(timestamp - args.timestamp) <=1:
+            if msg.topic == "/apollo/perception/obstacles":
+                perception_obstacles = \
+                    perception_obstacle_pb2.PerceptionObstacles()
+                perception_obstacles.ParseFromString(msg.message)
+                with open('perception_obstacles.txt', 'w') as f:
+                    f.write(str(perception_obstacles))  
+                print str(perception_obstacles) 
+                break

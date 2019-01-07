@@ -16,8 +16,6 @@
 
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 
-#include <gtest/gtest.h>
-
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/fusion/base/sensor.h"
 #include "modules/perception/fusion/base/sensor_frame.h"

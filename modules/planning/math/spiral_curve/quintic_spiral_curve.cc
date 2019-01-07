@@ -32,7 +32,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::PathPoint;
 using apollo::common::Status;
 
 QuinticSpiralCurve::QuinticSpiralCurve(const common::PathPoint& s,

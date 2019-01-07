@@ -36,7 +36,6 @@ using apollo::common::util::GetAbsolutePath;
 using apollo::common::util::GetProtoFromFile;
 using base::AttributePointCloud;
 using base::PointF;
-using base::PointD;
 using base::Object;
 
 bool CNNSegmentation::Init(const SegmentationInitOptions& options) {

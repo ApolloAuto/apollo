@@ -16,11 +16,7 @@
 #include "modules/perception/common/i_lib/pc/i_ground.h"
 
 #include <algorithm>
-#include <cassert>
 #include <cfloat>
-#include <cmath>
-#include <iostream>
-#include <utility>
 
 namespace apollo {
 namespace perception {

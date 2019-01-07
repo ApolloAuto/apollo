@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/common/graph/connected_component_analysis.h"
 
-#include <iostream>
-#include <queue>
-
 namespace apollo {
 namespace perception {
 namespace common {

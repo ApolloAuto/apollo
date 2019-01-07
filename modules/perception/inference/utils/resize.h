@@ -16,16 +16,7 @@
 
 #pragma once
 
-#include <cblas.h>
-#include <cuda_runtime_api.h>
-
-#include <boost/shared_ptr.hpp>
-#include <fstream>
-#include <iostream>
-#include <map>
 #include <memory>
-#include <string>
-#include <vector>
 
 #include "modules/perception/base/blob.h"
 #include "modules/perception/base/image.h"

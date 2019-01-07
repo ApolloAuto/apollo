@@ -17,7 +17,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "modules/perception/lidar/lib/interface/base_multi_target_tracker.h"
 

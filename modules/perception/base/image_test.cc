@@ -15,10 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/base/image.h"
 
-#include <gtest/gtest.h>
-#include <limits>
-#include <vector>
-
 namespace apollo {
 namespace perception {
 namespace base {

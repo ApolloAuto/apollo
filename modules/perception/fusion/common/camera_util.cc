@@ -21,7 +21,6 @@
 #include "modules/perception/fusion/common/camera_util.h"
 
 #include <limits>
-#include <memory>
 
 namespace apollo {
 namespace perception {

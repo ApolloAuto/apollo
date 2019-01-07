@@ -16,10 +16,8 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
-#include <stdio.h>
 #include <map>
 #include <string>
-#include <vector>
 
 #include "modules/perception/base/blob.h"
 

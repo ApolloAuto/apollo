@@ -22,7 +22,6 @@
 #include "modules/planning/navi/decider/navi_speed_ts_graph.h"
 
 #include <algorithm>
-#include <cmath>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"

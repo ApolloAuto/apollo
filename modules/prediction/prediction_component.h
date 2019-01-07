@@ -61,6 +61,12 @@ class PredictionComponent
   bool Proc(
       const std::shared_ptr<perception::PerceptionObstacles> &) override;
 
+  /**
+   * @brief Load and process feature proto file.
+   * @param a bin file including a sequence of feature proto.
+   */
+  void OfflineProcessFeatureProtoFile(const std::string& features_proto_file);
+
  private:
   void OnLocalization(const localization::LocalizationEstimate &localization);
 
