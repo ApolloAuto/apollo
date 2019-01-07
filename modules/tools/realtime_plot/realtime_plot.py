@@ -22,10 +22,9 @@ import sys
 import threading
 
 import gflags
-import matplotlib.pyplot as plt
 import numpy as np
-import rospy
-
+import matplotlib.pyplot as plt
+from cyber_py import cyber
 import common.proto_utils as proto_utils
 from item import Item
 from modules.localization.proto.localization_pb2 import LocalizationEstimate
@@ -183,7 +182,8 @@ def main(argv):
         Green Line: Past Planning Target History at every Car Status Frame
         Cyan Dashed Line: Past Planning Trajectory Frames
     """
-    rospy.init_node('realtime_plot', anonymous=True)
+    cyber.init()
+    planning_sub = cyber.Node("stat_planning")
 
     fig = plt.figure()
 
@@ -225,26 +225,17 @@ def main(argv):
 
     plotter = Plotter(item1, item2, item3, item4, FLAGS.show_st_graph)
     fig.canvas.mpl_connect('key_press_event', plotter.press)
-    planning_sub = rospy.Subscriber(
-        '/apollo/planning',
-        ADCTrajectory,
-        plotter.callback_planning,
-        queue_size=3)
-
+    planning_sub.create_reader('/apollo/planning',
+                                ADCTrajectory, plotter.callback_planning)
     if not FLAGS.show_st_graph:
-        localization_sub = rospy.Subscriber(
-            '/apollo/localization/pose',
-            LocalizationEstimate,
-            plotter.callback_localization,
-            queue_size=3)
-        chassis_sub = rospy.Subscriber(
-            '/apollo/canbus/chassis',
-            Chassis,
-            plotter.callback_chassis,
-            queue_size=3)
+        localization_sub = cyber.Node("localization_sub")
+        localization_sub.create_reader('/apollo/localization/pose',
+            LocalizationEstimate, plotter.callback_localization)
+        chassis_sub = cyber.Node("chassis_sub")
+        chassis_sub.create_reader('/apollo/canbus/chassis',
+            Chassis, plotter.callback_chassis)
 
-    rate = rospy.Rate(10)
-    while not rospy.is_shutdown():
+    while not cyber.is_shutdown():
         ax1.draw_artist(ax1.patch)
         ax2.draw_artist(ax2.patch)
         ax3.draw_artist(ax3.patch)
@@ -261,7 +252,6 @@ def main(argv):
         fig.canvas.blit(ax3.bbox)
         fig.canvas.blit(ax4.bbox)
         fig.canvas.flush_events()
-        rate.sleep()
 
 
 if __name__ == '__main__':

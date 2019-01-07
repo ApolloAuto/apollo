@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-import rospy
+from cyber_py import cyber
 from modules.planning.proto import planning_pb2
 import matplotlib.pyplot as plt
 from planning import Planning
@@ -40,8 +40,8 @@ def planning_callback(planning_pb):
 
 
 def add_listener():
-    rospy.init_node('st_plot', anonymous=True)
-    rospy.Subscriber('/apollo/planning', planning_pb2.ADCTrajectory,
+    planning_sub = cyber.Node("st_plot")
+    planning_sub.create_reader('/apollo/planning', planning_pb2.ADCTrajectory,
                      planning_callback)
 
 
@@ -50,6 +50,7 @@ def press_key():
 
 
 if __name__ == '__main__':
+    cyber.init()
     add_listener()
     fig = plt.figure(figsize=(14, 6))
     fig.canvas.mpl_connect('key_press_event', press_key)
@@ -66,3 +67,4 @@ if __name__ == '__main__':
     ani = animation.FuncAnimation(fig, update, interval=100)
 
     plt.show()
+    cyber.shutdown()

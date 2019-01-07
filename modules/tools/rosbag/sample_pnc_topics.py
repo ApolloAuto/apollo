@@ -29,10 +29,11 @@ Example:
 import glob
 import os
 import sys
-
 import glog
-import rosbag
-
+import argparse
+from cyber_py import cyber
+from cyber_py.record import RecordReader
+from cyber_py.record import RecordWriter
 
 class SamplePNC(object):
     """Sample bags to contain PNC related topics only."""
@@ -69,43 +70,32 @@ class SamplePNC(object):
     ]
 
     @classmethod
-    def process_bag(cls, input_bag, output_bag):
-        print("filtering: {} -> {}".format(input_bag, output_bag))
-        output_dir = os.path.dirname(output_bag)
+    def process_record(cls, input_record, output_record):
+        print("filtering: {} -> {}".format(input_record, output_record))
+        output_dir = os.path.dirname(output_record)
         if output_dir != "" and not os.path.exists(output_dir):
             os.makedirs(output_dir)
-        try:
-            with rosbag.Bag(input_bag, 'r') as bag_in:
-                try:
-                    with rosbag.Bag(output_bag, 'w') as bag_out:
-                        for topic, msg, t in bag_in.read_messages(
-                                topics=SamplePNC.TOPICS):
-                            bag_out.write(topic, msg, t)
-                except rosbag.ROSBagException as e:
-                    print("Write file {} raised ROSBagException: {}".format(
-                        input_bag, e))
-                except ValueError as e:
-                    print("Write file {} raised ValueError: {}".format(
-                        input_bag, e))
-                except:
-                    print("Write file {} raised unknown exception".format(
-                        output_bag))
-        except rosbag.ROSBagException as e:
-            print("open {} raised ROSBagException: {} ".format(input_bag, e))
-        except rosbag.ROSBagFormatException as e:
-            print("open {} raised ROSBagFormatException: {}".format(
-                input_bag, e))
-        except rosbag.ROSBagUnindexedException as e:
-            print("open {} raised ROSBagUnindexedException: {} ".format(
-                input_bag, e))
-        except:
-            print("Open {} failed with unknown exception".format(input_bag))
+        freader = RecordReader(input_record)
+        fwriter = RecordWriter()
+        if not fwriter.open(output_record):
+            print "writer open failed!"
+            return
+        print "+++ begin to process..."
+        for channelname, msg, datatype, timestamp in freader.read_messages():
+            if channelname in SamplePNC.TOPICS:
+                desc = freader.get_protodesc(channelname)
+                fwriter.write_channel(channelname, datatype, desc)
+                fwriter.write_message(channelname, msg, timestamp)
+        print "+++ Finished  processing..."
 
 
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description="Filter pnc rosbag")
-    parser.add_argument('input', type=str, help="the input rosbag")
-    parser.add_argument('output', type=str, help="the output rosbag")
+    cyber.init()
+    parser = argparse.ArgumentParser(
+        description="Filter pnc record. \
+            Usage: 'python sample_pnc_topic.py input_record  output_record'")
+    parser.add_argument('input', type=str, help="the input record")
+    parser.add_argument('output', type=str, help="the output record")
     args = parser.parse_args()
-    SamplePNC.process_bag(args.input, args.output)
+    SamplePNC.process_record(args.input, args.output)
+    cyber.shutdown()

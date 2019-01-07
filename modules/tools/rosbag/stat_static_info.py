@@ -24,12 +24,10 @@ Usage:
 
 import os
 import sys
-
-
-from modules.canbus.proto import chassis_pb2
-from modules.dreamview.proto import hmi_status_pb2
 from cyber_py import cyber
 from cyber_py.record import RecordReader
+from modules.canbus.proto import chassis_pb2
+from modules.dreamview.proto import hmi_status_pb2
 kChassisInfoTopic = '/apollo/canbus/chassis'
 kHMIInfoTopic = '/apollo/hmi/status'
 
@@ -48,8 +46,9 @@ class StaticInfoCalculator(object):
         """
         try:
             reader = RecordReader(bag_file)
-            print "begin"
+            print "begin to process bag file {}".format(bag_file)
             for msg in reader.read_messages():
+                print msg.topic
                 if msg.topic == kChassisInfoTopic and self.vehicle_vin == None:
                     chassis = chassis_pb2.Chassis()
                     chassis.ParseFromString(msg.message)
@@ -58,14 +57,14 @@ class StaticInfoCalculator(object):
                 elif msg.topic == kHMIInfoTopic and self.vehicle_name == None:
                     hmistatus = hmi_status_pb2.HMIStatus()
                     hmistatus.ParseFromString(msg.message)
-                    print hmistatus.MessageType
-                    if hmistatus.current_vehicle:
-                        self.vehicle_name = hmistatus.current_vehicle
+                    if hmistatus.current_map:
+                        self.vehicle_name = hmistatus.current_map
                         print self.vehicle_name
                 if self.done():
                     return True
         except:
             return False
+        print "finished processing bag file {}".format(bag_file)
         return self.done()
 
     def process_dir(self, bag_dir):
