@@ -18,11 +18,9 @@
 
 import sys
 import gflags
+from cyber_py import cyber
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-#import rospy
-from cyber_py import cyber
-
 from modules.control.proto import control_cmd_pb2
 BRAKE_LINE_DATA = []
 TROTTLE_LINE_DATA = []
@@ -32,11 +30,9 @@ FLAGS = gflags.FLAGS
 gflags.DEFINE_integer("data_length", 500, "Control plot data length")
 
 
-def callback(data):
+def callback(control_cmd_pb):
     global STEERING_LINE_DATA
     global TROTTLE_LINE_DATA, BRAKE_LINE_DATA
-    control_cmd_pb = control_cmd_pb2.ControlCommand()
-    control_cmd_pb.CopyFrom(data)
 
     STEERING_LINE_DATA.append(control_cmd_pb.steering_target)
     if len(STEERING_LINE_DATA) > FLAGS.data_length:
@@ -52,17 +48,12 @@ def callback(data):
 
 
 def listener():
-    #cyber.init()
+    cyber.init()
     test_node = cyber.Node("control_listener")
     test_node.create_reader("/apollo/control",
                             control_cmd_pb2.ControlCommand, callback)
     test_node.spin()
-    #cyber.shutdown()
-    #rospy.init_node('control_listener', anonymous=True)
-    #rospy.Subscriber('/apollo/control', control_cmd_pb2.ControlCommand,
-    #                 callback)
-
-    # rospy.spin()
+    cyber.shutdown()
 
 
 def compensate(data_list):
@@ -104,9 +95,7 @@ if __name__ == '__main__':
     brake_text = ax.text(0.75, 0.85, '', transform=ax.transAxes)
     throttle_text = ax.text(0.75, 0.90, '', transform=ax.transAxes)
     steering_text = ax.text(0.75, 0.95, '', transform=ax.transAxes)
-
     ani = animation.FuncAnimation(fig, update, interval=100)
-
     ax.set_ylim(-100, 120)
     ax.set_xlim(-1 * FLAGS.data_length, 10)
     ax.legend(loc="upper left")
