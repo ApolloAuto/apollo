@@ -61,7 +61,6 @@ The command line tool `cyber_monitor` provides a clear view of the list of real 
 ```bash
 username@computername:~$: source /your-path-to-apollo-install-dir/cyber/setup.bash
 username@computername:~$: cyber_monitor
-username@computername:~$:
 ```
 
 ### Useful commands
@@ -181,15 +180,15 @@ usage: cyber_recorder record [options]
 ```
 $ cyber_recorder play -h
 usage: cyber_recorder play [options]
-	-f, --file <file>			input record file
-	-c, --white-channel <name>		only play the specified channel
-	-l, --loop				loop play
-	-r, --rate <1.0>			multiply the play rate by FACTOR
-	-b, --begin <2018-07-01 00:00:00>	play the record begin at
-	-e, --end <2018-07-01 00:01:00>		play the record end at
-	-s, --start <seconds>			play started at n seconds
-	-d, --delay <seconds>			play delayed n seconds
-	-h, --help				show help message
+    -f, --file <file>			input record file  
+    -c, --white-channel <name>		only play the specified channel  
+    -l, --loop				loop play  
+    -r, --rate <1.0>			multiply the play rate by FACTOR  
+    -b, --begin <2018-07-01 00:00:00>	play the record begin at  
+    -e, --end <2018-07-01 00:01:00>	play the record end at  
+    -s, --start <seconds>		play started at n seconds  
+    -d, --delay <seconds>		play delayed n seconds  
+    -h, --help				show help message  
 ```
 
 - To split a record file:
@@ -270,7 +269,7 @@ play finished. file: 20180720202307.record
 
 ## rosbag_to\_record
 
-`rosbag_to_record` is a tool which can convert rosbag to recorder file provided by Apollo Cyber RT. Now the tool support following channel:
+`rosbag_to_record` is a tool which can convert rosbag to recorder file provided by Apollo Cyber RT. Now the tool support following channel:  
 /apollo/perception/obstacles  
 /apollo/planning  
 /apollo/prediction  
