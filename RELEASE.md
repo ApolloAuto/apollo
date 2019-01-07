@@ -17,7 +17,7 @@ Apollol 3.5 is capable of navigating through complex driving scenarios such as r
 * Open Vehicle Certification platform - 2 new vehicles added **GAC GE6** and **GWM WAY SUV**
 
 ## Autonomous Drive Capabilities
-Vehicles with this version can drive autonomously in complex urban road conditions including both residential and downtown areas. T**BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. URBAN DRIVING INVOLVES NAVIGATING HIGH RISK ZONES LIKE SCHOOLS, PLEASE TEST APOLLO 3.5 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM**.
+Vehicles with this version can drive autonomously in complex urban road conditions including both residential and downtown areas. **BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. URBAN DRIVING INVOLVES NAVIGATING HIGH RISK ZONES LIKE SCHOOLS, PLEASE TEST APOLLO 3.5 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM**.
 
 # Release 3.0
 
