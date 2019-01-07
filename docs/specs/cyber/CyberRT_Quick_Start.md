@@ -18,9 +18,9 @@ The example below demonstrates how to create a simple component, then build, run
 ## Set up the component file structure
 Please create the following files, assumed under the directory of `/apollo/cyber/examples/common_component_example/`:
 
-- header file: common_component_example.h
-- source file: common_component_example.cc
-- build file: BUILD
+- Header file: common_component_example.h
+- Source file: common_component_example.cc
+- Build file: BUILD
 - DAG dependency file: common.dag
 - Launch file: common.launch
 
@@ -114,9 +114,9 @@ cpplint()
 
 To configure the DAG dependency file (common.dag), specify the following items as below:
 
- - channel names: for data input and output
- - library path: library built from component class
- - class name: the class name of the component
+ - Channel names: for data input and output
+ - Library path: library built from component class
+ - Class name: the class name of the component
 
 ```bash
 # Define all coms in DAG streaming.
@@ -141,9 +141,9 @@ To configure the DAG dependency file (common.dag), specify the following items a
 
 To configure the launch (common.launch) file, specify the following items:
 
-  - the name of the component
-  - the dag file you just created in the previous step.
-  - the name of the process which the component runs within
+  - The name of the component
+  - The dag file you just created in the previous step.
+  - The name of the process which the component runs within
 
 ```bash
 <cyber>
@@ -174,13 +174,13 @@ source setup.bash
 
 There are two ways to launch the component:
 
-- launch with the launch file (recommended)
+- Launch with the launch file (recommended)
 
 ```bash
 cyber_launch start /apollo/cyber/examples/common_component_example/common.launch
 ```
 
-- launch with the DAG file
+- Launch with the DAG file
 
 ```bash
 mainboard -d /apollo/cyber/examples/common_component_example/common.dag
