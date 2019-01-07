@@ -32,7 +32,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-We just released many upgraded features to the Apollo master. This upgrade is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
+Apollo 3.5 is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
 
 **To learn more, please refer to the
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
@@ -244,7 +244,7 @@ If at this point, you do not have a Hardware setup, please go to [Without Hardwa
 
 * [Apollo 3.0 QuickStart Guide](docs/quickstart/apollo_3_0_quick_start.md)
 
-* [Apollo Upgraded QuickStart Guide](docs/quickstart/apollo_updated_quick_start.md)
+* [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_updated_quick_start.md)
 
 
 ### Without Hardware:
