@@ -1,4 +1,4 @@
-# Apollo Upgrade Quick Start Guide
+# Apollo 3.5 Quick Start Guide
 
 The following guide serves as a user manual for launching the Apollo upgraded software and hardware stack on vehicle.
 
@@ -22,7 +22,7 @@ before you proceed.
 ## Hardware and Software Installation
 
 Please refer to
-[Apollo Upgraded Hardware and System Installation Guide](apollo_3_5_hardware_system_installation_guide.md)
+[Apollo 3.5 Hardware and System Installation Guide](apollo_3_5_hardware_system_installation_guide.md)
 for the steps to install the hardware components and the system software, as well as
 [Apollo Software Installation Guide](apollo_software_installation_guide.md).
 
