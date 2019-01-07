@@ -1,6 +1,6 @@
 # Release 3.5
 
-Apollol 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. With 360-degree visibility and upgraded perception algorithms to handle the changing conditions of urban roads, the car is more secure and aware. 
+Apollo 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. With 360-degree visibility and upgraded perception algorithms to handle the changing conditions of urban roads, the car is more secure and aware.
 
 ## Major Features And Improvements
 * Upgraded Sensor Suite
@@ -25,7 +25,7 @@ Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a 
 
 ## Major Features And Improvements
 * New Safety module called Guardian
-* Enhanced Surveillance module - Monitor 
+* Enhanced Surveillance module - Monitor
 * Hardware service layer that will now act like a platform and not a product, giving developers the flexibility to integrate their own Hardware
 * Apollo Sensor Unit (ASU)
 * New Gatekeeper - Ultrasonic Sensor
@@ -34,7 +34,7 @@ Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a 
   * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
   * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
   * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
-  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
+  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines.
   * **Visual localization**: Cameras are currently being tested to aid and enhance localization
   * **16 beam LiDAR support**
 
