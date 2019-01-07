@@ -161,9 +161,7 @@ The cyber_recorder commands are:
 ```
  cyber_recorder info -h
 usage: cyber_recorder info [options]
-    -f, --file <file>                  input record file
-    -a, --all                          all channels
-    -h, --help                         show help message
+	-h, --help				show help message
 ```
 
 - To record a record file
@@ -183,16 +181,15 @@ usage: cyber_recorder record [options]
 ```
 $ cyber_recorder play -h
 usage: cyber_recorder play [options]
-    -f, --file <file>                  input record file
-    -a, --all                          all channels
-    -c, --channel <name>               channel name
-    -l, --loop                         loop playback the record
-    -r, --rate <1.0>                   multiply the publish rate by FACTOR
-    -b, --begin <2018-07-01 00:00:00>  begin at assigned time
-    -e, --end <2018-07-01 01:00:00>    end at assigned time
-    -s, --start <seconds>              start n seconds into the record
-    -d, --delay <seconds>              delay n seconds before play
-    -h, --help                         show help message
+	-f, --file <file>			input record file
+	-c, --white-channel <name>		only play the specified channel
+	-l, --loop				loop play
+	-r, --rate <1.0>			multiply the play rate by FACTOR
+	-b, --begin <2018-07-01 00:00:00>	play the record begin at
+	-e, --end <2018-07-01 00:01:00>		play the record end at
+	-s, --start <seconds>			play started at n seconds
+	-d, --delay <seconds>			play delayed n seconds
+	-h, --help				show help message
 ```
 
 - To split a record file:
@@ -222,30 +219,32 @@ usage: cyber_recorder recover [options]
 #### Check the details of a record file
 
 ```
-$ cyber_recorder info -f 20180720202307.record -a
-************** header section ******************
-path:          20180720202307.record
-version:       1.0
-duration:      6.024680 s
-begin_time:    2018-07-20 20:23:18
-end_time:      2018-07-20 20:23:24
-message_number:75
-chunk_number:  1
-index_position:6027
-size:          6650 bytes (6.494141 KB)
-******************** all sections **************
-header|major_version=1|minor_version=0|compress=0|chunk_interval=20000000000|segment_interval=60000000000|index_position=6027|chunk_number=1|channel_number=3|begin_time=1532089398663399667|end_time=1532089404688079759|message_number=75|size=6650|is_complete=1|chunk_raw_size=10485760|segment_raw_size=1048576000
-channel|name=/driver/channel|message_type=apollo.cybertron.proto.Driver|proto_desc=...
-channel|name=/carstatus/channel|message_type=apollo.cybertron.proto.CarStatus|proto_desc=...
-channel|name=/perception/channel|message_type=apollo.cybertron.proto.Perception|proto_desc=...
-chunk_header|message_number=75|begin_time=1532089398663399667|end_time=1532089404688079759|raw_size=804
-chunk_body|messages=...
-index|postion=2262|type=channel|message_number=7|name=/driver/channel|message_type=apollo.cybertron.proto.Driver|proto_desc=bytes
-index|postion=2466|type=channel|message_number=61|name=/carstatus/channel|message_type=apollo.cybertron.proto.CarStatus|proto_desc=bytes
-index|postion=2630|type=channel|message_number=7|name=/perception/channel|message_type=apollo.cybertron.proto.Perception|proto_desc=bytes
-index|postion=2671|type=chunk_header|message_number=75|begin_time=1532089398663399667|end_time=1532089404688079759|raw_size=804
-index|postion=6027|type=chunk_body|message_number=75
-************** end of file *********************
+$ cyber_recorder info demo.record
+record_file:    demo.record
+version:        1.0
+duration:       19.995227 Seconds
+begin_time:     2018-04-17 06:25:36
+end_time:       2018-04-17 06:25:55
+size:           28275479 Bytes (26.965598 MB)
+is_complete:    true
+message_number: 15379
+channel_number: 16
+channel_info:   /apollo/localization/pose                             2000 messages : apollo.localization.LocalizationEstimate
+                /tf                                                   4000 messages : apollo.transform.TransformStampeds
+                /apollo/control                                       2000 messages : apollo.control.ControlCommand
+                /apollo/sensor/gnss/odometry                          2000 messages : apollo.localization.Gps
+                /apollo/canbus/chassis                                2000 messages : apollo.canbus.Chassis
+                /apollo/sensor/gnss/imu                               1999 messages : apollo.drivers.gnss.Imu
+                /apollo/sensor/gnss/rtk_obs                             41 messages : apollo.drivers.gnss.EpochObservation
+                /apollo/sensor/gnss/ins_stat                            20 messages : apollo.drivers.gnss.InsStat
+                /apollo/sensor/gnss/best_pose                           20 messages : apollo.drivers.gnss.GnssBestPose
+                /apollo/perception/obstacles                           400 messages : apollo.perception.PerceptionObstacles
+                /apollo/prediction                                     400 messages : apollo.prediction.PredictionObstacles
+                /apollo/sensor/conti_radar                             270 messages : apollo.drivers.ContiRadar
+                /apollo/planning                                       200 messages : apollo.planning.ADCTrajectory
+                /apollo/monitor/static_info                              1 messages : apollo.data.StaticInfo
+                /apollo/sensor/gnss/rtk_eph                             25 messages : apollo.drivers.gnss.GnssEphemeris
+                /apollo/monitor                                          3 messages : apollo.common.monitor.MonitorMessage
 
 ```
 
@@ -253,10 +252,6 @@ index|postion=6027|type=chunk_body|message_number=75
 
 ```
 $ cyber_recorder record -a
-[RUNNING]  Record :     total channel num : 1  total msg num : 1
-[RUNNING]  Record :     total channel num : 1  total msg num : 2
-[RUNNING]  Record :     total channel num : 1  total msg num : 3
-[RUNNING]  Record :     total channel num : 1  total msg num : 4
 [RUNNING]  Record :     total channel num : 1  total msg num : 5
 ...
 ```
@@ -264,10 +259,87 @@ $ cyber_recorder record -a
 #### Replay a record file
 
 ```
-$ cyber_recorder play -f 20180720202307.record -a
+$ cyber_recorder play -f 20180720202307.record
 file: 20180720202307.record, chunk_number: 1, begin_time: 1532089398663399667, end_time: 1532089404688079759, message_number: 75
 please wait for loading and playing back record...
 Hit Ctrl+C to stop replay, or Space to pause.
 [RUNNING]  Record Time: 1532089404.688080    Progress: 6.024680 / 6.024680
 play finished. file: 20180720202307.record
+```
+
+
+## rosbag_to\_record
+
+`rosbag_to_record` is a tool which can convert rosbag to recorder file provided by Apollo Cyber RT. Now the tool support following channel:
+/apollo/perception/obstacles  
+/apollo/planning  
+/apollo/prediction  
+/apollo/canbus/chassis  
+/apollo/control  
+/apollo/guardian  
+/apollo/localization/pose  
+/apollo/perception/traffic\_light  
+/apollo/drive\_event  
+/apollo/sensor/gnss/odometry  
+/apollo/monitor/static\_info  
+/apollo/monitor  
+/apollo/canbus/chassis\_detail  
+/apollo/control/pad  
+/apollo/navigation  
+/apollo/routing\_request  
+/apollo/routing\_response  
+/tf  
+/tf\_static  
+/apollo/sensor/conti\_radar  
+/apollo/sensor/delphi\_esr  
+/apollo/sensor/gnss/best\_pose  
+/apollo/sensor/gnss/imu  
+/apollo/sensor/gnss/ins\_stat  
+/apollo/sensor/gnss/rtk\_eph  
+/apollo/sensor/gnss/rtk\_obs  
+/apollo/sensor/velodyne64/compensator/PointCloud2  
+
+### Install and run
+
+Launch rosbag_to\_record:
+
+```bash
+$ source /your-path-to-apollo-install-dir/cyber/setup.bash
+$ rosbag_to_record
+Usage:
+  rosbag_to_record input.bag output.record
+```
+
+### Example
+ 
+We can convert [Apollo2.5 demo bag](https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag) to record file.
+
+```bash
+$ rosbag_to_record demo_2.5.bag demo.record
+record_file:    demo.record
+version:        1.0
+duration:       19.995227 Seconds
+begin_time:     2018-04-17 06:25:36
+end_time:       2018-04-17 06:25:55
+size:           28275479 Bytes (26.965598 MB)
+is_complete:    true
+message_number: 15379
+channel_number: 16
+channel_info:   /apollo/localization/pose                             2000 messages : apollo.localization.LocalizationEstimate
+                /tf                                                   4000 messages : apollo.transform.TransformStampeds
+                /apollo/control                                       2000 messages : apollo.control.ControlCommand
+                /apollo/sensor/gnss/odometry                          2000 messages : apollo.localization.Gps
+                /apollo/canbus/chassis                                2000 messages : apollo.canbus.Chassis
+                /apollo/sensor/gnss/imu                               1999 messages : apollo.drivers.gnss.Imu
+                /apollo/sensor/gnss/rtk_obs                             41 messages : apollo.drivers.gnss.EpochObservation
+                /apollo/sensor/gnss/ins_stat                            20 messages : apollo.drivers.gnss.InsStat
+                /apollo/sensor/gnss/best_pose                           20 messages : apollo.drivers.gnss.GnssBestPose
+                /apollo/perception/obstacles                           400 messages : apollo.perception.PerceptionObstacles
+                /apollo/prediction                                     400 messages : apollo.prediction.PredictionObstacles
+                /apollo/sensor/conti_radar                             270 messages : apollo.drivers.ContiRadar
+                /apollo/planning                                       200 messages : apollo.planning.ADCTrajectory
+                /apollo/monitor/static_info                              1 messages : apollo.data.StaticInfo
+                /apollo/sensor/gnss/rtk_eph                             25 messages : apollo.drivers.gnss.GnssEphemeris
+                /apollo/monitor                                          3 messages : apollo.common.monitor.MonitorMessage
+Convertion finished! Took 0.505623051 seconds in total.
 ```
