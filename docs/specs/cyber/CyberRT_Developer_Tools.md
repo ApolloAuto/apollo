@@ -36,7 +36,7 @@ username@computername:~$: cyber_visualizer
 As for a point cloud or an image, you can select the source channel through its `ChannelName` sub-item, and `Action` sub-item to play or stop the data from the corresponding channel.
 As shown in figure below, three cameras' channel data on the buttom sections and one point cloud channel data on the top section are displayed simultaneously.
 
-	![visualization](images/cyber_visualizer3.png)
+    ![visualization](images/cyber_visualizer3.png)
 
 - To adjust the virtual camera in the 3D point cloud scene, you can right click on the point cloud display section. A dialog box will pop up as shown in figure below.
 
