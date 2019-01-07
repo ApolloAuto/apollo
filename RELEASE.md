@@ -1,3 +1,24 @@
+# Release 3.5
+
+Apollol 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. With 360-degree visibility and upgraded perception algorithms to handle the changing conditions of urban roads, the car is more secure and aware. 
+
+## Major Features And Improvements
+* Upgraded Sensor Suite
+    * VLS - 128 Line LiDAR
+    * FPD-Link Cameras
+    * Continental high-range function radars
+    * Apollo Extension Unit (AXU)
+    * Additional IPC
+* Brand new Runtime Framework - **Apollo CyberRT** which is specifically targeted towards autonomous driving
+* New Perception algorithms
+* Scenario - Based Planning with a new planning algorithm, Open Space Planner
+* New Localization algorithm
+* V2X Capabilities
+* Open Vehicle Certification platform - 2 new vehicles added **GAC GE6** and **GWM WAY SUV**
+
+## Autonomous Drive Capabilities
+Vehicles with this version can drive autonomously in complex urban road conditions including both residential and downtown areas. T**BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. URBAN DRIVING INVOLVES NAVIGATING HIGH RISK ZONES LIKE SCHOOLS, PLEASE TEST APOLLO 3.5 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM**.
+
 # Release 3.0
 
 Apollo 3.0 enables L4 product level solution that allows vehicles to drive in a closed venue setting at a low speed. Automakers can now leverage this one stop solution for autonomous driving without having to customize on their own.

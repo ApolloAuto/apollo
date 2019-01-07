@@ -1,4 +1,4 @@
-# Apollo master Hardware and System Installation Guide
+# Apollo 3.5 Hardware and System Installation Guide
 
 * [About This Guide](#about-this-guide)
     * [Document Conventions](#document-conventions)
