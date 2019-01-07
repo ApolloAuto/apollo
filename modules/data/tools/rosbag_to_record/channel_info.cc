@@ -72,14 +72,10 @@ void ChannelInfo::InitChannels() {
       "apollo.perception.TrafficLightDetection");
   InitChannelInfo<apollo::common::DriveEvent>("/apollo/drive_event",
                                               "apollo.common.DriveEvent");
-  InitChannelInfo<apollo::localization::CorrectedImu>(
-      "/apollo/sensor/gnss/corrected_imu", "apollo.localization.CorrectedImu");
   InitChannelInfo<apollo::localization::Gps>("/apollo/sensor/gnss/odometry",
                                              "apollo.localization.Gps");
   InitChannelInfo<apollo::data::StaticInfo>("/apollo/monitor/static_info",
                                             "apollo.data.StaticInfo");
-  InitChannelInfo<apollo::monitor::SystemStatus>(
-      "/apollo/monitor/system_status", "apollo.monitor.SystemStatus");
   InitChannelInfo<apollo::common::monitor::MonitorMessage>(
       "/apollo/monitor", "apollo.common.monitor.MonitorMessage");
 
@@ -94,18 +90,15 @@ void ChannelInfo::InitChannels() {
   InitChannelInfo<apollo::routing::RoutingResponse>(
       "/apollo/routing_response", "apollo.routing.RoutingResponse");
   InitChannelInfo<apollo::transform::TransformStampeds>(
-      "/tf", "adu.common.TransformStampeds");
+      "/tf", "apollo.transform.TransformStampeds");
   InitChannelInfo<apollo::transform::TransformStampeds>(
-      "/tf_static", "adu.common.TransformStampeds");
+      "/tf_static", "apollo.transform.TransformStampeds");
   InitChannelInfo<apollo::drivers::ContiRadar>("/apollo/sensor/conti_radar",
                                                "apollo.drivers.ContiRadar");
   InitChannelInfo<apollo::drivers::DelphiESR>("/apollo/sensor/delphi_esr",
                                               "apollo.drivers.DelphiESR");
   InitChannelInfo<apollo::drivers::gnss::GnssBestPose>(
       "/apollo/sensor/gnss/best_pose", "apollo.drivers.gnss.GnssBestPose");
-  InitChannelInfo<apollo::drivers::gnss::GnssStatus>(
-      "/apollo/sensor/gnss/gnss_status",
-      "apollo.drivers.gnss_status.GnssStatus");
   InitChannelInfo<apollo::drivers::gnss::Imu>("/apollo/sensor/gnss/imu",
                                               "apollo.drivers.gnss.Imu");
   InitChannelInfo<apollo::drivers::gnss::InsStat>(
