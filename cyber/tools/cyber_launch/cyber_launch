@@ -26,6 +26,7 @@ import time
 import atexit
 import argparse
 import threading
+import traceback
 
 import xml.etree.ElementTree as ET
 
