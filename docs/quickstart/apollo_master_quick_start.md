@@ -1,4 +1,4 @@
-# Apollo master Quick Start Guide
+# Apollo 3.5 Quick Start Guide
 
 The following guide serves as a user manual for launching the Apollo master
 software and hardware stack on vehicle.
