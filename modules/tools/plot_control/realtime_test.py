@@ -17,12 +17,11 @@
 ###############################################################################
 """Real Time ACC Calculate Test Tool Based on Speed"""
 
-import argparse
-import rospy
 import sys
 import os
 import datetime
-
+import argparse
+from cyber_py import cyber
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 
@@ -43,10 +42,9 @@ class RealTimeTest(object):
 
     def chassis_callback(self, chassis_pb2):
         """Calculate ACC from Chassis Speed"""
-
         speedmps = chassis_pb2.speed_mps
         t = chassis_pb2.header.timestamp_sec
-        speedkmh = speedmps * 3.6
+        #speedkmh = speedmps * 3.6
 
         self.buff.append(speedmps)
         if len(self.buff) < SmoothParam:
@@ -70,10 +68,12 @@ class RealTimeTest(object):
         self.buff = []
 
 
-def main(argv):
+if __name__ == '__main__':
     """Main function"""
     parser = argparse.ArgumentParser(
-        description="Test car realtime status.", prog="RealTimeTest.py")
+        description="Test car realtime status.",
+        prog="RealTimeTest.py",
+        usage="python realtime_test.py")
     parser.add_argument(
         "--acc",
         type=int,
@@ -81,19 +81,13 @@ def main(argv):
         default=2,
         help="Acc limit default must > 0")
     args = parser.parse_args()
-
     if args.acc < 0:
-        print "acc must >0"
-        return
-
+        print "acc must larger than 0"
+    cyber.init()
     rttest = RealTimeTest()
     rttest.acclimit = args.acc
-    rospy.init_node('RealTimeTest', anonymous=True)
-    rospy.Subscriber('/apollo/canbus/chassis', chassis_pb2.Chassis,
-                     rttest.chassis_callback)
-    rospy.spin()
-
-
-if __name__ == '__main__':
-
-    main(sys.argv)
+    cyber_node = cyber.Node("RealTimeTest")
+    cyber_node.create_reader("/apollo/canbus/chassis",
+                             chassis_pb2.Chassis, rttest.chassis_callback)
+    cyber_node.spin()
+    cyber.shutdown()

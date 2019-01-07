@@ -16,11 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-import rospy
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-
+from cyber_py import cyber
 from modules.planning.proto import planning_pb2
 from subplot_st_main import StMainSubplot
 from subplot_path import PathSubplot
@@ -58,8 +57,8 @@ def planning_callback(planning_pb):
 
 
 def add_listener():
-    rospy.init_node('st_plot', anonymous=True)
-    rospy.Subscriber('/apollo/planning', planning_pb2.ADCTrajectory,
+    planning_sub = cyber.Node("st_plot")
+    planning_sub.create_reader('/apollo/planning', planning_pb2.ADCTrajectory,
                      planning_callback)
 
 
@@ -84,7 +83,7 @@ if __name__ == '__main__':
         default=None,
         help="Specify the map file in txt or binary format")
     args = parser.parse_args()
-
+    cyber.init()
     add_listener()
     fig = plt.figure()
     fig.canvas.mpl_connect('key_press_event', press_key)
@@ -111,3 +110,4 @@ if __name__ == '__main__':
 
     ax.axis('equal')
     plt.show()
+    cyber.shutdown()
