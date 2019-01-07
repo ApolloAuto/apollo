@@ -18,11 +18,10 @@ Apollo演示的安装步骤：
     bash docker/scripts/dev_into.sh
     ```
 
-3. 运行如下命令回放位rosbag:
+3. 运行如下命令回放record:
 
     ```
-    python docs/demo_guide/rosbag_helper.py demo_1.5.bag # 下载rosbag
-    rosbag play demo_1.5.bag --loop
+    cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
     ```
 
     选项 `--loop` 用于设置循环回放模式.

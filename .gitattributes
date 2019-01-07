@@ -5,6 +5,7 @@
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.pcd filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+*.record filter=lfs diff=lfs merge=lfs -text
 
 # TODO(all): Currently we have some models named as *.md which should be renamed
 # and tracked.
