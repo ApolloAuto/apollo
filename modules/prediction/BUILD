@@ -58,4 +58,13 @@ filegroup(
     srcs = glob(["testdata/**"]),
 )
 
+cc_binary(
+    name = "feature_proto_file_to_model_features",
+    srcs = ["feature_proto_file_to_model_features.cc"],
+    deps = [
+        "//modules/common/adapters/proto:adapter_config_proto",
+        ":prediction_component_lib",
+    ],
+)
+
 cpplint()
