@@ -118,6 +118,7 @@ VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
   sunnyvale_big_loop
   sunnyvale_loop
+  sunnyvale_with_two_offices
 )
 MAP_VOLUME_CONF=""
 
