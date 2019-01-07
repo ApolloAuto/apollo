@@ -32,8 +32,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include "cyber/message/raw_message.h"
 #include "cyber/proto/record.pb.h"
 #include "cyber/record/file/record_file_writer.h"
+#include "cyber/record/record_message.h"
+#include "cyber/record/record_reader.h"
+#include "cyber/record/record_writer.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/data/tools/rosbag_to_record/channel_info.h"
@@ -69,7 +73,7 @@ int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
   int z_offset = -1;
   int stamp_offset = -1;
   int intensity_offset = -1;
-  for (const auto& field : rawdata->fields) {
+  for (const auto &field : rawdata->fields) {
     if (field.name == "x") {
       x_offset = field.offset;
     } else if (field.name == "y") {
@@ -123,8 +127,9 @@ int main(int argc, char **argv) {
   }
   auto channel_info = ChannelInfo::Instance();
 
-  auto record_writer =
-      std::make_shared<apollo::cyber::record::RecordFileWriter>();
+  auto record_writer = std::make_shared<apollo::cyber::record::RecordWriter>();
+  record_writer->SetSizeOfFileSegmentation(0);
+  record_writer->SetIntervalOfFileSegmentation(0);
   if (!record_writer->Open(record_file_name)) {
     std::cerr << "Error: open file[" << record_file_name << "] failed.";
   }
@@ -137,15 +142,14 @@ int main(int argc, char **argv) {
 
   std::vector<std::string> channel_write_flag;
   for (const rosbag::MessageInstance m : view) {
+    const std::string msg_type = m.getDataType();
     const std::string channel_name = m.getTopic();
-    if (channel_name == "/apollo/sensor/gnss/gnss_status") {
-      continue;
-    }
+
     auto desc = channel_info->GetProtoDesc(channel_name);
     auto record_message_type = channel_info->GetMessageType(channel_name);
     if (desc == "" || record_message_type == "") {
-      AWARN << "can not find desc or message type for channel: "
-            << channel_name;
+      AWARN << "can not find desc or message type for channel: " << channel_name
+            << "; desc:" << desc << ";type:" << record_message_type;
     }
 
     apollo::cyber::proto::Channel channel;
@@ -154,7 +158,7 @@ int main(int argc, char **argv) {
     channel.set_proto_desc(desc);
     if (std::find(channel_write_flag.begin(), channel_write_flag.end(),
                   channel_name) == channel_write_flag.end() &&
-        !record_writer->WriteChannel(channel)) {
+        !record_writer->WriteChannel(channel_name, record_message_type, desc)) {
       AERROR << "write channel info failed";
     } else {
       channel_write_flag.push_back(channel_name);
@@ -207,16 +211,8 @@ int main(int argc, char **argv) {
     } else if (channel_name == "/apollo/drive_event") {
       auto pb_msg = m.instantiate<apollo::common::DriveEvent>();
       pb_msg->SerializeToString(&serialized_str);
-    } else if (channel_name == "/apollo/sensor/gnss/corrected_imu") {
-      auto pb_msg = m.instantiate<apollo::localization::CorrectedImu>();
-      if (pb_msg) {
-        pb_msg->SerializeToString(&serialized_str);
-      }
     } else if (channel_name == "/apollo/sensor/gnss/odometry") {
       auto pb_msg = m.instantiate<apollo::localization::Gps>();
-      pb_msg->SerializeToString(&serialized_str);
-    } else if (channel_name == "/apollo/monitor/system_status") {
-      auto pb_msg = m.instantiate<apollo::monitor::SystemStatus>();
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/apollo/monitor/static_info") {
       auto pb_msg = m.instantiate<apollo::data::StaticInfo>();
@@ -303,11 +299,9 @@ int main(int argc, char **argv) {
       continue;
     }
 
-    SingleMessage single_msg;
-    single_msg.set_channel_name(channel_name);
-    single_msg.set_content(serialized_str);
-    single_msg.set_time(nsec);
-    if (!record_writer->WriteMessage(single_msg)) {
+    auto raw_msg =
+        std::make_shared<apollo::cyber::message::RawMessage>(serialized_str);
+    if (!record_writer->WriteMessage(channel_name, raw_msg, nsec)) {
       AERROR << "write single msg fail";
     }
   }
@@ -315,10 +309,10 @@ int main(int argc, char **argv) {
   record_writer->Close();
   record_writer = nullptr;
   std::cout << "Info of record file" << std::endl;
-  std::string command_line = "cyber_recorder info -f " + record_file_name;
-  system(command_line.c_str());
+  std::string command_line = "cyber_recorder info " + record_file_name;
+  int res = system(command_line.c_str());
 
   std::cout << "Convertion finished! Took " << ros::Time::now() - start_time
             << " seconds in total." << std::endl;
-  return 0;
+  return res;
 }
