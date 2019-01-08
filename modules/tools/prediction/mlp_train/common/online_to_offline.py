@@ -67,22 +67,18 @@ class LabelGenerator(object):
         self.observation_dict = dict()
 
 
-    def LoadFeaturePBAndSaveLabelFiles(self, input_filepath, output_filepath):
+    def LoadFeaturePBAndSaveLabelFiles(self, input_filepath):
         '''
         This function will be used to replace all the functionalities in
         generate_cruise_label.py
         '''
+        self.filepath = input_filepath
         feature_sequences = self.LoadPBFeatures(input_filepath)
         self.OrganizeFeatures(feature_sequences)
         del feature_sequences # Try to free up some memory
-        self.Label(output_filepath)
+        self.ObserveAllFeatureSequences()
+        self.Label()
 
-
-    '''
-    =======================================================================
-    Below are non-public-API functions
-    =======================================================================
-    '''
 
     '''
     @brief: parse the pb file of Feature of all obstacles at all times.
@@ -149,7 +145,7 @@ class LabelGenerator(object):
                     print 'No lane feature, cancel labeling'
                     continue
                 self.ObserveFeatureSequence(feature_sequence, idx)
-
+        np.save(self.filepath + '.npy', self.observation_dict)
 
     '''
     @brief: Observe the sequence of Features following the Feature at
@@ -200,13 +196,8 @@ class LabelGenerator(object):
             time_span = feature_sequence[j].timestamp - feature_curr.timestamp
             if time_span > param_fea['maximum_observation_time']:
                 break
+            total_observed_time_span = time_span
 
-            # Sanity check.
-            if not feature_sequence[j].HasField('lane') or \
-               not feature_sequence[j].lane.HasField('lane_feature'):
-                continue
-
-            total_observed_time_span = time_span         
             #####################################################################
             # Update the obstacle trajectory:
             # Only update for consecutive (sampling rate = 0.1sec) points.
@@ -217,43 +208,46 @@ class LabelGenerator(object):
 
             #####################################################################
             # Update the lane-change info (mainly for cruise scenario):
-            # If jittering or done, then jump over this part.
-            if (is_jittering or has_finished_lane_change):
-                continue
-            # Record the sequence of lane_segments the obstacle stepped on.
-            lane_id_j = feature_sequence[j].lane.lane_feature.lane_id
-            if lane_id_j not in obs_actual_lane_ids:
-                obs_actual_lane_ids.append(lane_id_j)
-            # If step into another lane, label lane change to be started.
-            if lane_id_j not in curr_lane_segments:
-                # If it's the first time, log new_lane_id
-                if not has_started_lane_change:
-                    has_started_lane_change = True
-                    lane_change_start_time = time_span
-                    new_lane_id = lane_id_j
-            else:
-                # If it stepped into other lanes and now comes back, it's jittering!
-                if has_started_lane_change:
-                    is_jittering = True
+            if feature_sequence[j].HasField('lane') and \
+               feature_sequence[j].lane.HasField('lane_feature'):
+                # If jittering or done, then jump over this part.
+                if (is_jittering or has_finished_lane_change):
                     continue
-            # If roughly get to the center of another lane, label lane change to be finished.
-            left_bound = feature_sequence[j].lane.lane_feature.dist_to_left_boundary
-            right_bound = feature_sequence[j].lane.lane_feature.dist_to_right_boundary
-            if left_bound / (left_bound + right_bound) > (0.5 - param_fea['lane_change_finish_condition']) and \
-               left_bound / (left_bound + right_bound) < (0.5 + param_fea['lane_change_finish_condition']):
-                if has_started_lane_change:
-                    # This means that the obstacle has finished lane change.
-                    has_finished_lane_change = True
-                    lane_change_finish_time = time_span
+                # Record the sequence of lane_segments the obstacle stepped on.
+                lane_id_j = feature_sequence[j].lane.lane_feature.lane_id
+                if lane_id_j not in obs_actual_lane_ids:
+                    obs_actual_lane_ids.append(lane_id_j)
+                # If step into another lane, label lane change to be started.
+                if lane_id_j not in curr_lane_segments:
+                    # If it's the first time, log new_lane_id
+                    if not has_started_lane_change:
+                        has_started_lane_change = True
+                        lane_change_start_time = time_span
+                        new_lane_id = lane_id_j
                 else:
-                    # This means that the obstacle moves back to the center
-                    # of the original lane for the first time.
-                    if lane_change_finish_time is None:
+                    # If it stepped into other lanes and now comes back, it's jittering!
+                    if has_started_lane_change:
+                        is_jittering = True
+                        continue
+                # If roughly get to the center of another lane, label lane change to be finished.
+                left_bound = feature_sequence[j].lane.lane_feature.dist_to_left_boundary
+                right_bound = feature_sequence[j].lane.lane_feature.dist_to_right_boundary
+                if left_bound / (left_bound + right_bound) > (0.5 - param_fea['lane_change_finish_condition']) and \
+                   left_bound / (left_bound + right_bound) < (0.5 + param_fea['lane_change_finish_condition']):
+                    if has_started_lane_change:
+                        # This means that the obstacle has finished lane change.
+                        has_finished_lane_change = True
                         lane_change_finish_time = time_span
+                    else:
+                        # This means that the obstacle moves back to the center
+                        # of the original lane for the first time.
+                        if lane_change_finish_time is None:
+                            lane_change_finish_time = time_span
 
         if len(obs_actual_lane_ids) == 0:
             print "No lane id"
             return
+
         # Update the observation_dict:
         dict_val = dict()
         dict_val['obs_traj'] = obs_traj
@@ -271,8 +265,7 @@ class LabelGenerator(object):
 
 
     '''
-    @brief Observe the sequence of Feature for up to max_observation_time seconds.
-           Based on the observation, label each lane sequence accordingly:
+    @brief Based on the observation, label each lane sequence accordingly:
               - label whether the obstacle is on the lane_sequence
                 within a certain amount of time.
               - if there is lane chage, label the time it takes to get to that lane.
@@ -390,36 +383,88 @@ class LabelGenerator(object):
                                 lane_sequence.time_to_lane_center = -1.0
 
             output_dict[obs_id] = feature_sequence
-        SaveOutputPB(self.filepath + '.cruise.label' ,output_dict.values())
+        self.SaveOutputPB(self.filepath + '.cruise.label', output_dict.values())
 
 
     def LabelTrajectory(self, period_of_interest=3.0):
-        self.label_dict['Trajectory{}'.format(int(period_of_interest))] = dict()
-        for obs_id, feature_sequence in self.feature_dict.items():
-            self.label_dict['Trajectory{}'.format(int(period_of_interest))][obs_id] = dict()
+        output_dict = self.feature_dict
+        for obs_id, feature_sequence in output_dict.items():
             for idx, feature in enumerate(feature_sequence):
-                if not feature.HasField('lane') or \
-                   not feature.lane.HasField('lane_feature'):
-                    print 'No lane feature, cancel labeling'
+                # Observe the subsequent Features
+                if (feature.id, feature.timestamp) not in self.observation_dict:
                     continue
-                self.ObserveFeatureSequence(feature_sequence, idx)
                 observed_val = self.observation_dict[(feature.id, feature.timestamp)]
 
-                if 'obs_traj' in observed_val.keys() and \
-                   observed_val['obs_traj_len'] >= (period_of_interest/0.1) + 1:
-                    self.label_dict['Trajectory{}'.format(int(period_of_interest))][obs_id][feature.timestamp] = \
-                            observed_val['obs_traj'][0:int((period_of_interest/0.1) + 1)]
+                for point in observed_val['obs_traj']:
+                    traj_point = feature.future_status.future_traj_points.add()
+                    traj_point.path_point.x = point[0]
+                    traj_point.path_point.y = point[1]
+                    traj_point.path_point.theta = point[2]
+                    traj_point.timestamp = point[3]
+
+            output_dict[obs_id] = feature_sequence
+        self.SaveOutputPB(self.filepath + '.future_status.label', output_dict.values())
 
 
-    def Label(self, output_file):
-        self.LabelTrajectory(1.0)
-        self.LabelTrajectory(3.0)
-        self.LabelSingleLane(feature_sequence, 1.0)
-        self.LabelSingleLane(feature_sequence, 3.0)
+    def LabelJunctionExit(self):
+        '''
+        label feature trajectory according to real future lane sequence in 7s
+        '''
+        output_dict = self.feature_dict
+        for obs_id, feature_sequence in output_dict.items():
+            feature_seq_len = len(feature_sequence)
+            for i, fea in enumerate(feature_sequence):
+                # Sanity check.
+                if not fea.HasField('junction_feature') or \
+                   not len(fea.junction_feature.junction_exit) or \
+                   not len(fea.junction_feature.junction_mlp_feature):
+                    # print("No junction_feature, junction_exit, or junction_mlp_feature, not labeling this frame.")
+                    continue
+                curr_pos = np.array([fea.position.x, fea.position.y])
+                # Only keep speed > 1
+                # TODO(all) consider recovery
+                # if fea.speed <= 1:
+                #     continue
+                heading = math.atan2(fea.raw_velocity.y, fea.raw_velocity.x)
+                # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
+                exit_dict = dict()
+                exit_pos_dict = dict()
+                for junction_exit in fea.junction_feature.junction_exit:
+                    if junction_exit.HasField('exit_lane_id'):
+                        exit_dict[junction_exit.exit_lane_id] = \
+                        BoundingRectangle(junction_exit.exit_position.x,
+                                          junction_exit.exit_position.y,
+                                          junction_exit.exit_heading,
+                                          0.01,
+                                          junction_exit.exit_width)
+                        exit_pos_dict[junction_exit.exit_lane_id] = np.array(
+                            [junction_exit.exit_position.x, junction_exit.exit_position.y])
+                # Searching for up to 100 frames (10 seconds)
+                for j in range(i, min(i + 100, feature_seq_len)):
+                    car_bounding = BoundingRectangle(feature_sequence[j].position.x,
+                                                     feature_sequence[j].position.y,
+                                                     math.atan2(feature_sequence[j].raw_velocity.y,
+                                                                feature_sequence[j].raw_velocity.x),
+                                                     feature_sequence[j].length,
+                                                     feature_sequence[j].width)
+                    for key, value in exit_dict.items():
+                        if car_bounding.overlap(value):
+                            exit_pos = exit_pos_dict[key]
+                            delta_pos = exit_pos - curr_pos
+                            angle = math.atan2(
+                                delta_pos[1], delta_pos[0]) - heading
+                            d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
+                            label = [0 for idx in range(12)]
+                            label[d_idx] = 1
+                            fea.junction_feature.junction_mlp_label.extend(label)
+                            break
+            output_dict[obs_id] = feature_sequence
+        self.SaveOutputPB(self.filepath + '.junction.label', output_dict.values())
+
+
+    def Label(self):
+        self.LabelTrajectory()
+        self.LabelSingleLane()
+        self.LabelJunctionExit()
         # TODO(all):
         #   - implement label multiple lane
-
-
-        # save the feature_dict and label_dict for future use.
-        #self.SaveOutputPB(output_file, self.feature_dict.values())
-        #np.save(output_file + '.npy', self.label_dict)
