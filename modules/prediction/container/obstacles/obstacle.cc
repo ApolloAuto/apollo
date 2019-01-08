@@ -152,7 +152,7 @@ bool Obstacle::IsNearJunction() {
 }
 
 void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
-                      const double timestamp) {
+                      const double timestamp, int pred_id) {
   if (feature_history_.size() > 0 &&
       timestamp <= feature_history_.front().timestamp()) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
@@ -164,13 +164,14 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 
   // Set ID, Type, and Status of the feature.
   Feature feature;
-  if (SetId(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
+  if (SetId(perception_obstacle, &feature, pred_id) ==
+      ErrorCode::PREDICTION_ERROR) {
     return;
   }
   if (SetType(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
     return;
   }
-  SetStatus(perception_obstacle, timestamp, &feature);
+  SetStatus(perception_obstacle, timestamp, &feature, pred_id);
 
   // Set obstacle observation for KF tracking
   if (!FLAGS_use_navigation_mode) {
@@ -320,8 +321,10 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
-                         const double timestamp, Feature* feature) {
-  if (SetId(perception_obstacle, feature) == ErrorCode::PREDICTION_ERROR) {
+                         const double timestamp, Feature* feature,
+                         int pred_id) {
+  if (SetId(perception_obstacle, feature, pred_id) ==
+      ErrorCode::PREDICTION_ERROR) {
     AERROR << "Obstacle has no ID";
     return;
   }
@@ -411,13 +414,13 @@ void Obstacle::UpdateStatus(Feature* feature) {
 }
 
 ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
-                          Feature* feature) {
+                          Feature* feature, int pred_id) {
   if (!perception_obstacle.has_id()) {
     AERROR << "Obstacle has no ID.";
     return ErrorCode::PREDICTION_ERROR;
   }
 
-  int id = perception_obstacle.id();
+  int id = pred_id > 0 ? pred_id : perception_obstacle.id();
   if (id_ < 0) {
     id_ = id;
     ADEBUG << "Obstacle has id [" << id_ << "].";
