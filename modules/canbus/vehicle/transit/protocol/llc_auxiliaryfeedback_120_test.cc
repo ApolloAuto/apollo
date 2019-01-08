@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,9 @@ using ::apollo::drivers::canbus::Byte;
 
 class llc_auxiliaryfeedback_120Test : public ::testing ::Test {
  public:
+  virtual void SetUp() {}
+
  protected:
-  virtual void SetUp() {
-    // setup parameters
-  }
   Llcauxiliaryfeedback120 Llcauxiliary_feedback120_;
 };
 
@@ -58,44 +57,6 @@ TEST_F(llc_auxiliaryfeedback_120Test, General) {
   EXPECT_FALSE(
       Llcauxiliary_feedback120_.llc_fbk_autonomybuttonpressed(&kBytes, length));
 }
-
-// TEST_F(llc_auxiliaryfeedback_120Test, ch) {
-//   const std::uint8_t kBytes = 0xFF;
-//   std::int32_t length = 1;
-
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_pdu_ch7(&bytes, length),
-//   false); EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_pdu_ch6(&bytes,
-//   length), false);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_pdu_ch5(&bytes, length),
-//   false); EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_pdu_ch4(&bytes,
-//   length), false);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_pdu_ch3(&bytes, length),
-//   false); EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_pdu_ch2(&bytes,
-//   length), false);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_pdu_ch1(&bytes, length),
-//   false);
-// }
-
-// TEST_F(llc_auxiliaryfeedback_120Test, light_horn) {
-//   const std::uint8_t bytes = 0xFF;
-//   std::int32_t length = 1;
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_hazardlights(&bytes, length),
-//             false);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_ledgreenon(&bytes, length),
-//             false);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_horn(&bytes, length), true);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_buzzeron(&bytes, length),
-//   false); EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_turnsignal(&bytes,
-//   length),
-//             false);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_lowbeam(&bytes, length),
-//   false); EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_highbeam(&bytes,
-//   length), false);
-//   EXPECT_EQ(Llcauxiliary_feedback120_.llc_fbk_ledredon(&bytes, length),
-//   false); EXPECT_EQ(
-//       Llcauxiliary_feedback120_.llc_fbk_autonomybuttonpressed(&bytes,
-//       length), false);
-// }
 
 }  // namespace transit
 }  // namespace canbus

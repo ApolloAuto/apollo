@@ -144,17 +144,6 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "llc_diag_steeringcontrol_722_test",
-    size = "small",
-    srcs = ["llc_diag_steeringcontrol_722_test.cc"],
-    deps = [
-        ":llc_diag_steeringcontrol_722",
-        "@gtest//:main",
-        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-    ],
-)
-
 cc_library(
     name = "llc_motioncommandfeedback1_22",
     srcs = [
