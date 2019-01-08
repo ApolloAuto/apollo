@@ -33,8 +33,10 @@ class Llcauxiliaryfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   void Parse(const std::uint8_t* bytes, int32_t length,
              ChassisDetail* chassis) const override;
 
-  FRIEND_TEST(llc_auxiliaryfeedback_120Test, Bool_llc_fbc_inverter);
-  // FRIEND_TEST(llc_auxiliaryfeedback_120Test, Bool_ch8)
+  FRIEND_TEST(llc_auxiliaryfeedback_120Test, inverter);
+  FRIEND_TEST(llc_auxiliaryfeedback_120Test, ch);
+  FRIEND_TEST(llc_auxiliaryfeedback_120Test, light_horn);
+
  private:
   // config detail: {'description': 'Inverter enabled', 'offset': 0.0,
   // 'precision': 1.0, 'len': 1, 'name': 'LLC_FBK_Inverter', 'is_signed_var':
