@@ -154,6 +154,7 @@ void V2xProxy::OnV2xCarStatusTimer() {
     AERROR << "Error:localization ignore, no pose or header in it.";
     return;
   }
+  v2x_carstatus_->mutable_localization()->CopyFrom(*localization);
   obu_interface_->SendCarStatusToObu(v2x_carstatus_);
 }
 
