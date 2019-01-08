@@ -396,10 +396,10 @@ class LabelGenerator(object):
                 observed_val = self.observation_dict[(feature.id, feature.timestamp)]
 
                 for point in observed_val['obs_traj']:
-                    traj_point = feature.future_status.future_traj_points.add()
+                    traj_point = feature.future_trajectory_points.add()
                     traj_point.path_point.x = point[0]
                     traj_point.path_point.y = point[1]
-                    traj_point.path_point.theta = point[2]
+                    traj_point.path_point.velocity_heading = point[2]
                     traj_point.timestamp = point[3]
 
             output_dict[obs_id] = feature_sequence

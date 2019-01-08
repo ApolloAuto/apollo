@@ -71,6 +71,8 @@ message TrajectoryPoint {
   optional double da = 5;
   // The angle between vehicle front wheel and vehicle longitudinal axis
   optional double steer = 6;
+  // The absolute time
+  optional double timestamp = 7;
 }
 
 message Trajectory {

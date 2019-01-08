@@ -73,6 +73,7 @@ proto_library(
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:prediction_point_proto_lib",
         "//modules/prediction/proto:lane_graph_proto_lib",
     ],
 )
@@ -142,17 +143,17 @@ proto_library(
     ],
 )
 
-proto_library(
-    name = "scenario_proto_lib",
-    srcs = [
-        "scenario.proto",
-    ],
-)
-
 cc_proto_library(
     name = "scenario_proto",
     deps = [
         ":scenario_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "scenario_proto_lib",
+    srcs = [
+        "scenario.proto",
     ],
 )
 
@@ -170,5 +171,21 @@ proto_library(
     ],
     deps = [
         ":network_model_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "prediction_point_proto",
+    deps = [
+        ":prediction_point_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "prediction_point_proto_lib",
+    srcs = [
+        "prediction_point.proto",
+    ],
+    deps = [
     ],
 )
