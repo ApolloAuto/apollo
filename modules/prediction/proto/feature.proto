@@ -2,9 +2,10 @@ syntax = "proto2";
 
 package apollo.prediction;
 
-import "modules/prediction/proto/lane_graph.proto";
 import "modules/common/proto/geometry.proto";
+import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
+import "modules/prediction/proto/lane_graph.proto";
 
 message Lane {
   // Features of all possible current lanes
@@ -62,7 +63,17 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
-// next id = 31
+// Ground truth information for labeling purpose
+message PathPointWithTime {
+  optional apollo.common.PathPoint path_point = 1;
+  optional double timestamp = 2;
+}
+
+message FutureStatus {
+  repeated PathPointWithTime future_traj_points = 1;
+}
+
+// next id = 32
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
@@ -103,4 +114,6 @@ message Feature {
   optional ObstaclePriority priority = 25;
 
   optional bool is_near_junction = 29 [default = false];
+
+  optional FutureStatus future_status = 31;
 }
