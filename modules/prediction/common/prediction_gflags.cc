@@ -39,6 +39,12 @@ DEFINE_double(vehicle_min_linear_acc, -4.0,
 DEFINE_double(vehicle_max_speed, 35.0,
               "Max speed of vehicle");
 
+// Tracking Adaptation
+DEFINE_double(max_tracking_time, 0.5,
+              "Max tracking time for disappear obstacles");
+DEFINE_double(max_tracking_dist, 3.0,
+              "Max tracking distance for disappear obstacles");
+
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
 DEFINE_double(lane_search_radius_in_junction, 15.0,

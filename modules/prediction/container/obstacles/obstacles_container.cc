@@ -227,7 +227,7 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
           AERROR << "Obstacle id [" << obs_id << "] with empty obstacle_ptr.";
           break;
         }
-        if (timestamp_ - obstacle_ptr->timestamp() > 0.5) {
+        if (timestamp_ - obstacle_ptr->timestamp() > FLAGS_max_tracking_time) {
           ADEBUG << "Obstacle already reach time threshold.";
           break;
         }
@@ -302,7 +302,7 @@ bool ObstaclesContainer::AdaptTracking(
                    obstacle_ptr->latest_feature().raw_velocity().y();
     double dist = std::hypot(perception_obstacle.position().x() - obs_x,
                              perception_obstacle.position().y() - obs_y);
-    if (dist < 3.0) {
+    if (dist < FLAGS_max_tracking_dist) {
       return true;
     }
   }

@@ -31,6 +31,10 @@ DECLARE_double(vehicle_max_linear_acc);
 DECLARE_double(vehicle_min_linear_acc);
 DECLARE_double(vehicle_max_speed);
 
+// Tracking Adaptation
+DECLARE_double(max_tracking_time);
+DECLARE_double(max_tracking_dist);
+
 // Map
 DECLARE_double(lane_search_radius);
 DECLARE_double(lane_search_radius_in_junction);
