@@ -53,8 +53,6 @@ cc_library(
     ],
 )
 
-
-
 cc_library(
     name = "adc_motioncontrollimits1_12",
     srcs = [
@@ -70,8 +68,6 @@ cc_library(
         "//modules/drivers/canbus/common:canbus_common",  
     ],
 )
-
-
 
 cc_library(
     name = "llc_auxiliaryfeedback_120",
@@ -89,8 +85,6 @@ cc_library(
     ],
 )
 
-
-
 cc_test(
     name = "llc_auxiliaryfeedback_120_test",
     size = "small",
@@ -99,11 +93,8 @@ cc_test(
         ":llc_auxiliaryfeedback_120",
         "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        
     ],
 )
-
-
 
 cc_library(
     name = "llc_diag_brakecontrol_721",
@@ -153,6 +144,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "llc_diag_steeringcontrol_722_test",
+    size = "small",
+    srcs = ["llc_diag_steeringcontrol_722_test.cc"],
+    deps = [
+        ":llc_diag_steeringcontrol_722",
+        "@gtest//:main",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+    ],
+)
+
 cc_library(
     name = "llc_motioncommandfeedback1_22",
     srcs = [
@@ -185,7 +187,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "llc_motionfeedback2_21",
     srcs = [
@@ -210,10 +211,8 @@ cc_test(
         ":llc_motionfeedback2_21",
         "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        
     ],
 )
-
 
 cc_library(
     name = "llc_vehiclelimits_24",
@@ -247,7 +246,6 @@ cc_library(
     ],
 )
 
-
 cc_test(
     name = "llc_vehiclestatus_25_test",
     size = "small",
@@ -256,10 +254,7 @@ cc_test(
         ":llc_vehiclestatus_25",
         "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        
     ],
 )
-
-
 
 cpplint()
