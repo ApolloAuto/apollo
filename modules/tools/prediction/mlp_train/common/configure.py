@@ -50,7 +50,7 @@ parameters = {
         # Lane change is defined to be finished if the ratio of deviation
         # from center-line to the lane width is within this: (must be < 0.5)
         'lane_change_finish_condition': 0.1,
-        'maximum_observation_time': 3.0
+        'maximum_observation_time': 6.0
     }
 }
 
