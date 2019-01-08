@@ -202,6 +202,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "llc_motionfeedback2_21_test",
+    size = "small",
+    srcs = ["llc_motionfeedback2_21_test.cc"],
+    deps = [
+        ":llc_motionfeedback2_21",
+        "@gtest//:main",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        
+    ],
+)
+
 
 cc_library(
     name = "llc_vehiclelimits_24",

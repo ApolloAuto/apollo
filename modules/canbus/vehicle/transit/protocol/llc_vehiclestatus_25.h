@@ -19,6 +19,8 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
+#include "gtest/gtest_prod.h"
+
 namespace apollo {
 namespace canbus {
 namespace transit {
@@ -30,6 +32,8 @@ class Llcvehiclestatus25 : public ::apollo::drivers::canbus::ProtocolData<
   Llcvehiclestatus25();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ChassisDetail* chassis) const override;
+
+  FRIEND_TEST(llc_vehiclestatus_25Test, 12voltage);
 
  private:
   // config detail: {'description': 'Vehicle 12V voltage feedback', 'offset':

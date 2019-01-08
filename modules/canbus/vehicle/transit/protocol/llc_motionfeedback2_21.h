@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "gtest/gtest_prod.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -30,6 +31,8 @@ class Llcmotionfeedback221 : public ::apollo::drivers::canbus::ProtocolData<
   Llcmotionfeedback221();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ChassisDetail* chassis) const override;
+
+  FRIEND_TEST(llc_motionfeedback2_21Test, motion_fdk);
 
  private:
   // config detail: {'name': 'LLC_FBK_VehicleSpeed', 'offset': 0.0, 'precision':
