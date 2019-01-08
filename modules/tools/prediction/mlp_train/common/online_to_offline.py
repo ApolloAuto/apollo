@@ -31,11 +31,10 @@ from configure import parameters
 param_fea = parameters['feature']
 
 
-class OnlineRawDataToDataTrain(object):
-    
-    #__metaclass__ = abc.ABCMeta
+class LabelGenerator(object):
 
     def __init__(self):
+        self.filepath = None
         '''
         feature_dict contains the organized Feature in the following way:
             obstacle_ID --> [Feature1, Feature2, Feature3, ...] (sequentially sorted)
@@ -68,19 +67,6 @@ class OnlineRawDataToDataTrain(object):
         self.observation_dict = dict()
 
 
-        '''
-        label_dict:
-        contains different sets of labels for different learning models:
-
-        'SingleLane1' --> Single-lane model that predicts up to 1 sec.
-        'SingleLane3' --> Single-lane model that predicts up to 3 sec.
-        'Trajectory3' --> Model that directly predicts trajectory up to 3 sec.
-        ...
-
-        '''
-        self.label_dict = dict()
-
-
     def LoadFeaturePBAndSaveLabelFiles(self, input_filepath, output_filepath):
         '''
         This function will be used to replace all the functionalities in
@@ -92,40 +78,34 @@ class OnlineRawDataToDataTrain(object):
         self.Label(output_filepath)
 
 
-    def LoadFeatureLearnPBAndLabel(self):
-        '''
-        This loads the feature_for_learning, label them according to the
-        pre-saved dictionary, and pack into h5 format for training.
-        '''
-        # TODO(jiacheng): implement this.
-
-
-
     '''
     =======================================================================
     Below are non-public-API functions
     =======================================================================
     '''
-    @staticmethod
-    def LoadPBFeatures(filepath):
-        '''
-        @brief: parse the pb file of Feature of all obstacles at all times.
-        @input filepath: the path of the pb file that contains all the features of
-                         every obstacle at every timestamp.
-        @output: python readable format of the same content.
-        '''
+
+    '''
+    @brief: parse the pb file of Feature of all obstacles at all times.
+    @input filepath: the path of the pb file that contains all the features of
+                     every obstacle at every timestamp.
+    @output: python readable format of the same content.
+    '''
+    def LoadPBFeatures(self, filepath):
+        self.filepath = filepath
         offline_features = offline_features_pb2.Features()
         with open(filepath, 'rb') as file_in:
             offline_features.ParseFromString(file_in.read())
         return offline_features.feature
 
 
+    '''
+    @brief: save the feature_sequences to an output protobuf file.
+    @input filepath: the path of the output pb file.
+    @input feature_sequences: the content to be saved.
+    '''
     @staticmethod
-    def save_protobuf(filename, feature_sequences):
-        """
-        save a features in the given filename
-        """
-        with open(filename, 'wb') as file:
+    def SaveOutputPB(filepath, feature_sequences):
+        with open(filepath, 'wb') as file:
             for features in feature_sequences:
                 for fea in features:
                     serializedMessage = fea.SerializeToString()
@@ -134,43 +114,56 @@ class OnlineRawDataToDataTrain(object):
         file.close()
 
 
+    '''
+    @brief: organize the features by obstacle IDs first, then sort each
+            obstacle's feature according to time sequence.
+    @input features: the unorganized features
+    @output: organized (meaning: grouped by obstacle ID and sorted by time)
+             features.
+    '''
     def OrganizeFeatures(self, features):
-        '''
-        @brief: organize the features by obstacle IDs first, then sort each obstacle's
-                feature according to time sequence.
-        @input features: the unorganized features
-        @output: organized (meaning: grouped by obstacle ID and sorted by time) features.
-        '''
-
         # Organize Feature by obstacle_ID (put those belonging to the same obstacle together)
-        for fea in features:
-            if fea.id in self.feature_dict.keys():
-                self.feature_dict[fea.id].append(fea)
+        for feature in features:
+            if feature.id in self.feature_dict.keys():
+                self.feature_dict[feature.id].append(feature)
             else:
-                self.feature_dict[fea.id] = [fea]
+                self.feature_dict[feature.id] = [feature]
 
         # For the same obstacle, sort the Feature sequentially.
-        for k in self.feature_dict.keys():
-            if len(self.feature_dict[k]) < 2:
-                del self.feature_dict[k]
+        for obs_id in self.feature_dict.keys():
+            if len(self.feature_dict[obs_id]) < 2:
+                del self.feature_dict[obs_id]
                 continue
-            self.feature_dict[k].sort(key=lambda x: x.timestamp)
+            self.feature_dict[obs_id].sort(key=lambda x: x.timestamp)
 
 
+    '''
+    @brief: observe all feature sequences and build observation_dict.
+    @output: the complete observation_dict.
+    '''
+    def ObserveAllFeatureSequences(self):
+        for obs_id, feature_sequence in self.feature_dict.items():
+            for idx, feature in enumerate(feature_sequence):
+                if not feature.HasField('lane') or \
+                   not feature.lane.HasField('lane_feature'):
+                    print 'No lane feature, cancel labeling'
+                    continue
+                self.ObserveFeatureSequence(feature_sequence, idx)
+
+
+    '''
+    @brief: Observe the sequence of Features following the Feature at
+            idx_curr and save some important observations in the class
+            so that it can be used by various label functions.
+    @input feature_sequence: A sorted sequence of Feature corresponding to
+                             one obstacle.
+    @input idx_curr: The index of the current Feature to be labelled.
+                     We will look at the subsequent Features following this
+                     one to complete labeling.
+    @output: All saved as class variables in observation_dict, 
+             including: its trajectory info and its lane changing info.
+    '''
     def ObserveFeatureSequence(self, feature_sequence, idx_curr):
-        '''
-        @brief: Observe the sequence of Features following the Feature at
-                idx_curr and save some important observations in the class
-                so that it can be used by various label functions.
-        @input feature_sequence: A sorted sequence of Feature corresponding to
-                                 one obstacle.
-        @input idx_curr: The index of the current Feature to be labelled.
-                         We will look at the subsequent Features following this
-                         one to complete labeling.
-        @output: All saved as class variables in observation_dict, 
-                 including: its trajectory info and its lane changing info.
-        '''
-
         # Initialization.
         feature_curr = feature_sequence[idx_curr]
         if (feature_curr.id, feature_curr.timestamp) in self.observation_dict.keys():
@@ -187,6 +180,7 @@ class OnlineRawDataToDataTrain(object):
             print "Obstacle is not on any lane."
             return
 
+        # Declare needed varables.
         new_lane_id = None
         has_started_lane_change = False
         has_finished_lane_change = False
@@ -213,26 +207,23 @@ class OnlineRawDataToDataTrain(object):
                 continue
 
             total_observed_time_span = time_span         
-            ###############################################
+            #####################################################################
             # Update the obstacle trajectory:
             # Only update for consecutive (sampling rate = 0.1sec) points.
-            if (prev_timestamp == -1.0 or 
-                abs(feature_sequence[j].timestamp - prev_timestamp - 0.1) < 0.01):
-                obs_traj.append((feature_sequence[j].position.x,\
-                                 feature_sequence[j].position.y,\
-                                 feature_sequence[j].velocity_heading))
-                prev_timestamp = feature_sequence[j].timestamp
+            obs_traj.append((feature_sequence[j].position.x,\
+                             feature_sequence[j].position.y,\
+                             feature_sequence[j].velocity_heading,\
+                             feature_sequence[j].timestamp))
 
-            ###############################################
-            # Update the lane change info:
+            #####################################################################
+            # Update the lane-change info (mainly for cruise scenario):
+            # If jittering or done, then jump over this part.
             if (is_jittering or has_finished_lane_change):
                 continue
-
             # Record the sequence of lane_segments the obstacle stepped on.
             lane_id_j = feature_sequence[j].lane.lane_feature.lane_id
             if lane_id_j not in obs_actual_lane_ids:
                 obs_actual_lane_ids.append(lane_id_j)
-
             # If step into another lane, label lane change to be started.
             if lane_id_j not in curr_lane_segments:
                 # If it's the first time, log new_lane_id
@@ -244,7 +235,7 @@ class OnlineRawDataToDataTrain(object):
                 # If it stepped into other lanes and now comes back, it's jittering!
                 if has_started_lane_change:
                     is_jittering = True
-
+                    continue
             # If roughly get to the center of another lane, label lane change to be finished.
             left_bound = feature_sequence[j].lane.lane_feature.dist_to_left_boundary
             right_bound = feature_sequence[j].lane.lane_feature.dist_to_right_boundary
@@ -263,7 +254,6 @@ class OnlineRawDataToDataTrain(object):
         if len(obs_actual_lane_ids) == 0:
             print "No lane id"
             return
-
         # Update the observation_dict:
         dict_val = dict()
         dict_val['obs_traj'] = obs_traj
@@ -280,43 +270,35 @@ class OnlineRawDataToDataTrain(object):
         return
 
 
+    '''
+    @brief Observe the sequence of Feature for up to max_observation_time seconds.
+           Based on the observation, label each lane sequence accordingly:
+              - label whether the obstacle is on the lane_sequence
+                within a certain amount of time.
+              - if there is lane chage, label the time it takes to get to that lane.
+    '''
     def LabelSingleLane(self, period_of_interest=3.0):
-        '''
-        @brief Observe the sequence of Feature for up to max_observation_time seconds.
-               Based on the observation, label each lane sequence accordingly:
-                  - label whether the obstacle is on the lane_sequence
-                    within a certain amount of time.
-                  - if there is lane chage, label the time it takes to get to that lane.
-        '''
-        for obs_id, feature_sequence in self.feature_dict.items():
+        output_dict = self.feature_dict
+        for obs_id, feature_sequence in output_dict.items():
             feature_seq_len = len(feature_sequence)
-            for i, fea in enumerate(feature_sequence):
-                # Sanity check.
-                if 'SingleLane{}'.format(int(period_of_interest)) in self.label_dict.keys() and \
-                   (fea.id, fea.timestamp) in self.label_dict['SingleLane{}'.format(int(period_of_interest))].keys():
-                    break
-
-                if 'SingleLane{}'.format(int(period_of_interest)) not in self.label_dict.keys():
-                    self.label_dict['SingleLane{}'.format(int(period_of_interest))] = dict()
-                dict_curr = self.label_dict['SingleLane{}'.format(int(period_of_interest))]
-                dict_curr[(fea.id, fea.timestamp)] = dict()
-
-                if not fea.HasField('lane') or \
-                   not fea.lane.HasField('lane_feature'):
+            for idx, feature in enumerate(feature_sequence):
+                if not feature.HasField('lane') or \
+                   not feature.lane.HasField('lane_feature'):
                     print "No lane feature, cancel labeling"
                     continue
 
                 # Observe the subsequent Features
-                self.ObserveFeatureSequence(feature_sequence, i)
-                observed_val = self.observation_dict[(fea.id, fea.timestamp)]
+                if (feature.id, feature.timestamp) not in self.observation_dict:
+                    continue
+                observed_val = self.observation_dict[(feature.id, feature.timestamp)]
 
                 # Based on the observation, label data.
-                for lane_sequence in fea.lane.lane_graph.lane_sequence:
+                for lane_sequence in feature.lane.lane_graph.lane_sequence:
                     # Sanity check.
                     if len(lane_sequence.lane_segment) == 0:
                         print ('There is no lane segment in this sequence.')
                         continue
-                    
+
                     # Handle jittering data
                     if observed_val['is_jittering']:
                         lane_sequence.label = -10
@@ -331,7 +313,7 @@ class OnlineRawDataToDataTrain(object):
                         lane_sequence.time_to_lane_center = -1.0
                         lane_sequence.time_to_lane_edge = -1.0
 
-                    # The current lane is obstacle's original lane.
+                    # The current lane is obstacle's original lane. (labels: 0,2,4)
                     if lane_sequence.vehicle_on_lane:
                         # Obs is following ONE OF its original lanes:
                         if not observed_val['has_started_lane_change'] or \
@@ -373,7 +355,7 @@ class OnlineRawDataToDataTrain(object):
                             lane_sequence.time_to_lane_edge = -1.0
                             lane_sequence.time_to_lane_center = -1.0
 
-                    # The current lane is NOT obstacle's original lane.
+                    # The current lane is NOT obstacle's original lane. (labels: -1,1,3)
                     else:
                         # Obstacle is following the original lane.
                         if not observed_val['has_started_lane_change'] or \
@@ -405,17 +387,10 @@ class OnlineRawDataToDataTrain(object):
                             else:
                                 lane_sequence.label = -1
                                 lane_sequence.time_to_lane_edge = -1.0
-                                lane_sequence.time_to_lane_center = -1.0            
+                                lane_sequence.time_to_lane_center = -1.0
 
-                    # Update the label_dict:
-                    dict_curr[(fea.id, fea.timestamp)][lane_sequence.lane_sequence_id] = \
-                        (lane_sequence.label,\
-                         lane_sequence.time_to_lane_edge,\
-                         lane_sequence.time_to_lane_center)
-
-                self.label_dict['SingleLane{}'.format(int(period_of_interest))] = dict_curr
-
-            self.feature_dict[obs_id] = feature_sequence
+            output_dict[obs_id] = feature_sequence
+        SaveOutputPB(self.filepath + '.cruise.label' ,output_dict.values())
 
 
     def LabelTrajectory(self, period_of_interest=3.0):
@@ -425,7 +400,7 @@ class OnlineRawDataToDataTrain(object):
             for idx, feature in enumerate(feature_sequence):
                 if not feature.HasField('lane') or \
                    not feature.lane.HasField('lane_feature'):
-                    print "No lane feature, cancel labeling"
+                    print 'No lane feature, cancel labeling'
                     continue
                 self.ObserveFeatureSequence(feature_sequence, idx)
                 observed_val = self.observation_dict[(feature.id, feature.timestamp)]
@@ -441,16 +416,10 @@ class OnlineRawDataToDataTrain(object):
         self.LabelTrajectory(3.0)
         self.LabelSingleLane(feature_sequence, 1.0)
         self.LabelSingleLane(feature_sequence, 3.0)
-        # TODO(jiacheng):
+        # TODO(all):
         #   - implement label multiple lane
 
 
         # save the feature_dict and label_dict for future use.
-        self.save_protobuf(output_file, self.feature_dict.values())
-        np.save(output_file + '.npy', self.label_dict)
-
-
-    #@abc.abstractmethod
-    #def Deserialize(self):
-    #   """ abstractmethod"""
-    #   raise NotImplementedError
+        #self.SaveOutputPB(output_file, self.feature_dict.values())
+        #np.save(output_file + '.npy', self.label_dict)
