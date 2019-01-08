@@ -236,4 +236,18 @@ cc_library(
 )
 
 
+cc_test(
+    name = "llc_vehiclestatus_25_test",
+    size = "small",
+    srcs = ["llc_vehiclestatus_25_test.cc"],
+    deps = [
+        ":llc_vehiclestatus_25",
+        "@gtest//:main",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        
+    ],
+)
+
+
+
 cpplint()
