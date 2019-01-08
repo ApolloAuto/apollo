@@ -7,7 +7,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
     * VLS - 128 Line LiDAR
     * FPD-Link Cameras
     * Continental high-range function radars
-    * Apollo Extension Unit (AXU)
+    * Apollo Expansion Unit (AXU)
     * Additional IPC
 * Brand new Runtime Framework - **Apollo CyberRT** which is specifically targeted towards autonomous driving
 * New Perception algorithms
