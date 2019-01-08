@@ -29,7 +29,7 @@ from common.feature_io import build_trajectory
 #from common.trajectory import TrajectoryToSample
 from common.online_to_offline import LabelGenerator
 
-'''
+
 def label_file(input_file, output_file):
     """
     label each feature file
@@ -55,20 +55,20 @@ def label_file(input_file, output_file):
         fea_trajs[fea_key] = fea_traj
     # save them in the output file with the same format as the input file
     save_protobuf(output_file, fea_trajs.values())
-'''
+
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generate labels')
     parser.add_argument('input', type=str, help='input file')
-    #parser.add_argument('output', type=str, help='output file')
+    parser.add_argument('output', type=str, help='output file')
     args = parser.parse_args()
 
     label_gen = LabelGenerator()
 
-    #print("Create Label {} -> {}".format(args.input, args.output))
+    print("Create Label {} -> {}".format(args.input, args.output))
     if os.path.isfile(args.input):
-        #label_file(args.input, args.output)
-        label_gen.LoadFeaturePBAndSaveLabelFiles(args.input)
+        label_file(args.input, args.output)
+        #label_gen.LoadFeaturePBAndSaveLabelFiles(args.input)
     else:
         print("{} is not a valid file".format(args.input))
