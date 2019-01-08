@@ -27,15 +27,17 @@ using ::apollo::drivers::canbus::Byte;
 
 class llc_vehiclestatus_25Test : public ::testing ::Test {
  public:
- protected:
   virtual void SetUp() {}
+
+ protected:
   Llcvehiclestatus25 Llcauxiliary_status25_;
 };
 
 TEST_F(llc_vehiclestatus_25Test, 12voltage) {
-  const std::uint8_t bytes = 0xFF;
+  const std::uint8_t kBytes = 0xFF;
   std::int32_t length = 1;
-  EXPECT_EQ(Llcauxiliary_status25_.llc_fbk_12voltage(&bytes, length), 25.5);
+  EXPECT_DOUBLE_EQ(Llcauxiliary_status25_.llc_fbk_12voltage(&kBytes, length),
+                   25.5);
 }
 
 }  // namespace transit

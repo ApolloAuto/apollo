@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,21 +27,25 @@ using ::apollo::drivers::canbus::Byte;
 
 class llc_motionfeedback2_21Test : public ::testing ::Test {
  public:
- protected:
   virtual void SetUp() {}
+
+ protected:
   Llcmotionfeedback221 Llcmotionfeedback2_21;
 };
 
 TEST_F(llc_motionfeedback2_21Test, motion_fdk) {
-  const std::uint8_t bytes = 0x00;
+  const std::uint8_t kBytes = 0x00;
   std::int32_t length = 1;
-  EXPECT_EQ(Llcmotionfeedback2_21.llc_fbk_vehiclespeed(&bytes, length), 0);
-  EXPECT_EQ(Llcmotionfeedback2_21.llc_motionfeedback2_counter(&bytes, length),
+  EXPECT_DOUBLE_EQ(Llcmotionfeedback2_21.llc_fbk_vehiclespeed(&kBytes, length),
+                   0);
+  EXPECT_EQ(Llcmotionfeedback2_21.llc_motionfeedback2_counter(&kBytes, length),
             0);
-  EXPECT_EQ(Llcmotionfeedback2_21.llc_motionfeedback2_checksum(&bytes, length),
+  EXPECT_EQ(Llcmotionfeedback2_21.llc_motionfeedback2_checksum(&kBytes, length),
             0);
-  EXPECT_EQ(Llcmotionfeedback2_21.llc_fbk_steeringrate(&bytes, length), 0);
-  EXPECT_EQ(Llcmotionfeedback2_21.llc_fbk_steeringangle(&bytes, length), 12.8);
+  EXPECT_DOUBLE_EQ(Llcmotionfeedback2_21.llc_fbk_steeringrate(&kBytes, length),
+                   0);
+  EXPECT_DOUBLE_EQ(Llcmotionfeedback2_21.llc_fbk_steeringangle(&kBytes, length),
+                   12.8);
 }
 
 }  // namespace transit
