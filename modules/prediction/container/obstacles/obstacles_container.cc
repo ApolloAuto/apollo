@@ -217,7 +217,8 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
       while (curr != nullptr) {
         int obs_id = curr->key;
         curr = curr->next;
-        if (seen_perception_ids.find(obs_id) != seen_perception_ids.end() ||
+        if (obs_id < 0 ||
+            seen_perception_ids.find(obs_id) != seen_perception_ids.end() ||
             seen_prediction_ids.find(obs_id) != seen_prediction_ids.end()) {
           // this obs_id has already been processed
           continue;
@@ -300,9 +301,15 @@ bool ObstaclesContainer::AdaptTracking(
     double obs_y = obstacle_ptr->latest_feature().position().y() + (timestamp_ -
                    obstacle_ptr->latest_feature().timestamp()) *
                    obstacle_ptr->latest_feature().raw_velocity().y();
-    double dist = std::hypot(perception_obstacle.position().x() - obs_x,
-                             perception_obstacle.position().y() - obs_y);
-    if (dist < FLAGS_max_tracking_dist) {
+    double v_heading = std::atan2(
+        obstacle_ptr->latest_feature().raw_velocity().y(),
+        obstacle_ptr->latest_feature().raw_velocity().x());
+    double dist_x = perception_obstacle.position().x() - obs_x;
+    double dist_y = perception_obstacle.position().y() - obs_y;
+    double dist = std::hypot(dist_x, dist_y);
+    double angle = std::atan2(dist_y, dist_x) - v_heading;
+    if (std::abs(dist * std::cos(angle)) < FLAGS_max_tracking_dist &&
+        std::abs(dist * std::sin(angle)) < FLAGS_max_tracking_dist / 3) {
       return true;
     }
   }
