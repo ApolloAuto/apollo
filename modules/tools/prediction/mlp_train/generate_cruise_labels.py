@@ -26,7 +26,7 @@ from common.configure import parameters
 from common.feature_io import load_protobuf
 from common.feature_io import save_protobuf
 from common.feature_io import build_trajectory
-#from common.trajectory import TrajectoryToSample
+from common.trajectory import TrajectoryToSample
 from common.online_to_offline import LabelGenerator
 
 
