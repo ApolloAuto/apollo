@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.prediction;
+
+message PredictionPathPoint {
+  required double x = 1;
+  required double y = 2;
+  optional double velocity_heading = 3;
+}
+
+message PredictionTrajectoryPoint {
+  required PredictionPathPoint path_point = 1;
+  required double timestamp = 2;
+}
