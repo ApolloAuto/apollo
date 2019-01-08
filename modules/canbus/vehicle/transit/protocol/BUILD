@@ -90,6 +90,21 @@ cc_library(
 )
 
 
+
+cc_test(
+    name = "llc_auxiliaryfeedback_120_test",
+    size = "small",
+    srcs = ["llc_auxiliaryfeedback_120_test.cc"],
+    deps = [
+        ":llc_auxiliaryfeedback_120",
+        "@gtest//:main",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        
+    ],
+)
+
+
+
 cc_library(
     name = "llc_diag_brakecontrol_721",
     srcs = [
@@ -219,4 +234,6 @@ cc_library(
         "//modules/drivers/canbus/common:canbus_common",  
     ],
 )
+
+
 cpplint()
