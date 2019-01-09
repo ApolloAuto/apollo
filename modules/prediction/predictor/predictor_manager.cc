@@ -168,7 +168,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         switch (perception_obstacle.type()) {
           case PerceptionObstacle::VEHICLE: {
             if (obstacle->HasJunctionFeatureWithExits() &&
-                !obstacle->IsClosedToJunctionExit()) {
+                !obstacle->IsCloseToJunctionExit()) {
               predictor = GetPredictor(vehicle_in_junction_predictor_);
               CHECK_NOTNULL(predictor);
             } else if (obstacle->IsOnLane()) {

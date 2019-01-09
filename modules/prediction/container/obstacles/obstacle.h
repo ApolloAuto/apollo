@@ -60,7 +60,7 @@ class Obstacle {
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
   void Insert(const perception::PerceptionObstacle& perception_obstacle,
-              const double timestamp, int prediction_id);
+              const double timestamp, const int prediction_id);
 
   /**
    * @brief Insert a feature proto message.
@@ -91,14 +91,14 @@ class Obstacle {
    * @param i The index of the feature.
    * @return The ith feature.
    */
-  const Feature& feature(size_t i) const;
+  const Feature& feature(const size_t i) const;
 
   /**
    * @brief Get a pointer to the ith feature from latest to earliest.
    * @param i The index of the feature.
    * @return A pointer to the ith feature.
    */
-  Feature* mutable_feature(size_t i);
+  Feature* mutable_feature(const size_t i);
 
   /**
    * @brief Get the latest feature.
@@ -149,12 +149,6 @@ class Obstacle {
   bool IsOnLane() const;
 
   /**
-   * @brief Check if the obstacle is near or on any lane.
-   * @return If the obstacle is near or on any lane.
-   */
-  bool IsNearLane() const;
-
-  /**
    * @brief Check if the obstacle can be ignored.
    * @return If the obstacle can be ignored.
    */
@@ -174,10 +168,10 @@ class Obstacle {
   bool IsInJunction(const std::string& junction_id);
 
   /**
-   * @brief Check if the obstacle is closed to a junction exit.
+   * @brief Check if the obstacle is close to a junction exit.
    * @return If the obstacle is closed to a junction exit.
    */
-  bool IsClosedToJunctionExit();
+  bool IsCloseToJunctionExit();
 
   /**
    * @brief Check if the obstacle has junction feature.
@@ -284,7 +278,7 @@ class Obstacle {
 
   void SetLanePoints(Feature* feature);
 
-  void SetLanePoints(Feature* feature, double lane_point_spacing,
+  void SetLanePoints(const Feature* feature, double lane_point_spacing,
                      LaneGraph* const lane_graph);
 
   void SetLaneSequencePath(LaneGraph* const lane_graph);

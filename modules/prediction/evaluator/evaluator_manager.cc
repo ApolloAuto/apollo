@@ -140,7 +140,7 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
   switch (obstacle->type()) {
     case PerceptionObstacle::VEHICLE: {
       if (obstacle->HasJunctionFeatureWithExits() &&
-          !obstacle->IsClosedToJunctionExit()) {
+          !obstacle->IsCloseToJunctionExit()) {
         evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
         CHECK_NOTNULL(evaluator);
       } else if (obstacle->IsOnLane()) {
