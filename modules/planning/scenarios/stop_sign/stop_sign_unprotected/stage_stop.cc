@@ -87,13 +87,18 @@ Stage::StageStatus StageStop::Process(
     return FinishStage();
   }
 
-  // STOP
+  // check on wait-time
   auto start_time = GetContext()->stop_start_time;
   const double wait_time = Clock::NowInSeconds() - start_time;
   ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
          << "]";
+  if (wait_time < scenario_config_.stop_duration()) {
+    return Stage::RUNNING;
+  }
+
+  // check on watch_vehicles
   auto& watch_vehicles = GetContext()->watch_vehicles;
-  if (wait_time >= scenario_config_.stop_duration() && watch_vehicles.empty()) {
+  if (watch_vehicles.empty()) {
     return FinishStage();
   }
 
@@ -112,7 +117,6 @@ Stage::StageStatus StageStop::Process(
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
-
   if (watch_vehicle_ids.empty()) {
     return FinishStage();
   }
