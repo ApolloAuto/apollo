@@ -65,7 +65,9 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
 };
 
 /*
- * stop_sign: adc proceed, 27m from stop sign, not enter stop-sign scenario yet
+ * stop_sign:
+ *   desc: adc proceed, 27m from stop sign, not enter stop-sign scenario yet,
+ *         but the stop decision for stop-sign shall be there
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
@@ -79,16 +81,21 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
+
+  // check PlanningContext content
+  auto* scenario_info = PlanningContext::GetScenarioInfo();
+  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->stop_done_overlap_id, "");
+  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
 }
 
 /*
- * stop_sign: adc stopped (speed and distance to stop_line)
- *   adc status: DRIVE => STOP
+ * stop_sign:
+ *   desc: adc close enough to stop-sign, enter PRE-STOP stage
  *   decision: STOP
  */
-/* TODO(all): to rewrite
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  FLAGS_enable_scenario_stop_sign_unprotected = true;
 
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -97,19 +104,15 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  // set PlanningStatus: stop_status = DRIVE
-  auto* stop_sign_status =
-      PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
-  stop_sign_status->set_stop_sign_id("1017");
-  stop_sign_status->set_status(StopSignStatus::DRIVE);
 
   RUN_GOLDEN_TEST_DECISION(0);
 
-  // check PlanningStatus value: STOP
-  EXPECT_TRUE(stop_sign_status->has_status() &&
-              stop_sign_status->status() == StopSignStatus::STOP);
+  // check PlanningContext content
+  auto* scenario_info = PlanningContext::GetScenarioInfo();
+  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->stop_done_overlap_id, "");
+  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
 }
-*/
 
 /*
  * stop_sign: adc stopped + wait_time < STOP_DURATION
