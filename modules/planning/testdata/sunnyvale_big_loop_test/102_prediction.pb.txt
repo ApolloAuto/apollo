@@ -108,8 +108,6 @@ prediction_obstacle {
     tracking_time: 9.9626448154449463
     type: VEHICLE
     timestamp: 1527023637.9486215
-    confidence: 0.98298782110214233
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1527023637.9486215
   predicted_period: 5
@@ -164,8 +162,6 @@ prediction_obstacle {
     tracking_time: 5.0025849342346191
     type: PEDESTRIAN
     timestamp: 1527023637.9486215
-    confidence: 0.97183692455291748
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1527023637.9486215
   predicted_period: 5
@@ -1313,8 +1309,6 @@ prediction_obstacle {
     tracking_time: 0.60030698776245117
     type: PEDESTRIAN
     timestamp: 1527023637.9486215
-    confidence: 0.60204702615737915
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1527023637.9486215
   predicted_period: 5
