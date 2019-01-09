@@ -256,24 +256,33 @@ Status LonController::ComputeControlCommand(
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
           ? -acceleration_cmd
           : acceleration_cmd;
-  if (FLAGS_use_preview_speed_for_table) {
-    calibration_value = control_interpolation_->Interpolate(
+  if (!FLAGS_use_acceleration) {
+    if (FLAGS_use_preview_speed_for_table) {
+      calibration_value = control_interpolation_->Interpolate(
         std::make_pair(debug->preview_speed_reference(), acceleration_lookup));
-  } else {
-    calibration_value = control_interpolation_->Interpolate(
+    } else {
+      calibration_value = control_interpolation_->Interpolate(
         std::make_pair(chassis_->speed_mps(), acceleration_lookup));
-  }
+    }
 
-  if (calibration_value >= 0) {
-    throttle_cmd = std::abs(calibration_value) > throttle_deadzone
+    if (calibration_value >= 0) {
+      throttle_cmd = std::abs(calibration_value) > throttle_deadzone
                        ? std::abs(calibration_value)
                        : throttle_deadzone;
-    brake_cmd = 0.0;
-  } else {
-    throttle_cmd = 0.0;
-    brake_cmd = std::abs(calibration_value) > brake_deadzone
+      brake_cmd = 0.0;
+    } else {
+      throttle_cmd = 0.0;
+      brake_cmd = std::abs(calibration_value) > brake_deadzone
                     ? std::abs(calibration_value)
                     : brake_deadzone;
+    }
+  } else {
+    cmd->set_acceleration(acceleration_cmd);
+    if (acceleration_cmd >= 0) {
+      cmd->set_throttle(acceleration_cmd);
+    } else {
+      cmd->set_brake(acceleration_cmd);
+    }
   }
 
   debug->set_station_error_limited(station_error_limited);
