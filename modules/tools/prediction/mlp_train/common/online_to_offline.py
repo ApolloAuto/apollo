@@ -77,7 +77,6 @@ class LabelGenerator(object):
         self.OrganizeFeatures(feature_sequences)
         del feature_sequences # Try to free up some memory
         self.ObserveAllFeatureSequences()
-        self.Label()
 
 
     '''
@@ -100,14 +99,10 @@ class LabelGenerator(object):
     @input feature_sequences: the content to be saved.
     '''
     @staticmethod
-    def SaveOutputPB(filepath, feature_sequences):
+    def SaveOutputPB(filepath, pb_message):
         with open(filepath, 'wb') as file:
-            for features in feature_sequences:
-                for fea in features:
-                    serializedMessage = fea.SerializeToString()
-                    delimiter = encoder._VarintBytes(len(serializedMessage))
-                    file.write(delimiter + serializedMessage)
-        file.close()
+            serializedMessage = pb_message.SerializeToString()
+            file.write(serializedMessage)
 
 
     '''
@@ -272,6 +267,7 @@ class LabelGenerator(object):
     '''
     def LabelSingleLane(self, period_of_interest=3.0):
         output_dict = self.feature_dict
+        output_features = offline_features_pb2.Features()
         for obs_id, feature_sequence in output_dict.items():
             feature_seq_len = len(feature_sequence)
             for idx, feature in enumerate(feature_sequence):
@@ -381,13 +377,16 @@ class LabelGenerator(object):
                                 lane_sequence.label = -1
                                 lane_sequence.time_to_lane_edge = -1.0
                                 lane_sequence.time_to_lane_center = -1.0
+                
+                output_features.feature.add().CopyFrom(feature)
 
             output_dict[obs_id] = feature_sequence
-        self.SaveOutputPB(self.filepath + '.cruise.label', output_dict.values())
+        self.SaveOutputPB(self.filepath + '.cruise.label', output_features)
 
 
     def LabelTrajectory(self, period_of_interest=3.0):
         output_dict = self.feature_dict
+        output_features = offline_features_pb2.Features()
         for obs_id, feature_sequence in output_dict.items():
             for idx, feature in enumerate(feature_sequence):
                 # Observe the subsequent Features
@@ -402,8 +401,10 @@ class LabelGenerator(object):
                     traj_point.path_point.velocity_heading = point[2]
                     traj_point.timestamp = point[3]
 
+                output_features.feature.add().CopyFrom(feature)
+
             output_dict[obs_id] = feature_sequence
-        self.SaveOutputPB(self.filepath + '.future_status.label', output_dict.values())
+        self.SaveOutputPB(self.filepath + '.future_status.label', output_features)
 
 
     def LabelJunctionExit(self):
@@ -411,6 +412,7 @@ class LabelGenerator(object):
         label feature trajectory according to real future lane sequence in 7s
         '''
         output_dict = self.feature_dict
+        output_features = offline_features_pb2.Features()
         for obs_id, feature_sequence in output_dict.items():
             feature_seq_len = len(feature_sequence)
             for i, fea in enumerate(feature_sequence):
@@ -458,8 +460,13 @@ class LabelGenerator(object):
                             label[d_idx] = 1
                             fea.junction_feature.junction_mlp_label.extend(label)
                             break
+                if fea.HasField('junction_feature') and \
+                   len(fea.junction_feature.junction_mlp_feature) > 0 and \
+                   len(fea.junction_feature.junction_mlp_label) > 0:
+                    output_features.feature.add().CopyFrom(fea)
+
             output_dict[obs_id] = feature_sequence
-        self.SaveOutputPB(self.filepath + '.junction.label', output_dict.values())
+        self.SaveOutputPB(self.filepath + '.junction.label', output_features)
 
 
     def Label(self):

@@ -81,8 +81,6 @@ def save_protobuf(filename, feature_trajectories):
                 delimiter = encoder._VarintBytes(len(serializedMessage))
                 f.write(delimiter + serializedMessage)
 
-    f.close()
-
 
 def build_trajectory(features):
     """
