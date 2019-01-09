@@ -65,7 +65,7 @@ template <typename MessageT>
 - Parameters:
     - channel_name: the name of the channel to write to
     - MessageT: The type of message to be written out
-- Return value - Shared pointer to the Reader object
+- Return value - Shared pointer to the Writer object
 
 ### Create a reader
 
@@ -92,7 +92,7 @@ The reader is created by the `CreateReader` interface of the node class. The int
     - channel_name: the name of the channel to receive from
     - reader_func: callback function to process the messages
 
-- Return value - Shared pointer to the Writer object
+- Return value - Shared pointer to the Reader object
 
 ### Code Example
 
