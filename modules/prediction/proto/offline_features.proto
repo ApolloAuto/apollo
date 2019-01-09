@@ -17,36 +17,14 @@ message CNNFeatures {
   optional int32 label = 5;
 }
 
-// next id = 6;
 message DataForLearning {
   // The info. needed for identifying a unique data point:
   optional int32 id = 1;
   optional double timestamp = 2;
 
-  // The actual input features for learning algorithms:
-  repeated double features_learning = 3;
+  // The features for learning algorithms:
+  repeated double features_for_learning = 3;
 
-  // The labels for each data point:
-  message TrajectoryPoint {
-  	optional double x = 1;
-  	optional double y = 2;
-  	optional double velocity_heading = 3;
-  }
-  repeated TrajectoryPoint trajectory = 4;
-
-
-  // In case if the learning algorithm processes single lane.
-  message LaneSequenceData {
-  	// The info. needed for identifying a unique data point:
-  	optional int32 lane_sequence_id = 1;
-
-  	// The actual input features for learning algorithms:
-  	repeated double features_lane_learning = 2;
-
-  	// The labels for each data point:
-  	optional int32 label = 3;
-	optional double time_to_lane_center = 4;
-	optional double time_to_lane_edge = 5;
-  }
-  repeated LaneSequenceData lane_sequence_data = 5;
+  // The ground-truth labels:
+  repeated double labels = 4;
 }
