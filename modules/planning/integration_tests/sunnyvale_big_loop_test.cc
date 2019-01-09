@@ -65,13 +65,11 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
 };
 
 /*
- * stop_sign: adc proceed
- *   adc status: null => DRIVE
+ * stop_sign: adc proceed, 27m from stop sign, not enter stop-sign scenario yet
  *   decision: STOP
  */
-/* TODO(all): to rewrite
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  FLAGS_enable_scenario_stop_sign_unprotected = true;
 
   std::string seq_num = "1";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -81,13 +79,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   PlanningTestBase::SetUp();
 
   RUN_GOLDEN_TEST_DECISION(0);
-
-  // check PlanningStatus value: DRIVE
-  auto stop_sign_status = PlanningContext::MutablePlanningStatus()->stop_sign();
-  EXPECT_TRUE(stop_sign_status.has_status() &&
-              stop_sign_status.status() == StopSignStatus::DRIVE);
 }
-*/
 
 /*
  * stop_sign: adc stopped (speed and distance to stop_line)
