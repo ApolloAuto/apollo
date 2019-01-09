@@ -301,15 +301,15 @@ bool ObstaclesContainer::AdaptTracking(
     double obs_y = obstacle_ptr->latest_feature().position().y() + (timestamp_ -
                    obstacle_ptr->latest_feature().timestamp()) *
                    obstacle_ptr->latest_feature().raw_velocity().y();
-    double heading = std::atan2(
-        obstacle_ptr->latest_feature().raw_velocity().y(),
-        obstacle_ptr->latest_feature().raw_velocity().x());
+    double vel_x = obstacle_ptr->latest_feature().raw_velocity().x();
+    double vel_y = obstacle_ptr->latest_feature().raw_velocity().y();
+    double vel = std::hypot(vel_x, vel_y);
     double dist_x = perception_obstacle.position().x() - obs_x;
     double dist_y = perception_obstacle.position().y() - obs_y;
-    double lon_dist = dist_x * std::cos(heading) + dist_y * std::sin(heading);
-    double lat_dist = dist_x * std::sin(heading) - dist_y * std::cos(heading);
-    if (std::abs(lon_dist) < FLAGS_max_tracking_dist &&
-        std::abs(lat_dist) < FLAGS_max_tracking_dist / 3) {
+    double dot_prod = dist_x * vel_x + dist_y * vel_y;
+    double cross_prod = dist_x * vel_y - dist_y * vel_x;
+    if (std::abs(dot_prod) < FLAGS_max_tracking_dist * vel &&
+        std::abs(cross_prod) < FLAGS_max_tracking_dist * vel / 3) {
       return true;
     }
   }
