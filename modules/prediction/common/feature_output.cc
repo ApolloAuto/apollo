@@ -52,21 +52,6 @@ void FeatureOutput::Insert(const Feature& feature) {
 void FeatureOutput::InsertIntoLearningData(const Feature& feature) {
   data_for_learning_.set_id(feature.id());
   data_for_learning_.set_timestamp(feature.timestamp());
-
-  for (int i = 0; i < feature.lane().lane_graph().lane_sequence_size();
-       i ++) {
-    DataForLearning::LaneSequenceData lane_sequence_data;
-    auto curr_lane_sequence = feature.lane().lane_graph().lane_sequence(i);
-
-    lane_sequence_data.set_lane_sequence_id(
-        curr_lane_sequence.lane_sequence_id());
-    for (int j = 0; j < curr_lane_sequence.features().mlp_features_size();
-         j ++) {
-      lane_sequence_data.add_features_lane_learning(
-          curr_lane_sequence.features().mlp_features(j));
-    }
-    data_for_learning_.add_lane_sequence_data()->CopyFrom(lane_sequence_data);
-  }
 }
 
 void FeatureOutput::Write() {
