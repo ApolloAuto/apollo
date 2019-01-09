@@ -19,12 +19,15 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::time::Clock;
+using apollo::planning::scenario::stop_sign::StopSignUnprotectedContext;
 
 /**
  * @class SunnyvaleBigLoopTest
@@ -115,13 +118,12 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 }
 
 /*
- * stop_sign: adc stopped + wait_time < STOP_DURATION
- *   adc status: STOP => STOP
+ * stop_sign:
+ *   desc: adc stopped + wait_time < STOP_DURATION, stage PRE-STOP => STOP
  *   decision: STOP
  */
-/* TODO(all): to rewrite
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, true);
+  FLAGS_enable_scenario_stop_sign_unprotected = true;
 
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -130,25 +132,26 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   FLAGS_test_chassis_file = seq_num + "_chassis.pb.txt";
   PlanningTestBase::SetUp();
 
-  // set PlanningStatus: wait_time < STOP_DURATION
-  auto* stop_sign_status =
-      PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
-  stop_sign_status->set_stop_sign_id("1017");
-  stop_sign_status->set_status(StopSignStatus::STOP);
-  auto* stop_sign_config =
-      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::STOP_SIGN);
-  double stop_duration = stop_sign_config->stop_sign().stop_duration();
-  double wait_time = stop_duration - 0.5;
-  double stop_start_time = Clock::NowInSeconds() - wait_time;
-  stop_sign_status->set_stop_start_time(stop_start_time);
-
+  // PRE-STOP stage
   RUN_GOLDEN_TEST_DECISION(0);
 
-  // check PlanningStatus value: STOP
-  EXPECT_TRUE(stop_sign_status->has_status() &&
-              stop_sign_status->status() == StopSignStatus::STOP);
+  // check PlanningContext content
+  auto* scenario_info = PlanningContext::GetScenarioInfo();
+  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->stop_done_overlap_id, "");
+  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
+
+  usleep(1000);
+
+  // STOP stage
+  RUN_GOLDEN_TEST_DECISION(1);
+
+  // check PlanningContext content
+  scenario_info = PlanningContext::GetScenarioInfo();
+  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->stop_done_overlap_id, "");
+  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
 }
-*/
 
 /*
  * stop_sign: adc stopped + wait time > STOP_DURATION
