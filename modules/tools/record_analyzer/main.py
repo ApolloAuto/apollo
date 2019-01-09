@@ -57,7 +57,8 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer, is_sim
             planning_analyzer.put(adc_trajectory)
             lidar_endtoend_analyzer.put_planning(adc_trajectory)
 
-        if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2":
+        if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2" or \
+            msg.topic == "/apollo/sensor/lidar128/compensator/PointCloud2":
             if not is_auto_drive or is_simulation:
                 continue
             point_cloud = pointcloud_pb2.PointCloud()
