@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ void OfflineProcessFeatureProtoFile(
 
   apollo::common::adapter::AdapterManagerConfig adapter_conf;
   if (!apollo::common::util::GetProtoFromFile(
-  	FLAGS_prediction_adapter_config_filename, &adapter_conf)) {
+    FLAGS_prediction_adapter_config_filename, &adapter_conf)) {
     AERROR << "Unable to load adapter conf file: "
            << FLAGS_prediction_adapter_config_filename;
     return;
@@ -70,9 +70,9 @@ void OfflineProcessFeatureProtoFile(
 
   auto obstacles_container_ptr = ContainerManager::Instance()->GetContainer<
       ObstaclesContainer>(
-      	apollo::common::adapter::AdapterConfig::PERCEPTION_OBSTACLES);
+        apollo::common::adapter::AdapterConfig::PERCEPTION_OBSTACLES);
   if (obstacles_container_ptr == nullptr) {
-  	return;
+    return;
   }
   obstacles_container_ptr->Clear();
   Features features;
@@ -86,8 +86,8 @@ void OfflineProcessFeatureProtoFile(
 }
 
 int main(int argc, char *argv[]) {
-  // google::ParseCommandLineFlags(&argc, &argv, true);
-  std::string file_name = "/apollo/data/prediction/feature.0.bin.junction.label";
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  std::string file_name = FLAGS_offline_feature_proto_file_name;
   OfflineProcessFeatureProtoFile(file_name);
   return 0;
 }
