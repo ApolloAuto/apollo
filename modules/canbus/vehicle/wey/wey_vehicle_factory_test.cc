@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/vehicle_factory.h"
-
+#include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
 #include "gtest/gtest.h"
-
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 
 namespace apollo {
 namespace canbus {
 
-class VehicleFactoryTest : public ::testing::Test {
+class WeyVehicleFactoryTest : public ::testing::Test {
  public:
-  VehicleFactoryTest() : factory_() {}
-
   virtual void SetUp() {
-    factory_.RegisterVehicleFactory();
+    VehicleParameter parameter;
+    parameter.set_brand(VehicleParameter::WEY);
+    wey_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}
 
  protected:
-  VehicleFactory factory_;
+  WeyVehicleFactory wey_factory_;
 };
 
-TEST_F(VehicleFactoryTest, CreateVehicle) {
-  VehicleParameter parameter;
+TEST_F(WeyVehicleFactoryTest, InitVehicleController) {
+  EXPECT_TRUE(wey_factory_.CreateVehicleController() != nullptr);
+}
 
-  parameter.set_brand(VehicleParameter::GEM);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::GE3);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
-
-  parameter.set_brand(VehicleParameter::WEY);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+TEST_F(WeyVehicleFactoryTest, InitMessageManager) {
+  EXPECT_TRUE(wey_factory_.CreateMessageManager() != nullptr);
 }
 
 }  // namespace canbus

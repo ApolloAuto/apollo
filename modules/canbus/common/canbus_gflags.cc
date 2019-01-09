@@ -49,3 +49,8 @@ DEFINE_int32(guardian_cmd_pending_queue_size, 10,
              "Max guardian cmd pending queue size");
 DEFINE_int32(control_cmd_pending_queue_size, 10,
              "Max control cmd pending queue size");
+
+// enable use acceleration or pedal
+// TODO(ChaoMa) : default: use pedal
+DEFINE_bool(use_acceleration, false,
+       "switch to use acceleration instead of throttle pedal and brake pedal");

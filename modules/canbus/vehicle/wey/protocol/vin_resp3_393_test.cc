@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#include "modules/canbus/vehicle/wey/protocol/vin_resp3_393.h"
+#include "gtest/gtest.h"
 
-#include "gflags/gflags.h"
+namespace apollo {
+namespace canbus {
+namespace wey {
 
-// System gflags
-DECLARE_string(canbus_node_name);
-DECLARE_string(canbus_module_name);
+class Vinresp3393Test : public ::testing::Test {
+ public:
+  virtual void SetUp() {}
+};
 
-DECLARE_string(canbus_adapter_config_filename);
+TEST_F(Vinresp3393Test, reset) {
+  Vinresp3393 vin3;
+  int32_t length = 8;
+  ChassisDetail chassis_detail;
+  uint8_t bytes[8] = {0x88, 0x44, 0x22, 0x11, 0x11, 0x12, 0x13, 0x14};
 
-// data file
-DECLARE_string(canbus_conf_file);
+  vin3.Parse(bytes, length, &chassis_detail);
+  EXPECT_DOUBLE_EQ(chassis_detail.wey().vin_resp3_393().vin16(), 136);
+}
 
-// Canbus gflags
-DECLARE_double(chassis_freq);
-DECLARE_int64(min_cmd_interval);
-
-// chassis_detail message publish
-DECLARE_bool(enable_chassis_detail_pub);
-
-// canbus test files
-DECLARE_string(canbus_test_file);
-
-// canbus test files
-DECLARE_bool(receive_guardian);
-
-DECLARE_int32(guardian_cmd_pending_queue_size);
-DECLARE_int32(control_cmd_pending_queue_size);
-
-// use acceleration or pedal
-DECLARE_bool(use_acceleration);
+}  // namespace wey
+}  // namespace canbus
+}  // namespace apollo
