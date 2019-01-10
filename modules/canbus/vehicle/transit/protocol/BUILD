@@ -112,6 +112,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "llc_diag_brakecontrol_721_test",
+    size = "small",
+    srcs = ["llc_diag_brakecontrol_721_test.cc"],
+    deps = [
+        ":llc_diag_brakecontrol_721",
+        "@gtest//:main",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+    ],
+)
+
 cc_library(
     name = "llc_diag_fault_620",
     srcs = [
