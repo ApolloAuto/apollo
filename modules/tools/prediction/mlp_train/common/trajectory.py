@@ -418,7 +418,10 @@ class TrajectoryToSample(object):
                         label = [0 for idx in range(12)]
                         label[d_idx] = 1
                         fea.junction_feature.junction_mlp_label.extend(label)
-                        break
+                        break # actually break two level
+                else:
+                    continue
+                break
         return trajectory
 
     @abc.abstractmethod
