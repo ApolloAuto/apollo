@@ -25,6 +25,8 @@ from modules.canbus.proto import chassis_pb2
 from modules.drivers.proto import pointcloud_pb2
 from module_control_analyzer import ControlAnalyzer
 from module_planning_analyzer import PlannigAnalyzer
+from modules.perception.proto import perception_obstacle_pb2
+from modules.prediction.proto import prediction_obstacle_pb2
 from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
 
 
@@ -65,6 +67,13 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer, is_sim
             point_cloud.ParseFromString(msg.message)
             lidar_endtoend_analyzer.put_lidar(point_cloud)
 
+        if msg.topic == "/apollo/perception/obstacles":
+            perception = perception_obstacle_pb2.PerceptionObstacles()
+            perception.ParseFromString(msg.message)
+
+        if msg.topic == "/apollo/prediction":
+            prediction = prediction_obstacle_pb2.PredictionObstacles()
+            prediction.ParseFromString(msg.message)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
