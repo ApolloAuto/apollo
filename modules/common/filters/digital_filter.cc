@@ -93,17 +93,12 @@ double DigitalFilter::Compute(const std::deque<double> &values,
                               const std::vector<double> &coefficients,
                               const std::size_t coeff_start,
                               const std::size_t coeff_end) {
-  if (coeff_start > coeff_end || coeff_end >= coefficients.size()) {
-    AERROR << "Invalid inputs.";
-    return 0.0;
-  }
-  if (coeff_end - coeff_start + 1 != values.size()) {
-    AERROR << "Sizes not match.";
-    return 0.0;
-  }
+  CHECK(coeff_start <= coeff_end && coeff_end < coefficients.size());
+  CHECK((coeff_end - coeff_start + 1) == values.size());
+
   double sum = 0.0;
-  int i = static_cast<int>(coeff_start);
-  for (auto &value : values) {
+  auto i = coeff_start;
+  for (const auto value : values) {
     sum += value * coefficients[i];
     ++i;
   }

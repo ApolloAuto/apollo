@@ -312,8 +312,6 @@ class Obstacle {
 
   common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
 
-  common::DigitalFilter heading_filter_;
-
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
 
   std::vector<Eigen::MatrixXf> rnn_states_;
