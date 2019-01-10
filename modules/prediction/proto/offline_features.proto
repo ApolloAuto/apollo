@@ -21,10 +21,12 @@ message DataForLearning {
   // The info. needed for identifying a unique data point:
   optional int32 id = 1;
   optional double timestamp = 2;
-
   // The features for learning algorithms:
   repeated double features_for_learning = 3;
-
   // The ground-truth labels:
   repeated double labels = 4;
+}
+
+message ListDataForLearning {
+  repeated DataForLearning data_for_learning = 1;
 }
