@@ -60,10 +60,9 @@ bash scripts/bootstrap.sh
 从下拉框里选择Navigation模式
 ![Navigation Mode](docs/demo_guide/images/dreamview_2_5_setup_profile.png)
 
-### 播放演示rosbag
+### 播放演示record
 ```
-bash ./docs/demo_guide/rosbag_helper.sh download # download rosbag
-rosbag play -l ./docs/demo_guide/demo_2.5.bag
+cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
 ```
 
 这时，Dreamview会播放一辆带着预测轨迹的行驶中的汽车。
