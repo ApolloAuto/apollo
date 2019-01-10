@@ -21,9 +21,9 @@
 namespace apollo {
 namespace relative_map {
 
-using apollo::perception::PerceptionObstacles;
 using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacles;
 
 bool RelativeMapComponent::Init() {
   InitReaders();
@@ -49,8 +49,7 @@ bool RelativeMapComponent::InitReaders() {
       });
 
   chassis_reader_ = node_->CreateReader<Chassis>(
-      FLAGS_chassis_topic,
-      [this](const std::shared_ptr<Chassis>& chassis) {
+      FLAGS_chassis_topic, [this](const std::shared_ptr<Chassis>& chassis) {
         ADEBUG << "Received chassis data: run chassis callback.";
         relative_map_.OnChassis(*chassis.get());
       });
@@ -63,14 +62,13 @@ bool RelativeMapComponent::InitReaders() {
       });
 
   navigation_reader_ = node_->CreateReader<NavigationInfo>(
-      FLAGS_localization_topic,
+      FLAGS_navigation_topic,
       [this](const std::shared_ptr<NavigationInfo>& navigation_info) {
         ADEBUG << "Received chassis data: run chassis callback.";
         relative_map_.OnNavigationInfo(*navigation_info.get());
       });
 
-  relative_map_writer_ =
-      node_->CreateWriter<MapMsg>(FLAGS_relative_map_topic);
+  relative_map_writer_ = node_->CreateWriter<MapMsg>(FLAGS_relative_map_topic);
   return true;
 }
 
