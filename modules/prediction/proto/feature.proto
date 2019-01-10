@@ -64,12 +64,6 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
-// Ground truth information for labeling purpose
-
-message FutureStatus {
-  repeated apollo.common.TrajectoryPoint future_traj_points = 1;
-}
-
 // next id = 32
 message Feature {
   // Obstacle ID

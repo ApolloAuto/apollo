@@ -165,4 +165,18 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "lane_scanning_evaluator",
+    srcs = [
+        "lane_scanning_evaluator.cc",
+    ],
+    hdrs = [
+        "lane_scanning_evaluator.h",
+    ],
+    deps = [
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/evaluator",
+    ],
+)
+
 cpplint()
