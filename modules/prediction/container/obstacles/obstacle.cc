@@ -52,13 +52,7 @@ bool IsClosed(const double x0, const double y0, const double theta0,
 
 }  // namespace
 
-Obstacle::Obstacle() {
-  double heading_filter_param = FLAGS_heading_filter_param;
-  CHECK_LT(heading_filter_param, 1.0);
-  CHECK_GT(heading_filter_param, 0.0);
-  heading_filter_ = common::DigitalFilter{{1.0, 1.0 - heading_filter_param},
-                                          {heading_filter_param}};
-}
+Obstacle::Obstacle() {}
 
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
@@ -578,11 +572,6 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
         ADEBUG << "Shift velocity heading to be " << shift_heading;
         velocity_heading = shift_heading;
       }
-    }
-    double filtered_heading = heading_filter_.Filter(velocity_heading);
-    if (type_ == PerceptionObstacle::BICYCLE ||
-        type_ == PerceptionObstacle::PEDESTRIAN) {
-      velocity_heading = filtered_heading;
     }
     velocity_x = speed * std::cos(velocity_heading);
     velocity_y = speed * std::sin(velocity_heading);
