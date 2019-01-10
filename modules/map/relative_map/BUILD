@@ -70,7 +70,8 @@ cc_library(
 
 cc_binary(
     name = "librelative_map_component.so",
-    linkopts = ["-shared"],
+    linkshared = True,
+    linkstatic = False,
     deps = [":relative_map_component_lib"],
 )
 
