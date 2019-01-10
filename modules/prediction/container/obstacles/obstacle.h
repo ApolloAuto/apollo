@@ -47,7 +47,12 @@ class Obstacle {
   /**
    * @brief Constructor
    */
-  Obstacle();
+  static std::unique_ptr<Obstacle>
+  Create(const perception::PerceptionObstacle& perception_obstacle,
+      const double timestamp, const int prediction_id);
+
+  static std::unique_ptr<Obstacle>
+  Create(const Feature& feature);
 
   /**
    * @brief Destructor
@@ -59,14 +64,14 @@ class Obstacle {
    * @param perception_obstacle The obstacle from perception.
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
-  void Insert(const perception::PerceptionObstacle& perception_obstacle,
+  bool Insert(const perception::PerceptionObstacle& perception_obstacle,
               const double timestamp, const int prediction_id);
 
   /**
    * @brief Insert a feature proto message.
    * @param feature proto message.
    */
-  void InsertFeature(const Feature& feature);
+  bool InsertFeature(const Feature& feature);
 
   /**
    * @brief Get the type of perception obstacle's type.
@@ -85,6 +90,8 @@ class Obstacle {
    * @return The obstacle's timestamp.
    */
   double timestamp() const;
+
+  bool ReceivedNewerMessage(const double timestamp) const;
 
   /**
    * @brief Get the ith feature from latest to earliest.
@@ -219,18 +226,18 @@ class Obstacle {
   bool RNNEnabled() const;
 
  private:
+  Obstacle() = default;
+
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
-                 double timestamp, Feature* feature, int prediction_id);
+                 double timestamp, Feature* feature);
 
   void UpdateStatus(Feature* feature);
 
-  common::ErrorCode SetId(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature, int prediction_id = -1);
+  bool SetId(const perception::PerceptionObstacle& perception_obstacle,
+             Feature* feature, int prediction_id = -1);
 
-  common::ErrorCode SetType(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  bool SetType(const perception::PerceptionObstacle& perception_obstacle,
+               Feature* feature);
 
   void SetIsNearJunction(
       const perception::PerceptionObstacle& perception_obstacle,
