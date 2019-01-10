@@ -32,16 +32,25 @@ class llc_diag_steeringcontrol_722Test : public ::testing ::Test {
 
 TEST_F(llc_diag_steeringcontrol_722Test, General) {
   Llcdiagsteeringcontrol722 steeringctrl_722_;
-  uint8_t data[8] = {0x67, 0x62, 0x63, 0x64, 0x51, 0x52, 0x53};
+  uint8_t data[7] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
   EXPECT_EQ(steeringctrl_722_.GetPeriod(), 10 * 1000);
+
+  double pos = 3;
+  int torque = 0xF;
+
+  steeringctrl_722_.set_llc_dbg_steeringsensorposition(pos);
+  steeringctrl_722_.set_llc_dbg_steeringrackinputtorque(torque);
+  steeringctrl_722_.set_llc_dbg_steeringmotorposition(pos);
+
   steeringctrl_722_.UpdateData(data);
-  EXPECT_EQ(data[0], 0b00000000);
-  EXPECT_EQ(data[1], 0b00000000);
-  EXPECT_EQ(data[2], 0b00000000);
-  EXPECT_EQ(data[3], 0b00000000);
-  EXPECT_EQ(data[4], 0b00000000);
-  EXPECT_EQ(data[5], 0b00000000);
-  EXPECT_EQ(data[6], 0b00000000);
+
+  EXPECT_EQ(data[0], 0xE0);
+  EXPECT_EQ(data[1], 0x93);
+  EXPECT_EQ(data[2], 0x4);
+  EXPECT_EQ(data[3], 0xF);
+  EXPECT_EQ(data[4], 0x0);
+  EXPECT_EQ(data[5], 0x98);
+  EXPECT_EQ(data[6], 0x3A);
 }
 
 }  // namespace transit

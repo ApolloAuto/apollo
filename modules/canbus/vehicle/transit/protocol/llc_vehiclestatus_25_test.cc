@@ -35,7 +35,7 @@ class llc_vehiclestatus_25Test : public ::testing ::Test {
 
 TEST_F(llc_vehiclestatus_25Test, 12voltage) {
   const std::uint8_t kBytes = 0xFF;
-  std::int32_t length = 1;
+  std::int32_t length = 8;
   EXPECT_DOUBLE_EQ(Llcauxiliary_status25_.llc_fbk_12voltage(&kBytes, length),
                    25.5);
 }

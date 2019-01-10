@@ -30,22 +30,26 @@ class llc_motionfeedback2_21Test : public ::testing ::Test {
   virtual void SetUp() {}
 
  protected:
-  Llcmotionfeedback221 Llcmotionfeedback2_21;
+  Llcmotionfeedback221 motionfdk2_21_;
 };
 
 TEST_F(llc_motionfeedback2_21Test, motion_fdk) {
-  const std::uint8_t kBytes = 0x00;
-  std::int32_t length = 1;
-  EXPECT_DOUBLE_EQ(Llcmotionfeedback2_21.llc_fbk_vehiclespeed(&kBytes, length),
-                   0);
-  EXPECT_EQ(Llcmotionfeedback2_21.llc_motionfeedback2_counter(&kBytes, length),
-            0);
-  EXPECT_EQ(Llcmotionfeedback2_21.llc_motionfeedback2_checksum(&kBytes, length),
-            0);
-  EXPECT_DOUBLE_EQ(Llcmotionfeedback2_21.llc_fbk_steeringrate(&kBytes, length),
-                   0);
-  EXPECT_DOUBLE_EQ(Llcmotionfeedback2_21.llc_fbk_steeringangle(&kBytes, length),
-                   12.8);
+  const uint8_t kData[8] = {0x9A, 0xFC, 0x56, 0xF7, 0x12, 0x34, 0xFF, 0xFF};
+  int32_t speed_len = 8;
+  int32_t counter_len = 2;
+  int32_t checksum_len = 8;
+  int32_t steeringrate_len = 8;
+  int32_t steeringangle_len = 8;
+
+  EXPECT_DOUBLE_EQ(motionfdk2_21_.llc_fbk_vehiclespeed(kData, speed_len),
+                   133.3);
+  EXPECT_EQ(motionfdk2_21_.llc_motionfeedback2_counter(kData, counter_len), 3);
+  EXPECT_EQ(motionfdk2_21_.llc_motionfeedback2_checksum(kData, checksum_len),
+            0xFF);
+  EXPECT_DOUBLE_EQ(motionfdk2_21_.llc_fbk_steeringrate(kData, steeringrate_len),
+                   -110.9);
+  EXPECT_DOUBLE_EQ(
+      motionfdk2_21_.llc_fbk_steeringangle(kData, steeringangle_len), -43.5);
 }
 
 }  // namespace transit
