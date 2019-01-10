@@ -53,6 +53,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "adc_motioncontrol1_10_test",
+    size = "small",
+    srcs = ["adc_motioncontrol1_10_test.cc"],
+    deps = [
+        ":adc_motioncontrol1_10",
+        "@gtest//:main",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+    ],
+)
+
 cc_library(
     name = "adc_motioncontrollimits1_12",
     srcs = [
