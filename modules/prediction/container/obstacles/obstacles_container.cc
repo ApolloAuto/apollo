@@ -31,9 +31,8 @@ namespace prediction {
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
-
 ObstaclesContainer::ObstaclesContainer()
-    : obstacles_(FLAGS_max_num_obstacles),
+    : ptr_obstacles_(FLAGS_max_num_obstacles),
       id_mapping_(FLAGS_max_num_obstacles) {}
 
 // This is called by Perception module at every frame to insert all
@@ -58,7 +57,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     timestamp = perception_obstacles.header().timestamp_sec();
   }
   if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap) {
-    obstacles_.Clear();
+    ptr_obstacles_.Clear();
     ADEBUG << "Replay mode is enabled.";
   } else if (timestamp <= timestamp_) {
     AERROR << "Invalid timestamp curr [" << timestamp << "] v.s. prev ["
@@ -82,6 +81,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   // Set up the ObstacleClusters:
   // 1. Initialize ObstacleClusters
   ObstacleClusters::Init();
+
   // 2. Insert the Obstacles one by one
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
@@ -109,7 +109,10 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
 
 
 Obstacle* ObstaclesContainer::GetObstacle(const int id) {
-  return obstacles_.GetSilently(id);
+  auto ptr_obstacle = ptr_obstacles_.GetSilently(id);
+  if (ptr_obstacle != nullptr)
+    return ptr_obstacles_.GetSilently(id)->get();
+  return nullptr;
 }
 
 
@@ -120,7 +123,7 @@ ObstaclesContainer::GetCurrentFramePredictableObstacleIds() const {
 
 
 void ObstaclesContainer::Clear() {
-  obstacles_.Clear();
+  ptr_obstacles_.Clear();
   id_mapping_.Clear();
   timestamp_ = -1.0;
 }
@@ -151,14 +154,18 @@ void ObstaclesContainer::InsertPerceptionObstacle(
 
   // Insert the obstacle and also update the LRUCache.
   curr_frame_predictable_obstacle_ids_.push_back(prediction_id);
-  Obstacle* obstacle_ptr = obstacles_.Get(prediction_id);
+  auto obstacle_ptr = GetObstacle(prediction_id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->Insert(perception_obstacle, timestamp, prediction_id);
     ADEBUG << "Refresh obstacle [" << prediction_id << "]";
   } else {
-    Obstacle obstacle;
-    obstacle.Insert(perception_obstacle, timestamp, prediction_id);
-    obstacles_.Put(prediction_id, std::move(obstacle));
+    auto ptr_obstacle = Obstacle::Create(
+        perception_obstacle, timestamp, prediction_id);
+    if (ptr_obstacle == nullptr) {
+      AERROR << "Failed to insert obstacle into container";
+      return;
+    }
+    ptr_obstacles_.Put(prediction_id, std::move(ptr_obstacle));
     ADEBUG << "Insert obstacle [" << prediction_id << "]";
   }
 }
@@ -169,13 +176,16 @@ void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
     return;
   }
   int id = feature.id();
-  Obstacle* obstacle_ptr = obstacles_.Get(id);
+  auto obstacle_ptr = GetObstacle(id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->InsertFeature(feature);
   } else {
-    Obstacle obstacle;
-    obstacle.InsertFeature(feature);
-    obstacles_.Put(id, std::move(obstacle));
+    auto ptr_obstacle = Obstacle::Create(feature);
+    if (ptr_obstacle == nullptr) {
+      AERROR << "Failed to insert obstacle into container";
+      return;
+    }
+    ptr_obstacles_.Put(id, std::move(ptr_obstacle));
   }
 }
 
@@ -213,7 +223,8 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
         seen_prediction_ids.insert(prediction_id);
       }
     } else {  // process adaption
-      common::util::Node<int, Obstacle>* curr = obstacles_.First();
+      common::util::Node<int, std::unique_ptr<Obstacle>>*
+      curr = ptr_obstacles_.First();
       while (curr != nullptr) {
         int obs_id = curr->key;
         curr = curr->next;
@@ -223,7 +234,7 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
           // this obs_id has already been processed
           continue;
         }
-        Obstacle* obstacle_ptr = obstacles_.GetSilently(obs_id);
+        Obstacle* obstacle_ptr = GetObstacle(obs_id);
         if (obstacle_ptr == nullptr) {
           AERROR << "Obstacle id [" << obs_id << "] with empty obstacle_ptr.";
           break;
@@ -247,7 +258,7 @@ void ObstaclesContainer::BuildLaneGraph() {
   // Go through every obstacle in the current frame, after some
   // sanity checks, build lane graph for non-junction cases.
   for (const int id : curr_frame_predictable_obstacle_ids_) {
-    Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
+    Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle found.";
       continue;
@@ -265,7 +276,7 @@ void ObstaclesContainer::BuildJunctionFeature() {
   // Go through every obstacle in the current frame, after some
   // sanit checks, build junction features for those that are in junction.
   for (const int id : curr_frame_predictable_obstacle_ids_) {
-    Obstacle* obstacle_ptr = obstacles_.GetSilently(id);
+    Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle found.";
       continue;

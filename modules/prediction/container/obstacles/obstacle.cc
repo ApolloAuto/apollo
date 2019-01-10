@@ -52,18 +52,13 @@ bool IsClosed(const double x0, const double y0, const double theta0,
 
 }  // namespace
 
-Obstacle::Obstacle() {}
-
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
 int Obstacle::id() const { return id_; }
 
 double Obstacle::timestamp() const {
-  if (feature_history_.size() > 0) {
-    return feature_history_.front().timestamp();
-  } else {
-    return 0.0;
-  }
+  CHECK(!feature_history_.empty());
+  return feature_history_.front().timestamp();
 }
 
 const Feature& Obstacle::feature(const size_t i) const {
@@ -72,6 +67,7 @@ const Feature& Obstacle::feature(const size_t i) const {
 }
 
 Feature* Obstacle::mutable_feature(const size_t i) {
+  CHECK(!feature_history_.empty());
   CHECK(i < feature_history_.size());
   return &feature_history_[i];
 }
@@ -132,28 +128,32 @@ bool Obstacle::IsNearJunction() {
                                      FLAGS_junction_search_radius);
 }
 
-void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
+bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
                       const double timestamp,
                       const int prediction_obstacle_id) {
-  if (feature_history_.size() > 0 &&
-      timestamp <= feature_history_.front().timestamp()) {
+  if (!perception_obstacle.has_id() || !perception_obstacle.has_type()) {
+    AERROR << "Perception obstacle has incomplete information; "
+        "skip insertion";
+    return false;
+  }
+
+  if (ReceivedNewerMessage(timestamp)) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
            << std::setprecision(20) << timestamp
            << "] than the most recent timestamp [ "
-           << feature_history_.front().timestamp() << "].";
-    return;
+           << this->timestamp() << "].";
+    return false;
   }
 
   // Set ID, Type, and Status of the feature.
   Feature feature;
-  if (SetId(perception_obstacle, &feature, prediction_obstacle_id) ==
-      ErrorCode::PREDICTION_ERROR) {
-    return;
+  if (!SetId(perception_obstacle, &feature, prediction_obstacle_id)) {
+    return false;
   }
-  if (SetType(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
-    return;
+  if (!SetType(perception_obstacle, &feature)) {
+    return false;
   }
-  SetStatus(perception_obstacle, timestamp, &feature, prediction_obstacle_id);
+  SetStatus(perception_obstacle, timestamp, &feature);
 
   // Set obstacle observation for KF tracking
   if (!FLAGS_use_navigation_mode) {
@@ -197,10 +197,12 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 
   // Trim historical features
   Trim();
+  return true;
 }
 
-void Obstacle::InsertFeature(const Feature& feature) {
+bool Obstacle::InsertFeature(const Feature& feature) {
   InsertFeatureToHistory(feature);
+  return true;
 }
 
 bool Obstacle::IsInJunction(const std::string& junction_id) {
@@ -303,13 +305,7 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
 }
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
-                         const double timestamp, Feature* feature,
-                         int pred_id) {
-  if (SetId(perception_obstacle, feature, pred_id) ==
-      ErrorCode::PREDICTION_ERROR) {
-    AERROR << "Obstacle has no ID";
-    return;
-  }
+                         const double timestamp, Feature* feature) {
   SetTimestamp(perception_obstacle, timestamp, feature);
   SetPolygonPoints(perception_obstacle, feature);
   SetPosition(perception_obstacle, feature);
@@ -395,13 +391,8 @@ void Obstacle::UpdateStatus(Feature* feature) {
   }
 }
 
-ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
-                          Feature* feature, int prediction_obstacle_id) {
-  if (!perception_obstacle.has_id()) {
-    AERROR << "Obstacle has no ID.";
-    return ErrorCode::PREDICTION_ERROR;
-  }
-
+bool Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
+                     Feature* feature, int prediction_obstacle_id) {
   int id = prediction_obstacle_id > 0 ?
       prediction_obstacle_id : perception_obstacle.id();
   if (id_ < 0) {
@@ -411,24 +402,19 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
     if (id_ != id) {
       AERROR << "Obstacle [" << id_ << "] has a mismatched ID [" << id
              << "] from perception obstacle.";
-      return ErrorCode::PREDICTION_ERROR;
+      return false;
     }
   }
   feature->set_id(id);
-  return ErrorCode::OK;
+  return true;
 }
 
-ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
-                            Feature* feature) {
-  if (perception_obstacle.has_type()) {
-    type_ = perception_obstacle.type();
-    ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
-    feature->set_type(type_);
-  } else {
-    AERROR << "Obstacle [" << id_ << "] has no type.";
-    return ErrorCode::PREDICTION_ERROR;
-  }
-  return ErrorCode::OK;
+bool Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
+                       Feature* feature) {
+  type_ = perception_obstacle.type();
+  ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
+  feature->set_type(type_);
+  return true;
 }
 
 void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
@@ -1355,10 +1341,7 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
 void Obstacle::SetNearbyObstacles() {
   // This function runs after all basic features have been set up
   Feature* feature_ptr = mutable_latest_feature();
-  if (feature_ptr == nullptr) {
-    AERROR << "Null feature received.";
-    return;
-  }
+
   LaneGraph* lane_graph =
       feature_ptr->mutable_lane()->mutable_lane_graph();
   for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
@@ -1452,7 +1435,7 @@ void Obstacle::SetMotionStatus() {
 }
 
 void Obstacle::SetMotionStatusBySpeed() {
-  int history_size = static_cast<int>(feature_history_.size());
+  auto history_size = feature_history_.size();
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
            << "is considered moving.";
@@ -1477,6 +1460,30 @@ void Obstacle::SetMotionStatusBySpeed() {
 void Obstacle::InsertFeatureToHistory(const Feature& feature) {
   feature_history_.emplace_front(feature);
   ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
+}
+
+std::unique_ptr<Obstacle> Obstacle::Create(
+    const PerceptionObstacle& perception_obstacle,
+    const double timestamp, const int prediction_id) {
+  std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle());
+  if (!ptr_obstacle->Insert(perception_obstacle, timestamp, prediction_id)) {
+    return nullptr;
+  }
+  return ptr_obstacle;
+}
+
+std::unique_ptr<Obstacle> Obstacle::Create(const Feature& feature) {
+  std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle());
+  ptr_obstacle->InsertFeatureToHistory(feature);
+  return ptr_obstacle;
+}
+
+bool Obstacle::ReceivedNewerMessage(const double timestamp) const {
+  if (feature_history_.empty()) {
+    return false;
+  }
+  auto last_timestamp_received = feature_history_.front().timestamp();
+  return timestamp <= last_timestamp_received;
 }
 
 void Obstacle::Trim() {

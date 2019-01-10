@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -99,6 +100,8 @@ class ObstaclesContainer : public Container {
    */
   void Clear();
 
+  size_t NumOfObstacles() { return ptr_obstacles_.size(); }
+
  private:
   /**
    * @brief Check if a perception_obstacle is an old existed obstacle
@@ -118,7 +121,7 @@ class ObstaclesContainer : public Container {
 
  private:
   double timestamp_ = -1.0;
-  common::util::LRUCache<int, Obstacle> obstacles_;
+  common::util::LRUCache<int, std::unique_ptr<Obstacle>> ptr_obstacles_;
   // an id_mapping from perception_id to prediction_id
   common::util::LRUCache<int, int> id_mapping_;
   std::vector<int> curr_frame_predictable_obstacle_ids_;
