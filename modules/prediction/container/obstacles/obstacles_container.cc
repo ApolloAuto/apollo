@@ -277,6 +277,7 @@ void ObstaclesContainer::BuildLaneGraph() {
       continue;
     }
     obstacle_ptr->BuildLaneGraph();
+    obstacle_ptr->BuildLaneGraphFromLeftToRight();
   }
 }
 
