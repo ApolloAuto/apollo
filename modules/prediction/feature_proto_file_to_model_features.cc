@@ -40,6 +40,8 @@ using apollo::prediction::ObstaclesContainer;
 using apollo::prediction::Obstacle;
 using apollo::prediction::Feature;
 using apollo::prediction::Features;
+using apollo::prediction::DataForLearning;
+using apollo::prediction::ListDataForLearning;
 using apollo::prediction::PredictionConf;
 
 void OfflineProcessFeatureProtoFile(
@@ -75,6 +77,7 @@ void OfflineProcessFeatureProtoFile(
     return;
   }
   obstacles_container_ptr->Clear();
+  ListDataForLearning list_data_for_learning;
   Features features;
   apollo::cyber::common::GetProtoFromBinaryFile(
       features_proto_file_name, &features);
@@ -82,12 +85,68 @@ void OfflineProcessFeatureProtoFile(
     obstacles_container_ptr->InsertFeatureProto(feature);
     Obstacle* obstacle_ptr = obstacles_container_ptr->GetObstacle(feature.id());
     EvaluatorManager::Instance()->EvaluateObstacle(obstacle_ptr);
+    Feature latest_feature = obstacle_ptr->latest_feature();
+    DataForLearning data_for_learning;
+    data_for_learning.set_id(latest_feature.id());
+    data_for_learning.set_timestamp(latest_feature.timestamp());
+    if (FLAGS_extract_feature_type == "junction") {
+      if (!latest_feature.has_junction_feature() &&
+          latest_feature.junction_feature().junction_mlp_feature_size() == 0 &&
+          latest_feature.junction_feature().junction_mlp_label_size() == 0) {
+        continue;
+      }
+      auto junction_feature = latest_feature.junction_feature();
+      for (int i = 0; i < junction_feature.junction_mlp_feature_size(); i++) {
+        data_for_learning.add_features_for_learning(
+            junction_feature.junction_mlp_feature(i));
+      }
+      for (int j = 0; j < junction_feature.junction_mlp_label_size(); j++) {
+        data_for_learning.add_labels(
+            junction_feature.junction_mlp_label(j));
+      }
+    } else if (FLAGS_extract_feature_type == "cruise") {
+      if (latest_feature.lane().lane_graph().lane_sequence_size() == 0) {
+        continue;
+      }
+      for (int i = 0; i < latest_feature.lane().
+          lane_graph().lane_sequence_size(); i++) {
+        auto curr_lane_sequence = latest_feature.lane().
+            lane_graph().lane_sequence(i);
+        if (curr_lane_sequence.features().mlp_features_size() == 0) {
+          continue;
+        }
+        data_for_learning.add_features_for_learning(
+            curr_lane_sequence.lane_sequence_id());
+        for (int j = 0; j < curr_lane_sequence.features().mlp_features_size();
+            j++) {
+          data_for_learning.add_features_for_learning(
+              curr_lane_sequence.features().mlp_features(j));
+        }
+        data_for_learning.add_labels(curr_lane_sequence.label());
+        data_for_learning.add_labels(curr_lane_sequence.time_to_lane_edge());
+        data_for_learning.add_labels(curr_lane_sequence.time_to_lane_center());
+      }
+      if (data_for_learning.labels_size() == 0) {
+        continue;
+      }
+    }
+    list_data_for_learning.add_data_for_learning()->CopyFrom(data_for_learning);
+  }
+
+  // write to file
+  if (list_data_for_learning.data_for_learning_size() <= 0) {
+    ADEBUG << "Skip writing empty data_for_learning.";
+  } else {
+    const std::string file_name = features_proto_file_name + ".bin";
+    apollo::common::util::SetProtoToBinaryFile(
+        list_data_for_learning, file_name);
   }
 }
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   std::string file_name = FLAGS_offline_feature_proto_file_name;
+  std::string feature_type = FLAGS_extract_feature_type;
   OfflineProcessFeatureProtoFile(file_name);
   return 0;
 }
