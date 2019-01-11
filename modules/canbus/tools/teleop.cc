@@ -32,8 +32,8 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
-#include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 
 
 // gflags
@@ -41,6 +41,11 @@ DEFINE_double(throttle_inc_delta, 2.0,
               "throttle pedal command delta percentage.");
 DEFINE_double(brake_inc_delta, 2.0, "brake pedal delta percentage");
 DEFINE_double(steer_inc_delta, 2.0, "steer delta percentage");
+// TODO(ALL) : switch the acceleration cmd or pedal cmd
+// default : use pedal cmd
+DEFINE_bool(use_acceleration, false,
+       "switch to use acceleration instead of throttle pedal and brake pedal");
+
 
 namespace {
 
