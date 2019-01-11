@@ -52,53 +52,37 @@ TrajectoryPartitioner::TrajectoryPartitioner() {
 }
 
 Status TrajectoryPartitioner::TrajectoryPartition(
-    const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
+    const std::unique_ptr<PublishableTrajectory>& trajectory_to_be_partitioned,
     const Frame* frame, ADCTrajectory* const ptr_trajectory_pb) {
-  // interpolate the stitched trajectory
-  std::vector<common::TrajectoryPoint> stitched_trajectory_to_end;
-  for (size_t i = 0; i < last_publishable_trajectory->size() - 1; i++) {
-    double relative_time_interval =
-        (last_publishable_trajectory->at(i + 1).relative_time() -
-         last_publishable_trajectory->at(i).relative_time()) /
-        static_cast<double>(interpolated_pieces_num_);
-    stitched_trajectory_to_end.push_back(last_publishable_trajectory->at(i));
-    for (size_t j = 0; j < interpolated_pieces_num_ - 1; j++) {
-      double relative_time =
-          last_publishable_trajectory->at(i).relative_time() +
-          (static_cast<double>(j) + 1) * relative_time_interval;
-      stitched_trajectory_to_end.emplace_back(
-          common::math::InterpolateUsingLinearApproximation(
-              last_publishable_trajectory->at(i),
-              last_publishable_trajectory->at(i + 1), relative_time));
-    }
-  }
+  // interpolate the zigzag trajectory
+  std::vector<common::TrajectoryPoint> zigzag_trajectory;
+  InterpolateTrajectory(trajectory_to_be_partitioned, &zigzag_trajectory);
 
-  stitched_trajectory_to_end.push_back(last_publishable_trajectory->back());
   double distance_s = 0.0;
-  apollo::planning_internal::Trajectories trajectory_partition;
+  apollo::planning_internal::Trajectories trajectory_partitioned;
   std::vector<apollo::canbus::Chassis::GearPosition> gear_positions;
 
   apollo::common::Trajectory* current_trajectory =
-      trajectory_partition.add_trajectory();
+      trajectory_partitioned.add_trajectory();
 
   // set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
   const double kepsilon = 1e-6;
-  size_t horizon = stitched_trajectory_to_end.size();
+  size_t horizon = zigzag_trajectory.size();
   size_t initial_horizon = std::min(horizon, initial_gear_check_horizon_);
   int direction_flag = 0;
   size_t i = 0;
   int j = 0;
   int init_direction = 0;
   while (i != initial_horizon) {
-    if (stitched_trajectory_to_end[j].v() > kepsilon) {
+    if (zigzag_trajectory[j].v() > kepsilon) {
       i++;
       j++;
       direction_flag++;
       if (init_direction == 0) {
         init_direction++;
       }
-    } else if (stitched_trajectory_to_end[j].v() < -kepsilon) {
+    } else if (zigzag_trajectory[j].v() < -kepsilon) {
       i++;
       j++;
       direction_flag--;
@@ -133,55 +117,53 @@ Status TrajectoryPartitioner::TrajectoryPartition(
   for (size_t i = 0; i < horizon; i++) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
     // then add a new trajectory with GEAR_REVERSE
-    if (stitched_trajectory_to_end[i].v() < -kepsilon &&
+    if (zigzag_trajectory[i].v() < -kepsilon &&
         gear_positions.back() == canbus::Chassis::GEAR_DRIVE) {
-      current_trajectory = trajectory_partition.add_trajectory();
+      current_trajectory = trajectory_partitioned.add_trajectory();
       gear_positions.push_back(canbus::Chassis::GEAR_REVERSE);
       distance_s = 0.0;
     }
     // shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
     // then add a new trajectory with GEAR_DRIVE
-    if (stitched_trajectory_to_end[i].v() > kepsilon &&
+    if (zigzag_trajectory[i].v() > kepsilon &&
         gear_positions.back() == canbus::Chassis::GEAR_REVERSE) {
-      current_trajectory = trajectory_partition.add_trajectory();
+      current_trajectory = trajectory_partitioned.add_trajectory();
       gear_positions.push_back(canbus::Chassis::GEAR_DRIVE);
       distance_s = 0.0;
     }
 
     auto* point = current_trajectory->add_trajectory_point();
-    point->set_relative_time(stitched_trajectory_to_end[i].relative_time());
-    point->mutable_path_point()->set_x(
-        stitched_trajectory_to_end[i].path_point().x());
-    point->mutable_path_point()->set_y(
-        stitched_trajectory_to_end[i].path_point().y());
+    point->set_relative_time(zigzag_trajectory[i].relative_time());
+    point->mutable_path_point()->set_x(zigzag_trajectory[i].path_point().x());
+    point->mutable_path_point()->set_y(zigzag_trajectory[i].path_point().y());
     point->mutable_path_point()->set_theta(
-        stitched_trajectory_to_end[i].path_point().theta());
+        zigzag_trajectory[i].path_point().theta());
     if (i > 0) {
       distance_s +=
           (gear_positions.back() == canbus::Chassis::GEAR_REVERSE ? -1.0
                                                                   : 1.0) *
-          std::sqrt((stitched_trajectory_to_end[i].path_point().x() -
-                     stitched_trajectory_to_end[i - 1].path_point().x()) *
-                        (stitched_trajectory_to_end[i].path_point().x() -
-                         stitched_trajectory_to_end[i - 1].path_point().x()) +
-                    (stitched_trajectory_to_end[i].path_point().y() -
-                     stitched_trajectory_to_end[i - 1].path_point().y()) *
-                        (stitched_trajectory_to_end[i].path_point().y() -
-                         stitched_trajectory_to_end[i - 1].path_point().y()));
+          std::sqrt((zigzag_trajectory[i].path_point().x() -
+                     zigzag_trajectory[i - 1].path_point().x()) *
+                        (zigzag_trajectory[i].path_point().x() -
+                         zigzag_trajectory[i - 1].path_point().x()) +
+                    (zigzag_trajectory[i].path_point().y() -
+                     zigzag_trajectory[i - 1].path_point().y()) *
+                        (zigzag_trajectory[i].path_point().y() -
+                         zigzag_trajectory[i - 1].path_point().y()));
     }
     point->mutable_path_point()->set_s(distance_s);
 
-    point->set_v(stitched_trajectory_to_end[i].v());
+    point->set_v(zigzag_trajectory[i].v());
     const auto& vehicle_config =
         common::VehicleConfigHelper::Instance()->GetConfig();
     point->mutable_path_point()->set_kappa(
-        std::tan(stitched_trajectory_to_end[i].steer()) /
+        std::tan(zigzag_trajectory[i].steer()) /
         vehicle_config.vehicle_param().wheel_base());
-    point->set_a(stitched_trajectory_to_end[i].a());
+    point->set_a(zigzag_trajectory[i].a());
   }
 
   // Choose the one to follow based on the closest partitioned trajectory
-  size_t trajectories_size = trajectory_partition.trajectory_size();
+  size_t trajectories_size = trajectory_partitioned.trajectory_size();
   size_t current_trajectory_index = 0;
   int closest_trajectory_point_index = 0;
   constexpr double kepsilon_to_destination = 1e-6;
@@ -202,7 +184,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
   for (size_t i = 0; i < trajectories_size; i++) {
     double min_distance = std::numeric_limits<double>::max();
     const apollo::common::Trajectory trajectory =
-        trajectory_partition.trajectory(static_cast<int>(i));
+        trajectory_partitioned.trajectory(static_cast<int>(i));
     int trajectory_size = trajectory.trajectory_point_size();
 
     const apollo::common::TrajectoryPoint trajectory_end_point =
@@ -217,7 +199,6 @@ Status TrajectoryPartitioner::TrajectoryPartition(
             (path_end_point.y() - vehicle_state.y());
 
     double traj_point_moving_direction = path_end_point.theta();
-    // TODO(Jinyun) simplify the calculation
     if (gear_positions[i] == canbus::Chassis::GEAR_REVERSE) {
       traj_point_moving_direction =
           common::math::NormalizeAngle(traj_point_moving_direction + M_PI);
@@ -265,7 +246,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
       auto closest_point = closest_points.top();
       closest_points.pop();
       double traj_point_moving_direction =
-          trajectory_partition
+          trajectory_partitioned
               .trajectory(static_cast<int>(closest_point.first.first))
               .trajectory_point(closest_point.first.second)
               .path_point()
@@ -290,50 +271,66 @@ Status TrajectoryPartitioner::TrajectoryPartition(
   }
 
   if (FLAGS_use_gear_shift_trajectory) {
-    if (flag_change_to_next || !gear_shift_period_finished_) {
-      gear_shift_period_finished_ = false;
-      if (gear_shift_period_started_) {
-        gear_shift_start_time_ = Clock::NowInSeconds();
-        gear_shift_position_ = gear_positions[current_trajectory_index];
-        gear_shift_period_started_ = false;
-      }
-      if (gear_shift_period_time_ > gear_shift_period_duration_) {
-        gear_shift_period_finished_ = true;
-        gear_shift_period_started_ = true;
-      } else {
-        GenerateGearShiftTrajectory(gear_shift_position_, frame,
-                                    ptr_trajectory_pb);
-        gear_shift_period_time_ =
-            Clock::NowInSeconds() - gear_shift_start_time_;
-        return Status::OK();
-      }
+    if (InsertGearShiftTrajectory(flag_change_to_next, current_trajectory_index,
+                                  gear_positions, frame, ptr_trajectory_pb)) {
+      return Status::OK();
     }
   }
 
-  // reassign relative time and relative s to have the closest point as origin
-  // point
-  ptr_trajectory_pb->mutable_trajectory_point()->CopyFrom(
-      *(trajectory_partition
-            .mutable_trajectory(static_cast<int>(current_trajectory_index))
-            ->mutable_trajectory_point()));
-  double time_shift =
-      ptr_trajectory_pb->trajectory_point(closest_trajectory_point_index)
-          .relative_time();
-  double s_shift =
-      ptr_trajectory_pb->trajectory_point(closest_trajectory_point_index)
-          .path_point()
-          .s();
-  int trajectory_size = ptr_trajectory_pb->trajectory_point_size();
-  for (int i = 0; i < trajectory_size; i++) {
-    apollo::common::TrajectoryPoint* trajectory_point =
-        ptr_trajectory_pb->mutable_trajectory_point(i);
-    trajectory_point->set_relative_time(trajectory_point->relative_time() -
-                                        time_shift);
-    trajectory_point->mutable_path_point()->set_s(
-        trajectory_point->path_point().s() - s_shift);
-  }
-  ptr_trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
+  SetTrajectoryPb(trajectory_partitioned, gear_positions,
+                  current_trajectory_index, closest_trajectory_point_index,
+                  ptr_trajectory_pb);
   return Status::OK();
+}
+
+void TrajectoryPartitioner::InterpolateTrajectory(
+    const std::unique_ptr<PublishableTrajectory>& trajectory_to_be_partitioned,
+    std::vector<common::TrajectoryPoint>* zigzag_trajectory) {
+  size_t trajectory_to_be_partitioned_intervals_num =
+      trajectory_to_be_partitioned->size() - 1;
+  size_t interpolated_points_num = interpolated_pieces_num_ - 1;
+  for (size_t i = 0; i < trajectory_to_be_partitioned_intervals_num; i++) {
+    double relative_time_interval =
+        (trajectory_to_be_partitioned->at(i + 1).relative_time() -
+         trajectory_to_be_partitioned->at(i).relative_time()) /
+        static_cast<double>(interpolated_pieces_num_);
+    zigzag_trajectory->push_back(trajectory_to_be_partitioned->at(i));
+    for (size_t j = 0; j < interpolated_points_num; j++) {
+      double relative_time =
+          trajectory_to_be_partitioned->at(i).relative_time() +
+          (static_cast<double>(j) + 1) * relative_time_interval;
+      zigzag_trajectory->emplace_back(
+          common::math::InterpolateUsingLinearApproximation(
+              trajectory_to_be_partitioned->at(i),
+              trajectory_to_be_partitioned->at(i + 1), relative_time));
+    }
+  }
+
+  zigzag_trajectory->push_back(trajectory_to_be_partitioned->back());
+}
+
+bool TrajectoryPartitioner::InsertGearShiftTrajectory(
+    const bool& flag_change_to_next, const size_t& current_trajectory_index,
+    const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
+    const Frame* frame, ADCTrajectory* const ptr_trajectory_pb) {
+  if (flag_change_to_next || !gear_shift_period_finished_) {
+    gear_shift_period_finished_ = false;
+    if (gear_shift_period_started_) {
+      gear_shift_start_time_ = Clock::NowInSeconds();
+      gear_shift_position_ = gear_positions[current_trajectory_index];
+      gear_shift_period_started_ = false;
+    }
+    if (gear_shift_period_time_ > gear_shift_period_duration_) {
+      gear_shift_period_finished_ = true;
+      gear_shift_period_started_ = true;
+    } else {
+      GenerateGearShiftTrajectory(gear_shift_position_, frame,
+                                  ptr_trajectory_pb);
+      gear_shift_period_time_ = Clock::NowInSeconds() - gear_shift_start_time_;
+      return true;
+    }
+  }
+  return false;
 }
 
 void TrajectoryPartitioner::GenerateGearShiftTrajectory(
@@ -356,6 +353,37 @@ void TrajectoryPartitioner::GenerateGearShiftTrajectory(
     next_point->CopyFrom(tp);
   }
   trajectory_pb->set_gear(gear_position);
+}
+
+void TrajectoryPartitioner::SetTrajectoryPb(
+    const apollo::planning_internal::Trajectories& trajectory_partitioned,
+    const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
+    const size_t& current_trajectory_index,
+    const int& closest_trajectory_point_index,
+    ADCTrajectory* const ptr_trajectory_pb) {
+  // reassign relative time and relative s to have the closest point as origin
+  // point
+  ptr_trajectory_pb->mutable_trajectory_point()->CopyFrom(
+      trajectory_partitioned
+          .trajectory(static_cast<int>(current_trajectory_index))
+          .trajectory_point());
+  double time_shift =
+      ptr_trajectory_pb->trajectory_point(closest_trajectory_point_index)
+          .relative_time();
+  double s_shift =
+      ptr_trajectory_pb->trajectory_point(closest_trajectory_point_index)
+          .path_point()
+          .s();
+  int trajectory_size = ptr_trajectory_pb->trajectory_point_size();
+  for (int i = 0; i < trajectory_size; i++) {
+    apollo::common::TrajectoryPoint* trajectory_point =
+        ptr_trajectory_pb->mutable_trajectory_point(i);
+    trajectory_point->set_relative_time(trajectory_point->relative_time() -
+                                        time_shift);
+    trajectory_point->mutable_path_point()->set_s(
+        trajectory_point->path_point().s() - s_shift);
+  }
+  ptr_trajectory_pb->set_gear(gear_positions[current_trajectory_index]);
 }
 
 void TrajectoryPartitioner::Restart() {
