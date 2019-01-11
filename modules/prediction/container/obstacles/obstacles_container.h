@@ -103,6 +103,7 @@ class ObstaclesContainer : public Container {
   size_t NumOfObstacles() { return ptr_obstacles_.size(); }
 
  private:
+  Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
   /**
    * @brief Check if a perception_obstacle is an old existed obstacle
    * @param A PerceptionObstacle

@@ -110,8 +110,17 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
 
 Obstacle* ObstaclesContainer::GetObstacle(const int id) {
   auto ptr_obstacle = ptr_obstacles_.GetSilently(id);
-  if (ptr_obstacle != nullptr)
-    return ptr_obstacles_.GetSilently(id)->get();
+  if (ptr_obstacle != nullptr) {
+    return ptr_obstacle->get();
+  }
+  return nullptr;
+}
+
+Obstacle* ObstaclesContainer::GetObstacleWithLRUUpdate(const int obstacle_id) {
+  auto ptr_obstacle = ptr_obstacles_.Get(obstacle_id);
+  if (ptr_obstacle != nullptr) {
+    return ptr_obstacle->get();
+  }
   return nullptr;
 }
 
@@ -154,7 +163,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
 
   // Insert the obstacle and also update the LRUCache.
   curr_frame_predictable_obstacle_ids_.push_back(prediction_id);
-  auto obstacle_ptr = GetObstacle(prediction_id);
+  auto obstacle_ptr = GetObstacleWithLRUUpdate(prediction_id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->Insert(perception_obstacle, timestamp, prediction_id);
     ADEBUG << "Refresh obstacle [" << prediction_id << "]";
@@ -176,7 +185,7 @@ void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
     return;
   }
   int id = feature.id();
-  auto obstacle_ptr = GetObstacle(id);
+  auto obstacle_ptr = GetObstacleWithLRUUpdate(id);
   if (obstacle_ptr != nullptr) {
     obstacle_ptr->InsertFeature(feature);
   } else {
@@ -274,7 +283,7 @@ void ObstaclesContainer::BuildLaneGraph() {
 
 void ObstaclesContainer::BuildJunctionFeature() {
   // Go through every obstacle in the current frame, after some
-  // sanit checks, build junction features for those that are in junction.
+  // sanity checks, build junction features for those that are in junction.
   for (const int id : curr_frame_predictable_obstacle_ids_) {
     Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
