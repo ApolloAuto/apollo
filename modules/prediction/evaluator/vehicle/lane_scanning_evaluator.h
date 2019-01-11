@@ -47,7 +47,8 @@ class LaneScanningEvaluator : public Evaluator {
    * @brief Extract features for learning model's input
    * @param Obstacle pointer
    */
-  void ExtractFeatures(const Obstacle* obstacle_ptr,
+  bool ExtractFeatures(const Obstacle* obstacle_ptr,
+                       const LaneGraph* lane_graph_ptr,
                        std::vector<double>* feature_values);
 
  private:
@@ -56,7 +57,7 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
    */
-  void ExtractObstacleFeatures(const Obstacle* obstacle_ptr,
+  bool ExtractObstacleFeatures(const Obstacle* obstacle_ptr,
                                std::vector<double>* feature_values);
 
   /**
@@ -64,7 +65,7 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
    */
-  void ExtractStaticEnvFeatures(const Obstacle* obstacle_ptr,
+  bool ExtractStaticEnvFeatures(const LaneGraph* lane_graph_ptr,
                                 std::vector<double>* feature_values);
 
 
