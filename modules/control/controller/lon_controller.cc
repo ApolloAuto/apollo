@@ -276,8 +276,10 @@ Status LonController::ComputeControlCommand(
                     ? std::abs(calibration_value)
                     : brake_deadzone;
     }
+      cmd->set_throttle(throttle_cmd);
+      cmd->set_brake(brake_cmd);
   } else {
-    cmd->set_acceleration(acceleration_cmd);
+      cmd->set_acceleration(acceleration_cmd);
     if (acceleration_cmd >= 0) {
       cmd->set_throttle(acceleration_cmd);
     } else {
@@ -309,9 +311,6 @@ Status LonController::ComputeControlCommand(
             debug->speed_lookup(), calibration_value, throttle_cmd, brake_cmd,
             debug->is_full_stop());
   }
-
-  cmd->set_throttle(throttle_cmd);
-  cmd->set_brake(brake_cmd);
 
   if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||

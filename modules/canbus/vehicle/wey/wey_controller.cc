@@ -300,12 +300,14 @@ Chassis WeyController::chassis() {
     if (wey.status_310().steerwheelanglesign() ==
             Status_310::STEERWHEELANGLESIGN_LEFT_POSITIVE) {
       chassis_.set_steering_percentage(
-          static_cast<float>(wey.fbs4_235().steerwheelangle() / 500 / 100));
+          static_cast<float>(wey.fbs4_235().steerwheelangle() * 100.0 /
+                           vehicle_params_.max_steer_angle() * M_PI / 180));
       angle_init = wey.fbs4_235().steerwheelangle();
     } else if (wey.status_310().steerwheelanglesign() ==
             Status_310::STEERWHEELANGLESIGN_RIGHT_NEGATIVE) {
       chassis_.set_steering_percentage(
-          static_cast<float>(wey.fbs4_235().steerwheelangle() / (-500) * 100));
+          static_cast<float>(wey.fbs4_235().steerwheelangle() * (-1) * 100.0 /
+                           vehicle_params_.max_steer_angle() * M_PI / 180));
       angle_init = wey.fbs4_235().steerwheelangle()*(-1);
     } else {
       chassis_.set_steering_percentage(0);
@@ -329,15 +331,14 @@ Chassis WeyController::chassis() {
     chassis_.set_parking_brake(false);
   }
   // 14, 15
-  if (chassis_.has_signal() && wey.has_status_310() &&
-      wey.status_310().has_lowbeamsts() &&
+  if (wey.has_status_310() && wey.status_310().has_lowbeamsts() &&
         wey.status_310().lowbeamsts() == Status_310::LOWBEAMSTS_ON) {
     chassis_.mutable_signal()->set_low_beam(true);
   } else {
     chassis_.mutable_signal()->set_low_beam(false);
   }
   // 16, 17
-  if (chassis_.has_signal() && wey.has_status_310()) {
+  if (wey.has_status_310()) {
     if (wey.status_310().has_leftturnlampsts() &&
         wey.status_310().leftturnlampsts() == Status_310::LEFTTURNLAMPSTS_ON ) {
       chassis_.mutable_signal()->
@@ -355,8 +356,8 @@ Chassis WeyController::chassis() {
           set_turn_signal(common::VehicleSignal::TURN_NONE);
   }
   // 18
-  if (chassis_.has_license() && wey.has_vin_resp1_391() &&
-        wey.has_vin_resp2_392() && wey.has_vin_resp3_393()) {
+  if (wey.has_vin_resp1_391() && wey.has_vin_resp2_392() &&
+                                             wey.has_vin_resp3_393()) {
     Vin_resp1_391 vin_resp1_391 = wey.vin_resp1_391();
     Vin_resp2_392 vin_resp2_392 = wey.vin_resp2_392();
     Vin_resp3_393 vin_resp3_393 = wey.vin_resp3_393();
@@ -408,7 +409,7 @@ Chassis WeyController::chassis() {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::DISALLOW_ENGAGE);
     chassis_.mutable_engage_advice()->set_reason(
-        "CANBUS not ready, firmware error or emergency button pressed!");
+        "CANBUS not ready, epb is not released or firmware error!");
   }
   return chassis_;
 }
@@ -431,7 +432,7 @@ ErrorCode WeyController::EnableAutoMode() {
   ads_req_vin_390_->set_req_vin_signal(Ads_req_vin_390::REQ_VIN_SIGNAL_REQUEST);
   // BCM enable control for horn/ beam/ turnlight
   // notice : if BCM enable, the beam manual control is invalid. If you use the
-  // car at night, please watch out or disable this function
+  // car at night, please watch out or disable this function before auto_drive
   ads3_38e_->set_ads_bcmworkstsvalid(Ads3_38e::ADS_BCMWORKSTSVALID_VALID);
   ads3_38e_->set_ads_bcm_worksts(Ads3_38e::ADS_BCM_WORKSTS_ACTIVE);
   ads3_38e_->set_ads_reqcontrolbcm(Ads3_38e::ADS_REQCONTROLBCM_REQUEST);
