@@ -33,6 +33,22 @@ TrajectoryPartitioner::TrajectoryPartitioner() {
                                        &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
+  gear_shift_max_t_ = planner_open_space_config_.trajectory_partition_config()
+                          .gear_shift_max_t();
+  gear_shift_unit_t_ = planner_open_space_config_.trajectory_partition_config()
+                           .gear_shift_unit_t();
+  interpolated_pieces_num_ =
+      planner_open_space_config_.trajectory_partition_config()
+          .interpolated_pieces_num();
+  initial_gear_check_horizon_ =
+      planner_open_space_config_.trajectory_partition_config()
+          .initial_gear_check_horizon();
+  heading_searching_range_ =
+      planner_open_space_config_.trajectory_partition_config()
+          .heading_searching_range();
+  gear_shift_period_duration_ =
+      planner_open_space_config_.trajectory_partition_config()
+          .gear_shift_period_duration();
 }
 
 Status TrajectoryPartitioner::TrajectoryPartition(
@@ -44,15 +60,9 @@ Status TrajectoryPartitioner::TrajectoryPartition(
     double relative_time_interval =
         (last_publishable_trajectory->at(i + 1).relative_time() -
          last_publishable_trajectory->at(i).relative_time()) /
-        static_cast<double>(
-            planner_open_space_config_.trajectory_partition_config()
-                .interpolated_pieces_num());
+        static_cast<double>(interpolated_pieces_num_);
     stitched_trajectory_to_end.push_back(last_publishable_trajectory->at(i));
-    for (size_t j = 0;
-         j < planner_open_space_config_.trajectory_partition_config()
-                     .interpolated_pieces_num() -
-                 1;
-         j++) {
+    for (size_t j = 0; j < interpolated_pieces_num_ - 1; j++) {
       double relative_time =
           last_publishable_trajectory->at(i).relative_time() +
           (static_cast<double>(j) + 1) * relative_time_interval;
@@ -75,9 +85,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
   // and check potential edge cases
   const double kepsilon = 1e-6;
   size_t horizon = stitched_trajectory_to_end.size();
-  size_t initial_horizon =
-      std::min(horizon, planner_open_space_config_.trajectory_partition_config()
-                            .initial_gear_check_horizon());
+  size_t initial_horizon = std::min(horizon, initial_gear_check_horizon_);
   int direction_flag = 0;
   size_t i = 0;
   int j = 0;
@@ -222,8 +230,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
 
     if (distance_to_trajs_end <= kepsilon_to_destination &&
         std::abs(traj_point_moving_direction - vehicle_moving_direction) <
-            planner_open_space_config_.trajectory_partition_config()
-                .heading_searching_range()) {
+            heading_searching_range_) {
       if (i + 1 >= trajectories_size) {
         current_trajectory_index = trajectories_size - 1;
         closest_trajectory_point_index = trajectory_size - 1;
@@ -274,8 +281,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
             common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
       }
       if (std::abs(traj_point_moving_direction - vehicle_moving_direction) <
-          planner_open_space_config_.trajectory_partition_config()
-              .heading_searching_range()) {
+          heading_searching_range_) {
         current_trajectory_index = closest_point.first.first;
         closest_trajectory_point_index = closest_point.first.second;
         break;
@@ -291,9 +297,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
         gear_shift_position_ = gear_positions[current_trajectory_index];
         gear_shift_period_started_ = false;
       }
-      if (gear_shift_period_time_ >
-          planner_open_space_config_.trajectory_partition_config()
-              .gear_shift_period_duration()) {
+      if (gear_shift_period_time_ > gear_shift_period_duration_) {
         gear_shift_period_finished_ = true;
         gear_shift_period_started_ = true;
       } else {
@@ -337,14 +341,6 @@ void TrajectoryPartitioner::GenerateGearShiftTrajectory(
     ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
 
-  // TODO(QiL): move this to config after finalize the logic
-  double gear_shift_max_t =
-      planner_open_space_config_.trajectory_partition_config()
-          .gear_shift_max_t();
-  double gear_shift_unit_t =
-      planner_open_space_config_.trajectory_partition_config()
-          .gear_shift_unit_t();
-
   apollo::common::TrajectoryPoint tp;
   auto path_point = tp.mutable_path_point();
   path_point->set_x(frame->vehicle_state().x());
@@ -354,7 +350,7 @@ void TrajectoryPartitioner::GenerateGearShiftTrajectory(
   path_point->set_s(0.0);
   tp.set_v(0.0);
   tp.set_a(0.0);
-  for (double t = 0.0; t < gear_shift_max_t; t += gear_shift_unit_t) {
+  for (double t = 0.0; t < gear_shift_max_t_; t += gear_shift_unit_t_) {
     tp.set_relative_time(t);
     auto next_point = trajectory_pb->add_trajectory_point();
     next_point->CopyFrom(tp);

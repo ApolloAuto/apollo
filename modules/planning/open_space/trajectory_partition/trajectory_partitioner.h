@@ -63,6 +63,12 @@ class TrajectoryPartitioner {
   double gear_shift_start_time_ = 0.0;
   apollo::canbus::Chassis::GearPosition gear_shift_position_ =
       canbus::Chassis::GEAR_DRIVE;
+  double gear_shift_max_t_ = 0.0;
+  double gear_shift_unit_t_ = 0.0;
+  size_t interpolated_pieces_num_ = 0;
+  size_t initial_gear_check_horizon_ = 0;
+  double heading_searching_range_ = 0.0;
+  double gear_shift_period_duration_ = 0.0;
 };
 }  // namespace planning
 }  // namespace apollo
