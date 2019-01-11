@@ -106,5 +106,6 @@ message Feature {
 
   optional bool is_near_junction = 29 [default = false];
 
+  // Obstacle ground-truth labels:
   repeated PredictionTrajectoryPoint future_trajectory_points = 31;
 }
