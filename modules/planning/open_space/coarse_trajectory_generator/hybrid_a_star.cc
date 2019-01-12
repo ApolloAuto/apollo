@@ -91,7 +91,7 @@ bool HybridAStar::RSPCheck(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
     const std::vector<std::vector<common::math::Vec2d>>&
         obstacles_vertices_vec) {
-  for (size_t i = 0; i < reeds_shepp_to_end->x.size(); i++) {
+  for (size_t i = 0; i < reeds_shepp_to_end->x.size(); ++i) {
     if (reeds_shepp_to_end->x[i] > XYbounds_[1] ||
         reeds_shepp_to_end->x[i] < XYbounds_[0] ||
         reeds_shepp_to_end->y[i] > XYbounds_[3] ||
@@ -117,7 +117,7 @@ bool HybridAStar::ValidityCheck(
   }
   for (const auto& obstacle_vertices : obstacles_vertices_vec) {
     size_t vertices_num = obstacle_vertices.size();
-    for (size_t i = 0; i < vertices_num - 1; i++) {
+    for (size_t i = 0; i < vertices_num - 1; ++i) {
       common::math::LineSegment2d line_segment = common::math::LineSegment2d(
           obstacle_vertices[i], obstacle_vertices[i + 1]);
       if (node->GetBoundingBox(vehicle_param_).HasOverlap(line_segment)) {
@@ -171,7 +171,7 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   intermediate_x.emplace_back(last_x);
   intermediate_y.emplace_back(last_y);
   intermediate_phi.emplace_back(last_phi);
-  for (size_t i = 0; i < arc / step_size_; i++) {
+  for (size_t i = 0; i < arc / step_size_; ++i) {
     double next_x = last_x + traveled_distance * std::cos(last_phi);
     double next_y = last_y + traveled_distance * std::sin(last_phi);
     double next_phi = common::math::NormalizeAngle(
@@ -237,7 +237,7 @@ double HybridAStar::NonHoloNoObstacleHeuristic(
 double HybridAStar::CalculateRSPCost(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
   double RSP_cost = 0.0;
-  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size(); i++) {
+  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size(); ++i) {
     if (reeds_shepp_to_end->segs_lengths[i] > 0.0) {
       RSP_cost += reeds_shepp_to_end->segs_lengths[i] * heu_rs_forward_penalty_;
     } else {
@@ -245,7 +245,7 @@ double HybridAStar::CalculateRSPCost(
     }
   }
 
-  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size() - 1; i++) {
+  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size() - 1; ++i) {
     if (reeds_shepp_to_end->segs_lengths[i] *
             reeds_shepp_to_end->segs_lengths[i + 1] <
         0.0) {
@@ -255,7 +255,7 @@ double HybridAStar::CalculateRSPCost(
   // steering cost
   bool first_nonS_flag = false;
   char last_turning;
-  for (size_t i = 0; i < reeds_shepp_to_end->segs_types.size(); i++) {
+  for (size_t i = 0; i < reeds_shepp_to_end->segs_types.size(); ++i) {
     if (reeds_shepp_to_end->segs_types[i] != 'S') {
       RSP_cost += heu_rs_steer_penalty_ * max_steer_angle_;
       if (!first_nonS_flag) {
@@ -270,6 +270,7 @@ double HybridAStar::CalculateRSPCost(
   }
   return RSP_cost;
 }
+
 bool HybridAStar::GetResult(HybridAStartResult* result) {
   std::shared_ptr<Node3d> current_node = final_node_;
   std::vector<double> hybrid_a_x;
@@ -328,7 +329,7 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
   }
   size_t x_size = result->x.size();
   // load velocity from position
-  for (size_t i = 0; i < x_size - 1; i++) {
+  for (size_t i = 0; i < x_size - 1; ++i) {
     double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
                             std::cos(result->phi[i]) +
                         ((result->y[i + 1] - result->y[i]) / delta_t_) *
@@ -337,12 +338,12 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
   }
   result->v.emplace_back(0.0);
   // load acceleration from velocity
-  for (size_t i = 0; i < x_size - 1; i++) {
+  for (size_t i = 0; i < x_size - 1; ++i) {
     double discrete_a = (result->v[i + 1] - result->v[i]) / delta_t_;
     result->a.emplace_back(discrete_a);
   }
   // load steering from phi
-  for (size_t i = 0; i < x_size - 1; i++) {
+  for (size_t i = 0; i < x_size - 1; ++i) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
                             vehicle_param_.wheel_base() / step_size_;
     if (result->v[i] > 0) {
@@ -414,7 +415,7 @@ bool HybridAStar::Plan(
     close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
     end_timestamp = Clock::NowInSeconds();
     reeds_shepp_time += (end_timestamp - start_timestamp);
-    for (size_t i = 0; i < next_node_num_; i++) {
+    for (size_t i = 0; i < next_node_num_; ++i) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary check failure handle
       if (next_node == nullptr) {

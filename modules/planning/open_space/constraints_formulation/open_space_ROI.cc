@@ -120,7 +120,7 @@ bool OpenSpaceROI::VPresentationObstacle() {
 
   // load vertices for parking boundary (not need to repeat the first vertice to
   // get close hull)
-  for (size_t i = 0; i < parking_boundaries_num; i++) {
+  for (size_t i = 0; i < parking_boundaries_num; ++i) {
     // directly load the ROI_distance_approach_parking_boundary_ into
     // obstacles_vertices_vec_
     obstacles_vertices_vec_.emplace_back(ROI_parking_boundary_[i]);
@@ -443,7 +443,7 @@ bool OpenSpaceROI::GetMapInfo(ParkingSpaceInfoConstPtr *target_parking_spot,
   std::vector<LaneSegment> segments_vector;
   int next_lanes_num = nearest_lane->lane().successor_id_size();
   if (next_lanes_num != 0) {
-    for (int i = 0; i < next_lanes_num; i++) {
+    for (int i = 0; i < next_lanes_num; ++i) {
       auto next_lane_id = nearest_lane->lane().successor_id(i);
       segments_vector.push_back(nearest_lanesegment);
       auto next_lane = hdmap_->GetLaneById(next_lane_id);
