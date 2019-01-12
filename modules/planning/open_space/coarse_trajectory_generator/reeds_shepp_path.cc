@@ -66,7 +66,7 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
   double optimal_path_length = std::numeric_limits<double>::infinity();
   size_t optimal_path_index = 0;
   size_t paths_size = all_possible_paths.size();
-  for (size_t i = 0; i < paths_size; i++) {
+  for (size_t i = 0; i < paths_size; ++i) {
     if (all_possible_paths.at(i).total_length < optimal_path_length) {
       optimal_path_index = i;
       optimal_path_length = all_possible_paths.at(i).total_length;
@@ -87,7 +87,7 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                end_node->GetPhi()) > 1e-3) {
     AERROR << "RSP end position not right";
     for (size_t i = 0;
-         i < all_possible_paths[optimal_path_index].segs_types.size(); i++) {
+         i < all_possible_paths[optimal_path_index].segs_types.size(); ++i) {
       AERROR << "types are "
              << all_possible_paths[optimal_path_index].segs_types[i];
     }
@@ -889,7 +889,7 @@ bool ReedShepp::SetRSP(const int& size, const double* lengths,
   path.segs_lengths = length_vec;
   path.segs_types = type_vec;
   double sum = 0.0;
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size; ++i) {
     sum += std::abs(lengths[i]);
   }
   path.total_length = sum;
@@ -928,7 +928,7 @@ bool ReedShepp::GenerateLocalConfigurations(
     d = -step_scaled;
   }
   pd = d;
-  for (size_t i = 0; i < shortest_path->segs_types.size(); i++) {
+  for (size_t i = 0; i < shortest_path->segs_types.size(); ++i) {
     char m = shortest_path->segs_types.at(i);
     double l = shortest_path->segs_lengths.at(i);
     if (l > 0.0) {
@@ -964,7 +964,7 @@ bool ReedShepp::GenerateLocalConfigurations(
     pphi.pop_back();
     pgear.pop_back();
   }
-  for (size_t i = 0; i < px.size(); i++) {
+  for (size_t i = 0; i < px.size(); ++i) {
     shortest_path->x.push_back(std::cos(-start_node->GetPhi()) * px.at(i) +
                                std::sin(-start_node->GetPhi()) * py.at(i) +
                                start_node->GetX());
@@ -975,7 +975,7 @@ bool ReedShepp::GenerateLocalConfigurations(
         common::math::NormalizeAngle(pphi.at(i) + start_node->GetPhi()));
   }
   shortest_path->gear = pgear;
-  for (size_t i = 0; i < shortest_path->segs_lengths.size(); i++) {
+  for (size_t i = 0; i < shortest_path->segs_lengths.size(); ++i) {
     shortest_path->segs_lengths.at(i) =
         shortest_path->segs_lengths.at(i) / max_kappa_;
   }

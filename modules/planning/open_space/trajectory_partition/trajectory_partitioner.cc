@@ -76,21 +76,21 @@ Status TrajectoryPartitioner::TrajectoryPartition(
   int init_direction = 0;
   while (i != initial_horizon) {
     if (zigzag_trajectory[j].v() > kepsilon) {
-      i++;
-      j++;
+      ++i;
+      ++j;
       direction_flag++;
       if (init_direction == 0) {
         init_direction++;
       }
     } else if (zigzag_trajectory[j].v() < -kepsilon) {
-      i++;
-      j++;
+      ++i;
+      ++j;
       direction_flag--;
       if (init_direction == 0) {
         init_direction--;
       }
     } else {
-      j++;
+      ++j;
     }
   }
   if (direction_flag > 1) {
@@ -114,7 +114,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
   }
 
   // partition trajectory points into each trajectory
-  for (size_t i = 0; i < horizon; i++) {
+  for (size_t i = 0; i < horizon; ++i) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
     // then add a new trajectory with GEAR_REVERSE
     if (zigzag_trajectory[i].v() < -kepsilon &&
@@ -181,7 +181,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
                       decltype(comp)>
       closest_points(comp);
 
-  for (size_t i = 0; i < trajectories_size; i++) {
+  for (size_t i = 0; i < trajectories_size; ++i) {
     double min_distance = std::numeric_limits<double>::max();
     const apollo::common::Trajectory trajectory =
         trajectory_partitioned.trajectory(static_cast<int>(i));
@@ -223,7 +223,7 @@ Status TrajectoryPartitioner::TrajectoryPartition(
       break;
     }
 
-    for (int j = 0; j < trajectory_size; j++) {
+    for (int j = 0; j < trajectory_size; ++j) {
       const apollo::common::TrajectoryPoint trajectory_point =
           trajectory.trajectory_point(j);
       const apollo::common::PathPoint path_point =
@@ -289,13 +289,13 @@ void TrajectoryPartitioner::InterpolateTrajectory(
   size_t trajectory_to_be_partitioned_intervals_num =
       trajectory_to_be_partitioned->size() - 1;
   size_t interpolated_points_num = interpolated_pieces_num_ - 1;
-  for (size_t i = 0; i < trajectory_to_be_partitioned_intervals_num; i++) {
+  for (size_t i = 0; i < trajectory_to_be_partitioned_intervals_num; ++i) {
     double relative_time_interval =
         (trajectory_to_be_partitioned->at(i + 1).relative_time() -
          trajectory_to_be_partitioned->at(i).relative_time()) /
         static_cast<double>(interpolated_pieces_num_);
     zigzag_trajectory->push_back(trajectory_to_be_partitioned->at(i));
-    for (size_t j = 0; j < interpolated_points_num; j++) {
+    for (size_t j = 0; j < interpolated_points_num; ++j) {
       double relative_time =
           trajectory_to_be_partitioned->at(i).relative_time() +
           (static_cast<double>(j) + 1) * relative_time_interval;
@@ -375,7 +375,7 @@ void TrajectoryPartitioner::SetTrajectoryPb(
           .path_point()
           .s();
   int trajectory_size = ptr_trajectory_pb->trajectory_point_size();
-  for (int i = 0; i < trajectory_size; i++) {
+  for (int i = 0; i < trajectory_size; ++i) {
     apollo::common::TrajectoryPoint* trajectory_point =
         ptr_trajectory_pb->mutable_trajectory_point(i);
     trajectory_point->set_relative_time(trajectory_point->relative_time() -
