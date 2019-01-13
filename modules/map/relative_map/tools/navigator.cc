@@ -153,16 +153,16 @@ bool GetNavigationPathFromFile(const std::string& filename,
       auto json_obj = json::parse(line_str);
       current_sampled_s = json_obj["s"];
       current_kappa = json_obj["kappa"];
-      diff_s = current_sampled_s - last_sampled_s;
+      diff_s = std::fabs(current_sampled_s - last_sampled_s);
       bool not_down_sampling =
           FLAGS_navigator_down_sample
               ? diff_s >= kStraightSampleInterval ||
                     (diff_s >= kSmallKappaSampleInterval &&
-                     current_kappa > kSmallKappa) ||
+                     std::fabs(current_kappa) > kSmallKappa) ||
                     (diff_s >= kMiddleKappaSampleInterval &&
-                     current_kappa > kMiddleKappa) ||
+                     std::fabs(current_kappa) > kMiddleKappa) ||
                     (diff_s >= kLargeKappaSampleInterval &&
-                     current_kappa > kLargeKappa)
+                     std::fabs(current_kappa) > kLargeKappa)
               : true;
       if (not_down_sampling) {
         last_sampled_s = current_sampled_s;
