@@ -22,6 +22,10 @@
 #include <sstream>
 #include <thread>
 
+#if __GNUC__ >= 5
+  #include <iomanip>
+#endif
+
 namespace apollo {
 namespace cyber {
 
@@ -87,7 +91,7 @@ std::string Time::ToString() const {
   auto time = system_clock::to_time_t(tp);
   std::stringstream ss;
 #if __GNUC__ >= 5
-  ss << std::put_time(std::localtime(&t), "%F %T");
+  ss << std::put_time(std::localtime(&time), "%F %T");
   ss << "." << nanoseconds_ % 1000000000UL;
 #else
   char date_time[128];
