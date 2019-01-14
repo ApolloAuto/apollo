@@ -108,8 +108,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
 }
 
 
-Obstacle* ObstaclesContainer::GetObstacle(const int id) {
-  auto ptr_obstacle = ptr_obstacles_.GetSilently(id);
+Obstacle* ObstaclesContainer::GetObstacle(const int perception_id) {
+  auto ptr_obstacle = ptr_obstacles_.GetSilently(perception_id);
   if (ptr_obstacle != nullptr) {
     return ptr_obstacle->get();
   }

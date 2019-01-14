@@ -234,7 +234,7 @@ class Obstacle {
   void UpdateStatus(Feature* feature);
 
   bool SetId(const perception::PerceptionObstacle& perception_obstacle,
-             Feature* feature, int prediction_id = -1);
+             Feature* feature, const int prediction_id = -1);
 
   bool SetType(const perception::PerceptionObstacle& perception_obstacle,
                Feature* feature);
@@ -305,7 +305,7 @@ class Obstacle {
 
   void SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr);
 
-  void Trim();
+  void DiscardOutdatedHistory();
 
  private:
   int id_ = -1;
