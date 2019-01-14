@@ -112,14 +112,9 @@ void SchedulerChoreography::CreateProcessor() {
 
   // Put tasks w/o processor assigned into a classic pool.
   for (uint32_t i = 0; i < task_pool_size_; i++) {
-    auto proc = std::make_shared<Processor>();
     auto ctx = std::make_shared<ClassicContext>();
-    ctx->SetGroupName(DEFAULT_GROUP_NAME);
-    ClassicContext::cr_group_[DEFAULT_GROUP_NAME];
-    ClassicContext::rq_locks_[DEFAULT_GROUP_NAME];
-    ClassicContext::mtx_wq_[DEFAULT_GROUP_NAME];
-    ClassicContext::cv_wq_[DEFAULT_GROUP_NAME];
 
+    auto proc = std::make_shared<Processor>();
     proc->BindContext(ctx);
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
     proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
@@ -131,15 +126,17 @@ void SchedulerChoreography::CreateProcessor() {
 bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  if (likely(id_cr_wl_.find(cr->id()) == id_cr_wl_.end())) {
+  MutexWrapper *wrapper = nullptr;
+  if (!id_map_mutex_.Get(cr->id(), &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
-      if (id_cr_wl_.find(cr->id()) == id_cr_wl_.end()) {
-        id_cr_wl_[cr->id()];
+      if (!id_map_mutex_.Get(cr->id(), &wrapper)) {
+        wrapper = new MutexWrapper();
+        id_map_mutex_.Set(cr->id(), wrapper);
       }
     }
   }
-  std::lock_guard<std::mutex> lg(id_cr_wl_[cr->id()]);
+  std::lock_guard<std::mutex> lg(wrapper->Mutex());
 
   // Assign sched cfg to tasks according to configuration.
   if (cr_confs_.find(cr->name()) != cr_confs_.end()) {
@@ -198,15 +195,17 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
 bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  if (unlikely(id_cr_wl_.find(crid) == id_cr_wl_.end())) {
+  MutexWrapper *wrapper = nullptr;
+  if (!id_map_mutex_.Get(crid, &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
-      if (id_cr_wl_.find(crid) == id_cr_wl_.end()) {
-        id_cr_wl_[crid];
+      if (!id_map_mutex_.Get(crid, &wrapper)) {
+        wrapper = new MutexWrapper();
+        id_map_mutex_.Set(crid, wrapper);
       }
     }
   }
-  std::lock_guard<std::mutex> lg(id_cr_wl_[crid]);
+  std::lock_guard<std::mutex> lg(wrapper->Mutex());
 
   // Find cr from id_cr &&
   // get cr prio if cr found
