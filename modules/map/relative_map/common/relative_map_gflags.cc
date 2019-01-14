@@ -17,11 +17,16 @@
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
 DEFINE_string(relative_map_adapter_config_filename,
-              "modules/map/relative_map/conf/adapter.conf",
+              "/apollo/modules/map/relative_map/conf/adapter.conf",
               "gflags conf file for relative map");
-DEFINE_string(relative_map_config_filename,
-              "modules/map/relative_map/conf/relative_map_config.pb.txt",
-              "Relative map configuration file");
+DEFINE_string(
+    relative_map_config_filename,
+    "/apollo/modules/map/relative_map/conf/relative_map_config.pb.txt",
+    "Relative map configuration file");
+
+DEFINE_string(navigator_config_filename,
+              "/apollo/modules/map/relative_map/conf/navigator_config.pb.txt",
+              "navigator config file name.");
 
 DEFINE_int32(relative_map_loop_rate, 10, "Loop rate for relative_map node");
 
@@ -30,7 +35,3 @@ DEFINE_bool(enable_cyclic_rerouting, false,
 
 DEFINE_bool(relative_map_generate_left_boundray, true,
             "Generate left boundary for detected lanes.");
-
-DEFINE_bool(navigator_down_sample, true,
-            "When a navigation line is sent, the original data is downsampled "
-            "to reduce unnecessary memory consumption.");
