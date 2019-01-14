@@ -37,4 +37,18 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "navigator_config_proto",
+    deps = [
+        ":navigator_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "navigator_config_proto_lib",
+    srcs = [
+        "navigator_config.proto",
+    ],
+)
+
 cpplint()
