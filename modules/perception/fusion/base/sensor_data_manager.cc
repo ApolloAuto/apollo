@@ -110,13 +110,9 @@ void SensorDataManager::GetLatestFrames(
     return;
   }
 
-  for (size_t i = 0; i < frames->size() - 1; ++i) {
-    for (size_t j = i + 1; j < frames->size(); ++j) {
-      if ((*frames)[j]->GetTimestamp() < (*frames)[i]->GetTimestamp()) {
-        std::swap((*frames)[j], (*frames)[i]);
-      }
-    }
-  }
+  std::sort((*frames)->begin(), (*frames)->end(), [](const auto& frame1, const auto& frame2 ){
+    return frame1->GetTimestamp() < frame2.GetTimestamp();
+  });
 }
 
 bool SensorDataManager::GetPose(const std::string& sensor_id, double timestamp,
