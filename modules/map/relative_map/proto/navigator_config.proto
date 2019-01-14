@@ -1,0 +1,28 @@
+syntax = "proto2";
+
+package apollo.relative_map;
+
+message SampleParam {
+  // Sampling interval for a straight line.
+  optional double straight_sample_interval = 1 [default = 3.0];
+  // Sampling interval for a curve segment with a small curvature.
+  optional double small_kappa_sample_interval = 2 [default = 1.0];
+  // Sampling interval for a curve segment with a middle curvature.
+  optional double middle_kappa_sample_interval = 3 [default = 0.4];
+  // Sampling interval for a curve segment with a large curvature.
+  optional double large_kappa_sample_interval = 4 [default = 0.1];
+  // Small curvature threshold.
+  optional double small_kappa = 5 [default = 0.002];
+  // Middle curvature threshold.
+  optional double middle_kappa = 6 [default = 0.008];
+  // Large curvature threshold.
+  optional double large_kappa = 7 [default = 0.02];
+}
+
+message NavigatorConfig {
+  // When a navigation line is sent, the original data is downsampled to reduce
+  // unnecessary memory consumption.
+  optional bool enable_navigator_downsample = 1 [default = true];
+  // Smapling paramters.
+  optional SampleParam sample_param = 2;
+}
