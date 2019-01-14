@@ -19,7 +19,6 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/integration_tests/planning_test_base.h"
 
@@ -27,7 +26,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::time::Clock;
-using apollo::planning::scenario::stop_sign::StopSignUnprotectedContext;
+
 
 /**
  * @class SunnyvaleBigLoopTest

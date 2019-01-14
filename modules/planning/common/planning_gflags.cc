@@ -31,18 +31,18 @@ DEFINE_bool(enable_collision_detection, false,
 // scenario related
 DEFINE_string(
     scenario_lane_follow_config_file,
-    "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt",
+    "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt",
     "The lane follow scenario configuration file");
 DEFINE_string(scenario_side_pass_config_file,
-              "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
+              "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
               "side pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
-              "scenario_stop_sign_unprotected_config.pb.txt",
+              "scenario/stop_sign_unprotected_config.pb.txt",
               "stop_sign_unprotected scenario configuration file");
 DEFINE_string(scenario_traffic_light_right_turn_unprotected_config_file,
               "/apollo/modules/planning/conf/"
-              "scenario_traffic_light_right_turn_unprotected_config.pb.txt",
+              "scenario/traffic_light_right_turn_unprotected_config.pb.txt",
               "scenario_traffic_light_right_turn_unprotected config file");
 
 DEFINE_bool(enable_scenario_side_pass, true,
