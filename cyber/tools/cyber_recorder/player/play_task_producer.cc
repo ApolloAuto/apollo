@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include "cyber/common/log.h"
+#include "cyber/common/time_conversion.h"
 #include "cyber/cyber.h"
 #include "cyber/message/protobuf_factory.h"
 #include "cyber/record/record_viewer.h"
@@ -148,9 +149,18 @@ bool PlayTaskProducer::ReadRecordInfo() {
       latest_end_time_ = header.end_time();
     }
 
+    auto begin_time_s = static_cast<double>(header.begin_time()) / 1e9;
+    auto end_time_s = static_cast<double>(header.end_time()) / 1e9;
+    auto begin_time_str =
+        common::UnixSecondsToString(static_cast<int>(begin_time_s));
+    auto end_time_str =
+        common::UnixSecondsToString(static_cast<int>(end_time_s));
+
     std::cout << "file: " << file << ", chunk_number: " << header.chunk_number()
               << ", begin_time: " << header.begin_time()
+              << " (" << begin_time_str << ")"
               << ", end_time: " << header.end_time()
+              << " (" << end_time_str << ")"
               << ", message_number: " << header.message_number() << std::endl;
   }
 
