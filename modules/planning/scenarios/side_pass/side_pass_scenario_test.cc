@@ -42,7 +42,7 @@ class SidePassScenarioTest : public ::testing::Test {
 
 TEST_F(SidePassScenarioTest, VerifyConf) {
   FLAGS_scenario_side_pass_config_file =
-      "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt";
+      "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
@@ -51,7 +51,7 @@ TEST_F(SidePassScenarioTest, VerifyConf) {
 
 TEST_F(SidePassScenarioTest, Init) {
   FLAGS_scenario_side_pass_config_file =
-      "/apollo/modules/planning/testdata/conf/scenario_side_pass_config.pb.txt";
+      "/apollo/modules/planning/testdata/conf/scenario/side_pass_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
