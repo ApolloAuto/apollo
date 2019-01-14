@@ -65,12 +65,13 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
    */
-  bool ExtractStaticEnvFeatures(const LaneGraph* lane_graph_ptr,
+  bool ExtractStaticEnvFeatures(const Obstacle* obstacle_ptr,
+                                const LaneGraph* lane_graph_ptr,
                                 std::vector<double>* feature_values);
 
 
  private:
-  static const size_t OBSTACLE_FEATURE_SIZE = 23 + 5 * 9;
+  static const size_t OBSTACLE_FEATURE_SIZE = 5 * 9;
   static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 20;
