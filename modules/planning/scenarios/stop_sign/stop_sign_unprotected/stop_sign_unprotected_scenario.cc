@@ -127,6 +127,11 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 bool StopSignUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario, const TrajectoryPoint& ego_point,
     const Frame& frame) {
+  if (PlanningContext::GetScenarioInfo()
+          ->next_stop_sign_overlap.object_id.empty()) {
+    return false;
+  }
+
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double stop_sign_overlap_start_s =
@@ -141,10 +146,6 @@ bool StopSignUnprotectedScenario::IsTransferable(
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      if (PlanningContext::GetScenarioInfo()
-              ->next_stop_sign_overlap.object_id.empty()) {
-        return false;
-      }
       return (adc_distance_to_stop_sign > 0 &&
               adc_distance_to_stop_sign <=
                   config_.stop_sign_unprotected_config()

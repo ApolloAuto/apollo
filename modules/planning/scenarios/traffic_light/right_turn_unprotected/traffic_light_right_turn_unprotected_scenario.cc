@@ -21,6 +21,7 @@
 #include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_scenario.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "cyber/common/log.h"
@@ -28,9 +29,9 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_creep.h"
-#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_intersection_cruise.h"
-#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_stop.h"
+#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/stage_creep.h"
+#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/stage_intersection_cruise.h"
+#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/stage_stop.h"
 
 namespace apollo {
 namespace planning {
@@ -38,6 +39,7 @@ namespace scenario {
 namespace traffic_light {
 
 using hdmap::HDMapUtil;
+using perception::TrafficLight;
 
 void TrafficLightRightTurnUnprotectedScenario::Init() {
   if (init_) {
@@ -80,17 +82,17 @@ void TrafficLightRightTurnUnprotectedScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightRightTurnUnprotectedStop(config);
+        return new StageStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightRightTurnUnprotectedCreep(config);
+        return new StageCreep(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightRightTurnUnprotectedIntersectionCruise(config);
+        return new StageIntersectionCruise(config);
       });
 }
 
@@ -144,7 +146,9 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return (is_stopped_for_traffic_light && right_turn);
+      return (is_stopped_for_traffic_light && right_turn &&
+          PlanningContext::GetScenarioInfo()->traffic_light_color ==
+              TrafficLight::RED);
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
@@ -152,7 +156,8 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
       return false;
     case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
-      return true;
+      return (current_scenario.GetStatus() !=
+              Scenario::ScenarioStatus::STATUS_DONE);
     case ScenarioConfig::TRAFFIC_LIGHT_GO_THROUGH:
       return false;
     default:

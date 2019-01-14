@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_intersection_cruise.h"
+#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/stage_intersection_cruise.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
@@ -35,7 +35,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign {
+namespace traffic_light {
 
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
@@ -52,16 +52,16 @@ Stage::StageStatus StageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along referenceline
-  std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it =
-      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == stop_sign_overlap_id;
+  // check if the traffic_light is still along referenceline
+  std::string traffic_light_overlap_id = GetContext()->traffic_light_id;
+  const std::vector<PathOverlap>& traffic_light_overlaps =
+      reference_line_info.reference_line().map_path().signal_overlaps();
+  auto traffic_light_overlap_it =
+      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
+                   [&traffic_light_overlap_id](const PathOverlap& overlap) {
+                     return overlap.object_id == traffic_light_overlap_id;
                    });
-  if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
+  if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
     return FinishStage();
   }
 
@@ -69,7 +69,7 @@ Stage::StageStatus StageIntersectionCruise::Process(
   // TODO(all): update when pnc-junction is ready
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  if (adc_back_edge_s - stop_sign_overlap_it->end_s > kIntersectionLength) {
+  if (adc_back_edge_s - traffic_light_overlap_it->end_s > kIntersectionLength) {
     return FinishStage();
   }
 
@@ -81,7 +81,7 @@ Stage::StageStatus StageIntersectionCruise::FinishStage() {
   return Stage::FINISHED;
 }
 
-}  // namespace stop_sign
+}  // namespace traffic_light
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
