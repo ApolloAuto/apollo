@@ -196,7 +196,7 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   }
 
   // Trim historical features
-  Trim();
+  DiscardOutdatedHistory();
   return true;
 }
 
@@ -392,7 +392,7 @@ void Obstacle::UpdateStatus(Feature* feature) {
 }
 
 bool Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
-                     Feature* feature, int prediction_obstacle_id) {
+                     Feature* feature, const int prediction_obstacle_id) {
   int id = prediction_obstacle_id > 0 ?
       prediction_obstacle_id : perception_obstacle.id();
   if (id_ < 0) {
@@ -1486,20 +1486,16 @@ bool Obstacle::ReceivedNewerMessage(const double timestamp) const {
   return timestamp <= last_timestamp_received;
 }
 
-void Obstacle::Trim() {
-  if (feature_history_.size() < 2) {
-    return;
-  }
-  int count = 0;
+void Obstacle::DiscardOutdatedHistory() {
+  auto num_of_frames = feature_history_.size();
   const double latest_ts = feature_history_.front().timestamp();
-  while (!feature_history_.empty() &&
-         latest_ts - feature_history_.back().timestamp() >=
+  while (latest_ts - feature_history_.back().timestamp() >=
              FLAGS_max_history_time) {
     feature_history_.pop_back();
-    ++count;
   }
-  if (count > 0) {
-    ADEBUG << "Obstacle [" << id_ << "] trimmed " << count
+  auto num_of_discarded_frames = num_of_frames - feature_history_.size();
+  if (num_of_discarded_frames > 0) {
+    ADEBUG << "Obstacle [" << id_ << "] discards " << num_of_discarded_frames
            << " historical features";
   }
 }
