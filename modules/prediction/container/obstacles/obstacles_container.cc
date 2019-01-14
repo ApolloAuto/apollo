@@ -25,6 +25,8 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 
+#define ADEBUG AINFO
+
 namespace apollo {
 namespace prediction {
 
@@ -276,7 +278,9 @@ void ObstaclesContainer::BuildLaneGraph() {
       ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
       continue;
     }
+    ADEBUG << "Building Lane Graph.";
     obstacle_ptr->BuildLaneGraph();
+    ADEBUG << "Building ordered Lane Graph.";
     obstacle_ptr->BuildLaneGraphFromLeftToRight();
   }
 }

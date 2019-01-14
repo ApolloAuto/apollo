@@ -1130,7 +1130,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   // No need to BuildLaneGraph for those non-moving obstacles.
   Feature* feature = mutable_latest_feature();
   if (feature->is_still()) {
-    ADEBUG << "Not build lane graph for still obstacle";
+    ADEBUG << "Don't build lane graph for non-moving obstacle.";
     return;
   }
   double speed = feature->speed();
