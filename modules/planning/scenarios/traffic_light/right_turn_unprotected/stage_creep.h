@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/stage.h"
@@ -34,18 +32,21 @@ namespace traffic_light {
 
 struct TrafficLightRightTurnUnprotectedContext;
 
-class TrafficLightRightTurnUnprotectedStop : public Stage {
+class StageCreep : public Stage {
  public:
-  explicit TrafficLightRightTurnUnprotectedStop(
+  explicit StageCreep(
       const ScenarioConfig::StageConfig& config) : Stage(config) {}
 
  private:
-  Stage::StageStatus Process(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
   TrafficLightRightTurnUnprotectedContext* GetContext() {
-    return GetContextAs<TrafficLightRightTurnUnprotectedContext>();
+    return Stage::GetContextAs<TrafficLightRightTurnUnprotectedContext>();
   }
+
+ private:
+  Stage::StageStatus FinishStage();
 
  private:
   ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config_;

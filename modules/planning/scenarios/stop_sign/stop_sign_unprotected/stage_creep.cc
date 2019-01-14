@@ -17,6 +17,8 @@
 /**
  * @file
  **/
+#include <string>
+#include <vector>
 
 #include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_creep.h"
 
@@ -50,6 +52,11 @@ Stage::StageStatus StageCreep::Process(
     return FinishStage();
   }
 
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StageCreep planning error";
+  }
+
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the stop_sign is still along referenceline
@@ -72,11 +79,6 @@ Stage::StageStatus StageCreep::Process(
   if (dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
           ->CheckCreepDone(*frame, reference_line_info,
                            stop_sign_overlap_it->end_s, wait_time, timeout)) {
-    bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-    if (!plan_ok) {
-      AERROR << "StageCreep planning error";
-    }
-
     return FinishStage();
   }
 
@@ -85,7 +87,7 @@ Stage::StageStatus StageCreep::Process(
       ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
                                         stop_sign_overlap_it->end_s);
 
-  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "StageCreep planning error";
   }

@@ -28,10 +28,10 @@ DECLARE_string(scenario_lane_follow_config_file);
 DECLARE_string(scenario_side_pass_config_file);
 DECLARE_string(scenario_stop_sign_unprotected_config_file);
 DECLARE_string(scenario_traffic_light_right_turn_unprotected_config_file);
+
 DECLARE_bool(enable_scenario_side_pass);
 DECLARE_double(side_pass_min_signal_intersection_distance);
 DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
-
 DECLARE_bool(enable_scenario_stop_sign_unprotected);
 DECLARE_bool(enable_scenario_traffic_light_right_turn_unprotected);
 
