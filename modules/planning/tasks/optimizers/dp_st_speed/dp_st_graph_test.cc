@@ -39,7 +39,7 @@ class DpStGraphTest : public ::testing::Test {
   virtual void SetUp() {
     FLAGS_enable_multi_thread_in_dp_st_graph = false;
     FLAGS_scenario_lane_follow_config_file =
-        "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt";
+        "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt";
     ScenarioConfig config;
     CHECK(GetProtoFromFile(FLAGS_scenario_lane_follow_config_file, &config));
 
