@@ -18,6 +18,7 @@ stage_config: {
   task_type: PATH_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
+  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
   task_config: {
     task_type: DECIDER_RULE_BASED_STOP
   }
@@ -32,6 +33,9 @@ stage_config: {
   }
   task_config: {
     task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
   }
 }
 
@@ -55,6 +59,8 @@ stage_config: {
       speed_limit: 1.0
       max_valid_stop_distance: 0.4
       min_boundary_t: 6.0
+      ignore_max_st_min_t: 0.1
+      ignore_min_st_min_s: 15.0
     }
   }
   task_config: {
