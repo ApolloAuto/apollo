@@ -131,6 +131,9 @@ void DeciderRuleBasedStop::CheckTrafficLight(
 
   // TODO(all): add stop_deceleration check based on signal colors
 
+  PlanningContext::GetScenarioInfo()->traffic_light_color =
+      traffic_light.color();
+
   if (traffic_light.color() == TrafficLight::GREEN) {
     return;
   }

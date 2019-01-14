@@ -38,6 +38,7 @@ namespace traffic_light {
 struct TrafficLightRightTurnUnprotectedContext {
   ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config;
   std::string traffic_light_id;
+  double stop_start_time = 0.0;
   double creep_start_time;
 };
 

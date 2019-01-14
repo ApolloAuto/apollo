@@ -32,18 +32,21 @@ namespace traffic_light {
 
 struct TrafficLightRightTurnUnprotectedContext;
 
-class TrafficLightRightTurnUnprotectedCreep : public Stage {
+class StageIntersectionCruise : public Stage {
  public:
-  explicit TrafficLightRightTurnUnprotectedCreep(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+  explicit StageIntersectionCruise(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
 
   TrafficLightRightTurnUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<TrafficLightRightTurnUnprotectedContext>();
+    return GetContextAs<TrafficLightRightTurnUnprotectedContext>();
   }
+
+ private:
+  Stage::StageStatus FinishStage();
 
  private:
   ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config_;
