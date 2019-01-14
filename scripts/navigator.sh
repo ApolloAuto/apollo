@@ -33,6 +33,10 @@ done
 
 #echo "${CTRL_ARGS[@]}"
 #echo "${PATH_NAME[@]}"
-cd /apollo
-./bazel-bin/modules/map/relative_map/tools/navigator "${CTRL_ARGS[@]}" "${PATH_NAME[@]}" 
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "${DIR}/.."
+source "${DIR}/apollo_base.sh"
+${APOLLO_BIN_PREFIX}/modules/map/relative_map/tools/navigator --navigator_config_filename=/apollo/modules/map/relative_map/conf/navigator_config.pb.txt  "${CTRL_ARGS[@]}" "${PATH_NAME[@]}"
+
 
