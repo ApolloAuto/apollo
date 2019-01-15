@@ -97,6 +97,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     if (IsPredictable(perception_obstacle)) {
+      curr_frame_non_predictable_obstacle_ids_.push_back(
+          perception_obstacle.id());
       continue;
     }
     Obstacle* obstacle_ptr = GetObstacle(perception_obstacle.id());
@@ -135,6 +137,22 @@ void ObstaclesContainer::Clear() {
   ptr_obstacles_.Clear();
   id_mapping_.Clear();
   timestamp_ = -1.0;
+}
+
+std::vector<int> ObstaclesContainer::curr_frame_predictable_obstacle_ids() {
+  return curr_frame_predictable_obstacle_ids_;
+}
+
+std::vector<int> ObstaclesContainer::curr_frame_non_predictable_obstacle_ids() {
+  return curr_frame_non_predictable_obstacle_ids_;
+}
+
+std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
+  std::vector<int> curr_frame_obs_ids = curr_frame_predictable_obstacle_ids_;
+  curr_frame_obs_ids.insert(curr_frame_obs_ids.end(),
+      curr_frame_non_predictable_obstacle_ids_.begin(),
+      curr_frame_non_predictable_obstacle_ids_.end());
+  return curr_frame_obs_ids;
 }
 
 
