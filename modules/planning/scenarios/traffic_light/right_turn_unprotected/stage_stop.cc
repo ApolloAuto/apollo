@@ -93,7 +93,7 @@ Stage::StageStatus StageStop::Process(
   if (PlanningContext::GetScenarioInfo()->traffic_light_color ==
       TrafficLight::GREEN) {
     next_stage_ = ScenarioConfig::
-        TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE;
+        TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
     return Stage::FINISHED;
   }
 
@@ -105,7 +105,7 @@ Stage::StageStatus StageStop::FinishStage() {
       GetContext()->traffic_light_id;
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
-  next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP;
+  next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;
   return Stage::FINISHED;
 }
 

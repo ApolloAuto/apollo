@@ -155,11 +155,9 @@ bool StopSignUnprotectedScenario::IsTransferable(
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       return (current_scenario.GetStatus() !=
               Scenario::ScenarioStatus::STATUS_DONE);
-    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_GO_THROUGH:
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
     default:
       break;
   }
