@@ -42,31 +42,31 @@ class TrafficLightRightTurnUnprotectedScenarioTest : public ::testing::Test {
 };
 
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
-  FLAGS_scenario_stop_sign_unprotected_config_file =
+  FLAGS_scenario_traffic_light_unprotected_right_turn_config_file =
       "/apollo/modules/planning/conf/"
       "scenario/traffic_light_right_turn_unprotected_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_right_turn_unprotected_config_file,
+      FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config));
 }
 
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, Init) {
-  FLAGS_scenario_stop_sign_unprotected_config_file =
+  FLAGS_scenario_traffic_light_unprotected_right_turn_config_file =
       "/apollo/modules/planning/testdata/conf/"
       "scenario/traffic_light_right_turn_unprotected_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_right_turn_unprotected_config_file,
+      FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config));
 
   ScenarioContext context;
   scenario_.reset(new TrafficLightRightTurnUnprotectedScenario(config,
                                                                &context));
   EXPECT_EQ(scenario_->scenario_type(),
-            ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED);
+            ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
 }
 
 }  // namespace traffic_light

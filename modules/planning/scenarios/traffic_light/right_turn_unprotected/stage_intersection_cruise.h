@@ -49,7 +49,7 @@ class StageIntersectionCruise : public Stage {
   Stage::StageStatus FinishStage();
 
  private:
-  ScenarioTrafficLightRightTurnUnprotectedConfig scenario_config_;
+  ScenarioTrafficLightUnprotectedRightTurnConfig scenario_config_;
 };
 
 }  // namespace traffic_light
