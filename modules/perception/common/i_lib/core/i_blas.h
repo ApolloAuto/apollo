@@ -870,7 +870,7 @@ inline void IAdd16(const T x[16], const T y[16], T z[16]) {
   z[15] = x[15] + y[15];
 }
 template <typename T>
-inline void IAdd20(const T x[16], const T y[16], T z[16]) {
+inline void IAdd20(const T x[20], const T y[20], T z[20]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
@@ -1215,7 +1215,7 @@ inline void IAddScaled7(const T x[7], const T y[7], T z[7], T k) {
   z[6] = x[6] + y[6] * k;
 }
 template <typename T>
-inline void IAddScaled8(const T x[7], const T y[7], T z[7], T k) {
+inline void IAddScaled8(const T x[8], const T y[8], T z[8], T k) {
   z[0] = x[0] + y[0] * k;
   z[1] = x[1] + y[1] * k;
   z[2] = x[2] + y[2] * k;
