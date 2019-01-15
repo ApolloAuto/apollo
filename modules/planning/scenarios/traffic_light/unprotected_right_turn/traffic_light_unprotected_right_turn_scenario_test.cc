@@ -20,7 +20,7 @@
 
 #define protected public
 #define private public
-#include "modules/planning/scenarios/traffic_light/right_turn_unprotected/traffic_light_right_turn_unprotected_scenario.h"
+#include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
 #include "gtest/gtest.h"
 
@@ -44,7 +44,7 @@ class TrafficLightRightTurnUnprotectedScenarioTest : public ::testing::Test {
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
   FLAGS_scenario_traffic_light_unprotected_right_turn_config_file =
       "/apollo/modules/planning/conf/"
-      "scenario/traffic_light_right_turn_unprotected_config.pb.txt";
+      "scenario/traffic_light_unprotected_right_turn_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
@@ -55,7 +55,7 @@ TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
 TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, Init) {
   FLAGS_scenario_traffic_light_unprotected_right_turn_config_file =
       "/apollo/modules/planning/testdata/conf/"
-      "scenario/traffic_light_right_turn_unprotected_config.pb.txt";
+      "scenario/traffic_light_unprotected_right_turn_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
