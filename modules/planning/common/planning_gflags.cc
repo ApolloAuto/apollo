@@ -42,8 +42,8 @@ DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "stop_sign_unprotected scenario configuration file");
 DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
               "/apollo/modules/planning/conf/"
-              "scenario/traffic_light_right_turn_unprotected_config.pb.txt",
-              "scenario_traffic_light_right_turn_unprotected config file");
+              "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
+              "scenario_traffic_light_unprotected_right_turn config file");
 
 DEFINE_bool(enable_scenario_side_pass, true,
             "enable side pass scenario in planning");

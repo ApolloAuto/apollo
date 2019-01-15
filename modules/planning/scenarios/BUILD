@@ -52,7 +52,7 @@ cc_library(
         "//modules/planning/scenarios/lane_follow",
         "//modules/planning/scenarios/side_pass",
         "//modules/planning/scenarios/stop_sign/stop_sign_unprotected:stop_sign_unprotected_scenario",
-        "//modules/planning/scenarios/traffic_light/right_turn_unprotected:traffic_light_right_turn_unprotected_scenario",
+        "//modules/planning/scenarios/traffic_light/unprotected_right_turn:traffic_light_unprotected_right_turn_scenario",
     ],
 )
 
