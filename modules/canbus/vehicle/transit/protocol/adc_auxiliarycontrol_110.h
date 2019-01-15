@@ -18,6 +18,7 @@
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "gtest/gtest_prod.h"
 
 namespace apollo {
 namespace canbus {
@@ -35,6 +36,8 @@ class Adcauxiliarycontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   void UpdateData(uint8_t* data) override;
 
   void Reset() override;
+
+  FRIEND_TEST(Auxiliarycontrol_110_test, General);
 
   // config detail: {'description': 'Aux control heartbeat counter', 'offset':
   // 0.0, 'precision': 1.0, 'len': 2, 'name': 'ADC_AuxControl_Counter',
