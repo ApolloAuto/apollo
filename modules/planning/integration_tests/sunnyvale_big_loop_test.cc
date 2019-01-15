@@ -53,8 +53,8 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_enable_multi_thread_in_dp_poly_path = false;
 
     FLAGS_enable_scenario_side_pass = false;
-    FLAGS_enable_scenario_stop_sign_unprotected = false;
-    FLAGS_enable_scenario_traffic_light_unprotected_right_turn = false;
+    FLAGS_enable_scenario_stop_sign = false;
+    FLAGS_enable_scenario_traffic_light = false;
     FLAGS_enable_rss_info = false;
 
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
@@ -73,7 +73,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
-  FLAGS_enable_scenario_stop_sign_unprotected = true;
+  FLAGS_enable_scenario_stop_sign = true;
 
   std::string seq_num = "1";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -97,7 +97,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
-  FLAGS_enable_scenario_stop_sign_unprotected = true;
+  FLAGS_enable_scenario_stop_sign = true;
 
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -122,7 +122,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
  *   decision: STOP
  */
 TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
-  FLAGS_enable_scenario_stop_sign_unprotected = true;
+  FLAGS_enable_scenario_stop_sign = true;
 
   std::string seq_num = "2";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";

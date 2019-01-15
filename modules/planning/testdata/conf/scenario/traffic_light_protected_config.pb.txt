@@ -1,0 +1,66 @@
+scenario_type: TRAFFIC_LIGHT_PROTECTED
+traffic_light_protected_config: {
+  max_valid_stop_distance: 3.5
+  max_adc_stop_speed: 0.3
+  min_pass_s_distance: 3.0
+}
+stage_type: TRAFFIC_LIGHT_PROTECTED_STOP
+stage_type: TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE
+
+stage_config: {
+  stage_type: TRAFFIC_LIGHT_PROTECTED_STOP
+  enabled: true
+  task_type: DECIDER_RULE_BASED_STOP
+  task_type: DP_POLY_PATH_OPTIMIZER
+  task_type: PATH_DECIDER
+  task_type: DP_ST_SPEED_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_config: {
+    task_type: DECIDER_RULE_BASED_STOP
+  }
+  task_config: {
+    task_type: DP_POLY_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+  }
+  task_config: {
+    task_type: DP_ST_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  }
+}
+
+stage_config: {
+  stage_type: TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE
+  enabled: true
+  task_type: DECIDER_RULE_BASED_STOP
+  task_type: DP_POLY_PATH_OPTIMIZER
+  task_type: PATH_DECIDER
+  task_type: DP_ST_SPEED_OPTIMIZER
+  task_type: SPEED_DECIDER
+  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_config: {
+    task_type: DECIDER_RULE_BASED_STOP
+  }
+  task_config: {
+    task_type: DP_POLY_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_DECIDER
+  }
+  task_config: {
+    task_type: DP_ST_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
+  }
+  task_config: {
+    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  }
+}

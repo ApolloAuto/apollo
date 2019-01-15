@@ -51,8 +51,8 @@ class GarageTest : public PlanningTestBase {
     FLAGS_enable_rss_info = false;
 
     FLAGS_enable_scenario_side_pass = false;
-    FLAGS_enable_scenario_stop_sign_unprotected = false;
-    FLAGS_enable_scenario_traffic_light_unprotected_right_turn = false;
+    FLAGS_enable_scenario_stop_sign = false;
+    FLAGS_enable_scenario_traffic_light = false;
   }
 };
 
