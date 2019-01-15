@@ -536,6 +536,26 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   }
 }
 
+bool ReferenceLineInfo::IsLeftTurnPath(const double forward_buffer) const {
+  // TODO(all): to combine with IsRightTurnPath()
+  double route_s = 0.0;
+  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
+  for (const auto& seg : Lanes()) {
+    if (route_s > adc_s + forward_buffer) {
+      break;
+    }
+    route_s += seg.end_s - seg.start_s;
+    if (route_s < adc_s) {
+      continue;
+    }
+    const auto& turn = seg.lane->lane().turn();
+    if (turn == hdmap::Lane::LEFT_TURN) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool ReferenceLineInfo::IsRightTurnPath(const double forward_buffer) const {
   double route_s = 0.0;
   const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();

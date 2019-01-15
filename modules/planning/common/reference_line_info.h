@@ -144,6 +144,7 @@ class ReferenceLineInfo {
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
+  bool IsLeftTurnPath(const double forward_buffer) const;
   bool IsRightTurnPath(const double forward_buffer) const;
 
   double OffsetToOtherReferenceLine() const {

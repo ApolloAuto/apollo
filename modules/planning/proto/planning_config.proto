@@ -92,6 +92,12 @@ message ScenarioStopSignUnprotectedConfig {
   optional float creep_timeout = 8 [default = 10.0];  // secoond
 }
 
+message ScenarioTrafficLightProtectedConfig {
+  optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
+  optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
+  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
+}
+
 message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
   optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
@@ -133,9 +139,12 @@ message ScenarioConfig {
     SIDE_PASS_PASS_OBSTACLE = 204;
     SIDE_PASS_BACKUP = 205;
 
-    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP = 300;
-    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP = 301 ;
-    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE = 302;
+    TRAFFIC_LIGHT_PROTECTED_STOP = 300;
+    TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE = 301;
+
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP = 310;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP = 311 ;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE = 312;
   };
 
   message StageConfig {
@@ -152,12 +161,13 @@ message ScenarioConfig {
     ScenarioLaneFollowConfig lane_follow_config = 2;
     ScenarioSidePassConfig side_pass_config = 3;
     ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 4;
-    ScenarioTrafficLightUnprotectedRightTurnConfig traffic_light_unprotected_right_turn_config = 5;
+    ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 5;
+    ScenarioTrafficLightUnprotectedRightTurnConfig traffic_light_unprotected_right_turn_config = 6;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
-  repeated StageType stage_type = 6;
+  repeated StageType stage_type = 7;
   // an unordered list of stage configs.
-  repeated StageConfig stage_config = 7;
+  repeated StageConfig stage_config = 8;
 }
 
 message PlannerPublicRoadConfig {

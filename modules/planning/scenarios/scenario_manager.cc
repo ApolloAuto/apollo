@@ -26,6 +26,7 @@
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
+#include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
 namespace apollo {
@@ -60,6 +61,11 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(new scenario::stop_sign::StopSignUnprotectedScenario(
           config_map_[scenario_type], &scenario_context_));
       break;
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+      ptr.reset(
+          new scenario::traffic_light::TrafficLightProtectedScenario(
+              config_map_[scenario_type], &scenario_context_));
+      break;
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       ptr.reset(
           new scenario::traffic_light::TrafficLightRightTurnUnprotectedScenario(
@@ -83,6 +89,9 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_traffic_light_protected_config_file,
+      &config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]));
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
@@ -208,30 +217,37 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   // prefer to use first encountered overlaps/objects
   const auto& reference_line_info = frame.reference_line_info().front();
   const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
+
+  std::vector<ScenarioConfig::ScenarioType> preferred_scenarios;
+  preferred_scenarios.push_back(ScenarioConfig::LANE_FOLLOW);
   for (const auto& overlap : first_overlaps) {
-    auto preferred_scenario = ScenarioConfig::LANE_FOLLOW;
     if (overlap.first == ReferenceLineInfo::OBSTACLE &&
         FLAGS_enable_scenario_side_pass) {
-      preferred_scenario = ScenarioConfig::SIDE_PASS;
+      preferred_scenarios.push_back(ScenarioConfig::SIDE_PASS);
     } else if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
       // stop_sign scenarios
-      if (FLAGS_enable_scenario_stop_sign_unprotected) {
-        preferred_scenario = ScenarioConfig::STOP_SIGN_UNPROTECTED;
+      if (FLAGS_enable_scenario_stop_sign) {
+        preferred_scenarios.push_back(ScenarioConfig::STOP_SIGN_UNPROTECTED);
       }
     } else if (overlap.first == ReferenceLineInfo::SIGNAL) {
       // traffic_light scenarios
-      if (FLAGS_enable_scenario_traffic_light_unprotected_right_turn) {
-        preferred_scenario =
-            ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
+      if (FLAGS_enable_scenario_traffic_light) {
+        preferred_scenarios.push_back(
+            ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
+        preferred_scenarios.push_back(
+            ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
       }
     }
+  }
+
+  for (const auto& preferred_scenario : preferred_scenarios) {
     if (rejected_scenarios.find(preferred_scenario) !=
             rejected_scenarios.end() ||
         supported_scenarios_.count(preferred_scenario) == 0) {
       continue;
     }
     if (SelectScenario(preferred_scenario, ego_point, frame)) {
-      AINFO << "select prefered scenario: "
+      AINFO << "select preferred scenario: "
             << ScenarioConfig::ScenarioType_Name(preferred_scenario);
       return;
     } else {
@@ -249,7 +265,15 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
       continue;
     }
     if (scenario == ScenarioConfig::STOP_SIGN_UNPROTECTED &&
-        !FLAGS_enable_scenario_stop_sign_unprotected) {
+        !FLAGS_enable_scenario_stop_sign) {
+      continue;
+    }
+    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED &&
+        !FLAGS_enable_scenario_traffic_light) {
+      continue;
+    }
+    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN &&
+        !FLAGS_enable_scenario_traffic_light) {
       continue;
     }
     if (SelectScenario(scenario, ego_point, frame)) {
