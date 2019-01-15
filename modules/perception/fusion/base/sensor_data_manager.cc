@@ -111,7 +111,7 @@ void SensorDataManager::GetLatestFrames(
   }
 
   std::sort((*frames).begin(), (*frames).end(), [](const SensorFramePtr frame1, const SensorFramePtr frame2 ){
-    return frame1->GetTimestamp() < frame2->GetTimestamp();
+    return frame1->GetTimestamp() > frame2->GetTimestamp();
   });
 }
 
