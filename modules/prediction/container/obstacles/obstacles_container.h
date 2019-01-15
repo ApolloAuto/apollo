@@ -102,6 +102,12 @@ class ObstaclesContainer : public Container {
 
   size_t NumOfObstacles() { return ptr_obstacles_.size(); }
 
+  std::vector<int> curr_frame_predictable_obstacle_ids();
+
+  std::vector<int> curr_frame_non_predictable_obstacle_ids();
+
+  std::vector<int> curr_frame_obstacle_ids();
+
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
   /**
@@ -126,6 +132,7 @@ class ObstaclesContainer : public Container {
   // an id_mapping from perception_id to prediction_id
   common::util::LRUCache<int, int> id_mapping_;
   std::vector<int> curr_frame_predictable_obstacle_ids_;
+  std::vector<int> curr_frame_non_predictable_obstacle_ids_;
   std::unordered_map<int, int> curr_frame_id_mapping_;
 };
 
