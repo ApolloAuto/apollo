@@ -27,16 +27,19 @@ namespace prediction {
 
 Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;
-std::size_t FeatureOutput::index_ = 0;
+std::size_t FeatureOutput::idx_feature_ = 0;
+std::size_t FeatureOutput::idx_learning_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
   Write();
+  WriteDataForLearning();
   Clear();
 }
 
 void FeatureOutput::Clear() {
-  index_ = 0;
+  idx_feature_ = 0;
+  idx_learning_ = 0;
   features_.Clear();
   list_data_for_learning_.Clear();
 }
@@ -67,20 +70,23 @@ void FeatureOutput::Write() {
   } else {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/feature." +
-        std::to_string(index_) + ".bin";
+        std::to_string(idx_feature_) + ".bin";
     common::util::SetProtoToBinaryFile(features_, file_name);
     features_.Clear();
-    ++index_;
+    ++idx_feature_;
   }
+}
 
-  if (!list_data_for_learning_.data_for_learning_size() <= 0) {
+void FeatureOutput::WriteDataForLearning() {
+  if (list_data_for_learning_.data_for_learning_size() <= 0) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/datalearn." +
-        std::to_string(index_) + ".bin";
+        std::to_string(idx_learning_) + ".bin";
     common::util::SetProtoToBinaryFile(list_data_for_learning_, file_name);
     list_data_for_learning_.Clear();
+    ++idx_learning_;
   }
 }
 
