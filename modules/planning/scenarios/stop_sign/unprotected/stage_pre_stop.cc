@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stage_pre_stop.h"
+#include "modules/planning/scenarios/stop_sign/unprotected/stage_pre_stop.h"
 
 #include <algorithm>
 #include <utility>

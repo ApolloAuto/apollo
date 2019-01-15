@@ -20,10 +20,14 @@
 
 #pragma once
 
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/scenarios/stop_sign/stop_sign_unprotected/stop_sign_unprotected_scenario.h"
+#include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -32,18 +36,22 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-class StageCreep : public Stage {
+class StageStop : public Stage {
  public:
-  explicit StageCreep(const ScenarioConfig::StageConfig& config)
+  explicit StageStop(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
-
   StopSignUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<StopSignUnprotectedContext>();
+    return GetContextAs<StopSignUnprotectedContext>();
   }
+  int RemoveWatchVehicle(
+      const Obstacle& obstacle,
+      const std::vector<std::string>& watch_vehicle_ids,
+      std::unordered_map<std::string, std::vector<std::string>>*
+          watch_vehicles);
 
  private:
   Stage::StageStatus FinishStage();
