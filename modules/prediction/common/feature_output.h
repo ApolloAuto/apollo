@@ -65,6 +65,11 @@ class FeatureOutput {
   static void Write();
 
   /**
+    * @brief Write DataForLearning features to a file
+    */
+  static void WriteDataForLearning();
+
+  /**
    * @brief Get feature size
    * @return Feature size
    */
@@ -72,8 +77,9 @@ class FeatureOutput {
 
  private:
   static Features features_;
+  static std::size_t idx_feature_;
   static ListDataForLearning list_data_for_learning_;
-  static std::size_t index_;
+  static std::size_t idx_learning_;
 };
 
 }  // namespace prediction
