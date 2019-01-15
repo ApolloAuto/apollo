@@ -35,44 +35,33 @@ class Motioncommandfeedback1_22_test : public ::testing::Test {
   Llcmotioncommandfeedback122 feedback_;
 };
 
-TEST_F(Motioncommandfeedback1_22_test, Steeringanglesetpoint) {
-  const int32_t length = 16;
+TEST_F(Motioncommandfeedback1_22_test, General) {
   const uint8_t bytes[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const double equivalent = 1201.85;
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_steeringanglesetpoint(bytes, length),
-                    equivalent);
-}
-
-TEST_F(Motioncommandfeedback1_22_test, Throttlesetpoint) {
-  const int32_t length = 10;
-  const uint8_t bytes[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const double equivalent = 43.50;
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_throttlesetpoint(bytes, length),
-                    equivalent);
-}
-
-TEST_F(Motioncommandfeedback1_22_test, Brakepercentsetpoint) {
-  const int32_t length = 11;
-  const uint8_t bytes[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const double equivalent = 93.3524;
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_brakepercentsetpoint(bytes, length),
-                    equivalent);
-}
-
-TEST_F(Motioncommandfeedback1_22_test, Motioncommandfeedback1_count) {
-  const int32_t length = 2;
-  const uint8_t bytes[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const int equivalent = 3;
-  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_count(bytes, length),
-            equivalent);
-}
-
-TEST_F(Motioncommandfeedback1_22_test, Motioncommandfeedback1_check) {
-  const int32_t length = 8;
-  const uint8_t bytes[8] = {0x8f, 0x9e, 0xad, 0xbc, 0xcb, 0xda, 0xe9, 0xf8};
-  const int equivalent = 248;
-  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_check(bytes, length),
-            equivalent);
+  const int32_t length_Steeringanglesetpoint = 16;
+  const int32_t length_Throttlesetpoint = 10;
+  const int32_t length_Brakepercentsetpoint = 11;
+  const int32_t length_Motioncommandfeedback1_count = 2;
+  const int32_t length_Motioncommandfeedback1_check = 8;
+  const double equivalent_Steeringanglesetpoint = 1201.85;
+  const double equivalent_Throttlesetpoint = 43.50;
+  const double equivalent_Brakepercentsetpoint = 93.3524;
+  const int equivalent_Motioncommandfeedback1_count = 3;
+  const int equivalent_Motioncommandfeedback1_check = 248;
+  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_steeringanglesetpoint(bytes,
+                    length_Steeringanglesetpoint),
+                    equivalent_Steeringanglesetpoint);
+  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_throttlesetpoint(bytes,
+                    length_Throttlesetpoint),
+                    equivalent_Throttlesetpoint);
+  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_brakepercentsetpoint(bytes,
+                    length_Brakepercentsetpoint),
+                    equivalent_Brakepercentsetpoint);
+  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_count(bytes,
+            length_Motioncommandfeedback1_count),
+            equivalent_Motioncommandfeedback1_count);
+  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_check(bytes,
+            length_Motioncommandfeedback1_check),
+            equivalent_Motioncommandfeedback1_check);
 }
 
 }  // namespace transit

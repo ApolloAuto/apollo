@@ -32,11 +32,7 @@ class Llcmotioncommandfeedback122
   Llcmotioncommandfeedback122();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ChassisDetail* chassis) const override;
-  FRIEND_TEST(Motioncommandfeedback1_22_test, Steeringanglesetpoint);
-  FRIEND_TEST(Motioncommandfeedback1_22_test, Throttlesetpoint);
-  FRIEND_TEST(Motioncommandfeedback1_22_test, Brakepercentsetpoint);
-  FRIEND_TEST(Motioncommandfeedback1_22_test, Motioncommandfeedback1_count);
-  FRIEND_TEST(Motioncommandfeedback1_22_test, Motioncommandfeedback1_check);
+  FRIEND_TEST(Motioncommandfeedback1_22_test, General);
 
  private:
   // config detail: {'description': 'Steering angle setpoint (after limits)',
