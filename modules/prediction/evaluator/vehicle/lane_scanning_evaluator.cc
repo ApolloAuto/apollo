@@ -83,9 +83,9 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   //  - if in online mode, pass it through trained model to evaluate.
   std::vector<double> feature_values;
   ExtractFeatures(obstacle_ptr, lane_graph_ptr, &feature_values);
-  // TODO(jiacheng): sanity check of extracted feature_values:
   if (FLAGS_prediction_offline_mode) {
-    // TODO(jiacheng): save the extracted features locally for offline training.
+    FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values);
+    ADEBUG << "Save extracted features for learning locally.";
   } else {
     // TODO(jiacheng): once the model is trained, implement this online part.
   }
@@ -122,10 +122,16 @@ bool LaneScanningEvaluator::ExtractFeatures(
     ADEBUG << "Failed to extract static environmental features around obs_id = "
            << id;
   }
-  // TODO(jiacheng): sanity check of extracted static env features:
+  if (static_feature_values.size() %
+      (SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) != 0) {
+    ADEBUG << "Obstacle [" << id << "] has incorrect static env feature size: "
+           << static_feature_values.size() << ".";
+    return false;
+  }
   feature_values->insert(feature_values->end(),
                          static_feature_values.begin(),
                          static_feature_values.end());
+
   return true;
 }
 
