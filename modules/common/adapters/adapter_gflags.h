@@ -92,4 +92,5 @@ DECLARE_string(guardian_topic);
 // Data topic
 DECLARE_string(data_topic);
 
+// CIDI V2X topic
 DECLARE_string(cidiv2x_topic);

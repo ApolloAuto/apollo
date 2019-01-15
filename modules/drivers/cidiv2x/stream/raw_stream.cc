@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The CiDi Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <string.h>
 #include <cmath>
 #include <ctime>
 #include <memory>
 #include <thread>
 #include <vector>
-#include <string.h>
 
 #include "cyber/cyber.h"
 
@@ -32,8 +32,9 @@ namespace apollo {
 namespace drivers {
 namespace cidiv2x {
 
-void switch_stream_status(const apollo::drivers::cidiv2x::Stream::Status &status,
-                          StreamStatus_Type *report_status_type) {
+void switch_stream_status(
+    const apollo::drivers::cidiv2x::Stream::Status &status,
+    StreamStatus_Type *report_status_type) {
   switch (status) {
     case apollo::drivers::cidiv2x::Stream::Status::CONNECTED:
       *report_status_type = StreamStatus::CONNECTED;
@@ -74,7 +75,7 @@ Stream *create_stream(const config::Stream &sd) {
         AERROR << "tcp def has no port field.";
         return nullptr;
       }
-      return Stream::create_tcp(sd.tcp().address().c_str(), 
+      return Stream::create_tcp(sd.tcp().address().c_str(),
                                 static_cast<uint16_t>(sd.tcp().port()));
 
     case config::Stream::kUdp:
@@ -91,18 +92,18 @@ Stream *create_stream(const config::Stream &sd) {
         return nullptr;
       }
       AINFO << "UDP Addr: " << sd.udp().address().c_str()
-            << ", port: "<< sd.udp().port() 
+            << ", port: " << sd.udp().port()
             << ", broadcast port: " << sd.udp().broadcast_port();
-      return Stream::create_udp(sd.udp().address().c_str(), 
-                                static_cast<uint16_t>(sd.udp().port()),
-                                static_cast<uint16_t>(sd.udp().broadcast_port()));
+      return Stream::create_udp(
+          sd.udp().address().c_str(), static_cast<uint16_t>(sd.udp().port()),
+          static_cast<uint16_t>(sd.udp().broadcast_port()));
     default:
       return nullptr;
   }
 }
 
 RawStream::RawStream(const config::Config &config,
-                     const std::shared_ptr<apollo::cyber::Node>& node) 
+                     const std::shared_ptr<apollo::cyber::Node> &node)
     : config_(config), node_(node) {
   data_parser_ptr_.reset(new CidiV2xParser(config_, node_));
 }
@@ -260,43 +261,39 @@ bool RawStream::Logout() {
 }
 
 void RawStream::StreamStatusCheck() {
-  bool status_report = false;
   StreamStatus_Type report_stream_status;
 
   if (data_stream_ &&
       (data_stream_->get_status() != data_stream_status_->status)) {
     data_stream_status_->status = data_stream_->get_status();
-    status_report = true;
     switch_stream_status(data_stream_status_->status, &report_stream_status);
     stream_status_.set_stream_type(report_stream_status);
-  }
-  // ADEBUG << "stream status: " << static_cast<Status>(data_stream_status_->status);
-  if(status_report) {
-
+    ADEBUG << "stream status: "
+           << stream_status_.ShortDebugString();
   }
 }
 
 void RawStream::DataSpin() {
-
-  static uint8_t heartBeatCount =0;
+  static uint8_t heartBeatCount = 0;
   char buf[BUFFER_SIZE] = "apollo";
-  std::chrono::duration<double, std::micro> default_period{100*1000}; 
+  std::chrono::duration<double, std::micro> default_period{100 * 1000};
   while (isRunning()) {
     size_t length = 0;
     ADEBUG << "is healthy: " << is_healthy_;
     memset(buffer_, 0, BUFFER_SIZE);
-    if(!is_healthy_) {
+    if (!is_healthy_) {
       length = data_stream_->read(buffer_, BUFFER_SIZE, 1);
-      if(length == 320) {
-        std::string tempStr = std::string((char*)buffer_);
-        ADEBUG << "Received data: "<<tempStr;
+      if (length == 320) {
+        std::string tempStr = std::string(reinterpret_cast<char *>(buffer_));
+        ADEBUG << "Received data: " << tempStr;
         is_healthy_ = true;
         char buf[BUFFER_SIZE] = "apollo";
-        size_t len = data_stream_->write((uint8_t *)buf, BUFFER_SIZE, 0);
-        if(len > 0) {
-          AINFO << "success sento to broadcaster: "<< buf;
-          
-        }else {
+        size_t len = data_stream_->write(reinterpret_cast<uint8_t *>(buf),
+                                         BUFFER_SIZE, 0);
+        if (len > 0) {
+          AINFO << "success sento to broadcaster: " << buf;
+
+        } else {
           AINFO << "Failed send to broadcaster.";
         }
       } else {
@@ -305,14 +302,14 @@ void RawStream::DataSpin() {
         std::this_thread::sleep_for(default_period);
         continue;
       }
-    }else {
-      length =data_stream_->read(buffer_, BUFFER_SIZE, 0);
-      if(length == 320) {
-        std::string tempStr = std::string((char*)buffer_);
-        ADEBUG << "Received data: "<<tempStr; 
+    } else {
+      length = data_stream_->read(buffer_, BUFFER_SIZE, 0);
+      if (length == 320) {
+        std::string tempStr = std::string(reinterpret_cast<char *>(buffer_));
+        ADEBUG << "Received data: " << tempStr;
         // memset(buffer_, 0, BUFFER_SIZE);
-      }else {
-        // Todo(inumo): set timeout to switch to broadcast mode 
+      } else {
+        // Todo(inumo): set timeout to switch to broadcast mode
         is_healthy_ = false;
       }
     }
@@ -332,10 +329,10 @@ void RawStream::DataSpin() {
       heartBeatCount++;
       if (heartBeatCount == 10) {
         heartBeatCount = 0;
-        data_stream_->write((uint8_t *)buf, BUFFER_SIZE, 0);
+        data_stream_->write(reinterpret_cast<uint8_t *>(buf), BUFFER_SIZE, 0);
       }
     } else {
-        heartBeatCount = 0;
+      heartBeatCount = 0;
     }
 
     StreamStatusCheck();
@@ -355,9 +352,7 @@ void RawStream::DataSpin() {
 //     sleep(1);
 //   }
 // }
-bool RawStream::isRunning() const {
-  return is_running_;
-}
+bool RawStream::isRunning() const { return is_running_; }
 void RawStream::Stop() {
   if (isRunning()) {
     is_running_ = false;
@@ -371,7 +366,6 @@ void RawStream::Stop() {
   }
   AINFO << "Raw stream stopped [ok].";
 }
-
 
 }  // namespace cidiv2x
 }  // namespace drivers

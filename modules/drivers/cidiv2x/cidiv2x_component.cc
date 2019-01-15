@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The CiDi Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ CidiV2xDriverComponent::CidiV2xDriverComponent()
 bool CidiV2xDriverComponent::Init() {
   Config config;
 
-  if (!::apollo::common::util::GetProtoFromFile(config_file_path_,
-                                                &config)) {
-    monitor_logger_buffer_.ERROR("Unable to load gnss conf file: " + config_file_path_);
+  if (!::apollo::common::util::GetProtoFromFile(config_file_path_, &config)) {
+    monitor_logger_buffer_.ERROR("Unable to load cidiv2x conf file: " +
+                                 config_file_path_);
     return false;
   }
   AINFO << "CidiV2x config: " << config.DebugString();
@@ -56,7 +56,6 @@ bool CidiV2xDriverComponent::Init() {
   AINFO << "The cidiv2x driver successfully initialized.";
   return true;
 }
-
 
 }  // namespace cidiv2x
 }  // namespace drivers
