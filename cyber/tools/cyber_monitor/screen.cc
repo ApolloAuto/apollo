@@ -164,7 +164,7 @@ void Screen::HighlightLine(int lineNo) {
   if (IsInit() && lineNo < Height()) {
     SetCurrentColor(WHITE_BLACK);
     for (int x = 0; x < Width(); ++x) {
-      int ch = mvinch(lineNo + highlight_direction_, x);
+      chtype ch = mvinch(lineNo + highlight_direction_, x);
       ch &= A_CHARTEXT;
       if (ch == ' ') mvaddch(lineNo + highlight_direction_, x, ch);
     }
@@ -172,7 +172,7 @@ void Screen::HighlightLine(int lineNo) {
 
     SetCurrentColor(BLACK_WHITE);
     for (int x = 0; x < Width(); ++x) {
-      int ch = mvinch(lineNo, x);
+      chtype ch = mvinch(lineNo, x);
       mvaddch(lineNo, x, ch & A_CHARTEXT);
     }
     ClearCurrentColor();
