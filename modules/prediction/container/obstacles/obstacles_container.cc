@@ -41,6 +41,10 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   // Clean up the history and get the PerceptionObstacles
   curr_frame_predictable_obstacle_ids_.clear();
   curr_frame_id_mapping_.clear();
+  curr_frame_predictable_obstacle_ids_.clear();
+  curr_frame_non_predictable_obstacle_ids_.clear();
+  curr_frame_id_perception_obstacle_map_.clear();
+
   PerceptionObstacles perception_obstacles;
   perception_obstacles.CopyFrom(
       dynamic_cast<const PerceptionObstacles&>(message));
@@ -97,10 +101,9 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     if (IsPredictable(perception_obstacle)) {
-      curr_frame_non_predictable_obstacle_ids_.push_back(
-          perception_obstacle.id());
       continue;
     }
+    // TODO(kechxu) use prediction id
     Obstacle* obstacle_ptr = GetObstacle(perception_obstacle.id());
     if (obstacle_ptr == nullptr) {
       continue;
@@ -108,7 +111,6 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     obstacle_ptr->SetNearbyObstacles();
   }
 }
-
 
 Obstacle* ObstaclesContainer::GetObstacle(const int perception_id) {
   auto ptr_obstacle = ptr_obstacles_.GetSilently(perception_id);
@@ -126,17 +128,21 @@ Obstacle* ObstaclesContainer::GetObstacleWithLRUUpdate(const int obstacle_id) {
   return nullptr;
 }
 
-
 const std::vector<int>&
 ObstaclesContainer::GetCurrentFramePredictableObstacleIds() const {
   return curr_frame_predictable_obstacle_ids_;
 }
 
-
 void ObstaclesContainer::Clear() {
   ptr_obstacles_.Clear();
   id_mapping_.Clear();
   timestamp_ = -1.0;
+}
+
+PerceptionObstacle ObstaclesContainer::GetPerceptionObstacle(const int id) {
+  CHECK(curr_frame_id_perception_obstacle_map_.find(id) !=
+        curr_frame_id_perception_obstacle_map_.end());
+  return curr_frame_id_perception_obstacle_map_[id];
 }
 
 std::vector<int> ObstaclesContainer::curr_frame_predictable_obstacle_ids() {
@@ -155,7 +161,6 @@ std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
   return curr_frame_obs_ids;
 }
 
-
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
   // Sanity checks.
@@ -169,6 +174,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
              << ", and prediction_id: " << prediction_id;
     }
   }
+  curr_frame_id_perception_obstacle_map_[prediction_id] = perception_obstacle;
   if (prediction_id < -1) {
     AERROR << "Invalid ID [" << prediction_id << "]";
     return;
@@ -176,6 +182,8 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   if (!IsPredictable(perception_obstacle)) {
     ADEBUG << "Perception obstacle [" << prediction_id
            << "] is not predictable.";
+    curr_frame_non_predictable_obstacle_ids_.push_back(
+        perception_obstacle.id());
     return;
   }
 
@@ -215,7 +223,6 @@ void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
     ptr_obstacles_.Put(id, std::move(ptr_obstacle));
   }
 }
-
 
 void ObstaclesContainer::BuildCurrentFrameIdMapping(
     const PerceptionObstacles& perception_obstacles) {
@@ -280,7 +287,6 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
   }
 }
 
-
 void ObstaclesContainer::BuildLaneGraph() {
   // Go through every obstacle in the current frame, after some
   // sanity checks, build lane graph for non-junction cases.
@@ -300,7 +306,6 @@ void ObstaclesContainer::BuildLaneGraph() {
     obstacle_ptr->BuildLaneGraphFromLeftToRight();
   }
 }
-
 
 void ObstaclesContainer::BuildJunctionFeature() {
   // Go through every obstacle in the current frame, after some
@@ -323,7 +328,6 @@ void ObstaclesContainer::BuildJunctionFeature() {
     }
   }
 }
-
 
 bool ObstaclesContainer::AdaptTracking(
     const PerceptionObstacle& perception_obstacle, Obstacle* obstacle_ptr) {
@@ -356,7 +360,6 @@ bool ObstaclesContainer::AdaptTracking(
   }
   return false;
 }
-
 
 bool ObstaclesContainer::IsPredictable(
     const PerceptionObstacle& perception_obstacle) {

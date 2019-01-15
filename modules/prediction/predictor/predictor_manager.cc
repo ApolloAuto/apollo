@@ -31,7 +31,6 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 PredictorManager::PredictorManager() { RegisterPredictors(); }
 
@@ -126,7 +125,7 @@ Predictor* PredictorManager::GetPredictor(
   return it != predictors_.end() ? it->second.get() : nullptr;
 }
 
-void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
+void PredictorManager::Run() {
   prediction_obstacles_.Clear();
   auto obstacles_container = ContainerManager::Instance()->GetContainer<
       ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
@@ -137,25 +136,20 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
   CHECK_NOTNULL(obstacles_container);
 
   Predictor* predictor = nullptr;
-  for (const auto& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
-    if (!perception_obstacle.has_id()) {
-      AERROR << "A perception obstacle has no id.";
-      continue;
-    }
-
-    int id = perception_obstacle.id();
+  for (int id : obstacles_container->curr_frame_obstacle_ids()) {
     if (id < 0) {
-      AERROR << "A perception obstacle has invalid id [" << id << "].";
+      ADEBUG << "The obstacle has invalid id [" << id << "].";
       continue;
     }
 
     PredictionObstacle prediction_obstacle;
-    prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    PerceptionObstacle perception_obstacle =
+        obstacles_container->GetPerceptionObstacle(id);
     // if obstacle == nullptr, that means obstacle is not predictable
     // Checkout the logic of non-predictable in obstacle.cc
     if (obstacle != nullptr) {
+      prediction_obstacle.set_timestamp(obstacle->timestamp());
       if (obstacle->ToIgnore()) {
         ADEBUG << "Ignore obstacle [" << id << "]";
         predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
@@ -165,7 +159,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
         ADEBUG << "Still obstacle [" << id << "]";
         predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
       } else {
-        switch (perception_obstacle.type()) {
+        switch (obstacle->type()) {
           case PerceptionObstacle::VEHICLE: {
             if (obstacle->HasJunctionFeatureWithExits() &&
                 !obstacle->IsCloseToJunctionExit()) {
@@ -216,7 +210,7 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
       }
       prediction_obstacle.set_timestamp(obstacle->timestamp());
       prediction_obstacle.set_is_static(obstacle->IsStill());
-    } else {
+    } else {  // obstacle == nullptr
       prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
       prediction_obstacle.set_is_static(true);
     }
@@ -229,8 +223,6 @@ void PredictorManager::Run(const PerceptionObstacles& perception_obstacles) {
     prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
         prediction_obstacle);
   }
-  prediction_obstacles_.set_perception_error_code(
-      perception_obstacles.error_code());
 }
 
 std::unique_ptr<Predictor> PredictorManager::CreatePredictor(

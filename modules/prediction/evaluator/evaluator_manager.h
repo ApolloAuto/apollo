@@ -56,9 +56,8 @@ class EvaluatorManager {
 
   /**
    * @brief Run evaluators
-   * @param Perception obstacles
    */
-  void Run(const perception::PerceptionObstacles& perception_obstacles);
+  void Run();
 
   void EvaluateObstacle(Obstacle* obstacle);
 

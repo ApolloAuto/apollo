@@ -102,6 +102,8 @@ class ObstaclesContainer : public Container {
 
   size_t NumOfObstacles() { return ptr_obstacles_.size(); }
 
+  apollo::perception::PerceptionObstacle GetPerceptionObstacle(const int id);
+
   std::vector<int> curr_frame_predictable_obstacle_ids();
 
   std::vector<int> curr_frame_non_predictable_obstacle_ids();
@@ -134,6 +136,9 @@ class ObstaclesContainer : public Container {
   std::vector<int> curr_frame_predictable_obstacle_ids_;
   std::vector<int> curr_frame_non_predictable_obstacle_ids_;
   std::unordered_map<int, int> curr_frame_id_mapping_;
+  // prediction_id -> perception_obstacle
+  std::unordered_map<int, apollo::perception::PerceptionObstacle>
+      curr_frame_id_perception_obstacle_map_;
 };
 
 }  // namespace prediction
