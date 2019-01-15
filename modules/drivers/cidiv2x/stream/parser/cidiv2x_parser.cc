@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The CiDi Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,40 @@
  * limitations under the License.
  *****************************************************************************/
 
-// An parser for decoding binary messages from a NovAtel receiver. The following
+// An parser for decoding binary messages from a CiDi OBU device. The following
 // messages must be
 // logged in order for this parser to work properly.
 //
+
+#include "modules/drivers/cidiv2x/stream/parser/cidiv2x_parser.h"
+
+#include <arpa/inet.h>
+
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <string>
 #include <vector>
 
-#include <arpa/inet.h>
 #include "cyber/cyber.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/drivers/cidiv2x/proto/cidiv2x.pb.h"
-#include "modules/drivers/cidiv2x/stream/parser/cidiv2x_parser.h"
 #include "modules/drivers/cidiv2x/stream/util/macros.h"
 
 namespace apollo {
 namespace drivers {
 namespace cidiv2x {
+
+// Anonymous namespace that contains helper constants and functions.
+namespace {
+
+constexpr size_t BUFFER_SIZE = 1024;
+
+constexpr size_t MSG_SIZE = 320;
+
+}  // namespace
 
 using ::apollo::drivers::CiDiV2X;
 
@@ -48,12 +60,12 @@ bool CidiV2xParser::Init() {
 CidiV2xParser::CidiV2xParser() { buffer_.reserve(BUFFER_SIZE); }
 
 CidiV2xParser::CidiV2xParser(const config::Config& config,
-                             const std::shared_ptr<apollo::cyber::Node> &node)
+                             const std::shared_ptr<apollo::cyber::Node>& node)
     : node_(node) {
   buffer_.reserve(BUFFER_SIZE);
 }
 
-bool CidiV2xParser::ParseRawData(const std::string &msg) {
+bool CidiV2xParser::ParseRawData(const std::string& msg) {
   ADEBUG << "Update the data.";
   Update(msg);
   ADEBUG << "Call GetMessage.";

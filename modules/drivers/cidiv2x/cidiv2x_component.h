@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The CiDi Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ namespace apollo {
 namespace drivers {
 namespace cidiv2x {
 
-
 using apollo::cyber::Component;
 using apollo::cyber::Writer;
 
@@ -56,4 +55,3 @@ CYBER_REGISTER_COMPONENT(CidiV2xDriverComponent)
 }  // namespace cidiv2x
 }  // namespace drivers
 }  // namespace apollo
-

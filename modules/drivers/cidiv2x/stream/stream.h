@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The CiDi Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ class Stream {
   static Stream *create_tcp(const char *address, uint16_t port,
                             uint32_t timeout_usec = 1000000);
 
-  static Stream *create_udp(const char *address, uint16_t port, uint16_t broad_port,
+  static Stream *create_udp(const char *address, uint16_t port,
+                            uint16_t broad_port,
                             uint32_t timeout_usec = 1000000);
 
   // Currently the following baud rates are supported:
@@ -88,7 +89,8 @@ class Stream {
   virtual size_t read(uint8_t *buffer, size_t max_length, uint8_t flag = 0) = 0;
 
   // Returns how many bytes it was successful to write.
-  virtual size_t write(const uint8_t *buffer, size_t length, uint8_t flag = 0) = 0;
+  virtual size_t write(const uint8_t *buffer, size_t length,
+                       uint8_t flag = 0) = 0;
 
   // // Reads up to max_length bytes. Returns actually number of bytes read.
   // virtual size_t broadcast_read(uint8_t *buffer, size_t max_length) = 0;
