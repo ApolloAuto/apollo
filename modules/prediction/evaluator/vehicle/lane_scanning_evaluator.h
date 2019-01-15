@@ -74,7 +74,7 @@ class LaneScanningEvaluator : public Evaluator {
   static const size_t OBSTACLE_FEATURE_SIZE = 5 * 9;
   static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
-  static const size_t LANE_POINTS_SIZE = 20;
+  static const size_t LANE_POINTS_SIZE = 100;  // (100 * 0.2m = 20m)
 };
 
 }  // namespace prediction

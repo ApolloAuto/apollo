@@ -25,8 +25,6 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 
-#define ADEBUG AINFO
-
 namespace apollo {
 namespace prediction {
 

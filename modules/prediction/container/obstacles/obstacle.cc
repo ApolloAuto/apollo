@@ -1143,11 +1143,14 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Treat the most probable lane_segment as the center, put its left
   // and right neighbors into a vector following the left-to-right order.
+  if (!feature->has_lane() || !feature->lane().has_lane_feature()) {
+    return;
+  }
   std::shared_ptr<const LaneInfo> center_lane_info =
       PredictionMap::LaneById(feature->lane().lane_feature().lane_id());
   std::vector<std::string> lane_ids_ordered;
   for (int i = center_lane_info->lane().left_neighbor_forward_lane_id().size()
-       - 1; i >= 0; i --) {
+       - 1; i >= 0; --i) {
     if (center_lane_info->lane().left_neighbor_forward_lane_id(i).has_id()) {
       lane_ids_ordered.push_back(
           center_lane_info->lane().left_neighbor_forward_lane_id(i).id());
@@ -1165,7 +1168,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_graph for every lane_segment and update it into proto.
   int seq_id = 0;
-  for (size_t i = 0; i < lane_ids_ordered.size(); i ++) {
+  for (size_t i = 0; i < lane_ids_ordered.size(); ++i) {
     // Construct the local lane_graph based on the current lane_segment.
     bool vehicle_is_on_lane = (lane_ids_ordered[i] ==
                                center_lane_info->lane().id().id());
