@@ -51,7 +51,7 @@ bool HeadingIsAtLeft(std::vector<double> heading1,
   }
   if (NormalizeAngle(heading1[idx] - heading2[idx]) > 0.0) {
     return true;
-  } else if (NormalizeAngle(heading1[idx] - heading2[idx] < 0.0)) {
+  } else if (NormalizeAngle(heading1[idx] - heading2[idx]) < 0.0) {
     return false;
   } else {
     return HeadingIsAtLeft(heading1, heading2, idx + 1);
