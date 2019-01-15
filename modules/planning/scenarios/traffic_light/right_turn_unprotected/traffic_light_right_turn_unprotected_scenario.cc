@@ -80,17 +80,17 @@ void TrafficLightRightTurnUnprotectedScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_STOP,
+      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new StageStop(config);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_CREEP,
+      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new StageCreep(config);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED_INTERSECTION_CRUISE,
+      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new StageIntersectionCruise(config);
       });
@@ -128,7 +128,7 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
 
-  auto scenario_config = config_.traffic_light_right_turn_unprotected_config();
+  auto scenario_config = config_.traffic_light_unprotected_right_turn_config();
 
   bool is_stopped_for_traffic_light = true;
   if (adc_speed > scenario_config.max_adc_stop_speed() ||
@@ -151,15 +151,12 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
               TrafficLight::RED);
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_LEFT_TURN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
       return false;
-    case ScenarioConfig::TRAFFIC_LIGHT_RIGHT_TURN_UNPROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       return (current_scenario.GetStatus() !=
               Scenario::ScenarioStatus::STATUS_DONE);
-    case ScenarioConfig::TRAFFIC_LIGHT_GO_THROUGH:
-      return false;
     default:
       break;
   }
@@ -171,12 +168,12 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
  * read scenario specific configs and set in context_ for stages to read
  */
 bool TrafficLightRightTurnUnprotectedScenario::GetScenarioConfig() {
-  if (!config_.has_traffic_light_right_turn_unprotected_config()) {
+  if (!config_.has_traffic_light_unprotected_right_turn_config()) {
     AERROR << "miss scenario specific config";
     return false;
   }
   context_.scenario_config.CopyFrom(
-      config_.traffic_light_right_turn_unprotected_config());
+      config_.traffic_light_unprotected_right_turn_config());
   return true;
 }
 
