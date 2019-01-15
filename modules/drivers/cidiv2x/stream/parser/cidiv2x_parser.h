@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The CiDi Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-// This defines enums and structures for parsing NovAtel binary messages. Please
-// refer to NovAtel's
-// documents for details about these messages.
-//  http://www.novatel.com/assets/Documents/Manuals/om-20000129.pdf
-//  http://www.novatel.com/assets/Documents/Manuals/OM-20000144UM.pdf
-
 #pragma once
 
 #include <stdint.h>
 #include <memory>
 #include <mutex>
-#include "modules/drivers/cidiv2x/stream/proto/config.pb.h"
+#include <string>
+#include <vector>
 
 #include "cyber/cyber.h"
 
 #include "modules/drivers/cidiv2x/proto/cidiv2x.pb.h"
+#include "modules/drivers/cidiv2x/stream/proto/config.pb.h"
 #include "modules/drivers/cidiv2x/stream/util/macros.h"
 
 namespace apollo {
@@ -166,14 +162,6 @@ struct SignInfo {
 static_assert(sizeof(SignInfo) == 125, "Incorrect size of SignInfo");
 
 }  // namespace v2xmsg
-// Anonymous namespace that contains helper constants and functions.
-namespace {
-
-constexpr size_t BUFFER_SIZE = 1024;
-
-constexpr size_t MSG_SIZE = 320;
-
-}  // namespace
 
 class CidiV2xParser {
  public:
@@ -189,7 +177,7 @@ class CidiV2xParser {
 
   CiDiV2X& GetData(void) { return cidiv2x_; }
 
-  bool ParseRawData(const std::string &msg);
+  bool ParseRawData(const std::string& msg);
 
   void Update(const uint8_t* data, size_t length) {
     data_ = data;
@@ -227,4 +215,3 @@ class CidiV2xParser {
 }  // namespace cidiv2x
 }  // namespace drivers
 }  // namespace apollo
-

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The CiDi Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,10 +79,8 @@ class RawStream {
   std::unique_ptr<CidiV2xParser> data_parser_ptr_;
 
   std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
-
 };
 
 }  // namespace cidiv2x
 }  // namespace drivers
 }  // namespace apollo
-
