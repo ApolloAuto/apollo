@@ -33,7 +33,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -49,7 +49,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -76,7 +76,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -92,7 +92,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",      
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -119,7 +119,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -146,7 +146,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -162,7 +162,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -189,7 +189,18 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
+    ],
+)
+
+cc_test(
+    name = "Motioncommandfeedback1_22_test",
+    size = "small",
+    srcs = ["llc_motioncommandfeedback1_22_test.cc"],
+    deps = [
+        ":llc_motioncommandfeedback1_22",
+        "@gtest//:main",
+        "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
     ],
 )
 
@@ -221,7 +232,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -248,7 +259,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -264,7 +275,7 @@ cc_library(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "//modules/drivers/canbus/common:canbus_common",  
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
