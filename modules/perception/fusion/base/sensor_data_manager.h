@@ -20,7 +20,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
+#include <algorithm>
 #include "gtest/gtest_prod.h"
 
 #include "cyber/common/macros.h"
