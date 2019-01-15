@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "modules/prediction/proto/offline_features.pb.h"
 
 namespace apollo {
@@ -54,7 +56,8 @@ class FeatureOutput {
     * @brief Insert a data_for_learning
     * @param A feature in proto
     */
-  static void InsertIntoLearningData(const Feature& feature);
+  static void InsertDataForLearning(
+      const Feature& feature, const std::vector<double>& feature_values);
 
   /**
    * @brief Write features to a file
@@ -69,7 +72,7 @@ class FeatureOutput {
 
  private:
   static Features features_;
-  static DataForLearning data_for_learning_;
+  static ListDataForLearning list_data_for_learning_;
   static std::size_t index_;
 };
 

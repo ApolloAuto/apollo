@@ -17,6 +17,7 @@
 #include "modules/prediction/common/feature_output.h"
 
 #include <string>
+#include <vector>
 
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -25,7 +26,7 @@ namespace apollo {
 namespace prediction {
 
 Features FeatureOutput::features_;
-DataForLearning FeatureOutput::data_for_learning_;
+ListDataForLearning FeatureOutput::list_data_for_learning_;
 std::size_t FeatureOutput::index_ = 0;
 
 void FeatureOutput::Close() {
@@ -37,7 +38,7 @@ void FeatureOutput::Close() {
 void FeatureOutput::Clear() {
   index_ = 0;
   features_.Clear();
-  data_for_learning_.Clear();
+  list_data_for_learning_.Clear();
 }
 
 bool FeatureOutput::Ready() {
@@ -49,9 +50,15 @@ void FeatureOutput::Insert(const Feature& feature) {
   features_.add_feature()->CopyFrom(feature);
 }
 
-void FeatureOutput::InsertIntoLearningData(const Feature& feature) {
-  data_for_learning_.set_id(feature.id());
-  data_for_learning_.set_timestamp(feature.timestamp());
+void FeatureOutput::InsertDataForLearning(
+    const Feature& feature, const std::vector<double>& feature_values) {
+  DataForLearning* data_for_learning =
+      list_data_for_learning_.add_data_for_learning();
+  data_for_learning->set_id(feature.id());
+  data_for_learning->set_timestamp(feature.timestamp());
+  for (size_t i = 0; i < feature_values.size(); ++i) {
+    data_for_learning->add_features_for_learning(feature_values[i]);
+  }
 }
 
 void FeatureOutput::Write() {
@@ -66,14 +73,14 @@ void FeatureOutput::Write() {
     ++index_;
   }
 
-  if (!data_for_learning_.has_id()) {
+  if (!list_data_for_learning_.data_for_learning_size() <= 0) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/datalearn." +
         std::to_string(index_) + ".bin";
-    common::util::SetProtoToBinaryFile(data_for_learning_, file_name);
-    data_for_learning_.Clear();
+    common::util::SetProtoToBinaryFile(list_data_for_learning_, file_name);
+    list_data_for_learning_.Clear();
   }
 }
 
