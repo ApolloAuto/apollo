@@ -250,7 +250,7 @@ void PredictionComponent::OnPerception(
   auto end_time6 = std::chrono::system_clock::now();
 
   // Make evaluations
-  EvaluatorManager::Instance()->Run(perception_msg);
+  EvaluatorManager::Instance()->Run();
   auto end_time7 = std::chrono::system_clock::now();
   diff = end_time7 - end_time6;
   ADEBUG << "Time to evaluate: "
@@ -260,7 +260,7 @@ void PredictionComponent::OnPerception(
   if (FLAGS_prediction_offline_mode) {
     return;
   }
-  PredictorManager::Instance()->Run(perception_msg);
+  PredictorManager::Instance()->Run();
   auto end_time8 = std::chrono::system_clock::now();
   diff = end_time8 - end_time7;
   ADEBUG << "Time to predict: "
@@ -277,6 +277,8 @@ void PredictionComponent::OnPerception(
       perception_msg.header().camera_timestamp());
   prediction_obstacles.mutable_header()->set_radar_timestamp(
       perception_msg.header().radar_timestamp());
+
+  prediction_obstacles.set_perception_error_code(perception_msg.error_code());
 
   if (FLAGS_prediction_test_mode) {
     for (auto const& prediction_obstacle :

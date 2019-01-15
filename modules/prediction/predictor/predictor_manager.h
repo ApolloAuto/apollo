@@ -54,10 +54,9 @@ class PredictorManager {
   Predictor* GetPredictor(const ObstacleConf::PredictorType& type);
 
   /**
-   * @brief Execute the predictor generation on perception obstacles
-   * @param Perception obstacles
+   * @brief Execute the predictor generation
    */
-  void Run(const perception::PerceptionObstacles& perception_obstacles);
+  void Run();
 
   /**
    * @brief Get prediction obstacles
