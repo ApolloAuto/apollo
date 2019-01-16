@@ -37,7 +37,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/open_space/coarse_trajectory_generator/grid_a_star.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/grid_search.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/reeds_shepp_path.h"
 
@@ -134,7 +134,7 @@ class HybridAStar {
   std::unordered_map<size_t, std::shared_ptr<Node3d>> open_set_;
   std::unordered_map<size_t, std::shared_ptr<Node3d>> close_set_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;
-  std::unique_ptr<GridAStar> grid_a_star_heuristic_generator_;
+  std::unique_ptr<GridSearch> grid_a_star_heuristic_generator_;
 };
 
 }  // namespace planning
