@@ -112,12 +112,6 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       lane_sequence_ptr->set_time_to_lane_center(finish_time);
     }
   }
-
-  // For offline training, append each proto output to the offline file.
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::Insert(*latest_feature_ptr);
-    ADEBUG << "Insert cruise feature into feature output";
-  }
 }
 
 void CruiseMLPEvaluator::ExtractFeatureValues
