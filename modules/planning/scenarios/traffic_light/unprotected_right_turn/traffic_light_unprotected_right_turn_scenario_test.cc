@@ -33,15 +33,15 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-class TrafficLightRightTurnUnprotectedScenarioTest : public ::testing::Test {
+class TrafficLightUnprotectedRightTurnScenarioTest : public ::testing::Test {
  public:
   virtual void SetUp() {}
 
  protected:
-  std::unique_ptr<TrafficLightRightTurnUnprotectedScenario> scenario_;
+  std::unique_ptr<TrafficLightUnprotectedRightTurnScenario> scenario_;
 };
 
-TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
+TEST_F(TrafficLightUnprotectedRightTurnScenarioTest, VerifyConf) {
   FLAGS_scenario_traffic_light_unprotected_right_turn_config_file =
       "/apollo/modules/planning/conf/"
       "scenario/traffic_light_unprotected_right_turn_config.pb.txt";
@@ -52,7 +52,7 @@ TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, VerifyConf) {
       &config));
 }
 
-TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, Init) {
+TEST_F(TrafficLightUnprotectedRightTurnScenarioTest, Init) {
   FLAGS_scenario_traffic_light_unprotected_right_turn_config_file =
       "/apollo/modules/planning/testdata/conf/"
       "scenario/traffic_light_unprotected_right_turn_config.pb.txt";
@@ -63,7 +63,7 @@ TEST_F(TrafficLightRightTurnUnprotectedScenarioTest, Init) {
       &config));
 
   ScenarioContext context;
-  scenario_.reset(new TrafficLightRightTurnUnprotectedScenario(config,
+  scenario_.reset(new TrafficLightUnprotectedRightTurnScenario(config,
                                                                &context));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
