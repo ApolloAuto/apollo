@@ -132,19 +132,15 @@ bool TrafficLightProtectedScenario::IsTransferable(
         << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
   }
 
-  const double forward_buffer = 5.0;
-  bool left_turn = reference_line_info.IsLeftTurnPath(forward_buffer);
-
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      return (is_stopped_for_traffic_light && !left_turn &&
-          PlanningContext::GetScenarioInfo()->traffic_light_color ==
-              TrafficLight::GREEN);
+      return (is_stopped_for_traffic_light && IsProtected(reference_line_info));
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      return false;
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
       return (current_scenario.GetStatus() !=
               Scenario::ScenarioStatus::STATUS_DONE);
@@ -168,6 +164,30 @@ bool TrafficLightProtectedScenario::GetScenarioConfig() {
   }
   context_.scenario_config.CopyFrom(
       config_.traffic_light_protected_config());
+  return true;
+}
+
+bool TrafficLightProtectedScenario::IsProtected(
+    const ReferenceLineInfo& reference_line_info) const {
+  const double forward_buffer = 5.0;
+  bool left_turn = reference_line_info.IsLeftTurnPath(forward_buffer);
+  if (left_turn) {
+    // TODO(all): add arrow-left check
+    return false;
+  }
+
+  bool right_turn = reference_line_info.IsRightTurnPath(forward_buffer);
+  if (right_turn) {
+    return (PlanningContext::GetScenarioInfo()->traffic_light_color ==
+        TrafficLight::GREEN);
+  }
+
+  bool u_turn = reference_line_info.IsUTurnPath(forward_buffer);
+  if (u_turn) {
+    // TODO(all): add arrow-u-turn check
+    return false;
+  }
+
   return true;
 }
 
