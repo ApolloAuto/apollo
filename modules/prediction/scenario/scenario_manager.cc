@@ -83,7 +83,7 @@ void ScenarioManager::PrioritizeObstacles(
                   pose_theta, FLAGS_scan_length, FLAGS_scan_width);
 
   const auto& obstacle_ids =
-      obstacles_container->GetCurrentFramePredictableObstacleIds();
+      obstacles_container->curr_frame_predictable_obstacle_ids();
 
   for (const int& obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
@@ -133,7 +133,7 @@ void ScenarioManager::PrioritizeObstaclesForCruiseScenario(
     const std::shared_ptr<CruiseScenarioFeatures> cruise_scenario_features,
     ObstaclesContainer* ptr_obstacle_contrainer) {
   const auto& obstacle_ids =
-      ptr_obstacle_contrainer->GetCurrentFramePredictableObstacleIds();
+      ptr_obstacle_contrainer->curr_frame_predictable_obstacle_ids();
 
   for (const int& obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = ptr_obstacle_contrainer->GetObstacle(obstacle_id);
