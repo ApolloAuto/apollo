@@ -147,7 +147,7 @@ bool PredictionComponent::Init() {
     common::util::Split(FLAGS_prediction_offline_bags, ':', &inputs);
     for (const auto& input : inputs) {
       std::vector<std::string> offline_bags;
-      GetDataFileNames(boost::filesystem::path(input), &offline_bags);
+      GetRecordFileNames(boost::filesystem::path(input), &offline_bags);
       std::sort(offline_bags.begin(), offline_bags.end());
       AINFO << "For input " << input << ", found " << offline_bags.size()
             << "  rosbags to process";
