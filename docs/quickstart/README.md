@@ -3,7 +3,7 @@
 ## Apollo 3.5
 
 - [Apollo 3.5 quick start](apollo_master_quick_start.md)
-- [Apollo 3.5 hardware system installation guide](apollo_master_hardware_system_installation_guide.md)
+- [Apollo 3.5 hardware system installation guide](apollo_3_5_hardware_system_installation_guide.md)
 
 ## Apollo 3.0
 
