@@ -1,7 +1,0 @@
-<cyber>
-    <module>
-        <name>cidiv2x</name>
-        <dag_conf>/apollo/modules/drivers/cidiv2x/dag/cidiv2x.dag</dag_conf>
-        <process_name>cidiv2x</process_name>
-    </module>
-</cyber>
