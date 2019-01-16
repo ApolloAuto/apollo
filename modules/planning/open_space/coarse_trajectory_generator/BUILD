@@ -33,12 +33,12 @@ cc_library(
 )
 
 cc_library(
-    name = "grid_a_star",
+    name = "grid_search",
     srcs = [
-        "grid_a_star.cc",
+        "grid_search.cc",
     ],
     hdrs = [
-        "grid_a_star.h",
+        "grid_search.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -54,7 +54,7 @@ cc_library(
     deps = [
         "//modules/planning/open_space/coarse_trajectory_generator:node3d",
         "//modules/planning/open_space/coarse_trajectory_generator:reeds_shepp_path",
-        "//modules/planning/open_space/coarse_trajectory_generator:grid_a_star",
+        "//modules/planning/open_space/coarse_trajectory_generator:grid_search",
 
     ],
 )

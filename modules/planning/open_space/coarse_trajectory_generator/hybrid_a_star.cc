@@ -30,7 +30,7 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   reed_shepp_generator_ =
       std::make_unique<ReedShepp>(vehicle_param_, planner_open_space_config_);
   grid_a_star_heuristic_generator_ =
-      std::make_unique<GridAStar>(planner_open_space_config_);
+      std::make_unique<GridSearch>(planner_open_space_config_);
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
   max_steer_angle_ =
@@ -210,7 +210,7 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
 
 bool HybridAStar::HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node,
                                         double* optimal_path_cost) {
-  if (!grid_a_star_heuristic_generator_->Plan(
+  if (!grid_a_star_heuristic_generator_->GenerateAStarPath(
           next_node->GetX(), next_node->GetY(), end_node_->GetX(),
           end_node_->GetY(), XYbounds_, obstacles_linesegments_vec_,
           optimal_path_cost)) {
@@ -345,7 +345,7 @@ bool HybridAStar::Plan(
     AERROR << "end_node in collision with obstacles";
     return false;
   }
-  // load open set, priority queue and ReedSheepPath_cache
+  // load open set, pq
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
       std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
@@ -360,9 +360,6 @@ bool HybridAStar::Plan(
     size_t current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
-    // AINFO << "hueristic cost is " << current_node->GetHeuCost();
-    // AINFO << "traj cost is " << current_node->GetTrajCost();
-    // AINFO << "cost is " << current_node->GetCost();
     // check if a analystic curve could be connected from current configuration
     // to the end configuration without collision. if so, search ends.
     if (AnalyticExpansion(current_node)) {
