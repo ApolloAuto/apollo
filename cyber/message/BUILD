@@ -13,12 +13,32 @@ cc_library(
 )
 
 cc_library(
+    name = "message_header",
+    hdrs = [
+        "message_header.h",
+    ],
+)
+
+cc_test(
+    name = "message_header_test",
+    size = "small",
+    srcs = [
+        "message_header_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
     name = "message_traits",
     hdrs = [
         "message_traits.h",
     ],
     deps = [
         "intra_message",
+        "message_header",
         "protobuf_traits",
         "py_message_traits",
         "raw_message_traits",
