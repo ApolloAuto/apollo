@@ -146,6 +146,7 @@ class ReferenceLineInfo {
 
   bool IsLeftTurnPath(const double forward_buffer) const;
   bool IsRightTurnPath(const double forward_buffer) const;
+  bool IsUTurnPath(const double forward_buffer) const;
 
   double OffsetToOtherReferenceLine() const {
     return offset_to_other_reference_line_;
@@ -208,6 +209,10 @@ class ReferenceLineInfo {
   bool GetFirstOverlap(const std::vector<hdmap::PathOverlap>& path_overlaps,
                        hdmap::PathOverlap* path_overlap);
 
+  bool CheckPathTurnType(const double forward_buffer,
+                         const hdmap::Lane::LaneTurn& lane_turn) const;
+
+ private:
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
   ReferenceLine reference_line_;
