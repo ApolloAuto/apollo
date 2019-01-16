@@ -159,5 +159,3 @@ DEFINE_string(heading_topic, "/apollo/sensor/gnss/heading",
 DEFINE_string(rtcm_data_topic, "/apollo/sensor/gnss/rtcm_data",
               "gnss rtcm data topic name");
 DEFINE_string(data_topic, "/apollo/data", "Data topic.");
-
-DEFINE_string(cidiv2x_topic, "/apollo/sensor/cidiv2x", "cidiv2x topic.");
