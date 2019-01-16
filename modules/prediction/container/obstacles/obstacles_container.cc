@@ -96,14 +96,10 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
   // 3. Sort the Obstacles
   ObstacleClusters::SortObstacles();
+
   // 4. Deduct the NearbyObstacles info. from the sorted Obstacles
-  for (const PerceptionObstacle& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
-    if (IsPredictable(perception_obstacle)) {
-      continue;
-    }
-    // TODO(kechxu) use prediction id
-    Obstacle* obstacle_ptr = GetObstacle(perception_obstacle.id());
+  for (const int id : curr_frame_predictable_obstacle_ids_) {
+    Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       continue;
     }
@@ -111,8 +107,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 }
 
-Obstacle* ObstaclesContainer::GetObstacle(const int perception_id) {
-  auto ptr_obstacle = ptr_obstacles_.GetSilently(perception_id);
+Obstacle* ObstaclesContainer::GetObstacle(const int id) {
+  auto ptr_obstacle = ptr_obstacles_.GetSilently(id);
   if (ptr_obstacle != nullptr) {
     return ptr_obstacle->get();
   }
@@ -127,28 +123,26 @@ Obstacle* ObstaclesContainer::GetObstacleWithLRUUpdate(const int obstacle_id) {
   return nullptr;
 }
 
-const std::vector<int>&
-ObstaclesContainer::GetCurrentFramePredictableObstacleIds() const {
-  return curr_frame_predictable_obstacle_ids_;
-}
-
 void ObstaclesContainer::Clear() {
   ptr_obstacles_.Clear();
   id_mapping_.Clear();
   timestamp_ = -1.0;
 }
 
-PerceptionObstacle ObstaclesContainer::GetPerceptionObstacle(const int id) {
+const PerceptionObstacle& ObstaclesContainer::GetPerceptionObstacle(
+    const int id) {
   CHECK(curr_frame_id_perception_obstacle_map_.find(id) !=
         curr_frame_id_perception_obstacle_map_.end());
   return curr_frame_id_perception_obstacle_map_[id];
 }
 
-std::vector<int> ObstaclesContainer::curr_frame_predictable_obstacle_ids() {
+const std::vector<int>&
+ObstaclesContainer::curr_frame_predictable_obstacle_ids() {
   return curr_frame_predictable_obstacle_ids_;
 }
 
-std::vector<int> ObstaclesContainer::curr_frame_non_predictable_obstacle_ids() {
+const std::vector<int>&
+ObstaclesContainer::curr_frame_non_predictable_obstacle_ids() {
   return curr_frame_non_predictable_obstacle_ids_;
 }
 
@@ -163,43 +157,41 @@ std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
   // Sanity checks.
-  int prediction_id = perception_obstacle.id();
-  if (curr_frame_id_mapping_.find(prediction_id) !=
-      curr_frame_id_mapping_.end()) {
-    prediction_id = curr_frame_id_mapping_[prediction_id];
-    if (prediction_id != perception_obstacle.id()) {
-      ADEBUG << "Obstacle have got AdaptTracking, with perception_id: "
-             << perception_obstacle.id()
-             << ", and prediction_id: " << prediction_id;
-    }
+  int id = PerceptionIdToPredictionId(perception_obstacle.id());
+  if (id != perception_obstacle.id()) {
+    ADEBUG << "Obstacle have got AdaptTracking, with perception id: "
+           << perception_obstacle.id() << ", and prediction id: " << id;
   }
-  curr_frame_id_perception_obstacle_map_[prediction_id] = perception_obstacle;
-  if (prediction_id < -1) {
-    AERROR << "Invalid ID [" << prediction_id << "]";
+  curr_frame_id_perception_obstacle_map_[id] = perception_obstacle;
+  if (id < -1) {
+    AERROR << "Invalid ID [" << id << "]";
     return;
   }
   if (!IsPredictable(perception_obstacle)) {
-    ADEBUG << "Perception obstacle [" << prediction_id
+    ADEBUG << "Perception obstacle [" << perception_obstacle.id()
            << "] is not predictable.";
-    curr_frame_non_predictable_obstacle_ids_.push_back(prediction_id);
+    curr_frame_non_predictable_obstacle_ids_.push_back(id);
     return;
   }
 
   // Insert the obstacle and also update the LRUCache.
-  curr_frame_predictable_obstacle_ids_.push_back(prediction_id);
-  auto obstacle_ptr = GetObstacleWithLRUUpdate(prediction_id);
+  auto obstacle_ptr = GetObstacleWithLRUUpdate(id);
   if (obstacle_ptr != nullptr) {
-    obstacle_ptr->Insert(perception_obstacle, timestamp, prediction_id);
-    ADEBUG << "Refresh obstacle [" << prediction_id << "]";
+    obstacle_ptr->Insert(perception_obstacle, timestamp, id);
+    ADEBUG << "Refresh obstacle [" << id << "]";
   } else {
     auto ptr_obstacle = Obstacle::Create(
-        perception_obstacle, timestamp, prediction_id);
+        perception_obstacle, timestamp, id);
     if (ptr_obstacle == nullptr) {
       AERROR << "Failed to insert obstacle into container";
       return;
     }
-    ptr_obstacles_.Put(prediction_id, std::move(ptr_obstacle));
-    ADEBUG << "Insert obstacle [" << prediction_id << "]";
+    ptr_obstacles_.Put(id, std::move(ptr_obstacle));
+    ADEBUG << "Insert obstacle [" << id << "]";
+  }
+
+  if (id != -1) {
+    curr_frame_predictable_obstacle_ids_.push_back(id);
   }
 }
 
@@ -283,6 +275,14 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
       }
     }
   }
+}
+
+int ObstaclesContainer::PerceptionIdToPredictionId(const int perception_id) {
+  if (curr_frame_id_mapping_.find(perception_id) ==
+      curr_frame_id_mapping_.end()) {
+    return perception_id;
+  }
+  return curr_frame_id_mapping_[perception_id];
 }
 
 void ObstaclesContainer::BuildLaneGraph() {

@@ -90,24 +90,31 @@ class ObstaclesContainer : public Container {
   Obstacle* GetObstacle(const int id);
 
   /**
-   * @brief Get predictable obstacle IDs in the current frame
-   * @return Predictable obstacle IDs in the current frame
-   */
-  const std::vector<int>& GetCurrentFramePredictableObstacleIds() const;
-
-  /**
    * @brief Clear obstacle container
    */
   void Clear();
 
   size_t NumOfObstacles() { return ptr_obstacles_.size(); }
 
-  apollo::perception::PerceptionObstacle GetPerceptionObstacle(const int id);
+  const apollo::perception::PerceptionObstacle&
+  GetPerceptionObstacle(const int id);
 
-  std::vector<int> curr_frame_predictable_obstacle_ids();
+  /**
+   * @brief Get predictable obstacle IDs in the current frame
+   * @return Predictable obstacle IDs in the current frame
+   */
+  const std::vector<int>& curr_frame_predictable_obstacle_ids();
 
-  std::vector<int> curr_frame_non_predictable_obstacle_ids();
+  /**
+   * @brief Get non-predictable obstacle IDs in the current frame
+   * @return Non-predictable obstacle IDs in the current frame
+   */
+  const std::vector<int>& curr_frame_non_predictable_obstacle_ids();
 
+  /**
+   * @brief Get current frame obstacle IDs in the current frame
+   * @return Current frame obstacle IDs in the current frame
+   */
   std::vector<int> curr_frame_obstacle_ids();
 
  private:
@@ -128,6 +135,8 @@ class ObstaclesContainer : public Container {
    */
   bool IsPredictable(const perception::PerceptionObstacle& perception_obstacle);
 
+  int PerceptionIdToPredictionId(const int perception_id);
+
  private:
   double timestamp_ = -1.0;
   common::util::LRUCache<int, std::unique_ptr<Obstacle>> ptr_obstacles_;
@@ -135,6 +144,7 @@ class ObstaclesContainer : public Container {
   common::util::LRUCache<int, int> id_mapping_;
   std::vector<int> curr_frame_predictable_obstacle_ids_;
   std::vector<int> curr_frame_non_predictable_obstacle_ids_;
+  // perception_id -> prediction_id
   std::unordered_map<int, int> curr_frame_id_mapping_;
   // prediction_id -> perception_obstacle
   std::unordered_map<int, apollo::perception::PerceptionObstacle>
