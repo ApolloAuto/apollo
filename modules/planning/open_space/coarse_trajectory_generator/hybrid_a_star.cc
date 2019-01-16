@@ -102,7 +102,7 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
     }
   }
   return true;
-}  // namespace planning
+}
 
 std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
@@ -210,13 +210,8 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
 
 bool HybridAStar::HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node,
                                         double* optimal_path_cost) {
-  if (!grid_a_star_heuristic_generator_->GenerateAStarPath(
-          next_node->GetX(), next_node->GetY(), end_node_->GetX(),
-          end_node_->GetY(), XYbounds_, obstacles_linesegments_vec_,
-          optimal_path_cost)) {
-    AERROR << "grid_a_star_heuristic failed";
-    return false;
-  }
+  *optimal_path_cost = grid_a_star_heuristic_generator_->CheckDpMap(
+      next_node->GetX(), next_node->GetY());
   return true;
 }
 
@@ -345,6 +340,10 @@ bool HybridAStar::Plan(
     AERROR << "end_node in collision with obstacles";
     return false;
   }
+  double map_time = Clock::NowInSeconds();
+  grid_a_star_heuristic_generator_->GenerateDpMap(ex, ey, XYbounds_,
+                                                  obstacles_linesegments_vec_);
+  AINFO << "map time " << Clock::NowInSeconds() - map_time;
   // load open set, pq
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
@@ -353,6 +352,7 @@ bool HybridAStar::Plan(
   // Hybrid A* begins
   size_t explored_node_num = 0;
   double heuristic_time = 0.0;
+  double rs_time = 0.0;
   double start_time = 0.0;
   double end_time = 0.0;
   while (!open_pq_.empty()) {
@@ -362,9 +362,12 @@ bool HybridAStar::Plan(
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
     // check if a analystic curve could be connected from current configuration
     // to the end configuration without collision. if so, search ends.
+    start_time = Clock::NowInSeconds();
     if (AnalyticExpansion(current_node)) {
       break;
     }
+    end_time = Clock::NowInSeconds();
+    rs_time += end_time - start_time;
     close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
     for (size_t i = 0; i < next_node_num_; ++i) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
@@ -406,6 +409,7 @@ bool HybridAStar::Plan(
   }
   AINFO << "explored node num is " << explored_node_num;
   AINFO << "heuristic time is " << heuristic_time;
+  AINFO << "rs time is "<< rs_time;
   return true;
 }
 }  // namespace planning

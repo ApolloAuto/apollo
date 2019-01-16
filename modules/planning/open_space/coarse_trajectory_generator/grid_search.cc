@@ -37,6 +37,12 @@ bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
   if (obstacles_linesegments_vec_.size() == 0) {
     return true;
   }
+  double node_grid_x = node->GetGridX();
+  double node_grid_y = node->GetGridY();
+  if (node_grid_x > max_grid_x_ || node_grid_x < 0 ||
+      node_grid_y > max_grid_y_ || node_grid_y < 0) {
+    return false;
+  }
   for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
     for (const common::math::LineSegment2d& linesegment :
          obstacle_linesegments) {
@@ -97,7 +103,7 @@ bool GridSearch::GenerateAStarPath(
     const std::vector<double>& XYbounds,
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec,
-    double* optimal_path_cost) {
+    GridAStartResult* result) {
   std::priority_queue<std::pair<double, double>,
                       std::vector<std::pair<double, double>>, cmp>
       open_pq;
@@ -151,7 +157,7 @@ bool GridSearch::GenerateAStarPath(
     AERROR << "Grid A searching return null ptr(open_set ran out)";
     return false;
   }
-  *optimal_path_cost = final_node_->GetPathCost() * xy_grid_resolution_;
+  LoadGridAStarResult(result);
   ADEBUG << "explored node num is " << explored_node_num;
   return true;
 }
@@ -166,6 +172,9 @@ bool GridSearch::GenerateDpMap(
   std::unordered_map<double, std::shared_ptr<Node2d>> open_set;
   dp_map_ = decltype(dp_map_)();
   XYbounds_ = XYbounds;
+  // XYbounds with xmin, xmax, ymin, ymax
+  max_grid_y_ = std::round((XYbounds_[3] - XYbounds_[2]) / xy_grid_resolution_);
+  max_grid_x_ = std::round((XYbounds_[1] - XYbounds_[0]) / xy_grid_resolution_);
   std::shared_ptr<Node2d> end_node =
       std::make_shared<Node2d>(ex, ey, xy_grid_resolution_, XYbounds_);
   obstacles_linesegments_vec_ = obstacles_linesegments_vec;
@@ -208,8 +217,29 @@ bool GridSearch::GenerateDpMap(
 
 double GridSearch::CheckDpMap(const double& sx, const double& sy) {
   double index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
-  return dp_map_[index]->GetCost();
+  if (dp_map_.find(index) != dp_map_.end()) {
+    return dp_map_[index]->GetCost() * xy_grid_resolution_;
+  } else {
+    return std::numeric_limits<double>::infinity();
+  }
 }
 
+void GridSearch::LoadGridAStarResult(GridAStartResult* result) {
+  (*result).path_cost = final_node_->GetPathCost() * xy_grid_resolution_;
+  std::shared_ptr<Node2d> current_node = final_node_;
+  std::vector<double> grid_a_x;
+  std::vector<double> grid_a_y;
+  while (current_node->GetPreNode() != nullptr) {
+    grid_a_x.push_back(current_node->GetGridX() * xy_grid_resolution_ +
+                       XYbounds_[0]);
+    grid_a_y.push_back(current_node->GetGridY() * xy_grid_resolution_ +
+                       XYbounds_[2]);
+    current_node = current_node->GetPreNode();
+  }
+  std::reverse(grid_a_x.begin(), grid_a_x.end());
+  std::reverse(grid_a_y.begin(), grid_a_y.end());
+  (*result).x = std::move(grid_a_x);
+  (*result).y = std::move(grid_a_y);
+}
 }  // namespace planning
 }  // namespace apollo

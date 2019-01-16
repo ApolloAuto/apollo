@@ -25,6 +25,8 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <algorithm>
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
@@ -48,18 +50,21 @@ class Node2d {
     grid_y_ = grid_y;
     index_ = grid_x_ * (XYbounds[3] - XYbounds[2]) + grid_y_;
   }
-  void SetPathCost(const double& path_cost) { path_cost_ = path_cost; }
-  void SetHeuristic(const double& heuristic) { heuristic_ = heuristic; }
+  void SetPathCost(const double& path_cost) {
+    path_cost_ = path_cost;
+    cost_ = path_cost_ + heuristic_;
+  }
+  void SetHeuristic(const double& heuristic) {
+    heuristic_ = heuristic;
+    cost_ = path_cost_ + heuristic_;
+  }
   void SetCost(const double& cost) { cost_ = cost; }
   void SetPreNode(std::shared_ptr<Node2d> pre_node) { pre_node_ = pre_node; }
   double GetGridX() const { return grid_x_; }
   double GetGridY() const { return grid_y_; }
   double GetPathCost() const { return path_cost_; }
   double GetHeuCost() const { return heuristic_; }
-  double GetCost() {
-    cost_ = path_cost_ + heuristic_;
-    return cost_;
-  }
+  double GetCost() { return cost_; }
   double GetIndex() const { return index_; }
   std::shared_ptr<Node2d> GetPreNode() { return pre_node_; }
   static double CalcIndex(const double& x, const double& y,
@@ -80,8 +85,14 @@ class Node2d {
   double path_cost_ = 0.0;
   double heuristic_ = 0.0;
   double cost_ = 0.0;
-  double index_ = 0;
+  double index_ = 0.0;
   std::shared_ptr<Node2d> pre_node_ = nullptr;
+};
+
+struct GridAStartResult {
+  std::vector<double> x;
+  std::vector<double> y;
+  double path_cost = 0.0;
 };
 
 class GridSearch {
@@ -93,7 +104,7 @@ class GridSearch {
       const std::vector<double>& XYbounds,
       const std::vector<std::vector<common::math::LineSegment2d>>&
           obstacles_linesegments_vec,
-      double* optimal_path_cost);
+      GridAStartResult* result);
   bool GenerateDpMap(
       const double& ex, const double& ey, const std::vector<double>& XYbounds,
       const std::vector<std::vector<common::math::LineSegment2d>>&
@@ -106,11 +117,14 @@ class GridSearch {
   std::vector<std::shared_ptr<Node2d>> GenerateNextNodes(
       std::shared_ptr<Node2d> node);
   bool CheckConstraints(std::shared_ptr<Node2d> node);
+  void LoadGridAStarResult(GridAStartResult* result);
 
  private:
   double xy_grid_resolution_ = 0.0;
   double node_radius_ = 0.0;
   std::vector<double> XYbounds_;
+  double max_grid_x_ = 0.0;
+  double max_grid_y_ = 0.0;
   std::shared_ptr<Node2d> start_node_;
   std::shared_ptr<Node2d> end_node_;
   std::shared_ptr<Node2d> final_node_;
