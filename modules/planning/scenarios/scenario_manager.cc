@@ -68,7 +68,7 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       ptr.reset(
-          new scenario::traffic_light::TrafficLightRightTurnUnprotectedScenario(
+          new scenario::traffic_light::TrafficLightUnprotectedRightTurnScenario(
               config_map_[scenario_type], &scenario_context_));
       break;
     default:
