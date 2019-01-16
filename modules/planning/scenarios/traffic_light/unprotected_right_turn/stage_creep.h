@@ -30,7 +30,7 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-struct TrafficLightRightTurnUnprotectedContext;
+struct TrafficLightUnprotectedRightTurnContext;
 
 class StageCreep : public Stage {
  public:
@@ -41,8 +41,8 @@ class StageCreep : public Stage {
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
 
-  TrafficLightRightTurnUnprotectedContext* GetContext() {
-    return Stage::GetContextAs<TrafficLightRightTurnUnprotectedContext>();
+  TrafficLightUnprotectedRightTurnContext* GetContext() {
+    return Stage::GetContextAs<TrafficLightUnprotectedRightTurnContext>();
   }
 
  private:

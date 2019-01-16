@@ -41,7 +41,7 @@ namespace traffic_light {
 using hdmap::HDMapUtil;
 using perception::TrafficLight;
 
-void TrafficLightRightTurnUnprotectedScenario::Init() {
+void TrafficLightUnprotectedRightTurnScenario::Init() {
   if (init_) {
     return;
   }
@@ -73,9 +73,9 @@ void TrafficLightRightTurnUnprotectedScenario::Init() {
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-    TrafficLightRightTurnUnprotectedScenario::s_stage_factory_;
+    TrafficLightUnprotectedRightTurnScenario::s_stage_factory_;
 
-void TrafficLightRightTurnUnprotectedScenario::RegisterStages() {
+void TrafficLightUnprotectedRightTurnScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
@@ -96,7 +96,7 @@ void TrafficLightRightTurnUnprotectedScenario::RegisterStages() {
       });
 }
 
-std::unique_ptr<Stage> TrafficLightRightTurnUnprotectedScenario::CreateStage(
+std::unique_ptr<Stage> TrafficLightUnprotectedRightTurnScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
@@ -109,7 +109,7 @@ std::unique_ptr<Stage> TrafficLightRightTurnUnprotectedScenario::CreateStage(
   return ptr;
 }
 
-bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
+bool TrafficLightUnprotectedRightTurnScenario::IsTransferable(
     const Scenario& current_scenario,
     const common::TrajectoryPoint& ego_point,
     const Frame& frame) {
@@ -167,7 +167,7 @@ bool TrafficLightRightTurnUnprotectedScenario::IsTransferable(
 /*
  * read scenario specific configs and set in context_ for stages to read
  */
-bool TrafficLightRightTurnUnprotectedScenario::GetScenarioConfig() {
+bool TrafficLightUnprotectedRightTurnScenario::GetScenarioConfig() {
   if (!config_.has_traffic_light_unprotected_right_turn_config()) {
     AERROR << "miss scenario specific config";
     return false;
