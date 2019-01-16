@@ -39,7 +39,6 @@ ObstaclesContainer::ObstaclesContainer()
 // detected obstacles.
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   // Clean up the history and get the PerceptionObstacles
-  curr_frame_predictable_obstacle_ids_.clear();
   curr_frame_id_mapping_.clear();
   curr_frame_predictable_obstacle_ids_.clear();
   curr_frame_non_predictable_obstacle_ids_.clear();
@@ -182,8 +181,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   if (!IsPredictable(perception_obstacle)) {
     ADEBUG << "Perception obstacle [" << prediction_id
            << "] is not predictable.";
-    curr_frame_non_predictable_obstacle_ids_.push_back(
-        perception_obstacle.id());
+    curr_frame_non_predictable_obstacle_ids_.push_back(prediction_id);
     return;
   }
 
