@@ -537,7 +537,20 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
 }
 
 bool ReferenceLineInfo::IsLeftTurnPath(const double forward_buffer) const {
-  // TODO(all): to combine with IsRightTurnPath()
+  return CheckPathTurnType(forward_buffer, hdmap::Lane::LEFT_TURN);
+}
+
+bool ReferenceLineInfo::IsRightTurnPath(const double forward_buffer) const {
+  return CheckPathTurnType(forward_buffer, hdmap::Lane::RIGHT_TURN);
+}
+
+bool ReferenceLineInfo::IsUTurnPath(const double forward_buffer) const {
+  return CheckPathTurnType(forward_buffer, hdmap::Lane::U_TURN);
+}
+
+bool ReferenceLineInfo::CheckPathTurnType(
+    const double forward_buffer,
+    const hdmap::Lane::LaneTurn& lane_turn) const {
   double route_s = 0.0;
   const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   for (const auto& seg : Lanes()) {
@@ -549,31 +562,13 @@ bool ReferenceLineInfo::IsLeftTurnPath(const double forward_buffer) const {
       continue;
     }
     const auto& turn = seg.lane->lane().turn();
-    if (turn == hdmap::Lane::LEFT_TURN) {
+    if (turn == lane_turn) {
       return true;
     }
   }
   return false;
 }
 
-bool ReferenceLineInfo::IsRightTurnPath(const double forward_buffer) const {
-  double route_s = 0.0;
-  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
-  for (const auto& seg : Lanes()) {
-    if (route_s > adc_s + forward_buffer) {
-      break;
-    }
-    route_s += seg.end_s - seg.start_s;
-    if (route_s < adc_s) {
-      continue;
-    }
-    const auto& turn = seg.lane->lane().turn();
-    if (turn == hdmap::Lane::RIGHT_TURN) {
-      return true;
-    }
-  }
-  return false;
-}
 
 bool ReferenceLineInfo::ReachedDestination() const {
   constexpr double kDestinationDeltaS = 0.05;
