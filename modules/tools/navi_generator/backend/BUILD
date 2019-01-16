@@ -16,6 +16,7 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/util:util",
         "//modules/tools/navi_generator/backend/hmi:topics_updater",
+        "//modules/tools/navi_generator/backend/database:db_operator",
         "//modules/tools/navi_generator/backend/webserver:navi_generator_websocket",
         "@civetweb//:civetweb++",
     ],

@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
 
@@ -35,6 +36,8 @@ using apollo::common::PointENU;
 using apollo::common::Quaternion;
 using apollo::common::Status;
 using apollo::common::math::EulerAnglesZXYd;
+using apollo::common::math::HeadingToQuaternion;
+using apollo::common::math::NormalizeAngle;
 using apollo::common::math::QuaternionRotate;
 using apollo::common::math::QuaternionToHeading;
 
@@ -101,15 +104,20 @@ PredictorOutput::PredictorOutput(
     : Predictor(memory_cycle_sec), publish_loc_func_(publish_loc_func) {
   name_ = kPredictorOutputName;
   dep_predicteds_.emplace(kPredictorGpsName, PoseList(memory_cycle_sec));
-  dep_predicteds_.emplace(kPredictorImuName, PoseList(memory_cycle_sec));
+  dep_predicteds_.emplace(kPredictorFilteredImuName,
+                          PoseList(memory_cycle_sec));
   dep_predicteds_.emplace(kPredictorPerceptionName, PoseList(memory_cycle_sec));
   on_adapter_thread_ = true;
+
+  constexpr double kTs = 0.01;
+  constexpr double kCutoffFreq = 10.0;
+  InitializeFilter(kTs, kCutoffFreq);
 }
 
 PredictorOutput::~PredictorOutput() {}
 
 bool PredictorOutput::Updateable() const {
-  const auto& imu = dep_predicteds_.find(kPredictorImuName)->second;
+  const auto& imu = dep_predicteds_.find(kPredictorFilteredImuName)->second;
   if (predicted_.empty()) {
     const auto& gps = dep_predicteds_.find(kPredictorGpsName)->second;
     return !gps.empty() && !imu.empty();
@@ -131,7 +139,7 @@ Status PredictorOutput::Update() {
           pose.orientation().qy(), pose.orientation().qz()));
     }
 
-    const auto& imu = dep_predicteds_[kPredictorImuName];
+    const auto& imu = dep_predicteds_[kPredictorFilteredImuName];
     Pose imu_pose;
     imu.FindNearestPose(timestamp_sec, &imu_pose);
 
@@ -145,7 +153,7 @@ Status PredictorOutput::Update() {
     return publish_loc_func_(timestamp_sec, pose);
   } else {
     // get timestamp from imu
-    const auto& imu = dep_predicteds_[kPredictorImuName];
+    const auto& imu = dep_predicteds_[kPredictorFilteredImuName];
     auto timestamp_sec = imu.Latest()->first;
 
     // base pose for prediction
@@ -193,7 +201,7 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
     return false;
   }
 
-  const auto& imu = dep_predicteds_[kPredictorImuName];
+  const auto& imu = dep_predicteds_[kPredictorFilteredImuName];
   auto p = imu.RangeOf(old_timestamp_sec);
   auto it = p.first;
   auto it_1 = p.second;
@@ -266,26 +274,66 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
     angular_vel.set_x((angular_velocity.x() + angular_velocity_1.x()) / 2.0);
     angular_vel.set_y((angular_velocity.y() + angular_velocity_1.y()) / 2.0);
     angular_vel.set_z((angular_velocity.z() + angular_velocity_1.z()) / 2.0);
-    EulerAnglesZXYd euler_a(orientation.qw(), orientation.qx(),
-                            orientation.qy(), orientation.qz());
-    auto derivation_roll =
-        angular_vel.x() +
-        std::sin(euler_a.roll()) * std::tan(euler_a.pitch()) * angular_vel.y() +
-        std::cos(euler_a.roll()) * std::tan(euler_a.pitch()) * angular_vel.z();
-    auto derivation_pitch = std::cos(euler_a.roll()) * angular_vel.y() -
-                            std::sin(euler_a.roll()) * angular_vel.z();
-    auto derivation_yaw =
-        std::sin(euler_a.roll()) / std::cos(euler_a.pitch()) * angular_vel.y() +
-        std::cos(euler_a.roll()) / std::cos(euler_a.pitch()) * angular_vel.z();
-    EulerAnglesZXYd euler_b(euler_a.roll() + derivation_roll * dt,
-                            euler_a.pitch() + derivation_pitch * dt,
-                            euler_a.yaw() + derivation_yaw * dt);
-    auto q = euler_b.ToQuaternion();
+
+    EulerAnglesZXYd euler_c;
+    if (FLAGS_enable_gps_heading) {
+      const auto& gps = dep_predicteds_[kPredictorGpsName];
+      auto gps_latest = gps.Latest();
+      auto gps_pose = gps_latest->second;
+
+      if (!gps_pose.has_orientation()) {
+        gps_pose.CopyFrom(old_pose);
+      }
+      EulerAnglesZXYd euler_b(
+          gps_pose.orientation().qw(), gps_pose.orientation().qx(),
+          gps_pose.orientation().qy(), gps_pose.orientation().qz());
+      euler_c = euler_b;
+
+    } else {
+      EulerAnglesZXYd euler_a(orientation.qw(), orientation.qx(),
+                              orientation.qy(), orientation.qz());
+
+      auto derivation_roll = angular_vel.x() +
+                             std::sin(euler_a.roll()) *
+                                 std::tan(euler_a.pitch()) * angular_vel.y() +
+                             std::cos(euler_a.roll()) *
+                                 std::tan(euler_a.pitch()) * angular_vel.z();
+
+      auto derivation_pitch = std::cos(euler_a.roll()) * angular_vel.y() -
+                              std::sin(euler_a.roll()) * angular_vel.z();
+
+      auto derivation_yaw = std::sin(euler_a.roll()) /
+                                std::cos(euler_a.pitch()) * angular_vel.y() +
+                            std::cos(euler_a.roll()) /
+                                std::cos(euler_a.pitch()) * angular_vel.z();
+
+      EulerAnglesZXYd euler_b(euler_a.roll() + derivation_roll * dt,
+                              euler_a.pitch() + derivation_pitch * dt,
+                              euler_a.yaw() + derivation_yaw * dt);
+
+      euler_c = euler_b;
+    }
+
+    auto q = euler_c.ToQuaternion();
     Quaternion orientation_1;
     orientation_1.set_qw(q.w());
     orientation_1.set_qx(q.x());
     orientation_1.set_qy(q.y());
     orientation_1.set_qz(q.z());
+
+    if (FLAGS_enable_heading_filter) {
+      auto heading = NormalizeAngle(
+          QuaternionToHeading(orientation_1.qw(), orientation_1.qx(),
+                              orientation_1.qy(), orientation_1.qz()));
+
+      auto filtered_heading = NormalizeAngle(digital_filter_.Filter(heading));
+
+      auto orientation_2 = HeadingToQuaternion(filtered_heading);
+      orientation_1.set_qw(orientation_2.w());
+      orientation_1.set_qx(orientation_2.x());
+      orientation_1.set_qy(orientation_2.y());
+      orientation_1.set_qz(orientation_2.z());
+    }
 
     Point3D linear_acceleration;
     if (FLAGS_enable_map_reference_unify) {
@@ -331,9 +379,11 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
 
     new_pose->mutable_position()->CopyFrom(position_1);
     new_pose->mutable_orientation()->CopyFrom(orientation_1);
-    new_pose->set_heading(QuaternionToHeading(
+
+    new_pose->set_heading(NormalizeAngle(QuaternionToHeading(
         new_pose->orientation().qw(), new_pose->orientation().qx(),
-        new_pose->orientation().qy(), new_pose->orientation().qz()));
+        new_pose->orientation().qy(), new_pose->orientation().qz())));
+
     new_pose->mutable_linear_velocity()->CopyFrom(linear_velocity_1);
     FillPoseFromImu(imu_pose_1, new_pose);
 
@@ -346,6 +396,13 @@ bool PredictorOutput::PredictByImu(double old_timestamp_sec,
 
   return true;
 }
-
+void PredictorOutput::InitializeFilter(const double ts,
+                                       const double cutoff_freq) {
+  // Low pass filter
+  std::vector<double> den(3, 0.0);
+  std::vector<double> num(3, 0.0);
+  common::LpfCoefficients(ts, cutoff_freq, &den, &num);
+  digital_filter_.set_coefficients(den, num);
+}
 }  // namespace localization
 }  // namespace apollo

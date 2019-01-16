@@ -22,6 +22,8 @@
 #ifndef MODULES_LOCALIZATION_LMD_PREDICTOR_RAW_PREDICTOR_IMU_H_
 #define MODULES_LOCALIZATION_LMD_PREDICTOR_RAW_PREDICTOR_IMU_H_
 
+#include "modules/common/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/lmd/predictor/predictor.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -76,10 +78,15 @@ class PredictorImu : public Predictor {
   void InitLPFilter(double cutoff_freq);
   void LPFilter();
 
+  void InitializeFilters(const double ts, const double cutoff_freq);
+  void DigitalFilter();
+
  private:
   PoseList raw_imu_;
   double iir_filter_bz_[3];
   double iir_filter_az_[3];
+
+  common::DigitalFilter digital_filter_x_, digital_filter_y_;
 };
 
 }  // namespace localization

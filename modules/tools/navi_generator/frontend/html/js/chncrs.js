@@ -1,5 +1,5 @@
-layui.define(function(exports){
- 
+layui.define(function (exports) {
+
     //coordinate conversion of various chinese encrypted coordinate systems such as BAIDU, GCJ02 etc
 
 
@@ -9,9 +9,9 @@ layui.define(function(exports){
      * @type {Object}
      */
     var GPS = {
-        PI : Math.PI,
-        x_pi : Math.PI * 3000.0 / 180.0,
-        delta : function (lat, lon) {
+        PI: Math.PI,
+        x_pi: Math.PI * 3000.0 / 180.0,
+        delta: function (lat, lon) {
             // Krasovsky 1940
             //
             // a = 6378245.0, 1/f = 298.3
@@ -27,11 +27,11 @@ layui.define(function(exports){
             var sqrtMagic = Math.sqrt(magic);
             dLat = (dLat * 180.0) / ((a * (1 - ee)) / (magic * sqrtMagic) * this.PI);
             dLon = (dLon * 180.0) / (a / sqrtMagic * Math.cos(radLat) * this.PI);
-            return {'lat':dLat, 'lon':dLon};
+            return { 'lat': dLat, 'lon': dLon };
         },
 
         //WGS-84 to GCJ-02
-        wgs84_gcj02 : function (wgsLon, wgsLat) {
+        wgs84_gcj02: function (wgsLon, wgsLat) {
             if (this.outOfChina(wgsLat, wgsLon))
                 return [wgsLon, wgsLat];
 
@@ -39,7 +39,7 @@ layui.define(function(exports){
             return [wgsLon + d.lon, wgsLat + d.lat];
         },
         //GCJ-02 to WGS-84
-        gcj02_wgs84 : function (gcjLon, gcjLat) {
+        gcj02_wgs84: function (gcjLon, gcjLat) {
             if (this.outOfChina(gcjLat, gcjLon))
                 return [gcjLon, gcjLat];
 
@@ -47,7 +47,7 @@ layui.define(function(exports){
             return [gcjLon - d.lon, gcjLat - d.lat];
         },
         //GCJ-02 to WGS-84 exactly
-        gcj02_wgs84_precise : function (gcjLon, gcjLat) {
+        gcj02_wgs84_precise: function (gcjLon, gcjLat) {
             var initDelta = 0.01;
             var threshold = 0.000000001;
             var dLat = initDelta, dLon = initDelta;
@@ -71,7 +71,7 @@ layui.define(function(exports){
             return [wgsLon, wgsLat];
         },
         //GCJ-02 to BD-09
-        gcj02_bd09ll : function (gcjLon, gcjLat) {
+        gcj02_bd09ll: function (gcjLon, gcjLat) {
             var x = gcjLon, y = gcjLat;
             var z = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * this.x_pi);
             var theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * this.x_pi);
@@ -80,7 +80,7 @@ layui.define(function(exports){
             return [bdLon, bdLat];
         },
         //BD-09 to GCJ-02
-        bd09ll_gcj02 : function (bdLon, bdLat) {
+        bd09ll_gcj02: function (bdLon, bdLat) {
             var x = bdLon - 0.0065, y = bdLat - 0.006;
             var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * this.x_pi);
             var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * this.x_pi);
@@ -89,21 +89,21 @@ layui.define(function(exports){
             return [gcjLon, gcjLat];
         },
 
-        outOfChina : function (lat, lon) {
+        outOfChina: function (lat, lon) {
             if (lon < 72.004 || lon > 137.8347)
                 return true;
             if (lat < 0.8293 || lat > 55.8271)
                 return true;
             return false;
         },
-        transformLat : function (x, y) {
+        transformLat: function (x, y) {
             var ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x));
             ret += (20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0 / 3.0;
             ret += (20.0 * Math.sin(y * this.PI) + 40.0 * Math.sin(y / 3.0 * this.PI)) * 2.0 / 3.0;
             ret += (160.0 * Math.sin(y / 12.0 * this.PI) + 320 * Math.sin(y * this.PI / 30.0)) * 2.0 / 3.0;
             return ret;
         },
-        transformLon : function (x, y) {
+        transformLon: function (x, y) {
             var ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x));
             ret += (20.0 * Math.sin(6.0 * x * this.PI) + 20.0 * Math.sin(2.0 * x * this.PI)) * 2.0 / 3.0;
             ret += (20.0 * Math.sin(x * this.PI) + 40.0 * Math.sin(x / 3.0 * this.PI)) * 2.0 / 3.0;
@@ -113,10 +113,10 @@ layui.define(function(exports){
     };
 
     var ProjectionTransform = {
-        crs : {
-            'bd09ll'    : '+proj=longlat +datum=BD09',
-            'gcj02'     : '+proj=longlat +datum=GCJ02',
-            'wgs84'     : '+proj=longlat +datum=WGS84 +no_defs'
+        crs: {
+            'bd09ll': '+proj=longlat +datum=BD09',
+            'gcj02': '+proj=longlat +datum=GCJ02',
+            'wgs84': '+proj=longlat +datum=WGS84 +no_defs'
         },
 
         /**
@@ -126,7 +126,7 @@ layui.define(function(exports){
          * @param  {String | CRS Object} toCRS      crs converted to
          * @return {Object} result geoJSON object
          */
-        transform:function(source, fromCRS, toCRS) {
+        transform: function (source, fromCRS, toCRS) {
             if (!source) {
                 return null;
             }
@@ -145,7 +145,7 @@ layui.define(function(exports){
             return this._transformGeoJSON(source, fromCRS, toCRS);
         },
 
-        _transformGeoJSON:function(geoJSON, fromCRS, toCRS) {
+        _transformGeoJSON: function (geoJSON, fromCRS, toCRS) {
             if (geoJSON['type'] === 'Feature') {
                 var geometry = this.transform(geoJSON['geometry'], fromCRS, toCRS);
                 var result = this._extend({}, geoJSON);
@@ -176,7 +176,7 @@ layui.define(function(exports){
             return result;
         },
 
-        _transformCoordinate:function(coordinates, fromCRS, toCRS) {
+        _transformCoordinate: function (coordinates, fromCRS, toCRS) {
             var f = fromCRS,
                 t = toCRS;
             if (fromCRS['type'] === 'proj4') {
@@ -196,13 +196,13 @@ layui.define(function(exports){
             if (f === t) {
                 return coordinates;
             }
-            var m = f+'_'+t;
-            return this._eachCoordinate(coordinates, function(c) {
+            var m = f + '_' + t;
+            return this._eachCoordinate(coordinates, function (c) {
                 return GPS[m](parseFloat(c[0]), parseFloat(c[1]));
             }, this);
         },
 
-        _extend:function(src, dst) {
+        _extend: function (src, dst) {
             for (var p in dst) {
                 if (dst.hasOwnProperty(p)) {
                     src[p] = dst[p];
@@ -211,7 +211,7 @@ layui.define(function(exports){
             return src;
         },
 
-        _toCRS:function(proj) {
+        _toCRS: function (proj) {
             for (var p in this.crs) {
                 if (proj === this.crs[p]) {
                     return p;
@@ -220,18 +220,18 @@ layui.define(function(exports){
             return null;
         },
 
-        _eachCoordinate:function(coordinates, fn, context) {
+        _eachCoordinate: function (coordinates, fn, context) {
             if (this._isCoord(coordinates)) {
                 return fn.call(context, coordinates);
             }
             var result = [];
-            for (var i=0,len=coordinates.length;i<len;i++) {
+            for (var i = 0, len = coordinates.length; i < len; i++) {
                 var p = coordinates[i];
                 if (p == null) {
                     continue;
                 }
                 if (this._isCoord(p)) {
-                    var pp = fn.call(context,p);
+                    var pp = fn.call(context, p);
                     result.push(pp);
                 } else if (this._isArray(p)) {
                     result.push(this._eachCoordinate(p, fn, context));
@@ -240,25 +240,25 @@ layui.define(function(exports){
             return result;
         },
 
-        _isCoord:function(coordinate) {
+        _isCoord: function (coordinate) {
             if (this._isArray(coordinate) && this._isNumber(coordinate[0]) && this._isNumber(coordinate[1])) {
                 return true;
             }
             return false;
         },
 
-        _isNumber:function(val) {
+        _isNumber: function (val) {
             return (typeof val === 'number') && !isNaN(val);
         },
 
-        _isArray:function(obj) {
-            if (!obj) {return false;}
+        _isArray: function (obj) {
+            if (!obj) { return false; }
             return typeof obj == 'array' || (obj.constructor !== null && obj.constructor == Array);
         },
 
-        _isString:function(_str) {
-            if (_str == null) {return false;}
-            return typeof _str == 'string' || (_str.constructor!==null && _str.constructor == String);
+        _isString: function (_str) {
+            if (_str == null) { return false; }
+            return typeof _str == 'string' || (_str.constructor !== null && _str.constructor == String);
         },
     };
 
@@ -272,6 +272,6 @@ layui.define(function(exports){
         window['maptalks']['CRSTransform'] = ProjectionTransform;
     }
 
-  
+
     exports('chncrs', ProjectionTransform);
 });

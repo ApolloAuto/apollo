@@ -24,6 +24,7 @@
 #define MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_TRAJECTORY_PROCESSOR_H_
 
 #include <condition_variable>
+#include <deque>
 #include <future>
 #include <map>
 #include <memory>
@@ -34,6 +35,7 @@
 
 #include "modules/tools/navi_generator/backend/database/db_operator.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_converter.h"
+#include "modules/tools/navi_generator/proto/navigation_response.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -72,11 +74,14 @@ struct FileInfo {
   std::uint8_t speed_max = 0;
 };
 
-typedef void (*UPDATE_GUI_FUNC)(const std::string&, void*);
+typedef void (*UPDATE_FRONTEND_FUNC)(const std::string&, void*);
+typedef void (*NOTIFY_BAG_FIFES_PROCESSED_FUNC)(void*);
 
 class TrajectoryProcessor {
  public:
-  TrajectoryProcessor(UPDATE_GUI_FUNC task, void* gui_service);
+  TrajectoryProcessor(UPDATE_FRONTEND_FUNC update_task,
+                      NOTIFY_BAG_FIFES_PROCESSED_FUNC notify_task,
+                      void* gui_service);
   ~TrajectoryProcessor();
 
  public:
@@ -98,9 +103,17 @@ class TrajectoryProcessor {
       const std::map<std::uint16_t, FileInfo>** processed_files_info);
 
  private:
+  /**
+   * @brief A worker thread function that receives and processes the bag files.
+   */
   void FileSegmentThread();
+  /**
+   * @brief A worker thread function that updates the frontend's display.
+   */
+  void UpdateFrontendThread();
+
   bool ExportSegmentsToFile(const std::string& file_name);
-  void ProcessFiles();
+  bool ProcessFiles();
   bool ProcessFile(const BagFileInfo& bag_file_info);
   bool ProcessBagFile(
       const std::string& first_bag_filename,
@@ -116,6 +129,8 @@ class TrajectoryProcessor {
   bool GetRightmostNaviFile(const FileInfo& file_info,
                             NaviFile* const navi_file);
 
+  bool ResponseToFrontend(const NaviResponse& navi_response);
+
  private:
   CommonBagFileInfo common_file_info_;
   // first: cur_file_seg_index, second: FileSegment
@@ -128,11 +143,23 @@ class TrajectoryProcessor {
 
   // A thread and its related variables that receive and process the bag files.
   std::unique_ptr<std::thread> file_seg_thread_;
+  std::atomic<bool> file_seg_finished_;
   std::condition_variable file_seg_cv_;
   mutable std::mutex file_seg_mut_;
-  bool file_seg_finished_ = false;
-  // A task for asynchronously updating GUI information.
-  std::packaged_task<void(const std::string&)> update_gui_task_;
+
+  // A thread in charge of updating the frontend.
+  std::unique_ptr<std::thread> update_frontend_thread_;
+  std::condition_variable update_frontend_cv_;
+  mutable std::mutex update_frontend_mut_;
+  // A task deque for asynchronously updating GUI information.
+  std::deque<std::packaged_task<void()>> update_frontend_tasks_;
+
+  // A binded updating frontend function.
+  std::function<void(const std::string&)> update_frontend_func_;
+  std::atomic<bool> update_frontend_finished_;
+
+  // A binded notifying bag files has been processed.
+  std::function<void()> notify_bag_file_processed_func_;
 };
 
 }  // namespace util

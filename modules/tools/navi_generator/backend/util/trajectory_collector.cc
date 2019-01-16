@@ -23,18 +23,25 @@
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/tools/navi_generator/proto/trajectory_collector.pb.h"
+#include "modules/common/util/util.h"
+
+namespace apollo {
+namespace navi_generator {
+namespace util {
+
+namespace {
+// Max velocity 240Km/h = 66.666m/s
+constexpr double kMaxDistance = 67.0;
+}  // namespace
 
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::DistanceXY;
+using apollo::localization::LocalizationEstimate;
 using ros::Time;
 using std::set;
 using std::shared_ptr;
 using std::string;
 using std::vector;
-
-namespace apollo {
-namespace navi_generator {
-namespace util {
 
 // CollectorMessage
 CollectorMessage::CollectorMessage(
@@ -53,8 +60,9 @@ CollectorMsgQueue::CollectorMsgQueue(const std::string& filename,
 
 // CollectorOptions
 CollectorOptions::CollectorOptions()
-    : split(false),
+    : split(true),
       append_date(true),
+      collector_type(CollectorType::TIME),
       compression(rosbag::compression::CompressionType::Uncompressed),
       buffer_size(1048576 * 256),
       chunk_size(1024 * 768),
@@ -77,9 +85,41 @@ TrajectoryCollector::TrajectoryCollector()
       writing_enabled_(false),
       initialized_(false),
       is_running_(false),
-      last_max_speed_limit(0.0),
-      last_min_speed_limit(0.0) {}
+      last_max_speed_limit_(0.0),
+      last_min_speed_limit_(0.0) {
+  queue_.reset(new std::queue<CollectorMessage>);
+}
 
+// Initialize trajectory collector
+bool TrajectoryCollector::Init() {
+  CollectorOptions options;
+  std::vector<std::string> topics = {"/apollo/sensor/gnss/best_pose",
+                                     "/apollo/localization/pose",
+                                     "/apollo/navi_generator/collector"};
+  options.topics = topics;
+  num_subscribers_ = 0;
+  queue_size_ = 0;
+  split_count_ = 0;
+  writing_enabled_ = true;
+
+  last_max_speed_limit_ = 0.0;
+  last_min_speed_limit_ = 0.0;
+
+  if (!initialized_) {
+    std::string collector_topic = "/apollo/navi_generator/collector";
+    ros::NodeHandle nh;
+    collector_publisher_ =
+        nh.advertise<apollo::navi_generator::TrajectoryCollectorMsg>(
+            collector_topic, 100);
+    // Subscribe to each topic
+    for (const string& topic : options.topics) {
+      Subscribe(topic);
+    }
+    initialized_ = true;
+  }
+  options_ = options;
+  return true;
+}
 // Initialize trajectory collector
 bool TrajectoryCollector::Init(const CollectorOptions& options) {
   options_ = options;
@@ -87,15 +127,27 @@ bool TrajectoryCollector::Init(const CollectorOptions& options) {
   queue_size_ = 0;
   split_count_ = 0;
   writing_enabled_ = true;
-  initialized_ = true;
 
-  std::string collector_topic = "/apollo/navi_generator/collector";
-  ros::NodeHandle nh;
-  collector_publisher_ =
-      nh.advertise<apollo::navi_generator::TrajectoryCollectorMsg>(
-          collector_topic, 100);
+  last_max_speed_limit_ = 0.0;
+  last_min_speed_limit_ = 0.0;
+
+  if (!initialized_) {
+    std::string collector_topic = "/apollo/navi_generator/collector";
+    ros::NodeHandle nh;
+    collector_publisher_ =
+        nh.advertise<apollo::navi_generator::TrajectoryCollectorMsg>(
+            collector_topic, 100);
+    // Subscribe to each topic
+    for (const string& topic : options_.topics) {
+      AINFO << "Subscribe " << topic.c_str();
+      Subscribe(topic);
+    }
+    initialized_ = true;
+  }
+
   return true;
 }
+
 // Start trajectory collector
 bool TrajectoryCollector::Start() {
   if (!initialized_) {
@@ -112,22 +164,12 @@ bool TrajectoryCollector::Start() {
     return false;
   }
   last_buffer_warn_ = Time();
-  queue_ = new std::queue<CollectorMessage>;
-  // Subscribe to each topic
-  for (const string& topic : options_.topics) {
-    AINFO << "Subscribe " << topic.c_str();
-    Subscribe(topic);
-  }
 
   ros::Time::waitForValid();
   start_time_ = ros::Time::now();
   // Create a thread for writing to the file
-  collect_thread_ =
-      std::thread(std::bind(&TrajectoryCollector::CollectData, this));
-  // Set a timer to triger publish info periodly
-  const double duration = 1.0;
-  timer_ = AdapterManager::CreateTimer(ros::Duration(duration),
-                                       &TrajectoryCollector::OnTimer, this);
+  collect_thread_.reset(
+      new std::thread(std::bind(&TrajectoryCollector::CollectData, this)));
   is_running_ = true;
   return true;
 }
@@ -135,18 +177,15 @@ bool TrajectoryCollector::Start() {
 bool TrajectoryCollector::Stop() {
   if (is_running_) {
     AINFO << "Stopping trajectory collector";
-    timer_.stop();
     is_running_ = false;
-    if (collect_thread_.joinable()) {
-      collect_thread_.join();
-    }
-    queue_condition_.notify_all();
-    if (queue_ != nullptr) {
-      delete queue_;
-      queue_ = nullptr;
+    if (collect_thread_ != nullptr && collect_thread_->joinable()) {
+      collect_thread_->join();
+      collect_thread_.reset();
+      queue_condition_.notify_all();
     }
   } else {
     AINFO << "Trajectory collector is not running.";
+    return false;
   }
   AINFO << "Trajectory collector stopped.";
   return true;
@@ -239,7 +278,7 @@ void TrajectoryCollector::UpdateFilenames() {
 void TrajectoryCollector::StartWriting() {
   bag_.setCompression(options_.compression);
   bag_.setChunkThreshold(options_.chunk_size);
-
+  mileage_ = 0.0;
   UpdateFilenames();
   // Open bag file.
   try {
@@ -254,7 +293,7 @@ void TrajectoryCollector::StopWriting() {
   bag_.close();
   rename(write_filename_.c_str(), target_filename_.c_str());
 }
-// Check logging
+// Check next warn time
 bool TrajectoryCollector::CheckNextWarnTime() {
   if (writing_enabled_) {
     return true;
@@ -353,38 +392,71 @@ bool TrajectoryCollector::CheckDuration(const ros::Time& t) {
 }
 // Check mileage
 bool TrajectoryCollector::CheckMileage() {
-  // TODO(zhanghua): mileage check should be add in future.
+  // Caculate mileage
+  if (options_.max_mileage > 0) {
+    if (localization_.has_pose()) {
+      if (last_pos_.has_position() && (localization_.pose().has_position())) {
+        double s =
+            DistanceXY(localization_.pose().position(), last_pos_.position());
+        if (s < kMaxDistance) {
+          mileage_ += s;
+        }
+      }
+      last_pos_ = localization_.pose();
+    }
+    // Check mileage
+    if (mileage_ > options_.max_mileage) {
+      if (options_.split) {
+        StopWriting();
+        split_count_++;
+        CheckNumSplits();
+        StartWriting();
+      } else {
+        StopWriting();
+        return true;
+      }
+    }
+  }
   return false;
 }
 // Publish collector message
 void TrajectoryCollector::PublishCollector() {
-  collector_data_.set_timestamp_sec(ros::Time::now().toSec());
-  collector_data_.set_max_speed_limit(options_.max_speed_limit);
-  collector_data_.set_min_speed_limit(options_.min_speed_limit);
-  collector_publisher_.publish(collector_data_);
-}
-// Timer callback for publish collector message
-void TrajectoryCollector::OnTimer(const ros::TimerEvent&) {
-  if ((std::fabs(last_max_speed_limit - options_.max_speed_limit) >
+  if (!is_running_) {
+    return;
+  }
+  if ((std::fabs(last_max_speed_limit_ - options_.max_speed_limit) >
        DBL_EPSILON) ||
-      (std::fabs(last_min_speed_limit - options_.min_speed_limit) >
+      (std::fabs(last_min_speed_limit_ - options_.min_speed_limit) >
        DBL_EPSILON)) {
-    PublishCollector();
-    last_max_speed_limit = options_.max_speed_limit;
-    last_min_speed_limit = options_.min_speed_limit;
+    collector_data_.set_timestamp_sec(ros::Time::now().toSec());
+    collector_data_.set_max_speed_limit(options_.max_speed_limit);
+    collector_data_.set_min_speed_limit(options_.min_speed_limit);
+    collector_publisher_.publish(collector_data_);
+    last_max_speed_limit_ = options_.max_speed_limit;
+    last_min_speed_limit_ = options_.min_speed_limit;
   }
 }
+
 // Callback to be invoked to push messages into a queue
 void TrajectoryCollector::EnQueue(
     const ros::MessageEvent<topic_tools::ShapeShifter const>& msg_event,
     const std::string& topic, boost::shared_ptr<ros::Subscriber> subscriber,
     boost::shared_ptr<int> count) {
+  // Get current localization
+  if (topic == "/apollo/localization/pose") {
+    topic_tools::ShapeShifter::ConstPtr msg = msg_event.getMessage();
+    auto localization =
+        msg->instantiate<apollo::localization::LocalizationEstimate>();
+    localization_ = *localization;
+  }
+  if (!is_running_) {
+    return;
+  }
   Time rectime = Time::now();
   CollectorMessage out(topic, msg_event.getMessage(),
                        msg_event.getConnectionHeaderPtr(), rectime);
   {
     std::lock_guard<std::mutex> lock(queue_mutex_);
-
     queue_->push(out);
     queue_size_ += out.msg_->size();
     // Check to see if buffer has been exceeded
@@ -424,22 +496,16 @@ void TrajectoryCollector::CollectData() {
   // Except it should only get checked if the node is not ok, and thus
   // it shouldn't be in contention.
   ros::NodeHandle nh;
-  while (nh.ok() || !queue_->empty() || is_running_) {
-    std::unique_lock<std::mutex> lock(queue_mutex_);
+  while (is_running_) {
     bool finished = false;
-    // User stop, exit this thread.
-    if (!is_running_) {
-      lock.unlock();
-      finished = true;
-      break;
-    }
+    std::unique_lock<std::mutex> lock(queue_mutex_);
     // If Queue is empty,wait for messages incoming.
     while (queue_->empty()) {
-      if (!nh.ok()) {
+      if (!nh.ok() || (!is_running_)) {
         finished = true;
         break;
       }
-      queue_condition_.wait_for(lock, std::chrono::seconds(120));
+      queue_condition_.wait_for(lock, std::chrono::seconds(10));
       // Check Duration
       if (CheckDuration(ros::Time::now())) {
         finished = true;
@@ -462,9 +528,16 @@ void TrajectoryCollector::CollectData() {
       AINFO << "Trajectory collector bag file size has been exceeded.";
       break;
     }
-    if (CheckDuration(out.time_)) {
-      AINFO << "Trajectory collector duration expired.";
-      break;
+    if (options_.collector_type == CollectorType::MILEAGE) {
+      if (CheckMileage()) {
+        AINFO << "Trajectory collector mileage expired.";
+        break;
+      }
+    } else {
+      if (CheckDuration(out.time_)) {
+        AINFO << "Trajectory collector duration expired.";
+        break;
+      }
     }
     // Check disk and write data to bag file
     try {
@@ -478,7 +551,6 @@ void TrajectoryCollector::CollectData() {
   }
   // Stop write file
   StopWriting();
-  queue_condition_.notify_one();
 }
 
 }  // namespace util

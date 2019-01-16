@@ -77,6 +77,17 @@ class TrajectoryConverter {
       const std::string& first_bag_filename,
       const std::string& second_bag_filename, double length_from_second_bag);
   /**
+   * @brief Extract the speed limits form the bag file. One speed limit per
+   * file.
+   * @param bag_filename The trajectory's bag filename.
+   * @param min_speed_limit The minimum speed limit.
+   * @param max_speed_limit The maximum speed limit.
+   * @return Return true for success.
+   */
+  bool ExtractSpeedLimit(const std::string& bag_filename,
+                         double* const min_speed_limit,
+                         double* const max_speed_limit);
+  /**
    * @brief Smooth the extracted trajectory points.
    * @return Return true for success.
    */

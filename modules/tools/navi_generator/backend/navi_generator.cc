@@ -24,14 +24,17 @@
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
+#include "modules/tools/navi_generator/backend/database/db_operator.h"
 
 namespace apollo {
 namespace navi_generator {
 
+using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
+using apollo::navi_generator::util::DBOperator;
 
 std::string NaviGenerator::Name() const {
   return FLAGS_navi_generator_module_name;
@@ -49,10 +52,20 @@ void NaviGenerator::CheckAdapters() {
   CHECK(AdapterManager::GetGps()) << "GpsAdapter is not initialized.";
   CHECK(AdapterManager::GetLocalization())
       << "LocalizationAdapter is not initialized.";
+  CHECK(AdapterManager::GetMonitor()) << "MonitorAdapter is not initialized.";
+  CHECK(AdapterManager::GetSystemStatus())
+      << "SystemStatus is not initialized.";
 }
 
 Status NaviGenerator::Init() {
   AdapterManager::Init(FLAGS_navi_generator_adapter_config_filename);
+
+  DBOperator db_operator;
+
+  if (!db_operator.InitDatabase()) {
+    return Status(ErrorCode::NAVI_GENERATOR_ERROR_DATABASE,
+                  "The database is not initialized");
+  }
 
   if (FLAGS_navi_generator_profiling_mode &&
       FLAGS_navi_generator_profiling_duration > 0.0) {

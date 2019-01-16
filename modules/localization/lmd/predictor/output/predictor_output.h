@@ -26,6 +26,8 @@
 
 #include "gtest/gtest.h"
 
+#include "modules/common/filters/digital_filter.h"
+#include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/localization/lmd/predictor/predictor.h"
 
 /**
@@ -65,9 +67,11 @@ class PredictorOutput : public Predictor {
  private:
   bool PredictByImu(double old_timestamp_sec, const Pose &old_pose,
                     double new_timestamp_sec, Pose *new_pose);
+  void InitializeFilter(const double ts, const double cutoff_freq);
 
  private:
   std::function<apollo::common::Status(double, const Pose &)> publish_loc_func_;
+  common::DigitalFilter digital_filter_;
 
   FRIEND_TEST(PredictorOutputTest, PredictByImu1);
   FRIEND_TEST(PredictorOutputTest, PredictByImu2);

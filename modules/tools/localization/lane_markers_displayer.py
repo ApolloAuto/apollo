@@ -4,6 +4,7 @@ from math import cos
 from math import sin
 from modules.localization.proto import odometry_lane_marker_pb2
 from sys import argv
+from sys import exit
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -52,7 +53,7 @@ def main():
     if(len(argv) != 2):
         print(
             "Please provide --argv[1]:raw OdometryLanemarker bin file to display")
-        sys.exit()
+        exit()
     read_lane_markers_data(argv[1])
 
 

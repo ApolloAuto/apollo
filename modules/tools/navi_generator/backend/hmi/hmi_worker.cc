@@ -31,6 +31,7 @@ namespace {
 using apollo::common::util::ContainsKey;
 using apollo::common::util::FindOrNull;
 using apollo::common::util::GetProtoFromFile;
+using apollo::common::util::InsertOrUpdate;
 using google::protobuf::Map;
 using RLock = boost::shared_lock<boost::shared_mutex>;
 using WLock = boost::unique_lock<boost::shared_mutex>;
@@ -82,24 +83,49 @@ int HMIWorker::RunHardwareCommand(const std::string &hardware,
   return RunComponentCommand(config_.hardware(), hardware, command);
 }
 
-void HMIWorker::RunModeCommand(const std::string &command_name) {
+int HMIWorker::RunModeCommand(const std::string &command_name) {
   std::string current_mode;
   {
     RLock rlock(status_mutex_);
     current_mode = status_.current_mode();
   }
   const Mode &mode_conf = config_.modes().at(current_mode);
+  int ret = 0;
   if (command_name == "start" || command_name == "stop") {
     // Run the command on all live modules.
     for (const auto &module : mode_conf.live_modules()) {
-      RunModuleCommand(module, command_name);
+      ret = RunModuleCommand(module, command_name);
+      if (ret != 0) {
+        return ret;
+      }
     }
   }
+  return ret;
 }
 
 void HMIWorker::UpdateSystemStatus(const monitor::SystemStatus &system_status) {
   WLock wlock(status_mutex_);
-  *status_.mutable_system_status() = system_status;
+  monitor::SystemStatus status = system_status;
+  for (auto &module : *status.mutable_modules()) {
+    monitor::ModuleStatus *moudle_status = &(module.second);
+    if ((module.first == "GPS") || (module.first == "canbus") ||
+        (module.first == "localization")) {
+      ModuleStatusSummary modules_status_summary;
+      modules_status_summary.set_summary(moudle_status->summary());
+      InsertOrUpdate(status_.mutable_modules(), module.first,
+                     modules_status_summary);
+    }
+  }
+
+  for (auto &hardware : *status.mutable_hardware()) {
+    monitor::HardwareStatus *hardware_status = &(hardware.second);
+    if ((hardware.first == "GPS") || (hardware.first == "CAN")) {
+      HardwareStatusSummary hardware_status_summary;
+      hardware_status_summary.set_summary(hardware_status->summary());
+      InsertOrUpdate(status_.mutable_hardware(), hardware.first,
+                     hardware_status_summary);
+    }
+  }
 }
 
 }  // namespace navi_generator

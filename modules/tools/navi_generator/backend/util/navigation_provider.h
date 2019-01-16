@@ -38,7 +38,12 @@ class NavigationProvider {
   ~NavigationProvider() = default;
 
   bool GetRoutePathAsJson(const nlohmann::json& expected_route,
+                          const bool get_all_lane,
                           nlohmann::json* const matched_route);
+
+ private:
+  void GenerateFailureResponse(const bool get_all_lane,
+                               nlohmann::json* const failure_response);
 };
 
 }  // namespace util
