@@ -169,21 +169,22 @@ bool TrafficLightProtectedScenario::GetScenarioConfig() {
 
 bool TrafficLightProtectedScenario::IsProtected(
     const ReferenceLineInfo& reference_line_info) const {
-  const double forward_buffer = 5.0;
-  bool left_turn = reference_line_info.IsLeftTurnPath(forward_buffer);
-  if (left_turn) {
+  const auto& turn = reference_line_info.GetPathTurnType();
+
+  // left turn
+  if (turn == hdmap::Lane::LEFT_TURN) {
     // TODO(all): add arrow-left check
     return false;
   }
 
-  bool right_turn = reference_line_info.IsRightTurnPath(forward_buffer);
-  if (right_turn) {
+  // right turn
+  if (turn == hdmap::Lane::RIGHT_TURN) {
     return (PlanningContext::GetScenarioInfo()->traffic_light_color ==
         TrafficLight::GREEN);
   }
 
-  bool u_turn = reference_line_info.IsUTurnPath(forward_buffer);
-  if (u_turn) {
+  // u-turn
+  if (turn == hdmap::Lane::U_TURN) {
     // TODO(all): add arrow-u-turn check
     return false;
   }

@@ -144,9 +144,7 @@ class ReferenceLineInfo {
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
-  bool IsLeftTurnPath(const double forward_buffer) const;
-  bool IsRightTurnPath(const double forward_buffer) const;
-  bool IsUTurnPath(const double forward_buffer) const;
+  const hdmap::Lane::LaneTurn& GetPathTurnType() const;
 
   double OffsetToOtherReferenceLine() const {
     return offset_to_other_reference_line_;
@@ -209,8 +207,7 @@ class ReferenceLineInfo {
   bool GetFirstOverlap(const std::vector<hdmap::PathOverlap>& path_overlaps,
                        hdmap::PathOverlap* path_overlap);
 
-  bool CheckPathTurnType(const double forward_buffer,
-                         const hdmap::Lane::LaneTurn& lane_turn) const;
+  void SetPathTurnType();
 
  private:
   const common::VehicleState vehicle_state_;
@@ -274,6 +271,8 @@ class ReferenceLineInfo {
    */
   std::vector<std::pair<OverlapType, hdmap::PathOverlap>>
       first_encounter_overlaps_;
+
+  hdmap::Lane::LaneTurn path_turn_type_;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };
