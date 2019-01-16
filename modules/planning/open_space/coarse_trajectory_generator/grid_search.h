@@ -62,6 +62,14 @@ class Node2d {
   }
   double GetIndex() const { return index_; }
   std::shared_ptr<Node2d> GetPreNode() { return pre_node_; }
+  static double CalcIndex(const double& x, const double& y,
+                          const double& xy_resolution,
+                          const std::vector<double>& XYbounds) {
+    // XYbounds with xmin, xmax, ymin, ymax
+    double grid_x = std::round((x - XYbounds[0]) / xy_resolution);
+    double grid_y = std::round((y - XYbounds[2]) / xy_resolution);
+    return grid_x * (XYbounds[3] - XYbounds[2]) + grid_y;
+  }
   bool operator==(const Node2d& right) const {
     return right.GetIndex() == index_;
   }
@@ -80,17 +88,21 @@ class GridSearch {
  public:
   explicit GridSearch(const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~GridSearch() = default;
-  bool GenerateAStarPath(const double& sx, const double& sy, const double& ex,
-            const double& ey, const std::vector<double>& XYbounds,
-            const std::vector<std::vector<common::math::LineSegment2d>>&
-                obstacles_linesegments_vec,
-            double* optimal_path_cost);
-  // bool GenerateDpMap(const double& ex, const double& ey, const std::vector<double>& XYbounds,
-  //           const std::vector<std::vector<common::math::LineSegment2d>>&
-  //               obstacles_linesegments_vec, );
+  bool GenerateAStarPath(
+      const double& sx, const double& sy, const double& ex, const double& ey,
+      const std::vector<double>& XYbounds,
+      const std::vector<std::vector<common::math::LineSegment2d>>&
+          obstacles_linesegments_vec,
+      double* optimal_path_cost);
+  bool GenerateDpMap(
+      const double& ex, const double& ey, const std::vector<double>& XYbounds,
+      const std::vector<std::vector<common::math::LineSegment2d>>&
+          obstacles_linesegments_vec);
+  double CheckDpMap(const double& sx, const double& sy);
 
  private:
-  double EuclidHeuristic(const double& x, const double& y);
+  double EuclidDistance(const double& x1, const double& y1, const double& x2,
+                        const double& y2);
   std::vector<std::shared_ptr<Node2d>> GenerateNextNodes(
       std::shared_ptr<Node2d> node);
   bool CheckConstraints(std::shared_ptr<Node2d> node);
@@ -111,11 +123,7 @@ class GridSearch {
       return left.second >= right.second;
     }
   };
-  std::priority_queue<std::pair<double, double>,
-                      std::vector<std::pair<double, double>>, cmp>
-      open_pq_;
-  std::unordered_map<double, std::shared_ptr<Node2d>> open_set_;
-  std::unordered_map<double, std::shared_ptr<Node2d>> close_set_;
+  std::unordered_map<double, std::shared_ptr<Node2d>> dp_map_;
 };
 }  // namespace planning
 }  // namespace apollo

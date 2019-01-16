@@ -28,9 +28,9 @@ GridSearch::GridSearch(const PlannerOpenSpaceConfig& open_space_conf) {
   node_radius_ = open_space_conf.warm_start_config().node_radius();
 }
 
-double GridSearch::EuclidHeuristic(const double& x, const double& y) {
-  return std::sqrt((x - end_node_->GetGridX()) * (x - end_node_->GetGridX()) +
-                   (y - end_node_->GetGridY()) * (y - end_node_->GetGridY()));
+double GridSearch::EuclidDistance(const double& x1, const double& y1,
+                                  const double& x2, const double& y2) {
+  return std::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
@@ -98,53 +98,55 @@ bool GridSearch::GenerateAStarPath(
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec,
     double* optimal_path_cost) {
-  // Clear and reload fields
-  open_set_.clear();
-  close_set_.clear();
-  open_pq_ = decltype(open_pq_)();
+  std::priority_queue<std::pair<double, double>,
+                      std::vector<std::pair<double, double>>, cmp>
+      open_pq;
+  std::unordered_map<double, std::shared_ptr<Node2d>> open_set;
+  std::unordered_map<double, std::shared_ptr<Node2d>> close_set;
   XYbounds_ = XYbounds;
-  start_node_.reset(new Node2d(sx, sy, xy_grid_resolution_, XYbounds_));
-  end_node_.reset(new Node2d(ex, ey, xy_grid_resolution_, XYbounds_));
-  final_node_ = nullptr;
+  std::shared_ptr<Node2d> start_node =
+      std::make_shared<Node2d>(sx, sy, xy_grid_resolution_, XYbounds_);
+  std::shared_ptr<Node2d> end_node =
+      std::make_shared<Node2d>(ex, ey, xy_grid_resolution_, XYbounds_);
+  std::shared_ptr<Node2d> final_node_ = nullptr;
   obstacles_linesegments_vec_ = obstacles_linesegments_vec;
-  open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
-  open_pq_.push(
-      std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
+  open_set.insert(std::make_pair(start_node->GetIndex(), start_node));
+  open_pq.push(std::make_pair(start_node->GetIndex(), start_node->GetCost()));
 
   // Grid a star begins
   size_t explored_node_num = 0;
-  while (!open_pq_.empty()) {
-    double current_id = open_pq_.top().first;
-    open_pq_.pop();
-    std::shared_ptr<Node2d> current_node = open_set_[current_id];
+  while (!open_pq.empty()) {
+    double current_id = open_pq.top().first;
+    open_pq.pop();
+    std::shared_ptr<Node2d> current_node = open_set[current_id];
     // Check destination
-    if (*(current_node) == *(end_node_)) {
+    if (*(current_node) == *(end_node)) {
       final_node_ = current_node;
       break;
     }
-    close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
+    close_set.insert(std::make_pair(current_node->GetIndex(), current_node));
     std::vector<std::shared_ptr<Node2d>> next_nodes =
         std::move(GenerateNextNodes(current_node));
     for (auto& next_node : next_nodes) {
       if (!CheckConstraints(next_node)) {
         continue;
       }
-      if (close_set_.find(next_node->GetIndex()) != close_set_.end()) {
+      if (close_set.find(next_node->GetIndex()) != close_set.end()) {
         continue;
       }
-      if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
+      if (open_set.find(next_node->GetIndex()) == open_set.end()) {
         ++explored_node_num;
-        // AINFO << "next node id " << next_node->GetIndex();
         next_node->SetHeuristic(
-            EuclidHeuristic(next_node->GetGridX(), next_node->GetGridY()));
+            EuclidDistance(next_node->GetGridX(), next_node->GetGridY(),
+                           end_node->GetGridX(), end_node->GetGridY()));
         next_node->SetPreNode(current_node);
-        open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
-        open_pq_.push(
+        open_set.insert(std::make_pair(next_node->GetIndex(), next_node));
+        open_pq.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
-      } 
       }
     }
-  
+  }
+
   if (final_node_ == nullptr) {
     AERROR << "Grid A searching return null ptr(open_set ran out)";
     return false;
@@ -152,6 +154,61 @@ bool GridSearch::GenerateAStarPath(
   *optimal_path_cost = final_node_->GetPathCost() * xy_grid_resolution_;
   ADEBUG << "explored node num is " << explored_node_num;
   return true;
+}
+
+bool GridSearch::GenerateDpMap(
+    const double& ex, const double& ey, const std::vector<double>& XYbounds,
+    const std::vector<std::vector<common::math::LineSegment2d>>&
+        obstacles_linesegments_vec) {
+  std::priority_queue<std::pair<double, double>,
+                      std::vector<std::pair<double, double>>, cmp>
+      open_pq;
+  std::unordered_map<double, std::shared_ptr<Node2d>> open_set;
+  dp_map_ = decltype(dp_map_)();
+  XYbounds_ = XYbounds;
+  std::shared_ptr<Node2d> end_node =
+      std::make_shared<Node2d>(ex, ey, xy_grid_resolution_, XYbounds_);
+  obstacles_linesegments_vec_ = obstacles_linesegments_vec;
+  open_set.insert(std::make_pair(end_node->GetIndex(), end_node));
+  open_pq.push(std::make_pair(end_node->GetIndex(), end_node->GetCost()));
+
+  // Grid a star begins
+  size_t explored_node_num = 0;
+  while (!open_pq.empty()) {
+    double current_id = open_pq.top().first;
+    open_pq.pop();
+    std::shared_ptr<Node2d> current_node = open_set[current_id];
+    dp_map_.insert(std::make_pair(current_node->GetIndex(), current_node));
+    std::vector<std::shared_ptr<Node2d>> next_nodes =
+        std::move(GenerateNextNodes(current_node));
+    for (auto& next_node : next_nodes) {
+      if (!CheckConstraints(next_node)) {
+        continue;
+      }
+      if (dp_map_.find(next_node->GetIndex()) != dp_map_.end()) {
+        continue;
+      }
+      if (open_set.find(next_node->GetIndex()) == open_set.end()) {
+        ++explored_node_num;
+        next_node->SetPreNode(current_node);
+        open_set.insert(std::make_pair(next_node->GetIndex(), next_node));
+        open_pq.push(
+            std::make_pair(next_node->GetIndex(), next_node->GetCost()));
+      } else {
+        if (open_set[next_node->GetIndex()]->GetCost() > next_node->GetCost()) {
+          open_set[next_node->GetIndex()]->SetCost(next_node->GetCost());
+          open_set[next_node->GetIndex()]->SetPreNode(current_node);
+        }
+      }
+    }
+  }
+  ADEBUG << "explored node num is " << explored_node_num;
+  return true;
+}
+
+double GridSearch::CheckDpMap(const double& sx, const double& sy) {
+  double index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
+  return dp_map_[index]->GetCost();
 }
 
 }  // namespace planning
