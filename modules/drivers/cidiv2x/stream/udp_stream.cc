@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The CiDi Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,7 @@ class UdpStream : public Stream {
   typedef uint32_t be32_t;
 
  public:
-  UdpStream(const char* address, uint16_t port, uint16_t broad_port,
-            uint32_t timeout_usec);
+  UdpStream(const char* address, uint16_t port, uint16_t broad_port, uint32_t timeout_usec);
   ~UdpStream();
 
   virtual bool Connect();
@@ -59,13 +58,12 @@ class UdpStream : public Stream {
   socklen_t socklenth_ = sizeof(peer_sockaddr_);
 };
 
-Stream* Stream::create_udp(const char* address, uint16_t port,
-                           uint16_t broad_port, uint32_t timeout_usec) {
+Stream* Stream::create_udp(const char* address, uint16_t port, uint16_t broad_port,
+                           uint32_t timeout_usec) {
   return new UdpStream(address, port, broad_port, timeout_usec);
 }
 
-UdpStream::UdpStream(const char* address, uint16_t port, uint16_t broad_port,
-                     uint32_t timeout_usec)
+UdpStream::UdpStream(const char* address, uint16_t port, uint16_t broad_port, uint32_t timeout_usec)
     : sockfd_(-1), errno_(0) {
   peer_addr_ = inet_addr(address);
   peer_port_ = htons(port);
@@ -112,8 +110,8 @@ void UdpStream::open() {
 
     if (fcntl(unicastfd, F_SETFL, flags & ~O_NONBLOCK) == -1) {
       ::close(unicastfd);
-      AERROR << "fcntl set unicast socket block failed, errno: " << errno
-             << ", " << strerror(errno);
+      AERROR << "fcntl set unicast socket block failed, errno: " << errno << ", "
+             << strerror(errno);
       return;
     }
     struct timeval block_to = {timeout_usec_ / 1000000,
@@ -137,16 +135,16 @@ void UdpStream::open() {
     if (setsockopt(unicastfd, SOL_SOCKET, SO_RCVTIMEO,
                    reinterpret_cast<char*>(&block_to), sizeof(block_to)) < 0) {
       ::close(unicastfd);
-      AERROR << "setsockopt set unicastfd socket rcv timeout failed, errno: "
-             << errno << ", " << strerror(errno);
+      AERROR << "setsockopt set unicastfd socket rcv timeout failed, errno: " << errno << ", "
+             << strerror(errno);
       return;
     }
 
     if (setsockopt(unicastfd, SOL_SOCKET, SO_SNDTIMEO,
                    reinterpret_cast<char*>(&block_to), sizeof(block_to)) < 0) {
       ::close(unicastfd);
-      AERROR << "setsockopt set unicastfd socket snd timeout failed, errno: "
-             << errno << ", " << strerror(errno);
+      AERROR << "setsockopt set unicastfd socket snd timeout failed, errno: " << errno << ", "
+             << strerror(errno);
       return;
     }
   } else {
@@ -166,34 +164,32 @@ void UdpStream::open() {
     }
     if (fcntl(unicastfd, F_SETFL, flags | O_NONBLOCK) == -1) {
       ::close(unicastfd);
-      AERROR << "fcntl set unicast socket non block failed, errno: " << errno
-             << ", " << strerror(errno);
+      AERROR << "fcntl set unicast socket non block failed, errno: " << errno << ", "
+             << strerror(errno);
       return;
     }
   }
   //  const int opt = 1;
-  // set socket to broadcast mode
-  //  if(setsockopt(fd, SOL_SOCKET, SO_BROADCAST, (char *)&opt, sizeof(opt)) <
-  //  0) {
+   // set socket to broadcast mode
+  //  if(setsockopt(fd, SOL_SOCKET, SO_BROADCAST, (char *)&opt, sizeof(opt)) < 0) {
   //    ::close(fd);
-  //    AERROR << "setsockopt set broadcast mode failed, errno: " << errno << ",
-  //    "
+  //    AERROR << "setsockopt set broadcast mode failed, errno: " << errno << ", "
   //           << strerror(errno);
-  //    return;
+  //    return;     
   //  }
-  AINFO << "setsockopt set broadcast mode success.";
-  struct sockaddr_in addrto;
-  bzero(&addrto, sizeof(struct sockaddr_in));
-  addrto.sin_family = AF_INET;
-  addrto.sin_addr.s_addr = htonl(INADDR_ANY);
-  addrto.sin_port = peer_broad_port_;
-  if (bind(fd, (struct sockaddr*)&(addrto), sizeof(struct sockaddr_in)) == -1) {
-    ::close(fd);
-    AERROR << "bind to port failed, errno: " << errno << ", "
-           << strerror(errno);
-    return;
-  }
-  AINFO << "bind to port: " << ntohs(peer_broad_port_);
+   AINFO << "setsockopt set broadcast mode success.";
+   struct sockaddr_in addrto;
+   bzero(&addrto, sizeof(struct sockaddr_in));
+   addrto.sin_family = AF_INET;
+   addrto.sin_addr.s_addr = htonl(INADDR_ANY);
+   addrto.sin_port = peer_broad_port_;
+   if(bind(fd, (struct sockaddr *)&(addrto), sizeof(struct sockaddr_in )) == -1) {
+     ::close(fd);
+     AERROR << "bind to port failed, errno: " << errno << ", "
+            << strerror(errno);
+     return;
+   }
+  AINFO << "bind to port: "<<ntohs(peer_broad_port_);
   sockfd_ = fd;
 
   unicast_sockfd_ = unicastfd;
@@ -245,16 +241,16 @@ size_t UdpStream::read(uint8_t* buffer, size_t max_length, uint8_t flag) {
   ssize_t ret = 0;
   // struct sockaddr_in peer_sockaddr;
   // socklen_t socklenth = sizeof(peer_sockaddr);
-  // flag == 1, broadcast mode
+  // flag == 1, broadcast mode 
   int sockfd = -1;
-  if (flag) {
+  if(flag) {
     bzero(&peer_sockaddr_, sizeof(peer_sockaddr_));
     peer_sockaddr_.sin_family = AF_INET;
     peer_sockaddr_.sin_port = peer_broad_port_;
     // peer_sockaddr.sin_addr.s_addr = peer_addr_;
     peer_sockaddr_.sin_addr.s_addr = htonl(INADDR_ANY);
-    sockfd = sockfd_;
-  } else {
+    sockfd = sockfd_;  
+  }else {
     peer_sockaddr_.sin_port = peer_port_;
     sockfd = unicast_sockfd_;
   }
@@ -274,7 +270,7 @@ size_t UdpStream::read(uint8_t* buffer, size_t max_length, uint8_t flag) {
     return 0;
   }
   ADEBUG << "Receive addr: " << inet_ntoa(peer_sockaddr_.sin_addr)
-         << ", port: " << ntohs(peer_sockaddr_.sin_port);
+        << ", port: " << ntohs(peer_sockaddr_.sin_port);
 
   return ret;
 }
@@ -287,15 +283,15 @@ size_t UdpStream::write(const uint8_t* data, size_t length, uint8_t flag) {
   // peer_sockaddr_.sin_port = peer_port_;
   // peer_sockaddr_.sin_addr.s_addr = peer_addr_;
   int sockfd = -1;
-  if (flag) {
-    // peer_sockaddr_.sin_port = peer_broad_port_;
+  if(flag) {
+    //peer_sockaddr_.sin_port = peer_broad_port_;
     sockfd = sockfd_;
-  } else {
+  }else {
     peer_sockaddr_.sin_port = peer_port_;
     sockfd = unicast_sockfd_;
   }
-  ADEBUG << "sendto addr: " << inet_ntoa(peer_sockaddr_.sin_addr)
-         << ", port: " << ntohs(peer_sockaddr_.sin_port);
+  ADEBUG << "sendto addr: " << inet_ntoa(peer_sockaddr_.sin_addr) 
+        << ", port: " << ntohs(peer_sockaddr_.sin_port);
   while (length > 0) {
     ssize_t nsent =
         ::sendto(sockfd, data, length, 0, (struct sockaddr*)&peer_sockaddr_,
@@ -309,7 +305,7 @@ size_t UdpStream::write(const uint8_t* data, size_t length, uint8_t flag) {
           status_ = Stream::Status::DISCONNECTED;
           errno_ = errno;
         } else if (errno != EAGAIN) {
-          status_ = Stream::Status::ERROR;
+         status_ = Stream::Status::ERROR;
           errno_ = errno;
         }
         return total_nsent;
@@ -327,6 +323,7 @@ size_t UdpStream::write(const uint8_t* data, size_t length, uint8_t flag) {
 //   ssize_t ret = 0;
 //   // struct sockaddr_in peer_sockaddr;
 //   // socklen_t socklenth = sizeof(peer_sockaddr);
+
 
 //   while ((ret = ::recvfrom(sockfd_, buffer, max_length, 0,
 //                            (struct sockaddr*)&peer_sockaddr_,
