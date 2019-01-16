@@ -30,7 +30,7 @@ message ROIConfig {
 }
 
 message WarmStartConfig {
-  // Hybrid A Star Warm Start
+  // Hybrid a star for warm start
   optional double xy_grid_resolution = 1 [default = 0.2];
   optional double phi_grid_resolution = 2 [default = 0.05];
   optional uint64 next_node_num = 3 [default = 10];
@@ -45,6 +45,9 @@ message WarmStartConfig {
   optional double heu_rs_gear_switch_penalty = 12 [default = 10.0];
   optional double heu_rs_steer_penalty = 13 [default = 100.0];
   optional double heu_rs_steer_change_penalty = 14 [default = 10.0];
+  // Grid a star for heuristic
+  optional double grid_a_star_xy_resolution = 15 [default = 0.1];
+  optional double node_radius = 16 [default = 0.5];
 }
 
 message DualVariableWarmStartConfig {
