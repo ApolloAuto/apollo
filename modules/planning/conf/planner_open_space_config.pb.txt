@@ -19,12 +19,7 @@ warm_start_config : {
   traj_gear_switch_penalty : 10.0
   traj_steer_penalty : 0.0
   traj_steer_change_penalty : 0.0
-  heu_rs_forward_penalty : 1.0
-  heu_rs_back_penalty : 1.0
-  heu_rs_gear_switch_penalty : 10.0
-  heu_rs_steer_penalty : 1.0
-  heu_rs_steer_change_penalty : 1.0
-  grid_a_star_xy_resolution : 0.1
+  grid_a_star_xy_resolution : 1.0
   node_radius : 0.5
 }
 

@@ -95,7 +95,8 @@ std::vector<std::shared_ptr<Node2d>> GridAStar::GenerateNextNodes(
 bool GridAStar::Plan(
     const double& sx, const double& sy, const double& ex, const double& ey,
     const std::vector<double>& XYbounds,
-    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    const std::vector<std::vector<common::math::LineSegment2d>>&
+        obstacles_linesegments_vec,
     double* optimal_path_cost) {
   // Clear and reload fields
   open_set_.clear();
@@ -105,19 +106,7 @@ bool GridAStar::Plan(
   start_node_.reset(new Node2d(sx, sy, xy_grid_resolution_, XYbounds_));
   end_node_.reset(new Node2d(ex, ey, xy_grid_resolution_, XYbounds_));
   final_node_ = nullptr;
-  std::vector<std::vector<common::math::LineSegment2d>>
-      obstacles_linesegments_vec;
-  for (const auto& obstacle_vertices : obstacles_vertices_vec) {
-    size_t vertices_num = obstacle_vertices.size();
-    std::vector<common::math::LineSegment2d> obstacle_linesegments;
-    for (size_t i = 0; i < vertices_num - 1; ++i) {
-      common::math::LineSegment2d line_segment = common::math::LineSegment2d(
-          obstacle_vertices[i], obstacle_vertices[i + 1]);
-      obstacle_linesegments.emplace_back(line_segment);
-    }
-    obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
-  }
-  obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
+  obstacles_linesegments_vec_ = obstacles_linesegments_vec;
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
       std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
@@ -138,13 +127,17 @@ bool GridAStar::Plan(
         std::move(GenerateNextNodes(current_node));
     for (auto& next_node : next_nodes) {
       if (!CheckConstraints(next_node)) {
+        // AINFO << "haha";
         continue;
       }
       if (close_set_.find(next_node->GetIndex()) != close_set_.end()) {
+        // AINFO << "haha";
         continue;
       }
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
         ++explored_node_num;
+        // AINFO << "haha";
+        // AINFO << "next node id " << next_node->GetIndex();
         next_node->SetHeuristic(
             EuclidHeuristic(next_node->GetGridX(), next_node->GetGridY()));
         next_node->SetPreNode(current_node);
@@ -153,14 +146,13 @@ bool GridAStar::Plan(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
       }
     }
-    if (final_node_ == nullptr) {
-      AERROR << "Grid A searching return null ptr(open_set ran out)";
-      return false;
-    }
-    *optimal_path_cost = final_node_->GetPathCost();
-    ADEBUG << "explored node num is " << explored_node_num;
-    return true;
   }
+  if (final_node_ == nullptr) {
+    AERROR << "Grid A searching return null ptr(open_set ran out)";
+    return false;
+  }
+  *optimal_path_cost = final_node_->GetPathCost() * xy_grid_resolution_;
+  ADEBUG << "explored node num is " << explored_node_num;
   return true;
 }
 

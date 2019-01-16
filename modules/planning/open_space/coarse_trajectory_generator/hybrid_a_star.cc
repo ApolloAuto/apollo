@@ -27,8 +27,10 @@ using apollo::common::time::Clock;
 
 HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
   planner_open_space_config_.CopyFrom(open_space_conf);
-  reed_shepp_generator_.reset(
-      new ReedShepp(vehicle_param_, planner_open_space_config_));
+  reed_shepp_generator_ =
+      std::make_unique<ReedShepp>(vehicle_param_, planner_open_space_config_);
+  grid_a_star_heuristic_generator_ =
+      std::make_unique<GridAStar>(planner_open_space_config_);
   next_node_num_ =
       planner_open_space_config_.warm_start_config().next_node_num();
   max_steer_angle_ =
@@ -47,50 +49,29 @@ HybridAStar::HybridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
       planner_open_space_config_.warm_start_config().traj_steer_penalty();
   traj_steer_change_penalty_ = planner_open_space_config_.warm_start_config()
                                    .traj_steer_change_penalty();
-  heu_rs_forward_penalty_ =
-      planner_open_space_config_.warm_start_config().heu_rs_forward_penalty();
-  heu_rs_back_penalty_ =
-      planner_open_space_config_.warm_start_config().heu_rs_back_penalty();
-  heu_rs_gear_switch_penalty_ = planner_open_space_config_.warm_start_config()
-                                    .heu_rs_gear_switch_penalty();
-  heu_rs_steer_penalty_ =
-      planner_open_space_config_.warm_start_config().heu_rs_steer_penalty();
-  heu_rs_steer_change_penalty_ = planner_open_space_config_.warm_start_config()
-                                     .heu_rs_steer_change_penalty();
 }
 
-bool HybridAStar::AnalyticExpansion(
-    std::shared_ptr<Node3d> current_node,
-    const std::vector<std::vector<common::math::Vec2d>>&
-        obstacles_vertices_vec) {
+bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
   std::shared_ptr<ReedSheppPath> reeds_shepp_to_check =
-      ReedSheppPath_cache_[current_node->GetIndex()];
-  if (!RSPCheck(reeds_shepp_to_check, obstacles_vertices_vec)) {
+      std::make_shared<ReedSheppPath>();
+  if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
+                                          reeds_shepp_to_check)) {
+    AERROR << "ShortestRSP failed";
     return false;
   }
+
+  if (!RSPCheck(reeds_shepp_to_check)) {
+    return false;
+  }
+
   AINFO << "Reach the end configuration with Reed Sharp";
   // load the whole RSP as nodes and add to the close set
   final_node_ = LoadRSPinCS(reeds_shepp_to_check, current_node);
   return true;
 }
 
-bool HybridAStar::ReedSheppHeuristic(
-    std::shared_ptr<Node3d> current_node,
-    std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
-  if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
-                                          reeds_shepp_to_end)) {
-    AERROR << "ShortestRSP failed";
-    return false;
-  }
-  ReedSheppPath_cache_.insert(
-      std::make_pair(current_node->GetIndex(), reeds_shepp_to_end));
-  return true;
-}
-
 bool HybridAStar::RSPCheck(
-    const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
-    const std::vector<std::vector<common::math::Vec2d>>&
-        obstacles_vertices_vec) {
+    const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
   for (size_t i = 0; i < reeds_shepp_to_end->x.size(); ++i) {
     if (reeds_shepp_to_end->x[i] > XYbounds_[1] ||
         reeds_shepp_to_end->x[i] < XYbounds_[0] ||
@@ -101,32 +82,27 @@ bool HybridAStar::RSPCheck(
     std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
         reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
         reeds_shepp_to_end->phi[i], XYbounds_, planner_open_space_config_));
-    if (!ValidityCheck(node, obstacles_vertices_vec)) {
+    if (!ValidityCheck(node)) {
       return false;
     }
   }
   return true;
 }
 
-bool HybridAStar::ValidityCheck(
-    std::shared_ptr<Node3d> node,
-    const std::vector<std::vector<common::math::Vec2d>>&
-        obstacles_vertices_vec) {
-  if (obstacles_vertices_vec.size() == 0) {
+bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
+  if (obstacles_linesegments_vec_.size() == 0) {
     return true;
   }
-  for (const auto& obstacle_vertices : obstacles_vertices_vec) {
-    size_t vertices_num = obstacle_vertices.size();
-    for (size_t i = 0; i < vertices_num - 1; ++i) {
-      common::math::LineSegment2d line_segment = common::math::LineSegment2d(
-          obstacle_vertices[i], obstacle_vertices[i + 1]);
-      if (node->GetBoundingBox(vehicle_param_).HasOverlap(line_segment)) {
+  for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
+    for (const common::math::LineSegment2d& linesegment :
+         obstacle_linesegments) {
+      if (node->GetBoundingBox(vehicle_param_).HasOverlap(linesegment)) {
         return false;
       }
     }
   }
   return true;
-}
+}  // namespace planning
 
 std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end,
@@ -135,7 +111,6 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
       reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
       XYbounds_, planner_open_space_config_));
   end_node->SetPre(current_node);
-  end_node->SetTrajCost(CalculateRSPCost(reeds_shepp_to_end));
   close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
   return end_node;
 }
@@ -200,13 +175,17 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   return next_node;
 }
 
-void HybridAStar::CalculateNodeCost(
-    std::shared_ptr<Node3d> current_node, std::shared_ptr<Node3d> next_node,
-    const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
+bool HybridAStar::CalculateNodeCost(std::shared_ptr<Node3d> current_node,
+                                    std::shared_ptr<Node3d> next_node) {
   next_node->SetTrajCost(current_node->GetTrajCost() +
                          TrajCost(current_node, next_node));
   // evaluate heuristic cost
-  next_node->SetHeuCost(NonHoloNoObstacleHeuristic(reeds_shepp_to_end));
+  double optimal_path_cost = 0.0;
+  if (!HoloObstacleHeuristic(next_node, &optimal_path_cost)) {
+    return false;
+  }
+  next_node->SetHeuCost(optimal_path_cost);
+  return true;
 }
 
 double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
@@ -229,46 +208,16 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
   return piecewise_cost;
 }
 
-double HybridAStar::NonHoloNoObstacleHeuristic(
-    const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
-  return CalculateRSPCost(reeds_shepp_to_end);
-}
-
-double HybridAStar::CalculateRSPCost(
-    const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
-  double RSP_cost = 0.0;
-  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size(); ++i) {
-    if (reeds_shepp_to_end->segs_lengths[i] > 0.0) {
-      RSP_cost += reeds_shepp_to_end->segs_lengths[i] * heu_rs_forward_penalty_;
-    } else {
-      RSP_cost += -reeds_shepp_to_end->segs_lengths[i] * heu_rs_back_penalty_;
-    }
+bool HybridAStar::HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node,
+                                        double* optimal_path_cost) {
+  if (!grid_a_star_heuristic_generator_->Plan(
+          next_node->GetX(), next_node->GetY(), end_node_->GetX(),
+          end_node_->GetY(), XYbounds_, obstacles_linesegments_vec_,
+          optimal_path_cost)) {
+    AERROR << "grid_a_star_heuristic failed";
+    return false;
   }
-
-  for (size_t i = 0; i < reeds_shepp_to_end->segs_lengths.size() - 1; ++i) {
-    if (reeds_shepp_to_end->segs_lengths[i] *
-            reeds_shepp_to_end->segs_lengths[i + 1] <
-        0.0) {
-      RSP_cost += heu_rs_gear_switch_penalty_;
-    }
-  }
-  // steering cost
-  bool first_nonS_flag = false;
-  char last_turning;
-  for (size_t i = 0; i < reeds_shepp_to_end->segs_types.size(); ++i) {
-    if (reeds_shepp_to_end->segs_types[i] != 'S') {
-      RSP_cost += heu_rs_steer_penalty_ * max_steer_angle_;
-      if (!first_nonS_flag) {
-        last_turning = reeds_shepp_to_end->segs_types[i];
-        first_nonS_flag = true;
-        continue;
-      }
-      if (reeds_shepp_to_end->segs_types[i] != last_turning) {
-        RSP_cost += 2 * heu_rs_steer_change_penalty_ * max_steer_angle_;
-      }
-    }
-  }
-  return RSP_cost;
+  return true;
 }
 
 bool HybridAStar::GetResult(HybridAStartResult* result) {
@@ -367,6 +316,20 @@ bool HybridAStar::Plan(
   while (!open_pq_.empty()) open_pq_.pop();
   final_node_ = nullptr;
 
+  std::vector<std::vector<common::math::LineSegment2d>>
+      obstacles_linesegments_vec;
+  for (const auto& obstacle_vertices : obstacles_vertices_vec) {
+    size_t vertices_num = obstacle_vertices.size();
+    std::vector<common::math::LineSegment2d> obstacle_linesegments;
+    for (size_t i = 0; i < vertices_num - 1; ++i) {
+      common::math::LineSegment2d line_segment = common::math::LineSegment2d(
+          obstacle_vertices[i], obstacle_vertices[i + 1]);
+      obstacle_linesegments.emplace_back(line_segment);
+    }
+    obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
+  }
+  obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
+
   // load XYbounds
   XYbounds_ = XYbounds;
   // load nodes and obstacles
@@ -374,11 +337,11 @@ bool HybridAStar::Plan(
       new Node3d({sx}, {sy}, {sphi}, XYbounds_, planner_open_space_config_));
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
-  if (!ValidityCheck(start_node_, obstacles_vertices_vec)) {
+  if (!ValidityCheck(start_node_)) {
     AERROR << "start_node in collision with obstacles";
     return false;
   }
-  if (!ValidityCheck(end_node_, obstacles_vertices_vec)) {
+  if (!ValidityCheck(end_node_)) {
     AERROR << "end_node in collision with obstacles";
     return false;
   }
@@ -386,36 +349,26 @@ bool HybridAStar::Plan(
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
       std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
-  std::shared_ptr<ReedSheppPath> reeds_shepp_first_node =
-      std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
-  if (!reed_shepp_generator_->ShortestRSP(start_node_, end_node_,
-                                          reeds_shepp_first_node)) {
-    AERROR << "ShortestRSP failed";
-    return false;
-  }
-
-  ReedSheppPath_cache_.insert(
-      std::make_pair(start_node_->GetIndex(), reeds_shepp_first_node));
 
   // Hybrid A* begins
   size_t explored_node_num = 0;
-  double reeds_shepp_time = 0.0;
-  double start_timestamp = 0.0;
-  double end_timestamp = 0.0;
+  double heuristic_time = 0.0;
+  double start_time = 0.0;
+  double end_time = 0.0;
   while (!open_pq_.empty()) {
     // take out the lowest cost neighoring node
     size_t current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
+    // AINFO << "hueristic cost is " << current_node->GetHeuCost();
+    // AINFO << "traj cost is " << current_node->GetTrajCost();
+    // AINFO << "cost is " << current_node->GetCost();
     // check if a analystic curve could be connected from current configuration
     // to the end configuration without collision. if so, search ends.
-    start_timestamp = Clock::NowInSeconds();
-    if (AnalyticExpansion(current_node, obstacles_vertices_vec)) {
+    if (AnalyticExpansion(current_node)) {
       break;
     }
     close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
-    end_timestamp = Clock::NowInSeconds();
-    reeds_shepp_time += (end_timestamp - start_timestamp);
     for (size_t i = 0; i < next_node_num_; ++i) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary check failure handle
@@ -423,7 +376,7 @@ bool HybridAStar::Plan(
         continue;
       }
       // collision check
-      if (!ValidityCheck(next_node, obstacles_vertices_vec)) {
+      if (!ValidityCheck(next_node)) {
         continue;
       }
       // check if the node is already in the close set
@@ -433,16 +386,13 @@ bool HybridAStar::Plan(
 
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
         explored_node_num++;
-        start_timestamp = Clock::NowInSeconds();
-        std::shared_ptr<ReedSheppPath> reeds_shepp_heuristic =
-            std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
-        if (!ReedSheppHeuristic(next_node, reeds_shepp_heuristic)) {
-          AERROR << "Heuristic fail";
-          continue;
+        start_time = Clock::NowInSeconds();
+        if (!CalculateNodeCost(current_node, next_node)) {
+          AERROR << "Node cost calculation fail";
+          return false;
         }
-        CalculateNodeCost(current_node, next_node, reeds_shepp_heuristic);
-        end_timestamp = Clock::NowInSeconds();
-        reeds_shepp_time += (end_timestamp - start_timestamp);
+        end_time = Clock::NowInSeconds();
+        heuristic_time += end_time - start_time;
         open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
         open_pq_.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
@@ -458,7 +408,7 @@ bool HybridAStar::Plan(
     return false;
   }
   AINFO << "explored node num is " << explored_node_num;
-  AINFO << "reeds_shepp_time is " << reeds_shepp_time;
+  AINFO << "heuristic time is " << heuristic_time;
   return true;
 }
 }  // namespace planning
