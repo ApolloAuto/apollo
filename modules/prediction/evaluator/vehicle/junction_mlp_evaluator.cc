@@ -82,11 +82,6 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
                       ->add_junction_mlp_probability(prob);
   }
 
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::Insert(*latest_feature_ptr);
-    ADEBUG << "Insert junction feature into feature output";
-  }
-
   // assign all lane_sequence probability
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
