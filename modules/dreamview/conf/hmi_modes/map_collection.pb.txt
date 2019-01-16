@@ -2,7 +2,9 @@ cyber_modules {
   key: "Computer"
   value: {
     dag_files: "/apollo/modules/drivers/camera/dag/camera_no_compress.dag"
+    dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
     dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
     dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
@@ -56,6 +58,15 @@ monitored_components {
   value: {
     channel {
       name: "/apollo/sensor/lidar128/compensator/PointCloud2"
+    }
+  }
+}
+
+monitored_components {
+  key: "Front up center 16 lidar"
+  value: {
+    channel {
+      name: "/apollo/sensor/lidar16/front/up/center/PointCloud2"
     }
   }
 }
