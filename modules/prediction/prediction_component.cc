@@ -249,6 +249,25 @@ void PredictionComponent::OnPerception(
   }
   auto end_time6 = std::chrono::system_clock::now();
 
+  // Insert features to FeatureOutput for offline_mode
+  if (FLAGS_prediction_offline_mode) {
+    for (const int id :
+        ptr_obstacles_container->curr_frame_predictable_obstacle_ids()) {
+      Obstacle* obstacle_ptr = ptr_obstacles_container->GetObstacle(id);
+      if (obstacle_ptr == nullptr) {
+        AERROR << "Null obstacle found.";
+        continue;
+      } else if (!obstacle_ptr->latest_feature().IsInitialized()) {
+        AERROR << "Obstacle [" << id << "] has no latest feature.";
+        return;
+      }
+      FeatureOutput::Insert(obstacle_ptr->latest_feature());
+      ADEBUG << "Insert feature into feature output";
+    }
+    // Not doing evaluation on offline mode
+    return;
+  }
+
   // Make evaluations
   EvaluatorManager::Instance()->Run();
   auto end_time7 = std::chrono::system_clock::now();
@@ -257,9 +276,6 @@ void PredictionComponent::OnPerception(
         << diff.count() * 1000 << " msec.";
 
   // Make predictions
-  if (FLAGS_prediction_offline_mode) {
-    return;
-  }
   PredictorManager::Instance()->Run();
   auto end_time8 = std::chrono::system_clock::now();
   diff = end_time8 - end_time7;
