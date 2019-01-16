@@ -18,22 +18,22 @@
  * @file
  */
 
-#include "modules/planning/open_space/coarse_trajectory_generator/grid_a_star.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/grid_search.h"
 
 namespace apollo {
 namespace planning {
-GridAStar::GridAStar(const PlannerOpenSpaceConfig& open_space_conf) {
+GridSearch::GridSearch(const PlannerOpenSpaceConfig& open_space_conf) {
   xy_grid_resolution_ =
       open_space_conf.warm_start_config().grid_a_star_xy_resolution();
   node_radius_ = open_space_conf.warm_start_config().node_radius();
 }
 
-double GridAStar::EuclidHeuristic(const double& x, const double& y) {
+double GridSearch::EuclidHeuristic(const double& x, const double& y) {
   return std::sqrt((x - end_node_->GetGridX()) * (x - end_node_->GetGridX()) +
                    (y - end_node_->GetGridY()) * (y - end_node_->GetGridY()));
 }
 
-bool GridAStar::CheckConstraints(std::shared_ptr<Node2d> node) {
+bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
   if (obstacles_linesegments_vec_.size() == 0) {
     return true;
   }
@@ -49,7 +49,7 @@ bool GridAStar::CheckConstraints(std::shared_ptr<Node2d> node) {
   return true;
 }
 
-std::vector<std::shared_ptr<Node2d>> GridAStar::GenerateNextNodes(
+std::vector<std::shared_ptr<Node2d>> GridSearch::GenerateNextNodes(
     std::shared_ptr<Node2d> current_node) {
   double current_node_x = current_node->GetGridX();
   double current_node_y = current_node->GetGridY();
@@ -92,7 +92,7 @@ std::vector<std::shared_ptr<Node2d>> GridAStar::GenerateNextNodes(
   return next_nodes;
 }
 
-bool GridAStar::Plan(
+bool GridSearch::GenerateAStarPath(
     const double& sx, const double& sy, const double& ex, const double& ey,
     const std::vector<double>& XYbounds,
     const std::vector<std::vector<common::math::LineSegment2d>>&
@@ -113,7 +113,7 @@ bool GridAStar::Plan(
 
   // Grid a star begins
   size_t explored_node_num = 0;
-  while (!open_set_.empty()) {
+  while (!open_pq_.empty()) {
     double current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node2d> current_node = open_set_[current_id];
@@ -127,16 +127,13 @@ bool GridAStar::Plan(
         std::move(GenerateNextNodes(current_node));
     for (auto& next_node : next_nodes) {
       if (!CheckConstraints(next_node)) {
-        // AINFO << "haha";
         continue;
       }
       if (close_set_.find(next_node->GetIndex()) != close_set_.end()) {
-        // AINFO << "haha";
         continue;
       }
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
         ++explored_node_num;
-        // AINFO << "haha";
         // AINFO << "next node id " << next_node->GetIndex();
         next_node->SetHeuristic(
             EuclidHeuristic(next_node->GetGridX(), next_node->GetGridY()));
@@ -144,9 +141,10 @@ bool GridAStar::Plan(
         open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
         open_pq_.push(
             std::make_pair(next_node->GetIndex(), next_node->GetCost()));
+      } 
       }
     }
-  }
+  
   if (final_node_ == nullptr) {
     AERROR << "Grid A searching return null ptr(open_set ran out)";
     return false;

@@ -20,11 +20,11 @@
 
 #pragma once
 
+#include <memory>
 #include <queue>
 #include <unordered_map>
-#include <vector>
-#include <memory>
 #include <utility>
+#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
@@ -50,11 +50,16 @@ class Node2d {
   }
   void SetPathCost(const double& path_cost) { path_cost_ = path_cost; }
   void SetHeuristic(const double& heuristic) { heuristic_ = heuristic; }
+  void SetCost(const double& cost) { cost_ = cost; }
   void SetPreNode(std::shared_ptr<Node2d> pre_node) { pre_node_ = pre_node; }
   double GetGridX() const { return grid_x_; }
   double GetGridY() const { return grid_y_; }
   double GetPathCost() const { return path_cost_; }
-  double GetCost() const { return path_cost_ + heuristic_; }
+  double GetHeuCost() const { return heuristic_; }
+  double GetCost() {
+    cost_ = path_cost_ + heuristic_;
+    return cost_;
+  }
   double GetIndex() const { return index_; }
   std::shared_ptr<Node2d> GetPreNode() { return pre_node_; }
   bool operator==(const Node2d& right) const {
@@ -66,19 +71,23 @@ class Node2d {
   double grid_y_ = 0.0;
   double path_cost_ = 0.0;
   double heuristic_ = 0.0;
+  double cost_ = 0.0;
   double index_ = 0;
   std::shared_ptr<Node2d> pre_node_ = nullptr;
 };
 
-class GridAStar {
+class GridSearch {
  public:
-  explicit GridAStar(const PlannerOpenSpaceConfig& open_space_conf);
-  virtual ~GridAStar() = default;
-  bool Plan(const double& sx, const double& sy, const double& ex,
+  explicit GridSearch(const PlannerOpenSpaceConfig& open_space_conf);
+  virtual ~GridSearch() = default;
+  bool GenerateAStarPath(const double& sx, const double& sy, const double& ex,
             const double& ey, const std::vector<double>& XYbounds,
             const std::vector<std::vector<common::math::LineSegment2d>>&
                 obstacles_linesegments_vec,
             double* optimal_path_cost);
+  // bool GenerateDpMap(const double& ex, const double& ey, const std::vector<double>& XYbounds,
+  //           const std::vector<std::vector<common::math::LineSegment2d>>&
+  //               obstacles_linesegments_vec, );
 
  private:
   double EuclidHeuristic(const double& x, const double& y);
