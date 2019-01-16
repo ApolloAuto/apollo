@@ -136,7 +136,7 @@ void PredictorManager::Run() {
   CHECK_NOTNULL(obstacles_container);
 
   Predictor* predictor = nullptr;
-  for (int id : obstacles_container->curr_frame_obstacle_ids()) {
+  for (const int id : obstacles_container->curr_frame_obstacle_ids()) {
     if (id < 0) {
       ADEBUG << "The obstacle has invalid id [" << id << "].";
       continue;
