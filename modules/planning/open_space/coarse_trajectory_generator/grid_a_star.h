@@ -23,6 +23,8 @@
 #include <queue>
 #include <unordered_map>
 #include <vector>
+#include <memory>
+#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/math/line_segment2d.h"
@@ -74,8 +76,8 @@ class GridAStar {
   virtual ~GridAStar() = default;
   bool Plan(const double& sx, const double& sy, const double& ex,
             const double& ey, const std::vector<double>& XYbounds,
-            const std::vector<std::vector<common::math::Vec2d>>&
-                obstacles_vertices_vec,
+            const std::vector<std::vector<common::math::LineSegment2d>>&
+                obstacles_linesegments_vec,
             double* optimal_path_cost);
 
  private:
