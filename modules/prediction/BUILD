@@ -67,4 +67,14 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "evaluate_prediction_output",
+    srcs = ["evaluate_prediction_output.cc"],
+    deps = [
+        "//cyber/common:file",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:prediction_output_evaluation_proto",
+    ],
+)
+
 cpplint()

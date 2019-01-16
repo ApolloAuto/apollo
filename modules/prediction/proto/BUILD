@@ -189,3 +189,19 @@ proto_library(
     deps = [
     ],
 )
+
+cc_proto_library(
+    name = "prediction_output_evaluation_proto",
+    deps = [
+        ":prediction_output_evaluation_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "prediction_output_evaluation_proto_lib",
+    srcs = [
+        "prediction_output_evaluation.proto",
+    ],
+    deps = [
+    ],
+)
