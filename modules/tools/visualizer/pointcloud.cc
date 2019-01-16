@@ -34,7 +34,7 @@ PointCloud::~PointCloud(void) {
 bool PointCloud::FillVertexBuffer(GLfloat* pBuffer) {
   if (buffer_ && pBuffer) {
     memcpy(pBuffer, buffer_, VertexBufferSize());
-    delete buffer_;
+    delete[] buffer_;
     buffer_ = nullptr;
     return true;
   } else {
