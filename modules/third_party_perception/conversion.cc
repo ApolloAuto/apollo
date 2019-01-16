@@ -177,7 +177,8 @@ PerceptionObstacles MobileyeToPerceptionObstacles(
     } else {
       path_c1 = obstacles.lane_marker().right_lane_marker().c1_heading_angle();
       path_c2 = obstacles.lane_marker().right_lane_marker().c2_curvature();
-      path_c3 = obstacles.lane_marker().right_lane_marker().c2_curvature();
+      path_c3 =
+          obstacles.lane_marker().right_lane_marker().c3_curvature_derivative();
     }
 
     if (!FLAGS_use_navigation_mode) {
