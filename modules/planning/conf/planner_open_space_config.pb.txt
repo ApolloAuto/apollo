@@ -24,6 +24,8 @@ warm_start_config : {
   heu_rs_gear_switch_penalty : 10.0
   heu_rs_steer_penalty : 1.0
   heu_rs_steer_change_penalty : 1.0
+  grid_a_star_xy_resolution : 0.1
+  node_radius : 0.5
 }
 
 dual_variable_warm_start_config : {
