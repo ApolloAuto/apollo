@@ -168,7 +168,8 @@ Copyright (C) 2014 Free Software Foundation, Inc.
 gdbserver is free software, covered by the GNU General Public License.
 This gdbserver was configured as "x86_64-linux-gnu"
 ```
-则表示Docker内部已安装了GDBServer（我已请Apollo项目组老师将GDBServer预装至Docker内部，正常情况下应该能看到上述提示信息）。若提示如下信息：
+则表示Docker内部已安装了GDBServer。
+若提示如下信息：
 ```
 bash: gdbserver: command not found
 ```
@@ -199,13 +200,7 @@ bash scripts/bootstrap.sh
 #### 2.2.3 查看“Planning”进程ID
 使用如下命令，查看“Planning”进程ID：
 ``` bash
-top
-```
-结果类似下图，可以看到“Planning”进程ID为4147，请记住该ID。按“q”退出“top”界面。
-![10](images/vscode/planning_id_top.png)
-还可使用如下命令查看：
-``` bash
-ps aux | grep planning
+ps aux | grep mainboard | grep planning
 ```
 结果类似下图，可以看到“Planning”进程ID为4147。
 ![11](images/vscode/planning_id_ps.png)
@@ -274,16 +269,14 @@ shift 2
 # If there is a gdbserver process running, stop it first. 
 GDBSERVER_NUMS=$(pgrep -c -x "gdbserver")
 if [ ${GDBSERVER_NUMS} -ne 0 ]; then
-  sudo pkill -f "gdbserver"
+  sudo pkill -SIGKILL -f "gdbserver"
 fi
 
+echo ${MODULE_NAME}
 # Because the "grep ${MODULE_NAME}" always generates a process with the name of 
 # "${MODULE_NAME}", I added another grep to remove grep itself from the output.
-# The following command got a wrong result and I can't find the reason. 
-#PROCESS_ID=$(ps -eo pid,command | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $1}')
-# This one is OK.
-PROCESS_ID=$(pgrep -o -x "${MODULE_NAME}")
-#echo ${PROCESS_ID}
+PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
+echo ${PROCESS_ID}
 
 # If the moudle is not started, start it first. 
 if [ -z ${PROCESS_ID} ]; then       
@@ -294,7 +287,8 @@ if [ -z ${PROCESS_ID} ]; then
   # run command_name module_name
   run ${MODULE_NAME} "$@"
 
-  PROCESS_ID=$(pgrep -o -x "${MODULE_NAME}")
+  PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
+  echo ${PROCESS_ID}
 fi 
 
 sudo gdbserver :${PORT_NUM} --attach ${PROCESS_ID}
@@ -363,16 +357,14 @@ xhost -local:root 1>/dev/null 2>&1
         "name": "C++ Launch",
         "type": "cppdbg",
         "request": "launch",
-        // You can change the "planning" to your module name, but it should be 
-        // same as in gdbserver of the docker container. 
-        "program": "${workspaceRoot}/bazel-bin/modules/planning/planning",
+        "program": "${workspaceRoot}/bazel-bin/cyber/mainboard",
         // You can change "localhost:1111" to another "IP:port" name, but it 
-        // should be same as in gdbserver of the docker container.  
+        // should be same as those in gdbserver of the docker container.  
         "miDebuggerServerAddress": "localhost:1111",
-        // You can change the task to meet your demands in the 
-        // ".vscode/tasks.json" file (search the label:  
-        // "start gdbserver", but the module name and the port 
-        // number should be consistent with this file.        
+        // You can set the name of the module to be debugged in the 
+        // ".vscode/tasks.json" file, for example "planning".
+        // Tips: search the label "start gdbserver" in ".vscode/tasks.json".
+        // The port number should be consistent with this file.        
         "preLaunchTask": "start gdbserver",
         "args": [],
         "stopAtEntry": false,
@@ -394,13 +386,12 @@ xhost -local:root 1>/dev/null 2>&1
 ```
 `.vscode/tasks.json`文件中用于启动GDBServer的任务配置如下：
 ```
-	{
+        {
             "label": "start gdbserver",
             "type": "shell",
             // you can change the "planning" module name to another one and 
-            // change the "1111" to another port number.
-            // Note: the module name and port number should be same as in 
-            // the "launch.json" file. 
+            // change the "1111" to another port number. The port number should 
+            // be same as that in the "launch.json" file. 
             "command": "bash docker/scripts/dev_start_gdb_server.sh planning 1111",            
             "isBackground": true,
             "problemMatcher": {
@@ -410,7 +401,7 @@ xhost -local:root 1>/dev/null 2>&1
                 },
                 "background": { 
                     "activeOnStart": true,
-                     // Don't change the following two lines, otherwise the 
+                    // Don't change the following two lines, otherwise the 
                     // gdbserver can't run in the background.
                     "beginsPattern": "^Listening on port$",
                     "endsPattern": "^$"
