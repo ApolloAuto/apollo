@@ -65,3 +65,11 @@ class StatisticalAnalyzer:
         p = np.percentile(arr, 99)
         print PrintColors.OKBLUE + "99 Percentile: \t" + PrintColors.ENDC, \
             "{0:.2f}".format(p)
+
+        p = np.min(arr)
+        print PrintColors.OKBLUE + "min: \t" + PrintColors.ENDC, \
+            "{0:.2f}".format(p)
+
+        p = np.max(arr)
+        print PrintColors.OKBLUE + "max: \t" + PrintColors.ENDC, \
+            "{0:.2f}".format(p)
