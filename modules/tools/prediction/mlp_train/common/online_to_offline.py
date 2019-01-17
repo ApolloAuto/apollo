@@ -418,8 +418,7 @@ class LabelGenerator(object):
             for i, fea in enumerate(feature_sequence):
                 # Sanity check.
                 if not fea.HasField('junction_feature') or \
-                   not len(fea.junction_feature.junction_exit) or \
-                   not len(fea.junction_feature.junction_mlp_feature):
+                   not len(fea.junction_feature.junction_exit):
                     # print("No junction_feature, junction_exit, or junction_mlp_feature, not labeling this frame.")
                     continue
                 curr_pos = np.array([fea.position.x, fea.position.y])
@@ -464,7 +463,6 @@ class LabelGenerator(object):
                         continue
                     break
                 if fea.HasField('junction_feature') and \
-                   len(fea.junction_feature.junction_mlp_feature) > 0 and \
                    len(fea.junction_feature.junction_mlp_label) > 0:
                     output_features.feature.add().CopyFrom(fea)
 
