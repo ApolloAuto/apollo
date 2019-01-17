@@ -32,6 +32,7 @@ DEFINE_string(prediction_data_dir,
               "Prefix of files to store feature data");
 DEFINE_string(offline_feature_proto_file_name, "",
               "The bin file including a series of feature proto messages");
+DEFINE_string(output_filename, "", "The filename for offline process.");
 DEFINE_string(extract_feature_type, "",
               "The extract feature type, either cruise or junction");
 

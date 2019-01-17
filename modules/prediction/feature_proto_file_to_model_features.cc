@@ -45,7 +45,8 @@ using apollo::prediction::ListDataForLearning;
 using apollo::prediction::PredictionConf;
 
 void OfflineProcessFeatureProtoFile(
-    const std::string& features_proto_file_name) {
+    const std::string& input_features_proto_filename,
+    const std::string& output_filename) {
   AERROR << "start";
   // Load prediction conf
   PredictionConf prediction_conf;
@@ -80,7 +81,7 @@ void OfflineProcessFeatureProtoFile(
   ListDataForLearning list_data_for_learning;
   Features features;
   apollo::cyber::common::GetProtoFromBinaryFile(
-      features_proto_file_name, &features);
+      input_features_proto_filename, &features);
   for (const Feature& feature : features.feature()) {
     obstacles_container_ptr->InsertFeatureProto(feature);
     Obstacle* obstacle_ptr = obstacles_container_ptr->GetObstacle(feature.id());
@@ -90,8 +91,8 @@ void OfflineProcessFeatureProtoFile(
     data_for_learning.set_id(latest_feature.id());
     data_for_learning.set_timestamp(latest_feature.timestamp());
     if (FLAGS_extract_feature_type == "junction") {
-      if (!latest_feature.has_junction_feature() &&
-          latest_feature.junction_feature().junction_mlp_feature_size() == 0 &&
+      if (!latest_feature.has_junction_feature() ||
+          latest_feature.junction_feature().junction_mlp_feature_size() == 0 ||
           latest_feature.junction_feature().junction_mlp_label_size() == 0) {
         continue;
       }
@@ -137,16 +138,16 @@ void OfflineProcessFeatureProtoFile(
   if (list_data_for_learning.data_for_learning_size() <= 0) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
-    const std::string file_name = features_proto_file_name + ".bin";
-    apollo::common::util::SetProtoToBinaryFile(
-        list_data_for_learning, file_name);
+    apollo::common::util::SetProtoToBinaryFile(list_data_for_learning,
+                                               output_filename);
   }
 }
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::string file_name = FLAGS_offline_feature_proto_file_name;
+  std::string input_filename = FLAGS_offline_feature_proto_file_name;
+  std::string output_filename = FLAGS_output_filename;
   std::string feature_type = FLAGS_extract_feature_type;
-  OfflineProcessFeatureProtoFile(file_name);
+  OfflineProcessFeatureProtoFile(input_filename, output_filename);
   return 0;
 }
