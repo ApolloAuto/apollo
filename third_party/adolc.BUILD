@@ -10,7 +10,7 @@ licenses(
 cc_library(
     name = "adolc",
     includes = ["."],
-    copts = [ "-fPIC"],
+    copts = [ "-fPIC", "-fopenmp"],
     linkopts = [
         "-L/usr/local/adolc/lib64 -ladolc",
     ],
