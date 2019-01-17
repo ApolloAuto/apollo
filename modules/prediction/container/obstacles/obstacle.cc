@@ -202,6 +202,8 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 
 bool Obstacle::InsertFeature(const Feature& feature) {
   InsertFeatureToHistory(feature);
+  type_ = feature.type();
+  id_ = feature.id();
   return true;
 }
 
