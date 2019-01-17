@@ -42,8 +42,9 @@ LonController::LonController()
     time_t rawtime;
     char name_buffer[80];
     std::time(&rawtime);
-    strftime(name_buffer, 80, "/tmp/speed_log__%F_%H%M%S.csv",
-             localtime(&rawtime));
+    std::tm time_tm;
+    localtime_r(&rawtime, &time_tm);
+    strftime(name_buffer, 80, "/tmp/speed_log__%F_%H%M%S.csv", &time_tm);
     speed_log_file_ = fopen(name_buffer, "w");
     if (speed_log_file_ == nullptr) {
       AERROR << "Fail to open file:" << name_buffer;
