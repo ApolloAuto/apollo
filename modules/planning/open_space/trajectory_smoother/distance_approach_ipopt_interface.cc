@@ -1400,7 +1400,6 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
 
   *obj_value = 0.0;
   // 1. objective to minimize state diff to warm up
-  // const int max_num_threads = std::max(1,  omp_get_max_threads() - 1);
   for (int i = 0; i < horizon_ + 1; ++i) {
     T x1_diff = x[state_index] - xWS_(0, i);
     T x2_diff = x[state_index + 1] - xWS_(1, i);

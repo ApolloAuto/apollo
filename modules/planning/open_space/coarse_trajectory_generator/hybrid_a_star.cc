@@ -393,6 +393,7 @@ bool HybridAStar::Plan(
     AERROR << "ShortestRSP failed";
     return false;
   }
+
   ReedSheppPath_cache_.insert(
       std::make_pair(start_node_->GetIndex(), reeds_shepp_first_node));
 

@@ -481,3 +481,6 @@ DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
             " or to use the planning starting-point's laneinfo all the time.");
 DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
               "(unit: meter) for side pass driving width l buffer");
+
+DEFINE_bool(enable_parallel_hybrid_a, false,
+            "True to enable hybrid a* implementation.");
