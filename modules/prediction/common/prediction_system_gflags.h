@@ -24,6 +24,7 @@ DECLARE_string(prediction_conf_file);
 DECLARE_string(prediction_adapter_config_filename);
 DECLARE_string(prediction_data_dir);
 DECLARE_string(offline_feature_proto_file_name);
+DECLARE_string(output_filename);
 DECLARE_string(extract_feature_type);
 
 DECLARE_bool(prediction_test_mode);
