@@ -47,19 +47,20 @@ wget https://www.coin-or.org/download/source/ADOL-C/ADOL-C-2.6.3.zip -O ADOL-C-2
 unzip ADOL-C-2.6.3.zip
 
 pushd ADOL-C-2.6.3
-autoreconf --install
-automake
-./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse --with-colpack="/usr/local/colpack" ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC" 
+sudo autoreconf --install
+sudo automake
+sudo ./configure --prefix="/apollo/docker/build/installers/ADOL-C-2.6.3" --enable-sparse --enable-addexa --with-openmp-flag="-fopenmp" --with-colpack="/usr/local/colpack" ADD_CXXFLAGS="-fPIC" ADD_CFLAGS="-fPIC" ADD_FFLAGS="-fPIC"
 
-make -j8 all
+sudo make -j8 all
 make install
 
+echo "Build ADOL-C done."
 mkdir -p /usr/local/adolc
 cp -r include /usr/local/adolc/ && cp -r lib64 /usr/local/adolc/
 cp LICENSE /usr/local/adolc/
 popd
 
-# export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH 
+export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH 
 
 # Clean up.
 apt-get clean && rm -rf /var/lib/apt/lists/*
