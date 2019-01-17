@@ -138,8 +138,8 @@ bool TrafficLightUnprotectedRightTurnScenario::IsTransferable(
         << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
   }
 
-  const double forward_buffer = 5.0;
-  bool right_turn = reference_line_info.IsRightTurnPath(forward_buffer);
+  bool right_turn = (reference_line_info.GetPathTurnType() ==
+      hdmap::Lane::RIGHT_TURN);
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
