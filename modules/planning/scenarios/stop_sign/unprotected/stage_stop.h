@@ -48,8 +48,7 @@ class StageStop : public Stage {
     return GetContextAs<StopSignUnprotectedContext>();
   }
   int RemoveWatchVehicle(
-      const Obstacle& obstacle,
-      const std::vector<std::string>& watch_vehicle_ids,
+      const PathDecision& path_decision,
       std::unordered_map<std::string, std::vector<std::string>>*
           watch_vehicles);
 
