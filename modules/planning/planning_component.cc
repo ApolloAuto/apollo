@@ -16,12 +16,15 @@
 #include "modules/planning/planning_component.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/message_util.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/navi_planning.h"
+#include "modules/planning/open_space_planning.h"
+#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -35,9 +38,13 @@ using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
   if (FLAGS_open_space_planner_switchable) {
-    planning_base_ = std::unique_ptr<PlanningBase>(new OpenSpacePlanning());
+    planning_base_ = std::make_unique<OpenSpacePlanning>();
   } else {
-    planning_base_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    if (FLAGS_use_navigation_mode) {
+      planning_base_ = std::make_unique<NaviPlanning>();
+    } else {
+      planning_base_ = std::make_unique<StdPlanning>();
+    }
   }
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
                                                &config_))
