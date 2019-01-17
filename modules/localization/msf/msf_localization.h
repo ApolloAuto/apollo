@@ -35,6 +35,7 @@
 #include "sensor_msgs/PointCloud2.h"
 
 #include "modules/drivers/gnss/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -81,6 +82,7 @@ class MSFLocalization : public LocalizationBase {
   void OnGnssRtkObs(const drivers::gnss::EpochObservation &raw_obs_msg);
   void OnGnssRtkEph(const drivers::gnss::GnssEphemeris &gnss_orbit_msg);
   void OnGnssBestPose(const drivers::gnss::GnssBestPose &bestgnsspos_msg);
+  void OnGnssHeading(const drivers::gnss::Heading &gnssheading_msg);
 
  private:
   bool LoadGnssAntennaExtrinsic(const std::string &file_path, double *offset_x,

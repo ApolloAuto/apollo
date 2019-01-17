@@ -34,6 +34,7 @@
 #include "include/sins_struct.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -47,6 +48,12 @@ namespace localization {
 namespace msf {
 
 enum class GnssMode { NOVATEL = 0, SELF };
+
+struct VehicleGnssAntExtrinsic {
+  int ant_num;
+  TransformD transform_1;
+  TransformD transform_2;
+};
 
 /**
  * @class MeasureRepublishProcess
@@ -75,6 +82,9 @@ class MeasureRepublishProcess {
   bool LidarLocalProcess(const LocalizationEstimate& lidar_local_msg,
                          MeasureData* measure);
 
+  bool GnssHeadingProcess(const drivers::gnss::Heading& heading_msg,
+                          MeasureData *measure, int *status);
+
  protected:
   bool IsSinsAlign();
   bool CheckBestgnssposeStatus(const GnssBestPose& bestgnsspos_msg);
@@ -85,6 +95,9 @@ class MeasureRepublishProcess {
                                             MeasureData* measure);
   bool CalculateVelFromBestgnsspose(const GnssBestPose& bestgnsspos_msg,
                                     MeasureData* measure);
+
+  bool LoadImuGnssAntennaExtrinsic(std::string file_path,
+                                 VehicleGnssAntExtrinsic* extrinsic) const;
 
  private:
   MeasureData pre_bestgnsspose_;
@@ -101,6 +114,10 @@ class MeasureRepublishProcess {
   double map_height_time_;
   std::mutex height_mutex_;
 
+  bool is_using_novatel_heading_;
+  double novatel_heading_time_;
+  std::mutex novatel_heading_mutex_;
+
   GnssMode gnss_mode_;
 
   static constexpr double DEG_TO_RAD = 0.017453292519943;
@@ -108,6 +125,7 @@ class MeasureRepublishProcess {
   static constexpr double GNSS_XY_STD_THRESHOLD = 5.0;
   static constexpr double BESTPOSE_TIME_MAX_INTERVAL = 1.05;
   static constexpr int BESTPOSE_GOOD_COUNT = 10;
+  VehicleGnssAntExtrinsic imu_gnssant_extrinsic_;
 };
 
 }  // namespace msf
