@@ -38,11 +38,14 @@ if __name__ == "__main__":
         "-sld", "--showlanedetails", action="store_const", const=True,
         help="Show all lane ids in map")
     parser.add_argument(
-        "-ss", "--showsignals", action="store_const", const=True,
-        help="Show all signal light stop lines with ids in map")
-    parser.add_argument(
         "-l", "--laneid", nargs='+',
         help="Show specific lane id(s) in map")
+    parser.add_argument(
+        "-signal", "--showsignals", action="store_const", const=True,
+        help="Show all signal light stop lines with ids in map")
+    parser.add_argument(
+        "-stopsign", "--showstopsigns", action="store_const", const=True,
+        help="Show all stop sign stop lines with ids in map")
     parser.add_argument(
         "--loc", action="store", type=str, required=False,
         help="Specify the localization pb file in txt format")
@@ -62,6 +65,8 @@ if __name__ == "__main__":
     map.draw_lanes(plt, args.showlaneids, lane_ids, args.showlanedetails)
     if args.showsignals:
         map.draw_signal_lights(plt)
+    if args.showstopsigns:
+        map.draw_stop_signs(plt)
 
     if args.drivingpath is not None:
         path = Path(args.drivingpath)
