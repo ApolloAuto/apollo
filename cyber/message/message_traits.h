@@ -20,7 +20,9 @@
 #include <string>
 
 #include "cyber/base/macros.h"
+#include "cyber/common/log.h"
 #include "cyber/message/intra_message.h"
+#include "cyber/message/message_header.h"
 #include "cyber/message/protobuf_traits.h"
 #include "cyber/message/py_message_traits.h"
 #include "cyber/message/raw_message_traits.h"
@@ -31,6 +33,7 @@ namespace message {
 
 DEFINE_TYPE_TRAIT(HasByteSize, ByteSize)
 DEFINE_TYPE_TRAIT(HasType, TypeName)
+DEFINE_TYPE_TRAIT(HasSetType, SetTypeName)
 DEFINE_TYPE_TRAIT(HasDescriptor, GetDescriptorString)
 DEFINE_TYPE_TRAIT(HasSerializeToString, SerializeToString)
 DEFINE_TYPE_TRAIT(HasParseFromString, ParseFromString)
@@ -49,6 +52,72 @@ class HasSerializer {
 template <typename T>
 constexpr bool HasSerializer<T>::value;
 
+template <typename T,
+          typename std::enable_if<HasType<T>::value &&
+                                      std::is_member_function_pointer<
+                                          decltype(&T::TypeName)>::value,
+                                  bool>::type = 0>
+std::string MessageType(const T& message) {
+  return message.TypeName();
+}
+
+template <typename T,
+          typename std::enable_if<HasType<T>::value &&
+                                      !std::is_member_function_pointer<
+                                          decltype(&T::TypeName)>::value,
+                                  bool>::type = 0>
+std::string MessageType(const T& message) {
+  return T::TypeName();
+}
+
+template <typename T,
+          typename std::enable_if<
+              !HasType<T>::value &&
+                  !std::is_base_of<google::protobuf::Message, T>::value,
+              bool>::type = 0>
+std::string MessageType(const T& message) {
+  return typeid(T).name();
+}
+
+template <typename T,
+          typename std::enable_if<HasType<T>::value &&
+                                      !std::is_member_function_pointer<
+                                          decltype(&T::TypeName)>::value,
+                                  bool>::type = 0>
+std::string MessageType() {
+  return T::TypeName();
+}
+
+template <typename T,
+          typename std::enable_if<
+              !HasType<T>::value &&
+                  !std::is_base_of<google::protobuf::Message, T>::value,
+              bool>::type = 0>
+std::string MessageType() {
+  return typeid(T).name();
+}
+
+template <
+    typename T,
+    typename std::enable_if<
+        HasType<T>::value &&
+            std::is_member_function_pointer<decltype(&T::TypeName)>::value &&
+            !std::is_base_of<google::protobuf::Message, T>::value,
+        bool>::type = 0>
+std::string MessageType() {
+  return typeid(T).name();
+}
+
+template <typename T>
+typename std::enable_if<HasSetType<T>::value, void>::type SetTypeName(
+    const std::string& type_name, T* message) {
+  message->SetTypeName(type_name);
+}
+
+template <typename T>
+typename std::enable_if<!HasSetType<T>::value, void>::type SetTypeName(
+    const std::string& type_name, T* message) {}
+
 template <typename T>
 typename std::enable_if<HasByteSize<T>::value, int>::type ByteSize(
     const T& message) {
@@ -60,6 +129,15 @@ typename std::enable_if<!HasByteSize<T>::value, int>::type ByteSize(
     const T& message) {
   (void)message;
   return -1;
+}
+
+template <typename T>
+int FullByteSize(const T& message) {
+  int content_size = ByteSize(message);
+  if (content_size < 0) {
+    return content_size;
+  }
+  return content_size + sizeof(MessageHeader);
 }
 
 template <typename T>
@@ -87,6 +165,25 @@ ParseFromString(const std::string& str, T* message) {
 }
 
 template <typename T>
+typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromHC(
+    const void* data, int size, T* message) {
+  const auto header_size = sizeof(MessageHeader);
+  RETURN_VAL_IF(size < header_size, false);
+  const MessageHeader* header = static_cast<const MessageHeader*>(data);
+  RETURN_VAL_IF((size - header_size) < header->content_size(), false);
+  SetTypeName(header->msg_type(), message);
+  return message->ParseFromArray(
+      static_cast<const void*>(static_cast<const char*>(data) + header_size),
+      header->content_size());
+}
+
+template <typename T>
+typename std::enable_if<!HasParseFromArray<T>::value, bool>::type ParseFromHC(
+    const void* data, int size, T* message) {
+  return false;
+}
+
+template <typename T>
 typename std::enable_if<HasSerializeToArray<T>::value, bool>::type
 SerializeToArray(const T& message, void* data, int size) {
   return message.SerializeToArray(data, size);
@@ -110,25 +207,28 @@ SerializeToString(const T& message, std::string* str) {
   return false;
 }
 
-template <typename T,
-          typename std::enable_if<HasType<T>::value, bool>::type = 0>
-std::string MessageType(const T& message) {
-  return T::TypeName();
+template <typename T>
+typename std::enable_if<HasSerializeToArray<T>::value, bool>::type
+SerializeToHC(const T& message, void* data, int size) {
+  int msg_size = ByteSize(message);
+  if (msg_size < 0) {
+    return false;
+  }
+  const std::string& type_name = MessageType(message);
+  MessageHeader header;
+  header.set_msg_type(type_name.data(), type_name.size());
+  header.set_content_size(msg_size);
+  char* ptr = reinterpret_cast<char*>(data);
+  memcpy(ptr, static_cast<const void*>(&header), sizeof(header));
+  ptr += sizeof(header);
+  int left_size = size - static_cast<int>(sizeof(header));
+  return SerializeToArray(message, reinterpret_cast<void*>(ptr), left_size);
 }
 
-template <typename T,
-          typename std::enable_if<HasType<T>::value, bool>::type = 0>
-std::string MessageType() {
-  return T::TypeName();
-}
-
-template <typename T,
-          typename std::enable_if<
-              !HasType<T>::value &&
-                  !std::is_base_of<google::protobuf::Message, T>::value,
-              bool>::type = 0>
-std::string MessageType() {
-  return typeid(T).name();
+template <typename T>
+typename std::enable_if<!HasSerializeToArray<T>::value, bool>::type
+SerializeToHC(const T& message, void* data, int size) {
+  return false;
 }
 
 template <typename T,
