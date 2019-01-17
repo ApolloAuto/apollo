@@ -50,5 +50,3 @@ DECLARE_int32(localization_pending_queue_size);
 DECLARE_int32(pad_msg_pending_queue_size);
 
 DECLARE_bool(reverse_heading_control);
-
-DECLARE_bool(use_acceleration);

@@ -256,35 +256,25 @@ Status LonController::ComputeControlCommand(
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
           ? -acceleration_cmd
           : acceleration_cmd;
-  if (!FLAGS_use_acceleration) {
-    if (FLAGS_use_preview_speed_for_table) {
-      calibration_value = control_interpolation_->Interpolate(
-        std::make_pair(debug->preview_speed_reference(), acceleration_lookup));
-    } else {
-      calibration_value = control_interpolation_->Interpolate(
-        std::make_pair(chassis_->speed_mps(), acceleration_lookup));
-    }
 
-    if (calibration_value >= 0) {
-      throttle_cmd = std::abs(calibration_value) > throttle_deadzone
+  if (FLAGS_use_preview_speed_for_table) {
+    calibration_value = control_interpolation_->Interpolate(
+        std::make_pair(debug->preview_speed_reference(), acceleration_lookup));
+  } else {
+    calibration_value = control_interpolation_->Interpolate(
+        std::make_pair(chassis_->speed_mps(), acceleration_lookup));
+  }
+
+  if (calibration_value >= 0) {
+    throttle_cmd = std::abs(calibration_value) > throttle_deadzone
                        ? std::abs(calibration_value)
                        : throttle_deadzone;
-      brake_cmd = 0.0;
-    } else {
-      throttle_cmd = 0.0;
-      brake_cmd = std::abs(calibration_value) > brake_deadzone
+    brake_cmd = 0.0;
+  } else {
+    throttle_cmd = 0.0;
+    brake_cmd = std::abs(calibration_value) > brake_deadzone
                     ? std::abs(calibration_value)
                     : brake_deadzone;
-    }
-      cmd->set_throttle(throttle_cmd);
-      cmd->set_brake(brake_cmd);
-  } else {
-      cmd->set_acceleration(acceleration_cmd);
-    if (acceleration_cmd >= 0) {
-      cmd->set_throttle(acceleration_cmd);
-    } else {
-      cmd->set_brake(acceleration_cmd);
-    }
   }
 
   debug->set_station_error_limited(station_error_limited);
@@ -311,6 +301,11 @@ Status LonController::ComputeControlCommand(
             debug->speed_lookup(), calibration_value, throttle_cmd, brake_cmd,
             debug->is_full_stop());
   }
+
+  // if the car is driven by acceleration, disgard the cmd->throttle and brake
+  cmd->set_throttle(throttle_cmd);
+  cmd->set_brake(brake_cmd);
+  cmd->set_acceleration(acceleration_cmd);
 
   if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||
