@@ -67,7 +67,7 @@ class Adseps113 : public ::apollo::drivers::canbus::ProtocolData<
 
  private:
   Ads_eps_113::Ads_epsmodeType ads_epsmode_;
-  double ads_reqepstargetangle_;
+  double ads_reqepstargetangle_ = 0.0;
 };
 
 }  // namespace wey

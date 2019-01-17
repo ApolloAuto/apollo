@@ -427,8 +427,10 @@ Status MPCController::ComputeControlCommand(
   }
 
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
+  // if the car is driven by acceleration, disgard the cmd->throttle and brake
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
+  cmd->set_acceleration(acceleration_cmd);
 
   debug->set_heading(VehicleStateProvider::Instance()->heading());
   debug->set_steering_position(chassis->steering_percentage());

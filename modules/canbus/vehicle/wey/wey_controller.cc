@@ -518,7 +518,7 @@ ErrorCode WeyController::EnableSpeedOnlyMode() {
   }
 }
 
-// NEUTRAL, REVERSE, DRIVE
+// NEUTRAL, REVERSE, DRIVE, PARK
 void WeyController::Gear(Chassis::GearPosition gear_position) {
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
@@ -562,7 +562,7 @@ void WeyController::Gear(Chassis::GearPosition gear_position) {
   }
 }
 
-// brake with acceleration
+// brake with pedal
 // acceleration:-7.0 ~ 5.0, unit:m/s^2
 void WeyController::Brake(double pedal) {
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
@@ -570,13 +570,10 @@ void WeyController::Brake(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  ads1_111_->set_ads_dectostop(Ads1_111::ADS_DECTOSTOP_DEMAND);
-  ads1_111_->set_ads_driveoff_req(Ads1_111::ADS_DRIVEOFF_REQ_NO_DEMAND);
-  ads1_111_->set_ads_taracce(pedal);
+  // None
 }
 
-// drive with acceleration
-// first true the Flags_use_acceleration in canbus.conf and control.conf
+// drive with pedal
 // acceleration:-7.0 ~ 5.0, unit:m/s^2
 void WeyController::Throttle(double pedal) {
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
@@ -584,10 +581,28 @@ void WeyController::Throttle(double pedal) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
-  ads1_111_->set_ads_dectostop(Ads1_111::ADS_DECTOSTOP_NO_DEMAND);
-  ads1_111_->set_ads_driveoff_req(Ads1_111::ADS_DRIVEOFF_REQ_DEMAND);
-  ads1_111_->set_ads_taracce(pedal);
+  // None
 }
+
+// wey use the acc to control the car acceleration and deceleration
+// drive with acceleration/deceleration
+// acc:-7.0 ~ 5.0, unit:m/s^2
+void WeyController::Acceleration(double acc) {
+  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+    AINFO << "The current drive mode does not need to set acceleration.";
+    return;
+  }
+  if (acc >= 0) {
+    ads1_111_->set_ads_dectostop(Ads1_111::ADS_DECTOSTOP_NO_DEMAND);
+    ads1_111_->set_ads_driveoff_req(Ads1_111::ADS_DRIVEOFF_REQ_DEMAND);
+  } else {
+    ads1_111_->set_ads_dectostop(Ads1_111::ADS_DECTOSTOP_DEMAND);
+    ads1_111_->set_ads_driveoff_req(Ads1_111::ADS_DRIVEOFF_REQ_NO_DEMAND);
+  }
+  ads1_111_->set_ads_taracce(acc);
+}
+
 
 // wey default, -500 ~ 500, left:+, right:-
 // angle:-99.99~0.00~99.99, unit:, left:+, right:-

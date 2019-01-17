@@ -56,8 +56,3 @@ DEFINE_int32(pad_msg_pending_queue_size, 10,
              "Max pad message pending queue size");
 
 DEFINE_bool(reverse_heading_control, false, "test vehicle reverse control");
-
-// switch to use acceleration_cmd or pedal_cmd (brake and throttle) for control
-// TODO(ChaoMa) : default: use pedal_cmd
-DEFINE_bool(use_acceleration, false,
-             "True to use acceleration_cmd instead of pedal_cmd");
