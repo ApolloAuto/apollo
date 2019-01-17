@@ -53,8 +53,11 @@ void switch_stream_status(const apollo::drivers::gnss::Stream::Status &status,
 std::string getLocalTimeFileStr(const std::string &gpsbin_folder) {
   time_t it = std::time(0);
   char local_time_char[64];
+  std::tm time_tm;
+  localtime_r(&it, &time_tm);
+
   std::strftime(local_time_char, sizeof(local_time_char), "%Y%m%d_%H%M%S",
-                localtime(&it));
+                &time_tm);
   std::string local_time_str = local_time_char;
   CHECK(cyber::common::EnsureDirectory(gpsbin_folder))
       << "gbsbin folder : " << gpsbin_folder << " create fail";
