@@ -192,7 +192,8 @@ int StageStop::RemoveWatchVehicle(
 
       const PerceptionObstacle& perception_obstacle = obstacle->Perception();
       PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
-      std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
+      std::string obstacle_type_name =
+          PerceptionObstacle_Type_Name(obstacle_type);
       auto obstacle_point = common::util::MakePointENU(
           perception_obstacle.position().x(),
           perception_obstacle.position().y(),
@@ -200,7 +201,8 @@ int StageStop::RemoveWatchVehicle(
 
       double distance = common::util::DistanceXY(
           stop_sign_point, obstacle_point);
-      ADEBUG << "obstacle_id[" << obstacle_id << "] distance[" << distance << "]";
+      ADEBUG << "obstacle_id[" << obstacle_id
+          << "] distance[" << distance << "]";
 
       // TODO(all): move 10.0 to conf
       if (distance > 10.0) {
