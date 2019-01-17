@@ -131,9 +131,9 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
  private:
   Ads1_111::Ads_dectostopType ads_dectostop_;
   Ads1_111::Ads_modeType ads_mode_;
-  double ads_taracce_;
+  double ads_taracce_ = 0.0;
   Ads1_111::Ads_driveoff_reqType ads_driveoff_req_;
-  double ads_aeb_taracce_;
+  double ads_aeb_taracce_ = 0.0;
   Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req_;
 };
 

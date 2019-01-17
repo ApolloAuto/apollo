@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/canbus/common/canbus_gflags.h"
 
 #include "cyber/common/log.h"
 
@@ -127,16 +126,9 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
   if (driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE ||
       driving_mode_ == Chassis::AUTO_SPEED_ONLY) {
     Gear(control_command.gear_location());
-    if (!FLAGS_use_acceleration) {
-      Throttle(control_command.throttle());
-      Brake(control_command.brake());
-    } else {
-     if (control_command.acceleration() >= 0) {
-      Throttle(control_command.throttle());
-      } else {
-      Brake(control_command.brake());
-      }
-    }
+    Throttle(control_command.throttle());
+    Acceleration(control_command.acceleration());
+    Brake(control_command.brake());
     SetEpbBreak(control_command);
     SetLimits();
   }

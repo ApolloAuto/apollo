@@ -552,6 +552,17 @@ void LincolnController::Throttle(double pedal) {
   throttle_62_->set_pedal(pedal);
 }
 
+// drive with acceleration/deceleration
+// acc:-7.0 ~ 5.0, unit:m/s^2
+void LincolnController::Acceleration(double acc) {
+  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+    AINFO << "The current drive mode does not need to set acceleration.";
+    return;
+  }
+  // None
+}
+
 // lincoln default, -470 ~ 470, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed
