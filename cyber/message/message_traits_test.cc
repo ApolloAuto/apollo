@@ -69,7 +69,12 @@ class Message {
     *str = "message";
   }
 
-  std::string TypeName() { return "type"; }
+  std::string TypeName() const { return "type"; }
+};
+
+class PbMessage {
+ public:
+  static std::string TypeName() { return "protobuf"; }
 };
 
 TEST(MessageTraitsTest, type_trait) {
@@ -90,6 +95,13 @@ TEST(MessageTraitsTest, type_trait) {
   EXPECT_TRUE(HasType<RawMessage>::value);
   EXPECT_TRUE(HasSerializer<RawMessage>::value);
   EXPECT_TRUE(HasDescriptor<RawMessage>::value);
+
+  Message msg;
+  EXPECT_EQ("type", MessageType<Message>(msg));
+
+  PbMessage pb_msg;
+  EXPECT_EQ("protobuf", MessageType<PbMessage>(pb_msg));
+  EXPECT_EQ("protobuf", MessageType<PbMessage>());
 }
 
 TEST(MessageTraitsTest, byte_size) {
@@ -218,6 +230,42 @@ TEST(MessageTraitsTest, parse_from_string) {
   RawMessage raw;
   EXPECT_TRUE(ParseFromString(str, &raw));
   EXPECT_EQ(str, raw.message);
+}
+
+TEST(MessageTraitsTest, serialize_parse_hc) {
+  auto msg = std::make_shared<proto::Chatter>();
+  msg->set_timestamp(12345);
+  msg->set_seq(1);
+  msg->set_content("chatter msg");
+
+  const int size = ByteSize(*msg) + static_cast<int>(sizeof(MessageHeader));
+  std::string buffer;
+  buffer.resize(size);
+  EXPECT_TRUE(SerializeToHC(*msg, const_cast<char*>(buffer.data()), size));
+
+  auto pb_msg = std::make_shared<proto::Chatter>();
+  auto raw_msg = std::make_shared<RawMessage>();
+
+  EXPECT_TRUE(
+      ParseFromHC(const_cast<char*>(buffer.data()), size, pb_msg.get()));
+  EXPECT_TRUE(
+      ParseFromHC(const_cast<char*>(buffer.data()), size, raw_msg.get()));
+
+  std::string new_buffer;
+  new_buffer.resize(size);
+  EXPECT_TRUE(
+      SerializeToHC(*pb_msg, const_cast<char*>(new_buffer.data()), size));
+  EXPECT_EQ(new_buffer, buffer);
+  new_buffer.clear();
+
+  new_buffer.resize(size);
+  EXPECT_TRUE(
+      SerializeToHC(*raw_msg, const_cast<char*>(new_buffer.data()), size));
+  EXPECT_TRUE(
+      ParseFromHC(const_cast<char*>(new_buffer.data()), size, pb_msg.get()));
+  EXPECT_EQ(pb_msg->timestamp(), 12345);
+  EXPECT_EQ(pb_msg->seq(), 1);
+  EXPECT_EQ(pb_msg->content(), "chatter msg");
 }
 
 TEST(MessageTraitsTest, message_type) {
