@@ -136,10 +136,7 @@ Stage::StageStatus StageStop::Process(
   }
 
   const PathDecision& path_decision = reference_line_info.path_decision();
-  for (const auto* obstacle : path_decision.obstacles().Items()) {
-    // remove from watch_vehicles_ if adc is stopping/waiting at stop sign
-    RemoveWatchVehicle(*obstacle, watch_vehicle_ids, &watch_vehicles);
-  }
+  RemoveWatchVehicle(path_decision, &watch_vehicles);
 
   return Stage::RUNNING;
 }
@@ -148,39 +145,12 @@ Stage::StageStatus StageStop::Process(
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
 int StageStop::RemoveWatchVehicle(
-    const Obstacle& obstacle, const std::vector<std::string>& watch_vehicle_ids,
+    const PathDecision& path_decision,
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  const PerceptionObstacle& perception_obstacle = obstacle.Perception();
-  const std::string& obstacle_id = std::to_string(perception_obstacle.id());
-  PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
-  std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
-
-  // check type
-  if (obstacle_type != PerceptionObstacle::UNKNOWN &&
-      obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
-      obstacle_type != PerceptionObstacle::BICYCLE &&
-      obstacle_type != PerceptionObstacle::VEHICLE) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "]. skip";
-    return 0;
-  }
-
-  // check if being watched
-  if (std::find(watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-                obstacle_id) == watch_vehicle_ids.end()) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "] not being watched. skip";
-    return 0;
-  }
-
   for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
-    if (std::find(it->second.begin(), it->second.end(), obstacle_id) ==
-        it->second.end()) {
-      continue;
-    }
-
+    // associated_lane/stop_sign info
     std::string associated_lane_id = it->first;
     auto assoc_lane_it = std::find_if(
         GetContext()->associated_lanes.begin(),
@@ -192,7 +162,6 @@ int StageStop::RemoveWatchVehicle(
     if (assoc_lane_it == GetContext()->associated_lanes.end()) {
       continue;
     }
-
     auto stop_sign_over_lap_info =
         assoc_lane_it->second.get()->GetObjectOverlapInfo(
             hdmap::MakeMapId(associated_lane_id));
@@ -210,24 +179,40 @@ int StageStop::RemoveWatchVehicle(
       continue;
     }
     auto stop_sign_point = lane.get()->GetSmoothPoint(stop_line_end_s);
-    auto obstacle_point = common::util::MakePointENU(
-        perception_obstacle.position().x(), perception_obstacle.position().y(),
-        perception_obstacle.position().z());
 
-    double distance = common::util::DistanceXY(stop_sign_point, obstacle_point);
-    ADEBUG << "obstacle_id[" << obstacle_id << "] distance[" << distance << "]";
-
-    // TODO(all): move 10.0 to conf
-    if (distance > 10.0) {
-      ADEBUG << "ERASE obstacle_id[" << obstacle_id << "]";
-      for (StopSignLaneVehicles::iterator it = watch_vehicles->begin();
-           it != watch_vehicles->end(); ++it) {
-        std::vector<std::string>& vehicles = it->second;
-        vehicles.erase(
-            std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
-            vehicles.end());
+    std::vector<std::string> remove_vehicles;
+    for (auto obstacle_id : it->second) {
+      // watched-vehicle info
+      auto *obstacle = path_decision.Find(obstacle_id);
+      if (!obstacle) {
+        AERROR << "mark ERASE obstacle_id[" << obstacle_id << "] not exist";
+        remove_vehicles.push_back(obstacle_id);
+        continue;
       }
-      return 0;
+
+      const PerceptionObstacle& perception_obstacle = obstacle->Perception();
+      PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+      std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
+      auto obstacle_point = common::util::MakePointENU(
+          perception_obstacle.position().x(),
+          perception_obstacle.position().y(),
+          perception_obstacle.position().z());
+
+      double distance = common::util::DistanceXY(
+          stop_sign_point, obstacle_point);
+      ADEBUG << "obstacle_id[" << obstacle_id << "] distance[" << distance << "]";
+
+      // TODO(all): move 10.0 to conf
+      if (distance > 10.0) {
+        ADEBUG << "mark ERASE obstacle_id[" << obstacle_id << "]";
+        remove_vehicles.push_back(obstacle_id);
+      }
+    }
+    for (auto obstacle_id : remove_vehicles) {
+      ADEBUG << "ERASE obstacle_id[" << obstacle_id << "]";
+      it->second.erase(
+          std::remove(it->second.begin(), it->second.end(), obstacle_id),
+          it->second.end());
     }
   }
 
