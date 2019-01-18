@@ -1,0 +1,118 @@
+#!/usr/bin/env python
+
+###############################################################################
+# Copyright 2019 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
+import random
+from google.protobuf.internal import decoder
+from google.protobuf.internal import encoder
+import hybrid_a_star_visualizer
+import common.proto_utils as proto_utils
+from modules.planning.proto import planner_open_space_config_pb2
+
+
+def load_open_space_protobuf(filename):
+    open_space_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()
+    proto_utils.get_pb_from_text_file(filename, open_space_params)
+    return open_space_params
+
+
+def GetParamsForTunning(tunning_object):
+    param_names_and_range = []
+    if tunning_object == "coarse_trajectory":
+        param_names_and_range.append(
+            ("warm_start_config.traj_forward_penalty", 2.0))
+        param_names_and_range.append(
+            ("warm_start_config.traj_back_penalty", 2.0))
+        param_names_and_range.append(
+            ("warm_start_config.traj_gear_switch_penalty", 2.0))
+        param_names_and_range.append(
+            ("warm_start_config.traj_steer_penalty", 2.0))
+        param_names_and_range.append(
+            ("warm_start_config.traj_steer_change_penalty", 2.0))
+    return param_names_and_range
+
+
+def RandSampling(param_names_and_range, origin_open_space_params):
+    rand_num = 10
+    params_lists = []
+    for iter in range(0, rand_num):
+        rand_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()
+        rand_params.CopyFrom(origin_open_space_params)
+        for param in param_names_and_range:
+            exec("rand_params." +
+                 str(param[0]) + "=random.uniform(rand_params." +
+                 str(param[0])
+                 + " - " + str(param[1])
+                 + " ,rand_params." + str(param[0]) + " + " + str(param[1]) + ")")
+            params_lists.append(rand_params)
+    return params_lists
+
+
+def TestingParams(params_lists, tunning_object):
+    key_to_evaluations = {}
+    for iter in range(0, len(params_lists)):
+        evaluation = ParamEvaluation(params_lists[iter], tunning_object)
+        key_to_evaluations[iter] = evaluation
+    return key_to_evaluations
+
+
+def ParamEvaluation(params, tunning_object):
+    proto_utils.write_pb_to_text_file(params, original_file_path)
+    if tunning_object == "coarse_trajectory":
+        visualize_flag = False
+        success, x_out, y_out, phi_out, v_out, a_out, steer_out, planning_time = hybrid_a_star_visualizer.HybridAStarPlan(
+            visualize_flag)
+        if not success:
+            return float('inf')
+        else:
+            return planning_time
+
+
+def GetOptimalParams(params_lists, key_to_evaluations):
+    tmp = []
+    for key, value in key_to_evaluations.items():
+        tmptuple = (value, key)
+        tmp.append(tmptuple)
+
+    tmp = sorted(tmp)
+    optimal_params = params_lists[tmp[0][1]]
+    optimal_evaluation = tmp[0][0]
+    return optimal_params, optimal_evaluation
+
+
+if __name__ == '__main__':
+    random.seed(666)
+    original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
+    optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
+    tunning_object = "coarse_trajectory"
+    param_names_and_range = GetParamsForTunning(tunning_object)
+    origin_open_space_params = load_open_space_protobuf(original_file_path)
+    params_lists = RandSampling(
+        param_names_and_range, origin_open_space_params)
+    key_to_evaluations = TestingParams(params_lists, tunning_object)
+    optimal_params, optimal_evaluation = GetOptimalParams(
+        params_lists, key_to_evaluations)
+    origin_evaluation = ParamEvaluation(
+        origin_open_space_params, tunning_object)
+    print("optimal_evaluation is " + str(optimal_evaluation))
+    print("origin_evaluation is " + str(origin_evaluation))
+    improvement_percentage = (
+        origin_evaluation - optimal_evaluation) / origin_evaluation
+    print("improvement_percentage is " + str(improvement_percentage))
+    proto_utils.write_pb_to_text_file(optimal_params, optimal_file_path)
+    proto_utils.write_pb_to_text_file(
+        origin_open_space_params, original_file_path)
