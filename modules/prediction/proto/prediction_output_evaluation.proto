@@ -18,5 +18,6 @@ message TrajectoryEvaluationMetrics {
 }
 
 message TrajectoryEvaluationMetricsGroup {
-  map<string, TrajectoryEvaluationMetrics> metrics = 1;
+  optional TrajectoryEvaluationMetrics junction_metrics = 1;
+  optional TrajectoryEvaluationMetrics on_lane_metrics = 2;
 }

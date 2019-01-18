@@ -72,8 +72,15 @@ cc_binary(
     srcs = ["evaluate_prediction_output.cc"],
     deps = [
         "//cyber/common:file",
+        "//modules/common/adapters/proto:adapter_config_proto",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_output_evaluation_proto",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/predictor:predictor_manager",
     ],
 )
 
