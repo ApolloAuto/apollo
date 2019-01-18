@@ -153,10 +153,15 @@ void ScenarioManager::Observe(const Frame& frame) {
       min_start_s = stop_sign_overlap.start_s;
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap =
           stop_sign_overlap;
+    } else {
+      // clear stop_done_overlap_id if already passed
+      if (PlanningContext::GetScenarioInfo()->stop_done_overlap_id ==
+          stop_sign_overlap.object_id) {
+        PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+      }
     }
   }
-  ADEBUG
-      << "Stop Sign: "
+  ADEBUG << "Stop Sign: "
       << PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
 
   // find next traffic_light_overlap
@@ -170,6 +175,12 @@ void ScenarioManager::Observe(const Frame& frame) {
       min_start_s = traffic_light_overlap.start_s;
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap =
           traffic_light_overlap;
+    } else {
+      // clear stop_done_overlap_id if already passed
+      if (PlanningContext::GetScenarioInfo()->stop_done_overlap_id ==
+          traffic_light_overlap.object_id) {
+        PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+      }
     }
   }
   ADEBUG << "Traffic Light: "
@@ -189,8 +200,7 @@ void ScenarioManager::Observe(const Frame& frame) {
           crosswalk_overlap;
     }
   }
-  ADEBUG
-      << "Crosswalk: "
+  ADEBUG << "Crosswalk: "
       << PlanningContext::GetScenarioInfo()->next_crosswalk_overlap.object_id;
 }
 

@@ -71,8 +71,7 @@ Stage::StageStatus StageCreep::Process(
                      return overlap.object_id == traffic_light_overlap_id;
                    });
   if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+    return FinishScenario();
   }
 
   // check on traffic light color

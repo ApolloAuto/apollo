@@ -62,7 +62,7 @@ Stage::StageStatus StageIntersectionCruise::Process(
                      return overlap.object_id == stop_sign_overlap_id;
                    });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    return FinishStage();
+    return FinishScenario();
   }
 
   // check pass intersection
@@ -77,8 +77,7 @@ Stage::StageStatus StageIntersectionCruise::Process(
 }
 
 Stage::StageStatus StageIntersectionCruise::FinishStage() {
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
+  return FinishScenario();
 }
 
 }  // namespace stop_sign
