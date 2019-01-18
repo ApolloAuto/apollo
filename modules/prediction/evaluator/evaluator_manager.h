@@ -23,6 +23,7 @@
 
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "cyber/common/macros.h"
 #include "modules/prediction/evaluator/evaluator.h"
@@ -58,6 +59,9 @@ class EvaluatorManager {
    * @brief Run evaluators
    */
   void Run();
+
+  void EvaluateObstacle(
+      Obstacle* obstacle, std::vector<Obstacle*> dynamic_env);
 
   void EvaluateObstacle(Obstacle* obstacle);
 

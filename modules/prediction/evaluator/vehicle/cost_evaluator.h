@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
@@ -38,6 +40,11 @@ class CostEvaluator : public Evaluator {
    * @param Obstacle pointer
    */
   void Evaluate(Obstacle* obstacle_ptr) override;
+
+  /**
+    * @brief Get the name of evaluator.
+    */
+  std::string GetName() override {return "COST_EVALUATOR";}
 
  private:
   double ComputeProbability(const double obstacle_length,

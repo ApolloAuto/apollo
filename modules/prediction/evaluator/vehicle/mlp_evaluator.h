@@ -55,6 +55,11 @@ class MLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
+    * @brief Get the name of evaluator.
+    */
+  std::string GetName() override {return "MLP_EVALUATOR";}
+
+  /**
    * @brief Clear obstacle feature map
    */
   void Clear();

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -45,11 +46,29 @@ class Evaluator {
    */
   virtual ~Evaluator() = default;
 
+  // TODO(all): Need to merge the following two functions into a single one.
+  // Can try using proto to pass static/dynamic env info.
+
   /**
    * @brief Evaluate an obstacle
    * @param Obstacle pointer
    */
   virtual void Evaluate(Obstacle* obstacle) = 0;
+
+  /**
+    * @brief Evaluate an obstacle
+    * @param Obstacle pointer
+    * @param vector of all Obstacles
+    */
+  virtual void Evaluate(
+      Obstacle* obstacle, std::vector<Obstacle*> dynamic_env) {
+    Evaluate(obstacle);
+  }
+
+  /**
+    * @brief Get the name of evaluator
+    */
+  virtual std::string GetName() = 0;
 
  protected:
   // Helper function to convert world coordinates to relative coordinates
