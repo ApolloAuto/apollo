@@ -17,11 +17,18 @@
 ###############################################################################
 
 import random
+import argparse
 from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 import hybrid_a_star_visualizer
 import common.proto_utils as proto_utils
 from modules.planning.proto import planner_open_space_config_pb2
+
+
+random.seed(233)
+original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
+optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
+tunning_object = "coarse_trajectory"
 
 
 def load_open_space_protobuf(filename):
@@ -47,16 +54,16 @@ def GetParamsForTunning(tunning_object):
 
 
 def RandSampling(param_names_and_range, origin_open_space_params):
-    rand_num = 10
+    rand_num = 100
     params_lists = []
     for iter in range(0, rand_num):
         rand_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()
         rand_params.CopyFrom(origin_open_space_params)
         for param in param_names_and_range:
             exec("rand_params." +
-                 str(param[0]) + "=random.uniform(rand_params." +
+                 str(param[0]) + "=random.uniform(max(rand_params." +
                  str(param[0])
-                 + " - " + str(param[1])
+                 + " - " + str(param[1]) + ",0.0)"
                  + " ,rand_params." + str(param[0]) + " + " + str(param[1]) + ")")
             params_lists.append(rand_params)
     return params_lists
@@ -95,10 +102,22 @@ def GetOptimalParams(params_lists, key_to_evaluations):
 
 
 if __name__ == '__main__':
-    random.seed(666)
-    original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
-    optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
-    tunning_object = "coarse_trajectory"
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--InputConfig", help="original conf address to be tuned", type=str)
+    parser.add_argument("--OutputConfig", help="tuned conf address", type=str)
+    parser.add_argument("--TunningObject",
+                        help="algorithm to be tuned", type=str)
+    args = parser.parse_args()
+    if args.InputConfig is not None:
+        original_file_path = args.InputConfig
+    if args.OutputConfig is not None:
+        optimal_file_path = args.OutputConfig
+    if args.TunningObject is not None:
+        tunning_object = args.TunningObject
+    if tunning_object != "coarse_trajectory":
+        print("Algorithm other than coarse_trajectory is not supported")
+        exit()
     param_names_and_range = GetParamsForTunning(tunning_object)
     origin_open_space_params = load_open_space_protobuf(original_file_path)
     params_lists = RandSampling(
