@@ -66,8 +66,7 @@ Stage::StageStatus StageStop::Process(
                      return overlap.object_id == traffic_light_id;
                    });
   if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+    return FinishScenario();
   }
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -98,6 +97,13 @@ Stage::StageStatus StageStop::Process(
   }
 
   return Stage::RUNNING;
+}
+
+Stage::StageStatus StageStop::FinishScenario() {
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+
+  next_stage_ = ScenarioConfig::NO_STAGE;
+  return Stage::FINISHED;
 }
 
 Stage::StageStatus StageStop::FinishStage() {

@@ -106,6 +106,11 @@ bool Stage::ExecuteTaskOnReferenceLine(
   return true;
 }
 
+Stage::StageStatus Stage::FinishScenario() {
+  next_stage_ = ScenarioConfig::NO_STAGE;
+  return Stage::FINISHED;
+}
+
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
