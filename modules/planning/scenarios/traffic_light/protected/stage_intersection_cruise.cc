@@ -62,7 +62,7 @@ Stage::StageStatus StageIntersectionCruise::Process(
                      return overlap.object_id == traffic_light_overlap_id;
                    });
   if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
-    return FinishStage();
+    return FinishScenario();
   }
 
   // check pass intersection
@@ -77,8 +77,7 @@ Stage::StageStatus StageIntersectionCruise::Process(
 }
 
 Stage::StageStatus StageIntersectionCruise::FinishStage() {
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
+  return FinishScenario();
 }
 
 }  // namespace traffic_light

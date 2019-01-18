@@ -73,8 +73,7 @@ Stage::StageStatus StagePreStop::Process(
                      return overlap.object_id == stop_sign_overlap_id;
                    });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+    return FinishScenario();
   }
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();

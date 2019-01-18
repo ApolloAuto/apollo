@@ -73,8 +73,7 @@ Stage::StageStatus StageStop::Process(
                      return overlap.object_id == stop_sign_overlap_id;
                    });
   if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+    return FinishScenario();
   }
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -219,6 +218,14 @@ int StageStop::RemoveWatchVehicle(
   }
 
   return 0;
+}
+
+Stage::StageStatus StageStop::FinishScenario() {
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+
+  next_stage_ = ScenarioConfig::NO_STAGE;
+  return Stage::FINISHED;
 }
 
 Stage::StageStatus StageStop::FinishStage() {
