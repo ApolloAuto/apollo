@@ -407,11 +407,10 @@ Since all parameters are stored in the parameter service object, the parameters 
 
 ```C
  /**
-   * @brief Construct a new ParameterClient object
-   *
-   * @param node shared_ptr of the node handler
-   * @param service_node_name node name which provide a param services
-   */
+  * @brief Set the Parameter object
+  *
+  * @param parameter parameter to be set
+  */
   void SetParameter(const Parameter& parameter);
 ```
 **Getting parameters:**
