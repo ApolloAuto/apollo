@@ -77,6 +77,7 @@ cc_binary(
         "//modules/prediction/proto:feature_proto",
         "//modules/prediction/proto:offline_features_proto",
         "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/proto:prediction_output_evaluation_proto",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator:evaluator_manager",
