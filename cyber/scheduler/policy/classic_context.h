@@ -28,6 +28,8 @@
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/scheduler/processor_context.h"
+#include "cyber/scheduler/common/mutex_wrapper.h"
+#include "cyber/scheduler/common/cv_wrapper.h"
 
 namespace apollo {
 namespace cyber {
@@ -43,19 +45,19 @@ using CR_GROUP = std::unordered_map<std::string, MULTI_PRIO_QUEUE>;
 using LOCK_QUEUE = std::array<base::AtomicRWLock, MAX_PRIO>;
 using RQ_LOCK_GROUP = std::unordered_map<std::string, LOCK_QUEUE>;
 
-using GRP_WQ_MUTEX = std::unordered_map<std::string, std::mutex>;
-using GRP_WQ_CV = std::unordered_map<std::string, std::condition_variable>;
+using GRP_WQ_MUTEX = std::unordered_map<std::string, MutexWrapper>;
+using GRP_WQ_CV = std::unordered_map<std::string, CvWrapper>;
 
 class ClassicContext : public ProcessorContext {
  public:
+  ClassicContext();
+  explicit ClassicContext(const std::string& group_name);
+
   std::shared_ptr<CRoutine> NextRoutine() override;
   void Wait() override;
   void Shutdown() override;
 
   static void Notify(const std::string& group_name);
-
-  void SetGroupName(const std::string& group_name) { group_name_ = group_name; }
-  std::string group_name_;
 
   alignas(CACHELINE_SIZE) static RQ_LOCK_GROUP rq_locks_;
   alignas(CACHELINE_SIZE) static CR_GROUP cr_group_;
@@ -64,8 +66,15 @@ class ClassicContext : public ProcessorContext {
   alignas(CACHELINE_SIZE) static GRP_WQ_CV cv_wq_;
 
  private:
+  void InitGroup(const std::string& group_name);
+
   std::chrono::steady_clock::time_point wake_time_;
   bool need_sleep_ = false;
+
+  MULTI_PRIO_QUEUE *multi_pri_rq_ = nullptr;
+  LOCK_QUEUE *lq_ = nullptr;
+  MutexWrapper *mtx_wrapper_ = nullptr;
+  CvWrapper *cw_ = nullptr;
 };
 
 }  // namespace scheduler
