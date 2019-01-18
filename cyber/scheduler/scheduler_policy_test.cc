@@ -49,7 +49,6 @@ TEST(SchedulerPolicyTest, classic) {
   auto processor = std::make_shared<Processor>();
   auto ctx = std::make_shared<ClassicContext>();
   processor->BindContext(ctx);
-  ctx->SetGroupName(DEFAULT_GROUP_NAME);
   std::vector<std::future<void>> res;
 
   // test single routine
