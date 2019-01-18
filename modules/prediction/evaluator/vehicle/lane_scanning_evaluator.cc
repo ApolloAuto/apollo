@@ -36,6 +36,12 @@ LaneScanningEvaluator::LaneScanningEvaluator() {
 }
 
 void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+  std::vector<Obstacle*> dummy_dynamic_env;
+  Evaluate(obstacle_ptr, dummy_dynamic_env);
+}
+
+void LaneScanningEvaluator::Evaluate(
+    Obstacle* obstacle_ptr, std::vector<Obstacle*> dynamic_env) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
