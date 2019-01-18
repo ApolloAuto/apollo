@@ -26,6 +26,7 @@ from modules.planning.proto import planner_open_space_config_pb2
 
 
 random.seed(233)
+rand_num = 100
 original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
 optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
 tunning_object = "coarse_trajectory"
@@ -54,7 +55,6 @@ def GetParamsForTunning(tunning_object):
 
 
 def RandSampling(param_names_and_range, origin_open_space_params):
-    rand_num = 100
     params_lists = []
     for iter in range(0, rand_num):
         rand_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()
@@ -104,17 +104,15 @@ def GetOptimalParams(params_lists, key_to_evaluations):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--InputConfig", help="original conf address to be tuned", type=str)
-    parser.add_argument("--OutputConfig", help="tuned conf address", type=str)
+        "--InputConfig", help="original conf address to be tuned", type=str, default=original_file_path)
+    parser.add_argument("--OutputConfig", help="tuned conf address",
+                        type=str, default=optimal_file_path)
     parser.add_argument("--TunningObject",
-                        help="algorithm to be tuned", type=str)
+                        help="algorithm to be tuned", type=str, default=tunning_object)
     args = parser.parse_args()
-    if args.InputConfig is not None:
-        original_file_path = args.InputConfig
-    if args.OutputConfig is not None:
-        optimal_file_path = args.OutputConfig
-    if args.TunningObject is not None:
-        tunning_object = args.TunningObject
+    original_file_path = args.InputConfig
+    optimal_file_path = args.OutputConfig
+    tunning_object = args.TunningObject
     if tunning_object != "coarse_trajectory":
         print("Algorithm other than coarse_trajectory is not supported")
         exit()
