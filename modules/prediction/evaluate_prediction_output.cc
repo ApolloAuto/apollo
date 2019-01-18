@@ -26,6 +26,7 @@
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/offline_features.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_output_evaluation.pb.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -59,18 +60,62 @@ void Initialize() {
   PredictorManager::Instance()->Init(prediction_conf);
 }
 
-double CorrectlyPredictedPortionOnLane(
-    const Obstacle* obstacle_ptr, const double time_range,
-    int* num_predicted_trajectory) {
+bool IsCorrectlyPredictedOnLane(
+    const PredictionTrajectoryPoint& future_point,
+    const PredictionObstacle& prediction_obstacle) {
   // TODO(kechxu) implement
-  return 0.0;
+  return false;
+}
+
+bool IsCorrectlyPredictedJunction(
+    const PredictionTrajectoryPoint& future_point,
+    const PredictionObstacle& prediction_obstacle) {
+  // TODO(kechxu) implement
+  return false;
+}
+
+double CorrectlyPredictedPortionOnLane(
+    Obstacle* obstacle_ptr, const double time_range,
+    int* num_predicted_trajectory) {
+  PredictionObstacle prediction_obstacle;
+  EvaluatorManager::Instance()->EvaluateObstacle(obstacle_ptr);
+  PredictorManager::Instance()->PredictObstacle(
+      obstacle_ptr, &prediction_obstacle, nullptr);
+  const Feature& feature = obstacle_ptr->latest_feature();
+  int total_count = 0;
+  int correct_count = 0;
+  for (const auto& future_point : feature.future_trajectory_points()) {
+    if (IsCorrectlyPredictedOnLane(future_point, prediction_obstacle)) {
+      ++correct_count;
+    }
+    ++total_count;
+  }
+  if (total_count == 0) {
+    return 0.0;
+  }
+  return static_cast<double>(correct_count) / static_cast<double>(total_count);
 }
 
 double CorrectlyPredictedPortionJunction(
-    const Obstacle* obstacle_ptr, const double time_range,
+    Obstacle* obstacle_ptr, const double time_range,
     int* num_predicted_trajectory) {
-  // TODO(kechxu) implement
-  return 0.0;
+  PredictionObstacle prediction_obstacle;
+  EvaluatorManager::Instance()->EvaluateObstacle(obstacle_ptr);
+  PredictorManager::Instance()->PredictObstacle(
+      obstacle_ptr, &prediction_obstacle, nullptr);
+  const Feature& feature = obstacle_ptr->latest_feature();
+  int total_count = 0;
+  int correct_count = 0;
+  for (const auto& future_point : feature.future_trajectory_points()) {
+    if (IsCorrectlyPredictedJunction(future_point, prediction_obstacle)) {
+      ++correct_count;
+    }
+    ++total_count;
+  }
+  if (total_count == 0) {
+    return 0.0;
+  }
+  return static_cast<double>(correct_count) / static_cast<double>(total_count);
 }
 
 void UpdateMetrics(const int num_trajectory, const double correct_portion,
@@ -129,6 +174,7 @@ TrajectoryEvaluationMetricsGroup Evaluate(
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
+  FLAGS_enable_trim_prediction_trajectory = false;
   apollo::prediction::Initialize();
   // TODO(kechxu) Load feature proto and run Evaluate
 }
