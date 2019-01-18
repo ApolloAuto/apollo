@@ -16,8 +16,8 @@ In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, an
 
 1. External GPS PPS / GPRMC Input Port 
 2. FAKRA Camera Data Input Port (5 ports)
-3. 10/100/1000M Base-T Ethernet Port (2 Ports) 
-4. KL-15 (AKA Car Ignite) Signal Input Port 
+3. 100 Base-TX/1000 Base-T Ethernet Port (2 Ports) 
+4. KL-15 (AKA Car Ignition) Signal Input Port 
 
 #### Rear Panel Connectors 
 
@@ -51,7 +51,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
 2. FPD-Link III cameras. 
 
-   There are 5 FAKRA connectors for FPD Link III cameras in ASU Front Panel labeled with 1~5, respectively, from right to left. The ASU can support up to 5 cameras by enabling Camera 1 ~ 4 and 5 whose deserializers (TI, DS90UB914ATRHSTQ1) convert FPD Link III signals into parallel data signals.
+   There are 5 FAKRA connectors for FPD Link III cameras in ASU Front Panel labeled with 1~5, respectively, from right to left. The ASU can support up to 5 cameras by enabling Camera 1 ~ 5 whose deserializers (TI, DS90UB914ATRHSTQ1) convert FPD Link III signals into parallel data signals.
 
    |Camera #| I2C Address | Deserializer|
    | -------- | ----------- | ------------------------- |
@@ -80,7 +80,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
 4. GPS synchronization output channels
 
-   The forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors need synchronized, such as Lidars, Stereo Cameras, etc. 
+   ASU forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors that need to be synchronized, such as LiDARs, etc. 
 
    ![1376350-2](images/1376350-2.jpeg)
 
@@ -103,7 +103,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
    The ASU provides 4 CAN Bus ports, the datapath is :
 
-   ![CAN_datapath](images/CAN_datapath.png)
+   ![CAN_datapath](images/CAN_path.png)
 
    | MFR             | MPN       | Description                                        |
    | --------------- | --------- | -------------------------------------------------- |
@@ -117,11 +117,11 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 4     | CANH-1 | INOUT | Channel 1, CANH |
    | 5    | CANL-1 | INOUT | Channel 1, CANL |
    | 6    | GND    | PWR   | Ground          |
-   | 7    | CANH-1 | INOUT | Channel 2, CANH |
-   | 8    | CANL-1 | INOUT | Channel 2, CANL |
+   | 7    | CANH-2 | INOUT | Channel 2, CANH |
+   | 8    | CANL-2 | INOUT | Channel 2, CANL |
    | 9    | GND    | PWR   | Ground          |
-   | 10   | CANH-2 | INOUT | Channel 3, CANH |
-   | 11   | CANL-2 | INOUT | Channel 3, CANL |
+   | 10   | CANH-3 | INOUT | Channel 3, CANH |
+   | 11   | CANL-3 | INOUT | Channel 3, CANL |
    | 12   | GND    | PWR   | Ground          |
 
    
