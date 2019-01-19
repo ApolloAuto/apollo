@@ -239,3 +239,7 @@ DEFINE_double(lane_distance_threshold, 3.0,
 DEFINE_double(lane_angle_difference_threshold, M_PI * 0.25,
               "The threshold for distance to ego/neighbor lane "
               "in feature extraction");
+
+// Trajectory evaluation
+DEFINE_double(distance_threshold_on_lane, 1.5,
+              "The threshold of distance in on-lane situation");
