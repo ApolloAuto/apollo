@@ -25,8 +25,8 @@ import common.proto_utils as proto_utils
 from modules.planning.proto import planner_open_space_config_pb2
 
 
-random.seed(233)
-rand_num = 100
+random.seed(333)
+rand_num = 1000
 original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
 optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
 tunning_object = "coarse_trajectory"
@@ -65,7 +65,7 @@ def RandSampling(param_names_and_range, origin_open_space_params):
                  str(param[0])
                  + " - " + str(param[1]) + ",0.0)"
                  + " ,rand_params." + str(param[0]) + " + " + str(param[1]) + ")")
-            params_lists.append(rand_params)
+        params_lists.append(rand_params)
     return params_lists
 
 
