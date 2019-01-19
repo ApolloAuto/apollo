@@ -133,9 +133,9 @@ class Teleop {
     char c = 0;
     int32_t level = 0;
     double brake = 0;
-    double brake_1 = 0;
     double throttle = 0;
-    double throttle_1 = 0;
+    double acc = 0;
+    double dec = 0;
     double steering = 0;
     struct termios cooked_;
     struct termios raw_;
@@ -177,25 +177,27 @@ class Teleop {
             }
           if (brake > 1e-6) {
             brake = GetCommand(brake, -FLAGS_brake_inc_delta);
-            if (FLAGS_use_acceleration) {
-              brake_1 = brake / 100 * vehicle_params_.max_deceleration();
-              control_command_.set_acceleration(brake_1);
-              control_command_.set_brake(brake_1);
-            } else {
+            if (!FLAGS_use_acceleration) {
               control_command_.set_brake(brake);
+            } else {
+              dec = brake / 100 * vehicle_params_.max_deceleration();
+              control_command_.set_acceleration(dec);
             }
           } else {
             throttle = GetCommand(throttle, FLAGS_throttle_inc_delta);
-            if (FLAGS_use_acceleration) {
-              throttle_1 = throttle / 100 * vehicle_params_.max_acceleration();
-              control_command_.set_acceleration(throttle_1);
-              control_command_.set_throttle(throttle_1);
-            } else {
+            if (!FLAGS_use_acceleration) {
               control_command_.set_throttle(throttle);
+            } else {
+              acc = throttle / 100 * vehicle_params_.max_acceleration();
+              control_command_.set_acceleration(acc);
             }
           }
-          AINFO << "Throttle = " << control_command_.throttle()
-                << ", Brake = " << control_command_.brake();
+          if (!FLAGS_use_acceleration) {
+            AINFO << "Throttle = " << control_command_.throttle()
+                  << ", Brake = " << control_command_.brake();
+          } else {
+            AINFO << "Acceleration = " << control_command_.acceleration();
+          }
           break;
         case KEYCODE_DN1:  // decelerate
         case KEYCODE_DN2:
@@ -205,25 +207,27 @@ class Teleop {
             }
           if (throttle > 1e-6) {
             throttle = GetCommand(throttle, -FLAGS_throttle_inc_delta);
-            if (FLAGS_use_acceleration) {
-              throttle_1 = throttle / 100 * vehicle_params_.max_acceleration();
-              control_command_.set_acceleration(throttle_1);
-              control_command_.set_throttle(throttle_1);
-            } else {
+            if (!FLAGS_use_acceleration) {
               control_command_.set_throttle(throttle);
+            } else {
+              acc = throttle / 100 * vehicle_params_.max_acceleration();
+              control_command_.set_acceleration(acc);
             }
           } else {
             brake = GetCommand(brake, FLAGS_brake_inc_delta);
-            if (FLAGS_use_acceleration) {
-              brake_1 = brake / 100 * vehicle_params_.max_deceleration();
-              control_command_.set_acceleration(brake_1);
-              control_command_.set_brake(brake_1);
-            } else {
+            if (!FLAGS_use_acceleration) {
               control_command_.set_brake(brake);
+            } else {
+              dec = brake / 100 * vehicle_params_.max_deceleration();
+              control_command_.set_acceleration(dec);
             }
           }
-          AINFO << "Throttle = " << control_command_.throttle()
-                << ", Brake = " << control_command_.brake();
+          if (!FLAGS_use_acceleration) {
+            AINFO << "Throttle = " << control_command_.throttle()
+                  << ", Brake = " << control_command_.brake();
+          } else {
+            AINFO << "Acceleration = " << control_command_.acceleration();
+          }
           break;
         case KEYCODE_LF1:  // left
         case KEYCODE_LF2:
