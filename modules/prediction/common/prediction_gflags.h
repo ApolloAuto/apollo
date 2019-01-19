@@ -143,3 +143,6 @@ DECLARE_int32(road_graph_max_search_horizon);
 // scenario feature extraction
 DECLARE_double(lane_distance_threshold);
 DECLARE_double(lane_angle_difference_threshold);
+
+// Trajectory evaluation
+DECLARE_double(distance_threshold_on_lane);
