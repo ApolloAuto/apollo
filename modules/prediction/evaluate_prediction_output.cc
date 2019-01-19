@@ -63,7 +63,27 @@ void Initialize() {
 bool IsCorrectlyPredictedOnLane(
     const PredictionTrajectoryPoint& future_point,
     const PredictionObstacle& prediction_obstacle) {
-  // TODO(kechxu) implement
+  double future_relative_time = future_point.timestamp() -
+                                prediction_obstacle.timestamp();
+  const auto& predicted_trajectories = prediction_obstacle.trajectory();
+  for (const auto& predicted_traj : predicted_trajectories) {
+    // find an index, TODO(kechxu) use binary search to speed up
+    int i = 0;
+    while (i + 1 < predicted_traj.trajectory_point_size() &&
+           predicted_traj.trajectory_point(i + 1).relative_time() <
+           future_relative_time) {
+      ++i;
+    }
+    // TODO(kechxu) consider interpolation
+    double predicted_x = predicted_traj.trajectory_point(i).path_point().x();
+    double predicted_y = predicted_traj.trajectory_point(i).path_point().y();
+    double diff_x = std::abs(predicted_x - future_point.path_point().x());
+    double diff_y = std::abs(predicted_y - future_point.path_point().y());
+    if (diff_x < FLAGS_distance_threshold_on_lane &&
+        diff_y < FLAGS_distance_threshold_on_lane) {
+      return true;
+    }
+  }
   return false;
 }
 
