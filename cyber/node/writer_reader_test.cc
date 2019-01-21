@@ -213,7 +213,7 @@ TEST(WriterReaderTest, observe) {
   EXPECT_EQ(oldest->case_name(), "message_3");
 
   for (auto it = reader.Begin(); it != reader.End(); ++it) {
-    EXPECT_EQ(oldest->case_name(), "message_3");
+    EXPECT_EQ((*it)->case_name(), "message_3");
   }
 
   reader.ClearData();
