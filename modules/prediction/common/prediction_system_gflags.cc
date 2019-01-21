@@ -42,12 +42,14 @@ DEFINE_double(
     "The runtime duration in test mode (in seconds). Negative value will not "
     "restrict the runtime duration.");
 
-DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
 DEFINE_string(
     prediction_offline_bags, "",
     "a list of bag files or directories for offline mode. The items need to be "
     "separated by colon ':'.  If this value is not set, the prediction module "
     "will use the listen to published ros topic mode.");
+DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
+DEFINE_bool(prediction_offline_dataforlearning, false, "Whether to extract "
+            "the features for offline learning-models training.");
 
 // Bag replay timestamp gap
 DEFINE_double(replay_timestamp_gap, 10.0,
