@@ -458,6 +458,8 @@ class RoadInfo {
 
   const std::vector<RoadBoundary> &GetBoundaries() const;
 
+  apollo::hdmap::Road_Type type() const { return road_.type(); }
+
  private:
   Road road_;
   std::vector<RoadSection> sections_;
