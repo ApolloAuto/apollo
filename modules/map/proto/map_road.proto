@@ -53,4 +53,12 @@ message Road {
 
   // if lane road not in the junction, junction id is null.
   optional Id junction_id = 3;
+
+  enum Type {
+    UNKNOWN = 0;
+    HIGHWAY = 1;
+    CITY_ROAD = 2;
+    PARK = 3;
+  };
+  optional Type type = 4;
 }
