@@ -73,6 +73,12 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       FeatureOutput::Write();
     }
   }
+  if (FLAGS_prediction_offline_dataforlearning) {
+    if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+        FeatureOutput::SizeOfDataForLearning() > FLAGS_max_num_dump_feature) {
+      FeatureOutput::WriteDataForLearning();
+    }
+  }
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
 

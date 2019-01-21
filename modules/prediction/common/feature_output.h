@@ -57,7 +57,8 @@ class FeatureOutput {
     * @param A feature in proto
     */
   static void InsertDataForLearning(
-      const Feature& feature, const std::vector<double>& feature_values);
+      const Feature& feature, const std::vector<double>& feature_values,
+      const std::vector<double>& labels);
 
   /**
    * @brief Write features to a file
@@ -74,6 +75,12 @@ class FeatureOutput {
    * @return Feature size
    */
   static int Size();
+
+  /**
+    * @brief Get the size of data_for_learning features.
+    * @return The size of data_for_learning features.
+    */
+  static int SizeOfDataForLearning();
 
  private:
   static Features features_;

@@ -32,8 +32,12 @@ std::size_t FeatureOutput::idx_learning_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
-  Write();
-  WriteDataForLearning();
+  if (FLAGS_prediction_offline_mode) {
+    Write();
+  }
+  if (FLAGS_prediction_offline_dataforlearning) {
+    WriteDataForLearning();
+  }
   Clear();
 }
 
@@ -54,13 +58,17 @@ void FeatureOutput::Insert(const Feature& feature) {
 }
 
 void FeatureOutput::InsertDataForLearning(
-    const Feature& feature, const std::vector<double>& feature_values) {
+    const Feature& feature, const std::vector<double>& feature_values,
+    const std::vector<double>& labels) {
   DataForLearning* data_for_learning =
       list_data_for_learning_.add_data_for_learning();
   data_for_learning->set_id(feature.id());
   data_for_learning->set_timestamp(feature.timestamp());
   for (size_t i = 0; i < feature_values.size(); ++i) {
     data_for_learning->add_features_for_learning(feature_values[i]);
+  }
+  for (size_t i = 0; i < labels.size(); ++i) {
+    data_for_learning->add_labels(labels[i]);
   }
 }
 
@@ -91,6 +99,10 @@ void FeatureOutput::WriteDataForLearning() {
 }
 
 int FeatureOutput::Size() { return features_.feature_size(); }
+
+int FeatureOutput::SizeOfDataForLearning() {
+  return list_data_for_learning_.data_for_learning_size();
+}
 
 }  // namespace prediction
 }  // namespace apollo
