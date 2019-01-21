@@ -74,6 +74,11 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
   if (!is_valid_) {
     return false;
   }
+
+  if (begin_time > header_.end_time() || end_time < header_.begin_time()) {
+    return false;
+  }
+
   while (message_index_ < chunk_.messages_size()) {
     const auto& next_message = chunk_.messages(message_index_);
     uint64_t time = next_message.time();
