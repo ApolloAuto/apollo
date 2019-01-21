@@ -1,3 +1,4 @@
+navigation_planning_config {
 planner_type : NAVI
 planner_navi_config {
   task : NAVI_PATH_DECIDER
@@ -55,4 +56,5 @@ planner_navi_config {
     speed_decider_detect_range : 0.35
     max_keep_nudge_cycles : 110
   }
+}
 }
