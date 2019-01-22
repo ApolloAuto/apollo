@@ -16,6 +16,7 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
+#include <algorithm>
 #include <unordered_map>
 
 #include "modules/prediction/common/feature_output.h"
@@ -26,6 +27,9 @@
 
 namespace apollo {
 namespace prediction {
+
+using apollo::prediction::math_util::EvaluateCubicPolynomial;
+using apollo::prediction::math_util::ComputePolynomial;
 
 namespace {
 
@@ -69,12 +73,16 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   std::vector<double> feature_values;
   ExtractFeatureValues(obstacle_ptr, &feature_values);
+  // Not compute probability on offline_mode
+  if (FLAGS_prediction_offline_mode) {
+    return;
+  }
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
     probability = ComputeProbability(feature_values);
   } else {
     for (int i = 0; i < 12; ++i) {
-      probability.push_back(feature_values[3 + 5 * i]);
+      probability.push_back(feature_values[3 + 6 * i]);
     }
   }
   for (double prob : probability) {
@@ -201,6 +209,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     feature_values->push_back(1.0);
     feature_values->push_back(1.0);
     feature_values->push_back(0.0);
+    feature_values->push_back(0.0);
   }
   int num_junction_exit = feature_ptr->junction_feature().junction_exit_size();
   for (int i = 0; i < num_junction_exit; ++i) {
@@ -215,12 +224,35 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double angle = std::atan2(diff_y, diff_x);
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
-    feature_values->operator[](idx * 5) = 1.0;
-    feature_values->operator[](idx * 5 + 1) = diff_x / junction_range;
-    feature_values->operator[](idx * 5 + 2) = diff_y / junction_range;
-    feature_values->operator[](idx * 5 + 3) =
+    double speed = std::max(0.1, feature_ptr->speed());
+    double exit_time = std::hypot(diff_x, diff_y) / speed;
+    std::array<double, 2> start_x = {0, speed};
+    std::array<double, 2> end_x = {diff_x, std::cos(diff_heading) * speed};
+    std::array<double, 2> start_y = {0, 0};
+    std::array<double, 2> end_y = {diff_y, std::sin(diff_heading) * speed};
+    std::array<double, 4> x_coeffs =
+        ComputePolynomial<3>(start_x, end_x, exit_time);
+    std::array<double, 4> y_coeffs =
+        ComputePolynomial<3>(start_y, end_y, exit_time);
+    double t = 0.0;
+    double cost = 0.0;
+    while (t <= exit_time) {
+      double x_1 = EvaluateCubicPolynomial(x_coeffs, t, 1);
+      double x_2 = EvaluateCubicPolynomial(x_coeffs, t, 2);
+      double y_1 = EvaluateCubicPolynomial(y_coeffs, t, 1);
+      double y_2 = EvaluateCubicPolynomial(y_coeffs, t, 2);
+      // cost = curvature * v^2
+      cost = std::max(cost, std::abs(x_1 * y_2 - y_1 * x_2) /
+                            std::hypot(x_1, y_1));
+      t += FLAGS_prediction_trajectory_time_resolution;
+    }
+    feature_values->operator[](idx * 6) = 1.0;
+    feature_values->operator[](idx * 6 + 1) = diff_x / junction_range;
+    feature_values->operator[](idx * 6 + 2) = diff_y / junction_range;
+    feature_values->operator[](idx * 6 + 3) =
         std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
-    feature_values->operator[](idx * 5 + 4) = diff_heading;
+    feature_values->operator[](idx * 6 + 4) = diff_heading;
+    feature_values->operator[](idx * 6 + 5) = cost;
   }
 }
 
