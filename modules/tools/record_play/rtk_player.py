@@ -38,10 +38,13 @@ from modules.common.proto import drive_state_pb2
 from modules.control.proto import pad_msg_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
+from modules.common.configs.proto import vehicle_config_pb2
+import common.proto_utils as proto_utils
 
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
 SEARCH_INTERVAL = 1000
 CHANGE_TO_COM = False
+
 
 class RtkPlayer(object):
     """
@@ -91,6 +94,10 @@ class RtkPlayer(object):
 
         self.estop = False
         self.logger.info("Planning Ready")
+
+        self.vehicle_params = vehicle_config_pb2.VehicleParam()
+        proto_utils.get_pb_from_text_file(
+        "/apollo/modules/common/data/vehicle_param.pb.txt", self.vehicle_params)
 
     def localization_callback(self, data):
         """
@@ -224,12 +231,14 @@ class RtkPlayer(object):
             adc_point.path_point.s = self.data['s'][i]
 
             if CHANGE_TO_COM:
-                # tmp way to get vehicle params(length / 2 - back edge to center)
+                # translation vector length(length / 2 - back edge to center)
                 adc_point.path_point.x = adc_point.path_point.x + \
-                    (4.933 / 2 - 1.043) * math.cos(adc_point.path_point.theta)
+                    (self.vehicle_params.length / 2 - self.vehicle_params.back_edge_to_center) * \
+                    math.cos(adc_point.path_point.theta)
                 adc_point.path_point.y = adc_point.path_point.y + \
-                    (4.933 / 2 - 1.043) * math.sin(adc_point.path_point.theta)
-                    
+                    (self.vehicle_params.length / 2 - self.vehicle_params.back_edge_to_center) * \
+                    math.sin(adc_point.path_point.theta)
+
             if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
                 adc_point.v = -adc_point.v
                 adc_point.path_point.s = -adc_point.path_point.s
@@ -292,6 +301,7 @@ def main():
         log_level=logging.DEBUG)
 
     record_file = os.path.join(APOLLO_ROOT, 'data/log/garage.csv')
+
     player = RtkPlayer(record_file, node, args['speedmulti'],
                        args['complete'].lower(), args['replan'].lower())
     atexit.register(player.shutdown)
