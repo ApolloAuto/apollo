@@ -183,4 +183,20 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "message_process",
+    srcs = ["message_process.cc"],
+    hdrs = [
+        "message_process.h",
+    ],
+    deps = [
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/predictor:predictor_manager",
+        "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/scenario:scenario_manager",
+        "//modules/prediction/util:data_extraction",
+    ],
+)
+
 cpplint()

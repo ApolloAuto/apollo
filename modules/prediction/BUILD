@@ -14,6 +14,7 @@ cc_library(
     deps = [
         "//cyber/common:file",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/prediction/common:message_process",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:offline_features_proto",
