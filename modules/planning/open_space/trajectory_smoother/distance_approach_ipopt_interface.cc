@@ -70,18 +70,20 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   planner_open_space_config_.CopyFrom(planner_open_space_config);
   distance_approach_config_ =
       planner_open_space_config_.distance_approach_config();
-  weight_state_x_ = distance_approach_config_.weight_state(0);
-  weight_state_y_ = distance_approach_config_.weight_state(1);
-  weight_state_phi_ = distance_approach_config_.weight_state(2);
-  weight_state_v_ = distance_approach_config_.weight_state(3);
-  weight_input_steer_ = distance_approach_config_.weight_u(0);
-  weight_input_a_ = distance_approach_config_.weight_u(1);
-  weight_rate_steer_ = distance_approach_config_.weight_u_rate(0);
-  weight_rate_a_ = distance_approach_config_.weight_u_rate(1);
-  weight_stitching_steer_ = distance_approach_config_.weight_stitching(0);
-  weight_stitching_a_ = distance_approach_config_.weight_stitching(1);
-  weight_first_order_time_ = distance_approach_config_.weight_time(0);
-  weight_second_order_time_ = distance_approach_config_.weight_time(1);
+  weight_state_x_ = distance_approach_config_.weight_x();
+  weight_state_y_ = distance_approach_config_.weight_y();
+  weight_state_phi_ = distance_approach_config_.weight_phi();
+  weight_state_v_ = distance_approach_config_.weight_v();
+  weight_input_steer_ = distance_approach_config_.weight_steer();
+  weight_input_a_ = distance_approach_config_.weight_a();
+  weight_rate_steer_ = distance_approach_config_.weight_steer_rate();
+  weight_rate_a_ = distance_approach_config_.weight_a_rate();
+  weight_stitching_steer_ = distance_approach_config_.weight_steer_stitching();
+  weight_stitching_a_ = distance_approach_config_.weight_a_stitching();
+  weight_first_order_time_ =
+      distance_approach_config_.weight_first_order_time();
+  weight_second_order_time_ =
+      distance_approach_config_.weight_second_order_time();
   min_safety_distance_ = distance_approach_config_.min_safety_distance();
   max_steer_angle_ =
       vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
@@ -1317,12 +1319,12 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   int time_index = time_start_index_;
   int dual_l_index = l_start_index_;
   int dual_n_index = n_start_index_;
-  // 1. state variables, 4 * [0, horizon]
-  // 2. control variables, 2 * [0, horizon_-1]
-  // 3. sampling time variables, 1 * [0, horizon_]
-  // 4. dual_l obstacles_edges_sum_ * [0, horizon]
-  // 5. dual_n obstacles_num * [0, horizon]
-  #pragma omp parallel num_threads(4)
+// 1. state variables, 4 * [0, horizon]
+// 2. control variables, 2 * [0, horizon_-1]
+// 3. sampling time variables, 1 * [0, horizon_]
+// 4. dual_l obstacles_edges_sum_ * [0, horizon]
+// 5. dual_n obstacles_num * [0, horizon]
+#pragma omp parallel num_threads(4)
   for (int i = 0; i < horizon_; ++i) {
     state_result_(0, i) = x[state_index];
     state_result_(1, i) = x[state_index + 1];
