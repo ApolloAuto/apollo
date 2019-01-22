@@ -51,7 +51,7 @@ std::string GetLogFileName() {
 
   std::tm time_tm;
   localtime_r(&raw_time, &time_tm);
-  strftime(name_buffer, 80, "/tmp/mpc_controller_%F_%H%M%S.csv",
+  strftime(name_buffer, sizeof(name_buffer), "/tmp/mpc_controller_%F_%H%M%S.csv",
            &time_tm);
   return std::string(name_buffer);
 }
