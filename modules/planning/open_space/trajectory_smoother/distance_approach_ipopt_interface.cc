@@ -1319,12 +1319,11 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   int time_index = time_start_index_;
   int dual_l_index = l_start_index_;
   int dual_n_index = n_start_index_;
-// 1. state variables, 4 * [0, horizon]
-// 2. control variables, 2 * [0, horizon_-1]
-// 3. sampling time variables, 1 * [0, horizon_]
-// 4. dual_l obstacles_edges_sum_ * [0, horizon]
-// 5. dual_n obstacles_num * [0, horizon]
-#pragma omp parallel num_threads(4)
+  // 1. state variables, 4 * [0, horizon]
+  // 2. control variables, 2 * [0, horizon_-1]
+  // 3. sampling time variables, 1 * [0, horizon_]
+  // 4. dual_l obstacles_edges_sum_ * [0, horizon]
+  // 5. dual_n obstacles_num * [0, horizon]
   for (int i = 0; i < horizon_; ++i) {
     state_result_(0, i) = x[state_index];
     state_result_(1, i) = x[state_index + 1];
@@ -1632,6 +1631,7 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   constraint_index += 4;
   state_index += 4;
 
+  // constraints on x,y,v
   for (int i = 1; i < horizon_; ++i) {
     g[constraint_index] = x[state_index];
     g[constraint_index + 1] = x[state_index + 1];
