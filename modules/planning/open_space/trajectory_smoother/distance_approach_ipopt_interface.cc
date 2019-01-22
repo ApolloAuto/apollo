@@ -1322,7 +1322,6 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   // 3. sampling time variables, 1 * [0, horizon_]
   // 4. dual_l obstacles_edges_sum_ * [0, horizon]
   // 5. dual_n obstacles_num * [0, horizon]
-  #pragma omp parallel num_threads(4)
   for (int i = 0; i < horizon_; ++i) {
     state_result_(0, i) = x[state_index];
     state_result_(1, i) = x[state_index + 1];
@@ -1403,6 +1402,13 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
   for (int i = 0; i < horizon_ + 1; ++i) {
     T x1_diff = x[state_index] - xWS_(0, i);
     T x2_diff = x[state_index + 1] - xWS_(1, i);
+    // T a =
+    //     x[state_index + 2] - 3.1415926 * floor(x[state_index + 2]
+    //     / 3.1415926);
+    // if (a < 0.0) {
+    //   a += (2.0 * 3.1415926);
+    // }
+    // a = a - 3.1415926;
     T x3_diff = x[state_index + 2] - xWS_(2, i);
     T x4_abs = x[state_index + 3];
     *obj_value += weight_state_x_ * x1_diff * x1_diff +
@@ -1630,6 +1636,7 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   constraint_index += 4;
   state_index += 4;
 
+  // constraints on x,y,v
   for (int i = 1; i < horizon_; ++i) {
     g[constraint_index] = x[state_index];
     g[constraint_index + 1] = x[state_index + 1];
