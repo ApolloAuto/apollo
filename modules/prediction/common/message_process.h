@@ -32,6 +32,8 @@ namespace prediction {
 
 class MessageProcess {
  public:
+  MessageProcess() = delete;
+
   static void OnPerception(
       const perception::PerceptionObstacles &perception_obstacles,
       PredictionObstacles* const prediction_obstacles);
