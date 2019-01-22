@@ -55,6 +55,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::common::math::Box2d;
 
 struct HybridAStartResult {
   std::vector<double> x;
