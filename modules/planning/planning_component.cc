@@ -140,7 +140,7 @@ bool PlanningComponent::Proc(
   auto start_time = adc_trajectory_pb.header().timestamp_sec();
   common::util::FillHeader(node_->Name(), &adc_trajectory_pb);
 
-  // modify trajecotry relative time due to the timestamp change in header
+  // modify trajectory relative time due to the timestamp change in header
   const double dt = start_time - adc_trajectory_pb.header().timestamp_sec();
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
