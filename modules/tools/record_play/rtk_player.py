@@ -41,7 +41,7 @@ from modules.planning.proto import planning_pb2
 
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
 SEARCH_INTERVAL = 1000
-
+CHANGE_TO_COM = False
 
 class RtkPlayer(object):
     """
@@ -223,6 +223,13 @@ class RtkPlayer(object):
             adc_point.path_point.theta = self.data['theta'][i]
             adc_point.path_point.s = self.data['s'][i]
 
+            if CHANGE_TO_COM:
+                # tmp way to get vehicle params(length / 2 - back edge to center)
+                adc_point.path_point.x = adc_point.path_point.x + \
+                    (4.933 / 2 - 1.043) * math.cos(adc_point.path_point.theta)
+                adc_point.path_point.y = adc_point.path_point.y + \
+                    (4.933 / 2 - 1.043) * math.sin(adc_point.path_point.theta)
+                    
             if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:
                 adc_point.v = -adc_point.v
                 adc_point.path_point.s = -adc_point.path_point.s
