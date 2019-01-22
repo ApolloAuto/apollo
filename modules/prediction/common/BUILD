@@ -190,6 +190,7 @@ cc_library(
         "message_process.h",
     ],
     deps = [
+        "//cyber/common:file",
         "//modules/common/adapters:adapter_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
