@@ -72,19 +72,11 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
 
 bool HybridAStar::RSPCheck(
     const std::shared_ptr<ReedSheppPath> reeds_shepp_to_end) {
-  for (size_t i = 0; i < reeds_shepp_to_end->x.size(); ++i) {
-    if (reeds_shepp_to_end->x[i] > XYbounds_[1] ||
-        reeds_shepp_to_end->x[i] < XYbounds_[0] ||
-        reeds_shepp_to_end->y[i] > XYbounds_[3] ||
-        reeds_shepp_to_end->y[i] < XYbounds_[2]) {
-      return false;
-    }
-    std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
-        reeds_shepp_to_end->x[i], reeds_shepp_to_end->y[i],
-        reeds_shepp_to_end->phi[i], XYbounds_, planner_open_space_config_));
-    if (!ValidityCheck(node)) {
-      return false;
-    }
+  std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
+      reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
+      XYbounds_, planner_open_space_config_));
+  if (!ValidityCheck(node)) {
+    return false;
   }
   return true;
 }
@@ -93,11 +85,34 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
   if (obstacles_linesegments_vec_.size() == 0) {
     return true;
   }
-  for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
-    for (const common::math::LineSegment2d& linesegment :
-         obstacle_linesegments) {
-      if (node->GetBoundingBox(vehicle_param_).HasOverlap(linesegment)) {
-        return false;
+  size_t node_step_size = node->GetStepSize();
+  size_t init_check_index = 0;
+  std::vector<double> traversed_x;
+  std::vector<double> traversed_y;
+  std::vector<double> traversed_phi;
+  traversed_x = node->GetXs();
+  traversed_y = node->GetYs();
+  traversed_phi = node->GetPhis();
+  // The first {x, y, phi} is collision free unless they are start and end
+  // configuration of search problem
+  if (node_step_size == 1) {
+    init_check_index = 0;
+  } else {
+    init_check_index = 1;
+  }
+  for (size_t i = init_check_index; i < node_step_size; ++i) {
+    if (traversed_x[i] > XYbounds_[1] || traversed_x[i] < XYbounds_[0] ||
+        traversed_y[i] > XYbounds_[3] || traversed_y[i] < XYbounds_[2]) {
+      return false;
+    }
+    Box2d bounding_box = Node3d::GetBoundingBox(
+        vehicle_param_, traversed_x[i], traversed_y[i], traversed_phi[i]);
+    for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
+      for (const common::math::LineSegment2d& linesegment :
+           obstacle_linesegments) {
+        if (bounding_box.HasOverlap(linesegment)) {
+          return false;
+        }
       }
     }
   }
@@ -360,8 +375,9 @@ bool HybridAStar::Plan(
     size_t current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
-    // check if a analystic curve could be connected from current configuration
-    // to the end configuration without collision. if so, search ends.
+    // check if a analystic curve could be connected from current
+    // configuration to the end configuration without collision. if so, search
+    // ends.
     start_time = Clock::NowInSeconds();
     if (AnalyticExpansion(current_node)) {
       break;
@@ -409,7 +425,7 @@ bool HybridAStar::Plan(
   }
   AINFO << "explored node num is " << explored_node_num;
   AINFO << "heuristic time is " << heuristic_time;
-  AINFO << "rs time is "<< rs_time;
+  AINFO << "rs time is " << rs_time;
   return true;
 }
 }  // namespace planning
