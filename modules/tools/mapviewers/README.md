@@ -15,7 +15,7 @@ pip install yattag
 Inside docker, run the following command from your Apollo root dir:
 
 ```
-python modules/tools/mapviewer/gmap_viwer.py map_path_and_file
+python modules/tools/mapviewer/gmap_viwer.py -m map_path_and_file
 ```
 
 An output file 
@@ -32,3 +32,29 @@ The default utm zone is set to ***10*** in this tool. if the HDMap is located in
 python modules/tools/mapviewer/gmap_viwer.py map_path_and_file utm_zone_id
 ```
 
+### hdmapviewer.py
+Activate enviroments: 
+
+```
+conda create --name py27bokeh python=2.7.15 numpy scipy bokeh protobuf
+conda activate py27bokeh
+```
+
+Inside docker, run the following command from Apollo root dir:
+```
+python modules/tools/mapviewer/hdmapviwer.py -m map_path_and_file
+```
+
+An output file 
+
+```
+hdmap.html
+```
+
+can be found in your Apollo root dir.
+
+
+Deactivate enviroments:
+```
+conda deactivate
+```
