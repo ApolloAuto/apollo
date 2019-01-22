@@ -53,20 +53,27 @@ message DualVariableWarmStartConfig {
 
 message DistanceApproachConfig {
   // Distance approach weight configs
-  repeated double weight_u = 1;
-  repeated double weight_u_rate = 2;
-  repeated double weight_state = 3;
-  repeated double weight_stitching = 4;
-  repeated double weight_time = 5;
-  optional double min_safety_distance = 6 [default = 0.0];
-  optional double max_speed_forward = 7 [default = 3.0];
-  optional double max_speed_reverse = 8 [default = 2.0];
-  optional double max_acceleration_forward = 9 [default = 2.0];
-  optional double max_acceleration_reverse = 10 [default = 2.0];
-  optional double min_time_sample_scaling = 11 [default = 0.1];
-  optional double max_time_sample_scaling = 12 [default = 10.0];
-  optional bool use_fix_time = 13 [default = false];
-  optional IpoptConfig ipopt_config = 14;
+  optional double weight_steer = 1;
+  optional double weight_a = 2;
+  optional double weight_steer_rate = 3;
+  optional double weight_a_rate = 4;
+  optional double weight_x = 5;
+  optional double weight_y = 6;
+  optional double weight_phi = 7;
+  optional double weight_v = 8;
+  optional double weight_steer_stitching = 9;
+  optional double weight_a_stitching = 10;
+  optional double weight_first_order_time = 11;
+  optional double weight_second_order_time = 12;
+  optional double min_safety_distance = 13 [default = 0.0];
+  optional double max_speed_forward = 14 [default = 3.0];
+  optional double max_speed_reverse = 15 [default = 2.0];
+  optional double max_acceleration_forward = 16 [default = 2.0];
+  optional double max_acceleration_reverse = 17 [default = 2.0];
+  optional double min_time_sample_scaling = 18 [default = 0.1];
+  optional double max_time_sample_scaling = 19 [default = 10.0];
+  optional bool use_fix_time = 20 [default = false];
+  optional IpoptConfig ipopt_config = 21;
 }
 
 message IpoptConfig {
