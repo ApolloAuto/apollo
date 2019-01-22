@@ -86,21 +86,24 @@ bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
     return true;
   }
   size_t node_step_size = node->GetStepSize();
-  size_t init_check_index = 0;
+  size_t last_check_index = 0;
   std::vector<double> traversed_x;
   std::vector<double> traversed_y;
   std::vector<double> traversed_phi;
   traversed_x = node->GetXs();
   traversed_y = node->GetYs();
   traversed_phi = node->GetPhis();
+  std::reverse(traversed_x.begin(), traversed_x.end());
+  std::reverse(traversed_y.begin(), traversed_y.end());
+  std::reverse(traversed_phi.begin(), traversed_phi.end());
   // The first {x, y, phi} is collision free unless they are start and end
   // configuration of search problem
   if (node_step_size == 1) {
-    init_check_index = 0;
+    last_check_index = 1;
   } else {
-    init_check_index = 1;
+    last_check_index = node_step_size - 1;
   }
-  for (size_t i = init_check_index; i < node_step_size; ++i) {
+  for (size_t i = 0; i < last_check_index; ++i) {
     if (traversed_x[i] > XYbounds_[1] || traversed_x[i] < XYbounds_[0] ||
         traversed_y[i] > XYbounds_[3] || traversed_y[i] < XYbounds_[2]) {
       return false;
@@ -190,17 +193,14 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   return next_node;
 }
 
-bool HybridAStar::CalculateNodeCost(std::shared_ptr<Node3d> current_node,
+void HybridAStar::CalculateNodeCost(std::shared_ptr<Node3d> current_node,
                                     std::shared_ptr<Node3d> next_node) {
   next_node->SetTrajCost(current_node->GetTrajCost() +
                          TrajCost(current_node, next_node));
   // evaluate heuristic cost
   double optimal_path_cost = 0.0;
-  if (!HoloObstacleHeuristic(next_node, &optimal_path_cost)) {
-    return false;
-  }
+  optimal_path_cost += HoloObstacleHeuristic(next_node);
   next_node->SetHeuCost(optimal_path_cost);
-  return true;
 }
 
 double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
@@ -223,11 +223,9 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
   return piecewise_cost;
 }
 
-bool HybridAStar::HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node,
-                                        double* optimal_path_cost) {
-  *optimal_path_cost = grid_a_star_heuristic_generator_->CheckDpMap(
-      next_node->GetX(), next_node->GetY());
-  return true;
+double HybridAStar::HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node) {
+  return grid_a_star_heuristic_generator_->CheckDpMap(next_node->GetX(),
+                                                      next_node->GetY());
 }
 
 bool HybridAStar::GetResult(HybridAStartResult* result) {
@@ -257,6 +255,9 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
   hybrid_a_x.push_back(current_node->GetX());
   hybrid_a_y.push_back(current_node->GetY());
   hybrid_a_phi.push_back(current_node->GetPhi());
+  std::reverse(hybrid_a_x.begin(), hybrid_a_x.end());
+  std::reverse(hybrid_a_y.begin(), hybrid_a_y.end());
+  std::reverse(hybrid_a_phi.begin(), hybrid_a_phi.end());
   (*result).x = hybrid_a_x;
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
@@ -323,7 +324,7 @@ bool HybridAStar::Plan(
   // clear containers
   open_set_.clear();
   close_set_.clear();
-  while (!open_pq_.empty()) open_pq_.pop();
+  open_pq_ = decltype(open_pq_)();
   final_node_ = nullptr;
 
   std::vector<std::vector<common::math::LineSegment2d>>
@@ -391,22 +392,18 @@ bool HybridAStar::Plan(
       if (next_node == nullptr) {
         continue;
       }
-      // collision check
-      if (!ValidityCheck(next_node)) {
-        continue;
-      }
       // check if the node is already in the close set
       if (close_set_.find(next_node->GetIndex()) != close_set_.end()) {
         continue;
       }
-
+      // collision check
+      if (!ValidityCheck(next_node)) {
+        continue;
+      }
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
         explored_node_num++;
         start_time = Clock::NowInSeconds();
-        if (!CalculateNodeCost(current_node, next_node)) {
-          AERROR << "Node cost calculation fail";
-          return false;
-        }
+        CalculateNodeCost(current_node, next_node);
         end_time = Clock::NowInSeconds();
         heuristic_time += end_time - start_time;
         open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
