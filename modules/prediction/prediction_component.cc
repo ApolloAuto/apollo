@@ -44,38 +44,11 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
-using cyber::record::RecordMessage;
-using cyber::record::RecordReader;
 
 PredictionComponent::~PredictionComponent() {}
 
 std::string PredictionComponent::Name() const {
   return FLAGS_prediction_module_name;
-}
-
-void PredictionComponent::ProcessOfflineData(const std::string& filename) {
-  RecordReader reader(filename);
-  RecordMessage message;
-  while (reader.ReadMessage(&message)) {
-    if (message.channel_name == FLAGS_perception_obstacle_topic) {
-      PerceptionObstacles perception_obstacles;
-      if (perception_obstacles.ParseFromString(message.content)) {
-        PredictionObstacles prediction_obstacles;
-        MessageProcess::OnPerception(
-            perception_obstacles, &prediction_obstacles);
-      }
-    } else if (message.channel_name == FLAGS_localization_topic) {
-      LocalizationEstimate localization;
-      if (localization.ParseFromString(message.content)) {
-        MessageProcess::OnLocalization(localization);
-      }
-    } else if (message.channel_name == FLAGS_planning_trajectory_topic) {
-      ADCTrajectory adc_trajectory;
-      if (adc_trajectory.ParseFromString(message.content)) {
-        MessageProcess::OnPlanning(adc_trajectory);
-      }
-    }
-  }
 }
 
 void PredictionComponent::OfflineProcessFeatureProtoFile(
@@ -96,26 +69,9 @@ void PredictionComponent::OfflineProcessFeatureProtoFile(
 bool PredictionComponent::Init() {
   component_start_time_ = Clock::NowInSeconds();
 
-  // Load prediction conf
-  PredictionConf prediction_conf;
-  if (!common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                      &prediction_conf)) {
-    AERROR << "Unable to load prediction conf file: "
-           << FLAGS_prediction_conf_file;
+  if (!MessageProcess::Init()) {
     return false;
   }
-  ADEBUG << "Prediction config file is loaded into: "
-            << prediction_conf.ShortDebugString();
-
-  common::adapter::AdapterManagerConfig adapter_conf;
-  if (!common::util::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
-                                      &adapter_conf)) {
-    AERROR << "Unable to load adapter conf file: "
-           << FLAGS_prediction_adapter_config_filename;
-    return false;
-  }
-  ADEBUG << "Adapter config file is loaded into: "
-            << adapter_conf.ShortDebugString();
 
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic, nullptr);
@@ -123,16 +79,6 @@ bool PredictionComponent::Init() {
   localization_reader_ =
       node_->CreateReader<localization::LocalizationEstimate>(
           FLAGS_localization_topic, nullptr);
-
-  // Initialization of all managers
-  ContainerManager::Instance()->Init(adapter_conf);
-  EvaluatorManager::Instance()->Init(prediction_conf);
-  PredictorManager::Instance()->Init(prediction_conf);
-
-  if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
-    AERROR << "Map cannot be loaded.";
-    return false;
-  }
 
   prediction_writer_ =
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
@@ -156,7 +102,7 @@ bool PredictionComponent::Init() {
       for (std::size_t i = 0; i < offline_bags.size(); ++i) {
         AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
               << " ]: " << offline_bags[i];
-        ProcessOfflineData(offline_bags[i]);
+        MessageProcess::ProcessOfflineData(offline_bags[i]);
       }
     }
     FeatureOutput::Close();
@@ -221,6 +167,7 @@ bool PredictionComponent::Proc(
   ADEBUG << "Time for updating PerceptionContainer: "
         << diff.count() * 1000 << " msec.";
 
+  // Postprocess prediction obstacles message
   prediction_obstacles.set_start_timestamp(frame_start_time_);
   prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
   prediction_obstacles.mutable_header()->set_lidar_timestamp(

@@ -67,9 +67,6 @@ class PredictionComponent
   void OfflineProcessFeatureProtoFile(const std::string& features_proto_file);
 
  private:
-  void ProcessOfflineData(const std::string &filename);
-
- private:
   double component_start_time_ = 0.0;
 
   double frame_start_time_ = 0.0;
