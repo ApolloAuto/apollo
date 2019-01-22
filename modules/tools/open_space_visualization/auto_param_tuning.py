@@ -26,7 +26,7 @@ import common.proto_utils as proto_utils
 from modules.planning.proto import planner_open_space_config_pb2
 
 
-random.seed(333)
+random.seed(6666)
 rand_num = 1000
 original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
 optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
@@ -50,7 +50,7 @@ def GetParamsForTunning(tunning_object):
         param_names_and_range.append(
             ("warm_start_config.traj_gear_switch_penalty", 2.0))
         param_names_and_range.append(
-            ("warm_start_config.traj_steer_penalty", 2.0))
+            ("warm_start_config.traj_steer_penalty", 3.0))
         param_names_and_range.append(
             ("warm_start_config.traj_steer_change_penalty", 2.0))
     elif tunning_object == "smooth_trajectory":
