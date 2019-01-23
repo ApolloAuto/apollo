@@ -16,7 +16,6 @@
 
 #include "modules/prediction/common/feature_output.h"
 
-#include <string>
 #include <vector>
 
 #include "modules/common/util/file.h"
@@ -59,7 +58,7 @@ void FeatureOutput::Insert(const Feature& feature) {
 
 void FeatureOutput::InsertDataForLearning(
     const Feature& feature, const std::vector<double>& feature_values,
-    const std::vector<double>& labels) {
+    const std::string& category) {
   DataForLearning* data_for_learning =
       list_data_for_learning_.add_data_for_learning();
   data_for_learning->set_id(feature.id());
@@ -67,9 +66,7 @@ void FeatureOutput::InsertDataForLearning(
   for (size_t i = 0; i < feature_values.size(); ++i) {
     data_for_learning->add_features_for_learning(feature_values[i]);
   }
-  for (size_t i = 0; i < labels.size(); ++i) {
-    data_for_learning->add_labels(labels[i]);
-  }
+  data_for_learning->set_category(category);
 }
 
 void FeatureOutput::Write() {
