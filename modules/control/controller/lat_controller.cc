@@ -425,7 +425,7 @@ Status LatController::ComputeControlCommand(
     steer_angle = digital_filter_.Filter(steer_angle);
   }
 
-  if (vehicle_state->linear_velocity() < FLAGS_lock_steer_speed &&
+  if (std::abs(vehicle_state->linear_velocity()) < FLAGS_lock_steer_speed &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
