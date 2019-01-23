@@ -42,16 +42,12 @@ bool system::CreateDirectory(const std::string& path) {
 
 bool system::GetFileSize(const std::string& path, unsigned int* size) {
   boost::filesystem::path p(path);
-  if (boost::filesystem::exists(p)) {
-    if (boost::filesystem::is_regular_file(p)) {
-      *size = static_cast<unsigned int>(boost::filesystem::file_size(p));
-      return true;
-    } else {
-      return false;
-    }
-  } else {
-    return false;
+  if (boost::filesystem::exists(p) && boost::filesystem::is_regular_file(p)) {
+    *size = static_cast<unsigned int>(boost::filesystem::file_size(p));
+    return true;
   }
+
+  return false;
 }
 
 bool system::CopyFile(const std::string& src, const std::string& dst,
@@ -68,11 +64,12 @@ bool system::CopyFile(const std::string& src, const std::string& dst,
         path_src, path_dst, boost::filesystem::copy_option::overwrite_if_exists,
         error);
   }
-  if (!error) {
-    return true;
-  } else {
+
+  if (error) {
     return false;
   }
+
+  return true;
 }
 
 void system::GetFilesInFolderRecursive(const std::string& folder,
