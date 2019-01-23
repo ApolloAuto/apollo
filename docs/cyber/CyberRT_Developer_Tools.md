@@ -188,6 +188,7 @@ usage: cyber_recorder play [options]
     -e, --end <2018-07-01 00:01:00>	play the record end at  
     -s, --start <seconds>		play started at n seconds  
     -d, --delay <seconds>		play delayed n seconds  
+    -p, --preload <seconds>		play after trying to preload n second(s)  
     -h, --help				show help message  
 ```
 
