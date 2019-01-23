@@ -37,7 +37,6 @@ namespace traffic_light {
 // stage context
 struct TrafficLightProtectedContext {
   ScenarioTrafficLightProtectedConfig scenario_config;
-  std::string traffic_light_id;
 };
 
 class TrafficLightProtectedScenario : public Scenario {
