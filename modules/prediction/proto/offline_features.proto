@@ -18,6 +18,8 @@ message CNNFeatures {
 }
 
 message DataForLearning {
+  // The task category of the data for learning
+  optional string category = 5;
   // The info. needed for identifying a unique data point:
   optional int32 id = 1;
   optional double timestamp = 2;
