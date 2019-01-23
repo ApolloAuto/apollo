@@ -58,7 +58,6 @@ void TrafficLightProtectedScenario::Init() {
     return;
   }
 
-  context_.traffic_light_id = traffic_light_overlap_id;
   traffic_light_ = HDMapUtil::BaseMap().GetSignalById(
       hdmap::MakeMapId(traffic_light_overlap_id));
   if (!traffic_light_) {
