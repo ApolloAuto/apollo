@@ -24,8 +24,7 @@
 #include <string>
 
 #include "cyber/component/component.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/prediction/common/message_process.h"
 
 /**
  * @namespace apollo::prediction
@@ -68,13 +67,6 @@ class PredictionComponent
   void OfflineProcessFeatureProtoFile(const std::string& features_proto_file);
 
  private:
-  void OnLocalization(const localization::LocalizationEstimate &localization);
-
-  void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
-
-  void OnPerception(
-      const perception::PerceptionObstacles &perception_obstacles);
-
   void ProcessOfflineData(const std::string &filename);
 
  private:
