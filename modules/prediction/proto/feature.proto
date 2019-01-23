@@ -3,7 +3,6 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/common/proto/geometry.proto";
-import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
 import "modules/prediction/proto/lane_graph.proto";
 import "modules/prediction/proto/prediction_point.proto";
