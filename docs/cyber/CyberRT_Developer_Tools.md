@@ -269,34 +269,37 @@ play finished. file: 20180720202307.record
 
 ## rosbag_to\_record
 
-`rosbag_to_record` is a tool which can convert rosbag to recorder file provided by Apollo Cyber RT. Now the tool support following channel:  
-/apollo/perception/obstacles  
-/apollo/planning  
-/apollo/prediction  
-/apollo/canbus/chassis  
-/apollo/control  
-/apollo/guardian  
-/apollo/localization/pose  
-/apollo/perception/traffic\_light  
-/apollo/drive\_event  
-/apollo/sensor/gnss/odometry  
-/apollo/monitor/static\_info  
-/apollo/monitor  
-/apollo/canbus/chassis\_detail  
-/apollo/control/pad  
-/apollo/navigation  
-/apollo/routing\_request  
-/apollo/routing\_response  
-/tf  
-/tf\_static  
-/apollo/sensor/conti\_radar  
-/apollo/sensor/delphi\_esr  
-/apollo/sensor/gnss/best\_pose  
-/apollo/sensor/gnss/imu  
-/apollo/sensor/gnss/ins\_stat  
-/apollo/sensor/gnss/rtk\_eph  
-/apollo/sensor/gnss/rtk\_obs  
-/apollo/sensor/velodyne64/compensator/PointCloud2  
+`rosbag_to_record` is a tool which can convert rosbag to recorder file provided by Apollo Cyber RT. Now the tool support following channel:
+
+```
+/apollo/perception/obstacles
+/apollo/planning
+/apollo/prediction
+/apollo/canbus/chassis
+/apollo/control
+/apollo/guardian
+/apollo/localization/pose
+/apollo/perception/traffic_light
+/apollo/drive_event
+/apollo/sensor/gnss/odometry
+/apollo/monitor/static_info
+/apollo/monitor
+/apollo/canbus/chassis_detail
+/apollo/control/pad
+/apollo/navigation
+/apollo/routing_request
+/apollo/routing_response
+/tf
+/tf_static
+/apollo/sensor/conti_radar
+/apollo/sensor/delphi_esr
+/apollo/sensor/gnss/best_pose
+/apollo/sensor/gnss/imu
+/apollo/sensor/gnss/ins_stat
+/apollo/sensor/gnss/rtk_eph
+/apollo/sensor/gnss/rtk_obs
+/apollo/sensor/velodyne64/compensator/PointCloud2
+```
 
 ### Install and run
 
