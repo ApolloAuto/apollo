@@ -37,7 +37,6 @@ namespace traffic_light {
 // stage context
 struct TrafficLightUnprotectedRightTurnContext {
   ScenarioTrafficLightUnprotectedRightTurnConfig scenario_config;
-  std::string traffic_light_id;
   double stop_start_time = 0.0;
   double creep_start_time;
 };
