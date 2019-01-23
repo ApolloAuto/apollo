@@ -71,7 +71,6 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  context_.stop_sign_id = stop_sign_overlap_id;
   stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
       hdmap::MakeMapId(stop_sign_overlap_id));
   if (!stop_sign_) {
