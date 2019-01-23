@@ -60,17 +60,14 @@ class TrafficLightProtectedScenario : public Scenario {
   static void RegisterStages();
   bool GetScenarioConfig();
   bool IsProtected(const ReferenceLineInfo& reference_line_info) const;
-
- private:
-  bool init_ = false;
-  TrafficLightProtectedContext context_;
-
-  hdmap::SignalInfoConstPtr traffic_light_ = nullptr;
-
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
+
+ private:
+  bool init_ = false;
+  TrafficLightProtectedContext context_;
 };
 
 }  // namespace traffic_light
