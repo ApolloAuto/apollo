@@ -97,14 +97,23 @@ bool Player::Start() {
     return false;
   }
 
-  std::cout << "\nPlease wait for loading...\n"
+  auto& play_param = producer_->play_param();
+  std::cout << "\nPlease wait " << play_param.preload_time_s
+            << " second(s) for loading...\n"
             << "Hit Ctrl+C to stop, Space to pause, or 's' to step.\n"
             << std::endl;
   producer_->Start();
 
-  auto& play_param = producer_->play_param();
-  if (play_param.delay_time_s != 0) {
-    std::this_thread::sleep_for(std::chrono::seconds(play_param.delay_time_s));
+  auto preload_sec = play_param.preload_time_s;
+  while (preload_sec > 0 && !is_stopped_.load() && apollo::cyber::OK()) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    --preload_sec;
+  }
+
+  auto delay_sec = play_param.delay_time_s;
+  while (delay_sec > 0 && !is_stopped_.load() && apollo::cyber::OK()) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    --delay_sec;
   }
 
   consumer_->Start(play_param.begin_time_ns);
