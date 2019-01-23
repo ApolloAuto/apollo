@@ -61,17 +61,14 @@ class TrafficLightUnprotectedRightTurnScenario : public Scenario {
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
-
- private:
-  bool init_ = false;
-  TrafficLightUnprotectedRightTurnContext context_;
-
-  hdmap::SignalInfoConstPtr traffic_light_ = nullptr;
-
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
+
+ private:
+  bool init_ = false;
+  TrafficLightUnprotectedRightTurnContext context_;
 };
 
 }  // namespace traffic_light
