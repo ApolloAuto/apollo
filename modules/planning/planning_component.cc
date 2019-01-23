@@ -128,6 +128,7 @@ bool PlanningComponent::Proc(
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.traffic_light =
         std::make_shared<TrafficLightDetection>(traffic_light_);
+    local_view_.relative_map = std::make_shared<MapMsg>(relative_map_);
   }
 
   if (!CheckInput()) {
@@ -171,10 +172,20 @@ bool PlanningComponent::CheckInput() {
     not_ready->set_reason("localization not ready");
   } else if (local_view_.chassis == nullptr) {
     not_ready->set_reason("chassis not ready");
-  } else if (!local_view_.routing->has_header()) {
-    not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
+  } else {
+    // nothing
+  }
+
+  if (FLAGS_use_navigation_mode) {
+    if (!local_view_.relative_map->has_header()) {
+      not_ready->set_reason("relative map not ready");
+    }
+  } else {
+    if (!local_view_.routing->has_header()) {
+      not_ready->set_reason("routing not ready");
+    }
   }
 
   if (not_ready->has_reason()) {
