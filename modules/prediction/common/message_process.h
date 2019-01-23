@@ -34,6 +34,8 @@ class MessageProcess {
  public:
   MessageProcess() = delete;
 
+  static bool Init();
+
   static void OnPerception(
       const perception::PerceptionObstacles &perception_obstacles,
       PredictionObstacles* const prediction_obstacles);
@@ -42,6 +44,8 @@ class MessageProcess {
       const localization::LocalizationEstimate &localization);
 
   static void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+
+  static void ProcessOfflineData(const std::string& record_filename);
 };
 
 }  // namespace prediction
