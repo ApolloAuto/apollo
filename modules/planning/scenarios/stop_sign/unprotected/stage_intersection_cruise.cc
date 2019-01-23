@@ -52,16 +52,10 @@ Stage::StageStatus StageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along referenceline
-  std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it =
-      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == stop_sign_overlap_id;
-                   });
-  if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
+  // check if the stop_sign is still along reference_line
+  std::string stop_sign_overlap_id =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  if (CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
 
@@ -69,7 +63,9 @@ Stage::StageStatus StageIntersectionCruise::Process(
   // TODO(all): update when pnc-junction is ready
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  if (adc_back_edge_s - stop_sign_overlap_it->end_s > kIntersectionLength) {
+  const double distance_adc_pass_stop_sign = adc_back_edge_s -
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
+  if (distance_adc_pass_stop_sign > kIntersectionLength) {
     return FinishStage();
   }
 
