@@ -96,10 +96,13 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
     return true;
   }
 
+  ADEBUG << "read next chunk.";
   if (ReadNextChunk(begin_time, end_time)) {
+    ADEBUG << "read chunk successfully.";
     message_index_ = 0;
     return ReadMessage(message, begin_time, end_time);
   }
+  ADEBUG << "no chunk to read.";
   return false;
 }
 
