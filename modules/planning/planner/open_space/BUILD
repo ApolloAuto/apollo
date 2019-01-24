@@ -10,7 +10,7 @@ cc_library(
     hdrs = [
         "open_space_planner.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "//cyber/common:log",
         "//external:gflags",
@@ -38,6 +38,7 @@ cc_test(
     srcs = [
         "open_space_planner_test.cc",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         ":open_space_planner",
         "@gtest//:main",
