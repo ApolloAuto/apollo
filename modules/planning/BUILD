@@ -39,13 +39,13 @@ cc_library(
         "navi_planning.cc",
         "open_space_planning.cc",
         "planning_base.cc",
-        "std_planning.cc",
+        "on_lane_planning.cc",
     ],
     hdrs = [
         "navi_planning.h",
         "open_space_planning.h",
         "planning_base.h",
-        "std_planning.h",
+        "on_lane_planning.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

@@ -14,33 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#pragma once
 
-#include "modules/planning/planner/std_planner_dispatcher.h"
+#include <memory>
 
-#include "gtest/gtest.h"
-
+#include "modules/common/status/status.h"
+#include "modules/common/util/factory.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 
+/**
+ * @namespace apollo::planning
+ * @brief apollo::planning
+ */
 namespace apollo {
 namespace planning {
 
-class StdPlannerDispatcherTest : public ::testing::Test {
+/**
+ * @class planning
+ *
+ * @brief PlannerDispatcher module main class.
+ */
+class OnLanePlannerDispatcher final : public PlannerDispatcher {
  public:
-  virtual void SetUp() {}
+  OnLanePlannerDispatcher() = default;
+  virtual ~OnLanePlannerDispatcher() = default;
 
- protected:
-  std::unique_ptr<PlannerDispatcher> pd_;
+  std::unique_ptr<Planner> DispatchPlanner() override;
 };
-
-TEST_F(StdPlannerDispatcherTest, Simple) {
-  pd_.reset(new StdPlannerDispatcher());
-  pd_->Init();
-  auto planner = pd_->DispatchPlanner();
-  EXPECT_EQ(planner->Name(), "PUBLIC_ROAD");
-}
 
 }  // namespace planning
 }  // namespace apollo
