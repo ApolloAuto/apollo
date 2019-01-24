@@ -10,7 +10,7 @@ cc_library(
     hdrs = [
         "open_space_trajectory_generator.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "//modules/planning/open_space/trajectory_smoother:distance_approach_problem",
         "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",
