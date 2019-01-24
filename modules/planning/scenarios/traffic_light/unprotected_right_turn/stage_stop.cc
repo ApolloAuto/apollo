@@ -42,7 +42,7 @@ using common::time::Clock;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
-Stage::StageStatus StageStop::Process(
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
@@ -92,14 +92,15 @@ Stage::StageStatus StageStop::Process(
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageStop::FinishScenario() {
+Stage::StageStatus
+    TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
-Stage::StageStatus StageStop::FinishStage() {
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   GetContext()->creep_start_time = Clock::NowInSeconds();

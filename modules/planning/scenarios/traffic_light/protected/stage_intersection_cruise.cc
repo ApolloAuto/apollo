@@ -40,14 +40,14 @@ namespace traffic_light {
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
-Stage::StageStatus StageIntersectionCruise::Process(
+Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageIntersectionCruise plan error";
+    AERROR << "TrafficLightProtectedStageIntersectionCruise plan error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -72,7 +72,7 @@ Stage::StageStatus StageIntersectionCruise::Process(
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageIntersectionCruise::FinishStage() {
+Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::FinishStage() {
   return FinishScenario();
 }
 
