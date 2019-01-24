@@ -32,10 +32,10 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-class StageIntersectionCruise : public Stage {
+class StopSignUnprotectedStageIntersectionCruise : public Stage {
  public:
-  explicit StageIntersectionCruise(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  explicit StopSignUnprotectedStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config) : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
