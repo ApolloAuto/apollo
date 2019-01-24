@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_creep.h"
+#include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_creep.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
@@ -43,7 +43,7 @@ using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
+Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
@@ -56,7 +56,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
+    AERROR << "TrafficLightUnprotectedLeftTurnStageCreep planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -66,12 +66,6 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
     return FinishScenario();
-  }
-
-  // check on traffic light color
-  if (PlanningContext::GetScenarioInfo()->traffic_light_color ==
-      TrafficLight::GREEN) {
-    return FinishStage();
   }
 
   const double wait_time =
@@ -93,14 +87,14 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
+    AERROR << "TrafficLightUnprotectedLeftTurnStageCreep planning error";
   }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::FinishStage() {
+Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::FinishStage() {
   next_stage_ =
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
+      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
 

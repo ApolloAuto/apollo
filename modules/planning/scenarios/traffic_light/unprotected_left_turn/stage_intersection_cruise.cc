@@ -21,10 +21,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_creep.h"
+#include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_intersection_cruise.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
@@ -38,25 +37,20 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::time::Clock;
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
-using perception::TrafficLight;
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
-  ADEBUG << "stage: Creep";
+Stage::StageStatus
+    TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
+
+        const TrajectoryPoint& planning_init_point, Frame* frame) {
+  ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
-
-  scenario_config_.CopyFrom(GetContext()->scenario_config);
-
-  if (!config_.enabled()) {
-    return FinishStage();
-  }
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
+    AERROR << "TrafficLightUnprotectedLeftTurnStageIntersectionCruise "
+        << "plan error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -68,40 +62,22 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     return FinishScenario();
   }
 
-  // check on traffic light color
-  if (PlanningContext::GetScenarioInfo()->traffic_light_color ==
-      TrafficLight::GREEN) {
+  // check pass intersection
+  // TODO(all): update when pnc-junction is ready
+  constexpr double kIntersectionLength = 10.0;  // unit: m
+  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
+  const double distance_adc_pass_traffic_light = adc_back_edge_s -
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s;
+  if (distance_adc_pass_traffic_light > kIntersectionLength) {
     return FinishStage();
   }
 
-  const double wait_time =
-      Clock::NowInSeconds() - GetContext()->creep_start_time;
-  const double timeout = scenario_config_.creep_timeout();
-  auto *task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task && task->CheckCreepDone(
-      *frame, reference_line_info,
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s,
-      wait_time, timeout)) {
-    return FinishStage();
-  }
-
-  // set param for PROCEED_WITH_CAUTION_SPEED
-  dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(
-          *frame, reference_line_info,
-          PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s);
-
-  plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
-  }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::FinishStage() {
-  next_stage_ =
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
-  return Stage::FINISHED;
+Stage::StageStatus
+    TrafficLightUnprotectedLeftTurnStageIntersectionCruise::FinishStage() {
+  return FinishScenario();
 }
 
 }  // namespace traffic_light
