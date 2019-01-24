@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/std_planning.h"
-
 #include <list>
 #include <utility>
 
@@ -31,6 +29,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/on_lane_planning.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
@@ -77,7 +76,7 @@ bool IsDifferentRouting(const RoutingResponse& first,
 }
 }  // namespace
 
-StdPlanning::~StdPlanning() {
+OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
     reference_line_provider_->Stop();
   }
@@ -91,9 +90,9 @@ StdPlanning::~StdPlanning() {
   EgoInfo::Instance()->Clear();
 }
 
-std::string StdPlanning::Name() const { return "std_planning"; }
+std::string OnLanePlanning::Name() const { return "on_lane_planning"; }
 
-Status StdPlanning::Init(const PlanningConfig& config) {
+Status OnLanePlanning::Init(const PlanningConfig& config) {
   config_ = config;
   if (!CheckPlanningConfig(config_)) {
     return Status(ErrorCode::PLANNING_ERROR,
@@ -132,7 +131,7 @@ Status StdPlanning::Init(const PlanningConfig& config) {
   return planner_->Init(config_);
 }
 
-Status StdPlanning::InitFrame(const uint32_t sequence_num,
+Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
                               const TrajectoryPoint& planning_start_point,
                               const double start_time,
                               const VehicleState& vehicle_state,
@@ -180,7 +179,7 @@ Status StdPlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-void StdPlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
+void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
 
   const auto& vehicle_state = VehicleStateProvider::Instance()->vehicle_state();
@@ -202,7 +201,7 @@ void StdPlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   }
 }
 
-void StdPlanning::RunOnce(const LocalView& local_view,
+void OnLanePlanning::RunOnce(const LocalView& local_view,
                           ADCTrajectory* const trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
@@ -375,7 +374,7 @@ void StdPlanning::RunOnce(const LocalView& local_view,
   FrameHistory::Instance()->Add(n, std::move(frame_));
 }
 
-void StdPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
+void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
   if (!FLAGS_enable_record_debug) {
     return;
   }
@@ -391,7 +390,7 @@ void StdPlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
   }
 }
 
-Status StdPlanning::Plan(
+Status OnLanePlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
     ADCTrajectory* const trajectory_pb) {
@@ -486,7 +485,7 @@ Status StdPlanning::Plan(
   return status;
 }
 
-bool StdPlanning::CheckPlanningConfig(const PlanningConfig& config) {
+bool OnLanePlanning::CheckPlanningConfig(const PlanningConfig& config) {
   if (!config.has_standard_planning_config()) {
     return false;
   }

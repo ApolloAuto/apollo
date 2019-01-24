@@ -24,7 +24,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/navi_planning.h"
 #include "modules/planning/open_space_planning.h"
-#include "modules/planning/std_planning.h"
+#include "modules/planning/on_lane_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -43,7 +43,7 @@ bool PlanningComponent::Init() {
     if (FLAGS_use_navigation_mode) {
       planning_base_ = std::make_unique<NaviPlanning>();
     } else {
-      planning_base_ = std::make_unique<StdPlanning>();
+      planning_base_ = std::make_unique<OnLanePlanning>();
     }
   }
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
