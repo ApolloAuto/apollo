@@ -74,7 +74,7 @@ void LaneScanningEvaluator::Evaluate(
   std::vector<double> labels = {0.0};
   if (FLAGS_prediction_offline_dataforlearning) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         labels);
+                                         "cruise");
     ADEBUG << "Save extracted features for learning locally.";
   } else {
     // TODO(jiacheng): once the model is trained, implement this online part.
