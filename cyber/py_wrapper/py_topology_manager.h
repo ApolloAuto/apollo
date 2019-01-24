@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef PYTHON_WRAPPER_PY_CHANNEL_H_
-#define PYTHON_WRAPPER_PY_CHANNEL_H_
+#ifndef PYTHON_WRAPPER_PY_TOPOLOGY_MANAGER_H_
+#define PYTHON_WRAPPER_PY_TOPOLOGY_MANAGER_H_
 
 #include <iostream>
 #include <string>
-
+#include <memory>
+#include <vector>
+#include <algorithm>
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/message/protobuf_factory.h"
@@ -31,31 +33,26 @@ namespace cyber {
 
 class PyNodeManager {
  public:
-  PyNodeManager()
-  {
+  PyNodeManager() {
      topology_ = apollo::cyber::service_discovery::TopologyManager::Instance();
      sleep(2);
      node_manager_ = topology_->node_manager();
      channel_manager_ = topology_->channel_manager();
   }
 
-  int hasNode(const std::string& node_name)
-  {
+  int hasNode(const std::string& node_name) {
     return node_manager_->HasNode(node_name);
   }
 
-  bool getNodes()
-  {
+  bool getNodes() {
     std::vector<RoleAttributes> nodes;
     topology_->node_manager()->GetNodes(&nodes);
-    if (nodes.empty())
-    {
+    if (nodes.empty()) {
         AINFO << "no node found.";
         return 0;
     }
     std::sort(nodes.begin(), nodes.end(),
-            [](const RoleAttributes& na, const RoleAttributes& nb) -> bool
-            {
+            [](const RoleAttributes& na, const RoleAttributes& nb) -> bool {
               if (na.node_name().compare(nb.node_name()) <= 0) {
                 return true;
               } else {
@@ -63,78 +60,79 @@ class PyNodeManager {
               }
             });
     std::cout << nodes.size() << std::endl;
-    for (auto& node : nodes)
-    {
+    for (auto& node : nodes) {
         AINFO << "node list info get successful:" + node.node_name();
     }
     return true;
   }
 
-  const char *connectChar(const char* temp1, const char* temp2)
-  {
+  const char *connectChar(const char* temp1, const char* temp2) {
     const char* result = NULL;
     std::string temp = std::string(temp1) + std::string(temp2);
     result = temp.c_str();
     return result;
   }
 
-  PyObject* showNodeInfo(const std::string& _node)
-  {
+  PyObject* showNodeInfo(const std::string& _node) {
       bool notFound = true;
       PyObject *pyobj_list = PyList_New(0);
-      if (node_manager_->HasNode(_node))
-      {
+      if (node_manager_->HasNode(_node)) {
         std::vector<RoleAttributes> nodes;
         node_manager_->GetNodes(&nodes);
         std::stringstream temps;
-        for (auto& node : nodes)
-        {
-          if (node.node_name() == _node)
-          {
-            PyList_Append(pyobj_list, Py_BuildValue("s", connectChar("nodename:  ", node.node_name().c_str())));
+        for (auto& node : nodes) {
+          if (node.node_name() == _node) {
+            PyList_Append(pyobj_list, Py_BuildValue("s",
+                connectChar("nodename:  ", node.node_name().c_str())));
             temps << node.process_id();
-            PyList_Append(pyobj_list, Py_BuildValue("s", connectChar("processid: ", temps.str().c_str())));
-            PyList_Append(pyobj_list, Py_BuildValue("s", connectChar("hostname:  ", node.host_name().c_str())));
+            PyList_Append(pyobj_list, Py_BuildValue("s",
+                    connectChar("processid: ", temps.str().c_str())));
+            PyList_Append(pyobj_list, Py_BuildValue("s",
+                    connectChar("hostname:  ", node.host_name().c_str())));
             std::vector<RoleAttributes> readers;
             channel_manager_->GetReadersOfNode(_node, &readers);
-            PyList_Append(pyobj_list, Py_BuildValue("s", "[Reading Channels]:  "));
-            for (auto& reader : readers)
-            {
-              if (reader.channel_name() == "param_event")
-              {
+            PyList_Append(pyobj_list, Py_BuildValue("s",
+                    "[Reading Channels]:  "));
+            for (auto& reader : readers) {
+              if (reader.channel_name() == "param_event") {
                 continue;
               }
-              PyList_Append(pyobj_list, Py_BuildValue("s", connectChar("    ", reader.channel_name().c_str())));
+              PyList_Append(pyobj_list, Py_BuildValue("s",
+                    connectChar("    ", reader.channel_name().c_str())));
             }
             std::cout << std::endl;
-            PyList_Append(pyobj_list, Py_BuildValue("s", "[Writing Channels]:  "));
+            PyList_Append(pyobj_list, Py_BuildValue("s",
+                    "[Writing Channels]:  "));
             std::vector<RoleAttributes> writers;
             channel_manager_->GetWritersOfNode(_node, &writers);
-            for (auto& writer : writers)
-            {
-              if (writer.channel_name() == "param_event")
-              {
+            for (auto& writer : writers) {
+              if (writer.channel_name() == "param_event") {
                 continue;
               }
-              PyList_Append(pyobj_list, Py_BuildValue("s", connectChar("    ", writer.channel_name().c_str())));
+              PyList_Append(pyobj_list, Py_BuildValue("s",
+                    connectChar("    ", writer.channel_name().c_str())));
             }
             std::cout << std::endl;
             notFound = false;
           }
         }
       }
-    if (notFound)
-    {
-        PyList_Append(pyobj_list, Py_BuildValue("s", connectChar("Node cannot be found: ", _node.c_str())));
+    if (notFound) {
+        PyList_Append(pyobj_list, Py_BuildValue("s",
+                    connectChar("Node cannot be found: ", _node.c_str())));
     }
     return pyobj_list;
   }
 
-  private:
-  apollo::cyber::service_discovery::TopologyManager* topology_ = nullptr;
-  std::shared_ptr<apollo::cyber::service_discovery::NodeManager> node_manager_;
-  std::shared_ptr<apollo::cyber::service_discovery::ChannelManager> channel_manager_;
+ private:
+    apollo::cyber::service_discovery::TopologyManager* topology_ = nullptr;
+    std::shared_ptr<apollo::cyber::service_discovery::NodeManager>
+                                                            node_manager_;
+    std::shared_ptr<apollo::cyber::service_discovery::ChannelManager>
+                                                            channel_manager_;
 };
-}
-}
-#endif
+
+}   // namespace cyber
+}   // namespace apollo
+
+#endif  // PYTHON_WRAPPER_PY_TOPOLOGY_MANAGER_H_

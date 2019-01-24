@@ -23,82 +23,78 @@
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
 using apollo::cyber::PyNodeManager;
 template <typename T>
-    T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
-      T obj_ptr = (T)PyCapsule_GetPointer(pyobj, type_ptr.c_str());
-      if (obj_ptr == nullptr) {
-        AINFO << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
-      }
-      return obj_ptr;
-    }
+T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
+  T obj_ptr = (T)PyCapsule_GetPointer(pyobj, type_ptr.c_str());
+  if (obj_ptr == nullptr) {
+    AINFO << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
+  }
+  return obj_ptr;
+}
 
-    PyObject *cyber_new_Node_Manager(PyObject *self, PyObject *args) {
-      PyNodeManager *pyobj_node_manager = new PyNodeManager();
-      PyObject *py_node_manager = PyCapsule_New(pyobj_node_manager, "apollo_cyber_node_manager", NULL);
-      return py_node_manager;
-    }
+PyObject *cyber_new_Node_Manager(PyObject *self, PyObject *args) {
+  PyNodeManager *pyobj_node_manager = new PyNodeManager();
+  PyObject *py_node_manager;
+  py_node_manager = PyCapsule_New(pyobj_node_manager,
+                            "apollo_cyber_node_manager", NULL);
+  return py_node_manager;
+}
 
-    static PyObject *cyber_Py_HasNode(PyObject *self, PyObject *args)
-    {
-        char *node_name = nullptr;
-        PyObject *py_node_manager_obj = 0;
-        Py_ssize_t len = 0;
-        PyNodeManager *py_node_manager = 0;
-        if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_HasNode"),
-                             &py_node_manager_obj, &node_name, &len)) {
-        AINFO << "cyber_Py_HasNode:cyber_Py_HasNode failed!";
+static PyObject *cyber_Py_HasNode(PyObject *self, PyObject *args) {
+    char *node_name = nullptr;
+    PyObject *py_node_manager_obj = 0;
+    Py_ssize_t len = 0;
+    PyNodeManager *py_node_manager = 0;
+    if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_HasNode"),
+                         &py_node_manager_obj, &node_name, &len)) {
+    AINFO << "cyber_Py_HasNode:cyber_Py_HasNode failed!";
+    return Py_None;
+    }
+    std::string data_str(node_name, len);
+    py_node_manager = reinterpret_cast<PyNodeManager *>(
+        PyCapsule_GetPointer(py_node_manager_obj, "apollo_cyber_node_manager"));
+    bool hasNode = py_node_manager->hasNode(data_str);
+    if (hasNode) {
+        Py_RETURN_TRUE;
+    } else {
+        Py_RETURN_FALSE;
+    }
+}
+
+static PyObject *cyber_Py_GetNodes(PyObject *self, PyObject *args) {
+    PyObject *py_node_manager_obj = 0;
+    PyNodeManager *py_node_manager = 0;
+    if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_Py_GetNodes"),
+                         &py_node_manager_obj)) {
+        AINFO << "cyber_Py_GetNodes:cyber_Py_GetNodes failed!";
         return Py_None;
-        }
-       std::string data_str(node_name, len);
-       py_node_manager = (PyNodeManager *)PyCapsule_GetPointer(py_node_manager_obj,
-                                                          "apollo_cyber_node_manager");
-       bool hasNode = py_node_manager->hasNode(data_str);
-       if (hasNode) {
-            Py_RETURN_TRUE;
-       } else {
-            Py_RETURN_FALSE;
-       }
     }
+    py_node_manager = reinterpret_cast<PyNodeManager *>(PyCapsule_GetPointer(
+                    py_node_manager_obj, "apollo_cyber_node_manager"));
+    bool getNodes = py_node_manager->getNodes();
+    if (getNodes) {
+     Py_RETURN_TRUE;
+    } else {
+     Py_RETURN_FALSE;
+    }
+}
 
-    static PyObject *cyber_Py_GetNodes(PyObject *self, PyObject *args)
-    {
-        PyObject *py_node_manager_obj = 0;
-        PyNodeManager *py_node_manager = 0;
-        if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_Py_GetNodes"),
-                             &py_node_manager_obj))
-        {
-            AINFO << "cyber_Py_GetNodes:cyber_Py_GetNodes failed!";
-            return Py_None;
-        }
-        py_node_manager = (PyNodeManager *)PyCapsule_GetPointer(py_node_manager_obj,
-                                                          "apollo_cyber_node_manager");
-        bool getNodes = py_node_manager->getNodes();
-        if (getNodes) {
-         Py_RETURN_TRUE;
-        } else
-        {
-         Py_RETURN_FALSE;
-        }
+static PyObject *cyber_Py_ShowNodeInfo(PyObject *self, PyObject *args) {
+    char *node_name = nullptr;
+    PyObject *py_node_manager_obj = 0;
+    Py_ssize_t len = 0;
+    PyNodeManager *py_node_manager = 0;
+    if (!PyArg_ParseTuple(args, const_cast<char *>
+    ("Os#:cyber_Py_ShowNodeInfo"), &py_node_manager_obj, &node_name, &len)) {
+        AINFO << "cyber_Py_ShowNodeInfo:cyber_Py_ShowNodeInfo failed!";
+        return Py_None;
     }
-
-    static PyObject *cyber_Py_ShowNodeInfo(PyObject *self, PyObject *args)
-    {
-        char *node_name = nullptr;
-        PyObject *py_node_manager_obj = 0;
-        Py_ssize_t len = 0;
-        PyNodeManager *py_node_manager = 0;
-        if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_ShowNodeInfo"),
-                             &py_node_manager_obj, &node_name, &len))
-        {
-            AINFO << "cyber_Py_ShowNodeInfo:cyber_Py_ShowNodeInfo failed!";
-            return Py_None;
-        }
-       std::string data_str(node_name, len);
-       py_node_manager = (PyNodeManager *)PyCapsule_GetPointer(py_node_manager_obj,
-                                                          "apollo_cyber_node_manager");
-       PyObject *showNodeInfo = py_node_manager->showNodeInfo(data_str);
-       std::cout << "show node info has finished";
-       return showNodeInfo;
-    }
+    std::string data_str(node_name, len);
+    py_node_manager = reinterpret_cast<PyNodeManager *>(PyCapsule_GetPointer(
+                py_node_manager_obj, "apollo_cyber_node_manager"));
+    PyObject *showNodeInfo = py_node_manager->showNodeInfo(data_str);
+    std::cout << "show node info has finished";
+    return showNodeInfo;
+}
 /////////////////////////////////////////////////////////////////////
 //// global for whole page, init module
 /////////////////////////////////////////////////////////////////////
