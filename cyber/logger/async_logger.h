@@ -102,6 +102,8 @@ class AsyncLogger : public google::base::Logger {
   // logged data may not have been flushed to disk yet.
   uint32_t LogSize() override;
 
+  const std::thread* LogThread() const { return &thread_; }
+
  private:
   // A buffered message.
   //

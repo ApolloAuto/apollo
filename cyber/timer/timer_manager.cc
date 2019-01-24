@@ -41,7 +41,7 @@ void TimerManager::Start() {
     ADEBUG << "TimerManager->Start() ok";
     running_ = true;
     scheduler_thread_ = std::thread([this]() { this->ThreadFuncImpl(); });
-    scheduler::Instance()->SetInnerThreadAttr(&scheduler_thread_, "timer");
+    scheduler::Instance()->SetInnerThreadAttr("timer", &scheduler_thread_);
   }
 }
 

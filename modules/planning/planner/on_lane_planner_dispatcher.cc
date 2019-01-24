@@ -14,33 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#include "modules/common/util/file.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/planner/on_lane_planner_dispatcher.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
-#include <memory>
-
-#include "modules/common/status/status.h"
-#include "modules/common/util/factory.h"
-#include "modules/planning/planner/planner_dispatcher.h"
-
-/**
- * @namespace apollo::planning
- * @brief apollo::planning
- */
 namespace apollo {
 namespace planning {
 
-/**
- * @class planning
- *
- * @brief PlannerDispatcher module main class.
- */
-class StdPlannerDispatcher final : public PlannerDispatcher {
- public:
-  StdPlannerDispatcher() = default;
-  virtual ~StdPlannerDispatcher() = default;
-
-  std::unique_ptr<Planner> DispatchPlanner() override;
-};
+std::unique_ptr<Planner> OnLanePlannerDispatcher::DispatchPlanner() {
+  PlanningConfig planning_config;
+  apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
+                                         &planning_config);
+  if (FLAGS_open_space_planner_switchable) {
+    return planner_factory_.CreateObject(
+        planning_config.standard_planning_config().planner_type(1));
+  }
+  return planner_factory_.CreateObject(
+      planning_config.standard_planning_config().planner_type(0));
+}
 
 }  // namespace planning
 }  // namespace apollo
