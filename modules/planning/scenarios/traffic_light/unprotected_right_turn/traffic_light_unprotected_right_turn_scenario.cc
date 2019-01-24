@@ -81,17 +81,18 @@ void TrafficLightUnprotectedRightTurnScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageStop(config);
+        return new TrafficLightUnprotectedRightTurnStageStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageCreep(config);
+        return new TrafficLightUnprotectedRightTurnStageCreep(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageIntersectionCruise(config);
+        return new TrafficLightUnprotectedRightTurnStageIntersectionCruise(
+            config);
       });
 }
 

@@ -42,7 +42,7 @@ using common::time::Clock;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
-Stage::StageStatus StageStop::Process(
+Stage::StageStatus TrafficLightProtectedStageStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
@@ -81,14 +81,14 @@ Stage::StageStatus StageStop::Process(
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageStop::FinishScenario() {
+Stage::StageStatus TrafficLightProtectedStageStop::FinishScenario() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
-Stage::StageStatus StageStop::FinishStage() {
+Stage::StageStatus TrafficLightProtectedStageStop::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE;
