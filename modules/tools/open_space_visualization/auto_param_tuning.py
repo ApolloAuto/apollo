@@ -26,12 +26,12 @@ import common.proto_utils as proto_utils
 from modules.planning.proto import planner_open_space_config_pb2
 
 
-random.seed(6666)
-rand_num = 1000
+random.seed(99999)
+rand_num = 100
 original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
 optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
-tunning_object = "coarse_trajectory"
-# tunning_object = "smooth_trajectory"
+# tunning_object = "coarse_trajectory"
+tunning_object = "smooth_trajectory"
 
 
 def load_open_space_protobuf(filename):
@@ -116,8 +116,12 @@ def ParamEvaluation(params, tunning_object):
             return planning_time
     elif tunning_object == "smooth_trajectory":
         visualize_flag = False
-        success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out = distance_approach_visualizer.SmoothTrajectory(
+        success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, planning_time = distance_approach_visualizer.SmoothTrajectory(
             visualize_flag)
+        if not success:
+            return float('inf')
+        else:
+            return planning_time
 
 
 def GetOptimalParams(params_lists, key_to_evaluations):
