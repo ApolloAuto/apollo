@@ -4,7 +4,7 @@ model_param {
   weight_file: "caffe.md"
   anchors_file: "anchors.txt"
   types_file: "types.txt"
-  feature_file: "unknown.pt"
+  feature_file: "feature.pt"
   offset_ratio: 0.288889
   confidence_threshold: 0.5
   min_2d_height: 10
