@@ -71,15 +71,16 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
-      hdmap::MakeMapId(stop_sign_overlap_id));
-  if (!stop_sign_) {
+  hdmap::StopSignInfoConstPtr stop_sign =
+      HDMapUtil::BaseMap().GetStopSignById(
+          hdmap::MakeMapId(stop_sign_overlap_id));
+  if (!stop_sign) {
     AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
   }
   context_.watch_vehicles.clear();
 
-  GetAssociatedLanes(*stop_sign_);
+  GetAssociatedLanes(*stop_sign);
 
   init_ = true;
 }

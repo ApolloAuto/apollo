@@ -37,7 +37,6 @@ namespace traffic_light {
 // stage context
 struct TrafficLightUnprotectedRightTurnContext {
   ScenarioTrafficLightUnprotectedRightTurnConfig scenario_config;
-  std::string traffic_light_id;
   double stop_start_time = 0.0;
   double creep_start_time;
 };
@@ -62,17 +61,14 @@ class TrafficLightUnprotectedRightTurnScenario : public Scenario {
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
-
- private:
-  bool init_ = false;
-  TrafficLightUnprotectedRightTurnContext context_;
-
-  hdmap::SignalInfoConstPtr traffic_light_ = nullptr;
-
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
+
+ private:
+  bool init_ = false;
+  TrafficLightUnprotectedRightTurnContext context_;
 };
 
 }  // namespace traffic_light

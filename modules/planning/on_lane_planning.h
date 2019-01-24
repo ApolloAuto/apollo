@@ -21,9 +21,9 @@
 #include <vector>
 
 #include "modules/planning/common/frame.h"
-#include "modules/planning/planner/std_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/tasks/smoothers/smoother.h"
+#include "planner/on_lane_planner_dispatcher.h"
 
 /**
  * @namespace apollo::planning
@@ -38,12 +38,12 @@ namespace planning {
  * @brief Planning module main class. It processes GPS and IMU as input,
  * to generate planning info.
  */
-class StdPlanning : public PlanningBase {
+class OnLanePlanning : public PlanningBase {
  public:
-  StdPlanning() {
-    planner_dispatcher_ = std::make_unique<StdPlannerDispatcher>();
+  OnLanePlanning() {
+    planner_dispatcher_ = std::make_unique<OnLanePlannerDispatcher>();
   }
-  virtual ~StdPlanning();
+  virtual ~OnLanePlanning();
 
   /**
    * @brief Planning name.

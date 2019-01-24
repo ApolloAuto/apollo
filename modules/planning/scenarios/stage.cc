@@ -126,6 +126,19 @@ bool Stage::CheckStopSignDone(
   return (stop_sign_overlap_it == stop_sign_overlaps.end());
 }
 
+bool Stage::CheckTrafficLightDone(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& traffic_light_overlap_id) {
+  const std::vector<PathOverlap>& traffic_light_overlaps =
+      reference_line_info.reference_line().map_path().signal_overlaps();
+  auto traffic_light_overlap_it =
+      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
+                   [&traffic_light_overlap_id](const PathOverlap& overlap) {
+                     return overlap.object_id == traffic_light_overlap_id;
+                   });
+  return (traffic_light_overlap_it == traffic_light_overlaps.end());
+}
+
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

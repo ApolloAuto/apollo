@@ -64,8 +64,8 @@ class Scheduler {
   uint32_t TaskPoolSize() { return task_pool_size_; }
 
   virtual bool RemoveTask(const std::string& name) = 0;
-  virtual void SetInnerThreadAttr(const std::thread* thr,
-                                  const std::string& name) {}
+  virtual void SetInnerThreadAttr(const std::string& name,
+                                  std::thread* thr) {}
 
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>&) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
