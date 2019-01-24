@@ -31,7 +31,7 @@ cc_library(
         "planner_dispatcher.h",
         "on_lane_planner_dispatcher.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "//modules/common/status",
         "//modules/common/util",
