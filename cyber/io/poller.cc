@@ -151,7 +151,7 @@ bool Poller::Init() {
 
   is_shutdown_.exchange(false);
   thread_ = std::thread(&Poller::ThreadFunc, this);
-  scheduler::Instance()->SetInnerThreadAttr(&thread_, "io_poller");
+  scheduler::Instance()->SetInnerThreadAttr("io_poller", &thread_);
   return true;
 }
 
