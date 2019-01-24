@@ -48,7 +48,7 @@ using perception::PerceptionObstacle;
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
-Stage::StageStatus StageStop::Process(
+Stage::StageStatus StopSignUnprotectedStageStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
@@ -135,7 +135,7 @@ Stage::StageStatus StageStop::Process(
 /**
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
-int StageStop::RemoveWatchVehicle(
+int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     const PathDecision& path_decision,
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
@@ -212,7 +212,7 @@ int StageStop::RemoveWatchVehicle(
   return 0;
 }
 
-Stage::StageStatus StageStop::FinishScenario() {
+Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
 
@@ -220,7 +220,7 @@ Stage::StageStatus StageStop::FinishScenario() {
   return Stage::FINISHED;
 }
 
-Stage::StageStatus StageStop::FinishStage() {
+Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();

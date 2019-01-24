@@ -92,22 +92,22 @@ void StopSignUnprotectedScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StagePreStop(config);
+        return new StopSignUnprotectedStagePreStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageStop(config);
+        return new StopSignUnprotectedStageStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageCreep(config);
+        return new StopSignUnprotectedStageCreep(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageIntersectionCruise(config);
+        return new StopSignUnprotectedStageIntersectionCruise(config);
       });
 }
 
