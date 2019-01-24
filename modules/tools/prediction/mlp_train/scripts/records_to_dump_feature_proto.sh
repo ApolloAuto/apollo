@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2018 The Apollo Authors. All Rights Reserved.
+# Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ sudo mkdir -p ${TARGET_DIR}
 if [ -z "$3" ]; then
     MAP_DIR="sunnyvale_with_two_offices"
 else
-	MAP_DIR=$3
+    MAP_DIR=$3
 fi
 
 ./bazel-bin/modules/prediction/pipeline/records_to_offline_data \
