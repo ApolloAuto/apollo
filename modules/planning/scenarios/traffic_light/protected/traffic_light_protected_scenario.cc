@@ -80,12 +80,12 @@ void TrafficLightProtectedScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageStop(config);
+        return new TrafficLightProtectedStageStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageIntersectionCruise(config);
+        return new TrafficLightProtectedStageIntersectionCruise(config);
       });
 }
 

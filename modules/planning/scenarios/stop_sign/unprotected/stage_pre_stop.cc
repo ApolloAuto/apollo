@@ -49,7 +49,7 @@ using perception::PerceptionObstacle;
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
-Stage::StageStatus StagePreStop::Process(
+Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: PreStop";
   CHECK_NOTNULL(frame);
@@ -58,7 +58,7 @@ Stage::StageStatus StagePreStop::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StagePreStop planning error";
+    AERROR << "StopSignUnprotectedStagePreStop planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -123,8 +123,9 @@ Stage::StageStatus StagePreStop::Process(
 /**
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
-int StagePreStop::AddWatchVehicle(const Obstacle& obstacle,
-                                  StopSignLaneVehicles* watch_vehicles) {
+int StopSignUnprotectedStagePreStop::AddWatchVehicle(
+    const Obstacle& obstacle,
+    StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle = obstacle.Perception();
@@ -211,7 +212,7 @@ int StagePreStop::AddWatchVehicle(const Obstacle& obstacle,
 /**
  * @brief: check valid stop_sign stop
  */
-bool StagePreStop::CheckADCStop(
+bool StopSignUnprotectedStagePreStop::CheckADCStop(
     const ReferenceLineInfo& reference_line_info) {
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
@@ -242,7 +243,7 @@ bool StagePreStop::CheckADCStop(
   return true;
 }
 
-Stage::StageStatus StagePreStop::FinishStage() {
+Stage::StageStatus StopSignUnprotectedStagePreStop::FinishStage() {
   GetContext()->stop_start_time = Clock::NowInSeconds();
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP;
 
