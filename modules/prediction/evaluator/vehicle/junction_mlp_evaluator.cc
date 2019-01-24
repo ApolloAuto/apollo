@@ -73,9 +73,12 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   std::vector<double> feature_values;
   ExtractFeatureValues(obstacle_ptr, &feature_values);
-  // Not compute probability on offline_mode
+  // Insert features to DataForLearning
   if (FLAGS_prediction_offline_mode) {
-    return;
+    FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
+                                         "junction");
+    ADEBUG << "Save extracted features for learning locally.";
+    return; // Skip Compute probability for offline mode
   }
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
