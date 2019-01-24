@@ -32,10 +32,10 @@ namespace traffic_light {
 
 struct TrafficLightProtectedContext;
 
-class StageIntersectionCruise : public Stage {
+class TrafficLightProtectedStageIntersectionCruise : public Stage {
  public:
-  explicit StageIntersectionCruise(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
+  explicit TrafficLightProtectedStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config) : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
